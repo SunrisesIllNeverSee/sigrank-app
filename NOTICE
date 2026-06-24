@@ -1,0 +1,8 @@
+SigRank
+Copyright (c) 2026 Deric J. McHenry / Ello Cello LLC
+
+Seed leaderboard data and operator display names in the wider-field comparison
+board are derived from tokscale.ai's public leaderboard (https://tokscale.ai),
+published by operators. tokscale.ai measures token volume; SigRank measures
+token-architecture efficiency — complementary systems. tokscale.ai is credited
+as the source wherever that data is shown.
