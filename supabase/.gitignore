@@ -1,0 +1,8 @@
+# Supabase CLI local state — never commit (machine-local, collides across sessions)
+.branches
+.temp
+
+# dotenvx / local secrets
+.env.keys
+.env.local
+.env.*.local

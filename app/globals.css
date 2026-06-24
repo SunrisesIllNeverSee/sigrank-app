@@ -1,0 +1,417 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * SigRank theme system — sharp / modern (Vercel · Railway), swappable.
+ *
+ * Single source of truth: every color is an "R G B" channel triple so Tailwind
+ * alpha modifiers (bg-gold/10, border-bg-border/40) keep working via
+ * rgb(var(--token) / <alpha-value>). The JS tokens in components/sigrank/tokens.ts
+ * resolve to the SAME vars, so inline-styled components theme-swap too.
+ *
+ * Swap themes by setting data-theme on <html>: "carbon" (default dark),
+ * "paper" (light), "railway" (violet dark). Carbon also backs :root so SSR
+ * paints correctly before the no-flash script runs.
+ */
+
+:root {
+  /* ── Shared identity colors (constant across themes) ───────────────────── */
+  --class-transmitter: 245 166 35;
+  --class-archplus: 96 165 250;
+  --class-arch: 59 130 246;
+  --class-power: 167 139 250;
+  --class-base: 148 163 184;
+  --class-seeker: 45 212 160;
+  --class-refiner: 244 116 72;
+  --class-bearer: 129 140 248;
+  --class-igniter: 100 116 139;
+
+  --platform-chatgpt: 16 163 127;
+  --platform-claude: 217 119 6;
+  --platform-pi: 99 102 241;
+  --platform-gemini: 66 133 244;
+
+  --rank-1: 245 166 35;
+  --rank-2: 96 165 250;
+  --rank-3: 129 140 248;
+
+  --bar-high: 96 165 250;
+  --bar-mid: 45 212 160;
+  --bar-low: 39 39 42;
+}
+
+/* ── Carbon — default dark (Vercel-black, hairline borders, no glow) ──────── */
+:root,
+[data-theme='carbon'] {
+  /* LOCKED THEME — exact values from _HEADER_LOCKED.html so every page that uses
+     these tokens inherits the chart's foundation theme (bone-white on warm black,
+     gold accent). Repointed 2026-06-18. */
+  color-scheme: dark;
+  --bg-base: 13 11 8;          /* #0d0b08 */
+  --bg-surface: 21 18 12;      /* #15120c */
+  --bg-elevated: 34 29 20;     /* #221d14 (pill/elevated fill) */
+  --bg-hover: 42 36 24;
+  --bg-border: 51 45 32;       /* #332d20 */
+  --bg-border-subtle: 36 31 22;/* #241f16 (table row line) */
+
+  --text-primary: 233 227 213; /* #e9e3d5 bone */
+  --text-secondary: 196 186 165; /* lifted from 178/168/148 — readability (owner 2026-06-19) */
+  --text-muted: 158 147 124;   /* lifted from 125/116/97 — was too dark on carbon */
+  --text-dim: 122 112 90;      /* lifted from 90/82/64 — passes ~4:1 on #0d0b08 */
+
+  --gold: 196 146 58;          /* #c4923a brand accent */
+  --accent: 156 196 255;       /* cascade-blue, harmonized with locked palette */
+
+  --rank-low: 167 139 250; /* #a78bfa — ranks 4–10 trophy-purple (dark) */
+
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --ring: 196 146 58;
+}
+
+/* ── Paper — light (Vercel-white) ─────────────────────────────────────────── */
+[data-theme='paper'] {
+  color-scheme: light;
+  --bg-base: 255 255 255;
+  --bg-surface: 250 250 250;
+  --bg-elevated: 244 244 245;
+  --bg-hover: 237 237 240;
+  --bg-border: 228 228 231;
+  --bg-border-subtle: 239 239 241;
+
+  --text-primary: 9 9 11;
+  --text-secondary: 82 82 91;
+  --text-muted: 113 113 122;
+  --text-dim: 161 161 170;
+
+  --gold: 180 83 9;         /* amber-700, readable on white */
+  --accent: 29 78 216;      /* blue-700 */
+
+  --bar-low: 228 228 231;
+  --rank-low: 124 58 237; /* #7c3aed — ranks 4–10 trophy-purple (light) */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  --ring: 180 83 9;
+}
+
+/* ── Railway — violet dark ────────────────────────────────────────────────── */
+[data-theme='railway'] {
+  color-scheme: dark;
+  --bg-base: 13 11 20;
+  --bg-surface: 21 18 31;
+  --bg-elevated: 28 24 41;
+  --bg-hover: 37 31 56;
+  --bg-border: 47 40 68;
+  --bg-border-subtle: 30 26 46;
+
+  --text-primary: 244 242 251;
+  --text-secondary: 190 181 214; /* lifted from 169/159/196 — readability (owner 2026-06-19) */
+  --text-muted: 152 141 184;   /* lifted from 122/111/153 — was too dark on dark violet */
+  --text-dim: 116 105 146;     /* lifted from 77/68/102 — passes ~4:1 on #0d0b14 */
+
+  --gold: 167 139 250;      /* brand accent becomes violet in this theme */
+  --accent: 139 92 246;
+
+  --bar-low: 47 40 68;
+  --rank-low: 167 139 250; /* #a78bfa — ranks 4–10 trophy-purple (railway) */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --ring: 167 139 250;
+}
+
+@layer base {
+  body {
+    background: rgb(var(--bg-base));
+    color: rgb(var(--text-primary));
+    /* LOCKED base size — _HEADER_LOCKED.html uses 14px/20px. The app default of
+       16px made every page render ~14% larger ("zoomed"). Match the foundation. */
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  ::selection {
+    background: rgb(var(--gold) / 0.25);
+  }
+
+  /* Hairline borders + crisp focus rings — the sharp-modern signature. */
+  *:focus-visible {
+    outline: 2px solid rgb(var(--ring) / 0.6);
+    outline-offset: 2px;
+  }
+}
+
+/* Placeholder marker: a small brand-accent superscript on placeholder values. */
+.ph {
+  display: inline-block;
+  margin-left: 2px;
+  font-size: 0.7em;
+  line-height: 1;
+  vertical-align: super;
+  color: rgb(var(--gold));
+  cursor: help;
+}
+
+/* Canonical-id superscript: mono, muted, attached to real values. */
+.canon-id {
+  margin-left: 1px;
+  font-family: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.62em;
+  line-height: 1;
+  vertical-align: super;
+  color: rgb(var(--text-muted));
+  letter-spacing: 0.02em;
+  cursor: help;
+}
+
+/* Real (verified) canonical ids render in the seeker/teal signal color. */
+.canon-id.real {
+  color: rgb(var(--class-seeker));
+}
+
+/* ── Landing cascade-header pulse ──────────────────────────────────────────
+ * Drives the travelling dash in components/home/CascadeHeader.tsx. The dash is
+ * normalized via pathLength=1, so animating stroke-dashoffset 1→0 runs one pulse
+ * the full length of the path. var(--dur)/var(--delay) are set per-stream inline.
+ */
+@keyframes cascade-pulse {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+.cascade-pulse {
+  animation: cascade-pulse var(--dur, 6s) linear var(--delay, 0s) infinite;
+}
+
+/* ── Landing rotating wordmark ─────────────────────────────────────────────
+ * Each letter of SIGRANK cycles through a small font pool on a stagger (per-
+ * letter animation-delay set inline), so the wordmark reads as alive without
+ * being chaotic. font-family swaps are stepwise (not interpolated) — the slow
+ * 8s cycle + 4 keyframe holds make each swap feel intentional. Reduced-motion
+ * locks to the base mono face.
+ */
+@keyframes wordmark-rotate {
+  0%, 18%   { font-family: var(--font-geist-mono), monospace; }
+  20%, 38%  { font-family: var(--wm-grotesk), sans-serif; }
+  40%, 58%  { font-family: var(--wm-serif), serif; }
+  60%, 78%  { font-family: var(--wm-black), sans-serif; }
+  80%, 98%  { font-family: var(--font-geist-mono), monospace; }
+  100%      { font-family: var(--font-geist-mono), monospace; }
+}
+.wordmark-letter {
+  display: inline-block;
+  animation: wordmark-rotate 8s steps(1, end) var(--wm-delay, 0s) infinite;
+}
+
+/* ── S → § swap: the leading S of SIGRANK gets a 5th rotational character.
+ * The ::before pseudo cycles through five glyphs: S across four font slots,
+ * then § on its own slot (the 5th character), then back to S. The real
+ * character is hidden with color:transparent so we never get a double image.
+ */
+@keyframes wordmark-s-char {
+  0%, 18%   { content: 'S'; }
+  20%, 38%  { content: 'S'; }
+  40%, 58%  { content: 'S'; }
+  60%, 78%  { content: 'S'; }
+  80%, 98%  { content: '§'; }
+  100%      { content: 'S'; }
+}
+.wordmark-letter-s {
+  color: transparent;
+  position: relative;
+}
+.wordmark-letter-s::before {
+  content: 'S';
+  position: absolute;
+  left: 0;
+  /* Lock to the exact gold token (not currentColor) so the S matches the other
+     letters precisely — currentColor on the pseudo rendered a faintly different
+     shade across the font-rotation keyframes (owner 2026-06-24). */
+  color: rgb(var(--gold));
+  animation: wordmark-s-char 8s steps(1, end) var(--wm-delay, 0s) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-letter {
+    animation: none;
+    font-family: var(--font-geist-mono), monospace;
+  }
+  .wordmark-letter-s {
+    color: inherit;
+  }
+  .wordmark-letter-s::before {
+    display: none;
+  }
+}
+
+/* ── Metric flip-card (landing FieldStatStrip) ─────────────────────────────────
+ * 3D auto-rotating card: front = symbol/value, back = why-it-matters. Auto-flips
+ * on a slow cycle; HOVER PAUSES (so a reader can hold a face); CLICK opens the
+ * metric page (the card is wrapped in a Link). Owner spec 2026-06-19. GPU-only;
+ * reduced-motion shows the front face statically. Each card staggers via --flip-delay.
+ */
+.flip-card {
+  perspective: 800px;
+}
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: flip-rotate 9s ease-in-out var(--flip-delay, 0s) infinite;
+}
+.flip-card:hover .flip-inner,
+.flip-card:focus-within .flip-inner {
+  animation-play-state: paused;   /* hover/focus pauses rotation */
+}
+.flip-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+@keyframes flip-rotate {
+  0%, 42%   { transform: rotateY(0deg); }
+  50%, 92%  { transform: rotateY(180deg); }
+  100%      { transform: rotateY(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner { animation: none; }
+  .flip-back { display: none; }   /* static front face only */
+}
+
+/* ── Compare page "special" treatment (CMP-SPECIAL, owner 2026-06-20) ───────────
+ * Pure-CSS staging for the head-to-head: a slow spotlight sweep behind the verdict
+ * (owner's "beam/spotlight bg" idea), a winner gold-glow pulse on the leading
+ * operator (their "Aceternity glow on #1" idea), and a grow-in for the win-tally
+ * bar + Υ figures (their "Framer grow-in" idea). All GPU-only, all
+ * reduced-motion-safe (locked static below).
+ */
+@keyframes verdict-sweep {
+  0%   { background-position: -30% 0; }
+  100% { background-position: 130% 0; }
+}
+.verdict-sweep {
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgb(var(--gold) / 0.10) 50%,
+    transparent 70%
+  );
+  background-size: 60% 100%;
+  background-repeat: no-repeat;
+  animation: verdict-sweep 9s ease-in-out infinite;
+}
+@keyframes winner-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.30), 0 0 24px -6px rgb(var(--gold) / 0.35); }
+  50%      { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.45), 0 0 40px -4px rgb(var(--gold) / 0.55); }
+}
+.winner-glow {
+  animation: winner-glow 4.5s ease-in-out infinite;
+}
+@keyframes tally-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.tally-grow {
+  transform-origin: var(--grow-origin, left);
+  animation: tally-grow 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes figure-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.figure-rise {
+  animation: figure-rise 0.7s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .verdict-sweep { animation: none; background-image: none; }
+  .winner-glow   { animation: none; box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35); }
+  .tally-grow    { animation: none; transform: scaleX(1); }
+  .figure-rise   { animation: none; opacity: 1; transform: none; }
+}
+
+/* ── Always-on gold glow (owner 2026-06-22: "glowing highlights around the boxes") ──
+ * A static gold ring + soft outer bloom for highlighting landing boxes (hero action
+ * tiles, the Get-on-the-board band + its inner tiles). `box-glow` = strong (band/
+ * section edges); `box-glow-soft` = lighter (inner tiles, so they read as nested).
+ * A slow breathing pulse makes them feel alive; locks to a static ring under
+ * reduced-motion. Opt-in (Carbon is no-glow by default). */
+@keyframes box-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35), 0 0 26px -8px rgb(var(--gold) / 0.40); }
+  50%      { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.55), 0 0 44px -6px rgb(var(--gold) / 0.60); }
+}
+.box-glow {
+  animation: box-glow-pulse 5s ease-in-out infinite;
+  border-color: rgb(var(--gold) / 0.45);
+}
+@keyframes box-glow-soft-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.22), 0 0 16px -8px rgb(var(--gold) / 0.30); }
+  50%      { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35), 0 0 26px -6px rgb(var(--gold) / 0.42); }
+}
+.box-glow-soft {
+  animation: box-glow-soft-pulse 5s ease-in-out infinite;
+  border-color: rgb(var(--gold) / 0.35);
+}
+@media (prefers-reduced-motion: reduce) {
+  .box-glow      { animation: none; box-shadow: 0 0 0 1px rgb(var(--gold) / 0.45), 0 0 30px -8px rgb(var(--gold) / 0.45); }
+  .box-glow-soft { animation: none; box-shadow: 0 0 0 1px rgb(var(--gold) / 0.30), 0 0 20px -8px rgb(var(--gold) / 0.32); }
+}
+
+/* ── Shine sweep (owner 2026-06-22: "flash fade" — premium-card glint) ──────────────
+ * A diagonal band of light sweeps across the box every few cycles, like light glinting
+ * off a card. Rendered on a ::before overlay (so it sits ABOVE the element's own
+ * background without clobbering it), clipped to the box. The host must be
+ * position:relative + overflow:hidden (the CTA tiles already are). Staggered per-tile
+ * via --shine-delay so they glint in sequence, not in unison. GPU-only (transform),
+ * reduced-motion-safe (no sweep). The sweep is mostly-idle: a quick pass, long pause. */
+@keyframes shine-sweep {
+  0%        { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  8%        { opacity: 1; }
+  22%       { transform: translateX(120%) skewX(-18deg); opacity: 0; }
+  100%      { transform: translateX(120%) skewX(-18deg); opacity: 0; }
+}
+.shine-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 85%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgb(var(--gold) / 0.30) 40%,
+    rgb(var(--text-primary) / 0.45) 50%,
+    rgb(var(--gold) / 0.30) 60%,
+    transparent
+  );
+  transform: translateX(-120%) skewX(-18deg);
+  animation: shine-sweep 6s ease-in-out infinite;
+  animation-delay: var(--shine-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .shine-sweep::before { animation: none; opacity: 0; }
+}
+
+/* ── Landing global motion pause (owner 2026-06-21) ─────────────────────────────
+ * A single manual switch that FREEZES every CSS-driven landing animation at once —
+ * the rotating wordmark, the signal-ticker marquee, the metric flip-cards, and the
+ * cascade backdrop. The <MotionPause/> client island sets
+ * `data-landing-motion="paused"` on <html>; this rule pauses (not resets) every
+ * animation so it resumes mid-cycle on play. `animation-play-state: paused` keeps
+ * the current frame, so nothing jumps. Doubles as an accessibility motion toggle.
+ */
+html[data-landing-motion='paused'] .wordmark-letter,
+html[data-landing-motion='paused'] .animate-ticker,
+html[data-landing-motion='paused'] .flip-inner,
+html[data-landing-motion='paused'] .cascade-pulse {
+  animation-play-state: paused !important;
+}
