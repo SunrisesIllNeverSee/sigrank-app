@@ -19,11 +19,17 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>
+  searchParams: Promise<{ next?: string; error?: string }>
 }) {
-  const { next } = await searchParams
+  const { next, error } = await searchParams
   const safeNext =
     typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : undefined
+  const errorMsg =
+    error === 'auth'
+      ? 'Sign-in didn’t complete — please try again, or use a different provider below.'
+      : error
+        ? 'Something went wrong signing in. Please try again.'
+        : null
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 py-12">
@@ -39,6 +45,12 @@ export default async function LoginPage({
           The leaderboard is free to browse without an account.
         </p>
       </header>
+
+      {errorMsg && (
+        <p className="rounded-md border border-bg-border bg-bg-base/50 px-3 py-2.5 text-center font-sans text-xs text-text-secondary">
+          {errorMsg}
+        </p>
+      )}
 
       <LoginButtons next={safeNext} />
 
