@@ -25,6 +25,7 @@ const EMPTY: ProfileInitial = {
   bio: '',
   links: {},
   operator_domains: [],
+  avatar_url: '',
 }
 
 export default async function EditProfilePage() {
@@ -37,7 +38,7 @@ export default async function EditProfilePage() {
   if (svc) {
     const { data } = await svc
       .from('operators')
-      .select('display_name, handle, location, bio, links, operator_domains')
+      .select('display_name, handle, location, bio, links, operator_domains, avatar_url')
       .eq('operator_id', op.operatorId)
       .maybeSingle()
     const d = data as {
@@ -47,6 +48,7 @@ export default async function EditProfilePage() {
       bio: string | null
       links: { github?: string; site?: string; x?: string } | null
       operator_domains: string[] | null
+      avatar_url: string | null
     } | null
     if (d) {
       initial = {
@@ -56,6 +58,7 @@ export default async function EditProfilePage() {
         bio: d.bio ?? '',
         links: d.links && typeof d.links === 'object' ? d.links : {},
         operator_domains: Array.isArray(d.operator_domains) ? d.operator_domains : [],
+        avatar_url: d.avatar_url ?? '',
       }
     }
   }
