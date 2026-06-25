@@ -28,7 +28,6 @@ import { CanonId } from '@/components/ui/CanonId'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { CascadePanel } from '@/components/profile/CascadePanel'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
-import { ClaimButton } from '@/components/claim/ClaimButton'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
 import CascadeRadar from '@/components/charts/CascadeRadar'
@@ -99,7 +98,6 @@ export default async function OperatorProfilePage({
   if (!row) notFound()
 
   const { operator, snapshot, telemetry } = row
-  const operatorId = operator.operator_id
   const history = await getOperatorHistory(codename)
 
   const topPct = Math.max(0, 100 - row.percentile)
@@ -375,12 +373,10 @@ export default async function OperatorProfilePage({
           >
             Compare →
           </a>
-          {/* Claim CTA self-hides for claimed operators; ClaimedBadge shows instead. */}
-          {operator.claimed ? (
-            <ClaimedBadge claimed={operator.claimed} />
-          ) : (
-            <ClaimButton operatorId={operatorId} claimed={operator.claimed} />
-          )}
+          {/* Claimed operators show a badge. The old pay-to-claim CTA was removed
+              (HARDENING_0625 §2): claiming is free + automatic on login, and seed
+              operators are never user-claimable (identity-takeover risk). */}
+          {operator.claimed && <ClaimedBadge claimed={operator.claimed} />}
         </div>
       </div>
 
