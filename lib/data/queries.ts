@@ -22,7 +22,6 @@ import { filterToWindow } from '@/lib/data/windows'
 import { CLASS_NAME_TO_ID, REWARDS } from '@/lib/canon/ids'
 import type { SignalClass } from '@/components/sigrank/types'
 import {
-  MOCK_CIRCLES,
   MOCK_CLASS_DISTRIBUTION,
   MOCK_COUNTRIES,
   MOCK_HALL,
@@ -30,7 +29,6 @@ import {
   MOCK_HOMEPAGE_STATS,
   MOCK_HOURLY,
   MOCK_WEEKLY,
-  type CircleRow,
   type ClassDistributionRow,
   type CountryCount,
   type HallRecord,
@@ -65,23 +63,6 @@ interface DbRankHistory {
   percentile: number | null
 }
 
-/** Minimal shape of a `circles` row (with embedded owner codename). */
-interface DbCircle {
-  circle_id: string
-  name: string
-  tag: string
-  owner_operator_id: string
-  operators: { codename: string | null } | null
-}
-
-/** Minimal shape of a `circle_metric_snapshots` row. */
-interface DbCircleSnapshot {
-  circle_id: string
-  snapshot_date: string
-  avg_compression: number | null
-  avg_signa_rate: number | null
-  global_rank: number | null
-}
 
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
@@ -104,64 +85,9 @@ export const OPERATOR_COLUMNS =
   // Phase-0 identity fields (migration 0007, apply post-move — null-safe on old rows)
   'handle, avatar_url, bio, links, location'
 
-/**
- * fetchCircleRows — build CircleRow[] from circles + latest
- * circle_metric_snapshots + member counts + embedded owner codename. When `tag`
- * is non-null the result is filtered to that single circle (case-insensitive).
- * Shared by getCircles (tag=null) and getCircle (tag=<tag>).
- */
-async function fetchCircleRows(
-  sb: SupabaseClient,
-  tag: string | null,
-): Promise<CircleRow[]> {
-  let circleQuery = sb
-    .from('circles')
-    .select('circle_id, name, tag, owner_operator_id, operators:owner_operator_id ( codename )')
-  if (tag !== null) circleQuery = circleQuery.ilike('tag', tag)
-  const { data: circleData, error: circleError } = await circleQuery
-  if (circleError) throw circleError
-  const circles = asDb<DbCircle[] | null>(circleData) ?? []
-  if (circles.length === 0) return []
-
-  const circleIds = circles.map((c) => c.circle_id)
-
-  // Latest circle_metric_snapshots per circle (descending → first wins).
-  const { data: snapData } = await sb
-    .from('circle_metric_snapshots')
-    .select('circle_id, snapshot_date, avg_compression, avg_signa_rate, global_rank')
-    .in('circle_id', circleIds)
-    .order('snapshot_date', { ascending: false })
-  const snapByCircle = new Map<string, DbCircleSnapshot>()
-  for (const s of (asDb<DbCircleSnapshot[] | null>(snapData) ?? [])) {
-    if (!snapByCircle.has(s.circle_id)) snapByCircle.set(s.circle_id, s)
-  }
-
-  // Active member counts per circle.
-  const { data: memberData } = await sb
-    .from('circle_members')
-    .select('circle_id, status')
-    .in('circle_id', circleIds)
-  const memberCount = new Map<string, number>()
-  for (const m of (asDb<Array<{ circle_id: string; status: string | null }> | null>(memberData) ?? [])) {
-    if (m.status && m.status !== 'active') continue
-    memberCount.set(m.circle_id, (memberCount.get(m.circle_id) ?? 0) + 1)
-  }
-
-  return circles.map((c) => {
-    const snap = snapByCircle.get(c.circle_id)
-    return {
-      circle_id: c.circle_id,
-      name: c.name,
-      tag: c.tag,
-      member_count: memberCount.get(c.circle_id) ?? 0,
-      avg_signa_rate: num(snap?.avg_signa_rate),
-      avg_compression: num(snap?.avg_compression),
-      global_rank: num(snap?.global_rank),
-      owner_codename: c.operators?.codename ?? 'unknown',
-      isPlaceholder: false,
-    }
-  })
-}
+// (Circles feature dropped 2026-06-25 — fresh-slate rebuild later. The circles /
+// circle_members / circle_metric_snapshots tables were removed from the DB; the
+// query code is gone with them. See ICEBOX.md / AFTER_LAUNCH.md.)
 
 // ───────────────────────────────────────────────────────────────────────────
 // Facade functions.
@@ -527,31 +453,8 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
   }
 }
 
-/** All Circles (teams). */
-export async function getCircles(): Promise<CircleRow[]> {
-  const sb = getSupabaseServer()
-  if (!sb) return MOCK_CIRCLES
-  try {
-    const rows = await fetchCircleRows(sb, null)
-    return rows.length === 0 ? MOCK_CIRCLES : rows
-  } catch {
-    return MOCK_CIRCLES
-  }
-}
-
-/** Single Circle by tag. */
-export async function getCircle(tag: string): Promise<CircleRow | null> {
-  const sb = getSupabaseServer()
-  const fromMock = () =>
-    MOCK_CIRCLES.find((c) => c.tag.toLowerCase() === tag.toLowerCase()) ?? null
-  if (!sb) return fromMock()
-  try {
-    const rows = await fetchCircleRows(sb, tag)
-    return rows[0] ?? fromMock()
-  } catch {
-    return fromMock()
-  }
-}
+// getCircles / getCircle removed 2026-06-25 (Circles feature dropped — fresh-slate
+// rebuild later; the route was already archived 06-22). See ICEBOX.md.
 
 /**
  * getOnlineHourly — 24h operators-online curve for the activity board.
