@@ -20,37 +20,13 @@ import 'server-only'
  */
 
 import { createHash, createPublicKey, verify as edVerify, type KeyObject } from 'node:crypto'
+import { canonicalJson, canonicalBytes } from './canonical.mjs'
 
-/** Agent fields excluded from the canonical (signed/hashed) body — they derive from it. */
-const DERIVED_AGENT_FIELDS = ['signature', 'snapshot_hash'] as const
-
-/** Recursively sort object keys (UTF-16 code-unit order — matches Python sort_keys for
- *  the ASCII keys this schema uses). Arrays keep order; scalars pass through. */
-function sortDeep(v: unknown): unknown {
-  if (Array.isArray(v)) return v.map(sortDeep)
-  if (v && typeof v === 'object') {
-    const src = v as Record<string, unknown>
-    const out: Record<string, unknown> = {}
-    for (const k of Object.keys(src).sort()) out[k] = sortDeep(src[k])
-    return out
-  }
-  return v
-}
-
-/** Canonical JSON string the agent signs/hashes (derived agent fields stripped). */
-export function canonicalJson(payload: Record<string, unknown>): string {
-  const clone = JSON.parse(JSON.stringify(payload)) as Record<string, unknown>
-  const agent = clone.agent
-  if (agent && typeof agent === 'object') {
-    for (const f of DERIVED_AGENT_FIELDS) delete (agent as Record<string, unknown>)[f]
-  }
-  return JSON.stringify(sortDeep(clone))
-}
-
-/** UTF-8 bytes of the canonical JSON — the exact bytes that get signed. */
-export function canonicalBytes(payload: Record<string, unknown>): Buffer {
-  return Buffer.from(canonicalJson(payload), 'utf-8')
-}
+// canonicalJson + canonicalBytes live in ./canonical.mjs (pure, no 'server-only') as the
+// SINGLE SOURCE OF TRUTH, so the canon-parity gate (__tests__/ingest/canon_parity.test.mjs)
+// imports the exact bytes the server verifies against. Re-exported here so existing server
+// consumers (gates.ts etc.) keep importing the canon helpers from signature.ts.
+export { canonicalJson, canonicalBytes }
 
 /** Server-recomputed snapshot hash ("sha256:<hex>") over the canonical bytes. */
 export function snapshotHash(payload: Record<string, unknown>): string {
@@ -70,6 +46,12 @@ function publicKeyFromAgent(pk: string): KeyObject | null {
   } catch {
     return null
   }
+}
+
+/** True when `pk` parses as a valid 32-byte ed25519 public key ("ed25519:<base64>"
+ *  or bare base64). Used by the enroll endpoint to reject a malformed device key. */
+export function isValidAgentPublicKey(pk: string): boolean {
+  return publicKeyFromAgent(pk) !== null
 }
 
 /**

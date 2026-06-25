@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SignOutButton } from '@/components/auth/SignOutButton'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
+import { ConnectDevicePanel } from '@/components/settings/ConnectDevicePanel'
 
 /**
  * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
@@ -108,6 +109,15 @@ export default async function SettingsPage() {
           </div>
         )}
       </Section>
+
+      {op && (
+        <Section
+          title="Connect a device"
+          desc="Link your local agent so your token runs cascade to the leaderboard."
+        >
+          <ConnectDevicePanel />
+        </Section>
+      )}
 
       <Section
         title="Privacy"
