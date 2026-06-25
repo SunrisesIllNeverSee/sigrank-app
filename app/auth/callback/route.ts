@@ -53,7 +53,6 @@ export async function GET(req: NextRequest) {
   // FREE CLAIM: create/link the operator via the service role (privileged, idempotent
   // on the operator_accounts user_id PK). The auth email is NEVER copied to any operator
   // column (P5) — identity stays isolated in auth.users + this link table.
-  let isNew = false
   const svc = getSupabaseServer()
   if (svc) {
     const { data: existing } = await svc
@@ -63,7 +62,6 @@ export async function GET(req: NextRequest) {
       .maybeSingle()
 
     if (!existing) {
-      isNew = true
       let operatorId: string | null = null
       for (let attempt = 0; attempt < 3 && !operatorId; attempt++) {
         const { data: op, error: opErr } = await svc
@@ -79,6 +77,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const dest = next ?? (isNew ? '/me/edit' : '/me')
+  // Login lands on the operator's own profile (/me → /user/[codename]); they edit
+  // in-place via the profile's "Edit profile" modal (AUTH_LAUNCH_DIRECTIVES D6).
+  const dest = next ?? '/me'
   return NextResponse.redirect(new URL(dest, origin))
 }
