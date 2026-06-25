@@ -51,6 +51,19 @@ export async function signInWithGitHub(next?: string): Promise<{ error?: string 
   return error ? { error: error.message } : {}
 }
 
+/** Start the X / Twitter OAuth flow (third provider). Works once the Twitter provider
+ *  is enabled in Supabase Auth; until then Supabase returns an honest error that
+ *  surfaces in the UI (the button never fakes a session). */
+export async function signInWithTwitter(next?: string): Promise<{ error?: string }> {
+  const sb = createBrowserClient()
+  if (!sb) return { error: 'Sign-in is not configured yet.' }
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'twitter',
+    options: { redirectTo: callbackUrl(next) },
+  })
+  return error ? { error: error.message } : {}
+}
+
 /** Send an email magic-link (second provider). Returns an error message on failure. */
 export async function signInWithEmail(email: string, next?: string): Promise<{ error?: string }> {
   const sb = createBrowserClient()
