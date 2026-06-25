@@ -65,7 +65,9 @@ export async function generateMetadata({
       : ''
   return {
     title: `${name}${yieldLabel} · SigRank`,
-    description: `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`,
+    description: row.pending
+      ? `${name} — an operator on SigRank (not ranked yet).`
+      : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`,
   }
 }
 
@@ -98,6 +100,7 @@ export default async function OperatorProfilePage({
   if (!row) notFound()
 
   const { operator, snapshot, telemetry } = row
+  const pending = row.pending ?? false
   const history = await getOperatorHistory(codename)
 
   const topPct = Math.max(0, 100 - row.percentile)
@@ -168,8 +171,21 @@ export default async function OperatorProfilePage({
   )
   const hasSocial = Boolean(operator.location || operator.bio || hasLinks || operator.handle)
 
-  // ── Stats tab: operational stats + the full cascade dashboard ──────────────
-  const statsPanel = (
+  // ── Stats tab: a "not ranked yet" notice when there's no cascade data, else
+  //    the operational stats + full cascade dashboard. ────────────────────────
+  const pendingPanel = (
+    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
+      <span className="font-mono text-2xl text-text-dim">Υ</span>
+      <p className="font-mono text-sm text-text-primary">Not ranked yet</p>
+      <p className="max-w-sm font-sans text-xs leading-relaxed text-text-secondary">
+        Your profile is live, but you’re not on the board until a verified cascade
+        lands. Connect the local agent to submit your token cascade and earn a Υ Yield
+        and class.
+      </p>
+    </div>
+  )
+
+  const rankedStatsPanel = (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-2 gap-4 rounded-lg border border-bg-border bg-bg-surface p-4 sm:grid-cols-4">
         <Stat label="Global rank">#{row.global_rank}</Stat>
@@ -386,19 +402,35 @@ export default async function OperatorProfilePage({
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">{name}</h1>
-            <SignalClassBadge signalClass={snapshot.class_tier} />
+            {pending ? (
+              <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
+                Unranked
+              </span>
+            ) : (
+              <SignalClassBadge signalClass={snapshot.class_tier} />
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-xs text-text-muted">
             {hasDisplayName && <span>{operator.codename}</span>}
             {operator.handle && <span className="text-text-secondary">@{operator.handle}</span>}
-            <span>Rank #{row.global_rank}</span>
-            <span>Top {topPct.toFixed(2)}% of the field</span>
-            <span>{snapshot.class_tier}</span>
+            {pending ? (
+              <span>No cascade data yet</span>
+            ) : (
+              <>
+                <span>Rank #{row.global_rank}</span>
+                <span>Top {topPct.toFixed(2)}% of the field</span>
+                <span>{snapshot.class_tier}</span>
+              </>
+            )}
           </div>
         </div>
       </header>
 
-      <ProfileTabs stats={statsPanel} submissions={submissionsPanel} social={socialPanel} />
+      <ProfileTabs
+        stats={pending ? pendingPanel : rankedStatsPanel}
+        submissions={submissionsPanel}
+        social={socialPanel}
+      />
     </div>
   )
 }

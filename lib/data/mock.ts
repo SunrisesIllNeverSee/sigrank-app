@@ -25,6 +25,9 @@ export interface LeaderboardRow {
   percentile: number
   /** Raw telemetry, present for the real operator and useful for mock detail. */
   telemetry: TelemetryRaw
+  /** True when the operator exists but has no cascade data yet (no verified
+   *  submission) — the profile renders an identity-only pending state, not 404. */
+  pending?: boolean
   // ── 730 window layer (optional; mirrors metric_snapshots). These let the mock
   //    path filter by window identically to the live path (lib/data/windows.ts).
   //    Live rows populate them from the DB; mock rows set them below. ──
