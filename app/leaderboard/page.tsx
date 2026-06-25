@@ -15,7 +15,8 @@
 import { redirect } from 'next/navigation'
 
 export default function LeaderboardPage() {
-  // Owner 2026-06-24: the board opens on the unfiltered "Everything" view (every
-  // operator's every window point), not a single window. Window tabs narrow from there.
-  redirect('/board/everything')
+  // Owner 2026-06-25: the "Everything" firehose (every operator's every window point
+  // → duplicate rows per seed) is removed. The board now opens on the "off" view —
+  // filter off: ONE row per operator (latest snapshot, no window filter). Tabs narrow.
+  redirect('/board/off')
 }

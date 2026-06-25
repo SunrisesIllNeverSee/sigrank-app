@@ -5,8 +5,8 @@
  * Extracted from the former /operators leaderboard page so the per-window board route
  * (app/board/[window]) is the single consumer. Mapping (per group brief):
  * snRatio=compression_ratio, threadsRecalled=cross_thread, compositeScore=
- * signa_rate. Anonymous-by-default: anonId shows the codename for unclaimed
- * operators and display_name for claimed ones.
+ * signa_rate. Board identity is PUBLIC (owner §0, 2026-06-25): anonId shows the
+ * operator's display_name when present, else the generated codename.
  *
  * 730 addition: the four RAW PILLARS (input/output/cacheWrite/cacheRead) are
  * populated from row.telemetry on EVERY row — including non-compounding ones
@@ -29,10 +29,12 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntry {
     // in BOTH paths is "unclaimed": pre-auth the whole board is the seed corpus
     // (italic); a claimed operator renders upright once claiming is real.
     isSeed: !operator.claimed,
-    // Anonymous-by-default: claimed operators may surface a display_name; all
-    // others show only the generated codename. Never invent PII.
-    anonId:
-      operator.claimed && operator.display_name ? operator.display_name : operator.codename,
+    // Board identity is PUBLIC (owner §0, 2026-06-25): show the operator's
+    // display_name whenever they have one — including unclaimed seeds, whose real
+    // names are backfilled in Supabase — else the generated codename. The prior
+    // `claimed &&` gate hid those backfilled names and is dropped. Never invent
+    // PII: this only surfaces an operator-set / owner-backfilled name.
+    anonId: operator.display_name ? operator.display_name : operator.codename,
     // Operator-cell 2nd line: the operator's @handle (their real tokscale/social
     // username, e.g. @olafurns7). Primary line is the real name (codename); the 2nd
     // line is the @handle so the cell reads "Ólafur Nils Sigurðsson / @olafurns7".
