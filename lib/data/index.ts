@@ -29,7 +29,6 @@ export type {
   HistoryPoint,
   HomepageStats,
   HallRecord,
-  CircleRow,
   ClassDistributionRow,
   TelemetryRaw,
   HourlyPoint,
