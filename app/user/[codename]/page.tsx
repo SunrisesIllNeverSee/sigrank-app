@@ -2,16 +2,18 @@
  * app/user/[codename]/page.tsx — the operator profile page (was /operators/[codename], owner 2026-06-22).
  *
  * "The single most important page after the homepage" (site_architecture.md
- * §Operator profile) — the BlitzStars-style player page, in a 3-column dashboard:
+ * §Operator profile). AUTH_LAUNCH_DIRECTIVES D6: a GitHub-style multi-tab workspace —
+ * a persistent identity header (avatar / name / class / rank) over three tabs:
  *
- *   ┌ identity rail ┬ SIGNA hero + trajectory ┬ Core-5 radar ┐
- *   └ (full width)  CoreMetricsGrid → ScoreBreakdown          ┘
+ *   • Stats        — view-only cascade dashboard (KPIs, radars, op-ratio, heat, trend)
+ *   • Submissions  — manual project/build showcase (D9 — not yet built; empty state)
+ *   • Social       — self-promo identity: handle, location, bio, links
  *
- * RSC: reads the operator + history through the @/lib/data facade (mock fallback
- * when Supabase is unset), resolves all Pro / not-yet-finalized values
- * server-side through the AuditProvider seam (D1: stub-now, finalize-later).
- * ScoreBreakdown is a client island; every value it receives is resolved here and
- * passed as plain serializable props, so RS.xx weights never reach the client.
+ * RSC: reads the operator + history through the @/lib/data facade (mock fallback when
+ * Supabase is unset). The three panels are server-rendered here and handed to the
+ * ProfileTabs client island, which only mounts the active one. ScoreBreakdown-style
+ * client islands receive plain serializable props resolved here, so RS.xx weights never
+ * reach the client.
  */
 
 import type { Metadata } from 'next'
@@ -25,6 +27,7 @@ import { OperatorAvatar } from '@/components/sigrank/OperatorAvatar'
 import { CanonId } from '@/components/ui/CanonId'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { CascadePanel } from '@/components/profile/CascadePanel'
+import { ProfileTabs } from '@/components/profile/ProfileTabs'
 import { ClaimButton } from '@/components/claim/ClaimButton'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
@@ -67,7 +70,7 @@ export async function generateMetadata({
   }
 }
 
-/** One labeled row in the identity rail. */
+/** One labeled row in the identity / stats rail. */
 function Stat({
   label,
   children,
@@ -160,144 +163,34 @@ export default async function OperatorProfilePage({
       ]
     : []
 
-  return (
+  const name = resolveName(operator)
+  const hasDisplayName = name !== operator.codename
+  const hasLinks = Boolean(
+    operator.links && (operator.links.github || operator.links.site || operator.links.x),
+  )
+  const hasSocial = Boolean(operator.location || operator.bio || hasLinks || operator.handle)
+
+  // ── Stats tab: operational stats + the full cascade dashboard ──────────────
+  const statsPanel = (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <a
-          href="/leaderboard"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
-        >
-          ← Leaderboard
-        </a>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Wrapped → deferred from launch (word-era content; route exists,
-              defer-not-delete). Re-add when cascade-converted. */}
-          <a
-            href={`/compare?a=${encodeURIComponent(operator.codename)}`}
-            className="rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
-          >
-            Compare →
-          </a>
-          {/* Claim CTA self-hides for claimed operators; ClaimedBadge shows instead. */}
-          {operator.claimed ? (
-            <ClaimedBadge claimed={operator.claimed} />
-          ) : (
-            <ClaimButton operatorId={operatorId} claimed={operator.claimed} />
-          )}
-        </div>
-      </div>
-
-      {/* Lean header: identity rail + headline cascade KPIs (the §igna hero,
-          SIGNA trajectory, and cascade-shape radar were removed — §igna is on
-          hold for launch; the cascade fingerprint section below carries the
-          real metrics). */}
-      <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
-        {/* Identity rail (all real telemetry). */}
-        <aside className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-4">
-          {/* Avatar + class badge row — avatar display-only pre-move (Phase-0).
-              Upload (Storage) wires in Phase 3 post-move. */}
-          <div className="flex items-center gap-3">
-            <OperatorAvatar
-              src={operator.avatar_url}
-              alt={resolveName(operator)}
-              size={48}
-            />
-            <SignalClassBadge signalClass={snapshot.class_tier} />
-          </div>
-          <Stat label="Operator">{resolveName(operator)}</Stat>
-          {resolveName(operator) !== operator.codename && (
-            <Stat label="Codename">{operator.codename}</Stat>
-          )}
-          {operator.handle && (
-            <Stat label="Handle">@{operator.handle}</Stat>
-          )}
-          <Stat label="Global rank">#{row.global_rank}</Stat>
-          <div className="flex flex-col gap-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-              Percentile
-            </span>
-            <span className="font-mono text-sm text-text-primary">
-              Top {topPct.toFixed(2)}%
-            </span>
-            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
-              <div
-                className="h-full rounded-full bg-gold"
-                style={{ width: `${topPct}%` }}
-              />
-            </div>
-          </div>
-          <Stat label="Platform">{operator.primary_domain}</Stat>
-          <Stat label="Account age">{operator.account_age_days} days</Stat>
-          {/* "turns" not "messages" — token-era vocab (a turn = one exchange).
-              DB column stays total_messages_lifetime; label only (owner 2026-06-19). */}
-          <Stat label="Lifetime turns">
-            {operator.total_messages_lifetime.toLocaleString('en-US')}
-          </Stat>
-          {/* Phase-0 identity fields — all null-safe, only rendered when set.
-              Location + bio + links surface here; write path is post-move (Phase 2+). */}
-          {operator.location && (
-            <Stat label="Location">{operator.location}</Stat>
-          )}
-          {operator.bio && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">About</span>
-              <p className="font-sans text-xs leading-relaxed text-text-secondary">{operator.bio}</p>
-            </div>
-          )}
-          {operator.links && (operator.links.github || operator.links.site || operator.links.x) && (
-            <div className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">Links</span>
-              <div className="flex flex-wrap gap-2">
-                {operator.links.github && (
-                  <a
-                    href={`https://github.com/${operator.links.github}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
-                  >
-                    github
-                  </a>
-                )}
-                {operator.links.x && (
-                  <a
-                    href={`https://x.com/${operator.links.x}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
-                  >
-                    x.com
-                  </a>
-                )}
-                {operator.links.site && (
-                  <a
-                    href={operator.links.site}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
-                  >
-                    site
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-        </aside>
-
-        {/* Headline: operator name + class, leading into the cascade section. */}
-        <div className="flex flex-col justify-center rounded-lg border border-bg-border bg-bg-surface p-6">
-          <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
-            Operator profile
+      <div className="grid grid-cols-2 gap-4 rounded-lg border border-bg-border bg-bg-surface p-4 sm:grid-cols-4">
+        <Stat label="Global rank">#{row.global_rank}</Stat>
+        <div className="flex flex-col gap-1">
+          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+            Percentile
           </span>
-          <h1 className="mt-1 font-mono text-3xl font-bold tracking-wide text-text-primary">
-            {resolveName(operator)}
-          </h1>
-          {resolveName(operator) !== operator.codename && (
-            <p className="font-mono text-xs text-text-muted">{operator.codename}</p>
-          )}
-          <p className="mt-1 font-sans text-sm text-text-secondary">
-            {snapshot.class_tier} · Rank #{row.global_rank} · Top {topPct.toFixed(2)}% of the field
-          </p>
+          <span className="font-mono text-sm text-text-primary">Top {topPct.toFixed(2)}%</span>
+          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
+            <div className="h-full rounded-full bg-gold" style={{ width: `${topPct}%` }} />
+          </div>
         </div>
+        <Stat label="Platform">{operator.primary_domain}</Stat>
+        <Stat label="Account age">{operator.account_age_days} days</Stat>
+        {/* "turns" not "messages" — token-era vocab (a turn = one exchange).
+            DB column stays total_messages_lifetime; label only (owner 2026-06-19). */}
+        <Stat label="Lifetime turns">
+          {operator.total_messages_lifetime.toLocaleString('en-US')}
+        </Stat>
       </div>
 
       <CascadePanel cascade={snapshot.cascade ?? null} />
@@ -386,7 +279,130 @@ export default async function OperatorProfilePage({
           </div>
         </section>
       )}
+    </div>
+  )
 
+  // ── Submissions tab: manual project/build showcase (D9 — not yet built) ────
+  const submissionsPanel = (
+    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
+      <span className="font-mono text-2xl text-text-dim">◈</span>
+      <p className="font-mono text-sm text-text-primary">No submissions yet</p>
+      <p className="max-w-sm font-sans text-xs leading-relaxed text-text-secondary">
+        Project and build showcases will live here. Verified cascade submissions feed the
+        leaderboard via the local agent; manual project highlights are coming.
+      </p>
+    </div>
+  )
+
+  // ── Social tab: the self-promo identity surface ────────────────────────────
+  const socialPanel = (
+    <div className="flex flex-col gap-5 rounded-lg border border-bg-border bg-bg-surface p-5">
+      {hasSocial ? (
+        <>
+          {operator.handle && <Stat label="Handle">@{operator.handle}</Stat>}
+          {operator.location && <Stat label="Location">{operator.location}</Stat>}
+          {operator.bio && (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+                About
+              </span>
+              <p className="font-sans text-sm leading-relaxed text-text-secondary">{operator.bio}</p>
+            </div>
+          )}
+          {hasLinks && operator.links && (
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+                Links
+              </span>
+              <div className="flex flex-wrap gap-3">
+                {operator.links.github && (
+                  <a
+                    href={`https://github.com/${operator.links.github}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
+                  >
+                    github
+                  </a>
+                )}
+                {operator.links.x && (
+                  <a
+                    href={`https://x.com/${operator.links.x}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
+                  >
+                    x.com
+                  </a>
+                )}
+                {operator.links.site && (
+                  <a
+                    href={operator.links.site}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
+                  >
+                    site
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="font-sans text-sm text-text-secondary">
+          {operator.claimed
+            ? 'No profile details yet — add a handle, location, bio, and links from your profile editor.'
+            : 'This operator hasn’t added a bio, location, or links.'}
+        </p>
+      )}
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <a
+          href="/leaderboard"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          ← Leaderboard
+        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={`/compare?a=${encodeURIComponent(operator.codename)}`}
+            className="rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
+          >
+            Compare →
+          </a>
+          {/* Claim CTA self-hides for claimed operators; ClaimedBadge shows instead. */}
+          {operator.claimed ? (
+            <ClaimedBadge claimed={operator.claimed} />
+          ) : (
+            <ClaimButton operatorId={operatorId} claimed={operator.claimed} />
+          )}
+        </div>
+      </div>
+
+      {/* Persistent identity header (GitHub-profile-style banner). */}
+      <header className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-5 sm:flex-row sm:items-center sm:gap-5">
+        <OperatorAvatar src={operator.avatar_url} alt={name} size={64} />
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">{name}</h1>
+            <SignalClassBadge signalClass={snapshot.class_tier} />
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-xs text-text-muted">
+            {hasDisplayName && <span>{operator.codename}</span>}
+            {operator.handle && <span className="text-text-secondary">@{operator.handle}</span>}
+            <span>Rank #{row.global_rank}</span>
+            <span>Top {topPct.toFixed(2)}% of the field</span>
+            <span>{snapshot.class_tier}</span>
+          </div>
+        </div>
+      </header>
+
+      <ProfileTabs stats={statsPanel} submissions={submissionsPanel} social={socialPanel} />
     </div>
   )
 }
