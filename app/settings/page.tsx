@@ -1,20 +1,22 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { SignOutButton } from '@/components/auth/SignOutButton'
+import { getSessionOperator } from '@/lib/supabase/auth-server'
 
 /**
- * app/settings/page.tsx — operator settings.
+ * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
  *
- * UI shell (server component). The account/identity sections that need a
- * logged-in session are rendered as labeled "sign-in required" states until the
- * Supabase auth client + session middleware land (terminal lane — see
- * SCRATCHPAD auth-batch spec). Theme controls work today (client island, no
- * auth). This page exists so AccountMenu → Settings is a real route, not a #.
+ * Profile *content* editing lives in the profile workspace (/me/edit, D6) — settings
+ * is now account-level only: who you're signed in as, links to your profile, sign out,
+ * appearance, and privacy info. force-dynamic so it reads the live session (this is a
+ * single authed page in the middleware matcher — the board is never affected).
  */
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Settings · SigRank',
-  description: 'Manage your SigRank operator account, appearance, and privacy.',
+  description: 'Manage your SigRank operator account and appearance.',
 }
 
 function Section({
@@ -39,25 +41,12 @@ function Section({
   )
 }
 
-/** A row that needs auth — shows a sign-in prompt until sessions land. */
-function AuthGatedRow({ label, hint }: { label: string; hint: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-md border border-dashed border-bg-border bg-bg-base/40 px-3 py-2.5">
-      <div className="flex flex-col">
-        <span className="font-mono text-xs text-text-secondary">{label}</span>
-        <span className="font-sans text-[11px] text-text-dim">{hint}</span>
-      </div>
-      <Link
-        href="/login"
-        className="shrink-0 rounded-md border border-gold/40 px-3 py-1 font-mono text-[11px] text-gold transition-colors hover:bg-gold/10"
-      >
-        Sign in
-      </Link>
-    </div>
-  )
-}
+const rowLink =
+  'shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary'
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const op = await getSessionOperator()
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 py-6">
       <header className="flex flex-col gap-1">
@@ -65,8 +54,9 @@ export default function SettingsPage() {
           ◈ Settings
         </h1>
         <p className="font-sans text-sm text-text-secondary">
-          Appearance works now. Account &amp; privacy controls unlock when you
-          sign in.
+          {op
+            ? 'Manage your account and appearance. Edit your public profile from your profile page.'
+            : 'Appearance works now. Account controls unlock when you sign in.'}
         </p>
       </header>
 
@@ -74,31 +64,50 @@ export default function SettingsPage() {
         <ThemeToggle />
       </Section>
 
-      <Section
-        title="Account"
-        desc="Your operator identity, handle, and claimed profile."
-      >
-        <AuthGatedRow
-          label="Operator handle"
-          hint="Set a display name on your claimed profile"
-        />
-        <AuthGatedRow
-          label="Claimed profile"
-          hint="Link a leaderboard row to your account"
-        />
+      <Section title="Account" desc="Your operator identity and profile.">
+        {op ? (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-4 rounded-md border border-bg-border bg-bg-base/40 px-3 py-2.5">
+              <div className="flex flex-col">
+                <span className="font-mono text-xs text-text-secondary">Signed in</span>
+                <span className="font-mono text-[11px] text-text-dim">{op.codename}</span>
+              </div>
+              <div className="flex gap-2">
+                <Link href="/me/edit" className={rowLink}>
+                  Edit profile
+                </Link>
+                <Link href={`/user/${encodeURIComponent(op.codename)}`} className={rowLink}>
+                  View profile
+                </Link>
+              </div>
+            </div>
+            <SignOutButton />
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-4 rounded-md border border-dashed border-bg-border bg-bg-base/40 px-3 py-2.5">
+            <div className="flex flex-col">
+              <span className="font-mono text-xs text-text-secondary">Sign in to manage your account</span>
+              <span className="font-sans text-[11px] text-text-dim">
+                Claim your profile, set your handle, and edit your details.
+              </span>
+            </div>
+            <Link
+              href="/login?next=/settings"
+              className="shrink-0 rounded-md border border-gold/40 px-3 py-1 font-mono text-[11px] text-gold transition-colors hover:bg-gold/10"
+            >
+              Log in
+            </Link>
+          </div>
+        )}
       </Section>
 
       <Section
         title="Privacy"
         desc="SigRank only ever stores token counts — never conversation content."
       >
-        <AuthGatedRow
-          label="Data &amp; submissions"
-          hint="Review or delete your submitted snapshots"
-        />
         <p className="font-sans text-[11px] leading-relaxed text-text-dim">
-          The free tier reads token counts, model ids, and content lengths
-          locally. No transcripts leave your device. See{' '}
+          The free tier reads token counts, model ids, and content lengths locally. No
+          transcripts leave your device. See{' '}
           <Link href="/about" className="text-text-muted underline hover:text-text-secondary">
             how it works
           </Link>
