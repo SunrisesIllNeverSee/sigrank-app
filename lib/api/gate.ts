@@ -165,3 +165,37 @@ export function unauthorizedResponse(detail: string): NextResponse {
     { status: 401, headers: { 'Cache-Control': 'no-store' } },
   )
 }
+
+/** Best-effort client IP — exported for write endpoints that log created_ip (§4.2). */
+export function getClientIp(req: NextRequest): string {
+  return clientIp(req)
+}
+
+/** Per-IP budget + window for the device mint/enroll endpoints (brute-force defense). */
+const ENROLL_RATE_LIMIT = 10
+const ENROLL_WINDOW_MS = 600_000 // 10 minutes
+
+/**
+ * Stricter per-IP fixed-window limit for the device mint-code / enroll endpoints
+ * (§4.2/§4.3). Bucketed key (`enroll:<ip>`) so it never shares counters with the
+ * read-path rateLimit(). With ~75-bit codes + 10-min expiry + one live code per
+ * operator, this cap makes brute force infeasible. Degrades open on any error.
+ */
+export function enrollRateLimit(req: NextRequest): RateResult {
+  try {
+    const now = Date.now()
+    const key = `enroll:${clientIp(req)}`
+    const entry = windowCounters.get(key)
+    if (!entry || now >= entry.resetAt) {
+      windowCounters.set(key, { count: 1, resetAt: now + ENROLL_WINDOW_MS })
+      return { ok: true, retryAfter: 0 }
+    }
+    entry.count += 1
+    if (entry.count > ENROLL_RATE_LIMIT) {
+      return { ok: false, retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)) }
+    }
+    return { ok: true, retryAfter: 0 }
+  } catch {
+    return { ok: true, retryAfter: 0 }
+  }
+}
