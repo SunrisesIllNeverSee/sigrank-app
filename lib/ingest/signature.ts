@@ -72,6 +72,12 @@ function publicKeyFromAgent(pk: string): KeyObject | null {
   }
 }
 
+/** True when `pk` parses as a valid 32-byte ed25519 public key ("ed25519:<base64>"
+ *  or bare base64). Used by the enroll endpoint to reject a malformed device key. */
+export function isValidAgentPublicKey(pk: string): boolean {
+  return publicKeyFromAgent(pk) !== null
+}
+
 /**
  * Verify a base64 ed25519 signature over the payload's canonical bytes against the
  * agent's "ed25519:<base64>" public key. Returns false on any malformation
