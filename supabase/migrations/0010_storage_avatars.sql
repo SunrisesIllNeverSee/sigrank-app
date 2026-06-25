@@ -20,11 +20,20 @@ on conflict (id) do update
       file_size_limit = excluded.file_size_limit,
       allowed_mime_types = excluded.allowed_mime_types;
 
--- Public read — the board <img> + profile page (anon + authenticated).
-drop policy if exists "avatars public read" on storage.objects;
-create policy "avatars public read" on storage.objects
-  for select
-  using (bucket_id = 'avatars');
+-- Read policy. Public buckets serve objects via their public URL (RLS-bypassing), so the
+-- board/profile <img> needs NO broad SELECT policy. A broad `using (bucket_id='avatars')`
+-- would let anyone LIST every object (enumerate operator ids + avatar paths) — flagged by
+-- `supabase db advisors` as public_bucket_allows_listing. Instead use an OWNER-SCOPED read:
+-- an operator may list only their OWN files, which also completes the INSERT+SELECT+UPDATE
+-- triad required for owner upsert. (The service-role upload route bypasses RLS regardless.)
+drop policy if exists "avatars public read" on storage.objects; -- reconcile any prior broad policy
+drop policy if exists "avatars owner read" on storage.objects;
+create policy "avatars owner read" on storage.objects
+  for select to authenticated
+  using (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = auth_operator_id()::text
+  );
 
 -- Owner-scoped writes: the first path segment must equal the writer's operator_id.
 drop policy if exists "avatars owner insert" on storage.objects;
