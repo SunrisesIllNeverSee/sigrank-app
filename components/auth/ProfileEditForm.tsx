@@ -53,7 +53,14 @@ function Field({
   )
 }
 
-export function ProfileEditForm({ initial }: { initial: ProfileInitial }) {
+export function ProfileEditForm({
+  initial,
+  onSaved,
+}: {
+  initial: ProfileInitial
+  /** Called after a successful save (e.g. to close a host modal). */
+  onSaved?: () => void
+}) {
   const router = useRouter()
   const [displayName, setDisplayName] = useState(initial.display_name)
   const [handle, setHandle] = useState(initial.handle)
@@ -132,6 +139,7 @@ export function ProfileEditForm({ initial }: { initial: ProfileInitial }) {
       }
       setStatus('saved')
       router.refresh()
+      onSaved?.()
     } catch {
       setError('Network error — please try again.')
       setStatus('error')
