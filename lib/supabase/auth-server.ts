@@ -57,6 +57,8 @@ export interface SessionOperator {
   userId: string
   operatorId: string
   codename: string
+  displayName: string | null
+  avatarUrl: string | null
 }
 
 /**
@@ -72,12 +74,25 @@ export async function getSessionOperator(): Promise<SessionOperator | null> {
   if (!svc) return null
   const { data } = await svc
     .from('operator_accounts')
-    .select('operator_id, operators:operator_id ( codename )')
+    .select('operator_id, operators:operator_id ( codename, display_name, avatar_url )')
     .eq('user_id', user.id)
     .maybeSingle()
   const row = data as
-    | { operator_id: string; operators: { codename: string | null } | null }
+    | {
+        operator_id: string
+        operators: {
+          codename: string | null
+          display_name: string | null
+          avatar_url: string | null
+        } | null
+      }
     | null
   if (!row?.operator_id) return null
-  return { userId: user.id, operatorId: row.operator_id, codename: row.operators?.codename ?? '' }
+  return {
+    userId: user.id,
+    operatorId: row.operator_id,
+    codename: row.operators?.codename ?? '',
+    displayName: row.operators?.display_name ?? null,
+    avatarUrl: row.operators?.avatar_url ?? null,
+  }
 }
