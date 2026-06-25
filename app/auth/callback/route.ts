@@ -71,10 +71,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=auth', origin))
   }
 
-  // PROVIDER PREFILL (owner 2026-06-25): the OAuth provider already hands us the PUBLIC
-  // identity fields, so a fresh profile isn't blank. display_name + avatar_url + handle
-  // only — the auth EMAIL is NEVER copied to any operator column (P5); it lives in
-  // auth.users and is shown only to the user in their own /settings.
+  // PROVIDER SYNC (owner 2026-06-25): the OAuth provider is the source of truth for the
+  // PUBLIC identity — display_name + avatar_url + handle are force-resynced from it on
+  // every login (see the returning-login branch). The auth EMAIL is NEVER copied to any
+  // operator column (P5); it lives in auth.users, shown only to the user in their /settings.
   const { handle: providerHandle, ...publicCore } = providerProfile(user.user_metadata)
 
   // FREE CLAIM: create/link the operator via the service role (privileged, idempotent
@@ -111,26 +111,16 @@ export async function GET(req: NextRequest) {
         }
       }
     } else {
-      // Returning login → backfill ONLY still-empty public fields (never clobber a value
-      // the user has since customized). handle stays best-effort + separate (UNIQUE).
+      // FORCE-RESYNC (owner 2026-06-25): the provider owns the public identity — overwrite
+      // display_name/avatar/handle with whatever THIS provider supplies on every login.
+      // Present fields only, so a magic-link login (no metadata) never nulls a value.
+      // bio/location/links stay user-owned (untouched).
       const opId = (existing as { operator_id: string }).operator_id
-      const { data: cur } = await svc
-        .from('operators')
-        .select('display_name, avatar_url, handle')
-        .eq('operator_id', opId)
-        .maybeSingle()
-      const have = (cur ?? {}) as {
-        display_name?: string | null
-        avatar_url?: string | null
-        handle?: string | null
+      if (Object.keys(publicCore).length > 0) {
+        await svc.from('operators').update(publicCore).eq('operator_id', opId)
       }
-      const patch: Record<string, string> = {}
-      if (!have.display_name && publicCore.display_name) patch.display_name = publicCore.display_name
-      if (!have.avatar_url && publicCore.avatar_url) patch.avatar_url = publicCore.avatar_url
-      if (Object.keys(patch).length > 0) {
-        await svc.from('operators').update(patch).eq('operator_id', opId)
-      }
-      if (!have.handle && providerHandle) {
+      // handle is UNIQUE → best-effort; a collision with another operator just no-ops.
+      if (providerHandle) {
         await svc.from('operators').update({ handle: providerHandle }).eq('operator_id', opId)
       }
     }
