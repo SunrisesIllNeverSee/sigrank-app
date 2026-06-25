@@ -28,6 +28,7 @@ import { CanonId } from '@/components/ui/CanonId'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { CascadePanel } from '@/components/profile/CascadePanel'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
+import { ProfileEditModal } from '@/components/profile/ProfileEditModal'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
 import CascadeRadar from '@/components/charts/CascadeRadar'
@@ -393,6 +394,8 @@ export default async function OperatorProfilePage({
               (HARDENING_0625 §2): claiming is free + automatic on login, and seed
               operators are never user-claimable (identity-takeover risk). */}
           {operator.claimed && <ClaimedBadge claimed={operator.claimed} />}
+          {/* Owner-only "Edit profile" modal — renders nothing for other viewers. */}
+          <ProfileEditModal codename={operator.codename} />
         </div>
       </div>
 
