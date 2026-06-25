@@ -27,6 +27,7 @@ export interface ProfileInitial {
   bio: string
   links: { github?: string; site?: string; x?: string }
   operator_domains: string[]
+  avatar_url: string
 }
 
 function Field({
@@ -66,11 +67,38 @@ export function ProfileEditForm({ initial }: { initial: ProfileInitial }) {
       (PLATFORMS as readonly string[]).includes(d),
     ),
   )
+  const [avatarUrl, setAvatarUrl] = useState(initial.avatar_url)
+  const [avatarBusy, setAvatarBusy] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
 
   function togglePlatform(p: Platform) {
     setPlatforms((cur) => (cur.includes(p) ? cur.filter((v) => v !== p) : [...cur, p]))
+  }
+
+  async function onAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarBusy(true)
+    setAvatarError(null)
+    const fd = new FormData()
+    fd.append('file', file)
+    try {
+      const res = await fetch('/api/v1/profile/avatar', { method: 'POST', body: fd })
+      const d = (await res.json().catch(() => ({}))) as { url?: string; error?: string }
+      if (!res.ok || !d.url) {
+        setAvatarError(d.error || 'Upload failed — please try again.')
+      } else {
+        setAvatarUrl(d.url)
+        router.refresh()
+      }
+    } catch {
+      setAvatarError('Network error — please try again.')
+    } finally {
+      setAvatarBusy(false)
+      e.target.value = '' // allow re-selecting the same file
+    }
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -216,15 +244,30 @@ export function ProfileEditForm({ initial }: { initial: ProfileInitial }) {
         </div>
       </fieldset>
 
-      <Field label="Avatar" hint="Shown on your profile and board row. Image upload turns on with Storage (0010).">
-        {/* TODO(AUTH.WIRE): upload to the `avatars` Supabase Storage bucket (0010) and
-            set avatar_url. Disabled until the Storage bucket + policy land. */}
-        <input
-          type="file"
-          accept="image/*"
-          disabled
-          className="font-sans text-xs text-text-dim file:mr-3 file:rounded-md file:border-0 file:bg-bg-elevated file:px-3 file:py-1.5 file:font-mono file:text-text-secondary"
-        />
+      <Field label="Avatar" hint="PNG, JPG, WebP, or GIF — under 2 MB. Shown on your profile and board row.">
+        <div className="flex items-center gap-3">
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- user avatar; tiny fixed size
+            <img
+              src={avatarUrl}
+              alt="Your avatar"
+              className="h-12 w-12 rounded-full border border-bg-border object-cover"
+            />
+          ) : (
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-bg-border text-gold">
+              ◎
+            </span>
+          )}
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            disabled={avatarBusy}
+            onChange={onAvatar}
+            className="font-sans text-xs text-text-dim file:mr-3 file:rounded-md file:border-0 file:bg-bg-elevated file:px-3 file:py-1.5 file:font-mono file:text-text-secondary disabled:opacity-60"
+          />
+        </div>
+        {avatarBusy && <span className="font-sans text-[11px] text-text-dim">Uploading…</span>}
+        {avatarError && <span className="font-sans text-[11px] text-text-dim">{avatarError}</span>}
       </Field>
 
       <div className="flex flex-col gap-2 border-t border-bg-border pt-4">
