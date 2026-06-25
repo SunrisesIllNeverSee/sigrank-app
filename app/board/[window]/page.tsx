@@ -14,7 +14,7 @@
  * The four windows are statically generated. An unknown slug → 404.
  */
 
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getLeaderboard } from '@/lib/data'
 import { toEntry } from '@/lib/leaderboard/to-entry'
 import { boardWindowBySlug, BOARD_WINDOWS } from '@/lib/data/windows'
@@ -25,9 +25,9 @@ import { LeaderboardKey } from '@/components/leaderboard/LeaderboardKey'
 // D19: cache leaderboard reads for 300s (Cache-Control max-age=300 equivalent).
 export const revalidate = 300
 
-/** Statically render the four known windows + the Everything board. */
+/** Statically render the four known windows + the "off" (filter-off) board. */
 export function generateStaticParams() {
-  return [...BOARD_WINDOWS.map((w) => ({ window: w.slug })), { window: 'everything' }]
+  return [...BOARD_WINDOWS.map((w) => ({ window: w.slug })), { window: 'off' }]
 }
 
 export default async function BoardWindowPage({
@@ -37,17 +37,22 @@ export default async function BoardWindowPage({
 }) {
   const { window: slug } = await params
 
-  // Everything board (owner 2026-06-24): NO window filter — every operator's every
-  // window point (7d/30d/90d/all) shows as a distinct row, all ranked by Υ together.
-  // The window weights/experience factor is a later scoring change.
-  const isEverything = slug === 'everything'
-  const win = isEverything ? null : boardWindowBySlug(slug)
-  if (!isEverything && !win) notFound()
+  // Legacy alias (owner 2026-06-25): the old "everything" firehose was removed. Any
+  // surviving /board/everything link forwards to the new default so it never 404s.
+  if (slug === 'everything') redirect('/board/off')
 
-  // Everything → allSnapshots (no per-operator collapse, no window filter).
+  // "off" board (owner 2026-06-25 — filter off): NO window filter, but collapsed to
+  // ONE row per operator (latest snapshot across all windows) via getLeaderboard()'s
+  // default latestPerOperator dedupe. Replaces the removed "everything" firehose, whose
+  // per-(operator×window) rows rendered every multi-window seed as duplicate entries.
+  const isOff = slug === 'off'
+  const win = isOff ? null : boardWindowBySlug(slug)
+  if (!isOff && !win) notFound()
+
+  // off → default params (latestPerOperator dedupe; one row per operator, no window filter).
   // Windowed → windowFilter on its enum. getLeaderboard defaults sort to Υ yield.
-  const rows = isEverything
-    ? await getLeaderboard({ allSnapshots: true })
+  const rows = isOff
+    ? await getLeaderboard({})
     : await getLeaderboard({ window: win!.enum, windowFilter: true })
   const entries = rows.map(toEntry)
 
@@ -75,11 +80,11 @@ export default async function BoardWindowPage({
       />
 
       {/* Window switcher removed (owner 2026-06-24): the window selector now lives INSIDE
-          the leaderboard box (LeaderboardTable's Window dropdown, incl. Everything). */}
+          the leaderboard box (LeaderboardTable's Window dropdown, incl. the "off" view). */}
       <LeaderboardTable
         entries={entries}
         totalUsers={rows.length}
-        window={isEverything ? 'everything' : win!.slug}
+        window={isOff ? 'off' : win!.slug}
       />
 
       {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
