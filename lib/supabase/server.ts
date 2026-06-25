@@ -10,6 +10,7 @@ import 'server-only'
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { serviceKeyOrNull } from './service-config.mjs'
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -37,7 +38,7 @@ export function getSupabaseServer(): SupabaseClient | null {
 }
 
 /** True when a real SERVICE-ROLE key is present (privileged writes are possible). */
-export const SUPABASE_SERVICE_CONFIGURED = Boolean(url && serviceKey)
+export const SUPABASE_SERVICE_CONFIGURED = serviceKeyOrNull(url, serviceKey) !== null
 
 let cachedService: SupabaseClient | null = null
 
@@ -55,9 +56,10 @@ let cachedService: SupabaseClient | null = null
  * failure loud instead of silent.
  */
 export function getSupabaseService(): SupabaseClient | null {
-  if (!url || !serviceKey) return null
+  const key = serviceKeyOrNull(url, serviceKey)
+  if (!key) return null
   if (cachedService) return cachedService
-  cachedService = createClient(url as string, serviceKey as string, {
+  cachedService = createClient(url as string, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
   return cachedService
