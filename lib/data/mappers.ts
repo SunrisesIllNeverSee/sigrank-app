@@ -265,6 +265,50 @@ export function telemetryFromSnapshot(s: DbMetricSnapshot): TelemetryRaw {
   }
 }
 
+/** A zero telemetry block — for an operator with no cascade data yet. */
+export const ZERO_TELEMETRY: TelemetryRaw = {
+  fresh_input: 0,
+  output: 0,
+  cache_read: 0,
+  cache_create: 0,
+  sessions: 0,
+  turns: 0,
+}
+
+/** All-null snapshot row → mapSnapshot yields cascade=null + class IGNITER + zeros. */
+const EMPTY_DB_SNAPSHOT: DbMetricSnapshot = {
+  operator_id: '',
+  snapshot_date: '',
+  window_type: null,
+  compression_ratio: null,
+  prompt_complexity: null,
+  cross_thread: null,
+  session_depth: null,
+  token_throughput: null,
+  signa_rate: null,
+  sdot_score: null,
+  sdrm_score: null,
+  signal_force: null,
+  drift_ratio: null,
+  class_tier: null,
+  movement_24h: null,
+  movement_7d: null,
+  ruleset_version: null,
+  input_tokens: null,
+  output_tokens: null,
+  cache_creation_tokens: null,
+  cache_read_tokens: null,
+}
+
+/**
+ * A "pending" snapshot for an operator that EXISTS but has no cascade data yet
+ * (freshly-claimed account, no verified submission). cascade is null, so the
+ * profile renders an identity-only pending state instead of 404ing.
+ */
+export function pendingSnapshot(): ScoredSnapshot {
+  return mapSnapshot(EMPTY_DB_SNAPSHOT)
+}
+
 /**
  * Dedupe snapshot rows ordered snapshot_date DESC down to the latest per
  * operator. Supabase JS has no DISTINCT ON, so we keep the first occurrence of
