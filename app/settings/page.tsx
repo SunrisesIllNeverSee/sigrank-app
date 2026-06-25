@@ -68,8 +68,16 @@ export default async function SettingsPage() {
         {op ? (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-4 rounded-md border border-bg-border bg-bg-base/40 px-3 py-2.5">
-              <div className="flex flex-col">
+              <div className="flex min-w-0 flex-col">
                 <span className="font-mono text-xs text-text-secondary">Signed in</span>
+                {op.email && (
+                  <span
+                    className="truncate font-mono text-[11px] text-text-primary"
+                    title={op.email}
+                  >
+                    {op.email} <span className="text-text-dim">· private</span>
+                  </span>
+                )}
                 <span className="font-mono text-[11px] text-text-dim">{op.codename}</span>
               </div>
               <div className="flex gap-2">

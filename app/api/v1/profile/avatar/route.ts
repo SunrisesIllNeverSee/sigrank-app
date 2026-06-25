@@ -52,9 +52,10 @@ export async function POST(req: NextRequest) {
   const { data: pub } = svc.storage.from('avatars').getPublicUrl(path)
   const url = pub.publicUrl
 
+  // Uploading is an explicit edit → lock the avatar against provider resync (0012).
   const { error: dbErr } = await svc
     .from('operators')
-    .update({ avatar_url: url })
+    .update({ avatar_url: url, avatar_locked: true })
     .eq('operator_id', op.operatorId)
   if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 })
 
