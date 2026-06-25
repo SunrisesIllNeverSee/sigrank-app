@@ -133,9 +133,10 @@ function topThreeByColumn(
   return place
 }
 
-// Window dropdown — owner order: All time · 90 · 30 · 7 (drives the /board/[window] route).
+// Window dropdown — "off" (filter off: one row/operator, no window) then All time · 90 · 30 · 7,
+// driving the /board/[window] route. Owner 2026-06-25: the "everything" firehose was removed.
 const WINDOW_OPTS = [
-  { value: 'everything', label: 'Everything' },
+  { value: 'off', label: 'off' },
   { value: 'all', label: 'All time' },
   { value: '90d', label: '90 day' },
   { value: '30d', label: '30 day' },
