@@ -71,10 +71,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=auth', origin))
   }
 
-  // PROVIDER SYNC (owner 2026-06-25): the OAuth provider is the source of truth for the
-  // PUBLIC identity — display_name + avatar_url + handle are force-resynced from it on
-  // every login (see the returning-login branch). The auth EMAIL is NEVER copied to any
-  // operator column (P5); it lives in auth.users, shown only to the user in their /settings.
+  // PROVIDER SYNC + LOCK-ON-EDIT (owner 2026-06-25): the OAuth provider is the DEFAULT
+  // source of truth for the PUBLIC identity — display_name + avatar_url + handle are
+  // resynced from it on every login, EXCEPT any field the user has edited (the *_locked
+  // flags, migration 0012), which stays hardlined to their value (see returning-login
+  // branch). The auth EMAIL is NEVER copied to any operator column (P5); it lives in
+  // auth.users, shown only to the user in their /settings.
   const { handle: providerHandle, ...publicCore } = providerProfile(user.user_metadata)
 
   // FREE CLAIM: create/link the operator via the service role (privileged, idempotent
@@ -111,16 +113,31 @@ export async function GET(req: NextRequest) {
         }
       }
     } else {
-      // FORCE-RESYNC (owner 2026-06-25): the provider owns the public identity — overwrite
-      // display_name/avatar/handle with whatever THIS provider supplies on every login.
-      // Present fields only, so a magic-link login (no metadata) never nulls a value.
-      // bio/location/links stay user-owned (untouched).
+      // RESYNC EXCEPT LOCKED (owner 2026-06-25): overwrite display_name/avatar/handle from
+      // THIS provider, but SKIP any field the user has edited (*_locked, 0012) — their edit
+      // is hardlined. Present fields only, so a magic-link login (no metadata) never nulls a
+      // value. bio/location/links stay user-owned.
       const opId = (existing as { operator_id: string }).operator_id
-      if (Object.keys(publicCore).length > 0) {
-        await svc.from('operators').update(publicCore).eq('operator_id', opId)
+      const { data: cur } = await svc
+        .from('operators')
+        .select('display_name_locked, avatar_locked, handle_locked')
+        .eq('operator_id', opId)
+        .maybeSingle()
+      const lock = (cur ?? {}) as {
+        display_name_locked?: boolean
+        avatar_locked?: boolean
+        handle_locked?: boolean
       }
-      // handle is UNIQUE → best-effort; a collision with another operator just no-ops.
-      if (providerHandle) {
+      const patch: Record<string, string> = {}
+      if (publicCore.display_name && !lock.display_name_locked) {
+        patch.display_name = publicCore.display_name
+      }
+      if (publicCore.avatar_url && !lock.avatar_locked) patch.avatar_url = publicCore.avatar_url
+      if (Object.keys(patch).length > 0) {
+        await svc.from('operators').update(patch).eq('operator_id', opId)
+      }
+      // handle is UNIQUE → best-effort; resync only when the user hasn't locked it.
+      if (providerHandle && !lock.handle_locked) {
         await svc.from('operators').update({ handle: providerHandle }).eq('operator_id', opId)
       }
     }
