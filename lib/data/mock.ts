@@ -86,18 +86,6 @@ export interface HomepageStats {
   isPlaceholder: boolean
 }
 
-/** A Circle (team) summary row. */
-export interface CircleRow {
-  circle_id: string
-  name: string
-  tag: string
-  member_count: number
-  avg_signa_rate: number
-  avg_compression: number
-  global_rank: number
-  owner_codename: string
-  isPlaceholder: boolean
-}
 
 /** A Hall of Signal record. */
 export interface HallRecord {
@@ -525,12 +513,8 @@ export const MOCK_HALL: HallRecord[] = [
   { reward_id: 'RW.33', title: 'First Verified Transmitter', operator_codename: 'TransVaultOrigin', value: 'claude region', date: '2026-05-14', isPlaceholder: true },
 ]
 
-/** Circles (placeholder; Phase 2 feature). */
-export const MOCK_CIRCLES: CircleRow[] = [
-  { circle_id: 'circle-signalvault', name: 'The Signal Vault', tag: 'VAULT', member_count: 7, avg_signa_rate: 88.3, avg_compression: 0.901, global_rank: 1, owner_codename: 'TransVaultOrigin', isPlaceholder: true },
-  { circle_id: 'circle-axiom', name: 'Axiom Collective', tag: 'AXIM', member_count: 5, avg_signa_rate: 79.1, avg_compression: 0.812, global_rank: 2, owner_codename: 'OrcaVanguard', isPlaceholder: true },
-  { circle_id: 'circle-prism', name: 'Prism Cartographers', tag: 'PRSM', member_count: 6, avg_signa_rate: 68.4, avg_compression: 0.724, global_rank: 3, owner_codename: 'PrismCartographer', isPlaceholder: true },
-]
+// MOCK_CIRCLES + CircleRow removed 2026-06-25 (Circles feature dropped — fresh-slate
+// rebuild later; DB tables + route already gone). See ICEBOX.md / AFTER_LAUNCH.md.
 
 /** Class distribution across the mock population. */
 export const MOCK_CLASS_DISTRIBUTION: ClassDistributionRow[] = (() => {
