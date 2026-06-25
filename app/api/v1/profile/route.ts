@@ -24,6 +24,47 @@ function str(v: unknown, max: number): string | null {
   return t ? t.slice(0, max) : null
 }
 
+/**
+ * GET /api/v1/profile — the signed-in operator's editable fields, for prefilling the
+ * in-profile edit modal. Returns { operator: null } when logged out. `codename` lets the
+ * client confirm ownership of the profile it's viewing before showing edit controls.
+ */
+export async function GET() {
+  const op = await getSessionOperator()
+  if (!op) return NextResponse.json({ operator: null })
+
+  const svc = getSupabaseServer()
+  if (!svc) return NextResponse.json({ operator: null })
+
+  const { data } = await svc
+    .from('operators')
+    .select('display_name, handle, bio, location, links, operator_domains, avatar_url')
+    .eq('operator_id', op.operatorId)
+    .maybeSingle()
+  const d = data as {
+    display_name: string | null
+    handle: string | null
+    bio: string | null
+    location: string | null
+    links: { github?: string; site?: string; x?: string } | null
+    operator_domains: string[] | null
+    avatar_url: string | null
+  } | null
+
+  return NextResponse.json({
+    operator: {
+      codename: op.codename,
+      display_name: d?.display_name ?? '',
+      handle: d?.handle ?? '',
+      bio: d?.bio ?? '',
+      location: d?.location ?? '',
+      links: d?.links ?? {},
+      operator_domains: d?.operator_domains ?? [],
+      avatar_url: d?.avatar_url ?? '',
+    },
+  })
+}
+
 export async function POST(req: NextRequest) {
   const op = await getSessionOperator()
   if (!op) return NextResponse.json({ error: 'Not signed in.' }, { status: 401 })
