@@ -1,27 +1,59 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { ThemeToggle } from './ThemeToggle'
 
 /**
- * AccountMenu — right-side account / profile entry point. Renders a "Login"
- * trigger that opens an absolutely-positioned dropdown panel holding auth
- * actions plus the theme controls. Closes on outside click or Escape.
+ * AccountMenu — right-side account / profile entry point. Renders a "Sign in"
+ * trigger that opens a dropdown panel holding auth actions plus the theme
+ * controls. Closes on outside click or Escape.
+ *
+ * Positioning (fix 2026-06-25): the panel is rendered via a PORTAL to
+ * document.body with `position: fixed`, anchored under the trigger. The Nav is
+ * `sticky top-0 ... backdrop-blur-md`, and a `backdrop-filter` ancestor becomes
+ * the containing block for absolutely-positioned descendants — which made the
+ * old `absolute mt-2` panel resolve UPWARD relative to the thin nav bar and
+ * clip off the top of the screen (the "dropUP, half off-screen" bug). A fixed
+ * portal escapes the nav's containing block entirely so it always drops down.
  *
  * Login route note: /api/auth/github does not exist yet, so the GitHub action
- * points at '#' for now (placeholder, swap when the route lands).
+ * points at '/login' for now (placeholder, swap when the route lands).
  */
 export function AccountMenu() {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ top: number; right: number } | null>(null)
+
+  // Anchor the fixed panel under the trigger (right-aligned). Recompute on open,
+  // and on resize/scroll while open so it tracks the sticky nav.
+  useLayoutEffect(() => {
+    if (!open) return
+    function place() {
+      const t = triggerRef.current
+      if (!t) return
+      const r = t.getBoundingClientRect()
+      setPos({ top: r.bottom + 8, right: window.innerWidth - r.right })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [open])
 
   useEffect(() => {
     if (!open) return
     function onPointerDown(e: MouseEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+      const target = e.target as Node
+      const inRoot = rootRef.current?.contains(target)
+      const inMenu = menuRef.current?.contains(target)
+      if (!inRoot && !inMenu) setOpen(false)
     }
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false)
@@ -46,6 +78,7 @@ export function AccountMenu() {
       </Link>
 
       <button
+        ref={triggerRef}
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -55,11 +88,14 @@ export function AccountMenu() {
         <span className="text-gold">◎</span> Sign in
       </button>
 
-      {open && (
+      {open && pos !== null && typeof document !== 'undefined' &&
+        createPortal(
         <div
+          ref={menuRef}
           role="menu"
           aria-label="Account"
-          className="absolute right-0 z-50 mt-2 w-56 rounded-md border border-bg-border bg-bg-elevated p-1 font-sans text-sm shadow-lg"
+          style={{ position: 'fixed', top: pos.top, right: pos.right }}
+          className="z-50 w-56 rounded-md border border-bg-border bg-bg-elevated p-1 font-sans text-sm shadow-lg"
         >
           <Link
             href="/login"
@@ -106,7 +142,8 @@ export function AccountMenu() {
             </div>
             <ThemeToggle />
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
