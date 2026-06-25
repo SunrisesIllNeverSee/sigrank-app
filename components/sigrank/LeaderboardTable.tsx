@@ -135,7 +135,7 @@ function topThreeByColumn(
 
 // Window dropdown — owner order: All time · 90 · 30 · 7 (drives the /board/[window] route).
 const WINDOW_OPTS = [
-  { value: 'everything', label: 'Everything' },
+  { value: 'everything', label: 'off' },
   { value: 'all', label: 'All time' },
   { value: '90d', label: '90 day' },
   { value: '30d', label: '30 day' },
