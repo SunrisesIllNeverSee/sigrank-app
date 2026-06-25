@@ -166,7 +166,11 @@ export async function materializeVerifiedSnapshot(
     p_snapshot_date: snapshotDateUTC(payload.window.end),
     p_signa_rate: r.signaRate,
     p_class_tier: r.classTier,
-    p_submitted_at: payload.submitted_at,
+    // p_submitted_at intentionally OMITTED → the RPC's COALESCE(p_submitted_at, now())
+    // stamps submitted_at with the SERVER clock. The per-device throttle counts on this
+    // column, so a client-supplied timestamp must never set it (review P2: a backdated
+    // submitted_at would make the throttle window always read 0 → unbounded writes). The
+    // client's claimed submitted_at is still preserved inside p_payload_json.
     p_schema_version: payload.schema_version,
     p_signature: signature,
     p_codename: payload.codename,
@@ -216,7 +220,9 @@ export async function insertSubmissionOnly(
   const { error } = await svc.from('snapshot_submissions').insert({
     operator_id: device.operator_id, // FROM DEVICE (§5.4)
     device_id: device.device_id,
-    submitted_at: payload.submitted_at,
+    // submitted_at OMITTED → column DEFAULT now() (server clock). Throttle integrity:
+    // never let a client timestamp set the throttle-keyed column (review P2). The client's
+    // claimed submitted_at remains in payload_json.
     window_type: payload.window.type,
     window_start: payload.window.start,
     window_end: payload.window.end,
