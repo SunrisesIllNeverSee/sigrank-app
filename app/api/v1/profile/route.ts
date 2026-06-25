@@ -108,6 +108,11 @@ export async function POST(req: NextRequest) {
     update.primary_domain = operator_domains.length > 1 ? 'multi' : operator_domains[0]
   }
 
+  // Lock-on-edit (0012): a non-empty value the user saves becomes hardlined, so the login
+  // provider-resync skips it from here on. Clearing a field leaves it provider-managed.
+  if (update.display_name) update.display_name_locked = true
+  if (update.handle) update.handle_locked = true
+
   const { error } = await svc.from('operators').update(update).eq('operator_id', op.operatorId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

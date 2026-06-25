@@ -26,6 +26,27 @@ function mintCodename(): string {
   return `signal-${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`
 }
 
+/** PUBLIC identity fields an OAuth provider exposes in user_metadata (GitHub + X carry
+ *  these; magic-link carries none → all undefined, a graceful no-op). Email is excluded
+ *  on purpose — it's PII (P5) and never leaves auth.users. */
+function providerProfile(meta: unknown): {
+  display_name?: string
+  avatar_url?: string
+  handle?: string
+} {
+  const m = (meta ?? {}) as Record<string, unknown>
+  const str = (v: unknown): string | undefined =>
+    typeof v === 'string' && v.trim() ? v.trim() : undefined
+  const out: { display_name?: string; avatar_url?: string; handle?: string } = {}
+  const name = str(m.full_name) ?? str(m.name)
+  const avatar = str(m.avatar_url) ?? str(m.picture)
+  const handle = (str(m.user_name) ?? str(m.preferred_username))?.replace(/^@+/, '')
+  if (name) out.display_name = name
+  if (avatar) out.avatar_url = avatar
+  if (handle) out.handle = handle
+  return out
+}
+
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin
   const code = req.nextUrl.searchParams.get('code')
@@ -50,9 +71,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=auth', origin))
   }
 
+  // PROVIDER SYNC + LOCK-ON-EDIT (owner 2026-06-25): the OAuth provider is the DEFAULT
+  // source of truth for the PUBLIC identity — display_name + avatar_url + handle are
+  // resynced from it on every login, EXCEPT any field the user has edited (the *_locked
+  // flags, migration 0012), which stays hardlined to their value (see returning-login
+  // branch). The auth EMAIL is NEVER copied to any operator column (P5); it lives in
+  // auth.users, shown only to the user in their /settings.
+  const { handle: providerHandle, ...publicCore } = providerProfile(user.user_metadata)
+
   // FREE CLAIM: create/link the operator via the service role (privileged, idempotent
-  // on the operator_accounts user_id PK). The auth email is NEVER copied to any operator
-  // column (P5) — identity stays isolated in auth.users + this link table.
+  // on the operator_accounts user_id PK).
   const svc = getSupabaseServer()
   if (svc) {
     const { data: existing } = await svc
@@ -62,17 +90,55 @@ export async function GET(req: NextRequest) {
       .maybeSingle()
 
     if (!existing) {
+      // First login → mint the operator, prefilled with the provider's public name/avatar.
       let operatorId: string | null = null
       for (let attempt = 0; attempt < 3 && !operatorId; attempt++) {
         const { data: op, error: opErr } = await svc
           .from('operators')
-          .insert({ codename: mintCodename(), claimed: true, claimed_at: new Date().toISOString() })
+          .insert({
+            codename: mintCodename(),
+            claimed: true,
+            claimed_at: new Date().toISOString(),
+            ...publicCore,
+          })
           .select('operator_id')
           .single()
         if (!opErr && op) operatorId = (op as { operator_id: string }).operator_id
       }
       if (operatorId) {
         await svc.from('operator_accounts').insert({ user_id: user.id, operator_id: operatorId })
+        // handle is UNIQUE — set it best-effort so a collision can never block the claim.
+        if (providerHandle) {
+          await svc.from('operators').update({ handle: providerHandle }).eq('operator_id', operatorId)
+        }
+      }
+    } else {
+      // RESYNC EXCEPT LOCKED (owner 2026-06-25): overwrite display_name/avatar/handle from
+      // THIS provider, but SKIP any field the user has edited (*_locked, 0012) — their edit
+      // is hardlined. Present fields only, so a magic-link login (no metadata) never nulls a
+      // value. bio/location/links stay user-owned.
+      const opId = (existing as { operator_id: string }).operator_id
+      const { data: cur } = await svc
+        .from('operators')
+        .select('display_name_locked, avatar_locked, handle_locked')
+        .eq('operator_id', opId)
+        .maybeSingle()
+      const lock = (cur ?? {}) as {
+        display_name_locked?: boolean
+        avatar_locked?: boolean
+        handle_locked?: boolean
+      }
+      const patch: Record<string, string> = {}
+      if (publicCore.display_name && !lock.display_name_locked) {
+        patch.display_name = publicCore.display_name
+      }
+      if (publicCore.avatar_url && !lock.avatar_locked) patch.avatar_url = publicCore.avatar_url
+      if (Object.keys(patch).length > 0) {
+        await svc.from('operators').update(patch).eq('operator_id', opId)
+      }
+      // handle is UNIQUE → best-effort; resync only when the user hasn't locked it.
+      if (providerHandle && !lock.handle_locked) {
+        await svc.from('operators').update({ handle: providerHandle }).eq('operator_id', opId)
       }
     }
   }

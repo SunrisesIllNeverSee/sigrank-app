@@ -59,6 +59,9 @@ export interface SessionOperator {
   codename: string
   displayName: string | null
   avatarUrl: string | null
+  /** The verified auth email — PRIVATE (P5): shown only to the user (e.g. /settings),
+   *  read live from auth.users; never stored in or read from a public operator column. */
+  email: string | null
 }
 
 /**
@@ -94,5 +97,6 @@ export async function getSessionOperator(): Promise<SessionOperator | null> {
     codename: row.operators?.codename ?? '',
     displayName: row.operators?.display_name ?? null,
     avatarUrl: row.operators?.avatar_url ?? null,
+    email: user.email ?? null,
   }
 }
