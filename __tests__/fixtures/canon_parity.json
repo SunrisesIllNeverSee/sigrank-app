@@ -1,0 +1,54 @@
+{
+  "_note": "TEST-ONLY keypair. Generated once for the canon-parity gate; both sigrank-mcp and sigrank-app assert against it. Not a real device identity.",
+  "public_key": "ed25519:pkMEwTRuT+XFpOhInnMvZt98yKgy8MfhBTqPTv8h+NQ=",
+  "private_key_pkcs8_b64": "MC4CAQAwBQYDK2VwBCIEIIu04KDTTAqykO+Q0/sivxqHW/YnhO6Urh9RZDkjlwE6",
+  "payload": {
+    "schema_version": "1.0",
+    "codename": "TransVaultOrigin",
+    "device_id": "1f0c9a4e-2b6d-4a1c-9e3f-7d5b2a8c4e10",
+    "submitted_at": "2026-06-25T18:30:00.000Z",
+    "window": {
+      "type": "30d",
+      "start": "2026-05-26T00:00:00.000Z",
+      "end": "2026-06-25T00:00:00.000Z"
+    },
+    "platform": {
+      "primary": "claude",
+      "models": [
+        "claude-opus-4-8"
+      ]
+    },
+    "core_metrics": {
+      "compression_ratio": 0.9003,
+      "prompt_complexity": 41.2,
+      "cross_thread_score": 73,
+      "session_depth_avg": 5,
+      "token_throughput": 2695923411
+    },
+    "background_metrics": {
+      "message_volume": 500,
+      "account_age_days": 365,
+      "total_messages_lifetime": 25000
+    },
+    "raw_telemetry": {
+      "sessions_count": 100,
+      "turns_total": 500,
+      "tokens_total": 2695923411,
+      "tokens_input_fresh": 1251211,
+      "tokens_output": 11296121,
+      "tokens_cache_read": 2555179769,
+      "tokens_cache_creation": 128196310,
+      "active_minutes_est": 1000
+    },
+    "tier": "free",
+    "agent": {
+      "version": "sigrank-mcp/0.9.15",
+      "ruleset_version": "rs-token-1",
+      "snapshot_hash": "sha256:4a234386f7764ad240c24a5fd36725f4c52e95bacc4bf916c1e60849ecb7a589",
+      "public_key": "ed25519:pkMEwTRuT+XFpOhInnMvZt98yKgy8MfhBTqPTv8h+NQ="
+    }
+  },
+  "expected_canonical": "{\"agent\":{\"public_key\":\"ed25519:pkMEwTRuT+XFpOhInnMvZt98yKgy8MfhBTqPTv8h+NQ=\",\"ruleset_version\":\"rs-token-1\",\"version\":\"sigrank-mcp/0.9.15\"},\"background_metrics\":{\"account_age_days\":365,\"message_volume\":500,\"total_messages_lifetime\":25000},\"codename\":\"TransVaultOrigin\",\"core_metrics\":{\"compression_ratio\":0.9003,\"cross_thread_score\":73,\"prompt_complexity\":41.2,\"session_depth_avg\":5,\"token_throughput\":2695923411},\"device_id\":\"1f0c9a4e-2b6d-4a1c-9e3f-7d5b2a8c4e10\",\"platform\":{\"models\":[\"claude-opus-4-8\"],\"primary\":\"claude\"},\"raw_telemetry\":{\"active_minutes_est\":1000,\"sessions_count\":100,\"tokens_cache_creation\":128196310,\"tokens_cache_read\":2555179769,\"tokens_input_fresh\":1251211,\"tokens_output\":11296121,\"tokens_total\":2695923411,\"turns_total\":500},\"schema_version\":\"1.0\",\"submitted_at\":\"2026-06-25T18:30:00.000Z\",\"tier\":\"free\",\"window\":{\"end\":\"2026-06-25T00:00:00.000Z\",\"start\":\"2026-05-26T00:00:00.000Z\",\"type\":\"30d\"}}",
+  "expected_snapshot_hash": "sha256:4a234386f7764ad240c24a5fd36725f4c52e95bacc4bf916c1e60849ecb7a589",
+  "expected_signature": "I/FJ9GkIRX1/lsXotaPQCOgsOF2jVWG6tP6vjyWqG4MNhU1bcLoL23pR1DQ7ZOac/VFbZvdHLDSDThyiujFsDw=="
+}
