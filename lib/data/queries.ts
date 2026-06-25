@@ -50,8 +50,10 @@ import {
   mapOperator,
   mapSnapshot,
   num,
+  pendingSnapshot,
   telemetryFromSnapshot,
   toSignalClass,
+  ZERO_TELEMETRY,
 } from '@/lib/data/mappers'
 import { fallbackRows, filterMockBoard, sortValue } from '@/lib/data/fallback'
 
@@ -286,7 +288,18 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
       .maybeSingle()
     if (snapError) throw snapError
     const snap = asDb<DbMetricSnapshot | null>(snapData)
-    if (!snap) return fromMock()
+    if (!snap) {
+      // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
+      // verified submission). Render an identity-only PENDING profile — never a 404.
+      return {
+        operator: mapOperator(op),
+        snapshot: pendingSnapshot(),
+        global_rank: 0,
+        percentile: 0,
+        telemetry: ZERO_TELEMETRY,
+        pending: true,
+      }
+    }
 
     const { data: rankData } = await sb
       .from('rank_history')
