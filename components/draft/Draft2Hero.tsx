@@ -1,6 +1,7 @@
 import React from 'react'
 import { CascadeHeader } from '@/components/home/CascadeHeader'
 import { RotatingWordmark } from '@/components/home/RotatingWordmark'
+import { TerminalWordmark } from '@/components/home/TerminalWordmark'
 import { Draft2ActionTiles } from '@/components/draft/Draft2ActionTiles'
 
 /**
@@ -32,8 +33,11 @@ export function Draft2Hero() {
           Operator Performance Signature
         </p>
 
-        {/* the original SIGRANK logo — animated wordmark + § coin */}
+        {/* the original SIGRANK logo — animated wordmark + § coin.
+            Under terminal theme, TerminalWordmark (block-letter art) takes over;
+            RotatingWordmark self-gates to null. Both render here; only one shows. */}
         <RotatingWordmark />
+        <TerminalWordmark />
 
         {/* powered by — white + larger (owner 2026-06-22) */}
         <span className="font-mono text-sm uppercase tracking-[0.22em] text-text-primary sm:text-base">

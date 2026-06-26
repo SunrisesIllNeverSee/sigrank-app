@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 /**
  * RotatingWordmark — the landing hero wordmark, EXAGGERATED.
@@ -13,10 +13,27 @@ import React from 'react'
  *
  * Hero-scale: clamped huge (up to ~9rem), heavy weight, tight tracking. The §
  * coin sits after the word. Reduced-motion locks every letter to the mono face.
+ *
+ * Self-gates: renders null when data-theme === 'terminal' (the TerminalWordmark
+ * takes over the hero under that theme). Watches data-theme via MutationObserver.
  */
 const WORD = 'SIGRANK'.split('')
 
 export function RotatingWordmark() {
+  const [hidden, setHidden] = useState(false)
+
+  useEffect(() => {
+    const check = () => {
+      setHidden(document.documentElement.getAttribute('data-theme') === 'terminal')
+    }
+    check()
+    const observer = new MutationObserver(check)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
+
+  if (hidden) return null
+
   return (
     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
       <h1
