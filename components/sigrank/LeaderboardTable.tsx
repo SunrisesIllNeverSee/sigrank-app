@@ -60,6 +60,18 @@ function platformLabel(e: LeaderboardEntry): string {
   return PLATFORM_LABEL[p] ?? (e.platform as string)
 }
 
+// WINDOW chip (FIX F): on the "off" board the same operator shows once per
+// (platform, window), so each row is tagged with its window to read as an
+// intentional breakout, not a duplicate. Single-window boards don't render it.
+const WINDOW_LABEL: Record<string, string> = {
+  today: 'TODAY', '7d': '7D', '30d': '30D', '90d': '90D', all_time: 'ALL', all: 'ALL',
+}
+function windowLabel(e: LeaderboardEntry): string {
+  const w = (e.window ?? '').toLowerCase()
+  if (!w) return ''
+  return WINDOW_LABEL[w] ?? w.toUpperCase()
+}
+
 const fmtBig = (n: number | null | undefined): string => {
   if (n == null) return '—'
   if (n >= 1e12) return `${(n / 1e12).toFixed(2)}T`
@@ -179,6 +191,23 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
   const [classFilter, setClassFilter] = useState<string>('all')
   const [page, setPage] = useState(0) // 0-based; 25 rows/page (owner 2026-06-24)
 
+  // FIX F: the "off" board mixes windows (per-(operator, platform, window) rows), so it
+  // labels each row with its window. Single-window boards don't (the window is the board).
+  const showWindow = win === 'off'
+  const winChip = (e: LeaderboardEntry) =>
+    showWindow && windowLabel(e) ? (
+      <span
+        style={{
+          marginLeft: 6, padding: '0 5px', borderRadius: 4, background: 'rgb(var(--bg-elevated))',
+          border: `1px solid ${T.line}`, color: T.mut, fontSize: 9, fontWeight: 700,
+          letterSpacing: '0.04em', verticalAlign: 'middle', whiteSpace: 'nowrap',
+        }}
+        title={`${e.window} window`}
+      >
+        {windowLabel(e)}
+      </span>
+    ) : null
+
   const isActive = (col: SortKey) => sort === col
 
   // Click a header → sort by it; click the active column → flip direction. Default
@@ -286,6 +315,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                     <span style={{ color: T.ink, fontSize: 13, fontWeight: 600, fontStyle: e.isSeed ? 'italic' : 'normal', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>
                       {e.anonId}
+                      {winChip(e)}
                     </span>
                     <span style={{ color: T.mut, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.subLabel ?? platformLabel(e)}</span>
                   </span>
@@ -337,7 +367,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                       <span style={st.op}>
                         <OperatorAvatar alt={e.anonId} />
                         <Link href={`/user/${encodeURIComponent(e.anonId)}`} style={st.opLink}>
-                          <span style={{ ...st.opName, fontStyle: e.isSeed ? 'italic' : 'normal' }}><span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>{e.anonId}</span>
+                          <span style={{ ...st.opName, fontStyle: e.isSeed ? 'italic' : 'normal' }}><span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>{e.anonId}{winChip(e)}</span>
                           {(e.subLabel || e.location) ? (
                             <span style={st.opSub}>
                               {e.subLabel}
@@ -393,7 +423,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                       <span style={st.op}>
                         <OperatorAvatar alt={e.anonId} />
                         <Link href={`/user/${encodeURIComponent(e.anonId)}`} style={st.opLink}>
-                          <span style={{ ...st.opName, fontStyle: e.isSeed ? 'italic' : 'normal' }}><span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>{e.anonId}</span>
+                          <span style={{ ...st.opName, fontStyle: e.isSeed ? 'italic' : 'normal' }}><span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>{e.anonId}{winChip(e)}</span>
                           {(e.subLabel || e.location) ? (
                             <span style={st.opSub}>
                               {e.subLabel}

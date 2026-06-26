@@ -55,6 +55,10 @@ export interface DbMetricSnapshot {
   snapshot_date: string
   /** 730 window bucket: '7d' | '30d' | '90d' | 'all_time' (TEXT, schema 0001). */
   window_type: string | null
+  /** Per-submission AI platform (migration 0015, FIX H). Backfilled from the
+   *  operator's primary_domain on legacy rows; carried per-snapshot going forward
+   *  so claude/codex/multi get distinct (operator, window, platform) slots. */
+  platform: string | null
   compression_ratio: number | null
   prompt_complexity: number | null
   cross_thread: number | null
@@ -103,6 +107,14 @@ export interface BoardParams {
    * later scoring change; for now mixed window rows just sort by their own Υ.
    */
   allSnapshots?: boolean
+  /**
+   * Per-platform board slots (migration 0015, FIX H): when true, collapse to one
+   * row per (operator, platform) instead of one per operator — so an operator who
+   * ran claude AND codex in the window shows BOTH, labeled. No effect under
+   * allSnapshots (which already keeps every row). Behaviour-preserving until
+   * multi-platform submissions exist (legacy rows carry one platform per operator).
+   */
+  perPlatform?: boolean
   /** primary_domain filter, or null/undefined for all. */
   platform?: string | null
   /** Lowercase class scope (e.g. 'transmitter'), or 'all'/undefined. */
@@ -280,6 +292,7 @@ const EMPTY_DB_SNAPSHOT: DbMetricSnapshot = {
   operator_id: '',
   snapshot_date: '',
   window_type: null,
+  platform: null,
   compression_ratio: null,
   prompt_complexity: null,
   cross_thread: null,
@@ -320,4 +333,21 @@ export function latestPerOperator(rows: DbMetricSnapshot[]): Map<string, DbMetri
     if (!byOp.has(r.operator_id)) byOp.set(r.operator_id, r)
   }
   return byOp
+}
+
+/**
+ * Per-platform dedupe (FIX H): latest snapshot per (operator_id, platform) from a
+ * descending-ordered result. Same contract as latestPerOperator but keyed on the
+ * platform too, so claude/codex/multi each keep their own row. A null platform
+ * (pre-0015 row read before backfill) folds under the operator's '∅' bucket.
+ */
+export function latestPerOperatorPlatform(
+  rows: DbMetricSnapshot[],
+): Map<string, DbMetricSnapshot> {
+  const byOpPlatform = new Map<string, DbMetricSnapshot>()
+  for (const r of rows) {
+    const key = `${r.operator_id}|${r.platform ?? '∅'}`
+    if (!byOpPlatform.has(key)) byOpPlatform.set(key, r)
+  }
+  return byOpPlatform
 }
