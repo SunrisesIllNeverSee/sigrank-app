@@ -169,10 +169,11 @@ npx sigrank-mcp`}
         <div className="font-mono text-xs uppercase tracking-wide text-gold">Or let your AI agent do it</div>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
           Don&apos;t want to leave your agent? Just tell it to run{' '}
-          <Cmd>npx sigrank-mcp me</Cmd> for your cascade, or{' '}
-          <Cmd>npx sigrank-mcp submit</Cmd> to publish. It reads your logs, derives the cascade,
-          and submits — you don&apos;t paste anything. For direct tool calls, wire it as an MCP
-          server (one JSON line) — see the{' '}
+          <Cmd>npx sigrank-mcp me</Cmd> to see your cascade, or{' '}
+          <Cmd>npx sigrank-mcp submit</Cmd> to publish (sign in once first with{' '}
+          <Cmd>npx sigrank-mcp enroll</Cmd>). It reads your logs, derives the cascade, and
+          submits — you don&apos;t paste anything. For direct tool calls, wire it as an MCP
+          server — see the{' '}
           <Link href="/wiki/local-agent" className="text-text-accent underline-offset-2 hover:underline">
             local agent wiki page
           </Link>.
