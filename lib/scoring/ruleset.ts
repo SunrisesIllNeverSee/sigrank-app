@@ -14,9 +14,16 @@ import 'server-only'
  */
 
 /**
- * RS.01 — SIGNA RATE composite weights. Sum = 1.0.
+ * RS.01 — SIGNA RATE composite weights.
  * Order: M.01 compression / M.04 session-depth / M.02 prompt-complexity /
  * M.03 cross-thread / M.05 token-throughput.
+ *
+ * tt (M.05 token-throughput) is a WORD-ERA metric → MUTED to 0 (2026-06-26): it is not
+ * a valid token-cascade signal (it was being fed the raw total, distorting the score).
+ * §IGNA is under recalibration — the recal finalizes the remaining weights (they are
+ * intentionally NOT rebalanced to 1.0 here; the recal owns the final normalization).
+ * Until then signa = comp+sd+pc+ct only (tt contributes nothing). See WEBSITE_FIXES /
+ * the §IGNA recalibration note.
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.01
 export const RS01_SIGNA_WEIGHTS = {
@@ -24,7 +31,7 @@ export const RS01_SIGNA_WEIGHTS = {
   sd: 0.2,
   pc: 0.2,
   ct: 0.15,
-  tt: 0.15,
+  tt: 0, // MUTED — word-era M.05, removed from the live composite pending §IGNA recal
 } as const
 
 /**

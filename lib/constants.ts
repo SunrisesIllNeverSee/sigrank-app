@@ -95,7 +95,8 @@ export const SORT_METRICS: SortMetricOption[] = [
   { key: 'prompt_complexity', canonId: 'M.02', label: 'Prompt Complexity' },
   { key: 'cross_thread', canonId: 'M.03', label: 'Cross-Thread' },
   { key: 'session_depth', canonId: 'M.04', label: 'Session Depth' },
-  { key: 'token_throughput', canonId: 'M.05', label: 'Token Throughput' },
+  // M.05 Token Throughput removed 2026-06-26 — word-era metric, muted from §IGNA + dropped
+  // from sort options (was fed the raw total, distorting the value). Pending §IGNA recal.
   { key: 'message_volume', canonId: 'B.01', label: 'Turn Volume' },
   { key: 'signal_force', canonId: 'E.01', label: 'Signal Force' },
 ]
