@@ -22,8 +22,8 @@ export * from '@/lib/data/mappers'
 export * from '@/lib/data/fallback'
 export * from '@/lib/data/queries'
 
-// Re-export the row/record types from the mock module (the canonical type source)
-// so feature builders import data + types from this single facade.
+// Re-export the row/record types from the neutral types module (extracted from
+// mock.ts 2026-06-26) so feature builders import data + types from this facade.
 export type {
   LeaderboardRow,
   HistoryPoint,
@@ -34,4 +34,4 @@ export type {
   HourlyPoint,
   WeeklyPoint,
   CountryCount,
-} from '@/lib/data/mock'
+} from '@/lib/data/types'

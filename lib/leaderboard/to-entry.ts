@@ -14,7 +14,7 @@
  * real fuel to display even where the derived metrics read "—".
  */
 
-import type { LeaderboardRow } from '@/lib/data/mock'
+import type { LeaderboardRow } from '@/lib/data/types'
 import type { LeaderboardEntry } from '@/components/sigrank'
 
 /** Map a scored row into the ported LeaderboardTable entry shape. */

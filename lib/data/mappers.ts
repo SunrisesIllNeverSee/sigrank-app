@@ -17,7 +17,7 @@
  */
 
 import { computeCascadeMetrics } from '@/lib/ingest/bridge'
-import type { TelemetryRaw } from '@/lib/data/mock'
+import type { TelemetryRaw } from '@/lib/data/types'
 import type { SignalClass } from '@/components/sigrank/types'
 import type { Operator, ScoredSnapshot, SupporterTier } from '@/lib/scoring/types'
 
