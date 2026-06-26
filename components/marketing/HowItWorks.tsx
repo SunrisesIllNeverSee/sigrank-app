@@ -30,7 +30,7 @@ const STEPS: Step[] = [
     n: 2,
     kicker: 'CONNECT',
     title: 'It reads your tokens on-device',
-    body: 'The agent reads local session logs from 15 platforms — Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more — and counts the four token pillars across 7d / 30d / 90d / all-time. It never reads your prompts; only the counts.',
+    body: 'The agent reads local session logs from 14+ platforms — Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more — and counts the four token pillars across 7d / 30d / 90d / all-time. It never reads your prompts; only the counts.',
   },
   {
     n: 3,
