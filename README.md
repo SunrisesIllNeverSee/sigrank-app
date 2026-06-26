@@ -1,24 +1,6 @@
 <div align="center">
 
-```
-  ◈  ───────────────────────────────────────────  ◈
-
-  ███████ ██  ██████  ██████   █████  ███    ██ ██   ██
-  ██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██
-  ███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████
-       ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██
-  ███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██
-
-  ◈  ───────────────────────────────────────────  ◈
-
-     We measure the architecture of users' token cascade.
-                    signalaf
-
-             powered by  MO§ES™
-   Most platforms reward volume. SigRank rewards structure.
-
-     ▸ Identifying Burners, Builders, and 10×ers ◂
-```
+<img src="assets/sigrank-splash.svg" alt="SigRank — TUI splash">
 
 # SigRank
 
