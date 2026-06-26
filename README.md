@@ -1,7 +1,36 @@
+<div align="center">
+
+```
+ ███████ ██  ██████  ██████   █████  ███    ██ ██   ██
+ ██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██
+ ███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████
+      ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██
+ ███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██
+```
+
 # SigRank
 
-A privacy-preserving, BlitzStars-style leaderboard that scores AI operators on
-11 canonical token-telemetry metrics, with a Pro tier behind Stripe billing.
+**A privacy-preserving leaderboard that scores AI operators on token cascade efficiency.**
+
+The rank metric: **Υ = (cache_read × output) / input²** — the yield cascade.
+
+[![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
+[![vercel](https://img.shields.io/badge/deploy-Vercel-black.svg?style=flat-square)](https://vercel.com)
+[![next.js](https://img.shields.io/badge/Next.js-15-black.svg?style=flat-square)](https://nextjs.org)
+[![react](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev)
+[![typescript](https://img.shields.io/badge/TypeScript-strict-blue.svg?style=flat-square)](https://www.typescriptlang.org)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
+[![supabase](https://img.shields.io/badge/db-Supabase-green.svg?style=flat-square)](https://supabase.com)
+[![stripe](https://img.shields.io/badge/billing-Stripe-purple.svg?style=flat-square)](https://stripe.com)
+
+</div>
+
+---
+
+A BlitzStars-style leaderboard for AI operators. Scores 11 canonical token-telemetry
+metrics across 15+ platforms (Claude, Codex, Amp, Gemini, and more). Free tier + Pro tier
+behind Stripe. Anonymous + claimable operator entries. Four selectable themes (Carbon,
+Paper, Railway, Terminal).
 
 ## Stack
 
@@ -57,3 +86,12 @@ sync.
 See [`.env.example`](./.env.example) for the full list (Supabase, Stripe price
 ids, grace period, site URL, `SIG_ARMY_DIR`, `RULESET_VERSION`). Values marked
 `OPERATOR_OVERRIDE_REQUIRED` must be supplied by the operator before going live.
+
+## Related
+
+- **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI + MCP server. On-device token scanner, tabbed TUI dashboard, and MCP tools for AI clients. [`npm install -g sigrank-mcp`](https://www.npmjs.com/package/sigrank-mcp)
+- **[signalaf.com](https://signalaf.com)** — the live board
+
+## License
+
+MIT — see [LICENSE](./LICENSE)
