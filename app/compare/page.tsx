@@ -31,9 +31,19 @@ export const metadata: Metadata = {
 }
 
 function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
+  // Prefer the real name whenever present — including unclaimed seeds whose names
+  // are backfilled in Supabase (mirror to-entry.ts; the old `claimed &&` gate hid
+  // those and surfaced raw codenames). Owner's own 730 window-pulls are staged as
+  // mock rows with placeholder codenames ("static seed · 7d ✱mem") and no
+  // display_name; render those as a clean window label, never the raw placeholder.
+  if (row.operator.display_name) return row.operator.display_name
+  const code = row.operator.codename
+  const m = code.match(/^static seed · (7d|30d|90d|all)( ✱mem)?/)
+  if (m) {
+    const win = m[1] === 'all' ? 'all-time' : m[1]
+    return m[2] ? `Owner · ${win} (with claude-mem)` : `Owner · ${win}`
+  }
+  return code
 }
 
 export default async function ComparePage({
