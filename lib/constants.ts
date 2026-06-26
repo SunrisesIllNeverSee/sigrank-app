@@ -114,3 +114,11 @@ export const DEMO_BANNER =
  * at 0.9.5 once). Bump this when the MCP package is published.
  */
 export const MCP_VERSION = '0.11.2' as const
+
+/**
+ * PLATFORM_COUNT — how many platforms the MCP's adapter registry reads. Mirrors
+ * sigrank-mcp `adapters.mjs` ALL_PLATFORMS.length. Centralized so the landing/wiki/
+ * marketing copy never drifts (it was hardcoded as "14+" while the registry had 15).
+ * Bump when the MCP ships a new adapter.
+ */
+export const PLATFORM_COUNT = 15 as const
