@@ -180,7 +180,7 @@ const PROFILE_PIPELINE = [
   {
     step: '01',
     title: 'Agent reads your local logs',
-    body: 'tokenpull reads local session logs from 15 platforms — Claude Code, Codex, Amp, Kimi, Gemini CLI, GitHub Copilot CLI, Goose, Kilo, Hermes, and more — and counts the four token pillars across each window. Never prompt content; only the four integers.',
+    body: 'tokenpull reads local session logs from 14+ platforms — Claude Code, Codex, Amp, Kimi, Gemini CLI, GitHub Copilot CLI, Goose, Kilo, Hermes, and more — and counts the four token pillars across each window. Never prompt content; only the four integers.',
   },
   {
     step: '02',
@@ -208,7 +208,7 @@ export function LocalAgentMcp() {
         </h1>
         <P>
           The SigRank local agent is an MCP that reads your token counts straight from local session
-          logs — 15 platforms supported, including Claude Code, Codex, Amp, Gemini CLI, GitHub Copilot
+          logs — 14+ platforms supported, including Claude Code, Codex, Amp, Gemini CLI, GitHub Copilot
           CLI, Goose, Kilo, and more — and keeps your live cascade in sync with the board and your
           operator profile. You never touch a number; the agent is the verifier. It counts tokens; it
           never reads the content of your prompts or replies.
@@ -222,7 +222,7 @@ export function LocalAgentMcp() {
           {[
             {
               t: 'Zero-paste, on-device read',
-              b: 'tokenpull reads local session logs from 15 platforms and counts the four token pillars across 7d / 30d / 90d / all-time — no copy-paste, nothing to assemble by hand.',
+              b: 'tokenpull reads local session logs from 14+ platforms and counts the four token pillars across 7d / 30d / 90d / all-time — no copy-paste, nothing to assemble by hand.',
             },
             {
               t: 'Publishes in one call',
