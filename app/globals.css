@@ -154,6 +154,58 @@
   font-family: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
 }
 
+/* ── Terminal layer 4: box-drawing borders (theme-scoped, purely additive) ───
+ * Under terminal only, restyle the existing card/surface border patterns to a
+ * dashed box-drawing feel + add ◈ corner accents (the TUI SPLASH_RULE motif).
+ * Targets the Tailwind border classes already used sitewide — no component
+ * changes needed. Cannot leak into carbon/paper/railway (scoped under the
+ * theme selector). Reversible: remove this block to revert.
+ *
+ * The ◈ corners are rendered via ::before/::after pseudo-elements on elements
+ * that have BOTH a border class AND a rounded class (the card pattern). They
+ * sit at the top-left + bottom-right corners, colored with --gold, and are
+ * small enough not to crowd the content.
+ */
+[data-theme='terminal'] .border-bg-border,
+[data-theme='terminal'] .border-bg-border-subtle {
+  border-style: dashed;
+}
+
+/* ◈ corner accents on bordered cards (the TUI motif). Only on elements that
+   have both a border + rounded corners (the card pattern) — not on every
+   hairline divider. We target the common card class combos. */
+[data-theme='terminal'] .rounded-xl.border,
+[data-theme='terminal'] .rounded-2xl.border,
+[data-theme='terminal'] .rounded-lg.border {
+  position: relative;
+}
+[data-theme='terminal'] .rounded-xl.border::before,
+[data-theme='terminal'] .rounded-2xl.border::before,
+[data-theme='terminal'] .rounded-lg.border::before {
+  content: '◈';
+  position: absolute;
+  top: -0.5em;
+  left: -0.35em;
+  font-size: 0.7em;
+  line-height: 1;
+  color: rgb(var(--gold) / 0.6);
+  pointer-events: none;
+  z-index: 1;
+}
+[data-theme='terminal'] .rounded-xl.border::after,
+[data-theme='terminal'] .rounded-2xl.border::after,
+[data-theme='terminal'] .rounded-lg.border::after {
+  content: '◈';
+  position: absolute;
+  bottom: -0.5em;
+  right: -0.35em;
+  font-size: 0.7em;
+  line-height: 1;
+  color: rgb(var(--gold) / 0.6);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* ── Terminal wordmark — block-letter SIGRANK with color-cycle (Layer 3) ──────
  * The terminal-theme hero wordmark: the TUI splash block-letter art (SPLASH_ART
  * from sigrank-mcp/tui.mjs) rendered as a <pre>, with a continuous color-cycle
