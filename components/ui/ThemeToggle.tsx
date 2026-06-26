@@ -12,6 +12,7 @@ const THEMES = [
   { id: 'carbon', label: 'Carbon' },
   { id: 'paper', label: 'Paper' },
   { id: 'railway', label: 'Railway' },
+  { id: 'terminal', label: 'Terminal' },
 ] as const
 
 type ThemeId = (typeof THEMES)[number]['id']
@@ -21,7 +22,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     const current = document.documentElement.getAttribute('data-theme')
-    if (current === 'carbon' || current === 'paper' || current === 'railway') {
+    if (current === 'carbon' || current === 'paper' || current === 'railway' || current === 'terminal') {
       setTheme(current)
     }
   }, [])
