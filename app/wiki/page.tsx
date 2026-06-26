@@ -354,7 +354,7 @@ export default function Draft1Page() {
       items: [
         {
           label: 'The local agent (MCP)',
-          hint: 'Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank-mcp@0.11.0.',
+          hint: 'Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank-mcp@0.11.1.',
           node: withPermalink('local-agent', <LocalAgentMcp />),
         },
       ],
