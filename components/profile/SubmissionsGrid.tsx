@@ -26,6 +26,15 @@ const PLATFORM_HEAD: Record<string, string> = {
 const fmtY = (n: number | null): string =>
   n == null ? '—' : n >= 1000 ? `${(n / 1000).toFixed(1)}K` : n.toFixed(0)
 
+// Raw token total — shown for non-compounding windows (real usage, no cache → null Υ)
+// so a cache-less window (e.g. codex 7d) reads as real volume, not a blank "Υ —".
+const fmtTok = (n: number | null | undefined): string =>
+  n == null ? '—'
+    : n >= 1e9 ? `${(n / 1e9).toFixed(1)}B`
+    : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M`
+    : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K`
+    : `${n}`
+
 export function SubmissionsGrid({ submissions }: { submissions: OperatorSubmission[] }) {
   // Index every cell by "platform|window" for O(1) lookup while laying out the grid.
   const byKey = new Map<string, OperatorSubmission>()
@@ -66,7 +75,16 @@ export function SubmissionsGrid({ submissions }: { submissions: OperatorSubmissi
                     <td key={w} className="px-3 py-2 text-right align-top">
                       {cell ? (
                         <span className="inline-flex flex-col items-end gap-0.5">
-                          <span className="text-text-primary">Υ {fmtY(cell.yield_)}</span>
+                          {cell.yield_ != null ? (
+                            <span className="text-text-primary">Υ {fmtY(cell.yield_)}</span>
+                          ) : (
+                            <span
+                              className="text-text-primary"
+                              title="No cache this window — volume only, no Υ yield (e.g. a window without prompt caching)"
+                            >
+                              ∑ {fmtTok(cell.totalTokens)}
+                            </span>
+                          )}
                           <span className="text-[10px] uppercase tracking-wide text-text-secondary">
                             {cell.classTier}
                           </span>
