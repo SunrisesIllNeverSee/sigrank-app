@@ -308,7 +308,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
             const yld = e.yield_ == null ? '—' : e.yield_ >= 1000 ? `${(e.yield_ / 1000).toFixed(1)}K` : e.yield_.toFixed(0)
             return (
               <li key={`m-${e.anonId}-${i}`}>
-                <Link href={`/user/${encodeURIComponent(e.anonId)}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8, background: T.field, border: `1px solid ${T.rowLine}`, textDecoration: 'none' }}>
+                <Link href={`/user/${encodeURIComponent(e.codename)}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8, background: T.field, border: `1px solid ${T.rowLine}`, textDecoration: 'none' }}>
                   <span style={{ width: 22, color: rankColor(e.rank), fontWeight: rankWeight(e.rank), fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>{e.rank}</span>
                   <OperatorAvatar alt={e.anonId} size={26} />
                   <span style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -366,7 +366,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                     <td style={{ ...st.td, ...st.tdL }}>
                       <span style={st.op}>
                         <OperatorAvatar alt={e.anonId} />
-                        <Link href={`/user/${encodeURIComponent(e.anonId)}`} style={st.opLink}>
+                        <Link href={`/user/${encodeURIComponent(e.codename)}`} style={st.opLink}>
                           <span style={{ ...st.opName, fontStyle: e.isSeed ? 'italic' : 'normal' }}><span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>{e.anonId}{winChip(e)}</span>
                           {(e.subLabel || e.location) ? (
                             <span style={st.opSub}>
@@ -422,7 +422,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                     <td style={{ ...st.td, ...st.tdL }}>
                       <span style={st.op}>
                         <OperatorAvatar alt={e.anonId} />
-                        <Link href={`/user/${encodeURIComponent(e.anonId)}`} style={st.opLink}>
+                        <Link href={`/user/${encodeURIComponent(e.codename)}`} style={st.opLink}>
                           <span style={{ ...st.opName, fontStyle: e.isSeed ? 'italic' : 'normal' }}><span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: 'normal' }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>{e.anonId}{winChip(e)}</span>
                           {(e.subLabel || e.location) ? (
                             <span style={st.opSub}>
