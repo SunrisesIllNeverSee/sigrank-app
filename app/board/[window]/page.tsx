@@ -64,6 +64,7 @@ export default async function BoardWindowPage({
           same animated <WaveHero/> as the Hall, with board-specific copy. */}
       <WaveHero
         eyebrow="The SigRank Leaderboard"
+        terminalText="LEADERBOARD"
         title={
           <>
             Builders, Burners &amp;{' '}
