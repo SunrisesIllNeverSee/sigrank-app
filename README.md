@@ -1,20 +1,28 @@
 <div align="center">
 
-<img src="https://ghrb.waren.build/banner?header=SigRank&subheader=privacy-preserving%20AI%20operator%20leaderboard&bg=0a0a0a-1a1a1a&color=e0b240&subheadercolor=96c896" alt="SigRank" width="640">
+```
+ ███████ ██  ██████  ██████   █████  ███    ██ ██   ██
+ ██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██
+ ███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████
+      ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██
+ ███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██
+```
+
+◈ ─────────────────────────────────────────── ◈
 
 # SigRank
 
-**A privacy-preserving leaderboard that scores AI operators on token cascade efficiency.**
+**We measure the architecture of users' token cascade.**
 
-The rank metric: **Υ = (cache_read × output) / input²** — the yield cascade.
+Most platforms reward volume. SigRank rewards structure.
 
+[![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
 [![vercel](https://img.shields.io/badge/deploy-Vercel-black.svg?style=flat-square)](https://vercel.com)
 [![next.js](https://img.shields.io/badge/Next.js-15-black.svg?style=flat-square)](https://nextjs.org)
 [![react](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev)
 [![typescript](https://img.shields.io/badge/TypeScript-strict-blue.svg?style=flat-square)](https://www.typescriptlang.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
-[![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![supabase](https://img.shields.io/badge/db-Supabase-green.svg?style=flat-square)](https://supabase.com)
 [![stripe](https://img.shields.io/badge/billing-Stripe-purple.svg?style=flat-square)](https://stripe.com)
 
@@ -22,10 +30,15 @@ The rank metric: **Υ = (cache_read × output) / input²** — the yield cascade
 
 ---
 
-A BlitzStars-style leaderboard for AI operators. Scores 11 canonical token-telemetry
-metrics across 15+ platforms (Claude, Codex, Amp, Gemini, and more). Free tier + Pro tier
-behind Stripe. Anonymous + claimable operator entries. Four selectable themes (Carbon,
-Paper, Railway, Terminal).
+> **Fair warning: the blade cuts both ways.**
+
+A privacy-preserving leaderboard that scores AI operators on token cascade efficiency.
+The rank metric: **Υ = (cache_read × output) / input²** — the yield cascade.
+
+We measure the architecture of users' token cascade to identify patterns, margins, and
+operator signature — revealing whether signal is compounded or tokens burned.
+
+**Identifying Burners, Builders, and 10×ers.**
 
 ## Stack
 
