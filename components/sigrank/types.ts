@@ -25,6 +25,10 @@ export type Platform = 'ChatGPT' | 'Claude' | 'Pi' | 'Gemini'
 export interface LeaderboardEntry {
   rank: number
   anonId: string
+  /** Generated codename — the STABLE profile-route key (/user/<codename>). The board
+   *  links by this, never by anonId: anonId may be a display_name (e.g. "MO§ES™") which
+   *  the profile lookup can't resolve, so linking by anonId 404s. */
+  codename: string
   /** Operator-cell 2nd line (BlitzStars-style): real handle for seed operators. */
   subLabel?: string
   /** True for frozen seed-corpus rows (placeholders) — rendered italic. */
