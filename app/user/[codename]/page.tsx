@@ -19,7 +19,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { getOperator, getOperatorHistory } from '@/lib/data'
+import { getOperator, getOperatorHistory, getOperatorSubmissions } from '@/lib/data'
 import { decodeCodename } from '@/lib/route-params'
 import type { Operator } from '@/lib/scoring/types'
 import { SignalClassBadge } from '@/components/sigrank'
@@ -27,6 +27,7 @@ import { OperatorAvatar } from '@/components/sigrank/OperatorAvatar'
 import { CanonId } from '@/components/ui/CanonId'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { CascadePanel } from '@/components/profile/CascadePanel'
+import { SubmissionsGrid } from '@/components/profile/SubmissionsGrid'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
@@ -103,6 +104,8 @@ export default async function OperatorProfilePage({
   const { operator, snapshot, telemetry } = row
   const pending = row.pending ?? false
   const history = await getOperatorHistory(codename)
+  // FIX I3: every (platform × window) submission for the Submissions-tab grid.
+  const submissions = await getOperatorSubmissions(codename)
 
   const topPct = Math.max(0, 100 - row.percentile)
 
@@ -297,17 +300,22 @@ export default async function OperatorProfilePage({
     </div>
   )
 
-  // ── Submissions tab: manual project/build showcase (D9 — not yet built) ────
-  const submissionsPanel = (
-    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
-      <span className="font-mono text-2xl text-text-dim">◈</span>
-      <p className="font-mono text-sm text-text-primary">No submissions yet</p>
-      <p className="max-w-sm font-sans text-xs leading-relaxed text-text-secondary">
-        Project and build showcases will live here. Verified cascade submissions feed the
-        leaderboard via the local agent; manual project highlights are coming.
-      </p>
-    </div>
-  )
+  // ── Submissions tab: every verified (platform × window) submission (FIX I3) ──
+  // The grid renders once the operator has any verified submission; until then the
+  // dashed placeholder explains where they'll appear.
+  const submissionsPanel =
+    submissions.length > 0 ? (
+      <SubmissionsGrid submissions={submissions} />
+    ) : (
+      <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
+        <span className="font-mono text-2xl text-text-dim">◈</span>
+        <p className="font-mono text-sm text-text-primary">No submissions yet</p>
+        <p className="max-w-sm font-sans text-xs leading-relaxed text-text-secondary">
+          Verified cascade submissions feed the leaderboard via the local agent. Once you
+          submit, every platform × window you run will appear here as a grid.
+        </p>
+      </div>
+    )
 
   // ── Social tab: the self-promo identity surface ────────────────────────────
   const socialPanel = (

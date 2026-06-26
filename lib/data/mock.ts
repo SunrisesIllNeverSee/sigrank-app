@@ -33,6 +33,10 @@ export interface LeaderboardRow {
   //    Live rows populate them from the DB; mock rows set them below. ──
   /** DB window_type enum: '7d' | '30d' | '90d' | 'all_time'. */
   window_type?: string | null
+  /** Per-submission AI platform (FIX H): claude/codex/multi/… Distinguishes the
+   *  same operator's per-platform rows on the "off" board. Live rows read it from
+   *  metric_snapshots.platform; mock rows fall back to the operator's primary_domain. */
+  platform?: string | null
   /** Snapshot DATE ('YYYY-MM-DD') — recency reference for the window buffer. */
   snapshot_date?: string | null
 }

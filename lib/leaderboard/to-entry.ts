@@ -79,8 +79,14 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntry {
     compositeScore: snapshot.signa_rate,
     acctAge: `${operator.account_age_days}d`,
     lastSeen: 'active',
-    // LB-4: primary_domain for the client-side platform filter (lowercased; 'other'
-    // when absent). Matched against PLATFORM_DOMAIN_MAP[selectedLabel] in the table.
-    platform: (operator.primary_domain ?? 'other').toLowerCase(),
+    // LB-4 + FIX H: the PER-SUBMISSION platform (row.platform, from
+    // metric_snapshots.platform) so a codex row reads "Codex" even when the
+    // operator's primary_domain is claude. Falls back to primary_domain (legacy /
+    // pre-0015 rows) then 'other'. Lowercased; matched against PLATFORM_DOMAIN_MAP.
+    platform: (row.platform ?? operator.primary_domain ?? 'other').toLowerCase(),
+    // FIX H: the row's window bucket ('7d'/'30d'/'90d'/'all_time'), so the "off"
+    // board can label each (operator × platform × window) row as an intentional
+    // breakout instead of a duplicate. Undefined on legacy rows without a window.
+    window: row.window_type ?? undefined,
   }
 }
