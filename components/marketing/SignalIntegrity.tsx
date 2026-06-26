@@ -158,7 +158,7 @@ function Mono({ children }: { children: string }) {
 const CLI_CMDS = [
   { cmd: 'sigrank-mcp', args: '',        desc: 'Full tabbed TUI — Dashboard / Trends / Compare / Board / Watch / Connect. Default in a terminal.' },
   { cmd: 'sigrank-mcp', args: 'tui',     desc: 'Same as above — explicit launch. Keys: 1–6 or ← → switch, R refresh, Q quit.' },
-  { cmd: 'sigrank-mcp', args: 'enroll',  desc: 'Sign in: redeem a connect code from signalaf.com → Settings → Connect a device. (Or in the TUI: Connect tab, key 6.)' },
+  { cmd: 'sigrank-mcp', args: 'enroll',  desc: 'Sign in: paste a key from signalaf.com → Settings → "New key". (Or in the TUI: Connect tab, key 6.)' },
   { cmd: 'sigrank-mcp', args: 'submit',  desc: 'Publish your verified runs to the board. (Or press [S] from any read tab in the TUI.)' },
   { cmd: 'sigrank-mcp', args: 'me',      desc: 'Your local cascade across 7d / 30d / 90d / all-time. Zero paste, on-device.' },
   { cmd: 'sigrank-mcp', args: 'board',   desc: 'Live leaderboard from signalaf.com — auto-refreshes every 30s.' },
@@ -173,11 +173,12 @@ const MCP_TOOL_LIST = [
   { name: 'tokenpull_compare', desc: 'All four sources side-by-side: tokenpull / ccusage / token-dash / tokscale with delta % per pillar.' },
   { name: 'rank_paste',        desc: 'Score a ccusage / tokscale paste locally. Returns Υ + narration card.' },
   { name: 'rank_windows',      desc: 'Score all four windows from a dashboard paste at once.' },
+  { name: 'submit_paste',      desc: 'Rank a paste AND publish it to the board in one call.' },
+  { name: 'submit_verified',   desc: 'Sign + POST the verified cascade to /api/v1/snapshots (the ranked path).' },
+  { name: 'enroll',            desc: 'Paste a key from Settings → "New key" → bind this device (signed submit).' },
   { name: 'get_leaderboard',   desc: 'Live leaderboard from signalaf.com, any window.' },
   { name: 'get_operator',      desc: "One operator's live profile by codename." },
   { name: 'watch_tokenpull',   desc: 'Streaming cascade snapshot — diffs on each poll.' },
-  { name: 'enroll',            desc: 'Redeem a connect code → bind this device (signed submit).' },
-  { name: 'submit_verified',   desc: 'Sign + POST the verified cascade to /api/v1/snapshots (the ranked path).' },
 ]
 
 const PROFILE_PIPELINE = [
@@ -249,7 +250,7 @@ export function LocalAgentMcp() {
       <section className="flex flex-col gap-3">
         <H2>Supported platforms</H2>
         <P>
-          tokenpull reads local session logs from 15 AI coding platforms. Each adapter
+          tokenpull reads local session logs from 14+ AI coding platforms. Each adapter
           reads that platform&apos;s own log format — you don&apos;t reconfigure anything.
         </P>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
