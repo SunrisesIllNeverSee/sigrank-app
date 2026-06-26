@@ -63,7 +63,12 @@ export const snapshotPayloadSchema = z.object({
     prompt_complexity: z.number().min(0).max(100),
     cross_thread_score: z.number().int(),
     session_depth_avg: z.number().min(0),
-    token_throughput: z.number().min(0),
+    // token_throughput (M.05) is a deprecated word-era metric: the server RE-derives
+    // it from pillars (bridge.ts) and the board mutes it (RS01 weight 0), so the
+    // submitted value is validated-then-discarded. Platforms without a per-message
+    // throughput (e.g. codex) legitimately send null — accept it instead of rejecting
+    // the whole snapshot as schema_invalid. Nullable + optional for the coming drop.
+    token_throughput: z.number().min(0).nullable().optional(),
   }).strict(),
 
   background_metrics: z.object({
