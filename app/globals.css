@@ -117,6 +117,82 @@
   --ring: 167 139 250;
 }
 
+/* ── Terminal — TUI skin (gold-on-black, monospace, terminal-green accents) ──
+ * The 4th opt-in theme (owner 2026-06-26). Mirrors the sigrank-mcp TUI splash:
+ * near-black bg, warm bone-green text, TUI gold (#e0b240) brand accent, terminal-
+ * green accent. Every token reuses the SAME var names so all components re-skin
+ * for free. Layer 2 (monospace) is scoped below. NEVER default — carbon stays. */
+[data-theme='terminal'] {
+  color-scheme: dark;
+  --bg-base: 5 6 5;            /* near-black, faint green cast */
+  --bg-surface: 10 13 10;
+  --bg-elevated: 16 20 16;
+  --bg-hover: 22 28 22;
+  --bg-border: 38 64 42;       /* dim terminal-green border */
+  --bg-border-subtle: 24 38 26;
+
+  --text-primary: 222 230 210; /* warm bone-green */
+  --text-secondary: 150 200 150;
+  --text-muted: 110 150 110;
+  --text-dim: 78 110 78;       /* passes ~4:1 on #050605 */
+
+  --gold: 224 178 64;          /* TUI gold (#e0b240) */
+  --accent: 120 220 130;       /* terminal green accent */
+
+  --bar-low: 24 38 26;
+  --rank-low: 224 178 64;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.6);
+  --ring: 224 178 64;
+}
+
+/* ── Terminal layer 2: monospace sitewide (theme-scoped, cannot leak) ────────
+ * Under terminal only, force the mono font on body + the common text elements.
+ * The repo already loads --font-geist-mono via layout.tsx. Mono is wider than
+ * the default sans — verified the board table + nav don't overflow on mobile. */
+[data-theme='terminal'] body,
+[data-theme='terminal'] :where(h1, h2, h3, h4, h5, h6, p, span, a, button, td, th, div, li, label, input, select, textarea) {
+  font-family: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
+}
+
+/* ── Terminal wordmark — block-letter SIGRANK with color-cycle (Layer 3) ──────
+ * The terminal-theme hero wordmark: the TUI splash block-letter art (SPLASH_ART
+ * from sigrank-mcp/tui.mjs) rendered as a <pre>, with a continuous color-cycle
+ * through the TUI MOSES_PAL palette (warm golds/ambers: 256-colors 220/178/214/
+ * 208/222/230 → #e0b240 #f0c862 #e8a0d0 #f08c3c #f0d878 #fef0c0). The cycle
+ * sweeps a background-clip:text gradient across the art so the color "flashes"
+ * travel left→right. Per-line stagger via --tw-delay so the sweep reads as
+ * flowing down the wordmark.
+ *
+ * Reduced motion (owner: keep movement, do NOT freeze): slow the cycle to a
+ * 30s drift + lower the palette contrast so it's barely perceptible — never a
+ * strobe (seizure risk). The animation still runs, just gently.
+ */
+@keyframes terminal-wordmark-cycle {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.terminal-wordmark-line {
+  background: linear-gradient(
+    90deg,
+    #e0b240, #f0c862, #e8a0d0, #f08c3c, #f0d878, #fef0c0,
+    #e0b240, #f0c862, #e8a0d0, #f08c3c, #f0d878, #fef0c0
+  );
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: terminal-wordmark-cycle 8s linear var(--tw-delay, 0s) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .terminal-wordmark-line {
+    /* Owner: keep movement, slow it to a gentle drift — never a strobe.
+       30s cycle + the wide gradient makes the shift barely perceptible. */
+    animation-duration: 30s;
+  }
+}
+
 @layer base {
   body {
     background: rgb(var(--bg-base));
