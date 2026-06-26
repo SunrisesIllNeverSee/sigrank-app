@@ -22,7 +22,9 @@ export function MetricRadar({ snapshot: s, size = 240 }: Props) {
     { label: 'PC', canon: 'M.02', value: s.prompt_complexity.value, max: 100 },
     { label: 'CT', canon: 'M.03', value: s.cross_thread, max: 100 },
     { label: 'SD', canon: 'M.04', value: s.session_depth, max: 30 },
-    { label: 'TT', canon: 'M.05', value: s.token_throughput, max: 20000 },
+    // TT (M.05 token-throughput) removed 2026-06-26 — word-era metric, muted from §IGNA;
+    // it was fed the raw total (e.g. 2.19B) which pegged this axis (max 20000) and distorted
+    // the radar. 4-axis radar until §IGNA recal defines any replacement.
   ]
 
   const center = size / 2
