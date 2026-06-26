@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="340" viewBox="0 0 640 340">
+  <rect width="640" height="340" fill="#050605" rx="8"/>
+  <g font-family="Menlo, Monaco, 'Courier New', monospace" text-anchor="middle">
+    <text x="320" y="28" font-size="11" fill="#6e966e">◈  ───────────────────────────────────────────  ◈</text>
+    <text x="320" y="62" font-size="15" fill="#e0b240">███████ ██  ██████  ██████   █████  ███    ██ ██   ██</text>
+    <text x="320" y="84" font-size="15" fill="#f0c862">██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██ </text>
+    <text x="320" y="106" font-size="15" fill="#e8a0d0">███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████  </text>
+    <text x="320" y="128" font-size="15" fill="#f08c3c">     ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██ </text>
+    <text x="320" y="150" font-size="15" fill="#f0d878">███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██</text>
+    <text x="320" y="178" font-size="11" fill="#6e966e">◈  ───────────────────────────────────────────  ◈</text>
+    <text x="320" y="210" font-size="14" fill="#dee6d2" font-weight="bold">We measure the architecture of users' token cascade.</text>
+    <text x="320" y="232" font-size="12" fill="#6e966e">signalaf</text>
+    <text x="320" y="258" font-size="12" fill="#6e966e">powered by  <tspan fill="#e0b240" font-weight="bold">MO§ES™</tspan></text>
+    <text x="320" y="282" font-size="11" fill="#96c896">Most platforms reward volume. SigRank rewards structure.</text>
+    <text x="320" y="312" font-size="12" fill="#e0b240">▸ <tspan fill="#6e966e">Identifying Burners, Builders, and 10×ers</tspan> ◂</text>
+  </g>
+</svg>
