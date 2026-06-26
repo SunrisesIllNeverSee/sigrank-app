@@ -66,6 +66,7 @@ const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
         percentile: 0,
         telemetry: telemetryFromSnapshot(snap),
         window_type: snap.window_type ?? null,
+        platform: snap.platform ?? op.primary_domain ?? null,
         snapshot_date: snap.snapshot_date ?? null,
       })
     }

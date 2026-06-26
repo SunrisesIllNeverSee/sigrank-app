@@ -45,6 +45,7 @@ import {
   type HistoryParams,
   asDb,
   latestPerOperator,
+  latestPerOperatorPlatform,
   mapOperator,
   mapSnapshot,
   num,
@@ -66,7 +67,7 @@ interface DbRankHistory {
 
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
-  'operator_id, snapshot_date, window_type, compression_ratio, prompt_complexity, cross_thread, ' +
+  'operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, ' +
   'session_depth, token_throughput, signa_rate, sdot_score, sdrm_score, signal_force, ' +
   'drift_ratio, class_tier, movement_24h, movement_7d, ' +
   'ruleset_version, ' +
@@ -115,11 +116,14 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
     // home/transmitters/hall) keep their pre-730 full-field behaviour.
     const windowed =
       params.windowFilter && params.window ? filterToWindow(allSnaps, params.window) : allSnaps
-    // Everything board: keep EVERY window point (no per-operator collapse). Otherwise
-    // collapse to the latest snapshot per operator (the windowed/legacy behaviour).
+    // "off" board: keep EVERY (operator, platform, window) point — no collapse.
+    // perPlatform (windowed boards, FIX H): one row per (operator, platform).
+    // Otherwise collapse to the latest snapshot per operator (legacy behaviour).
     const snapRows: DbMetricSnapshot[] = params.allSnapshots
       ? windowed
-      : [...latestPerOperator(windowed).values()]
+      : params.perPlatform
+        ? [...latestPerOperatorPlatform(windowed).values()]
+        : [...latestPerOperator(windowed).values()]
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
     if (snapRows.length === 0) return params.windowFilter ? [] : filterMockBoard(params)
@@ -156,6 +160,7 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
         percentile: pctById.get(snap.operator_id) ?? 0,
         telemetry: telemetryFromSnapshot(snap),
         window_type: snap.window_type ?? null,
+        platform: snap.platform ?? op.primary_domain ?? null,
         snapshot_date: snap.snapshot_date ?? null,
       })
     }
@@ -245,6 +250,97 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
     }
   } catch {
     return fromMock()
+  }
+}
+
+/** One operator submission cell: a (platform, window) point with its score. */
+export interface OperatorSubmission {
+  /** Lowercase platform ('claude'/'codex'/'multi'/…). */
+  platform: string
+  /** Window bucket ('7d'/'30d'/'90d'/'all_time'/'today'). */
+  window: string
+  /** Snapshot date 'YYYY-MM-DD' (most recent for this platform×window). */
+  snapshotDate: string | null
+  classTier: SignalClass
+  /** Υ Yield (null when non-compounding — no cache pillar). */
+  yield_: number | null
+  signaRate: number | null
+  totalTokens: number | null
+}
+
+/** Map one DB snapshot → a submission cell. */
+function toSubmission(snap: DbMetricSnapshot, primaryDomain: string | null): OperatorSubmission {
+  const s = mapSnapshot(snap)
+  const t = telemetryFromSnapshot(snap)
+  const c = s.cascade
+  return {
+    platform: (snap.platform ?? primaryDomain ?? 'other').toLowerCase(),
+    window: snap.window_type ?? 'all_time',
+    snapshotDate: snap.snapshot_date ?? null,
+    classTier: s.class_tier,
+    yield_: c && !c.nonCompounding ? c.yield_ : null,
+    signaRate: snap.signa_rate ?? null,
+    totalTokens: t ? t.fresh_input + t.output + t.cache_create + t.cache_read : null,
+  }
+}
+
+/**
+ * All of an operator's submissions, one per (platform, window) — the data behind the
+ * profile Submissions grid (FIX I3 / owner 2026-06-26: "show all their submissions —
+ * claude/codex/multi × 7/30/90/all"). Latest snapshot per (platform, window) wins
+ * (rows arrive date-desc → first seen). Empty when the operator has no verified
+ * submission yet. Per-platform cells populate as FIX H multi-platform submissions land.
+ */
+export async function getOperatorSubmissions(codename: string): Promise<OperatorSubmission[]> {
+  const sb = getSupabaseServer()
+  const dedupe = (rows: OperatorSubmission[]): OperatorSubmission[] => {
+    const seen = new Map<string, OperatorSubmission>()
+    for (const r of rows) {
+      const k = `${r.platform}|${r.window}`
+      if (!seen.has(k)) seen.set(k, r)
+    }
+    return [...seen.values()]
+  }
+  // Degraded/mock path: the single fallback row → one submission cell.
+  if (!sb) {
+    const r = fallbackRows().find(
+      (x) => x.operator.codename.toLowerCase() === codename.toLowerCase(),
+    )
+    if (!r || r.pending) return []
+    const t = r.telemetry
+    const c = r.snapshot.cascade
+    return [
+      {
+        platform: (r.platform ?? r.operator.primary_domain ?? 'other').toLowerCase(),
+        window: r.window_type ?? 'all_time',
+        snapshotDate: r.snapshot_date ?? null,
+        classTier: r.snapshot.class_tier,
+        yield_: c && !c.nonCompounding ? c.yield_ : null,
+        signaRate: r.snapshot.signa_rate ?? null,
+        totalTokens: t ? t.fresh_input + t.output + t.cache_create + t.cache_read : null,
+      },
+    ]
+  }
+  try {
+    const { data: opData, error: opError } = await sb
+      .from('operators_public')
+      .select('operator_id, primary_domain')
+      .ilike('codename', codename)
+      .limit(1)
+      .maybeSingle()
+    if (opError) throw opError
+    const op = asDb<{ operator_id: string; primary_domain: string | null } | null>(opData)
+    if (!op) return []
+    const { data: snapData, error: snapError } = await sb
+      .from('metric_snapshots')
+      .select(SNAPSHOT_COLUMNS)
+      .eq('operator_id', op.operator_id)
+      .order('snapshot_date', { ascending: false })
+    if (snapError) throw snapError
+    const snaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
+    return dedupe(snaps.map((s) => toSubmission(s, op.primary_domain)))
+  } catch {
+    return []
   }
 }
 

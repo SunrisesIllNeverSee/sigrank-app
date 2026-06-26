@@ -166,6 +166,10 @@ export async function materializeVerifiedSnapshot(
     p_snapshot_date: snapshotDateUTC(payload.window.end),
     p_signa_rate: r.signaRate,
     p_class_tier: r.classTier,
+    // FIX H (migration 0015): the per-submission platform → its own board slot.
+    // The payload's platform.primary is a validated enum (lib/payload/schema.ts);
+    // the RPC keys (operator, date, window, platform) so claude/codex don't collide.
+    p_platform: payload.platform.primary,
     // p_submitted_at intentionally OMITTED → the RPC's COALESCE(p_submitted_at, now())
     // stamps submitted_at with the SERVER clock. The per-device throttle counts on this
     // column, so a client-supplied timestamp must never set it (review P2: a backdated

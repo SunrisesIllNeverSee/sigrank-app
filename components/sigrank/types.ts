@@ -30,9 +30,13 @@ export interface LeaderboardEntry {
   /** True for frozen seed-corpus rows (placeholders) — rendered italic. */
   isSeed?: boolean
   location?: string
-  /** Operator's primary_domain (lowercase, e.g. 'claude'/'chatgpt'/'multi') for the
-   *  client-side platform filter (LB-4). Absent → treated as 'other'. */
+  /** Per-submission platform (lowercase, e.g. 'claude'/'codex'/'multi') for the
+   *  client-side platform filter (LB-4) + the platform column. Absent → 'other'. */
   platform?: string
+  /** Row window bucket ('7d'/'30d'/'90d'/'all_time'), FIX H. Rendered as a label on
+   *  the "off" board so an operator's per-(platform, window) rows read as intentional
+   *  breakouts, not duplicates. Undefined on single-window boards (redundant there). */
+  window?: string
   signalClass: SignalClass
   /** Υ Yield = leverage × velocity. Primary rank metric. null = non-compounding platform. */
   yield_?: number | null
