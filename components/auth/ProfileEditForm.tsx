@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { PlatformPicker } from '@/components/auth/PlatformPicker'
 
 /**
  * components/auth/ProfileEditForm.tsx — the editable profile surface
@@ -14,9 +15,6 @@ import { useRouter } from 'next/navigation'
  * /api/v1/profile (auth-resolved, column-allowlisted). github/x are stored as the
  * username/handle (the profile renders github.com/<v> and x.com/<v>); site is a URL.
  */
-const PLATFORMS = ['claude', 'chatgpt', 'gemini', 'pi'] as const
-type Platform = (typeof PLATFORMS)[number]
-
 const inputCls =
   'w-full rounded-md border border-bg-border bg-bg-base px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-dim focus:border-gold/50 focus:outline-none'
 
@@ -69,20 +67,13 @@ export function ProfileEditForm({
   const [github, setGithub] = useState(initial.links.github ?? '')
   const [site, setSite] = useState(initial.links.site ?? '')
   const [x, setX] = useState(initial.links.x ?? '')
-  const [platforms, setPlatforms] = useState<Platform[]>(
-    initial.operator_domains.filter((d): d is Platform =>
-      (PLATFORMS as readonly string[]).includes(d),
-    ),
-  )
+  // operator_domains: any of the 15 known platforms + custom "Other" entries (PlatformPicker).
+  const [platforms, setPlatforms] = useState<string[]>(initial.operator_domains)
   const [avatarUrl, setAvatarUrl] = useState(initial.avatar_url)
   const [avatarBusy, setAvatarBusy] = useState(false)
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
-
-  function togglePlatform(p: Platform) {
-    setPlatforms((cur) => (cur.includes(p) ? cur.filter((v) => v !== p) : [...cur, p]))
-  }
 
   async function onAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -226,31 +217,7 @@ export function ProfileEditForm({
         </div>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-2">
-        <legend className="font-mono text-xs font-semibold uppercase tracking-wide text-text-secondary">
-          Platforms
-        </legend>
-        <div className="flex flex-wrap gap-2">
-          {PLATFORMS.map((p) => {
-            const on = platforms.includes(p)
-            return (
-              <button
-                key={p}
-                type="button"
-                aria-pressed={on}
-                onClick={() => togglePlatform(p)}
-                className={`rounded-md border px-3 py-1.5 font-mono text-xs capitalize transition-colors ${
-                  on
-                    ? 'border-gold/50 bg-gold/10 text-gold'
-                    : 'border-bg-border text-text-secondary hover:bg-bg-elevated'
-                }`}
-              >
-                {p}
-              </button>
-            )
-          })}
-        </div>
-      </fieldset>
+      <PlatformPicker selected={platforms} onChange={setPlatforms} />
 
       <Field label="Avatar" hint="PNG, JPG, WebP, or GIF — under 2 MB. Shown on your profile and board row.">
         <div className="flex items-center gap-3">
