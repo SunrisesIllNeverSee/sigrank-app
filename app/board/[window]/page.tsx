@@ -41,19 +41,21 @@ export default async function BoardWindowPage({
   // surviving /board/everything link forwards to the new default so it never 404s.
   if (slug === 'everything') redirect('/board/off')
 
-  // "off" board (owner 2026-06-25 — filter off): NO window filter, but collapsed to
-  // ONE row per operator (latest snapshot across all windows) via getLeaderboard()'s
-  // default latestPerOperator dedupe. Replaces the removed "everything" firehose, whose
-  // per-(operator×window) rows rendered every multi-window seed as duplicate entries.
+  // "off" board (owner 2026-06-26 — FIX F): filters off shows ALL of an operator's
+  // submissions broken out by (platform × window) — every snapshot point, no collapse —
+  // each row LABELED (codename · platform · window) so the breakouts read as intentional,
+  // not the old unlabeled "everything" firehose. allSnapshots keeps every row; the window
+  // label (LeaderboardTable, win==='off') + platform column disambiguate the duplicates.
   const isOff = slug === 'off'
   const win = isOff ? null : boardWindowBySlug(slug)
   if (!isOff && !win) notFound()
 
-  // off → default params (latestPerOperator dedupe; one row per operator, no window filter).
-  // Windowed → windowFilter on its enum. getLeaderboard defaults sort to Υ yield.
+  // off → allSnapshots (every operator×platform×window row, no collapse).
+  // Windowed → windowFilter on its enum + perPlatform (one row per operator×platform
+  // WITHIN the window, FIX H — claude/codex/multi shown separately). Sort defaults to Υ.
   const rows = isOff
-    ? await getLeaderboard({})
-    : await getLeaderboard({ window: win!.enum, windowFilter: true })
+    ? await getLeaderboard({ allSnapshots: true })
+    : await getLeaderboard({ window: win!.enum, windowFilter: true, perPlatform: true })
   const entries = rows.map(toEntry)
 
   return (
