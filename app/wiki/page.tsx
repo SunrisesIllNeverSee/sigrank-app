@@ -230,7 +230,7 @@ npx sigrank-mcp`}
 }
 
 const FLOW: { step: string; title: string; body: string }[] = [
-  { step: '01', title: 'The local agent reads your tokens', body: 'The SigRank agent (MCP) reads local session logs from 15 platforms — Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more — and counts the four token pillars. You never touch a number; the agent is the verifier. It never reads the content of your prompts or replies.' },
+  { step: '01', title: 'The local agent reads your tokens', body: 'The SigRank agent (MCP) reads local session logs from 14+ platforms — Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more — and counts the four token pillars. You never touch a number; the agent is the verifier. It never reads the content of your prompts or replies.' },
   { step: '02', title: 'We compute the cascade layer', body: 'From your four pillars we derive Υ Yield, Leverage, SNR, 10xDEV, and your cascade species. Architecture is the only variable — the same four integers reveal whether you\'re a Burner, a Builder, or a 10×er.' },
   { step: '03', title: 'Account + review lands you on the board', body: 'Board entries go through an account and a quick review, so the leaderboard stays honest (observer-inflated tooling gets stripped). Want to just see your numbers? Paste below — it runs instantly and does NOT save to the board.' },
 ]
@@ -341,7 +341,7 @@ export default function Draft1Page() {
       items: [
         // MCP-FIRST (owner 2026-06-24): lead with the agent + its run commands (was hidden
         // two groups down); the paste/manual options follow as clearly-secondary "other ways".
-        { label: 'Run the agent (MCP / CLI)', hint: 'The fastest, recommended path — npm i -g sigrank-mcp / npx sigrank-mcp. Zero paste, reads 15 platforms. Board entry is managed from your profile.', node: <SubmitMcpLead /> },
+        { label: 'Run the agent (MCP / CLI)', hint: 'The fastest, recommended path — npm i -g sigrank-mcp / npx sigrank-mcp. Zero paste, reads 14+ platforms. Board entry is managed from your profile.', node: <SubmitMcpLead /> },
         { label: 'How it works (3 steps)', hint: '01 agent reads tokens · 02 compute the cascade · 03 account + review → board (via your profile).', node: <SubmitFlow /> },
         { label: 'Other ways — paste ccusage', hint: 'No agent? Paste ccusage --json for an instant PROJECTED cascade. Calculator only — not saved to the board.', node: <PasteRunNumbers /> },
         { label: 'Other ways — manual entry (advanced)', hint: 'No token counts at all? A rough estimate from coarse activity proxies, reduced confidence. Approximation only.', node: <ManualEntryPanel /> },
