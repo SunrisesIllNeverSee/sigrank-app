@@ -1,12 +1,6 @@
 <div align="center">
 
-```
- ███████ ██  ██████  ██████   █████  ███    ██ ██   ██
- ██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██
- ███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████
-      ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██
- ███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██
-```
+<img src="https://ghrb.waren.build/banner?header=SigRank&subheader=privacy-preserving%20AI%20operator%20leaderboard&bg=0a0a0a-1a1a1a&color=e0b240&subheadercolor=96c896" alt="SigRank" width="640">
 
 # SigRank
 
@@ -20,6 +14,7 @@ The rank metric: **Υ = (cache_read × output) / input²** — the yield cascade
 [![react](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev)
 [![typescript](https://img.shields.io/badge/TypeScript-strict-blue.svg?style=flat-square)](https://www.typescriptlang.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
+[![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![supabase](https://img.shields.io/badge/db-Supabase-green.svg?style=flat-square)](https://supabase.com)
 [![stripe](https://img.shields.io/badge/billing-Stripe-purple.svg?style=flat-square)](https://stripe.com)
 
