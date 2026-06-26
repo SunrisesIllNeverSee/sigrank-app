@@ -430,6 +430,9 @@ export const PLATFORMS: Record<string, PlatformDef> = {
   'P.04': { id: 'P.04', label: 'Pi', domain: 'pi', hex: colors.platform.Pi },
   'P.05': { id: 'P.05', label: 'Multi', domain: 'multi' },
   'P.06': { id: 'P.06', label: 'Other', domain: 'other' },
+  // P.07 Codex (2026-06-26): appended (NOT inserted at P.04 — that's Pi) to keep
+  // canonical IDs stable. Distinct color, never mapped to ChatGPT (P.02).
+  'P.07': { id: 'P.07', label: 'Codex', domain: 'codex', hex: colors.platform.Codex },
 }
 
 export type BadgeCategory = 'Structural' | 'Event' | 'Prestige' | 'Audit' | 'Patron'
