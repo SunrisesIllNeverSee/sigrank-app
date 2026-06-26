@@ -23,6 +23,7 @@ export const platformPrimaryEnum = z.enum([
   'chatgpt',
   'gemini',
   'pi',
+  'codex',
   'multi',
   'other',
 ])
