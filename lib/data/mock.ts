@@ -9,6 +9,10 @@
  * The one real operator is MO§ES (codename TransVaultOrigin); the other 11 are
  * fictional placeholders (claimed:false, isPlaceholder:true) spanning the class
  * and score range so every UI surface has populated, varied rows.
+ *
+ * TYPES extracted to lib/data/types.ts (2026-06-26) — this module now imports
+ * them from there. The mock DATA (MOCK_LEADERBOARD etc.) stays here as the
+ * cold-store fallback for local dev / no-creds.
  */
 
 import type { SignalClass } from '@/components/sigrank/types'
@@ -16,30 +20,30 @@ import { CLASS_NAME_TO_ID } from '@/lib/canon/ids'
 import type { Operator, ScoredSnapshot, SupporterTier } from '@/lib/scoring/types'
 import { computeCascadeMetrics } from '@/lib/ingest/bridge'
 
-/** A leaderboard row: identity + scored snapshot + ranking metadata. */
-export interface LeaderboardRow {
-  operator: Operator
-  snapshot: ScoredSnapshot
-  global_rank: number
-  /** Percentile [0,100], higher = better. */
-  percentile: number
-  /** Raw telemetry, present for the real operator and useful for mock detail. */
-  telemetry: TelemetryRaw
-  /** True when the operator exists but has no cascade data yet (no verified
-   *  submission) — the profile renders an identity-only pending state, not 404. */
-  pending?: boolean
-  // ── 730 window layer (optional; mirrors metric_snapshots). These let the mock
-  //    path filter by window identically to the live path (lib/data/windows.ts).
-  //    Live rows populate them from the DB; mock rows set them below. ──
-  /** DB window_type enum: '7d' | '30d' | '90d' | 'all_time'. */
-  window_type?: string | null
-  /** Per-submission AI platform (FIX H): claude/codex/multi/… Distinguishes the
-   *  same operator's per-platform rows on the "off" board. Live rows read it from
-   *  metric_snapshots.platform; mock rows fall back to the operator's primary_domain. */
-  platform?: string | null
-  /** Snapshot DATE ('YYYY-MM-DD') — recency reference for the window buffer. */
-  snapshot_date?: string | null
-}
+// Types re-exported from the neutral types module (was defined inline here).
+export type {
+  LeaderboardRow,
+  TelemetryRaw,
+  HistoryPoint,
+  HomepageStats,
+  HallRecord,
+  ClassDistributionRow,
+  HourlyPoint,
+  WeeklyPoint,
+  CountryCount,
+} from '@/lib/data/types'
+
+import type {
+  LeaderboardRow,
+  TelemetryRaw,
+  HistoryPoint,
+  HomepageStats,
+  HallRecord,
+  ClassDistributionRow,
+  HourlyPoint,
+  WeeklyPoint,
+  CountryCount,
+} from '@/lib/data/types'
 
 /** Shared snapshot date for the deterministic seed corpus (mirrors the live DB). */
 const SEED_SNAPSHOT_DATE = '2026-05-14'
@@ -57,56 +61,6 @@ function seedWindowType(codename: string): string {
   if (codename.startsWith('static seed · 90d')) return '90d'
   if (codename.startsWith('static seed · all')) return 'all_time'
   return '30d'
-}
-
-/** Raw token telemetry (CANON §I / §VII). */
-export interface TelemetryRaw {
-  fresh_input: number
-  output: number
-  cache_read: number
-  cache_create: number
-  sessions: number
-  turns: number
-}
-
-/** A single point in an operator's score history. */
-export interface HistoryPoint {
-  /** ISO date (deterministic literal — not derived from a clock). */
-  date: string
-  signa_rate: number
-  global_rank: number
-  class_tier: SignalClass
-}
-
-/** Aggregate homepage stat block. */
-export interface HomepageStats {
-  total_operators: number
-  total_snapshots: number
-  total_tokens_scored: number
-  transmitter_count: number
-  top_operator_codename: string
-  top_signa_rate: number
-  /** Whether these numbers are placeholders (mock fallback). */
-  isPlaceholder: boolean
-}
-
-
-/** A Hall of Signal record. */
-export interface HallRecord {
-  /** Reward canonical id, e.g. "RW.28". */
-  reward_id: string
-  title: string
-  operator_codename: string
-  value: string
-  date: string
-  isPlaceholder: boolean
-}
-
-/** Per-class population row for the class distribution board. */
-export interface ClassDistributionRow {
-  class_tier: SignalClass
-  class_id: string
-  count: number
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -419,29 +373,6 @@ export const MOCK_HISTORY: Record<string, HistoryPoint[]> = {
     { date: '2026-05-12', signa_rate: 90.6, global_rank: 2, class_tier: 'TRANSMITTER' },
     { date: '2026-05-19', signa_rate: 91.2, global_rank: 2, class_tier: 'TRANSMITTER' },
   ],
-}
-
-/** One hour of the operators-online daily curve (BlitzStars "Hourly"). */
-export interface HourlyPoint {
-  /** Hour label, "00".."23". */
-  label: string
-  online: number
-}
-
-/** One day of the weekly online band — daily max and average (BlitzStars "Weekly"). */
-export interface WeeklyPoint {
-  label: string
-  max: number
-  avg: number
-}
-
-/**
- * Live operators online for one country (BlitzStars "Players Online - Live").
- * Country-level, not continent — operators self-identify by country.
- */
-export interface CountryCount {
-  country: string
-  online: number
 }
 
 /** MOCK_HOURLY — deterministic 24h operators-online curve (evening peak ~19:00). */

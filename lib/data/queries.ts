@@ -29,15 +29,17 @@ import {
   MOCK_HOMEPAGE_STATS,
   MOCK_HOURLY,
   MOCK_WEEKLY,
-  type ClassDistributionRow,
-  type CountryCount,
-  type HallRecord,
-  type HistoryPoint,
-  type HomepageStats,
-  type HourlyPoint,
-  type LeaderboardRow,
-  type WeeklyPoint,
 } from '@/lib/data/mock'
+import type {
+  ClassDistributionRow,
+  CountryCount,
+  HallRecord,
+  HistoryPoint,
+  HomepageStats,
+  HourlyPoint,
+  LeaderboardRow,
+  WeeklyPoint,
+} from '@/lib/data/types'
 import {
   type BoardParams,
   type DbMetricSnapshot,
