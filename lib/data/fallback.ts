@@ -14,7 +14,8 @@
 import { SORT_DEFAULT } from '@/lib/constants'
 import { filterToWindow } from '@/lib/data/windows'
 import coldStore from '@/lib/data/snapshot.json'
-import { MOCK_LEADERBOARD, type LeaderboardRow } from '@/lib/data/mock'
+import { MOCK_LEADERBOARD } from '@/lib/data/mock'
+import type { LeaderboardRow } from '@/lib/data/types'
 import {
   type BoardParams,
   type DbMetricSnapshot,
