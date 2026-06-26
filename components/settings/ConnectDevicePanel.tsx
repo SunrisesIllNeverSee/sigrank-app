@@ -4,11 +4,16 @@
  * components/settings/ConnectDevicePanel.tsx — "Connect a device" island (D7 §4.4).
  *
  * Client component rendered inside the Settings "Connect a device" section (signed-in
- * only). Generates a single-use connect code (POST /api/v1/devices/mint-code), shows
- * it big + monospace with a copy button and a live 10:00 countdown that greys out on
- * expiry, and lists the operator's enrolled devices (GET /api/v1/devices) each with a
- * Revoke kill-switch (POST /api/v1/devices/revoke). The actual enrollment happens in
- * the TUI: `npx sigrank-mcp` → Connect tab (key 6) → paste the code → Enter.
+ * only). Two paths:
+ *   - "Generate connect code" — the original single-use code (no auto-revoke).
+ *   - "New key" (FIX O, 2026-06-26) — 2FA-style re-key: auto-revokes ALL prior trusted
+ *     devices, mints a fresh code, shows it ONCE. The key IS the code — paste into the
+ *     agent's Connect tab to re-bind. Kills the revoke cycle (lose key → New key → paste).
+ *
+ * Shows the code big + monospace with a copy button and a live 10:00 countdown that
+ * greys out on expiry, and lists the operator's enrolled devices (GET /api/v1/devices)
+ * each with a Revoke kill-switch (POST /api/v1/devices/revoke). The actual enrollment
+ * happens in the TUI: `npx sigrank-mcp` → Connect tab (key 6) → paste the code → Enter.
  */
 
 import { useCallback, useEffect, useState } from 'react'
@@ -26,6 +31,7 @@ interface MintResponse {
   code: string
   expires_at: string
   expires_in_seconds: number
+  revoked_prior?: boolean
 }
 
 const btnPrimary =
@@ -45,8 +51,10 @@ export function ConnectDevicePanel() {
   const [expiresAt, setExpiresAt] = useState<number | null>(null)
   const [remaining, setRemaining] = useState(0)
   const [minting, setMinting] = useState(false)
+  const [newKeying, setNewKeying] = useState(false) // FIX O: New key button state
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [newKeyNotice, setNewKeyNotice] = useState<string | null>(null) // FIX O: "prior keys retired" message
 
   const loadDevices = useCallback(async () => {
     try {
@@ -104,6 +112,35 @@ export function ConnectDevicePanel() {
     }
   }, [])
 
+  // FIX O: New key — 2FA-style re-key. Auto-revokes ALL prior trusted devices +
+  // mints a fresh code in one call. The old key dies; the new code is shown ONCE.
+  const newKey = useCallback(async () => {
+    setNewKeying(true)
+    setError(null)
+    setCopied(false)
+    setNewKeyNotice(null)
+    try {
+      const r = await fetch('/api/v1/devices/new-key', { method: 'POST' })
+      const j = (await r.json()) as Partial<MintResponse> & { reason?: string; error?: string }
+      if (!r.ok) {
+        setError(j.error || 'Could not generate a new key. Try again.')
+        return
+      }
+      if (j.code && j.expires_at) {
+        setCode(j.code)
+        setExpiresAt(Date.parse(j.expires_at))
+        if (j.revoked_prior) {
+          setNewKeyNotice('Prior keys retired. Paste this new key into the agent to re-bind.')
+        }
+        void loadDevices() // refresh the device list (old devices now show revoked)
+      }
+    } catch {
+      setError('Network error — try again.')
+    } finally {
+      setNewKeying(false)
+    }
+  }, [loadDevices])
+
   const copy = useCallback(async () => {
     if (!code) return
     try {
@@ -151,9 +188,24 @@ export function ConnectDevicePanel() {
           </span>
         </div>
       ) : (
-        <button type="button" onClick={mint} disabled={minting} className={`w-fit ${btnPrimary}`}>
-          {minting ? 'Generating…' : 'Generate connect code'}
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" onClick={mint} disabled={minting} className={`w-fit ${btnPrimary}`}>
+            {minting ? 'Generating…' : 'Generate connect code'}
+          </button>
+          {/* FIX O: New key — 2FA-style re-key. Auto-revokes prior devices + mints fresh. */}
+          <button
+            type="button"
+            onClick={newKey}
+            disabled={newKeying}
+            className="w-fit rounded-md border border-gold/60 px-4 py-2 font-mono text-sm font-semibold text-gold transition-colors hover:bg-gold/10 disabled:opacity-50"
+          >
+            {newKeying ? 'Issuing new key…' : 'New key'}
+          </button>
+        </div>
+      )}
+
+      {newKeyNotice && (
+        <p className="font-mono text-[11px] text-gold/80">{newKeyNotice}</p>
       )}
 
       {error && <p className="font-mono text-[11px] text-red-400">{error}</p>}
