@@ -1,240 +1,182 @@
 import React from 'react'
 import Link from 'next/link'
 
-interface Step {
-  n: number
-  kicker: string
-  title: string
-  body: string
+/**
+ * HowItWorks — the landing "how to use SigRank" section.
+ *
+ * Clean + visual (owner 2026-06-26): npm command → TUI board mockup →
+ * 1-2-3 submit steps → "or send it to your agent" one-liner.
+ *
+ * The full CLI command reference + MCP tool table live on the wiki
+ * (SignalIntegrity.tsx) — the landing keeps it simple: install, see the
+ * board, submit in 3 steps, or let your agent run the command.
+ */
+
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold/15 font-mono text-sm font-bold text-gold">
+          {n}
+        </span>
+        <h3 className="text-base font-semibold tracking-tight text-text-primary">{title}</h3>
+      </div>
+      <p className="pl-10 text-sm leading-relaxed text-text-secondary">{children}</p>
+    </div>
+  )
 }
 
-/**
- * HowItWorks — the four-step "From telemetry to rank" grid (INSTALL · CONNECT ·
- * COMPUTE · RANK) + a CLI quickstart block with the real install command, all CLI
- * commands, and the MCP tool table.
- *
- * MCP-first positioning (owner 2026-06-23): leads with the SigRank agent (MCP) +
- * its zero-paste `tokenpull` reader as the primary path; ccusage/tokscale paste is
- * the FALLBACK, not the headline.
- *
- * CLI commands and MCP tools are real — sigrank-mcp@0.11.1 is the live package.
- */
-const STEPS: Step[] = [
-  {
-    n: 1,
-    kicker: 'INSTALL',
-    title: 'Install the SigRank agent',
-    body: 'npm install -g sigrank-mcp — then run sigrank-mcp to open the tabbed TUI, or wire it into Claude Code or any MCP client with one JSON config line.',
-  },
-  {
-    n: 2,
-    kicker: 'CONNECT',
-    title: 'It reads your tokens on-device',
-    body: 'The agent reads local session logs from 14+ platforms — Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more — and counts the four token pillars across 7d / 30d / 90d / all-time. It never reads your prompts; only the counts.',
-  },
-  {
-    n: 3,
-    kicker: 'COMPUTE',
-    title: 'Your cascade, derived locally',
-    body: 'From those four pillars it derives Υ Yield, SNR, Leverage, Velocity & 10xDEV on-device, and hands back your cascade class. Only the four counts ever leave your machine.',
-  },
-  {
-    n: 4,
-    kicker: 'RANK',
-    title: 'Publish to your profile',
-    body: 'One zero-paste call publishes your snapshot; the server re-scores authoritatively and your operator profile updates live across all four windows. No agent yet? Paste your ccusage or tokscale output as a fallback.',
-  },
-]
-
-function Code({ children }: { children: string }) {
+/** A single monospace command line with a $ prompt. */
+function Cmd({ children }: { children: string }) {
   return (
-    <code className="rounded bg-bg-surface px-1.5 py-0.5 font-mono text-[11px] text-text-accent">
+    <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">
       {children}
     </code>
   )
 }
 
-const CLI_COMMANDS = [
-  {
-    cmd: 'sigrank-mcp',
-    args: '',
-    desc: 'Opens the full tabbed TUI — Dashboard / Trends / Compare / Board / Watch / Connect. Default when run in a terminal. Keys: 1–6 or ← → switch tabs, R refresh, Q quit.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'tui',
-    desc: 'Same as above — explicit TUI launch.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'me',
-    desc: 'Your local cascade across all four time windows (7d / 30d / 90d / all-time). Reads on-device, zero paste.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'board',
-    desc: 'Live leaderboard from signalaf.com — auto-refreshes every 30s.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'compare',
-    desc: 'Source audit — reads all four verifiers (tokenpull / ccusage / token-dash / tokscale) and shows delta % between them.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'watch',
-    desc: 'Live cascade meter — re-reads your logs on every poll and shows what moved.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'enroll',
-    desc: 'Sign in: paste a key from signalaf.com → Settings → "New key" to bind this device and publish verified runs.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: 'submit',
-    desc: 'Publish your verified runs to the board (sign in with enroll first). Signs locally, server re-scores.',
-  },
-  {
-    cmd: 'sigrank-mcp',
-    args: '--help',
-    desc: 'Full command reference with all flags.',
-  },
-]
-
-const MCP_TOOLS = [
-  { name: 'tokenpull', desc: 'On-device read → 4-window cascade. Zero paste, token-only.' },
-  { name: 'tokenpull_submit', desc: 'Read local logs + publish to the board in one call.' },
-  { name: 'tokenpull_compare', desc: 'All four sources side-by-side with delta % vs tokenpull.' },
-  { name: 'rank_paste', desc: 'Score a ccusage / tokscale paste locally. Returns Υ + card.' },
-  { name: 'rank_windows', desc: 'Score all four windows from a dashboard paste at once.' },
-  { name: 'submit_paste', desc: 'Rank a paste AND publish it to the board in one call.' },
-  { name: 'submit_verified', desc: 'Publish signed runs as a verified operator (requires enroll).' },
-  { name: 'enroll', desc: 'Bind this device: paste a key from Settings → "New key".' },
-  { name: 'get_leaderboard', desc: 'Live board from signalaf.com.' },
-  { name: 'get_operator', desc: "One operator's live profile by codename." },
-  { name: 'watch_tokenpull', desc: 'Streaming cascade snapshot — diffs on each poll.' },
+// ── TUI board mockup data (realistic — mirrors the live 30d board) ──────────
+const BOARD_ROWS = [
+  { rank: 1, name: 'TransVaultOrigin', cls: 'TRANSMITTER', yld: '18,436.98', snr: '90.2', lev: '4.27×', vel: '1.63', d10: '0.63', pct: '100%', mv: '▲', you: true },
+  { rank: 2, name: 'OrcaVanguard',     cls: 'TRANSMITTER', yld: '12,104.41', snr: '84.1', lev: '3.82×', vel: '1.41', d10: '0.58', pct: '99%',  mv: '▲' },
+  { rank: 3, name: 'IronLattice',      cls: 'ARCHITECT',   yld:  '8,902.17', snr: '78.5', lev: '3.10×', vel: '1.29', d10: '0.49', pct: '98%',  mv: '—' },
+  { rank: 4, name: 'MeridianScribe',   cls: 'ARCHITECT',   yld:  '6,418.80', snr: '71.3', lev: '2.64×', vel: '1.12', d10: '0.42', pct: '95%',  mv: '▼' },
+  { rank: 5, name: 'VectorHerald',     cls: 'POWER',       yld:  '4,771.02', snr: '65.8', lev: '2.21×', vel: '0.98', d10: '0.34', pct: '91%',  mv: '▲' },
+  { rank: 6, name: 'DriftPilgrim',     cls: 'POWER',       yld:  '3,209.44', snr: '58.2', lev: '1.87×', vel: '0.84', d10: '0.27', pct: '85%',  mv: '—' },
 ]
 
 export function HowItWorks() {
   return (
-    <section className="my-16 flex flex-col gap-20">
+    <section className="my-16 flex flex-col gap-12">
 
-      {/* ── Four-step flow ── */}
+      {/* ── Section header ── */}
       <div>
         <div className="font-mono text-xs uppercase tracking-widest text-gold">⊙ How it works</div>
         <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-          From telemetry to rank in under a minute
+          Install. Run. Submit.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
-          Install the SigRank agent and it does the rest — reads your session token counts
-          on-device, derives your cascade locally, and publishes a snapshot the server
-          re-scores. Zero paste, and it never reads your prompts or replies; only the four
-          token counts ever leave your machine.
+          The SigRank agent reads your local AI session logs on-device, derives your token cascade,
+          and publishes to the board. No paste, no prompts read — only the four token counts leave
+          your machine.
         </p>
-
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s) => (
-            <div
-              key={s.n}
-              className="rounded-xl border border-bg-border-subtle bg-bg-surface p-7 transition-colors hover:border-bg-border"
-            >
-              <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg border border-gold/25 bg-gold/10 font-mono text-base font-semibold text-gold">
-                {s.n}
-              </div>
-              <div className="mb-3 font-mono text-xs font-medium tracking-wide text-gold">
-                {s.kicker}
-              </div>
-              <h3 className="text-lg font-semibold tracking-tight text-text-primary">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.body}</p>
-            </div>
-          ))}
-        </div>
       </div>
 
-      {/* ── CLI quickstart ── */}
-      <div className="flex flex-col gap-8">
-        <div>
-          <div className="font-mono text-xs uppercase tracking-widest text-gold">⊙ CLI quickstart</div>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">
-            Install once. Run anywhere.
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
-            The agent ships as a CLI tool and an MCP server in the same package. In a terminal it
-            opens the interactive TUI; wired into your AI client it exposes MCP tools your agent
-            can call directly. Non-TTY (piped) mode starts the MCP server automatically.
-          </p>
-        </div>
-
-        {/* install block */}
-        <pre className="overflow-x-auto rounded-xl border border-bg-border bg-bg-base px-5 py-4 font-mono text-[12px] leading-loose text-text-secondary">
+      {/* ── Install command ── */}
+      <div className="flex flex-col gap-3">
+        <div className="font-mono text-xs uppercase tracking-wide text-text-muted">Install</div>
+        <pre className="overflow-x-auto rounded-xl border border-bg-border bg-bg-base px-5 py-4 font-mono text-[13px] leading-loose text-text-secondary">
 {`# install globally
 npm install -g sigrank-mcp
 
 # or run without installing
-npx sigrank-mcp
-
-# wire into Claude Code  →  .mcp.json
-{
-  "mcpServers": {
-    "sigrank": { "command": "npx", "args": ["sigrank-mcp"] }
-  }
-}`}
+npx sigrank-mcp`}
         </pre>
+      </div>
 
-        {/* CLI commands */}
-        <div>
-          <div className="mb-3 font-mono text-xs uppercase tracking-wide text-text-muted">
-            CLI commands
+      {/* ── TUI board mockup ── */}
+      <div className="flex flex-col gap-3">
+        <div className="font-mono text-xs uppercase tracking-wide text-text-muted">
+          What you see — the tabbed TUI
+        </div>
+        <div className="overflow-hidden rounded-xl border border-bg-border bg-bg-surface shadow-lg">
+          {/* terminal title bar */}
+          <div className="flex items-center gap-2 border-b border-bg-border-subtle bg-bg-base/60 px-4 py-2.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+            <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+            <span className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+            <span className="ml-2 font-mono text-[11px] text-text-dim">sigrank-mcp — Dashboard</span>
           </div>
-          <div className="flex flex-col divide-y divide-bg-border-subtle rounded-xl border border-bg-border bg-bg-surface overflow-hidden">
-            {CLI_COMMANDS.map((c) => (
+          {/* tab bar */}
+          <div className="flex gap-4 border-b border-bg-border-subtle px-4 py-2 font-mono text-[11px]">
+            <span className="text-text-dim">1 Dashboard</span>
+            <span className="text-text-dim">2 Trends</span>
+            <span className="text-text-dim">3 Compare</span>
+            <span className="border-b-2 border-gold pb-1 text-gold">4 Board</span>
+            <span className="text-text-dim">5 Watch</span>
+            <span className="text-text-dim">6 Connect</span>
+          </div>
+          {/* board content */}
+          <div className="overflow-x-auto px-4 py-3">
+            <div className="font-mono text-[11px] text-text-dim">
+              Leaderboard&nbsp;&nbsp;window: 30d&nbsp;&nbsp;·&nbsp;&nbsp;sorted by Υ Yield&nbsp;&nbsp;·&nbsp;&nbsp;signalaf.com/leaderboard
+            </div>
+            {/* column headers */}
+            <div className="mt-3 flex gap-2 border-b border-bg-border-subtle pb-2 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+              <span className="w-8 text-right">#</span>
+              <span className="w-36">Codename</span>
+              <span className="w-24">Class</span>
+              <span className="w-24 text-right">Υ Yield</span>
+              <span className="w-14 text-right">SNR</span>
+              <span className="w-14 text-right">Lev</span>
+              <span className="w-12 text-right">Vel</span>
+              <span className="w-12 text-right">10x</span>
+              <span className="w-12 text-right">Pct</span>
+              <span className="w-10 text-right">7d↕</span>
+            </div>
+            {/* rows */}
+            {BOARD_ROWS.map((r) => (
               <div
-                key={c.cmd + c.args}
-                className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3"
+                key={r.rank}
+                className={`flex gap-2 py-1.5 font-mono text-[11px] ${
+                  r.you ? 'rounded bg-gold/10' : ''
+                }`}
               >
-                <span className="shrink-0 font-mono text-[12px] font-bold text-text-primary">
-                  {c.cmd}
+                <span className={`w-8 text-right ${r.rank <= 3 ? 'font-bold text-gold' : 'text-text-muted'}`}>
+                  #{r.rank}
                 </span>
-                {c.args && (
-                  <span className="shrink-0 font-mono text-[12px] font-semibold text-gold">
-                    {c.args}
-                  </span>
-                )}
-                <span className="text-xs leading-snug text-text-muted">{c.desc}</span>
+                <span className={`w-36 truncate ${r.you ? 'font-bold text-gold' : 'text-text-primary'}`}>
+                  {r.name}{r.you && <span className="ml-1 text-gold/70">YOU</span>}
+                </span>
+                <span className="w-24 text-text-secondary">{r.cls}</span>
+                <span className="w-24 text-right font-semibold text-text-primary">{r.yld}</span>
+                <span className="w-14 text-right text-text-secondary">{r.snr}</span>
+                <span className="w-14 text-right text-text-secondary">{r.lev}</span>
+                <span className="w-12 text-right text-text-secondary">{r.vel}</span>
+                <span className="w-12 text-right text-text-secondary">{r.d10}</span>
+                <span className="w-12 text-right text-text-muted">{r.pct}</span>
+                <span className={`w-10 text-right ${r.mv === '▲' ? 'text-green-400' : r.mv === '▼' ? 'text-red-400' : 'text-text-dim'}`}>
+                  {r.mv}
+                </span>
               </div>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* MCP tools */}
-        <div>
-          <div className="mb-3 font-mono text-xs uppercase tracking-wide text-text-muted">
-            MCP tools — callable by your AI client
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {MCP_TOOLS.map((t) => (
-              <div
-                key={t.name}
-                className="flex flex-col gap-1.5 rounded-lg border border-bg-border bg-bg-surface p-3"
-              >
-                <Code>{t.name}</Code>
-                <span className="text-xs leading-relaxed text-text-muted">{t.desc}</span>
-              </div>
-            ))}
-          </div>
-          <p className="mt-3 font-sans text-[11px] text-text-dim">
-            Full reference:{' '}
-            <Link
-              href="/wiki/local-agent"
-              className="text-text-accent underline-offset-2 hover:underline"
-            >
-              The local agent (MCP) wiki page
-            </Link>
-            {' '}·{' '}
-            <Code>sigrank-mcp --help</Code> in your terminal.
-          </p>
+      {/* ── 1-2-3 submit steps ── */}
+      <div className="flex flex-col gap-5">
+        <div className="font-mono text-xs uppercase tracking-wide text-text-muted">
+          Submit your cascade in 3 steps
         </div>
+        <Step n={1} title="Install & open the TUI">
+          Run <Cmd>npx sigrank-mcp</Cmd> in your terminal. It reads your local AI session logs
+          (Claude Code, Codex, Gemini CLI, and 11+ others) and derives your cascade on-device.
+        </Step>
+        <Step n={2} title="Paste a key to sign in">
+          Go to <Link href="/settings" className="text-text-accent underline-offset-2 hover:underline">signalaf.com → Settings</Link> and
+          click <span className="font-semibold text-gold">&ldquo;New key&rdquo;</span>. Copy the key, open the{' '}
+          <span className="text-text-secondary">Connect</span> tab (key 6) in the TUI, paste it, and press Enter.
+        </Step>
+        <Step n={3} title="Press [S] to submit">
+          From any read tab, press <Cmd>S</Cmd> to sign + publish your cascade to the board. The server
+          re-scores authoritatively — your rank updates live across all four windows.
+        </Step>
+      </div>
+
+      {/* ── Agent option ── */}
+      <div className="rounded-xl border border-bg-border bg-bg-surface px-5 py-4">
+        <div className="font-mono text-xs uppercase tracking-wide text-gold">Or let your AI agent do it</div>
+        <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+          Don&apos;t want to leave your agent? Just tell it to run{' '}
+          <Cmd>npx sigrank-mcp me</Cmd> for your cascade, or{' '}
+          <Cmd>npx sigrank-mcp submit</Cmd> to publish. It reads your logs, derives the cascade,
+          and submits — you don&apos;t paste anything. For direct tool calls, wire it as an MCP
+          server (one JSON line) — see the{' '}
+          <Link href="/wiki/local-agent" className="text-text-accent underline-offset-2 hover:underline">
+            local agent wiki page
+          </Link>.
+        </p>
       </div>
 
     </section>
