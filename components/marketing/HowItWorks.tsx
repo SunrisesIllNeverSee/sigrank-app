@@ -87,6 +87,16 @@ const CLI_COMMANDS = [
   },
   {
     cmd: 'sigrank-mcp',
+    args: 'enroll',
+    desc: 'Sign in: paste a key from signalaf.com → Settings → "New key" to bind this device and publish verified runs.',
+  },
+  {
+    cmd: 'sigrank-mcp',
+    args: 'submit',
+    desc: 'Publish your verified runs to the board (sign in with enroll first). Signs locally, server re-scores.',
+  },
+  {
+    cmd: 'sigrank-mcp',
     args: '--help',
     desc: 'Full command reference with all flags.',
   },
@@ -98,6 +108,9 @@ const MCP_TOOLS = [
   { name: 'tokenpull_compare', desc: 'All four sources side-by-side with delta % vs tokenpull.' },
   { name: 'rank_paste', desc: 'Score a ccusage / tokscale paste locally. Returns Υ + card.' },
   { name: 'rank_windows', desc: 'Score all four windows from a dashboard paste at once.' },
+  { name: 'submit_paste', desc: 'Rank a paste AND publish it to the board in one call.' },
+  { name: 'submit_verified', desc: 'Publish signed runs as a verified operator (requires enroll).' },
+  { name: 'enroll', desc: 'Bind this device: paste a key from Settings → "New key".' },
   { name: 'get_leaderboard', desc: 'Live board from signalaf.com.' },
   { name: 'get_operator', desc: "One operator's live profile by codename." },
   { name: 'watch_tokenpull', desc: 'Streaming cascade snapshot — diffs on each poll.' },
