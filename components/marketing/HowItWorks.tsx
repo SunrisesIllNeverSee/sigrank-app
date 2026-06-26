@@ -58,7 +58,7 @@ const CLI_COMMANDS = [
   {
     cmd: 'sigrank-mcp',
     args: '',
-    desc: 'Opens the full tabbed TUI — Dashboard / Compare / Board / Watch. Default when run in a terminal. Keys: 1–4 or ← → switch tabs, R refresh, Q quit.',
+    desc: 'Opens the full tabbed TUI — Dashboard / Trends / Compare / Board / Watch / Connect. Default when run in a terminal. Keys: 1–6 or ← → switch tabs, R refresh, Q quit.',
   },
   {
     cmd: 'sigrank-mcp',
