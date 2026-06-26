@@ -58,7 +58,7 @@ export function TerminalWordmark() {
           so the 52-char width fits mobile without horizontal scroll. */}
       <pre
         aria-hidden
-        className="select-none overflow-x-auto font-mono leading-[1.1] text-[clamp(0.45rem,1.8vw,0.95rem)] tracking-tight"
+        className="select-none overflow-x-auto font-mono leading-[1.1] text-[clamp(0.6rem,3.2vw,1.7rem)] tracking-tight"
         style={{ margin: 0 }}
       >
         {SPLASH_ART.map((line, i) => (
