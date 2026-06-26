@@ -103,6 +103,7 @@ export default async function ComparePage({
     <div className="flex flex-col gap-8">
       <WaveHero
         eyebrow="◈ Compare"
+        terminalText="HEAD TO HEAD"
         title="Head to Head"
         subtitle={
           <>

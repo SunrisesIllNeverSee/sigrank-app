@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { TerminalBlockText } from '@/components/home/TerminalBlockText'
 
 /**
  * TerminalWordmark — the terminal-theme hero wordmark (Layer 3, FIX O-adjacent).
@@ -24,15 +25,6 @@ import React, { useEffect, useState } from 'react'
  * "For all builders, burners and 10xers" tagline under the wordmark.
  */
 
-// Exact copy of SPLASH_ART from sigrank-mcp/tui.mjs (lines 1093–1097).
-const SPLASH_ART = [
-  '███████ ██  ██████  ██████   █████  ███    ██ ██   ██',
-  '██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██ ',
-  '███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████  ',
-  '     ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██ ',
-  '███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██',
-]
-
 const SPLASH_RULE = '◈  ───────────────────────────────────────────  ◈'
 
 export function TerminalWordmark() {
@@ -54,23 +46,14 @@ export function TerminalWordmark() {
 
   return (
     <div className="flex flex-col items-center gap-3" aria-label="SIGRANK">
-      {/* Block-letter art — <pre> preserves the exact spacing. Responsive font-size
-          so the 52-char width fits mobile without horizontal scroll. */}
-      <pre
-        aria-hidden
-        className="select-none overflow-x-auto font-mono leading-[1.1] text-[clamp(0.6rem,3.2vw,1.7rem)] tracking-tight"
-        style={{ margin: 0 }}
-      >
-        {SPLASH_ART.map((line, i) => (
-          <div
-            key={i}
-            className="terminal-wordmark-line"
-            style={{ ['--tw-delay' as string]: `${i * 0.4}s` }}
-          >
-            {line}
-          </div>
-        ))}
-      </pre>
+      {/* Block-letter art via the shared engine. SIGRANK's glyphs reproduce the
+          original SPLASH_ART byte-for-byte. Responsive font-size so the 52-char
+          width fits mobile without a horizontal-scroll gutter (overflow-x-clip). */}
+      <TerminalBlockText
+        text="SIGRANK"
+        label="SIGRANK"
+        fontClassName="text-[clamp(0.6rem,3.2vw,1.7rem)]"
+      />
 
       {/* ◈ rule + tagline (SPLASH_RULE + "For all builders, burners and 10xers") */}
       <div className="flex flex-col items-center gap-1 font-mono text-[10px] text-text-dim sm:text-[11px]">

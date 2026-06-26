@@ -12,6 +12,7 @@
  */
 
 import React from 'react'
+import { WaveHeroTitle } from '@/components/ui/WaveHeroTitle'
 
 // Three sine-ish crests across the band, each its own pulse speed + phase so the
 // field shimmers rather than marching in lockstep.
@@ -28,11 +29,20 @@ export interface WaveHeroProps {
   title: React.ReactNode
   /** Optional one-line description below the title. */
   subtitle?: React.ReactNode
+  /**
+   * Plain-string hero word for the terminal theme. When set AND the terminal
+   * theme is active, the title renders as block-letter art (matching the landing
+   * SIGRANK wordmark). Omit → the styled <h1> renders in every theme as before.
+   */
+  terminalText?: string
 }
 
-export function WaveHero({ eyebrow, title, subtitle }: WaveHeroProps) {
+export function WaveHero({ eyebrow, title, subtitle, terminalText }: WaveHeroProps) {
   return (
-    <header className="relative mb-8 overflow-hidden rounded-xl border border-bg-border bg-bg-surface">
+    // w-full so the masthead exactly fills its max-w-6xl page container (the same
+    // box the table sits in) — hero and table share one width + centering, no
+    // scrollbar-gutter drift between them.
+    <header className="relative mb-8 w-full overflow-hidden rounded-xl border border-bg-border bg-bg-surface">
       {/* Animated signal-wave backdrop */}
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
@@ -61,9 +71,7 @@ export function WaveHero({ eyebrow, title, subtitle }: WaveHeroProps) {
         <span className="font-mono text-xs uppercase tracking-[0.4em] text-text-gold">
           {eyebrow}
         </span>
-        <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl">
-          {title}
-        </h1>
+        <WaveHeroTitle title={title} terminalText={terminalText} />
         {subtitle ? (
           <p className="max-w-xl font-sans text-sm text-text-secondary">{subtitle}</p>
         ) : null}
