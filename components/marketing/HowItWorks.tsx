@@ -17,7 +17,7 @@ interface Step {
  * its zero-paste `tokenpull` reader as the primary path; ccusage/tokscale paste is
  * the FALLBACK, not the headline.
  *
- * CLI commands and MCP tools are real — sigrank-mcp@0.11.0 is the live package.
+ * CLI commands and MCP tools are real — sigrank-mcp@0.11.1 is the live package.
  */
 const STEPS: Step[] = [
   {
