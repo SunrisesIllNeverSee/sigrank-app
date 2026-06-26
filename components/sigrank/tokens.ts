@@ -40,6 +40,7 @@ export const colors = {
     Claude: c('platform-claude'),
     Pi: c('platform-pi'),
     Gemini: c('platform-gemini'),
+    Codex: c('platform-codex'),
   },
   rank: {
     1: c('rank-1'),

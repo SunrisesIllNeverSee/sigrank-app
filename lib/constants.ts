@@ -33,7 +33,7 @@ export const WINDOW_API_MAP: Record<WindowUI, string> = {
 }
 
 /** Platform filter labels shown in the UI (CANON T.15). */
-export const PLATFORM_UI = ['All', 'Claude', 'ChatGPT', 'Gemini', 'Pi', 'Multi'] as const
+export const PLATFORM_UI = ['All', 'Claude', 'ChatGPT', 'Gemini', 'Pi', 'Codex', 'Multi'] as const
 export type PlatformUI = (typeof PLATFORM_UI)[number]
 
 /** Default selected platform filter. */
@@ -49,6 +49,7 @@ export const PLATFORM_DOMAIN_MAP: Record<PlatformUI, string | null> = {
   ChatGPT: 'chatgpt',
   Gemini: 'gemini',
   Pi: 'pi',
+  Codex: 'codex',
   Multi: 'multi',
 }
 
