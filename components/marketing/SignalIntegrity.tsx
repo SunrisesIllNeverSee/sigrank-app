@@ -156,8 +156,10 @@ function Mono({ children }: { children: string }) {
 }
 
 const CLI_CMDS = [
-  { cmd: 'sigrank-mcp', args: '',        desc: 'Full tabbed TUI — Dashboard / Compare / Board / Watch. Default in a terminal.' },
-  { cmd: 'sigrank-mcp', args: 'tui',     desc: 'Same as above — explicit launch. Keys: 1–4 or ← → switch, R refresh, Q quit.' },
+  { cmd: 'sigrank-mcp', args: '',        desc: 'Full tabbed TUI — Dashboard / Trends / Compare / Board / Watch / Connect. Default in a terminal.' },
+  { cmd: 'sigrank-mcp', args: 'tui',     desc: 'Same as above — explicit launch. Keys: 1–6 or ← → switch, R refresh, Q quit.' },
+  { cmd: 'sigrank-mcp', args: 'enroll',  desc: 'Sign in: redeem a connect code from signalaf.com → Settings → Connect a device. (Or in the TUI: Connect tab, key 6.)' },
+  { cmd: 'sigrank-mcp', args: 'submit',  desc: 'Publish your verified runs to the board. (Or press [S] from any read tab in the TUI.)' },
   { cmd: 'sigrank-mcp', args: 'me',      desc: 'Your local cascade across 7d / 30d / 90d / all-time. Zero paste, on-device.' },
   { cmd: 'sigrank-mcp', args: 'board',   desc: 'Live leaderboard from signalaf.com — auto-refreshes every 30s.' },
   { cmd: 'sigrank-mcp', args: 'compare', desc: 'Source audit — tokenpull vs ccusage vs token-dash vs tokscale, with delta %.' },
@@ -174,6 +176,8 @@ const MCP_TOOL_LIST = [
   { name: 'get_leaderboard',   desc: 'Live leaderboard from signalaf.com, any window.' },
   { name: 'get_operator',      desc: "One operator's live profile by codename." },
   { name: 'watch_tokenpull',   desc: 'Streaming cascade snapshot — diffs on each poll.' },
+  { name: 'enroll',            desc: 'Redeem a connect code → bind this device (signed submit).' },
+  { name: 'submit_verified',   desc: 'Sign + POST the verified cascade to /api/v1/snapshots (the ranked path).' },
 ]
 
 const PROFILE_PIPELINE = [
