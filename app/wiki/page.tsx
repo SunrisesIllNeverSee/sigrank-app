@@ -20,6 +20,7 @@
 import type { Metadata } from 'next'
 
 import { TOKEN_METRICS } from '@/lib/canon/ids'
+import { MCP_VERSION } from '@/lib/constants'
 import { ClassLadder } from '@/components/marketing/ClassLadder'
 import { PasteForm } from '@/components/submit/PasteForm'
 import { SubmitForm } from '@/components/submit/SubmitForm'
@@ -354,7 +355,7 @@ export default function Draft1Page() {
       items: [
         {
           label: 'The local agent (MCP)',
-          hint: 'Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank-mcp@0.11.1.',
+          hint: `Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank-mcp@${MCP_VERSION}.`,
           node: withPermalink('local-agent', <LocalAgentMcp />),
         },
       ],
