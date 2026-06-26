@@ -1,0 +1,56 @@
+name: Bug Report
+description: Report a bug in SigRank
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! The more detail, the faster we can fix it.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: "When I go to the board page and..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: What should have happened instead?
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      options:
+        - Carbon (default)
+        - Paper
+        - Railway
+        - Terminal
+        - Not sure
+    validations:
+      required: false
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: Link to the page where the bug occurred (if applicable).
+      placeholder: "https://signalaf.com/board"
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, device.
+      placeholder: "Chrome 125, macOS 14, desktop"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console output / screenshots
+      description: Any errors from the browser console, or screenshots.
+      render: shell
