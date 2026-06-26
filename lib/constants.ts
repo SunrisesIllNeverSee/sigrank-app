@@ -107,3 +107,10 @@ export const SORT_DEFAULT = 'yield_'
 /** Demo banner copy shown whenever the app is running on mock/fallback data. */
 export const DEMO_BANNER =
   'Demo mode — showing sample data. Connect Supabase to see live operator telemetry.'
+
+/**
+ * MCP_VERSION — the live sigrank-mcp npm package version. Centralized here so
+ * every web reference tracks ONE source (was hardcoded in ≥2 places, went stale
+ * at 0.9.5 once). Bump this when the MCP package is published.
+ */
+export const MCP_VERSION = '0.11.1' as const
