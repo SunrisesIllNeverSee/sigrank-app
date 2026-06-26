@@ -35,6 +35,9 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntry {
     // `claimed &&` gate hid those backfilled names and is dropped. Never invent
     // PII: this only surfaces an operator-set / owner-backfilled name.
     anonId: operator.display_name ? operator.display_name : operator.codename,
+    // Profile-route key — ALWAYS the codename (the /user/<codename> lookup key), even
+    // when anonId is a display_name. Linking by anonId 404s for renamed operators.
+    codename: operator.codename,
     // Operator-cell 2nd line: the operator's @handle (their real tokscale/social
     // username, e.g. @olafurns7). Primary line is the real name (codename); the 2nd
     // line is the @handle so the cell reads "Ólafur Nils Sigurðsson / @olafurns7".
