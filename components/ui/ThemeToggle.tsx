@@ -41,7 +41,7 @@ export function ThemeToggle() {
     <div
       role="group"
       aria-label="Theme"
-      className="inline-flex items-center gap-0.5 rounded-md border border-bg-border bg-bg-elevated p-0.5"
+      className="grid grid-cols-2 gap-0.5 rounded-md border border-bg-border bg-bg-elevated p-0.5"
     >
       {THEMES.map((t) => (
         <button
