@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./banner.svg" alt="SigRank" width="800">
+<p><img src="./banner.svg" alt="SigRank" width="800"></p>
 
 **A privacy-preserving leaderboard for AI operator efficiency.**
 
