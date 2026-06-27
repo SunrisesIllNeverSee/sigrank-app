@@ -70,7 +70,7 @@ export function HowItWorks() {
         <CommandCard
           kicker="Step 1"
           title="View your cascade"
-          command="npx sigrank-mcp"
+          command="npx sigrank"
           note="Opens the tabbed TUI. Reads your local logs (Claude Code, Codex, Gemini CLI, and 11+ others), derives Υ Yield + your cascade on-device. Zero paste."
         >
           <TuiBoardMockup />
@@ -79,8 +79,8 @@ export function HowItWorks() {
         <CommandCard
           kicker="Step 2"
           title="Submit to the board"
-          command="npx sigrank-mcp submit"
-          note={'Sign in once first with npx sigrank-mcp enroll (paste a key from Settings → "New key"). Then submit signs + publishes your cascade — your rank updates live.'}
+          command="npx sigrank submit"
+          note={'Sign in once first with npx sigrank enroll (paste a key from Settings → "New key"). Then submit signs + publishes your cascade — your rank updates live.'}
         >
           <TuiBoardMockup highlightYou />
         </CommandCard>
@@ -91,11 +91,11 @@ export function HowItWorks() {
         <div className="font-mono text-xs uppercase tracking-wide text-gold">Or let your AI agent do it</div>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
           Don&apos;t want to leave your agent? Just tell it to run{' '}
-          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank-mcp me</code>{' '}
+          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank me</code>{' '}
           to see your cascade, or{' '}
-          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank-mcp submit</code>{' '}
+          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank submit</code>{' '}
           to publish (sign in once first with{' '}
-          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank-mcp enroll</code>).
+          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank enroll</code>).
           It reads your logs, derives the cascade, and submits — you don&apos;t paste anything. For
           direct tool calls, wire it as an MCP server — see the{' '}
           <Link href="/wiki/local-agent" className="text-text-accent underline-offset-2 hover:underline">
