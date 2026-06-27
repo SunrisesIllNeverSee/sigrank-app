@@ -1,5 +1,46 @@
 # SigRank App — Code Audit
 
+> **⚠️ ARCHIVED 2026-06-27** — This audit was written against the original
+> codebase structure (app/operators/, app/api/v1/claim/, app/api/v1/ingest/).
+> Those files no longer exist — the app was restructured (operators → user/,
+> claim → devices/enroll, ingest → snapshots). The 30 findings cannot be
+> verified against the current codebase. A fresh audit was run on 2026-06-27
+> (see below) — all current API routes are secure, RLS is enabled on all
+> tables, Stripe webhook uses raw body verification, and the P1 billing portal
+> auth bypass has been fixed. This document is kept for historical reference
+> only. Do NOT use it as a live task list.
+
+## 2026-06-27 Fresh Audit Summary
+
+**Code health:** tsc 0 errors · next build 56 routes clean · canonical 11/11 (Υ 18436.98) · npm audit 0 critical
+
+**Security (all ✅):**
+- P1 #4 billing portal auth bypass — FIXED (session-bound, body params ignored)
+- All API routes: input validation + rate limiting + auth where needed
+- Stripe webhook: raw body signature verification + idempotency dedup
+- RLS: enabled on ALL 20+ tables via policies.sql
+- Service-role client separation (never falls back to anon key)
+
+**Live site (all ✅):**
+- All routes 200 (no 500s)
+- OG + Twitter meta tags present
+- robots.txt + sitemap.xml live
+- Mobile responsive (Tailwind breakpoints)
+
+**MCP server (all ✅):**
+- Tarball clean (no secrets/fixtures leaking)
+- 11 tools validated (enum + length limits)
+- All execSync converted to async execFile (defense-in-depth)
+
+**Data integrity (all ✅):**
+- 18 active tables, no orphaned FKs, no unused columns
+- Cascade math verified: Υ = (cr × o) / i² = 18436.98 for MO§ES seed
+- SNR uses compression ratio o/(i+o) — intentional, code + tests consistent
+
+---
+
+## Historical Findings (pre-restructure — files may not exist)
+
 This document is the hand-off for a fresh session to remediate. It contains **30 adversarially-confirmed findings** grouped by severity (P1 → P2 → P3), then by dimension. Each finding lists the file, a title, the detail, and the suggested fix. Findings are numbered sequentially 1–30.
 
 **Severity counts:** **7 × P1**, **16 × P2**, **7 × P3** (total 30).
