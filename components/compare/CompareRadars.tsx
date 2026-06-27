@@ -19,7 +19,7 @@ import React from 'react'
 import type { LeaderboardRow } from '@/lib/data'
 import CascadeRadar, { type CascadeRadarSeries } from '@/components/charts/CascadeRadar'
 
-const A_COLOR = 'rgb(var(--accent))'
+const A_COLOR = 'rgb(var(--class-arch))' // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
 const B_COLOR = 'rgb(var(--class-seeker))'
 
 function nameOf(row: LeaderboardRow): string {
