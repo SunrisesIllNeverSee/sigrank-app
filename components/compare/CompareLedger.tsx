@@ -31,7 +31,7 @@ import type { LeaderboardRow } from '@/lib/data'
 import { CanonId } from '@/components/ui/CanonId'
 import { DISPLAY_RAW, DISPLAY_METRICS } from '@/lib/canon/ids'
 
-const A_COLOR = 'rgb(var(--accent))'
+const A_COLOR = 'rgb(var(--class-arch))' // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
 const B_COLOR = 'rgb(var(--class-seeker))'
 
 /** The owner's compare METRICS view: the 8 rows from the ASCII, in order.
