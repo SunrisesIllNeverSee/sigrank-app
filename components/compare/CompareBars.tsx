@@ -15,6 +15,7 @@
 
 import React from 'react'
 import type { LeaderboardRow } from '@/lib/data'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 import { CanonId } from '@/components/ui/CanonId'
 import CascadeRadar, { type CascadeRadarSeries } from '@/components/charts/CascadeRadar'
 
@@ -59,9 +60,7 @@ function winnerOf(row: MetricRow): 'a' | 'b' | 'tie' {
 }
 
 function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
+  return operatorDisplayName(row)
 }
 
 /** A operator's share (0..1) of the combined "outward" magnitude on this axis.
