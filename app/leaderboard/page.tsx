@@ -15,8 +15,9 @@
 import { redirect } from 'next/navigation'
 
 export default function LeaderboardPage() {
-  // Owner 2026-06-25: the "Everything" firehose (every operator's every window point
-  // → duplicate rows per seed) is removed. The board now opens on the "off" view —
-  // filter off: ONE row per operator (latest snapshot, no window filter). Tabs narrow.
-  redirect('/board/off')
+  // Owner 2026-06-27: the board now opens on the operator-TOTAL view at /board/all —
+  // ONE entry per operator (their cross-platform 'multi' total, all-time), with the
+  // per-platform / per-window breakdowns as URL filters (?view=platforms, ?platform=…).
+  // (Was /board/off, the allSnapshots firehose — every operator×platform×window row.)
+  redirect('/board/all')
 }

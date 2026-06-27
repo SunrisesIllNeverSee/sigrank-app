@@ -51,6 +51,7 @@ import {
   mapOperator,
   mapSnapshot,
   num,
+  operatorTotalCollapse,
   pendingSnapshot,
   telemetryFromSnapshot,
   toSignalClass,
@@ -78,11 +79,11 @@ async function recomputeRank(
       .select(SNAPSHOT_COLUMNS)
       .order('snapshot_date', { ascending: false })
     if (error || !allSnaps) return { rank: 0, percentile: 0 }
-    // Collapse to latest snapshot per operator (same as the board's legacy path)
-    const latest = new Map<string, DbMetricSnapshot>()
-    for (const s of asDb<DbMetricSnapshot[]>(allSnaps) ?? []) {
-      if (!latest.has(s.operator_id)) latest.set(s.operator_id, s)
-    }
+    // Collapse to the operator-TOTAL row per operator (BOARD redesign 2026-06-27):
+    // prefer each operator's 'multi' snapshot (already a cross-platform sum), else
+    // their latest single-platform snapshot — the SAME collapse the operator-total
+    // board uses, so a recomputed profile rank ranks the same yield the board does.
+    const latest = operatorTotalCollapse(asDb<DbMetricSnapshot[]>(allSnaps) ?? []).byOperator
     // Compute yield_ for each + sort descending
     const ranked = [...latest.values()]
       .map((s) => {
@@ -109,6 +110,20 @@ interface DbRankHistory {
   snapshot_date: string
   global_rank: number | null
   percentile: number | null
+}
+
+/**
+ * A LeaderboardRow carrying the operator's distinct submitted-platform SET — only
+ * populated on the `operatorTotal` board path (BOARD redesign, 2026-06-27), where a
+ * single total row stands in for an operator who may have run claude + codex + multi.
+ * The UI badges this set ("claude·codex·multi"). It's a structural superset of
+ * LeaderboardRow (the base interface lives in lib/data/types.ts, which this layer
+ * does not own), so a `LeaderboardRowWithPlatforms[]` is assignable to a
+ * `LeaderboardRow[]` and the optional field is read back via to-entry's local cast.
+ */
+export interface LeaderboardRowWithPlatforms extends LeaderboardRow {
+  /** Distinct platforms the operator submitted, e.g. ['claude','codex','multi']. */
+  platforms?: string[]
 }
 
 
@@ -163,14 +178,28 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
     // home/transmitters/hall) keep their pre-730 full-field behaviour.
     const windowed =
       params.windowFilter && params.window ? filterToWindow(allSnaps, params.window) : allSnaps
-    // "off" board: keep EVERY (operator, platform, window) point — no collapse.
-    // perPlatform (windowed boards, FIX H): one row per (operator, platform).
-    // Otherwise collapse to the latest snapshot per operator (legacy behaviour).
-    const snapRows: DbMetricSnapshot[] = params.allSnapshots
-      ? windowed
-      : params.perPlatform
-        ? [...latestPerOperatorPlatform(windowed).values()]
-        : [...latestPerOperator(windowed).values()]
+    // Collapse ladder (precedence top→bottom):
+    //   allSnapshots  — keep EVERY (operator, platform, window) point ("off" board).
+    //   operatorTotal — ONE total row per operator: the operator's 'multi' snapshot
+    //                   (which already SUMS every platform) when present, else their
+    //                   latest single-platform row. The clean default board.
+    //   perPlatform   — one row per (operator, platform) (FIX H per-platform view).
+    //   else          — latest snapshot per operator (legacy behaviour).
+    // operatorTotal also yields the distinct platform SET per operator so the UI can
+    // badge "claude·codex·multi" on the single total row.
+    let platformsByOperator: Map<string, string[]> | null = null
+    let snapRows: DbMetricSnapshot[]
+    if (params.allSnapshots) {
+      snapRows = windowed
+    } else if (params.operatorTotal) {
+      const collapsed = operatorTotalCollapse(windowed)
+      platformsByOperator = collapsed.platformsByOperator
+      snapRows = [...collapsed.byOperator.values()]
+    } else if (params.perPlatform) {
+      snapRows = [...latestPerOperatorPlatform(windowed).values()]
+    } else {
+      snapRows = [...latestPerOperator(windowed).values()]
+    }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
     if (snapRows.length === 0) return params.windowFilter ? [] : filterMockBoard(params)
@@ -196,10 +225,14 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
       if (!pctById.has(r.operator_id)) pctById.set(r.operator_id, num(r.percentile))
     }
 
-    let rows: LeaderboardRow[] = []
+    let rows: LeaderboardRowWithPlatforms[] = []
     for (const snap of snapRows) {
       const op = opById.get(snap.operator_id)
       if (!op) continue
+      // operatorTotal: the distinct platforms this operator submitted (for the UI
+      // multi-platform badge). Only attached on the operatorTotal path; other paths
+      // leave `platforms` undefined (the per-row platform column is the source there).
+      const platforms = platformsByOperator?.get(snap.operator_id)
       rows.push({
         operator: mapOperator(op),
         snapshot: mapSnapshot(snap),
@@ -209,6 +242,7 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
         window_type: snap.window_type ?? null,
         platform: snap.platform ?? op.primary_domain ?? null,
         snapshot_date: snap.snapshot_date ?? null,
+        ...(platforms && platforms.length > 0 ? { platforms } : {}),
       })
     }
     // Honest empty (mirrors the latest.size===0 guard above): if operators didn't
@@ -257,15 +291,22 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
     const op = asDb<DbOperator | null>(opData)
     if (!op) return fromMock()
 
+    // BOARD redesign (2026-06-27): the profile headline (rank / class / cascade) must
+    // agree with the board's operator-TOTAL row, so we pick the operator's total the
+    // SAME way the board does — prefer their `platform='multi'` snapshot (which already
+    // SUMS every platform), falling back to their latest single-platform snapshot. We
+    // read all of the operator's snapshots (date-desc) and run operatorTotalCollapse,
+    // rather than a blind .limit(1) that could land on a single-platform row and
+    // disagree with the board. (The per-platform×window Submissions grid is a separate
+    // query — getOperatorSubmissions — and is untouched.)
     const { data: snapData, error: snapError } = await sb
       .from('metric_snapshots')
       .select(SNAPSHOT_COLUMNS)
       .eq('operator_id', op.operator_id)
       .order('snapshot_date', { ascending: false })
-      .limit(1)
-      .maybeSingle()
     if (snapError) throw snapError
-    const snap = asDb<DbMetricSnapshot | null>(snapData)
+    const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
+    const snap = operatorTotalCollapse(allOpSnaps).byOperator.get(op.operator_id) ?? null
     if (!snap) {
       // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
       // verified submission). Render an identity-only PENDING profile — never a 404.
