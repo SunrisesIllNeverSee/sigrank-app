@@ -2,6 +2,15 @@
 
 <!-- What does this PR change and why? -->
 
+## Impact
+
+- [ ] User-facing UI / copy
+- [ ] API behavior
+- [ ] Database / Supabase
+- [ ] Billing / Stripe
+- [ ] Scoring / ingest
+- [ ] Documentation only
+
 ## Type
 
 - [ ] Bug fix
@@ -18,6 +27,10 @@
 - [ ] `npm run build` succeeds
 - [ ] No frozen invariants broken (MO§ES SEED values, Υ formula, cascade identity, RS.xx weights server-only)
 
+## Screenshots
+
+<!-- Add before/after screenshots for UI changes, or write "N/A". -->
+
 ## Notes
 
-<!-- Anything else reviewers should know. -->
+<!-- Env vars, migrations, rollout concerns, skipped checks, or reviewer context. -->
