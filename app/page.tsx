@@ -11,6 +11,11 @@ import { Draft2CtaBand } from '@/components/draft/Draft2CtaBand'
 import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 
+// ISR: the Three Degrees chart now auto-pulls the top operator's live all-time metrics
+// (lib/marketing/top-operator-column.ts). Revalidate daily so the page stays prerendered
+// (○ Static) + refreshes the gold column once a day, rather than going fully dynamic.
+export const revalidate = 86400
+
 export const metadata: Metadata = withOG({
   title: 'SigRank — AI Operator Leaderboard',
   description:
