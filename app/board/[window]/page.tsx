@@ -15,12 +15,14 @@
  */
 
 import { notFound, redirect } from 'next/navigation'
+import type { Metadata } from 'next'
 import { getLeaderboard } from '@/lib/data'
 import { toEntry } from '@/lib/leaderboard/to-entry'
 import { boardWindowBySlug, BOARD_WINDOWS } from '@/lib/data/windows'
 import { LeaderboardTable } from '@/components/sigrank'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { LeaderboardKey } from '@/components/leaderboard/LeaderboardKey'
+import { withOG } from '@/lib/seo'
 
 // D19: cache leaderboard reads for 300s (Cache-Control max-age=300 equivalent).
 export const revalidate = 300
@@ -28,6 +30,24 @@ export const revalidate = 300
 /** Statically render the four known windows + the "off" (filter-off) board. */
 export function generateStaticParams() {
   return [...BOARD_WINDOWS.map((w) => ({ window: w.slug })), { window: 'off' }]
+}
+
+/** Per-window OG metadata. */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ window: string }>
+}): Promise<Metadata> {
+  const { window: slug } = await params
+  const isOff = slug === 'off'
+  const win = isOff ? null : boardWindowBySlug(slug)
+  if (!isOff && !win) return { title: 'Board not found · SigRank' }
+  const label = isOff ? 'All-time' : win!.label
+  return withOG({
+    title: `${label} Leaderboard · SigRank`,
+    description: `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
+    path: `/board/${slug}`,
+  })
 }
 
 export default async function BoardWindowPage({
