@@ -23,6 +23,7 @@ import { CompareRadars } from '@/components/compare/CompareRadars'
 import { ChallengeBar } from '@/components/compare/ChallengeBar'
 import { getChallengeBetween } from '@/lib/challenges/server'
 import { GATE_CHALLENGES } from '@/lib/features'
+import { CompareShareCard, type CompareOperand } from '@/components/share/CompareShareCard'
 
 export const metadata: Metadata = {
   title: 'Compare Operators · SigRank',
@@ -44,6 +45,31 @@ function nameOf(row: LeaderboardRow): string {
     return m[2] ? `Owner · ${win} (with claude-mem)` : `Owner · ${win}`
   }
   return code
+}
+
+/**
+ * Build a CompareShareCard operand from a row — the headline metrics with raw
+ * values + winner direction, same set the on-page bars use. Cost is lower-wins.
+ */
+function toOperand(row: LeaderboardRow): CompareOperand {
+  const c = row.snapshot.cascade
+  const live = c && !c.nonCompounding
+  const yield_ = live ? c.yield_ : 0
+  const lev = live ? c.leverage : 0
+  const snr = c ? c.snr : 0
+  const vel = c ? c.velocity : 0
+  const cost = c ? c.costPerMillion : 0
+  return {
+    name: nameOf(row),
+    signalClass: row.snapshot.class_tier,
+    metrics: [
+      { label: 'Yield', value: yield_ >= 1000 ? `${(yield_ / 1000).toFixed(1)}K` : yield_.toFixed(0), raw: yield_, higherWins: true },
+      { label: 'SNR', value: `${(snr * 100).toFixed(0)}%`, raw: snr, higherWins: true },
+      { label: 'Leverage', value: `${lev.toFixed(0)}x`, raw: lev, higherWins: true },
+      { label: 'Velocity', value: vel.toFixed(1), raw: vel, higherWins: true },
+      { label: '$/1M', value: `$${cost.toFixed(2)}`, raw: cost, higherWins: false },
+    ],
+  }
 }
 
 export default async function ComparePage({
@@ -127,6 +153,13 @@ export default async function ComparePage({
       {/* MAIN MATCHUP BOX — selectors + two operator panels: identity (logo/name/
           class/Υ) outboard, 5 derived facts inboard (owner 2026-06-22). */}
       <CompareMatchup a={rowA} b={rowB} options={selectorOptions} />
+
+      {/* Share / download the head-to-head as a card for socials (owner 2026-06-27). */}
+      <CompareShareCard
+        a={toOperand(rowA)}
+        b={toOperand(rowB)}
+        href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+      />
 
       {/* LEDGER — the RAW / METRICS / TOTAL head-to-head table to the owner's ASCII
           template, with diverging bars per row (owner 2026-06-22). */}
