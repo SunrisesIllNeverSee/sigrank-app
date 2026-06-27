@@ -15,6 +15,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { getTopOperatorColumn, type GoldColumn } from '@/lib/marketing/top-operator-column'
 
 type Variant = 'full' | 'embed'
 
@@ -28,27 +29,45 @@ const COLS: { label: string; tone: 'white' | 'gold' }[] = [
   { label: 'Power users†', tone: 'white' },
   { label: 'Top Evals to date**', tone: 'gold' },
 ]
-// Gold column = the top REAL operator measured to date (MO§ES™, the owner — the only
-// real operator on the live board so far). Values are the canonical board compute for
-// that row (GET /api/v1/operators, 2026-06-27), replacing the earlier modeled-seed figures.
-const ROWS: { metric: string; vals: [string, string, string]; winner: 2 }[] = [
-  { metric: 'Υ Yield', vals: ['1.57', '1.51', '488.65'], winner: 2 },
-  { metric: 'SNR', vals: ['0.33', '0.07', '0.58'], winner: 2 },
-  { metric: 'Velocity (O/I)', vals: ['0.50', '0.08', '1.36'], winner: 2 },
-  { metric: 'Leverage (CR/I)', vals: ['3.2×', '22.3×', '360.2×'], winner: 2 },
-  { metric: '10xDEV (log₁₀)', vals: ['0.50', '1.35', '2.56'], winner: 2 },
-  { metric: 'Efficiency (vs AA 4.0)', vals: ['1.00', '5.61', '93.17'], winner: 2 },
-  { metric: 'Operating Ratio (C:I:O)', vals: ['3.5 : 1 : 0.50', '22 : 1 : 0.08', '360 : 1 : 1.36'], winner: 2 },
-]
+// Gold column = the top REAL operator currently leading the live board, on the ALL-TIME
+// window (lib/marketing/top-operator-column.ts). It auto-pulls the canonical board
+// compute at render, so the chart tracks "whoever leads" + can never disagree with the
+// board. `gold` is null when there's no qualifying real operator yet → these FALLBACK
+// literals (the last known real read, MO§ES™ all-time 2026-06-27) are used instead.
+const GOLD_FALLBACK: GoldColumn = {
+  yield_: '488.65',
+  snr: '0.58',
+  velocity: '1.36',
+  leverage: '360.2×',
+  dev10x: '2.56',
+  efficiency: '93.17',
+  opRatio: '360 : 1 : 1.36',
+  devLinear: '360×',
+}
+
+function buildRows(gold: GoldColumn): { metric: string; vals: [string, string, string]; winner: 2 }[] {
+  return [
+    { metric: 'Υ Yield', vals: ['1.57', '1.51', gold.yield_], winner: 2 },
+    { metric: 'SNR', vals: ['0.33', '0.07', gold.snr], winner: 2 },
+    { metric: 'Velocity (O/I)', vals: ['0.50', '0.08', gold.velocity], winner: 2 },
+    { metric: 'Leverage (CR/I)', vals: ['3.2×', '22.3×', gold.leverage], winner: 2 },
+    { metric: '10xDEV (log₁₀)', vals: ['0.50', '1.35', gold.dev10x], winner: 2 },
+    { metric: 'Efficiency (vs AA 4.0)', vals: ['1.00', '5.61', gold.efficiency], winner: 2 },
+    { metric: 'Operating Ratio (C:I:O)', vals: ['3.5 : 1 : 0.50', '22 : 1 : 0.08', gold.opRatio], winner: 2 },
+  ]
+}
 
 /** 10xDEV log-anchor read — exponent, not multiplier. */
-const DEV_ROWS: { degree: string; dev: string; linear: string }[] = [
-  { degree: 'Average users (AA 7:2:1)*', dev: '0.50', linear: '3.2×' },
-  { degree: 'Power-user median', dev: '1.35', linear: '22.4×' },
-  { degree: 'Top operator to date', dev: '2.56', linear: '360×' },
-]
+function buildDevRows(gold: GoldColumn): { degree: string; dev: string; linear: string }[] {
+  return [
+    { degree: 'Average users (AA 7:2:1)*', dev: '0.50', linear: '3.2×' },
+    { degree: 'Power-user median', dev: '1.35', linear: '22.4×' },
+    { degree: 'Top operator to date', dev: gold.dev10x, linear: gold.devLinear },
+  ]
+}
 
-function ComparisonTable() {
+function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
+  const ROWS = rows
   return (
     <div className="overflow-x-auto rounded-xl border border-gold/30 bg-bg-surface">
       <table className="w-full border-collapse font-mono text-lg sm:text-xl">
@@ -95,7 +114,8 @@ function ComparisonTable() {
   )
 }
 
-function DevTable() {
+function DevTable({ rows }: { rows: ReturnType<typeof buildDevRows> }) {
+  const DEV_ROWS = rows
   return (
     <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
       <table className="w-full border-collapse font-mono text-xs">
@@ -127,12 +147,13 @@ function DevTable() {
 function SourceMarkers() {
   return (
     <p className="font-sans text-[11px] leading-relaxed text-text-muted">
-      <span className="text-text-secondary">Sources:</span> top operator + power-user median are{' '}
-      <em>measured</em> from the live board (
-      <Link href="/board/30d" className="text-text-accent underline-offset-2 hover:underline">
-        30d window
-      </Link>
-      , retrieved 2026-06-21), derived from canonical four-pillar token telemetry. Token counts only.{' '}
+      <span className="text-text-secondary">Sources:</span> the top operator is{' '}
+      <em>measured live</em> from the{' '}
+      <Link href="/board/all" className="text-text-accent underline-offset-2 hover:underline">
+        all-time board
+      </Link>{' '}
+      (auto-pulled, refreshed daily); the power-user median is a measured survey (n=10). Both derived
+      from canonical four-pillar token telemetry. Token counts only.{' '}
       <span className="text-text-secondary">AA 7:2:1</span> is a{' '}
       <em>modeled</em> baseline from{' '}
       <a
@@ -246,7 +267,20 @@ function Provenance() {
   )
 }
 
-export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
+export async function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
+  // Auto-pull the current top real operator (all-time) for the gold column; fall back to
+  // the last-known real read when the board has no qualifying real operator yet.
+  const gold = (await getTopOperatorColumn()) ?? GOLD_FALLBACK
+  const rows = buildRows(gold)
+  const devRows = buildDevRows(gold)
+
+  // 10xDEV deltas vs the two reference degrees (AA 0.50 / power-user 1.35), computed from
+  // the live gold dev10x so the wiki bullets never drift. Linear = 10^delta.
+  const goldDev = Number(gold.dev10x) || 0
+  const devVsAA = goldDev - 0.5
+  const devVsPower = goldDev - 1.35
+  const fmtDelta = (d: number) => `+${d.toFixed(2)} decades = ~${Math.round(10 ** d)}×`
+
   if (variant === 'embed') {
     return (
       <div className="flex flex-col gap-3">
@@ -283,10 +317,9 @@ export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
                 bank in cache.
               </p>
               <p>
-                Our highest measurement to date sits at{' '}
-                <strong className="text-gold">360 : 1 : 1.36</strong>: every input token returns{' '}
-                <strong className="text-gold">~1.4</strong> outputs while carrying a cache of roughly 360 (about
-                2.1B total). That&apos;s the eval to beat.
+                The top operator on the live board sits at{' '}
+                <strong className="text-gold">{gold.opRatio}</strong>: every input token returns multiple
+                outputs while carrying a deep cache. That&apos;s the eval to beat.
               </p>
             </div>
           </div>
@@ -294,7 +327,7 @@ export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
           {/* footnotes/sources BEFORE the chart (owner) */}
           <SourceMarkers />
 
-          <ComparisonTable />
+          <ComparisonTable rows={rows} />
 
           {/* under-chart footnote (owner 2026-06-22) */}
           <p className="font-mono text-[11px] text-text-muted">
@@ -325,14 +358,14 @@ export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
           input tokens per output, on a ~7 cache); input-normalized that&apos;s{' '}
           <strong className="text-text-primary">3.5 : 1 : 0.5</strong>. We surveyed 10 power users (median
           ~500B total tokens) at about <strong className="text-text-primary">22 : 1 : 0.08</strong>, output
-          traded for cache. Our highest measurement to date is{' '}
-          <strong className="text-gold">360 : 1 : 1.36</strong>: every input returns ~1.4 outputs on a ~360 cache
-          (≈2.1B total). Three degrees of leverage, each a real skill, and the distance between them learnable.
+          traded for cache. The top operator on the live board is{' '}
+          <strong className="text-gold">{gold.opRatio}</strong>: every input returns multiple outputs on a deep
+          cache. Three degrees of leverage, each a real skill, and the distance between them learnable.
         </p>
       </div>
 
       <SourceMarkers />
-      <ComparisonTable />
+      <ComparisonTable rows={rows} />
 
       <div className="flex flex-col gap-3">
         <h2 className="font-mono text-lg font-bold text-text-primary">10xDEV read on the log anchor</h2>
@@ -340,15 +373,15 @@ export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
           10xDEV is an exponent, not a multiplier: each whole point is a 10× jump in real cascade
           amplification (linear = 10^10xDEV).
         </p>
-        <DevTable />
+        <DevTable rows={devRows} />
         <ul className="flex flex-col gap-1 font-sans text-sm text-text-muted">
           <li>
-            Seed #3 vs AA baseline:{' '}
-            <strong className="text-text-secondary">+2.20 decades = ~159× more amplification</strong>
+            Top operator vs AA baseline:{' '}
+            <strong className="text-text-secondary">{fmtDelta(devVsAA)} more amplification</strong>
           </li>
           <li>
-            Seed #3 vs power-user median:{' '}
-            <strong className="text-text-secondary">+1.35 decades = ~22× more</strong>
+            Top operator vs power-user median:{' '}
+            <strong className="text-text-secondary">{fmtDelta(devVsPower)} more</strong>
           </li>
         </ul>
         <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
