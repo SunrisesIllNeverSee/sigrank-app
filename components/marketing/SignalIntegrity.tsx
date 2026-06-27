@@ -157,15 +157,15 @@ function Mono({ children }: { children: string }) {
 }
 
 const CLI_CMDS = [
-  { cmd: 'sigrank-mcp', args: '',        desc: 'Full tabbed TUI — Dashboard / Trends / Compare / Board / Watch / Connect. Default in a terminal.' },
-  { cmd: 'sigrank-mcp', args: 'tui',     desc: 'Same as above — explicit launch. Keys: 1–6 or ← → switch, R refresh, Q quit.' },
-  { cmd: 'sigrank-mcp', args: 'enroll',  desc: 'Sign in: paste a key from signalaf.com → Settings → "New key". (Or in the TUI: Connect tab, key 6.)' },
-  { cmd: 'sigrank-mcp', args: 'submit',  desc: 'Publish your verified runs to the board. (Or press [S] from any read tab in the TUI.)' },
-  { cmd: 'sigrank-mcp', args: 'me',      desc: 'Your local cascade across 7d / 30d / 90d / all-time. Zero paste, on-device.' },
-  { cmd: 'sigrank-mcp', args: 'board',   desc: 'Live leaderboard from signalaf.com — auto-refreshes every 30s.' },
-  { cmd: 'sigrank-mcp', args: 'compare', desc: 'Source audit — tokenpull vs ccusage vs token-dash vs tokscale, with delta %.' },
-  { cmd: 'sigrank-mcp', args: 'watch',   desc: 'Live cascade meter — re-reads logs on every poll, shows what moved.' },
-  { cmd: 'sigrank-mcp', args: '--help',  desc: 'Full command reference with all flags and platform options.' },
+  { cmd: 'sigrank', args: '',        desc: 'Full tabbed TUI — Dashboard / Trends / Compare / Board / Watch / Connect. Default in a terminal.' },
+  { cmd: 'sigrank', args: 'tui',     desc: 'Same as above — explicit launch. Keys: 1–6 or ← → switch, R refresh, Q quit.' },
+  { cmd: 'sigrank', args: 'enroll',  desc: 'Sign in: paste a key from signalaf.com → Settings → "New key". (Or in the TUI: Connect tab, key 6.)' },
+  { cmd: 'sigrank', args: 'submit',  desc: 'Publish your verified runs to the board. (Or press [S] from any read tab in the TUI.)' },
+  { cmd: 'sigrank', args: 'me',      desc: 'Your local cascade across 7d / 30d / 90d / all-time. Zero paste, on-device.' },
+  { cmd: 'sigrank', args: 'board',   desc: 'Live leaderboard from signalaf.com — auto-refreshes every 30s.' },
+  { cmd: 'sigrank', args: 'compare', desc: 'Source audit — tokenpull vs ccusage vs token-dash vs tokscale, with delta %.' },
+  { cmd: 'sigrank', args: 'watch',   desc: 'Live cascade meter — re-reads logs on every poll, shows what moved.' },
+  { cmd: 'sigrank', args: '--help',  desc: 'Full command reference with all flags and platform options.' },
 ]
 
 const MCP_TOOL_LIST = [
@@ -291,10 +291,10 @@ export function LocalAgentMcp() {
         <H2>Install</H2>
         <pre className="overflow-x-auto rounded-lg border border-bg-border bg-bg-base px-4 py-3 font-mono text-[11px] leading-loose text-text-secondary">
 {`# install globally (recommended)
-npm install -g sigrank-mcp
+npm install -g sigrank
 
 # or run without installing
-npx sigrank-mcp
+npx sigrank
 
 # wire into Claude Code — .mcp.json
 {
