@@ -32,7 +32,7 @@ export function Footer() {
                 (owner 2026-06-24). */}
             <code className="rounded-md border border-bg-border bg-bg-elevated px-3 py-1.5 font-mono text-xs text-text-secondary">
               <span className="text-text-muted">$ </span>
-              <span className="text-gold">npx sigrank-mcp</span>
+              <span className="text-gold">npx sigrank</span>
             </code>
             {FOOTER_LINKS.length > 0 && (
               <ul className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
