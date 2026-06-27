@@ -4,6 +4,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SignOutButton } from '@/components/auth/SignOutButton'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { ConnectDevicePanel } from '@/components/settings/ConnectDevicePanel'
+import { DangerZone } from '@/components/settings/DangerZone'
 
 /**
  * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
@@ -141,6 +142,8 @@ export default async function SettingsPage() {
           Support the build →
         </Link>
       </Section>
+
+      {op && <DangerZone codename={op.codename} />}
     </div>
   )
 }
