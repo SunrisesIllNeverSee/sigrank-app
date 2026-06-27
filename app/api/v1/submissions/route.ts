@@ -120,8 +120,13 @@ export async function GET(req: NextRequest) {
   const metricParam = sp.get('metric') ?? 'yield_'
   const sort = METRIC_PARAM_TO_SORT[metricParam] ?? SORT_DEFAULT
 
-  // window: passed through as the API enum directly (api_spec.md uses API enums).
-  const windowParam = sp.get('window') ?? '30d'
+  // window: OPTIONAL filter. Absent or 'all' → EVERY submission across all windows
+  // (the "all submissions" default — the product goal of this feed). A specific enum
+  // (7d/30d/90d/all_time) narrows to that window_type. The facade's allSnapshots mode
+  // does NOT window-filter, so we apply the filter here at the route level.
+  const windowParam = sp.get('window') ?? 'all'
+  const WINDOW_TYPES = new Set(['7d', '30d', '90d', 'all_time'])
+  const windowFilter = windowParam !== 'all' && WINDOW_TYPES.has(windowParam) ? windowParam : null
 
   const limitRaw = Number.parseInt(sp.get('limit') ?? '', 10)
   const requestedLimit = Number.isFinite(limitRaw)
@@ -132,6 +137,10 @@ export async function GET(req: NextRequest) {
   // x-api-key lifts the cap for bulk/full corpus reads.
   const { limit, gated } = enforceListGate(req, requestedLimit)
 
+  // When narrowing to one window, fetch a wider slice first so the gated top-N is
+  // filled from that window rather than starved by other windows ranking above it.
+  const fetchLimit = windowFilter ? Math.min(MAX_LIMIT, limit * 5) : limit
+
   // allSnapshots: keep EVERY raw snapshot row (no collapse to one per operator),
   // ranked together by the requested metric — this is the submissions corpus, not
   // the per-operator aggregate leaderboard. Same Supabase client + ruleset + trust
@@ -140,10 +149,15 @@ export async function GET(req: NextRequest) {
     window: windowParam,
     allSnapshots: true,
     sort,
-    limit,
+    limit: fetchLimit,
   })
 
-  const entries = rows.map((row, i) => serializeSubmissionEntry(row, i + 1))
+  const filtered = windowFilter
+    ? rows.filter((row) => (row.window_type ?? 'all_time') === windowFilter)
+    : rows
+
+  // Re-rank 1..N over the (optionally filtered) set, then clamp to the gated limit.
+  const entries = filtered.slice(0, limit).map((row, i) => serializeSubmissionEntry(row, i + 1))
 
   const body = {
     window: windowParam,
