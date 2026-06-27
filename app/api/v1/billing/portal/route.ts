@@ -1,25 +1,24 @@
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe/server'
 import { getSupabaseServer } from '@/lib/supabase/server'
+import { getSessionOperator } from '@/lib/supabase/auth-server'
 
 /**
  * POST /api/v1/billing/portal
  *
- * Body: { operator_id?: string, customer_id?: string }
+ * Auth-required: opens a Stripe Billing Portal session for the SIGNED-IN
+ * operator's own subscription. The Stripe customer id is resolved from the
+ * verified session's operator_id — body operator_id/customer_id are IGNORED
+ * (they were an auth-bypass vector: operator_id is a public UUID returned by
+ * GET /api/v1/operators/[codename], and customer_id was accepted with no
+ * ownership check at all). Fix follows the profile route's pattern
+ * (getSessionOperator → resolve from op.operatorId).
  *
- * Opens a Stripe Billing Portal session so an operator can manage / cancel
- * their subscription. Returns 503 { error: 'stripe_not_configured' } when
- * Stripe is unconfigured. Resolves the Stripe customer id either from the body
- * or by looking up the operator's subscription row (getSupabaseServer-guarded);
- * returns 404 when no customer can be resolved.
+ * Returns 401 when not signed in, 503 { error: 'stripe_not_configured' } when
+ * Stripe is unconfigured, 404 when the signed-in operator has no Stripe customer.
  */
 
 export const runtime = 'nodejs'
-
-interface PortalBody {
-  operator_id?: string
-  customer_id?: string
-}
 
 /**
  * Resolve a Stripe customer id from the operator row. Guarded.
@@ -48,24 +47,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'stripe_not_configured' }, { status: 503 })
   }
 
-  let body: PortalBody
+  // Auth gate: resolve the verified session. The body's operator_id/customer_id
+  // are deliberately ignored — both were auth-bypass vectors (operator_id is a
+  // public UUID; customer_id was accepted with no ownership check).
+  const op = await getSessionOperator()
+  if (!op) {
+    return NextResponse.json({ error: 'not_signed_in' }, { status: 401 })
+  }
+
+  // Consume the body for request-shape validation only (keeps the 400 on
+  // malformed JSON), but do NOT use its fields for authorization.
   try {
-    body = (await req.json()) as PortalBody
+    await req.json()
   } catch {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
   }
 
-  if (body.operator_id !== undefined) {
-    if (typeof body.operator_id !== 'string' || !/^[a-zA-Z0-9_-]{1,256}$/.test(body.operator_id)) {
-      return NextResponse.json({ error: 'invalid_operator_id' }, { status: 400 })
-    }
-  }
-
-  let customerId = body.customer_id ?? null
-  if (!customerId && body.operator_id) {
-    customerId = await customerForOperator(body.operator_id)
-  }
-
+  const customerId = await customerForOperator(op.operatorId)
   if (!customerId) {
     return NextResponse.json({ error: 'no_customer' }, { status: 404 })
   }
