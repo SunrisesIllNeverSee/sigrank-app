@@ -6,12 +6,12 @@ import { TuiBoardMockup } from '@/components/marketing/TuiBoardMockup'
 /**
  * HowItWorks — the landing "how to use SigRank" section.
  *
- * Command-forward (tokscale-style, owner 2026-06-26): two big cards side by
- * side — "View your cascade" + "Submit to the board" — each with the command,
- * a copy button, and the TUI board mockup. Below: the agent option callout.
+ * 3-step quickstart (owner 2026-06-27): Install → Sign in → Submit.
+ * Three command cards with copy buttons + TUI mockup. Below: the agent
+ * option callout for users who don't want to leave their AI client.
  *
  * The full CLI command reference + MCP tool table live on the wiki
- * (SignalIntegrity.tsx) — the landing keeps it clean: two commands, two cards.
+ * (SignalIntegrity.tsx) — the landing keeps it clean: three commands, three cards.
  */
 
 /** A command line with a copy button — the tokscale-style quickstart unit. */
@@ -56,31 +56,40 @@ export function HowItWorks() {
       <div>
         <div className="font-mono text-xs uppercase tracking-widest text-gold">⊙ How it works</div>
         <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-          Two commands. That&apos;s it.
+          Three commands. That&apos;s it.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
           The SigRank agent reads your local AI session logs on-device, derives your token cascade,
           and publishes to the board. No paste, no prompts read — only the four token counts leave
-          your machine.
+          your machine. ccusage, tokscale, and tokendash are bundled — no separate installs.
         </p>
       </div>
 
-      {/* ── Two-card quickstart ── */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* ── Three-card quickstart ── */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <CommandCard
           kicker="Step 1"
-          title="View your cascade"
-          command="npx sigrank"
-          note="Opens the tabbed TUI. Reads your local logs (Claude Code, Codex, Gemini CLI, and 11+ others), derives Υ Yield + your cascade on-device. Zero paste."
+          title="Install"
+          command="npm install -g sigrank"
+          note="Pulls the agent + ccusage + tokscale + tokendash in one install. Node ≥18, macOS + Linux."
         >
           <TuiBoardMockup />
         </CommandCard>
 
         <CommandCard
           kicker="Step 2"
+          title="Sign in"
+          command="sigrank enroll"
+          note={'Paste a connect code from signalaf.com → Settings → "New key". Binds your device to your operator identity.'}
+        >
+          <TuiBoardMockup />
+        </CommandCard>
+
+        <CommandCard
+          kicker="Step 3"
           title="Submit to the board"
-          command="npx sigrank submit"
-          note={'Sign in once first with npx sigrank enroll (paste a key from Settings → "New key"). Then submit signs + publishes your cascade — your rank updates live.'}
+          command="sigrank submit"
+          note="Signs + publishes your cascade. Your rank updates live on signalaf.com."
         >
           <TuiBoardMockup highlightYou />
         </CommandCard>
