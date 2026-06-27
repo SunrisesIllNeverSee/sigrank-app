@@ -45,20 +45,34 @@ function yieldStr(r: LeaderboardRow): string {
   return y.toFixed(2)
 }
 
-/** Count axis wins across the six cascade metrics (cost = lower wins). */
+/**
+ * Count axis wins across the six cascade metrics AND the four raw pillars
+ * (owner 2026-06-27: the tally was 6 metrics only; fold in the raw pillars so the
+ * head-to-head count reflects raw volume too). Cost = lower wins; everything else
+ * higher wins. Max is now 10.
+ */
 function tally(a: LeaderboardRow, b: LeaderboardRow): { aWins: number; bWins: number } {
   const ca = a.snapshot.cascade
   const cb = b.snapshot.cascade
+  const ta = a.telemetry
+  const tb = b.telemetry
   const comp = (c: typeof ca, pick: (x: NonNullable<typeof ca>) => number) =>
     c && !c.nonCompounding ? pick(c) : 0
   const raw = (c: typeof ca, pick: (x: NonNullable<typeof ca>) => number) => (c ? pick(c) : 0)
+  const tel = (t: typeof ta, pick: (x: NonNullable<typeof ta>) => number) => (t ? pick(t) : 0)
   const axes: Array<[number, number, boolean]> = [
+    // 6 derived metrics
     [comp(ca, (x) => x.yield_), comp(cb, (x) => x.yield_), true],
     [raw(ca, (x) => x.snr), raw(cb, (x) => x.snr), true],
     [comp(ca, (x) => x.leverage), comp(cb, (x) => x.leverage), true],
     [raw(ca, (x) => x.velocity), raw(cb, (x) => x.velocity), true],
     [comp(ca, (x) => x.dev10x ?? 0), comp(cb, (x) => x.dev10x ?? 0), true],
     [raw(ca, (x) => x.costPerMillion), raw(cb, (x) => x.costPerMillion), false], // lower wins
+    // 4 raw pillars (higher volume wins)
+    [tel(ta, (x) => x.fresh_input), tel(tb, (x) => x.fresh_input), true],
+    [tel(ta, (x) => x.output), tel(tb, (x) => x.output), true],
+    [tel(ta, (x) => x.cache_read), tel(tb, (x) => x.cache_read), true],
+    [tel(ta, (x) => x.cache_create), tel(tb, (x) => x.cache_create), true],
   ]
   let aWins = 0
   let bWins = 0
