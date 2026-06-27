@@ -5,14 +5,22 @@ import type { SupporterTier } from '@/lib/scoring/types'
 /**
  * POST /api/v1/billing/create-checkout-session
  *
- * Body: { tier: 'patron'|'pro'|'circle_sponsor', interval: 'monthly'|'yearly',
- *         operator_id?: string }
+ * Two flows (owner 2026-06-27 — "Support the Build"):
+ *  1. DONATION (one-time, pay-what-you-want):
+ *       { kind: 'donation', amount_cents: number, operator_id?: string }
+ *     → one-time Checkout in `payment` mode at the customer-entered amount
+ *       (server clamps to $1–$10,000). Uses STRIPE_DONATION_PRODUCT (a Product
+ *       id) so the line item is a price_data with the supporter product.
+ *  2. SUBSCRIPTION (recurring, preset monthly amounts):
+ *       { kind: 'subscription', price: <stripe price id>, operator_id?: string }
+ *     → `subscription` mode against one of the configured monthly support prices
+ *       (STRIPE_SUPPORT_PRICES, a comma list of allowed price ids — server-side
+ *       allowlist so the client can't inject an arbitrary price).
  *
- * Creates a Stripe Checkout Session in `subscription` mode for the selected
- * supporter tier. When Stripe is unconfigured (getStripe() === null) it returns
- * 503 { error: 'stripe_not_configured' } so the UI can show "Try again later"
- * and never falsely complete a sale. Founder tier is OFF (D7) — only the three
- * shipping tiers are accepted.
+ * When Stripe is unconfigured (getStripe() === null) returns 503
+ * { error: 'stripe_not_configured' } so the UI shows "Try again later" and never
+ * falsely completes a sale. (Legacy tier/interval body still accepted for the
+ * old 3-tier path; see priceIdFor.)
  */
 
 export const runtime = 'nodejs'
@@ -20,7 +28,14 @@ export const runtime = 'nodejs'
 type CheckoutTier = Extract<SupporterTier, 'patron' | 'pro' | 'circle_sponsor'>
 type Interval = 'monthly' | 'yearly'
 
+/** Donation clamp — guard against fat-finger / abuse on the customer amount. */
+const DONATION_MIN_CENTS = 100 // $1
+const DONATION_MAX_CENTS = 1_000_000 // $10,000
+
 interface CheckoutBody {
+  kind?: 'donation' | 'subscription'
+  amount_cents?: number
+  price?: string
   tier?: string
   interval?: string
   operator_id?: string
@@ -54,17 +69,83 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
   }
 
+  const stripe = getStripe()
+  if (!stripe) {
+    // No Stripe creds → never sell silently. UI shows "Try again later".
+    return NextResponse.json({ error: 'stripe_not_configured' }, { status: 503 })
+  }
+
+  const siteUrl0 = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const operatorId0 =
+    body.operator_id && typeof body.operator_id === 'string' ? body.operator_id.slice(0, 256) : ''
+
+  // ── Flow 1 — DONATION (one-time, pay-what-you-want) ──────────────────────────
+  if (body.kind === 'donation') {
+    const amount = Number(body.amount_cents)
+    if (!Number.isFinite(amount) || amount < DONATION_MIN_CENTS || amount > DONATION_MAX_CENTS) {
+      return NextResponse.json({ error: 'invalid_amount' }, { status: 400 })
+    }
+    const productId = process.env.STRIPE_DONATION_PRODUCT
+    if (!productId) {
+      return NextResponse.json({ error: 'donation_not_configured' }, { status: 503 })
+    }
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              product: productId,
+              unit_amount: Math.round(amount),
+            },
+          },
+        ],
+        metadata: { operator_id: operatorId0, kind: 'donation' },
+        success_url: `${siteUrl0}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${siteUrl0}/upgrade/canceled`,
+      })
+      return NextResponse.json({ url: session.url })
+    } catch (err) {
+      console.error('[checkout] donation session failed', err)
+      return NextResponse.json({ error: 'checkout_failed' }, { status: 502 })
+    }
+  }
+
+  // ── Flow 2 — SUBSCRIPTION (recurring monthly preset) ─────────────────────────
+  if (body.kind === 'subscription') {
+    // Server-side allowlist: only price ids configured in STRIPE_SUPPORT_PRICES
+    // (comma-separated) are accepted, so the client can't inject an arbitrary one.
+    const allowed = (process.env.STRIPE_SUPPORT_PRICES ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    const price = typeof body.price === 'string' ? body.price : ''
+    if (!price || !allowed.includes(price)) {
+      return NextResponse.json({ error: 'invalid_price' }, { status: 400 })
+    }
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [{ price, quantity: 1 }],
+        metadata: { operator_id: operatorId0, kind: 'subscription' },
+        success_url: `${siteUrl0}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${siteUrl0}/upgrade/canceled`,
+      })
+      return NextResponse.json({ url: session.url })
+    } catch (err) {
+      console.error('[checkout] subscription session failed', err)
+      return NextResponse.json({ error: 'checkout_failed' }, { status: 502 })
+    }
+  }
+
+  // ── Legacy 3-tier path (kept; preset patron/pro/circle_sponsor) ──────────────
   const tier = body.tier as CheckoutTier
   const interval: Interval = body.interval === 'yearly' ? 'yearly' : 'monthly'
 
   if (!VALID_TIERS.includes(tier)) {
     return NextResponse.json({ error: 'invalid_tier' }, { status: 400 })
-  }
-
-  const stripe = getStripe()
-  if (!stripe) {
-    // No Stripe creds → never sell silently. UI shows "Try again later".
-    return NextResponse.json({ error: 'stripe_not_configured' }, { status: 503 })
   }
 
   const price = priceIdFor(tier, interval)
