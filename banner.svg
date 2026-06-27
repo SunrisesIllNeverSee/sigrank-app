@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
+  <rect width="800" height="200" rx="12" fill="#0a0805"/>
+  <rect x="0" y="0" width="800" height="3" rx="12" fill="#c4923a"/>
+  <text x="60" y="110" font-family="Georgia, serif" font-size="56" font-weight="700" fill="#e8b955">§ SigRank</text>
+  <text x="60" y="150" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#a89a7a">The AI operator leaderboard</text>
+  <text x="60" y="178" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#6b6354">signalaf.com</text>
+</svg>
