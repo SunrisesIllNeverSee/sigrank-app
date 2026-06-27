@@ -85,10 +85,13 @@ export default async function ComparePage({
   // supplies the defaults.
   const board = await getLeaderboard({ limit: 500 })
 
-  // Resolve A and B; default to the top two operators, fall back gracefully if a
-  // supplied codename doesn't resolve.
+  // Resolve A and B. Default A to the top operator; default B to "The Field" —
+  // the average/baseline operator (owner 2026-06-27) — so the page opens as
+  // "you vs. the average" rather than two arbitrary top operators. Falls back to
+  // board[1] if The Field can't be resolved, and to graceful nulls throughout.
   const rowA: LeaderboardRow | null = (a ? await getOperator(a) : null) ?? board[0] ?? null
-  let rowB: LeaderboardRow | null = (b ? await getOperator(b) : null) ?? board[1] ?? null
+  let rowB: LeaderboardRow | null =
+    (b ? await getOperator(b) : null) ?? (await getOperator('the-field')) ?? board[1] ?? null
   if (rowA && rowB && rowA.operator.codename === rowB.operator.codename) {
     rowB = board.find((r) => r.operator.codename !== rowA.operator.codename) ?? rowB
   }
