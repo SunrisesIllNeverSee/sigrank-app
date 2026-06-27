@@ -1,6 +1,8 @@
 # Contributing to SigRank
 
-Thanks for your interest in contributing! SigRank is a privacy-preserving AI operator leaderboard — here's how to contribute effectively.
+Thanks for your interest in contributing. SigRank is a privacy-preserving AI
+operator leaderboard, and this repo is intentionally strict about scoring
+correctness, secrets, and deterministic fallbacks.
 
 ## Quick start
 
@@ -11,25 +13,29 @@ npm install
 npm run dev
 ```
 
-The app builds and renders fully without Supabase or Stripe credentials (deterministic mock fallback).
+The app builds and renders without Supabase or Stripe credentials. With no live
+credentials, reads fall back to the cold-store snapshot and deterministic mock
+data.
 
 ## Before you commit
 
-All three must pass:
+All three gates must pass:
 
 ```bash
-npx tsc --noEmit                              # 0 TypeScript errors
-node --test __tests__/ingest/canonical.test.mjs  # 11/11 (Υ 18436.98)
-npm run build                                 # clean production build
+npx tsc --noEmit
+node --test __tests__/ingest/canonical.test.mjs
+npm run build
 ```
 
-## Frozen invariants — do not change
+## Frozen invariants
 
-- **MO§ES SEED values:** `(1_251_211, 11_296_121, 128_196_310, 2_555_179,769)` → Υ 18436.98
-- **The Υ formula:** `(cache_read × output) / input²`
-- **The cascade identity:** `T × C × R = Cr/I = Leverage`
-- **10xDEV = log₁₀(Leverage)**
-- **RS.xx weights are server-only** — never expose in client components
+Do not change these without explicit owner approval:
+
+- **MO§ES SEED values:** `(1_251_211, 11_296_121, 128_196_310, 2_555_179,769)` -> Υ 18436.98
+- **The Υ formula:** `(cache_read * output) / input^2`
+- **The cascade identity:** `T * C * R = Cr/I = Leverage`
+- **10xDEV:** `log10(Leverage)`
+- **RS.xx weights:** server-only, never exposed in client components
 
 ## Conventions
 
@@ -37,7 +43,20 @@ npm run build                                 # clean production build
 - Match surrounding code style.
 - No secrets in the repo. Keys live in `.env.local` (gitignored).
 - Scoring weights are server-only (`lib/scoring/ruleset.ts` imports `server-only`).
+- Read operator data through `@/lib/data`; do not import Supabase directly in
+  feature code.
+- Keep placeholder and canonical markers explicit with `<Placeholder />` and
+  `<CanonId />`.
+- Keep `components/sigrank/tokens.ts` and Tailwind theme values aligned.
+
+## Pull request checklist
+
+- Explain the user-visible change and why it matters.
+- Note any database, env var, billing, or scoring impact.
+- Include screenshots for visual changes.
+- Confirm typecheck, canonical test, and build status.
 
 ## Pull requests
 
-Use the PR template. Verify all three gates pass before requesting review.
+Use the PR template and keep the diff focused. If a check is skipped, explain
+why in the PR notes.

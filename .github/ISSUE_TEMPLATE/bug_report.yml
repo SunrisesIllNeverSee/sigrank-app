@@ -15,6 +15,22 @@ body:
       placeholder: "When I go to the board page and..."
     validations:
       required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of SigRank is affected?
+      options:
+        - Public board
+        - Operator profile
+        - Submit / ingest
+        - Account / claim
+        - Billing / Stripe
+        - API
+        - Supabase / data
+        - Other / not sure
+    validations:
+      required: true
   - type: textarea
     id: expected
     attributes:
@@ -40,6 +56,17 @@ body:
       label: URL
       description: Link to the page where the bug occurred (if applicable).
       placeholder: "https://signalaf.com/board"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest set of steps that reproduces the issue.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: false
   - type: textarea
     id: environment
     attributes:
