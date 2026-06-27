@@ -163,18 +163,11 @@ Vercel environment variables.
 
 ## Supabase
 
-Supabase setup lives in [`supabase/README.md`](./supabase/README.md).
+Schema, migrations, RLS policies, and seed data live in
+[`supabase/`](./supabase/). See [`supabase/README.md`](./supabase/README.md) for
+setup if you are running your own instance against a dedicated Supabase project.
 
-At a high level:
-
-```bash
-supabase db push
-psql "$SUPABASE_DB_URL" -f supabase/seed.sql
-psql "$SUPABASE_DB_URL" -f supabase/policies.sql
-```
-
-The SQL is idempotent where practical, and RLS is enabled across the schema. Use
-a dedicated SigRank Supabase project for live deployment.
+RS.xx scoring weights are server-only and are not included here.
 
 ## Scoring Invariants
 
