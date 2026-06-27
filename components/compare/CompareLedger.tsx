@@ -28,6 +28,7 @@
 
 import React from 'react'
 import type { LeaderboardRow } from '@/lib/data'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 import { CanonId } from '@/components/ui/CanonId'
 import { DISPLAY_RAW, DISPLAY_METRICS } from '@/lib/canon/ids'
 
@@ -42,9 +43,7 @@ const DISPLAY_METRICS_COMPARE = METRIC_VIEW.map(
 ).filter(Boolean)
 
 function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
+  return operatorDisplayName(row)
 }
 
 const fmtInt = (n: number) =>
