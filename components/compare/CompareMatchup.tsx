@@ -12,17 +12,14 @@
  */
 
 import type { LeaderboardRow } from '@/lib/data'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 import type { SignalClass } from '@/components/sigrank/types'
 import { colors } from '@/components/sigrank/tokens'
 import { glyphFor } from '@/lib/canon/ids'
 import { deriveFacts, type OperatorFact } from '@/lib/compare/facts'
 import { CompareSelectors, type CompareOption } from '@/components/compare/CompareSelectors'
 
-function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
-}
+const nameOf = operatorDisplayName
 
 function classColor(cls: SignalClass): string {
   return colors.class[cls] ?? colors.class.BASE

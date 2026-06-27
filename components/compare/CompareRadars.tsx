@@ -17,15 +17,14 @@
 
 import React from 'react'
 import type { LeaderboardRow } from '@/lib/data'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 import CascadeRadar, { type CascadeRadarSeries } from '@/components/charts/CascadeRadar'
 
 const A_COLOR = 'rgb(var(--class-arch))' // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
 const B_COLOR = 'rgb(var(--class-seeker))'
 
 function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
+  return operatorDisplayName(row)
 }
 
 interface Axis {

@@ -26,6 +26,7 @@ import { ChallengeBar } from '@/components/compare/ChallengeBar'
 import { getChallengeBetween } from '@/lib/challenges/server'
 import { GATE_CHALLENGES } from '@/lib/features'
 import { CompareShareCard, type CompareOperand } from '@/components/share/CompareShareCard'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 
 export const metadata: Metadata = withOG({
   title: 'Compare Operators · SigRank',
@@ -34,21 +35,10 @@ export const metadata: Metadata = withOG({
   path: '/compare',
 })
 
-function nameOf(row: LeaderboardRow): string {
-  // Prefer the real name whenever present — including unclaimed seeds whose names
-  // are backfilled in Supabase (mirror to-entry.ts; the old `claimed &&` gate hid
-  // those and surfaced raw codenames). Owner's own 730 window-pulls are staged as
-  // mock rows with placeholder codenames ("static seed · 7d ✱mem") and no
-  // display_name; render those as a clean window label, never the raw placeholder.
-  if (row.operator.display_name) return row.operator.display_name
-  const code = row.operator.codename
-  const m = code.match(/^static seed · (7d|30d|90d|all)( ✱mem)?/)
-  if (m) {
-    const win = m[1] === 'all' ? 'all-time' : m[1]
-    return m[2] ? `Owner · ${win} (with claude-mem)` : `Owner · ${win}`
-  }
-  return code
-}
+// The canonical name rule lives in lib/compare/operator-name.ts so the page, matchup,
+// radars, ledger + share card all agree (was duplicated + drifted — components stayed
+// claimed-gated and showed raw codenames like "DriftPilgrim" for seed rows).
+const nameOf = operatorDisplayName
 
 /**
  * Build a CompareShareCard operand from a row — the headline metrics with raw
