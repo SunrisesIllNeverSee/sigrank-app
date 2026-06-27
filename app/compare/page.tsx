@@ -8,6 +8,7 @@
  */
 
 import type { Metadata } from 'next'
+import { withOG } from '@/lib/seo'
 
 import { getLeaderboard, getOperator, type LeaderboardRow } from '@/lib/data'
 import { WaveHero } from '@/components/ui/WaveHero'
@@ -25,11 +26,12 @@ import { getChallengeBetween } from '@/lib/challenges/server'
 import { GATE_CHALLENGES } from '@/lib/features'
 import { CompareShareCard, type CompareOperand } from '@/components/share/CompareShareCard'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Compare Operators · SigRank',
   description:
     'Head-to-head operator comparison across the cascade layer — Υ Yield, SNR, Leverage, Velocity, 10xDEV & blended cost — with a shape radar.',
-}
+  path: '/compare',
+})
 
 function nameOf(row: LeaderboardRow): string {
   // Prefer the real name whenever present — including unclaimed seeds whose names

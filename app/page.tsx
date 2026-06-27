@@ -7,6 +7,15 @@ import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
 import { Draft2Hero } from '@/components/draft/Draft2Hero'
 import { Draft2LiveActivity } from '@/components/draft/Draft2LiveActivity'
 import { Draft2CtaBand } from '@/components/draft/Draft2CtaBand'
+import type { Metadata } from 'next'
+import { withOG } from '@/lib/seo'
+
+export const metadata: Metadata = withOG({
+  title: 'SigRank — AI Operator Leaderboard',
+  description:
+    'Privacy-preserving leaderboard scoring AI operators on canonical token-telemetry metrics. Rank by Υ Yield, see the cascade, claim your operator.',
+  path: '/',
+})
 
 /**
  * Homepage (`/`) — the landing.

@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Metadata } from 'next'
+import { withOG } from '@/lib/seo'
 import { getLeaderboard } from '@/lib/data'
 import {
   PLATFORM_UI,
@@ -16,11 +17,12 @@ import { MetricTopTen } from '@/components/hall/MetricTopTen'
 import { RecordTicker } from '@/components/hall/RecordTicker'
 import { ComingSoonMarkers } from '@/components/hall/ComingSoonMarkers'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Hall of Signal — SigRank',
   description:
     'Triumphus Famae Et Gloriae — the permanent record of peak signal across the SigRank leaderboard.',
-}
+  path: '/hall',
+})
 
 /**
  * Two record galleries, driven by the canonical display set (lib/canon/ids.ts) so

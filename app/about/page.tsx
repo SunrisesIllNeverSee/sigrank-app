@@ -6,17 +6,19 @@
  */
 
 import type { Metadata } from 'next'
+import { withOG } from '@/lib/seo'
 
 import { WaveHero } from '@/components/ui/WaveHero'
 import { HowItWorks } from '@/components/marketing/HowItWorks'
 import { ClassLadder } from '@/components/marketing/ClassLadder'
 import { IpBoundary } from '@/components/marketing/IpBoundary'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'About · SigRank',
   description:
     'SigRank is a privacy-preserving leaderboard that scores AI operators on token-telemetry metrics computed locally — token counts and lengths, never prompt content.',
-}
+  path: '/about',
+})
 
 const PILLARS: { h: string; b: string }[] = [
   {
