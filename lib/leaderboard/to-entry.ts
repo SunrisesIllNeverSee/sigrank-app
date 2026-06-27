@@ -17,11 +17,28 @@
 import type { LeaderboardRow } from '@/lib/data/types'
 import type { LeaderboardEntry } from '@/components/sigrank'
 
+/**
+ * A LeaderboardEntry carrying the operator's distinct submitted-platform SET, for
+ * the operator-total board's multi-platform badge (BOARD redesign, 2026-06-27). The
+ * base LeaderboardEntry lives in components/sigrank/types.ts (which this builder does
+ * not own), so we extend it structurally here; LeaderboardTable reads `platforms`
+ * back via the same local extension. Undefined on non-operatorTotal boards.
+ */
+export interface LeaderboardEntryWithPlatforms extends LeaderboardEntry {
+  /** Distinct platforms the operator submitted, e.g. ['claude','codex','multi']. */
+  platforms?: string[]
+}
+
+/** A LeaderboardRow optionally carrying the per-operator platform set (operatorTotal
+ *  board); the field is attached structurally in queries.ts. */
+type RowWithPlatforms = LeaderboardRow & { platforms?: string[] }
+
 /** Map a scored row into the ported LeaderboardTable entry shape. */
-export function toEntry(row: LeaderboardRow): LeaderboardEntry {
+export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
   const { operator, snapshot, global_rank } = row
   const c = snapshot.cascade
   const t = row.telemetry
+  const platforms = (row as RowWithPlatforms).platforms
   return {
     rank: global_rank,
     // Seed rows render italic (owner 2026-06-20). The live facade hardcodes
@@ -91,5 +108,11 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntry {
     // board can label each (operator × platform × window) row as an intentional
     // breakout instead of a duplicate. Undefined on legacy rows without a window.
     window: row.window_type ?? undefined,
+    // BOARD redesign (2026-06-27): on the operator-total board the single row stands
+    // in for an operator across platforms — this is the distinct platform SET they
+    // submitted (['claude','codex','multi']) so LeaderboardTable can badge it. Only
+    // present on the operatorTotal path; undefined elsewhere (the per-row `platform`
+    // column is the source on per-platform / "off" boards).
+    ...(platforms && platforms.length > 0 ? { platforms } : {}),
   }
 }

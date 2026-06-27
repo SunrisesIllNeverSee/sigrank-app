@@ -60,6 +60,31 @@ function platformLabel(e: LeaderboardEntry): string {
   return PLATFORM_LABEL[p] ?? (e.platform as string)
 }
 
+// BOARD redesign (2026-06-27): on the operator-total board a single row stands in for
+// an operator across platforms, so each row carries the distinct platform SET they
+// submitted (e.platforms). The badge reads "claude·codex·multi" (compact) when more
+// than one platform; for a single platform it just shows that platform's label. Empty
+// on boards that don't populate the set (per-platform / "off" — the PLATFORM column is
+// the source there). `platforms` is attached structurally by to-entry on this path.
+type EntryWithPlatforms = LeaderboardEntry & { platforms?: string[] }
+function platformBadge(e: LeaderboardEntry): string {
+  const set = (e as EntryWithPlatforms).platforms
+  if (!set || set.length === 0) return ''
+  // Order: real platforms first, 'multi' last (it's the roll-up). Lowercased, deduped.
+  const ordered = [...new Set(set.map((p) => p.toLowerCase()))].sort((a, b) =>
+    a === 'multi' ? 1 : b === 'multi' ? -1 : a.localeCompare(b),
+  )
+  if (ordered.length === 1) return PLATFORM_LABEL[ordered[0]] ?? ordered[0]
+  return ordered.join('·')
+}
+
+// The PLATFORM cell value: the operator's multi-platform badge ("claude·codex·multi")
+// when the row carries a platform SET (operator-total board), else the single chosen
+// platform's label (per-platform / "off" boards, and single-platform operators).
+function platformDisplay(e: LeaderboardEntry): string {
+  return platformBadge(e) || platformLabel(e)
+}
+
 // WINDOW chip (FIX F): on the "off" board the same operator shows once per
 // (platform, window), so each row is tagged with its window to read as an
 // intentional breakout, not a duplicate. Single-window boards don't render it.
@@ -180,14 +205,30 @@ interface Props {
   entries: LeaderboardEntry[]
   totalUsers?: number
   window?: string
+  /** Initial Platform filter (BOARD redesign 2026-06-27) — reflects the ?platform=
+   *  URL param; the dropdown drives the URL (server re-queries). Default 'All'. */
+  platform?: PlatformUI
+  /** Board breakdown mode (BOARD redesign 2026-06-27): 'total' = one operator-total
+   *  row (default), 'platforms' = the per-platform breakdown (?view=platforms). The
+   *  "by platform" toggle drives the URL. Off boards ignore it. */
+  view?: 'total' | 'platforms'
 }
 
-export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: Props) {
+export function LeaderboardTable({
+  entries,
+  totalUsers,
+  window: win = '30d',
+  platform: platformProp = 'All',
+  view: breakdownProp = 'total',
+}: Props) {
   const router = useRouter()
   const [view, setView] = useState<ViewMode>('metrics')
   const [sort, setSort] = useState<SortKey>('yield')
   const [dir, setDir] = useState<SortDir>('desc')
-  const [platform, setPlatform] = useState<PlatformUI>('All')
+  // Platform filter is URL-DRIVEN on windowed boards (server re-queries with ?platform=)
+  // so the operator-total board can filter to a single platform's snapshots. Seeded from
+  // the prop (the URL's value); changing it pushes a new URL rather than filtering in JS.
+  const [platform, setPlatform] = useState<PlatformUI>(platformProp)
   const [classFilter, setClassFilter] = useState<string>('all')
   const [page, setPage] = useState(0) // 0-based; 25 rows/page (owner 2026-06-24)
 
@@ -223,17 +264,57 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
     setView(v); setSort(v === 'raw' ? 'rawTotal' : 'yield'); setDir('desc')
   }
 
-  const onWindow = (e: React.ChangeEvent<HTMLSelectElement>) => router.push(`/board/${e.target.value}`)
+  // URL-driven board controls (BOARD redesign 2026-06-27). The Window slug, the
+  // ?platform= filter, and the ?view=platforms breakdown all live in the URL so the
+  // SERVER re-queries the right rows (the operator-total board's platform filter can't
+  // be done client-side — its rows are 'multi' roll-ups, not per-platform). buildBoardUrl
+  // composes the next URL from the current board slug + the next platform/view, dropping
+  // params at their defaults so clean states stay clean. The "off" board keeps its
+  // pre-existing client-side platform filter (it ships every row, no server re-query).
+  const isOff = win === 'off'
+  const buildBoardUrl = (nextWin: string, nextPlatform: PlatformUI, nextView: 'total' | 'platforms') => {
+    const sp = new URLSearchParams()
+    const domain = PLATFORM_DOMAIN_MAP[nextPlatform]
+    if (domain) sp.set('platform', domain)
+    if (nextView === 'platforms') sp.set('view', 'platforms')
+    const qs = sp.toString()
+    const base = `/board/${nextWin}`
+    return qs ? `${base}?${qs}` : base
+  }
 
-  // Shared filter — platform (primary_domain) + class tier. Applied to both views.
+  const onWindow = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const nextWin = e.target.value
+    // Off board has no platform/view breakdown — go clean. Else preserve them.
+    if (nextWin === 'off') router.push('/board/off')
+    else router.push(buildBoardUrl(nextWin, platform, breakdownProp))
+  }
+
+  // Platform dropdown: off board → client-side filter (setState); windowed boards →
+  // drive the URL so the server returns that platform's rows (operator-total path).
+  const onPlatform = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const next = e.target.value as PlatformUI
+    setPlatform(next)
+    if (!isOff) router.push(buildBoardUrl(win, next, breakdownProp))
+  }
+
+  // "By platform" breakdown toggle (windowed boards only): flips ?view=platforms.
+  const onBreakdownToggle = (next: 'total' | 'platforms') => {
+    if (isOff || next === breakdownProp) return
+    router.push(buildBoardUrl(win, platform, next))
+  }
+
+  // Shared filter — class tier (always client-side) + platform. The platform filter is
+  // applied IN JS only on the "off" board (which ships every row); on windowed boards the
+  // server already returned the selected platform's rows (URL-driven), so re-filtering in
+  // JS would wrongly hide the operator-total 'multi' roll-up rows.
   const filtered = useMemo(() => {
     const domain = PLATFORM_DOMAIN_MAP[platform] // null = All
     return entries.filter((e) => {
-      if (domain && (e.platform ?? 'other') !== domain) return false
+      if (isOff && domain && (e.platform ?? 'other') !== domain) return false
       if (classFilter !== 'all' && e.signalClass.toLowerCase() !== classFilter) return false
       return true
     })
-  }, [entries, platform, classFilter])
+  }, [entries, platform, classFilter, isOff])
 
   // One sort pipeline for both views (raw default = rawTotal). Nulls fall to the bottom.
   const sorted = useMemo(() => {
@@ -293,7 +374,32 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
           <div style={st.filters}>
             <Field label="Window" value={win} onChange={onWindow} options={WINDOW_OPTS} />
             <Field label="Class" value={classFilter} onChange={(e) => setClassFilter(e.target.value)} options={CLASS_FILTER.map((c) => ({ value: c.id, label: c.label }))} />
-            <Field label="Platform" value={platform} onChange={(e) => setPlatform(e.target.value as PlatformUI)} options={PLATFORM_UI.map((p) => ({ value: p, label: p }))} />
+            {/* Platform: URL-driven on windowed boards (server returns that platform's rows),
+                client-side on the "off" board. (BOARD redesign 2026-06-27.) */}
+            <Field label="Platform" value={platform} onChange={onPlatform} options={PLATFORM_UI.map((p) => ({ value: p, label: p }))} />
+            {/* "By platform" breakdown toggle — windowed boards only. Default = one
+                operator-total row; "By platform" = one row per (operator, platform). */}
+            {!isOff ? (
+              <div style={st.fieldCol}>
+                <span style={st.flab}>Breakdown</span>
+                <div style={st.toggleRow}>
+                  <button
+                    type="button"
+                    onClick={() => onBreakdownToggle('total')}
+                    style={{ ...st.modeBtn, ...(breakdownProp === 'total' ? st.modeOn : null) }}
+                  >
+                    Total
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onBreakdownToggle('platforms')}
+                    style={{ ...st.modeBtn, ...(breakdownProp === 'platforms' ? st.modeOn : null) }}
+                  >
+                    By platform
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
           <div style={st.toggleRow}>
             <button onClick={() => switchView('metrics')} style={{ ...st.modeBtn, ...(view === 'metrics' ? st.modeOn : null) }}>Metrics · the cascade</button>
@@ -321,7 +427,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                   </span>
                   <span style={{ textAlign: 'right', flexShrink: 0 }}>
                     <span style={{ display: 'block', color: T.ink, fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{view === 'raw' ? `∑ ${fmtBig(rawTotal(e))}` : `Υ ${yld}`}</span>
-                    <span style={{ display: 'inline-block', marginTop: 2, padding: '1px 6px', borderRadius: 4, background: 'rgb(var(--bg-elevated))', border: `1px solid ${T.line}`, color: T.mut, fontSize: 9, fontWeight: 700, letterSpacing: '0.04em' }}>{platformLabel(e)}</span>
+                    <span style={{ display: 'inline-block', marginTop: 2, padding: '1px 6px', borderRadius: 4, background: 'rgb(var(--bg-elevated))', border: `1px solid ${T.line}`, color: T.mut, fontSize: 9, fontWeight: 700, letterSpacing: '0.04em' }}>{platformDisplay(e)}</span>
                   </span>
                 </Link>
               </li>
@@ -387,7 +493,7 @@ export function LeaderboardTable({ entries, totalUsers, window: win = '30d' }: P
                     <td style={{ ...st.td, ...st.tdR, ...st.gdiv, fontSize: 11, color: T.mut }}>{e.opRatio ?? '—'}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.efficiency, e.efficiency) }}>{f2(e.efficiency)}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.costPerMillion, e.costPerMillion) }}>{e.costPerMillion == null ? '—' : `$${e.costPerMillion.toFixed(2)}`}</td>
-                    <td style={{ ...st.td, ...st.tdL, ...st.gdiv, color: T.ink }}>{platformLabel(e)}</td>
+                    <td style={{ ...st.td, ...st.tdL, ...st.gdiv, color: T.ink }} title={platformBadge(e) ? `Platforms: ${platformBadge(e)}` : undefined}>{platformDisplay(e)}</td>
                     <td style={{ ...st.td, ...st.tdR, color: T.mut }}>{e.lastSeen}</td>
                   </tr>
                 )
