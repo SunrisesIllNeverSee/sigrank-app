@@ -10,6 +10,23 @@ body:
       description: What's the use case or pain point?
     validations:
       required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of SigRank would this improve?
+      options:
+        - Public board
+        - Operator profile
+        - Submit / ingest
+        - Account / claim
+        - Billing / Stripe
+        - API
+        - Supabase / data
+        - Documentation
+        - Other / not sure
+    validations:
+      required: true
   - type: textarea
     id: solution
     attributes:
@@ -22,5 +39,13 @@ body:
     attributes:
       label: Alternatives considered
       description: Any other approaches you've thought about.
+    validations:
+      required: false
+  - type: textarea
+    id: success
+    attributes:
+      label: Success criteria
+      description: How should we know this feature is complete?
+      placeholder: "Users can..."
     validations:
       required: false
