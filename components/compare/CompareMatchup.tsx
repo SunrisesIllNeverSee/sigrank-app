@@ -36,7 +36,13 @@ function classVar(cls: SignalClass): string {
 function yieldStr(r: LeaderboardRow): string {
   const c = r.snapshot.cascade
   if (!c || c.nonCompounding) return '—'
-  return c.yield_ >= 1000 ? `${(c.yield_ / 1000).toFixed(1)}K` : c.yield_.toFixed(0)
+  const y = c.yield_
+  // Small yields (e.g. The Field, a low-leverage baseline at ~0.36) must show
+  // decimals — toFixed(0) rounded them to a misleading "0". ≥1000 → K-form,
+  // ≥1 → whole, <1 → 2dp so a real positive yield never displays as zero.
+  if (y >= 1000) return `${(y / 1000).toFixed(1)}K`
+  if (y >= 1) return y.toFixed(0)
+  return y.toFixed(2)
 }
 
 /** Count axis wins across the six cascade metrics (cost = lower wins). */

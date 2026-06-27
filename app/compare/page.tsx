@@ -11,6 +11,7 @@ import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 
 import { getLeaderboard, getOperator, type LeaderboardRow } from '@/lib/data'
+import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { CompareMatchup } from '@/components/compare/CompareMatchup'
 import { type CompareOption } from '@/components/compare/CompareSelectors'
@@ -85,11 +86,26 @@ export default async function ComparePage({
   // supplies the defaults.
   const board = await getLeaderboard({ limit: 500 })
 
-  // Resolve A and B. Default A to the top operator; default B to "The Field" —
-  // the average/baseline operator (owner 2026-06-27) — so the page opens as
-  // "you vs. the average" rather than two arbitrary top operators. Falls back to
-  // board[1] if The Field can't be resolved, and to graceful nulls throughout.
-  const rowA: LeaderboardRow | null = (a ? await getOperator(a) : null) ?? board[0] ?? null
+  // Default opponent B is "The Field" — the average/baseline operator (owner
+  // 2026-06-27) — so the page opens as "you vs. the average".
+  //
+  // Default side A (owner 2026-06-27): the SIGNED-IN operator (true "you vs.
+  // average"); when signed out, a rotating board pick rather than always #1 (so
+  // the matchup isn't the lopsided top-vs-average). The pick is day-seeded, not
+  // Math.random() (which would break RSC/ISR caching) — stable within a cache
+  // window, varies day to day. The Field itself is excluded from the A pool.
+  let defaultA: LeaderboardRow | null = null
+  const session = await getSessionOperator()
+  if (session?.codename) defaultA = await getOperator(session.codename)
+  if (!defaultA) {
+    const pool = board.filter((r) => r.operator.codename !== 'the-field')
+    if (pool.length > 0) {
+      const daySeed = Math.floor(Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`) / 86_400_000)
+      defaultA = pool[daySeed % pool.length] ?? pool[0]
+    }
+  }
+
+  const rowA: LeaderboardRow | null = (a ? await getOperator(a) : null) ?? defaultA ?? board[0] ?? null
   let rowB: LeaderboardRow | null =
     (b ? await getOperator(b) : null) ?? (await getOperator('the-field')) ?? board[1] ?? null
   if (rowA && rowB && rowA.operator.codename === rowB.operator.codename) {
