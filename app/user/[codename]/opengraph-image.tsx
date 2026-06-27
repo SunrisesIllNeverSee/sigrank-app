@@ -82,7 +82,7 @@ export default async function Image({ params }: { params: Promise<{ codename: st
                   {cls}
                 </span>
               ) : null}
-              <span>{subParts.join(' · ')}</span>
+              <span>{subParts.join(' - ')}</span>
             </div>
           </div>
           {ranked ? (
@@ -98,9 +98,9 @@ export default async function Image({ params }: { params: Promise<{ codename: st
         {/* metric bars */}
         {ranked && c ? (
           <div style={{ display: 'flex', gap: 34, marginTop: 'auto', marginBottom: 30 }}>
-            <MetricBar value={fmtYield(c.yield_)} label="Υ Yield" share={c.yield_ / yMax} />
+            <MetricBar value={fmtYield(c.yield_)} label="Yield" share={c.yield_ / yMax} />
             <MetricBar value={`${(c.snr * 100).toFixed(0)}%`} label="SNR" share={c.snr / snrMax} />
-            <MetricBar value={`${c.leverage.toFixed(0)}×`} label="Leverage" share={c.leverage / levMax} />
+            <MetricBar value={`${c.leverage.toFixed(0)}x`} label="Leverage" share={c.leverage / levMax} />
             <MetricBar value={c.velocity.toFixed(1)} label="Velocity" share={c.velocity / velMax} />
           </div>
         ) : null}
