@@ -99,7 +99,7 @@ mock data, while billing routes return configuration errors instead of crashing.
 > If vendor chunks act strange, run the dev server directly from this directory:
 >
 > ```bash
-> bash -c 'cd /Users/dericmchenry/Desktop/SigRank-repos/sigrank-app && node_modules/.bin/next dev --port 3000'
+> node_modules/.bin/next dev --port 3000
 > ```
 
 ## Scripts
