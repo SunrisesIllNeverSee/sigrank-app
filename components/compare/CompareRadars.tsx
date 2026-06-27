@@ -78,12 +78,16 @@ function metricAxes(a: LeaderboardRow, b: LeaderboardRow): Axis[] {
   })
   return [
     mk('Υ Yield', comp(ca, (x) => x.yield_), comp(cb, (x) => x.yield_)),
-    mk('SNR', raw(ca, (x) => x.snr), raw(cb, (x) => x.snr)),
+    // Leverage ↔ SNR swapped (owner) so the longer "Leverage" label sits where it
+    // reads without clipping.
     mk('Leverage', comp(ca, (x) => x.leverage), comp(cb, (x) => x.leverage)),
+    mk('SNR', raw(ca, (x) => x.snr), raw(cb, (x) => x.snr)),
     mk('Velocity', raw(ca, (x) => x.velocity), raw(cb, (x) => x.velocity)),
     mk('10xDEV', comp(ca, (x) => x.dev10x ?? 0), comp(cb, (x) => x.dev10x ?? 0)),
-    mk('$/1M', raw(ca, (x) => x.costPerMillion), raw(cb, (x) => x.costPerMillion), false),
+    // Efficacy ↔ $/1M swapped (owner) — keeps efficiency next to the cost axis and
+    // moves the longer label off the clipping edge.
     mk('Efficacy', raw(ca, (x) => x.efficiency), raw(cb, (x) => x.efficiency)),
+    mk('$/1M', raw(ca, (x) => x.costPerMillion), raw(cb, (x) => x.costPerMillion), false),
     mk('Op Ratio', comp(ca, (x) => x.leverage), comp(cb, (x) => x.leverage)), // ranks by lead term
   ]
 }
