@@ -13,7 +13,7 @@
  * Shows the code big + monospace with a copy button and a live 10:00 countdown that
  * greys out on expiry, and lists the operator's enrolled devices (GET /api/v1/devices)
  * each with a Revoke kill-switch (POST /api/v1/devices/revoke). The actual enrollment
- * happens in the TUI: `npx sigrank-mcp` → Connect tab (key 6) → paste the code → Enter.
+ * happens in the TUI: `npx sigrank` → Connect tab (key 6) → paste the code → Enter.
  */
 
 import { useCallback, useEffect, useState } from 'react'
@@ -214,7 +214,7 @@ export function ConnectDevicePanel() {
         <li>
           1. Run{' '}
           <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-text-secondary">
-            npx sigrank-mcp
+            npx sigrank
           </code>{' '}
           on the machine you want to rank.
         </li>

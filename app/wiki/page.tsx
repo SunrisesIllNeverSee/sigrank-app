@@ -212,14 +212,14 @@ function SubmitMcpLead() {
 
       <pre className="overflow-x-auto rounded-md border border-bg-border bg-bg-base px-4 py-3 font-mono text-xs leading-relaxed text-text-secondary">
 {`# install once (recommended)
-npm install -g sigrank-mcp
+npm install -g sigrank
 
 # …or run with no install
-npx sigrank-mcp`}
+npx sigrank`}
       </pre>
 
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
-        <code className="rounded bg-bg-surface px-1 py-0.5 font-mono text-xs text-gold">npx sigrank-mcp</code>{' '}
+        <code className="rounded bg-bg-surface px-1 py-0.5 font-mono text-xs text-gold">npx sigrank</code>{' '}
         opens your dashboard — the cascade across every detected platform and window, the 5-source token
         comparison, and your board position. <strong className="text-text-primary">Submitting to the
         board is managed from your profile</strong> (sign in, then publish) — so your numbers land
@@ -342,7 +342,7 @@ export default function Draft1Page() {
       items: [
         // MCP-FIRST (owner 2026-06-24): lead with the agent + its run commands (was hidden
         // two groups down); the paste/manual options follow as clearly-secondary "other ways".
-        { label: 'Run the agent (MCP / CLI)', hint: `The fastest, recommended path — npm i -g sigrank-mcp / npx sigrank-mcp. Zero paste, reads ${PLATFORM_COUNT}+ platforms. Board entry is managed from your profile.`, node: <SubmitMcpLead /> },
+        { label: 'Run the agent (MCP / CLI)', hint: `The fastest, recommended path — npm i -g sigrank / npx sigrank. Zero paste, reads ${PLATFORM_COUNT}+ platforms. Board entry is managed from your profile.`, node: <SubmitMcpLead /> },
         { label: 'How it works (3 steps)', hint: '01 agent reads tokens · 02 compute the cascade · 03 account + review → board (via your profile).', node: <SubmitFlow /> },
         { label: 'Other ways — paste ccusage', hint: 'No agent? Paste ccusage --json for an instant PROJECTED cascade. Calculator only — not saved to the board.', node: <PasteRunNumbers /> },
         { label: 'Other ways — manual entry (advanced)', hint: 'No token counts at all? A rough estimate from coarse activity proxies, reduced confidence. Approximation only.', node: <ManualEntryPanel /> },
