@@ -11,7 +11,7 @@
  */
 import { ImageResponse } from 'next/og'
 import { getOperator, getLeaderboard } from '@/lib/data'
-import { CardFrame, MetricBar, Identity, GOLD, DIM, TEXT } from '@/lib/og/card'
+import { CardFrame, MetricBar, GOLD, DIM, TEXT, ogFonts } from '@/lib/og/card'
 
 export const runtime = 'nodejs'
 export const alt = 'SigRank operator rank card'
@@ -31,6 +31,7 @@ const fmtYield = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toF
 export default async function Image({ params }: { params: Promise<{ codename: string }> }) {
   const { codename: raw } = await params
   const row = await getOperator(decode(raw))
+  const fonts = await ogFonts()
 
   // Unknown / pending operators still get a clean card (no fabricated stats).
   if (!row) {
@@ -42,7 +43,7 @@ export default async function Image({ params }: { params: Promise<{ codename: st
           </div>
         </CardFrame>
       ),
-      size,
+      { ...size, fonts },
     )
   }
 
@@ -105,6 +106,6 @@ export default async function Image({ params }: { params: Promise<{ codename: st
         ) : null}
       </CardFrame>
     ),
-    size,
+    { ...size, fonts },
   )
 }

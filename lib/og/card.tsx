@@ -15,6 +15,33 @@ import React from 'react'
 export const OG_SIZE = { width: 1200, height: 630 }
 export const OG_CONTENT_TYPE = 'image/png'
 
+/**
+ * Load Geist Mono (the site's mono face) as raw TTF bytes for Satori. Satori has
+ * no default font — every ImageResponse must register the families it uses or it
+ * 500s. Fetched from the Google Fonts static host at render; cached by the route's
+ * own caching. Returns the `fonts` array ImageResponse expects.
+ */
+export async function ogFonts() {
+  const url =
+    'https://github.com/vercel/geist-font/raw/main/packages/next/dist/fonts/geist-mono/GeistMono-Regular.ttf'
+  const fallback =
+    'https://raw.githubusercontent.com/vercel/geist-font/main/packages/next/dist/fonts/geist-mono/GeistMono-Regular.ttf'
+  let buf: ArrayBuffer | null = null
+  for (const u of [url, fallback]) {
+    try {
+      const res = await fetch(u)
+      if (res.ok) {
+        buf = await res.arrayBuffer()
+        break
+      }
+    } catch {
+      /* try next */
+    }
+  }
+  if (!buf) return undefined // ImageResponse falls back to its own default
+  return [{ name: 'GeistMono', data: buf, weight: 400 as const, style: 'normal' as const }]
+}
+
 const GOLD = '#e0b240'
 const GOLD_HI = '#f0c862'
 const INK = '#0a0a0a'
@@ -55,7 +82,7 @@ export function CardFrame({
         display: 'flex',
         flexDirection: 'column',
         background: INK,
-        fontFamily: 'mono',
+        fontFamily: 'GeistMono',
         color: TEXT,
         position: 'relative',
         padding: '54px 70px 0 70px',
