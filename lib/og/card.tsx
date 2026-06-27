@@ -8,7 +8,7 @@
  *
  * Style locked with owner (2026-06-27): terminal look — near-black bg, gold
  * accents, mono, a faint cascade wave along the bottom, and a bottom CTA strip
- * ("Join the board → signalaf.com/user/<codename>"). One frame, three cards.
+ * ("Join the board signalaf.com/user/<codename>"). One frame, three cards.
  */
 import React from 'react'
 
@@ -22,24 +22,25 @@ export const OG_CONTENT_TYPE = 'image/png'
  * own caching. Returns the `fonts` array ImageResponse expects.
  */
 export async function ogFonts() {
-  const url =
-    'https://github.com/vercel/geist-font/raw/main/packages/next/dist/fonts/geist-mono/GeistMono-Regular.ttf'
-  const fallback =
-    'https://raw.githubusercontent.com/vercel/geist-font/main/packages/next/dist/fonts/geist-mono/GeistMono-Regular.ttf'
-  let buf: ArrayBuffer | null = null
-  for (const u of [url, fallback]) {
+  // JetBrains Mono from the jsDelivr fontsource mirror — a stable, CORS-open TTF
+  // host. (The earlier GeistMono GitHub path 400'd.) A clean monospace face that
+  // matches the terminal look; Satori needs the raw bytes, not a CSS @font-face.
+  const sources = [
+    'https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-700-normal.ttf',
+    'https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.ttf',
+  ]
+  for (const u of sources) {
     try {
       const res = await fetch(u)
       if (res.ok) {
-        buf = await res.arrayBuffer()
-        break
+        const buf = await res.arrayBuffer()
+        return [{ name: 'OGMono', data: buf, weight: 400 as const, style: 'normal' as const }]
       }
     } catch {
       /* try next */
     }
   }
-  if (!buf) return undefined // ImageResponse falls back to its own default
-  return [{ name: 'GeistMono', data: buf, weight: 400 as const, style: 'normal' as const }]
+  return undefined // ImageResponse falls back to its own default
 }
 
 const GOLD = '#e0b240'
@@ -82,16 +83,18 @@ export function CardFrame({
         display: 'flex',
         flexDirection: 'column',
         background: INK,
-        fontFamily: 'GeistMono',
+        fontFamily: 'OGMono',
         color: TEXT,
         position: 'relative',
         padding: '54px 70px 0 70px',
       }}
     >
       <Wave />
-      {/* brand */}
+      {/* brand — ASCII only so Satori never needs a dynamic-font download (the ◈
+          glyph 400'd the render). A filled square reads as the mark. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, color: GOLD, letterSpacing: 4 }}>
-        ◈ SIGRANK
+        <div style={{ width: 16, height: 16, background: GOLD, transform: 'rotate(45deg)' }} />
+        SIGRANK
       </div>
       {/* body */}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
@@ -108,7 +111,7 @@ export function CardFrame({
           fontSize: 22,
         }}
       >
-        <span style={{ color: GOLD }}>Join the board →</span>
+        <span style={{ color: GOLD }}>Join the board</span>
         <span style={{ color: DIM }}>
           signalaf.com{ctaCodename ? `/user/${ctaCodename}` : ''}
         </span>
