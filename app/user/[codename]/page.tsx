@@ -30,6 +30,7 @@ import { CascadePanel } from '@/components/profile/CascadePanel'
 import { SubmissionsGrid } from '@/components/profile/SubmissionsGrid'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal'
+import { ProfileShareCard } from '@/components/share/ProfileShareCard'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
 import CascadeRadar from '@/components/charts/CascadeRadar'
@@ -111,6 +112,20 @@ export default async function OperatorProfilePage({
 
   // ── Chart-kit data, all derived from real telemetry + cascade fields ──────
   const c = snapshot.cascade
+
+  // Headline metrics for the downloadable share card (ProfileShareCard). Bars are
+  // normalized to a sensible per-metric ceiling so the fill reads as "where you
+  // sit" — honest + bounded, no extra board query needed.
+  const ranked = !pending && c && !c.nonCompounding
+  const shareMetrics =
+    ranked && c
+      ? [
+          { label: 'Yield', value: c.yield_ >= 1000 ? `${(c.yield_ / 1000).toFixed(1)}K` : c.yield_.toFixed(0), share: Math.min(1, c.yield_ / 20000) },
+          { label: 'SNR', value: `${(c.snr * 100).toFixed(0)}%`, share: Math.min(1, c.snr) },
+          { label: 'Leverage', value: `${c.leverage.toFixed(0)}x`, share: Math.min(1, c.leverage / 10) },
+          { label: 'Velocity', value: c.velocity.toFixed(1), share: Math.min(1, c.velocity / 5) },
+        ]
+      : []
 
   // Score trajectory: real history points only. When a single snapshot exists
   // we render a one-point series and label it honestly (no fabricated trend).
@@ -434,6 +449,18 @@ export default async function OperatorProfilePage({
               </>
             )}
           </div>
+        </div>
+        {/* Share the profile link + download a refined card image for socials. */}
+        <div className="sm:ml-auto">
+          <ProfileShareCard
+            codename={operator.codename}
+            name={name}
+            handle={operator.handle}
+            signalClass={snapshot.class_tier}
+            rank={pending ? null : row.global_rank}
+            topPct={pending ? null : topPct}
+            metrics={shareMetrics}
+          />
         </div>
       </header>
 
