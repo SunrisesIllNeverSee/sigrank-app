@@ -18,15 +18,14 @@
  */
 
 import type { LeaderboardRow } from '@/lib/data'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 import type { SignalClass } from '@/components/sigrank/types'
 import { colors } from '@/components/sigrank/tokens'
 import { glyphFor } from '@/lib/canon/ids'
 import { regimeOf } from '@/lib/compare/narrate'
 
 function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
+  return operatorDisplayName(row)
 }
 
 function classColor(cls: SignalClass): string {

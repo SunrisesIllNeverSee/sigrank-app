@@ -1,5 +1,6 @@
 import React from 'react'
 import type { LeaderboardRow } from '@/lib/data'
+import { operatorDisplayName } from '@/lib/compare/operator-name'
 import { SignalClassBadge } from '@/components/sigrank'
 import { CanonId } from '@/components/ui/CanonId'
 import { Placeholder } from '@/components/ui/Placeholder'
@@ -122,9 +123,7 @@ export function winnerOf(row: MetricRow): 'a' | 'b' | 'tie' {
 }
 
 export function nameOf(row: LeaderboardRow): string {
-  return row.operator.claimed && row.operator.display_name
-    ? row.operator.display_name
-    : row.operator.codename
+  return operatorDisplayName(row)
 }
 
 /** Head-to-head radar — adapter over the shared CascadeRadar (CMP-3).
