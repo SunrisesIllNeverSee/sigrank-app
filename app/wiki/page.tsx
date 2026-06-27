@@ -18,6 +18,7 @@
  */
 
 import type { Metadata } from 'next'
+import { withOG } from '@/lib/seo'
 
 import { TOKEN_METRICS } from '@/lib/canon/ids'
 import { MCP_VERSION, PLATFORM_COUNT } from '@/lib/constants'
@@ -31,11 +32,12 @@ import { VerificationTests } from '@/components/marketing/VerificationTests'
 import { SignatureDrift, LocalAgentMcp, Credits } from '@/components/marketing/SignalIntegrity'
 import Link from 'next/link'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Wiki · SigRank',
   description:
     'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™.',
-}
+  path: '/wiki',
+})
 
 /** Prepend a deep-link to a Proof topic's standalone page above its console node, so
  * the dedicated /wiki/<slug> route (real title + crawlable + shareable) is reachable

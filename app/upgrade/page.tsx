@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { withOG } from '@/lib/seo'
 import Link from 'next/link'
 import { SupportCheckout } from '@/components/billing/SupportCheckout'
 
@@ -15,11 +16,12 @@ import { SupportCheckout } from '@/components/billing/SupportCheckout'
  * early-supporter contribution, not a fixed Pro subscription.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Back the build · SigRank',
   description:
     'Support SigRank as an early backer. The leaderboard stays free; supporters fund the precision tier and lock in lifetime founding-supporter perks.',
-}
+  path: '/upgrade',
+})
 
 export default async function UpgradePage({
   searchParams,
@@ -27,8 +29,7 @@ export default async function UpgradePage({
   searchParams: Promise<{ tier?: string }>
 }) {
   const { tier } = await searchParams
-  const preset = tier === 'pro' || tier === 'circle_sponsor' ? tier : 'patron'
-
+  void tier // preset selection is handled inside SupportCheckout
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6 py-8">
       <header className="flex flex-col gap-2 text-center">
@@ -46,7 +47,7 @@ export default async function UpgradePage({
         </p>
       </header>
 
-      <SupportCheckout presetTier={preset} />
+      <SupportCheckout />
 
       <p className="text-center font-mono text-[11px] text-text-dim">
         Secure checkout via Stripe ·{' '}

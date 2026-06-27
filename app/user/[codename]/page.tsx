@@ -21,6 +21,7 @@ import { notFound } from 'next/navigation'
 
 import { getOperator, getOperatorHistory, getOperatorSubmissions } from '@/lib/data'
 import { decodeCodename } from '@/lib/route-params'
+import { withOG } from '@/lib/seo'
 import type { Operator } from '@/lib/scoring/types'
 import { SignalClassBadge } from '@/components/sigrank'
 import { OperatorAvatar } from '@/components/sigrank/OperatorAvatar'
@@ -66,12 +67,15 @@ export async function generateMetadata({
     c && !c.nonCompounding
       ? ` · Υ ${c.yield_ >= 1000 ? `${(c.yield_ / 1000).toFixed(1)}K` : c.yield_.toFixed(0)}`
       : ''
-  return {
-    title: `${name}${yieldLabel} · SigRank`,
-    description: row.pending
-      ? `${name} — an operator on SigRank (not ranked yet).`
-      : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`,
-  }
+  const title = `${name}${yieldLabel} · SigRank`
+  const description = row.pending
+    ? `${name} — an operator on SigRank (not ranked yet).`
+    : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`
+  return withOG({
+    title,
+    description,
+    path: `/user/${rawCodename}`,
+  })
 }
 
 /** One labeled row in the identity / stats rail. */
