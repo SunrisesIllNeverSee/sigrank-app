@@ -115,6 +115,17 @@ export interface BoardParams {
    * multi-platform submissions exist (legacy rows carry one platform per operator).
    */
   perPlatform?: boolean
+  /**
+   * Operator-total board (BOARD redesign, 2026-06-27): when true, collapse to ONE
+   * row per operator that represents their cross-platform TOTAL — preferring the
+   * operator's `platform==='multi'` snapshot (the MCP already sums every active
+   * platform's pillars into that one cascade), falling back to their latest single-
+   * platform snapshot when no 'multi' row exists. This is the clean default board:
+   * one total row per operator, no double-counting (multi already contains
+   * claude+codex). Takes precedence over perPlatform / latestPerOperator when set;
+   * no effect under allSnapshots (which keeps every row). See operatorTotalCollapse.
+   */
+  operatorTotal?: boolean
   /** primary_domain filter, or null/undefined for all. */
   platform?: string | null
   /** Lowercase class scope (e.g. 'transmitter'), or 'all'/undefined. */
@@ -350,4 +361,56 @@ export function latestPerOperatorPlatform(
     if (!byOpPlatform.has(key)) byOpPlatform.set(key, r)
   }
   return byOpPlatform
+}
+
+/** The output of operatorTotalCollapse: one chosen snapshot per operator + the
+ *  distinct platform set that operator has submitted (for the UI multi-badge). */
+export interface OperatorTotalCollapse {
+  /** Chosen "total" snapshot per operator_id (multi-preferred, latest-by-date). */
+  byOperator: Map<string, DbMetricSnapshot>
+  /** Distinct platforms each operator has submitted, e.g. ['claude','codex','multi'].
+   *  Ordered by first-seen in the (date-desc) input. Excludes null/∅ platforms. */
+  platformsByOperator: Map<string, string[]>
+}
+
+/**
+ * Operator-total collapse (BOARD redesign, 2026-06-27): one row per operator that
+ * is their cross-platform TOTAL. The MCP already submits a `platform='multi'`
+ * snapshot whose pillars SUM every active platform's cascade, so that row IS the
+ * operator's total — we must NOT re-sum claude+codex+multi (multi already contains
+ * them → double-count). So per operator we PREFER their latest 'multi' snapshot;
+ * when an operator has no 'multi' row (single-platform operator) we fall back to
+ * their latest single-platform snapshot. Input is date-DESC (same contract as
+ * latestPerOperator), so "latest" = first-seen.
+ *
+ * Also returns the distinct platform SET per operator (all non-null platforms they
+ * submitted) so the UI can badge "claude·codex·multi" on the single total row.
+ */
+export function operatorTotalCollapse(rows: DbMetricSnapshot[]): OperatorTotalCollapse {
+  // Latest 'multi' row per operator (first-seen wins under date-desc input).
+  const multiByOp = new Map<string, DbMetricSnapshot>()
+  // Latest ANY row per operator — the single-platform fallback.
+  const latestByOp = new Map<string, DbMetricSnapshot>()
+  // Distinct submitted platforms per operator (first-seen order; null/∅ excluded).
+  const platformsByOperator = new Map<string, string[]>()
+
+  for (const r of rows) {
+    const op = r.operator_id
+    if (!latestByOp.has(op)) latestByOp.set(op, r)
+    if (r.platform === 'multi' && !multiByOp.has(op)) multiByOp.set(op, r)
+    const p = r.platform
+    if (p != null && p !== '') {
+      const set = platformsByOperator.get(op)
+      if (!set) platformsByOperator.set(op, [p])
+      else if (!set.includes(p)) set.push(p)
+    }
+  }
+
+  // Prefer the 'multi' total; fall back to the operator's latest single-platform row.
+  const byOperator = new Map<string, DbMetricSnapshot>()
+  for (const [op, latest] of latestByOp) {
+    byOperator.set(op, multiByOp.get(op) ?? latest)
+  }
+
+  return { byOperator, platformsByOperator }
 }
