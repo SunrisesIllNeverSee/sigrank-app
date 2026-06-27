@@ -1,5 +1,6 @@
 import { getHomepageStats } from '@/lib/data'
 import { MotionPause } from '@/components/home/MotionPause'
+import { DeletedNotice } from '@/components/home/DeletedNotice'
 import { HowItWorks } from '@/components/marketing/HowItWorks'
 import { IpBoundary } from '@/components/marketing/IpBoundary'
 import { PricingCards } from '@/components/marketing/PricingCards'
@@ -38,6 +39,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-8 py-2">
+      <DeletedNotice />
       <Draft2Hero />
 
       {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
