@@ -28,21 +28,24 @@ const COLS: { label: string; tone: 'white' | 'gold' }[] = [
   { label: 'Power users†', tone: 'white' },
   { label: 'Top Evals to date**', tone: 'gold' },
 ]
+// Gold column = the top REAL operator measured to date (MO§ES™, the owner — the only
+// real operator on the live board so far). Values are the canonical board compute for
+// that row (GET /api/v1/operators, 2026-06-27), replacing the earlier modeled-seed figures.
 const ROWS: { metric: string; vals: [string, string, string]; winner: 2 }[] = [
-  { metric: 'Υ Yield', vals: ['1.57', '1.51', '745.40'], winner: 2 },
-  { metric: 'SNR', vals: ['0.33', '0.07', '0.63'], winner: 2 },
-  { metric: 'Velocity (O/I)', vals: ['0.50', '0.08', '1.70'], winner: 2 },
-  { metric: 'Leverage (CR/I)', vals: ['3.2×', '22.3×', '438.6×'], winner: 2 },
-  { metric: '10xDEV (log₁₀)', vals: ['0.50', '1.35', '2.64'], winner: 2 },
-  { metric: 'Efficiency (vs AA 4.0)', vals: ['1.00', '5.61', '114.50'], winner: 2 },
-  { metric: 'Operating Ratio (C:I:O)', vals: ['3.5 : 1 : 0.50', '22 : 1 : 0.08', '439 : 1 : 1.70'], winner: 2 },
+  { metric: 'Υ Yield', vals: ['1.57', '1.51', '488.65'], winner: 2 },
+  { metric: 'SNR', vals: ['0.33', '0.07', '0.58'], winner: 2 },
+  { metric: 'Velocity (O/I)', vals: ['0.50', '0.08', '1.36'], winner: 2 },
+  { metric: 'Leverage (CR/I)', vals: ['3.2×', '22.3×', '360.2×'], winner: 2 },
+  { metric: '10xDEV (log₁₀)', vals: ['0.50', '1.35', '2.56'], winner: 2 },
+  { metric: 'Efficiency (vs AA 4.0)', vals: ['1.00', '5.61', '93.17'], winner: 2 },
+  { metric: 'Operating Ratio (C:I:O)', vals: ['3.5 : 1 : 0.50', '22 : 1 : 0.08', '360 : 1 : 1.36'], winner: 2 },
 ]
 
 /** 10xDEV log-anchor read — exponent, not multiplier. */
 const DEV_ROWS: { degree: string; dev: string; linear: string }[] = [
   { degree: 'Average users (AA 7:2:1)*', dev: '0.50', linear: '3.2×' },
   { degree: 'Power-user median', dev: '1.35', linear: '22.4×' },
-  { degree: 'Top operator to date', dev: '2.64', linear: '439×' },
+  { degree: 'Top operator to date', dev: '2.56', linear: '360×' },
 ]
 
 function ComparisonTable() {
@@ -153,19 +156,19 @@ function Provenance() {
 
       <div>
         <p className="font-mono text-[11px] font-bold text-text-secondary">
-          Top operator, seed #3 · <span className="text-gold">measured</span>
+          Top operator to date · <span className="text-gold">measured</span>
         </p>
         <p>
-          Row 3 of the live SigRank board (&ldquo;static seed · 30d&rdquo;, OWNER clean, claude-mem
-          observer stripped), 30-day window. Source:{' '}
+          The top real operator on the live SigRank board so far (MO§ES™ — the owner&apos;s own
+          observer-stripped run). Source:{' '}
           <a
-            href="https://signalaf.com/board/30d"
+            href="https://signalaf.com/compare?a=signal-92b4f9f485&b=the-field"
             className="text-text-accent underline-offset-2 hover:underline"
           >
-            signalaf.com/board/30d
+            signalaf.com/compare
           </a>{' '}
-          (retrieved 2026-06-21). Derived from canonical four-pillar token telemetry (input / output /
-          cache_create / cache_read). Token counts only, no prompt content.
+          (retrieved 2026-06-27, canonical board compute). Derived from canonical four-pillar token
+          telemetry (input / output / cache_create / cache_read). Token counts only, no prompt content.
         </p>
       </div>
 
@@ -231,11 +234,12 @@ function Provenance() {
           Treat as a reference floor, not a real operator&apos;s telemetry.
         </p>
         <p>
-          <span className="text-text-muted">**</span> <strong>Clean row</strong>: the claude-mem
-          memory observer (an MCP that auto-prompts memory, low-input/high-output) inflated the raw
-          owner row by ~25% of output. Seed #3 is the observer-stripped figure. The inflated vs clean
-          pair is shown openly on the live board (rows 2 and 3), the instrument measuring its own
-          contamination and removing it.
+          <span className="text-text-muted">**</span> <strong>Top operator to date</strong>: the
+          gold column is the highest real operator measured on the live board so far (MO§ES™, the
+          owner). The claude-mem memory observer (an MCP that auto-prompts memory, low-input/high-output)
+          inflated the raw owner row by ~25% of output; the figure shown here is the observer-stripped
+          read. The inflated vs clean pair is shown openly on the live board, the instrument measuring
+          its own contamination and removing it.
         </p>
       </div>
     </div>
@@ -280,9 +284,9 @@ export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
               </p>
               <p>
                 Our highest measurement to date sits at{' '}
-                <strong className="text-gold">439 : 1 : 1.70</strong>: every input token returns{' '}
-                <strong className="text-gold">~1.7</strong> outputs while carrying a cache of roughly 439 (about
-                3.9B total). That&apos;s the eval to beat.
+                <strong className="text-gold">360 : 1 : 1.36</strong>: every input token returns{' '}
+                <strong className="text-gold">~1.4</strong> outputs while carrying a cache of roughly 360 (about
+                2.1B total). That&apos;s the eval to beat.
               </p>
             </div>
           </div>
@@ -322,8 +326,8 @@ export function ThreeDegreesChart({ variant = 'full' }: { variant?: Variant }) {
           <strong className="text-text-primary">3.5 : 1 : 0.5</strong>. We surveyed 10 power users (median
           ~500B total tokens) at about <strong className="text-text-primary">22 : 1 : 0.08</strong>, output
           traded for cache. Our highest measurement to date is{' '}
-          <strong className="text-gold">439 : 1 : 1.70</strong>: every input returns ~1.7 outputs on a ~439 cache
-          (≈3.9B total). Three degrees of leverage, each a real skill, and the distance between them learnable.
+          <strong className="text-gold">360 : 1 : 1.36</strong>: every input returns ~1.4 outputs on a ~360 cache
+          (≈2.1B total). Three degrees of leverage, each a real skill, and the distance between them learnable.
         </p>
       </div>
 
