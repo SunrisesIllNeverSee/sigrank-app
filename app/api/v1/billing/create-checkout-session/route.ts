@@ -85,7 +85,9 @@ export async function POST(req: Request) {
     if (!Number.isFinite(amount) || amount < DONATION_MIN_CENTS || amount > DONATION_MAX_CENTS) {
       return NextResponse.json({ error: 'invalid_amount' }, { status: 400 })
     }
-    const productId = process.env.STRIPE_DONATION_PRODUCT
+    // .trim() — dashboard copy-paste can introduce leading/trailing whitespace,
+    // which Stripe rejects ("No such product: '  prod_…'"). Defensive.
+    const productId = process.env.STRIPE_DONATION_PRODUCT?.trim()
     if (!productId) {
       return NextResponse.json({ error: 'donation_not_configured' }, { status: 503 })
     }
@@ -121,7 +123,7 @@ export async function POST(req: Request) {
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean)
-    const price = typeof body.price === 'string' ? body.price : ''
+    const price = typeof body.price === 'string' ? body.price.trim() : ''
     if (!price || !allowed.includes(price)) {
       return NextResponse.json({ error: 'invalid_price' }, { status: 400 })
     }
