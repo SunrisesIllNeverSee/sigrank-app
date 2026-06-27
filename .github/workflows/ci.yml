@@ -27,3 +27,27 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  # Cross-repo contract test — catches platform-enum drift between the web app
+  # and the MCP server. The codex landing was triple-blocked because these enums
+  # drifted (one repo accepted a platform the other didn't). This job checks out
+  # the MCP repo and diffs the two enums. Fails if they don't match.
+  cross-repo-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Checkout sigrank-mcp (the other half of the contract)
+        uses: actions/checkout@v4
+        with:
+          repository: SunrisesIllNeverSee/sigrank-mcp
+          path: _sigrank-mcp
+          # Public repo — no token needed. If it goes private, add a PAT secret.
+          # token: ${{ secrets.CROSS_REPO_PAT }}
+
+      - name: Cross-repo platform-enum contract test
+        run: node __tests__/contract/platform-enum-contract.test.mjs ${{ github.workspace }}/_sigrank-mcp

@@ -10,6 +10,7 @@ import './globals.css'
 import { Nav } from '@/components/ui/Nav'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 import { Footer } from '@/components/ui/Footer'
+import { siteMetadata } from '@/lib/seo'
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
 // foundation). Wired to the existing --font-geist-sans var name so all
@@ -34,11 +35,7 @@ const wmGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['700'], variable:
 const wmSerif = Bitter({ subsets: ['latin'], weight: ['700'], variable: '--wm-serif', display: 'swap' })
 const wmBlack = Archivo_Black({ subsets: ['latin'], weight: ['400'], variable: '--wm-black', display: 'swap' })
 
-export const metadata: Metadata = {
-  title: 'SigRank',
-  description:
-    'Privacy-preserving leaderboard scoring AI operators on canonical token-telemetry metrics.',
-}
+export const metadata: Metadata = siteMetadata
 
 // No-flash theme init: applies the saved theme before the body content paints.
 // Runs synchronously as the first child of <body>. data-theme="carbon" is the

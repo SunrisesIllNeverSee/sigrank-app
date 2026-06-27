@@ -58,6 +58,51 @@ import {
 } from '@/lib/data/mappers'
 import { fallbackRows, filterMockBoard, sortValue } from '@/lib/data/fallback'
 
+/**
+ * Recompute an operator's global rank + percentile when rank_history is empty.
+ * Fetches all latest snapshots, computes Υ yield for each (same as the board),
+ * sorts descending, and finds the operator's 1-based position. Percentile is
+ * computed as (operators_below / total) * 100.
+ *
+ * This is the fallback for the P1 rank_history gap (2026-06-27): seeds have
+ * rank_history rows, but operators added via the ingest pipeline don't.
+ */
+async function recomputeRank(
+  sb: SupabaseClient,
+  operatorId: string,
+  _thisSnap: DbMetricSnapshot,
+): Promise<{ rank: number; percentile: number }> {
+  try {
+    const { data: allSnaps, error } = await sb
+      .from('metric_snapshots')
+      .select(SNAPSHOT_COLUMNS)
+      .order('snapshot_date', { ascending: false })
+    if (error || !allSnaps) return { rank: 0, percentile: 0 }
+    // Collapse to latest snapshot per operator (same as the board's legacy path)
+    const latest = new Map<string, DbMetricSnapshot>()
+    for (const s of asDb<DbMetricSnapshot[]>(allSnaps) ?? []) {
+      if (!latest.has(s.operator_id)) latest.set(s.operator_id, s)
+    }
+    // Compute yield_ for each + sort descending
+    const ranked = [...latest.values()]
+      .map((s) => {
+        const snap = mapSnapshot(s)
+        const y = snap.cascade && !snap.cascade.nonCompounding ? snap.cascade.yield_ : 0
+        return { operator_id: s.operator_id, yield_: y }
+      })
+      .sort((a, b) => b.yield_ - a.yield_)
+    const total = ranked.length
+    if (total === 0) return { rank: 0, percentile: 0 }
+    const idx = ranked.findIndex((r) => r.operator_id === operatorId)
+    if (idx === -1) return { rank: 0, percentile: 0 }
+    const rank = idx + 1
+    const percentile = total > 1 ? ((total - rank) / (total - 1)) * 100 : 100
+    return { rank, percentile: Math.round(percentile * 100) / 100 }
+  } catch {
+    return { rank: 0, percentile: 0 }
+  }
+}
+
 /** Minimal shape of a `rank_history` row we read. */
 interface DbRankHistory {
   operator_id: string
@@ -243,11 +288,28 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
       .maybeSingle()
     const rank = asDb<DbRankHistory | null>(rankData)
 
+    // P1 fix (2026-06-27): rank_history is only populated for seed operators
+    // (manual insert). Operators added via the ingest pipeline
+    // (materialize_verified_snapshot) get NO rank_history row, so their profile
+    // shows "rank #0". When rank_history returns 0/null, recompute the rank
+    // the same way the board does: fetch all latest snapshots, compute Υ, sort
+    // descending, find this operator's position. This is O(n) but n is small
+    // (currently ~21 operators). The "right" fix is to populate rank_history
+    // in materialize_verified_snapshot (a future migration), but this fallback
+    // fixes every existing profile immediately without a DB change.
+    let globalRank = num(rank?.global_rank)
+    let percentile = num(rank?.percentile)
+    if (globalRank === 0) {
+      const recomputed = await recomputeRank(sb, op.operator_id, snap)
+      globalRank = recomputed.rank
+      percentile = recomputed.percentile
+    }
+
     return {
       operator: mapOperator(op),
       snapshot: mapSnapshot(snap),
-      global_rank: num(rank?.global_rank),
-      percentile: num(rank?.percentile),
+      global_rank: globalRank,
+      percentile,
       telemetry: telemetryFromSnapshot(snap),
     }
   } catch {
