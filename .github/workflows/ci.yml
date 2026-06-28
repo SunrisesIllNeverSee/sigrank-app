@@ -51,3 +51,9 @@ jobs:
 
       - name: Cross-repo platform-enum contract test
         run: node __tests__/contract/platform-enum-contract.test.mjs ${{ github.workspace }}/_sigrank-mcp
+
+      - name: Cross-repo window-enum contract test
+        run: node __tests__/contract/window-enum-contract.test.mjs ${{ github.workspace }}/_sigrank-mcp
+
+      - name: Cross-repo MCP version + platform-count drift test
+        run: node __tests__/contract/mcp-version-drift.test.mjs ${{ github.workspace }}/_sigrank-mcp

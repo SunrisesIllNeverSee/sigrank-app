@@ -87,10 +87,12 @@ export interface SortMetricOption {
 }
 
 /**
- * SORT_METRICS — the metrics a leaderboard can be sorted by. `signa_rate` is
- * the default global sort key. Keys match `metric_snapshots` columns.
+ * SORT_METRICS — the metrics a leaderboard can be sorted by. `yield_` is
+ * the default global sort key (SORT_DEFAULT). Keys match `metric_snapshots`
+ * columns or derived cascade fields (yield_ → cascade.yield_).
  */
 export const SORT_METRICS: SortMetricOption[] = [
+  { key: 'yield_', canonId: 'Y.01', label: 'Yield' },
   { key: 'signa_rate', canonId: 'C.01', label: 'SIGNA RATE' },
   { key: 'compression_ratio', canonId: 'M.01', label: 'Compression' },
   { key: 'prompt_complexity', canonId: 'M.02', label: 'Prompt Complexity' },
