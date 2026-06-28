@@ -48,37 +48,142 @@ function extractMockCodenames(filePath) {
 }
 
 /**
- * Extract operator codenames from supabase/seed.sql.
- * Finds all INSERT INTO operators ... VALUES ... blocks and extracts the
- * codename column value from each tuple.
+ * Tokenize a SQL `VALUES` body into tuples → columns.
+ *
+ * Unlike a naive "collect every quoted string" scan, this respects:
+ *   - single-quoted strings, with '' as an escaped apostrophe (so a comma or
+ *     paren INSIDE a string never splits a column),
+ *   - nested parens (function calls like gen_random_uuid(), casts),
+ *   - SQL line (`-- …`) and block (`/* … *​/`) comments.
+ *
+ * Returns an array of tuples; each tuple is an array of raw column expressions
+ * in column order. This lets the caller index by the REAL column position
+ * instead of assuming every value is a quoted literal (which silently mis-reads
+ * the moment any unquoted column — gen_random_uuid(), a number, NULL — precedes
+ * the codename, or a codename contains an escaped apostrophe).
  */
-function extractSeedCodenames(filePath) {
-  const src = readFileSync(filePath, 'utf8')
+function tokenizeValues(valuesBody) {
+  const tuples = []
+  let cur = []
+  let buf = ''
+  let depth = 0
+  let inTuple = false
+  let inStr = false
+  const n = valuesBody.length
+  for (let i = 0; i < n; i++) {
+    const ch = valuesBody[i]
+    if (inStr) {
+      buf += ch
+      if (ch === "'") {
+        if (valuesBody[i + 1] === "'") {
+          buf += "'"
+          i++ // consume the escaped second quote
+        } else {
+          inStr = false
+        }
+      }
+      continue
+    }
+    // Line comment: `-- …` to end of line (outside strings).
+    if (ch === '-' && valuesBody[i + 1] === '-') {
+      while (i < n && valuesBody[i] !== '\n') i++
+      continue
+    }
+    // Block comment: `/* … */` (outside strings).
+    if (ch === '/' && valuesBody[i + 1] === '*') {
+      i += 2
+      while (i < n && !(valuesBody[i] === '*' && valuesBody[i + 1] === '/')) i++
+      i += 1 // land on the closing '/'; the for-loop's i++ steps past it
+      continue
+    }
+    if (ch === "'") {
+      inStr = true
+      buf += ch
+      continue
+    }
+    if (!inTuple) {
+      // Between tuples: ignore commas/whitespace until the next '('.
+      if (ch === '(') {
+        inTuple = true
+        depth = 0
+        cur = []
+        buf = ''
+      }
+      continue
+    }
+    if (ch === '(') {
+      depth++
+      buf += ch
+      continue
+    }
+    if (ch === ')') {
+      if (depth === 0) {
+        cur.push(buf.trim())
+        tuples.push(cur)
+        inTuple = false
+        buf = ''
+        continue
+      }
+      depth--
+      buf += ch
+      continue
+    }
+    if (ch === ',' && depth === 0) {
+      cur.push(buf.trim())
+      buf = ''
+      continue
+    }
+    buf += ch
+  }
+  return tuples
+}
+
+/**
+ * If a column expression is a single-quoted string literal (optionally with a
+ * `::cast`), return its value with `''` unescaped to `'`. Otherwise null — i.e.
+ * an unquoted value (NULL, a number, true/false, or a call like
+ * gen_random_uuid()). Codenames are always quoted text, so null = "not a
+ * codename literal".
+ */
+function quotedValue(colExpr) {
+  const m = colExpr.match(/^'((?:[^']|'')*)'(?:\s*::\s*"?[A-Za-z0-9_ ]+"?(?:\[\])?)?$/)
+  if (!m) return null
+  return m[1].replace(/''/g, "'")
+}
+
+/**
+ * Extract operator codenames from raw seed SQL. Finds every
+ * `INSERT INTO operators (cols…) VALUES …` block, locates the codename COLUMN by
+ * name, then reads that column's value from each tuple BY ITS REAL POSITION
+ * (robust to unquoted leading columns + escaped apostrophes). The non-operators
+ * metric_snapshots block is ignored (the regex is anchored to `INTO operators`).
+ */
+function extractSeedCodenamesFromSql(src) {
   const codenames = new Set()
-
-  // Find all INSERT INTO operators (...) VALUES ...; blocks
-  // Use a non-greedy match up to the terminating ; or ON CONFLICT
-  const insertBlocks = [...src.matchAll(/INSERT\s+INTO\s+operators\s*\(([^)]+)\)\s*VALUES\s*([\s\S]*?)(?:ON\s+CONFLICT|;)/gis)]
-
+  const insertBlocks = [
+    ...src.matchAll(
+      /INSERT\s+INTO\s+operators\s*\(([^)]+)\)\s*VALUES\s*([\s\S]*?)(?:ON\s+CONFLICT|;)/gis,
+    ),
+  ]
   for (const block of insertBlocks) {
     const cols = block[1].split(',').map((c) => c.trim().toLowerCase())
     const codenameIdx = cols.indexOf('codename')
     if (codenameIdx < 0) continue
-
-    const valuesBlock = block[2]
-    // Extract each tuple: (...), (...), or a single (...)
-    // Handle multi-line tuples (the single-row insert spans multiple lines)
-    const tuples = [...valuesBlock.matchAll(/\(([^)]*?(?:\([^)]*\)[^)]*?)*?)\)/gs)]
-    for (const tuple of tuples) {
-      // Extract quoted strings, skipping SQL casts (::bigint, ::uuid) and comments
-      const strings = [...tuple[1].matchAll(/'([^']+)'/g)].map((m) => m[1])
-      if (strings[codenameIdx]) {
-        codenames.add(strings[codenameIdx].trim())
-      }
+    for (const tupleCols of tokenizeValues(block[2])) {
+      const raw = tupleCols[codenameIdx]
+      const value = raw == null ? null : quotedValue(raw)
+      if (value) codenames.add(value.trim())
     }
   }
-
   return codenames
+}
+
+/**
+ * Extract operator codenames from supabase/seed.sql (reads the file, then
+ * delegates to extractSeedCodenamesFromSql).
+ */
+function extractSeedCodenames(filePath) {
+  return extractSeedCodenamesFromSql(readFileSync(filePath, 'utf8'))
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────
@@ -113,5 +218,40 @@ test('mock.ts and seed.sql define the same operator codename set (excluding know
   console.log(
     `✓ mock/seed sync: ${mockCodenames.size} operators match between mock.ts and seed.sql` +
       ` (${knownMockOnly.size} known mock-only operators excluded)`,
+  )
+})
+
+test('seed parser reads codenames by real column position (unquoted leading cols + escaped apostrophes)', () => {
+  // Synthetic seed exercising exactly the cases the old "index the quoted-strings
+  // array" approach got wrong:
+  //   - an unquoted leading column (gen_random_uuid()) before codename,
+  //   - a `--` comment containing parens,
+  //   - an apostrophe escaped as '' inside a codename,
+  //   - a comma inside a quoted string (display_name).
+  // The old parser returned 'Brien' for row 1 (split 'O''Brien' into 'O' + 'Brien'
+  // and mis-indexed). This asserts the column-position parser returns real values.
+  const synthetic = `
+INSERT INTO operators (
+  operator_id, codename, display_name, account_age_days, claimed, claim_contact
+) VALUES (
+  gen_random_uuid(),  -- unquoted leading column (op-test-0001 parity)
+  'O''Brien',
+  'Pat, the Tester',
+  42,
+  true,
+  NULL
+)
+ON CONFLICT (codename) DO NOTHING;
+
+INSERT INTO operators (codename, display_name, claimed) VALUES
+  ('Clean·Name', NULL, false),
+  ('Has''Quote', 'x', true)
+ON CONFLICT (codename) DO NOTHING;
+`
+  const got = [...extractSeedCodenamesFromSql(synthetic)].sort()
+  assert.deepEqual(
+    got,
+    ["O'Brien", 'Clean·Name', "Has'Quote"].sort(),
+    'codenames must be read from the real codename column and SQL-unescaped',
   )
 })
