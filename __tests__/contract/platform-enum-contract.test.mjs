@@ -39,6 +39,15 @@ function extractWebEnum(filePath) {
     .split(',')
     .map((s) => s.trim().replace(/['"`]/g, ''))
     .filter(Boolean)
+  // Silent-empty guard (mirrors window-enum-contract): a format change that makes
+  // the outer regex match but yields zero entries must fail loudly, not pass on an
+  // empty-set match. Platform enums are never legitimately empty.
+  if (items.length === 0) {
+    throw new Error(
+      `Extracted zero platform values from ${filePath} — the source format may ` +
+        `have changed (block matched, but no entries). Update the extractor.`,
+    )
+  }
   return new Set(items)
 }
 
@@ -54,6 +63,15 @@ function extractMcpEnum(filePath) {
     .split(',')
     .map((s) => s.trim().replace(/['"`]/g, ''))
     .filter(Boolean)
+  // Silent-empty guard (mirrors window-enum-contract): a format change that makes
+  // the outer regex match but yields zero entries must fail loudly, not pass on an
+  // empty-set match. Platform enums are never legitimately empty.
+  if (items.length === 0) {
+    throw new Error(
+      `Extracted zero platform values from ${filePath} — the source format may ` +
+        `have changed (block matched, but no entries). Update the extractor.`,
+    )
+  }
   return new Set(items)
 }
 
