@@ -8,51 +8,80 @@ Most platforms reward volume. SigRank rewards structure.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
+[![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold&label=sigrank)](https://www.npmjs.com/package/sigrank)
 [![deploy](https://img.shields.io/badge/deploy-Vercel-black.svg?style=flat-square)](https://vercel.com)
-[![Node](https://img.shields.io/badge/Node-22.x-339933.svg?style=flat-square)](https://nodejs.org)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg?style=flat-square)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg?style=flat-square)](https://www.typescriptlang.org)
-[![Tests](https://img.shields.io/badge/tests-node%20--test-brightgreen.svg?style=flat-square)](https://nodejs.org/api/test.html)
 [![Supabase](https://img.shields.io/badge/db-Supabase-green.svg?style=flat-square)](https://supabase.com)
 [![Stripe](https://img.shields.io/badge/billing-Stripe-purple.svg?style=flat-square)](https://stripe.com)
-[![Issues](https://img.shields.io/github/issues/SunrisesIllNeverSee/sigrank-app?style=flat-square)](https://github.com/SunrisesIllNeverSee/sigrank-app/issues)
-[![Last commit](https://img.shields.io/github/last-commit/SunrisesIllNeverSee/sigrank-app?style=flat-square)](https://github.com/SunrisesIllNeverSee/sigrank-app/commits/main)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
 
 </div>
 
+| The leaderboard | Your operator profile |
+|:---:|:---:|
+| [![SigRank leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all) | [![SigRank operator profile](./.github/assets/profile.png)](https://signalaf.com) |
+| Every operator ranked by **Υ Yield** — the architecture of the cascade, not raw spend | Cascade layer, class, and fingerprint — all from four token counts |
+
 ---
 
-SigRank scores AI operators by token cascade efficiency: how much reusable signal
-they create from each unit of input. The core rank metric is:
+## What is SigRank?
+
+SigRank scores AI operators by **token cascade efficiency**: how much reusable signal
+they create from each unit of input — not how many tokens they burn. The rank metric:
 
 ```txt
-Υ = (cache_read * output) / input^2
+Υ = (cache_read × output) / input²
 ```
 
-The product is anonymous by default, claimable by operators, and built around a
-simple question: is this session compounding signal, or just burning tokens?
+The board is anonymous by default, claimable by operators, and built around one
+question: **is this session compounding signal, or just burning tokens?** Volume is
+noise; yield is signal.
 
-## What This Repo Contains
+This repo is the **Next.js app behind [signalaf.com](https://signalaf.com)** — the
+public board, operator profiles, the wiki, account + billing, and the scoring/ingest
+engine. You don't clone this to *use* SigRank (see below) — you clone it to work on it.
 
-- **Next.js app** for the public board, operator profiles, wiki, account pages,
-  billing flows, and ingest routes.
-- **Scoring and ingest logic** for canonical token pillars, cascade metrics,
-  classes, audit records, and public leaderboard shapes.
-- **Supabase schema** with migrations, RLS policies, seed data, and snapshot
-  support for live and offline operation.
-- **Stripe integration** for Pro billing, support checkout, and operator claims.
+## Get ranked (you don't need this repo)
 
-## Repository Status
+SigRank runs from your terminal. The agent reads your local AI session logs on-device,
+derives your cascade, and publishes to the board — **token-only, no transcript content.**
 
-| Area | Status |
-| --- | --- |
-| Public app | Live at [signalaf.com](https://signalaf.com) |
-| CI | TypeScript, canonical ingest test, and production build |
-| Data | Supabase-first reads with snapshot and mock fallback |
-| Billing | Stripe-ready routes with explicit unconfigured states |
-| Secrets | Kept out of git; production values belong in Vercel env |
+```bash
+npm install -g sigrank     # bundles ccusage + tokscale + tokendash — no separate installs
+sigrank enroll             # sign in: paste a connect code from signalaf.com → Settings
+sigrank submit             # publish your verified runs to the board
+```
+
+Or explore first, no sign-in:
+
+```bash
+sigrank                    # full tabbed TUI: dashboard · compare · board · watch
+npx sigrank board --once   # print the live leaderboard once
+```
+
+Full CLI + MCP docs: **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** ·
+package: **[sigrank on npm](https://www.npmjs.com/package/sigrank)** · agent:
+**[sigrank-agent on PyPI](https://pypi.org/project/sigrank-agent/)**.
+
+## How it works
+
+- **Four raw token pillars** — `input`, `output`, `cache_creation`, `cache_read` — are the
+  only inputs. No message content, ever.
+- The **cascade engine** derives Υ Yield, Leverage, Velocity, 10xDEV, SNR, and efficiency
+  from those four numbers. The server re-scores every submission authoritatively.
+- Operators are placed in **signal classes** (Transmitter, Architect, …) by their cascade
+  shape, and ranked globally by Υ.
+- **SIGNA RATE** is the class credential; **Υ Yield** is the rank metric.
+
+Deep dive: the in-app **[wiki](https://signalaf.com/wiki)**.
+
+---
+
+# For developers
+
+The rest of this README is for working on the app itself.
 
 ## Stack
 
@@ -64,35 +93,21 @@ simple question: is this session compounding signal, or just burning tokens?
 
 ## Quick Start
 
-Install dependencies:
-
 ```bash
 npm install
+cp .env.example .env.local      # all values optional — see Environment below
+npm run dev                     # http://localhost:3000
 ```
 
-Create a local environment file:
+The app is designed to run **without** Supabase or Stripe credentials. When env vars are
+missing, reads fall back to the cold-store snapshot and then deterministic mock data,
+while billing routes return configuration errors instead of crashing — so it stays
+buildable, previewable, and testable out of the box.
 
-```bash
-cp .env.example .env.local
-```
-
-Start the dev server from the project directory:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-The app is designed to run without Supabase or Stripe credentials. When env vars
-are missing, reads fall back to the cold-store snapshot and then deterministic
-mock data, while billing routes return configuration errors instead of crashing.
-
-> If vendor chunks act strange, run the dev server directly from this directory:
+> Requires **Node 22.x** (see `engines` in `package.json`). On a newer Node, `next dev`
+> may fail to start — use the version manager of your choice to pin 22.
 >
-> ```bash
-> node_modules/.bin/next dev --port 3000
-> ```
+> If vendor chunks act strange, run the dev server directly: `node_modules/.bin/next dev --port 3000`
 
 ## Scripts
 
@@ -106,12 +121,12 @@ mock data, while billing routes return configuration errors instead of crashing.
 | `npm run test:canonical` | Run the canonical ingest parity test |
 | `npm run snapshot` | Refresh the database snapshot |
 
-Before committing, run:
+Before committing, run the gates CI enforces:
 
 ```bash
-npx tsc --noEmit
-npm run build
-npm run test:canonical
+npx tsc --noEmit            # 0 errors (typescript is a devDependency)
+npm run build               # production build green
+npm run test:canonical      # canonical ingest parity — MO§ES Υ 18436.98
 ```
 
 ## Project Map
@@ -121,8 +136,8 @@ npm run test:canonical
 | `app/` | App Router pages and API routes |
 | `app/api/v1/` | Public API, ingest, claim, devices, billing, metrics |
 | `components/` | UI components by product area |
-| `components/sigrank/tokens.ts` | Source of truth for SigRank colors and typography |
-| `lib/data/` | Single read facade: Supabase, snapshot, then mock fallback |
+| `components/sigrank/` | Board, profile, and shared SigRank UI (incl. `PlatformIcon`) |
+| `lib/data/` | Single read facade: Supabase → snapshot → mock fallback |
 | `lib/ingest/` | Canonical payload parsing and cascade metric materialization |
 | `lib/scoring/` | Core scoring engine and server-only ruleset boundary |
 | `lib/supabase/` | Browser, server, service-role, and auth helpers |
@@ -132,70 +147,61 @@ npm run test:canonical
 
 ## Data Model
 
-All app code should read operator data through `@/lib/data`.
-
-That facade chooses the safest available source:
+All app code reads operator data through `@/lib/data`. The facade chooses the safest
+available source, in order:
 
 1. **Supabase live reads** when credentials are configured.
-2. **Cold-store snapshot** from `lib/data/snapshot.json` if live reads are
-   unavailable or fail.
-3. **Mock fixtures** from `lib/data/mock.ts` as the last resort.
-
-This keeps the app buildable, previewable, and testable even when external
-services are not configured.
+2. **Cold-store snapshot** (`lib/data/snapshot.json`) if live reads are unavailable or fail.
+3. **Mock fixtures** (`lib/data/mock.ts`) as the last resort.
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and fill values as needed.
+Copy `.env.example` to `.env.local` and fill values as needed. All are optional locally
+(the app degrades gracefully); production values live in **Vercel environment variables**.
 
 | Variable group | Notes |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Required for live Supabase reads and service-role writes |
-| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Required for billing and webhook flows |
-| `STRIPE_PRICE_*` | Required per paid tier or claim checkout path |
-| `NEXT_PUBLIC_SITE_URL` | Used for Stripe redirects and public URLs |
-| `SIGRANK_RULESET` | Server-only proprietary RS.xx scoring overrides |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Live Supabase reads + service-role writes |
+| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Billing and webhook flows |
+| `STRIPE_PRICE_*` | Per paid tier / claim checkout path |
+| `NEXT_PUBLIC_SITE_URL` | Stripe redirects and public URLs |
+| `SIGRANK_RULESET` | **Server-only** proprietary RS.xx scoring overrides |
 | `SIGRANK_API_KEY` | Optional trusted bulk-read key for public API consumers |
 | `NEXT_PUBLIC_GATE_*` | Optional feature gates for unfinished surfaces |
 
-Never commit real secrets or proprietary ruleset values. Put production values in
-Vercel environment variables.
+**Never commit real secrets or proprietary ruleset values.**
 
 ## Supabase
 
-Schema, migrations, RLS policies, and seed data live in
-[`supabase/`](./supabase/). See [`supabase/README.md`](./supabase/README.md) for
-setup if you are running your own instance against a dedicated Supabase project.
-
-RS.xx scoring weights are server-only and are not included here.
+Schema, migrations, RLS policies, and seed data live in [`supabase/`](./supabase/). See
+[`supabase/README.md`](./supabase/README.md) to run your own instance. RS.xx scoring
+weights are server-only and are not included here.
 
 ## Scoring Invariants
 
-These are product contracts, not implementation details:
+Product contracts, not implementation details:
 
-- `Υ = (cache_read * output) / input^2`
-- `T * C * R = Cr / I = Leverage`
-- `10xDEV = log10(Leverage)`
-- SIGNA RATE is the class credential.
-- Υ Yield is the rank metric.
+- `Υ = (cache_read × output) / input²`
+- `T × C × R = Cr / I = Leverage`
+- `10xDEV = log₁₀(Leverage)`
+- **SIGNA RATE** is the class credential; **Υ Yield** is the rank metric.
 - RS.xx weights are server-only and must not be exposed to client components.
 
 ## Development Notes
 
-- Keep changes small and aligned with the existing file ownership.
-- Pages are React Server Components by default; add `'use client'` only when a
-  component needs hooks, event handlers, or browser APIs.
+- Keep changes small and aligned with existing file ownership.
+- Pages are React Server Components by default; add `'use client'` only when a component
+  needs hooks, event handlers, or browser APIs.
 - Keep `components/sigrank/tokens.ts` and Tailwind theme values in sync.
-- Use `<Placeholder />` for placeholder metrics and `<CanonId />` for canonical
-  real values.
+- Use `<Placeholder />` for placeholder metrics and `<CanonId />` for canonical real values.
 - Do not import server-only scoring configuration into client code.
 - Avoid random values and wall-clock reads at module scope.
 
 ## Related
 
-- [signalaf.com](https://signalaf.com) - live SigRank board
-- [sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp) - local
-  scanner, TUI dashboard, and MCP tooling
+- **[signalaf.com](https://signalaf.com)** — the live board
+- **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npm i -g sigrank`)
+- **[sigrank-agent](https://pypi.org/project/sigrank-agent/)** — the Python agent
 
 ## Community
 
@@ -205,4 +211,4 @@ These are product contracts, not implementation details:
 
 ## License
 
-MIT - see [`LICENSE`](./LICENSE).
+MIT — see [`LICENSE`](./LICENSE).
