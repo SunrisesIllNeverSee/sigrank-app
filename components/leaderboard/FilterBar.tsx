@@ -8,9 +8,9 @@
  * are URL-state driven: the RSC page reads `searchParams`, resolves the current
  * values, and passes them in; each control pushes its own query param on change.
  *
- * Sort keys (SORT_METRICS): SIGNA RATE / Compression / Prompt Complexity /
- * Cross-Thread / Session Depth / Token Throughput / Message Volume / Signal
- * Force. The default sort key (SORT_DEFAULT = 'signa_rate') drops the param.
+ * Sort keys (SORT_METRICS): Yield / SIGNA RATE / Compression / Prompt Complexity /
+ * Cross-Thread / Session Depth / Message Volume / Signal Force.
+ * The default sort key (SORT_DEFAULT = 'yield_') drops the param.
  */
 
 import { useCallback } from 'react'
