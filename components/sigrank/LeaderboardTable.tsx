@@ -23,6 +23,7 @@ import type { LeaderboardEntry } from './types'
 import { glyphFor } from '@/lib/canon/ids'
 import { PLATFORM_UI, PLATFORM_DOMAIN_MAP, CLASS_FILTER, type PlatformUI } from '@/lib/constants'
 import { OperatorAvatar } from './OperatorAvatar'
+import { PlatformIcon } from './PlatformIcon'
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
 // SPECIES colors stay literal (semantic identity for the class glyph, theme-invariant).
@@ -67,22 +68,35 @@ function platformLabel(e: LeaderboardEntry): string {
 // on boards that don't populate the set (per-platform / "off" — the PLATFORM column is
 // the source there). `platforms` is attached structurally by to-entry on this path.
 type EntryWithPlatforms = LeaderboardEntry & { platforms?: string[] }
-function platformBadge(e: LeaderboardEntry): string {
+
+// PLATFORM column (2026-06-28): the REAL platforms an operator submitted, as a deduped
+// lowercased list with 'multi' DROPPED — "multi" is a roll-up flag, not a 4th platform,
+// so listing it next to the real ones (claude·codex·multi) was wasted space. Falls back
+// to the single per-row platform on per-platform / "off" boards. Sorted stably.
+function platformsOf(e: LeaderboardEntry): string[] {
   const set = (e as EntryWithPlatforms).platforms
-  if (!set || set.length === 0) return ''
-  // Order: real platforms first, 'multi' last (it's the roll-up). Lowercased, deduped.
-  const ordered = [...new Set(set.map((p) => p.toLowerCase()))].sort((a, b) =>
-    a === 'multi' ? 1 : b === 'multi' ? -1 : a.localeCompare(b),
-  )
-  if (ordered.length === 1) return PLATFORM_LABEL[ordered[0]] ?? ordered[0]
-  return ordered.join('·')
+  const raw = set && set.length > 0 ? set : [e.platform ?? '']
+  const real = [...new Set(raw.map((p) => p.toLowerCase()))].filter((p) => p && p !== 'multi')
+  return real.sort((a, b) => a.localeCompare(b))
 }
 
-// The PLATFORM cell value: the operator's multi-platform badge ("claude·codex·multi")
-// when the row carries a platform SET (operator-total board), else the single chosen
-// platform's label (per-platform / "off" boards, and single-platform operators).
-function platformDisplay(e: LeaderboardEntry): string {
-  return platformBadge(e) || platformLabel(e)
+// Render: primary platform's logo + a small "+N" when the operator spans more (logo +N
+// badge, owner 2026-06-28). One platform → just its logo. None → an em dash.
+function PlatformCell({ e }: { e: LeaderboardEntry }) {
+  const list = platformsOf(e)
+  if (list.length === 0) return <span style={{ color: T.mut }}>—</span>
+  const [primary, ...rest] = list
+  const full = list.map((p) => PLATFORM_LABEL[p] ?? p).join(' · ')
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }} title={full}>
+      <PlatformIcon platform={primary} size={16} title={PLATFORM_LABEL[primary] ?? primary} />
+      {rest.length > 0 ? (
+        <span style={{ fontSize: 10, fontWeight: 700, color: T.mut, letterSpacing: '.02em' }}>
+          +{rest.length}
+        </span>
+      ) : null}
+    </span>
+  )
 }
 
 // WINDOW chip (FIX F): on the "off" board the same operator shows once per
@@ -115,17 +129,19 @@ const f2 = (n: number | null | undefined): string => (n == null ? '—' : n.toFi
 const fmtMoney = (n: number | null | undefined): string =>
   n == null ? '—' : n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(1)}K` : `$${n.toFixed(2)}`
 
-// LAST cell (2026-06-28): render the operator's snapshot_date as a real, short date
-// like BlitzStars (was the literal string "active" for every row). e.lastSeen is now
-// the snapshot's 'YYYY-MM-DD' (or null). Returns { short, full }: a compact
-// "May 14" / "Jun 28" for the cell + an ISO full date for the title tooltip. Parsed as
-// UTC-noon to avoid the date sliding a day across the viewer's timezone.
+// LAST cell (2026-06-28): render the operator's snapshot_date as mm/dd/yy (owner) —
+// was the literal string "active" for every row. e.lastSeen is the snapshot's
+// 'YYYY-MM-DD' (or null). Returns { short, full }: "05/14/26" for the cell + a long
+// date for the hover tooltip. Sliced from the ISO parts directly (no Date/timezone
+// math) so the displayed day never drifts across the viewer's locale.
 function fmtLast(iso: string | null | undefined): { short: string; full: string } {
-  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return { short: '—', full: '' }
-  const d = new Date(`${iso}T12:00:00Z`)
-  if (isNaN(d.getTime())) return { short: '—', full: '' }
-  const short = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' })
-  const full = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? '')
+  if (!m) return { short: '—', full: '' }
+  const [, yyyy, mm, dd] = m
+  const short = `${mm}/${dd}/${yyyy.slice(2)}`
+  const full = new Date(`${iso}T12:00:00Z`).toLocaleDateString(undefined, {
+    year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+  })
   return { short, full }
 }
 
@@ -441,7 +457,7 @@ export function LeaderboardTable({
                   </span>
                   <span style={{ textAlign: 'right', flexShrink: 0 }}>
                     <span style={{ display: 'block', color: T.ink, fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{view === 'raw' ? `∑ ${fmtBig(rawTotal(e))}` : `Υ ${yld}`}</span>
-                    <span style={{ display: 'inline-block', marginTop: 2, padding: '1px 6px', borderRadius: 4, background: 'rgb(var(--bg-elevated))', border: `1px solid ${T.line}`, color: T.mut, fontSize: 9, fontWeight: 700, letterSpacing: '0.04em' }}>{platformDisplay(e)}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 2, padding: '2px 6px', borderRadius: 4, background: 'rgb(var(--bg-elevated))', border: `1px solid ${T.line}`, color: T.mut }}><PlatformCell e={e} /></span>
                   </span>
                 </Link>
               </li>
@@ -507,7 +523,7 @@ export function LeaderboardTable({
                     <td style={{ ...st.td, ...st.tdR, ...st.gdiv, fontSize: 11, color: T.mut }}>{e.opRatio ?? '—'}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.efficiency, e.efficiency) }}>{f2(e.efficiency)}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.costPerMillion, e.costPerMillion) }}>{e.costPerMillion == null ? '—' : `$${e.costPerMillion.toFixed(2)}`}</td>
-                    <td style={{ ...st.td, ...st.tdL, ...st.gdiv, color: T.ink }} title={platformBadge(e) ? `Platforms: ${platformBadge(e)}` : undefined}>{platformDisplay(e)}</td>
+                    <td style={{ ...st.td, ...st.tdL, ...st.gdiv, color: T.ink }}><PlatformCell e={e} /></td>
                     <td style={{ ...st.td, ...st.tdR, color: T.mut }} title={fmtLast(e.lastSeen).full || undefined}>{fmtLast(e.lastSeen).short}</td>
                   </tr>
                 )
