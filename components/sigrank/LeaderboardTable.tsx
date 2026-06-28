@@ -115,6 +115,20 @@ const f2 = (n: number | null | undefined): string => (n == null ? '—' : n.toFi
 const fmtMoney = (n: number | null | undefined): string =>
   n == null ? '—' : n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(1)}K` : `$${n.toFixed(2)}`
 
+// LAST cell (2026-06-28): render the operator's snapshot_date as a real, short date
+// like BlitzStars (was the literal string "active" for every row). e.lastSeen is now
+// the snapshot's 'YYYY-MM-DD' (or null). Returns { short, full }: a compact
+// "May 14" / "Jun 28" for the cell + an ISO full date for the title tooltip. Parsed as
+// UTC-noon to avoid the date sliding a day across the viewer's timezone.
+function fmtLast(iso: string | null | undefined): { short: string; full: string } {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return { short: '—', full: '' }
+  const d = new Date(`${iso}T12:00:00Z`)
+  if (isNaN(d.getTime())) return { short: '—', full: '' }
+  const short = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' })
+  const full = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
+  return { short, full }
+}
+
 // Top-3 rank accent (# column + shadow-box tint). Gold / blue / indigo.
 const RANK_COLOR: Record<number, string> = { 1: '#f5a623', 2: '#60a5fa', 3: '#818cf8' }
 const rankColor = (rank: number): string => RANK_COLOR[rank] ?? T.mut
@@ -447,8 +461,8 @@ export function LeaderboardTable({
                 <th colSpan={2} style={{ ...st.grp, ...st.gdiv }}>ACTIVITY</th>
               </tr>
               <tr>
-                <th style={{ ...st.col, ...st.colR, width: 30 }}>#</th>
-                <th style={{ ...st.col, ...st.colL }}>OPERATOR</th>
+                <th style={{ ...st.col, ...st.colR, ...st.stickyRankHead, width: 30 }}>#</th>
+                <th style={{ ...st.col, ...st.colL, ...st.stickyOpHead }}>OPERATOR</th>
                 <th onClick={() => onSortColumn('totalTokens')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('totalTokens') ? st.colActive : null) }} title="Sort by Total"><span style={st.ic}>∑</span>TOTAL{caret('totalTokens')}</th>
                 <th onClick={() => onSortColumn('yield')} style={{ ...st.col, ...st.colR, ...st.gdiv, ...st.colSort, ...(isActive('yield') ? st.colActive : null) }} title="Sort by Υ Yield"><span style={st.ic}>Υ</span>YIELD{caret('yield')}</th>
                 <th onClick={() => onSortColumn('snr')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('snr') ? st.colActive : null) }} title="Sort by SNR"><span style={st.ic}>▲</span>SNR{caret('snr')}</th>
@@ -468,8 +482,8 @@ export function LeaderboardTable({
                 const sp = speciesOf(e.signalClass)
                 return (
                   <tr key={`${e.anonId}-${i}`}>
-                    <td style={{ ...st.td, ...st.tdR, color: rankColor(e.rank), fontWeight: rankWeight(e.rank) }}>{e.rank}</td>
-                    <td style={{ ...st.td, ...st.tdL }}>
+                    <td style={{ ...st.td, ...st.tdR, ...st.stickyRank, color: rankColor(e.rank), fontWeight: rankWeight(e.rank) }}>{e.rank}</td>
+                    <td style={{ ...st.td, ...st.tdL, ...st.stickyOp }}>
                       <span style={st.op}>
                         <OperatorAvatar alt={e.anonId} />
                         <Link href={`/user/${encodeURIComponent(e.codename)}`} style={st.opLink}>
@@ -494,7 +508,7 @@ export function LeaderboardTable({
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.efficiency, e.efficiency) }}>{f2(e.efficiency)}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.costPerMillion, e.costPerMillion) }}>{e.costPerMillion == null ? '—' : `$${e.costPerMillion.toFixed(2)}`}</td>
                     <td style={{ ...st.td, ...st.tdL, ...st.gdiv, color: T.ink }} title={platformBadge(e) ? `Platforms: ${platformBadge(e)}` : undefined}>{platformDisplay(e)}</td>
-                    <td style={{ ...st.td, ...st.tdR, color: T.mut }}>{e.lastSeen}</td>
+                    <td style={{ ...st.td, ...st.tdR, color: T.mut }} title={fmtLast(e.lastSeen).full || undefined}>{fmtLast(e.lastSeen).short}</td>
                   </tr>
                 )
               })}
@@ -509,8 +523,8 @@ export function LeaderboardTable({
                 <th colSpan={1} style={{ ...st.grp, ...st.gdiv }}>COST</th>
               </tr>
               <tr>
-                <th style={{ ...st.col, ...st.colR, width: 30 }}>#</th>
-                <th style={{ ...st.col, ...st.colL }}>OPERATOR</th>
+                <th style={{ ...st.col, ...st.colR, ...st.stickyRankHead, width: 30 }}>#</th>
+                <th style={{ ...st.col, ...st.colL, ...st.stickyOpHead }}>OPERATOR</th>
                 <th onClick={() => onSortColumn('input')} style={{ ...st.col, ...st.colR, ...st.gdiv, ...st.colSort, ...(isActive('input') ? st.colActive : null) }} title="Sort by Input"><span style={st.ic}>→</span>INPUT{caret('input')}</th>
                 <th onClick={() => onSortColumn('output')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('output') ? st.colActive : null) }} title="Sort by Output"><span style={st.ic}>←</span>OUTPUT{caret('output')}</th>
                 <th onClick={() => onSortColumn('cacheWrite')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('cacheWrite') ? st.colActive : null) }} title="Sort by Cache-write"><span style={st.ic}>✎</span>CACHE-WRITE{caret('cacheWrite')}</th>
@@ -524,8 +538,8 @@ export function LeaderboardTable({
                 const sp = speciesOf(e.signalClass)
                 return (
                   <tr key={`raw-${e.anonId}-${i}`}>
-                    <td style={{ ...st.td, ...st.tdR, color: rankColor(e.rank), fontWeight: rankWeight(e.rank) }}>{e.rank}</td>
-                    <td style={{ ...st.td, ...st.tdL }}>
+                    <td style={{ ...st.td, ...st.tdR, ...st.stickyRank, color: rankColor(e.rank), fontWeight: rankWeight(e.rank) }}>{e.rank}</td>
+                    <td style={{ ...st.td, ...st.tdL, ...st.stickyOp }}>
                       <span style={st.op}>
                         <OperatorAvatar alt={e.anonId} />
                         <Link href={`/user/${encodeURIComponent(e.codename)}`} style={st.opLink}>
@@ -591,7 +605,12 @@ export function LeaderboardTable({
 }
 
 const st: Record<string, React.CSSProperties> = {
-  wrap: { maxWidth: 1180, margin: '0 auto' },
+  // FRAME FIX (2026-06-28): no own max-width — inherit the page's max-w-6xl <main>
+  // container so the board box shares EXACT edges with the WaveHero + LeaderboardKey
+  // (the old maxWidth:1180 + margin:auto floated it narrower-and-centered inside the
+  // 1152px shell → the staggered-box misalignment). Full width; the table scrolls
+  // horizontally inside (overflowX:auto) like BlitzStars.
+  wrap: { width: '100%' },
   field: { background: T.field, border: `1px solid ${T.line}`, padding: 20, fontFamily: 'Roboto, -apple-system, system-ui, sans-serif', color: T.ink, fontSize: 14, lineHeight: 1.45, WebkitFontSmoothing: 'antialiased' },
   headRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, marginBottom: 18, flexWrap: 'wrap' },
   pager: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 16, fontSize: 12 },
@@ -614,6 +633,17 @@ const st: Record<string, React.CSSProperties> = {
   colR: { textAlign: 'right' },
   ic: { opacity: 0.7, marginRight: 4 },
   gdiv: { borderLeft: `1px solid ${T.line}` },
+  // STICKY identity (2026-06-28): freeze # + OPERATOR on the left during horizontal
+  // scroll so you never lose track of whose row you're reading (better than BlitzStars,
+  // which scrolls everything). Each sticky cell needs a solid bg so scrolling content
+  // doesn't bleed through, plus a left offset. # is ~46px wide (30 + 2×8 padding), so
+  // OPERATOR pins at left:46. z-index keeps them above the scrolling body cells.
+  stickyRank: { position: 'sticky' as const, left: 0, zIndex: 2, background: T.field },
+  stickyOp: { position: 'sticky' as const, left: 46, zIndex: 2, background: T.field },
+  // Header variants sit higher (above body sticky cells when both scroll) + use the
+  // header's elevated bg so the frozen header corner reads as header, not body.
+  stickyRankHead: { position: 'sticky' as const, left: 0, zIndex: 3, background: 'rgb(var(--bg-surface))' },
+  stickyOpHead: { position: 'sticky' as const, left: 46, zIndex: 3, background: 'rgb(var(--bg-surface))' },
   td: { padding: '7px 10px', borderBottom: `1px solid ${T.rowLine}`, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' },
   tdL: { textAlign: 'left' },
   tdR: { textAlign: 'right' },

@@ -87,6 +87,12 @@ export interface ScoredSnapshot {
   /** Ruleset version that produced this snapshot. */
   ruleset_version: string
   /**
+   * Snapshot date ('YYYY-MM-DD') — the recency of this scored window. Surfaced as the
+   * board's LAST column (2026-06-28). Optional/null on rows without a date (the engine
+   * doesn't always stamp it; queries.ts + mock both populate it where available).
+   */
+  snapshot_date?: string | null
+  /**
    * Cascade diagnostics (Υ-layer) — null when telemetry lacks cache tokens
    * (non-Claude platforms or Codex alpha path). Always present for Claude operators.
    */
