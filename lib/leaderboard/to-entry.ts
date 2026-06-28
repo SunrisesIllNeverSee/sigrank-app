@@ -98,7 +98,11 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     messageVolume: operator.total_messages_lifetime,
     compositeScore: snapshot.signa_rate,
     acctAge: `${operator.account_age_days}d`,
-    lastSeen: 'active',
+    // LAST column (2026-06-28): the snapshot's date ('YYYY-MM-DD') — the recency of
+    // this scored window — so the board shows a real date like BlitzStars instead of
+    // the old literal "active". The table (fmtLast) formats it to "May 14" + a full
+    // date on hover. Null when the row carries no snapshot_date (legacy rows).
+    lastSeen: snapshot.snapshot_date ?? null,
     // LB-4 + FIX H: the PER-SUBMISSION platform (row.platform, from
     // metric_snapshots.platform) so a codex row reads "Codex" even when the
     // operator's primary_domain is claude. Falls back to primary_domain (legacy /

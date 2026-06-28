@@ -80,7 +80,9 @@ export interface LeaderboardEntry {
   threadsRecalled?: number
   compositeScore?: number
   acctAge: string
-  lastSeen: string
+  /** Snapshot date ('YYYY-MM-DD') of this scored window — the LAST column. Null when
+   *  the row has no snapshot_date (legacy rows); the table renders it as "—". */
+  lastSeen: string | null
 }
 
 export interface ProfileMetric {

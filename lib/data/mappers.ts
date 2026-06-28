@@ -246,6 +246,10 @@ export function mapSnapshot(s: DbMetricSnapshot): ScoredSnapshot {
     movement_24h: num(s.movement_24h),
     movement_7d: num(s.movement_7d),
     ruleset_version: s.ruleset_version ?? '1.0',
+    // LAST column (2026-06-28): carry the snapshot date through so the board can show
+    // a real date instead of the literal "active". DbMetricSnapshot.snapshot_date is
+    // always selected (queries.ts §SELECT); null-safe for the empty/pending row.
+    snapshot_date: s.snapshot_date || null,
     // Cascade is DERIVED on read from the 4 raw token pillars (migration 0005),
     // mirroring the mock path (mock.ts feeds the same computeCascadeMetrics).
     // Null ONLY when all four pillars are absent (legacy pre-0005 rows). A
