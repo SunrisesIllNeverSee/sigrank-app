@@ -12,14 +12,19 @@ import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 
 // ISR: the Three Degrees chart now auto-pulls the top operator's live all-time metrics
-// (lib/marketing/top-operator-column.ts). Revalidate daily so the page stays prerendered
-// (○ Static) + refreshes the gold column once a day, rather than going fully dynamic.
-export const revalidate = 86400
+// (lib/marketing/top-operator-column.ts). Revalidate hourly so the page stays prerendered
+// (○ Static) + refreshes the gold column + metadata/brand edits propagate within the hour
+// (was 86400 — a metadata change took up to 24h to show in-browser).
+export const revalidate = 3600
 
+// Home title carries the dual brand: SigRank (the product) · SignalAF (the domain identity),
+// near-equal parallel per owner. Sub-pages get just "· SigRank" via the root template
+// (SITE_NAME); the home title is the root segment so it's set in full here. Description is
+// the hero's voice (kept in sync with SITE_TAGLINE).
 export const metadata: Metadata = withOG({
-  title: 'SignalAF — AI Operator Leaderboard',
+  title: 'SigRank · SignalAF — AI Operator Leaderboard',
   description:
-    'Privacy-preserving leaderboard scoring AI operators on canonical token-telemetry metrics. Rank by Υ Yield, see the cascade, claim your operator.',
+    'The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned? Volume is noise; yield is signal.',
   path: '/',
 })
 
