@@ -15,7 +15,7 @@ import type { Metadata } from 'next'
 
 /** Canonical production origin (no trailing slash). */
 export const SITE_ORIGIN = 'https://signalaf.com'
-export const SITE_NAME = 'SignalAF'
+export const SITE_NAME = 'SigRank'
 export const SITE_TAGLINE =
   'The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned? Volume is noise; yield is signal. Privacy-preserving, token-telemetry, cascade-ranked.'
 
