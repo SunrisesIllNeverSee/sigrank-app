@@ -24,6 +24,7 @@ import { tierForPrice } from '@/lib/stripe/server'
 import type { SubscriptionStatus, SubscriptionRecord } from '@/lib/stripe/tier'
 import { applyRewardsForOperator, recomputeSupporterTier } from '@/lib/stripe/rewards'
 import type { SupporterTier } from '@/lib/scoring/types'
+import { captureServer } from '@/lib/posthog/server'
 
 /** Result of a handler — surfaced in the webhook response for observability. */
 export interface HandlerResult {
@@ -198,6 +199,16 @@ export async function handleCheckoutCompleted(
     }
   }
 
+  // ── One-time donation ("Support the Build", pay-what-you-want) ────────────
+  if (session.mode === 'payment' && session.metadata?.kind === 'donation') {
+    await captureServer(operatorId ?? 'anon_supporter', 'donation_completed', {
+      amount_total: session.amount_total ?? undefined,
+      currency: session.currency ?? undefined,
+      has_operator: !!operatorId,
+    })
+    return ok(`donation completed operator=${operatorId ?? 'anon'} amount=${session.amount_total ?? '?'}`)
+  }
+
   // ── Subscription checkout: tier work happens on subscription.* events ─────
   if (session.mode === 'subscription') {
     return ok(
@@ -297,8 +308,24 @@ export async function dispatchEvent(
     case 'checkout.session.completed':
       return handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session)
     case 'customer.subscription.created':
-    case 'customer.subscription.updated':
-      return handleSubscriptionUpsert(event.data.object as Stripe.Subscription, nowMs)
+    case 'customer.subscription.updated': {
+      const sub = event.data.object as Stripe.Subscription
+      const res = await handleSubscriptionUpsert(sub, nowMs)
+      // subscription_activated — the trustworthy revenue event (server webhook, not the
+      // client). Fire once on creation so .updated events don't re-count it. Falls back
+      // to the Stripe customer id when operator_id isn't threaded into metadata.
+      if (event.type === 'customer.subscription.created') {
+        const subOperatorId = operatorIdFrom(sub.metadata)
+        const distinct =
+          subOperatorId ?? (typeof sub.customer === 'string' ? sub.customer : sub.customer?.id ?? '')
+        await captureServer(distinct, 'subscription_activated', {
+          tier: tierForSubscription(sub),
+          status: sub.status,
+          has_operator: !!subOperatorId,
+        })
+      }
+      return res
+    }
     case 'customer.subscription.deleted':
       return handleSubscriptionDeleted(event.data.object as Stripe.Subscription, nowMs)
     case 'invoice.payment_succeeded':
