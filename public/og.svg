@@ -1,24 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="Helvetica, Arial, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#15120c"/>
       <stop offset="100%" stop-color="#0a0805"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#c4923a"/>
-      <stop offset="100%" stop-color="#e8b955"/>
+    <linearGradient id="wm" x1="0" y1="0" x2="1" y2="0.4">
+      <stop offset="0%" stop-color="#e6a3c8"/>
+      <stop offset="22%" stop-color="#e8924a"/>
+      <stop offset="55%" stop-color="#e8b955"/>
+      <stop offset="100%" stop-color="#f0d28a"/>
     </linearGradient>
   </defs>
+
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <!-- § mark -->
-  <text x="80" y="200" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="700" fill="url(#gold)">§</text>
-  <!-- SigRank wordmark -->
-  <text x="80" y="340" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="#f5f0e8">SigRank</text>
-  <!-- Tagline -->
-  <text x="80" y="400" font-family="Helvetica, Arial, sans-serif" font-size="28" fill="#a89a7a">The AI operator leaderboard.</text>
-  <text x="80" y="440" font-family="Helvetica, Arial, sans-serif" font-size="28" fill="#a89a7a">Privacy-preserving. Token-telemetry. Cascade-ranked.</text>
-  <!-- Υ formula -->
-  <text x="80" y="540" font-family="Georgia, 'Times New Roman', serif" font-size="36" fill="#c4923a">Υ = (cache_read × output) / input²</text>
-  <!-- signalaf.com -->
-  <text x="80" y="600" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#6b6354">signalaf.com</text>
+
+  <!-- faint cascade streaks (echo the hero's animated lines) -->
+  <g opacity="0.22" stroke-width="3" fill="none">
+    <line x1="0" y1="180" x2="1200" y2="120" stroke="#c4923a"/>
+    <line x1="0" y1="470" x2="1200" y2="540" stroke="#2dd4a0"/>
+    <line x1="0" y1="540" x2="1200" y2="430" stroke="#c4923a"/>
+  </g>
+
+  <!-- eyebrow -->
+  <text x="600" y="150" text-anchor="middle" font-size="26" font-weight="700"
+        letter-spacing="9" fill="#2dd4a0">OPERATOR PERFORMANCE SIGNATURE</text>
+
+  <!-- pixel-block SIGRANK wordmark (chunky monospace caps in the gradient) -->
+  <text x="600" y="350" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="170" font-weight="700"
+        letter-spacing="6" fill="url(#wm)">SIGRANK</text>
+
+  <!-- divider + sub -->
+  <text x="600" y="420" text-anchor="middle" font-size="24" fill="#9e937c">— For all builders, burners and 10×ers —</text>
+
+  <!-- descriptive line (the hero's voice) -->
+  <text x="600" y="500" text-anchor="middle" font-size="30" font-weight="600" fill="#e9e3d5">The new standard in AI evaluation &amp; benchmarks.</text>
+  <text x="600" y="545" text-anchor="middle" font-size="26" fill="#c4baa5">Is your signal compounding, or are tokens burned?</text>
+
+  <!-- footer: formula + url -->
+  <text x="80" y="600" font-family="Georgia, 'Times New Roman', serif" font-size="24" fill="#c4923a">Υ = (cache_read × output) / input²</text>
+  <text x="1120" y="600" text-anchor="end" font-size="22" fill="#6b6354">signalaf.com</text>
 </svg>
