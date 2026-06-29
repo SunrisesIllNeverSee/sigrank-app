@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { TopicPage } from '@/components/wiki/TopicPage'
 import { Credits } from '@/components/marketing/SignalIntegrity'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumb, definedTerm } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'Measured Alongside',
@@ -11,6 +13,17 @@ export const metadata: Metadata = {
 export default function MeasuredAlongsidePage() {
   return (
     <TopicPage>
+      <JsonLd data={[
+        breadcrumb([
+          { name: 'Wiki', path: '/wiki' },
+          { name: 'Measured Alongside', path: '/wiki/measured-alongside' },
+        ]),
+        definedTerm(
+          'Measured Alongside',
+          'Credit to the token-usage tools SigRank reads alongside: ccusage, tokscale, and token-dashboard.',
+          '/wiki/measured-alongside',
+        ),
+      ]} />
       <Credits />
     </TopicPage>
   )

@@ -38,6 +38,8 @@ import CascadeRadar from '@/components/charts/CascadeRadar'
 import OperatingRatioBar from '@/components/charts/OperatingRatioBar'
 import EvolutionLine from '@/components/charts/EvolutionLine'
 import KpiTile from '@/components/charts/KpiTile'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { operatorProfile } from '@/lib/jsonld'
 import HeatBar from '@/components/charts/HeatBar'
 
 /**
@@ -403,6 +405,15 @@ export default async function OperatorProfilePage({
 
   return (
     <div className="flex flex-col gap-6">
+      <JsonLd
+        data={operatorProfile({
+          codename: resolveName(operator),
+          path: `/user/${rawCodename}`,
+          classTier: snapshot.class_tier,
+          globalRank: row.global_rank,
+          pending,
+        })}
+      />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <a
           href="/leaderboard"

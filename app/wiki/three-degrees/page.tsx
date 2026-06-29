@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { TopicPage } from '@/components/wiki/TopicPage'
 import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumb, definedTerm } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'The Three Degrees of Leverage',
@@ -15,6 +17,17 @@ export const revalidate = 86400
 export default function ThreeDegreesPage() {
   return (
     <TopicPage>
+      <JsonLd data={[
+        breadcrumb([
+          { name: 'Wiki', path: '/wiki' },
+          { name: 'Three Degrees of Leverage', path: '/wiki/three-degrees' },
+        ]),
+        definedTerm(
+          'Three Degrees of Leverage',
+          'The 10xDEV log anchor: average user → power-user median → top operator, read as a token cascade.',
+          '/wiki/three-degrees',
+        ),
+      ]} />
       <ThreeDegreesChart variant="full" />
     </TopicPage>
   )
