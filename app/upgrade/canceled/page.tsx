@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export const metadata = { title: 'Checkout canceled · SigRank' }
+export const metadata = { title: 'Checkout canceled' }
 
 /** Stripe Checkout cancel_url target (subscription + claim flows). */
 export default function UpgradeCanceledPage() {

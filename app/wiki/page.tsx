@@ -33,7 +33,7 @@ import { SignatureDrift, LocalAgentMcp, Credits } from '@/components/marketing/S
 import Link from 'next/link'
 
 export const metadata: Metadata = withOG({
-  title: 'Wiki · SigRank',
+  title: 'Wiki',
   description:
     'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™.',
   path: '/wiki',

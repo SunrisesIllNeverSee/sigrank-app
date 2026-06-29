@@ -12,7 +12,7 @@ import { LoginButtons } from '@/components/auth/LoginButtons'
  */
 
 export const metadata: Metadata = {
-  title: 'Sign in · SigRank',
+  title: 'Sign in',
   description: 'Sign in to claim your operator profile and back the build.',
 }
 
