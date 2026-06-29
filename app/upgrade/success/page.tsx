@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export const metadata = { title: 'Payment complete · SigRank' }
+export const metadata = { title: 'Payment complete' }
 
 /**
  * Stripe Checkout success_url target (subscription + claim flows).

@@ -17,7 +17,7 @@ import { SupportCheckout } from '@/components/billing/SupportCheckout'
  */
 
 export const metadata: Metadata = withOG({
-  title: 'Back the build · SigRank',
+  title: 'Back the build',
   description:
     'Support SigRank as an early backer. The leaderboard stays free; supporters fund the precision tier and lock in lifetime founding-supporter perks.',
   path: '/upgrade',

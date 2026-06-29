@@ -14,7 +14,7 @@ import { ProfileEditForm, type ProfileInitial } from '@/components/auth/ProfileE
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Edit profile · SigRank',
+  title: 'Edit profile',
   description: 'Set up your SigRank operator profile — display name, handle, links, and more.',
 }
 
