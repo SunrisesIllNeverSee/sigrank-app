@@ -435,6 +435,8 @@ export const MOCK_HOMEPAGE_STATS: HomepageStats = {
   transmitter_count: MOCK_LEADERBOARD.filter((r) => r.snapshot.class_tier === 'TRANSMITTER').length,
   top_operator_codename: 'TransVaultOrigin',
   top_signa_rate: 96.4,
+  active_last_hour: 0,
+  comparisons_ran: 0,
   isPlaceholder: true,
 }
 
