@@ -12,6 +12,8 @@ import { WaveHero } from '@/components/ui/WaveHero'
 import { HowItWorks } from '@/components/marketing/HowItWorks'
 import { ClassLadder } from '@/components/marketing/ClassLadder'
 import { IpBoundary } from '@/components/marketing/IpBoundary'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumb } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
   title: 'About',
@@ -38,6 +40,9 @@ const PILLARS: { h: string; b: string }[] = [
 export default function AboutPage() {
   return (
     <div className="flex flex-col gap-10">
+      <JsonLd data={breadcrumb([
+        { name: 'About', path: '/about' },
+      ])} />
       <WaveHero
         eyebrow="◈ About SigRank"
         title="The Operator, Not the Model"
