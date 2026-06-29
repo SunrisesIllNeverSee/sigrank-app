@@ -19,10 +19,12 @@ export const SITE_NAME = 'SigRank'
 export const SITE_TAGLINE =
   'Privacy-preserving leaderboard scoring AI operators on canonical token-telemetry metrics.'
 
-/** Static OG image (1200×630 brand card). SVG works on most platforms;
- *  for max compatibility, convert to /og.png (1200×630) when a PNG is available. */
+/** Static OG image (1200×630 brand card). MUST be a raster PNG/JPG — X, LinkedIn,
+ *  Facebook, iMessage, Slack, and Discord all reject SVG for link-preview cards, so
+ *  an SVG og:image renders blank everywhere. /og.png is generated from /og.svg
+ *  (rsvg-convert -w 1200 -h 630). Keep the .png as the og:image source of truth. */
 const OG_IMAGE = {
-  url: '/og.svg',
+  url: '/og.png',
   width: 1200,
   height: 630,
   alt: SITE_NAME,
