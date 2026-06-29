@@ -22,16 +22,24 @@
   </g>
 
   <!-- eyebrow -->
-  <text x="600" y="150" text-anchor="middle" font-size="26" font-weight="700"
+  <text x="600" y="120" text-anchor="middle" font-size="26" font-weight="700"
         letter-spacing="9" fill="#2dd4a0">OPERATOR PERFORMANCE SIGNATURE</text>
 
-  <!-- pixel-block SIGRANK wordmark (chunky monospace caps in the gradient) -->
-  <text x="600" y="350" text-anchor="middle"
-        font-family="'Courier New', monospace" font-size="170" font-weight="700"
-        letter-spacing="6" fill="url(#wm)">SIGRANK</text>
+  <!-- SIGRANK wordmark as terminal block-art (█ U+2588), the SAME 5-row figlet
+       glyphs the live hero's TerminalWordmark/TerminalBlockText render, in the
+       gold→pink gradient. Monospace + xml:space=preserve so the spaces that
+       form the letter gaps survive. 53 chars wide; centered. -->
+  <g font-family="'Courier New', Courier, monospace" font-size="32" font-weight="700"
+     letter-spacing="0" fill="url(#wm)" text-anchor="middle" xml:space="preserve">
+    <text x="600" y="218">███████ ██  ██████  ██████   █████  ███    ██ ██   ██</text>
+    <text x="600" y="252">██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██ </text>
+    <text x="600" y="286">███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████  </text>
+    <text x="600" y="320">     ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██ </text>
+    <text x="600" y="354">███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██</text>
+  </g>
 
   <!-- divider + sub -->
-  <text x="600" y="420" text-anchor="middle" font-size="24" fill="#9e937c">— For all builders, burners and 10×ers —</text>
+  <text x="600" y="424" text-anchor="middle" font-size="24" fill="#9e937c">— For all builders, burners and 10×ers —</text>
 
   <!-- descriptive line (the hero's voice) -->
   <text x="600" y="500" text-anchor="middle" font-size="30" font-weight="600" fill="#e9e3d5">The new standard in AI evaluation &amp; benchmarks.</text>
