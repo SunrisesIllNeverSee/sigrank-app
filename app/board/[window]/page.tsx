@@ -131,11 +131,11 @@ export default async function BoardWindowPage({
       {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
           same animated <WaveHero/> as the Hall, with board-specific copy. */}
       <WaveHero
-        eyebrow="The SigRank Leaderboard"
+        eyebrow="🏆 The SigRank Leaderboard"
         terminalText="LEADERBOARD"
         title={
           <>
-            Builders, Burners &amp;{' '}
+            Burners, Builders &amp;{' '}
             <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
               10×ers
             </span>
@@ -143,7 +143,7 @@ export default async function BoardWindowPage({
         }
         subtitle={
           <>
-            Every operator scored from four raw token counts and ranked by{' '}
+            Four integers in, full ledger out. Every operator ranked by{' '}
             <strong className="text-text-primary">Υ Yield</strong> — the architecture of the cascade,
             not raw spend. Volume is noise; yield is signal.
           </>

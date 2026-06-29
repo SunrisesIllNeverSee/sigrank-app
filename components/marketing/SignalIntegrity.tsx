@@ -299,7 +299,7 @@ npx sigrank
 # wire into Claude Code — .mcp.json
 {
   "mcpServers": {
-    "sigrank": { "command": "npx", "args": ["sigrank-mcp"] }
+    "sigrank": { "command": "npx", "args": ["sigrank"] }
   }
 }`}
         </pre>

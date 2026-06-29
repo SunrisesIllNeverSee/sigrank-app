@@ -157,7 +157,7 @@ function TransmitterClasses() {
       </div>
       <p className="max-w-2xl font-sans text-sm text-text-muted">
         Nine cascade classes from Transmitter down. The ranges shown are qualitative cuts — exact
-        breakpoints (RS.05) are still calibrating as the 730 windows fill, so class assignments may shift.
+        breakpoints are still calibrating as the leaderboard fills, so class assignments may shift.
       </p>
       <ClassLadder />
     </section>
@@ -353,11 +353,11 @@ export default function Draft1Page() {
     },
     {
       groupLabel: 'Agent & Profile',
-      source: 'sigrank-mcp',
+      source: 'sigrank',
       items: [
         {
           label: 'The local agent (MCP)',
-          hint: `Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank-mcp@${MCP_VERSION}.`,
+          hint: `Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank@${MCP_VERSION}.`,
           node: withPermalink('local-agent', <LocalAgentMcp />),
         },
       ],
