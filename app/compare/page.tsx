@@ -10,7 +10,9 @@
 import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 
+import { headers } from 'next/headers'
 import { getLeaderboard, getOperator, type LeaderboardRow } from '@/lib/data'
+import { bumpComparisonsRan } from '@/lib/data/queries'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { CompareMatchup } from '@/components/compare/CompareMatchup'
@@ -71,6 +73,16 @@ export default async function ComparePage({
   searchParams: Promise<{ a?: string; b?: string }>
 }) {
   const { a, b } = await searchParams
+
+  // Count a user-specified head-to-head as a "comparison ran" (the fogged homepage
+  // stat). Only when BOTH operands are chosen, and skip prefetch so hovering a
+  // compare link doesn't inflate it. Fire-and-forget + fully defensive.
+  if (a && b) {
+    const h = await headers()
+    const isPrefetch =
+      h.get('next-router-prefetch') === '1' || h.get('purpose') === 'prefetch'
+    if (!isPrefetch) await bumpComparisonsRan()
+  }
   // Full operator corpus for the opponent pickers (owner 2026-06-22: "do the static
   // seed all") — every seed operator, not just the top 12. board[] (yield-ranked) still
   // supplies the defaults.

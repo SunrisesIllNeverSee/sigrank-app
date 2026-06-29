@@ -66,6 +66,10 @@ export interface HomepageStats {
   transmitter_count: number
   top_operator_codename: string
   top_signa_rate: number
+  /** Operators active in the last hour (by operators.last_seen). */
+  active_last_hour: number
+  /** Total head-to-head comparisons run (site_counters.comparisons_ran). */
+  comparisons_ran: number
   /** Whether these numbers are placeholders (mock fallback). */
   isPlaceholder: boolean
 }

@@ -593,6 +593,32 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       | null
     if (!s) return MOCK_HOMEPAGE_STATS
 
+    // Two extra, independently-defensive reads so a missing column/table (e.g. before
+    // migration 0021 lands) degrades to 0 rather than collapsing the whole block to
+    // MOCK. Both are daily-stale under the homepage ISR — fine for the fogged strip.
+    let active_last_hour = 0
+    try {
+      const { count } = await sb
+        .from('operators')
+        .select('*', { count: 'exact', head: true })
+        .gte('last_seen', new Date(Date.now() - 3_600_000).toISOString())
+      active_last_hour = count ?? 0
+    } catch {
+      /* leave 0 */
+    }
+
+    let comparisons_ran = 0
+    try {
+      const { data: c } = await sb
+        .from('site_counters')
+        .select('value')
+        .eq('key', 'comparisons_ran')
+        .maybeSingle()
+      comparisons_ran = num((c as { value: number | null } | null)?.value)
+    } catch {
+      /* site_counters may not exist yet — leave 0 */
+    }
+
     return {
       total_operators: num(s.total_operators),
       total_snapshots: num(s.total_snapshots),
@@ -600,10 +626,27 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       transmitter_count: num(s.transmitter_count),
       top_operator_codename: s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
       top_signa_rate: num(s.top_signa_rate),
+      active_last_hour,
+      comparisons_ran,
       isPlaceholder: false,
     }
   } catch {
     return MOCK_HOMEPAGE_STATS
+  }
+}
+
+/**
+ * Bump the public "comparisons ran" counter (site_counters via the atomic
+ * increment_site_counter RPC). Fire-and-forget + fully defensive: safe to call
+ * before migration 0021 lands — the RPC error is swallowed (it's a vanity stat).
+ */
+export async function bumpComparisonsRan(): Promise<void> {
+  const sb = getSupabaseServer()
+  if (!sb) return
+  try {
+    await sb.rpc('increment_site_counter', { counter_key: 'comparisons_ran' })
+  } catch {
+    /* RPC/table not present yet, or transient — ignore */
   }
 }
 

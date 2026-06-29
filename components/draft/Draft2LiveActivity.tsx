@@ -34,8 +34,14 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       accent: false,
     },
     {
-      // No presence telemetry yet — always a placeholder. TODO(ONLINE.LIVE).
-      value: <Placeholder value="1,847" title="Placeholder — no active-user telemetry yet" />,
+      // Wired to operators.last_seen (daily-stale under ISR; the strip stays fogged).
+      value: real ? (
+        <span title="Active operators in the last hour (by last_seen)">
+          {fmtCount(stats.active_last_hour)}
+        </span>
+      ) : (
+        <Placeholder value="1,847" title="Placeholder — no active-user telemetry yet" />
+      ),
       label: 'Active in the last hour',
       accent: true,
     },
@@ -46,8 +52,14 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       accent: false,
     },
     {
-      // No comparison-count telemetry yet. TODO(wire): count /compare runs.
-      value: <Placeholder value="—" title="Placeholder — comparison count not wired yet" />,
+      // Wired to site_counters.comparisons_ran (bumped on a /compare matchup).
+      value: real ? (
+        <span title="Total head-to-head comparisons run">
+          {fmtCount(stats.comparisons_ran)}
+        </span>
+      ) : (
+        <Placeholder value="—" title="Placeholder — comparison count not wired yet" />
+      ),
       label: 'Comparisons ran',
       accent: false,
     },
