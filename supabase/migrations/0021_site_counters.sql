@@ -18,22 +18,29 @@ values ('comparisons_ran', 0)
 on conflict (key) do nothing;
 
 -- RLS: public SELECT (it's a non-PII vanity counter, mirrors system_stats), but NO
--- anon write policy — the increment runs through the SECURITY DEFINER RPC below and
--- the server (service-role) client. Direct anon writes stay blocked.
+-- anon write policy — the increment runs through the server (service-role) client +
+-- the server-only RPC below. Direct anon writes/calls stay blocked.
 alter table site_counters enable row level security;
 
 drop policy if exists p_site_counters_public_select on site_counters;
 create policy p_site_counters_public_select on site_counters
   for select to anon, authenticated using (true);
 
--- Atomic increment (supabase-js can't express value = value + 1 directly).
+-- Atomic increment (supabase-js can't express value = value + 1 directly). SECURITY
+-- INVOKER — the only caller is the server's service_role client (which already bypasses
+-- RLS), so no DEFINER is needed. Execute is REVOKED from PUBLIC so anon/authenticated
+-- can't call it as a public endpoint (Postgres grants EXECUTE to PUBLIC by default).
 create or replace function increment_site_counter(counter_key text)
 returns void
 language sql
-security definer
+security invoker
 set search_path = public
 as $$
   update site_counters set value = value + 1, updated_at = now() where key = counter_key;
 $$;
 
-grant execute on function increment_site_counter(text) to anon, authenticated, service_role;
+-- Revoke from public AND anon/authenticated explicitly — Supabase's ALTER DEFAULT
+-- PRIVILEGES grants EXECUTE to anon+authenticated directly on new public functions,
+-- so a `from public` revoke alone leaves them able to call it.
+revoke execute on function increment_site_counter(text) from public, anon, authenticated;
+grant execute on function increment_site_counter(text) to service_role;
