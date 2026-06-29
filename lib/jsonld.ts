@@ -117,3 +117,99 @@ export function definedTerm(term: string, definition: string, path: string) {
     },
   }
 }
+
+// ── WS1: Dataset + FAQPage (citation play) ───────────────────────────────
+
+const DATASET_ID = `${SITE_ORIGIN}/#sigrank-index`
+
+/**
+ * The SigRank Index as a citable Schema.org Dataset.
+ *
+ * This is the block that makes SigRank recognizable as a primary data source
+ * by Google Dataset Search and answer engines. Attach on /methodology and
+ * /board/all.
+ *
+ * License is CC-BY-4.0 (LOCKED by owner 2026-06-29): MIT governs the code;
+ * CC-BY governs the DATA. The attribution requirement IS the citation
+ * mechanism — reuse requires credit, which turns reuse into citations.
+ */
+export function sigrankDataset(opts?: { temporalStart?: string; updated?: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    '@id': DATASET_ID,
+    name: 'The SigRank Index — AI Operator Token-Efficiency Leaderboard',
+    alternateName: 'SigRank Index',
+    description:
+      'A privacy-preserving, continuously-updated leaderboard ranking AI operators by ' +
+      'token-cascade efficiency (the yield metric Υ = cache_read × output / input²). ' +
+      'Built from on-device, ed25519-signed token-telemetry snapshots.',
+    url: `${SITE_ORIGIN}/methodology`,
+    sameAs: `${SITE_ORIGIN}/board/all`,
+    creator: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
+    isAccessibleForFree: true,
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    keywords: [
+      'AI operator leaderboard',
+      'token efficiency',
+      'token cascade efficiency',
+      'LLM benchmark',
+      'prompt caching',
+      'agent performance',
+    ],
+    creativeWorkStatus: 'Published',
+    temporalCoverage: `${opts?.temporalStart ?? '2026-05-14'}/..`,
+    ...(opts?.updated ? { dateModified: opts.updated } : {}),
+    measurementTechnique:
+      'On-device token telemetry; operators submit ed25519-signed snapshots verified server-side. ' +
+      'No message content is read or stored (token counts only).',
+    variableMeasured: [
+      {
+        '@type': 'PropertyValue',
+        name: 'Yield (Υ)',
+        description: 'Token-cascade efficiency: cache_read × output / input².',
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Global rank',
+        description: "An operator's position on the all-time cross-platform board.",
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Class tier',
+        description: 'Performance band assigned from the scoring ruleset.',
+      },
+    ],
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'application/json',
+        name: 'Leaderboard API (top-N, public)',
+        contentUrl: `${SITE_ORIGIN}/api/v1/leaderboard`,
+      },
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'application/json',
+        name: 'Metric leaders API',
+        contentUrl: `${SITE_ORIGIN}/api/v1/metrics/leaders`,
+      },
+    ],
+  }
+}
+
+/** FAQPage — renders an FAQ section as structured data (rich results + AI citation). */
+export function faqPage(faqs: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.answer,
+      },
+    })),
+  }
+}
