@@ -17,7 +17,7 @@ import { getSessionOperator } from '@/lib/supabase/auth-server'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'My Profile · SigRank',
+  title: 'My Profile',
   description: 'Your SigRank operator profile.',
 }
 

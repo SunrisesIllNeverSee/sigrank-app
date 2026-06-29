@@ -18,7 +18,7 @@ import { RecordTicker } from '@/components/hall/RecordTicker'
 import { ComingSoonMarkers } from '@/components/hall/ComingSoonMarkers'
 
 export const metadata: Metadata = withOG({
-  title: 'Hall of Signal — SigRank',
+  title: 'Hall of Signal',
   description:
     'Triumphus Famae Et Gloriae — the permanent record of peak signal across the SigRank leaderboard.',
   path: '/hall',

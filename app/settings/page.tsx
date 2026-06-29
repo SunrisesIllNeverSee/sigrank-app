@@ -17,7 +17,7 @@ import { DangerZone } from '@/components/settings/DangerZone'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Settings · SigRank',
+  title: 'Settings',
   description: 'Manage your SigRank operator account and appearance.',
 }
 

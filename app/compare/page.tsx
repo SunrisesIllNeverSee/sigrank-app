@@ -29,7 +29,7 @@ import { CompareShareCard, type CompareOperand } from '@/components/share/Compar
 import { operatorDisplayName } from '@/lib/compare/operator-name'
 
 export const metadata: Metadata = withOG({
-  title: 'Compare Operators · SigRank',
+  title: 'Compare Operators',
   description:
     'Head-to-head operator comparison across the cascade layer — Υ Yield, SNR, Leverage, Velocity, 10xDEV & blended cost — with a shape radar.',
   path: '/compare',
