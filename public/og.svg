@@ -31,11 +31,11 @@
        form the letter gaps survive. 53 chars wide; centered. -->
   <g font-family="'Courier New', Courier, monospace" font-size="32" font-weight="700"
      letter-spacing="0" fill="url(#wm)" text-anchor="middle" xml:space="preserve">
-    <text x="600" y="218">███████ ██  ██████  ██████   █████  ███    ██ ██   ██</text>
-    <text x="600" y="252">██      ██ ██       ██   ██ ██   ██ ████   ██ ██  ██ </text>
-    <text x="600" y="286">███████ ██ ██   ███ ██████  ███████ ██ ██  ██ █████  </text>
-    <text x="600" y="320">     ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██ ██  ██ </text>
-    <text x="600" y="354">███████ ██  ██████  ██   ██ ██   ██ ██   ████ ██   ██</text>
+    <text x="600" y="218">███████ ██  ██████  ██████   █████  ███    ██  ██   ██</text>
+    <text x="600" y="252">██      ██ ██       ██   ██ ██   ██ ████   ██  ██  ██ </text>
+    <text x="600" y="286">███████ ██ ██   ███ ██████  ███████ ██ ██  ██  █████  </text>
+    <text x="600" y="320">     ██ ██ ██    ██ ██   ██ ██   ██ ██  ██ ██  ██  ██ </text>
+    <text x="600" y="354">███████ ██  ██████  ██   ██ ██   ██ ██   ████  ██   ██</text>
   </g>
 
   <!-- divider + sub -->
