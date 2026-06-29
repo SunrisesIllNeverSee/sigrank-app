@@ -3,7 +3,7 @@ import { TopicPage } from '@/components/wiki/TopicPage'
 import { Credits } from '@/components/marketing/SignalIntegrity'
 
 export const metadata: Metadata = {
-  title: 'Measured Alongside · SigRank',
+  title: 'Measured Alongside',
   description:
     'Credit to the token-usage tools SigRank reads alongside and builds on — ccusage, tokscale, and token-dashboard. They measure how much; SigRank ranks how well.',
 }

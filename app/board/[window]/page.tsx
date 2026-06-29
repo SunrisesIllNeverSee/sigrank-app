@@ -68,10 +68,10 @@ export async function generateMetadata({
   const { window: slug } = await params
   const isOff = slug === 'off'
   const win = isOff ? null : boardWindowBySlug(slug)
-  if (!isOff && !win) return { title: 'Board not found · SigRank' }
+  if (!isOff && !win) return { title: 'Board not found' }
   const label = isOff ? 'All-time' : win!.label
   return withOG({
-    title: `${label} Leaderboard · SigRank`,
+    title: `${label} Leaderboard`,
     description: `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
     path: `/board/${slug}`,
   })

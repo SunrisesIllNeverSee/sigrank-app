@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export const metadata = { title: 'Subscription · SigRank' }
+export const metadata = { title: 'Subscription' }
 
 /**
  * Stripe Billing Portal return_url target.

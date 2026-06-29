@@ -104,10 +104,10 @@ export async function generateMetadata({
   const { codename: rawCodename } = await params
   const codename = decodeCodename(rawCodename) // see lib/route-params — '·'/space codenames arrive URL-encoded in pages
   const row = await getOperator(codename)
-  if (!row) return { title: 'Operator not found · SigRank' }
+  if (!row) return { title: 'Operator not found' }
   const name = row.operator.display_name ?? row.operator.codename
   return {
-    title: `${name} · Wrapped · SigRank`,
+    title: `${name} · Wrapped`,
     description: `${name}'s token-telemetry recap — ${compact(totalTokens(row))} tokens scored, SIGNA RATE ${row.snapshot.signa_rate.toFixed(1)}.`,
   }
 }

@@ -60,14 +60,14 @@ export async function generateMetadata({
   const { codename: rawCodename } = await params
   const codename = decodeCodename(rawCodename)
   const row = await getOperator(codename)
-  if (!row) return { title: 'Operator not found · SigRank' }
+  if (!row) return { title: 'Operator not found' }
   const name = resolveName(row.operator)
   const c = row.snapshot.cascade
   const yieldLabel =
     c && !c.nonCompounding
       ? ` · Υ ${c.yield_ >= 1000 ? `${(c.yield_ / 1000).toFixed(1)}K` : c.yield_.toFixed(0)}`
       : ''
-  const title = `${name}${yieldLabel} · SigRank`
+  const title = `${name}${yieldLabel}`
   const description = row.pending
     ? `${name} — an operator on SigRank (not ranked yet).`
     : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`

@@ -17,7 +17,7 @@ import { withOG } from '@/lib/seo'
 export const revalidate = 86400
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank — AI Operator Leaderboard',
+  title: 'SignalAF — AI Operator Leaderboard',
   description:
     'Privacy-preserving leaderboard scoring AI operators on canonical token-telemetry metrics. Rank by Υ Yield, see the cascade, claim your operator.',
   path: '/',
