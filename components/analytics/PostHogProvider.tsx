@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { initPostHog, posthog } from '@/lib/posthog/client'
+import { PostHogIdentify } from './PostHogIdentify'
 
 /**
  * Client island that boots PostHog and emits manual SPA pageviews. The root
@@ -18,6 +19,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
+      <PostHogIdentify />
       {/* useSearchParams() needs a Suspense boundary to avoid de-opting the whole
           tree to client rendering / failing static generation in Next App Router. */}
       <Suspense fallback={null}>
