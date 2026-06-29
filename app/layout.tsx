@@ -10,6 +10,8 @@ import './globals.css'
 import { Nav } from '@/components/ui/Nav'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 import { Footer } from '@/components/ui/Footer'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { organization, website } from '@/lib/jsonld'
 import { siteMetadata } from '@/lib/seo'
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
@@ -55,6 +57,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
+        <JsonLd data={[organization(), website()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <Nav />
         <DemoBanner />
