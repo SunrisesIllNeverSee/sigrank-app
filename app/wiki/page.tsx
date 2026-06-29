@@ -30,6 +30,8 @@ import { TopicConsole, type TopicGroup } from '@/components/draft/TopicConsole'
 import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
 import { VerificationTests } from '@/components/marketing/VerificationTests'
 import { SignatureDrift, LocalAgentMcp, Credits } from '@/components/marketing/SignalIntegrity'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumb } from '@/lib/jsonld'
 import Link from 'next/link'
 
 export const metadata: Metadata = withOG({
@@ -396,6 +398,9 @@ export default function Draft1Page() {
 
   return (
     <div className="flex flex-col gap-5">
+      <JsonLd data={breadcrumb([
+        { name: 'Wiki', path: '/wiki' },
+      ])} />
       {/* WikiSignBar removed (owner 2026-06-24): the "Get ranked → Sign in" CTA moved to
           the global nav (AccountMenu, top-right), so the wiki's duplicate sign bar is gone. */}
       {/* The wiki: numbered root column → content panel. */}
