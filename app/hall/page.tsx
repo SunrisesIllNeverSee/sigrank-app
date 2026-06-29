@@ -16,6 +16,8 @@ import { HallHeader } from '@/components/hall/HallHeader'
 import { MetricTopTen } from '@/components/hall/MetricTopTen'
 import { RecordTicker } from '@/components/hall/RecordTicker'
 import { ComingSoonMarkers } from '@/components/hall/ComingSoonMarkers'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumb } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
   title: 'Hall of Signal',
@@ -116,6 +118,9 @@ export default async function HallPage({ searchParams }: PageProps) {
 
   return (
     <div>
+      <JsonLd data={breadcrumb([
+        { name: 'Hall of Signal', path: '/hall' },
+      ])} />
       {/* HALL-1: animated masthead. */}
       <HallHero />
 
