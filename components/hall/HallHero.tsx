@@ -12,7 +12,7 @@ export function HallHero() {
   return (
     <WaveHero
       eyebrow="🏛️ Hall of Signal"
-      terminalText="TRIUMPHUS FAMAE ET GLORIAE"
+      terminalText="FAMAE ET GLORIA"
       title="Triumphus Famae Et Gloriae"
       subtitle="The permanent record — the highest marks ever set across the SigRank leaderboard."
     />
