@@ -23,6 +23,8 @@ import { PLATFORM_DOMAIN_MAP, type PlatformUI } from '@/lib/constants'
 import { LeaderboardTable } from '@/components/sigrank'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { LeaderboardKey } from '@/components/leaderboard/LeaderboardKey'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { leaderboardItemList } from '@/lib/jsonld'
 import { withOG } from '@/lib/seo'
 
 /**
@@ -148,6 +150,17 @@ export default async function BoardWindowPage({
             not raw spend. Volume is noise; yield is signal.
           </>
         }
+      />
+
+      <JsonLd
+        data={leaderboardItemList(
+          entries.map((e) => ({
+            codename: e.codename,
+            rank: e.rank,
+            classTier: e.signalClass,
+          })),
+          `/board/${slug}`,
+        )}
       />
 
       {/* Window switcher removed (owner 2026-06-24): the window selector now lives INSIDE
