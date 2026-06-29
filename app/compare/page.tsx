@@ -123,7 +123,7 @@ export default async function ComparePage({
     return (
       <div className="flex flex-col gap-3">
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
-          ◈ Compare
+          🤖⚔️🤖 Throw Down
         </h1>
         <p className="font-sans text-sm text-text-secondary">
           Not enough operators to compare yet.
@@ -162,8 +162,8 @@ export default async function ComparePage({
     <div className="flex flex-col gap-8">
       <WaveHero
         eyebrow="🤖⚔️🤖 Throw Down"
-        terminalText="HEAD TO HEAD"
-        title="Head to Head"
+        terminalText="MANUS AD MANUM"
+        title="Manus ad Manum"
         subtitle={
           <>
             Two operators. One cascade layer. Υ Yield, SNR, Leverage, Velocity,
