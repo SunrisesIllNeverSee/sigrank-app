@@ -12,6 +12,7 @@
 
 import { useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
+import { track } from '@/lib/posthog/events'
 
 export interface CompareOperand {
   name: string
@@ -117,6 +118,7 @@ export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
       await navigator.clipboard.writeText(`https://signalaf.com${href}`)
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
+      track.compareShared('copy', { href })
     } catch {
       /* clipboard blocked */
     }
@@ -131,6 +133,7 @@ export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
       link.href = dataUrl
       link.download = `sigrank-compare.png`
       link.click()
+      track.compareShared('download')
     } finally {
       setBusy(false)
     }
