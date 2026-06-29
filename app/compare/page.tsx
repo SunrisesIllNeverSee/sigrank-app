@@ -149,14 +149,14 @@ export default async function ComparePage({
   return (
     <div className="flex flex-col gap-8">
       <WaveHero
-        eyebrow="◈ Compare"
+        eyebrow="🤖⚔️🤖 Throw Down"
         terminalText="HEAD TO HEAD"
         title="Head to Head"
         subtitle={
           <>
-            Two operators across the cascade layer — Υ Yield, SNR, Leverage, Velocity,
-            10xDEV &amp; blended cost. Two architectures: the data tells you not just
-            who&apos;s ahead, but <em>where</em> and why.
+            Two operators. One cascade layer. Υ Yield, SNR, Leverage, Velocity,
+            10xDEV &amp; blended cost — the data tells you not just who&apos;s ahead,
+            but <em>where</em> and why.
           </>
         }
       />
