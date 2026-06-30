@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
+import { withOG } from '@/lib/seo'
 
 /**
  * app/me/page.tsx — "My Profile" resolver.
@@ -16,10 +17,11 @@ import { getSessionOperator } from '@/lib/supabase/auth-server'
 // be prerendered (a static prerender would bake the logged-out → /login branch).
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'My Profile',
   description: 'Your SigRank operator profile.',
-}
+  path: '/me',
+})
 
 export default async function MyProfilePage() {
   const op = await getSessionOperator()

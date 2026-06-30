@@ -12,7 +12,16 @@
  * yet — FilterBar was already removed). Re-add if/when the board grows filters.
  */
 
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { withOG } from '@/lib/seo'
+
+export const metadata: Metadata = withOG({
+  title: 'Leaderboard',
+  description:
+    'The SigRank leaderboard — rank AI operators by token-cascade yield (Υ = cache_read × output / input²). Browse by platform, time window, or signal class.',
+  path: '/leaderboard',
+})
 
 export default function LeaderboardPage() {
   // Owner 2026-06-27: the board now opens on the operator-TOTAL view at /board/all —
