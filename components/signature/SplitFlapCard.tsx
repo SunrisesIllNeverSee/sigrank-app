@@ -190,21 +190,23 @@ const PRINT_CSS = `
 }
 `
 
-// ── Line layout ───────────────────────────────────────────────────────────
-// Each metric line is one monospace string:
-//   [glyph 5] [gap 2] [label 14] [gap 4] [value 12] = 37 chars
-// Three color zones: glyph (colored), label (dim green), value (bright green)
+// ── Line layout (4 columns) ─────────────────────────────────────────────────
+// Each metric line is one monospace string, four zones (owner's header map):
+//   CASCADE        NEW USER       TELEMETRY        AVERAGE USER
+//   [abbr/glyph]   [your value]   [metric name]    [avg value]
+// Widths chosen to fit the 780px right panel at 24px mono.
+const ABBR_W = 5     // CASCADE  — Υ / SNR / LEV
+const YOU_W = 10     // NEW USER — your value (right-aligned)
+const NAME_W = 15    // TELEMETRY — metric name
+const AVG_W = 8      // AVERAGE USER — avg value (right-aligned)
+const G1 = 2, G2 = 3, G3 = 3
+// zone boundaries (char offsets) for slicing the revealed string into colored spans
+const Z_YOU = ABBR_W + G1                       // your-value starts here
+const Z_NAME = Z_YOU + YOU_W + G2               // metric-name starts here
+const Z_AVG = Z_NAME + NAME_W + G3              // avg-value starts here
 
-const GLYPH_W = 5
-const LABEL_W = 14
-const GAP1 = 2
-const GAP2 = 4
-const VALUE_W = 12
-const GLYPH_ZONE = GLYPH_W + GAP1           // 7
-const LABEL_ZONE = LABEL_W + GAP2           // 18
-
-function formatLine(glyph: string, label: string, value: string): string {
-  return glyph.padEnd(GLYPH_W) + ' '.repeat(GAP1) + label.padEnd(LABEL_W) + ' '.repeat(GAP2) + value.padStart(VALUE_W)
+function formatLine(abbr: string, you: string, name: string, avg: string): string {
+  return abbr.padEnd(ABBR_W) + ' '.repeat(G1) + you.padStart(YOU_W) + ' '.repeat(G2) + name.padEnd(NAME_W) + ' '.repeat(G3) + avg.padStart(AVG_W)
 }
 
 // ── Typewriter line (colored glyph + label + value) ───────────────────────
@@ -219,7 +221,7 @@ function TypewriterLine({
   reduced: boolean
   rowH: number
 }) {
-  const [count, setCount] = useState(reduced ? text.length : 0)
+  const [count, setCount] = useState(text.length)
   const done = count >= text.length
 
   useEffect(() => {
@@ -238,9 +240,14 @@ function TypewriterLine({
       fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
       textShadow: '0 0 6px rgba(120,255,120,0.25)',
     }}>
-      <span style={{ color: glyphColor, fontWeight: 800, textShadow: `0 0 8px ${glyphColor}66` }}>{revealed.slice(0, GLYPH_ZONE)}</span>
-      <span style={{ color: '#5a8a5a', fontWeight: 600 }}>{revealed.slice(GLYPH_ZONE, GLYPH_ZONE + LABEL_ZONE)}</span>
-      <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{revealed.slice(GLYPH_ZONE + LABEL_ZONE)}</span>
+      {/* CASCADE: abbr/glyph (metric color) */}
+      <span style={{ color: glyphColor, fontWeight: 800, textShadow: `0 0 8px ${glyphColor}66` }}>{revealed.slice(0, Z_YOU)}</span>
+      {/* NEW USER: your value (bright phosphor) */}
+      <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{revealed.slice(Z_YOU, Z_NAME)}</span>
+      {/* TELEMETRY: metric name (dim green) */}
+      <span style={{ color: '#5a8a5a', fontWeight: 600 }}>{revealed.slice(Z_NAME, Z_AVG)}</span>
+      {/* AVERAGE USER: avg value (muted) */}
+      <span style={{ color: '#6e8a6e', fontWeight: 700 }}>{revealed.slice(Z_AVG)}</span>
       {!done && <span className="print-cursor" style={{ color: '#a8ffa8', fontWeight: 800 }}>{'\u258c'}</span>}
     </div>
   )
@@ -260,7 +267,7 @@ function TypewriterSimple({
   size?: number
   rowH: number
 }) {
-  const [count, setCount] = useState(reduced ? text.length : 0)
+  const [count, setCount] = useState(text.length)
   const done = count >= text.length
 
   useEffect(() => {
@@ -339,33 +346,36 @@ function Board({
   const LINE_GAP = 40
   const INITIAL_DELAY = 300
 
-  const headerText = 'CASCADE TELEMETRY              *** LIVE ***'
+  // The 4 column heads (owner): CASCADE | NEW USER | TELEMETRY | AVERAGE USER
+  const headerText = formatLine('CASC', 'NEW USER', 'TELEMETRY', 'AVG')
   const dividerText = '         - - - DERIVED - - -'
 
+  // value | metric name | AVG USER (AA 7:2:1 baseline \u2014 same average user as the landing page).
+  // Raw token rows have no per-user-token avg \u2192 '\u00b7'.
   const rawLines = [
-    { glyph: 'IN', label: 'INPUT', value: inputStr, color: C_BONE },
-    { glyph: 'OUT', label: 'OUTPUT', value: outputStr, color: C_GREEN },
-    { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, color: C_GREEN },
-    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, color: C_BONE },
-    { glyph: '\u2211', label: 'TOTAL', value: totalStr, color: C_DIM },
+    { glyph: 'IN', label: 'INPUT', value: inputStr, avg: '\u00b7', color: C_BONE },
+    { glyph: 'OUT', label: 'OUTPUT', value: outputStr, avg: '\u00b7', color: C_GREEN },
+    { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, avg: '\u00b7', color: C_GREEN },
+    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: '\u00b7', color: C_BONE },
+    { glyph: '\u2211', label: 'TOTAL', value: totalStr, avg: '\u00b7', color: C_DIM },
   ]
   const derivedLines = [
-    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, color: C_GOLD },
-    { glyph: 'SNR', label: 'SNR', value: snrStr, color: C_GREEN },
-    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, color: C_GREEN },
-    { glyph: 'VEL', label: 'VELOCITY', value: velStr, color: C_BONE },
-    { glyph: '\u26a1', label: '10X DEV', value: devStr, color: C_GOLD },
-    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, color: C_BONE },
-    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, color: C_GREEN },
-    { glyph: '$', label: 'COST/1M', value: costStr, color: C_DIM },
+    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: '1.57', color: C_GOLD },
+    { glyph: 'SNR', label: 'SNR', value: snrStr, avg: '33%', color: C_GREEN },
+    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, avg: '3.2x', color: C_GREEN },
+    { glyph: 'VEL', label: 'VELOCITY', value: velStr, avg: '0.50', color: C_BONE },
+    { glyph: '\u26a1', label: '10X DEV', value: devStr, avg: '0.50', color: C_GOLD },
+    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: '\u00b7', color: C_BONE },
+    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, avg: '1.0x', color: C_GREEN },
+    { glyph: '$', label: 'COST/1M', value: costStr, avg: '\u00b7', color: C_DIM },
   ]
 
   // Compute cumulative start delays
   const allTexts = [
     headerText,
-    ...rawLines.map(l => formatLine(l.glyph, l.label, l.value)),
+    ...rawLines.map(l => formatLine(l.glyph, l.value, l.label, l.avg)),
     dividerText,
-    ...derivedLines.map(l => formatLine(l.glyph, l.label, l.value)),
+    ...derivedLines.map(l => formatLine(l.glyph, l.value, l.label, l.avg)),
   ]
   const delays: number[] = []
   let cursor = INITIAL_DELAY
@@ -496,7 +506,7 @@ function Board({
         {rawLines.map((l) => (
           <TypewriterLine
             key={`raw-${l.glyph}`}
-            text={formatLine(l.glyph, l.label, l.value)}
+            text={formatLine(l.glyph, l.value, l.label, l.avg)}
             glyphColor={l.color}
             startDelay={delays[delayIdx++]}
             charDelay={CHAR_DELAY}
@@ -526,7 +536,7 @@ function Board({
         {derivedLines.map((l) => (
           <TypewriterLine
             key={`der-${l.glyph}`}
-            text={formatLine(l.glyph, l.label, l.value)}
+            text={formatLine(l.glyph, l.value, l.label, l.avg)}
             glyphColor={l.color}
             startDelay={delays[delayIdx++]}
             charDelay={CHAR_DELAY}
