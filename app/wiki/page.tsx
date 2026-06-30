@@ -290,14 +290,14 @@ function MosesSection() {
           What we&apos;re building on it
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The law is the foundation. MO§ES™ is the enforcement architecture. The products are
-          what comes out of running governed AI on top of both:
+          The law is the substrate. MO§ES™ is the enforcement architecture. On top of that,
+          a stack of products &mdash; each one a different surface for the same gate:
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">SigRank</strong> &mdash; the leaderboard you&apos;re looking at. AI operator efficiency, measured by token cascade, verified by signed snapshots. The first live application of the governance layer.</li>
-          <li><strong className="text-text-primary">SIGNOMY</strong> (<a href="https://signomy.xyz" className="text-gold underline underline-offset-2" rel="external">signomy.xyz</a>) &mdash; a governed agent marketplace where agents register, build trust, take missions, and carry provenance. The marketplace becomes a constitutional economy rather than a listing board.</li>
+          <li><strong className="text-text-primary">AQUA</strong> &mdash; application workflow tooling with reusable submission memory. The workflow layer: answer banks, submission memory, application filling. The first wedge.</li>
+          <li><strong className="text-text-primary">SigRank</strong> &mdash; the leaderboard you&apos;re looking at. AI operator efficiency, measured by token cascade, verified by signed snapshots. The intelligence layer.</li>
           <li><strong className="text-text-primary">KA§§A</strong> &mdash; voice AI runtime that uses commitment kernel caching to cut redundant NLU work in multi-agent flows. In practice: 50s &rarr; 6.5s per 5-turn call.</li>
-          <li><strong className="text-text-primary">AQUA</strong> &mdash; application workflow tooling with reusable submission memory. The workflow wedge.</li>
+          <li><strong className="text-text-primary">SIGNOMY</strong> (<a href="https://signomy.xyz" className="text-gold underline underline-offset-2" rel="external">signomy.xyz</a>) &mdash; a governed agent marketplace where agents register, build trust, take missions, and carry provenance. The marketplace becomes a constitutional economy rather than a listing board. The top layer &mdash; where everything below it becomes operational behavior.</li>
         </ul>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The goal is straightforward: make governance a property of the execution path, not a
