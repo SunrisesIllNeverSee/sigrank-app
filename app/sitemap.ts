@@ -17,6 +17,8 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: Metadata
   { path: '/leaderboard', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/hall', priority: 0.8, changeFrequency: 'daily' },
   { path: '/methodology', priority: 0.8, changeFrequency: 'daily' },
+  { path: '/research', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/research/q1-2026', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/compare', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/wiki', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/wiki/local-agent', priority: 0.6, changeFrequency: 'monthly' },
