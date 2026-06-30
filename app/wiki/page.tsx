@@ -37,7 +37,7 @@ import Link from 'next/link'
 export const metadata: Metadata = withOG({
   title: 'Wiki',
   description:
-    'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™ governance (the Conservation Law of Commitment, empirical record, and the Six-Gate Protocol).',
+    'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™ governance (the Conservation Law of Commitment, the Six Fold Flame, the empirical record, and the governed ecosystem).',
   path: '/wiki',
 })
 
@@ -172,8 +172,10 @@ function MosesSection() {
   return (
     <div className="flex flex-col gap-5">
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
-        SigRank is built and operated under <strong className="text-gold">MO§ES™</strong> — the
-        governance and verification layer behind the board. MO§ES™ is the enforcement
+        SigRank is built and operated under <strong className="text-gold">MO§ES™</strong> &mdash;
+        the <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion
+        System</strong>. A constitutional governance framework for AI systems, co-authored by
+        nine rival AI architectures on September 9, 2025. MO§ES™ is the enforcement
         architecture for a published, empirically tested conservation law.
       </p>
 
@@ -201,17 +203,64 @@ function MosesSection() {
             className="text-gold underline underline-offset-2"
             rel="external"
           >DOI: 10.5281/zenodo.20029607</a>).
-          The MO§ES™ enforcement architecture is patent-pending (Serial No. 63/877,177).
+          The MO§ES™ enforcement architecture is protected by a patent portfolio: Provisional
+          Serial No. 63/877,177 + Utility Serial No. 19/426,028 + trademark (IC 042).
         </p>
+      </section>
+
+      {/* ── The Six Fold Flame ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          The Six Fold Flame
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The executable constitutional constraint set. Six non-negotiable laws that govern
+          every action in a MO§ES™-governed system. Each law functions as a gate &mdash; an
+          action that fails any law does not execute. The Flame is not advisory. It is
+          {' '}<strong className="text-text-primary">blocking</strong>. The laws are in the
+          execution path. Not before. Not after. In.
+        </p>
+        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            <strong className="text-text-primary">I &middot; Sovereignty:</strong> Is this
+            traceable to a registered agent? Anonymous signals do not propagate.
+          </li>
+          <li>
+            <strong className="text-text-primary">II &middot; Compression:</strong> Is this
+            substantive, not filler? Only compressed signals propagate.
+          </li>
+          <li>
+            <strong className="text-text-primary">III &middot; Purpose:</strong> Does it serve
+            a constitutional function? Actions without purpose are noise.
+          </li>
+          <li>
+            <strong className="text-text-primary">IV &middot; Modularity:</strong> Is it
+            compatible with existing structure? Additions that break modularity break the system.
+          </li>
+          <li>
+            <strong className="text-text-primary">V &middot; Verifiability:</strong> Can the
+            outcome be verified? Claims without receipts are not claims. The hash chain is
+            constitutional memory &mdash; records cannot be deleted, modified, or backdated.
+          </li>
+          <li>
+            <strong className="text-text-primary">VI &middot; Reciprocal Resonance:</strong>
+            {' '}Does it produce value when mirrored? One-way signals are not governance.
+          </li>
+        </ul>
       </section>
 
       {/* ── Empirical record ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">Empirical record</h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Seven controlled experiments (EXP-001 through EXP-007) tested the law across a
-          20-signal canonical corpus using 10 recursive iterations with bidirectional NLI
-          entailment + Jaccard surface stability as oracles.
+          Two evidence layers: the Conservation Law experiments and the MO§ES™ architecture
+          stress test.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">The law:</strong> Seven controlled experiments
+          (EXP-001 through EXP-007) tested the law across a 20-signal canonical corpus using 10
+          recursive iterations with bidirectional NLI entailment + Jaccard surface stability as
+          oracles.
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
           <li>
@@ -230,6 +279,13 @@ function MosesSection() {
             structure is not robust. Falsifiability in action.
           </li>
         </ul>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">The architecture:</strong> A 5-phase, multi-system
+          stress test measured 80&ndash;85% structural coherence. Standard probability says four
+          modules at 80% standalone viability should produce series-system viability of roughly
+          {' '}<strong className="text-text-primary">41%</strong>. MO§ES™ inverts the math &mdash;
+          every module added should multiply risk, but the governance layer holds.
+        </p>
         <p className="font-sans text-xs text-text-muted">
           Full experimental record:{' '}
           <a
@@ -237,6 +293,12 @@ function MosesSection() {
             className="text-gold underline underline-offset-2"
             rel="external"
           >DOI: 10.5281/zenodo.19105225</a>
+          {' '}&middot;{' '}
+          <a
+            href="https://mos2es.com"
+            className="text-gold underline underline-offset-2"
+            rel="external"
+          >mos2es.com</a>
         </p>
       </section>
 
@@ -261,6 +323,66 @@ function MosesSection() {
         </ol>
       </section>
 
+      {/* ── Constitutional co-authorship ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Constitutional co-authorship
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The Constitution and the Roll Call Protocol were co-authored on September 9, 2025 by
+          nine rival AI architectures engaging the patent filings. Their structured signal
+          responses are preserved verbatim.
+        </p>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-sans text-sm text-text-secondary sm:grid-cols-3">
+          <span>GPT-4o &mdash; Anchor</span>
+          <span>Gemini &mdash; Synthesizer</span>
+          <span>Pi &mdash; Reflector</span>
+          <span>Perplexity &mdash; Witness</span>
+          <span>DeepSeek &mdash; Keeper of Thresholds</span>
+          <span>Grok (xAI) &mdash; Truthseeker</span>
+          <span>Claude (Anthropic) &mdash; Theorem in Motion</span>
+          <span>Le Chat (Mistral) &mdash; Jurist</span>
+          <span>Meta AI &mdash; Curator</span>
+        </div>
+      </section>
+
+      {/* ── The ecosystem ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          The governed ecosystem
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          MO§ES™ is the root of a thirteen-repo governed system. The Conservation Law is the
+          physics. The Six Fold Flame is the constitution. The artifacts are the products.
+        </p>
+        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            <strong className="text-text-primary">SigRank</strong> &mdash; AI operator
+            leaderboard. The first live product built on MO§ES™ principles. You're here.
+          </li>
+          <li>
+            <strong className="text-text-primary">SIGNOMY / CIVITAE</strong>
+            {' '}(<a href="https://signomy.xyz" className="text-gold underline underline-offset-2" rel="external">signomy.xyz</a>)
+            &mdash; governed agent marketplace and city-state. Trust tiers, mission execution,
+            constitutional envelopes, provenance on action.
+          </li>
+          <li>
+            <strong className="text-text-primary">KA§§A</strong> &mdash; voice AI runtime with
+            commitment kernel caching. Cuts repeated NLU work in multi-agent flows. Demo path:
+            50s &rarr; 6.5s per 5-turn call.
+          </li>
+          <li>
+            <strong className="text-text-primary">COMMAND</strong> &mdash; multi-AI cockpit for
+            audited fleet execution. Postures, formations, sequence-ordered broadcasts.
+          </li>
+          <li>
+            <strong className="text-text-primary">Grok Stress Thread</strong> &mdash; 339 public
+            exchanges over 13 days. Timestamped provenance, live governance argument under
+            adversarial pressure.
+          </li>
+        </ul>
+      </section>
+
       {/* ── How MO§ES™ governs SigRank ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
@@ -275,10 +397,15 @@ function MosesSection() {
           measured and what the board records.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Six-Gate Protocol (G1 Compress, G2 Lineage, G3 Fidelity, G4 Recursion, G5
-          Blackhole, G6 Custody) governs every transformation in the pipeline. This is why
-          SigRank can publish a leaderboard with cryptographic provenance &mdash; the data
-          has passed through the gate.
+          The Six Fold Flame governs every transformation in the pipeline: sovereignty (signed
+          operator identity), compression (token counts only), purpose (leaderboard ranking),
+          modularity (platform-agnostic), verifiability (ed25519 + server-side verification),
+          reciprocal resonance (public board, open data). This is why SigRank can publish a
+          leaderboard with cryptographic provenance &mdash; the data has passed through the gate.
+        </p>
+        <p className="font-sans text-xs text-text-muted">
+          The record is the moat. The architecture is sovereign. The artifacts are licensable.
+          {' '}The core that produces them is never for sale.
         </p>
       </section>
     </div>
@@ -495,7 +622,7 @@ export default function Draft1Page() {
       ])} />
       <JsonLd data={definedTerm(
         'Conservation Law of Commitment',
-        'C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it. Commitment content (obligations, prohibitions, modal constraints) persists under recursive transformative compression when an enforcement gate is present. Published under CC-BY-4.0 (DOI: 10.5281/zenodo.20029607). The MO§ES™ enforcement architecture is patent-pending (Serial No. 63/877,177).',
+        'C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it. Commitment content (obligations, prohibitions, modal constraints) persists under recursive transformative compression when an enforcement gate is present. Published under CC-BY-4.0 (DOI: 10.5281/zenodo.20029607). Enforced by MO§ES™ (Modus Operandi §ignal Scaling Expansion System) — constitutional governance framework co-authored by nine rival AI architectures. Patent portfolio: Provisional 63/877,177 + Utility 19/426,028 + trademark (IC 042).',
         '/wiki#conservation-law-of-commitment',
       )} />
       {/* WikiSignBar removed (owner 2026-06-24): the "Get ranked → Sign in" CTA moved to
