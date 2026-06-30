@@ -24,6 +24,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: Metadata
   { path: '/wiki', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/wiki/local-agent', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/wiki/measured-alongside', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/wiki/methodology-refinement', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/wiki/signal-drift', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/wiki/three-degrees', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/wiki/verification', priority: 0.6, changeFrequency: 'monthly' },
