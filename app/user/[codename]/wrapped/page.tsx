@@ -25,6 +25,7 @@ import type { HistoryPoint, LeaderboardRow } from '@/lib/data'
 import { WrappedStats } from '@/components/sigrank/WrappedStats'
 import type { Badge } from '@/components/sigrank/types'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
+import { TrackWrappedView } from '@/components/analytics/TrackWrappedView'
 
 /** Fallback for values with no canonical token-telemetry source. */
 const UNTRACKED = '—'
@@ -129,6 +130,7 @@ export default async function OperatorWrappedPage({
 
   return (
     <div className="flex flex-col gap-8">
+      <TrackWrappedView />
       <a
         href={`/user/${operator.codename}`}
         className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"

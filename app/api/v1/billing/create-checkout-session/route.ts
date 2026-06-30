@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe/server'
 import type { SupporterTier } from '@/lib/scoring/types'
+import { captureServer } from '@/lib/posthog/server'
 
 /**
  * POST /api/v1/billing/create-checkout-session
@@ -108,6 +109,11 @@ export async function POST(req: Request) {
         success_url: `${siteUrl0}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${siteUrl0}/upgrade/canceled`,
       })
+      await captureServer(operatorId0 || 'anon_checkout', 'checkout_started', {
+        kind: 'donation',
+        amount_cents: Math.round(amount),
+        has_operator: !!operatorId0,
+      })
       return NextResponse.json({ url: session.url })
     } catch (err) {
       console.error('[checkout] donation session failed', err)
@@ -134,6 +140,11 @@ export async function POST(req: Request) {
         metadata: { operator_id: operatorId0, kind: 'subscription' },
         success_url: `${siteUrl0}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${siteUrl0}/upgrade/canceled`,
+      })
+      await captureServer(operatorId0 || 'anon_checkout', 'checkout_started', {
+        kind: 'subscription',
+        price,
+        has_operator: !!operatorId0,
       })
       return NextResponse.json({ url: session.url })
     } catch (err) {
@@ -177,6 +188,12 @@ export async function POST(req: Request) {
       },
       success_url: `${siteUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/upgrade/canceled`,
+    })
+    await captureServer(operatorId || 'anon_checkout', 'checkout_started', {
+      kind: 'subscription_tier',
+      tier,
+      interval,
+      has_operator: !!operatorId,
     })
     return NextResponse.json({ url: session.url })
   } catch (err) {

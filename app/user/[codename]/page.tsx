@@ -41,6 +41,7 @@ import KpiTile from '@/components/charts/KpiTile'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { operatorProfile } from '@/lib/jsonld'
 import HeatBar from '@/components/charts/HeatBar'
+import { TrackProfileView } from '@/components/analytics/TrackProfileView'
 
 /**
  * Resolve the display name for an operator. display_name now carries both the
@@ -414,6 +415,7 @@ export default async function OperatorProfilePage({
           pending,
         })}
       />
+      <TrackProfileView codename={operator.codename} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <a
           href="/leaderboard"
