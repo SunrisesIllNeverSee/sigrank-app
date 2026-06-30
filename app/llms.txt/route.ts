@@ -46,6 +46,20 @@ on-device scanner (npm: sigrank) and submit signed, server-verifiable snapshots.
 ## Tooling
 - npm package: https://www.npmjs.com/package/sigrank
 - MCP server + CLI source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
+
+## Academic foundation
+- [The Conservation Law of Commitment](${SITE_ORIGIN}/science): the theoretical foundation. C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it.
+- Conservation Law paper (Zenodo, CC-BY-4.0): https://doi.org/10.5281/zenodo.20029607
+- Experimental Record (Zenodo): https://doi.org/10.5281/zenodo.19105225
+- Public Recursive Transformation Harness (Zenodo): https://doi.org/10.5281/zenodo.19109397
+- P-000 Propositions Prospectus (Zenodo): https://doi.org/10.5281/zenodo.20031715
+- Commitment Theory (34-paper research program): https://github.com/SunrisesIllNeverSee/Commitment_Theory
+
+## Governance
+- MO§ES™ governance framework (patent pending 63/877,177): https://mos2es.com
+- SIGNOMY governed agent marketplace: https://signomy.xyz
+- GitHub org: https://github.com/SunrisesIllNeverSee
+- ORCID: https://orcid.org/0009-0002-9904-5390
 `
 
   return new Response(body, {
