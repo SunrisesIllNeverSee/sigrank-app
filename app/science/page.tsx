@@ -14,7 +14,7 @@ import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { conservationLawArticle, mosesPatent, breadcrumb } from '@/lib/jsonld'
+import { conservationLawArticle, mosesPatent, breadcrumb, experimentalRecordDataset, transformationHarnessDataset, propositionsDataset } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
   title: 'Science — The Conservation Law of Commitment',
@@ -30,6 +30,9 @@ export default function SciencePage() {
         data={[
           conservationLawArticle(),
           mosesPatent(),
+          experimentalRecordDataset(),
+          transformationHarnessDataset(),
+          propositionsDataset(),
           breadcrumb([{ name: 'Science', path: '/science' }]),
         ]}
       />

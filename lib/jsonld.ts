@@ -296,3 +296,147 @@ export function mosesPatent() {
     about: 'AI governance enforcement architecture',
   }
 }
+
+/**
+ * Dataset — Experimental Record (EXP-001 to EXP-007).
+ * Zenodo DOI: 10.5281/zenodo.19105225. This is the empirical evidence
+ * supporting the Conservation Law. Published as a dataset on Zenodo.
+ * Google Dataset Search and AI engines use Dataset schema to discover
+ * and cite research data.
+ */
+export function experimentalRecordDataset() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    '@id': 'https://doi.org/10.5281/zenodo.19105225',
+    name: 'Experimental Record for A Conservation Law for Commitment in Language Under Transformative Compression and Recursive Application (EXP-001 to EXP-007)',
+    description:
+      'Seven controlled harness experiments testing commitment conservation under recursive transformative compression. ' +
+      '20-signal canonical corpus, GPT-4o-mini, 10 recursive iterations, NLI bidirectional entailment + Jaccard surface stability. ' +
+      '13/20 signals achieved NLI=1.00 under gate condition. Nine failure modes documented.',
+    url: 'https://doi.org/10.5281/zenodo.19105225',
+    creator: {
+      '@type': 'Person',
+      name: 'Deric J. McHenry',
+      sameAs: 'https://orcid.org/0009-0002-9904-5390',
+    },
+    publisher: { '@id': ORG_ID },
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+    datePublished: '2026-03-19',
+    version: '1.0.0',
+    keywords: [
+      'commitment conservation',
+      'recursive transformation',
+      'semantic stability',
+      'commitment extraction',
+      'language invariance',
+      'semantic compression',
+      'gating',
+      'conservation law',
+      'NLI bidirectional entailment',
+      'Jaccard similarity',
+      'falsifiability',
+    ],
+    variableMeasured: [
+      {
+        '@type': 'PropertyValue',
+        name: 'NLI bidirectional entailment',
+        description: '1.00 = both directions entail, 0.50 = one direction, 0.00 = neither.',
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Jaccard surface stability',
+        description: 'Surface keyword overlap vs. origin commitment set.',
+      },
+    ],
+    measurementTechnique:
+      'Recursive transformative compression with NLI bidirectional entailment (microsoft/deberta-v3-base-mnli) + Jaccard surface stability. 10 iterations per signal.',
+    isBasedOn: 'https://doi.org/10.5281/zenodo.20029607',
+    citation: 'https://doi.org/10.5281/zenodo.20029607',
+  }
+}
+
+/**
+ * Dataset — Public Recursive Transformation Harness.
+ * Zenodo DOI: 10.5281/zenodo.19109397. The reproducible harness code
+ * used to run the experiments. Published as a workflow on Zenodo.
+ */
+export function transformationHarnessDataset() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    '@id': 'https://doi.org/10.5281/zenodo.19109397',
+    name: 'Public Recursive Transformation Harness for A Conservation Law for Commitment in Language Under Transformative Compression and Recursive Application',
+    description:
+      'The public proxy harness for testing commitment conservation under recursive transformative compression. ' +
+      'Python implementation. Model-agnostic — works with any LLM API. Includes canonical 20-signal corpus.',
+    url: 'https://doi.org/10.5281/zenodo.19109397',
+    creator: {
+      '@type': 'Person',
+      name: 'Deric J. McHenry',
+      sameAs: 'https://orcid.org/0009-0002-9904-5390',
+    },
+    publisher: { '@id': ORG_ID },
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+    datePublished: '2026-03-19',
+    version: '1.0.0',
+    keywords: [
+      'commitment conservation',
+      'recursive transformation',
+      'public proxy harness',
+      'semantic stability',
+      'commitment extraction',
+      'gating',
+      'workflow',
+      'python',
+      'research methods',
+    ],
+    programmingLanguage: 'Python',
+    runtimePlatform: 'Python 3',
+    isBasedOn: 'https://doi.org/10.5281/zenodo.20029607',
+    citation: 'https://doi.org/10.5281/zenodo.20029607',
+  }
+}
+
+/**
+ * Dataset — Propositions of Commitment Theory (P-000).
+ * Zenodo DOI: 10.5281/zenodo.20031715. The research prospectus defining
+ * all CT terms, disambiguation, and the 34-paper pipeline.
+ */
+export function propositionsDataset() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    '@id': 'https://doi.org/10.5281/zenodo.20031715',
+    name: 'Propositions of Commitment Theory: A Research Prospectus',
+    description:
+      'The foundational prospectus defining Commitment Theory (CT) terms, disambiguation from linguistic/epistemic uses of "commitment," ' +
+      'the conservation law statement, and the 34-paper research pipeline across CT, Legal Theory, and MISC tracks.',
+    url: 'https://doi.org/10.5281/zenodo.20031715',
+    creator: {
+      '@type': 'Person',
+      name: 'Deric J. McHenry',
+      sameAs: 'https://orcid.org/0009-0002-9904-5390',
+    },
+    publisher: { '@id': ORG_ID },
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+    datePublished: '2026-04-20',
+    version: 'V.1',
+    keywords: [
+      'commitment theory',
+      'conservation law',
+      'AI governance',
+      'semantic preservation',
+      'commitment conservation',
+      'research prospectus',
+    ],
+    isPartOf: {
+      '@type': 'PublicationEvent',
+      name: 'Commitment Theory Research Program',
+    },
+    references: 'https://doi.org/10.5281/zenodo.20029607',
+  }
+}
