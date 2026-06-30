@@ -49,13 +49,22 @@ function tierForSubscription(sub: Stripe.Subscription): SupporterTier {
   return tierForPrice(priceId)
 }
 
+/** Stripe v22 moved billing periods onto subscription items. Read the first
+ * item's current_period_* (all items share a cycle in our single-price model). */
+function periodEnd(sub: Stripe.Subscription): number {
+  return sub.items.data[0]?.current_period_end ?? 0
+}
+function periodStart(sub: Stripe.Subscription): number {
+  return sub.items.data[0]?.current_period_start ?? 0
+}
+
 /** Build the resolver-shaped record from a Stripe subscription. */
 function toSubscriptionRecord(sub: Stripe.Subscription): SubscriptionRecord {
   return {
     tier: tierForSubscription(sub),
     status: sub.status as SubscriptionStatus,
     // Stripe gives epoch seconds; the resolver accepts epoch ms or ISO.
-    current_period_end: sub.current_period_end * 1000,
+    current_period_end: periodEnd(sub) * 1000,
     cancel_at_period_end: Boolean(sub.cancel_at_period_end),
   }
 }
@@ -110,8 +119,8 @@ async function persistSubscription(
         operator_id: operatorId,
         tier: record.tier,
         status: record.status,
-        current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+        current_period_start: new Date(periodStart(sub) * 1000).toISOString(),
+        current_period_end: new Date(periodEnd(sub) * 1000).toISOString(),
         cancel_at_period_end: record.cancel_at_period_end,
         updated_at: new Date(nowMs).toISOString(),
       },
@@ -249,10 +258,9 @@ export async function handleInvoicePaid(
   invoice: Stripe.Invoice,
 ): Promise<HandlerResult> {
   const sb = getSupabaseServer()
+  const invSub = invoice.parent?.subscription_details?.subscription ?? null
   const subId =
-    typeof invoice.subscription === 'string'
-      ? invoice.subscription
-      : invoice.subscription?.id ?? null
+    typeof invSub === 'string' ? invSub : invSub?.id ?? null
   if (!sb) return ok(`invoice paid (dev) subscription=${subId}`)
   try {
     if (subId) {
@@ -276,10 +284,9 @@ export async function handleInvoiceFailed(
   invoice: Stripe.Invoice,
 ): Promise<HandlerResult> {
   const sb = getSupabaseServer()
+  const invSub = invoice.parent?.subscription_details?.subscription ?? null
   const subId =
-    typeof invoice.subscription === 'string'
-      ? invoice.subscription
-      : invoice.subscription?.id ?? null
+    typeof invSub === 'string' ? invSub : invSub?.id ?? null
   if (!sb) return ok(`invoice failed (dev) subscription=${subId}`)
   try {
     if (subId) {
