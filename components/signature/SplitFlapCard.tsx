@@ -3,9 +3,10 @@
 /**
  * components/signature/SplitFlapCard.tsx — dot-matrix tractor-feed printout.
  *
- * Right panel: green-bar computer paper with sprocket holes, large black
- * monospace text, print-head scan animation. Left panel: gold SigRank
- * identity with radar. No split-flap — just printed text, fully readable.
+ * Right panel: green-bar computer paper with sprocket holes. Text prints
+ * character-by-character, left to right, with a blinking cursor at the
+ * print head — like a real dot-matrix printer. Left panel: gold SigRank
+ * identity with radar.
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -101,64 +102,107 @@ function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
 // ── Print animation CSS ───────────────────────────────────────────────────
 
 const PRINT_CSS = `
-@keyframes printFeed {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes printHead {
-  0% { top: 0; opacity: 0.9; }
-  85% { opacity: 0.7; }
-  100% { top: 100%; opacity: 0; }
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 @keyframes paperFeed {
-  from { transform: translateY(12px); opacity: 0; }
+  from { transform: translateY(14px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+.print-cursor {
+  animation: blink 0.3s steps(1) infinite;
 }
 `
 
-// ── A printed line ────────────────────────────────────────────────────────
+// ── Line formatting ───────────────────────────────────────────────────────
+// Each metric line is one monospace string: [glyph 5] [gap 2] [label 14] [gap 4] [value 12]
+// = 37 chars total. The glyph zone (first 7 chars) is colored, label zone
+// (next 18) is dark gray, value zone (last 12) is near-black bold.
 
-interface PrintLine {
-  glyph: string
-  label: string
-  value: string
-  color: string
+const GLYPH_W = 5
+const LABEL_W = 14
+const GAP1 = 2
+const GAP2 = 4
+const VALUE_W = 12
+const GLYPH_ZONE = GLYPH_W + GAP1           // 7
+const LABEL_ZONE = LABEL_W + GAP2           // 18
+
+function formatLine(glyph: string, label: string, value: string): string {
+  return glyph.padEnd(GLYPH_W) + ' '.repeat(GAP1) + label.padEnd(LABEL_W) + ' '.repeat(GAP2) + value.padStart(VALUE_W)
 }
 
-function PrintRow({ line, index }: { line: PrintLine; index: number }) {
+// ── Typewriter line (colored glyph + label + value) ───────────────────────
+
+function TypewriterLine({
+  text, glyphColor, startDelay, charDelay, reduced,
+}: {
+  text: string
+  glyphColor: string
+  startDelay: number
+  charDelay: number
+  reduced: boolean
+}) {
+  const [count, setCount] = useState(reduced ? text.length : 0)
+  const done = count >= text.length
+
+  useEffect(() => {
+    if (done) return
+    const delay = count === 0 ? startDelay : charDelay
+    const timer = setTimeout(() => setCount(c => c + 1), delay)
+    return () => clearTimeout(timer)
+  }, [count, done, startDelay, charDelay])
+
+  const revealed = text.slice(0, count)
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', height: '40px',
-      padding: '0 20px 0 16px', gap: '12px',
-      animation: `printFeed 0.25s ease-out ${index * 55}ms both`,
+      height: '40px', display: 'flex', alignItems: 'center',
+      padding: '0 20px 0 16px', whiteSpace: 'pre',
+      fontSize: '22px', fontWeight: 700,
+      fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+      textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.06)',
     }}>
-      {/* Glyph — colored, bold */}
-      <span style={{
-        width: '52px', flexShrink: 0,
-        fontSize: '26px', fontWeight: 800, color: line.color,
-        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-        textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.08)',
-      }}>
-        {line.glyph}
-      </span>
-      {/* Label — dark gray */}
-      <span style={{
-        width: '180px', flexShrink: 0,
-        fontSize: '18px', fontWeight: 600, color: '#2a3a1a',
-        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-        letterSpacing: '0.5px',
-      }}>
-        {line.label}
-      </span>
-      {/* Value — black, bold, right-aligned */}
-      <span style={{
-        flex: 1, textAlign: 'right',
-        fontSize: '24px', fontWeight: 800, color: '#0a0a0a',
-        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-        textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.06)',
-      }}>
-        {line.value}
-      </span>
+      <span style={{ color: glyphColor, fontWeight: 800 }}>{revealed.slice(0, GLYPH_ZONE)}</span>
+      <span style={{ color: '#2a3a1a', fontWeight: 600 }}>{revealed.slice(GLYPH_ZONE, GLYPH_ZONE + LABEL_ZONE)}</span>
+      <span style={{ color: '#0a0a0a', fontWeight: 800 }}>{revealed.slice(GLYPH_ZONE + LABEL_ZONE)}</span>
+      {!done && <span className="print-cursor" style={{ color: '#0a0a0a', fontWeight: 800 }}>{'\u258c'}</span>}
+    </div>
+  )
+}
+
+// ── Typewriter simple (single color, for header/divider) ──────────────────
+
+function TypewriterSimple({
+  text, color, startDelay, charDelay, reduced, weight = 700, size = 22,
+}: {
+  text: string
+  color: string
+  startDelay: number
+  charDelay: number
+  reduced: boolean
+  weight?: number
+  size?: number
+}) {
+  const [count, setCount] = useState(reduced ? text.length : 0)
+  const done = count >= text.length
+
+  useEffect(() => {
+    if (done) return
+    const delay = count === 0 ? startDelay : charDelay
+    const timer = setTimeout(() => setCount(c => c + 1), delay)
+    return () => clearTimeout(timer)
+  }, [count, done, startDelay, charDelay])
+
+  return (
+    <div style={{
+      height: '40px', display: 'flex', alignItems: 'center',
+      padding: '0 20px 0 16px', whiteSpace: 'pre',
+      fontSize: `${size}px`, fontWeight: weight, color,
+      fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+      textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.06)',
+    }}>
+      {text.slice(0, count)}
+      {!done && <span className="print-cursor" style={{ color }}>{'\u258c'}</span>}
     </div>
   )
 }
@@ -169,30 +213,31 @@ function Board({
   cardRef, codename, name, yieldValue, classTier, platform,
   inputTokens, outputTokens, cacheRead, cacheCreate,
   snr, leverage, velocity, dev10x, scaleV, efficiency, costPerMillion,
-  opRatio, cascadeStr, radarAxes,
+  opRatio, cascadeStr, radarAxes, reduced,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>
+  reduced: boolean
 } & Omit<SplitFlapCardProps, 'showControls'>) {
   const W = 1200, H = 630, LEFT_W = 420, RIGHT_W = W - LEFT_W
 
-  const yieldStr = yieldValue !== null ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0)) : '—'
-  const snrStr = snr != null ? `${(snr * 100).toFixed(0)}%` : '—'
-  const levStr = leverage != null ? `${leverage.toFixed(0)}x` : '—'
-  const velStr = velocity != null ? velocity.toFixed(1) : '—'
-  const devStr = dev10x != null ? dev10x.toFixed(2) : '—'
-  const scaleStr = scaleV != null ? scaleV.toFixed(2) : '—'
-  const effStr = efficiency != null ? `${efficiency.toFixed(1)}x` : '—'
-  const costStr = costPerMillion != null ? `$${costPerMillion.toFixed(2)}` : '—'
-  const inputStr = inputTokens != null ? fmtTokens(inputTokens) : '—'
-  const outputStr = outputTokens != null ? fmtTokens(outputTokens) : '—'
-  const cacheReadStr = cacheRead != null ? fmtTokens(cacheRead) : '—'
-  const cacheCreateStr = cacheCreate != null ? fmtTokens(cacheCreate) : '—'
-  const totalStr = (inputTokens && outputTokens && cacheRead && cacheCreate) ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '—'
-  const opStr = opRatio ?? '—'
-  const cascadeStrVal = cascadeStr ?? '—'
+  const yieldStr = yieldValue !== null ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0)) : '\u2014'
+  const snrStr = snr != null ? `${(snr * 100).toFixed(0)}%` : '\u2014'
+  const levStr = leverage != null ? `${leverage.toFixed(0)}x` : '\u2014'
+  const velStr = velocity != null ? velocity.toFixed(1) : '\u2014'
+  const devStr = dev10x != null ? dev10x.toFixed(2) : '\u2014'
+  const scaleStr = scaleV != null ? scaleV.toFixed(2) : '\u2014'
+  const effStr = efficiency != null ? `${efficiency.toFixed(1)}x` : '\u2014'
+  const costStr = costPerMillion != null ? `$${costPerMillion.toFixed(2)}` : '\u2014'
+  const inputStr = inputTokens != null ? fmtTokens(inputTokens) : '\u2014'
+  const outputStr = outputTokens != null ? fmtTokens(outputTokens) : '\u2014'
+  const cacheReadStr = cacheRead != null ? fmtTokens(cacheRead) : '\u2014'
+  const cacheCreateStr = cacheCreate != null ? fmtTokens(cacheCreate) : '\u2014'
+  const totalStr = (inputTokens && outputTokens && cacheRead && cacheCreate) ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '\u2014'
+  const opStr = opRatio ?? '\u2014'
+  const cascadeStrVal = cascadeStr ?? '\u2014'
 
   const radarColors = ['#f0c862', '#8ae89a', '#8ae89a', '#f0c862', '#f0eee0', '#8ae89a']
-  const radarGlyphs = ['Υ', 'SNR', 'LEV', '⚡', 'SCL', 'EFF']
+  const radarGlyphs = ['\u03a5', 'SNR', 'LEV', '\u26a1', 'SCL', 'EFF']
   const coloredAxes: RadarAxis[] = radarAxes && radarAxes.length >= 3
     ? radarAxes.map((a, i) => ({ ...a, color: radarColors[i % 6], glyph: radarGlyphs[i % 6] }))
     : []
@@ -200,21 +245,29 @@ function Board({
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
 
-  // Dark, readable colors for glyphs on green-bar paper
+  // Dark ink colors for glyphs on green-bar paper
   const C_GOLD = '#7a5a1a'
   const C_GREEN = '#1a4a2a'
   const C_BONE = '#2a2a2a'
   const C_DIM = '#4a5a3a'
 
-  // All printed lines — raw first, then derived
-  const rawLines: PrintLine[] = [
+  // ── Build all print lines ───────────────────────────────────────────────
+
+  const CHAR_DELAY = 8      // ms per character
+  const LINE_GAP = 45       // ms between lines
+  const INITIAL_DELAY = 350 // ms before first line (after paper feed)
+
+  const headerText = 'CASCADE TELEMETRY              *** LIVE ***'
+  const dividerText = '         - - - DERIVED - - -'
+
+  const rawLines = [
     { glyph: 'IN', label: 'INPUT', value: inputStr, color: C_BONE },
     { glyph: 'OUT', label: 'OUTPUT', value: outputStr, color: C_GREEN },
     { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, color: C_GREEN },
     { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, color: C_BONE },
     { glyph: '\u2211', label: 'TOTAL', value: totalStr, color: C_DIM },
   ]
-  const derivedLines: PrintLine[] = [
+  const derivedLines = [
     { glyph: '\u03a5', label: 'YIELD', value: yieldStr, color: C_GOLD },
     { glyph: 'SNR', label: 'SNR', value: snrStr, color: C_GREEN },
     { glyph: 'LEV', label: 'LEVERAGE', value: levStr, color: C_GREEN },
@@ -225,7 +278,20 @@ function Board({
     { glyph: '$', label: 'COST/1M', value: costStr, color: C_DIM },
   ]
 
-  // Sprocket hole pattern — small dark circles on a gray strip
+  // Compute cumulative start delays for each line
+  const allTexts = [
+    headerText,
+    ...rawLines.map(l => formatLine(l.glyph, l.label, l.value)),
+    dividerText,
+    ...derivedLines.map(l => formatLine(l.glyph, l.label, l.value)),
+  ]
+  const delays: number[] = []
+  let cursor = INITIAL_DELAY
+  for (const t of allTexts) {
+    delays.push(cursor)
+    cursor += t.length * CHAR_DELAY + LINE_GAP
+  }
+  // Sprocket hole pattern
   const sprocketBg = {
     backgroundColor: '#c8d4b8',
     backgroundImage: 'radial-gradient(circle at center, #a8b498 3px, transparent 3.5px)',
@@ -233,11 +299,13 @@ function Board({
     backgroundPosition: '0 10px',
   }
 
-  // Green-bar paper stripes — alternating green/white, 40px each
+  // Green-bar paper stripes
   const paperBg = {
     backgroundColor: '#eef4e4',
     backgroundImage: 'repeating-linear-gradient(0deg, #d8e6c8 0px, #d8e6c8 40px, #eef4e4 40px, #eef4e4 80px)',
   }
+
+  let delayIdx = 0
 
   return (
     <div ref={cardRef} style={{
@@ -269,7 +337,7 @@ function Board({
 
         {/* Brand row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>&#9670; SIGRANK</span>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>{'\u25c8'} SIGRANK</span>
           <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES &middot; MO&sect;ES&#8482;</span>
         </div>
 
@@ -281,7 +349,7 @@ function Board({
 
         {/* Yield headline */}
         <div style={{ marginTop: '10px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK }}>&#933;</span>
+          <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK }}>{'\u03a5'}</span>
           <span style={{ fontSize: '11px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
           <span style={{ fontSize: '30px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
         </div>
@@ -324,7 +392,7 @@ function Board({
       <div style={{
         width: RIGHT_W, height: H, display: 'flex',
         boxSizing: 'border-box', flexShrink: 0,
-        animation: 'paperFeed 0.4s ease-out both',
+        animation: 'paperFeed 0.35s ease-out both',
       }}>
         {/* Left sprocket strip */}
         <div style={{ width: '24px', height: '100%', ...sprocketBg, flexShrink: 0 }} />
@@ -334,61 +402,57 @@ function Board({
           flex: 1, height: '100%', position: 'relative', overflow: 'hidden',
           ...paperBg,
         }}>
-          {/* Print head — scans down on mount */}
-          <div style={{
-            position: 'absolute', left: 0, right: 0, height: '3px',
-            background: 'linear-gradient(to bottom, rgba(10,10,10,0.6), rgba(10,10,10,0.1))',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
-            zIndex: 5, pointerEvents: 'none',
-            animation: 'printHead 1.1s ease-in 0.1s both',
-          }} />
-
-          {/* Printed header */}
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '6px 20px 4px 16px', height: '36px',
-            borderBottom: '1px solid #b8c4a8',
-            animation: 'printFeed 0.25s ease-out both',
-          }}>
-            <span style={{
-              fontSize: '16px', fontWeight: 800, color: '#1a2a0a',
-              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-              letterSpacing: '1px',
-            }}>
-              CASCADE TELEMETRY
-            </span>
-            <span style={{
-              fontSize: '14px', fontWeight: 700, color: '#4a5a3a',
-              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-            }}>
-              *** LIVE ***
-            </span>
+          {/* Header line */}
+          <div style={{ borderBottom: '1px solid #b8c4a8' }}>
+            <TypewriterSimple
+              text={headerText}
+              color="#1a2a0a"
+              startDelay={delays[delayIdx++]}
+              charDelay={CHAR_DELAY}
+              reduced={reduced}
+              weight={800}
+              size={18}
+            />
           </div>
 
           {/* Raw token lines */}
-          {rawLines.map((line, i) => (
-            <PrintRow key={`raw-${line.glyph}`} line={line} index={i + 1} />
+          {rawLines.map((l) => (
+            <TypewriterLine
+              key={`raw-${l.glyph}`}
+              text={formatLine(l.glyph, l.label, l.value)}
+              glyphColor={l.color}
+              startDelay={delays[delayIdx++]}
+              charDelay={CHAR_DELAY}
+              reduced={reduced}
+            />
           ))}
 
           {/* Perforation divider */}
           <div style={{
-            height: '20px', display: 'flex', alignItems: 'center',
-            borderTop: '2px dashed #b8c4a8', borderBottom: '2px dashed #b8c4a8',
-            margin: '0 12px',
-            animation: `printFeed 0.25s ease-out ${(rawLines.length + 1) * 55}ms both`,
+            borderTop: '2px dashed #b8c4a8',
+            borderBottom: '2px dashed #b8c4a8',
           }}>
-            <span style={{
-              flex: 1, textAlign: 'center',
-              fontSize: '10px', color: '#8a9a7a', letterSpacing: '3px',
-              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-            }}>
-              - - - DERIVED - - -
-            </span>
+            <TypewriterSimple
+              text={dividerText}
+              color="#8a9a7a"
+              startDelay={delays[delayIdx++]}
+              charDelay={CHAR_DELAY}
+              reduced={reduced}
+              weight={600}
+              size={16}
+            />
           </div>
 
           {/* Derived metric lines */}
-          {derivedLines.map((line, i) => (
-            <PrintRow key={`der-${line.glyph}`} line={line} index={i + rawLines.length + 2} />
+          {derivedLines.map((l) => (
+            <TypewriterLine
+              key={`der-${l.glyph}`}
+              text={formatLine(l.glyph, l.label, l.value)}
+              glyphColor={l.color}
+              startDelay={delays[delayIdx++]}
+              charDelay={CHAR_DELAY}
+              reduced={reduced}
+            />
           ))}
         </div>
 
@@ -409,6 +473,7 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
   const [busy, setBusy] = useState(false)
   const [replayKey, setReplayKey] = useState(0)
   const [scale, setScale] = useState(1)
+  const [reduced, setReduced] = useState(false)
 
   useEffect(() => {
     const container = containerRef.current
@@ -418,6 +483,15 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
     const ro = new ResizeObserver(update)
     ro.observe(container)
     return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
   }, [])
 
   const replay = useCallback(() => setReplayKey((k) => k + 1), [])
@@ -451,14 +525,14 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
     <div className="flex flex-col gap-3">
       {showControls && (
         <div className="flex items-center gap-2">
-          <button type="button" onClick={replay} className={btn}>&#8635; Replay</button>
+          <button type="button" onClick={replay} className={btn}>{'\u21bb'} Replay</button>
           <button type="button" onClick={shareLink} className={btn}>{copied ? 'Copied \u2713' : 'Share'}</button>
           <button type="button" onClick={download} disabled={busy} className={btn}>{busy ? 'Rendering\u2026' : 'Download card'}</button>
         </div>
       )}
       <div ref={containerRef} className="overflow-hidden rounded-lg border border-[#264028]" style={{ width: '100%', height: 630 * scale }}>
         <div key={replayKey} style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: 1200, height: 630 }}>
-          <Board cardRef={cardRef} {...props} />
+          <Board cardRef={cardRef} reduced={reduced} {...props} />
         </div>
       </div>
     </div>
