@@ -24,7 +24,7 @@
     "react-dom": "^19.2.7",
     "server-only": "^0.0.1",
     "stripe": "^16.0.0",
-    "zod": "^3.23.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
