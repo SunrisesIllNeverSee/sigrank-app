@@ -1,16 +1,15 @@
 'use client'
 
 /**
- * components/signature/SplitFlapCard.tsx — real Solari split-flap board.
+ * components/signature/SplitFlapCard.tsx — dot-matrix tractor-feed printout.
  *
- * No midline seam. Glyphs label each metric. Name at top. Big radar.
- * 2-column board grid: raw pillars left, derived metrics right.
- * Fills the full 1200×630 with no dead space.
+ * Right panel: green-bar computer paper with sprocket holes, large black
+ * monospace text, print-head scan animation. Left panel: gold SigRank
+ * identity with radar. No split-flap — just printed text, fully readable.
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { toPng } from 'html-to-image'
-import { SplitFlap, type Palette } from 'clackboard'
 import { track } from '@/lib/posthog/events'
 
 export interface SplitFlapCardProps {
@@ -35,17 +34,6 @@ export interface SplitFlapCardProps {
   radarAxes?: { label: string; value: number; max: number }[]
   showControls?: boolean
 }
-
-// ── Palettes — NO MIDLINE (div = bg) ──────────────────────────────────────
-
-const mk = (text: string, bg = '#0a0a08'): Palette => ({
-  text, topBg: bg, botBg: bg, border: '#1a1a16', div: bg,
-})
-const GOLD_P = mk('#f0c862')       // brighter gold for readability
-const GREEN_P = mk('#8ae89a')      // brighter green
-const BONE_P = mk('#f0eee0')       // brighter bone
-const DIM_P = mk('#7aaa7a')        // brighter dim
-const LABEL_P = mk('#6a9a6a', '#060606')
 
 // ── Format helpers ────────────────────────────────────────────────────────
 
@@ -110,29 +98,67 @@ function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
   )
 }
 
-// ── A compact metric cell: glyph + value stacked ──────────────────────────
+// ── Print animation CSS ───────────────────────────────────────────────────
 
-function MetricCell({ glyph, value, palette }: { glyph: string; value: string; palette: Palette }) {
+const PRINT_CSS = `
+@keyframes printFeed {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes printHead {
+  0% { top: 0; opacity: 0.9; }
+  85% { opacity: 0.7; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes paperFeed {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+`
+
+// ── A printed line ────────────────────────────────────────────────────────
+
+interface PrintLine {
+  glyph: string
+  label: string
+  value: string
+  color: string
+}
+
+function PrintRow({ line, index }: { line: PrintLine; index: number }) {
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      gap: '1px', padding: '3px 4px',
-      borderBottom: '1px solid #131311',
+      display: 'flex', alignItems: 'center', height: '40px',
+      padding: '0 20px 0 16px', gap: '12px',
+      animation: `printFeed 0.25s ease-out ${index * 55}ms both`,
     }}>
-      {/* Glyph — colored, prominent */}
-      <SplitFlap
-        value={glyph} length={glyph.length}
-        size="md" variant="classic" palette={palette}
-        mode="board" easing="decelerate" flipMs={60} stagger={12} gap={1}
-        perspective={150} animateOnMount
-      />
-      {/* Value — bigger, readable */}
-      <SplitFlap
-        value={value.padEnd(6, ' ')} length={6}
-        size="md" variant="classic" palette={palette}
-        mode="board" easing="decelerate" flipMs={80} stagger={18} gap={2}
-        perspective={200} animateOnMount
-      />
+      {/* Glyph — colored, bold */}
+      <span style={{
+        width: '52px', flexShrink: 0,
+        fontSize: '26px', fontWeight: 800, color: line.color,
+        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+        textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.08)',
+      }}>
+        {line.glyph}
+      </span>
+      {/* Label — dark gray */}
+      <span style={{
+        width: '180px', flexShrink: 0,
+        fontSize: '18px', fontWeight: 600, color: '#2a3a1a',
+        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+        letterSpacing: '0.5px',
+      }}>
+        {line.label}
+      </span>
+      {/* Value — black, bold, right-aligned */}
+      <span style={{
+        flex: 1, textAlign: 'right',
+        fontSize: '24px', fontWeight: 800, color: '#0a0a0a',
+        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+        textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.06)',
+      }}>
+        {line.value}
+      </span>
     </div>
   )
 }
@@ -174,24 +200,44 @@ function Board({
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
 
-  // Raw + derived metrics for the 2-column grid
-  const rawMetrics = [
-    { glyph: 'IN', value: inputStr, palette: BONE_P },
-    { glyph: 'OUT', value: outputStr, palette: GREEN_P },
-    { glyph: 'CR', value: cacheReadStr, palette: GREEN_P },
-    { glyph: 'CW', value: cacheCreateStr, palette: BONE_P },
-    { glyph: '∑', value: totalStr, palette: DIM_P },
+  // Dark, readable colors for glyphs on green-bar paper
+  const C_GOLD = '#7a5a1a'
+  const C_GREEN = '#1a4a2a'
+  const C_BONE = '#2a2a2a'
+  const C_DIM = '#4a5a3a'
+
+  // All printed lines — raw first, then derived
+  const rawLines: PrintLine[] = [
+    { glyph: 'IN', label: 'INPUT', value: inputStr, color: C_BONE },
+    { glyph: 'OUT', label: 'OUTPUT', value: outputStr, color: C_GREEN },
+    { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, color: C_GREEN },
+    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, color: C_BONE },
+    { glyph: '\u2211', label: 'TOTAL', value: totalStr, color: C_DIM },
   ]
-  const derivedMetrics = [
-    { glyph: 'Υ', value: yieldStr, palette: GOLD_P },
-    { glyph: 'SNR', value: snrStr, palette: GREEN_P },
-    { glyph: 'LEV', value: levStr, palette: GREEN_P },
-    { glyph: 'VEL', value: velStr, palette: BONE_P },
-    { glyph: '⚡', value: devStr, palette: GOLD_P },
-    { glyph: 'SCL', value: scaleStr, palette: BONE_P },
-    { glyph: 'EFF', value: effStr, palette: GREEN_P },
-    { glyph: '$', value: costStr, palette: DIM_P },
+  const derivedLines: PrintLine[] = [
+    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, color: C_GOLD },
+    { glyph: 'SNR', label: 'SNR', value: snrStr, color: C_GREEN },
+    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, color: C_GREEN },
+    { glyph: 'VEL', label: 'VELOCITY', value: velStr, color: C_BONE },
+    { glyph: '\u26a1', label: '10X DEV', value: devStr, color: C_GOLD },
+    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, color: C_BONE },
+    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, color: C_GREEN },
+    { glyph: '$', label: 'COST/1M', value: costStr, color: C_DIM },
   ]
+
+  // Sprocket hole pattern — small dark circles on a gray strip
+  const sprocketBg = {
+    backgroundColor: '#c8d4b8',
+    backgroundImage: 'radial-gradient(circle at center, #a8b498 3px, transparent 3.5px)',
+    backgroundSize: '20px 20px',
+    backgroundPosition: '0 10px',
+  }
+
+  // Green-bar paper stripes — alternating green/white, 40px each
+  const paperBg = {
+    backgroundColor: '#eef4e4',
+    backgroundImage: 'repeating-linear-gradient(0deg, #d8e6c8 0px, #d8e6c8 40px, #eef4e4 40px, #eef4e4 80px)',
+  }
 
   return (
     <div ref={cardRef} style={{
@@ -200,6 +246,8 @@ function Board({
       position: 'relative', overflow: 'hidden',
       fontFamily: 'var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace',
     }}>
+      <style>{PRINT_CSS}</style>
+
       {/* ═══ LEFT 1/3 — gold ═══ */}
       <div style={{
         width: LEFT_W, height: H, background: GOLD_BG,
@@ -221,8 +269,8 @@ function Board({
 
         {/* Brand row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>◈ SIGRANK</span>
-          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES · MO§ES™</span>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>&#9670; SIGRANK</span>
+          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES &middot; MO&sect;ES&#8482;</span>
         </div>
 
         {/* Diamond divider */}
@@ -233,7 +281,7 @@ function Board({
 
         {/* Yield headline */}
         <div style={{ marginTop: '10px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK }}>Υ</span>
+          <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK }}>&#933;</span>
           <span style={{ fontSize: '11px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
           <span style={{ fontSize: '30px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
         </div>
@@ -242,7 +290,7 @@ function Board({
         <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {[
             ['CLASS', classTier],
-            ['PLATFORM', (platform ?? '—').toUpperCase()],
+            ['PLATFORM', (platform ?? '\u2014').toUpperCase()],
             ['CASCADE', cascadeStrVal],
             ['OP RATIO', opStr],
           ].map(([label, val]) => (
@@ -272,70 +320,81 @@ function Board({
         </div>
       </div>
 
-      {/* ═══ RIGHT 2/3 — dark Solari board, 2-column grid ═══ */}
+      {/* ═══ RIGHT 2/3 — tractor-feed printout ═══ */}
       <div style={{
-        width: RIGHT_W, height: H, background: '#050605',
-        display: 'flex', flexDirection: 'column', boxSizing: 'border-box', flexShrink: 0,
+        width: RIGHT_W, height: H, display: 'flex',
+        boxSizing: 'border-box', flexShrink: 0,
+        animation: 'paperFeed 0.4s ease-out both',
       }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '8px 16px 6px', borderBottom: '2px solid #264028',
-        }}>
-          <SplitFlap
-            value="CASCADE TELEMETRY" size="md" variant="classic" palette={GOLD_P}
-            mode="board" easing="decelerate" flipMs={60} stagger={25} gap={2}
-            perspective={200} animateOnMount
-          />
-          <SplitFlap
-            value="LIVE" size="md" variant="classic" palette={DIM_P}
-            mode="board" flipMs={60} animateOnMount
-          />
-        </div>
+        {/* Left sprocket strip */}
+        <div style={{ width: '24px', height: '100%', ...sprocketBg, flexShrink: 0 }} />
 
-        {/* Section labels */}
+        {/* Paper — green-bar with printed content */}
         <div style={{
-          display: 'flex', padding: '6px 16px 4px',
-          borderBottom: '1px solid #1a2a1a',
+          flex: 1, height: '100%', position: 'relative', overflow: 'hidden',
+          ...paperBg,
         }}>
-          <span style={{ flex: 1, fontSize: '12px', color: '#8ae89a', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center', fontWeight: 700 }}>
-            RAW TOKENS
-          </span>
-          <span style={{ flex: 1, fontSize: '12px', color: '#8ae89a', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center', fontWeight: 700 }}>
-            DERIVED METRICS
-          </span>
-        </div>
-
-        {/* 2-column grid: raw left, derived right */}
-        <div style={{
-          flex: 1, display: 'flex', overflow: 'hidden',
-        }}>
-          {/* Left column — raw */}
+          {/* Print head — scans down on mount */}
           <div style={{
-            flex: 1, borderRight: '1px solid #1a2a1a',
-            display: 'flex', flexDirection: 'column', justifyContent: 'space-around',
+            position: 'absolute', left: 0, right: 0, height: '3px',
+            background: 'linear-gradient(to bottom, rgba(10,10,10,0.6), rgba(10,10,10,0.1))',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            zIndex: 5, pointerEvents: 'none',
+            animation: 'printHead 1.1s ease-in 0.1s both',
+          }} />
+
+          {/* Printed header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '6px 20px 4px 16px', height: '36px',
+            borderBottom: '1px solid #b8c4a8',
+            animation: 'printFeed 0.25s ease-out both',
           }}>
-            {rawMetrics.map((m) => (
-              <MetricCell key={m.glyph} glyph={m.glyph} value={m.value} palette={m.palette} />
-            ))}
+            <span style={{
+              fontSize: '16px', fontWeight: 800, color: '#1a2a0a',
+              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+              letterSpacing: '1px',
+            }}>
+              CASCADE TELEMETRY
+            </span>
+            <span style={{
+              fontSize: '14px', fontWeight: 700, color: '#4a5a3a',
+              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+            }}>
+              *** LIVE ***
+            </span>
           </div>
 
-          {/* Right column — derived */}
+          {/* Raw token lines */}
+          {rawLines.map((line, i) => (
+            <PrintRow key={`raw-${line.glyph}`} line={line} index={i + 1} />
+          ))}
+
+          {/* Perforation divider */}
           <div style={{
-            flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around',
+            height: '20px', display: 'flex', alignItems: 'center',
+            borderTop: '2px dashed #b8c4a8', borderBottom: '2px dashed #b8c4a8',
+            margin: '0 12px',
+            animation: `printFeed 0.25s ease-out ${(rawLines.length + 1) * 55}ms both`,
           }}>
-            {derivedMetrics.map((m) => (
-              <MetricCell key={m.glyph} glyph={m.glyph} value={m.value} palette={m.palette} />
-            ))}
+            <span style={{
+              flex: 1, textAlign: 'center',
+              fontSize: '10px', color: '#8a9a7a', letterSpacing: '3px',
+              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+            }}>
+              - - - DERIVED - - -
+            </span>
           </div>
+
+          {/* Derived metric lines */}
+          {derivedLines.map((line, i) => (
+            <PrintRow key={`der-${line.glyph}`} line={line} index={i + rawLines.length + 2} />
+          ))}
         </div>
+
+        {/* Right sprocket strip */}
+        <div style={{ width: '24px', height: '100%', ...sprocketBg, flexShrink: 0 }} />
       </div>
-
-      {/* Scanline */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)',
-      }} />
     </div>
   )
 }
@@ -392,9 +451,9 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
     <div className="flex flex-col gap-3">
       {showControls && (
         <div className="flex items-center gap-2">
-          <button type="button" onClick={replay} className={btn}>↻ Replay</button>
-          <button type="button" onClick={shareLink} className={btn}>{copied ? 'Copied ✓' : 'Share'}</button>
-          <button type="button" onClick={download} disabled={busy} className={btn}>{busy ? 'Rendering…' : 'Download card'}</button>
+          <button type="button" onClick={replay} className={btn}>&#8635; Replay</button>
+          <button type="button" onClick={shareLink} className={btn}>{copied ? 'Copied \u2713' : 'Share'}</button>
+          <button type="button" onClick={download} disabled={busy} className={btn}>{busy ? 'Rendering\u2026' : 'Download card'}</button>
         </div>
       )}
       <div ref={containerRef} className="overflow-hidden rounded-lg border border-[#264028]" style={{ width: '100%', height: 630 * scale }}>
