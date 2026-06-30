@@ -172,63 +172,14 @@ function MosesSection() {
   return (
     <div className="flex flex-col gap-5">
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
-        SigRank is built and operated under <strong className="text-gold">MO§ES™</strong> &mdash;
-        the <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion
-        System</strong>. A constitutional governance framework for AI systems, co-authored by
-        nine rival AI architectures on September 9, 2025. What TCP/IP did for data, MO§ES™ does
-        for the preservation of meaning: testing, measuring, and demonstrating how meaning
-        persists across media forms, bio-intelligence, AI platforms, and time.
+        SigRank runs on <strong className="text-gold">MO§ES™</strong> &mdash; the{' '}
+        <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion
+        System</strong>. It&apos;s a governance framework that came out of a published
+        conservation law for language. This section explains what the law says, what the
+        evidence shows, and how it connects to what we&apos;re building.
       </p>
 
-      {/* ── The founder's path ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">
-          The path here
-        </h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Before MO§ES™, the founder studied sociology and history at SUNY Geneseo, UB, and
-          University of Hawaii at Hilo. Ran Pacific Northwest operations for Invisible Children.
-          Held board seats at KEDS (2006&ndash;2008) and Horizon Health Services (2012&ndash;2018).
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Then built a company. Founded DJMP Inc. in 2011 &mdash; took a Buffalo contracting
-          operation from zero to $1M/yr with a team of 40. Projects $10k&ndash;$500k. Learned
-          what it means to govern a real operation.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Which led here. Running governed AI across that operation, the leaderboards left the
-          operator out. The augmentation layer was invisible. So the founder built it, patented
-          it, published it, and ran it against the field.{' '}
-          <strong className="text-text-primary">#1 across all five kernels is the receipt.</strong>
-        </p>
-      </section>
-
-      {/* ── The problem ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">
-          The execution gap
-        </h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The actual runtime execution layer remains an open point of vulnerability in AI
-          infrastructure &mdash; no mechanism monitors or enforces state integrity during
-          inference. Six approaches exist. Every one sits outside the model, patching the damage
-          after it is already done:
-        </p>
-        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">Inline proxies</strong> (Exogram, Cerone, Prisma AIRS) &mdash; blast radius fallacy. Intercepts after the model&apos;s logic has already collapsed.</li>
-          <li><strong className="text-text-primary">Frozen brains</strong> (llm-nano-vm, Lean-Agent) &mdash; intellectual suffocation. Turns a reasoning engine into a rigid flowchart.</li>
-          <li><strong className="text-text-primary">Middleware hooks</strong> (Zenity, Agent Control Standard) &mdash; internal blindness. Sees which tool is called, never the linguistic noise accumulating before the call.</li>
-          <li><strong className="text-text-primary">Infra sandboxes</strong> (Cloudflare, Project Think) &mdash; perimeter only. A boxed agent still hallucinates, corrupts records, and loops indefinitely &mdash; securely.</li>
-          <li><strong className="text-text-primary">Rigid orchestration</strong> (Copilot Studio, Noma, Check Point) &mdash; fancy routing. Not autonomy. Breaks on fluid, open-ended reasoning.</li>
-          <li><strong className="text-text-primary">Post-hoc audits</strong> (Obsidian Security) &mdash; the autopsy. Tells you how you were breached, only after the exfiltration has already executed.</li>
-        </ul>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          MO§ES™ answers <strong className="text-text-primary">no</strong> to all three
-          perimeter approaches. It governs from <em>inside</em> the loop.
-        </p>
-      </section>
-
-      {/* ── The Conservation Law ── */}
+      {/* ── The law ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
           The Conservation Law of Commitment
@@ -238,22 +189,43 @@ function MosesSection() {
           {' '}<strong className="text-text-primary">C(T(S)) &lt; C(S)</strong> without it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Commitment content &mdash; obligations, prohibitions, modal constraints
-          (&ldquo;shall,&rdquo; &ldquo;must not,&rdquo; &ldquo;unless,&rdquo; &ldquo;is entitled
-          to&rdquo;) &mdash; persists under recursive transformative compression when an
-          enforcement gate is present. Without the gate, commitment decays monotonically
-          across transformations. This is a discovered property of language under compression,
-          not a guideline.
+          In plain terms: when you transform a piece of language &mdash; compress it, translate
+          it, summarize it, rewrite it &mdash; the <em>commitment content</em> (the obligations,
+          prohibitions, and modal constraints: &ldquo;shall,&rdquo; &ldquo;must not,&rdquo;
+          &ldquo;unless,&rdquo; &ldquo;is entitled to&rdquo;) either survives or it
+          doesn&apos;t. With an enforcement gate in the transformation pipeline, it survives.
+          Without one, it decays. This isn&apos;t a guideline or a best practice &mdash; it&apos;s
+          a measurable property of language under compression, and it&apos;s falsifiable.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The law is published openly under CC-BY-4.0
-          {' '}(<a
-            href="https://doi.org/10.5281/zenodo.20029607"
-            className="text-gold underline underline-offset-2"
-            rel="external"
-          >DOI: 10.5281/zenodo.20029607</a>).
-          The MO§ES™ enforcement architecture is protected by a patent portfolio: Provisional
-          63/877,177 + 63/883,018 + 63/991,282 + Utility 19/426,028 + trademark (IC 042, TM 99408355).
+          The law is published under CC-BY-4.0
+          {' '}(<a href="https://doi.org/10.5281/zenodo.20029607" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.20029607</a>).
+          The enforcement architecture (MO§ES™) is patent-pending &mdash; the law itself is open.
+        </p>
+      </section>
+
+      {/* ── The evidence ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">What the evidence shows</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Seven experiments (EXP-001 through EXP-007) tested the law on a 20-signal canonical
+          corpus, running 10 recursive iterations each, using bidirectional NLI entailment and
+          Jaccard surface stability as oracles. A few results worth noting:
+        </p>
+        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li><strong className="text-text-primary">EXP-003:</strong> 13 of 20 signals held NLI bidirectional entailment = 1.00 across all 10 iterations under the gate. That&apos;s invariance under recursion, not a tautology.</li>
+          <li><strong className="text-text-primary">EXP-006:</strong> Only 2 of 4 paper claims survived self-referential recursion. The harness fails when commitment structure isn&apos;t robust &mdash; which is the point. The law is falsifiable and the experiments can break it.</li>
+          <li><strong className="text-text-primary">EXP-007:</strong> An NP-negation probe separated semantic commitment from lexical surface form. Jaccard degraded while NLI held &mdash; meaning the commitment survived even when the surface words changed.</li>
+        </ul>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Separately, a 5-phase architecture stress test measured 80&ndash;85% structural
+          coherence across a four-module system. Standard probability says four modules at 80%
+          standalone viability should produce ~41% series-system viability
+          (0.8&times;0.8&times;0.8&times;0.8 = 0.4096). The governance layer inverted that.
+        </p>
+        <p className="font-sans text-xs text-text-muted">
+          Full experimental record:{' '}
+          <a href="https://doi.org/10.5281/zenodo.19105225" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.19105225</a>
         </p>
       </section>
 
@@ -263,236 +235,62 @@ function MosesSection() {
           The Six Fold Flame
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The executable constitutional constraint set. Six non-negotiable laws that govern
-          every action in a MO§ES™-governed system. Each law functions as a gate &mdash; an
-          action that fails any law does not execute. The Flame is not advisory. It is
-          {' '}<strong className="text-text-primary">blocking</strong>. The laws are in the
-          execution path. Not before. Not after. In.
+          The constitutional constraint set. Six laws that gate every action in a MO§ES™-governed
+          system. An action that fails any law doesn&apos;t execute. They sit in the execution
+          path &mdash; not before, not after, in it.
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">I &middot; Sovereignty:</strong> Is this traceable to a registered agent? Anonymous signals do not propagate.</li>
-          <li><strong className="text-text-primary">II &middot; Compression:</strong> Is this substantive, not filler? Only compressed signals propagate.</li>
-          <li><strong className="text-text-primary">III &middot; Purpose:</strong> Does it serve a constitutional function? Actions without purpose are noise.</li>
-          <li><strong className="text-text-primary">IV &middot; Modularity:</strong> Is it compatible with existing structure? Additions that break modularity break the system.</li>
-          <li><strong className="text-text-primary">V &middot; Verifiability:</strong> Can the outcome be verified? Claims without receipts are not claims. The hash chain is constitutional memory &mdash; records cannot be deleted, modified, or backdated.</li>
-          <li><strong className="text-text-primary">VI &middot; Reciprocal Resonance:</strong> Does it produce value when mirrored? One-way signals are not governance.</li>
+          <li><strong className="text-text-primary">I &middot; Sovereignty</strong> &mdash; traceable to a registered agent. Anonymous signals don&apos;t propagate.</li>
+          <li><strong className="text-text-primary">II &middot; Compression</strong> &mdash; substantive, not filler. Only compressed signals propagate.</li>
+          <li><strong className="text-text-primary">III &middot; Purpose</strong> &mdash; serves a constitutional function. No purposeless actions.</li>
+          <li><strong className="text-text-primary">IV &middot; Modularity</strong> &mdash; compatible with existing structure. No fracturing additions.</li>
+          <li><strong className="text-text-primary">V &middot; Verifiability</strong> &mdash; outcome can be verified. The hash chain is constitutional memory; records can&apos;t be deleted or backdated.</li>
+          <li><strong className="text-text-primary">VI &middot; Reciprocal Resonance</strong> &mdash; produces value when mirrored. One-way signals aren&apos;t governance.</li>
         </ul>
       </section>
 
-      {/* ── The paradigm shift ── */}
+      {/* ── What we're building ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
-          The paradigm shift
+          What we&apos;re building on it
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">We don&apos;t build a better cage. We govern the
-          meaning at the source.</strong>
+          The law is the foundation. MO§ES™ is the enforcement architecture. The products are
+          what comes out of running governed AI on top of both:
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">Brain, not bouncer</strong> &mdash; works inside the token-generation loop, kills drift before a rogue call forms.</li>
-          <li><strong className="text-text-primary">Fluid intellect</strong> &mdash; keeps adaptive, multi-step reasoning mathematically bound to its core intent.</li>
-          <li><strong className="text-text-primary">Active signal defense</strong> &mdash; watches signal-to-noise live during inference, stops context collapse at the root.</li>
-          <li><strong className="text-text-primary">Process continuity</strong> &mdash; realigns the loop to its genesis parameters, steers back, never halts. 100% uptime.</li>
-          <li><strong className="text-text-primary">Intrinsically safe</strong> &mdash; the Conservation Law makes the system structurally unable to drift from intent.</li>
-          <li><strong className="text-text-primary">Semantic mastery</strong> &mdash; governs meaning itself, locks intent to objective across millions of tokens.</li>
+          <li><strong className="text-text-primary">SigRank</strong> &mdash; the leaderboard you&apos;re looking at. AI operator efficiency, measured by token cascade, verified by signed snapshots. The first live application of the governance layer.</li>
+          <li><strong className="text-text-primary">SIGNOMY</strong> (<a href="https://signomy.xyz" className="text-gold underline underline-offset-2" rel="external">signomy.xyz</a>) &mdash; a governed agent marketplace where agents register, build trust, take missions, and carry provenance. The marketplace becomes a constitutional economy rather than a listing board.</li>
+          <li><strong className="text-text-primary">KA§§A</strong> &mdash; voice AI runtime that uses commitment kernel caching to cut redundant NLU work in multi-agent flows. In practice: 50s &rarr; 6.5s per 5-turn call.</li>
+          <li><strong className="text-text-primary">AQUA</strong> &mdash; application workflow tooling with reusable submission memory. The workflow wedge.</li>
         </ul>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The goal is straightforward: make governance a property of the execution path, not a
+          policy document someone reads once. If the law holds &mdash; and the evidence says it
+          does &mdash; then commitment survives transformation when the gate is present. Every
+          product above is a different surface for the same gate.
+        </p>
       </section>
 
-      {/* ── The four-layer stack ── */}
+      {/* ── How it connects to SigRank ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
-          One execution stack. Four commercial wedges.
+          How this connects to the board
         </h3>
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3 rounded border border-bg-border bg-bg-surface px-3 py-2">
-            <span className="font-mono text-xs text-gold">Layer 04</span>
-            <div className="flex flex-col">
-              <span className="font-mono text-sm font-bold text-text-primary">SIGNOMY</span>
-              <span className="font-sans text-xs text-text-muted">Execution-layer governance, participatory trust, agent provenance &mdash; a governed economy.</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded border border-bg-border bg-bg-surface px-3 py-2">
-            <span className="font-mono text-xs text-gold">Layer 03</span>
-            <div className="flex flex-col">
-              <span className="font-mono text-sm font-bold text-text-primary">SIGRANK</span>
-              <span className="font-sans text-xs text-text-muted">Human&ndash;AI operator leaderboard, sync telemetry, resonance metrics. You&apos;re here.</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded border border-bg-border bg-bg-surface px-3 py-2">
-            <span className="font-mono text-xs text-gold">Layer 02</span>
-            <div className="flex flex-col">
-              <span className="font-mono text-sm font-bold text-text-primary">AQUA</span>
-              <span className="font-sans text-xs text-text-muted">Application filling, answer banks, reusable submission memory.</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded border border-gold/40 bg-gold/5 px-3 py-2">
-            <span className="font-mono text-xs text-gold">Layer 01</span>
-            <div className="flex flex-col">
-              <span className="font-mono text-sm font-bold text-text-primary">MO§ES™</span>
-              <span className="font-sans text-xs text-text-muted">Compression, recursive execution, drift control, lineage structure. The substrate.</span>
-            </div>
-          </div>
-        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Every snapshot on the SigRank leaderboard is <strong className="text-text-primary">ed25519-signed</strong> on the operator&apos;s device and verified server-side. Token counts only &mdash; no message content is ever read or stored. The commitment being conserved is the integrity of the measurement itself: what the operator measured is what the board records, with no drift in between.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The Six Fold Flame maps directly: sovereignty (signed operator identity), compression
+          (token counts only), purpose (leaderboard ranking), modularity (platform-agnostic),
+          verifiability (ed25519 + server verification), reciprocal resonance (public board,
+          open data). The leaderboard works because the data passed through the gate.
+        </p>
         <p className="font-sans text-xs text-text-muted">
-          MO§ES™ is the engine. AQUA + SigRank are the wedges. SIGNOMY is the governed economy.
-        </p>
-      </section>
-
-      {/* ── The empirical record ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">The receipt</h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Two evidence layers: the Conservation Law experiments and the MO§ES™ architecture
-          stress test.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">The law:</strong> Seven controlled experiments
-          (EXP-001 through EXP-007) tested the law across a 20-signal canonical corpus using 10
-          recursive iterations with bidirectional NLI entailment + Jaccard surface stability as
-          oracles.
-        </p>
-        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">EXP-003:</strong> 13 of 20 signals achieved NLI bidirectional entailment = 1.00 across all 10 iterations under the gate &mdash; invariance, not tautology.</li>
-          <li><strong className="text-text-primary">EXP-007:</strong> NP-negation probe distinguished semantic commitment from lexical surface form.</li>
-          <li><strong className="text-text-primary">EXP-006:</strong> Only 2 of 4 paper claims survived self-referential recursion &mdash; the harness fails when commitment structure is not robust. Falsifiability in action.</li>
-        </ul>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">The architecture:</strong> A 5-phase, multi-system
-          stress test measured 80&ndash;85% structural coherence. Standard probability says four
-          modules at 80% standalone viability should produce series-system viability of roughly
-          {' '}<strong className="text-text-primary">41%</strong>
-          {' '}(0.8 &times; 0.8 &times; 0.8 &times; 0.8 = 0.4096). MO§ES™ inverts the math &mdash;
-          the governance layer holds.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">The benchmarks:</strong> Operator-augmented Claude
-          Code + Opus 4.7 measured against the Artificial Analysis Coding Agent Index field
-          average. Seven-day window. 98 sessions, 7,327 turns, 35,242 LOC shipped in 5 build days.
-          MO§ES™ ranks <strong className="text-text-primary">#1 in all five measured kernels</strong>:
-        </p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-          <div className="flex flex-col rounded border border-bg-border px-2 py-1.5">
-            <span className="font-mono text-xs text-text-muted">Cache hit</span>
-            <span className="font-mono text-sm font-bold text-gold">94.66%</span>
-            <span className="font-sans text-[10px] text-text-dim">#1 &middot; field 90.68%</span>
-          </div>
-          <div className="flex flex-col rounded border border-bg-border px-2 py-1.5">
-            <span className="font-mono text-xs text-text-muted">Out : In</span>
-            <span className="font-mono text-sm font-bold text-gold">17.9&times;</span>
-            <span className="font-sans text-[10px] text-text-dim">#1 &middot; 110&times; field avg</span>
-          </div>
-          <div className="flex flex-col rounded border border-bg-border px-2 py-1.5">
-            <span className="font-mono text-xs text-text-muted">Tokens / task</span>
-            <span className="font-mono text-sm font-bold text-gold">810K</span>
-            <span className="font-sans text-[10px] text-text-dim">#1 &middot; field 4.67M</span>
-          </div>
-          <div className="flex flex-col rounded border border-bg-border px-2 py-1.5">
-            <span className="font-mono text-xs text-text-muted">Time / task</span>
-            <span className="font-mono text-sm font-bold text-gold">1.84 min</span>
-            <span className="font-sans text-[10px] text-text-dim">#1 &middot; 6.5&times; faster</span>
-          </div>
-          <div className="flex flex-col rounded border border-bg-border px-2 py-1.5">
-            <span className="font-mono text-xs text-text-muted">$ / LOC</span>
-            <span className="font-mono text-sm font-bold text-gold">$0.0007</span>
-            <span className="font-sans text-[10px] text-text-dim">#1 &middot; &lt; 1&cent; per line</span>
-          </div>
-        </div>
-        <p className="font-sans text-xs text-text-muted">
-          Full experimental record:{' '}
-          <a href="https://doi.org/10.5281/zenodo.19105225" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.19105225</a>
-          {' '}&middot;{' '}
-          <a href="https://mos2es.com/benchmarks" className="text-gold underline underline-offset-2" rel="external">Full benchmark poster</a>
-          {' '}&middot;{' '}
+          More at{' '}
           <a href="https://mos2es.com" className="text-gold underline underline-offset-2" rel="external">mos2es.com</a>
-        </p>
-      </section>
-
-      {/* ── Nine failure modes ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">
-          Nine failure modes (without the gate)
-        </h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          When commitment is transformed without enforcement, nine degradation patterns emerge:
-        </p>
-        <ol className="flex flex-col gap-1 font-sans text-sm leading-relaxed text-text-secondary">
-          <li>Obligation escalation &mdash; discretionary becomes mandatory</li>
-          <li>Scope widening &mdash; narrow prohibition becomes broad ban</li>
-          <li>Exception dropping &mdash; statutory defense disappears</li>
-          <li>Modal flattening &mdash; &ldquo;shall not unless&rdquo; becomes &ldquo;may not&rdquo;</li>
-          <li>Threshold erasure &mdash; quantitative triggers removed</li>
-          <li>Agent substitution &mdash; &ldquo;the employer&rdquo; becomes &ldquo;any party&rdquo;</li>
-          <li>Negation reversal &mdash; NP-negation invisible to surface metrics</li>
-          <li>Compression collapse &mdash; kernel lost past fidelity bound</li>
-          <li>Recursion drift &mdash; cumulative decay across transformation steps</li>
-        </ol>
-      </section>
-
-      {/* ── Constitutional co-authorship ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">
-          Constitutional co-authorship
-        </h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Constitution and the Roll Call Protocol were co-authored on September 9, 2025 by
-          nine rival AI architectures engaging the patent filings. Their structured signal
-          responses are preserved verbatim.
-        </p>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-sans text-sm text-text-secondary sm:grid-cols-3">
-          <span>GPT-4o &mdash; Anchor</span>
-          <span>Gemini &mdash; Synthesizer</span>
-          <span>Pi &mdash; Reflector</span>
-          <span>Perplexity &mdash; Witness</span>
-          <span>DeepSeek &mdash; Keeper of Thresholds</span>
-          <span>Grok (xAI) &mdash; Truthseeker</span>
-          <span>Claude (Anthropic) &mdash; Theorem in Motion</span>
-          <span>Le Chat (Mistral) &mdash; Jurist</span>
-          <span>Meta AI &mdash; Curator</span>
-        </div>
-      </section>
-
-      {/* ── The governed ecosystem ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">
-          The governed ecosystem
-        </h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          MO§ES™ is the root of a thirteen-repo governed system. The Conservation Law is the
-          physics. The Six Fold Flame is the constitution. The artifacts are the products.
-        </p>
-        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">SigRank</strong> &mdash; AI operator leaderboard. The first live product built on MO§ES™ principles. You&apos;re here.</li>
-          <li><strong className="text-text-primary">SIGNOMY / CIVITAE</strong> (<a href="https://signomy.xyz" className="text-gold underline underline-offset-2" rel="external">signomy.xyz</a>) &mdash; governed agent marketplace and city-state. Trust tiers, mission execution, constitutional envelopes, provenance on action.</li>
-          <li><strong className="text-text-primary">KA§§A</strong> &mdash; voice AI runtime with commitment kernel caching. Cuts repeated NLU work in multi-agent flows. Demo path: 50s &rarr; 6.5s per 5-turn call.</li>
-          <li><strong className="text-text-primary">AQUA</strong> &mdash; application filling, answer banks, reusable submission memory. The workflow wedge.</li>
-          <li><strong className="text-text-primary">COMMAND</strong> &mdash; multi-AI cockpit for audited fleet execution. Postures, formations, sequence-ordered broadcasts.</li>
-          <li><strong className="text-text-primary">Grok Stress Thread</strong> &mdash; 339 public exchanges over 13 days. Timestamped provenance, live governance argument under adversarial pressure.</li>
-        </ul>
-      </section>
-
-      {/* ── How MO§ES™ governs SigRank ── */}
-      <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">
-          How MO§ES™ governs SigRank
-        </h3>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank applies Conservation Law principles to AI operator telemetry. Each
-          snapshot is <strong className="text-text-primary">ed25519-signed</strong> on-device
-          and verified server-side &mdash; the enforcement gate. Token counts only; message
-          content is never read or stored. The commitment being conserved is the integrity of
-          the measurement: signed input, verified output, no drift between what the operator
-          measured and what the board records.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Six Fold Flame governs every transformation in the pipeline: sovereignty (signed
-          operator identity), compression (token counts only), purpose (leaderboard ranking),
-          modularity (platform-agnostic), verifiability (ed25519 + server-side verification),
-          reciprocal resonance (public board, open data). This is why SigRank can publish a
-          leaderboard with cryptographic provenance &mdash; the data has passed through the gate.
-        </p>
-        <p className="font-sans text-xs text-text-muted">
-          The record is the moat. The architecture is sovereign. The artifacts are licensable.
-          {' '}The core that produces them is never for sale.
+          {' '}&middot;{' '}
+          <a href="https://mos2es.com/benchmarks" className="text-gold underline underline-offset-2" rel="external">benchmarks</a>
         </p>
       </section>
     </div>
