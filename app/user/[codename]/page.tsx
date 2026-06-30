@@ -496,6 +496,11 @@ export default async function OperatorProfilePage({
           leverage={c.leverage}
           velocity={c.velocity}
           platform={operator.primary_domain}
+          inputTokens={telemetry.fresh_input}
+          outputTokens={telemetry.output}
+          cacheRead={telemetry.cache_read}
+          cacheCreate={telemetry.cache_create}
+          radarAxes={radarAxes}
         />
       )}
 
