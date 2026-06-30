@@ -5,13 +5,23 @@
  * sigrank-app at app/wiki/methodology-refinement/page.tsx). Server component, matches the
  * existing /wiki/<slug> TopicPage pattern.
  *
- * Purpose (owner 2026-06-30, prelaunch #1): recreate the early anchor + static-seed +
- * tokscale-reader board entries as a TERMINAL-styled table, then explain them as part of
- * the methodology-refinement story — how these experiments calibrated the Index and why
- * they now live in the record (the wiki) instead of the live ranking.
+ * GROUNDED in the repo's own analysis (rewritten 2026-06-30 after the first draft invented a
+ * triumphant framing the repo contradicts):
+ *   - YIELD_ANALYSIS.md: trust the ordinal RANK; the honest magnitude is reader-matched 6.3×
+ *     and 10xDEV (1.76 vs 1.50), NOT the I²-divergent raw 18,437. Lead with what survives.
+ *   - SEED_CANDIDATES.md: the static seeds are the owner's own pulls split WITH-mem vs CLEAN —
+ *     "let the board show the inflation gap publicly — honesty as a feature."
+ *   - TOKEN_PILLAR_ROOT_NUMBERS.md: the tokscale read is a documented PARTIAL (852 opus-4-8
+ *     msgs vs 18K in JSONL) — the dual reading brackets the operator between min/max input.
+ *   - three_degree_comparison.md: 10xDEV is anti-inflation (telescoping identity locks the
+ *     exponent to earned leverage).
  *
- * Moat: shows the cascade SHAPE (Υ = cache_read × output / input²) and these real OUTPUTS
- * only. The RS.xx weighting that maps pillars → Υ stays server-side. No weights here.
+ * The four removed entries (TheSignalVault/ccusage anchor, the two static seeds, the tokscale
+ * reader) are ALL the owner (MO§ES) under seed-era identities + readers. The LIVE claimed
+ * operator @SunrisesIllNeverSee stays on the board. This page is the calibration record.
+ *
+ * Moat: cascade SHAPE (Υ = cache_read × output ÷ input²) + real OUTPUTS only. RS.xx weighting
+ * stays server-side.
  */
 
 import type { Metadata } from 'next'
@@ -22,30 +32,28 @@ import { breadcrumb, definedTerm } from '@/lib/jsonld'
 export const metadata: Metadata = {
   title: 'How We Got Here — Refining the Index',
   description:
-    'The early calibration entries behind the SigRank Index: the anchor operator, the two static seeds, and the dual-reader experiment. How these real measurements refined the methodology — and why they live in the record, not the live board.',
+    'The calibration entries behind the SigRank Index: one operator (MO§ES) measured by two readers, and the same workload run with and without memory. How bracketing those extremes refined the methodology — and why the honest lead is the rank, not the raw multiplier.',
 }
 
-/** A calibration row — the real early-entry stats, recreated as a teaching table. */
 interface CalRow {
   glyph: string
   name: string
+  reading: string
   yield_: string
+  tenx: string
   comp: string
-  cplx: string
-  xthr: string
-  sdep: string
-  signa: string
-  tier: string
   note: string
 }
 
-// Real values pulled from the live board 2026-06-30 (30d · claude). These are the
-// entries being moved off the live ranking into this record. Outputs only — no weights.
-const ROWS: CalRow[] = [
-  { glyph: '◈', name: 'TheSignalVault', yield_: '18,436.98', comp: '0.969', cplx: '92.0', xthr: '37', sdep: '26.1', signa: '538.41', tier: 'TRANSMITTER', note: 'the anchor' },
-  { glyph: '◈', name: 'static seed · ✱mem', yield_: '2,308.80', comp: '0.768', cplx: '70.0', xthr: '26', sdep: '18.0', signa: '184.45', tier: 'TRANSMITTER', note: 'calibration seed (memory-on)' },
-  { glyph: '◈', name: 'static seed · clean', yield_: '1,695.42', comp: '0.723', cplx: '66.0', xthr: '24', sdep: '16.5', signa: '170.30', tier: 'TRANSMITTER', note: 'calibration seed (clean)' },
-  { glyph: '◈', name: 'MO§ES (tokscale reader)', yield_: '16.24', comp: '0.218', cplx: '92.0', xthr: '37', sdep: '26.1', signa: '15.28', tier: 'TRANSMITTER', note: 'same operator — different reader' },
+// Real values from YIELD_ANALYSIS.md + SEED_CANDIDATES.md (repo-sourced, not inferred).
+// Υ and 10xDEV are the two readings the methodology brackets between.
+const READER_ROWS: CalRow[] = [
+  { glyph: '◈', name: 'MO§ES — ccusage read', reading: 'min input (1.25M)', yield_: '18,436.98', tenx: '3.31', comp: '0.969', note: 'most-favorable reading — the ceiling' },
+  { glyph: '◈', name: 'MO§ES — tokscale read', reading: 'max input (partial)', yield_: '16.24', tenx: '1.76', comp: '0.218', note: 'own worst-case reading — the floor' },
+]
+const SEED_ROWS: CalRow[] = [
+  { glyph: '◈', name: 'static seed · ✱mem', reading: 'WITH memory', yield_: '2,308.80', tenx: '—', comp: '0.768', note: 'context reused' },
+  { glyph: '◈', name: 'static seed · clean', reading: 'CLEAN (mem stripped)', yield_: '1,695.42', tenx: '—', comp: '0.723', note: 'same work, no reuse' },
 ]
 
 function Th({ children }: { children: React.ReactNode }) {
@@ -56,6 +64,38 @@ function Td({ children, accent }: { children: React.ReactNode; accent?: boolean 
     <td className={`px-2 py-1 tabular-nums ${accent ? 'text-text-accent' : 'text-text-primary'}`}>
       {children}
     </td>
+  )
+}
+function Table({ rows }: { rows: CalRow[] }) {
+  return (
+    <div className="overflow-x-auto rounded border border-bg-border-subtle bg-bg-surface">
+      <table className="w-full border-collapse font-mono text-xs">
+        <thead className="border-b border-bg-border-subtle">
+          <tr>
+            <Th>ENTRY</Th>
+            <Th>READING</Th>
+            <Th>Υ YIELD</Th>
+            <Th>10×DEV</Th>
+            <Th>◌ COMP</Th>
+            <Th>NOTE</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.name} className="border-b border-bg-border-subtle/40 last:border-0">
+              <Td>
+                <span className="text-text-muted">{r.glyph}</span> {r.name}
+              </Td>
+              <Td>{r.reading}</Td>
+              <Td accent>{r.yield_}</Td>
+              <Td>{r.tenx}</Td>
+              <Td>{r.comp}</Td>
+              <Td>{r.note}</Td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
@@ -70,7 +110,7 @@ export default function MethodologyRefinementPage() {
           ]),
           definedTerm(
             'Index Calibration',
-            'The early anchor and seed entries used to calibrate the SigRank Index scoring scale before live operators populated the board.',
+            'The dual-reader and memory-pair entries used to bracket and verify the SigRank Index scoring before live operators populated the board.',
             '/wiki/methodology-refinement',
           ),
         ]}
@@ -79,109 +119,65 @@ export default function MethodologyRefinementPage() {
       <header className="flex flex-col gap-2">
         <h1 className="font-mono text-lg text-text-primary">How We Got Here — Refining the Index</h1>
         <p className="text-sm leading-relaxed text-text-secondary">
-          Before real operators populated the board, the SigRank Index had to be{' '}
-          <em>calibrated</em>: we needed entries whose token cascades we understood completely, so
-          we could see what the scale did at its extremes. These are those entries — recreated here
-          as the record of how the methodology was tuned. They are no longer on the live ranking;
-          this page is where they belong.
+          Before live operators populated the board, the Index had to be{' '}
+          <em>bracketed and stress-tested</em> against entries we understood completely — all of
+          them our own usage (MO§ES), measured deliberately at the extremes. These are those
+          entries, kept here as the record of how the methodology was tuned and where it&apos;s
+          honest about its own limits. They are no longer on the live ranking; this page is where
+          they belong.
         </p>
       </header>
 
-      {/* Terminal-styled calibration table — mirrors the live board's mono/glyph aesthetic. */}
+      {/* 1. The dual-reader bracket. */}
       <section className="flex flex-col gap-2">
-        <div className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
-          Calibration entries · 30d · claude · 2026-05→06
-        </div>
-        <div className="overflow-x-auto rounded border border-bg-border-subtle bg-bg-surface">
-          <table className="w-full border-collapse font-mono text-xs">
-            <thead className="border-b border-bg-border-subtle">
-              <tr>
-                <Th>OPERATOR</Th>
-                <Th>Υ YIELD</Th>
-                <Th>◌ COMP</Th>
-                <Th>⚙ CPLX</Th>
-                <Th>⇄ XTHR</Th>
-                <Th>▼ DEPTH</Th>
-                <Th>§IGNA</Th>
-                <Th>TIER</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {ROWS.map((r) => (
-                <tr key={r.name} className="border-b border-bg-border-subtle/40 last:border-0">
-                  <Td>
-                    <span className="text-text-muted">{r.glyph}</span> {r.name}
-                  </Td>
-                  <Td accent>{r.yield_}</Td>
-                  <Td>{r.comp}</Td>
-                  <Td>{r.cplx}</Td>
-                  <Td>{r.xthr}</Td>
-                  <Td>{r.sdep}</Td>
-                  <Td>{r.signa}</Td>
-                  <Td>{r.tier}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="font-mono text-[10px] text-text-muted">
-          Υ = cache_read × output ÷ input². Pillars shown are real measured outputs; the weighting
-          that maps them to Υ is part of the ruleset and stays server-side.
+        <h2 className="font-mono text-sm text-text-primary">1. One operator, two readers — the bracket</h2>
+        <Table rows={READER_ROWS} />
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Both rows are the <em>same operator&apos;s same activity</em>, counted by two different
+          token tools. ccusage reads a small fresh-input footprint (Υ 18,437); tokscale reads a
+          larger, partial input (Υ 16). That is a &gt;1,000× swing from the <em>reader alone</em> —
+          and it is exactly why we do <strong>not</strong> lead with the raw multiplier. Υ = cache_read
+          × output ÷ input², so input² in the denominator makes Υ hypersensitive to a tiny input.
+          The honest figures are the ones that survive a hostile reading:
+        </p>
+        <ul className="ml-4 flex list-disc flex-col gap-1 text-sm leading-relaxed text-text-secondary">
+          <li><strong>The rank.</strong> On every reader and every axis, the operator is #1. The ordinal does not wobble.</li>
+          <li><strong>The reader-matched 6.3×.</strong> Put everyone on the <em>same</em> reader (the volume-style one) and even this operator&apos;s <em>worst</em> input reading beats the strongest high-volume operator by 6.3×. That is the courtroom number.</li>
+          <li><strong>10×DEV.</strong> The log view tames the input² blow-up: 1.76 vs the field&apos;s best 1.50 — clearly ahead, on a sane scale. The telescoping identity locks the exponent to earned leverage, so it can&apos;t be inflated independently.</li>
+        </ul>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The lesson the bracket taught: <strong>put every operator on one reader.</strong> The
+          moment the field is measured the same way, the comparison stops being arguable — and the
+          bracket <span className="font-mono text-text-accent">[16.24 … 18,437]</span> itself becomes
+          the robustness story (&quot;best even at its own worst-case measurement&quot;).
         </p>
       </section>
 
-      {/* The story — three lessons, each tied to a row. */}
-      <section className="flex flex-col gap-4 text-sm leading-relaxed text-text-secondary">
-        <div>
-          <h2 className="mb-1 font-mono text-sm text-text-primary">1. The anchor — why the scale is exponential</h2>
-          <p>
-            <span className="font-mono text-text-accent">◈ TheSignalVault</span> scores Υ 18,437 — orders of
-            magnitude above everything else. That is not a bug; it is the point. The cascade
-            (cache_read × output ÷ input²) rewards an operator who does enormous downstream work off
-            a small, dense prompt. A near-perfect compression ratio (0.969) on deep, cross-threaded
-            sessions produces a yield that <em>should</em> dwarf a casual run. The anchor proved the
-            scale separates a true signal-amplifier from the field — and showed us the board needs a
-            visual scale (not a linear bar) so one extreme entry doesn&apos;t flatten everyone below
-            it. That is a presentation lesson the anchor taught, and the reason it now lives here
-            rather than skewing the live ladder.
-          </p>
-        </div>
-        <div>
-          <h2 className="mb-1 font-mono text-sm text-text-primary">2. The two static seeds — memory is signal</h2>
-          <p>
-            <span className="font-mono text-text-accent">◈ static seed · ✱mem</span> (Υ 2,309) and{' '}
-            <span className="font-mono text-text-accent">◈ static seed · clean</span> (Υ 1,695) are the
-            same workload measured with and without memory/context reuse. The memory-on run scores
-            ~36% higher. We built these deliberately to confirm the Index <em>credits</em> the thing
-            that actually makes an operator efficient: reusing prior context (cache_read) instead of
-            re-paying for it every turn. Two controlled seeds, one variable — that is how we verified
-            the cascade measures what we claim it measures.
-          </p>
-        </div>
-        <div>
-          <h2 className="mb-1 font-mono text-sm text-text-primary">3. The dual-reader test — the score is reader-sensitive</h2>
-          <p>
-            The most important calibration entry is the pair:{' '}
-            <span className="font-mono text-text-accent">◈ TheSignalVault</span> (Υ 18,437, comp 0.969)
-            and <span className="font-mono text-text-accent">◈ MO§ES (tokscale reader)</span> (Υ 16,
-            comp 0.218) — the <em>same operator</em>, the same underlying activity, read by two
-            different token-accounting tools. A &gt;1,000× gap in yield from nothing but the reader.
-            This is why SigRank standardized on a single canonical reader: the cascade is only
-            comparable across operators if everyone is measured the same way. The dual-reader test is
-            the experiment that forced that decision — and it is the clearest single illustration of
-            what the Index is sensitive to.
-          </p>
-        </div>
+      {/* 2. The memory pair. */}
+      <section className="flex flex-col gap-2">
+        <h2 className="font-mono text-sm text-text-primary">2. With memory vs. clean — what the Index credits</h2>
+        <Table rows={SEED_ROWS} />
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The two static seeds are the same workload run <em>with</em> memory/context reuse and{' '}
+          <em>clean</em> (observer stripped). The memory-on run yields ~36% higher. We staged the
+          pair on purpose: it lets the board <em>show the inflation gap publicly</em> — honesty as a
+          feature — and it confirms the cascade credits the thing that actually makes an operator
+          efficient: reusing prior context (cache_read) instead of re-paying for it every turn.
+        </p>
       </section>
 
       <section className="flex flex-col gap-2 border-t border-bg-border-subtle pt-4 text-sm leading-relaxed text-text-secondary">
         <h2 className="font-mono text-sm text-text-primary">Why they&apos;re here, not on the board</h2>
         <p>
-          The live board ranks real operators. These four entries did their job — they calibrated the
-          scale, verified the cascade credits context reuse, and forced the single-reader standard.
-          Leaving them on the live ladder would misrepresent the field (an internal anchor at the top
-          of a public ranking is not a real competitor). So they retire into the record. The
-          methodology they shaped is the one now scoring everyone else.
+          These entries did their job — they bracketed the scale, exposed its sensitivity to the
+          reader, and confirmed the cascade credits context reuse. Leaving a seed-era self-anchor at
+          the top of a public ranking would misrepresent the live field, so they retire into the
+          record. The live board ranks real operators; the methodology these entries refined is the
+          one now scoring everyone.
+        </p>
+        <p className="font-mono text-[10px] text-text-muted">
+          Υ = cache_read × output ÷ input². Pillars and yields shown are real measured outputs; the
+          weighting that maps them to Υ is part of the ruleset and stays server-side.
         </p>
       </section>
     </TopicPage>
