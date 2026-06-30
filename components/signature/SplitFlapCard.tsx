@@ -213,8 +213,8 @@ function formatLine(abbr: string, you: string, name: string, avg: string): strin
 
 // Weighted to content within the 60% (720px) panel: abbr narrow · your value ·
 // TELEMETRY (metric name) widest · AVERAGE USER. fr units flex with the panel.
-const COLS = '0.7fr 1fr 1.8fr 1.1fr'
-const CELL_PAD = '0 30px'
+const COLS = '0.6fr 1fr 1.6fr 1fr'
+const CELL_PAD = '0 18px'
 
 function TypewriterLine({
   abbr, you, name, avg, glyphColor, startDelay, charDelay, reduced,
@@ -305,7 +305,7 @@ function Board({
   cardRef: React.RefObject<HTMLDivElement | null>
   reduced: boolean
 } & Omit<SplitFlapCardProps, 'showControls'>) {
-  const W = 1200, H = 630, LEFT_W = 480, RIGHT_W = W - LEFT_W  // 40% rings / 60% printout
+  const W = 1200, H = 630, LEFT_W = 720, RIGHT_W = W - LEFT_W  // 60% rings / 40% printout
 
   const yieldStr = yieldValue !== null ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0)) : '\u2014'
   const snrStr = snr != null ? `${(snr * 100).toFixed(0)}%` : '\u2014'
@@ -468,8 +468,8 @@ function Board({
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Signature
             </span>
-            <div style={{ width: '380px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={380} centerValue={yieldStr} reduced={reduced} replayKey={0} />
+            <div style={{ width: '480px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <RadialRings axes={coloredAxes} size={480} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
         )}
@@ -504,13 +504,13 @@ function Board({
         <div style={{
           display: 'grid', gridTemplateColumns: COLS, alignItems: 'center',
           padding: '14px 28px 12px', borderBottom: '1px solid #2a5a2a',
-          fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px',
+          fontSize: '10px', fontWeight: 800, letterSpacing: '0.5px',
           color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.4)',
           fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
         }}>
           <span>CASCADE</span>
-          <span style={{ textAlign: 'right' }}>NEW USER</span>
-          <span style={{ paddingLeft: '24px' }}>TELEMETRY</span>
+          <span style={{ textAlign: 'right' }}>WELCOME OPERATOR</span>
+          <span style={{ paddingLeft: '16px' }}>TELEMETRY</span>
           <span style={{ textAlign: 'right', color: '#6e8a6e', textShadow: 'none' }}>AVERAGE USER</span>
         </div>
 
