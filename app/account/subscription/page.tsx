@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+import { withOG } from '@/lib/seo'
 
-export const metadata = { title: 'Subscription' }
+export const metadata: Metadata = withOG({
+  title: 'Subscription',
+  description: 'Manage your SigRank supporter subscription.',
+  path: '/account/subscription',
+})
 
 /**
  * Stripe Billing Portal return_url target.

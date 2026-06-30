@@ -5,6 +5,7 @@ import { SignOutButton } from '@/components/auth/SignOutButton'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { ConnectDevicePanel } from '@/components/settings/ConnectDevicePanel'
 import { DangerZone } from '@/components/settings/DangerZone'
+import { withOG } from '@/lib/seo'
 
 /**
  * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
@@ -16,10 +17,11 @@ import { DangerZone } from '@/components/settings/DangerZone'
  */
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Settings',
   description: 'Manage your SigRank operator account and appearance.',
-}
+  path: '/settings',
+})
 
 function Section({
   title,

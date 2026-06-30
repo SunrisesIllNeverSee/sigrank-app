@@ -26,6 +26,7 @@ import { WrappedStats } from '@/components/sigrank/WrappedStats'
 import type { Badge } from '@/components/sigrank/types'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
 import { TrackWrappedView } from '@/components/analytics/TrackWrappedView'
+import { withOG } from '@/lib/seo'
 
 /** Fallback for values with no canonical token-telemetry source. */
 const UNTRACKED = '—'
@@ -107,10 +108,11 @@ export async function generateMetadata({
   const row = await getOperator(codename)
   if (!row) return { title: 'Operator not found' }
   const name = row.operator.display_name ?? row.operator.codename
-  return {
+  return withOG({
     title: `${name} · Wrapped`,
     description: `${name}'s token-telemetry recap — ${compact(totalTokens(row))} tokens scored, SIGNA RATE ${row.snapshot.signa_rate.toFixed(1)}.`,
-  }
+    path: `/user/${rawCodename}/wrapped`,
+  })
 }
 
 export default async function OperatorWrappedPage({

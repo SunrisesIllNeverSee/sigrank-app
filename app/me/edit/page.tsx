@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { getSupabaseServer } from '@/lib/supabase/server'
 import { ProfileEditForm, type ProfileInitial } from '@/components/auth/ProfileEditForm'
+import { withOG } from '@/lib/seo'
 
 /**
  * app/me/edit/page.tsx — the editable profile surface (AUTH_LAUNCH_DIRECTIVES D6:
@@ -13,10 +14,11 @@ import { ProfileEditForm, type ProfileInitial } from '@/components/auth/ProfileE
  */
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Edit profile',
   description: 'Set up your SigRank operator profile — display name, handle, links, and more.',
-}
+  path: '/me/edit',
+})
 
 const EMPTY: ProfileInitial = {
   display_name: '',

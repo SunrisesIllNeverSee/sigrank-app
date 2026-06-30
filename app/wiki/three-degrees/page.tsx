@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
 import { TopicPage } from '@/components/wiki/TopicPage'
 import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
+import { withOG } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, definedTerm } from '@/lib/jsonld'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'The Three Degrees of Leverage',
   description:
     'AA 7:2:1 average user → power-user median → the top operator to date, read as a token cascade (Cache:Input:Output). The 10xDEV log anchor and full provenance.',
-}
+  path: '/wiki/three-degrees',
+})
 
 // ISR: the chart auto-pulls the top operator's live all-time metrics. Daily revalidate
 // keeps this page prerendered + refreshes the gold column once a day.
