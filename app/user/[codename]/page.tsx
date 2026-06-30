@@ -32,7 +32,7 @@ import { SubmissionsGrid } from '@/components/profile/SubmissionsGrid'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal'
 import { ProfileShareCard } from '@/components/share/ProfileShareCard'
-import { SignalSignature } from '@/components/signature/SignalSignature'
+import { SplitFlapCard } from '@/components/signature/SplitFlapCard'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
 import CascadeRadar from '@/components/charts/CascadeRadar'
@@ -482,16 +482,20 @@ export default async function OperatorProfilePage({
         </div>
       </header>
 
-      {/* Animated signal signature — the operator's identity as a living artifact.
-          Noise field resolves to codename, Υ decrypts in, cascade radar emerges.
+      {/* Split-flap departures board — the operator's stats as a Solari board.
+          Each character flips through glyphs and lands on its value. Loops.
           Only shown for ranked operators with cascade data. */}
       {ranked && c && !c.nonCompounding && (
-        <SignalSignature
+        <SplitFlapCard
           codename={operator.codename}
+          name={name}
           yieldValue={c.yield_}
           rank={row.global_rank}
           classTier={snapshot.class_tier}
-          radarAxes={radarAxes}
+          snr={c.snr}
+          leverage={c.leverage}
+          velocity={c.velocity}
+          platform={operator.primary_domain}
         />
       )}
 
