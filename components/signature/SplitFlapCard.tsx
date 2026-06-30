@@ -345,9 +345,9 @@ function Board({
   const NUM_LINES = 15
   const ROW_H = Math.floor(H / NUM_LINES)  // 42px
 
-  const CHAR_DELAY = 8
-  const LINE_GAP = 40
-  const INITIAL_DELAY = 300
+  const CHAR_DELAY = 22   // visible dot-matrix speed (was 8 = too fast to see)
+  const LINE_GAP = 90     // pause between rows so the print head sweeps down
+  const INITIAL_DELAY = 250
 
   // The 4 column heads (owner): CASCADE | NEW USER | TELEMETRY | AVERAGE USER
   const headerText = formatLine('CASC', 'NEW USER', 'TELEMETRY', 'AVG')
