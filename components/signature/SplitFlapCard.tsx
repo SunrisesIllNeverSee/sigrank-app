@@ -98,6 +98,74 @@ function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
   )
 }
 
+// ── Radial rings (#4 composite — concentric arcs, one metric per ring) ─────
+// Hand-rolled SVG (no charting dep), gold-panel palette: dark arcs on gold.
+// Each metric is one ring; the arc sweep = normalized value; Υ sits in center.
+
+function RadialRings({ axes, size, centerValue }: { axes: RadarAxis[]; size: number; centerValue: string }) {
+  const n = axes.length
+  if (n < 3) return null
+  const cx = size / 2, cy = size / 2
+  const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
+  const TRACK = 'rgba(10,10,10,0.10)'        // unfilled ring track
+  const INK = '#0a0a0a'
+
+  // Rings packed outer→inner; leave a hole in the middle for the Υ label.
+  const outerR = size / 2 - 16
+  const ringGap = 4
+  const ringW = (outerR - size * 0.18 - (n - 1) * ringGap) / n  // hole radius ≈ 18% of size
+  const startAngle = -90 // top (degrees)
+
+  // Build an SVG arc path from `start`° sweeping `frac` of a full turn at radius r.
+  const arc = (r: number, frac: number) => {
+    const sweep = Math.max(0.0001, Math.min(0.9999, frac)) * 360
+    const a0 = (startAngle * Math.PI) / 180
+    const a1 = ((startAngle + sweep) * Math.PI) / 180
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0)
+    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1)
+    const large = sweep > 180 ? 1 : 0
+    return `M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r.toFixed(1)} ${r.toFixed(1)} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`
+  }
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="Cascade signature rings">
+      {axes.map((ax, i) => {
+        const r = outerR - i * (ringW + ringGap) - ringW / 2
+        const frac = norm(ax.value, ax.max)
+        const [lx, ly] = [cx, cy + r]  // label anchor at the ring's bottom (the gap below 'start')
+        return (
+          <g key={`ring-${i}`}>
+            {/* full track */}
+            <circle cx={cx} cy={cy} r={r.toFixed(1)} fill="none" stroke={TRACK} strokeWidth={ringW.toFixed(1)} />
+            {/* value arc */}
+            <path d={arc(r, frac)} fill="none" stroke={ax.color} strokeWidth={ringW.toFixed(1)} strokeLinecap="round" />
+            {/* glyph label riding just inside the arc start (top) */}
+            <text x={cx} y={(cy - r).toFixed(1)} dx={6} dy={4}
+              fontSize={Math.max(10, ringW * 0.7).toFixed(0)} fontWeight={800}
+              fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }} opacity={0.75}>
+              {ax.glyph}
+            </text>
+            <text x={lx} y={ly.toFixed(1)} dy={3} textAnchor="middle"
+              fontSize={Math.max(9, ringW * 0.55).toFixed(0)} fontWeight={700}
+              fill={INK} opacity={0.45} style={{ fontFamily: 'ui-monospace, monospace' }}>
+              {`${Math.round(frac * 100)}`}
+            </text>
+          </g>
+        )
+      })}
+      {/* center Υ */}
+      <text x={cx} y={cy} dy={-2} textAnchor="middle" dominantBaseline="middle"
+        fontSize={size * 0.075} fontWeight={900} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
+        {'Υ'}
+      </text>
+      <text x={cx} y={cy} dy={size * 0.07} textAnchor="middle" dominantBaseline="middle"
+        fontSize={size * 0.058} fontWeight={800} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
+        {centerValue}
+      </text>
+    </svg>
+  )
+}
+
 // ── Print animation CSS ───────────────────────────────────────────────────
 
 const PRINT_CSS = `
@@ -368,10 +436,10 @@ function Board({
             marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
           }}>
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-              Cascade Fingerprint
+              Cascade Signature
             </span>
             <div style={{ width: '340px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <ColoredRadar axes={coloredAxes} size={340} />
+              <RadialRings axes={coloredAxes} size={340} centerValue={yieldStr} />
             </div>
           </div>
         )}
@@ -384,7 +452,7 @@ function Board({
       {/* ═══ RIGHT 2/3 — black terminal printout ═══ */}
       <div style={{
         width: RIGHT_W, height: H, background: '#0a0a0a',
-        display: 'flex', flexDirection: 'column',
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
         boxSizing: 'border-box', flexShrink: 0, position: 'relative',
         overflow: 'hidden',
       }}>
