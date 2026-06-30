@@ -21,6 +21,7 @@
 
 import { useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
+import { track } from '@/lib/posthog/events'
 
 export interface ProfileShareCardProps {
   codename: string
@@ -127,6 +128,7 @@ export function ProfileShareCard(props: ProfileShareCardProps) {
       await navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
+      track.profileShared('copy', { codename: props.codename })
     } catch {
       /* clipboard blocked — no-op; the URL is in the address bar anyway */
     }
@@ -141,6 +143,7 @@ export function ProfileShareCard(props: ProfileShareCardProps) {
       a.href = dataUrl
       a.download = `sigrank-${props.codename}.png`
       a.click()
+      track.profileShared('download', { codename: props.codename })
     } finally {
       setBusy(false)
     }

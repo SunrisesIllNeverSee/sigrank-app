@@ -13,6 +13,7 @@ import { Footer } from '@/components/ui/Footer'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { organization, website } from '@/lib/jsonld'
 import { siteMetadata } from '@/lib/seo'
+import { PostHogProvider } from '@/components/analytics/PostHogProvider'
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
 // foundation). Wired to the existing --font-geist-sans var name so all
@@ -59,10 +60,12 @@ export default function RootLayout({
       <body className="min-h-screen bg-bg-base text-text-primary">
         <JsonLd data={[organization(), website()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
-        <Nav />
-        <DemoBanner />
-        <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>
-        <Footer />
+        <PostHogProvider>
+          <Nav />
+          <DemoBanner />
+          <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   )

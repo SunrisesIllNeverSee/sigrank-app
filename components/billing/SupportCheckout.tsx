@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { startCheckout } from './CheckoutRedirect'
+import { track } from '@/lib/posthog/events'
 
 /**
  * components/billing/SupportCheckout.tsx — the "Support the Build" checkout.
@@ -48,6 +49,11 @@ export function SupportCheckout() {
   const [pending, setPending] = useState(false)
   const [note, setNote] = useState<string | null>(null)
 
+  // upgrade_viewed — SupportCheckout always renders on /upgrade, so its mount = page view.
+  useEffect(() => {
+    track.upgradeViewed()
+  }, [])
+
   async function go() {
     setPending(true)
     setNote(null)
@@ -69,6 +75,11 @@ export function SupportCheckout() {
       payload = { kind: 'subscription', price: selectedMonthly }
     }
 
+    track.checkoutClicked(
+      mode === 'once'
+        ? { kind: 'donation', amount_usd: Number(amount) }
+        : { kind: 'subscription', price: selectedMonthly },
+    )
     const outcome = await startCheckout('/api/v1/billing/create-checkout-session', payload)
     if (!outcome.ok) {
       setPending(false)
