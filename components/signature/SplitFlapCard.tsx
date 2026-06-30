@@ -1,22 +1,23 @@
 'use client'
 
 /**
- * components/signature/SplitFlapCard.tsx — the split-flap departures board.
+ * components/signature/SplitFlapCard.tsx — real Solari split-flap board.
  *
- * Solari-style board split in thirds:
- *   Left 1/3:  Vertical SIGRANK wordmark · DEPARTURES · MO§ES™ ·
- *              CLASS (vertical) · PLATFORM (vertical) · radar map
- *   Right 2/3: Full Solari board — raw token pillars + derived metrics,
- *              each row a departures line with label + value cells.
+ * Uses clackboard for authentic 3D rotateX flip animation — each character
+ * is a physical tile that splits horizontally and flips on a hinge, just
+ * like the boards at European train stations.
  *
- * Animation: starts with ALL random glyphs, then progressively flips
- * and settles — left panel first, then right panel top-to-bottom.
- * Each character cycles through random glyphs, stops on its final value.
- * Loops every 14s.
+ * Layout: 1/3 + 2/3 split
+ *   Left 1/3:  Gold background (TV-station ident style). SIGRANK wordmark,
+ *             DEPARTURES, MO§ES™, CLASS, PLATFORM, cascade radar.
+ *   Right 2/3: Dark Solari board. Each metric is a row of real split-flap
+ *             cells with label + value. Classic variant (scan-line texture,
+ *             hinge marks). Board mode (all flaps spin, settle independently).
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback } from 'react'
 import { toPng } from 'html-to-image'
+import { SplitFlap, type Palette } from 'clackboard'
 import { track } from '@/lib/posthog/events'
 import CascadeRadar from '@/components/charts/CascadeRadar'
 
@@ -26,12 +27,10 @@ export interface SplitFlapCardProps {
   yieldValue: number | null
   classTier: string
   platform: string | null
-  /** Raw token pillars */
   inputTokens?: number | null
   outputTokens?: number | null
   cacheRead?: number | null
   cacheCreate?: number | null
-  /** Derived cascade metrics */
   snr?: number | null
   leverage?: number | null
   velocity?: number | null
@@ -40,196 +39,46 @@ export interface SplitFlapCardProps {
   efficiency?: number | null
   costPerMillion?: number | null
   opRatio?: string | null
-  /** Radar axes */
   radarAxes?: { label: string; value: number; max: number }[]
   showControls?: boolean
 }
 
-// ── Glyph pools ───────────────────────────────────────────────────────────
+// ── Palettes ──────────────────────────────────────────────────────────────
 
-const ALPHA_GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#§◈Υ▲▼░▒'.split('')
-const NUM_GLYPHS = '0123456789KMB.▲▼░'.split('')
-const ALL_GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#§◈Υ▲▼░▒'.split('')
-
-function rnd(pool: string[]): string {
-  return pool[Math.floor(Math.random() * pool.length)]
+// Gold text on dark tiles (yield, 10xDEV)
+const GOLD_PALETTE: Palette = {
+  text: '#e0b240',
+  topBg: '#0c0c0a',
+  botBg: '#070706',
+  border: '#1a1a16',
+  div: '#2a2515',
 }
 
-function isNumericChar(ch: string): boolean {
-  return /[0-9.KMB%×x]/.test(ch)
+// Green text on dark tiles (SNR, leverage, efficiency, output, cache read)
+const GREEN_PALETTE: Palette = {
+  text: '#78dc82',
+  topBg: '#0c0c0a',
+  botBg: '#070706',
+  border: '#1a1a16',
+  div: '#1a2a1a',
 }
 
-// ── Flap cell — starts on random, cycles, settles ─────────────────────────
-
-interface FlapCellProps {
-  finalChar: string
-  delay: number
-  duration: number
-  playKey: number
-  className?: string
-  style?: React.CSSProperties
+// Bone/white text on dark tiles (input, cache write, velocity, scale V)
+const BONE_PALETTE: Palette = {
+  text: '#dee6d2',
+  topBg: '#0c0c0a',
+  botBg: '#070706',
+  border: '#1a1a16',
+  div: '#1a2a1a',
 }
 
-function FlapCell({ finalChar, delay, duration, playKey, className, style }: FlapCellProps) {
-  const numeric = isNumericChar(finalChar)
-  const pool = numeric ? NUM_GLYPHS : ALPHA_GLYPHS
-  // Start on a RANDOM glyph — never the final value
-  const [display, setDisplay] = useState(() => finalChar === ' ' ? ' ' : rnd(pool))
-  const [settled, setSettled] = useState(false)
-
-  useEffect(() => {
-    // Reset to random on every play
-    setSettled(false)
-    setDisplay(finalChar === ' ' ? ' ' : rnd(pool))
-
-    const ticks = 8 + Math.floor(Math.random() * 6)
-    const step = duration / ticks
-    let i = 0
-
-    const startTimer = setTimeout(() => {
-      const interval = setInterval(() => {
-        if (i >= ticks) {
-          clearInterval(interval)
-          setDisplay(finalChar)
-          setSettled(true)
-          return
-        }
-        setDisplay(finalChar === ' ' ? ' ' : rnd(pool))
-        i++
-      }, step)
-    }, delay)
-
-    return () => {
-      clearTimeout(startTimer)
-    }
-  }, [finalChar, delay, duration, playKey])
-
-  return (
-    <span
-      className={className}
-      style={{
-        display: 'inline-block',
-        minWidth: '0.6em',
-        textAlign: 'center',
-        opacity: settled ? 1 : 0.7,
-        ...style,
-      }}
-    >
-      {display}
-    </span>
-  )
-}
-
-// ── Flap row — a string rendered as individual flap cells ─────────────────
-
-function FlapRow({
-  text,
-  delay,
-  duration,
-  playKey,
-  className,
-  style,
-  charDelay = 40,
-}: {
-  text: string
-  delay: number
-  duration: number
-  playKey: number
-  className?: string
-  style?: React.CSSProperties
-  charDelay?: number
-}) {
-  return (
-    <>
-      {text.split('').map((ch, i) => (
-        <FlapCell
-          key={`${i}-${ch}`}
-          finalChar={ch}
-          delay={delay + i * charDelay}
-          duration={duration}
-          playKey={playKey}
-          className={className}
-          style={style}
-        />
-      ))}
-    </>
-  )
-}
-
-// ── Vertical text — each letter stacked ───────────────────────────────────
-
-function VerticalFlap({
-  text,
-  delay,
-  duration,
-  playKey,
-  color,
-  fontSize,
-}: {
-  text: string
-  delay: number
-  duration: number
-  playKey: number
-  color: string
-  fontSize: number
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
-      {text.split('').map((ch, i) => (
-        <FlapCell
-          key={`${i}-${ch}`}
-          finalChar={ch}
-          delay={delay + i * 60}
-          duration={duration}
-          playKey={playKey}
-          style={{ color, fontSize, fontWeight: 700, lineHeight: 1.05 }}
-        />
-      ))}
-    </div>
-  )
-}
-
-// ── Solari board row — label + value cells ────────────────────────────────
-
-function BoardRow({
-  label,
-  value,
-  delay,
-  duration,
-  playKey,
-  valueColor,
-}: {
-  label: string
-  value: string
-  delay: number
-  duration: number
-  playKey: number
-  valueColor: string
-}) {
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '140px 1fr auto',
-      gap: '10px',
-      padding: '6px 16px',
-      borderBottom: '1px solid #152015',
-      alignItems: 'center',
-    }}>
-      {/* Label */}
-      <span style={{ fontSize: '12px', color: '#6e966e', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-        <FlapRow text={label} delay={delay} duration={duration * 0.6} playKey={playKey} charDelay={25} />
-      </span>
-      {/* Value — the big flap numbers */}
-      <span style={{ fontSize: '24px', fontWeight: 700, color: valueColor, letterSpacing: '1px' }}>
-        <FlapRow text={value} delay={delay + 100} duration={duration} playKey={playKey} charDelay={35} />
-      </span>
-      {/* Status dot */}
-      <span style={{
-        width: '8px', height: '8px', borderRadius: '50%',
-        background: valueColor, opacity: 0.6,
-      }} />
-    </div>
-  )
+// Dim text (total, $/1M)
+const DIM_PALETTE: Palette = {
+  text: '#6e966e',
+  topBg: '#0c0c0a',
+  botBg: '#070706',
+  border: '#1a1a16',
+  div: '#1a2a1a',
 }
 
 // ── Format helpers ────────────────────────────────────────────────────────
@@ -239,6 +88,65 @@ function fmtTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
   return n.toFixed(0)
+}
+
+function pad(str: string, len: number): string {
+  return str.padEnd(len, ' ')
+}
+
+// ── A single metric row: label + split-flap value ─────────────────────────
+
+function MetricRow({
+  label,
+  value,
+  palette,
+  valueLen,
+  delay,
+}: {
+  label: string
+  value: string
+  palette: Palette
+  valueLen: number
+  delay: number
+}) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      padding: '4px 16px',
+      borderBottom: '1px solid #152015',
+    }}>
+      {/* Label — static, dim green */}
+      <span style={{
+        fontSize: '12px',
+        color: '#6e966e',
+        letterSpacing: '1.5px',
+        textTransform: 'uppercase',
+        width: '110px',
+        flexShrink: 0,
+        fontFamily: 'var(--font-geist-mono), ui-monospace, monospace',
+      }}>
+        {label}
+      </span>
+      {/* Value — real split-flap cells */}
+      <SplitFlap
+        value={pad(value, valueLen)}
+        length={valueLen}
+        size="sm"
+        variant="classic"
+        palette={palette}
+        mode="board"
+        easing="decelerate"
+        flipMs={80}
+        stagger={30}
+        gap={2}
+        perspective={200}
+        animateOnMount
+        style={{ justifyContent: 'flex-start' }}
+      />
+    </div>
+  )
 }
 
 // ── The board ─────────────────────────────────────────────────────────────
@@ -261,18 +169,16 @@ function Board({
   scaleV,
   efficiency,
   costPerMillion,
-  opRatio,
   radarAxes,
-  playKey,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>
-} & Omit<SplitFlapCardProps, 'showControls'> & { playKey: number }) {
+} & Omit<SplitFlapCardProps, 'showControls'>) {
   const W = 1200
   const H = 630
   const LEFT_W = 380
   const RIGHT_W = W - LEFT_W
 
-  // Format all values
+  // Format values
   const yieldStr = yieldValue !== null
     ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0))
     : '—'
@@ -283,7 +189,6 @@ function Board({
   const scaleStr = scaleV != null ? scaleV.toFixed(2) : '—'
   const effStr = efficiency != null ? `${efficiency.toFixed(1)}x` : '—'
   const costStr = costPerMillion != null ? `$${costPerMillion.toFixed(2)}` : '—'
-  const opStr = opRatio ?? '—'
   const inputStr = inputTokens != null ? fmtTokens(inputTokens) : '—'
   const outputStr = outputTokens != null ? fmtTokens(outputTokens) : '—'
   const cacheReadStr = cacheRead != null ? fmtTokens(cacheRead) : '—'
@@ -291,20 +196,9 @@ function Board({
   const totalStr = (inputTokens && outputTokens && cacheRead && cacheCreate)
     ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '—'
 
-  // Animation delays — left panel first, then right panel top-to-bottom
-  const D = {
-    wordmark: 0, departures: 400, moses: 500, class: 600, platform: 700, radar: 900,
-    row1: 800, row2: 900, row3: 1000, row4: 1100, row5: 1200,
-    row6: 1300, row7: 1400, row8: 1500, row9: 1600, row10: 1700,
-    row11: 1800, row12: 1900, row13: 2000, row14: 2100,
-    footer: 2300,
-  }
-  const DUR = 600
-
-  const GOLD = '#e0b240'
-  const GREEN = '#78dc82'
-  const DIM = '#6e966e'
-  const TEXT = '#dee6d2'
+  // Gold for the left panel
+  const GOLD_BG = '#c4923a'
+  const GOLD_DARK = '#0a0a0a'
 
   return (
     <div
@@ -313,76 +207,140 @@ function Board({
         width: W,
         height: H,
         background: '#050605',
-        color: TEXT,
-        fontFamily: 'var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace',
         display: 'flex',
         flexDirection: 'row',
         boxSizing: 'border-box',
         position: 'relative',
         overflow: 'hidden',
+        fontFamily: 'var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace',
       }}
     >
-      {/* ═══════════ LEFT 1/3 ═══════════ */}
+      {/* ═══════════ LEFT 1/3 — gold background, TV ident style ═══════════ */}
       <div style={{
         width: LEFT_W,
         height: H,
-        borderRight: '2px solid #264028',
+        background: GOLD_BG,
         display: 'flex',
         flexDirection: 'column',
-        padding: '28px 24px',
+        padding: '32px 28px',
         boxSizing: 'border-box',
-        background: '#070907',
+        position: 'relative',
       }}>
-        {/* Vertical SIGRANK wordmark */}
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-          <VerticalFlap text="SIGRANK" delay={D.wordmark} duration={DUR} playKey={playKey} color={GOLD} fontSize={28} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
-            {/* DEPARTURES */}
-            <div style={{ fontSize: '13px', color: DIM, letterSpacing: '2px' }}>
-              <FlapRow text="DEPART" delay={D.departures} duration={DUR * 0.7} playKey={playKey} charDelay={30} />
-              <FlapRow text="URES" delay={D.departures + 180} duration={DUR * 0.7} playKey={playKey} charDelay={30} />
-            </div>
-            {/* MO§ES™ */}
-            <div style={{ fontSize: '14px', color: GOLD, letterSpacing: '1px' }}>
-              <FlapRow text="MO§ES™" delay={D.moses} duration={DUR * 0.7} playKey={playKey} charDelay={35} />
-            </div>
+        {/* Subtle texture overlay on gold */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 3px)',
+        }} />
+
+        {/* SIGRANK wordmark — big, dark on gold */}
+        <div style={{
+          fontSize: '36px',
+          fontWeight: 800,
+          color: GOLD_DARK,
+          letterSpacing: '4px',
+          lineHeight: 1,
+        }}>
+          SIGRANK
+        </div>
+
+        {/* Diamond divider */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginTop: '10px',
+        }}>
+          <div style={{ width: '10px', height: '10px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.3 }} />
+        </div>
+
+        {/* DEPARTURES + MO§ES™ */}
+        <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{
+            fontSize: '16px',
+            color: GOLD_DARK,
+            letterSpacing: '3px',
+            fontWeight: 700,
+            opacity: 0.8,
+          }}>
+            DEPARTURES
+          </div>
+          <div style={{
+            fontSize: '14px',
+            color: GOLD_DARK,
+            letterSpacing: '2px',
+            fontWeight: 600,
+            opacity: 0.6,
+          }}>
+            MO§ES™
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: '#1a2a1a', margin: '20px 0 16px' }} />
-
-        {/* CLASS (vertical) + label */}
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <span style={{ fontSize: '10px', color: DIM, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Class</span>
-          </div>
-          <VerticalFlap
-            text={classTier.length > 6 ? classTier.slice(0, 6) : classTier}
-            delay={D.class}
-            duration={DUR}
-            playKey={playKey}
-            color={GREEN}
-            fontSize={18}
-          />
+        {/* Operator name — the "destination" */}
+        <div style={{
+          marginTop: '20px',
+          fontSize: '22px',
+          fontWeight: 700,
+          color: GOLD_DARK,
+          letterSpacing: '1px',
+          lineHeight: 1.15,
+          wordBreak: 'break-word',
+        }}>
+          {name.toUpperCase()}
         </div>
 
-        {/* PLATFORM (vertical) + label */}
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', marginTop: '16px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <span style={{ fontSize: '10px', color: DIM, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Platform</span>
+        {/* Class + Platform */}
+        <div style={{
+          marginTop: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{
+              fontSize: '10px',
+              color: GOLD_DARK,
+              opacity: 0.5,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              width: '70px',
+            }}>
+              Class
+            </span>
+            <span style={{
+              fontSize: '14px',
+              color: GOLD_DARK,
+              fontWeight: 700,
+              letterSpacing: '1px',
+            }}>
+              {classTier}
+            </span>
           </div>
-          <VerticalFlap
-            text={(platform ?? '—').toUpperCase().slice(0, 8)}
-            delay={D.platform}
-            duration={DUR}
-            playKey={playKey}
-            color={TEXT}
-            fontSize={18}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{
+              fontSize: '10px',
+              color: GOLD_DARK,
+              opacity: 0.5,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              width: '70px',
+            }}>
+              Platform
+            </span>
+            <span style={{
+              fontSize: '14px',
+              color: GOLD_DARK,
+              fontWeight: 700,
+              letterSpacing: '1px',
+            }}>
+              {(platform ?? '—').toUpperCase()}
+            </span>
+          </div>
         </div>
 
-        {/* Radar map — bottom of left panel */}
+        {/* Radar at bottom — dark on gold */}
         {radarAxes && radarAxes.length >= 3 && (
           <div style={{
             marginTop: 'auto',
@@ -390,25 +348,43 @@ function Board({
             flexDirection: 'column',
             alignItems: 'center',
             gap: '4px',
-            opacity: 1,
           }}>
-            <span style={{ fontSize: '10px', color: DIM, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+            <span style={{
+              fontSize: '10px',
+              color: GOLD_DARK,
+              opacity: 0.5,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+            }}>
               Cascade
             </span>
             <div style={{
-              opacity: 1,
-              transition: 'opacity 0.6s',
+              background: 'rgba(10,10,10,0.15)',
+              borderRadius: '8px',
+              padding: '8px',
             }}>
               <CascadeRadar values={radarAxes} size={180} />
             </div>
           </div>
         )}
+
+        {/* Footer on gold */}
+        <div style={{
+          marginTop: '12px',
+          fontSize: '11px',
+          color: GOLD_DARK,
+          opacity: 0.4,
+          letterSpacing: '1px',
+        }}>
+          signalaf.com/user/{codename}
+        </div>
       </div>
 
-      {/* ═══════════ RIGHT 2/3 — the Solari board ═══════════ */}
+      {/* ═══════════ RIGHT 2/3 — dark Solari board ═══════════ */}
       <div style={{
         width: RIGHT_W,
         height: H,
+        background: '#050605',
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
@@ -418,64 +394,56 @@ function Board({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '16px 24px 12px',
+          padding: '14px 20px 10px',
           borderBottom: '2px solid #264028',
         }}>
-          <span style={{ fontSize: '16px', color: GOLD, letterSpacing: '2px' }}>
-            <FlapRow text={name.toUpperCase()} delay={D.row1} duration={DUR} playKey={playKey} charDelay={30} />
+          <span style={{
+            fontSize: '14px',
+            color: '#e0b240',
+            letterSpacing: '2px',
+            fontWeight: 700,
+          }}>
+            CASCADE TELEMETRY
           </span>
-          <span style={{ fontSize: '12px', color: DIM, letterSpacing: '2px' }}>
-            <FlapRow text="LIVE" delay={D.row1 + 200} duration={400} playKey={playKey} />
+          <span style={{
+            fontSize: '11px',
+            color: '#6e966e',
+            letterSpacing: '2px',
+          }}>
+            LIVE
           </span>
         </div>
 
-        {/* Board rows — raw data + derived metrics, as many as fit */}
+        {/* Board rows — raw data + derived metrics */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {/* Raw token pillars */}
-          <BoardRow label="Input" value={inputStr} delay={D.row2} duration={DUR} playKey={playKey} valueColor={TEXT} />
-          <BoardRow label="Output" value={outputStr} delay={D.row3} duration={DUR} playKey={playKey} valueColor={GREEN} />
-          <BoardRow label="Cache R" value={cacheReadStr} delay={D.row4} duration={DUR} playKey={playKey} valueColor={GREEN} />
-          <BoardRow label="Cache W" value={cacheCreateStr} delay={D.row5} duration={DUR} playKey={playKey} valueColor={TEXT} />
-          <BoardRow label="Total" value={totalStr} delay={D.row6} duration={DUR} playKey={playKey} valueColor={DIM} />
+          <MetricRow label="Input" value={inputStr} palette={BONE_PALETTE} valueLen={10} delay={0} />
+          <MetricRow label="Output" value={outputStr} palette={GREEN_PALETTE} valueLen={10} delay={100} />
+          <MetricRow label="Cache R" value={cacheReadStr} palette={GREEN_PALETTE} valueLen={10} delay={200} />
+          <MetricRow label="Cache W" value={cacheCreateStr} palette={BONE_PALETTE} valueLen={10} delay={300} />
+          <MetricRow label="Total" value={totalStr} palette={DIM_PALETTE} valueLen={10} delay={400} />
 
-          {/* Divider between raw and derived */}
-          <div style={{ height: 1, background: '#264028', margin: '2px 0' }} />
+          {/* Divider */}
+          <div style={{ height: 1, background: '#264028', margin: '2px 16px' }} />
 
           {/* Derived cascade metrics */}
-          <BoardRow label="Yield Υ" value={yieldStr} delay={D.row7} duration={DUR} playKey={playKey} valueColor={GOLD} />
-          <BoardRow label="SNR" value={snrStr} delay={D.row8} duration={DUR} playKey={playKey} valueColor={GREEN} />
-          <BoardRow label="Leverage" value={levStr} delay={D.row9} duration={DUR} playKey={playKey} valueColor={GREEN} />
-          <BoardRow label="Velocity" value={velStr} delay={D.row10} duration={DUR} playKey={playKey} valueColor={TEXT} />
-          <BoardRow label="10xDEV" value={devStr} delay={D.row11} duration={DUR} playKey={playKey} valueColor={GOLD} />
-          <BoardRow label="Scale V" value={scaleStr} delay={D.row12} duration={DUR} playKey={playKey} valueColor={TEXT} />
-          <BoardRow label="Efficiency" value={effStr} delay={D.row13} duration={DUR} playKey={playKey} valueColor={GREEN} />
-          <BoardRow label="$/1M" value={costStr} delay={D.row14} duration={DUR} playKey={playKey} valueColor={DIM} />
-        </div>
-
-        {/* Footer */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '12px 24px',
-          borderTop: '2px solid #264028',
-          fontSize: '14px',
-        }}>
-          <span style={{ color: GOLD }}>
-            <FlapRow text="signalaf.com" delay={D.footer} duration={DUR * 0.6} playKey={playKey} charDelay={20} />
-          </span>
-          <span style={{ color: DIM, fontSize: '12px' }}>
-            <FlapRow text={`/user/${codename}`} delay={D.footer + 200} duration={DUR * 0.6} playKey={playKey} charDelay={15} />
-          </span>
+          <MetricRow label="Yield Υ" value={yieldStr} palette={GOLD_PALETTE} valueLen={10} delay={500} />
+          <MetricRow label="SNR" value={snrStr} palette={GREEN_PALETTE} valueLen={10} delay={600} />
+          <MetricRow label="Leverage" value={levStr} palette={GREEN_PALETTE} valueLen={10} delay={700} />
+          <MetricRow label="Velocity" value={velStr} palette={BONE_PALETTE} valueLen={10} delay={800} />
+          <MetricRow label="10xDEV" value={devStr} palette={GOLD_PALETTE} valueLen={10} delay={900} />
+          <MetricRow label="Scale V" value={scaleStr} palette={BONE_PALETTE} valueLen={10} delay={1000} />
+          <MetricRow label="Efficiency" value={effStr} palette={GREEN_PALETTE} valueLen={10} delay={1100} />
+          <MetricRow label="$/1M" value={costStr} palette={DIM_PALETTE} valueLen={10} delay={1200} />
         </div>
       </div>
 
-      {/* Scanline texture */}
+      {/* Scanline texture over the whole card */}
       <div style={{
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)',
+        background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px)',
       }} />
     </div>
   )
@@ -486,18 +454,11 @@ function Board({
 export function SplitFlapCard(props: SplitFlapCardProps) {
   const { showControls = true } = props
   const cardRef = useRef<HTMLDivElement | null>(null)
-  const [playKey, setPlayKey] = useState(0)
   const [copied, setCopied] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [replayKey, setReplayKey] = useState(0)
 
-  // Auto-play on mount + loop every 14s
-  useEffect(() => {
-    setPlayKey(1)
-    const loop = setInterval(() => setPlayKey((k) => k + 1), 14000)
-    return () => clearInterval(loop)
-  }, [])
-
-  const replay = useCallback(() => setPlayKey((k) => k + 1), [])
+  const replay = useCallback(() => setReplayKey((k) => k + 1), [])
 
   const shareLink = async () => {
     const url = `https://signalaf.com/user/${props.codename}`
@@ -543,13 +504,9 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
         </div>
       )}
 
-      {/* Visible board — responsive scaling */}
-      <div className="overflow-hidden rounded-lg border border-[#264028]" style={{ aspectRatio: '1200/630' }}>
-        <Board
-          cardRef={cardRef}
-          {...props}
-          playKey={playKey}
-        />
+      {/* Visible board */}
+      <div key={replayKey} className="overflow-hidden rounded-lg border border-[#264028]" style={{ aspectRatio: '1200/630' }}>
+        <Board cardRef={cardRef} {...props} />
       </div>
     </div>
   )
