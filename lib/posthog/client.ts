@@ -22,6 +22,14 @@ export function initPostHog() {
     capture_pageview: false, // SPA pageviews are sent manually in PostHogProvider
     capture_pageleave: true,
     persistence: 'localStorage+cookie',
+    // Privacy is the moat ("we don't read your content"). Even if session replay is
+    // enabled in the PostHog project, mask ALL input + textarea values and all text by
+    // config — so pasted ccusage token data is never recorded. Belt-and-suspenders with
+    // the ph-no-capture class on the paste textarea (components/submit/PasteForm.tsx).
+    session_recording: {
+      maskAllInputs: true,
+      maskTextSelector: '*',
+    },
   })
 }
 
