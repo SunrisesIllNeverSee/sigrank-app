@@ -102,43 +102,51 @@ function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
 // Hand-rolled SVG (no charting dep), gold-panel palette: dark arcs on gold.
 // Each metric is one ring; the arc sweep = normalized value; Υ sits in center.
 
-function RadialRings({ axes, size, centerValue }: { axes: RadarAxis[]; size: number; centerValue: string }) {
+function RadialRings({ axes, size, centerValue, reduced, replayKey }: { axes: RadarAxis[]; size: number; centerValue: string; reduced: boolean; replayKey: number }) {
   const n = axes.length
+  // Animate each ring's fill from 0 → its value on mount (and on replay).
+  // Render a full circle with stroke-dasharray = circumference; the visible
+  // arc length = dashoffset, transitioned via CSS. Export-safe (PNG grabs rest state).
+  const [grown, setGrown] = useState(reduced)
+  useEffect(() => {
+    if (reduced) { setGrown(true); return }
+    setGrown(false)
+    const t = setTimeout(() => setGrown(true), 60)  // next frame → triggers the transition
+    return () => clearTimeout(t)
+  }, [reduced, replayKey])
+
   if (n < 3) return null
   const cx = size / 2, cy = size / 2
   const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
-  const TRACK = 'rgba(10,10,10,0.10)'        // unfilled ring track
+  const TRACK = 'rgba(10,10,10,0.10)'
   const INK = '#0a0a0a'
 
-  // Rings packed outer→inner; leave a hole in the middle for the Υ label.
   const outerR = size / 2 - 16
   const ringGap = 4
-  const ringW = (outerR - size * 0.18 - (n - 1) * ringGap) / n  // hole radius ≈ 18% of size
-  const startAngle = -90 // top (degrees)
-
-  // Build an SVG arc path from `start`° sweeping `frac` of a full turn at radius r.
-  const arc = (r: number, frac: number) => {
-    const sweep = Math.max(0.0001, Math.min(0.9999, frac)) * 360
-    const a0 = (startAngle * Math.PI) / 180
-    const a1 = ((startAngle + sweep) * Math.PI) / 180
-    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0)
-    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1)
-    const large = sweep > 180 ? 1 : 0
-    return `M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r.toFixed(1)} ${r.toFixed(1)} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`
-  }
+  const ringW = (outerR - size * 0.18 - (n - 1) * ringGap) / n
+  const startAngle = -90
 
   return (
     <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="Cascade signature rings">
       {axes.map((ax, i) => {
         const r = outerR - i * (ringW + ringGap) - ringW / 2
         const frac = norm(ax.value, ax.max)
-        const [lx, ly] = [cx, cy + r]  // label anchor at the ring's bottom (the gap below 'start')
+        const circ = 2 * Math.PI * r
+        // dasharray: [visible run, rest]. visible = frac × circ. Animate from 0 → frac.
+        const visible = (grown ? frac : 0) * circ
+        const [lx, ly] = [cx, cy + r]
         return (
           <g key={`ring-${i}`}>
             {/* full track */}
             <circle cx={cx} cy={cy} r={r.toFixed(1)} fill="none" stroke={TRACK} strokeWidth={ringW.toFixed(1)} />
-            {/* value arc */}
-            <path d={arc(r, frac)} fill="none" stroke={ax.color} strokeWidth={ringW.toFixed(1)} strokeLinecap="round" />
+            {/* value arc — a circle rotated so the dash starts at top, growing clockwise */}
+            <circle
+              cx={cx} cy={cy} r={r.toFixed(1)} fill="none"
+              stroke={ax.color} strokeWidth={ringW.toFixed(1)} strokeLinecap="round"
+              strokeDasharray={`${visible.toFixed(2)} ${(circ - visible).toFixed(2)}`}
+              transform={`rotate(${startAngle} ${cx} ${cy})`}
+              style={{ transition: reduced ? 'none' : `stroke-dasharray 900ms cubic-bezier(.22,1,.36,1) ${i * 110}ms` }}
+            />
             {/* glyph label riding just inside the arc start (top) */}
             <text x={cx} y={(cy - r).toFixed(1)} dx={6} dy={4}
               fontSize={Math.max(10, ringW * 0.7).toFixed(0)} fontWeight={800}
@@ -224,9 +232,9 @@ function TypewriterLine({
   const revealed = text.slice(0, count)
   return (
     <div style={{
-      height: `${rowH}px`, display: 'flex', alignItems: 'center',
+      flex: 1, minHeight: 0, display: 'flex', alignItems: 'center',
       padding: '0 24px 0 20px', whiteSpace: 'pre',
-      fontSize: '22px', fontWeight: 700,
+      fontSize: '24px', fontWeight: 700,
       fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
       textShadow: '0 0 6px rgba(120,255,120,0.25)',
     }}>
@@ -264,7 +272,7 @@ function TypewriterSimple({
 
   return (
     <div style={{
-      height: `${rowH}px`, display: 'flex', alignItems: 'center',
+      flex: 1, minHeight: 0, display: 'flex', alignItems: 'center',
       padding: '0 24px 0 20px', whiteSpace: 'pre',
       fontSize: `${size}px`, fontWeight: weight, color,
       fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
@@ -439,7 +447,7 @@ function Board({
               Cascade Signature
             </span>
             <div style={{ width: '340px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={340} centerValue={yieldStr} />
+              <RadialRings axes={coloredAxes} size={340} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
         )}
