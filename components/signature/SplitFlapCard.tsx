@@ -116,20 +116,20 @@ function MetricCell({ glyph, value, palette }: { glyph: string; value: string; p
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      gap: '2px', padding: '6px 4px',
+      gap: '1px', padding: '3px 4px',
       borderBottom: '1px solid #131311',
     }}>
-      {/* Glyph — small, colored */}
+      {/* Glyph — colored, prominent */}
       <SplitFlap
         value={glyph} length={glyph.length}
-        size="sm" variant="classic" palette={palette}
+        size="md" variant="classic" palette={palette}
         mode="board" easing="decelerate" flipMs={60} stagger={12} gap={1}
         perspective={150} animateOnMount
       />
       {/* Value — bigger, readable */}
       <SplitFlap
-        value={value.padEnd(8, ' ')} length={8}
-        size="sm" variant="classic" palette={palette}
+        value={value.padEnd(6, ' ')} length={6}
+        size="md" variant="classic" palette={palette}
         mode="board" easing="decelerate" flipMs={80} stagger={18} gap={2}
         perspective={200} animateOnMount
       />
@@ -213,7 +213,7 @@ function Board({
 
         {/* Name — TOP, largest */}
         <div style={{
-          fontSize: '38px', fontWeight: 900, color: GOLD_DARK,
+          fontSize: '42px', fontWeight: 900, color: GOLD_DARK,
           letterSpacing: '1px', lineHeight: 1.02, wordBreak: 'break-word',
         }}>
           {name.toUpperCase()}
@@ -221,8 +221,8 @@ function Board({
 
         {/* Brand row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>◈ SIGRANK</span>
-          <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES · MO§ES™</span>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>◈ SIGRANK</span>
+          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES · MO§ES™</span>
         </div>
 
         {/* Diamond divider */}
@@ -233,9 +233,9 @@ function Board({
 
         {/* Yield headline */}
         <div style={{ marginTop: '10px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '26px', fontWeight: 900, color: GOLD_DARK }}>Υ</span>
-          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
-          <span style={{ fontSize: '26px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
+          <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK }}>Υ</span>
+          <span style={{ fontSize: '11px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
+          <span style={{ fontSize: '30px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
         </div>
 
         {/* Info rows */}
@@ -247,8 +247,8 @@ function Board({
             ['OP RATIO', opStr],
           ].map(([label, val]) => (
             <div key={label} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase', width: '62px', flexShrink: 0 }}>{label}</span>
-              <span style={{ fontSize: '13px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{val}</span>
+              <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase', width: '68px', flexShrink: 0 }}>{label}</span>
+              <span style={{ fontSize: '15px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{val}</span>
             </div>
           ))}
         </div>
@@ -283,12 +283,12 @@ function Board({
           padding: '8px 16px 6px', borderBottom: '2px solid #264028',
         }}>
           <SplitFlap
-            value="CASCADE TELEMETRY" size="sm" variant="classic" palette={GOLD_P}
+            value="CASCADE TELEMETRY" size="md" variant="classic" palette={GOLD_P}
             mode="board" easing="decelerate" flipMs={60} stagger={25} gap={2}
             perspective={200} animateOnMount
           />
           <SplitFlap
-            value="LIVE" size="sm" variant="classic" palette={DIM_P}
+            value="LIVE" size="md" variant="classic" palette={DIM_P}
             mode="board" flipMs={60} animateOnMount
           />
         </div>
@@ -298,10 +298,10 @@ function Board({
           display: 'flex', padding: '6px 16px 4px',
           borderBottom: '1px solid #1a2a1a',
         }}>
-          <span style={{ flex: 1, fontSize: '10px', color: '#6e966e', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center' }}>
+          <span style={{ flex: 1, fontSize: '12px', color: '#8ae89a', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center', fontWeight: 700 }}>
             RAW TOKENS
           </span>
-          <span style={{ flex: 1, fontSize: '10px', color: '#6e966e', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center' }}>
+          <span style={{ flex: 1, fontSize: '12px', color: '#8ae89a', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center', fontWeight: 700 }}>
             DERIVED METRICS
           </span>
         </div>
@@ -313,7 +313,7 @@ function Board({
           {/* Left column — raw */}
           <div style={{
             flex: 1, borderRight: '1px solid #1a2a1a',
-            display: 'flex', flexDirection: 'column',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-around',
           }}>
             {rawMetrics.map((m) => (
               <MetricCell key={m.glyph} glyph={m.glyph} value={m.value} palette={m.palette} />
@@ -322,7 +322,7 @@ function Board({
 
           {/* Right column — derived */}
           <div style={{
-            flex: 1, display: 'flex', flexDirection: 'column',
+            flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around',
           }}>
             {derivedMetrics.map((m) => (
               <MetricCell key={m.glyph} glyph={m.glyph} value={m.value} palette={m.palette} />
