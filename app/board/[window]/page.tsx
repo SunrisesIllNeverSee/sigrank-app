@@ -24,7 +24,7 @@ import { LeaderboardTable } from '@/components/sigrank'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { LeaderboardKey } from '@/components/leaderboard/LeaderboardKey'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { leaderboardItemList } from '@/lib/jsonld'
+import { leaderboardItemList, sigrankDataset } from '@/lib/jsonld'
 import { withOG } from '@/lib/seo'
 
 /**
@@ -153,14 +153,17 @@ export default async function BoardWindowPage({
       />
 
       <JsonLd
-        data={leaderboardItemList(
-          entries.map((e) => ({
-            codename: e.codename,
-            rank: e.rank,
-            classTier: e.signalClass,
-          })),
-          `/board/${slug}`,
-        )}
+        data={[
+          sigrankDataset({ updated: new Date().toISOString() }),
+          leaderboardItemList(
+            entries.map((e) => ({
+              codename: e.codename,
+              rank: e.rank,
+              classTier: e.signalClass,
+            })),
+            `/board/${slug}`,
+          ),
+        ]}
       />
 
       {/* Window switcher removed (owner 2026-06-24): the window selector now lives INSIDE
