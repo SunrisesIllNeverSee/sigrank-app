@@ -3,8 +3,9 @@
 /**
  * components/signature/SplitFlapCard.tsx — real Solari split-flap board.
  *
- * No midline seam (div = bg). Glyphs label each metric. Name at top.
- * Big radar. Board fills with no dead space.
+ * No midline seam. Glyphs label each metric. Name at top. Big radar.
+ * 2-column board grid: raw pillars left, derived metrics right.
+ * Fills the full 1200×630 with no dead space.
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -35,30 +36,16 @@ export interface SplitFlapCardProps {
   showControls?: boolean
 }
 
-// ── Palettes — NO MIDLINE (div = bg, invisible seam) ─────────────────────
+// ── Palettes — NO MIDLINE (div = bg) ──────────────────────────────────────
 
-const mkPalette = (text: string): Palette => ({
-  text,
-  topBg: '#0a0a08',
-  botBg: '#0a0a08',
-  border: '#151513',
-  div: '#0a0a08',  // same as bg = no visible midline seam
+const mk = (text: string, bg = '#0a0a08'): Palette => ({
+  text, topBg: bg, botBg: bg, border: '#1a1a16', div: bg,
 })
-
-const GOLD_P = mkPalette('#e0b240')
-const GREEN_P = mkPalette('#78dc82')
-const BONE_P = mkPalette('#dee6d2')
-const DIM_P = mkPalette('#6e966e')
-const LABEL_P = mkPalette('#5a8a5a')
-
-// ── Glyphs (from CANON §IV) ───────────────────────────────────────────────
-
-interface MetricDef {
-  glyph: string
-  label: string
-  value: string
-  palette: Palette
-}
+const GOLD_P = mk('#f0c862')       // brighter gold for readability
+const GREEN_P = mk('#8ae89a')      // brighter green
+const BONE_P = mk('#f0eee0')       // brighter bone
+const DIM_P = mk('#7aaa7a')        // brighter dim
+const LABEL_P = mk('#6a9a6a', '#060606')
 
 // ── Format helpers ────────────────────────────────────────────────────────
 
@@ -76,9 +63,7 @@ interface RadarAxis { label: string; value: number; max: number; color: string; 
 function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
   const n = axes.length
   if (n < 3) return null
-  const cx = size / 2
-  const cy = size / 2
-  const radius = size / 2 - 40
+  const cx = size / 2, cy = size / 2, radius = size / 2 - 44
   const rings = [0.25, 0.5, 0.75, 1]
   const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
   const point = (i: number, r: number): [number, number] => {
@@ -86,39 +71,36 @@ function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
     return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]
   }
   const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
-  const polyPath = axes
-    .map((_, i) => {
-      const r = norm(axes[i].value, axes[i].max) * radius
-      const [x, y] = point(i, r)
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
-    })
-    .join(' ') + ' Z'
+  const polyPath = axes.map((_, i) => {
+    const r = norm(axes[i].value, axes[i].max) * radius
+    const [x, y] = point(i, r)
+    return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ') + ' Z'
 
   return (
     <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="Cascade fingerprint">
       {rings.map((ring) => (
         <polygon key={ring}
           points={axes.map((_, i) => point(i, ring * radius).map((v) => v.toFixed(1)).join(',')).join(' ')}
-          fill="none" stroke="rgba(10,10,10,0.15)" strokeWidth={1} />
+          fill="none" stroke="rgba(10,10,10,0.12)" strokeWidth={1} />
       ))}
       {axes.map((_, i) => {
         const [x, y] = point(i, radius)
-        return <line key={`s-${i}`} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(10,10,10,0.1)" strokeWidth={1} />
+        return <line key={`s-${i}`} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(10,10,10,0.08)" strokeWidth={1} />
       })}
-      <path d={polyPath} fill="rgba(10,10,10,0.15)" stroke="#0a0a0a" strokeWidth={2.5} strokeLinejoin="round" />
+      <path d={polyPath} fill="rgba(10,10,10,0.12)" stroke="#0a0a0a" strokeWidth={3} strokeLinejoin="round" />
       {axes.map((ax, i) => {
         const [x, y] = point(i, norm(ax.value, ax.max) * radius)
-        return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={5} fill={ax.color} stroke="#0a0a0a" strokeWidth={1} />
+        return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={6} fill={ax.color} stroke="#0a0a0a" strokeWidth={1.5} />
       })}
-      {/* Axis labels: glyph + value, colored per metric */}
       {axes.map((ax, i) => {
-        const [lx, ly] = point(i, radius + 22)
+        const [lx, ly] = point(i, radius + 24)
         const cos = Math.cos(angleAt(i))
         const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
         return (
           <text key={`l-${i}`} x={lx.toFixed(1)} y={ly.toFixed(1)}
             textAnchor={anchor} dominantBaseline="middle"
-            fontSize={13} fontWeight={700} fill={ax.color}
+            fontSize={14} fontWeight={800} fill={ax.color}
             style={{ fontFamily: 'ui-monospace, monospace' }}>
             {ax.glyph}
           </text>
@@ -128,37 +110,28 @@ function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
   )
 }
 
-// ── Metric row: glyph + label + value, all split-flap ─────────────────────
+// ── A compact metric cell: glyph + value stacked ──────────────────────────
 
-function MetricRow({ glyph, label, value, palette }: { glyph: string; label: string; value: string; palette: Palette }) {
+function MetricCell({ glyph, value, palette }: { glyph: string; value: string; palette: Palette }) {
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: '4px',
-      padding: '2px 10px', borderBottom: '1px solid #131311',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      gap: '2px', padding: '6px 4px',
+      borderBottom: '1px solid #131311',
     }}>
-      {/* Glyph — colored, prominent */}
+      {/* Glyph — small, colored */}
       <SplitFlap
         value={glyph} length={glyph.length}
         size="sm" variant="classic" palette={palette}
-        mode="board" easing="decelerate" flipMs={60} stagger={15} gap={1}
+        mode="board" easing="decelerate" flipMs={60} stagger={12} gap={1}
         perspective={150} animateOnMount
-        style={{ flexShrink: 0 }}
       />
-      {/* Label */}
+      {/* Value — bigger, readable */}
       <SplitFlap
-        value={label.padEnd(7, ' ')} length={7}
-        size="sm" variant="classic" palette={LABEL_P}
-        mode="board" easing="decelerate" flipMs={60} stagger={15} gap={1}
-        perspective={150} animateOnMount
-        style={{ flexShrink: 0 }}
-      />
-      {/* Value */}
-      <SplitFlap
-        value={value.padEnd(10, ' ')} length={10}
+        value={value.padEnd(8, ' ')} length={8}
         size="sm" variant="classic" palette={palette}
-        mode="board" easing="decelerate" flipMs={80} stagger={20} gap={2}
+        mode="board" easing="decelerate" flipMs={80} stagger={18} gap={2}
         perspective={200} animateOnMount
-        style={{ justifyContent: 'flex-start' }}
       />
     </div>
   )
@@ -192,34 +165,33 @@ function Board({
   const opStr = opRatio ?? '—'
   const cascadeStrVal = cascadeStr ?? '—'
 
-  // Radar axes with per-metric colors + glyphs
-  const radarColors = ['#e0b240', '#78dc82', '#78dc82', '#e0b240', '#dee6d2', '#78dc82']
+  const radarColors = ['#f0c862', '#8ae89a', '#8ae89a', '#f0c862', '#f0eee0', '#8ae89a']
   const radarGlyphs = ['Υ', 'SNR', 'LEV', '⚡', 'SCL', 'EFF']
   const coloredAxes: RadarAxis[] = radarAxes && radarAxes.length >= 3
     ? radarAxes.map((a, i) => ({ ...a, color: radarColors[i % 6], glyph: radarGlyphs[i % 6] }))
     : []
 
-  // All metrics for the board
-  const rawMetrics: MetricDef[] = [
-    { glyph: 'IN', label: 'INPUT', value: inputStr, palette: BONE_P },
-    { glyph: 'OUT', label: 'OUTPUT', value: outputStr, palette: GREEN_P },
-    { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, palette: GREEN_P },
-    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, palette: BONE_P },
-    { glyph: '∑', label: 'TOTAL', value: totalStr, palette: DIM_P },
-  ]
-  const derivedMetrics: MetricDef[] = [
-    { glyph: 'Υ', label: 'YIELD', value: yieldStr, palette: GOLD_P },
-    { glyph: 'SNR', label: 'SNR', value: snrStr, palette: GREEN_P },
-    { glyph: 'LEV', label: 'LEVERAG', value: levStr, palette: GREEN_P },
-    { glyph: 'VEL', label: 'VELOCTY', value: velStr, palette: BONE_P },
-    { glyph: '⚡', label: '10XDEV', value: devStr, palette: GOLD_P },
-    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, palette: BONE_P },
-    { glyph: 'EFF', label: 'EFFICNC', value: effStr, palette: GREEN_P },
-    { glyph: '$', label: 'COST/1M', value: costStr, palette: DIM_P },
-  ]
-
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
+
+  // Raw + derived metrics for the 2-column grid
+  const rawMetrics = [
+    { glyph: 'IN', value: inputStr, palette: BONE_P },
+    { glyph: 'OUT', value: outputStr, palette: GREEN_P },
+    { glyph: 'CR', value: cacheReadStr, palette: GREEN_P },
+    { glyph: 'CW', value: cacheCreateStr, palette: BONE_P },
+    { glyph: '∑', value: totalStr, palette: DIM_P },
+  ]
+  const derivedMetrics = [
+    { glyph: 'Υ', value: yieldStr, palette: GOLD_P },
+    { glyph: 'SNR', value: snrStr, palette: GREEN_P },
+    { glyph: 'LEV', value: levStr, palette: GREEN_P },
+    { glyph: 'VEL', value: velStr, palette: BONE_P },
+    { glyph: '⚡', value: devStr, palette: GOLD_P },
+    { glyph: 'SCL', value: scaleStr, palette: BONE_P },
+    { glyph: 'EFF', value: effStr, palette: GREEN_P },
+    { glyph: '$', value: costStr, palette: DIM_P },
+  ]
 
   return (
     <div ref={cardRef} style={{
@@ -239,35 +211,35 @@ function Board({
           background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px)',
         }} />
 
-        {/* Name — TOP, largest font */}
+        {/* Name — TOP, largest */}
         <div style={{
-          fontSize: '40px', fontWeight: 900, color: GOLD_DARK,
+          fontSize: '38px', fontWeight: 900, color: GOLD_DARK,
           letterSpacing: '1px', lineHeight: 1.02, wordBreak: 'break-word',
         }}>
           {name.toUpperCase()}
         </div>
 
-        {/* Small brand row under name */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>SIGRANK</span>
+        {/* Brand row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>◈ SIGRANK</span>
           <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES · MO§ES™</span>
         </div>
 
         {/* Diamond divider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
           <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
           <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
         </div>
 
         {/* Yield headline */}
-        <div style={{ marginTop: '12px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '28px', fontWeight: 900, color: GOLD_DARK }}>Υ</span>
-          <span style={{ fontSize: '11px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
-          <span style={{ fontSize: '28px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
+        <div style={{ marginTop: '10px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <span style={{ fontSize: '26px', fontWeight: 900, color: GOLD_DARK }}>Υ</span>
+          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
+          <span style={{ fontSize: '26px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
         </div>
 
-        {/* Info rows — organized */}
-        <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        {/* Info rows */}
+        <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {[
             ['CLASS', classTier],
             ['PLATFORM', (platform ?? '—').toUpperCase()],
@@ -276,12 +248,12 @@ function Board({
           ].map(([label, val]) => (
             <div key={label} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase', width: '62px', flexShrink: 0 }}>{label}</span>
-              <span style={{ fontSize: '14px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{val}</span>
+              <span style={{ fontSize: '13px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{val}</span>
             </div>
           ))}
         </div>
 
-        {/* Radar — BIG, bottom anchored, fills space */}
+        {/* Radar — BIG, fills bottom */}
         {coloredAxes.length >= 3 && (
           <div style={{
             marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
@@ -289,26 +261,26 @@ function Board({
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Fingerprint
             </span>
-            <div style={{ width: '320px', background: 'rgba(10,10,10,0.08)', borderRadius: '8px', padding: '4px' }}>
-              <ColoredRadar axes={coloredAxes} size={320} />
+            <div style={{ width: '340px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <ColoredRadar axes={coloredAxes} size={340} />
             </div>
           </div>
         )}
 
-        <div style={{ marginTop: '6px', fontSize: '9px', color: GOLD_DARK, opacity: 0.3, letterSpacing: '1px' }}>
+        <div style={{ marginTop: '4px', fontSize: '9px', color: GOLD_DARK, opacity: 0.3, letterSpacing: '1px' }}>
           signalaf.com/user/{codename}
         </div>
       </div>
 
-      {/* ═══ RIGHT 2/3 — dark Solari board ═══ */}
+      {/* ═══ RIGHT 2/3 — dark Solari board, 2-column grid ═══ */}
       <div style={{
         width: RIGHT_W, height: H, background: '#050605',
         display: 'flex', flexDirection: 'column', boxSizing: 'border-box', flexShrink: 0,
       }}>
-        {/* Header — split-flap */}
+        {/* Header */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '8px 14px 6px', borderBottom: '2px solid #264028',
+          padding: '8px 16px 6px', borderBottom: '2px solid #264028',
         }}>
           <SplitFlap
             value="CASCADE TELEMETRY" size="sm" variant="classic" palette={GOLD_P}
@@ -321,20 +293,41 @@ function Board({
           />
         </div>
 
-        {/* Board rows — fills the space, no dead space */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
-          {/* Raw token pillars */}
-          {rawMetrics.map((m) => (
-            <MetricRow key={m.label} glyph={m.glyph} label={m.label} value={m.value} palette={m.palette} />
-          ))}
+        {/* Section labels */}
+        <div style={{
+          display: 'flex', padding: '6px 16px 4px',
+          borderBottom: '1px solid #1a2a1a',
+        }}>
+          <span style={{ flex: 1, fontSize: '10px', color: '#6e966e', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center' }}>
+            RAW TOKENS
+          </span>
+          <span style={{ flex: 1, fontSize: '10px', color: '#6e966e', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center' }}>
+            DERIVED METRICS
+          </span>
+        </div>
 
-          {/* Divider */}
-          <div style={{ height: 1, background: '#264028', margin: '1px 10px' }} />
+        {/* 2-column grid: raw left, derived right */}
+        <div style={{
+          flex: 1, display: 'flex', overflow: 'hidden',
+        }}>
+          {/* Left column — raw */}
+          <div style={{
+            flex: 1, borderRight: '1px solid #1a2a1a',
+            display: 'flex', flexDirection: 'column',
+          }}>
+            {rawMetrics.map((m) => (
+              <MetricCell key={m.glyph} glyph={m.glyph} value={m.value} palette={m.palette} />
+            ))}
+          </div>
 
-          {/* Derived metrics */}
-          {derivedMetrics.map((m) => (
-            <MetricRow key={m.label} glyph={m.glyph} label={m.label} value={m.value} palette={m.palette} />
-          ))}
+          {/* Right column — derived */}
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+          }}>
+            {derivedMetrics.map((m) => (
+              <MetricCell key={m.glyph} glyph={m.glyph} value={m.value} palette={m.palette} />
+            ))}
+          </div>
         </div>
       </div>
 
