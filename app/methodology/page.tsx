@@ -120,7 +120,7 @@ export default async function MethodologyPage() {
             {
               question: 'How do I get listed on the SigRank Index?',
               answer:
-                'Install the SigRank MCP server (npm: sigrank), enroll your operator identity, and submit a snapshot. The scanner reads your token telemetry locally and publishes a signed snapshot to the leaderboard. Visit signalaf.com/submit to get started.',
+                'Install the SigRank CLI (npm: sigrank), enroll your operator identity, and submit a snapshot. The scanner reads your token telemetry locally and publishes a signed snapshot to the leaderboard. Enrollment and submission are done via the SigRank CLI.',
             },
           ]),
         ]}
