@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+import { withOG } from '@/lib/seo'
 
-export const metadata = { title: 'Payment complete' }
+export const metadata: Metadata = withOG({
+  title: 'Payment complete',
+  description: 'Thank you for backing SigRank — your founding-supporter perks are locked in.',
+  path: '/upgrade/success',
+})
 
 /**
  * Stripe Checkout success_url target (subscription + claim flows).

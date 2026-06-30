@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
 import { TopicPage } from '@/components/wiki/TopicPage'
 import { LocalAgentMcp } from '@/components/marketing/SignalIntegrity'
+import { withOG } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, definedTerm } from '@/lib/jsonld'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'The Local Agent (MCP)',
   description:
     'The SigRank MCP: a zero-paste, on-device reader (tokenpull) that counts your four token pillars locally and publishes your cascade — read-only, emits no prompt, never reads your content. Install + quickstart.',
-}
+  path: '/wiki/local-agent',
+})
 
 export default function LocalAgentPage() {
   return (

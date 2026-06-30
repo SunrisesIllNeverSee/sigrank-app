@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { LoginButtons } from '@/components/auth/LoginButtons'
+import { withOG } from '@/lib/seo'
 
 /**
  * app/login/page.tsx — sign-in page.
@@ -11,10 +12,11 @@ import { LoginButtons } from '@/components/auth/LoginButtons'
  * to browse without an account.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'Sign in',
   description: 'Sign in to claim your operator profile and back the build.',
-}
+  path: '/login',
+})
 
 export default async function LoginPage({
   searchParams,

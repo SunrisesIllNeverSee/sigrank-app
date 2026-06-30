@@ -28,12 +28,14 @@ import type { Metadata } from 'next'
 import { TopicPage } from '@/components/wiki/TopicPage'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, definedTerm } from '@/lib/jsonld'
+import { withOG } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOG({
   title: 'How We Got Here — Refining the Index',
   description:
     'The calibration entries behind the SigRank Index: one operator (MO§ES) measured by two readers, and the same workload run with and without memory. How bracketing those extremes refined the methodology — and why the honest lead is the rank, not the raw multiplier.',
-}
+  path: '/wiki/methodology-refinement',
+})
 
 interface CalRow {
   glyph: string
