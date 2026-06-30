@@ -28,7 +28,7 @@ export function getStripe(): Stripe | null {
   if (!STRIPE_CONFIGURED) return null
   if (cached) return cached
   cached = new Stripe(secretKey as string, {
-    apiVersion: '2024-06-20',
+    apiVersion: '2026-06-24.dahlia',
     typescript: true,
   })
   return cached
