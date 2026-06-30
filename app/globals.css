@@ -59,7 +59,7 @@
   --text-primary: 233 227 213; /* #e9e3d5 bone */
   --text-secondary: 196 186 165; /* lifted from 178/168/148 — readability (owner 2026-06-19) */
   --text-muted: 158 147 124;   /* lifted from 125/116/97 — was too dark on carbon */
-  --text-dim: 122 112 90;      /* lifted from 90/82/64 — passes ~4:1 on #0d0b08 */
+  --text-dim: 146 134 108;     /* AA: 5.20:1 on surface, 5.47:1 on base (lifted from 122/112/90, which was 4.0:1 — Lighthouse a11y fix 2026-06-30) */
 
   --gold: 196 146 58;          /* #c4923a brand accent */
   --accent: 156 196 255;       /* cascade-blue, harmonized with locked palette */
@@ -107,7 +107,7 @@
   --text-primary: 244 242 251;
   --text-secondary: 190 181 214; /* lifted from 169/159/196 — readability (owner 2026-06-19) */
   --text-muted: 152 141 184;   /* lifted from 122/111/153 — was too dark on dark violet */
-  --text-dim: 116 105 146;     /* lifted from 77/68/102 — passes ~4:1 on #0d0b14 */
+  --text-dim: 129 117 162;     /* AA: 4.65:1 on #0d0b14 (lifted from 116/105/146, which was 3.9:1 — Lighthouse a11y fix 2026-06-30) */
 
   --gold: 167 139 250;      /* brand accent becomes violet in this theme */
   --accent: 139 92 246;
@@ -135,7 +135,7 @@
   --text-primary: 222 230 210; /* warm bone-green */
   --text-secondary: 150 200 150;
   --text-muted: 110 150 110;
-  --text-dim: 78 110 78;       /* passes ~4:1 on #050605 */
+  --text-dim: 92 130 92;       /* AA: 4.64:1 on #050605 (lifted from 78/110/78, which was 3.5:1 — Lighthouse a11y fix 2026-06-30) */
 
   --gold: 224 178 64;          /* TUI gold (#e0b240) */
   --accent: 120 220 130;       /* terminal green accent */
