@@ -175,9 +175,37 @@ function MosesSection() {
         SigRank runs on <strong className="text-gold">MO§ES™</strong> &mdash; the{' '}
         <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion
         System</strong>. It&apos;s a governance framework that came out of a published
-        conservation law for language. This section explains what the law says, what the
-        evidence shows, and how it connects to what we&apos;re building.
+        conservation law for language. This section explains where it came from, what the law
+        says, what the evidence shows, and how it connects to what we&apos;re building.
       </p>
+
+      {/* ── The path here ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Where this came from
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Before any of this, the founder studied sociology and history at SUNY Geneseo, UB,
+          and University of Hawaii at Hilo. Ran Pacific Northwest operations for Invisible
+          Children. Held board seats at KEDS (2006&ndash;2008) and Horizon Health Services
+          (2012&ndash;2018). Different world, but the same question: how do you keep
+          commitment intact when it passes through a lot of hands?
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Then DJMP Inc. &mdash; a Buffalo contracting operation, started in 2011, taken from
+          zero to $1M/yr with a team of 40. Projects ranging $10k&ndash;$500k. Real operations,
+          real governance, real consequences when things drift.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Running governed AI across that operation, something was missing. The leaderboards
+          measured the models. Nobody measured the operator &mdash; the person actually
+          steering the AI, making the calls, deciding what to keep and what to cut. The
+          augmentation layer was invisible. So the founder built a way to measure it, found a
+          conservation law underneath it, published the law, patented the enforcement
+          architecture, and ran it against the field. That&apos;s where SigRank and MO§ES™
+          came from &mdash; not from a market thesis, from an operational gap.
+        </p>
+      </section>
 
       {/* ── The law ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
