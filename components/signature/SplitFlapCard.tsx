@@ -211,18 +211,26 @@ function formatLine(abbr: string, you: string, name: string, avg: string): strin
 
 // ── Typewriter line (colored glyph + label + value) ───────────────────────
 
+// Weighted to content within the 60% (720px) panel: abbr narrow · your value ·
+// TELEMETRY (metric name) widest · AVERAGE USER. fr units flex with the panel.
+const COLS = '0.7fr 1fr 1.8fr 1.1fr'
+const CELL_PAD = '0 30px'
+
 function TypewriterLine({
-  text, glyphColor, startDelay, charDelay, reduced, rowH,
+  abbr, you, name, avg, glyphColor, startDelay, charDelay, reduced,
 }: {
-  text: string
+  abbr: string
+  you: string
+  name: string
+  avg: string
   glyphColor: string
   startDelay: number
   charDelay: number
   reduced: boolean
-  rowH: number
 }) {
-  const [count, setCount] = useState(text.length)
-  const done = count >= text.length
+  const total = abbr.length + you.length + name.length + avg.length
+  const [count, setCount] = useState(reduced ? total : 0)
+  const done = count >= total
 
   useEffect(() => {
     if (done) return
@@ -231,23 +239,18 @@ function TypewriterLine({
     return () => clearTimeout(timer)
   }, [count, done, startDelay, charDelay])
 
-  const revealed = text.slice(0, count)
+  const aEnd = abbr.length, yEnd = aEnd + you.length, nEnd = yEnd + name.length
+  const rev = (start: number, str: string) => str.slice(0, Math.max(0, Math.min(str.length, count - start)))
   return (
     <div style={{
-      flex: 1, minHeight: 0, display: 'flex', alignItems: 'center',
-      padding: '0 24px 0 20px', whiteSpace: 'pre',
-      fontSize: '24px', fontWeight: 700,
+      flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: COLS, alignItems: 'center',
+      padding: CELL_PAD, fontSize: '24px', fontWeight: 700,
       fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-      textShadow: '0 0 6px rgba(120,255,120,0.25)',
     }}>
-      {/* CASCADE: abbr/glyph (metric color) */}
-      <span style={{ color: glyphColor, fontWeight: 800, textShadow: `0 0 8px ${glyphColor}66` }}>{revealed.slice(0, Z_YOU)}</span>
-      {/* NEW USER: your value (bright phosphor) */}
-      <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{revealed.slice(Z_YOU, Z_NAME)}</span>
-      {/* TELEMETRY: metric name (dim green) */}
-      <span style={{ color: '#5a8a5a', fontWeight: 600 }}>{revealed.slice(Z_NAME, Z_AVG)}</span>
-      {/* AVERAGE USER: avg value (muted) */}
-      <span style={{ color: '#6e8a6e', fontWeight: 700 }}>{revealed.slice(Z_AVG)}</span>
+      <span style={{ color: glyphColor, fontWeight: 800, textShadow: `0 0 8px ${glyphColor}66` }}>{rev(0, abbr)}</span>
+      <span style={{ color: '#a8ffa8', fontWeight: 800, textAlign: 'right', textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{rev(aEnd, you)}</span>
+      <span style={{ color: '#5a8a5a', fontWeight: 600, fontSize: '15px', letterSpacing: '0.5px', paddingLeft: '24px' }}>{rev(yEnd, name)}</span>
+      <span style={{ color: '#6e8a6e', fontWeight: 700, textAlign: 'right' }}>{rev(nEnd, avg)}</span>
       {!done && <span className="print-cursor" style={{ color: '#a8ffa8', fontWeight: 800 }}>{'\u258c'}</span>}
     </div>
   )
@@ -302,7 +305,7 @@ function Board({
   cardRef: React.RefObject<HTMLDivElement | null>
   reduced: boolean
 } & Omit<SplitFlapCardProps, 'showControls'>) {
-  const W = 1200, H = 630, LEFT_W = 420, RIGHT_W = W - LEFT_W
+  const W = 1200, H = 630, LEFT_W = 480, RIGHT_W = W - LEFT_W  // 40% rings / 60% printout
 
   const yieldStr = yieldValue !== null ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0)) : '\u2014'
   const snrStr = snr != null ? `${(snr * 100).toFixed(0)}%` : '\u2014'
@@ -350,14 +353,23 @@ function Board({
   const headerText = formatLine('CASC', 'NEW USER', 'TELEMETRY', 'AVG')
   const dividerText = '         - - - DERIVED - - -'
 
-  // value | metric name | AVG USER (AA 7:2:1 baseline \u2014 same average user as the landing page).
-  // Raw token rows have no per-user-token avg \u2192 '\u00b7'.
+  // AVERAGE USER token breakdown \u2014 anchored on the NEW USER's input, split by the
+  // average operating ratio 3.5 : 1 : 0.5 (cache : input : output, input-normalized).
+  // i.e. "at your input volume, what a 3.5:1:0.5 operator would produce." The contrast
+  // (your real cache_read >> 3.5\u00d7 input) is the leverage edge, made visible.
+  const avgIn = inputTokens ?? null
+  const avgOut = avgIn != null ? avgIn * 0.5 : null
+  const avgCache = avgIn != null ? avgIn * 3.5 : null
+  const avgTotal = avgIn != null ? avgIn + avgOut! + avgCache! : null
+  const avgFmt = (n: number | null) => (n != null ? fmtTokens(n) : '\u00b7')
+
+  // value | metric name | AVG USER. Raw rows: avg = your-input \u00d7 the 3.5:1:0.5 ratio.
   const rawLines = [
-    { glyph: 'IN', label: 'INPUT', value: inputStr, avg: '\u00b7', color: C_BONE },
-    { glyph: 'OUT', label: 'OUTPUT', value: outputStr, avg: '\u00b7', color: C_GREEN },
-    { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, avg: '\u00b7', color: C_GREEN },
+    { glyph: 'IN', label: 'INPUT', value: inputStr, avg: avgFmt(avgIn), color: C_BONE },
+    { glyph: 'OUT', label: 'OUTPUT', value: outputStr, avg: avgFmt(avgOut), color: C_GREEN },
+    { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, avg: avgFmt(avgCache), color: C_GREEN },
     { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: '\u00b7', color: C_BONE },
-    { glyph: '\u2211', label: 'TOTAL', value: totalStr, avg: '\u00b7', color: C_DIM },
+    { glyph: '\u2211', label: 'TOTAL', value: totalStr, avg: avgFmt(avgTotal), color: C_DIM },
   ]
   const derivedLines = [
     { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: '1.57', color: C_GOLD },
@@ -456,8 +468,8 @@ function Board({
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Signature
             </span>
-            <div style={{ width: '340px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={340} centerValue={yieldStr} reduced={reduced} replayKey={0} />
+            <div style={{ width: '380px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <RadialRings axes={coloredAxes} size={380} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
         )}
@@ -488,62 +500,55 @@ function Board({
           }} />
         )}
 
-        {/* Header line */}
-        <div style={{ borderBottom: '1px solid #1a3a1a' }}>
-          <TypewriterSimple
-            text={headerText}
-            color="#8ae89a"
-            startDelay={delays[delayIdx++]}
-            charDelay={CHAR_DELAY}
-            reduced={reduced}
-            weight={800}
-            size={18}
-            rowH={ROW_H}
-          />
+        {/* Column header row — CASCADE | NEW USER | TELEMETRY | AVERAGE USER */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: COLS, alignItems: 'center',
+          padding: '14px 28px 12px', borderBottom: '1px solid #2a5a2a',
+          fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px',
+          color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.4)',
+          fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+        }}>
+          <span>CASCADE</span>
+          <span style={{ textAlign: 'right' }}>NEW USER</span>
+          <span style={{ paddingLeft: '24px' }}>TELEMETRY</span>
+          <span style={{ textAlign: 'right', color: '#6e8a6e', textShadow: 'none' }}>AVERAGE USER</span>
         </div>
 
         {/* Raw token lines */}
         {rawLines.map((l) => (
           <TypewriterLine
             key={`raw-${l.glyph}`}
-            text={formatLine(l.glyph, l.value, l.label, l.avg)}
+            abbr={l.glyph} you={l.value} name={l.label} avg={l.avg}
             glyphColor={l.color}
             startDelay={delays[delayIdx++]}
             charDelay={CHAR_DELAY}
             reduced={reduced}
-            rowH={ROW_H}
           />
         ))}
-
-        {/* Perforation divider */}
-        <div style={{
-          borderTop: '1px dashed #1a3a1a',
-          borderBottom: '1px dashed #1a3a1a',
-        }}>
-          <TypewriterSimple
-            text={dividerText}
-            color="#4a6a4a"
-            startDelay={delays[delayIdx++]}
-            charDelay={CHAR_DELAY}
-            reduced={reduced}
-            weight={600}
-            size={16}
-            rowH={ROW_H}
-          />
-        </div>
 
         {/* Derived metric lines */}
         {derivedLines.map((l) => (
           <TypewriterLine
             key={`der-${l.glyph}`}
-            text={formatLine(l.glyph, l.value, l.label, l.avg)}
+            abbr={l.glyph} you={l.value} name={l.label} avg={l.avg}
             glyphColor={l.color}
             startDelay={delays[delayIdx++]}
             charDelay={CHAR_DELAY}
             reduced={reduced}
-            rowH={ROW_H}
           />
         ))}
+
+        {/* Operating-ratio footer strip — you vs the average 3.5:1:0.5 */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 30px', borderTop: '1px solid #1a3a1a',
+          fontSize: '15px', fontWeight: 700, letterSpacing: '0.5px',
+          fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+        }}>
+          <span style={{ color: '#5a8a5a' }}>OP RATIO <span style={{ color: '#4a6a4a', fontSize: '11px' }}>C:I:O</span></span>
+          <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{opStr}</span>
+          <span style={{ color: '#6e8a6e' }}>avg 3.5:1:0.5</span>
+        </div>
       </div>
     </div>
   )
