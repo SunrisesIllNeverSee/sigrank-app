@@ -32,6 +32,7 @@ import { SubmissionsGrid } from '@/components/profile/SubmissionsGrid'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal'
 import { ProfileShareCard } from '@/components/share/ProfileShareCard'
+import { SignalSignature } from '@/components/signature/SignalSignature'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
 import { SignaHistoryChart } from '@/components/charts/SignaHistoryChart'
 import CascadeRadar from '@/components/charts/CascadeRadar'
@@ -480,6 +481,19 @@ export default async function OperatorProfilePage({
           />
         </div>
       </header>
+
+      {/* Animated signal signature — the operator's identity as a living artifact.
+          Noise field resolves to codename, Υ decrypts in, cascade radar emerges.
+          Only shown for ranked operators with cascade data. */}
+      {ranked && c && !c.nonCompounding && (
+        <SignalSignature
+          codename={operator.codename}
+          yieldValue={c.yield_}
+          rank={row.global_rank}
+          classTier={snapshot.class_tier}
+          radarAxes={radarAxes}
+        />
+      )}
 
       <ProfileTabs
         stats={pending ? pendingPanel : rankedStatsPanel}
