@@ -175,21 +175,22 @@ function MosesSection() {
         SigRank runs on <strong className="text-gold">MO§ES™</strong> &mdash; the{' '}
         <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion
         System</strong>. It&apos;s a governance framework that came out of a published
-        conservation law for language. This section explains where it came from, what the law
-        says, what the evidence shows, and how it connects to what we&apos;re building.
+        conservation law for language. This section covers where it came from, what the law
+        says, what the evidence shows, how governance works inside it, who it&apos;s for, and
+        what we&apos;re building on top of it.
       </p>
 
-      {/* ── The path here ── */}
+      {/* ── Where this came from ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
           Where this came from
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Before any of this, the founder studied sociology and history at SUNY Geneseo, UB,
-          and University of Hawaii at Hilo. Ran Pacific Northwest operations for Invisible
-          Children. Held board seats at KEDS (2006&ndash;2008) and Horizon Health Services
-          (2012&ndash;2018). Different world, but the same question: how do you keep
-          commitment intact when it passes through a lot of hands?
+          The founder studied sociology and history at SUNY Geneseo, UB, and University of
+          Hawaii at Hilo. Ran Pacific Northwest operations for Invisible Children. Held board
+          seats at KEDS (2006&ndash;2008) and Horizon Health Services (2012&ndash;2018).
+          Different world, but the same question underneath: how do you keep commitment intact
+          when it passes through a lot of hands?
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Then DJMP Inc. &mdash; a Buffalo contracting operation, started in 2011, taken from
@@ -228,22 +229,24 @@ function MosesSection() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The law is published under CC-BY-4.0
           {' '}(<a href="https://doi.org/10.5281/zenodo.20029607" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.20029607</a>).
-          The enforcement architecture (MO§ES™) is patent-pending &mdash; the law itself is open.
+          The enforcement architecture (MO§ES™) is patent-pending. The law itself is open.
         </p>
       </section>
 
       {/* ── The evidence ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">What the evidence shows</h3>
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          What the evidence shows
+        </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Seven experiments (EXP-001 through EXP-007) tested the law on a 20-signal canonical
           corpus, running 10 recursive iterations each, using bidirectional NLI entailment and
-          Jaccard surface stability as oracles. A few results worth noting:
+          Jaccard surface stability as oracles. Three results worth pulling out:
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
           <li><strong className="text-text-primary">EXP-003:</strong> 13 of 20 signals held NLI bidirectional entailment = 1.00 across all 10 iterations under the gate. That&apos;s invariance under recursion, not a tautology.</li>
           <li><strong className="text-text-primary">EXP-006:</strong> Only 2 of 4 paper claims survived self-referential recursion. The harness fails when commitment structure isn&apos;t robust &mdash; which is the point. The law is falsifiable and the experiments can break it.</li>
-          <li><strong className="text-text-primary">EXP-007:</strong> An NP-negation probe separated semantic commitment from lexical surface form. Jaccard degraded while NLI held &mdash; meaning the commitment survived even when the surface words changed.</li>
+          <li><strong className="text-text-primary">EXP-007:</strong> An NP-negation probe separated semantic commitment from lexical surface form. Jaccard degraded while NLI held &mdash; the commitment survived even when the surface words changed.</li>
         </ul>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Separately, a 5-phase architecture stress test measured 80&ndash;85% structural
@@ -257,7 +260,7 @@ function MosesSection() {
         </p>
       </section>
 
-      {/* ── Execution governance ── */}
+      {/* ── Governance in the action path ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
           Governance in the action path
@@ -266,21 +269,42 @@ function MosesSection() {
           Most approaches to AI governance sit outside the model &mdash; firewalls that drop
           packets after the logic has already corrupted, sandboxes that box an agent that still
           hallucinates inside the box, post-hoc audits that tell you how you were breached after
-          the exfiltration executed. Every one of them patches the damage after it&apos;s done.
+          the damage is done. Every one of them patches after the fact.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          MO§ES™ doesn&apos;t build a better cage. It governs from inside the loop &mdash; in the
-          execution path, not before it, not after it. The enforcement gate sits where the
+          MO§ES™ doesn&apos;t build a better cage. It governs from inside the loop &mdash; in
+          the execution path, not before it, not after it. The enforcement gate sits where the
           transformation happens. Commitment that passes through the gate survives. Commitment
-          that doesn&apos;t, doesn&apos;t. That&apos;s the whole idea, and the conservation law
-          is what makes it a property of the system rather than a policy someone has to remember
-          to follow.
+          that doesn&apos;t, doesn&apos;t. The conservation law is what makes this a property of
+          the system rather than a policy someone has to remember to follow.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The practical difference: a violation doesn&apos;t kill the workflow &mdash; the loop
+          The practical difference: a violation doesn&apos;t kill the workflow. The loop
           realigns to its original parameters and steers back. The agent stays fluid, bound to
           intent, instead of dying in a dead end or looping indefinitely inside a sandbox that
           only secures the perimeter.
+        </p>
+      </section>
+
+      {/* ── Who this is for ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Who this is for
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank measures the operator, not the model. If you&apos;re the person steering the
+          AI &mdash; deciding what to keep, what to cut, what to ask next &mdash; the board is
+          about you. A few groups who get something specific out of it:
+        </p>
+        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li><strong className="text-text-primary">Builders and developers</strong> &mdash; see how your AI-assisted workflow actually performs. The token cascade shows whether you&apos;re burning tokens or compounding them. Compare against the field instead of guessing.</li>
+          <li><strong className="text-text-primary">Creators and writers</strong> &mdash; measure augmentation efficiency, not just output volume. The cascade reveals whether the AI is helping you think or just generating text. The four pillars separate signal from noise.</li>
+          <li><strong className="text-text-primary">Students and researchers</strong> &mdash; benchmark your AI collaboration patterns against established operators. See what efficient operator-AI interaction looks like, with real numbers behind it.</li>
+          <li><strong className="text-text-primary">Enterprise teams</strong> &mdash; quantify operator effectiveness for hiring, training, and tooling decisions. The board is an objective surface, not a self-reported one. Signed snapshots mean the numbers are verifiable.</li>
+        </ul>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          In the SIGNOMY layer, agents carry provenance and build trust. SigRank is where that
+          provenance starts &mdash; the operator&apos;s measured record becomes portable.
         </p>
       </section>
 
@@ -290,11 +314,11 @@ function MosesSection() {
           What we&apos;re building on it
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The law is the substrate. MO§ES™ is the enforcement architecture. On top of that,
-          a stack of products &mdash; each one a different surface for the same gate:
+          The law is the substrate. MO§ES™ is the enforcement architecture. On top of that, a
+          stack of products &mdash; each one a different surface for the same gate:
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">AQUA</strong> &mdash; application workflow tooling with reusable submission memory. The workflow layer: answer banks, submission memory, application filling. The first wedge.</li>
+          <li><strong className="text-text-primary">AQUA</strong> &mdash; application workflow tooling with reusable submission memory. Answer banks, submission memory, application filling. The workflow layer and the first wedge.</li>
           <li><strong className="text-text-primary">SigRank</strong> &mdash; the leaderboard you&apos;re looking at. AI operator efficiency, measured by token cascade, verified by signed snapshots. The intelligence layer.</li>
           <li><strong className="text-text-primary">KA§§A</strong> &mdash; voice AI runtime that uses commitment kernel caching to cut redundant NLU work in multi-agent flows. In practice: 50s &rarr; 6.5s per 5-turn call.</li>
           <li><strong className="text-text-primary">SIGNOMY</strong> (<a href="https://signomy.xyz" className="text-gold underline underline-offset-2" rel="external">signomy.xyz</a>) &mdash; a governed agent marketplace where agents register, build trust, take missions, and carry provenance. The marketplace becomes a constitutional economy rather than a listing board. The top layer &mdash; where everything below it becomes operational behavior.</li>
@@ -307,7 +331,7 @@ function MosesSection() {
         </p>
       </section>
 
-      {/* ── How it connects to SigRank ── */}
+      {/* ── How this connects to the board ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
           How this connects to the board
@@ -316,11 +340,10 @@ function MosesSection() {
           Every snapshot on the SigRank leaderboard is <strong className="text-text-primary">ed25519-signed</strong> on the operator&apos;s device and verified server-side. Token counts only &mdash; no message content is ever read or stored. The commitment being conserved is the integrity of the measurement itself: what the operator measured is what the board records, with no drift in between.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The governance layer maps directly to how the board works: signed operator identity
-          (sovereignty), token counts only (compression), leaderboard ranking (purpose),
-          platform-agnostic (modularity), ed25519 + server verification (verifiability),
-          public board with open data (reciprocal resonance). The leaderboard works because
-          the data passed through the gate &mdash; not because someone reviewed it after the fact.
+          The governance layer maps directly to how the board works: signed operator identity,
+          token counts only, leaderboard ranking, platform-agnostic collection, ed25519
+          verification, and a public board with open data. The leaderboard works because the
+          data passed through the gate &mdash; not because someone reviewed it after the fact.
         </p>
         <p className="font-sans text-xs text-text-muted">
           More at{' '}
