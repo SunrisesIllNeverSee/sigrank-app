@@ -257,24 +257,31 @@ function MosesSection() {
         </p>
       </section>
 
-      {/* ── The Six Fold Flame ── */}
+      {/* ── Execution governance ── */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
         <h3 className="font-mono text-sm font-bold text-text-primary">
-          The Six Fold Flame
+          Governance in the action path
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The constitutional constraint set. Six laws that gate every action in a MO§ES™-governed
-          system. An action that fails any law doesn&apos;t execute. They sit in the execution
-          path &mdash; not before, not after, in it.
+          Most approaches to AI governance sit outside the model &mdash; firewalls that drop
+          packets after the logic has already corrupted, sandboxes that box an agent that still
+          hallucinates inside the box, post-hoc audits that tell you how you were breached after
+          the exfiltration executed. Every one of them patches the damage after it&apos;s done.
         </p>
-        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
-          <li><strong className="text-text-primary">I &middot; Sovereignty</strong> &mdash; traceable to a registered agent. Anonymous signals don&apos;t propagate.</li>
-          <li><strong className="text-text-primary">II &middot; Compression</strong> &mdash; substantive, not filler. Only compressed signals propagate.</li>
-          <li><strong className="text-text-primary">III &middot; Purpose</strong> &mdash; serves a constitutional function. No purposeless actions.</li>
-          <li><strong className="text-text-primary">IV &middot; Modularity</strong> &mdash; compatible with existing structure. No fracturing additions.</li>
-          <li><strong className="text-text-primary">V &middot; Verifiability</strong> &mdash; outcome can be verified. The hash chain is constitutional memory; records can&apos;t be deleted or backdated.</li>
-          <li><strong className="text-text-primary">VI &middot; Reciprocal Resonance</strong> &mdash; produces value when mirrored. One-way signals aren&apos;t governance.</li>
-        </ul>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          MO§ES™ doesn&apos;t build a better cage. It governs from inside the loop &mdash; in the
+          execution path, not before it, not after it. The enforcement gate sits where the
+          transformation happens. Commitment that passes through the gate survives. Commitment
+          that doesn&apos;t, doesn&apos;t. That&apos;s the whole idea, and the conservation law
+          is what makes it a property of the system rather than a policy someone has to remember
+          to follow.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The practical difference: a violation doesn&apos;t kill the workflow &mdash; the loop
+          realigns to its original parameters and steers back. The agent stays fluid, bound to
+          intent, instead of dying in a dead end or looping indefinitely inside a sandbox that
+          only secures the perimeter.
+        </p>
       </section>
 
       {/* ── What we're building ── */}
@@ -309,10 +316,11 @@ function MosesSection() {
           Every snapshot on the SigRank leaderboard is <strong className="text-text-primary">ed25519-signed</strong> on the operator&apos;s device and verified server-side. Token counts only &mdash; no message content is ever read or stored. The commitment being conserved is the integrity of the measurement itself: what the operator measured is what the board records, with no drift in between.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Six Fold Flame maps directly: sovereignty (signed operator identity), compression
-          (token counts only), purpose (leaderboard ranking), modularity (platform-agnostic),
-          verifiability (ed25519 + server verification), reciprocal resonance (public board,
-          open data). The leaderboard works because the data passed through the gate.
+          The governance layer maps directly to how the board works: signed operator identity
+          (sovereignty), token counts only (compression), leaderboard ranking (purpose),
+          platform-agnostic (modularity), ed25519 + server verification (verifiability),
+          public board with open data (reciprocal resonance). The leaderboard works because
+          the data passed through the gate &mdash; not because someone reviewed it after the fact.
         </p>
         <p className="font-sans text-xs text-text-muted">
           More at{' '}
