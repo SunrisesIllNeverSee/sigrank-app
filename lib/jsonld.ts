@@ -26,6 +26,14 @@ export function organization() {
     url: SITE_ORIGIN,
     description: SITE_TAGLINE,
     logo: `${SITE_ORIGIN}/og.png`,
+    sameAs: [
+      'https://orcid.org/0009-0002-9904-5390',
+      'https://github.com/SunrisesIllNeverSee',
+      'https://doi.org/10.5281/zenodo.20029607',
+      'https://doi.org/10.5281/zenodo.19105225',
+      'https://signomy.xyz',
+      'https://mos2es.com',
+    ],
   }
 }
 
@@ -150,6 +158,7 @@ export function sigrankDataset(opts?: { temporalStart?: string; updated?: string
     publisher: { '@id': ORG_ID },
     isAccessibleForFree: true,
     license: 'https://creativecommons.org/licenses/by/4.0/',
+    citation: 'https://doi.org/10.5281/zenodo.20029607',
     keywords: [
       'AI operator leaderboard',
       'token efficiency',
@@ -241,5 +250,49 @@ export function researchArticle(opts: {
       '@type': 'PublicationEvent',
       name: 'SigRank Quarterly Index Report',
     },
+  }
+}
+
+/** ScholarlyArticle — the Conservation Law paper (Zenodo DOI). */
+export function conservationLawArticle() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ScholarlyArticle',
+    '@id': 'https://doi.org/10.5281/zenodo.20029607',
+    headline:
+      'A Conservation Law for Commitment in Language Under Transformative Compression and Recursive Application',
+    url: 'https://doi.org/10.5281/zenodo.20029607',
+    author: {
+      '@type': 'Person',
+      name: 'Deric J. McHenry',
+      sameAs: 'https://orcid.org/0009-0002-9904-5390',
+    },
+    publisher: { '@id': ORG_ID },
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    datePublished: '2026-05-04',
+    version: 'V.05',
+    isPartOf: {
+      '@type': 'PublicationEvent',
+      name: 'Commitment Theory Research Program',
+    },
+  }
+}
+
+/** MO§ES™ enforcement architecture — schema.org has no Patent type; CreativeWork is closest. */
+export function mosesPatent() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    '@id': `${SITE_ORIGIN}/#moses-patent`,
+    name: 'MO§ES™ Enforcement Architecture',
+    description:
+      'Constitutional AI governance enforcement engine for the Conservation Law of Commitment. Patent Serial No. 63/877,177 (Provisional, pending).',
+    author: {
+      '@type': 'Person',
+      name: 'Deric J. McHenry',
+      sameAs: 'https://orcid.org/0009-0002-9904-5390',
+    },
+    publisher: { '@id': ORG_ID },
+    about: 'AI governance enforcement architecture',
   }
 }
