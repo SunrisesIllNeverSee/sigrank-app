@@ -262,6 +262,7 @@ export function conservationLawArticle() {
     headline:
       'A Conservation Law for Commitment in Language Under Transformative Compression and Recursive Application',
     url: 'https://doi.org/10.5281/zenodo.20029607',
+    identifier: { '@type': 'PropertyValue', propertyID: 'DOI', value: '10.5281/zenodo.20029607' },
     author: {
       '@type': 'Person',
       name: 'Deric J. McHenry',
@@ -285,6 +286,7 @@ export function mosesPatent() {
     '@type': 'CreativeWork',
     '@id': `${SITE_ORIGIN}/#moses-patent`,
     name: 'MO§ES™ Enforcement Architecture',
+    identifier: { '@type': 'PropertyValue', propertyID: 'USPTO Provisional Application', value: '63/877,177' },
     description:
       'Constitutional AI governance enforcement engine for the Conservation Law of Commitment. Patent Serial No. 63/877,177 (Provisional, pending).',
     author: {
@@ -315,6 +317,7 @@ export function experimentalRecordDataset() {
       '20-signal canonical corpus, GPT-4o-mini, 10 recursive iterations, NLI bidirectional entailment + Jaccard surface stability. ' +
       '13/20 signals achieved NLI=1.00 under gate condition. Nine failure modes documented.',
     url: 'https://doi.org/10.5281/zenodo.19105225',
+    identifier: { '@type': 'PropertyValue', propertyID: 'DOI', value: '10.5281/zenodo.19105225' },
     creator: {
       '@type': 'Person',
       name: 'Deric J. McHenry',
@@ -372,6 +375,7 @@ export function transformationHarnessDataset() {
       'The public proxy harness for testing commitment conservation under recursive transformative compression. ' +
       'Python implementation. Model-agnostic — works with any LLM API. Includes canonical 20-signal corpus.',
     url: 'https://doi.org/10.5281/zenodo.19109397',
+    identifier: { '@type': 'PropertyValue', propertyID: 'DOI', value: '10.5281/zenodo.19109397' },
     creator: {
       '@type': 'Person',
       name: 'Deric J. McHenry',
@@ -415,6 +419,7 @@ export function propositionsDataset() {
       'The foundational prospectus defining Commitment Theory (CT) terms, disambiguation from linguistic/epistemic uses of "commitment," ' +
       'the conservation law statement, and the 34-paper research pipeline across CT, Legal Theory, and MISC tracks.',
     url: 'https://doi.org/10.5281/zenodo.20031715',
+    identifier: { '@type': 'PropertyValue', propertyID: 'DOI', value: '10.5281/zenodo.20031715' },
     creator: {
       '@type': 'Person',
       name: 'Deric J. McHenry',
