@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import {
   Roboto,
   Geist_Mono,
@@ -39,6 +39,16 @@ const wmSerif = Bitter({ subsets: ['latin'], weight: ['700'], variable: '--wm-se
 const wmBlack = Archivo_Black({ subsets: ['latin'], weight: ['400'], variable: '--wm-black', display: 'swap' })
 
 export const metadata: Metadata = siteMetadata
+
+// Viewport — themeColor for each of the 4 themes so the browser chrome
+// (mobile address bar, PWA title bar) matches the active theme's bg.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0d0b08' },   // carbon (default)
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },  // paper
+  ],
+  colorScheme: 'dark light',
+}
 
 // No-flash theme init: applies the saved theme before the body content paints.
 // Runs synchronously as the first child of <body>. data-theme="carbon" is the
