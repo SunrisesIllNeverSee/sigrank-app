@@ -33,6 +33,9 @@ on-device scanner (npm: sigrank) and submit signed, server-verifiable snapshots.
 - [Metric leaders API](${SITE_ORIGIN}/api/v1/metrics/leaders): top performers per metric
 - Dataset license: CC-BY-4.0 (attribution required — https://creativecommons.org/licenses/by/4.0/)
 
+## Research
+- [Q1 2026 Report](${SITE_ORIGIN}/research/q1-2026): State of AI Operator Token Efficiency — the inaugural quarterly report. Headline findings, platform breakdown, citation block.
+
 ## Concepts (definitions)
 - [Verification](${SITE_ORIGIN}/wiki/verification)
 - [Signal Drift](${SITE_ORIGIN}/wiki/signal-drift)
