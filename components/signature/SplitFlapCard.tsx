@@ -1,12 +1,11 @@
 'use client'
 
 /**
- * components/signature/SplitFlapCard.tsx — dot-matrix tractor-feed printout.
+ * components/signature/SplitFlapCard.tsx — terminal printout on black paper.
  *
- * Right panel: green-bar computer paper with sprocket holes. Text prints
- * character-by-character, left to right, with a blinking cursor at the
- * print head — like a real dot-matrix printer. Left panel: gold SigRank
- * identity with radar.
+ * Right panel: black background, bright phosphor-green monospace text
+ * printing character-by-character with a blinking cursor. Fills the full
+ * 630px height — no dead space. Left panel: gold SigRank identity + radar.
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -106,19 +105,19 @@ const PRINT_CSS = `
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
-@keyframes paperFeed {
-  from { transform: translateY(14px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes scanline {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
 }
 .print-cursor {
   animation: blink 0.3s steps(1) infinite;
 }
 `
 
-// ── Line formatting ───────────────────────────────────────────────────────
-// Each metric line is one monospace string: [glyph 5] [gap 2] [label 14] [gap 4] [value 12]
-// = 37 chars total. The glyph zone (first 7 chars) is colored, label zone
-// (next 18) is dark gray, value zone (last 12) is near-black bold.
+// ── Line layout ───────────────────────────────────────────────────────────
+// Each metric line is one monospace string:
+//   [glyph 5] [gap 2] [label 14] [gap 4] [value 12] = 37 chars
+// Three color zones: glyph (colored), label (dim green), value (bright green)
 
 const GLYPH_W = 5
 const LABEL_W = 14
@@ -135,13 +134,14 @@ function formatLine(glyph: string, label: string, value: string): string {
 // ── Typewriter line (colored glyph + label + value) ───────────────────────
 
 function TypewriterLine({
-  text, glyphColor, startDelay, charDelay, reduced,
+  text, glyphColor, startDelay, charDelay, reduced, rowH,
 }: {
   text: string
   glyphColor: string
   startDelay: number
   charDelay: number
   reduced: boolean
+  rowH: number
 }) {
   const [count, setCount] = useState(reduced ? text.length : 0)
   const done = count >= text.length
@@ -156,16 +156,16 @@ function TypewriterLine({
   const revealed = text.slice(0, count)
   return (
     <div style={{
-      height: '40px', display: 'flex', alignItems: 'center',
-      padding: '0 20px 0 16px', whiteSpace: 'pre',
+      height: `${rowH}px`, display: 'flex', alignItems: 'center',
+      padding: '0 24px 0 20px', whiteSpace: 'pre',
       fontSize: '22px', fontWeight: 700,
       fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-      textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.06)',
+      textShadow: '0 0 6px rgba(120,255,120,0.25)',
     }}>
-      <span style={{ color: glyphColor, fontWeight: 800 }}>{revealed.slice(0, GLYPH_ZONE)}</span>
-      <span style={{ color: '#2a3a1a', fontWeight: 600 }}>{revealed.slice(GLYPH_ZONE, GLYPH_ZONE + LABEL_ZONE)}</span>
-      <span style={{ color: '#0a0a0a', fontWeight: 800 }}>{revealed.slice(GLYPH_ZONE + LABEL_ZONE)}</span>
-      {!done && <span className="print-cursor" style={{ color: '#0a0a0a', fontWeight: 800 }}>{'\u258c'}</span>}
+      <span style={{ color: glyphColor, fontWeight: 800, textShadow: `0 0 8px ${glyphColor}66` }}>{revealed.slice(0, GLYPH_ZONE)}</span>
+      <span style={{ color: '#5a8a5a', fontWeight: 600 }}>{revealed.slice(GLYPH_ZONE, GLYPH_ZONE + LABEL_ZONE)}</span>
+      <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{revealed.slice(GLYPH_ZONE + LABEL_ZONE)}</span>
+      {!done && <span className="print-cursor" style={{ color: '#a8ffa8', fontWeight: 800 }}>{'\u258c'}</span>}
     </div>
   )
 }
@@ -173,7 +173,7 @@ function TypewriterLine({
 // ── Typewriter simple (single color, for header/divider) ──────────────────
 
 function TypewriterSimple({
-  text, color, startDelay, charDelay, reduced, weight = 700, size = 22,
+  text, color, startDelay, charDelay, reduced, weight = 700, size = 22, rowH,
 }: {
   text: string
   color: string
@@ -182,6 +182,7 @@ function TypewriterSimple({
   reduced: boolean
   weight?: number
   size?: number
+  rowH: number
 }) {
   const [count, setCount] = useState(reduced ? text.length : 0)
   const done = count >= text.length
@@ -195,11 +196,11 @@ function TypewriterSimple({
 
   return (
     <div style={{
-      height: '40px', display: 'flex', alignItems: 'center',
-      padding: '0 20px 0 16px', whiteSpace: 'pre',
+      height: `${rowH}px`, display: 'flex', alignItems: 'center',
+      padding: '0 24px 0 20px', whiteSpace: 'pre',
       fontSize: `${size}px`, fontWeight: weight, color,
       fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-      textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.06)',
+      textShadow: `0 0 6px ${color}44`,
     }}>
       {text.slice(0, count)}
       {!done && <span className="print-cursor" style={{ color }}>{'\u258c'}</span>}
@@ -245,17 +246,22 @@ function Board({
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
 
-  // Dark ink colors for glyphs on green-bar paper
-  const C_GOLD = '#7a5a1a'
-  const C_GREEN = '#1a4a2a'
-  const C_BONE = '#2a2a2a'
-  const C_DIM = '#4a5a3a'
+  // Bright phosphor colors on black
+  const C_GOLD = '#f0c862'
+  const C_GREEN = '#8ae89a'
+  const C_BONE = '#e0e0d0'
+  const C_DIM = '#5a8a5a'
 
-  // ── Build all print lines ───────────────────────────────────────────────
+  // ── Layout: 15 lines fill 630px exactly ─────────────────────────────────
+  // 1 header + 5 raw + 1 divider + 8 derived = 15 lines
+  // 630 / 15 = 42px per row — no dead space
 
-  const CHAR_DELAY = 8      // ms per character
-  const LINE_GAP = 45       // ms between lines
-  const INITIAL_DELAY = 350 // ms before first line (after paper feed)
+  const NUM_LINES = 15
+  const ROW_H = Math.floor(H / NUM_LINES)  // 42px
+
+  const CHAR_DELAY = 8
+  const LINE_GAP = 40
+  const INITIAL_DELAY = 300
 
   const headerText = 'CASCADE TELEMETRY              *** LIVE ***'
   const dividerText = '         - - - DERIVED - - -'
@@ -278,7 +284,7 @@ function Board({
     { glyph: '$', label: 'COST/1M', value: costStr, color: C_DIM },
   ]
 
-  // Compute cumulative start delays for each line
+  // Compute cumulative start delays
   const allTexts = [
     headerText,
     ...rawLines.map(l => formatLine(l.glyph, l.label, l.value)),
@@ -290,19 +296,6 @@ function Board({
   for (const t of allTexts) {
     delays.push(cursor)
     cursor += t.length * CHAR_DELAY + LINE_GAP
-  }
-  // Sprocket hole pattern
-  const sprocketBg = {
-    backgroundColor: '#c8d4b8',
-    backgroundImage: 'radial-gradient(circle at center, #a8b498 3px, transparent 3.5px)',
-    backgroundSize: '20px 20px',
-    backgroundPosition: '0 10px',
-  }
-
-  // Green-bar paper stripes
-  const paperBg = {
-    backgroundColor: '#eef4e4',
-    backgroundImage: 'repeating-linear-gradient(0deg, #d8e6c8 0px, #d8e6c8 40px, #eef4e4 40px, #eef4e4 80px)',
   }
 
   let delayIdx = 0
@@ -388,76 +381,83 @@ function Board({
         </div>
       </div>
 
-      {/* ═══ RIGHT 2/3 — tractor-feed printout ═══ */}
+      {/* ═══ RIGHT 2/3 — black terminal printout ═══ */}
       <div style={{
-        width: RIGHT_W, height: H, display: 'flex',
-        boxSizing: 'border-box', flexShrink: 0,
-        animation: 'paperFeed 0.35s ease-out both',
+        width: RIGHT_W, height: H, background: '#0a0a0a',
+        display: 'flex', flexDirection: 'column',
+        boxSizing: 'border-box', flexShrink: 0, position: 'relative',
+        overflow: 'hidden',
       }}>
-        {/* Left sprocket strip */}
-        <div style={{ width: '24px', height: '100%', ...sprocketBg, flexShrink: 0 }} />
-
-        {/* Paper — green-bar with printed content */}
+        {/* CRT scanline overlay — subtle moving glow */}
         <div style={{
-          flex: 1, height: '100%', position: 'relative', overflow: 'hidden',
-          ...paperBg,
-        }}>
-          {/* Header line */}
-          <div style={{ borderBottom: '1px solid #b8c4a8' }}>
-            <TypewriterSimple
-              text={headerText}
-              color="#1a2a0a"
-              startDelay={delays[delayIdx++]}
-              charDelay={CHAR_DELAY}
-              reduced={reduced}
-              weight={800}
-              size={18}
-            />
-          </div>
-
-          {/* Raw token lines */}
-          {rawLines.map((l) => (
-            <TypewriterLine
-              key={`raw-${l.glyph}`}
-              text={formatLine(l.glyph, l.label, l.value)}
-              glyphColor={l.color}
-              startDelay={delays[delayIdx++]}
-              charDelay={CHAR_DELAY}
-              reduced={reduced}
-            />
-          ))}
-
-          {/* Perforation divider */}
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10,
+          background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 3px)',
+        }} />
+        {/* Slow scan glow */}
+        {!reduced && (
           <div style={{
-            borderTop: '2px dashed #b8c4a8',
-            borderBottom: '2px dashed #b8c4a8',
-          }}>
-            <TypewriterSimple
-              text={dividerText}
-              color="#8a9a7a"
-              startDelay={delays[delayIdx++]}
-              charDelay={CHAR_DELAY}
-              reduced={reduced}
-              weight={600}
-              size={16}
-            />
-          </div>
+            position: 'absolute', left: 0, right: 0, height: '120px', pointerEvents: 'none', zIndex: 5,
+            background: 'linear-gradient(to bottom, transparent, rgba(120,255,120,0.04), transparent)',
+            animation: 'scanline 4s linear infinite',
+          }} />
+        )}
 
-          {/* Derived metric lines */}
-          {derivedLines.map((l) => (
-            <TypewriterLine
-              key={`der-${l.glyph}`}
-              text={formatLine(l.glyph, l.label, l.value)}
-              glyphColor={l.color}
-              startDelay={delays[delayIdx++]}
-              charDelay={CHAR_DELAY}
-              reduced={reduced}
-            />
-          ))}
+        {/* Header line */}
+        <div style={{ borderBottom: '1px solid #1a3a1a' }}>
+          <TypewriterSimple
+            text={headerText}
+            color="#8ae89a"
+            startDelay={delays[delayIdx++]}
+            charDelay={CHAR_DELAY}
+            reduced={reduced}
+            weight={800}
+            size={18}
+            rowH={ROW_H}
+          />
         </div>
 
-        {/* Right sprocket strip */}
-        <div style={{ width: '24px', height: '100%', ...sprocketBg, flexShrink: 0 }} />
+        {/* Raw token lines */}
+        {rawLines.map((l) => (
+          <TypewriterLine
+            key={`raw-${l.glyph}`}
+            text={formatLine(l.glyph, l.label, l.value)}
+            glyphColor={l.color}
+            startDelay={delays[delayIdx++]}
+            charDelay={CHAR_DELAY}
+            reduced={reduced}
+            rowH={ROW_H}
+          />
+        ))}
+
+        {/* Perforation divider */}
+        <div style={{
+          borderTop: '1px dashed #1a3a1a',
+          borderBottom: '1px dashed #1a3a1a',
+        }}>
+          <TypewriterSimple
+            text={dividerText}
+            color="#4a6a4a"
+            startDelay={delays[delayIdx++]}
+            charDelay={CHAR_DELAY}
+            reduced={reduced}
+            weight={600}
+            size={16}
+            rowH={ROW_H}
+          />
+        </div>
+
+        {/* Derived metric lines */}
+        {derivedLines.map((l) => (
+          <TypewriterLine
+            key={`der-${l.glyph}`}
+            text={formatLine(l.glyph, l.label, l.value)}
+            glyphColor={l.color}
+            startDelay={delays[delayIdx++]}
+            charDelay={CHAR_DELAY}
+            reduced={reduced}
+            rowH={ROW_H}
+          />
+        ))}
       </div>
     </div>
   )
