@@ -31,13 +31,13 @@ import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
 import { VerificationTests } from '@/components/marketing/VerificationTests'
 import { SignatureDrift, LocalAgentMcp, Credits } from '@/components/marketing/SignalIntegrity'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumb } from '@/lib/jsonld'
+import { breadcrumb, definedTerm } from '@/lib/jsonld'
 import Link from 'next/link'
 
 export const metadata: Metadata = withOG({
   title: 'Wiki',
   description:
-    'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™.',
+    'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™ governance (the Conservation Law of Commitment, empirical record, and the Six-Gate Protocol).',
   path: '/wiki',
 })
 
@@ -166,27 +166,119 @@ function TransmitterClasses() {
   )
 }
 
-/* ───────────────────── 5 · MO§ES™ (owner-authored) ───────────────────── */
+/* ───────────────────── 5 · MO§ES™ (commitment theory) ───────────────────── */
 
 function MosesSection() {
   return (
     <div className="flex flex-col gap-5">
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
         SigRank is built and operated under <strong className="text-gold">MO§ES™</strong> — the
-        governance and verification layer behind the board.
+        governance and verification layer behind the board. MO§ES™ is the enforcement
+        architecture for a published, empirically tested conservation law.
       </p>
-      <section className="flex flex-col gap-2 rounded-lg border border-dashed border-gold/40 bg-gold/5 p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">MO§ES™ commitment theory</h3>
-        {/* TODO(owner): owner is writing this. */}
-        <p className="font-sans text-sm italic leading-relaxed text-text-dim">
-          [ Owner to write — the commitment theory behind MO§ES™. ]
+
+      {/* ── The Conservation Law ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          The Conservation Law of Commitment
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">C(T(S)) &asymp; C(S)</strong> with enforcement;
+          {' '}<strong className="text-text-primary">C(T(S)) &lt; C(S)</strong> without it.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Commitment content &mdash; obligations, prohibitions, modal constraints
+          (&ldquo;shall,&rdquo; &ldquo;must not,&rdquo; &ldquo;unless,&rdquo; &ldquo;is entitled
+          to&rdquo;) &mdash; persists under recursive transformative compression when an
+          enforcement gate is present. Without the gate, commitment decays monotonically
+          across transformations. This is a discovered property of language under compression,
+          not a guideline.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The law is published openly under CC-BY-4.0
+          {' '}(<a
+            href="https://doi.org/10.5281/zenodo.20029607"
+            className="text-gold underline underline-offset-2"
+            rel="external"
+          >DOI: 10.5281/zenodo.20029607</a>).
+          The MO§ES™ enforcement architecture is patent-pending (Serial No. 63/877,177).
         </p>
       </section>
-      <section className="flex flex-col gap-2 rounded-lg border border-dashed border-gold/40 bg-gold/5 p-5">
-        <h3 className="font-mono text-sm font-bold text-text-primary">Founding the board</h3>
-        {/* TODO(owner): owner is writing this. */}
-        <p className="font-sans text-sm italic leading-relaxed text-text-dim">
-          [ Owner to write — the founding-of-the-board story. ]
+
+      {/* ── Empirical record ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">Empirical record</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Seven controlled experiments (EXP-001 through EXP-007) tested the law across a
+          20-signal canonical corpus using 10 recursive iterations with bidirectional NLI
+          entailment + Jaccard surface stability as oracles.
+        </p>
+        <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            <strong className="text-text-primary">EXP-003:</strong> 13 of 20 signals achieved
+            NLI bidirectional entailment = 1.00 across all 10 iterations under the gate
+            condition &mdash; a measurement of invariance, not a tautology.
+          </li>
+          <li>
+            <strong className="text-text-primary">EXP-007:</strong> NP-negation probe
+            distinguished semantic commitment from lexical surface form (Jaccard degraded
+            while NLI held for 3 of 4 signals).
+          </li>
+          <li>
+            <strong className="text-text-primary">EXP-006:</strong> Only 2 of 4 paper claims
+            survived self-referential recursion &mdash; the harness fails when commitment
+            structure is not robust. Falsifiability in action.
+          </li>
+        </ul>
+        <p className="font-sans text-xs text-text-muted">
+          Full experimental record:{' '}
+          <a
+            href="https://doi.org/10.5281/zenodo.19105225"
+            className="text-gold underline underline-offset-2"
+            rel="external"
+          >DOI: 10.5281/zenodo.19105225</a>
+        </p>
+      </section>
+
+      {/* ── Nine failure modes ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Nine failure modes (without the gate)
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          When commitment is transformed without enforcement, nine degradation patterns emerge:
+        </p>
+        <ol className="flex flex-col gap-1 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>Obligation escalation &mdash; discretionary becomes mandatory</li>
+          <li>Scope widening &mdash; narrow prohibition becomes broad ban</li>
+          <li>Exception dropping &mdash; statutory defense disappears</li>
+          <li>Modal flattening &mdash; &ldquo;shall not unless&rdquo; becomes &ldquo;may not&rdquo;</li>
+          <li>Threshold erasure &mdash; quantitative triggers removed</li>
+          <li>Agent substitution &mdash; &ldquo;the employer&rdquo; becomes &ldquo;any party&rdquo;</li>
+          <li>Negation reversal &mdash; NP-negation invisible to surface metrics</li>
+          <li>Compression collapse &mdash; kernel lost past fidelity bound</li>
+          <li>Recursion drift &mdash; cumulative decay across transformation steps</li>
+        </ol>
+      </section>
+
+      {/* ── How MO§ES™ governs SigRank ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-gold/40 bg-gold/5 p-5">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          How MO§ES™ governs SigRank
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank applies Conservation Law principles to AI operator telemetry. Each
+          snapshot is <strong className="text-text-primary">ed25519-signed</strong> on-device
+          and verified server-side &mdash; the enforcement gate. Token counts only; message
+          content is never read or stored. The commitment being conserved is the integrity of
+          the measurement: signed input, verified output, no drift between what the operator
+          measured and what the board records.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The Six-Gate Protocol (G1 Compress, G2 Lineage, G3 Fidelity, G4 Recursion, G5
+          Blackhole, G6 Custody) governs every transformation in the pipeline. This is why
+          SigRank can publish a leaderboard with cryptographic provenance &mdash; the data
+          has passed through the gate.
         </p>
       </section>
     </div>
@@ -401,6 +493,11 @@ export default function Draft1Page() {
       <JsonLd data={breadcrumb([
         { name: 'Wiki', path: '/wiki' },
       ])} />
+      <JsonLd data={definedTerm(
+        'Conservation Law of Commitment',
+        'C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it. Commitment content (obligations, prohibitions, modal constraints) persists under recursive transformative compression when an enforcement gate is present. Published under CC-BY-4.0 (DOI: 10.5281/zenodo.20029607). The MO§ES™ enforcement architecture is patent-pending (Serial No. 63/877,177).',
+        '/wiki#conservation-law-of-commitment',
+      )} />
       {/* WikiSignBar removed (owner 2026-06-24): the "Get ranked → Sign in" CTA moved to
           the global nav (AccountMenu, top-right), so the wiki's duplicate sign bar is gone. */}
       {/* The wiki: numbered root column → content panel. */}
