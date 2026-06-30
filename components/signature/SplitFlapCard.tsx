@@ -249,7 +249,8 @@ function TypewriterLine({
     }}>
       <span style={{ color: glyphColor, fontWeight: 800, textShadow: `0 0 8px ${glyphColor}66` }}>{rev(0, abbr)}</span>
       <span style={{ color: '#a8ffa8', fontWeight: 800, textAlign: 'right', textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{rev(aEnd, you)}</span>
-      <span style={{ color: '#5a8a5a', fontWeight: 600, fontSize: '15px', letterSpacing: '0.5px', paddingLeft: '24px' }}>{rev(yEnd, name)}</span>
+      {/* TELEMETRY: metric name — centered + glowing phosphor (the emphasis column) */}
+      <span style={{ color: '#8ae89a', fontWeight: 700, fontSize: '16px', letterSpacing: '0.5px', textAlign: 'center', textShadow: '0 0 7px rgba(138,232,154,0.45)' }}>{rev(yEnd, name)}</span>
       <span style={{ color: '#6e8a6e', fontWeight: 700, textAlign: 'right' }}>{rev(nEnd, avg)}</span>
       {!done && <span className="print-cursor" style={{ color: '#a8ffa8', fontWeight: 800 }}>{'\u258c'}</span>}
     </div>
@@ -305,7 +306,7 @@ function Board({
   cardRef: React.RefObject<HTMLDivElement | null>
   reduced: boolean
 } & Omit<SplitFlapCardProps, 'showControls'>) {
-  const W = 1200, H = 630, LEFT_W = 720, RIGHT_W = W - LEFT_W  // 60% rings / 40% printout
+  const W = 1200, H = 630, LEFT_W = 600, RIGHT_W = W - LEFT_W  // 50/50 rings / printout
 
   const yieldStr = yieldValue !== null ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0)) : '\u2014'
   const snrStr = snr != null ? `${(snr * 100).toFixed(0)}%` : '\u2014'
@@ -468,8 +469,8 @@ function Board({
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Signature
             </span>
-            <div style={{ width: '480px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={480} centerValue={yieldStr} reduced={reduced} replayKey={0} />
+            <div style={{ width: '440px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <RadialRings axes={coloredAxes} size={440} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
         )}
@@ -505,13 +506,14 @@ function Board({
           display: 'grid', gridTemplateColumns: COLS, alignItems: 'center',
           padding: '14px 28px 12px', borderBottom: '1px solid #2a5a2a',
           fontSize: '10px', fontWeight: 800, letterSpacing: '0.5px',
-          color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.4)',
+          color: '#6e8a6e',
           fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
         }}>
           <span>CASCADE</span>
           <span style={{ textAlign: 'right' }}>WELCOME OPERATOR</span>
-          <span style={{ paddingLeft: '16px' }}>TELEMETRY</span>
-          <span style={{ textAlign: 'right', color: '#6e8a6e', textShadow: 'none' }}>AVERAGE USER</span>
+          {/* TELEMETRY — centered + glowing phosphor (the emphasis) */}
+          <span style={{ textAlign: 'center', color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>TELEMETRY</span>
+          <span style={{ textAlign: 'right' }}>AVERAGE USER</span>
         </div>
 
         {/* Raw token lines */}
