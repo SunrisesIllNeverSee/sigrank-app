@@ -504,6 +504,7 @@ export default async function OperatorProfilePage({
           efficiency={c.efficiency}
           costPerMillion={c.costPerMillion}
           opRatio={c.opRatio}
+          cascadeStr={c.cascadeStr}
           radarAxes={radarAxes}
         />
       )}

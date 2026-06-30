@@ -3,23 +3,20 @@
 /**
  * components/signature/SplitFlapCard.tsx — real Solari split-flap board.
  *
- * Uses clackboard for authentic 3D rotateX flip animation — each character
- * is a physical tile that splits horizontally and flips on a hinge, just
- * like the boards at European train stations.
+ * Uses clackboard for authentic 3D rotateX flip animation. Both labels
+ * AND values are split-flap cells. The board scales to fit its container
+ * (1200×630 design surface, CSS transform scale for display).
  *
  * Layout: 1/3 + 2/3 split
- *   Left 1/3:  Gold background (TV-station ident style). SIGRANK wordmark,
- *             DEPARTURES, MO§ES™, CLASS, PLATFORM, cascade radar.
- *   Right 2/3: Dark Solari board. Each metric is a row of real split-flap
- *             cells with label + value. Classic variant (scan-line texture,
- *             hinge marks). Board mode (all flaps spin, settle independently).
+ *   Left 1/3:  Gold background. Operator name (largest), class, platform,
+ *             cascade string, op ratio, yield headline, radar with colored axes.
+ *   Right 2/3: Dark Solari board. Header + 13 metric rows, all split-flap.
  */
 
-import { useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { toPng } from 'html-to-image'
 import { SplitFlap, type Palette } from 'clackboard'
 import { track } from '@/lib/posthog/events'
-import CascadeRadar from '@/components/charts/CascadeRadar'
 
 export interface SplitFlapCardProps {
   codename: string
@@ -39,47 +36,20 @@ export interface SplitFlapCardProps {
   efficiency?: number | null
   costPerMillion?: number | null
   opRatio?: string | null
+  cascadeStr?: string | null
   radarAxes?: { label: string; value: number; max: number }[]
   showControls?: boolean
 }
 
 // ── Palettes ──────────────────────────────────────────────────────────────
 
-// Gold text on dark tiles (yield, 10xDEV)
-const GOLD_PALETTE: Palette = {
-  text: '#e0b240',
-  topBg: '#0c0c0a',
-  botBg: '#070706',
-  border: '#1a1a16',
-  div: '#2a2515',
-}
+const GOLD_PALETTE: Palette = { text: '#e0b240', topBg: '#0c0c0a', botBg: '#070706', border: '#1a1a16', div: '#2a2515' }
+const GREEN_PALETTE: Palette = { text: '#78dc82', topBg: '#0c0c0a', botBg: '#070706', border: '#1a1a16', div: '#1a2a1a' }
+const BONE_PALETTE: Palette = { text: '#dee6d2', topBg: '#0c0c0a', botBg: '#070706', border: '#1a1a16', div: '#1a2a1a' }
+const DIM_PALETTE: Palette = { text: '#6e966e', topBg: '#0c0c0a', botBg: '#070706', border: '#1a1a16', div: '#1a2a1a' }
 
-// Green text on dark tiles (SNR, leverage, efficiency, output, cache read)
-const GREEN_PALETTE: Palette = {
-  text: '#78dc82',
-  topBg: '#0c0c0a',
-  botBg: '#070706',
-  border: '#1a1a16',
-  div: '#1a2a1a',
-}
-
-// Bone/white text on dark tiles (input, cache write, velocity, scale V)
-const BONE_PALETTE: Palette = {
-  text: '#dee6d2',
-  topBg: '#0c0c0a',
-  botBg: '#070706',
-  border: '#1a1a16',
-  div: '#1a2a1a',
-}
-
-// Dim text (total, $/1M)
-const DIM_PALETTE: Palette = {
-  text: '#6e966e',
-  topBg: '#0c0c0a',
-  botBg: '#070706',
-  border: '#1a1a16',
-  div: '#1a2a1a',
-}
+// Label palette — smaller, dim
+const LABEL_PALETTE: Palette = { text: '#6e966e', topBg: '#080808', botBg: '#050505', border: '#141414', div: '#1a2a1a' }
 
 // ── Format helpers ────────────────────────────────────────────────────────
 
@@ -90,48 +60,127 @@ function fmtTokens(n: number): string {
   return n.toFixed(0)
 }
 
-function pad(str: string, len: number): string {
-  return str.padEnd(len, ' ')
+// ── Colored radar (inline SVG, per-axis colors) ───────────────────────────
+
+interface RadarAxis {
+  label: string
+  value: number
+  max: number
+  color: string
 }
 
-// ── A single metric row: label + split-flap value ─────────────────────────
+function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
+  const n = axes.length
+  if (n < 3) return null
+  const cx = size / 2
+  const cy = size / 2
+  const radius = size / 2 - 32
+  const rings = [0.25, 0.5, 0.75, 1]
+  const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
+  const point = (i: number, r: number): [number, number] => {
+    const a = angleAt(i)
+    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]
+  }
+  const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
+  const polyPath = axes
+    .map((_, i) => {
+      const r = norm(axes[i].value, axes[i].max) * radius
+      const [x, y] = point(i, r)
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
+    })
+    .join(' ') + ' Z'
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="Cascade fingerprint">
+      {/* rings */}
+      {rings.map((ring) => (
+        <polygon
+          key={ring}
+          points={axes.map((_, i) => point(i, ring * radius).map((v) => v.toFixed(1)).join(',')).join(' ')}
+          fill="none"
+          stroke="rgba(10,10,10,0.2)"
+          strokeWidth={1}
+        />
+      ))}
+      {/* spokes */}
+      {axes.map((_, i) => {
+        const [x, y] = point(i, radius)
+        return <line key={`s-${i}`} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(10,10,10,0.15)" strokeWidth={1} />
+      })}
+      {/* polygon fill */}
+      <path d={polyPath} fill="rgba(10,10,10,0.2)" stroke="#0a0a0a" strokeWidth={2} strokeLinejoin="round" />
+      {/* vertices — colored per axis */}
+      {axes.map((ax, i) => {
+        const [x, y] = point(i, norm(ax.value, ax.max) * radius)
+        return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={4} fill={ax.color} />
+      })}
+      {/* axis labels — colored per metric */}
+      {axes.map((ax, i) => {
+        const [lx, ly] = point(i, radius + 18)
+        const cos = Math.cos(angleAt(i))
+        const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
+        return (
+          <text
+            key={`l-${i}`}
+            x={lx.toFixed(1)}
+            y={ly.toFixed(1)}
+            textAnchor={anchor}
+            dominantBaseline="middle"
+            fontSize={11}
+            fontWeight={700}
+            fill={ax.color}
+            style={{ fontFamily: 'ui-monospace, monospace' }}
+          >
+            {ax.label}
+          </text>
+        )
+      })}
+    </svg>
+  )
+}
+
+// ── A metric row: split-flap label + split-flap value ─────────────────────
 
 function MetricRow({
   label,
   value,
   palette,
+  labelLen,
   valueLen,
-  delay,
 }: {
   label: string
   value: string
   palette: Palette
+  labelLen: number
   valueLen: number
-  delay: number
 }) {
   return (
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: '10px',
-      padding: '4px 16px',
+      gap: '6px',
+      padding: '3px 12px',
       borderBottom: '1px solid #152015',
     }}>
-      {/* Label — static, dim green */}
-      <span style={{
-        fontSize: '12px',
-        color: '#6e966e',
-        letterSpacing: '1.5px',
-        textTransform: 'uppercase',
-        width: '110px',
-        flexShrink: 0,
-        fontFamily: 'var(--font-geist-mono), ui-monospace, monospace',
-      }}>
-        {label}
-      </span>
-      {/* Value — real split-flap cells */}
+      {/* Label — split-flap */}
       <SplitFlap
-        value={pad(value, valueLen)}
+        value={label.padEnd(labelLen, ' ')}
+        length={labelLen}
+        size="sm"
+        variant="classic"
+        palette={LABEL_PALETTE}
+        mode="board"
+        easing="decelerate"
+        flipMs={60}
+        stagger={20}
+        gap={1}
+        perspective={150}
+        animateOnMount
+        style={{ flexShrink: 0 }}
+      />
+      {/* Value — split-flap */}
+      <SplitFlap
+        value={value.padEnd(valueLen, ' ')}
         length={valueLen}
         size="sm"
         variant="classic"
@@ -139,7 +188,7 @@ function MetricRow({
         mode="board"
         easing="decelerate"
         flipMs={80}
-        stagger={30}
+        stagger={25}
         gap={2}
         perspective={200}
         animateOnMount
@@ -149,7 +198,7 @@ function MetricRow({
   )
 }
 
-// ── The board ─────────────────────────────────────────────────────────────
+// ── The board (1200×630 design surface) ───────────────────────────────────
 
 function Board({
   cardRef,
@@ -169,13 +218,15 @@ function Board({
   scaleV,
   efficiency,
   costPerMillion,
+  opRatio,
+  cascadeStr,
   radarAxes,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>
 } & Omit<SplitFlapCardProps, 'showControls'>) {
   const W = 1200
   const H = 630
-  const LEFT_W = 380
+  const LEFT_W = 400
   const RIGHT_W = W - LEFT_W
 
   // Format values
@@ -195,8 +246,17 @@ function Board({
   const cacheCreateStr = cacheCreate != null ? fmtTokens(cacheCreate) : '—'
   const totalStr = (inputTokens && outputTokens && cacheRead && cacheCreate)
     ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '—'
+  const opStr = opRatio ?? '—'
+  const cascadeStrVal = cascadeStr ?? '—'
 
-  // Gold for the left panel
+  // Radar axes with per-metric colors
+  const coloredAxes: RadarAxis[] = radarAxes && radarAxes.length >= 3
+    ? radarAxes.map((a, i) => ({
+        ...a,
+        color: ['#e0b240', '#78dc82', '#78dc82', '#e0b240', '#dee6d2', '#78dc82'][i % 6],
+      }))
+    : []
+
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
 
@@ -215,167 +275,98 @@ function Board({
         fontFamily: 'var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace',
       }}
     >
-      {/* ═══════════ LEFT 1/3 — gold background, TV ident style ═══════════ */}
+      {/* ═══════════ LEFT 1/3 — gold background ═══════════ */}
       <div style={{
         width: LEFT_W,
         height: H,
         background: GOLD_BG,
         display: 'flex',
         flexDirection: 'column',
-        padding: '32px 28px',
+        padding: '24px 24px',
         boxSizing: 'border-box',
         position: 'relative',
+        flexShrink: 0,
       }}>
-        {/* Subtle texture overlay on gold */}
+        {/* Texture overlay */}
         <div style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
+          position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 3px)',
         }} />
 
-        {/* SIGRANK wordmark — big, dark on gold */}
-        <div style={{
-          fontSize: '36px',
-          fontWeight: 800,
-          color: GOLD_DARK,
-          letterSpacing: '4px',
-          lineHeight: 1,
-        }}>
-          SIGRANK
+        {/* Top: SIGRANK + DEPARTURES small */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <span style={{ fontSize: '16px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>SIGRANK</span>
+          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.5, letterSpacing: '2px' }}>DEPARTURES</span>
         </div>
+
+        {/* MO§ES™ */}
+        <div style={{ fontSize: '11px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px', marginTop: '2px' }}>MO§ES™</div>
 
         {/* Diamond divider */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginTop: '10px',
-        }}>
-          <div style={{ width: '10px', height: '10px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
-          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.3 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
+          <div style={{ width: '8px', height: '8px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
         </div>
 
-        {/* DEPARTURES + MO§ES™ */}
-        <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <div style={{
-            fontSize: '16px',
-            color: GOLD_DARK,
-            letterSpacing: '3px',
-            fontWeight: 700,
-            opacity: 0.8,
-          }}>
-            DEPARTURES
-          </div>
-          <div style={{
-            fontSize: '14px',
-            color: GOLD_DARK,
-            letterSpacing: '2px',
-            fontWeight: 600,
-            opacity: 0.6,
-          }}>
-            MO§ES™
-          </div>
-        </div>
-
-        {/* Operator name — the "destination" */}
+        {/* Operator name — THE LARGEST FONT on the left */}
         <div style={{
-          marginTop: '20px',
-          fontSize: '22px',
-          fontWeight: 700,
+          marginTop: '16px',
+          fontSize: '42px',
+          fontWeight: 900,
           color: GOLD_DARK,
           letterSpacing: '1px',
-          lineHeight: 1.15,
+          lineHeight: 1.05,
           wordBreak: 'break-word',
         }}>
           {name.toUpperCase()}
         </div>
 
-        {/* Class + Platform */}
-        <div style={{
-          marginTop: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{
-              fontSize: '10px',
-              color: GOLD_DARK,
-              opacity: 0.5,
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-              width: '70px',
-            }}>
-              Class
-            </span>
-            <span style={{
-              fontSize: '14px',
-              color: GOLD_DARK,
-              fontWeight: 700,
-              letterSpacing: '1px',
-            }}>
-              {classTier}
-            </span>
+        {/* Yield headline — big number under name */}
+        <div style={{ marginTop: '12px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <span style={{ fontSize: '14px', color: GOLD_DARK, opacity: 0.5, letterSpacing: '1px' }}>Υ YIELD</span>
+          <span style={{ fontSize: '32px', fontWeight: 800, color: GOLD_DARK }}>{yieldStr}</span>
+        </div>
+
+        {/* Class + Platform + Cascade + Op Ratio */}
+        <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase', width: '64px' }}>Class</span>
+            <span style={{ fontSize: '15px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '1px' }}>{classTier}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{
-              fontSize: '10px',
-              color: GOLD_DARK,
-              opacity: 0.5,
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-              width: '70px',
-            }}>
-              Platform
-            </span>
-            <span style={{
-              fontSize: '14px',
-              color: GOLD_DARK,
-              fontWeight: 700,
-              letterSpacing: '1px',
-            }}>
-              {(platform ?? '—').toUpperCase()}
-            </span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase', width: '64px' }}>Platform</span>
+            <span style={{ fontSize: '15px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '1px' }}>{(platform ?? '—').toUpperCase()}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase', width: '64px' }}>Cascade</span>
+            <span style={{ fontSize: '15px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{cascadeStrVal}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase', width: '64px' }}>Op Ratio</span>
+            <span style={{ fontSize: '15px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{opStr}</span>
           </div>
         </div>
 
-        {/* Radar at bottom — dark on gold */}
-        {radarAxes && radarAxes.length >= 3 && (
+        {/* Radar — enlarged, colored axes, bottom anchored */}
+        {coloredAxes.length >= 3 && (
           <div style={{
             marginTop: 'auto',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '4px',
+            gap: '2px',
           }}>
-            <span style={{
-              fontSize: '10px',
-              color: GOLD_DARK,
-              opacity: 0.5,
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-            }}>
-              Cascade
+            <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+              Cascade Fingerprint
             </span>
-            <div style={{
-              background: 'rgba(10,10,10,0.15)',
-              borderRadius: '8px',
-              padding: '8px',
-            }}>
-              <CascadeRadar values={radarAxes} size={180} />
+            <div style={{ width: '260px', background: 'rgba(10,10,10,0.1)', borderRadius: '8px', padding: '6px' }}>
+              <ColoredRadar axes={coloredAxes} size={260} />
             </div>
           </div>
         )}
 
-        {/* Footer on gold */}
-        <div style={{
-          marginTop: '12px',
-          fontSize: '11px',
-          color: GOLD_DARK,
-          opacity: 0.4,
-          letterSpacing: '1px',
-        }}>
+        {/* Footer */}
+        <div style={{ marginTop: '8px', fontSize: '10px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1px' }}>
           signalaf.com/user/{codename}
         </div>
       </div>
@@ -388,75 +379,97 @@ function Board({
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
+        flexShrink: 0,
       }}>
-        {/* Board header */}
+        {/* Board header — split-flap */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '14px 20px 10px',
+          padding: '10px 16px 8px',
           borderBottom: '2px solid #264028',
         }}>
-          <span style={{
-            fontSize: '14px',
-            color: '#e0b240',
-            letterSpacing: '2px',
-            fontWeight: 700,
-          }}>
-            CASCADE TELEMETRY
-          </span>
-          <span style={{
-            fontSize: '11px',
-            color: '#6e966e',
-            letterSpacing: '2px',
-          }}>
-            LIVE
-          </span>
+          <SplitFlap
+            value="CASCADE TELEMETRY"
+            size="sm"
+            variant="classic"
+            palette={GOLD_PALETTE}
+            mode="board"
+            easing="decelerate"
+            flipMs={60}
+            stagger={25}
+            gap={2}
+            perspective={200}
+            animateOnMount
+          />
+          <SplitFlap
+            value="LIVE"
+            size="sm"
+            variant="classic"
+            palette={DIM_PALETTE}
+            mode="board"
+            flipMs={60}
+            animateOnMount
+          />
         </div>
 
-        {/* Board rows — raw data + derived metrics */}
+        {/* Board rows — all split-flap labels + values */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {/* Raw token pillars */}
-          <MetricRow label="Input" value={inputStr} palette={BONE_PALETTE} valueLen={10} delay={0} />
-          <MetricRow label="Output" value={outputStr} palette={GREEN_PALETTE} valueLen={10} delay={100} />
-          <MetricRow label="Cache R" value={cacheReadStr} palette={GREEN_PALETTE} valueLen={10} delay={200} />
-          <MetricRow label="Cache W" value={cacheCreateStr} palette={BONE_PALETTE} valueLen={10} delay={300} />
-          <MetricRow label="Total" value={totalStr} palette={DIM_PALETTE} valueLen={10} delay={400} />
+          <MetricRow label="INPUT" value={inputStr} palette={BONE_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="OUTPUT" value={outputStr} palette={GREEN_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="CACHE R" value={cacheReadStr} palette={GREEN_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="CACHE W" value={cacheCreateStr} palette={BONE_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="TOTAL" value={totalStr} palette={DIM_PALETTE} labelLen={8} valueLen={10} />
 
           {/* Divider */}
-          <div style={{ height: 1, background: '#264028', margin: '2px 16px' }} />
+          <div style={{ height: 1, background: '#264028', margin: '2px 12px' }} />
 
           {/* Derived cascade metrics */}
-          <MetricRow label="Yield Υ" value={yieldStr} palette={GOLD_PALETTE} valueLen={10} delay={500} />
-          <MetricRow label="SNR" value={snrStr} palette={GREEN_PALETTE} valueLen={10} delay={600} />
-          <MetricRow label="Leverage" value={levStr} palette={GREEN_PALETTE} valueLen={10} delay={700} />
-          <MetricRow label="Velocity" value={velStr} palette={BONE_PALETTE} valueLen={10} delay={800} />
-          <MetricRow label="10xDEV" value={devStr} palette={GOLD_PALETTE} valueLen={10} delay={900} />
-          <MetricRow label="Scale V" value={scaleStr} palette={BONE_PALETTE} valueLen={10} delay={1000} />
-          <MetricRow label="Efficiency" value={effStr} palette={GREEN_PALETTE} valueLen={10} delay={1100} />
-          <MetricRow label="$/1M" value={costStr} palette={DIM_PALETTE} valueLen={10} delay={1200} />
+          <MetricRow label="YIELD Υ" value={yieldStr} palette={GOLD_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="SNR" value={snrStr} palette={GREEN_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="LEVERAGE" value={levStr} palette={GREEN_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="VELOCITY" value={velStr} palette={BONE_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="10XDEV" value={devStr} palette={GOLD_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="SCALE V" value={scaleStr} palette={BONE_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="EFFICIENC" value={effStr} palette={GREEN_PALETTE} labelLen={8} valueLen={10} />
+          <MetricRow label="$/1M" value={costStr} palette={DIM_PALETTE} labelLen={8} valueLen={10} />
         </div>
       </div>
 
-      {/* Scanline texture over the whole card */}
+      {/* Scanline texture */}
       <div style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
+        position: 'absolute', inset: 0, pointerEvents: 'none',
         background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px)',
       }} />
     </div>
   )
 }
 
-// ── Main export ───────────────────────────────────────────────────────────
+// ── Main export with responsive scaling ───────────────────────────────────
 
 export function SplitFlapCard(props: SplitFlapCardProps) {
   const { showControls = true } = props
   const cardRef = useRef<HTMLDivElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const [copied, setCopied] = useState(false)
   const [busy, setBusy] = useState(false)
   const [replayKey, setReplayKey] = useState(0)
+  const [scale, setScale] = useState(1)
+
+  // Responsive scaling: measure container, scale the 1200×630 board to fit
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const update = () => {
+      const w = container.clientWidth
+      setScale(w / 1200)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [])
 
   const replay = useCallback(() => setReplayKey((k) => k + 1), [])
 
@@ -492,21 +505,29 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
     <div className="flex flex-col gap-3">
       {showControls && (
         <div className="flex items-center gap-2">
-          <button type="button" onClick={replay} className={btn}>
-            ↻ Replay
-          </button>
-          <button type="button" onClick={shareLink} className={btn}>
-            {copied ? 'Copied ✓' : 'Share'}
-          </button>
-          <button type="button" onClick={download} disabled={busy} className={btn}>
-            {busy ? 'Rendering…' : 'Download card'}
-          </button>
+          <button type="button" onClick={replay} className={btn}>↻ Replay</button>
+          <button type="button" onClick={shareLink} className={btn}>{copied ? 'Copied ✓' : 'Share'}</button>
+          <button type="button" onClick={download} disabled={busy} className={btn}>{busy ? 'Rendering…' : 'Download card'}</button>
         </div>
       )}
 
-      {/* Visible board */}
-      <div key={replayKey} className="overflow-hidden rounded-lg border border-[#264028]" style={{ aspectRatio: '1200/630' }}>
-        <Board cardRef={cardRef} {...props} />
+      {/* Container — measures width, scales the board */}
+      <div
+        ref={containerRef}
+        className="overflow-hidden rounded-lg border border-[#264028]"
+        style={{ width: '100%', height: 630 * scale }}
+      >
+        <div
+          key={replayKey}
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            width: 1200,
+            height: 630,
+          }}
+        >
+          <Board cardRef={cardRef} {...props} />
+        </div>
       </div>
     </div>
   )
