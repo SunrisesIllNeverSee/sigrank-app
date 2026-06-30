@@ -490,16 +490,20 @@ export default async function OperatorProfilePage({
           codename={operator.codename}
           name={name}
           yieldValue={c.yield_}
-          rank={row.global_rank}
           classTier={snapshot.class_tier}
-          snr={c.snr}
-          leverage={c.leverage}
-          velocity={c.velocity}
           platform={operator.primary_domain}
           inputTokens={telemetry.fresh_input}
           outputTokens={telemetry.output}
           cacheRead={telemetry.cache_read}
           cacheCreate={telemetry.cache_create}
+          snr={c.snr}
+          leverage={c.leverage}
+          velocity={c.velocity}
+          dev10x={c.dev10x}
+          scaleV={c.scaleV}
+          efficiency={c.efficiency}
+          costPerMillion={c.costPerMillion}
+          opRatio={c.opRatio}
           radarAxes={radarAxes}
         />
       )}
