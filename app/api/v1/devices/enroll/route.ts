@@ -3,6 +3,7 @@ import { getSupabaseService } from '@/lib/supabase/server'
 import { enrollRateLimit, rateLimitedResponse } from '@/lib/api/gate'
 import { normalizeConnectCode } from '@/lib/devices/connect-code'
 import { isValidAgentPublicKey } from '@/lib/ingest/signature'
+import { captureServer } from '@/lib/posthog/server'
 
 /**
  * POST /api/v1/devices/enroll — redeem a connect code + bind a device (D7 §4.3).
@@ -59,6 +60,11 @@ export async function POST(req: NextRequest) {
     : null
   switch (row?.status) {
     case 'enrolled':
+      // operator_enrolled — activation captured server-side at the API boundary (the
+      // signed enroll request already arrives here; the CLI never phones home).
+      await captureServer(row.codename ?? row.operator_id ?? '', 'operator_enrolled', {
+        agent_version: agentVersion ?? undefined,
+      })
       return NextResponse.json(
         {
           status: 'enrolled',

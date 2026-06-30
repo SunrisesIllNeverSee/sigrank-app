@@ -34,6 +34,7 @@ import {
   revalidateTouchedWindows,
   type MaterializeResult,
 } from '@/lib/ingest/materialize'
+import { captureServer } from '@/lib/posthog/server'
 
 const SCORING_ETA_SECONDS = 30
 
@@ -222,6 +223,19 @@ export async function POST(req: NextRequest) {
     payload.window.start,
     payload.agent.snapshot_hash,
   )
+
+  // snapshot_submitted — activation/core event, recorded server-side from the signed
+  // agent request. Booleans/enums only; no token values. `persisted` says whether it
+  // actually reached the board (vs accepted-but-unverified / write flag off).
+  await captureServer(payload.codename, 'snapshot_submitted', {
+    source: 'agent',
+    window_type: payload.window.type,
+    platform: payload.platform.primary,
+    verification_tier: gate.tier,
+    persisted,
+    has_cascade:
+      payload.raw_telemetry.tokens_cache_creation > 0 && payload.raw_telemetry.tokens_cache_read > 0,
+  })
 
   return NextResponse.json(
     {
