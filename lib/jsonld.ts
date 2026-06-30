@@ -235,10 +235,8 @@ export function researchArticle(opts: {
     publisher: { '@id': ORG_ID },
     license: 'https://creativecommons.org/licenses/by/4.0/',
     about: 'AI operator token efficiency',
-    citation: [
-      `${SITE_ORIGIN}/methodology`,
-      ...opts.headlineFindings,
-    ],
+    abstract: opts.headlineFindings.join(' '),
+    citation: `${SITE_ORIGIN}/methodology`,
     isPartOf: {
       '@type': 'PublicationEvent',
       name: 'SigRank Quarterly Index Report',
