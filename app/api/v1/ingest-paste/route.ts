@@ -21,6 +21,7 @@ import { getSupabaseServer } from '@/lib/supabase/server'
 import { ingestMeta } from '@/lib/ingest'
 import { pillarsToCore5 } from '@/lib/ingest/bridge'
 import { scoreSnapshot } from '@/lib/scoring/engine'
+import { captureServer } from '@/lib/posthog/server'
 
 const SCORING_ETA_SECONDS = 10
 
@@ -117,6 +118,15 @@ export async function POST(req: NextRequest) {
       })
     } catch { /* graceful fallback — still ack */ }
   }
+
+  // snapshot_submitted (web-paste path) — recorded server-side. source distinguishes it
+  // from the signed-agent path; paste is run-the-numbers (pending_review, never ranked).
+  await captureServer(codename, 'snapshot_submitted', {
+    source: 'web_paste',
+    window_type: windowType,
+    platform: platformRaw,
+    class_tier: scored.class_tier,
+  })
 
   // 5. Respond
   return NextResponse.json(

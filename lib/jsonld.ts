@@ -213,3 +213,35 @@ export function faqPage(faqs: { question: string; answer: string }[]) {
     })),
   }
 }
+
+/** ScholarlyArticle — for quarterly research reports (Part C citation magnet). */
+export function researchArticle(opts: {
+  slug: string
+  title: string
+  description: string
+  datePublished: string
+  headlineFindings: string[]
+}) {
+  const url = `${SITE_ORIGIN}/research/${opts.slug}`
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ScholarlyArticle',
+    '@id': url,
+    headline: opts.title,
+    description: opts.description,
+    url,
+    datePublished: opts.datePublished,
+    author: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    about: 'AI operator token efficiency',
+    citation: [
+      `${SITE_ORIGIN}/methodology`,
+      ...opts.headlineFindings,
+    ],
+    isPartOf: {
+      '@type': 'PublicationEvent',
+      name: 'SigRank Quarterly Index Report',
+    },
+  }
+}

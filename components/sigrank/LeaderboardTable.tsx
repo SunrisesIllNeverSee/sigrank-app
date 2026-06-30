@@ -24,6 +24,7 @@ import { glyphFor } from '@/lib/canon/ids'
 import { PLATFORM_UI, PLATFORM_DOMAIN_MAP, CLASS_FILTER, type PlatformUI } from '@/lib/constants'
 import { OperatorAvatar } from './OperatorAvatar'
 import { PlatformIcon } from './PlatformIcon'
+import { track } from '@/lib/posthog/events'
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
 // SPECIES colors stay literal (semantic identity for the class glyph, theme-invariant).
@@ -261,6 +262,12 @@ export function LeaderboardTable({
   const [platform, setPlatform] = useState<PlatformUI>(platformProp)
   const [classFilter, setClassFilter] = useState<string>('all')
   const [page, setPage] = useState(0) // 0-based; 25 rows/page (owner 2026-06-24)
+
+  // board_viewed funnel event (no-ops without the PostHog key). Fires on mount and
+  // when the window/platform/breakdown changes; URL-driven boards remount so it stays fresh.
+  React.useEffect(() => {
+    track.boardViewed(win, { platform, view: breakdownProp, total: totalUsers })
+  }, [win, platform, breakdownProp, totalUsers])
 
   // FIX F: the "off" board mixes windows (per-(operator, platform, window) rows), so it
   // labels each row with its window. Single-window boards don't (the window is the board).
