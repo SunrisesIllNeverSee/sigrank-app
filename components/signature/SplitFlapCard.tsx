@@ -24,17 +24,22 @@ export interface SplitFlapCardProps {
   codename: string
   name: string
   yieldValue: number | null
-  rank: number | null
   classTier: string
-  snr: number | null
-  leverage: number | null
-  velocity: number | null
   platform: string | null
-  /** Raw token pillars for the Solari board rows */
+  /** Raw token pillars */
   inputTokens?: number | null
   outputTokens?: number | null
   cacheRead?: number | null
   cacheCreate?: number | null
+  /** Derived cascade metrics */
+  snr?: number | null
+  leverage?: number | null
+  velocity?: number | null
+  dev10x?: number | null
+  scaleV?: number | null
+  efficiency?: number | null
+  costPerMillion?: number | null
+  opRatio?: string | null
   /** Radar axes */
   radarAxes?: { label: string; value: number; max: number }[]
   showControls?: boolean
@@ -204,18 +209,18 @@ function BoardRow({
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '160px 1fr auto',
-      gap: '12px',
-      padding: '10px 16px',
+      gridTemplateColumns: '140px 1fr auto',
+      gap: '10px',
+      padding: '6px 16px',
       borderBottom: '1px solid #152015',
       alignItems: 'center',
     }}>
       {/* Label */}
-      <span style={{ fontSize: '13px', color: '#6e966e', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+      <span style={{ fontSize: '12px', color: '#6e966e', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
         <FlapRow text={label} delay={delay} duration={duration * 0.6} playKey={playKey} charDelay={25} />
       </span>
       {/* Value — the big flap numbers */}
-      <span style={{ fontSize: '28px', fontWeight: 700, color: valueColor, letterSpacing: '1px' }}>
+      <span style={{ fontSize: '24px', fontWeight: 700, color: valueColor, letterSpacing: '1px' }}>
         <FlapRow text={value} delay={delay + 100} duration={duration} playKey={playKey} charDelay={35} />
       </span>
       {/* Status dot */}
@@ -243,16 +248,20 @@ function Board({
   codename,
   name,
   yieldValue,
-  rank,
   classTier,
-  snr,
-  leverage,
-  velocity,
   platform,
   inputTokens,
   outputTokens,
   cacheRead,
   cacheCreate,
+  snr,
+  leverage,
+  velocity,
+  dev10x,
+  scaleV,
+  efficiency,
+  costPerMillion,
+  opRatio,
   radarAxes,
   playKey,
 }: {
@@ -260,17 +269,21 @@ function Board({
 } & Omit<SplitFlapCardProps, 'showControls'> & { playKey: number }) {
   const W = 1200
   const H = 630
-  const LEFT_W = 380  // 1/3-ish
+  const LEFT_W = 380
   const RIGHT_W = W - LEFT_W
 
-  // Derived values
+  // Format all values
   const yieldStr = yieldValue !== null
     ? (yieldValue >= 1000 ? `${(yieldValue / 1000).toFixed(1)}K` : yieldValue.toFixed(0))
     : '—'
-  const rankStr = rank !== null ? `#${rank}` : '—'
-  const snrStr = snr !== null ? `${(snr * 100).toFixed(0)}%` : '—'
-  const levStr = leverage !== null ? `${leverage.toFixed(0)}x` : '—'
-  const velStr = velocity !== null ? velocity.toFixed(1) : '—'
+  const snrStr = snr != null ? `${(snr * 100).toFixed(0)}%` : '—'
+  const levStr = leverage != null ? `${leverage.toFixed(0)}x` : '—'
+  const velStr = velocity != null ? velocity.toFixed(1) : '—'
+  const devStr = dev10x != null ? dev10x.toFixed(2) : '—'
+  const scaleStr = scaleV != null ? scaleV.toFixed(2) : '—'
+  const effStr = efficiency != null ? `${efficiency.toFixed(1)}x` : '—'
+  const costStr = costPerMillion != null ? `$${costPerMillion.toFixed(2)}` : '—'
+  const opStr = opRatio ?? '—'
   const inputStr = inputTokens != null ? fmtTokens(inputTokens) : '—'
   const outputStr = outputTokens != null ? fmtTokens(outputTokens) : '—'
   const cacheReadStr = cacheRead != null ? fmtTokens(cacheRead) : '—'
@@ -280,25 +293,13 @@ function Board({
 
   // Animation delays — left panel first, then right panel top-to-bottom
   const D = {
-    wordmark: 0,
-    departures: 400,
-    moses: 500,
-    class: 600,
-    platform: 700,
-    radar: 900,
-    // Right panel rows — staggered
-    row1: 800,
-    row2: 950,
-    row3: 1100,
-    row4: 1250,
-    row5: 1400,
-    row6: 1550,
-    row7: 1700,
-    row8: 1850,
-    row9: 2000,
-    footer: 2200,
+    wordmark: 0, departures: 400, moses: 500, class: 600, platform: 700, radar: 900,
+    row1: 800, row2: 900, row3: 1000, row4: 1100, row5: 1200,
+    row6: 1300, row7: 1400, row8: 1500, row9: 1600, row10: 1700,
+    row11: 1800, row12: 1900, row13: 2000, row14: 2100,
+    footer: 2300,
   }
-  const DUR = 700
+  const DUR = 600
 
   const GOLD = '#e0b240'
   const GREEN = '#78dc82'
@@ -428,7 +429,7 @@ function Board({
           </span>
         </div>
 
-        {/* Board rows — raw data + derived metrics */}
+        {/* Board rows — raw data + derived metrics, as many as fit */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {/* Raw token pillars */}
           <BoardRow label="Input" value={inputStr} delay={D.row2} duration={DUR} playKey={playKey} valueColor={TEXT} />
@@ -438,12 +439,17 @@ function Board({
           <BoardRow label="Total" value={totalStr} delay={D.row6} duration={DUR} playKey={playKey} valueColor={DIM} />
 
           {/* Divider between raw and derived */}
-          <div style={{ height: 1, background: '#264028', margin: '4px 0' }} />
+          <div style={{ height: 1, background: '#264028', margin: '2px 0' }} />
 
-          {/* Derived metrics */}
+          {/* Derived cascade metrics */}
           <BoardRow label="Yield Υ" value={yieldStr} delay={D.row7} duration={DUR} playKey={playKey} valueColor={GOLD} />
-          <BoardRow label="Rank" value={rankStr} delay={D.row8} duration={DUR} playKey={playKey} valueColor={GOLD} />
-          <BoardRow label="SNR" value={snrStr} delay={D.row9} duration={DUR} playKey={playKey} valueColor={GREEN} />
+          <BoardRow label="SNR" value={snrStr} delay={D.row8} duration={DUR} playKey={playKey} valueColor={GREEN} />
+          <BoardRow label="Leverage" value={levStr} delay={D.row9} duration={DUR} playKey={playKey} valueColor={GREEN} />
+          <BoardRow label="Velocity" value={velStr} delay={D.row10} duration={DUR} playKey={playKey} valueColor={TEXT} />
+          <BoardRow label="10xDEV" value={devStr} delay={D.row11} duration={DUR} playKey={playKey} valueColor={GOLD} />
+          <BoardRow label="Scale V" value={scaleStr} delay={D.row12} duration={DUR} playKey={playKey} valueColor={TEXT} />
+          <BoardRow label="Efficiency" value={effStr} delay={D.row13} duration={DUR} playKey={playKey} valueColor={GREEN} />
+          <BoardRow label="$/1M" value={costStr} delay={D.row14} duration={DUR} playKey={playKey} valueColor={DIM} />
         </div>
 
         {/* Footer */}
