@@ -434,23 +434,23 @@ function Board({
         </div>
 
         {/* Yield headline */}
-        <div style={{ marginTop: '10px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK }}>{'\u03a5'}</span>
-          <span style={{ fontSize: '11px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
-          <span style={{ fontSize: '30px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
+        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <span style={{ fontSize: '26px', fontWeight: 900, color: GOLD_DARK }}>{'\u03a5'}</span>
+          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
+          <span style={{ fontSize: '26px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
         </div>
 
-        {/* Info rows */}
-        <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {/* Info rows \u2014 tight two-per-line grid so the identity block stays compact */}
+        <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '5px' }}>
           {[
             ['CLASS', classTier],
             ['PLATFORM', (platform ?? '\u2014').toUpperCase()],
             ['CASCADE', cascadeStrVal],
             ['OP RATIO', opStr],
           ].map(([label, val]) => (
-            <div key={label} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase', width: '68px', flexShrink: 0 }}>{label}</span>
-              <span style={{ fontSize: '15px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.5px' }}>{val}</span>
+            <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: '1px', minWidth: 0 }}>
+              <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>{label}</span>
+              <span style={{ fontSize: '14px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{val}</span>
             </div>
           ))}
         </div>
