@@ -461,16 +461,17 @@ function Board({
           ))}
         </div>
 
-        {/* Radar — fills the space below the info rows */}
+        {/* Radar — sized to fit the remaining space (no overflow into the info block) */}
         {coloredAxes.length >= 3 && (
           <div style={{
-            flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+            flex: 1, minHeight: 0, overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px',
           }}>
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Signature
             </span>
-            <div style={{ width: '100%', maxWidth: '420px', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={420} centerValue={yieldStr} reduced={reduced} replayKey={0} />
+            <div style={{ width: '340px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <RadialRings axes={coloredAxes} size={340} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
         )}
