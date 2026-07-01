@@ -440,8 +440,14 @@ function Board({
           <span style={{ fontSize: '26px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
         </div>
 
-        {/* Info rows \u2014 tight two-per-line grid so the identity block stays compact */}
-        <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '5px' }}>
+        {/* Divider \u2014 anchors directly under \u03a5 / yield */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
+          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
+        </div>
+
+        {/* Info rows \u2014 CLASS/PLATFORM/CASCADE/OP RATIO, below the divider */}
+        <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '6px' }}>
           {[
             ['CLASS', classTier],
             ['PLATFORM', (platform ?? '\u2014').toUpperCase()],
@@ -455,13 +461,7 @@ function Board({
           ))}
         </div>
 
-        {/* Divider — closes the identity block (all info above this line) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '14px' }}>
-          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
-          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
-        </div>
-
-        {/* Radar — fills the space between the two dividers */}
+        {/* Radar — fills the space below the info rows */}
         {coloredAxes.length >= 3 && (
           <div style={{
             flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
