@@ -11,6 +11,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { toPng } from 'html-to-image'
 import { track } from '@/lib/posthog/events'
+import type { FieldAverages } from '@/lib/data/field-average'
 
 export interface SplitFlapCardProps {
   codename: string
@@ -32,6 +33,10 @@ export interface SplitFlapCardProps {
   opRatio?: string | null
   cascadeStr?: string | null
   radarAxes?: { label: string; value: number; max: number }[]
+  /** Live per-metric field averages — single source for the AVG USER column,
+   *  the radar's field polygon, and the op-ratio footer. Absent → legacy
+   *  hardcoded references. */
+  fieldAvg?: FieldAverages | null
   showControls?: boolean
 }
 
@@ -223,6 +228,13 @@ function TwoSeriesRadar({ rows, size, reduced, replayKey }: {
       <polygon points={poly(avgFracs, 1)}
         fill="rgba(10,10,10,0.07)" stroke={INK} strokeWidth={1.5}
         strokeDasharray="5 4" opacity={0.5} strokeLinejoin="round" />
+      {/* field-avg vertex markers — hollow, so the two series stay legible */}
+      {rows.map((r, i) => {
+        if (r.avgFrac == null) return null
+        const [x, y] = pt(i, Math.max(0.02, r.avgFrac) * radius)
+        return <circle key={`av-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={4}
+          fill="none" stroke={INK} strokeWidth={1.5} opacity={0.55} />
+      })}
       {/* you — solid ink, animated grow */}
       <polygon points={poly(youFracs, scale)}
         fill="rgba(10,10,10,0.16)" stroke={INK} strokeWidth={3} strokeLinejoin="round"
@@ -433,7 +445,7 @@ function Board({
   cardRef, codename, name, yieldValue, classTier, platform,
   inputTokens, outputTokens, cacheRead, cacheCreate,
   snr, leverage, velocity, dev10x, scaleV, efficiency, costPerMillion,
-  opRatio, cascadeStr, radarAxes, reduced,
+  opRatio, cascadeStr, radarAxes, fieldAvg, reduced,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>
   reduced: boolean
@@ -463,25 +475,40 @@ function Board({
     : []
 
   // Meter rows — pair each radar axis (by label) with its display value and
-  // the average-operator reference (same avgs the terminal panel prints).
-  // Unmatched labels fall back to a percent readout so nothing renders blank.
-  const meterMeta: Record<string, { glyph: string; you: string; avg: string | null; avgNum: number | null }> = {
-    'SNR':        { glyph: 'SNR', you: snrStr,   avg: '33%',  avgNum: 0.33 },
-    'Velocity':   { glyph: 'VEL', you: velStr,   avg: '0.50', avgNum: 0.5 },
-    'Leverage':   { glyph: 'LEV', you: levStr,   avg: '3.2x', avgNum: 3.2 },
-    '10xDEV':     { glyph: '\u26a1', you: devStr, avg: '0.50', avgNum: 0.5 },
-    'Scale V':    { glyph: 'SCL', you: scaleStr, avg: null,   avgNum: null },
-    'Efficiency': { glyph: 'EFF', you: effStr,   avg: '1.0x', avgNum: 1.0 },
+  // the average-operator reference. When fieldAvg carries a live average for
+  // a metric, the axis is normalized so THE FIELD AVERAGE SITS ON THE 50%
+  // RING (frac = you / 2*avg): the avg polygon becomes a regular reference
+  // shape and any vertex outside it reads "above the field" at a glance.
+  // Metrics without a live average fall back to the fixed per-metric max.
+  const fmtAvg = {
+    pct: (v: number) => `${(v * 100).toFixed(0)}%`,
+    x1: (v: number) => `${v.toFixed(1)}x`,
+    f1: (v: number) => v.toFixed(1),
+    f2: (v: number) => v.toFixed(2),
+  }
+  const meterMeta: Record<string, { glyph: string; you: string; youNum: number | null; avg: string | null; avgNum: number | null }> = {
+    'SNR':        { glyph: 'SNR', you: snrStr,   youNum: snr ?? null,        avgNum: fieldAvg?.snr ?? 0.33,       avg: fieldAvg?.snr != null ? fmtAvg.pct(fieldAvg.snr) : '33%' },
+    'Velocity':   { glyph: 'VEL', you: velStr,   youNum: velocity ?? null,   avgNum: fieldAvg?.velocity ?? 0.5,   avg: fieldAvg?.velocity != null ? fmtAvg.f1(fieldAvg.velocity) : '0.50' },
+    'Leverage':   { glyph: 'LEV', you: levStr,   youNum: leverage ?? null,   avgNum: fieldAvg?.leverage ?? 3.2,   avg: fieldAvg?.leverage != null ? fmtAvg.x1(fieldAvg.leverage) : '3.2x' },
+    '10xDEV':     { glyph: '\u26a1', you: devStr, youNum: dev10x ?? null,    avgNum: fieldAvg?.dev10x ?? 0.5,     avg: fieldAvg?.dev10x != null ? fmtAvg.f2(fieldAvg.dev10x) : '0.50' },
+    'Scale V':    { glyph: 'SCL', you: scaleStr, youNum: scaleV ?? null,     avgNum: fieldAvg?.scaleV ?? null,    avg: fieldAvg?.scaleV != null ? fmtAvg.f2(fieldAvg.scaleV) : null },
+    'Efficiency': { glyph: 'EFF', you: effStr,   youNum: efficiency ?? null, avgNum: fieldAvg?.efficiency ?? 1.0, avg: fieldAvg?.efficiency != null ? fmtAvg.x1(fieldAvg.efficiency) : '1.0x' },
   }
   const normFrac = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
   const meterRows: MeterRow[] = (radarAxes ?? []).map((ax) => {
     const meta = meterMeta[ax.label]
+    // Avg-anchored scaling when both numbers exist; legacy max-scaling otherwise.
+    const anchored = meta != null && meta.youNum != null && meta.avgNum != null && meta.avgNum > 0
+    const frac = anchored
+      ? Math.max(0.02, Math.min(1, meta.youNum! / (2 * meta.avgNum!)))
+      : normFrac(ax.value, ax.max)
+    const avgFrac = anchored ? 0.5 : meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null
     return {
       glyph: meta?.glyph ?? ax.label.slice(0, 3).toUpperCase(),
       label: ax.label,
-      frac: normFrac(ax.value, ax.max),
-      you: meta?.you ?? `${Math.round(normFrac(ax.value, ax.max) * 100)}%`,
-      avgFrac: meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null,
+      frac,
+      you: meta?.you ?? `${Math.round(frac * 100)}%`,
+      avgFrac,
       avg: meta?.avg ?? null,
     }
   })
@@ -519,10 +546,14 @@ function Board({
   // average operating ratio 3.5 : 1 : 0.5 (cache : input : output, input-normalized).
   // i.e. "at your input volume, what a 3.5:1:0.5 operator would produce." The contrast
   // (your real cache_read >> 3.5\u00d7 input) is the leverage edge, made visible.
+  const R_CR = fieldAvg?.crRatio ?? 3.5
+  const R_OUT = fieldAvg?.outRatio ?? 0.5
+  const R_CW = fieldAvg?.cwRatio ?? null
   const avgIn = inputTokens ?? null
-  const avgOut = avgIn != null ? avgIn * 0.5 : null
-  const avgCache = avgIn != null ? avgIn * 3.5 : null
-  const avgTotal = avgIn != null ? avgIn + avgOut! + avgCache! : null
+  const avgOut = avgIn != null ? avgIn * R_OUT : null
+  const avgCache = avgIn != null ? avgIn * R_CR : null
+  const avgCw = avgIn != null && R_CW != null ? avgIn * R_CW : null
+  const avgTotal = avgIn != null ? avgIn + avgOut! + avgCache! + (avgCw ?? 0) : null
   const avgFmt = (n: number | null) => (n != null ? fmtTokens(n) : '\u00b7')
 
   // value | metric name | AVG USER. Raw rows: avg = your-input \u00d7 the 3.5:1:0.5 ratio.
@@ -530,18 +561,21 @@ function Board({
     { glyph: 'IN', label: 'INPUT', value: inputStr, avg: avgFmt(avgIn), color: C_BONE },
     { glyph: 'OUT', label: 'OUTPUT', value: outputStr, avg: avgFmt(avgOut), color: C_GREEN },
     { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, avg: avgFmt(avgCache), color: C_GREEN },
-    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: '\u00b7', color: C_BONE },
+    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: avgFmt(avgCw), color: C_BONE },
     { glyph: '\u2211', label: 'TOTAL', value: totalStr, avg: avgFmt(avgTotal), color: C_DIM },
   ]
+  const fa = fieldAvg
+  const DOT = '\u00b7'
+  const favgYield = fa?.yield_ != null ? (fa.yield_ >= 1000 ? `${(fa.yield_ / 1000).toFixed(1)}K` : fa.yield_.toFixed(2)) : '1.57'
   const derivedLines = [
-    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: '1.57', color: C_GOLD },
-    { glyph: 'SNR', label: 'SNR', value: snrStr, avg: '33%', color: C_GREEN },
-    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, avg: '3.2x', color: C_GREEN },
-    { glyph: 'VEL', label: 'VELOCITY', value: velStr, avg: '0.50', color: C_BONE },
-    { glyph: '\u26a1', label: '10X DEV', value: devStr, avg: '0.50', color: C_GOLD },
-    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: '\u00b7', color: C_BONE },
-    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, avg: '1.0x', color: C_GREEN },
-    { glyph: '$', label: 'COST/1M', value: costStr, avg: '\u00b7', color: C_DIM },
+    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: favgYield, color: C_GOLD },
+    { glyph: 'SNR', label: 'SNR', value: snrStr, avg: fa?.snr != null ? `${(fa.snr * 100).toFixed(0)}%` : '33%', color: C_GREEN },
+    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, avg: fa?.leverage != null ? `${fa.leverage.toFixed(1)}x` : '3.2x', color: C_GREEN },
+    { glyph: 'VEL', label: 'VELOCITY', value: velStr, avg: fa?.velocity != null ? fa.velocity.toFixed(1) : '0.50', color: C_BONE },
+    { glyph: '\u26a1', label: '10X DEV', value: devStr, avg: fa?.dev10x != null ? fa.dev10x.toFixed(2) : '0.50', color: C_GOLD },
+    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: fa?.scaleV != null ? fa.scaleV.toFixed(2) : DOT, color: C_BONE },
+    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, avg: fa?.efficiency != null ? `${fa.efficiency.toFixed(1)}x` : '1.0x', color: C_GREEN },
+    { glyph: '$', label: 'COST/1M', value: costStr, avg: fa?.costPerMillion != null ? `$${fa.costPerMillion.toFixed(2)}` : DOT, color: C_DIM },
   ]
 
   // Compute cumulative start delays
@@ -624,7 +658,7 @@ function Board({
           <MeterPanel
             meters={meterRows}
             heroValue={yieldStr}
-            heroAvg="1.57"
+            heroAvg={favgYield}
             reduced={reduced}
             replayKey={0}
           />
@@ -709,7 +743,7 @@ function Board({
         }}>
           <span style={{ color: '#5a8a5a' }}>OP RATIO <span style={{ color: '#4a6a4a', fontSize: '11px' }}>C:I:O</span></span>
           <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{opStr}</span>
-          <span style={{ color: '#6e8a6e' }}>avg 3.5:1:0.5</span>
+          <span style={{ color: '#6e8a6e' }}>avg {fieldAvg?.opRatio ?? '3.5:1:0.5'}</span>
         </div>
       </div>
     </div>
