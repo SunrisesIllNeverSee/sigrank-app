@@ -474,10 +474,16 @@ function Board({
   const normFrac = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
   const meterRows: MeterRow[] = (radarAxes ?? []).map((ax) => {
     const meta = meterMeta[ax.label]
-    // Fixed per-axis scale; the avg series plots at its true per-metric
-    // position so the field's actual silhouette shows (not a uniform ring).
-    const frac = normFrac(ax.value, ax.max)
-    const avgFrac = meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null
+    // Per-axis calibration: each axis scales to ITS OWN data — max = 1.25 ×
+    // the larger of (you, field avg) — then log-compressed (log1p) so
+    // order-of-magnitude gaps (e.g. 2000x leverage vs 3x avg) stay visible
+    // instead of pinning one vertex to the rim and the other to the center.
+    const youV = meta?.youNum ?? ax.value
+    const avgV = meta?.avgNum ?? null
+    const axisMax = Math.max(youV ?? 0, avgV ?? 0, 1e-9) * 1.25
+    const logN = (v: number) => Math.log1p(Math.max(0, v)) / Math.log1p(axisMax)
+    const frac = youV != null ? Math.max(0.02, Math.min(1, logN(youV))) : normFrac(ax.value, ax.max)
+    const avgFrac = avgV != null ? Math.max(0.02, Math.min(1, logN(avgV))) : null
     return {
       glyph: meta?.glyph ?? ax.label.slice(0, 3).toUpperCase(),
       label: ax.label,
@@ -618,18 +624,18 @@ function Board({
           {/* CENTER — the \u00a7 circle mark (landing-page logo), dead-center */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', flexShrink: 0 }}>
             <span style={{
-              width: '40px', height: '40px', borderRadius: '50%',
-              border: `3px solid ${GOLD_DARK}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '22px', fontWeight: 700, color: GOLD_DARK, lineHeight: 1,
+              width: '58px', height: '58px', borderRadius: '50%',
+              border: `4px solid ${GOLD_DARK}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '32px', fontWeight: 700, color: GOLD_DARK, lineHeight: 1,
               fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace', boxSizing: 'border-box',
             }}>{'\u00a7'}</span>
             <span style={{ fontSize: '9px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px', opacity: 0.7 }}>SIGRANK</span>
           </div>
           {/* RIGHT — Υ hero, right-aligned; cascade string rides beneath it */}
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', textAlign: 'right' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '1px', opacity: 0.7 }}>{'\u03a5'} YIELD</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
               <span style={{ fontSize: '46px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1, letterSpacing: '-1.5px' }}>{yieldStr}</span>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '1px', opacity: 0.7 }}>{'\u03a5'} YIELD</span>
             </div>
             <span style={{ fontSize: '11px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap', opacity: 0.85 }}>{cascadeStrVal}</span>
           </div>
