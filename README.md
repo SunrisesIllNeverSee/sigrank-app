@@ -1,6 +1,6 @@
 <div align="center">
 
-<p><img src="./.github/assets/og-card.png" alt="SigRank — the new standard in AI evaluation &amp; benchmarks" width="800"></p>
+<p><img src="./.github/assets/og-card-v2.png" alt="SigRank — the new standard in AI evaluation &amp; benchmarks" width="800"></p>
 
 **A privacy-preserving leaderboard for AI operator efficiency.**
 

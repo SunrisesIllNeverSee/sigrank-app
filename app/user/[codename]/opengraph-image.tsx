@@ -14,7 +14,7 @@
  * rest-state of the animated card.
  *
  * File-convention: Next auto-injects the og:image / twitter:image meta for
- * this route segment, overriding the site-wide /og.png.
+ * this route segment, overriding the site-wide /og-v2.png.
  */
 
 import { ImageResponse } from 'next/og'
