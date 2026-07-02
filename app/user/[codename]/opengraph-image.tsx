@@ -54,6 +54,12 @@ interface RadarRow { glyph: string; frac: number; avgFrac: number | null; you: s
 function radarSvg(rows: RadarRow[], svgSize: number) {
   const n = rows.length
   const cx = svgSize / 2, cy = svgSize / 2, radius = svgSize / 2 - 52
+  // Satori cannot render SVG <text>; axis labels are absolutely-positioned
+  // divs overlaid on the chart instead.
+  const labelAt = (i: number): { left: number; top: number } => {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / n
+    return { left: cx + Math.cos(a) * (radius + 30), top: cy + Math.sin(a) * (radius + 26) }
+  }
   const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
   const pt = (i: number, r: number): [number, number] => {
     const a = angleAt(i)
@@ -65,6 +71,7 @@ function radarSvg(rows: RadarRow[], svgSize: number) {
       .join(' ')
 
   return (
+    <div style={{ display: 'flex', position: 'relative', width: svgSize, height: svgSize }}>
     <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
       {[0.25, 0.5, 0.75, 1].map((ring) => (
         <polygon
@@ -96,27 +103,28 @@ function radarSvg(rows: RadarRow[], svgSize: number) {
         const [x, y] = pt(i, Math.max(0.02, r.frac) * radius)
         return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={5} fill={INK} />
       })}
-      {rows.map((r, i) => {
-        const [lx, ly] = pt(i, radius + 16)
-        const cos = Math.cos(angleAt(i))
-        const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
-        return (
-          <text key={`lb-${i}`} x={lx.toFixed(1)} y={(ly - 5).toFixed(1)} textAnchor={anchor} fontSize={13} fontWeight={800} fill={INK}>
-            {r.glyph}
-          </text>
-        )
-      })}
-      {rows.map((r, i) => {
-        const [lx, ly] = pt(i, radius + 16)
-        const cos = Math.cos(angleAt(i))
-        const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
-        return (
-          <text key={`val-${i}`} x={lx.toFixed(1)} y={(ly + 10).toFixed(1)} textAnchor={anchor} fontSize={11} fontWeight={900} fill={INK} opacity={0.6}>
-            {r.you}
-          </text>
-        )
-      })}
     </svg>
+    {rows.map((r, i) => {
+      const { left, top } = labelAt(i)
+      return (
+        <div
+          key={`lb-${i}`}
+          style={{
+            position: 'absolute',
+            left: left - 40,
+            top: top - 14,
+            width: 80,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', fontSize: 13, fontWeight: 800, color: INK }}>{r.glyph}</div>
+          <div style={{ display: 'flex', fontSize: 11, fontWeight: 900, color: INK, opacity: 0.6 }}>{r.you}</div>
+        </div>
+      )
+    })}
+    </div>
   )
 }
 
