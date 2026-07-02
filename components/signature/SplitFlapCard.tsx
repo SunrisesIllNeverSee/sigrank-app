@@ -615,10 +615,15 @@ function Board({
               {classTier} &middot; {(platform ?? '\u2014').toUpperCase()} &middot; {opStr}
             </span>
           </div>
-          {/* CENTER — SigRank logo mark, dead-center of the header zone */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px', flexShrink: 0 }}>
-            <span style={{ fontSize: '26px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1 }}>{'\u25c8'}</span>
-            <span style={{ fontSize: '10px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px', opacity: 0.7 }}>SIGRANK</span>
+          {/* CENTER — the \u00a7 circle mark (landing-page logo), dead-center */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', flexShrink: 0 }}>
+            <span style={{
+              width: '40px', height: '40px', borderRadius: '50%',
+              border: `3px solid ${GOLD_DARK}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '22px', fontWeight: 700, color: GOLD_DARK, lineHeight: 1,
+              fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace', boxSizing: 'border-box',
+            }}>{'\u00a7'}</span>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px', opacity: 0.7 }}>SIGRANK</span>
           </div>
           {/* RIGHT — Υ hero, right-aligned; cascade string rides beneath it */}
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', textAlign: 'right' }}>
