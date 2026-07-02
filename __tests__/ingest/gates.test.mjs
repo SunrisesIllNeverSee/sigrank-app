@@ -37,6 +37,17 @@ function plausibilityGate(p) {
   if (Number.isFinite(spanMin) && rt.active_minutes_est > spanMin + 1) out.push(['active_exceeds_window', 'flag'])
   const outPerMin = rt.tokens_output / Math.max(rt.active_minutes_est, 1)
   if (outPerMin > GATE_LIMITS.MAX_OUTPUT_TOKENS_PER_MIN) out.push(['implausible_output_rate', 'flag'])
+
+  // S1.2 cross-field ratio checks (defense in depth alongside the battery).
+  if (rt.tokens_cache_read > 1_000 && rt.tokens_cache_creation === 0) {
+    out.push(['cache_without_creation', 'flag'])
+  }
+  if (rt.tokens_cache_creation > 0 && rt.tokens_cache_read / rt.tokens_cache_creation > 100) {
+    out.push(['extreme_cache_ratio', 'flag'])
+  }
+  if (rt.active_minutes_est > 0 && rt.turns_total / rt.active_minutes_est > 50) {
+    out.push(['implausible_cadence', 'flag'])
+  }
   return out
 }
 
@@ -115,4 +126,30 @@ test('active minutes exceed the window span → flag active_exceeds_window', () 
     }),
   )
   assert.ok(codes(r).includes('active_exceeds_window'))
+})
+
+// S1.2 cross-field ratio checks
+
+test('cache_read > 1000 with cache_creation = 0 → flag cache_without_creation', () => {
+  const r = plausibilityGate(
+    cleanPayload({ raw_telemetry: { tokens_cache_read: 50_000, tokens_cache_creation: 0 } }),
+  )
+  assert.ok(codes(r).includes('cache_without_creation'))
+  assert.equal(decisionOf(r), 'flag')
+})
+
+test('cache_read/cache_creation > 100:1 → flag extreme_cache_ratio', () => {
+  const r = plausibilityGate(
+    cleanPayload({ raw_telemetry: { tokens_cache_read: 500_000, tokens_cache_creation: 100 } }),
+  )
+  assert.ok(codes(r).includes('extreme_cache_ratio'))
+  assert.equal(decisionOf(r), 'flag')
+})
+
+test('turns/active_minutes > 50 → flag implausible_cadence', () => {
+  const r = plausibilityGate(
+    cleanPayload({ raw_telemetry: { turns_total: 10_000, active_minutes_est: 10 } }),
+  )
+  assert.ok(codes(r).includes('implausible_cadence'))
+  assert.equal(decisionOf(r), 'flag')
 })

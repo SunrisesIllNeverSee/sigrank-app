@@ -113,6 +113,24 @@ export function plausibilityGate(p: SnapshotPayloadV1): GateReason[] {
   if (outPerMin > GATE_LIMITS.MAX_OUTPUT_TOKENS_PER_MIN) {
     out.push(flag('plausibility', 'implausible_output_rate', `${Math.round(outPerMin)} output tok/min > ${GATE_LIMITS.MAX_OUTPUT_TOKENS_PER_MIN}`))
   }
+
+  // Cross-field ratio checks (S1.2) — flag, not reject (avoids false positives on power users).
+  // These are defense-in-depth: the battery (Gate 5) checks the same patterns, but having them
+  // in the plausibility gate means they fire even if the battery is ever unwired.
+
+  // Impossible cascade: cache_read > 0 with cache_creation = 0 (must write cache before reading).
+  if (rt.tokens_cache_read > 1_000 && rt.tokens_cache_creation === 0) {
+    out.push(flag('plausibility', 'cache_without_creation', `${rt.tokens_cache_read} cache_read with 0 cache_creation (impossible cascade)`))
+  }
+  // Extreme cache ratio: cache_read/cache_creation > 100:1 (real max ~30:1 for power users).
+  if (rt.tokens_cache_creation > 0 && rt.tokens_cache_read / rt.tokens_cache_creation > 100) {
+    out.push(flag('plausibility', 'extreme_cache_ratio', `cache_read/cache_creation = ${(rt.tokens_cache_read / rt.tokens_cache_creation).toFixed(1)}:1 (real max ~30:1)`))
+  }
+  // Implausible cadence: turns/active_minutes > 50 (real sessions: 0.5-10/min).
+  if (rt.active_minutes_est > 0 && rt.turns_total / rt.active_minutes_est > 50) {
+    out.push(flag('plausibility', 'implausible_cadence', `${(rt.turns_total / rt.active_minutes_est).toFixed(1)} turns/min (real: 0.5-10)`))
+  }
+
   return out
 }
 
