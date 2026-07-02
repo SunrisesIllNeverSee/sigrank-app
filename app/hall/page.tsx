@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 import { getLeaderboard } from '@/lib/data'
+import { sortValue } from '@/lib/data/fallback'
 import {
   PLATFORM_UI,
   PLATFORM_DEFAULT,
@@ -127,17 +128,22 @@ async function HallContent({ searchParams }: PageProps) {
   // decorative) — picking a window narrows each record board to that window's
   // holders. TODO(HALL.WINDOW): owner may prefer the Hall to stay all-time-only
   // regardless of window; if so, drop windowFilter and treat window as a label.
-  const metricRows = await Promise.all(
-    ALL_BOARDS.map((b) =>
-      getLeaderboard({
-        sort: b.sort,
-        classScope: activeClass,
-        platform: platform === PLATFORM_DEFAULT ? null : platform,
-        window: windowEnum,
-        windowFilter: true,
-        limit: 10,
-      }),
-    ),
+  // One base fetch, N in-memory sorts: every board shares the same scope
+  // (class/platform/window) and getLeaderboard sorts in JS anyway, so 15
+  // parallel calls were 15x identical DB work. Fetch the scoped field once
+  // and derive each record board with sortValue (the same comparator
+  // getLeaderboard uses), re-ranking per board.
+  const baseRows = await getLeaderboard({
+    classScope: activeClass,
+    platform: platform === PLATFORM_DEFAULT ? null : platform,
+    window: windowEnum,
+    windowFilter: true,
+  })
+  const metricRows = ALL_BOARDS.map((b) =>
+    [...baseRows]
+      .sort((a, z) => sortValue(z, b.sort) - sortValue(a, b.sort))
+      .slice(0, 10)
+      .map((r, i) => ({ ...r, global_rank: i + 1 })),
   )
 
   // HALL-4: record-highlights ticker — the #1 holder of every board (cascade +
