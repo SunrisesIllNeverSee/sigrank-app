@@ -321,7 +321,7 @@ function Board({
   const outputStr = outputTokens != null ? fmtTokens(outputTokens) : '\u2014'
   const cacheReadStr = cacheRead != null ? fmtTokens(cacheRead) : '\u2014'
   const cacheCreateStr = cacheCreate != null ? fmtTokens(cacheCreate) : '\u2014'
-  const totalStr = (inputTokens && outputTokens && cacheRead && cacheCreate) ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '\u2014'
+  const totalStr = (inputTokens != null && outputTokens != null && cacheRead != null && cacheCreate != null) ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '\u2014'
   const opStr = opRatio ?? '\u2014'
   const cascadeStrVal = cascadeStr ?? '\u2014'
 
