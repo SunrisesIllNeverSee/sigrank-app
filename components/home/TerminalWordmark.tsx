@@ -21,7 +21,7 @@ import { TerminalBlockText } from '@/components/home/TerminalBlockText'
  * width without horizontal scroll. Reduced-motion: the CSS slows the cycle to a
  * 30s drift (never freezes — owner's a11y call).
  *
- * Optional nicety (included — reads clean): the ◈ ─── ◈ rule (SPLASH_RULE) +
+ * Optional nicety (included — reads clean): the ◈ ─── ◈ rule (SPLASH_RULE).
  */
 
 const SPLASH_RULE = '◈  ───────────────────────────────────────────  ◈'
