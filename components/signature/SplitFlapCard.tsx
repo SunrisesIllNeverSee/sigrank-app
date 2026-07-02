@@ -546,14 +546,19 @@ function Board({
   // average operating ratio 3.5 : 1 : 0.5 (cache : input : output, input-normalized).
   // i.e. "at your input volume, what a 3.5:1:0.5 operator would produce." The contrast
   // (your real cache_read >> 3.5\u00d7 input) is the leverage edge, made visible.
-  const R_CR = fieldAvg?.crRatio ?? 3.5
-  const R_OUT = fieldAvg?.outRatio ?? 0.5
-  const R_CW = fieldAvg?.cwRatio ?? null
+  // AVERAGE USER baseline = the measured average-AI-user operating ratio
+  // 3.5 : 1 : 0.5 (cache-read : input : output; cache-write ~0). This is a
+  // canonical population constant (real measured data), NOT the mean of the
+  // current leaderboard field — the field is power users; the column exists
+  // to show the contrast against the average user.
+  const R_CR = 3.5
+  const R_OUT = 0.5
   const avgIn = inputTokens ?? null
   const avgOut = avgIn != null ? avgIn * R_OUT : null
   const avgCache = avgIn != null ? avgIn * R_CR : null
-  const avgCw = avgIn != null && R_CW != null ? avgIn * R_CW : null
-  const avgTotal = avgIn != null ? avgIn + avgOut! + avgCache! + (avgCw ?? 0) : null
+  const avgCw = avgIn != null ? 0 : null // baseline user writes ~no cache
+  const avgTotal = avgIn != null ? avgIn * (1 + R_OUT + R_CR) : null
+  const DOT = '\u00b7'
   const avgFmt = (n: number | null) => (n != null ? fmtTokens(n) : '\u00b7')
 
   // value | metric name | AVG USER. Raw rows: avg = your-input \u00d7 the 3.5:1:0.5 ratio.
@@ -561,21 +566,19 @@ function Board({
     { glyph: 'IN', label: 'INPUT', value: inputStr, avg: avgFmt(avgIn), color: C_BONE },
     { glyph: 'OUT', label: 'OUTPUT', value: outputStr, avg: avgFmt(avgOut), color: C_GREEN },
     { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, avg: avgFmt(avgCache), color: C_GREEN },
-    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: avgFmt(avgCw), color: C_BONE },
+    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: avgIn != null ? '0' : DOT, color: C_BONE },
     { glyph: '\u2211', label: 'TOTAL', value: totalStr, avg: avgFmt(avgTotal), color: C_DIM },
   ]
-  const fa = fieldAvg
-  const DOT = '\u00b7'
-  const favgYield = fa?.yield_ != null ? (fa.yield_ >= 1000 ? `${(fa.yield_ / 1000).toFixed(1)}K` : fa.yield_.toFixed(2)) : '1.57'
+  const avgScl = avgTotal != null && avgTotal > 0 ? Math.log10(avgTotal).toFixed(2) : DOT
   const derivedLines = [
-    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: favgYield, color: C_GOLD },
-    { glyph: 'SNR', label: 'SNR', value: snrStr, avg: fa?.snr != null ? `${(fa.snr * 100).toFixed(0)}%` : '33%', color: C_GREEN },
-    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, avg: fa?.leverage != null ? `${fa.leverage.toFixed(1)}x` : '3.2x', color: C_GREEN },
-    { glyph: 'VEL', label: 'VELOCITY', value: velStr, avg: fa?.velocity != null ? fa.velocity.toFixed(1) : '0.50', color: C_BONE },
-    { glyph: '\u26a1', label: '10X DEV', value: devStr, avg: fa?.dev10x != null ? fa.dev10x.toFixed(2) : '0.50', color: C_GOLD },
-    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: fa?.scaleV != null ? fa.scaleV.toFixed(2) : DOT, color: C_BONE },
-    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, avg: fa?.efficiency != null ? `${fa.efficiency.toFixed(1)}x` : '1.0x', color: C_GREEN },
-    { glyph: '$', label: 'COST/1M', value: costStr, avg: fa?.costPerMillion != null ? `$${fa.costPerMillion.toFixed(2)}` : DOT, color: C_DIM },
+    { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: '1.57', color: C_GOLD },
+    { glyph: 'SNR', label: 'SNR', value: snrStr, avg: '33%', color: C_GREEN },
+    { glyph: 'LEV', label: 'LEVERAGE', value: levStr, avg: '3.2x', color: C_GREEN },
+    { glyph: 'VEL', label: 'VELOCITY', value: velStr, avg: '0.50', color: C_BONE },
+    { glyph: '\u26a1', label: '10X DEV', value: devStr, avg: '0.50', color: C_GOLD },
+    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: avgScl, color: C_BONE },
+    { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, avg: '1.0x', color: C_GREEN },
+    { glyph: '$', label: 'COST/1M', value: costStr, avg: '$2.31', color: C_DIM },
   ]
 
   // Compute cumulative start delays
@@ -658,7 +661,7 @@ function Board({
           <MeterPanel
             meters={meterRows}
             heroValue={yieldStr}
-            heroAvg={favgYield}
+            heroAvg="1.57"
             reduced={reduced}
             replayKey={0}
           />
@@ -743,7 +746,7 @@ function Board({
         }}>
           <span style={{ color: '#5a8a5a' }}>OP RATIO <span style={{ color: '#4a6a4a', fontSize: '11px' }}>C:I:O</span></span>
           <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{opStr}</span>
-          <span style={{ color: '#6e8a6e' }}>avg {fieldAvg?.opRatio ?? '3.5:1:0.5'}</span>
+          <span style={{ color: '#6e8a6e' }}>avg 3.5:1:0.5</span>
         </div>
       </div>
     </div>
