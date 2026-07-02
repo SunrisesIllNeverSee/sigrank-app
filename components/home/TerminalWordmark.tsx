@@ -22,7 +22,6 @@ import { TerminalBlockText } from '@/components/home/TerminalBlockText'
  * 30s drift (never freezes — owner's a11y call).
  *
  * Optional nicety (included — reads clean): the ◈ ─── ◈ rule (SPLASH_RULE) +
- * "For all builders, burners and 10xers" tagline under the wordmark.
  */
 
 const SPLASH_RULE = '◈  ───────────────────────────────────────────  ◈'
@@ -55,10 +54,9 @@ export function TerminalWordmark() {
         fontClassName="text-[clamp(0.6rem,3.2vw,1.7rem)]"
       />
 
-      {/* ◈ rule + tagline (SPLASH_RULE + "For all builders, burners and 10xers") */}
+      {/* ◈ rule (SPLASH_RULE) — tagline removed per owner 2026-07-02 */}
       <div className="flex flex-col items-center gap-1 font-mono text-[10px] text-text-dim sm:text-[11px]">
         <span>{SPLASH_RULE}</span>
-        <span className="text-text-secondary">For all builders, burners and 10xers</span>
       </div>
     </div>
   )
