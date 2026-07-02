@@ -11,7 +11,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { toPng } from 'html-to-image'
 import { track } from '@/lib/posthog/events'
-import type { FieldAverages } from '@/lib/data/field-average'
 
 export interface SplitFlapCardProps {
   codename: string
@@ -33,10 +32,6 @@ export interface SplitFlapCardProps {
   opRatio?: string | null
   cascadeStr?: string | null
   radarAxes?: { label: string; value: number; max: number }[]
-  /** Live per-metric field averages — single source for the AVG USER column,
-   *  the radar's field polygon, and the op-ratio footer. Absent → legacy
-   *  hardcoded references. */
-  fieldAvg?: FieldAverages | null
   showControls?: boolean
 }
 
@@ -179,144 +174,6 @@ function RadialRings({ axes, size, centerValue, reduced, replayKey }: { axes: Ra
   )
 }
 
-// ── You-vs-field radar (two series, ink on gold) ───────────────────────────
-// You = solid ink stroke + translucent fill; field avg = dashed faint overlay.
-// Fixed size in a fixed-height zone — geometry constant, nothing to crop.
-
-function TwoSeriesRadar({ rows, size, reduced, replayKey }: {
-  rows: MeterRow[]
-  size: number
-  reduced: boolean
-  replayKey: number
-}) {
-  const [grown, setGrown] = useState(reduced)
-  useEffect(() => {
-    if (reduced) { setGrown(true); return }
-    setGrown(false)
-    const t = setTimeout(() => setGrown(true), 60)
-    return () => clearTimeout(t)
-  }, [reduced, replayKey])
-
-  const n = rows.length
-  if (n < 3) return null
-  const INK = '#0a0a0a'
-  const cx = size / 2, cy = size / 2, radius = size / 2 - 52
-  const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
-  const pt = (i: number, r: number): [number, number] => {
-    const a = angleAt(i)
-    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]
-  }
-  const poly = (fracs: number[], scale: number) =>
-    fracs.map((f, i) => pt(i, Math.max(0.02, f) * radius * scale).map((v) => v.toFixed(1)).join(',')).join(' ')
-
-  const youFracs = rows.map((r) => r.frac)
-  const avgFracs = rows.map((r) => r.avgFrac ?? 0)
-  const scale = grown ? 1 : 0.05
-
-  return (
-    <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="You vs the average operator">
-      {[0.25, 0.5, 0.75, 1].map((ring) => (
-        <polygon key={ring}
-          points={rows.map((_, i) => pt(i, ring * radius).map((v) => v.toFixed(1)).join(',')).join(' ')}
-          fill="none" stroke="rgba(10,10,10,0.12)" strokeWidth={1} />
-      ))}
-      {rows.map((_, i) => {
-        const [x, y] = pt(i, radius)
-        return <line key={`sp-${i}`} x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(10,10,10,0.08)" strokeWidth={1} />
-      })}
-      {/* field average — dashed faint reference */}
-      <polygon points={poly(avgFracs, 1)}
-        fill="rgba(10,10,10,0.07)" stroke={INK} strokeWidth={1.5}
-        strokeDasharray="5 4" opacity={0.5} strokeLinejoin="round" />
-      {/* field-avg vertex markers — hollow, so the two series stay legible */}
-      {rows.map((r, i) => {
-        if (r.avgFrac == null) return null
-        const [x, y] = pt(i, Math.max(0.02, r.avgFrac) * radius)
-        return <circle key={`av-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={4}
-          fill="none" stroke={INK} strokeWidth={1.5} opacity={0.55} />
-      })}
-      {/* you — solid ink, animated grow */}
-      <polygon points={poly(youFracs, scale)}
-        fill="rgba(10,10,10,0.16)" stroke={INK} strokeWidth={3} strokeLinejoin="round"
-        style={{ transition: reduced ? 'none' : 'all 900ms cubic-bezier(.22,1,.36,1)' }} />
-      {rows.map((r, i) => {
-        const [x, y] = pt(i, Math.max(0.02, r.frac) * radius * scale)
-        return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={5} fill={INK}
-          style={{ transition: reduced ? 'none' : 'all 900ms cubic-bezier(.22,1,.36,1)' }} />
-      })}
-      {rows.map((r, i) => {
-        const [lx, ly] = pt(i, radius + 16)
-        const cos = Math.cos(angleAt(i))
-        const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
-        return (
-          <text key={`lb-${i}`} x={lx.toFixed(1)} y={(ly - 5).toFixed(1)} textAnchor={anchor} dominantBaseline="middle"
-            fontSize={13} fontWeight={800} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
-            {r.glyph}
-            {/* value stacked BELOW the glyph — short lines can't clip the viewBox edge */}
-            <tspan x={lx.toFixed(1)} dy={13} fontSize={11} fontWeight={900} opacity={0.6}>{r.you}</tspan>
-          </text>
-        )
-      })}
-    </svg>
-  )
-}
-
-// ── Meter panel (hero Υ + horizontal metric bars) ──────────────────────────
-// Fresh left-side viz: a hero stat + metric meters. Horizontal bars fit the
-// rectangular panel natively — nothing to crop. Each bar carries an avg-user
-// tick + dimmed avg label, so every fill reads "you vs the average operator."
-
-interface MeterRow { glyph: string; label: string; frac: number; you: string; avgFrac: number | null; avg: string | null }
-
-function MeterPanel({ meters, heroValue, heroAvg, reduced, replayKey }: {
-  meters: MeterRow[]
-  heroValue: string
-  heroAvg: string
-  reduced: boolean
-  replayKey: number
-}) {
-  const [grown, setGrown] = useState(reduced)
-  useEffect(() => {
-    if (reduced) { setGrown(true); return }
-    setGrown(false)
-    const t = setTimeout(() => setGrown(true), 60)
-    return () => clearTimeout(t)
-  }, [reduced, replayKey])
-
-  const INK = '#0a0a0a'
-
-  return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', width: '100%' }}>
-      {/* Hero stat — Υ yield, the one number that matters */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
-        <span style={{ fontSize: '84px', fontWeight: 900, color: INK, lineHeight: 1, letterSpacing: '-2px' }}>
-          {heroValue}
-        </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <span style={{ fontSize: '15px', fontWeight: 800, color: INK, letterSpacing: '1px' }}>{'Υ'} YIELD</span>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: INK, opacity: 0.45, letterSpacing: '0.5px' }}>avg {heroAvg}</span>
-        </div>
-      </div>
-
-      {/* You vs the field — two-series radar; the field-avg polygon is the
-          reference that makes the shape mean something */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-        <div style={{ width: '100%', maxWidth: '310px' }}>
-          <TwoSeriesRadar rows={meters} size={330} reduced={reduced} replayKey={replayKey} />
-        </div>
-        <div style={{ display: 'flex', gap: '18px', fontSize: '10px', fontWeight: 700, color: INK, letterSpacing: '1px' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '16px', height: '3px', background: INK, borderRadius: '2px' }} /> YOU
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', opacity: 0.55 }}>
-            <span style={{ width: '16px', height: '0px', borderTop: `2px dashed ${INK}` }} /> FIELD AVG
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── Print animation CSS ───────────────────────────────────────────────────
 
 const PRINT_CSS = `
@@ -445,7 +302,7 @@ function Board({
   cardRef, codename, name, yieldValue, classTier, platform,
   inputTokens, outputTokens, cacheRead, cacheCreate,
   snr, leverage, velocity, dev10x, scaleV, efficiency, costPerMillion,
-  opRatio, cascadeStr, radarAxes, fieldAvg, reduced,
+  opRatio, cascadeStr, radarAxes, reduced,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>
   reduced: boolean
@@ -473,45 +330,6 @@ function Board({
   const coloredAxes: RadarAxis[] = radarAxes && radarAxes.length >= 3
     ? radarAxes.map((a, i) => ({ ...a, color: radarColors[i % 6], glyph: radarGlyphs[i % 6] }))
     : []
-
-  // Meter rows — pair each radar axis (by label) with its display value and
-  // the average-operator reference. When fieldAvg carries a live average for
-  // a metric, the axis is normalized so THE FIELD AVERAGE SITS ON THE 50%
-  // RING (frac = you / 2*avg): the avg polygon becomes a regular reference
-  // shape and any vertex outside it reads "above the field" at a glance.
-  // Metrics without a live average fall back to the fixed per-metric max.
-  const fmtAvg = {
-    pct: (v: number) => `${(v * 100).toFixed(0)}%`,
-    x1: (v: number) => `${v.toFixed(1)}x`,
-    f1: (v: number) => v.toFixed(1),
-    f2: (v: number) => v.toFixed(2),
-  }
-  const meterMeta: Record<string, { glyph: string; you: string; youNum: number | null; avg: string | null; avgNum: number | null }> = {
-    'SNR':        { glyph: 'SNR', you: snrStr,   youNum: snr ?? null,        avgNum: fieldAvg?.snr ?? 0.33,       avg: fieldAvg?.snr != null ? fmtAvg.pct(fieldAvg.snr) : '33%' },
-    'Velocity':   { glyph: 'VEL', you: velStr,   youNum: velocity ?? null,   avgNum: fieldAvg?.velocity ?? 0.5,   avg: fieldAvg?.velocity != null ? fmtAvg.f1(fieldAvg.velocity) : '0.50' },
-    'Leverage':   { glyph: 'LEV', you: levStr,   youNum: leverage ?? null,   avgNum: fieldAvg?.leverage ?? 3.2,   avg: fieldAvg?.leverage != null ? fmtAvg.x1(fieldAvg.leverage) : '3.2x' },
-    '10xDEV':     { glyph: '\u26a1', you: devStr, youNum: dev10x ?? null,    avgNum: fieldAvg?.dev10x ?? 0.5,     avg: fieldAvg?.dev10x != null ? fmtAvg.f2(fieldAvg.dev10x) : '0.50' },
-    'Scale V':    { glyph: 'SCL', you: scaleStr, youNum: scaleV ?? null,     avgNum: fieldAvg?.scaleV ?? null,    avg: fieldAvg?.scaleV != null ? fmtAvg.f2(fieldAvg.scaleV) : null },
-    'Efficiency': { glyph: 'EFF', you: effStr,   youNum: efficiency ?? null, avgNum: fieldAvg?.efficiency ?? 1.0, avg: fieldAvg?.efficiency != null ? fmtAvg.x1(fieldAvg.efficiency) : '1.0x' },
-  }
-  const normFrac = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
-  const meterRows: MeterRow[] = (radarAxes ?? []).map((ax) => {
-    const meta = meterMeta[ax.label]
-    // Avg-anchored scaling when both numbers exist; legacy max-scaling otherwise.
-    const anchored = meta != null && meta.youNum != null && meta.avgNum != null && meta.avgNum > 0
-    const frac = anchored
-      ? Math.max(0.02, Math.min(1, meta.youNum! / (2 * meta.avgNum!)))
-      : normFrac(ax.value, ax.max)
-    const avgFrac = anchored ? 0.5 : meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null
-    return {
-      glyph: meta?.glyph ?? ax.label.slice(0, 3).toUpperCase(),
-      label: ax.label,
-      frac,
-      you: meta?.you ?? `${Math.round(frac * 100)}%`,
-      avgFrac,
-      avg: meta?.avg ?? null,
-    }
-  })
 
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
@@ -546,19 +364,10 @@ function Board({
   // average operating ratio 3.5 : 1 : 0.5 (cache : input : output, input-normalized).
   // i.e. "at your input volume, what a 3.5:1:0.5 operator would produce." The contrast
   // (your real cache_read >> 3.5\u00d7 input) is the leverage edge, made visible.
-  // AVERAGE USER baseline = the measured average-AI-user operating ratio
-  // 3.5 : 1 : 0.5 (cache-read : input : output; cache-write ~0). This is a
-  // canonical population constant (real measured data), NOT the mean of the
-  // current leaderboard field — the field is power users; the column exists
-  // to show the contrast against the average user.
-  const R_CR = 3.5
-  const R_OUT = 0.5
   const avgIn = inputTokens ?? null
-  const avgOut = avgIn != null ? avgIn * R_OUT : null
-  const avgCache = avgIn != null ? avgIn * R_CR : null
-  const avgCw = avgIn != null ? 0 : null // baseline user writes ~no cache
-  const avgTotal = avgIn != null ? avgIn * (1 + R_OUT + R_CR) : null
-  const DOT = '\u00b7'
+  const avgOut = avgIn != null ? avgIn * 0.5 : null
+  const avgCache = avgIn != null ? avgIn * 3.5 : null
+  const avgTotal = avgIn != null ? avgIn + avgOut! + avgCache! : null
   const avgFmt = (n: number | null) => (n != null ? fmtTokens(n) : '\u00b7')
 
   // value | metric name | AVG USER. Raw rows: avg = your-input \u00d7 the 3.5:1:0.5 ratio.
@@ -566,19 +375,18 @@ function Board({
     { glyph: 'IN', label: 'INPUT', value: inputStr, avg: avgFmt(avgIn), color: C_BONE },
     { glyph: 'OUT', label: 'OUTPUT', value: outputStr, avg: avgFmt(avgOut), color: C_GREEN },
     { glyph: 'CR', label: 'CACHE R', value: cacheReadStr, avg: avgFmt(avgCache), color: C_GREEN },
-    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: avgIn != null ? '0' : DOT, color: C_BONE },
+    { glyph: 'CW', label: 'CACHE W', value: cacheCreateStr, avg: '\u00b7', color: C_BONE },
     { glyph: '\u2211', label: 'TOTAL', value: totalStr, avg: avgFmt(avgTotal), color: C_DIM },
   ]
-  const avgScl = avgTotal != null && avgTotal > 0 ? Math.log10(avgTotal).toFixed(2) : DOT
   const derivedLines = [
     { glyph: '\u03a5', label: 'YIELD', value: yieldStr, avg: '1.57', color: C_GOLD },
     { glyph: 'SNR', label: 'SNR', value: snrStr, avg: '33%', color: C_GREEN },
     { glyph: 'LEV', label: 'LEVERAGE', value: levStr, avg: '3.2x', color: C_GREEN },
     { glyph: 'VEL', label: 'VELOCITY', value: velStr, avg: '0.50', color: C_BONE },
     { glyph: '\u26a1', label: '10X DEV', value: devStr, avg: '0.50', color: C_GOLD },
-    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: avgScl, color: C_BONE },
+    { glyph: 'SCL', label: 'SCALE V', value: scaleStr, avg: '\u00b7', color: C_BONE },
     { glyph: 'EFF', label: 'EFFICIENCY', value: effStr, avg: '1.0x', color: C_GREEN },
-    { glyph: '$', label: 'COST/1M', value: costStr, avg: '$2.31', color: C_DIM },
+    { glyph: '$', label: 'COST/1M', value: costStr, avg: '\u00b7', color: C_DIM },
   ]
 
   // Compute cumulative start delays
@@ -625,26 +433,23 @@ function Board({
           display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px',
         }}>
           <div style={{
-            flex: 1, minWidth: 0, height: '100%',
-            display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+            fontSize: `${nameSize}px`, fontWeight: 900, color: GOLD_DARK,
+            letterSpacing: '1px', lineHeight: 1.05, wordBreak: 'break-word',
+            flex: 1, minWidth: 0, maxHeight: '96px', overflow: 'hidden',
           }}>
-            <div style={{
-              fontSize: `${nameSize}px`, fontWeight: 900, color: GOLD_DARK,
-              letterSpacing: '1px', lineHeight: 1.05, wordBreak: 'break-word',
-              overflow: 'hidden',
-            }}>
-              {name.toUpperCase()}
-            </div>
-            {/* brand pinned to zone bottom-left — baseline-mirrors the op-ratio
-                line at the info block's bottom-right (symmetry, no dead gap) */}
-            <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
+            {name.toUpperCase()}
           </div>
           {/* Info block — top-right corner (yield moved to radar center) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', flexShrink: 0, textAlign: 'right' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', flexShrink: 0, textAlign: 'right' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{classTier} &middot; {(platform ?? '\u2014').toUpperCase()}</span>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{cascadeStrVal}</span>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{opStr}</span>
           </div>
+        </div>
+
+        {/* ── BRAND STRIP — FIXED 22px row ── */}
+        <div style={{ height: '22px', flexShrink: 0, display: 'flex', alignItems: 'center', marginTop: '6px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
         </div>
 
         {/* ── DIVIDER — FIXED 16px row at a constant y (padding 20 + header 96 +
@@ -654,17 +459,20 @@ function Board({
           <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
         </div>
 
-        {/* Meters — hero Υ + metric bars fill the space below the divider.
-            Rows are paired by radarAxes label (order: SNR, Velocity, Leverage,
-            10xDEV, Scale V, Efficiency per app/user/[codename]/page.tsx). */}
-        {meterRows.length >= 3 && (
-          <MeterPanel
-            meters={meterRows}
-            heroValue={yieldStr}
-            heroAvg="1.57"
-            reduced={reduced}
-            replayKey={0}
-          />
+        {/* Radar — fills remaining space below the divider */}
+        {coloredAxes.length >= 3 && (
+          <div style={{
+            flex: 1, minHeight: 0, overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+            width: '100%',
+          }}>
+            <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+              Cascade Signature
+            </span>
+            <div style={{ width: '100%', maxWidth: '520px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <RadialRings axes={coloredAxes} size={460} centerValue={yieldStr} reduced={reduced} replayKey={0} />
+            </div>
+          </div>
         )}
 
         {/* Footer divider + url */}
