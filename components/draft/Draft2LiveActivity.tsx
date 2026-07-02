@@ -30,7 +30,7 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       value: real ? (
         <span title="Live — total operators ranked">{fmtCount(stats.total_operators)}</span>
       ) : (
-        <Placeholder value="20" title="Placeholder — no real operator count yet" />
+        <Placeholder value="—" title="Placeholder — no real operator count yet" />
       ),
       label: 'Operators ranked',
       accent: false,
@@ -43,7 +43,7 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
           {stats.active_last_hour > 0 ? fmtCount(stats.active_last_hour) : '—'}
         </span>
       ) : (
-        <Placeholder value="1,847" title="Placeholder — no active-user telemetry yet" />
+        <Placeholder value="—" title="Placeholder — no active-user telemetry yet" />
       ),
       label: 'Active in the last hour',
       accent: true,
