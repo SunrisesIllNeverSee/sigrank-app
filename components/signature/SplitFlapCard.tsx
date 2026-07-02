@@ -175,13 +175,14 @@ function RadialRings({ axes, size, centerValue, reduced, replayKey }: { axes: Ra
 }
 
 // ── Meter panel (hero Υ + horizontal metric bars) ──────────────────────────
-// Fresh left-side viz: a hero stat + five meters. Horizontal bars fit the
-// rectangular panel natively — nothing to crop, no aspect-ratio fight.
-// Plain divs (no SVG viewBox), ink-on-gold monochrome, animated width.
+// Fresh left-side viz: a hero stat + metric meters. Horizontal bars fit the
+// rectangular panel natively — nothing to crop. Each bar carries an avg-user
+// tick + dimmed avg label, so every fill reads "you vs the average operator."
 
-function MeterPanel({ axes, displays, heroValue, heroAvg, reduced, replayKey }: {
-  axes: RadarAxis[]
-  displays: string[]
+interface MeterRow { glyph: string; label: string; frac: number; you: string; avgFrac: number | null; avg: string | null }
+
+function MeterPanel({ meters, heroValue, heroAvg, reduced, replayKey }: {
+  meters: MeterRow[]
   heroValue: string
   heroAvg: string
   reduced: boolean
@@ -196,10 +197,6 @@ function MeterPanel({ axes, displays, heroValue, heroAvg, reduced, replayKey }: 
   }, [reduced, replayKey])
 
   const INK = '#0a0a0a'
-  const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
-  // axes[0] is Υ — shown as the hero; bars render the rest.
-  const bars = axes.slice(1)
-  const barDisplays = displays.slice(1)
 
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', width: '100%' }}>
@@ -214,28 +211,38 @@ function MeterPanel({ axes, displays, heroValue, heroAvg, reduced, replayKey }: 
         </div>
       </div>
 
-      {/* Meter bars — one per metric, track + rounded ink fill + direct labels */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-        {bars.map((ax, i) => {
-          const frac = norm(ax.value, ax.max)
-          return (
-            <div key={`m-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: INK, letterSpacing: '1.5px', opacity: 0.85 }}>
-                  {ax.glyph}<span style={{ opacity: 0.5, fontWeight: 700, marginLeft: '8px', letterSpacing: '0.5px' }}>{ax.label.toUpperCase()}</span>
-                </span>
-                <span style={{ fontSize: '15px', fontWeight: 900, color: INK }}>{barDisplays[i] ?? ''}</span>
-              </div>
-              <div style={{ position: 'relative', height: '10px', borderRadius: '5px', background: 'rgba(10,10,10,0.10)', overflow: 'hidden' }}>
-                <div style={{
-                  position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: '5px',
-                  background: INK, width: `${(grown ? frac : 0) * 100}%`,
-                  transition: reduced ? 'none' : `width 900ms cubic-bezier(.22,1,.36,1) ${i * 110}ms`,
-                }} />
-              </div>
+      {/* Meter bars — track + rounded ink fill + avg tick ("you vs avg user") */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {meters.map((m, i) => (
+          <div key={`m-${m.glyph}`} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: INK, letterSpacing: '1.5px', opacity: 0.85 }}>
+                {m.glyph}<span style={{ opacity: 0.5, fontWeight: 700, marginLeft: '8px', letterSpacing: '0.5px' }}>{m.label.toUpperCase()}</span>
+              </span>
+              <span style={{ fontSize: '15px', fontWeight: 900, color: INK }}>
+                {m.you}
+                {m.avg != null && (
+                  <span style={{ fontSize: '10px', fontWeight: 700, opacity: 0.4, marginLeft: '8px' }}>avg {m.avg}</span>
+                )}
+              </span>
             </div>
-          )
-        })}
+            <div style={{ position: 'relative', height: '10px', borderRadius: '5px', background: 'rgba(10,10,10,0.10)' }}>
+              <div style={{
+                position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: '5px',
+                background: INK, width: `${(grown ? m.frac : 0) * 100}%`,
+                transition: reduced ? 'none' : `width 900ms cubic-bezier(.22,1,.36,1) ${i * 110}ms`,
+              }} />
+              {/* avg-user tick — the reference that makes the fill mean something */}
+              {m.avgFrac != null && (
+                <div style={{
+                  position: 'absolute', top: '-3px', bottom: '-3px', width: '2px',
+                  left: `calc(${(m.avgFrac * 100).toFixed(1)}% - 1px)`,
+                  background: INK, opacity: 0.55,
+                }} />
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -398,6 +405,30 @@ function Board({
     ? radarAxes.map((a, i) => ({ ...a, color: radarColors[i % 6], glyph: radarGlyphs[i % 6] }))
     : []
 
+  // Meter rows — pair each radar axis (by label) with its display value and
+  // the average-operator reference (same avgs the terminal panel prints).
+  // Unmatched labels fall back to a percent readout so nothing renders blank.
+  const meterMeta: Record<string, { glyph: string; you: string; avg: string | null; avgNum: number | null }> = {
+    'SNR':        { glyph: 'SNR', you: snrStr,   avg: '33%',  avgNum: 0.33 },
+    'Velocity':   { glyph: 'VEL', you: velStr,   avg: '0.50', avgNum: 0.5 },
+    'Leverage':   { glyph: 'LEV', you: levStr,   avg: '3.2x', avgNum: 3.2 },
+    '10xDEV':     { glyph: '\u26a1', you: devStr, avg: '0.50', avgNum: 0.5 },
+    'Scale V':    { glyph: 'SCL', you: scaleStr, avg: null,   avgNum: null },
+    'Efficiency': { glyph: 'EFF', you: effStr,   avg: '1.0x', avgNum: 1.0 },
+  }
+  const normFrac = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
+  const meterRows: MeterRow[] = (radarAxes ?? []).map((ax) => {
+    const meta = meterMeta[ax.label]
+    return {
+      glyph: meta?.glyph ?? ax.label.slice(0, 3).toUpperCase(),
+      label: ax.label,
+      frac: normFrac(ax.value, ax.max),
+      you: meta?.you ?? `${Math.round(normFrac(ax.value, ax.max) * 100)}%`,
+      avgFrac: meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null,
+      avg: meta?.avg ?? null,
+    }
+  })
+
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
 
@@ -500,23 +531,26 @@ function Board({
           display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px',
         }}>
           <div style={{
-            fontSize: `${nameSize}px`, fontWeight: 900, color: GOLD_DARK,
-            letterSpacing: '1px', lineHeight: 1.05, wordBreak: 'break-word',
-            flex: 1, minWidth: 0, maxHeight: '96px', overflow: 'hidden',
+            flex: 1, minWidth: 0, height: '100%',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
           }}>
-            {name.toUpperCase()}
+            <div style={{
+              fontSize: `${nameSize}px`, fontWeight: 900, color: GOLD_DARK,
+              letterSpacing: '1px', lineHeight: 1.05, wordBreak: 'break-word',
+              overflow: 'hidden',
+            }}>
+              {name.toUpperCase()}
+            </div>
+            {/* brand pinned to zone bottom-left — baseline-mirrors the op-ratio
+                line at the info block's bottom-right (symmetry, no dead gap) */}
+            <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
           </div>
           {/* Info block — top-right corner (yield moved to radar center) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', flexShrink: 0, textAlign: 'right' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', flexShrink: 0, textAlign: 'right' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{classTier} &middot; {(platform ?? '\u2014').toUpperCase()}</span>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{cascadeStrVal}</span>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{opStr}</span>
           </div>
-        </div>
-
-        {/* ── BRAND STRIP — FIXED 22px row ── */}
-        <div style={{ height: '22px', flexShrink: 0, display: 'flex', alignItems: 'center', marginTop: '6px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
         </div>
 
         {/* ── DIVIDER — FIXED 16px row at a constant y (padding 20 + header 96 +
@@ -526,11 +560,12 @@ function Board({
           <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
         </div>
 
-        {/* Meters — hero Υ + metric bars fill the space below the divider */}
-        {coloredAxes.length >= 3 && (
+        {/* Meters — hero Υ + metric bars fill the space below the divider.
+            Rows are paired by radarAxes label (order: SNR, Velocity, Leverage,
+            10xDEV, Scale V, Efficiency per app/user/[codename]/page.tsx). */}
+        {meterRows.length >= 3 && (
           <MeterPanel
-            axes={coloredAxes}
-            displays={[yieldStr, snrStr, levStr, devStr, scaleStr, effStr]}
+            meters={meterRows}
             heroValue={yieldStr}
             heroAvg="1.57"
             reduced={reduced}
