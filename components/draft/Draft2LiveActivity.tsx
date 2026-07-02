@@ -15,6 +15,8 @@ import type { HomepageStats } from '@/lib/data'
  * Server component — pure render from injected stats, no clock/RNG.
  */
 function fmtCount(n: number): string {
+  if (n >= 1_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(2)}T`
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
   return n.toLocaleString()
@@ -30,14 +32,15 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       ) : (
         <Placeholder value="20" title="Placeholder — no real operator count yet" />
       ),
-      label: 'Operators ranked across 6 platforms',
+      label: 'Operators ranked',
       accent: false,
     },
     {
       // Wired to operators.last_seen (daily-stale under ISR; the strip stays fogged).
+      // A zero counter reads as anti-social-proof — show "—" until the field is live.
       value: real ? (
         <span title="Active operators in the last hour (by last_seen)">
-          {fmtCount(stats.active_last_hour)}
+          {stats.active_last_hour > 0 ? fmtCount(stats.active_last_hour) : '—'}
         </span>
       ) : (
         <Placeholder value="1,847" title="Placeholder — no active-user telemetry yet" />
@@ -46,16 +49,24 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       accent: true,
     },
     {
-      // owner 2026-06-21: show the infinity symbol for the TRANSMITTER class.
-      value: <span title="TRANSMITTER class (K.01)" className="text-gold">∞</span>,
+      // TRANSMITTER class (K.01) — the real count from system_stats.transmitter_count.
+      // Was ∞ (read as broken, not exclusive); now the honest integer, "—" until live.
+      value: real ? (
+        <span title="TRANSMITTER class (K.01)" className="text-gold">
+          {stats.transmitter_count > 0 ? fmtCount(stats.transmitter_count) : '—'}
+        </span>
+      ) : (
+        <Placeholder value="—" title="Placeholder — transmitter count not wired yet" />
+      ),
       label: 'Operators in TRANSMITTER class',
       accent: false,
     },
     {
       // Wired to site_counters.comparisons_ran (bumped on a /compare matchup).
+      // Hide at zero — an empty counter is worse than no counter.
       value: real ? (
         <span title="Total head-to-head comparisons run">
-          {fmtCount(stats.comparisons_ran)}
+          {stats.comparisons_ran > 0 ? fmtCount(stats.comparisons_ran) : '—'}
         </span>
       ) : (
         <Placeholder value="—" title="Placeholder — comparison count not wired yet" />

@@ -479,7 +479,7 @@ export function LeaderboardTable({
             <thead>
               <tr>
                 <th colSpan={3} style={st.grp}>IDENTITY &amp; SCALE</th>
-                <th colSpan={6} style={{ ...st.grp, ...st.gdiv, color: T.gold }}>CASCADE YIELD</th>
+                <th colSpan={5} style={{ ...st.grp, ...st.gdiv, color: T.gold }}>CASCADE YIELD</th>
                 <th colSpan={3} style={{ ...st.grp, ...st.gdiv }}>COMPOSITION &amp; COST</th>
                 <th colSpan={2} style={{ ...st.grp, ...st.gdiv }}>ACTIVITY</th>
               </tr>
@@ -492,7 +492,6 @@ export function LeaderboardTable({
                 <th onClick={() => onSortColumn('velocity')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('velocity') ? st.colActive : null) }} title="Sort by Velocity"><span style={st.ic}>⚡</span>VEL{caret('velocity')}</th>
                 <th onClick={() => onSortColumn('leverage')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('leverage') ? st.colActive : null) }} title="Sort by Leverage"><span style={st.ic}>⚙</span>LEV{caret('leverage')}</th>
                 <th onClick={() => onSortColumn('dev10x')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('dev10x') ? st.colActive : null) }} title="Sort by 10xDEV"><span style={st.ic}>✧</span>10xDEV{caret('dev10x')}</th>
-                <th style={{ ...st.col, ...st.colR, opacity: 0.45 }} title="§igna on hold — formula not finalized">§IGNA</th>
                 <th onClick={() => onSortColumn('opRatio')} style={{ ...st.col, ...st.colR, ...st.gdiv, ...st.colSort, ...(isActive('opRatio') ? st.colActive : null) }} title="Sort by Op Ratio (lead term: leverage)"><span style={st.ic}>⋮</span>OP RATIO{caret('opRatio')}</th>
                 <th onClick={() => onSortColumn('efficiency')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('efficiency') ? st.colActive : null) }} title="Sort by Efficiency"><span style={st.ic}>◌</span>EFF{caret('efficiency')}</th>
                 <th onClick={() => onSortColumn('costPerMillion')} style={{ ...st.col, ...st.colR, ...st.colSort, ...(isActive('costPerMillion') ? st.colActive : null) }} title="Sort by $/1M (lower is better)"><span style={st.ic}>$</span>/1M{caret('costPerMillion')}</th>
@@ -526,7 +525,6 @@ export function LeaderboardTable({
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.velocity, e.velocity) }}>{f2(e.velocity)}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.leverage, e.leverage) }}>{fmtLev(e.leverage)}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.dev10x, e.dev10x) }}>{e.dev10x == null ? '—' : e.dev10x.toFixed(2)}</td>
-                    <td style={{ ...st.td, ...st.tdR, opacity: 0.4, color: T.mut }} title="§igna on hold">∞</td>
                     <td style={{ ...st.td, ...st.tdR, ...st.gdiv, fontSize: 11, color: T.mut }}>{e.opRatio ?? '—'}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.efficiency, e.efficiency) }}>{f2(e.efficiency)}</td>
                     <td style={{ ...st.td, ...st.tdR, ...podiumBox(top3.costPerMillion, e.costPerMillion) }}>{e.costPerMillion == null ? '—' : `$${e.costPerMillion.toFixed(2)}`}</td>

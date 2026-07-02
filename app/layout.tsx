@@ -40,13 +40,14 @@ const wmBlack = Archivo_Black({ subsets: ['latin'], weight: ['400'], variable: '
 
 export const metadata: Metadata = siteMetadata
 
-// Viewport — themeColor for each of the 4 themes so the browser chrome
-// (mobile address bar, PWA title bar) matches the active theme's bg.
+// Viewport — themeColor matches the SSR default theme (carbon = #0d0b08). The site
+// defaults to dark regardless of OS preference (data-theme="carbon" is the SSR default
+// + the no-flash THEME_INIT only overrides when a user has explicitly chosen a theme),
+// so a single dark themeColor avoids the white browser-chrome flash a light-pref media
+// branch would cause on the dark default. Users who switch to the paper (light) theme
+// get a dark chrome — a minor mismatch, far better than flashing white on the dark site.
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0d0b08' },   // carbon (default)
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },  // paper
-  ],
+  themeColor: '#0d0b08',
   colorScheme: 'dark light',
 }
 
