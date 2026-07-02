@@ -729,16 +729,19 @@ function Board({
           />
         ))}
 
-        {/* Operating-ratio footer strip — you vs the average 3.5:1:0.5 */}
+        {/* Operating-ratio footer — same 4-column grid as the metric rows, so
+            each cell lines up under its column head:
+            OP RATIO | your ratio | C:I:O | 3.5:1:0.5 */}
         <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 30px', borderTop: '1px solid #1a3a1a',
+          display: 'grid', gridTemplateColumns: COLS, alignItems: 'center',
+          padding: '10px 18px', borderTop: '1px solid #1a3a1a',
           fontSize: '15px', fontWeight: 700, letterSpacing: '0.5px',
           fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
         }}>
-          <span style={{ color: '#5a8a5a' }}>OP RATIO <span style={{ color: '#4a6a4a', fontSize: '11px' }}>C:I:O</span></span>
-          <span style={{ color: '#a8ffa8', fontWeight: 800, textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{opStr}</span>
-          <span style={{ color: '#6e8a6e' }}>avg 3.5:1:0.5</span>
+          <span style={{ color: '#5a8a5a' }}>OP RATIO</span>
+          <span style={{ color: '#a8ffa8', fontWeight: 800, textAlign: 'right', textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>{opStr}</span>
+          <span style={{ color: '#4a6a4a', fontSize: '11px', textAlign: 'center', paddingLeft: '24px' }}>C:I:O</span>
+          <span style={{ color: '#6e8a6e', textAlign: 'right' }}>3.5:1:0.5</span>
         </div>
       </div>
     </div>
