@@ -1,3 +1,7 @@
+> **🏆 SigRank is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
+> efficiently you use AI, not how much. See your projected rank in 60 seconds at
+> [signalaf.com/score](https://signalaf.com/score). *Token counts only. Never your prompts.*
+
 <div align="center">
 
 <p><img src="./.github/assets/og-card-v2.png" alt="SigRank — the new standard in AI evaluation &amp; benchmarks" width="800"></p>
