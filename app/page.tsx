@@ -52,15 +52,16 @@ export default async function HomePage() {
       <DeletedNotice />
       <Draft2Hero />
 
+      {/* The three degrees of leverage — our show-stopper, directly under the hero
+          (owner 2026-07-02: moved above the live board so the comparison table leads,
+          with the explanation underneath). Sources/footnotes + a link to the full wiki
+          description live inside the section. */}
+      <ThreeDegreesChart variant="embed" />
+
       {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
           the 4 MiniBoards were archived; "Real operators. Real cascades." moved into it).
-          First under the hero. */}
+          Now sits under the Three Degrees section. */}
       <Draft2LiveActivity stats={homeStats} />
-
-      {/* The three degrees of leverage — our show-stopper, directly under the live board,
-          with sources/footnotes above the chart + a link to the full wiki description
-          (owner 2026-06-22). */}
-      <ThreeDegreesChart variant="embed" />
 
       <HowItWorks />
       <IpBoundary />

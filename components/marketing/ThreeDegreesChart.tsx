@@ -284,25 +284,34 @@ export async function ThreeDegreesChart({ variant = 'full' }: { variant?: Varian
   if (variant === 'embed') {
     return (
       <div className="flex flex-col gap-3">
-        {/* eyebrow OUTSIDE the box (owner 2026-06-22) so the headline inside stays large */}
+        {/* eyebrow OUTSIDE the box (owner 2026-06-22) */}
         <div className="font-mono text-sm uppercase tracking-[0.2em] text-gold sm:text-base">
           ⊙ The three degrees of leverage
         </div>
 
         <section className="box-glow flex flex-col gap-5 rounded-2xl border border-gold/25 bg-gradient-to-b from-gold/5 to-bg-surface p-6 sm:p-8">
-          {/* Horizontal split: left third = headline, right two-thirds = the cascade
-              walkthrough (owner 2026-06-22: kill the dead space, 1/3 + 2/3). */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-            {/* left third — headline (eyebrow now lives above the box) */}
-            <div className="flex flex-col gap-2 md:col-span-1">
-              <h2 className="text-3xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
-                The baseline builds. The field caches.{' '}
-                <span className="text-gold">A few compound.</span>
-              </h2>
-            </div>
+          {/* Comparison table LEADS (owner 2026-07-02: table-first, explanation below).
+              The 1/3 + 2/3 headline/walkthrough split that used to sit above the table
+              now lives below it as a full-width explanation block. */}
+          <ComparisonTable rows={rows} />
 
-            {/* right two-thirds — the C:I:O cascade walkthrough, full width of its column */}
-            <div className="flex flex-col gap-3 text-base font-medium leading-relaxed text-text-secondary sm:text-lg md:col-span-2">
+          {/* under-chart footnote (owner 2026-06-22) */}
+          <p className="font-mono text-[11px] text-text-muted">
+            † Power users: median ~500 billion total tokens (n=10).
+          </p>
+
+          {/* footnotes/sources (owner: kept with the table) */}
+          <SourceMarkers />
+
+          {/* Explanation — headline + the C:I:O cascade walkthrough, full width
+              (owner 2026-07-02: was a 1/3 + 2/3 split above the table; now below it,
+              full-width, since the table is the lead). */}
+          <div className="mt-2 flex flex-col gap-4 border-t border-bg-border-subtle pt-6">
+            <h2 className="text-3xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
+              The baseline builds. The field caches.{' '}
+              <span className="text-gold">A few compound.</span>
+            </h2>
+            <div className="flex flex-col gap-3 text-base font-medium leading-relaxed text-text-secondary sm:text-lg">
               <p>
                 Read it as a token cascade: <strong className="text-text-primary">Cache : Input : Output</strong>.
                 Research pegs the average user near <strong className="text-text-primary">7 : 2 : 1</strong>, so
@@ -323,16 +332,6 @@ export async function ThreeDegreesChart({ variant = 'full' }: { variant?: Varian
               </p>
             </div>
           </div>
-
-          {/* footnotes/sources BEFORE the chart (owner) */}
-          <SourceMarkers />
-
-          <ComparisonTable rows={rows} />
-
-          {/* under-chart footnote (owner 2026-06-22) */}
-          <p className="font-mono text-[11px] text-text-muted">
-            † Power users: median ~500 billion total tokens (n=10).
-          </p>
 
           <Link
             href="/wiki/three-degrees"
