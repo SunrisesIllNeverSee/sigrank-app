@@ -34,8 +34,16 @@ export interface ProfileShareCardProps {
   metrics: { label: string; value: string; share: number }[]
 }
 
-const GOLD = '#e0b240'
-const GOLD_HI = '#f0c862'
+// ── Palette — mirrors the canonical SplitFlapCard design ────────────────────
+const GOLD_BG = '#c4923a'
+const INK = '#0a0a0a'
+const C_GREEN = '#8ae89a'
+const C_GOLD = '#f0c862'
+const C_DULL = '#6e8a6e'
+
+// Canonical measured average-AI-user operating ratio (cache-read:input:output).
+// A population constant, NOT a computed field mean — do not replace it.
+const AVG_RATIO = '3.5:1:0.5'
 
 function Card({
   cardRef,
@@ -46,72 +54,187 @@ function Card({
   topPct,
   metrics,
 }: { cardRef: React.RefObject<HTMLDivElement | null> } & Omit<ProfileShareCardProps, 'codename'>) {
+  const upper = name.toUpperCase()
+  const nameSize = upper.length <= 12 ? 42 : upper.length <= 18 ? 34 : upper.length <= 26 ? 28 : 22
+  const heroValue = metrics[0]?.value ?? '—'
+  const identity = [signalClass, handle ? `@${handle}` : null, topPct != null ? `TOP ${topPct.toFixed(1)}%` : null]
+    .filter(Boolean)
+    .join(' · ')
+
   return (
     <div
       ref={cardRef}
       style={{
         width: 1200,
         height: 630,
-        background: '#0a0a0a',
-        color: '#f4f4f4',
-        fontFamily: 'var(--font-geist-mono), ui-monospace, monospace',
+        background: '#050605',
+        fontFamily: 'var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace',
         display: 'flex',
-        flexDirection: 'column',
-        padding: '54px 70px',
+        flexDirection: 'row',
         boxSizing: 'border-box',
-        position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* cascade wave backdrop */}
-      <svg width={1200} height={200} viewBox="0 0 1200 200" style={{ position: 'absolute', left: 0, bottom: 0, opacity: 0.16 }}>
-        <path d="M0,100 C200,40 400,160 600,100 C800,40 1000,160 1200,100 L1200,200 L0,200 Z" fill={GOLD} />
-      </svg>
-
-      {/* brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, color: GOLD, letterSpacing: 4 }}>
-        <div style={{ width: 16, height: 16, background: GOLD, transform: 'rotate(45deg)' }} />
-        SIGRANK
-      </div>
-
-      {/* identity + rank */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 34 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: 760 }}>
-          <div style={{ fontSize: 56, fontWeight: 700, lineHeight: 1.05 }}>{name}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 16, fontSize: 22, color: '#bbbbbb' }}>
-            <span style={{ background: '#1c1708', color: GOLD, padding: '6px 16px', borderRadius: 8, fontSize: 19, border: `1px solid #3a2f10` }}>
-              {signalClass}
+      {/* ═══ LEFT — gold identity panel (SplitFlapCard header language) ═══ */}
+      <div
+        style={{
+          width: 600,
+          height: 630,
+          background: GOLD_BG,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px 22px',
+          boxSizing: 'border-box',
+          flexShrink: 0,
+        }}
+      >
+        {/* Header zone — name+identity | § circle | Υ hero (label UNDER number) */}
+        <div style={{ height: 96, flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: nameSize, fontWeight: 900, color: INK, letterSpacing: 1, lineHeight: 1.05, overflow: 'hidden' }}>
+              {upper}
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: INK, letterSpacing: 0.3, whiteSpace: 'nowrap', opacity: 0.85 }}>
+              {identity}
             </span>
-            <span>{[handle ? `@${handle}` : null, topPct != null ? `Top ${topPct.toFixed(1)}%` : null].filter(Boolean).join(' · ')}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, flexShrink: 0 }}>
+            <span
+              style={{
+                width: 58,
+                height: 58,
+                borderRadius: '50%',
+                border: `4px solid ${INK}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 32,
+                fontWeight: 700,
+                color: INK,
+                lineHeight: 1,
+                boxSizing: 'border-box',
+              }}
+            >
+              {'§'}
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: 3, opacity: 0.7 }}>SIGRANK</span>
+          </div>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', textAlign: 'right' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+              <span style={{ fontSize: 46, fontWeight: 900, color: INK, lineHeight: 1, letterSpacing: -1.5 }}>{heroValue}</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: INK, letterSpacing: 1, opacity: 0.7 }}>{'Υ'} YIELD</span>
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: INK, letterSpacing: 0.3, whiteSpace: 'nowrap', opacity: 0.85 }}>
+              {rank != null ? `GLOBAL RANK #${rank}` : 'UNRANKED'}
+            </span>
           </div>
         </div>
-        {rank != null ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <div style={{ fontSize: 92, color: GOLD, fontWeight: 800, lineHeight: 0.9 }}>#{rank}</div>
-            <div style={{ fontSize: 15, color: '#888', letterSpacing: 2.4, marginTop: 6 }}>GLOBAL RANK</div>
-          </div>
-        ) : (
-          <div style={{ fontSize: 22, color: '#888' }}>not ranked yet</div>
-        )}
-      </div>
 
-      {/* metric bars */}
-      <div style={{ display: 'flex', gap: 34, marginTop: 'auto', marginBottom: 26 }}>
-        {metrics.map((m) => (
-          <div key={m.label} style={{ display: 'flex', flexDirection: 'column', width: 200 }}>
-            <span style={{ fontSize: 34, color: GOLD_HI, fontWeight: 700 }}>{m.value}</span>
-            <div style={{ display: 'flex', width: '100%', height: 12, background: '#181818', borderRadius: 6, marginTop: 10 }}>
-              <div style={{ width: `${Math.max(4, Math.min(100, m.share * 100))}%`, height: 12, borderRadius: 6, background: GOLD }} />
+        {/* Divider — diamond + hairline */}
+        <div style={{ height: 16, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+          <div style={{ width: 7, height: 7, background: INK, transform: 'rotate(45deg)', flexShrink: 0 }} />
+          <div style={{ flex: 1, height: 2, background: INK, opacity: 0.2 }} />
+        </div>
+
+        {/* Headline metric meters — ink-on-gold bars */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 30 }}>
+          {metrics.map((m) => (
+            <div key={m.label} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: 1.4 }}>{m.label.toUpperCase()}</span>
+                <span style={{ fontSize: 26, fontWeight: 900, color: INK }}>{m.value}</span>
+              </div>
+              <div style={{ display: 'flex', width: '100%', height: 10, background: 'rgba(10,10,10,0.12)', borderRadius: 5 }}>
+                <div style={{ width: `${Math.max(4, Math.min(100, m.share * 100))}%`, height: 10, borderRadius: 5, background: INK }} />
+              </div>
             </div>
-            <span style={{ fontSize: 15, color: '#888', letterSpacing: 1.4, marginTop: 12 }}>{m.label.toUpperCase()}</span>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Footer divider + url */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <div style={{ flex: 1, height: 2, background: INK, opacity: 0.2 }} />
+          <div style={{ width: 7, height: 7, background: INK, transform: 'rotate(45deg)' }} />
+        </div>
+        <div style={{ fontSize: 9, color: INK, opacity: 0.3, letterSpacing: 1 }}>signalaf.com</div>
       </div>
 
-      {/* footer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid #241d08`, paddingTop: 20, fontSize: 22 }}>
-        <span style={{ color: GOLD }}>Join the board</span>
-        <span style={{ color: '#888' }}>signalaf.com</span>
+      {/* ═══ RIGHT — black terminal printout ═══ */}
+      <div
+        style={{
+          width: 600,
+          height: 630,
+          background: INK,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          boxSizing: 'border-box',
+          flexShrink: 0,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* CRT scanline overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 3px)',
+          }}
+        />
+
+        {/* Column header row */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '14px 28px 12px',
+            borderBottom: '1px solid #2a5a2a',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: 0.5,
+            color: C_DULL,
+          }}
+        >
+          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>TELEMETRY</span>
+          <span>WELCOME OPERATOR</span>
+        </div>
+
+        {/* Metric printout rows — phosphor green terminal */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 34, padding: '0 28px' }}>
+          {metrics.map((m) => (
+            <div key={m.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span style={{ fontSize: 20, fontWeight: 700, color: C_GREEN, letterSpacing: 1, textShadow: '0 0 7px rgba(138,232,154,0.45)' }}>
+                {m.label.toUpperCase()}
+              </span>
+              <span style={{ fontSize: 40, fontWeight: 800, color: C_GOLD, textShadow: '0 0 8px rgba(240,200,98,0.4)' }}>{m.value}</span>
+            </div>
+          ))}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <span style={{ fontSize: 20, fontWeight: 700, color: C_DULL, letterSpacing: 1 }}>JOIN THE BOARD</span>
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#a8ffa8', textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>signalaf.com</span>
+          </div>
+        </div>
+
+        {/* Average-user baseline footer — canonical C:I:O ratio */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '10px 18px',
+            borderTop: '1px solid #1a3a1a',
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: 0.5,
+          }}
+        >
+          <span style={{ color: '#5a8a5a' }}>AVERAGE USER</span>
+          <span style={{ color: '#4a6a4a', fontSize: 11 }}>C:I:O</span>
+          <span style={{ color: C_DULL }}>{AVG_RATIO}</span>
+        </div>
       </div>
     </div>
   )
