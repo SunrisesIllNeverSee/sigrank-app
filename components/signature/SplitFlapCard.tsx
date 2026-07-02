@@ -213,6 +213,7 @@ function formatLine(abbr: string, you: string, name: string, avg: string): strin
 
 // Weighted to content within the 60% (720px) panel: abbr narrow · your value ·
 // TELEMETRY (metric name) widest · AVERAGE USER. fr units flex with the panel.
+// CASCADE column (col 3) gets extra right padding to nudge it right slightly.
 const COLS = '0.6fr 1fr 1.6fr 1fr'
 const CELL_PAD = '0 18px'
 
@@ -249,8 +250,8 @@ function TypewriterLine({
     }}>
       <span style={{ color: '#8ae89a', fontWeight: 700, fontSize: '16px', letterSpacing: '0.5px', textShadow: '0 0 7px rgba(138,232,154,0.45)' }}>{rev(yEnd, name)}</span>
       <span style={{ color: '#6e8a6e', fontWeight: 800, textAlign: 'right' }}>{rev(aEnd, you)}</span>
-      {/* TELEMETRY: metric name — centered + glowing phosphor (the emphasis column) */}
-      <span style={{ color: glyphColor, fontWeight: 800, textAlign: 'center', textShadow: `0 0 8px ${glyphColor}88` }}>{rev(0, abbr)}</span>
+      {/* CASCADE: glyph/abbr — centered + glowing, nudged right slightly */}
+      <span style={{ color: glyphColor, fontWeight: 800, textAlign: 'center', paddingLeft: '24px', textShadow: `0 0 8px ${glyphColor}88` }}>{rev(0, abbr)}</span>
       <span style={{ color: '#6e8a6e', fontWeight: 700, textAlign: 'right' }}>{rev(nEnd, avg)}</span>
       {!done && <span className="print-cursor" style={{ color: '#a8ffa8', fontWeight: 800 }}>{'\u258c'}</span>}
     </div>
@@ -419,35 +420,33 @@ function Board({
           background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px)',
         }} />
 
-        {/* Name — TOP, largest */}
-        <div style={{
-          fontSize: '42px', fontWeight: 900, color: GOLD_DARK,
-          letterSpacing: '1px', lineHeight: 1.02, wordBreak: 'break-word',
-        }}>
-          {name.toUpperCase()}
+        {/* Top row: Name (left) + Yield (top right corner) */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+          <div style={{
+            fontSize: '42px', fontWeight: 900, color: GOLD_DARK,
+            letterSpacing: '1px', lineHeight: 1.02, wordBreak: 'break-word',
+            flex: 1, minWidth: 0,
+          }}>
+            {name.toUpperCase()}
+          </div>
+          {/* Yield — top right corner */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+              <span style={{ fontSize: '22px', fontWeight: 900, color: GOLD_DARK }}>{'\u03a5'}</span>
+              <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
+            </div>
+            <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1 }}>{yieldStr}</span>
+          </div>
         </div>
 
         {/* Brand row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
           <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>{'\u25c8'} SIGRANK</span>
           <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES &middot; MO&sect;ES&#8482;</span>
         </div>
 
-        {/* Yield headline */}
-        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '26px', fontWeight: 900, color: GOLD_DARK }}>{'\u03a5'}</span>
-          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
-          <span style={{ fontSize: '26px', fontWeight: 800, color: GOLD_DARK, marginLeft: 'auto' }}>{yieldStr}</span>
-        </div>
-
-        {/* Divider \u2014 anchors directly under \u03a5 / yield */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
-          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
-          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
-        </div>
-
-        {/* Info rows \u2014 CLASS/PLATFORM/CASCADE/OP RATIO, below the divider */}
-        <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '6px' }}>
+        {/* Info rows — CLASS/PLATFORM/CASCADE/OP RATIO, ABOVE the divider */}
+        <div style={{ marginTop: '10px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '6px' }}>
           {[
             ['CLASS', classTier],
             ['PLATFORM', (platform ?? '\u2014').toUpperCase()],
@@ -461,17 +460,24 @@ function Board({
           ))}
         </div>
 
-        {/* Radar — sized to fit the remaining space (no overflow into the info block) */}
+        {/* Divider — stays in place, between info rows and chart */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
+          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
+        </div>
+
+        {/* Radar — enlarged to fill remaining space */}
         {coloredAxes.length >= 3 && (
           <div style={{
             flex: 1, minHeight: 0, overflow: 'hidden',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+            width: '100%',
           }}>
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Signature
             </span>
-            <div style={{ width: '340px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={340} centerValue={yieldStr} reduced={reduced} replayKey={0} />
+            <div style={{ width: '100%', maxWidth: '460px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+              <RadialRings axes={coloredAxes} size={460} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
         )}
@@ -518,7 +524,7 @@ function Board({
           {/* order: TELEMETRY | WELCOME | CASCADE | AVG. telemetry+cascade bright, operator+avg dull */}
           <span style={{ color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>TELEMETRY</span>
           <span style={{ textAlign: 'right' }}>WELCOME OPERATOR</span>
-          <span style={{ textAlign: 'center', color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>CASCADE</span>
+          <span style={{ textAlign: 'center', paddingLeft: '24px', color: '#8ae89a', textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>CASCADE</span>
           <span style={{ textAlign: 'right' }}>AVERAGE USER</span>
         </div>
 
