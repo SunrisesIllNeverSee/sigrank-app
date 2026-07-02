@@ -21,6 +21,7 @@
  */
 
 import { notFound, redirect } from 'next/navigation'
+import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getLeaderboard } from '@/lib/data'
 import { toEntry } from '@/lib/leaderboard/to-entry'
@@ -151,13 +152,26 @@ export default async function BoardWindowPage({
       />
 
       {/* Client wrapper: reads useSearchParams for platform/view filter state,
-          selects + filters from the pre-fetched datasets. No API calls. */}
-      <BoardTableClient
-        totalEntries={totalEntries}
-        platformEntries={platformEntries}
-        offEntries={offEntries.length > 0 ? offEntries : undefined}
-        window={isOff ? 'off' : win!.slug}
-      />
+          selects + filters from the pre-fetched datasets. Wrapped in <Suspense>
+          so useSearchParams() doesn't force a client-side render bailout during
+          static generation — the fallback renders in the static HTML. */}
+      <Suspense fallback={
+        <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
+          <div className="mb-4 h-8 rounded bg-bg-elevated" />
+          <div className="space-y-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-6 rounded bg-bg-elevated" />
+            ))}
+          </div>
+        </div>
+      }>
+        <BoardTableClient
+          totalEntries={totalEntries}
+          platformEntries={platformEntries}
+          offEntries={offEntries.length > 0 ? offEntries : undefined}
+          window={isOff ? 'off' : win!.slug}
+        />
+      </Suspense>
 
       {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
           of the board (after the table) per owner. */}
