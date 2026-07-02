@@ -27,6 +27,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { validateSnapshot } from '@/lib/payload/schema'
 import { runIngestGates, type GateContext } from '@/lib/ingest/gates'
+import { runBattery } from '@/lib/ingest/battery'
+import { checkAndStoreAttestation } from '@/lib/ingest/attestation'
 import { getSupabaseService } from '@/lib/supabase/server'
 import {
   materializeVerifiedSnapshot,
@@ -152,9 +154,12 @@ export async function POST(req: NextRequest) {
         ? device.agent_public_key
         : null,
     // Exact-hash dedup ONLY. isReplay is deliberately unwired → live-upload (§0.4):
-    // same (operator, window) with newer numbers UPSERTs; only an exact hash rejects.
+    // same (operator, window) with newer numbers UPSERTS; only an exact hash rejects.
     isDuplicateHash: () => dupHash,
     recentSubmissionCount: () => recentCount,
+    // Gate 5 battery — proprietary anomaly detection (Benford / cadence / contamination).
+    // Server-only plug-in; never shipped to the public repo or open agent.
+    battery: runBattery,
   }
 
   // 4. Ingest integrity gates (anti-gaming). First reject wins.
@@ -170,6 +175,27 @@ export async function POST(req: NextRequest) {
       },
       { status: 422 },
     )
+  }
+
+  // 4b. Source attestation cross-check (S1.3, v1.1 payloads only). If the payload
+  // includes source_attestation, cross-check it against historical attestations
+  // from this device and store the new entries. Tampering flags upgrade the gate
+  // decision from 'accept' to 'flag' (the submission is accepted-but-unverified).
+  if (payload.source_attestation && payload.source_attestation.length > 0 && svc) {
+    const attestation = await checkAndStoreAttestation(
+      payload,
+      payload.device_id,
+      device?.operator_id ?? null,
+    )
+    if (attestation.flags.length > 0) {
+      gate.reasons.push(...attestation.flags)
+      // Upgrade the decision to 'flag' if it was 'accept' — attestation tampering
+      // means the submission is not trusted enough to materialize onto the board.
+      if (gate.decision === 'accept') {
+        gate.decision = 'flag'
+        if (gate.tier === 'verified') gate.tier = 'flagged'
+      }
+    }
   }
 
   // 5. Persist (env-gated; ENROLLED devices only — operator resolved FROM THE DEVICE, §5.4).

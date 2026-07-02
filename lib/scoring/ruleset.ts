@@ -94,12 +94,33 @@ export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
 ]
 
 /**
- * RS.06 — Anti-gaming penalty rules. Disabled for MVP (CANON RS.06 = MVP off).
+ * RS.06 — Anti-gaming penalty rules. Enabled 2026-07-02 with a gentle penalty curve
+ * (10% Υ reduction per battery flag, max 40%). The ingest gate chain flags suspicious
+ * submissions; RS.06 applies the score-level penalty on top of the gate-level flag.
+ * This is the second line of defense: even if a fabricator passes the plausibility
+ * gate, the battery flags trigger a Υ penalty that drops them down the board.
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.06
 export const RS06_ANTI_GAMING = {
-  enabled: false,
+  enabled: true,
+  /** Υ penalty per battery flag (gentle: 10% per flag). */
+  penaltyPerFlag: 0.10,
+  /** Maximum total penalty (caps at 40% even with many flags). */
+  maxPenalty: 0.40,
 } as const
+
+/**
+ * applyRS06Penalty — reduce a yield based on the number of battery flags fired.
+ * Returns the original yield if RS.06 is disabled or no flags fired.
+ */
+export function applyRS06Penalty(yield_: number, batteryFlags: number): number {
+  if (!RS06_ANTI_GAMING.enabled || batteryFlags <= 0) return yield_
+  const penalty = Math.min(
+    batteryFlags * RS06_ANTI_GAMING.penaltyPerFlag,
+    RS06_ANTI_GAMING.maxPenalty,
+  )
+  return yield_ * (1 - penalty)
+}
 
 /**
  * RS.07 — Class promotion stickiness: consecutive scoring cycles a higher class
