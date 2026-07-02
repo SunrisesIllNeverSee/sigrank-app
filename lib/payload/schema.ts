@@ -35,14 +35,28 @@ export const payloadTierEnum = z.enum(['free', 'precision'])
 const isoDateTime = z.string().datetime({ offset: true })
 
 /**
- * snapshotPayloadSchema — Schema v1.0 (snapshot_payload.md).
+ * snapshotPayloadSchema — Schema v1.0 / v1.1 (snapshot_payload.md).
  * FAIL-CLOSED: every object is `.strict()`, so an unexpected/extra field is REJECTED
  * (status:'rejected', reason:'schema_invalid') — never silently stripped. This is the
  * P1-2 ingest gate: an allowlist enforced at the boundary, not a denylist. Bump
  * schema_version to evolve the shape; do not relax strictness for forward-compat.
+ *
+ * v1.1 (2026-07-02): adds the optional `source_attestation` block (S1.3 anti-gaming).
+ * v1.0 payloads are still accepted — attestation is optional, not required. The server
+ * cross-checks attestation across submissions when present (tampering detection).
  */
+export const sourceAttestationSchema = z.object({
+  path_hash: z.string().min(1),
+  content_hash: z.string().min(1),
+  mtime: z.number(),
+  size: z.number().int().min(0),
+  lines: z.number().int().min(0),
+  first_ts: isoDateTime.nullable().optional(),
+  last_ts: isoDateTime.nullable().optional(),
+}).strict()
+
 export const snapshotPayloadSchema = z.object({
-  schema_version: z.literal('1.0'),
+  schema_version: z.union([z.literal('1.0'), z.literal('1.1')]),
   codename: z.string().min(1),
   device_id: z.string().uuid(),
   submitted_at: isoDateTime,
@@ -108,6 +122,11 @@ export const snapshotPayloadSchema = z.object({
     snapshot_hash: z.string().min(1),
     public_key: z.string().min(1),
   }).strict(),
+
+  // v1.1: source attestation (S1.3 anti-gaming). Optional — v1.0 payloads omit it.
+  // When present, the server stores + cross-checks it across submissions to detect
+  // log tampering (a file whose content_hash changed but timestamps didn't = edited).
+  source_attestation: z.array(sourceAttestationSchema).optional(),
 }).strict()
 
 /** The validated Snapshot Payload type, inferred from the schema. */
