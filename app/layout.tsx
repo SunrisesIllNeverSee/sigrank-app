@@ -40,19 +40,19 @@ const wmBlack = Archivo_Black({ subsets: ['latin'], weight: ['400'], variable: '
 
 export const metadata: Metadata = siteMetadata
 
-// Viewport — themeColor matches the SSR default theme (carbon = #0d0b08). The site
-// defaults to dark regardless of OS preference (data-theme="carbon" is the SSR default
+// Viewport — themeColor matches the SSR default theme (terminal = #050605). The site
+// defaults to dark regardless of OS preference (data-theme="terminal" is the SSR default
 // + the no-flash THEME_INIT only overrides when a user has explicitly chosen a theme),
 // so a single dark themeColor avoids the white browser-chrome flash a light-pref media
 // branch would cause on the dark default. Users who switch to the paper (light) theme
 // get a dark chrome — a minor mismatch, far better than flashing white on the dark site.
 export const viewport: Viewport = {
-  themeColor: '#0d0b08',
+  themeColor: '#050605',
   colorScheme: 'dark light',
 }
 
 // No-flash theme init: applies the saved theme before the body content paints.
-// Runs synchronously as the first child of <body>. data-theme="carbon" is the
+// Runs synchronously as the first child of <body>. data-theme="terminal" is the
 // SSR default so dark renders correctly before this runs.
 const THEME_INIT = `(function(){try{var t=localStorage.getItem('sigrank-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`
 
@@ -64,7 +64,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="carbon"
+      data-theme="terminal"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} font-sans`}
     >
