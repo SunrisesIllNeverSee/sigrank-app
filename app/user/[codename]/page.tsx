@@ -44,6 +44,12 @@ import { operatorProfile } from '@/lib/jsonld'
 import HeatBar from '@/components/charts/HeatBar'
 import { TrackProfileView } from '@/components/analytics/TrackProfileView'
 
+// ISR: revalidate every 2 minutes so profile data stays current. The page reads
+// no cookies/searchParams (pure public profile), so it's ISR-eligible. The
+// data-layer cache (unstable_cache on getOperator etc.) provides the first-tier
+// cache; this export makes the CDN hold the rendered page too.
+export const revalidate = 120
+
 /**
  * Resolve the display name for an operator. display_name now carries both the
  * claimed operator's chosen name AND the seed's real handle (public tokscale

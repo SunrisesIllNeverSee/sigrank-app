@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe/server'
+import { getSessionOperator } from '@/lib/supabase/auth-server'
 import type { SupporterTier } from '@/lib/scoring/types'
 import { captureServer } from '@/lib/posthog/server'
 
@@ -77,8 +78,13 @@ export async function POST(req: Request) {
   }
 
   const siteUrl0 = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-  const operatorId0 =
-    body.operator_id && typeof body.operator_id === 'string' ? body.operator_id.slice(0, 256) : ''
+
+  // AUTH (2026-07-02): when a session exists, bind operator_id from the session
+  // and ignore the body value. This closes the "clobber someone's
+  // stripe_customer_id" medium — a logged-in operator can't inject another
+  // operator's id. Anonymous donations (no session) are still allowed.
+  const sessionOp = await getSessionOperator()
+  const operatorId0 = sessionOp?.operatorId ?? ''
 
   // ── Flow 1 — DONATION (one-time, pay-what-you-want) ──────────────────────────
   if (body.kind === 'donation') {
@@ -138,6 +144,12 @@ export async function POST(req: Request) {
         mode: 'subscription',
         line_items: [{ price, quantity: 1 }],
         metadata: { operator_id: operatorId0, kind: 'subscription' },
+        // subscription_data.metadata is what handleSubscriptionUpsert reads
+        // (Lane 1 fix: without this, subscription events arrive with empty
+        // metadata → customers pay, get nothing).
+        subscription_data: {
+          metadata: { operator_id: operatorId0, kind: 'subscription' },
+        },
         success_url: `${siteUrl0}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${siteUrl0}/upgrade/canceled`,
       })
@@ -169,13 +181,8 @@ export async function POST(req: Request) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
-  // Length-guard the optional operator_id before it reaches Stripe metadata
-  // (500-char/key limit). Overlong values would fail the API call or be
-  // silently truncated, breaking webhook reconciliation (P2 #11).
-  const operatorId =
-    body.operator_id && typeof body.operator_id === 'string'
-      ? body.operator_id.slice(0, 256)
-      : ''
+  // operator_id already resolved from the session above (operatorId0); reuse it.
+  const operatorId = operatorId0
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -185,6 +192,16 @@ export async function POST(req: Request) {
         operator_id: operatorId,
         tier,
         interval,
+      },
+      // subscription_data.metadata is what handleSubscriptionUpsert reads
+      // (Lane 1 fix: without this, subscription events arrive with empty
+      // metadata → customers pay, get nothing).
+      subscription_data: {
+        metadata: {
+          operator_id: operatorId,
+          tier,
+          interval,
+        },
       },
       success_url: `${siteUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/upgrade/canceled`,
