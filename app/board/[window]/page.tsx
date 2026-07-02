@@ -15,6 +15,7 @@
  */
 
 import { notFound, redirect } from 'next/navigation'
+import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getLeaderboard } from '@/lib/data'
 import { toEntry } from '@/lib/leaderboard/to-entry'
@@ -87,7 +88,6 @@ export default async function BoardWindowPage({
   searchParams: Promise<{ window?: string; platform?: string; view?: string }>
 }) {
   const { window: slug } = await params
-  const sp = await searchParams
 
   // Legacy alias (owner 2026-06-25): the old "everything" firehose was removed. Any
   // surviving /board/everything link forwards to the new default so it never 404s.
@@ -102,6 +102,68 @@ export default async function BoardWindowPage({
   // The route slug is the primary WINDOW selector (default board = /board/all = all_time).
   const win = isOff ? null : boardWindowBySlug(slug)
   if (!isOff && !win) notFound()
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
+          same animated <WaveHero/> as the Hall, with board-specific copy. */}
+      <WaveHero
+        eyebrow="📊 Burners 🔥 Builders 🧱 10×ers 🚀"
+        terminalText="SIGNALBOARD"
+        title={
+          <>
+            Burners, Builders &amp;{' '}
+            <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
+              10×ers
+            </span>
+          </>
+        }
+        subtitle={
+          <>
+            Four integers in, full ledger out. Every operator ranked by{' '}
+            <strong className="text-text-primary">Υ Yield</strong> — the architecture of the cascade,
+            not raw spend. Volume is noise; yield is signal.
+          </>
+        }
+      />
+
+      {/* Filter-driven content (searchParams) isolated behind <Suspense> so the
+          shell (hero + key) stays static + CDN-cacheable. revalidate=300 applies
+          to the shell; the table streams with the active filter. */}
+      <Suspense fallback={
+        <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
+          <div className="mb-4 h-8 rounded bg-bg-elevated" />
+          <div className="space-y-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-6 rounded bg-bg-elevated" />
+            ))}
+          </div>
+        </div>
+      }>
+        <BoardContent searchParams={searchParams} isOff={isOff} win={win} slug={slug} />
+      </Suspense>
+
+      {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
+          of the board (after the table) per owner. */}
+      <LeaderboardKey />
+    </div>
+  )
+}
+
+/** Filter-driven content — reads searchParams (dynamic API) inside <Suspense>
+ * so the page shell stays static and revalidate=300 takes effect. */
+async function BoardContent({
+  searchParams,
+  isOff,
+  win,
+  slug,
+}: {
+  searchParams: Promise<{ window?: string; platform?: string; view?: string }>
+  isOff: boolean
+  win: ReturnType<typeof boardWindowBySlug> | null
+  slug: string
+}) {
+  const sp = await searchParams
 
   // BOARD redesign (2026-06-27): the DEFAULT board is one operator-TOTAL row per
   // operator — preferring the operator's 'multi' snapshot (which already SUMS every
@@ -129,29 +191,7 @@ export default async function BoardWindowPage({
   const entries = rows.map(toEntry)
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
-          same animated <WaveHero/> as the Hall, with board-specific copy. */}
-      <WaveHero
-        eyebrow="📊 Burners 🔥 Builders 🧱 10×ers 🚀"
-        terminalText="SIGNALBOARD"
-        title={
-          <>
-            Burners, Builders &amp;{' '}
-            <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
-              10×ers
-            </span>
-          </>
-        }
-        subtitle={
-          <>
-            Four integers in, full ledger out. Every operator ranked by{' '}
-            <strong className="text-text-primary">Υ Yield</strong> — the architecture of the cascade,
-            not raw spend. Volume is noise; yield is signal.
-          </>
-        }
-      />
-
+    <>
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
@@ -177,10 +217,6 @@ export default async function BoardWindowPage({
         platform={platformLabelFor(platformFilter)}
         view={viewPlatforms ? 'platforms' : 'total'}
       />
-
-      {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
-          of the board (after the table) per owner. */}
-      <LeaderboardKey />
-    </div>
+    </>
   )
 }
