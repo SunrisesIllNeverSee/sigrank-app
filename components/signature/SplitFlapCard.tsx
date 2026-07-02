@@ -174,6 +174,80 @@ function RadialRings({ axes, size, centerValue, reduced, replayKey }: { axes: Ra
   )
 }
 
+// ── You-vs-field radar (two series, ink on gold) ───────────────────────────
+// You = solid ink stroke + translucent fill; field avg = dashed faint overlay.
+// Fixed size in a fixed-height zone — geometry constant, nothing to crop.
+
+function TwoSeriesRadar({ rows, size, reduced, replayKey }: {
+  rows: MeterRow[]
+  size: number
+  reduced: boolean
+  replayKey: number
+}) {
+  const [grown, setGrown] = useState(reduced)
+  useEffect(() => {
+    if (reduced) { setGrown(true); return }
+    setGrown(false)
+    const t = setTimeout(() => setGrown(true), 60)
+    return () => clearTimeout(t)
+  }, [reduced, replayKey])
+
+  const n = rows.length
+  if (n < 3) return null
+  const INK = '#0a0a0a'
+  const cx = size / 2, cy = size / 2, radius = size / 2 - 34
+  const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
+  const pt = (i: number, r: number): [number, number] => {
+    const a = angleAt(i)
+    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]
+  }
+  const poly = (fracs: number[], scale: number) =>
+    fracs.map((f, i) => pt(i, Math.max(0.02, f) * radius * scale).map((v) => v.toFixed(1)).join(',')).join(' ')
+
+  const youFracs = rows.map((r) => r.frac)
+  const avgFracs = rows.map((r) => r.avgFrac ?? 0)
+  const scale = grown ? 1 : 0.05
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="You vs the average operator">
+      {[0.25, 0.5, 0.75, 1].map((ring) => (
+        <polygon key={ring}
+          points={rows.map((_, i) => pt(i, ring * radius).map((v) => v.toFixed(1)).join(',')).join(' ')}
+          fill="none" stroke="rgba(10,10,10,0.12)" strokeWidth={1} />
+      ))}
+      {rows.map((_, i) => {
+        const [x, y] = pt(i, radius)
+        return <line key={`sp-${i}`} x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(10,10,10,0.08)" strokeWidth={1} />
+      })}
+      {/* field average — dashed faint reference */}
+      <polygon points={poly(avgFracs, 1)}
+        fill="rgba(10,10,10,0.07)" stroke={INK} strokeWidth={1.5}
+        strokeDasharray="5 4" opacity={0.5} strokeLinejoin="round" />
+      {/* you — solid ink, animated grow */}
+      <polygon points={poly(youFracs, scale)}
+        fill="rgba(10,10,10,0.16)" stroke={INK} strokeWidth={3} strokeLinejoin="round"
+        style={{ transition: reduced ? 'none' : 'all 900ms cubic-bezier(.22,1,.36,1)' }} />
+      {rows.map((r, i) => {
+        const [x, y] = pt(i, Math.max(0.02, r.frac) * radius * scale)
+        return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={5} fill={INK}
+          style={{ transition: reduced ? 'none' : 'all 900ms cubic-bezier(.22,1,.36,1)' }} />
+      })}
+      {rows.map((r, i) => {
+        const [lx, ly] = pt(i, radius + 20)
+        const cos = Math.cos(angleAt(i))
+        const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
+        return (
+          <text key={`lb-${i}`} x={lx.toFixed(1)} y={ly.toFixed(1)} textAnchor={anchor} dominantBaseline="middle"
+            fontSize={13} fontWeight={800} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
+            {r.glyph}
+            <tspan dx={5} fontSize={11} fontWeight={900} opacity={0.6}>{r.you}</tspan>
+          </text>
+        )
+      })}
+    </svg>
+  )
+}
+
 // ── Meter panel (hero Υ + horizontal metric bars) ──────────────────────────
 // Fresh left-side viz: a hero stat + metric meters. Horizontal bars fit the
 // rectangular panel natively — nothing to crop. Each bar carries an avg-user
@@ -211,38 +285,20 @@ function MeterPanel({ meters, heroValue, heroAvg, reduced, replayKey }: {
         </div>
       </div>
 
-      {/* Meter bars — track + rounded ink fill + avg tick ("you vs avg user") */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {meters.map((m, i) => (
-          <div key={`m-${m.glyph}`} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: INK, letterSpacing: '1.5px', opacity: 0.85 }}>
-                {m.glyph}<span style={{ opacity: 0.5, fontWeight: 700, marginLeft: '8px', letterSpacing: '0.5px' }}>{m.label.toUpperCase()}</span>
-              </span>
-              <span style={{ fontSize: '15px', fontWeight: 900, color: INK }}>
-                {m.you}
-                {m.avg != null && (
-                  <span style={{ fontSize: '10px', fontWeight: 700, opacity: 0.4, marginLeft: '8px' }}>avg {m.avg}</span>
-                )}
-              </span>
-            </div>
-            <div style={{ position: 'relative', height: '10px', borderRadius: '5px', background: 'rgba(10,10,10,0.10)' }}>
-              <div style={{
-                position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: '5px',
-                background: INK, width: `${(grown ? m.frac : 0) * 100}%`,
-                transition: reduced ? 'none' : `width 900ms cubic-bezier(.22,1,.36,1) ${i * 110}ms`,
-              }} />
-              {/* avg-user tick — the reference that makes the fill mean something */}
-              {m.avgFrac != null && (
-                <div style={{
-                  position: 'absolute', top: '-3px', bottom: '-3px', width: '2px',
-                  left: `calc(${(m.avgFrac * 100).toFixed(1)}% - 1px)`,
-                  background: INK, opacity: 0.55,
-                }} />
-              )}
-            </div>
-          </div>
-        ))}
+      {/* You vs the field — two-series radar; the field-avg polygon is the
+          reference that makes the shape mean something */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+        <div style={{ width: '100%', maxWidth: '310px' }}>
+          <TwoSeriesRadar rows={meters} size={330} reduced={reduced} replayKey={replayKey} />
+        </div>
+        <div style={{ display: 'flex', gap: '18px', fontSize: '10px', fontWeight: 700, color: INK, letterSpacing: '1px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <span style={{ width: '16px', height: '3px', background: INK, borderRadius: '2px' }} /> YOU
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', opacity: 0.55 }}>
+            <span style={{ width: '16px', height: '0px', borderTop: `2px dashed ${INK}` }} /> FIELD AVG
+          </span>
+        </div>
       </div>
     </div>
   )
