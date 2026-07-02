@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { CascadeHeader } from '@/components/home/CascadeHeader'
 import { RotatingWordmark } from '@/components/home/RotatingWordmark'
 import { TerminalWordmark } from '@/components/home/TerminalWordmark'
@@ -44,6 +45,16 @@ export function Draft2Hero() {
           powered by MO§ES™
         </span>
 
+        {/* privacy badge — the differentiator every launch post leans on, surfaced
+            at the brand level so a stranger landing from X/HN sees it first (GTM
+            Phase C front-door fix, 2026-07-02). */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/5 px-4 py-1.5">
+          <span className="text-gold">⊙</span>
+          <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-text-primary sm:text-sm">
+            Token counts only. Never your prompts.
+          </span>
+        </div>
+
         <div className="h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
 
         {/* body — "We measure…" starts on a new line (owner). text-balance evens the
@@ -59,6 +70,18 @@ export function Draft2Hero() {
             Fair warning: the blade cuts both ways.
           </p>
         </div>
+
+        {/* primary CTA — the personal hook (GTM Phase C front-door fix, 2026-07-02).
+            A stranger landing from a launch post sees the privacy badge + this CTA
+            above the fold → /score gives them an instant cascade preview (no account,
+            no save). The action tiles below are secondary navigation. */}
+        <Link
+          href="/score"
+          className="group inline-flex items-center gap-2 rounded-lg border border-gold bg-gold/10 px-6 py-3 font-mono text-sm font-bold uppercase tracking-[0.14em] text-gold transition-all duration-200 hover:bg-gold/20 hover:shadow-lg hover:shadow-gold/20 sm:text-base"
+        >
+          Compute your Υ
+          <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+        </Link>
 
         {/* four action tiles — Measure · Board · Compare · Info·Wiki (shared component).
             Shine-sweep glint on too (owner 2026-06-22: add it to the header boxes). */}
