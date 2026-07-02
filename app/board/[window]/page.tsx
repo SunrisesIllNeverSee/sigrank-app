@@ -12,47 +12,25 @@
  * was redundant. LB-1: a real page heading now leads the board (was none).
  *
  * The four windows are statically generated. An unknown slug → 404.
+ *
+ * CACHING (2026-07-02): the page no longer reads searchParams (which forced
+ * dynamic rendering + no-store). Both operatorTotal + perPlatform data variants
+ * are pre-fetched on the server; the client wrapper (BoardTableClient) reads
+ * useSearchParams and selects/filters the right dataset. This keeps the page
+ * static + CDN-cacheable (revalidate=300) while preserving filter functionality.
  */
 
 import { notFound, redirect } from 'next/navigation'
-import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getLeaderboard } from '@/lib/data'
 import { toEntry } from '@/lib/leaderboard/to-entry'
 import { boardWindowBySlug, BOARD_WINDOWS } from '@/lib/data/windows'
-import { PLATFORM_DOMAIN_MAP, type PlatformUI } from '@/lib/constants'
-import { LeaderboardTable } from '@/components/sigrank'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { LeaderboardKey } from '@/components/leaderboard/LeaderboardKey'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { leaderboardItemList, sigrankDataset } from '@/lib/jsonld'
 import { withOG } from '@/lib/seo'
-
-/**
- * Normalize a ?platform= search param to a `primary_domain` filter value (lowercase)
- * the facade understands, or null when absent / 'all' / unrecognized. Accepts both
- * the domain value ('claude') and the UI label ('Claude'). Keeps the board's platform
- * filter URL-driven (BOARD redesign, 2026-06-27) without trusting arbitrary input.
- */
-function normalizePlatform(raw: string | undefined): string | null {
-  if (!raw) return null
-  const v = raw.trim().toLowerCase()
-  if (!v || v === 'all') return null
-  // Accept any known primary_domain value from the UI→domain map.
-  const domains = new Set(
-    (Object.values(PLATFORM_DOMAIN_MAP).filter(Boolean) as string[]).map((d) => d.toLowerCase()),
-  )
-  return domains.has(v) ? v : null
-}
-
-/** Resolve the ?platform= filter back to its UI label so the table dropdown reflects it. */
-function platformLabelFor(domain: string | null): PlatformUI {
-  if (!domain) return 'All'
-  const entry = (Object.entries(PLATFORM_DOMAIN_MAP) as [PlatformUI, string | null][]).find(
-    ([, d]) => d?.toLowerCase() === domain,
-  )
-  return entry ? entry[0] : 'All'
-}
+import { BoardTableClient } from '@/components/board/BoardTableClient'
 
 // D19: cache leaderboard reads for 300s (Cache-Control max-age=300 equivalent).
 export const revalidate = 300
@@ -82,10 +60,8 @@ export async function generateMetadata({
 
 export default async function BoardWindowPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ window: string }>
-  searchParams: Promise<{ window?: string; platform?: string; view?: string }>
 }) {
   const { window: slug } = await params
 
@@ -102,6 +78,39 @@ export default async function BoardWindowPage({
   // The route slug is the primary WINDOW selector (default board = /board/all = all_time).
   const win = isOff ? null : boardWindowBySlug(slug)
   if (!isOff && !win) notFound()
+
+  // Pre-fetch BOTH data variants on the server so the page is fully static
+  // (no searchParams access → revalidate=300 takes effect → CDN-cached).
+  // The client wrapper (BoardTableClient) selects + filters the right dataset
+  // based on useSearchParams. The "off" board only needs allSnapshots.
+  let totalEntries: ReturnType<typeof toEntry>[] = []
+  let platformEntries: ReturnType<typeof toEntry>[] = []
+  let offEntries: ReturnType<typeof toEntry>[] = []
+
+  if (isOff) {
+    const rows = await getLeaderboard({ allSnapshots: true })
+    offEntries = rows.map(toEntry)
+  } else {
+    // operatorTotal: one row per operator (the 'multi' roll-up when present).
+    const totalRows = await getLeaderboard({
+      window: win!.enum,
+      windowFilter: true,
+      operatorTotal: true,
+    })
+    totalEntries = totalRows.map(toEntry)
+
+    // perPlatform: one row per (operator, platform) — for ?view=platforms.
+    const platformRows = await getLeaderboard({
+      window: win!.enum,
+      windowFilter: true,
+      perPlatform: true,
+    })
+    platformEntries = platformRows.map(toEntry)
+  }
+
+  // JsonLd from the default (operatorTotal) entries — search engines see the
+  // default board. Filtered variants are client-side and don't need structured data.
+  const jsonLdEntries = isOff ? offEntries : totalEntries
 
   return (
     <div className="flex flex-col gap-6">
@@ -127,76 +136,11 @@ export default async function BoardWindowPage({
         }
       />
 
-      {/* Filter-driven content (searchParams) isolated behind <Suspense> so the
-          shell (hero + key) stays static + CDN-cacheable. revalidate=300 applies
-          to the shell; the table streams with the active filter. */}
-      <Suspense fallback={
-        <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
-          <div className="mb-4 h-8 rounded bg-bg-elevated" />
-          <div className="space-y-2">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-6 rounded bg-bg-elevated" />
-            ))}
-          </div>
-        </div>
-      }>
-        <BoardContent searchParams={searchParams} isOff={isOff} win={win} slug={slug} />
-      </Suspense>
-
-      {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
-          of the board (after the table) per owner. */}
-      <LeaderboardKey />
-    </div>
-  )
-}
-
-/** Filter-driven content — reads searchParams (dynamic API) inside <Suspense>
- * so the page shell stays static and revalidate=300 takes effect. */
-async function BoardContent({
-  searchParams,
-  isOff,
-  win,
-  slug,
-}: {
-  searchParams: Promise<{ window?: string; platform?: string; view?: string }>
-  isOff: boolean
-  win: ReturnType<typeof boardWindowBySlug> | null
-  slug: string
-}) {
-  const sp = await searchParams
-
-  // BOARD redesign (2026-06-27): the DEFAULT board is one operator-TOTAL row per
-  // operator — preferring the operator's 'multi' snapshot (which already SUMS every
-  // platform, so we never re-sum claude+codex+multi), all_time window. The breakdowns
-  // are driven by URL searchParams, NOT hardcoded:
-  //   ?platform=claude|codex|…  → filter the board to one platform
-  //   ?view=platforms           → flip to the per-platform breakdown (one row per
-  //                               (operator, platform); the old perPlatform behaviour)
-  // The route slug still picks the window; with no params the slug board is the clean
-  // single-total-row default. /board/off (allSnapshots) is unchanged.
-  const platformFilter = normalizePlatform(sp.platform)
-  const viewPlatforms = sp.view === 'platforms'
-
-  const rows = isOff
-    ? await getLeaderboard({ allSnapshots: true })
-    : await getLeaderboard({
-        window: win!.enum,
-        windowFilter: true,
-        // ?view=platforms → per-platform breakdown; default → one operator-total row.
-        ...(viewPlatforms ? { perPlatform: true } : { operatorTotal: true }),
-        // ?platform=… narrows to a single platform's rows (matched on primary_domain /
-        // the per-row platform); 'all'/absent leaves the board unfiltered.
-        ...(platformFilter ? { platform: platformFilter } : {}),
-      })
-  const entries = rows.map(toEntry)
-
-  return (
-    <>
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
           leaderboardItemList(
-            entries.map((e) => ({
+            jsonLdEntries.map((e) => ({
               codename: e.codename,
               rank: e.rank,
               classTier: e.signalClass,
@@ -206,17 +150,18 @@ async function BoardContent({
         ]}
       />
 
-      {/* Window switcher removed (owner 2026-06-24): the window selector now lives INSIDE
-          the leaderboard box (LeaderboardTable's Window dropdown, incl. the "off" view).
-          BOARD redesign (2026-06-27): the Platform dropdown + the "by platform" toggle now
-          DRIVE the URL (?platform / ?view=platforms); their initial value reflects the URL. */}
-      <LeaderboardTable
-        entries={entries}
-        totalUsers={rows.length}
+      {/* Client wrapper: reads useSearchParams for platform/view filter state,
+          selects + filters from the pre-fetched datasets. No API calls. */}
+      <BoardTableClient
+        totalEntries={totalEntries}
+        platformEntries={platformEntries}
+        offEntries={offEntries.length > 0 ? offEntries : undefined}
         window={isOff ? 'off' : win!.slug}
-        platform={platformLabelFor(platformFilter)}
-        view={viewPlatforms ? 'platforms' : 'total'}
       />
-    </>
+
+      {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
+          of the board (after the table) per owner. */}
+      <LeaderboardKey />
+    </div>
   )
 }
