@@ -19,7 +19,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { getOperator, getOperatorHistory, getOperatorSubmissions } from '@/lib/data'
+import { getLeaderboard, getOperator, getOperatorHistory, getOperatorSubmissions } from '@/lib/data'
+import { computeFieldAverages } from '@/lib/data/field-average'
 import { decodeCodename } from '@/lib/route-params'
 import { withOG } from '@/lib/seo'
 import type { Operator } from '@/lib/scoring/types'
@@ -130,6 +131,11 @@ export default async function OperatorProfilePage({
   // Headline metrics for the downloadable share card (ProfileShareCard). Bars are
   // normalized to a sensible per-metric ceiling so the fill reads as "where you
   // sit" — honest + bounded, no extra board query needed.
+  // Field averages for the share card: every "average operator" reference on
+  // the card (AVG USER column, radar field polygon, op-ratio footer) comes
+  // from the live board, so they always agree and move with the field.
+  const fieldAvg = computeFieldAverages(await getLeaderboard())
+
   const ranked = !pending && c && !c.nonCompounding
   const shareMetrics =
     ranked && c
@@ -512,6 +518,7 @@ export default async function OperatorProfilePage({
           opRatio={c.opRatio}
           cascadeStr={c.cascadeStr}
           radarAxes={radarAxes}
+          fieldAvg={fieldAvg}
         />
       )}
 
