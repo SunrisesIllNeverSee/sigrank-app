@@ -6,7 +6,7 @@
  * `withOG({ title, description, ... })` to layer page-specific fields on top
  * of the site defaults.
  *
- * The static OG image is /og.png (1200×630, committed to /public). Per-page
+ * The static OG image is /og-v2.png (1200×630, committed to /public). Per-page
  * dynamic images were attempted with Satori and reverted (was 500ing); the
  * static image + dynamic title/description approach is simpler and reliable.
  */
@@ -17,14 +17,16 @@ import type { Metadata } from 'next'
 export const SITE_ORIGIN = 'https://signalaf.com'
 export const SITE_NAME = 'SigRank'
 export const SITE_TAGLINE =
-  'The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned? Volume is noise; yield is signal. Privacy-preserving, token-telemetry, cascade-ranked.'
+  'Burners · Builders · 10Xer’s. The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?'
 
 /** Static OG image (1200×630 brand card). MUST be a raster PNG/JPG — X, LinkedIn,
  *  Facebook, iMessage, Slack, and Discord all reject SVG for link-preview cards, so
- *  an SVG og:image renders blank everywhere. /og.png is generated from /og.svg
- *  (rsvg-convert -w 1200 -h 630). Keep the .png as the og:image source of truth. */
+ *  an SVG og:image renders blank everywhere. /og-v2.png is generated from /og-v2.svg
+ *  (rsvg-convert -w 1200 -h 630). Keep the .png as the og:image source of truth.
+ *  NOTE: versioned filename (og-v2) busts the GitHub/social OG cache — bump the suffix
+ *  when the image changes so platforms re-fetch instead of serving a stale preview. */
 const OG_IMAGE = {
-  url: '/og.png',
+  url: '/og-v2.png',
   width: 1200,
   height: 630,
   alt: SITE_NAME,
@@ -49,7 +51,7 @@ export function withOG(opts: {
   title: string
   description: string
   path?: string
-  /** Override the OG image (e.g. a per-page image). Defaults to /og.png. */
+  /** Override the OG image (e.g. a per-page image). Defaults to /og-v2.png. */
   ogImage?: { url: string; width?: number; height?: number; alt?: string }
 }): Metadata {
   const { title, description, path, ogImage } = opts
