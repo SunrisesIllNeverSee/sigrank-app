@@ -174,6 +174,73 @@ function RadialRings({ axes, size, centerValue, reduced, replayKey }: { axes: Ra
   )
 }
 
+// ── Meter panel (hero Υ + horizontal metric bars) ──────────────────────────
+// Fresh left-side viz: a hero stat + five meters. Horizontal bars fit the
+// rectangular panel natively — nothing to crop, no aspect-ratio fight.
+// Plain divs (no SVG viewBox), ink-on-gold monochrome, animated width.
+
+function MeterPanel({ axes, displays, heroValue, heroAvg, reduced, replayKey }: {
+  axes: RadarAxis[]
+  displays: string[]
+  heroValue: string
+  heroAvg: string
+  reduced: boolean
+  replayKey: number
+}) {
+  const [grown, setGrown] = useState(reduced)
+  useEffect(() => {
+    if (reduced) { setGrown(true); return }
+    setGrown(false)
+    const t = setTimeout(() => setGrown(true), 60)
+    return () => clearTimeout(t)
+  }, [reduced, replayKey])
+
+  const INK = '#0a0a0a'
+  const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
+  // axes[0] is Υ — shown as the hero; bars render the rest.
+  const bars = axes.slice(1)
+  const barDisplays = displays.slice(1)
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', width: '100%' }}>
+      {/* Hero stat — Υ yield, the one number that matters */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
+        <span style={{ fontSize: '84px', fontWeight: 900, color: INK, lineHeight: 1, letterSpacing: '-2px' }}>
+          {heroValue}
+        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <span style={{ fontSize: '15px', fontWeight: 800, color: INK, letterSpacing: '1px' }}>{'Υ'} YIELD</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: INK, opacity: 0.45, letterSpacing: '0.5px' }}>avg {heroAvg}</span>
+        </div>
+      </div>
+
+      {/* Meter bars — one per metric, track + rounded ink fill + direct labels */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        {bars.map((ax, i) => {
+          const frac = norm(ax.value, ax.max)
+          return (
+            <div key={`m-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: INK, letterSpacing: '1.5px', opacity: 0.85 }}>
+                  {ax.glyph}<span style={{ opacity: 0.5, fontWeight: 700, marginLeft: '8px', letterSpacing: '0.5px' }}>{ax.label.toUpperCase()}</span>
+                </span>
+                <span style={{ fontSize: '15px', fontWeight: 900, color: INK }}>{barDisplays[i] ?? ''}</span>
+              </div>
+              <div style={{ position: 'relative', height: '10px', borderRadius: '5px', background: 'rgba(10,10,10,0.10)', overflow: 'hidden' }}>
+                <div style={{
+                  position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: '5px',
+                  background: INK, width: `${(grown ? frac : 0) * 100}%`,
+                  transition: reduced ? 'none' : `width 900ms cubic-bezier(.22,1,.36,1) ${i * 110}ms`,
+                }} />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── Print animation CSS ───────────────────────────────────────────────────
 
 const PRINT_CSS = `
@@ -334,6 +401,11 @@ function Board({
   const GOLD_BG = '#c4923a'
   const GOLD_DARK = '#0a0a0a'
 
+  // Name auto-scales to fit the fixed 96px header zone instead of wrapping
+  // taller and pushing the divider down. Longer name → smaller size; the zone
+  // height never changes, so everything below it is geometrically anchored.
+  const nameSize = name.length <= 12 ? 42 : name.length <= 18 ? 34 : name.length <= 26 ? 28 : 22
+
   // Bright phosphor colors on black
   const C_GOLD = '#f0c862'
   const C_GREEN = '#8ae89a'
@@ -420,12 +492,17 @@ function Board({
           background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px)',
         }} />
 
-        {/* Row 1 — Name (left, hero) + info block (top-right corner, right-aligned) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+        {/* ── HEADER ZONE — FIXED 96px. Name auto-scales (nameSize) and clips
+            inside this box; it can never grow the zone, so the divider below
+            sits at a constant y regardless of name length. ── */}
+        <div style={{
+          height: '96px', flexShrink: 0, overflow: 'hidden',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px',
+        }}>
           <div style={{
-            fontSize: '42px', fontWeight: 900, color: GOLD_DARK,
-            letterSpacing: '1px', lineHeight: 1.02, wordBreak: 'break-word',
-            flex: 1, minWidth: 0,
+            fontSize: `${nameSize}px`, fontWeight: 900, color: GOLD_DARK,
+            letterSpacing: '1px', lineHeight: 1.05, wordBreak: 'break-word',
+            flex: 1, minWidth: 0, maxHeight: '96px', overflow: 'hidden',
           }}>
             {name.toUpperCase()}
           </div>
@@ -437,31 +514,28 @@ function Board({
           </div>
         </div>
 
-        {/* Row 2 — brand strip = divider anchor (nothing below this but the divider) */}
-        <div style={{ marginTop: '6px' }}>
+        {/* ── BRAND STRIP — FIXED 22px row ── */}
+        <div style={{ height: '22px', flexShrink: 0, display: 'flex', alignItems: 'center', marginTop: '6px' }}>
           <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
         </div>
 
-        {/* Divider — FIXED below brand + info, all words above this line */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px' }}>
-          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
+        {/* ── DIVIDER — FIXED 16px row at a constant y (padding 20 + header 96 +
+            brand 28). Anchored: content above cannot push it, below cannot pull it. ── */}
+        <div style={{ height: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)', flexShrink: 0 }} />
           <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
         </div>
 
-        {/* Radar — fills remaining space below the divider */}
+        {/* Meters — hero Υ + metric bars fill the space below the divider */}
         {coloredAxes.length >= 3 && (
-          <div style={{
-            flex: 1, minHeight: 0, overflow: 'hidden',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
-            width: '100%',
-          }}>
-            <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-              Cascade Signature
-            </span>
-            <div style={{ width: '100%', maxWidth: '520px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
-              <RadialRings axes={coloredAxes} size={460} centerValue={yieldStr} reduced={reduced} replayKey={0} />
-            </div>
-          </div>
+          <MeterPanel
+            axes={coloredAxes}
+            displays={[yieldStr, snrStr, levStr, devStr, scaleStr, effStr]}
+            heroValue={yieldStr}
+            heroAvg="1.57"
+            reduced={reduced}
+            replayKey={0}
+          />
         )}
 
         {/* Footer divider + url */}
