@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 import { getLeaderboard } from '@/lib/data'
@@ -25,6 +25,10 @@ export const metadata: Metadata = withOG({
     'Triumphus Famae Et Gloriae — the permanent record of peak signal across the SigRank leaderboard.',
   path: '/hall',
 })
+
+// ISR: cache the static shell for 300s. The filter-driven content inside
+// <Suspense> streams dynamically; the shell (hero + coming-soon) is CDN-cached.
+export const revalidate = 300
 
 /**
  * Two record galleries, driven by the canonical display set (lib/canon/ids.ts) so
@@ -70,6 +74,43 @@ function coerce<T extends string>(raw: string | undefined, allowed: readonly T[]
  * archived out of the tree 2026-06-20.)
  */
 export default async function HallPage({ searchParams }: PageProps) {
+  return (
+    <div>
+      <JsonLd data={breadcrumb([
+        { name: 'Hall of Signal', path: '/hall' },
+      ])} />
+      {/* HALL-1: animated masthead. */}
+      <HallHero />
+
+      {/* Filter-driven content (searchParams) isolated behind <Suspense> so the
+          shell stays static + CDN-cacheable. revalidate=300 applies to the shell. */}
+      <Suspense fallback={
+        <div className="mb-8 animate-pulse">
+          <div className="mb-6 h-8 rounded bg-bg-surface" />
+          <div className="mb-8 h-10 rounded bg-bg-surface" />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="h-40 rounded bg-bg-surface" />
+            ))}
+          </div>
+        </div>
+      }>
+        <HallContent searchParams={searchParams} />
+      </Suspense>
+
+      {/* HALL Task 6: coming-soon markers (Eras teaser · Season Leaders · Sessions) —
+          the footer "On the horizon" area per HALL_DESIGN §2/§6/§7. Last child of the page. */}
+      <div className="mt-12">
+        <ComingSoonMarkers />
+      </div>
+    </div>
+  )
+}
+
+/** Filter-driven content — reads searchParams (dynamic API) inside <Suspense>
+ * so the page shell stays static. This is the Next 15 pattern for keeping
+ * filterable pages ISR-cacheable. */
+async function HallContent({ searchParams }: PageProps) {
   const { class: classParam, platform: platformParam, window: windowParam } = await searchParams
   const activeClass = classParam ?? 'all'
   const platform = coerce<PlatformUI>(platformParam, PLATFORM_UI, PLATFORM_DEFAULT)
@@ -117,13 +158,7 @@ export default async function HallPage({ searchParams }: PageProps) {
   }).filter((x): x is NonNullable<typeof x> => x !== null)
 
   return (
-    <div>
-      <JsonLd data={breadcrumb([
-        { name: 'Hall of Signal', path: '/hall' },
-      ])} />
-      {/* HALL-1: animated masthead. */}
-      <HallHero />
-
+    <>
       {/* HALL-4: record-highlights ticker (under the hero, above the filter block). */}
       <div className="mb-6">
         <RecordTicker items={tickerItems} />
@@ -165,12 +200,6 @@ export default async function HallPage({ searchParams }: PageProps) {
           <MetricTopTen key={b.canonId} canonId={b.canonId} rows={metricRows[CASCADE_BOARDS.length + i]} />
         ))}
       </div>
-
-      {/* HALL Task 6: coming-soon markers (Eras teaser · Season Leaders · Sessions) —
-          the footer "On the horizon" area per HALL_DESIGN §2/§6/§7. Last child of the page. */}
-      <div className="mt-12">
-        <ComingSoonMarkers />
-      </div>
-    </div>
+    </>
   )
 }
