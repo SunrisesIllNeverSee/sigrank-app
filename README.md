@@ -45,7 +45,10 @@ engine. You don't clone this to *use* SigRank (see below) — you clone it to wo
 
 ## Get ranked (you don't need this repo)
 
-SigRank runs from your terminal. The agent reads your local AI session logs on-device,
+Fastest look, no install: **[signalaf.com/score](https://signalaf.com/score)** — paste your
+usage stats, get a projected yield + ghost rank.
+
+SigRank runs from your terminal. The client reads your local AI session logs on-device,
 derives your cascade, and publishes to the board — **token-only, no transcript content.**
 
 ```bash
@@ -61,9 +64,11 @@ sigrank                    # full tabbed TUI: dashboard · compare · board · w
 npx sigrank board --once   # print the live leaderboard once
 ```
 
+Cautious? `sigrank submit --dry-run` prints the exact signed payload — four token
+counts and a signature — and sends nothing.
+
 Full CLI + MCP docs: **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** ·
-package: **[sigrank on npm](https://www.npmjs.com/package/sigrank)** · agent:
-**[sigrank-agent on PyPI](https://pypi.org/project/sigrank-agent/)**.
+package: **[sigrank on npm](https://www.npmjs.com/package/sigrank)**.
 
 ## How it works
 
@@ -86,7 +91,7 @@ The rest of this README is for working on the app itself.
 ## Stack
 
 - **Framework:** Next.js 15 App Router, React 19, TypeScript strict
-- **UI:** Tailwind CSS, dark-only SigRank design tokens
+- **UI:** Tailwind CSS, themeable SigRank design tokens (carbon default)
 - **Data:** Supabase with cold-store snapshot and mock fallback
 - **Billing:** Stripe Checkout, Billing Portal, webhook handlers
 - **Validation:** zod, Node test runner, TypeScript
@@ -200,8 +205,8 @@ Product contracts, not implementation details:
 ## Related
 
 - **[signalaf.com](https://signalaf.com)** — the live board
+- **[signalaf.com/score](https://signalaf.com/score)** — projected yield + ghost rank in 60 seconds, no account
 - **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npm i -g sigrank`)
-- **[sigrank-agent](https://pypi.org/project/sigrank-agent/)** — the Python agent
 
 ## Community
 
