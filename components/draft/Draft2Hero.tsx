@@ -39,6 +39,11 @@ export function Draft2Hero() {
         <RotatingWordmark />
         <TerminalWordmark />
 
+        {/* powered by — white + larger (owner 2026-06-22) */}
+        <span className="font-mono text-sm uppercase tracking-[0.22em] text-text-primary sm:text-base">
+          powered by MO§ES™
+        </span>
+
         {/* privacy badge — the differentiator every launch post leans on, surfaced
             at the brand level so a stranger landing from X/HN sees it first (GTM
             Phase C front-door fix, 2026-07-02). */}
