@@ -439,14 +439,20 @@ function Board({
           </div>
         </div>
 
+        {/* Divider — anchored right before ◈ SIGRANK brand row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px' }}>
+          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
+        </div>
+
         {/* Brand row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
           <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>{'\u25c8'} SIGRANK</span>
           <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES &middot; MO&sect;ES&#8482;</span>
         </div>
 
-        {/* Info rows — CLASS/PLATFORM/CASCADE/OP RATIO, ABOVE the divider */}
-        <div style={{ marginTop: '10px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '6px' }}>
+        {/* Info rows — CLASS/PLATFORM/CASCADE/OP RATIO, below brand */}
+        <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '5px' }}>
           {[
             ['CLASS', classTier],
             ['PLATFORM', (platform ?? '\u2014').toUpperCase()],
@@ -460,13 +466,7 @@ function Board({
           ))}
         </div>
 
-        {/* Divider — stays in place, between info rows and chart */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
-          <div style={{ width: '7px', height: '7px', background: GOLD_DARK, transform: 'rotate(45deg)' }} />
-          <div style={{ flex: 1, height: '2px', background: GOLD_DARK, opacity: 0.2 }} />
-        </div>
-
-        {/* Radar — enlarged to fill remaining space */}
+        {/* Radar — fills remaining space below the info */}
         {coloredAxes.length >= 3 && (
           <div style={{
             flex: 1, minHeight: 0, overflow: 'hidden',
