@@ -268,48 +268,25 @@ function TwoSeriesRadar({ rows, size, reduced, replayKey }: {
 
 interface MeterRow { glyph: string; label: string; frac: number; you: string; avgFrac: number | null; avg: string | null }
 
-function MeterPanel({ meters, heroValue, heroAvg, reduced, replayKey }: {
+function MeterPanel({ meters, reduced, replayKey }: {
   meters: MeterRow[]
-  heroValue: string
-  heroAvg: string
   reduced: boolean
   replayKey: number
 }) {
-  const [grown, setGrown] = useState(reduced)
-  useEffect(() => {
-    if (reduced) { setGrown(true); return }
-    setGrown(false)
-    const t = setTimeout(() => setGrown(true), 60)
-    return () => clearTimeout(t)
-  }, [reduced, replayKey])
-
-  const INK = '#0a0a0a'
-
   return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', width: '100%' }}>
-      {/* Hero stat — Υ yield, the one number that matters */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
-        <span style={{ fontSize: '84px', fontWeight: 900, color: INK, lineHeight: 1, letterSpacing: '-2px' }}>
-          {heroValue}
-        </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <span style={{ fontSize: '15px', fontWeight: 800, color: INK, letterSpacing: '1px' }}>{'Υ'} YIELD</span>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: INK, opacity: 0.45, letterSpacing: '0.5px' }}>avg {heroAvg}</span>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+      {/* You vs the field — two-series radar, expanded to fill the panel now
+          that the hero lives in the fixed header zone above the divider */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', minHeight: 0 }}>
+        <div style={{ width: '100%', maxWidth: '430px', minHeight: 0 }}>
+          <TwoSeriesRadar rows={meters} size={430} reduced={reduced} replayKey={replayKey} />
         </div>
-      </div>
-
-      {/* You vs the field — two-series radar; the field-avg polygon is the
-          reference that makes the shape mean something */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-        <div style={{ width: '100%', maxWidth: '310px' }}>
-          <TwoSeriesRadar rows={meters} size={330} reduced={reduced} replayKey={replayKey} />
-        </div>
-        <div style={{ display: 'flex', gap: '18px', fontSize: '10px', fontWeight: 700, color: INK, letterSpacing: '1px' }}>
+        <div style={{ display: 'flex', gap: '18px', fontSize: '10px', fontWeight: 700, color: '#0a0a0a', letterSpacing: '1px' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '16px', height: '3px', background: INK, borderRadius: '2px' }} /> YOU
+            <span style={{ width: '16px', height: '3px', background: '#0a0a0a', borderRadius: '2px' }} /> YOU
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '5px', opacity: 0.55 }}>
-            <span style={{ width: '16px', height: '0px', borderTop: `2px dashed ${INK}` }} /> FIELD AVG
+            <span style={{ width: '16px', height: '0px', borderTop: '2px dashed #0a0a0a' }} /> FIELD AVG
           </span>
         </div>
       </div>
@@ -639,6 +616,14 @@ function Board({
                 line at the info block's bottom-right (symmetry, no dead gap) */}
             <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
           </div>
+          {/* Υ hero — lives INSIDE the fixed 96px zone; divider cannot move */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexShrink: 0, alignSelf: 'center' }}>
+            <span style={{ fontSize: '54px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1, letterSpacing: '-2px' }}>{yieldStr}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '1px' }}>{'\u03a5'} YIELD</span>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: GOLD_DARK, opacity: 0.45 }}>avg 1.57</span>
+            </div>
+          </div>
           {/* Info block — top-right corner (yield moved to radar center) */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', flexShrink: 0, textAlign: 'right' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{classTier} &middot; {(platform ?? '\u2014').toUpperCase()}</span>
@@ -660,8 +645,6 @@ function Board({
         {meterRows.length >= 3 && (
           <MeterPanel
             meters={meterRows}
-            heroValue={yieldStr}
-            heroAvg="1.57"
             reduced={reduced}
             replayKey={0}
           />
