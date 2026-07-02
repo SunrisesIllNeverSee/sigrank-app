@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 import { CascadeHeader } from '@/components/home/CascadeHeader'
 import { RotatingWordmark } from '@/components/home/RotatingWordmark'
 import { TerminalWordmark } from '@/components/home/TerminalWordmark'
@@ -71,26 +70,13 @@ export function Draft2Hero() {
           </p>
         </div>
 
-        {/* primary CTA — the personal hook (GTM Phase C front-door fix, 2026-07-02).
-            A stranger landing from a launch post sees the privacy badge + this CTA
-            above the fold → /score gives them an instant cascade preview (no account,
-            no save). The action tiles below are secondary navigation. */}
-        <Link
-          href="/score"
-          className="group inline-flex items-center gap-2 rounded-lg border border-gold bg-gold/10 px-6 py-3 font-mono text-sm font-bold uppercase tracking-[0.14em] text-gold transition-all duration-200 hover:bg-gold/20 hover:shadow-lg hover:shadow-gold/20 sm:text-base"
-        >
-          Compute your Υ
-          <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-        </Link>
-
-        {/* four action tiles — Measure · Board · Compare · Info·Wiki (shared component).
-            Shine-sweep glint on too (owner 2026-06-22: add it to the header boxes). */}
+        {/* action tiles — Measure (→ /score) · Board · Info·Wiki (shared component).
+            Shine-sweep glint on too (owner 2026-06-22: add it to the header boxes).
+            Compare removed 2026-07-02 per owner; grid adjusted to 3 cols. */}
         <Draft2ActionTiles className="mt-3" shine />
 
-        {/* taglines — bigger (owner 2026-06-22: increase size of these last two) */}
-        <p className="font-mono text-lg font-semibold text-text-secondary sm:text-xl">
-          Identifying Burners, Builders, and 10×ers.
-        </p>
+        {/* tagline — bigger (owner 2026-06-22: increase size). The "Identifying
+            Burners, Builders, and 10×ers." line removed 2026-07-02 per owner. */}
         <p className="font-mono text-xl font-bold uppercase tracking-[0.18em] text-text-primary sm:text-2xl">
           signal <span className="text-gold">AF</span>
         </p>
