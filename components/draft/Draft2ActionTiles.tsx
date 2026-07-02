@@ -12,6 +12,7 @@ import Link from 'next/link'
 const TILES: { href: string; glyph: string; label: string }[] = [
   { href: '/score', glyph: 'Υ', label: 'Measure' },
   { href: '/leaderboard', glyph: '≣', label: 'Board' },
+  { href: '/compare', glyph: '⇄', label: 'Compare' },
   { href: '/wiki', glyph: '◧', label: 'Info · Wiki' },
 ]
 
@@ -25,7 +26,7 @@ export function Draft2ActionTiles({
   return (
     <div
       className={
-        'mx-auto grid w-full max-w-2xl grid-cols-3 items-stretch gap-3 ' + className
+        'mx-auto grid w-full max-w-2xl grid-cols-2 items-stretch gap-3 sm:grid-cols-4 ' + className
       }
     >
       {TILES.map((b, i) => (
