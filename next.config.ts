@@ -9,11 +9,6 @@ const POSTHOG_ASSETS = POSTHOG_HOST.includes('eu.')
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // PPR (Partial Prerendering) — lets routes with <Suspense> boundaries around
-  // dynamic APIs (searchParams) keep their static shell CDN-cached while the
-  // filter-driven content streams. 'incremental' = opt-in per route via Suspense;
-  // routes without Suspense are unaffected. Needed for /hall + /board ISR caching.
-  experimental: { ppr: 'incremental' },
   // Don't 308-redirect /ingest → /ingest/ ; PostHog ingestion paths are exact.
   skipTrailingSlashRedirect: true,
   // Analytics reverse proxy: the browser POSTs to signalaf.com/ingest (same origin)
