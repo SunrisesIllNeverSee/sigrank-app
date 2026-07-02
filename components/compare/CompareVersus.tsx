@@ -91,9 +91,16 @@ export function CompareVersus({ a, b }: { a: LeaderboardRow; b: LeaderboardRow }
   const regA = regOf(a)
   const regB = regOf(b)
 
+  // When both operators share a regime, fold to one clause so the verdict doesn't
+  // read "X runs a closed kinetic loop, Y a closed kinetic loop" (stuck template).
+  const sameRegime = regA.key === regB.key
+  const regimeClause = sameRegime
+    ? `both run a ${regA.word}`
+    : `${nameA} runs a ${regA.word}, ${nameB} a ${regB.word}`
+
   const verdict = winner
-    ? `${winner === 'a' ? nameA : nameB} takes the cascade, ${Math.max(aWins, bWins)}–${Math.min(aWins, bWins)} — ${nameA} runs a ${regA.word}, ${nameB} a ${regB.word}.`
-    : `Dead heat, ${aWins}–${bWins} — ${nameA} a ${regA.word}, ${nameB} a ${regB.word}. Two architectures, not a better operator.`
+    ? `${winner === 'a' ? nameA : nameB} takes the cascade, ${Math.max(aWins, bWins)}–${Math.min(aWins, bWins)} — ${regimeClause}.`
+    : `Dead heat, ${aWins}–${bWins} — ${regimeClause}. Two architectures, not a better operator.`
 
   const Side = ({ r, side, cls, col, name, won }: {
     r: LeaderboardRow; side: 'a' | 'b'; cls: SignalClass; col: string; name: string; won: boolean

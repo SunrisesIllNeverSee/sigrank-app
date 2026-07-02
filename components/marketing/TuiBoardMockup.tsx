@@ -7,6 +7,14 @@ import React from 'react'
  * install/submit commands. Static data (realistic — mirrors the live 30d
  * board). When `highlightYou` is true, the #1 row gets a gold bg-tint + YOU
  * marker (the "after you submit" view).
+ *
+ * The #1 Υ (18,436.98) is the CANONICAL ANCHOR — the owner's verified ccusage
+ * ceiling (the most-favorable raw read). It is intentionally NOT the live
+ * board's observer-stripped top (~552.53, shown in the Three Degrees gold
+ * column): the mock illustrates the TUI at the canonical anchor, the chart
+ * tracks the live observer-stripped field. The caption below the rows makes
+ * that distinction visible so a visitor doesn't read the two surfaces as a 33×
+ * discrepancy (review 2026-07-02).
  */
 
 interface Row {
@@ -98,6 +106,14 @@ export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolea
             </div>
           )
         })}
+      </div>
+      {/* Reconciling caption (review 2026-07-02): the mock renders the canonical
+          anchor read (the verified ccusage ceiling), NOT the observer-stripped
+          live board shown in the Three Degrees gold column — so the two surfaces
+          don't read as a 33× discrepancy. */}
+      <div className="border-t border-bg-border-subtle px-4 py-2 font-mono text-[10px] leading-snug text-text-dim">
+        Illustrative — canonical anchor read (ccusage ceiling). Live board shows
+        observer-stripped yields.
       </div>
     </div>
   )
