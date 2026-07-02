@@ -61,12 +61,23 @@ export function HallSubmissionRow({
   // (the little green canon-id superscript was removed per owner 2026-06-21).
   const valueNode = isPlaceholder ? <Placeholder value={value} /> : <span>{value}</span>
 
+  // Unclaimed rows are the seed corpus (italic, matching the live board's
+  // isSeed treatment in to-entry.ts) so a reader can tell a real claimed
+  // operator from a placeholder seed at a glance — the Hall's whole pitch is
+  // verification honesty, so seed rows get a visual class of their own rather
+  // than ranking indistinguishably from claimed operators.
   const nameNode = href ? (
-    <Link href={href} className="text-text-primary transition-colors hover:text-accent">
+    <Link
+      href={href}
+      className="text-text-primary transition-colors hover:text-accent"
+      style={{ fontStyle: claimed ? 'normal' : 'italic' }}
+    >
       {codename}
     </Link>
   ) : (
-    <span className="text-text-primary">{codename}</span>
+    <span className="text-text-primary" style={{ fontStyle: claimed ? 'normal' : 'italic' }}>
+      {codename}
+    </span>
   )
 
   // Class is now the canonical GLYPH (◈ ▲ ▽ …) in its class color, not the "Trans"

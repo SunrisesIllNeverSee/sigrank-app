@@ -27,7 +27,7 @@ type Variant = 'full' | 'embed'
 const COLS: { label: string; tone: 'white' | 'gold' }[] = [
   { label: 'Average Users*', tone: 'white' },
   { label: 'Power users†', tone: 'white' },
-  { label: 'Top Evals to date**', tone: 'gold' },
+  { label: 'Top Evals to date‡', tone: 'gold' },
 ]
 // Gold column = the top REAL operator currently leading the live board, on the ALL-TIME
 // window (lib/marketing/top-operator-column.ts). It auto-pulls the canonical board
@@ -255,7 +255,7 @@ function Provenance() {
           Treat as a reference floor, not a real operator&apos;s telemetry.
         </p>
         <p>
-          <span className="text-text-muted">**</span> <strong>Top operator to date</strong>: the
+          <span className="text-text-muted">‡</span> <strong>Top operator to date</strong>: the
           gold column is the highest real operator measured on the live board so far (MO§ES™, the
           owner). The claude-mem memory observer (an MCP that auto-prompts memory, low-input/high-output)
           inflated the raw owner row by ~25% of output; the figure shown here is the observer-stripped
