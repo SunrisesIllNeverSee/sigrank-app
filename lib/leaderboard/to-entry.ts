@@ -27,6 +27,10 @@ import type { LeaderboardEntry } from '@/components/sigrank'
 export interface LeaderboardEntryWithPlatforms extends LeaderboardEntry {
   /** Distinct platforms the operator submitted, e.g. ['claude','codex','multi']. */
   platforms?: string[]
+  /** The operator's declared primary domain (lowercased) — used for client-side
+   *  platform filtering on static (ISR-cached) board pages where the server can't
+   *  read searchParams without opting into dynamic rendering. */
+  primaryDomain?: string
 }
 
 /** A LeaderboardRow optionally carrying the per-operator platform set (operatorTotal
@@ -118,5 +122,8 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     // present on the operatorTotal path; undefined elsewhere (the per-row `platform`
     // column is the source on per-platform / "off" boards).
     ...(platforms && platforms.length > 0 ? { platforms } : {}),
+    // The operator's primary domain (lowercased) for client-side platform filtering
+    // on ISR-cached board pages (the server can't read searchParams without going dynamic).
+    primaryDomain: operator.primary_domain?.toLowerCase(),
   }
 }
