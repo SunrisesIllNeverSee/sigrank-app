@@ -10,8 +10,8 @@
 
 import type { LeaderboardRow } from '@/lib/data'
 
-/** D19: leaderboard responses carry Cache-Control max-age=300. */
-export const LEADERBOARD_CACHE_CONTROL = 'public, max-age=300'
+/** D19: leaderboard responses carry Cache-Control max-age=300 + s-maxage for CDN. */
+export const LEADERBOARD_CACHE_CONTROL = 'public, max-age=300, s-maxage=300, stale-while-revalidate=600'
 
 /** Deterministic generated_at — no wall-clock read (mock parity, build-safe). */
 const GENERATED_AT = '2026-05-19T00:00:00Z'

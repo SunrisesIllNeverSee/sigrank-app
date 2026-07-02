@@ -37,6 +37,7 @@ type Status =
   | { kind: 'submitting' }
   | { kind: 'ok'; result: SubmitResult; codename: string }
   | { kind: 'error'; detail: string }
+  | { kind: 'signin_required' }
 
 interface ParsePreview {
   input: number
@@ -121,6 +122,9 @@ export function PasteForm() {
       if (res.ok) {
         const result = await res.json() as SubmitResult
         setStatus({ kind: 'ok', result, codename: codename.trim() })
+      } else if (res.status === 401) {
+        // Session required — the persisting path needs a login. Show the sign-in CTA.
+        setStatus({ kind: 'signin_required' })
       } else {
         const text = await res.text().catch(() => '')
         setStatus({ kind: 'error', detail: `Submission rejected (${res.status}). ${text}`.trim() })
@@ -199,7 +203,7 @@ export function PasteForm() {
         {/* CTA row — claim funnel + run again. NO "view your profile" (no row exists). */}
         <div className="flex flex-wrap items-center gap-3 border-t border-gold/20 pt-4">
           <a
-            href="mailto:hello@signalaf.com?subject=SigRank%20%E2%80%94%20claim%20my%20rank"
+            href="/login?next=/wiki"
             className="rounded-md bg-gold px-5 py-2.5 font-mono text-sm font-bold text-bg-base transition-colors hover:bg-gold/90"
           >
             Claim this rank →
@@ -217,6 +221,36 @@ export function PasteForm() {
           Compression {comp}% · ran as {submittedCodename || 'guest'} · id {result.submission_id}.
           Account + review (or the local agent) is what lands you on the leaderboard.
         </p>
+      </div>
+    )
+  }
+  // ── Sign-in required state (Lane 4: ingest-paste now requires a session) ──
+  if (status.kind === 'signin_required') {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border border-text-accent/30 bg-text-accent/5 p-6">
+        <p className="font-mono text-sm font-semibold text-text-accent">
+          Sign in to save your run
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The paste preview is free (no account needed). To persist a submission to your
+          operator profile, sign in — the persisting path binds the submission to your
+          account, not a body-supplied codename.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <a
+            href="/login?next=/wiki"
+            className="rounded-md bg-gold px-5 py-2.5 font-mono text-sm font-bold text-bg-base transition-colors hover:bg-gold/90"
+          >
+            Sign in →
+          </a>
+          <button
+            type="button"
+            onClick={() => setStatus({ kind: 'idle' })}
+            className="rounded-md border border-bg-border px-4 py-2.5 font-mono text-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
+          >
+            Just preview
+          </button>
+        </div>
       </div>
     )
   }

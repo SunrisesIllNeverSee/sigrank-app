@@ -5,7 +5,7 @@ import 'server-only'
  *
  * Each handler is invoked by app/api/v1/billing/stripe-webhook/route.ts after
  * the route has (1) verified the signature and (2) deduped via webhook_events.
- * Every DB operation here is getSupabaseServer()-guarded: with no creds (dev /
+ * Every DB operation here is getSupabaseService()-guarded: with no creds (dev /
  * mock mode) handlers log and resolve so the webhook still acks 200. Handlers
  * never throw on a missing Supabase client.
  *
@@ -19,7 +19,7 @@ import 'server-only'
  */
 
 import type Stripe from 'stripe'
-import { getSupabaseServer } from '@/lib/supabase/server'
+import { getSupabaseService } from '@/lib/supabase/server'
 import { tierForPrice } from '@/lib/stripe/server'
 import type { SubscriptionStatus, SubscriptionRecord } from '@/lib/stripe/tier'
 import { applyRewardsForOperator, recomputeSupporterTier } from '@/lib/stripe/rewards'
@@ -74,7 +74,7 @@ function toSubscriptionRecord(sub: Stripe.Subscription): SubscriptionRecord {
  * returns 'free' when Supabase is unconfigured or the read fails.
  */
 async function readPriorTier(operatorId: string): Promise<SupporterTier> {
-  const sb = getSupabaseServer()
+  const sb = getSupabaseService()
   if (!sb) return 'free'
   try {
     const { data } = await sb
@@ -98,7 +98,7 @@ async function persistSubscription(
   nowMs: number,
 ): Promise<void> {
   const record = toSubscriptionRecord(sub)
-  const sb = getSupabaseServer()
+  const sb = getSupabaseService()
   if (!sb) {
     // Dev path: recompute from this single record so reward logging still runs.
     const nextTier = recomputeSupporterTier(record, nowMs)
@@ -184,7 +184,7 @@ export async function handleCheckoutCompleted(
         ? session.payment_intent
         : session.payment_intent?.id ?? null
 
-    const sb = getSupabaseServer()
+    const sb = getSupabaseService()
     if (!sb) {
       console.info(
         `[webhook] (no supabase) claim operator=${operatorId} pi=${paymentIntent}`,
@@ -218,11 +218,48 @@ export async function handleCheckoutCompleted(
     return ok(`donation completed operator=${operatorId ?? 'anon'} amount=${session.amount_total ?? '?'}`)
   }
 
-  // ── Subscription checkout: tier work happens on subscription.* events ─────
+  // ── Subscription checkout: belt-and-braces persist (Lane 1 fix 2026-07-02) ──
+  // The primary path is subscription.* events (handleSubscriptionUpsert reads
+  // sub.metadata). But if subscription_data.metadata was missing on an older
+  // checkout, those events skip. Here we resolve session.subscription and
+  // persist the link directly from the session metadata, so the operator gets
+  // their tier even if the subscription event arrives with empty metadata.
   if (session.mode === 'subscription') {
+    if (!operatorId) {
+      return ok(
+        `subscription checkout completed operator=unknown (tier applied on subscription event)`,
+      )
+    }
+    // Resolve the subscription id from the session.
+    const subId =
+      typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id ?? null
+    if (!subId) {
+      return ok(
+        `subscription checkout completed operator=${operatorId} (no subscription id on session)`,
+      )
+    }
+    // Persist the stripe_customer_id link from the session (the subscription
+    // event will handle tier computation; this just ensures the customer link
+    // is recorded even if the subscription event is delayed/skipped).
+    const sb = getSupabaseService()
+    if (sb) {
+      try {
+        const customerId =
+          typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
+        if (customerId) {
+          await sb
+            .from('operators')
+            .update({ stripe_customer_id: customerId })
+            .eq('operator_id', operatorId)
+        }
+      } catch (err) {
+        console.error('[webhook] checkout subscription customer link failed', err)
+      }
+    }
     return ok(
-      `subscription checkout completed operator=${operatorId ?? 'unknown'} ` +
-        `(tier applied on subscription event)`,
+      `subscription checkout completed operator=${operatorId} sub=${subId} (tier applied on subscription event; customer link persisted)`,
     )
   }
 
@@ -257,7 +294,7 @@ export async function handleSubscriptionDeleted(
 export async function handleInvoicePaid(
   invoice: Stripe.Invoice,
 ): Promise<HandlerResult> {
-  const sb = getSupabaseServer()
+  const sb = getSupabaseService()
   const invSub = invoice.parent?.subscription_details?.subscription ?? null
   const subId =
     typeof invSub === 'string' ? invSub : invSub?.id ?? null
@@ -283,7 +320,7 @@ export async function handleInvoicePaid(
 export async function handleInvoiceFailed(
   invoice: Stripe.Invoice,
 ): Promise<HandlerResult> {
-  const sb = getSupabaseServer()
+  const sb = getSupabaseService()
   const invSub = invoice.parent?.subscription_details?.subscription ?? null
   const subId =
     typeof invSub === 'string' ? invSub : invSub?.id ?? null

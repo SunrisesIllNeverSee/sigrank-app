@@ -59,6 +59,6 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(body, {
-    headers: { 'Cache-Control': 'public, max-age=300' },
+    headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=600' },
   })
 }
