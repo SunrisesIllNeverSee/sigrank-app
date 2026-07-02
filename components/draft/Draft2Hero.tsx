@@ -39,11 +39,6 @@ export function Draft2Hero() {
         <RotatingWordmark />
         <TerminalWordmark />
 
-        {/* powered by — white + larger (owner 2026-06-22) */}
-        <span className="font-mono text-sm uppercase tracking-[0.22em] text-text-primary sm:text-base">
-          powered by MO§ES™
-        </span>
-
         {/* privacy badge — the differentiator every launch post leans on, surfaced
             at the brand level so a stranger landing from X/HN sees it first (GTM
             Phase C front-door fix, 2026-07-02). */}
@@ -70,13 +65,14 @@ export function Draft2Hero() {
           </p>
         </div>
 
-        {/* action tiles — Measure (→ /score) · Board · Info·Wiki (shared component).
-            Shine-sweep glint on too (owner 2026-06-22: add it to the header boxes).
-            Compare removed 2026-07-02 per owner; grid adjusted to 3 cols. */}
+        {/* action tiles — Measure (→ /score) · Board · Compare · Info·Wiki (shared
+            component). Shine-sweep glint on too (owner 2026-06-22). */}
         <Draft2ActionTiles className="mt-3" shine />
 
-        {/* tagline — bigger (owner 2026-06-22: increase size). The "Identifying
-            Burners, Builders, and 10×ers." line removed 2026-07-02 per owner. */}
+        {/* taglines — bigger (owner 2026-06-22: increase size of these last two) */}
+        <p className="font-mono text-lg font-semibold text-text-secondary sm:text-xl">
+          Identifying Burners, Builders, and 10×ers.
+        </p>
         <p className="font-mono text-xl font-bold uppercase tracking-[0.18em] text-text-primary sm:text-2xl">
           signal <span className="text-gold">AF</span>
         </p>
