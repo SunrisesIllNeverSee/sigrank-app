@@ -25,7 +25,7 @@ export function organization() {
     name: SITE_NAME,
     url: SITE_ORIGIN,
     description: SITE_TAGLINE,
-    logo: `${SITE_ORIGIN}/og.png`,
+    logo: `${SITE_ORIGIN}/og-v2.png`,
     sameAs: [
       'https://orcid.org/0009-0002-9904-5390',
       'https://github.com/SunrisesIllNeverSee',
