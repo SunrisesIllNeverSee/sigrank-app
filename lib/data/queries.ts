@@ -59,6 +59,71 @@ import {
 } from '@/lib/data/mappers'
 import { fallbackRows, filterMockBoard, sortValue } from '@/lib/data/fallback'
 
+// ───────────────────────────────────────────────────────────────────────────
+// Bounded-query helpers (2026-07-02 — the (d) sweep).
+// PostgREST caps a select at 1000 rows by default; unbounded selects silently
+// truncate with NO error. These helpers paginate + fail-loud so a growing
+// table can't quietly corrupt rankings/aggregates.
+// ───────────────────────────────────────────────────────────────────────────
+
+/** PostgREST's default per-request row cap. Pagination chunks at this size. */
+const POSTGREST_PAGE_SIZE = 1000
+
+/** Hard ceiling for whole-table scans — if we hit this, something is wrong
+ *  (the table grew beyond a safe bound). Logs a warning; does NOT silently
+ *  continue. 50K rows = ~150 operators × ~365 days of daily snapshots, well
+ *  beyond current scale (~21 operators). */
+const TABLE_SCAN_CEILING = 50_000
+
+/** Log a truncation warning (fail-loud, not cap-and-continue). */
+function warnTruncation(table: string, hit: number, ceiling: number) {
+  console.warn(
+    `[queries] ${table} scan hit ${hit} rows (ceiling ${ceiling}) — ` +
+      `possible silent truncation. Investigate the table size.`,
+  )
+}
+
+/**
+ * Paginate through ALL rows of a table that would otherwise be capped at 1000
+ * by PostgREST. Fetches in `.range(from, to)` chunks until a page returns fewer
+ * than PAGE_SIZE rows (the last page) or the ceiling is hit (fail-loud).
+ *
+ * The `buildQuery` fn receives the supabase client and should return a SELECT
+ * query builder (NOT awaited) — the helper applies `.range()` + awaits.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchAllPaginated<T>(
+  sb: SupabaseClient,
+  buildQuery: (sb: SupabaseClient) => any,
+  table: string,
+): Promise<T[]> {
+  const all: T[] = []
+  let from = 0
+  while (from < TABLE_SCAN_CEILING) {
+    const to = from + POSTGREST_PAGE_SIZE - 1
+    const { data, error } = await buildQuery(sb).range(from, to)
+    if (error) throw error
+    const page = (data ?? []) as T[]
+    all.push(...page)
+    if (page.length < POSTGREST_PAGE_SIZE) return all // last page
+    from += POSTGREST_PAGE_SIZE
+  }
+  // Hit the ceiling — fail-loud (don't silently continue).
+  warnTruncation(table, all.length, TABLE_SCAN_CEILING)
+  return all
+}
+
+/** Safe per-operator limit — one operator's daily snapshots for ~3yr (with
+ *  per-platform rows). Asserts if hit so we know when to raise it. */
+const PER_OPERATOR_LIMIT = 1000
+
+/** Assert a per-operator query didn't silently truncate. */
+function assertOperatorLimit(rows: unknown[], codename: string) {
+  if (rows.length >= PER_OPERATOR_LIMIT) {
+    warnTruncation(`metric_snapshots (operator ${codename})`, rows.length, PER_OPERATOR_LIMIT)
+  }
+}
+
 /**
  * Recompute an operator's global rank + percentile when rank_history is empty.
  * Fetches all latest snapshots, computes Υ yield for each (same as the board),
@@ -74,11 +139,16 @@ async function recomputeRank(
   _thisSnap: DbMetricSnapshot,
 ): Promise<{ rank: number; percentile: number }> {
   try {
-    const { data: allSnaps, error } = await sb
-      .from('metric_snapshots')
-      .select(SNAPSHOT_COLUMNS)
-      .order('snapshot_date', { ascending: false })
-    if (error || !allSnaps) return { rank: 0, percentile: 0 }
+    const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
+      sb,
+      (s) =>
+        s
+          .from('metric_snapshots')
+          .select(SNAPSHOT_COLUMNS)
+          .order('snapshot_date', { ascending: false }),
+      'metric_snapshots (recomputeRank)',
+    )
+    if (allSnaps.length === 0) return { rank: 0, percentile: 0 }
     // Collapse to the operator-TOTAL row per operator (BOARD redesign 2026-06-27):
     // prefer each operator's 'multi' snapshot (already a cross-platform sum), else
     // their latest single-platform snapshot — the SAME collapse the operator-total
@@ -164,12 +234,16 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
     // Live path: read latest metric_snapshots, join operators + rank_history.
     // We sort/filter/re-rank in JS so the live board is shape- and order-
     // identical to filterMockBoard (the schema-parity contract).
-    const { data: snapData, error: snapError } = await sb
-      .from('metric_snapshots')
-      .select(SNAPSHOT_COLUMNS)
-      .order('snapshot_date', { ascending: false })
-    if (snapError) throw snapError
-    const allSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
+    // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
+    const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
+      sb,
+      (s) =>
+        s
+          .from('metric_snapshots')
+          .select(SNAPSHOT_COLUMNS)
+          .order('snapshot_date', { ascending: false }),
+      'metric_snapshots (getLeaderboard)',
+    )
     // DB empty/unreachable → mock fallback (graceful-degradation contract).
     if (allSnaps.length === 0) return filterMockBoard(params)
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
@@ -216,12 +290,18 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
 
     // Latest rank_history per operator for percentile (global_rank is recomputed
     // from the filtered view below, mirroring the mock re-ranking).
-    const { data: rankData } = await sb
-      .from('rank_history')
-      .select('operator_id, snapshot_date, global_rank, percentile')
-      .order('snapshot_date', { ascending: false })
+    // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
+    const rankData = await fetchAllPaginated<DbRankHistory>(
+      sb,
+      (s) =>
+        s
+          .from('rank_history')
+          .select('operator_id, snapshot_date, global_rank, percentile')
+          .order('snapshot_date', { ascending: false }),
+      'rank_history (getLeaderboard)',
+    )
     const pctById = new Map<string, number>()
-    for (const r of (asDb<DbRankHistory[] | null>(rankData) ?? [])) {
+    for (const r of rankData) {
       if (!pctById.has(r.operator_id)) pctById.set(r.operator_id, num(r.percentile))
     }
 
@@ -304,8 +384,10 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
       .select(SNAPSHOT_COLUMNS)
       .eq('operator_id', op.operator_id)
       .order('snapshot_date', { ascending: false })
+      .limit(PER_OPERATOR_LIMIT)
     if (snapError) throw snapError
     const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
+    assertOperatorLimit(allOpSnaps, op.codename)
     const snap = operatorTotalCollapse(allOpSnaps).byOperator.get(op.operator_id) ?? null
     if (!snap) {
       // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
@@ -441,8 +523,10 @@ export async function getOperatorSubmissions(codename: string): Promise<Operator
       .select(SNAPSHOT_COLUMNS)
       .eq('operator_id', op.operator_id)
       .order('snapshot_date', { ascending: false })
+      .limit(PER_OPERATOR_LIMIT)
     if (snapError) throw snapError
     const snaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
+    assertOperatorLimit(snaps, codename)
     return dedupe(snaps.map((s) => toSubmission(s, op.primary_domain)))
   } catch {
     return []
@@ -478,6 +562,7 @@ export async function getOperatorHistory(
       .select('snapshot_date, signa_rate, class_tier')
       .eq('operator_id', op.operator_id)
       .order('snapshot_date', { ascending: true })
+      .limit(PER_OPERATOR_LIMIT)
     if (snapError) throw snapError
     const snaps =
       asDb<Array<{
@@ -486,13 +571,18 @@ export async function getOperatorHistory(
         class_tier: string | null
       }> | null>(snapData) ?? []
     if (snaps.length === 0) return fromMock()
+    assertOperatorLimit(snaps, codename)
 
     // Per-date global_rank from rank_history (keyed by date).
     const { data: rankData } = await sb
       .from('rank_history')
       .select('snapshot_date, global_rank')
       .eq('operator_id', op.operator_id)
+      .limit(PER_OPERATOR_LIMIT)
     const rankByDate = new Map<string, number>()
+    if (rankData && (rankData as unknown[]).length >= PER_OPERATOR_LIMIT) {
+      warnTruncation(`rank_history (operator ${codename})`, (rankData as unknown[]).length, PER_OPERATOR_LIMIT)
+    }
     for (const r of ((rankData as Array<{ snapshot_date: string; global_rank: number | null }>) ?? [])) {
       rankByDate.set(r.snapshot_date, num(r.global_rank))
     }
@@ -656,14 +746,20 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
   if (!sb) return MOCK_CLASS_DISTRIBUTION
   try {
     // Count each operator once, by their latest snapshot's class_tier.
-    const { data, error } = await sb
-      .from('metric_snapshots')
-      .select('operator_id, snapshot_date, class_tier')
-      .order('snapshot_date', { ascending: false })
-    if (error) throw error
-    const rows =
-      (data as Array<{ operator_id: string; snapshot_date: string; class_tier: string | null }>) ??
-      []
+    // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
+    const rows = await fetchAllPaginated<{
+      operator_id: string
+      snapshot_date: string
+      class_tier: string | null
+    }>(
+      sb,
+      (s) =>
+        s
+          .from('metric_snapshots')
+          .select('operator_id, snapshot_date, class_tier')
+          .order('snapshot_date', { ascending: false }),
+      'metric_snapshots (getClassDistribution)',
+    )
     if (rows.length === 0) return MOCK_CLASS_DISTRIBUTION
 
     const seen = new Set<string>()
