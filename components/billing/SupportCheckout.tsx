@@ -48,10 +48,21 @@ export function SupportCheckout() {
   const [selectedMonthly, setSelectedMonthly] = useState<string>(monthly[0]?.price ?? '')
   const [pending, setPending] = useState(false)
   const [note, setNote] = useState<string | null>(null)
+  // Logged-in operator (codename), if any — threaded into checkout so revenue events
+  // key to a person instead of the anon bucket. Same source + key the server events use
+  // (/api/v1/profile → operator.codename; matches metadata.operator_id server-side). (salvaged from PR #16)
+  const [operatorId, setOperatorId] = useState<string | null>(null)
 
   // upgrade_viewed — SupportCheckout always renders on /upgrade, so its mount = page view.
   useEffect(() => {
     track.upgradeViewed()
+    fetch('/api/v1/profile', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const codename: string | undefined = d?.operator?.codename
+        if (codename) setOperatorId(codename)
+      })
+      .catch(() => {})
   }, [])
 
   async function go() {
@@ -65,14 +76,14 @@ export function SupportCheckout() {
         setNote('Enter an amount of $1 or more.')
         return
       }
-      payload = { kind: 'donation', amount_cents: Math.round(dollars * 100) }
+      payload = { kind: 'donation', amount_cents: Math.round(dollars * 100), ...(operatorId ? { operator_id: operatorId } : {}) }
     } else {
       if (!selectedMonthly) {
         setPending(false)
         setNote('Pick a monthly amount.')
         return
       }
-      payload = { kind: 'subscription', price: selectedMonthly }
+      payload = { kind: 'subscription', price: selectedMonthly, ...(operatorId ? { operator_id: operatorId } : {}) }
     }
 
     track.checkoutClicked(
