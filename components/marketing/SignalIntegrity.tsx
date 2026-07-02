@@ -161,7 +161,6 @@ const CLI_CMDS = [
   { cmd: 'sigrank', args: 'tui',     desc: 'Same as above — explicit launch. Keys: 1–6 or ← → switch, R refresh, Q quit.' },
   { cmd: 'sigrank', args: 'enroll',  desc: 'Sign in: paste a key from signalaf.com → Settings → "New key". (Or in the TUI: Connect tab, key 6.)' },
   { cmd: 'sigrank', args: 'submit',  desc: 'Publish your verified runs to the board. (Or press [S] from any read tab in the TUI.)' },
-  { cmd: 'sigrank', args: 'me',      desc: 'Your local cascade across 7d / 30d / 90d / all-time. Zero paste, on-device.' },
   { cmd: 'sigrank', args: 'board',   desc: 'Live leaderboard from signalaf.com — auto-refreshes every 30s.' },
   { cmd: 'sigrank', args: 'compare', desc: 'Source audit — tokenpull vs ccusage vs token-dash vs tokscale, with delta %.' },
   { cmd: 'sigrank', args: 'watch',   desc: 'Live cascade meter — re-reads logs on every poll, shows what moved.' },
@@ -251,7 +250,7 @@ export function LocalAgentMcp() {
       <section className="flex flex-col gap-3">
         <H2>Supported platforms</H2>
         <P>
-          tokenpull reads local session logs from 14+ AI coding platforms. Each adapter
+          tokenpull reads local session logs from {PLATFORM_COUNT}+ AI coding platforms. Each adapter
           reads that platform&apos;s own log format — you don&apos;t reconfigure anything.
         </P>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
