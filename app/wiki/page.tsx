@@ -543,6 +543,7 @@ export default function Draft1Page() {
         { label: 'Signature drift — the tune meter', hint: 'Shape-not-magnitude drift from an operator’s calibrated signature; the contamination constraint. (Internals proprietary.)', node: withPermalink('signal-drift', <SignatureDrift />) },
         { label: 'The local agent (MCP)', hint: 'Full CLI + MCP reference, and the exact path from local logs → board → operator profile. See also the Agent & Profile group above.', node: withPermalink('local-agent', <LocalAgentMcp />) },
         { label: 'Measured alongside', hint: 'Tip of the hat to the token tools SigRank reads alongside / builds on — ccusage, tokscale, token-dashboard.', node: withPermalink('measured-alongside', <Credits />) },
+        { label: 'How we got here — refining the index', hint: 'Why we lead with the ordinal rank + reader-matched framing, and treat the raw Υ multiplier with care. The honest calibration story.', node: <p className="text-sm text-text-secondary">Read the full write-up on <a href="/wiki/methodology-refinement" className="text-text-accent underline-offset-2 hover:underline">the index-refinement page ↗</a>.</p> },
       ],
     },
     {
