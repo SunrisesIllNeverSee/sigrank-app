@@ -45,6 +45,6 @@ CREATE INDEX IF NOT EXISTS idx_source_attestations_content_hash
   ON source_attestations (device_id, path_hash, content_hash);
 
 -- RLS: this table is server-only (service role reads/writes). No anon access.
-ALTER TABLE source_attestations ENABLE ROW LEVEL LEVEL SECURITY;
+ALTER TABLE source_attestations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE source_attestations FORCE ROW LEVEL SECURITY;
 -- No policy = no access for anon/authenticated roles. Service role bypasses RLS.
