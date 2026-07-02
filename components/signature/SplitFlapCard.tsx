@@ -474,12 +474,10 @@ function Board({
   const normFrac = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
   const meterRows: MeterRow[] = (radarAxes ?? []).map((ax) => {
     const meta = meterMeta[ax.label]
-    // Avg-anchored scaling when both numbers exist; legacy max-scaling otherwise.
-    const anchored = meta != null && meta.youNum != null && meta.avgNum != null && meta.avgNum > 0
-    const frac = anchored
-      ? Math.max(0.02, Math.min(1, meta.youNum! / (2 * meta.avgNum!)))
-      : normFrac(ax.value, ax.max)
-    const avgFrac = anchored ? 0.5 : meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null
+    // Fixed per-axis scale; the avg series plots at its true per-metric
+    // position so the field's actual silhouette shows (not a uniform ring).
+    const frac = normFrac(ax.value, ax.max)
+    const avgFrac = meta?.avgNum != null ? normFrac(meta.avgNum, ax.max) : null
     return {
       glyph: meta?.glyph ?? ax.label.slice(0, 3).toUpperCase(),
       label: ax.label,
@@ -599,8 +597,9 @@ function Board({
             sits at a constant y regardless of name length. ── */}
         <div style={{
           height: '96px', flexShrink: 0, overflow: 'hidden',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: '12px',
         }}>
+          {/* LEFT — name on top, identity info tucked beneath it */}
           <div style={{
             flex: 1, minWidth: 0, height: '100%',
             display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
@@ -612,23 +611,22 @@ function Board({
             }}>
               {name.toUpperCase()}
             </div>
-            {/* brand pinned to zone bottom-left — baseline-mirrors the op-ratio
-                line at the info block's bottom-right (symmetry, no dead gap) */}
-            <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap', opacity: 0.85 }}>
+              {classTier} &middot; {(platform ?? '\u2014').toUpperCase()} &middot; {opStr}
+            </span>
           </div>
-          {/* Υ hero — lives INSIDE the fixed 96px zone; divider cannot move */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexShrink: 0, alignSelf: 'center' }}>
-            <span style={{ fontSize: '54px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1, letterSpacing: '-2px' }}>{yieldStr}</span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '1px' }}>{'\u03a5'} YIELD</span>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: GOLD_DARK, opacity: 0.45 }}>avg 1.57</span>
+          {/* CENTER — SigRank logo mark, dead-center of the header zone */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px', flexShrink: 0 }}>
+            <span style={{ fontSize: '26px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1 }}>{'\u25c8'}</span>
+            <span style={{ fontSize: '10px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px', opacity: 0.7 }}>SIGRANK</span>
+          </div>
+          {/* RIGHT — Υ hero, right-aligned; cascade string rides beneath it */}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', textAlign: 'right' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '1px', opacity: 0.7 }}>{'\u03a5'} YIELD</span>
+              <span style={{ fontSize: '46px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1, letterSpacing: '-1.5px' }}>{yieldStr}</span>
             </div>
-          </div>
-          {/* Info block — top-right corner (yield moved to radar center) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', flexShrink: 0, textAlign: 'right' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{classTier} &middot; {(platform ?? '\u2014').toUpperCase()}</span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{cascadeStrVal}</span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{opStr}</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap', opacity: 0.85 }}>{cascadeStrVal}</span>
           </div>
         </div>
 
