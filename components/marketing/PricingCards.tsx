@@ -40,7 +40,7 @@ const TIERS: Tier[] = [
       'MCP server, Claude Code plugin, IDE extensions',
     ],
     cta: 'Start free',
-    ctaHref: '/wiki',
+    ctaHref: '/score',
   },
   {
     badge: 'EARLY SUPPORTER',
