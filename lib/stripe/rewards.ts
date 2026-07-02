@@ -6,7 +6,7 @@ import 'server-only'
  * Maps a resolved SupporterTier to the canonical reward set (RW.16–RW.27) and
  * recomputes the operator's supporter tier from the full set of subscription
  * rows using the pure resolver in lib/stripe/tier.ts. All DB writes are
- * getSupabaseServer()-guarded by the caller (handlers.ts); the functions here
+ * getSupabaseService()-guarded by the caller (handlers.ts); the functions here
  * are pure mappings plus a single guarded persistence helper.
  *
  * Reward catalog (lib/canon/ids.ts REWARDS):
@@ -15,7 +15,7 @@ import 'server-only'
  *   circle_sponsor → RW.25, RW.26, RW.27
  */
 
-import { getSupabaseServer } from '@/lib/supabase/server'
+import { getSupabaseService } from '@/lib/supabase/server'
 import type { SupporterTier } from '@/lib/scoring/types'
 import {
   getSupporterTier,
@@ -106,7 +106,7 @@ export function recomputeSupporterTier(
  * If a denormalized operator_rewards table is added later (see migration 0003),
  * re-enable the upsert/delete writes guarded on its existence.
  *
- * getSupabaseServer()-guarded: when Supabase is unconfigured (or any write
+ * getSupabaseService()-guarded: when Supabase is unconfigured (or any write
  * throws) it logs and returns the computed delta without throwing, so the
  * webhook can still ack (200) in dev. Returns the RewardDelta that was applied.
  */
@@ -116,7 +116,7 @@ export async function applyRewardsForOperator(
   nextTier: SupporterTier,
 ): Promise<RewardDelta> {
   const delta = diffRewards(prevTier, nextTier)
-  const sb = getSupabaseServer()
+  const sb = getSupabaseService()
   if (!sb) {
     // No creds → dev no-op. Log so the flow is observable.
     console.info(

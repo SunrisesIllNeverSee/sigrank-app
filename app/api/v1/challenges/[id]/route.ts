@@ -25,6 +25,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseServer } from '@/lib/supabase/server'
+import { resolveAuth } from '@/lib/api/auth'
 
 function compositeScore(d: number, cl: number, fi: number, br: number, im: number): number {
   return Math.round((d * 0.30 + cl * 0.20 + fi * 0.20 + br * 0.15 + im * 0.15) * 100) / 100
@@ -93,8 +94,21 @@ export async function PATCH(
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
   }
 
+  if (!body || typeof body !== 'object') {
+    return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
+  }
+
+  // AUTH (2026-07-02): resolve the submitter's identity from signature-OR-session,
+  // NOT from a body-supplied codename. Anyone with curl could previously submit
+  // scores as any operator and decide challenge outcomes.
+  const auth = await resolveAuth(req, body as Record<string, unknown>)
+  if (!auth.ok) {
+    return NextResponse.json(auth.body, { status: auth.status })
+  }
+  const operatorCodename = auth.codename
+  const operatorId = auth.operatorId
+
   const b = body as Record<string, unknown>
-  const operatorCodename = typeof b.operator_codename === 'string' ? b.operator_codename.trim() : ''
   const signalText       = typeof b.signal_text       === 'string' ? b.signal_text               : ''
   const engine           = typeof b.engine            === 'string' ? b.engine                    : 'claude'
   const certJson         = b.certificate_json ?? null
@@ -106,9 +120,6 @@ export async function PATCH(
   const brevity  = Number(rawScores?.brevity  ?? 0)
   const impact   = Number(rawScores?.impact   ?? 0)
 
-  if (!operatorCodename) {
-    return NextResponse.json({ error: 'missing_field', detail: 'operator_codename required' }, { status: 400 })
-  }
   if (!signalText.trim()) {
     return NextResponse.json({ error: 'missing_field', detail: 'signal_text required' }, { status: 400 })
   }
@@ -131,17 +142,6 @@ export async function PATCH(
     })
   }
 
-  // Resolve operator
-  const { data: operator } = await sb
-    .from('operators')
-    .select('operator_id')
-    .eq('codename', operatorCodename)
-    .single()
-
-  if (!operator) {
-    return NextResponse.json({ error: 'operator_not_found', detail: `Operator '${operatorCodename}' not found` }, { status: 404 })
-  }
-
   // Fetch challenge to validate it's active and this operator is a participant
   const { data: challenge } = await sb
     .from('challenges')
@@ -161,8 +161,8 @@ export async function PATCH(
   // For throwdown: verify this operator is a participant
   if (challenge.format === 'throwdown') {
     const isParticipant =
-      challenge.challenger_id === operator.operator_id ||
-      challenge.challenged_id === operator.operator_id
+      challenge.challenger_id === operatorId ||
+      challenge.challenged_id === operatorId
     if (!isParticipant) {
       return NextResponse.json({ error: 'not_participant', detail: 'Operator is not a participant in this throwdown' }, { status: 403 })
     }
@@ -173,7 +173,7 @@ export async function PATCH(
     .from('challenge_submissions')
     .upsert({
       challenge_id:    id,
-      operator_id:     operator.operator_id,
+      operator_id:     operatorId,
       signal_text:     signalText,
       score_density:   density,
       score_clarity:   clarity,

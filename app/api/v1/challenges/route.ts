@@ -19,6 +19,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseServer } from '@/lib/supabase/server'
+import { resolveAuth } from '@/lib/api/auth'
 
 const DEFAULT_WINDOW_HOURS = 24
 const DEFAULT_BRIEF =
@@ -40,17 +41,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
   }
 
+  if (!body || typeof body !== 'object') {
+    return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
+  }
+
+  // AUTH (2026-07-02): resolve the challenger's identity from signature-OR-session,
+  // NOT from a body-supplied codename. The body codename is ignored for the
+  // challenger; the challenged codename is still accepted from the body (it's
+  // the target, not the caller).
+  const auth = await resolveAuth(req, body as Record<string, unknown>)
+  if (!auth.ok) {
+    return NextResponse.json(auth.body, { status: auth.status })
+  }
+  const challengerCodename = auth.codename
+  const challengerId = auth.operatorId
+
   const b = body as Record<string, unknown>
-  const challengerCodename = typeof b.challenger_codename === 'string' ? b.challenger_codename.trim() : ''
   const challengedCodename = typeof b.challenged_codename === 'string' ? b.challenged_codename.trim() : ''
   const promptBrief        = typeof b.prompt_brief       === 'string' ? b.prompt_brief.trim()       : ''
   const format             = typeof b.format             === 'string' ? b.format                    : 'throwdown'
   const challengerEngine   = typeof b.challenger_engine  === 'string' ? b.challenger_engine         : 'claude'
   const windowHours        = typeof b.window_hours       === 'number' ? b.window_hours              : DEFAULT_WINDOW_HOURS
 
-  if (!challengerCodename) {
-    return NextResponse.json({ error: 'missing_field', detail: 'challenger_codename required' }, { status: 400 })
-  }
   if (format === 'throwdown' && !challengedCodename) {
     return NextResponse.json({ error: 'missing_field', detail: 'challenged_codename required for throwdown' }, { status: 400 })
   }
@@ -79,17 +91,7 @@ export async function POST(req: NextRequest) {
     }, { status: 201 })
   }
 
-  // Resolve operator UUIDs by codename
-  const { data: challenger } = await sb
-    .from('operators')
-    .select('operator_id')
-    .eq('codename', challengerCodename)
-    .single()
-
-  if (!challenger) {
-    return NextResponse.json({ error: 'operator_not_found', detail: `Challenger '${challengerCodename}' not found` }, { status: 404 })
-  }
-
+  // Challenger identity is already resolved from auth — no codename lookup needed.
   let challengedId: string | null = null
   if (challengedCodename) {
     const { data: challenged } = await sb
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
   const { data: created, error } = await sb
     .from('challenges')
     .insert({
-      challenger_id:    challenger.operator_id,
+      challenger_id:    challengerId,
       challenged_id:    challengedId,
       prompt_id:        promptId,
       prompt_brief:     resolvedBrief,
