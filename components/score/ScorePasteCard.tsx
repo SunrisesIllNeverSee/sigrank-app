@@ -21,6 +21,15 @@ interface ParsePreview {
   estimated: boolean
   caveat: string | null
   costUsd: number | null
+  // Projected scoring (the "ghost rank" preview):
+  yield: number
+  leverage: number
+  velocity: number
+  signaRate: number
+  classTier: string
+  signalForce: number
+  dev10x: number | null
+  cascadeStr: string
 }
 
 type Status =
@@ -136,6 +145,28 @@ export function ScorePasteCard() {
                 <span className="text-text-primary">${preview.costUsd.toFixed(3)}</span>
               </>
             )}
+          </div>
+
+          {/* Projected scoring — the ghost rank preview */}
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1 border-t border-gold/20 pt-3 font-mono text-xs sm:grid-cols-4">
+            <span className="text-text-muted">Υ Yield</span>
+            <span className="text-gold font-bold">{preview.yield.toFixed(1)}</span>
+            <span className="text-text-muted">Class tier</span>
+            <span className="text-gold font-bold">{preview.classTier}</span>
+            <span className="text-text-muted">SIGNA rate</span>
+            <span className="text-text-primary">{preview.signaRate.toFixed(1)}</span>
+            <span className="text-text-muted">Leverage</span>
+            <span className="text-text-primary">{preview.leverage.toFixed(1)}:1</span>
+            <span className="text-text-muted">Velocity</span>
+            <span className="text-text-primary">{preview.velocity.toFixed(2)}×</span>
+            {preview.dev10x != null && (
+              <>
+                <span className="text-text-muted">10× dev</span>
+                <span className="text-text-primary">{preview.dev10x.toFixed(2)}</span>
+              </>
+            )}
+            <span className="text-text-muted">Cascade</span>
+            <span className="text-text-primary">{preview.cascadeStr}</span>
           </div>
 
           {/* Not-saved notice + CTA */}
