@@ -233,7 +233,7 @@ export default async function OperatorOG({
         { glyph: 'SNR', youV: c.snr, avgV: 0.33, you: snrStr },
         { glyph: 'VEL', youV: c.velocity, avgV: 0.5, you: velStr },
         { glyph: 'LEV', youV: c.leverage, avgV: 3.2, you: levStr },
-        { glyph: '⚡', youV: c.dev10x ?? 0, avgV: 0.5, you: devStr },
+        { glyph: '10X', youV: c.dev10x ?? 0, avgV: 0.5, you: devStr },
         { glyph: 'SCL', youV: c.scaleV, avgV: null, you: scaleStr },
         { glyph: 'EFF', youV: c.efficiency, avgV: 1.0, you: effStr },
       ].map(({ glyph, youV, avgV, you }) => {
@@ -256,14 +256,14 @@ export default async function OperatorOG({
     ['OUTPUT', outputT != null ? fmtTokens(outputT) : DASH, 'OUT', avgFmt(avgOut), C_GREEN],
     ['CACHE R', cacheR != null ? fmtTokens(cacheR) : DASH, 'CR', avgFmt(avgCache), C_GREEN],
     ['CACHE W', cacheW != null ? fmtTokens(cacheW) : DASH, 'CW', avgIn != null ? '0' : DOT, C_BONE],
-    ['TOTAL', totalT != null ? fmtTokens(totalT) : DASH, '∑', avgFmt(avgTotal), C_DIM],
+    ['TOTAL', totalT != null ? fmtTokens(totalT) : DASH, 'TOT', avgFmt(avgTotal), C_DIM],
   ]
   const derivedLines: [string, string, string, string, string][] = [
     ['YIELD', yieldStr, 'Υ', '1.57', C_GOLD],
     ['SNR', snrStr, 'SNR', '33%', C_GREEN],
     ['LEVERAGE', levStr, 'LEV', '3.2x', C_GREEN],
     ['VELOCITY', velStr, 'VEL', '0.50', C_BONE],
-    ['10X DEV', devStr, '⚡', '0.50', C_GOLD],
+    ['10X DEV', devStr, '10X', '0.50', C_GOLD],
     ['SCALE V', scaleStr, 'SCL', avgScl, C_BONE],
     ['EFFICIENCY', effStr, 'EFF', '1.0x', C_GREEN],
     ['COST/1M', costStr, '$', '$2.31', C_DIM],
