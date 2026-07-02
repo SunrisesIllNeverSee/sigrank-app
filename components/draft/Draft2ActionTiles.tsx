@@ -10,7 +10,7 @@ import Link from 'next/link'
  * the hero tiles keep just the soft glow.
  */
 const TILES: { href: string; glyph: string; label: string }[] = [
-  { href: '/wiki', glyph: 'Υ', label: 'Measure' },
+  { href: '/score', glyph: 'Υ', label: 'Measure' },
   { href: '/leaderboard', glyph: '≣', label: 'Board' },
   { href: '/compare', glyph: '⇄', label: 'Compare' },
   { href: '/wiki', glyph: '◧', label: 'Info · Wiki' },
