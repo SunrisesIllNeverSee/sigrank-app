@@ -195,7 +195,7 @@ function TwoSeriesRadar({ rows, size, reduced, replayKey }: {
   const n = rows.length
   if (n < 3) return null
   const INK = '#0a0a0a'
-  const cx = size / 2, cy = size / 2, radius = size / 2 - 34
+  const cx = size / 2, cy = size / 2, radius = size / 2 - 52
   const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
   const pt = (i: number, r: number): [number, number] => {
     const a = angleAt(i)
@@ -233,14 +233,15 @@ function TwoSeriesRadar({ rows, size, reduced, replayKey }: {
           style={{ transition: reduced ? 'none' : 'all 900ms cubic-bezier(.22,1,.36,1)' }} />
       })}
       {rows.map((r, i) => {
-        const [lx, ly] = pt(i, radius + 20)
+        const [lx, ly] = pt(i, radius + 16)
         const cos = Math.cos(angleAt(i))
         const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
         return (
-          <text key={`lb-${i}`} x={lx.toFixed(1)} y={ly.toFixed(1)} textAnchor={anchor} dominantBaseline="middle"
+          <text key={`lb-${i}`} x={lx.toFixed(1)} y={(ly - 5).toFixed(1)} textAnchor={anchor} dominantBaseline="middle"
             fontSize={13} fontWeight={800} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
             {r.glyph}
-            <tspan dx={5} fontSize={11} fontWeight={900} opacity={0.6}>{r.you}</tspan>
+            {/* value stacked BELOW the glyph — short lines can't clip the viewBox edge */}
+            <tspan x={lx.toFixed(1)} dy={13} fontSize={11} fontWeight={900} opacity={0.6}>{r.you}</tspan>
           </text>
         )
       })}
