@@ -420,8 +420,8 @@ function Board({
           background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px)',
         }} />
 
-        {/* Top row: Name (left) + Yield (top right corner) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        {/* Row 1 — Name (left, hero) + info block (top-right corner, right-aligned) */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
           <div style={{
             fontSize: '42px', fontWeight: 900, color: GOLD_DARK,
             letterSpacing: '1px', lineHeight: 1.02, wordBreak: 'break-word',
@@ -429,35 +429,17 @@ function Board({
           }}>
             {name.toUpperCase()}
           </div>
-          {/* Yield — top right corner */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-              <span style={{ fontSize: '22px', fontWeight: 900, color: GOLD_DARK }}>{'\u03a5'}</span>
-              <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Yield</span>
-            </div>
-            <span style={{ fontSize: '30px', fontWeight: 900, color: GOLD_DARK, lineHeight: 1 }}>{yieldStr}</span>
+          {/* Info block — top-right corner (yield moved to radar center) */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', flexShrink: 0, textAlign: 'right' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{classTier} &middot; {(platform ?? '\u2014').toUpperCase()}</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{cascadeStrVal}</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: GOLD_DARK, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{opStr}</span>
           </div>
         </div>
 
-        {/* Brand row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '3px' }}>{'\u25c8'} SIGRANK</span>
-          <span style={{ fontSize: '10px', color: GOLD_DARK, opacity: 0.4, letterSpacing: '2px' }}>DEPARTURES &middot; MO&sect;ES&#8482;</span>
-        </div>
-
-        {/* Info rows — CLASS/PLATFORM/CASCADE/OP RATIO, below brand */}
-        <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '18px', rowGap: '5px' }}>
-          {[
-            ['CLASS', classTier],
-            ['PLATFORM', (platform ?? '\u2014').toUpperCase()],
-            ['CASCADE', cascadeStrVal],
-            ['OP RATIO', opStr],
-          ].map(([label, val]) => (
-            <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: '1px', minWidth: 0 }}>
-              <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>{label}</span>
-              <span style={{ fontSize: '14px', color: GOLD_DARK, fontWeight: 700, letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{val}</span>
-            </div>
-          ))}
+        {/* Row 2 — brand strip = divider anchor (nothing below this but the divider) */}
+        <div style={{ marginTop: '6px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: GOLD_DARK, letterSpacing: '2.5px', opacity: 0.7 }}>{'\u25c8'} SIGRANK</span>
         </div>
 
         {/* Divider — FIXED below brand + info, all words above this line */}
@@ -476,7 +458,7 @@ function Board({
             <span style={{ fontSize: '9px', color: GOLD_DARK, opacity: 0.35, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Cascade Signature
             </span>
-            <div style={{ width: '100%', maxWidth: '460px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
+            <div style={{ width: '100%', maxWidth: '520px', maxHeight: '100%', aspectRatio: '1', background: 'rgba(10,10,10,0.06)', borderRadius: '8px', padding: '4px' }}>
               <RadialRings axes={coloredAxes} size={460} centerValue={yieldStr} reduced={reduced} replayKey={0} />
             </div>
           </div>
