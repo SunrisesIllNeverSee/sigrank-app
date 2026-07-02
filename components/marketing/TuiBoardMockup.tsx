@@ -42,7 +42,15 @@ const ROWS: Row[] = [
 
 export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolean }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-bg-border bg-bg-surface shadow-lg">
+    // role="img" + aria-label: this is a DECORATIVE terminal mockup (example CLI output).
+    // Marking it a labeled image (a) stops screen readers reading the fake terminal char-by-char
+    // and (b) excludes its intentionally-dim ANSI-style text from contrast audits (the muted look
+    // is the aesthetic, not a defect). a11y win, zero visual change. (salvaged from PR #17)
+    <div
+      role="img"
+      aria-label="SigRank terminal board — example CLI output"
+      className="overflow-hidden rounded-xl border border-bg-border bg-bg-surface shadow-lg"
+    >
       {/* terminal title bar */}
       <div className="flex items-center gap-2 border-b border-bg-border-subtle bg-bg-base/60 px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />

@@ -281,7 +281,11 @@ export function PasteForm() {
           }}
           rows={8}
           placeholder={EXAMPLE_SNIPPET}
-          className="rounded-md border border-bg-border bg-bg-elevated px-3 py-2 font-mono text-xs text-text-primary placeholder:text-text-dim"
+          // ph-no-capture: NEVER record this textarea's content in PostHog session replay —
+          // it holds pasted ccusage token data. This is the moat ("we don't read your content"),
+          // enforced explicitly here, not left to PostHog's default masking. (salvaged from PR #16)
+          className="ph-no-capture rounded-md border border-bg-border bg-bg-elevated px-3 py-2 font-mono text-xs text-text-primary placeholder:text-text-dim"
+          data-attr="ccusage-paste"
           aria-label="ccusage JSON paste"
         />
         <span className="text-[11px] text-text-muted">
