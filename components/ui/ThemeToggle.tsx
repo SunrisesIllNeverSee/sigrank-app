@@ -18,7 +18,7 @@ const THEMES = [
 type ThemeId = (typeof THEMES)[number]['id']
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<ThemeId>('carbon')
+  const [theme, setTheme] = useState<ThemeId>('terminal')
 
   useEffect(() => {
     const current = document.documentElement.getAttribute('data-theme')
