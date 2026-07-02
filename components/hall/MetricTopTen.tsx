@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import type { LeaderboardRow } from '@/lib/data'
 import { METRICS, TOKEN_METRICS, DISPLAY_RAW, DISPLAY_METRICS } from '@/lib/canon/ids'
