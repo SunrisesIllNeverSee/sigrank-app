@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 import { getLeaderboard } from '@/lib/data'
@@ -62,8 +62,22 @@ export default async function HallPage() {
       <HallHero />
 
       {/* Client wrapper: reads useSearchParams for class/platform/window filter
-          state, filters + sorts the pre-fetched data. No API calls. */}
-      <HallContentClient windowsData={windowsData} />
+          state, filters + sorts the pre-fetched data. Wrapped in <Suspense> so
+          useSearchParams() doesn't force a client-side render bailout during
+          static generation — the fallback renders in the static HTML. */}
+      <Suspense fallback={
+        <div className="mb-8 animate-pulse">
+          <div className="mb-6 h-8 rounded bg-bg-surface" />
+          <div className="mb-8 h-10 rounded bg-bg-surface" />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="h-40 rounded bg-bg-surface" />
+            ))}
+          </div>
+        </div>
+      }>
+        <HallContentClient windowsData={windowsData} />
+      </Suspense>
 
       {/* HALL Task 6: coming-soon markers (Eras teaser · Season Leaders · Sessions) —
           the footer "On the horizon" area per HALL_DESIGN §2/§6/§7. Last child of the page. */}
