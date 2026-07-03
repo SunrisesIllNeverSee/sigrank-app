@@ -116,7 +116,7 @@ export const DEMO_BANNER =
  * every web reference tracks ONE source (was hardcoded in ≥2 places, went stale
  * at 0.9.5 once). Bump this when the MCP package is published.
  */
-export const MCP_VERSION = '0.14.3' as const
+export const MCP_VERSION = '0.15.0' as const
 
 /**
  * PLATFORM_COUNT — how many platforms the MCP's adapter registry reads. Mirrors
