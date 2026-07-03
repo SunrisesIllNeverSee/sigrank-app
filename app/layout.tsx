@@ -10,6 +10,7 @@ import './globals.css'
 import { Nav } from '@/components/ui/Nav'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 import { Footer } from '@/components/ui/Footer'
+import { ThemeCycleShortcut } from '@/components/ui/ThemeCycleShortcut'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { organization, website } from '@/lib/jsonld'
 import { siteMetadata } from '@/lib/seo'
@@ -72,6 +73,7 @@ export default function RootLayout({
         <JsonLd data={[organization(), website()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <PostHogProvider>
+          <ThemeCycleShortcut />
           <Nav />
           <DemoBanner />
           <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>

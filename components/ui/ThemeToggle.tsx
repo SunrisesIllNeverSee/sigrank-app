@@ -1,39 +1,24 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { THEMES, type ThemeId, getCurrentTheme, applyTheme } from '@/lib/theme'
 
 /**
  * ThemeToggle — sharp segmented theme switcher. Sets data-theme on <html> and
  * persists to localStorage (read back by the no-flash init in layout.tsx).
  * Initializes from whatever the init script already applied to avoid a flash.
+ * Theme logic lives in @/lib/theme so the Shift+T shortcut stays in sync.
  */
-
-const THEMES = [
-  { id: 'carbon', label: 'Carbon' },
-  { id: 'paper', label: 'Paper' },
-  { id: 'railway', label: 'Railway' },
-  { id: 'terminal', label: 'Terminal' },
-] as const
-
-type ThemeId = (typeof THEMES)[number]['id']
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<ThemeId>('terminal')
 
   useEffect(() => {
-    const current = document.documentElement.getAttribute('data-theme')
-    if (current === 'carbon' || current === 'paper' || current === 'railway' || current === 'terminal') {
-      setTheme(current)
-    }
+    setTheme(getCurrentTheme())
   }, [])
 
-  function apply(id: ThemeId) {
-    document.documentElement.setAttribute('data-theme', id)
-    try {
-      localStorage.setItem('sigrank-theme', id)
-    } catch {
-      /* private mode / storage disabled — theme still applies for the session */
-    }
+  function select(id: ThemeId) {
+    applyTheme(id)
     setTheme(id)
   }
 
@@ -48,7 +33,7 @@ export function ThemeToggle() {
           key={t.id}
           type="button"
           aria-pressed={theme === t.id}
-          onClick={() => apply(t.id)}
+          onClick={() => select(t.id)}
           className={
             'rounded px-2 py-1 font-mono text-[11px] tracking-tight transition-colors ' +
             (theme === t.id
