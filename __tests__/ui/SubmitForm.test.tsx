@@ -10,11 +10,19 @@ vi.mock('next/navigation', () => ({
 import { SubmitForm } from '@/components/submit/SubmitForm'
 
 describe('SubmitForm', () => {
-  it('renders without crashing', () => {
+  it('renders a form with a submit button', () => {
     render(<SubmitForm />)
-    // SubmitForm should render some form elements
+    // SubmitForm renders a <form> with a submit button
     const form = document.querySelector('form')
-    // If no form tag, at least check it rendered something
-    expect(form || screen.getByText(/./)).toBeTruthy()
+    expect(form).not.toBeNull()
+    expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument()
+  })
+
+  it('renders all metric input fields', () => {
+    render(<SubmitForm />)
+    // The codename field is required and labeled
+    expect(screen.getByLabelText(/codename/i)).toBeInTheDocument()
+    // A platform selector is present
+    expect(screen.getByLabelText(/platform/i)).toBeInTheDocument()
   })
 })

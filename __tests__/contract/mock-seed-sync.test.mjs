@@ -54,7 +54,7 @@ function extractMockCodenames(filePath) {
  *   - single-quoted strings, with '' as an escaped apostrophe (so a comma or
  *     paren INSIDE a string never splits a column),
  *   - nested parens (function calls like gen_random_uuid(), casts),
- *   - SQL line (`-- …`) and block (`/* … *​/`) comments.
+ *   - SQL line comments (`-- …`) and block comments (slash-star … star-slash).
  *
  * Returns an array of tuples; each tuple is an array of raw column expressions
  * in column order. This lets the caller index by the REAL column position
