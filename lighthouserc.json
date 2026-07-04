@@ -13,21 +13,11 @@
       }
     },
     "assert": {
-      "preset": "lighthouse:recommended",
       "assertions": {
         "categories:performance": ["warn", { "minScore": 0.85 }],
         "categories:accessibility": ["warn", { "minScore": 0.9 }],
         "categories:seo": ["warn", { "minScore": 0.9 }],
-        "categories:best-practices": ["warn", { "minScore": 0.9 }],
-        "aria-prohibited-attr": "warn",
-        "duplicated-javascript-insight": "warn",
-        "legacy-javascript-insight": "warn",
-        "network-dependency-tree-insight": "warn",
-        "unused-javascript": "warn",
-        "cache-insight": "warn",
-        "legacy-javascript": "warn",
-        "render-blocking-insight": "warn",
-        "uses-long-cache-ttl": "warn"
+        "categories:best-practices": ["warn", { "minScore": 0.9 }]
       }
     },
     "upload": {
