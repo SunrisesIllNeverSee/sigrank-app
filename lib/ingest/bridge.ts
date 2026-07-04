@@ -68,7 +68,6 @@ export function pillarsToCore5(input: BridgeInput): BridgeResult {
   const { pillars, sessionsCount, turnsTotal } = input
   const { input: i, output: o, cacheCreate: cw, cacheRead: cr } = pillars
 
-  const safeI     = Math.max(i, 1)
   const safeSess  = Math.max(sessionsCount, 1)
   const total     = i + o + cw + cr
 

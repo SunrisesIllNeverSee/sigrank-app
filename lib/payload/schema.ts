@@ -98,6 +98,8 @@ export const snapshotPayloadSchema = z.object({
       signa_rate: z.number().optional(),
       signal_force: z.number().optional(),
       drift_ratio: z.number().nullable().optional(),
+      // v1.1: edit-longevity ratio (agent-side anti-gaming metric).
+      edit_longevity: z.number().min(0).max(1).optional(),
     })
     .strict()
     .partial()
