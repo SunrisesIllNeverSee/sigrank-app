@@ -39,8 +39,6 @@ export default [
       '_sigrank-mcp/',
       '**/*.d.ts',
       'next-env.d.ts',
-      '__tests__/**',
-      'scripts/**',
     ],
   },
 ]
