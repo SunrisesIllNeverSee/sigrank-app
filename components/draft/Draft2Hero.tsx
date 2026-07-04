@@ -7,13 +7,14 @@ import { Draft2ActionTiles } from '@/components/draft/Draft2ActionTiles'
 /**
  * Draft2Hero — the launch-landing intro block for /draft2 (owner edit 2026-06-21).
  *
- * Order, per owner: the original SIGRANK logo
+ * Order, per owner: intro line (mono, one-line sm+) → "Operator Performance
+ * Signature" → the original SIGRANK logo
  * (RotatingWordmark + § coin) → "powered by MO§ES™" → body → four action tiles
  * (Measure / Board / Compare / Info·Wiki) → "Identifying Burners, Builders, and
  * 10×ers." → SIGNAL AF.
  *
- * The wordmark owns the only <h1> (the SIGRANK reveal); the "Operator Performance
- * Signature" line is a lead-in <p>, so the page has exactly one h1. CascadeHeader + RotatingWordmark
+ * The wordmark owns the only <h1> (the SIGRANK reveal); the "Introducing…" line is
+ * a lead-in <p>, so the page has exactly one h1. CascadeHeader + RotatingWordmark
  * are reused from the live landing ("like the original") — never forked. Server
  * component: both are client islands rendered as children, never imported into a
  * client file. No props, no data reads.
@@ -24,6 +25,11 @@ export function Draft2Hero() {
       <CascadeHeader slowFactor={1.8} />
 
       <div className="relative z-10 flex flex-col items-center gap-5">
+        {/* intro line (lead-in above the logo) */}
+        <p className="font-mono text-base font-bold leading-tight tracking-tight text-text-primary sm:whitespace-nowrap md:text-xl lg:text-2xl">
+          Introducing the new standard in{' '}
+          <span className="text-gold">AI evaluation &amp; benchmarks</span>
+        </p>
         <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary sm:text-base">
           Operator Performance Signature
         </p>
@@ -56,7 +62,7 @@ export function Draft2Hero() {
         <div className="flex max-w-2xl flex-col gap-2 text-center">
           <p className="text-balance font-sans text-lg leading-relaxed text-text-secondary sm:text-xl">
             We measure the{' '}
-            <strong className="text-text-primary">architecture of your token cascade</strong>{' '}
+            <strong className="text-text-primary">architecture of users&apos; token cascade</strong>{' '}
             to identify patterns, margins, and operator signature — revealing whether signal is
             compounded or tokens burned. Most platforms reward volume. SigRank rewards structure.
           </p>
