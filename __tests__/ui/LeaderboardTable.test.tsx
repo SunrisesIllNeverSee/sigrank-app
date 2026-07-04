@@ -52,16 +52,18 @@ describe('LeaderboardTable', () => {
     const seedEntries: LeaderboardEntry[] = [
       { ...mockEntries[0], isSeed: true, anonId: 'SeedOperator', codename: 'SeedOperator' },
     ]
-    const { container } = render(<LeaderboardTable entries={seedEntries} />)
-    // The seed operator should appear in the table
+    render(<LeaderboardTable entries={seedEntries} />)
+    // The seed operator's name span has fontStyle: 'italic' (inline style via
+    // e.isSeed ? 'italic' : 'normal'). jsdom's getComputedStyle reads inline styles.
     const matches = screen.getAllByText('SeedOperator')
-    expect(matches.length).toBeGreaterThan(0)
-    // At least one should be italic (the seed styling)
-    const hasItalic = matches.some((el) => {
-      const style = window.getComputedStyle(el)
-      return style.fontStyle === 'italic' || el.className.includes('italic')
-    })
-    // If jsdom doesn't compute styles, just verify it rendered
-    expect(matches.length).toBeGreaterThan(0)
+    const hasItalic = matches.some((el) => window.getComputedStyle(el).fontStyle === 'italic')
+    expect(hasItalic).toBe(true)
+  })
+
+  it('renders non-seed operators without italic styling', () => {
+    render(<LeaderboardTable entries={mockEntries} />)
+    const matches = screen.getAllByText('TestOperator')
+    const hasItalic = matches.some((el) => window.getComputedStyle(el).fontStyle === 'italic')
+    expect(hasItalic).toBe(false)
   })
 })

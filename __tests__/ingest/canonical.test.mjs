@@ -49,7 +49,6 @@ function compute(i, o, cw, cr) {
 
 /** Mirrors pillarsToCore5 in bridge.ts */
 function pillarsToCore5(i, o, cw, cr, sessionsCount, turnsTotal) {
-  const safeI    = Math.max(i, 1)
   const safeSess = Math.max(sessionsCount, 1)
   const total    = i + o + cw + cr
 
