@@ -1,0 +1,39 @@
+# Dependabot — automated dependency update PRs.
+# Opens weekly PRs for npm packages and GitHub Actions versions, and surfaces
+# security advisories as soon as they're published in GitHub's advisory database.
+# Repo setting "Allow Dependabot auto-merge" must be enabled in GitHub UI to use
+# the auto-merge hints below; this file alone does not auto-merge.
+version: 2
+updates:
+  # npm dependencies (package.json + package-lock.json)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+    # Group patch updates so they land in one PR instead of ten.
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
+
+  # GitHub Actions versions used in workflows (keeps actions/checkout etc. current)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"

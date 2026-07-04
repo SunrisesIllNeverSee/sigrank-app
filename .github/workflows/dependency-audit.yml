@@ -1,0 +1,55 @@
+# Dependency audit — runs npm audit and fails on high/critical advisories.
+# Moderate/low findings are reported as an artifact for triage but do NOT fail
+# the job, because some moderate vulns are transitive deps of Next.js whose only
+# "fix" is a breaking downgrade (e.g. postcss via next). Gating on high/critical
+# keeps CI green on unactionable moderate findings while still blocking real risk.
+name: Dependency Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Twice weekly — catches newly disclosed advisories between PRs.
+    - cron: "17 6 * * 1,4"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: npm audit (high/critical gate)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: npm audit (fail on high/critical)
+        # --omit=dev: production deps only (the ones that ship to Vercel).
+        # --audit-level=high: exit non-zero only on high or critical.
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Full audit report (always, for triage)
+        if: always()
+        run: |
+          echo "## npm audit — full report" > audit-report.md
+          echo "" >> audit-report.md
+          echo '```' >> audit-report.md
+          npm audit --omit=dev || true >> audit-report.md 2>&1
+          echo '```' >> audit-report.md
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: audit-report.md
+          retention-days: 14
