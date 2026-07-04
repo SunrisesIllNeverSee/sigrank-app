@@ -54,7 +54,7 @@ export function TerminalWordmark() {
         fontClassName="text-[clamp(0.6rem,3.2vw,1.7rem)]"
       />
 
-      {/* ◈ rule (SPLASH_RULE) — tagline removed per owner 2026-07-02 */}
+      {/* ◈ rule (SPLASH_RULE) */}
       <div className="flex flex-col items-center gap-1 font-mono text-[10px] text-text-dim sm:text-[11px]">
         <span>{SPLASH_RULE}</span>
       </div>
