@@ -1,0 +1,20 @@
+# CODEOWNERS — auto-requests review on PRs touching critical paths.
+# If SunrisesIllNeverSee is an organization (not a user account), replace the
+# handle below with @SunrisesIllNeverSee/<team-slug>.
+
+# Scoring + ingest correctness (frozen invariants live here)
+/lib/scoring/         @SunrisesIllNeverSee
+/lib/ingest/          @SunrisesIllNeverSee
+/lib/canon/           @SunrisesIllNeverSee
+
+# API routes (billing, ingest, auth, devices)
+/app/api/             @SunrisesIllNeverSee
+
+# Database migrations + RLS posture
+/supabase/            @SunrisesIllNeverSee
+
+# CI / security workflows + governance
+/.github/             @SunrisesIllNeverSee
+
+# Canonical + contract tests (regression gates)
+/__tests__/           @SunrisesIllNeverSee

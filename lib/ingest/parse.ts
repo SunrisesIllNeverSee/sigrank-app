@@ -270,7 +270,7 @@ function extractByName(
     }
   }
 
-  let reasoning = grabField(text, ALIASES.reasoning)
+  const reasoning = grabField(text, ALIASES.reasoning)
   const totalO = o + reasoning
 
   if (i + totalO + cw + cr === 0) return null
