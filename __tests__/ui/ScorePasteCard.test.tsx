@@ -18,8 +18,9 @@ describe('ScorePasteCard', () => {
 
   it('shows a preview/parse button', () => {
     render(<ScorePasteCard />)
-    // Look for any button — the paste card has a preview/calculate action
-    const buttons = screen.getAllByRole('button')
-    expect(buttons.length).toBeGreaterThan(0)
+    // The paste card's primary action is "Parse & preview" — assert by
+    // accessible name so the test fails if the parse action is removed
+    // or relabeled to something unrelated.
+    expect(screen.getByRole('button', { name: /preview|parse|calculate/i })).toBeInTheDocument()
   })
 })
