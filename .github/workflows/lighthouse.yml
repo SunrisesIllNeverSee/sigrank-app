@@ -18,7 +18,7 @@ jobs:
     name: Lighthouse audit (live site)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v12
@@ -29,7 +29,7 @@ jobs:
 
       - name: Upload Lighthouse report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lighthouse-report
           path: .lighthouseci/
