@@ -17,7 +17,7 @@ import type { Metadata } from 'next'
 export const SITE_ORIGIN = 'https://signalaf.com'
 export const SITE_NAME = 'SigRank'
 export const SITE_TAGLINE =
-  'Burners · Builders · 10Xer’s. The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?'
+  'The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?'
 
 /** Static OG image (1200×630 brand card). MUST be a raster PNG/JPG — X, LinkedIn,
  *  Facebook, iMessage, Slack, and Discord all reject SVG for link-preview cards, so
