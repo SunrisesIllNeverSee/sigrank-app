@@ -1,0 +1,22 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          release-type: node
+          package-name: sigrank-app
+          # Conventional commits → auto-bump + changelog + tag + GitHub release.
+          # The PR that release-please opens also bumps package.json version.
+          # Merge the PR to cut a release. Vercel deploys on the merge — the
+          # tag is the release marker. No npm publish (Vercel handles deploy).

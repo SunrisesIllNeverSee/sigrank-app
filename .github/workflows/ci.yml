@@ -6,7 +6,30 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
+  # Secret scan — blocks commits that leak keys/tokens. Uses gitleaks; for a
+  # public repo the default GITHUB_TOKEN is sufficient (no license key needed).
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # gitleaks-action needs pull-requests: write to post review comments on
+      # PRs. Without it the scan still runs and fails on leaks, but PR
+      # annotations silently don't appear.
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so gitleaks can scan past commits, not just the diff.
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -19,11 +42,28 @@ jobs:
 
       - run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
       - name: Typecheck
         run: npx tsc --noEmit
 
       - name: Canonical test (11/11, Υ 18436.98)
         run: node --test __tests__/ingest/canonical.test.mjs
+
+      - name: Test coverage report
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+      - name: UI component tests (vitest)
+        run: npm run test:ui
 
       - name: Build
         run: npm run build

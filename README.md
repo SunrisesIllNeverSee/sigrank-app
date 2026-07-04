@@ -11,6 +11,12 @@
 Most platforms reward volume. SigRank rewards structure.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml)
+[![audit](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/dependency-audit.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/dependency-audit.yml)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?style=flat-square&logo=dependabot)](https://github.com/SunrisesIllNeverSee/sigrank-app/network/dependencies)
+[![coverage](https://img.shields.io/badge/coverage-node--test-brightgreen.svg?style=flat-square)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
+[![Lighthouse](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/lighthouse.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/lighthouse.yml)
+[![E2E](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/e2e.yml)
 [![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
 [![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold&label=sigrank)](https://www.npmjs.com/package/sigrank)
 [![deploy](https://img.shields.io/badge/deploy-Vercel-black.svg?style=flat-square)](https://vercel.com)
