@@ -1,0 +1,43 @@
+# CodeQL — GitHub's static analysis (SAST) for JavaScript/TypeScript.
+# Surfaces code-level security issues (taint flows, injection, crypto misuse,
+# unsafe data handling) as "Code scanning alerts" under the Security tab and as
+# PR annotations. Complements Dependabot (which handles dependency-level vulns).
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly scan on Monday — catches new queries / regressions between releases.
+    - cron: "23 6 * * 1"
+
+permissions:
+  contents: read
+  # Required to upload CodeQL results to the Security tab.
+  security-events: write
+  # Required to upload SARIF results (actions/upload-sarif).
+  actions: read
+
+jobs:
+  analyze:
+    name: Analyze (js/ts)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          # Build mode "none" — CodeQL analyzes JS/TS source directly without
+          # needing a production build, which keeps this job independent of
+          # Next.js build env vars and faster than autobuild.
+          build-mode: none
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"

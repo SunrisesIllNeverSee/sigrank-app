@@ -19,13 +19,21 @@ data.
 
 ## Before you commit
 
-All three gates must pass:
+All three local gates must pass:
 
 ```bash
 npx tsc --noEmit
 node --test __tests__/ingest/canonical.test.mjs
 npm run build
 ```
+
+CI also runs (in addition to the above + cross-repo contract tests):
+
+- **Secret scan** (gitleaks) — never commit real keys/tokens; `.env.example`
+  placeholders are allowlisted.
+- **CodeQL** — static analysis on JS/TS; fix or dismiss alerts it raises on your PR.
+- **Dependency audit** — `npm audit` fails on high/critical advisories (moderate
+  is reported only). If your PR bumps a dep with a high/critical advisory, CI blocks.
 
 ## Frozen invariants
 

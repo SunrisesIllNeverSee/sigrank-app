@@ -1,0 +1,15 @@
+# gitleaks config — extends the built-in rule set and allowlists placeholder
+# files so the secret-scan CI job does not false-positive on .env.example or
+# test fixtures (which carry truncated/empty placeholder values, never real keys).
+# Auto-detected by gitleaks when present at the repo root.
+title = "SigRank gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Env example + test fixtures are placeholders, not real secrets"
+paths = [
+  '''\.env\.example$''',
+  '''__tests__/fixtures/.*''',
+]
