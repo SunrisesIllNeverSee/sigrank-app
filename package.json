@@ -22,14 +22,14 @@
     "snapshot": "node scripts/snapshot-db.mjs"
   },
   "dependencies": {
-    "@stripe/stripe-js": "^9.8.0",
+    "@stripe/stripe-js": "^9.9.0",
     "@supabase/ssr": "^0.12.0",
-    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/supabase-js": "^2.110.0",
     "clackboard": "^1.1.2",
     "html-to-image": "^1.11.13",
     "next": "^15.5.19",
-    "posthog-js": "^1.396.2",
-    "posthog-node": "^5.38.8",
+    "posthog-js": "^1.396.6",
+    "posthog-node": "^5.39.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "server-only": "^0.0.1",
