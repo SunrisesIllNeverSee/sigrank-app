@@ -24,7 +24,7 @@
   "dependencies": {
     "@stripe/stripe-js": "^9.9.0",
     "@supabase/ssr": "^0.12.0",
-    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/supabase-js": "^2.110.0",
     "clackboard": "^1.1.2",
     "html-to-image": "^1.11.13",
     "next": "^15.5.19",
