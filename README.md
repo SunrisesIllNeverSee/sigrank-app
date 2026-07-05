@@ -217,6 +217,8 @@ Product contracts, not implementation details:
 - **[signalaf.com](https://signalaf.com)** — the live board
 - **[signalaf.com/score](https://signalaf.com/score)** — projected yield + ghost rank in 60 seconds, no account
 - **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npm i -g sigrank`)
+- **[Smithery](https://smithery.ai/servers/burnmydays/sigrank-mcp)** — one-click MCP install for Claude Desktop, Cursor, and more
+- **[Glama](https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp)** — MCP server directory listing
 
 ## Community
 

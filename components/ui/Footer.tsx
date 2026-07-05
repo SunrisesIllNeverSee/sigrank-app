@@ -65,6 +65,14 @@ export function Footer() {
             <Link href="/about#terms" className="transition-colors hover:text-text-primary">
               Terms
             </Link>
+            <a
+              href="https://smithery.ai/servers/burnmydays/sigrank-mcp"
+              className="transition-colors hover:text-text-primary"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Smithery
+            </a>
           </nav>
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
             <span className="font-mono text-[11px] text-text-secondary">
