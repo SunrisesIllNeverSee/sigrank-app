@@ -244,6 +244,7 @@ export function ProfileShareCard(props: ProfileShareCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null)
   const [copied, setCopied] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [preview, setPreview] = useState(false)
 
   const shareLink = async () => {
     const url = `https://signalaf.com/user/${props.codename}`
@@ -280,6 +281,9 @@ export function ProfileShareCard(props: ProfileShareCardProps) {
       <button type="button" onClick={shareLink} className={btn}>
         {copied ? 'Copied ✓' : 'Share'}
       </button>
+      <button type="button" onClick={() => setPreview(true)} className={btn}>
+        Preview
+      </button>
       <button type="button" onClick={download} disabled={busy} className={btn}>
         {busy ? 'Rendering…' : 'Download card'}
       </button>
@@ -289,6 +293,35 @@ export function ProfileShareCard(props: ProfileShareCardProps) {
       <div style={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none' }} aria-hidden>
         <Card cardRef={cardRef} {...props} />
       </div>
+
+      {/* Preview modal — shows the card scaled to fit the viewport */}
+      {preview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setPreview(false)}
+        >
+          <div
+            className="relative max-h-full max-w-full overflow-auto rounded-lg border border-bg-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreview(false)}
+              className="absolute right-2 top-2 z-10 rounded-md border border-bg-border bg-bg-surface px-2 py-1 font-mono text-xs text-text-primary transition-colors hover:bg-bg-hover"
+            >
+              Close ✕
+            </button>
+            <div
+              style={{
+                transform: 'scale(min(1, calc((100vw - 2rem) / 1200), calc((100vh - 2rem) / 630)))',
+                transformOrigin: 'top left',
+              }}
+            >
+              <Card cardRef={cardRef} {...props} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
