@@ -62,7 +62,7 @@ function withPermalink(slug: string, node: React.ReactNode) {
 
 function SigRankDefinition() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
         <strong className="text-text-primary">SigRank</strong> is the operator leaderboard for AI — it
         ranks the <strong className="text-text-primary">operator, not the model</strong>, by the
@@ -73,6 +73,26 @@ function SigRankDefinition() {
         Volume is noise. Yield is signal. The same four token counts reveal whether you compound
         signal or burn it — and whether you&apos;re a Burner, a Builder, or a 10×er.
       </p>
+
+      {/* What the board shows */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">What the board shows</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The leaderboard ranks every operator by <strong className="text-text-primary">Υ Yield</strong> —
+          the headline cascade metric — across four scoring windows: 7-day, 30-day, 90-day, and
+          all-time. Each row shows the operator&apos;s class tier (Transmitter down to Igniter),
+          their four raw token pillars, the full cascade (Υ Yield, SNR, Leverage, Velocity, 10xDEV),
+          cost per million tokens, and their efficiency vs the Artificial Analysis 7:2:1 baseline.
+        </p>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          Every number is derived from four raw integers: input, output, cache-read, cache-write.
+          No word counts, no message content, no self-reported fields. The server recomputes
+          everything from the raw payload — you cannot inflate a metric without inflating the
+          pillars that feed it, and the telescoping identity (Test 3) catches any mismatch.
+        </p>
+      </section>
+
+      {/* What the signature is — and isn't */}
       <p className="max-w-2xl rounded-lg border-l-2 border-gold/50 bg-bg-surface px-4 py-3 font-sans text-sm leading-relaxed text-text-secondary">
         <strong className="text-text-primary">What the signature is — and isn&apos;t.</strong> SigRank
         measures the token-cascade signature honestly: a real coordinate of <em>how</em> an operator
@@ -80,6 +100,39 @@ function SigRankDefinition() {
         quality of the work itself, and it doesn&apos;t claim to be. Read it as one signal, set beside
         the operator&apos;s actual work — together they say more than either does alone.
       </p>
+
+      {/* The three operator archetypes */}
+      <section className="flex flex-col gap-2">
+        <h3 className="font-mono text-sm font-bold text-text-primary">The three archetypes</h3>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+            <span className="font-mono text-sm font-bold text-text-primary">Burner</span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">
+              High input, low reuse. Fresh tokens in, tokens out, nothing held. The cascade
+              doesn&apos;t compound — it burns. Most operators start here.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+            <span className="font-mono text-sm font-bold text-text-primary">Builder</span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">
+              Cache-write is happening — context is being built forward. Leverage is rising but
+              hasn&apos;t compounded yet. The architecture is forming.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded-lg border border-gold/30 bg-gold/5 p-3">
+            <span className="font-mono text-sm font-bold text-gold">10×er</span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">
+              Cache-read dominates. The operator holds context, reuses it, and produces far more
+              output than they spend input on. The cascade compounds — 10× and above.
+            </span>
+          </div>
+        </div>
+        <p className="font-sans text-xs text-text-dim">
+          These are not fixed labels — they are cascade shapes. An operator can be a Burner on
+          Monday and a 10×er by Friday if their architecture shifts. The class tier (K.01–K.09)
+          is the stable read; the archetype is the live one.
+        </p>
+      </section>
     </div>
   )
 }
@@ -99,7 +152,7 @@ const PILLARS: { id: string; name: string; glyph: string; what: string }[] = [
 
 function FourPillars() {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-4">
       <p className="max-w-2xl font-sans text-sm text-text-secondary">
         Every score starts from <strong className="text-text-primary">four raw token counts</strong> —
         nothing else, and never your prompt content. The whole cascade is derived from these.
@@ -116,32 +169,132 @@ function FourPillars() {
           </div>
         ))}
       </div>
+
+      {/* Why these four */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">Why these four</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The four pillars are not arbitrary — they are the complete token economy of an AI coding
+          session. <strong className="text-text-primary">Input</strong> is what you pay to ask.
+          <strong className="text-text-primary"> Output</strong> is what the model produces back.
+          <strong className="text-text-primary"> Cache-write</strong> is context you build forward
+          (paying a premium to store it). <strong className="text-text-primary"> Cache-read</strong>
+          is context you reuse (paying almost nothing because it&apos;s already held).
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          The cascade is the relationship between these four. An operator who writes a lot of
+          cache and then reads it back is <em>compounding</em> — their cache-read dwarfs their
+          input. An operator who sends fresh input every turn and never reuses context is
+          <em> burning</em> — their input dwarfs everything else. The same four integers reveal
+          both patterns, and everything in between.
+        </p>
+      </section>
+
+      {/* How they relate */}
+      <section className="flex flex-col gap-2">
+        <h3 className="font-mono text-sm font-bold text-text-primary">How they relate</h3>
+        <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
+{`  Input ────────────────────►  the cost of asking
+    │
+    ▼
+  Output ◄──────────────────  the work produced
+    │
+    ▼
+  Cache-write ◄────────────  context built forward (premium)
+    │
+    ▼
+  Cache-read ◄────────────  context reused (near-free)
+    │
+    └──► back to Input: reuse reduces what you need to send next turn`}
+          </pre>
+        </div>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          The cascade is a loop, not a line. Cache-read feeds back into the next turn&apos;s input —
+          the more you reuse, the less fresh input you need. That feedback is why leverage compounds:
+          an operator who holds context produces more output per input over time, not less. The four
+          pillars capture the entire loop; the cascade metrics measure its shape.
+        </p>
+      </section>
+
+      {/* The AA baseline */}
+      <section className="flex flex-col gap-2 rounded-lg border border-gold/30 bg-gold/5 p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">The 7:2:1 baseline</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The Artificial Analysis pricing baseline sets a 7:2:1 ratio for cache-read : cache-write :
+          fresh input. SigRank&apos;s Efficiency metric (Y.08) measures how an operator&apos;s cascade
+          compares to that baseline — are they above or below the field average for their token mix?
+          It&apos;s not a pass/fail; it&apos;s a reference point. The baseline comes from published
+          model pricing data, not from SigRank&apos;s own sample.
+        </p>
+      </section>
     </section>
   )
 }
 
+const CASCADE_NOTES: Record<string, string> = {
+  'Y.01': 'The headline metric. Leverage × velocity — how much output you produce per unit of fresh input, amplified by how much context you reuse. This is what the board ranks on.',
+  'Y.02': 'Signal-to-noise ratio. What share of your fresh traffic is actually output? High SNR means most of what moves through you is work, not requests.',
+  'Y.03': 'Cache reuse per fresh input. The core compounding metric. High leverage means you hold context and reuse it — the cascade is working for you.',
+  'Y.04': 'Output per fresh input. How much work the model produces for each token you send. Velocity without leverage is fast but expensive; velocity with leverage is the 10× shape.',
+  'Y.05': 'The amplification exponent. log10 of transmission × commitment × reuse. 10×DEV = 1 means 10× amplification; 2 means 100×. Bound by the telescoping identity — you cannot inflate it independently.',
+  'Y.06': 'Raw operator scale. log10 of total tokens. A 6 here means ~1M tokens; a 7 means ~10M. Scale is context, not rank — a small operator can out-yield a large one.',
+  'Y.07': 'Blended USD per 1M tokens. The wallet pillar. Lower is better. An operator with high leverage and velocity spends less per unit of work — efficiency at the bank level.',
+  'Y.08': 'Efficiency vs the AA 7:2:1 baseline. Above 1.0 means your cascade beats the field average for your token mix; below 1.0 means you are under it. Not a pass/fail — a reference point.',
+  'Y.09': 'Composition shorthand: leverage:1:velocity. Shows the shape of your cascade at a glance — are you cache-heavy, output-heavy, or balanced?',
+}
+
 function CascadeList() {
   return (
-    <section className="flex flex-col gap-1.5">
-      <p className="mb-2 max-w-2xl font-sans text-sm text-text-secondary">
+    <section className="flex flex-col gap-4">
+      <p className="max-w-2xl font-sans text-sm text-text-secondary">
         From the four pillars we derive the <strong className="text-text-primary">token cascade</strong> —
-        the metrics the board actually ranks on. Token-only; no word-era proxies.
+        the metrics the board actually ranks on. Token-only; no word-era proxies. Each metric captures
+        a different facet of how the cascade compounds (or doesn&apos;t).
       </p>
-      {Object.values(TOKEN_METRICS).map((m) => (
-        <div
-          key={m.id}
-          className="flex items-baseline gap-2 border-b border-bg-border-subtle py-1.5 last:border-b-0"
-        >
-          <span className="w-16 shrink-0 font-mono text-sm font-bold text-text-accent">{m.ticker}</span>
-          <span className="shrink-0 font-mono text-[13px] text-text-primary">
-            {m.name}
-            <sup className="ml-0.5 text-[10px] text-text-muted">{m.id}</sup>
-          </span>
-          <span className="ml-auto text-right font-mono text-xs leading-snug text-text-secondary">
-            {m.formula}
-          </span>
-        </div>
-      ))}
+
+      {/* The metric list with explanations */}
+      <div className="flex flex-col gap-0">
+        {Object.values(TOKEN_METRICS).map((m) => (
+          <div
+            key={m.id}
+            className="flex flex-col gap-1 border-b border-bg-border-subtle py-3 last:border-b-0"
+          >
+            <div className="flex items-baseline gap-2">
+              <span className="w-16 shrink-0 font-mono text-sm font-bold text-text-accent">{m.ticker}</span>
+              <span className="shrink-0 font-mono text-[13px] text-text-primary">
+                {m.name}
+                <sup className="ml-0.5 text-[10px] text-text-muted">{m.id}</sup>
+              </span>
+              <span className="ml-auto text-right font-mono text-xs leading-snug text-text-secondary">
+                {m.formula}
+              </span>
+            </div>
+            <p className="pl-[72px] font-sans text-xs leading-relaxed text-text-muted">
+              {CASCADE_NOTES[m.id]}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* The telescoping identity */}
+      <section className="flex flex-col gap-2 rounded-lg border border-gold/30 bg-gold/5 p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">The telescoping identity</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The cascade has three stages — transmission (O/I), commitment (Create/O), and reuse
+          (Read/Create). Their product <strong>must</strong> equal cache_read / input exactly,
+          because the intermediate terms cancel:
+        </p>
+        <pre className="overflow-x-auto font-mono text-xs text-text-secondary">
+{`(O/I) × (Create/O) × (Read/Create) = Read/Input`}
+        </pre>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          So 10^(10xDEV) = Leverage, by identity — not by fit. An operator cannot inflate their
+          amplification exponent independently of their leverage; the two are bound by algebra.
+          This is Test 3 in the verification suite — it catches any fabricated row where the
+          numbers don&apos;t actually compose.
+        </p>
+      </section>
     </section>
   )
 }
@@ -150,18 +303,58 @@ function CascadeList() {
 
 function TransmitterClasses() {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="font-mono text-lg font-bold text-text-primary">The nine classes</h2>
         <span className="rounded-full border border-gold/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-gold">
           still calibrating
         </span>
       </div>
-      <p className="max-w-2xl font-sans text-sm text-text-muted">
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
         Nine cascade classes from Transmitter down. The ranges shown are qualitative cuts — exact
         breakpoints are still calibrating as the leaderboard fills, so class assignments may shift.
       </p>
+
+      {/* What the classes measure */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">What the classes measure</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Class tier is a two-axis read: <strong className="text-text-primary">compression</strong>
+          (how much of your total token flow is reuse vs fresh input) and{' '}
+          <strong className="text-text-primary">SIGNA RATE</strong> (a composite signal-quality
+          score, currently calibrating). The higher your compression, the higher your class. The
+          higher your SIGNA, the more your compression is <em>meaningful</em> reuse rather than
+          idle re-reading.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          The top three classes (Transmitter, ARCH+, ARCH) require both compression AND SIGNA
+          gates — you cannot get there by re-reading the same context without producing. The
+          lower six classes (POWER down to IGNITER) are compression-only — SIGNA is not yet
+          enforced there because the calibration sample is still growing.
+        </p>
+      </section>
+
       <ClassLadder />
+
+      {/* How you move between classes */}
+      <section className="flex flex-col gap-2 rounded-lg border border-gold/30 bg-gold/5 p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">How you move between classes</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Class is not a lifetime label. It is recomputed every scoring window (7d / 30d / 90d /
+          all-time). An operator who shifts from burning to compounding — building cache, reusing
+          context, producing more per input — will see their class rise within a week. An operator
+          who stops reusing context will see it fall.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          The practical path upward: <strong className="text-text-primary">hold context longer</strong>
+          (reduce fresh input by reusing what the model already knows),{' '}
+          <strong className="text-text-primary">produce more per turn</strong> (let the model
+          generate complete outputs rather than stopping early), and{' '}
+          <strong className="text-text-primary">build cache forward</strong> (write context that
+          future turns will read back). The cascade metrics track all three; the class tier
+          summarizes the result.
+        </p>
+      </section>
     </section>
   )
 }
@@ -405,14 +598,51 @@ const FLOW: { step: string; title: string; body: string }[] = [
 
 function SubmitFlow() {
   return (
-    <section className="grid gap-3 sm:grid-cols-3">
-      {FLOW.map((f) => (
-        <div key={f.step} className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface px-4 py-4">
-          <span className="font-mono text-xs text-text-accent">{f.step}</span>
-          <span className="font-mono text-sm font-bold text-text-primary">{f.title}</span>
-          <span className="font-sans text-xs leading-relaxed text-text-muted">{f.body}</span>
-        </div>
-      ))}
+    <section className="flex flex-col gap-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        {FLOW.map((f) => (
+          <div key={f.step} className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface px-4 py-4">
+            <span className="font-mono text-xs text-text-accent">{f.step}</span>
+            <span className="font-mono text-sm font-bold text-text-primary">{f.title}</span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">{f.body}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* The verification path */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">Why account + review?</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The board is public and ranked. Without a gate, it would fill with observer-inflated
+          entries — tooling that reports numbers the operator didn&apos;t actually produce, or
+          synthetic data designed to game a single metric. The account ties a submission to a
+          real identity; the review checks that the token counts came from a real session, not
+          a fabricated one.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          The review is lightweight — it runs the verification suite (Benford, telescoping
+          identity, bot control) on the submitted payload. If the numbers compose, the entry
+          lands. If they don&apos;t, it gets flagged. The gate is mechanical, not editorial —
+          we don&apos;t judge whether your work is good, just whether your numbers are real.
+        </p>
+      </section>
+
+      {/* What you keep private */}
+      <section className="flex flex-col gap-2 rounded-lg border border-gold/30 bg-gold/5 p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">What you keep private</h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The agent reads token counts. It does not read your prompts, your replies, your code,
+          or your file contents. The four integers (input, output, cache-read, cache-write) are
+          all that leaves your machine. The server derives the cascade from those four — no
+          content is transmitted, stored, or seen by anyone.
+        </p>
+        <p className="font-sans text-xs text-text-muted">
+          This is not a privacy compromise we tolerate — it is the architecture the Conservation
+          Law predicts. EXP-007 established that conserved structure is detectable without reading
+          content. Token counts are a legitimate statistical witness; we never need to see what
+          you typed.
+        </p>
+      </section>
     </section>
   )
 }
