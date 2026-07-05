@@ -38,15 +38,8 @@ type Status =
   | { kind: 'parsed'; preview: ParsePreview }
   | { kind: 'error'; detail: string }
 
-const EXAMPLE_SNIPPET = `{
-  "totals": {
-    "inputTokens": 1251211,
-    "outputTokens": 11296121,
-    "cacheCreationTokens": 128196310,
-    "cacheReadTokens": 2555179769,
-    "totalCost": 0.527
-  }
-}`
+const EXAMPLE_SNIPPET = `1251211 11296121 128196310 2555179769
+// input  output  cacheCreate  cacheRead`
 
 export function ScorePasteCard() {
   const [paste, setPaste] = useState('')
@@ -80,7 +73,7 @@ export function ScorePasteCard() {
       {/* Paste area */}
       <label className="flex flex-col gap-1">
         <span className="text-xs font-medium text-text-secondary">
-          Paste <code className="font-mono text-text-primary">ccusage --json</code> output
+          Paste your four token counts
         </span>
         <textarea
           value={paste}
@@ -91,10 +84,10 @@ export function ScorePasteCard() {
           rows={8}
           placeholder={EXAMPLE_SNIPPET}
           className="rounded-md border border-bg-border bg-bg-elevated px-3 py-2 font-mono text-xs text-text-primary placeholder:text-text-dim"
-          aria-label="ccusage JSON paste"
+          aria-label="Token counts paste"
         />
         <span className="text-[11px] text-text-muted">
-          Accepts: full ccusage JSON, partial fragments, Codex exports, or four bare numbers.
+          Accepts: four bare numbers, ccusage JSON, or partial fragments. Order: input output cacheCreate cacheRead.
         </span>
       </label>
 
@@ -175,9 +168,9 @@ export function ScorePasteCard() {
               These are run numbers — not saved to the board.
             </p>
             <p className="mt-1 font-sans text-[12px] leading-snug text-text-secondary">
-              To land on the leaderboard, run the local agent
-              (<code className="font-mono text-text-primary">npx sigrank me</code>) and submit
-              through your account. Board entries are reviewed, so the board stays honest.
+              To land on the leaderboard, install the agent
+              (<code className="font-mono text-text-primary">npm install -g sigrank</code>), enroll,
+              and submit a signed snapshot. The agent reads your local logs — no paste needed.
             </p>
           </div>
         </div>
