@@ -91,7 +91,6 @@ function warnTruncation(table: string, hit: number, ceiling: number) {
  * The `buildQuery` fn receives the supabase client and should return a SELECT
  * query builder (NOT awaited) — the helper applies `.range()` + awaits.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchAllPaginated<T>(
   sb: SupabaseClient,
   buildQuery: (sb: SupabaseClient) => any,

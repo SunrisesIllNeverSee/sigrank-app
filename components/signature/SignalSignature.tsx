@@ -76,7 +76,6 @@ function NoiseField({
     canvas.height = h * dpr
     ctx.scale(dpr, dpr)
 
-    let frame = 0
     let raf = 0
 
     const cellW = 10
@@ -93,14 +92,6 @@ function NoiseField({
 
       c.font = '11px ui-monospace, "SF Mono", Menlo, monospace'
       c.textBaseline = 'top'
-
-      // How much noise vs signal (0 = pure noise, 1 = fully resolved)
-      const noiseLevel =
-        phase === PHASE_NOISE ? 1.0 :
-        phase === PHASE_RESOLVE ? 1.0 - progress :
-        phase === PHASE_SIGNAL ? 0.0 :
-        phase === PHASE_HOLD ? 0.0 :
-        0
 
       // Flicker during noise phase
       const flicker = phase === PHASE_NOISE ? (Math.random() > 0.92 ? 0.3 : 1) : 1
@@ -142,7 +133,6 @@ function NoiseField({
         }
       }
 
-      frame++
       if (phase === PHASE_NOISE || phase === PHASE_RESOLVE) {
         raf = requestAnimationFrame(draw)
       }

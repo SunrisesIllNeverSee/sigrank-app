@@ -151,7 +151,7 @@ function Radar({
   return <CascadeRadar axes={axes} series={series} size={240} />
 }
 
-export function CompareTable({ a, b, isPro = false }: Props) {
+export function CompareTable({ a, b }: Props) {
   const rows = buildRows(a, b)
   const aName = nameOf(a)
   const bName = nameOf(b)
