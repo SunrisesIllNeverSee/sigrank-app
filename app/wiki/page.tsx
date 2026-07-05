@@ -495,6 +495,7 @@ export default function Draft1Page() {
   const groups: TopicGroup[] = [
     {
       groupLabel: 'SigRank console',
+      description: 'What SigRank is, how it works, and what the leaderboard measures. Start here if you are new.',
       items: [
         {
           label: 'What it is',
@@ -506,6 +507,7 @@ export default function Draft1Page() {
     {
       groupLabel: 'Submit',
       source: 'run the agent',
+      description: 'How to get your token counts and land on the board — from the zero-paste agent to paste fallbacks.',
       items: [
         // MCP-FIRST (owner 2026-06-24): lead with the agent + its run commands (was hidden
         // two groups down); the paste/manual options follow as clearly-secondary "other ways".
@@ -519,6 +521,7 @@ export default function Draft1Page() {
     {
       groupLabel: 'Agent & Profile',
       source: 'sigrank',
+      description: `The SigRank MCP server — install, CLI commands, all 12 MCP tools, and how the agent feeds your operator profile. sigrank@${MCP_VERSION}.`,
       items: [
         {
           label: 'The local agent (MCP)',
@@ -530,6 +533,7 @@ export default function Draft1Page() {
     {
       groupLabel: 'Metrics',
       source: 'token-only',
+      description: 'The four raw token counts every score is built from, and the derived cascade metrics the board ranks on.',
       items: [
         { label: 'The four pillars', hint: 'The four raw token counts every score is built from (T.01–T.04).', node: <FourPillars /> },
         { label: 'The cascade', hint: 'Υ Yield / SNR / Leverage / Velocity / 10×DEV / Scale / $1M / Efficiency (Y.01–Y.08).', node: <CascadeList /> },
@@ -537,6 +541,7 @@ export default function Draft1Page() {
     },
     {
       groupLabel: 'Proof',
+      description: 'How we know the numbers are real — verification tests, integrity checks, the calibration story, and the tools SigRank reads alongside.',
       items: [
         { label: 'The three degrees of leverage', hint: 'AA 7:2:1 baseline → wild field → a compounding operator; the 10xDEV log read + full provenance.', node: withPermalink('three-degrees', <ThreeDegreesChart variant="full" />) },
         { label: 'Verification & integrity tests', hint: 'How we know the numbers are real — Benford (with its honest failure + fix), the bot control, the telescoping lock, content-free verification, the threat model.', node: withPermalink('verification', <VerificationTests />) },
@@ -547,12 +552,14 @@ export default function Draft1Page() {
     },
     {
       groupLabel: 'Transmitters',
+      description: 'The nine cascade classes from Transmitter down — where the breakpoints are and what each class means.',
       items: [
         { label: 'The nine classes', hint: 'K.01–K.09, Transmitter down — qualitative ranges (exact breaks RS.05).', node: <TransmitterClasses /> },
       ],
     },
     {
       groupLabel: 'MO§ES™',
+      description: 'The governance framework SigRank runs on — the Conservation Law of Commitment, the evidence, and the stack of products built on top.',
       items: [
         { label: 'Commitment theory + founding', hint: 'The theory behind MO§ES™ + the founding-of-the-board story (owner-authored).', node: <MosesSection /> },
       ],
