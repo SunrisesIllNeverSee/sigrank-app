@@ -403,6 +403,35 @@ npx sigrank
           server to the SIGNOMY marketplace surface.
         </P>
 
+        {/* ── Badges ── */}
+        <div className="flex flex-wrap gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold"
+            alt="npm version"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://smithery.ai/badge/burnmydays/sigrank-mcp"
+            alt="Smithery quality score"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp/badges/score.svg"
+            alt="Glama score"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square"
+            alt="MIT license"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://img.shields.io/badge/platform-node-grey.svg?style=flat-square"
+            alt="Node.js platform"
+          />
+        </div>
+
         <div className="grid gap-2 sm:grid-cols-2">
           {[
             { cat: 'Frontend', items: 'Next.js 15 · React 19 · TypeScript · Tailwind CSS' },
@@ -410,7 +439,7 @@ npx sigrank
             { cat: 'Hosting', items: 'Vercel (web CDN + auto-deploy) · Porkbun (DNS)' },
             { cat: 'MCP server', items: 'Node.js · @modelcontextprotocol/sdk · ed25519 signed snapshots' },
             { cat: 'Token readers', items: 'ccusage · tokscale · token-dashboard (bundled as deps)' },
-            { cat: 'MCP directories', items: 'Smithery (98/100) · Glama · npm' },
+            { cat: 'MCP directories', items: 'Smithery (98/100) · Glama (AAA) · npm' },
             { cat: 'SIGNOMY surface', items: 'Python · FastAPI · FastMCP · CIVITAE · Railway' },
             { cat: 'Testing', items: 'Playwright · Vitest · axe-core · Lighthouse' },
           ].map((t) => (
@@ -452,7 +481,7 @@ npx sigrank
                 <span className="ml-auto font-mono text-[11px] text-text-accent">↗</span>
               </span>
               <span className="font-sans text-xs leading-relaxed text-text-muted">
-                MCP server directory listing with tool introspection and live preview.
+                MCP server directory listing with tool introspection and live preview. AAA rating.
               </span>
             </a>
             <a
