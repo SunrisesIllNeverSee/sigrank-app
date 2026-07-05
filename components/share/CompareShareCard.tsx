@@ -33,13 +33,112 @@ export interface CompareShareCardProps {
 }
 
 // ── Palette — mirrors ProfileShareCard exactly ──────────────────────────────
-const GOLD_BG = '#c4923a'
 const INK = '#0a0a0a'
 const C_GREEN = '#8ae89a'
 const C_GOLD = '#f0c862'
 const C_DULL = '#6e8a6e'
 const A_COLOR = '#e8a0d0' // pink — matches the site's compare A
 const B_COLOR = '#f0c862' // gold — matches the site's compare B
+
+/** Build an SVG radar chart with two overlapping polygons (A vs B). */
+function RadarGraphic({ a, b }: { a: CompareOperand; b: CompareOperand }) {
+  const n = a.metrics.length
+  const cx = 300
+  const cy = 305
+  const r = 210
+  // Angles starting from top, clockwise
+  const angles = a.metrics.map((_, i) => (-90 + (i * 360) / n) * (Math.PI / 180))
+
+  // Normalize: higherWins → raw/max; lowerWins → 1 - raw/max (so "better" = outward)
+  const norm = (val: number, max: number, higherWins: boolean) => {
+    const m = Math.max(max, 1)
+    return Math.max(0.05, Math.min(1, higherWins ? val / m : 1 - val / m))
+  }
+
+  const pt = (angle: number, radius: number) => ({
+    x: cx + radius * Math.cos(angle),
+    y: cy + radius * Math.sin(angle),
+  })
+
+  // Build polygon points for an operator
+  const polygon = (op: CompareOperand) =>
+    op.metrics
+      .map((m, i) => {
+        const max = Math.max(a.metrics[i].raw, b.metrics[i].raw, 1)
+        const v = norm(m.raw, max, m.higherWins)
+        const p = pt(angles[i], r * v)
+        return `${p.x.toFixed(1)},${p.y.toFixed(1)}`
+      })
+      .join(' ')
+
+  // Grid rings (concentric polygons at 0.33, 0.66, 1.0)
+  const gridRing = (frac: number) =>
+    angles.map((ang) => {
+      const p = pt(ang, r * frac)
+      return `${p.x.toFixed(1)},${p.y.toFixed(1)}`
+    }).join(' ')
+
+  // Axis lines + labels
+  const axisLabels = a.metrics.map((m, i) => {
+    const p = pt(angles[i], r + 28)
+    return { x: p.x, y: p.y, label: m.label.toUpperCase() }
+  })
+
+  return (
+    <svg width={600} height={630} style={{ display: 'block' }}>
+      {/* Grid rings */}
+      {[0.33, 0.66, 1.0].map((f) => (
+        <polygon
+          key={f}
+          points={gridRing(f)}
+          fill="none"
+          stroke="#1a3a1a"
+          strokeWidth={1}
+        />
+      ))}
+      {/* Axis lines */}
+      {angles.map((ang, i) => {
+        const p = pt(ang, r)
+        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#1a3a1a" strokeWidth={1} />
+      })}
+      {/* A polygon (pink, semi-transparent fill) */}
+      <polygon
+        points={polygon(a)}
+        fill={A_COLOR}
+        fillOpacity={0.15}
+        stroke={A_COLOR}
+        strokeWidth={2}
+        strokeLinejoin="round"
+      />
+      {/* B polygon (gold, semi-transparent fill) */}
+      <polygon
+        points={polygon(b)}
+        fill={B_COLOR}
+        fillOpacity={0.15}
+        stroke={B_COLOR}
+        strokeWidth={2}
+        strokeLinejoin="round"
+      />
+      {/* Axis labels */}
+      {axisLabels.map((al, i) => (
+        <text
+          key={i}
+          x={al.x}
+          y={al.y}
+          fill={C_DULL}
+          fontSize={11}
+          fontWeight={700}
+          fontFamily="var(--font-geist-mono), ui-monospace, monospace"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          letterSpacing={0.5}
+        >
+          {al.label}
+        </text>
+      ))}
+    </svg>
+  )
+}
 
 function Card({ cardRef, a, b }: { cardRef: React.RefObject<HTMLDivElement | null> } & Omit<CompareShareCardProps, 'href'>) {
   const leaderOf = (i: number): 'a' | 'b' | 'tie' => {
@@ -51,8 +150,6 @@ function Card({ cardRef, a, b }: { cardRef: React.RefObject<HTMLDivElement | nul
 
   const aUpper = a.name.toUpperCase()
   const bUpper = b.name.toUpperCase()
-  const aNameSize = aUpper.length <= 12 ? 34 : aUpper.length <= 18 ? 28 : aUpper.length <= 26 ? 24 : 20
-  const bNameSize = bUpper.length <= 12 ? 34 : bUpper.length <= 18 ? 28 : bUpper.length <= 26 ? 24 : 20
 
   return (
     <div
@@ -68,121 +165,83 @@ function Card({ cardRef, a, b }: { cardRef: React.RefObject<HTMLDivElement | nul
         overflow: 'hidden',
       }}
     >
-      {/* ═══ LEFT — gold identity panel (ProfileShareCard header language) ═══ */}
+      {/* ═══ LEFT — radar graphic on dark background ═══ */}
       <div
         style={{
           width: 600,
           height: 630,
-          background: GOLD_BG,
+          background: INK,
           display: 'flex',
           flexDirection: 'column',
-          padding: '20px 22px',
           boxSizing: 'border-box',
           flexShrink: 0,
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        {/* Header zone — A name+class | § VS § | B name+class */}
-        <div style={{ height: 96, flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: 10 }}>
-          {/* A identity */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: aNameSize, fontWeight: 900, color: INK, letterSpacing: 0.5, lineHeight: 1.05, overflow: 'hidden' }}>
-              {aUpper}
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: INK, letterSpacing: 0.3, whiteSpace: 'nowrap', opacity: 0.85 }}>
-              {a.signalClass}
-            </span>
-          </div>
-          {/* § VS § center */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, flexShrink: 0 }}>
-            <span
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                border: `3px solid ${INK}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 22,
-                fontWeight: 900,
-                color: INK,
-                lineHeight: 1,
-                boxSizing: 'border-box',
-              }}
-            >
-              {'§'}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 900, color: INK, letterSpacing: 2 }}>VS</span>
-            <span
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                border: `3px solid ${INK}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 22,
-                fontWeight: 900,
-                color: INK,
-                lineHeight: 1,
-                boxSizing: 'border-box',
-              }}
-            >
-              {'§'}
-            </span>
-          </div>
-          {/* B identity */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', textAlign: 'right' }}>
-            <div style={{ fontSize: bNameSize, fontWeight: 900, color: INK, letterSpacing: 0.5, lineHeight: 1.05, overflow: 'hidden', textAlign: 'right' }}>
-              {bUpper}
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: INK, letterSpacing: 0.3, whiteSpace: 'nowrap', opacity: 0.85 }}>
-              {b.signalClass}
-            </span>
-          </div>
+        {/* CRT scanline overlay (matches right panel) */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 3px)',
+            zIndex: 1,
+          }}
+        />
+
+        {/* Header — A name (pink) | VS | B name (gold) */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '14px 22px 12px',
+            borderBottom: '1px solid #2a2a2a',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: 0.5,
+            color: C_DULL,
+            position: 'relative',
+            zIndex: 2,
+          }}
+        >
+          <span style={{ color: A_COLOR, fontSize: 14, fontWeight: 900 }}>{
+            aUpper.length > 16 ? aUpper.slice(0, 16) + '…' : aUpper
+          }</span>
+          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>VS</span>
+          <span style={{ color: B_COLOR, fontSize: 14, fontWeight: 900 }}>{
+            bUpper.length > 16 ? bUpper.slice(0, 16) + '…' : bUpper
+          }</span>
         </div>
 
-        {/* Divider — diamond + hairline */}
-        <div style={{ height: 16, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-          <div style={{ width: 7, height: 7, background: INK, transform: 'rotate(45deg)', flexShrink: 0 }} />
-          <div style={{ flex: 1, height: 2, background: INK, opacity: 0.2 }} />
+        {/* Radar chart */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 2 }}>
+          <RadarGraphic a={a} b={b} />
         </div>
 
-        {/* Diverging metric bars — A left / B right, leader brighter */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 22 }}>
-          {a.metrics.map((m, i) => {
-            const leader = leaderOf(i)
-            const bv = b.metrics[i]?.value ?? '—'
-            const aw = m.raw
-            const bw = b.metrics[i]?.raw ?? 0
-            const sum = aw + bw || 1
-            const aPct = Math.round((aw / sum) * 100)
-            return (
-              <div key={m.label} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <span style={{ fontSize: 18, fontWeight: 900, color: leader === 'a' ? INK : 'rgba(10,10,10,0.5)' }}>{m.value}</span>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: INK, letterSpacing: 1.2, opacity: 0.7 }}>{m.label.toUpperCase()}</span>
-                  <span style={{ fontSize: 18, fontWeight: 900, color: leader === 'b' ? INK : 'rgba(10,10,10,0.5)' }}>{bv}</span>
-                </div>
-                <div style={{ display: 'flex', width: '100%', height: 8, borderRadius: 4, overflow: 'hidden', background: 'rgba(10,10,10,0.12)' }}>
-                  <div style={{ width: `${aPct}%`, height: 8, background: INK, opacity: leader === 'a' ? 1 : 0.4 }} />
-                  <div style={{ width: `${100 - aPct}%`, height: 8, background: INK, opacity: leader === 'b' ? 1 : 0.4 }} />
-                </div>
-              </div>
-            )
-          })}
+        {/* Footer — classes + url */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '10px 22px',
+            borderTop: '1px solid #222',
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: 0.5,
+            position: 'relative',
+            zIndex: 2,
+          }}
+        >
+          <span style={{ color: A_COLOR, opacity: 0.7 }}>{a.signalClass}</span>
+          <span style={{ color: '#444' }}>signalaf.com/compare</span>
+          <span style={{ color: B_COLOR, opacity: 0.7 }}>{b.signalClass}</span>
         </div>
-
-        {/* Footer divider + url */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-          <div style={{ flex: 1, height: 2, background: INK, opacity: 0.2 }} />
-          <div style={{ width: 7, height: 7, background: INK, transform: 'rotate(45deg)' }} />
-        </div>
-        <div style={{ fontSize: 9, color: INK, opacity: 0.3, letterSpacing: 1 }}>signalaf.com/compare</div>
       </div>
 
-      {/* ═══ RIGHT — black terminal printout (ProfileShareCard right panel) ═══ */}
+      {/* ═══ RIGHT — black terminal printout (matches ProfileShareCard) ═══ */}
       <div
         style={{
           width: 600,
@@ -207,7 +266,7 @@ function Card({ cardRef, a, b }: { cardRef: React.RefObject<HTMLDivElement | nul
           }}
         />
 
-        {/* Column header row */}
+        {/* Column header row — same style as Profile card */}
         <div
           style={{
             display: 'flex',
@@ -221,48 +280,53 @@ function Card({ cardRef, a, b }: { cardRef: React.RefObject<HTMLDivElement | nul
             color: C_DULL,
           }}
         >
-          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>HEAD TO HEAD</span>
-          <span>OPERATOR COMPARISON</span>
+          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>TELEMETRY</span>
+          <span>HEAD TO HEAD</span>
         </div>
 
-        {/* Metric printout rows — A value | label | B value, leader glows */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 28, padding: '0 28px' }}>
+        {/* Metric printout rows — label (green, left) → A val (pink) | B val (gold, right)
+            Same layout as Profile card: label left, value(s) right. Leader glows. */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 30, padding: '0 28px' }}>
           {a.metrics.map((m, i) => {
             const leader = leaderOf(i)
             const bv = b.metrics[i]?.value ?? '—'
             return (
               <div key={m.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 800,
-                    color: leader === 'a' ? A_COLOR : '#666',
-                    textShadow: leader === 'a' ? `0 0 8px rgba(232,160,208,0.5)` : 'none',
-                  }}
-                >
-                  {m.value}
+                {/* label — phosphor green, same as Profile card */}
+                <span style={{ fontSize: 20, fontWeight: 700, color: C_GREEN, letterSpacing: 1, textShadow: '0 0 7px rgba(138,232,154,0.45)' }}>
+                  {m.label.toUpperCase()}
                 </span>
-                <span style={{ fontSize: 16, fontWeight: 700, color: C_DULL, letterSpacing: 1.2 }}>{m.label.toUpperCase()}</span>
-                <span
-                  style={{
-                    fontSize: 28,
+                {/* A value (pink) + B value (gold) — leader glows, loser dimmed */}
+                <span style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+                  <span style={{
+                    fontSize: 32,
                     fontWeight: 800,
-                    color: leader === 'b' ? C_GOLD : '#666',
-                    textShadow: leader === 'b' ? `0 0 8px rgba(240,200,98,0.5)` : 'none',
-                  }}
-                >
-                  {bv}
+                    color: leader === 'a' ? A_COLOR : '#555',
+                    textShadow: leader === 'a' ? '0 0 8px rgba(232,160,208,0.5)' : 'none',
+                  }}>
+                    {m.value}
+                  </span>
+                  <span style={{ fontSize: 14, color: '#333' }}>vs</span>
+                  <span style={{
+                    fontSize: 32,
+                    fontWeight: 800,
+                    color: leader === 'b' ? C_GOLD : '#555',
+                    textShadow: leader === 'b' ? '0 0 8px rgba(240,200,98,0.4)' : 'none',
+                  }}>
+                    {bv}
+                  </span>
                 </span>
               </div>
             )
           })}
+          {/* CTA — same as Profile card's "JOIN THE BOARD" */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <span style={{ fontSize: 18, fontWeight: 700, color: C_DULL, letterSpacing: 1 }}>COMPARE YOURSELF</span>
-            <span style={{ fontSize: 22, fontWeight: 700, color: '#a8ffa8', textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>signalaf.com</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: C_DULL, letterSpacing: 1 }}>COMPARE YOURSELF</span>
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#a8ffa8', textShadow: '0 0 8px rgba(168,255,168,0.4)' }}>signalaf.com</span>
           </div>
         </div>
 
-        {/* Footer — A color vs B color legend */}
+        {/* Footer — A name (pink) | VS | B name (gold), same position as Profile's AVERAGE USER footer */}
         <div
           style={{
             display: 'flex',
@@ -275,9 +339,9 @@ function Card({ cardRef, a, b }: { cardRef: React.RefObject<HTMLDivElement | nul
             letterSpacing: 0.5,
           }}
         >
-          <span style={{ color: A_COLOR }}>{a.name.toUpperCase()}</span>
+          <span style={{ color: A_COLOR }}>{aUpper.length > 18 ? aUpper.slice(0, 18) + '…' : aUpper}</span>
           <span style={{ color: '#4a6a4a', fontSize: 11 }}>LEADER GLOWS</span>
-          <span style={{ color: C_GOLD }}>{b.name.toUpperCase()}</span>
+          <span style={{ color: C_GOLD }}>{bUpper.length > 18 ? bUpper.slice(0, 18) + '…' : bUpper}</span>
         </div>
       </div>
     </div>
