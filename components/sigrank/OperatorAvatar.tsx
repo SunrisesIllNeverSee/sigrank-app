@@ -38,9 +38,9 @@ export function OperatorAvatar({ src, alt, size = 22 }: Props) {
     lineHeight: 1,
   }
   if (src) {
-    // eslint-disable-next-line @next/next/no-img-element -- user-uploaded avatar; sizes are tiny + fixed
     return (
       <span style={box}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded avatar; sizes are tiny + fixed */}
         <img src={src} alt={alt} width={size} height={size} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       </span>
     )

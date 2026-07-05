@@ -49,136 +49,6 @@ function fmtTokens(n: number): string {
   return n.toFixed(0)
 }
 
-// ── Colored radar ─────────────────────────────────────────────────────────
-
-interface RadarAxis { label: string; value: number; max: number; color: string; glyph: string }
-
-function ColoredRadar({ axes, size }: { axes: RadarAxis[]; size: number }) {
-  const n = axes.length
-  if (n < 3) return null
-  const cx = size / 2, cy = size / 2, radius = size / 2 - 44
-  const rings = [0.25, 0.5, 0.75, 1]
-  const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
-  const point = (i: number, r: number): [number, number] => {
-    const a = angleAt(i)
-    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]
-  }
-  const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
-  const polyPath = axes.map((_, i) => {
-    const r = norm(axes[i].value, axes[i].max) * radius
-    const [x, y] = point(i, r)
-    return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
-  }).join(' ') + ' Z'
-
-  return (
-    <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="Cascade fingerprint">
-      {rings.map((ring) => (
-        <polygon key={ring}
-          points={axes.map((_, i) => point(i, ring * radius).map((v) => v.toFixed(1)).join(',')).join(' ')}
-          fill="none" stroke="rgba(10,10,10,0.12)" strokeWidth={1} />
-      ))}
-      {axes.map((_, i) => {
-        const [x, y] = point(i, radius)
-        return <line key={`s-${i}`} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="rgba(10,10,10,0.08)" strokeWidth={1} />
-      })}
-      <path d={polyPath} fill="rgba(10,10,10,0.12)" stroke="#0a0a0a" strokeWidth={3} strokeLinejoin="round" />
-      {axes.map((ax, i) => {
-        const [x, y] = point(i, norm(ax.value, ax.max) * radius)
-        return <circle key={`v-${i}`} cx={x.toFixed(1)} cy={y.toFixed(1)} r={6} fill={ax.color} stroke="#0a0a0a" strokeWidth={1.5} />
-      })}
-      {axes.map((ax, i) => {
-        const [lx, ly] = point(i, radius + 24)
-        const cos = Math.cos(angleAt(i))
-        const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end'
-        return (
-          <text key={`l-${i}`} x={lx.toFixed(1)} y={ly.toFixed(1)}
-            textAnchor={anchor} dominantBaseline="middle"
-            fontSize={14} fontWeight={800} fill={ax.color}
-            style={{ fontFamily: 'ui-monospace, monospace' }}>
-            {ax.glyph}
-          </text>
-        )
-      })}
-    </svg>
-  )
-}
-
-// ── Radial rings (#4 composite — concentric arcs, one metric per ring) ─────
-// Hand-rolled SVG (no charting dep), gold-panel palette: dark arcs on gold.
-// Each metric is one ring; the arc sweep = normalized value; Υ sits in center.
-
-function RadialRings({ axes, size, centerValue, reduced, replayKey }: { axes: RadarAxis[]; size: number; centerValue: string; reduced: boolean; replayKey: number }) {
-  const n = axes.length
-  // Animate each ring's fill from 0 → its value on mount (and on replay).
-  // Render a full circle with stroke-dasharray = circumference; the visible
-  // arc length = dashoffset, transitioned via CSS. Export-safe (PNG grabs rest state).
-  const [grown, setGrown] = useState(reduced)
-  useEffect(() => {
-    if (reduced) { setGrown(true); return }
-    setGrown(false)
-    const t = setTimeout(() => setGrown(true), 60)  // next frame → triggers the transition
-    return () => clearTimeout(t)
-  }, [reduced, replayKey])
-
-  if (n < 3) return null
-  const cx = size / 2, cy = size / 2
-  const norm = (v: number, m: number) => (!m || m <= 0 ? 0 : Math.max(0, Math.min(1, v / m)))
-  const TRACK = 'rgba(10,10,10,0.10)'
-  const INK = '#0a0a0a'
-
-  const outerR = size / 2 - 16
-  const ringGap = 4
-  const ringW = (outerR - size * 0.18 - (n - 1) * ringGap) / n
-  const startAngle = -90
-
-  return (
-    <svg viewBox={`0 0 ${size} ${size}`} width="100%" role="img" aria-label="Cascade signature rings">
-      {axes.map((ax, i) => {
-        const r = outerR - i * (ringW + ringGap) - ringW / 2
-        const frac = norm(ax.value, ax.max)
-        const circ = 2 * Math.PI * r
-        // dasharray: [visible run, rest]. visible = frac × circ. Animate from 0 → frac.
-        const visible = (grown ? frac : 0) * circ
-        const [lx, ly] = [cx, cy + r]
-        return (
-          <g key={`ring-${i}`}>
-            {/* full track */}
-            <circle cx={cx} cy={cy} r={r.toFixed(1)} fill="none" stroke={TRACK} strokeWidth={ringW.toFixed(1)} />
-            {/* value arc — a circle rotated so the dash starts at top, growing clockwise */}
-            <circle
-              cx={cx} cy={cy} r={r.toFixed(1)} fill="none"
-              stroke={ax.color} strokeWidth={ringW.toFixed(1)} strokeLinecap="round"
-              strokeDasharray={`${visible.toFixed(2)} ${(circ - visible).toFixed(2)}`}
-              transform={`rotate(${startAngle} ${cx} ${cy})`}
-              style={{ transition: reduced ? 'none' : `stroke-dasharray 900ms cubic-bezier(.22,1,.36,1) ${i * 110}ms` }}
-            />
-            {/* glyph label riding just inside the arc start (top) */}
-            <text x={cx} y={(cy - r).toFixed(1)} dx={6} dy={4}
-              fontSize={Math.max(10, ringW * 0.7).toFixed(0)} fontWeight={800}
-              fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }} opacity={0.75}>
-              {ax.glyph}
-            </text>
-            <text x={lx} y={ly.toFixed(1)} dy={3} textAnchor="middle"
-              fontSize={Math.max(9, ringW * 0.55).toFixed(0)} fontWeight={700}
-              fill={INK} opacity={0.45} style={{ fontFamily: 'ui-monospace, monospace' }}>
-              {`${Math.round(frac * 100)}`}
-            </text>
-          </g>
-        )
-      })}
-      {/* center Υ */}
-      <text x={cx} y={cy} dy={-2} textAnchor="middle" dominantBaseline="middle"
-        fontSize={size * 0.075} fontWeight={900} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
-        {'Υ'}
-      </text>
-      <text x={cx} y={cy} dy={size * 0.07} textAnchor="middle" dominantBaseline="middle"
-        fontSize={size * 0.058} fontWeight={800} fill={INK} style={{ fontFamily: 'ui-monospace, monospace' }}>
-        {centerValue}
-      </text>
-    </svg>
-  )
-}
-
 // ── You-vs-field radar (two series, ink on gold) ───────────────────────────
 // You = solid ink stroke + translucent fill; field avg = dashed faint overlay.
 // Fixed size in a fixed-height zone — geometry constant, nothing to crop.
@@ -320,10 +190,6 @@ const YOU_W = 10     // NEW USER — your value (right-aligned)
 const NAME_W = 15    // TELEMETRY — metric name
 const AVG_W = 8      // AVERAGE USER — avg value (right-aligned)
 const G1 = 2, G2 = 3, G3 = 3
-// zone boundaries (char offsets) for slicing the revealed string into colored spans
-const Z_YOU = ABBR_W + G1                       // your-value starts here
-const Z_NAME = Z_YOU + YOU_W + G2               // metric-name starts here
-const Z_AVG = Z_NAME + NAME_W + G3              // avg-value starts here
 
 function formatLine(abbr: string, you: string, name: string, avg: string): string {
   return abbr.padEnd(ABBR_W) + ' '.repeat(G1) + you.padStart(YOU_W) + ' '.repeat(G2) + name.padEnd(NAME_W) + ' '.repeat(G3) + avg.padStart(AVG_W)
@@ -378,44 +244,6 @@ function TypewriterLine({
   )
 }
 
-// ── Typewriter simple (single color, for header/divider) ──────────────────
-
-function TypewriterSimple({
-  text, color, startDelay, charDelay, reduced, weight = 700, size = 22, rowH,
-}: {
-  text: string
-  color: string
-  startDelay: number
-  charDelay: number
-  reduced: boolean
-  weight?: number
-  size?: number
-  rowH: number
-}) {
-  const [count, setCount] = useState(text.length)
-  const done = count >= text.length
-
-  useEffect(() => {
-    if (done) return
-    const delay = count === 0 ? startDelay : charDelay
-    const timer = setTimeout(() => setCount(c => c + 1), delay)
-    return () => clearTimeout(timer)
-  }, [count, done, startDelay, charDelay])
-
-  return (
-    <div style={{
-      flex: 1, minHeight: 0, display: 'flex', alignItems: 'center',
-      padding: '0 24px 0 20px', whiteSpace: 'pre',
-      fontSize: `${size}px`, fontWeight: weight, color,
-      fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
-      textShadow: `0 0 6px ${color}44`,
-    }}>
-      {text.slice(0, count)}
-      {!done && <span className="print-cursor" style={{ color }}>{'\u258c'}</span>}
-    </div>
-  )
-}
-
 // ── The board ─────────────────────────────────────────────────────────────
 
 function Board({
@@ -444,12 +272,6 @@ function Board({
   const totalStr = (inputTokens != null && outputTokens != null && cacheRead != null && cacheCreate != null) ? fmtTokens(inputTokens + outputTokens + cacheRead + cacheCreate) : '\u2014'
   const opStr = opRatio ?? '\u2014'
   const cascadeStrVal = cascadeStr ?? '\u2014'
-
-  const radarColors = ['#f0c862', '#8ae89a', '#8ae89a', '#f0c862', '#f0eee0', '#8ae89a']
-  const radarGlyphs = ['\u03a5', 'SNR', 'LEV', '\u26a1', 'SCL', 'EFF']
-  const coloredAxes: RadarAxis[] = radarAxes && radarAxes.length >= 3
-    ? radarAxes.map((a, i) => ({ ...a, color: radarColors[i % 6], glyph: radarGlyphs[i % 6] }))
-    : []
 
   // Meter rows — pair each radar axis (by label) with its display value and
   // the average-operator reference. When fieldAvg carries a live average for
@@ -512,9 +334,6 @@ function Board({
   // 1 header + 5 raw + 1 divider + 8 derived = 15 lines
   // 630 / 15 = 42px per row — no dead space
 
-  const NUM_LINES = 15
-  const ROW_H = Math.floor(H / NUM_LINES)  // 42px
-
   const CHAR_DELAY = 22   // visible dot-matrix speed (was 8 = too fast to see)
   const LINE_GAP = 90     // pause between rows so the print head sweeps down
   const INITIAL_DELAY = 250
@@ -537,7 +356,6 @@ function Board({
   const avgIn = inputTokens ?? null
   const avgOut = avgIn != null ? avgIn * R_OUT : null
   const avgCache = avgIn != null ? avgIn * R_CR : null
-  const avgCw = avgIn != null ? 0 : null // baseline user writes ~no cache
   const avgTotal = avgIn != null ? avgIn * (1 + R_OUT + R_CR) : null
   const DOT = '\u00b7'
   const avgFmt = (n: number | null) => (n != null ? fmtTokens(n) : '\u00b7')

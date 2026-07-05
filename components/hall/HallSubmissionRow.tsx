@@ -40,7 +40,6 @@ export function HallSubmissionRow({
   classTier,
   platform,
   value,
-  canonId,
   isPlaceholder = true,
   href,
 }: Props) {
