@@ -62,7 +62,7 @@ export default async function BoardOG({
           </div>
           {top3.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {top3.map((e, i) => (
+              {top3.map((e, _i) => (
                 <div
                   key={e.codename}
                   style={{

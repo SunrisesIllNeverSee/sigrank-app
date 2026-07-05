@@ -97,7 +97,7 @@ export function SubmitForm() {
           detail: `Submission rejected (${res.status}). ${text}`.trim(),
         })
       }
-    } catch (err) {
+    } catch {
       setStatus({
         kind: 'error',
         detail:

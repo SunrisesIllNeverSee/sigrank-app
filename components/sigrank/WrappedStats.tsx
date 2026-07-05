@@ -1,6 +1,6 @@
 import React from 'react'
 import { colors, fonts, radius, shadow } from './tokens'
-import type { ActivityDay, Badge } from './types'
+import type { Badge } from './types'
 
 interface Props {
   stats?: {
