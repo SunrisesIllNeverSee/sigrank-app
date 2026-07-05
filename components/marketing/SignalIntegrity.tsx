@@ -395,6 +395,59 @@ npx sigrank
         </p>
       </section>
 
+      {/* Build out / Stack — where the MCP lives in the ecosystem */}
+      <section className="flex flex-col gap-3">
+        <H2>Build out — where to find & install</H2>
+        <P>
+          The SigRank MCP is published across the MCP ecosystem. One-click install from Smithery,
+          listed on Glama, and installable from npm — whichever your client supports.
+        </P>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <a
+            href="https://smithery.ai/servers/burnmydays/sigrank-mcp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col gap-1.5 rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-gold/40 hover:bg-bg-elevated"
+          >
+            <span className="flex items-baseline gap-2">
+              <span className="font-mono text-sm font-bold text-text-primary">Smithery</span>
+              <span className="ml-auto font-mono text-[11px] text-text-accent">↗</span>
+            </span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">
+              One-click install for Claude Desktop, Cursor, and other MCP clients. Quality score 98/100.
+            </span>
+          </a>
+          <a
+            href="https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col gap-1.5 rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-gold/40 hover:bg-bg-elevated"
+          >
+            <span className="flex items-baseline gap-2">
+              <span className="font-mono text-sm font-bold text-text-primary">Glama</span>
+              <span className="ml-auto font-mono text-[11px] text-text-accent">↗</span>
+            </span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">
+              MCP server directory listing with tool introspection and live preview.
+            </span>
+          </a>
+          <a
+            href="https://www.npmjs.com/package/sigrank"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col gap-1.5 rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-gold/40 hover:bg-bg-elevated"
+          >
+            <span className="flex items-baseline gap-2">
+              <span className="font-mono text-sm font-bold text-text-primary">npm</span>
+              <span className="ml-auto font-mono text-[11px] text-text-accent">↗</span>
+            </span>
+            <span className="font-sans text-xs leading-relaxed text-text-muted">
+              <Mono>npm i -g sigrank</Mono> — the CLI, TUI, and MCP server in one package.
+            </span>
+          </a>
+        </div>
+      </section>
+
       <p className="font-sans text-[11px] italic text-text-dim">
         Token counts only — never prompt content. Verified-passive by design.
       </p>
