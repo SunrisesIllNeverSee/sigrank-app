@@ -20,22 +20,26 @@ page renders on deterministic mock data when no Supabase credentials are present
 
 ## Apply
 
-### Option A — Supabase CLI (recommended)
+> ⚠️ **NEVER run `supabase db push` on this project.** See "Migration ledger
+> drift" below for why. Apply migrations via the Supabase Dashboard SQL editor
+> or MCP `apply_migration` only.
+
+### Option A — Supabase Dashboard / MCP (the ONLY safe path for this project)
 
 ```bash
-# From the repo root, with a linked project (supabase link).
-# Push the migrations directory (runs 0001 then 0002 in lexical order):
-supabase db push
-
-# Then load seed + policies:
-psql "$SUPABASE_DB_URL" -f supabase/seed.sql
-psql "$SUPABASE_DB_URL" -f supabase/policies.sql
+# DO NOT run `supabase db push` — it will re-run ALL numbered migrations
+# against a remote ledger that tracks by timestamp = catastrophic.
+#
+# Instead, paste the migration SQL into the Supabase Dashboard SQL editor
+# (Dashboard → SQL → New query), or apply via Supabase MCP apply_migration.
+# The local numbered files in migrations/ are RECORD-ONLY — they document
+# what was applied, they are not commands to run via the CLI.
 ```
 
-### Option B — plain psql (single-file schema)
+### Option B — plain psql (single-file schema, fresh project only)
 
 ```bash
-# Point at your Postgres / Supabase connection string:
+# Only for spinning up a NEW project from scratch. Never on the live project.
 export DATABASE_URL="postgresql://postgres:<pw>@<host>:5432/postgres"
 
 psql "$DATABASE_URL" -f supabase/schema.sql
@@ -45,7 +49,51 @@ psql "$DATABASE_URL" -f supabase/policies.sql
 
 All scripts are idempotent (`CREATE ... IF NOT EXISTS`, `INSERT ... ON CONFLICT
 DO NOTHING`, `DROP POLICY IF EXISTS` before `CREATE POLICY`), so re-running them
-is safe.
+is safe on a fresh project.
+
+## Migration ledger drift (expected — do NOT "fix" with db push)
+
+**The warning `Remote migration versions not found in local migrations directory`
+is expected and safe to ignore.** Here's why:
+
+The live Supabase project's migration ledger (`supabase_migrations.schema_migrations`)
+tracks migrations by **timestamp** (e.g. `20260624153429`). The local files in
+`migrations/` are **numbered** (`0001_init.sql` through `0023_source_attestation.sql`).
+These two naming schemes are incompatible.
+
+**What happened:** Migrations 0001–0005 were applied via the CLI early on (both
+names match). From 0006 onward, migrations were applied by pasting SQL into the
+Supabase Dashboard SQL editor, which stamped them with timestamps in the remote
+ledger. The local numbered files were written afterward as record-only
+documentation. Some migrations (0006, 0009–0012, 0018, 0021–0023) were applied
+via the Dashboard's plain SQL editor, which doesn't record to the migration
+ledger at all — so they exist in the DB but have no ledger entry.
+
+**Why `db push` is catastrophic:** The CLI sees all 23 numbered local files as
+"not yet applied" (because the remote ledger has timestamp-named entries, not
+`0001`–`0023`) and tries to re-run every migration from scratch — double-creating
+tables, erroring on constraints, potentially corrupting data.
+
+**The decision (2026-06-25, DECISIONS.md):** Apply via Dashboard/MCP only, never
+`db push`. The local files are record-only. The live DB is the source of truth.
+
+**Mapping (remote timestamp → local numbered file):**
+
+| Remote timestamp | Local file | What it does |
+|---|---|---|
+| `20260624153429` | 0007 | Identity columns (handle, avatar_url, bio, links, location) |
+| `20260624171956` | 0008 | operators_public view (PII fix) |
+| `20260624172019` | 0008 | Column-level GRANT/REVOKE on operators |
+| `20260625080637` | 0017 (partial) | Revoke anon SELECT on circles tables |
+| `20260625220535` | 0013 | Device enroll codes + materialize_verified_snapshot RPC |
+| `20260625220551` | 0014 | enroll_device RPC |
+| `20260626141333` | 0015 | Platform column on metric_snapshots |
+| `20260626141832` | 0016 | Revoke/rebind fix for enroll_device |
+| `20260627112209` | 0019 | pg_cron + recompute_the_field() |
+| `20260627115029` | 0020 | delete_account() RPC |
+
+Local-only (applied to DB via Dashboard, no ledger entry): 0006, 0009, 0010,
+0011, 0012, 0018, 0021, 0022, 0023.
 
 ## Extensions
 
