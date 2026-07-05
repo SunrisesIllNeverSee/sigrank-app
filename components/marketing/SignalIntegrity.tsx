@@ -395,79 +395,30 @@ npx sigrank
         </p>
       </section>
 
-      {/* Build out / Stack — the full MO§ES™ ecosystem + tech components */}
+      {/* Build out / Stack — the full technical stack */}
       <section className="flex flex-col gap-4">
         <H2>Build out — the stack</H2>
         <P>
-          SigRank is one surface of a larger stack. MO§ES™ is the substrate; each layer above it
-          is a different product built on the same enforcement gate. Here is the full stack,
-          bottom-up, with the tech that powers each layer.
+          Every piece of technology across the SigRank ecosystem, from the web app to the MCP
+          server to the SIGNOMY marketplace surface.
         </P>
 
-        {/* ── The MO§ES™ product stack ── */}
-        <div className="flex flex-col gap-2">
-          <span className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
-            The four-layer stack
-          </span>
-          <div className="grid gap-2">
-            {[
-              { layer: 'Substrate', name: 'MO§ES™', desc: 'The Conservation Law of Commitment + enforcement gate architecture. Published (CC-BY-4.0), patent-pending. The foundation everything else runs on.', url: 'https://mos2es.com', live: true },
-              { layer: 'Workflow', name: 'AQUA', desc: 'Application workflow tooling with reusable submission memory. Answer banks, submission memory, application filling. The first wedge.', url: null, live: false },
-              { layer: 'Intelligence', name: 'SigRank', desc: 'The leaderboard you are looking at. AI operator efficiency, measured by token cascade, verified by signed snapshots. Live now.', url: 'https://signalaf.com', live: true },
-              { layer: 'Runtime', name: 'KA§§A', desc: 'Voice AI runtime using commitment kernel caching. 50s to 6.5s per 5-turn call in multi-agent flows.', url: null, live: false },
-              { layer: 'Marketplace', name: 'SIGNOMY', desc: 'Governed agent marketplace. Agents register, build trust, take missions, carry provenance. The top layer.', url: 'https://signomy.xyz', live: true },
-            ].map((s) => (
-              <div
-                key={s.name}
-                className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface px-4 py-3"
-              >
-                <div className="flex items-baseline gap-2">
-                  <span className="font-mono text-[10px] uppercase tracking-wide text-text-muted">{s.layer}</span>
-                  <span className="font-mono text-sm font-bold text-text-primary">{s.name}</span>
-                  {s.live ? (
-                    <span className="ml-auto rounded-full border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide text-gold">live</span>
-                  ) : (
-                    <span className="ml-auto rounded-full border border-bg-border px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide text-text-muted">building</span>
-                  )}
-                </div>
-                <span className="font-sans text-xs leading-relaxed text-text-muted">{s.desc}</span>
-                {s.url && (
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-fit font-mono text-[11px] text-text-accent underline-offset-2 hover:underline"
-                  >
-                    {s.url.replace('https://', '')} ↗
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Tech components ── */}
-        <div className="flex flex-col gap-2">
-          <span className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
-            Tech components
-          </span>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {[
-              { cat: 'Frontend', items: 'Next.js 15 · React 19 · TypeScript · Tailwind CSS' },
-              { cat: 'Backend', items: 'Supabase (Postgres + Auth) · Stripe (billing) · PostHog (analytics)' },
-              { cat: 'Hosting', items: 'Vercel (web CDN) · Porkbun (DNS)' },
-              { cat: 'MCP server', items: 'Node.js · @modelcontextprotocol/sdk · ed25519 signed snapshots' },
-              { cat: 'Token readers', items: 'ccusage · tokscale · token-dashboard (bundled as deps)' },
-              { cat: 'MCP directories', items: 'Smithery (98/100) · Glama · npm' },
-              { cat: 'SIGNOMY surface', items: 'Python · FastAPI · FastMCP · CIVITAE · Railway' },
-              { cat: 'Testing', items: 'Playwright · Vitest · axe-core · Lighthouse' },
-            ].map((t) => (
-              <div key={t.cat} className="flex flex-col gap-0.5 rounded-lg border border-bg-border bg-bg-surface px-3 py-2.5">
-                <span className="font-mono text-[11px] font-bold text-text-primary">{t.cat}</span>
-                <span className="font-mono text-[10px] leading-relaxed text-text-muted">{t.items}</span>
-              </div>
-            ))}
-          </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {[
+            { cat: 'Frontend', items: 'Next.js 15 · React 19 · TypeScript · Tailwind CSS' },
+            { cat: 'Backend', items: 'Supabase (Postgres + Auth) · Stripe (billing) · PostHog (analytics)' },
+            { cat: 'Hosting', items: 'Vercel (web CDN + auto-deploy) · Porkbun (DNS)' },
+            { cat: 'MCP server', items: 'Node.js · @modelcontextprotocol/sdk · ed25519 signed snapshots' },
+            { cat: 'Token readers', items: 'ccusage · tokscale · token-dashboard (bundled as deps)' },
+            { cat: 'MCP directories', items: 'Smithery (98/100) · Glama · npm' },
+            { cat: 'SIGNOMY surface', items: 'Python · FastAPI · FastMCP · CIVITAE · Railway' },
+            { cat: 'Testing', items: 'Playwright · Vitest · axe-core · Lighthouse' },
+          ].map((t) => (
+            <div key={t.cat} className="flex flex-col gap-0.5 rounded-lg border border-bg-border bg-bg-surface px-3 py-2.5">
+              <span className="font-mono text-[11px] font-bold text-text-primary">{t.cat}</span>
+              <span className="font-mono text-[10px] leading-relaxed text-text-muted">{t.items}</span>
+            </div>
+          ))}
         </div>
 
         {/* ── Where to install the MCP ── */}
