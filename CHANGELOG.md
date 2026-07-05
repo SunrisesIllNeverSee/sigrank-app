@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.3.0...v0.3.1) (2026-07-05)
+
+
+### Bug Fixes
+
+* **hero:** restore original landing copy — intro line, users', leaderboard title ([273620b](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/273620b0fdd57dbb930b982330f37b1555a9d043))
+
 ## [0.3.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.2.0...v0.3.0) (2026-07-04)
 
 
