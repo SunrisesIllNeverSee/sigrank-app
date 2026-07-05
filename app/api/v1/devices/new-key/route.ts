@@ -36,8 +36,6 @@ export async function POST(req: NextRequest) {
   const svc = getSupabaseService()
   if (!svc) return NextResponse.json({ error: 'Enrollment is not configured.' }, { status: 503 })
 
-  const nowIso = new Date().toISOString()
-
   // 1. Auto-revoke ALL prior trusted devices for this operator (the old key dies).
   const { error: revokeErr } = await svc
     .from('devices')

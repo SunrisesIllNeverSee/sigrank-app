@@ -23,7 +23,7 @@ import {
   PLATFORM_DEFAULT,
   type PlatformUI,
 } from '@/lib/constants'
-import { boardWindowBySlug, BOARD_WINDOWS } from '@/lib/data/windows'
+import { boardWindowBySlug } from '@/lib/data/windows'
 import { DISPLAY_RAW, DISPLAY_METRICS } from '@/lib/canon/ids'
 import { recordValue } from '@/lib/hall/record-value'
 import { HallHeader } from '@/components/hall/HallHeader'
