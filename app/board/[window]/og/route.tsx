@@ -1,11 +1,10 @@
 /**
- * app/board/[window]/opengraph-image/route.ts — per-board-window dynamic OG card.
+ * app/board/[window]/og/route.tsx — per-board-window dynamic OG card.
  *
- * Workaround for Next.js 15 bug: opengraph-image.tsx in dynamic routes ([window])
- * 500s on Vercel. Using a route.ts handler instead of the file convention fixes it.
- * See: github.com/vercel/next.js/issues/57349
- *
- * The page.tsx generateMetadata() links to this route via og:image.
+ * Next.js 15 has a known bug where opengraph-image.tsx in dynamic routes
+ * 500s on Vercel (github.com/vercel/next.js/issues/57349). This route
+ * handler at /board/[window]/og bypasses the file convention entirely.
+ * The board page's generateMetadata links to this route via og:image.
  */
 
 import { ImageResponse } from 'next/og'
@@ -14,6 +13,8 @@ import { toEntry } from '@/lib/leaderboard/to-entry'
 import { boardWindowBySlug } from '@/lib/data/windows'
 
 export const runtime = 'nodejs'
+export const size = { width: 1200, height: 630 }
+export const contentType = 'image/png'
 
 const LABELS: Record<string, string> = {
   '7d': '7 day',
