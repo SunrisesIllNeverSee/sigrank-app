@@ -23,8 +23,18 @@
 --   2. CREATEs a single new function with the 0015 signature + the throttle check
 --   3. REVOKEs public access + GRANTs to service_role only
 
--- ── 1. Drop both existing overloads ──────────────────────────────────────────
--- 0013 overload (31 args, no p_platform):
+-- ── 1. Drop ALL existing overloads ───────────────────────────────────────────
+-- There may be up to 3 overloads in the live DB:
+--   (a) 0013's original (31 args, no p_platform)
+--   (b) 0015's replacement (32 args, p_platform at end)
+--   (c) the BAD 0025 overload (31 args, wrong types: integer class_tier,
+--       numeric cross_thread/throughput, integer total_messages, no
+--       p_submitted_at, p_platform in position 16, returns text)
+--       — created by the first version of this migration if it was applied.
+--       The REVOKE in that version failed, so this orphan exists but nothing
+--       calls it. We drop all three, then create the correct one.
+
+-- (a) 0013 overload (31 args, no p_platform):
 DROP FUNCTION IF EXISTS public.materialize_verified_snapshot(
   uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
   date, numeric, text,
@@ -32,13 +42,25 @@ DROP FUNCTION IF EXISTS public.materialize_verified_snapshot(
   numeric, numeric, integer, numeric, bigint, numeric, numeric, integer, integer, bigint
 );
 
--- 0015 overload (32 args, with p_platform at end):
+-- (b) 0015 overload (32 args, with p_platform at end):
 DROP FUNCTION IF EXISTS public.materialize_verified_snapshot(
   uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
   date, numeric, text,
   timestamptz, text, text, text, text, text,
   numeric, numeric, integer, numeric, bigint, numeric, numeric, integer, integer, bigint,
   text
+);
+
+-- (c) BAD 0025 overload (31 args, wrong types — the orphan from the first
+--     attempt at this migration). Signature: p_class_tier=integer,
+--     p_platform in position 16 (after class_tier), no p_submitted_at,
+--     p_cross_thread=numeric, p_token_throughput=numeric,
+--     p_total_messages=integer, returns text.
+DROP FUNCTION IF EXISTS public.materialize_verified_snapshot(
+  uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
+  date, numeric, integer, text,
+  text, text, text, text, text, text,
+  numeric, numeric, numeric, numeric, numeric, numeric, numeric, integer, integer, integer
 );
 
 -- ── 2. Create the new function (0015 signature + throttle check) ────────────
