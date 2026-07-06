@@ -42,14 +42,12 @@ CREATE TABLE IF NOT EXISTS signal_prompts (
   created_by        TEXT NOT NULL DEFAULT 'system'
                     -- system (weekly cron) or operator codename (custom)
 );
-
 CREATE INDEX IF NOT EXISTS idx_signal_prompts_week
   ON signal_prompts(week_number DESC);
 CREATE INDEX IF NOT EXISTS idx_signal_prompts_active
   ON signal_prompts(active_from, active_to);
 CREATE INDEX IF NOT EXISTS idx_signal_prompts_format
   ON signal_prompts(format);
-
 -- ============================================================================
 -- 21. challenges — one row per challenge match (all formats).
 -- ============================================================================
@@ -112,7 +110,6 @@ CREATE TABLE IF NOT EXISTS challenges (
   completed_at      TIMESTAMPTZ,
   ruleset_version   TEXT NOT NULL DEFAULT 'challenge-v1'
 );
-
 CREATE INDEX IF NOT EXISTS idx_challenges_challenger
   ON challenges(challenger_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_challenges_challenged
@@ -124,7 +121,6 @@ CREATE INDEX IF NOT EXISTS idx_challenges_format
 CREATE INDEX IF NOT EXISTS idx_challenges_bracket
   ON challenges(bracket_id, bracket_round)
   WHERE bracket_id IS NOT NULL;
-
 -- ============================================================================
 -- 22. challenge_submissions — one row per operator per challenge.
 --     Stores the raw signal text + five-pillar scores + certificate artifact.
@@ -163,31 +159,26 @@ CREATE TABLE IF NOT EXISTS challenge_submissions (
   UNIQUE (challenge_id, operator_id)
                     -- one submission per operator per challenge
 );
-
 CREATE INDEX IF NOT EXISTS idx_challenge_subs_challenge
   ON challenge_submissions(challenge_id);
 CREATE INDEX IF NOT EXISTS idx_challenge_subs_operator
   ON challenge_submissions(operator_id, submitted_at DESC);
 CREATE INDEX IF NOT EXISTS idx_challenge_subs_score
   ON challenge_submissions(composite_score DESC);
-
 -- ============================================================================
 -- RLS policies (service-role writes; public read on completed challenges).
 -- ============================================================================
 ALTER TABLE signal_prompts        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE challenges            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE challenge_submissions ENABLE ROW LEVEL SECURITY;
-
 -- Public can read published prompts
 CREATE POLICY "signal_prompts_public_read"
   ON signal_prompts FOR SELECT
   USING (published_at IS NOT NULL);
-
 -- Public can read completed / active challenges
 CREATE POLICY "challenges_public_read"
   ON challenges FOR SELECT
   USING (status IN ('active', 'complete'));
-
 -- Public can read submissions for completed challenges
 CREATE POLICY "challenge_subs_public_read"
   ON challenge_submissions FOR SELECT
@@ -198,7 +189,6 @@ CREATE POLICY "challenge_subs_public_read"
         AND c.status = 'complete'
     )
   );
-
 -- Writes via service role only (no INSERT/UPDATE policies for anon/authenticated)
 
 -- ============================================================================
@@ -208,7 +198,6 @@ CREATE POLICY "challenge_subs_public_read"
 ALTER TABLE operators ADD COLUMN IF NOT EXISTS operator_domains TEXT[] DEFAULT '{}';
 CREATE INDEX IF NOT EXISTS idx_operators_domains
   ON operators USING gin (operator_domains);
-
 -- ============================================================================
 -- Add challenge_record columns to metric_snapshots (career W/L/draw).
 -- Denormalized for fast profile reads.
@@ -217,4 +206,4 @@ ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS challenges_total  INTEGER 
 ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS challenges_won    INTEGER DEFAULT 0;
 ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS challenges_lost   INTEGER DEFAULT 0;
 ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS signal_drop_best  NUMERIC(5,2);
-                                                    -- best single signal drop score
+-- best single signal drop score;
