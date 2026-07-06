@@ -54,6 +54,9 @@ export interface HistoryPoint {
   /** ISO date (deterministic literal — not derived from a clock). */
   date: string
   signa_rate: number
+  /** Υ Yield = (cache_read × output) / input² — the rank metric, computed
+   *  from the token pillars at each snapshot. 0 when pillars are missing. */
+  yield_: number
   global_rank: number
   class_tier: SignalClass
 }
