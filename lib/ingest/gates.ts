@@ -76,6 +76,19 @@ export const GATE_LIMITS = {
   MAX_OUTPUT_TOKENS_PER_MIN: 20_000,
   /** Max submissions per device within the throttle window before rate-limiting. */
   MAX_SUBMISSIONS_PER_WINDOW: 24,
+  // ── Tightened range-plausibility bounds (deviewreview3) ────────────────────
+  // The original bounds (100:1 reuse, 50/min cadence) were loose enough to
+  // drive Υ arbitrarily high while staying under them. Real data: reuse ~20-25:1,
+  // cacheWrite ~2-11:1, input share >0.3% of total. These tightened bounds
+  // catch a tuned fabricator who sets input=1 to inflate Υ = cr·o/i².
+  /** Max cache_read/cache_creation ratio (real max ~30:1 for power users; was 100:1). */
+  MAX_CACHE_REUSE_RATIO: 35,
+  /** Min cache_creation/output ratio (real min ~1.5:1; fabricators set cc<<o). */
+  MIN_CACHE_WRITE_RATIO: 0.5,
+  /** Min input share of total tokens (real min ~0.03% for power users; fabricators set input→0). */
+  MIN_INPUT_SHARE_FRAC: 0.0003,
+  /** Max cadence turns/active_minutes (real: 0.5-10/min; was 50). */
+  MAX_CADENCE_PER_MIN: 15,
 } as const
 
 const reject = (gate: string, code: string, detail: string): GateReason => ({ gate, code, severity: 'reject', detail })
@@ -117,17 +130,30 @@ export function plausibilityGate(p: SnapshotPayloadV1): GateReason[] {
   // Cross-field ratio checks (S1.2) — flag, not reject (avoids false positives on power users).
   // These are defense-in-depth: the battery (Gate 5) checks the same patterns, but having them
   // in the plausibility gate means they fire even if the battery is ever unwired.
+  // Bounds tightened (deviewreview3): the original 100:1 reuse + 50/min cadence were
+  // loose enough to drive Υ arbitrarily high while staying under them.
 
   // Impossible cascade: cache_read > 0 with cache_creation = 0 (must write cache before reading).
   if (rt.tokens_cache_read > 1_000 && rt.tokens_cache_creation === 0) {
     out.push(flag('plausibility', 'cache_without_creation', `${rt.tokens_cache_read} cache_read with 0 cache_creation (impossible cascade)`))
   }
-  // Extreme cache ratio: cache_read/cache_creation > 100:1 (real max ~30:1 for power users).
-  if (rt.tokens_cache_creation > 0 && rt.tokens_cache_read / rt.tokens_cache_creation > 100) {
+  // Extreme cache reuse: cache_read/cache_creation > 35:1 (real max ~30:1; was 100:1).
+  // A fabricator who sets cc low and cr high inflates Υ = cr·o/i² while staying under 100:1.
+  if (rt.tokens_cache_creation > 0 && rt.tokens_cache_read / rt.tokens_cache_creation > GATE_LIMITS.MAX_CACHE_REUSE_RATIO) {
     out.push(flag('plausibility', 'extreme_cache_ratio', `cache_read/cache_creation = ${(rt.tokens_cache_read / rt.tokens_cache_creation).toFixed(1)}:1 (real max ~30:1)`))
   }
-  // Implausible cadence: turns/active_minutes > 50 (real sessions: 0.5-10/min).
-  if (rt.active_minutes_est > 0 && rt.turns_total / rt.active_minutes_est > 50) {
+  // Low cache-write ratio: cache_creation/output < 0.5 (real min ~1.5:1).
+  // A fabricator who sets cc<<o gets high Υ without the cache-write cost.
+  if (rt.tokens_output > 1_000 && rt.tokens_cache_creation / rt.tokens_output < GATE_LIMITS.MIN_CACHE_WRITE_RATIO) {
+    out.push(flag('plausibility', 'low_cache_write_ratio', `cache_creation/output = ${(rt.tokens_cache_creation / rt.tokens_output).toFixed(2)}:1 (real min ~1.5:1)`))
+  }
+  // Input share too low: input < 0.1% of total (real min ~0.3%).
+  // A fabricator who sets input→0 inflates Υ = cr·o/i² quadratically.
+  if (pillars > 10_000 && rt.tokens_input_fresh / pillars < GATE_LIMITS.MIN_INPUT_SHARE_FRAC) {
+    out.push(flag('plausibility', 'implausible_input_share', `input is ${(rt.tokens_input_fresh / pillars * 100).toFixed(3)}% of total (real min ~0.3%)`))
+  }
+  // Implausible cadence: turns/active_minutes > 15 (real sessions: 0.5-10/min; was 50).
+  if (rt.active_minutes_est > 0 && rt.turns_total / rt.active_minutes_est > GATE_LIMITS.MAX_CADENCE_PER_MIN) {
     out.push(flag('plausibility', 'implausible_cadence', `${(rt.turns_total / rt.active_minutes_est).toFixed(1)} turns/min (real: 0.5-10)`))
   }
 
