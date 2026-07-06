@@ -37,7 +37,7 @@ const TIERS: Tier[] = [
       'Public leaderboard with platform filters',
       'Head-to-head compare on the cascade metrics',
       'Operator profile with the cascade fingerprint',
-      'MCP server, Claude Code plugin, IDE extensions',
+      'MCP server for Claude Code, Cursor, and any MCP-compatible client',
     ],
     cta: 'Start free',
     ctaHref: '/score',
