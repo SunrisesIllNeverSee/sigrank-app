@@ -6,147 +6,177 @@
 -- throttle check INSIDE the materialize_verified_snapshot RPC, so the count
 -- is read and enforced in the same transaction as the insert.
 --
--- The RPC already runs in a single transaction (SECURITY DEFINER). Adding
--- a count check at the top of the RPC body makes it atomic: the count is
--- read with the same transactional visibility as the insert, so concurrent
--- requests can't all see the same pre-insert count.
+-- The RPC already runs in a single transaction. Adding a count check at the
+-- top of the RPC body makes it atomic: the count is read with the same
+-- transactional visibility as the insert, so concurrent requests can't all
+-- see the same pre-insert count.
 --
 -- Note: this is a defense-in-depth check. The gate-chain throttle (Gate 3)
 -- stays as-is for the no-store/test path. The RPC check is the authoritative
 -- one for the production path.
 --
--- ⚠️ This migration ALTERs the existing materialize_verified_snapshot function.
--- It must be applied AFTER all prior migrations (it depends on the function
--- existing from the original init + subsequent patches).
---
 -- ⚠️ APPLY VIA `supabase db query --linked` OR the dashboard SQL editor — NEVER
 --    `supabase db push` (re-runs ALL numbered migrations = catastrophic).
+--
+-- This migration:
+--   1. DROPs both existing overloads (0013 without p_platform, 0015 with p_platform)
+--   2. CREATEs a single new function with the 0015 signature + the throttle check
+--   3. REVOKEs public access + GRANTs to service_role only
 
--- The throttle cap (must match GATE_LIMITS.MAX_SUBMISSIONS_PER_WINDOW in gates.ts).
--- 24 submissions per 60 seconds per device.
-create or replace function public.materialize_verified_snapshot(
-  p_operator_id uuid,
-  p_device_id uuid,
-  p_window_type text,
-  p_window_start timestamptz,
-  p_window_end timestamptz,
-  p_ruleset_version text,
-  p_snapshot_hash text,
-  p_payload_json jsonb,
-  p_input bigint,
-  p_output bigint,
-  p_cache_creation bigint,
-  p_cache_read bigint,
-  p_snapshot_date date,
-  p_signa_rate numeric,
-  p_class_tier integer,
-  p_platform text,
-  p_schema_version text,
-  p_signature text,
-  p_codename text,
-  p_tier text,
-  p_verification_tier text,
-  p_compression_ratio numeric,
-  p_prompt_complexity numeric,
-  p_cross_thread numeric,
-  p_session_depth numeric,
-  p_token_throughput numeric,
-  p_signal_force numeric,
-  p_live_signa_rate numeric,
-  p_message_volume integer,
-  p_account_age_days integer,
-  p_total_messages integer
+-- ── 1. Drop both existing overloads ──────────────────────────────────────────
+-- 0013 overload (31 args, no p_platform):
+DROP FUNCTION IF EXISTS public.materialize_verified_snapshot(
+  uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
+  date, numeric, text,
+  timestamptz, text, text, text, text, text,
+  numeric, numeric, integer, numeric, bigint, numeric, numeric, integer, integer, bigint
+);
+
+-- 0015 overload (32 args, with p_platform at end):
+DROP FUNCTION IF EXISTS public.materialize_verified_snapshot(
+  uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
+  date, numeric, text,
+  timestamptz, text, text, text, text, text,
+  numeric, numeric, integer, numeric, bigint, numeric, numeric, integer, integer, bigint,
+  text
+);
+
+-- ── 2. Create the new function (0015 signature + throttle check) ────────────
+CREATE FUNCTION public.materialize_verified_snapshot(
+  p_operator_id        UUID,
+  p_device_id          UUID,
+  p_window_type        TEXT,
+  p_window_start       TIMESTAMPTZ,
+  p_window_end         TIMESTAMPTZ,
+  p_ruleset_version    TEXT,
+  p_snapshot_hash      TEXT,
+  p_payload_json       JSONB,
+  p_input              BIGINT,
+  p_output             BIGINT,
+  p_cache_creation     BIGINT,
+  p_cache_read         BIGINT,
+  p_snapshot_date      DATE,
+  p_signa_rate         NUMERIC,
+  p_class_tier         TEXT,
+  p_submitted_at       TIMESTAMPTZ DEFAULT NULL,
+  p_schema_version     TEXT        DEFAULT NULL,
+  p_signature          TEXT        DEFAULT NULL,
+  p_codename           TEXT        DEFAULT NULL,
+  p_tier               TEXT        DEFAULT NULL,
+  p_verification_tier  TEXT        DEFAULT 'verified',
+  p_compression_ratio  NUMERIC     DEFAULT NULL,
+  p_prompt_complexity  NUMERIC     DEFAULT NULL,
+  p_cross_thread       INTEGER     DEFAULT NULL,
+  p_session_depth      NUMERIC     DEFAULT NULL,
+  p_token_throughput   BIGINT      DEFAULT NULL,
+  p_signal_force       NUMERIC     DEFAULT NULL,
+  p_live_signa_rate    NUMERIC     DEFAULT NULL,
+  p_message_volume     INTEGER     DEFAULT NULL,
+  p_account_age_days   INTEGER     DEFAULT NULL,
+  p_total_messages     BIGINT      DEFAULT NULL,
+  p_platform           TEXT        DEFAULT 'claude'
 )
-returns text
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_snapshot_id uuid;
-  v_existing record;
-  v_throttle_count integer;
-  v_throttle_cap integer := 24;
-  v_throttle_window_ms bigint := 60000;
-  v_window_since timestamptz;
-begin
+RETURNS UUID
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
+DECLARE
+  v_metric_snapshot_id UUID;
+  v_throttle_count     INTEGER;
+  v_throttle_cap       INTEGER := 24;   -- must match GATE_LIMITS.MAX_SUBMISSIONS_PER_WINDOW
+  v_throttle_window_ms BIGINT  := 60000; -- must match THROTTLE_WINDOW_MS (60s)
+  v_window_since       TIMESTAMPTZ;
+BEGIN
   -- Atomic throttle check: count this device's submissions in the trailing
-  -- window INSIDE the transaction. Concurrent requests will see each other's
-  -- inserts (depending on isolation level) or at least see a count that
-  -- includes recently committed rows. This closes the TOCTOU gap where N
-  -- concurrent requests all read the same pre-fetched count.
+  -- window INSIDE the transaction. This closes the TOCTOU gap where N
+  -- concurrent requests all read the same pre-fetched count from the app
+  -- layer. The count here is read with the same transactional visibility as
+  -- the insert below, so concurrent requests can't all see the same
+  -- pre-insert count.
   v_window_since := now() - (v_throttle_window_ms || ' milliseconds')::interval;
-  select count(*) into v_throttle_count
-  from snapshot_submissions
-  where device_id = p_device_id
-    and submitted_at >= v_window_since;
+  SELECT count(*) INTO v_throttle_count
+  FROM public.snapshot_submissions
+  WHERE device_id = p_device_id
+    AND submitted_at >= v_window_since;
 
-  if v_throttle_count >= v_throttle_cap then
-    raise exception 'throttle_exceeded: device % submitted % times in the last 60s (cap %)',
+  IF v_throttle_count >= v_throttle_cap THEN
+    RAISE EXCEPTION 'throttle_exceeded: device % submitted % times in the last 60s (cap %)',
       p_device_id, v_throttle_count, v_throttle_cap
-      using errcode = 'P0001';
-  end if;
+      USING ERRCODE = 'P0001';
+  END IF;
 
-  -- Existing upsert logic (unchanged from the original RPC).
-  -- Find the existing snapshot for this (operator, window, platform).
-  select ms.snapshot_id, ms.input_tokens, ms.output_tokens,
-         ms.cache_creation_tokens, ms.cache_read_tokens
-  into v_existing
-  from metric_snapshots ms
-  where ms.operator_id = p_operator_id
-    and ms.window_type = p_window_type
-    and ms.platform = p_platform
-    and ms.snapshot_date = p_snapshot_date
-  limit 1;
+  -- ③ append-only canonical row. unique_violation on snapshot_hash aborts the tx.
+  INSERT INTO public.snapshot_submissions (
+    operator_id, device_id, submitted_at, window_type, window_start, window_end,
+    schema_version, ruleset_version, snapshot_hash, signature, payload_json,
+    codename, tier, verification_tier, status,
+    input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens
+  ) VALUES (
+    p_operator_id, p_device_id, COALESCE(p_submitted_at, now()),
+    p_window_type, p_window_start, p_window_end,
+    p_schema_version, p_ruleset_version, p_snapshot_hash, p_signature, p_payload_json,
+    p_codename, p_tier, p_verification_tier, 'scored',
+    p_input, p_output, p_cache_creation, p_cache_read
+  );
 
-  if found then
-    -- Upsert: update the existing snapshot with new pillars.
-    update metric_snapshots
-    set input_tokens = p_input,
-        output_tokens = p_output,
-        cache_creation_tokens = p_cache_creation,
-        cache_read_tokens = p_cache_read,
-        signa_rate = p_signa_rate,
-        class_tier = p_class_tier,
-        generated_at = now()
-    where snapshot_id = v_existing.snapshot_id
-    returning snapshot_id into v_snapshot_id;
-  else
-    -- Insert new snapshot.
-    insert into metric_snapshots (
-      operator_id, window_type, window_start, window_end,
-      input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens,
-      snapshot_date, signa_rate, class_tier, platform, generated_at
-    )
-    values (
-      p_operator_id, p_window_type, p_window_start, p_window_end,
-      p_input, p_output, p_cache_creation, p_cache_read,
-      p_snapshot_date, p_signa_rate, p_class_tier, p_platform, now()
-    )
-    returning snapshot_id into v_snapshot_id;
-  end if;
-
-  -- Insert the submission record (for audit + throttle counting).
-  insert into snapshot_submissions (
-    snapshot_hash, device_id, operator_id, payload_json,
-    schema_version, signature, codename, tier, verification_tier,
-    submitted_at
+  -- ④ board read layer — live-upload UPSERT (§0.4), keyed per-platform (0015).
+  INSERT INTO public.metric_snapshots AS m (
+    operator_id, snapshot_date, window_type, platform,
+    input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens,
+    signa_rate, class_tier, ruleset_version,
+    compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput,
+    signal_force, live_signa_rate, message_volume, account_age_days, total_messages,
+    last_seen, movement_24h, movement_7d, generated_at
+  ) VALUES (
+    p_operator_id, p_snapshot_date, p_window_type, p_platform,
+    p_input, p_output, p_cache_creation, p_cache_read,
+    p_signa_rate, p_class_tier, p_ruleset_version,
+    p_compression_ratio, p_prompt_complexity, p_cross_thread, p_session_depth, p_token_throughput,
+    p_signal_force, p_live_signa_rate, p_message_volume, p_account_age_days, p_total_messages,
+    now(), 0, 0, now()
   )
-  values (
-    p_snapshot_hash, p_device_id, p_operator_id, p_payload_json,
-    p_schema_version, p_signature, p_codename, p_tier, p_verification_tier,
-    now()
-  )
-  on conflict (snapshot_hash) do nothing;
+  ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO UPDATE SET
+    input_tokens          = EXCLUDED.input_tokens,
+    output_tokens         = EXCLUDED.output_tokens,
+    cache_creation_tokens = EXCLUDED.cache_creation_tokens,
+    cache_read_tokens     = EXCLUDED.cache_read_tokens,
+    signa_rate            = EXCLUDED.signa_rate,
+    class_tier            = EXCLUDED.class_tier,
+    ruleset_version       = EXCLUDED.ruleset_version,
+    compression_ratio     = COALESCE(EXCLUDED.compression_ratio, m.compression_ratio),
+    prompt_complexity     = COALESCE(EXCLUDED.prompt_complexity, m.prompt_complexity),
+    cross_thread          = COALESCE(EXCLUDED.cross_thread,       m.cross_thread),
+    session_depth         = COALESCE(EXCLUDED.session_depth,      m.session_depth),
+    token_throughput      = COALESCE(EXCLUDED.token_throughput,   m.token_throughput),
+    signal_force          = COALESCE(EXCLUDED.signal_force,       m.signal_force),
+    live_signa_rate       = COALESCE(EXCLUDED.live_signa_rate,    m.live_signa_rate),
+    message_volume        = COALESCE(EXCLUDED.message_volume,     m.message_volume),
+    account_age_days      = COALESCE(EXCLUDED.account_age_days,   m.account_age_days),
+    total_messages        = COALESCE(EXCLUDED.total_messages,     m.total_messages),
+    last_seen             = now(),
+    generated_at          = now()
+  RETURNING m.metric_snapshot_id INTO v_metric_snapshot_id;
 
-  return v_snapshot_id::text;
-end;
+  RETURN v_metric_snapshot_id;
+END;
 $$;
 
--- Revoke public access (same as 0022 for recompute_the_field).
-revoke execute on function public.materialize_verified_snapshot(
-  uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb,
-  bigint, bigint, bigint, bigint, date, numeric, integer, text,
-  text, text, text, text, text, text, numeric, numeric, numeric,
-  numeric, numeric, numeric, numeric, integer, integer, integer
-) from public, anon, authenticated;
+-- ── 3. Lock EXECUTE to service role only ────────────────────────────────────
+-- Postgres grants EXECUTE to PUBLIC by default, which would expose this as an
+-- anon/authenticated /rest/v1/rpc endpoint. The full argument-type signature
+-- is required (functions resolve by signature).
+REVOKE EXECUTE ON FUNCTION public.materialize_verified_snapshot(
+  uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
+  date, numeric, text,
+  timestamptz, text, text, text, text, text,
+  numeric, numeric, integer, numeric, bigint, numeric, numeric, integer, integer, bigint,
+  text
+) FROM PUBLIC, anon, authenticated;
+
+GRANT EXECUTE ON FUNCTION public.materialize_verified_snapshot(
+  uuid, uuid, text, timestamptz, timestamptz, text, text, jsonb, bigint, bigint, bigint, bigint,
+  date, numeric, text,
+  timestamptz, text, text, text, text, text,
+  numeric, numeric, integer, numeric, bigint, numeric, numeric, integer, integer, bigint,
+  text
+) TO service_role;
