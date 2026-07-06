@@ -24,12 +24,12 @@ interface Row {
 }
 
 const ROWS: Row[] = [
-  { rank: 1, name: 'signal-92b4f9f485', cls: 'BASE',        yld: '566.34', snr: '0.59', lev: '385.7×', vel: '1.47', d10: '2.59', pct: '100%', mv: '—', you: true },
-  { rank: 2, name: 'OrcaVanguard',      cls: 'TRANSMITTER', yld: '2.59',   snr: '0.08', lev: '27.9×',  vel: '0.09', d10: '1.45', pct: '99%',  mv: '—' },
-  { rank: 3, name: 'IronLattice',       cls: 'TRANSMITTER', yld: '2.30',   snr: '0.07', lev: '30.1×',  vel: '0.08', d10: '1.48', pct: '98%',  mv: '—' },
-  { rank: 4, name: 'EmberCoil',         cls: 'POWER',       yld: '1.82',   snr: '0.08', lev: '22.3×',  vel: '0.08', d10: '1.35', pct: '91%',  mv: '—' },
-  { rank: 5, name: 'DriftPilgrim',      cls: 'BASE',        yld: '1.77',   snr: '0.05', lev: '31.5×',  vel: '0.06', d10: '1.50', pct: '85%',  mv: '—' },
-  { rank: 6, name: 'MeridianScribe',    cls: 'ARCH+',       yld: '1.51',   snr: '0.06', lev: '22.3×',  vel: '0.07', d10: '1.35', pct: '75%',  mv: '—' },
+  { rank: 1, name: 'MO§ES™',              cls: 'BASE',        yld: '566.34', snr: '0.59', lev: '385.7×', vel: '1.47', d10: '2.59', pct: '100%', mv: '—', you: true },
+  { rank: 2, name: 'Ólafur Nils Sigurðsson', cls: 'TRANSMITTER', yld: '2.59',   snr: '0.08', lev: '27.9×',  vel: '0.09', d10: '1.45', pct: '99%',  mv: '—' },
+  { rank: 3, name: 'Ivan Golovach',       cls: 'TRANSMITTER', yld: '2.30',   snr: '0.07', lev: '30.1×',  vel: '0.08', d10: '1.48', pct: '98%',  mv: '—' },
+  { rank: 4, name: 'Maple Gao',           cls: 'POWER',       yld: '1.82',   snr: '0.08', lev: '22.3×',  vel: '0.08', d10: '1.35', pct: '91%',  mv: '—' },
+  { rank: 5, name: 'Vincent Koc',         cls: 'BASE',        yld: '1.77',   snr: '0.05', lev: '31.5×',  vel: '0.06', d10: '1.50', pct: '85%',  mv: '—' },
+  { rank: 6, name: 'Max Ghenis',          cls: 'ARCH+',       yld: '1.51',   snr: '0.06', lev: '22.3×',  vel: '0.07', d10: '1.35', pct: '75%',  mv: '—' },
 ]
 
 export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolean }) {
@@ -67,7 +67,7 @@ export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolea
         {/* column headers */}
         <div className="mt-3 flex gap-2 border-b border-bg-border-subtle pb-2 font-mono text-[10px] uppercase tracking-wide text-text-muted whitespace-nowrap">
           <span className="w-8 text-right">#</span>
-          <span className="w-36">Codename</span>
+          <span className="w-36">Operator</span>
           <span className="w-24">Class</span>
           <span className="w-24 text-right">Υ Yield</span>
           <span className="w-14 text-right">SNR</span>
