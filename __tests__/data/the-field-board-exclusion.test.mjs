@@ -1,11 +1,14 @@
 /**
  * __tests__/data/the-field-board-exclusion.test.mjs
- * CLAIM 9: The Field (operator_id = f1e1d000-...) is NOT excluded from the
- * ranked board in getLeaderboard, so it appears in the ranked field and
- * inflates operatorCount/percentiles. PASSES if the claim is TRUE (before fix)
- * and FALSE (after fix).
+ * CLAIM 9 (REVERSED): The Field (operator_id = f1e1d000-...) is intentionally
+ * KEPT on the ranked board — it's the average/baseline operator that makes
+ * "you vs. the field" plug-and-play. The owner confirmed this is the desired
+ * behavior. The devinreview suggested excluding it, but the utility of having
+ * the average baseline visible outweighs the operatorCount inflation concern.
  *
- * This test verifies the fix: The Field is excluded from the board.
+ * This test confirms The Field is NOT filtered from either the live path
+ * (queries.ts) or the fallback path (fallback.ts).
+ *
  * Run: node --test __tests__/data/the-field-board-exclusion.test.mjs
  */
 import { test } from 'node:test'
@@ -18,52 +21,36 @@ const read = (p) => readFileSync(join(root, p), 'utf8')
 
 const FIELD_OPERATOR_ID = 'f1e1d000-0000-4000-8000-000000000001'
 
-test('FIX 9: getLeaderboard excludes The Field from the ranked board', () => {
+test('The Field is KEPT on the ranked board (live path — queries.ts)', () => {
   const src = read('lib/data/queries.ts')
-  // The fix adds a filter for FIELD_OPERATOR_ID after the collapse step.
+  // The Field constant may exist for other uses, but there should be NO
+  // filter that excludes it from snapRows.
   assert.ok(
-    src.includes(FIELD_OPERATOR_ID),
-    'queries.ts must reference the Field operator_id for exclusion',
-  )
-  assert.ok(
-    src.includes('s.operator_id !== FIELD_OPERATOR_ID') || src.includes("s.operator_id !== 'f1e1d000"),
-    'queries.ts must filter out The Field from snapRows',
+    !src.includes('s.operator_id !== FIELD_OPERATOR_ID'),
+    'queries.ts must NOT filter The Field from snapRows (owner wants it on the board)',
   )
 })
 
-test('FIX 9: filterMockBoard (fallback path) also excludes The Field', () => {
+test('The Field is KEPT on the ranked board (fallback path — fallback.ts)', () => {
   const src = read('lib/data/fallback.ts')
   assert.ok(
-    src.includes(FIELD_OPERATOR_ID),
-    'fallback.ts must reference the Field operator_id for exclusion',
-  )
-  assert.ok(
-    src.includes("r.operator.operator_id !== 'f1e1d000") || src.includes('r.operator.operator_id !== FIELD_OPERATOR_ID'),
-    'fallback.ts must filter out The Field from the mock/cold-store board',
+    !src.includes("r.operator.operator_id !== 'f1e1d000"),
+    'fallback.ts must NOT filter The Field from the mock/cold-store board',
   )
 })
 
-test('FIX 9: The Field exists in snapshot.json (confirming the fallback risk is real)', () => {
+test('The Field exists in snapshot.json (confirming it ships in the cold store)', () => {
   const src = read('lib/data/snapshot.json')
   assert.ok(
     src.includes(FIELD_OPERATOR_ID),
-    'snapshot.json contains The Field — the fallback path MUST filter it',
+    'snapshot.json contains The Field — it ships as the average-baseline reference',
   )
 })
 
-test('FIX 9: /compare already excluded The Field (parity check)', () => {
+test('/compare uses The Field as the default opponent B (baseline)', () => {
   const src = read('app/compare/page.tsx')
   assert.ok(
     src.includes("'the-field'"),
-    '/compare page filters the-field from the side-A pool',
-  )
-})
-
-test('FIX 9: The Field operator_id is the known constant', () => {
-  // Verify the operator_id matches what the SQL migration uses.
-  const migrationSrc = read('supabase/migrations/0019_the_field_autoupdate.sql')
-  assert.ok(
-    migrationSrc.includes(FIELD_OPERATOR_ID),
-    'migration 0019 must reference the same Field operator_id',
+    '/compare page uses the-field as the default compare baseline',
   )
 })
