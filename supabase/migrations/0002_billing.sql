@@ -27,10 +27,8 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   created_at           TIMESTAMPTZ DEFAULT now(),
   updated_at           TIMESTAMPTZ DEFAULT now()
 );
-
 CREATE INDEX IF NOT EXISTS idx_subscriptions_operator ON subscriptions(operator_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
-
 -- ============================================================================
 -- webhook_events — Stripe webhook idempotency (webhook_handling.md).
 -- ============================================================================
@@ -41,9 +39,7 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   processed_at       TIMESTAMPTZ,
   payload_json       JSONB NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS idx_webhook_events_type ON webhook_events(event_type);
-
 -- ============================================================================
 -- audit_log — append-only forensic / state-change trail (IPO S.X.03).
 -- ============================================================================
@@ -60,10 +56,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
   payload            JSONB,
   occurred_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
 CREATE INDEX IF NOT EXISTS idx_audit_log_operator ON audit_log(operator_id, occurred_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_log_event_type ON audit_log(event_type, occurred_at DESC);
-
 -- ============================================================================
 -- ruleset_versions — trust ledger of scoring changes (refresh_cadences.md).
 -- ============================================================================
@@ -73,7 +67,6 @@ CREATE TABLE IF NOT EXISTS ruleset_versions (
   changelog          TEXT NOT NULL,
   changed_params     JSONB NOT NULL  -- which RS.xx params changed
 );
-
 -- ============================================================================
 -- system_stats — singleton homepage aggregate block (one row, id pinned TRUE).
 -- ============================================================================
@@ -88,5 +81,4 @@ CREATE TABLE IF NOT EXISTS system_stats (
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT system_stats_singleton CHECK (id IS TRUE)
 );
-
--- End of 0002_billing.
+-- End of 0002_billing.;
