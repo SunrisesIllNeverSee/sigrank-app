@@ -133,6 +133,16 @@ export default async function ComparePage({
         ])
       : [[], []]
 
+  // Field average SIGNA RATE — mean of all ranked, compounding operators on
+  // the board. Drawn as a horizontal reference line on the overtime chart.
+  const fieldSignaRates = board
+    .filter((r) => !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding)
+    .map((r) => r.snapshot.signa_rate)
+    .filter((v) => Number.isFinite(v) && v > 0)
+  const fieldAvgSigna = fieldSignaRates.length
+    ? fieldSignaRates.reduce((a, b) => a + b, 0) / fieldSignaRates.length
+    : null
+
   if (!rowA || !rowB) {
     return (
       <div className="flex flex-col gap-3">
@@ -203,6 +213,7 @@ export default async function ComparePage({
           historyB={historyB}
           nameA={nameOf(rowA)}
           nameB={nameOf(rowB)}
+          fieldAvg={fieldAvgSigna}
         />
       </div>
 
