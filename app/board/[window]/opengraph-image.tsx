@@ -22,22 +22,7 @@ export default async function BoardOG({
 }) {
   const { window: slug } = await params
   const win = boardWindowBySlug(slug)
-
-  // Fallback for unknown slugs (the page 404s, but OG route must not throw).
   const label = win?.label ?? 'Leaderboard'
-
-  let top3: { codename: string; rank: number; anonId: string; signalClass: string }[] = []
-  try {
-    const rows = await getLeaderboard(win ? { window: win.enum } : {})
-    top3 = rows.slice(0, 3).map(toEntry).map((e) => ({
-      codename: e.codename ?? '—',
-      rank: e.rank ?? 0,
-      anonId: e.anonId ?? e.codename ?? '—',
-      signalClass: e.signalClass ?? '—',
-    }))
-  } catch {
-    // Data layer failed — render a static fallback card instead of 500ing.
-  }
 
   return new ImageResponse(
     (
@@ -54,7 +39,6 @@ export default async function BoardOG({
           fontFamily: 'sans-serif',
         }}
       >
-        {/* Top: brand + window label */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 32, fontWeight: 700, color: '#C4923A' }}>
             ◈ SigRank
@@ -63,40 +47,9 @@ export default async function BoardOG({
             {label}
           </div>
         </div>
-
-        {/* Middle: title + top 3 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ fontSize: 72, fontWeight: 800, letterSpacing: '-0.03em' }}>
-            Leaderboard
-          </div>
-          {top3.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {top3.map((e) => (
-                <div
-                  key={e.codename}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 16,
-                    fontSize: 32,
-                  }}
-                >
-                  <span style={{ color: '#C4923A', fontWeight: 800, width: 60 }}>
-                    #{e.rank}
-                  </span>
-                  <span style={{ fontWeight: 600 }}>
-                    {e.anonId}
-                  </span>
-                  <span style={{ opacity: 0.5, fontSize: 24 }}>
-                    {e.signalClass}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+        <div style={{ fontSize: 72, fontWeight: 800, letterSpacing: '-0.03em' }}>
+          Leaderboard
         </div>
-
-        {/* Bottom: url */}
         <div style={{ fontSize: 28, opacity: 0.4 }}>
           signalaf.com/board/{slug}
         </div>
