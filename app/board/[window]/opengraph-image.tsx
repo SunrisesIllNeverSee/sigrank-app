@@ -7,11 +7,17 @@
  */
 
 import { ImageResponse } from 'next/og'
-import { boardWindowBySlug } from '@/lib/data/windows'
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 export const runtime = 'nodejs'
+
+const LABELS: Record<string, string> = {
+  '7d': '7 day',
+  '30d': '30 day',
+  '90d': '90 day',
+  all: 'All time',
+}
 
 export default async function BoardOG({
   params,
@@ -19,8 +25,7 @@ export default async function BoardOG({
   params: Promise<{ window: string }>
 }) {
   const { window: slug } = await params
-  const win = boardWindowBySlug(slug)
-  const label = win?.label ?? 'Leaderboard'
+  const label = LABELS[slug] ?? 'Leaderboard'
 
   return new ImageResponse(
     (
