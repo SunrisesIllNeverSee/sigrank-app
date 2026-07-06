@@ -105,7 +105,7 @@ export default function ScorePage() {
         <p className="font-sans text-xs leading-relaxed text-text-muted">
           Pulls the agent + ccusage + tokscale + tokendash in one install. Node ≥18, macOS + Linux.
           Or let your AI agent do it — tell it to run{' '}
-          <code className="font-mono text-text-primary">npx sigrank me</code> to see your cascade,
+          <code className="font-mono text-text-primary">npx sigrank</code> to see your cascade,
           or <code className="font-mono text-text-primary">npx sigrank submit</code> to publish.
           For direct tool calls, wire it as an MCP server — see the{' '}
           <Link href="/wiki/local-agent" className="text-text-accent underline-offset-2 hover:underline">
