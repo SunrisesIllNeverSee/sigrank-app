@@ -298,7 +298,7 @@ function Card({ cardRef, a, b, href }: {
               : `linear-gradient(105deg, ${colA}11, transparent 72%)`,
           }}>
             {/* identity (outboard = left for A) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 160, flexShrink: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 160, flexShrink: 0, justifyContent: 'center' }}>
               <span style={{ fontSize: 22, color: colA, lineHeight: 1 }}>{glyphFor(clsA)}</span>
               <span style={{ fontSize: aNameSize, fontWeight: 900, color: '#e9e3d5', letterSpacing: 0.5, lineHeight: 1.1 }}>{nameA}</span>
               <span style={{ fontSize: 10, fontWeight: 700, color: colA, letterSpacing: 0.3 }}>{clsA} · #{a.global_rank}</span>
@@ -335,7 +335,7 @@ function Card({ cardRef, a, b, href }: {
               : `linear-gradient(255deg, ${colB}11, transparent 72%)`,
           }}>
             {/* identity (outboard = right for B, via row-reverse) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 160, flexShrink: 0, alignItems: 'flex-end', textAlign: 'right' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 160, flexShrink: 0, alignItems: 'flex-end', textAlign: 'right', justifyContent: 'center' }}>
               <span style={{ fontSize: 22, color: colB, lineHeight: 1 }}>{glyphFor(clsB)}</span>
               <span style={{ fontSize: bNameSize, fontWeight: 900, color: '#e9e3d5', letterSpacing: 0.5, lineHeight: 1.1 }}>{nameB}</span>
               <span style={{ fontSize: 10, fontWeight: 700, color: colB, letterSpacing: 0.3 }}>{clsB} · #{b.global_rank}</span>
