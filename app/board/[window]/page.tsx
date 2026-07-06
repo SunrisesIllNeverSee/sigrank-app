@@ -56,6 +56,7 @@ export async function generateMetadata({
     title: `${label} Leaderboard`,
     description: `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
     path: `/board/${slug}`,
+    ogImage: { url: `/board/${slug}/og`, width: 1200, height: 630, alt: `SigRank ${label} Leaderboard` },
   })
 }
 
