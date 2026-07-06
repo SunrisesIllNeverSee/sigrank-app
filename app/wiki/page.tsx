@@ -616,14 +616,17 @@ function SubmitFlow() {
           The board is public and ranked. Without a gate, it would fill with observer-inflated
           entries — tooling that reports numbers the operator didn&apos;t actually produce, or
           synthetic data designed to game a single metric. The account ties a submission to a
-          real identity; the review checks that the token counts came from a real session, not
-          a fabricated one.
+          real identity; the review checks that the token counts are physically plausible and
+          that the source logs haven&apos;t been edited.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          The review is lightweight — it runs the verification suite (Benford, telescoping
-          identity, bot control) on the submitted payload. If the numbers compose, the entry
-          lands. If they don&apos;t, it gets flagged. The gate is mechanical, not editorial —
-          we don&apos;t judge whether your work is good, just whether your numbers are real.
+          The review is lightweight — it runs the plausibility gate (range checks, cross-field
+          ratios, cadence bounds) and the source-attestation cross-check (log file hashes that
+          detect tampering across submissions). Benford&apos;s Law runs as a backstop but is
+          cosmetic at per-session scale (n=4); its real power is aggregate, across the whole
+          board. If the numbers compose, the entry lands. If they don&apos;t, it gets flagged.
+          The gate is mechanical, not editorial — we don&apos;t judge whether your work is good,
+          just whether your numbers are real.
         </p>
       </section>
 
