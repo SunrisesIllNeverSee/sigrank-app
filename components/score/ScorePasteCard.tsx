@@ -6,7 +6,7 @@
  * Calls /api/v1/ingest-parse (no auth, no DB write) to parse the paste and
  * show the four token pillars + compression ratio. This is a pure calculator
  * — nothing is persisted. To land on the board, the operator uses the local
- * agent (npx sigrank me) or creates an account.
+ * agent (npx sigrank) or creates an account.
  */
 
 import React, { useState } from 'react'

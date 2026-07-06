@@ -179,6 +179,10 @@ const MCP_TOOL_LIST = [
   { name: 'get_leaderboard',   desc: 'Live leaderboard from signalaf.com, any window.' },
   { name: 'get_operator',      desc: "One operator's live profile by codename." },
   { name: 'watch_tokenpull',   desc: 'Streaming cascade snapshot — diffs on each poll.' },
+  { name: 'diagnose_cascade',  desc: 'Diagnoses where your token cascade is leaking efficiency — ranked findings with severity + estimated Υ impact.' },
+  { name: 'simulate_change',   desc: 'Prescriptive "what if" — test proposed pillar changes and see the exact Υ delta + class change before committing.' },
+  { name: 'suggest_improvements', desc: 'Generates ranked, simulated improvement suggestions — tests strategies and returns them sorted by Υ yield impact.' },
+  { name: 'self_improve',      desc: 'One-click optimize: diagnoses, suggests, and simulates the best change in a single call.' },
 ]
 
 const PROFILE_PIPELINE = [
