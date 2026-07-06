@@ -26,10 +26,18 @@ export default async function BoardOG({
   // Fallback for unknown slugs (the page 404s, but OG route must not throw).
   const label = win?.label ?? 'Leaderboard'
 
-  const rows = await getLeaderboard(
-    win ? { window: win.enum } : {},
-  )
-  const top3 = rows.slice(0, 3).map(toEntry)
+  let top3: { codename: string; rank: number; anonId: string; signalClass: string }[] = []
+  try {
+    const rows = await getLeaderboard(win ? { window: win.enum } : {})
+    top3 = rows.slice(0, 3).map(toEntry).map((e) => ({
+      codename: e.codename ?? '—',
+      rank: e.rank ?? 0,
+      anonId: e.anonId ?? e.codename ?? '—',
+      signalClass: e.signalClass ?? '—',
+    }))
+  } catch {
+    // Data layer failed — render a static fallback card instead of 500ing.
+  }
 
   return new ImageResponse(
     (
@@ -63,7 +71,7 @@ export default async function BoardOG({
           </div>
           {top3.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {top3.map((e, _i) => (
+              {top3.map((e) => (
                 <div
                   key={e.codename}
                   style={{
