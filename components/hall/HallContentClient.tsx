@@ -86,7 +86,7 @@ export function HallContentClient({ windowsData }: Props) {
     if (v === '—') return null
     return {
       board: DISPLAY_BY_ID[b.canonId]?.ticker ?? b.canonId,
-      holder: top.operator.codename,
+      holder: top.operator.display_name || top.operator.codename,
       value: v,
       href: `/user/${top.operator.codename}`,
     }

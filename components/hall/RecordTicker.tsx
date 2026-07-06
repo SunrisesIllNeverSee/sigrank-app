@@ -19,7 +19,7 @@ import Link from 'next/link'
 export interface RecordTickerItem {
   /** Metric ticker the record belongs to (e.g. 'Υ', 'SNR', 'IN'). */
   board: string
-  /** Record holder's codename. */
+  /** Record holder's display name (real name when present, else codename). */
   holder: string
   /** Headline record value, already formatted (e.g. '1.2K', '$4.20'). */
   value: string

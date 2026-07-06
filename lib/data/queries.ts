@@ -619,7 +619,7 @@ export async function getHallOfSignal(params: BoardParams = {}): Promise<HallRec
       .select(
         'awarded_at, source_note, ' +
           'badges:badge_id ( badge_name ), ' +
-          'operators:operator_id ( codename )',
+          'operators:operator_id ( codename, display_name )',
       )
       .order('awarded_at', { ascending: false })
     if (error) throw error
@@ -628,7 +628,7 @@ export async function getHallOfSignal(params: BoardParams = {}): Promise<HallRec
       awarded_at: string | null
       source_note: string | null
       badges: { badge_name: string | null } | null
-      operators: { codename: string | null } | null
+      operators: { codename: string | null; display_name: string | null } | null
     }
     const rows = (data as unknown as HallJoin[] | null) ?? []
     if (rows.length === 0) return MOCK_HALL
@@ -642,7 +642,7 @@ export async function getHallOfSignal(params: BoardParams = {}): Promise<HallRec
       return {
         reward_id: rewardId,
         title: r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? 'Hall of Signal',
-        operator_codename: r.operators?.codename ?? 'unknown',
+        operator_codename: r.operators?.display_name || r.operators?.codename || 'unknown',
         value: note || (r.badges?.badge_name ?? ''),
         date: (r.awarded_at ?? '').slice(0, 10),
         isPlaceholder: false,
