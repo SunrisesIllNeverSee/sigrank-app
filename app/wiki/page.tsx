@@ -26,7 +26,8 @@ import { ClassLadder } from '@/components/marketing/ClassLadder'
 import { PasteForm } from '@/components/submit/PasteForm'
 import { SubmitForm } from '@/components/submit/SubmitForm'
 
-import { TopicConsole, type TopicGroup } from '@/components/draft/TopicConsole'
+import { WikiDoc, type WikiDocGroup } from '@/components/wiki/WikiDoc'
+import { WikiTOC, type TocItem } from '@/components/wiki/WikiTOC'
 import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
 import { VerificationTests } from '@/components/marketing/VerificationTests'
 import { SignatureDrift, LocalAgentMcp, Credits } from '@/components/marketing/SignalIntegrity'
@@ -64,10 +65,9 @@ function SigRankDefinition() {
   return (
     <div className="flex flex-col gap-4">
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
-        <strong className="text-text-primary">SigRank</strong> is the operator leaderboard for AI — it
-        ranks the <strong className="text-text-primary">operator, not the model</strong>, by the
-        architecture of their token cascade. The console is the field at a glance: every operator,
-        every metric, scored from four raw integers and ranked live.
+        <strong className="text-text-primary">SigRank</strong> is the operator leaderboard for AI.
+        It ranks the <strong className="text-text-primary">operator, not the model</strong> — by the
+        architecture of their token cascade. Four raw integers in, the full ledger out, ranked live.
       </p>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
         Volume is noise. Yield is signal. The same four token counts reveal whether you compound
@@ -154,8 +154,9 @@ function FourPillars() {
   return (
     <section className="flex flex-col gap-4">
       <p className="max-w-2xl font-sans text-sm text-text-secondary">
-        Every score starts from <strong className="text-text-primary">four raw token counts</strong> —
-        nothing else, and never your prompt content. The whole cascade is derived from these.
+        Every score starts from <strong className="text-text-primary">four raw token counts</strong>.
+        Not your prompts, not your code, not your word counts — four integers. The whole cascade is
+        derived from these.
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {PILLARS.map((p) => (
@@ -249,8 +250,8 @@ function CascadeList() {
     <section className="flex flex-col gap-4">
       <p className="max-w-2xl font-sans text-sm text-text-secondary">
         From the four pillars we derive the <strong className="text-text-primary">token cascade</strong> —
-        the metrics the board actually ranks on. Token-only; no word-era proxies. Each metric captures
-        a different facet of how the cascade compounds (or doesn&apos;t).
+        the metrics the board actually ranks on. Each one captures a different facet of how the cascade
+        compounds (or doesn&apos;t). Token-only; no word-era proxies.
       </p>
 
       {/* The metric list with explanations */}
@@ -366,11 +367,10 @@ function MosesSection() {
     <div className="flex flex-col gap-5">
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
         SigRank runs on <strong className="text-gold">MO§ES™</strong> &mdash; the{' '}
-        <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion
-        System</strong>. It&apos;s a governance framework that came out of a published
-        conservation law for language. This section covers where it came from, what the law
-        says, what the evidence shows, how governance works inside it, who it&apos;s for, and
-        what we&apos;re building on top of it.
+        <strong className="text-text-primary">Modus Operandi §ignal Scaling Expansion System</strong>.
+        A governance framework built on a published conservation law for language. This section covers
+        where it came from, what the law says, what the evidence shows, how governance works, who
+        it&apos;s for, and what we&apos;re building on top of it.
       </p>
 
       {/* ── Where this came from ── */}
@@ -563,10 +563,10 @@ function SubmitMcpLead() {
         </span>
         <h2 className="font-mono text-lg font-bold text-text-primary">Run the local agent (MCP / CLI)</h2>
         <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
-          The SigRank agent reads your local session logs across 15 AI coding platforms (Claude Code,
-          Codex, Gemini CLI, Copilot CLI, Amp, Goose, Kilo, and more) and counts the four token pillars
-          per window — <strong className="text-text-primary">zero paste, token counts only, never your
-          prompt content.</strong> One command:
+          The SigRank agent reads your local session logs across {PLATFORM_COUNT}+ AI coding platforms
+          (Claude Code, Codex, Gemini CLI, Copilot CLI, Amp, Goose, Kilo, and more) and counts the
+          four token pillars per window — <strong className="text-text-primary">zero paste, token
+          counts only, never your prompt content.</strong> One command:
         </p>
       </div>
 
@@ -656,11 +656,16 @@ function PasteRunNumbers() {
       <div className="flex flex-col gap-1">
         <h2 className="font-mono text-lg font-bold text-text-primary">Run numbers — paste ccusage output</h2>
         <p className="max-w-2xl font-sans text-sm text-text-secondary">
-          Run{' '}
+          No agent installed yet? You can still see your cascade in 30 seconds. Run{' '}
           <code className="rounded bg-bg-surface px-1 py-0.5 font-mono text-text-primary">ccusage --json</code>{' '}
-          in your terminal and paste the output below to see your cascade and projected rank. Real
-          token counts extracted directly. Accepts full JSON, partial fragments, Codex exports, or four
-          bare numbers. <span className="text-text-muted">Calculator only — not saved to the board.</span>
+          in your terminal — it prints your four token pillars per session. Paste the output below and
+          the calculator derives your full cascade: Υ Yield, SNR, Leverage, Velocity, 10xDEV, and your
+          projected class tier.
+        </p>
+        <p className="max-w-2xl font-sans text-xs text-text-muted">
+          Accepts full JSON, partial fragments, Codex exports, or four bare numbers (input, output,
+          cache-read, cache-write). <span className="text-text-secondary">Calculator only — not saved
+          to the board.</span> When you&apos;re ready to land on the board, install the agent above.
         </p>
       </div>
       <PasteForm />
@@ -725,12 +730,14 @@ function ContactCard() {
 /* ───────────────────── CONSOLE GROUPS (owner-ordered) ───────────────────── */
 
 export default function Draft1Page() {
-  const groups: TopicGroup[] = [
+  const groups: WikiDocGroup[] = [
     {
+      id: 'sigrank-console',
       groupLabel: 'SigRank console',
       description: 'What SigRank is, how it works, and what the leaderboard measures. Start here if you are new.',
       items: [
         {
+          id: 'what-it-is',
           label: 'What it is',
           hint: 'Ranks the operator, not the model — four integers in, full ledger out.',
           node: <SigRankDefinition />,
@@ -738,25 +745,26 @@ export default function Draft1Page() {
       ],
     },
     {
+      id: 'submit',
       groupLabel: 'Submit',
       source: 'run the agent',
       description: 'How to get your token counts and land on the board — from the zero-paste agent to paste fallbacks.',
       items: [
-        // MCP-FIRST (owner 2026-06-24): lead with the agent + its run commands (was hidden
-        // two groups down); the paste/manual options follow as clearly-secondary "other ways".
-        { label: 'Run the agent (MCP / CLI)', hint: `The fastest, recommended path — npm i -g sigrank / npx sigrank. Zero paste, reads ${PLATFORM_COUNT}+ platforms. Board entry is managed from your profile.`, node: <SubmitMcpLead /> },
-        { label: 'How it works (3 steps)', hint: '01 agent reads tokens · 02 compute the cascade · 03 account + review → board (via your profile).', node: <SubmitFlow /> },
-        { label: 'Other ways — paste ccusage', hint: 'No agent? Paste ccusage --json for an instant PROJECTED cascade. Calculator only — not saved to the board.', node: <PasteRunNumbers /> },
-        { label: 'Other ways — manual entry (advanced)', hint: 'No token counts at all? A rough estimate from coarse activity proxies, reduced confidence. Approximation only.', node: <ManualEntryPanel /> },
-        { label: 'Contact / help', hint: '#contact — mailto hello@signalaf.com + @burnmydays.', node: <ContactCard /> },
+        { id: 'run-the-agent', label: 'Run the agent (MCP / CLI)', hint: `The fastest, recommended path — npm i -g sigrank / npx sigrank. Zero paste, reads ${PLATFORM_COUNT}+ platforms. Board entry is managed from your profile.`, node: <SubmitMcpLead /> },
+        { id: 'how-it-works', label: 'How it works (3 steps)', hint: '01 agent reads tokens · 02 compute the cascade · 03 account + review → board (via your profile).', node: <SubmitFlow /> },
+        { id: 'paste-ccusage', label: 'Other ways — paste ccusage', hint: 'No agent? Paste ccusage --json for an instant PROJECTED cascade. Calculator only — not saved to the board.', node: <PasteRunNumbers /> },
+        { id: 'manual-entry', label: 'Other ways — manual entry (advanced)', hint: 'No token counts at all? A rough estimate from coarse activity proxies, reduced confidence. Approximation only.', node: <ManualEntryPanel /> },
+        { id: 'contact', label: 'Contact / help', hint: 'mailto hello@signalaf.com + @burnmydays.', node: <ContactCard /> },
       ],
     },
     {
+      id: 'agent-profile',
       groupLabel: 'Agent & Profile',
       source: 'sigrank',
       description: `The SigRank MCP server — install, CLI commands, all 12 MCP tools, and how the agent feeds your operator profile. sigrank@${MCP_VERSION}.`,
       items: [
         {
+          id: 'local-agent',
           label: 'The local agent (MCP)',
           hint: `Full reference: install · all CLI commands · all MCP tools · how the agent feeds your operator profile (the write path). sigrank@${MCP_VERSION}.`,
           node: withPermalink('local-agent', <LocalAgentMcp />),
@@ -764,43 +772,57 @@ export default function Draft1Page() {
       ],
     },
     {
+      id: 'metrics',
       groupLabel: 'Metrics',
       source: 'token-only',
       description: 'The four raw token counts every score is built from, and the derived cascade metrics the board ranks on.',
       items: [
-        { label: 'The four pillars', hint: 'The four raw token counts every score is built from (T.01–T.04).', node: <FourPillars /> },
-        { label: 'The cascade', hint: 'Υ Yield / SNR / Leverage / Velocity / 10×DEV / Scale / $1M / Efficiency (Y.01–Y.08).', node: <CascadeList /> },
+        { id: 'four-pillars', label: 'The four pillars', hint: 'The four raw token counts every score is built from (T.01–T.04).', node: <FourPillars /> },
+        { id: 'the-cascade', label: 'The cascade', hint: 'Υ Yield / SNR / Leverage / Velocity / 10×DEV / Scale / $1M / Efficiency (Y.01–Y.08).', node: <CascadeList /> },
       ],
     },
     {
+      id: 'proof',
       groupLabel: 'Proof',
       description: 'How we know the numbers are real — verification tests, integrity checks, the calibration story, and the tools SigRank reads alongside.',
       items: [
-        { label: 'The three degrees of leverage', hint: 'AA 7:2:1 baseline → wild field → a compounding operator; the 10xDEV log read + full provenance.', node: withPermalink('three-degrees', <ThreeDegreesChart variant="full" />) },
-        { label: 'Verification & integrity tests', hint: 'How we know the numbers are real — Benford (with its honest failure + fix), the bot control, the telescoping lock, content-free verification, the threat model.', node: withPermalink('verification', <VerificationTests />) },
-        { label: 'Signature drift — the tune meter', hint: 'Shape-not-magnitude drift from an operator’s calibrated signature; the contamination constraint. (Internals proprietary.)', node: withPermalink('signal-drift', <SignatureDrift />) },
-        { label: 'Measured alongside', hint: 'Tip of the hat to the token tools SigRank reads alongside / builds on — ccusage, tokscale, token-dashboard.', node: withPermalink('measured-alongside', <Credits />) },
-        { label: 'How we got here — refining the index', hint: 'Why we lead with the ordinal rank + reader-matched framing, and treat the raw Υ multiplier with care. The honest calibration story.', node: <p className="text-sm text-text-secondary">Read the full write-up on <a href="/wiki/methodology-refinement" className="text-text-accent underline-offset-2 hover:underline">the index-refinement page ↗</a>.</p> },
+        { id: 'three-degrees', label: 'The three degrees of leverage', hint: 'AA 7:2:1 baseline → wild field → a compounding operator; the 10xDEV log read + full provenance.', node: withPermalink('three-degrees', <ThreeDegreesChart variant="full" />) },
+        { id: 'verification', label: 'Verification & integrity tests', hint: 'How we know the numbers are real — Benford (with its honest failure + fix), the bot control, the telescoping lock, content-free verification, the threat model.', node: withPermalink('verification', <VerificationTests />) },
+        { id: 'signal-drift', label: 'Signature drift — the tune meter', hint: 'Shape-not-magnitude drift from an operator’s calibrated signature; the contamination constraint. (Internals proprietary.)', node: withPermalink('signal-drift', <SignatureDrift />) },
+        { id: 'measured-alongside', label: 'Measured alongside', hint: 'Tip of the hat to the token tools SigRank reads alongside / builds on — ccusage, tokscale, token-dashboard.', node: withPermalink('measured-alongside', <Credits />) },
+        { id: 'methodology-refinement', label: 'How we got here — refining the index', hint: 'Why we lead with the ordinal rank + reader-matched framing, and treat the raw Υ multiplier with care. The honest calibration story.', node: <p className="text-sm text-text-secondary">Read the full write-up on <a href="/wiki/methodology-refinement" className="text-text-accent underline-offset-2 hover:underline">the index-refinement page ↗</a>.</p> },
       ],
     },
     {
+      id: 'transmitters',
       groupLabel: 'Transmitters',
       description: 'The nine cascade classes from Transmitter down — where the breakpoints are and what each class means.',
       items: [
-        { label: 'The nine classes', hint: 'K.01–K.09, Transmitter down — qualitative ranges (exact breaks RS.05).', node: <TransmitterClasses /> },
+        { id: 'nine-classes', label: 'The nine classes', hint: 'K.01–K.09, Transmitter down — qualitative ranges (exact breaks RS.05).', node: <TransmitterClasses /> },
       ],
     },
     {
+      id: 'moses',
       groupLabel: 'MO§ES™',
       description: 'The governance framework SigRank runs on — the Conservation Law of Commitment, the evidence, and the stack of products built on top.',
       items: [
-        { label: 'Commitment theory + founding', hint: 'The theory behind MO§ES™ + the founding-of-the-board story (owner-authored).', node: <MosesSection /> },
+        { id: 'commitment-theory', label: 'Commitment theory + founding', hint: 'The theory behind MO§ES™ + the founding-of-the-board story (owner-authored).', node: <MosesSection /> },
       ],
     },
   ]
 
+  // Build TOC items from the groups
+  const tocItems: TocItem[] = groups.map((g) => ({
+    id: g.id,
+    label: g.groupLabel,
+    subItems: g.items.map((item) => ({
+      id: item.id,
+      label: item.label,
+    })),
+  }))
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-0">
       <JsonLd data={breadcrumb([
         { name: 'Wiki', path: '/wiki' },
       ])} />
@@ -809,10 +831,14 @@ export default function Draft1Page() {
         'C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it. Commitment content (obligations, prohibitions, modal constraints) persists under recursive transformative compression when an enforcement gate is present. Published under CC-BY-4.0 (DOI: 10.5281/zenodo.20029607). Enforced by MO§ES™ (Modus Operandi §ignal Scaling Expansion System) — constitutional governance framework co-authored by nine rival AI architectures. Patent portfolio: Provisional 63/877,177 + 63/883,018 + 63/991,282 + Utility 19/426,028 + trademark TM 99408355 (IC 042).',
         '/wiki#conservation-law-of-commitment',
       )} />
-      {/* WikiSignBar removed (owner 2026-06-24): the "Get ranked → Sign in" CTA moved to
-          the global nav (AccountMenu, top-right), so the wiki's duplicate sign bar is gone. */}
-      {/* The wiki: numbered root column → content panel. */}
-      <TopicConsole groups={groups} />
+
+      {/* Two-column layout: sticky TOC nav + scrolling doc */}
+      <div className="flex flex-col gap-0 lg:flex-row lg:gap-8">
+        <WikiTOC items={tocItems} />
+        <div className="min-w-0 flex-1 pt-6 lg:pt-8">
+          <WikiDoc groups={groups} />
+        </div>
+      </div>
     </div>
   )
 }
