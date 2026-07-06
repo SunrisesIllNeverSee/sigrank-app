@@ -31,6 +31,26 @@ test('FIX 9: getLeaderboard excludes The Field from the ranked board', () => {
   )
 })
 
+test('FIX 9: filterMockBoard (fallback path) also excludes The Field', () => {
+  const src = read('lib/data/fallback.ts')
+  assert.ok(
+    src.includes(FIELD_OPERATOR_ID),
+    'fallback.ts must reference the Field operator_id for exclusion',
+  )
+  assert.ok(
+    src.includes("r.operator.operator_id !== 'f1e1d000") || src.includes('r.operator.operator_id !== FIELD_OPERATOR_ID'),
+    'fallback.ts must filter out The Field from the mock/cold-store board',
+  )
+})
+
+test('FIX 9: The Field exists in snapshot.json (confirming the fallback risk is real)', () => {
+  const src = read('lib/data/snapshot.json')
+  assert.ok(
+    src.includes(FIELD_OPERATOR_ID),
+    'snapshot.json contains The Field — the fallback path MUST filter it',
+  )
+})
+
 test('FIX 9: /compare already excluded The Field (parity check)', () => {
   const src = read('app/compare/page.tsx')
   assert.ok(
