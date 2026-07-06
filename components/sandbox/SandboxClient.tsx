@@ -53,8 +53,8 @@ const CLASS_COLORS: Record<SignalClass, string> = {
 
 const PILLAR_PRESETS: Record<string, { pillars: RawPillars; sessions: number; turns: number; label: string }> = {
   moses: {
-    label: 'MO§ES (TRANSMITTER)',
-    pillars: { input: 4_709_166, output: 15_598_921, cacheCreate: 176_566_528, cacheRead: 3_282_304_883 },
+    label: 'MO§ES (canonical SEED)',
+    pillars: { input: 1_251_211, output: 11_296_121, cacheCreate: 128_196_310, cacheRead: 2_555_179_769 },
     sessions: 419, turns: 7_747,
   },
   archplus: {
