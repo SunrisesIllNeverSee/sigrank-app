@@ -53,6 +53,9 @@ jobs:
       - name: Canonical test (11/11, Υ 18436.98)
         run: node --test __tests__/ingest/canonical.test.mjs
 
+      - name: Anti-gaming claim tests (RS.06 dead code, Benford vacuous, SIGNA ceiling, contamination bypass)
+        run: node --test __tests__/ingest/rs06-wiring.test.mjs __tests__/ingest/benford-vacuous.test.mjs __tests__/scoring/signa-ceiling.test.mjs __tests__/ingest/contamination-bypass.test.mjs
+
       - name: Test coverage report
         run: npm run test:coverage
 
