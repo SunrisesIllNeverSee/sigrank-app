@@ -761,7 +761,7 @@ export default function Draft1Page() {
       id: 'agent-profile',
       groupLabel: 'Agent & Profile',
       source: 'sigrank',
-      description: `The SigRank MCP server — install, CLI commands, all 12 MCP tools, and how the agent feeds your operator profile. sigrank@${MCP_VERSION}.`,
+      description: `The SigRank MCP server — install, CLI commands, all 15 MCP tools, and how the agent feeds your operator profile. sigrank@${MCP_VERSION}.`,
       items: [
         {
           id: 'local-agent',
