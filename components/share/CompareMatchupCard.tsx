@@ -321,7 +321,7 @@ function Card({ cardRef, a, b, href }: {
       ref={cardRef}
       style={{
         width: 1200,
-        height: 900,
+        height: 903,
         background: '#050605',
         fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
         display: 'flex',
@@ -333,18 +333,18 @@ function Card({ cardRef, a, b, href }: {
       {/* ═══ TOP — matchup on dark background (300px = 1/3) ═══ */}
       <div style={{
         height: 300, display: 'flex', flexDirection: 'column',
-        borderBottom: '1px solid #1a3a1a', boxSizing: 'border-box',
+        boxSizing: 'border-box',
       }}>
         {/* header strip — operator names flank the title so name length
             doesn't affect the matchup box widths below */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '8px 24px', borderBottom: '1px solid #1a3a1a',
+          padding: '10px 24px', borderBottom: '1px solid #1a3a1a',
           fontSize: 10, fontWeight: 800, letterSpacing: 0.5, color: C_DULL,
         }}>
-          <span style={{ color: colA, fontSize: 14, fontWeight: 900, letterSpacing: 0.5 }}>{nameA}</span>
-          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)', letterSpacing: 2 }}>MANUS AD MANUM</span>
-          <span style={{ color: colB, fontSize: 14, fontWeight: 900, letterSpacing: 0.5 }}>{nameB}</span>
+          <span style={{ color: colA, fontSize: 16, fontWeight: 900, letterSpacing: 0.5 }}>{nameA}</span>
+          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)', letterSpacing: 3, fontSize: 13 }}>MANUS AD MANUM</span>
+          <span style={{ color: colB, fontSize: 16, fontWeight: 900, letterSpacing: 0.5 }}>{nameB}</span>
         </div>
 
         {/* matchup panels — 5 columns: identity | facts | VS | facts | identity */}
@@ -382,10 +382,10 @@ function Card({ cardRef, a, b, href }: {
           {/* VS divider */}
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: 4, padding: '0 16px', flexShrink: 0, width: 80,
+            gap: 6, padding: '0 16px', flexShrink: 0, width: 90,
           }}>
-            <span style={{ fontSize: 24, fontWeight: 900, color: '#7d7461', letterSpacing: 4 }}>VS</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#4a6a4a', fontVariantNumeric: 'tabular-nums' }}>{aWins}–{bWins}</span>
+            <span style={{ fontSize: 32, fontWeight: 900, color: '#7d7461', letterSpacing: 4 }}>VS</span>
+            <span style={{ fontSize: 20, fontWeight: 800, color: '#4a6a4a', fontVariantNumeric: 'tabular-nums' }}>{aWins}–{bWins}</span>
           </div>
 
           {/* B facts (inboard) */}
@@ -419,6 +419,18 @@ function Card({ cardRef, a, b, href }: {
             )}
           </div>
         </div>
+      </div>
+
+      {/* ═══ DIVIDER — between matchup and radars ═══ */}
+      <div style={{
+        height: 3, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(90deg, transparent, #1a3a1a 15%, #2a5a2a 50%, #1a3a1a 85%, transparent)',
+        flexShrink: 0,
+      }}>
+        <div style={{
+          width: 10, height: 10, background: '#2a5a2a', transform: 'rotate(45deg)',
+          boxShadow: '0 0 12px rgba(42,90,42,0.5)',
+        }} />
       </div>
 
       {/* ═══ BOTTOM — dual radars on terminal black (600px = 2/3) ═══ */}
@@ -501,7 +513,7 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
     if (!cardRef.current) return
     setBusy(true)
     try {
-      const dataUrl = await toPng(cardRef.current, { width: 1200, height: 900, pixelRatio: 2, cacheBust: true })
+      const dataUrl = await toPng(cardRef.current, { width: 1200, height: 903, pixelRatio: 2, cacheBust: true })
       const link = document.createElement('a')
       link.href = dataUrl
       link.download = `sigrank-compare-matchup.png`
@@ -549,7 +561,7 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
             </button>
             <div
               style={{
-                transform: 'scale(min(1, calc((100vw - 2rem) / 1200), calc((100vh - 2rem) / 900)))',
+                transform: 'scale(min(1, calc((100vw - 2rem) / 1200), calc((100vh - 2rem) / 903)))',
                 transformOrigin: 'top left',
               }}
             >
