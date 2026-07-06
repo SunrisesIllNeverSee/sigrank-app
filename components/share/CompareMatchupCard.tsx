@@ -250,8 +250,8 @@ function Card({ cardRef, a, b, href }: {
   const colB = classColor(clsB)
   const { aWins, bWins } = tally(a, b)
   const winner: 'a' | 'b' | null = aWins === bWins ? null : aWins > bWins ? 'a' : 'b'
-  const factsA = deriveFacts(a, b)
-  const factsB = deriveFacts(b, a)
+  const factsA = deriveFacts(a, b).slice(0, 3)
+  const factsB = deriveFacts(b, a).slice(0, 3)
 
   const aNameSize = nameA.length <= 10 ? 22 : nameA.length <= 16 ? 18 : nameA.length <= 24 ? 15 : 13
   const bNameSize = nameB.length <= 10 ? 22 : nameB.length <= 16 ? 18 : nameB.length <= 24 ? 15 : 13
