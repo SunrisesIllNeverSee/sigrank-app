@@ -59,6 +59,12 @@ import {
 } from '@/lib/data/mappers'
 import { fallbackRows, filterMockBoard, sortValue } from '@/lib/data/fallback'
 
+/** The Field — synthetic averaged-pillar baseline operator. Excluded from the
+ *  ranked board (it's a reference, not a competitor) but available as a compare
+ *  opponent. Mirrors the /compare page's `the-field` codename filter and the
+ *  SQL recompute's self-exclusion. */
+const FIELD_OPERATOR_ID = 'f1e1d000-0000-4000-8000-000000000001'
+
 // ───────────────────────────────────────────────────────────────────────────
 // Bounded-query helpers (2026-07-02 — the (d) sweep).
 // PostgREST caps a select at 1000 rows by default; unbounded selects silently
@@ -276,6 +282,12 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
     if (snapRows.length === 0) return params.windowFilter ? [] : filterMockBoard(params)
+
+    // Exclude The Field (synthetic averaged-pillar baseline) from the ranked board.
+    // It's a reference operator, not a competitor — including it inflates
+    // operatorCount and percentiles. /compare already filters it from the side-A
+    // pool; this mirrors that exclusion at the query/collapse layer.
+    snapRows = snapRows.filter((s) => s.operator_id !== FIELD_OPERATOR_ID)
 
     const opIds = [...new Set(snapRows.map((s) => s.operator_id))]
     const { data: opData, error: opError } = await sb

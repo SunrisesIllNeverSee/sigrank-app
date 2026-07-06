@@ -146,7 +146,14 @@ export function dedupGate(p: SnapshotPayloadV1, ctx: GateContext): GateReason[] 
   return out
 }
 
-/** Gate 3 — per-device throttle / sybil rate cap (store-injected; 0 without a store). */
+/** Gate 3 — per-device throttle / sybil rate cap (store-injected; 0 without a store).
+ *
+ * TOCTOU note: this gate reads a pre-fetched count, so N concurrent requests
+ * sharing one snapshotted count all pass (effective cap = count + inflight).
+ * The authoritative throttle check is INSIDE the materialize_verified_snapshot
+ * RPC (migration 0025_atomic_throttle.sql), which counts + enforces atomically
+ * in the same transaction as the insert. This gate stays as a fast-path
+ * pre-check for the no-store/test path and to give early feedback. */
 export function throttleGate(p: SnapshotPayloadV1, ctx: GateContext): GateReason[] {
   const n = ctx.recentSubmissionCount?.(p.device_id) ?? 0
   return n >= GATE_LIMITS.MAX_SUBMISSIONS_PER_WINDOW
