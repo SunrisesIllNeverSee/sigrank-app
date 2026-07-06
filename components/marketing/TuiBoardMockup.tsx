@@ -4,17 +4,9 @@ import React from 'react'
  * TuiBoardMockup — a CSS replica of the sigrank-mcp TUI Board tab.
  *
  * Used on the landing HowItWorks section as the "screenshot" alongside the
- * install/submit commands. Static data (realistic — mirrors the live 30d
- * board). When `highlightYou` is true, the #1 row gets a gold bg-tint + YOU
- * marker (the "after you submit" view).
- *
- * The #1 Υ (18,436.98) is the CANONICAL ANCHOR — the owner's verified ccusage
- * ceiling (the most-favorable raw read). It is intentionally NOT the live
- * board's observer-stripped top (~552.53, shown in the Three Degrees gold
- * column): the mock illustrates the TUI at the canonical anchor, the chart
- * tracks the live observer-stripped field. The caption below the rows makes
- * that distinction visible so a visitor doesn't read the two surfaces as a 33×
- * discrepancy (review 2026-07-02).
+ * install/submit commands. Static data mirrors the live 30d board (refreshed
+ * 2026-07-06). When `highlightYou` is true, the #1 row gets a gold bg-tint +
+ * YOU marker (the "after you submit" view).
  */
 
 interface Row {
@@ -32,12 +24,12 @@ interface Row {
 }
 
 const ROWS: Row[] = [
-  { rank: 1, name: 'TransVaultOrigin', cls: 'TRANSMITTER', yld: '18,436.98', snr: '90.2', lev: '4.27×', vel: '1.63', d10: '0.63', pct: '100%', mv: '▲', you: true },
-  { rank: 2, name: 'OrcaVanguard',     cls: 'TRANSMITTER', yld: '12,104.41', snr: '84.1', lev: '3.82×', vel: '1.41', d10: '0.58', pct: '99%',  mv: '▲' },
-  { rank: 3, name: 'IronLattice',      cls: 'ARCHITECT',   yld:  '8,902.17', snr: '78.5', lev: '3.10×', vel: '1.29', d10: '0.49', pct: '98%',  mv: '—' },
-  { rank: 4, name: 'MeridianScribe',   cls: 'ARCHITECT',   yld:  '6,418.80', snr: '71.3', lev: '2.64×', vel: '1.12', d10: '0.42', pct: '95%',  mv: '▼' },
-  { rank: 5, name: 'VectorHerald',     cls: 'POWER',       yld:  '4,771.02', snr: '65.8', lev: '2.21×', vel: '0.98', d10: '0.34', pct: '91%',  mv: '▲' },
-  { rank: 6, name: 'DriftPilgrim',     cls: 'POWER',       yld:  '3,209.44', snr: '58.2', lev: '1.87×', vel: '0.84', d10: '0.27', pct: '85%',  mv: '—' },
+  { rank: 1, name: 'signal-92b4f9f485', cls: 'BASE',        yld: '566.34', snr: '0.59', lev: '385.7×', vel: '1.47', d10: '2.59', pct: '100%', mv: '—', you: true },
+  { rank: 2, name: 'OrcaVanguard',      cls: 'TRANSMITTER', yld: '2.59',   snr: '0.08', lev: '27.9×',  vel: '0.09', d10: '1.45', pct: '99%',  mv: '—' },
+  { rank: 3, name: 'IronLattice',       cls: 'TRANSMITTER', yld: '2.30',   snr: '0.07', lev: '30.1×',  vel: '0.08', d10: '1.48', pct: '98%',  mv: '—' },
+  { rank: 4, name: 'EmberCoil',         cls: 'POWER',       yld: '1.82',   snr: '0.08', lev: '22.3×',  vel: '0.08', d10: '1.35', pct: '91%',  mv: '—' },
+  { rank: 5, name: 'DriftPilgrim',      cls: 'BASE',        yld: '1.77',   snr: '0.05', lev: '31.5×',  vel: '0.06', d10: '1.50', pct: '85%',  mv: '—' },
+  { rank: 6, name: 'MeridianScribe',    cls: 'ARCH+',       yld: '1.51',   snr: '0.06', lev: '22.3×',  vel: '0.07', d10: '1.35', pct: '75%',  mv: '—' },
 ]
 
 export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolean }) {
@@ -56,7 +48,7 @@ export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolea
         <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
         <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
         <span className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
-        <span className="ml-2 font-mono text-[11px] text-text-dim">sigrank-mcp — Board</span>
+        <span className="ml-2 font-mono text-[11px] text-text-dim">⊙ SigRank — Board</span>
       </div>
       {/* tab bar */}
       <div className="flex gap-4 overflow-x-auto border-b border-bg-border-subtle px-4 py-2 font-mono text-[11px] whitespace-nowrap">
@@ -115,13 +107,8 @@ export function TuiBoardMockup({ highlightYou = false }: { highlightYou?: boolea
           )
         })}
       </div>
-      {/* Reconciling caption (review 2026-07-02): the mock renders the canonical
-          anchor read (the verified ccusage ceiling), NOT the observer-stripped
-          live board shown in the Three Degrees gold column — so the two surfaces
-          don't read as a 33× discrepancy. */}
       <div className="border-t border-bg-border-subtle px-4 py-2 font-mono text-[10px] leading-snug text-text-dim">
-        Illustrative — canonical anchor read (ccusage ceiling). Live board shows
-        observer-stripped yields.
+        Illustrative — mirrors the live 30d board. See signalaf.com/board/30d for real-time data.
       </div>
     </div>
   )
