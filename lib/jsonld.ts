@@ -29,8 +29,13 @@ export function organization() {
     sameAs: [
       'https://orcid.org/0009-0002-9904-5390',
       'https://github.com/SunrisesIllNeverSee',
+      'https://github.com/SunrisesIllNeverSee/sigrank-app',
+      'https://github.com/SunrisesIllNeverSee/sigrank-mcp',
+      'https://www.npmjs.com/package/sigrank',
       'https://doi.org/10.5281/zenodo.20029607',
       'https://doi.org/10.5281/zenodo.19105225',
+      'https://doi.org/10.5281/zenodo.19109397',
+      'https://doi.org/10.5281/zenodo.20031715',
       'https://signomy.xyz',
       'https://mos2es.com',
     ],
@@ -153,12 +158,21 @@ export function sigrankDataset(opts?: { temporalStart?: string; updated?: string
       'token-cascade efficiency (the yield metric Υ = cache_read × output / input²). ' +
       'Built from on-device, ed25519-signed token-telemetry snapshots.',
     url: `${SITE_ORIGIN}/methodology`,
-    sameAs: `${SITE_ORIGIN}/board/all`,
+    sameAs: [
+      `${SITE_ORIGIN}/board/all`,
+      'https://www.npmjs.com/package/sigrank',
+      'https://github.com/SunrisesIllNeverSee/sigrank-mcp',
+    ],
     creator: { '@id': ORG_ID },
     publisher: { '@id': ORG_ID },
     isAccessibleForFree: true,
     license: 'https://creativecommons.org/licenses/by/4.0/',
-    citation: 'https://doi.org/10.5281/zenodo.20029607',
+    citation: [
+      'https://doi.org/10.5281/zenodo.20029607',
+      'https://doi.org/10.5281/zenodo.19105225',
+      'https://doi.org/10.5281/zenodo.19109397',
+      'https://doi.org/10.5281/zenodo.20031715',
+    ],
     keywords: [
       'AI operator leaderboard',
       'token efficiency',
@@ -443,5 +457,122 @@ export function propositionsDataset() {
       name: 'Commitment Theory Research Program',
     },
     references: 'https://doi.org/10.5281/zenodo.20029607',
+  }
+}
+
+// ── Score calculator + CLI tool (GEO: make the tools machine-readable) ────
+
+/**
+ * WebApplication — the /score calculator. An interactive, browser-based
+ * tool that computes your yield from pasted token stats. AI engines
+ * answering "AI token efficiency calculator" queries should surface this.
+ */
+export function scoreCalculator() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'SigRank Score Calculator',
+    url: `${SITE_ORIGIN}/score`,
+    description:
+      'Paste your ccusage JSON to see your Υ Yield, class tier, and compression ratio instantly. No account needed — just run the numbers.',
+    applicationCategory: 'CalculatorApplication',
+    operatingSystem: 'Any (web browser)',
+    browserRequirements: 'Requires JavaScript',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    publisher: { '@id': ORG_ID },
+    featureList: [
+      'Yield (Υ) calculation from token cascade',
+      'Class tier classification (IGNITER to TRANSMITTER)',
+      'Compression ratio analysis',
+      'No account required',
+    ],
+  }
+}
+
+/**
+ * SoftwareApplication — the `sigrank` CLI tool (npm). The on-device
+ * scanner + leaderboard client. AI engines answering "AI coding tools"
+ * or "token tracking tools" should surface this.
+ */
+export function cliTool() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'sigrank',
+    alternateName: 'SigRank CLI',
+    description:
+      'A privacy-preserving terminal tool that parses your AI coding logs locally, computes token-cascade efficiency metrics, and publishes signed snapshots to the SigRank leaderboard. Bundles ccusage, tokscale, and token-dashboard.',
+    url: SITE_ORIGIN,
+    downloadUrl: 'https://www.npmjs.com/package/sigrank',
+    installUrl: 'https://www.npmjs.com/package/sigrank',
+    codeRepository: 'https://github.com/SunrisesIllNeverSee/sigrank-mcp',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'macOS, Linux',
+    runtimePlatform: 'Node.js >= 18',
+    softwareVersion: '0.14.3',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    publisher: { '@id': ORG_ID },
+    featureList: [
+      'Local log parsing (ccusage, tokscale, token-dashboard bundled)',
+      'Yield (Υ) cascade metric computation',
+      'ed25519-signed snapshot submission',
+      'Live leaderboard with board windows (7d/30d/90d/all)',
+      'Head-to-head operator comparison',
+      'MCP server for agent integration',
+      'Dry-run mode to inspect payloads before sending',
+    ],
+    keywords: [
+      'mcp',
+      'model-context-protocol',
+      'ai-agents',
+      'claude',
+      'token-telemetry',
+      'leaderboard',
+      'cli',
+      'yield-cascade',
+    ],
+  }
+}
+
+/**
+ * HowTo — the /score flow. Three steps: paste, see yield, see class.
+ * Google rich results can show these as step-by-step snippets.
+ */
+export function scoreHowTo() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'Score your AI token cascade',
+    description:
+      'Paste your ccusage JSON output to instantly see your Υ Yield, class tier, and compression ratio. No account needed.',
+    totalTime: 'PT1M',
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: 'Get your token stats',
+        text: 'Run `ccusage --json` or `npx sigrank me` to get your token cascade numbers (input, output, cache write, cache read).',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: 'Paste your stats',
+        text: 'Go to signalaf.com/score and paste your ccusage JSON output into the input field.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: 'See your yield and class',
+        text: 'The calculator computes your Υ Yield = (cache_read × output) / input², your class tier (IGNITER to TRANSMITTER), and your compression ratio instantly.',
+      },
+    ],
   }
 }

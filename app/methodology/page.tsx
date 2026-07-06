@@ -12,6 +12,7 @@
  */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { getLeaderboard } from '@/lib/data'
 import { toEntry } from '@/lib/leaderboard/to-entry'
 import { PLATFORM_COUNT } from '@/lib/constants'
@@ -304,13 +305,28 @@ export default async function MethodologyPage() {
             <dd className="text-base text-text-secondary">
               Install the SigRank MCP server (<code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">npm i -g sigrank</code>),
               enroll, and submit a snapshot. Visit{' '}
-              <a href="/submit" className="text-gold underline underline-offset-2">
+              <Link href="/submit" className="text-gold underline underline-offset-2">
                 /submit
-              </a>{' '}
+              </Link>{' '}
+              or{' '}
+              <Link href="/score" className="text-gold underline underline-offset-2">
+                /score
+              </Link>{' '}
               to get started.
             </dd>
           </div>
         </dl>
+      </section>
+
+      {/* Cross-link to the Q1 report — internal link from /methodology (the citation
+          page) to /research/q1-2026 so Google discovers the report (G3/G4). */}
+      <section className="mt-8 border-t border-bg-border-subtle pt-6">
+        <p className="text-sm text-text-muted">
+          Looking for the quarterly findings?{' '}
+          <Link href="/research/q1-2026" className="text-gold underline underline-offset-2">
+            Read the Q1 2026 State of AI Operator Token Efficiency →
+          </Link>
+        </p>
       </section>
     </div>
   )
