@@ -339,6 +339,9 @@ function Board({
   const INITIAL_DELAY = 250
 
   // The 4 column heads (owner): CASCADE | NEW USER | TELEMETRY | AVERAGE USER
+  // The AVG column uses the AA-modeled 3.5:1:0.5 baseline (a canonical population
+  // constant), NOT the live field mean. Labeled "AVG" for space; the footer
+  // clarifies "AA-modeled baseline" to distinguish from the live field median.
   const headerText = formatLine('CASC', 'NEW USER', 'TELEMETRY', 'AVG')
   const dividerText = '         - - - DERIVED - - -'
 
@@ -346,11 +349,12 @@ function Board({
   // average operating ratio 3.5 : 1 : 0.5 (cache : input : output, input-normalized).
   // i.e. "at your input volume, what a 3.5:1:0.5 operator would produce." The contrast
   // (your real cache_read >> 3.5\u00d7 input) is the leverage edge, made visible.
-  // AVERAGE USER baseline = the measured average-AI-user operating ratio
+  // AVERAGE USER baseline = the AA-modeled average-AI-user operating ratio
   // 3.5 : 1 : 0.5 (cache-read : input : output; cache-write ~0). This is a
-  // canonical population constant (real measured data), NOT the mean of the
-  // current leaderboard field — the field is power users; the column exists
-  // to show the contrast against the average user.
+  // canonical population constant (real measured data), NOT the live field median
+  // — the field is power users; the column exists to show the contrast against
+  // the average user. See also: ThreeDegreesChart (same 3.5:1:0.5 baseline),
+  // field-average.ts (live field mean for the radar), /compare (live field median).
   const R_CR = 3.5
   const R_OUT = 0.5
   const avgIn = inputTokens ?? null

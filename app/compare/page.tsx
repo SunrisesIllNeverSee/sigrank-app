@@ -88,8 +88,10 @@ export default async function ComparePage({
   // supplies the defaults.
   const board = await getLeaderboard({ limit: 500 })
 
-  // Default opponent B is "The Field" — the average/baseline operator (owner
-  // 2026-06-27) — so the page opens as "you vs. the average".
+  // Default opponent B is "The Field" — the median-Υ baseline operator (owner
+  // 2026-06-27, migration 0024) — so the page opens as "you vs. the field median".
+  // Note: this is the LIVE field median (computed from real operators' Υ),
+  // distinct from the AA-modeled 3.5:1:0.5 baseline in SplitFlapCard/ThreeDegreesChart.
   //
   // Default side A (owner 2026-06-27): the SIGNED-IN operator (true "you vs.
   // average"); when signed out, a rotating board pick rather than always #1 (so
