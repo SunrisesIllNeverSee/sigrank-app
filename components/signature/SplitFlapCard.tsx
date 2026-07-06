@@ -581,6 +581,7 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
   const [replayKey, setReplayKey] = useState(0)
   const [scale, setScale] = useState(1)
   const [reduced, setReduced] = useState(false)
+  const [preview, setPreview] = useState(false)
 
   useEffect(() => {
     const container = containerRef.current
@@ -634,6 +635,7 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
         <div className="flex items-center gap-2">
           <button type="button" onClick={replay} className={btn}>{'\u21bb'} Replay</button>
           <button type="button" onClick={shareLink} className={btn}>{copied ? 'Copied \u2713' : 'Share'}</button>
+          <button type="button" onClick={() => setPreview(true)} className={btn}>Preview</button>
           <button type="button" onClick={download} disabled={busy} className={btn}>{busy ? 'Rendering\u2026' : 'Download card'}</button>
         </div>
       )}
@@ -642,6 +644,34 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
           <Board cardRef={cardRef} reduced={reduced} {...props} />
         </div>
       </div>
+
+      {preview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setPreview(false)}
+        >
+          <div
+            className="relative max-h-full max-w-full overflow-auto rounded-lg border border-bg-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreview(false)}
+              className="absolute right-2 top-2 z-10 rounded-md border border-bg-border bg-bg-surface px-2 py-1 font-mono text-xs text-text-primary transition-colors hover:bg-bg-hover"
+            >
+              Close ✕
+            </button>
+            <div
+              style={{
+                transform: 'scale(min(1, calc((100vw - 2rem) / 1200), calc((100vh - 2rem) / 630)))',
+                transformOrigin: 'top left',
+              }}
+            >
+              <Board cardRef={cardRef} reduced={reduced} {...props} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
