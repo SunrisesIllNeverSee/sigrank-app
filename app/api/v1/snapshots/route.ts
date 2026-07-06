@@ -204,7 +204,19 @@ export async function POST(req: NextRequest) {
     // Sanity guard (§5.4): a codename disagreeing with the device's bound operator is
     // rejected — the operator is authoritative from the device; a mismatch signals
     // confusion/tampering (we never trust the payload codename for resolution).
-    if (device.codename && device.codename !== payload.codename) {
+    // A null device codename means the device hasn't been bound to a codename yet —
+    // reject the payload codename rather than letting an arbitrary name through.
+    if (device.codename == null) {
+      return NextResponse.json(
+        {
+          status: 'rejected',
+          reason: 'device_codename_not_bound',
+          detail: 'this device has no codename bound — complete enrollment first',
+        },
+        { status: 422 },
+      )
+    }
+    if (device.codename !== payload.codename) {
       return NextResponse.json(
         {
           status: 'rejected',
