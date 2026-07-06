@@ -439,7 +439,7 @@ export default async function OperatorProfilePage({
       </div>
 
       {/* Persistent identity header (GitHub-profile-style banner). */}
-      <header className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-5 sm:flex-row sm:items-center sm:gap-5">
+      <header className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-5 sm:flex-row sm:items-center sm:gap-5 sm:w-fit">
         <OperatorAvatar src={operator.avatar_url} alt={name} size={64} />
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-3">
