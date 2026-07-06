@@ -10,6 +10,9 @@ import { Draft2LiveActivity } from '@/components/draft/Draft2LiveActivity'
 import { Draft2CtaBand } from '@/components/draft/Draft2CtaBand'
 import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { cliTool } from '@/lib/jsonld'
+import Link from 'next/link'
 
 // ISR: the Three Degrees chart now auto-pulls the top operator's live all-time metrics
 // (lib/marketing/top-operator-column.ts). Revalidate hourly so the page stays prerendered
@@ -49,6 +52,9 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-8 py-2">
+      {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product) */}
+      <JsonLd data={cliTool()} />
+
       <DeletedNotice />
       <Draft2Hero />
 
@@ -67,6 +73,31 @@ export default async function HomePage() {
       <IpBoundary />
       <PricingCards />
       <Draft2CtaBand />
+
+      {/* Research + methodology links — internal links from the indexed homepage
+          to /methodology and /research so Google discovers + indexes them (G3/G4).
+          Also gives visitors a path to the citation/data sources. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pb-4 text-center">
+        <Link
+          href="/methodology"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Methodology & data →
+        </Link>
+        <Link
+          href="/research/q1-2026"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Q1 2026 report →
+        </Link>
+        <Link
+          href="/science"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Academic foundation →
+        </Link>
+      </div>
+
       <MotionPause />
     </div>
   )
