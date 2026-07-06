@@ -360,18 +360,18 @@ export const MOCK_OPERATORS: Operator[] = MOCK_LEADERBOARD.map((r) => r.operator
 /** Per-operator score history keyed by codename (deterministic literal points). */
 export const MOCK_HISTORY: Record<string, HistoryPoint[]> = {
   TransVaultOrigin: [
-    { date: '2026-04-21', signa_rate: 92.1, global_rank: 1, class_tier: 'TRANSMITTER' },
-    { date: '2026-04-28', signa_rate: 93.8, global_rank: 1, class_tier: 'TRANSMITTER' },
-    { date: '2026-05-05', signa_rate: 95.0, global_rank: 1, class_tier: 'TRANSMITTER' },
-    { date: '2026-05-12', signa_rate: 95.9, global_rank: 1, class_tier: 'TRANSMITTER' },
-    { date: '2026-05-19', signa_rate: 96.4, global_rank: 1, class_tier: 'TRANSMITTER' },
+    { date: '2026-04-21', signa_rate: 92.1, yield_: 14200, global_rank: 1, class_tier: 'TRANSMITTER' },
+    { date: '2026-04-28', signa_rate: 93.8, yield_: 15800, global_rank: 1, class_tier: 'TRANSMITTER' },
+    { date: '2026-05-05', signa_rate: 95.0, yield_: 16750, global_rank: 1, class_tier: 'TRANSMITTER' },
+    { date: '2026-05-12', signa_rate: 95.9, yield_: 17620, global_rank: 1, class_tier: 'TRANSMITTER' },
+    { date: '2026-05-19', signa_rate: 96.4, yield_: 18437, global_rank: 1, class_tier: 'TRANSMITTER' },
   ],
   OrcaVanguard: [
-    { date: '2026-04-21', signa_rate: 87.0, global_rank: 3, class_tier: 'TRANSMITTER' },
-    { date: '2026-04-28', signa_rate: 88.4, global_rank: 2, class_tier: 'TRANSMITTER' },
-    { date: '2026-05-05', signa_rate: 89.9, global_rank: 2, class_tier: 'TRANSMITTER' },
-    { date: '2026-05-12', signa_rate: 90.6, global_rank: 2, class_tier: 'TRANSMITTER' },
-    { date: '2026-05-19', signa_rate: 91.2, global_rank: 2, class_tier: 'TRANSMITTER' },
+    { date: '2026-04-21', signa_rate: 87.0, yield_: 9800, global_rank: 3, class_tier: 'TRANSMITTER' },
+    { date: '2026-04-28', signa_rate: 88.4, yield_: 11200, global_rank: 2, class_tier: 'TRANSMITTER' },
+    { date: '2026-05-05', signa_rate: 89.9, yield_: 12450, global_rank: 2, class_tier: 'TRANSMITTER' },
+    { date: '2026-05-12', signa_rate: 90.6, yield_: 13380, global_rank: 2, class_tier: 'TRANSMITTER' },
+    { date: '2026-05-19', signa_rate: 91.2, yield_: 14100, global_rank: 2, class_tier: 'TRANSMITTER' },
   ],
 }
 

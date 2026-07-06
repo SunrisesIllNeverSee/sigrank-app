@@ -1,9 +1,9 @@
 /**
  * components/compare/CompareHistoryChart.tsx — CMP-HISTORY (owner 2026-07-02).
  *
- * Dual-line overtime chart for the compare page. Plots both operators' SIGNA
- * RATE history on a shared timeline with smooth monotone curves, gradient
- * area fills, dashed gridlines, every x-label, and a class threshold band.
+ * Dual-line overtime chart for the compare page. Plots both operators' Υ Yield
+ * history on a shared timeline with smooth monotone curves, gradient
+ * area fills, dashed gridlines, every x-label, and a field baseline.
  *
  * Inspired by the chart-demo-composite concepts (owner 2026-06-28):
  *  - Smooth midpoint-quadratic curves (chart 1 — Composed)
@@ -27,7 +27,7 @@ interface Props {
   nameA: string
   /** Display name for B (legend label). */
   nameB: string
-  /** Field average SIGNA RATE (current board mean). Drawn as a horizontal
+  /** Field average Υ Yield (current board mean). Drawn as a horizontal
    *  reference line so both operators are contextualized against the field. */
   fieldAvg?: number | null
   /** SVG height. Default 240. */
@@ -50,7 +50,7 @@ interface Pt {
 }
 
 function toPts(h: HistoryPoint[]): Pt[] {
-  return h.map((p) => ({ date: p.date, v: p.signa_rate }))
+  return h.map((p) => ({ date: p.date, v: p.yield_ }))
 }
 
 /** Smooth monotone-ish curve via midpoint quadratics (from chart-demo Composed). */
@@ -82,7 +82,7 @@ export function CompareHistoryChart({
     return (
       <div className="flex h-[240px] items-center justify-center rounded-lg border border-bg-border bg-bg-surface">
         <span className="font-mono text-xs text-text-muted">
-          Not enough history yet — both operators need at least two snapshots to chart trajectory.
+          Not enough history yet — both operators need at least two snapshots to chart Υ Yield trajectory.
         </span>
       </div>
     )
@@ -133,7 +133,7 @@ export function CompareHistoryChart({
   // Y-axis ticks (5 steps).
   const yTicks = Array.from({ length: 5 }, (_, i) => min + (range * i) / 4)
 
-  // Field baseline — the current board mean SIGNA RATE, drawn as a horizontal
+  // Field baseline — the current board mean Υ Yield, drawn as a horizontal
   // reference line. Not time-varying (we don't have aggregate history), but
   // it contextualizes both operators against the field.
   const hasField = fieldAvg != null && Number.isFinite(fieldAvg) && fieldAvg > 0
@@ -149,7 +149,7 @@ export function CompareHistoryChart({
       viewBox={`0 0 ${W} ${H}`}
       className="w-full"
       role="img"
-      aria-label="SIGNA RATE overtime comparison"
+      aria-label="Yield overtime comparison"
       style={{ fontVariantNumeric: 'tabular-nums' }}
     >
       <defs>
@@ -165,7 +165,7 @@ export function CompareHistoryChart({
 
       {/* title */}
       <text x={padL} y={16} fontSize={11} fill={MUTED} style={{ letterSpacing: '0.04em' }} fontFamily={MONO}>
-        SIGNA RATE · OVERTIME
+        Υ YIELD · OVERTIME
       </text>
 
       {/* legend (top-right, inline) */}
