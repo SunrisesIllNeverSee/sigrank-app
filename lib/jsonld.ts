@@ -56,7 +56,7 @@ export function website() {
 
 /** Leaderboard / board window → ItemList of operators. */
 export function leaderboardItemList(
-  entries: { codename: string; rank: number; classTier?: string }[],
+  entries: { codename: string; display_name?: string | null; rank: number; classTier?: string }[],
   path: string,
 ) {
   return {
@@ -71,7 +71,7 @@ export function leaderboardItemList(
       url: `${SITE_ORIGIN}/user/${encodeURIComponent(e.codename)}`,
       item: {
         '@type': 'Person',
-        name: e.codename,
+        name: e.display_name || e.codename,
         ...(e.classTier ? { jobTitle: e.classTier } : {}),
       },
     })),
@@ -81,6 +81,7 @@ export function leaderboardItemList(
 /** Operator profile → ProfilePage about a Person. */
 export function operatorProfile(o: {
   codename: string
+  display_name?: string | null
   path: string
   classTier?: string
   globalRank?: number
@@ -92,7 +93,7 @@ export function operatorProfile(o: {
     url: `${SITE_ORIGIN}${o.path}`,
     mainEntity: {
       '@type': 'Person',
-      name: o.codename,
+      name: o.display_name || o.codename,
       ...(o.classTier ? { jobTitle: o.classTier } : {}),
       ...(o.globalRank && !o.pending
         ? { description: `Rank #${o.globalRank} on the SigRank leaderboard` }

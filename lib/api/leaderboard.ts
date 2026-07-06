@@ -29,6 +29,7 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     rank: row.global_rank,
     operator_id: operator.operator_id,
     codename: operator.codename,
+    display_name: operator.display_name ?? null,
     claimed: operator.claimed,
     class_tier: snapshot.class_tier, // UPPERCASE canonical SignalClass
     platform: operator.primary_domain,

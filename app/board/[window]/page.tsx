@@ -144,6 +144,7 @@ export default async function BoardWindowPage({
           leaderboardItemList(
             jsonLdEntries.map((e) => ({
               codename: e.codename,
+              display_name: e.anonId !== e.codename ? e.anonId : null,
               rank: e.rank,
               classTier: e.signalClass,
             })),
