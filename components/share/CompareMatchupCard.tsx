@@ -292,9 +292,6 @@ function Card({ cardRef, a, b, href }: {
   const factsA = deriveFacts(a, b).slice(0, 3)
   const factsB = deriveFacts(b, a).slice(0, 3)
 
-  const aNameSize = nameA.length <= 10 ? 24 : nameA.length <= 16 ? 20 : nameA.length <= 24 ? 16 : 14
-  const bNameSize = nameB.length <= 10 ? 24 : nameB.length <= 16 ? 20 : nameB.length <= 24 ? 16 : 14
-
   // Build radar data — mirrors CompareRadars.tsx
   const rAxes = rawAxes(a, b)
   const mAxes = metricAxes(a, b)
@@ -338,14 +335,16 @@ function Card({ cardRef, a, b, href }: {
         height: 300, display: 'flex', flexDirection: 'column',
         borderBottom: '1px solid #1a3a1a', boxSizing: 'border-box',
       }}>
-        {/* header strip */}
+        {/* header strip — operator names flank the title so name length
+            doesn't affect the matchup box widths below */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '8px 28px', borderBottom: '1px solid #1a3a1a',
+          padding: '8px 24px', borderBottom: '1px solid #1a3a1a',
           fontSize: 10, fontWeight: 800, letterSpacing: 0.5, color: C_DULL,
         }}>
-          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)' }}>MANUS AD MANUM</span>
-          <span>HEAD TO HEAD</span>
+          <span style={{ color: colA, fontSize: 14, fontWeight: 900, letterSpacing: 0.5 }}>{nameA}</span>
+          <span style={{ color: C_GREEN, textShadow: '0 0 8px rgba(138,232,154,0.5)', letterSpacing: 2 }}>MANUS AD MANUM</span>
+          <span style={{ color: colB, fontSize: 14, fontWeight: 900, letterSpacing: 0.5 }}>{nameB}</span>
         </div>
 
         {/* matchup panels — 5 columns: identity | facts | VS | facts | identity */}
@@ -353,21 +352,21 @@ function Card({ cardRef, a, b, href }: {
           {/* A identity (outboard = left) */}
           <div style={{
             width: 200, flexShrink: 0, display: 'flex', flexDirection: 'column',
-            gap: 3, padding: '12px 20px', justifyContent: 'space-evenly',
+            gap: 4, padding: '14px 20px', justifyContent: 'space-evenly',
+            alignItems: 'center', textAlign: 'center',
             background: winner === 'a'
               ? `linear-gradient(105deg, ${colA}22, transparent 72%)`
               : `linear-gradient(105deg, ${colA}11, transparent 72%)`,
           }}>
-            <span style={{ fontSize: 24, color: colA, lineHeight: 1 }}>{glyphFor(clsA)}</span>
-            <span style={{ fontSize: aNameSize, fontWeight: 900, color: C_BONE, letterSpacing: 0.5, lineHeight: 1.1 }}>{nameA}</span>
+            <span style={{ fontSize: 32, color: colA, lineHeight: 1 }}>{glyphFor(clsA)}</span>
             <span style={{ fontSize: 11, fontWeight: 700, color: colA, letterSpacing: 0.3 }}>{clsA} · #{a.global_rank}</span>
-            <span style={{ fontSize: 32, fontWeight: 800, color: C_GOLD, lineHeight: 1 }}>{yieldStr(a)}</span>
+            <span style={{ fontSize: 36, fontWeight: 800, color: C_GOLD, lineHeight: 1 }}>{yieldStr(a)}</span>
             <span style={{ fontSize: 9, color: '#7d7461' }}>Υ YIELD</span>
             {winner === 'a' && (
               <span style={{
                 fontSize: 9, fontWeight: 800, color: C_GOLD,
                 border: '1px solid ' + C_GOLD + '66', borderRadius: 999,
-                padding: '2px 8px', letterSpacing: 1, textTransform: 'uppercase', alignSelf: 'flex-start',
+                padding: '2px 8px', letterSpacing: 1, textTransform: 'uppercase',
               }}>◆ Leads {aWins}–{bWins}</span>
             )}
           </div>
@@ -401,16 +400,15 @@ function Card({ cardRef, a, b, href }: {
           {/* B identity (outboard = right) */}
           <div style={{
             width: 200, flexShrink: 0, display: 'flex', flexDirection: 'column',
-            gap: 3, padding: '12px 20px', justifyContent: 'space-evenly',
-            alignItems: 'flex-end', textAlign: 'right',
+            gap: 4, padding: '14px 20px', justifyContent: 'space-evenly',
+            alignItems: 'center', textAlign: 'center',
             background: winner === 'b'
               ? `linear-gradient(255deg, ${colB}22, transparent 72%)`
               : `linear-gradient(255deg, ${colB}11, transparent 72%)`,
           }}>
-            <span style={{ fontSize: 24, color: colB, lineHeight: 1 }}>{glyphFor(clsB)}</span>
-            <span style={{ fontSize: bNameSize, fontWeight: 900, color: C_BONE, letterSpacing: 0.5, lineHeight: 1.1 }}>{nameB}</span>
+            <span style={{ fontSize: 32, color: colB, lineHeight: 1 }}>{glyphFor(clsB)}</span>
             <span style={{ fontSize: 11, fontWeight: 700, color: colB, letterSpacing: 0.3 }}>{clsB} · #{b.global_rank}</span>
-            <span style={{ fontSize: 32, fontWeight: 800, color: C_GOLD, lineHeight: 1 }}>{yieldStr(b)}</span>
+            <span style={{ fontSize: 36, fontWeight: 800, color: C_GOLD, lineHeight: 1 }}>{yieldStr(b)}</span>
             <span style={{ fontSize: 9, color: '#7d7461' }}>Υ YIELD</span>
             {winner === 'b' && (
               <span style={{
