@@ -28,6 +28,7 @@ import { ChallengeBar } from '@/components/compare/ChallengeBar'
 import { getChallengeBetween } from '@/lib/challenges/server'
 import { GATE_CHALLENGES } from '@/lib/features'
 import { CompareShareCard, type CompareOperand } from '@/components/share/CompareShareCard'
+import { CompareMatchupCard } from '@/components/share/CompareMatchupCard'
 import { operatorDisplayName } from '@/lib/compare/operator-name'
 
 export const metadata: Metadata = withOG({
@@ -191,6 +192,13 @@ export default async function ComparePage({
       <CompareShareCard
         a={toOperand(rowA)}
         b={toOperand(rowB)}
+        href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+      />
+
+      {/* Matchup + radars card — the full visual snapshot (matchup + dual radars). */}
+      <CompareMatchupCard
+        a={rowA}
+        b={rowB}
         href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
       />
 
