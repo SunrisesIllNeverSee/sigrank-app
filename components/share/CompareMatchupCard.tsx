@@ -288,7 +288,7 @@ function Card({ cardRef, a, b, href }: {
           <span>HEAD TO HEAD</span>
         </div>
 
-        {/* matchup panels */}
+        {/* matchup panels — both sides use the SAME layout (identity outboard, facts inboard) */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'stretch' }}>
           {/* A panel */}
           <div style={{
@@ -297,8 +297,8 @@ function Card({ cardRef, a, b, href }: {
               ? `linear-gradient(105deg, ${colA}22, transparent 72%)`
               : `linear-gradient(105deg, ${colA}11, transparent 72%)`,
           }}>
-            {/* identity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 150, flexShrink: 0 }}>
+            {/* identity (outboard = left for A) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 160, flexShrink: 0 }}>
               <span style={{ fontSize: 22, color: colA, lineHeight: 1 }}>{glyphFor(clsA)}</span>
               <span style={{ fontSize: aNameSize, fontWeight: 900, color: '#e9e3d5', letterSpacing: 0.5, lineHeight: 1.1 }}>{nameA}</span>
               <span style={{ fontSize: 10, fontWeight: 700, color: colA, letterSpacing: 0.3 }}>{clsA} · #{a.global_rank}</span>
@@ -312,7 +312,7 @@ function Card({ cardRef, a, b, href }: {
                 }}>◆ Leads {aWins}–{bWins}</span>
               )}
             </div>
-            {/* facts */}
+            {/* facts (inboard = right for A) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center', minWidth: 0, flex: 1 }}>
               {factsA.map((f, i) => <FactLine key={i} fact={f} />)}
             </div>
@@ -327,27 +327,15 @@ function Card({ cardRef, a, b, href }: {
             <span style={{ fontSize: 14, fontWeight: 800, color: '#4a6a4a', fontVariantNumeric: 'tabular-nums' }}>{aWins}–{bWins}</span>
           </div>
 
-          {/* B panel */}
+          {/* B panel — SAME layout as A (identity outboard = right, facts inboard = left) */}
           <div style={{
-            flex: 1, display: 'flex', gap: 12, padding: '10px 20px',
+            flex: 1, display: 'flex', gap: 12, padding: '10px 20px', flexDirection: 'row-reverse',
             background: winner === 'b'
               ? `linear-gradient(255deg, ${colB}22, transparent 72%)`
               : `linear-gradient(255deg, ${colB}11, transparent 72%)`,
           }}>
-            {/* facts (left for B, mirrored) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center', minWidth: 0, flex: 1, alignItems: 'flex-end', textAlign: 'right' }}>
-              {factsB.map((f, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexDirection: 'row-reverse' }}>
-                  <span style={{ fontSize: 9, color: f.polarity === 'up' ? C_GOLD : f.polarity === 'down' ? C_DULL : '#4a6a4a', fontFamily: 'ui-monospace, monospace', flexShrink: 0 }}>{f.polarity === 'up' ? '✦' : f.polarity === 'down' ? '△' : '·'}</span>
-                  <span style={{ fontSize: 10, fontFamily: 'ui-monospace, monospace', lineHeight: 1.3, minWidth: 0 }}>
-                    <span style={{ fontWeight: 700, color: '#e9e3d5' }}>{f.label}</span>
-                    <span style={{ color: '#7d7461' }}> · {f.detail}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-            {/* identity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 150, flexShrink: 0, alignItems: 'flex-end', textAlign: 'right' }}>
+            {/* identity (outboard = right for B, via row-reverse) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: 160, flexShrink: 0, alignItems: 'flex-end', textAlign: 'right' }}>
               <span style={{ fontSize: 22, color: colB, lineHeight: 1 }}>{glyphFor(clsB)}</span>
               <span style={{ fontSize: bNameSize, fontWeight: 900, color: '#e9e3d5', letterSpacing: 0.5, lineHeight: 1.1 }}>{nameB}</span>
               <span style={{ fontSize: 10, fontWeight: 700, color: colB, letterSpacing: 0.3 }}>{clsB} · #{b.global_rank}</span>
@@ -360,6 +348,10 @@ function Card({ cardRef, a, b, href }: {
                   padding: '1px 6px', letterSpacing: 1, textTransform: 'uppercase',
                 }}>◆ Leads {bWins}–{aWins}</span>
               )}
+            </div>
+            {/* facts (inboard = left for B, via row-reverse) — uses the SAME FactLine component */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center', minWidth: 0, flex: 1, alignItems: 'flex-end', textAlign: 'right' }}>
+              {factsB.map((f, i) => <FactLine key={i} fact={f} />)}
             </div>
           </div>
         </div>
