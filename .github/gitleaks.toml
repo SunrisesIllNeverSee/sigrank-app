@@ -1,0 +1,26 @@
+# Gitleaks config — extends default rules with allow-lists for known safe paths.
+# The default rules are broad and can flag test fixtures, seed values, or
+# example keys in documentation. This config narrows the false-positive surface.
+# https://github.com/gitleaks/gitleaks#configuration
+
+[extend]
+# Inherit all default rules, then add allow-lists below.
+useDefault = true
+
+# Allow-list: paths where test fixtures, seed values, and example keys live.
+# These are NOT real secrets — they're deterministic test data.
+[[allowlist]]
+description = "Test fixtures + canonical seed data (not real secrets)"
+paths = [
+  '''__tests__/.*''',
+  '''lib/data/snapshot\.json''',
+  '''lib/data/mock\.ts''',
+  '''\.env\.example''',
+]
+
+# Allow-list: ed25519 public keys in source (public keys are not secrets).
+[[allowlist]]
+description = "ed25519 public keys (public, not secret)"
+regexes = [
+  '''ed25519:[A-Za-z0-9+/]+''',
+]
