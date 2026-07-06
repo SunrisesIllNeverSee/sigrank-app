@@ -17,7 +17,8 @@ const SAMPLE_CCUSAGE = JSON.stringify({
 })
 
 test('score paste → projection appears', async ({ page }) => {
-  await page.goto('/score')
+  // The paste calculator moved to /score/paste (the agent path is now primary on /score).
+  await page.goto('/score/paste')
   // Paste card is visible
   const textarea = page.locator('textarea').first()
   await expect(textarea).toBeVisible()
