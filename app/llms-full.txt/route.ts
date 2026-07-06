@@ -29,13 +29,14 @@ export async function GET() {
           (e: {
             rank: number
             codename: string
+            display_name?: string | null
             class_tier?: string
             yield_?: number
             leverage?: number
             velocity?: number
             platform?: string
           }) =>
-            `| ${e.rank} | ${e.codename} | ${e.class_tier ?? '—'} | ${e.yield_?.toFixed(2) ?? '—'} | ${e.leverage?.toFixed(1) ?? '—'}× | ${e.velocity?.toFixed(2) ?? '—'} | ${e.platform ?? '—'} |`,
+            `| ${e.rank} | ${e.display_name || e.codename} | ${e.class_tier ?? '—'} | ${e.yield_?.toFixed(2) ?? '—'} | ${e.leverage?.toFixed(1) ?? '—'}× | ${e.velocity?.toFixed(2) ?? '—'} | ${e.platform ?? '—'} |`,
         )
         .join('\n')
     }
@@ -139,9 +140,9 @@ the pipeline. It's an arms race; we're honest about that.
 
 ## Top operators (live board snapshot)
 
-| Rank | Codename | Class | Yield (Υ) | Leverage | Velocity | Platform |
+| Rank | Operator | Class | Yield (Υ) | Leverage | Velocity | Platform |
 |------|----------|-------|-----------|----------|----------|----------|
-${operators || '| 1 | signal-92b4f9f485 | BASE | 566.34 | 385.7× | 1.47 | claude |'}
+${operators || '| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |'}
 
 ## Core pages
 

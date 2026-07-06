@@ -419,7 +419,8 @@ export default async function OperatorProfilePage({
     <div className="flex flex-col gap-6">
       <JsonLd
         data={operatorProfile({
-          codename: resolveName(operator),
+          codename: operator.codename,
+          display_name: operator.display_name,
           path: `/user/${rawCodename}`,
           classTier: snapshot.class_tier,
           globalRank: row.global_rank,
