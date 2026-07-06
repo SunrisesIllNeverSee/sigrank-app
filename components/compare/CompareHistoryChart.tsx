@@ -27,6 +27,9 @@ interface Props {
   nameA: string
   /** Display name for B (legend label). */
   nameB: string
+  /** Field average SIGNA RATE (current board mean). Drawn as a horizontal
+   *  reference line so both operators are contextualized against the field. */
+  fieldAvg?: number | null
   /** SVG height. Default 240. */
   height?: number
 }
@@ -37,7 +40,7 @@ const BLUE = 'rgb(var(--class-arch))'
 const LINE = 'rgb(var(--bg-border))'
 const BONE = 'rgb(var(--text-primary))'
 const MUTED = 'rgb(var(--text-muted))'
-const SEEK = 'rgb(var(--class-seeker))' // threshold band color
+const FIELD = 'rgb(var(--text-muted))' // field baseline — muted/neutral
 const SURF = 'rgb(var(--bg-surface))'
 const MONO = 'var(--font-geist-mono), ui-monospace, monospace'
 
@@ -68,6 +71,7 @@ export function CompareHistoryChart({
   historyB,
   nameA,
   nameB,
+  fieldAvg,
   height = 240,
 }: Props) {
   const ptsA = toPts(historyA)
@@ -129,17 +133,14 @@ export function CompareHistoryChart({
   // Y-axis ticks (5 steps).
   const yTicks = Array.from({ length: 5 }, (_, i) => min + (range * i) / 4)
 
-  // Class threshold — illustrative "Architect" band at a sensible SIGNA RATE.
-  // This is a visual reference line, not a hard gate.
-  const thresholdVal = Math.max(min, Math.min(max, rawMax * 0.75))
-  const thresholdY = yAt(thresholdVal)
+  // Field baseline — the current board mean SIGNA RATE, drawn as a horizontal
+  // reference line. Not time-varying (we don't have aggregate history), but
+  // it contextualizes both operators against the field.
+  const hasField = fieldAvg != null && Number.isFinite(fieldAvg) && fieldAvg > 0
+  const fieldY = hasField ? yAt(fieldAvg!) : 0
 
   const lastA = ptsA[ptsA.length - 1]
   const lastB = ptsB[ptsB.length - 1]
-  const firstA = ptsA[0]
-  const firstB = ptsB[0]
-  const deltaA = ptsA.length >= 2 ? lastA.v - firstA.v : 0
-  const deltaB = ptsB.length >= 2 ? lastB.v - firstB.v : 0
 
   const truncName = (n: string) => (n.length > 14 ? n.slice(0, 14) + '…' : n)
 
@@ -169,14 +170,22 @@ export function CompareHistoryChart({
 
       {/* legend (top-right, inline) */}
       <g>
-        <rect x={W - padR - 200} y={8} width={10} height={10} rx={2} fill={BLUE} />
-        <text x={W - padR - 186} y={17} fill={BONE} fontSize={10} fontFamily={MONO}>
+        <rect x={W - padR - 270} y={8} width={10} height={10} rx={2} fill={BLUE} />
+        <text x={W - padR - 256} y={17} fill={BONE} fontSize={10} fontFamily={MONO}>
           {truncName(nameA)}
         </text>
-        <rect x={W - padR - 100} y={8} width={10} height={10} rx={2} fill={GOLD} />
-        <text x={W - padR - 86} y={17} fill={BONE} fontSize={10} fontFamily={MONO}>
+        <rect x={W - padR - 170} y={8} width={10} height={10} rx={2} fill={GOLD} />
+        <text x={W - padR - 156} y={17} fill={BONE} fontSize={10} fontFamily={MONO}>
           {truncName(nameB)}
         </text>
+        {hasField && (
+          <>
+            <line x1={W - padR - 70} y1={13} x2={W - padR - 60} y2={13} stroke={FIELD} strokeWidth={1.5} strokeDasharray="4 3" />
+            <text x={W - padR - 56} y={17} fill={MUTED} fontSize={10} fontFamily={MONO}>
+              Field avg
+            </text>
+          </>
+        )}
       </g>
 
       {/* dashed gridlines + y labels */}
@@ -192,11 +201,15 @@ export function CompareHistoryChart({
         )
       })}
 
-      {/* class threshold band */}
-      <line x1={padL} y1={thresholdY.toFixed(2)} x2={W - padR} y2={thresholdY.toFixed(2)} stroke={SEEK} strokeWidth={1.2} strokeDasharray="6 4" opacity={0.7} />
-      <text x={W - padR} y={(thresholdY - 5).toFixed(2)} textAnchor="end" fontSize={9} fill={SEEK} fontFamily={MONO}>
-        Architect threshold
-      </text>
+      {/* field baseline — horizontal reference line at the board mean */}
+      {hasField && (
+        <>
+          <line x1={padL} y1={fieldY.toFixed(2)} x2={W - padR} y2={fieldY.toFixed(2)} stroke={FIELD} strokeWidth={1.2} strokeDasharray="5 3" opacity={0.6} />
+          <text x={padL + 4} y={(fieldY - 5).toFixed(2)} textAnchor="start" fontSize={9} fill={MUTED} fontFamily={MONO}>
+            Field avg {fieldAvg!.toFixed(1)}
+          </text>
+        </>
+      )}
 
       {/* A area wash + smooth line */}
       {ptsA.length >= 2 && (
@@ -292,21 +305,6 @@ export function CompareHistoryChart({
           {d.slice(5)}
         </text>
       ))}
-
-      {/* delta labels (bottom-center, below x-labels) */}
-      {ptsA.length >= 2 && (
-        <text
-          x={(padL + innerW * 0.35).toFixed(0)}
-          y={H - 7}
-          textAnchor="middle"
-          fill={deltaA >= 0 ? SEEK : 'rgb(var(--class-refiner))'}
-          fontSize={9}
-          fontFamily={MONO}
-          opacity={0}
-        >
-          {truncName(nameA)}: {deltaA >= 0 ? '▲ +' : '▼ '}{Math.abs(deltaA).toFixed(1)}
-        </text>
-      )}
     </svg>
   )
 }
