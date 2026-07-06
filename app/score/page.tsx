@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { withOG } from '@/lib/seo'
 import { CopyButton } from '@/components/marketing/CopyButton'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { scoreCalculator, scoreHowTo, cliTool } from '@/lib/jsonld'
 
 /**
  * app/score/page.tsx — the "Measure" page.
@@ -59,6 +61,9 @@ const PRIVACY_POINTS = [
 export default function ScorePage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
+      {/* JSON-LD: WebApplication (the calculator) + HowTo (the flow) + SoftwareApplication (the CLI) */}
+      <JsonLd data={[scoreCalculator(), scoreHowTo(), cliTool()]} />
+
       {/* Hero */}
       <div className="flex flex-col gap-3 text-center">
         <span className="font-mono text-xs uppercase tracking-widest text-gold">
