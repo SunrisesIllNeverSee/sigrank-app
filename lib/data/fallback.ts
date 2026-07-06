@@ -84,6 +84,11 @@ export function fallbackRows(): LeaderboardRow[] {
 
 export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   let rows = [...fallbackRows()]
+  // Exclude The Field (synthetic averaged-pillar baseline) from the ranked board.
+  // Mirrors the live path's FIELD_OPERATOR_ID filter in queries.ts. The Field is
+  // in the cold-store snapshot (snapshot.json) as a compare-baseline reference,
+  // not a competitor — including it inflates operatorCount and percentiles.
+  rows = rows.filter((r) => r.operator.operator_id !== 'f1e1d000-0000-4000-8000-000000000001')
   // 730: narrow to the window ONLY when the caller opts in (the /board route);
   // legacy callers keep the full field. Mirrors the live path's windowFilter gate.
   if (params.windowFilter && params.window) rows = filterToWindow(rows, params.window)
