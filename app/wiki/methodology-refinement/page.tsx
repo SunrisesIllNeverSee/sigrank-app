@@ -1,9 +1,7 @@
 /**
  * app/wiki/methodology-refinement/page.tsx — "How We Got Here: Refining the Index".
  *
- * DRAFT for owner review (lives in RNS Devins_Plans/wiki/ until approved, then ships to
- * sigrank-app at app/wiki/methodology-refinement/page.tsx). Server component, matches the
- * existing /wiki/<slug> TopicPage pattern.
+ * Server component, matches the /wiki/<slug> TopicPage pattern.
  *
  * GROUNDED in the repo's own analysis (rewritten 2026-06-30 after the first draft invented a
  * triumphant framing the repo contradicts):

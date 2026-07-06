@@ -578,6 +578,35 @@ export function Credits() {
         Independent project — not affiliated with or endorsed by the tools above; names belong to their
         authors. Token counts only.
       </p>
+
+      {/* ── Standing on shoulders ── */}
+      <section className="mt-4 flex flex-col gap-3 rounded-lg border border-gold/20 bg-gold/[0.03] p-5">
+        <h2 className="font-mono text-lg font-bold text-text-primary">
+          Standing on shoulders
+        </h2>
+        <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
+          The idea that an operator deserves a stat screen isn&apos;t new — it&apos;s just never been
+          applied to AI. Every competitive game gives you one: K/D, accuracy, rank, a Hall of Fame.
+          <strong className="text-text-primary"> BlitzStars.com</strong>, built by{' '}
+          <strong className="text-text-primary">sockrobber</strong>, showed what a real player stat
+          board looks like for World of Tanks: Blitz — live stats, historical progression, clan
+          rankings, a record of who actually runs the field. Not just &ldquo;how much you played&rdquo;
+          but <em>how well you played</em> — the shape of your performance, tracked over time.
+        </p>
+        <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
+          That design principle — <strong className="text-text-secondary">measure the operator,
+          not the tool</strong> — is what SigRank brings to AI coding. The game is different; the
+          idea is the same. Credit where it&apos;s due.
+        </p>
+        <a
+          href="https://blitzstars.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-fit font-mono text-xs text-text-accent underline-offset-2 hover:underline"
+        >
+          blitzstars.com ↗
+        </a>
+      </section>
     </div>
   )
 }
