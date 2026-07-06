@@ -11,7 +11,7 @@ import type { Metadata } from 'next'
 import { withOG } from '@/lib/seo'
 
 import { headers } from 'next/headers'
-import { getLeaderboard, getOperator, type LeaderboardRow } from '@/lib/data'
+import { getLeaderboard, getOperator, getOperatorHistory, type LeaderboardRow } from '@/lib/data'
 import { bumpComparisonsRan } from '@/lib/data/queries'
 import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { WaveHero } from '@/components/ui/WaveHero'
@@ -19,6 +19,7 @@ import { CompareMatchup } from '@/components/compare/CompareMatchup'
 import { type CompareOption } from '@/components/compare/CompareSelectors'
 import { CompareLedger } from '@/components/compare/CompareLedger'
 import { CompareRadars } from '@/components/compare/CompareRadars'
+import { CompareHistoryChart } from '@/components/compare/CompareHistoryChart'
 // CMP redesign (owner 2026-06-22): the matchup box (CompareMatchup) folds the selectors +
 // identity + 5 derived facts per operator; CompareLedger is the RAW/METRICS/TOTAL ledger
 // (owner's ASCII template); CompareRadars is the dual-layer raw+metrics radar pair.
@@ -122,6 +123,16 @@ export default async function ComparePage({
       ? await getChallengeBetween(rowA.operator.codename, rowB.operator.codename)
       : null
 
+  // Overtime comparison: both operators' SIGNA RATE history (ascending by date).
+  // Fire both fetches in parallel; either can be empty (chart degrades gracefully).
+  const [historyA, historyB] =
+    rowA && rowB
+      ? await Promise.all([
+          getOperatorHistory(rowA.operator.codename),
+          getOperatorHistory(rowB.operator.codename),
+        ])
+      : [[], []]
+
   if (!rowA || !rowB) {
     return (
       <div className="flex flex-col gap-3">
@@ -183,6 +194,17 @@ export default async function ComparePage({
       {/* DUAL-LAYER RADARS — raw shape + metric shape (ghost raw underlay), consuming
           TERM's CascadeRadar variant support (owner 2026-06-22). */}
       <CompareRadars a={rowA} b={rowB} />
+
+      {/* OVERTIME COMPARISON — dual-line SIGNA RATE trajectory on a shared timeline
+          (owner 2026-07-02). Shows who's climbing, who's flat, who crossed over. */}
+      <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
+        <CompareHistoryChart
+          historyA={historyA}
+          historyB={historyB}
+          nameA={nameOf(rowA)}
+          nameB={nameOf(rowB)}
+        />
+      </div>
 
       {/* LEDGER — the RAW / METRICS / TOTAL head-to-head table to the owner's ASCII
           template, with diverging bars per row (owner 2026-06-22). */}
