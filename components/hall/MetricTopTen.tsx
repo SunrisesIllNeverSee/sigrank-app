@@ -58,6 +58,7 @@ export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
                 key={row.operator.operator_id}
                 rank={i + 1}
                 codename={row.operator.codename}
+                displayName={row.operator.display_name}
                 claimed={row.operator.claimed}
                 classTier={row.snapshot.class_tier}
                 platform={row.operator.primary_domain}
