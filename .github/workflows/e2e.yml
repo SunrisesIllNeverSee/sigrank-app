@@ -15,6 +15,9 @@ jobs:
   e2e:
     name: Playwright e2e (live site)
     runs-on: ubuntu-latest
+    env:
+      # Explicit so logs show the target. playwright.config.ts reads this var.
+      E2E_BASE_URL: https://signalaf.com
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -23,8 +26,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+
+      - name: Healthcheck target site
+        run: |
+          echo "Target: $E2E_BASE_URL"
+          curl --fail --silent --show-error --max-time 15 "$E2E_BASE_URL" > /dev/null \
+            && echo "✓ Site is reachable" \
+            || { echo "✗ Site is not reachable — aborting before Playwright"; exit 1; }
+
       - name: Run Playwright tests
         run: npx playwright test
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7
