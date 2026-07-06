@@ -9,8 +9,10 @@ import { Trophy } from '@/components/hall/Trophy'
 interface Props {
   /** Display rank within the board. */
   rank: number
-  /** Operator codename. */
+  /** Operator codename (used for the profile link, never displayed directly). */
   codename: string
+  /** Display name — the operator's real name when present, else the codename. */
+  displayName?: string | null
   /** Whether the operator profile has been claimed (group brief requirement). */
   claimed: boolean
   /** Optional class tier for the badge. */
@@ -36,6 +38,7 @@ interface Props {
 export function HallSubmissionRow({
   rank,
   codename,
+  displayName,
   claimed,
   classTier,
   platform,
@@ -60,6 +63,11 @@ export function HallSubmissionRow({
   // (the little green canon-id superscript was removed per owner 2026-06-21).
   const valueNode = isPlaceholder ? <Placeholder value={value} /> : <span>{value}</span>
 
+  // Display name: show the operator's real name (display_name) when present,
+  // else fall back to the codename. Mirrors to-entry.ts's anonId logic so the
+  // Hall matches the main board's identity treatment.
+  const displayLabel = displayName || codename
+
   // Unclaimed rows are the seed corpus (italic, matching the live board's
   // isSeed treatment in to-entry.ts) so a reader can tell a real claimed
   // operator from a placeholder seed at a glance — the Hall's whole pitch is
@@ -71,11 +79,11 @@ export function HallSubmissionRow({
       className="text-text-primary transition-colors hover:text-accent"
       style={{ fontStyle: claimed ? 'normal' : 'italic' }}
     >
-      {codename}
+      {displayLabel}
     </Link>
   ) : (
     <span className="text-text-primary" style={{ fontStyle: claimed ? 'normal' : 'italic' }}>
-      {codename}
+      {displayLabel}
     </span>
   )
 
