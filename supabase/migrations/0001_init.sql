@@ -11,8 +11,10 @@
 -- ============================================================================
 
 -- Extensions ------------------------------------------------------------------
-CREATE EXTENSION IF NOT EXISTS pgcrypto;   -- gen_random_uuid()
-CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- trigram search on codename
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+-- gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+-- trigram search on codename
 
 -- ============================================================================
 -- operators — primary identity table (anonymous by default + claim fields).
@@ -45,14 +47,12 @@ CREATE TABLE IF NOT EXISTS operators (
   claim_payment_id        TEXT,
   claim_contact           TEXT
 );
-
 CREATE INDEX IF NOT EXISTS idx_operators_codename ON operators(codename);
 CREATE INDEX IF NOT EXISTS idx_operators_last_seen ON operators(last_seen DESC);
 CREATE INDEX IF NOT EXISTS idx_operators_status ON operators(status);
 CREATE INDEX IF NOT EXISTS idx_operators_claimed ON operators(claimed);
 CREATE INDEX IF NOT EXISTS idx_operators_codename_trgm
   ON operators USING gin (codename gin_trgm_ops);
-
 -- ============================================================================
 -- devices
 -- ============================================================================
@@ -67,9 +67,7 @@ CREATE TABLE IF NOT EXISTS devices (
   trust_status       TEXT NOT NULL DEFAULT 'pending'
                      -- pending, trusted, revoked
 );
-
 CREATE INDEX IF NOT EXISTS idx_devices_operator ON devices(operator_id);
-
 -- ============================================================================
 -- snapshot_submissions — append-only raw payloads.
 -- ============================================================================
@@ -89,12 +87,10 @@ CREATE TABLE IF NOT EXISTS snapshot_submissions (
   status             TEXT NOT NULL DEFAULT 'received'
                      -- received, validated, rejected, scored
 );
-
 CREATE INDEX IF NOT EXISTS idx_submissions_operator
   ON snapshot_submissions(operator_id, submitted_at DESC);
 CREATE INDEX IF NOT EXISTS idx_submissions_status
   ON snapshot_submissions(status);
-
 -- ============================================================================
 -- session_summaries
 -- ============================================================================
@@ -113,10 +109,8 @@ CREATE TABLE IF NOT EXISTS session_summaries (
   compression_ratio       NUMERIC(5,4),
   last_seen_at            TIMESTAMPTZ
 );
-
 CREATE INDEX IF NOT EXISTS idx_sessions_operator
   ON session_summaries(operator_id, started_at DESC);
-
 -- ============================================================================
 -- feature_rollups_daily
 -- ============================================================================
@@ -136,10 +130,8 @@ CREATE TABLE IF NOT EXISTS feature_rollups_daily (
   feature_json       JSONB,
   PRIMARY KEY (rollup_date, operator_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_rollups_operator
   ON feature_rollups_daily(operator_id, rollup_date DESC);
-
 -- ============================================================================
 -- metric_snapshots — board-grade scored metrics (incl. sdot_score + sdrm_score).
 -- ============================================================================
@@ -185,14 +177,12 @@ CREATE TABLE IF NOT EXISTS metric_snapshots (
 
   UNIQUE (operator_id, snapshot_date, window_type)
 );
-
 CREATE INDEX IF NOT EXISTS idx_metric_snapshots_signa
   ON metric_snapshots(signa_rate DESC);
 CREATE INDEX IF NOT EXISTS idx_metric_snapshots_class
   ON metric_snapshots(class_tier, signa_rate DESC);
 CREATE INDEX IF NOT EXISTS idx_metric_snapshots_date
   ON metric_snapshots(snapshot_date DESC);
-
 -- ============================================================================
 -- rank_history
 -- ============================================================================
@@ -209,10 +199,8 @@ CREATE TABLE IF NOT EXISTS rank_history (
   percentile         NUMERIC(5,2),
   PRIMARY KEY (operator_id, snapshot_date)
 );
-
 CREATE INDEX IF NOT EXISTS idx_rank_history_global
   ON rank_history(snapshot_date, global_rank);
-
 -- ============================================================================
 -- badges + operator_badges
 -- ============================================================================
@@ -224,7 +212,6 @@ CREATE TABLE IF NOT EXISTS badges (
   rarity             TEXT NOT NULL DEFAULT 'common',
   icon_url           TEXT
 );
-
 CREATE TABLE IF NOT EXISTS operator_badges (
   operator_id        UUID NOT NULL REFERENCES operators(operator_id),
   badge_id           UUID NOT NULL REFERENCES badges(badge_id),
@@ -233,10 +220,8 @@ CREATE TABLE IF NOT EXISTS operator_badges (
   source_note        TEXT,
   PRIMARY KEY (operator_id, badge_id, awarded_at)
 );
-
 CREATE INDEX IF NOT EXISTS idx_operator_badges_operator
   ON operator_badges(operator_id);
-
 -- ============================================================================
 -- leaderboards_cached
 -- ============================================================================
@@ -251,10 +236,8 @@ CREATE TABLE IF NOT EXISTS leaderboards_cached (
   payload_json       JSONB NOT NULL,
   expires_at         TIMESTAMPTZ
 );
-
 CREATE INDEX IF NOT EXISTS idx_leaderboards_lookup
   ON leaderboards_cached(board_type, scope, scope_value, window_type, generated_at DESC);
-
 -- ============================================================================
 -- audit_records — precision-tier audit findings.
 -- ============================================================================
@@ -269,10 +252,8 @@ CREATE TABLE IF NOT EXISTS audit_records (
   status             TEXT NOT NULL DEFAULT 'active',
   confidence         NUMERIC(3,2)
 );
-
 CREATE INDEX IF NOT EXISTS idx_audit_records_operator
   ON audit_records(operator_id, audit_date DESC);
-
 -- ============================================================================
 -- rulesets — versioned scoring rule sets.
 -- ============================================================================
@@ -285,7 +266,6 @@ CREATE TABLE IF NOT EXISTS rulesets (
   weight_json        JSONB NOT NULL,
   notes              TEXT
 );
-
 -- ============================================================================
 -- circles + circle_members + circle_metric_snapshots (Phase 2).
 -- ============================================================================
@@ -297,9 +277,7 @@ CREATE TABLE IF NOT EXISTS circles (
   created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
   owner_operator_id  UUID NOT NULL REFERENCES operators(operator_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_circles_owner ON circles(owner_operator_id);
-
 CREATE TABLE IF NOT EXISTS circle_members (
   circle_id          UUID NOT NULL REFERENCES circles(circle_id),
   operator_id        UUID NOT NULL REFERENCES operators(operator_id),
@@ -308,9 +286,7 @@ CREATE TABLE IF NOT EXISTS circle_members (
   status             TEXT NOT NULL DEFAULT 'active',
   PRIMARY KEY (circle_id, operator_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_circle_members_operator ON circle_members(operator_id);
-
 CREATE TABLE IF NOT EXISTS circle_metric_snapshots (
   circle_id          UUID NOT NULL REFERENCES circles(circle_id),
   snapshot_date      DATE NOT NULL,
@@ -323,5 +299,4 @@ CREATE TABLE IF NOT EXISTS circle_metric_snapshots (
   global_rank        INTEGER,
   PRIMARY KEY (circle_id, snapshot_date)
 );
-
--- End of 0001_init.
+-- End of 0001_init.;
