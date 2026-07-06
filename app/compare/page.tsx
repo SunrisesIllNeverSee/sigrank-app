@@ -179,20 +179,20 @@ export default async function ComparePage({
           class/Υ) outboard, 5 derived facts inboard (owner 2026-06-22). */}
       <CompareMatchup a={rowA} b={rowB} options={selectorOptions} />
 
+      {/* DUAL-LAYER RADARS — raw shape + metric shape (ghost raw underlay), consuming
+          TERM's CascadeRadar variant support (owner 2026-06-22). */}
+      <CompareRadars a={rowA} b={rowB} />
+
+      {/* LEDGER — the RAW / METRICS / TOTAL head-to-head table to the owner's ASCII
+          template, with diverging bars per row (owner 2026-06-22). */}
+      <CompareLedger a={rowA} b={rowB} />
+
       {/* Share / download the head-to-head as a card for socials (owner 2026-06-27). */}
       <CompareShareCard
         a={toOperand(rowA)}
         b={toOperand(rowB)}
         href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
       />
-
-      {/* LEDGER — the RAW / METRICS / TOTAL head-to-head table to the owner's ASCII
-          template, with diverging bars per row (owner 2026-06-22). */}
-      <CompareLedger a={rowA} b={rowB} />
-
-      {/* DUAL-LAYER RADARS — raw shape + metric shape (ghost raw underlay), consuming
-          TERM's CascadeRadar variant support (owner 2026-06-22). */}
-      <CompareRadars a={rowA} b={rowB} />
 
       {/* Throw-Downs "coming soon" line — page tail. */}
       {ThrowDownLine}
