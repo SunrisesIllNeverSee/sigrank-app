@@ -57,7 +57,7 @@ jobs:
         run: node --test __tests__/ingest/rs06-wiring.test.mjs __tests__/ingest/benford-vacuous.test.mjs __tests__/scoring/signa-ceiling.test.mjs __tests__/ingest/contamination-bypass.test.mjs
 
       - name: Hardening tests (Jensen fix, codename guard, throttle TOCTOU, baseline labels, board exclusion)
-        run: node --test __tests__/data/the-field-jensen.test.mjs __tests__/ingest/codename-guard-bypass.test.mjs __tests__/ingest/throttle-toctou.test.mjs __tests__/data/baseline-labels.test.mjs __tests__/data/the-field-board-exclusion.test.mjs
+        run: node --test __tests__/data/the-field-jensen.test.mjs __tests__/ingest/codename-guard-bypass.test.mjs __tests__/ingest/throttle-toctou.test.mjs __tests__/data/baseline-labels.test.mjs __tests__/data/the-field-board-exclusion.test.mjs __tests__/ingest/tightened-plausibility.test.mjs
 
       - name: Test coverage report
         run: npm run test:coverage
