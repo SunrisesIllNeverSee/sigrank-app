@@ -13,8 +13,6 @@ import { toEntry } from '@/lib/leaderboard/to-entry'
 import { boardWindowBySlug } from '@/lib/data/windows'
 
 export const runtime = 'nodejs'
-export const size = { width: 1200, height: 630 }
-export const contentType = 'image/png'
 
 const LABELS: Record<string, string> = {
   '7d': '7 day',
