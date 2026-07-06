@@ -133,14 +133,14 @@ export default async function ComparePage({
         ])
       : [[], []]
 
-  // Field average SIGNA RATE — mean of all ranked, compounding operators on
+  // Field average Υ Yield — mean of all ranked, compounding operators on
   // the board. Drawn as a horizontal reference line on the overtime chart.
-  const fieldSignaRates = board
+  const fieldYields = board
     .filter((r) => !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding)
-    .map((r) => r.snapshot.signa_rate)
+    .map((r) => r.snapshot.cascade!.yield_)
     .filter((v) => Number.isFinite(v) && v > 0)
-  const fieldAvgSigna = fieldSignaRates.length
-    ? fieldSignaRates.reduce((a, b) => a + b, 0) / fieldSignaRates.length
+  const fieldAvgYield = fieldYields.length
+    ? fieldYields.reduce((a, b) => a + b, 0) / fieldYields.length
     : null
 
   if (!rowA || !rowB) {
@@ -205,7 +205,7 @@ export default async function ComparePage({
           TERM's CascadeRadar variant support (owner 2026-06-22). */}
       <CompareRadars a={rowA} b={rowB} />
 
-      {/* OVERTIME COMPARISON — dual-line SIGNA RATE trajectory on a shared timeline
+      {/* OVERTIME COMPARISON — dual-line Υ Yield trajectory on a shared timeline
           (owner 2026-07-02). Shows who's climbing, who's flat, who crossed over. */}
       <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
         <CompareHistoryChart
@@ -213,7 +213,7 @@ export default async function ComparePage({
           historyB={historyB}
           nameA={nameOf(rowA)}
           nameB={nameOf(rowB)}
-          fieldAvg={fieldAvgSigna}
+          fieldAvg={fieldAvgYield}
         />
       </div>
 

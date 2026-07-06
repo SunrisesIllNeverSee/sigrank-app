@@ -555,10 +555,10 @@ export async function getOperatorHistory(
     const op = asDb<{ operator_id: string } | null>(opData)
     if (!op) return fromMock()
 
-    // Per-snapshot scores (signa / class), oldest → newest.
+    // Per-snapshot scores + token pillars (for Υ Yield), oldest → newest.
     const { data: snapData, error: snapError } = await sb
       .from('metric_snapshots')
-      .select('snapshot_date, signa_rate, class_tier')
+      .select('snapshot_date, signa_rate, class_tier, input_tokens, output_tokens, cache_read_tokens, cache_creation_tokens')
       .eq('operator_id', op.operator_id)
       .order('snapshot_date', { ascending: true })
       .limit(PER_OPERATOR_LIMIT)
@@ -568,6 +568,10 @@ export async function getOperatorHistory(
         snapshot_date: string
         signa_rate: number | null
         class_tier: string | null
+        input_tokens: number | null
+        output_tokens: number | null
+        cache_read_tokens: number | null
+        cache_creation_tokens: number | null
       }> | null>(snapData) ?? []
     if (snaps.length === 0) return fromMock()
     assertOperatorLimit(snaps, codename)
@@ -586,12 +590,20 @@ export async function getOperatorHistory(
       rankByDate.set(r.snapshot_date, num(r.global_rank))
     }
 
-    const points: HistoryPoint[] = snaps.map((s) => ({
-      date: s.snapshot_date,
-      signa_rate: num(s.signa_rate),
-      global_rank: rankByDate.get(s.snapshot_date) ?? 0,
-      class_tier: toSignalClass(s.class_tier),
-    }))
+    const points: HistoryPoint[] = snaps.map((s) => {
+      const input = num(s.input_tokens)
+      const output = num(s.output_tokens)
+      const cacheRead = num(s.cache_read_tokens)
+      // Υ Yield = (cache_read × output) / input² — guard against div-by-zero.
+      const yield_ = input > 0 ? (cacheRead * output) / (input * input) : 0
+      return {
+        date: s.snapshot_date,
+        signa_rate: num(s.signa_rate),
+        yield_,
+        global_rank: rankByDate.get(s.snapshot_date) ?? 0,
+        class_tier: toSignalClass(s.class_tier),
+      }
+    })
     return params.limit && params.limit > 0 ? points.slice(-params.limit) : points
   } catch {
     return fromMock()
