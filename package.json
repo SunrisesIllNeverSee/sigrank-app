@@ -32,6 +32,7 @@
     "posthog-node": "^5.39.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "recharts": "^3.9.2",
     "server-only": "^0.0.1",
     "stripe": "^22.3.0",
     "zod": "^4.4.3"
