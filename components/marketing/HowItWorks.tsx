@@ -100,7 +100,7 @@ export function HowItWorks() {
         <div className="font-mono text-xs uppercase tracking-wide text-gold">Or let your AI agent do it</div>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
           Don&apos;t want to leave your agent? Just tell it to run{' '}
-          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank me</code>{' '}
+          <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank</code>{' '}
           to see your cascade, or{' '}
           <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">npx sigrank submit</code>{' '}
           to publish (sign in once first with{' '}

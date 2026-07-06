@@ -167,7 +167,7 @@ ${operators || '| 1 | signal-92b4f9f485 | BASE | 566.34 | 385.7× | 1.47 | claud
 - npm package: https://www.npmjs.com/package/sigrank
 - MCP server + CLI source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
 - Install: \`npm install -g sigrank\` then \`sigrank enroll\` then \`sigrank submit\`
-- Or: \`npx sigrank me\` to see your cascade, \`npx sigrank submit\` to publish
+- Or: \`npx sigrank\` to see your cascade, \`npx sigrank submit\` to publish
 
 ## Academic foundation
 
