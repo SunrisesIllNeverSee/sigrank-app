@@ -20,6 +20,9 @@ import type { ActiveChallenge } from '@/lib/challenges/types'
 interface ChallengeBarProps {
   codeA: string
   codeB: string
+  /** Display names for A/B (preferred over codename for visible text). */
+  nameA?: string
+  nameB?: string
   activeChallenge: ActiveChallenge | null
 }
 
@@ -43,8 +46,10 @@ function useCountdown(windowClose: string): string {
   return remaining
 }
 
-function ActiveState({ challenge, codeA, codeB }: { challenge: ActiveChallenge; codeA: string; codeB: string }) {
+function ActiveState({ challenge, codeA, codeB, nameA, nameB }: { challenge: ActiveChallenge; codeA: string; codeB: string; nameA?: string; nameB?: string }) {
   const countdown = useCountdown(challenge.window_close)
+  const dispA = nameA ?? codeA
+  const dispB = nameB ?? codeB
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4">
       <div className="flex items-center justify-between gap-3">
@@ -56,9 +61,9 @@ function ActiveState({ challenge, codeA, codeB }: { challenge: ActiveChallenge; 
         </span>
       </div>
       <p className="font-sans text-sm text-text-secondary leading-relaxed">
-        <span className="font-semibold text-text-primary">{codeA}</span>
+        <span className="font-semibold text-text-primary">{dispA}</span>
         {' vs '}
-        <span className="font-semibold text-text-primary">{codeB}</span>
+        <span className="font-semibold text-text-primary">{dispB}</span>
         {' · '}
         <span className="italic text-text-muted">{challenge.prompt_brief}</span>
       </p>
@@ -72,9 +77,11 @@ function ActiveState({ challenge, codeA, codeB }: { challenge: ActiveChallenge; 
   )
 }
 
-function CompleteState({ challenge, codeA, codeB }: { challenge: ActiveChallenge; codeA: string; codeB: string }) {
+function CompleteState({ challenge, codeA, codeB, nameA, nameB }: { challenge: ActiveChallenge; codeA: string; codeB: string; nameA?: string; nameB?: string }) {
   const aWon = challenge.winner_codename === codeA
   const bWon = challenge.winner_codename === codeB
+  const dispA = nameA ?? codeA
+  const dispB = nameB ?? codeB
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-bg-border bg-bg-surface p-4">
@@ -85,7 +92,7 @@ function CompleteState({ challenge, codeA, codeB }: { challenge: ActiveChallenge
       </div>
       <div className="grid grid-cols-3 items-center gap-2 font-mono text-sm">
         <div className={`text-right ${aWon ? 'text-gold font-bold' : 'text-text-secondary'}`}>
-          {codeA}
+          {dispA}
           {aWon && <span className="ml-1 text-[10px]">▲</span>}
           <div className="text-xs text-text-muted font-normal">
             {challenge.challenger_score?.toFixed(1) ?? '—'}
@@ -95,7 +102,7 @@ function CompleteState({ challenge, codeA, codeB }: { challenge: ActiveChallenge
           {challenge.margin != null ? `Δ${challenge.margin.toFixed(1)}` : 'vs'}
         </div>
         <div className={`text-left ${bWon ? 'text-gold font-bold' : 'text-text-secondary'}`}>
-          {codeB}
+          {dispB}
           {bWon && <span className="ml-1 text-[10px]">▲</span>}
           <div className="text-xs text-text-muted font-normal">
             {challenge.challenged_score?.toFixed(1) ?? '—'}
@@ -106,7 +113,7 @@ function CompleteState({ challenge, codeA, codeB }: { challenge: ActiveChallenge
   )
 }
 
-export function ChallengeBar({ codeA, codeB, activeChallenge }: ChallengeBarProps) {
+export function ChallengeBar({ codeA, codeB, nameA, nameB, activeChallenge }: ChallengeBarProps) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [newChallenge, setNewChallenge] = useState<ActiveChallenge | null>(null)
   const [errMsg, setErrMsg] = useState('')
@@ -149,13 +156,13 @@ export function ChallengeBar({ codeA, codeB, activeChallenge }: ChallengeBarProp
   }
 
   if (challenge?.status === 'active') {
-    return <ActiveState challenge={challenge} codeA={codeA} codeB={codeB} />
+    return <ActiveState challenge={challenge} codeA={codeA} codeB={codeB} nameA={nameA} nameB={nameB} />
   }
 
   if (challenge?.status === 'complete') {
     return (
       <div className="flex flex-col gap-3">
-        <CompleteState challenge={challenge} codeA={codeA} codeB={codeB} />
+        <CompleteState challenge={challenge} codeA={codeA} codeB={codeB} nameA={nameA} nameB={nameB} />
         <button
           onClick={onThrowDown}
           disabled={status === 'sending'}
@@ -169,12 +176,14 @@ export function ChallengeBar({ codeA, codeB, activeChallenge }: ChallengeBarProp
   }
 
   // No active challenge
+  const dispA = nameA ?? codeA
+  const dispB = nameB ?? codeB
   return (
     <div className="flex items-center gap-4 rounded-xl border border-bg-border bg-bg-surface px-4 py-3">
       <p className="font-sans text-sm text-text-muted flex-1">
         No active throw-down between{' '}
-        <span className="font-semibold text-text-primary">{codeA}</span> and{' '}
-        <span className="font-semibold text-text-primary">{codeB}</span>.
+        <span className="font-semibold text-text-primary">{dispA}</span> and{' '}
+        <span className="font-semibold text-text-primary">{dispB}</span>.
       </p>
       <button
         onClick={onThrowDown}

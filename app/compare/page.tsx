@@ -151,7 +151,7 @@ export default async function ComparePage({
     .sort((x, y) => x.label.localeCompare(y.label))
 
   const ThrowDownLine = GATE_CHALLENGES ? (
-    <ChallengeBar codeA={aCode} codeB={bCode} activeChallenge={activeChallenge} />
+    <ChallengeBar codeA={aCode} codeB={bCode} nameA={nameOf(rowA)} nameB={nameOf(rowB)} activeChallenge={activeChallenge} />
   ) : (
     <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
       <span className="font-mono text-xs text-text-muted">⚔ Throw-Downs</span>
