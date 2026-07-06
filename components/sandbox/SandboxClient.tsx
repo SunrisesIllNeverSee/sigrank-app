@@ -11,11 +11,11 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, Area, AreaChart,
 } from 'recharts'
 import { computeCascadeMetrics, fmt, type RawPillars } from '@/lib/cascade/metrics'
+import { CascadeGenome } from '@/components/sandbox/CascadeGenome'
 import type { SignalClass } from '@/components/sigrank/types'
 
 interface ScoreResponse {
@@ -215,16 +215,6 @@ export function SandboxClient() {
     URL.revokeObjectURL(url)
   }
 
-  const radarData = score
-    ? [
-        { metric: 'Comp', value: score.scores.comp, fullMark: 100 },
-        { metric: 'Depth', value: score.scores.sd, fullMark: 100 },
-        { metric: 'PC', value: score.scores.pc, fullMark: 100 },
-        { metric: 'Cross-T', value: score.scores.ct, fullMark: 100 },
-        { metric: 'Throughput', value: score.scores.tt, fullMark: 100 },
-      ]
-    : []
-
   const trajectoryData = history.map((h) => ({
     run: h.label,
     Υ: Math.round(h.cascade.yield_ * 100) / 100,
@@ -363,25 +353,17 @@ export function SandboxClient() {
             <MetricCard label="Efficiency" value={fmt(cascade.efficiency, { decimals: 2 })} />
           </div>
 
-          {/* Radar + Trajectory */}
+          {/* Cascade Genome + Trajectory */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {radarData.length > 0 && (
+            {score && (
               <div className="p-3 rounded-lg border border-[rgb(var(--bg-border))] bg-[rgb(var(--bg-surface))]">
-                <h4 className="text-xs uppercase tracking-wider text-[rgb(var(--text-muted))] mb-2">Core 5 Radar</h4>
-                <ResponsiveContainer width="100%" height={220}>
-                  <RadarChart data={radarData}>
-                    <PolarGrid stroke="rgb(var(--bg-border))" />
-                    <PolarAngleAxis dataKey="metric" tick={{ fill: 'rgb(var(--text-muted))', fontSize: 10 }} />
-                    <PolarRadiusAxis domain={[0, 100]} tick={{ fill: 'rgb(var(--text-dim))', fontSize: 8 }} />
-                    <Radar
-                      dataKey="value"
-                      stroke="rgb(var(--accent))"
-                      fill="rgb(var(--accent))"
-                      fillOpacity={0.3}
-                      strokeWidth={2}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
+                <h4 className="text-xs uppercase tracking-wider text-[rgb(var(--text-muted))] mb-2">Cascade Genome</h4>
+                <CascadeGenome
+                  scores={score.scores}
+                  classAverage={{ comp: 60, sd: 58, pc: 50, ct: 45, tt: 70 }}
+                  top1Percent={{ comp: 90, sd: 92, pc: 80, ct: 75, tt: 90 }}
+                  compact
+                />
               </div>
             )}
 
