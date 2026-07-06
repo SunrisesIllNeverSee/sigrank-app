@@ -13,3 +13,10 @@ paths = [
   '''\.env\.example$''',
   '''__tests__/fixtures/.*''',
 ]
+
+[[allowlists]]
+description = "IndexNow key is a public verification key, not a secret — it must be served publicly at /indexnow-key.txt for Bing/Yandex to verify site ownership"
+paths = [
+  '''app/indexnow-key\.txt/route\.ts''',
+  '''app/api/indexnow/route\.ts''',
+]
