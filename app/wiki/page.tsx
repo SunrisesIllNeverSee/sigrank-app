@@ -12,7 +12,7 @@
  *
  * RSC discipline: this is a SERVER component. It renders each topic's content
  * into nodes and passes them to the client TopicConsole; the only client islands
- * are WikiSignBar, PasteForm, and SubmitForm. Imports real components — never
+ * are WikiSignBar, ScorePasteCard, and SubmitForm. Imports real components — never
  * forks them. Inline literal markup is reproduced from the source pages (plain
  * markup, no logic). Draft-only: touches no live file.
  */
@@ -23,7 +23,7 @@ import { withOG } from '@/lib/seo'
 import { TOKEN_METRICS } from '@/lib/canon/ids'
 import { MCP_VERSION, PLATFORM_COUNT } from '@/lib/constants'
 import { ClassLadder } from '@/components/marketing/ClassLadder'
-import { PasteForm } from '@/components/submit/PasteForm'
+import { ScorePasteCard } from '@/components/score/ScorePasteCard'
 import { SubmitForm } from '@/components/submit/SubmitForm'
 
 import { WikiDoc, type WikiDocGroup } from '@/components/wiki/WikiDoc'
@@ -668,7 +668,7 @@ function PasteRunNumbers() {
           to the board.</span> When you&apos;re ready to land on the board, install the agent above.
         </p>
       </div>
-      <PasteForm />
+      <ScorePasteCard />
     </section>
   )
 }
