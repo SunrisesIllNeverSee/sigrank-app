@@ -37,14 +37,12 @@ ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS input_tokens          BIGI
 ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS output_tokens         BIGINT;
 ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS cache_creation_tokens BIGINT;
 ALTER TABLE metric_snapshots ADD COLUMN IF NOT EXISTS cache_read_tokens     BIGINT;
-
 -- snapshot_submissions — canonical, append-only, lossless replay layer.
 -- NOT NULL DEFAULT 0: every submission row carries real pillar values.
 ALTER TABLE snapshot_submissions ADD COLUMN IF NOT EXISTS input_tokens          BIGINT NOT NULL DEFAULT 0;
 ALTER TABLE snapshot_submissions ADD COLUMN IF NOT EXISTS output_tokens         BIGINT NOT NULL DEFAULT 0;
 ALTER TABLE snapshot_submissions ADD COLUMN IF NOT EXISTS cache_creation_tokens BIGINT NOT NULL DEFAULT 0;
 ALTER TABLE snapshot_submissions ADD COLUMN IF NOT EXISTS cache_read_tokens     BIGINT NOT NULL DEFAULT 0;
-
 -- DEFERRED -> 0006: a session_pillars table (per-session 4-pillar split +
 -- started_at/ended_at timestamps) for the PARKED Benford/Cadence battery
 -- (PARKED_EQUATIONS.md, post-launch). Not built now — per-session pillars can
@@ -54,4 +52,4 @@ ALTER TABLE snapshot_submissions ADD COLUMN IF NOT EXISTS cache_read_tokens     
 -- compression_ratio) are intentionally LEFT IN PLACE and nullable. Revisit any
 -- drop / Pro-move only in a separate, deliberate, non-additive migration once
 -- their formulas are ratified — never bundled with this pillar-storage fix.
--- ============================================================================
+-- ============================================================================;
