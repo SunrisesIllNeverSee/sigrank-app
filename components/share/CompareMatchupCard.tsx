@@ -224,9 +224,9 @@ function FactLine({ fact }: { fact: OperatorFact }) {
   const mark = fact.polarity === 'up' ? '✦' : fact.polarity === 'down' ? '△' : '·'
   const markColor = fact.polarity === 'up' ? C_GOLD : fact.polarity === 'down' ? C_DULL : '#4a6a4a'
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-      <span style={{ fontSize: 10, color: markColor, fontFamily: 'ui-monospace, monospace', flexShrink: 0 }}>{mark}</span>
-      <span style={{ fontSize: 11, fontFamily: 'ui-monospace, monospace', lineHeight: 1.4, minWidth: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+      <span style={{ fontSize: 9, color: markColor, fontFamily: 'ui-monospace, monospace', flexShrink: 0 }}>{mark}</span>
+      <span style={{ fontSize: 10, fontFamily: 'ui-monospace, monospace', lineHeight: 1.3, minWidth: 0 }}>
         <span style={{ fontWeight: 700, color: '#e9e3d5' }}>{fact.label}</span>
         <span style={{ color: '#7d7461' }}> · {fact.detail}</span>
       </span>
@@ -253,8 +253,8 @@ function Card({ cardRef, a, b, href }: {
   const factsA = deriveFacts(a, b)
   const factsB = deriveFacts(b, a)
 
-  const aNameSize = nameA.length <= 10 ? 28 : nameA.length <= 16 ? 22 : nameA.length <= 24 ? 18 : 16
-  const bNameSize = nameB.length <= 10 ? 28 : nameB.length <= 16 ? 22 : nameB.length <= 24 ? 18 : 16
+  const aNameSize = nameA.length <= 10 ? 22 : nameA.length <= 16 ? 18 : nameA.length <= 24 ? 15 : 13
+  const bNameSize = nameB.length <= 10 ? 22 : nameB.length <= 16 ? 18 : nameB.length <= 24 ? 15 : 13
 
   const rAxes = rawAxes(a, b)
   const mAxes = metricAxes(a, b)
@@ -273,9 +273,9 @@ function Card({ cardRef, a, b, href }: {
         overflow: 'hidden',
       }}
     >
-      {/* ═══ TOP — matchup on dark background (400px) ═══ */}
+      {/* ═══ TOP — matchup on dark background (300px = 1/3) ═══ */}
       <div style={{
-        height: 400, display: 'flex', flexDirection: 'column',
+        height: 300, display: 'flex', flexDirection: 'column',
         borderBottom: '1px solid #1a3a1a', boxSizing: 'border-box',
       }}>
         {/* header strip */}
@@ -292,28 +292,28 @@ function Card({ cardRef, a, b, href }: {
         <div style={{ flex: 1, display: 'flex', alignItems: 'stretch' }}>
           {/* A panel */}
           <div style={{
-            flex: 1, display: 'flex', gap: 16, padding: '16px 24px',
+            flex: 1, display: 'flex', gap: 12, padding: '10px 20px',
             background: winner === 'a'
               ? `linear-gradient(105deg, ${colA}22, transparent 72%)`
               : `linear-gradient(105deg, ${colA}11, transparent 72%)`,
           }}>
             {/* identity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 180, flexShrink: 0 }}>
-              <span style={{ fontSize: 28, color: colA, lineHeight: 1 }}>{glyphFor(clsA)}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 150, flexShrink: 0 }}>
+              <span style={{ fontSize: 22, color: colA, lineHeight: 1 }}>{glyphFor(clsA)}</span>
               <span style={{ fontSize: aNameSize, fontWeight: 900, color: '#e9e3d5', letterSpacing: 0.5, lineHeight: 1.1 }}>{nameA}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: colA, letterSpacing: 0.3 }}>{clsA} · #{a.global_rank}</span>
-              <span style={{ fontSize: 36, fontWeight: 800, color: C_GOLD, lineHeight: 1, marginTop: 4 }}>{yieldStr(a)}</span>
-              <span style={{ fontSize: 9, color: '#7d7461' }}>Υ YIELD</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: colA, letterSpacing: 0.3 }}>{clsA} · #{a.global_rank}</span>
+              <span style={{ fontSize: 28, fontWeight: 800, color: C_GOLD, lineHeight: 1, marginTop: 2 }}>{yieldStr(a)}</span>
+              <span style={{ fontSize: 8, color: '#7d7461' }}>Υ YIELD</span>
               {winner === 'a' && (
                 <span style={{
-                  marginTop: 4, fontSize: 9, fontWeight: 800, color: C_GOLD,
+                  marginTop: 3, fontSize: 8, fontWeight: 800, color: C_GOLD,
                   border: '1px solid ' + C_GOLD + '66', borderRadius: 999,
-                  padding: '2px 8px', letterSpacing: 1, textTransform: 'uppercase', alignSelf: 'flex-start',
+                  padding: '1px 6px', letterSpacing: 1, textTransform: 'uppercase', alignSelf: 'flex-start',
                 }}>◆ Leads {aWins}–{bWins}</span>
               )}
             </div>
             {/* facts */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center', minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center', minWidth: 0, flex: 1 }}>
               {factsA.map((f, i) => <FactLine key={i} fact={f} />)}
             </div>
           </div>
@@ -321,25 +321,25 @@ function Card({ cardRef, a, b, href }: {
           {/* VS divider */}
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: 4, padding: '0 12px', flexShrink: 0,
+            gap: 3, padding: '0 10px', flexShrink: 0,
           }}>
-            <span style={{ fontSize: 28, fontWeight: 900, color: '#7d7461', letterSpacing: 4 }}>VS</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#4a6a4a', fontVariantNumeric: 'tabular-nums' }}>{aWins}–{bWins}</span>
+            <span style={{ fontSize: 22, fontWeight: 900, color: '#7d7461', letterSpacing: 4 }}>VS</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#4a6a4a', fontVariantNumeric: 'tabular-nums' }}>{aWins}–{bWins}</span>
           </div>
 
           {/* B panel */}
           <div style={{
-            flex: 1, display: 'flex', gap: 16, padding: '16px 24px',
+            flex: 1, display: 'flex', gap: 12, padding: '10px 20px',
             background: winner === 'b'
               ? `linear-gradient(255deg, ${colB}22, transparent 72%)`
               : `linear-gradient(255deg, ${colB}11, transparent 72%)`,
           }}>
             {/* facts (left for B, mirrored) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center', minWidth: 0, flex: 1, alignItems: 'flex-end', textAlign: 'right' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center', minWidth: 0, flex: 1, alignItems: 'flex-end', textAlign: 'right' }}>
               {factsB.map((f, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexDirection: 'row-reverse' }}>
-                  <span style={{ fontSize: 10, color: f.polarity === 'up' ? C_GOLD : f.polarity === 'down' ? C_DULL : '#4a6a4a', fontFamily: 'ui-monospace, monospace', flexShrink: 0 }}>{f.polarity === 'up' ? '✦' : f.polarity === 'down' ? '△' : '·'}</span>
-                  <span style={{ fontSize: 11, fontFamily: 'ui-monospace, monospace', lineHeight: 1.4, minWidth: 0 }}>
+                  <span style={{ fontSize: 9, color: f.polarity === 'up' ? C_GOLD : f.polarity === 'down' ? C_DULL : '#4a6a4a', fontFamily: 'ui-monospace, monospace', flexShrink: 0 }}>{f.polarity === 'up' ? '✦' : f.polarity === 'down' ? '△' : '·'}</span>
+                  <span style={{ fontSize: 10, fontFamily: 'ui-monospace, monospace', lineHeight: 1.3, minWidth: 0 }}>
                     <span style={{ fontWeight: 700, color: '#e9e3d5' }}>{f.label}</span>
                     <span style={{ color: '#7d7461' }}> · {f.detail}</span>
                   </span>
@@ -347,17 +347,17 @@ function Card({ cardRef, a, b, href }: {
               ))}
             </div>
             {/* identity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 180, flexShrink: 0, alignItems: 'flex-end', textAlign: 'right' }}>
-              <span style={{ fontSize: 28, color: colB, lineHeight: 1 }}>{glyphFor(clsB)}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 150, flexShrink: 0, alignItems: 'flex-end', textAlign: 'right' }}>
+              <span style={{ fontSize: 22, color: colB, lineHeight: 1 }}>{glyphFor(clsB)}</span>
               <span style={{ fontSize: bNameSize, fontWeight: 900, color: '#e9e3d5', letterSpacing: 0.5, lineHeight: 1.1 }}>{nameB}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: colB, letterSpacing: 0.3 }}>{clsB} · #{b.global_rank}</span>
-              <span style={{ fontSize: 36, fontWeight: 800, color: C_GOLD, lineHeight: 1, marginTop: 4 }}>{yieldStr(b)}</span>
-              <span style={{ fontSize: 9, color: '#7d7461' }}>Υ YIELD</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: colB, letterSpacing: 0.3 }}>{clsB} · #{b.global_rank}</span>
+              <span style={{ fontSize: 28, fontWeight: 800, color: C_GOLD, lineHeight: 1, marginTop: 2 }}>{yieldStr(b)}</span>
+              <span style={{ fontSize: 8, color: '#7d7461' }}>Υ YIELD</span>
               {winner === 'b' && (
                 <span style={{
-                  marginTop: 4, fontSize: 9, fontWeight: 800, color: C_GOLD,
+                  marginTop: 3, fontSize: 8, fontWeight: 800, color: C_GOLD,
                   border: '1px solid ' + C_GOLD + '66', borderRadius: 999,
-                  padding: '2px 8px', letterSpacing: 1, textTransform: 'uppercase',
+                  padding: '1px 6px', letterSpacing: 1, textTransform: 'uppercase',
                 }}>◆ Leads {bWins}–{aWins}</span>
               )}
             </div>
@@ -365,9 +365,9 @@ function Card({ cardRef, a, b, href }: {
         </div>
       </div>
 
-      {/* ═══ BOTTOM — dual radars on terminal black (500px) ═══ */}
+      {/* ═══ BOTTOM — dual radars on terminal black (600px = 2/3) ═══ */}
       <div style={{
-        height: 500, background: INK, display: 'flex', flexDirection: 'column',
+        height: 600, background: INK, display: 'flex', flexDirection: 'column',
         position: 'relative', overflow: 'hidden', boxSizing: 'border-box',
       }}>
         {/* CRT scanlines */}
@@ -391,8 +391,8 @@ function Card({ cardRef, a, b, href }: {
           flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-around',
           position: 'relative', zIndex: 2, padding: '0 20px',
         }}>
-          <CardRadar axes={rAxes} aColor={A_COLOR} bColor={B_COLOR} size={380} />
-          <CardRadar axes={mAxes} aColor={A_COLOR} bColor={B_COLOR} size={380} />
+          <CardRadar axes={rAxes} aColor={A_COLOR} bColor={B_COLOR} size={460} />
+          <CardRadar axes={mAxes} aColor={A_COLOR} bColor={B_COLOR} size={460} />
         </div>
 
         {/* footer */}
