@@ -474,10 +474,11 @@ function Card({ cardRef, a, b, href }: {
           <span style={{ color: C_GOLD }}>{bWins} WINS</span>
         </div>
         <div style={{
-          textAlign: 'center', fontSize: 9, color: '#3a5a3a', letterSpacing: 1,
-          paddingBottom: 8, position: 'relative', zIndex: 2,
+          textAlign: 'center', fontSize: 11, color: C_GREEN, letterSpacing: 1,
+          paddingBottom: 10, position: 'relative', zIndex: 2,
+          textShadow: '0 0 8px rgba(138,232,154,0.4)',
         }}>
-          signalaf.com/compare{href.replace(/.*\?/, '?')}
+          ▸ CLAIM YOUR SCORE AT SIGNALAF.COM ▸
         </div>
       </div>
     </div>
