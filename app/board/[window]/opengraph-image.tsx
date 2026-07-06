@@ -7,8 +7,6 @@
  */
 
 import { ImageResponse } from 'next/og'
-import { getLeaderboard } from '@/lib/data'
-import { toEntry } from '@/lib/leaderboard/to-entry'
 import { boardWindowBySlug } from '@/lib/data/windows'
 
 export const size = { width: 1200, height: 630 }
