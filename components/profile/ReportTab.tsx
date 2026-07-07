@@ -17,6 +17,8 @@ import { DnaCard } from './DnaCard'
  * Privacy: the Report tab is opt-in, off by default. When report_visible=false,
  * only the operator sees their own Report tab (when logged in). Visitors see
  * Stats / Submissions / Social only — no Report tab.
+ *
+ * Owner sees a privacy toggle that POSTs to /api/profile/report-visibility.
  */
 export function ReportTab({
   report,
@@ -26,6 +28,30 @@ export function ReportTab({
   isOwner: boolean
 }) {
   const [visible, setVisible] = useState(report?.report_visible ?? false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function toggleVisibility() {
+    const next = !visible
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/profile/report-visibility', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visible: next }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.reason || `http_${res.status}`)
+      }
+      setVisible(next)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'failed')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   if (!report) {
     return (
@@ -52,13 +78,17 @@ export function ReportTab({
     <div className="flex flex-col gap-4">
       {/* Privacy toggle (owner only) */}
       {isOwner && (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-3">
+          {error && (
+            <span className="font-mono text-xs text-red-400">Failed: {error}</span>
+          )}
           <button
             type="button"
-            onClick={() => setVisible(!visible)}
-            className="font-mono text-xs uppercase tracking-[0.06em] text-text-muted hover:text-text-secondary transition-colors"
+            onClick={toggleVisibility}
+            disabled={saving}
+            className="font-mono text-xs uppercase tracking-[0.06em] text-text-muted hover:text-text-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {visible ? 'Make private 🔒' : 'Make public ◐'}
+            {saving ? 'Saving…' : visible ? 'Make private 🔒' : 'Make public ◐'}
           </button>
         </div>
       )}

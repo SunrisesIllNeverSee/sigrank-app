@@ -21,6 +21,7 @@ import { notFound } from 'next/navigation'
 
 import { getLeaderboard, getOperator, getOperatorHistory, getOperatorSubmissions, getOperatorReport } from '@/lib/data'
 import { computeFieldAverages } from '@/lib/data/field-average'
+import { getSessionOperator } from '@/lib/supabase/auth-server'
 import { decodeCodename } from '@/lib/route-params'
 import { withOG } from '@/lib/seo'
 import type { Operator } from '@/lib/scoring/types'
@@ -124,6 +125,11 @@ export default async function OperatorProfilePage({
   // Cascade Report System Phase 1: fetch the operator's latest report block.
   // Returns null if no report exists (operator hasn't submitted with sigrank@0.16.0+).
   const operatorReport = await getOperatorReport(operator.operator_id)
+
+  // Owner check: is the signed-in user viewing their own profile?
+  // Used to show the privacy toggle on the Report tab and interactive sliders on the Lab tab.
+  const session = await getSessionOperator()
+  const isOwner = !!(session && session.codename === operator.codename)
 
   const topPct = Math.max(0, 100 - row.percentile)
 
@@ -506,7 +512,7 @@ export default async function OperatorProfilePage({
         report={
           <ReportTab
             report={operatorReport}
-            isOwner={false}
+            isOwner={isOwner}
           />
         }
         lab={
@@ -518,7 +524,7 @@ export default async function OperatorProfilePage({
                 cacheCreate: telemetry.cache_create,
                 cacheRead: telemetry.cache_read,
               }}
-              isOwner={false}
+              isOwner={isOwner}
             />
           ) : undefined
         }

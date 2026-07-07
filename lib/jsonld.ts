@@ -514,7 +514,7 @@ export function cliTool() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'macOS, Linux',
     runtimePlatform: 'Node.js >= 18',
-    softwareVersion: '0.14.3',
+    softwareVersion: '0.16.0',
     offers: {
       '@type': 'Offer',
       price: '0',
