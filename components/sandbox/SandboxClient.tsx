@@ -80,7 +80,7 @@ const PILLAR_PRESETS: Record<string, { pillars: RawPillars; sessions: number; tu
 }
 
 function Slider({
-  label, value, onChange, min, max, step, format, accent,
+  label, value, onChange, min, max, step, format, accent, disabled,
 }: {
   label: string
   value: number
@@ -90,6 +90,7 @@ function Slider({
   step: number
   format: (v: number) => string
   accent?: string
+  disabled?: boolean
 }) {
   return (
     <div className="flex flex-col gap-1">
@@ -105,8 +106,9 @@ function Slider({
         max={max}
         step={step}
         value={value}
+        disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1.5 appearance-none rounded-full bg-[rgb(var(--bg-border))] cursor-pointer
+        className="w-full h-1.5 appearance-none rounded-full bg-[rgb(var(--bg-border))] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5
                    [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[rgb(var(--accent))]
                    [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform
@@ -135,8 +137,14 @@ function MetricCard({
   )
 }
 
-export function SandboxClient() {
-  const [pillars, setPillars] = useState<RawPillars>(PILLAR_PRESETS.moses.pillars)
+export function SandboxClient({
+  initialPillars,
+  readOnly = false,
+}: {
+  initialPillars?: RawPillars
+  readOnly?: boolean
+} = {}) {
+  const [pillars, setPillars] = useState<RawPillars>(initialPillars ?? PILLAR_PRESETS.moses.pillars)
   const [sessions, setSessions] = useState(PILLAR_PRESETS.moses.sessions)
   const [turns, setTurns] = useState(PILLAR_PRESETS.moses.turns)
   const [lifetime, setLifetime] = useState(50_000)
@@ -144,7 +152,7 @@ export function SandboxClient() {
   const [score, setScore] = useState<ScoreResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState<HistoryEntry[]>([])
-  const [activePreset, setActivePreset] = useState('moses')
+  const [activePreset, setActivePreset] = useState(initialPillars ? 'custom' : 'moses')
   const historyId = useRef(0)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -254,24 +262,28 @@ export function SandboxClient() {
             onChange={(v) => { setPillars((p) => ({ ...p, input: v })); setActivePreset('') }}
             min={0} max={10_000_000} step={50_000}
             format={(v) => fmt(v, { compact: true, decimals: 1 })}
+            disabled={readOnly}
           />
           <Slider
             label="Output" value={pillars.output}
             onChange={(v) => { setPillars((p) => ({ ...p, output: v })); setActivePreset('') }}
             min={0} max={20_000_000} step={50_000}
             format={(v) => fmt(v, { compact: true, decimals: 1 })}
+            disabled={readOnly}
           />
           <Slider
             label="Cache Create" value={pillars.cacheCreate}
             onChange={(v) => { setPillars((p) => ({ ...p, cacheCreate: v })); setActivePreset('') }}
             min={0} max={200_000_000} step={500_000}
             format={(v) => fmt(v, { compact: true, decimals: 1 })}
+            disabled={readOnly}
           />
           <Slider
             label="Cache Read" value={pillars.cacheRead}
             onChange={(v) => { setPillars((p) => ({ ...p, cacheRead: v })); setActivePreset('') }}
             min={0} max={4_000_000_000} step={10_000_000}
             format={(v) => fmt(v, { compact: true, decimals: 1 })}
+            disabled={readOnly}
           />
 
           <div className="h-px bg-[rgb(var(--bg-border))] my-1" />
