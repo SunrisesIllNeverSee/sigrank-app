@@ -1,5 +1,48 @@
 # Changelog
 
+## [0.5.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.4.0...v0.5.0) (2026-07-07)
+
+
+### Features
+
+* Cascade Report System Phase 1 — profile Report + Lab tabs, badges, DNA, health score ([e006019](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e00601988d8c749816e9c9c807ebe37a60813125))
+* **compare:** add CompareMatchupCard — matchup + dual radars social card ([a5c14dc](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a5c14dc882c3e2b129427b51acfb8c5847db8d01))
+* **compare:** add field baseline to overtime chart ([bf92ef6](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/bf92ef617ad034a80fa0b3de77c530b71d37eeb5))
+* **compare:** add overtime SIGNA RATE comparison chart ([dfb1bc0](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/dfb1bc0ab8e88946a589a145798ef0bce2ceb66c))
+* **compare:** redesign overtime chart with demo-inspired polish ([e7c3844](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e7c3844a937e10a0939ccd128781ace6cf1f6371))
+* **compare:** switch overtime chart from SIGNA RATE to Υ Yield ([297e88a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/297e88ad8afe174c4c6bce55f48cc6d6195418ef))
+* **wiki:** TOC nav + scrolling doc + standing-on-shoulders ([a1d0991](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a1d0991833efb29228904519775bb507a41cd73d))
+
+
+### Bug Fixes
+
+* **compare:** adjust matchup card to 1/3 matchup + 2/3 radars ([d1e85f2](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/d1e85f28898b650de6b5dbab944e09e6774fd058))
+* **compare:** bigger header title + VS, add divider between sections ([124768f](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/124768f7060d7040774716d2633d2bc1ab513b9d))
+* **compare:** limit matchup card to 3 insights per operator ([a933ebb](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a933ebb6dd056792ac8ceb165498445d660e0121))
+* **compare:** make matchup card panels symmetric ([539b8d5](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/539b8d5b34ae8539b047f3ad3c69e6c9bd051f2a))
+* **compare:** match site CascadeRadar styling + fill matchup space ([f950010](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/f950010d1b320da4ba6ddee71e3c9dd094cddc49))
+* **compare:** move operator names to header, center identity boxes ([baea839](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/baea8398bb84b35d95af133813580f08b5769aa0))
+* **compare:** move radars above share card ([a7ebdc1](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a7ebdc14b9b93560bd1618adad677c8fb8bbc8c8))
+* **compare:** replace URL footer with CTA to claim score ([9e22a9c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/9e22a9cf04fc38bb910eb9dccca1714ab091408a))
+* **compare:** show display names in ChallengeBar, not codenames ([a8061bf](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a8061bf6d5c086c85a470543ec34fae4f451b745))
+* **compare:** vertically center identity blocks to match facts ([032c3c4](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/032c3c4c688c02a9de6b7626e75bb1a106e39dc2))
+* **hall:** show display_name instead of codename for claimed operators ([d74345a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/d74345a6198911e12d26caba50cb541eb59ec709))
+* landing page — remove fake `sigrank me` command + update MCP info ([a64cbbc](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a64cbbc6f3e0c7876cc46c2f3bdb2694299a6b96))
+* **migration 0026:** correct FK column names — operator_id/submission_id, not id ([b8bf65b](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b8bf65b6bf6f71ae7f4bcaed3b0df308fad3d322))
+* **migration 0026:** correct FK table name — snapshot_submissions, not submissions ([03a1cbb](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/03a1cbb82c8b7d88b00d591f14928882159db680))
+* **migration 0026:** make idempotent — DROP IF EXISTS before CREATE policies/trigger ([b4ad7d4](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b4ad7d4bba64014935e75a110c3a82ca53377d97))
+* **profile:** add Preview button to SplitFlapCard + fix header dead space ([89722fd](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/89722fdf1b2eaa6f7c3c56930cec6e77fef97fee))
+* **profile:** remove outdated ProfileShareCard from user header ([7efc128](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7efc1289a1fff2e190e9f4e4e7abef0dc09eb9d3))
+* prune codenames from all user-facing display surfaces ([53b18ab](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/53b18abcd746bc8f8ee99428f5f5ca23be82dca3))
+* refresh stale terminal mockup + screenshots to match live board ([e5fe382](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e5fe3829eff0d0614bdf0de68933135f1a13322a))
+* **supabase:** pull remote migrations into local repo ([85f5da7](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/85f5da75246918232f08f42d75d0cb692e6b9746))
+* wire privacy toggle to API + owner-aware Report/Lab tabs + MCP_VERSION 0.16.0 ([c3facb1](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c3facb15a1189ca4ca41cbcca417a104b59b334e))
+
+
+### Reverts
+
+* keep The Field on the ranked board (owner decision) ([ba791b7](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/ba791b7c2542d2be9340ae25b95dad3c50e9e555))
+
 ## [0.4.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.3.1...v0.4.0) (2026-07-06)
 
 
