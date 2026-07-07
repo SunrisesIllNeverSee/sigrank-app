@@ -41,6 +41,7 @@ import {
   getOnlineHourly as _getOnlineHourly,
   getOnlineWeekly as _getOnlineWeekly,
   getOnlineByCountry as _getOnlineByCountry,
+  getOperatorReport as _getOperatorReport,
 } from '@/lib/data/queries'
 
 import type {
@@ -54,7 +55,7 @@ import type {
   HistoryPoint,
 } from '@/lib/data/types'
 import type { BoardParams, HistoryParams } from '@/lib/data/mappers'
-import type { OperatorSubmission } from '@/lib/data/queries'
+import type { OperatorSubmission, OperatorReport } from '@/lib/data/queries'
 
 // ── Board-tagged reads (revalidate: 300s) ────────────────────────────────
 
@@ -126,6 +127,12 @@ export const getOperatorHistory = unstable_cache(
   { revalidate: 120, tags: ['operator'] },
 )
 
+export const getOperatorReport = unstable_cache(
+  _getOperatorReport,
+  ['operator-report'],
+  { revalidate: 120, tags: ['operator'] },
+)
+
 // ── Re-export types so consumers importing from @/lib/data still see them ──
 export type {
   LeaderboardRow,
@@ -139,3 +146,4 @@ export type {
 }
 export type { BoardParams, HistoryParams }
 export type { OperatorSubmission }
+export type { OperatorReport }
