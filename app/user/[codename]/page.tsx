@@ -19,7 +19,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { getLeaderboard, getOperator, getOperatorHistory, getOperatorSubmissions } from '@/lib/data'
+import { getLeaderboard, getOperator, getOperatorHistory, getOperatorSubmissions, getOperatorReport } from '@/lib/data'
 import { computeFieldAverages } from '@/lib/data/field-average'
 import { decodeCodename } from '@/lib/route-params'
 import { withOG } from '@/lib/seo'
@@ -30,6 +30,8 @@ import { CanonId } from '@/components/ui/CanonId'
 import { CascadePanel } from '@/components/profile/CascadePanel'
 import { SubmissionsGrid } from '@/components/profile/SubmissionsGrid'
 import { ProfileTabs } from '@/components/profile/ProfileTabs'
+import { ReportTab } from '@/components/profile/ReportTab'
+import { LabTab } from '@/components/profile/LabTab'
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal'
 import { SplitFlapCard } from '@/components/signature/SplitFlapCard'
 import { ClaimedBadge } from '@/components/claim/ClaimedBadge'
@@ -119,6 +121,9 @@ export default async function OperatorProfilePage({
   const history = await getOperatorHistory(codename)
   // FIX I3: every (platform × window) submission for the Submissions-tab grid.
   const submissions = await getOperatorSubmissions(codename)
+  // Cascade Report System Phase 1: fetch the operator's latest report block.
+  // Returns null if no report exists (operator hasn't submitted with sigrank@0.16.0+).
+  const operatorReport = await getOperatorReport(operator.operator_id)
 
   const topPct = Math.max(0, 100 - row.percentile)
 
@@ -498,6 +503,25 @@ export default async function OperatorProfilePage({
 
       <ProfileTabs
         stats={pending ? pendingPanel : rankedStatsPanel}
+        report={
+          <ReportTab
+            report={operatorReport}
+            isOwner={false}
+          />
+        }
+        lab={
+          ranked && c ? (
+            <LabTab
+              pillars={{
+                input: telemetry.fresh_input,
+                output: telemetry.output,
+                cacheCreate: telemetry.cache_create,
+                cacheRead: telemetry.cache_read,
+              }}
+              isOwner={false}
+            />
+          ) : undefined
+        }
         submissions={submissionsPanel}
         social={socialPanel}
       />

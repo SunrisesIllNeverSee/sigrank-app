@@ -40,11 +40,13 @@ export {
   getOnlineHourly,
   getOnlineWeekly,
   getOnlineByCountry,
+  getOperatorReport,
 } from '@/lib/data/cached'
 
 // Writes are NOT cached — re-export directly from queries.
 export { bumpComparisonsRan } from '@/lib/data/queries'
 export type { OperatorSubmission } from '@/lib/data/queries'
+export type { OperatorReport } from '@/lib/data/queries'
 
 // Re-export the row/record types from the neutral types module (extracted from
 // mock.ts 2026-06-26) so feature builders import data + types from this facade.

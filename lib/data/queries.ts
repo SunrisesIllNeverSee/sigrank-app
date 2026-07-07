@@ -833,3 +833,57 @@ export async function getOnlineWeekly(): Promise<WeeklyPoint[]> {
 export async function getOnlineByCountry(): Promise<CountryCount[]> {
   return MOCK_COUNTRIES
 }
+
+/**
+ * OperatorReport — the cascade report block from the MCP submission.
+ * Computed locally in the MCP (mode detection + badges + health score),
+ * submitted alongside the 4 token pillars, stored as-is in operator_reports.
+ */
+export interface OperatorReport {
+  report: {
+    current_mode: string
+    mode_confidence: number
+    mode_distribution: Record<string, number>
+    mode_weighted_yield: number
+    peak_yield: number
+    health_score: number
+    weekly_snapshots?: Array<{
+      weekStart: string
+      pillars: { input: number; output: number; cacheCreate: number; cacheRead: number }
+      yield: number
+      mode: string
+      mode_confidence: number
+      dayCount: number
+    }>
+    badges: {
+      earned_this_week: string[]
+      in_progress: Array<{ id: string; label: string; icon: string; progress: number; target: number; display: string }>
+      collection: string[]
+    }
+  }
+  report_visible: boolean
+  created_at: string
+}
+
+/**
+ * getOperatorReport — fetch the latest cascade report for an operator.
+ * Returns null if no report exists (operator hasn't submitted with the new MCP yet).
+ * The report_visible flag controls whether visitors can see the full Report tab.
+ */
+export async function getOperatorReport(operatorId: string): Promise<OperatorReport | null> {
+  const sb = getSupabaseServer()
+  if (!sb) return null
+  try {
+    const { data, error } = await sb
+      .from('operator_reports')
+      .select('report, report_visible, created_at')
+      .eq('operator_id', operatorId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (error) throw error
+    return data as unknown as OperatorReport | null
+  } catch {
+    return null
+  }
+}
