@@ -1,11 +1,58 @@
 import React from 'react'
 import Link from 'next/link'
 
-// ITEM 3 (owner 2026-06-22): general footer nav cleared — "clear out the nav in the footer, I'm
-// going to redo it later." The general nav stays deferred to that redesign. The LEGAL links
-// (About/Privacy/Terms) in the legal row below are added separately (2026-06-25, launch/compliance)
-// so the Privacy/Terms sections on /about are discoverable site-wide — not part of the cleared nav.
-const FOOTER_LINKS: { href: string; label: string }[] = []
+/**
+ * Footer link categories — SEO content discoverability (2026-07-07).
+ * Each category links to the pages built in the SEO expansion.
+ * Kept compact: 3-4 links per column, small text, hover to primary.
+ */
+const FOOTER_COLUMNS: { heading: string; links: { href: string; label: string }[] }[] = [
+  {
+    heading: 'Metrics',
+    links: [
+      { href: '/metrics/yield-cascade', label: 'Yield (Υ)' },
+      { href: '/metrics/cache-hit-rate', label: 'Cache Hit Rate' },
+      { href: '/metrics/compression-ratio', label: 'Compression Ratio' },
+      { href: '/metrics/leverage', label: 'Leverage' },
+    ],
+  },
+  {
+    heading: 'Guides',
+    links: [
+      { href: '/guides/how-to-measure-ai-coding-efficiency', label: 'Measure AI Coding Efficiency' },
+      { href: '/guides/how-to-improve-your-yield', label: 'Improve Your Yield' },
+      { href: '/guides/how-to-reduce-token-waste', label: 'Reduce Token Waste' },
+      { href: '/guides/how-to-read-your-cascade', label: 'Read Your Cascade' },
+    ],
+  },
+  {
+    heading: 'Tools',
+    links: [
+      { href: '/tools/yield-calculator', label: 'Yield Calculator' },
+      { href: '/tools/cascade-comparator', label: 'Cascade Comparator' },
+      { href: '/tools/operator-class-checker', label: 'Class Checker' },
+      { href: '/tools/token-waste-calculator', label: 'Token Waste Calculator' },
+    ],
+  },
+  {
+    heading: 'Compare',
+    links: [
+      { href: '/vs/ccusage', label: 'vs ccusage' },
+      { href: '/vs/wakatime', label: 'vs WakaTime' },
+      { href: '/vs/lmsys-arena', label: 'vs LMSYS Arena' },
+      { href: '/vs/cursor', label: 'vs Cursor' },
+    ],
+  },
+  {
+    heading: 'Explore',
+    links: [
+      { href: '/alternatives/ai-coding-metrics', label: 'AI Coding Metrics Tools' },
+      { href: '/alternatives/ccusage-alternatives', label: 'ccusage Alternatives' },
+      { href: '/blog/best-ai-coding-tools-2026', label: 'Best AI Coding Tools 2026' },
+      { href: '/token-telemetry', label: 'Token Telemetry' },
+    ],
+  },
+]
 
 /**
  * Site footer chrome. Server component.
@@ -14,12 +61,15 @@ const FOOTER_LINKS: { href: string; label: string }[] = []
  * version stacked two bordered rows that each re-stated the brand + a competing
  * tagline, so it read as two footers. Merged into a single bar: brand + nav on top,
  * one thin legal/privacy line below — no duplicate SIGRANK, no competing taglines.
+ *
+ * SEO link columns added 2026-07-07 — makes the 34 new content pages discoverable
+ * from every page on the site (internal linking is a top SEO ranking factor).
  */
 export function Footer() {
   return (
     <footer className="mt-16 w-full border-t border-bg-border bg-bg-surface">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
-        {/* Brand + nav */}
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8">
+        {/* Brand + CLI */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <span className="font-mono text-base text-accent">◈</span>
@@ -27,30 +77,36 @@ export function Footer() {
               SIGRANK
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Run the local agent — the CLI is always one line away, site-wide
-                (owner 2026-06-24). */}
-            <code className="rounded-md border border-bg-border bg-bg-elevated px-3 py-1.5 font-mono text-xs text-text-secondary">
-              <span className="text-text-muted">$ </span>
-              <span className="text-gold">npx sigrank</span>
-            </code>
-            {FOOTER_LINKS.length > 0 && (
-              <ul className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
-                {FOOTER_LINKS.map((l) => (
+          <code className="rounded-md border border-bg-border bg-bg-elevated px-3 py-1.5 font-mono text-xs text-text-secondary">
+            <span className="text-text-muted">$ </span>
+            <span className="text-gold">npx sigrank</span>
+          </code>
+        </div>
+
+        {/* SEO link columns */}
+        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-3 lg:grid-cols-5">
+          {FOOTER_COLUMNS.map((col) => (
+            <div key={col.heading} className="flex flex-col gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                {col.heading}
+              </p>
+              <ul className="flex flex-col gap-1.5">
+                {col.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="transition-colors hover:text-text-primary">
+                    <Link
+                      href={l.href}
+                      className="text-[11px] text-text-muted transition-colors hover:text-text-primary"
+                    >
                       {l.label}
                     </Link>
                   </li>
                 ))}
               </ul>
-            )}
-          </div>
+            </div>
+          ))}
         </div>
 
-        {/* Legal links (2026-06-25, launch/compliance — Privacy/Terms discoverability)
-            + one legal/privacy line: powered-by · copyright · counts-not-content stance
-            (owner 2026-06-19, ccusage "stays local" spirit). */}
+        {/* Legal links + one legal/privacy line */}
         <div className="flex flex-col gap-2 border-t border-bg-border pt-4">
           <nav
             aria-label="Legal"
