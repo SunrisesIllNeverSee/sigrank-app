@@ -7,6 +7,8 @@
 -- Privacy: report_visible defaults to FALSE. Only the operator sees their own
 -- report when logged in. Visitors see Layer 1 only (yield, class, badges).
 -- The operator can flip report_visible to TRUE to share the full Report tab.
+--
+-- Idempotent: safe to re-run (DROP IF EXISTS before CREATE for policies/trigger).
 
 CREATE TABLE IF NOT EXISTS operator_reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -25,6 +27,11 @@ CREATE INDEX IF NOT EXISTS idx_operator_reports_operator_id
 -- RLS: server-only writes (MCP submit uses service role key).
 -- Public reads only when report_visible = true.
 ALTER TABLE operator_reports ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if re-running (idempotent)
+DROP POLICY IF EXISTS "public reads visible reports" ON operator_reports;
+DROP POLICY IF EXISTS "server writes reports" ON operator_reports;
+DROP POLICY IF EXISTS "server updates reports" ON operator_reports;
 
 -- Public reads: only visible reports (report_visible = true)
 CREATE POLICY "public reads visible reports" ON operator_reports
@@ -47,6 +54,9 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Drop existing trigger if re-running (idempotent)
+DROP TRIGGER IF EXISTS update_operator_reports_updated_at ON operator_reports;
 
 CREATE TRIGGER update_operator_reports_updated_at
   BEFORE UPDATE ON operator_reports
