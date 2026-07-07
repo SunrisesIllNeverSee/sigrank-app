@@ -10,8 +10,8 @@
 
 CREATE TABLE IF NOT EXISTS operator_reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  operator_id UUID REFERENCES operators(id) ON DELETE CASCADE,
-  submission_id UUID REFERENCES snapshot_submissions(id) ON DELETE CASCADE,
+  operator_id UUID REFERENCES operators(operator_id) ON DELETE CASCADE,
+  submission_id UUID REFERENCES snapshot_submissions(submission_id) ON DELETE CASCADE,
   report JSONB NOT NULL,                  -- the full report block from the MCP
   report_visible BOOLEAN DEFAULT FALSE,   -- privacy toggle (off by default)
   created_at TIMESTAMPTZ DEFAULT now(),
