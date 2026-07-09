@@ -8,7 +8,7 @@
  */
 
 import type { Metadata } from 'next'
-import { withOG } from '@/lib/seo'
+import { withOG, SITE_ORIGIN } from '@/lib/seo'
 
 import { headers } from 'next/headers'
 import { getLeaderboard, getOperator, getOperatorHistory, type LeaderboardRow } from '@/lib/data'
@@ -26,6 +26,7 @@ import { CompareHistoryChart } from '@/components/compare/CompareHistoryChart'
 // Superseded: CompareVersus, CompareBars, CompareTable, CompareTitleCard (files retained,
 // just unmounted — not archived).
 import { ChallengeBar } from '@/components/compare/ChallengeBar'
+import { ChallengeOnX } from '@/components/compare/ChallengeOnX'
 import { getChallengeBetween } from '@/lib/challenges/server'
 import { GATE_CHALLENGES } from '@/lib/features'
 import { CompareShareCard, type CompareOperand } from '@/components/share/CompareShareCard'
@@ -171,14 +172,32 @@ export default async function ComparePage({
     .map((r) => ({ codename: r.operator.codename, label: nameOf(r) }))
     .sort((x, y) => x.label.localeCompare(y.label))
 
+  const compareUrl = `${SITE_ORIGIN}/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`
+
   const ThrowDownLine = GATE_CHALLENGES ? (
-    <ChallengeBar codeA={aCode} codeB={bCode} nameA={nameOf(rowA)} nameB={nameOf(rowB)} activeChallenge={activeChallenge} />
+    <div className="flex flex-wrap items-center gap-3">
+      <ChallengeBar codeA={aCode} codeB={bCode} nameA={nameOf(rowA)} nameB={nameOf(rowB)} activeChallenge={activeChallenge} />
+      <ChallengeOnX
+        nameA={nameOf(rowA)}
+        nameB={nameOf(rowB)}
+        xA={rowA.operator.links?.x}
+        xB={rowB.operator.links?.x}
+        compareUrl={compareUrl}
+      />
+    </div>
   ) : (
-    <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
       <span className="font-mono text-xs text-text-muted">⚔ Throw-Downs</span>
       <span className="rounded-full border border-bg-border px-2.5 py-0.5 font-mono text-[10px] text-text-muted">
         Coming soon
       </span>
+      <ChallengeOnX
+        nameA={nameOf(rowA)}
+        nameB={nameOf(rowB)}
+        xA={rowA.operator.links?.x}
+        xB={rowB.operator.links?.x}
+        compareUrl={compareUrl}
+      />
     </div>
   )
 
