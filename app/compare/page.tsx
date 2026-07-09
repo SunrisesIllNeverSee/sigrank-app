@@ -199,6 +199,9 @@ export default async function ComparePage({
 
       {/* MAIN MATCHUP BOX — selectors + two operator panels: identity (logo/name/
           class/Υ) outboard, 5 derived facts inboard (owner 2026-06-22). */}
+      <h2 className="font-mono text-base font-bold text-text-primary">
+        How comparison works
+      </h2>
       <CompareMatchup a={rowA} b={rowB} options={selectorOptions} />
 
       {/* DUAL-LAYER RADARS — raw shape + metric shape (ghost raw underlay), consuming

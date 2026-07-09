@@ -17,9 +17,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { WaveHero } from '@/components/ui/WaveHero'
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs LMSYS Chatbot Arena — Rank the Driver, Not the Car',
+  title: 'SigRank vs LMSYS Arena \u2014 Rank Driver, Not Car',
   description:
-    'LMSYS ranks AI models by human preference votes. SigRank ranks operators by token cascade efficiency. Models don\'t drive — operators do. The AI benchmarking leaderboard that ranks the driver, not the car.',
+    'LMSYS ranks AI models by preference votes. SigRank ranks operators by cascade efficiency. Models don\u2019t drive \u2014 operators do. Rank the driver, not the car.',
   path: '/vs/lmsys-arena',
 })
 

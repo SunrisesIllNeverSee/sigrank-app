@@ -18,7 +18,7 @@ import { breadcrumb, definedTerm, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Velocity — Token Production Rate in AI Coding',
   description:
-    'Velocity = output / session_time measures token production rate in AI coding. Learn why velocity is a secondary metric, how it interacts with yield, and when high AI output speed matters.',
+    'Velocity = output / session_time \u2014 token production rate in AI coding. Learn why it\u2019s a secondary metric and how it interacts with yield.',
   path: '/metrics/velocity',
 })
 
@@ -77,7 +77,7 @@ export default function VelocityPage() {
       {/* ── The formula ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The formula
+          The velocity formula
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">

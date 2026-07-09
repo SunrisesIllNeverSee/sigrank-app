@@ -14,7 +14,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'How to Reduce Token Waste',
   description:
-    'A practical guide to reducing AI token waste. Identify common waste sources — repeated context, poor caching, verbose prompts, unnecessary re-rolls — and apply concrete fixes. Measure your improvement with yield.',
+    'A practical guide to reducing AI token waste. Identify common waste sources and apply concrete fixes. Measure your improvement with yield.',
   path: '/guides/how-to-reduce-token-waste',
 })
 

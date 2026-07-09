@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'AI Operator Scoring — The New Performance Layer',
   description:
-    'AI operator scoring is the new performance layer: it ranks the human driving the AI, not the model. How it differs from model benchmarking and time tracking, the SigRank scoring system, and privacy preservation.',
+    'AI operator scoring ranks the human driving the AI, not the model. How it differs from model benchmarking, the SigRank system, and privacy.',
   path: '/ai-operator-scoring',
 })
 

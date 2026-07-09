@@ -19,7 +19,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'AI Benchmarking — Beyond Model Leaderboards',
   description:
-    'The problem with model-only AI benchmarking: it ranks the model, not the operator. SigRank benchmarks the human driving the AI — token-cascade efficiency, not preference votes. A new category of benchmark.',
+    'Model-only AI benchmarking ranks the model, not the operator. SigRank benchmarks the human driving the AI \u2014 cascade efficiency, not preference votes.',
   path: '/ai-benchmarking',
 })
 

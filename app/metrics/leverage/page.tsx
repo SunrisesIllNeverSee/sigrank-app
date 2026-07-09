@@ -18,7 +18,7 @@ import { breadcrumb, definedTerm, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Leverage — Cached Context Amplification',
   description:
-    'Leverage = cache_read / input measures how much cached context amplifies your fresh input in AI coding. Learn what token leverage means, why high leverage matters, and how to increase it.',
+    'Leverage = cache_read / input \u2014 how much cached context amplifies your fresh input. Learn what token leverage means and how to increase it.',
   path: '/metrics/leverage',
 })
 
@@ -77,7 +77,7 @@ export default function LeveragePage() {
       {/* ── The formula ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The formula
+          The leverage formula
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">

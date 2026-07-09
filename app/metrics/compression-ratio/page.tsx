@@ -17,7 +17,7 @@ import { breadcrumb, definedTerm, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Compression Ratio — Output per Input',
   description:
-    'Compression Ratio = output / input measures how much you get back per token sent to an AI model. Learn what token compression ratio means, why it matters, and how to improve your output-to-input ratio.',
+    'Compression ratio = output / input \u2014 how much you get back per token sent to an AI model. Learn what it means and how to improve it.',
   path: '/metrics/compression-ratio',
 })
 
@@ -76,7 +76,7 @@ export default function CompressionRatioPage() {
       {/* ── The formula ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The formula
+          The compression ratio formula
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">
@@ -104,7 +104,7 @@ export default function CompressionRatioPage() {
       {/* ── What it measures ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          What it measures
+          What compression ratio measures
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The compression ratio measures how much value you extract per token of

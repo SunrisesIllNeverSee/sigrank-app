@@ -17,9 +17,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { WaveHero } from '@/components/ui/WaveHero'
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs Cursor — Cross-Tool Token Metrics, Not Editor Lock-in',
+  title: 'SigRank vs Cursor — Cross-Tool Token Metrics',
   description:
-    'Cursor is an AI editor with built-in metrics. SigRank is platform-neutral — works with Cursor, Claude Code, Copilot, and 15+ tools. Your token efficiency score follows you across editors. Cursor AI metrics, explained.',
+    'Cursor is an AI editor with built-in metrics. SigRank is platform-neutral \u2014 works with Cursor, Claude Code, Copilot, and 15+ tools.',
   path: '/vs/cursor',
 })
 

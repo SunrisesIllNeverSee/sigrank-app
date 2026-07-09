@@ -17,9 +17,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { WaveHero } from '@/components/ui/WaveHero'
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs ccusage — From Token Sensor to Instrument Panel',
+  title: 'SigRank vs ccusage \u2014 Sensor to Instrument Panel',
   description:
-    'ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring (Υ Yield), leaderboards, operator profiles, and MCP integration. The ccusage upgrade.',
+    'ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.',
   path: '/vs/ccusage',
 })
 

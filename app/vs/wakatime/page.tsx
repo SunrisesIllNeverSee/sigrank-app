@@ -17,9 +17,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { WaveHero } from '@/components/ui/WaveHero'
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs WakaTime — Time Spent vs Token Efficiency',
+  title: 'SigRank vs WakaTime — Time vs Token Efficiency',
   description:
-    'WakaTime tracks hours coding. SigRank tracks token cascade efficiency. Time ≠ signal — an hour with good cache reuse beats 10 hours of burning input tokens. The AI coding tracker that measures what matters.',
+    'WakaTime tracks hours coding. SigRank tracks token cascade efficiency. Time \u2260 signal \u2014 an hour with good cache reuse beats 10 hours of burning input.',
   path: '/vs/wakatime',
 })
 

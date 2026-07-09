@@ -20,7 +20,7 @@ import { conservationLawArticle, mosesPatent, breadcrumb, experimentalRecordData
 export const metadata: Metadata = withOG({
   title: 'Science — The Conservation Law of Commitment',
   description:
-    'The academic foundation of SigRank: the Conservation Law of Commitment (C(T(S)) ≈ C(S) with enforcement), the Commitment Theory research program, the MO§ES™ enforcement architecture, and the Zenodo deposits that ground the SigRank Index.',
+    'The academic foundation of SigRank: the Conservation Law of Commitment, the Commitment Theory program, the MO\u00A7ES\u2122 architecture, and Zenodo deposits.',
   path: '/science',
 })
 

@@ -16,7 +16,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'How to Track Your Token Cascade',
   description:
-    'A complete guide to token cascade tracking and AI token flow analysis. Learn the four pillars — input, output, cache-read, cache-write — and how to track them automatically with sigrank.',
+    'A complete guide to token cascade tracking. Learn the four pillars \u2014 input, output, cache-read, cache-write \u2014 and how to track them with sigrank.',
   path: '/guides/how-to-track-token-cascade',
 })
 

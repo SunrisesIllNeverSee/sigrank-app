@@ -18,7 +18,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Token Telemetry — Measuring AI Coding Activity',
   description:
-    'Token telemetry is the privacy-preserving measurement of AI coding activity. Four pillars — input, output, cache-read, cache-write — capture the full token cascade without reading prompt content.',
+    'Token telemetry measures AI coding activity privately. Four pillars \u2014 input, output, cache-read, cache-write \u2014 capture the cascade without reading prompts.',
   path: '/token-telemetry',
 })
 

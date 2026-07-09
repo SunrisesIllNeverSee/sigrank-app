@@ -17,7 +17,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'How to Compare AI Operators',
   description:
-    'A guide to comparing AI operators — not models. Learn why operator comparison matters, how to use the SigRank compare tool, what metrics to compare (yield, cache hit rate, leverage, class tier), and how to benchmark against the field.',
+    'A guide to comparing AI operators \u2014 not models. Compare yield, cache hit rate, leverage, and class tier, and benchmark against the field.',
   path: '/guides/how-to-compare-ai-operators',
 })
 

@@ -19,7 +19,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Best AI Benchmarking Tools (2026)',
   description:
-    'The 6 best AI benchmarking tools in 2026, compared. SigRank, LMSYS Arena, HELM, Open LLM Leaderboard, Chatbot Arena, and HumanEval — what each benchmarks, pros, cons, and best for.',
+    'The 6 best AI benchmarking tools in 2026. SigRank, LMSYS Arena, HELM, Open LLM Leaderboard, and HumanEval \u2014 what each benchmarks, pros, cons, and best for.',
   path: '/alternatives/ai-benchmarking-tools',
 })
 
