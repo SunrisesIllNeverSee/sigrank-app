@@ -13,10 +13,10 @@ import { usePathname } from 'next/navigation'
  * only this list needs the client hook.
  */
 
-// Some links own routes beyond their own href. /leaderboard is the entry but the
-// board lives at /board/* (redirect target); treat those as the same active tab.
+// Some links own routes beyond their own href. /board/all is the leaderboard
+// entry; /board/* routes are all part of the same tab.
 const ACTIVE_PREFIX: Record<string, string[]> = {
-  '/leaderboard': ['/leaderboard', '/board'],
+  '/board/all': ['/board'],
   '/compare': ['/compare'],
   '/hall': ['/hall'],
   '/wiki': ['/wiki'],
