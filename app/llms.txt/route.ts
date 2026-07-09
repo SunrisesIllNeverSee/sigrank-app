@@ -8,9 +8,9 @@
  * Spec: https://llmstxt.org
  */
 
-import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from '@/lib/seo'
+import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 
-export const revalidate = 3600 // 1h
+export const revalidate = 3600; // 1h
 
 export async function GET() {
   const body = `# ${SITE_NAME}
@@ -83,6 +83,14 @@ on-device scanner (npm: sigrank) and submit signed, server-verifiable snapshots.
 - [AI Coding Metrics Tools](${SITE_ORIGIN}/alternatives/ai-coding-metrics): 7 best tools compared
 - [ccusage Alternatives](${SITE_ORIGIN}/alternatives/ccusage-alternatives): 5 best alternatives
 
+## MCP server (for AI agents)
+- [SigRank MCP](${SITE_ORIGIN}/mcp): 15 tools any AI agent can call — rank, leaderboard, submit, diagnose, improve
+- Install: \`npx sigrank\` (or \`npx sigrank-mcp\`)
+- npm: https://www.npmjs.com/package/sigrank
+- Source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
+- Registries: Official MCP Registry, Smithery, Glama, Cline Marketplace
+- Tools: rank_paste, get_leaderboard, get_operator, submit_paste, submit_verified, tokenpull, tokenpull_submit, watch_tokenpull, rank_windows, tokenpull_compare, enroll, simulate_change, diagnose_cascade, suggest_improvements, self_improve
+
 ## Tooling
 - npm package: https://www.npmjs.com/package/sigrank
 - MCP server + CLI source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
@@ -100,9 +108,9 @@ on-device scanner (npm: sigrank) and submit signed, server-verifiable snapshots.
 - SIGNOMY governed agent marketplace: https://signomy.xyz
 - GitHub org: https://github.com/SunrisesIllNeverSee
 - ORCID: https://orcid.org/0009-0002-9904-5390
-`
+`;
 
   return new Response(body, {
-    headers: { 'content-type': 'text/plain; charset=utf-8' },
-  })
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
 }
