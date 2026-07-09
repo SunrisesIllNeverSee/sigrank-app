@@ -316,12 +316,12 @@ sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
           >
             Calculate your Υ Yield
           </a>
-          <a
+          <Link
             href="/board/all"
             className="rounded-lg border border-bg-border bg-bg-elevated px-4 py-2 font-mono text-xs uppercase tracking-wide text-text-primary transition-colors hover:border-gold"
           >
             See the leaderboard
-          </a>
+          </Link>
         </div>
       </section>
 
