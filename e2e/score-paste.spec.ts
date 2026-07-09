@@ -35,7 +35,7 @@ test('score paste → projection appears', async ({ page }) => {
   // correctly (not the four-number fallback, which would swap
   // cache_create/cache_read and produce a different yield). The UI renders
   // yield via toFixed(1), so 18436.98 rounds to "18437.0".
-  await expect(page.getByText(/Υ yield/i)).toBeVisible({ timeout: 10000 })
+  await expect(page.getByText('Υ Yield', { exact: true })).toBeVisible({ timeout: 10000 })
   await expect(page.getByText(/18437\.0/)).toBeVisible()
 
   // a11y check — informational, not a hard gate.
