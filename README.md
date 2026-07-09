@@ -1,3 +1,5 @@
+# SigRank
+
 > **🏆 SigRank is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
 > efficiently you use AI, not how much. See your projected rank in 60 seconds at
 > [signalaf.com/score](https://signalaf.com/score). *Token counts only. Never your prompts.*
@@ -28,6 +30,25 @@ Most platforms reward volume. SigRank rewards structure.
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
 
 </div>
+
+## Table of Contents
+
+- [What is SigRank?](#what-is-sigrank)
+- [Get ranked (you don't need this repo)](#get-ranked-you-dont-need-this-repo)
+- [How it works](#how-it-works)
+- [For developers](#for-developers)
+- [Stack](#stack)
+- [Quick Start](#quick-start)
+- [Scripts](#scripts)
+- [Project Map](#project-map)
+- [Data Model](#data-model)
+- [Environment](#environment)
+- [Supabase](#supabase)
+- [Scoring Invariants](#scoring-invariants)
+- [Development Notes](#development-notes)
+- [Related](#related)
+- [Community](#community)
+- [License](#license)
 
 | The leaderboard | Your operator profile |
 |:---:|:---:|
@@ -76,6 +97,18 @@ npx sigrank board --once   # print the live leaderboard once
 
 Cautious? `sigrank submit --dry-run` prints the exact signed payload — four token
 counts and a signature — and sends nothing.
+
+```bash
+$ sigrank submit --dry-run
+📦 Payload (not sent):
+  input:          1,251,211
+  output:        11,296,121
+  cache_create:     128,196
+  cache_read:    2,555,179,769
+  Υ Yield:          18,436.98
+  class:            TRANSMITTER
+  signature:        ed25519:9f3a...
+```
 
 Full CLI + MCP docs: **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** ·
 package: **[sigrank on npm](https://www.npmjs.com/package/sigrank)**.
@@ -223,8 +256,23 @@ Product contracts, not implementation details:
 ## Community
 
 - [Contributing](./.github/CONTRIBUTING.md)
+- [Code of Conduct](./.github/CODE_OF_CONDUCT.md)
 - [Security policy](./SECURITY.md)
 - [Changelog](./CHANGELOG.md)
+
+### Reporting issues
+
+Found a bug or have a feature request? Please
+[open an issue](https://github.com/SunrisesIllNeverSee/sigrank-app/issues) on GitHub.
+Search existing issues first to avoid duplicates, and include repro steps, expected
+vs. actual behavior, and your environment (OS, Node version).
+
+### Pull request process
+
+1. **Fork** the repo and create a branch from `main`.
+2. Make your change, keeping it small and aligned with existing file ownership.
+3. Ensure `npx tsc --noEmit` passes with **0 errors** before pushing.
+4. Open a pull request against `main` with a clear description of what and why.
 
 ## License
 
