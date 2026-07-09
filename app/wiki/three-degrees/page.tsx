@@ -8,7 +8,7 @@ import { breadcrumb, definedTerm } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'The Three Degrees of Leverage',
   description:
-    'AA 7:2:1 average user → power-user median → the top operator to date, read as a token cascade (Cache:Input:Output). The 10xDEV log anchor and full provenance.',
+    'AA 7:2:1 average user to power-user median to the top operator, read as a token cascade. The 10xDEV log anchor and full provenance.',
   path: '/wiki/three-degrees',
 })
 

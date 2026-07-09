@@ -8,7 +8,7 @@ import { breadcrumb, definedTerm } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Verification & Integrity Tests',
   description:
-    'How we know the numbers are real: Benford’s Law (shown failing its first form, then earned back via the floor fix), the Hermes bot control, the telescoping identity lock, content-free verification, and the gaming threat model.',
+    'How we know the numbers are real: Benford’s Law, the Hermes bot control, telescoping identity lock, content-free verification, and the gaming threat model.',
   path: '/wiki/verification',
 })
 

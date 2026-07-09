@@ -96,7 +96,7 @@ export default function VsCopilotPage() {
       {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version
+          The short version: Copilot
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           GitHub Copilot is an AI pair programmer — inline completions, chat, and

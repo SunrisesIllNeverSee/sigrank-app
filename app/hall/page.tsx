@@ -70,6 +70,13 @@ export default async function HallPage() {
           the highest yield, the cleanest cascades, and the most efficient token
           architecture on record. Entries are immutable once recorded.
         </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          The Hall updates as new snapshots are submitted. An operator who achieves
+          a higher yield in a future session takes the record — the previous mark
+          stands as a benchmark to beat. Class tiers (Burner, Builder, 10×er) are
+          determined by yield thresholds, not raw output, so the Hall rewards
+          efficiency architecture over brute-force token production.
+        </p>
       </section>
 
       {/* Client wrapper: reads useSearchParams for class/platform/window filter

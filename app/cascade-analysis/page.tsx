@@ -149,7 +149,7 @@ export default function CascadeAnalysisPage() {
       {/* ── What a token cascade is ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          What a token cascade is
+          What a token cascade is — the architecture
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           A token cascade is the flow of tokens through an AI coding session.

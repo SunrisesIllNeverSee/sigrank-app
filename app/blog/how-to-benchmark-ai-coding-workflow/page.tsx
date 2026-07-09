@@ -19,7 +19,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, faqPage } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
-  title: 'How to Benchmark Your AI Coding Workflow',
+  title: 'Benchmarking AI Coding Workflows — Analysis',
   description:
     'A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples.',
   path: '/blog/how-to-benchmark-ai-coding-workflow',
@@ -130,7 +130,7 @@ export default function HowToBenchmarkAiCodingWorkflowPage() {
 
       <WaveHero
         eyebrow="◈ Blog · Tutorial"
-        title="How to Benchmark Your AI Coding Workflow"
+        title="Benchmarking AI Coding Workflows — Analysis"
         subtitle={
           <>
             A complete, seven-step guide to measuring and improving your{' '}
