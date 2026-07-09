@@ -34,7 +34,6 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: Metadata
   { path: '/llms-full.txt', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/upgrade', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/login', priority: 0.3, changeFrequency: 'yearly' },
-  { path: '/submit', priority: 0.5, changeFrequency: 'monthly' },
 
   // ── SEO content pages (2026-07-07) ──────────────────────────────────────
   // Comparison pages — commercial intent

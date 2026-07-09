@@ -380,7 +380,7 @@ export default function AIBenchmarkingToolsPage() {
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
           See where you rank?{' '}
-          <Link href="/leaderboard" className="text-gold underline underline-offset-2">
+          <Link href="/board/all" className="text-gold underline underline-offset-2">
             View the leaderboard →
           </Link>{' '}
           or{' '}

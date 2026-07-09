@@ -428,7 +428,7 @@ export default async function OperatorProfilePage({
       <TrackProfileView codename={operator.codename} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <a
-          href="/leaderboard"
+          href="/board/all"
           className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
         >
           ← Leaderboard

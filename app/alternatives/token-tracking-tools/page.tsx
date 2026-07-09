@@ -365,7 +365,7 @@ export default function TokenTrackingToolsPage() {
             Run the calculator →
           </Link>{' '}
           or{' '}
-          <Link href="/leaderboard" className="text-gold underline underline-offset-2">
+          <Link href="/board/all" className="text-gold underline underline-offset-2">
             view the leaderboard →
           </Link>
         </p>

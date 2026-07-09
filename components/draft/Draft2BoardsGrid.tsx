@@ -38,7 +38,7 @@ export function Draft2BoardsGrid({
           </p>
         </div>
         <Link
-          href="/leaderboard"
+          href="/board/all"
           className="shrink-0 font-mono text-xs uppercase tracking-wide text-gold transition-colors hover:text-text-primary"
         >
           Full board →
