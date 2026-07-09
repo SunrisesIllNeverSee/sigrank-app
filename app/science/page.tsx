@@ -11,6 +11,7 @@
  */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { withOG } from '@/lib/seo'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -330,6 +331,24 @@ export default function SciencePage() {
             className="text-gold underline underline-offset-2"
             rel="external"
           >signomy.xyz/moses</a>.
+        </p>
+      </section>
+
+      {/* ── Topic hubs ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Learn more:{' '}
+          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">
+            AI Benchmarking
+          </Link>
+          {' · '}
+          <Link href="/cascade-analysis" className="text-gold underline underline-offset-2">
+            Cascade Analysis
+          </Link>
+          {' · '}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            Methodology
+          </Link>
         </p>
       </section>
     </div>

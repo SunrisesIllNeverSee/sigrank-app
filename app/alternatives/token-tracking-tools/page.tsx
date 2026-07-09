@@ -357,16 +357,20 @@ export default function TokenTrackingToolsPage() {
         </dl>
       </section>
 
-      {/* Cross-link */}
+      {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          See your token score?{' '}
-          <Link href="/score" className="text-gold underline underline-offset-2">
-            Run the calculator →
-          </Link>{' '}
-          or{' '}
-          <Link href="/board/all" className="text-gold underline underline-offset-2">
-            view the leaderboard →
+          Related:{' '}
+          <Link href="/token-telemetry" className="text-gold underline underline-offset-2">
+            Token Telemetry
+          </Link>
+          {' · '}
+          <Link href="/vs/ccusage" className="text-gold underline underline-offset-2">
+            vs ccusage
+          </Link>
+          {' · '}
+          <Link href="/wiki/local-agent" className="text-gold underline underline-offset-2">
+            The Local Agent (MCP)
           </Link>
         </p>
       </section>

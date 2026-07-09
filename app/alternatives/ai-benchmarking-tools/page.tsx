@@ -376,16 +376,20 @@ export default function AIBenchmarkingToolsPage() {
         </dl>
       </section>
 
-      {/* Cross-link */}
+      {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          See where you rank?{' '}
-          <Link href="/board/all" className="text-gold underline underline-offset-2">
-            View the leaderboard →
-          </Link>{' '}
-          or{' '}
+          Related:{' '}
+          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">
+            AI Benchmarking
+          </Link>
+          {' · '}
+          <Link href="/vs/lmsys-arena" className="text-gold underline underline-offset-2">
+            vs LMSYS Arena
+          </Link>
+          {' · '}
           <Link href="/methodology" className="text-gold underline underline-offset-2">
-            read the methodology →
+            Methodology
           </Link>
         </p>
       </section>

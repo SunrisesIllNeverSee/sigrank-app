@@ -64,6 +64,16 @@ const RELATED = [
     title: 'The SigRank Index — Methodology',
     desc: 'The canonical methodology: how operator scores are computed, verified, and ranked across platforms and time windows.',
   },
+  {
+    href: '/ai-operator-scoring',
+    title: 'AI Operator Scoring — The New Performance Layer',
+    desc: 'The companion hub: what operator scoring is, how it differs from model benchmarking and time tracking, and the privacy-preserving scoring system.',
+  },
+  {
+    href: '/metrics/velocity',
+    title: 'Velocity',
+    desc: 'Tokens produced per unit of wall-clock time. The throughput metric — useful for speed comparisons, but yield is the number the leaderboard ranks by.',
+  },
 ]
 
 export default function OperatorPerformancePage() {

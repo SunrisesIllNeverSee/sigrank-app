@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { withOG } from '@/lib/seo'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -116,6 +117,24 @@ export default function YieldCalculatorPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/metrics/yield-cascade" className="text-gold underline underline-offset-2">
+            Yield (Υ)
+          </Link>
+          {' · '}
+          <Link href="/tools/operator-class-checker" className="text-gold underline underline-offset-2">
+            Class Checker
+          </Link>
+          {' · '}
+          <Link href="/guides/how-to-improve-your-yield" className="text-gold underline underline-offset-2">
+            Improve Your Yield
+          </Link>
+        </p>
       </section>
     </div>
   )

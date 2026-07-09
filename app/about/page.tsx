@@ -6,6 +6,7 @@
  */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { withOG } from '@/lib/seo'
 
 import { WaveHero } from '@/components/ui/WaveHero'
@@ -289,6 +290,24 @@ export default function AboutPage() {
         </div>
         <p className="font-mono text-[11px] text-text-dim">
           All signal is monitored. All drift is noted.
+        </p>
+      </section>
+
+      {/* ── Topic hubs ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Learn more:{' '}
+          <Link href="/ai-operator-scoring" className="text-gold underline underline-offset-2">
+            AI Operator Scoring
+          </Link>
+          {' · '}
+          <Link href="/operator-performance" className="text-gold underline underline-offset-2">
+            Operator Performance
+          </Link>
+          {' · '}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            Methodology
+          </Link>
         </p>
       </section>
     </div>

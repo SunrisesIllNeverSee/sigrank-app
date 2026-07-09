@@ -356,6 +356,23 @@ export default function HowToTrackTokenCascadePage() {
           </div>
         </dl>
       </section>
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/wiki/local-agent" className="text-gold underline underline-offset-2">
+            The Local Agent (MCP)
+          </Link>
+          {' · '}
+          <Link href="/metrics/yield-cascade" className="text-gold underline underline-offset-2">
+            Yield (Υ)
+          </Link>
+          {' · '}
+          <Link href="/guides/how-to-read-your-cascade" className="text-gold underline underline-offset-2">
+            Read Your Cascade
+          </Link>
+        </p>
+      </section>
 
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
