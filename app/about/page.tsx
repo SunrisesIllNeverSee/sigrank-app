@@ -19,7 +19,7 @@ import { breadcrumb } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'About',
   description:
-    'SigRank is a privacy-preserving leaderboard that scores AI operators on token-telemetry metrics computed locally — token counts and lengths, never prompt content.',
+    'SigRank is a privacy-preserving leaderboard that scores AI operators on token-telemetry metrics computed locally \u2014 token counts, never prompt content.',
   path: '/about',
 })
 

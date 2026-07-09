@@ -19,9 +19,9 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, faqPage } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
-  title: 'Best AI Coding Tools for Measuring Developer Performance (2026)',
+  title: 'Best AI Coding Tools for Dev Performance (2026)',
   description:
-    'The best AI coding tools for measuring developer performance in 2026. Why LOC, commits, and hours fail in the AI era — and the new token-based metrics (yield, cache hit rate, leverage) that replace them. 7 tools reviewed.',
+    'The best AI coding tools for developer performance in 2026. Why LOC, commits, and hours fail \u2014 and the token metrics that replace them. 7 tools reviewed.',
   path: '/blog/best-ai-coding-tools-2026',
 })
 

@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Best ccusage Alternatives (2026)',
   description:
-    'The 5 best ccusage alternatives in 2026. SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale — compared on scoring, leaderboards, multi-platform support, and MCP integration.',
+    'The 5 best ccusage alternatives in 2026. SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale \u2014 compared on scoring, leaderboards, and MCP.',
   path: '/alternatives/ccusage-alternatives',
 })
 

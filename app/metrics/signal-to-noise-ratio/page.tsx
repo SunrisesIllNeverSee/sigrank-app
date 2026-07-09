@@ -16,9 +16,9 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, definedTerm, faqPage } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
-  title: 'Signal-to-Noise Ratio (SNR) — Signal Density in AI Coding',
+  title: 'Signal-to-Noise Ratio (SNR) — Signal Density',
   description:
-    'Signal-to-Noise Ratio (SNR) = signal_tokens / total_tokens measures signal density in AI coding. Learn what signal vs noise means, why high SNR matters, and its relationship to the Conservation Law of Commitment.',
+    'Signal-to-noise ratio (SNR) measures signal density in AI coding. Learn what signal vs noise means, why SNR matters, and its link to the Conservation Law.',
   path: '/metrics/signal-to-noise-ratio',
 })
 
@@ -77,7 +77,7 @@ export default function SignalToNoiseRatioPage() {
       {/* ── The formula ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The formula
+          The SNR formula
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">

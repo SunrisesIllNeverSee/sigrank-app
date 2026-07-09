@@ -9,7 +9,7 @@ import { CascadeComparator } from './CascadeComparator'
 export const metadata: Metadata = withOG({
   title: 'Cascade Comparator — Compare Two AI Token Cascades',
   description:
-    'Free AI metrics comparison tool. Enter two sets of token pillars (A vs B) and compare yield, compression ratio, cache hit rate, and leverage side by side. No account needed.',
+    'Free AI metrics comparison tool. Enter two sets of token pillars and compare yield, compression ratio, cache hit rate, and leverage side by side.',
   path: '/tools/cascade-comparator',
 })
 

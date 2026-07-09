@@ -49,6 +49,29 @@ export default async function UpgradePage({
 
       <SupportCheckout />
 
+      {/* ── Founding supporter perks ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Founding supporter perks
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Founding supporters lock in <strong className="text-text-primary">lifetime
+          perks</strong> at today&apos;s rate — the price never changes for you, even
+          as the precision tier matures and pricing increases for new subscribers.
+          You get permanent <strong className="text-text-primary">founding-supporter
+          status</strong> on your profile, marking you as someone who backed the build
+          before it was polished.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The precision tier unlocks deeper analytics: per-session cascade breakdowns,
+          historical yield trajectories, head-to-head comparisons without rate limits,
+          and exportable reports. Founding supporters get all of this at the early-backer
+          rate for as long as SigRank exists. The leaderboard itself — the board, the
+          Hall, the metrics pages — stays free for everyone. Your contribution funds the
+          precision layer and the ongoing build.
+        </p>
+      </section>
+
       <p className="text-center font-mono text-[11px] text-text-dim">
         Secure checkout via Stripe ·{' '}
         {/* TODO(sweep 2026-06-22): /pro removed in ITEM 1 — repointed to /wiki; restore the Pro explainer target when Stripe goes live in the new repo. */}
