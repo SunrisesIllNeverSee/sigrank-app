@@ -38,7 +38,7 @@ import Link from 'next/link'
 export const metadata: Metadata = withOG({
   title: 'Wiki',
   description:
-    'SigRank wiki — the console, the four pillars + token cascade, the nine transmitter classes, and MO§ES™ governance (the Conservation Law of Commitment, the Six Fold Flame, the empirical record, and the governed ecosystem).',
+    'SigRank wiki — the console, four pillars, token cascade, nine transmitter classes, and MO§ES governance framework.',
   path: '/wiki',
 })
 

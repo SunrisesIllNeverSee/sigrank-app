@@ -38,7 +38,7 @@ const REPORTS: ReportMeta[] = [
     slug: 'q1-2026',
     title: 'State of AI Operator Token Efficiency — Q1 2026',
     description:
-      'The inaugural SigRank Index report. Median vs. top-decile yield gaps, platform leadership, cache utilization, and the efficiency frontier — computed from live operator telemetry.',
+      'The inaugural SigRank Index report. Median vs. top-decile yield gaps, platform leadership, cache utilization, and the efficiency frontier.',
     datePublished: '2026-06-30',
     quarter: 'Q1 2026',
   },

@@ -117,7 +117,7 @@ export default function ScorePage() {
       {/* How it works — the pipeline */}
       <div className="mt-12 flex flex-col gap-4">
         <h2 className="font-mono text-sm font-semibold uppercase tracking-wider text-text-muted">
-          How it works
+          How the agent path works
         </h2>
         <div className="flex flex-col gap-4">
           {PIPELINE.map((p) => (

@@ -8,7 +8,7 @@ import { breadcrumb, definedTerm } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'The Local Agent (MCP)',
   description:
-    'The SigRank MCP: a zero-paste, on-device reader (tokenpull) that counts your four token pillars locally and publishes your cascade — read-only, emits no prompt, never reads your content. Install + quickstart.',
+    'The SigRank MCP: a zero-paste, on-device reader that counts your four token pillars locally and publishes your cascade. Read-only, never reads your content.',
   path: '/wiki/local-agent',
 })
 

@@ -110,7 +110,7 @@ export default function HowToTrackTokenCascadePage() {
       {/* ── What a token cascade is ─────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-          What a token cascade is
+          What a token cascade is — the four pillars
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           When you work with an AI coding agent, tokens flow through your session in four

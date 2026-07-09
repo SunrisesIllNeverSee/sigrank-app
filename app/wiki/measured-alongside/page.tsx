@@ -8,7 +8,7 @@ import { breadcrumb, definedTerm } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Measured Alongside',
   description:
-    'Credit to the token-usage tools SigRank reads alongside and builds on — ccusage, tokscale, and token-dashboard. They measure how much; SigRank ranks how well.',
+    'Credit to the token-usage tools SigRank builds on — ccusage, tokscale, and token-dashboard. They measure how much; SigRank ranks how well.',
   path: '/wiki/measured-alongside',
 })
 

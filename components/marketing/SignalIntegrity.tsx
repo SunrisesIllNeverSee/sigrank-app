@@ -55,9 +55,9 @@ export function SignatureDrift() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
+        <h2 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           Signature Drift — the tune meter
-        </h1>
+        </h2>
         <P>
           Every operator has a <strong>signature</strong>: the characteristic <em>shape</em> of their
           token cascade — the proportions between output, cache-write, and cache-read, anchored to
@@ -212,9 +212,9 @@ export function LocalAgentMcp() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
+        <h2 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           The local agent (MCP)
-        </h1>
+        </h2>
         <P>
           The SigRank local agent is an MCP that reads your token counts straight from local session
           logs — {PLATFORM_COUNT}+ platforms supported, including Claude Code, Codex, Amp, Gemini CLI, GitHub Copilot
@@ -557,9 +557,9 @@ export function Credits() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
+        <h2 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           Measured alongside
-        </h1>
+        </h2>
         <P>
           SigRank doesn&apos;t measure tokens in a vacuum — it builds on a small ecosystem of token-usage
           tools, and ranks the <em>architecture</em> of the cascade on top of what they count. Credit
