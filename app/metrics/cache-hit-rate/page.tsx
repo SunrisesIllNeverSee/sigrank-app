@@ -18,7 +18,7 @@ import { breadcrumb, definedTerm, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Cache Hit Rate — Context Reuse Efficiency',
   description:
-    'Cache Hit Rate = cache_read / (cache_read + cache_write) measures how well you reuse prompt-cached context. Learn why it is the highest-leverage AI coding metric and how to improve cache reuse for lower cost and latency.',
+    'Cache hit rate measures how well you reuse prompt-cached context. Learn why it\u2019s the highest-leverage AI coding metric and how to improve it.',
   path: '/metrics/cache-hit-rate',
 })
 
@@ -82,7 +82,7 @@ export default function CacheHitRatePage() {
       {/* ── The formula ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The formula
+          The cache hit rate formula
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">

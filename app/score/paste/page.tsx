@@ -40,6 +40,26 @@ export default function ScorePastePage() {
         <ScorePasteCard />
       </div>
 
+      {/* ── How it works ── */}
+      <section className="mt-8 flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          How it works
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The paste flow is the backup path: you manually enter the four token
+          counts (input, output, cache_read, cache_write) from any AI platform&apos;s
+          usage dashboard, and the calculator instantly computes your Υ Yield, class
+          tier, and full cascade metrics. No account, no save — just the numbers.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The agent flow is the primary path: install the SigRank CLI, and the
+          on-device scanner reads your token pillars automatically from your local
+          logs — no paste needed. The agent also publishes signed snapshots to the
+          leaderboard so your scores are verifiable. Use paste for a quick preview;
+          use the agent for ongoing tracking.
+        </p>
+      </section>
+
       {/* Back to the agent path */}
       <div className="mt-10 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">

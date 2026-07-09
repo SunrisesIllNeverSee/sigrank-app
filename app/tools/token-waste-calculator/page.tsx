@@ -7,9 +7,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { WasteCalculator } from './WasteCalculator'
 
 export const metadata: Metadata = withOG({
-  title: 'Token Waste Calculator — How Many AI Tokens Are Wasted',
+  title: 'Token Waste Calculator — AI Token Waste',
   description:
-    'Free AI token waste calculator. Enter your four token pillars to estimate wasted tokens, efficiency percentage, and a breakdown by category — excess input, unreused cache writes, repeated context.',
+    'Free AI token waste calculator. Enter your four token pillars to estimate wasted tokens, efficiency percentage, and a breakdown by category.',
   path: '/tools/token-waste-calculator',
 })
 

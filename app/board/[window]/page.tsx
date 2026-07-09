@@ -114,18 +114,27 @@ export default async function BoardWindowPage({
   // default board. Filtered variants are client-side and don't need structured data.
   const jsonLdEntries = isOff ? offEntries : totalEntries
 
+  // Dynamic H1 label: each board window gets a unique page heading (e.g.
+  // "30-Day Leaderboard" vs "All-Time Leaderboard") so /board/all and /board/30d
+  // don't share the same H1. "Burners, Builders & 10×ers" moves to the eyebrow.
+  const boardLabel = isOff
+    ? 'All-Time'
+    : win!.slug === 'all'
+      ? 'All-Time'
+      : `${win!.days}-Day`
+
   return (
     <div className="flex flex-col gap-6">
       {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
           same animated <WaveHero/> as the Hall, with board-specific copy. */}
       <WaveHero
-        eyebrow="📊 Burners 🔥 Builders 🧱 10×ers 🚀"
+        eyebrow="Burners, Builders & 10×ers"
         terminalText="SIGNALBOARD"
         title={
           <>
-            Burners, Builders &amp;{' '}
+            {boardLabel}{' '}
             <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
-              10×ers
+              Leaderboard
             </span>
           </>
         }
@@ -137,6 +146,23 @@ export default async function BoardWindowPage({
           </>
         }
       />
+
+      {/* ── What is this? ── */}
+      <section className="mx-auto max-w-2xl px-4 pb-6">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The SigRank leaderboard ranks AI operators by token-cascade efficiency —
+          Υ Yield = (cache_read × output) / input². Operators are tiered into
+          Burners, Builders, and 10×ers based on how well they compound signal
+          across their token cascade. Higher yield means more signal per token
+          spent — not more time, not more output, but better architecture.
+        </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          To get listed, install the SigRank CLI (<code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">npm i -g sigrank</code>),
+          enroll, and submit a snapshot. The on-device scanner reads your four
+          token pillars and publishes a signed record. No prompt content leaves
+          your machine — only the four counts.
+        </p>
+      </section>
 
       <JsonLd
         data={[

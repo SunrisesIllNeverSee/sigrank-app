@@ -226,6 +226,8 @@ export function ProfileEditForm({
             <img
               src={avatarUrl}
               alt="Your avatar"
+              width={48}
+              height={48}
               className="h-12 w-12 rounded-full border border-bg-border object-cover"
             />
           ) : (

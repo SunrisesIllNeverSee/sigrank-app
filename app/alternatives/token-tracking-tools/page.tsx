@@ -19,7 +19,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Best Token Tracking Tools (2026)',
   description:
-    'The 5 best token tracking tools in 2026. SigRank, ccusage, Tokscale, Token Dashboard, and Tiktoken — compared on counting, scoring, ranking, and multi-platform support.',
+    'The 5 best token tracking tools in 2026. SigRank, ccusage, Tokscale, Token Dashboard, and Tiktoken \u2014 compared on counting, scoring, and multi-platform.',
   path: '/alternatives/token-tracking-tools',
 })
 

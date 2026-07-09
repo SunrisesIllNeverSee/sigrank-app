@@ -9,7 +9,7 @@ import { YieldCalculator } from './YieldCalculator'
 export const metadata: Metadata = withOG({
   title: 'Yield (Υ) Calculator — Token Cascade Efficiency',
   description:
-    'Free yield calculator for AI token cascades. Enter your four token pillars (input, output, cache-read, cache-write) to compute Υ Yield, compression ratio, cache hit rate, and class tier instantly.',
+    'Free yield calculator for AI token cascades. Enter your four token pillars to compute \u03A5 Yield, compression ratio, cache hit rate, and class tier instantly.',
   path: '/tools/yield-calculator',
 })
 

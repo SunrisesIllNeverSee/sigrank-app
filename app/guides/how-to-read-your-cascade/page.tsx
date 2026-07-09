@@ -14,7 +14,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'How to Read Your Token Cascade',
   description:
-    'A diagnostic guide to reading your token cascade. Learn what each pillar reveals about your workflow, what high cache-read means, what high input/low output means, what balanced cascades look like, and how to interpret your class tier.',
+    'A diagnostic guide to reading your token cascade. Learn what each pillar reveals about your workflow and how to interpret your class tier.',
   path: '/guides/how-to-read-your-cascade',
 })
 

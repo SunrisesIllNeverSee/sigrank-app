@@ -413,26 +413,36 @@ npx sigrank
           <img
             src="https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold"
             alt="npm version"
+            width={120}
+            height={20}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://smithery.ai/badge/burnmydays/sigrank-mcp"
             alt="Smithery quality score"
+            width={120}
+            height={20}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp/badges/score.svg"
             alt="Glama score"
+            width={120}
+            height={20}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square"
             alt="MIT license"
+            width={120}
+            height={20}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://img.shields.io/badge/platform-node-grey.svg?style=flat-square"
             alt="Node.js platform"
+            width={120}
+            height={20}
           />
         </div>
 
