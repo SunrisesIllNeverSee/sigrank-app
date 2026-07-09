@@ -95,7 +95,7 @@ export default function VsWakatimePage() {
       {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version
+          The short version: WakaTime
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           WakaTime is a time tracker. It measures how many hours your editor was

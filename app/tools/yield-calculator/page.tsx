@@ -77,7 +77,7 @@ export default function YieldCalculatorPage() {
         title="Yield (Υ) Calculator"
         subtitle={
           <>
-            Enter your four token pillars and see your{' '}
+            Enter your pillars for Υ Yield and see your{' '}
             <span className="text-gold">Υ Yield</span> score, class tier, and cascade
             shape instantly. Pure arithmetic — nothing leaves your browser.
           </>

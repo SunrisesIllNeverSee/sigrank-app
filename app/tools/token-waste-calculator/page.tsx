@@ -77,9 +77,9 @@ export default function TokenWasteCalculatorPage() {
         title="Token Waste Calculator"
         subtitle={
           <>
-            How many of your tokens actually contributed to output? Enter your four
-            pillars and see estimated <span className="text-gold">waste</span>, efficiency,
-            and a breakdown by category.
+            How many of your tokens actually contributed to output? Enter your pillars for
+            waste analysis and see estimated <span className="text-gold">waste</span>,
+            efficiency, and a breakdown by category.
           </>
         }
       />

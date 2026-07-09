@@ -95,7 +95,7 @@ export default function VsLmsysArenaPage() {
       {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version
+          The short version: LMSYS Arena
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           LMSYS Chatbot Arena is the gold standard for one question:{' '}

@@ -95,7 +95,7 @@ export default function VsCursorPage() {
       {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version
+          The short version: Cursor
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Cursor is an excellent AI code editor — and it ships some token usage
