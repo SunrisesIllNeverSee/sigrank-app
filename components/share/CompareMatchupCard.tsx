@@ -428,12 +428,10 @@ function Card({
   cardRef,
   a,
   b,
-  href,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>;
   a: LeaderboardRow;
   b: LeaderboardRow;
-  href: string;
 }) {
   const nameA = operatorDisplayName(a).toUpperCase();
   const nameB = operatorDisplayName(b).toUpperCase();
@@ -960,7 +958,7 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
         }}
         aria-hidden
       >
-        <Card cardRef={cardRef} a={a} b={b} href={href} />
+        <Card cardRef={cardRef} a={a} b={b} />
       </div>
 
       {preview && (
@@ -986,7 +984,7 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
                 transformOrigin: "top left",
               }}
             >
-              <Card cardRef={cardRef} a={a} b={b} href={href} />
+              <Card cardRef={cardRef} a={a} b={b} />
             </div>
           </div>
         </div>

@@ -70,7 +70,6 @@ export function ClassChecker() {
   }, [mode, yieldInput, pillars]);
 
   const tier = classForYield(yield_);
-  const rank = TIERS.indexOf(tier); // 0 = top (TRANSMITTER)
 
   function updatePillar(key: PillarKey, v: string) {
     setPillars((prev) => ({ ...prev, [key]: v }));
