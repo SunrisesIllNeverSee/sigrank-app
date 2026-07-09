@@ -136,7 +136,7 @@ export function AccountMenu() {
           <>
             {operator.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={operator.avatarUrl} alt="" className="h-5 w-5 rounded-full object-cover" />
+              <img src={operator.avatarUrl} alt="" width={20} height={20} className="h-5 w-5 rounded-full object-cover" />
             ) : (
               <span className="text-gold">◎</span>
             )}

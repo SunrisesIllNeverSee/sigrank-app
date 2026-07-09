@@ -7,9 +7,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { ClassChecker } from './ClassChecker'
 
 export const metadata: Metadata = withOG({
-  title: 'Operator Class Checker — AI Operator Tier Calculator',
+  title: 'Operator Class Checker — AI Tier Calculator',
   description:
-    'Check your AI operator class tier from a yield score or four token pillars. Maps Υ Yield to IGNITER, SEEKER, BUILDER, or TRANSMITTER with a description of what each tier means.',
+    'Check your AI operator class tier from a yield score or four token pillars. Maps \u03A5 Yield to IGNITER, SEEKER, BUILDER, or TRANSMITTER.',
   path: '/tools/operator-class-checker',
 })
 

@@ -17,7 +17,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'How to Measure AI Coding Efficiency',
   description:
-    'A step-by-step guide to measuring AI coding efficiency with the four token pillars and the Υ Yield metric. Learn why time-based metrics fail and how to compute yield with ccusage and sigrank.',
+    'A step-by-step guide to measuring AI coding efficiency with the four token pillars and \u03A5 Yield. Learn why time-based metrics fail and how to compute yield.',
   path: '/guides/how-to-measure-ai-coding-efficiency',
 })
 

@@ -24,7 +24,7 @@ import { sigrankDataset, faqPage, breadcrumb } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'The SigRank Index — Methodology',
   description:
-    'The SigRank Index ranks AI operators by token-cascade efficiency (Υ = cache_read × output / input²). Methodology, key figures, and FAQ. Privacy-preserving, on-device, cryptographically-signed telemetry.',
+    'The SigRank Index ranks operators by cascade efficiency (\u03A5 = cache_read \u00D7 output / input\u00B2). Methodology, key figures, FAQ. Privacy-preserving and signed.',
   path: '/methodology',
 })
 

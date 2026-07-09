@@ -17,9 +17,9 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 import { WaveHero } from '@/components/ui/WaveHero'
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs GitHub Copilot — Token Tracking for Any AI Tool',
+  title: 'SigRank vs Copilot \u2014 Token Tracking for AI Tools',
   description:
-    'GitHub Copilot is an AI pair programmer. SigRank measures how efficiently any operator uses any AI tool — including Copilot. Copilot tells you what you wrote; SigRank tells you how efficiently you drove the AI. GitHub Copilot token tracking, explained.',
+    'Copilot is an AI pair programmer. SigRank measures how efficiently you drive it. Copilot shows what you wrote; SigRank shows how you drove the AI.',
   path: '/vs/copilot',
 })
 

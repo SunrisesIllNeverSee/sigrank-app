@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Cascade Analysis — Understanding Token Flow',
   description:
-    'Cascade analysis is the study of token flow through AI coding sessions. What a token cascade is, how to read yours, what each pillar reveals, and the diagnostic patterns that separate compounding signal from burning tokens.',
+    'Cascade analysis studies token flow through AI coding sessions. What a cascade is, how to read yours, and patterns separating signal from burning tokens.',
   path: '/cascade-analysis',
 })
 

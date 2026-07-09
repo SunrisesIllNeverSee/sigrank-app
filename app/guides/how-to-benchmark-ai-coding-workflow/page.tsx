@@ -18,7 +18,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'How to Benchmark Your AI Coding Workflow',
   description:
-    'A step-by-step guide to benchmarking your AI coding workflow. Learn what to measure (the four pillars + yield), how to establish a baseline, compare across time periods, and use the SigRank leaderboard for external comparison.',
+    'A step-by-step guide to benchmarking your AI coding workflow. Measure the four pillars + yield, set a baseline, and compare on the leaderboard.',
   path: '/guides/how-to-benchmark-ai-coding-workflow',
 })
 

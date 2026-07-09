@@ -19,7 +19,7 @@ import { breadcrumb, faqPage } from '@/lib/jsonld'
 export const metadata: Metadata = withOG({
   title: 'Best AI Coding Metrics Tools (2026)',
   description:
-    'The 7 best AI coding metrics tools in 2026, compared. SigRank, ccusage, WakaTime, LMSYS, Cursor insights, GitHub Copilot metrics, and Token Dashboard — what each measures, pros, cons, pricing, and best for.',
+    'The 7 best AI coding metrics tools in 2026. SigRank, ccusage, WakaTime, LMSYS, Cursor, Copilot, and Token Dashboard \u2014 what each measures and best for.',
   path: '/alternatives/ai-coding-metrics',
 })
 

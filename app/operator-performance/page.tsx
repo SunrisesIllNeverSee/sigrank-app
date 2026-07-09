@@ -18,9 +18,9 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, faqPage } from '@/lib/jsonld'
 
 export const metadata: Metadata = withOG({
-  title: 'Operator Performance — Scoring the Human, Not the Model',
+  title: 'Operator Performance \u2014 Score the Human, Not Model',
   description:
-    'Operator performance is about the human driving the AI, not the model. How SigRank scores operators, the class tiers from IGNITER to TRANSMITTER, and why the operator is the variable that matters.',
+    'Operator performance scores the human driving the AI, not the model. SigRank class tiers from IGNITER to TRANSMITTER, and why the operator matters.',
   path: '/operator-performance',
 })
 
