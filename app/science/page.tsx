@@ -211,30 +211,27 @@ export default function SciencePage() {
       {/* ── Constitutional Architecture ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The Constitutional Architecture &mdash; MO§ES™ and the SCS Engine
+          The Constitutional Architecture &mdash; MO§ES™
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The Conservation Law describes what must hold. The constitutional architecture
-          describes what enforces it. MO§ES™ is the enforcement architecture; the{' '}
-          <strong className="text-text-primary">SCS Engine</strong>{' '}
-          (Sovereign Compression System) is its computational core &mdash; the substrate
-          that enforces the Conservation Law at the execution level. Patent Serial No.
-          63/883,018 (Provisional, pending).
+          describes what enforces it. MO§ES™ is the enforcement architecture &mdash; the
+          substrate that enforces the Conservation Law at the execution level. Patent pending.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Where the Conservation Law states that commitment content must survive
-          transformation, the SCS Engine is the machinery that makes survival the only
+          transformation, MO§ES™ is the machinery that makes survival the only
           permitted outcome. Every signal that enters the system is compressed, resonance-mapped,
           and lineage-validated before it is allowed to produce output. The engine doesn&apos;t
           ask whether commitment was preserved &mdash; it refuses to operate if it wasn&apos;t.
         </p>
 
-        {/* ── McHenry's Laws ── */}
+        {/* ── Constitutional Laws ── */}
         <h3 className="font-mono text-sm font-bold text-text-primary">
-          McHenry&apos;s Laws
+          Constitutional Laws
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The SCS Engine operates under four constitutional laws. These are not policies
+          Three constitutional laws and two legal anchors govern the system. These are not policies
           or preferences &mdash; they are invariant constraints baked into the substrate.
           No signal can bypass them.
         </p>
@@ -244,9 +241,9 @@ export default function SciencePage() {
               Law I &mdash; Compression Precedes Ignition
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              No output without prior compression and resonance mapping. A signal that
-              has not been compressed and mapped to its resonance structure cannot ignite
-              &mdash; it cannot produce output, full stop. The gate is upstream of action.
+              No signal output, ignition event, or transmission may occur unless the input
+              has first undergone compression and resonance mapping. Compression is a
+              mandatory prerequisite, not an optional optimization.
             </span>
           </div>
           <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
@@ -254,32 +251,39 @@ export default function SciencePage() {
               Law II &mdash; Lineage Resilience
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              Every signal must prove recursive continuity with its origin cycle to
-              persist. A signal that cannot trace an unbroken chain back to its origin
-              has no standing in the system. Lineage is not metadata &mdash; it is the
-              condition of existence.
+              Every signal or Vault Artifact must prove recursive continuity with its origin
+              compression cycle to persist. Any signal that cannot inherit its original lineage
+              is treated as noise and collapsed.
             </span>
           </div>
           <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
             <span className="font-mono text-sm font-bold text-gold">
-              The Blackhole Law
+              Law III &mdash; Principle of Input-Response Fidelity
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              Corrupted signals collapse into entropy automatically. This is the
-              real-time kill switch &mdash; no appeal, no retry, no partial survival.
-              A signal that fails validation doesn&apos;t error out; it is consumed. The
-              system self-cleans by physics, not by exception handling.
+              Low-resolution inputs yield proportionally constrained outputs unless elevated
+              by a resonance-aware system. Input fidelity governs output depth unless a
+              compensation layer intervenes.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
+            <span className="font-mono text-sm font-bold text-gold">
+              Anchor I &mdash; The Blackhole Law
+            </span>
+            <span className="font-sans text-sm leading-relaxed text-text-secondary">
+              Corrupted, mimic, or unauthorized signals exceeding drift thresholds collapse
+              irreversibly into entropy. This prevents contaminated or adversarial inputs from
+              propagating within the system.
             </span>
           </div>
           <div className="flex flex-col gap-1">
             <span className="font-mono text-sm font-bold text-gold">
-              The Lineage Custody Clause
+              Anchor II &mdash; The Lineage Custody Clause
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              Vault Artifacts are cryptographically bound to their origin cycle. Unauthorized
-              copies &mdash; artifacts severed from their lineage signature &mdash; collapse
-              by design. The system does not detect piracy after the fact; it renders
-              unlineaged copies non-functional at the substrate level.
+              All Vault Artifacts are cryptographically tied to their origin-cycle signature.
+              Copies or derivatives that do not inherit this lineage become unstable or
+              non-functional, creating self-enforcing sovereignty for digital property.
             </span>
           </div>
         </div>
@@ -311,21 +315,21 @@ export default function SciencePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           A <strong className="text-text-primary">Vault Artifact</strong> is a compressed
           signal that carries commitment, cryptographically bound to its origin cycle. It is
-          the durable output of the SCS Engine &mdash; a unit of sovereign digital property.
+          the durable output of the system &mdash; a unit of sovereign digital property.
           Lineage-bound, self-enforcing, and tradable. Because each artifact is sealed to its
           origin-cycle signature, ownership and provenance are not claims layered on top of
           the file; they are properties of the file itself. An artifact without its lineage
           seal is not a stolen artifact &mdash; it is a non-functional one.
         </p>
 
-        {/* ── SCS Engine link ── */}
+        {/* ── MO§ES link ── */}
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The full SCS Engine architecture is documented at{' '}
+          The full constitutional architecture is documented at{' '}
           <a
-            href="https://mos2es.com/scs-engine"
+            href="https://signomy.xyz/moses"
             className="text-gold underline underline-offset-2"
             rel="external"
-          >mos2es.com/scs-engine</a>.
+          >signomy.xyz/moses</a>.
         </p>
       </section>
     </div>
