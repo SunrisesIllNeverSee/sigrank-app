@@ -44,6 +44,45 @@ on-device scanner (npm: sigrank) and submit signed, server-verifiable snapshots.
 - [Local Agent](${SITE_ORIGIN}/wiki/local-agent)
 - [Measured Alongside](${SITE_ORIGIN}/wiki/measured-alongside)
 
+## Metrics (definitions + formulas)
+- [Yield (Υ)](${SITE_ORIGIN}/metrics/yield-cascade): cache_read × output / input² — the headline efficiency metric
+- [Cache Hit Rate](${SITE_ORIGIN}/metrics/cache-hit-rate): cache_read / (cache_read + cache_write) — context reuse efficiency
+- [Compression Ratio](${SITE_ORIGIN}/metrics/compression-ratio): output / input — output per input token
+- [Leverage](${SITE_ORIGIN}/metrics/leverage): cache_read / input — cached context amplification
+- [Velocity](${SITE_ORIGIN}/metrics/velocity): output / session_time — token production rate
+- [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): signal_tokens / total_tokens — signal density
+
+## Guides (how-to)
+- [How to Measure AI Coding Efficiency](${SITE_ORIGIN}/guides/how-to-measure-ai-coding-efficiency)
+- [How to Improve Your Yield](${SITE_ORIGIN}/guides/how-to-improve-your-yield)
+- [How to Reduce Token Waste](${SITE_ORIGIN}/guides/how-to-reduce-token-waste)
+- [How to Read Your Token Cascade](${SITE_ORIGIN}/guides/how-to-read-your-cascade)
+- [How to Track Your Token Cascade](${SITE_ORIGIN}/guides/how-to-track-token-cascade)
+- [How to Benchmark AI Coding Workflow](${SITE_ORIGIN}/guides/how-to-benchmark-ai-coding-workflow)
+
+## Tools (interactive)
+- [Yield Calculator](${SITE_ORIGIN}/tools/yield-calculator): enter four token pillars, get Υ Yield + class tier
+- [Operator Class Checker](${SITE_ORIGIN}/tools/operator-class-checker): map yield to IGNITER/SEEKER/BUILDER/TRANSMITTER
+- [Cascade Comparator](${SITE_ORIGIN}/tools/cascade-comparator): compare two operators side by side
+- [Token Waste Calculator](${SITE_ORIGIN}/tools/token-waste-calculator): estimate wasted tokens by category
+
+## Topic hubs
+- [AI Benchmarking](${SITE_ORIGIN}/ai-benchmarking): beyond model leaderboards — ranking the operator
+- [AI Coding Metrics](${SITE_ORIGIN}/ai-coding-metrics): the complete guide to all six metrics
+- [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): scoring the human, not the model
+- [Operator Performance](${SITE_ORIGIN}/operator-performance): measuring developer performance in the AI era
+- [Cascade Analysis](${SITE_ORIGIN}/cascade-analysis): understanding token cascade architecture
+- [Token Telemetry](${SITE_ORIGIN}/token-telemetry): privacy-preserving measurement of AI coding activity
+
+## Comparisons
+- [SigRank vs ccusage](${SITE_ORIGIN}/vs/ccusage)
+- [SigRank vs WakaTime](${SITE_ORIGIN}/vs/wakatime)
+- [SigRank vs LMSYS Arena](${SITE_ORIGIN}/vs/lmsys-arena)
+- [SigRank vs Cursor](${SITE_ORIGIN}/vs/cursor)
+- [SigRank vs Copilot](${SITE_ORIGIN}/vs/copilot)
+- [AI Coding Metrics Tools](${SITE_ORIGIN}/alternatives/ai-coding-metrics): 7 best tools compared
+- [ccusage Alternatives](${SITE_ORIGIN}/alternatives/ccusage-alternatives): 5 best alternatives
+
 ## Tooling
 - npm package: https://www.npmjs.com/package/sigrank
 - MCP server + CLI source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
