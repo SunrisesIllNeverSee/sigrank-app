@@ -365,16 +365,20 @@ export default function CcusageAlternativesPage() {
         </dl>
       </section>
 
-      {/* Cross-link */}
+      {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          See your score instantly?{' '}
-          <Link href="/score" className="text-gold underline underline-offset-2">
-            Run the calculator →
-          </Link>{' '}
-          or{' '}
-          <Link href="/methodology" className="text-gold underline underline-offset-2">
-            read the methodology →
+          Related:{' '}
+          <Link href="/vs/ccusage" className="text-gold underline underline-offset-2">
+            vs ccusage
+          </Link>
+          {' · '}
+          <Link href="/wiki/local-agent" className="text-gold underline underline-offset-2">
+            The Local Agent (MCP)
+          </Link>
+          {' · '}
+          <Link href="/tools/yield-calculator" className="text-gold underline underline-offset-2">
+            Yield Calculator
           </Link>
         </p>
       </section>

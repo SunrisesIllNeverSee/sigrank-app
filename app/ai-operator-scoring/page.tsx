@@ -45,6 +45,16 @@ const RELATED = [
     title: 'Yield (Υ) Cascade',
     desc: 'The headline metric in the scoring system: cache_read × output / input². The architecture of the cascade, not raw spend.',
   },
+  {
+    href: '/vs/lmsys-arena',
+    title: 'SigRank vs. LMSYS Chatbot Arena',
+    desc: 'LMSYS Arena ranks AI models by human preference. SigRank ranks operators by token-cascade efficiency. Different questions, different answers — and why both matter.',
+  },
+  {
+    href: '/score',
+    title: 'The SIGNA Score',
+    desc: 'The composite operator score that blends yield with signal-force and drift. How the number on the leaderboard is computed and what it means.',
+  },
 ]
 
 export default function AIOperatorScoringPage() {

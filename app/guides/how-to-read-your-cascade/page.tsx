@@ -381,6 +381,23 @@ export default function HowToReadYourCascadePage() {
           </div>
         </dl>
       </section>
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/metrics/yield-cascade" className="text-gold underline underline-offset-2">
+            Yield (Υ)
+          </Link>
+          {' · '}
+          <Link href="/tools/cascade-comparator" className="text-gold underline underline-offset-2">
+            Cascade Comparator
+          </Link>
+          {' · '}
+          <Link href="/guides/how-to-track-token-cascade" className="text-gold underline underline-offset-2">
+            Track Your Token Cascade
+          </Link>
+        </p>
+      </section>
 
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">

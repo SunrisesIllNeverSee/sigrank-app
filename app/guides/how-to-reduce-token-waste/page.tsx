@@ -382,6 +382,23 @@ export default function HowToReduceTokenWastePage() {
           </div>
         </dl>
       </section>
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/tools/token-waste-calculator" className="text-gold underline underline-offset-2">
+            Token Waste Calculator
+          </Link>
+          {' · '}
+          <Link href="/metrics/cache-hit-rate" className="text-gold underline underline-offset-2">
+            Cache Hit Rate
+          </Link>
+          {' · '}
+          <Link href="/guides/how-to-improve-your-yield" className="text-gold underline underline-offset-2">
+            Improve Your Yield
+          </Link>
+        </p>
+      </section>
 
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">

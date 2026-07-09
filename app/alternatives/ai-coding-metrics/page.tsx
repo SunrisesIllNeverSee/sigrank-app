@@ -394,16 +394,20 @@ export default function AICodingMetricsPage() {
         </dl>
       </section>
 
-      {/* Cross-link */}
+      {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          Ready to see your score?{' '}
-          <Link href="/score" className="text-gold underline underline-offset-2">
-            Run the calculator →
-          </Link>{' '}
-          or{' '}
-          <Link href="/methodology" className="text-gold underline underline-offset-2">
-            read the methodology →
+          Related:{' '}
+          <Link href="/ai-coding-metrics" className="text-gold underline underline-offset-2">
+            AI Coding Metrics
+          </Link>
+          {' · '}
+          <Link href="/vs/ccusage" className="text-gold underline underline-offset-2">
+            vs ccusage
+          </Link>
+          {' · '}
+          <Link href="/vs/wakatime" className="text-gold underline underline-offset-2">
+            vs WakaTime
           </Link>
         </p>
       </section>

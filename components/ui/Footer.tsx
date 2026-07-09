@@ -50,6 +50,20 @@ const FOOTER_COLUMNS: { heading: string; links: { href: string; label: string }[
       { href: '/alternatives/ccusage-alternatives', label: 'ccusage Alternatives' },
       { href: '/blog/best-ai-coding-tools-2026', label: 'Best AI Coding Tools 2026' },
       { href: '/token-telemetry', label: 'Token Telemetry' },
+      { href: '/alternatives/ai-benchmarking-tools', label: 'AI Benchmarking Tools' },
+      { href: '/alternatives/token-tracking-tools', label: 'Token Tracking Tools' },
+      { href: '/blog/how-to-benchmark-ai-coding-workflow', label: 'How to Benchmark AI Coding' },
+      { href: '/guides/how-to-benchmark-ai-coding-workflow', label: 'Benchmark Workflow Guide' },
+    ],
+  },
+  {
+    heading: 'Topics',
+    links: [
+      { href: '/ai-benchmarking', label: 'AI Benchmarking' },
+      { href: '/ai-coding-metrics', label: 'AI Coding Metrics' },
+      { href: '/ai-operator-scoring', label: 'AI Operator Scoring' },
+      { href: '/operator-performance', label: 'Operator Performance' },
+      { href: '/cascade-analysis', label: 'Cascade Analysis' },
     ],
   },
 ]
@@ -84,7 +98,7 @@ export function Footer() {
         </div>
 
         {/* SEO link columns */}
-        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-3 lg:grid-cols-6">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} className="flex flex-col gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
