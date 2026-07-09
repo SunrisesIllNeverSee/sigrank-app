@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { withOG } from '@/lib/seo'
 import { WaveHero } from '@/components/ui/WaveHero'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -108,6 +109,24 @@ export default function CascadeComparatorPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/compare" className="text-gold underline underline-offset-2">
+            Compare Operators
+          </Link>
+          {' · '}
+          <Link href="/tools/yield-calculator" className="text-gold underline underline-offset-2">
+            Yield Calculator
+          </Link>
+          {' · '}
+          <Link href="/guides/how-to-read-your-cascade" className="text-gold underline underline-offset-2">
+            Read Your Cascade
+          </Link>
+        </p>
       </section>
     </div>
   )
