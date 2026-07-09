@@ -1,7 +1,7 @@
-import React from 'react'
-import Link from 'next/link'
-import { MiniBoard } from '@/components/home/MiniBoard'
-import type { LeaderboardRow } from '@/lib/data'
+import React from "react";
+import Link from "next/link";
+import { MiniBoard } from "@/components/home/MiniBoard";
+import type { LeaderboardRow } from "@/lib/data";
 
 /**
  * Draft2BoardsGrid — the "live proof" section for /draft2.
@@ -17,10 +17,10 @@ export function Draft2BoardsGrid({
   topDev,
   topVolume,
 }: {
-  topYield: LeaderboardRow[]
-  topLeverage: LeaderboardRow[]
-  topDev: LeaderboardRow[]
-  topVolume: LeaderboardRow[]
+  topYield: LeaderboardRow[];
+  topLeverage: LeaderboardRow[];
+  topDev: LeaderboardRow[];
+  topVolume: LeaderboardRow[];
 }) {
   return (
     <section className="my-16">
@@ -52,5 +52,5 @@ export function Draft2BoardsGrid({
         <MiniBoard metric="volume" rows={topVolume} />
       </div>
     </section>
-  )
+  );
 }

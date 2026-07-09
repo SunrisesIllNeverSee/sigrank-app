@@ -10,33 +10,33 @@
  * preserved so the page's content definitions don't change.
  */
 
-import React from 'react'
+import React from "react";
 
 export interface WikiDocItem {
   /** Stable slug for the anchor id. */
-  id: string
+  id: string;
   /** Visible label for the sub-topic heading. */
-  label: string
+  label: string;
   /** Pre-rendered content node (server-rendered upstream). */
-  node: React.ReactNode
+  node: React.ReactNode;
   /** Optional one-line caption shown under the sub-topic heading. */
-  hint?: string
+  hint?: string;
 }
 
 export interface WikiDocGroup {
   /** Stable slug for the anchor id. */
-  id: string
+  id: string;
   /** Group heading, e.g. "Metrics", "Submit". */
-  groupLabel: string
+  groupLabel: string;
   /** Optional source route shown as a mono sub-label. */
-  source?: string
+  source?: string;
   /** Optional group-level description. */
-  description?: string
-  items: WikiDocItem[]
+  description?: string;
+  items: WikiDocItem[];
 }
 
 export interface WikiDocProps {
-  groups: WikiDocGroup[]
+  groups: WikiDocGroup[];
 }
 
 export function WikiDoc({ groups }: WikiDocProps) {
@@ -84,18 +84,18 @@ export function WikiDoc({ groups }: WikiDocProps) {
                     {item.label}
                   </h3>
                   {item.hint && (
-                    <p className="font-sans text-xs text-text-muted">{item.hint}</p>
+                    <p className="font-sans text-xs text-text-muted">
+                      {item.hint}
+                    </p>
                   )}
                 </div>
                 {/* Sub-topic content */}
-                <div className="min-w-0">
-                  {item.node}
-                </div>
+                <div className="min-w-0">{item.node}</div>
               </div>
             ))}
           </div>
         </section>
       ))}
     </div>
-  )
+  );
 }

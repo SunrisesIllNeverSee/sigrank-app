@@ -6,21 +6,22 @@
  * (including any "hours since last seen") so callers control determinism.
  */
 
-import type { SignalClass } from '@/components/sigrank/types'
+import type { SignalClass } from "@/components/sigrank/types";
 import {
   RS01_SIGNA_WEIGHTS,
   RS02_DEPTH_BUCKETS,
   RS02_DEPTH_FALLBACK,
   RS05_CLASS_THRESHOLDS,
-} from '@/lib/scoring/secret-config'
-import type { Core5Raw, Core5Scores } from '@/lib/scoring/types'
+} from "@/lib/scoring/secret-config";
+import type { Core5Raw, Core5Scores } from "@/lib/scoring/types";
 
 /** Log normalization shared by TT / MV / Signal Force: min(100, 20·log10(x+1)). */
-export const logNorm = (x: number): number => Math.min(100, 20 * Math.log10(x + 1))
+export const logNorm = (x: number): number =>
+  Math.min(100, 20 * Math.log10(x + 1));
 
 /** Clamp a value into [min, max]. */
 const clamp = (x: number, min: number, max: number): number =>
-  Math.max(min, Math.min(max, x))
+  Math.max(min, Math.min(max, x));
 
 /**
  * normalizeCore5 — turn raw Core 5 inputs into [0,100] scores (CANON §VI.6).
@@ -37,15 +38,15 @@ export function normalizeCore5(raw: Core5Raw): Core5Scores {
     pc: clamp(raw.prompt_complexity, 0, 100),
     ct: clamp(raw.cross_thread, 0, 100),
     tt: logNorm(raw.token_throughput),
-  }
+  };
 }
 
 /** RS.02 session-depth bucketization. First threshold met (>=) wins. */
 export function bucketizeDepth(rawDepth: number): number {
   for (const [threshold, score] of RS02_DEPTH_BUCKETS) {
-    if (rawDepth >= threshold) return score
+    if (rawDepth >= threshold) return score;
   }
-  return RS02_DEPTH_FALLBACK
+  return RS02_DEPTH_FALLBACK;
 }
 
 /**
@@ -53,12 +54,11 @@ export function bucketizeDepth(rawDepth: number): number {
  * = w·comp + w·sd + w·pc + w·ct + w·tt, result in [0,100].
  */
 export function computeSignaRate(scores: Core5Scores): number {
-  const { comp, sd, pc, ct, tt } = scores
-  const w = RS01_SIGNA_WEIGHTS
-  const signa = w.comp * comp + w.sd * sd + w.pc * pc + w.ct * ct + w.tt * tt
-  return clamp(signa, 0, 100)
+  const { comp, sd, pc, ct, tt } = scores;
+  const w = RS01_SIGNA_WEIGHTS;
+  const signa = w.comp * comp + w.sd * sd + w.pc * pc + w.ct * ct + w.tt * tt;
+  return clamp(signa, 0, 100);
 }
-
 
 /**
  * assignClass — LOCKED FUNCTION FORM (CANON §V, class_tiers.md).
@@ -77,15 +77,19 @@ export function computeSignaRate(scores: Core5Scores): number {
  * For the placeholder thresholds this is byte-identical to the prior if-chain,
  * preserving exact >= edge semantics.
  */
-export function assignClass(compression: number, signaRate: number): SignalClass {
+export function assignClass(
+  compression: number,
+  signaRate: number,
+): SignalClass {
   for (const t of RS05_CLASS_THRESHOLDS) {
     const met =
       t.signaMin !== null
         ? compression >= t.compMin && signaRate >= t.signaMin
-        : compression >= t.compMin
-    if (met) return t.class as SignalClass
+        : compression >= t.compMin;
+    if (met) return t.class as SignalClass;
   }
-  return RS05_CLASS_THRESHOLDS[RS05_CLASS_THRESHOLDS.length - 1].class as SignalClass
+  return RS05_CLASS_THRESHOLDS[RS05_CLASS_THRESHOLDS.length - 1]
+    .class as SignalClass;
 }
 
 /**
@@ -99,29 +103,29 @@ export function computeSignalForce(
   sessionDepthRaw: number,
   accountAgeDays: number,
 ): { raw: number; score: number } {
-  if (accountAgeDays <= 0) return { raw: 0, score: 0 }
-  const raw = (totalMessagesLifetime * sessionDepthRaw) / accountAgeDays
-  return { raw, score: logNorm(raw) }
+  if (accountAgeDays <= 0) return { raw: 0, score: 0 };
+  const raw = (totalMessagesLifetime * sessionDepthRaw) / accountAgeDays;
+  return { raw, score: logNorm(raw) };
 }
 
 /** Input bundle for scoreSnapshot. */
 export interface ScoreSnapshotInput {
-  raw: Core5Raw
+  raw: Core5Raw;
   /** PC confidence: 'exact' (precision/sig_army) or 'low' (free-tier estimate). */
-  pcConfidence: 'exact' | 'low'
+  pcConfidence: "exact" | "low";
   /** Lifetime total messages (B.03) for Signal Force. */
-  totalMessagesLifetime: number
+  totalMessagesLifetime: number;
   /** Account age in days (B.02) for Signal Force. */
-  accountAgeDays: number
+  accountAgeDays: number;
 }
 
 /** Output of scoreSnapshot — the engine-computed slice of a ScoredSnapshot. */
 export interface ScoreSnapshotResult {
-  signa_rate: number
-  class_tier: SignalClass
-  scores: Core5Scores
-  signal_force: number
-  signal_force_raw: number
+  signa_rate: number;
+  class_tier: SignalClass;
+  scores: Core5Scores;
+  signal_force: number;
+  signal_force_raw: number;
 }
 
 /**
@@ -131,19 +135,19 @@ export interface ScoreSnapshotResult {
  * AuditProvider), not here.
  */
 export function scoreSnapshot(input: ScoreSnapshotInput): ScoreSnapshotResult {
-  const scores = normalizeCore5(input.raw)
-  const signa_rate = computeSignaRate(scores)
-  const class_tier = assignClass(input.raw.compression_ratio, signa_rate)
+  const scores = normalizeCore5(input.raw);
+  const signa_rate = computeSignaRate(scores);
+  const class_tier = assignClass(input.raw.compression_ratio, signa_rate);
   const sf = computeSignalForce(
     input.totalMessagesLifetime,
     input.raw.session_depth,
     input.accountAgeDays,
-  )
+  );
   return {
     signa_rate,
     class_tier,
     scores,
     signal_force: sf.score,
     signal_force_raw: sf.raw,
-  }
+  };
 }

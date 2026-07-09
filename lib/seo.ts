@@ -11,13 +11,13 @@
  * static image + dynamic title/description approach is simpler and reliable.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
 
 /** Canonical production origin (no trailing slash). */
-export const SITE_ORIGIN = 'https://signalaf.com'
-export const SITE_NAME = 'SigRank'
+export const SITE_ORIGIN = "https://signalaf.com";
+export const SITE_NAME = "SigRank";
 export const SITE_TAGLINE =
-  'The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?'
+  "The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?";
 
 /** Static OG image (1200×630 brand card). MUST be a raster PNG/JPG — X, LinkedIn,
  *  Facebook, iMessage, Slack, and Discord all reject SVG for link-preview cards, so
@@ -26,14 +26,14 @@ export const SITE_TAGLINE =
  *  NOTE: versioned filename (og-v2) busts the GitHub/social OG cache — bump the suffix
  *  when the image changes so platforms re-fetch instead of serving a stale preview. */
 const OG_IMAGE = {
-  url: '/og-v2.png',
+  url: "/og-v2.png",
   width: 1200,
   height: 630,
   alt: SITE_NAME,
-}
+};
 
 /** Twitter card type — summary_large_image shows the full 1200×630 card. */
-const TWITTER_CARD = 'summary_large_image' as const
+const TWITTER_CARD = "summary_large_image" as const;
 
 /**
  * Build a Metadata object with site-wide OG/Twitter defaults, optionally
@@ -48,15 +48,15 @@ const TWITTER_CARD = 'summary_large_image' as const
  *   })
  */
 export function withOG(opts: {
-  title: string
-  description: string
-  path?: string
+  title: string;
+  description: string;
+  path?: string;
   /** Override the OG image (e.g. a per-page image). Defaults to /og-v2.png. */
-  ogImage?: { url: string; width?: number; height?: number; alt?: string }
+  ogImage?: { url: string; width?: number; height?: number; alt?: string };
 }): Metadata {
-  const { title, description, path, ogImage } = opts
-  const image = ogImage ?? OG_IMAGE
-  const url = path ? `${SITE_ORIGIN}${path}` : SITE_ORIGIN
+  const { title, description, path, ogImage } = opts;
+  const image = ogImage ?? OG_IMAGE;
+  const url = path ? `${SITE_ORIGIN}${path}` : SITE_ORIGIN;
   return {
     title,
     description,
@@ -65,7 +65,7 @@ export function withOG(opts: {
       title,
       description,
       siteName: SITE_NAME,
-      type: 'website',
+      type: "website",
       url,
       images: [image],
     },
@@ -75,7 +75,7 @@ export function withOG(opts: {
       description,
       images: [image.url],
     },
-  }
+  };
 }
 
 /**
@@ -93,7 +93,7 @@ export const siteMetadata: Metadata = {
   description: SITE_TAGLINE,
   openGraph: {
     siteName: SITE_NAME,
-    type: 'website',
+    type: "website",
     url: SITE_ORIGIN,
     images: [OG_IMAGE],
   },
@@ -101,4 +101,4 @@ export const siteMetadata: Metadata = {
     card: TWITTER_CARD,
     images: [OG_IMAGE.url],
   },
-}
+};

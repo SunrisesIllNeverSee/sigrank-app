@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * ChallengeOnX — social viral loop for the compare page.
@@ -13,29 +13,35 @@
  * it just posts the compare link without tags.
  */
 
-import Link from 'next/link'
+import Link from "next/link";
 
 interface ChallengeOnXProps {
   /** Display name for operator A. */
-  nameA: string
+  nameA: string;
   /** Display name for operator B. */
-  nameB: string
+  nameB: string;
   /** X handle for operator A (without @), if they have one. */
-  xA?: string | null
+  xA?: string | null;
   /** X handle for operator B (without @), if they have one. */
-  xB?: string | null
+  xB?: string | null;
   /** Compare page URL (with ?a=&b= params). */
-  compareUrl: string
+  compareUrl: string;
 }
 
-export function ChallengeOnX({ nameA, nameB, xA, xB, compareUrl }: ChallengeOnXProps) {
+export function ChallengeOnX({
+  nameA,
+  nameB,
+  xA,
+  xB,
+  compareUrl,
+}: ChallengeOnXProps) {
   // Build the tag text: @handle if available, otherwise just the name
-  const tagA = xA ? `@${xA}` : nameA
-  const tagB = xB ? `@${xB}` : nameB
+  const tagA = xA ? `@${xA}` : nameA;
+  const tagB = xB ? `@${xB}` : nameB;
 
-  const text = `⚔️ Throw-down challenge:\n\n${tagA} vs ${tagB}\n\nToken cascade head-to-head. Who compounds signal better?\n\n${compareUrl}`
+  const text = `⚔️ Throw-down challenge:\n\n${tagA} vs ${tagB}\n\nToken cascade head-to-head. Who compounds signal better?\n\n${compareUrl}`;
 
-  const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+  const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
   return (
     <Link
@@ -53,5 +59,5 @@ export function ChallengeOnX({ nameA, nameB, xA, xB, compareUrl }: ChallengeOnXP
       </svg>
       Challenge on X
     </Link>
-  )
+  );
 }

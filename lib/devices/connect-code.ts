@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/devices/connect-code.ts — connect-code generation + normalization (D7 §4.2).
@@ -11,16 +11,16 @@ import 'server-only'
  * `byte % 32` index draw is unbiased.
  */
 
-import { randomBytes } from 'node:crypto'
+import { randomBytes } from "node:crypto";
 
-const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ' // 32 chars, no I L O U
+const CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"; // 32 chars, no I L O U
 
 /** Generate a fresh SIGR-XXXXX-XXXXX-XXXXX connect code (~75-bit). */
 export function generateConnectCode(): string {
-  const bytes = randomBytes(15)
-  let s = ''
-  for (let i = 0; i < 15; i++) s += CROCKFORD[bytes[i] % 32]
-  return `SIGR-${s.slice(0, 5)}-${s.slice(5, 10)}-${s.slice(10, 15)}`
+  const bytes = randomBytes(15);
+  let s = "";
+  for (let i = 0; i < 15; i++) s += CROCKFORD[bytes[i] % 32];
+  return `SIGR-${s.slice(0, 5)}-${s.slice(5, 10)}-${s.slice(10, 15)}`;
 }
 
 /**
@@ -30,8 +30,8 @@ export function generateConnectCode(): string {
  * lookup simply misses (→ code_invalid), never throwing.
  */
 export function normalizeConnectCode(raw: string): string {
-  const up = raw.trim().toUpperCase().replace(/\s+/g, '')
-  if (!up.startsWith('SIGR-')) return up
-  const body = up.slice(5).replace(/[ILO]/g, (c) => (c === 'O' ? '0' : '1'))
-  return `SIGR-${body}`
+  const up = raw.trim().toUpperCase().replace(/\s+/g, "");
+  if (!up.startsWith("SIGR-")) return up;
+  const body = up.slice(5).replace(/[ILO]/g, (c) => (c === "O" ? "0" : "1"));
+  return `SIGR-${body}`;
 }

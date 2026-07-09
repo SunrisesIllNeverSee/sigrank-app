@@ -1,28 +1,62 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
-import { CopyButton } from '@/components/marketing/CopyButton'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { scoreCalculator, scoreHowTo, cliTool } from '@/lib/jsonld'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { CopyButton } from "@/components/marketing/CopyButton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { scoreCalculator, scoreHowTo, cliTool } from "@/lib/jsonld";
 
 /**
  * app/score/page.tsx — the "Measure" page.
  *
- * This is a LANDING PAGE for cold traffic from GitHub/HN. The README links
- * here with "See your projected rank in 60 seconds." The page must deliver
- * that — one command, one outcome — not a technical doc.
- *
- * Primary: one command (`npx sigrank`) that does everything.
- * Secondary: how it works + privacy (below the fold for people who want details).
- * Backup: paste calculator link at the bottom.
+ * Primary content: the agent path (install → enroll → submit) + data privacy.
+ * The paste calculator is a backup, linked at the bottom — not the main flow.
+ * The agent reads your local logs on-device; paste is for when you can't
+ * install or just want a quick preview.
  */
 
 export const metadata: Metadata = withOG({
-  title: 'See your AI operator rank',
+  title: "Score your cascade",
   description:
-    'Run one command. See where you rank against every other AI operator. Token counts only — never your prompts.',
-  path: '/score',
-})
+    "Install the SigRank agent to read your token cascade from local logs on-device. No paste, no prompts read — only the four token counts leave your machine.",
+  path: "/score",
+});
+
+const PIPELINE = [
+  {
+    step: "01",
+    title: "Agent reads your local logs",
+    body: "tokenpull reads local session logs from 15+ platforms — Claude Code, Codex, Amp, Kimi, Gemini CLI, GitHub Copilot CLI, Goose, Kilo, Hermes, and more — and counts the four token pillars across each window. Never prompt content; only the four integers.",
+  },
+  {
+    step: "02",
+    title: "Cascade derived on-device",
+    body: "The cascade math runs locally: Υ Yield, SNR, Leverage, Velocity, 10xDEV, and your class tier. You see your full cascade before anything leaves your machine.",
+  },
+  {
+    step: "03",
+    title: "Pillars submitted to the board",
+    body: "sigrank submit posts the four canonical pillars per window. The server re-scores them authoritatively. Only the four integers are transmitted — never your prompts, never your outputs, never your code.",
+  },
+];
+
+const PRIVACY_POINTS = [
+  {
+    t: "Zero-paste, on-device read",
+    b: "tokenpull reads local session logs and counts the four token pillars across 7d / 30d / 90d / all-time — no copy-paste, nothing to assemble by hand.",
+  },
+  {
+    t: "Token counts only",
+    b: "The agent counts tokens. It never reads the content of your prompts or replies. Only the four integers leave your machine.",
+  },
+  {
+    t: "Signed submissions",
+    b: "Each snapshot is signed with an ed25519 keypair (per-device). The server verifies the signature before accepting. No spoofing, no spoofed ranks.",
+  },
+  {
+    t: "Read-only by design",
+    b: "The agent is read-only against telemetry. It emits no prompt of its own. It measures without disturbing what it measures.",
+  },
+];
 
 export default function ScorePage() {
   return (
@@ -30,118 +64,112 @@ export default function ScorePage() {
       {/* JSON-LD: WebApplication (the calculator) + HowTo (the flow) + SoftwareApplication (the CLI) */}
       <JsonLd data={[scoreCalculator(), scoreHowTo(), cliTool()]} />
 
-      {/* Hero — one screen, one action */}
-      <div className="flex flex-col gap-6 text-center">
-        <h1 className="font-mono text-4xl font-bold leading-tight text-text-primary sm:text-5xl">
-          See your rank
+      {/* Hero */}
+      <div className="flex flex-col gap-3 text-center">
+        <span className="font-mono text-xs uppercase tracking-widest text-gold">
+          ◈ Score your cascade
+        </span>
+        <h1 className="font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
+          How much signal does your token cascade actually compound?
         </h1>
-        <p className="mx-auto max-w-lg font-sans text-base leading-relaxed text-text-secondary">
-          How efficiently do you use AI compared to everyone else? Run one command.
-          Get your rank in 60 seconds.
+        <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
+          Install the agent. It reads your local AI session logs on-device,
+          derives your cascade, and submits a signed snapshot to the board. No
+          paste, no prompts read — only the four token counts leave your
+          machine.
         </p>
+      </div>
 
-        {/* One command — the entire action */}
-        <div className="mx-auto mt-2 flex w-full max-w-lg items-center gap-3 rounded-lg border border-bg-border bg-bg-base px-4 py-4">
-          <code className="flex-1 overflow-x-auto font-mono text-lg font-semibold text-text-accent">
-            npx sigrank
+      {/* Install — three steps with copy buttons */}
+      <div className="mt-10 flex flex-col gap-3">
+        <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-base px-4 py-3">
+          <span className="font-mono text-xs font-semibold text-text-muted">
+            1
+          </span>
+          <code className="flex-1 overflow-x-auto font-mono text-sm font-semibold text-text-accent">
+            npm install -g sigrank
           </code>
-          <CopyButton text="npx sigrank" />
+          <CopyButton text="npm install -g sigrank" />
         </div>
-
-        <p className="font-sans text-sm leading-relaxed text-text-muted">
-          That&apos;s it. It reads your local AI session logs, counts your tokens,
-          and shows your rank.{' '}
-          <Link href="/board/all" className="text-text-accent underline-offset-2 hover:underline">
-            See the leaderboard →
+        <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-base px-4 py-3">
+          <span className="font-mono text-xs font-semibold text-text-muted">
+            2
+          </span>
+          <code className="flex-1 overflow-x-auto font-mono text-sm font-semibold text-text-accent">
+            sigrank enroll
+          </code>
+          <CopyButton text="sigrank enroll" />
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-base px-4 py-3">
+          <span className="font-mono text-xs font-semibold text-text-muted">
+            3
+          </span>
+          <code className="flex-1 overflow-x-auto font-mono text-sm font-semibold text-text-accent">
+            sigrank submit
+          </code>
+          <CopyButton text="sigrank submit" />
+        </div>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          Pulls the agent + ccusage + tokscale + tokendash in one install. Node
+          ≥18, macOS + Linux. Or let your AI agent do it — tell it to run{" "}
+          <code className="font-mono text-text-primary">npx sigrank</code> to
+          see your cascade, or{" "}
+          <code className="font-mono text-text-primary">
+            npx sigrank submit
+          </code>{" "}
+          to publish. For direct tool calls, wire it as an MCP server — see the{" "}
+          <Link
+            href="/wiki/local-agent"
+            className="text-text-accent underline-offset-2 hover:underline"
+          >
+            local agent wiki page
           </Link>
+          .
         </p>
       </div>
 
-      {/* What you get — below the fold */}
-      <div className="mt-16 flex flex-col gap-4">
-        <h2 className="font-mono text-sm font-semibold uppercase tracking-wider text-text-muted">
-          What you see
-        </h2>
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <span className="font-mono text-sm font-bold text-gold">→</span>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-sans text-sm font-semibold text-text-primary">Your rank on the board</h3>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                Where you stand against every other AI operator. Updated every time you submit.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <span className="font-mono text-sm font-bold text-gold">→</span>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-sans text-sm font-semibold text-text-primary">Your yield score</h3>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                How much signal you compound from every token. Not how much you spend — how efficiently you use what you spend.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <span className="font-mono text-sm font-bold text-gold">→</span>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-sans text-sm font-semibold text-text-primary">Your class tier</h3>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                Bronze, Silver, Gold, Platinum, or Diamond — based on your cascade efficiency, not your token volume.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* How it works — for people who want details */}
+      {/* How it works — the pipeline */}
       <div className="mt-12 flex flex-col gap-4">
         <h2 className="font-mono text-sm font-semibold uppercase tracking-wider text-text-muted">
-          How it works
+          How the agent path works
         </h2>
         <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <span className="font-mono text-sm font-bold text-gold">01</span>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-sans text-sm font-semibold text-text-primary">Reads your local logs</h3>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                sigrank reads session logs from Claude Code, Codex, Cursor, and 15+ other platforms.
-                It counts tokens — never reads your prompts or outputs.
-              </p>
+          {PIPELINE.map((p) => (
+            <div key={p.step} className="flex gap-4">
+              <span className="font-mono text-sm font-bold text-gold">
+                {p.step}
+              </span>
+              <div className="flex flex-col gap-1">
+                <h3 className="font-sans text-sm font-semibold text-text-primary">
+                  {p.title}
+                </h3>
+                <p className="font-sans text-sm leading-relaxed text-text-secondary">
+                  {p.body}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-4">
-            <span className="font-mono text-sm font-bold text-gold">02</span>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-sans text-sm font-semibold text-text-primary">Scores you on-device</h3>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                Your yield, class tier, and rank are computed locally. You see your full score before anything leaves your machine.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <span className="font-mono text-sm font-bold text-gold">03</span>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-sans text-sm font-semibold text-text-primary">Submit to the board</h3>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                <code className="font-mono text-text-primary">npx sigrank submit</code> posts your four token counts
-                (input, output, cache create, cache read) to the leaderboard. Signed with a per-device key. No spoofing.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Privacy — one line, not a wall */}
+      {/* Data privacy */}
       <div className="mt-12 rounded-xl border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-sm font-semibold uppercase tracking-wider text-gold">
-          ⊙ Privacy
+          ⊙ Data privacy
         </h2>
-        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          Token counts only. Never your prompts, never your outputs, never your code.
-          The agent reads local logs on-device and submits four integers. Signed with ed25519.
-          Read-only by design — it measures without disturbing what it measures.
-        </p>
-        <p className="mt-3 font-mono text-xs text-text-muted">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {PRIVACY_POINTS.map((p) => (
+            <div key={p.t} className="flex flex-col gap-1">
+              <h3 className="font-sans text-sm font-semibold text-text-primary">
+                {p.t}
+              </h3>
+              <p className="font-sans text-sm leading-relaxed text-text-secondary">
+                {p.b}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 font-mono text-xs text-text-muted">
           Token counts only. Never your prompts.
         </p>
       </div>
@@ -149,7 +177,7 @@ export default function ScorePage() {
       {/* Paste — backup link at the bottom */}
       <div className="mt-12 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Can&apos;t install the agent? Just want a quick preview?{' '}
+          Can&apos;t install the agent? Just want a quick preview?{" "}
           <Link
             href="/score/paste"
             className="text-text-accent underline-offset-2 hover:underline"
@@ -158,9 +186,10 @@ export default function ScorePage() {
           </Link>
         </p>
         <p className="mt-1 font-sans text-xs leading-relaxed text-text-muted">
-          The paste calculator is a backup — no account, no save, just the numbers.
+          The paste calculator is a backup — no account, no save, just the
+          numbers. The agent path is how you compete.
         </p>
       </div>
     </main>
-  )
+  );
 }

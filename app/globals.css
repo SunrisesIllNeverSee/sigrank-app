@@ -44,25 +44,25 @@
 
 /* ── Carbon — default dark (Vercel-black, hairline borders, no glow) ──────── */
 :root,
-[data-theme='carbon'] {
+[data-theme="carbon"] {
   /* LOCKED THEME — exact values from _HEADER_LOCKED.html so every page that uses
      these tokens inherits the chart's foundation theme (bone-white on warm black,
      gold accent). Repointed 2026-06-18. */
   color-scheme: dark;
-  --bg-base: 13 11 8;          /* #0d0b08 */
-  --bg-surface: 21 18 12;      /* #15120c */
-  --bg-elevated: 34 29 20;     /* #221d14 (pill/elevated fill) */
+  --bg-base: 13 11 8; /* #0d0b08 */
+  --bg-surface: 21 18 12; /* #15120c */
+  --bg-elevated: 34 29 20; /* #221d14 (pill/elevated fill) */
   --bg-hover: 42 36 24;
-  --bg-border: 51 45 32;       /* #332d20 */
-  --bg-border-subtle: 36 31 22;/* #241f16 (table row line) */
+  --bg-border: 51 45 32; /* #332d20 */
+  --bg-border-subtle: 36 31 22; /* #241f16 (table row line) */
 
   --text-primary: 233 227 213; /* #e9e3d5 bone */
   --text-secondary: 196 186 165; /* lifted from 178/168/148 — readability (owner 2026-06-19) */
-  --text-muted: 158 147 124;   /* lifted from 125/116/97 — was too dark on carbon */
-  --text-dim: 146 134 108;     /* AA: 5.20:1 on surface, 5.47:1 on base (lifted from 122/112/90, which was 4.0:1 — Lighthouse a11y fix 2026-06-30) */
+  --text-muted: 158 147 124; /* lifted from 125/116/97 — was too dark on carbon */
+  --text-dim: 146 134 108; /* AA: 5.20:1 on surface, 5.47:1 on base (lifted from 122/112/90, which was 4.0:1 — Lighthouse a11y fix 2026-06-30) */
 
-  --gold: 196 146 58;          /* #c4923a brand accent */
-  --accent: 156 196 255;       /* cascade-blue, harmonized with locked palette */
+  --gold: 196 146 58; /* #c4923a brand accent */
+  --accent: 156 196 255; /* cascade-blue, harmonized with locked palette */
 
   --rank-low: 167 139 250; /* #a78bfa — ranks 4–10 trophy-purple (dark) */
 
@@ -71,7 +71,7 @@
 }
 
 /* ── Paper — light (Vercel-white) ─────────────────────────────────────────── */
-[data-theme='paper'] {
+[data-theme="paper"] {
   color-scheme: light;
   --bg-base: 255 255 255;
   --bg-surface: 250 250 250;
@@ -85,8 +85,8 @@
   --text-muted: 113 113 122;
   --text-dim: 161 161 170;
 
-  --gold: 180 83 9;         /* amber-700, readable on white */
-  --accent: 29 78 216;      /* blue-700 */
+  --gold: 180 83 9; /* amber-700, readable on white */
+  --accent: 29 78 216; /* blue-700 */
 
   --bar-low: 228 228 231;
   --rank-low: 124 58 237; /* #7c3aed — ranks 4–10 trophy-purple (light) */
@@ -95,7 +95,7 @@
 }
 
 /* ── Railway — violet dark ────────────────────────────────────────────────── */
-[data-theme='railway'] {
+[data-theme="railway"] {
   color-scheme: dark;
   --bg-base: 13 11 20;
   --bg-surface: 21 18 31;
@@ -106,10 +106,10 @@
 
   --text-primary: 244 242 251;
   --text-secondary: 190 181 214; /* lifted from 169/159/196 — readability (owner 2026-06-19) */
-  --text-muted: 152 141 184;   /* lifted from 122/111/153 — was too dark on dark violet */
-  --text-dim: 129 117 162;     /* AA: 4.65:1 on #0d0b14 (lifted from 116/105/146, which was 3.9:1 — Lighthouse a11y fix 2026-06-30) */
+  --text-muted: 152 141 184; /* lifted from 122/111/153 — was too dark on dark violet */
+  --text-dim: 129 117 162; /* AA: 4.65:1 on #0d0b14 (lifted from 116/105/146, which was 3.9:1 — Lighthouse a11y fix 2026-06-30) */
 
-  --gold: 167 139 250;      /* brand accent becomes violet in this theme */
+  --gold: 167 139 250; /* brand accent becomes violet in this theme */
   --accent: 139 92 246;
 
   --bar-low: 47 40 68;
@@ -123,22 +123,22 @@
  * near-black bg, warm bone-green text, TUI gold (#e0b240) brand accent, terminal-
  * green accent. Every token reuses the SAME var names so all components re-skin
  * for free. Layer 2 (monospace) is scoped below. NEVER default — carbon stays. */
-[data-theme='terminal'] {
+[data-theme="terminal"] {
   color-scheme: dark;
-  --bg-base: 5 6 5;            /* near-black, faint green cast */
+  --bg-base: 5 6 5; /* near-black, faint green cast */
   --bg-surface: 10 13 10;
   --bg-elevated: 16 20 16;
   --bg-hover: 22 28 22;
-  --bg-border: 38 64 42;       /* dim terminal-green border */
+  --bg-border: 38 64 42; /* dim terminal-green border */
   --bg-border-subtle: 24 38 26;
 
   --text-primary: 222 230 210; /* warm bone-green */
   --text-secondary: 150 200 150;
   --text-muted: 110 150 110;
-  --text-dim: 92 130 92;       /* AA: 4.64:1 on #050605 (lifted from 78/110/78, which was 3.5:1 — Lighthouse a11y fix 2026-06-30) */
+  --text-dim: 92 130 92; /* AA: 4.64:1 on #050605 (lifted from 78/110/78, which was 3.5:1 — Lighthouse a11y fix 2026-06-30) */
 
-  --gold: 224 178 64;          /* TUI gold (#e0b240) */
-  --accent: 120 220 130;       /* terminal green accent */
+  --gold: 224 178 64; /* TUI gold (#e0b240) */
+  --accent: 120 220 130; /* terminal green accent */
 
   --bar-low: 24 38 26;
   --rank-low: 224 178 64;
@@ -150,9 +150,29 @@
  * Under terminal only, force the mono font on body + the common text elements.
  * The repo already loads --font-geist-mono via layout.tsx. Mono is wider than
  * the default sans — verified the board table + nav don't overflow on mobile. */
-[data-theme='terminal'] body,
-[data-theme='terminal'] :where(h1, h2, h3, h4, h5, h6, p, span, a, button, td, th, div, li, label, input, select, textarea) {
-  font-family: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
+[data-theme="terminal"] body,
+[data-theme="terminal"]
+  :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    a,
+    button,
+    td,
+    th,
+    div,
+    li,
+    label,
+    input,
+    select,
+    textarea
+  ) {
+  font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
 }
 
 /* ── Terminal layer 4: box-drawing borders (theme-scoped, purely additive) ───
@@ -167,23 +187,23 @@
  * sit at the top-left + bottom-right corners, colored with --gold, and are
  * small enough not to crowd the content.
  */
-[data-theme='terminal'] .border-bg-border,
-[data-theme='terminal'] .border-bg-border-subtle {
+[data-theme="terminal"] .border-bg-border,
+[data-theme="terminal"] .border-bg-border-subtle {
   border-style: dashed;
 }
 
 /* ◈ corner accents on bordered cards (the TUI motif). Only on elements that
    have both a border + rounded corners (the card pattern) — not on every
    hairline divider. We target the common card class combos. */
-[data-theme='terminal'] .rounded-xl.border,
-[data-theme='terminal'] .rounded-2xl.border,
-[data-theme='terminal'] .rounded-lg.border {
+[data-theme="terminal"] .rounded-xl.border,
+[data-theme="terminal"] .rounded-2xl.border,
+[data-theme="terminal"] .rounded-lg.border {
   position: relative;
 }
-[data-theme='terminal'] .rounded-xl.border::before,
-[data-theme='terminal'] .rounded-2xl.border::before,
-[data-theme='terminal'] .rounded-lg.border::before {
-  content: '◈';
+[data-theme="terminal"] .rounded-xl.border::before,
+[data-theme="terminal"] .rounded-2xl.border::before,
+[data-theme="terminal"] .rounded-lg.border::before {
+  content: "◈";
   position: absolute;
   top: -0.5em;
   left: -0.35em;
@@ -193,10 +213,10 @@
   pointer-events: none;
   z-index: 1;
 }
-[data-theme='terminal'] .rounded-xl.border::after,
-[data-theme='terminal'] .rounded-2xl.border::after,
-[data-theme='terminal'] .rounded-lg.border::after {
-  content: '◈';
+[data-theme="terminal"] .rounded-xl.border::after,
+[data-theme="terminal"] .rounded-2xl.border::after,
+[data-theme="terminal"] .rounded-lg.border::after {
+  content: "◈";
   position: absolute;
   bottom: -0.5em;
   right: -0.35em;
@@ -221,14 +241,28 @@
  * strobe (seizure risk). The animation still runs, just gently.
  */
 @keyframes terminal-wordmark-cycle {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 .terminal-wordmark-line {
   background: linear-gradient(
     90deg,
-    #e0b240, #f0c862, #e8a0d0, #f08c3c, #f0d878, #fef0c0,
-    #e0b240, #f0c862, #e8a0d0, #f08c3c, #f0d878, #fef0c0
+    #e0b240,
+    #f0c862,
+    #e8a0d0,
+    #f08c3c,
+    #f0d878,
+    #fef0c0,
+    #e0b240,
+    #f0c862,
+    #e8a0d0,
+    #f08c3c,
+    #f0d878,
+    #fef0c0
   );
   background-size: 200% 100%;
   background-position: 0% 50%;
@@ -256,7 +290,9 @@
     line-height: 1.45;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   ::selection {
@@ -284,7 +320,7 @@
 /* Canonical-id superscript: mono, muted, attached to real values. */
 .canon-id {
   margin-left: 1px;
-  font-family: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
+  font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
   font-size: 0.62em;
   line-height: 1;
   vertical-align: super;
@@ -304,8 +340,12 @@
  * the full length of the path. var(--dur)/var(--delay) are set per-stream inline.
  */
 @keyframes cascade-pulse {
-  from { stroke-dashoffset: 1; }
-  to   { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 .cascade-pulse {
   animation: cascade-pulse var(--dur, 6s) linear var(--delay, 0s) infinite;
@@ -319,12 +359,29 @@
  * locks to the base mono face.
  */
 @keyframes wordmark-rotate {
-  0%, 18%   { font-family: var(--font-geist-mono), monospace; }
-  20%, 38%  { font-family: var(--wm-grotesk), sans-serif; }
-  40%, 58%  { font-family: var(--wm-serif), serif; }
-  60%, 78%  { font-family: var(--wm-black), sans-serif; }
-  80%, 98%  { font-family: var(--font-geist-mono), monospace; }
-  100%      { font-family: var(--font-geist-mono), monospace; }
+  0%,
+  18% {
+    font-family: var(--font-geist-mono), monospace;
+  }
+  20%,
+  38% {
+    font-family: var(--wm-grotesk), sans-serif;
+  }
+  40%,
+  58% {
+    font-family: var(--wm-serif), serif;
+  }
+  60%,
+  78% {
+    font-family: var(--wm-black), sans-serif;
+  }
+  80%,
+  98% {
+    font-family: var(--font-geist-mono), monospace;
+  }
+  100% {
+    font-family: var(--font-geist-mono), monospace;
+  }
 }
 .wordmark-letter {
   display: inline-block;
@@ -337,19 +394,36 @@
  * character is hidden with color:transparent so we never get a double image.
  */
 @keyframes wordmark-s-char {
-  0%, 18%   { content: 'S'; }
-  20%, 38%  { content: 'S'; }
-  40%, 58%  { content: 'S'; }
-  60%, 78%  { content: 'S'; }
-  80%, 98%  { content: '§'; }
-  100%      { content: 'S'; }
+  0%,
+  18% {
+    content: "S";
+  }
+  20%,
+  38% {
+    content: "S";
+  }
+  40%,
+  58% {
+    content: "S";
+  }
+  60%,
+  78% {
+    content: "S";
+  }
+  80%,
+  98% {
+    content: "§";
+  }
+  100% {
+    content: "S";
+  }
 }
 .wordmark-letter-s {
   color: transparent;
   position: relative;
 }
 .wordmark-letter-s::before {
-  content: 'S';
+  content: "S";
   position: absolute;
   left: 0;
   /* Lock to the exact gold token (not currentColor) so the S matches the other
@@ -389,7 +463,7 @@
 }
 .flip-card:hover .flip-inner,
 .flip-card:focus-within .flip-inner {
-  animation-play-state: paused;   /* hover/focus pauses rotation */
+  animation-play-state: paused; /* hover/focus pauses rotation */
 }
 .flip-face {
   position: absolute;
@@ -406,13 +480,25 @@
   transform: rotateY(180deg);
 }
 @keyframes flip-rotate {
-  0%, 42%   { transform: rotateY(0deg); }
-  50%, 92%  { transform: rotateY(180deg); }
-  100%      { transform: rotateY(360deg); }
+  0%,
+  42% {
+    transform: rotateY(0deg);
+  }
+  50%,
+  92% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .flip-inner { animation: none; }
-  .flip-back { display: none; }   /* static front face only */
+  .flip-inner {
+    animation: none;
+  }
+  .flip-back {
+    display: none;
+  } /* static front face only */
 }
 
 /* ── Compare page "special" treatment (CMP-SPECIAL, owner 2026-06-20) ───────────
@@ -423,14 +509,18 @@
  * reduced-motion-safe (locked static below).
  */
 @keyframes verdict-sweep {
-  0%   { background-position: -30% 0; }
-  100% { background-position: 130% 0; }
+  0% {
+    background-position: -30% 0;
+  }
+  100% {
+    background-position: 130% 0;
+  }
 }
 .verdict-sweep {
   background-image: linear-gradient(
     100deg,
     transparent 30%,
-    rgb(var(--gold) / 0.10) 50%,
+    rgb(var(--gold) / 0.1) 50%,
     transparent 70%
   );
   background-size: 60% 100%;
@@ -438,32 +528,64 @@
   animation: verdict-sweep 9s ease-in-out infinite;
 }
 @keyframes winner-glow {
-  0%, 100% { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.30), 0 0 24px -6px rgb(var(--gold) / 0.35); }
-  50%      { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.45), 0 0 40px -4px rgb(var(--gold) / 0.55); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.3),
+      0 0 24px -6px rgb(var(--gold) / 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.45),
+      0 0 40px -4px rgb(var(--gold) / 0.55);
+  }
 }
 .winner-glow {
   animation: winner-glow 4.5s ease-in-out infinite;
 }
 @keyframes tally-grow {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 .tally-grow {
   transform-origin: var(--grow-origin, left);
   animation: tally-grow 1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes figure-rise {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .figure-rise {
   animation: figure-rise 0.7s ease-out both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .verdict-sweep { animation: none; background-image: none; }
-  .winner-glow   { animation: none; box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35); }
-  .tally-grow    { animation: none; transform: scaleX(1); }
-  .figure-rise   { animation: none; opacity: 1; transform: none; }
+  .verdict-sweep {
+    animation: none;
+    background-image: none;
+  }
+  .winner-glow {
+    animation: none;
+    box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35);
+  }
+  .tally-grow {
+    animation: none;
+    transform: scaleX(1);
+  }
+  .figure-rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ── Always-on gold glow (owner 2026-06-22: "glowing highlights around the boxes") ──
@@ -473,24 +595,52 @@
  * A slow breathing pulse makes them feel alive; locks to a static ring under
  * reduced-motion. Opt-in (Carbon is no-glow by default). */
 @keyframes box-glow-pulse {
-  0%, 100% { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35), 0 0 26px -8px rgb(var(--gold) / 0.40); }
-  50%      { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.55), 0 0 44px -6px rgb(var(--gold) / 0.60); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.35),
+      0 0 26px -8px rgb(var(--gold) / 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.55),
+      0 0 44px -6px rgb(var(--gold) / 0.6);
+  }
 }
 .box-glow {
   animation: box-glow-pulse 5s ease-in-out infinite;
   border-color: rgb(var(--gold) / 0.45);
 }
 @keyframes box-glow-soft-pulse {
-  0%, 100% { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.22), 0 0 16px -8px rgb(var(--gold) / 0.30); }
-  50%      { box-shadow: 0 0 0 1px rgb(var(--gold) / 0.35), 0 0 26px -6px rgb(var(--gold) / 0.42); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.22),
+      0 0 16px -8px rgb(var(--gold) / 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.35),
+      0 0 26px -6px rgb(var(--gold) / 0.42);
+  }
 }
 .box-glow-soft {
   animation: box-glow-soft-pulse 5s ease-in-out infinite;
   border-color: rgb(var(--gold) / 0.35);
 }
 @media (prefers-reduced-motion: reduce) {
-  .box-glow      { animation: none; box-shadow: 0 0 0 1px rgb(var(--gold) / 0.45), 0 0 30px -8px rgb(var(--gold) / 0.45); }
-  .box-glow-soft { animation: none; box-shadow: 0 0 0 1px rgb(var(--gold) / 0.30), 0 0 20px -8px rgb(var(--gold) / 0.32); }
+  .box-glow {
+    animation: none;
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.45),
+      0 0 30px -8px rgb(var(--gold) / 0.45);
+  }
+  .box-glow-soft {
+    animation: none;
+    box-shadow:
+      0 0 0 1px rgb(var(--gold) / 0.3),
+      0 0 20px -8px rgb(var(--gold) / 0.32);
+  }
 }
 
 /* ── Shine sweep (owner 2026-06-22: "flash fade" — premium-card glint) ──────────────
@@ -501,13 +651,24 @@
  * via --shine-delay so they glint in sequence, not in unison. GPU-only (transform),
  * reduced-motion-safe (no sweep). The sweep is mostly-idle: a quick pass, long pause. */
 @keyframes shine-sweep {
-  0%        { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
-  8%        { opacity: 1; }
-  22%       { transform: translateX(120%) skewX(-18deg); opacity: 0; }
-  100%      { transform: translateX(120%) skewX(-18deg); opacity: 0; }
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  22% {
+    transform: translateX(120%) skewX(-18deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(120%) skewX(-18deg);
+    opacity: 0;
+  }
 }
 .shine-sweep::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: 0;
@@ -517,9 +678,9 @@
   background: linear-gradient(
     100deg,
     transparent,
-    rgb(var(--gold) / 0.30) 40%,
+    rgb(var(--gold) / 0.3) 40%,
     rgb(var(--text-primary) / 0.45) 50%,
-    rgb(var(--gold) / 0.30) 60%,
+    rgb(var(--gold) / 0.3) 60%,
     transparent
   );
   transform: translateX(-120%) skewX(-18deg);
@@ -527,7 +688,10 @@
   animation-delay: var(--shine-delay, 0s);
 }
 @media (prefers-reduced-motion: reduce) {
-  .shine-sweep::before { animation: none; opacity: 0; }
+  .shine-sweep::before {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 /* ── Landing global motion pause (owner 2026-06-21) ─────────────────────────────
@@ -538,9 +702,9 @@
  * animation so it resumes mid-cycle on play. `animation-play-state: paused` keeps
  * the current frame, so nothing jumps. Doubles as an accessibility motion toggle.
  */
-html[data-landing-motion='paused'] .wordmark-letter,
-html[data-landing-motion='paused'] .animate-ticker,
-html[data-landing-motion='paused'] .flip-inner,
-html[data-landing-motion='paused'] .cascade-pulse {
+html[data-landing-motion="paused"] .wordmark-letter,
+html[data-landing-motion="paused"] .animate-ticker,
+html[data-landing-motion="paused"] .flip-inner,
+html[data-landing-motion="paused"] .cascade-pulse {
   animation-play-state: paused !important;
 }

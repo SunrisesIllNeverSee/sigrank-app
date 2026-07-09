@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 /**
  * ClaimedBadge — shared "✓ Claimed" pill (G4-owned, imported by other groups).
@@ -8,11 +8,11 @@ import React from 'react'
  */
 
 interface Props {
-  claimed: boolean
+  claimed: boolean;
 }
 
 export function ClaimedBadge({ claimed }: Props) {
-  if (!claimed) return null
+  if (!claimed) return null;
   return (
     <span
       title="This operator has been claimed by its owner."
@@ -20,5 +20,5 @@ export function ClaimedBadge({ claimed }: Props) {
     >
       ✓ Claimed
     </span>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/leaderboard/ClassFilter.tsx
@@ -10,30 +10,30 @@
  * changing it pushes a `class=<id>` query param.
  */
 
-import { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { CLASS_FILTER } from '@/lib/constants'
+import { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { CLASS_FILTER } from "@/lib/constants";
 
 interface Props {
   /** Currently-selected class scope id (lowercase, e.g. 'transmitter' or 'all'). */
-  value: string
+  value: string;
 }
 
 export function ClassFilter({ value }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const onChange = useCallback(
     (next: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (next === 'all') params.delete('class')
-      else params.set('class', next)
-      const qs = params.toString()
-      router.push(qs ? `${pathname}?${qs}` : pathname)
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === "all") params.delete("class");
+      else params.set("class", next);
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     },
     [router, pathname, searchParams],
-  )
+  );
 
   return (
     <label className="flex flex-col gap-1">
@@ -53,5 +53,5 @@ export function ClassFilter({ value }: Props) {
         ))}
       </select>
     </label>
-  )
+  );
 }

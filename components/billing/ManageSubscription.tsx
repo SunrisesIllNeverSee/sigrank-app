@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
 /**
  * components/billing/ManageSubscription.tsx — "Manage subscription" button that
@@ -13,38 +13,41 @@ import React, { useState } from 'react'
  */
 
 interface Props {
-  operatorId?: string
-  customerId?: string
+  operatorId?: string;
+  customerId?: string;
 }
 
 export function ManageSubscription({ operatorId, customerId }: Props) {
-  const [pending, setPending] = useState(false)
-  const [notice, setNotice] = useState<string | null>(null)
+  const [pending, setPending] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   async function onManage() {
-    setPending(true)
-    setNotice(null)
+    setPending(true);
+    setNotice(null);
     try {
-      const res = await fetch('/api/v1/billing/portal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ operator_id: operatorId, customer_id: customerId }),
-      })
+      const res = await fetch("/api/v1/billing/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          operator_id: operatorId,
+          customer_id: customerId,
+        }),
+      });
       if (res.status === 503) {
-        setNotice('Try again later')
-        setPending(false)
-        return
+        setNotice("Try again later");
+        setPending(false);
+        return;
       }
-      const data = (await res.json()) as { url?: string }
+      const data = (await res.json()) as { url?: string };
       if (data.url) {
-        window.location.assign(data.url)
-        return
+        window.location.assign(data.url);
+        return;
       }
-      setNotice('Could not open the billing portal.')
-      setPending(false)
+      setNotice("Could not open the billing portal.");
+      setPending(false);
     } catch {
-      setNotice('Try again later')
-      setPending(false)
+      setNotice("Try again later");
+      setPending(false);
     }
   }
 
@@ -56,9 +59,11 @@ export function ManageSubscription({ operatorId, customerId }: Props) {
         disabled={pending}
         className="rounded-md border border-bg-border bg-bg-elevated px-4 py-2 font-sans text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {pending ? 'Opening…' : 'Manage subscription'}
+        {pending ? "Opening…" : "Manage subscription"}
       </button>
-      {notice ? <span className="font-sans text-[11px] text-text-muted">{notice}</span> : null}
+      {notice ? (
+        <span className="font-sans text-[11px] text-text-muted">{notice}</span>
+      ) : null}
     </div>
-  )
+  );
 }

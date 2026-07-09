@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { PlatformPicker } from '@/components/auth/PlatformPicker'
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { PlatformPicker } from "@/components/auth/PlatformPicker";
 
 /**
  * components/auth/ProfileEditForm.tsx — the editable profile surface
@@ -16,16 +16,16 @@ import { PlatformPicker } from '@/components/auth/PlatformPicker'
  * username/handle (the profile renders github.com/<v> and x.com/<v>); site is a URL.
  */
 const inputCls =
-  'w-full rounded-md border border-bg-border bg-bg-base px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-dim focus:border-gold/50 focus:outline-none'
+  "w-full rounded-md border border-bg-border bg-bg-base px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-dim focus:border-gold/50 focus:outline-none";
 
 export interface ProfileInitial {
-  display_name: string
-  handle: string
-  location: string
-  bio: string
-  links: { github?: string; site?: string; x?: string }
-  operator_domains: string[]
-  avatar_url: string
+  display_name: string;
+  handle: string;
+  location: string;
+  bio: string;
+  links: { github?: string; site?: string; x?: string };
+  operator_domains: string[];
+  avatar_url: string;
 }
 
 function Field({
@@ -33,9 +33,9 @@ function Field({
   hint,
   children,
 }: {
-  label: string
-  hint?: string
-  children: React.ReactNode
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
 }) {
   return (
     <label className="flex flex-col gap-1.5">
@@ -46,73 +46,85 @@ function Field({
         </span>
       </span>
       {children}
-      {hint && <span className="font-sans text-[11px] text-text-dim">{hint}</span>}
+      {hint && (
+        <span className="font-sans text-[11px] text-text-dim">{hint}</span>
+      )}
     </label>
-  )
+  );
 }
 
 export function ProfileEditForm({
   initial,
   onSaved,
 }: {
-  initial: ProfileInitial
+  initial: ProfileInitial;
   /** Called after a successful save (e.g. to close a host modal). */
-  onSaved?: () => void
+  onSaved?: () => void;
 }) {
-  const router = useRouter()
-  const [displayName, setDisplayName] = useState(initial.display_name)
-  const [handle, setHandle] = useState(initial.handle)
-  const [location, setLocation] = useState(initial.location)
-  const [bio, setBio] = useState(initial.bio)
-  const [github, setGithub] = useState(initial.links.github ?? '')
-  const [site, setSite] = useState(initial.links.site ?? '')
-  const [x, setX] = useState(initial.links.x ?? '')
+  const router = useRouter();
+  const [displayName, setDisplayName] = useState(initial.display_name);
+  const [handle, setHandle] = useState(initial.handle);
+  const [location, setLocation] = useState(initial.location);
+  const [bio, setBio] = useState(initial.bio);
+  const [github, setGithub] = useState(initial.links.github ?? "");
+  const [site, setSite] = useState(initial.links.site ?? "");
+  const [x, setX] = useState(initial.links.x ?? "");
   // operator_domains: any of the 15 known platforms + custom "Other" entries (PlatformPicker).
-  const [platforms, setPlatforms] = useState<string[]>(initial.operator_domains)
-  const [avatarUrl, setAvatarUrl] = useState(initial.avatar_url)
-  const [avatarBusy, setAvatarBusy] = useState(false)
-  const [avatarError, setAvatarError] = useState<string | null>(null)
-  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [error, setError] = useState<string | null>(null)
+  const [platforms, setPlatforms] = useState<string[]>(
+    initial.operator_domains,
+  );
+  const [avatarUrl, setAvatarUrl] = useState(initial.avatar_url);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
+    "idle",
+  );
+  const [error, setError] = useState<string | null>(null);
 
   async function onAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setAvatarBusy(true)
-    setAvatarError(null)
-    const fd = new FormData()
-    fd.append('file', file)
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarBusy(true);
+    setAvatarError(null);
+    const fd = new FormData();
+    fd.append("file", file);
     try {
-      const res = await fetch('/api/v1/profile/avatar', { method: 'POST', body: fd })
-      const d = (await res.json().catch(() => ({}))) as { url?: string; error?: string }
+      const res = await fetch("/api/v1/profile/avatar", {
+        method: "POST",
+        body: fd,
+      });
+      const d = (await res.json().catch(() => ({}))) as {
+        url?: string;
+        error?: string;
+      };
       if (!res.ok || !d.url) {
-        setAvatarError(d.error || 'Upload failed — please try again.')
+        setAvatarError(d.error || "Upload failed — please try again.");
       } else {
-        setAvatarUrl(d.url)
-        router.refresh()
+        setAvatarUrl(d.url);
+        router.refresh();
       }
     } catch {
-      setAvatarError('Network error — please try again.')
+      setAvatarError("Network error — please try again.");
     } finally {
-      setAvatarBusy(false)
-      e.target.value = '' // allow re-selecting the same file
+      setAvatarBusy(false);
+      e.target.value = ""; // allow re-selecting the same file
     }
   }
 
   async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setStatus('saving')
-    setError(null)
+    e.preventDefault();
+    setStatus("saving");
+    setError(null);
 
-    const links: Record<string, string> = {}
-    if (github.trim()) links.github = github.trim()
-    if (site.trim()) links.site = site.trim()
-    if (x.trim()) links.x = x.trim()
+    const links: Record<string, string> = {};
+    if (github.trim()) links.github = github.trim();
+    if (site.trim()) links.site = site.trim();
+    if (x.trim()) links.x = x.trim();
 
     try {
-      const res = await fetch('/api/v1/profile', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const res = await fetch("/api/v1/profile", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           display_name: displayName,
           handle,
@@ -121,25 +133,28 @@ export function ProfileEditForm({
           links,
           operator_domains: platforms,
         }),
-      })
+      });
       if (!res.ok) {
-        const d = (await res.json().catch(() => ({}))) as { error?: string }
-        setError(d.error || 'Could not save — please try again.')
-        setStatus('error')
-        return
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(d.error || "Could not save — please try again.");
+        setStatus("error");
+        return;
       }
-      setStatus('saved')
-      router.refresh()
-      onSaved?.()
+      setStatus("saved");
+      router.refresh();
+      onSaved?.();
     } catch {
-      setError('Network error — please try again.')
-      setStatus('error')
+      setError("Network error — please try again.");
+      setStatus("error");
     }
   }
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
-      <Field label="Display name" hint="The human label on the board. Defaults to your codename until set.">
+      <Field
+        label="Display name"
+        hint="The human label on the board. Defaults to your codename until set."
+      >
         <input
           type="text"
           value={displayName}
@@ -149,7 +164,10 @@ export function ProfileEditForm({
         />
       </Field>
 
-      <Field label="Handle" hint="An opt-in @name. Separate from your display name; no reservation yet.">
+      <Field
+        label="Handle"
+        hint="An opt-in @name. Separate from your display name; no reservation yet."
+      >
         <div className="flex items-center gap-2">
           <span className="font-mono text-sm text-text-dim">@</span>
           <input
@@ -219,7 +237,10 @@ export function ProfileEditForm({
 
       <PlatformPicker selected={platforms} onChange={setPlatforms} />
 
-      <Field label="Avatar" hint="PNG, JPG, WebP, or GIF — under 2 MB. Shown on your profile and board row.">
+      <Field
+        label="Avatar"
+        hint="PNG, JPG, WebP, or GIF — under 2 MB. Shown on your profile and board row."
+      >
         <div className="flex items-center gap-3">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- user avatar; tiny fixed size
@@ -243,29 +264,37 @@ export function ProfileEditForm({
             className="font-sans text-xs text-text-dim file:mr-3 file:rounded-md file:border-0 file:bg-bg-elevated file:px-3 file:py-1.5 file:font-mono file:text-text-secondary disabled:opacity-60"
           />
         </div>
-        {avatarBusy && <span className="font-sans text-[11px] text-text-dim">Uploading…</span>}
-        {avatarError && <span className="font-sans text-[11px] text-text-dim">{avatarError}</span>}
+        {avatarBusy && (
+          <span className="font-sans text-[11px] text-text-dim">
+            Uploading…
+          </span>
+        )}
+        {avatarError && (
+          <span className="font-sans text-[11px] text-text-dim">
+            {avatarError}
+          </span>
+        )}
       </Field>
 
       <div className="flex flex-col gap-2 border-t border-bg-border pt-4">
         <button
           type="submit"
-          disabled={status === 'saving'}
+          disabled={status === "saving"}
           className="w-fit rounded-md bg-gold px-5 py-2.5 font-semibold text-bg-base transition-colors hover:bg-gold/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === 'saving' ? 'Saving…' : 'Save profile'}
+          {status === "saving" ? "Saving…" : "Save profile"}
         </button>
-        {status === 'saved' && (
+        {status === "saved" && (
           <p className="rounded-md border border-bg-border bg-bg-base/50 px-3 py-2 font-sans text-xs text-text-secondary">
             Saved. Your profile and board row are updated.
           </p>
         )}
-        {status === 'error' && error && (
+        {status === "error" && error && (
           <p className="rounded-md border border-bg-border bg-bg-base/50 px-3 py-2 font-sans text-xs text-text-secondary">
             {error}
           </p>
         )}
       </div>
     </form>
-  )
+  );
 }

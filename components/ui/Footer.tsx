@@ -1,72 +1,108 @@
-import React from 'react'
-import Link from 'next/link'
+import React from "react";
+import Link from "next/link";
 
 /**
  * Footer link categories — SEO content discoverability (2026-07-07).
  * Each category links to the pages built in the SEO expansion.
  * Kept compact: 3-4 links per column, small text, hover to primary.
  */
-const FOOTER_COLUMNS: { heading: string; links: { href: string; label: string }[] }[] = [
+const FOOTER_COLUMNS: {
+  heading: string;
+  links: { href: string; label: string }[];
+}[] = [
   {
-    heading: 'Metrics',
+    heading: "Metrics",
     links: [
-      { href: '/metrics/yield-cascade', label: 'Yield (Υ)' },
-      { href: '/metrics/cache-hit-rate', label: 'Cache Hit Rate' },
-      { href: '/metrics/compression-ratio', label: 'Compression Ratio' },
-      { href: '/metrics/leverage', label: 'Leverage' },
+      { href: "/metrics/yield-cascade", label: "Yield (Υ)" },
+      { href: "/metrics/cache-hit-rate", label: "Cache Hit Rate" },
+      { href: "/metrics/compression-ratio", label: "Compression Ratio" },
+      { href: "/metrics/leverage", label: "Leverage" },
     ],
   },
   {
-    heading: 'Guides',
+    heading: "Guides",
     links: [
-      { href: '/guides/how-to-measure-ai-coding-efficiency', label: 'Measure AI Coding Efficiency' },
-      { href: '/guides/how-to-improve-your-yield', label: 'Improve Your Yield' },
-      { href: '/guides/how-to-reduce-token-waste', label: 'Reduce Token Waste' },
-      { href: '/guides/how-to-read-your-cascade', label: 'Read Your Cascade' },
+      {
+        href: "/guides/how-to-measure-ai-coding-efficiency",
+        label: "Measure AI Coding Efficiency",
+      },
+      {
+        href: "/guides/how-to-improve-your-yield",
+        label: "Improve Your Yield",
+      },
+      {
+        href: "/guides/how-to-reduce-token-waste",
+        label: "Reduce Token Waste",
+      },
+      { href: "/guides/how-to-read-your-cascade", label: "Read Your Cascade" },
     ],
   },
   {
-    heading: 'Tools',
+    heading: "Tools",
     links: [
-      { href: '/tools/yield-calculator', label: 'Yield Calculator' },
-      { href: '/tools/cascade-comparator', label: 'Cascade Comparator' },
-      { href: '/tools/operator-class-checker', label: 'Class Checker' },
-      { href: '/tools/token-waste-calculator', label: 'Token Waste Calculator' },
+      { href: "/tools/yield-calculator", label: "Yield Calculator" },
+      { href: "/tools/cascade-comparator", label: "Cascade Comparator" },
+      { href: "/tools/operator-class-checker", label: "Class Checker" },
+      {
+        href: "/tools/token-waste-calculator",
+        label: "Token Waste Calculator",
+      },
     ],
   },
   {
-    heading: 'Compare',
+    heading: "Compare",
     links: [
-      { href: '/vs/ccusage', label: 'vs ccusage' },
-      { href: '/vs/wakatime', label: 'vs WakaTime' },
-      { href: '/vs/lmsys-arena', label: 'vs LMSYS Arena' },
-      { href: '/vs/cursor', label: 'vs Cursor' },
+      { href: "/vs/ccusage", label: "vs ccusage" },
+      { href: "/vs/wakatime", label: "vs WakaTime" },
+      { href: "/vs/lmsys-arena", label: "vs LMSYS Arena" },
+      { href: "/vs/cursor", label: "vs Cursor" },
     ],
   },
   {
-    heading: 'Explore',
+    heading: "Explore",
     links: [
-      { href: '/alternatives/ai-coding-metrics', label: 'AI Coding Metrics Tools' },
-      { href: '/alternatives/ccusage-alternatives', label: 'ccusage Alternatives' },
-      { href: '/blog/best-ai-coding-tools-2026', label: 'Best AI Coding Tools 2026' },
-      { href: '/token-telemetry', label: 'Token Telemetry' },
-      { href: '/alternatives/ai-benchmarking-tools', label: 'AI Benchmarking Tools' },
-      { href: '/alternatives/token-tracking-tools', label: 'Token Tracking Tools' },
-      { href: '/blog/how-to-benchmark-ai-coding-workflow', label: 'How to Benchmark AI Coding' },
-      { href: '/guides/how-to-benchmark-ai-coding-workflow', label: 'Benchmark Workflow Guide' },
+      {
+        href: "/alternatives/ai-coding-metrics",
+        label: "AI Coding Metrics Tools",
+      },
+      {
+        href: "/alternatives/ccusage-alternatives",
+        label: "ccusage Alternatives",
+      },
+      {
+        href: "/blog/best-ai-coding-tools-2026",
+        label: "Best AI Coding Tools 2026",
+      },
+      { href: "/token-telemetry", label: "Token Telemetry" },
+      {
+        href: "/alternatives/ai-benchmarking-tools",
+        label: "AI Benchmarking Tools",
+      },
+      {
+        href: "/alternatives/token-tracking-tools",
+        label: "Token Tracking Tools",
+      },
+      {
+        href: "/blog/how-to-benchmark-ai-coding-workflow",
+        label: "How to Benchmark AI Coding",
+      },
+      {
+        href: "/guides/how-to-benchmark-ai-coding-workflow",
+        label: "Benchmark Workflow Guide",
+      },
     ],
   },
   {
-    heading: 'Topics',
+    heading: "Topics",
     links: [
-      { href: '/ai-benchmarking', label: 'AI Benchmarking' },
-      { href: '/ai-coding-metrics', label: 'AI Coding Metrics' },
-      { href: '/ai-operator-scoring', label: 'AI Operator Scoring' },
-      { href: '/operator-performance', label: 'Operator Performance' },
-      { href: '/cascade-analysis', label: 'Cascade Analysis' },
+      { href: "/ai-benchmarking", label: "AI Benchmarking" },
+      { href: "/ai-coding-metrics", label: "AI Coding Metrics" },
+      { href: "/ai-operator-scoring", label: "AI Operator Scoring" },
+      { href: "/operator-performance", label: "Operator Performance" },
+      { href: "/cascade-analysis", label: "Cascade Analysis" },
     ],
   },
-]
+];
 
 /**
  * Site footer chrome. Server component.
@@ -126,26 +162,37 @@ export function Footer() {
             aria-label="Legal"
             className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-text-muted"
           >
-            <Link href="/about" className="transition-colors hover:text-text-primary">
+            <Link
+              href="/about"
+              className="transition-colors hover:text-text-primary"
+            >
               About
             </Link>
-            <Link href="/about#privacy" className="transition-colors hover:text-text-primary">
+            <Link
+              href="/about#privacy"
+              className="transition-colors hover:text-text-primary"
+            >
               Privacy
             </Link>
-            <Link href="/about#terms" className="transition-colors hover:text-text-primary">
+            <Link
+              href="/about#terms"
+              className="transition-colors hover:text-text-primary"
+            >
               Terms
             </Link>
           </nav>
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
             <span className="font-mono text-[11px] text-text-secondary">
-              powered by <span className="font-bold text-gold">MO§ES™</span> · © 2026 Ello Cello LLC
+              powered by <span className="font-bold text-gold">MO§ES™</span> · ©
+              2026 Ello Cello LLC
             </span>
             <span className="font-sans text-[11px] leading-snug text-text-muted">
-              Token counts only — never prompt content. Your sessions stay on your machine.
+              Token counts only — never prompt content. Your sessions stay on
+              your machine.
             </span>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

@@ -14,22 +14,22 @@
  * marked as a placeholder.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { getHallOfSignal } from '@/lib/data'
-import { REWARDS } from '@/lib/canon/ids'
-import { rateLimit, rateLimitedResponse } from '@/lib/api/gate'
+import { NextResponse, type NextRequest } from "next/server";
+import { getHallOfSignal } from "@/lib/data";
+import { REWARDS } from "@/lib/canon/ids";
+import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
 
-const FIVEFOLD_HOLD_REWARD_ID = 'RW.34'
+const FIVEFOLD_HOLD_REWARD_ID = "RW.34";
 
 export async function GET(req: NextRequest) {
   // CORPUS gate (Gate #3): best-effort per-IP rate limit before any read. The
   // hall is a public read and was the one /api/v1 endpoint left unguarded. It
   // serves prestige records (not the bulk corpus), so it needs the rate limit
   // but no list-size gate. rateLimit degrades open, so it can't break the read.
-  const rl = rateLimit(req)
-  if (!rl.ok) return rateLimitedResponse(rl.retryAfter)
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
 
-  const records = await getHallOfSignal()
+  const records = await getHallOfSignal();
 
   // Single-op record categories (RW.28..RW.33).
   const singleOp = records.map((r) => ({
@@ -39,26 +39,29 @@ export async function GET(req: NextRequest) {
     operator: r.operator_codename,
     achieved_at: r.date,
     is_placeholder: r.isPlaceholder,
-  }))
+  }));
 
   // Multi-recipient category — Fivefold Hold (RW.34). No seeded recipients yet.
-  const fivefold = REWARDS[FIVEFOLD_HOLD_REWARD_ID]
+  const fivefold = REWARDS[FIVEFOLD_HOLD_REWARD_ID];
   const multiRecipient = [
     {
       reward_id: FIVEFOLD_HOLD_REWARD_ID,
-      name: 'Fivefold Hold Recipients',
+      name: "Fivefold Hold Recipients",
       operators: [] as string[],
       is_placeholder: true,
       note: fivefold?.reward,
     },
-  ]
+  ];
 
   const body = {
-    generated_at: '2026-05-19T00:00:00Z',
+    generated_at: "2026-05-19T00:00:00Z",
     categories: [...singleOp, ...multiRecipient],
-  }
+  };
 
   return NextResponse.json(body, {
-    headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=600' },
-  })
+    headers: {
+      "Cache-Control":
+        "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+    },
+  });
 }

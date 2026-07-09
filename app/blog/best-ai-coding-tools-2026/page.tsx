@@ -10,74 +10,77 @@
  * BreadcrumbList + FAQPage.
  */
 
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
-import { SITE_ORIGIN } from '@/lib/seo'
-import { WaveHero } from '@/components/ui/WaveHero'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumb, faqPage } from '@/lib/jsonld'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { SITE_ORIGIN } from "@/lib/seo";
+import { WaveHero } from "@/components/ui/WaveHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: 'Best AI Coding Tools for Dev Performance (2026)',
+  title: "Best AI Coding Tools for Dev Performance (2026)",
   description:
-    'The best AI coding tools for developer performance in 2026. Why LOC, commits, and hours fail \u2014 and the token metrics that replace them. 7 tools reviewed.',
-  path: '/blog/best-ai-coding-tools-2026',
-})
+    "The best AI coding tools for developer performance in 2026. Why LOC, commits, and hours fail \u2014 and the token metrics that replace them. 7 tools reviewed.",
+  path: "/blog/best-ai-coding-tools-2026",
+});
 
 /** Inline ScholarlyArticle JSON-LD (follows the researchArticle() pattern). */
 function articleJsonLd() {
-  const url = `${SITE_ORIGIN}/blog/best-ai-coding-tools-2026`
+  const url = `${SITE_ORIGIN}/blog/best-ai-coding-tools-2026`;
   return {
-    '@context': 'https://schema.org',
-    '@type': 'ScholarlyArticle',
-    '@id': url,
-    headline: 'Best AI Coding Tools for Measuring Developer Performance (2026)',
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "@id": url,
+    headline: "Best AI Coding Tools for Measuring Developer Performance (2026)",
     description:
-      'The shift from time-based to token-based developer metrics. Why traditional dev metrics fail in the AI coding era, the new metrics that matter, and 7 tools reviewed.',
+      "The shift from time-based to token-based developer metrics. Why traditional dev metrics fail in the AI coding era, the new metrics that matter, and 7 tools reviewed.",
     url,
-    datePublished: '2026-07-07',
-    author: { '@type': 'Organization', name: 'SigRank', url: SITE_ORIGIN },
-    publisher: { '@type': 'Organization', name: 'SigRank', url: SITE_ORIGIN },
-    license: 'https://creativecommons.org/licenses/by/4.0/',
-    about: 'AI developer performance measurement and token-based metrics',
+    datePublished: "2026-07-07",
+    author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    about: "AI developer performance measurement and token-based metrics",
     keywords: [
-      'best ai coding tools 2026',
-      'ai developer performance tools',
-      'ai coding measurement',
-      'token efficiency',
-      'developer metrics',
+      "best ai coding tools 2026",
+      "ai developer performance tools",
+      "ai coding measurement",
+      "token efficiency",
+      "developer metrics",
     ],
-  }
+  };
 }
 
 const faqs = [
   {
-    question: 'What are the best AI coding tools for measuring developer performance in 2026?',
+    question:
+      "What are the best AI coding tools for measuring developer performance in 2026?",
     answer:
-      'SigRank, ccusage, and the Token Dashboard lead the field for token-based measurement. WakaTime remains useful for time tracking, while Cursor and GitHub Copilot offer limited built-in metrics. LMSYS ranks AI models, not operators. For measuring the human driving the AI, SigRank is the only tool that scores the operator directly.',
+      "SigRank, ccusage, and the Token Dashboard lead the field for token-based measurement. WakaTime remains useful for time tracking, while Cursor and GitHub Copilot offer limited built-in metrics. LMSYS ranks AI models, not operators. For measuring the human driving the AI, SigRank is the only tool that scores the operator directly.",
   },
   {
-    question: 'Why do traditional developer metrics like LOC and commits fail in the AI coding era?',
+    question:
+      "Why do traditional developer metrics like LOC and commits fail in the AI coding era?",
     answer:
-      'Lines of code and commit counts measure the wrong unit. When an AI agent generates 90% of the code, LOC reflects the model\'s verbosity, not the developer\'s skill. Hours tracked miss that a 15-minute high-leverage session can outperform an 8-hour low-yield one. Token-based metrics — yield, cache hit rate, leverage — measure how efficiently the operator drives the cascade instead.',
+      "Lines of code and commit counts measure the wrong unit. When an AI agent generates 90% of the code, LOC reflects the model's verbosity, not the developer's skill. Hours tracked miss that a 15-minute high-leverage session can outperform an 8-hour low-yield one. Token-based metrics — yield, cache hit rate, leverage — measure how efficiently the operator drives the cascade instead.",
   },
   {
-    question: 'What is the yield metric (Υ) and why does it matter for AI coding?',
+    question:
+      "What is the yield metric (Υ) and why does it matter for AI coding?",
     answer:
-      'Yield (Υ) = (cache_read × output) / input². It measures token-cascade efficiency: how well an operator reuses cached context and converts input tokens into useful output. A high yield means signal is compounding; a low yield means tokens are being burned. It is the headline metric for AI developer performance because it captures the full cascade, not just one dimension.',
+      "Yield (Υ) = (cache_read × output) / input². It measures token-cascade efficiency: how well an operator reuses cached context and converts input tokens into useful output. A high yield means signal is compounding; a low yield means tokens are being burned. It is the headline metric for AI developer performance because it captures the full cascade, not just one dimension.",
   },
   {
-    question: 'Does SigRank read my prompt content?',
+    question: "Does SigRank read my prompt content?",
     answer:
-      'No. SigRank reads only four token integers — input, output, cache-read, and cache-write — from local logs. No message content is ever read, stored, or transmitted. Snapshots are ed25519-signed on-device and verified server-side. Privacy is architectural, not a promise.',
+      "No. SigRank reads only four token integers — input, output, cache-read, and cache-write — from local logs. No message content is ever read, stored, or transmitted. Snapshots are ed25519-signed on-device and verified server-side. Privacy is architectural, not a promise.",
   },
   {
-    question: 'How is SigRank different from LMSYS Chatbot Arena?',
+    question: "How is SigRank different from LMSYS Chatbot Arena?",
     answer:
       'LMSYS ranks AI MODELS by human preference in head-to-head matchups. SigRank ranks OPERATORS — the humans driving the AI — by token-cascade efficiency. LMSYS answers "which model is best?"; SigRank answers "which developer uses their model most efficiently?" They measure different units entirely.',
   },
-]
+];
 
 export default function BestAiCodingTools2026Page() {
   return (
@@ -86,8 +89,11 @@ export default function BestAiCodingTools2026Page() {
         data={[
           articleJsonLd(),
           breadcrumb([
-            { name: 'Blog', path: '/blog' },
-            { name: 'Best AI Coding Tools 2026', path: '/blog/best-ai-coding-tools-2026' },
+            { name: "Blog", path: "/blog" },
+            {
+              name: "Best AI Coding Tools 2026",
+              path: "/blog/best-ai-coding-tools-2026",
+            },
           ]),
           faqPage(faqs),
         ]}
@@ -98,8 +104,7 @@ export default function BestAiCodingTools2026Page() {
         title="Best AI Coding Tools for Measuring Developer Performance (2026)"
         subtitle={
           <>
-            The shift from{' '}
-            <span className="text-gold">time-based</span> to{' '}
+            The shift from <span className="text-gold">time-based</span> to{" "}
             <span className="text-gold">token-based</span> developer metrics —
             and the 7 tools that define the new field.
           </>
@@ -130,10 +135,10 @@ export default function BestAiCodingTools2026Page() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           A new class of tools has emerged to measure what actually matters in
-          the AI coding era: <strong className="text-text-primary">token
-          efficiency</strong>. This is the story of why the old metrics failed,
-          what replaced them, and the seven tools every engineering leader
-          should know in 2026.
+          the AI coding era:{" "}
+          <strong className="text-text-primary">token efficiency</strong>. This
+          is the story of why the old metrics failed, what replaced them, and
+          the seven tools every engineering leader should know in 2026.
         </p>
       </section>
 
@@ -157,10 +162,10 @@ export default function BestAiCodingTools2026Page() {
           </h3>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             An AI agent can emit a thousand lines of boilerplate in seconds.
-            High LOC now correlates with{' '}
+            High LOC now correlates with{" "}
             <span className="text-gold">verbosity, not value</span>. The
-            developer who prompts for a tight, correct fifty-line module is
-            more effective than the one who accepts a sprawling five-hundred-line
+            developer who prompts for a tight, correct fifty-line module is more
+            effective than the one who accepts a sprawling five-hundred-line
             dump. LOC rewards the wrong behavior.
           </p>
         </div>
@@ -185,9 +190,9 @@ export default function BestAiCodingTools2026Page() {
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             Time tracking assumes throughput is proportional to minutes spent.
             In the AI era, the opposite is often true: the developer who spends
-            fifteen minutes crafting a high-leverage prompt that triggers a
-            long cache-read cascade outperforms the one who spends eight hours
-            re-explaining context the model already has.{' '}
+            fifteen minutes crafting a high-leverage prompt that triggers a long
+            cache-read cascade outperforms the one who spends eight hours
+            re-explaining context the model already has.{" "}
             <span className="text-gold">Leverage, not hours</span>, is the new
             throughput.
           </p>
@@ -201,7 +206,7 @@ export default function BestAiCodingTools2026Page() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           If the old metrics measured the developer&apos;s hands, the new
-          metrics measure the developer&apos;s{' '}
+          metrics measure the developer&apos;s{" "}
           <strong className="text-text-primary">cascade</strong> — the flow of
           tokens between operator and model. Four pillars define it:
         </p>
@@ -229,7 +234,7 @@ export default function BestAiCodingTools2026Page() {
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-sans text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">Yield (Υ)</strong> ={' '}
+            <strong className="text-text-primary">Yield (Υ)</strong> ={" "}
             <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
               (cache_read × output) / input²
             </code>
@@ -241,7 +246,7 @@ export default function BestAiCodingTools2026Page() {
         </div>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-sans text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">Cache hit rate</strong> ={' '}
+            <strong className="text-text-primary">Cache hit rate</strong> ={" "}
             <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
               cache_read / (cache_read + cache_write)
             </code>
@@ -253,7 +258,7 @@ export default function BestAiCodingTools2026Page() {
         </div>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-sans text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">Leverage</strong> ={' '}
+            <strong className="text-text-primary">Leverage</strong> ={" "}
             <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
               cache_read / input
             </code>
@@ -304,11 +309,11 @@ export default function BestAiCodingTools2026Page() {
             code quality or business impact.
           </p>
           <p className="mt-2 font-sans text-xs text-text-muted">
-            Install:{' '}
+            Install:{" "}
             <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-gold">
               npx sigrank
-            </code>{' '}
-            ·{' '}
+            </code>{" "}
+            ·{" "}
             <Link
               href="/methodology"
               className="text-gold underline underline-offset-2"
@@ -330,9 +335,9 @@ export default function BestAiCodingTools2026Page() {
             <strong className="text-text-primary">Strengths:</strong> A clean
             CLI that reads Claude Code token usage from local logs and prints
             the four pillars (input, output, cache-read, cache-write). No
-            account, no cloud, no telemetry. The raw data layer that
-            token-based measurement is built on. SigRank bundles it so you
-            don&apos;t need a separate install.
+            account, no cloud, no telemetry. The raw data layer that token-based
+            measurement is built on. SigRank bundles it so you don&apos;t need a
+            separate install.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Claude
@@ -360,10 +365,10 @@ export default function BestAiCodingTools2026Page() {
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Measures
-            hours, not token efficiency. Can&apos;t distinguish an
-            AI-assisted session from a hand-typed one. In the AI era, its core
-            metric — time-in-editor — is increasingly decoupled from output.
-            Best used as a complement to token-based tools, not a replacement.
+            hours, not token efficiency. Can&apos;t distinguish an AI-assisted
+            session from a hand-typed one. In the AI era, its core metric —
+            time-in-editor — is increasingly decoupled from output. Best used as
+            a complement to token-based tools, not a replacement.
           </p>
         </div>
 
@@ -378,17 +383,17 @@ export default function BestAiCodingTools2026Page() {
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Strengths:</strong> The
             leading AI-native editor. Shows per-session token usage and request
-            counts in its settings panel, giving developers a rough sense of
-            how much they&apos;re spending. Excellent editing experience; the
-            tool most AI-first developers actually live in.
+            counts in its settings panel, giving developers a rough sense of how
+            much they&apos;re spending. Excellent editing experience; the tool
+            most AI-first developers actually live in.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Metrics
             are usage-oriented (tokens consumed, requests made), not
             efficiency-oriented (no yield, no cache hit rate, no leverage).
-            Locked to the Cursor platform — no cross-platform comparison.
-            No operator scoring, no leaderboard, no way to benchmark against
-            the field.
+            Locked to the Cursor platform — no cross-platform comparison. No
+            operator scoring, no leaderboard, no way to benchmark against the
+            field.
           </p>
         </div>
 
@@ -404,8 +409,8 @@ export default function BestAiCodingTools2026Page() {
             <strong className="text-text-primary">Strengths:</strong> The most
             widely deployed AI coding tool. GitHub&apos;s org-level dashboards
             show acceptance rate, suggestions shown vs. accepted, and active
-            users — useful for adoption tracking across a team. Deep
-            integration with the GitHub workflow (PRs, issues, code review).
+            users — useful for adoption tracking across a team. Deep integration
+            with the GitHub workflow (PRs, issues, code review).
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> No
@@ -427,17 +432,16 @@ export default function BestAiCodingTools2026Page() {
           </p>
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Strengths:</strong> The gold
-            standard for ranking AI <em>models</em> by human preference.
-            Blind, head-to-head, Elo-rated. If you want to know whether GPT-5.4
-            beats Claude 4.5 for coding tasks, LMSYS is the source.
+            standard for ranking AI <em>models</em> by human preference. Blind,
+            head-to-head, Elo-rated. If you want to know whether GPT-5.4 beats
+            Claude 4.5 for coding tasks, LMSYS is the source.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Ranks
             models, not operators. Two developers using the same model can have
             wildly different efficiency — LMSYS can&apos;t see that. It answers
             &ldquo;which model is best?&rdquo; not &ldquo;which developer uses
-            their model best?&rdquo; Complementary to SigRank, not a
-            competitor.
+            their model best?&rdquo; Complementary to SigRank, not a competitor.
           </p>
         </div>
 
@@ -459,9 +463,9 @@ export default function BestAiCodingTools2026Page() {
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong>
-            Visualization only — no scoring, no leaderboard, no class tier.
-            You still need SigRank (or manual calculation) to turn the charts
-            into a yield number. Most useful as the &ldquo;eyes&rdquo; on top of
+            Visualization only — no scoring, no leaderboard, no class tier. You
+            still need SigRank (or manual calculation) to turn the charts into a
+            yield number. Most useful as the &ldquo;eyes&rdquo; on top of
             ccusage&apos;s raw data and SigRank&apos;s scoring.
           </p>
         </div>
@@ -484,31 +488,41 @@ export default function BestAiCodingTools2026Page() {
             </thead>
             <tbody className="divide-y divide-bg-border-subtle text-text-secondary">
               <tr>
-                <td className="px-4 py-3 font-bold text-text-primary">SigRank</td>
+                <td className="px-4 py-3 font-bold text-text-primary">
+                  SigRank
+                </td>
                 <td className="px-4 py-3">Token cascade (Υ)</td>
                 <td className="px-4 py-3 text-gold">Yes</td>
                 <td className="px-4 py-3 text-gold">Yes (15+)</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-bold text-text-primary">ccusage</td>
+                <td className="px-4 py-3 font-bold text-text-primary">
+                  ccusage
+                </td>
                 <td className="px-4 py-3">Raw token counts</td>
                 <td className="px-4 py-3 text-text-muted">No</td>
                 <td className="px-4 py-3 text-text-muted">Claude only</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-bold text-text-primary">WakaTime</td>
+                <td className="px-4 py-3 font-bold text-text-primary">
+                  WakaTime
+                </td>
                 <td className="px-4 py-3">Time in editor</td>
                 <td className="px-4 py-3 text-text-muted">No</td>
                 <td className="px-4 py-3 text-gold">Yes</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-bold text-text-primary">Cursor</td>
+                <td className="px-4 py-3 font-bold text-text-primary">
+                  Cursor
+                </td>
                 <td className="px-4 py-3">Token usage</td>
                 <td className="px-4 py-3 text-text-muted">No</td>
                 <td className="px-4 py-3 text-text-muted">Cursor only</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-bold text-text-primary">Copilot</td>
+                <td className="px-4 py-3 font-bold text-text-primary">
+                  Copilot
+                </td>
                 <td className="px-4 py-3">Acceptance rate</td>
                 <td className="px-4 py-3 text-text-muted">No</td>
                 <td className="px-4 py-3 text-text-muted">GitHub only</td>
@@ -520,7 +534,9 @@ export default function BestAiCodingTools2026Page() {
                 <td className="px-4 py-3 text-gold">Yes</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-bold text-text-primary">Token Dashboard</td>
+                <td className="px-4 py-3 font-bold text-text-primary">
+                  Token Dashboard
+                </td>
                 <td className="px-4 py-3">Token trends</td>
                 <td className="px-4 py-3 text-text-muted">No</td>
                 <td className="px-4 py-3 text-gold">Yes</td>
@@ -543,9 +559,9 @@ export default function BestAiCodingTools2026Page() {
           measure stamina, not skill.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The tools that win in 2026 are the ones that measure the{' '}
+          The tools that win in 2026 are the ones that measure the{" "}
           <strong className="text-text-primary">cascade</strong> — the flow of
-          tokens between operator and model — and that score the{' '}
+          tokens between operator and model — and that score the{" "}
           <strong className="text-text-primary">operator</strong>, not the
           model. Yield, cache hit rate, and leverage are the new LOC, commit
           count, and hours. They capture what actually matters: is signal
@@ -556,11 +572,11 @@ export default function BestAiCodingTools2026Page() {
           directly, across platforms, with privacy preserved by architecture.
           The rest measure pieces — raw counts, time, usage, model preference,
           trends. Useful, but incomplete. The operator is the new unit of
-          measurement, and the tools that measure it will define how
-          engineering teams evaluate performance for the next decade.
+          measurement, and the tools that measure it will define how engineering
+          teams evaluate performance for the next decade.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Ready to see your cascade?{' '}
+          Ready to see your cascade?{" "}
           <Link
             href="/score"
             className="text-gold underline underline-offset-2"
@@ -588,20 +604,29 @@ export default function BestAiCodingTools2026Page() {
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          Related:{' '}
-          <Link href="/alternatives/ai-coding-metrics" className="text-gold underline underline-offset-2">
+          Related:{" "}
+          <Link
+            href="/alternatives/ai-coding-metrics"
+            className="text-gold underline underline-offset-2"
+          >
             AI Coding Metrics Tools
           </Link>
-          {' · '}
-          <Link href="/ai-coding-metrics" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/ai-coding-metrics"
+            className="text-gold underline underline-offset-2"
+          >
             AI Coding Metrics
           </Link>
-          {' · '}
-          <Link href="/tools/yield-calculator" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/tools/yield-calculator"
+            className="text-gold underline underline-offset-2"
+          >
             Yield Calculator
           </Link>
         </p>
       </section>
     </div>
-  )
+  );
 }

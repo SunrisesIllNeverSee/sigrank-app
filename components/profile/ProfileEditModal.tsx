@@ -1,9 +1,12 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createPortal } from 'react-dom'
-import { ProfileEditForm, type ProfileInitial } from '@/components/auth/ProfileEditForm'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
+import {
+  ProfileEditForm,
+  type ProfileInitial,
+} from "@/components/auth/ProfileEditForm";
 
 /**
  * components/profile/ProfileEditModal.tsx — owner-only "Edit profile" button + modal
@@ -15,38 +18,38 @@ import { ProfileEditForm, type ProfileInitial } from '@/components/auth/ProfileE
  * ProfileEditForm, prefilled from that response; on save it closes and refreshes.
  */
 interface ProfileData extends ProfileInitial {
-  codename: string
+  codename: string;
 }
 
 export function ProfileEditModal({ codename }: { codename: string }) {
-  const router = useRouter()
-  const [data, setData] = useState<ProfileData | null>(null)
-  const [open, setOpen] = useState(false)
+  const router = useRouter();
+  const [data, setData] = useState<ProfileData | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    let alive = true
-    fetch('/api/v1/profile', { cache: 'no-store' })
+    let alive = true;
+    fetch("/api/v1/profile", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { operator: null }))
       .then((d) => {
-        if (alive) setData((d?.operator as ProfileData | null) ?? null)
+        if (alive) setData((d?.operator as ProfileData | null) ?? null);
       })
-      .catch(() => {})
+      .catch(() => {});
     return () => {
-      alive = false
-    }
-  }, [])
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === "Escape") setOpen(false);
     }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [open])
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   // Owner-only: the session operator must be the operator on this profile.
-  if (!data || data.codename !== codename) return null
+  if (!data || data.codename !== codename) return null;
 
   return (
     <>
@@ -59,7 +62,7 @@ export function ProfileEditModal({ codename }: { codename: string }) {
       </button>
 
       {open &&
-        typeof document !== 'undefined' &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             role="dialog"
@@ -88,8 +91,8 @@ export function ProfileEditModal({ codename }: { codename: string }) {
               <ProfileEditForm
                 initial={data}
                 onSaved={() => {
-                  setOpen(false)
-                  router.refresh()
+                  setOpen(false);
+                  router.refresh();
                 }}
               />
             </div>
@@ -97,5 +100,5 @@ export function ProfileEditModal({ codename }: { codename: string }) {
           document.body,
         )}
     </>
-  )
+  );
 }

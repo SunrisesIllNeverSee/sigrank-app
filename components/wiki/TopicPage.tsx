@@ -10,8 +10,8 @@
  * TopicConsole tab-switcher behind one shared URL/title). Server component.
  */
 
-import React from 'react'
-import Link from 'next/link'
+import React from "react";
+import Link from "next/link";
 
 export function TopicPage({ children }: { children: React.ReactNode }) {
   return (
@@ -32,5 +32,5 @@ export function TopicPage({ children }: { children: React.ReactNode }) {
         </Link>
       </div>
     </div>
-  )
+  );
 }

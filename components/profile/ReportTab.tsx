@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import type { OperatorReport } from '@/lib/data'
-import { BadgeCollection } from './BadgeCollection'
-import { HealthScore } from './HealthScore'
-import { DnaCard } from './DnaCard'
+import { useState } from "react";
+import type { OperatorReport } from "@/lib/data";
+import { BadgeCollection } from "./BadgeCollection";
+import { HealthScore } from "./HealthScore";
+import { DnaCard } from "./DnaCard";
 
 /**
  * components/profile/ReportTab.tsx — the Cascade Report tab on the operator profile.
@@ -24,32 +24,32 @@ export function ReportTab({
   report,
   isOwner,
 }: {
-  report: OperatorReport | null
-  isOwner: boolean
+  report: OperatorReport | null;
+  isOwner: boolean;
 }) {
-  const [visible, setVisible] = useState(report?.report_visible ?? false)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [visible, setVisible] = useState(report?.report_visible ?? false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function toggleVisibility() {
-    const next = !visible
-    setSaving(true)
-    setError(null)
+    const next = !visible;
+    setSaving(true);
+    setError(null);
     try {
-      const res = await fetch('/api/profile/report-visibility', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/profile/report-visibility", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ visible: next }),
-      })
+      });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.reason || `http_${res.status}`)
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.reason || `http_${res.status}`);
       }
-      setVisible(next)
+      setVisible(next);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'failed')
+      setError(e instanceof Error ? e.message : "failed");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
   }
 
@@ -57,22 +57,25 @@ export function ReportTab({
     return (
       <div className="rounded-lg border border-bg-border p-6 text-center">
         <p className="font-mono text-sm text-text-muted">
-          No report yet. Update your MCP to{' '}
-          <code className="text-gold">sigrank@0.16.0</code> and run{' '}
-          <code className="text-gold">sigrank submit</code> to generate your cascade report.
+          No report yet. Update your MCP to{" "}
+          <code className="text-gold">sigrank@0.16.0</code> and run{" "}
+          <code className="text-gold">sigrank submit</code> to generate your
+          cascade report.
         </p>
       </div>
-    )
+    );
   }
 
-  const r = report.report
-  const modePct = Math.round(r.mode_confidence * 100)
+  const r = report.report;
+  const modePct = Math.round(r.mode_confidence * 100);
 
   // Mode distribution formatting
-  const distEntries = Object.entries(r.mode_distribution).sort((a, b) => b[1] - a[1])
+  const distEntries = Object.entries(r.mode_distribution).sort(
+    (a, b) => b[1] - a[1],
+  );
   const distText = distEntries
     .map(([mode, pct]) => `${Math.round(pct * 100)}% ${mode}`)
-    .join(', ')
+    .join(", ");
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,7 +83,9 @@ export function ReportTab({
       {isOwner && (
         <div className="flex items-center justify-end gap-3">
           {error && (
-            <span className="font-mono text-xs text-red-400">Failed: {error}</span>
+            <span className="font-mono text-xs text-red-400">
+              Failed: {error}
+            </span>
           )}
           <button
             type="button"
@@ -88,7 +93,7 @@ export function ReportTab({
             disabled={saving}
             className="font-mono text-xs uppercase tracking-[0.06em] text-text-muted hover:text-text-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saving…' : visible ? 'Make private 🔒' : 'Make public ◐'}
+            {saving ? "Saving…" : visible ? "Make private 🔒" : "Make public ◐"}
           </button>
         </div>
       )}
@@ -111,7 +116,10 @@ export function ReportTab({
             This week: {distText}
           </p>
           <p className="font-mono text-sm text-text-secondary">
-            Mode-weighted yield: <span className="text-text-primary">{r.mode_weighted_yield.toLocaleString()}</span>
+            Mode-weighted yield:{" "}
+            <span className="text-text-primary">
+              {r.mode_weighted_yield.toLocaleString()}
+            </span>
           </p>
         </div>
       </div>
@@ -134,19 +142,25 @@ export function ReportTab({
           <div className="flex gap-6 font-mono text-sm">
             <div>
               <span className="text-text-muted">7d: </span>
-              <span className="text-text-primary">{r.peak_yield.toLocaleString()}</span>
+              <span className="text-text-primary">
+                {r.peak_yield.toLocaleString()}
+              </span>
             </div>
             <div>
               <span className="text-text-muted">30d: </span>
-              <span className="text-text-primary">{r.mode_weighted_yield.toLocaleString()}</span>
+              <span className="text-text-primary">
+                {r.mode_weighted_yield.toLocaleString()}
+              </span>
             </div>
             <div>
               <span className="text-text-muted">Peak: </span>
-              <span className="text-text-primary">{r.peak_yield.toLocaleString()}</span>
+              <span className="text-text-primary">
+                {r.peak_yield.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

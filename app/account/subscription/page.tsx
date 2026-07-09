@@ -1,12 +1,12 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: 'Subscription',
-  description: 'Manage your SigRank supporter subscription.',
-  path: '/account/subscription',
-})
+  title: "Subscription",
+  description: "Manage your SigRank supporter subscription.",
+  path: "/account/subscription",
+});
 
 /**
  * Stripe Billing Portal return_url target.
@@ -21,9 +21,12 @@ export default function AccountSubscriptionPage() {
         Your billing changes have been saved. Manage your plan from the Stripe
         billing portal any time.
       </p>
-      <Link href="/" className="rounded-md border px-4 py-2 text-sm hover:opacity-80">
+      <Link
+        href="/"
+        className="rounded-md border px-4 py-2 text-sm hover:opacity-80"
+      >
         Back to the board
       </Link>
     </main>
-  )
+  );
 }

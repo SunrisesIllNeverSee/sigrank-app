@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/ingest/battery.ts — SERVER-ONLY proprietary verification battery (Gate 5).
@@ -13,15 +13,15 @@ import 'server-only'
  * Pure + deterministic — no wall-clock, no RNG, no external state.
  */
 
-import type { SnapshotPayloadV1 } from '@/lib/payload/schema'
-import type { GateReason, VerificationTier } from '@/lib/ingest/gates'
+import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import type { GateReason, VerificationTier } from "@/lib/ingest/gates";
 
 const flag = (code: string, detail: string): GateReason => ({
-  gate: 'battery',
+  gate: "battery",
   code,
-  severity: 'flag',
+  severity: "flag",
   detail,
-})
+});
 
 /**
  * Benford's-law first-digit check on the 4 token pillars.
@@ -35,24 +35,25 @@ const flag = (code: string, detail: string): GateReason => ({
  * 3 are non-zero. Below 25% leading digits in 1-3 is a flag.
  */
 function benfordCheck(p: SnapshotPayloadV1): GateReason | null {
-  const rt = p.raw_telemetry
+  const rt = p.raw_telemetry;
   const vals = [
     rt.tokens_input_fresh,
     rt.tokens_output,
     rt.tokens_cache_read,
     rt.tokens_cache_creation,
-  ].filter((v) => v > 0)
-  if (vals.length < 3) return null // too few pillars to test
+  ].filter((v) => v > 0);
+  if (vals.length < 3) return null; // too few pillars to test
 
-  const leadingDigits = vals.map((v) => parseInt(String(v)[0], 10))
-  const lowDigitFraction = leadingDigits.filter((d) => d <= 3).length / leadingDigits.length
+  const leadingDigits = vals.map((v) => parseInt(String(v)[0], 10));
+  const lowDigitFraction =
+    leadingDigits.filter((d) => d <= 3).length / leadingDigits.length;
   if (lowDigitFraction < 0.25) {
     return flag(
-      'benford_violation',
+      "benford_violation",
       `leading-digit distribution ${Math.round(lowDigitFraction * 100)}% in 1-3 (expected ~60% per Benford's law)`,
-    )
+    );
   }
-  return null
+  return null;
 }
 
 /**
@@ -63,16 +64,16 @@ function benfordCheck(p: SnapshotPayloadV1): GateReason | null {
  * turns/min is a flag (not a reject — rare burst patterns are possible).
  */
 function cadenceCheck(p: SnapshotPayloadV1): GateReason | null {
-  const rt = p.raw_telemetry
-  if (rt.active_minutes_est <= 0) return null
-  const turnsPerMin = rt.turns_total / rt.active_minutes_est
+  const rt = p.raw_telemetry;
+  if (rt.active_minutes_est <= 0) return null;
+  const turnsPerMin = rt.turns_total / rt.active_minutes_est;
   if (turnsPerMin > 50) {
     return flag(
-      'implausible_cadence',
+      "implausible_cadence",
       `${turnsPerMin.toFixed(1)} turns/min (real sessions: 0.5-10)`,
-    )
+    );
   }
-  return null
+  return null;
 }
 
 /**
@@ -85,25 +86,28 @@ function cadenceCheck(p: SnapshotPayloadV1): GateReason | null {
  * is extreme (real max ~30:1 for highly-cached power users).
  */
 function contaminationCheck(p: SnapshotPayloadV1): GateReason | null {
-  const rt = p.raw_telemetry
+  const rt = p.raw_telemetry;
 
   // Impossible cascade: cache_read with zero cache_creation
   if (rt.tokens_cache_read > 1_000 && rt.tokens_cache_creation === 0) {
     return flag(
-      'contamination_signature',
+      "contamination_signature",
       `${rt.tokens_cache_read} cache_read with 0 cache_creation (impossible cascade — must write before read)`,
-    )
+    );
   }
 
   // Extreme cache ratio (real max ~30:1, flag at 100:1)
-  if (rt.tokens_cache_creation > 0 && rt.tokens_cache_read / rt.tokens_cache_creation > 100) {
+  if (
+    rt.tokens_cache_creation > 0 &&
+    rt.tokens_cache_read / rt.tokens_cache_creation > 100
+  ) {
     return flag(
-      'extreme_cache_ratio',
+      "extreme_cache_ratio",
       `cache_read/cache_creation = ${(rt.tokens_cache_read / rt.tokens_cache_creation).toFixed(1)}:1 (real max ~30:1)`,
-    )
+    );
   }
 
-  return null
+  return null;
 }
 
 /**
@@ -115,31 +119,35 @@ function contaminationCheck(p: SnapshotPayloadV1): GateReason | null {
  * based on the overall decision (any flag → 'flagged').
  */
 export function runBattery(p: SnapshotPayloadV1): {
-  tier?: VerificationTier
-  flags: GateReason[]
-  signals: Record<string, number>
+  tier?: VerificationTier;
+  flags: GateReason[];
+  signals: Record<string, number>;
 } {
-  const flags: GateReason[] = []
-  const signals: Record<string, number> = {}
+  const flags: GateReason[] = [];
+  const signals: Record<string, number> = {};
 
-  const benford = benfordCheck(p)
-  if (benford) flags.push(benford)
+  const benford = benfordCheck(p);
+  if (benford) flags.push(benford);
 
-  const cadence = cadenceCheck(p)
-  if (cadence) flags.push(cadence)
+  const cadence = cadenceCheck(p);
+  if (cadence) flags.push(cadence);
 
-  const contamination = contaminationCheck(p)
-  if (contamination) flags.push(contamination)
+  const contamination = contaminationCheck(p);
+  if (contamination) flags.push(contamination);
 
   // Signals for downstream RS.06 scoring penalty consumption
-  signals.benford_flags = flags.filter((f) => f.code.startsWith('benford')).length
+  signals.benford_flags = flags.filter((f) =>
+    f.code.startsWith("benford"),
+  ).length;
   signals.cadence_flags = flags.filter(
-    (f) => f.code.startsWith('cadence') || f.code.startsWith('implausible_cadence'),
-  ).length
+    (f) =>
+      f.code.startsWith("cadence") || f.code.startsWith("implausible_cadence"),
+  ).length;
   signals.contamination_flags = flags.filter(
-    (f) => f.code.startsWith('contamination') || f.code.startsWith('extreme_cache'),
-  ).length
-  signals.battery_flag_total = flags.length
+    (f) =>
+      f.code.startsWith("contamination") || f.code.startsWith("extreme_cache"),
+  ).length;
+  signals.battery_flag_total = flags.length;
 
-  return { flags, signals }
+  return { flags, signals };
 }

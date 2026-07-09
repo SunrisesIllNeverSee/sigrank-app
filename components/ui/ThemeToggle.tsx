@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { THEMES, type ThemeId, getCurrentTheme, applyTheme } from '@/lib/theme'
+import { useEffect, useState } from "react";
+import { THEMES, type ThemeId, getCurrentTheme, applyTheme } from "@/lib/theme";
 
 /**
  * ThemeToggle — sharp segmented theme switcher. Sets data-theme on <html> and
@@ -11,15 +11,15 @@ import { THEMES, type ThemeId, getCurrentTheme, applyTheme } from '@/lib/theme'
  */
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<ThemeId>('terminal')
+  const [theme, setTheme] = useState<ThemeId>("terminal");
 
   useEffect(() => {
-    setTheme(getCurrentTheme())
-  }, [])
+    setTheme(getCurrentTheme());
+  }, []);
 
   function select(id: ThemeId) {
-    applyTheme(id)
-    setTheme(id)
+    applyTheme(id);
+    setTheme(id);
   }
 
   return (
@@ -35,15 +35,15 @@ export function ThemeToggle() {
           aria-pressed={theme === t.id}
           onClick={() => select(t.id)}
           className={
-            'rounded px-2 py-1 font-mono text-[11px] tracking-tight transition-colors ' +
+            "rounded px-2 py-1 font-mono text-[11px] tracking-tight transition-colors " +
             (theme === t.id
-              ? 'bg-bg-hover text-text-primary'
-              : 'text-text-muted hover:text-text-secondary')
+              ? "bg-bg-hover text-text-primary"
+              : "text-text-muted hover:text-text-secondary")
           }
         >
           {t.label}
         </button>
       ))}
     </div>
-  )
+  );
 }
