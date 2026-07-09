@@ -305,10 +305,6 @@ export default async function MethodologyPage() {
             <dd className="text-base text-text-secondary">
               Install the SigRank MCP server (<code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">npm i -g sigrank</code>),
               enroll, and submit a snapshot. Visit{' '}
-              <Link href="/submit" className="text-gold underline underline-offset-2">
-                /submit
-              </Link>{' '}
-              or{' '}
               <Link href="/score" className="text-gold underline underline-offset-2">
                 /score
               </Link>{' '}
