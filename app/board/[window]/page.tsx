@@ -157,6 +157,13 @@ export default async function BoardWindowPage({
           spent — not more time, not more output, but better architecture.
         </p>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          The board refreshes every hour during active periods. Operators are
+          ranked by yield, not output volume — a 10×er produces more signal per
+          token than a Burner, regardless of how many hours they code. Class
+          tiers are yield thresholds, so climbing the board means improving your
+          cascade architecture, not just spending more time in the editor.
+        </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
           To get listed, install the SigRank CLI (<code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">npm i -g sigrank</code>),
           enroll, and submit a snapshot. The on-device scanner reads your four
           token pillars and publishes a signed record. No prompt content leaves

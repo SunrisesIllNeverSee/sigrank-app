@@ -31,7 +31,7 @@ import { withOG } from '@/lib/seo'
 export const metadata: Metadata = withOG({
   title: 'How We Got Here — Refining the Index',
   description:
-    'The calibration entries behind the SigRank Index: one operator (MO§ES) measured by two readers, and the same workload run with and without memory. How bracketing those extremes refined the methodology — and why the honest lead is the rank, not the raw multiplier.',
+    'The calibration entries behind the SigRank Index: one operator measured by two readers, with and without memory. How bracketing refined the methodology.',
   path: '/wiki/methodology-refinement',
 })
 

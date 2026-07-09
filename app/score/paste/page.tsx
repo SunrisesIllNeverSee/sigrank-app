@@ -43,7 +43,7 @@ export default function ScorePastePage() {
       {/* ── How it works ── */}
       <section className="mt-8 flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          How it works
+          How the paste path works
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The paste flow is the backup path: you manually enter the four token

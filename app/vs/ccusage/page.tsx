@@ -96,7 +96,7 @@ export default function VsCcusagePage() {
       {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version
+          The short version: ccusage
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           ccusage is a CLI that parses Claude Code&apos;s local JSONL logs and
