@@ -24,33 +24,37 @@
  * clamp), error handling, and D19 Cache-Control header.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { getLeaderboard, type LeaderboardRow } from '@/lib/data'
-import { SORT_DEFAULT } from '@/lib/constants'
-import { LEADERBOARD_CACHE_CONTROL } from '@/lib/api/leaderboard'
-import { enforceListGate, rateLimit, rateLimitedResponse } from '@/lib/api/gate'
+import { NextResponse, type NextRequest } from "next/server";
+import { getLeaderboard, type LeaderboardRow } from "@/lib/data";
+import { SORT_DEFAULT } from "@/lib/constants";
+import { LEADERBOARD_CACHE_CONTROL } from "@/lib/api/leaderboard";
+import {
+  enforceListGate,
+  rateLimit,
+  rateLimitedResponse,
+} from "@/lib/api/gate";
 
 /** Note surfaced when an unauthenticated caller is clamped to the public top-N. */
-const GATED_NOTE = 'top N public; full corpus requires an API key'
+const GATED_NOTE = "top N public; full corpus requires an API key";
 
 /** Deterministic generated_at — no wall-clock read (mock parity, build-safe). */
-const GENERATED_AT = '2026-05-19T00:00:00Z'
+const GENERATED_AT = "2026-05-19T00:00:00Z";
 
-const MAX_LIMIT = 1000
-const DEFAULT_LIMIT = 200
+const MAX_LIMIT = 1000;
+const DEFAULT_LIMIT = 200;
 
 /** Map the metric query alias (api_spec.md) to a metric_snapshots sort column. */
 const METRIC_PARAM_TO_SORT: Record<string, string> = {
-  yield: 'yield_',
-  yield_: 'yield_',
-  signa_rate: 'signa_rate',
-  compression: 'compression_ratio',
-  depth: 'session_depth',
-  volume: 'message_volume',
-  complexity: 'prompt_complexity',
-  cross_thread: 'cross_thread',
-  signal_force: 'signal_force',
-}
+  yield: "yield_",
+  yield_: "yield_",
+  signa_rate: "signa_rate",
+  compression: "compression_ratio",
+  depth: "session_depth",
+  volume: "message_volume",
+  complexity: "prompt_complexity",
+  cross_thread: "cross_thread",
+  signal_force: "signal_force",
+};
 
 /**
  * Serialize one raw snapshot row to the submissions entry shape. Distinct from
@@ -59,21 +63,21 @@ const METRIC_PARAM_TO_SORT: Record<string, string> = {
  * (snapshot_id, window, submitted_at) rather than operator-aggregate fields.
  */
 function serializeSubmissionEntry(row: LeaderboardRow, rank: number) {
-  const { operator, snapshot } = row
-  const c = snapshot.cascade
-  const t = row.telemetry
+  const { operator, snapshot } = row;
+  const c = snapshot.cascade;
+  const t = row.telemetry;
   // Deterministic per-snapshot handle: a snapshot is uniquely keyed by
   // (operator, platform, window, date). No DB key is exposed, so derive a stable
   // id from those parts (identical points reproduce identical ids).
-  const platform = row.platform ?? operator.primary_domain
-  const window = row.window_type ?? null
+  const platform = row.platform ?? operator.primary_domain;
+  const window = row.window_type ?? null;
   const snapshotId = deterministicId(
-    'snap',
+    "snap",
     operator.operator_id,
-    platform ?? 'other',
-    window ?? 'all_time',
-    row.snapshot_date ?? '',
-  )
+    platform ?? "other",
+    window ?? "all_time",
+    row.snapshot_date ?? "",
+  );
   return {
     rank,
     snapshot_id: snapshotId,
@@ -91,10 +95,12 @@ function serializeSubmissionEntry(row: LeaderboardRow, rank: number) {
     output_tokens: t ? t.output : null,
     cache_creation_tokens: t ? t.cache_create : null,
     cache_read_tokens: t ? t.cache_read : null,
-    total_tokens: c ? t.fresh_input + t.output + t.cache_create + t.cache_read : null,
+    total_tokens: c
+      ? t.fresh_input + t.output + t.cache_create + t.cache_read
+      : null,
     class_tier: snapshot.class_tier, // UPPERCASE canonical SignalClass
     submitted_at: row.snapshot_date ?? null,
-  }
+  };
 }
 
 /**
@@ -102,44 +108,45 @@ function serializeSubmissionEntry(row: LeaderboardRow, rank: number) {
  * route's handle scheme. API-response handles only — never a DB key.
  */
 function deterministicId(prefix: string, ...parts: string[]): string {
-  let h = 0
-  const s = parts.join('|')
+  let h = 0;
+  const s = parts.join("|");
   for (let i = 0; i < s.length; i++) {
-    h = (h * 31 + s.charCodeAt(i)) | 0
+    h = (h * 31 + s.charCodeAt(i)) | 0;
   }
-  return `${prefix}_${(h >>> 0).toString(16).padStart(8, '0')}`
+  return `${prefix}_${(h >>> 0).toString(16).padStart(8, "0")}`;
 }
 
 export async function GET(req: NextRequest) {
   // CORPUS gate: best-effort per-IP rate limit (defense-in-depth) before any read.
-  const rl = rateLimit(req)
-  if (!rl.ok) return rateLimitedResponse(rl.retryAfter)
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
 
-  const sp = req.nextUrl.searchParams
+  const sp = req.nextUrl.searchParams;
 
-  const metricParam = sp.get('metric') ?? 'yield_'
-  const sort = METRIC_PARAM_TO_SORT[metricParam] ?? SORT_DEFAULT
+  const metricParam = sp.get("metric") ?? "yield_";
+  const sort = METRIC_PARAM_TO_SORT[metricParam] ?? SORT_DEFAULT;
 
   // window: OPTIONAL filter. Absent or 'all' → EVERY submission across all windows
   // (the "all submissions" default — the product goal of this feed). A specific enum
   // (7d/30d/90d/all_time) narrows to that window_type. The facade's allSnapshots mode
   // does NOT window-filter, so we apply the filter here at the route level.
-  const windowParam = sp.get('window') ?? 'all'
-  const WINDOW_TYPES = new Set(['7d', '30d', '90d', 'all_time'])
-  const windowFilter = windowParam !== 'all' && WINDOW_TYPES.has(windowParam) ? windowParam : null
+  const windowParam = sp.get("window") ?? "all";
+  const WINDOW_TYPES = new Set(["7d", "30d", "90d", "all_time"]);
+  const windowFilter =
+    windowParam !== "all" && WINDOW_TYPES.has(windowParam) ? windowParam : null;
 
-  const limitRaw = Number.parseInt(sp.get('limit') ?? '', 10)
+  const limitRaw = Number.parseInt(sp.get("limit") ?? "", 10);
   const requestedLimit = Number.isFinite(limitRaw)
     ? Math.min(Math.max(limitRaw, 1), MAX_LIMIT)
-    : DEFAULT_LIMIT
+    : DEFAULT_LIMIT;
 
   // CORPUS gate: unauthenticated callers are clamped to the public top-N; a valid
   // x-api-key lifts the cap for bulk/full corpus reads.
-  const { limit, gated } = enforceListGate(req, requestedLimit)
+  const { limit, gated } = enforceListGate(req, requestedLimit);
 
   // When narrowing to one window, fetch a wider slice first so the gated top-N is
   // filled from that window rather than starved by other windows ranking above it.
-  const fetchLimit = windowFilter ? Math.min(MAX_LIMIT, limit * 5) : limit
+  const fetchLimit = windowFilter ? Math.min(MAX_LIMIT, limit * 5) : limit;
 
   // allSnapshots: keep EVERY raw snapshot row (no collapse to one per operator),
   // ranked together by the requested metric — this is the submissions corpus, not
@@ -150,14 +157,16 @@ export async function GET(req: NextRequest) {
     allSnapshots: true,
     sort,
     limit: fetchLimit,
-  })
+  });
 
   const filtered = windowFilter
-    ? rows.filter((row) => (row.window_type ?? 'all_time') === windowFilter)
-    : rows
+    ? rows.filter((row) => (row.window_type ?? "all_time") === windowFilter)
+    : rows;
 
   // Re-rank 1..N over the (optionally filtered) set, then clamp to the gated limit.
-  const entries = filtered.slice(0, limit).map((row, i) => serializeSubmissionEntry(row, i + 1))
+  const entries = filtered
+    .slice(0, limit)
+    .map((row, i) => serializeSubmissionEntry(row, i + 1));
 
   const body = {
     window: windowParam,
@@ -166,9 +175,9 @@ export async function GET(req: NextRequest) {
     total: entries.length,
     entries,
     ...(gated ? { gated: true, note: GATED_NOTE } : {}),
-  }
+  };
 
   return NextResponse.json(body, {
-    headers: { 'Cache-Control': LEADERBOARD_CACHE_CONTROL },
-  })
+    headers: { "Cache-Control": LEADERBOARD_CACHE_CONTROL },
+  });
 }

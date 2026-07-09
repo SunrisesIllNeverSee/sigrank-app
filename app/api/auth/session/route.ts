@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { getSessionOperator } from '@/lib/supabase/auth-server'
+import { NextResponse } from "next/server";
+import { getSessionOperator } from "@/lib/supabase/auth-server";
 
 /**
  * GET /api/auth/session — the current signed-in operator's PUBLIC display fields
@@ -10,16 +10,16 @@ import { getSessionOperator } from '@/lib/supabase/auth-server'
  * public profile fields — never the auth email (P5). Resolution is getUser-verified
  * server-side (the cookie is validated with Supabase, not trusted blindly).
  */
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const op = await getSessionOperator()
-  if (!op) return NextResponse.json({ operator: null })
+  const op = await getSessionOperator();
+  if (!op) return NextResponse.json({ operator: null });
   return NextResponse.json({
     operator: {
       codename: op.codename,
       displayName: op.displayName,
       avatarUrl: op.avatarUrl,
     },
-  })
+  });
 }

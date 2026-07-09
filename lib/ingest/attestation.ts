@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/ingest/attestation.ts — S1.3 source file integrity attestation (server side).
@@ -16,20 +16,20 @@ import 'server-only'
  * their JSONL files between submissions is caught by the inconsistency.
  */
 
-import { getSupabaseService } from '@/lib/supabase/server'
-import type { SnapshotPayloadV1 } from '@/lib/payload/schema'
-import type { GateReason } from '@/lib/ingest/gates'
+import { getSupabaseService } from "@/lib/supabase/server";
+import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import type { GateReason } from "@/lib/ingest/gates";
 
 const flag = (code: string, detail: string): GateReason => ({
-  gate: 'attestation',
+  gate: "attestation",
   code,
-  severity: 'flag',
+  severity: "flag",
   detail,
-})
+});
 
 export interface AttestationResult {
-  flags: GateReason[]
-  stored: boolean
+  flags: GateReason[];
+  stored: boolean;
 }
 
 /**
@@ -45,39 +45,46 @@ export async function checkAndStoreAttestation(
   deviceId: string,
   operatorId: string | null,
 ): Promise<AttestationResult> {
-  const attestation = (payload as SnapshotPayloadV1 & { source_attestation?: unknown[] }).source_attestation
+  const attestation = (
+    payload as SnapshotPayloadV1 & { source_attestation?: unknown[] }
+  ).source_attestation;
   if (!attestation || !Array.isArray(attestation) || attestation.length === 0) {
-    return { flags: [], stored: false }
+    return { flags: [], stored: false };
   }
 
-  const svc = getSupabaseService()
-  if (!svc) return { flags: [], stored: false }
+  const svc = getSupabaseService();
+  if (!svc) return { flags: [], stored: false };
 
-  const flags: GateReason[] = []
+  const flags: GateReason[] = [];
 
   // Cross-check each attested file against historical attestations from this device.
   for (const entry of attestation) {
-    if (typeof entry !== 'object' || entry === null) continue
+    if (typeof entry !== "object" || entry === null) continue;
     const e = entry as {
-      path_hash: string
-      content_hash: string
-      mtime: number
-      first_ts?: string | null
-      last_ts?: string | null
-    }
+      path_hash: string;
+      content_hash: string;
+      mtime: number;
+      first_ts?: string | null;
+      last_ts?: string | null;
+    };
 
     // Query historical attestations for this device + path_hash.
     const { data: historical } = await svc
-      .from('source_attestations')
-      .select('content_hash, first_ts, last_ts, mtime, recorded_at')
-      .eq('device_id', deviceId)
-      .eq('path_hash', e.path_hash)
-      .order('recorded_at', { ascending: false })
-      .limit(5)
+      .from("source_attestations")
+      .select("content_hash, first_ts, last_ts, mtime, recorded_at")
+      .eq("device_id", deviceId)
+      .eq("path_hash", e.path_hash)
+      .order("recorded_at", { ascending: false })
+      .limit(5);
 
     if (historical && historical.length > 0) {
       for (const h of historical) {
-        const hRow = h as { content_hash: string; first_ts: string | null; last_ts: string | null; mtime: number | null }
+        const hRow = h as {
+          content_hash: string;
+          first_ts: string | null;
+          last_ts: string | null;
+          mtime: number | null;
+        };
 
         // Tampering signal 1: content_hash changed but timestamps are identical.
         if (
@@ -87,26 +94,26 @@ export async function checkAndStoreAttestation(
         ) {
           flags.push(
             flag(
-              'attestation_tamper_hash_change',
+              "attestation_tamper_hash_change",
               `file ${e.path_hash.slice(0, 8)}… content_hash changed but timestamps identical (log edited without session moving)`,
             ),
-          )
-          break // one flag per file is enough
+          );
+          break; // one flag per file is enough
         }
 
         // Tampering signal 2: mtime is newer than last_ts (edited after session ended).
         if (e.last_ts && hRow.mtime != null) {
-          const lastTsMs = Date.parse(e.last_ts)
-          const mtimeMs = e.mtime * 1000
+          const lastTsMs = Date.parse(e.last_ts);
+          const mtimeMs = e.mtime * 1000;
           if (mtimeMs > lastTsMs + 60_000) {
             // 60s grace for clock skew
             flags.push(
               flag(
-                'attestation_tamper_mtime',
+                "attestation_tamper_mtime",
                 `file ${e.path_hash.slice(0, 8)}… mtime ${new Date(mtimeMs).toISOString()} > last_ts ${e.last_ts} (edited after session ended)`,
               ),
-            )
-            break
+            );
+            break;
           }
         }
       }
@@ -115,7 +122,7 @@ export async function checkAndStoreAttestation(
 
   // Store the new attestation entries.
   const rows = attestation.map((entry) => {
-    const e = entry as Record<string, unknown>
+    const e = entry as Record<string, unknown>;
     return {
       device_id: deviceId,
       operator_id: operatorId,
@@ -130,12 +137,12 @@ export async function checkAndStoreAttestation(
       lines: e.lines as number,
       first_ts: (e.first_ts as string | null) ?? null,
       last_ts: (e.last_ts as string | null) ?? null,
-    }
-  })
+    };
+  });
 
   if (rows.length > 0) {
-    await svc.from('source_attestations').insert(rows)
+    await svc.from("source_attestations").insert(rows);
   }
 
-  return { flags, stored: true }
+  return { flags, stored: true };
 }

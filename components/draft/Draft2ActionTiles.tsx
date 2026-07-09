@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 /**
  * Draft2ActionTiles — DRAFT 2 only. The four unified action tiles
@@ -10,33 +10,36 @@ import Link from 'next/link'
  * the hero tiles keep just the soft glow.
  */
 const TILES: { href: string; glyph: string; label: string }[] = [
-  { href: '/score', glyph: 'Υ', label: 'Measure' },
-  { href: '/board/all', glyph: '≣', label: 'Board' },
-  { href: '/compare', glyph: '⇄', label: 'Compare' },
-  { href: '/wiki', glyph: '◧', label: 'Info · Wiki' },
-]
+  { href: "/score", glyph: "Υ", label: "Measure" },
+  { href: "/board/all", glyph: "≣", label: "Board" },
+  { href: "/compare", glyph: "⇄", label: "Compare" },
+  { href: "/wiki", glyph: "◧", label: "Info · Wiki" },
+];
 
 export function Draft2ActionTiles({
-  className = '',
+  className = "",
   shine = false,
 }: {
-  className?: string
-  shine?: boolean
+  className?: string;
+  shine?: boolean;
 }) {
   return (
     <div
       className={
-        'mx-auto grid w-full max-w-2xl grid-cols-2 items-stretch gap-3 sm:grid-cols-4 ' + className
+        "mx-auto grid w-full max-w-2xl grid-cols-2 items-stretch gap-3 sm:grid-cols-4 " +
+        className
       }
     >
       {TILES.map((b, i) => (
         <Link
           key={b.label}
           href={b.href}
-          style={shine ? ({ ['--shine-delay' as string]: `${i * 0.7}s` }) : undefined}
+          style={
+            shine ? { ["--shine-delay" as string]: `${i * 0.7}s` } : undefined
+          }
           className={
-            'box-glow-soft group relative flex flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-4 py-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10' +
-            (shine ? ' shine-sweep' : '')
+            "box-glow-soft group relative flex flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-4 py-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10" +
+            (shine ? " shine-sweep" : "")
           }
         >
           {/* top accent rail — lights gold on hover */}
@@ -50,5 +53,5 @@ export function Draft2ActionTiles({
         </Link>
       ))}
     </div>
-  )
+  );
 }

@@ -11,16 +11,16 @@
  * - Observer-contamination signatures (claude-mem inflation)
  */
 
-import { test } from 'node:test'
-import assert from 'node:assert/strict'
+import { test } from "node:test";
+import assert from "node:assert/strict";
 
 /**
  * Faithful port of runBattery (lib/ingest/battery.ts). Returns flags + signals.
  * Pure + deterministic — no wall-clock, no RNG.
  */
 function runBattery(p) {
-  const rt = p.raw_telemetry
-  const flags = []
+  const rt = p.raw_telemetry;
+  const flags = [];
 
   // Benford's-law first-digit check on the 4 token pillars.
   const vals = [
@@ -28,48 +28,72 @@ function runBattery(p) {
     rt.tokens_output,
     rt.tokens_cache_read,
     rt.tokens_cache_creation,
-  ].filter((v) => v > 0)
+  ].filter((v) => v > 0);
   if (vals.length >= 3) {
-    const leadingDigits = vals.map((v) => parseInt(String(v)[0], 10))
-    const lowDigitFraction = leadingDigits.filter((d) => d <= 3).length / leadingDigits.length
+    const leadingDigits = vals.map((v) => parseInt(String(v)[0], 10));
+    const lowDigitFraction =
+      leadingDigits.filter((d) => d <= 3).length / leadingDigits.length;
     if (lowDigitFraction < 0.25) {
-      flags.push({ gate: 'battery', code: 'benford_violation', severity: 'flag' })
+      flags.push({
+        gate: "battery",
+        code: "benford_violation",
+        severity: "flag",
+      });
     }
   }
 
   // Cadence: turns per active minute.
   if (rt.active_minutes_est > 0) {
-    const turnsPerMin = rt.turns_total / rt.active_minutes_est
+    const turnsPerMin = rt.turns_total / rt.active_minutes_est;
     if (turnsPerMin > 50) {
-      flags.push({ gate: 'battery', code: 'implausible_cadence', severity: 'flag' })
+      flags.push({
+        gate: "battery",
+        code: "implausible_cadence",
+        severity: "flag",
+      });
     }
   }
 
   // Contamination: impossible cascade (cache_read with 0 cache_creation).
   if (rt.tokens_cache_read > 1_000 && rt.tokens_cache_creation === 0) {
-    flags.push({ gate: 'battery', code: 'contamination_signature', severity: 'flag' })
+    flags.push({
+      gate: "battery",
+      code: "contamination_signature",
+      severity: "flag",
+    });
   }
 
   // Contamination: extreme cache ratio (> 100:1).
-  if (rt.tokens_cache_creation > 0 && rt.tokens_cache_read / rt.tokens_cache_creation > 100) {
-    flags.push({ gate: 'battery', code: 'extreme_cache_ratio', severity: 'flag' })
+  if (
+    rt.tokens_cache_creation > 0 &&
+    rt.tokens_cache_read / rt.tokens_cache_creation > 100
+  ) {
+    flags.push({
+      gate: "battery",
+      code: "extreme_cache_ratio",
+      severity: "flag",
+    });
   }
 
   const signals = {
-    benford_flags: flags.filter((f) => f.code.startsWith('benford')).length,
+    benford_flags: flags.filter((f) => f.code.startsWith("benford")).length,
     cadence_flags: flags.filter(
-      (f) => f.code.startsWith('cadence') || f.code.startsWith('implausible_cadence'),
+      (f) =>
+        f.code.startsWith("cadence") ||
+        f.code.startsWith("implausible_cadence"),
     ).length,
     contamination_flags: flags.filter(
-      (f) => f.code.startsWith('contamination') || f.code.startsWith('extreme_cache'),
+      (f) =>
+        f.code.startsWith("contamination") ||
+        f.code.startsWith("extreme_cache"),
     ).length,
     battery_flag_total: flags.length,
-  }
+  };
 
-  return { flags, signals }
+  return { flags, signals };
 }
 
-const codes = (result) => result.flags.map((f) => f.code)
+const codes = (result) => result.flags.map((f) => f.code);
 
 /** A clean, real-shaped payload (MO§ES-like distribution, Benford-compliant). */
 function cleanPayload(over = {}) {
@@ -82,17 +106,17 @@ function cleanPayload(over = {}) {
     tokens_cache_creation: 128_196_310, // leading 1
     active_minutes_est: 6000,
     ...over.raw_telemetry,
-  }
-  return { raw_telemetry: rt }
+  };
+  return { raw_telemetry: rt };
 }
 
-test('clean real-shaped payload → zero battery flags', () => {
-  const r = runBattery(cleanPayload())
-  assert.equal(r.flags.length, 0, `unexpected flags: ${codes(r)}`)
-  assert.equal(r.signals.battery_flag_total, 0)
-})
+test("clean real-shaped payload → zero battery flags", () => {
+  const r = runBattery(cleanPayload());
+  assert.equal(r.flags.length, 0, `unexpected flags: ${codes(r)}`);
+  assert.equal(r.signals.battery_flag_total, 0);
+});
 
-test('round fabricated numbers (5xxxxx, 7xxxxx, 9xxxxx) → benford_violation', () => {
+test("round fabricated numbers (5xxxxx, 7xxxxx, 9xxxxx) → benford_violation", () => {
   const r = runBattery(
     cleanPayload({
       raw_telemetry: {
@@ -102,12 +126,12 @@ test('round fabricated numbers (5xxxxx, 7xxxxx, 9xxxxx) → benford_violation', 
         tokens_cache_creation: 50_000, // leading 5
       },
     }),
-  )
-  assert.ok(codes(r).includes('benford_violation'), `flags: ${codes(r)}`)
-  assert.ok(r.signals.benford_flags >= 1)
-})
+  );
+  assert.ok(codes(r).includes("benford_violation"), `flags: ${codes(r)}`);
+  assert.ok(r.signals.benford_flags >= 1);
+});
 
-test('impossible cascade (cache_read > 1000, cache_creation = 0) → contamination_signature', () => {
+test("impossible cascade (cache_read > 1000, cache_creation = 0) → contamination_signature", () => {
   const r = runBattery(
     cleanPayload({
       raw_telemetry: {
@@ -115,12 +139,12 @@ test('impossible cascade (cache_read > 1000, cache_creation = 0) → contaminati
         tokens_cache_creation: 0,
       },
     }),
-  )
-  assert.ok(codes(r).includes('contamination_signature'), `flags: ${codes(r)}`)
-  assert.ok(r.signals.contamination_flags >= 1)
-})
+  );
+  assert.ok(codes(r).includes("contamination_signature"), `flags: ${codes(r)}`);
+  assert.ok(r.signals.contamination_flags >= 1);
+});
 
-test('extreme cache ratio (1000:1) → extreme_cache_ratio', () => {
+test("extreme cache ratio (1000:1) → extreme_cache_ratio", () => {
   const r = runBattery(
     cleanPayload({
       raw_telemetry: {
@@ -128,12 +152,12 @@ test('extreme cache ratio (1000:1) → extreme_cache_ratio', () => {
         tokens_cache_creation: 1_000,
       },
     }),
-  )
-  assert.ok(codes(r).includes('extreme_cache_ratio'), `flags: ${codes(r)}`)
-  assert.ok(r.signals.contamination_flags >= 1)
-})
+  );
+  assert.ok(codes(r).includes("extreme_cache_ratio"), `flags: ${codes(r)}`);
+  assert.ok(r.signals.contamination_flags >= 1);
+});
 
-test('machine-perfect cadence (100 turns in 1 minute) → implausible_cadence', () => {
+test("machine-perfect cadence (100 turns in 1 minute) → implausible_cadence", () => {
   const r = runBattery(
     cleanPayload({
       raw_telemetry: {
@@ -141,12 +165,12 @@ test('machine-perfect cadence (100 turns in 1 minute) → implausible_cadence', 
         active_minutes_est: 1,
       },
     }),
-  )
-  assert.ok(codes(r).includes('implausible_cadence'), `flags: ${codes(r)}`)
-  assert.ok(r.signals.cadence_flags >= 1)
-})
+  );
+  assert.ok(codes(r).includes("implausible_cadence"), `flags: ${codes(r)}`);
+  assert.ok(r.signals.cadence_flags >= 1);
+});
 
-test('too few pillars (< 3 non-zero) → skip benford check (no false positive)', () => {
+test("too few pillars (< 3 non-zero) → skip benford check (no false positive)", () => {
   const r = runBattery(
     cleanPayload({
       raw_telemetry: {
@@ -156,11 +180,14 @@ test('too few pillars (< 3 non-zero) → skip benford check (no false positive)'
         tokens_cache_creation: 0,
       },
     }),
-  )
-  assert.ok(!codes(r).includes('benford_violation'), `should not flag benford with < 3 pillars: ${codes(r)}`)
-})
+  );
+  assert.ok(
+    !codes(r).includes("benford_violation"),
+    `should not flag benford with < 3 pillars: ${codes(r)}`,
+  );
+});
 
-test('signals aggregate correctly across multiple flags', () => {
+test("signals aggregate correctly across multiple flags", () => {
   const r = runBattery(
     cleanPayload({
       raw_telemetry: {
@@ -172,8 +199,8 @@ test('signals aggregate correctly across multiple flags', () => {
         active_minutes_est: 1,
       },
     }),
-  )
-  assert.ok(r.signals.benford_flags >= 1)
-  assert.ok(r.signals.cadence_flags >= 1)
-  assert.ok(r.signals.battery_flag_total >= 2)
-})
+  );
+  assert.ok(r.signals.benford_flags >= 1);
+  assert.ok(r.signals.cadence_flags >= 1);
+  assert.ok(r.signals.battery_flag_total >= 2);
+});

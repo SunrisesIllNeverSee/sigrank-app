@@ -9,63 +9,108 @@
  * and a styled comparison table matching the repo's table conventions.
  */
 
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumb, faqPage } from '@/lib/jsonld'
-import { WaveHero } from '@/components/ui/WaveHero'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs ccusage \u2014 Sensor to Instrument Panel',
+  title: "SigRank vs ccusage \u2014 Sensor to Instrument Panel",
   description:
-    'ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.',
-  path: '/vs/ccusage',
-})
+    "ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.",
+  path: "/vs/ccusage",
+});
 
 // Comparison rows — feature-by-feature, ccusage vs SigRank.
 const COMPARE_ROWS: { feature: string; ccusage: string; sigrank: string }[] = [
-  { feature: 'Reads Claude Code token logs', ccusage: 'Yes', sigrank: 'Yes (bundles ccusage)' },
-  { feature: 'Token pillar breakdown (input / output / cache-read / cache-write)', ccusage: 'Yes', sigrank: 'Yes' },
-  { feature: 'Cascade efficiency score (Υ = cache_read × output / input²)', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'Compression ratio + SNR + Leverage + Velocity', ccusage: 'Partial (raw counts)', sigrank: 'Yes (derived metrics)' },
-  { feature: 'Class tier (IGNITER → TRANSMITTER)', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'Global operator leaderboard', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'Operator profiles + head-to-head compare', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'MCP server for AI-agent integration', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'ed25519-signed snapshot submission', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'Platform-neutral (Cursor, Copilot, Gemini, 15+)', ccusage: 'Claude Code only', sigrank: 'Yes' },
-  { feature: 'Bundled tools (tokscale, token-dashboard)', ccusage: 'No', sigrank: 'Yes' },
-  { feature: 'Privacy-preserving (token counts only)', ccusage: 'Yes', sigrank: 'Yes' },
-]
+  {
+    feature: "Reads Claude Code token logs",
+    ccusage: "Yes",
+    sigrank: "Yes (bundles ccusage)",
+  },
+  {
+    feature:
+      "Token pillar breakdown (input / output / cache-read / cache-write)",
+    ccusage: "Yes",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Cascade efficiency score (Υ = cache_read × output / input²)",
+    ccusage: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Compression ratio + SNR + Leverage + Velocity",
+    ccusage: "Partial (raw counts)",
+    sigrank: "Yes (derived metrics)",
+  },
+  {
+    feature: "Class tier (IGNITER → TRANSMITTER)",
+    ccusage: "No",
+    sigrank: "Yes",
+  },
+  { feature: "Global operator leaderboard", ccusage: "No", sigrank: "Yes" },
+  {
+    feature: "Operator profiles + head-to-head compare",
+    ccusage: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "MCP server for AI-agent integration",
+    ccusage: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "ed25519-signed snapshot submission",
+    ccusage: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Platform-neutral (Cursor, Copilot, Gemini, 15+)",
+    ccusage: "Claude Code only",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Bundled tools (tokscale, token-dashboard)",
+    ccusage: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Privacy-preserving (token counts only)",
+    ccusage: "Yes",
+    sigrank: "Yes",
+  },
+];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: 'Is SigRank a ccusage alternative or a ccusage upgrade?',
+    question: "Is SigRank a ccusage alternative or a ccusage upgrade?",
     answer:
-      'Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `sigrank submit` is the upgrade path.',
+      "Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `sigrank submit` is the upgrade path.",
   },
   {
-    question: 'Does SigRank replace ccusage?',
+    question: "Does SigRank replace ccusage?",
     answer:
-      'No — it wraps it. The SigRank CLI calls ccusage under the hood to parse your Claude Code token telemetry locally, then computes the four-pillar cascade metrics (Υ Yield, compression ratio, SNR, Leverage, Velocity), signs a snapshot with ed25519, and publishes it to the leaderboard. You can still run `ccusage` standalone anytime; SigRank just adds the scoring and ranking layer ccusage was never built to provide.',
+      "No — it wraps it. The SigRank CLI calls ccusage under the hood to parse your Claude Code token telemetry locally, then computes the four-pillar cascade metrics (Υ Yield, compression ratio, SNR, Leverage, Velocity), signs a snapshot with ed25519, and publishes it to the leaderboard. You can still run `ccusage` standalone anytime; SigRank just adds the scoring and ranking layer ccusage was never built to provide.",
   },
   {
-    question: 'What does ccusage not measure that SigRank does?',
+    question: "What does ccusage not measure that SigRank does?",
     answer:
-      'ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccusage tells you what you spent; SigRank tells you how efficiently you drove.',
+      "ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccusage tells you what you spent; SigRank tells you how efficiently you drove.",
   },
   {
-    question: 'Can I use SigRank with my existing ccusage output?',
+    question: "Can I use SigRank with my existing ccusage output?",
     answer:
-      'Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and compression ratio instantly, no account required. To publish to the leaderboard, run `sigrank enroll` then `sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.',
+      "Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and compression ratio instantly, no account required. To publish to the leaderboard, run `sigrank enroll` then `sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.",
   },
   {
-    question: 'Does SigRank only work with Claude Code like ccusage?',
+    question: "Does SigRank only work with Claude Code like ccusage?",
     answer:
-      'No. ccusage is Claude Code-specific — it reads the Claude Code JSONL logs. SigRank is platform-neutral: it works across Claude Code, Cursor, GitHub Copilot, ChatGPT, Gemini, and 15+ other platforms. ccusage remains the reader for Claude Code logs; SigRank adds readers (tokscale, token-dashboard) and a unified scoring layer so your efficiency is comparable no matter which tool you drove.',
+      "No. ccusage is Claude Code-specific — it reads the Claude Code JSONL logs. SigRank is platform-neutral: it works across Claude Code, Cursor, GitHub Copilot, ChatGPT, Gemini, and 15+ other platforms. ccusage remains the reader for Claude Code logs; SigRank adds readers (tokscale, token-dashboard) and a unified scoring layer so your efficiency is comparable no matter which tool you drove.",
   },
-]
+];
 
 export default function VsCcusagePage() {
   return (
@@ -73,8 +118,8 @@ export default function VsCcusagePage() {
       <JsonLd
         data={[
           breadcrumb([
-            { name: 'Comparisons', path: '/vs' },
-            { name: 'SigRank vs ccusage', path: '/vs/ccusage' },
+            { name: "Comparisons", path: "/vs" },
+            { name: "SigRank vs ccusage", path: "/vs/ccusage" },
           ]),
           faqPage(FAQS),
         ]}
@@ -85,7 +130,7 @@ export default function VsCcusagePage() {
         title="From Token Sensor to Instrument Panel"
         subtitle={
           <>
-            ccusage reads your Claude Code token logs. SigRank{' '}
+            ccusage reads your Claude Code token logs. SigRank{" "}
             <span className="text-gold">bundles ccusage</span> and adds cascade
             scoring, leaderboards, operator profiles, and MCP integration. The
             sensor stays — the instrument panel is what was missing.
@@ -102,17 +147,17 @@ export default function VsCcusagePage() {
           ccusage is a CLI that parses Claude Code&apos;s local JSONL logs and
           prints your token usage — input, output, cache creation, cache read.
           It does exactly one thing well: it <em>reads the sensor</em>. SigRank
-          takes that same reading and turns it into an{' '}
+          takes that same reading and turns it into an{" "}
           <strong className="text-text-primary">instrument panel</strong>: a
-          cascade-efficiency score (Υ Yield), a class tier, a global leaderboard,
-          operator profiles, head-to-head comparisons, and an MCP server your AI
-          agents can query. You don&apos;t throw away ccusage — you graduate from
-          it.
+          cascade-efficiency score (Υ Yield), a class tier, a global
+          leaderboard, operator profiles, head-to-head comparisons, and an MCP
+          server your AI agents can query. You don&apos;t throw away ccusage —
+          you graduate from it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The analogy: ccusage is the oxygen sensor in the exhaust. SigRank is
-          the dashboard that turns that reading into a lap time, a ranking, and a
-          pit strategy. Both matter. Only one tells you whether you&apos;re
+          the dashboard that turns that reading into a lap time, a ranking, and
+          a pit strategy. Both matter. Only one tells you whether you&apos;re
           winning.
         </p>
       </section>
@@ -144,7 +189,9 @@ export default function VsCcusagePage() {
                   className="border-b border-bg-border-subtle last:border-0"
                 >
                   <td className="px-4 py-2.5 text-text-primary">{r.feature}</td>
-                  <td className="px-4 py-2.5 text-text-secondary">{r.ccusage}</td>
+                  <td className="px-4 py-2.5 text-text-secondary">
+                    {r.ccusage}
+                  </td>
                   <td className="px-4 py-2.5 font-medium text-gold">
                     {r.sigrank}
                   </td>
@@ -161,22 +208,23 @@ export default function VsCcusagePage() {
           Why raw token counts aren&apos;t enough
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          ccusage answers <em>&quot;how many tokens did I burn?&quot;</em> That&apos;s
-          necessary but not sufficient. Two operators can spend the same 50K input
-          tokens and get wildly different outcomes. One reuses cached context
-          efficiently and produces 30K output tokens; the other re-sends the same
-          context every turn and produces 3K. Same spend, ten-fold difference in
-          signal.
+          ccusage answers <em>&quot;how many tokens did I burn?&quot;</em>{" "}
+          That&apos;s necessary but not sufficient. Two operators can spend the
+          same 50K input tokens and get wildly different outcomes. One reuses
+          cached context efficiently and produces 30K output tokens; the other
+          re-sends the same context every turn and produces 3K. Same spend,
+          ten-fold difference in signal.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s headline metric —{' '}
+          SigRank&apos;s headline metric —{" "}
           <span className="font-mono text-gold">
             Υ = cache_read × output / input²
-          </span>{' '}
+          </span>{" "}
           — measures exactly that gap. It rewards the operator who compounds
           cached context into output and penalizes the one who burns fresh input
-          without leverage. ccusage gives you the four integers; SigRank tells you
-          whether the cascade they describe is <em>compounding or burning</em>.
+          without leverage. ccusage gives you the four integers; SigRank tells
+          you whether the cascade they describe is{" "}
+          <em>compounding or burning</em>.
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
@@ -214,20 +262,22 @@ export default function VsCcusagePage() {
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
-{`npm install -g sigrank
+            {`npm install -g sigrank
 sigrank enroll      # create your operator identity
 sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Prefer to inspect before you submit? Run{' '}
-          <span className="font-mono text-text-primary">sigrank me --dry-run</span>{' '}
-          to see your scored payload locally, or paste your{' '}
-          <span className="font-mono text-text-primary">ccusage --json</span>{' '}
-          output into the{' '}
+          Prefer to inspect before you submit? Run{" "}
+          <span className="font-mono text-text-primary">
+            sigrank me --dry-run
+          </span>{" "}
+          to see your scored payload locally, or paste your{" "}
+          <span className="font-mono text-text-primary">ccusage --json</span>{" "}
+          output into the{" "}
           <a href="/score" className="text-gold underline underline-offset-2">
             /score calculator
-          </a>{' '}
+          </a>{" "}
           — no account, no submission, just the numbers.
         </p>
       </section>
@@ -256,8 +306,8 @@ sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Keep your ccusage reads. Add the scoring, the leaderboard, and the
-          operator profile that turns those reads into a rank. Install SigRank and
-          submit your first signed snapshot in under a minute.
+          operator profile that turns those reads into a rank. Install SigRank
+          and submit your first signed snapshot in under a minute.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
@@ -278,20 +328,29 @@ sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          Related:{' '}
-          <Link href="/alternatives/ccusage-alternatives" className="text-gold underline underline-offset-2">
+          Related:{" "}
+          <Link
+            href="/alternatives/ccusage-alternatives"
+            className="text-gold underline underline-offset-2"
+          >
             ccusage Alternatives
           </Link>
-          {' · '}
-          <Link href="/tools/yield-calculator" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/tools/yield-calculator"
+            className="text-gold underline underline-offset-2"
+          >
             Yield Calculator
           </Link>
-          {' · '}
-          <Link href="/wiki/local-agent" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/wiki/local-agent"
+            className="text-gold underline underline-offset-2"
+          >
             The Local Agent (MCP)
           </Link>
         </p>
       </section>
     </div>
-  )
+  );
 }

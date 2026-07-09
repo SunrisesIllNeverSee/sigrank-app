@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React from 'react'
+import React from "react";
 
 /**
  * CascadeHeader — an animated "signal cascade" backdrop for the landing
@@ -23,16 +23,53 @@ import React from 'react'
 // Each stream: a bezier from a tight left origin to a fanned-out right target.
 // dur/delay stagger the pulses so the cascade reads as continuous flow.
 const STREAMS: { d: string; dur: number; delay: number; gold: boolean }[] = [
-  { d: 'M -20 100 C 200 100, 360 40,  640 28',  dur: 5.5, delay: 0.0, gold: true },
-  { d: 'M -20 100 C 200 100, 360 70,  640 64',  dur: 6.2, delay: 0.6, gold: false },
-  { d: 'M -20 100 C 200 100, 360 100, 660 100', dur: 5.0, delay: 0.3, gold: true },
-  { d: 'M -20 100 C 200 100, 360 130, 640 136', dur: 6.6, delay: 0.9, gold: false },
-  { d: 'M -20 100 C 200 100, 360 160, 640 172', dur: 5.8, delay: 0.2, gold: true },
-  { d: 'M -20 100 C 240 100, 380 55,  640 46',  dur: 7.0, delay: 1.2, gold: false },
-  { d: 'M -20 100 C 240 100, 380 145, 640 154', dur: 6.0, delay: 1.5, gold: true },
-]
+  {
+    d: "M -20 100 C 200 100, 360 40,  640 28",
+    dur: 5.5,
+    delay: 0.0,
+    gold: true,
+  },
+  {
+    d: "M -20 100 C 200 100, 360 70,  640 64",
+    dur: 6.2,
+    delay: 0.6,
+    gold: false,
+  },
+  {
+    d: "M -20 100 C 200 100, 360 100, 660 100",
+    dur: 5.0,
+    delay: 0.3,
+    gold: true,
+  },
+  {
+    d: "M -20 100 C 200 100, 360 130, 640 136",
+    dur: 6.6,
+    delay: 0.9,
+    gold: false,
+  },
+  {
+    d: "M -20 100 C 200 100, 360 160, 640 172",
+    dur: 5.8,
+    delay: 0.2,
+    gold: true,
+  },
+  {
+    d: "M -20 100 C 240 100, 380 55,  640 46",
+    dur: 7.0,
+    delay: 1.2,
+    gold: false,
+  },
+  {
+    d: "M -20 100 C 240 100, 380 145, 640 154",
+    dur: 6.0,
+    delay: 1.5,
+    gold: true,
+  },
+];
 
-export function CascadeHeader({ slowFactor = 1 }: { slowFactor?: number } = {}) {
+export function CascadeHeader({
+  slowFactor = 1,
+}: { slowFactor?: number } = {}) {
   // slowFactor multiplies each stream's animation duration. Default 1 (live
   // landing, unchanged); draft2 passes >1 for a calmer, slower cascade.
   return (
@@ -49,11 +86,23 @@ export function CascadeHeader({ slowFactor = 1 }: { slowFactor?: number } = {}) 
           {/* Brighten-to-the-right gradient so output reads as amplified. */}
           <linearGradient id="cascade-gold" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="rgb(var(--gold))" stopOpacity="0.05" />
-            <stop offset="100%" stopColor="rgb(var(--gold))" stopOpacity="0.55" />
+            <stop
+              offset="100%"
+              stopColor="rgb(var(--gold))"
+              stopOpacity="0.55"
+            />
           </linearGradient>
           <linearGradient id="cascade-accent" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="rgb(var(--accent))" stopOpacity="0.04" />
-            <stop offset="100%" stopColor="rgb(var(--accent))" stopOpacity="0.4" />
+            <stop
+              offset="0%"
+              stopColor="rgb(var(--accent))"
+              stopOpacity="0.04"
+            />
+            <stop
+              offset="100%"
+              stopColor="rgb(var(--accent))"
+              stopOpacity="0.4"
+            />
           </linearGradient>
         </defs>
 
@@ -63,7 +112,7 @@ export function CascadeHeader({ slowFactor = 1 }: { slowFactor?: number } = {}) 
             <path
               d={s.d}
               fill="none"
-              stroke={s.gold ? 'url(#cascade-gold)' : 'url(#cascade-accent)'}
+              stroke={s.gold ? "url(#cascade-gold)" : "url(#cascade-accent)"}
               strokeWidth="1"
             />
             {/* the travelling pulse: a short dash that runs the path length.
@@ -71,20 +120,20 @@ export function CascadeHeader({ slowFactor = 1 }: { slowFactor?: number } = {}) 
             <path
               d={s.d}
               fill="none"
-              stroke={s.gold ? 'rgb(var(--gold))' : 'rgb(var(--accent))'}
+              stroke={s.gold ? "rgb(var(--gold))" : "rgb(var(--accent))"}
               strokeWidth="1.75"
               strokeLinecap="round"
               pathLength={1}
               strokeDasharray="0.12 0.88"
               className="cascade-pulse motion-reduce:[animation:none] motion-reduce:[stroke-dashoffset:0]"
               style={{
-                ['--dur' as string]: `${s.dur * slowFactor}s`,
-                ['--delay' as string]: `${s.delay}s`,
+                ["--dur" as string]: `${s.dur * slowFactor}s`,
+                ["--delay" as string]: `${s.delay}s`,
               }}
             />
           </g>
         ))}
       </svg>
     </div>
-  )
+  );
 }

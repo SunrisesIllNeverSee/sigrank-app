@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
 /**
  * RotatingWordmark — the landing hero wordmark, EXAGGERATED.
@@ -17,22 +17,27 @@ import React, { useEffect, useState } from 'react'
  * Self-gates: renders null when data-theme === 'terminal' (the TerminalWordmark
  * takes over the hero under that theme). Watches data-theme via MutationObserver.
  */
-const WORD = 'SIGRANK'.split('')
+const WORD = "SIGRANK".split("");
 
 export function RotatingWordmark() {
-  const [hidden, setHidden] = useState(false)
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const check = () => {
-      setHidden(document.documentElement.getAttribute('data-theme') === 'terminal')
-    }
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => observer.disconnect()
-  }, [])
+      setHidden(
+        document.documentElement.getAttribute("data-theme") === "terminal",
+      );
+    };
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
-  if (hidden) return null
+  if (hidden) return null;
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
@@ -46,8 +51,10 @@ export function RotatingWordmark() {
             aria-hidden
             // i===0 is the S — gets the extra wordmark-letter-s class so it
             // briefly swaps to § (the MO§ES™ glyph) on the serif keyframe slot.
-            className={i === 0 ? 'wordmark-letter wordmark-letter-s' : 'wordmark-letter'}
-            style={{ ['--wm-delay' as string]: `${i * 0.55}s` }}
+            className={
+              i === 0 ? "wordmark-letter wordmark-letter-s" : "wordmark-letter"
+            }
+            style={{ ["--wm-delay" as string]: `${i * 0.55}s` }}
           >
             {ch}
           </span>
@@ -57,5 +64,5 @@ export function RotatingWordmark() {
         §
       </span>
     </div>
-  )
+  );
 }

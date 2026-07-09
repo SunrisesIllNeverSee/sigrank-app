@@ -14,9 +14,7 @@
     },
     "platform": {
       "primary": "claude",
-      "models": [
-        "claude-opus-4-8"
-      ]
+      "models": ["claude-opus-4-8"]
     },
     "core_metrics": {
       "compression_ratio": 0.9003,

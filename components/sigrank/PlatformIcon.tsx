@@ -13,21 +13,29 @@
  * from the cell's text color (theme token). A `title` gives an accessible label.
  */
 
-import React from 'react'
+import React from "react";
 
-export type PlatformKey = 'claude' | 'chatgpt' | 'gemini' | 'pi' | 'codex' | 'multi' | 'other'
+export type PlatformKey =
+  "claude" | "chatgpt" | "gemini" | "pi" | "codex" | "multi" | "other";
 
 const LABEL: Record<PlatformKey, string> = {
-  claude: 'Claude', chatgpt: 'ChatGPT', gemini: 'Gemini',
-  pi: 'Pi', codex: 'Codex', multi: 'Multi', other: 'Other',
-}
+  claude: "Claude",
+  chatgpt: "ChatGPT",
+  gemini: "Gemini",
+  pi: "Pi",
+  codex: "Codex",
+  multi: "Multi",
+  other: "Other",
+};
 
 /** Normalize any incoming platform string to a known key (defensive; 'other' fallback). */
 export function platformKey(p: string | null | undefined): PlatformKey {
-  const k = (p ?? '').toLowerCase()
-  return (['claude', 'chatgpt', 'gemini', 'pi', 'codex', 'multi'] as const).includes(k as never)
+  const k = (p ?? "").toLowerCase();
+  return (
+    ["claude", "chatgpt", "gemini", "pi", "codex", "multi"] as const
+  ).includes(k as never)
     ? (k as PlatformKey)
-    : 'other'
+    : "other";
 }
 
 // Original monochrome glyphs (16×16). Each is a distinct, recognizable mark — not a
@@ -37,15 +45,27 @@ const GLYPH: Record<PlatformKey, React.ReactNode> = {
   claude: (
     <g fill="currentColor">
       {Array.from({ length: 8 }).map((_, i) => (
-        <rect key={i} x="7.2" y="1.5" width="1.6" height="5" rx="0.8"
-          transform={`rotate(${i * 45} 8 8)`} />
+        <rect
+          key={i}
+          x="7.2"
+          y="1.5"
+          width="1.6"
+          height="5"
+          rx="0.8"
+          transform={`rotate(${i * 45} 8 8)`}
+        />
       ))}
     </g>
   ),
   // ChatGPT — interlocking hex knot suggested by a rounded six-point ring.
   chatgpt: (
-    <path fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-      d="M8 2.2 13 5v6L8 13.8 3 11V5z" />
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinejoin="round"
+      d="M8 2.2 13 5v6L8 13.8 3 11V5z"
+    />
   ),
   // Gemini — twin verticals (the "twins" / duality).
   gemini: (
@@ -66,8 +86,14 @@ const GLYPH: Record<PlatformKey, React.ReactNode> = {
   ),
   // Codex — angle brackets </>.
   codex: (
-    <path fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-      d="M5.6 4.5 2.5 8l3.1 3.5M10.4 4.5 13.5 8l-3.1 3.5" />
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5.6 4.5 2.5 8l3.1 3.5M10.4 4.5 13.5 8l-3.1 3.5"
+    />
   ),
   // Multi — overlapping nodes (a small constellation).
   multi: (
@@ -79,22 +105,27 @@ const GLYPH: Record<PlatformKey, React.ReactNode> = {
   ),
   // Other — a neutral diamond.
   other: (
-    <path fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-      d="M8 2.5 13.5 8 8 13.5 2.5 8z" />
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinejoin="round"
+      d="M8 2.5 13.5 8 8 13.5 2.5 8z"
+    />
   ),
-}
+};
 
 export function PlatformIcon({
   platform,
   size = 16,
   title,
 }: {
-  platform: string | null | undefined
-  size?: number
-  title?: string
+  platform: string | null | undefined;
+  size?: number;
+  title?: string;
 }) {
-  const key = platformKey(platform)
-  const label = title ?? LABEL[key]
+  const key = platformKey(platform);
+  const label = title ?? LABEL[key];
   return (
     <svg
       width={size}
@@ -102,10 +133,14 @@ export function PlatformIcon({
       viewBox="0 0 16 16"
       role="img"
       aria-label={label}
-      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+      style={{
+        display: "inline-block",
+        verticalAlign: "middle",
+        flexShrink: 0,
+      }}
     >
       <title>{label}</title>
       {GLYPH[key]}
     </svg>
-  )
+  );
 }

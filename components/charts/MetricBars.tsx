@@ -1,4 +1,4 @@
-import { Placeholder } from '@/components/ui/Placeholder'
+import { Placeholder } from "@/components/ui/Placeholder";
 
 /**
  * MetricBars — ranked horizontal bar chart for a single metric (the classic
@@ -8,25 +8,25 @@ import { Placeholder } from '@/components/ui/Placeholder'
  */
 
 export interface BarItem {
-  label: string
-  value: number
+  label: string;
+  value: number;
   /** Pre-formatted display value (already carries '~' for low-confidence). */
-  formatted: string
-  isPlaceholder?: boolean
+  formatted: string;
+  isPlaceholder?: boolean;
 }
 
 interface Props {
-  items: BarItem[]
+  items: BarItem[];
 }
 
 export function MetricBars({ items }: Props) {
-  if (items.length === 0) return null
-  const max = Math.max(...items.map((i) => i.value), 0) || 1
+  if (items.length === 0) return null;
+  const max = Math.max(...items.map((i) => i.value), 0) || 1;
 
   return (
     <div className="flex flex-col gap-2 border-b border-bg-border px-4 py-4">
       {items.map((it, i) => {
-        const pct = Math.max(2, Math.min(100, (it.value / max) * 100))
+        const pct = Math.max(2, Math.min(100, (it.value / max) * 100));
         return (
           <div key={`${it.label}-${i}`} className="flex items-center gap-3">
             <span className="w-5 shrink-0 text-right font-mono text-[11px] text-text-muted">
@@ -45,11 +45,15 @@ export function MetricBars({ items }: Props) {
               />
             </div>
             <span className="w-20 shrink-0 text-right font-mono text-xs font-semibold text-text-primary">
-              {it.isPlaceholder ? <Placeholder value={it.formatted} /> : it.formatted}
+              {it.isPlaceholder ? (
+                <Placeholder value={it.formatted} />
+              ) : (
+                it.formatted
+              )}
             </span>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

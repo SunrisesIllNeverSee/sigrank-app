@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/draft/WikiSignBar.tsx — DRAFT (About-wiki hub) only.
@@ -9,11 +9,11 @@
  * Draft-only — touches no live chrome.
  */
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState } from "react";
+import Link from "next/link";
 
 export function WikiSignBar() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-bg-border bg-bg-surface px-4 py-2.5">
       <Link
@@ -41,7 +41,7 @@ export function WikiSignBar() {
             aria-haspopup="menu"
             className="flex items-center gap-1 rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
           >
-            Sign in <span className="text-text-dim">{open ? '▴' : '▾'}</span>
+            Sign in <span className="text-text-dim">{open ? "▴" : "▾"}</span>
           </button>
 
           {open && (
@@ -87,5 +87,5 @@ export function WikiSignBar() {
         </div>
       </div>
     </div>
-  )
+  );
 }

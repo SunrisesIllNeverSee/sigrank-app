@@ -1,8 +1,8 @@
-import React from 'react'
-import { CascadeHeader } from '@/components/home/CascadeHeader'
-import { RotatingWordmark } from '@/components/home/RotatingWordmark'
-import { TerminalWordmark } from '@/components/home/TerminalWordmark'
-import { Draft2ActionTiles } from '@/components/draft/Draft2ActionTiles'
+import React from "react";
+import { CascadeHeader } from "@/components/home/CascadeHeader";
+import { RotatingWordmark } from "@/components/home/RotatingWordmark";
+import { TerminalWordmark } from "@/components/home/TerminalWordmark";
+import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
 
 /**
  * Draft2Hero — the launch-landing intro block for /draft2 (owner edit 2026-06-21).
@@ -27,7 +27,7 @@ export function Draft2Hero() {
       <div className="relative z-10 flex flex-col items-center gap-5">
         {/* intro line (lead-in above the logo) */}
         <p className="font-mono text-base font-bold leading-tight tracking-tight text-text-primary sm:whitespace-nowrap md:text-xl lg:text-2xl">
-          Introducing the new standard in{' '}
+          Introducing the new standard in{" "}
           <span className="text-gold">AI evaluation &amp; benchmarks</span>
         </p>
         <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary sm:text-base">
@@ -61,10 +61,13 @@ export function Draft2Hero() {
             line lengths so there's no one-word orphan line (owner 2026-06-24). */}
         <div className="flex max-w-2xl flex-col gap-2 text-center">
           <p className="text-balance font-sans text-lg leading-relaxed text-text-secondary sm:text-xl">
-            We measure the{' '}
-            <strong className="text-text-primary">architecture of users&apos; token cascade</strong>{' '}
-            to identify patterns, margins, and operator signature — revealing whether signal is
-            compounded or tokens burned. Most platforms reward volume. SigRank rewards structure.
+            We measure the{" "}
+            <strong className="text-text-primary">
+              architecture of users&apos; token cascade
+            </strong>{" "}
+            to identify patterns, margins, and operator signature — revealing
+            whether signal is compounded or tokens burned. Most platforms reward
+            volume. SigRank rewards structure.
           </p>
           <p className="text-balance font-sans text-lg font-medium leading-relaxed text-text-primary sm:text-xl">
             Fair warning: the blade cuts both ways.
@@ -84,5 +87,5 @@ export function Draft2Hero() {
         </p>
       </div>
     </header>
-  )
+  );
 }

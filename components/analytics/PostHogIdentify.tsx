@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { initPostHog, posthog } from '@/lib/posthog/client'
+import { useEffect } from "react";
+import { initPostHog, posthog } from "@/lib/posthog/client";
 
 // Marks that THIS browser identified an operator, so a later logged-out load can
 // reset() to a fresh anonymous id instead of leaking the prior person.
-const IDENTIFIED_FLAG = 'sigrank_ph_identified'
+const IDENTIFIED_FLAG = "sigrank_ph_identified";
 
 /**
  * Stitches the anonymous browser session to the operator on (re)load. Identifies by
@@ -16,36 +16,36 @@ const IDENTIFIED_FLAG = 'sigrank_ph_identified'
  */
 export function PostHogIdentify() {
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return
-    initPostHog()
-    let alive = true
-    fetch('/api/v1/profile', { cache: 'no-store' })
+    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    initPostHog();
+    let alive = true;
+    fetch("/api/v1/profile", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { operator: null }))
       .then((d) => {
-        if (!alive) return
-        const codename: string | undefined = d?.operator?.codename
+        if (!alive) return;
+        const codename: string | undefined = d?.operator?.codename;
         if (codename) {
           // identify() merges the current anonymous person into the codename person.
           if (posthog.get_distinct_id?.() !== codename) {
-            posthog.identify(codename, { codename })
+            posthog.identify(codename, { codename });
           }
           try {
-            localStorage.setItem(IDENTIFIED_FLAG, codename)
+            localStorage.setItem(IDENTIFIED_FLAG, codename);
           } catch {
             /* storage blocked — identify still applied for this load */
           }
         } else {
           // Logged out: if we'd identified earlier, reset to a fresh anonymous id.
-          let hadIdentified = false
+          let hadIdentified = false;
           try {
-            hadIdentified = !!localStorage.getItem(IDENTIFIED_FLAG)
+            hadIdentified = !!localStorage.getItem(IDENTIFIED_FLAG);
           } catch {
             /* ignore */
           }
           if (hadIdentified) {
-            posthog.reset()
+            posthog.reset();
             try {
-              localStorage.removeItem(IDENTIFIED_FLAG)
+              localStorage.removeItem(IDENTIFIED_FLAG);
             } catch {
               /* ignore */
             }
@@ -54,10 +54,10 @@ export function PostHogIdentify() {
       })
       .catch(() => {
         /* best-effort — never block on identify */
-      })
+      });
     return () => {
-      alive = false
-    }
-  }, [])
-  return null
+      alive = false;
+    };
+  }, []);
+  return null;
 }

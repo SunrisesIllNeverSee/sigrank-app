@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/draft/TopicConsole.tsx — the wiki scrolling accordion.
@@ -15,54 +15,56 @@
  * prop; this shell only owns expansion state.
  */
 
-import { useId, useRef, useState } from 'react'
+import { useId, useRef, useState } from "react";
 
 export interface TopicItem {
   /** Stable key + visible label for the sub-topic heading. */
-  label: string
+  label: string;
   /** Pre-rendered content node (server-rendered upstream, passed in here). */
-  node: React.ReactNode
+  node: React.ReactNode;
   /** Optional one-line caption shown under the sub-topic heading. */
-  hint?: string
+  hint?: string;
 }
 
 export interface TopicGroup {
   /** Group heading, e.g. "Metrics", "Submit", "Support". */
-  groupLabel: string
+  groupLabel: string;
   /** Optional source route shown as a mono sub-label. */
-  source?: string
+  source?: string;
   /** Optional group-level description shown when the group is expanded. */
-  description?: string
-  items: TopicItem[]
+  description?: string;
+  items: TopicItem[];
 }
 
 export interface TopicConsoleProps {
-  groups: TopicGroup[]
+  groups: TopicGroup[];
 }
 
 export function TopicConsole({ groups }: TopicConsoleProps) {
-  const selectId = useId()
+  const selectId = useId();
 
   // First group open by default; rest collapsed.
-  const [openGroups, setOpenGroups] = useState<Record<number, boolean>>({ 0: true })
+  const [openGroups, setOpenGroups] = useState<Record<number, boolean>>({
+    0: true,
+  });
 
-  const sectionRefs = useRef<Record<number, HTMLDivElement | null>>({})
+  const sectionRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   function toggleGroup(gi: number) {
     setOpenGroups((prev) => {
-      const isOpen = prev[gi] ?? false
-      const next = { ...prev, [gi]: !isOpen }
+      const isOpen = prev[gi] ?? false;
+      const next = { ...prev, [gi]: !isOpen };
       // If opening, scroll to the section header
       if (!isOpen && sectionRefs.current[gi]) {
         setTimeout(() => {
           sectionRefs.current[gi]?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          })
-        }, 50)
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 50);
       }
-      return next
-    })
+      return next;
+    });
   }
 
   return (
@@ -79,15 +81,15 @@ export function TopicConsole({ groups }: TopicConsoleProps) {
           id={selectId}
           defaultValue=""
           onChange={(e) => {
-            const gi = Number(e.target.value)
+            const gi = Number(e.target.value);
             if (!isNaN(gi)) {
-              setOpenGroups((prev) => ({ ...prev, [gi]: true }))
+              setOpenGroups((prev) => ({ ...prev, [gi]: true }));
               setTimeout(() => {
                 sectionRefs.current[gi]?.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                })
-              }, 50)
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }, 50);
             }
           }}
           className="w-full rounded-md border border-bg-border bg-bg-surface px-3 py-2.5 font-mono text-xs text-text-primary outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
@@ -104,11 +106,13 @@ export function TopicConsole({ groups }: TopicConsoleProps) {
       {/* ───────────── SCROLLING ACCORDION ───────────── */}
       <div className="flex flex-col gap-2">
         {groups.map((g, gi) => {
-          const isOpen = openGroups[gi] ?? false
+          const isOpen = openGroups[gi] ?? false;
           return (
             <div
               key={g.groupLabel}
-              ref={(el) => { sectionRefs.current[gi] = el }}
+              ref={(el) => {
+                sectionRefs.current[gi] = el;
+              }}
               className="overflow-hidden rounded-lg border border-bg-border bg-bg-surface/40"
             >
               {/* Group header — click to expand/collapse + scroll */}
@@ -119,7 +123,7 @@ export function TopicConsole({ groups }: TopicConsoleProps) {
                 className="flex w-full items-center gap-2 px-4 py-3 text-left transition-colors hover:bg-bg-hover/40"
               >
                 <span className="font-mono text-[10px] text-text-dim">
-                  {isOpen ? '▾' : '▸'}
+                  {isOpen ? "▾" : "▸"}
                 </span>
                 <span className="font-mono text-sm font-bold tabular-nums text-text-dim">
                   {gi + 1}
@@ -153,21 +157,21 @@ export function TopicConsole({ groups }: TopicConsoleProps) {
                           {item.label}
                         </h3>
                         {item.hint && (
-                          <p className="font-sans text-xs text-text-muted">{item.hint}</p>
+                          <p className="font-sans text-xs text-text-muted">
+                            {item.hint}
+                          </p>
                         )}
                       </div>
                       {/* Sub-topic content */}
-                      <div className="min-w-0">
-                        {item.node}
-                      </div>
+                      <div className="min-w-0">{item.node}</div>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

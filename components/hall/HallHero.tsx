@@ -6,7 +6,7 @@
  * look is unchanged — it just supplies its own copy.
  */
 
-import { WaveHero } from '@/components/ui/WaveHero'
+import { WaveHero } from "@/components/ui/WaveHero";
 
 export function HallHero() {
   return (
@@ -16,5 +16,5 @@ export function HallHero() {
       title="Triumphus Famae Et Gloriae"
       subtitle="The permanent record — the highest marks ever set across the SigRank leaderboard."
     />
-  )
+  );
 }

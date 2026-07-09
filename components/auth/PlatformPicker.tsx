@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * components/auth/PlatformPicker.tsx — the profile "Platforms" selector as a popup.
@@ -20,62 +20,62 @@ import { createPortal } from 'react-dom'
 // The 15 known platforms (popular first, then the rest). Mirrors the MCP adapter
 // registry; keep in sync with sigrank-mcp `ALL_PLATFORMS` when adapters are added.
 const KNOWN_PLATFORMS: { domain: string; label: string }[] = [
-  { domain: 'claude', label: 'Claude' },
-  { domain: 'codex', label: 'Codex' },
-  { domain: 'gemini', label: 'Gemini' },
-  { domain: 'copilot', label: 'Copilot' },
-  { domain: 'amp', label: 'Amp' },
-  { domain: 'opencode', label: 'OpenCode' },
-  { domain: 'goose', label: 'Goose' },
-  { domain: 'droid', label: 'Droid' },
-  { domain: 'kimi', label: 'Kimi' },
-  { domain: 'qwen', label: 'Qwen' },
-  { domain: 'pi', label: 'Pi' },
-  { domain: 'openclaw', label: 'OpenClaw' },
-  { domain: 'codebuff', label: 'Codebuff' },
-  { domain: 'kilo', label: 'Kilo' },
-  { domain: 'hermes', label: 'Hermes' },
-]
-const KNOWN_SET = new Set(KNOWN_PLATFORMS.map((p) => p.domain))
+  { domain: "claude", label: "Claude" },
+  { domain: "codex", label: "Codex" },
+  { domain: "gemini", label: "Gemini" },
+  { domain: "copilot", label: "Copilot" },
+  { domain: "amp", label: "Amp" },
+  { domain: "opencode", label: "OpenCode" },
+  { domain: "goose", label: "Goose" },
+  { domain: "droid", label: "Droid" },
+  { domain: "kimi", label: "Kimi" },
+  { domain: "qwen", label: "Qwen" },
+  { domain: "pi", label: "Pi" },
+  { domain: "openclaw", label: "OpenClaw" },
+  { domain: "codebuff", label: "Codebuff" },
+  { domain: "kilo", label: "Kilo" },
+  { domain: "hermes", label: "Hermes" },
+];
+const KNOWN_SET = new Set(KNOWN_PLATFORMS.map((p) => p.domain));
 const labelFor = (domain: string): string =>
-  KNOWN_PLATFORMS.find((p) => p.domain === domain)?.label ?? domain
+  KNOWN_PLATFORMS.find((p) => p.domain === domain)?.label ?? domain;
 
 export function PlatformPicker({
   selected,
   onChange,
 }: {
-  selected: string[]
-  onChange: (next: string[]) => void
+  selected: string[];
+  onChange: (next: string[]) => void;
 }) {
-  const [open, setOpen] = useState(false)
-  const [custom, setCustom] = useState('')
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState("");
 
   // Escape closes the popup (mirrors ProfileEditModal).
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === "Escape") setOpen(false);
     }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [open])
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   const toggle = (domain: string) =>
     onChange(
       selected.includes(domain)
         ? selected.filter((d) => d !== domain)
         : [...selected, domain],
-    )
+    );
 
   const addCustom = () => {
-    const v = custom.trim().toLowerCase()
-    setCustom('')
-    if (!v || selected.includes(v)) return
-    onChange([...selected, v])
-  }
+    const v = custom.trim().toLowerCase();
+    setCustom("");
+    if (!v || selected.includes(v)) return;
+    onChange([...selected, v]);
+  };
 
   // Custom (Other) entries = selected domains that aren't in the known 15.
-  const customSelected = selected.filter((d) => !KNOWN_SET.has(d))
+  const customSelected = selected.filter((d) => !KNOWN_SET.has(d));
 
   return (
     <fieldset className="flex flex-col gap-2">
@@ -89,7 +89,9 @@ export function PlatformPicker({
       {/* Selected summary + the trigger that opens the popup. */}
       <div className="flex flex-wrap items-center gap-2">
         {selected.length === 0 ? (
-          <span className="font-sans text-xs text-text-dim">None selected yet.</span>
+          <span className="font-sans text-xs text-text-dim">
+            None selected yet.
+          </span>
         ) : (
           selected.map((d) => (
             <span
@@ -118,7 +120,7 @@ export function PlatformPicker({
       </div>
 
       {open &&
-        typeof document !== 'undefined' &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             role="dialog"
@@ -145,13 +147,14 @@ export function PlatformPicker({
                 </button>
               </div>
               <p className="mb-4 font-sans text-xs text-text-dim">
-                The tools you run — SigRank&rsquo;s local agent reads usage from these. Pick all that apply.
+                The tools you run — SigRank&rsquo;s local agent reads usage from
+                these. Pick all that apply.
               </p>
 
               {/* The 15 known platforms as checkboxes. */}
               <div className="grid grid-cols-2 gap-1.5">
                 {KNOWN_PLATFORMS.map((p) => {
-                  const on = selected.includes(p.domain)
+                  const on = selected.includes(p.domain);
                   return (
                     <button
                       key={p.domain}
@@ -161,21 +164,23 @@ export function PlatformPicker({
                       onClick={() => toggle(p.domain)}
                       className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left font-mono text-xs transition-colors ${
                         on
-                          ? 'border-gold/50 bg-gold/10 text-gold'
-                          : 'border-bg-border text-text-secondary hover:bg-bg-elevated'
+                          ? "border-gold/50 bg-gold/10 text-gold"
+                          : "border-bg-border text-text-secondary hover:bg-bg-elevated"
                       }`}
                     >
                       <span
                         aria-hidden
                         className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-sm border text-[9px] ${
-                          on ? 'border-gold bg-gold text-bg-base' : 'border-bg-border'
+                          on
+                            ? "border-gold bg-gold text-bg-base"
+                            : "border-bg-border"
                         }`}
                       >
-                        {on ? '✓' : ''}
+                        {on ? "✓" : ""}
                       </span>
                       {p.label}
                     </button>
-                  )
+                  );
                 })}
               </div>
 
@@ -213,9 +218,9 @@ export function PlatformPicker({
                     value={custom}
                     onChange={(e) => setCustom(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        addCustom()
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustom();
                       }
                     }}
                     placeholder="e.g. my-agent"
@@ -246,5 +251,5 @@ export function PlatformPicker({
           document.body,
         )}
     </fieldset>
-  )
+  );
 }

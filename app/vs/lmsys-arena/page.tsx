@@ -9,62 +9,106 @@
  * WaveHero, and a styled comparison table matching the repo's conventions.
  */
 
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumb, faqPage } from '@/lib/jsonld'
-import { WaveHero } from '@/components/ui/WaveHero'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: 'SigRank vs LMSYS Arena \u2014 Rank Driver, Not Car',
+  title: "SigRank vs LMSYS Arena \u2014 Rank Driver, Not Car",
   description:
-    'LMSYS ranks AI models by preference votes. SigRank ranks operators by cascade efficiency. Models don\u2019t drive \u2014 operators do. Rank the driver, not the car.',
-  path: '/vs/lmsys-arena',
-})
+    "LMSYS ranks AI models by preference votes. SigRank ranks operators by cascade efficiency. Models don\u2019t drive \u2014 operators do. Rank the driver, not the car.",
+  path: "/vs/lmsys-arena",
+});
 
 const COMPARE_ROWS: { feature: string; lmsys: string; sigrank: string }[] = [
-  { feature: 'What gets ranked', lmsys: 'AI models (GPT, Claude, Gemini…)', sigrank: 'AI operators (the humans driving)' },
-  { feature: 'Ranking signal', lmsys: 'Human preference votes (Elo)', sigrank: 'Token cascade efficiency (Υ Yield)' },
-  { feature: 'Measurement method', lmsys: 'Blind pairwise voting', sigrank: 'On-device token telemetry (ed25519-signed)' },
-  { feature: 'Scores the model or the operator', lmsys: 'The model', sigrank: 'The operator' },
-  { feature: 'Objective vs subjective', lmsys: 'Subjective (human taste)', sigrank: 'Objective (token counts, no content read)' },
-  { feature: 'Privacy-preserving (no prompt content)', lmsys: 'N/A (votes on outputs)', sigrank: 'Yes (token counts only)' },
-  { feature: 'Reproducible from your own logs', lmsys: 'No (centralized vote corpus)', sigrank: 'Yes (on-device scanner)' },
-  { feature: 'Class tier (IGNITER → TRANSMITTER)', lmsys: 'No', sigrank: 'Yes' },
-  { feature: 'Operator profiles + head-to-head compare', lmsys: 'No', sigrank: 'Yes' },
-  { feature: 'Platform-neutral (15+ AI tools)', lmsys: 'Models only', sigrank: 'Yes' },
-  { feature: 'Published science (Conservation Law, DOI)', lmsys: 'Elo methodology papers', sigrank: 'Yes (DOI: 10.5281/zenodo.20029607)' },
-  { feature: 'MCP server for agent integration', lmsys: 'No', sigrank: 'Yes' },
-]
+  {
+    feature: "What gets ranked",
+    lmsys: "AI models (GPT, Claude, Gemini…)",
+    sigrank: "AI operators (the humans driving)",
+  },
+  {
+    feature: "Ranking signal",
+    lmsys: "Human preference votes (Elo)",
+    sigrank: "Token cascade efficiency (Υ Yield)",
+  },
+  {
+    feature: "Measurement method",
+    lmsys: "Blind pairwise voting",
+    sigrank: "On-device token telemetry (ed25519-signed)",
+  },
+  {
+    feature: "Scores the model or the operator",
+    lmsys: "The model",
+    sigrank: "The operator",
+  },
+  {
+    feature: "Objective vs subjective",
+    lmsys: "Subjective (human taste)",
+    sigrank: "Objective (token counts, no content read)",
+  },
+  {
+    feature: "Privacy-preserving (no prompt content)",
+    lmsys: "N/A (votes on outputs)",
+    sigrank: "Yes (token counts only)",
+  },
+  {
+    feature: "Reproducible from your own logs",
+    lmsys: "No (centralized vote corpus)",
+    sigrank: "Yes (on-device scanner)",
+  },
+  {
+    feature: "Class tier (IGNITER → TRANSMITTER)",
+    lmsys: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Operator profiles + head-to-head compare",
+    lmsys: "No",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Platform-neutral (15+ AI tools)",
+    lmsys: "Models only",
+    sigrank: "Yes",
+  },
+  {
+    feature: "Published science (Conservation Law, DOI)",
+    lmsys: "Elo methodology papers",
+    sigrank: "Yes (DOI: 10.5281/zenodo.20029607)",
+  },
+  { feature: "MCP server for agent integration", lmsys: "No", sigrank: "Yes" },
+];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: 'What is the difference between LMSYS Chatbot Arena and SigRank?',
+    question: "What is the difference between LMSYS Chatbot Arena and SigRank?",
     answer:
-      'LMSYS Chatbot Arena ranks AI MODELS — GPT-4, Claude, Gemini — by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the humans driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. LMSYS answers &quot;which model is best?&quot;; SigRank answers &quot;which operator drives best?&quot; Models don\'t drive — operators do. The leaderboard should rank the driver, not the car.',
+      "LMSYS Chatbot Arena ranks AI MODELS — GPT-4, Claude, Gemini — by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the humans driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. LMSYS answers &quot;which model is best?&quot;; SigRank answers &quot;which operator drives best?&quot; Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
   },
   {
-    question: 'Is SigRank an LMSYS alternative?',
+    question: "Is SigRank an LMSYS alternative?",
     answer:
-      'They are complementary, not replacements. LMSYS is the gold standard for model ranking — it tells you which AI to use. SigRank is the standard for operator ranking — it tells you how well you used it. You pick the model with LMSYS; you measure your skill with SigRank. If you want an AI benchmarking leaderboard that ranks the human side of the human-AI loop, SigRank is the one that does that.',
+      "They are complementary, not replacements. LMSYS is the gold standard for model ranking — it tells you which AI to use. SigRank is the standard for operator ranking — it tells you how well you used it. You pick the model with LMSYS; you measure your skill with SigRank. If you want an AI benchmarking leaderboard that ranks the human side of the human-AI loop, SigRank is the one that does that.",
   },
   {
-    question: 'Why rank operators instead of models?',
+    question: "Why rank operators instead of models?",
     answer:
-      'Because the model is a constant across operators, but the outcome is not. Give ten operators the same Claude model and the same task and you get ten different token cascades — different input sizes, different cache reuse, different output. The model didn\'t change; the driving did. LMSYS controls for the operator to isolate the model. SigRank controls for the model to isolate the operator. Both are valid; only SigRank answers &quot;how well did I drive?&quot;',
+      "Because the model is a constant across operators, but the outcome is not. Give ten operators the same Claude model and the same task and you get ten different token cascades — different input sizes, different cache reuse, different output. The model didn't change; the driving did. LMSYS controls for the operator to isolate the model. SigRank controls for the model to isolate the operator. Both are valid; only SigRank answers &quot;how well did I drive?&quot;",
   },
   {
-    question: 'How is SigRank objective while LMSYS is subjective?',
+    question: "How is SigRank objective while LMSYS is subjective?",
     answer:
-      'LMSYS uses human preference votes — which response &quot;feels better.&quot; That is a subjective, taste-based signal, vulnerable to length bias and style preference. SigRank reads four token integers (input, output, cache-read, cache-write) from your local logs and computes Υ Yield = cache_read × output / input². No human judges, no prompt content read, no opinion — just the arithmetic of the cascade. The score is reproducible from your own logs; anyone can verify it.',
+      "LMSYS uses human preference votes — which response &quot;feels better.&quot; That is a subjective, taste-based signal, vulnerable to length bias and style preference. SigRank reads four token integers (input, output, cache-read, cache-write) from your local logs and computes Υ Yield = cache_read × output / input². No human judges, no prompt content read, no opinion — just the arithmetic of the cascade. The score is reproducible from your own logs; anyone can verify it.",
   },
   {
-    question: 'Does SigRank ignore model quality?',
+    question: "Does SigRank ignore model quality?",
     answer:
-      'No — it normalizes across it. SigRank is platform-neutral, so operators on different models are comparable on the cascade axis. A strong operator on a weaker model can still achieve high Leverage and cache reuse; a weak operator on the best model can still burn input tokens. The cascade measures driving skill, which is partly independent of engine power. LMSYS tells you the engine\'s ceiling; SigRank tells you how close you got to it.',
+      "No — it normalizes across it. SigRank is platform-neutral, so operators on different models are comparable on the cascade axis. A strong operator on a weaker model can still achieve high Leverage and cache reuse; a weak operator on the best model can still burn input tokens. The cascade measures driving skill, which is partly independent of engine power. LMSYS tells you the engine's ceiling; SigRank tells you how close you got to it.",
   },
-]
+];
 
 export default function VsLmsysArenaPage() {
   return (
@@ -72,8 +116,8 @@ export default function VsLmsysArenaPage() {
       <JsonLd
         data={[
           breadcrumb([
-            { name: 'Comparisons', path: '/vs' },
-            { name: 'SigRank vs LMSYS Chatbot Arena', path: '/vs/lmsys-arena' },
+            { name: "Comparisons", path: "/vs" },
+            { name: "SigRank vs LMSYS Chatbot Arena", path: "/vs/lmsys-arena" },
           ]),
           faqPage(FAQS),
         ]}
@@ -85,7 +129,7 @@ export default function VsLmsysArenaPage() {
         subtitle={
           <>
             LMSYS ranks <span className="text-gold">models</span> by human
-            preference. SigRank ranks{' '}
+            preference. SigRank ranks{" "}
             <span className="text-gold">operators</span> by token cascade
             efficiency. Models don&apos;t drive — operators do.
           </>
@@ -98,16 +142,16 @@ export default function VsLmsysArenaPage() {
           The short version: LMSYS Arena
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          LMSYS Chatbot Arena is the gold standard for one question:{' '}
+          LMSYS Chatbot Arena is the gold standard for one question:{" "}
           <em>which AI model is best?</em> It collects blind pairwise votes,
           computes Elo, and ranks GPT-4, Claude, Gemini, and the rest. That is a
           model-ranking problem, and LMSYS solves it well.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank solves a different problem:{' '}
+          SigRank solves a different problem:{" "}
           <strong className="text-text-primary">
             which operator drives best?
-          </strong>{' '}
+          </strong>{" "}
           Give ten operators the same model and the same task and you get ten
           different token cascades. The model didn&apos;t change — the driving
           did. LMSYS ranks the car; SigRank ranks the driver. The leaderboard
@@ -163,10 +207,10 @@ export default function VsLmsysArenaPage() {
           A leaderboard that ranks models tells you the ceiling — the best
           engine you can put in the car. It tells you nothing about who is
           extracting the most from the engine they have. That is the gap SigRank
-          fills. The cascade metric{' '}
+          fills. The cascade metric{" "}
           <span className="font-mono text-gold">
             Υ = cache_read × output / input²
-          </span>{' '}
+          </span>{" "}
           is model-agnostic: it measures how well the operator reused context,
           compressed input, and converted tokens into output — regardless of
           which model produced them.
@@ -196,14 +240,14 @@ export default function VsLmsysArenaPage() {
           &quot;feels better.&quot; That is a subjective signal, and it is the
           right signal for model ranking (you want models humans like). But it
           carries known biases: longer responses win, confident tone wins, style
-          wins. SigRank&apos;s Υ is built from four token integers read on-device
-          — no judges, no content read, no opinion. The score is the arithmetic
-          of the cascade, reproducible from your own logs. Anyone can verify it;
-          no one can vote it up.
+          wins. SigRank&apos;s Υ is built from four token integers read
+          on-device — no judges, no content read, no opinion. The score is the
+          arithmetic of the cascade, reproducible from your own logs. Anyone can
+          verify it; no one can vote it up.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank&apos;s scoring is grounded in published science — the
-          Conservation Law of Commitment (DOI:{' '}
+          Conservation Law of Commitment (DOI:{" "}
           <a
             href="https://doi.org/10.5281/zenodo.20029607"
             className="text-gold underline underline-offset-2"
@@ -238,9 +282,9 @@ export default function VsLmsysArenaPage() {
           You picked the model. Now measure the driving.
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          LMSYS told you which AI to use. SigRank tells you how well you used it.
-          Install the CLI, submit a signed snapshot, and see where you rank among
-          operators — not models.
+          LMSYS told you which AI to use. SigRank tells you how well you used
+          it. Install the CLI, submit a signed snapshot, and see where you rank
+          among operators — not models.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
@@ -261,20 +305,29 @@ export default function VsLmsysArenaPage() {
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          Related:{' '}
-          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">
+          Related:{" "}
+          <Link
+            href="/ai-benchmarking"
+            className="text-gold underline underline-offset-2"
+          >
             AI Benchmarking
           </Link>
-          {' · '}
-          <Link href="/alternatives/ai-benchmarking-tools" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/alternatives/ai-benchmarking-tools"
+            className="text-gold underline underline-offset-2"
+          >
             AI Benchmarking Tools
           </Link>
-          {' · '}
-          <Link href="/methodology" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
             Methodology
           </Link>
         </p>
       </section>
     </div>
-  )
+  );
 }

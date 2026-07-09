@@ -1,25 +1,30 @@
-'use client'
+"use client";
 
-import React, { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   PLATFORM_UI,
   PLATFORM_DEFAULT,
   CLASS_FILTER,
   type PlatformUI,
-} from '@/lib/constants'
-import { BOARD_WINDOWS } from '@/lib/data/windows'
+} from "@/lib/constants";
+import { BOARD_WINDOWS } from "@/lib/data/windows";
 
 /** The Hall record-state tabs (verification / dispute lifecycle). */
-export const HALL_STATE_TABS = ['Verified', 'Personal', 'Disputed', 'Delisted'] as const
-export type HallStateTab = (typeof HALL_STATE_TABS)[number]
+export const HALL_STATE_TABS = [
+  "Verified",
+  "Personal",
+  "Disputed",
+  "Delisted",
+] as const;
+export type HallStateTab = (typeof HALL_STATE_TABS)[number];
 
 interface Props {
   /** Resolved from the page's searchParams so the selectors render the active value. */
-  platform: PlatformUI
+  platform: PlatformUI;
   /** Canonical 730 window slug ('7d' | '30d' | '90d' | 'all'). */
-  windowSlug: string
-  classScope: string
+  windowSlug: string;
+  classScope: string;
 }
 
 /** One shared label+<select> field so all three Hall filters are identical size/style.
@@ -32,26 +37,26 @@ function FilterSelect({
   clearValue,
   options,
 }: {
-  label: string
-  param: string
-  value: string
-  clearValue: string
-  options: { value: string; label: string }[]
+  label: string;
+  param: string;
+  value: string;
+  clearValue: string;
+  options: { value: string; label: string }[];
 }) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const onChange = useCallback(
     (next: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (next === clearValue) params.delete(param)
-      else params.set(param, next)
-      const qs = params.toString()
-      router.push(qs ? `${pathname}?${qs}` : pathname)
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === clearValue) params.delete(param);
+      else params.set(param, next);
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     },
     [router, pathname, searchParams, param, clearValue],
-  )
+  );
 
   return (
     <label className="flex flex-col gap-1">
@@ -72,7 +77,7 @@ function FilterSelect({
         ))}
       </select>
     </label>
-  )
+  );
 }
 
 /**
@@ -96,7 +101,10 @@ export function HallHeader({ platform, windowSlug, classScope }: Props) {
           // Hall defaults to the all-time record book → 'all' clears the param.
           clearValue="all"
           // Canonical 730 windows (same set + labels as the board): 7 day / 30 day / 90 day / All time.
-          options={BOARD_WINDOWS.map((w) => ({ value: w.slug, label: w.label }))}
+          options={BOARD_WINDOWS.map((w) => ({
+            value: w.slug,
+            label: w.label,
+          }))}
         />
         <FilterSelect
           label="Class"
@@ -114,5 +122,5 @@ export function HallHeader({ platform, windowSlug, classScope }: Props) {
         />
       </div>
     </div>
-  )
+  );
 }

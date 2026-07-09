@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 /**
  * components/home/DeletedNotice.tsx — one-time "your account was deleted" banner
@@ -10,9 +10,9 @@ import { useSearchParams } from 'next/navigation'
  * force it dynamic. Dismissible; renders nothing without the param.
  */
 function Banner() {
-  const params = useSearchParams()
-  const [show, setShow] = useState(true)
-  if (!show || params.get('deleted') !== '1') return null
+  const params = useSearchParams();
+  const [show, setShow] = useState(true);
+  if (!show || params.get("deleted") !== "1") return null;
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
       <span className="font-sans text-sm text-text-secondary">
@@ -27,7 +27,7 @@ function Banner() {
         ✕
       </button>
     </div>
-  )
+  );
 }
 
 export function DeletedNotice() {
@@ -36,5 +36,5 @@ export function DeletedNotice() {
     <Suspense fallback={null}>
       <Banner />
     </Suspense>
-  )
+  );
 }

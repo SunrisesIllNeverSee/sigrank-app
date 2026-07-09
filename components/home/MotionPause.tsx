@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/home/MotionPause.tsx — a floating pause/play toggle for ALL landing
@@ -16,54 +16,57 @@
  * paused (the CSS already statics those animations, but the button reflects it).
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
-const KEY = 'sigrank:landing-motion'
-type Motion = 'running' | 'paused'
+const KEY = "sigrank:landing-motion";
+type Motion = "running" | "paused";
 
 function apply(state: Motion) {
-  document.documentElement.dataset.landingMotion = state
+  document.documentElement.dataset.landingMotion = state;
 }
 
 export function MotionPause() {
   // Start as null until we've read the persisted/OS preference on mount, so the
   // button label doesn't flash the wrong glyph before hydration settles.
-  const [motion, setMotion] = useState<Motion | null>(null)
+  const [motion, setMotion] = useState<Motion | null>(null);
 
   useEffect(() => {
-    let initial: Motion
-    const saved = (typeof window !== 'undefined' && localStorage.getItem(KEY)) as Motion | null
-    if (saved === 'paused' || saved === 'running') {
-      initial = saved
+    let initial: Motion;
+    const saved = (typeof window !== "undefined" &&
+      localStorage.getItem(KEY)) as Motion | null;
+    if (saved === "paused" || saved === "running") {
+      initial = saved;
     } else {
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      initial = reduce ? 'paused' : 'running'
+      const reduce = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      initial = reduce ? "paused" : "running";
     }
-    apply(initial)
-    setMotion(initial)
+    apply(initial);
+    setMotion(initial);
     // Scope the attribute to the landing's lifetime: clear it on unmount so a
     // paused state never bleeds onto pages that share an animation class
     // (HallHero's .cascade-pulse, the metrics .flip-inner cards). The choice is
     // still persisted in localStorage, so it re-applies when the landing remounts.
     return () => {
-      delete document.documentElement.dataset.landingMotion
-    }
-  }, [])
+      delete document.documentElement.dataset.landingMotion;
+    };
+  }, []);
 
   const toggle = () => {
-    const next: Motion = motion === 'paused' ? 'running' : 'paused'
-    apply(next)
+    const next: Motion = motion === "paused" ? "running" : "paused";
+    apply(next);
     try {
-      localStorage.setItem(KEY, next)
+      localStorage.setItem(KEY, next);
     } catch {
       /* private mode / storage disabled — non-fatal, the data-attr still applies */
     }
-    setMotion(next)
-  }
+    setMotion(next);
+  };
 
-  const paused = motion === 'paused'
+  const paused = motion === "paused";
   // Before mount we don't know the state — render a neutral, still-functional button.
-  const label = paused ? 'Play landing motion' : 'Pause landing motion'
+  const label = paused ? "Play landing motion" : "Pause landing motion";
 
   return (
     <button
@@ -76,8 +79,8 @@ export function MotionPause() {
     >
       {/* ⏸ when running (click to pause) · ▶ when paused (click to play) */}
       <span aria-hidden className="font-mono text-sm leading-none">
-        {paused ? '▶' : '⏸'}
+        {paused ? "▶" : "⏸"}
       </span>
     </button>
-  )
+  );
 }

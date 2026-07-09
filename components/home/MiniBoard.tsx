@@ -1,6 +1,6 @@
-import React from 'react'
-import Link from 'next/link'
-import type { LeaderboardRow } from '@/lib/data'
+import React from "react";
+import Link from "next/link";
+import type { LeaderboardRow } from "@/lib/data";
 
 /**
  * MiniBoard — a compact top-5 leaderboard for one metric, for the landing-page
@@ -12,62 +12,70 @@ import type { LeaderboardRow } from '@/lib/data'
  * top row (so the #1 reads as a full bar and the rest scale against it).
  */
 
-export type MiniMetric = 'yield' | 'leverage' | 'dev10x' | 'volume'
+export type MiniMetric = "yield" | "leverage" | "dev10x" | "volume";
 
 const META: Record<MiniMetric, { title: string; glyph: string }> = {
-  yield: { title: 'Top Υ Yield', glyph: 'Υ' },
-  leverage: { title: 'Top Leverage', glyph: '×' },
-  dev10x: { title: 'Top 10xDEV', glyph: '⚡' },
-  volume: { title: 'Top Volume', glyph: 'tok' },
-}
+  yield: { title: "Top Υ Yield", glyph: "Υ" },
+  leverage: { title: "Top Leverage", glyph: "×" },
+  dev10x: { title: "Top 10xDEV", glyph: "⚡" },
+  volume: { title: "Top Volume", glyph: "tok" },
+};
 
 /** Pull the display value + a raw magnitude for a row under a given metric. */
 function readMetric(
   row: LeaderboardRow,
   metric: MiniMetric,
 ): { value: string; raw: number } {
-  const c = row.snapshot.cascade
+  const c = row.snapshot.cascade;
   switch (metric) {
-    case 'yield': {
-      const v = c && !c.nonCompounding ? c.yield_ : 0
-      return { value: v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toFixed(0), raw: v }
+    case "yield": {
+      const v = c && !c.nonCompounding ? c.yield_ : 0;
+      return {
+        value: v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toFixed(0),
+        raw: v,
+      };
     }
-    case 'leverage': {
-      const v = c && !c.nonCompounding ? c.leverage : 0
-      return { value: v >= 1000 ? `${(v / 1000).toFixed(1)}K×` : `${v.toFixed(0)}×`, raw: v }
+    case "leverage": {
+      const v = c && !c.nonCompounding ? c.leverage : 0;
+      return {
+        value: v >= 1000 ? `${(v / 1000).toFixed(1)}K×` : `${v.toFixed(0)}×`,
+        raw: v,
+      };
     }
-    case 'dev10x': {
-      const v = c && !c.nonCompounding && c.dev10x !== null ? c.dev10x : 0
-      return { value: v.toFixed(2), raw: v }
+    case "dev10x": {
+      const v = c && !c.nonCompounding && c.dev10x !== null ? c.dev10x : 0;
+      return { value: v.toFixed(2), raw: v };
     }
-    case 'volume': {
-      const v = row.operator.total_messages_lifetime
+    case "volume": {
+      const v = row.operator.total_messages_lifetime;
       const b =
-        v >= 1e9 ? `${(v / 1e9).toFixed(1)}B`
-        : v >= 1e6 ? `${(v / 1e6).toFixed(1)}M`
-        : v.toLocaleString('en-US')
-      return { value: b, raw: v }
+        v >= 1e9
+          ? `${(v / 1e9).toFixed(1)}B`
+          : v >= 1e6
+            ? `${(v / 1e6).toFixed(1)}M`
+            : v.toLocaleString("en-US");
+      return { value: b, raw: v };
     }
   }
 }
 
 function label(row: LeaderboardRow): string {
-  const op = row.operator
+  const op = row.operator;
   // Claimed → may show handle; else codename. Seed identities are public tokscale data.
-  if (op.claimed && op.display_name) return op.display_name
-  return op.display_name ?? op.codename
+  if (op.claimed && op.display_name) return op.display_name;
+  return op.display_name ?? op.codename;
 }
 
 export function MiniBoard({
   metric,
   rows,
 }: {
-  metric: MiniMetric
-  rows: LeaderboardRow[]
+  metric: MiniMetric;
+  rows: LeaderboardRow[];
 }) {
-  const meta = META[metric]
-  const top5 = rows.slice(0, 5)
-  const max = Math.max(...top5.map((r) => readMetric(r, metric).raw), 1)
+  const meta = META[metric];
+  const top5 = rows.slice(0, 5);
+  const max = Math.max(...top5.map((r) => readMetric(r, metric).raw), 1);
 
   return (
     <div className="flex h-full flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
@@ -79,8 +87,8 @@ export function MiniBoard({
       </div>
       <ol className="flex flex-col gap-1">
         {top5.map((row) => {
-          const m = readMetric(row, metric)
-          const frac = Math.max(0.04, m.raw / max)
+          const m = readMetric(row, metric);
+          const frac = Math.max(0.04, m.raw / max);
           return (
             <li key={row.operator.operator_id}>
               <Link
@@ -104,9 +112,9 @@ export function MiniBoard({
                 </span>
               </Link>
             </li>
-          )
+          );
         })}
       </ol>
     </div>
-  )
+  );
 }

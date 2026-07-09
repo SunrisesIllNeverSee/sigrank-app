@@ -15,14 +15,14 @@
  *   node --test __tests__/contract/mock-seed-sync.test.mjs
  */
 
-import { test } from 'node:test'
-import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { resolve, dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve, dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const repoRoot = resolve(__dirname, '..', '..')
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(__dirname, "..", "..");
 
 /**
  * Extract operator codenames from lib/data/mock.ts.
@@ -38,13 +38,15 @@ const repoRoot = resolve(__dirname, '..', '..')
  * that should appear in BOTH sources.
  */
 function extractMockCodenames(filePath) {
-  const src = readFileSync(filePath, 'utf8')
-  const matches = [...src.matchAll(/[{,]\s*codename:\s*['"]([^'"]+)['"]/g)]
-  const all = matches.map((m) => m[1].trim()).filter(Boolean)
+  const src = readFileSync(filePath, "utf8");
+  const matches = [...src.matchAll(/[{,]\s*codename:\s*['"]([^'"]+)['"]/g)];
+  const all = matches.map((m) => m[1].trim()).filter(Boolean);
   // Filter out known mock-only operators (OWNER test variants)
-  const mockOnly = new Set(all.filter((c) => c.startsWith('static seed ·') || c === 'app seed'))
-  const shared = new Set(all.filter((c) => !mockOnly.has(c)))
-  return { shared, mockOnly }
+  const mockOnly = new Set(
+    all.filter((c) => c.startsWith("static seed ·") || c === "app seed"),
+  );
+  const shared = new Set(all.filter((c) => !mockOnly.has(c)));
+  return { shared, mockOnly };
 }
 
 /**
@@ -63,79 +65,80 @@ function extractMockCodenames(filePath) {
  * the codename, or a codename contains an escaped apostrophe).
  */
 function tokenizeValues(valuesBody) {
-  const tuples = []
-  let cur = []
-  let buf = ''
-  let depth = 0
-  let inTuple = false
-  let inStr = false
-  const n = valuesBody.length
+  const tuples = [];
+  let cur = [];
+  let buf = "";
+  let depth = 0;
+  let inTuple = false;
+  let inStr = false;
+  const n = valuesBody.length;
   for (let i = 0; i < n; i++) {
-    const ch = valuesBody[i]
+    const ch = valuesBody[i];
     if (inStr) {
-      buf += ch
+      buf += ch;
       if (ch === "'") {
         if (valuesBody[i + 1] === "'") {
-          buf += "'"
-          i++ // consume the escaped second quote
+          buf += "'";
+          i++; // consume the escaped second quote
         } else {
-          inStr = false
+          inStr = false;
         }
       }
-      continue
+      continue;
     }
     // Line comment: `-- …` to end of line (outside strings).
-    if (ch === '-' && valuesBody[i + 1] === '-') {
-      while (i < n && valuesBody[i] !== '\n') i++
-      continue
+    if (ch === "-" && valuesBody[i + 1] === "-") {
+      while (i < n && valuesBody[i] !== "\n") i++;
+      continue;
     }
     // Block comment: `/* … */` (outside strings).
-    if (ch === '/' && valuesBody[i + 1] === '*') {
-      i += 2
-      while (i < n && !(valuesBody[i] === '*' && valuesBody[i + 1] === '/')) i++
-      i += 1 // land on the closing '/'; the for-loop's i++ steps past it
-      continue
+    if (ch === "/" && valuesBody[i + 1] === "*") {
+      i += 2;
+      while (i < n && !(valuesBody[i] === "*" && valuesBody[i + 1] === "/"))
+        i++;
+      i += 1; // land on the closing '/'; the for-loop's i++ steps past it
+      continue;
     }
     if (ch === "'") {
-      inStr = true
-      buf += ch
-      continue
+      inStr = true;
+      buf += ch;
+      continue;
     }
     if (!inTuple) {
       // Between tuples: ignore commas/whitespace until the next '('.
-      if (ch === '(') {
-        inTuple = true
-        depth = 0
-        cur = []
-        buf = ''
+      if (ch === "(") {
+        inTuple = true;
+        depth = 0;
+        cur = [];
+        buf = "";
       }
-      continue
+      continue;
     }
-    if (ch === '(') {
-      depth++
-      buf += ch
-      continue
+    if (ch === "(") {
+      depth++;
+      buf += ch;
+      continue;
     }
-    if (ch === ')') {
+    if (ch === ")") {
       if (depth === 0) {
-        cur.push(buf.trim())
-        tuples.push(cur)
-        inTuple = false
-        buf = ''
-        continue
+        cur.push(buf.trim());
+        tuples.push(cur);
+        inTuple = false;
+        buf = "";
+        continue;
       }
-      depth--
-      buf += ch
-      continue
+      depth--;
+      buf += ch;
+      continue;
     }
-    if (ch === ',' && depth === 0) {
-      cur.push(buf.trim())
-      buf = ''
-      continue
+    if (ch === "," && depth === 0) {
+      cur.push(buf.trim());
+      buf = "";
+      continue;
     }
-    buf += ch
+    buf += ch;
   }
-  return tuples
+  return tuples;
 }
 
 /**
@@ -146,9 +149,11 @@ function tokenizeValues(valuesBody) {
  * codename literal".
  */
 function quotedValue(colExpr) {
-  const m = colExpr.match(/^'((?:[^']|'')*)'(?:\s*::\s*"?[A-Za-z0-9_ ]+"?(?:\[\])?)?$/)
-  if (!m) return null
-  return m[1].replace(/''/g, "'")
+  const m = colExpr.match(
+    /^'((?:[^']|'')*)'(?:\s*::\s*"?[A-Za-z0-9_ ]+"?(?:\[\])?)?$/,
+  );
+  if (!m) return null;
+  return m[1].replace(/''/g, "'");
 }
 
 /**
@@ -159,23 +164,23 @@ function quotedValue(colExpr) {
  * metric_snapshots block is ignored (the regex is anchored to `INTO operators`).
  */
 function extractSeedCodenamesFromSql(src) {
-  const codenames = new Set()
+  const codenames = new Set();
   const insertBlocks = [
     ...src.matchAll(
       /INSERT\s+INTO\s+operators\s*\(([^)]+)\)\s*VALUES\s*([\s\S]*?)(?:ON\s+CONFLICT|;)/gis,
     ),
-  ]
+  ];
   for (const block of insertBlocks) {
-    const cols = block[1].split(',').map((c) => c.trim().toLowerCase())
-    const codenameIdx = cols.indexOf('codename')
-    if (codenameIdx < 0) continue
+    const cols = block[1].split(",").map((c) => c.trim().toLowerCase());
+    const codenameIdx = cols.indexOf("codename");
+    if (codenameIdx < 0) continue;
     for (const tupleCols of tokenizeValues(block[2])) {
-      const raw = tupleCols[codenameIdx]
-      const value = raw == null ? null : quotedValue(raw)
-      if (value) codenames.add(value.trim())
+      const raw = tupleCols[codenameIdx];
+      const value = raw == null ? null : quotedValue(raw);
+      if (value) codenames.add(value.trim());
     }
   }
-  return codenames
+  return codenames;
 }
 
 /**
@@ -183,25 +188,32 @@ function extractSeedCodenamesFromSql(src) {
  * delegates to extractSeedCodenamesFromSql).
  */
 function extractSeedCodenames(filePath) {
-  return extractSeedCodenamesFromSql(readFileSync(filePath, 'utf8'))
+  return extractSeedCodenamesFromSql(readFileSync(filePath, "utf8"));
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────
 
-const mockPath = join(repoRoot, 'lib/data/mock.ts')
-const seedPath = join(repoRoot, 'supabase/seed.sql')
+const mockPath = join(repoRoot, "lib/data/mock.ts");
+const seedPath = join(repoRoot, "supabase/seed.sql");
 
-const { shared: mockCodenames, mockOnly: knownMockOnly } = extractMockCodenames(mockPath)
-const seedCodenames = extractSeedCodenames(seedPath)
+const { shared: mockCodenames, mockOnly: knownMockOnly } =
+  extractMockCodenames(mockPath);
+const seedCodenames = extractSeedCodenames(seedPath);
 
-test('mock.ts and seed.sql both define operators', () => {
-  assert.ok(mockCodenames.size > 0, 'mock.ts should define at least one shared operator')
-  assert.ok(seedCodenames.size > 0, 'seed.sql should define at least one operator')
-})
+test("mock.ts and seed.sql both define operators", () => {
+  assert.ok(
+    mockCodenames.size > 0,
+    "mock.ts should define at least one shared operator",
+  );
+  assert.ok(
+    seedCodenames.size > 0,
+    "seed.sql should define at least one operator",
+  );
+});
 
-test('mock.ts and seed.sql define the same operator codename set (excluding known mock-only)', () => {
-  const mockOnly = [...mockCodenames].filter((c) => !seedCodenames.has(c))
-  const seedOnly = [...seedCodenames].filter((c) => !mockCodenames.has(c))
+test("mock.ts and seed.sql define the same operator codename set (excluding known mock-only)", () => {
+  const mockOnly = [...mockCodenames].filter((c) => !seedCodenames.has(c));
+  const seedOnly = [...seedCodenames].filter((c) => !mockCodenames.has(c));
 
   if (mockOnly.length > 0 || seedOnly.length > 0) {
     const msg =
@@ -209,19 +221,23 @@ test('mock.ts and seed.sql define the same operator codename set (excluding know
       `  mock.ts (shared): ${mockCodenames.size} operators\n` +
       `  mock.ts (known mock-only, excluded): ${knownMockOnly.size} operators\n` +
       `  seed.sql: ${seedCodenames.size} operators\n` +
-      (mockOnly.length > 0 ? `  Only in mock.ts: [${mockOnly.join(', ')}]\n` : '') +
-      (seedOnly.length > 0 ? `  Only in seed.sql: [${seedOnly.join(', ')}]\n` : '') +
-      `  FIX: add the missing operator(s) to BOTH lib/data/mock.ts and supabase/seed.sql`
-    assert.fail(msg)
+      (mockOnly.length > 0
+        ? `  Only in mock.ts: [${mockOnly.join(", ")}]\n`
+        : "") +
+      (seedOnly.length > 0
+        ? `  Only in seed.sql: [${seedOnly.join(", ")}]\n`
+        : "") +
+      `  FIX: add the missing operator(s) to BOTH lib/data/mock.ts and supabase/seed.sql`;
+    assert.fail(msg);
   }
 
   console.log(
     `✓ mock/seed sync: ${mockCodenames.size} operators match between mock.ts and seed.sql` +
       ` (${knownMockOnly.size} known mock-only operators excluded)`,
-  )
-})
+  );
+});
 
-test('seed parser reads codenames by real column position (unquoted leading cols + escaped apostrophes)', () => {
+test("seed parser reads codenames by real column position (unquoted leading cols + escaped apostrophes)", () => {
   // Synthetic seed exercising exactly the cases the old "index the quoted-strings
   // array" approach got wrong:
   //   - an unquoted leading column (gen_random_uuid()) before codename,
@@ -247,11 +263,11 @@ INSERT INTO operators (codename, display_name, claimed) VALUES
   ('Clean·Name', NULL, false),
   ('Has''Quote', 'x', true)
 ON CONFLICT (codename) DO NOTHING;
-`
-  const got = [...extractSeedCodenamesFromSql(synthetic)].sort()
+`;
+  const got = [...extractSeedCodenamesFromSql(synthetic)].sort();
   assert.deepEqual(
     got,
-    ["O'Brien", 'Clean·Name', "Has'Quote"].sort(),
-    'codenames must be read from the real codename column and SQL-unescaped',
-  )
-})
+    ["O'Brien", "Clean·Name", "Has'Quote"].sort(),
+    "codenames must be read from the real codename column and SQL-unescaped",
+  );
+});

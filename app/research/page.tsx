@@ -5,47 +5,43 @@
  * As more quarters ship, they're added to REPORTS below.
  */
 
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
-import { WaveHero } from '@/components/ui/WaveHero'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumb } from '@/lib/jsonld'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { WaveHero } from "@/components/ui/WaveHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumb } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: 'Research',
+  title: "Research",
   description:
-    'SigRank quarterly reports on AI operator token efficiency. Original findings computed from live operator telemetry — the citation source for AI efficiency data.',
-  path: '/research',
-})
+    "SigRank quarterly reports on AI operator token efficiency. Original findings computed from live operator telemetry — the citation source for AI efficiency data.",
+  path: "/research",
+});
 
 interface ReportListing {
-  slug: string
-  title: string
-  description: string
-  date: string
-  quarter: string
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  quarter: string;
 }
 
 const REPORTS: ReportListing[] = [
   {
-    slug: 'q1-2026',
-    title: 'State of AI Operator Token Efficiency — Q1 2026',
+    slug: "q1-2026",
+    title: "State of AI Operator Token Efficiency — Q1 2026",
     description:
-      'The inaugural SigRank Index report. Median vs. top-decile yield gaps, platform leadership, cache utilization, and the efficiency frontier.',
-    date: '2026-06-30',
-    quarter: 'Q1 2026',
+      "The inaugural SigRank Index report. Median vs. top-decile yield gaps, platform leadership, cache utilization, and the efficiency frontier.",
+    date: "2026-06-30",
+    quarter: "Q1 2026",
   },
-]
+];
 
 export default function ResearchIndexPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <JsonLd
-        data={breadcrumb([
-          { name: 'Research', path: '/research' },
-        ])}
-      />
+      <JsonLd data={breadcrumb([{ name: "Research", path: "/research" }])} />
 
       <WaveHero
         eyebrow="📊 SigRank Research"
@@ -89,5 +85,5 @@ export default function ResearchIndexPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import React from 'react'
-import type { SupporterTier } from '@/lib/scoring/types'
-import type { SubscriptionStatus as SubStatus } from '@/lib/stripe/tier'
-import { Placeholder } from '@/components/ui/Placeholder'
+import React from "react";
+import type { SupporterTier } from "@/lib/scoring/types";
+import type { SubscriptionStatus as SubStatus } from "@/lib/stripe/tier";
+import { Placeholder } from "@/components/ui/Placeholder";
 
 /**
  * components/billing/SubscriptionStatus.tsx — read-only subscription summary.
@@ -12,52 +12,52 @@ import { Placeholder } from '@/components/ui/Placeholder'
  */
 
 const TIER_LABEL: Record<SupporterTier, string> = {
-  free: 'Free',
-  patron: 'Patron',
-  pro: 'Pro',
-  circle_sponsor: 'Circle Sponsor',
-}
+  free: "Free",
+  patron: "Patron",
+  pro: "Pro",
+  circle_sponsor: "Circle Sponsor",
+};
 
 const STATUS_LABEL: Record<SubStatus, string> = {
-  incomplete: 'Incomplete',
-  incomplete_expired: 'Expired',
-  trialing: 'Trialing',
-  active: 'Active',
-  past_due: 'Past due',
-  canceled: 'Canceled',
-  unpaid: 'Unpaid',
-  paused: 'Paused',
-}
+  incomplete: "Incomplete",
+  incomplete_expired: "Expired",
+  trialing: "Trialing",
+  active: "Active",
+  past_due: "Past due",
+  canceled: "Canceled",
+  unpaid: "Unpaid",
+  paused: "Paused",
+};
 
 interface Props {
-  tier: SupporterTier
-  status?: SubStatus
+  tier: SupporterTier;
+  status?: SubStatus;
   /** ISO date the current paid period ends. */
-  currentPeriodEnd?: string | null
-  cancelAtPeriodEnd?: boolean
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean;
   /** Mock / no-live-data → render values with the placeholder marker. */
-  isPlaceholder?: boolean
+  isPlaceholder?: boolean;
 }
 
 function StatusDot({ status }: { status: SubStatus }) {
   const color =
-    status === 'active' || status === 'trialing'
-      ? 'bg-class-seeker'
-      : status === 'past_due'
-        ? 'bg-text-gold'
-        : 'bg-text-muted'
-  return <span className={`inline-block h-2 w-2 rounded-full ${color}`} />
+    status === "active" || status === "trialing"
+      ? "bg-class-seeker"
+      : status === "past_due"
+        ? "bg-text-gold"
+        : "bg-text-muted";
+  return <span className={`inline-block h-2 w-2 rounded-full ${color}`} />;
 }
 
 export function SubscriptionStatus({
   tier,
-  status = 'active',
+  status = "active",
   currentPeriodEnd,
   cancelAtPeriodEnd = false,
   isPlaceholder = false,
 }: Props) {
-  const tierLabel = TIER_LABEL[tier]
-  const renewLabel = cancelAtPeriodEnd ? 'Ends' : 'Renews'
+  const tierLabel = TIER_LABEL[tier];
+  const renewLabel = cancelAtPeriodEnd ? "Ends" : "Renews";
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
@@ -72,25 +72,38 @@ export function SubscriptionStatus({
       </div>
 
       <div className="font-mono text-2xl font-bold text-text-primary">
-        {isPlaceholder ? <Placeholder value={tierLabel} title="Demo — connect billing for live status" /> : tierLabel}
+        {isPlaceholder ? (
+          <Placeholder
+            value={tierLabel}
+            title="Demo — connect billing for live status"
+          />
+        ) : (
+          tierLabel
+        )}
       </div>
 
-      {tier !== 'free' && currentPeriodEnd ? (
+      {tier !== "free" && currentPeriodEnd ? (
         <div className="font-sans text-xs text-text-secondary">
-          {renewLabel}:{' '}
+          {renewLabel}:{" "}
           {isPlaceholder ? (
-            <Placeholder value={currentPeriodEnd} title="Demo — placeholder renewal date" />
+            <Placeholder
+              value={currentPeriodEnd}
+              title="Demo — placeholder renewal date"
+            />
           ) : (
-            <span className="font-mono text-text-primary">{currentPeriodEnd}</span>
+            <span className="font-mono text-text-primary">
+              {currentPeriodEnd}
+            </span>
           )}
         </div>
       ) : null}
 
-      {tier === 'free' ? (
+      {tier === "free" ? (
         <p className="font-sans text-xs text-text-muted">
-          No active subscription. Upgrade to Pro for precision scoring and full history.
+          No active subscription. Upgrade to Pro for precision scoring and full
+          history.
         </p>
       ) : null}
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/ingest/materialize.ts — verified submission → metric_snapshots → board (D7 §6).
@@ -26,50 +26,61 @@ import 'server-only'
  * pillars and IGNORES the agent's self-reported composites (the un-gameable layer).
  */
 
-import { revalidatePath } from 'next/cache'
-import { getSupabaseService } from '@/lib/supabase/server'
-import { pillarsToCore5 } from '@/lib/ingest/bridge'
-import { scoreSnapshot } from '@/lib/scoring/engine'
-import { boardWindowByEnum } from '@/lib/data/windows'
-import type { SnapshotPayloadV1 } from '@/lib/payload/schema'
-import type { GateResult } from '@/lib/ingest/gates'
+import { revalidatePath } from "next/cache";
+import { getSupabaseService } from "@/lib/supabase/server";
+import { pillarsToCore5 } from "@/lib/ingest/bridge";
+import { scoreSnapshot } from "@/lib/scoring/engine";
+import { boardWindowByEnum } from "@/lib/data/windows";
+import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import type { GateResult } from "@/lib/ingest/gates";
 
 /** The enrolled-device facts the persist path needs (resolved FROM the device, §5.4). */
 export interface ResolvedDevice {
-  device_id: string
-  operator_id: string
+  device_id: string;
+  operator_id: string;
 }
 
 /** Persist outcome the route maps to an HTTP status. */
 export type MaterializeResult =
   | { ok: true; metricSnapshotId: string | null }
-  | { ok: false; reason: 'persistence_unavailable' | 'duplicate_snapshot' | 'persist_failed'; detail: string }
+  | {
+      ok: false;
+      reason:
+        "persistence_unavailable" | "duplicate_snapshot" | "persist_failed";
+      detail: string;
+    };
 
 /** Background-metric clamp bounds (§6.1): a fabricated lifetime/age can't inflate signal_force. */
-const MAX_ACCOUNT_AGE_DAYS = 3650 // 10y
-const MAX_TOTAL_MESSAGES = 5_000_000
+const MAX_ACCOUNT_AGE_DAYS = 3650; // 10y
+const MAX_TOTAL_MESSAGES = 5_000_000;
 
 /** Round to a column scale so a value can never numeric_value_out_of_range → abort the tx (review P3). */
 const round = (n: number, dp: number): number => {
-  const f = 10 ** dp
-  return Math.round(n * f) / f
-}
-const clampMax = (n: number, max: number): number => Math.max(-max, Math.min(max, n))
+  const f = 10 ** dp;
+  return Math.round(n * f) / f;
+};
+const clampMax = (n: number, max: number): number =>
+  Math.max(-max, Math.min(max, n));
 
 /** The server-recomputed, column-scale-safe values for one snapshot. Pure + DB-free (testable). */
 export interface RecomputedSnapshot {
-  pillars: { input: number; output: number; cacheCreate: number; cacheRead: number }
-  signaRate: number
-  classTier: string
-  compressionRatio: number
-  promptComplexity: number
-  crossThread: number
-  sessionDepth: number
-  tokenThroughput: number
-  signalForce: number
-  messageVolume: number
-  accountAgeDays: number
-  totalMessages: number
+  pillars: {
+    input: number;
+    output: number;
+    cacheCreate: number;
+    cacheRead: number;
+  };
+  signaRate: number;
+  classTier: string;
+  compressionRatio: number;
+  promptComplexity: number;
+  crossThread: number;
+  sessionDepth: number;
+  tokenThroughput: number;
+  signalForce: number;
+  messageVolume: number;
+  accountAgeDays: number;
+  totalMessages: number;
 }
 
 /**
@@ -77,30 +88,44 @@ export interface RecomputedSnapshot {
  * payload, derives the board number from the 4 raw pillars + clamped background metrics.
  * Exported so materialize.test.mjs can assert the cascade anchor without a DB.
  */
-export function recomputeFromPillars(payload: SnapshotPayloadV1): RecomputedSnapshot {
-  const rt = payload.raw_telemetry
+export function recomputeFromPillars(
+  payload: SnapshotPayloadV1,
+): RecomputedSnapshot {
+  const rt = payload.raw_telemetry;
   const pillars = {
     input: rt.tokens_input_fresh,
     output: rt.tokens_output,
     cacheCreate: rt.tokens_cache_creation,
     cacheRead: rt.tokens_cache_read,
-  }
+  };
   const bridge = pillarsToCore5({
     pillars,
     sessionsCount: rt.sessions_count,
     turnsTotal: rt.turns_total,
-  })
+  });
 
-  const accountAgeDays = Math.max(1, Math.min(payload.background_metrics.account_age_days, MAX_ACCOUNT_AGE_DAYS))
-  const totalMessages = Math.max(0, Math.min(payload.background_metrics.total_messages_lifetime, MAX_TOTAL_MESSAGES))
-  const messageVolume = Math.max(0, Math.min(payload.background_metrics.message_volume, MAX_TOTAL_MESSAGES))
+  const accountAgeDays = Math.max(
+    1,
+    Math.min(payload.background_metrics.account_age_days, MAX_ACCOUNT_AGE_DAYS),
+  );
+  const totalMessages = Math.max(
+    0,
+    Math.min(
+      payload.background_metrics.total_messages_lifetime,
+      MAX_TOTAL_MESSAGES,
+    ),
+  );
+  const messageVolume = Math.max(
+    0,
+    Math.min(payload.background_metrics.message_volume, MAX_TOTAL_MESSAGES),
+  );
 
   const scored = scoreSnapshot({
     raw: bridge.core5,
     pcConfidence: bridge.pcConfidence,
     totalMessagesLifetime: totalMessages,
     accountAgeDays,
-  })
+  });
 
   return {
     pillars,
@@ -108,8 +133,14 @@ export function recomputeFromPillars(payload: SnapshotPayloadV1): RecomputedSnap
     // compression_ratio NUMERIC(5,4), session_depth NUMERIC(6,2), signal_force NUMERIC(10,2).
     signaRate: round(clampMax(scored.signa_rate, 999.99), 2),
     classTier: scored.class_tier,
-    compressionRatio: round(clampMax(bridge.core5.compression_ratio, 9.9999), 4),
-    promptComplexity: round(clampMax(bridge.core5.prompt_complexity, 999.99), 2),
+    compressionRatio: round(
+      clampMax(bridge.core5.compression_ratio, 9.9999),
+      4,
+    ),
+    promptComplexity: round(
+      clampMax(bridge.core5.prompt_complexity, 999.99),
+      2,
+    ),
     crossThread: Math.round(bridge.core5.cross_thread),
     sessionDepth: round(clampMax(bridge.core5.session_depth, 9999.99), 2),
     tokenThroughput: Math.round(bridge.tokensTotal),
@@ -117,12 +148,12 @@ export function recomputeFromPillars(payload: SnapshotPayloadV1): RecomputedSnap
     messageVolume,
     accountAgeDays,
     totalMessages,
-  }
+  };
 }
 
 /** window.end (ISO, any offset) → UTC 'YYYY-MM-DD' for snapshot_date (§6.2). */
 function snapshotDateUTC(windowEnd: string): string {
-  return new Date(windowEnd).toISOString().slice(0, 10)
+  return new Date(windowEnd).toISOString().slice(0, 10);
 }
 
 /**
@@ -139,18 +170,24 @@ export async function materializeVerifiedSnapshot(
   device: ResolvedDevice,
   gate: GateResult,
 ): Promise<MaterializeResult> {
-  if (!(gate.tier === 'verified' && gate.decision === 'accept')) {
-    throw new Error(`materializeVerifiedSnapshot called with non-verified gate (tier=${gate.tier}, decision=${gate.decision})`)
+  if (!(gate.tier === "verified" && gate.decision === "accept")) {
+    throw new Error(
+      `materializeVerifiedSnapshot called with non-verified gate (tier=${gate.tier}, decision=${gate.decision})`,
+    );
   }
 
-  const svc = getSupabaseService()
+  const svc = getSupabaseService();
   if (!svc) {
-    return { ok: false, reason: 'persistence_unavailable', detail: 'SUPABASE_SERVICE_ROLE_KEY is not configured.' }
+    return {
+      ok: false,
+      reason: "persistence_unavailable",
+      detail: "SUPABASE_SERVICE_ROLE_KEY is not configured.",
+    };
   }
 
-  const r = recomputeFromPillars(payload)
+  const r = recomputeFromPillars(payload);
 
-  const { data, error } = await svc.rpc('materialize_verified_snapshot', {
+  const { data, error } = await svc.rpc("materialize_verified_snapshot", {
     p_operator_id: device.operator_id, // resolved FROM DEVICE (§5.4), never from payload
     p_device_id: device.device_id,
     p_window_type: payload.window.type,
@@ -190,17 +227,21 @@ export async function materializeVerifiedSnapshot(
     p_message_volume: r.messageVolume,
     p_account_age_days: r.accountAgeDays,
     p_total_messages: r.totalMessages,
-  })
+  });
 
   if (error) {
     // 23505 = unique_violation on uq_submissions_snapshot_hash → exact-hash replay (§0.4).
-    if (error.code === '23505') {
-      return { ok: false, reason: 'duplicate_snapshot', detail: 'snapshot_hash already accepted' }
+    if (error.code === "23505") {
+      return {
+        ok: false,
+        reason: "duplicate_snapshot",
+        detail: "snapshot_hash already accepted",
+      };
     }
-    return { ok: false, reason: 'persist_failed', detail: error.message }
+    return { ok: false, reason: "persist_failed", detail: error.message };
   }
 
-  return { ok: true, metricSnapshotId: (data as string | null) ?? null }
+  return { ok: true, metricSnapshotId: (data as string | null) ?? null };
 }
 
 /**
@@ -214,14 +255,18 @@ export async function insertSubmissionOnly(
   device: ResolvedDevice,
   gate: GateResult,
 ): Promise<MaterializeResult> {
-  const svc = getSupabaseService()
+  const svc = getSupabaseService();
   if (!svc) {
-    return { ok: false, reason: 'persistence_unavailable', detail: 'SUPABASE_SERVICE_ROLE_KEY is not configured.' }
+    return {
+      ok: false,
+      reason: "persistence_unavailable",
+      detail: "SUPABASE_SERVICE_ROLE_KEY is not configured.",
+    };
   }
 
-  const r = recomputeFromPillars(payload)
+  const r = recomputeFromPillars(payload);
 
-  const { error } = await svc.from('snapshot_submissions').insert({
+  const { error } = await svc.from("snapshot_submissions").insert({
     operator_id: device.operator_id, // FROM DEVICE (§5.4)
     device_id: device.device_id,
     // submitted_at OMITTED → column DEFAULT now() (server clock). Throttle integrity:
@@ -238,21 +283,25 @@ export async function insertSubmissionOnly(
     codename: payload.codename,
     tier: payload.tier,
     verification_tier: gate.tier,
-    status: 'validated',
+    status: "validated",
     input_tokens: r.pillars.input,
     output_tokens: r.pillars.output,
     cache_creation_tokens: r.pillars.cacheCreate,
     cache_read_tokens: r.pillars.cacheRead,
-  })
+  });
 
   if (error) {
-    if (error.code === '23505') {
-      return { ok: false, reason: 'duplicate_snapshot', detail: 'snapshot_hash already accepted' }
+    if (error.code === "23505") {
+      return {
+        ok: false,
+        reason: "duplicate_snapshot",
+        detail: "snapshot_hash already accepted",
+      };
     }
-    return { ok: false, reason: 'persist_failed', detail: error.message }
+    return { ok: false, reason: "persist_failed", detail: error.message };
   }
 
-  return { ok: true, metricSnapshotId: null }
+  return { ok: true, metricSnapshotId: null };
 }
 
 /**
@@ -261,7 +310,7 @@ export async function insertSubmissionOnly(
  * (which replaced the removed "everything" firehose, PR#10). all_time → "all".
  */
 export function revalidateTouchedWindows(windowType: string): void {
-  const win = boardWindowByEnum(windowType)
-  if (win) revalidatePath(`/board/${win.slug}`)
-  revalidatePath('/board/off')
+  const win = boardWindowByEnum(windowType);
+  if (win) revalidatePath(`/board/${win.slug}`);
+  revalidatePath("/board/off");
 }

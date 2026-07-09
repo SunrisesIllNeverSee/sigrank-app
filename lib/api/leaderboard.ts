@@ -8,13 +8,14 @@
  * both `/leaderboard` and `/metrics/leaders` import.
  */
 
-import type { LeaderboardRow } from '@/lib/data'
+import type { LeaderboardRow } from "@/lib/data";
 
 /** D19: leaderboard responses carry Cache-Control max-age=300 + s-maxage for CDN. */
-export const LEADERBOARD_CACHE_CONTROL = 'public, max-age=300, s-maxage=300, stale-while-revalidate=600'
+export const LEADERBOARD_CACHE_CONTROL =
+  "public, max-age=300, s-maxage=300, stale-while-revalidate=600";
 
 /** Deterministic generated_at — no wall-clock read (mock parity, build-safe). */
-const GENERATED_AT = '2026-05-19T00:00:00Z'
+const GENERATED_AT = "2026-05-19T00:00:00Z";
 
 /**
  * Serialize one row to the api_spec.md leaderboard entry shape.
@@ -22,9 +23,9 @@ const GENERATED_AT = '2026-05-19T00:00:00Z'
  * Includes the operator's `claimed` flag per the group brief.
  */
 export function serializeLeaderboardEntry(row: LeaderboardRow) {
-  const { operator, snapshot } = row
-  const c = snapshot.cascade
-  const t = row.telemetry
+  const { operator, snapshot } = row;
+  const c = snapshot.cascade;
+  const t = row.telemetry;
   return {
     rank: row.global_rank,
     operator_id: operator.operator_id,
@@ -51,7 +52,9 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     output_tokens: t ? t.output : null,
     cache_creation_tokens: t ? t.cache_create : null,
     cache_read_tokens: t ? t.cache_read : null,
-    total_tokens: c ? t.fresh_input + t.output + t.cache_create + t.cache_read : null,
+    total_tokens: c
+      ? t.fresh_input + t.output + t.cache_create + t.cache_read
+      : null,
     scale_v: c ? c.scaleV : null,
     efficiency: c ? c.efficiency : null,
     cost_per_million: c ? c.costPerMillion : null,
@@ -63,5 +66,5 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     movement_24h: snapshot.movement_24h,
     movement_7d: snapshot.movement_7d,
     is_placeholder: operator.isPlaceholder ?? false,
-  }
+  };
 }
