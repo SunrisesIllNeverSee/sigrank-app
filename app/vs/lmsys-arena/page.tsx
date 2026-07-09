@@ -10,6 +10,7 @@
  */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { withOG } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumb, faqPage } from '@/lib/jsonld'
@@ -255,6 +256,24 @@ export default function VsLmsysArenaPage() {
             See the operator leaderboard
           </a>
         </div>
+      </section>
+
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">
+            AI Benchmarking
+          </Link>
+          {' · '}
+          <Link href="/alternatives/ai-benchmarking-tools" className="text-gold underline underline-offset-2">
+            AI Benchmarking Tools
+          </Link>
+          {' · '}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            Methodology
+          </Link>
+        </p>
       </section>
     </div>
   )

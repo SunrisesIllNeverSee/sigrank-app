@@ -361,6 +361,23 @@ export default function HowToCompareAIOperatorsPage() {
           </div>
         </dl>
       </section>
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/compare" className="text-gold underline underline-offset-2">
+            Compare Operators
+          </Link>
+          {' · '}
+          <Link href="/tools/cascade-comparator" className="text-gold underline underline-offset-2">
+            Cascade Comparator
+          </Link>
+          {' · '}
+          <Link href="/metrics/yield-cascade" className="text-gold underline underline-offset-2">
+            Yield (Υ)
+          </Link>
+        </p>
+      </section>
 
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">

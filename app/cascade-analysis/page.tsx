@@ -88,6 +88,11 @@ const RELATED = [
     title: 'Cascade Comparator',
     desc: 'Compare two operators\' token cascades side by side — see where the yield gap comes from.',
   },
+  {
+    href: '/token-telemetry',
+    title: 'Token Telemetry',
+    desc: 'How the four token pillars are captured on-device from real coding sessions — the data layer that makes cascade analysis possible.',
+  },
 ]
 
 export default function CascadeAnalysisPage() {

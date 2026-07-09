@@ -366,6 +366,23 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
           </div>
         </dl>
       </section>
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{' '}
+          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">
+            AI Benchmarking
+          </Link>
+          {' · '}
+          <Link href="/vs/lmsys-arena" className="text-gold underline underline-offset-2">
+            vs LMSYS Arena
+          </Link>
+          {' · '}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            Methodology
+          </Link>
+        </p>
+      </section>
 
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">

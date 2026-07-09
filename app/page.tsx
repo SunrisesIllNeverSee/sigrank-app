@@ -98,6 +98,24 @@ export default async function HomePage() {
         </Link>
       </div>
 
+      {/* ── Topic hubs ── */}
+      <section className="flex flex-col gap-3 border-t border-bg-border-subtle pt-6">
+        <h2 className="font-mono text-sm font-bold text-text-primary">
+          Learn more
+        </h2>
+        <p className="font-sans text-sm text-text-muted">
+          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">AI Benchmarking</Link>
+          {' · '}
+          <Link href="/ai-coding-metrics" className="text-gold underline underline-offset-2">AI Coding Metrics</Link>
+          {' · '}
+          <Link href="/ai-operator-scoring" className="text-gold underline underline-offset-2">AI Operator Scoring</Link>
+          {' · '}
+          <Link href="/operator-performance" className="text-gold underline underline-offset-2">Operator Performance</Link>
+          {' · '}
+          <Link href="/cascade-analysis" className="text-gold underline underline-offset-2">Cascade Analysis</Link>
+        </p>
+      </section>
+
       <MotionPause />
     </div>
   )

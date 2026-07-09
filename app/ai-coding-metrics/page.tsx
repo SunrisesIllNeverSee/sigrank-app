@@ -248,6 +248,30 @@ export default function AICodingMetricsPage() {
               how snapshots are verified, and how the leaderboard is ranked.
             </p>
           </Link>
+          <Link
+            href="/metrics/yield-cascade"
+            className="group rounded-lg border border-bg-border bg-bg-surface p-5 transition-colors hover:border-bg-border-subtle hover:bg-bg-elevated"
+          >
+            <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">
+              Yield (Υ)
+            </h3>
+            <p className="mt-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+              The headline metric. Measures cascade architecture — whether
+              signal is compounding or tokens are burning.
+            </p>
+          </Link>
+          <Link
+            href="/tools/yield-calculator"
+            className="group rounded-lg border border-bg-border bg-bg-surface p-5 transition-colors hover:border-bg-border-subtle hover:bg-bg-elevated"
+          >
+            <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">
+              Yield Calculator
+            </h3>
+            <p className="mt-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+              Enter your four token pillars and compute Υ Yield, compression
+              ratio, cache hit rate, and class tier instantly.
+            </p>
+          </Link>
         </div>
       </section>
 
