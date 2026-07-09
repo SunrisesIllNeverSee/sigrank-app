@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React from 'react'
-import Link from 'next/link'
+import React from "react";
+import Link from "next/link";
 
 /**
  * RecordTicker — the record-highlights marquee for the Hall of Signal.
@@ -18,19 +18,19 @@ import Link from 'next/link'
  */
 export interface RecordTickerItem {
   /** Metric ticker the record belongs to (e.g. 'Υ', 'SNR', 'IN'). */
-  board: string
+  board: string;
   /** Record holder's display name (real name when present, else codename). */
-  holder: string
+  holder: string;
   /** Headline record value, already formatted (e.g. '1.2K', '$4.20'). */
-  value: string
+  value: string;
   /** Link target (operator profile). */
-  href: string
+  href: string;
 }
 
 export function RecordTicker({ items }: { items: RecordTickerItem[] }) {
-  if (items.length === 0) return null
+  if (items.length === 0) return null;
   // Duplicate the track for a seamless loop.
-  const track = [...items, ...items]
+  const track = [...items, ...items];
 
   return (
     <div className="group relative overflow-hidden rounded-lg border border-bg-border bg-bg-surface py-2.5">
@@ -44,7 +44,7 @@ export function RecordTicker({ items }: { items: RecordTickerItem[] }) {
             key={`${it.board}-${i}`}
             href={it.href}
             className={`flex shrink-0 items-center gap-2 rounded-md border-l-2 bg-bg-elevated/60 px-3 py-1.5 transition-colors hover:bg-bg-elevated ${
-              i % 2 === 0 ? 'border-l-gold' : 'border-l-accent'
+              i % 2 === 0 ? "border-l-gold" : "border-l-accent"
             }`}
           >
             <span className="text-[11px]">🥇</span>
@@ -62,5 +62,5 @@ export function RecordTicker({ items }: { items: RecordTickerItem[] }) {
         ))}
       </div>
     </div>
-  )
+  );
 }

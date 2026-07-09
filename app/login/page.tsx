@@ -1,7 +1,7 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { LoginButtons } from '@/components/auth/LoginButtons'
-import { withOG } from '@/lib/seo'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { LoginButtons } from "@/components/auth/LoginButtons";
+import { withOG } from "@/lib/seo";
 
 /**
  * app/login/page.tsx — sign-in page.
@@ -13,25 +13,27 @@ import { withOG } from '@/lib/seo'
  */
 
 export const metadata: Metadata = withOG({
-  title: 'Sign in',
-  description: 'Sign in to claim your operator profile and back the build.',
-  path: '/login',
-})
+  title: "Sign in",
+  description: "Sign in to claim your operator profile and back the build.",
+  path: "/login",
+});
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
-  const { next, error } = await searchParams
+  const { next, error } = await searchParams;
   const safeNext =
-    typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : undefined
+    typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
+      ? next
+      : undefined;
   const errorMsg =
-    error === 'auth'
-      ? 'Sign-in didn’t complete — please try again, or use a different provider below.'
+    error === "auth"
+      ? "Sign-in didn’t complete — please try again, or use a different provider below."
       : error
-        ? 'Something went wrong signing in. Please try again.'
-        : null
+        ? "Something went wrong signing in. Please try again."
+        : null;
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 py-12">
@@ -43,8 +45,8 @@ export default async function LoginPage({
           Sign in
         </h1>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Claim your operator profile, set your handle, and back the build.
-          The leaderboard is free to browse without an account.
+          Claim your operator profile, set your handle, and back the build. The
+          leaderboard is free to browse without an account.
         </p>
       </header>
 
@@ -57,13 +59,16 @@ export default async function LoginPage({
       <LoginButtons next={safeNext} />
 
       <p className="text-center font-sans text-[11px] leading-relaxed text-text-dim">
-        SigRank stores token counts only — never conversation content. By signing
-        in you agree to the{' '}
-        <Link href="/about" className="text-text-muted underline hover:text-text-secondary">
+        SigRank stores token counts only — never conversation content. By
+        signing in you agree to the{" "}
+        <Link
+          href="/about"
+          className="text-text-muted underline hover:text-text-secondary"
+        >
           terms &amp; privacy
         </Link>
         .
       </p>
     </div>
-  )
+  );
 }

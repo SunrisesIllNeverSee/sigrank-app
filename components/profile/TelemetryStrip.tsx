@@ -7,30 +7,30 @@
  * star. "Active Minutes" is an estimate, so it keeps its ~ prefix + placeholder.
  */
 
-import { CanonId } from '@/components/ui/CanonId'
-import { Placeholder } from '@/components/ui/Placeholder'
-import type { TelemetryRaw } from '@/lib/data'
+import { CanonId } from "@/components/ui/CanonId";
+import { Placeholder } from "@/components/ui/Placeholder";
+import type { TelemetryRaw } from "@/lib/data";
 
 interface Props {
-  telemetry: TelemetryRaw
+  telemetry: TelemetryRaw;
 }
 
 /** Compact human formatting: 1.08B / 34.8M / 123,246. */
 function fmt(n: number): string {
-  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
-  return n.toLocaleString('en-US')
+  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  return n.toLocaleString("en-US");
 }
 
 interface Cell {
-  key: string
-  value: React.ReactNode
+  key: string;
+  value: React.ReactNode;
 }
 
 export function TelemetryStrip({ telemetry }: Props) {
   const cells: Cell[] = [
     {
-      key: 'Fresh Input',
+      key: "Fresh Input",
       value: (
         <>
           {fmt(telemetry.fresh_input)}
@@ -39,7 +39,7 @@ export function TelemetryStrip({ telemetry }: Props) {
       ),
     },
     {
-      key: 'Output',
+      key: "Output",
       value: (
         <>
           {fmt(telemetry.output)}
@@ -48,7 +48,7 @@ export function TelemetryStrip({ telemetry }: Props) {
       ),
     },
     {
-      key: 'Cache Read',
+      key: "Cache Read",
       value: (
         <>
           {fmt(telemetry.cache_read)}
@@ -57,7 +57,7 @@ export function TelemetryStrip({ telemetry }: Props) {
       ),
     },
     {
-      key: 'Cache Create',
+      key: "Cache Create",
       value: (
         <>
           {fmt(telemetry.cache_create)}
@@ -66,22 +66,25 @@ export function TelemetryStrip({ telemetry }: Props) {
       ),
     },
     {
-      key: 'Sessions / Turns',
+      key: "Sessions / Turns",
       value: (
         <>
-          {telemetry.sessions.toLocaleString('en-US')} /{' '}
-          {telemetry.turns.toLocaleString('en-US')}
+          {telemetry.sessions.toLocaleString("en-US")} /{" "}
+          {telemetry.turns.toLocaleString("en-US")}
           <CanonId id="T.06" real title="Sessions / turns (CANON T.06)" />
         </>
       ),
     },
     {
-      key: 'Active Minutes',
+      key: "Active Minutes",
       value: (
-        <Placeholder value="~2,700" title="Placeholder · active-minute estimate, not yet finalized" />
+        <Placeholder
+          value="~2,700"
+          title="Placeholder · active-minute estimate, not yet finalized"
+        />
       ),
     },
-  ]
+  ];
 
   return (
     <div className="grid grid-cols-2 gap-6 border-b border-bg-border-subtle bg-bg-base p-5 sm:grid-cols-3 lg:grid-cols-6">
@@ -96,5 +99,5 @@ export function TelemetryStrip({ telemetry }: Props) {
         </div>
       ))}
     </div>
-  )
+  );
 }

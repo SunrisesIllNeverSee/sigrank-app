@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * HallContentClient — client wrapper for the Hall of Signal content.
@@ -14,60 +14,77 @@
  * and renders the ticker + MetricTopTen boards.
  */
 
-import React from 'react'
-import { useSearchParams } from 'next/navigation'
-import type { LeaderboardRow } from '@/lib/data'
-import { sortValue } from '@/lib/data/sort-value'
+import React from "react";
+import { useSearchParams } from "next/navigation";
+import type { LeaderboardRow } from "@/lib/data";
+import { sortValue } from "@/lib/data/sort-value";
 import {
   PLATFORM_UI,
   PLATFORM_DEFAULT,
   type PlatformUI,
-} from '@/lib/constants'
-import { boardWindowBySlug } from '@/lib/data/windows'
-import { DISPLAY_RAW, DISPLAY_METRICS } from '@/lib/canon/ids'
-import { recordValue } from '@/lib/hall/record-value'
-import { HallHeader } from '@/components/hall/HallHeader'
-import { MetricTopTen } from '@/components/hall/MetricTopTen'
-import { RecordTicker } from '@/components/hall/RecordTicker'
+} from "@/lib/constants";
+import { boardWindowBySlug } from "@/lib/data/windows";
+import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/canon/ids";
+import { recordValue } from "@/lib/hall/record-value";
+import { HallHeader } from "@/components/hall/HallHeader";
+import { MetricTopTen } from "@/components/hall/MetricTopTen";
+import { RecordTicker } from "@/components/hall/RecordTicker";
 
-const CASCADE_BOARDS = DISPLAY_METRICS.map((d) => ({ canonId: d.id, sort: d.key }))
-const RAW_BOARDS = DISPLAY_RAW.map((d) => ({ canonId: d.id, sort: d.key }))
-const ALL_BOARDS = [...CASCADE_BOARDS, ...RAW_BOARDS]
+const CASCADE_BOARDS = DISPLAY_METRICS.map((d) => ({
+  canonId: d.id,
+  sort: d.key,
+}));
+const RAW_BOARDS = DISPLAY_RAW.map((d) => ({ canonId: d.id, sort: d.key }));
+const ALL_BOARDS = [...CASCADE_BOARDS, ...RAW_BOARDS];
 
 const DISPLAY_BY_ID: Record<string, (typeof DISPLAY_METRICS)[number]> =
-  Object.fromEntries([...DISPLAY_RAW, ...DISPLAY_METRICS].map((d) => [d.id, d]))
+  Object.fromEntries(
+    [...DISPLAY_RAW, ...DISPLAY_METRICS].map((d) => [d.id, d]),
+  );
 
 interface Props {
   /** Base rows for all 4 windows, keyed by window slug. No class/platform filter
    *  applied (the client filters). Limit 30 per window for headroom. */
-  windowsData: Record<string, LeaderboardRow[]>
+  windowsData: Record<string, LeaderboardRow[]>;
 }
 
 /** Coerce a raw search param to a known union member, else the fallback. */
-function coerce<T extends string>(raw: string | null, allowed: readonly T[], fallback: T): T {
-  return allowed.includes(raw as T) ? (raw as T) : fallback
+function coerce<T extends string>(
+  raw: string | null,
+  allowed: readonly T[],
+  fallback: T,
+): T {
+  return allowed.includes(raw as T) ? (raw as T) : fallback;
 }
 
 export function HallContentClient({ windowsData }: Props) {
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
 
-  const classParam = searchParams.get('class') ?? 'all'
-  const platformParam = searchParams.get('platform')
-  const windowParam = searchParams.get('window') ?? 'all'
+  const classParam = searchParams.get("class") ?? "all";
+  const platformParam = searchParams.get("platform");
+  const windowParam = searchParams.get("window") ?? "all";
 
-  const activeClass = classParam
-  const platform = coerce<PlatformUI>(platformParam, PLATFORM_UI, PLATFORM_DEFAULT)
-  const win = boardWindowBySlug(windowParam) ?? boardWindowBySlug('all')!
-  const windowSlug = win.slug
+  const activeClass = classParam;
+  const platform = coerce<PlatformUI>(
+    platformParam,
+    PLATFORM_UI,
+    PLATFORM_DEFAULT,
+  );
+  const win = boardWindowBySlug(windowParam) ?? boardWindowBySlug("all")!;
+  const windowSlug = win.slug;
 
   // Select the right window's data, then filter by class + platform.
-  let baseRows = windowsData[win.slug] ?? []
+  let baseRows = windowsData[win.slug] ?? [];
   if (platform !== PLATFORM_DEFAULT) {
-    const domain = platform.toLowerCase()
-    baseRows = baseRows.filter((r) => r.operator.primary_domain?.toLowerCase() === domain)
+    const domain = platform.toLowerCase();
+    baseRows = baseRows.filter(
+      (r) => r.operator.primary_domain?.toLowerCase() === domain,
+    );
   }
-  if (activeClass !== 'all') {
-    baseRows = baseRows.filter((r) => r.snapshot.class_tier?.toLowerCase() === activeClass.toLowerCase())
+  if (activeClass !== "all") {
+    baseRows = baseRows.filter(
+      (r) => r.snapshot.class_tier?.toLowerCase() === activeClass.toLowerCase(),
+    );
   }
 
   // Sort into 15 boards (same as the server did: one base fetch, N in-memory sorts).
@@ -76,21 +93,21 @@ export function HallContentClient({ windowsData }: Props) {
       .sort((a, z) => sortValue(z, b.sort) - sortValue(a, b.sort))
       .slice(0, 10)
       .map((r, i) => ({ ...r, global_rank: i + 1 })),
-  )
+  );
 
   // Record ticker — #1 holder of every board.
   const tickerItems = ALL_BOARDS.map((b, i) => {
-    const top = metricRows[i]?.[0]
-    if (!top) return null
-    const v = recordValue(top, b.canonId)
-    if (v === '—') return null
+    const top = metricRows[i]?.[0];
+    if (!top) return null;
+    const v = recordValue(top, b.canonId);
+    if (v === "—") return null;
     return {
       board: DISPLAY_BY_ID[b.canonId]?.ticker ?? b.canonId,
       holder: top.operator.display_name || top.operator.codename,
       value: v,
       href: `/user/${top.operator.codename}`,
-    }
-  }).filter((x): x is NonNullable<typeof x> => x !== null)
+    };
+  }).filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
     <>
@@ -101,7 +118,11 @@ export function HallContentClient({ windowsData }: Props) {
 
       {/* HALL-2: real platform / window / class dropdowns (URL-param driven). */}
       <div className="mb-8">
-        <HallHeader platform={platform} windowSlug={windowSlug} classScope={activeClass} />
+        <HallHeader
+          platform={platform}
+          windowSlug={windowSlug}
+          classScope={activeClass}
+        />
       </div>
 
       {/* Cascade Records — peak holders on every cascade metric (Y.01–Y.09). */}
@@ -109,13 +130,17 @@ export function HallContentClient({ windowsData }: Props) {
         Cascade Records
       </h2>
       <p className="mb-4 max-w-2xl font-sans text-sm text-text-muted">
-        The peak holders on every cascade metric. As the 730 windows fill, these become
-        the all-time record book — who held the highest Υ, the deepest sessions, the
-        cleanest signal.
+        The peak holders on every cascade metric. As the 730 windows fill, these
+        become the all-time record book — who held the highest Υ, the deepest
+        sessions, the cleanest signal.
       </p>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {CASCADE_BOARDS.map((b, i) => (
-          <MetricTopTen key={b.canonId} canonId={b.canonId} rows={metricRows[i]} />
+          <MetricTopTen
+            key={b.canonId}
+            canonId={b.canonId}
+            rows={metricRows[i]}
+          />
         ))}
       </div>
 
@@ -124,14 +149,18 @@ export function HallContentClient({ windowsData }: Props) {
         Raw Records
       </h2>
       <p className="mb-4 max-w-2xl font-sans text-sm text-text-muted">
-        The biggest raw token throughput — who pushed the most input, output, and cache,
-        and who runs the cheapest wallet ($/1M).
+        The biggest raw token throughput — who pushed the most input, output,
+        and cache, and who runs the cheapest wallet ($/1M).
       </p>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {RAW_BOARDS.map((b, i) => (
-          <MetricTopTen key={b.canonId} canonId={b.canonId} rows={metricRows[CASCADE_BOARDS.length + i]} />
+          <MetricTopTen
+            key={b.canonId}
+            canonId={b.canonId}
+            rows={metricRows[CASCADE_BOARDS.length + i]}
+          />
         ))}
       </div>
     </>
-  )
+  );
 }

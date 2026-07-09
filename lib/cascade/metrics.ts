@@ -12,24 +12,24 @@
 
 /** The four token pillars extracted from any supported input format. */
 export interface RawPillars {
-  input: number
-  output: number
-  cacheCreate: number
-  cacheRead: number
+  input: number;
+  output: number;
+  cacheCreate: number;
+  cacheRead: number;
 }
 
 export interface CascadeMetrics {
-  yield_: number
-  velocity: number
-  leverage: number
-  snr: number
-  dev10x: number | null
-  scaleV: number
-  costPerMillion: number
-  efficiency: number
-  opRatio: string
-  cascadeStr: string
-  nonCompounding: boolean
+  yield_: number;
+  velocity: number;
+  leverage: number;
+  snr: number;
+  dev10x: number | null;
+  scaleV: number;
+  costPerMillion: number;
+  efficiency: number;
+  opRatio: string;
+  cascadeStr: string;
+  nonCompounding: boolean;
 }
 
 /**
@@ -41,33 +41,37 @@ const PRICE = {
   output: 15 / 1e6,
   cacheCreate: 3.75 / 1e6,
   cacheRead: 0.3 / 1e6,
-}
+};
 
 export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
-  const { input: i, output: o, cacheCreate: cw, cacheRead: cr } = pillars
-  const safeI = Math.max(i, 1)
+  const { input: i, output: o, cacheCreate: cw, cacheRead: cr } = pillars;
+  const safeI = Math.max(i, 1);
 
-  const snr = (i + o) > 0 ? o / (i + o) : 0
-  const velocity = o / safeI
-  const leverage = cr / safeI
-  const yield_ = leverage * velocity
+  const snr = i + o > 0 ? o / (i + o) : 0;
+  const velocity = o / safeI;
+  const leverage = cr / safeI;
+  const yield_ = leverage * velocity;
 
-  const total = i + o + cw + cr
-  const scaleV = total > 0 ? Math.log10(total) : 0
-  const cost = i * PRICE.input + o * PRICE.output + cw * PRICE.cacheCreate + cr * PRICE.cacheRead
-  const costPerMillion = total > 0 ? cost / (total / 1e6) : 0
-  const efficiency = ((cr + cw + o) / safeI) / 4.0
-  const opRatio = `${Math.round(leverage)}:1:${velocity.toFixed(velocity < 1 ? 2 : 1)}`
+  const total = i + o + cw + cr;
+  const scaleV = total > 0 ? Math.log10(total) : 0;
+  const cost =
+    i * PRICE.input +
+    o * PRICE.output +
+    cw * PRICE.cacheCreate +
+    cr * PRICE.cacheRead;
+  const costPerMillion = total > 0 ? cost / (total / 1e6) : 0;
+  const efficiency = (cr + cw + o) / safeI / 4.0;
+  const opRatio = `${Math.round(leverage)}:1:${velocity.toFixed(velocity < 1 ? 2 : 1)}`;
 
-  let dev10x: number | null = null
-  let cascadeStr = '—'
+  let dev10x: number | null = null;
+  let cascadeStr = "—";
 
   if (cw > 0 && o > 0 && i > 0 && cr > 0) {
-    const transmission = o / i
-    const commitment = cw / o
-    const reuse = cr / cw
-    dev10x = Math.log10(transmission * commitment * reuse)
-    cascadeStr = `${transmission.toFixed(1)}×${commitment.toFixed(1)}×${reuse.toFixed(1)}`
+    const transmission = o / i;
+    const commitment = cw / o;
+    const reuse = cr / cw;
+    dev10x = Math.log10(transmission * commitment * reuse);
+    cascadeStr = `${transmission.toFixed(1)}×${commitment.toFixed(1)}×${reuse.toFixed(1)}`;
   }
 
   return {
@@ -82,14 +86,20 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
     opRatio,
     cascadeStr,
     nonCompounding: cw === 0,
-  }
+  };
 }
 
 /** Format a number for display — compact notation for large values. */
-export function fmt(n: number, opts?: { decimals?: number; compact?: boolean }): string {
-  if (n === 0) return '0'
-  if (opts?.compact && Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(1)}M`
-  if (opts?.compact && Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(1)}k`
-  const d = opts?.decimals ?? 2
-  return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })
+export function fmt(
+  n: number,
+  opts?: { decimals?: number; compact?: boolean },
+): string {
+  if (n === 0) return "0";
+  if (opts?.compact && Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (opts?.compact && Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(1)}k`;
+  const d = opts?.decimals ?? 2;
+  return n.toLocaleString("en-US", {
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
+  });
 }

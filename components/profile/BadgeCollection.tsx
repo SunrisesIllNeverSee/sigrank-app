@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/profile/BadgeCollection.tsx — renders the 8 launch badges.
@@ -10,30 +10,68 @@
  * Badge icons are emoji — no SVG assets needed for Phase 1.
  */
 
-const BADGE_META: Record<string, { label: string; icon: string; condition: string }> = {
-  first_spark: { label: 'First Spark', icon: '◈', condition: '1× cache leverage' },
-  cascade_engine: { label: 'Cascade Engine', icon: '⚡', condition: '10×cache leverage' },
-  chain_reaction: { label: 'Chain Reaction', icon: '⚡', condition: '100×cache leverage' },
-  foundation: { label: 'Foundation', icon: '🏗️', condition: '3 BUILD→MAINTAIN arcs' },
-  phoenix: { label: 'Phoenix', icon: '🔥', condition: '5×MAINTAIN recovery within 1 day' },
-  verified: { label: 'Verified', icon: '✓', condition: 'Submitted via signed agent' },
-  cascade_streak: { label: 'Cascade Streak', icon: '🔥', condition: '7 consecutive days MAINTAIN' },
-  top_10: { label: 'Top 10', icon: '🏆', condition: 'Currently in top 10' },
-}
+const BADGE_META: Record<
+  string,
+  { label: string; icon: string; condition: string }
+> = {
+  first_spark: {
+    label: "First Spark",
+    icon: "◈",
+    condition: "1× cache leverage",
+  },
+  cascade_engine: {
+    label: "Cascade Engine",
+    icon: "⚡",
+    condition: "10×cache leverage",
+  },
+  chain_reaction: {
+    label: "Chain Reaction",
+    icon: "⚡",
+    condition: "100×cache leverage",
+  },
+  foundation: {
+    label: "Foundation",
+    icon: "🏗️",
+    condition: "3 BUILD→MAINTAIN arcs",
+  },
+  phoenix: {
+    label: "Phoenix",
+    icon: "🔥",
+    condition: "5×MAINTAIN recovery within 1 day",
+  },
+  verified: {
+    label: "Verified",
+    icon: "✓",
+    condition: "Submitted via signed agent",
+  },
+  cascade_streak: {
+    label: "Cascade Streak",
+    icon: "🔥",
+    condition: "7 consecutive days MAINTAIN",
+  },
+  top_10: { label: "Top 10", icon: "🏆", condition: "Currently in top 10" },
+};
 
 export function BadgeCollection({
   badges,
 }: {
   badges: {
-    earned_this_week: string[]
-    in_progress: Array<{ id: string; label: string; icon: string; progress: number; target: number; display: string }>
-    collection: string[]
-  }
+    earned_this_week: string[];
+    in_progress: Array<{
+      id: string;
+      label: string;
+      icon: string;
+      progress: number;
+      target: number;
+      display: string;
+    }>;
+    collection: string[];
+  };
 }) {
   const earned = badges.collection.map((id) => ({
     id,
     ...BADGE_META[id],
-  }))
+  }));
 
   return (
     <div className="rounded-lg border border-bg-border p-4">
@@ -79,7 +117,9 @@ export function BadgeCollection({
                   <div className="mt-1 h-1 overflow-hidden rounded-full bg-bg-border">
                     <div
                       className="h-full rounded-full bg-gold/40"
-                      style={{ width: `${Math.min((badge.progress / badge.target) * 100, 100)}%` }}
+                      style={{
+                        width: `${Math.min((badge.progress / badge.target) * 100, 100)}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -95,5 +135,5 @@ export function BadgeCollection({
         </p>
       )}
     </div>
-  )
+  );
 }

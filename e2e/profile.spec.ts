@@ -1,24 +1,24 @@
-import { test, expect } from '@playwright/test'
-import AxeBuilder from '@axe-core/playwright'
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 // TransVaultOrigin is the MO§ES codename — always present (seed operator).
-const SEED_CODENAME = 'TransVaultOrigin'
+const SEED_CODENAME = "TransVaultOrigin";
 
-test('operator profile renders + tabs work', async ({ page }) => {
-  await page.goto(`/user/${SEED_CODENAME}`)
+test("operator profile renders + tabs work", async ({ page }) => {
+  await page.goto(`/user/${SEED_CODENAME}`);
 
   // Profile header renders
-  await expect(page.locator('h1, h2').first()).toBeVisible()
+  await expect(page.locator("h1, h2").first()).toBeVisible();
 
   // Three tabs present
-  await expect(page.getByRole('tab', { name: /stats/i })).toBeVisible()
-  await expect(page.getByRole('tab', { name: /submissions/i })).toBeVisible()
-  await expect(page.getByRole('tab', { name: /social/i })).toBeVisible()
+  await expect(page.getByRole("tab", { name: /stats/i })).toBeVisible();
+  await expect(page.getByRole("tab", { name: /submissions/i })).toBeVisible();
+  await expect(page.getByRole("tab", { name: /social/i })).toBeVisible();
 
   // Click each tab — panel should mount without error
-  await page.getByRole('tab', { name: /stats/i }).click()
-  await page.getByRole('tab', { name: /submissions/i }).click()
-  await page.getByRole('tab', { name: /social/i }).click()
+  await page.getByRole("tab", { name: /stats/i }).click();
+  await page.getByRole("tab", { name: /submissions/i }).click();
+  await page.getByRole("tab", { name: /social/i }).click();
 
   // a11y check — informational, not a hard gate.
   // The live site has a known a11y violation (region — content not wrapped in
@@ -28,13 +28,13 @@ test('operator profile renders + tabs work', async ({ page }) => {
   // This does NOT fail the test — the functional assertions above are the gate.
   // TODO: file the violation as an a11y bug, fix it, then tighten to a hard assert:
   //   expect(results.violations).toEqual([])
-  const results = await new AxeBuilder({ page }).analyze()
+  const results = await new AxeBuilder({ page }).analyze();
   if (results.violations.length > 0) {
     console.log(
       `[a11y] /user/${SEED_CODENAME} — ${results.violations.length} violation(s):\n` +
         results.violations
           .map((v) => `  - ${v.id} (${v.impact}): ${v.description}`)
-          .join('\n'),
-    )
+          .join("\n"),
+    );
   }
-})
+});

@@ -15,12 +15,12 @@
  * the no-DB/error path is lib/data/fallback. All functions are async.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { getSupabaseServer } from '@/lib/supabase/server'
-import { SORT_DEFAULT } from '@/lib/constants'
-import { filterToWindow } from '@/lib/data/windows'
-import { CLASS_NAME_TO_ID, REWARDS } from '@/lib/canon/ids'
-import type { SignalClass } from '@/components/sigrank/types'
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getSupabaseServer } from "@/lib/supabase/server";
+import { SORT_DEFAULT } from "@/lib/constants";
+import { filterToWindow } from "@/lib/data/windows";
+import { CLASS_NAME_TO_ID, REWARDS } from "@/lib/canon/ids";
+import type { SignalClass } from "@/components/sigrank/types";
 import {
   MOCK_CLASS_DISTRIBUTION,
   MOCK_COUNTRIES,
@@ -29,7 +29,7 @@ import {
   MOCK_HOMEPAGE_STATS,
   MOCK_HOURLY,
   MOCK_WEEKLY,
-} from '@/lib/data/mock'
+} from "@/lib/data/mock";
 import type {
   ClassDistributionRow,
   CountryCount,
@@ -39,7 +39,7 @@ import type {
   HourlyPoint,
   LeaderboardRow,
   WeeklyPoint,
-} from '@/lib/data/types'
+} from "@/lib/data/types";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -56,8 +56,8 @@ import {
   telemetryFromSnapshot,
   toSignalClass,
   ZERO_TELEMETRY,
-} from '@/lib/data/mappers'
-import { fallbackRows, filterMockBoard, sortValue } from '@/lib/data/fallback'
+} from "@/lib/data/mappers";
+import { fallbackRows, filterMockBoard, sortValue } from "@/lib/data/fallback";
 
 // ───────────────────────────────────────────────────────────────────────────
 // Bounded-query helpers (2026-07-02 — the (d) sweep).
@@ -67,20 +67,20 @@ import { fallbackRows, filterMockBoard, sortValue } from '@/lib/data/fallback'
 // ───────────────────────────────────────────────────────────────────────────
 
 /** PostgREST's default per-request row cap. Pagination chunks at this size. */
-const POSTGREST_PAGE_SIZE = 1000
+const POSTGREST_PAGE_SIZE = 1000;
 
 /** Hard ceiling for whole-table scans — if we hit this, something is wrong
  *  (the table grew beyond a safe bound). Logs a warning; does NOT silently
  *  continue. 50K rows = ~150 operators × ~365 days of daily snapshots, well
  *  beyond current scale (~21 operators). */
-const TABLE_SCAN_CEILING = 50_000
+const TABLE_SCAN_CEILING = 50_000;
 
 /** Log a truncation warning (fail-loud, not cap-and-continue). */
 function warnTruncation(table: string, hit: number, ceiling: number) {
   console.warn(
     `[queries] ${table} scan hit ${hit} rows (ceiling ${ceiling}) — ` +
       `possible silent truncation. Investigate the table size.`,
-  )
+  );
 }
 
 /**
@@ -96,30 +96,34 @@ async function fetchAllPaginated<T>(
   buildQuery: (sb: SupabaseClient) => any,
   table: string,
 ): Promise<T[]> {
-  const all: T[] = []
-  let from = 0
+  const all: T[] = [];
+  let from = 0;
   while (from < TABLE_SCAN_CEILING) {
-    const to = from + POSTGREST_PAGE_SIZE - 1
-    const { data, error } = await buildQuery(sb).range(from, to)
-    if (error) throw error
-    const page = (data ?? []) as T[]
-    all.push(...page)
-    if (page.length < POSTGREST_PAGE_SIZE) return all // last page
-    from += POSTGREST_PAGE_SIZE
+    const to = from + POSTGREST_PAGE_SIZE - 1;
+    const { data, error } = await buildQuery(sb).range(from, to);
+    if (error) throw error;
+    const page = (data ?? []) as T[];
+    all.push(...page);
+    if (page.length < POSTGREST_PAGE_SIZE) return all; // last page
+    from += POSTGREST_PAGE_SIZE;
   }
   // Hit the ceiling — fail-loud (don't silently continue).
-  warnTruncation(table, all.length, TABLE_SCAN_CEILING)
-  return all
+  warnTruncation(table, all.length, TABLE_SCAN_CEILING);
+  return all;
 }
 
 /** Safe per-operator limit — one operator's daily snapshots for ~3yr (with
  *  per-platform rows). Asserts if hit so we know when to raise it. */
-const PER_OPERATOR_LIMIT = 1000
+const PER_OPERATOR_LIMIT = 1000;
 
 /** Assert a per-operator query didn't silently truncate. */
 function assertOperatorLimit(rows: unknown[], codename: string) {
   if (rows.length >= PER_OPERATOR_LIMIT) {
-    warnTruncation(`metric_snapshots (operator ${codename})`, rows.length, PER_OPERATOR_LIMIT)
+    warnTruncation(
+      `metric_snapshots (operator ${codename})`,
+      rows.length,
+      PER_OPERATOR_LIMIT,
+    );
   }
 }
 
@@ -142,43 +146,48 @@ async function recomputeRank(
       sb,
       (s) =>
         s
-          .from('metric_snapshots')
+          .from("metric_snapshots")
           .select(SNAPSHOT_COLUMNS)
-          .order('snapshot_date', { ascending: false }),
-      'metric_snapshots (recomputeRank)',
-    )
-    if (allSnaps.length === 0) return { rank: 0, percentile: 0 }
+          .order("snapshot_date", { ascending: false }),
+      "metric_snapshots (recomputeRank)",
+    );
+    if (allSnaps.length === 0) return { rank: 0, percentile: 0 };
     // Collapse to the operator-TOTAL row per operator (BOARD redesign 2026-06-27):
     // prefer each operator's 'multi' snapshot (already a cross-platform sum), else
     // their latest single-platform snapshot — the SAME collapse the operator-total
     // board uses, so a recomputed profile rank ranks the same yield the board does.
-    const latest = operatorTotalCollapse(asDb<DbMetricSnapshot[]>(allSnaps) ?? []).byOperator
+    const latest = operatorTotalCollapse(
+      asDb<DbMetricSnapshot[]>(allSnaps) ?? [],
+    ).byOperator;
     // Compute yield_ for each + sort descending
     const ranked = [...latest.values()]
       .map((s) => {
-        const snap = mapSnapshot(s)
-        const y = snap.cascade && !snap.cascade.nonCompounding ? snap.cascade.yield_ : 0
-        return { operator_id: s.operator_id, yield_: y }
+        const snap = mapSnapshot(s);
+        const y =
+          snap.cascade && !snap.cascade.nonCompounding
+            ? snap.cascade.yield_
+            : 0;
+        return { operator_id: s.operator_id, yield_: y };
       })
-      .sort((a, b) => b.yield_ - a.yield_)
-    const total = ranked.length
-    if (total === 0) return { rank: 0, percentile: 0 }
-    const idx = ranked.findIndex((r) => r.operator_id === operatorId)
-    if (idx === -1) return { rank: 0, percentile: 0 }
-    const rank = idx + 1
-    const percentile = total > 1 ? ((total - rank) / (total - 1)) * 100 : 100
-    return { rank, percentile: Math.round(percentile * 100) / 100 }
+      .sort((a, b) => b.yield_ - a.yield_);
+    const total = ranked.length;
+    if (total === 0) return { rank: 0, percentile: 0 };
+    const idx = ranked.findIndex((r) => r.operator_id === operatorId);
+    if (idx === -1) return { rank: 0, percentile: 0 };
+    const rank = idx + 1;
+    const percentile = total > 1 ? ((total - rank) / (total - 1)) * 100 : 100;
+    return { rank, percentile: Math.round(percentile * 100) / 100 };
   } catch {
-    return { rank: 0, percentile: 0 }
+    return { rank: 0, percentile: 0 };
   }
 }
 
 /** Minimal shape of a `rank_history` row we read. */
 interface DbRankHistory {
-  operator_id: string
-  snapshot_date: string
-  global_rank: number | null
-  percentile: number | null
+  operator_id: string;
+  snapshot_date: string;
+  global_rank: number | null;
+  percentile: number | null;
 }
 
 /**
@@ -192,17 +201,16 @@ interface DbRankHistory {
  */
 export interface LeaderboardRowWithPlatforms extends LeaderboardRow {
   /** Distinct platforms the operator submitted, e.g. ['claude','codex','multi']. */
-  platforms?: string[]
+  platforms?: string[];
 }
-
 
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
-  'operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, ' +
-  'session_depth, token_throughput, signa_rate, sdot_score, sdrm_score, signal_force, ' +
-  'drift_ratio, class_tier, movement_24h, movement_7d, ' +
-  'ruleset_version, ' +
-  'input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens'
+  "operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, " +
+  "session_depth, token_throughput, signa_rate, sdot_score, sdrm_score, signal_force, " +
+  "drift_ratio, class_tier, movement_24h, movement_7d, " +
+  "ruleset_version, " +
+  "input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens";
 
 /**
  * All operators columns the mapper reads — these are exactly the columns the
@@ -211,11 +219,11 @@ export const SNAPSHOT_COLUMNS =
  * would error, and the public path must never read the PII email.
  */
 export const OPERATOR_COLUMNS =
-  'operator_id, codename, display_name, claimed, claimed_at, ' +
-  'current_supporter_tier, verification_status, primary_domain, ' +
-  'account_age_days, total_messages_lifetime, ' +
+  "operator_id, codename, display_name, claimed, claimed_at, " +
+  "current_supporter_tier, verification_status, primary_domain, " +
+  "account_age_days, total_messages_lifetime, " +
   // Phase-0 identity fields (migration 0007, apply post-move — null-safe on old rows)
-  'handle, avatar_url, bio, links, location'
+  "handle, avatar_url, bio, links, location";
 
 // (Circles feature dropped 2026-06-25 — fresh-slate rebuild later. The circles /
 // circle_members / circle_metric_snapshots tables were removed from the DB; the
@@ -226,9 +234,11 @@ export const OPERATOR_COLUMNS =
 // ───────────────────────────────────────────────────────────────────────────
 
 /** Global / filtered leaderboard. */
-export async function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
-  const sb = getSupabaseServer()
-  if (!sb) return filterMockBoard(params)
+export async function getLeaderboard(
+  params: BoardParams = {},
+): Promise<LeaderboardRow[]> {
+  const sb = getSupabaseServer();
+  if (!sb) return filterMockBoard(params);
   try {
     // Live path: read latest metric_snapshots, join operators + rank_history.
     // We sort/filter/re-rank in JS so the live board is shape- and order-
@@ -238,19 +248,21 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
       sb,
       (s) =>
         s
-          .from('metric_snapshots')
+          .from("metric_snapshots")
           .select(SNAPSHOT_COLUMNS)
-          .order('snapshot_date', { ascending: false }),
-      'metric_snapshots (getLeaderboard)',
-    )
+          .order("snapshot_date", { ascending: false }),
+      "metric_snapshots (getLeaderboard)",
+    );
     // DB empty/unreachable → mock fallback (graceful-degradation contract).
-    if (allSnaps.length === 0) return filterMockBoard(params)
+    if (allSnaps.length === 0) return filterMockBoard(params);
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
     // home/transmitters/hall) keep their pre-730 full-field behaviour.
     const windowed =
-      params.windowFilter && params.window ? filterToWindow(allSnaps, params.window) : allSnaps
+      params.windowFilter && params.window
+        ? filterToWindow(allSnaps, params.window)
+        : allSnaps;
     // Collapse ladder (precedence top→bottom):
     //   allSnapshots  — keep EVERY (operator, platform, window) point ("off" board).
     //   operatorTotal — ONE total row per operator: the operator's 'multi' snapshot
@@ -260,32 +272,33 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
     //   else          — latest snapshot per operator (legacy behaviour).
     // operatorTotal also yields the distinct platform SET per operator so the UI can
     // badge "claude·codex·multi" on the single total row.
-    let platformsByOperator: Map<string, string[]> | null = null
-    let snapRows: DbMetricSnapshot[]
+    let platformsByOperator: Map<string, string[]> | null = null;
+    let snapRows: DbMetricSnapshot[];
     if (params.allSnapshots) {
-      snapRows = windowed
+      snapRows = windowed;
     } else if (params.operatorTotal) {
-      const collapsed = operatorTotalCollapse(windowed)
-      platformsByOperator = collapsed.platformsByOperator
-      snapRows = [...collapsed.byOperator.values()]
+      const collapsed = operatorTotalCollapse(windowed);
+      platformsByOperator = collapsed.platformsByOperator;
+      snapRows = [...collapsed.byOperator.values()];
     } else if (params.perPlatform) {
-      snapRows = [...latestPerOperatorPlatform(windowed).values()]
+      snapRows = [...latestPerOperatorPlatform(windowed).values()];
     } else {
-      snapRows = [...latestPerOperator(windowed).values()]
+      snapRows = [...latestPerOperator(windowed).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
-    if (snapRows.length === 0) return params.windowFilter ? [] : filterMockBoard(params)
+    if (snapRows.length === 0)
+      return params.windowFilter ? [] : filterMockBoard(params);
 
-    const opIds = [...new Set(snapRows.map((s) => s.operator_id))]
+    const opIds = [...new Set(snapRows.map((s) => s.operator_id))];
     const { data: opData, error: opError } = await sb
-      .from('operators_public')
+      .from("operators_public")
       .select(OPERATOR_COLUMNS)
-      .in('operator_id', opIds)
-    if (opError) throw opError
+      .in("operator_id", opIds);
+    if (opError) throw opError;
     const opById = new Map<string, DbOperator>(
       (asDb<DbOperator[] | null>(opData) ?? []).map((o) => [o.operator_id, o]),
-    )
+    );
 
     // Latest rank_history per operator for percentile (global_rank is recomputed
     // from the filtered view below, mirroring the mock re-ranking).
@@ -294,24 +307,25 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
       sb,
       (s) =>
         s
-          .from('rank_history')
-          .select('operator_id, snapshot_date, global_rank, percentile')
-          .order('snapshot_date', { ascending: false }),
-      'rank_history (getLeaderboard)',
-    )
-    const pctById = new Map<string, number>()
+          .from("rank_history")
+          .select("operator_id, snapshot_date, global_rank, percentile")
+          .order("snapshot_date", { ascending: false }),
+      "rank_history (getLeaderboard)",
+    );
+    const pctById = new Map<string, number>();
     for (const r of rankData) {
-      if (!pctById.has(r.operator_id)) pctById.set(r.operator_id, num(r.percentile))
+      if (!pctById.has(r.operator_id))
+        pctById.set(r.operator_id, num(r.percentile));
     }
 
-    let rows: LeaderboardRowWithPlatforms[] = []
+    let rows: LeaderboardRowWithPlatforms[] = [];
     for (const snap of snapRows) {
-      const op = opById.get(snap.operator_id)
-      if (!op) continue
+      const op = opById.get(snap.operator_id);
+      if (!op) continue;
       // operatorTotal: the distinct platforms this operator submitted (for the UI
       // multi-platform badge). Only attached on the operatorTotal path; other paths
       // leave `platforms` undefined (the per-row platform column is the source there).
-      const platforms = platformsByOperator?.get(snap.operator_id)
+      const platforms = platformsByOperator?.get(snap.operator_id);
       rows.push({
         operator: mapOperator(op),
         snapshot: mapSnapshot(snap),
@@ -322,53 +336,60 @@ export async function getLeaderboard(params: BoardParams = {}): Promise<Leaderbo
         platform: snap.platform ?? op.primary_domain ?? null,
         snapshot_date: snap.snapshot_date ?? null,
         ...(platforms && platforms.length > 0 ? { platforms } : {}),
-      })
+      });
     }
     // Honest empty (mirrors the latest.size===0 guard above): if operators didn't
     // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key deploy),
     // a windowFilter board returns [] rather than fabricated mock seeds.
-    if (rows.length === 0) return params.windowFilter ? [] : filterMockBoard(params)
+    if (rows.length === 0)
+      return params.windowFilter ? [] : filterMockBoard(params);
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
-    if (params.platform && params.platform !== 'all') {
+    if (params.platform && params.platform !== "all") {
       rows = rows.filter(
-        (r) => r.operator.primary_domain.toLowerCase() === params.platform!.toLowerCase(),
-      )
+        (r) =>
+          r.operator.primary_domain.toLowerCase() ===
+          params.platform!.toLowerCase(),
+      );
     }
-    if (params.classScope && params.classScope !== 'all') {
+    if (params.classScope && params.classScope !== "all") {
       rows = rows.filter(
-        (r) => r.snapshot.class_tier.toLowerCase() === params.classScope!.toLowerCase(),
-      )
+        (r) =>
+          r.snapshot.class_tier.toLowerCase() ===
+          params.classScope!.toLowerCase(),
+      );
     }
-    const sort = params.sort ?? SORT_DEFAULT
-    rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort))
-    rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }))
-    if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit)
-    return rows
+    const sort = params.sort ?? SORT_DEFAULT;
+    rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
+    rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
+    if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
+    return rows;
   } catch {
-    return filterMockBoard(params)
+    return filterMockBoard(params);
   }
 }
 
 /** Single operator by codename (identity + latest snapshot + rank). */
-export async function getOperator(codename: string): Promise<LeaderboardRow | null> {
-  const sb = getSupabaseServer()
+export async function getOperator(
+  codename: string,
+): Promise<LeaderboardRow | null> {
+  const sb = getSupabaseServer();
   const fromMock = () =>
     fallbackRows().find(
       (r) => r.operator.codename.toLowerCase() === codename.toLowerCase(),
-    ) ?? null
-  if (!sb) return fromMock()
+    ) ?? null;
+  if (!sb) return fromMock();
   try {
     // Identity by codename (case-insensitive), then latest snapshot + rank.
     const { data: opData, error: opError } = await sb
-      .from('operators_public')
+      .from("operators_public")
       .select(OPERATOR_COLUMNS)
-      .ilike('codename', codename)
+      .ilike("codename", codename)
       .limit(1)
-      .maybeSingle()
-    if (opError) throw opError
-    const op = asDb<DbOperator | null>(opData)
-    if (!op) return fromMock()
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<DbOperator | null>(opData);
+    if (!op) return fromMock();
 
     // BOARD redesign (2026-06-27): the profile headline (rank / class / cascade) must
     // agree with the board's operator-TOTAL row, so we pick the operator's total the
@@ -379,15 +400,16 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
     // disagree with the board. (The per-platform×window Submissions grid is a separate
     // query — getOperatorSubmissions — and is untouched.)
     const { data: snapData, error: snapError } = await sb
-      .from('metric_snapshots')
+      .from("metric_snapshots")
       .select(SNAPSHOT_COLUMNS)
-      .eq('operator_id', op.operator_id)
-      .order('snapshot_date', { ascending: false })
-      .limit(PER_OPERATOR_LIMIT)
-    if (snapError) throw snapError
-    const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
-    assertOperatorLimit(allOpSnaps, op.codename)
-    const snap = operatorTotalCollapse(allOpSnaps).byOperator.get(op.operator_id) ?? null
+      .eq("operator_id", op.operator_id)
+      .order("snapshot_date", { ascending: false })
+      .limit(PER_OPERATOR_LIMIT);
+    if (snapError) throw snapError;
+    const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? [];
+    assertOperatorLimit(allOpSnaps, op.codename);
+    const snap =
+      operatorTotalCollapse(allOpSnaps).byOperator.get(op.operator_id) ?? null;
     if (!snap) {
       // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
       // verified submission). Render an identity-only PENDING profile — never a 404.
@@ -398,17 +420,17 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
         percentile: 0,
         telemetry: ZERO_TELEMETRY,
         pending: true,
-      }
+      };
     }
 
     const { data: rankData } = await sb
-      .from('rank_history')
-      .select('operator_id, snapshot_date, global_rank, percentile')
-      .eq('operator_id', op.operator_id)
-      .order('snapshot_date', { ascending: false })
+      .from("rank_history")
+      .select("operator_id, snapshot_date, global_rank, percentile")
+      .eq("operator_id", op.operator_id)
+      .order("snapshot_date", { ascending: false })
       .limit(1)
-      .maybeSingle()
-    const rank = asDb<DbRankHistory | null>(rankData)
+      .maybeSingle();
+    const rank = asDb<DbRankHistory | null>(rankData);
 
     // P1 fix (2026-06-27): rank_history is only populated for seed operators
     // (manual insert). Operators added via the ingest pipeline
@@ -419,12 +441,12 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
     // (currently ~21 operators). The "right" fix is to populate rank_history
     // in materialize_verified_snapshot (a future migration), but this fallback
     // fixes every existing profile immediately without a DB change.
-    let globalRank = num(rank?.global_rank)
-    let percentile = num(rank?.percentile)
+    let globalRank = num(rank?.global_rank);
+    let percentile = num(rank?.percentile);
     if (globalRank === 0) {
-      const recomputed = await recomputeRank(sb, op.operator_id, snap)
-      globalRank = recomputed.rank
-      percentile = recomputed.percentile
+      const recomputed = await recomputeRank(sb, op.operator_id, snap);
+      globalRank = recomputed.rank;
+      percentile = recomputed.percentile;
     }
 
     return {
@@ -433,41 +455,46 @@ export async function getOperator(codename: string): Promise<LeaderboardRow | nu
       global_rank: globalRank,
       percentile,
       telemetry: telemetryFromSnapshot(snap),
-    }
+    };
   } catch {
-    return fromMock()
+    return fromMock();
   }
 }
 
 /** One operator submission cell: a (platform, window) point with its score. */
 export interface OperatorSubmission {
   /** Lowercase platform ('claude'/'codex'/'multi'/…). */
-  platform: string
+  platform: string;
   /** Window bucket ('7d'/'30d'/'90d'/'all_time'/'today'). */
-  window: string
+  window: string;
   /** Snapshot date 'YYYY-MM-DD' (most recent for this platform×window). */
-  snapshotDate: string | null
-  classTier: SignalClass
+  snapshotDate: string | null;
+  classTier: SignalClass;
   /** Υ Yield (null when non-compounding — no cache pillar). */
-  yield_: number | null
-  signaRate: number | null
-  totalTokens: number | null
+  yield_: number | null;
+  signaRate: number | null;
+  totalTokens: number | null;
 }
 
 /** Map one DB snapshot → a submission cell. */
-function toSubmission(snap: DbMetricSnapshot, primaryDomain: string | null): OperatorSubmission {
-  const s = mapSnapshot(snap)
-  const t = telemetryFromSnapshot(snap)
-  const c = s.cascade
+function toSubmission(
+  snap: DbMetricSnapshot,
+  primaryDomain: string | null,
+): OperatorSubmission {
+  const s = mapSnapshot(snap);
+  const t = telemetryFromSnapshot(snap);
+  const c = s.cascade;
   return {
-    platform: (snap.platform ?? primaryDomain ?? 'other').toLowerCase(),
-    window: snap.window_type ?? 'all_time',
+    platform: (snap.platform ?? primaryDomain ?? "other").toLowerCase(),
+    window: snap.window_type ?? "all_time",
     snapshotDate: snap.snapshot_date ?? null,
     classTier: s.class_tier,
     yield_: c && !c.nonCompounding ? c.yield_ : null,
     signaRate: snap.signa_rate ?? null,
-    totalTokens: t ? t.fresh_input + t.output + t.cache_create + t.cache_read : null,
-  }
+    totalTokens: t
+      ? t.fresh_input + t.output + t.cache_create + t.cache_read
+      : null,
+  };
 }
 
 /**
@@ -477,58 +504,69 @@ function toSubmission(snap: DbMetricSnapshot, primaryDomain: string | null): Ope
  * (rows arrive date-desc → first seen). Empty when the operator has no verified
  * submission yet. Per-platform cells populate as FIX H multi-platform submissions land.
  */
-export async function getOperatorSubmissions(codename: string): Promise<OperatorSubmission[]> {
-  const sb = getSupabaseServer()
+export async function getOperatorSubmissions(
+  codename: string,
+): Promise<OperatorSubmission[]> {
+  const sb = getSupabaseServer();
   const dedupe = (rows: OperatorSubmission[]): OperatorSubmission[] => {
-    const seen = new Map<string, OperatorSubmission>()
+    const seen = new Map<string, OperatorSubmission>();
     for (const r of rows) {
-      const k = `${r.platform}|${r.window}`
-      if (!seen.has(k)) seen.set(k, r)
+      const k = `${r.platform}|${r.window}`;
+      if (!seen.has(k)) seen.set(k, r);
     }
-    return [...seen.values()]
-  }
+    return [...seen.values()];
+  };
   // Degraded/mock path: the single fallback row → one submission cell.
   if (!sb) {
     const r = fallbackRows().find(
       (x) => x.operator.codename.toLowerCase() === codename.toLowerCase(),
-    )
-    if (!r || r.pending) return []
-    const t = r.telemetry
-    const c = r.snapshot.cascade
+    );
+    if (!r || r.pending) return [];
+    const t = r.telemetry;
+    const c = r.snapshot.cascade;
     return [
       {
-        platform: (r.platform ?? r.operator.primary_domain ?? 'other').toLowerCase(),
-        window: r.window_type ?? 'all_time',
+        platform: (
+          r.platform ??
+          r.operator.primary_domain ??
+          "other"
+        ).toLowerCase(),
+        window: r.window_type ?? "all_time",
         snapshotDate: r.snapshot_date ?? null,
         classTier: r.snapshot.class_tier,
         yield_: c && !c.nonCompounding ? c.yield_ : null,
         signaRate: r.snapshot.signa_rate ?? null,
-        totalTokens: t ? t.fresh_input + t.output + t.cache_create + t.cache_read : null,
+        totalTokens: t
+          ? t.fresh_input + t.output + t.cache_create + t.cache_read
+          : null,
       },
-    ]
+    ];
   }
   try {
     const { data: opData, error: opError } = await sb
-      .from('operators_public')
-      .select('operator_id, primary_domain')
-      .ilike('codename', codename)
+      .from("operators_public")
+      .select("operator_id, primary_domain")
+      .ilike("codename", codename)
       .limit(1)
-      .maybeSingle()
-    if (opError) throw opError
-    const op = asDb<{ operator_id: string; primary_domain: string | null } | null>(opData)
-    if (!op) return []
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<{
+      operator_id: string;
+      primary_domain: string | null;
+    } | null>(opData);
+    if (!op) return [];
     const { data: snapData, error: snapError } = await sb
-      .from('metric_snapshots')
+      .from("metric_snapshots")
       .select(SNAPSHOT_COLUMNS)
-      .eq('operator_id', op.operator_id)
-      .order('snapshot_date', { ascending: false })
-      .limit(PER_OPERATOR_LIMIT)
-    if (snapError) throw snapError
-    const snaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? []
-    assertOperatorLimit(snaps, codename)
-    return dedupe(snaps.map((s) => toSubmission(s, op.primary_domain)))
+      .eq("operator_id", op.operator_id)
+      .order("snapshot_date", { ascending: false })
+      .limit(PER_OPERATOR_LIMIT);
+    if (snapError) throw snapError;
+    const snaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? [];
+    assertOperatorLimit(snaps, codename);
+    return dedupe(snaps.map((s) => toSubmission(s, op.primary_domain)));
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -537,76 +575,89 @@ export async function getOperatorHistory(
   codename: string,
   params: HistoryParams = {},
 ): Promise<HistoryPoint[]> {
-  const sb = getSupabaseServer()
+  const sb = getSupabaseServer();
   const fromMock = () => {
-    const points = MOCK_HISTORY[codename] ?? []
-    return params.limit && params.limit > 0 ? points.slice(-params.limit) : points
-  }
-  if (!sb) return fromMock()
+    const points = MOCK_HISTORY[codename] ?? [];
+    return params.limit && params.limit > 0
+      ? points.slice(-params.limit)
+      : points;
+  };
+  if (!sb) return fromMock();
   try {
     // Resolve the operator id from the codename first.
     const { data: opData, error: opError } = await sb
-      .from('operators_public')
-      .select('operator_id')
-      .ilike('codename', codename)
+      .from("operators_public")
+      .select("operator_id")
+      .ilike("codename", codename)
       .limit(1)
-      .maybeSingle()
-    if (opError) throw opError
-    const op = asDb<{ operator_id: string } | null>(opData)
-    if (!op) return fromMock()
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<{ operator_id: string } | null>(opData);
+    if (!op) return fromMock();
 
     // Per-snapshot scores + token pillars (for Υ Yield), oldest → newest.
     const { data: snapData, error: snapError } = await sb
-      .from('metric_snapshots')
-      .select('snapshot_date, signa_rate, class_tier, input_tokens, output_tokens, cache_read_tokens, cache_creation_tokens')
-      .eq('operator_id', op.operator_id)
-      .order('snapshot_date', { ascending: true })
-      .limit(PER_OPERATOR_LIMIT)
-    if (snapError) throw snapError
+      .from("metric_snapshots")
+      .select(
+        "snapshot_date, signa_rate, class_tier, input_tokens, output_tokens, cache_read_tokens, cache_creation_tokens",
+      )
+      .eq("operator_id", op.operator_id)
+      .order("snapshot_date", { ascending: true })
+      .limit(PER_OPERATOR_LIMIT);
+    if (snapError) throw snapError;
     const snaps =
       asDb<Array<{
-        snapshot_date: string
-        signa_rate: number | null
-        class_tier: string | null
-        input_tokens: number | null
-        output_tokens: number | null
-        cache_read_tokens: number | null
-        cache_creation_tokens: number | null
-      }> | null>(snapData) ?? []
-    if (snaps.length === 0) return fromMock()
-    assertOperatorLimit(snaps, codename)
+        snapshot_date: string;
+        signa_rate: number | null;
+        class_tier: string | null;
+        input_tokens: number | null;
+        output_tokens: number | null;
+        cache_read_tokens: number | null;
+        cache_creation_tokens: number | null;
+      }> | null>(snapData) ?? [];
+    if (snaps.length === 0) return fromMock();
+    assertOperatorLimit(snaps, codename);
 
     // Per-date global_rank from rank_history (keyed by date).
     const { data: rankData } = await sb
-      .from('rank_history')
-      .select('snapshot_date, global_rank')
-      .eq('operator_id', op.operator_id)
-      .limit(PER_OPERATOR_LIMIT)
-    const rankByDate = new Map<string, number>()
+      .from("rank_history")
+      .select("snapshot_date, global_rank")
+      .eq("operator_id", op.operator_id)
+      .limit(PER_OPERATOR_LIMIT);
+    const rankByDate = new Map<string, number>();
     if (rankData && (rankData as unknown[]).length >= PER_OPERATOR_LIMIT) {
-      warnTruncation(`rank_history (operator ${codename})`, (rankData as unknown[]).length, PER_OPERATOR_LIMIT)
+      warnTruncation(
+        `rank_history (operator ${codename})`,
+        (rankData as unknown[]).length,
+        PER_OPERATOR_LIMIT,
+      );
     }
-    for (const r of ((rankData as Array<{ snapshot_date: string; global_rank: number | null }>) ?? [])) {
-      rankByDate.set(r.snapshot_date, num(r.global_rank))
+    for (const r of (rankData as Array<{
+      snapshot_date: string;
+      global_rank: number | null;
+    }>) ?? []) {
+      rankByDate.set(r.snapshot_date, num(r.global_rank));
     }
 
     const points: HistoryPoint[] = snaps.map((s) => {
-      const input = num(s.input_tokens)
-      const output = num(s.output_tokens)
-      const cacheRead = num(s.cache_read_tokens)
+      const input = num(s.input_tokens);
+      const output = num(s.output_tokens);
+      const cacheRead = num(s.cache_read_tokens);
       // Υ Yield = (cache_read × output) / input² — guard against div-by-zero.
-      const yield_ = input > 0 ? (cacheRead * output) / (input * input) : 0
+      const yield_ = input > 0 ? (cacheRead * output) / (input * input) : 0;
       return {
         date: s.snapshot_date,
         signa_rate: num(s.signa_rate),
         yield_,
         global_rank: rankByDate.get(s.snapshot_date) ?? 0,
         class_tier: toSignalClass(s.class_tier),
-      }
-    })
-    return params.limit && params.limit > 0 ? points.slice(-params.limit) : points
+      };
+    });
+    return params.limit && params.limit > 0
+      ? points.slice(-params.limit)
+      : points;
   } catch {
-    return fromMock()
+    return fromMock();
   }
 }
 
@@ -615,107 +666,112 @@ export async function getMetricLeaders(
   metric: string,
   params: BoardParams = {},
 ): Promise<LeaderboardRow[]> {
-  return getLeaderboard({ ...params, sort: metric })
+  return getLeaderboard({ ...params, sort: metric });
 }
 
 /** Hall of Signal records. */
-export async function getHallOfSignal(params: BoardParams = {}): Promise<HallRecord[]> {
-  const sb = getSupabaseServer()
-  if (!sb) return MOCK_HALL
+export async function getHallOfSignal(
+  params: BoardParams = {},
+): Promise<HallRecord[]> {
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_HALL;
   try {
-    void params
+    void params;
     // Hall records derive from badge awards. We embed the badge catalog (for the
     // record title) and the operator (for the codename), newest awards first.
     const { data, error } = await sb
-      .from('operator_badges')
+      .from("operator_badges")
       .select(
-        'awarded_at, source_note, ' +
-          'badges:badge_id ( badge_name ), ' +
-          'operators:operator_id ( codename, display_name )',
+        "awarded_at, source_note, " +
+          "badges:badge_id ( badge_name ), " +
+          "operators:operator_id ( codename, display_name )",
       )
-      .order('awarded_at', { ascending: false })
-    if (error) throw error
+      .order("awarded_at", { ascending: false });
+    if (error) throw error;
 
     type HallJoin = {
-      awarded_at: string | null
-      source_note: string | null
-      badges: { badge_name: string | null } | null
-      operators: { codename: string | null; display_name: string | null } | null
-    }
-    const rows = (data as unknown as HallJoin[] | null) ?? []
-    if (rows.length === 0) return MOCK_HALL
+      awarded_at: string | null;
+      source_note: string | null;
+      badges: { badge_name: string | null } | null;
+      operators: {
+        codename: string | null;
+        display_name: string | null;
+      } | null;
+    };
+    const rows = (data as unknown as HallJoin[] | null) ?? [];
+    if (rows.length === 0) return MOCK_HALL;
 
     const records: HallRecord[] = rows.map((r) => {
       // source_note may carry an explicit RW.xx reward id; otherwise fall back to
       // the Hall-of-Signal reserved reward (RW.15 / BG.16) from the canon catalog.
-      const note = r.source_note ?? ''
-      const rwMatch = note.match(/RW\.\d+/)
-      const rewardId = rwMatch && REWARDS[rwMatch[0]] ? rwMatch[0] : 'RW.15'
+      const note = r.source_note ?? "";
+      const rwMatch = note.match(/RW\.\d+/);
+      const rewardId = rwMatch && REWARDS[rwMatch[0]] ? rwMatch[0] : "RW.15";
       return {
         reward_id: rewardId,
-        title: r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? 'Hall of Signal',
-        operator_codename: r.operators?.display_name || r.operators?.codename || 'unknown',
-        value: note || (r.badges?.badge_name ?? ''),
-        date: (r.awarded_at ?? '').slice(0, 10),
+        title:
+          r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? "Hall of Signal",
+        operator_codename:
+          r.operators?.display_name || r.operators?.codename || "unknown",
+        value: note || (r.badges?.badge_name ?? ""),
+        date: (r.awarded_at ?? "").slice(0, 10),
         isPlaceholder: false,
-      }
-    })
-    return records
+      };
+    });
+    return records;
   } catch {
-    return MOCK_HALL
+    return MOCK_HALL;
   }
 }
 
 /** Homepage aggregate stats. */
 export async function getHomepageStats(): Promise<HomepageStats> {
-  const sb = getSupabaseServer()
-  if (!sb) return MOCK_HOMEPAGE_STATS
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_HOMEPAGE_STATS;
   try {
     // Singleton aggregate block (system_stats.id is pinned TRUE), with the top
     // operator's codename embedded via the top_operator_id FK.
     const { data, error } = await sb
-      .from('system_stats')
+      .from("system_stats")
       .select(
-        'total_operators, total_snapshots, total_tokens_scored, transmitter_count, ' +
-          'top_signa_rate, operators:top_operator_id ( codename )',
+        "total_operators, total_snapshots, total_tokens_scored, transmitter_count, " +
+          "top_signa_rate, operators:top_operator_id ( codename )",
       )
       .limit(1)
-      .maybeSingle()
-    if (error) throw error
-    const s = data as
-      | {
-          total_operators: number | null
-          total_snapshots: number | null
-          total_tokens_scored: number | null
-          transmitter_count: number | null
-          top_signa_rate: number | null
-          operators: { codename: string | null } | null
-        }
-      | null
-    if (!s) return MOCK_HOMEPAGE_STATS
+      .maybeSingle();
+    if (error) throw error;
+    const s = data as {
+      total_operators: number | null;
+      total_snapshots: number | null;
+      total_tokens_scored: number | null;
+      transmitter_count: number | null;
+      top_signa_rate: number | null;
+      operators: { codename: string | null } | null;
+    } | null;
+    if (!s) return MOCK_HOMEPAGE_STATS;
 
     // Two extra, independently-defensive reads so a missing column/table (e.g. before
     // migration 0021 lands) degrades to 0 rather than collapsing the whole block to
     // MOCK. Both are daily-stale under the homepage ISR — fine for the fogged strip.
-    let active_last_hour = 0
+    let active_last_hour = 0;
     try {
       const { count } = await sb
-        .from('operators')
-        .select('*', { count: 'exact', head: true })
-        .gte('last_seen', new Date(Date.now() - 3_600_000).toISOString())
-      active_last_hour = count ?? 0
+        .from("operators")
+        .select("*", { count: "exact", head: true })
+        .gte("last_seen", new Date(Date.now() - 3_600_000).toISOString());
+      active_last_hour = count ?? 0;
     } catch {
       /* leave 0 */
     }
 
-    let comparisons_ran = 0
+    let comparisons_ran = 0;
     try {
       const { data: c } = await sb
-        .from('site_counters')
-        .select('value')
-        .eq('key', 'comparisons_ran')
-        .maybeSingle()
-      comparisons_ran = num((c as { value: number | null } | null)?.value)
+        .from("site_counters")
+        .select("value")
+        .eq("key", "comparisons_ran")
+        .maybeSingle();
+      comparisons_ran = num((c as { value: number | null } | null)?.value);
     } catch {
       /* site_counters may not exist yet — leave 0 */
     }
@@ -725,14 +781,15 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       total_snapshots: num(s.total_snapshots),
       total_tokens_scored: num(s.total_tokens_scored),
       transmitter_count: num(s.transmitter_count),
-      top_operator_codename: s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
+      top_operator_codename:
+        s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
       top_signa_rate: num(s.top_signa_rate),
       active_last_hour,
       comparisons_ran,
       isPlaceholder: false,
-    }
+    };
   } catch {
-    return MOCK_HOMEPAGE_STATS
+    return MOCK_HOMEPAGE_STATS;
   }
 }
 
@@ -742,10 +799,10 @@ export async function getHomepageStats(): Promise<HomepageStats> {
  * before migration 0021 lands — the RPC error is swallowed (it's a vanity stat).
  */
 export async function bumpComparisonsRan(): Promise<void> {
-  const sb = getSupabaseServer()
-  if (!sb) return
+  const sb = getSupabaseServer();
+  if (!sb) return;
   try {
-    await sb.rpc('increment_site_counter', { counter_key: 'comparisons_ran' })
+    await sb.rpc("increment_site_counter", { counter_key: "comparisons_ran" });
   } catch {
     /* RPC/table not present yet, or transient — ignore */
   }
@@ -753,54 +810,54 @@ export async function bumpComparisonsRan(): Promise<void> {
 
 /** Class distribution across the active population. */
 export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
-  const sb = getSupabaseServer()
-  if (!sb) return MOCK_CLASS_DISTRIBUTION
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_CLASS_DISTRIBUTION;
   try {
     // Count each operator once, by their latest snapshot's class_tier.
     // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
     const rows = await fetchAllPaginated<{
-      operator_id: string
-      snapshot_date: string
-      class_tier: string | null
+      operator_id: string;
+      snapshot_date: string;
+      class_tier: string | null;
     }>(
       sb,
       (s) =>
         s
-          .from('metric_snapshots')
-          .select('operator_id, snapshot_date, class_tier')
-          .order('snapshot_date', { ascending: false }),
-      'metric_snapshots (getClassDistribution)',
-    )
-    if (rows.length === 0) return MOCK_CLASS_DISTRIBUTION
+          .from("metric_snapshots")
+          .select("operator_id, snapshot_date, class_tier")
+          .order("snapshot_date", { ascending: false }),
+      "metric_snapshots (getClassDistribution)",
+    );
+    if (rows.length === 0) return MOCK_CLASS_DISTRIBUTION;
 
-    const seen = new Set<string>()
-    const counts = new Map<SignalClass, number>()
+    const seen = new Set<string>();
+    const counts = new Map<SignalClass, number>();
     for (const r of rows) {
-      if (seen.has(r.operator_id)) continue
-      seen.add(r.operator_id)
-      const cls = toSignalClass(r.class_tier)
-      counts.set(cls, (counts.get(cls) ?? 0) + 1)
+      if (seen.has(r.operator_id)) continue;
+      seen.add(r.operator_id);
+      const cls = toSignalClass(r.class_tier);
+      counts.set(cls, (counts.get(cls) ?? 0) + 1);
     }
 
     // Emit in the same canonical class order the mock board uses.
     const order: SignalClass[] = [
-      'TRANSMITTER',
-      'ARCH+',
-      'ARCH',
-      'POWER',
-      'BASE',
-      'SEEKER',
-      'REFINER',
-      'BEARER',
-      'IGNITER',
-    ]
+      "TRANSMITTER",
+      "ARCH+",
+      "ARCH",
+      "POWER",
+      "BASE",
+      "SEEKER",
+      "REFINER",
+      "BEARER",
+      "IGNITER",
+    ];
     return order.map((cls) => ({
       class_tier: cls,
       class_id: CLASS_NAME_TO_ID[cls],
       count: counts.get(cls) ?? 0,
-    }))
+    }));
   } catch {
-    return MOCK_CLASS_DISTRIBUTION
+    return MOCK_CLASS_DISTRIBUTION;
   }
 }
 
@@ -813,7 +870,7 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineHourly(): Promise<HourlyPoint[]> {
-  return MOCK_HOURLY
+  return MOCK_HOURLY;
 }
 
 /**
@@ -822,7 +879,7 @@ export async function getOnlineHourly(): Promise<HourlyPoint[]> {
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineWeekly(): Promise<WeeklyPoint[]> {
-  return MOCK_WEEKLY
+  return MOCK_WEEKLY;
 }
 
 /**
@@ -831,7 +888,7 @@ export async function getOnlineWeekly(): Promise<WeeklyPoint[]> {
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineByCountry(): Promise<CountryCount[]> {
-  return MOCK_COUNTRIES
+  return MOCK_COUNTRIES;
 }
 
 /**
@@ -841,28 +898,40 @@ export async function getOnlineByCountry(): Promise<CountryCount[]> {
  */
 export interface OperatorReport {
   report: {
-    current_mode: string
-    mode_confidence: number
-    mode_distribution: Record<string, number>
-    mode_weighted_yield: number
-    peak_yield: number
-    health_score: number
+    current_mode: string;
+    mode_confidence: number;
+    mode_distribution: Record<string, number>;
+    mode_weighted_yield: number;
+    peak_yield: number;
+    health_score: number;
     weekly_snapshots?: Array<{
-      weekStart: string
-      pillars: { input: number; output: number; cacheCreate: number; cacheRead: number }
-      yield: number
-      mode: string
-      mode_confidence: number
-      dayCount: number
-    }>
+      weekStart: string;
+      pillars: {
+        input: number;
+        output: number;
+        cacheCreate: number;
+        cacheRead: number;
+      };
+      yield: number;
+      mode: string;
+      mode_confidence: number;
+      dayCount: number;
+    }>;
     badges: {
-      earned_this_week: string[]
-      in_progress: Array<{ id: string; label: string; icon: string; progress: number; target: number; display: string }>
-      collection: string[]
-    }
-  }
-  report_visible: boolean
-  created_at: string
+      earned_this_week: string[];
+      in_progress: Array<{
+        id: string;
+        label: string;
+        icon: string;
+        progress: number;
+        target: number;
+        display: string;
+      }>;
+      collection: string[];
+    };
+  };
+  report_visible: boolean;
+  created_at: string;
 }
 
 /**
@@ -870,20 +939,22 @@ export interface OperatorReport {
  * Returns null if no report exists (operator hasn't submitted with the new MCP yet).
  * The report_visible flag controls whether visitors can see the full Report tab.
  */
-export async function getOperatorReport(operatorId: string): Promise<OperatorReport | null> {
-  const sb = getSupabaseServer()
-  if (!sb) return null
+export async function getOperatorReport(
+  operatorId: string,
+): Promise<OperatorReport | null> {
+  const sb = getSupabaseServer();
+  if (!sb) return null;
   try {
     const { data, error } = await sb
-      .from('operator_reports')
-      .select('report, report_visible, created_at')
-      .eq('operator_id', operatorId)
-      .order('created_at', { ascending: false })
+      .from("operator_reports")
+      .select("report, report_visible, created_at")
+      .eq("operator_id", operatorId)
+      .order("created_at", { ascending: false })
       .limit(1)
-      .maybeSingle()
-    if (error) throw error
-    return data as unknown as OperatorReport | null
+      .maybeSingle();
+    if (error) throw error;
+    return data as unknown as OperatorReport | null;
   } catch {
-    return null
+    return null;
   }
 }

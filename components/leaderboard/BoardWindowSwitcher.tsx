@@ -8,34 +8,37 @@
  * windows stay tweetable/crawlable/statically rendered. Client island only for the
  * onChange → router.push; the routes themselves are unchanged.
  */
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { BOARD_WINDOWS } from '@/lib/data/windows'
+import { useRouter } from "next/navigation";
+import { BOARD_WINDOWS } from "@/lib/data/windows";
 
 // Theme-reactive (L-THEME): the selector sits on the board, follows the active theme.
 const T = {
-  field: 'rgb(var(--bg-elevated))',
-  line: 'rgb(var(--bg-border))',
-  ink: 'rgb(var(--text-primary))',
-  gold: 'rgb(var(--gold))',
-  mut: 'rgb(var(--text-muted))',
-}
+  field: "rgb(var(--bg-elevated))",
+  line: "rgb(var(--bg-border))",
+  ink: "rgb(var(--text-primary))",
+  gold: "rgb(var(--gold))",
+  mut: "rgb(var(--text-muted))",
+};
 
 // Everything leads, then the four windows. label drives the option text.
-const OPTIONS = [{ slug: 'everything', label: 'Everything — every window' }, ...BOARD_WINDOWS]
+const OPTIONS = [
+  { slug: "everything", label: "Everything — every window" },
+  ...BOARD_WINDOWS,
+];
 
 export function BoardWindowSwitcher({ current }: { current: string }) {
-  const router = useRouter()
+  const router = useRouter();
   return (
-    <div style={{ maxWidth: 1180, margin: '0 auto', width: '100%' }}>
+    <div style={{ maxWidth: 1180, margin: "0 auto", width: "100%" }}>
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           gap: 10,
-          flexWrap: 'wrap',
-          fontFamily: 'Roboto, -apple-system, system-ui, sans-serif',
+          flexWrap: "wrap",
+          fontFamily: "Roboto, -apple-system, system-ui, sans-serif",
         }}
       >
         <label
@@ -43,8 +46,8 @@ export function BoardWindowSwitcher({ current }: { current: string }) {
           style={{
             color: T.mut,
             fontSize: 11,
-            letterSpacing: '.1em',
-            textTransform: 'uppercase',
+            letterSpacing: ".1em",
+            textTransform: "uppercase",
           }}
         >
           View
@@ -57,13 +60,13 @@ export function BoardWindowSwitcher({ current }: { current: string }) {
             background: T.field,
             border: `1px solid ${T.line}`,
             color: T.ink,
-            padding: '7px 14px',
+            padding: "7px 14px",
             borderRadius: 8,
             fontSize: 13,
             fontWeight: 600,
-            letterSpacing: '.02em',
-            cursor: 'pointer',
-            appearance: 'auto',
+            letterSpacing: ".02em",
+            cursor: "pointer",
+            appearance: "auto",
           }}
         >
           {OPTIONS.map((o) => (
@@ -74,5 +77,5 @@ export function BoardWindowSwitcher({ current }: { current: string }) {
         </select>
       </div>
     </div>
-  )
+  );
 }

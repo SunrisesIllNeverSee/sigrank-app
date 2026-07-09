@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { SandboxClient } from '@/components/sandbox/SandboxClient'
+import { useState } from "react";
+import { SandboxClient } from "@/components/sandbox/SandboxClient";
 
 /**
  * components/profile/LabTab.tsx — the Lab tab on the operator profile.
@@ -18,16 +18,21 @@ export function LabTab({
   pillars,
   isOwner,
 }: {
-  pillars: { input: number; output: number; cacheCreate: number; cacheRead: number }
-  isOwner: boolean
+  pillars: {
+    input: number;
+    output: number;
+    cacheCreate: number;
+    cacheRead: number;
+  };
+  isOwner: boolean;
 }) {
-  const [resetKey, setResetKey] = useState(0)
-  const [currentPillars, setCurrentPillars] = useState(pillars)
+  const [resetKey, setResetKey] = useState(0);
+  const [currentPillars, setCurrentPillars] = useState(pillars);
 
   const handleReset = () => {
-    setCurrentPillars(pillars)
-    setResetKey((k) => k + 1)
-  }
+    setCurrentPillars(pillars);
+    setResetKey((k) => k + 1);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -49,8 +54,10 @@ export function LabTab({
       <div className="rounded-lg border border-bg-border p-4">
         {!isOwner && (
           <p className="mb-3 font-mono text-xs text-text-muted">
-            Read-only view — {pillars.input.toLocaleString()} in · {pillars.output.toLocaleString()} out ·{' '}
-            {pillars.cacheCreate.toLocaleString()} cw · {pillars.cacheRead.toLocaleString()} cr
+            Read-only view — {pillars.input.toLocaleString()} in ·{" "}
+            {pillars.output.toLocaleString()} out ·{" "}
+            {pillars.cacheCreate.toLocaleString()} cw ·{" "}
+            {pillars.cacheRead.toLocaleString()} cr
           </p>
         )}
         <SandboxClient
@@ -60,5 +67,5 @@ export function LabTab({
         />
       </div>
     </div>
-  )
+  );
 }

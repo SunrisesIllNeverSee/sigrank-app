@@ -11,15 +11,15 @@
  * caller — here we just display the value passed in.
  */
 
-import { CanonId } from '@/components/ui/CanonId'
+import { CanonId } from "@/components/ui/CanonId";
 
 interface Props {
   /** Core 5 input chips (label + display value), in display order. */
-  inputs: { label: string; value: string }[]
+  inputs: { label: string; value: string }[];
   /** The final SIGNA RATE [0,100]. */
-  signaRate: number
+  signaRate: number;
   /** Whether the operator carries the Audit Verified badge (BG.07). */
-  auditVerified: boolean
+  auditVerified: boolean;
 }
 
 export function BlackBoxEngine({ inputs, signaRate, auditVerified }: Props) {
@@ -27,7 +27,7 @@ export function BlackBoxEngine({ inputs, signaRate, auditVerified }: Props) {
     <div
       className="grid grid-cols-1 items-center gap-5 border-t border-gold/25 p-7 lg:grid-cols-[1.2fr_40px_1.4fr_40px_1fr]"
       style={{
-        background: 'linear-gradient(180deg, rgba(245,160,32,0.06), #060b17)',
+        background: "linear-gradient(180deg, rgba(245,160,32,0.06), #060b17)",
       }}
     >
       {/* Inputs */}
@@ -48,13 +48,15 @@ export function BlackBoxEngine({ inputs, signaRate, auditVerified }: Props) {
         </div>
       </div>
 
-      <div className="hidden text-center font-mono text-2xl text-gold lg:block"><span aria-hidden="true">→</span></div>
+      <div className="hidden text-center font-mono text-2xl text-gold lg:block">
+        <span aria-hidden="true">→</span>
+      </div>
 
       {/* Sealed box — NO weights ever rendered here. */}
       <div
         className="relative overflow-hidden rounded-xl border border-gold/25 p-6 text-center"
         style={{
-          background: 'linear-gradient(180deg, #0b1525, #060b17)',
+          background: "linear-gradient(180deg, #0b1525, #060b17)",
         }}
       >
         <div
@@ -62,7 +64,7 @@ export function BlackBoxEngine({ inputs, signaRate, auditVerified }: Props) {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(245,160,32,0.025) 8px, rgba(245,160,32,0.025) 9px)',
+              "repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(245,160,32,0.025) 8px, rgba(245,160,32,0.025) 9px)",
           }}
         />
         <div className="relative mb-1.5 font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
@@ -77,11 +79,16 @@ export function BlackBoxEngine({ inputs, signaRate, auditVerified }: Props) {
           <span>Proprietary weights</span>
           <span className="text-text-dim">·</span>
           <span className="font-semibold text-gold">⊘ Locked</span>
-          <CanonId id="RS.01" title="Proprietary SIGNA weights — server-only, never exposed" />
+          <CanonId
+            id="RS.01"
+            title="Proprietary SIGNA weights — server-only, never exposed"
+          />
         </div>
       </div>
 
-      <div className="hidden text-center font-mono text-2xl text-gold lg:block"><span aria-hidden="true">→</span></div>
+      <div className="hidden text-center font-mono text-2xl text-gold lg:block">
+        <span aria-hidden="true">→</span>
+      </div>
 
       {/* Output */}
       <div className="text-left lg:text-right">
@@ -102,5 +109,5 @@ export function BlackBoxEngine({ inputs, signaRate, auditVerified }: Props) {
         )}
       </div>
     </div>
-  )
+  );
 }

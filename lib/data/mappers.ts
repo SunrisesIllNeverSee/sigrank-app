@@ -16,10 +16,14 @@
  * is an internal split, not a new public surface.
  */
 
-import { computeCascadeMetrics } from '@/lib/ingest/bridge'
-import type { TelemetryRaw } from '@/lib/data/types'
-import type { SignalClass } from '@/components/sigrank/types'
-import type { Operator, ScoredSnapshot, SupporterTier } from '@/lib/scoring/types'
+import { computeCascadeMetrics } from "@/lib/ingest/bridge";
+import type { TelemetryRaw } from "@/lib/data/types";
+import type { SignalClass } from "@/components/sigrank/types";
+import type {
+  Operator,
+  ScoredSnapshot,
+  SupporterTier,
+} from "@/lib/scoring/types";
 
 // ───────────────────────────────────────────────────────────────────────────
 // Raw DB row shapes (snake_case columns mirroring supabase/schema.sql), shared
@@ -28,58 +32,58 @@ import type { Operator, ScoredSnapshot, SupporterTier } from '@/lib/scoring/type
 
 /** Minimal shape of an `operators` row we read. */
 export interface DbOperator {
-  operator_id: string
-  codename: string
-  display_name: string | null
-  claimed: boolean | null
-  claimed_at: string | null
+  operator_id: string;
+  codename: string;
+  display_name: string | null;
+  claimed: boolean | null;
+  claimed_at: string | null;
   // P5 (0008): claim_contact (PII email), claim_payment_id, and stripe_customer_id
   // are NOT read into the public path — operator reads go through the
   // operators_public view, which excludes them. Service-role writes still set them.
-  current_supporter_tier: string | null
-  verification_status: string | null
-  primary_domain: string | null
-  account_age_days: number | null
-  total_messages_lifetime: number | null
+  current_supporter_tier: string | null;
+  verification_status: string | null;
+  primary_domain: string | null;
+  account_age_days: number | null;
+  total_messages_lifetime: number | null;
   // Phase-0 identity fields (migration 0007, apply post-move)
-  handle: string | null
-  avatar_url: string | null
-  bio: string | null
-  links: { github?: string; site?: string; x?: string } | null
-  location: string | null
+  handle: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  links: { github?: string; site?: string; x?: string } | null;
+  location: string | null;
 }
 
 /** Minimal shape of a `metric_snapshots` row we read. */
 export interface DbMetricSnapshot {
-  operator_id: string
-  snapshot_date: string
+  operator_id: string;
+  snapshot_date: string;
   /** 730 window bucket: '7d' | '30d' | '90d' | 'all_time' (TEXT, schema 0001). */
-  window_type: string | null
+  window_type: string | null;
   /** Per-submission AI platform (migration 0015, FIX H). Backfilled from the
    *  operator's primary_domain on legacy rows; carried per-snapshot going forward
    *  so claude/codex/multi get distinct (operator, window, platform) slots. */
-  platform: string | null
-  compression_ratio: number | null
-  prompt_complexity: number | null
-  cross_thread: number | null
-  session_depth: number | null
-  token_throughput: number | null
-  signa_rate: number | null
-  sdot_score: number | null
-  sdrm_score: number | null
-  signal_force: number | null
-  drift_ratio: number | null
-  class_tier: string | null
-  movement_24h: number | null
-  movement_7d: number | null
-  ruleset_version: string | null
+  platform: string | null;
+  compression_ratio: number | null;
+  prompt_complexity: number | null;
+  cross_thread: number | null;
+  session_depth: number | null;
+  token_throughput: number | null;
+  signa_rate: number | null;
+  sdot_score: number | null;
+  sdrm_score: number | null;
+  signal_force: number | null;
+  drift_ratio: number | null;
+  class_tier: string | null;
+  movement_24h: number | null;
+  movement_7d: number | null;
+  ruleset_version: string | null;
   // The 4 raw token pillars (migration 0005, nullable). When present, the
   // cascade layer is derived on read via computeCascadeMetrics(); when all four
   // are null (legacy rows) cascade stays null. Canon: DB stores pillars only.
-  input_tokens: number | null
-  output_tokens: number | null
-  cache_creation_tokens: number | null
-  cache_read_tokens: number | null
+  input_tokens: number | null;
+  output_tokens: number | null;
+  cache_creation_tokens: number | null;
+  cache_read_tokens: number | null;
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -89,7 +93,7 @@ export interface DbMetricSnapshot {
 /** Common query params for board-style reads. */
 export interface BoardParams {
   /** API window enum (e.g. '30d'); maps from WINDOW_API_MAP. */
-  window?: string
+  window?: string;
   /**
    * 730: when true, `window` is applied as a board FILTER (exact window_type +
    * recency buffer, lib/data/windows.ts). Default false → `window` is a passthrough
@@ -98,7 +102,7 @@ export interface BoardParams {
    * (Won't-fix, owner 2026-06-20: the metric pages EXPLAIN metrics, they don't
    * window-filter — windowFilter stays board-only by design.)
    */
-  windowFilter?: boolean
+  windowFilter?: boolean;
   /**
    * Everything board (owner 2026-06-24): when true, do NOT collapse to one row per
    * operator — every window point (each operator's 7d/30d/90d/all snapshots) renders
@@ -106,7 +110,7 @@ export interface BoardParams {
    * boards keep their one-row-per-operator behaviour. Window weights/experience are a
    * later scoring change; for now mixed window rows just sort by their own Υ.
    */
-  allSnapshots?: boolean
+  allSnapshots?: boolean;
   /**
    * Per-platform board slots (migration 0015, FIX H): when true, collapse to one
    * row per (operator, platform) instead of one per operator — so an operator who
@@ -114,7 +118,7 @@ export interface BoardParams {
    * allSnapshots (which already keeps every row). Behaviour-preserving until
    * multi-platform submissions exist (legacy rows carry one platform per operator).
    */
-  perPlatform?: boolean
+  perPlatform?: boolean;
   /**
    * Operator-total board (BOARD redesign, 2026-06-27): when true, collapse to ONE
    * row per operator that represents their cross-platform TOTAL — preferring the
@@ -125,22 +129,22 @@ export interface BoardParams {
    * claude+codex). Takes precedence over perPlatform / latestPerOperator when set;
    * no effect under allSnapshots (which keeps every row). See operatorTotalCollapse.
    */
-  operatorTotal?: boolean
+  operatorTotal?: boolean;
   /** primary_domain filter, or null/undefined for all. */
-  platform?: string | null
+  platform?: string | null;
   /** Lowercase class scope (e.g. 'transmitter'), or 'all'/undefined. */
-  classScope?: string
+  classScope?: string;
   /** Sort key (a metric_snapshots column). */
-  sort?: string
+  sort?: string;
   /** Max rows. */
-  limit?: number
+  limit?: number;
 }
 
 /** History query params. */
 export interface HistoryParams {
-  window?: string
+  window?: string;
   /** Max points (most recent first). */
-  limit?: number
+  limit?: number;
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -148,27 +152,27 @@ export interface HistoryParams {
 // ───────────────────────────────────────────────────────────────────────────
 
 const SUPPORTER_TIERS: ReadonlySet<string> = new Set<SupporterTier>([
-  'free',
-  'patron',
-  'pro',
-  'circle_sponsor',
-])
+  "free",
+  "patron",
+  "pro",
+  "circle_sponsor",
+]);
 
 const VERIFICATION_STATUSES: ReadonlySet<string> = new Set<
-  Operator['verification_status']
->(['unverified', 'verified', 'audited'])
+  Operator["verification_status"]
+>(["unverified", "verified", "audited"]);
 
 const SIGNAL_CLASSES: ReadonlySet<string> = new Set<SignalClass>([
-  'TRANSMITTER',
-  'ARCH+',
-  'ARCH',
-  'POWER',
-  'BASE',
-  'SEEKER',
-  'REFINER',
-  'BEARER',
-  'IGNITER',
-])
+  "TRANSMITTER",
+  "ARCH+",
+  "ARCH",
+  "POWER",
+  "BASE",
+  "SEEKER",
+  "REFINER",
+  "BEARER",
+  "IGNITER",
+]);
 
 /**
  * Cast a Supabase `.select()` result to our hand-written row type. The supabase
@@ -177,27 +181,31 @@ const SIGNAL_CLASSES: ReadonlySet<string> = new Set<SignalClass>([
  * the runtime shape we know each query produces.
  */
 export function asDb<T>(data: unknown): T {
-  return data as T
+  return data as T;
 }
 
 /** Coerce a possibly-null DB value to a finite number, else a fallback. */
 export function num(v: number | null | undefined, fallback = 0): number {
-  return typeof v === 'number' && Number.isFinite(v) ? v : fallback
+  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
 }
 
 /** Narrow a free-text supporter tier to the SupporterTier union. */
 export function toSupporterTier(v: string | null | undefined): SupporterTier {
-  return v && SUPPORTER_TIERS.has(v) ? (v as SupporterTier) : 'free'
+  return v && SUPPORTER_TIERS.has(v) ? (v as SupporterTier) : "free";
 }
 
 /** Narrow a free-text verification status to the union. */
-export function toVerification(v: string | null | undefined): Operator['verification_status'] {
-  return v && VERIFICATION_STATUSES.has(v) ? (v as Operator['verification_status']) : 'unverified'
+export function toVerification(
+  v: string | null | undefined,
+): Operator["verification_status"] {
+  return v && VERIFICATION_STATUSES.has(v)
+    ? (v as Operator["verification_status"])
+    : "unverified";
 }
 
 /** Narrow a free-text class_tier to the SignalClass union (defaults IGNITER). */
 export function toSignalClass(v: string | null | undefined): SignalClass {
-  return v && SIGNAL_CLASSES.has(v) ? (v as SignalClass) : 'IGNITER'
+  return v && SIGNAL_CLASSES.has(v) ? (v as SignalClass) : "IGNITER";
 }
 
 /** Map a DB operators row → facade Operator (live rows are never placeholders). */
@@ -214,7 +222,7 @@ export function mapOperator(o: DbOperator): Operator {
     claim_contact: null,
     current_supporter_tier: toSupporterTier(o.current_supporter_tier),
     verification_status: toVerification(o.verification_status),
-    primary_domain: o.primary_domain ?? 'other',
+    primary_domain: o.primary_domain ?? "other",
     account_age_days: num(o.account_age_days),
     total_messages_lifetime: num(o.total_messages_lifetime),
     isPlaceholder: false,
@@ -224,7 +232,7 @@ export function mapOperator(o: DbOperator): Operator {
     bio: o.bio ?? null,
     links: o.links ?? null,
     location: o.location ?? null,
-  }
+  };
 }
 
 /** Map a DB metric_snapshots row → facade ScoredSnapshot. */
@@ -235,7 +243,7 @@ export function mapSnapshot(s: DbMetricSnapshot): ScoredSnapshot {
     compression_ratio: num(s.compression_ratio),
     // Live snapshots carry no per-value confidence column; precision is implied
     // by an 'audited' operator, but at this layer we expose the free-tier 'low'.
-    prompt_complexity: { value: num(s.prompt_complexity), confidence: 'low' },
+    prompt_complexity: { value: num(s.prompt_complexity), confidence: "low" },
     cross_thread: num(s.cross_thread),
     session_depth: num(s.session_depth),
     token_throughput: num(s.token_throughput),
@@ -245,7 +253,7 @@ export function mapSnapshot(s: DbMetricSnapshot): ScoredSnapshot {
     sdrm_score: s.sdrm_score ?? null,
     movement_24h: num(s.movement_24h),
     movement_7d: num(s.movement_7d),
-    ruleset_version: s.ruleset_version ?? '1.0',
+    ruleset_version: s.ruleset_version ?? "1.0",
     // LAST column (2026-06-28): carry the snapshot date through so the board can show
     // a real date instead of the literal "active". DbMetricSnapshot.snapshot_date is
     // always selected (queries.ts §SELECT); null-safe for the empty/pending row.
@@ -263,7 +271,7 @@ export function mapSnapshot(s: DbMetricSnapshot): ScoredSnapshot {
           cacheCreate: num(s.cache_creation_tokens),
           cacheRead: num(s.cache_read_tokens),
         }),
-  }
+  };
 }
 
 /** True when a snapshot carries none of the 4 pillars (legacy pre-0005 row). */
@@ -273,7 +281,7 @@ export function pillarsAllNull(s: DbMetricSnapshot): boolean {
     s.output_tokens == null &&
     s.cache_creation_tokens == null &&
     s.cache_read_tokens == null
-  )
+  );
 }
 
 /**
@@ -289,7 +297,7 @@ export function telemetryFromSnapshot(s: DbMetricSnapshot): TelemetryRaw {
     cache_create: num(s.cache_creation_tokens),
     sessions: 0,
     turns: 0,
-  }
+  };
 }
 
 /** A zero telemetry block — for an operator with no cascade data yet. */
@@ -300,12 +308,12 @@ export const ZERO_TELEMETRY: TelemetryRaw = {
   cache_create: 0,
   sessions: 0,
   turns: 0,
-}
+};
 
 /** All-null snapshot row → mapSnapshot yields cascade=null + class IGNITER + zeros. */
 const EMPTY_DB_SNAPSHOT: DbMetricSnapshot = {
-  operator_id: '',
-  snapshot_date: '',
+  operator_id: "",
+  snapshot_date: "",
   window_type: null,
   platform: null,
   compression_ratio: null,
@@ -326,7 +334,7 @@ const EMPTY_DB_SNAPSHOT: DbMetricSnapshot = {
   output_tokens: null,
   cache_creation_tokens: null,
   cache_read_tokens: null,
-}
+};
 
 /**
  * A "pending" snapshot for an operator that EXISTS but has no cascade data yet
@@ -334,7 +342,7 @@ const EMPTY_DB_SNAPSHOT: DbMetricSnapshot = {
  * profile renders an identity-only pending state instead of 404ing.
  */
 export function pendingSnapshot(): ScoredSnapshot {
-  return mapSnapshot(EMPTY_DB_SNAPSHOT)
+  return mapSnapshot(EMPTY_DB_SNAPSHOT);
 }
 
 /**
@@ -342,12 +350,14 @@ export function pendingSnapshot(): ScoredSnapshot {
  * operator. Supabase JS has no DISTINCT ON, so we keep the first occurrence of
  * each operator_id from a descending-ordered result.
  */
-export function latestPerOperator(rows: DbMetricSnapshot[]): Map<string, DbMetricSnapshot> {
-  const byOp = new Map<string, DbMetricSnapshot>()
+export function latestPerOperator(
+  rows: DbMetricSnapshot[],
+): Map<string, DbMetricSnapshot> {
+  const byOp = new Map<string, DbMetricSnapshot>();
   for (const r of rows) {
-    if (!byOp.has(r.operator_id)) byOp.set(r.operator_id, r)
+    if (!byOp.has(r.operator_id)) byOp.set(r.operator_id, r);
   }
-  return byOp
+  return byOp;
 }
 
 /**
@@ -359,22 +369,22 @@ export function latestPerOperator(rows: DbMetricSnapshot[]): Map<string, DbMetri
 export function latestPerOperatorPlatform(
   rows: DbMetricSnapshot[],
 ): Map<string, DbMetricSnapshot> {
-  const byOpPlatform = new Map<string, DbMetricSnapshot>()
+  const byOpPlatform = new Map<string, DbMetricSnapshot>();
   for (const r of rows) {
-    const key = `${r.operator_id}|${r.platform ?? '∅'}`
-    if (!byOpPlatform.has(key)) byOpPlatform.set(key, r)
+    const key = `${r.operator_id}|${r.platform ?? "∅"}`;
+    if (!byOpPlatform.has(key)) byOpPlatform.set(key, r);
   }
-  return byOpPlatform
+  return byOpPlatform;
 }
 
 /** The output of operatorTotalCollapse: one chosen snapshot per operator + the
  *  distinct platform set that operator has submitted (for the UI multi-badge). */
 export interface OperatorTotalCollapse {
   /** Chosen "total" snapshot per operator_id (multi-preferred, latest-by-date). */
-  byOperator: Map<string, DbMetricSnapshot>
+  byOperator: Map<string, DbMetricSnapshot>;
   /** Distinct platforms each operator has submitted, e.g. ['claude','codex','multi'].
    *  Ordered by first-seen in the (date-desc) input. Excludes null/∅ platforms. */
-  platformsByOperator: Map<string, string[]>
+  platformsByOperator: Map<string, string[]>;
 }
 
 /**
@@ -390,31 +400,33 @@ export interface OperatorTotalCollapse {
  * Also returns the distinct platform SET per operator (all non-null platforms they
  * submitted) so the UI can badge "claude·codex·multi" on the single total row.
  */
-export function operatorTotalCollapse(rows: DbMetricSnapshot[]): OperatorTotalCollapse {
+export function operatorTotalCollapse(
+  rows: DbMetricSnapshot[],
+): OperatorTotalCollapse {
   // Latest 'multi' row per operator (first-seen wins under date-desc input).
-  const multiByOp = new Map<string, DbMetricSnapshot>()
+  const multiByOp = new Map<string, DbMetricSnapshot>();
   // Latest ANY row per operator — the single-platform fallback.
-  const latestByOp = new Map<string, DbMetricSnapshot>()
+  const latestByOp = new Map<string, DbMetricSnapshot>();
   // Distinct submitted platforms per operator (first-seen order; null/∅ excluded).
-  const platformsByOperator = new Map<string, string[]>()
+  const platformsByOperator = new Map<string, string[]>();
 
   for (const r of rows) {
-    const op = r.operator_id
-    if (!latestByOp.has(op)) latestByOp.set(op, r)
-    if (r.platform === 'multi' && !multiByOp.has(op)) multiByOp.set(op, r)
-    const p = r.platform
-    if (p != null && p !== '') {
-      const set = platformsByOperator.get(op)
-      if (!set) platformsByOperator.set(op, [p])
-      else if (!set.includes(p)) set.push(p)
+    const op = r.operator_id;
+    if (!latestByOp.has(op)) latestByOp.set(op, r);
+    if (r.platform === "multi" && !multiByOp.has(op)) multiByOp.set(op, r);
+    const p = r.platform;
+    if (p != null && p !== "") {
+      const set = platformsByOperator.get(op);
+      if (!set) platformsByOperator.set(op, [p]);
+      else if (!set.includes(p)) set.push(p);
     }
   }
 
   // Prefer the 'multi' total; fall back to the operator's latest single-platform row.
-  const byOperator = new Map<string, DbMetricSnapshot>()
+  const byOperator = new Map<string, DbMetricSnapshot>();
   for (const [op, latest] of latestByOp) {
-    byOperator.set(op, multiByOp.get(op) ?? latest)
+    byOperator.set(op, multiByOp.get(op) ?? latest);
   }
 
-  return { byOperator, platformsByOperator }
+  return { byOperator, platformsByOperator };
 }

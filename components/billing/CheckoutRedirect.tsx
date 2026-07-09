@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { loadStripe, type Stripe } from '@stripe/stripe-js'
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
 /**
  * components/billing/CheckoutRedirect.tsx — client-only Stripe.js loader + the
@@ -16,21 +16,20 @@ import { loadStripe, type Stripe } from '@stripe/stripe-js'
  * Stripe.js needs (e.g. Elements) without re-loading the SDK.
  */
 
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
-let stripePromise: Promise<Stripe | null> | null = null
+let stripePromise: Promise<Stripe | null> | null = null;
 
 /** Memoized client-side Stripe.js instance, or null when no publishable key. */
 export function getStripeClient(): Promise<Stripe | null> {
-  if (!publishableKey) return Promise.resolve(null)
-  if (!stripePromise) stripePromise = loadStripe(publishableKey)
-  return stripePromise
+  if (!publishableKey) return Promise.resolve(null);
+  if (!stripePromise) stripePromise = loadStripe(publishableKey);
+  return stripePromise;
 }
 
 /** Outcome of a checkout start attempt — drives UI messaging. */
 export type CheckoutOutcome =
-  | { ok: true }
-  | { ok: false; reason: 'not_configured' | 'failed' }
+  { ok: true } | { ok: false; reason: "not_configured" | "failed" };
 
 /**
  * startCheckout — POST to a billing endpoint, then redirect to the returned
@@ -43,18 +42,18 @@ export async function startCheckout(
 ): Promise<CheckoutOutcome> {
   try {
     const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    })
-    if (res.status === 503) return { ok: false, reason: 'not_configured' }
-    const data = (await res.json()) as { url?: string }
+    });
+    if (res.status === 503) return { ok: false, reason: "not_configured" };
+    const data = (await res.json()) as { url?: string };
     if (data.url) {
-      window.location.assign(data.url)
-      return { ok: true }
+      window.location.assign(data.url);
+      return { ok: true };
     }
-    return { ok: false, reason: 'failed' }
+    return { ok: false, reason: "failed" };
   } catch {
-    return { ok: false, reason: 'failed' }
+    return { ok: false, reason: "failed" };
   }
 }

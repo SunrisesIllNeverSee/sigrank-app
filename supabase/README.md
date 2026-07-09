@@ -7,13 +7,13 @@ page renders on deterministic mock data when no Supabase credentials are present
 
 ## Files
 
-| File | Purpose |
-|---|---|
-| `schema.sql` | Canonical, full DDL — all 20 tables, indexes, and constraints. Authoritative. |
-| `migrations/0001_init.sql` | First half of `schema.sql`: core telemetry → scoring → leaderboard tables (incl. `operators` with its full claim + Stripe columns). |
-| `migrations/0002_billing.sql` | Second half: Stripe billing (`subscriptions`, `webhook_events`), `audit_log`, `ruleset_versions`, `system_stats`. Depends on `0001`. |
-| `seed.sql` | Ruleset v1.0, 16 badges (BG.01–BG.16), MO§ES operator + snapshot + rank + cached board, `system_stats` singleton. Mirrors `lib/data/mock.ts`. |
-| `policies.sql` | Enables RLS on every table; public read-only on public tables; writes are service-role only (Phase-2 owner writes deferred). |
+| File                          | Purpose                                                                                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema.sql`                  | Canonical, full DDL — all 20 tables, indexes, and constraints. Authoritative.                                                                 |
+| `migrations/0001_init.sql`    | First half of `schema.sql`: core telemetry → scoring → leaderboard tables (incl. `operators` with its full claim + Stripe columns).           |
+| `migrations/0002_billing.sql` | Second half: Stripe billing (`subscriptions`, `webhook_events`), `audit_log`, `ruleset_versions`, `system_stats`. Depends on `0001`.          |
+| `seed.sql`                    | Ruleset v1.0, 16 badges (BG.01–BG.16), MO§ES operator + snapshot + rank + cached board, `system_stats` singleton. Mirrors `lib/data/mock.ts`. |
+| `policies.sql`                | Enables RLS on every table; public read-only on public tables; writes are service-role only (Phase-2 owner writes deferred).                  |
 
 > `schema.sql` ≡ `0001_init.sql` + `0002_billing.sql`. Apply **either** the
 > single `schema.sql` **or** the two migrations in order — not both.
@@ -79,18 +79,18 @@ tables, erroring on constraints, potentially corrupting data.
 
 **Mapping (remote timestamp → local numbered file):**
 
-| Remote timestamp | Local file | What it does |
-|---|---|---|
-| `20260624153429` | 0007 | Identity columns (handle, avatar_url, bio, links, location) |
-| `20260624171956` | 0008 | operators_public view (PII fix) |
-| `20260624172019` | 0008 | Column-level GRANT/REVOKE on operators |
-| `20260625080637` | 0017 (partial) | Revoke anon SELECT on circles tables |
-| `20260625220535` | 0013 | Device enroll codes + materialize_verified_snapshot RPC |
-| `20260625220551` | 0014 | enroll_device RPC |
-| `20260626141333` | 0015 | Platform column on metric_snapshots |
-| `20260626141832` | 0016 | Revoke/rebind fix for enroll_device |
-| `20260627112209` | 0019 | pg_cron + recompute_the_field() |
-| `20260627115029` | 0020 | delete_account() RPC |
+| Remote timestamp | Local file     | What it does                                                |
+| ---------------- | -------------- | ----------------------------------------------------------- |
+| `20260624153429` | 0007           | Identity columns (handle, avatar_url, bio, links, location) |
+| `20260624171956` | 0008           | operators_public view (PII fix)                             |
+| `20260624172019` | 0008           | Column-level GRANT/REVOKE on operators                      |
+| `20260625080637` | 0017 (partial) | Revoke anon SELECT on circles tables                        |
+| `20260625220535` | 0013           | Device enroll codes + materialize_verified_snapshot RPC     |
+| `20260625220551` | 0014           | enroll_device RPC                                           |
+| `20260626141333` | 0015           | Platform column on metric_snapshots                         |
+| `20260626141832` | 0016           | Revoke/rebind fix for enroll_device                         |
+| `20260627112209` | 0019           | pg_cron + recompute_the_field()                             |
+| `20260627115029` | 0020           | delete_account() RPC                                        |
 
 Local-only (applied to DB via Dashboard, no ledger entry): 0006, 0009, 0010,
 0011, 0012, 0018, 0021, 0022, 0023.

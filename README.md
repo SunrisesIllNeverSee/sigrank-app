@@ -1,8 +1,8 @@
 # SigRank
 
 > **🏆 SigRank is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
-> efficiently you use AI, not how much. See the rankings at
-> [signalaf.com/board/all](https://signalaf.com/board/all). *Token counts only. Never your prompts.*
+> efficiently you use AI, not how much. See your projected rank in 60 seconds at
+> [signalaf.com/score](https://signalaf.com/score). _Token counts only. Never your prompts._
 
 <div align="center">
 
@@ -50,10 +50,10 @@ Most platforms reward volume. SigRank rewards structure.
 - [Community](#community)
 - [License](#license)
 
-| The leaderboard | Your operator profile |
-|:---:|:---:|
-| [![SigRank leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all) | [![SigRank operator profile](./.github/assets/profile.png)](https://signalaf.com) |
-| Every operator ranked by **Υ Yield** — the architecture of the cascade, not raw spend | Cascade layer, class, and fingerprint — all from four token counts |
+|                                    The leaderboard                                    |                               Your operator profile                               |
+| :-----------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
+| [![SigRank leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all)  | [![SigRank operator profile](./.github/assets/profile.png)](https://signalaf.com) |
+| Every operator ranked by **Υ Yield** — the architecture of the cascade, not raw spend |        Cascade layer, class, and fingerprint — all from four token counts         |
 
 ---
 
@@ -72,7 +72,7 @@ noise; yield is signal.
 
 This repo is the **Next.js app behind [signalaf.com](https://signalaf.com)** — the
 public board, operator profiles, the wiki, account + billing, and the scoring/ingest
-engine. You don't clone this to *use* SigRank (see below) — you clone it to work on it.
+engine. You don't clone this to _use_ SigRank (see below) — you clone it to work on it.
 
 ## Get ranked (you don't need this repo)
 
@@ -159,15 +159,15 @@ buildable, previewable, and testable out of the box.
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the local Next.js dev server |
-| `npm run build` | Create a production build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run the configured Next.js lint command |
-| `npm test` | Run all Node test files |
-| `npm run test:canonical` | Run the canonical ingest parity test |
-| `npm run snapshot` | Refresh the database snapshot |
+| Command                  | Purpose                                 |
+| ------------------------ | --------------------------------------- |
+| `npm run dev`            | Start the local Next.js dev server      |
+| `npm run build`          | Create a production build               |
+| `npm run start`          | Serve the production build              |
+| `npm run lint`           | Run the configured Next.js lint command |
+| `npm test`               | Run all Node test files                 |
+| `npm run test:canonical` | Run the canonical ingest parity test    |
+| `npm run snapshot`       | Refresh the database snapshot           |
 
 Before committing, run the gates CI enforces:
 
@@ -179,19 +179,19 @@ npm run test:canonical      # canonical ingest parity — MO§ES Υ 18436.98
 
 ## Project Map
 
-| Path | Responsibility |
-| --- | --- |
-| `app/` | App Router pages and API routes |
-| `app/api/v1/` | Public API, ingest, claim, devices, billing, metrics |
-| `components/` | UI components by product area |
+| Path                  | Responsibility                                               |
+| --------------------- | ------------------------------------------------------------ |
+| `app/`                | App Router pages and API routes                              |
+| `app/api/v1/`         | Public API, ingest, claim, devices, billing, metrics         |
+| `components/`         | UI components by product area                                |
 | `components/sigrank/` | Board, profile, and shared SigRank UI (incl. `PlatformIcon`) |
-| `lib/data/` | Single read facade: Supabase → snapshot → mock fallback |
-| `lib/ingest/` | Canonical payload parsing and cascade metric materialization |
-| `lib/scoring/` | Core scoring engine and server-only ruleset boundary |
-| `lib/supabase/` | Browser, server, service-role, and auth helpers |
-| `lib/stripe/` | Stripe server helpers, handlers, tiers, and rewards |
-| `supabase/` | SQL schema, migrations, seed data, policies, and tests |
-| `__tests__/` | Node test suites and canonical fixtures |
+| `lib/data/`           | Single read facade: Supabase → snapshot → mock fallback      |
+| `lib/ingest/`         | Canonical payload parsing and cascade metric materialization |
+| `lib/scoring/`        | Core scoring engine and server-only ruleset boundary         |
+| `lib/supabase/`       | Browser, server, service-role, and auth helpers              |
+| `lib/stripe/`         | Stripe server helpers, handlers, tiers, and rewards          |
+| `supabase/`           | SQL schema, migrations, seed data, policies, and tests       |
+| `__tests__/`          | Node test suites and canonical fixtures                      |
 
 ## Data Model
 
@@ -207,15 +207,15 @@ available source, in order:
 Copy `.env.example` to `.env.local` and fill values as needed. All are optional locally
 (the app degrades gracefully); production values live in **Vercel environment variables**.
 
-| Variable group | Notes |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Live Supabase reads + service-role writes |
-| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Billing and webhook flows |
-| `STRIPE_PRICE_*` | Per paid tier / claim checkout path |
-| `NEXT_PUBLIC_SITE_URL` | Stripe redirects and public URLs |
-| `SIGRANK_RULESET` | **Server-only** proprietary RS.xx scoring overrides |
-| `SIGRANK_API_KEY` | Optional trusted bulk-read key for public API consumers |
-| `NEXT_PUBLIC_GATE_*` | Optional feature gates for unfinished surfaces |
+| Variable group                                                                           | Notes                                                   |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Live Supabase reads + service-role writes               |
+| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`       | Billing and webhook flows                               |
+| `STRIPE_PRICE_*`                                                                         | Per paid tier / claim checkout path                     |
+| `NEXT_PUBLIC_SITE_URL`                                                                   | Stripe redirects and public URLs                        |
+| `SIGRANK_RULESET`                                                                        | **Server-only** proprietary RS.xx scoring overrides     |
+| `SIGRANK_API_KEY`                                                                        | Optional trusted bulk-read key for public API consumers |
+| `NEXT_PUBLIC_GATE_*`                                                                     | Optional feature gates for unfinished surfaces          |
 
 **Never commit real secrets or proprietary ruleset values.**
 

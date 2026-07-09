@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/leaderboard/PlatformSelector.tsx
@@ -10,30 +10,34 @@
  * PLATFORM_DEFAULT ('All'), which clears the filter.
  */
 
-import { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { PLATFORM_UI, PLATFORM_DEFAULT, type PlatformUI } from '@/lib/constants'
+import { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  PLATFORM_UI,
+  PLATFORM_DEFAULT,
+  type PlatformUI,
+} from "@/lib/constants";
 
 interface Props {
   /** Currently-selected platform label (resolved by the page from searchParams). */
-  value: PlatformUI
+  value: PlatformUI;
 }
 
 export function PlatformSelector({ value }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const select = useCallback(
     (next: PlatformUI) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (next === PLATFORM_DEFAULT) params.delete('platform')
-      else params.set('platform', next)
-      const qs = params.toString()
-      router.push(qs ? `${pathname}?${qs}` : pathname)
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === PLATFORM_DEFAULT) params.delete("platform");
+      else params.set("platform", next);
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     },
     [router, pathname, searchParams],
-  )
+  );
 
   return (
     <div className="flex flex-col gap-1">
@@ -46,7 +50,7 @@ export function PlatformSelector({ value }: Props) {
         className="inline-flex flex-wrap overflow-hidden rounded-md border border-bg-border"
       >
         {PLATFORM_UI.map((label) => {
-          const active = label === value
+          const active = label === value;
           return (
             <button
               key={label}
@@ -54,17 +58,17 @@ export function PlatformSelector({ value }: Props) {
               aria-pressed={active}
               onClick={() => select(label)}
               className={
-                'px-3 py-1.5 font-sans text-xs transition-colors ' +
+                "px-3 py-1.5 font-sans text-xs transition-colors " +
                 (active
-                  ? 'bg-text-accent/15 text-text-accent'
-                  : 'bg-bg-surface text-text-secondary hover:bg-bg-hover hover:text-text-primary')
+                  ? "bg-text-accent/15 text-text-accent"
+                  : "bg-bg-surface text-text-secondary hover:bg-bg-hover hover:text-text-primary")
               }
             >
               {label}
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

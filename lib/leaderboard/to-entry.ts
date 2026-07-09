@@ -14,8 +14,8 @@
  * real fuel to display even where the derived metrics read "—".
  */
 
-import type { LeaderboardRow } from '@/lib/data/types'
-import type { LeaderboardEntry } from '@/components/sigrank'
+import type { LeaderboardRow } from "@/lib/data/types";
+import type { LeaderboardEntry } from "@/components/sigrank";
 
 /**
  * A LeaderboardEntry carrying the operator's distinct submitted-platform SET, for
@@ -26,23 +26,23 @@ import type { LeaderboardEntry } from '@/components/sigrank'
  */
 export interface LeaderboardEntryWithPlatforms extends LeaderboardEntry {
   /** Distinct platforms the operator submitted, e.g. ['claude','codex','multi']. */
-  platforms?: string[]
+  platforms?: string[];
   /** The operator's declared primary domain (lowercased) — used for client-side
    *  platform filtering on static (ISR-cached) board pages where the server can't
    *  read searchParams without opting into dynamic rendering. */
-  primaryDomain?: string
+  primaryDomain?: string;
 }
 
 /** A LeaderboardRow optionally carrying the per-operator platform set (operatorTotal
  *  board); the field is attached structurally in queries.ts. */
-type RowWithPlatforms = LeaderboardRow & { platforms?: string[] }
+type RowWithPlatforms = LeaderboardRow & { platforms?: string[] };
 
 /** Map a scored row into the ported LeaderboardTable entry shape. */
 export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
-  const { operator, snapshot, global_rank } = row
-  const c = snapshot.cascade
-  const t = row.telemetry
-  const platforms = (row as RowWithPlatforms).platforms
+  const { operator, snapshot, global_rank } = row;
+  const c = snapshot.cascade;
+  const t = row.telemetry;
+  const platforms = (row as RowWithPlatforms).platforms;
   return {
     rank: global_rank,
     // Seed rows render italic (owner 2026-06-20). The live facade hardcodes
@@ -111,7 +111,11 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     // metric_snapshots.platform) so a codex row reads "Codex" even when the
     // operator's primary_domain is claude. Falls back to primary_domain (legacy /
     // pre-0015 rows) then 'other'. Lowercased; matched against PLATFORM_DOMAIN_MAP.
-    platform: (row.platform ?? operator.primary_domain ?? 'other').toLowerCase(),
+    platform: (
+      row.platform ??
+      operator.primary_domain ??
+      "other"
+    ).toLowerCase(),
     // FIX H: the row's window bucket ('7d'/'30d'/'90d'/'all_time'), so the "off"
     // board can label each (operator × platform × window) row as an intentional
     // breakout instead of a duplicate. Undefined on legacy rows without a window.
@@ -125,5 +129,5 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     // The operator's primary domain (lowercased) for client-side platform filtering
     // on ISR-cached board pages (the server can't read searchParams without going dynamic).
     primaryDomain: operator.primary_domain?.toLowerCase(),
-  }
+  };
 }

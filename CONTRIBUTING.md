@@ -54,7 +54,7 @@ develop and test without a backend.
 
 ### Commit style
 
-One job per commit. Don't batch unrelated changes. Focus on *why*, not *what*:
+One job per commit. Don't batch unrelated changes. Focus on _why_, not _what_:
 
 ```
 fix(board): remove soft-404 /board/off from sitemap
@@ -68,11 +68,11 @@ actual default board page.
 
 Every PR must pass all three gates before merge:
 
-| Gate | Command | What it checks |
-|------|---------|----------------|
-| TypeScript | `npx tsc --noEmit` | 0 type errors (strict mode) |
-| Build | `npm run build` | Production build succeeds (31 routes) |
-| Canonical | `node --test __tests__/ingest/canonical.test.mjs` | 11/11 tests pass — the MO§ES Υ invariant (18436.98) + scoring math |
+| Gate       | Command                                           | What it checks                                                     |
+| ---------- | ------------------------------------------------- | ------------------------------------------------------------------ |
+| TypeScript | `npx tsc --noEmit`                                | 0 type errors (strict mode)                                        |
+| Build      | `npm run build`                                   | Production build succeeds (31 routes)                              |
+| Canonical  | `node --test __tests__/ingest/canonical.test.mjs` | 11/11 tests pass — the MO§ES Υ invariant (18436.98) + scoring math |
 
 These are non-negotiable. If any gate fails, the PR will not be merged.
 
@@ -185,6 +185,7 @@ triages what and how to handle findings.
 
 Branch protection is configured in GitHub UI (Settings → Branches), not in
 code. The recommended rules for `main`:
+
 - Require CI (build job) to pass before merge.
 - Require CodeQL to pass.
 - Require dependency-audit to pass.

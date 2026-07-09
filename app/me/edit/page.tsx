@@ -1,10 +1,13 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { getSessionOperator } from '@/lib/supabase/auth-server'
-import { getSupabaseServer } from '@/lib/supabase/server'
-import { ProfileEditForm, type ProfileInitial } from '@/components/auth/ProfileEditForm'
-import { withOG } from '@/lib/seo'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSupabaseServer } from "@/lib/supabase/server";
+import {
+  ProfileEditForm,
+  type ProfileInitial,
+} from "@/components/auth/ProfileEditForm";
+import { withOG } from "@/lib/seo";
 
 /**
  * app/me/edit/page.tsx — the editable profile surface (AUTH_LAUNCH_DIRECTIVES D6:
@@ -12,56 +15,61 @@ import { withOG } from '@/lib/seo'
  * row; writes go through POST /api/v1/profile. force-dynamic so it always reads the
  * live session + current values.
  */
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = withOG({
-  title: 'Edit profile',
-  description: 'Set up your SigRank operator profile — display name, handle, links, and more.',
-  path: '/me/edit',
-})
+  title: "Edit profile",
+  description:
+    "Set up your SigRank operator profile — display name, handle, links, and more.",
+  path: "/me/edit",
+});
 
 const EMPTY: ProfileInitial = {
-  display_name: '',
-  handle: '',
-  location: '',
-  bio: '',
+  display_name: "",
+  handle: "",
+  location: "",
+  bio: "",
   links: {},
   operator_domains: [],
-  avatar_url: '',
-}
+  avatar_url: "",
+};
 
 export default async function EditProfilePage() {
-  const op = await getSessionOperator()
-  if (!op) redirect('/login?next=/me/edit')
+  const op = await getSessionOperator();
+  if (!op) redirect("/login?next=/me/edit");
 
   // Prefill from the operator row (service-role read, scoped to the owner).
-  let initial = EMPTY
-  const svc = getSupabaseServer()
+  let initial = EMPTY;
+  const svc = getSupabaseServer();
   if (svc) {
     const { data } = await svc
-      .from('operators')
-      .select('display_name, handle, location, bio, links, operator_domains, avatar_url')
-      .eq('operator_id', op.operatorId)
-      .maybeSingle()
+      .from("operators")
+      .select(
+        "display_name, handle, location, bio, links, operator_domains, avatar_url",
+      )
+      .eq("operator_id", op.operatorId)
+      .maybeSingle();
     const d = data as {
-      display_name: string | null
-      handle: string | null
-      location: string | null
-      bio: string | null
-      links: { github?: string; site?: string; x?: string } | null
-      operator_domains: string[] | null
-      avatar_url: string | null
-    } | null
+      display_name: string | null;
+      handle: string | null;
+      location: string | null;
+      bio: string | null;
+      links: { github?: string; site?: string; x?: string } | null;
+      operator_domains: string[] | null;
+      avatar_url: string | null;
+    } | null;
     if (d) {
       initial = {
-        display_name: d.display_name ?? '',
-        handle: d.handle ?? '',
-        location: d.location ?? '',
-        bio: d.bio ?? '',
-        links: d.links && typeof d.links === 'object' ? d.links : {},
-        operator_domains: Array.isArray(d.operator_domains) ? d.operator_domains : [],
-        avatar_url: d.avatar_url ?? '',
-      }
+        display_name: d.display_name ?? "",
+        handle: d.handle ?? "",
+        location: d.location ?? "",
+        bio: d.bio ?? "",
+        links: d.links && typeof d.links === "object" ? d.links : {},
+        operator_domains: Array.isArray(d.operator_domains)
+          ? d.operator_domains
+          : [],
+        avatar_url: d.avatar_url ?? "",
+      };
     }
   }
 
@@ -73,20 +81,23 @@ export default async function EditProfilePage() {
         </h1>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Fill in as much or as little as you want — nothing here is required.
-          Everything you add is public on your profile and board row. Your sign-in
-          email is never shown.
+          Everything you add is public on your profile and board row. Your
+          sign-in email is never shown.
         </p>
       </header>
 
       <ProfileEditForm initial={initial} />
 
       <p className="font-sans text-[11px] leading-relaxed text-text-dim">
-        Your permanent codename and rank stay as they are.{' '}
-        <Link href="/me" className="text-text-muted underline hover:text-text-secondary">
+        Your permanent codename and rank stay as they are.{" "}
+        <Link
+          href="/me"
+          className="text-text-muted underline hover:text-text-secondary"
+        >
           Back to my profile
         </Link>
         .
       </p>
     </div>
-  )
+  );
 }

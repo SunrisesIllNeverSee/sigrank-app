@@ -24,40 +24,41 @@
  * + LEAD sign-off. Merging this code does NOT enable writes.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { validateSnapshot } from '@/lib/payload/schema'
-import { runIngestGates, type GateContext } from '@/lib/ingest/gates'
-import { runBattery } from '@/lib/ingest/battery'
-import { checkAndStoreAttestation } from '@/lib/ingest/attestation'
-import { getSupabaseService } from '@/lib/supabase/server'
+import { NextResponse, type NextRequest } from "next/server";
+import { validateSnapshot } from "@/lib/payload/schema";
+import { runIngestGates, type GateContext } from "@/lib/ingest/gates";
+import { runBattery } from "@/lib/ingest/battery";
+import { checkAndStoreAttestation } from "@/lib/ingest/attestation";
+import { getSupabaseService } from "@/lib/supabase/server";
 import {
   materializeVerifiedSnapshot,
   insertSubmissionOnly,
   revalidateTouchedWindows,
   type MaterializeResult,
-} from '@/lib/ingest/materialize'
-import { captureServer } from '@/lib/posthog/server'
+} from "@/lib/ingest/materialize";
+import { captureServer } from "@/lib/posthog/server";
 
-const SCORING_ETA_SECONDS = 30
+const SCORING_ETA_SECONDS = 30;
 
 /** Persist stays OFF until this is set in prod — the verify-before-write flip (§0.8/§7). */
-const PERSIST_ENABLED = process.env.SIGRANK_INGEST_WRITE === '1'
+const PERSIST_ENABLED = process.env.SIGRANK_INGEST_WRITE === "1";
 
 /** Throttle window: count a device's submissions in the trailing 60s (cap = GATE_LIMITS). */
-const THROTTLE_WINDOW_MS = 60_000
+const THROTTLE_WINDOW_MS = 60_000;
 
 interface ResolvedDeviceRow {
-  device_id: string
-  operator_id: string
-  agent_public_key: string
-  trust_status: string
-  codename: string | null
+  device_id: string;
+  operator_id: string;
+  agent_public_key: string;
+  trust_status: string;
+  codename: string | null;
 }
 
 /** Normalize a supabase to-one embed (object) vs to-many (array) to the codename. */
 function embeddedCodename(operators: unknown): string | null {
-  if (Array.isArray(operators)) return (operators[0] as { codename?: string })?.codename ?? null
-  return (operators as { codename?: string } | null)?.codename ?? null
+  if (Array.isArray(operators))
+    return (operators[0] as { codename?: string })?.codename ?? null;
+  return (operators as { codename?: string } | null)?.codename ?? null;
 }
 
 /**
@@ -66,73 +67,87 @@ function embeddedCodename(operators: unknown): string | null {
  * payloads reproduce identical ids. API-response handles only — never DB keys.
  */
 function deterministicId(prefix: string, ...parts: string[]): string {
-  let h = 0
-  const s = parts.join('|')
+  let h = 0;
+  const s = parts.join("|");
   for (let i = 0; i < s.length; i++) {
-    h = (h * 31 + s.charCodeAt(i)) | 0
+    h = (h * 31 + s.charCodeAt(i)) | 0;
   }
-  return `${prefix}_${(h >>> 0).toString(16).padStart(8, '0')}`
+  return `${prefix}_${(h >>> 0).toString(16).padStart(8, "0")}`;
 }
 
 export async function POST(req: NextRequest) {
   // Body must be JSON.
-  let raw: unknown
+  let raw: unknown;
   try {
-    raw = await req.json()
+    raw = await req.json();
   } catch {
     return NextResponse.json(
-      { status: 'rejected', reason: 'schema_invalid', detail: 'Body is not valid JSON.' },
+      {
+        status: "rejected",
+        reason: "schema_invalid",
+        detail: "Body is not valid JSON.",
+      },
       { status: 400 },
-    )
+    );
   }
 
   // 1. Schema validation.
-  const result = validateSnapshot(raw)
+  const result = validateSnapshot(raw);
   if (!result.ok) {
     return NextResponse.json(
-      { status: 'rejected', reason: result.reason, detail: result.detail },
+      { status: "rejected", reason: result.reason, detail: result.detail },
       { status: 400 },
-    )
+    );
   }
-  const payload = result.data
+  const payload = result.data;
 
   // 2. Require the signature header to be present (presence ≠ verification — step 3 verifies).
-  const signature = req.headers.get('x-agent-signature')
+  const signature = req.headers.get("x-agent-signature");
   if (!signature) {
     return NextResponse.json(
-      { status: 'rejected', reason: 'signature_invalid', detail: 'Missing X-Agent-Signature header.' },
+      {
+        status: "rejected",
+        reason: "signature_invalid",
+        detail: "Missing X-Agent-Signature header.",
+      },
       { status: 401 },
-    )
+    );
   }
 
   // 3. Pre-fetch the live gate state (async) so the SYNC gate callbacks read in-memory
   // values: the enrolled device (+ its operator codename), exact-hash dedup, and the
   // device's trailing-window submission count for throttle.
-  const svc = getSupabaseService()
-  let device: ResolvedDeviceRow | null = null
-  let dupHash = false
-  let recentCount = 0
+  const svc = getSupabaseService();
+  let device: ResolvedDeviceRow | null = null;
+  let dupHash = false;
+  let recentCount = 0;
   if (svc) {
-    const sinceIso = new Date(Date.now() - THROTTLE_WINDOW_MS).toISOString()
+    const sinceIso = new Date(Date.now() - THROTTLE_WINDOW_MS).toISOString();
     const [devRes, dupRes, throttleRes] = await Promise.all([
       svc
-        .from('devices')
-        .select('device_id, operator_id, agent_public_key, trust_status, operators:operator_id(codename)')
-        .eq('device_id', payload.device_id)
+        .from("devices")
+        .select(
+          "device_id, operator_id, agent_public_key, trust_status, operators:operator_id(codename)",
+        )
+        .eq("device_id", payload.device_id)
         .maybeSingle(),
       svc
-        .from('snapshot_submissions')
-        .select('submission_id', { count: 'exact', head: true })
-        .eq('snapshot_hash', payload.agent.snapshot_hash),
+        .from("snapshot_submissions")
+        .select("submission_id", { count: "exact", head: true })
+        .eq("snapshot_hash", payload.agent.snapshot_hash),
       svc
-        .from('snapshot_submissions')
-        .select('submission_id', { count: 'exact', head: true })
-        .eq('device_id', payload.device_id)
-        .gte('submitted_at', sinceIso),
-    ])
-    const d = devRes.data as
-      | { device_id: string; operator_id: string; agent_public_key: string; trust_status: string; operators: unknown }
-      | null
+        .from("snapshot_submissions")
+        .select("submission_id", { count: "exact", head: true })
+        .eq("device_id", payload.device_id)
+        .gte("submitted_at", sinceIso),
+    ]);
+    const d = devRes.data as {
+      device_id: string;
+      operator_id: string;
+      agent_public_key: string;
+      trust_status: string;
+      operators: unknown;
+    } | null;
     if (d) {
       device = {
         device_id: d.device_id,
@@ -140,17 +155,17 @@ export async function POST(req: NextRequest) {
         agent_public_key: d.agent_public_key,
         trust_status: d.trust_status,
         codename: embeddedCodename(d.operators),
-      }
+      };
     }
-    dupHash = (dupRes.count ?? 0) > 0
-    recentCount = throttleRes.count ?? 0
+    dupHash = (dupRes.count ?? 0) > 0;
+    recentCount = throttleRes.count ?? 0;
   }
 
   const ctx: GateContext = {
     signatureB64: signature,
     // Only a TRUSTED enrolled device yields a key (§5.3); revoked/unenrolled → null → unverified.
     lookupDeviceKey: (id) =>
-      device && device.device_id === id && device.trust_status === 'trusted'
+      device && device.device_id === id && device.trust_status === "trusted"
         ? device.agent_public_key
         : null,
     // Exact-hash dedup ONLY. isReplay is deliberately unwired → live-upload (§0.4):
@@ -160,46 +175,54 @@ export async function POST(req: NextRequest) {
     // Gate 5 battery — proprietary anomaly detection (Benford / cadence / contamination).
     // Server-only plug-in; never shipped to the public repo or open agent.
     battery: runBattery,
-  }
+  };
 
   // 4. Ingest integrity gates (anti-gaming). First reject wins.
-  const gate = runIngestGates(payload, ctx)
-  if (gate.decision === 'reject') {
-    const top = gate.reasons.find((r) => r.severity === 'reject')
+  const gate = runIngestGates(payload, ctx);
+  if (gate.decision === "reject") {
+    const top = gate.reasons.find((r) => r.severity === "reject");
     return NextResponse.json(
       {
-        status: 'rejected',
-        reason: top?.code ?? 'gate_rejected',
-        detail: top?.detail ?? 'failed an ingest integrity gate',
-        gate: { decision: gate.decision, tier: gate.tier, reasons: gate.reasons },
+        status: "rejected",
+        reason: top?.code ?? "gate_rejected",
+        detail: top?.detail ?? "failed an ingest integrity gate",
+        gate: {
+          decision: gate.decision,
+          tier: gate.tier,
+          reasons: gate.reasons,
+        },
       },
       { status: 422 },
-    )
+    );
   }
 
   // 4b. Source attestation cross-check (S1.3, v1.1 payloads only). If the payload
   // includes source_attestation, cross-check it against historical attestations
   // from this device and store the new entries. Tampering flags upgrade the gate
   // decision from 'accept' to 'flag' (the submission is accepted-but-unverified).
-  if (payload.source_attestation && payload.source_attestation.length > 0 && svc) {
+  if (
+    payload.source_attestation &&
+    payload.source_attestation.length > 0 &&
+    svc
+  ) {
     const attestation = await checkAndStoreAttestation(
       payload,
       payload.device_id,
       device?.operator_id ?? null,
-    )
+    );
     if (attestation.flags.length > 0) {
-      gate.reasons.push(...attestation.flags)
+      gate.reasons.push(...attestation.flags);
       // Upgrade the decision to 'flag' if it was 'accept' — attestation tampering
       // means the submission is not trusted enough to materialize onto the board.
-      if (gate.decision === 'accept') {
-        gate.decision = 'flag'
-        if (gate.tier === 'verified') gate.tier = 'flagged'
+      if (gate.decision === "accept") {
+        gate.decision = "flag";
+        if (gate.tier === "verified") gate.tier = "flagged";
       }
     }
   }
 
   // 5. Persist (env-gated; ENROLLED devices only — operator resolved FROM THE DEVICE, §5.4).
-  let persisted = false
+  let persisted = false;
   if (PERSIST_ENABLED && svc && device) {
     // Sanity guard (§5.4): a codename disagreeing with the device's bound operator is
     // rejected — the operator is authoritative from the device; a mismatch signals
@@ -209,83 +232,106 @@ export async function POST(req: NextRequest) {
     if (device.codename == null) {
       return NextResponse.json(
         {
-          status: 'rejected',
-          reason: 'device_codename_not_bound',
-          detail: 'this device has no codename bound — complete enrollment first',
+          status: "rejected",
+          reason: "device_codename_not_bound",
+          detail:
+            "this device has no codename bound — complete enrollment first",
         },
         { status: 422 },
-      )
+      );
     }
     if (device.codename !== payload.codename) {
       return NextResponse.json(
         {
-          status: 'rejected',
-          reason: 'codename_device_mismatch',
-          detail: 'payload codename does not match the codename bound to this device',
+          status: "rejected",
+          reason: "codename_device_mismatch",
+          detail:
+            "payload codename does not match the codename bound to this device",
         },
         { status: 422 },
-      )
+      );
     }
 
-    const resolved = { device_id: device.device_id, operator_id: device.operator_id }
-    let res: MaterializeResult
-    if (gate.decision === 'accept' && gate.tier === 'verified') {
-      res = await materializeVerifiedSnapshot(payload, signature, resolved, gate)
-      if (res.ok) revalidateTouchedWindows(payload.window.type)
+    const resolved = {
+      device_id: device.device_id,
+      operator_id: device.operator_id,
+    };
+    let res: MaterializeResult;
+    if (gate.decision === "accept" && gate.tier === "verified") {
+      res = await materializeVerifiedSnapshot(
+        payload,
+        signature,
+        resolved,
+        gate,
+      );
+      if (res.ok) revalidateTouchedWindows(payload.window.type);
     } else {
       // accepted-but-unverified / flagged (e.g. revoked device, or a plausibility flag): audit only.
-      res = await insertSubmissionOnly(payload, signature, resolved, gate)
+      res = await insertSubmissionOnly(payload, signature, resolved, gate);
     }
 
     if (!res.ok) {
-      if (res.reason === 'duplicate_snapshot') {
+      if (res.reason === "duplicate_snapshot") {
         return NextResponse.json(
-          { status: 'rejected', reason: 'duplicate_snapshot', detail: res.detail },
+          {
+            status: "rejected",
+            reason: "duplicate_snapshot",
+            detail: res.detail,
+          },
           { status: 422 },
-        )
+        );
       }
-      if (res.reason === 'persistence_unavailable') {
-        return NextResponse.json({ status: 'persistence_unavailable', detail: res.detail }, { status: 503 })
+      if (res.reason === "persistence_unavailable") {
+        return NextResponse.json(
+          { status: "persistence_unavailable", detail: res.detail },
+          { status: 503 },
+        );
       }
-      return NextResponse.json({ status: 'persist_failed', detail: res.detail }, { status: 500 })
+      return NextResponse.json(
+        { status: "persist_failed", detail: res.detail },
+        { status: 500 },
+      );
     }
-    persisted = true
+    persisted = true;
   }
 
   // Response: real operator_id when the device is known; deterministic handles otherwise.
-  const operatorId = device?.operator_id ?? deterministicId('op', payload.codename.toLowerCase())
+  const operatorId =
+    device?.operator_id ??
+    deterministicId("op", payload.codename.toLowerCase());
   const submissionId = deterministicId(
-    'sub',
+    "sub",
     payload.device_id,
     payload.window.type,
     payload.window.start,
     payload.agent.snapshot_hash,
-  )
+  );
 
   // snapshot_submitted — activation/core event, recorded server-side from the signed
   // agent request. Booleans/enums only; no token values. `persisted` says whether it
   // actually reached the board (vs accepted-but-unverified / write flag off).
-  await captureServer(payload.codename, 'snapshot_submitted', {
-    source: 'agent',
+  await captureServer(payload.codename, "snapshot_submitted", {
+    source: "agent",
     window_type: payload.window.type,
     platform: payload.platform.primary,
     verification_tier: gate.tier,
     persisted,
     has_cascade:
-      payload.raw_telemetry.tokens_cache_creation > 0 && payload.raw_telemetry.tokens_cache_read > 0,
-  })
+      payload.raw_telemetry.tokens_cache_creation > 0 &&
+      payload.raw_telemetry.tokens_cache_read > 0,
+  });
 
   return NextResponse.json(
     {
-      status: 'received',
+      status: "received",
       submission_id: submissionId,
       operator_id: operatorId,
       verification_tier: gate.tier,
       gate_decision: gate.decision,
       persisted,
-      flags: gate.reasons.filter((r) => r.severity !== 'reject'),
+      flags: gate.reasons.filter((r) => r.severity !== "reject"),
       scoring_eta_seconds: SCORING_ETA_SECONDS,
     },
     { status: 202 },
-  )
+  );
 }

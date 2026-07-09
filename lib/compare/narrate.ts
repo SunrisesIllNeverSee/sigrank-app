@@ -14,57 +14,63 @@
  */
 
 export interface RegimeInput {
-  velocity: number
-  leverage: number
-  nonCompounding?: boolean
+  velocity: number;
+  leverage: number;
+  nonCompounding?: boolean;
 }
 
-export type RegimeKey = 'stateless' | 'kinetic' | 'archival' | 'volatile' | 'transient'
+export type RegimeKey =
+  "stateless" | "kinetic" | "archival" | "volatile" | "transient";
 
 export interface Regime {
-  key: RegimeKey
-  word: string // short label for a chip / verdict
-  blurb: string // one terse sentence
+  key: RegimeKey;
+  word: string; // short label for a chip / verdict
+  blurb: string; // one terse sentence
 }
 
 // TODO(CMP-2): OPERATOR_OVERRIDE_REQUIRED — proprietary regime breakpoints.
-const T = { vHigh: 1, lHigh: 100, lMid: 10, vMid: 0.8, lLow: 2 }
+const T = { vHigh: 1, lHigh: 100, lMid: 10, vMid: 0.8, lLow: 2 };
 
 /** Classify a cascade into its operating regime (narrate.py `_template` parity). */
 export function regimeOf(m: RegimeInput): Regime {
-  const v = m.velocity ?? 0
-  const l = m.leverage ?? 0
+  const v = m.velocity ?? 0;
+  const l = m.leverage ?? 0;
   if (m.nonCompounding) {
     return {
-      key: 'stateless',
-      word: 'stateless pipe',
-      blurb: "No cache commits — the cascade can't form. Reuse without building forward.",
-    }
+      key: "stateless",
+      word: "stateless pipe",
+      blurb:
+        "No cache commits — the cascade can't form. Reuse without building forward.",
+    };
   }
   if (v >= T.vHigh && l >= T.lHigh) {
     return {
-      key: 'kinetic',
-      word: 'closed kinetic loop',
-      blurb: "Holds both axes at once — high generation AND deep memory leverage. The rare operator the tradeoff says shouldn't exist.",
-    }
+      key: "kinetic",
+      word: "closed kinetic loop",
+      blurb:
+        "Holds both axes at once — high generation AND deep memory leverage. The rare operator the tradeoff says shouldn't exist.",
+    };
   }
   if (l >= T.lMid && v < T.vHigh) {
     return {
-      key: 'archival',
-      word: 'archival sponge',
-      blurb: 'Deep reuse, light generation — holds context beautifully, executes little with it.',
-    }
+      key: "archival",
+      word: "archival sponge",
+      blurb:
+        "Deep reuse, light generation — holds context beautifully, executes little with it.",
+    };
   }
   if (v >= T.vMid && l < T.lLow) {
     return {
-      key: 'volatile',
-      word: 'volatile ingestor',
-      blurb: "Fast on single shots, resets between turns — memory doesn't persist into a compounding loop.",
-    }
+      key: "volatile",
+      word: "volatile ingestor",
+      blurb:
+        "Fast on single shots, resets between turns — memory doesn't persist into a compounding loop.",
+    };
   }
   return {
-    key: 'transient',
-    word: 'transient',
-    blurb: 'Low on both axes — neither building state nor converting input to output efficiently.',
-  }
+    key: "transient",
+    word: "transient",
+    blurb:
+      "Low on both axes — neither building state nor converting input to output efficiently.",
+  };
 }

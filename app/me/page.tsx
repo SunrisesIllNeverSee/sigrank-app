@@ -1,7 +1,7 @@
-import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
-import { getSessionOperator } from '@/lib/supabase/auth-server'
-import { withOG } from '@/lib/seo'
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { withOG } from "@/lib/seo";
 
 /**
  * app/me/page.tsx — "My Profile" resolver.
@@ -15,18 +15,18 @@ import { withOG } from '@/lib/seo'
  */
 // Auth-dependent redirect — must read the live session cookie on every request, never
 // be prerendered (a static prerender would bake the logged-out → /login branch).
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = withOG({
-  title: 'My Profile',
-  description: 'Your SigRank operator profile.',
-  path: '/me',
-})
+  title: "My Profile",
+  description: "Your SigRank operator profile.",
+  path: "/me",
+});
 
 export default async function MyProfilePage() {
-  const op = await getSessionOperator()
-  if (!op) redirect('/login?next=/me')
+  const op = await getSessionOperator();
+  if (!op) redirect("/login?next=/me");
   // A freshly-claimed operator with no codename yet → finish the profile fill-out.
-  if (!op.codename) redirect('/me/edit')
-  redirect(`/user/${encodeURIComponent(op.codename)}`)
+  if (!op.codename) redirect("/me/edit");
+  redirect(`/user/${encodeURIComponent(op.codename)}`);
 }

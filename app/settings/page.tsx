@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { SignOutButton } from '@/components/auth/SignOutButton'
-import { getSessionOperator } from '@/lib/supabase/auth-server'
-import { ConnectDevicePanel } from '@/components/settings/ConnectDevicePanel'
-import { DangerZone } from '@/components/settings/DangerZone'
-import { withOG } from '@/lib/seo'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { SignOutButton } from "@/components/auth/SignOutButton";
+import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { ConnectDevicePanel } from "@/components/settings/ConnectDevicePanel";
+import { DangerZone } from "@/components/settings/DangerZone";
+import { withOG } from "@/lib/seo";
 
 /**
  * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
@@ -15,22 +15,22 @@ import { withOG } from '@/lib/seo'
  * appearance, and privacy info. force-dynamic so it reads the live session (this is a
  * single authed page in the middleware matcher — the board is never affected).
  */
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = withOG({
-  title: 'Settings',
-  description: 'Manage your SigRank operator account and appearance.',
-  path: '/settings',
-})
+  title: "Settings",
+  description: "Manage your SigRank operator account and appearance.",
+  path: "/settings",
+});
 
 function Section({
   title,
   desc,
   children,
 }: {
-  title: string
-  desc?: string
-  children: React.ReactNode
+  title: string;
+  desc?: string;
+  children: React.ReactNode;
 }) {
   return (
     <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
@@ -42,14 +42,14 @@ function Section({
       </div>
       {children}
     </section>
-  )
+  );
 }
 
 const rowLink =
-  'shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary'
+  "shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary";
 
 export default async function SettingsPage() {
-  const op = await getSessionOperator()
+  const op = await getSessionOperator();
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 py-6">
@@ -59,8 +59,8 @@ export default async function SettingsPage() {
         </h1>
         <p className="font-sans text-sm text-text-secondary">
           {op
-            ? 'Manage your account and appearance. Edit your public profile from your profile page.'
-            : 'Appearance works now. Account controls unlock when you sign in.'}
+            ? "Manage your account and appearance. Edit your public profile from your profile page."
+            : "Appearance works now. Account controls unlock when you sign in."}
         </p>
       </header>
 
@@ -73,7 +73,9 @@ export default async function SettingsPage() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-4 rounded-md border border-bg-border bg-bg-base/40 px-3 py-2.5">
               <div className="flex min-w-0 flex-col">
-                <span className="font-mono text-xs text-text-secondary">Signed in</span>
+                <span className="font-mono text-xs text-text-secondary">
+                  Signed in
+                </span>
                 {op.email && (
                   <span
                     className="truncate font-mono text-[11px] text-text-primary"
@@ -82,13 +84,18 @@ export default async function SettingsPage() {
                     {op.email} <span className="text-text-dim">· private</span>
                   </span>
                 )}
-                <span className="font-mono text-[11px] text-text-dim">{op.codename}</span>
+                <span className="font-mono text-[11px] text-text-dim">
+                  {op.codename}
+                </span>
               </div>
               <div className="flex gap-2">
                 <Link href="/me/edit" className={rowLink}>
                   Edit profile
                 </Link>
-                <Link href={`/user/${encodeURIComponent(op.codename)}`} className={rowLink}>
+                <Link
+                  href={`/user/${encodeURIComponent(op.codename)}`}
+                  className={rowLink}
+                >
                   View profile
                 </Link>
               </div>
@@ -98,7 +105,9 @@ export default async function SettingsPage() {
         ) : (
           <div className="flex items-center justify-between gap-4 rounded-md border border-dashed border-bg-border bg-bg-base/40 px-3 py-2.5">
             <div className="flex flex-col">
-              <span className="font-mono text-xs text-text-secondary">Sign in to manage your account</span>
+              <span className="font-mono text-xs text-text-secondary">
+                Sign in to manage your account
+              </span>
               <span className="font-sans text-[11px] text-text-dim">
                 Claim your profile, set your handle, and edit your details.
               </span>
@@ -127,9 +136,12 @@ export default async function SettingsPage() {
         desc="SigRank only ever stores token counts — never conversation content."
       >
         <p className="font-sans text-[11px] leading-relaxed text-text-dim">
-          The free tier reads token counts, model ids, and content lengths locally. No
-          transcripts leave your device. See{' '}
-          <Link href="/about" className="text-text-muted underline hover:text-text-secondary">
+          The free tier reads token counts, model ids, and content lengths
+          locally. No transcripts leave your device. See{" "}
+          <Link
+            href="/about"
+            className="text-text-muted underline hover:text-text-secondary"
+          >
             how it works
           </Link>
           .
@@ -147,5 +159,5 @@ export default async function SettingsPage() {
 
       {op && <DangerZone codename={op.codename} />}
     </div>
-  )
+  );
 }

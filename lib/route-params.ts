@@ -16,8 +16,8 @@
  */
 export function decodeCodename(raw: string): string {
   try {
-    return decodeURIComponent(raw)
+    return decodeURIComponent(raw);
   } catch {
-    return raw
+    return raw;
   }
 }

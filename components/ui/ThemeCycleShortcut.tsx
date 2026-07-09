@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { getCurrentTheme, nextTheme, applyTheme } from '@/lib/theme'
+import { useEffect } from "react";
+import { getCurrentTheme, nextTheme, applyTheme } from "@/lib/theme";
 
 /**
  * ThemeCycleShortcut — global Shift+T listener that cycles through the four
@@ -16,18 +16,24 @@ import { getCurrentTheme, nextTheme, applyTheme } from '@/lib/theme'
 export function ThemeCycleShortcut() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key !== 'T' && e.key !== 't') return
+      if (e.key !== "T" && e.key !== "t") return;
       // Require Shift, forbid any other modifier (Cmd/Ctrl/Alt/Meta).
-      if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return
-      const el = e.target as HTMLElement | null
-      const tag = el?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return
-      e.preventDefault()
-      applyTheme(nextTheme(getCurrentTheme()))
+      if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement | null;
+      const tag = el?.tagName;
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el?.isContentEditable
+      )
+        return;
+      e.preventDefault();
+      applyTheme(nextTheme(getCurrentTheme()));
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
-  return null
+  return null;
 }

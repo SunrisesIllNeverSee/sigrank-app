@@ -1,10 +1,10 @@
-import React from 'react'
+import React from "react";
 
 interface Props {
   /** The placeholder value to display. */
-  value: React.ReactNode
+  value: React.ReactNode;
   /** Tooltip text explaining why this value is a placeholder. */
-  title?: string
+  title?: string;
 }
 
 /**
@@ -12,11 +12,14 @@ interface Props {
  * indicating the number is not yet a real, verified value. The optional title
  * surfaces as a native tooltip on hover.
  */
-export function Placeholder({ value, title = 'Placeholder — not a verified value' }: Props) {
+export function Placeholder({
+  value,
+  title = "Placeholder — not a verified value",
+}: Props) {
   return (
     <span title={title}>
       {value}
       <span className="ph">★</span>
     </span>
-  )
+  );
 }

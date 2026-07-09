@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/leaderboard/WindowSelector.tsx
@@ -12,30 +12,30 @@
  * (WINDOW_API_MAP); a visible TODO note surfaces that fallback near the board.
  */
 
-import { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { WINDOW_UI, WINDOW_DEFAULT, type WindowUI } from '@/lib/constants'
+import { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { WINDOW_UI, WINDOW_DEFAULT, type WindowUI } from "@/lib/constants";
 
 interface Props {
   /** Currently-selected window label (resolved by the page from searchParams). */
-  value: WindowUI
+  value: WindowUI;
 }
 
 export function WindowSelector({ value }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const select = useCallback(
     (next: WindowUI) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (next === WINDOW_DEFAULT) params.delete('window')
-      else params.set('window', next)
-      const qs = params.toString()
-      router.push(qs ? `${pathname}?${qs}` : pathname)
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === WINDOW_DEFAULT) params.delete("window");
+      else params.set("window", next);
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     },
     [router, pathname, searchParams],
-  )
+  );
 
   return (
     <div className="flex flex-col gap-1">
@@ -48,7 +48,7 @@ export function WindowSelector({ value }: Props) {
         className="inline-flex overflow-hidden rounded-md border border-bg-border"
       >
         {WINDOW_UI.map((label) => {
-          const active = label === value
+          const active = label === value;
           return (
             <button
               key={label}
@@ -56,17 +56,17 @@ export function WindowSelector({ value }: Props) {
               aria-pressed={active}
               onClick={() => select(label)}
               className={
-                'px-3 py-1.5 font-mono text-xs transition-colors ' +
+                "px-3 py-1.5 font-mono text-xs transition-colors " +
                 (active
-                  ? 'bg-text-accent/15 text-text-accent'
-                  : 'bg-bg-surface text-text-secondary hover:bg-bg-hover hover:text-text-primary')
+                  ? "bg-text-accent/15 text-text-accent"
+                  : "bg-bg-surface text-text-secondary hover:bg-bg-hover hover:text-text-primary")
               }
             >
               {label}
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

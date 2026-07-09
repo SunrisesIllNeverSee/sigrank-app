@@ -14,38 +14,41 @@
  */
 
 function envBool(key: string, defaultVal = false): boolean {
-  const v = process.env[key]
-  if (v === undefined || v === '') return defaultVal
-  return v === '1' || v.toLowerCase() === 'true'
+  const v = process.env[key];
+  if (v === undefined || v === "") return defaultVal;
+  return v === "1" || v.toLowerCase() === "true";
 }
 
 // ---------------------------------------------------------------------------
 // SHIPPED — live for all users
 // ---------------------------------------------------------------------------
 
-export const FEAT_SUBMIT_PASTE   = true  // ccusage JSON paste on /submit
-export const FEAT_TRANSMITTERS   = true  // /transmitters discovery page
-export const FEAT_CASCADE_PANEL  = true  // Υ cascade panel on operator profiles
-export const FEAT_COMPARE_TABLE  = true  // /compare metric table + radar
+export const FEAT_SUBMIT_PASTE = true; // ccusage JSON paste on /submit
+export const FEAT_TRANSMITTERS = true; // /transmitters discovery page
+export const FEAT_CASCADE_PANEL = true; // Υ cascade panel on operator profiles
+export const FEAT_COMPARE_TABLE = true; // /compare metric table + radar
 
 // ---------------------------------------------------------------------------
 // GATED — built, not yet live
 // ---------------------------------------------------------------------------
 
 /** /arena — signal-Areana challenge submission interface (Phase 4) */
-export const GATE_ARENA = envBool('NEXT_PUBLIC_GATE_ARENA', false)
+export const GATE_ARENA = envBool("NEXT_PUBLIC_GATE_ARENA", false);
 
 /** Throw-down initiation from /transmitters + /compare (depends on GATE_ARENA) */
-export const GATE_CHALLENGES = envBool('NEXT_PUBLIC_GATE_CHALLENGES', false)
+export const GATE_CHALLENGES = envBool("NEXT_PUBLIC_GATE_CHALLENGES", false);
 
 /** Weekly signal drop (cron + signal_prompts seeder) */
-export const GATE_SIGNAL_DROP = envBool('NEXT_PUBLIC_GATE_SIGNAL_DROP', false)
+export const GATE_SIGNAL_DROP = envBool("NEXT_PUBLIC_GATE_SIGNAL_DROP", false);
 
 /** Blind bracket / Circle Wars */
-export const GATE_BRACKETS = envBool('NEXT_PUBLIC_GATE_BRACKETS', false)
+export const GATE_BRACKETS = envBool("NEXT_PUBLIC_GATE_BRACKETS", false);
 
 /** Species badge on trading card / wrapped view */
-export const GATE_TRADING_CARD_SPECIES = envBool('NEXT_PUBLIC_GATE_TRADING_CARD_SPECIES', false)
+export const GATE_TRADING_CARD_SPECIES = envBool(
+  "NEXT_PUBLIC_GATE_TRADING_CARD_SPECIES",
+  false,
+);
 
 // ---------------------------------------------------------------------------
 // Helpers for UI components
@@ -53,5 +56,5 @@ export const GATE_TRADING_CARD_SPECIES = envBool('NEXT_PUBLIC_GATE_TRADING_CARD_
 
 /** Returns true if challenge features (arena + throw-down) are live. */
 export function challengesEnabled(): boolean {
-  return GATE_CHALLENGES && GATE_ARENA
+  return GATE_CHALLENGES && GATE_ARENA;
 }

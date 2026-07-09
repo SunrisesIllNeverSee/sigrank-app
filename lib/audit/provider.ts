@@ -8,14 +8,14 @@
  * touching feature code. This is a leaf "stub-now, finalize-later" seam.
  */
 
-import { MockAuditProvider } from '@/lib/audit/mock'
+import { MockAuditProvider } from "@/lib/audit/mock";
 
 /** A single Pro metric read result. `finalized:false` => still a placeholder. */
 export interface ProMetricResult {
   /** The metric value, or null when not yet computed for this operator. */
-  value: number | null
+  value: number | null;
   /** True only when a real precision-tier engine has finalized this value. */
-  finalized: boolean
+  finalized: boolean;
 }
 
 /**
@@ -25,19 +25,19 @@ export interface ProMetricResult {
  */
 export interface AuditProvider {
   /** E.02 Drift Ratio, [0,100] — precision tier only. Null when uncomputed. */
-  getDriftRatio(operatorId: string): Promise<number | null>
+  getDriftRatio(operatorId: string): Promise<number | null>;
   /** M.01 refined (precision) compression ratio, [0,1]. Null when uncomputed. */
-  getRefinedCompression(operatorId: string): Promise<number | null>
+  getRefinedCompression(operatorId: string): Promise<number | null>;
   /** M.02 exact Prompt Complexity (confidence always 'exact'). Null when uncomputed. */
   getExactPromptComplexity(
     operatorId: string,
-  ): Promise<{ value: number; confidence: 'exact' } | null>
+  ): Promise<{ value: number; confidence: "exact" } | null>;
   /**
    * Generic Pro metric read by key — the extension point for not-yet-finalized
    * Pro metrics that have no dedicated method yet. Returns a finalized flag so
    * the UI can render a "Coming to Pro · not finalized" slot.
    */
-  getProMetric(key: string, operatorId: string): Promise<ProMetricResult>
+  getProMetric(key: string, operatorId: string): Promise<ProMetricResult>;
 }
 
 /**
@@ -45,11 +45,11 @@ export interface AuditProvider {
  * provider is wired (e.g. via a server bootstrap). Kept module-local so the
  * factory can swap implementations without callers changing.
  */
-let injected: AuditProvider | null = null
+let injected: AuditProvider | null = null;
 
 /** Wire a real AuditProvider (called once at server bootstrap when available). */
 export function setAuditProvider(provider: AuditProvider | null): void {
-  injected = provider
+  injected = provider;
 }
 
 /**
@@ -60,6 +60,6 @@ export function setAuditProvider(provider: AuditProvider | null): void {
  * from this module (`import type`), so there is no runtime initialization cycle.
  */
 export function getAuditProvider(): AuditProvider {
-  if (injected) return injected
-  return new MockAuditProvider()
+  if (injected) return injected;
+  return new MockAuditProvider();
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/leaderboard/FilterBar.tsx
@@ -13,44 +13,44 @@
  * The default sort key (SORT_DEFAULT = 'yield_') drops the param.
  */
 
-import { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   SORT_METRICS,
   SORT_DEFAULT,
   type PlatformUI,
   type WindowUI,
-} from '@/lib/constants'
-import { PlatformSelector } from './PlatformSelector'
-import { WindowSelector } from './WindowSelector'
-import { ClassFilter } from './ClassFilter'
+} from "@/lib/constants";
+import { PlatformSelector } from "./PlatformSelector";
+import { WindowSelector } from "./WindowSelector";
+import { ClassFilter } from "./ClassFilter";
 
 interface Props {
   /** Resolved platform label (from searchParams). */
-  platform: PlatformUI
+  platform: PlatformUI;
   /** Resolved window label (from searchParams). */
-  window: WindowUI
+  window: WindowUI;
   /** Resolved lowercase class scope id (from searchParams). */
-  classScope: string
+  classScope: string;
   /** Resolved sort key (a metric_snapshots column; from searchParams). */
-  sort: string
+  sort: string;
 }
 
 export function FilterBar({ platform, window, classScope, sort }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const onSort = useCallback(
     (next: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (next === SORT_DEFAULT) params.delete('sort')
-      else params.set('sort', next)
-      const qs = params.toString()
-      router.push(qs ? `${pathname}?${qs}` : pathname)
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === SORT_DEFAULT) params.delete("sort");
+      else params.set("sort", next);
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     },
     [router, pathname, searchParams],
-  )
+  );
 
   return (
     <div className="flex flex-wrap items-end gap-4 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
@@ -75,5 +75,5 @@ export function FilterBar({ platform, window, classScope, sort }: Props) {
         </select>
       </label>
     </div>
-  )
+  );
 }

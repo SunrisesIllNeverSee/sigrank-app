@@ -11,46 +11,46 @@
  *
  * Run: node --test __tests__/data/the-field-board-exclusion.test.mjs
  */
-import { test } from 'node:test'
-import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
-const root = process.cwd()
-const read = (p) => readFileSync(join(root, p), 'utf8')
+const root = process.cwd();
+const read = (p) => readFileSync(join(root, p), "utf8");
 
-const FIELD_OPERATOR_ID = 'f1e1d000-0000-4000-8000-000000000001'
+const FIELD_OPERATOR_ID = "f1e1d000-0000-4000-8000-000000000001";
 
-test('The Field is KEPT on the ranked board (live path — queries.ts)', () => {
-  const src = read('lib/data/queries.ts')
+test("The Field is KEPT on the ranked board (live path — queries.ts)", () => {
+  const src = read("lib/data/queries.ts");
   // The Field constant may exist for other uses, but there should be NO
   // filter that excludes it from snapRows.
   assert.ok(
-    !src.includes('s.operator_id !== FIELD_OPERATOR_ID'),
-    'queries.ts must NOT filter The Field from snapRows (owner wants it on the board)',
-  )
-})
+    !src.includes("s.operator_id !== FIELD_OPERATOR_ID"),
+    "queries.ts must NOT filter The Field from snapRows (owner wants it on the board)",
+  );
+});
 
-test('The Field is KEPT on the ranked board (fallback path — fallback.ts)', () => {
-  const src = read('lib/data/fallback.ts')
+test("The Field is KEPT on the ranked board (fallback path — fallback.ts)", () => {
+  const src = read("lib/data/fallback.ts");
   assert.ok(
     !src.includes("r.operator.operator_id !== 'f1e1d000"),
-    'fallback.ts must NOT filter The Field from the mock/cold-store board',
-  )
-})
+    "fallback.ts must NOT filter The Field from the mock/cold-store board",
+  );
+});
 
-test('The Field exists in snapshot.json (confirming it ships in the cold store)', () => {
-  const src = read('lib/data/snapshot.json')
+test("The Field exists in snapshot.json (confirming it ships in the cold store)", () => {
+  const src = read("lib/data/snapshot.json");
   assert.ok(
     src.includes(FIELD_OPERATOR_ID),
-    'snapshot.json contains The Field — it ships as the average-baseline reference',
-  )
-})
+    "snapshot.json contains The Field — it ships as the average-baseline reference",
+  );
+});
 
-test('/compare uses The Field as the default opponent B (baseline)', () => {
-  const src = read('app/compare/page.tsx')
+test("/compare uses The Field as the default opponent B (baseline)", () => {
+  const src = read("app/compare/page.tsx");
   assert.ok(
     src.includes("'the-field'"),
-    '/compare page uses the-field as the default compare baseline',
-  )
-})
+    "/compare page uses the-field as the default compare baseline",
+  );
+});

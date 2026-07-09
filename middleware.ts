@@ -1,5 +1,5 @@
-import { type NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
 /**
  * Root middleware — refreshes the Supabase auth session cookie.
@@ -14,36 +14,37 @@ import { createServerClient } from '@supabase/ssr'
  * `/me` + `/settings` pages via getSessionOperator() (getUser-verified).
  */
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request })
+  let response = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   // No creds → nothing to refresh; let the request through unchanged.
-  if (!url || !anonKey) return response
+  if (!url || !anonKey) return response;
 
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll() {
-        return request.cookies.getAll()
+        return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        for (const { name, value } of cookiesToSet) request.cookies.set(name, value)
-        response = NextResponse.next({ request })
+        for (const { name, value } of cookiesToSet)
+          request.cookies.set(name, value);
+        response = NextResponse.next({ request });
         for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options)
+          response.cookies.set(name, value, options);
         }
       },
     },
-  })
+  });
 
   // getUser() validates + refreshes the session. Nothing must run between client
   // creation and this call (@supabase/ssr requirement).
-  await supabase.auth.getUser()
+  await supabase.auth.getUser();
 
-  return response
+  return response;
 }
 
 export const config = {
   // SCOPED: only the authenticated surfaces. Board/API/public routes stay anon.
-  matcher: ['/me/:path*', '/settings/:path*'],
-}
+  matcher: ["/me/:path*", "/settings/:path*"],
+};

@@ -15,119 +15,127 @@
  * REPORTS below + the report's compute function.
  */
 
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { getLeaderboard } from '@/lib/data'
-import { toEntry } from '@/lib/leaderboard/to-entry'
-import { withOG } from '@/lib/seo'
-import { WaveHero } from '@/components/ui/WaveHero'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { sigrankDataset, researchArticle, breadcrumb } from '@/lib/jsonld'
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getLeaderboard } from "@/lib/data";
+import { toEntry } from "@/lib/leaderboard/to-entry";
+import { withOG } from "@/lib/seo";
+import { WaveHero } from "@/components/ui/WaveHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { sigrankDataset, researchArticle, breadcrumb } from "@/lib/jsonld";
 
 /** ── Report registry ─────────────────────────────────────────────────── */
 interface ReportMeta {
-  slug: string
-  title: string
-  description: string
-  datePublished: string
-  quarter: string
+  slug: string;
+  title: string;
+  description: string;
+  datePublished: string;
+  quarter: string;
 }
 
 const REPORTS: ReportMeta[] = [
   {
-    slug: 'q1-2026',
-    title: 'State of AI Operator Token Efficiency — Q1 2026',
+    slug: "q1-2026",
+    title: "State of AI Operator Token Efficiency — Q1 2026",
     description:
-      'The inaugural SigRank Index report. Median vs. top-decile yield gaps, platform leadership, cache utilization, and the efficiency frontier.',
-    datePublished: '2026-06-30',
-    quarter: 'Q1 2026',
+      "The inaugural SigRank Index report. Median vs. top-decile yield gaps, platform leadership, cache utilization, and the efficiency frontier.",
+    datePublished: "2026-06-30",
+    quarter: "Q1 2026",
   },
-]
+];
 
 export function generateStaticParams() {
-  return REPORTS.map((r) => ({ slug: r.slug }))
+  return REPORTS.map((r) => ({ slug: r.slug }));
 }
 
 export function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   return (async () => {
-    const { slug } = await params
-    const report = REPORTS.find((r) => r.slug === slug)
-    if (!report) return { title: 'Not Found' }
+    const { slug } = await params;
+    const report = REPORTS.find((r) => r.slug === slug);
+    if (!report) return { title: "Not Found" };
     return withOG({
       title: report.title,
       description: report.description,
       path: `/research/${report.slug}`,
-    })
-  })()
+    });
+  })();
 }
 
 // ISR: revalidate every 30 minutes so figures stay current within the quarter.
-export const revalidate = 1800
+export const revalidate = 1800;
 
 /** Format yield for display. */
 function fmtY(y: number): string {
-  if (y >= 1_000_000) return `${(y / 1_000_000).toFixed(2)}M`
-  if (y >= 1_000) return `${(y / 1_000).toFixed(1)}K`
-  return Math.round(y).toLocaleString('en-US')
+  if (y >= 1_000_000) return `${(y / 1_000_000).toFixed(2)}M`;
+  if (y >= 1_000) return `${(y / 1_000).toFixed(1)}K`;
+  return Math.round(y).toLocaleString("en-US");
 }
 
 /** Compute report stats from the all-time leaderboard. */
 function computeStats(entries: ReturnType<typeof toEntry>[]) {
-  const ranked = entries.filter((e) => e.yield_ !== null && e.yield_ !== undefined)
-  const yields = ranked.map((e) => e.yield_!).sort((a, b) => a - b)
+  const ranked = entries.filter(
+    (e) => e.yield_ !== null && e.yield_ !== undefined,
+  );
+  const yields = ranked.map((e) => e.yield_!).sort((a, b) => a - b);
 
-  const n = yields.length
-  const topYield = n > 0 ? yields[n - 1] : 0
-  const medianY = n > 0
-    ? n % 2 === 0
-      ? (yields[n / 2 - 1] + yields[n / 2]) / 2
-      : yields[Math.floor(n / 2)]
-    : 0
-  const topDecile = n > 0 ? yields[Math.floor(n * 0.9)] : 0
-  const bottomDecile = n > 0 ? yields[Math.floor(n * 0.1)] : 0
+  const n = yields.length;
+  const topYield = n > 0 ? yields[n - 1] : 0;
+  const medianY =
+    n > 0
+      ? n % 2 === 0
+        ? (yields[n / 2 - 1] + yields[n / 2]) / 2
+        : yields[Math.floor(n / 2)]
+      : 0;
+  const topDecile = n > 0 ? yields[Math.floor(n * 0.9)] : 0;
+  const bottomDecile = n > 0 ? yields[Math.floor(n * 0.1)] : 0;
 
   // Efficiency gap: top vs median (how many times better)
-  const gap = medianY > 0 ? topYield / medianY : 0
+  const gap = medianY > 0 ? topYield / medianY : 0;
 
   // Waste: how much lower is the median vs the top decile (as %)
-  const wastePct = topDecile > 0 ? Math.round((1 - medianY / topDecile) * 100) : 0
+  const wastePct =
+    topDecile > 0 ? Math.round((1 - medianY / topDecile) * 100) : 0;
 
   // Per-platform breakdown
-  const platformMap = new Map<string, { yields: number[]; count: number }>()
+  const platformMap = new Map<string, { yields: number[]; count: number }>();
   for (const e of ranked) {
-    const p = e.platform ?? 'other'
-    const entry = platformMap.get(p) ?? { yields: [], count: 0 }
-    entry.yields.push(e.yield_!)
-    entry.count++
-    platformMap.set(p, entry)
+    const p = e.platform ?? "other";
+    const entry = platformMap.get(p) ?? { yields: [], count: 0 };
+    entry.yields.push(e.yield_!);
+    entry.count++;
+    platformMap.set(p, entry);
   }
 
   const platformStats = Array.from(platformMap.entries())
     .map(([platform, { yields: ys, count }]) => {
-      const avg = ys.reduce((s, y) => s + y, 0) / ys.length
-      return { platform, avgYield: avg, count }
+      const avg = ys.reduce((s, y) => s + y, 0) / ys.length;
+      return { platform, avgYield: avg, count };
     })
-    .sort((a, b) => b.avgYield - a.avgYield)
+    .sort((a, b) => b.avgYield - a.avgYield);
 
-  const topPlatform = platformStats[0] ?? null
-  const otherPlatformsAvg = platformStats.length > 1
-    ? platformStats.slice(1).reduce((s, p) => s + p.avgYield, 0) / (platformStats.length - 1)
-    : 0
+  const topPlatform = platformStats[0] ?? null;
+  const otherPlatformsAvg =
+    platformStats.length > 1
+      ? platformStats.slice(1).reduce((s, p) => s + p.avgYield, 0) /
+        (platformStats.length - 1)
+      : 0;
 
   // Cache utilization
-  const avgSnr = ranked.length > 0
-    ? ranked.reduce((s, e) => s + (e.snr ?? 0), 0) / ranked.length
-    : 0
-  const cachePct = Math.round(avgSnr * 100)
+  const avgSnr =
+    ranked.length > 0
+      ? ranked.reduce((s, e) => s + (e.snr ?? 0), 0) / ranked.length
+      : 0;
+  const cachePct = Math.round(avgSnr * 100);
 
   // Top operator
-  const topEntry = ranked.length > 0
-    ? ranked.reduce((best, e) => (e.yield_! > best.yield_! ? e : best))
-    : null
+  const topEntry =
+    ranked.length > 0
+      ? ranked.reduce((best, e) => (e.yield_! > best.yield_! ? e : best))
+      : null;
 
   return {
     n,
@@ -143,37 +151,37 @@ function computeStats(entries: ReturnType<typeof toEntry>[]) {
     cachePct,
     topEntry,
     operatorCount: entries.length,
-  }
+  };
 }
 
 export default async function ResearchReportPage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params
-  const report = REPORTS.find((r) => r.slug === slug)
-  if (!report) notFound()
+  const { slug } = await params;
+  const report = REPORTS.find((r) => r.slug === slug);
+  if (!report) notFound();
 
   // Fetch all-time data for real stats
-  const rows = await getLeaderboard({ window: 'all_time', windowFilter: true })
-  const entries = rows.map(toEntry)
-  const s = computeStats(entries)
+  const rows = await getLeaderboard({ window: "all_time", windowFilter: true });
+  const entries = rows.map(toEntry);
+  const s = computeStats(entries);
 
-  const monthYear = new Date(report.datePublished).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  })
+  const monthYear = new Date(report.datePublished).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   // Build headline findings (quotable, standalone sentences)
   const headlineFindings: string[] = [
     `The median AI operator scores Υ ${fmtY(s.medianY)}, ${s.wastePct}% below the top decile (Υ ${fmtY(s.topDecile)}).`,
-    `The top-ranked operator (${s.topEntry?.anonId ?? '—'}) achieves Υ ${fmtY(s.topYield)}, ${s.gap.toFixed(1)}× the median.`,
+    `The top-ranked operator (${s.topEntry?.anonId ?? "—"}) achieves Υ ${fmtY(s.topYield)}, ${s.gap.toFixed(1)}× the median.`,
     s.topPlatform
       ? `${s.topPlatform.platform} operators lead on yield, averaging Υ ${fmtY(s.topPlatform.avgYield)} vs. Υ ${fmtY(s.otherPlatformsAvg)} elsewhere.`
-      : 'Platform breakdown unavailable.',
+      : "Platform breakdown unavailable.",
     `Across all ranked operators, ${s.cachePct}% of input tokens are served from cache on average.`,
-  ]
+  ];
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
@@ -188,7 +196,7 @@ export default async function ResearchReportPage({
             headlineFindings,
           }),
           breadcrumb([
-            { name: 'Research', path: '/research' },
+            { name: "Research", path: "/research" },
             { name: report.quarter, path: `/research/${report.slug}` },
           ]),
         ]}
@@ -201,7 +209,7 @@ export default async function ResearchReportPage({
         subtitle={
           <>
             State of AI Operator Token Efficiency. Computed from live operator
-            telemetry — {s.operatorCount} operators, {s.platformStats.length}{' '}
+            telemetry — {s.operatorCount} operators, {s.platformStats.length}{" "}
             platforms.
           </>
         }
@@ -219,7 +227,7 @@ export default async function ResearchReportPage({
                 {i + 1}.
               </span>
               <span>
-                {finding}{' '}
+                {finding}{" "}
                 <span className="text-sm text-text-muted">({monthYear})</span>
               </span>
             </li>
@@ -278,10 +286,10 @@ export default async function ResearchReportPage({
         </h2>
         <p className="text-base text-text-secondary">
           Figures are computed from the SigRank Index — a privacy-preserving
-          leaderboard ranking AI operators by token-cascade efficiency (Υ ={' '}
+          leaderboard ranking AI operators by token-cascade efficiency (Υ ={" "}
           cache_read × output / input²). Data is built from on-device,
           ed25519-signed token-telemetry snapshots. No message content is ever
-          read or stored. Full methodology at{' '}
+          read or stored. Full methodology at{" "}
           <a
             href="/methodology"
             className="text-gold underline underline-offset-2"
@@ -299,8 +307,8 @@ export default async function ResearchReportPage({
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
           <p className="font-mono text-sm text-text-secondary">
-            &ldquo;According to the SigRank Index ({report.quarter}),{' '}
-            {headlineFindings[0].replace(/\.$/, '')}.&rdquo;
+            &ldquo;According to the SigRank Index ({report.quarter}),{" "}
+            {headlineFindings[0].replace(/\.$/, "")}.&rdquo;
           </p>
           <p className="mt-2 font-mono text-xs text-text-muted">
             signalaf.com/research/{report.slug}
@@ -314,7 +322,7 @@ export default async function ResearchReportPage({
           License
         </h2>
         <p className="text-base text-text-secondary">
-          This report is licensed under{' '}
+          This report is licensed under{" "}
           <a
             href="https://creativecommons.org/licenses/by/4.0/"
             className="text-gold underline underline-offset-2"
@@ -326,5 +334,5 @@ export default async function ResearchReportPage({
         </p>
       </section>
     </div>
-  )
+  );
 }

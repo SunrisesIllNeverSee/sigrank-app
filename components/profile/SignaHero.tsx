@@ -9,39 +9,39 @@
  * SIGNA RATE itself is the real C.01 value for MO§ES.
  */
 
-import { CanonId } from '@/components/ui/CanonId'
-import { Placeholder } from '@/components/ui/Placeholder'
-import { CLASS_NAME_TO_ID, CLASS_TIERS } from '@/lib/canon/ids'
-import type { SignalClass } from '@/components/sigrank/types'
+import { CanonId } from "@/components/ui/CanonId";
+import { Placeholder } from "@/components/ui/Placeholder";
+import { CLASS_NAME_TO_ID, CLASS_TIERS } from "@/lib/canon/ids";
+import type { SignalClass } from "@/components/sigrank/types";
 
 interface Props {
   /** C.01 SIGNA RATE [0,100]. */
-  signaRate: number
+  signaRate: number;
   /** K.xx class assignment. */
-  classTier: SignalClass
+  classTier: SignalClass;
   /** Global rank for the "Rank #N Global" line. */
-  globalRank: number
+  globalRank: number;
   /** 24h rank movement (positive = climbed). */
-  movement24h: number
+  movement24h: number;
   /** 7d rank movement (positive = climbed). */
-  movement7d: number
+  movement7d: number;
   /** Whether the underlying snapshot is a placeholder (mock) row. */
-  isPlaceholder?: boolean
+  isPlaceholder?: boolean;
 }
 
 function MovementChip({ delta, label }: { delta: number; label: string }) {
-  const up = delta >= 0
-  const arrow = up ? '↑' : '↓'
-  const sign = up ? '+' : ''
+  const up = delta >= 0;
+  const arrow = up ? "↑" : "↓";
+  const sign = up ? "+" : "";
   return (
     <span className="font-mono text-[13px] font-medium text-text-secondary">
-      <span className={up ? 'text-class-seeker' : 'text-class-refiner'}>
+      <span className={up ? "text-class-seeker" : "text-class-refiner"}>
         {arrow} {sign}
         {delta}
-      </span>{' '}
+      </span>{" "}
       · {label}
     </span>
-  )
+  );
 }
 
 export function SignaHero({
@@ -52,9 +52,9 @@ export function SignaHero({
   movement7d,
   isPlaceholder = false,
 }: Props) {
-  const classId = CLASS_NAME_TO_ID[classTier]
-  const glyph = CLASS_TIERS[classId]?.glyph ?? '◈'
-  const signaDisplay = signaRate.toFixed(1)
+  const classId = CLASS_NAME_TO_ID[classTier];
+  const glyph = CLASS_TIERS[classId]?.glyph ?? "◈";
+  const signaDisplay = signaRate.toFixed(1);
 
   return (
     <div className="relative z-[1]">
@@ -84,9 +84,12 @@ export function SignaHero({
         <MovementChip delta={movement24h} label="24h" />
         <MovementChip delta={movement7d} label="7d" />
         <span className="font-mono text-[13px] font-medium text-text-secondary">
-          <Placeholder value="38-day streak" title="Placeholder · streak not yet computed" />
+          <Placeholder
+            value="38-day streak"
+            title="Placeholder · streak not yet computed"
+          />
         </span>
       </div>
     </div>
-  )
+  );
 }

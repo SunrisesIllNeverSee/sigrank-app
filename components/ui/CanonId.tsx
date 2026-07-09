@@ -1,10 +1,10 @@
 interface Props {
   /** The canonical id to render as a superscript (e.g. "RS.07"). */
-  id: string
+  id: string;
   /** When true, the id refers to a real/verified value and renders green. */
-  real?: boolean
+  real?: boolean;
   /** Optional tooltip text shown on hover. */
-  title?: string
+  title?: string;
 }
 
 /**
@@ -15,5 +15,5 @@ interface Props {
 // marker (the green "verified" tags) — no longer needed. Render nothing, so every call
 // site site-wide stops showing them without touching each one. Props kept for back-compat.
 export function CanonId(_props: Props) {
-  return null
+  return null;
 }

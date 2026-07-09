@@ -27,7 +27,7 @@
  * stays the same.
  */
 
-import { unstable_cache } from 'next/cache'
+import { unstable_cache } from "next/cache";
 
 import {
   getLeaderboard as _getLeaderboard,
@@ -42,7 +42,7 @@ import {
   getOnlineWeekly as _getOnlineWeekly,
   getOnlineByCountry as _getOnlineByCountry,
   getOperatorReport as _getOperatorReport,
-} from '@/lib/data/queries'
+} from "@/lib/data/queries";
 
 import type {
   LeaderboardRow,
@@ -53,85 +53,83 @@ import type {
   WeeklyPoint,
   CountryCount,
   HistoryPoint,
-} from '@/lib/data/types'
-import type { BoardParams, HistoryParams } from '@/lib/data/mappers'
-import type { OperatorSubmission, OperatorReport } from '@/lib/data/queries'
+} from "@/lib/data/types";
+import type { BoardParams, HistoryParams } from "@/lib/data/mappers";
+import type { OperatorSubmission, OperatorReport } from "@/lib/data/queries";
 
 // ── Board-tagged reads (revalidate: 300s) ────────────────────────────────
 
-export const getLeaderboard = unstable_cache(
-  _getLeaderboard,
-  ['leaderboard'],
-  { revalidate: 300, tags: ['board'] },
-)
+export const getLeaderboard = unstable_cache(_getLeaderboard, ["leaderboard"], {
+  revalidate: 300,
+  tags: ["board"],
+});
 
 export const getHallOfSignal = unstable_cache(
   _getHallOfSignal,
-  ['hall-of-signal'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["hall-of-signal"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 export const getClassDistribution = unstable_cache(
   _getClassDistribution,
-  ['class-distribution'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["class-distribution"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 export const getMetricLeaders = unstable_cache(
   _getMetricLeaders,
-  ['metric-leaders'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["metric-leaders"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 export const getHomepageStats = unstable_cache(
   _getHomepageStats,
-  ['homepage-stats'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["homepage-stats"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 export const getOnlineHourly = unstable_cache(
   _getOnlineHourly,
-  ['online-hourly'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["online-hourly"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 export const getOnlineWeekly = unstable_cache(
   _getOnlineWeekly,
-  ['online-weekly'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["online-weekly"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 export const getOnlineByCountry = unstable_cache(
   _getOnlineByCountry,
-  ['online-by-country'],
-  { revalidate: 300, tags: ['board'] },
-)
+  ["online-by-country"],
+  { revalidate: 300, tags: ["board"] },
+);
 
 // ── Operator-tagged reads (revalidate: 120s) ─────────────────────────────
 
-export const getOperator = unstable_cache(
-  _getOperator,
-  ['operator'],
-  { revalidate: 120, tags: ['operator'] },
-)
+export const getOperator = unstable_cache(_getOperator, ["operator"], {
+  revalidate: 120,
+  tags: ["operator"],
+});
 
 export const getOperatorSubmissions = unstable_cache(
   _getOperatorSubmissions,
-  ['operator-submissions'],
-  { revalidate: 120, tags: ['operator'] },
-)
+  ["operator-submissions"],
+  { revalidate: 120, tags: ["operator"] },
+);
 
 export const getOperatorHistory = unstable_cache(
   _getOperatorHistory,
-  ['operator-history'],
-  { revalidate: 120, tags: ['operator'] },
-)
+  ["operator-history"],
+  { revalidate: 120, tags: ["operator"] },
+);
 
 export const getOperatorReport = unstable_cache(
   _getOperatorReport,
-  ['operator-report'],
-  { revalidate: 120, tags: ['operator'] },
-)
+  ["operator-report"],
+  { revalidate: 120, tags: ["operator"] },
+);
 
 // ── Re-export types so consumers importing from @/lib/data still see them ──
 export type {
@@ -143,7 +141,7 @@ export type {
   WeeklyPoint,
   CountryCount,
   HistoryPoint,
-}
-export type { BoardParams, HistoryParams }
-export type { OperatorSubmission }
-export type { OperatorReport }
+};
+export type { BoardParams, HistoryParams };
+export type { OperatorSubmission };
+export type { OperatorReport };
