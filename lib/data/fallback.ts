@@ -11,11 +11,11 @@
  * queries ← index (barrel). Consumers still import via `@/lib/data`.
  */
 
-import { SORT_DEFAULT } from '@/lib/constants'
-import { filterToWindow } from '@/lib/data/windows'
-import coldStore from '@/lib/data/snapshot.json'
-import { MOCK_LEADERBOARD } from '@/lib/data/mock'
-import type { LeaderboardRow } from '@/lib/data/types'
+import { SORT_DEFAULT } from "@/lib/constants";
+import { filterToWindow } from "@/lib/data/windows";
+import coldStore from "@/lib/data/snapshot.json";
+import { MOCK_LEADERBOARD } from "@/lib/data/mock";
+import type { LeaderboardRow } from "@/lib/data/types";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -24,7 +24,7 @@ import {
   mapOperator,
   mapSnapshot,
   telemetryFromSnapshot,
-} from '@/lib/data/mappers'
+} from "@/lib/data/mappers";
 
 /**
  * Cold-store fallback base (owner 2026-06-20). The build-time snapshot.json is a
@@ -43,23 +43,23 @@ const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
     // mappers read; mapOperator/mapSnapshot coalesce the rest with ?? null), so
     // cast through unknown — the mappers are the contract, not the JSON's literal type.
     const store = coldStore as unknown as {
-      operators?: DbOperator[]
-      metric_snapshots?: DbMetricSnapshot[]
-    }
-    const ops = store.operators ?? []
-    const snaps = store.metric_snapshots ?? []
-    if (!ops.length || !snaps.length) return []
-    const opById = new Map(ops.map((o) => [o.operator_id, o]))
+      operators?: DbOperator[];
+      metric_snapshots?: DbMetricSnapshot[];
+    };
+    const ops = store.operators ?? [];
+    const snaps = store.metric_snapshots ?? [];
+    if (!ops.length || !snaps.length) return [];
+    const opById = new Map(ops.map((o) => [o.operator_id, o]));
     // Deduplicate: same as latestPerOperator on the live path — one row per
     // operator_id (first encountered, which is the most-recent after DB ordering).
     // Without this, a snapshot.json with both '30d' + 'all_time' rows per operator
     // produces duplicate leaderboard entries. (Bug: COLD_STORE_ROWS was iterating
     // all snaps blindly; latestPerOperator was only called on the live DB path.)
-    const latestSnap = latestPerOperator(snaps)
-    const rows: LeaderboardRow[] = []
+    const latestSnap = latestPerOperator(snaps);
+    const rows: LeaderboardRow[] = [];
     for (const [, snap] of latestSnap) {
-      const op = opById.get(snap.operator_id)
-      if (!op) continue
+      const op = opById.get(snap.operator_id);
+      if (!op) continue;
       rows.push({
         operator: mapOperator(op),
         snapshot: mapSnapshot(snap),
@@ -69,44 +69,49 @@ const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
         window_type: snap.window_type ?? null,
         platform: snap.platform ?? op.primary_domain ?? null,
         snapshot_date: snap.snapshot_date ?? null,
-      })
+      });
     }
-    return rows
+    return rows;
   } catch {
-    return []
+    return [];
   }
-})()
+})();
 
 /** The fallback base: cold-store snapshot if we have one, else the mock seeds. */
 export function fallbackRows(): LeaderboardRow[] {
-  return COLD_STORE_ROWS.length > 0 ? COLD_STORE_ROWS : MOCK_LEADERBOARD
+  return COLD_STORE_ROWS.length > 0 ? COLD_STORE_ROWS : MOCK_LEADERBOARD;
 }
 
 export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
-  let rows = [...fallbackRows()]
+  let rows = [...fallbackRows()];
   // 730: narrow to the window ONLY when the caller opts in (the /board route);
   // legacy callers keep the full field. Mirrors the live path's windowFilter gate.
-  if (params.windowFilter && params.window) rows = filterToWindow(rows, params.window)
-  if (params.platform && params.platform !== 'all') {
+  if (params.windowFilter && params.window)
+    rows = filterToWindow(rows, params.window);
+  if (params.platform && params.platform !== "all") {
     rows = rows.filter(
-      (r) => r.operator.primary_domain.toLowerCase() === params.platform!.toLowerCase(),
-    )
+      (r) =>
+        r.operator.primary_domain.toLowerCase() ===
+        params.platform!.toLowerCase(),
+    );
   }
-  if (params.classScope && params.classScope !== 'all') {
+  if (params.classScope && params.classScope !== "all") {
     rows = rows.filter(
-      (r) => r.snapshot.class_tier.toLowerCase() === params.classScope!.toLowerCase(),
-    )
+      (r) =>
+        r.snapshot.class_tier.toLowerCase() ===
+        params.classScope!.toLowerCase(),
+    );
   }
-  const sort = params.sort ?? SORT_DEFAULT
-  rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort))
+  const sort = params.sort ?? SORT_DEFAULT;
+  rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
   // Re-rank within the filtered/sorted view for stable display ranks.
-  rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }))
-  if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit)
-  return rows
+  rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
+  if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
+  return rows;
 }
 
 /** Pull a numeric sort value from a row for a given sort key.
  * Extracted to lib/data/sort-value.ts so client components can import it
  * without pulling in 60KB of mock data + cold store. */
-import { sortValue } from '@/lib/data/sort-value'
-export { sortValue }
+import { sortValue } from "@/lib/data/sort-value";
+export { sortValue };

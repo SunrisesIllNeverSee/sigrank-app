@@ -1,5 +1,5 @@
-import React from 'react'
-import { Draft2ActionTiles } from '@/components/draft/Draft2ActionTiles'
+import React from "react";
+import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
 
 /**
  * Draft2CtaBand — the closing conversion band for /draft2.
@@ -27,5 +27,5 @@ export function Draft2CtaBand() {
           (owner 2026-06-22: "flash fade" on the CTA boxes). */}
       <Draft2ActionTiles className="mt-8" shine />
     </section>
-  )
+  );
 }

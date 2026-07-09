@@ -1,21 +1,21 @@
-import React from 'react'
+import React from "react";
 
 /** Rank tier → metal color token. 1 = gold, 2 = silver, 3 = bronze. */
 const TIER_COLOR: Record<1 | 2 | 3, string> = {
-  1: 'text-rank-1',
-  2: 'text-rank-2',
-  3: 'text-rank-3',
-}
+  1: "text-rank-1",
+  2: "text-rank-2",
+  3: "text-rank-3",
+};
 
 const TIER_LABEL: Record<1 | 2 | 3, string> = {
-  1: '1st place',
-  2: '2nd place',
-  3: '3rd place',
-}
+  1: "1st place",
+  2: "2nd place",
+  3: "3rd place",
+};
 
 interface Props {
   /** Podium tier — 1 (gold) · 2 (silver) · 3 (bronze). */
-  tier: 1 | 2 | 3
+  tier: 1 | 2 | 3;
 }
 
 /**
@@ -43,5 +43,5 @@ export function Trophy({ tier }: Props) {
       {/* stem + base */}
       <path d="M11 10h2v5h-2v-5Zm-3 7h8v2H8v-2Zm-1 2h10v2H7v-2Z" />
     </svg>
-  )
+  );
 }

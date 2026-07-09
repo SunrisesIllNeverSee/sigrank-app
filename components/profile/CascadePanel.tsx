@@ -21,35 +21,38 @@
  *   Baseline          — everything else
  */
 
-import { CanonId } from '@/components/ui/CanonId'
-import type { CascadeMetrics } from '@/lib/ingest/bridge'
+import { CanonId } from "@/components/ui/CanonId";
+import type { CascadeMetrics } from "@/lib/ingest/bridge";
 
 // ---------------------------------------------------------------------------
 // Species classifier
 // ---------------------------------------------------------------------------
 
 type Species =
-  | 'Cascade Architect'
-  | 'Cache Architect'
-  | 'High Converter'
-  | 'Throughput Engine'
-  | 'Baseline'
+  | "Cascade Architect"
+  | "Cache Architect"
+  | "High Converter"
+  | "Throughput Engine"
+  | "Baseline";
 
 function classifySpecies(c: CascadeMetrics): Species {
-  if (c.yield_ >= 10_000 && c.dev10x !== null && c.dev10x >= 3.0) return 'Cascade Architect'
-  if (c.yield_ >= 1_000 && !c.nonCompounding)                      return 'Cache Architect'
-  if (c.snr >= 0.85)                                                return 'High Converter'
-  if (c.velocity >= 5)                                              return 'Throughput Engine'
-  return 'Baseline'
+  if (c.yield_ >= 10_000 && c.dev10x !== null && c.dev10x >= 3.0)
+    return "Cascade Architect";
+  if (c.yield_ >= 1_000 && !c.nonCompounding) return "Cache Architect";
+  if (c.snr >= 0.85) return "High Converter";
+  if (c.velocity >= 5) return "Throughput Engine";
+  return "Baseline";
 }
 
 const SPECIES_COLORS: Record<Species, string> = {
-  'Cascade Architect': 'text-gold border-gold/40 bg-gold/8',
-  'Cache Architect':   'text-class-transmitter border-class-transmitter/40 bg-class-transmitter/8',
-  'High Converter':    'text-class-arch border-class-arch/40 bg-class-arch/8',
-  'Throughput Engine': 'text-text-accent border-text-accent/40 bg-text-accent/8',
-  'Baseline':          'text-text-muted border-bg-border bg-bg-elevated',
-}
+  "Cascade Architect": "text-gold border-gold/40 bg-gold/8",
+  "Cache Architect":
+    "text-class-transmitter border-class-transmitter/40 bg-class-transmitter/8",
+  "High Converter": "text-class-arch border-class-arch/40 bg-class-arch/8",
+  "Throughput Engine":
+    "text-text-accent border-text-accent/40 bg-text-accent/8",
+  Baseline: "text-text-muted border-bg-border bg-bg-elevated",
+};
 
 // ---------------------------------------------------------------------------
 // Stat row sub-component
@@ -62,16 +65,18 @@ function CascadeStat({
   sub,
   highlighted,
 }: {
-  label: string
-  canonId?: string
-  value: string
-  sub?: string
-  highlighted?: boolean
+  label: string;
+  canonId?: string;
+  value: string;
+  sub?: string;
+  highlighted?: boolean;
 }) {
   return (
     <div
       className={`flex flex-col gap-0.5 rounded-md px-3 py-2.5 ${
-        highlighted ? 'bg-gold/8 border border-gold/20' : 'bg-bg-elevated border border-bg-border'
+        highlighted
+          ? "bg-gold/8 border border-gold/20"
+          : "bg-bg-elevated border border-bg-border"
       }`}
     >
       <div className="flex items-center gap-1">
@@ -82,7 +87,7 @@ function CascadeStat({
       </div>
       <span
         className={`font-mono text-lg font-bold leading-none ${
-          highlighted ? 'text-gold' : 'text-text-primary'
+          highlighted ? "text-gold" : "text-text-primary"
         }`}
       >
         {value}
@@ -91,7 +96,7 @@ function CascadeStat({
         <span className="font-mono text-[10px] text-text-muted">{sub}</span>
       )}
     </div>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -109,16 +114,19 @@ function NonCompoundingState() {
       </div>
       <div className="rounded-md border border-bg-border bg-bg-elevated px-4 py-3">
         <p className="font-mono text-sm text-text-secondary">
-          <span className="font-bold text-text-primary">Non-compounding platform.</span>{' '}
-          Cache telemetry unavailable — Υ (Yield) requires cache_read and cache_create
-          tokens. SIGNA RATE still applies.
+          <span className="font-bold text-text-primary">
+            Non-compounding platform.
+          </span>{" "}
+          Cache telemetry unavailable — Υ (Yield) requires cache_read and
+          cache_create tokens. SIGNA RATE still applies.
         </p>
         <p className="mt-1 font-mono text-xs text-text-muted">
-          Platforms: ChatGPT · Gemini · Perplexity · Grok · Codex (alpha estimation)
+          Platforms: ChatGPT · Gemini · Perplexity · Grok · Codex (alpha
+          estimation)
         </p>
       </div>
     </section>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -126,30 +134,33 @@ function NonCompoundingState() {
 // ---------------------------------------------------------------------------
 
 interface Props {
-  cascade: CascadeMetrics | null
+  cascade: CascadeMetrics | null;
 }
 
 export function CascadePanel({ cascade }: Props) {
   if (!cascade || cascade.nonCompounding) {
-    return <NonCompoundingState />
+    return <NonCompoundingState />;
   }
 
-  const species = classifySpecies(cascade)
-  const speciesColor = SPECIES_COLORS[species]
+  const species = classifySpecies(cascade);
+  const speciesColor = SPECIES_COLORS[species];
 
-  const yieldFmt = cascade.yield_ >= 1_000
-    ? `${(cascade.yield_ / 1_000).toFixed(1)}K`
-    : cascade.yield_.toFixed(1)
+  const yieldFmt =
+    cascade.yield_ >= 1_000
+      ? `${(cascade.yield_ / 1_000).toFixed(1)}K`
+      : cascade.yield_.toFixed(1);
 
-  const velocityFmt = cascade.velocity >= 10
-    ? cascade.velocity.toFixed(1)
-    : cascade.velocity.toFixed(2)
+  const velocityFmt =
+    cascade.velocity >= 10
+      ? cascade.velocity.toFixed(1)
+      : cascade.velocity.toFixed(2);
 
-  const leverageFmt = cascade.leverage >= 1_000
-    ? `${(cascade.leverage / 1_000).toFixed(1)}K`
-    : cascade.leverage.toFixed(1)
+  const leverageFmt =
+    cascade.leverage >= 1_000
+      ? `${(cascade.leverage / 1_000).toFixed(1)}K`
+      : cascade.leverage.toFixed(1);
 
-  const dev10xFmt = cascade.dev10x !== null ? cascade.dev10x.toFixed(2) : '—'
+  const dev10xFmt = cascade.dev10x !== null ? cascade.dev10x.toFixed(2) : "—";
 
   return (
     <section className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-4">
@@ -170,7 +181,7 @@ export function CascadePanel({ cascade }: Props) {
       </div>
 
       {/* Cascade string — the T×C×R decomposition */}
-      {cascade.cascadeStr !== '—' && (
+      {cascade.cascadeStr !== "—" && (
         <div className="rounded-md border border-bg-border bg-bg-elevated px-3 py-2">
           <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
             T × C × R cascade
@@ -218,10 +229,10 @@ export function CascadePanel({ cascade }: Props) {
 
       {/* Context note */}
       <p className="font-sans text-[11px] leading-snug text-text-muted">
-        Cascade metrics are derived from cache token telemetry (Claude Code / API).
-        Υ ≥ 10K with 10xDEV ≥ 3.0 classifies as Cascade Architect.
+        Cascade metrics are derived from cache token telemetry (Claude Code /
+        API). Υ ≥ 10K with 10xDEV ≥ 3.0 classifies as Cascade Architect.
         Non-Claude platforms show this section as non-compounding.
       </p>
     </section>
-  )
+  );
 }

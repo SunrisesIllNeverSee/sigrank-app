@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/api/gate.ts — CORPUS gate (Gate #3) for the public /api/v1 read endpoints.
@@ -26,19 +26,19 @@ import 'server-only'
  * worse outage than the scraping it prevents.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from "next/server";
 
 /** Max entries an unauthenticated caller may read (the public "top N"). */
-export const PUBLIC_TOP_N = 25
+export const PUBLIC_TOP_N = 25;
 
 /** Max entries a valid-API-key caller may read in one request (bulk/full cap). */
-export const API_KEY_CAP = 1000
+export const API_KEY_CAP = 1000;
 
 /** Per-IP request budget for list reads, per RATE_WINDOW_MS. */
-const LIST_RATE_LIMIT = 60
+const LIST_RATE_LIMIT = 60;
 
 /** Fixed-window length for the rate limiter, in milliseconds. */
-const RATE_WINDOW_MS = 60_000
+const RATE_WINDOW_MS = 60_000;
 
 /**
  * Is the request authenticated for bulk/full reads?
@@ -48,18 +48,18 @@ const RATE_WINDOW_MS = 60_000
  * No secret is stored here; the key is read from the environment at call time.
  */
 export function apiKeyValid(req: NextRequest): boolean {
-  const expected = process.env.SIGRANK_API_KEY
-  if (!expected) return false
-  const provided = req.headers.get('x-api-key')
-  return provided != null && provided === expected
+  const expected = process.env.SIGRANK_API_KEY;
+  if (!expected) return false;
+  const provided = req.headers.get("x-api-key");
+  return provided != null && provided === expected;
 }
 
 /** Outcome of the list-size gate. */
 export interface ListGate {
   /** The effective (possibly clamped) limit the caller is allowed to read. */
-  limit: number
+  limit: number;
   /** True when the caller's request was clamped below what they asked for. */
-  gated: boolean
+  gated: boolean;
 }
 
 /**
@@ -72,22 +72,25 @@ export interface ListGate {
  *
  * `requestedLimit` is the caller's already-sanitized limit (finite, >= 1).
  */
-export function enforceListGate(req: NextRequest, requestedLimit: number): ListGate {
+export function enforceListGate(
+  req: NextRequest,
+  requestedLimit: number,
+): ListGate {
   if (apiKeyValid(req)) {
-    return { limit: Math.min(requestedLimit, API_KEY_CAP), gated: false }
+    return { limit: Math.min(requestedLimit, API_KEY_CAP), gated: false };
   }
   return {
     limit: Math.min(requestedLimit, PUBLIC_TOP_N),
     gated: requestedLimit > PUBLIC_TOP_N,
-  }
+  };
 }
 
 /** Outcome of a rate-limit check. */
 export interface RateResult {
   /** False when the caller has exceeded their window budget. */
-  ok: boolean
+  ok: boolean;
   /** Seconds until the current window resets (for the Retry-After header). */
-  retryAfter: number
+  retryAfter: number;
 }
 
 /**
@@ -100,16 +103,16 @@ export interface RateResult {
  * enforcement. Until then this raises the cost of casual bulk scraping without
  * any external dependency.
  */
-const windowCounters = new Map<string, { count: number; resetAt: number }>()
+const windowCounters = new Map<string, { count: number; resetAt: number }>();
 
 /** Best-effort client IP from the proxy chain (first x-forwarded-for hop). */
 function clientIp(req: NextRequest): string {
-  const fwd = req.headers.get('x-forwarded-for')
+  const fwd = req.headers.get("x-forwarded-for");
   if (fwd) {
-    const first = fwd.split(',')[0]?.trim()
-    if (first) return first
+    const first = fwd.split(",")[0]?.trim();
+    if (first) return first;
   }
-  return req.headers.get('x-real-ip')?.trim() || 'unknown'
+  return req.headers.get("x-real-ip")?.trim() || "unknown";
 }
 
 /**
@@ -120,23 +123,26 @@ function clientIp(req: NextRequest): string {
  */
 export function rateLimit(req: NextRequest): RateResult {
   try {
-    const now = Date.now()
-    const ip = clientIp(req)
-    const entry = windowCounters.get(ip)
+    const now = Date.now();
+    const ip = clientIp(req);
+    const entry = windowCounters.get(ip);
 
     if (!entry || now >= entry.resetAt) {
-      windowCounters.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
-      return { ok: true, retryAfter: 0 }
+      windowCounters.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+      return { ok: true, retryAfter: 0 };
     }
 
-    entry.count += 1
+    entry.count += 1;
     if (entry.count > LIST_RATE_LIMIT) {
-      return { ok: false, retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)) }
+      return {
+        ok: false,
+        retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
+      };
     }
-    return { ok: true, retryAfter: 0 }
+    return { ok: true, retryAfter: 0 };
   } catch {
     // Degrade open: a broken limiter must not break reads.
-    return { ok: true, retryAfter: 0 }
+    return { ok: true, retryAfter: 0 };
   }
 }
 
@@ -144,36 +150,37 @@ export function rateLimit(req: NextRequest): RateResult {
 export function rateLimitedResponse(retryAfter: number): NextResponse {
   return NextResponse.json(
     {
-      status: 'rate_limited',
-      detail: 'Too many requests. Slow down and retry after the indicated delay.',
+      status: "rate_limited",
+      detail:
+        "Too many requests. Slow down and retry after the indicated delay.",
       retry_after: retryAfter,
     },
     {
       status: 429,
       headers: {
-        'Retry-After': String(retryAfter),
-        'Cache-Control': 'no-store',
+        "Retry-After": String(retryAfter),
+        "Cache-Control": "no-store",
       },
     },
-  )
+  );
 }
 
 /** Build a 401 (unauthorized) response for endpoints that require an API key. */
 export function unauthorizedResponse(detail: string): NextResponse {
   return NextResponse.json(
-    { status: 'unauthorized', detail },
-    { status: 401, headers: { 'Cache-Control': 'no-store' } },
-  )
+    { status: "unauthorized", detail },
+    { status: 401, headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 /** Best-effort client IP — exported for write endpoints that log created_ip (§4.2). */
 export function getClientIp(req: NextRequest): string {
-  return clientIp(req)
+  return clientIp(req);
 }
 
 /** Per-IP budget + window for the device mint/enroll endpoints (brute-force defense). */
-const ENROLL_RATE_LIMIT = 10
-const ENROLL_WINDOW_MS = 600_000 // 10 minutes
+const ENROLL_RATE_LIMIT = 10;
+const ENROLL_WINDOW_MS = 600_000; // 10 minutes
 
 /**
  * Stricter per-IP fixed-window limit for the device mint-code / enroll endpoints
@@ -183,19 +190,22 @@ const ENROLL_WINDOW_MS = 600_000 // 10 minutes
  */
 export function enrollRateLimit(req: NextRequest): RateResult {
   try {
-    const now = Date.now()
-    const key = `enroll:${clientIp(req)}`
-    const entry = windowCounters.get(key)
+    const now = Date.now();
+    const key = `enroll:${clientIp(req)}`;
+    const entry = windowCounters.get(key);
     if (!entry || now >= entry.resetAt) {
-      windowCounters.set(key, { count: 1, resetAt: now + ENROLL_WINDOW_MS })
-      return { ok: true, retryAfter: 0 }
+      windowCounters.set(key, { count: 1, resetAt: now + ENROLL_WINDOW_MS });
+      return { ok: true, retryAfter: 0 };
     }
-    entry.count += 1
+    entry.count += 1;
     if (entry.count > ENROLL_RATE_LIMIT) {
-      return { ok: false, retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)) }
+      return {
+        ok: false,
+        retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
+      };
     }
-    return { ok: true, retryAfter: 0 }
+    return { ok: true, retryAfter: 0 };
   } catch {
-    return { ok: true, retryAfter: 0 }
+    return { ok: true, retryAfter: 0 };
   }
 }

@@ -13,35 +13,35 @@
 /** The four token pillars extracted from any supported input format. */
 export interface RawPillars {
   /** Fresh input tokens (non-cached). */
-  input: number
+  input: number;
   /** Output tokens (reasoning included). */
-  output: number
+  output: number;
   /** Cache creation tokens. */
-  cacheCreate: number
+  cacheCreate: number;
   /** Cache read tokens. */
-  cacheRead: number
+  cacheRead: number;
 }
 
 /** Source of the parsed data and whether estimation was applied. */
-export type IngestSource = 'ccusage' | 'codex' | 'manual'
+export type IngestSource = "ccusage" | "codex" | "manual";
 
 /** Metadata returned alongside the raw pillars. */
 export interface IngestMeta {
-  source: IngestSource
+  source: IngestSource;
   /** True if any values were estimated (Codex pathway). */
-  estimated: boolean
+  estimated: boolean;
   /** Human-readable caveat to display if estimated is true. */
-  caveat: string | null
+  caveat: string | null;
   /** Parsing mode description (Codex: which pathway was used). */
-  parsingMode: string | null
+  parsingMode: string | null;
   /** Real cost in USD if provided by ccusage, null otherwise. */
-  costUsd: number | null
+  costUsd: number | null;
 }
 
 /** Full result of ingestMeta(). */
 export interface IngestResult {
-  pillars: RawPillars
-  meta: IngestMeta
+  pillars: RawPillars;
+  meta: IngestMeta;
 }
 
 /**
@@ -50,7 +50,7 @@ export interface IngestResult {
  * own Claude io_ratio instead of the AA 2:1 baseline.
  */
 export interface OperatorProfile {
-  modelType: 'claude' | 'other'
+  modelType: "claude" | "other";
   /** claude_input / claude_output ratio from verified Claude sessions. */
-  ioRatio?: number
+  ioRatio?: number;
 }

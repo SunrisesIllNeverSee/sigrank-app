@@ -9,55 +9,55 @@
  * explicitly choose to share their cascade report (mode patterns, badges, DNA).
  */
 
-import { NextResponse } from 'next/server'
-import { getSessionOperator } from '@/lib/supabase/auth-server'
-import { getSupabaseServer } from '@/lib/supabase/server'
+import { NextResponse } from "next/server";
+import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json().catch(() => ({}))
-    const visible = Boolean(body.visible)
+    const body = await request.json().catch(() => ({}));
+    const visible = Boolean(body.visible);
 
     // Auth: the operator must be logged in and linked
-    const sessionOp = await getSessionOperator()
+    const sessionOp = await getSessionOperator();
     if (!sessionOp) {
       return NextResponse.json(
-        { status: 'error', reason: 'unauthorized' },
+        { status: "error", reason: "unauthorized" },
         { status: 401 },
-      )
+      );
     }
 
-    const svc = getSupabaseServer()
+    const svc = getSupabaseServer();
     if (!svc) {
       return NextResponse.json(
-        { status: 'error', reason: 'server_not_configured' },
+        { status: "error", reason: "server_not_configured" },
         { status: 500 },
-      )
+      );
     }
 
     // Update the operator's latest report's visibility
     const { error } = await svc
-      .from('operator_reports')
+      .from("operator_reports")
       .update({ report_visible: visible })
-      .eq('operator_id', sessionOp.operatorId)
-      .order('created_at', { ascending: false })
-      .limit(1)
+      .eq("operator_id", sessionOp.operatorId)
+      .order("created_at", { ascending: false })
+      .limit(1);
 
     if (error) {
       return NextResponse.json(
-        { status: 'error', reason: 'update_failed', detail: error.message },
+        { status: "error", reason: "update_failed", detail: error.message },
         { status: 500 },
-      )
+      );
     }
 
     return NextResponse.json({
-      status: 'ok',
+      status: "ok",
       report_visible: visible,
-    })
+    });
   } catch (e) {
     return NextResponse.json(
-      { status: 'error', reason: 'server_error', detail: String(e) },
+      { status: "error", reason: "server_error", detail: String(e) },
       { status: 500 },
-    )
+    );
   }
 }

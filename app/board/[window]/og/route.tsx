@@ -12,12 +12,11 @@
  * TODO: revisit when Next.js 15 bug is fixed or upgrade to Next.js 16.
  */
 
-export const runtime = 'nodejs'
+export const runtime = "nodejs";
 
 export async function GET() {
   return new Response(null, {
     status: 302,
-    headers: { Location: '/og-v2.png' },
-  })
+    headers: { Location: "/og-v2.png" },
+  });
 }
-

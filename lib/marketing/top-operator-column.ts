@@ -1,4 +1,4 @@
-import { getLeaderboard, type LeaderboardRow } from '@/lib/data'
+import { getLeaderboard, type LeaderboardRow } from "@/lib/data";
 
 /**
  * lib/marketing/top-operator-column.ts — the live "top operator to date" gold column
@@ -16,33 +16,34 @@ import { getLeaderboard, type LeaderboardRow } from '@/lib/data'
 
 /** The seven gold-column display strings, formatted to match the chart's existing style. */
 export interface GoldColumn {
-  yield_: string
-  snr: string
-  velocity: string
-  leverage: string
-  dev10x: string
-  efficiency: string
-  opRatio: string
+  yield_: string;
+  snr: string;
+  velocity: string;
+  leverage: string;
+  dev10x: string;
+  efficiency: string;
+  opRatio: string;
   /** The 10xDEV table read: exponent + linear amplification (10^x). */
-  devLinear: string
+  devLinear: string;
 }
 
 /** Is this a REAL operator (not a staged seed / The Field / a retired-and-anonymized row)? */
 function isRealOperator(row: LeaderboardRow): boolean {
-  const code = row.operator.codename.toLowerCase()
-  if (code === 'the-field') return false
-  if (code.startsWith('static seed') || code.startsWith('app seed')) return false
+  const code = row.operator.codename.toLowerCase();
+  if (code === "the-field") return false;
+  if (code.startsWith("static seed") || code.startsWith("app seed"))
+    return false;
   // Deleted accounts are anonymized to codename 'retired-<hash>' (account deletion) — skip.
-  if (code.startsWith('retired-')) return false
-  if (row.operator.isPlaceholder) return false
+  if (code.startsWith("retired-")) return false;
+  if (row.operator.isPlaceholder) return false;
   // Must have a real compounding cascade (a non-compounding/empty row isn't "top operator").
-  const c = row.snapshot.cascade
-  return Boolean(c && !c.nonCompounding)
+  const c = row.snapshot.cascade;
+  return Boolean(c && !c.nonCompounding);
 }
 
 /** Format a leverage-style "N×" value. */
 function timesStr(n: number): string {
-  return `${n.toFixed(1)}×`
+  return `${n.toFixed(1)}×`;
 }
 
 /**
@@ -51,17 +52,17 @@ function timesStr(n: number): string {
  */
 export async function getTopOperatorColumn(): Promise<GoldColumn | null> {
   const board = await getLeaderboard({
-    window: 'all_time',
+    window: "all_time",
     windowFilter: true,
     operatorTotal: true,
-  })
+  });
   // getLeaderboard returns yield-ranked rows; take the first REAL one.
-  const top = board.find(isRealOperator)
-  const c = top?.snapshot.cascade
-  if (!c) return null
+  const top = board.find(isRealOperator);
+  const c = top?.snapshot.cascade;
+  if (!c) return null;
 
-  const velocity = c.velocity
-  const leverage = c.leverage
+  const velocity = c.velocity;
+  const leverage = c.leverage;
   return {
     yield_: c.yield_.toFixed(2),
     snr: c.snr.toFixed(2),
@@ -73,5 +74,5 @@ export async function getTopOperatorColumn(): Promise<GoldColumn | null> {
     opRatio: `${Math.round(leverage)} : 1 : ${velocity.toFixed(velocity < 1 ? 2 : 2)}`,
     // 10xDEV table: linear amplification = 10^dev10x ≈ leverage (the telescoping identity).
     devLinear: timesStr(leverage),
-  }
+  };
 }

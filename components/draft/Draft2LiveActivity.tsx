@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { Placeholder } from '@/components/ui/Placeholder'
-import type { HomepageStats } from '@/lib/data'
+import Link from "next/link";
+import { Placeholder } from "@/components/ui/Placeholder";
+import type { HomepageStats } from "@/lib/data";
 
 /**
  * Draft2LiveActivity — the macro-stats "live activity" block. Five cells: Operators
@@ -15,24 +15,33 @@ import type { HomepageStats } from '@/lib/data'
  * Server component — pure render from injected stats, no clock/RNG.
  */
 function fmtCount(n: number): string {
-  if (n >= 1_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(2)}T`
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
-  return n.toLocaleString()
+  if (n >= 1_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(2)}T`;
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString();
 }
 
 export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
-  const real = !stats.isPlaceholder
+  const real = !stats.isPlaceholder;
 
-  const cells: { value: React.ReactNode; label: React.ReactNode; accent: boolean }[] = [
+  const cells: {
+    value: React.ReactNode;
+    label: React.ReactNode;
+    accent: boolean;
+  }[] = [
     {
       value: real ? (
-        <span title="Live — total operators ranked">{fmtCount(stats.total_operators)}</span>
+        <span title="Live — total operators ranked">
+          {fmtCount(stats.total_operators)}
+        </span>
       ) : (
-        <Placeholder value="—" title="Placeholder — no real operator count yet" />
+        <Placeholder
+          value="—"
+          title="Placeholder — no real operator count yet"
+        />
       ),
-      label: 'Operators ranked',
+      label: "Operators ranked",
       accent: false,
     },
     {
@@ -40,12 +49,15 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       // A zero counter reads as anti-social-proof — show "—" until the field is live.
       value: real ? (
         <span title="Active operators in the last hour (by last_seen)">
-          {stats.active_last_hour > 0 ? fmtCount(stats.active_last_hour) : '—'}
+          {stats.active_last_hour > 0 ? fmtCount(stats.active_last_hour) : "—"}
         </span>
       ) : (
-        <Placeholder value="—" title="Placeholder — no active-user telemetry yet" />
+        <Placeholder
+          value="—"
+          title="Placeholder — no active-user telemetry yet"
+        />
       ),
-      label: 'Active in the last hour',
+      label: "Active in the last hour",
       accent: true,
     },
     {
@@ -53,12 +65,17 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       // Was ∞ (read as broken, not exclusive); now the honest integer, "—" until live.
       value: real ? (
         <span title="TRANSMITTER class (K.01)" className="text-gold">
-          {stats.transmitter_count > 0 ? fmtCount(stats.transmitter_count) : '—'}
+          {stats.transmitter_count > 0
+            ? fmtCount(stats.transmitter_count)
+            : "—"}
         </span>
       ) : (
-        <Placeholder value="—" title="Placeholder — transmitter count not wired yet" />
+        <Placeholder
+          value="—"
+          title="Placeholder — transmitter count not wired yet"
+        />
       ),
-      label: 'Operators in TRANSMITTER class',
+      label: "Operators in TRANSMITTER class",
       accent: false,
     },
     {
@@ -66,12 +83,15 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       // Hide at zero — an empty counter is worse than no counter.
       value: real ? (
         <span title="Total head-to-head comparisons run">
-          {stats.comparisons_ran > 0 ? fmtCount(stats.comparisons_ran) : '—'}
+          {stats.comparisons_ran > 0 ? fmtCount(stats.comparisons_ran) : "—"}
         </span>
       ) : (
-        <Placeholder value="—" title="Placeholder — comparison count not wired yet" />
+        <Placeholder
+          value="—"
+          title="Placeholder — comparison count not wired yet"
+        />
       ),
-      label: 'Comparisons ran',
+      label: "Comparisons ran",
       accent: false,
     },
     {
@@ -80,12 +100,15 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
           {fmtCount(stats.total_tokens_scored)}
         </span>
       ) : (
-        <Placeholder value="—" title="Placeholder — total tokens not computed yet" />
+        <Placeholder
+          value="—"
+          title="Placeholder — total tokens not computed yet"
+        />
       ),
-      label: 'Total tokens measured',
+      label: "Total tokens measured",
       accent: false,
     },
-  ]
+  ];
 
   return (
     <section className="rounded-xl border border-bg-border bg-bg-surface p-5">
@@ -103,7 +126,8 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
             Real operators. Real cascades.
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-secondary">
-            The leaderboard is the product — scored live by the same engine that scores you.
+            The leaderboard is the product — scored live by the same engine that
+            scores you.
           </p>
         </div>
         <Link
@@ -134,8 +158,8 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
               <div key={i} className="bg-bg-base px-4 py-5 text-left">
                 <div
                   className={
-                    'font-mono text-2xl font-semibold leading-none tracking-tight ' +
-                    (c.accent ? 'text-gold' : 'text-text-primary')
+                    "font-mono text-2xl font-semibold leading-none tracking-tight " +
+                    (c.accent ? "text-gold" : "text-text-primary")
                   }
                 >
                   {c.value}
@@ -155,5 +179,5 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
         </div>
       </details>
     </section>
-  )
+  );
 }

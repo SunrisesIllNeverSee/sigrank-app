@@ -8,11 +8,11 @@
  * included per the group brief.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { getOperator } from '@/lib/data'
-import { rateLimit, rateLimitedResponse } from '@/lib/api/gate'
+import { NextResponse, type NextRequest } from "next/server";
+import { getOperator } from "@/lib/data";
+import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
 
-const GENERATED_AT = '2026-05-19T00:00:00Z'
+const GENERATED_AT = "2026-05-19T00:00:00Z";
 
 export async function GET(
   req: NextRequest,
@@ -21,28 +21,31 @@ export async function GET(
   // CORPUS gate: best-effort per-IP rate limit blocks per-operator sweep scraping
   // (defense-in-depth). Single-operator reads have no list limit, so only the
   // rate limit applies here.
-  const rl = rateLimit(req)
-  if (!rl.ok) return rateLimitedResponse(rl.retryAfter)
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
 
-  const { codename } = await params
-  const row = await getOperator(codename)
+  const { codename } = await params;
+  const row = await getOperator(codename);
 
   if (!row) {
     return NextResponse.json(
-      { status: 'not_found', detail: `No operator with codename "${codename}".` },
+      {
+        status: "not_found",
+        detail: `No operator with codename "${codename}".`,
+      },
       { status: 404 },
-    )
+    );
   }
 
-  const { operator, snapshot } = row
-  const c = snapshot.cascade
+  const { operator, snapshot } = row;
+  const c = snapshot.cascade;
 
   // Drift Ratio (E.02) is precision-tier only: null unless the operator is on a
   // Pro/precision tier AND the audit has already computed a value.
   const isPrecision =
-    operator.current_supporter_tier === 'pro' ||
-    operator.current_supporter_tier === 'circle_sponsor'
-  const driftRatio = isPrecision ? snapshot.drift_ratio : null
+    operator.current_supporter_tier === "pro" ||
+    operator.current_supporter_tier === "circle_sponsor";
+  const driftRatio = isPrecision ? snapshot.drift_ratio : null;
 
   const body = {
     operator_id: operator.operator_id,
@@ -83,22 +86,31 @@ export async function GET(
     ruleset_version: snapshot.ruleset_version,
     is_placeholder: operator.isPlaceholder ?? false,
     // Raw token pillars (the cascade fuel) so API consumers can verify the score.
-    ...(c ? {
-      input_tokens: row.telemetry.fresh_input,
-      output_tokens: row.telemetry.output,
-      cache_creation_tokens: row.telemetry.cache_create,
-      cache_read_tokens: row.telemetry.cache_read,
-      total_tokens: row.telemetry.fresh_input + row.telemetry.output + row.telemetry.cache_create + row.telemetry.cache_read,
-      scale_v: c.scaleV,
-      efficiency: c.efficiency,
-      cost_per_million: c.costPerMillion,
-      op_ratio: c.opRatio,
-      cascade_str: c.cascadeStr,
-      non_compounding: c.nonCompounding,
-    } : {}),
-  }
+    ...(c
+      ? {
+          input_tokens: row.telemetry.fresh_input,
+          output_tokens: row.telemetry.output,
+          cache_creation_tokens: row.telemetry.cache_create,
+          cache_read_tokens: row.telemetry.cache_read,
+          total_tokens:
+            row.telemetry.fresh_input +
+            row.telemetry.output +
+            row.telemetry.cache_create +
+            row.telemetry.cache_read,
+          scale_v: c.scaleV,
+          efficiency: c.efficiency,
+          cost_per_million: c.costPerMillion,
+          op_ratio: c.opRatio,
+          cascade_str: c.cascadeStr,
+          non_compounding: c.nonCompounding,
+        }
+      : {}),
+  };
 
   return NextResponse.json(body, {
-    headers: { 'Cache-Control': 'public, max-age=120, s-maxage=120, stale-while-revalidate=600' },
-  })
+    headers: {
+      "Cache-Control":
+        "public, max-age=120, s-maxage=120, stale-while-revalidate=600",
+    },
+  });
 }

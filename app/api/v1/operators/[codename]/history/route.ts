@@ -7,33 +7,39 @@
  * (most-recent) points returned.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { getOperator, getOperatorHistory } from '@/lib/data'
+import { NextResponse, type NextRequest } from "next/server";
+import { getOperator, getOperatorHistory } from "@/lib/data";
 
-const MAX_LIMIT = 365
+const MAX_LIMIT = 365;
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ codename: string }> },
 ) {
-  const { codename } = await params
+  const { codename } = await params;
 
-  const operator = await getOperator(codename)
+  const operator = await getOperator(codename);
   if (!operator) {
     return NextResponse.json(
-      { status: 'not_found', detail: `No operator with codename "${codename}".` },
+      {
+        status: "not_found",
+        detail: `No operator with codename "${codename}".`,
+      },
       { status: 404 },
-    )
+    );
   }
 
-  const sp = req.nextUrl.searchParams
-  const windowParam = sp.get('window') ?? '30d'
-  const limitRaw = Number.parseInt(sp.get('limit') ?? '', 10)
+  const sp = req.nextUrl.searchParams;
+  const windowParam = sp.get("window") ?? "30d";
+  const limitRaw = Number.parseInt(sp.get("limit") ?? "", 10);
   const limit = Number.isFinite(limitRaw)
     ? Math.min(Math.max(limitRaw, 1), MAX_LIMIT)
-    : undefined
+    : undefined;
 
-  const points = await getOperatorHistory(codename, { window: windowParam, limit })
+  const points = await getOperatorHistory(codename, {
+    window: windowParam,
+    limit,
+  });
 
   const body = {
     codename: operator.operator.codename,
@@ -46,9 +52,12 @@ export async function GET(
       class_tier: p.class_tier, // UPPERCASE canonical SignalClass
     })),
     is_placeholder: operator.operator.isPlaceholder ?? false,
-  }
+  };
 
   return NextResponse.json(body, {
-    headers: { 'Cache-Control': 'public, max-age=120, s-maxage=120, stale-while-revalidate=600' },
-  })
+    headers: {
+      "Cache-Control":
+        "public, max-age=120, s-maxage=120, stale-while-revalidate=600",
+    },
+  });
 }

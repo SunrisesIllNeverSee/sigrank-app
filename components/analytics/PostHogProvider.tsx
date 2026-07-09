@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { Suspense, useEffect } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { initPostHog, posthog } from '@/lib/posthog/client'
-import { PostHogIdentify } from './PostHogIdentify'
+import { Suspense, useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { initPostHog, posthog } from "@/lib/posthog/client";
+import { PostHogIdentify } from "./PostHogIdentify";
 
 /**
  * Client island that boots PostHog and emits manual SPA pageviews. The root
@@ -13,8 +13,8 @@ import { PostHogIdentify } from './PostHogIdentify'
  */
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    initPostHog()
-  }, [])
+    initPostHog();
+  }, []);
 
   return (
     <>
@@ -26,20 +26,20 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         <PageViews />
       </Suspense>
     </>
-  )
+  );
 }
 
 function PageViews() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Child effects run before the parent's init effect on first mount, so ensure
     // init here too (idempotent) — otherwise the very first pageview would be lost.
-    initPostHog()
-    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return
-    posthog.capture('$pageview', { $current_url: window.location.href })
-  }, [pathname, searchParams])
+    initPostHog();
+    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    posthog.capture("$pageview", { $current_url: window.location.href });
+  }, [pathname, searchParams]);
 
-  return null
+  return null;
 }

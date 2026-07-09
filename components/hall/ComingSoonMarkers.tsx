@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 /**
  * ComingSoonMarkers — the Hall's "On the horizon" footer (HALL_DESIGN §2/§6/§7).
@@ -18,9 +18,9 @@ function Marker({
   subtext,
   children,
 }: {
-  title: string
-  subtext: string
-  children?: React.ReactNode
+  title: string;
+  subtext: string;
+  children?: React.ReactNode;
 }) {
   return (
     <div
@@ -38,7 +38,7 @@ function Marker({
       <p className="font-sans text-xs text-text-muted">{subtext}</p>
       {children}
     </div>
-  )
+  );
 }
 
 export function ComingSoonMarkers() {
@@ -48,7 +48,8 @@ export function ComingSoonMarkers() {
         On the horizon
       </h2>
       <p className="mb-4 max-w-2xl font-sans text-sm text-text-muted">
-        Future wings of the Hall — no pipeline built yet. They light up as the data lands.
+        Future wings of the Hall — no pipeline built yet. They light up as the
+        data lands.
       </p>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* (a) ERAS — a future SEPARATE page. Disabled, non-navigating: aria-disabled +
@@ -72,5 +73,5 @@ export function ComingSoonMarkers() {
         <Marker title="Sessions" subtext="awaiting session data" />
       </div>
     </section>
-  )
+  );
 }

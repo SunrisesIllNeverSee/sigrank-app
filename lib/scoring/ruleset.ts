@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/scoring/ruleset.ts — SERVER-ONLY proprietary scoring parameters (RS.xx).
@@ -32,7 +32,7 @@ export const RS01_SIGNA_WEIGHTS = {
   pc: 0.2,
   ct: 0.15,
   tt: 0, // MUTED — word-era M.05, removed from the live composite pending §IGNA recal
-} as const
+} as const;
 
 /**
  * RS.02 — Session-depth bucketization curve.
@@ -47,11 +47,10 @@ export const RS02_DEPTH_BUCKETS: ReadonlyArray<readonly [number, number]> = [
   [15, 72],
   [10, 58],
   [5, 42],
-]
+];
 /** Fallback score when raw session depth is below the smallest bucket. */
 // OPERATOR_OVERRIDE_REQUIRED RS.02
-export const RS02_DEPTH_FALLBACK = 25
-
+export const RS02_DEPTH_FALLBACK = 25;
 
 /**
  * RS.04 — Prompt-complexity sub-score weights (CANON M.02 / RS.04).
@@ -65,7 +64,7 @@ export const RS04_PC_WEIGHTS = {
   constraints: 0.15,
   symbolic: 0.1,
   response_shaping: 0.1,
-} as const
+} as const;
 
 /**
  * RS.05 — Class threshold exact breakpoints (the numerical realization of the
@@ -78,20 +77,20 @@ export const RS04_PC_WEIGHTS = {
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.05
 export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
-  class: string
-  compMin: number
-  signaMin: number | null
+  class: string;
+  compMin: number;
+  signaMin: number | null;
 }> = [
-  { class: 'TRANSMITTER', compMin: 0.85, signaMin: 85 },
-  { class: 'ARCH+', compMin: 0.75, signaMin: 75 },
-  { class: 'ARCH', compMin: 0.65, signaMin: 65 },
-  { class: 'POWER', compMin: 0.5, signaMin: 50 },
-  { class: 'BASE', compMin: 0.4, signaMin: null },
-  { class: 'SEEKER', compMin: 0.3, signaMin: null },
-  { class: 'REFINER', compMin: 0.2, signaMin: null },
-  { class: 'BEARER', compMin: 0.15, signaMin: null },
-  { class: 'IGNITER', compMin: 0, signaMin: null },
-]
+  { class: "TRANSMITTER", compMin: 0.85, signaMin: 85 },
+  { class: "ARCH+", compMin: 0.75, signaMin: 75 },
+  { class: "ARCH", compMin: 0.65, signaMin: 65 },
+  { class: "POWER", compMin: 0.5, signaMin: 50 },
+  { class: "BASE", compMin: 0.4, signaMin: null },
+  { class: "SEEKER", compMin: 0.3, signaMin: null },
+  { class: "REFINER", compMin: 0.2, signaMin: null },
+  { class: "BEARER", compMin: 0.15, signaMin: null },
+  { class: "IGNITER", compMin: 0, signaMin: null },
+];
 
 /**
  * RS.06 — Anti-gaming penalty rules. Enabled 2026-07-02 with a gentle penalty curve
@@ -104,22 +103,22 @@ export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
 export const RS06_ANTI_GAMING = {
   enabled: true,
   /** Υ penalty per battery flag (gentle: 10% per flag). */
-  penaltyPerFlag: 0.10,
+  penaltyPerFlag: 0.1,
   /** Maximum total penalty (caps at 40% even with many flags). */
-  maxPenalty: 0.40,
-} as const
+  maxPenalty: 0.4,
+} as const;
 
 /**
  * applyRS06Penalty — reduce a yield based on the number of battery flags fired.
  * Returns the original yield if RS.06 is disabled or no flags fired.
  */
 export function applyRS06Penalty(yield_: number, batteryFlags: number): number {
-  if (!RS06_ANTI_GAMING.enabled || batteryFlags <= 0) return yield_
+  if (!RS06_ANTI_GAMING.enabled || batteryFlags <= 0) return yield_;
   const penalty = Math.min(
     batteryFlags * RS06_ANTI_GAMING.penaltyPerFlag,
     RS06_ANTI_GAMING.maxPenalty,
-  )
-  return yield_ * (1 - penalty)
+  );
+  return yield_ * (1 - penalty);
 }
 
 /**
@@ -127,7 +126,7 @@ export function applyRS06Penalty(yield_: number, batteryFlags: number): number {
  * must be held before promotion takes effect. Demotions are immediate.
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.07
-export const RS07_PROMOTION_CYCLES = 3
+export const RS07_PROMOTION_CYCLES = 3;
 
 /** Active ruleset version stamped onto every scored snapshot. */
-export const RULESET_VERSION = '1.0'
+export const RULESET_VERSION = "1.0";

@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
  * NavLinks — the desktop inline nav links with an active-page indicator.
@@ -16,39 +16,43 @@ import { usePathname } from 'next/navigation'
 // Some links own routes beyond their own href. /board/all is the leaderboard
 // entry; /board/* routes are all part of the same tab.
 const ACTIVE_PREFIX: Record<string, string[]> = {
-  '/board/all': ['/board'],
-  '/compare': ['/compare'],
-  '/hall': ['/hall'],
-  '/wiki': ['/wiki'],
-}
+  "/board/all": ["/board"],
+  "/compare": ["/compare"],
+  "/hall": ["/hall"],
+  "/wiki": ["/wiki"],
+};
 
 function isActive(pathname: string, href: string): boolean {
-  const prefixes = ACTIVE_PREFIX[href] ?? [href]
-  return prefixes.some((p) => pathname === p || pathname.startsWith(p + '/'))
+  const prefixes = ACTIVE_PREFIX[href] ?? [href];
+  return prefixes.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
-export function NavLinks({ links }: { links: { href: string; label: string }[] }) {
-  const pathname = usePathname() ?? ''
+export function NavLinks({
+  links,
+}: {
+  links: { href: string; label: string }[];
+}) {
+  const pathname = usePathname() ?? "";
   return (
     <ul className="hidden flex-wrap items-center gap-1 md:flex">
       {links.map((link) => {
-        const active = isActive(pathname, link.href)
+        const active = isActive(pathname, link.href);
         return (
           <li key={link.href}>
             <Link
               href={link.href}
-              aria-current={active ? 'page' : undefined}
+              aria-current={active ? "page" : undefined}
               className={
                 active
-                  ? 'rounded-md px-2.5 py-1.5 font-sans text-sm font-semibold text-gold underline decoration-gold/60 underline-offset-4'
-                  : 'rounded-md px-2.5 py-1.5 font-sans text-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary'
+                  ? "rounded-md px-2.5 py-1.5 font-sans text-sm font-semibold text-gold underline decoration-gold/60 underline-offset-4"
+                  : "rounded-md px-2.5 py-1.5 font-sans text-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
               }
             >
               {link.label}
             </Link>
           </li>
-        )
+        );
       })}
     </ul>
-  )
+  );
 }

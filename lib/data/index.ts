@@ -23,8 +23,8 @@
  * edits — every consumer still imports the same names from `@/lib/data`.
  */
 
-export * from '@/lib/data/mappers'
-export * from '@/lib/data/fallback'
+export * from "@/lib/data/mappers";
+export * from "@/lib/data/fallback";
 
 // Cached read functions (data-layer caching via unstable_cache).
 // These shadow the raw query exports — consumers get caching transparently.
@@ -41,12 +41,12 @@ export {
   getOnlineWeekly,
   getOnlineByCountry,
   getOperatorReport,
-} from '@/lib/data/cached'
+} from "@/lib/data/cached";
 
 // Writes are NOT cached — re-export directly from queries.
-export { bumpComparisonsRan } from '@/lib/data/queries'
-export type { OperatorSubmission } from '@/lib/data/queries'
-export type { OperatorReport } from '@/lib/data/queries'
+export { bumpComparisonsRan } from "@/lib/data/queries";
+export type { OperatorSubmission } from "@/lib/data/queries";
+export type { OperatorReport } from "@/lib/data/queries";
 
 // Re-export the row/record types from the neutral types module (extracted from
 // mock.ts 2026-06-26) so feature builders import data + types from this facade.
@@ -60,4 +60,4 @@ export type {
   HourlyPoint,
   WeeklyPoint,
   CountryCount,
-} from '@/lib/data/types'
+} from "@/lib/data/types";

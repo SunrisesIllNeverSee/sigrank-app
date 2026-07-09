@@ -23,77 +23,118 @@
  * The submission is stored with source='web_paste' and confidence='medium'.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { getSupabaseService } from '@/lib/supabase/server'
-import { requireSession } from '@/lib/api/auth'
-import { ingestMeta } from '@/lib/ingest'
-import { pillarsToCore5 } from '@/lib/ingest/bridge'
-import { scoreSnapshot } from '@/lib/scoring/engine'
-import { captureServer } from '@/lib/posthog/server'
+import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseService } from "@/lib/supabase/server";
+import { requireSession } from "@/lib/api/auth";
+import { ingestMeta } from "@/lib/ingest";
+import { pillarsToCore5 } from "@/lib/ingest/bridge";
+import { scoreSnapshot } from "@/lib/scoring/engine";
+import { captureServer } from "@/lib/posthog/server";
 
-const SCORING_ETA_SECONDS = 10
+const SCORING_ETA_SECONDS = 10;
 
 function deterministicId(prefix: string, ...parts: string[]): string {
-  let h = 0
-  const s = parts.join('|')
-  for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0 }
-  return `${prefix}_${(h >>> 0).toString(16).padStart(8, '0')}`
+  let h = 0;
+  const s = parts.join("|");
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return `${prefix}_${(h >>> 0).toString(16).padStart(8, "0")}`;
 }
 
 export async function POST(req: NextRequest) {
   // 0. Require a Supabase session — resolve operator from the session, not the body.
-  const auth = await requireSession()
+  const auth = await requireSession();
   if (!auth.ok) {
-    return NextResponse.json(auth.body, { status: auth.status })
+    return NextResponse.json(auth.body, { status: auth.status });
   }
-  const codename = auth.session.codename
-  const operatorId = auth.session.operatorId
+  const codename = auth.session.codename;
+  const operatorId = auth.session.operatorId;
 
-  let body: unknown
-  try { body = await req.json() } catch {
-    return NextResponse.json({ status: 'rejected', reason: 'invalid_json', detail: 'Body is not valid JSON.' }, { status: 400 })
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      {
+        status: "rejected",
+        reason: "invalid_json",
+        detail: "Body is not valid JSON.",
+      },
+      { status: 400 },
+    );
   }
 
-  if (!body || typeof body !== 'object') {
-    return NextResponse.json({ status: 'rejected', reason: 'schema_invalid', detail: 'Body must be an object.' }, { status: 400 })
+  if (!body || typeof body !== "object") {
+    return NextResponse.json(
+      {
+        status: "rejected",
+        reason: "schema_invalid",
+        detail: "Body must be an object.",
+      },
+      { status: 400 },
+    );
   }
 
-  const b = body as Record<string, unknown>
-  const rawPaste = typeof b.raw_paste === 'string' ? b.raw_paste : ''
-  const windowType = typeof b.window_type === 'string' ? b.window_type : '30d'
-  const windowEnd  = typeof b.window_end  === 'string' ? b.window_end  : new Date().toISOString()
-  const platformRaw = b.telemetry && typeof (b.telemetry as Record<string, unknown>).platform === 'object'
-    ? ((b.telemetry as Record<string, unknown>).platform as Record<string, unknown>).primary as string ?? 'claude'
-    : 'claude'
+  const b = body as Record<string, unknown>;
+  const rawPaste = typeof b.raw_paste === "string" ? b.raw_paste : "";
+  const windowType = typeof b.window_type === "string" ? b.window_type : "30d";
+  const windowEnd =
+    typeof b.window_end === "string" ? b.window_end : new Date().toISOString();
+  const platformRaw =
+    b.telemetry &&
+    typeof (b.telemetry as Record<string, unknown>).platform === "object"
+      ? (((
+          (b.telemetry as Record<string, unknown>).platform as Record<
+            string,
+            unknown
+          >
+        ).primary as string) ?? "claude")
+      : "claude";
 
   if (!rawPaste) {
-    return NextResponse.json({ status: 'rejected', reason: 'missing_paste', detail: 'raw_paste is required.' }, { status: 400 })
+    return NextResponse.json(
+      {
+        status: "rejected",
+        reason: "missing_paste",
+        detail: "raw_paste is required.",
+      },
+      { status: 400 },
+    );
   }
 
   // 1. Parse
-  let pillars, meta
+  let pillars, meta;
   try {
-    const result = ingestMeta(rawPaste)
-    pillars = result.pillars
-    meta    = result.meta
+    const result = ingestMeta(rawPaste);
+    pillars = result.pillars;
+    meta = result.meta;
   } catch (err) {
-    const detail = err instanceof Error ? err.message : 'Parse failed.'
-    return NextResponse.json({ status: 'rejected', reason: 'parse_failed', detail }, { status: 422 })
+    const detail = err instanceof Error ? err.message : "Parse failed.";
+    return NextResponse.json(
+      { status: "rejected", reason: "parse_failed", detail },
+      { status: 422 },
+    );
   }
 
   // 2. Bridge → Core5Raw (use 1/1 session fallback for free-tier paste path)
-  const bridge = pillarsToCore5({ pillars, sessionsCount: 1, turnsTotal: 1 })
+  const bridge = pillarsToCore5({ pillars, sessionsCount: 1, turnsTotal: 1 });
 
   // 3. Score
   const scored = scoreSnapshot({
     raw: bridge.core5,
-    pcConfidence: 'low',
+    pcConfidence: "low",
     totalMessagesLifetime: 0,
     accountAgeDays: 0,
-  })
+  });
 
   // 4. Persist (non-blocking; mock-accept if Supabase not configured)
-  const submissionId = deterministicId('paste', codename.toLowerCase(), windowEnd, rawPaste.slice(0, 32))
+  const submissionId = deterministicId(
+    "paste",
+    codename.toLowerCase(),
+    windowEnd,
+    rawPaste.slice(0, 32),
+  );
 
   // 4. Record the paste in the append-only inbox ONLY — do NOT persist to the
   //    live board. (OWNER decision 2026-06-19): paste = RUN-NUMBERS. It computes
@@ -102,47 +143,52 @@ export async function POST(req: NextRequest) {
   //    submission review (the future auth/review path reads this same inbox).
   //    `snapshot_submissions` is an audit log, NOT what the board reads (the board
   //    reads operators + metric_snapshots — untouched here, so paste never ranks).
-  const sb = getSupabaseService()
+  const sb = getSupabaseService();
   if (sb) {
     try {
-      await sb.from('snapshot_submissions').insert({
+      await sb.from("snapshot_submissions").insert({
         operator_id: operatorId,
         window_type: windowType,
-        window_end:  windowEnd,
-        schema_version: '1.0',
-        ruleset_version: 'paste-v1',
+        window_end: windowEnd,
+        schema_version: "1.0",
+        ruleset_version: "paste-v1",
         snapshot_hash: submissionId,
-        signature: 'web_paste',
+        signature: "web_paste",
         payload_json: {
           codename,
-          source: 'web_paste',
-          confidence: 'medium',
+          source: "web_paste",
+          confidence: "medium",
           // status: pending — NOT promoted to the board. account + review gates that.
-          status: 'pending_review',
+          status: "pending_review",
           pillars,
           meta,
-          scored: { signa_rate: scored.signa_rate, class_tier: scored.class_tier },
+          scored: {
+            signa_rate: scored.signa_rate,
+            class_tier: scored.class_tier,
+          },
           platform: platformRaw,
           window_type: windowType,
-          window_end:  windowEnd,
+          window_end: windowEnd,
         },
-      })
-    } catch { /* graceful fallback — still ack */ }
+      });
+    } catch {
+      /* graceful fallback — still ack */
+    }
   }
 
   // snapshot_submitted (web-paste path) — recorded server-side. source distinguishes it
   // from the signed-agent path; paste is run-the-numbers (pending_review, never ranked).
-  await captureServer(codename, 'snapshot_submitted', {
-    source: 'web_paste',
+  await captureServer(codename, "snapshot_submitted", {
+    source: "web_paste",
     window_type: windowType,
     platform: platformRaw,
     class_tier: scored.class_tier,
-  })
+  });
 
   // 5. Respond
   return NextResponse.json(
     {
-      status: 'received',
+      status: "received",
       submission_id: submissionId,
       operator_id: operatorId,
       signa_rate: Math.round(scored.signa_rate * 10) / 10,
@@ -153,5 +199,5 @@ export async function POST(req: NextRequest) {
       scoring_eta_seconds: SCORING_ETA_SECONDS,
     },
     { status: 202 },
-  )
+  );
 }

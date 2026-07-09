@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * components/compare/CompareSelectors.tsx — the two opponent pickers (owner 2026-06-22:
@@ -10,11 +10,11 @@
  * (the page already de-dupes B). Sits inside the matchup poster header area.
  */
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export interface CompareOption {
-  codename: string
-  label: string
+  codename: string;
+  label: string;
 }
 
 export function CompareSelectors({
@@ -22,20 +22,24 @@ export function CompareSelectors({
   aCode,
   bCode,
 }: {
-  options: CompareOption[]
-  aCode: string
-  bCode: string
+  options: CompareOption[];
+  aCode: string;
+  bCode: string;
 }) {
-  const router = useRouter()
+  const router = useRouter();
 
   const go = (a: string, b: string) => {
-    router.push(`/compare?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`)
-  }
+    router.push(
+      `/compare?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`,
+    );
+  };
 
   return (
     <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
       <label className="flex flex-col gap-1">
-        <span className="font-sans text-[10px] uppercase tracking-wider text-text-muted">Operator A</span>
+        <span className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
+          Operator A
+        </span>
         <select
           aria-label="Choose operator A"
           value={aCode}
@@ -43,14 +47,20 @@ export function CompareSelectors({
           className="w-full rounded-md border border-bg-border bg-bg-surface px-3 py-2 font-mono text-sm text-text-primary outline-none transition-colors hover:bg-bg-hover focus:border-text-accent"
         >
           {options.map((o) => (
-            <option key={`a-${o.codename}`} value={o.codename} disabled={o.codename === bCode}>
+            <option
+              key={`a-${o.codename}`}
+              value={o.codename}
+              disabled={o.codename === bCode}
+            >
               {o.label}
             </option>
           ))}
         </select>
       </label>
 
-      <span className="pb-2 text-center font-mono text-xs text-text-muted">vs</span>
+      <span className="pb-2 text-center font-mono text-xs text-text-muted">
+        vs
+      </span>
 
       <label className="flex flex-col gap-1">
         <span className="font-sans text-[10px] uppercase tracking-wider text-text-muted sm:text-right">
@@ -63,12 +73,16 @@ export function CompareSelectors({
           className="w-full rounded-md border border-bg-border bg-bg-surface px-3 py-2 font-mono text-sm text-text-primary outline-none transition-colors hover:bg-bg-hover focus:border-text-accent"
         >
           {options.map((o) => (
-            <option key={`b-${o.codename}`} value={o.codename} disabled={o.codename === aCode}>
+            <option
+              key={`b-${o.codename}`}
+              value={o.codename}
+              disabled={o.codename === aCode}
+            >
               {o.label}
             </option>
           ))}
         </select>
       </label>
     </div>
-  )
+  );
 }

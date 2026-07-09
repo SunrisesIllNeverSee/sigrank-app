@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 /**
  * MobileNav — the hamburger menu shown below the `md` breakpoint, where the
@@ -9,25 +9,30 @@ import Link from 'next/link'
  * (rendered by Nav); this is just the links, collapsed behind a toggle. Closes
  * on outside click, Escape, or selecting a link. Client island (toggle state).
  */
-export function MobileNav({ links }: { links: { href: string; label: string }[] }) {
-  const [open, setOpen] = useState(false)
-  const rootRef = useRef<HTMLDivElement>(null)
+export function MobileNav({
+  links,
+}: {
+  links: { href: string; label: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     function onDown(e: MouseEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+      if (rootRef.current && !rootRef.current.contains(e.target as Node))
+        setOpen(false);
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === "Escape") setOpen(false);
     }
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
     <div ref={rootRef} className="relative md:hidden">
@@ -40,7 +45,9 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
         className="flex h-9 w-9 items-center justify-center rounded-md border border-bg-border bg-bg-elevated text-text-secondary transition-colors hover:text-text-primary"
       >
         {/* hamburger / close glyph */}
-        <span className="font-mono text-base leading-none">{open ? '✕' : '☰'}</span>
+        <span className="font-mono text-base leading-none">
+          {open ? "✕" : "☰"}
+        </span>
       </button>
 
       {open && (
@@ -63,5 +70,5 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
         </div>
       )}
     </div>
-  )
+  );
 }

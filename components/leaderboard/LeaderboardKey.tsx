@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * LeaderboardKey — the board's legend popup (owner 2026-06-24).
@@ -9,14 +9,14 @@
  * lockstep with the contract — no hand-copied values. Client island (modal state).
  */
 
-import { useState } from 'react'
-import { TOKEN_METRICS, CLASS_TIERS } from '@/lib/canon/ids'
+import { useState } from "react";
+import { TOKEN_METRICS, CLASS_TIERS } from "@/lib/canon/ids";
 
-type Tab = 'metrics' | 'classes'
+type Tab = "metrics" | "classes";
 
 export function LeaderboardKey() {
-  const [open, setOpen] = useState(false)
-  const [tab, setTab] = useState<Tab>('metrics')
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<Tab>("metrics");
 
   return (
     <div className="mx-auto w-full max-w-[1180px]">
@@ -44,22 +44,22 @@ export function LeaderboardKey() {
               <div className="flex gap-1 rounded-md border border-bg-border p-0.5">
                 <button
                   type="button"
-                  onClick={() => setTab('metrics')}
+                  onClick={() => setTab("metrics")}
                   className={
-                    tab === 'metrics'
-                      ? 'rounded px-3 py-1 font-mono text-xs font-bold text-gold'
-                      : 'rounded px-3 py-1 font-mono text-xs text-text-muted hover:text-text-primary'
+                    tab === "metrics"
+                      ? "rounded px-3 py-1 font-mono text-xs font-bold text-gold"
+                      : "rounded px-3 py-1 font-mono text-xs text-text-muted hover:text-text-primary"
                   }
                 >
                   Cascade metrics
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTab('classes')}
+                  onClick={() => setTab("classes")}
                   className={
-                    tab === 'classes'
-                      ? 'rounded px-3 py-1 font-mono text-xs font-bold text-gold'
-                      : 'rounded px-3 py-1 font-mono text-xs text-text-muted hover:text-text-primary'
+                    tab === "classes"
+                      ? "rounded px-3 py-1 font-mono text-xs font-bold text-gold"
+                      : "rounded px-3 py-1 font-mono text-xs text-text-muted hover:text-text-primary"
                   }
                 >
                   The nine classes
@@ -75,28 +75,54 @@ export function LeaderboardKey() {
               </button>
             </div>
 
-            {tab === 'metrics' ? (
+            {tab === "metrics" ? (
               <div className="flex flex-col gap-1.5">
                 {Object.values(TOKEN_METRICS).map((m) => (
-                  <div key={m.id} className="flex items-baseline gap-2 border-b border-bg-border-subtle py-1.5 last:border-b-0">
-                    <span className="w-14 shrink-0 font-mono text-sm font-bold text-text-accent">{m.ticker}</span>
-                    <span className="shrink-0 font-mono text-[13px] text-text-primary">{m.name}</span>
-                    <span className="ml-auto text-right font-mono text-[11px] leading-snug text-text-secondary">{m.formula}</span>
+                  <div
+                    key={m.id}
+                    className="flex items-baseline gap-2 border-b border-bg-border-subtle py-1.5 last:border-b-0"
+                  >
+                    <span className="w-14 shrink-0 font-mono text-sm font-bold text-text-accent">
+                      {m.ticker}
+                    </span>
+                    <span className="shrink-0 font-mono text-[13px] text-text-primary">
+                      {m.name}
+                    </span>
+                    <span className="ml-auto text-right font-mono text-[11px] leading-snug text-text-secondary">
+                      {m.formula}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
                 {Object.values(CLASS_TIERS).map((c) => (
-                  <div key={c.id} className="flex items-baseline gap-3 border-b border-bg-border-subtle py-1.5 last:border-b-0">
-                    <span aria-hidden className="w-5 shrink-0 text-center font-mono text-base" style={{ color: c.hex }}>{c.glyph}</span>
-                    <span className="w-28 shrink-0 font-mono text-[13px] font-bold" style={{ color: c.hex }}>{c.name}</span>
-                    <span className="font-sans text-xs leading-snug text-text-secondary">{c.meaning}</span>
+                  <div
+                    key={c.id}
+                    className="flex items-baseline gap-3 border-b border-bg-border-subtle py-1.5 last:border-b-0"
+                  >
+                    <span
+                      aria-hidden
+                      className="w-5 shrink-0 text-center font-mono text-base"
+                      style={{ color: c.hex }}
+                    >
+                      {c.glyph}
+                    </span>
+                    <span
+                      className="w-28 shrink-0 font-mono text-[13px] font-bold"
+                      style={{ color: c.hex }}
+                    >
+                      {c.name}
+                    </span>
+                    <span className="font-sans text-xs leading-snug text-text-secondary">
+                      {c.meaning}
+                    </span>
                   </div>
                 ))}
                 <p className="mt-2 font-sans text-[11px] leading-relaxed text-text-muted">
-                  Class is assigned from your cascade — SNR and 10xDEV, whichever is more restrictive.
-                  TRANSMITTER is rare on purpose. Exact breakpoints are proprietary (RS.05).
+                  Class is assigned from your cascade — SNR and 10xDEV,
+                  whichever is more restrictive. TRANSMITTER is rare on purpose.
+                  Exact breakpoints are proprietary (RS.05).
                 </p>
               </div>
             )}
@@ -104,5 +130,5 @@ export function LeaderboardKey() {
         </div>
       ) : null}
     </div>
-  )
+  );
 }

@@ -10,35 +10,35 @@
  * Spec: https://llmstxt.org (the "full" variant)
  */
 
-import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from '@/lib/seo'
+import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 
-export const revalidate = 3600 // 1h
+export const revalidate = 3600; // 1h
 
 export async function GET() {
   // Fetch top operators for the inline board snapshot
-  let operators = ''
+  let operators = "";
   try {
     const res = await fetch(`${SITE_ORIGIN}/api/v1/leaderboard?limit=10`, {
       next: { revalidate: 3600 },
-    })
+    });
     if (res.ok) {
-      const data = await res.json()
-      const entries = data.entries ?? []
+      const data = await res.json();
+      const entries = data.entries ?? [];
       operators = entries
         .map(
           (e: {
-            rank: number
-            codename: string
-            display_name?: string | null
-            class_tier?: string
-            yield_?: number
-            leverage?: number
-            velocity?: number
-            platform?: string
+            rank: number;
+            codename: string;
+            display_name?: string | null;
+            class_tier?: string;
+            yield_?: number;
+            leverage?: number;
+            velocity?: number;
+            platform?: string;
           }) =>
-            `| ${e.rank} | ${e.display_name || e.codename} | ${e.class_tier ?? '—'} | ${e.yield_?.toFixed(2) ?? '—'} | ${e.leverage?.toFixed(1) ?? '—'}× | ${e.velocity?.toFixed(2) ?? '—'} | ${e.platform ?? '—'} |`,
+            `| ${e.rank} | ${e.display_name || e.codename} | ${e.class_tier ?? "—"} | ${e.yield_?.toFixed(2) ?? "—"} | ${e.leverage?.toFixed(1) ?? "—"}× | ${e.velocity?.toFixed(2) ?? "—"} | ${e.platform ?? "—"} |`,
         )
-        .join('\n')
+        .join("\n");
     }
   } catch {
     // API unreachable — skip the inline board
@@ -142,7 +142,7 @@ the pipeline. It's an arms race; we're honest about that.
 
 | Rank | Operator | Class | Yield (Υ) | Leverage | Velocity | Platform |
 |------|----------|-------|-----------|----------|----------|----------|
-${operators || '| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |'}
+${operators || "| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |"}
 
 ## Core pages
 
@@ -194,9 +194,9 @@ When citing SigRank data, use:
 
 Dataset DOI: https://doi.org/10.5281/zenodo.20029607 (Conservation Law paper +
 experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
-`
+`;
 
   return new Response(body, {
-    headers: { 'content-type': 'text/plain; charset=utf-8' },
-  })
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
 }

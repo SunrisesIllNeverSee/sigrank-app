@@ -1,35 +1,35 @@
-import { getHomepageStats } from '@/lib/data'
-import { MotionPause } from '@/components/home/MotionPause'
-import { DeletedNotice } from '@/components/home/DeletedNotice'
-import { HowItWorks } from '@/components/marketing/HowItWorks'
-import { IpBoundary } from '@/components/marketing/IpBoundary'
-import { PricingCards } from '@/components/marketing/PricingCards'
-import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
-import { Draft2Hero } from '@/components/draft/Draft2Hero'
-import { Draft2LiveActivity } from '@/components/draft/Draft2LiveActivity'
-import { Draft2CtaBand } from '@/components/draft/Draft2CtaBand'
-import type { Metadata } from 'next'
-import { withOG } from '@/lib/seo'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { cliTool } from '@/lib/jsonld'
-import Link from 'next/link'
+import { getHomepageStats } from "@/lib/data";
+import { MotionPause } from "@/components/home/MotionPause";
+import { DeletedNotice } from "@/components/home/DeletedNotice";
+import { HowItWorks } from "@/components/marketing/HowItWorks";
+import { IpBoundary } from "@/components/marketing/IpBoundary";
+import { PricingCards } from "@/components/marketing/PricingCards";
+import { ThreeDegreesChart } from "@/components/marketing/ThreeDegreesChart";
+import { Draft2Hero } from "@/components/draft/Draft2Hero";
+import { Draft2LiveActivity } from "@/components/draft/Draft2LiveActivity";
+import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
+import type { Metadata } from "next";
+import { withOG } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { cliTool } from "@/lib/jsonld";
+import Link from "next/link";
 
 // ISR: the Three Degrees chart now auto-pulls the top operator's live all-time metrics
 // (lib/marketing/top-operator-column.ts). Revalidate hourly so the page stays prerendered
 // (○ Static) + refreshes the gold column + metadata/brand edits propagate within the hour
 // (was 86400 — a metadata change took up to 24h to show in-browser).
-export const revalidate = 3600
+export const revalidate = 3600;
 
 // Home title carries the dual brand: SigRank (the product) · SignalAF (the domain identity),
 // near-equal parallel per owner. Sub-pages get just "· SigRank" via the root template
 // (SITE_NAME); the home title is the root segment so it's set in full here. Description is
 // the hero's voice (kept in sync with SITE_TAGLINE).
 export const metadata: Metadata = withOG({
-  title: 'SigRank · SignalAF — AI Operator Leaderboard',
+  title: "SigRank · SignalAF — AI Operator Leaderboard",
   description:
-    'The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?',
-  path: '/',
-})
+    "The new standard in AI evaluation & benchmarks. SigRank measures the architecture of your token cascade — is signal compounding, or are tokens burned?",
+  path: "/",
+});
 
 /**
  * Homepage (`/`) — the landing.
@@ -48,7 +48,7 @@ export const metadata: Metadata = withOG({
  * now (functional; rename is a later cleanup).
  */
 export default async function HomePage() {
-  const homeStats = await getHomepageStats()
+  const homeStats = await getHomepageStats();
 
   return (
     <div className="flex flex-col gap-8 py-2">
@@ -104,19 +104,44 @@ export default async function HomePage() {
           Learn more
         </h2>
         <p className="font-sans text-sm text-text-muted">
-          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">AI Benchmarking</Link>
-          {' · '}
-          <Link href="/ai-coding-metrics" className="text-gold underline underline-offset-2">AI Coding Metrics</Link>
-          {' · '}
-          <Link href="/ai-operator-scoring" className="text-gold underline underline-offset-2">AI Operator Scoring</Link>
-          {' · '}
-          <Link href="/operator-performance" className="text-gold underline underline-offset-2">Operator Performance</Link>
-          {' · '}
-          <Link href="/cascade-analysis" className="text-gold underline underline-offset-2">Cascade Analysis</Link>
+          <Link
+            href="/ai-benchmarking"
+            className="text-gold underline underline-offset-2"
+          >
+            AI Benchmarking
+          </Link>
+          {" · "}
+          <Link
+            href="/ai-coding-metrics"
+            className="text-gold underline underline-offset-2"
+          >
+            AI Coding Metrics
+          </Link>
+          {" · "}
+          <Link
+            href="/ai-operator-scoring"
+            className="text-gold underline underline-offset-2"
+          >
+            AI Operator Scoring
+          </Link>
+          {" · "}
+          <Link
+            href="/operator-performance"
+            className="text-gold underline underline-offset-2"
+          >
+            Operator Performance
+          </Link>
+          {" · "}
+          <Link
+            href="/cascade-analysis"
+            className="text-gold underline underline-offset-2"
+          >
+            Cascade Analysis
+          </Link>
         </p>
       </section>
 
       <MotionPause />
     </div>
-  )
+  );
 }

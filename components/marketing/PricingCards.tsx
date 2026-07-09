@@ -1,17 +1,17 @@
-import React from 'react'
-import Link from 'next/link'
-import { Placeholder } from '@/components/ui/Placeholder'
+import React from "react";
+import Link from "next/link";
+import { Placeholder } from "@/components/ui/Placeholder";
 
 interface Tier {
-  badge: string
-  name: string
+  badge: string;
+  name: string;
   /** Price node (placeholder — real amounts are env-driven Stripe prices). */
-  price: React.ReactNode
-  priceSuffix: string
-  features: string[]
-  cta: string
-  ctaHref: string
-  featured?: boolean
+  price: React.ReactNode;
+  priceSuffix: string;
+  features: string[];
+  cta: string;
+  ctaHref: string;
+  featured?: boolean;
 }
 
 /**
@@ -26,46 +26,53 @@ interface Tier {
  */
 const TIERS: Tier[] = [
   {
-    badge: 'FREE',
-    name: 'Operator',
+    badge: "FREE",
+    name: "Operator",
     price: <Placeholder value="$0" title="Free tier — always free" />,
-    priceSuffix: ' · always free',
+    priceSuffix: " · always free",
     features: [
-      'Submit token telemetry, get ranked instantly',
-      'Full cascade layer — Υ Yield, SNR, Leverage, Velocity, 10xDEV',
-      'Cascade species + class assignment',
-      'Public leaderboard with platform filters',
-      'Head-to-head compare on the cascade metrics',
-      'Operator profile with the cascade fingerprint',
-      'MCP server for Claude Code, Cursor, and any MCP-compatible client',
+      "Submit token telemetry, get ranked instantly",
+      "Full cascade layer — Υ Yield, SNR, Leverage, Velocity, 10xDEV",
+      "Cascade species + class assignment",
+      "Public leaderboard with platform filters",
+      "Head-to-head compare on the cascade metrics",
+      "Operator profile with the cascade fingerprint",
+      "MCP server for Claude Code, Cursor, and any MCP-compatible client",
     ],
-    cta: 'Start free',
-    ctaHref: '/score',
+    cta: "Start free",
+    ctaHref: "/score",
   },
   {
-    badge: 'EARLY SUPPORTER',
-    name: 'Back the build',
-    price: <Placeholder value="Pay what helps" title="Founding-supporter contribution — maps to the patron / lifetime tier" />,
-    priceSuffix: ' · lock in founding-supporter perks',
+    badge: "EARLY SUPPORTER",
+    name: "Back the build",
+    price: (
+      <Placeholder
+        value="Pay what helps"
+        title="Founding-supporter contribution — maps to the patron / lifetime tier"
+      />
+    ),
+    priceSuffix: " · lock in founding-supporter perks",
     features: [
-      'Pro is being built — back it early and shape it',
-      'Lifetime founding-supporter status + badge',
-      'First access to the precision tier when it ships',
-      'Founder perks (TBD) grandfathered in at this rate',
-      'Direct line on what gets built next',
-      'The free board stays free — this funds the build',
-      'Help keep the corpus verified + independent',
+      "Pro is being built — back it early and shape it",
+      "Lifetime founding-supporter status + badge",
+      "First access to the precision tier when it ships",
+      "Founder perks (TBD) grandfathered in at this rate",
+      "Direct line on what gets built next",
+      "The free board stays free — this funds the build",
+      "Help keep the corpus verified + independent",
     ],
-    cta: 'Support the build',
-    ctaHref: '/upgrade?tier=patron',
+    cta: "Support the build",
+    ctaHref: "/upgrade?tier=patron",
     featured: true,
   },
-]
+];
 
 export function PricingCards() {
   return (
     <section className="my-16">
-      <div className="font-mono text-xs uppercase tracking-widest text-gold">⊙ Tiers</div>
+      <div className="font-mono text-xs uppercase tracking-widest text-gold">
+        ⊙ Tiers
+      </div>
       <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
         Free for ranking. Back the build for what&apos;s next.
       </h2>
@@ -81,18 +88,18 @@ export function PricingCards() {
           <div
             key={t.name}
             className={
-              'rounded-2xl border p-9 ' +
+              "rounded-2xl border p-9 " +
               (t.featured
-                ? 'border-gold/25 bg-gradient-to-b from-gold/5 to-bg-surface'
-                : 'border-bg-border-subtle bg-bg-surface')
+                ? "border-gold/25 bg-gradient-to-b from-gold/5 to-bg-surface"
+                : "border-bg-border-subtle bg-bg-surface")
             }
           >
             <span
               className={
-                'inline-block rounded-full px-2.5 py-1 font-mono text-xs font-semibold ' +
+                "inline-block rounded-full px-2.5 py-1 font-mono text-xs font-semibold " +
                 (t.featured
-                  ? 'border border-gold/25 bg-gold/10 text-gold'
-                  : 'bg-bg-elevated text-text-secondary')
+                  ? "border border-gold/25 bg-gold/10 text-gold"
+                  : "bg-bg-elevated text-text-secondary")
               }
             >
               {t.badge}
@@ -122,10 +129,10 @@ export function PricingCards() {
             <Link
               href={t.ctaHref}
               className={
-                'block w-full rounded-md py-2.5 text-center text-sm font-semibold transition-colors ' +
+                "block w-full rounded-md py-2.5 text-center text-sm font-semibold transition-colors " +
                 (t.featured
-                  ? 'bg-gold text-bg-base hover:bg-gold/90'
-                  : 'border border-bg-border text-text-secondary hover:border-bg-border hover:text-text-primary')
+                  ? "bg-gold text-bg-base hover:bg-gold/90"
+                  : "border border-bg-border text-text-secondary hover:border-bg-border hover:text-text-primary")
               }
             >
               {t.cta}
@@ -134,5 +141,5 @@ export function PricingCards() {
         ))}
       </div>
     </section>
-  )
+  );
 }

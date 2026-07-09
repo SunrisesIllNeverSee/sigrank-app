@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
-import { getStripe } from '@/lib/stripe/server'
-import { getSupabaseServer } from '@/lib/supabase/server'
-import { getSessionOperator } from '@/lib/supabase/auth-server'
+import { NextResponse } from "next/server";
+import { getStripe } from "@/lib/stripe/server";
+import { getSupabaseServer } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/supabase/auth-server";
 
 /**
  * POST /api/v1/billing/portal
@@ -18,7 +18,7 @@ import { getSessionOperator } from '@/lib/supabase/auth-server'
  * Stripe is unconfigured, 404 when the signed-in operator has no Stripe customer.
  */
 
-export const runtime = 'nodejs'
+export const runtime = "nodejs";
 
 /**
  * Resolve a Stripe customer id from the operator row. Guarded.
@@ -26,58 +26,61 @@ export const runtime = 'nodejs'
  * column (schema.sql §1); the subscriptions table has no such column.
  */
 async function customerForOperator(operatorId: string): Promise<string | null> {
-  const sb = getSupabaseServer()
-  if (!sb) return null
+  const sb = getSupabaseServer();
+  if (!sb) return null;
   try {
     const { data } = await sb
-      .from('operators')
-      .select('stripe_customer_id')
-      .eq('operator_id', operatorId)
-      .not('stripe_customer_id', 'is', null)
-      .maybeSingle()
-    return (data?.stripe_customer_id as string) ?? null
+      .from("operators")
+      .select("stripe_customer_id")
+      .eq("operator_id", operatorId)
+      .not("stripe_customer_id", "is", null)
+      .maybeSingle();
+    return (data?.stripe_customer_id as string) ?? null;
   } catch {
-    return null
+    return null;
   }
 }
 
 export async function POST(req: Request) {
-  const stripe = getStripe()
+  const stripe = getStripe();
   if (!stripe) {
-    return NextResponse.json({ error: 'stripe_not_configured' }, { status: 503 })
+    return NextResponse.json(
+      { error: "stripe_not_configured" },
+      { status: 503 },
+    );
   }
 
   // Auth gate: resolve the verified session. The body's operator_id/customer_id
   // are deliberately ignored — both were auth-bypass vectors (operator_id is a
   // public UUID; customer_id was accepted with no ownership check).
-  const op = await getSessionOperator()
+  const op = await getSessionOperator();
   if (!op) {
-    return NextResponse.json({ error: 'not_signed_in' }, { status: 401 })
+    return NextResponse.json({ error: "not_signed_in" }, { status: 401 });
   }
 
   // Consume the body for request-shape validation only (keeps the 400 on
   // malformed JSON), but do NOT use its fields for authorization.
   try {
-    await req.json()
+    await req.json();
   } catch {
-    return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ error: "invalid_json" }, { status: 400 });
   }
 
-  const customerId = await customerForOperator(op.operatorId)
+  const customerId = await customerForOperator(op.operatorId);
   if (!customerId) {
-    return NextResponse.json({ error: 'no_customer' }, { status: 404 })
+    return NextResponse.json({ error: "no_customer" }, { status: 404 });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   try {
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${siteUrl}/account/subscription`,
-    })
-    return NextResponse.json({ url: session.url })
+    });
+    return NextResponse.json({ url: session.url });
   } catch (err) {
-    console.error('[portal] session create failed', err)
-    return NextResponse.json({ error: 'portal_failed' }, { status: 502 })
+    console.error("[portal] session create failed", err);
+    return NextResponse.json({ error: "portal_failed" }, { status: 502 });
   }
 }

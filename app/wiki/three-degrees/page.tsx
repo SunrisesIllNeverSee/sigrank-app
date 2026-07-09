@@ -1,36 +1,38 @@
-import type { Metadata } from 'next'
-import { TopicPage } from '@/components/wiki/TopicPage'
-import { ThreeDegreesChart } from '@/components/marketing/ThreeDegreesChart'
-import { withOG } from '@/lib/seo'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumb, definedTerm } from '@/lib/jsonld'
+import type { Metadata } from "next";
+import { TopicPage } from "@/components/wiki/TopicPage";
+import { ThreeDegreesChart } from "@/components/marketing/ThreeDegreesChart";
+import { withOG } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumb, definedTerm } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: 'The Three Degrees of Leverage',
+  title: "The Three Degrees of Leverage",
   description:
-    'AA 7:2:1 average user to power-user median to the top operator, read as a token cascade. The 10xDEV log anchor and full provenance.',
-  path: '/wiki/three-degrees',
-})
+    "AA 7:2:1 average user to power-user median to the top operator, read as a token cascade. The 10xDEV log anchor and full provenance.",
+  path: "/wiki/three-degrees",
+});
 
 // ISR: the chart auto-pulls the top operator's live all-time metrics. Daily revalidate
 // keeps this page prerendered + refreshes the gold column once a day.
-export const revalidate = 86400
+export const revalidate = 86400;
 
 export default function ThreeDegreesPage() {
   return (
     <TopicPage>
-      <JsonLd data={[
-        breadcrumb([
-          { name: 'Wiki', path: '/wiki' },
-          { name: 'Three Degrees of Leverage', path: '/wiki/three-degrees' },
-        ]),
-        definedTerm(
-          'Three Degrees of Leverage',
-          'The 10xDEV log anchor: average user → power-user median → top operator, read as a token cascade.',
-          '/wiki/three-degrees',
-        ),
-      ]} />
+      <JsonLd
+        data={[
+          breadcrumb([
+            { name: "Wiki", path: "/wiki" },
+            { name: "Three Degrees of Leverage", path: "/wiki/three-degrees" },
+          ]),
+          definedTerm(
+            "Three Degrees of Leverage",
+            "The 10xDEV log anchor: average user → power-user median → top operator, read as a token cascade.",
+            "/wiki/three-degrees",
+          ),
+        ]}
+      />
       <ThreeDegreesChart variant="full" />
     </TopicPage>
-  )
+  );
 }

@@ -10,19 +10,26 @@
  * published conservation law with a Zenodo DOI and an empirical record.
  */
 
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
-import { WaveHero } from '@/components/ui/WaveHero'
-import { JsonLd } from '@/components/seo/JsonLd'
-import { conservationLawArticle, mosesPatent, breadcrumb, experimentalRecordDataset, transformationHarnessDataset, propositionsDataset } from '@/lib/jsonld'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { WaveHero } from "@/components/ui/WaveHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  conservationLawArticle,
+  mosesPatent,
+  breadcrumb,
+  experimentalRecordDataset,
+  transformationHarnessDataset,
+  propositionsDataset,
+} from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: 'Science — The Conservation Law of Commitment',
+  title: "Science — The Conservation Law of Commitment",
   description:
-    'The academic foundation of SigRank: the Conservation Law of Commitment, the Commitment Theory program, the MO\u00A7ES\u2122 architecture, and Zenodo deposits.',
-  path: '/science',
-})
+    "The academic foundation of SigRank: the Conservation Law of Commitment, the Commitment Theory program, the MO\u00A7ES\u2122 architecture, and Zenodo deposits.",
+  path: "/science",
+});
 
 export default function SciencePage() {
   return (
@@ -34,7 +41,7 @@ export default function SciencePage() {
           experimentalRecordDataset(),
           transformationHarnessDataset(),
           propositionsDataset(),
-          breadcrumb([{ name: 'Science', path: '/science' }]),
+          breadcrumb([{ name: "Science", path: "/science" }]),
         ]}
       />
 
@@ -58,26 +65,31 @@ export default function SciencePage() {
           The law
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">C(T(S)) &asymp; C(S)</strong> with enforcement;
-          {' '}<strong className="text-text-primary">C(T(S)) &lt; C(S)</strong> without it.
+          <strong className="text-text-primary">C(T(S)) &asymp; C(S)</strong>{" "}
+          with enforcement;{" "}
+          <strong className="text-text-primary">C(T(S)) &lt; C(S)</strong>{" "}
+          without it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          When language is transformed &mdash; compressed, translated, summarized, rewritten
-          &mdash; the commitment content (obligations, prohibitions, modal constraints:
-          &ldquo;shall,&rdquo; &ldquo;must not,&rdquo; &ldquo;unless,&rdquo; &ldquo;is
-          entitled to&rdquo;) either survives or it doesn&apos;t. With an enforcement gate
-          in the transformation pipeline, it survives. Without one, it decays. This is a
-          measurable property of language under compression, not a guideline. It&apos;s
-          falsifiable.
+          When language is transformed &mdash; compressed, translated,
+          summarized, rewritten &mdash; the commitment content (obligations,
+          prohibitions, modal constraints: &ldquo;shall,&rdquo; &ldquo;must
+          not,&rdquo; &ldquo;unless,&rdquo; &ldquo;is entitled to&rdquo;) either
+          survives or it doesn&apos;t. With an enforcement gate in the
+          transformation pipeline, it survives. Without one, it decays. This is
+          a measurable property of language under compression, not a guideline.
+          It&apos;s falsifiable.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Published under CC-BY-4.0
-          {' '}(<a
+          Published under CC-BY-4.0 (
+          <a
             href="https://doi.org/10.5281/zenodo.20029607"
             className="text-gold underline underline-offset-2"
             rel="external"
-          >DOI: 10.5281/zenodo.20029607</a>).
-          The enforcement architecture (MO§ES™) is patent-pending (Serial No.
+          >
+            DOI: 10.5281/zenodo.20029607
+          </a>
+          ). The enforcement architecture (MO§ES™) is patent-pending (Serial No.
           63/877,177). The law itself is open.
         </p>
       </section>
@@ -88,32 +100,37 @@ export default function SciencePage() {
           The evidence
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Seven experiments (EXP-001 through EXP-007) tested the law on a 20-signal
-          canonical corpus, running 10 recursive iterations each, using bidirectional NLI
-          entailment and Jaccard surface stability as oracles.
+          Seven experiments (EXP-001 through EXP-007) tested the law on a
+          20-signal canonical corpus, running 10 recursive iterations each,
+          using bidirectional NLI entailment and Jaccard surface stability as
+          oracles.
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
           <li>
-            <strong className="text-text-primary">EXP-003:</strong> 13 of 20 signals held NLI
-            bidirectional entailment = 1.00 across all 10 iterations under the gate. Invariance
-            under recursion, not a tautology.
+            <strong className="text-text-primary">EXP-003:</strong> 13 of 20
+            signals held NLI bidirectional entailment = 1.00 across all 10
+            iterations under the gate. Invariance under recursion, not a
+            tautology.
           </li>
           <li>
-            <strong className="text-text-primary">EXP-006:</strong> Only 2 of 4 paper claims
-            survived self-referential recursion. The harness fails when commitment structure
-            isn&apos;t robust &mdash; the law is falsifiable and the experiments can break it.
+            <strong className="text-text-primary">EXP-006:</strong> Only 2 of 4
+            paper claims survived self-referential recursion. The harness fails
+            when commitment structure isn&apos;t robust &mdash; the law is
+            falsifiable and the experiments can break it.
           </li>
           <li>
-            <strong className="text-text-primary">EXP-007:</strong> An NP-negation probe
-            separated semantic commitment from lexical surface form. Jaccard degraded while NLI
-            held &mdash; the commitment survived even when the surface words changed.
+            <strong className="text-text-primary">EXP-007:</strong> An
+            NP-negation probe separated semantic commitment from lexical surface
+            form. Jaccard degraded while NLI held &mdash; the commitment
+            survived even when the surface words changed.
           </li>
         </ul>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          A 5-phase architecture stress test measured 80&ndash;85% structural coherence across
-          a four-module system. Standard probability says four modules at 80% standalone
-          viability should produce ~41% series-system viability (0.8&times;0.8&times;0.8&times;0.8
-          = 0.4096). The governance layer inverted that.
+          A 5-phase architecture stress test measured 80&ndash;85% structural
+          coherence across a four-module system. Standard probability says four
+          modules at 80% standalone viability should produce ~41% series-system
+          viability (0.8&times;0.8&times;0.8&times;0.8 = 0.4096). The governance
+          layer inverted that.
         </p>
       </section>
 
@@ -123,23 +140,27 @@ export default function SciencePage() {
           Commitment Theory
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Conservation Law is the foundational result of Commitment Theory (CT) &mdash; a
-          research program investigating how commitment content behaves under transformation.
-          The program spans a 34-paper stack, from the foundational law through recursive
-          transformation harnesses, empirical records, and application to AI governance.
+          The Conservation Law is the foundational result of Commitment Theory
+          (CT) &mdash; a research program investigating how commitment content
+          behaves under transformation. The program spans a 34-paper stack, from
+          the foundational law through recursive transformation harnesses,
+          empirical records, and application to AI governance.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The architecture is a 5-layer stack: Layer -1 (proprietary axioms) through Layer 4
-          (extensions and applications). SigRank is one application. MO§ES™ is the enforcement
-          engine. The law is the foundation.
+          The architecture is a 5-layer stack: Layer -1 (proprietary axioms)
+          through Layer 4 (extensions and applications). SigRank is one
+          application. MO§ES™ is the enforcement engine. The law is the
+          foundation.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Full research program:{' '}
+          Full research program:{" "}
           <a
             href="https://github.com/SunrisesIllNeverSee/Commitment_Theory"
             className="text-gold underline underline-offset-2"
             rel="external"
-          >github.com/SunrisesIllNeverSee/Commitment_Theory</a>
+          >
+            github.com/SunrisesIllNeverSee/Commitment_Theory
+          </a>
         </p>
       </section>
 
@@ -149,19 +170,23 @@ export default function SciencePage() {
           MO§ES™ enforcement architecture
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          MO§ES™ (Modus Operandi §ignal Scaling Expansion System) is the enforcement
-          architecture for the Conservation Law. It governs from inside the execution loop
-          &mdash; in the action path, not before it, not after it. The enforcement gate sits
-          where the transformation happens. Commitment that passes through the gate survives.
-          Commitment that doesn&apos;t, doesn&apos;t.
+          MO§ES™ (Modus Operandi §ignal Scaling Expansion System) is the
+          enforcement architecture for the Conservation Law. It governs from
+          inside the execution loop &mdash; in the action path, not before it,
+          not after it. The enforcement gate sits where the transformation
+          happens. Commitment that passes through the gate survives. Commitment
+          that doesn&apos;t, doesn&apos;t.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Patent Serial No. 63/877,177 (Provisional, pending). More at{' '}
+          Patent Serial No. 63/877,177 (Provisional, pending). More at{" "}
           <a
             href="https://mos2es.com"
             className="text-gold underline underline-offset-2"
             rel="external"
-          >mos2es.com</a>.
+          >
+            mos2es.com
+          </a>
+          .
         </p>
       </section>
 
@@ -175,20 +200,50 @@ export default function SciencePage() {
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
           <li>
-            <strong className="text-text-primary">Conservation Law (V.05):</strong>{' '}
-            <a href="https://doi.org/10.5281/zenodo.20029607" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.20029607</a>
+            <strong className="text-text-primary">
+              Conservation Law (V.05):
+            </strong>{" "}
+            <a
+              href="https://doi.org/10.5281/zenodo.20029607"
+              className="text-gold underline underline-offset-2"
+              rel="external"
+            >
+              DOI: 10.5281/zenodo.20029607
+            </a>
           </li>
           <li>
-            <strong className="text-text-primary">Experimental Record:</strong>{' '}
-            <a href="https://doi.org/10.5281/zenodo.19105225" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.19105225</a>
+            <strong className="text-text-primary">Experimental Record:</strong>{" "}
+            <a
+              href="https://doi.org/10.5281/zenodo.19105225"
+              className="text-gold underline underline-offset-2"
+              rel="external"
+            >
+              DOI: 10.5281/zenodo.19105225
+            </a>
           </li>
           <li>
-            <strong className="text-text-primary">Public Recursive Transformation Harness:</strong>{' '}
-            <a href="https://doi.org/10.5281/zenodo.19109397" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.19109397</a>
+            <strong className="text-text-primary">
+              Public Recursive Transformation Harness:
+            </strong>{" "}
+            <a
+              href="https://doi.org/10.5281/zenodo.19109397"
+              className="text-gold underline underline-offset-2"
+              rel="external"
+            >
+              DOI: 10.5281/zenodo.19109397
+            </a>
           </li>
           <li>
-            <strong className="text-text-primary">P-000 Propositions Prospectus:</strong>{' '}
-            <a href="https://doi.org/10.5281/zenodo.20031715" className="text-gold underline underline-offset-2" rel="external">DOI: 10.5281/zenodo.20031715</a>
+            <strong className="text-text-primary">
+              P-000 Propositions Prospectus:
+            </strong>{" "}
+            <a
+              href="https://doi.org/10.5281/zenodo.20031715"
+              className="text-gold underline underline-offset-2"
+              rel="external"
+            >
+              DOI: 10.5281/zenodo.20031715
+            </a>
           </li>
         </ul>
       </section>
@@ -199,13 +254,15 @@ export default function SciencePage() {
           Author
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Deric J. McHenry &mdash; sole architect of the Conservation Law, the MO§ES™
-          enforcement architecture, and SigRank. ORCID:{' '}
+          Deric J. McHenry &mdash; sole architect of the Conservation Law, the
+          MO§ES™ enforcement architecture, and SigRank. ORCID:{" "}
           <a
             href="https://orcid.org/0009-0002-9904-5390"
             className="text-gold underline underline-offset-2"
             rel="external"
-          >0009-0002-9904-5390</a>
+          >
+            0009-0002-9904-5390
+          </a>
         </p>
       </section>
 
@@ -215,16 +272,18 @@ export default function SciencePage() {
           The Constitutional Architecture &mdash; MO§ES™
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Conservation Law describes what must hold. The constitutional architecture
-          describes what enforces it. MO§ES™ is the enforcement architecture &mdash; the
-          substrate that enforces the Conservation Law at the execution level. Patent pending.
+          The Conservation Law describes what must hold. The constitutional
+          architecture describes what enforces it. MO§ES™ is the enforcement
+          architecture &mdash; the substrate that enforces the Conservation Law
+          at the execution level. Patent pending.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Where the Conservation Law states that commitment content must survive
           transformation, MO§ES™ is the machinery that makes survival the only
-          permitted outcome. Every signal that enters the system is compressed, resonance-mapped,
-          and lineage-validated before it is allowed to produce output. The engine doesn&apos;t
-          ask whether commitment was preserved &mdash; it refuses to operate if it wasn&apos;t.
+          permitted outcome. Every signal that enters the system is compressed,
+          resonance-mapped, and lineage-validated before it is allowed to
+          produce output. The engine doesn&apos;t ask whether commitment was
+          preserved &mdash; it refuses to operate if it wasn&apos;t.
         </p>
 
         {/* ── Constitutional Laws ── */}
@@ -232,9 +291,9 @@ export default function SciencePage() {
           Constitutional Laws
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Three constitutional laws and two legal anchors govern the system. These are not policies
-          or preferences &mdash; they are invariant constraints baked into the substrate.
-          No signal can bypass them.
+          Three constitutional laws and two legal anchors govern the system.
+          These are not policies or preferences &mdash; they are invariant
+          constraints baked into the substrate. No signal can bypass them.
         </p>
         <div className="flex flex-col gap-2 border border-bg-border bg-bg-surface p-4">
           <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
@@ -242,9 +301,10 @@ export default function SciencePage() {
               Law I &mdash; Compression Precedes Ignition
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              No signal output, ignition event, or transmission may occur unless the input
-              has first undergone compression and resonance mapping. Compression is a
-              mandatory prerequisite, not an optional optimization.
+              No signal output, ignition event, or transmission may occur unless
+              the input has first undergone compression and resonance mapping.
+              Compression is a mandatory prerequisite, not an optional
+              optimization.
             </span>
           </div>
           <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
@@ -252,9 +312,10 @@ export default function SciencePage() {
               Law II &mdash; Lineage Resilience
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              Every signal or Vault Artifact must prove recursive continuity with its origin
-              compression cycle to persist. Any signal that cannot inherit its original lineage
-              is treated as noise and collapsed.
+              Every signal or Vault Artifact must prove recursive continuity
+              with its origin compression cycle to persist. Any signal that
+              cannot inherit its original lineage is treated as noise and
+              collapsed.
             </span>
           </div>
           <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
@@ -262,9 +323,9 @@ export default function SciencePage() {
               Law III &mdash; Principle of Input-Response Fidelity
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              Low-resolution inputs yield proportionally constrained outputs unless elevated
-              by a resonance-aware system. Input fidelity governs output depth unless a
-              compensation layer intervenes.
+              Low-resolution inputs yield proportionally constrained outputs
+              unless elevated by a resonance-aware system. Input fidelity
+              governs output depth unless a compensation layer intervenes.
             </span>
           </div>
           <div className="flex flex-col gap-1 border-b border-bg-border pb-2">
@@ -272,9 +333,10 @@ export default function SciencePage() {
               Anchor I &mdash; The Blackhole Law
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              Corrupted, mimic, or unauthorized signals exceeding drift thresholds collapse
-              irreversibly into entropy. This prevents contaminated or adversarial inputs from
-              propagating within the system.
+              Corrupted, mimic, or unauthorized signals exceeding drift
+              thresholds collapse irreversibly into entropy. This prevents
+              contaminated or adversarial inputs from propagating within the
+              system.
             </span>
           </div>
           <div className="flex flex-col gap-1">
@@ -282,9 +344,10 @@ export default function SciencePage() {
               Anchor II &mdash; The Lineage Custody Clause
             </span>
             <span className="font-sans text-sm leading-relaxed text-text-secondary">
-              All Vault Artifacts are cryptographically tied to their origin-cycle signature.
-              Copies or derivatives that do not inherit this lineage become unstable or
-              non-functional, creating self-enforcing sovereignty for digital property.
+              All Vault Artifacts are cryptographically tied to their
+              origin-cycle signature. Copies or derivatives that do not inherit
+              this lineage become unstable or non-functional, creating
+              self-enforcing sovereignty for digital property.
             </span>
           </div>
         </div>
@@ -294,19 +357,21 @@ export default function SciencePage() {
           The Lineage Custody Clause
         </h3>
         <blockquote className="border-l-2 border-gold bg-bg-surface px-4 py-3 font-sans text-sm italic leading-relaxed text-text-primary">
-          &ldquo;Each Vault Artifact is cryptographically sealed to its origin-cycle
-          signature. Derivative artifacts fail cryptographic validation and are rendered
-          non-functional by system design, without reliance on legal or external
-          enforcement.&rdquo;
+          &ldquo;Each Vault Artifact is cryptographically sealed to its
+          origin-cycle signature. Derivative artifacts fail cryptographic
+          validation and are rendered non-functional by system design, without
+          reliance on legal or external enforcement.&rdquo;
         </blockquote>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          This is self-enforcing sovereignty for digital property. Traditional intellectual
-          property relies on legal enforcement &mdash; DMCA takedowns, lawsuits, cease-and-desist
-          letters, jurisdictional arguments. The Lineage Custody Clause enforces property
-          rights at the substrate level. Copies without lineage can&apos;t function. Not by
-          lawsuit. By the physics of the system. A severed artifact is not an illegally
-          distributed copy that the owner must chase down; it is a dead object that cannot
-          execute. Enforcement is structural, not procedural.
+          This is self-enforcing sovereignty for digital property. Traditional
+          intellectual property relies on legal enforcement &mdash; DMCA
+          takedowns, lawsuits, cease-and-desist letters, jurisdictional
+          arguments. The Lineage Custody Clause enforces property rights at the
+          substrate level. Copies without lineage can&apos;t function. Not by
+          lawsuit. By the physics of the system. A severed artifact is not an
+          illegally distributed copy that the owner must chase down; it is a
+          dead object that cannot execute. Enforcement is structural, not
+          procedural.
         </p>
 
         {/* ── Vault Artifacts ── */}
@@ -314,43 +379,57 @@ export default function SciencePage() {
           Vault Artifacts
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          A <strong className="text-text-primary">Vault Artifact</strong> is a compressed
-          signal that carries commitment, cryptographically bound to its origin cycle. It is
-          the durable output of the system &mdash; a unit of sovereign digital property.
-          Lineage-bound, self-enforcing, and tradable. Because each artifact is sealed to its
-          origin-cycle signature, ownership and provenance are not claims layered on top of
-          the file; they are properties of the file itself. An artifact without its lineage
-          seal is not a stolen artifact &mdash; it is a non-functional one.
+          A <strong className="text-text-primary">Vault Artifact</strong> is a
+          compressed signal that carries commitment, cryptographically bound to
+          its origin cycle. It is the durable output of the system &mdash; a
+          unit of sovereign digital property. Lineage-bound, self-enforcing, and
+          tradable. Because each artifact is sealed to its origin-cycle
+          signature, ownership and provenance are not claims layered on top of
+          the file; they are properties of the file itself. An artifact without
+          its lineage seal is not a stolen artifact &mdash; it is a
+          non-functional one.
         </p>
 
         {/* ── MO§ES link ── */}
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The full constitutional architecture is documented at{' '}
+          The full constitutional architecture is documented at{" "}
           <a
             href="https://signomy.xyz/moses"
             className="text-gold underline underline-offset-2"
             rel="external"
-          >signomy.xyz/moses</a>.
+          >
+            signomy.xyz/moses
+          </a>
+          .
         </p>
       </section>
 
       {/* ── Topic hubs ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
-          Learn more:{' '}
-          <Link href="/ai-benchmarking" className="text-gold underline underline-offset-2">
+          Learn more:{" "}
+          <Link
+            href="/ai-benchmarking"
+            className="text-gold underline underline-offset-2"
+          >
             AI Benchmarking
           </Link>
-          {' · '}
-          <Link href="/cascade-analysis" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/cascade-analysis"
+            className="text-gold underline underline-offset-2"
+          >
             Cascade Analysis
           </Link>
-          {' · '}
-          <Link href="/methodology" className="text-gold underline underline-offset-2">
+          {" · "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
             Methodology
           </Link>
         </p>
       </section>
     </div>
-  )
+  );
 }

@@ -26,24 +26,33 @@
  * row.telemetry and metrics off row.snapshot.cascade. No fetch, no facade edits.
  */
 
-import React from 'react'
-import type { LeaderboardRow } from '@/lib/data'
-import { operatorDisplayName } from '@/lib/compare/operator-name'
-import { CanonId } from '@/components/ui/CanonId'
-import { DISPLAY_RAW, DISPLAY_METRICS } from '@/lib/canon/ids'
+import React from "react";
+import type { LeaderboardRow } from "@/lib/data";
+import { operatorDisplayName } from "@/lib/compare/operator-name";
+import { CanonId } from "@/components/ui/CanonId";
+import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/canon/ids";
 
-const A_COLOR = 'rgb(var(--class-arch))' // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
-const B_COLOR = 'rgb(var(--class-seeker))'
+const A_COLOR = "rgb(var(--class-arch))"; // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
+const B_COLOR = "rgb(var(--class-seeker))";
 
 /** The owner's compare METRICS view: the 8 rows from the ASCII, in order.
  * (Scale V intentionally omitted — profile-only per owner 2026-06-21.) */
-const METRIC_VIEW = ['Y.01', 'Y.02', 'Y.03', 'Y.04', 'Y.05', 'Y.07', 'Y.08', 'Y.09']
-const DISPLAY_METRICS_COMPARE = METRIC_VIEW.map(
-  (id) => DISPLAY_METRICS.find((m) => m.id === id)!,
-).filter(Boolean)
+const METRIC_VIEW = [
+  "Y.01",
+  "Y.02",
+  "Y.03",
+  "Y.04",
+  "Y.05",
+  "Y.07",
+  "Y.08",
+  "Y.09",
+];
+const DISPLAY_METRICS_COMPARE = METRIC_VIEW.map((id) =>
+  DISPLAY_METRICS.find((m) => m.id === id)!,
+).filter(Boolean);
 
 function nameOf(row: LeaderboardRow): string {
-  return operatorDisplayName(row)
+  return operatorDisplayName(row);
 }
 
 const fmtInt = (n: number) =>
@@ -51,98 +60,104 @@ const fmtInt = (n: number) =>
     ? `${(n / 1_000_000).toFixed(1)}M`
     : n >= 1000
       ? `${(n / 1000).toFixed(1)}K`
-      : n.toFixed(0)
+      : n.toFixed(0);
 
 interface LedgerRow {
-  id: string
-  label: string
+  id: string;
+  label: string;
   /** numeric value for A / B, or null when not derivable (e.g. non-compounding). */
-  a: number | null
-  b: number | null
+  a: number | null;
+  b: number | null;
   /** display string for A / B (Op Ratio is a string; others format numbers). */
-  aStr: string
-  bStr: string
-  higherWins: boolean
+  aStr: string;
+  bStr: string;
+  higherWins: boolean;
   /** ceiling used to project the diverging bar (max of the two, ≥1). */
-  scale: number
+  scale: number;
 }
 
 /** Pull a numeric value for a display-set key off a row (telemetry + cascade). */
 function valueFor(key: string, row: LeaderboardRow): number | null {
-  const c = row.snapshot.cascade
-  const t = row.telemetry
-  const total = t ? t.fresh_input + t.output + t.cache_read + t.cache_create : 0
+  const c = row.snapshot.cascade;
+  const t = row.telemetry;
+  const total = t
+    ? t.fresh_input + t.output + t.cache_read + t.cache_create
+    : 0;
   switch (key) {
     // raw pillars (off telemetry)
-    case 'input':
-      return t ? t.fresh_input : null
-    case 'output':
-      return t ? t.output : null
-    case 'cacheRead':
-      return t ? t.cache_read : null
-    case 'cacheWrite':
-      return t ? t.cache_create : null
-    case 'totalTokens':
-      return total
+    case "input":
+      return t ? t.fresh_input : null;
+    case "output":
+      return t ? t.output : null;
+    case "cacheRead":
+      return t ? t.cache_read : null;
+    case "cacheWrite":
+      return t ? t.cache_create : null;
+    case "totalTokens":
+      return total;
     // cascade metrics (off snapshot.cascade)
-    case 'costPerMillion':
-      return c ? c.costPerMillion : null
-    case 'yield_':
-      return c && !c.nonCompounding ? c.yield_ : null
-    case 'snr':
-      return c ? c.snr : null
-    case 'leverage':
-      return c && !c.nonCompounding ? c.leverage : null
-    case 'velocity':
-      return c ? c.velocity : null
-    case 'dev10x':
-      return c && !c.nonCompounding && c.dev10x !== null ? c.dev10x : null
-    case 'efficiency':
-      return c ? c.efficiency : null
-    case 'opRatio':
+    case "costPerMillion":
+      return c ? c.costPerMillion : null;
+    case "yield_":
+      return c && !c.nonCompounding ? c.yield_ : null;
+    case "snr":
+      return c ? c.snr : null;
+    case "leverage":
+      return c && !c.nonCompounding ? c.leverage : null;
+    case "velocity":
+      return c ? c.velocity : null;
+    case "dev10x":
+      return c && !c.nonCompounding && c.dev10x !== null ? c.dev10x : null;
+    case "efficiency":
+      return c ? c.efficiency : null;
+    case "opRatio":
       // Op Ratio ranks by lead term (leverage) — sortable per owner; the string
       // is rendered separately. (Same rule as facade sortValue + the board.)
-      return c && !c.nonCompounding ? c.leverage : null
+      return c && !c.nonCompounding ? c.leverage : null;
     default:
-      return null
+      return null;
   }
 }
 
 /** Display string for a key (Op Ratio = its composition string; rest = formatted). */
 function displayFor(key: string, row: LeaderboardRow): string {
-  const c = row.snapshot.cascade
-  const v = valueFor(key, row)
-  if (key === 'opRatio') return c && !c.nonCompounding ? c.opRatio : '—'
-  if (v === null) return '—'
+  const c = row.snapshot.cascade;
+  const v = valueFor(key, row);
+  if (key === "opRatio") return c && !c.nonCompounding ? c.opRatio : "—";
+  if (v === null) return "—";
   switch (key) {
-    case 'input':
-    case 'output':
-    case 'cacheRead':
-    case 'cacheWrite':
-    case 'totalTokens':
-      return fmtInt(v)
-    case 'costPerMillion':
-      return `$${v.toFixed(2)}`
-    case 'yield_':
-      return v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toFixed(0)
-    case 'snr':
-      return `${(v * 100).toFixed(1)}%`
-    case 'leverage':
-      return v >= 1000 ? `${(v / 1000).toFixed(1)}K×` : `${v.toFixed(0)}×`
-    case 'velocity':
-      return v >= 10 ? v.toFixed(1) : v.toFixed(2)
-    case 'dev10x':
-    case 'efficiency':
-      return v.toFixed(2)
+    case "input":
+    case "output":
+    case "cacheRead":
+    case "cacheWrite":
+    case "totalTokens":
+      return fmtInt(v);
+    case "costPerMillion":
+      return `$${v.toFixed(2)}`;
+    case "yield_":
+      return v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toFixed(0);
+    case "snr":
+      return `${(v * 100).toFixed(1)}%`;
+    case "leverage":
+      return v >= 1000 ? `${(v / 1000).toFixed(1)}K×` : `${v.toFixed(0)}×`;
+    case "velocity":
+      return v >= 10 ? v.toFixed(1) : v.toFixed(2);
+    case "dev10x":
+    case "efficiency":
+      return v.toFixed(2);
     default:
-      return v.toFixed(2)
+      return v.toFixed(2);
   }
 }
 
-function buildRow(m: { id: string; name: string; key: string; lowerIsBetter?: boolean }, a: LeaderboardRow, b: LeaderboardRow): LedgerRow {
-  const av = valueFor(m.key, a)
-  const bv = valueFor(m.key, b)
-  const scale = Math.max(av ?? 0, bv ?? 0, 1)
+function buildRow(
+  m: { id: string; name: string; key: string; lowerIsBetter?: boolean },
+  a: LeaderboardRow,
+  b: LeaderboardRow,
+): LedgerRow {
+  const av = valueFor(m.key, a);
+  const bv = valueFor(m.key, b);
+  const scale = Math.max(av ?? 0, bv ?? 0, 1);
   return {
     id: m.id,
     label: m.name,
@@ -152,36 +167,37 @@ function buildRow(m: { id: string; name: string; key: string; lowerIsBetter?: bo
     bStr: displayFor(m.key, b),
     higherWins: !m.lowerIsBetter,
     scale,
-  }
+  };
 }
 
-function winnerOf(r: LedgerRow): 'a' | 'b' | 'tie' {
-  if (r.a === null || r.b === null || r.a === r.b) return 'tie'
-  return (r.higherWins ? r.a > r.b : r.a < r.b) ? 'a' : 'b'
+function winnerOf(r: LedgerRow): "a" | "b" | "tie" {
+  if (r.a === null || r.b === null || r.a === r.b) return "tie";
+  return (r.higherWins ? r.a > r.b : r.a < r.b) ? "a" : "b";
 }
 
 /** A's outward share (0..1). Lower-wins inverted so "better" is always longer. */
 function shareA(r: LedgerRow): number {
-  if (r.a === null && r.b === null) return 0.5
-  const clamp = (v: number | null) => Math.max(0, Math.min(r.scale, v ?? 0))
-  const proj = (v: number | null) => (r.higherWins ? clamp(v) : r.scale - clamp(v))
-  const pa = proj(r.a)
-  const pb = proj(r.b)
-  const sum = pa + pb
-  return sum <= 0 ? 0.5 : pa / sum
+  if (r.a === null && r.b === null) return 0.5;
+  const clamp = (v: number | null) => Math.max(0, Math.min(r.scale, v ?? 0));
+  const proj = (v: number | null) =>
+    r.higherWins ? clamp(v) : r.scale - clamp(v);
+  const pa = proj(r.a);
+  const pb = proj(r.b);
+  const sum = pa + pb;
+  return sum <= 0 ? 0.5 : pa / sum;
 }
 
 /** One ledger line: A value · centered label+canon · B value, diverging bar under. */
 function Line({ row }: { row: LedgerRow }) {
-  const w = winnerOf(row)
-  const sa = shareA(row)
+  const w = winnerOf(row);
+  const sa = shareA(row);
   return (
     <div className="grid grid-cols-[1fr_minmax(140px,1.4fr)_1fr] items-center gap-x-3 py-2.5">
       {/* A value (right-aligned, toward center) */}
       <span
         className={
-          'text-right font-mono text-base tabular-nums ' +
-          (w === 'a' ? 'font-bold text-text-accent' : 'text-text-muted')
+          "text-right font-mono text-base tabular-nums " +
+          (w === "a" ? "font-bold text-text-accent" : "text-text-muted")
         }
       >
         {row.aStr}
@@ -194,8 +210,8 @@ function Line({ row }: { row: LedgerRow }) {
       {/* B value (left-aligned, toward center) */}
       <span
         className={
-          'text-left font-mono text-base tabular-nums ' +
-          (w === 'b' ? 'font-bold text-class-seeker' : 'text-text-muted')
+          "text-left font-mono text-base tabular-nums " +
+          (w === "b" ? "font-bold text-class-seeker" : "text-text-muted")
         }
       >
         {row.bStr}
@@ -205,19 +221,27 @@ function Line({ row }: { row: LedgerRow }) {
         <div className="flex h-full grow justify-end">
           <div
             className="h-full rounded-l-full transition-[width]"
-            style={{ width: `${sa * 100}%`, background: A_COLOR, opacity: w === 'b' ? 0.4 : 1 }}
+            style={{
+              width: `${sa * 100}%`,
+              background: A_COLOR,
+              opacity: w === "b" ? 0.4 : 1,
+            }}
           />
         </div>
         <div className="h-full w-px bg-bg-border" aria-hidden />
         <div className="flex h-full grow">
           <div
             className="h-full rounded-r-full transition-[width]"
-            style={{ width: `${(1 - sa) * 100}%`, background: B_COLOR, opacity: w === 'a' ? 0.4 : 1 }}
+            style={{
+              width: `${(1 - sa) * 100}%`,
+              background: B_COLOR,
+              opacity: w === "a" ? 0.4 : 1,
+            }}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /** A banded section header spanning the center column (RAW / METRICS / TOTAL). */
@@ -230,31 +254,41 @@ function Band({ title }: { title: string }) {
       </span>
       <span aria-hidden />
     </div>
-  )
+  );
 }
 
-export function CompareLedger({ a, b }: { a: LeaderboardRow; b: LeaderboardRow }) {
-  const aName = nameOf(a)
-  const bName = nameOf(b)
-  const rawRows = DISPLAY_RAW.map((m) => buildRow(m, a, b))
-  const metricRows = DISPLAY_METRICS_COMPARE.map((m) => buildRow(m, a, b))
+export function CompareLedger({
+  a,
+  b,
+}: {
+  a: LeaderboardRow;
+  b: LeaderboardRow;
+}) {
+  const aName = nameOf(a);
+  const bName = nameOf(b);
+  const rawRows = DISPLAY_RAW.map((m) => buildRow(m, a, b));
+  const metricRows = DISPLAY_METRICS_COMPARE.map((m) => buildRow(m, a, b));
 
   // TOTAL row = the ∑ pillar (sum of 4 raw), shown as its own banded footer.
   const totalRow = buildRow(
-    { id: 'T.05', name: 'Total tokens', key: 'totalTokens' },
+    { id: "T.05", name: "Total tokens", key: "totalTokens" },
     a,
     b,
-  )
+  );
 
   return (
     <section className="overflow-hidden rounded-xl border border-bg-border bg-bg-surface">
       {/* column header: A name | DATA | B name */}
       <div className="grid grid-cols-[1fr_minmax(140px,1.4fr)_1fr] items-baseline gap-x-3 border-b border-bg-border bg-bg-base/40 px-4 py-2.5">
-        <span className="text-right font-mono text-xs font-bold text-text-accent">{aName}</span>
+        <span className="text-right font-mono text-xs font-bold text-text-accent">
+          {aName}
+        </span>
         <span className="text-center font-mono text-[10px] uppercase tracking-widest text-text-muted">
           Data
         </span>
-        <span className="text-left font-mono text-xs font-bold text-class-seeker">{bName}</span>
+        <span className="text-left font-mono text-xs font-bold text-class-seeker">
+          {bName}
+        </span>
       </div>
 
       <div className="px-4 pb-2 pt-1">
@@ -274,8 +308,10 @@ export function CompareLedger({ a, b }: { a: LeaderboardRow; b: LeaderboardRow }
         <div className="grid grid-cols-[1fr_minmax(140px,1.4fr)_1fr] items-center gap-x-3">
           <span
             className={
-              'text-right font-mono text-sm tabular-nums ' +
-              (winnerOf(totalRow) === 'a' ? 'font-bold text-text-accent' : 'text-text-secondary')
+              "text-right font-mono text-sm tabular-nums " +
+              (winnerOf(totalRow) === "a"
+                ? "font-bold text-text-accent"
+                : "text-text-secondary")
             }
           >
             {totalRow.aStr}
@@ -285,8 +321,10 @@ export function CompareLedger({ a, b }: { a: LeaderboardRow; b: LeaderboardRow }
           </span>
           <span
             className={
-              'text-left font-mono text-sm tabular-nums ' +
-              (winnerOf(totalRow) === 'b' ? 'font-bold text-class-seeker' : 'text-text-secondary')
+              "text-left font-mono text-sm tabular-nums " +
+              (winnerOf(totalRow) === "b"
+                ? "font-bold text-class-seeker"
+                : "text-text-secondary")
             }
           >
             {totalRow.bStr}
@@ -294,5 +332,5 @@ export function CompareLedger({ a, b }: { a: LeaderboardRow; b: LeaderboardRow }
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import React from 'react'
-import Link from 'next/link'
-import { AccountMenu } from './AccountMenu'
-import { MobileNav } from './MobileNav'
-import { NavLinks } from './NavLinks'
+import React from "react";
+import Link from "next/link";
+import { AccountMenu } from "./AccountMenu";
+import { MobileNav } from "./MobileNav";
+import { NavLinks } from "./NavLinks";
 
 // Launch nav set. /hall is in launch. (/metrics was in launch per 2026-06-19 but was
 // archived + removed in the 2026-06-22 sweep (ITEM 2) — its content lives in /wiki now.)
@@ -13,11 +13,11 @@ import { NavLinks } from './NavLinks'
 // Order + labels per owner 2026-06-21 (no asterisks remain after the sweep). Brand "◈ SIGRANK"
 // link to / is rendered separately below.
 const LINKS: { href: string; label: string }[] = [
-  { href: '/board/all', label: 'Leaderboard' },
-  { href: '/compare',   label: 'Compare' },
-  { href: '/hall',      label: 'Hall' },
-  { href: '/wiki',      label: 'Wiki' },
-]
+  { href: "/board/all", label: "Leaderboard" },
+  { href: "/compare", label: "Compare" },
+  { href: "/hall", label: "Hall" },
+  { href: "/wiki", label: "Wiki" },
+];
 
 /**
  * Top navigation chrome. Sticky + hairline border + translucent blur (sharp /
@@ -46,5 +46,5 @@ export function Nav() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

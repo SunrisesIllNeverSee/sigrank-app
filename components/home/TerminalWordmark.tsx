@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import { TerminalBlockText } from '@/components/home/TerminalBlockText'
+import React, { useEffect, useState } from "react";
+import { TerminalBlockText } from "@/components/home/TerminalBlockText";
 
 /**
  * TerminalWordmark — the terminal-theme hero wordmark (Layer 3, FIX O-adjacent).
@@ -24,24 +24,27 @@ import { TerminalBlockText } from '@/components/home/TerminalBlockText'
  * Optional nicety (included — reads clean): the ◈ ─── ◈ rule (SPLASH_RULE).
  */
 
-const SPLASH_RULE = '◈  ───────────────────────────────────────────  ◈'
+const SPLASH_RULE = "◈  ───────────────────────────────────────────  ◈";
 
 export function TerminalWordmark() {
-  const [isTerminal, setIsTerminal] = useState(false)
+  const [isTerminal, setIsTerminal] = useState(false);
 
   useEffect(() => {
     const check = () => {
-      const t = document.documentElement.getAttribute('data-theme')
-      setIsTerminal(t === 'terminal')
-    }
-    check()
+      const t = document.documentElement.getAttribute("data-theme");
+      setIsTerminal(t === "terminal");
+    };
+    check();
     // Watch for theme changes (the ThemeToggle sets data-theme on <html>).
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => observer.disconnect()
-  }, [])
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
-  if (!isTerminal) return null
+  if (!isTerminal) return null;
 
   return (
     <div className="flex flex-col items-center gap-3" aria-label="SIGRANK">
@@ -59,5 +62,5 @@ export function TerminalWordmark() {
         <span>{SPLASH_RULE}</span>
       </div>
     </div>
-  )
+  );
 }

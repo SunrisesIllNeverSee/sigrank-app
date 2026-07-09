@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 /**
  * lib/stripe/rewards.ts — supporter-tier reward grant / revoke (server-only).
@@ -15,20 +15,17 @@ import 'server-only'
  *   circle_sponsor → RW.25, RW.26, RW.27
  */
 
-import { getSupabaseService } from '@/lib/supabase/server'
-import type { SupporterTier } from '@/lib/scoring/types'
-import {
-  getSupporterTier,
-  type SubscriptionRecord,
-} from '@/lib/stripe/tier'
+import { getSupabaseService } from "@/lib/supabase/server";
+import type { SupporterTier } from "@/lib/scoring/types";
+import { getSupporterTier, type SubscriptionRecord } from "@/lib/stripe/tier";
 
 /** Canonical reward ids unlocked by each supporter tier (REWARD_TIERS.md). */
 export const TIER_REWARDS: Record<SupporterTier, string[]> = {
   free: [],
-  patron: ['RW.16', 'RW.17', 'RW.18'],
-  pro: ['RW.19', 'RW.20', 'RW.21', 'RW.22', 'RW.23', 'RW.24'],
-  circle_sponsor: ['RW.25', 'RW.26', 'RW.27'],
-}
+  patron: ["RW.16", "RW.17", "RW.18"],
+  pro: ["RW.19", "RW.20", "RW.21", "RW.22", "RW.23", "RW.24"],
+  circle_sponsor: ["RW.25", "RW.26", "RW.27"],
+};
 
 /**
  * rewardsForTier — the full set of reward ids an operator at `tier` holds.
@@ -37,33 +34,34 @@ export const TIER_REWARDS: Record<SupporterTier, string[]> = {
  * grant set is deterministic.
  */
 export function rewardsForTier(tier: SupporterTier): string[] {
-  const set = new Set<string>()
-  const add = (t: SupporterTier) => TIER_REWARDS[t].forEach((id) => set.add(id))
+  const set = new Set<string>();
+  const add = (t: SupporterTier) =>
+    TIER_REWARDS[t].forEach((id) => set.add(id));
   switch (tier) {
-    case 'circle_sponsor':
-      add('circle_sponsor')
-      add('pro')
-      add('patron')
-      break
-    case 'pro':
-      add('pro')
-      add('patron')
-      break
-    case 'patron':
-      add('patron')
-      break
-    case 'free':
+    case "circle_sponsor":
+      add("circle_sponsor");
+      add("pro");
+      add("patron");
+      break;
+    case "pro":
+      add("pro");
+      add("patron");
+      break;
+    case "patron":
+      add("patron");
+      break;
+    case "free":
     default:
-      break
+      break;
   }
-  return [...set].sort()
+  return [...set].sort();
 }
 
 /** A grant/revoke plan: which rewards to grant and which to revoke. */
 export interface RewardDelta {
-  tier: SupporterTier
-  grant: string[]
-  revoke: string[]
+  tier: SupporterTier;
+  grant: string[];
+  revoke: string[];
 }
 
 /**
@@ -75,11 +73,11 @@ export function diffRewards(
   prevTier: SupporterTier,
   nextTier: SupporterTier,
 ): RewardDelta {
-  const prev = new Set(rewardsForTier(prevTier))
-  const next = new Set(rewardsForTier(nextTier))
-  const grant = [...next].filter((id) => !prev.has(id)).sort()
-  const revoke = [...prev].filter((id) => !next.has(id)).sort()
-  return { tier: nextTier, grant, revoke }
+  const prev = new Set(rewardsForTier(prevTier));
+  const next = new Set(rewardsForTier(nextTier));
+  const grant = [...next].filter((id) => !prev.has(id)).sort();
+  const revoke = [...prev].filter((id) => !next.has(id)).sort();
+  return { tier: nextTier, grant, revoke };
 }
 
 /**
@@ -91,7 +89,7 @@ export function recomputeSupporterTier(
   subs: SubscriptionRecord | SubscriptionRecord[] | null | undefined,
   now?: number | Date,
 ): SupporterTier {
-  return getSupporterTier(subs, now)
+  return getSupporterTier(subs, now);
 }
 
 /**
@@ -115,30 +113,30 @@ export async function applyRewardsForOperator(
   prevTier: SupporterTier,
   nextTier: SupporterTier,
 ): Promise<RewardDelta> {
-  const delta = diffRewards(prevTier, nextTier)
-  const sb = getSupabaseService()
+  const delta = diffRewards(prevTier, nextTier);
+  const sb = getSupabaseService();
   if (!sb) {
     // No creds → dev no-op. Log so the flow is observable.
     console.info(
       `[rewards] (no supabase) operator=${operatorId} ${prevTier}→${nextTier} ` +
-        `grant=[${delta.grant.join(',')}] revoke=[${delta.revoke.join(',')}]`,
-    )
-    return delta
+        `grant=[${delta.grant.join(",")}] revoke=[${delta.revoke.join(",")}]`,
+    );
+    return delta;
   }
   try {
     // The reward set is derived from current_supporter_tier — persisting the
     // tier is sufficient. The grant/revoke delta is logged, not table-written.
     await sb
-      .from('operators')
+      .from("operators")
       .update({ current_supporter_tier: nextTier })
-      .eq('operator_id', operatorId)
+      .eq("operator_id", operatorId);
 
     console.info(
       `[rewards] operator=${operatorId} ${prevTier}→${nextTier} ` +
-        `grant=[${delta.grant.join(',')}] revoke=[${delta.revoke.join(',')}]`,
-    )
+        `grant=[${delta.grant.join(",")}] revoke=[${delta.revoke.join(",")}]`,
+    );
   } catch (err) {
-    console.error(`[rewards] persist failed operator=${operatorId}`, err)
+    console.error(`[rewards] persist failed operator=${operatorId}`, err);
   }
-  return delta
+  return delta;
 }

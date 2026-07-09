@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { track } from '@/lib/posthog/events'
+import { useEffect } from "react";
+import { track } from "@/lib/posthog/events";
 
 /**
  * Fires profile_viewed on mount. is_own is resolved exactly like ProfileEditModal:
@@ -10,21 +10,21 @@ import { track } from '@/lib/posthog/events'
  */
 export function TrackProfileView({ codename }: { codename: string }) {
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return
-    let alive = true
-    fetch('/api/v1/profile', { cache: 'no-store' })
+    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    let alive = true;
+    fetch("/api/v1/profile", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { operator: null }))
       .then((d) => {
-        if (!alive) return
-        const isOwn = !!d?.operator && d.operator.codename === codename
-        track.profileViewed(isOwn)
+        if (!alive) return;
+        const isOwn = !!d?.operator && d.operator.codename === codename;
+        track.profileViewed(isOwn);
       })
       .catch(() => {
-        if (alive) track.profileViewed(false)
-      })
+        if (alive) track.profileViewed(false);
+      });
     return () => {
-      alive = false
-    }
-  }, [codename])
-  return null
+      alive = false;
+    };
+  }, [codename]);
+  return null;
 }

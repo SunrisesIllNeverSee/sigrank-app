@@ -1,12 +1,13 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { withOG } from '@/lib/seo'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: 'Payment complete',
-  description: 'Thank you for backing SigRank — your founding-supporter perks are locked in.',
-  path: '/upgrade/success',
-})
+  title: "Payment complete",
+  description:
+    "Thank you for backing SigRank — your founding-supporter perks are locked in.",
+  path: "/upgrade/success",
+});
 
 /**
  * Stripe Checkout success_url target (subscription + claim flows).
@@ -17,15 +18,20 @@ export const metadata: Metadata = withOG({
 export default function UpgradeSuccessPage() {
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-4 px-6 text-center">
-      <div className="text-3xl" aria-hidden>✓</div>
+      <div className="text-3xl" aria-hidden>
+        ✓
+      </div>
       <h1 className="text-2xl font-semibold">Payment complete</h1>
       <p className="opacity-70">
-        Your supporter tier is active. Pro metrics and any claimed operator entry
-        unlock on the next board read.
+        Your supporter tier is active. Pro metrics and any claimed operator
+        entry unlock on the next board read.
       </p>
-      <Link href="/" className="rounded-md border px-4 py-2 text-sm hover:opacity-80">
+      <Link
+        href="/"
+        className="rounded-md border px-4 py-2 text-sm hover:opacity-80"
+      >
         Back to the board
       </Link>
     </main>
-  )
+  );
 }

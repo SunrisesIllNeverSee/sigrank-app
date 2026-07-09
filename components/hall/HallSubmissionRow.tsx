@@ -1,32 +1,32 @@
-import React from 'react'
-import Link from 'next/link'
-import type { SignalClass } from '@/components/sigrank/types'
-import { colors } from '@/components/sigrank/tokens'
-import { glyphFor } from '@/lib/canon/ids'
-import { Placeholder } from '@/components/ui/Placeholder'
-import { Trophy } from '@/components/hall/Trophy'
+import React from "react";
+import Link from "next/link";
+import type { SignalClass } from "@/components/sigrank/types";
+import { colors } from "@/components/sigrank/tokens";
+import { glyphFor } from "@/lib/canon/ids";
+import { Placeholder } from "@/components/ui/Placeholder";
+import { Trophy } from "@/components/hall/Trophy";
 
 interface Props {
   /** Display rank within the board. */
-  rank: number
+  rank: number;
   /** Operator codename (used for the profile link, never displayed directly). */
-  codename: string
+  codename: string;
   /** Display name — the operator's real name when present, else the codename. */
-  displayName?: string | null
+  displayName?: string | null;
   /** Whether the operator profile has been claimed (group brief requirement). */
-  claimed: boolean
+  claimed: boolean;
   /** Optional class tier for the badge. */
-  classTier?: SignalClass
+  classTier?: SignalClass;
   /** Optional platform domain (e.g. 'claude'). */
-  platform?: string
+  platform?: string;
   /** The displayed metric value (already formatted). */
-  value: React.ReactNode
+  value: React.ReactNode;
   /** Canonical id for the value's source (e.g. 'M.01'). */
-  canonId?: string
+  canonId?: string;
   /** When true, the value is a placeholder (gold star); else real (green canon id). */
-  isPlaceholder?: boolean
+  isPlaceholder?: boolean;
   /** Optional href to the operator profile. */
-  href?: string
+  href?: string;
 }
 
 /**
@@ -56,17 +56,23 @@ export function HallSubmissionRow({
         <span className="sr-only">{`rank ${rank}`}</span>
       </>
     ) : (
-      <span className={rank <= 10 ? 'text-rank-low' : 'text-text-muted'}>{rank}</span>
-    )
+      <span className={rank <= 10 ? "text-rank-low" : "text-text-muted"}>
+        {rank}
+      </span>
+    );
 
   // Value: placeholder rows keep the gold-star; real rows show the bare value
   // (the little green canon-id superscript was removed per owner 2026-06-21).
-  const valueNode = isPlaceholder ? <Placeholder value={value} /> : <span>{value}</span>
+  const valueNode = isPlaceholder ? (
+    <Placeholder value={value} />
+  ) : (
+    <span>{value}</span>
+  );
 
   // Display name: show the operator's real name (display_name) when present,
   // else fall back to the codename. Mirrors to-entry.ts's anonId logic so the
   // Hall matches the main board's identity treatment.
-  const displayLabel = displayName || codename
+  const displayLabel = displayName || codename;
 
   // Unclaimed rows are the seed corpus (italic, matching the live board's
   // isSeed treatment in to-entry.ts) so a reader can tell a real claimed
@@ -77,15 +83,18 @@ export function HallSubmissionRow({
     <Link
       href={href}
       className="text-text-primary transition-colors hover:text-accent"
-      style={{ fontStyle: claimed ? 'normal' : 'italic' }}
+      style={{ fontStyle: claimed ? "normal" : "italic" }}
     >
       {displayLabel}
     </Link>
   ) : (
-    <span className="text-text-primary" style={{ fontStyle: claimed ? 'normal' : 'italic' }}>
+    <span
+      className="text-text-primary"
+      style={{ fontStyle: claimed ? "normal" : "italic" }}
+    >
       {displayLabel}
     </span>
-  )
+  );
 
   // Class is now the canonical GLYPH (◈ ▲ ▽ …) in its class color, not the "Trans"
   // text badge (owner 2026-06-21: "swap the trans class title with the symbol").
@@ -98,7 +107,7 @@ export function HallSubmissionRow({
     >
       {glyphFor(classTier)}
     </span>
-  ) : null
+  ) : null;
 
   return (
     // 2 rows per entry (owner 2026-06-21): row 1 = rank · name · class glyph · claimed;
@@ -111,19 +120,25 @@ export function HallSubmissionRow({
         {classGlyph}
         <span className="min-w-0 flex-1 truncate">{nameNode}</span>
         {claimed ? (
-          <span title="Claimed operator" className="font-mono text-[10px] text-text-gold" aria-label="claimed">
+          <span
+            title="Claimed operator"
+            className="font-mono text-[10px] text-text-gold"
+            aria-label="claimed"
+          >
             ✓
           </span>
         ) : null}
       </div>
       <div className="flex items-baseline justify-end gap-2 pl-9">
         {platform ? (
-          <span className="mr-auto font-mono text-[10px] uppercase text-text-muted">{platform}</span>
+          <span className="mr-auto font-mono text-[10px] uppercase text-text-muted">
+            {platform}
+          </span>
         ) : null}
         <span className="shrink-0 font-mono text-base font-semibold tabular-nums text-text-primary">
           {valueNode}
         </span>
       </div>
     </div>
-  )
+  );
 }
