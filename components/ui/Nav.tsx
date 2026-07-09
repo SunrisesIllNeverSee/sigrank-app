@@ -13,7 +13,7 @@ import { NavLinks } from './NavLinks'
 // Order + labels per owner 2026-06-21 (no asterisks remain after the sweep). Brand "◈ SIGRANK"
 // link to / is rendered separately below.
 const LINKS: { href: string; label: string }[] = [
-  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/board/all', label: 'Leaderboard' },
   { href: '/compare',   label: 'Compare' },
   { href: '/hall',      label: 'Hall' },
   { href: '/wiki',      label: 'Wiki' },

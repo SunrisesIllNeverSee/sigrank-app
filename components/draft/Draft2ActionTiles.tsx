@@ -11,7 +11,7 @@ import Link from 'next/link'
  */
 const TILES: { href: string; glyph: string; label: string }[] = [
   { href: '/score', glyph: 'Υ', label: 'Measure' },
-  { href: '/leaderboard', glyph: '≣', label: 'Board' },
+  { href: '/board/all', glyph: '≣', label: 'Board' },
   { href: '/compare', glyph: '⇄', label: 'Compare' },
   { href: '/wiki', glyph: '◧', label: 'Info · Wiki' },
 ]
