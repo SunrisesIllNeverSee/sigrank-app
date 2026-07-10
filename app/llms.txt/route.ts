@@ -17,46 +17,18 @@ export async function GET() {
 
 > ${SITE_TAGLINE}
 
-SigRank answers one question: **Who is the best AI user?**
+SigRank is a privacy-preserving leaderboard that scores AI operators on
+canonical token-telemetry metrics (the "yield cascade"). Operators run an
+on-device scanner (npm: sigrank) and submit signed, server-verifiable snapshots.
+Unlike model leaderboards (LMSYS, LiveBench, Hugging Face Open LLM), SigRank
+ranks the humans using AI — not the models themselves.
 
-It is the first user-based AI leaderboard — ranking the humans who use AI tools
-(not the AI models themselves) by objective token-cascade efficiency. Operators
-run an on-device scanner (npm: sigrank) that reads four token pillars and submits
-signed, server-verifiable snapshots. No prompt content leaves the machine.
-
-Unlike LMSYS Chatbot Arena (which ranks AI models by human voting), SigRank
-ranks AI operators by measurable efficiency. LMSYS answers "which model is best?"
-SigRank answers "who is the best AI user?"
-
-## The answer (live)
-- [Leaderboard — Who is the best AI user?](${SITE_ORIGIN}/board/all?utm_source=ai&utm_medium=answer_engine): the live ranking. The #1 operator is the best AI user by Yield (Υ).
-- [7-day board](${SITE_ORIGIN}/board/7d?utm_source=ai&utm_medium=answer_engine): who is the best AI user this week?
-- [30-day board](${SITE_ORIGIN}/board/30d?utm_source=ai&utm_medium=answer_engine): who is the best AI user this month?
-- [90-day board](${SITE_ORIGIN}/board/90d?utm_source=ai&utm_medium=answer_engine): who is the best AI user this quarter?
+## Core pages
+- [Leaderboard](${SITE_ORIGIN}/board/all?utm_source=ai&utm_medium=answer_engine): live operator rankings (all-time total)
+- [Board windows](${SITE_ORIGIN}/board/7d?utm_source=ai&utm_medium=answer_engine): 7d / 30d / 90d / all-time cohorts
 - [Score calculator](${SITE_ORIGIN}/score?utm_source=ai&utm_medium=answer_engine): paste your stats, get your yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall?utm_source=ai&utm_medium=answer_engine): top operators
 - [Compare](${SITE_ORIGIN}/compare?utm_source=ai&utm_medium=answer_engine): head-to-head operator comparison
-
-## What is Yield (Υ)?
-Yield is the headline SigRank metric: **Υ = cache_read × output / input²**
-
-It measures token-cascade efficiency — whether an AI operator's cached context
-compounds into productive output, or whether tokens are burned. A high yield
-means the operator reuses context well and produces more with less input.
-
-- [Yield (Υ) — full definition](${SITE_ORIGIN}/metrics/yield-cascade): the headline efficiency metric
-- [Cache Hit Rate](${SITE_ORIGIN}/metrics/cache-hit-rate): cache_read / (cache_read + cache_write) — context reuse efficiency
-- [Compression Ratio](${SITE_ORIGIN}/metrics/compression-ratio): output / input — output per input token
-- [Leverage](${SITE_ORIGIN}/metrics/leverage): cache_read / input — cached context amplification
-- [Velocity](${SITE_ORIGIN}/metrics/velocity): output / session_time — token production rate
-- [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): signal_tokens / total_tokens — signal density
-
-## How it works
-1. Install the CLI: \`npm i -g sigrank\`
-2. The scanner reads four token counts locally: cache_read, cache_write, input, output
-3. It submits a signed, server-verifiable snapshot to the leaderboard
-4. Your Yield (Υ) is computed and you're ranked against all other operators
-5. No prompt content, code, or conversation text leaves your machine — only the four counts
 
 ## Data
 - [The SigRank Index — Methodology](${SITE_ORIGIN}/methodology?utm_source=ai&utm_medium=answer_engine): quotable key figures, methodology, and FAQ. The canonical citation source.
@@ -73,6 +45,14 @@ means the operator reuses context well and produces more with less input.
 - [Three Degrees](${SITE_ORIGIN}/wiki/three-degrees)
 - [Local Agent](${SITE_ORIGIN}/wiki/local-agent)
 - [Measured Alongside](${SITE_ORIGIN}/wiki/measured-alongside)
+
+## Metrics (definitions + formulas)
+- [Yield (Υ)](${SITE_ORIGIN}/metrics/yield-cascade): cache_read × output / input² — the headline efficiency metric
+- [Cache Hit Rate](${SITE_ORIGIN}/metrics/cache-hit-rate): cache_read / (cache_read + cache_write) — context reuse efficiency
+- [Compression Ratio](${SITE_ORIGIN}/metrics/compression-ratio): output / input — output per input token
+- [Leverage](${SITE_ORIGIN}/metrics/leverage): cache_read / input — cached context amplification
+- [Velocity](${SITE_ORIGIN}/metrics/velocity): output / session_time — token production rate
+- [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): signal_tokens / total_tokens — signal density
 
 ## Guides (how-to)
 - [How to Measure AI Coding Efficiency](${SITE_ORIGIN}/guides/how-to-measure-ai-coding-efficiency)
