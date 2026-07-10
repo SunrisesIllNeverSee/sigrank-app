@@ -111,20 +111,36 @@ export default function ScorePage() {
         </div>
         <p className="font-sans text-xs leading-relaxed text-text-muted">
           Pulls the agent + ccusage + tokscale + tokendash in one install. Node
-          ≥18, macOS + Linux. Or let your AI agent do it — tell it to run{" "}
-          <code className="font-mono text-text-primary">npx sigrank</code> to
-          see your cascade, or{" "}
-          <code className="font-mono text-text-primary">
-            npx sigrank submit
-          </code>{" "}
-          to publish. For direct tool calls, wire it as an MCP server — see the{" "}
+          ≥18, macOS + Linux.
+        </p>
+      </div>
+
+      {/* MCP install — bash button like tokscale */}
+      <div className="mt-6 flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs uppercase tracking-widest text-gold">
+            ⊙ Or wire it as an MCP server
+          </span>
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-base px-4 py-3">
+          <span className="font-mono text-xs font-semibold text-text-muted">
+            $
+          </span>
+          <code className="flex-1 overflow-x-auto font-mono text-sm font-semibold text-text-accent">
+            npx sigrank
+          </code>
+          <CopyButton text="npx sigrank" />
+        </div>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          Works with Claude Desktop, Cursor, Cline, Windsurf, and any
+          MCP-compatible client. No API key required for read tools. See the{" "}
           <Link
-            href="/wiki/local-agent"
+            href="/mcp"
             className="text-text-accent underline-offset-2 hover:underline"
           >
-            local agent wiki page
-          </Link>
-          .
+            MCP server page
+          </Link>{" "}
+          for client setup + all 15 tools.
         </p>
       </div>
 
