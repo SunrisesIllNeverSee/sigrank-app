@@ -271,8 +271,13 @@ export function researchArticle(opts: {
     abstract: opts.headlineFindings.join(" "),
     citation: `${SITE_ORIGIN}/methodology`,
     isPartOf: {
-      "@type": "PublicationEvent",
+      "@type": "PublicationIssue",
       name: "SigRank Quarterly Index Report",
+      isPartOf: {
+        "@type": "Periodical",
+        name: "SigRank Research Reports",
+        publisher: { "@id": ORG_ID },
+      },
     },
   };
 }
@@ -301,8 +306,13 @@ export function conservationLawArticle() {
     datePublished: "2026-05-04",
     version: "V.05",
     isPartOf: {
-      "@type": "PublicationEvent",
+      "@type": "PublicationIssue",
       name: "Commitment Theory Research Program",
+      isPartOf: {
+        "@type": "Periodical",
+        name: "Commitment Theory Research Reports",
+        publisher: { "@id": ORG_ID },
+      },
     },
   };
 }
@@ -484,8 +494,9 @@ export function propositionsDataset() {
       "research prospectus",
     ],
     isPartOf: {
-      "@type": "PublicationEvent",
+      "@type": "DataCatalog",
       name: "Commitment Theory Research Program",
+      publisher: { "@id": ORG_ID },
     },
     references: "https://doi.org/10.5281/zenodo.20029607",
   };
