@@ -24,3 +24,4 @@ next-env.d.ts
 
 # coverage (c8 output)
 /coverage/
+_sigrank-mcp/
