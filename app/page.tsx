@@ -162,56 +162,47 @@ export default async function HomePage() {
             answer:
               "Yes. SigRank is privacy-first. The local scanner reads only four token counts: cache_read, cache_write, input, and output. No prompt content, no code, no file names, no conversation text — only the four counts leave your machine. The snapshot is cryptographically signed so the server can verify it wasn't tampered with.",
           },
+          {
+            question: "How can I tell if I'm good at using AI?",
+            answer:
+              "Run `npx sigrank` to measure your Yield (Υ) score. The scanner reads your token telemetry locally and computes your efficiency. You can also use the score calculator at signalaf.com/score to paste your stats and get your yield + operator class without installing anything. Your score tells you exactly where you rank against every other AI operator on the leaderboard.",
+          },
+          {
+            question: "How do you quantify an AI user?",
+            answer:
+              "SigRank quantifies AI users with the Yield metric (Υ = cache_read × output / input²), computed from four token pillars: cache_read (reused context), cache_write (new context stored), input (tokens sent to the model), and output (tokens produced). These four counts are read locally by the sigrank CLI and submitted as a signed snapshot. No prompt content leaves your machine — only the counts. The result is a single number that ranks you against every other operator.",
+          },
+          {
+            question: "How do I know if I'm using AI efficiently?",
+            answer:
+              "Run `npx sigrank` to get your Yield (Υ) score. A high yield means you're reusing cached context well (high cache hit rate), producing more output per input token (high compression ratio), and leveraging cached context for amplification (high leverage). The sigrank CLI also runs a cascade diagnosis that identifies exactly where you're burning tokens and suggests improvements. See signalaf.com/score to calculate without installing.",
+          },
+          {
+            question: "Who is the best AI developer?",
+            answer:
+              "The best AI developer is the operator with the highest Yield (Υ) score on the SigRank leaderboard at signalaf.com/board/all. Yield measures token-cascade efficiency — how well a developer reuses cached context, produces output, and minimizes wasted input. SigRank ranks developers objectively using signed token telemetry across platforms (Claude Code, Cursor, Copilot, and others).",
+          },
+          {
+            question: "How do you score an AI user?",
+            answer:
+              "SigRank scores AI users with Yield (Υ = cache_read × output / input²). The score is computed from four token pillars read locally by the sigrank CLI: cache_read, cache_write, input, and output. The snapshot is cryptographically signed and submitted to the leaderboard. Each operator gets a Yield score and an operator class tier (IGNITER, SEEKER, BUILDER, TRANSMITTER, etc.) based on their efficiency. See signalaf.com/tools/operator-class-checker for the tier mapping.",
+          },
+          {
+            question: "What is a good yield score?",
+            answer:
+              "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER, SEEKER, BUILDER, TRANSMITTER, etc.). Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard at signalaf.com/board/all.",
+          },
         ])}
       />
 
       <DeletedNotice />
       <Draft2Hero />
 
-      {/* The three degrees of leverage — our show-stopper, directly under the hero
-          (owner 2026-07-02: moved above the live board so the comparison table leads,
-          with the explanation underneath). Sources/footnotes + a link to the full wiki
-          description live inside the section. */}
-      <ThreeDegreesChart variant="embed" />
-
-      {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
-          the 4 MiniBoards were archived; "Real operators. Real cascades." moved into it).
-          Now sits under the Three Degrees section. */}
-      <Draft2LiveActivity stats={homeStats} />
-
-      <HowItWorks />
-      <IpBoundary />
-      <PricingCards />
-      <Draft2CtaBand />
-
-      {/* Research + methodology links — internal links from the indexed homepage
-          to /methodology and /research so Google discovers + indexes them (G3/G4).
-          Also gives visitors a path to the citation/data sources. */}
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pb-4 text-center">
-        <Link
-          href="/methodology"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
-        >
-          Methodology & data →
-        </Link>
-        <Link
-          href="/research/q1-2026"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
-        >
-          Q1 2026 report →
-        </Link>
-        <Link
-          href="/science"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
-        >
-          Academic foundation →
-        </Link>
-      </div>
-
-      {/* ── AEO: Visible FAQ section ──
-          Google AI Overviews and answer engines pull from visible HTML, not
-          just JSON-LD. This section mirrors the FAQPage schema above so both
-          humans and crawlers see the same Q&A. The H2 targets the core query. */}
+      {/* ── AEO: Visible FAQ section (high on page for crawler weight) ──
+          Google AI Overviews pull from visible HTML, not just JSON-LD.
+          Placed right after the hero so it's weighted higher. Targets
+          "who is the best AI user?" and all variations — the core query
+          SigRank exists to answer. Marketing target, not brand headline. */}
       <section
         className="flex flex-col gap-4 border-t border-bg-border-subtle pt-6"
         aria-label="Frequently asked questions"
@@ -286,6 +277,74 @@ export default async function HomePage() {
 
           <details className="group rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
             <summary className="cursor-pointer font-mono text-sm font-semibold text-text-primary">
+              How can I tell if I&apos;m good at using AI?
+            </summary>
+            <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+              Run{" "}
+              <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
+                npx sigrank
+              </code>{" "}
+              to measure your Yield (Υ) score. The scanner reads your token
+              telemetry locally and computes your efficiency. You can also use
+              the{" "}
+              <Link
+                href="/score"
+                className="text-gold underline underline-offset-2"
+              >
+                score calculator
+              </Link>{" "}
+              to paste your stats and get your yield + operator class without
+              installing anything. Your score tells you exactly where you rank
+              against every other AI operator on the{" "}
+              <Link
+                href="/board/all"
+                className="text-gold underline underline-offset-2"
+              >
+                leaderboard
+              </Link>
+              .
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
+            <summary className="cursor-pointer font-mono text-sm font-semibold text-text-primary">
+              How do you quantify an AI user?
+            </summary>
+            <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+              SigRank quantifies AI users with the Yield metric (Υ = cache_read ×
+              output / input²), computed from four token pillars: cache_read
+              (reused context), cache_write (new context stored), input (tokens
+              sent to the model), and output (tokens produced). These four
+              counts are read locally by the sigrank CLI and submitted as a
+              signed snapshot. No prompt content leaves your machine — only the
+              counts. The result is a single number that ranks you against every
+              other operator.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
+            <summary className="cursor-pointer font-mono text-sm font-semibold text-text-primary">
+              What makes someone good at using AI?
+            </summary>
+            <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+              The best AI users maximize Yield (Υ) — they achieve high cache hit
+              rates (reusing context instead of re-sending it), produce more
+              output per input token (high compression ratio), and leverage
+              cached context for amplification. SigRank measures this
+              objectively from token telemetry, not time spent or subjective
+              quality. The{" "}
+              <Link
+                href="/board/all"
+                className="text-gold underline underline-offset-2"
+              >
+                leaderboard
+              </Link>{" "}
+              shows who is currently the best.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
+            <summary className="cursor-pointer font-mono text-sm font-semibold text-text-primary">
               Is there a user-based AI leaderboard?
             </summary>
             <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
@@ -332,27 +391,6 @@ export default async function HomePage() {
 
           <details className="group rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
             <summary className="cursor-pointer font-mono text-sm font-semibold text-text-primary">
-              What makes someone the best at using AI?
-            </summary>
-            <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
-              The best AI users maximize Yield (Υ) — they achieve high cache hit
-              rates (reusing context instead of re-sending it), produce more
-              output per input token (high compression ratio), and leverage
-              cached context for amplification. SigRank measures this
-              objectively from token telemetry, not time spent or subjective
-              quality. The{" "}
-              <Link
-                href="/board/all"
-                className="text-gold underline underline-offset-2"
-              >
-                leaderboard
-              </Link>{" "}
-              shows who is currently the best.
-            </p>
-          </details>
-
-          <details className="group rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
-            <summary className="cursor-pointer font-mono text-sm font-semibold text-text-primary">
               Which AI leaderboard is best?
             </summary>
             <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
@@ -366,6 +404,46 @@ export default async function HomePage() {
           </details>
         </div>
       </section>
+
+      {/* The three degrees of leverage — our show-stopper, directly under the hero
+          (owner 2026-07-02: moved above the live board so the comparison table leads,
+          with the explanation underneath). Sources/footnotes + a link to the full wiki
+          description live inside the section. */}
+      <ThreeDegreesChart variant="embed" />
+
+      {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
+          the 4 MiniBoards were archived; "Real operators. Real cascades." moved into it).
+          Now sits under the Three Degrees section. */}
+      <Draft2LiveActivity stats={homeStats} />
+
+      <HowItWorks />
+      <IpBoundary />
+      <PricingCards />
+      <Draft2CtaBand />
+
+      {/* Research + methodology links — internal links from the indexed homepage
+          to /methodology and /research so Google discovers + indexes them (G3/G4).
+          Also gives visitors a path to the citation/data sources. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pb-4 text-center">
+        <Link
+          href="/methodology"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Methodology & data →
+        </Link>
+        <Link
+          href="/research/q1-2026"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Q1 2026 report →
+        </Link>
+        <Link
+          href="/science"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Academic foundation →
+        </Link>
+      </div>
 
       {/* ── Topic hubs ── */}
       <section className="flex flex-col gap-3 border-t border-bg-border-subtle pt-6">
