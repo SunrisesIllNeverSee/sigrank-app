@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.6.0...v0.7.0) (2026-07-10)
+
+
+### Features
+
+* **aeo:** add visible FAQ section to homepage targeting 'who is the best AI user?' ([bcead04](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/bcead04b42ce9d9a73ac86c81b66490dde0615ce))
+* **aeo:** move FAQ above the fold + add 'how can I tell if I'm good' variations ([963511b](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/963511bc9f43e092c14f5ad562050489d1c66661))
+* **aeo:** target "who is the best AI user?" across homepage + leaderboard ([5608e78](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/5608e7873443662c014f35e4308c677315ef346d))
+
+
+### Bug Fixes
+
+* MCP_VERSION drift 0.16.1→0.17.0 (CI contract test) ([a06f8b6](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a06f8b67ae8f9a5b69c650b85f45ce757a91af15))
+
 ## [0.6.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.5.0...v0.6.0) (2026-07-10)
 
 
