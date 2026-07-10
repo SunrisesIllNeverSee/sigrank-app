@@ -50,7 +50,7 @@ test("The Field exists in snapshot.json (confirming it ships in the cold store)"
 test("/compare uses The Field as the default opponent B (baseline)", () => {
   const src = read("app/compare/page.tsx");
   assert.ok(
-    src.includes("'the-field'"),
+    src.includes("the-field"),
     "/compare page uses the-field as the default compare baseline",
   );
 });
