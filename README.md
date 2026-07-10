@@ -1,8 +1,8 @@
 # SigRank
 
 > **🏆 SigRank is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
-> efficiently you use AI, not how much. See your projected rank in 60 seconds at
-> [signalaf.com/score](https://signalaf.com/score). _Token counts only. Never your prompts._
+> efficiently you use AI, not how much. Run `npx sigrank` to see your cascade now.
+> _Token counts only. Never your prompts._
 
 <div align="center">
 
@@ -76,11 +76,14 @@ engine. You don't clone this to _use_ SigRank (see below) — you clone it to wo
 
 ## Get ranked (you don't need this repo)
 
-Fastest look, no install: **[signalaf.com/score](https://signalaf.com/score)** — paste your
-usage stats, get a projected yield + ghost rank.
+SigRank runs from your terminal — or wire it as an MCP server for your AI agent:
 
-SigRank runs from your terminal. The client reads your local AI session logs on-device,
-derives your cascade, and publishes to the board — **token-only, no transcript content.**
+```bash
+npx sigrank                 # see your cascade now (no install, no sign-in)
+```
+
+The client reads your local AI session logs on-device, derives your cascade,
+and publishes to the board — **token-only, no transcript content.**
 
 ```bash
 npm install -g sigrank     # bundles ccusage + tokscale + tokendash — no separate installs
@@ -248,8 +251,8 @@ Product contracts, not implementation details:
 ## Related
 
 - **[signalaf.com](https://signalaf.com)** — the live board
-- **[signalaf.com/score](https://signalaf.com/score)** — projected yield + ghost rank in 60 seconds, no account
-- **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npm i -g sigrank`)
+- **[signalaf.com/score](https://signalaf.com/score)** — paste four token counts, get projected yield + ghost rank
+- **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npx sigrank`)
 - **[Smithery](https://smithery.ai/servers/burnmydays/sigrank-mcp)** — one-click MCP install for Claude Desktop, Cursor, and more
 - **[Glama](https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp)** — MCP server directory listing
 
