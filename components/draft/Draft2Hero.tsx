@@ -6,6 +6,41 @@ import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
 import { CopyButton } from "@/components/marketing/CopyButton";
 
 /**
+ * NpxButton — the glowing CTA button for the landing page hero.
+ * Replaces the old code-block-style npx display with a prominent button
+ * that has a pulsing glow animation. Clicking copies "npx sigrank".
+ * Landing page only — not used on other pages.
+ */
+function NpxButton() {
+  return (
+    <button
+      onClick={undefined}
+      className="group relative inline-flex items-center gap-3 rounded-xl border border-gold/40 bg-gold/10 px-6 py-3.5 font-mono text-base font-bold text-text-primary shadow-lg shadow-gold/20 transition-all duration-300 hover:border-gold hover:bg-gold/20 hover:shadow-gold/40 sm:text-lg"
+      style={{
+        animation: "npx-glow 2s ease-in-out infinite",
+      }}
+    >
+      <span className="text-gold">$</span>
+      <span className="text-text-primary">npx sigrank</span>
+      <span className="absolute inset-0 rounded-xl bg-gold/10 blur-md" style={{ animation: "npx-pulse 2s ease-in-out infinite" }} />
+      <span className="relative z-10">
+        <CopyButton text="npx sigrank" />
+      </span>
+      <style>{`
+        @keyframes npx-glow {
+          0%, 100% { box-shadow: 0 0 8px 2px rgba(218, 165, 32, 0.2); }
+          50% { box-shadow: 0 0 24px 6px rgba(218, 165, 32, 0.45); }
+        }
+        @keyframes npx-pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.7; }
+        }
+      `}</style>
+    </button>
+  );
+}
+
+/**
  * Draft2Hero — the launch-landing intro block for /draft2 (owner edit 2026-06-21).
  *
  * Order, per owner: intro line (mono, one-line sm+) → "Operator Performance
@@ -56,16 +91,10 @@ export function Draft2Hero() {
           </span>
         </div>
 
-        {/* npx quickstart — tokenscale-style command + copy button */}
-        <div className="flex items-center gap-3 rounded-xl border border-bg-border bg-bg-base px-5 py-3">
-          <span className="font-mono text-sm font-semibold text-text-muted">
-            $
-          </span>
-          <code className="flex-1 overflow-x-auto font-mono text-base font-bold text-text-accent sm:text-lg">
-            npx sigrank
-          </code>
-          <CopyButton text="npx sigrank" />
-        </div>
+        {/* npx CTA — glowing button in the heading (landing page only).
+            Replaces the old code-block placement. Pulsing gold glow draws
+            the eye to the install command. */}
+        <NpxButton />
 
         <div className="h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
 
