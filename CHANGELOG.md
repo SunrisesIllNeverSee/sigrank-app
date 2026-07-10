@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.6.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.5.0...v0.6.0) (2026-07-10)
+
+
+### Features
+
+* add /mcp landing page + MCP section in llms.txt ([7f44851](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7f44851961d34495a21c100b64f7d5df9ddb50fb))
+* Challenge on X — social viral loop for compare page ([d1e925f](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/d1e925f9241bdb3b822a5af41f1a13943aa98212))
+* **science:** add SCS Engine / constitutional architecture section to /science ([7b45139](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7b4513917d09c07fe3161c5aad53b707b626ff28))
+* **seo:** add 34 SEO content pages — comparison, alternatives, guides, metrics, tools, topic hubs, blog ([1f5cad0](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/1f5cad0568d72ef0f1dbd1be9e02101547fa935f))
+* wire internal linking — topic hubs + cross-links across 31 pages ([a96b251](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a96b25113d39983b0bdd71d2b5d85483fbb41cdf))
+
+
+### Bug Fixes
+
+* CI — the-field test quote match + MCP_VERSION 0.16.0→0.16.1 ([f75ed09](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/f75ed09eff0c24a286401af794283e0970e7f452))
+* **e2e:** scope Υ Yield locator to exact match ([24ca57a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/24ca57a1f7a3ef8d75823c5b6f24edff359b5a58))
+* Phase H — wiki meta descriptions, duplicate titles/H1s, cross-page H2s, low content ([b527f5d](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b527f5de60bdefad89eaba2c09e9da8fbe3c81c3))
+* README link to /board/all instead of /score ([33ec2af](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/33ec2afd093f2cd0917b16fe467653b8d4533eac))
+* remove 404 /submit link + eliminate 46 /leaderboard redirects ([4cac367](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/4cac3677631ffbf293b9a4ac717676c92bacdade))
+* replace &lt;a&gt; with &lt;Link&gt; and remove unused vars (LucidShark findings) ([096adf8](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/096adf82592994f7eda143a4307a4223dbb3492c))
+* rewrite /score page to deliver on README promise ([efbd797](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/efbd7977b243dceab7d4f5ad3d6ff08df7ac793d))
+* **science:** correct constitutional laws — 3 laws + 2 anchors, link to signomy.xyz/moses ([b853bb2](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b853bb272b61a131739ac6110d46c8206f9c5121))
+* security headers, meta descriptions, page titles, content gaps, H1/H2, image sizes ([a64cd27](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a64cd277de777893cd1f4d54aab22b7993f8c690))
+* sitemap /leaderboard → /board/all + expand llms.txt with SEO content ([255cb2d](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/255cb2d314f3d55dff32ab1ace7cf54041b903be))
+* structured data isPartOf invalid type (Google Search Console) ([4fd4cfb](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/4fd4cfb304a45cf068f2bf83f18dab5742ffba4a))
+
 ## [0.5.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.4.0...v0.5.0) (2026-07-07)
 
 ### Features
