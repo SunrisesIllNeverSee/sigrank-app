@@ -62,26 +62,6 @@ export default async function HallPage() {
       {/* HALL-1: animated masthead. */}
       <HallHero />
 
-      {/* ── What is the Hall? ── */}
-      <section className="mx-auto max-w-2xl px-4 pb-6">
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The Hall of Signal is the permanent record of peak operator
-          performance across the SigRank leaderboard. Where the leaderboard
-          shows the current field, the Hall preserves the all-time best — the
-          operators who achieved the highest yield, the cleanest cascades, and
-          the most efficient token architecture on record. Entries are immutable
-          once recorded.
-        </p>
-        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          The Hall updates as new snapshots are submitted. An operator who
-          achieves a higher yield in a future session takes the record — the
-          previous mark stands as a benchmark to beat. Class tiers (Burner,
-          Builder, 10×er) are determined by yield thresholds, not raw output, so
-          the Hall rewards efficiency architecture over brute-force token
-          production.
-        </p>
-      </section>
-
       {/* Client wrapper: reads useSearchParams for class/platform/window filter
           state, filters + sorts the pre-fetched data. Wrapped in <Suspense> so
           useSearchParams() doesn't force a client-side render bailout during
@@ -101,6 +81,26 @@ export default async function HallPage() {
       >
         <HallContentClient windowsData={windowsData} />
       </Suspense>
+
+      {/* ── What is the Hall? — moved to bottom (owner 2026-07-09) ── */}
+      <section className="mx-auto mt-8 max-w-2xl px-4 pb-6">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The Hall of Signal is the permanent record of peak operator
+          performance across the SigRank leaderboard. Where the leaderboard
+          shows the current field, the Hall preserves the all-time best — the
+          operators who achieved the highest yield, the cleanest cascades, and
+          the most efficient token architecture on record. Entries are immutable
+          once recorded.
+        </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          The Hall updates as new snapshots are submitted. An operator who
+          achieves a higher yield in a future session takes the record — the
+          previous mark stands as a benchmark to beat. Class tiers (Burner,
+          Builder, 10×er) are determined by yield thresholds, not raw output, so
+          the Hall rewards efficiency architecture over brute-force token
+          production.
+        </p>
+      </section>
 
       {/* HALL Task 6: coming-soon markers (Eras teaser · Season Leaders · Sessions) —
           the footer "On the horizon" area per HALL_DESIGN §2/§6/§7. Last child of the page. */}
