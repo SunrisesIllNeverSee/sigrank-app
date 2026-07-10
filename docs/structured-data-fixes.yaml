@@ -1,0 +1,95 @@
+# Structured Data Fixes — signalaf.com
+# Google Search Console: "Invalid object type for field isPartOf" on Dataset
+# Fixed: 2026-07-10
+# File: lib/jsonld.ts
+
+issue:
+  source: "Google Search Console"
+  type: "Datasets structured data"
+  severity: "non-critical"
+  description: "Invalid object type for field 'isPartOf'"
+  affected_pages:
+    - "/methodology"
+    - "/research/*"
+    - "/board/all"
+
+root_cause: |
+  Three schema.org JSON-LD builders in lib/jsonld.ts used @type: "PublicationEvent"
+  for the isPartOf field. PublicationEvent is a subtype of Event, not CreativeWork.
+  Schema.org spec requires isPartOf to be a CreativeWork or URL.
+  Google's Dataset validator specifically rejects PublicationEvent on Dataset types.
+
+fixes:
+  - function: "propositionsDataset()"
+    type: "Dataset"
+    line: 496
+    before:
+      isPartOf:
+        "@type": "PublicationEvent"
+        name: "Commitment Theory Research Program"
+    after:
+      isPartOf:
+        "@type": "DataCatalog"
+        name: "Commitment Theory Research Program"
+        publisher: "@id: ORG_ID"
+    reason: |
+      Dataset.isPartOf expects Dataset or DataCatalog (per Google Dataset Search docs).
+      DataCatalog is the correct type for a research program that contains multiple datasets.
+
+  - function: "researchArticle()"
+    type: "ScholarlyArticle"
+    line: 273
+    before:
+      isPartOf:
+        "@type": "PublicationEvent"
+        name: "SigRank Quarterly Index Report"
+    after:
+      isPartOf:
+        "@type": "PublicationIssue"
+        name: "SigRank Quarterly Index Report"
+        isPartOf:
+          "@type": "Periodical"
+          name: "SigRank Research Reports"
+          publisher: "@id: ORG_ID"
+    reason: |
+      ScholarlyArticle.isPartOf expects a CreativeWork subtype.
+      PublicationIssue (with nested Periodical) is the standard schema.org pattern
+      for scholarly articles published in a periodical series.
+
+  - function: "conservationLawArticle()"
+    type: "ScholarlyArticle"
+    line: 308
+    before:
+      isPartOf:
+        "@type": "PublicationEvent"
+        name: "Commitment Theory Research Program"
+    after:
+      isPartOf:
+        "@type": "PublicationIssue"
+        name: "Commitment Theory Research Program"
+        isPartOf:
+          "@type": "Periodical"
+          name: "Commitment Theory Research Reports"
+          publisher: "@id: ORG_ID"
+    reason: |
+      Same as researchArticle — PublicationIssue/Periodical is the correct
+      CreativeWork hierarchy for scholarly publications.
+
+schema_org_references:
+  isPartOf: "https://schema.org/isPartOf — expects CreativeWork or URL"
+  DataCatalog: "https://schema.org/DataCatalog — for dataset collections"
+  PublicationIssue: "https://schema.org/PublicationIssue — CreativeWork subtype"
+  Periodical: "https://schema.org/Periodical — CreativeWork subtype for serials"
+  google_dataset_docs: "https://developers.google.com/search/docs/appearance/structured-data/dataset"
+
+validation:
+  tsc: "0 errors"
+  canonical_test: "11/11 pass"
+  next_step: "Deploy to Vercel → Google Search Console → Validate Fix on the Datasets issue"
+
+post_deploy:
+  - "Push to sigrank-app main → Vercel auto-deploys → signalaf.com"
+  - "Go to Google Search Console → Enhancements → Datasets"
+  - "Click the 'Invalid object type for field isPartOf' issue"
+  - "Click 'Validate Fix'"
+  - "Google will recrawl affected pages (may take 2+ weeks)"
