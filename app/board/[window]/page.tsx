@@ -53,8 +53,8 @@ export async function generateMetadata({
   if (!isOff && !win) return { title: "Board not found" };
   const label = isOff ? "All-time" : win!.label;
   return withOG({
-    title: `${label} Leaderboard — Who Is the Best AI User?`,
-    description: `Who is the best AI user? The SigRank ${label.toLowerCase()} leaderboard ranks AI operators by Yield (Υ = cache_read × output / input²). See who is the most efficient AI coder — ${label.toLowerCase()} window, privacy-preserving, signed token telemetry.`,
+    title: `${label} Leaderboard`,
+    description: `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
     path: `/board/${slug}`,
     ogImage: {
       url: `/board/${slug}/og`,
