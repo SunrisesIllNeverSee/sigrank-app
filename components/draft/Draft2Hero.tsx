@@ -3,6 +3,7 @@ import { CascadeHeader } from "@/components/home/CascadeHeader";
 import { RotatingWordmark } from "@/components/home/RotatingWordmark";
 import { TerminalWordmark } from "@/components/home/TerminalWordmark";
 import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
+import { CopyButton } from "@/components/marketing/CopyButton";
 
 /**
  * Draft2Hero — the launch-landing intro block for /draft2 (owner edit 2026-06-21).
@@ -53,6 +54,17 @@ export function Draft2Hero() {
           <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-text-primary sm:text-sm">
             Token counts only. Never your prompts.
           </span>
+        </div>
+
+        {/* npx quickstart — tokenscale-style command + copy button */}
+        <div className="flex items-center gap-3 rounded-xl border border-bg-border bg-bg-base px-5 py-3">
+          <span className="font-mono text-sm font-semibold text-text-muted">
+            $
+          </span>
+          <code className="flex-1 overflow-x-auto font-mono text-base font-bold text-text-accent sm:text-lg">
+            npx sigrank
+          </code>
+          <CopyButton text="npx sigrank" />
         </div>
 
         <div className="h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
