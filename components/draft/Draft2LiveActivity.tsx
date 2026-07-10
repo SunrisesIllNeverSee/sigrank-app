@@ -125,10 +125,6 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
             Real operators. Real cascades.
           </h2>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-text-secondary">
-            The leaderboard is the product — scored live by the same engine that
-            scores you.
-          </p>
         </div>
         <Link
           href="/board/all"
@@ -178,6 +174,11 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
           </div>
         </div>
       </details>
+      {/* Leaderboard paragraph — moved to bottom of section (owner 2026-07-09). */}
+      <p className="mt-5 max-w-2xl text-base leading-relaxed text-text-secondary">
+        The leaderboard is the product — scored live by the same engine that
+        scores you.
+      </p>
     </section>
   );
 }
