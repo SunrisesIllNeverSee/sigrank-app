@@ -153,33 +153,6 @@ export default async function BoardWindowPage({
         }
       />
 
-      {/* ── What is this? ── */}
-      <section className="mx-auto max-w-2xl px-4 pb-6">
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The SigRank leaderboard ranks AI operators by token-cascade efficiency
-          — Υ Yield = (cache_read × output) / input². Operators are tiered into
-          Burners, Builders, and 10×ers based on how well they compound signal
-          across their token cascade. Higher yield means more signal per token
-          spent — not more time, not more output, but better architecture.
-        </p>
-        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          The board refreshes every hour during active periods. Operators are
-          ranked by yield, not output volume — a 10×er produces more signal per
-          token than a Burner, regardless of how many hours they code. Class
-          tiers are yield thresholds, so climbing the board means improving your
-          cascade architecture, not just spending more time in the editor.
-        </p>
-        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          To get listed, install the SigRank CLI (
-          <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
-            npm i -g sigrank
-          </code>
-          ), enroll, and submit a snapshot. The on-device scanner reads your
-          four token pillars and publishes a signed record. No prompt content
-          leaves your machine — only the four counts.
-        </p>
-      </section>
-
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
@@ -246,6 +219,33 @@ export default async function BoardWindowPage({
       {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
           of the board (after the table) per owner. */}
       <LeaderboardKey />
+
+      {/* ── What is this? — moved to bottom (owner 2026-07-11) ── */}
+      <section className="mx-auto max-w-2xl px-4 pb-6">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The SigRank leaderboard ranks AI operators by token-cascade efficiency
+          — Υ Yield = (cache_read × output) / input². Operators are tiered into
+          Burners, Builders, and 10×ers based on how well they compound signal
+          across their token cascade. Higher yield means more signal per token
+          spent — not more time, not more output, but better architecture.
+        </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          The board refreshes every hour during active periods. Operators are
+          ranked by yield, not output volume — a 10×er produces more signal per
+          token than a Burner, regardless of how many hours they code. Class
+          tiers are yield thresholds, so climbing the board means improving your
+          cascade architecture, not just spending more time in the editor.
+        </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          To get listed, install the SigRank CLI (
+          <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
+            npm i -g sigrank
+          </code>
+          ), enroll, and submit a snapshot. The on-device scanner reads your
+          four token pillars and publishes a signed record. No prompt content
+          leaves your machine — only the four counts.
+        </p>
+      </section>
     </div>
   );
 }
