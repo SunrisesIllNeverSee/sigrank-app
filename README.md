@@ -34,6 +34,7 @@ Most platforms reward volume. SigRank rewards structure.
 ## Table of Contents
 
 - [What is SigRank?](#what-is-sigrank)
+- [The SigRank ecosystem](#the-sigrank-ecosystem)
 - [Get ranked (you don't need this repo)](#get-ranked-you-dont-need-this-repo)
 - [How it works](#how-it-works)
 - [For developers](#for-developers)
@@ -73,6 +74,16 @@ noise; yield is signal.
 This repo is the **Next.js app behind [signalaf.com](https://signalaf.com)** — the
 public board, operator profiles, the wiki, account + billing, and the scoring/ingest
 engine. You don't clone this to _use_ SigRank (see below) — you clone it to work on it.
+
+## The SigRank ecosystem
+
+| Repo | What it is | Install |
+|------|-----------|---------|
+| **[sigrank-app](https://github.com/SunrisesIllNeverSee/sigrank-app)** (this repo) | The leaderboard — signalaf.com. Privacy-preserving operator profiles, class tiers, board rankings. | [signalaf.com](https://signalaf.com) |
+| **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** | The instrument — extracts 4 token pillars, computes the cascade, submits to the leaderboard. MCP server + TUI dashboard. | `npx sigrank` |
+| **[signaf](https://github.com/SunrisesIllNeverSee/signa)** | The coach — reads your session logs, builds a taste profile, measures ASI, coaches you on token efficiency. | `npx @burnmydays/signaf` |
+| **[sigrank-vscode](https://github.com/SunrisesIllNeverSee/sigrank-vscode)** | The IDE extension — see your cascade metrics inline in VS Code. | `code --install-extension sigrank.sigrank` |
+| **[fundscore](https://github.com/SunrisesIllNeverSee/fundscore)** | The repo scorer — investor-readiness scoring for GitHub repos. CLI + MCP server. | `npx fundscore` |
 
 ## Get ranked (you don't need this repo)
 
