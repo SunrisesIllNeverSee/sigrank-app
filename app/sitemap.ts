@@ -177,6 +177,26 @@ const STATIC_ROUTES: {
     priority: 0.6,
     changeFrequency: "monthly",
   },
+  {
+    path: "/blog/how-sigrank-measures-operator-efficiency",
+    priority: 0.5,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/token-cascade-vs-raw-token-consumption",
+    priority: 0.5,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/why-yield-beats-tokenmaxxing",
+    priority: 0.5,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/ai-power-user-benchmarking",
+    priority: 0.5,
+    changeFrequency: "monthly",
+  },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
