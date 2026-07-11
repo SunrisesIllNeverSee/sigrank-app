@@ -31,6 +31,10 @@ Most platforms reward volume. SigRank rewards structure.
 
 </div>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/sigrank"><img src="https://img.shields.io/badge/$%20npx%20sigrank-gold?style=for-the-badge&logo=npm&logoColor=white&labelColor=1a1a1a&color=daa520" alt="npx sigrank" /></a>
+</p>
+
 ## Table of Contents
 
 - [What is SigRank?](#what-is-sigrank)
