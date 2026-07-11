@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AccountMenu } from "./AccountMenu";
 import { MobileNav } from "./MobileNav";
 import { NavLinks } from "./NavLinks";
+import { NavNpxCTA } from "./NavNpxCTA";
 
 // Launch nav set. /hall is in launch. (/metrics was in launch per 2026-06-19 but was
 // archived + removed in the 2026-06-22 sweep (ITEM 2) — its content lives in /wiki now.)
@@ -40,6 +41,9 @@ export function Nav() {
         {/* Desktop: inline links (hidden on mobile — MobileNav covers it).
             NavLinks is a client island that highlights the active route. */}
         <NavLinks links={LINKS} />
+
+        {/* npx CTA — glowing button in the nav bar (landing page only). */}
+        <NavNpxCTA />
 
         <div className="ml-auto">
           <AccountMenu />
