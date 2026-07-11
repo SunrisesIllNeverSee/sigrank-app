@@ -86,6 +86,12 @@ ranks the humans using AI — not the models themselves.
 - [AI Coding Metrics Tools](${SITE_ORIGIN}/alternatives/ai-coding-metrics): 7 best tools compared
 - [ccusage Alternatives](${SITE_ORIGIN}/alternatives/ccusage-alternatives): 5 best alternatives
 
+## Blog
+- [How SigRank Measures Operator Efficiency](${SITE_ORIGIN}/blog/how-sigrank-measures-operator-efficiency): the yield metric (Υ = cache_read × output / input²) and the four token pillars that define AI operator efficiency
+- [Token Cascade vs Raw Token Consumption](${SITE_ORIGIN}/blog/token-cascade-vs-raw-token-consumption): why cascade efficiency (Υ) — not raw token volume — is the metric that matters
+- [Why Yield Beats Tokenmaxxing](${SITE_ORIGIN}/blog/why-yield-beats-tokenmaxxing): tokenmaxxing maximizes token count; yield (Υ) proves efficiency beats volume
+- [AI Power User Benchmarking with SigRank](${SITE_ORIGIN}/blog/ai-power-user-benchmarking): how to benchmark yourself against other AI power users using operator classes and yield metrics
+
 ## MCP server (for AI agents)
 - [SigRank MCP](${SITE_ORIGIN}/mcp): 15 tools any AI agent can call — rank, leaderboard, submit, diagnose, improve
 - Install: \`npx sigrank\` (or \`npx sigrank-mcp\`)
