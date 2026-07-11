@@ -13,7 +13,7 @@ import { DemoBanner } from "@/components/ui/DemoBanner";
 import { Footer } from "@/components/ui/Footer";
 import { ThemeCycleShortcut } from "@/components/ui/ThemeCycleShortcut";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { organization, website } from "@/lib/jsonld";
+import { organization, website, product } from "@/lib/jsonld";
 import { siteMetadata } from "@/lib/seo";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 
@@ -86,7 +86,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
-        <JsonLd data={[organization(), website()]} />
+        <JsonLd data={[organization(), website(), product()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <PostHogProvider>
           <ThemeCycleShortcut />

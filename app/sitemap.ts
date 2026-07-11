@@ -42,6 +42,7 @@ const STATIC_ROUTES: {
   { path: "/wiki/signal-drift", priority: 0.6, changeFrequency: "monthly" },
   { path: "/wiki/three-degrees", priority: 0.6, changeFrequency: "monthly" },
   { path: "/wiki/verification", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/faq", priority: 0.6, changeFrequency: "monthly" },
   { path: "/about", priority: 0.5, changeFrequency: "monthly" },
   { path: "/llms.txt", priority: 0.5, changeFrequency: "monthly" },
   { path: "/llms-full.txt", priority: 0.5, changeFrequency: "monthly" },
