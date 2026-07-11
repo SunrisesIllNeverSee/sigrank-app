@@ -8,6 +8,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
+import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
 import { DemoBanner } from "@/components/ui/DemoBanner";
 import { Footer } from "@/components/ui/Footer";
 import { ThemeCycleShortcut } from "@/components/ui/ThemeCycleShortcut";
@@ -93,6 +94,7 @@ export default function RootLayout({
           <DemoBanner />
           <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>
           <Footer />
+          <NavNpxCTA />
         </PostHogProvider>
       </body>
     </html>
