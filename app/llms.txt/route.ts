@@ -29,6 +29,7 @@ ranks the humans using AI — not the models themselves.
 - [Score calculator](${SITE_ORIGIN}/score?utm_source=ai&utm_medium=answer_engine): paste your stats, get your yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall?utm_source=ai&utm_medium=answer_engine): top operators
 - [Compare](${SITE_ORIGIN}/compare?utm_source=ai&utm_medium=answer_engine): head-to-head operator comparison
+- [FAQ](${SITE_ORIGIN}/faq?utm_source=ai&utm_medium=answer_engine): answers to common questions — best AI user, AI power user, token cascade efficiency
 
 ## Data
 - [The SigRank Index — Methodology](${SITE_ORIGIN}/methodology?utm_source=ai&utm_medium=answer_engine): quotable key figures, methodology, and FAQ. The canonical citation source.
