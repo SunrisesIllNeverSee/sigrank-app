@@ -42,6 +42,34 @@ export function organization() {
   };
 }
 
+/** Product — SigRank as a product/service for schema.org rich results. */
+export function product() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "SigRank — AI Operator Performance Rankings",
+    description:
+      "Leaderboard measuring AI users (operators) by token cascade efficiency " +
+      "(Υ Yield, C:I:O) and operator classes. Privacy-preserving, on-device telemetry " +
+      "with ed25519-signed submissions.",
+    url: SITE_ORIGIN,
+    brand: { "@id": ORG_ID },
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    category: "AI Developer Tools",
+    keywords: [
+      "AI operator leaderboard",
+      "token cascade efficiency",
+      "AI power user",
+      "compare AI users",
+      "token efficiency benchmark",
+    ],
+  };
+}
+
 /** WebSite — site-wide, rendered in app/layout.tsx. */
 export function website() {
   return {
