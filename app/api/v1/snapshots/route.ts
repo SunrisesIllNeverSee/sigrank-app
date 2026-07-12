@@ -264,7 +264,7 @@ export async function POST(req: NextRequest) {
         resolved,
         gate,
       );
-      if (res.ok) revalidateTouchedWindows(payload.window.type);
+      if (res.ok) revalidateTouchedWindows(payload.window.type, payload.codename);
     } else {
       // accepted-but-unverified / flagged (e.g. revoked device, or a plausibility flag): audit only.
       res = await insertSubmissionOnly(payload, signature, resolved, gate);
