@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.8.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.7.0...v0.8.0) (2026-07-12)
+
+
+### Features
+
+* 'tool is the person' positioning — bridge blog, FAQ, ccusage beachhead ([8944803](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8944803e3775614b5302f82a77cb31ef24010c4d))
+* add 4 topical cluster blog posts targeting AI search intent ([a53b4dc](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a53b4dc9d273358c9cf9587b2b2801832afe0c48))
+* add MCP install bash button to /score page ([990a891](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/990a8912d0ea8f9e98c726906b7406fb0601e494))
+* add Product schema, dedicated FAQ page, intent-targeted Q&As ([de0d18a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/de0d18a7ef4f6a15ad33ceacde69fb1ea8fb595a))
+* add tokenscale-style npx button to homepage hero ([00d633c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/00d633c1468c349c0c8c75cae34f01701b122845))
+* move FAQ to /about page + revert llms.txt to original structure ([ac6825f](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/ac6825fd96ec88e9ea12936ae85857241308cac0))
+
+
+### Bug Fixes
+
+* accept optional `report` block in snapshot payload schema ([b42bf6a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b42bf6abfc3b9cd199640b718ea2054a84d385f4))
+* also revalidate profile page ISR cache on submit ([5924ac4](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/5924ac40906d1f8837db3b68d774a4c3e51e2c6a))
+* bump MCP_VERSION to 0.17.1 (cross-repo contract drift) ([3ad77a9](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/3ad77a9e9136737401fa843e6c7caadd38d18b84))
+* bust operator cache tag on verified submission ([a381df1](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a381df1ea39a60f5a13efe810b30bac42a7986a7))
+* Hall ticker frozen — remove motion-reduce:animate-none ([8ba9c16](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8ba9c1696d3d649ef09178ce95b0ccdb3d6498a3))
+* move npx CTA to nav bar + move board paragraph to bottom ([6187a5d](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/6187a5dcdecbb493a794881babf35d7d73a33e7d))
+* NPX button placement + paragraph relocations + compare cleanup ([f06b22e](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/f06b22ed77915fcb6100143b2dd38616a5993a94))
+* npx CTA button floats in bottom-right corner (landing only) ([50740dc](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/50740dcd7e40dcdca0fc900af682f314101266bb))
+* sync MCP_VERSION to 0.0.177 (cross-repo contract drift) ([b5cadb6](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b5cadb67237b250a8b18554b535f505e79405b98))
+
+
+### Reverts
+
+* remove visible FAQ section + restore original titles ([7d1bbf8](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7d1bbf8f9dc57116671e5f1a537cfd1a8538f96d))
+
 ## [0.7.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.6.0...v0.7.0) (2026-07-10)
 
 
