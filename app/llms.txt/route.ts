@@ -88,7 +88,8 @@ ranks the humans using AI — not the models themselves.
 
 ## Blog
 - [How SigRank Measures Operator Efficiency](${SITE_ORIGIN}/blog/how-sigrank-measures-operator-efficiency): the yield metric (Υ = cache_read × output / input²) and the four token pillars that define AI operator efficiency
-- [Token Cascade vs Raw Token Consumption](${SITE_ORIGIN}/blog/token-cascade-vs-raw-token-consumption): why cascade efficiency (Υ) — not raw token volume — is the metric that matters
+- [Token Yield vs Token Count](${SITE_ORIGIN}/blog/token-cascade-vs-raw-token-consumption): why token yield (Υ) — not raw token count — measures AI operator skill. The tool is the person.
+- [The Tool Is the Person](${SITE_ORIGIN}/blog/the-tool-is-the-person): why measuring the AI tool IS measuring the human operator. Your token cascade is your skill signature.
 - [Why Yield Beats Tokenmaxxing](${SITE_ORIGIN}/blog/why-yield-beats-tokenmaxxing): tokenmaxxing maximizes token count; yield (Υ) proves efficiency beats volume
 - [AI Power User Benchmarking with SigRank](${SITE_ORIGIN}/blog/ai-power-user-benchmarking): how to benchmark yourself against other AI power users using operator classes and yield metrics
 

@@ -1,10 +1,11 @@
 /**
- * app/blog/token-cascade-vs-raw-token-consumption/page.tsx — "Token Cascade
- * vs Raw Token Consumption".
+ * app/blog/token-cascade-vs-raw-token-consumption/page.tsx — "Token Yield vs
+ * Token Count: Why Volume Lies About AI Skill".
  *
- * Long-form blog post targeting "token efficiency", "AI token usage", and
- * "token cascade efficiency". Argues that cascade architecture (Υ) — not raw
- * volume — is the metric that matters.
+ * Long-form blog post targeting "token efficiency", "AI token usage", "token
+ * yield", and "ccusage alternative". Argues that yield (Υ) — not raw volume —
+ * is the metric that measures AI operator skill. Introduces the "tool is the
+ * person" thesis: your token cascade IS your skill signature.
  *
  * JSON-LD: ScholarlyArticle (inline, following lib/jsonld.ts pattern) +
  * BreadcrumbList + FAQPage.
@@ -19,9 +20,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Token Cascade vs Raw Token Consumption",
+  title: "Token Yield vs Token Count: Why Volume Lies About AI Skill",
   description:
-    "Why token cascade efficiency (Υ) is the metric that matters — not how many tokens you burn. The difference between volume and architecture.",
+    "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
   path: "/blog/token-cascade-vs-raw-token-consumption",
 });
 
@@ -32,21 +33,23 @@ function articleJsonLd() {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
     "@id": url,
-    headline: "Token Cascade vs Raw Token Consumption",
+    headline: "Token Yield vs Token Count: Why Volume Lies About AI Skill",
     description:
-      "Why token cascade efficiency (Υ) is the metric that matters — not how many tokens you burn. The difference between volume and architecture.",
+      "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
     url,
     datePublished: "2026-07-07",
     author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
-    about: "Token cascade efficiency versus raw token consumption volume",
+    about: "Token yield versus raw token count as a measure of AI operator skill",
     keywords: [
       "token efficiency",
       "ai token usage",
-      "token cascade efficiency",
+      "token yield",
       "yield metric",
-      "token consumption",
+      "token count",
+      "ai operator skill",
+      "ccusage alternative",
     ],
   };
 }
@@ -54,9 +57,9 @@ function articleJsonLd() {
 const faqs = [
   {
     question:
-      "What is the difference between token count and token cascade efficiency?",
+      "What is the difference between token count and token yield?",
     answer:
-      "Token count measures how many tokens you consume. Token cascade efficiency (Υ = cache_read × output / input²) measures how well those tokens compound — high yield means your cached context is doing work for you, not just burning input.",
+      "Token count measures how many tokens you consume — it's a billing number. Token yield (Υ = cache_read × output / input²) measures how well those tokens compound. High yield means your cached context is doing work for you. Token count tells you what you spent; yield tells you what you got for it.",
   },
   {
     question: "Why does input² appear in the yield formula?",
@@ -67,6 +70,11 @@ const faqs = [
     question: "Is high token usage bad?",
     answer:
       "Not necessarily — high token usage with high cache reuse and high output is efficient. High token usage with low cache reuse and low output is tokenmaxxing: burning tokens without compounding signal. Yield distinguishes the two.",
+  },
+  {
+    question: "How does tracking my token usage tell you about my skill?",
+    answer:
+      "Every token the AI tool burns is a decision you made. High cache reuse means you build on prior context (discipline). Low fresh input means you don't flood the model (restraint). High output per input means you extract work efficiently (leverage). Your token cascade is your skill signature — the tool is the person.",
   },
 ];
 
@@ -89,13 +97,13 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
 
       <WaveHero
         eyebrow="◈ Blog · Token Efficiency"
-        title="Token Cascade vs Raw Token Consumption"
+        title="Token Yield vs Token Count: Why Volume Lies About AI Skill"
         subtitle={
           <>
             Why{" "}
-            <span className="text-gold">token cascade efficiency (Υ)</span> is
-            the metric that matters — not how many tokens you burn. The
-            difference between volume and architecture.
+            <span className="text-gold">token yield (Υ)</span> — not raw token
+            count — measures AI operator skill. Your token cascade is your skill
+            signature. <span className="text-gold">The tool is the person.</span>
           </>
         }
       />
@@ -117,8 +125,8 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
           tokens did we burn?</strong> It feels like a productivity signal. It
           isn&apos;t. Two operators can consume the same number of tokens and
           have wildly different efficiency — one compounding signal, the other
-          just spending. Raw token consumption measures volume. It tells you
-          how much you spent, not what you bought.
+          just spending. Raw token count measures volume. It tells you how
+          much you spent, not what you bought — and not how skilled you are.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The metric that actually matters is{" "}
@@ -126,11 +134,13 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
             href="/metrics/yield-cascade"
             className="text-gold underline underline-offset-2"
           >
-            token cascade efficiency
+            token yield
           </Link>{" "}
-          — yield (Υ). It measures the{" "}
-          <em>architecture</em> of your token flow, not the volume. This post
-          explains the difference and why volume-based tracking misleads.
+          (Υ). It measures the{" "}
+          <em>architecture</em> of your token flow, not the volume — and
+          that architecture is a direct reflection of your skill as an AI
+          operator. This post explains the difference and why volume-based
+          tracking misleads.
         </p>
       </section>
 
@@ -154,10 +164,10 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
         </p>
       </section>
 
-      {/* ── What cascade efficiency measures ── */}
+      {/* ── What yield measures ── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          What cascade efficiency measures
+          What yield measures
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Yield (Υ) captures the shape of the cascade — how well your tokens
@@ -192,7 +202,7 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
           Raw token count rewards none of these. It only rewards spending.
           That&apos;s the core difference:{" "}
           <span className="text-gold">volume measures how much you spent;
-          cascade efficiency measures what you got for it.</span>
+          yield measures what you got for it.</span>
         </p>
       </section>
 
@@ -288,6 +298,45 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
           compounding signal. That&apos;s tokenmaxxing, and yield flags it
           immediately. The number doesn&apos;t care how much you spent; it
           cares whether your spending compounded.
+        </p>
+      </section>
+
+      {/* ── The tool is the person ── */}
+      <section className="flex flex-col gap-4 rounded-lg border border-gold/30 bg-gold/5 p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          The tool is the person
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Here&apos;s the insight that the token-count leaderboards miss:{" "}
+          <strong className="text-text-primary">every token the tool burns
+          is a decision the person made.</strong> When you reuse cached context,
+          that&apos;s your discipline. When you keep input lean, that&apos;s your
+          restraint. When you extract high output from low input, that&apos;s
+          your leverage. The cascade isn&apos;t the tool&apos;s behavior —
+          it&apos;s yours.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The token-count leaderboards (clawdboard, CCgather, TrustMRT) rank{" "}
+          <em>tools spending money</em>. They tell you who burned the most tokens
+          or spent the most dollars. That&apos;s a leaderboard of hammers, not
+          carpenters. Yield ranks the carpenter — because the cascade{" "}
+          <em>is</em> the person&apos;s skill signature.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          You don&apos;t need a quiz to know if someone is an{" "}
+          <Link
+            href="/blog/ai-power-user-benchmarking"
+            className="text-gold underline underline-offset-2"
+          >
+            AI power user
+          </Link>
+          . You need their token cascade.{" "}
+          <Link
+            href="/board/all"
+            className="text-gold underline underline-offset-2"
+          >
+            See who ranks →
+          </Link>
         </p>
       </section>
 
