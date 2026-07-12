@@ -907,6 +907,19 @@ export function LeaderboardTable({
                         }}
                       >
                         {e.rank}
+                        {e.percentile != null && e.percentile > 0 && (
+                          <span
+                            style={{
+                              display: "block",
+                              fontSize: 9,
+                              fontWeight: 400,
+                              color: T.mut,
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            p{e.percentile.toFixed(0)}
+                          </span>
+                        )}
                       </td>
                       <td style={{ ...st.td, ...st.tdL, ...st.stickyOp }}>
                         <span style={st.op}>
@@ -1181,6 +1194,19 @@ export function LeaderboardTable({
                         }}
                       >
                         {e.rank}
+                        {e.percentile != null && e.percentile > 0 && (
+                          <span
+                            style={{
+                              display: "block",
+                              fontSize: 9,
+                              fontWeight: 400,
+                              color: T.mut,
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            p{e.percentile.toFixed(0)}
+                          </span>
+                        )}
                       </td>
                       <td style={{ ...st.td, ...st.tdL, ...st.stickyOp }}>
                         <span style={st.op}>
