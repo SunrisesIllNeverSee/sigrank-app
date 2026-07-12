@@ -197,6 +197,11 @@ const STATIC_ROUTES: {
     priority: 0.5,
     changeFrequency: "monthly",
   },
+  {
+    path: "/blog/the-tool-is-the-person",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
