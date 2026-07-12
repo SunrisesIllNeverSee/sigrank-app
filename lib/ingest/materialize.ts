@@ -312,10 +312,16 @@ export async function insertSubmissionOnly(
  * the profile page (getOperator, getOperatorHistory, getOperatorSubmissions,
  * getOperatorReport — all tagged "operator" in cached.ts) refreshes
  * immediately instead of waiting up to 120s for the unstable_cache TTL.
+ * Finally revalidate the operator's profile page path itself so the ISR
+ * static cache (export const revalidate = 120) is also busted.
  */
-export function revalidateTouchedWindows(windowType: string): void {
+export function revalidateTouchedWindows(
+  windowType: string,
+  codename?: string,
+): void {
   const win = boardWindowByEnum(windowType);
   if (win) revalidatePath(`/board/${win.slug}`);
   revalidatePath("/board/off");
   revalidateTag("operator");
+  if (codename) revalidatePath(`/user/${codename}`);
 }
