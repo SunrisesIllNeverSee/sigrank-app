@@ -45,6 +45,7 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
   const platforms = (row as RowWithPlatforms).platforms;
   return {
     rank: global_rank,
+    percentile: row.percentile,
     // Seed rows render italic (owner 2026-06-20). The live facade hardcodes
     // isPlaceholder:false for ALL DB rows, so that's mock-only — the signal that works
     // in BOTH paths is "unclaimed": pre-auth the whole board is the seed corpus

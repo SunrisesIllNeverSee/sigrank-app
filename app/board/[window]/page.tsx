@@ -148,7 +148,10 @@ export default async function BoardWindowPage({
             Four integers in, full ledger out. Every operator ranked by{" "}
             <strong className="text-text-primary">Υ Yield</strong> — the
             architecture of the cascade, not raw spend. Volume is noise; yield
-            is signal.
+            is signal.{" "}
+            <span className="text-text-secondary">
+              See how you rank. Compare against top operators. Beat the average.
+            </span>
           </>
         }
       />

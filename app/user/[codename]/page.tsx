@@ -146,7 +146,25 @@ export default async function OperatorProfilePage({
   // Field averages for the share card: every "average operator" reference on
   // the card (AVG USER column, radar field polygon, op-ratio footer) comes
   // from the live board, so they always agree and move with the field.
-  const fieldAvg = computeFieldAverages(await getLeaderboard());
+  const boardRows = await getLeaderboard();
+  const fieldAvg = computeFieldAverages(boardRows);
+
+  // Competitive deltas (SHARED_DESIGN_DECISIONS §3): delta from field average
+  // + delta from top operator. Turns the metric into a race, not just a score.
+  const topOperator = boardRows.find(
+    (r) => r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
+  );
+  const opYield = c && !c.nonCompounding ? c.yield_ : null;
+  const fieldAvgYield = fieldAvg.yield_;
+  const topYield = topOperator?.snapshot.cascade?.yield_ ?? null;
+  const deltaFromAvg =
+    opYield != null && fieldAvgYield != null && fieldAvgYield > 0
+      ? ((opYield - fieldAvgYield) / fieldAvgYield) * 100
+      : null;
+  const deltaFromTop =
+    opYield != null && topYield != null && topYield > 0
+      ? ((topYield - opYield) / topYield) * 100
+      : null;
 
   const ranked = !pending && c && !c.nonCompounding;
 
@@ -281,6 +299,38 @@ export default async function OperatorProfilePage({
           {operator.total_messages_lifetime.toLocaleString("en-US")}
         </Stat>
       </div>
+
+      {/* Competitive deltas (SHARED_DESIGN_DECISIONS §2-3): "rank, compare,
+          win, improve" language. Shows how the operator stacks up against
+          the field average and the top operator — turns the metric into a race. */}
+      {ranked && (deltaFromAvg != null || deltaFromTop != null) && (
+        <div className="flex flex-wrap gap-4 rounded-lg border border-bg-border bg-bg-surface p-4">
+          {deltaFromAvg != null && (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+                vs. field average
+              </span>
+              <span
+                className={`font-mono text-sm ${deltaFromAvg >= 0 ? "text-gold" : "text-text-secondary"}`}
+              >
+                {deltaFromAvg >= 0 ? "▲" : "▼"} {Math.abs(deltaFromAvg).toFixed(1)}%{" "}
+                {deltaFromAvg >= 0 ? "above" : "below"} average
+              </span>
+            </div>
+          )}
+          {deltaFromTop != null && (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+                vs. top operator
+              </span>
+              <span className="font-mono text-sm text-text-secondary">
+                {deltaFromTop > 0 ? "▼" : "▲"} {Math.abs(deltaFromTop).toFixed(1)}%{" "}
+                {deltaFromTop > 0 ? "below" : "at"} top
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       <CascadePanel cascade={snapshot.cascade ?? null} />
 
