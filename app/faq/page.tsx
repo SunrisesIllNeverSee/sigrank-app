@@ -59,6 +59,16 @@ const FAQS: { question: string; answer: string }[] = [
     answer:
       "Top operators build workflows where one unit of new input sits atop a large cached base and yields more than one unit of output. This reflects disciplined, system-level reuse, not brute-force prompting. See the class tiers on /board/all.",
   },
+  {
+    question: "How does tracking my tokens tell you about my skill?",
+    answer:
+      "Every token the AI tool burns is a decision you made. High cache reuse shows discipline — you build on prior context instead of re-explaining. Low fresh input shows restraint — you don't flood the model. High output per input shows leverage — you extract work efficiently. Your token cascade is your skill signature. The tool is the person. See /blog/the-tool-is-the-person for the full argument.",
+  },
+  {
+    question: "How is SigRank different from token-count leaderboards?",
+    answer:
+      "Token-count leaderboards (clawdboard, CCgather, TrustMRT) rank by how many tokens you burned or dollars you spent — they measure the tool, not the person. SigRank ranks by yield (Υ = cache_read × output / input²), which measures how efficiently you use the tool. It's the difference between ranking hammers by how many nails they hit and ranking carpenters by what they built.",
+  },
 ];
 
 export default function FaqPage() {
