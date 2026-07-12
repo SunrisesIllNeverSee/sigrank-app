@@ -140,6 +140,23 @@ export const snapshotPayloadSchema = z
       })
       .strict(),
 
+    // Cascade Report block (mode detection + badges + health).
+    // Computed locally by the agent (pure math), submitted alongside the 4 token
+    // pillars. The server stores it as-is — does NOT recompute modes.
+    // Weekly granularity is the privacy boundary — no daily modes in the report.
+    report: z
+      .object({
+        current_mode: z.string().min(1),
+        mode_confidence: z.number().min(0).max(1),
+        mode_distribution: z.record(z.string(), z.number()),
+        mode_weighted_yield: z.number(),
+        peak_yield: z.number(),
+        health_score: z.number(),
+        badges: z.record(z.string(), z.unknown()),
+      })
+      .strict()
+      .optional(),
+
     // v1.1: source attestation (S1.3 anti-gaming). Optional — v1.0 payloads omit it.
     // When present, the server stores + cross-checks it across submissions to detect
     // log tampering (a file whose content_hash changed but timestamps didn't = edited).
