@@ -357,6 +357,50 @@ export default function CcusageAlternativesPage() {
         </div>
       </section>
 
+      {/* ── The tool is the person ── */}
+      <section className="flex flex-col gap-4 rounded-lg border border-gold/30 bg-gold/5 p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          The tool is the person
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Here&apos;s the thing that most ccusage alternatives miss:{" "}
+          <strong className="text-text-primary">every token the tool burns
+          is a decision the person made.</strong> When you reuse cached
+          context, that&apos;s your discipline. When you keep input lean,
+          that&apos;s your restraint. When you extract high output from low
+          input, that&apos;s your leverage.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The token-count leaderboards (clawdboard, CCgather, TrustMRT) rank{" "}
+          <em>tools spending money</em>. They tell you who burned the most
+          tokens. That&apos;s a leaderboard of hammers, not carpenters. SigRank
+          ranks the carpenter — because{" "}
+          <Link
+            href="/blog/the-tool-is-the-person"
+            className="text-gold underline underline-offset-2"
+          >
+            the tool is the person
+          </Link>
+          , and your token cascade is your skill signature.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          You don&apos;t need a quiz to know if you&apos;re an{" "}
+          <Link
+            href="/blog/ai-power-user-benchmarking"
+            className="text-gold underline underline-offset-2"
+          >
+            AI power user
+          </Link>
+          . You need your token cascade.{" "}
+          <Link
+            href="/score"
+            className="text-gold underline underline-offset-2"
+          >
+            Score yours →
+          </Link>
+        </p>
+      </section>
+
       {/* Verdict */}
       <section className="flex flex-col gap-3 rounded-lg border border-gold/30 bg-gold/5 p-6">
         <h2 className="font-mono text-base font-bold text-text-primary">
@@ -405,10 +449,24 @@ export default function CcusageAlternativesPage() {
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
           <Link
+            href="/blog/the-tool-is-the-person"
+            className="text-gold underline underline-offset-2"
+          >
+            The Tool Is the Person
+          </Link>
+          {" · "}
+          <Link
             href="/vs/ccusage"
             className="text-gold underline underline-offset-2"
           >
             vs ccusage
+          </Link>
+          {" · "}
+          <Link
+            href="/blog/token-cascade-vs-raw-token-consumption"
+            className="text-gold underline underline-offset-2"
+          >
+            Token Yield vs Token Count
           </Link>
           {" · "}
           <Link
