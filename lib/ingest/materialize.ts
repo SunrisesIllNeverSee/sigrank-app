@@ -26,7 +26,7 @@ import "server-only";
  * pillars and IGNORES the agent's self-reported composites (the un-gameable layer).
  */
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getSupabaseService } from "@/lib/supabase/server";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import { scoreSnapshot } from "@/lib/scoring/engine";
@@ -305,12 +305,17 @@ export async function insertSubmissionOnly(
 }
 
 /**
- * revalidateTouchedWindows — refresh the static board pages a new verified row
- * affects (§6.4): the specific window slug + the deduped default "/board/off"
- * (which replaced the removed "everything" firehose, PR#10). all_time → "all".
+ * revalidateTouchedWindows — refresh the static board pages AND the operator
+ * profile cache a new verified row affects (§6.4): the specific window slug +
+ * the deduped default "/board/off" (which replaced the removed "everything"
+ * firehose, PR#10). all_time → "all". Also bust the "operator" cache tag so
+ * the profile page (getOperator, getOperatorHistory, getOperatorSubmissions,
+ * getOperatorReport — all tagged "operator" in cached.ts) refreshes
+ * immediately instead of waiting up to 120s for the unstable_cache TTL.
  */
 export function revalidateTouchedWindows(windowType: string): void {
   const win = boardWindowByEnum(windowType);
   if (win) revalidatePath(`/board/${win.slug}`);
   revalidatePath("/board/off");
+  revalidateTag("operator");
 }
