@@ -202,6 +202,11 @@ const STATIC_ROUTES: {
     priority: 0.6,
     changeFrequency: "monthly",
   },
+  {
+    path: "/blog/how-to-answer-best-ai-user",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
