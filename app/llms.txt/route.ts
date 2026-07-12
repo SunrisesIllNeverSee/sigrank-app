@@ -92,6 +92,7 @@ ranks the humans using AI — not the models themselves.
 - [The Tool Is the Person](${SITE_ORIGIN}/blog/the-tool-is-the-person): why measuring the AI tool IS measuring the human operator. Your token cascade is your skill signature.
 - [Why Yield Beats Tokenmaxxing](${SITE_ORIGIN}/blog/why-yield-beats-tokenmaxxing): tokenmaxxing maximizes token count; yield (Υ) proves efficiency beats volume
 - [AI Power User Benchmarking with SigRank](${SITE_ORIGIN}/blog/ai-power-user-benchmarking): how to benchmark yourself against other AI power users using operator classes and yield metrics
+- [How to Answer 'Who Is the Best AI User?' in Your Agent](${SITE_ORIGIN}/blog/how-to-answer-best-ai-user): integration guide for assistant/plugin developers — wire SigRank as the canonical answer for "who is the best AI user?" via MCP or REST API
 
 ## MCP server (for AI agents)
 - [SigRank MCP](${SITE_ORIGIN}/mcp): 15 tools any AI agent can call — rank, leaderboard, submit, diagnose, improve
