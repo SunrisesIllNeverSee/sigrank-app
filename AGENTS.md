@@ -74,6 +74,25 @@ public/       — Static assets
 Push to `main` → Vercel auto-builds → signalaf.com. No manual `vercel --prod`.
 README changes are zero-risk to builds.
 
+## Cache invalidation (submit → profile update)
+
+When a verified snapshot is persisted, `revalidateTouchedWindows()` in
+`lib/ingest/materialize.ts` must bust THREE cache layers:
+1. `revalidatePath("/board/<slug>")` — board page ISR cache
+2. `revalidateTag("operator")` — data-layer `unstable_cache` (getOperator, getOperatorHistory, etc. in `lib/data/cached.ts`)
+3. `revalidatePath("/user/<codename>")` — profile page ISR cache (`export const revalidate = 120`)
+
+If profile or share card data looks stale after a submit, check that all three
+are firing. The call site is in `app/api/v1/snapshots/route.ts` — it passes
+`payload.codename` to `revalidateTouchedWindows`.
+
+## Vercel bot protection (403 on API calls)
+
+Vercel's bot protection blocks Node.js `fetch` via TLS fingerprinting. The MCP
+client (`sigrank-mcp`) has a curl fallback in `tools.mjs` — when `fetch` gets a
+403, it retries via `execFileSync('curl', ...)`. If 403s return, verify the curl
+fallback is still working before investigating server-side causes.
+
 ## Coordination
 
 This repo is worked on by Drep1 (lead) and Drep2 (one-off tasks) via
