@@ -24,6 +24,8 @@ export type Platform = "ChatGPT" | "Claude" | "Pi" | "Gemini";
 
 export interface LeaderboardEntry {
   rank: number;
+  /** Percentile [0,100], higher = better. null when not available. */
+  percentile?: number | null;
   anonId: string;
   /** Generated codename — the STABLE profile-route key (/user/<codename>). The board
    *  links by this, never by anonId: anonId may be a display_name (e.g. "MO§ES™") which
