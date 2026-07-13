@@ -78,9 +78,15 @@ export function ClaimTab({ codename, isSignedIn, hasOperator }: Props) {
           </h2>
         </div>
         <p className="max-w-lg font-sans text-xs leading-relaxed text-text-secondary">
-          This operator profile was seeded from public tokscale data. If
-          that&apos;s you, claim it to take ownership — edit your bio, set your
-          handle, and link your GitHub.
+          This operator profile was seeded from public tokscale data — a static
+          snapshot. If that&apos;s you, claim it to take ownership: edit your
+          bio, set your handle, link your GitHub, and start submitting{" "}
+          <span className="font-mono text-text-primary">live readings</span>{" "}
+          via{" "}
+          <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-[11px] text-text-primary">
+            sigrank submit
+          </code>
+          .
         </p>
         <div className="mt-1">
           <Link
@@ -138,13 +144,19 @@ export function ClaimTab({ codename, isSignedIn, hasOperator }: Props) {
         Verify you&apos;re the real operator by entering your exact tokscale
         lifetime <span className="font-mono text-text-primary">input</span> token
         count. Only the real operator knows this number — find it on your
-        tokscale profile.
+        tokscale profile. Once claimed, you can enroll a device and submit live
+        readings via{" "}
+        <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-[11px] text-text-primary">
+          sigrank submit
+        </code>
+        .
       </p>
 
       {status === "success" ? (
         <div className="rounded-md border border-accent/40 bg-accent/10 px-3 py-2.5">
           <p className="font-mono text-xs text-accent">
-            ✓ Profile claimed! Redirecting...
+            ✓ Profile claimed! You can now enroll a device and submit live
+            readings. Redirecting...
           </p>
         </div>
       ) : (
