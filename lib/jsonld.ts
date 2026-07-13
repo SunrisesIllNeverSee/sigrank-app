@@ -200,8 +200,18 @@ export function sigrankDataset(opts?: {
       "https://www.npmjs.com/package/sigrank",
       "https://github.com/SunrisesIllNeverSee/sigrank-mcp",
     ],
-    creator: { "@id": ORG_ID },
-    publisher: { "@id": ORG_ID },
+    creator: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_ORIGIN,
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_ORIGIN,
+    },
     isAccessibleForFree: true,
     license: "https://creativecommons.org/licenses/by/4.0/",
     citation: [
@@ -364,7 +374,12 @@ export function mosesPatent() {
       name: "Deric J. McHenry",
       sameAs: "https://orcid.org/0009-0002-9904-5390",
     },
-    publisher: { "@id": ORG_ID },
+    publisher: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_ORIGIN,
+    },
     about: "AI governance enforcement architecture",
   };
 }
@@ -397,7 +412,12 @@ export function experimentalRecordDataset() {
       name: "Deric J. McHenry",
       sameAs: "https://orcid.org/0009-0002-9904-5390",
     },
-    publisher: { "@id": ORG_ID },
+    publisher: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_ORIGIN,
+    },
     license: "https://creativecommons.org/licenses/by/4.0/",
     isAccessibleForFree: true,
     datePublished: "2026-03-19",
@@ -460,7 +480,12 @@ export function transformationHarnessDataset() {
       name: "Deric J. McHenry",
       sameAs: "https://orcid.org/0009-0002-9904-5390",
     },
-    publisher: { "@id": ORG_ID },
+    publisher: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_ORIGIN,
+    },
     license: "https://creativecommons.org/licenses/by/4.0/",
     isAccessibleForFree: true,
     datePublished: "2026-03-19",
@@ -508,7 +533,12 @@ export function propositionsDataset() {
       name: "Deric J. McHenry",
       sameAs: "https://orcid.org/0009-0002-9904-5390",
     },
-    publisher: { "@id": ORG_ID },
+    publisher: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_ORIGIN,
+    },
     license: "https://creativecommons.org/licenses/by/4.0/",
     isAccessibleForFree: true,
     datePublished: "2026-04-20",
@@ -524,7 +554,12 @@ export function propositionsDataset() {
     isPartOf: {
       "@type": "DataCatalog",
       name: "Commitment Theory Research Program",
-      publisher: { "@id": ORG_ID },
+      publisher: {
+        "@type": "Organization",
+        "@id": ORG_ID,
+        name: SITE_NAME,
+        url: SITE_ORIGIN,
+      },
     },
     references: "https://doi.org/10.5281/zenodo.20029607",
   };
