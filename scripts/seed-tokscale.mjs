@@ -29,8 +29,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// ── Tokscale provider name → our platform enum ──
+// ── Tokscale provider/platform name → our platform enum ──
+// Covers both the per-provider names (from profile pages: "Claude Code", "Codex CLI")
+// and the platform_breakdown names (from leaderboard JSON: "anthropic", "openai", etc.)
 const PROVIDER_MAP = {
+  // Provider names (from profile pages)
   "claude code": "claude",
   "claude": "claude",
   "codex cli": "codex",
@@ -49,6 +52,21 @@ const PROVIDER_MAP = {
   "antigravity cli": "other",
   "antigravity": "other",
   "unattributed": "other",
+  // Platform names (from leaderboard JSON platform_breakdown)
+  "anthropic": "claude",
+  "xai": "other",
+  "deepseek": "other",
+  "zhipu": "other",
+  "alibaba": "other",
+  "moonshot": "other",
+  "minimax": "other",
+  "mistral": "other",
+  "nvidia": "other",
+  "xiaomi": "other",
+  "bytedance": "other",
+  "cohere": "other",
+  "tencent": "other",
+  "unknown": "other",
   "multi": "multi",
 };
 
@@ -174,8 +192,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 
 if (args.length < 1) {
-  console.error("Usage: node scripts/seed-tokscale.mjs <input.csv> [output.sql]");
+  console.error("Usage: node scripts/seed-tokscale.mjs <input.csv|input.json> [output.sql]");
   console.error("");
+  console.error("JSON:        tokscale leaderboard JSON (users[] with stats + platform_breakdown)");
   console.error("Simple CSV:  handle,display_name,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens[,platform][,account_age_days][,total_messages_lifetime]");
   console.error("Multi CSV:   handle,display_name,provider,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens[,reasoning_tokens][,cost][,account_age_days][,total_messages_lifetime]");
   process.exit(1);
@@ -192,88 +211,149 @@ const outputPath = args[1]
       `tokscale_seed_${new Date().toISOString().slice(0, 10)}.sql`,
     );
 
-const csv = readFileSync(inputPath, "utf-8");
-const { header, rows } = parseCSV(csv);
+const raw = readFileSync(inputPath, "utf-8");
+const isJson = inputPath.endsWith(".json") || raw.trimStart().startsWith("{");
 
-const isMultiPlatform = header.includes("provider");
+// ── Parse input: JSON (tokscale leaderboard) or CSV ──
+let parsedRows; // normalized to { handle, display_name, provider?, input, output, cacheCreate, cacheRead, platform?, ageDays, totalMessages, domains? }
+let isMultiPlatform;
 
-// Only `handle` is truly required. Token columns default to 0 if missing —
-// the scrape may not have every field for every user (some profiles show no
-// cache tokens, some show no cost, etc.). Parse what we have.
-const mustHave = isMultiPlatform
-  ? ["handle", "provider"]
-  : ["handle"];
-const missing = mustHave.filter((c) => !header.includes(c));
-if (missing.length > 0) {
-  console.error(`Missing required columns: ${missing.join(", ")}`);
-  console.error(`Only 'handle'${isMultiPlatform ? " + 'provider'" : ""} is required. Token columns default to 0 if absent.`);
-  process.exit(1);
+if (isJson) {
+  const data = JSON.parse(raw);
+  const users = data.users ?? (Array.isArray(data) ? data : []);
+  if (users.length === 0) {
+    console.error("No users found in JSON.");
+    process.exit(1);
+  }
+  isMultiPlatform = false; // JSON data is already aggregated — one snapshot per user
+  parsedRows = users.map((u) => {
+    const s = u.stats ?? {};
+    const platforms = (u.platform_breakdown ?? []).map((p) => mapProvider(p.platform));
+    const distinctPlatforms = [...new Set(platforms)].filter((p) => p && p !== "other");
+    // If only "other" platforms, use that; if mix of named + other, keep named
+    const domains = distinctPlatforms.length > 0 ? distinctPlatforms : (platforms.length > 0 ? [...new Set(platforms)] : ["other"]);
+    return {
+      handle: u.handle,
+      display_name: u.display_name || null,
+      avatar_url: u.avatar_url || null,
+      input: String(s.inputTokens ?? 0),
+      output: String(s.outputTokens ?? 0),
+      cacheCreate: String(s.cacheWriteTokens ?? 0),
+      cacheRead: String(s.cacheReadTokens ?? 0),
+      ageDays: String(s.activeDays ?? 30),
+      totalMessages: String(s.sessionCount ?? 0),
+      domains,
+    };
+  });
+  console.log(`Parsed JSON: ${parsedRows.length} users`);
+} else {
+  const { header, rows } = parseCSV(raw);
+  isMultiPlatform = header.includes("provider");
+  // ... CSV path continues below
+  parsedRows = rows;
 }
 
-// Track which token columns are present (for reporting)
-const hasInput = header.includes("input_tokens");
-const hasOutput = header.includes("output_tokens");
-const hasCacheCreate = header.includes("cache_creation_tokens");
-const hasCacheRead = header.includes("cache_read_tokens");
-const hasPlatform = header.includes("platform");
-const hasProvider = header.includes("provider");
-const hasAge = header.includes("account_age_days");
-const hasMessages = header.includes("total_messages_lifetime");
-const hasReasoning = header.includes("reasoning_tokens");
-const hasCost = header.includes("cost");
+// ── For CSV path: validate columns + track what's present ──
+let header = null;
+let hasInput, hasOutput, hasCacheCreate, hasCacheRead, hasPlatform, hasProvider, hasAge, hasMessages;
+if (!isJson) {
+  const parsed = parseCSV(raw);
+  header = parsed.header;
+  const csvRows = parsed.rows;
+  isMultiPlatform = header.includes("provider");
+  parsedRows = csvRows;
 
-if (!hasInput && !hasOutput && !hasCacheCreate && !hasCacheRead) {
-  console.error("Warning: no token columns found. All operators will have 0 tokens.");
+  const mustHave = isMultiPlatform ? ["handle", "provider"] : ["handle"];
+  const missing = mustHave.filter((c) => !header.includes(c));
+  if (missing.length > 0) {
+    console.error(`Missing required columns: ${missing.join(", ")}`);
+    process.exit(1);
+  }
+
+  hasInput = header.includes("input_tokens");
+  hasOutput = header.includes("output_tokens");
+  hasCacheCreate = header.includes("cache_creation_tokens");
+  hasCacheRead = header.includes("cache_read_tokens");
+  hasPlatform = header.includes("platform");
+  hasProvider = header.includes("provider");
+  hasAge = header.includes("account_age_days");
+  hasMessages = header.includes("total_messages_lifetime");
+
+  if (!hasInput && !hasOutput && !hasCacheCreate && !hasCacheRead) {
+    console.error("Warning: no token columns found. All operators will have 0 tokens.");
+  }
 }
 
 const snapshotDate = new Date().toISOString().slice(0, 10);
 
-// ── Group rows by handle (multi-platform) or treat each row as one operator (simple) ──
-const operators = new Map(); // codename → { displayName, handle, domains, ageDays, totalMessages, providers: [{ platform, input, output, cc, cr }] }
+// ── BigInt parser (handles commas, $, whitespace, empty cells) ──
+const parseBigInt = (val) => {
+  if (!val) return 0n;
+  const cleaned = String(val).replace(/[,\s$]/g, "");
+  try { return BigInt(cleaned || 0); } catch { return 0n; }
+};
 
-for (const row of rows) {
+// ── Group rows by handle ──
+const operators = new Map();
+const seenSlugs = new Set();
+
+for (const row of parsedRows) {
   const handle = row.handle;
-  if (!handle) continue; // skip blank rows
+  if (!handle) continue;
+
   const displayName = row.display_name || null;
-  // Parse what we have — missing columns OR empty cells default to 0.
-  // Some profiles show no cache tokens, some show no cost, some are partial.
-  const parseBigInt = (val) => {
-    if (!val) return 0n;
-    const cleaned = String(val).replace(/[,\s$]/g, "");
-    try { return BigInt(cleaned || 0); } catch { return 0n; }
-  };
-  const input = parseBigInt(hasInput ? row.input_tokens : 0);
-  const output = parseBigInt(hasOutput ? row.output_tokens : 0);
-  const cacheCreate = parseBigInt(hasCacheCreate ? row.cache_creation_tokens : 0);
-  const cacheRead = parseBigInt(hasCacheRead ? row.cache_read_tokens : 0);
-  const ageDays = parseInt((hasAge ? row.account_age_days : null) || "30", 10);
-  const totalMessages = parseBigInt(hasMessages ? row.total_messages_lifetime : 0);
+  const avatarUrl = row.avatar_url || null;
 
   let slug = slugify(handle);
-  // Deduplicate slugs
-  if (operators.has(slug) === false && [...operators.keys()].some((k) => k === slug)) {
-    slug = `${slug}-${operators.size}`;
-  }
+  if (seenSlugs.has(slug)) slug = `${slug}-${operators.size}`;
+  seenSlugs.add(slug);
 
-  if (isMultiPlatform) {
+  if (isJson) {
+    // JSON path: already aggregated, domains pre-computed from platform_breakdown
+    const input = parseBigInt(row.input);
+    const output = parseBigInt(row.output);
+    const cacheCreate = parseBigInt(row.cacheCreate);
+    const cacheRead = parseBigInt(row.cacheRead);
+    const domains = row.domains ?? ["other"];
+    const primaryDomain = domains.length > 1 ? "multi" : domains[0] ?? "other";
+
+    operators.set(slug, {
+      displayName,
+      handle: handle.replace(/^@+/, ""),
+      avatarUrl,
+      domains,
+      primaryDomain,
+      ageDays: parseInt(row.ageDays || "30", 10),
+      totalMessages: parseBigInt(row.totalMessages).toString(),
+      providers: [{
+        platform: primaryDomain,
+        input: input.toString(),
+        output: output.toString(),
+        cacheCreate: cacheCreate.toString(),
+        cacheRead: cacheRead.toString(),
+      }],
+    });
+  } else if (isMultiPlatform) {
+    // CSV multi-platform: group by handle, one snapshot per provider
+    const input = parseBigInt(hasInput ? row.input_tokens : 0);
+    const output = parseBigInt(hasOutput ? row.output_tokens : 0);
+    const cacheCreate = parseBigInt(hasCacheCreate ? row.cache_creation_tokens : 0);
+    const cacheRead = parseBigInt(hasCacheRead ? row.cache_read_tokens : 0);
     const provider = mapProvider(row.provider);
 
     if (!operators.has(slug)) {
       operators.set(slug, {
         displayName,
         handle: handle.replace(/^@+/, ""),
+        avatarUrl: null,
         domains: [],
-        ageDays,
-        totalMessages: totalMessages.toString(),
+        ageDays: parseInt((hasAge ? row.account_age_days : null) || "30", 10),
+        totalMessages: parseBigInt(hasMessages ? row.total_messages_lifetime : 0).toString(),
         providers: [],
       });
     }
-
     const op = operators.get(slug);
-    // Track distinct domains
-    if (!op.domains.includes(provider)) {
-      op.domains.push(provider);
-    }
+    if (!op.domains.includes(provider)) op.domains.push(provider);
     op.providers.push({
       platform: provider,
       input: input.toString(),
@@ -282,13 +362,20 @@ for (const row of rows) {
       cacheRead: cacheRead.toString(),
     });
   } else {
-    const platform = row.platform || "claude";
+    // CSV simple: one row = one operator, single platform
+    const input = parseBigInt(hasInput ? row.input_tokens : 0);
+    const output = parseBigInt(hasOutput ? row.output_tokens : 0);
+    const cacheCreate = parseBigInt(hasCacheCreate ? row.cache_creation_tokens : 0);
+    const cacheRead = parseBigInt(hasCacheRead ? row.cache_read_tokens : 0);
+    const platform = (hasPlatform ? row.platform : null) || "claude";
+
     operators.set(slug, {
       displayName,
       handle: handle.replace(/^@+/, ""),
+      avatarUrl: null,
       domains: [platform],
-      ageDays,
-      totalMessages: totalMessages.toString(),
+      ageDays: parseInt((hasAge ? row.account_age_days : null) || "30", 10),
+      totalMessages: parseBigInt(hasMessages ? row.total_messages_lifetime : 0).toString(),
       providers: [{
         platform,
         input: input.toString(),
@@ -305,9 +392,9 @@ const opEntries = [];
 const snapEntries = [];
 
 for (const [codename, op] of operators) {
-  // Determine primary_domain: "multi" if 2+ distinct platforms, else the single platform
+  // Determine primary_domain: use pre-computed (JSON) or derive from providers (CSV)
   const distinctPlatforms = [...new Set(op.providers.map((p) => p.platform))];
-  const primaryDomain = distinctPlatforms.length > 1 ? "multi" : distinctPlatforms[0] || "claude";
+  const primaryDomain = op.primaryDomain ?? (distinctPlatforms.length > 1 ? "multi" : distinctPlatforms[0] || "claude");
 
   // Sort domains for deterministic output
   const domainsSorted = [...new Set(op.domains)].sort();
@@ -316,6 +403,7 @@ for (const [codename, op] of operators) {
     codename,
     display_name: op.displayName,
     handle: op.handle,
+    avatar_url: op.avatarUrl,
     primary_domain: primaryDomain,
     operator_domains: domainsSorted,
     ageDays: op.ageDays,
@@ -335,6 +423,7 @@ for (const [codename, op] of operators) {
 
     snapEntries.push({
       codename,
+      handle: op.handle,
       platform: p.platform,
       input: p.input,
       output: p.output,
@@ -364,6 +453,7 @@ for (const [codename, op] of operators) {
 
     snapEntries.push({
       codename,
+      handle: op.handle,
       platform: "multi",
       input: sumInput.toString(),
       output: sumOutput.toString(),
@@ -382,6 +472,13 @@ for (const [codename, op] of operators) {
 }
 
 // ── Generate SQL ──
+// Handle collisions: the existing 10 seeds already use some real handles
+// (IvGolovach, MapleEve, etc.) with fake codenames (IronLattice, EmberCoil).
+// Strategy: insert new operators by codename, but if the handle already exists
+// (ON CONFLICT (handle)), UPDATE the existing operator's real data instead.
+// This upserts by handle — the existing seed operators get real token data,
+// new operators get inserted fresh.
+
 const opValues = opEntries
   .map(
     (e) =>
@@ -392,7 +489,7 @@ const opValues = opEntries
 const snapValues = snapEntries
   .map(
     (e) =>
-      `  ('${e.codename}', '${e.platform}', ${e.input}::bigint, ${e.output}::bigint, ${e.cacheCreate}::bigint, ${e.cacheRead}::bigint, ${e.signa}, ${e.comp}, ${e.pc}, ${e.ct}, ${e.sd}, ${e.tt}, ${e.sf}, '${e.cls}')`,
+      `  ('${e.handle}', '${e.platform}', ${e.input}::bigint, ${e.output}::bigint, ${e.cacheCreate}::bigint, ${e.cacheRead}::bigint, '${e.cls}')`,
   )
   .join(",\n");
 
@@ -401,9 +498,14 @@ const sql = `-- ================================================================
 -- ${isMultiPlatform ? "Multi-platform: per-provider snapshots + aggregated 'multi' snapshot." : "Single-platform."}
 --
 -- Generated by scripts/seed-tokscale.mjs from ${args[0]}.
--- Idempotent (ON CONFLICT DO NOTHING). Each operator carries their REAL 4 token
--- pillars (input, output, cache_creation, cache_read); cascade/Υ is computed ON
--- READ via computeCascadeMetrics() — same path as the existing seeds.
+-- Idempotent. Each operator carries their REAL 4 token pillars (input, output,
+-- cache_creation, cache_read); cascade/Υ is computed ON READ via
+-- computeCascadeMetrics() — same path as the existing seeds.
+--
+-- Two-step upsert: the handle unique index is partial (WHERE handle IS NOT NULL),
+-- so ON CONFLICT (handle) doesn't work. Instead:
+--   Step 1: UPDATE existing operators (matching by handle) with real tokscale data
+--   Step 2: INSERT new operators (handles not already in the DB)
 --
 -- Identity: real handles (slugified → codename, real name → display_name).
 -- Claim model: unclaimed (claimed=false). Users claim via GitHub OAuth +
@@ -413,20 +515,47 @@ const sql = `-- ================================================================
 -- Snapshot date: ${snapshotDate}. Window: 30d. Ruleset: 1.0.
 -- ============================================================================
 
--- ── operators ──
+-- ── Step 1: UPDATE existing operators (handle match) with real tokscale data ──
+-- The original 10 seeds used real handles with fake codenames (IronLattice, etc.).
+-- This updates their display_name, primary_domain, operator_domains, account_age,
+-- and total_messages with the real tokscale values. codename is NOT overwritten.
+UPDATE operators o
+SET
+  display_name            = COALESCE(src.display_name, o.display_name),
+  primary_domain          = src.primary_domain,
+  operator_domains        = src.operator_domains,
+  account_age_days        = src.account_age_days,
+  total_messages_lifetime = src.total_messages_lifetime
+FROM (VALUES
+${opEntries.map((e) => `  ('${e.handle}', ${e.display_name ? `'${e.display_name.replace(/'/g, "''")}'` : "NULL"}, '${e.primary_domain}', ${e.ageDays}, ${e.totalMessages}, ARRAY['${e.operator_domains.join("','")}']::text[])`).join(",\n")}
+) AS src(handle, display_name, primary_domain, account_age_days, total_messages_lifetime, operator_domains)
+WHERE o.handle = src.handle;
+
+-- ── Step 2: INSERT new operators (handles not already in the DB) ──
 INSERT INTO operators (codename, display_name, handle, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, claimed, operator_domains)
-VALUES
-${opValues}
+SELECT v.codename, v.display_name, v.handle, 'free', 'unverified', v.primary_domain, v.account_age_days, v.total_messages_lifetime, false, v.operator_domains
+FROM (VALUES
+${opEntries.map((e) => `  ('${e.codename}', ${e.display_name ? `'${e.display_name.replace(/'/g, "''")}'` : "NULL"}, '${e.handle}', '${e.primary_domain}', ${e.ageDays}, ${e.totalMessages}, ARRAY['${e.operator_domains.join("','")}']::text[])`).join(",\n")}
+) AS v(codename, display_name, handle, primary_domain, account_age_days, total_messages_lifetime, operator_domains)
+WHERE v.handle NOT IN (SELECT handle FROM operators WHERE handle IS NOT NULL)
 ON CONFLICT (codename) DO NOTHING;
 
--- ── metric_snapshots (per-provider + aggregated 'multi' where applicable) ──
-INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, platform, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, signal_force, class_tier, last_seen, recency_modifier, live_signa_rate, movement_24h, movement_7d, ruleset_version)
-SELECT o.operator_id, DATE '${snapshotDate}', '30d', v.platform, v.input, v.output, v.cc, v.cr, v.signa, v.comp, v.pc, v.ct, v.sd, v.tt, v.sf, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, v.signa, 0, 0, '1.0'
+-- ── metric_snapshots (keyed by handle → operator_id lookup) ──
+-- Only the 4 raw token pillars + class_tier. No placeholder fields — the board
+-- computes cascade (Υ, leverage, 10xDEV, etc.) on read from the 4 pillars.
+INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, platform, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, class_tier, last_seen, recency_modifier, movement_24h, movement_7d, ruleset_version)
+SELECT o.operator_id, DATE '${snapshotDate}', 'all', v.platform, v.input, v.output, v.cc, v.cr, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, 0, 0, '1.0'
 FROM (VALUES
 ${snapValues}
-) AS v(codename, platform, input, output, cc, cr, signa, comp, pc, ct, sd, tt, sf, cls)
-JOIN operators o ON o.codename = v.codename
-ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO NOTHING;
+) AS v(handle, platform, input, output, cc, cr, cls)
+JOIN operators o ON o.handle = v.handle
+ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO UPDATE SET
+  input_tokens           = EXCLUDED.input_tokens,
+  output_tokens          = EXCLUDED.output_tokens,
+  cache_creation_tokens  = EXCLUDED.cache_creation_tokens,
+  cache_read_tokens      = EXCLUDED.cache_read_tokens,
+  class_tier             = EXCLUDED.class_tier,
+  last_seen              = EXCLUDED.last_seen;
 
 -- End of tokscale seed (${opEntries.length} operators, ${snapEntries.length} snapshots).
 `;
