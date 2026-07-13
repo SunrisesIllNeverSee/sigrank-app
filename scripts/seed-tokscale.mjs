@@ -544,7 +544,7 @@ ON CONFLICT (codename) DO NOTHING;
 -- Only the 4 raw token pillars + class_tier. No placeholder fields — the board
 -- computes cascade (Υ, leverage, 10xDEV, etc.) on read from the 4 pillars.
 INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, platform, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, class_tier, last_seen, recency_modifier, movement_24h, movement_7d, ruleset_version)
-SELECT o.operator_id, DATE '${snapshotDate}', 'all', v.platform, v.input, v.output, v.cc, v.cr, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, 0, 0, '1.0'
+SELECT o.operator_id, DATE '${snapshotDate}', 'all_time', v.platform, v.input, v.output, v.cc, v.cr, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, 0, 0, '1.0'
 FROM (VALUES
 ${snapValues}
 ) AS v(handle, platform, input, output, cc, cr, cls)
