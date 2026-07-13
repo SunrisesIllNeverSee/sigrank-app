@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// TransVaultOrigin is the MO§ES codename — always present (seed operator).
-const SEED_CODENAME = "TransVaultOrigin";
+// furic (Richard Fu) is the top-ranked tokscale seed operator — always present.
+const SEED_CODENAME = "furic";
 
 test("operator profile renders + tabs work", async ({ page }) => {
   await page.goto(`/user/${SEED_CODENAME}`);

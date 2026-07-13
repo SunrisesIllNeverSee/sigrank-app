@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 test("leaderboard renders + sort works", async ({ page }) => {
-  await page.goto("/leaderboard");
+  await page.goto("/board/all");
   // Table renders with rows
   const table = page.locator("table");
   await expect(table).toBeVisible();
