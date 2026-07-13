@@ -62,6 +62,10 @@ const FOOTER_COLUMNS: {
     heading: "Explore",
     links: [
       {
+        href: "https://sigarena.signalaf.com",
+        label: "AI User Leaderboard →",
+      },
+      {
         href: "/alternatives/ai-coding-metrics",
         label: "AI Coding Metrics Tools",
       },
