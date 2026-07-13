@@ -42,22 +42,31 @@ export function organization() {
   };
 }
 
-/** Product — SigRank as a product/service for schema.org rich results. */
+/** SoftwareApplication — SigRank as a software tool for schema.org rich results.
+ *
+ *  Was previously typed as Product, but Google's Product snippet validator requires
+ *  aggregateRating + review + availability. SigRank is a free CLI/MCP tool, not a
+ *  retail product — SoftwareApplication is the correct type and doesn't trigger the
+ *  review/rating requirements. Offer keeps availability for completeness.
+ */
 export function product() {
   return {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "SoftwareApplication",
     name: "SigRank — AI Operator Performance Rankings",
     description:
       "Leaderboard measuring AI users (operators) by token cascade efficiency " +
       "(Υ Yield, C:I:O) and operator classes. Privacy-preserving, on-device telemetry " +
       "with ed25519-signed submissions.",
     url: SITE_ORIGIN,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Cross-platform (Node.js 18+)",
     brand: { "@id": ORG_ID },
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
     },
     category: "AI Developer Tools",
     keywords: [
