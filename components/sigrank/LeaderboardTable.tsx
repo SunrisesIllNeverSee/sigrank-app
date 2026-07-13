@@ -408,8 +408,8 @@ export function LeaderboardTable({
   const isActive = (col: SortKey) => sort === col;
 
   // Click a header → sort by it; click the active column → flip direction. Default
-  // direction is the metric's "best-first" ($/1M asc, all else desc). The # column always
-  // shows the server global_rank — sorting REORDERS rows, never renumbers #.
+  // direction is the metric's "best-first" ($/1M asc, all else desc). The # column
+  // shows the position within the active sort — switching metrics renumbers rows.
   const onSortColumn = (col: SortKey) => {
     if (col === sort) setDir((d) => (d === "desc" ? "asc" : "desc"));
     else {
@@ -494,7 +494,7 @@ export function LeaderboardTable({
 
   // Pagination — 25 rows/page (owner 2026-06-24). Page resets to 0 on any sort/filter
   // change so you never land on an out-of-range page. `rows` is the current page slice;
-  // the # column still shows each entry's server rank (slicing never renumbers).
+  // the # column shows the position within the active sort (renumbers on sort change).
   const PER_PAGE = 25;
   const pageCount = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
   React.useEffect(() => {
@@ -628,6 +628,7 @@ export function LeaderboardTable({
         <ul className="flex flex-col gap-1.5 md:hidden">
           {rows.map((e, i) => {
             const sp = speciesOf(e.signalClass);
+            const displayRank = safePage * PER_PAGE + i + 1;
             const yld =
               e.yield_ == null
                 ? "—"
@@ -652,13 +653,13 @@ export function LeaderboardTable({
                   <span
                     style={{
                       width: 22,
-                      color: rankColor(e.rank),
-                      fontWeight: rankWeight(e.rank),
+                      color: rankColor(displayRank),
+                      fontWeight: rankWeight(displayRank),
                       fontSize: 12,
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >
-                    {e.rank}
+                    {displayRank}
                   </span>
                   <OperatorAvatar alt={e.anonId} size={26} />
                   <span
@@ -895,6 +896,7 @@ export function LeaderboardTable({
               <tbody>
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
+                  const displayRank = safePage * PER_PAGE + i + 1;
                   return (
                     <tr key={`${e.anonId}-${i}`}>
                       <td
@@ -902,11 +904,11 @@ export function LeaderboardTable({
                           ...st.td,
                           ...st.tdR,
                           ...st.stickyRank,
-                          color: rankColor(e.rank),
-                          fontWeight: rankWeight(e.rank),
+                          color: rankColor(displayRank),
+                          fontWeight: rankWeight(displayRank),
                         }}
                       >
-                        {e.rank}
+                        {displayRank}
                         {e.percentile != null && e.percentile > 0 && (
                           <span
                             style={{
@@ -1351,7 +1353,7 @@ export function LeaderboardTable({
         ) : null}
         <div style={st.note}>
           {view === "metrics"
-            ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column is the true global Υ-rank — sorting reorders rows but never renumbers it."
+            ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column reflects the current sort — switching metrics renumbers rows to match."
             : "Raw pillars — the four integers the engine derives every metric from. Click a header to sort; the last column is total cost ($). Top-3 per column boxed."}
           {totalUsers != null
             ? ` · 25 per page · ${sorted.length} of ${totalUsers} operators.`
