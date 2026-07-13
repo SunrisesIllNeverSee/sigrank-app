@@ -197,14 +197,33 @@ const { header, rows } = parseCSV(csv);
 
 const isMultiPlatform = header.includes("provider");
 
-// Validate required columns
-const requiredSimple = ["handle", "display_name", "input_tokens", "output_tokens", "cache_creation_tokens", "cache_read_tokens"];
-const requiredMulti = ["handle", "display_name", "provider", "input_tokens", "output_tokens", "cache_creation_tokens", "cache_read_tokens"];
-const required = isMultiPlatform ? requiredMulti : requiredSimple;
-const missing = required.filter((c) => !header.includes(c));
+// Only `handle` is truly required. Token columns default to 0 if missing —
+// the scrape may not have every field for every user (some profiles show no
+// cache tokens, some show no cost, etc.). Parse what we have.
+const mustHave = isMultiPlatform
+  ? ["handle", "provider"]
+  : ["handle"];
+const missing = mustHave.filter((c) => !header.includes(c));
 if (missing.length > 0) {
   console.error(`Missing required columns: ${missing.join(", ")}`);
+  console.error(`Only 'handle'${isMultiPlatform ? " + 'provider'" : ""} is required. Token columns default to 0 if absent.`);
   process.exit(1);
+}
+
+// Track which token columns are present (for reporting)
+const hasInput = header.includes("input_tokens");
+const hasOutput = header.includes("output_tokens");
+const hasCacheCreate = header.includes("cache_creation_tokens");
+const hasCacheRead = header.includes("cache_read_tokens");
+const hasPlatform = header.includes("platform");
+const hasProvider = header.includes("provider");
+const hasAge = header.includes("account_age_days");
+const hasMessages = header.includes("total_messages_lifetime");
+const hasReasoning = header.includes("reasoning_tokens");
+const hasCost = header.includes("cost");
+
+if (!hasInput && !hasOutput && !hasCacheCreate && !hasCacheRead) {
+  console.error("Warning: no token columns found. All operators will have 0 tokens.");
 }
 
 const snapshotDate = new Date().toISOString().slice(0, 10);
@@ -214,13 +233,21 @@ const operators = new Map(); // codename → { displayName, handle, domains, age
 
 for (const row of rows) {
   const handle = row.handle;
+  if (!handle) continue; // skip blank rows
   const displayName = row.display_name || null;
-  const input = BigInt(row.input_tokens || 0);
-  const output = BigInt(row.output_tokens || 0);
-  const cacheCreate = BigInt(row.cache_creation_tokens || 0);
-  const cacheRead = BigInt(row.cache_read_tokens || 0);
-  const ageDays = parseInt(row.account_age_days || "30", 10);
-  const totalMessages = BigInt(row.total_messages_lifetime || "0");
+  // Parse what we have — missing columns OR empty cells default to 0.
+  // Some profiles show no cache tokens, some show no cost, some are partial.
+  const parseBigInt = (val) => {
+    if (!val) return 0n;
+    const cleaned = String(val).replace(/[,\s$]/g, "");
+    try { return BigInt(cleaned || 0); } catch { return 0n; }
+  };
+  const input = parseBigInt(hasInput ? row.input_tokens : 0);
+  const output = parseBigInt(hasOutput ? row.output_tokens : 0);
+  const cacheCreate = parseBigInt(hasCacheCreate ? row.cache_creation_tokens : 0);
+  const cacheRead = parseBigInt(hasCacheRead ? row.cache_read_tokens : 0);
+  const ageDays = parseInt((hasAge ? row.account_age_days : null) || "30", 10);
+  const totalMessages = parseBigInt(hasMessages ? row.total_messages_lifetime : 0);
 
   let slug = slugify(handle);
   // Deduplicate slugs
