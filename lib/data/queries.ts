@@ -290,14 +290,21 @@ export async function getLeaderboard(
     if (snapRows.length === 0)
       return params.windowFilter ? [] : filterMockBoard(params);
 
-    const opIds = [...new Set(snapRows.map((s) => s.operator_id))];
-    const { data: opData, error: opError } = await sb
-      .from("operators_public")
-      .select(OPERATOR_COLUMNS)
-      .in("operator_id", opIds);
-    if (opError) throw opError;
+    const opIds = new Set(snapRows.map((s) => s.operator_id));
+    // Fetch all operators_public (paginated) — the IN clause with 1600+ UUIDs
+    // exceeds PostgREST's URL length limit, causing a silent error → mock fallback.
+    // With <2k operators, fetching all is cheaper than batching the IN filter.
+    const opData = await fetchAllPaginated<DbOperator>(
+      sb,
+      (s) =>
+        s
+          .from("operators_public")
+          .select(OPERATOR_COLUMNS)
+          .order("operator_id"),
+      "operators_public (getLeaderboard)",
+    );
     const opById = new Map<string, DbOperator>(
-      (asDb<DbOperator[] | null>(opData) ?? []).map((o) => [o.operator_id, o]),
+      opData.filter((o) => opIds.has(o.operator_id)).map((o) => [o.operator_id, o]),
     );
 
     // Latest rank_history per operator for percentile (global_rank is recomputed
