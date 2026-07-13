@@ -38,6 +38,7 @@ import { CanonId } from "@/components/ui/CanonId";
 import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
+import { OperatorRecords } from "@/components/profile/OperatorRecords";
 import { ReportTab } from "@/components/profile/ReportTab";
 import { LabTab } from "@/components/profile/LabTab";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
@@ -632,6 +633,15 @@ export default async function OperatorProfilePage({
           fieldAvg={fieldAvg}
         />
       )}
+
+      {/* Hall of Signal — where this operator ranks on every board. Renders
+          only if the operator is in the top 10 on at least one metric. Uses
+          the same boardRows already fetched for field averages — no extra DB
+          call. Placed above the tabs so prestige is visible immediately. */}
+      <OperatorRecords
+        codename={operator.codename}
+        boardRows={boardRows}
+      />
 
       <ProfileTabs
         stats={pending ? pendingPanel : rankedStatsPanel}
