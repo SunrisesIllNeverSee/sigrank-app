@@ -8,12 +8,12 @@ import { breadcrumb, definedTerm } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "The Three Degrees of Leverage",
   description:
-    "AA 7:2:1 average user to power-user median to the top operator, read as a token cascade. The 10xDEV log anchor and full provenance.",
+    "Median operator to top-100 median to the top operator, read as a token cascade. All three columns measured live from the all-time board. The 10xDEV log anchor and full provenance.",
   path: "/wiki/three-degrees",
 });
 
-// ISR: the chart auto-pulls the top operator's live all-time metrics. Daily revalidate
-// keeps this page prerendered + refreshes the gold column once a day.
+// ISR: the chart auto-pulls live all-time board medians + the top operator. Daily
+// revalidate keeps this page prerendered + refreshes the columns once a day.
 export const revalidate = 86400;
 
 export default function ThreeDegreesPage() {
@@ -27,7 +27,7 @@ export default function ThreeDegreesPage() {
           ]),
           definedTerm(
             "Three Degrees of Leverage",
-            "The 10xDEV log anchor: average user → power-user median → top operator, read as a token cascade.",
+            "The 10xDEV log anchor: median operator → top-100 median → top operator, all measured live from the all-time board.",
             "/wiki/three-degrees",
           ),
         ]}
