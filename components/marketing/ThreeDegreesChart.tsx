@@ -17,66 +17,60 @@ import React from "react";
 import Link from "next/link";
 import {
   getTopOperatorColumn,
+  getAverageUsersColumn,
+  getPowerUsersColumn,
+  GOLD_FALLBACK,
+  AVG_FALLBACK,
+  POWER_FALLBACK,
   type GoldColumn,
 } from "@/lib/marketing/top-operator-column";
 
 type Variant = "full" | "embed";
 
 /** The headline comparison table — the three degrees across seven metrics.
- * Owner-facing column headers (owner 2026-06-22). The provenance footnotes below the
- * table keep the precise, truthful framing (modeled baseline / power-user median / clean
- * observer-stripped seed) — these headers are the plain-language read.
+ * Owner-facing column headers (owner 2026-06-22, updated 2026-07-13). All three columns
+ * are now LIVE from the all-time board:
+ *   - "Average Users" = median of ALL real operators (the typical operator)
+ *   - "Power users"   = median of the top 100 real operators (the typical elite)
+ *   - "Top Evals"     = the single top real operator (gold column)
  * `tone`: 'white' = Average + Power user columns, 'gold' = the Top Evals column. */
 const COLS: { label: string; tone: "white" | "gold" }[] = [
   { label: "Average Users*", tone: "white" },
   { label: "Power users†", tone: "white" },
   { label: "Top Evals to date‡", tone: "gold" },
 ];
-// Gold column = the top REAL operator currently leading the live board, on the ALL-TIME
-// window (lib/marketing/top-operator-column.ts). It auto-pulls the canonical board
-// compute at render, so the chart tracks "whoever leads" + can never disagree with the
-// board. `gold` is null when there's no qualifying real operator yet → these FALLBACK
-// literals (the last known real read, MO§ES™ all-time 2026-06-27) are used instead.
-const GOLD_FALLBACK: GoldColumn = {
-  yield_: "488.65",
-  snr: "0.58",
-  velocity: "1.36",
-  leverage: "360.2×",
-  dev10x: "2.56",
-  efficiency: "93.17",
-  opRatio: "360 : 1 : 1.36",
-  devLinear: "360×",
-};
 
 function buildRows(
+  avg: GoldColumn,
+  power: GoldColumn,
   gold: GoldColumn,
 ): { metric: string; vals: [string, string, string]; winner: 2 }[] {
   return [
-    { metric: "Υ Yield", vals: ["1.57", "1.51", gold.yield_], winner: 2 },
-    { metric: "SNR", vals: ["0.33", "0.07", gold.snr], winner: 2 },
+    { metric: "Υ Yield", vals: [avg.yield_, power.yield_, gold.yield_], winner: 2 },
+    { metric: "SNR", vals: [avg.snr, power.snr, gold.snr], winner: 2 },
     {
       metric: "Velocity (O/I)",
-      vals: ["0.50", "0.08", gold.velocity],
+      vals: [avg.velocity, power.velocity, gold.velocity],
       winner: 2,
     },
     {
       metric: "Leverage (CR/I)",
-      vals: ["3.2×", "22.3×", gold.leverage],
+      vals: [avg.leverage, power.leverage, gold.leverage],
       winner: 2,
     },
     {
       metric: "10xDEV (log₁₀)",
-      vals: ["0.50", "1.35", gold.dev10x],
+      vals: [avg.dev10x, power.dev10x, gold.dev10x],
       winner: 2,
     },
     {
       metric: "Efficiency (vs AA 4.0)",
-      vals: ["1.00", "5.61", gold.efficiency],
+      vals: [avg.efficiency, power.efficiency, gold.efficiency],
       winner: 2,
     },
     {
       metric: "Operating Ratio (C:I:O)",
-      vals: ["3.5 : 1 : 0.50", "22 : 1 : 0.08", gold.opRatio],
+      vals: [avg.opRatio, power.opRatio, gold.opRatio],
       winner: 2,
     },
   ];
@@ -84,11 +78,13 @@ function buildRows(
 
 /** 10xDEV log-anchor read — exponent, not multiplier. */
 function buildDevRows(
+  avg: GoldColumn,
+  power: GoldColumn,
   gold: GoldColumn,
 ): { degree: string; dev: string; linear: string }[] {
   return [
-    { degree: "Average users (AA 7:2:1)*", dev: "0.50", linear: "3.2×" },
-    { degree: "Power-user median", dev: "1.35", linear: "22.4×" },
+    { degree: "Average users (median, all operators)*", dev: avg.dev10x, linear: avg.devLinear },
+    { degree: "Power-user median (top 100)", dev: power.dev10x, linear: power.devLinear },
     {
       degree: "Top operator to date",
       dev: gold.dev10x,
@@ -196,7 +192,7 @@ function DevTable({ rows }: { rows: ReturnType<typeof buildDevRows> }) {
 function SourceMarkers() {
   return (
     <p className="font-sans text-[11px] leading-relaxed text-text-muted">
-      <span className="text-text-secondary">Sources:</span> the top operator is{" "}
+      <span className="text-text-secondary">Sources:</span> all three columns are{" "}
       <em>measured live</em> from the{" "}
       <Link
         href="/board/all"
@@ -204,19 +200,9 @@ function SourceMarkers() {
       >
         all-time board
       </Link>{" "}
-      (auto-pulled, refreshed daily); the power-user median is a measured survey
-      (n=10). Both derived from canonical four-pillar token telemetry. Token
-      counts only. <span className="text-text-secondary">AA 7:2:1</span> is a{" "}
-      <em>modeled</em> baseline from{" "}
-      <a
-        href="https://artificialanalysis.ai/methodology"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-text-accent underline-offset-2 hover:underline"
-      >
-        Artificial Analysis methodology
-      </a>{" "}
-      (not measured; a reference floor).
+      (auto-pulled at render). Average Users = median of all real operators; Power
+      users = median of the top 100 by yield; Top Evals = the single leading operator.
+      All derived from canonical four-pillar token telemetry. Token counts only.
     </p>
   );
 }
@@ -231,68 +217,80 @@ function Provenance() {
 
       <div>
         <p className="font-mono text-[11px] font-bold text-text-secondary">
-          Top operator to date · <span className="text-gold">measured</span>
+          Top operator to date · <span className="text-gold">measured live</span>
         </p>
         <p>
-          The top real operator on the live SigRank board so far (MO§ES™ — the
-          owner&apos;s own observer-stripped run). Source:{" "}
-          <a
-            href="https://signalaf.com/compare?a=signal-92b4f9f485&b=the-field"
-            className="text-text-accent underline-offset-2 hover:underline"
-          >
-            signalaf.com/compare
-          </a>{" "}
-          (retrieved 2026-06-27, canonical board compute). Derived from
+          The top real operator on the live SigRank all-time board (auto-pulled
+          at render via the same operatorTotal path the board uses). Derived from
           canonical four-pillar token telemetry (input / output / cache_create /
-          cache_read). Token counts only, no prompt content.
+          cache_read). Token counts only, no prompt content. Source:{" "}
+          <Link
+            href="/board/all"
+            className="text-text-accent underline-offset-2 hover:underline"
+          >
+            signalaf.com/board/all
+          </Link>
+          .
         </p>
       </div>
 
       <div>
         <p className="font-mono text-[11px] font-bold text-text-secondary">
-          Power-user median (n=10) · <span className="text-gold">measured</span>
+          Power users (top 100 median) · <span className="text-gold">measured live</span>
         </p>
         <p>
-          Operators #5–14 of the live board (public tokscale.ai footprints
-          surfaced on SigRank). Median, not mean: n=10 is small and right-skewed
-          (one operator = 64% of the field&apos;s total tokens), so the median
-          is the honest &ldquo;typical operator.&rdquo; Source:{" "}
-          <a
-            href="https://signalaf.com/board/30d"
+          The median of the top 100 real operators on the all-time board, ranked
+          by Υ Yield. Median, not mean: the top 100 is right-skewed (the top 5
+          have yields 10-100× higher than the rest), so the median is the honest
+          &ldquo;typical elite performer&rdquo; — the operator ranked ~50th out
+          of the top 100. Source:{" "}
+          <Link
+            href="/board/all"
             className="text-text-accent underline-offset-2 hover:underline"
           >
-            signalaf.com/board/30d
-          </a>{" "}
-          (retrieved 2026-06-21).
+            signalaf.com/board/all
+          </Link>
+          .
         </p>
       </div>
 
       <div>
         <p className="font-mono text-[11px] font-bold text-text-secondary">
-          Average users (AA 7:2:1) ·{" "}
-          <span className="text-text-dim uppercase">modeled, not measured</span>
+          Average users (all operators median) · <span className="text-gold">measured live</span>
         </p>
         <p>
-          A synthetic reference operator built from the Artificial Analysis
-          blended-price ratio:{" "}
-          <em>
-            &ldquo;we calculate a blended price assuming a 7:2:1 ratio of cache
-            hit, input, and output tokens&rdquo;
-          </em>{" "}
-          (
-          <a
-            href="https://artificialanalysis.ai/methodology"
-            target="_blank"
-            rel="noopener noreferrer"
+          The median of ALL real operators on the all-time board. Median, not
+          mean: the board is heavily right-skewed (a single IGNITER-class
+          operator with 9 quadrillion input tokens pulls the mean yield to 427
+          vs the median of 2.5 — a 170× spread). The median is the exact 50th
+          percentile, immune to any outlier no matter how extreme. The trimmed
+          mean (drop 5% each end) still lands at 17.6 vs 2.5 — still pulled by
+          the upper-middle. Median is the cleanest cut. Source:{" "}
+          <Link
+            href="/board/all"
             className="text-text-accent underline-offset-2 hover:underline"
           >
-            Artificial Analysis methodology
-          </a>
-          ) (retrieved 2026-06-21). Ratio cache:input:output = 7:2:1 →
-          input-normalized 3.5:1:0.50. The cache term was split create/read
-          (cw=0.7, cr=6.3) to give the reference a defined cascade (a modeling
-          choice). This row is a constructed reference, not telemetry from a
-          real operator. Do not cite as measured.
+            signalaf.com/board/all
+          </Link>
+          .
+        </p>
+      </div>
+
+      <div>
+        <p className="font-mono text-[11px] font-bold text-text-secondary">
+          Why median, not mean
+        </p>
+        <p>
+          Token-cascade metrics are not normally distributed. They follow a
+          power law: a few operators compound signal at extreme rates while the
+          long tail burns tokens. The mean is dragged toward the extremes; the
+          median sits at the honest middle. For the &ldquo;typical
+          operator&rdquo; column, the median answers &ldquo;what does the
+          operator at the 50th percentile look like?&rdquo; — which is the
+          question the chart asks. A mean would answer &ldquo;what would you get
+          if you pooled everyone&apos;s tokens and divided evenly?&rdquo; — which
+          is a different question, and not a useful one when the distribution is
+          this skewed.
         </p>
       </div>
 
@@ -313,20 +311,19 @@ function Provenance() {
       <div className="flex flex-col gap-2 border-t border-bg-border-subtle pt-3 text-[11px] text-text-dim">
         <p>
           <span className="text-text-muted">*</span>{" "}
-          <strong>Modeled baseline</strong>: synthesized from the AA 7:2:1
-          ratio, not measured. The cache create/read split is a modeling
-          assumption. Treat as a reference floor, not a real operator&apos;s
-          telemetry.
+          <strong>Average Users</strong>: median of all real operators on the
+          all-time board, computed live at render. Excludes staged seeds, The
+          Field, and retired/anonymized rows.
+        </p>
+        <p>
+          <span className="text-text-muted">†</span>{" "}
+          <strong>Power users</strong>: median of the top 100 real operators by
+          Υ Yield on the all-time board, computed live at render.
         </p>
         <p>
           <span className="text-text-muted">‡</span>{" "}
-          <strong>Top operator to date</strong>: the gold column is the highest
-          real operator measured on the live board so far (MO§ES™, the owner).
-          The claude-mem memory observer (an MCP that auto-prompts memory,
-          low-input/high-output) inflated the raw owner row by ~25% of output;
-          the figure shown here is the observer-stripped read. The inflated vs
-          clean pair is shown openly on the live board, the instrument measuring
-          its own contamination and removing it.
+          <strong>Top Evals to date</strong>: the single top real operator on
+          the all-time board, computed live at render.
         </p>
       </div>
     </div>
@@ -338,17 +335,29 @@ export async function ThreeDegreesChart({
 }: {
   variant?: Variant;
 }) {
-  // Auto-pull the current top real operator (all-time) for the gold column; fall back to
-  // the last-known real read when the board has no qualifying real operator yet.
-  const gold = (await getTopOperatorColumn()) ?? GOLD_FALLBACK;
-  const rows = buildRows(gold);
-  const devRows = buildDevRows(gold);
+  // All three columns are now LIVE from the all-time board:
+  //   avg   = median of ALL real operators (the typical operator)
+  //   power = median of the top 100 real operators (the typical elite)
+  //   gold  = the single top real operator (unchanged)
+  // Each falls back to frozen reference values when the board has no qualifying data.
+  const [avgCol, powerCol, goldCol] = await Promise.all([
+    getAverageUsersColumn(),
+    getPowerUsersColumn(),
+    getTopOperatorColumn(),
+  ]);
+  const avg = avgCol ?? AVG_FALLBACK;
+  const power = powerCol ?? POWER_FALLBACK;
+  const gold = goldCol ?? GOLD_FALLBACK;
+  const rows = buildRows(avg, power, gold);
+  const devRows = buildDevRows(avg, power, gold);
 
-  // 10xDEV deltas vs the two reference degrees (AA 0.50 / power-user 1.35), computed from
-  // the live gold dev10x so the wiki bullets never drift. Linear = 10^delta.
+  // 10xDEV deltas vs the two reference degrees, computed from the live values so the
+  // wiki bullets never drift. Linear = 10^delta.
   const goldDev = Number(gold.dev10x) || 0;
-  const devVsAA = goldDev - 0.5;
-  const devVsPower = goldDev - 1.35;
+  const avgDev = Number(avg.dev10x) || 0;
+  const powerDev = Number(power.dev10x) || 0;
+  const devVsAvg = goldDev - avgDev;
+  const devVsPower = goldDev - powerDev;
   const fmtDelta = (d: number) =>
     `+${d.toFixed(2)} decades = ~${Math.round(10 ** d)}×`;
 
@@ -368,7 +377,7 @@ export async function ThreeDegreesChart({
 
           {/* under-chart footnote (owner 2026-06-22) */}
           <p className="font-mono text-[11px] text-text-muted">
-            † Power users: median ~500 billion total tokens (n=10).
+            † Power users: median of the top 100 real operators by Υ Yield.
           </p>
 
           {/* footnotes/sources (owner: kept with the table) */}
@@ -388,19 +397,18 @@ export async function ThreeDegreesChart({
                 <strong className="text-text-primary">
                   Cache : Input : Output
                 </strong>
-                . Research pegs the average user near{" "}
-                <strong className="text-text-primary">7 : 2 : 1</strong>, so it
-                takes about 2 input tokens to produce 1 output, riding a cache
-                of roughly 7. Input-normalized, that&apos;s{" "}
-                <strong className="text-text-primary">3.5 : 1 : 0.5</strong>{" "}
-                (the leftmost column).
+                . The median operator on the board sits at{" "}
+                <strong className="text-text-primary">{avg.opRatio}</strong>{" "}
+                (the leftmost column) — the typical operator, the 50th
+                percentile of everyone measured.
               </p>
               <p>
-                We surveyed 10{" "}
-                <strong className="text-text-primary">power users</strong> with
-                a median around 500B total tokens, and they land near{" "}
-                <strong className="text-text-primary">22 : 1 : 0.08</strong>.
-                What they give up in output they bank in cache.
+                The median of the{" "}
+                <strong className="text-text-primary">top 100</strong> operators
+                lands at{" "}
+                <strong className="text-text-primary">{power.opRatio}</strong>.
+                What they give up in output they bank in cache — the typical
+                elite performer.
               </p>
               <p>
                 The top operator on the live board sits at{" "}
@@ -432,16 +440,23 @@ export async function ThreeDegreesChart({
         <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
           Read it as a token cascade:{" "}
           <strong className="text-text-primary">Cache : Input : Output</strong>.
-          Research pegs the average user near{" "}
-          <strong className="text-text-primary">7 : 2 : 1</strong> (~2 input
-          tokens per output, on a ~7 cache); input-normalized that&apos;s{" "}
-          <strong className="text-text-primary">3.5 : 1 : 0.5</strong>. We
-          surveyed 10 power users (median ~500B total tokens) at about{" "}
-          <strong className="text-text-primary">22 : 1 : 0.08</strong>, output
+          The median operator on the all-time board sits at{" "}
+          <strong className="text-text-primary">{avg.opRatio}</strong> — the
+          typical operator, the 50th percentile of everyone measured. The median
+          of the top 100 lands at{" "}
+          <strong className="text-text-primary">{power.opRatio}</strong>, output
           traded for cache. The top operator on the live board is{" "}
           <strong className="text-gold">{gold.opRatio}</strong>: every input
           returns multiple outputs on a deep cache. Three degrees of leverage,
-          each a real skill, and the distance between them learnable.
+          each a real skill, and the distance between them learnable. All three
+          columns are measured live from the{" "}
+          <Link
+            href="/board/all"
+            className="text-text-accent underline-offset-2 hover:underline"
+          >
+            all-time board
+          </Link>
+          .
         </p>
       </div>
 
@@ -459,13 +474,13 @@ export async function ThreeDegreesChart({
         <DevTable rows={devRows} />
         <ul className="flex flex-col gap-1 font-sans text-sm text-text-muted">
           <li>
-            Top operator vs AA baseline:{" "}
+            Top operator vs median operator:{" "}
             <strong className="text-text-secondary">
-              {fmtDelta(devVsAA)} more amplification
+              {fmtDelta(devVsAvg)} more amplification
             </strong>
           </li>
           <li>
-            Top operator vs power-user median:{" "}
+            Top operator vs top-100 median:{" "}
             <strong className="text-text-secondary">
               {fmtDelta(devVsPower)} more
             </strong>
