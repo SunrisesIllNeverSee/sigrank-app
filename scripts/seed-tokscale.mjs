@@ -232,6 +232,12 @@ if (isJson) {
     const distinctPlatforms = [...new Set(platforms)].filter((p) => p && p !== "other");
     // If only "other" platforms, use that; if mix of named + other, keep named
     const domains = distinctPlatforms.length > 0 ? distinctPlatforms : (platforms.length > 0 ? [...new Set(platforms)] : ["other"]);
+    // Favored platform = the one with the most tokens (from platform_breakdown)
+    const breakdown = u.platform_breakdown ?? [];
+    const topPlatform = breakdown.length > 0
+      ? breakdown.reduce((a, b) => (BigInt(b.tokens) > BigInt(a.tokens) ? b : a))
+      : null;
+    const favoredPlatform = topPlatform ? mapProvider(topPlatform.platform) : (domains[0] ?? "other");
     return {
       handle: u.handle,
       display_name: u.display_name || null,
@@ -243,6 +249,7 @@ if (isJson) {
       ageDays: String(s.activeDays ?? 30),
       totalMessages: String(s.sessionCount ?? 0),
       domains,
+      favoredPlatform,
     };
   });
   console.log(`Parsed JSON: ${parsedRows.length} users`);
@@ -315,7 +322,7 @@ for (const row of parsedRows) {
     const cacheCreate = parseBigInt(row.cacheCreate);
     const cacheRead = parseBigInt(row.cacheRead);
     const domains = row.domains ?? ["other"];
-    const primaryDomain = domains.length > 1 ? "multi" : domains[0] ?? "other";
+    const primaryDomain = row.favoredPlatform ?? (domains.length > 1 ? "multi" : domains[0] ?? "other");
 
     operators.set(slug, {
       displayName,
