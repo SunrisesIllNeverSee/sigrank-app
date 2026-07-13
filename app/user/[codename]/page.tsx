@@ -28,7 +28,7 @@ import {
   getOperatorReport,
 } from "@/lib/data";
 import { computeFieldAverages } from "@/lib/data/field-average";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSessionOperator, getSessionUser } from "@/lib/supabase/auth-server";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
 import type { Operator } from "@/lib/scoring/types";
@@ -39,6 +39,7 @@ import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { OperatorRecords } from "@/components/profile/OperatorRecords";
+import { ClaimTab } from "@/components/profile/ClaimTab";
 import { ReportTab } from "@/components/profile/ReportTab";
 import { LabTab } from "@/components/profile/LabTab";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
@@ -138,6 +139,11 @@ export default async function OperatorProfilePage({
   // Used to show the privacy toggle on the Report tab and interactive sliders on the Lab tab.
   const session = await getSessionOperator();
   const isOwner = !!(session && session.codename === operator.codename);
+  // For the ClaimTab: is the viewer signed in (auth user exists), and do they
+  // already have a linked operator? getSessionOperator returns null both when
+  // not signed in AND when signed in but not linked — so we check getSessionUser
+  // separately to distinguish the two states.
+  const sessionUser = await getSessionUser();
 
   const topPct = Math.max(0, 100 - row.percentile);
 
@@ -642,6 +648,17 @@ export default async function OperatorProfilePage({
         codename={operator.codename}
         boardRows={boardRows}
       />
+
+      {/* Claim this profile — shown only on unclaimed seeded profiles. Lets
+          the real operator verify ownership (via exact tokscale token count)
+          and take over the profile. Hidden once claimed. */}
+      {!operator.claimed && (
+        <ClaimTab
+          codename={operator.codename}
+          isSignedIn={!!sessionUser}
+          hasOperator={!!session}
+        />
+      )}
 
       <ProfileTabs
         stats={pending ? pendingPanel : rankedStatsPanel}
