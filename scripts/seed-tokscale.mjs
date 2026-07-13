@@ -2,50 +2,63 @@
 /**
  * scripts/seed-tokscale.mjs — generate a Supabase seed migration from a tokscale scrape CSV.
  *
+ * Supports TWO CSV formats:
+ *
+ * 1. SIMPLE (one row per user, single platform):
+ *    handle,display_name,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens[,platform][,account_age_days][,total_messages_lifetime]
+ *
+ * 2. MULTI-PLATFORM (one row per user×provider, multiple rows per user):
+ *    handle,display_name,provider,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens,reasoning_tokens,cost[,account_age_days][,total_messages_lifetime]
+ *
+ * The script auto-detects the format from the header:
+ *   - If "provider" column exists → multi-platform mode
+ *   - Otherwise → simple mode
+ *
+ * In multi-platform mode:
+ *   - Groups rows by handle
+ *   - Creates one operator row with operator_domains = [all providers], primary_domain = dominant or "multi"
+ *   - Creates one metric_snapshots row per provider (with that provider's 4 pillars)
+ *   - Creates one "multi" snapshot with summed pillars (the board prefers this)
+ *   - Maps tokscale provider names to our platform enum (see PROVIDER_MAP below)
+ *
  * Usage:
  *   node scripts/seed-tokscale.mjs <input.csv> [output.sql]
- *
- * CSV format (header row required):
- *   handle,display_name,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens[,platform][,account_age_days][,total_messages_lifetime]
- *
- * - handle:          the tokscale/social @username (e.g. "olafurns7"). Becomes the
- *                    codename (slugified) + the `handle` column.
- * - display_name:    real name (e.g. "Ólafur Nils Sigurðsson"). Becomes display_name.
- * - input_tokens:    BIGINT — raw input token count
- * - output_tokens:   BIGINT — raw output token count
- * - cache_creation:  BIGINT — cache creation tokens
- * - cache_read:      BIGINT — cache read tokens
- * - platform:        optional — claude / chatgpt / gemini / pi / multi (default: claude)
- * - account_age_days: optional — operator account age (default: 30)
- * - total_messages:  optional — lifetime message count (default: 0)
- *
- * The script:
- *   1. Parses the CSV
- *   2. Slugifies each handle → codename
- *   3. Runs computeCascadeMetrics() on the 4 pillars to derive cascade values
- *   4. Derives a class tier from yield (using ruleset thresholds)
- *   5. Generates placeholder signa/comp/etc. from the cascade
- *   6. Emits two INSERT blocks (operators + metric_snapshots) as a .sql migration
- *
- * The output migration is idempotent (ON CONFLICT DO NOTHING) and mirrors the
- * pattern in supabase/seed.sql.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// ── Cascade computation (mirrors lib/ingest/bridge.ts computeCascadeMetrics) ──
-// Υ Yield = (cache_read × output) / input²
-// Leverage = cache_read / input
-// 10xDEV = log10(leverage)
-// SNR = compression_ratio (placeholder — derived from cache_read / total)
-// Velocity = output / input
-// Scale V = log10(total)
-// Efficiency = yield × leverage (simplified)
-// Cost/1M = (input × $3 + output × $15 + cacheCreate × $3.75 + cacheRead × $0.30) / 1M
-// Op Ratio = `${leverage}:1:${velocity}`
+// ── Tokscale provider name → our platform enum ──
+const PROVIDER_MAP = {
+  "claude code": "claude",
+  "claude": "claude",
+  "codex cli": "codex",
+  "codex": "codex",
+  "chatgpt": "chatgpt",
+  "openai": "chatgpt",
+  "gemini": "gemini",
+  "google": "gemini",
+  "pi": "pi",
+  "grok build": "other",
+  "grok": "other",
+  "hermes agent": "other",
+  "hermes": "other",
+  "opencode": "other",
+  "gajae code": "other",
+  "antigravity cli": "other",
+  "antigravity": "other",
+  "unattributed": "other",
+  "multi": "multi",
+};
 
+/** Map a tokscale provider name to our platform enum. */
+function mapProvider(raw) {
+  const key = raw.toLowerCase().trim();
+  return PROVIDER_MAP[key] ?? "other";
+}
+
+// ── Cascade computation (mirrors lib/ingest/bridge.ts computeCascadeMetrics) ──
 function computeCascade(input, output, cacheCreate, cacheRead) {
   const total = input + output + cacheCreate + cacheRead;
   const nonCompounding = cacheCreate === 0 && cacheRead === 0;
@@ -73,7 +86,6 @@ function computeCascade(input, output, cacheCreate, cacheRead) {
   const velocity = output / input;
   const scaleV = Math.log10(total);
   const efficiency = yield_ * leverage;
-  // Claude pricing (simplified): $3/M input, $15/M output, $3.75/M cache write, $0.30/M cache read
   const costPerMillion =
     (input * 3 + output * 15 + cacheCreate * 3.75 + cacheRead * 0.3) / total;
   const opRatio = `${leverage.toFixed(0)}:1:${velocity.toFixed(1)}`;
@@ -93,7 +105,6 @@ function computeCascade(input, output, cacheCreate, cacheRead) {
   };
 }
 
-// ── Class tier from yield (mirrors ruleset thresholds) ──
 function classFromYield(yield_, nonCompounding) {
   if (nonCompounding || yield_ <= 0) return "IGNITER";
   if (yield_ >= 100) return "TRANSMITTER";
@@ -107,26 +118,17 @@ function classFromYield(yield_, nonCompounding) {
   return "IGNITER";
 }
 
-// ── Placeholder signa/comp/etc. derived from cascade ──
 function placeholders(c) {
-  // signa_rate: rough proxy from efficiency (clamped 0-100)
   const signa = Math.min(99, Math.max(1, Math.log10(c.efficiency + 1) * 30));
-  // compression_ratio: proxy from snr
   const comp = Math.min(0.99, Math.max(0.01, c.snr));
-  // prompt_complexity: proxy from scaleV
   const pc = Math.min(100, Math.max(1, c.scaleV * 5));
-  // cross_thread: proxy from leverage (clamped)
   const ct = Math.min(100, Math.max(0, Math.round(c.leverage / 10)));
-  // session_depth: proxy from dev10x
   const sd = Math.min(30, Math.max(1, c.dev10x * 5));
-  // token_throughput: proxy from total
   const tt = Math.min(100000, Math.round(c.total / 1000));
-  // signal_force: proxy from yield
   const sf = Math.min(100, Math.max(0.1, Math.log10(c.yield_ + 1) * 10));
   return { signa, comp, pc, ct, sd, tt, sf };
 }
 
-// ── Slugify handle → codename ──
 function slugify(handle) {
   return handle
     .replace(/^@+/, "")
@@ -136,7 +138,6 @@ function slugify(handle) {
     .slice(0, 60);
 }
 
-// ── CSV parser (minimal, handles quoted fields) ──
 function parseCSV(text) {
   const lines = text.split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) throw new Error("CSV needs a header + at least 1 row");
@@ -174,6 +175,9 @@ const args = process.argv.slice(2);
 
 if (args.length < 1) {
   console.error("Usage: node scripts/seed-tokscale.mjs <input.csv> [output.sql]");
+  console.error("");
+  console.error("Simple CSV:  handle,display_name,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens[,platform][,account_age_days][,total_messages_lifetime]");
+  console.error("Multi CSV:   handle,display_name,provider,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens[,reasoning_tokens][,cost][,account_age_days][,total_messages_lifetime]");
   process.exit(1);
 }
 
@@ -191,26 +195,22 @@ const outputPath = args[1]
 const csv = readFileSync(inputPath, "utf-8");
 const { header, rows } = parseCSV(csv);
 
+const isMultiPlatform = header.includes("provider");
+
 // Validate required columns
-const required = [
-  "handle",
-  "display_name",
-  "input_tokens",
-  "output_tokens",
-  "cache_creation_tokens",
-  "cache_read_tokens",
-];
+const requiredSimple = ["handle", "display_name", "input_tokens", "output_tokens", "cache_creation_tokens", "cache_read_tokens"];
+const requiredMulti = ["handle", "display_name", "provider", "input_tokens", "output_tokens", "cache_creation_tokens", "cache_read_tokens"];
+const required = isMultiPlatform ? requiredMulti : requiredSimple;
 const missing = required.filter((c) => !header.includes(c));
 if (missing.length > 0) {
   console.error(`Missing required columns: ${missing.join(", ")}`);
-  console.error(`Required: ${required.join(", ")}`);
-  console.error(`Optional: platform, account_age_days, total_messages_lifetime`);
   process.exit(1);
 }
 
 const snapshotDate = new Date().toISOString().slice(0, 10);
-const entries = [];
-const seenSlugs = new Set();
+
+// ── Group rows by handle (multi-platform) or treat each row as one operator (simple) ──
+const operators = new Map(); // codename → { displayName, handle, domains, ageDays, totalMessages, providers: [{ platform, input, output, cc, cr }] }
 
 for (const row of rows) {
   const handle = row.handle;
@@ -219,65 +219,159 @@ for (const row of rows) {
   const output = BigInt(row.output_tokens || 0);
   const cacheCreate = BigInt(row.cache_creation_tokens || 0);
   const cacheRead = BigInt(row.cache_read_tokens || 0);
-  const platform = row.platform || "claude";
   const ageDays = parseInt(row.account_age_days || "30", 10);
   const totalMessages = BigInt(row.total_messages_lifetime || "0");
 
   let slug = slugify(handle);
   // Deduplicate slugs
-  if (seenSlugs.has(slug)) {
-    slug = `${slug}-${entries.length}`;
+  if (operators.has(slug) === false && [...operators.keys()].some((k) => k === slug)) {
+    slug = `${slug}-${operators.size}`;
   }
-  seenSlugs.add(slug);
 
-  const c = computeCascade(
-    Number(input),
-    Number(output),
-    Number(cacheCreate),
-    Number(cacheRead),
-  );
-  const cls = classFromYield(c.yield_, c.nonCompounding);
-  const p = placeholders(c);
+  if (isMultiPlatform) {
+    const provider = mapProvider(row.provider);
 
-  entries.push({
-    codename: slug,
-    display_name: displayName,
-    handle: handle.replace(/^@+/, ""),
-    platform,
-    ageDays,
-    totalMessages: totalMessages.toString(),
-    input: input.toString(),
-    output: output.toString(),
-    cacheCreate: cacheCreate.toString(),
-    cacheRead: cacheRead.toString(),
-    signa: p.signa.toFixed(1),
-    comp: p.comp.toFixed(3),
-    pc: p.pc.toFixed(0),
-    ct: p.ct.toString(),
-    sd: p.sd.toFixed(1),
-    tt: p.tt.toString(),
-    sf: p.sf.toFixed(1),
-    cls,
+    if (!operators.has(slug)) {
+      operators.set(slug, {
+        displayName,
+        handle: handle.replace(/^@+/, ""),
+        domains: [],
+        ageDays,
+        totalMessages: totalMessages.toString(),
+        providers: [],
+      });
+    }
+
+    const op = operators.get(slug);
+    // Track distinct domains
+    if (!op.domains.includes(provider)) {
+      op.domains.push(provider);
+    }
+    op.providers.push({
+      platform: provider,
+      input: input.toString(),
+      output: output.toString(),
+      cacheCreate: cacheCreate.toString(),
+      cacheRead: cacheRead.toString(),
+    });
+  } else {
+    const platform = row.platform || "claude";
+    operators.set(slug, {
+      displayName,
+      handle: handle.replace(/^@+/, ""),
+      domains: [platform],
+      ageDays,
+      totalMessages: totalMessages.toString(),
+      providers: [{
+        platform,
+        input: input.toString(),
+        output: output.toString(),
+        cacheCreate: cacheCreate.toString(),
+        cacheRead: cacheRead.toString(),
+      }],
+    });
+  }
+}
+
+// ── Build SQL entries ──
+const opEntries = [];
+const snapEntries = [];
+
+for (const [codename, op] of operators) {
+  // Determine primary_domain: "multi" if 2+ distinct platforms, else the single platform
+  const distinctPlatforms = [...new Set(op.providers.map((p) => p.platform))];
+  const primaryDomain = distinctPlatforms.length > 1 ? "multi" : distinctPlatforms[0] || "claude";
+
+  // Sort domains for deterministic output
+  const domainsSorted = [...new Set(op.domains)].sort();
+
+  opEntries.push({
+    codename,
+    display_name: op.displayName,
+    handle: op.handle,
+    primary_domain: primaryDomain,
+    operator_domains: domainsSorted,
+    ageDays: op.ageDays,
+    totalMessages: op.totalMessages,
   });
+
+  // One snapshot per provider
+  for (const p of op.providers) {
+    const c = computeCascade(
+      Number(p.input),
+      Number(p.output),
+      Number(p.cacheCreate),
+      Number(p.cacheRead),
+    );
+    const cls = classFromYield(c.yield_, c.nonCompounding);
+    const ph = placeholders(c);
+
+    snapEntries.push({
+      codename,
+      platform: p.platform,
+      input: p.input,
+      output: p.output,
+      cacheCreate: p.cacheCreate,
+      cacheRead: p.cacheRead,
+      signa: ph.signa.toFixed(1),
+      comp: ph.comp.toFixed(3),
+      pc: ph.pc.toFixed(0),
+      ct: ph.ct.toString(),
+      sd: ph.sd.toFixed(1),
+      tt: ph.tt.toString(),
+      sf: ph.sf.toFixed(1),
+      cls,
+    });
+  }
+
+  // If multi-platform: create a "multi" aggregated snapshot (summed pillars)
+  if (distinctPlatforms.length > 1) {
+    const sumInput = op.providers.reduce((a, p) => a + BigInt(p.input), 0n);
+    const sumOutput = op.providers.reduce((a, p) => a + BigInt(p.output), 0n);
+    const sumCC = op.providers.reduce((a, p) => a + BigInt(p.cacheCreate), 0n);
+    const sumCR = op.providers.reduce((a, p) => a + BigInt(p.cacheRead), 0n);
+
+    const c = computeCascade(Number(sumInput), Number(sumOutput), Number(sumCC), Number(sumCR));
+    const cls = classFromYield(c.yield_, c.nonCompounding);
+    const ph = placeholders(c);
+
+    snapEntries.push({
+      codename,
+      platform: "multi",
+      input: sumInput.toString(),
+      output: sumOutput.toString(),
+      cacheCreate: sumCC.toString(),
+      cacheRead: sumCR.toString(),
+      signa: ph.signa.toFixed(1),
+      comp: ph.comp.toFixed(3),
+      pc: ph.pc.toFixed(0),
+      ct: ph.ct.toString(),
+      sd: ph.sd.toFixed(1),
+      tt: ph.tt.toString(),
+      sf: ph.sf.toFixed(1),
+      cls,
+    });
+  }
 }
 
 // ── Generate SQL ──
-const opValues = entries
+const opValues = opEntries
   .map(
     (e) =>
-      `  ('${e.codename}', ${e.display_name ? `'${e.display_name.replace(/'/g, "''")}'` : "NULL"}, '${e.handle}', 'free', 'unverified', '${e.platform}', ${e.ageDays}, ${e.totalMessages}, false)`,
+      `  ('${e.codename}', ${e.display_name ? `'${e.display_name.replace(/'/g, "''")}'` : "NULL"}, '${e.handle}', 'free', 'unverified', '${e.primary_domain}', ${e.ageDays}, ${e.totalMessages}, false, ARRAY['${e.operator_domains.join("','")}']::text[])`,
   )
   .join(",\n");
 
-const snapValues = entries
+const snapValues = snapEntries
   .map(
     (e) =>
-      `  ('${e.codename}', ${e.input}::bigint, ${e.output}::bigint, ${e.cacheCreate}::bigint, ${e.cacheRead}::bigint, ${e.signa}, ${e.comp}, ${e.pc}, ${e.ct}, ${e.sd}, ${e.tt}, ${e.sf}, '${e.cls}')`,
+      `  ('${e.codename}', '${e.platform}', ${e.input}::bigint, ${e.output}::bigint, ${e.cacheCreate}::bigint, ${e.cacheRead}::bigint, ${e.signa}, ${e.comp}, ${e.pc}, ${e.ct}, ${e.sd}, ${e.tt}, ${e.sf}, '${e.cls}')`,
   )
   .join(",\n");
 
 const sql = `-- ============================================================================
--- tokscale_seed_${snapshotDate}.sql — ${entries.length} tokscale operators seeded from scrape.
+-- tokscale_seed_${snapshotDate}.sql — ${opEntries.length} tokscale operators seeded from scrape.
+-- ${isMultiPlatform ? "Multi-platform: per-provider snapshots + aggregated 'multi' snapshot." : "Single-platform."}
 --
 -- Generated by scripts/seed-tokscale.mjs from ${args[0]}.
 -- Idempotent (ON CONFLICT DO NOTHING). Each operator carries their REAL 4 token
@@ -293,30 +387,37 @@ const sql = `-- ================================================================
 -- ============================================================================
 
 -- ── operators ──
-INSERT INTO operators (codename, display_name, handle, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, claimed)
+INSERT INTO operators (codename, display_name, handle, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, claimed, operator_domains)
 VALUES
 ${opValues}
 ON CONFLICT (codename) DO NOTHING;
 
--- ── metric_snapshots ──
-INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, signal_force, class_tier, last_seen, recency_modifier, live_signa_rate, movement_24h, movement_7d, ruleset_version)
-SELECT o.operator_id, DATE '${snapshotDate}', '30d', v.input, v.output, v.cc, v.cr, v.signa, v.comp, v.pc, v.ct, v.sd, v.tt, v.sf, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, v.signa, 0, 0, '1.0'
+-- ── metric_snapshots (per-provider + aggregated 'multi' where applicable) ──
+INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, platform, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, signal_force, class_tier, last_seen, recency_modifier, live_signa_rate, movement_24h, movement_7d, ruleset_version)
+SELECT o.operator_id, DATE '${snapshotDate}', '30d', v.platform, v.input, v.output, v.cc, v.cr, v.signa, v.comp, v.pc, v.ct, v.sd, v.tt, v.sf, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, v.signa, 0, 0, '1.0'
 FROM (VALUES
 ${snapValues}
-) AS v(codename, input, output, cc, cr, signa, comp, pc, ct, sd, tt, sf, cls)
+) AS v(codename, platform, input, output, cc, cr, signa, comp, pc, ct, sd, tt, sf, cls)
 JOIN operators o ON o.codename = v.codename
-ON CONFLICT (operator_id, snapshot_date, window_type) DO NOTHING;
+ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO NOTHING;
 
--- End of tokscale seed (${entries.length} operators).
+-- End of tokscale seed (${opEntries.length} operators, ${snapEntries.length} snapshots).
 `;
 
 writeFileSync(outputPath, sql, "utf-8");
 console.log(`✓ Generated ${outputPath}`);
-console.log(`  ${entries.length} operators`);
+console.log(`  ${opEntries.length} operators, ${snapEntries.length} snapshots`);
+console.log(`  Mode: ${isMultiPlatform ? "multi-platform" : "single-platform"}`);
 console.log(`  Snapshot date: ${snapshotDate}`);
 console.log(`  Class distribution:`);
 const dist = {};
-entries.forEach((e) => (dist[e.cls] = (dist[e.cls] || 0) + 1));
+snapEntries.forEach((e) => (dist[e.cls] = (dist[e.cls] || 0) + 1));
 Object.entries(dist)
   .sort((a, b) => b[1] - a[1])
   .forEach(([cls, n]) => console.log(`    ${cls}: ${n}`));
+console.log(`  Platform distribution:`);
+const pdist = {};
+snapEntries.forEach((e) => (pdist[e.platform] = (pdist[e.platform] || 0) + 1));
+Object.entries(pdist)
+  .sort((a, b) => b[1] - a[1])
+  .forEach(([p, n]) => console.log(`    ${p}: ${n}`));
