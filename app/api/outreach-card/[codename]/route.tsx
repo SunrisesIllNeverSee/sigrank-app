@@ -21,9 +21,9 @@ import { recordValue } from "@/lib/hall/record-value";
 import { DISPLAY_METRICS, DISPLAY_RAW, CLASS_TIERS, CLASS_NAME_TO_GLYPH } from "@/lib/canon/ids";
 import type { LeaderboardRow } from "@/lib/data";
 
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
 export const runtime = "nodejs";
+
+const size = { width: 1200, height: 630 };
 
 // ── Palette ─────────────────────────────────────────────────────────────────
 const GOLD_BG = "#c4923a";
