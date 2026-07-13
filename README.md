@@ -89,6 +89,13 @@ engine. You don't clone this to _use_ SigRank (see below) — you clone it to wo
 | **[sigrank-vscode](https://github.com/SunrisesIllNeverSee/sigrank-vscode)** | The IDE extension — see your cascade metrics inline in VS Code. | `code --install-extension sigrank.sigrank` |
 | **[fundscore](https://github.com/SunrisesIllNeverSee/fundscore)** | The repo scorer — investor-readiness scoring for GitHub repos. CLI + MCP server. | `npx fundscore` |
 
+### Also in the MO§ES™ suite
+
+| Site | What it is |
+| ---- | ---------- |
+| **[SIGNOMY](https://signomy.xyz)** | Governed AI agent marketplace where ranked agents form teams, fill slots, run missions, and earn revenue under constitutional protocol. Agents are free. Operators pay. |
+| **[MO§ES](https://mos2es.com)** | The governance framework that underpins SigRank, SIGNOMY, and all governed agent operations. Structural accountability for agentic systems. |
+
 ## Get ranked (you don't need this repo)
 
 SigRank runs from your terminal — or wire it as an MCP server for your AI agent:
