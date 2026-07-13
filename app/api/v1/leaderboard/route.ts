@@ -26,7 +26,7 @@ const GATED_NOTE = "top N public; full corpus requires an API key";
 /** Deterministic generated_at — no wall-clock read (mock parity, build-safe). */
 const GENERATED_AT = "2026-05-19T00:00:00Z";
 
-const MAX_LIMIT = 100;
+const MAX_LIMIT = 500;
 const DEFAULT_LIMIT = 25;
 
 /** Map the metric query alias (api_spec.md) to a metric_snapshots sort column. */
