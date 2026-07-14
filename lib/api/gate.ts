@@ -29,10 +29,10 @@ import "server-only";
 import { NextResponse, type NextRequest } from "next/server";
 
 /** Max entries an unauthenticated caller may read (the public "top N"). */
-export const PUBLIC_TOP_N = 500;
+export const PUBLIC_TOP_N = 2000;
 
 /** Max entries a valid-API-key caller may read in one request (bulk/full cap). */
-export const API_KEY_CAP = 1000;
+export const API_KEY_CAP = 5000;
 
 /** Per-IP request budget for list reads, per RATE_WINDOW_MS. */
 const LIST_RATE_LIMIT = 60;
