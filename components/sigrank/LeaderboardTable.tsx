@@ -380,8 +380,7 @@ export function LeaderboardTable({
   const [platform, setPlatform] = useState<PlatformUI>(platformProp);
   const [classFilter, setClassFilter] = useState<string>("all");
   // Category filter (owner 2026-07-14): default = "human" (Human Center of Mass only).
-  // "outliers" adds extreme-cache operators (input/total < 0.1% with real output).
-  // "bots" adds input-dump bots (input/total > 80%) and cache replay bots.
+  // "outliers" adds outliers & bots (input/total < 0.1% or > 80%) — one category.
   // "all" shows everything unfiltered.
   const [categoryFilter, setCategoryFilter] = useState<string>("human");
   const [page, setPage] = useState(0); // 0-based; 25 rows/page (owner 2026-06-24)
@@ -526,18 +525,13 @@ export function LeaderboardTable({
       if (isOff && domain && (e.platform ?? "other") !== domain) return false;
       if (classFilter !== "all" && e.signalClass.toLowerCase() !== classFilter)
         return false;
-      // Category filter: Human Center of Mass / + Outliers / + Bots / All
-      if (categoryFilter !== "all") {
+      // Category filter: Human Center of Mass / + Outliers & Bots / All
+      if (categoryFilter === "human") {
         const inp = e.input ?? 0;
         const tot = e.totalTokens ?? 0;
         if (tot > 0) {
           const inputPct = inp / tot;
-          const isOutlier = inputPct < 0.001; // < 0.1% input
-          const isBot = inputPct > 0.8; // > 80% input
-          if (categoryFilter === "human" && (isOutlier || isBot)) return false;
-          if (categoryFilter === "outliers" && isBot) return false;
-          // "outliers" includes humans + outliers, excludes bots
-          // "bots" includes everyone (humans + outliers + bots)
+          if (inputPct < 0.001 || inputPct > 0.8) return false;
         }
       }
       return true;
@@ -630,7 +624,7 @@ export function LeaderboardTable({
               }))}
             />
             {/* Category filter (owner 2026-07-14): Human Center of Mass by default.
-                Toggle buttons to add outliers and bots. */}
+                Toggle to add outliers & bots (one category). */}
             <div style={st.fieldCol}>
               <span style={st.flab}>Category</span>
               <div style={st.toggleRow}>
@@ -652,17 +646,7 @@ export function LeaderboardTable({
                     ...(categoryFilter === "outliers" ? st.modeOn : null),
                   }}
                 >
-                  + Outliers
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCategoryFilter("bots")}
-                  style={{
-                    ...st.modeBtn,
-                    ...(categoryFilter === "bots" ? st.modeOn : null),
-                  }}
-                >
-                  + Bots
+                  + Outliers & Bots
                 </button>
                 <button
                   type="button"
