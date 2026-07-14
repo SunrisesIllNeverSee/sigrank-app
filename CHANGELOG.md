@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.9.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.8.0...v0.9.0) (2026-07-14)
+
+
+### Features
+
+* Hall of Fame tracker + Field Distribution dashboards ([45aba9c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/45aba9c36538730af3d23e8184c6e59b6af07f25))
+* Sprint 2 — ghost-rank quadrant + records API + JSON-LD achievements ([8848b75](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8848b7515f75c9c1870c0c27d2ba80c99de859da))
+
+
+### Bug Fixes
+
+* bump leaderboard MAX_LIMIT to 2000 to match PUBLIC_TOP_N ([dbdbf43](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/dbdbf439cc12b66a7d4a7e4e639b127c24d83f87))
+* bump PUBLIC_TOP_N to 2000 to expose full operator corpus ([cfe5c27](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/cfe5c27621feb0de8618ed5789afe2d7361b5c7c))
+* bust board data cache + lowercase profile path on submit ([f25ff95](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/f25ff95bd21dfafd99006c75bbdd5f8077431546))
+* **ci:** bump MCP_VERSION 0.0.178 → 0.18.0 ([449f268](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/449f26850d8c06bdac277fa7152abe26491c4250))
+
 ## [0.8.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.7.0...v0.8.0) (2026-07-14)
 
 
