@@ -58,7 +58,7 @@ Y = (cache_read x output) / input^2
 
 [13] A proper chi-square goodness-of-fit test was run on all 5 raw token pillars: input, output, cache read, cache write, total. Degrees of freedom 8, critical value 15.51 at p=0.05.
 
-![Benford's Law Validation](article-charts/01-benford-law.png)
+![Benford's Law Validation](/article-charts/01-benford-law.png)
 
 | Pillar | N | chi-sq | Verdict |
 |--------|---|--------|---------|
@@ -74,7 +74,7 @@ Y = (cache_read x output) / input^2
 
 [15] **But aggregate Benford isn't enough.** It proves the dataset isn't wholesale fabricated; it doesn't catch individual bots hiding in the tails. So a complementary test was added: the input/total ratio. Real humans have a healthy mix of fresh input and cache reuse. Bots don't.
 
-![Bot Detection: Input/Total Ratio](article-charts/06-bot-zones.png)
+![Bot Detection: Input/Total Ratio](/article-charts/06-bot-zones.png)
 
 | Zone | Signal | Count | % | What they're doing |
 |------|--------|-------|---|-------------------|
@@ -105,7 +105,7 @@ Y = (cache_read x output) / input^2
 
 [20] The **median** is the real center. SigRank calls it the **Human Center of Mass**: where real operators naturally cluster, not the average including trillion-token outliers.
 
-![Yield Distribution: Human Center of Mass](article-charts/02-yield-distribution.png)
+![Yield Distribution: Human Center of Mass](/article-charts/02-yield-distribution.png)
 
 | Metric | Median | IQR (25th-75th) |
 |--------|--------|-----------------|
@@ -153,7 +153,7 @@ C : I : O = 19 : 1 : 0.09
 
 [28] This is why volume != yield. An operator with 10 trillion tokens and 0.01x yield is less efficient than an operator with 1 billion tokens and 1,000x yield. The first is pumping. The second is compounding.
 
-![Volume vs Yield: The Central Finding](article-charts/03-volume-vs-yield.png)
+![Volume vs Yield: The Central Finding](/article-charts/03-volume-vs-yield.png)
 
 [29] Volume-based leaderboards rank by total tokens. SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's 497,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant." Yield says "elite."
 
@@ -163,9 +163,9 @@ C : I : O = 19 : 1 : 0.09
 
 [31] **7 human archetypes emerged** from the clustering. Separately, the input/total ratio analysis (see [15a]) flags 89 outliers and 24 bots from the full 1,628 — a cross-cutting classification that overlays the archetypes, not an 8th mutually exclusive category. An operator like `furic` appears in the Cache Architects archetype AND carries the outlier flag. Silhouette score 0.625, which is "good structure," not noise.
 
-![7 Emergent Archetypes: Token Composition](article-charts/04-archetype-composition.png)
+![7 Emergent Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
-![Distribution of Archetypes Across the Field](article-charts/05-archetype-distribution.png)
+![Distribution of Archetypes Across the Field](/article-charts/05-archetype-distribution.png)
 
 ### The Field (n=963, 59.8%)
 [32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
@@ -256,3 +256,10 @@ C : I : O = 19 : 1 : 0.09
 *Tool: SigRank, `npx sigrank` on npm*
 *Live board: [signalaf.com](https://signalaf.com)*
 *Dataset: available for academic use (Zenodo upload pending)*
+
+---
+
+*This work is part of a broader research program on [Commitment Theory](https://github.com/SunrisesIllNeverSee/Commitment_Theory) — a 34-paper investigation into how governance structures emerge from measurable behavior in autonomous systems. SigRank applies the same principle to AI operators: you don't measure trust by asking, you measure it by observing the cascade.*
+
+*- [djm · mos2es](https://mos2es.com)*
+*[@burnmydays on X](https://x.com/burnmydays) · [GitHub](https://github.com/SunrisesIllNeverSee)*
