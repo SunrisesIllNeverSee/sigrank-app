@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import type { LeaderboardRow } from "@/lib/data";
+import type { LeaderboardRow, HallRecord } from "@/lib/data";
+import { getHallOfSignal } from "@/lib/data";
 import { sortValue } from "@/lib/data/sort-value";
 import {
   DISPLAY_RAW,
@@ -9,26 +10,32 @@ import {
 import { recordValue } from "@/lib/hall/record-value";
 
 /**
- * OperatorRecords — the "Hall of Signal" section on an operator profile.
+ * OperatorRecords — the "Records" badge strip on an operator profile.
  *
- * Shows where this operator ranks on every Hall board (cascade metrics + raw
- * token pillars). Computed from the same getLeaderboard() data the profile page
- * already fetches — no extra DB call. Renders ABOVE the tab bar (not a tab) so
- * prestige is visible immediately. Does NOT render if the operator isn't in
- * the top 10 on any board.
+ * Two record types, both rendered as compact badge-style chips in a horizontal
+ * wrap:
  *
- * Medal tracker: gold/silver/bronze counts for #1/#2/#3 finishes.
- * Each row: rank trophy · metric name + canonical id · value · snapshot date.
+ *  a. **Static curated records** — from getHallOfSignal(), filtered to records
+ *     where operator_codename matches this operator (checked against BOTH the
+ *     codename and the display_name, since the Hall may store either).
+ *  b. **Dynamic metric records** — computed from the leaderboard data already
+ *     fetched on the profile page. For each metric board, if this operator is
+ *     #1, #2, or #3, show a "Holds #1 on Υ Yield" style chip.
+ *
+ * Renders ABOVE the tab bar so prestige is visible immediately. Does NOT render
+ * if the operator holds zero records (no empty state — just null).
+ *
+ * Medal colors: gold for #1, silver (#c0c0c0) for #2, bronze (#cd7f32) for #3.
+ * Static records get a trophy emoji. SigRank gold/black aesthetic.
  */
 
-/** One board entry for this operator. */
-interface BoardEntry {
+/** One dynamic metric record held by this operator. */
+interface DynamicRecord {
   canonId: string;
   name: string;
   ticker: string;
   rank: number;
   value: string;
-  date: string;
 }
 
 const CASCADE_BOARDS = DISPLAY_METRICS.map((d) => ({
@@ -46,223 +53,154 @@ const RAW_BOARDS = DISPLAY_RAW.map((d) => ({
 
 const ALL_BOARDS = [...CASCADE_BOARDS, ...RAW_BOARDS];
 
-/** Compute this operator's rank on every board. Returns entries where they're
- *  in the top 10, sorted by rank (best first). */
-function computeBoardEntries(
+/** Compute this operator's dynamic metric records (top 3 only). Returns
+ *  entries where they're #1, #2, or #3 on a board, sorted by rank. */
+function computeDynamicRecords(
   codename: string,
   boardRows: LeaderboardRow[],
-): BoardEntry[] {
-  const entries: BoardEntry[] = [];
+): DynamicRecord[] {
+  const records: DynamicRecord[] = [];
 
   for (const board of ALL_BOARDS) {
     const sorted = [...boardRows]
       .sort((a, z) => sortValue(z, board.sort) - sortValue(a, board.sort))
-      .slice(0, 10);
+      .slice(0, 3);
 
     const rank = sorted.findIndex(
       (r) => r.operator.codename === codename,
     );
-    if (rank === -1) continue; // not in top 10
+    if (rank === -1) continue; // not in top 3
 
     const row = sorted[rank];
     const value = recordValue(row, board.canonId);
     if (value === "—") continue; // non-compounding on a compounding metric
 
-    entries.push({
+    records.push({
       canonId: board.canonId,
       name: board.name,
       ticker: board.ticker,
       rank: rank + 1,
       value,
-      date: row.snapshot.snapshot_date?.slice(0, 10) ?? "—",
     });
   }
 
-  // Sort by rank (best first), then by metric name for stable ordering.
-  return entries.sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
+  return records.sort((a, b) => a.rank - b.rank);
 }
 
-/** Trophy node for ranks 1-3, plain number for 4-10. */
-function RankNode({ rank }: { rank: number }) {
-  if (rank === 1)
-    return (
-      <span className="text-gold" aria-label="rank 1">
-        🥇
-      </span>
-    );
-  if (rank === 2)
-    return (
-      <span className="text-text-secondary" aria-label="rank 2">
-        🥈
-      </span>
-    );
-  if (rank === 3)
-    return (
-      <span className="text-rank-low" aria-label="rank 3">
-        🥉
-      </span>
-    );
-  return (
-    <span className="text-text-muted" aria-label={`rank ${rank}`}>
-      #{rank}
-    </span>
-  );
+/** Filter static Hall records to those belonging to this operator. Checks
+ *  against BOTH codename and display_name — the Hall may store either. */
+function filterStaticRecords(
+  hallRecords: HallRecord[],
+  codename: string,
+  displayName?: string,
+): HallRecord[] {
+  const names = new Set<string>([codename]);
+  if (displayName) names.add(displayName);
+  return hallRecords.filter((r) => names.has(r.operator_codename));
 }
 
-/** Value color by medal tier. */
-function valueClass(rank: number): string {
-  if (rank === 1) return "text-gold";
-  if (rank === 2) return "text-text-secondary";
-  if (rank === 3) return "text-rank-low";
-  return "text-text-secondary";
+/** Inline medal color for a rank (gold/silver/bronze). */
+function medalColor(rank: number): string | undefined {
+  if (rank === 1) return undefined; // gold uses the theme class
+  if (rank === 2) return "#c0c0c0";
+  if (rank === 3) return "#cd7f32";
+  return undefined;
+}
+
+/** Rank prefix label. */
+function rankLabel(rank: number): string {
+  return `Holds #${rank}`;
 }
 
 interface Props {
-  /** Operator codename — used to find this operator in the board rows. */
+  /** Operator codename — used to find this operator in the board rows + Hall. */
   codename: string;
+  /** Operator display name — checked against Hall records too (optional). */
+  display_name?: string;
   /** Full leaderboard rows (already fetched by the profile page for field
-   *  averages). Reused — no extra DB call. */
-  boardRows: LeaderboardRow[];
+   *  averages). Reused — no extra DB call. Optional; if absent, dynamic
+   *  records are skipped. */
+  boardRows?: LeaderboardRow[];
 }
 
-export function OperatorRecords({ codename, boardRows }: Props) {
-  const entries = computeBoardEntries(codename, boardRows);
-
-  // Don't render if the operator isn't in the top 10 on any board.
-  if (entries.length === 0) return null;
-
-  const gold = entries.filter((e) => e.rank === 1).length;
-  const silver = entries.filter((e) => e.rank === 2).length;
-  const bronze = entries.filter((e) => e.rank === 3).length;
-
-  const cascadeEntries = entries.filter((e) =>
-    CASCADE_BOARDS.some((b) => b.canonId === e.canonId),
-  );
-  const rawEntries = entries.filter((e) =>
-    RAW_BOARDS.some((b) => b.canonId === e.canonId),
+export async function OperatorRecords({
+  codename,
+  display_name,
+  boardRows,
+}: Props) {
+  // Static curated records from the Hall of Signal.
+  const hallRecords = await getHallOfSignal();
+  const staticRecords = filterStaticRecords(
+    hallRecords,
+    codename,
+    display_name,
   );
 
-  // Latest snapshot date across all entries.
-  const latestDate = entries
-    .map((e) => e.date)
-    .filter((d) => d !== "—")
-    .sort()
-    .pop();
+  // Dynamic metric records (top 3 on each board).
+  const dynamicRecords = boardRows
+    ? computeDynamicRecords(codename, boardRows)
+    : [];
+
+  const total = staticRecords.length + dynamicRecords.length;
+  if (total === 0) return null;
 
   return (
-    <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+    <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
       <div className="flex items-center gap-2">
-        <span className="text-base">🏆</span>
-        <h2 className="font-mono text-sm font-bold tracking-wide text-text-primary">
-          Hall of Signal
+        <span className="text-sm">🏆</span>
+        <h2 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
+          Records
         </h2>
       </div>
-      <p className="max-w-lg font-sans text-xs leading-relaxed text-text-muted">
-        Where this operator ranks on the all-time record boards — every cascade
-        metric and raw token pillar.
-      </p>
 
-      {/* Medal tracker */}
-      <div className="flex items-center gap-3 rounded-md border border-bg-border bg-bg-elevated px-3 py-2">
-        <div className="flex items-center gap-1.5 font-mono text-sm font-semibold">
-          <span>🥇</span>
-          <span className="tabular-nums text-gold">{gold}</span>
-        </div>
-        <div className="flex items-center gap-1.5 font-mono text-sm font-semibold">
-          <span>🥈</span>
-          <span className="tabular-nums text-text-secondary">{silver}</span>
-        </div>
-        <div className="flex items-center gap-1.5 font-mono text-sm font-semibold">
-          <span>🥉</span>
-          <span className="tabular-nums text-rank-low">{bronze}</span>
-        </div>
-        <div className="mx-1 h-4 w-px bg-bg-border" />
-        <span className="ml-auto font-mono text-xs text-text-secondary">
-          {entries.length} top-10 finishes
-          {latestDate ? ` · last updated ${latestDate}` : ""}
-        </span>
-      </div>
+      <div className="flex flex-wrap gap-2">
+        {/* Static curated records — trophy chips. */}
+        {staticRecords.map((r, i) => (
+          <Link
+            key={`static-${i}`}
+            href="/hall"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 font-mono text-xs text-text-primary transition-colors hover:border-gold hover:bg-gold/20"
+            title={`${r.title} · ${r.date}`}
+          >
+            <span className="text-gold">🏆</span>
+            <span className="font-semibold text-gold">{r.title}</span>
+            {r.value && (
+              <span className="text-text-secondary">{r.value}</span>
+            )}
+          </Link>
+        ))}
 
-      {/* Cascade metrics */}
-      {cascadeEntries.length > 0 && (
-        <>
-          <h3 className="mt-1 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-text-dim">
-            Cascade Metrics
-          </h3>
-          <div className="flex flex-col gap-1.5">
-            {cascadeEntries.map((e) => (
-              <Link
-                key={e.canonId}
-                href="/hall"
-                className="grid grid-cols-[28px_1fr_auto_auto] items-center gap-3 rounded-md border border-bg-border bg-bg-elevated px-3 py-2 transition-colors hover:border-gold hover:bg-bg-hover"
+        {/* Dynamic metric records — medal chips. */}
+        {dynamicRecords.map((r) => {
+          const color = medalColor(r.rank);
+          const isGold = r.rank === 1;
+          return (
+            <Link
+              key={`dyn-${r.canonId}`}
+              href="/hall"
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-xs transition-colors hover:bg-bg-hover ${
+                isGold
+                  ? "border-gold/40 bg-gold/10 text-text-primary hover:border-gold"
+                  : "border-bg-border bg-bg-elevated text-text-primary"
+              }`}
+              title={`${rankLabel(r.rank)} on ${r.name} · ${r.value}`}
+            >
+              <span
+                className="font-bold"
+                style={color ? { color } : undefined}
               >
-                <span className="flex w-7 items-center justify-center font-mono text-xs font-bold">
-                  <RankNode rank={e.rank} />
-                </span>
-                <span className="font-sans text-sm font-medium text-text-primary">
-                  {e.name}
-                  <span className="ml-1 font-mono text-[10px] text-text-dim">
-                    {e.ticker}
-                  </span>
-                </span>
-                <span
-                  className={`font-mono text-sm font-bold tabular-nums ${valueClass(e.rank)}`}
-                >
-                  {e.value}
-                </span>
-                <span className="font-mono text-[10px] tabular-nums text-text-dim">
-                  {e.date}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Raw token pillars */}
-      {rawEntries.length > 0 && (
-        <>
-          <h3 className="mt-3 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-text-dim">
-            Raw Token Pillars
-          </h3>
-          <div className="flex flex-col gap-1.5">
-            {rawEntries.map((e) => (
-              <Link
-                key={e.canonId}
-                href="/hall"
-                className="grid grid-cols-[28px_1fr_auto_auto] items-center gap-3 rounded-md border border-bg-border bg-bg-elevated px-3 py-2 transition-colors hover:border-gold hover:bg-bg-hover"
+                #{r.rank}
+              </span>
+              <span className="text-text-secondary">{r.name}</span>
+              <span
+                className={`font-semibold ${isGold ? "text-gold" : ""}`}
+                style={color && !isGold ? { color } : undefined}
               >
-                <span className="flex w-7 items-center justify-center font-mono text-xs font-bold">
-                  <RankNode rank={e.rank} />
-                </span>
-                <span className="font-sans text-sm font-medium text-text-primary">
-                  {e.name}
-                  <span className="ml-1 font-mono text-[10px] text-text-dim">
-                    {e.ticker}
-                  </span>
-                </span>
-                <span
-                  className={`font-mono text-sm font-bold tabular-nums ${valueClass(e.rank)}`}
-                >
-                  {e.value}
-                </span>
-                <span className="font-mono text-[10px] tabular-nums text-text-dim">
-                  {e.date}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Footer link */}
-      <div className="mt-2 border-t border-bg-border pt-2 text-right">
-        <Link
-          href="/hall"
-          className="font-mono text-xs text-accent transition-colors hover:text-gold"
-        >
-          View all boards on the Hall of Signal →
-        </Link>
+                {r.value}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
