@@ -23,6 +23,7 @@ import PlatformAdoption from "@/components/field/PlatformAdoption";
 import PlatformYieldQuartile from "@/components/field/PlatformYieldQuartile";
 import CascadeComposition from "@/components/field/CascadeComposition";
 import YieldQuartileBoxPlot from "@/components/field/YieldQuartileBoxPlot";
+import GhostRankQuadrant from "@/components/field/GhostRankQuadrant";
 import BotDetectionPanel from "@/components/field/BotDetectionPanel";
 
 export const metadata: Metadata = withOG({
@@ -303,6 +304,20 @@ export default async function FieldPage() {
           meaning they are buried deep on any volume leaderboard. But their yield values reach into
           the hundreds of thousands. Volume metrics hide them. Yield metrics find them.
         </p>
+        <div className="overflow-x-auto">
+          <GhostRankQuadrant
+            operators={operators}
+            ghostRanks={ghost_ranks}
+            medians={meta.medians}
+          />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The quadrant chart above plots every human operator on a log-log grid of total tokens
+          versus yield. The dashed gold lines mark the median on each axis, splitting the field into
+          four quadrants. Q2 — the top-left, low volume and high yield — is the ghost-rank region,
+          highlighted in cyan. These operators would be invisible on any volume-ranked leaderboard,
+          yet they dominate on yield. They are the operators worth recruiting.
+        </p>
         <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
           <table className="w-full border-collapse font-sans text-sm">
             <thead>
@@ -325,9 +340,17 @@ export default async function FieldPage() {
               </tr>
             </thead>
             <tbody>
-              {ghost_ranks.slice(0, 10).map((g) => (
+              {ghost_ranks.slice(0, 20).map((g) => (
                 <tr key={g.handle} className="border-b border-bg-border-subtle">
-                  <td className="px-4 py-2 font-mono text-text-primary">{g.handle}</td>
+                  <td className="px-4 py-2 font-mono text-text-primary">
+                    <Link
+                      href={`/user/${g.handle}`}
+                      className="underline hover:text-text-primary"
+                      style={{ color: "#10b981" }}
+                    >
+                      {g.handle}
+                    </Link>
+                  </td>
                   <td className="px-4 py-2 text-right font-mono text-text-muted">
                     #{g.tokscale_rank.toLocaleString()}
                   </td>
@@ -348,8 +371,14 @@ export default async function FieldPage() {
           </table>
         </div>
         <p className="text-xs text-text-muted">
-          Showing 10 of {ghost_ranks.length} ghost-rank operators.
+          Showing 20 of {ghost_ranks.length} ghost-rank operators.
         </p>
+        <Link
+          href="/login"
+          className="self-start rounded-md border border-gold bg-bg-surface px-5 py-2.5 font-sans text-sm font-bold text-gold transition-colors hover:bg-gold hover:text-bg-primary"
+        >
+          Claim your profile →
+        </Link>
       </section>
 
       {/* ── Bot Detection ────────────────────────────────────────────── */}

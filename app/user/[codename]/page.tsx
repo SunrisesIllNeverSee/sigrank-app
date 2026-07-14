@@ -26,7 +26,9 @@ import {
   getOperatorHistory,
   getOperatorSubmissions,
   getOperatorReport,
+  getHallOfSignal,
 } from "@/lib/data";
+import type { HallRecord } from "@/lib/data";
 import { computeFieldAverages } from "@/lib/data/field-average";
 import { getSessionOperator, getSessionUser } from "@/lib/supabase/auth-server";
 import { decodeCodename } from "@/lib/route-params";
@@ -155,6 +157,16 @@ export default async function OperatorProfilePage({
   // from the live board, so they always agree and move with the field.
   const boardRows = await getLeaderboard();
   const fieldAvg = computeFieldAverages(boardRows);
+
+  // Hall of Signal records for this operator — fed to the profile JSON-LD
+  // (achievement schema). OperatorRecords fetches the Hall again internally
+  // (it's cached via unstable_cache), so no duplicate DB hit.
+  const hallRecords = await getHallOfSignal();
+  const operatorHallNames = new Set<string>([operator.codename]);
+  if (operator.display_name) operatorHallNames.add(operator.display_name);
+  const operatorRecords: HallRecord[] = hallRecords.filter((r) =>
+    operatorHallNames.has(r.operator_codename),
+  );
 
   // Competitive deltas (SHARED_DESIGN_DECISIONS §3): delta from field average
   // + delta from top operator. Turns the metric into a race, not just a score.
@@ -601,6 +613,7 @@ export default async function OperatorProfilePage({
           classTier: snapshot.class_tier,
           globalRank: row.global_rank,
           pending,
+          records: operatorRecords,
         })}
       />
       <TrackProfileView codename={operator.codename} />
