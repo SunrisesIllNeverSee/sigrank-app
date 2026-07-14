@@ -10,7 +10,7 @@
  * server. No API calls needed — all data is pre-fetched.
  *
  * The server fetches base rows for all 4 windows (limit 30 for headroom).
- * This client filters by class/platform, sorts into 15 boards using sortValue,
+ * This client filters by class/platform, sorts into 18 boards using sortValue,
  * and renders the ticker + MetricTopTen boards.
  */
 
@@ -30,12 +30,24 @@ import { HallHeader } from "@/components/hall/HallHeader";
 import { MetricTopTen } from "@/components/hall/MetricTopTen";
 import { RecordTicker } from "@/components/hall/RecordTicker";
 
-const CASCADE_BOARDS = DISPLAY_METRICS.map((d) => ({
+/** Op-ratio variant board ids (Y.10–Y.12) — split out of DISPLAY_METRICS so they
+ *  render in their own "Operating Ratio Records" section. */
+const OP_RATIO_IDS = new Set(["Y.10", "Y.11", "Y.12"]);
+
+const CASCADE_BOARDS = DISPLAY_METRICS.filter(
+  (d) => !OP_RATIO_IDS.has(d.id),
+).map((d) => ({
+  canonId: d.id,
+  sort: d.key,
+}));
+const OP_RATIO_BOARDS = DISPLAY_METRICS.filter((d) =>
+  OP_RATIO_IDS.has(d.id),
+).map((d) => ({
   canonId: d.id,
   sort: d.key,
 }));
 const RAW_BOARDS = DISPLAY_RAW.map((d) => ({ canonId: d.id, sort: d.key }));
-const ALL_BOARDS = [...CASCADE_BOARDS, ...RAW_BOARDS];
+const ALL_BOARDS = [...CASCADE_BOARDS, ...OP_RATIO_BOARDS, ...RAW_BOARDS];
 
 const DISPLAY_BY_ID: Record<string, (typeof DISPLAY_METRICS)[number]> =
   Object.fromEntries(
@@ -87,7 +99,7 @@ export function HallContentClient({ windowsData }: Props) {
     );
   }
 
-  // Sort into 15 boards (same as the server did: one base fetch, N in-memory sorts).
+  // Sort into 18 boards (same as the server did: one base fetch, N in-memory sorts).
   const metricRows = ALL_BOARDS.map((b) =>
     [...baseRows]
       .sort((a, z) => sortValue(z, b.sort) - sortValue(a, b.sort))
@@ -144,6 +156,26 @@ export function HallContentClient({ windowsData }: Props) {
         ))}
       </div>
 
+      {/* Operating Ratio Records — peak holders on the op-ratio variants
+          (Y.10–Y.12): best overall, best cache, best output. */}
+      <h2 className="mb-1 mt-10 font-mono text-lg font-bold tracking-wide text-text-primary">
+        Operating Ratio Records
+      </h2>
+      <p className="mb-4 max-w-2xl font-sans text-sm text-text-muted">
+        The operators with the strongest operating-ratio terms — the highest
+        cache leverage, the cleanest cache efficiency, and the highest output
+        velocity in the c:i:o composition.
+      </p>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {OP_RATIO_BOARDS.map((b, i) => (
+          <MetricTopTen
+            key={b.canonId}
+            canonId={b.canonId}
+            rows={metricRows[CASCADE_BOARDS.length + i]}
+          />
+        ))}
+      </div>
+
       {/* Raw Records — peak holders on the raw token pillars (T.xx + $/1M). */}
       <h2 className="mb-1 mt-10 font-mono text-lg font-bold tracking-wide text-text-primary">
         Raw Records
@@ -157,7 +189,7 @@ export function HallContentClient({ windowsData }: Props) {
           <MetricTopTen
             key={b.canonId}
             canonId={b.canonId}
-            rows={metricRows[CASCADE_BOARDS.length + i]}
+            rows={metricRows[CASCADE_BOARDS.length + OP_RATIO_BOARDS.length + i]}
           />
         ))}
       </div>

@@ -427,55 +427,6 @@ export default async function OperatorProfilePage({
                   the fuel.
                 </p>
               </div>
-              {c && fieldAvg.yield_ != null && (
-                <div className="flex flex-col items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                    You vs the field
-                  </span>
-                  <CascadeRadar
-                    axes={[
-                      { label: "Υ Yield", max: Math.max(c.yield_, fieldAvg.yield_ ?? 0) * 1.2 },
-                      { label: "SNR", max: 1 },
-                      { label: "Velocity", max: 50 },
-                      { label: "Leverage", max: 200 },
-                      { label: "10xDEV", max: 5 },
-                      { label: "Efficiency", max: 5 },
-                    ]}
-                    series={[
-                      {
-                        name: "Field avg",
-                        values: [
-                          fieldAvg.yield_ ?? 0,
-                          fieldAvg.snr ?? 0,
-                          fieldAvg.velocity ?? 0,
-                          fieldAvg.leverage ?? 0,
-                          fieldAvg.dev10x ?? 0,
-                          fieldAvg.efficiency ?? 0,
-                        ],
-                        color: "rgb(var(--text-muted))",
-                        variant: "ghost",
-                      },
-                      {
-                        name: "You",
-                        values: [
-                          c.yield_,
-                          c.snr,
-                          c.velocity,
-                          c.leverage,
-                          c.dev10x ?? 0,
-                          c.efficiency,
-                        ],
-                        color: "rgb(var(--gold))",
-                      },
-                    ]}
-                    size={260}
-                  />
-                  <p className="text-center font-sans text-[11px] leading-snug text-text-muted">
-                    Your cascade fingerprint (gold) vs the live field average
-                    (gray). Bigger polygon = stronger across all axes.
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* Operating ratio + per-axis heat. */}
