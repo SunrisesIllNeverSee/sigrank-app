@@ -100,7 +100,7 @@ export default async function BlogPost({
   };
 
   return (
-    <article className="mx-auto max-w-3xl py-2">
+    <article className="mx-auto max-w-3xl px-4 py-8 md:py-12">
       <JsonLd
         data={[
           articleLd,
@@ -112,7 +112,7 @@ export default async function BlogPost({
       />
 
       {/* Header */}
-      <header className="mb-8 flex flex-col gap-3">
+      <header className="mb-10 flex flex-col gap-4 border-b border-bg-border pb-8">
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           ◈ SigRank Blog
         </p>
@@ -120,7 +120,7 @@ export default async function BlogPost({
           {title}
         </h1>
         {description && (
-          <p className="text-base leading-relaxed text-text-secondary">
+          <p className="text-lg leading-relaxed text-text-secondary">
             {description}
           </p>
         )}
@@ -132,7 +132,7 @@ export default async function BlogPost({
       </header>
 
       {/* Markdown body */}
-      <div className="prose-sigrank">
+      <div className="prose-sigrank mt-2">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
     </article>
