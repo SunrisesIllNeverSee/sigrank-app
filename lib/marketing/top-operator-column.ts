@@ -51,15 +51,15 @@ function isRealOperator(row: LeaderboardRow): boolean {
   // Must have a real compounding cascade (a non-compounding/empty row isn't "top operator").
   const c = row.snapshot.cascade;
   if (!c || c.nonCompounding) return false;
-  // Bot/outlier filter: input/total ratio must be between 0.1% and 80%.
-  // < 0.1% = cache replay bots or extreme outliers (furic etc.)
+  // Bot/outlier filter: input/total ratio must be between 1% and 80%.
+  // < 1% = outliers & bots (extreme cache reuse, near-zero fresh input — furic, sadw1q, etc.)
   // > 80% = input dump bots
   // These get their own category — they don't set the numbers for the Human Center of Mass.
   const t = row.telemetry;
   const total = t.fresh_input + t.output + t.cache_read + t.cache_create;
   if (total <= 0) return false;
   const inputPct = t.fresh_input / total;
-  if (inputPct < 0.001 || inputPct > 0.8) return false;
+  if (inputPct < 0.01 || inputPct > 0.8) return false;
   return true;
 }
 
