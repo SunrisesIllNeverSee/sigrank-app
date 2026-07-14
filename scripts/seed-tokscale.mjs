@@ -560,15 +560,15 @@ ON CONFLICT (codename) DO NOTHING;
 -- ── metric_snapshots (keyed by handle → operator_id lookup) ──
 -- Only the 4 raw token pillars + class_tier. No placeholder fields — the board
 -- computes cascade (Υ, leverage, 10xDEV, etc.) on read from the 4 pillars.
--- Inserts BOTH 30d (the API default window) and all_time so the board shows
--- seeds without needing a window switch.
+-- Seeds go in all_time ONLY — the 30d window is reserved for live/verified
+-- operators (MCP submissions). The board reads all_time for the seeded field
+-- and 30d for the live field.
 INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, platform, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, class_tier, last_seen, recency_modifier, movement_24h, movement_7d, ruleset_version)
-SELECT o.operator_id, DATE '${snapshotDate}', w.window_type, v.platform, v.input, v.output, v.cc, v.cr, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, 0, 0, '1.0'
+SELECT o.operator_id, DATE '${snapshotDate}', 'all_time', v.platform, v.input, v.output, v.cc, v.cr, v.cls, TIMESTAMPTZ '${snapshotDate}T00:00:00Z', 1.00, 0, 0, '1.0'
 FROM (VALUES
 ${snapValues}
 ) AS v(handle, platform, input, output, cc, cr, cls)
 JOIN operators o ON o.handle = v.handle
-CROSS JOIN (VALUES ('30d'), ('all_time')) AS w(window_type)
 ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO UPDATE SET
   input_tokens           = EXCLUDED.input_tokens,
   output_tokens          = EXCLUDED.output_tokens,

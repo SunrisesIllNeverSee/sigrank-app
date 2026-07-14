@@ -28,14 +28,15 @@ import {
 type Variant = "full" | "embed";
 
 /** The headline comparison table — the three degrees across seven metrics.
- * Owner-facing column headers (owner 2026-06-22, updated 2026-07-13). All three columns
- * are now LIVE from the all-time board:
- *   - "Average Users" = median of ALL real operators (the typical operator)
- *   - "Power users"   = median of the top 100 real operators (the typical elite)
- *   - "Top Evals"     = the single top real operator (gold column)
+ * Owner-facing column headers (owner 2026-06-22, updated 2026-07-14). All three columns
+ * are now LIVE from the all-time board, filtered to the Human Center of Mass
+ * (bots/outliers with input/total < 0.1% or > 80% are categorized separately):
+ *   - "Human Center of Mass" = median of all real human operators (the typical operator)
+ *   - "Power users"   = median of the top 100 real human operators (the typical elite)
+ *   - "Top Evals"     = the single top real human operator (gold column)
  * `tone`: 'white' = Average + Power user columns, 'gold' = the Top Evals column. */
 const COLS: { label: string; tone: "white" | "gold" }[] = [
-  { label: "Average Users*", tone: "white" },
+  { label: "Human Center of Mass*", tone: "white" },
   { label: "Power users†", tone: "white" },
   { label: "Top Evals to date‡", tone: "gold" },
 ];
@@ -83,7 +84,7 @@ function buildDevRows(
   gold: GoldColumn,
 ): { degree: string; dev: string; linear: string }[] {
   return [
-    { degree: "Average users (median, all operators)*", dev: avg.dev10x, linear: avg.devLinear },
+    { degree: "Human Center of Mass (median, all human operators)*", dev: avg.dev10x, linear: avg.devLinear },
     { degree: "Power-user median (top 100)", dev: power.dev10x, linear: power.devLinear },
     {
       degree: "Top operator to date",
