@@ -22,6 +22,8 @@ const STATIC_ROUTES: {
   { path: "/score", priority: 0.9, changeFrequency: "daily" },
   { path: "/hall", priority: 0.8, changeFrequency: "daily" },
   { path: "/field", priority: 0.8, changeFrequency: "daily" },
+  { path: "/blog", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/blog/volume-isnt-yield", priority: 0.9, changeFrequency: "weekly" },
   { path: "/methodology", priority: 0.8, changeFrequency: "daily" },
   { path: "/science", priority: 0.7, changeFrequency: "monthly" },
   { path: "/research", priority: 0.7, changeFrequency: "monthly" },
