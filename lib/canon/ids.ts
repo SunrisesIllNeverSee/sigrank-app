@@ -144,6 +144,27 @@ export const TOKEN_METRICS: Record<string, TokenMetricDef> = {
       "leverage:1:velocity — cache-read per input : 1 : output per input (composition shorthand)",
     era: "token",
   },
+  "Y.10": {
+    id: "Y.10",
+    ticker: "OP-B",
+    name: "Best Operating Ratio",
+    formula: "cacheRead / input — the leverage term of the op ratio (c:i:o)",
+    era: "token",
+  },
+  "Y.11": {
+    id: "Y.11",
+    ticker: "OP-C",
+    name: "Best Cache Op Ratio",
+    formula: "cacheRead / input — highest cache efficiency in the operating ratio",
+    era: "token",
+  },
+  "Y.12": {
+    id: "Y.12",
+    ticker: "OP-O",
+    name: "Best Output Op Ratio",
+    formula: "output / input — highest output efficiency in the operating ratio (velocity term)",
+    era: "token",
+  },
 };
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -201,6 +222,9 @@ export const DISPLAY_METRICS: DisplayMetric[] = [
   },
   { id: "Y.08", ticker: "EFF", name: "Efficiency", key: "efficiency" },
   { id: "Y.09", ticker: "OP", name: "Op Ratio", key: "opRatio" },
+  { id: "Y.10", ticker: "OP-B", name: "Best Operating Ratio", key: "opBest" },
+  { id: "Y.11", ticker: "OP-C", name: "Best Cache Op Ratio", key: "opCache" },
+  { id: "Y.12", ticker: "OP-O", name: "Best Output Op Ratio", key: "opOutput" },
 ];
 
 /**

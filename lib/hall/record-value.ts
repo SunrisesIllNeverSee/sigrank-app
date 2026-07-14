@@ -59,6 +59,13 @@ export function recordValue(row: LeaderboardRow, canonId: string): string {
       return c ? c.efficiency.toFixed(2) : "—";
     case "Y.09":
       return c && !c.nonCompounding ? c.opRatio : "—";
+    case "Y.10":
+    case "Y.11":
+      // Best overall / best cache op ratio — display the leverage (cache) term.
+      return c && !c.nonCompounding ? `${k(c.leverage)}×` : "—";
+    case "Y.12":
+      // Best output op ratio — display the velocity (output) term.
+      return c ? c.velocity.toFixed(2) : "—";
     // ── Raw token pillars (T.xx) — read straight off telemetry, integer-formatted ──
     case "T.02":
       return fmtTokens(t.fresh_input);
