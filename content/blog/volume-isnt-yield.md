@@ -263,5 +263,5 @@ C : I : O = 19 : 1 : 0.09
 
 *This work is part of a broader research program on [Commitment Theory](https://github.com/SunrisesIllNeverSee/Commitment_Theory) — a 34-paper investigation into how governance structures emerge from measurable behavior in autonomous systems. SigRank applies the same principle to AI operators: you don't measure trust by asking, you measure it by observing the cascade.*
 
-*- [djm · mos2es](https://mos2es.com)*
+*- djm · [MO§ES™](https://mos2es.com)*
 *[@burnmydays on X](https://x.com/burnmydays) · [GitHub](https://github.com/SunrisesIllNeverSee)*

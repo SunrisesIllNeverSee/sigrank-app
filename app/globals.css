@@ -716,33 +716,42 @@ html[data-landing-motion="paused"] .cascade-pulse {
  */
 .prose-sigrank {
   color: rgb(var(--text-secondary));
-  font-size: 0.95rem;
-  line-height: 1.75;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  letter-spacing: 0.005em;
 }
 .prose-sigrank > * + * {
-  margin-top: 1.25em;
+  margin-top: 1.4em;
 }
+
+/* Headings */
 .prose-sigrank h1,
 .prose-sigrank h2,
 .prose-sigrank h3 {
   color: rgb(var(--text-primary));
   font-weight: 700;
   line-height: 1.3;
+  scroll-margin-top: 5rem;
 }
 .prose-sigrank h1 {
-  font-size: 1.75rem;
-  margin-top: 2em;
+  font-size: 1.85rem;
+  margin-top: 2.5em;
+  letter-spacing: -0.01em;
 }
 .prose-sigrank h2 {
-  font-size: 1.4rem;
-  margin-top: 2em;
-  padding-bottom: 0.3em;
+  font-size: 1.45rem;
+  margin-top: 2.5em;
+  padding-bottom: 0.35em;
   border-bottom: 1px solid rgb(var(--border));
+  letter-spacing: -0.005em;
 }
 .prose-sigrank h3 {
-  font-size: 1.15rem;
-  margin-top: 1.5em;
+  font-size: 1.2rem;
+  margin-top: 2em;
+  color: rgb(var(--text-primary));
 }
+
+/* Paragraphs + inline elements */
 .prose-sigrank p {
   color: rgb(var(--text-secondary));
 }
@@ -750,6 +759,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
   color: rgb(var(--gold));
   text-decoration: underline;
   text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
 }
 .prose-sigrank a:hover {
   color: rgb(var(--text-primary));
@@ -758,77 +768,121 @@ html[data-landing-motion="paused"] .cascade-pulse {
   color: rgb(var(--text-primary));
   font-weight: 700;
 }
+.prose-sigrank em {
+  color: rgb(var(--text-secondary));
+}
+
+/* Inline code + code blocks */
 .prose-sigrank code {
   font-family: var(--font-mono, monospace);
   font-size: 0.85em;
-  padding: 0.15em 0.35em;
-  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  border-radius: 5px;
   background: rgb(var(--elevated));
-  color: rgb(var(--text-primary));
+  color: rgb(var(--gold));
+  border: 1px solid rgb(var(--border) / 0.5);
 }
 .prose-sigrank pre {
-  padding: 1em 1.25em;
-  border-radius: 8px;
+  padding: 1.1em 1.4em;
+  border-radius: 10px;
   background: rgb(var(--surface));
   border: 1px solid rgb(var(--border));
   overflow-x: auto;
+  margin: 1.6em 0;
 }
 .prose-sigrank pre code {
   background: none;
   padding: 0;
-  font-size: 0.85rem;
+  border: none;
+  color: rgb(var(--text-primary));
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
+
+/* Blockquotes — used for footnotes and callouts */
 .prose-sigrank blockquote {
-  padding: 0.75em 1.25em;
-  border-left: 3px solid rgb(var(--gold) / 0.5);
-  background: rgb(var(--surface) / 0.5);
-  border-radius: 0 6px 6px 0;
+  padding: 1em 1.5em;
+  border-left: 3px solid rgb(var(--gold) / 0.6);
+  background: rgb(var(--surface) / 0.4);
+  border-radius: 0 8px 8px 0;
   color: rgb(var(--text-secondary));
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 1.6em 0;
 }
 .prose-sigrank blockquote p {
   margin: 0;
 }
+.prose-sigrank blockquote p + p {
+  margin-top: 0.75em;
+}
 .prose-sigrank blockquote strong {
   color: rgb(var(--text-primary));
 }
+
+/* Lists */
 .prose-sigrank ul,
 .prose-sigrank ol {
-  padding-left: 1.5em;
+  padding-left: 1.6em;
 }
 .prose-sigrank li {
-  margin-top: 0.5em;
+  margin-top: 0.6em;
 }
+.prose-sigrank li::marker {
+  color: rgb(var(--gold) / 0.7);
+}
+
+/* Images / charts — full width, rounded, with breathing room */
 .prose-sigrank img {
   width: 100%;
-  border-radius: 8px;
+  height: auto;
+  border-radius: 10px;
   border: 1px solid rgb(var(--border));
+  margin: 2em 0;
+  display: block;
 }
+
+/* Tables — scrollable wrapper, styled headers, zebra rows */
 .prose-sigrank table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+.prose-sigrank thead {
+  background: rgb(var(--surface) / 0.6);
 }
 .prose-sigrank th {
-  padding: 0.6em 0.8em;
+  padding: 0.7em 1em;
   text-align: left;
   font-weight: 700;
   color: rgb(var(--text-primary));
   border-bottom: 2px solid rgb(var(--border));
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 .prose-sigrank td {
-  padding: 0.5em 0.8em;
-  border-bottom: 1px solid rgb(var(--border) / 0.5);
+  padding: 0.65em 1em;
+  border-bottom: 1px solid rgb(var(--border) / 0.4);
   color: rgb(var(--text-secondary));
+  white-space: nowrap;
 }
-.prose-sigrank tr:hover td {
-  background: rgb(var(--surface) / 0.3);
+.prose-sigrank tbody tr:nth-child(even) td {
+  background: rgb(var(--surface) / 0.2);
 }
+.prose-sigrank tbody tr:hover td {
+  background: rgb(var(--surface) / 0.4);
+}
+
+/* Horizontal rules */
 .prose-sigrank hr {
   border: none;
   border-top: 1px solid rgb(var(--border));
-  margin: 2em 0;
+  margin: 2.5em 0;
 }
