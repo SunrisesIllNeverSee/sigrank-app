@@ -31,6 +31,7 @@ async function getPost(slug: string) {
         timestamp?: string;
         author?: string;
         tags?: string[];
+        hero?: string;
       },
       content,
     };
@@ -60,10 +61,12 @@ export async function generateMetadata({
   if (!post) return {};
   const title = post.frontmatter.title ?? slug;
   const description = post.frontmatter.description ?? "";
+  const hero = post.frontmatter.hero;
   return withOG({
     title,
     description,
     path: `/blog/${slug}`,
+    ...(hero ? { ogImage: { url: hero, alt: title } } : {}),
   });
 }
 
@@ -83,6 +86,7 @@ export default async function BlogPost({
   const description = frontmatter.description ?? "";
   const author = frontmatter.author ?? "SigRank";
   const date = frontmatter.timestamp ?? "";
+  const hero = frontmatter.hero;
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -130,6 +134,17 @@ export default async function BlogPost({
           <span>{author}</span>
         </div>
       </header>
+
+      {/* Hero image */}
+      {hero && (
+        <div className="mb-10 overflow-hidden rounded-xl border border-bg-border">
+          <img
+            src={hero}
+            alt={title}
+            className="h-auto w-full object-cover"
+          />
+        </div>
+      )}
 
       {/* Markdown body */}
       <div className="prose-sigrank mt-2">
