@@ -36,10 +36,19 @@ export interface GoldColumn {
   devLinear: string;
 }
 
+/** Hand-picked humans — verified operators that bypass the input/total ratio filter.
+ * These are real humans whose input/total falls below 1% but are confirmed not bots/outliers.
+ * (owner 2026-07-14: some operators like MOSES have low input ratios but are real humans.) */
+const HUMAN_WHITELIST = new Set([
+  "signal-92b4f9f485", // MOSES — canonical anchor, verified human
+  "transvaultorigin",  // MOSES mock codename (fallback path)
+]);
+
 /** Is this a REAL operator (not a staged seed / The Field / a retired-and-anonymized row)?
- * Also filters bots via the input/total ratio: operators with < 0.1% or > 80% input/total
+ * Also filters bots via the input/total ratio: operators with < 1% or > 80% input/total
  * are categorized as outliers/bots and excluded from the Human Center of Mass computation
- * (owner 2026-07-14: Three Degrees chart based on Human Center of Mass, not bot-contaminated). */
+ * (owner 2026-07-14: Three Degrees chart based on Human Center of Mass, not bot-contaminated).
+ * Hand-picked humans in HUMAN_WHITELIST bypass the ratio filter. */
 function isRealOperator(row: LeaderboardRow): boolean {
   const code = row.operator.codename.toLowerCase();
   if (code === "the-field") return false;
@@ -51,6 +60,8 @@ function isRealOperator(row: LeaderboardRow): boolean {
   // Must have a real compounding cascade (a non-compounding/empty row isn't "top operator").
   const c = row.snapshot.cascade;
   if (!c || c.nonCompounding) return false;
+  // Hand-picked humans bypass the ratio filter.
+  if (HUMAN_WHITELIST.has(code)) return true;
   // Bot/outlier filter: input/total ratio must be between 1% and 80%.
   // < 1% = outliers & bots (extreme cache reuse, near-zero fresh input — furic, sadw1q, etc.)
   // > 80% = input dump bots
