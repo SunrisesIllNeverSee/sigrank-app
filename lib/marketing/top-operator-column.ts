@@ -63,14 +63,23 @@ function isRealOperator(row: LeaderboardRow): boolean {
   // Hand-picked humans bypass the ratio filter.
   if (HUMAN_WHITELIST.has(code)) return true;
   // Bot/outlier filter: input/total ratio must be between 1% and 80%.
-  // < 1% = outliers & bots (extreme cache reuse, near-zero fresh input — furic, sadw1q, etc.)
-  // > 80% = input dump bots
-  // These get their own category — they don't set the numbers for the Human Center of Mass.
+  // > 80% = input dump bots → outlier.
+  // < 1% = gray zone: keep MOSES-like operators, reject extreme outliers.
+  //   MOSES-like = velocity <= 2x, yield <= 1000, real output (> 1M), real cache write (> 1M).
+  //   Outliers = velocity > 2x, yield > 1000, near-zero output, or near-zero cache write.
   const t = row.telemetry;
   const total = t.fresh_input + t.output + t.cache_read + t.cache_create;
   if (total <= 0) return false;
   const inputPct = t.fresh_input / total;
-  if (inputPct < 0.01 || inputPct > 0.8) return false;
+  if (inputPct > 0.8) return false;
+  if (inputPct < 0.01) {
+    const c2 = row.snapshot.cascade;
+    const vel = c2?.velocity ?? 0;
+    const yld = c2?.yield_ ?? 0;
+    const out = t.output;
+    const cw = t.cache_create;
+    if (vel > 2.0 || yld > 1000 || out < 1_000_000 || cw < 1_000_000) return false;
+  }
   return true;
 }
 

@@ -537,7 +537,18 @@ export function LeaderboardTable({
           const tot = e.totalTokens ?? 0;
           if (tot > 0) {
             const inputPct = inp / tot;
-            if (inputPct < 0.01 || inputPct > 0.8) return false;
+            if (inputPct > 0.8) return false; // input dump bots
+            if (inputPct < 0.01) {
+              // Gray zone (input < 1%): keep MOSES-like operators, reject extreme outliers.
+              // MOSES-like = velocity <= 2x, yield <= 1000, real output (> 1M), real cache write (> 1M).
+              // Outliers = velocity > 2x, yield > 1000, near-zero output, or near-zero cache write.
+              const vel = e.velocity ?? 0;
+              const yld = e.yield_ ?? 0;
+              const out = e.output ?? 0;
+              const cw = e.cacheWrite ?? 0;
+              if (vel > 2.0 || yld > 1000 || out < 1_000_000 || cw < 1_000_000)
+                return false;
+            }
           }
         }
       }
