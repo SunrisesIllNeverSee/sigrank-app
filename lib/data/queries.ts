@@ -19,7 +19,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { SORT_DEFAULT } from "@/lib/constants";
 import { filterToWindow } from "@/lib/data/windows";
-import { CLASS_NAME_TO_ID, REWARDS } from "@/lib/canon/ids";
+import { CLASS_NAME_TO_ID, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/canon/ids";
 import type { SignalClass } from "@/components/sigrank/types";
 import {
   MOCK_CLASS_DISTRIBUTION,
@@ -58,6 +58,7 @@ import {
   ZERO_TELEMETRY,
 } from "@/lib/data/mappers";
 import { fallbackRows, filterMockBoard, sortValue } from "@/lib/data/fallback";
+import { recordValue } from "@/lib/hall/record-value";
 
 // ───────────────────────────────────────────────────────────────────────────
 // Bounded-query helpers (2026-07-02 — the (d) sweep).
@@ -964,4 +965,114 @@ export async function getOperatorReport(
   } catch {
     return null;
   }
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Operator records (reverse lookup: operator → records they hold).
+// ───────────────────────────────────────────────────────────────────────────
+
+/** A static curated Hall record held by an operator. */
+export interface OperatorStaticRecord {
+  reward_id: string;
+  title: string;
+  value: string;
+  achieved_at: string;
+  is_placeholder: boolean;
+}
+
+/** A dynamic metric record — the operator is #1/#2/#3 on a metric board. */
+export interface OperatorDynamicRecord {
+  metric: string;
+  metric_name: string;
+  rank: number;
+  value: string;
+  window: string;
+}
+
+/** The full records payload for an operator (reverse lookup). */
+export interface OperatorRecordsResult {
+  codename: string;
+  static_records: OperatorStaticRecord[];
+  dynamic_records: OperatorDynamicRecord[];
+}
+
+/** The 15 metric boards (9 cascade + 6 raw) — mirrors OperatorRecords.tsx. */
+const RECORD_CASCADE_BOARDS = DISPLAY_METRICS.map((d) => ({
+  canonId: d.id,
+  sort: d.key,
+  name: d.name,
+}));
+const RECORD_RAW_BOARDS = DISPLAY_RAW.map((d) => ({
+  canonId: d.id,
+  sort: d.key,
+  name: d.name,
+}));
+const RECORD_ALL_BOARDS = [...RECORD_CASCADE_BOARDS, ...RECORD_RAW_BOARDS];
+
+/**
+ * getOperatorRecords — the reverse lookup from operator → records they hold.
+ *
+ * Combines:
+ *  a. Static curated Hall records (getHallOfSignal filtered to this operator,
+ *     checked against BOTH codename and display_name — the Hall may store either).
+ *  b. Dynamic metric records — for each of the 15 metric boards (9 cascade + 6
+ *     raw), check if this operator is #1, #2, or #3.
+ *
+ * Returns null when the codename is not found in the leaderboard (genuine 404).
+ * Reads through the same facade functions the profile page uses, so it 200s on
+ * seed data with Supabase unset and degrades gracefully on any DB failure.
+ */
+export async function getOperatorRecords(
+  codename: string,
+): Promise<OperatorRecordsResult | null> {
+  // Resolve the operator first (404 if genuinely unknown). getOperator reads
+  // through the cached facade and handles the mock-fallback path.
+  const operator = await getOperator(codename);
+  if (!operator) return null;
+
+  // Static curated records from the Hall of Signal.
+  const hallRecords = await getHallOfSignal();
+  const names = new Set<string>([operator.operator.codename]);
+  if (operator.operator.display_name)
+    names.add(operator.operator.display_name);
+  const staticRecords: OperatorStaticRecord[] = hallRecords
+    .filter((r) => names.has(r.operator_codename))
+    .map((r) => ({
+      reward_id: r.reward_id,
+      title: r.title,
+      value: r.value,
+      achieved_at: r.date,
+      is_placeholder: r.isPlaceholder,
+    }));
+
+  // Dynamic metric records (top 3 on each board). Uses the same default board
+  // the profile page fetches (getLeaderboard() with no params → full field).
+  const boardRows = await getLeaderboard();
+  const dynamicRecords: OperatorDynamicRecord[] = [];
+  for (const board of RECORD_ALL_BOARDS) {
+    const sorted = [...boardRows]
+      .sort((a, z) => sortValue(z, board.sort) - sortValue(a, board.sort))
+      .slice(0, 3);
+    const rank = sorted.findIndex(
+      (r) => r.operator.codename === operator.operator.codename,
+    );
+    if (rank === -1) continue; // not in top 3
+    const row = sorted[rank];
+    const value = recordValue(row, board.canonId);
+    if (value === "—") continue; // non-compounding on a compounding metric
+    dynamicRecords.push({
+      metric: board.canonId,
+      metric_name: board.name,
+      rank: rank + 1,
+      value,
+      window: row.window_type ?? "all_time",
+    });
+  }
+  dynamicRecords.sort((a, b) => a.rank - b.rank);
+
+  return {
+    codename: operator.operator.codename,
+    static_records: staticRecords,
+    dynamic_records: dynamicRecords,
+  };
 }
