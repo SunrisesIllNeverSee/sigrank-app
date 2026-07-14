@@ -2,10 +2,10 @@
  * app/field/page.tsx — AI Operator Field Distribution Analysis.
  *
  * The SEO-heavy page proving the "Volume ≠ Yield" thesis with real data from
- * 1,611 human operators (bots filtered out). Server component, ISR (1h).
+ * 1,498 human operators (Human Center of Mass, outliers/bots separated). Server component, ISR (1h).
  * Renders 9 pure-SVG chart components + analysis text + JSON-LD Dataset schema.
  *
- * Data source: public/data/field-analysis.json (pre-generated, 1,611 humans).
+ * Data source: public/data/field-analysis.json (pre-generated, 1,611 total, 1,498 Human Center of Mass).
  */
 
 import type { Metadata } from "next";
@@ -30,7 +30,7 @@ export const metadata: Metadata = withOG({
   title:
     "AI Operator Field Analysis — The True Distribution of Token Efficiency",
   description:
-    "Real data from 1,611 human AI operators proves volume ≠ yield. Median yield 1.95, SNR 0.4%, leverage 20.45×. Bots filtered, ghost ranks exposed, platform dominance analyzed.",
+    "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR 8.4%, leverage 18.6×. Bots filtered, ghost ranks exposed, platform dominance analyzed.",
   path: "/field",
 });
 
@@ -69,9 +69,9 @@ export default async function FieldPage() {
     "@type": "Dataset",
     name: "AI Operator Field Distribution Analysis — SigRank",
     description:
-      "Distribution analysis of 1,611 human AI operators ranked by token-cascade efficiency (yield Υ). " +
+      "Distribution analysis of 1,498 human AI operators (Human Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
       "Volume vs yield correlation, SNR separation, platform dominance, bot detection. " +
-      "Bots filtered via 6-signal bot-likelihood score.",
+      "Bots filtered via 6-signal bot-likelihood score + input/total ratio analysis.",
     url: `${SITE_ORIGIN}/field`,
     creator: { "@id": `${SITE_ORIGIN}/#org` },
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
@@ -87,12 +87,12 @@ export default async function FieldPage() {
     ],
     variableMeasured: [
       { "@type": "PropertyValue", name: "Yield (Υ)", description: "cache_read × output / input²" },
-      { "@type": "PropertyValue", name: "SNR", description: "output / total_tokens" },
+      { "@type": "PropertyValue", name: "SNR", description: "output / (input + output)" },
       { "@type": "PropertyValue", name: "Leverage", description: "cache_read / input" },
       { "@type": "PropertyValue", name: "Velocity", description: "output / session_time" },
     ],
     measurementTechnique:
-      "On-device token telemetry from 1,611 human operators. Bots identified via 6-signal bot-likelihood score and removed.",
+      "On-device token telemetry from 1,498 human operators (Human Center of Mass). Bots and outliers separated via input/total ratio analysis.",
     temporalCoverage: meta.scraped_at,
   };
 
@@ -172,9 +172,9 @@ export default async function FieldPage() {
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
-          Signal-to-Noise Ratio (SNR) = output / total_tokens. It measures what fraction of your
-          token spend produced actual output versus prompt overhead. Bots have SNR below 0.1%.
-          Humans have SNR above 30%. One number separates signal producers from token burners.
+          Signal-to-Noise Ratio (SNR) = output / (input + output). It measures what fraction of your
+          interaction produced actual output versus prompt overhead. Bots have SNR near zero.
+          Humans have SNR above 5%. One number separates signal producers from token burners.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The histogram shows the field clustering tightly around the median SNR of{" "}
@@ -391,7 +391,9 @@ export default async function FieldPage() {
           SigRank&apos;s metrics catch gaming automatically. A 6-signal bot-likelihood score
           identifies operators with inhuman throughput, zero cache usage, single-model fixation,
           and zero sessions. {meta.bots_removed} confirmed bots and {meta.suspects_removed} suspects
-          were removed from the field distribution.
+          were removed from the field distribution. An additional input/total ratio analysis
+          separates extreme humans (outliers) from replay bots and input dump bots, keeping the
+          Human Center of Mass clean.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The scatter plot shows why bots are detectable: they cluster in the bottom-right —
