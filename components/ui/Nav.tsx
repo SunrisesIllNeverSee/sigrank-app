@@ -18,6 +18,7 @@ const LINKS: { href: string; label: string }[] = [
   { href: "/compare", label: "Compare" },
   { href: "/hall", label: "Hall" },
   { href: "/wiki", label: "Wiki" },
+  { href: "/blog", label: "Blog" },
 ];
 
 /**
