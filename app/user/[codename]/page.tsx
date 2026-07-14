@@ -30,6 +30,7 @@ import {
 } from "@/lib/data";
 import type { HallRecord } from "@/lib/data";
 import { computeFieldAverages } from "@/lib/data/field-average";
+import { isOutlierRow } from "@/lib/data/outlier-classify";
 import { getSessionOperator, getSessionUser } from "@/lib/supabase/auth-server";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
@@ -155,8 +156,10 @@ export default async function OperatorProfilePage({
   // Field averages for the share card: every "average operator" reference on
   // the card (AVG USER column, radar field polygon, op-ratio footer) comes
   // from the live board, so they always agree and move with the field.
+  // (owner 2026-07-14: filtered to Human Center of Mass — outliers/bots excluded.)
   const boardRows = await getLeaderboard();
-  const fieldAvg = computeFieldAverages(boardRows);
+  const humanRows = boardRows.filter((r) => !isOutlierRow(r));
+  const fieldAvg = computeFieldAverages(humanRows);
 
   // Hall of Signal records for this operator — fed to the profile JSON-LD
   // (achievement schema). OperatorRecords fetches the Hall again internally
@@ -170,7 +173,7 @@ export default async function OperatorProfilePage({
 
   // Competitive deltas (SHARED_DESIGN_DECISIONS §3): delta from field average
   // + delta from top operator. Turns the metric into a race, not just a score.
-  const topOperator = boardRows.find(
+  const topOperator = humanRows.find(
     (r) => r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
   );
   const opYield = c && !c.nonCompounding ? c.yield_ : null;
@@ -270,6 +273,8 @@ export default async function OperatorProfilePage({
 
   const name = resolveName(operator);
   const hasDisplayName = name !== operator.codename;
+  // Outlier/bot detection (owner 2026-07-14): red asterisk on profile header.
+  const outlier = !pending && c && !c.nonCompounding ? isOutlierRow(row) : false;
   const hasLinks = Boolean(
     operator.links &&
     (operator.links.github || operator.links.site || operator.links.x),
@@ -598,10 +603,22 @@ export default async function OperatorProfilePage({
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
               {name}
+              {outlier && (
+                <span
+                  title="Outlier or bot — excluded from Human Center of Mass"
+                  className="ml-1 text-red-500"
+                >
+                  *
+                </span>
+              )}
             </h1>
             {pending ? (
               <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
                 Unranked
+              </span>
+            ) : outlier ? (
+              <span className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-red-400">
+                Outlier
               </span>
             ) : (
               <SignalClassBadge signalClass={snapshot.class_tier} />

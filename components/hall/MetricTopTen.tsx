@@ -9,6 +9,7 @@ import {
   DISPLAY_METRICS,
 } from "@/lib/canon/ids";
 import { recordValue } from "@/lib/hall/record-value";
+import { isOutlierRow } from "@/lib/data/outlier-classify";
 import { HallSubmissionRow } from "./HallSubmissionRow";
 
 interface Props {
@@ -73,6 +74,7 @@ export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
                 canonId={canonId}
                 isPlaceholder={!real}
                 href={`/user/${row.operator.codename}`}
+                outlier={isOutlierRow(row)}
               />
             );
           })

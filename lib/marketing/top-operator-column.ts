@@ -1,4 +1,5 @@
 import { getLeaderboard, type LeaderboardRow } from "@/lib/data";
+import { isOutlierRow } from "@/lib/data/outlier-classify";
 
 /**
  * lib/marketing/top-operator-column.ts — the live columns for the Three Degrees chart
@@ -36,19 +37,8 @@ export interface GoldColumn {
   devLinear: string;
 }
 
-/** Hand-picked humans — verified operators that bypass the input/total ratio filter.
- * These are real humans whose input/total falls below 1% but are confirmed not bots/outliers.
- * (owner 2026-07-14: some operators like MOSES have low input ratios but are real humans.) */
-const HUMAN_WHITELIST = new Set([
-  "signal-92b4f9f485", // MOSES — canonical anchor, verified human
-  "transvaultorigin",  // MOSES mock codename (fallback path)
-]);
-
 /** Is this a REAL operator (not a staged seed / The Field / a retired-and-anonymized row)?
- * Also filters bots via the input/total ratio: operators with < 1% or > 80% input/total
- * are categorized as outliers/bots and excluded from the Human Center of Mass computation
- * (owner 2026-07-14: Three Degrees chart based on Human Center of Mass, not bot-contaminated).
- * Hand-picked humans in HUMAN_WHITELIST bypass the ratio filter. */
+ * Also filters outliers/bots via the shared isOutlier classifier (owner 2026-07-14). */
 function isRealOperator(row: LeaderboardRow): boolean {
   const code = row.operator.codename.toLowerCase();
   if (code === "the-field") return false;
@@ -60,27 +50,8 @@ function isRealOperator(row: LeaderboardRow): boolean {
   // Must have a real compounding cascade (a non-compounding/empty row isn't "top operator").
   const c = row.snapshot.cascade;
   if (!c || c.nonCompounding) return false;
-  // Hand-picked humans bypass the ratio filter.
-  if (HUMAN_WHITELIST.has(code)) return true;
-  // Bot/outlier filter: input/total ratio must be between 1% and 80%.
-  // > 80% = input dump bots → outlier.
-  // < 1% = gray zone: keep MOSES-like operators, reject extreme outliers.
-  //   MOSES-like = velocity <= 2x, yield <= 1000, real output (> 1M), real cache write (> 1M).
-  //   Outliers = velocity > 2x, yield > 1000, near-zero output, or near-zero cache write.
-  const t = row.telemetry;
-  const total = t.fresh_input + t.output + t.cache_read + t.cache_create;
-  if (total <= 0) return false;
-  const inputPct = t.fresh_input / total;
-  if (inputPct > 0.8) return false;
-  if (inputPct < 0.01) {
-    const c2 = row.snapshot.cascade;
-    const vel = c2?.velocity ?? 0;
-    const yld = c2?.yield_ ?? 0;
-    const out = t.output;
-    const cw = t.cache_create;
-    if (vel > 2.0 || yld > 1000 || out < 1_000_000 || cw < 1_000_000) return false;
-  }
-  return true;
+  // Outlier/bot filter (shared classifier — same logic as leaderboard + profile + compare).
+  return !isOutlierRow(row);
 }
 
 /** Format a leverage-style "N×" value. */
