@@ -56,6 +56,9 @@ const FOOTER_COLUMNS: {
       { href: "/vs/wakatime", label: "vs WakaTime" },
       { href: "/vs/lmsys-arena", label: "vs LMSYS Arena" },
       { href: "/vs/cursor", label: "vs Cursor" },
+      { href: "/vs/braintrust", label: "vs Braintrust" },
+      { href: "/vs/langchain", label: "vs LangChain" },
+      { href: "/vs/langfuse", label: "vs Langfuse" },
     ],
   },
   {

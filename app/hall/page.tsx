@@ -34,12 +34,12 @@ export const revalidate = 300;
  * CACHING (2026-07-02): the page no longer reads searchParams (which forced
  * dynamic rendering + no-store in Next 15). All 4 windows' base data is
  * pre-fetched on the server (limit 30 for filter headroom); the client wrapper
- * filters by class/platform/window + sorts into 15 boards. This keeps the page
+ * filters by class/platform/window + sorts into 18 boards. This keeps the page
  * static + CDN-cacheable (revalidate=300) while preserving filter functionality.
  */
 export default async function HallPage() {
   // Pre-fetch base rows for all 4 windows (no class/platform filter).
-  // The client wrapper filters by class/platform and sorts into 15 boards.
+  // The client wrapper filters by class/platform and sorts into 18 boards.
   // Limit 30 per window gives headroom for platform/class filtering before
   // slicing to the top 10 per metric.
   const windowsData: Record<

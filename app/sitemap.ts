@@ -57,6 +57,9 @@ const STATIC_ROUTES: {
   { path: "/vs/lmsys-arena", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/cursor", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/copilot", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/braintrust", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/langchain", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/langfuse", priority: 0.7, changeFrequency: "monthly" },
 
   // Alternatives / listicle pages — commercial intent
   {

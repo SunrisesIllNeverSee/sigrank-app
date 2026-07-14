@@ -84,6 +84,9 @@ ranks the humans using AI — not the models themselves.
 - [SigRank vs LMSYS Arena](${SITE_ORIGIN}/vs/lmsys-arena)
 - [SigRank vs Cursor](${SITE_ORIGIN}/vs/cursor)
 - [SigRank vs Copilot](${SITE_ORIGIN}/vs/copilot)
+- [SigRank vs Braintrust](${SITE_ORIGIN}/vs/braintrust)
+- [SigRank vs LangChain](${SITE_ORIGIN}/vs/langchain)
+- [SigRank vs Langfuse](${SITE_ORIGIN}/vs/langfuse)
 - [AI Coding Metrics Tools](${SITE_ORIGIN}/alternatives/ai-coding-metrics): 7 best tools compared
 - [ccusage Alternatives](${SITE_ORIGIN}/alternatives/ccusage-alternatives): 5 best alternatives
 
