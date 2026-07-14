@@ -708,3 +708,127 @@ html[data-landing-motion="paused"] .flip-inner,
 html[data-landing-motion="paused"] .cascade-pulse {
   animation-play-state: paused !important;
 }
+
+/* ── Blog / article prose (owner 2026-07-14) ────────────────────────────────────
+ * Lightweight markdown styling for /blog posts. Uses the theme's CSS vars so it
+ * swaps with data-theme like everything else. Not @tailwindcss/typography — just
+ * enough to make react-markdown output read like an article, not raw HTML.
+ */
+.prose-sigrank {
+  color: rgb(var(--text-secondary));
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.prose-sigrank > * + * {
+  margin-top: 1.25em;
+}
+.prose-sigrank h1,
+.prose-sigrank h2,
+.prose-sigrank h3 {
+  color: rgb(var(--text-primary));
+  font-weight: 700;
+  line-height: 1.3;
+}
+.prose-sigrank h1 {
+  font-size: 1.75rem;
+  margin-top: 2em;
+}
+.prose-sigrank h2 {
+  font-size: 1.4rem;
+  margin-top: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid rgb(var(--border));
+}
+.prose-sigrank h3 {
+  font-size: 1.15rem;
+  margin-top: 1.5em;
+}
+.prose-sigrank p {
+  color: rgb(var(--text-secondary));
+}
+.prose-sigrank a {
+  color: rgb(var(--gold));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-sigrank a:hover {
+  color: rgb(var(--text-primary));
+}
+.prose-sigrank strong {
+  color: rgb(var(--text-primary));
+  font-weight: 700;
+}
+.prose-sigrank code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85em;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  background: rgb(var(--elevated));
+  color: rgb(var(--text-primary));
+}
+.prose-sigrank pre {
+  padding: 1em 1.25em;
+  border-radius: 8px;
+  background: rgb(var(--surface));
+  border: 1px solid rgb(var(--border));
+  overflow-x: auto;
+}
+.prose-sigrank pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.85rem;
+}
+.prose-sigrank blockquote {
+  padding: 0.75em 1.25em;
+  border-left: 3px solid rgb(var(--gold) / 0.5);
+  background: rgb(var(--surface) / 0.5);
+  border-radius: 0 6px 6px 0;
+  color: rgb(var(--text-secondary));
+}
+.prose-sigrank blockquote p {
+  margin: 0;
+}
+.prose-sigrank blockquote strong {
+  color: rgb(var(--text-primary));
+}
+.prose-sigrank ul,
+.prose-sigrank ol {
+  padding-left: 1.5em;
+}
+.prose-sigrank li {
+  margin-top: 0.5em;
+}
+.prose-sigrank img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgb(var(--border));
+}
+.prose-sigrank table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.prose-sigrank th {
+  padding: 0.6em 0.8em;
+  text-align: left;
+  font-weight: 700;
+  color: rgb(var(--text-primary));
+  border-bottom: 2px solid rgb(var(--border));
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.prose-sigrank td {
+  padding: 0.5em 0.8em;
+  border-bottom: 1px solid rgb(var(--border) / 0.5);
+  color: rgb(var(--text-secondary));
+}
+.prose-sigrank tr:hover td {
+  background: rgb(var(--surface) / 0.3);
+}
+.prose-sigrank hr {
+  border: none;
+  border-top: 1px solid rgb(var(--border));
+  margin: 2em 0;
+}
