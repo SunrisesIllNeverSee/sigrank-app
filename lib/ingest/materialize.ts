@@ -323,5 +323,9 @@ export function revalidateTouchedWindows(
   if (win) revalidatePath(`/board/${win.slug}`);
   revalidatePath("/board/off");
   revalidateTag("operator");
-  if (codename) revalidatePath(`/user/${codename}`);
+  revalidateTag("board");
+  if (codename) {
+    revalidatePath(`/user/${codename}`);
+    revalidatePath(`/user/${codename.toLowerCase()}`);
+  }
 }
