@@ -21,6 +21,7 @@ const STATIC_ROUTES: {
   { path: "/board/all", priority: 0.9, changeFrequency: "hourly" },
   { path: "/score", priority: 0.9, changeFrequency: "daily" },
   { path: "/hall", priority: 0.8, changeFrequency: "daily" },
+  { path: "/field", priority: 0.8, changeFrequency: "daily" },
   { path: "/methodology", priority: 0.8, changeFrequency: "daily" },
   { path: "/science", priority: 0.7, changeFrequency: "monthly" },
   { path: "/research", priority: 0.7, changeFrequency: "monthly" },
