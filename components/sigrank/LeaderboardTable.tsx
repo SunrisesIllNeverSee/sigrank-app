@@ -531,7 +531,7 @@ export function LeaderboardTable({
         const tot = e.totalTokens ?? 0;
         if (tot > 0) {
           const inputPct = inp / tot;
-          if (inputPct < 0.001 || inputPct > 0.8) return false;
+          if (inputPct < 0.01 || inputPct > 0.8) return false;
         }
       }
       return true;
