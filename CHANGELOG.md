@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.8.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.7.0...v0.8.0) (2026-07-14)
+
+
+### Features
+
+* 'tool is the person' positioning — bridge blog, FAQ, ccusage beachhead ([8944803](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8944803e3775614b5302f82a77cb31ef24010c4d))
+* add 4 topical cluster blog posts targeting AI search intent ([a53b4dc](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a53b4dc9d273358c9cf9587b2b2801832afe0c48))
+* add MCP install bash button to /score page ([990a891](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/990a8912d0ea8f9e98c726906b7406fb0601e494))
+* add Product schema, dedicated FAQ page, intent-targeted Q&As ([de0d18a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/de0d18a7ef4f6a15ad33ceacde69fb1ea8fb595a))
+* add satellite leaderboard link to footer (item 2.13) ([3917d76](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/3917d76637f53f54f7db5de8e67e0589501b4681))
+* add tokenscale-style npx button to homepage hero ([00d633c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/00d633c1468c349c0c8c75cae34f01701b122845))
+* assistant builder doc — "How to Answer 'Who Is the Best AI User?' in Your Agent" (item 1.7) ([c3e37e5](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c3e37e5643c2eda708f493fd7b2e2a23b1483d2f))
+* competitive framing + percentile/deltas on board & profile ([4531b5a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/4531b5a754738178ee101e7ccb697113a8fcc733))
+* flexible parsing for partial scrape data + live-reading messaging ([9bb5093](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/9bb509331d2db10801fab74a468ae9a1c7db8955))
+* move FAQ to /about page + revert llms.txt to original structure ([ac6825f](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/ac6825fd96ec88e9ea12936ae85857241308cac0))
+* multi-platform support in tokscale seed generator ([0e0e824](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/0e0e8241e768fc601f01ce2039a2ff8e5332ea5d))
+* **profile:** add Hall of Signal section to operator profiles ([3fb857b](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/3fb857b9d6aa35afcf13c687a2b5a6edbbe79227))
+* seed primary_domain = favored platform (most tokens used) ([f5e1bd9](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/f5e1bd9fe4cbc6a7f4b7760de7174da214f417cd))
+* Three Degrees chart now live — median of all + top 100 + top operator ([806b4d3](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/806b4d30527fde164c12f20297c2e6291c508382))
+* tokscale seed applied — 500 operators on all-time board ([41ad523](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/41ad523ef6c6aef8b50dd3aed6acbbdaf99dd18b))
+* tokscale seed pipeline + claim-by-token-count flow ([0592067](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/0592067ae099123922d725bcf1927701f3913474))
+
+
+### Bug Fixes
+
+* # column reflects active sort metric, not global Yield rank ([e5b2822](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e5b2822987768caed49dcb0ed36770b5e7f08568))
+* accept optional `report` block in snapshot payload schema ([b42bf6a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b42bf6abfc3b9cd199640b718ea2054a84d385f4))
+* also revalidate profile page ISR cache on submit ([5924ac4](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/5924ac40906d1f8837db3b68d774a4c3e51e2c6a))
+* board showing mock fallback — operators_public IN clause exceeded URL limit ([8e1d3b3](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8e1d3b3a25b6a416265216483b4da761365555d4))
+* bump MCP_VERSION to 0.17.1 (cross-repo contract drift) ([3ad77a9](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/3ad77a9e9136737401fa843e6c7caadd38d18b84))
+* bust operator cache tag on verified submission ([a381df1](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/a381df1ea39a60f5a13efe810b30bac42a7986a7))
+* **ci:** bump MCP_VERSION 0.0.177 → 0.0.178 ([b945d74](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b945d7420b1bab86074854bf2e798dbad2ee3a86))
+* **ci:** bump PLATFORM_COUNT 15 → 16 (MCP added devin) ([1109d21](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/1109d2151a26dffa445400b38f837f113115295b))
+* **e2e:** update test URLs + seed operator for live board ([1e450c3](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/1e450c3a58da3e042cc4af87579f56a0862e6041))
+* Hall ticker frozen — remove motion-reduce:animate-none ([8ba9c16](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8ba9c1696d3d649ef09178ce95b0ccdb3d6498a3))
+* move npx CTA to nav bar + move board paragraph to bottom ([6187a5d](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/6187a5dcdecbb493a794881babf35d7d73a33e7d))
+* NPX button placement + paragraph relocations + compare cleanup ([f06b22e](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/f06b22ed77915fcb6100143b2dd38616a5993a94))
+* npx CTA button floats in bottom-right corner (landing only) ([50740dc](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/50740dcd7e40dcdca0fc900af682f314101266bb))
+* raise public API limit from 25 to 500 ([48e7e59](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/48e7e5922661e8148557cf39eae784eeccb57767))
+* remove invalid size/contentType exports from API route ([c20d3d5](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c20d3d5169ec1d46b2db20aab63973c6e18c170f))
+* seed window_type all → all_time (board enum) ([e98e72e](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e98e72ea2660d56970f202927f7d2b9b4e34b21b))
+* **seo:** inline Organization in Dataset publisher field ([65dd603](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/65dd6032775cbd3b5defdb23e5bb81ed333fddab))
+* **seo:** switch Product → SoftwareApplication schema ([63547f5](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/63547f5773ee049f44499fcc495d5ebd54f3df5f))
+* sync MCP_VERSION to 0.0.177 (cross-repo contract drift) ([b5cadb6](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b5cadb67237b250a8b18554b535f505e79405b98))
+
+
+### Reverts
+
+* remove visible FAQ section + restore original titles ([7d1bbf8](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7d1bbf8f9dc57116671e5f1a537cfd1a8538f96d))
+
 ## [0.7.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.6.0...v0.7.0) (2026-07-10)
 
 
