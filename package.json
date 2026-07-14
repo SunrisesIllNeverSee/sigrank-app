@@ -28,7 +28,7 @@
     "clackboard": "^1.1.2",
     "html-to-image": "^1.11.13",
     "next": "^15.5.19",
-    "posthog-js": "^1.397.0",
+    "posthog-js": "^1.399.5",
     "posthog-node": "^5.41.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
