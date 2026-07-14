@@ -12,6 +12,7 @@
  */
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import type { HallRecord } from "@/lib/data";
 
 const ORG_ID = `${SITE_ORIGIN}/#org`;
 const SITE_ID = `${SITE_ORIGIN}/#website`;
@@ -128,6 +129,7 @@ export function operatorProfile(o: {
   classTier?: string;
   globalRank?: number;
   pending?: boolean;
+  records?: HallRecord[];
 }) {
   return {
     "@context": "https://schema.org",
@@ -139,6 +141,15 @@ export function operatorProfile(o: {
       ...(o.classTier ? { jobTitle: o.classTier } : {}),
       ...(o.globalRank && !o.pending
         ? { description: `Rank #${o.globalRank} on the SigRank leaderboard` }
+        : {}),
+      ...(o.records && o.records.length > 0
+        ? {
+            achievement: o.records.map((r) => ({
+              "@type": "Thing",
+              name: r.title,
+              description: `${r.value} — achieved ${r.date}`,
+            })),
+          }
         : {}),
     },
   };
