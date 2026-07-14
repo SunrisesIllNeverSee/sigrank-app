@@ -544,6 +544,66 @@ export function LeaderboardTable({
     return [...filtered].sort(cmp);
   }, [filtered, sort, dir]);
 
+  // Dual-rank # column (owner 2026-07-14): show the current sort rank AND the
+  // "other" board's default rank so a reader sees both positions at once.
+  // Metrics board: primary = current sort rank, secondary = volume rank (by
+  // totalTokens). Raw board: primary = current sort rank, secondary = yield
+  // rank (by Υ). Both computed over the filtered set so they track the active
+  // class/platform/category filters.
+  const yieldRankMap = useMemo(() => {
+    const order = [...filtered].sort(
+      (a, b) => (b.yield_ ?? -Infinity) - (a.yield_ ?? -Infinity),
+    );
+    const m = new Map<LeaderboardEntry, number>();
+    order.forEach((e, i) => m.set(e, i + 1));
+    return m;
+  }, [filtered]);
+
+  const volumeRankMap = useMemo(() => {
+    const order = [...filtered].sort(
+      (a, b) => (b.totalTokens ?? -Infinity) - (a.totalTokens ?? -Infinity),
+    );
+    const m = new Map<LeaderboardEntry, number>();
+    order.forEach((e, i) => m.set(e, i + 1));
+    return m;
+  }, [filtered]);
+
+  // Short label for the current sort key, used in the # header so the reader
+  // knows which metric the primary rank reflects. Y/V on metrics, V/Y on raw.
+  const sortLabel = (k: SortKey): string => {
+    switch (k) {
+      case "yield":
+        return "Y";
+      case "snr":
+        return "S";
+      case "velocity":
+        return "VEL";
+      case "leverage":
+        return "L";
+      case "dev10x":
+        return "D";
+      case "efficiency":
+        return "E";
+      case "costPerMillion":
+        return "$";
+      case "totalTokens":
+      case "rawTotal":
+        return "V";
+      case "input":
+        return "IN";
+      case "output":
+        return "OUT";
+      case "cacheWrite":
+        return "CW";
+      case "cacheRead":
+        return "CR";
+      case "totalCost":
+        return "$";
+      default:
+        return "#";
+    }
+  };
+
   // Pagination — 25 rows/page (owner 2026-06-24). Page resets to 0 on any sort/filter
   // change so you never land on an out-of-range page. `rows` is the current page slice;
   // the # column shows the position within the active sort (renumbers on sort change).
@@ -718,6 +778,8 @@ export function LeaderboardTable({
           {rows.map((e, i) => {
             const sp = speciesOf(e.signalClass);
             const displayRank = safePage * PER_PAGE + i + 1;
+            const otherRank =
+              view === "raw" ? yieldRankMap.get(e) : volumeRankMap.get(e);
             const yld =
               e.yield_ == null
                 ? "—"
@@ -746,9 +808,24 @@ export function LeaderboardTable({
                       fontWeight: rankWeight(displayRank),
                       fontSize: 12,
                       fontVariantNumeric: "tabular-nums",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      lineHeight: 1.1,
                     }}
                   >
                     {displayRank}
+                    {otherRank != null && (
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 400,
+                          color: T.mut,
+                        }}
+                      >
+                        /{otherRank}
+                      </span>
+                    )}
                   </span>
                   <OperatorAvatar alt={e.anonId} size={26} />
                   <span
@@ -861,7 +938,7 @@ export function LeaderboardTable({
                       width: 30,
                     }}
                   >
-                    #
+                    {sortLabel(sort)}/V
                   </th>
                   <th style={{ ...st.col, ...st.colL, ...st.stickyOpHead }}>
                     OPERATOR
@@ -1102,6 +1179,7 @@ export function LeaderboardTable({
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
                   const displayRank = safePage * PER_PAGE + i + 1;
+                  const volRank = volumeRankMap.get(e);
                   return (
                     <tr key={`${e.anonId}-${i}`}>
                       <td
@@ -1114,6 +1192,19 @@ export function LeaderboardTable({
                         }}
                       >
                         {displayRank}
+                        {volRank != null && (
+                          <span
+                            style={{
+                              display: "block",
+                              fontSize: 9,
+                              fontWeight: 400,
+                              color: T.mut,
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            /{volRank}
+                          </span>
+                        )}
                         {e.percentile != null && e.percentile > 0 && (
                           <span
                             style={{
@@ -1304,7 +1395,7 @@ export function LeaderboardTable({
                       width: 30,
                     }}
                   >
-                    #
+                    {sortLabel(sort)}/Y
                   </th>
                   <th style={{ ...st.col, ...st.colL, ...st.stickyOpHead }}>
                     OPERATOR
@@ -1389,6 +1480,8 @@ export function LeaderboardTable({
               <tbody>
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
+                  const displayRank = safePage * PER_PAGE + i + 1;
+                  const yRank = yieldRankMap.get(e);
                   return (
                     <tr key={`raw-${e.anonId}-${i}`}>
                       <td
@@ -1396,11 +1489,24 @@ export function LeaderboardTable({
                           ...st.td,
                           ...st.tdR,
                           ...st.stickyRank,
-                          color: rankColor(e.rank),
-                          fontWeight: rankWeight(e.rank),
+                          color: rankColor(displayRank),
+                          fontWeight: rankWeight(displayRank),
                         }}
                       >
-                        {e.rank}
+                        {displayRank}
+                        {yRank != null && (
+                          <span
+                            style={{
+                              display: "block",
+                              fontSize: 9,
+                              fontWeight: 400,
+                              color: T.mut,
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            /{yRank}
+                          </span>
+                        )}
                         {e.percentile != null && e.percentile > 0 && (
                           <span
                             style={{
@@ -1558,8 +1664,8 @@ export function LeaderboardTable({
         ) : null}
         <div style={st.note}>
           {view === "metrics"
-            ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column reflects the current sort — switching metrics renumbers rows to match."
-            : "Raw pillars — the four integers the engine derives every metric from. Click a header to sort; the last column is total cost ($). Top-3 per column boxed."}
+            ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column shows the current sort rank over the volume rank (Y/V) — switching metrics renumbers rows to match."
+            : "Raw pillars — the four integers the engine derives every metric from. Click a header to sort; the last column is total cost ($). Top-3 per column boxed. The # column shows the current sort rank over the yield rank (V/Y)."}
           {totalUsers != null
             ? ` · 25 per page · ${sorted.length} of ${totalUsers} operators.`
             : null}

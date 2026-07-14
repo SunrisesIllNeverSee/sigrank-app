@@ -75,7 +75,7 @@ export function MotionPause() {
       aria-pressed={paused}
       aria-label={label}
       title={label}
-      className="fixed bottom-5 right-5 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-surface/90 text-text-secondary shadow-card backdrop-blur transition-colors hover:border-gold/50 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
+      className="fixed bottom-5 left-5 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-surface/90 text-text-secondary shadow-card backdrop-blur transition-colors hover:border-gold/50 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
     >
       {/* ⏸ when running (click to pause) · ▶ when paused (click to play) */}
       <span aria-hidden className="font-mono text-sm leading-none">
