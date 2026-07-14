@@ -135,16 +135,6 @@ export default async function BlogPost({
       <div className="prose-sigrank">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
-
-      {/* Footer */}
-      <footer className="mt-12 border-t border-bg-border pt-6">
-        <a
-          href="/board/all"
-          className="text-gold underline hover:text-text-primary"
-        >
-          ← Back to the leaderboard
-        </a>
-      </footer>
     </article>
   );
 }
