@@ -43,7 +43,7 @@ export default function FieldStatCards({ medians }: FieldStatCardsProps) {
       symbol: "SNR",
       label: "Median Signal-to-Noise",
       value: `${(medians.snr * 100).toFixed(2)}%`,
-      description: "Output fraction of total token spend",
+      description: "Output fraction of input + output",
       color: "#10b981",
     },
     {
