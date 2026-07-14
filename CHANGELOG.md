@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.9.0...v0.10.0) (2026-07-14)
+
+
+### Features
+
+* Op Ratio multi-sort + 3 hall boards + 3 vs pages + remove you-vs-field ([b4eb31b](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/b4eb31bdc3cc2b9114c4c3177622b261c5a3cef5))
+
 ## [0.9.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.8.0...v0.9.0) (2026-07-14)
 
 
