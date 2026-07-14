@@ -379,6 +379,11 @@ export function LeaderboardTable({
   // the prop (the URL's value); changing it pushes a new URL rather than filtering in JS.
   const [platform, setPlatform] = useState<PlatformUI>(platformProp);
   const [classFilter, setClassFilter] = useState<string>("all");
+  // Category filter (owner 2026-07-14): default = "human" (Human Center of Mass only).
+  // "outliers" adds extreme-cache operators (input/total < 0.1% with real output).
+  // "bots" adds input-dump bots (input/total > 80%) and cache replay bots.
+  // "all" shows everything unfiltered.
+  const [categoryFilter, setCategoryFilter] = useState<string>("human");
   const [page, setPage] = useState(0); // 0-based; 25 rows/page (owner 2026-06-24)
   // OP RATIO dropdown (multi-sort): the column header opens a menu of 6 sort
   // options instead of the simple click-to-sort every other column uses.
@@ -509,19 +514,35 @@ export function LeaderboardTable({
     router.push(buildBoardUrl(win, platform, next));
   };
 
-  // Shared filter — class tier (always client-side) + platform. The platform filter is
-  // applied IN JS only on the "off" board (which ships every row); on windowed boards the
-  // server already returned the selected platform's rows (URL-driven), so re-filtering in
-  // JS would wrongly hide the operator-total 'multi' roll-up rows.
+  // Shared filter — class tier (always client-side) + platform + category. The platform
+  // filter is applied IN JS only on the "off" board (which ships every row); on windowed
+  // boards the server already returned the selected platform's rows (URL-driven), so
+  // re-filtering in JS would wrongly hide the operator-total 'multi' roll-up rows.
+  // Category filter (owner 2026-07-14): defaults to "human" (Human Center of Mass) —
+  // excludes outliers (input/total < 0.1%) and bots (input/total > 80%).
   const filtered = useMemo(() => {
     const domain = PLATFORM_DOMAIN_MAP[platform]; // null = All
     return entries.filter((e) => {
       if (isOff && domain && (e.platform ?? "other") !== domain) return false;
       if (classFilter !== "all" && e.signalClass.toLowerCase() !== classFilter)
         return false;
+      // Category filter: Human Center of Mass / + Outliers / + Bots / All
+      if (categoryFilter !== "all") {
+        const inp = e.input ?? 0;
+        const tot = e.totalTokens ?? 0;
+        if (tot > 0) {
+          const inputPct = inp / tot;
+          const isOutlier = inputPct < 0.001; // < 0.1% input
+          const isBot = inputPct > 0.8; // > 80% input
+          if (categoryFilter === "human" && (isOutlier || isBot)) return false;
+          if (categoryFilter === "outliers" && isBot) return false;
+          // "outliers" includes humans + outliers, excludes bots
+          // "bots" includes everyone (humans + outliers + bots)
+        }
+      }
       return true;
     });
-  }, [entries, platform, classFilter, isOff]);
+  }, [entries, platform, classFilter, categoryFilter, isOff]);
 
   // One sort pipeline for both views (raw default = rawTotal). Nulls fall to the bottom.
   const sorted = useMemo(() => {
@@ -540,7 +561,7 @@ export function LeaderboardTable({
   const pageCount = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
   React.useEffect(() => {
     setPage(0);
-  }, [sort, dir, platform, classFilter, view]);
+  }, [sort, dir, platform, classFilter, categoryFilter, view]);
   const safePage = Math.min(page, pageCount - 1);
   const rows = useMemo(
     () => sorted.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE),
@@ -608,6 +629,53 @@ export function LeaderboardTable({
                 label: c.label,
               }))}
             />
+            {/* Category filter (owner 2026-07-14): Human Center of Mass by default.
+                Toggle buttons to add outliers and bots. */}
+            <div style={st.fieldCol}>
+              <span style={st.flab}>Category</span>
+              <div style={st.toggleRow}>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter("human")}
+                  style={{
+                    ...st.modeBtn,
+                    ...(categoryFilter === "human" ? st.modeOn : null),
+                  }}
+                >
+                  Human
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter("outliers")}
+                  style={{
+                    ...st.modeBtn,
+                    ...(categoryFilter === "outliers" ? st.modeOn : null),
+                  }}
+                >
+                  + Outliers
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter("bots")}
+                  style={{
+                    ...st.modeBtn,
+                    ...(categoryFilter === "bots" ? st.modeOn : null),
+                  }}
+                >
+                  + Bots
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter("all")}
+                  style={{
+                    ...st.modeBtn,
+                    ...(categoryFilter === "all" ? st.modeOn : null),
+                  }}
+                >
+                  All
+                </button>
+              </div>
+            </div>
             {/* Platform: URL-driven on windowed boards (server returns that platform's rows),
                 client-side on the "off" board. (BOARD redesign 2026-06-27.) */}
             <Field
