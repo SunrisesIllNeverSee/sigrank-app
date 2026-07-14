@@ -21,6 +21,7 @@ const ACTIVE_PREFIX: Record<string, string[]> = {
   "/compare": ["/compare"],
   "/hall": ["/hall"],
   "/wiki": ["/wiki"],
+  "/blog": ["/blog"],
 };
 
 function isActive(pathname: string, href: string): boolean {
