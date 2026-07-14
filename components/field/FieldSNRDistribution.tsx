@@ -85,7 +85,7 @@ export default function FieldSNRDistribution({
     >
       {/* Title */}
       <text x={padL} y={24} fontSize={13} fill={SEEK} fontWeight={700}>
-        SNR DISTRIBUTION — 1,611 HUMAN OPERATORS
+        SNR DISTRIBUTION — {operators.length} HUMAN OPERATORS
       </text>
       <text
         x={width - padR}
@@ -229,7 +229,7 @@ export default function FieldSNRDistribution({
         fill={INK}
         textAnchor="middle"
       >
-        Signal-to-Noise Ratio (output / total_tokens)
+        Signal-to-Noise Ratio (output / (input + output))
       </text>
     </svg>
   );
