@@ -40,6 +40,7 @@ import {
 } from "@/components/share/CompareShareCard";
 import { CompareMatchupCard } from "@/components/share/CompareMatchupCard";
 import { operatorDisplayName } from "@/lib/compare/operator-name";
+import { isOutlierRow } from "@/lib/data/outlier-classify";
 
 export const metadata: Metadata = withOG({
   title: "Compare Operators",
@@ -117,8 +118,10 @@ export default async function ComparePage({
   }
   // Full operator corpus for the opponent pickers (owner 2026-06-22: "do the static
   // seed all") — every seed operator, not just the top 12. board[] (yield-ranked) still
-  // supplies the defaults.
+  // supplies the defaults. (owner 2026-07-14: outliers/bots filtered from the default
+  // A pool + field median, but remain selectable in the dropdown.)
   const board = await getLeaderboard({ limit: 500 });
+  const humanBoard = board.filter((r) => !isOutlierRow(r));
 
   // Default opponent B is "The Field" — the median-Υ baseline operator (owner
   // 2026-06-27, migration 0024) — so the page opens as "you vs. the field median".
@@ -134,7 +137,7 @@ export default async function ComparePage({
   const session = await getSessionOperator();
   if (session?.codename) defaultA = await getOperator(session.codename);
   if (!defaultA) {
-    const pool = board.filter((r) => r.operator.codename !== "the-field");
+    const pool = humanBoard.filter((r) => r.operator.codename !== "the-field");
     if (pool.length > 0) {
       const daySeed = Math.floor(
         Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`) /
@@ -174,9 +177,10 @@ export default async function ComparePage({
         ])
       : [[], []];
 
-  // Field average Υ Yield — mean of all ranked, compounding operators on
-  // the board. Drawn as a horizontal reference line on the overtime chart.
-  const fieldYields = board
+  // Field average Υ Yield — mean of all ranked, compounding HUMAN operators
+  // (outliers/bots excluded, owner 2026-07-14). Drawn as a horizontal reference
+  // line on the overtime chart.
+  const fieldYields = humanBoard
     .filter(
       (r) =>
         !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,

@@ -27,6 +27,8 @@ interface Props {
   isPlaceholder?: boolean;
   /** Optional href to the operator profile. */
   href?: string;
+  /** When true, the operator is an outlier/bot — red asterisk next to name (owner 2026-07-14). */
+  outlier?: boolean;
 }
 
 /**
@@ -45,6 +47,7 @@ export function HallSubmissionRow({
   value,
   isPlaceholder = true,
   href,
+  outlier = false,
 }: Props) {
   // Rank cell: 1–3 get a tinted trophy (gold/silver/bronze), 4–10 the bare
   // number in trophy-purple, >10 the muted number. Trophies are visually distinct
@@ -86,6 +89,14 @@ export function HallSubmissionRow({
       style={{ fontStyle: claimed ? "normal" : "italic" }}
     >
       {displayLabel}
+      {outlier && (
+        <span
+          title="Outlier or bot — excluded from Human Center of Mass"
+          className="ml-1 text-red-500"
+        >
+          *
+        </span>
+      )}
     </Link>
   ) : (
     <span
@@ -93,6 +104,14 @@ export function HallSubmissionRow({
       style={{ fontStyle: claimed ? "normal" : "italic" }}
     >
       {displayLabel}
+      {outlier && (
+        <span
+          title="Outlier or bot — excluded from Human Center of Mass"
+          className="ml-1 text-red-500"
+        >
+          *
+        </span>
+      )}
     </span>
   );
 
