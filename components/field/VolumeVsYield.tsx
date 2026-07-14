@@ -117,7 +117,7 @@ export default function VolumeVsYield({
         fill={MUT}
         textAnchor="end"
       >
-        1,611 operators · log-log · near-zero correlation
+        {operators.length} operators · log-log · near-zero correlation
       </text>
 
       {/* Grid + axis labels X */}
