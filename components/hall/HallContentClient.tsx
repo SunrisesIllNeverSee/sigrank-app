@@ -24,6 +24,7 @@ import {
   type PlatformUI,
 } from "@/lib/constants";
 import { boardWindowBySlug } from "@/lib/data/windows";
+import { isOutlierRow } from "@/lib/data/outlier-classify";
 import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/canon/ids";
 import { recordValue } from "@/lib/hall/record-value";
 import { HallHeader } from "@/components/hall/HallHeader";
@@ -118,6 +119,7 @@ export function HallContentClient({ windowsData }: Props) {
       holder: top.operator.display_name || top.operator.codename,
       value: v,
       href: `/user/${top.operator.codename}`,
+      outlier: isOutlierRow(top),
     };
   }).filter((x): x is NonNullable<typeof x> => x !== null);
 

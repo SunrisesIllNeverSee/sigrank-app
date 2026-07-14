@@ -30,6 +30,7 @@ import {
 import { OperatorAvatar } from "./OperatorAvatar";
 import { PlatformIcon } from "./PlatformIcon";
 import { track } from "@/lib/posthog/events";
+import { isOutlierEntry } from "@/lib/data/outlier-classify";
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
 // SPECIES colors stay literal (semantic identity for the class glyph, theme-invariant).
@@ -527,30 +528,7 @@ export function LeaderboardTable({
         return false;
       // Category filter: Human Center of Mass / + Outliers & Bots / All
       if (categoryFilter === "human") {
-        // Hand-picked humans bypass the ratio filter (owner 2026-07-14).
-        const code = e.codename.toLowerCase();
-        const isWhitelisted =
-          code === "signal-92b4f9f485" || // MOSES
-          code === "transvaultorigin"; // MOSES mock codename
-        if (!isWhitelisted) {
-          const inp = e.input ?? 0;
-          const tot = e.totalTokens ?? 0;
-          if (tot > 0) {
-            const inputPct = inp / tot;
-            if (inputPct > 0.8) return false; // input dump bots
-            if (inputPct < 0.01) {
-              // Gray zone (input < 1%): keep MOSES-like operators, reject extreme outliers.
-              // MOSES-like = velocity <= 2x, yield <= 1000, real output (> 1M), real cache write (> 1M).
-              // Outliers = velocity > 2x, yield > 1000, near-zero output, or near-zero cache write.
-              const vel = e.velocity ?? 0;
-              const yld = e.yield_ ?? 0;
-              const out = e.output ?? 0;
-              const cw = e.cacheWrite ?? 0;
-              if (vel > 2.0 || yld > 1000 || out < 1_000_000 || cw < 1_000_000)
-                return false;
-            }
-          }
-        }
+        if (isOutlierEntry(e)) return false;
       }
       return true;
     });
