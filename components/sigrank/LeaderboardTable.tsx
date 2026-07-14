@@ -225,7 +225,12 @@ type SortKey =
   | "dev10x"
   | "totalTokens"
   | "costPerMillion"
-  | "opRatio"
+  | "opRatioBest"
+  | "opRatioWorst"
+  | "opRatioCacheHigh"
+  | "opRatioCacheLow"
+  | "opRatioOutputHigh"
+  | "opRatioOutputLow"
   | "efficiency"
   | "input"
   | "output"
@@ -259,8 +264,14 @@ const sortVal = (e: LeaderboardEntry, k: SortKey): number => {
     case "efficiency":
       return e.efficiency ?? -Infinity;
     // Op Ratio = leverage:1:velocity → rank by the lead term (leverage).
-    case "opRatio":
+    case "opRatioBest":
+    case "opRatioWorst":
+    case "opRatioCacheHigh":
+    case "opRatioCacheLow":
       return e.leverage ?? -Infinity;
+    case "opRatioOutputHigh":
+    case "opRatioOutputLow":
+      return e.velocity ?? -Infinity;
     case "input":
       return e.input ?? -Infinity;
     case "output":
@@ -369,6 +380,9 @@ export function LeaderboardTable({
   const [platform, setPlatform] = useState<PlatformUI>(platformProp);
   const [classFilter, setClassFilter] = useState<string>("all");
   const [page, setPage] = useState(0); // 0-based; 25 rows/page (owner 2026-06-24)
+  // OP RATIO dropdown (multi-sort): the column header opens a menu of 6 sort
+  // options instead of the simple click-to-sort every other column uses.
+  const [opRatioOpen, setOpRatioOpen] = useState(false);
 
   // board_viewed funnel event (no-ops without the PostHog key). Fires on mount and
   // when the window/platform/breakdown changes; URL-driven boards remount so it stays fresh.
@@ -406,6 +420,33 @@ export function LeaderboardTable({
     ) : null;
 
   const isActive = (col: SortKey) => sort === col;
+
+  // OP RATIO multi-sort: any of the 6 op-ratio sort keys counts as "active" for
+  // the column header highlight. The dropdown drives sort/dir directly (no toggle).
+  const OP_RATIO_KEYS: SortKey[] = [
+    "opRatioBest",
+    "opRatioWorst",
+    "opRatioCacheHigh",
+    "opRatioCacheLow",
+    "opRatioOutputHigh",
+    "opRatioOutputLow",
+  ];
+  const isOpRatioActive = () => OP_RATIO_KEYS.includes(sort);
+
+  // Close the OP RATIO dropdown on click-outside (no portal — simple backdrop).
+  React.useEffect(() => {
+    if (!opRatioOpen) return;
+    const onDocClick = () => setOpRatioOpen(false);
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [opRatioOpen]);
+
+  // Selecting an op-ratio option sets both sort + dir, then closes the menu.
+  const onOpRatioSelect = (key: SortKey, nextDir: SortDir) => {
+    setSort(key);
+    setDir(nextDir);
+    setOpRatioOpen(false);
+  };
 
   // Click a header → sort by it; click the active column → flip direction. Default
   // direction is the metric's "best-first" ($/1M asc, all else desc). The # column
@@ -851,17 +892,133 @@ export function LeaderboardTable({
                     <span style={st.ic}>✧</span>10xDEV{caret("dev10x")}
                   </th>
                   <th
-                    onClick={() => onSortColumn("opRatio")}
                     style={{
                       ...st.col,
                       ...st.colR,
                       ...st.gdiv,
                       ...st.colSort,
-                      ...(isActive("opRatio") ? st.colActive : null),
+                      ...(isOpRatioActive() ? st.colActive : null),
+                      position: "relative" as const,
                     }}
-                    title="Sort by Op Ratio (lead term: leverage)"
+                    title="Sort by Op Ratio (c:i:o)"
                   >
-                    <span style={st.ic}>⋮</span>OP RATIO{caret("opRatio")}
+                    <span
+                      style={{
+                        ...st.ic,
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                      }}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        setOpRatioOpen((o) => !o);
+                      }}
+                    >
+                      <span style={st.ic}>⋮</span>
+                      OP RATIO
+                      {isOpRatioActive() ? (
+                        <span
+                          style={{
+                            marginLeft: 4,
+                            color: T.gold,
+                            fontSize: 9,
+                          }}
+                        >
+                          ●
+                        </span>
+                      ) : null}
+                      <span style={{ marginLeft: 3 }}>▾</span>
+                    </span>
+                    {opRatioOpen ? (
+                      <div
+                        onClick={(ev) => ev.stopPropagation()}
+                        style={{
+                          position: "absolute" as const,
+                          top: "100%",
+                          right: 0,
+                          zIndex: 20,
+                          marginTop: 4,
+                          minWidth: 220,
+                          background: "rgb(var(--bg-elevated))",
+                          border: `1px solid ${T.line}`,
+                          borderRadius: 8,
+                          boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
+                          padding: 4,
+                          textAlign: "left",
+                          textTransform: "none",
+                          letterSpacing: 0,
+                          fontSize: 12,
+                          color: T.ink,
+                          fontWeight: 400,
+                        }}
+                      >
+                        {(
+                          [
+                            {
+                              key: "opRatioBest",
+                              dir: "desc" as SortDir,
+                              label: "Best ratio overall",
+                            },
+                            {
+                              key: "opRatioWorst",
+                              dir: "asc" as SortDir,
+                              label: "Worst ratio overall",
+                            },
+                            {
+                              key: "opRatioCacheHigh",
+                              dir: "desc" as SortDir,
+                              label: "↑Cache c:i:o — highest cache",
+                            },
+                            {
+                              key: "opRatioCacheLow",
+                              dir: "asc" as SortDir,
+                              label: "↓Cache c:i:o — lowest cache",
+                            },
+                            {
+                              key: "opRatioOutputHigh",
+                              dir: "desc" as SortDir,
+                              label: "c:i:o ↑Output — highest output",
+                            },
+                            {
+                              key: "opRatioOutputLow",
+                              dir: "asc" as SortDir,
+                              label: "c:i:o ↓Output — lowest output",
+                            },
+                          ] as const
+                        ).map((opt) => {
+                          const activeOpt =
+                            sort === opt.key && dir === opt.dir;
+                          return (
+                            <button
+                              key={opt.key}
+                              type="button"
+                              onClick={() =>
+                                onOpRatioSelect(opt.key, opt.dir)
+                              }
+                              style={{
+                                display: "block",
+                                width: "100%",
+                                background: activeOpt
+                                  ? "rgb(var(--gold) / 0.16)"
+                                  : "transparent",
+                                border: "none",
+                                color: activeOpt ? T.gold : T.ink,
+                                padding: "7px 10px",
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: activeOpt ? 700 : 400,
+                                cursor: "pointer",
+                                fontFamily: "inherit",
+                                textAlign: "left",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {opt.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </th>
                   <th
                     onClick={() => onSortColumn("efficiency")}

@@ -35,6 +35,14 @@ export function sortValue(row: LeaderboardRow, key: string): number {
       // Op Ratio = leverage:1:velocity → its magnitude is the lead term (leverage).
       // Sort on leverage so the ratio ranks honestly; non-compounding sort last.
       return c && !c.nonCompounding ? c.leverage : -1;
+    case "opBest":
+    case "opCache":
+      // Best overall / best cache op ratio — both rank on the leverage (cache) term.
+      // Non-compounding operators sort last.
+      return c && !c.nonCompounding ? c.leverage : -1;
+    case "opOutput":
+      // Best output op ratio — ranks on the velocity (output) term.
+      return c ? c.velocity : -1;
     case "snr":
       return c ? c.snr : s.compression_ratio;
     case "dev10x":
