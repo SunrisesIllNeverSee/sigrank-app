@@ -66,6 +66,10 @@ const FOOTER_COLUMNS: {
         label: "AI User Leaderboard →",
       },
       {
+        href: "/field",
+        label: "Field Analysis",
+      },
+      {
         href: "/alternatives/ai-coding-metrics",
         label: "AI Coding Metrics Tools",
       },
