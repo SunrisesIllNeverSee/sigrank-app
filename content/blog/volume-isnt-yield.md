@@ -5,6 +5,7 @@ description: SigRank, a measurement layer for how humans operate AI coding agent
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
 author: Deric (@SunrisesIllNeverSee)
+hero: /article-charts/03-volume-vs-yield.png
 ---
 
 # Volume Isn't Yield: The Shape of AI Operators
@@ -165,8 +166,6 @@ C : I : O = 19 : 1 : 0.09
 
 ![7 Emergent Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
-![Distribution of Archetypes Across the Field](/article-charts/05-archetype-distribution.png)
-
 ### The Field (n=963, 59.8%)
 [32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
 
@@ -175,6 +174,8 @@ C : I : O = 19 : 1 : 0.09
 
 ### Cache Architects (n=137, 8.5%)
 [34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 358x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 97.0% cache read, yield 84).
+
+![Distribution of Archetypes Across the Field](/article-charts/05-archetype-distribution.png)
 
 ### Input-Heavy Operators (n=102, 6.3%)
 [35] 43% of their tokens are input. Only 54% cache read. Yield 0.02, effectively zero. These operators are dumping tokens in without building cache. They're the opposite of Cache Architects. Whether they're beginners, using tools that don't support caching, or just inefficient, their cascade isn't compounding. Examples: `wuwangzhang1216` (487B tokens, 33.7% input, 60.9% cache read), `jake8655`, `gaorf30153`, `Gioxaa` (18.5B tokens, 27% input, 72% cache read, yield 0.003), `bnmbanhmi` (2.56B tokens, 56% input, 44% cache read, yield 0).
