@@ -17,7 +17,7 @@ import { createPortal } from "react-dom";
  * plus any custom strings the user typed under Other.
  */
 
-// The 15 known platforms (popular first, then the rest). Mirrors the MCP adapter
+// The 16 known platforms (popular first, then the rest). Mirrors the MCP adapter
 // registry; keep in sync with sigrank-mcp `ALL_PLATFORMS` when adapters are added.
 const KNOWN_PLATFORMS: { domain: string; label: string }[] = [
   { domain: "claude", label: "Claude" },
@@ -35,6 +35,7 @@ const KNOWN_PLATFORMS: { domain: string; label: string }[] = [
   { domain: "codebuff", label: "Codebuff" },
   { domain: "kilo", label: "Kilo" },
   { domain: "hermes", label: "Hermes" },
+  { domain: "devin", label: "Devin" },
 ];
 const KNOWN_SET = new Set(KNOWN_PLATFORMS.map((p) => p.domain));
 const labelFor = (domain: string): string =>
@@ -151,7 +152,7 @@ export function PlatformPicker({
                 these. Pick all that apply.
               </p>
 
-              {/* The 15 known platforms as checkboxes. */}
+              {/* The 16 known platforms as checkboxes. */}
               <div className="grid grid-cols-2 gap-1.5">
                 {KNOWN_PLATFORMS.map((p) => {
                   const on = selected.includes(p.domain);
