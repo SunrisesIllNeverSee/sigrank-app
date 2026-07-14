@@ -46,10 +46,6 @@ interface Props {
   /** Base rows for all 4 windows, keyed by window slug. No class/platform filter
    *  applied (the client filters). Limit 30 per window for headroom. */
   windowsData: Record<string, LeaderboardRow[]>;
-  /** Server-rendered children slotted between the record ticker and the cascade
-   *  boards (e.g. <PrestigeRecords/>). Passed through so a server component can
-   *  occupy a position inside this client island without losing its server data. */
-  children?: React.ReactNode;
 }
 
 /** Coerce a raw search param to a known union member, else the fallback. */
@@ -61,7 +57,7 @@ function coerce<T extends string>(
   return allowed.includes(raw as T) ? (raw as T) : fallback;
 }
 
-export function HallContentClient({ windowsData, children }: Props) {
+export function HallContentClient({ windowsData }: Props) {
   const searchParams = useSearchParams();
 
   const classParam = searchParams.get("class") ?? "all";
@@ -128,9 +124,6 @@ export function HallContentClient({ windowsData, children }: Props) {
           classScope={activeClass}
         />
       </div>
-
-      {/* Server-rendered prestige records slot (e.g. <PrestigeRecords/>). */}
-      {children}
 
       {/* Cascade Records — peak holders on every cascade metric (Y.01–Y.09). */}
       <h2 className="mb-1 font-mono text-lg font-bold tracking-wide text-text-primary">
