@@ -249,6 +249,8 @@ C : I : O = 19 : 1 : 0.09
 
 [51] Volume isn't yield. The cascade economy rewards compounding, not pumping. And the shape of AI operators is not what you'd expect: it's a power law with a human center of mass, a hidden elite of cache architects, and a long tail of input-heavy operators still finding their footing.
 
+[52] This is the first cut. 1,628 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the bot detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
+
 ---
 
 *Data: 1,628 operators from public AI coding agent leaderboards (2026-07-13)*
