@@ -384,6 +384,9 @@ export function LeaderboardTable({
   // "outliers" adds outliers & bots (input/total < 0.1% or > 80%) — one category.
   // "all" shows everything unfiltered.
   const [categoryFilter, setCategoryFilter] = useState<string>("human");
+  // Search filter (owner 2026-07-14): client-side text search across anonId (display
+  // name), codename, and subLabel (@handle). Filters the visible rows in real time.
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState(0); // 0-based; 25 rows/page (owner 2026-06-24)
   // OP RATIO dropdown (multi-sort): the column header opens a menu of 6 sort
   // options instead of the simple click-to-sort every other column uses.
@@ -522,6 +525,7 @@ export function LeaderboardTable({
   // excludes outliers (input/total < 0.1%) and bots (input/total > 80%).
   const filtered = useMemo(() => {
     const domain = PLATFORM_DOMAIN_MAP[platform]; // null = All
+    const sq = searchQuery.trim().toLowerCase();
     return entries.filter((e) => {
       if (isOff && domain && (e.platform ?? "other") !== domain) return false;
       if (classFilter !== "all" && e.signalClass.toLowerCase() !== classFilter)
@@ -530,9 +534,20 @@ export function LeaderboardTable({
       if (categoryFilter === "human") {
         if (isOutlierEntry(e)) return false;
       }
+      // Search filter: match against display name, codename, or @handle.
+      if (sq) {
+        const haystack = [
+          e.anonId,
+          e.codename,
+          e.subLabel ?? "",
+        ]
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(sq)) return false;
+      }
       return true;
     });
-  }, [entries, platform, classFilter, categoryFilter, isOff]);
+  }, [entries, platform, classFilter, categoryFilter, isOff, searchQuery]);
 
   // One sort pipeline for both views (raw default = rawTotal). Nulls fall to the bottom.
   const sorted = useMemo(() => {
@@ -611,7 +626,7 @@ export function LeaderboardTable({
   const pageCount = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
   React.useEffect(() => {
     setPage(0);
-  }, [sort, dir, platform, classFilter, categoryFilter, view]);
+  }, [sort, dir, platform, classFilter, categoryFilter, view, searchQuery]);
   const safePage = Math.min(page, pageCount - 1);
   const rows = useMemo(
     () => sorted.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE),
@@ -724,6 +739,18 @@ export function LeaderboardTable({
               onChange={onPlatform}
               options={PLATFORM_UI.map((p) => ({ value: p, label: p }))}
             />
+            {/* Search — filter by operator name, codename, or @handle. */}
+            <label style={st.fieldCol}>
+              <span style={st.flab}>Search</span>
+              <input
+                type="text"
+                aria-label="Search operators"
+                placeholder="name or @handle…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={st.searchInput}
+              />
+            </label>
             {/* "By platform" breakdown toggle — windowed boards only. Default = one
                 operator-total row; "By platform" = one row per (operator, platform). */}
             {!isOff ? (
@@ -1748,6 +1775,17 @@ const st: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     fontFamily: "inherit",
     minWidth: 132,
+  },
+  searchInput: {
+    background: "rgb(var(--bg-elevated))",
+    border: `1px solid ${T.line}`,
+    color: T.ink,
+    padding: "7px 12px",
+    borderRadius: 8,
+    fontSize: 12,
+    fontFamily: "inherit",
+    minWidth: 132,
+    outline: "none",
   },
   toggleRow: {
     display: "flex",
