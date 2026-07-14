@@ -36,7 +36,10 @@ export interface GoldColumn {
   devLinear: string;
 }
 
-/** Is this a REAL operator (not a staged seed / The Field / a retired-and-anonymized row)? */
+/** Is this a REAL operator (not a staged seed / The Field / a retired-and-anonymized row)?
+ * Also filters bots via the input/total ratio: operators with < 0.1% or > 80% input/total
+ * are categorized as outliers/bots and excluded from the Human Center of Mass computation
+ * (owner 2026-07-14: Three Degrees chart based on Human Center of Mass, not bot-contaminated). */
 function isRealOperator(row: LeaderboardRow): boolean {
   const code = row.operator.codename.toLowerCase();
   if (code === "the-field") return false;
@@ -47,7 +50,17 @@ function isRealOperator(row: LeaderboardRow): boolean {
   if (row.operator.isPlaceholder) return false;
   // Must have a real compounding cascade (a non-compounding/empty row isn't "top operator").
   const c = row.snapshot.cascade;
-  return Boolean(c && !c.nonCompounding);
+  if (!c || c.nonCompounding) return false;
+  // Bot/outlier filter: input/total ratio must be between 0.1% and 80%.
+  // < 0.1% = cache replay bots or extreme outliers (furic etc.)
+  // > 80% = input dump bots
+  // These get their own category — they don't set the numbers for the Human Center of Mass.
+  const t = row.telemetry;
+  const total = t.fresh_input + t.output + t.cache_read + t.cache_create;
+  if (total <= 0) return false;
+  const inputPct = t.fresh_input / total;
+  if (inputPct < 0.001 || inputPct > 0.8) return false;
+  return true;
 }
 
 /** Format a leverage-style "N×" value. */
