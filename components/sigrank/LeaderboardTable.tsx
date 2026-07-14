@@ -527,11 +527,18 @@ export function LeaderboardTable({
         return false;
       // Category filter: Human Center of Mass / + Outliers & Bots / All
       if (categoryFilter === "human") {
-        const inp = e.input ?? 0;
-        const tot = e.totalTokens ?? 0;
-        if (tot > 0) {
-          const inputPct = inp / tot;
-          if (inputPct < 0.01 || inputPct > 0.8) return false;
+        // Hand-picked humans bypass the ratio filter (owner 2026-07-14).
+        const code = e.codename.toLowerCase();
+        const isWhitelisted =
+          code === "signal-92b4f9f485" || // MOSES
+          code === "transvaultorigin"; // MOSES mock codename
+        if (!isWhitelisted) {
+          const inp = e.input ?? 0;
+          const tot = e.totalTokens ?? 0;
+          if (tot > 0) {
+            const inputPct = inp / tot;
+            if (inputPct < 0.01 || inputPct > 0.8) return false;
+          }
         }
       }
       return true;
