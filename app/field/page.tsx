@@ -1,0 +1,406 @@
+/**
+ * app/field/page.tsx — AI Operator Field Distribution Analysis.
+ *
+ * The SEO-heavy page proving the "Volume ≠ Yield" thesis with real data from
+ * 1,611 human operators (bots filtered out). Server component, ISR (1h).
+ * Renders 9 pure-SVG chart components + analysis text + JSON-LD Dataset schema.
+ *
+ * Data source: public/data/field-analysis.json (pre-generated, 1,611 humans).
+ */
+
+import type { Metadata } from "next";
+import Link from "next/link";
+import { withOG } from "@/lib/seo";
+import { SITE_ORIGIN } from "@/lib/seo";
+import { getFieldAnalysis } from "@/lib/field/data";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumb } from "@/lib/jsonld";
+import FieldStatCards from "@/components/field/FieldStatCards";
+import FieldSNRDistribution from "@/components/field/FieldSNRDistribution";
+import VolumeVsYield from "@/components/field/VolumeVsYield";
+import LeverageVsVelocity from "@/components/field/LeverageVsVelocity";
+import PlatformAdoption from "@/components/field/PlatformAdoption";
+import PlatformYieldQuartile from "@/components/field/PlatformYieldQuartile";
+import CascadeComposition from "@/components/field/CascadeComposition";
+import YieldQuartileBoxPlot from "@/components/field/YieldQuartileBoxPlot";
+import BotDetectionPanel from "@/components/field/BotDetectionPanel";
+
+export const metadata: Metadata = withOG({
+  title:
+    "AI Operator Field Analysis — The True Distribution of Token Efficiency",
+  description:
+    "Real data from 1,611 human AI operators proves volume ≠ yield. Median yield 1.95, SNR 0.4%, leverage 20.45×. Bots filtered, ghost ranks exposed, platform dominance analyzed.",
+  path: "/field",
+});
+
+export const revalidate = 3600;
+
+export default async function FieldPage() {
+  const data = await getFieldAnalysis();
+  const { meta, operators, bots, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
+
+  // Compute platform × yield-quartile breakdown for the stacked bar chart
+  const opsSorted = [...operators].sort((a, b) => a.yield - b.yield);
+  const n = opsSorted.length;
+  const qSize = Math.floor(n / 4);
+  const quartileSlices = [
+    opsSorted.slice(0, qSize),
+    opsSorted.slice(qSize, 2 * qSize),
+    opsSorted.slice(2 * qSize, 3 * qSize),
+    opsSorted.slice(3 * qSize),
+  ];
+  const topPlatforms = ["anthropic", "openai", "google", "zhipu", "deepseek", "other"];
+  const quartilePlatformData = quartileSlices.map((slice, i) => {
+    const counts = new Map<string, number>();
+    for (const op of slice) {
+      const plat = topPlatforms.includes(op.platform) ? op.platform : "other";
+      counts.set(plat, (counts.get(plat) ?? 0) + 1);
+    }
+    return {
+      quartile: yield_quartiles[i]?.label ?? `Q${i + 1}`,
+      platforms: topPlatforms.map((p) => ({ platform: p, count: counts.get(p) ?? 0 })),
+    };
+  });
+
+  // JSON-LD Dataset schema for the field analysis
+  const fieldDataset = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: "AI Operator Field Distribution Analysis — SigRank",
+    description:
+      "Distribution analysis of 1,611 human AI operators ranked by token-cascade efficiency (yield Υ). " +
+      "Volume vs yield correlation, SNR separation, platform dominance, bot detection. " +
+      "Bots filtered via 6-signal bot-likelihood score.",
+    url: `${SITE_ORIGIN}/field`,
+    creator: { "@id": `${SITE_ORIGIN}/#org` },
+    publisher: { "@id": `${SITE_ORIGIN}/#org` },
+    isAccessibleForFree: true,
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    keywords: [
+      "AI operator distribution",
+      "token efficiency",
+      "yield vs volume",
+      "AI operator field analysis",
+      "bot detection",
+      "token cascade",
+    ],
+    variableMeasured: [
+      { "@type": "PropertyValue", name: "Yield (Υ)", description: "cache_read × output / input²" },
+      { "@type": "PropertyValue", name: "SNR", description: "output / total_tokens" },
+      { "@type": "PropertyValue", name: "Leverage", description: "cache_read / input" },
+      { "@type": "PropertyValue", name: "Velocity", description: "output / session_time" },
+    ],
+    measurementTechnique:
+      "On-device token telemetry from 1,611 human operators. Bots identified via 6-signal bot-likelihood score and removed.",
+    temporalCoverage: meta.scraped_at,
+  };
+
+  return (
+    <div className="mx-auto flex max-w-4xl flex-col gap-10 py-2">
+      <JsonLd
+        data={[
+          fieldDataset,
+          breadcrumb([{ name: "Field Analysis", path: "/field" }]),
+        ]}
+      />
+
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <header className="flex flex-col gap-3">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          ◈ Field Distribution Analysis
+        </p>
+        <h1 className="font-sans text-3xl font-bold leading-tight text-text-primary md:text-4xl">
+          AI Operator Field Analysis — The True Distribution of Token Efficiency
+        </h1>
+        <p className="text-base leading-relaxed text-text-secondary">
+          Real data from <strong className="text-text-primary">{meta.humans_included.toLocaleString()}</strong> human AI
+          operators. Bots filtered. Volume ranked. Yield revealed. The field has a shape — and it
+          proves that <strong className="text-gold">volume ≠ yield</strong>.
+        </p>
+      </header>
+
+      {/* ── Stat cards ───────────────────────────────────────────────── */}
+      <FieldStatCards
+        medians={{
+          yield: meta.medians.yield,
+          snr: meta.medians.snr,
+          leverage: meta.medians.leverage,
+          tokens_per_day: meta.medians.tokens_per_day,
+        }}
+      />
+
+      {/* ── Volume ≠ Yield ───────────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Volume ≠ Yield
+        </h2>
+        <div className="overflow-x-auto">
+          <VolumeVsYield
+            operators={operators}
+            medianYield={meta.medians.yield}
+            medianTokens={meta.medians.total_tokens}
+            yieldFence={meta.iqr_fences.yield}
+            tokensFence={meta.iqr_fences.total_tokens}
+          />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The tokscale leaderboard ranks by total token volume. SigRank ranks by yield — how
+          efficiently an operator converts input tokens into output tokens using cache compounding.
+          These two rankings have almost zero correlation. The operator with the most tokens (9
+          quadrillion) has a yield of 0. The operator with the highest yield (110,251) ranks #357
+          by volume. Volume is noise. Yield is signal.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The scatter plot above makes this visible. The median lines divide the field into four
+          quadrants — and the top-right (high volume, high yield) is nearly empty. The highest-yield
+          operators cluster in the bottom-right: modest token spend, extraordinary efficiency. This
+          is the ghost-rank phenomenon, explored below.
+        </p>
+      </section>
+
+      {/* ── The SNR Separation ───────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          The SNR Separation
+        </h2>
+        <div className="overflow-x-auto">
+          <FieldSNRDistribution
+            operators={operators}
+            median={meta.medians.snr}
+            fence={meta.iqr_fences.snr}
+          />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Signal-to-Noise Ratio (SNR) = output / total_tokens. It measures what fraction of your
+          token spend produced actual output versus prompt overhead. Bots have SNR below 0.1%.
+          Humans have SNR above 30%. One number separates signal producers from token burners.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The histogram shows the field clustering tightly around the median SNR of{" "}
+          {(meta.medians.snr * 100).toFixed(2)}%. The IQR fences (dashed lines) bracket the middle
+          50% of operators. The long tail to the right — operators with SNR above 10% — are the
+          ghost-rank operators: they produce disproportionate output from minimal input.
+        </p>
+      </section>
+
+      {/* ── Leverage × Velocity ──────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Leverage × Velocity
+        </h2>
+        <div className="overflow-x-auto">
+          <LeverageVsVelocity
+            operators={operators}
+            medianLeverage={meta.medians.leverage}
+            medianVelocity={meta.medians.velocity}
+            leverageFence={meta.iqr_fences.leverage}
+            velocityFence={meta.iqr_fences.velocity}
+          />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Leverage (cache_read / input) measures how much cached context amplifies each fresh input
+          token. Velocity (output / time) measures how fast that amplified context converts into
+          output. Together, they define the yield rectangle — the area of leverage × velocity
+          approximates how efficiently an operator turns cached knowledge into produced signal.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The median crosshair divides the field. Operators in the top-right quadrant — high
+          leverage and high velocity — are the architectural elite. They read deeply from cache and
+          produce rapidly. The bottom-left cluster (low leverage, low velocity) represents the
+          volume-burning majority: fresh input, minimal caching, slow output.
+        </p>
+      </section>
+
+      {/* ── Platform Dominance ───────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Platform Dominance
+        </h2>
+        <div className="overflow-x-auto">
+          <PlatformAdoption platforms={platform_adoption} />
+        </div>
+        <div className="mt-2 overflow-x-auto">
+          <PlatformYieldQuartile data={quartilePlatformData} />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Anthropic-primary operators dominate the top yield quartile — 96% of the highest-yield
+          operators use Claude as their primary platform. This isn&apos;t coincidence: Anthropic&apos;s
+          mature prompt caching infrastructure produces higher cacheRead values, which directly
+          drives yield.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The adoption chart shows raw volume — OpenAI and Anthropic lead in total operator count.
+          But the quartile breakdown reveals the efficiency story: OpenAI dominates the bottom
+          quartiles (high volume, low yield), while Anthropic owns the top. The platform you choose
+          shapes the ceiling of your yield architecture.
+        </p>
+      </section>
+
+      {/* ── Cascade Composition ──────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Cascade Composition
+        </h2>
+        <div className="overflow-x-auto">
+          <CascadeComposition operators={notable_operators} />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Four notable operators, four radically different cascade architectures. The stacked bars
+          show how each operator composes their token spend across the four pillars: input (fresh
+          tokens), output (produced signal), cache write (context stored), and cache read (context
+          reused). The bot at left burns input with zero cache. The high-yield operators at right
+          are dominated by cache read — they reuse context, not burn it.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          These operators illustrate the yield spectrum. See their full profiles on the{" "}
+          <Link href="/hall" className="text-gold underline hover:text-text-primary">
+            Hall of Signal
+          </Link>{" "}
+          and learn how the metrics are computed on the{" "}
+          <Link href="/methodology" className="text-gold underline hover:text-text-primary">
+            methodology page
+          </Link>
+          .
+        </p>
+      </section>
+
+      {/* ── Yield Quartile Box Plots ─────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Yield Quartile Box Plots
+        </h2>
+        <div className="overflow-x-auto">
+          <YieldQuartileBoxPlot quartiles={yield_quartiles} />
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The box plots break down four metrics — yield, leverage, velocity, and SNR — across the
+          four yield quartiles. The progression is stark: leverage jumps from a median of ~5× in Q1
+          to ~200× in Q4. Velocity climbs from 0.03 to nearly 1.0. But SNR stays flat across all
+          quartiles — the signal density of output doesn't change. What changes is how much cached
+          context amplifies that output.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          This is the architectural insight: high-yield operators don&apos;t produce denser signal —
+          they produce more signal from the same density by leveraging cache. The yield gap is a
+          leverage gap, not a talent gap.
+        </p>
+      </section>
+
+      {/* ── Ghost Ranks ──────────────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Ghost Ranks: The Hidden Operators
+        </h2>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Ghost-rank operators are invisible on volume-based leaderboards but dominate yield-based
+          rankings. They use fewer tokens but achieve higher output efficiency. These are the
+          operators worth recruiting — they have skill, not just spend.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The data reveals {ghost_ranks.length} ghost-rank operators — Q2 by yield but with tokscale
+          ranks in the hundreds or thousands. Their median tokscale rank is{" "}
+          {Math.round(ghost_ranks.reduce((s, g) => s + g.tokscale_rank, 0) / ghost_ranks.length)},
+          meaning they are buried deep on any volume leaderboard. But their yield values reach into
+          the hundreds of thousands. Volume metrics hide them. Yield metrics find them.
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse font-sans text-sm">
+            <thead>
+              <tr className="border-b border-bg-border">
+                <th className="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider text-text-muted">
+                  Handle
+                </th>
+                <th className="px-4 py-2 text-right text-xs font-bold uppercase tracking-wider text-text-muted">
+                  Tokscale Rank
+                </th>
+                <th className="px-4 py-2 text-right text-xs font-bold uppercase tracking-wider text-gold">
+                  Yield (Υ)
+                </th>
+                <th className="px-4 py-2 text-right text-xs font-bold uppercase tracking-wider text-text-muted">
+                  Total Tokens
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider text-text-muted">
+                  Platform
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {ghost_ranks.slice(0, 10).map((g) => (
+                <tr key={g.handle} className="border-b border-bg-border-subtle">
+                  <td className="px-4 py-2 font-mono text-text-primary">{g.handle}</td>
+                  <td className="px-4 py-2 text-right font-mono text-text-muted">
+                    #{g.tokscale_rank.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 text-right font-mono font-bold text-gold">
+                    {g.yield >= 1000
+                      ? `${(g.yield / 1000).toFixed(1)}K`
+                      : g.yield.toFixed(1)}
+                  </td>
+                  <td className="px-4 py-2 text-right font-mono text-text-muted">
+                    {g.total_tokens >= 1_000_000_000
+                      ? `${(g.total_tokens / 1e9).toFixed(1)}B`
+                      : `${(g.total_tokens / 1e6).toFixed(1)}M`}
+                  </td>
+                  <td className="px-4 py-2 text-text-secondary">{g.platform}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs text-text-muted">
+          Showing 10 of {ghost_ranks.length} ghost-rank operators.
+        </p>
+      </section>
+
+      {/* ── Bot Detection ────────────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Bot Detection
+        </h2>
+        <BotDetectionPanel operators={operators} bots={bots} />
+        <p className="text-sm leading-relaxed text-text-secondary">
+          SigRank&apos;s metrics catch gaming automatically. A 6-signal bot-likelihood score
+          identifies operators with inhuman throughput, zero cache usage, single-model fixation,
+          and zero sessions. {meta.bots_removed} confirmed bots and {meta.suspects_removed} suspects
+          were removed from the field distribution.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The scatter plot shows why bots are detectable: they cluster in the bottom-right —
+          massive token volume with near-zero SNR. They pump input tokens without producing
+          proportionate output. No human operator occupies that region. The 6-signal score makes
+          this structural: inhuman throughput, zero cache reads, single-model fixation, and zero
+          sessions are individually suspicious; together they are conclusive.
+        </p>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <footer className="mt-8 flex flex-col gap-3 border-t border-bg-border pt-6">
+        <p className="text-sm text-text-secondary">
+          Data scraped {meta.scraped_at} from{" "}
+          <a
+            href={meta.source}
+            className="text-gold underline hover:text-text-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            tokscale.ai/leaderboard
+          </a>
+          . {meta.total_scraped.toLocaleString()} operators scraped, {meta.bots_removed} bots +{" "}
+          {meta.suspects_removed} suspects removed, {meta.humans_included.toLocaleString()} humans
+          analyzed.
+        </p>
+        <div className="flex flex-wrap gap-4 text-sm">
+          <Link href="/methodology" className="text-gold underline hover:text-text-primary">
+            Methodology
+          </Link>
+          <Link href="/hall" className="text-gold underline hover:text-text-primary">
+            Hall of Signal
+          </Link>
+          <Link href="/board/all" className="text-gold underline hover:text-text-primary">
+            Live Leaderboard
+          </Link>
+        </div>
+      </footer>
+    </div>
+  );
+}

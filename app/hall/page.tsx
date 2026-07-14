@@ -6,6 +6,7 @@ import { BOARD_WINDOWS } from "@/lib/data/windows";
 import { HallHero } from "@/components/hall/HallHero";
 import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
 import { HallContentClient } from "@/components/hall/HallContentClient";
+import { PrestigeRecords } from "@/components/hall/PrestigeRecords";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb } from "@/lib/jsonld";
 
@@ -79,7 +80,9 @@ export default async function HallPage() {
           </div>
         }
       >
-        <HallContentClient windowsData={windowsData} />
+        <HallContentClient windowsData={windowsData}>
+          <PrestigeRecords />
+        </HallContentClient>
       </Suspense>
 
       {/* ── What is the Hall? — moved to bottom (owner 2026-07-09) ── */}
