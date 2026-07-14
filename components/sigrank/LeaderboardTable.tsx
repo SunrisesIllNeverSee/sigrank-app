@@ -804,7 +804,9 @@ export function LeaderboardTable({
         <ul className="flex flex-col gap-1.5 md:hidden">
           {rows.map((e, i) => {
             const sp = speciesOf(e.signalClass);
-            const displayRank = safePage * PER_PAGE + i + 1;
+            const displayRank = searchQuery
+              ? e.rank
+              : safePage * PER_PAGE + i + 1;
             const otherRank =
               view === "raw" ? yieldRankMap.get(e) : volumeRankMap.get(e);
             const yld =
@@ -1205,7 +1207,9 @@ export function LeaderboardTable({
               <tbody>
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
-                  const displayRank = safePage * PER_PAGE + i + 1;
+                  const displayRank = searchQuery
+                    ? e.rank
+                    : safePage * PER_PAGE + i + 1;
                   const volRank = volumeRankMap.get(e);
                   return (
                     <tr key={`${e.anonId}-${i}`}>
@@ -1507,7 +1511,9 @@ export function LeaderboardTable({
               <tbody>
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
-                  const displayRank = safePage * PER_PAGE + i + 1;
+                  const displayRank = searchQuery
+                    ? e.rank
+                    : safePage * PER_PAGE + i + 1;
                   const yRank = yieldRankMap.get(e);
                   return (
                     <tr key={`raw-${e.anonId}-${i}`}>
