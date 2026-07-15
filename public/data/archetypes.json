@@ -1,0 +1,162 @@
+{
+  "method": "hybrid_yield_tiers + composition_shapes",
+  "description": "K-Means on log(yield, leverage, velocity, snr) for 3 yield tiers, then K-Means on token composition proportions for sub-shapes",
+  "n_operators": 1611,
+  "n_archetypes": 7,
+  "archetypes": [
+    {
+      "archetype_id": 0,
+      "name": "Context Builders",
+      "description": "Moderate yield, actively building cache (3%+ cache writes)",
+      "n": 313,
+      "yield_median": 6.71,
+      "leverage_median": 37.81,
+      "velocity_median": 0.18,
+      "snr_median": 0.0048,
+      "input_pct": 0.024342617634024486,
+      "output_pct": 0.004750367037214476,
+      "cache_read_pct": 0.9181721902369886,
+      "cache_write_pct": 0.04779065660875758,
+      "total_tokens_median": 3866710308.0,
+      "tokens_per_day_median": 53886084.0,
+      "top_platform": "anthropic",
+      "sample_handles": [
+        "gwbiubiu",
+        "shivang2000",
+        "YoannLetacq"
+      ]
+    },
+    {
+      "archetype_id": 1,
+      "name": "The Field",
+      "description": "The human center of mass \u2014 moderate cache reuse, finding their rhythm",
+      "n": 963,
+      "yield_median": 1.24,
+      "leverage_median": 15.71,
+      "velocity_median": 0.08,
+      "snr_median": 0.0044,
+      "input_pct": 0.05876368830025957,
+      "output_pct": 0.004402185768377999,
+      "cache_read_pct": 0.9266418383675677,
+      "cache_write_pct": 0.008115886861418958,
+      "total_tokens_median": 6016650728.0,
+      "tokens_per_day_median": 69748955.0,
+      "top_platform": "openai",
+      "sample_handles": [
+        "Xavierhorwood",
+        "LeeByeongMuk",
+        "journeyWorker"
+      ]
+    },
+    {
+      "archetype_id": 2,
+      "name": "Input-Heavy Operators",
+      "description": "High input proportion (30%+), low cache reuse \u2014 tokens going in, not much coming out",
+      "n": 102,
+      "yield_median": 0.02,
+      "leverage_median": 1.24,
+      "velocity_median": 0.01,
+      "snr_median": 0.005,
+      "input_pct": 0.4309583295948931,
+      "output_pct": 0.004967755274437521,
+      "cache_read_pct": 0.5432730469359071,
+      "cache_write_pct": 0.0036603228436972862,
+      "total_tokens_median": 2222812827.5,
+      "tokens_per_day_median": 41303320.5,
+      "top_platform": "openai",
+      "sample_handles": [
+        "wuwangzhang1216",
+        "jake8655",
+        "gaorf30153"
+      ]
+    },
+    {
+      "archetype_id": 3,
+      "name": "Steady Cascaders",
+      "description": "Moderate yield, consistent cache reuse, the upper mid-field",
+      "n": 4,
+      "yield_median": 13.5,
+      "leverage_median": 6.715,
+      "velocity_median": 1.505,
+      "snr_median": 0.2389,
+      "input_pct": 0.19721610705708512,
+      "output_pct": 0.2389250399165105,
+      "cache_read_pct": 0.5324336820985266,
+      "cache_write_pct": 0.007321900921609984,
+      "total_tokens_median": 115865456170.5,
+      "tokens_per_day_median": 804356201.0,
+      "top_platform": "anthropic",
+      "sample_handles": [
+        "sadw1q",
+        "rar-file",
+        "cexll"
+      ]
+    },
+    {
+      "archetype_id": 4,
+      "name": "Cache Builders",
+      "description": "High yield + active cache construction (5%+ cache writes, building new context)",
+      "n": 46,
+      "yield_median": 1824.525,
+      "leverage_median": 914.745,
+      "velocity_median": 2.2350000000000003,
+      "snr_median": 0.0031,
+      "input_pct": 0.0009980745428369029,
+      "output_pct": 0.003109006852823206,
+      "cache_read_pct": 0.925002083916193,
+      "cache_write_pct": 0.07005022709144408,
+      "total_tokens_median": 1701293252.5,
+      "tokens_per_day_median": 47812460.5,
+      "top_platform": "anthropic",
+      "sample_handles": [
+        "gabsh",
+        "marquis08",
+        "typark96"
+      ]
+    },
+    {
+      "archetype_id": 5,
+      "name": "Cache Architects",
+      "description": "Extreme cache reuse (99.7%+ cache reads, near-zero fresh input)",
+      "n": 137,
+      "yield_median": 444.12,
+      "leverage_median": 360.17,
+      "velocity_median": 1.29,
+      "snr_median": 0.0037,
+      "input_pct": 0.0026938702791660233,
+      "output_pct": 0.003733954604884705,
+      "cache_read_pct": 0.9657394666678123,
+      "cache_write_pct": 0.027263900860282242,
+      "total_tokens_median": 4897466140.0,
+      "tokens_per_day_median": 86604209.0,
+      "top_platform": "anthropic",
+      "sample_handles": [
+        "furic",
+        "younhomaeng-svg",
+        "grishin43"
+      ]
+    },
+    {
+      "archetype_id": 6,
+      "name": "Cascade Operators",
+      "description": "High yield through balanced cache leverage and velocity",
+      "n": 46,
+      "yield_median": 135.14999999999998,
+      "leverage_median": 140.64,
+      "velocity_median": 0.99,
+      "snr_median": 0.0067,
+      "input_pct": 0.006745528851281092,
+      "output_pct": 0.006658021213813462,
+      "cache_read_pct": 0.943580811516075,
+      "cache_write_pct": 0.0417344417718675,
+      "total_tokens_median": 3116190575.0,
+      "tokens_per_day_median": 47616987.5,
+      "top_platform": "anthropic",
+      "sample_handles": [
+        "honggilgim",
+        "henmmi",
+        "shpark-daim"
+      ]
+    }
+  ]
+}
