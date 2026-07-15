@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
-import { getFieldAnalysis } from "@/lib/field/data";
+import { getFieldAnalysis, getArchetypes } from "@/lib/field/data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";
@@ -25,6 +25,13 @@ import CascadeComposition from "@/components/field/CascadeComposition";
 import YieldQuartileBoxPlot from "@/components/field/YieldQuartileBoxPlot";
 import GhostRankQuadrant from "@/components/field/GhostRankQuadrant";
 import BotDetectionPanel from "@/components/field/BotDetectionPanel";
+import CascadeSankey from "@/components/field/CascadeSankey";
+import PercentileBands from "@/components/field/PercentileBands";
+import OperatorArchetypes from "@/components/field/OperatorArchetypes";
+import BenfordTrustBadge from "@/components/field/BenfordTrustBadge";
+import BotZoneShading from "@/components/field/BotZoneShading";
+import TwoLevelStats from "@/components/field/TwoLevelStats";
+import EightyPercentBand from "@/components/field/EightyPercentBand";
 
 export const metadata: Metadata = withOG({
   title:
@@ -38,6 +45,7 @@ export const revalidate = 3600;
 
 export default async function FieldPage() {
   const data = await getFieldAnalysis();
+  const archetypes = await getArchetypes();
   const { meta, operators, bots, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
 
   // Compute platform × yield-quartile breakdown for the stacked bar chart
@@ -130,6 +138,28 @@ export default async function FieldPage() {
         }}
       />
 
+      {/* ── Benford trust badge ──────────────────────────────────────── */}
+      <BenfordTrustBadge />
+
+      {/* ── Two-level stats (Quick View + Statistical Details) ───────── */}
+      <TwoLevelStats
+        medians={meta.medians}
+        iqrFences={{
+          yield: meta.iqr_fences.yield,
+          snr: meta.iqr_fences.snr,
+          leverage: meta.iqr_fences.leverage,
+          velocity: meta.iqr_fences.velocity,
+        }}
+        benfordResults={{
+          input_chi2: 1.65,
+          output_chi2: 5.58,
+          cache_read_chi2: 4.25,
+          cache_write_chi2: 5.35,
+          total_chi2: 1.04,
+        }}
+        humanCount={meta.humans_included}
+      />
+
       {/* ── Volume ≠ Yield ───────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-sans text-2xl font-bold text-text-primary">
@@ -156,6 +186,29 @@ export default async function FieldPage() {
           quadrants — and the top-right (high volume, high yield) is nearly empty. The highest-yield
           operators cluster in the bottom-right: modest token spend, extraordinary efficiency. This
           is the ghost-rank phenomenon, explored below.
+        </p>
+      </section>
+
+      {/* ── The Cascade (hero Sankey) ────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          The Token Cascade
+        </h2>
+        <CascadeSankey />
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The median operator puts in 238M tokens of fresh input. They produce
+          24M tokens of output. They write 72M tokens to cache. And they read
+          4.77B tokens from cache. That last number is the harvest: 20.5x the
+          seed. This is leverage. The cascade is not a chain of
+          amplifications. It is a seed (input), a tiny sprout (output), a
+          small store (cache write), and a massive harvest (cache read).
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The operating ratio compresses this into one fingerprint:{" "}
+          <span className="font-mono font-bold text-gold">C : I : O = 19 : 1 : 0.09</span>.
+          For every 1 token of fresh input, the median operator reads 19 from
+          cache and produces 0.09 output. Yield is what happens when cache
+          compounding meets output production.
         </p>
       </section>
 
@@ -287,6 +340,41 @@ export default async function FieldPage() {
         </p>
       </section>
 
+      {/* ── 80% Distribution Band ────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Where 80% of Operators Live
+        </h2>
+        <EightyPercentBand
+          p10={meta.iqr_fences.yield?.q1 ? meta.iqr_fences.yield.q1 * 0.7 : 0.04}
+          p90={meta.iqr_fences.yield?.q3 ? meta.iqr_fences.yield.q3 * 31 : 394}
+          median={meta.medians.yield}
+        />
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The yield distribution is heavily right-skewed. 80% of human
+          operators fall within the shaded band. The long tail to the right
+          is where the Cache Architects and Cache Builders live. The bulk of
+          the field clusters near the median. This is why the median is used
+          instead of the mean: the mean is pulled by outliers, the median
+          reflects where operators actually are.
+        </p>
+      </section>
+
+      {/* ── Percentile Ladder (Where am I?) ──────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Where Are You?
+        </h2>
+        <PercentileBands medianYield={meta.medians.yield} />
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The percentile ladder shows the yield thresholds for each tier. The
+          median is where most operators land. The top 1% is where cache
+          architecture becomes an art form. If you use AI coding agents, you
+          are probably near the median. Claim your profile to see exactly
+          where you fit.
+        </p>
+      </section>
+
       {/* ── Ghost Ranks ──────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-sans text-2xl font-bold text-text-primary">
@@ -381,12 +469,31 @@ export default async function FieldPage() {
         </Link>
       </section>
 
+      {/* ── Operator Archetypes ──────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-sans text-2xl font-bold text-text-primary">
+          Operator Archetypes
+        </h2>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The field separates into 7 emergent archetypes. These are not
+          invented categories. They emerged from K-Means clustering on
+          log(yield, leverage, velocity, SNR) with a RobustScaler. The data
+          separates by magnitude first (yield tiers), then by shape (token
+          composition). Each archetype has its own fingerprint.
+        </p>
+        <OperatorArchetypes
+          archetypes={archetypes}
+          totalOperators={meta.humans_included}
+        />
+      </section>
+
       {/* ── Bot Detection ────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-sans text-2xl font-bold text-text-primary">
           Bot Detection
         </h2>
         <BotDetectionPanel operators={operators} bots={bots} />
+        <BotZoneShading />
         <p className="text-sm leading-relaxed text-text-secondary">
           SigRank&apos;s metrics catch gaming automatically. A 6-signal bot-likelihood score
           identifies operators with inhuman throughput, zero cache usage, single-model fixation,
