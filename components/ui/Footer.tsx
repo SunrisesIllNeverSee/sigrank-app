@@ -180,13 +180,13 @@ export function Footer() {
               About
             </Link>
             <Link
-              href="/about#privacy"
+              href="/privacy"
               className="transition-colors hover:text-text-primary"
             >
               Privacy
             </Link>
             <Link
-              href="/about#terms"
+              href="/terms"
               className="transition-colors hover:text-text-primary"
             >
               Terms

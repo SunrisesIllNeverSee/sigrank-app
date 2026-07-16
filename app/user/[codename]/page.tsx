@@ -275,12 +275,27 @@ export default async function OperatorProfilePage({
   const hasDisplayName = name !== operator.codename;
   // Outlier/bot detection (owner 2026-07-14): red asterisk on profile header.
   const outlier = !pending && c && !c.nonCompounding ? isOutlierRow(row) : false;
+
+  // Profile visibility gate (migration 0021, owner 2026-07-16: "private user
+  // name... control who sees your profile"). When the operator has set their
+  // profile to 'private' AND the viewer is NOT the owner, redact the identity
+  // fields — only codename + computed metrics (rank, yield, class) remain
+  // visible. The owner always sees their own full profile.
+  const isPrivate = operator.profile_visibility === "private";
+  const viewerRedacted = isPrivate && !isOwner;
+  const displayName = viewerRedacted ? null : operator.display_name;
+  const handle_ = viewerRedacted ? null : operator.handle;
+  const avatarUrl = viewerRedacted ? null : operator.avatar_url;
+  const bio_ = viewerRedacted ? null : operator.bio;
+  const location_ = viewerRedacted ? null : operator.location;
+  const links_ = viewerRedacted ? null : operator.links;
+  const nameShown = viewerRedacted ? operator.codename : name;
+
   const hasLinks = Boolean(
-    operator.links &&
-    (operator.links.github || operator.links.site || operator.links.x),
+    links_ && (links_.github || links_.site || links_.x),
   );
   const hasSocial = Boolean(
-    operator.location || operator.bio || hasLinks || operator.handle,
+    location_ || bio_ || hasLinks || handle_,
   );
 
   // ── Stats tab: a "not ranked yet" notice when there's no cascade data, else
@@ -493,31 +508,36 @@ export default async function OperatorProfilePage({
   // ── Social tab: the self-promo identity surface ────────────────────────────
   const socialPanel = (
     <div className="flex flex-col gap-5 rounded-lg border border-bg-border bg-bg-surface p-5">
-      {hasSocial ? (
+      {viewerRedacted ? (
+        <p className="font-sans text-sm text-text-secondary">
+          This operator&apos;s profile is private. Only their codename, rank,
+          and computed metrics are visible.
+        </p>
+      ) : hasSocial ? (
         <>
-          {operator.handle && <Stat label="Handle">@{operator.handle}</Stat>}
-          {operator.location && (
-            <Stat label="Location">{operator.location}</Stat>
+          {handle_ && <Stat label="Handle">@{handle_}</Stat>}
+          {location_ && (
+            <Stat label="Location">{location_}</Stat>
           )}
-          {operator.bio && (
+          {bio_ && (
             <div className="flex flex-col gap-0.5">
               <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
                 About
               </span>
               <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                {operator.bio}
+                {bio_}
               </p>
             </div>
           )}
-          {hasLinks && operator.links && (
+          {hasLinks && links_ && (
             <div className="flex flex-col gap-1">
               <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
                 Links
               </span>
               <div className="flex flex-wrap gap-3">
-                {operator.links.github && (
+                {links_.github && (
                   <a
-                    href={`https://github.com/${operator.links.github}`}
+                    href={`https://github.com/${links_.github}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
@@ -525,9 +545,9 @@ export default async function OperatorProfilePage({
                     github
                   </a>
                 )}
-                {operator.links.x && (
+                {links_.x && (
                   <a
-                    href={`https://x.com/${operator.links.x}`}
+                    href={`https://x.com/${links_.x}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
@@ -535,9 +555,9 @@ export default async function OperatorProfilePage({
                     x.com
                   </a>
                 )}
-                {operator.links.site && (
+                {links_.site && (
                   <a
-                    href={operator.links.site}
+                    href={links_.site}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
@@ -564,7 +584,7 @@ export default async function OperatorProfilePage({
       <JsonLd
         data={operatorProfile({
           codename: operator.codename,
-          display_name: operator.display_name,
+          display_name: displayName,
           path: `/user/${rawCodename}`,
           classTier: snapshot.class_tier,
           globalRank: row.global_rank,
@@ -610,11 +630,11 @@ export default async function OperatorProfilePage({
 
       {/* Persistent identity header (GitHub-profile-style banner). */}
       <header className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-5 sm:flex-row sm:items-center sm:gap-5 sm:w-fit">
-        <OperatorAvatar src={operator.avatar_url} alt={name} size={64} />
+        <OperatorAvatar src={avatarUrl} alt={nameShown} size={64} />
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
-              {name}
+              {nameShown}
               {outlier && (
                 <span
                   title="Outlier or bot — excluded from Human Center of Mass"
@@ -635,11 +655,16 @@ export default async function OperatorProfilePage({
             ) : (
               <SignalClassBadge signalClass={snapshot.class_tier} />
             )}
+            {viewerRedacted && (
+              <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
+                🔒 Private
+              </span>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-xs text-text-muted">
-            {hasDisplayName && <span>{operator.codename}</span>}
-            {operator.handle && (
-              <span className="text-text-secondary">@{operator.handle}</span>
+            {hasDisplayName && !viewerRedacted && <span>{operator.codename}</span>}
+            {handle_ && (
+              <span className="text-text-secondary">@{handle_}</span>
             )}
             {pending ? (
               <span>No cascade data yet</span>
@@ -660,7 +685,7 @@ export default async function OperatorProfilePage({
       {ranked && c && !c.nonCompounding && (
         <SplitFlapCard
           codename={operator.codename}
-          name={name}
+          name={nameShown}
           yieldValue={c.yield_}
           classTier={snapshot.class_tier}
           platform={operator.primary_domain}
@@ -688,7 +713,7 @@ export default async function OperatorProfilePage({
           call. Placed above the tabs so prestige is visible immediately. */}
       <OperatorRecords
         codename={operator.codename}
-        display_name={operator.display_name ?? undefined}
+        display_name={displayName ?? undefined}
         boardRows={boardRows}
       />
 
