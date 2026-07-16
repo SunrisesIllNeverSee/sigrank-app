@@ -117,10 +117,11 @@ export default async function ComparePage({
     if (!isPrefetch) await bumpComparisonsRan();
   }
   // Full operator corpus for the opponent pickers (owner 2026-06-22: "do the static
-  // seed all") — every seed operator, not just the top 12. board[] (yield-ranked) still
-  // supplies the defaults. (owner 2026-07-14: outliers/bots filtered from the default
-  // A pool + field median, but remain selectable in the dropdown.)
-  const board = await getLeaderboard({ limit: 500 });
+  // seed all") — every operator, not just the top 500. Owner 2026-07-16: removed the
+  // 500 limit so the searchable combobox can find ANY operator. board[] (yield-ranked)
+  // still supplies the defaults. (owner 2026-07-14: outliers/bots filtered from the
+  // default A pool + field median, but remain selectable in the dropdown.)
+  const board = await getLeaderboard();
   const humanBoard = board.filter((r) => !isOutlierRow(r));
 
   // Default opponent B is "The Field" — the median-Υ baseline operator (owner

@@ -587,6 +587,18 @@ export default async function OperatorProfilePage({
           >
             Compare →
           </a>
+          {/* "Compare against me" — shows when a signed-in operator is viewing
+              someone else's profile (owner 2026-07-16: "on every profile show be a
+              compare again me butten"). Links to /compare with the viewer as A and
+              the profile operator as B. Hidden when viewing your own profile. */}
+          {session && session.codename !== operator.codename && (
+            <a
+              href={`/compare?a=${encodeURIComponent(session.codename)}&b=${encodeURIComponent(operator.codename)}`}
+              className="rounded-md border border-text-accent/40 bg-text-accent/10 px-3 py-1.5 font-mono text-xs text-text-accent transition-colors hover:bg-text-accent/20"
+            >
+              ⚔ Compare against me
+            </a>
+          )}
           {/* Claimed operators show a badge. The old pay-to-claim CTA was removed
               (HARDENING_0625 §2): claiming is free + automatic on login, and seed
               operators are never user-claimable (identity-takeover risk). */}
