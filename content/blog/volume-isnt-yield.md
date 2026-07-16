@@ -1,7 +1,7 @@
 ---
 type: article
 title: "Volume Isn't Yield: The Shape of AI Operators"
-description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,628 operators actually use LLMs. Benford validation, 7 human archetypes + outlier/bot classification, and the cascade economy.
+description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,628 operators actually use LLMs. Benford validation, 8 archetypes (7 human + outliers/bots), and the cascade economy.
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
 author: Deric (@SunrisesIllNeverSee)
@@ -10,7 +10,7 @@ hero: /article-charts/03-volume-vs-yield.png
 
 # Volume Isn't Yield: The Shape of AI Operators
 
-> [1] SigRank measures how operators use AI coding agents. Not by token volume, but by the token cascade. Once you measure the margins instead of the totals, the field separates into 7 human archetypes plus a cross-cutting flag for outliers and bots. The median operator gets 19x more signal from cache than they put in as input. The shape is not what you'd expect.
+> [1] SigRank measures how operators use AI coding agents. Not by token volume, but by the token cascade. Once you measure the margins instead of the totals, the field separates into 8 archetypes — 7 human clusters plus an 8th for outliers and bots. The median operator gets 19x more signal from cache than they put in as input. The shape is not what you'd expect.
 
 ---
 
@@ -158,13 +158,13 @@ C : I : O = 19 : 1 : 0.09
 
 [29] Volume-based leaderboards rank by total tokens. SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's 497,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant." Yield says "elite."
 
-## The 7 Archetypes + Outlier Flag
+## The 8 Archetypes
 
 [30] K-Means clustering was run on the 1,498 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the methodology page.
 
-[31] **7 human archetypes emerged** from the clustering. Separately, the input/total ratio analysis (see [15a]) flags 89 outliers and 24 bots from the full 1,628 — a cross-cutting classification that overlays the archetypes, not an 8th mutually exclusive category. An operator like `furic` appears in the Cache Architects archetype AND carries the outlier flag. Silhouette score 0.625, which is "good structure," not noise.
+[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers & Bots — comes from the input/total ratio analysis (see [15a]), which flags 89 extreme humans and 24 bots from the full 1,628. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
 
-![7 Emergent Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
+![7 Human Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
 ### The Field (n=963, 59.8%)
 [32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
@@ -175,7 +175,7 @@ C : I : O = 19 : 1 : 0.09
 ### Cache Architects (n=137, 8.5%)
 [34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 358x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 97.0% cache read, yield 84).
 
-![Distribution of Archetypes Across the Field](/article-charts/05-archetype-distribution.png)
+![8 Archetypes: Distribution Across the Field](/article-charts/26-eight-categories-donut.png)
 
 ### Input-Heavy Operators (n=102, 6.3%)
 [35] 43% of their tokens are input. Only 54% cache read. Yield 0.02, effectively zero. These operators are dumping tokens in without building cache. They're the opposite of Cache Architects. Whether they're beginners, using tools that don't support caching, or just inefficient, their cascade isn't compounding. Examples: `wuwangzhang1216` (487B tokens, 33.7% input, 60.9% cache read), `jake8655`, `gaorf30153`, `Gioxaa` (18.5B tokens, 27% input, 72% cache read, yield 0.003), `bnmbanhmi` (2.56B tokens, 56% input, 44% cache read, yield 0).
@@ -189,9 +189,9 @@ C : I : O = 19 : 1 : 0.09
 ### Steady Cascaders (n=4, 0.2%)
 [38] A rare shape. 24% output, most operators are under 1%. These operators produce proportionally more output than the rest of the field. Yield 13.5, moderate. They're not the highest yield, but their composition is unique. Note: n=4 is small — this cluster is the most likely to dissolve or merge with reclassification. Examples: `rar-file` (9.08B tokens, 6.3% input, 13.3% output, yield 26), `cexll` (214B tokens, 33% input, 30% output, yield 1.0). (The originally listed `sadw1q` has been reclassified as an outlier — 0.14% input and yield of 110,251 places it in the extreme-human zone, not the Human Center of Mass.)
 
-### Outliers & Bots (cross-cutting flag, not a separate archetype)
+### Outliers & Bots (the 8th archetype)
 
-[39] The 89 outliers and 24 bots flagged by the input/total ratio analysis (see [15a]) are not a separate archetype — they're a cross-cutting classification that overlays the 7 archetypes. Some outliers appear in Cache Architects or Cache Builders; the bots don't appear in any archetype because they were excluded from clustering. Here's what the flag catches:
+[39] The 89 outliers and 24 bots flagged by the input/total ratio analysis (see [15a]) form the 8th archetype. Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The bots don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
 
 [40] **Outliers (89 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
 
@@ -226,13 +226,13 @@ C : I : O = 19 : 1 : 0.09
 
 3. **The Human Center of Mass.** This phrase stuck. Not "field average including trillion-token outliers" but "where real operators naturally cluster." That's the thing people remember.
 
-4. **The data naturally separates into 7 clusters.** Not "7 operator types were invented." The clustering is unsupervised; the groups emerged from the data, not from interpretation. That's a huge credibility difference.
+4. **The data naturally separates into 8 archetypes.** Not "8 operator types were invented." The 7 human clusters emerged from unsupervised K-Means; the 8th (outliers & bots) emerged from the input/total ratio analysis. The groups emerged from the data, not from interpretation. That's a huge credibility difference.
 
 5. **This is something that doesn't exist yet.** GitHub measures commits. Stack Overflow measured reputation. Kaggle measures competitions. SigRank measures operator behavior, not models, not benchmarks, humans operating models. That's genuinely a different domain.
 
 ## What's Next
 
-[44] **Phase 1: The Field Page.** A `/field` page on signalaf.com that shows the distribution, the 7 archetypes + outlier/bot flag, the percentile bands, the cascade flow, the bot zone, and the Benford trust badge. One story: Volume != Yield. You land on the Human Center of Mass and see where you fit.
+[44] **Phase 1: The Field Page.** A `/field` page on signalaf.com that shows the distribution, the 8 archetypes, the percentile bands, the cascade flow, the bot zone, and the Benford trust badge. One story: Volume != Yield. You land on the Human Center of Mass and see where you fit.
 
 [45] **Phase 2: The Methodology Page.** A `/methodology` page with the full chi-square tables, the bot detection algorithm, the clustering methodology, the provenance chain. This is the citation target, the place where "can I trust this?" gets answered.
 

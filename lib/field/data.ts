@@ -8,9 +8,8 @@
  * Also loads public/data/archetypes.json (7 operator archetypes from
  * K-Means clustering) for the OperatorArchetypes component.
  *
- * Uses JSON imports instead of fs.readFile() for Cloudflare Workers
- * compatibility. JSON imports are bundled at build time and work on
- * both Vercel and Cloudflare without filesystem access.
+ * Uses JSON imports instead of fs.readFile() for serverless compatibility.
+ * JSON imports are bundled at build time and work without filesystem access.
  */
 
 import fieldAnalysisRaw from "@/public/data/field-analysis.json";
