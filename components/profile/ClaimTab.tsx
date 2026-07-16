@@ -55,8 +55,9 @@ export function ClaimTab({ codename, isSignedIn, hasOperator }: Props) {
 
       if (res.ok && data.status === "claimed") {
         setStatus("success");
-        // Refresh the page — the profile is now claimed, ClaimTab will disappear.
-        setTimeout(() => router.refresh(), 1500);
+        // Redirect to Settings with ?claimed=1 so the user lands on the
+        // Connect a device section and knows what to do next.
+        setTimeout(() => router.push("/settings?claimed=1"), 1500);
       } else {
         setStatus("error");
         setErrorMsg(data.error || "Claim failed. Please try again.");
@@ -155,8 +156,7 @@ export function ClaimTab({ codename, isSignedIn, hasOperator }: Props) {
       {status === "success" ? (
         <div className="rounded-md border border-accent/40 bg-accent/10 px-3 py-2.5">
           <p className="font-mono text-xs text-accent">
-            ✓ Profile claimed! You can now enroll a device and submit live
-            readings. Redirecting...
+            ✓ Profile claimed! Taking you to Settings to connect your agent...
           </p>
         </div>
       ) : (
