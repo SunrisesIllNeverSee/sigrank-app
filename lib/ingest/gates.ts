@@ -85,8 +85,10 @@ export const GATE_LIMITS = {
   // drive Υ arbitrarily high while staying under them. Real data: reuse ~20-25:1,
   // cacheWrite ~2-11:1, input share >0.3% of total. These tightened bounds
   // catch a tuned fabricator who sets input=1 to inflate Υ = cr·o/i².
-  /** Max cache_read/cache_creation ratio (real max ~30:1 for power users; was 100:1). */
+  /** Max cache_read/cache_creation ratio (real max ~30:1 for Claude power users; was 100:1). */
   MAX_CACHE_REUSE_RATIO: 35,
+  /** Codex-specific max cache_read/cache_creation ratio (Codex caches more aggressively; ~70:1 observed). */
+  MAX_CACHE_REUSE_RATIO_CODEX: 80,
   /** Min cache_creation/output ratio (real min ~1.5:1; fabricators set cc<<o). */
   MIN_CACHE_WRITE_RATIO: 0.5,
   /** Min input share of total tokens (real min ~0.03% for power users; fabricators set input→0). */
@@ -205,18 +207,22 @@ export function plausibilityGate(p: SnapshotPayloadV1): GateReason[] {
       ),
     );
   }
-  // Extreme cache reuse: cache_read/cache_creation > 35:1 (real max ~30:1; was 100:1).
-  // A fabricator who sets cc low and cr high inflates Υ = cr·o/i² while staying under 100:1.
+  // Extreme cache reuse: cache_read/cache_creation ratio too high.
+  // Claude real max ~30:1; Codex caches more aggressively (~70:1 observed).
+  // A fabricator who sets cc low and cr high inflates Υ = cr·o/i².
+  const isCodex = p.platform.primary === "codex";
+  const maxReuse = isCodex
+    ? GATE_LIMITS.MAX_CACHE_REUSE_RATIO_CODEX
+    : GATE_LIMITS.MAX_CACHE_REUSE_RATIO;
   if (
     rt.tokens_cache_creation > 0 &&
-    rt.tokens_cache_read / rt.tokens_cache_creation >
-      GATE_LIMITS.MAX_CACHE_REUSE_RATIO
+    rt.tokens_cache_read / rt.tokens_cache_creation > maxReuse
   ) {
     out.push(
       flag(
         "plausibility",
         "extreme_cache_ratio",
-        `cache_read/cache_creation = ${(rt.tokens_cache_read / rt.tokens_cache_creation).toFixed(1)}:1 (real max ~30:1)`,
+        `cache_read/cache_creation = ${(rt.tokens_cache_read / rt.tokens_cache_creation).toFixed(1)}:1 (real max ~${maxReuse - 5}:1${isCodex ? " for Codex" : ""})`,
       ),
     );
   }
