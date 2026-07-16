@@ -48,8 +48,13 @@ function Section({
 const rowLink =
   "shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary";
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ claimed?: string }>;
+}) {
   const op = await getSessionOperator();
+  const { claimed } = await searchParams;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 py-6">
@@ -63,6 +68,26 @@ export default async function SettingsPage() {
             : "Appearance works now. Account controls unlock when you sign in."}
         </p>
       </header>
+
+      {claimed === "1" && op && (
+        <div className="flex flex-col gap-2 rounded-lg border border-gold/40 bg-gold/5 p-4">
+          <div className="flex items-center gap-2">
+            <span className="text-base">✓</span>
+            <h2 className="font-mono text-sm font-bold tracking-wide text-gold">
+              Profile claimed!
+            </h2>
+          </div>
+          <p className="font-sans text-xs leading-relaxed text-text-secondary">
+            Your operator profile is now linked to your account. Next step:
+            connect your agent so your live token runs cascade to the
+            leaderboard. Generate a connect code below and paste it into{" "}
+            <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-[11px] text-text-primary">
+              npx sigrank
+            </code>{" "}
+            → Connect tab.
+          </p>
+        </div>
+      )}
 
       <Section title="Appearance" desc="Theme is saved to this browser.">
         <ThemeToggle />
