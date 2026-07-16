@@ -19,6 +19,7 @@ const inputCls =
   "w-full rounded-md border border-bg-border bg-bg-base px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-dim focus:border-gold/50 focus:outline-none";
 
 export interface ProfileInitial {
+  codename?: string;
   display_name: string;
   handle: string;
   location: string;
@@ -26,6 +27,7 @@ export interface ProfileInitial {
   links: { github?: string; site?: string; x?: string };
   operator_domains: string[];
   avatar_url: string;
+  profile_visibility?: "public" | "private";
 }
 
 function Field({
@@ -76,6 +78,14 @@ export function ProfileEditForm({
   const [avatarUrl, setAvatarUrl] = useState(initial.avatar_url);
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    initial.profile_visibility ?? "public",
+  );
+  const [codename, setCodename] = useState(initial.codename ?? "");
+  const [codenameStatus, setCodenameStatus] = useState<
+    "idle" | "checking" | "saving" | "saved" | "error"
+  >("idle");
+  const [codenameError, setCodenameError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
   );
@@ -149,8 +159,84 @@ export function ProfileEditForm({
     }
   }
 
+  async function onChangeCodename(e: React.FormEvent) {
+    e.preventDefault();
+    if (codenameStatus === "saving") return;
+    setCodenameStatus("saving");
+    setCodenameError(null);
+    try {
+      const res = await fetch("/api/v1/profile/codename", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ codename: codename.trim().toLowerCase() }),
+      });
+      const d = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        codename?: string;
+      };
+      if (!res.ok) {
+        setCodenameError(d.error || "Could not change codename.");
+        setCodenameStatus("error");
+        return;
+      }
+      setCodenameStatus("saved");
+      // Navigate to the new profile URL
+      if (d.codename) {
+        router.push(`/user/${encodeURIComponent(d.codename)}`);
+        router.refresh();
+      }
+    } catch {
+      setCodenameError("Network error — please try again.");
+      setCodenameStatus("error");
+    }
+  }
+
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
+      {/* Codename (separate form — changes the URL key) */}
+      <Field
+        label="Codename"
+        hint="Your permanent identity on the leaderboard. Changing this updates your profile URL. Lowercase letters, numbers, and hyphens only."
+      >
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={codename}
+            onChange={(e) => {
+              setCodename(e.target.value);
+              setCodenameStatus("idle");
+              setCodenameError(null);
+            }}
+            className={inputCls}
+            placeholder="your-codename"
+            pattern="[a-z0-9-]{3,30}"
+            title="3-30 chars, lowercase letters/numbers/hyphens"
+          />
+          <button
+            type="button"
+            onClick={onChangeCodename}
+            disabled={
+              codenameStatus === "saving" ||
+              !codename.trim() ||
+              codename.trim().toLowerCase() === (initial.codename ?? "")
+            }
+            className="shrink-0 rounded-md border border-bg-border px-3 py-2 font-mono text-xs text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {codenameStatus === "saving" ? "Changing…" : "Change"}
+          </button>
+        </div>
+        {codenameStatus === "saved" && (
+          <span className="font-sans text-[11px] text-gold">
+            Codename updated. Your profile URL has changed.
+          </span>
+        )}
+        {codenameStatus === "error" && codenameError && (
+          <span className="font-sans text-[11px] text-red-400">
+            {codenameError}
+          </span>
+        )}
+      </Field>
+
       <Field
         label="Display name"
         hint="The human label on the board. Defaults to your codename until set."
@@ -277,6 +363,56 @@ export function ProfileEditForm({
       </Field>
 
       <div className="flex flex-col gap-2 border-t border-bg-border pt-4">
+        {/* Profile visibility (migration 0021) — controls who can see the
+            identity fields above (display name, handle, bio, location, links,
+            avatar). Private = only codename + computed metrics are public. */}
+        <fieldset className="flex flex-col gap-2">
+          <legend className="font-mono text-xs font-semibold uppercase tracking-wide text-text-secondary">
+            Profile visibility
+          </legend>
+          <div className="flex flex-wrap gap-3">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="profile-visibility"
+                value="public"
+                checked={visibility === "public"}
+                onChange={() => setVisibility("public")}
+                className="accent-gold"
+              />
+              <span className="font-sans text-sm text-text-primary">
+                Public
+              </span>
+              <span className="font-sans text-[11px] text-text-dim">
+                — all fields visible to everyone
+              </span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="profile-visibility"
+                value="private"
+                checked={visibility === "private"}
+                onChange={() => setVisibility("private")}
+                className="accent-gold"
+              />
+              <span className="font-sans text-sm text-text-primary">
+                Private
+              </span>
+              <span className="font-sans text-[11px] text-text-dim">
+                — only codename + rank + metrics visible
+              </span>
+            </label>
+          </div>
+          {visibility === "private" && (
+            <p className="font-sans text-[11px] leading-relaxed text-text-dim">
+              Your display name, handle, avatar, bio, location, and links will be
+              hidden from other users. You&apos;ll still appear on the leaderboard
+              with your codename and computed metrics (rank, Υ Yield, class).
+            </p>
+          )}
+        </fieldset>
+
         <button
           type="submit"
           disabled={status === "saving"}
