@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0c862"/>
+      <stop offset="100%" style="stop-color:#c4923a"/>
+    </linearGradient>
+    <linearGradient id="goldBright" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c4923a"/>
+      <stop offset="50%" style="stop-color:#f0c862"/>
+      <stop offset="100%" style="stop-color:#c4923a"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0d0d"/>
+      <stop offset="50%" style="stop-color:#0a0a0a"/>
+      <stop offset="100%" style="stop-color:#080808"/>
+    </linearGradient>
+    <linearGradient id="bladeGold" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" style="stop-color:#c4923a;stop-opacity:0.3"/>
+      <stop offset="50%" style="stop-color:#f0c862;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#f0c862;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="bladeGray" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" style="stop-color:#3a4a3a;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#5a6a5a;stop-opacity:0.8"/>
+    </linearGradient>
+    <radialGradient id="glowGold" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#f0c862;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#f0c862;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="goldGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+  <rect width="1200" height="675" fill="url(#glowGold)"/>
+
+  <!-- Top & bottom accent lines -->
+  <rect x="0" y="0" width="1200" height="3" fill="url(#goldBright)"/>
+  <rect x="0" y="672" width="1200" height="3" fill="url(#goldBright)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       HEADER (compact)
+       ═══════════════════════════════════════════════════════════════ -->
+  <text x="40" y="38" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="3">SIGRANK · FIELD ANALYSIS</text>
+  <text x="40" y="66" font-family="Roboto, sans-serif" font-size="26" font-weight="900" fill="#f0c862">HCM vs Active Users</text>
+  <text x="40" y="86" font-family="Roboto, sans-serif" font-size="12" fill="#6e8a6e">1,598 operators vs 8 claimed power users · the cache architect advantage</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       LEFT: CASCADE BLADE CHART (OP Ratio visualization)
+       The OP ratio (cache_read : output : cache_write) drawn as blade shapes.
+       HCM = stubby triangle. Active Users = long sharp blade.
+       This is the "wow" visual.
+       ═══════════════════════════════════════════════════════════════ -->
+  
+  <text x="40" y="120" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="2">CASCADE BLADE · OP RATIO SHAPE</text>
+
+  <!-- Chart area: x=40-560, y=130-380 -->
+  <!-- Axis baseline -->
+  <line x1="60" y1="370" x2="540" y2="370" stroke="#2a2a2a" stroke-width="1"/>
+  <text x="60" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">0</text>
+  <text x="180" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">100</text>
+  <text x="300" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">200</text>
+  <text x="420" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">300</text>
+  <text x="510" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">428</text>
+
+  <!-- HCM blade (10.4:1:0.49) — normalized to max=428 -->
+  <!-- cache_read=10.4 → 10.4/428*480 = 11.7px from center -->
+  <!-- output=1 → 1/428*480 = 1.1px up -->
+  <!-- cache_write=0.49 → 0.49/428*480 = 0.5px down -->
+  <!-- Drawn as triangle from origin (60,370) -->
+  <polygon points="60,370 71.7,369 71.7,371" fill="url(#bladeGray)" stroke="#5a6a5a" stroke-width="0.5"/>
+  <text x="80" y="355" font-family="Roboto Mono, monospace" font-size="11" fill="#6e8a6e">HCM</text>
+  <text x="80" y="370" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a">10.4:1:0.49</text>
+
+  <!-- PU blade (243:1:1.03) -->
+  <polygon points="60,370 332,369 332,371" fill="url(#bladeGray)" stroke="#7a8a7a" stroke-width="0.5" opacity="0.6"/>
+  <text x="340" y="355" font-family="Roboto Mono, monospace" font-size="10" fill="#8a9a8a">PU</text>
+  <text x="340" y="368" font-family="Roboto Mono, monospace" font-size="9" fill="#6a7a6a">243:1:1.03</text>
+
+  <!-- Active Users blade (427.8:1:2.77) — the big one -->
+  <!-- cache_read=427.8 → 427.8/428*480 = 479.7px → x=539.7 -->
+  <!-- output=1 → 1/428*480 = 1.12px up → y=368.88 -->
+  <!-- cache_write=2.77 → 2.77/428*480 = 3.1px down → y=373.1 -->
+  <polygon points="60,370 539.7,368.9 539.7,373.1" fill="url(#bladeGold)" stroke="#f0c862" stroke-width="1" filter="url(#goldGlow)"/>
+  <text x="445" y="340" font-family="Roboto Mono, monospace" font-size="13" font-weight="700" fill="#f0c862">YOUR USERS</text>
+  <text x="445" y="356" font-family="Roboto Mono, monospace" font-size="11" fill="#f0c862">427.8:1:2.77</text>
+
+  <!-- Arrow showing the leap -->
+  <path d="M 75 360 Q 250 280 440 330" stroke="#c4923a" stroke-width="1.5" fill="none" stroke-dasharray="4,3" opacity="0.6"/>
+  <polygon points="440,330 432,326 434,334" fill="#c4923a" opacity="0.6"/>
+  <text x="200" y="270" font-family="Roboto Mono, monospace" font-size="20" font-weight="900" fill="#f0c862" opacity="0.8">41×</text>
+  <text x="200" y="285" font-family="Roboto, sans-serif" font-size="9" fill="#8a7a4a">LEVERAGE</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       RIGHT: RADAR CHART (4 token categories, normalized)
+       Shows the shape difference between HCM and Active Users
+       ═══════════════════════════════════════════════════════════════ -->
+  
+  <text x="620" y="120" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="2">TOKEN PROFILE · RADAR</text>
+
+  <!-- Radar chart center: (800, 250), radius=110 -->
+  <!-- 4 axes: Input (top), Output (right), Cache Write (bottom), Cache Read (left) -->
+  <!-- Grid circles -->
+  <circle cx="800" cy="250" r="110" fill="none" stroke="#1a2a1a" stroke-width="0.5"/>
+  <circle cx="800" cy="250" r="82" fill="none" stroke="#1a2a1a" stroke-width="0.5"/>
+  <circle cx="800" cy="250" r="55" fill="none" stroke="#1a2a1a" stroke-width="0.5"/>
+  <circle cx="800" cy="250" r="27" fill="none" stroke="#1a2a1a" stroke-width="0.5"/>
+
+  <!-- Axes -->
+  <line x1="800" y1="140" x2="800" y2="360" stroke="#1a2a1a" stroke-width="0.5"/>
+  <line x1="690" y1="250" x2="910" y2="250" stroke="#1a2a1a" stroke-width="0.5"/>
+
+  <!-- Axis labels -->
+  <text x="800" y="132" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a" text-anchor="middle">INPUT</text>
+  <text x="918" y="254" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a">OUTPUT</text>
+  <text x="800" y="375" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a" text-anchor="middle">CACHE W</text>
+  <text x="675" y="254" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a" text-anchor="end">CACHE R</text>
+
+  <!-- HCM shape (normalized to max of each category = 100%)
+       Input: 1.9B = 100% → top, 110px
+       Output: 932M = 100% → right, 110px
+       Cache Write: 440M = 100% → bottom, 110px
+       Cache Read: 20B = 100% → left, 110px
+       Points: (800,140) (910,250) (800,360) (690,250) -->
+  <polygon points="800,140 910,250 800,360 690,250" fill="#4a5a4a" fill-opacity="0.15" stroke="#5a6a5a" stroke-width="1.5"/>
+
+  <!-- Active Users shape (normalized)
+       Input: 7.8M/1.9B = 0.4% → top, 0.4px (barely visible)
+       Output: 21.7M/932M = 2.3% → right, 2.5px
+       Cache Write: 216M/440M = 49% → bottom, 54px
+       Cache Read: 3.3B/20B = 16.5% → left, 18px
+       Points: (800,249.6) (802.5,250) (800,304) (782,250) -->
+  <polygon points="800,249.6 803,250 800,304 782,250" fill="#f0c862" fill-opacity="0.3" stroke="#f0c862" stroke-width="1.5"/>
+
+  <!-- HCM label -->
+  <text x="835" y="170" font-family="Roboto Mono, monospace" font-size="10" fill="#6e8a6e">HCM</text>
+  <rect x="833" y="174" width="20" height="2" fill="#5a6a5a"/>
+
+  <!-- Active Users label -->
+  <text x="835" y="195" font-family="Roboto Mono, monospace" font-size="10" fill="#f0c862">ACTIVE</text>
+  <rect x="833" y="199" width="20" height="2" fill="#f0c862"/>
+
+  <!-- Annotation: "barely visible" -->
+  <text x="800" y="245" font-family="Roboto, sans-serif" font-size="8" fill="#c4923a" text-anchor="middle" opacity="0.7">↑ 243× less input</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CENTER: THE THREE NUMBERS (big, bold, the takeaway)
+       ═══════════════════════════════════════════════════════════════ -->
+  
+  <!-- 41x -->
+  <text x="180" y="450" font-family="Roboto Mono, monospace" font-size="52" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" filter="url(#goldGlow)">41×</text>
+  <text x="180" y="472" font-family="Roboto, sans-serif" font-size="11" fill="#8a9a8a" text-anchor="middle">MORE LEVERAGE</text>
+  <text x="180" y="487" font-family="Roboto, sans-serif" font-size="9" fill="#5a6a5a" text-anchor="middle">cache_read ÷ input</text>
+
+  <!-- 5.7x -->
+  <text x="440" y="450" font-family="Roboto Mono, monospace" font-size="52" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" filter="url(#goldGlow)">5.7×</text>
+  <text x="440" y="472" font-family="Roboto, sans-serif" font-size="11" fill="#8a9a8a" text-anchor="middle">MORE VELOCITY</text>
+  <text x="440" y="487" font-family="Roboto, sans-serif" font-size="9" fill="#5a6a5a" text-anchor="middle">output per session</text>
+
+  <!-- 243x -->
+  <text x="700" y="450" font-family="Roboto Mono, monospace" font-size="52" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" filter="url(#goldGlow)">243×</text>
+  <text x="700" y="472" font-family="Roboto, sans-serif" font-size="11" fill="#8a9a8a" text-anchor="middle">LESS INPUT</text>
+  <text x="700" y="487" font-family="Roboto, sans-serif" font-size="9" fill="#5a6a5a" text-anchor="middle">7.8M vs 1.9B tokens</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       RIGHT: STACKED BAR CHART (token composition)
+       Shows how the 4 token types stack up for each group
+       ═══════════════════════════════════════════════════════════════ -->
+  
+  <text x="860" y="425" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="2">TOKEN MIX</text>
+
+  <!-- HCM stacked bar (23.3B total) -->
+  <!-- Cache Read 20B = 85.8%, Cache Write 440M = 1.9%, Output 932M = 4%, Input 1.9B = 8.2% -->
+  <text x="860" y="445" font-family="Roboto Mono, monospace" font-size="9" fill="#6e8a6e">HCM 23.3B</text>
+  <rect x="860" y="450" width="256" height="16" rx="2" fill="#141a14"/>
+  <rect x="860" y="450" width="220" height="16" rx="2" fill="#3a4a3a"/>
+  <rect x="1080" y="450" width="21" height="16" fill="#4a5a4a"/>
+  <rect x="1101" y="450" width="10" height="16" fill="#5a6a5a"/>
+  <rect x="1111" y="450" width="5" height="16" rx="2" fill="#6a7a6a"/>
+
+  <!-- Active Users stacked bar (3.6B total) -->
+  <!-- Cache Read 3.3B = 91.7%, Cache Write 216M = 6%, Output 21.7M = 0.6%, Input 7.8M = 0.2% -->
+  <text x="860" y="482" font-family="Roboto Mono, monospace" font-size="9" fill="#f0c862">ACTIVE 3.6B</text>
+  <rect x="860" y="487" width="256" height="16" rx="2" fill="#141a14"/>
+  <rect x="860" y="487" width="235" height="16" rx="2" fill="url(#goldGrad)"/>
+  <rect x="1095" y="487" width="15" height="16" fill="#d4a04a"/>
+  <rect x="1110" y="487" width="2" height="16" fill="#f0c862"/>
+  <rect x="1112" y="487" width="1" height="16" rx="2" fill="#fae090"/>
+
+  <!-- Legend -->
+  <rect x="860" y="515" width="8" height="8" rx="1" fill="#5a6a5a"/>
+  <text x="872" y="522" font-family="Roboto Mono, monospace" font-size="8" fill="#5a6a5a">Cache R</text>
+  <rect x="920" y="515" width="8" height="8" rx="1" fill="#6a7a6a"/>
+  <text x="932" y="522" font-family="Roboto Mono, monospace" font-size="8" fill="#5a6a5a">Input</text>
+  <rect x="970" y="515" width="8" height="8" rx="1" fill="#7a8a7a"/>
+  <text x="982" y="522" font-family="Roboto Mono, monospace" font-size="8" fill="#5a6a5a">Output</text>
+  <rect x="1020" y="515" width="8" height="8" rx="1" fill="#8a9a8a"/>
+  <text x="1032" y="522" font-family="Roboto Mono, monospace" font-size="8" fill="#5a6a5a">Cache W</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       BOTTOM: BASELINE LADDER (visual progression)
+       ═══════════════════════════════════════════════════════════════ -->
+  
+  <line x1="40" y1="545" x2="1160" y2="545" stroke="#141a14" stroke-width="1"/>
+  
+  <text x="40" y="568" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="2">OP RATIO LADDER · CACHE_READ : OUTPUT : CACHE_WRITE</text>
+
+  <!-- Ladder steps (ascending) -->
+  <!-- AA -->
+  <rect x="40" y="585" width="240" height="50" rx="6" fill="#0f1a0f" stroke="#1a2a1a" stroke-width="1"/>
+  <text x="52" y="603" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="1">AA</text>
+  <text x="52" y="622" font-family="Roboto Mono, monospace" font-size="15" font-weight="700" fill="#6e8a6e">3.5 : 1 : 0.5</text>
+  <text x="52" y="636" font-family="Roboto, sans-serif" font-size="9" fill="#4a5a4a">all-users avg</text>
+
+  <!-- HCM -->
+  <rect x="290" y="595" width="240" height="50" rx="6" fill="#0f1a10" stroke="#1a2a1a" stroke-width="1"/>
+  <text x="302" y="613" font-family="Roboto Mono, monospace" font-size="10" fill="#b0a060" letter-spacing="1">HCM</text>
+  <text x="302" y="632" font-family="Roboto Mono, monospace" font-size="15" font-weight="700" fill="#b0a060">20 : 1 : 0.1</text>
+  <text x="302" y="646" font-family="Roboto, sans-serif" font-size="9" fill="#5a5a3a">human center of mass</text>
+
+  <!-- PU -->
+  <rect x="540" y="605" width="240" height="50" rx="6" fill="#0f1505" stroke="#2a2010" stroke-width="1"/>
+  <text x="552" y="623" font-family="Roboto Mono, monospace" font-size="10" fill="#c4923a" letter-spacing="1">PU</text>
+  <text x="552" y="642" font-family="Roboto Mono, monospace" font-size="15" font-weight="700" fill="#c4923a">243 : 1 : 1.03</text>
+  <text x="552" y="656" font-family="Roboto, sans-serif" font-size="9" fill="#5a4a2a">Codex power-user</text>
+
+  <!-- YOUR USERS (highlighted, elevated) -->
+  <rect x="790" y="575" width="370" height="60" rx="8" fill="#1a1505" stroke="#c4923a" stroke-width="2"/>
+  <rect x="790" y="575" width="370" height="3" rx="1" fill="url(#goldBright)"/>
+  <text x="804" y="596" font-family="Roboto Mono, monospace" font-size="11" fill="#f0c862" letter-spacing="1">YOUR ACTIVE USERS</text>
+  <text x="804" y="620" font-family="Roboto Mono, monospace" font-size="20" font-weight="900" fill="#f0c862" filter="url(#goldGlow)">427.8 : 1 : 2.77</text>
+  <text x="804" y="636" font-family="Roboto, sans-serif" font-size="9" fill="#8a7a4a">hotter than the Codex PU baseline · self-selection for the top end</text>
+
+  <!-- Ascending arrows between steps -->
+  <polygon points="280,610 290,605 290,615" fill="#3a4a3a"/>
+  <polygon points="530,620 540,615 540,625" fill="#5a4a2a"/>
+  <polygon points="780,600 790,590 790,610" fill="#c4923a"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════════ -->
+  <text x="40" y="665" font-family="Roboto Mono, monospace" font-size="10" fill="#c4923a" font-weight="700" letter-spacing="1">SIGRANK · SIGNALAF.COM</text>
+  <text x="1160" y="665" font-family="Roboto, sans-serif" font-size="9" fill="#3a4a3a" text-anchor="end">8 active users · 41× leverage · 5.7× velocity · 243× less input</text>
+</svg>

@@ -224,7 +224,9 @@ export const OPERATOR_COLUMNS =
   "current_supporter_tier, verification_status, primary_domain, " +
   "account_age_days, total_messages_lifetime, " +
   // Phase-0 identity fields (migration 0007, apply post-move — null-safe on old rows)
-  "handle, avatar_url, bio, links, location";
+  "handle, avatar_url, bio, links, location, " +
+  // Profile visibility (migration 0021) — gates which fields non-owners can see.
+  "profile_visibility";
 
 // (Circles feature dropped 2026-06-25 — fresh-slate rebuild later. The circles /
 // circle_members / circle_metric_snapshots tables were removed from the DB; the

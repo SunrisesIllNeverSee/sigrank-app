@@ -39,7 +39,7 @@ export async function GET() {
   const { data } = await svc
     .from("operators")
     .select(
-      "display_name, handle, bio, location, links, operator_domains, avatar_url",
+      "display_name, handle, bio, location, links, operator_domains, avatar_url, profile_visibility",
     )
     .eq("operator_id", op.operatorId)
     .maybeSingle();
@@ -51,6 +51,7 @@ export async function GET() {
     links: { github?: string; site?: string; x?: string } | null;
     operator_domains: string[] | null;
     avatar_url: string | null;
+    profile_visibility: string | null;
   } | null;
 
   return NextResponse.json({
@@ -63,6 +64,7 @@ export async function GET() {
       links: d?.links ?? {},
       operator_domains: d?.operator_domains ?? [],
       avatar_url: d?.avatar_url ?? "",
+      profile_visibility: d?.profile_visibility ?? "public",
     },
   });
 }
@@ -117,6 +119,11 @@ export async function POST(req: NextRequest) {
     links,
     operator_domains,
   };
+  // Profile visibility (migration 0021) — 'public' or 'private'. Only update
+  // when the caller explicitly sends it (so partial saves don't clobber it).
+  if (body.profile_visibility === "public" || body.profile_visibility === "private") {
+    update.profile_visibility = body.profile_visibility;
+  }
   // Derive the display platform only when at least one is set (don't clobber an
   // existing primary_domain on an empty platform selection).
   if (operator_domains.length > 0) {

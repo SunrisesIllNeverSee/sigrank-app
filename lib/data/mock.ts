@@ -85,6 +85,7 @@ const MOSES_OPERATOR: Operator = {
   account_age_days: 119,
   total_messages_lifetime: 53960,
   isPlaceholder: false,
+  profile_visibility: "public" as const,
 };
 
 // MO§ES canonical pillars (verified against metrics.py SEED)
@@ -705,6 +706,7 @@ function seedToRow(spec: SeedSpec): LeaderboardRow {
     account_age_days: spec.age,
     total_messages_lifetime: spec.lifetime,
     isPlaceholder: true,
+    profile_visibility: "public" as const,
   };
   // Cascade computed from the REAL frozen pillars — reproduces canon Υ.
   const pillars = {

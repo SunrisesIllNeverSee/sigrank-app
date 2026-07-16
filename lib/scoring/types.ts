@@ -173,4 +173,7 @@ export interface Operator {
   links?: { github?: string; site?: string; x?: string } | null;
   /** Public location string (city/country, operator-supplied). */
   location?: string | null;
+  /** Profile visibility level (migration 0021). 'public' = all fields visible;
+   *  'private' = only codename + computed metrics visible to non-owners. */
+  profile_visibility?: "public" | "private" | null;
 }
