@@ -1,0 +1,5 @@
+# Gitleaks ignore — Supabase anon key in wrangler.jsonc
+# This is a PUBLIC key (NEXT_PUBLIC_ prefix, role:anon in JWT payload).
+# It's safe to expose — Supabase RLS enforces access control, not the key.
+# Gitleaks flags it because it looks like a JWT, but it's a false positive.
+e7f16ed428e307515a59abbecaf9de716bca8fe6:wrangler.jsonc:jwt:12
