@@ -7,26 +7,16 @@
  *
  * Also loads public/data/archetypes.json (7 operator archetypes from
  * K-Means clustering) for the OperatorArchetypes component.
+ *
+ * Uses JSON imports instead of fs.readFile() for Cloudflare Workers
+ * compatibility. JSON imports are bundled at build time and work on
+ * both Vercel and Cloudflare without filesystem access.
  */
 
-import { promises as fs } from "fs";
-import path from "path";
+import fieldAnalysisRaw from "@/public/data/field-analysis.json";
+import archetypesRaw from "@/public/data/archetypes.json";
 import type { FieldAnalysis } from "@/lib/field/types";
 import type { ArchetypeData } from "@/components/field/OperatorArchetypes";
-
-const DATA_PATH = path.join(
-  process.cwd(),
-  "public",
-  "data",
-  "field-analysis.json",
-);
-
-const ARCHETYPES_PATH = path.join(
-  process.cwd(),
-  "public",
-  "data",
-  "archetypes.json",
-);
 
 let cached: FieldAnalysis | null = null;
 let archetypesCached: ArchetypeData[] | null = null;
@@ -34,16 +24,14 @@ let archetypesCached: ArchetypeData[] | null = null;
 /** Load the field-analysis dataset (cached for the lifetime of the process). */
 export async function getFieldAnalysis(): Promise<FieldAnalysis> {
   if (cached) return cached;
-  const raw = await fs.readFile(DATA_PATH, "utf-8");
-  cached = JSON.parse(raw) as FieldAnalysis;
+  cached = fieldAnalysisRaw as FieldAnalysis;
   return cached;
 }
 
 /** Load the archetypes dataset (cached for the lifetime of the process). */
 export async function getArchetypes(): Promise<ArchetypeData[]> {
   if (archetypesCached) return archetypesCached;
-  const raw = await fs.readFile(ARCHETYPES_PATH, "utf-8");
-  const parsed = JSON.parse(raw) as { archetypes: ArchetypeData[] };
+  const parsed = archetypesRaw as { archetypes: ArchetypeData[] };
   archetypesCached = parsed.archetypes;
   return archetypesCached;
 }

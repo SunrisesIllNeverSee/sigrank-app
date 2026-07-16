@@ -19,7 +19,11 @@
     "e2e": "playwright test",
     "e2e:local": "E2E_BASE_URL=http://localhost:3000 playwright test",
     "e2e:report": "playwright show-report",
-    "snapshot": "node scripts/snapshot-db.mjs"
+    "snapshot": "node scripts/snapshot-db.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:dev": "wrangler dev --port 8787",
+    "cf:deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "cf:preview": "opennextjs-cloudflare build && wrangler deploy --name sigrank-app-preview"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.9.0",
@@ -45,6 +49,7 @@
     "@axe-core/playwright": "^4.12.1",
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.2.10",
+    "@opennextjs/cloudflare": "^1.20.1",
     "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -61,6 +66,7 @@
     "tailwindcss": "^3.4.0",
     "typescript": "5.8.2",
     "typescript-eslint": "^8.64.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.111.0"
   }
 }
