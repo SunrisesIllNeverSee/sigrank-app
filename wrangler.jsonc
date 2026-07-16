@@ -3,6 +3,10 @@
   "name": "sigrank-app",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    { "pattern": "signaaf.com", "custom_domain": true }
+  ],
+  "workers_dev": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
