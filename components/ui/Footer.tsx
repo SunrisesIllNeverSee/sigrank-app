@@ -191,6 +191,12 @@ export function Footer() {
             >
               Terms
             </Link>
+            <a
+              href="mailto:hello@signalaf.com"
+              className="transition-colors hover:text-text-primary"
+            >
+              Contact
+            </a>
           </nav>
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
             <span className="font-mono text-[11px] text-text-secondary">
