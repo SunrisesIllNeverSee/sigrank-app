@@ -25,6 +25,7 @@ export const metadata: Metadata = withOG({
 });
 
 const EMPTY: ProfileInitial = {
+  codename: "",
   display_name: "",
   handle: "",
   location: "",
@@ -32,6 +33,7 @@ const EMPTY: ProfileInitial = {
   links: {},
   operator_domains: [],
   avatar_url: "",
+  profile_visibility: "public",
 };
 
 export default async function EditProfilePage() {
@@ -45,7 +47,7 @@ export default async function EditProfilePage() {
     const { data } = await svc
       .from("operators")
       .select(
-        "display_name, handle, location, bio, links, operator_domains, avatar_url",
+        "display_name, handle, location, bio, links, operator_domains, avatar_url, profile_visibility",
       )
       .eq("operator_id", op.operatorId)
       .maybeSingle();
@@ -57,9 +59,11 @@ export default async function EditProfilePage() {
       links: { github?: string; site?: string; x?: string } | null;
       operator_domains: string[] | null;
       avatar_url: string | null;
+      profile_visibility: string | null;
     } | null;
     if (d) {
       initial = {
+        codename: op.codename,
         display_name: d.display_name ?? "",
         handle: d.handle ?? "",
         location: d.location ?? "",
@@ -69,6 +73,8 @@ export default async function EditProfilePage() {
           ? d.operator_domains
           : [],
         avatar_url: d.avatar_url ?? "",
+        profile_visibility:
+          d.profile_visibility === "private" ? "private" : "public",
       };
     }
   }
