@@ -51,6 +51,9 @@ export interface DbOperator {
   bio: string | null;
   links: { github?: string; site?: string; x?: string } | null;
   location: string | null;
+  // Profile visibility (migration 0021) — 'public' | 'private'. Null-safe on
+  // pre-migration rows (defaults to 'public' in mapOperator).
+  profile_visibility: string | null;
 }
 
 /** Minimal shape of a `metric_snapshots` row we read. */
@@ -232,6 +235,8 @@ export function mapOperator(o: DbOperator): Operator {
     bio: o.bio ?? null,
     links: o.links ?? null,
     location: o.location ?? null,
+    profile_visibility:
+      o.profile_visibility === "private" ? "private" : "public",
   };
 }
 
