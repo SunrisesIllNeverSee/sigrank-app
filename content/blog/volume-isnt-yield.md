@@ -47,7 +47,7 @@ Y = (cache_read × output) / input^2
 | Cache Write | 1.6% | Context committed for reuse |
 | Output | 0.5% | What the model generates |
 
-> **Rounding note.** Percentages are median-of-ratios — each operator's pillar share is computed individually, then the median across all 1,498 Human Center of Mass operators is reported. Pillar medians may not sum to exactly 100% because medians don't commute with sums. All ratios in this article (operating ratio, leverage, velocity) are median-of-ratios, not ratio-of-medians; the two diverge when distributions are skewed.
+> **Rounding note.** Percentages are median-of-ratios — each operator's pillar share is computed individually, then the median across all 1,515 Human Center of Mass operators is reported. Pillar medians may not sum to exactly 100% because medians don't commute with sums. All ratios in this article (operating ratio, leverage, velocity) are median-of-ratios, not ratio-of-medians; the two diverge when distributions are skewed.
 
 [10] This is why volume is misleading. An operator with 5 billion total tokens might have only 200 million tokens of actual input; the rest is cache replay. They're not "using" 5 billion tokens. They're using 200 million and compounding it.
 
@@ -90,10 +90,10 @@ Y = (cache_read × output) / input^2
 
 | Category | Count | % | Criteria |
 |----------|-------|---|----------|
-| Human Center of Mass | 1,498 | 92.0% | Input 1–80%, or gray-zone passing MOSES-like filter |
-| Outliers | 113 | 7.0% | 96 extreme humans + 17 flagged outliers (6-signal score) |
+| Human Center of Mass | 1,515 | 93.1% | Input 1–80%, or gray-zone passing MOSES-like filter |
+| Outliers | 113 | 6.9% | 96 extreme humans + 17 flagged outliers (6-signal score) |
 
-[16] 113 operators (7.0%) are outliers. The aggregate Benford passes because 1,498 real operators dominate the first-digit distribution; 113 outliers out of 1,628 is 7.0%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
+[16] 113 operators (6.9%) are outliers. The aggregate Benford passes because 1,515 real operators dominate the first-digit distribution; 113 outliers out of 1,628 is 6.9%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
 
 [17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's an outlier dumping synthetic input. This single operator skews the field average by 248,000%.
 
@@ -101,7 +101,7 @@ Y = (cache_read × output) / input^2
 
 ## The Human Center of Mass
 
-[19] After separating out the 113 outliers, 1,498 operators remain in the **Human Center of Mass**. The field average is meaningless; `grenadeoftacoss` alone skews it by 248,000%. The mean tells nobody anything.
+[19] After separating out the 113 outliers, 1,515 operators remain in the **Human Center of Mass**. The field average is meaningless; `grenadeoftacoss` alone skews it by 248,000%. The mean tells nobody anything.
 
 [20] The **median** is the real center. SigRank calls it the **Human Center of Mass**: where real operators naturally cluster, not the average including trillion-token outliers.
 
@@ -161,20 +161,20 @@ C : I : O = 19 : 1 : 0.09
 
 ## The 8 Archetypes
 
-[30] K-Means clustering was run on the 1,498 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
+[30] K-Means clustering was run on the 1,515 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
 
-[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 96 extreme humans and 17 flagged outliers from the full 1,628. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
+[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,515 Human Center of Mass operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 96 extreme humans and 17 flagged outliers from the full 1,628. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
 
 ![7 Human Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
 ### The Field (n=963, 59.8%)
-[32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
+[32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 93.1% cache read, yield 1.2).
 
 ### Context Builders (n=313, 19.4%)
 [33] Moderate yield (6.71), but with a difference: they're actively building cache. 4.8% of their tokens go to cache writes, 6x more than The Field. They're investing in context construction, and it's paying off with 5x higher yield. Examples: `gwbiubiu` (1.66B tokens, 0.94% input, 4% cache writes), `shivang2000`, `YoannLetacq`, `amondnet` (40.7B tokens, 0.22% input, 7.7% cache writes, yield 165), `trin4ik` (12.7B tokens, 1.6% input, 2.8% cache writes, yield 10.6).
 
 ### Cache Architects (n=137, 8.5%)
-[34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 360x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 97.0% cache read, yield 84).
+[34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 360x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 96.9% cache read, yield 84).
 
 ![8 Archetypes: Distribution Across the Field](/article-charts/26-eight-categories-donut.png)
 
@@ -255,7 +255,7 @@ C : I : O = 19 : 1 : 0.09
 
 ---
 
-*Data: 1,628 classified operators (1,628 scraped, 113 outliers separated, 1,498 Human Center of Mass) from public AI coding agent leaderboards (2026-07-13)*
+*Data: 1,628 classified operators (1,628 scraped, 113 outliers separated, 1,515 Human Center of Mass) from public AI coding agent leaderboards (2026-07-13)*
 *Analysis: Benford chi-square (scipy), K-Means clustering (scikit-learn), outlier detection (6-signal score + input/total ratio)*
 *Tool: SigRank, `npx sigrank` on npm*
 *Live board: [signalaf.com](https://signalaf.com) · [Field analysis](/field) · [Methodology](/methodology) · [Leaderboard](/board/all)*

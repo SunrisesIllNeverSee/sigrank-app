@@ -645,7 +645,7 @@ export default async function OperatorProfilePage({
               {nameShown}
               {outlier && (
                 <span
-                  title="Outlier or bot — excluded from Human Center of Mass"
+                  title="Outlier — excluded from Human Center of Mass"
                   className="ml-1 text-red-500"
                 >
                   *
