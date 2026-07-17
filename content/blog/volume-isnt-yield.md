@@ -1,7 +1,7 @@
 ---
 type: article
 title: "Volume Isn't Yield: The Shape of AI Operators"
-description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,628 operators actually use LLMs. Benford validation, 8 archetypes (7 human + outliers/bots), and the cascade economy.
+description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,611 operators actually use LLMs. Benford validation, 8 archetypes (7 human + outliers/bots), and the cascade economy.
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
 author: Deric (@SunrisesIllNeverSee)
@@ -27,7 +27,7 @@ hero: /article-charts/03-volume-vs-yield.png
 [6] The core metric is **Yield**:
 
 ```
-Y = (cache_read x output) / input^2
+Y = (cache_read × output) / input^2
 ```
 
 [7] Yield rewards building cache that produces output. Volume rewards burning tokens. They're not correlated. They're often inversely correlated. That's the whole thesis.
@@ -36,7 +36,7 @@ Y = (cache_read x output) / input^2
 
 ## What the Numbers Show
 
-[8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,628 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
+[8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,611 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
 
 [9] The first thing the margins show: **92.4% of the median operator's tokens are cache reads.** Not input. Not output. Cache reads. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
 
@@ -63,13 +63,13 @@ Y = (cache_read x output) / input^2
 
 | Pillar | N | chi-sq | Verdict |
 |--------|---|--------|---------|
-| Input tokens | 1,628 | 1.65 | PASS |
-| Output tokens | 1,628 | 5.54 | PASS |
-| Cache Read | 1,625 | 4.09 | PASS |
+| Input tokens | 1,611 | 1.65 | PASS |
+| Output tokens | 1,611 | 5.54 | PASS |
+| Cache Read | 1,608 | 4.09 | PASS |
 | Cache Write | 1,482 | 5.47 | PASS |
-| Total tokens | 1,628 | 0.77 | PASS |
+| Total tokens | 1,611 | 0.77 | PASS |
 
-> **Why N is smaller for Cache Read and Cache Write.** 3 operators had zero cache read and 129 had zero cache write — no leading digit to test, so they're excluded from that pillar's chi-square only. All other pillars use the full 1,628.
+> **Why N is smaller for Cache Read and Cache Write.** 3 operators had zero cache read and 129 had zero cache write — no leading digit to test, so they're excluded from that pillar's chi-square only. All other pillars use the full 1,611.
 
 [14] All 5 pillars pass. The observed first-digit distribution matches the expected Benford distribution almost perfectly. This is real telemetry, not fabricated.
 
@@ -80,29 +80,29 @@ Y = (cache_read x output) / input^2
 | Zone | Signal | Count | % | What they're doing |
 |------|--------|-------|---|-------------------|
 | Zone 0 | input/total < 0.1% | 64 | 4.0% | Near-zero input — splits into extreme humans + replay bots (see [15a]) |
-| Zone 1 | input/total > 80% | 11 | 0.7% | Input dump bots, massive input, no cache reuse |
-| Gray zone | 0.1–1% | 211 | 13.1% | Low input — splits into MOSES-like humans + extreme outliers (see [15a]) |
-| Human | 1–80% | 1,325 | 82.2% | Real operators, healthy input/cache mix |
+| Zone 1 | input/total > 80% | 11 | 0.7% | Input dumpers, massive input, no cache reuse, yield=0 |
+| Gray zone | 0.1–1% | 210 | 13.0% | Low input — splits into MOSES-like humans + extreme outliers (see [15a]) |
+| Human | 1–80% | 1,326 | 82.3% | Real operators, healthy input/cache mix |
 
-[15a] **Zone 0 is not all bots.** This is the critical distinction. Of the 64 operators with input < 0.1%, 51 have real output (median 4M tokens) and real cache writes (median 64M tokens) — they're extreme humans, not bots. They've built cached context so efficient that they barely need fresh input. The other 13 have near-zero output and near-zero cache writes — they're replay bots, just cycling cached context without producing anything. The gray zone (0.1–1% input) splits similarly: 172 operators pass a MOSES-like filter (velocity ≤ 2x, yield ≤ 1,000, real output > 1M, real cache write > 1M) and stay in the Human Center of Mass. 38 fail the filter and join the outliers.
+[15a] **Zone 0 is not all bots.** This is the critical distinction. Of the 64 operators with input < 0.1%, 51 have real output (median 4M tokens) and real cache writes (median 64M tokens) — they're extreme humans, not bots. They've built cached context so efficient that they barely need fresh input. The other 13 have near-zero output and near-zero cache writes — they look like replay bots, just cycling cached context without producing anything. The gray zone (0.1–1% input) splits similarly: 172 operators pass a MOSES-like filter (velocity ≤ 2x, yield ≤ 1,000, real output > 1M, real cache write > 1M) and stay in the Human Center of Mass. 38 fail the filter and join the outliers. The final bot/suspect classification uses a 6-signal score (inhuman throughput, zero cache reads, single-model fixation, zero sessions, anomalous input ratio, near-zero output) — 2 operators score high enough to be confirmed bots, 15 more score as suspects and are removed from the Human Center of Mass but kept visible in their own category.
 
 **The classification:**
 
 | Category | Count | % | Criteria |
 |----------|-------|---|----------|
-| Human Center of Mass | 1,498 | 92.1% | Input 1–80%, or gray-zone passing MOSES-like filter |
-| Outliers (extreme humans) | 89 | 5.5% | Input < 1%, fails MOSES-like filter, but real output + cache write |
-| Bots | 24 | 1.5% | Replay bots (13, near-zero output) + input dump bots (11, > 80% input) |
+| Human Center of Mass | 1,498 | 92.9% | Input 1–80%, or gray-zone passing MOSES-like filter |
+| Outliers (extreme humans) | 96 | 6.0% | Input < 1%, fails MOSES-like filter, but real output + cache write |
+| Bots & suspects | 17 | 1.1% | 2 confirmed bots (replay + input dump) + 15 suspects flagged by multi-signal score |
 
-[16] 24 operators (1.5%) are bots. The aggregate Benford passes because 1,498 real operators dominate the first-digit distribution; 24 bots out of 1,611 is only 1.5%, not enough to break the aggregate. But if you don't separate them — and the 89 extreme outliers alongside them — they pollute every downstream metric.
+[16] 17 operators (1.1%) are bots or suspects. The aggregate Benford passes because 1,498 real operators dominate the first-digit distribution; 17 flagged operators out of 1,611 is only 1.1%, not enough to break the aggregate. But if you don't separate them — and the 96 extreme outliers alongside them — they pollute every downstream metric.
 
-[17] **The outlier:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's a bot dumping synthetic input. This single operator skews the field average by 248,000%.
+[17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's a bot dumping synthetic input. This single operator skews the field average by 248,000%.
 
-[18] **The bots don't get deleted.** They get their own category. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else. The 89 outliers — extreme humans like `furic` who have real output and real cache construction but near-zero input — get their own toggle on the leaderboard. They're not bots. They're just not the center of mass.
+[18] **The bots don't get deleted.** They get their own category. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else. The 96 outliers — extreme humans like `furic` who have real output and real cache construction but near-zero input — get their own toggle on the leaderboard. They're not bots. They're just not the center of mass.
 
 ## The Human Center of Mass
 
-[19] After separating out the 24 bots and 89 outliers, 1,498 operators remain in the **Human Center of Mass**. The field average is meaningless; `grenadeoftacoss` alone skews it by 248,000%. The mean tells nobody anything.
+[19] After separating out the 17 bots/suspects and 96 outliers, 1,498 operators remain in the **Human Center of Mass**. The field average is meaningless; `grenadeoftacoss` alone skews it by 248,000%. The mean tells nobody anything.
 
 [20] The **median** is the real center. SigRank calls it the **Human Center of Mass**: where real operators naturally cluster, not the average including trillion-token outliers.
 
@@ -110,14 +110,14 @@ Y = (cache_read x output) / input^2
 
 | Metric | Median | IQR (25th-75th) |
 |--------|--------|-----------------|
-| Yield | 1.69 | 0.53 – 7.52 |
+| Yield | 1.68 | 0.53 – 7.52 |
 | Leverage | 18.6x | 9.7 – 41.2 |
 | Velocity | 0.09 | 0.05 – 0.19 |
 | SNR | 8.4% | 4.9% – 15.9% |
 | Total tokens | 5.28B | 1.78B – 16.0B |
 | Compression | 0.924 | 0.902 – 0.973 |
 
-[21] 80% of operators live between 1.8B and 16B total tokens. The median yield is 1.69, meaning the typical operator gets about 1.7x more signal out of their cascade than they put in as input. The top 1% pulls 10,000x or more.
+[21] 80% of operators live between 1.8B and 16B total tokens. The median yield is 1.68, meaning the typical operator gets about 1.7x more signal out of their cascade than they put in as input. The top 1% pulls 10,000x or more.
 
 [22] The median leverage is 18.6x. For every token of fresh input, the median operator reads 19 tokens of cached context. That's the cascade economy in one number.
 
@@ -160,9 +160,9 @@ C : I : O = 19 : 1 : 0.09
 
 ## The 8 Archetypes
 
-[30] K-Means clustering was run on the 1,498 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the methodology page.
+[30] K-Means clustering was run on the 1,498 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
 
-[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers & Bots — comes from the input/total ratio analysis (see [15a]), which flags 89 extreme humans and 24 bots from the full 1,628. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
+[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers & Bots — comes from the input/total ratio analysis (see [15a]), which flags 96 extreme humans and 17 bots/suspects from the full 1,611. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
 
 ![7 Human Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
@@ -173,7 +173,7 @@ C : I : O = 19 : 1 : 0.09
 [33] Moderate yield (6.71), but with a difference: they're actively building cache. 4.8% of their tokens go to cache writes, 6x more than The Field. They're investing in context construction, and it's paying off with 5x higher yield. Examples: `gwbiubiu` (1.66B tokens, 0.94% input, 4% cache writes), `shivang2000`, `YoannLetacq`, `amondnet` (40.7B tokens, 0.22% input, 7.7% cache writes, yield 165), `trin4ik` (12.7B tokens, 1.6% input, 2.8% cache writes, yield 10.6).
 
 ### Cache Architects (n=137, 8.5%)
-[34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 358x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 97.0% cache read, yield 84).
+[34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 360x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 97.0% cache read, yield 84).
 
 ![8 Archetypes: Distribution Across the Field](/article-charts/26-eight-categories-donut.png)
 
@@ -191,11 +191,11 @@ C : I : O = 19 : 1 : 0.09
 
 ### Outliers & Bots (the 8th archetype)
 
-[39] The 89 outliers and 24 bots flagged by the input/total ratio analysis (see [15a]) form the 8th archetype. Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The bots don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
+[39] The 96 outliers and 17 bots/suspects flagged by the input/total ratio analysis (see [15a]) form the 8th archetype. Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The bots don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
 
-[40] **Outliers (89 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
+[40] **Outliers (96 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
 
-[41] **Bots (24 operators):** Two flavors. Cache replay bots (13 operators, near-zero input and near-zero output, just cycling cached context without producing anything) and input dump bots (11 operators, input/total > 80%, massive raw input, near-zero yield, no cache reuse). Examples: `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output), `KimHyeon9606` (1.1B tokens, 0.06% input, yield 774 — replay bot with real-looking yield but near-zero output), `dylanneve1` (1.06B tokens, 0.08% input, yield 917 — same pattern).
+[41] **Bots & suspects (17 operators):** Two confirmed bots — `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output) and `stelle-w` (450B tokens, 75% input, 25% output, zero cache). Plus 15 suspects flagged by a multi-signal bot score (3–4 signals): anomalous token ratios that don't match human patterns but aren't as clear-cut as the confirmed bots. Examples: `iamtheavoc1` (7T tokens, 14% input, 18% output, 64% cache read — suspect, score 4), `logcjj` (115B tokens, 52% input, near-zero yield — suspect, score 3).
 
 [42] Not deleted, categorized. They get their own toggle on the leaderboard. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else.
 
@@ -232,9 +232,9 @@ C : I : O = 19 : 1 : 0.09
 
 ## What's Next
 
-[44] **Phase 1: The Field Page.** A `/field` page on signalaf.com that shows the distribution, the 8 archetypes, the percentile bands, the cascade flow, the bot zone, and the Benford trust badge. One story: Volume != Yield. You land on the Human Center of Mass and see where you fit.
+[44] **The [field page](/field) is live.** It shows the distribution, the 8 archetypes, the percentile bands, the cascade flow, the bot zone, and the Benford trust badge. One story: Volume != Yield. You land on the Human Center of Mass and see where you fit.
 
-[45] **Phase 2: The Methodology Page.** A `/methodology` page with the full chi-square tables, the bot detection algorithm, the clustering methodology, the provenance chain. This is the citation target, the place where "can I trust this?" gets answered.
+[45] **The [methodology page](/methodology) is live.** Full chi-square tables, the bot detection algorithm, the clustering methodology, the provenance chain. This is the citation target, the place where "can I trust this?" gets answered.
 
 [46] **Phase 3: The Dataset.** Upload to Zenodo, get a DOI, register DataCite metadata. The dataset becomes formally citable in academic papers.
 
@@ -250,14 +250,14 @@ C : I : O = 19 : 1 : 0.09
 
 [51] Volume isn't yield. The cascade economy rewards compounding, not pumping. And the shape of AI operators is not what you'd expect: it's a power law with a human center of mass, a hidden elite of cache architects, and a long tail of input-heavy operators still finding their footing.
 
-[52] This is the first cut. 1,628 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the bot detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
+[52] This is the first cut. 1,611 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the bot detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
 
 ---
 
-*Data: 1,628 operators from public AI coding agent leaderboards (2026-07-13)*
+*Data: 1,611 classified operators (1,628 scraped, 17 bots/suspects removed) from public AI coding agent leaderboards (2026-07-13)*
 *Analysis: Benford chi-square (scipy), K-Means clustering (scikit-learn), bot detection (6-signal score + input/total ratio)*
 *Tool: SigRank, `npx sigrank` on npm*
-*Live board: [signalaf.com](https://signalaf.com)*
+*Live board: [signalaf.com](https://signalaf.com) · [Field analysis](/field) · [Methodology](/methodology) · [Leaderboard](/board/all)*
 *Dataset: available for academic use (Zenodo upload pending)*
 
 ---
