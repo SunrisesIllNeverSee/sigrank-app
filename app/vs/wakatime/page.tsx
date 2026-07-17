@@ -247,7 +247,7 @@ export default function VsWakatimePage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank doesn&apos;t ignore time — it demotes it to a denominator.
-          Velocity = output / session_time measures how much signal you produce
+          Velocity = output / input measures how much signal you produce
           per unit time. That bridges the WakaTime view (productivity per hour)
           with the cascade view (signal per token). An operator with high Υ{" "}
           <em>and</em> high Velocity is the full picture: efficient{" "}

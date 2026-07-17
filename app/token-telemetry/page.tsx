@@ -74,7 +74,7 @@ const RELATED = [
   {
     href: "/metrics/velocity",
     title: "Velocity",
-    desc: "output / session_time — tokens produced per unit of wall-clock time.",
+    desc: "output / input — how much the model generates per token of fresh context.",
   },
   {
     href: "/guides/how-to-track-token-cascade",
