@@ -50,6 +50,18 @@ const nextConfig: NextConfig = {
   // Note (owner 2026-06-22): the /operators → /leaderboard + /user redirects were REMOVED
   // (owner wants a clean slate — old /operators[...] bookmarks now 404, by design). All
   // internal links already point at the new /leaderboard + /user/<codename> routes.
+  //
+  // /wiki/three-degrees → /wiki/four-degrees (owner 2026-07-17: renamed after expanding
+  // from 3 to 4 columns. Keep the redirect so old bookmarks + search indexes resolve.)
+  async redirects() {
+    return [
+      {
+        source: "/wiki/three-degrees",
+        destination: "/wiki/four-degrees",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
