@@ -226,7 +226,7 @@ export default async function FieldPage() {
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
           Signal-to-Noise Ratio (SNR) = output / (input + output). It measures what fraction of your
-          interaction produced actual output versus prompt overhead. Bots have SNR near zero.
+          interaction produced actual output versus prompt overhead. Outliers have SNR near zero.
           Humans have SNR above 5%. One number separates signal producers from token burners.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -358,6 +358,35 @@ export default async function FieldPage() {
           instead of the mean: the mean is pulled by outliers, the median
           reflects where operators actually are.
         </p>
+        <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
+          <p className="text-sm leading-relaxed text-text-secondary">
+            <strong className="text-text-primary">The average-user anchor.</strong>{" "}
+            The median yield of {meta.medians.yield} sits close to the{" "}
+            <a
+              href="https://artificialanalysis.ai"
+              className="text-gold underline underline-offset-2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Artificial Analysis
+            </a>{" "}
+            modeled &ldquo;average AI user&rdquo; baseline of 1.75 (the 7:2:1
+            cache-read : cache-write : input ratio). But the composition is very
+            different: the real field has <strong className="text-text-primary">{meta.medians.leverage}× leverage</strong>{" "}
+            vs the model&apos;s 3.5× — real operators read far more cache — but
+            only <strong className="text-text-primary">{meta.medians.velocity} velocity</strong>{" "}
+            vs the model&apos;s 0.50 — they produce less output per input token.
+            Cache-heavy, output-light. Net yield is close to the modeled average;
+            the path there is not. See the{" "}
+            <Link
+              href="/wiki/four-degrees"
+              className="text-gold underline underline-offset-2"
+            >
+              Four Degrees of Leverage
+            </Link>{" "}
+            for the full cascade.
+          </p>
+        </div>
       </section>
 
       {/* ── Percentile Ladder (Where am I?) ──────────────────────────── */}
@@ -507,6 +536,26 @@ export default async function FieldPage() {
           proportionate output. No human operator occupies that region. The 6-signal score makes
           this structural: inhuman throughput, zero cache reads, single-model fixation, and zero
           sessions are individually suspicious; together they are conclusive.
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          This is why the Four Degrees chart&apos;s columns are honest: the 113
+          outliers are separated before the median is computed. Without
+          separation, `grenadeoftacoss` alone skews the field average by
+          248,000%. The median is immune. Read the{" "}
+          <Link
+            href="/blog/volume-isnt-yield"
+            className="text-gold underline underline-offset-2"
+          >
+            full analysis
+          </Link>{" "}
+          or see the{" "}
+          <Link
+            href="/wiki/four-degrees"
+            className="text-gold underline underline-offset-2"
+          >
+            Four Degrees of Leverage
+          </Link>{" "}
+          to see how the clean median compares to the modeled average.
         </p>
       </section>
 
