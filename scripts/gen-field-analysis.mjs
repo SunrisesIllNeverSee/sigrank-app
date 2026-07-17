@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
- * scripts/gen-field-analysis.mjs — Generate the bot-filtered field-analysis JSON for /field page.
+ * scripts/gen-field-analysis.mjs — Generate the field-analysis JSON for /field page.
  *
  * Reads:
  *   - tokscale-leaderboard.json (1,628 operators, the master scrape)
- *   - tokscale-bot-analysis.json (500 operators with bot/suspect/human classification)
+ *   - tokscale-bot-analysis.json (500 operators with outlier/suspect/human classification)
  *
  * Writes:
- *   - public/data/field-analysis.json (trimmed, bot-filtered, with medians + IQR + ghost-ranks)
+ *   - public/data/field-analysis.json (trimmed, with medians + IQR + ghost-ranks)
  *
- * Bot filtering: removes 2 confirmed bots + 15 suspects from the distribution data.
- * They're kept in a separate `bots` array for the bot detection callout.
+ * Outlier handling: the 17 former bots/suspects are kept IN the operators array
+ * with a `classification` field. They're not removed — they're part of the 113
+ * outliers (96 extreme humans + 17 flagged). The `bots` array is kept empty for
+ * backward compat.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -34,19 +36,19 @@ const botAnalysis = JSON.parse(readFileSync(BOT_ANALYSIS_PATH, "utf-8"));
 const allUsers = leaderboard.users;
 const botUsers = botAnalysis.users;
 
-// ── Build bot/suspect handle sets ──
+// ── Build outlier handle sets ──
 const botHandles = new Set(
   botUsers.filter((u) => u.classification === "bot").map((u) => u.handle)
 );
 const suspectHandles = new Set(
   botUsers.filter((u) => u.classification === "suspect").map((u) => u.handle)
 );
-const excludeHandles = new Set([...botHandles, ...suspectHandles]);
+const flaggedHandles = new Set([...botHandles, ...suspectHandles]);
 
 console.log(`Total scraped: ${allUsers.length}`);
-console.log(`Bots excluded: ${botHandles.size} — ${[...botHandles].join(", ")}`);
-console.log(`Suspects excluded: ${suspectHandles.size}`);
-console.log(`Humans included: ${allUsers.length - excludeHandles.size}`);
+console.log(`Flagged outliers (former bots): ${botHandles.size} — ${[...botHandles].join(", ")}`);
+console.log(`Flagged outliers (former suspects): ${suspectHandles.size}`);
+console.log(`Human Center of Mass: ${allUsers.length - flaggedHandles.size}`);
 
 // ── Compute derived metrics per operator ──
 function computeMetrics(u) {
@@ -88,29 +90,22 @@ function computeMetrics(u) {
   };
 }
 
-// ── Split into humans + bots ──
-const humans = [];
-const bots = [];
+// ── Build operators array (all 1,628, flagged outliers get classification) ──
+const operators = [];
+const humans = []; // still needed for median computation (Human Center of Mass only)
 
 for (const u of allUsers) {
   const metrics = computeMetrics(u);
-  if (botHandles.has(u.handle)) {
-    const botData = botUsers.find((b) => b.handle === u.handle);
-    bots.push({
+  if (flaggedHandles.has(u.handle)) {
+    const flaggedData = botUsers.find((b) => b.handle === u.handle);
+    operators.push({
       ...metrics,
-      classification: "bot",
-      bot_score: botData?.bot_score || 0,
-      signals: botData?.signals || [],
-    });
-  } else if (suspectHandles.has(u.handle)) {
-    const suspectData = botUsers.find((b) => b.handle === u.handle);
-    bots.push({
-      ...metrics,
-      classification: "suspect",
-      bot_score: suspectData?.bot_score || 0,
-      signals: suspectData?.signals || [],
+      classification: botHandles.has(u.handle) ? "bot" : "suspect",
+      bot_score: flaggedData?.bot_score || 0,
+      signals: flaggedData?.signals || [],
     });
   } else {
+    operators.push(metrics);
     humans.push(metrics);
   }
 }
@@ -208,7 +203,7 @@ for (const h of humans) {
 }
 // Also count from top_platforms
 for (const u of allUsers) {
-  if (excludeHandles.has(u.handle)) continue;
+  if (flaggedHandles.has(u.handle)) continue;
   for (const p of u.top_platforms || []) {
     platformCounts[p] = (platformCounts[p] || 0) + 1;
   }
@@ -229,14 +224,13 @@ const output = {
     scraped_at: leaderboard.scraped_at,
     source: leaderboard.source,
     total_scraped: allUsers.length,
-    bots_removed: botHandles.size,
-    suspects_removed: suspectHandles.size,
     humans_included: humans.length,
+    outliers: 113, // 96 extreme humans + 17 flagged
     medians,
     iqr_fences: iqrFences,
   },
-  operators: humans,
-  bots,
+  operators,
+  bots: [], // deprecated — kept for backward compat
   ghost_ranks: ghostRanks,
   yield_quartiles: yieldQuartiles,
   platform_adoption: platformAdoption,
