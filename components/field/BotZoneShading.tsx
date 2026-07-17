@@ -40,7 +40,7 @@ export default function BotZoneShading() {
             <span className="font-mono font-bold text-green-400">
               1% - 80%
             </span>{" "}
-            - Human Center of Mass (1,515 operators)
+            - Human Center of Mass (1,498 operators)
           </span>
         </div>
         <div className="flex items-center gap-2">
