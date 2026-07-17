@@ -227,12 +227,12 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           Signal-to-Noise Ratio (SNR) = output / (input + output). It measures what fraction of your
           interaction produced actual output versus prompt overhead. Outliers have SNR near zero.
-          Humans have SNR above 5%. One number separates signal producers from token burners.
+          Humans have SNR above .05. One number separates signal producers from token burners.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The histogram shows the field clustering tightly around the median SNR of{" "}
           {meta.medians.snr.toFixed(3)}. The IQR fences (dashed lines) bracket the middle
-          50% of operators. The long tail to the right — operators with SNR above 10% — are the
+          50% of operators. The long tail to the right — operators with SNR above .10 — are the
           ghost-rank operators: they produce disproportionate output from minimal input.
         </p>
       </section>
@@ -361,7 +361,7 @@ export default async function FieldPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
           <p className="text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">The average-user anchor.</strong>{" "}
-            The median yield of {meta.medians.yield} sits close to the{" "}
+            The median yield of {meta.medians.yield.toFixed(2)} sits close to the{" "}
             <a
               href="https://artificialanalysis.ai"
               className="text-gold underline underline-offset-2"
@@ -372,9 +372,9 @@ export default async function FieldPage() {
             </a>{" "}
             modeled &ldquo;average AI user&rdquo; baseline of 1.75 (the 7:2:1
             cache-read : cache-write : input ratio). But the composition is very
-            different: the real field has <strong className="text-text-primary">{meta.medians.leverage}× leverage</strong>{" "}
+            different: the real field has <strong className="text-text-primary">{meta.medians.leverage.toFixed(1)}× leverage</strong>{" "}
             vs the model&apos;s 3.5× — real operators read far more cache — but
-            only <strong className="text-text-primary">{meta.medians.velocity} velocity</strong>{" "}
+            only <strong className="text-text-primary">{meta.medians.velocity.toFixed(2)} velocity</strong>{" "}
             vs the model&apos;s 0.50 — they produce less output per input token.
             Cache-heavy, output-light. Net yield is close to the modeled average;
             the path there is not. See the{" "}
@@ -417,7 +417,13 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The data reveals {ghost_ranks.length} ghost-rank operators — above median yield but with tokscale
           ranks in the hundreds or thousands. Their median tokscale rank is{" "}
-          {Math.round(ghost_ranks.reduce((s, g) => s + g.tokscale_rank, 0) / ghost_ranks.length)},
+          {(() => {
+            const ranks = ghost_ranks.map((g) => g.tokscale_rank).sort((a, b) => a - b);
+            const mid = Math.floor(ranks.length / 2);
+            return ranks.length % 2 === 0
+              ? Math.round((ranks[mid - 1] + ranks[mid]) / 2)
+              : ranks[mid];
+          })()},
           meaning they are buried deep on any volume leaderboard. But their yield values reach into
           the hundreds of thousands. Volume metrics hide them. Yield metrics find them.
         </p>
@@ -506,13 +512,14 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The field separates into 7 emergent archetypes. These are not
           invented categories. They emerged from K-Means clustering on
-          log(yield, leverage, velocity, SNR) with a RobustScaler. The data
+          log(yield, leverage, velocity, SNR) with a RobustScaler on the
+          1,611 non-flagged operators. The data
           separates by magnitude first (yield tiers), then by shape (token
           composition). Each archetype has its own fingerprint.
         </p>
         <OperatorArchetypes
           archetypes={archetypes}
-          totalOperators={meta.humans_included}
+          totalOperators={archetypes.reduce((s, a) => s + (a.n ?? 0), 0)}
         />
       </section>
 
@@ -538,8 +545,8 @@ export default async function FieldPage() {
           sessions are individually suspicious; together they are conclusive.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          This is why the Four Degrees chart&apos;s columns are honest: the 113
-          outliers are separated before the median is computed. Without
+          This is why the Four Degrees chart&apos;s columns are honest: the{" "}
+          {meta.outliers} outliers are separated before the median is computed. Without
           separation, `grenadeoftacoss` alone skews the field average by
           248,000%. The median is immune. Read the{" "}
           <Link
