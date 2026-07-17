@@ -34,7 +34,7 @@ export default function BenfordTrustBadge() {
         </span>
         <span className="font-mono text-xs text-text-muted">
           All 5 token pillars pass chi-square goodness-of-fit (&chi;&sup2; &lt;
-          15.51, p &gt; 0.05). 1,611 operators.
+          15.51, p &gt; 0.05). 1,611 non-flagged operators.
         </span>
       </div>
       <Link
