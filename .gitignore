@@ -28,3 +28,11 @@ _sigrank-mcp/
 .dev.vars
 .open-next/
 .wrangler/
+
+# Vercel env files (contain secrets)
+vercel-prod.env
+vercel*.env
+*.env.local
+
+# Design mockups (reference only, not production assets)
+public/mockup-*
