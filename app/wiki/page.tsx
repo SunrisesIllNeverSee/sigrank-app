@@ -1115,8 +1115,8 @@ export default function Draft1Page() {
       items: [
         {
           id: "three-degrees",
-          label: "The three degrees of leverage",
-          hint: "AA 7:2:1 baseline → wild field → a compounding operator; the 10xDEV log read + full provenance.",
+          label: "The four degrees of leverage",
+          hint: "AA 7:2:1 baseline → wild field median → power users → top eval; the 10xDEV log read + full provenance.",
           node: withPermalink(
             "three-degrees",
             <ThreeDegreesChart variant="full" />,

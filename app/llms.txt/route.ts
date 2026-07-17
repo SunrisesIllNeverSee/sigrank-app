@@ -44,7 +44,7 @@ ranks the humans using AI — not the models themselves.
 ## Concepts (definitions)
 - [Verification](${SITE_ORIGIN}/wiki/verification)
 - [Signal Drift](${SITE_ORIGIN}/wiki/signal-drift)
-- [Three Degrees](${SITE_ORIGIN}/wiki/three-degrees)
+- [Four Degrees](${SITE_ORIGIN}/wiki/three-degrees)
 - [Local Agent](${SITE_ORIGIN}/wiki/local-agent)
 - [Measured Alongside](${SITE_ORIGIN}/wiki/measured-alongside)
 
