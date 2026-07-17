@@ -112,7 +112,7 @@ Y = (cache_read × output) / input^2
 | Yield | 1.68 | 0.53 – 7.52 |
 | Leverage | 18.6x | 9.7 – 41.2 |
 | Velocity | 0.09 | 0.05 – 0.19 |
-| SNR | 8.4% | 4.9% – 15.9% |
+| SNR | .084 | .049 – .159 |
 | Total tokens | 5.28B | 1.78B – 16.0B |
 | Compression | 0.924 | 0.902 – 0.973 |
 
@@ -122,7 +122,7 @@ Y = (cache_read × output) / input^2
 
 [22b] **How does this compare to the "average AI user"?** The [Artificial Analysis](https://artificialanalysis.ai) pricing baseline models a 7:2:1 cache-read : cache-write : input ratio — the "average AI user" has a yield of 1.75, leverage of 3.5×, and velocity of 0.50. The real SigRank field median (yield 1.68, leverage 18.6×, velocity 0.09) tells a very different story: actual operators who install a token scanner read **5× more cache** than the model assumes (18.6× vs 3.5× leverage) but produce **5× less output per input** (0.09 vs 0.50 velocity). Net yield is about the same (1.68 vs 1.75) — but the composition is cache-heavy, output-light. The [Four Degrees of Leverage chart](/wiki/four-degrees) shows this side by side: the AA baseline column (static, the modeled average) next to the Human Center of Mass column (live, the real field median). The gap between them is the selection effect: people who care enough to measure their token cascade are cache-efficient, not output-prolific.
 
-[22a] Three more metrics in the table above need defining. **Velocity** is output divided by input: how much the model generates per token of fresh context. The median is 0.09, meaning 9 tokens of output for every 100 tokens of input. **SNR** (signal-to-noise ratio) is output as a percentage of input plus output: what fraction of the operator's interaction was actual generated signal versus prompt overhead. The median is 8.4%, which makes sense when 92.4% of tokens are cache replay — the cascade is dominated by context reuse, not fresh interaction. **Compression** is the share of total tokens that are cached (cache read + cache write): how much of the operator's world is stored context versus fresh interaction. The median is 0.924, meaning 92.4% of everything an operator touches is cached context they built earlier.
+[22a] Three more metrics in the table above need defining. **Velocity** is output divided by input: how much the model generates per token of fresh context. The median is 0.09, meaning 9 tokens of output for every 100 tokens of input. **SNR** (signal-to-noise ratio) is output as a fraction of input plus output: what fraction of the operator's interaction was actual generated signal versus prompt overhead. The median is .084, which makes sense when 92.4% of tokens are cache replay — the cascade is dominated by context reuse, not fresh interaction. **Compression** is the share of total tokens that are cached (cache read + cache write): how much of the operator's world is stored context versus fresh interaction. The median is 0.924, meaning 92.4% of everything an operator touches is cached context they built earlier.
 
 [23] This is where you land when you open SigRank. Not the outliers. The Human Center of Mass. Where you probably are.
 
