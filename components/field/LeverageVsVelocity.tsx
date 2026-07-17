@@ -1,7 +1,7 @@
 /**
  * LeverageVsVelocity — SVG scatter plot.
  *
- * X = leverage (cache_read / input), Y = velocity (output / session_time proxy).
+ * X = leverage (cache_read / input), Y = velocity (output / input).
  * Median crosshair. IQR-trimmed axes. The "yield = area of rectangle" concept
  * — leverage × velocity approximates how much cached context amplifies output.
  *
@@ -219,7 +219,7 @@ export default function LeverageVsVelocity({
         textAnchor="middle"
         transform={`rotate(-90 16 ${padT + plotH / 2})`}
       >
-        Velocity (output / time)
+        Velocity (output / input)
       </text>
     </svg>
   );
