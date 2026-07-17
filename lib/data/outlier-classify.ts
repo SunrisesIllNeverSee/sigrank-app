@@ -1,8 +1,8 @@
 /**
- * lib/data/outlier-classify.ts — shared outlier/bot classification.
+ * lib/data/outlier-classify.ts — shared outlier classification.
  *
  * One source of truth for whether an operator is in the Human Center of Mass
- * or classified as an Outlier & Bot. Used by:
+ * or classified as an Outlier. Used by:
  *   - Leaderboard category filter (components/sigrank/LeaderboardTable.tsx)
  *   - Three Degrees chart (lib/marketing/top-operator-column.ts isRealOperator)
  *   - Profile page (outlier badge + field averages)
@@ -19,7 +19,7 @@ export const HUMAN_WHITELIST = new Set([
   "transvaultorigin", // MOSES mock codename (fallback path)
 ]);
 
-/** Classify an operator as an outlier/bot or a human.
+/** Classify an operator as an outlier or a human.
  *
  * Human Center of Mass:
  *   - input/total 1%–80% (normal range), OR

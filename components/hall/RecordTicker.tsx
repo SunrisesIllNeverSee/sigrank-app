@@ -25,7 +25,7 @@ export interface RecordTickerItem {
   value: string;
   /** Link target (operator profile). */
   href: string;
-  /** When true, the holder is an outlier/bot — red asterisk (owner 2026-07-14). */
+  /** When true, the holder is an outlier — red asterisk (owner 2026-07-14). */
   outlier?: boolean;
 }
 
@@ -54,7 +54,7 @@ export function RecordTicker({ items }: { items: RecordTickerItem[] }) {
               {it.holder}
               {it.outlier && (
                 <span
-                  title="Outlier or bot — excluded from Human Center of Mass"
+                  title="Outlier — excluded from Human Center of Mass"
                   className="ml-1 text-red-500"
                 >
                   *
