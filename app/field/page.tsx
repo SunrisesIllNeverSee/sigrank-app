@@ -97,7 +97,7 @@ export default async function FieldPage() {
       { "@type": "PropertyValue", name: "Yield (Υ)", description: "cache_read × output / input²" },
       { "@type": "PropertyValue", name: "SNR", description: "output / (input + output)" },
       { "@type": "PropertyValue", name: "Leverage", description: "cache_read / input" },
-      { "@type": "PropertyValue", name: "Velocity", description: "output / session_time" },
+      { "@type": "PropertyValue", name: "Velocity", description: "output / input" },
     ],
     measurementTechnique:
       "On-device token telemetry from 1,498 human operators (Human Center of Mass). Bots and outliers separated via input/total ratio analysis.",
@@ -152,10 +152,10 @@ export default async function FieldPage() {
         }}
         benfordResults={{
           input_chi2: 1.65,
-          output_chi2: 5.58,
-          cache_read_chi2: 4.25,
-          cache_write_chi2: 5.35,
-          total_chi2: 1.04,
+          output_chi2: 5.54,
+          cache_read_chi2: 4.09,
+          cache_write_chi2: 5.47,
+          total_chi2: 0.77,
         }}
         humanCount={meta.humans_included}
       />
@@ -178,7 +178,7 @@ export default async function FieldPage() {
           The tokscale leaderboard ranks by total token volume. SigRank ranks by yield — how
           efficiently an operator converts input tokens into output tokens using cache compounding.
           These two rankings have almost zero correlation. The operator with the most tokens (9
-          quadrillion) has a yield of 0. The operator with the highest yield (110,251) ranks #357
+          quadrillion) has a yield of 0. The operator with the highest yield (2.46M) ranks #697
           by volume. Volume is noise. Yield is signal.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -253,8 +253,8 @@ export default async function FieldPage() {
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
           Leverage (cache_read / input) measures how much cached context amplifies each fresh input
-          token. Velocity (output / time) measures how fast that amplified context converts into
-          output. Together, they define the yield rectangle — the area of leverage × velocity
+          token. Velocity (output / input) measures how much the model generates per token of fresh
+          context. Together, they define the yield rectangle — the area of leverage × velocity
           approximates how efficiently an operator turns cached knowledge into produced signal.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -277,7 +277,7 @@ export default async function FieldPage() {
           <PlatformYieldQuartile data={quartilePlatformData} />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
-          Anthropic-primary operators dominate the top yield quartile — 96% of the highest-yield
+          Anthropic-primary operators dominate the top yield quartile — 98.5% of the highest-yield
           operators use Claude as their primary platform. This isn&apos;t coincidence: Anthropic&apos;s
           mature prompt caching infrastructure produces higher cacheRead values, which directly
           drives yield.
@@ -386,7 +386,7 @@ export default async function FieldPage() {
           operators worth recruiting — they have skill, not just spend.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The data reveals {ghost_ranks.length} ghost-rank operators — Q2 by yield but with tokscale
+          The data reveals {ghost_ranks.length} ghost-rank operators — above median yield but with tokscale
           ranks in the hundreds or thousands. Their median tokscale rank is{" "}
           {Math.round(ghost_ranks.reduce((s, g) => s + g.tokscale_rank, 0) / ghost_ranks.length)},
           meaning they are buried deep on any volume leaderboard. But their yield values reach into
@@ -528,6 +528,9 @@ export default async function FieldPage() {
           analyzed.
         </p>
         <div className="flex flex-wrap gap-4 text-sm">
+          <Link href="/blog/volume-isnt-yield" className="text-gold underline hover:text-text-primary">
+            Read the full analysis
+          </Link>
           <Link href="/methodology" className="text-gold underline hover:text-text-primary">
             Methodology
           </Link>
