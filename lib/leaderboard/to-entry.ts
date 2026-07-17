@@ -130,5 +130,9 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     // The operator's primary domain (lowercased) for client-side platform filtering
     // on ISR-cached board pages (the server can't read searchParams without going dynamic).
     primaryDomain: operator.primary_domain?.toLowerCase(),
+    // Retired operators (opt-out): shown on the board with tokens, but no profile
+    // page link. PII already stripped + codename changed to signal-<hash> by the
+    // retire script.
+    status: operator.status ?? null,
   };
 }

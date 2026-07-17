@@ -42,7 +42,8 @@ export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
   // falling back to the TOKEN_METRICS/METRICS def, then the raw id.
   const name = DISPLAY_BY_ID[canonId]?.name ?? def?.name ?? canonId;
   const ticker = DISPLAY_BY_ID[canonId]?.ticker ?? def?.ticker ?? canonId;
-  const top = rows.slice(0, limit);
+  // Retired operators (opt-out): exclude from Hall of Signal top-ten highlights.
+  const top = rows.filter((r) => r.operator.status !== "retired").slice(0, limit);
 
   return (
     <section className="rounded-md border border-bg-border bg-bg-surface p-4">

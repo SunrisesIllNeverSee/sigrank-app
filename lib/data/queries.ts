@@ -226,7 +226,9 @@ export const OPERATOR_COLUMNS =
   // Phase-0 identity fields (migration 0007, apply post-move — null-safe on old rows)
   "handle, avatar_url, bio, links, location, " +
   // Profile visibility (migration 0021) — gates which fields non-owners can see.
-  "profile_visibility";
+  "profile_visibility, " +
+  // status — needed to detect retired operators (opt-out: show on board, no profile page)
+  "status";
 
 // (Circles feature dropped 2026-06-25 — fresh-slate rebuild later. The circles /
 // circle_members / circle_metric_snapshots tables were removed from the DB; the
@@ -379,6 +381,29 @@ export async function getLeaderboard(
   }
 }
 
+/**
+ * Check whether an operator is retired (opt-out). Used by the profile page to
+ * redirect retired operators to the leaderboard instead of rendering a profile
+ * or 404. Retired operators stay on the board with their tokens but have no
+ * profile page.
+ */
+export async function isOperatorRetired(codename: string): Promise<boolean> {
+  const sb = getSupabaseServer();
+  if (!sb) return false;
+  try {
+    const { data, error } = await sb
+      .from("operators_public")
+      .select("status")
+      .ilike("codename", codename)
+      .limit(1)
+      .maybeSingle();
+    if (error) return false;
+    return (data as { status: string | null } | null)?.status === "retired";
+  } catch {
+    return false;
+  }
+}
+
 /** Single operator by codename (identity + latest snapshot + rank). */
 export async function getOperator(
   codename: string,
@@ -400,6 +425,10 @@ export async function getOperator(
     if (opError) throw opError;
     const op = asDb<DbOperator | null>(opData);
     if (!op) return fromMock();
+    // Retired operators (opt-out): no profile page. They stay on the leaderboard
+    // with their tokens but are not clickable — getOperator returns null so the
+    // profile route redirects to /leaderboard instead of rendering a profile.
+    if (op.status === "retired") return null;
 
     // BOARD redesign (2026-06-27): the profile headline (rank / class / cascade) must
     // agree with the board's operator-TOTAL row, so we pick the operator's total the

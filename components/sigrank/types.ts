@@ -85,6 +85,9 @@ export interface LeaderboardEntry {
   /** Snapshot date ('YYYY-MM-DD') of this scored window — the LAST column. Null when
    *  the row has no snapshot_date (legacy rows); the table renders it as "—". */
   lastSeen: string | null;
+  /** Operator status: active, dormant, banned, retired. Retired = opted-out
+   *  (anonymous on the board, no profile page link). */
+  status?: string | null;
 }
 
 export interface ProfileMetric {
