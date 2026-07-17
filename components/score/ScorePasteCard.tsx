@@ -10,6 +10,7 @@
  */
 
 import React, { useState } from "react";
+import { track } from "@/lib/posthog/events";
 
 interface ParsePreview {
   input: number;
@@ -64,6 +65,18 @@ export function ScorePasteCard() {
       }
       const data = await res.json();
       setStatus({ kind: "parsed", preview: data });
+      // Fire score_calculated so we can see the /score → enroll funnel.
+      // Yield band buckets the raw number for cohort analysis without
+      // storing the exact value (privacy-preserving).
+      const y = data.yield ?? 0;
+      const band =
+        y >= 10000 ? "10k+" : y >= 1000 ? "1k-10k" : y >= 100 ? "100-1k" : "0-100";
+      track.scoreCalculated({
+        classTier: data.classTier ?? "UNKNOWN",
+        yieldBand: band,
+        source: data.source ?? "unknown",
+        estimated: !!data.estimated,
+      });
     } catch {
       setStatus({
         kind: "error",
