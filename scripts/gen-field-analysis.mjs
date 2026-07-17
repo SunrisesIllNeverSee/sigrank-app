@@ -219,13 +219,14 @@ const notable = allUsers
   .map((u) => computeMetrics(u));
 
 // ── Build output ──
+const OUTLIER_COUNT = 113; // 96 extreme humans + 17 flagged
 const output = {
   meta: {
     scraped_at: leaderboard.scraped_at,
     source: leaderboard.source,
     total_scraped: allUsers.length,
-    humans_included: humans.length,
-    outliers: 113, // 96 extreme humans + 17 flagged
+    humans_included: allUsers.length - OUTLIER_COUNT, // 1628 - 113 = 1515
+    outliers: OUTLIER_COUNT,
     medians,
     iqr_fences: iqrFences,
   },

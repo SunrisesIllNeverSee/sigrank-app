@@ -2,7 +2,7 @@
  * lib/field/types.ts — TypeScript types for the field-analysis.json dataset.
  *
  * The dataset at public/data/field-analysis.json captures the AI operator
- * field distribution: 1,628 operators (1,498 Human Center of Mass + 113
+ * field distribution: 1,628 operators (1,515 Human Center of Mass + 113
  * outliers) with token cascade metrics, plus 50 ghost-rank operators, yield
  * quartile IQR data, platform adoption counts, and 4 notable operators for
  * the cascade composition chart.
