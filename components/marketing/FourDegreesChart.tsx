@@ -222,7 +222,7 @@ function SourceMarkers() {
       </Link>{" "}
       (auto-pulled at render). Human Center of Mass = median of all real operators;
       Power users = median of the top 100 by yield; Top Evals = the single leading
-      operator. 113 outliers separated (see the{" "}
+      operator. 130 outliers separated (see the{" "}
       <Link
         href="/field"
         className="text-text-accent underline-offset-2 hover:underline"
@@ -317,7 +317,7 @@ function Provenance() {
           Average users (all operators median) · <span className="text-gold">measured live</span>
         </p>
         <p>
-          The median of ALL real operators on the all-time board, with the 113
+          The median of ALL real operators on the all-time board, with the 130
           outliers separated (they&apos;re not deleted — they get their own
           category — but they don&apos;t set the median). Median, not mean: the
           board is heavily right-skewed (a single IGNITER-class operator with 9
@@ -383,7 +383,7 @@ function Provenance() {
           <span className="text-text-muted">*</span>{" "}
           <strong>Human Center of Mass</strong>: median of all real operators on
           the all-time board, computed live at render. Excludes staged seeds, The
-          Field, retired/anonymized rows, and the 113 outliers (extreme humans +
+          Field, retired/anonymized rows, and the 130 outliers (113 extreme humans + 17 flagged
           flagged operators) that would skew the median. See the{" "}
           <Link
             href="/field"
