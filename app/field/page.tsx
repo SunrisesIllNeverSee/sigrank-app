@@ -2,10 +2,10 @@
  * app/field/page.tsx — AI Operator Field Distribution Analysis.
  *
  * The SEO-heavy page proving the "Volume ≠ Yield" thesis with real data from
- * 1,515 human operators (Human Center of Mass, outliers separated). Server component, ISR (1h).
+ * 1,498 human operators (Human Center of Mass, outliers separated). Server component, ISR (1h).
  * Renders 9 pure-SVG chart components + analysis text + JSON-LD Dataset schema.
  *
- * Data source: public/data/field-analysis.json (pre-generated, 1,628 total, 1,515 Human Center of Mass).
+ * Data source: public/data/field-analysis.json (pre-generated, 1,628 total, 1,498 Human Center of Mass).
  */
 
 import type { Metadata } from "next";
@@ -37,7 +37,7 @@ export const metadata: Metadata = withOG({
   title:
     "AI Operator Field Analysis — The True Distribution of Token Efficiency",
   description:
-    "Real data from 1,515 human AI operators proves volume ≠ yield. Median yield 1.68, SNR 8.4%, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
+    "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR 8.4%, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
   path: "/field",
 });
 
@@ -77,7 +77,7 @@ export default async function FieldPage() {
     "@type": "Dataset",
     name: "AI Operator Field Distribution Analysis — SigRank",
     description:
-      "Distribution analysis of 1,515 human AI operators (Human Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
+      "Distribution analysis of 1,498 human AI operators (Human Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
       "Volume vs yield correlation, SNR separation, platform dominance, outlier detection. " +
       "Outliers separated via 6-signal outlier-likelihood score + input/total ratio analysis.",
     url: `${SITE_ORIGIN}/field`,
@@ -100,7 +100,7 @@ export default async function FieldPage() {
       { "@type": "PropertyValue", name: "Velocity", description: "output / input" },
     ],
     measurementTechnique:
-      "On-device token telemetry from 1,515 human operators (Human Center of Mass). Outliers separated via input/total ratio analysis.",
+      "On-device token telemetry from 1,498 human operators (Human Center of Mass). Outliers separated via input/total ratio analysis.",
     temporalCoverage: meta.scraped_at,
   };
 

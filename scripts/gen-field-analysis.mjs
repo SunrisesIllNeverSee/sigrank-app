@@ -219,13 +219,15 @@ const notable = allUsers
   .map((u) => computeMetrics(u));
 
 // ── Build output ──
-const OUTLIER_COUNT = 113; // 96 extreme humans + 17 flagged
+const FLAGGED_COUNT = flaggedHandles.size; // 17 former bots/suspects
+const EXTREME_OUTLIER_COUNT = 113; // from input/total ratio analysis
+const OUTLIER_COUNT = EXTREME_OUTLIER_COUNT + FLAGGED_COUNT; // 130 total
 const output = {
   meta: {
     scraped_at: leaderboard.scraped_at,
     source: leaderboard.source,
     total_scraped: allUsers.length,
-    humans_included: allUsers.length - OUTLIER_COUNT, // 1628 - 113 = 1515
+    humans_included: allUsers.length - OUTLIER_COUNT, // 1628 - 130 = 1498
     outliers: OUTLIER_COUNT,
     medians,
     iqr_fences: iqrFences,
