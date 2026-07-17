@@ -22,7 +22,7 @@
   <!-- ═══ HEADER ═══════════════════════════════════════════════════ -->
   <text x="60" y="48" font-family="Roboto Mono, monospace" font-size="11" fill="#5a8a5a" letter-spacing="3">SIGRANK · FIELD ANALYSIS</text>
   <text x="60" y="82" font-family="Roboto, sans-serif" font-size="32" font-weight="900" fill="#f0c862">The 8 Archetypes</text>
-  <text x="60" y="106" font-family="Roboto, sans-serif" font-size="14" fill="#6e8a6e">1,611 operators classified by cascade architecture · from The Field to The Elite</text>
+  <text x="60" y="106" font-family="Roboto, sans-serif" font-size="14" fill="#6e8a6e">Classified by cascade architecture · from The Field to The Elite · snapshot 2026-07-13</text>
 
   <!-- Column headers -->
   <text x="110" y="138" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a" letter-spacing="1">ARCHETYPE</text>
@@ -173,5 +173,5 @@
 
   <!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
   <text x="60" y="980" font-family="Roboto Mono, monospace" font-size="11" fill="#c4923a" font-weight="700" letter-spacing="1">SIGRANK · SIGNALAF.COM</text>
-  <text x="1140" y="980" font-family="Roboto, sans-serif" font-size="10" fill="#3a4a3a" text-anchor="end">8 archetypes · 1,611 operators · classified by cascade architecture</text>
+  <text x="1140" y="980" font-family="Roboto, sans-serif" font-size="10" fill="#3a4a3a" text-anchor="end">8 archetypes · snapshot 2026-07-13 · signalaf.com</text>
 </svg>
