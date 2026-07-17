@@ -93,7 +93,7 @@ Y = (cache_read × output) / input^2
 | Human Center of Mass | 1,498 | 92.0% | Input 1–80%, or gray-zone passing MOSES-like filter |
 | Outliers | 130 | 8.0% | 113 from input/total ratio analysis + 17 flagged (6-signal score) |
 
-[16] 130 operators (8.0%) are outliers. The aggregate Benford passes because 1,498 real operators dominate the first-digit distribution; 130 outliers out of 1,628 is 8.0%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
+[16] 130 operators (8.0%) are outliers. The aggregate Benford passes because 1,611 non-flagged operators dominate the first-digit distribution; 130 outliers out of 1,628 is 8.0%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
 
 [17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's an outlier dumping synthetic input. This single operator skews the field average by 248,000%.
 
@@ -161,9 +161,9 @@ C : I : O = 19 : 1 : 0.09
 
 ## The 8 Archetypes
 
-[30] K-Means clustering was run on the 1,498 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
+[30] K-Means clustering was run on the 1,611 non-flagged operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
 
-[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 113 extreme humans from the 1,628, plus 17 flagged by the 6-signal score, for a total of 130 outliers. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
+[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,611 non-flagged operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 113 extreme humans from the 1,628, plus 17 flagged by the 6-signal score, for a total of 130 outliers. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
 
 ![7 Human Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
