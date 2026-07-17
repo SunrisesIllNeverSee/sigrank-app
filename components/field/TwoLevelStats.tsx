@@ -48,7 +48,7 @@ export default function TwoLevelStats({
 }: TwoLevelStatsProps) {
   const quickStats = [
     { label: "Yield (Y)", value: medians.yield.toFixed(2), color: "#d4af37" },
-    { label: "SNR", value: `${(medians.snr * 100).toFixed(1)}%`, color: "#10b981" },
+    { label: "SNR", value: medians.snr.toFixed(3), color: "#10b981" },
     { label: "Leverage", value: `${medians.leverage.toFixed(1)}x`, color: "#8b5cf6" },
     { label: "Velocity", value: `${medians.velocity.toFixed(2)}x`, color: "#3498db" },
     { label: "Total tokens", value: fmtNum(medians.total_tokens), color: "#e17055" },
@@ -132,9 +132,9 @@ export default function TwoLevelStats({
                     {iqrFences.snr && (
                       <tr>
                         <td className="py-1 text-green-400">SNR</td>
-                        <td className="py-1 text-right">{(iqrFences.snr.q1 * 100).toFixed(2)}%</td>
-                        <td className="py-1 text-right">{(iqrFences.snr.q3 * 100).toFixed(2)}%</td>
-                        <td className="py-1 text-right">{(iqrFences.snr.iqr * 100).toFixed(2)}%</td>
+                        <td className="py-1 text-right">{iqrFences.snr.q1.toFixed(3)}</td>
+                        <td className="py-1 text-right">{iqrFences.snr.q3.toFixed(3)}</td>
+                        <td className="py-1 text-right">{iqrFences.snr.iqr.toFixed(3)}</td>
                       </tr>
                     )}
                   </tbody>
