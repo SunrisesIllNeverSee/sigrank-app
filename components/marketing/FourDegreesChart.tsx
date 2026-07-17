@@ -222,8 +222,22 @@ function SourceMarkers() {
       </Link>{" "}
       (auto-pulled at render). Human Center of Mass = median of all real operators;
       Power users = median of the top 100 by yield; Top Evals = the single leading
-      operator. All derived from canonical four-pillar token telemetry. Token counts
-      only.
+      operator. 113 outliers separated (see the{" "}
+      <Link
+        href="/field"
+        className="text-text-accent underline-offset-2 hover:underline"
+      >
+        field analysis
+      </Link>
+      ). All derived from canonical four-pillar token telemetry. Token counts
+      only. Read the{" "}
+      <Link
+        href="/blog/volume-isnt-yield"
+        className="text-text-accent underline-offset-2 hover:underline"
+      >
+        full analysis
+      </Link>
+      .
     </p>
   );
 }
@@ -303,13 +317,19 @@ function Provenance() {
           Average users (all operators median) · <span className="text-gold">measured live</span>
         </p>
         <p>
-          The median of ALL real operators on the all-time board. Median, not
-          mean: the board is heavily right-skewed (a single IGNITER-class
-          operator with 9 quadrillion input tokens pulls the mean yield to 427
-          vs the median of 2.5 — a 170× spread). The median is the exact 50th
-          percentile, immune to any outlier no matter how extreme. The trimmed
-          mean (drop 5% each end) still lands at 17.6 vs 2.5 — still pulled by
-          the upper-middle. Median is the cleanest cut. Source:{" "}
+          The median of ALL real operators on the all-time board, with the 113
+          outliers separated (they&apos;re not deleted — they get their own
+          category — but they don&apos;t set the median). Median, not mean: the
+          board is heavily right-skewed (a single IGNITER-class operator with 9
+          quadrillion input tokens pulls the mean yield to 427 vs the median of
+          2.5 — a 170× spread). The median is the exact 50th percentile, immune
+          to any outlier no matter how extreme. The trimmed mean (drop 5% each
+          end) still lands at 17.6 vs 2.5 — still pulled by the upper-middle.
+          Median is the cleanest cut. The gap between this column and the AA
+          baseline is the selection effect: real operators who install a token
+          scanner are cache-heavy (leverage ~20× vs AA&apos;s 3.5×) but
+          output-light (velocity ~0.09 vs AA&apos;s 0.50) — net yield is close
+          to the modeled average, but the composition is very different. Source:{" "}
           <Link
             href="/board/all"
             className="text-text-accent underline-offset-2 hover:underline"
@@ -363,7 +383,15 @@ function Provenance() {
           <span className="text-text-muted">*</span>{" "}
           <strong>Human Center of Mass</strong>: median of all real operators on
           the all-time board, computed live at render. Excludes staged seeds, The
-          Field, and retired/anonymized rows.
+          Field, retired/anonymized rows, and the 113 outliers (extreme humans +
+          flagged operators) that would skew the median. See the{" "}
+          <Link
+            href="/field"
+            className="text-text-accent underline-offset-2 hover:underline"
+          >
+            field analysis
+          </Link>{" "}
+          for the full outlier separation methodology.
         </p>
         <p>
           <span className="text-text-muted">†</span>{" "}
