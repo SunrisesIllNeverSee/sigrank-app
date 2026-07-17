@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/supabase/auth-server";
 import { getSupabaseService } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe/server";
+import { captureServer } from "@/lib/posthog/server";
 
 /**
  * POST /api/v1/account/delete — permanent account deletion (owner 2026-06-27).
@@ -97,6 +98,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: authErr.message }, { status: 500 });
     }
   }
+
+  // Fire operator_retired event for trend tracking (best-effort, never blocks).
+  await captureServer(op.codename, "operator_retired", {
+    codename: op.codename,
+    had_subscription: !!customerId,
+  });
 
   return NextResponse.json({ ok: true });
 }

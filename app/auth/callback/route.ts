@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { captureServer } from "@/lib/posthog/server";
 
 /**
  * GET /auth/callback — OAuth (GitHub) + magic-link return point.
@@ -98,19 +99,23 @@ export async function GET(req: NextRequest) {
     if (!existing) {
       // First login → mint the operator, prefilled with the provider's public name/avatar.
       let operatorId: string | null = null;
+      let mintedCodename: string | null = null;
       for (let attempt = 0; attempt < 3 && !operatorId; attempt++) {
+        const codename = mintCodename();
         const { data: op, error: opErr } = await svc
           .from("operators")
           .insert({
-            codename: mintCodename(),
+            codename,
             claimed: true,
             claimed_at: new Date().toISOString(),
             ...publicCore,
           })
           .select("operator_id")
           .single();
-        if (!opErr && op)
+        if (!opErr && op) {
           operatorId = (op as { operator_id: string }).operator_id;
+          mintedCodename = codename;
+        }
       }
       if (operatorId) {
         await svc
@@ -122,6 +127,14 @@ export async function GET(req: NextRequest) {
             .from("operators")
             .update({ handle: providerHandle })
             .eq("operator_id", operatorId);
+        }
+        // Fire operator_claimed event for trend tracking (best-effort, never blocks).
+        if (mintedCodename) {
+          await captureServer(mintedCodename, "operator_claimed", {
+            codename: mintedCodename,
+            had_handle: !!providerHandle,
+            claim_path: "auth_callback",
+          });
         }
       }
     } else {
