@@ -2,10 +2,10 @@
  * app/field/page.tsx — AI Operator Field Distribution Analysis.
  *
  * The SEO-heavy page proving the "Volume ≠ Yield" thesis with real data from
- * 1,498 human operators (Human Center of Mass, outliers/bots separated). Server component, ISR (1h).
+ * 1,498 human operators (Human Center of Mass, outliers separated). Server component, ISR (1h).
  * Renders 9 pure-SVG chart components + analysis text + JSON-LD Dataset schema.
  *
- * Data source: public/data/field-analysis.json (pre-generated, 1,611 total, 1,498 Human Center of Mass).
+ * Data source: public/data/field-analysis.json (pre-generated, 1,628 total, 1,498 Human Center of Mass).
  */
 
 import type { Metadata } from "next";
@@ -46,7 +46,7 @@ export const revalidate = 3600;
 export default async function FieldPage() {
   const data = await getFieldAnalysis();
   const archetypes = await getArchetypes();
-  const { meta, operators, bots, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
+  const { meta, operators, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
 
   // Compute platform × yield-quartile breakdown for the stacked bar chart
   const opsSorted = [...operators].sort((a, b) => a.yield - b.yield);
@@ -78,8 +78,8 @@ export default async function FieldPage() {
     name: "AI Operator Field Distribution Analysis — SigRank",
     description:
       "Distribution analysis of 1,498 human AI operators (Human Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
-      "Volume vs yield correlation, SNR separation, platform dominance, bot detection. " +
-      "Bots filtered via 6-signal bot-likelihood score + input/total ratio analysis.",
+      "Volume vs yield correlation, SNR separation, platform dominance, outlier detection. " +
+      "Outliers separated via 6-signal outlier-likelihood score + input/total ratio analysis.",
     url: `${SITE_ORIGIN}/field`,
     creator: { "@id": `${SITE_ORIGIN}/#org` },
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
@@ -90,7 +90,7 @@ export default async function FieldPage() {
       "token efficiency",
       "yield vs volume",
       "AI operator field analysis",
-      "bot detection",
+      "outlier detection",
       "token cascade",
     ],
     variableMeasured: [
@@ -100,7 +100,7 @@ export default async function FieldPage() {
       { "@type": "PropertyValue", name: "Velocity", description: "output / input" },
     ],
     measurementTechnique:
-      "On-device token telemetry from 1,498 human operators (Human Center of Mass). Bots and outliers separated via input/total ratio analysis.",
+      "On-device token telemetry from 1,498 human operators (Human Center of Mass). Outliers separated via input/total ratio analysis.",
     temporalCoverage: meta.scraped_at,
   };
 
@@ -487,23 +487,22 @@ export default async function FieldPage() {
         />
       </section>
 
-      {/* ── Bot Detection ────────────────────────────────────────────── */}
+      {/* ── Outlier Detection ───────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Bot Detection
+          Outlier Detection
         </h2>
-        <BotDetectionPanel operators={operators} bots={bots} />
+        <BotDetectionPanel operators={operators} bots={[]} />
         <BotZoneShading />
         <p className="text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s metrics catch gaming automatically. A 6-signal bot-likelihood score
+          SigRank&apos;s metrics catch gaming automatically. A 6-signal outlier-likelihood score
           identifies operators with inhuman throughput, zero cache usage, single-model fixation,
-          and zero sessions. {meta.bots_removed} confirmed bots and {meta.suspects_removed} suspects
-          were removed from the field distribution. An additional input/total ratio analysis
-          separates extreme humans (outliers) from replay bots and input dump bots, keeping the
-          Human Center of Mass clean.
+          and zero sessions. {meta.outliers} outliers were separated from the field distribution.
+          An additional input/total ratio analysis separates extreme humans from replay outliers
+          and input dump outliers, keeping the Human Center of Mass clean.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The scatter plot shows why bots are detectable: they cluster in the bottom-right —
+          The scatter plot shows why outliers are detectable: they cluster in the bottom-right —
           massive token volume with near-zero SNR. They pump input tokens without producing
           proportionate output. No human operator occupies that region. The 6-signal score makes
           this structural: inhuman throughput, zero cache reads, single-model fixation, and zero
@@ -523,8 +522,8 @@ export default async function FieldPage() {
           >
             tokscale.ai/leaderboard
           </a>
-          . {meta.total_scraped.toLocaleString()} operators scraped, {meta.bots_removed} bots +{" "}
-          {meta.suspects_removed} suspects removed, {meta.humans_included.toLocaleString()} humans
+          . {meta.total_scraped.toLocaleString()} operators scraped, {meta.outliers} outliers
+          separated, {meta.humans_included.toLocaleString()} humans
           analyzed.
         </p>
         <div className="flex flex-wrap gap-4 text-sm">

@@ -3,8 +3,8 @@
     "scraped_at": "2026-07-13T18:51:35Z",
     "source": "https://tokscale.ai/leaderboard",
     "total_scraped": 1628,
-    "bots_removed": 2,
-    "suspects_removed": 15,
+    "bots_removed": 0,
+    "suspects_removed": 0,
     "humans_included": 1498,
     "medians": {
       "yield": 1.68,
@@ -59,7 +59,7 @@
         "upper": 37311132630.88
       }
     },
-    "outliers": 96,
+    "outliers": 113,
     "total_classified": 1628
   },
   "operators": [
@@ -33893,9 +33893,7 @@
       "platform": "openai",
       "op_ratio": "3:1:0.02",
       "sigrank_yield": 0.06430529719588204
-    }
-  ],
-  "bots": [
+    },
     {
       "handle": "grenadeoftacoss",
       "display_name": "grenadeoftacoss",
@@ -34369,6 +34367,7 @@
       ]
     }
   ],
+  "bots": [],
   "ghost_ranks": [
     {
       "handle": "younhomaeng-svg",
