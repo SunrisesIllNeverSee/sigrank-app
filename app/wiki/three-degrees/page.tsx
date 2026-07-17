@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "The Three Degrees of Leverage",
+  title: "The Four Degrees of Leverage",
   description:
-    "Median operator to top-100 median to the top operator, read as a token cascade. All three columns measured live from the all-time board. The 10xDEV log anchor and full provenance.",
+    "AA baseline to median operator to top-100 median to the top operator, read as a token cascade. The last three columns measured live from the all-time board. The 10xDEV log anchor and full provenance.",
   path: "/wiki/three-degrees",
 });
 
@@ -23,11 +23,11 @@ export default function ThreeDegreesPage() {
         data={[
           breadcrumb([
             { name: "Wiki", path: "/wiki" },
-            { name: "Three Degrees of Leverage", path: "/wiki/three-degrees" },
+            { name: "Four Degrees of Leverage", path: "/wiki/three-degrees" },
           ]),
           definedTerm(
-            "Three Degrees of Leverage",
-            "The 10xDEV log anchor: median operator → top-100 median → top operator, all measured live from the all-time board.",
+            "Four Degrees of Leverage",
+            "The 10xDEV log anchor: AA baseline → median operator → top-100 median → top operator. The first column is a static modeled reference; the last three are measured live from the all-time board.",
             "/wiki/three-degrees",
           ),
         ]}

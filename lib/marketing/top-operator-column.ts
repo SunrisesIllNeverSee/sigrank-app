@@ -2,16 +2,19 @@ import { getLeaderboard, type LeaderboardRow } from "@/lib/data";
 import { isOutlierRow } from "@/lib/data/outlier-classify";
 
 /**
- * lib/marketing/top-operator-column.ts — the live columns for the Three Degrees chart
- * (owner 2026-06-27, updated 2026-07-13).
+ * lib/marketing/top-operator-column.ts — the live columns for the Four Degrees chart
+ * (owner 2026-06-27, updated 2026-07-13, expanded to 4 degrees 2026-07-17).
  *
- * Three columns, all computed from the live ALL-TIME board via the same operatorTotal
- * path the board uses (computeCascadeMetrics), so the chart can never disagree with the
- * board:
+ * Four columns — the first is a static modeled baseline, the rest are computed from
+ * the live ALL-TIME board via the same operatorTotal path the board uses
+ * (computeCascadeMetrics), so the chart can never disagree with the board:
  *
- *   1. "Average Users"  — median of ALL real operators on the all-time board.
- *   2. "Power users"    — median of the top 100 real operators (by yield).
- *   3. "Top Evals"      — the single top real operator (gold column, unchanged).
+ *   1. "AA baseline"   — the Artificial Analysis 7:2:1 modeled reference (static).
+ *                        Operating ratio 3.5:1:0.5 (cache_read : input : output).
+ *                        Efficiency = 1.00 by definition. Not live data.
+ *   2. "Human Center of Mass" — median of all real operators on the all-time board.
+ *   3. "Power users"    — median of the top 100 real operators (by yield).
+ *   4. "Top Evals"      — the single top real operator (gold column).
  *
  * Why median, not mean: the token-cascade metrics are heavily right-skewed (not normal
  * distribution). A single IGNITER-class operator with 9 quadrillion input tokens pulls
@@ -94,6 +97,20 @@ function formatColumn(m: NonNullable<ReturnType<typeof cascadeMetrics>>): GoldCo
     devLinear: timesStr(m.leverage),
   };
 }
+
+/** The AA 7:2:1 modeled baseline column (static — not live data).
+ * Operating ratio 3.5:1:0.5 (cache_read : input : output, cache_write ~0).
+ * Efficiency = 1.00 by definition (the reference point all other operators are measured against). */
+const AA_BASELINE: GoldColumn = {
+  yield_: "1.75",
+  snr: "0.33",
+  velocity: "0.50",
+  leverage: "3.5×",
+  dev10x: "0.54",
+  efficiency: "1.00",
+  opRatio: "3.5 : 1 : 0.50",
+  devLinear: "3.5×",
+};
 
 /** Fallback values when the board has no qualifying real operators yet. */
 const GOLD_FALLBACK: GoldColumn = {
@@ -218,4 +235,4 @@ export async function getPowerUsersColumn(): Promise<GoldColumn | null> {
   });
 }
 
-export { GOLD_FALLBACK, AVG_FALLBACK, POWER_FALLBACK };
+export { GOLD_FALLBACK, AVG_FALLBACK, POWER_FALLBACK, AA_BASELINE };
