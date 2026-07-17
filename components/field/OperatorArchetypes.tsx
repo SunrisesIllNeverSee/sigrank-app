@@ -127,7 +127,7 @@ export default function OperatorArchetypes({
                 <div>
                   <div className="text-text-muted">SNR</div>
                   <div className="font-bold text-text-primary">
-                    {(arch.snr_median * 100).toFixed(1)}%
+                    {arch.snr_median.toFixed(3)}
                   </div>
                 </div>
               </div>
