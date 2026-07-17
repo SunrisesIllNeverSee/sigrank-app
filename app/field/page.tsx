@@ -37,7 +37,7 @@ export const metadata: Metadata = withOG({
   title:
     "AI Operator Field Analysis — The True Distribution of Token Efficiency",
   description:
-    "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR 8.4%, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
+    "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
   path: "/field",
 });
 
@@ -231,7 +231,7 @@ export default async function FieldPage() {
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The histogram shows the field clustering tightly around the median SNR of{" "}
-          {(meta.medians.snr * 100).toFixed(2)}%. The IQR fences (dashed lines) bracket the middle
+          {meta.medians.snr.toFixed(3)}. The IQR fences (dashed lines) bracket the middle
           50% of operators. The long tail to the right — operators with SNR above 10% — are the
           ghost-rank operators: they produce disproportionate output from minimal input.
         </p>

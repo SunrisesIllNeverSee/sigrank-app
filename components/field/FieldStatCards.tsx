@@ -42,7 +42,7 @@ export default function FieldStatCards({ medians }: FieldStatCardsProps) {
     {
       symbol: "SNR",
       label: "Median Signal-to-Noise",
-      value: `${(medians.snr * 100).toFixed(2)}%`,
+      value: `${medians.snr.toFixed(3)}`,
       description: "Output fraction of input + output",
       color: "#10b981",
     },
