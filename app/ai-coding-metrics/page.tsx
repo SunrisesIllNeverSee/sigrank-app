@@ -61,8 +61,8 @@ const METRICS = [
   {
     href: "/metrics/velocity",
     name: "Velocity",
-    formula: "output / session_time",
-    desc: "Tokens produced per unit of wall-clock time. The throughput metric — useful, but it measures speed, not efficiency. A fast operator burning tokens is still burning tokens.",
+    formula: "output / input",
+    desc: "Output tokens per fresh input token. The output-efficiency metric — useful, but it measures output ratio, not cascade efficiency. High output per input without cache reuse is still wasteful.",
     priority: "Secondary",
   },
 ];
