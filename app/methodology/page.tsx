@@ -28,8 +28,9 @@ export const metadata: Metadata = withOG({
   path: "/methodology",
 });
 
-// ISR: revalidate every 5 minutes so key figures stay current.
-export const revalidate = 300;
+// ISR: revalidate every 30 minutes so key figures stay current. Methodology
+// content changes rarely; 300s was over-validating.
+export const revalidate = 1800;
 
 /** Format a yield value for display (e.g. 18437 → "18,437", 1234567 → "1.23M"). */
 function fmtYield(y: number): string {

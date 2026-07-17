@@ -28,8 +28,8 @@ import { SignaHistoryChart } from "@/components/charts/SignaHistoryChart";
 import { TrackWrappedView } from "@/components/analytics/TrackWrappedView";
 import { withOG } from "@/lib/seo";
 
-// ISR: revalidate every 2 minutes — same rationale as the profile page.
-export const revalidate = 120;
+// ISR: revalidate every 10 minutes — same rationale as the profile page.
+export const revalidate = 600;
 
 /** Fallback for values with no canonical token-telemetry source. */
 const UNTRACKED = "—";
