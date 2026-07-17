@@ -1,9 +1,9 @@
 /**
- * components/marketing/ThreeDegreesChart.tsx — "The Three Degrees of Leverage"
+ * components/marketing/ThreeDegreesChart.tsx — "The Four Degrees of Leverage"
  * (owner content, Devins_Plans/three_degree_comparison.md, 2026-06-22).
  *
  * A map of how far work travels: AA 7:2:1 modeled baseline → the wild field median
- * → a clean compounding operator. Shared component, two variants:
+ * → a clean compounding operator → the top eval. Shared component, two variants:
  *   - 'embed'  (landing): footnote/source markers ABOVE the chart + a link to the
  *     full description in the wiki. Compact.
  *   - 'full'   (wiki): the whole file — the comparison table, the 10xDEV log read,
@@ -22,68 +22,75 @@ import {
   GOLD_FALLBACK,
   AVG_FALLBACK,
   POWER_FALLBACK,
+  AA_BASELINE,
   type GoldColumn,
 } from "@/lib/marketing/top-operator-column";
 
 type Variant = "full" | "embed";
 
-/** The headline comparison table — the three degrees across seven metrics.
- * Owner-facing column headers (owner 2026-06-22, updated 2026-07-14). All three columns
- * are now LIVE from the all-time board, filtered to the Human Center of Mass
+/** The headline comparison table — the four degrees across seven metrics.
+ * Owner-facing column headers (owner 2026-06-22, updated 2026-07-14, expanded to 4
+ * degrees 2026-07-17). The first column is a static modeled baseline; the rest are
+ * LIVE from the all-time board, filtered to the Human Center of Mass
  * (bots/outliers with input/total < 0.1% or > 80% are categorized separately):
+ *   - "AA baseline"   = the Artificial Analysis 7:2:1 modeled reference (static)
  *   - "Human Center of Mass" = median of all real human operators (the typical operator)
  *   - "Power users"   = median of the top 100 real human operators (the typical elite)
  *   - "Top Evals"     = the single top real human operator (gold column)
- * `tone`: 'white' = Average + Power user columns, 'gold' = the Top Evals column. */
-const COLS: { label: string; tone: "white" | "gold" }[] = [
+ * `tone`: 'muted' = AA baseline, 'white' = HCM + Power user columns, 'gold' = Top Evals. */
+const COLS: { label: string; tone: "muted" | "white" | "gold" }[] = [
+  { label: "AA baseline§", tone: "muted" },
   { label: "Human Center of Mass*", tone: "white" },
   { label: "Power users†", tone: "white" },
   { label: "Top Evals to date‡", tone: "gold" },
 ];
 
 function buildRows(
+  aa: GoldColumn,
   avg: GoldColumn,
   power: GoldColumn,
   gold: GoldColumn,
-): { metric: string; vals: [string, string, string]; winner: 2 }[] {
+): { metric: string; vals: [string, string, string, string]; winner: 3 }[] {
   return [
-    { metric: "Υ Yield", vals: [avg.yield_, power.yield_, gold.yield_], winner: 2 },
-    { metric: "SNR", vals: [avg.snr, power.snr, gold.snr], winner: 2 },
+    { metric: "Υ Yield", vals: [aa.yield_, avg.yield_, power.yield_, gold.yield_], winner: 3 },
+    { metric: "SNR", vals: [aa.snr, avg.snr, power.snr, gold.snr], winner: 3 },
     {
       metric: "Velocity (O/I)",
-      vals: [avg.velocity, power.velocity, gold.velocity],
-      winner: 2,
+      vals: [aa.velocity, avg.velocity, power.velocity, gold.velocity],
+      winner: 3,
     },
     {
       metric: "Leverage (CR/I)",
-      vals: [avg.leverage, power.leverage, gold.leverage],
-      winner: 2,
+      vals: [aa.leverage, avg.leverage, power.leverage, gold.leverage],
+      winner: 3,
     },
     {
       metric: "10xDEV (log₁₀)",
-      vals: [avg.dev10x, power.dev10x, gold.dev10x],
-      winner: 2,
+      vals: [aa.dev10x, avg.dev10x, power.dev10x, gold.dev10x],
+      winner: 3,
     },
     {
       metric: "Efficiency (vs AA 4.0)",
-      vals: [avg.efficiency, power.efficiency, gold.efficiency],
-      winner: 2,
+      vals: [aa.efficiency, avg.efficiency, power.efficiency, gold.efficiency],
+      winner: 3,
     },
     {
       metric: "Operating Ratio (C:I:O)",
-      vals: [avg.opRatio, power.opRatio, gold.opRatio],
-      winner: 2,
+      vals: [aa.opRatio, avg.opRatio, power.opRatio, gold.opRatio],
+      winner: 3,
     },
   ];
 }
 
 /** 10xDEV log-anchor read — exponent, not multiplier. */
 function buildDevRows(
+  aa: GoldColumn,
   avg: GoldColumn,
   power: GoldColumn,
   gold: GoldColumn,
 ): { degree: string; dev: string; linear: string }[] {
   return [
+    { degree: "AA baseline (7:2:1 modeled reference)", dev: aa.dev10x, linear: aa.devLinear },
     { degree: "Human Center of Mass (median, all human operators)*", dev: avg.dev10x, linear: avg.devLinear },
     { degree: "Power-user median (top 100)", dev: power.dev10x, linear: power.devLinear },
     {
@@ -109,7 +116,7 @@ function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
                 key={c.label}
                 className={
                   "px-4 py-4 text-right text-sm font-bold sm:text-base " +
-                  (c.tone === "gold" ? "text-gold" : "text-white")
+                  (c.tone === "gold" ? "text-gold" : c.tone === "muted" ? "text-text-muted" : "text-white")
                 }
               >
                 {c.label}
@@ -133,7 +140,9 @@ function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
                     "px-4 py-3 text-right font-bold tabular-nums " +
                     (i === r.winner
                       ? "text-xl text-gold sm:text-2xl"
-                      : "text-lg text-white/85 sm:text-xl")
+                      : i === 0
+                        ? "text-lg text-text-muted sm:text-xl"
+                        : "text-lg text-white/85 sm:text-xl")
                   }
                 >
                   {v}
@@ -193,7 +202,17 @@ function DevTable({ rows }: { rows: ReturnType<typeof buildDevRows> }) {
 function SourceMarkers() {
   return (
     <p className="font-sans text-[11px] leading-relaxed text-text-muted">
-      <span className="text-text-secondary">Sources:</span> all three columns are{" "}
+      <span className="text-text-secondary">Sources:</span> the AA baseline is a
+      static modeled reference (7:2:1 cache-read : cache-write : input ratio from{" "}
+      <a
+        href="https://artificialanalysis.ai"
+        className="text-text-accent underline-offset-2 hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Artificial Analysis
+      </a>{" "}
+      pricing data). The other three columns are{" "}
       <em>measured live</em> from the{" "}
       <Link
         href="/board/all"
@@ -201,9 +220,10 @@ function SourceMarkers() {
       >
         all-time board
       </Link>{" "}
-      (auto-pulled at render). Average Users = median of all real operators; Power
-      users = median of the top 100 by yield; Top Evals = the single leading operator.
-      All derived from canonical four-pillar token telemetry. Token counts only.
+      (auto-pulled at render). Human Center of Mass = median of all real operators;
+      Power users = median of the top 100 by yield; Top Evals = the single leading
+      operator. All derived from canonical four-pillar token telemetry. Token counts
+      only.
     </p>
   );
 }
@@ -215,6 +235,29 @@ function Provenance() {
       <h3 className="font-mono text-sm font-bold text-text-primary">
         Sources &amp; provenance
       </h3>
+
+      <div>
+        <p className="font-mono text-[11px] font-bold text-text-secondary">
+          AA baseline (7:2:1 modeled reference) · <span className="text-text-muted">static</span>
+        </p>
+        <p>
+          The Artificial Analysis pricing baseline sets a 7:2:1 ratio for
+          cache-read : cache-write : fresh input. This is a modeled reference
+          point, not live data — it represents the &ldquo;average AI user&rdquo;
+          operating ratio of 3.5:1:0.5 (cache-read : input : output). Efficiency
+          is 1.00 by definition: all other operators are measured against this.
+          Source:{" "}
+          <a
+            href="https://artificialanalysis.ai"
+            className="text-text-accent underline-offset-2 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Artificial Analysis
+          </a>{" "}
+          pricing data.
+        </p>
+      </div>
 
       <div>
         <p className="font-mono text-[11px] font-bold text-text-secondary">
@@ -311,9 +354,15 @@ function Provenance() {
 
       <div className="flex flex-col gap-2 border-t border-bg-border-subtle pt-3 text-[11px] text-text-dim">
         <p>
+          <span className="text-text-muted">§</span>{" "}
+          <strong>AA baseline</strong>: the Artificial Analysis 7:2:1 modeled
+          reference (3.5:1:0.5 operating ratio). Static — not live data.
+          Efficiency = 1.00 by definition.
+        </p>
+        <p>
           <span className="text-text-muted">*</span>{" "}
-          <strong>Average Users</strong>: median of all real operators on the
-          all-time board, computed live at render. Excludes staged seeds, The
+          <strong>Human Center of Mass</strong>: median of all real operators on
+          the all-time board, computed live at render. Excludes staged seeds, The
           Field, and retired/anonymized rows.
         </p>
         <p>
@@ -336,27 +385,32 @@ export async function ThreeDegreesChart({
 }: {
   variant?: Variant;
 }) {
-  // All three columns are now LIVE from the all-time board:
+  // Four columns:
+  //   aa    = AA 7:2:1 modeled baseline (static, not live)
   //   avg   = median of ALL real operators (the typical operator)
   //   power = median of the top 100 real operators (the typical elite)
-  //   gold  = the single top real operator (unchanged)
-  // Each falls back to frozen reference values when the board has no qualifying data.
+  //   gold  = the single top real operator
+  // The live columns fall back to frozen reference values when the board has no
+  // qualifying data.
   const [avgCol, powerCol, goldCol] = await Promise.all([
     getAverageUsersColumn(),
     getPowerUsersColumn(),
     getTopOperatorColumn(),
   ]);
+  const aa = AA_BASELINE;
   const avg = avgCol ?? AVG_FALLBACK;
   const power = powerCol ?? POWER_FALLBACK;
   const gold = goldCol ?? GOLD_FALLBACK;
-  const rows = buildRows(avg, power, gold);
-  const devRows = buildDevRows(avg, power, gold);
+  const rows = buildRows(aa, avg, power, gold);
+  const devRows = buildDevRows(aa, avg, power, gold);
 
-  // 10xDEV deltas vs the two reference degrees, computed from the live values so the
+  // 10xDEV deltas vs the reference degrees, computed from the live values so the
   // wiki bullets never drift. Linear = 10^delta.
   const goldDev = Number(gold.dev10x) || 0;
+  const aaDev = Number(aa.dev10x) || 0;
   const avgDev = Number(avg.dev10x) || 0;
   const powerDev = Number(power.dev10x) || 0;
+  const devVsAA = goldDev - aaDev;
   const devVsAvg = goldDev - avgDev;
   const devVsPower = goldDev - powerDev;
   const fmtDelta = (d: number) =>
@@ -367,7 +421,7 @@ export async function ThreeDegreesChart({
       <div className="flex flex-col gap-3">
         {/* eyebrow OUTSIDE the box (owner 2026-06-22) */}
         <div className="font-mono text-sm uppercase tracking-[0.2em] text-gold sm:text-base">
-          ⊙ The three degrees of leverage
+          ⊙ The four degrees of leverage
         </div>
 
         <section className="box-glow flex flex-col gap-5 rounded-2xl border border-gold/25 bg-gradient-to-b from-gold/5 to-bg-surface p-6 sm:p-8">
@@ -398,10 +452,13 @@ export async function ThreeDegreesChart({
                 <strong className="text-text-primary">
                   Cache : Input : Output
                 </strong>
-                . The median operator on the board sits at{" "}
+                . The AA baseline at{" "}
+                <strong className="text-text-muted">{aa.opRatio}</strong> is the
+                modeled reference — the average AI user. The median operator on
+                the board sits at{" "}
                 <strong className="text-text-primary">{avg.opRatio}</strong>{" "}
-                (the leftmost column) — the typical operator, the 50th
-                percentile of everyone measured.
+                (the second column) — the typical operator, the 50th percentile
+                of everyone measured.
               </p>
               <p>
                 The median of the{" "}
@@ -436,21 +493,23 @@ export async function ThreeDegreesChart({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
-          The Three Degrees of Leverage
+          The Four Degrees of Leverage
         </h1>
         <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
           Read it as a token cascade:{" "}
           <strong className="text-text-primary">Cache : Input : Output</strong>.
-          The median operator on the all-time board sits at{" "}
+          The AA baseline sits at{" "}
+          <strong className="text-text-muted">{aa.opRatio}</strong> — the modeled
+          average AI user. The median operator on the all-time board sits at{" "}
           <strong className="text-text-primary">{avg.opRatio}</strong> — the
           typical operator, the 50th percentile of everyone measured. The median
           of the top 100 lands at{" "}
           <strong className="text-text-primary">{power.opRatio}</strong>, output
           traded for cache. The top operator on the live board is{" "}
           <strong className="text-gold">{gold.opRatio}</strong>: every input
-          returns multiple outputs on a deep cache. Three degrees of leverage,
-          each a real skill, and the distance between them learnable. All three
-          columns are measured live from the{" "}
+          returns multiple outputs on a deep cache. Four degrees of leverage,
+          each a real skill, and the distance between them learnable. The last
+          three columns are measured live from the{" "}
           <Link
             href="/board/all"
             className="text-text-accent underline-offset-2 hover:underline"
@@ -475,9 +534,15 @@ export async function ThreeDegreesChart({
         <DevTable rows={devRows} />
         <ul className="flex flex-col gap-1 font-sans text-sm text-text-muted">
           <li>
+            Top operator vs AA baseline:{" "}
+            <strong className="text-text-secondary">
+              {fmtDelta(devVsAA)} more amplification
+            </strong>
+          </li>
+          <li>
             Top operator vs median operator:{" "}
             <strong className="text-text-secondary">
-              {fmtDelta(devVsAvg)} more amplification
+              {fmtDelta(devVsAvg)} more
             </strong>
           </li>
           <li>
