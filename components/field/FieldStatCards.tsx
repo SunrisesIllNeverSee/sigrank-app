@@ -49,7 +49,7 @@ export default function FieldStatCards({ medians }: FieldStatCardsProps) {
     {
       symbol: "L",
       label: "Median Leverage",
-      value: `${medians.leverage.toFixed(2)}×`,
+      value: `${medians.leverage.toFixed(1)}×`,
       description: "Cache-read amplification over raw input",
       color: "#8b5cf6",
     },
