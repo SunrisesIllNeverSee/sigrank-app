@@ -668,7 +668,7 @@ function Board({
   // 3.5 : 1 : 0.5 (cache-read : input : output; cache-write ~0). This is a
   // canonical population constant (real measured data), NOT the live field median
   // — the field is power users; the column exists to show the contrast against
-  // the average user. See also: ThreeDegreesChart (same 3.5:1:0.5 baseline),
+  // the average user. See also: FourDegreesChart (same 3.5:1:0.5 baseline),
   // field-average.ts (live field mean for the radar), /compare (live field median).
   const R_CR = 3.5;
   const R_OUT = 0.5;

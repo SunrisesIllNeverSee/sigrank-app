@@ -128,7 +128,7 @@ export default async function ComparePage({
   // Default opponent B is "The Field" — the median-Υ baseline operator (owner
   // 2026-06-27, migration 0024) — so the page opens as "you vs. the field median".
   // Note: this is the LIVE field median (computed from real operators' Υ),
-  // distinct from the AA-modeled 3.5:1:0.5 baseline in SplitFlapCard/ThreeDegreesChart.
+  // distinct from the AA-modeled 3.5:1:0.5 baseline in SplitFlapCard/FourDegreesChart.
   //
   // Default side A (owner 2026-06-27): the SIGNED-IN operator (true "you vs.
   // average"); when signed out, a rotating board pick rather than always #1 (so
