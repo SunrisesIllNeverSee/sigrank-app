@@ -29,15 +29,15 @@ test("FIX 8: /compare documents its baseline as live field median", () => {
   );
 });
 
-test("FIX 8: ThreeDegreesChart already labels its baselines (parity check)", () => {
-  const src = read("components/marketing/ThreeDegreesChart.tsx");
+test("FIX 8: FourDegreesChart already labels its baselines (parity check)", () => {
+  const src = read("components/marketing/FourDegreesChart.tsx");
   assert.ok(
     /modeled baseline/i.test(src),
-    'ThreeDegreesChart must label its baseline as "modeled"',
+    'FourDegreesChart must label its baseline as "modeled"',
   );
   assert.ok(
     /median/i.test(src),
-    "ThreeDegreesChart must reference the median for the power-user baseline",
+    "FourDegreesChart must reference the median for the power-user baseline",
   );
 });
 

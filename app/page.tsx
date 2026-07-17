@@ -4,7 +4,7 @@ import { DeletedNotice } from "@/components/home/DeletedNotice";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { IpBoundary } from "@/components/marketing/IpBoundary";
 import { PricingCards } from "@/components/marketing/PricingCards";
-import { ThreeDegreesChart } from "@/components/marketing/ThreeDegreesChart";
+import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
 import { Draft2Hero } from "@/components/draft/Draft2Hero";
 import { Draft2LiveActivity } from "@/components/draft/Draft2LiveActivity";
 import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
@@ -202,7 +202,7 @@ export default async function HomePage() {
           (owner 2026-07-02: moved above the live board so the comparison table leads,
           with the explanation underneath). Sources/footnotes + a link to the full wiki
           description live inside the section. */}
-      <ThreeDegreesChart variant="embed" />
+      <FourDegreesChart variant="embed" />
 
       {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
           the 4 MiniBoards were archived; "Real operators. Real cascades." moved into it).
