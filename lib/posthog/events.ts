@@ -32,6 +32,23 @@ export const track = {
   wrappedViewed: () => {
     if (on()) posthog.capture("wrapped_viewed");
   },
+  // Score calculator: fires when a user successfully parses their token counts
+  // on /score/paste. Captures the class tier + yield band so we can see the
+  // funnel from "curious visitor" → "calculated score" → "enrolled + submitted".
+  scoreCalculated: (extra: {
+    classTier: string;
+    yieldBand: string;
+    source: string;
+    estimated: boolean;
+  }) => {
+    if (on()) posthog.capture("score_calculated", extra);
+  },
+  // Compare: fires when a user views a head-to-head with both operators
+  // selected (not the default landing). Captures whether it's the default
+  // "you vs field" or a user-chosen pair.
+  compareViewed: (extra: { isDefault: boolean }) => {
+    if (on()) posthog.capture("compare_viewed", extra);
+  },
   upgradeViewed: () => {
     if (on()) posthog.capture("upgrade_viewed");
   },

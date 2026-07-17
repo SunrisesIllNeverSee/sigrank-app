@@ -34,6 +34,7 @@ import { ChallengeBar } from "@/components/compare/ChallengeBar";
 import { ChallengeOnX } from "@/components/compare/ChallengeOnX";
 import { getChallengeBetween } from "@/lib/challenges/server";
 import { GATE_CHALLENGES } from "@/lib/features";
+import { TrackCompareView } from "@/components/analytics/TrackCompareView";
 import {
   CompareShareCard,
   type CompareOperand,
@@ -257,6 +258,7 @@ export default async function ComparePage({
 
   return (
     <div className="flex flex-col gap-8">
+      <TrackCompareView isDefault={!(a && b)} />
       <WaveHero
         eyebrow="🤖⚔️🤖 Throw Down"
         terminalText="MANUS AD MANUM"
