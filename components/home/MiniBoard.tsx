@@ -74,7 +74,9 @@ export function MiniBoard({
   rows: LeaderboardRow[];
 }) {
   const meta = META[metric];
-  const top5 = rows.slice(0, 5);
+  // Retired operators (opt-out): exclude from home-page highlights. They stay
+  // on the full leaderboard with their tokens but aren't featured.
+  const top5 = rows.filter((r) => r.operator.status !== "retired").slice(0, 5);
   const max = Math.max(...top5.map((r) => readMetric(r, metric).raw), 1);
 
   return (

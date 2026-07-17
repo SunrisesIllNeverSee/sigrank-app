@@ -9,7 +9,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getOperator } from "@/lib/data";
+import { getOperator, isOperatorRetired } from "@/lib/data";
 import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
 
 const GENERATED_AT = "2026-05-19T00:00:00Z";
@@ -25,6 +25,16 @@ export async function GET(
   if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
 
   const { codename } = await params;
+
+  // Retired operators (opt-out): no profile data via API. They stay on the
+  // leaderboard with their tokens but have no profile endpoint.
+  if (await isOperatorRetired(codename)) {
+    return NextResponse.json(
+      { status: "retired", detail: "This operator has opted out and has no public profile." },
+      { status: 404 },
+    );
+  }
+
   const row = await getOperator(codename);
 
   if (!row) {

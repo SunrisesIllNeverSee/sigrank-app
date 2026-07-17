@@ -45,7 +45,8 @@ export {
 } from "@/lib/data/cached";
 
 // Writes are NOT cached — re-export directly from queries.
-export { bumpComparisonsRan } from "@/lib/data/queries";
+// isOperatorRetired is also not cached (fresh status check for opt-out redirects).
+export { bumpComparisonsRan, isOperatorRetired } from "@/lib/data/queries";
 export type { OperatorSubmission } from "@/lib/data/queries";
 export type { OperatorReport } from "@/lib/data/queries";
 export type {

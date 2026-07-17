@@ -817,6 +817,35 @@ export function LeaderboardTable({
                   : e.yield_.toFixed(0);
             return (
               <li key={`m-${e.anonId}-${i}`}>
+                {e.status === "retired" ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      background: T.field,
+                      border: `1px solid ${T.rowLine}`,
+                    }}
+                  >
+                    <span style={{ width: 22, color: rankColor(displayRank), fontWeight: rankWeight(displayRank), fontSize: 12, fontVariantNumeric: "tabular-nums" }}>{displayRank}</span>
+                    <OperatorAvatar alt={e.anonId} size={26} />
+                    <span style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column" }}>
+                      <span style={{ color: T.ink, fontSize: 13, fontWeight: 600, fontStyle: e.isSeed ? "italic" : "normal", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: "normal" }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>
+                        {e.anonId}
+                      </span>
+                      <span style={{ color: T.mut, fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{e.subLabel ?? platformLabel(e)}</span>
+                    </span>
+                    <span style={{ textAlign: "right", flexShrink: 0 }}>
+                      <span style={{ display: "block", color: T.ink, fontSize: 14, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{view === "raw" ? `∑ ${fmtBig(rawTotal(e))}` : `Υ ${yld}`}</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 2, padding: "2px 6px", borderRadius: 4, background: "rgb(var(--bg-elevated))", border: `1px solid ${T.line}`, color: T.mut }}>
+                        <PlatformCell e={e} />
+                      </span>
+                    </span>
+                  </div>
+                ) : (
                 <Link
                   href={`/user/${encodeURIComponent(e.codename)}`}
                   style={{
@@ -931,6 +960,7 @@ export function LeaderboardTable({
                     </span>
                   </span>
                 </Link>
+                )}
               </li>
             );
           })}
@@ -1253,6 +1283,20 @@ export function LeaderboardTable({
                       <td style={{ ...st.td, ...st.tdL, ...st.stickyOp }}>
                         <span style={st.op}>
                           <OperatorAvatar alt={e.anonId} />
+                          {e.status === "retired" ? (
+                            <span style={st.opLink}>
+                              <span style={{ ...st.opName, fontStyle: e.isSeed ? "italic" : "normal" }}>
+                                <span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: "normal" }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>
+                                {e.anonId}
+                              </span>
+                              {e.subLabel || e.location ? (
+                                <span style={st.opSub}>
+                                  {e.subLabel}
+                                  {e.location ? <span style={{ color: T.mut }}>{e.subLabel ? "  ·  " : ""}◍ {e.location}</span> : null}
+                                </span>
+                              ) : null}
+                            </span>
+                          ) : (
                           <Link
                             href={`/user/${encodeURIComponent(e.codename)}`}
                             style={st.opLink}
@@ -1288,6 +1332,7 @@ export function LeaderboardTable({
                               </span>
                             ) : null}
                           </Link>
+                          )}
                         </span>
                       </td>
                       <td
@@ -1557,6 +1602,20 @@ export function LeaderboardTable({
                       <td style={{ ...st.td, ...st.tdL, ...st.stickyOp }}>
                         <span style={st.op}>
                           <OperatorAvatar alt={e.anonId} />
+                          {e.status === "retired" ? (
+                            <span style={st.opLink}>
+                              <span style={{ ...st.opName, fontStyle: e.isSeed ? "italic" : "normal" }}>
+                                <span aria-hidden style={{ color: SPECIES_SWATCH[sp] ?? T.thru, marginRight: 5, fontStyle: "normal" }} title={e.signalClass}>{glyphFor(e.signalClass)}</span>
+                                {e.anonId}
+                              </span>
+                              {e.subLabel || e.location ? (
+                                <span style={st.opSub}>
+                                  {e.subLabel}
+                                  {e.location ? <span style={{ color: T.mut }}>{e.subLabel ? "  ·  " : ""}◍ {e.location}</span> : null}
+                                </span>
+                              ) : null}
+                            </span>
+                          ) : (
                           <Link
                             href={`/user/${encodeURIComponent(e.codename)}`}
                             style={st.opLink}
@@ -1592,6 +1651,7 @@ export function LeaderboardTable({
                               </span>
                             ) : null}
                           </Link>
+                          )}
                         </span>
                       </td>
                       <td

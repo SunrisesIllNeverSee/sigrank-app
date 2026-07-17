@@ -17,9 +17,9 @@
  */
 
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import { getOperator, getOperatorHistory } from "@/lib/data";
+import { getOperator, getOperatorHistory, isOperatorRetired } from "@/lib/data";
 import { decodeCodename } from "@/lib/route-params";
 import type { HistoryPoint, LeaderboardRow } from "@/lib/data";
 import { WrappedStats } from "@/components/sigrank/WrappedStats";
@@ -143,6 +143,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { codename: rawCodename } = await params;
   const codename = decodeCodename(rawCodename); // see lib/route-params — '·'/space codenames arrive URL-encoded in pages
+  if (await isOperatorRetired(codename)) return { title: "SigRank Leaderboard" };
   const row = await getOperator(codename);
   if (!row) return { title: "Operator not found" };
   const name = row.operator.display_name ?? row.operator.codename;
@@ -160,6 +161,7 @@ export default async function OperatorWrappedPage({
 }) {
   const { codename: rawCodename } = await params;
   const codename = decodeCodename(rawCodename); // see lib/route-params — '·'/space codenames arrive URL-encoded in pages
+  if (await isOperatorRetired(codename)) redirect("/leaderboard");
   const row = await getOperator(codename);
   if (!row) notFound();
 
