@@ -176,4 +176,7 @@ export interface Operator {
   /** Profile visibility level (migration 0021). 'public' = all fields visible;
    *  'private' = only codename + computed metrics visible to non-owners. */
   profile_visibility?: "public" | "private" | null;
+  /** Operator status: active, dormant, banned, retired. Retired = opted-out
+   *  (PII stripped, anonymous codename, still on board, no profile page). */
+  status?: string | null;
 }

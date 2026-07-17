@@ -18,7 +18,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import {
   getLeaderboard,
@@ -27,6 +27,7 @@ import {
   getOperatorSubmissions,
   getOperatorReport,
   getHallOfSignal,
+  isOperatorRetired,
 } from "@/lib/data";
 import type { HallRecord } from "@/lib/data";
 import { computeFieldAverages } from "@/lib/data/field-average";
@@ -82,6 +83,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { codename: rawCodename } = await params;
   const codename = decodeCodename(rawCodename);
+  // Retired operators (opt-out): no metadata (they redirect to the leaderboard).
+  if (await isOperatorRetired(codename)) return { title: "SigRank Leaderboard" };
   const row = await getOperator(codename);
   if (!row) return { title: "Operator not found" };
   const name = resolveName(row.operator);
@@ -126,6 +129,9 @@ export default async function OperatorProfilePage({
 }) {
   const { codename: rawCodename } = await params;
   const codename = decodeCodename(rawCodename); // see decodeCodename — fixes "·"/space seed codenames 404
+  // Retired operators (opt-out): redirect to the leaderboard. No profile page,
+  // no 404 — they stay on the board with their tokens but aren't clickable.
+  if (await isOperatorRetired(codename)) redirect("/leaderboard");
   const row = await getOperator(codename);
   if (!row) notFound();
 
