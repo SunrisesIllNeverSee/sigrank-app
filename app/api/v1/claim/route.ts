@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionUser } from "@/lib/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { captureServer } from "@/lib/posthog/server";
 
 /**
  * POST /api/v1/claim — claim an existing unclaimed seeded operator profile.
@@ -195,6 +196,13 @@ export async function POST(req: NextRequest) {
       .update({ handle })
       .eq("operator_id", op.operator_id);
   }
+
+  // Fire operator_claimed event for trend tracking (best-effort, never blocks).
+  await captureServer(codename, "operator_claimed", {
+    codename,
+    had_handle: !!handle,
+    claim_path: "seeded",
+  });
 
   return NextResponse.json({
     status: "claimed",
