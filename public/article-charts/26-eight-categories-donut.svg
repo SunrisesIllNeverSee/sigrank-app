@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0d0d"/>
+      <stop offset="100%" style="stop-color:#080808"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c4923a"/>
+      <stop offset="100%" style="stop-color:#f0c862"/>
+    </linearGradient>
+    <filter id="goldGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="1000" fill="url(#bgGrad)"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#goldGrad)"/>
+  <rect x="0" y="997" width="1200" height="3" fill="url(#goldGrad)"/>
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════════ -->
+  <text x="600" y="50" font-family="Roboto Mono, monospace" font-size="11" fill="#5a8a5a" letter-spacing="3" text-anchor="middle">SIGRANK · FIELD ANALYSIS</text>
+  <text x="600" y="90" font-family="Roboto, sans-serif" font-size="32" font-weight="900" fill="#f0c862" text-anchor="middle">The 8 Archetypes</text>
+  <text x="600" y="116" font-family="Roboto, sans-serif" font-size="14" fill="#6e8a6e" text-anchor="middle">1,611 operators classified by cascade architecture</text>
+
+  <!-- ═══ DONUT CHART ═════════════════════════════════════════════ -->
+  <!-- Center: (600, 440), outer radius: 280, inner radius: 160 -->
+  <!-- 7 segments summing to 1,611. Outliers (113) are within these archetypes. -->
+
+  <!-- Segment 1: The Field (963/1611 = 59.78%, 215.2°) -->
+  <path d="M 600.0,160.0 A 280,280 0 1 1 427.6,616.6 L 501.5,523.8 A 160,160 0 1 0 600.0,280.0 Z" fill="#3a5a3a" stroke="#0d0d0d" stroke-width="2"/>
+
+  <!-- Segment 2: Context Builders (313/1611 = 19.43%, 69.9°) -->
+  <path d="M 427.6,616.6 A 280,280 0 0 1 330.3,369.8 L 445.9,382.7 A 160,160 0 0 0 501.5,523.8 Z" fill="#6a7a4a" stroke="#0d0d0d" stroke-width="2"/>
+
+  <!-- Segment 3: Cache Architects (137/1611 = 8.50%, 30.6°) -->
+  <path d="M 330.3,369.8 A 280,280 0 0 1 401.6,204.2 L 486.6,288.1 A 160,160 0 0 0 445.9,382.7 Z" fill="url(#goldGrad)" stroke="#0d0d0d" stroke-width="2" opacity="0.85"/>
+
+  <!-- Segment 4: Input-Heavy (102/1611 = 6.33%, 22.8°) -->
+  <path d="M 401.6,204.2 A 280,280 0 0 1 504.3,166.3 L 545.3,280.1 A 160,160 0 0 0 486.6,288.1 Z" fill="#6a3a3a" stroke="#0d0d0d" stroke-width="2"/>
+
+  <!-- Segment 5: Cache Builders (46/1611 = 2.85%, 10.3°) -->
+  <path d="M 504.3,166.3 A 280,280 0 0 1 551.2,161.4 L 572.1,277.3 A 160,160 0 0 0 545.3,280.1 Z" fill="#f0c862" stroke="#0d0d0d" stroke-width="2" filter="url(#goldGlow)"/>
+
+  <!-- Segment 6: Cascade Operators (46/1611 = 2.85%, 10.3°) -->
+  <path d="M 551.2,161.4 A 280,280 0 0 1 595.6,160.0 L 597.5,280.0 A 160,160 0 0 0 572.1,277.3 Z" fill="#b0a060" stroke="#0d0d0d" stroke-width="2"/>
+
+  <!-- Segment 7: Steady Cascaders (4/1611 = 0.25%, 0.9°) -->
+  <path d="M 595.6,160.0 A 280,280 0 0 1 600.0,160.0 L 600.0,280.0 A 160,160 0 0 0 597.5,280.0 Z" fill="#8a7a4a" stroke="#0d0d0d" stroke-width="1.5"/>
+
+  <!-- Center text -->
+  <text x="600" y="425" font-family="Roboto, sans-serif" font-size="36" font-weight="900" fill="#f0c862" text-anchor="middle">1,611</text>
+  <text x="600" y="450" font-family="Roboto Mono, monospace" font-size="11" fill="#6e8a6e" text-anchor="middle" letter-spacing="2">OPERATORS</text>
+  <text x="600" y="475" font-family="Roboto, sans-serif" font-size="12" fill="#5a6a5a" text-anchor="middle">7 archetypes + 113 outliers</text>
+
+  <!-- ═══ LEGEND ═══════════════════════════════════════════════════ -->
+  <!-- Two columns, 4 rows each -->
+
+  <!-- Left column -->
+  <rect x="120" y="755" width="14" height="14" rx="2" fill="#3a5a3a"/>
+  <text x="142" y="767" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#8a9a8a">The Field</text>
+  <text x="142" y="783" font-family="Roboto Mono, monospace" font-size="11" fill="#5a6a5a">n=963 · 59.8% · Υ=1.24</text>
+
+  <rect x="120" y="800" width="14" height="14" rx="2" fill="#6a7a4a"/>
+  <text x="142" y="812" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#b0a060">Context Builders</text>
+  <text x="142" y="828" font-family="Roboto Mono, monospace" font-size="11" fill="#6a6a4a">n=313 · 19.4% · Υ=6.71</text>
+
+  <rect x="120" y="845" width="14" height="14" rx="2" fill="url(#goldGrad)" opacity="0.85"/>
+  <text x="142" y="857" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#f0c862">Cache Architects</text>
+  <text x="142" y="873" font-family="Roboto Mono, monospace" font-size="11" fill="#8a7a4a">n=137 · 8.5% · Υ=444</text>
+
+  <rect x="120" y="890" width="14" height="14" rx="2" fill="#6a3a3a"/>
+  <text x="142" y="902" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#8a5a5a">Input-Heavy</text>
+  <text x="142" y="918" font-family="Roboto Mono, monospace" font-size="11" fill="#6a4a4a">n=102 · 6.3% · Υ=0.02</text>
+
+  <!-- Right column -->
+  <rect x="640" y="755" width="14" height="14" rx="2" fill="#f0c862" filter="url(#goldGlow)"/>
+  <text x="662" y="767" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#f0c862">Cache Builders ★</text>
+  <text x="662" y="783" font-family="Roboto Mono, monospace" font-size="11" fill="#8a7a4a">n=46 · 2.9% · Υ=1,825</text>
+
+  <rect x="640" y="800" width="14" height="14" rx="2" fill="#b0a060"/>
+  <text x="662" y="812" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#b0a060">Cascade Operators</text>
+  <text x="662" y="828" font-family="Roboto Mono, monospace" font-size="11" fill="#6a6a4a">n=46 · 2.9% · Υ=135</text>
+
+  <rect x="640" y="845" width="14" height="14" rx="2" fill="#8a7a4a"/>
+  <text x="662" y="857" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#b0a060">Steady Cascaders</text>
+  <text x="662" y="873" font-family="Roboto Mono, monospace" font-size="11" fill="#6a6a4a">n=4 · 0.2% · Υ=13.5</text>
+
+  <rect x="640" y="890" width="14" height="14" rx="2" fill="#4a4a4a"/>
+  <text x="662" y="902" font-family="Roboto, sans-serif" font-size="14" font-weight="700" fill="#6a6a6a">Outliers (within ↑)</text>
+  <text x="662" y="918" font-family="Roboto Mono, monospace" font-size="11" fill="#5a5a5a">n=113 · 7.0% · Υ=5,237*</text>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════════ -->
+  <text x="60" y="980" font-family="Roboto Mono, monospace" font-size="11" fill="#c4923a" font-weight="700" letter-spacing="1">SIGRANK · SIGNALAF.COM</text>
+  <text x="1140" y="980" font-family="Roboto, sans-serif" font-size="10" fill="#3a4a3a" text-anchor="end">7 archetypes + 113 outliers · 1,611 operators · classified by cascade architecture</text>
+</svg>
