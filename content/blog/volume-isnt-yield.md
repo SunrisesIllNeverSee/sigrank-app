@@ -1,7 +1,7 @@
 ---
 type: article
 title: "Volume Isn't Yield: The Shape of AI Operators"
-description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,628 operators actually use LLMs. Benford validation, 8 archetypes (7 human + outliers), and the cascade economy.
+description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,611 operators actually use LLMs. Benford validation, 8 archetypes (7 human + outliers), and the cascade economy.
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
 author: Deric (@SunrisesIllNeverSee)
@@ -10,7 +10,7 @@ hero: /article-charts/03-volume-vs-yield.png
 
 # Volume Isn't Yield: The Shape of AI Operators
 
-> [1] SigRank measures how operators use AI coding agents. Not by token volume, but by the token cascade. Once you measure the margins instead of the totals, the field separates into 8 archetypes — 7 human clusters plus an 8th for outliers. The median operator gets 19x more signal from cache than they put in as input. The shape is not what you'd expect.
+> [1] We ranked 1,611 AI coding operators by token volume. Then we measured what they actually *did* with those tokens. The field separates into 8 archetypes — 7 human clusters plus an 8th for outliers. The median operator gets 19x more signal from cache than they put in as input. The shape is not what you'd expect.
 
 ---
 
@@ -36,7 +36,7 @@ Y = (cache_read × output) / input^2
 
 ## What the Numbers Show
 
-[8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,628 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
+[8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,611 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
 
 [9] The first thing the margins show: **92.4% of the median operator's tokens are cache reads.** Not input. Not output. Cache reads. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
 
@@ -93,7 +93,7 @@ Y = (cache_read × output) / input^2
 | Human Center of Mass | 1,498 | 92.0% | Input 1–80%, or gray-zone passing MOSES-like filter |
 | Outliers | 113 | 7.0% | 96 extreme humans + 17 flagged outliers (6-signal score) |
 
-[16] 113 operators (7.0%) are outliers. The aggregate Benford passes because 1,498 real operators dominate the first-digit distribution; 113 outliers out of 1,628 is 7.0%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
+[16] 113 operators (7.0%) are outliers. The aggregate Benford passes because 1,498 real operators dominate the first-digit distribution; 113 outliers out of 1,611 is 7.0%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
 
 [17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's an outlier dumping synthetic input. This single operator skews the field average by 248,000%.
 
@@ -161,7 +161,7 @@ C : I : O = 19 : 1 : 0.09
 
 [30] K-Means clustering was run on the 1,498 Human Center of Mass operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
 
-[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 96 extreme humans and 17 flagged outliers from the full 1,628. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
+[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,498 Human Center of Mass operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 96 extreme humans and 17 flagged outliers from the full 1,611. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
 
 ![7 Human Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
 
@@ -249,11 +249,11 @@ C : I : O = 19 : 1 : 0.09
 
 [51] Volume isn't yield. The cascade economy rewards compounding, not pumping. And the shape of AI operators is not what you'd expect: it's a power law with a human center of mass, a hidden elite of cache architects, and a long tail of input-heavy operators still finding their footing.
 
-[52] This is the first cut. 1,628 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the outlier detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
+[52] This is the first cut. 1,611 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the outlier detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
 
 ---
 
-*Data: 1,628 classified operators (1,628 scraped, 113 outliers separated) from public AI coding agent leaderboards (2026-07-13)*
+*Data: 1,611 classified operators (1,628 scraped, 17 dropped for missing pillars, 113 outliers separated) from public AI coding agent leaderboards (2026-07-13)*
 *Analysis: Benford chi-square (scipy), K-Means clustering (scikit-learn), outlier detection (6-signal score + input/total ratio)*
 *Tool: SigRank, `npx sigrank` on npm*
 *Live board: [signalaf.com](https://signalaf.com) · [Field analysis](/field) · [Methodology](/methodology) · [Leaderboard](/board/all)*

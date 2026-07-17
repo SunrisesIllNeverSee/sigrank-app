@@ -22,7 +22,7 @@
   <!-- ═══ HEADER ═══════════════════════════════════════════════════ -->
   <text x="60" y="48" font-family="Roboto Mono, monospace" font-size="11" fill="#5a8a5a" letter-spacing="3">SIGRANK · FIELD ANALYSIS</text>
   <text x="60" y="82" font-family="Roboto, sans-serif" font-size="32" font-weight="900" fill="#f0c862">The 8 Archetypes</text>
-  <text x="60" y="106" font-family="Roboto, sans-serif" font-size="14" fill="#6e8a6e">1,598 operators classified by cascade architecture · from The Field to The Elite</text>
+  <text x="60" y="106" font-family="Roboto, sans-serif" font-size="14" fill="#6e8a6e">1,611 operators classified by cascade architecture · from The Field to The Elite</text>
 
   <!-- Column headers -->
   <text x="110" y="138" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a" letter-spacing="1">ARCHETYPE</text>
@@ -158,12 +158,12 @@
   <rect x="1115" y="794" width="4" height="12" rx="1" fill="#5a7a5a"/>
   <text x="920" y="822" font-family="Roboto Mono, monospace" font-size="8" fill="#5a5a3a">6.3% I · 24% O · 67% CR · 2.0% CW</text>
 
-  <!-- ═══ ROW 8: Outliers & Bots ═════════════════════════════════ -->
+  <!-- ═══ ROW 8: Outliers ═════════════════════════════════ -->
   <rect x="60" y="855" width="1080" height="90" rx="8" fill="#0f0f0f" stroke="#1a1a1a" stroke-width="1"/>
   <circle cx="85" cy="900" r="14" fill="#1a1a1a" stroke="#4a4a4a" stroke-width="1"/>
   <text x="85" y="905" font-family="Roboto Mono, monospace" font-size="13" font-weight="700" fill="#6a6a6a" text-anchor="middle">8</text>
-  <text x="110" y="888" font-family="Roboto, sans-serif" font-size="17" font-weight="700" fill="#6a6a6a">Outliers &amp; Bots</text>
-  <text x="110" y="912" font-family="Roboto, sans-serif" font-size="12" fill="#5a5a5a">89 extreme humans (too extreme to set the median) + 24 bots</text>
+  <text x="110" y="888" font-family="Roboto, sans-serif" font-size="17" font-weight="700" fill="#6a6a6a">Outliers</text>
+  <text x="110" y="912" font-family="Roboto, sans-serif" font-size="12" fill="#5a5a5a">96 extreme humans (too extreme to set the median) + 17 flagged</text>
   <text x="110" y="928" font-family="Roboto, sans-serif" font-size="12" fill="#5a5a5a">(replay and input-dump). Categorized, not deleted.</text>
   <text x="560" y="900" font-family="Roboto Mono, monospace" font-size="16" font-weight="700" fill="#6a6a6a" text-anchor="end">113</text>
   <text x="630" y="900" font-family="Roboto Mono, monospace" font-size="16" font-weight="700" fill="#6a6a6a" text-anchor="end">7.0%</text>
@@ -173,5 +173,5 @@
 
   <!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
   <text x="60" y="980" font-family="Roboto Mono, monospace" font-size="11" fill="#c4923a" font-weight="700" letter-spacing="1">SIGRANK · SIGNALAF.COM</text>
-  <text x="1140" y="980" font-family="Roboto, sans-serif" font-size="10" fill="#3a4a3a" text-anchor="end">8 archetypes · 1,598 operators · classified by cascade architecture</text>
+  <text x="1140" y="980" font-family="Roboto, sans-serif" font-size="10" fill="#3a4a3a" text-anchor="end">8 archetypes · 1,611 operators · classified by cascade architecture</text>
 </svg>
