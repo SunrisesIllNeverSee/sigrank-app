@@ -53,7 +53,7 @@ ranks the humans using AI — not the models themselves.
 - [Cache Hit Rate](${SITE_ORIGIN}/metrics/cache-hit-rate): cache_read / (cache_read + cache_write) — context reuse efficiency
 - [Compression Ratio](${SITE_ORIGIN}/metrics/compression-ratio): output / input — output per input token
 - [Leverage](${SITE_ORIGIN}/metrics/leverage): cache_read / input — cached context amplification
-- [Velocity](${SITE_ORIGIN}/metrics/velocity): output / session_time — token production rate
+- [Velocity](${SITE_ORIGIN}/metrics/velocity): output / input — output efficiency ratio
 - [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): signal_tokens / total_tokens — signal density
 
 ## Guides (how-to)

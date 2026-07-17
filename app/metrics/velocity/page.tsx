@@ -18,7 +18,7 @@ import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Velocity — Token Production Rate in AI Coding",
   description:
-    "Velocity = output / session_time \u2014 token production rate in AI coding. Learn why it\u2019s a secondary metric and how it interacts with yield.",
+    "Velocity = output / input \u2014 output efficiency ratio in AI coding. Learn why it\u2019s a secondary metric and how it interacts with yield.",
   path: "/metrics/velocity",
 });
 
@@ -33,14 +33,14 @@ export default function VelocityPage() {
           ]),
           definedTerm(
             "Velocity — Token Production Rate",
-            "Velocity = output / session_time. The rate at which an AI operator produces output tokens per unit of session time. A secondary metric: high velocity without yield is fast waste. Velocity matters most for throughput-oriented tasks where raw output volume per hour is the goal.",
+            "Velocity = output / input. The ratio of output tokens to fresh input tokens — how much the model generates per unit of fresh context provided. A secondary metric: high velocity without yield is fast waste. Velocity matters most for throughput-oriented tasks where raw output volume per input is the goal.",
             "/metrics/velocity",
           ),
           faqPage([
             {
               question: "What is velocity in AI coding?",
               answer:
-                "Velocity = output / session_time. It measures how many output tokens an operator produces per unit of session time — tokens per minute, per hour, or per session. High velocity means you are generating output quickly; low velocity means you are spending time on input and context management without proportional output.",
+              "Velocity = output / input. It measures how many output tokens an operator produces per token of fresh input. High velocity means you are generating substantial output relative to your input; low velocity means you are spending most of your tokens on fresh context without proportional output.",
             },
             {
               question: "Why is velocity a secondary metric?",
@@ -50,7 +50,7 @@ export default function VelocityPage() {
             {
               question: "How does velocity interact with yield?",
               answer:
-                "They measure different dimensions. Yield = (cache_read × output) / input² measures cascade efficiency. Velocity = output / session_time measures production rate. An operator can have high yield and low velocity (efficient but slow — deep, careful work with long thinking time). Or high velocity and low yield (fast but wasteful — rapid-fire prompts with no context reuse). The best operators have both: high yield AND high velocity — efficient cascades that also produce a lot of output quickly.",
+                "They measure different dimensions. Yield = (cache_read × output) / input² measures cascade efficiency. Velocity = output / input measures output efficiency. An operator can have high yield and low velocity (efficient but low output ratio — deep, careful work with minimal fresh input). Or high velocity and low yield (fast output but wasteful — rapid-fire prompts with no cache reuse). The best operators have both: high yield AND high velocity — efficient cascades that also produce high output per input.",
             },
             {
               question: "When does velocity matter?",
@@ -81,24 +81,25 @@ export default function VelocityPage() {
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">
-            Velocity = output / session_time
+            Velocity = output / input
           </p>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Velocity is the rate of output token production per unit of session
-          time. It answers a simple question:{" "}
-          <em>how many tokens of useful output am I generating per hour?</em> A
-          velocity of 5,000 tokens/hour means you&rsquo;re producing 5,000
-          output tokens for every hour of active session time. A velocity of 500
-          tokens/hour means you&rsquo;re spending most of your time on input,
-          context management, or waiting — not generating output.
+          Velocity is the ratio of output tokens to fresh input tokens. It
+          answers a simple question:{" "}
+          <em>how much output am I generating per token of fresh context I
+          provide?</em> A velocity of 0.5 means you produce 1 output token for
+          every 2 input tokens — the model is generating substantial output
+          relative to your prompts. A velocity of 0.01 means you produce 1
+          output token for every 100 input tokens — most of your tokens are
+          fresh context, not generated output.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">session_time</strong> is the
-          wall-clock duration of the active session — from first prompt to last
-          response. It includes the time you spend composing prompts, the time
-          the model spends generating, and the time you spend reviewing output.
-          Velocity captures the full loop, not just model inference speed.
+          <strong className="text-text-primary">input</strong> is the fresh
+          context you provide each turn — new prompts, new instructions, new
+          code snippets. Velocity captures how efficiently the model converts
+          your fresh input into output, independent of cache reuse (which is
+          what leverage measures).
         </p>
       </section>
 
@@ -109,18 +110,19 @@ export default function VelocityPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Velocity measures your{" "}
-          <strong className="text-text-primary">throughput</strong> — how much
-          output you produce per unit of time invested. It is the AI-coding
-          analog of lines-of-code-per-hour, but measured in output tokens rather
-          than lines. Unlike lines of code, output tokens are a direct measure
-          of the model&rsquo;s productive work, not your typing speed.
+          <strong className="text-text-primary">output efficiency</strong> —
+          how much output you produce per token of fresh input. It is the
+          AI-coding analog of code-to-comment ratio, but measured in output
+          tokens versus input tokens. Unlike lines of code, output tokens are a
+          direct measure of the model&rsquo;s productive work, not your typing
+          speed.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Velocity is influenced by several factors: how quickly you compose
-          prompts (your input velocity), how long the model takes to respond
-          (inference latency), how much output you request per turn (prompt
-          design), and how much time you spend reviewing or editing between
-          turns (your review loop). Improving any of these increases velocity —
+          Velocity is influenced by several factors: how specific your prompts
+          are (targeted input produces more output per token), how much output
+          you request per turn (prompt design), how much context you can reuse
+          from cache (which reduces the input you need to provide), and the
+          complexity of the task. Improving any of these increases velocity —
           but not all improvements are equal.
         </p>
       </section>
@@ -135,26 +137,29 @@ export default function VelocityPage() {
           <strong className="text-text-primary">
             high velocity without yield is fast waste
           </strong>
-          . An operator who generates 10,000 output tokens per hour but sends
-          50,000 fresh input tokens with no cache reuse has high velocity but
-          low yield. They are burning tokens quickly — efficient at producing
-          volume, inefficient at producing value.
+          . An operator who generates 10,000 output tokens from 50,000 fresh
+          input tokens with no cache reuse has high velocity but low yield.
+          They are burning input efficiently — good output ratio, but no
+          context compounding.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           This is why SigRank treats velocity as secondary. Yield is the
           headline because it measures the <em>architecture</em> of the cascade
-          — whether signal is compounding. Velocity measures the <em>speed</em>{" "}
-          of the cascade — how fast tokens flow. Speed without architecture is
-          noise. Architecture without speed is still signal (just slower
-          signal). The priority is architecture first, speed second.
+          — whether signal is compounding. Velocity measures the <em>output
+          ratio</em>{" "}
+          of the cascade — how much output you get per input. Output without
+          compounding is noise. Architecture without output is still signal
+          (just less of it). The priority is architecture first, output ratio
+          second.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Consider two operators. Operator A produces 3,000 tokens/hour with a
-          yield of 50 (efficient cascade, moderate speed). Operator B produces
-          8,000 tokens/hour with a yield of 2 (fast cascade, wasteful). Operator
-          A is the better AI coder — their output compounds. Operator B is
-          generating more volume but burning context to do it. Velocity alone
-          would rank B higher; yield correctly ranks A higher.
+          Consider two operators. Operator A has a velocity of 0.3 with a
+          yield of 50 (efficient cascade, moderate output ratio). Operator B
+          has a velocity of 0.8 with a yield of 2 (high output ratio, wasteful
+          cascade). Operator A is the better AI coder — their output compounds.
+          Operator B is generating more output per input but burning context to
+          do it. Velocity alone would rank B higher; yield correctly ranks A
+          higher.
         </p>
       </section>
 
@@ -166,7 +171,7 @@ export default function VelocityPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Velocity and yield measure orthogonal dimensions. Yield measures
           cascade efficiency (output × cache reuse / input²). Velocity measures
-          production rate (output / time). They share the{" "}
+          output efficiency (output / input). They share the{" "}
           <strong className="text-text-primary">output</strong> term but diverge
           everywhere else.
         </p>
@@ -268,7 +273,7 @@ export default function VelocityPage() {
             <strong className="text-gold">
               2. Reduce review-loop overhead.
             </strong>{" "}
-            Time spent reviewing and editing between turns is session_time that
+            Time spent reviewing and editing between turns is input that
             doesn&rsquo;t produce output. Trust the cascade — if your context is
             stable and your prompts are specific, the output quality is high
             enough to reduce round-trip edits.
@@ -300,11 +305,11 @@ export default function VelocityPage() {
               What is velocity in AI coding?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Velocity = output / session_time. It measures how many output
-              tokens you produce per unit of session time. High velocity means
-              you&rsquo;re generating output quickly; low velocity means
-              you&rsquo;re spending time on input and context management without
-              proportional output.
+              Velocity = output / input. It measures how many output tokens you
+              produce per token of fresh input. High velocity means you&rsquo;re
+              generating substantial output relative to your input; low velocity
+              means you&rsquo;re spending most of your tokens on fresh context
+              without proportional output.
             </dd>
           </div>
           <div className="flex flex-col gap-1">
@@ -313,10 +318,11 @@ export default function VelocityPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               High velocity without yield is fast waste. An operator generating
-              10,000 tokens/hour with no cache reuse has high velocity but low
-              yield — they are burning tokens quickly. Yield measures
-              efficiency; velocity measures speed. Speed without efficiency is
-              just faster waste. Yield is the headline; velocity is context.
+              high output per input with no cache reuse has high velocity but
+              low yield — they are burning input efficiently. Yield measures
+              efficiency; velocity measures output ratio. Output without
+              compounding is just faster waste. Yield is the headline; velocity
+              is context.
             </dd>
           </div>
           <div className="flex flex-col gap-1">
