@@ -32,7 +32,7 @@ type Variant = "full" | "embed";
  * Owner-facing column headers (owner 2026-06-22, updated 2026-07-14, expanded to 4
  * degrees 2026-07-17). The first column is a static modeled baseline; the rest are
  * LIVE from the all-time board, filtered to the Human Center of Mass
- * (bots/outliers with input/total < 0.1% or > 80% are categorized separately):
+ * (outliers with input/total < 0.1% or > 80% are categorized separately):
  *   - "AA baseline"   = the Artificial Analysis 7:2:1 modeled reference (static)
  *   - "Human Center of Mass" = median of all real human operators (the typical operator)
  *   - "Power users"   = median of the top 100 real human operators (the typical elite)

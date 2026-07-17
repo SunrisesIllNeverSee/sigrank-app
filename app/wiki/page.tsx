@@ -1125,7 +1125,7 @@ export default function Draft1Page() {
         {
           id: "verification",
           label: "Verification & integrity tests",
-          hint: "How we know the numbers are real — Benford (with its honest failure + fix), the bot control, the telescoping lock, content-free verification, the threat model.",
+          hint: "How we know the numbers are real — Benford (with its honest failure + fix), the outlier control, the telescoping lock, content-free verification, the threat model.",
           node: withPermalink("verification", <VerificationTests />),
         },
         {
