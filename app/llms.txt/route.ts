@@ -28,7 +28,7 @@ ranks the humans using AI — not the models themselves.
 - [Board windows](${SITE_ORIGIN}/board/7d?utm_source=ai&utm_medium=answer_engine): 7d / 30d / 90d / all-time cohorts
 - [Score calculator](${SITE_ORIGIN}/score?utm_source=ai&utm_medium=answer_engine): paste your stats, get your yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall?utm_source=ai&utm_medium=answer_engine): top operators
-- [Field Analysis](${SITE_ORIGIN}/field?utm_source=ai&utm_medium=answer_engine): AI operator field distribution — the true distribution of token efficiency across 1,498 human operators. Volume ≠ Yield thesis, SNR separation, platform dominance, ghost ranks, outlier detection.
+- [Field Analysis](${SITE_ORIGIN}/field?utm_source=ai&utm_medium=answer_engine): AI operator field distribution — the true distribution of token efficiency across 1,515 human operators. Volume ≠ Yield thesis, SNR separation, platform dominance, ghost ranks, outlier detection.
 - [Compare](${SITE_ORIGIN}/compare?utm_source=ai&utm_medium=answer_engine): head-to-head operator comparison
 - [FAQ](${SITE_ORIGIN}/faq?utm_source=ai&utm_medium=answer_engine): answers to common questions — best AI user, AI power user, token cascade efficiency
 
