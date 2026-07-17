@@ -1,5 +1,5 @@
 /**
- * components/marketing/ThreeDegreesChart.tsx — "The Four Degrees of Leverage"
+ * components/marketing/FourDegreesChart.tsx — "The Four Degrees of Leverage"
  * (owner content, Devins_Plans/three_degree_comparison.md, 2026-06-22).
  *
  * A map of how far work travels: AA 7:2:1 modeled baseline → the wild field median
@@ -380,7 +380,7 @@ function Provenance() {
   );
 }
 
-export async function ThreeDegreesChart({
+export async function FourDegreesChart({
   variant = "full",
 }: {
   variant?: Variant;
@@ -478,7 +478,7 @@ export async function ThreeDegreesChart({
           </div>
 
           <Link
-            href="/wiki/three-degrees"
+            href="/wiki/four-degrees"
             className="w-fit font-mono text-sm font-semibold text-text-accent underline-offset-2 hover:underline"
           >
             Full description, the 10xDEV log read &amp; full provenance →

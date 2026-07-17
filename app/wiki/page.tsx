@@ -28,7 +28,7 @@ import { SubmitForm } from "@/components/submit/SubmitForm";
 
 import { WikiDoc, type WikiDocGroup } from "@/components/wiki/WikiDoc";
 import { WikiTOC, type TocItem } from "@/components/wiki/WikiTOC";
-import { ThreeDegreesChart } from "@/components/marketing/ThreeDegreesChart";
+import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
 import { VerificationTests } from "@/components/marketing/VerificationTests";
 import {
   SignatureDrift,
@@ -1114,12 +1114,12 @@ export default function Draft1Page() {
         "How we know the numbers are real — verification tests, integrity checks, the calibration story, and the tools SigRank reads alongside.",
       items: [
         {
-          id: "three-degrees",
+          id: "four-degrees",
           label: "The four degrees of leverage",
           hint: "AA 7:2:1 baseline → wild field median → power users → top eval; the 10xDEV log read + full provenance.",
           node: withPermalink(
-            "three-degrees",
-            <ThreeDegreesChart variant="full" />,
+            "four-degrees",
+            <FourDegreesChart variant="full" />,
           ),
         },
         {
