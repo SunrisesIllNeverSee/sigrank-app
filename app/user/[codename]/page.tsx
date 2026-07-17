@@ -281,7 +281,7 @@ export default async function OperatorProfilePage({
 
   const name = resolveName(operator);
   const hasDisplayName = name !== operator.codename;
-  // Outlier/bot detection (owner 2026-07-14): red asterisk on profile header.
+  // Outlier detection (owner 2026-07-14): red asterisk on profile header.
   const outlier = !pending && c && !c.nonCompounding ? isOutlierRow(row) : false;
 
   // Profile visibility gate (migration 0021, owner 2026-07-16: "private user

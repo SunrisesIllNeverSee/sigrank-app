@@ -2,8 +2,8 @@
  * lib/field/types.ts — TypeScript types for the field-analysis.json dataset.
  *
  * The dataset at public/data/field-analysis.json captures the AI operator
- * field distribution: 1,611 human operators (bots filtered) with token
- * cascade metrics, plus 17 bots/suspects, 50 ghost-rank operators, yield
+ * field distribution: 1,628 operators (1,498 Human Center of Mass + 113
+ * outliers) with token cascade metrics, plus 50 ghost-rank operators, yield
  * quartile IQR data, platform adoption counts, and 4 notable operators for
  * the cascade composition chart.
  */
@@ -30,9 +30,8 @@ export interface FieldMeta {
   scraped_at: string;
   source: string;
   total_scraped: number;
-  bots_removed: number;
-  suspects_removed: number;
   humans_included: number;
+  outliers: number;
   medians: FieldMedians;
   iqr_fences: {
     yield: IqrFence;
@@ -64,12 +63,10 @@ export interface FieldOperator {
   platform: string;
   op_ratio: string;
   sigrank_yield: number;
-}
-
-export interface FieldBot extends FieldOperator {
-  classification: "bot" | "suspect";
-  bot_score: number;
-  signals: string[];
+  /** Optional — present on operators that were flagged as outliers (former bot/suspect classification). */
+  classification?: string;
+  bot_score?: number;
+  signals?: string[];
 }
 
 export interface GhostRank {
@@ -98,7 +95,7 @@ export interface PlatformAdoption {
 export interface FieldAnalysis {
   meta: FieldMeta;
   operators: FieldOperator[];
-  bots: FieldBot[];
+  bots: FieldOperator[]; // deprecated — kept as empty array for backward compat
   ghost_ranks: GhostRank[];
   yield_quartiles: YieldQuartile[];
   platform_adoption: PlatformAdoption[];

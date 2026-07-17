@@ -47,7 +47,7 @@ async function getAllPosts(): Promise<PostSummary[]> {
 export const metadata: Metadata = withOG({
   title: "Blog — SigRank",
   description:
-    "Analysis and research on AI operator efficiency, token cascade economics, and bot detection.",
+    "Analysis and research on AI operator efficiency, token cascade economics, and outlier detection.",
   path: "/blog",
 });
 
@@ -67,7 +67,7 @@ export default async function BlogIndex() {
         </h1>
         <p className="text-base leading-relaxed text-text-secondary">
           Deep dives into AI operator efficiency, the token cascade economy,
-          and bot detection methodology.
+          and outlier detection methodology.
         </p>
       </header>
 

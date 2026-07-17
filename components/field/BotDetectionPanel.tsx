@@ -1,14 +1,18 @@
 /**
- * BotDetectionPanel — SVG scatter + table of confirmed bots.
+ * BotDetectionPanel — SVG scatter + table of flagged outliers.
  *
- * SNR vs total tokens scatter with bots highlighted in red. Table of 2
- * confirmed bots with their signals. Pure inline SVG + styled HTML table,
- * no chart libraries.
+ * SNR vs total tokens scatter with flagged outliers highlighted in red.
+ * Table of confirmed outliers with their signals. Pure inline SVG + styled
+ * HTML table, no chart libraries.
+ *
+ * Note: the component name retains "Bot" for git-history continuity, but the
+ * display text says "outliers" — the 17 former bots/suspects are now lumped
+ * into the 113 outliers (owner 2026-07-17: no separate bot category).
  */
 
-import type { FieldBot, FieldOperator } from "@/lib/field/types";
+import type { FieldOperator } from "@/lib/field/types";
 
-const BOT = "#c0392b";
+const FLAG = "#c0392b";
 const CASCADE = "#8b5cf6";
 const GOLD = "#c4923a";
 const INK = "#e0e0d0";
@@ -18,7 +22,7 @@ const BG = "#0d0b08";
 
 export interface BotDetectionPanelProps {
   operators: FieldOperator[];
-  bots: FieldBot[];
+  bots?: FieldOperator[]; // deprecated — kept for backward compat, unused
 }
 
 function fmtTokens(n: number): string {
@@ -31,23 +35,26 @@ function fmtTokens(n: number): string {
 
 export default function BotDetectionPanel({
   operators,
-  bots,
 }: BotDetectionPanelProps) {
+  // Flagged outliers are operators with a `classification` field (former
+  // bot/suspect category, now lumped into outliers).
+  const flaggedOutliers = operators.filter((o) => o.classification != null);
+
   // Scatter: SNR vs total_tokens (log scale)
   const humanPoints = operators
-    .filter((o) => o.total_tokens > 0 && o.snr > 0)
+    .filter((o) => o.total_tokens > 0 && o.snr > 0 && o.classification == null)
     .map((o) => ({
       tokens: o.total_tokens,
       snr: o.snr,
     }));
 
-  const botPoints = bots
+  const outlierPoints = flaggedOutliers
     .filter((b) => b.total_tokens > 0)
     .map((b) => ({
       handle: b.handle,
       tokens: b.total_tokens,
       snr: Math.max(b.snr, 0.0001),
-      classification: b.classification,
+      classification: b.classification!,
     }));
 
   if (humanPoints.length === 0) return null;
@@ -74,7 +81,9 @@ export default function BotDetectionPanel({
     plotH -
     ((Math.log10(snr) - logSnrMin) / (logSnrMax - logSnrMin)) * plotH;
 
-  const confirmedBots = bots.filter((b) => b.classification === "bot");
+  const confirmedOutliers = flaggedOutliers.filter(
+    (b) => b.classification === "bot",
+  );
 
   return (
     <div>
@@ -82,12 +91,12 @@ export default function BotDetectionPanel({
         viewBox={`0 0 ${width} ${scatterH}`}
         width="100%"
         role="img"
-        aria-label="Bot detection scatter — SNR vs total tokens"
+        aria-label="Outlier detection scatter — SNR vs total tokens"
         style={{ background: BG, border: `1px solid ${LINE}` }}
       >
         {/* Title */}
-        <text x={padL} y={26} fontSize={13} fill={BOT} fontWeight={700}>
-          BOT DETECTION — SNR vs TOTAL TOKENS
+        <text x={padL} y={26} fontSize={13} fill={FLAG} fontWeight={700}>
+          OUTLIER DETECTION — SNR vs TOTAL TOKENS
         </text>
         <text
           x={width - padR}
@@ -96,7 +105,7 @@ export default function BotDetectionPanel({
           fill={MUT}
           textAnchor="end"
         >
-          {humanPoints.length} humans · {botPoints.length} bots/suspects
+          {humanPoints.length} humans · {outlierPoints.length} flagged outliers
         </text>
 
         {/* Grid X */}
@@ -168,14 +177,14 @@ export default function BotDetectionPanel({
           />
         ))}
 
-        {/* Bot points */}
-        {botPoints.map((b, i) => (
+        {/* Outlier points */}
+        {outlierPoints.map((b, i) => (
           <g key={`b-${i}`}>
             <circle
               cx={xFor(b.tokens).toFixed(1)}
               cy={yFor(b.snr).toFixed(1)}
               r={5}
-              fill={BOT}
+              fill={FLAG}
               stroke={BG}
               strokeWidth={1}
               opacity={b.classification === "bot" ? 1 : 0.6}
@@ -185,7 +194,7 @@ export default function BotDetectionPanel({
                 x={xFor(b.tokens) + 8}
                 y={yFor(b.snr) - 4}
                 fontSize={9}
-                fill={BOT}
+                fill={FLAG}
                 fontWeight={700}
               >
                 {b.handle.length > 14
@@ -218,19 +227,19 @@ export default function BotDetectionPanel({
         </text>
       </svg>
 
-      {/* Bot table */}
+      {/* Outlier table */}
       <div className="mt-4 overflow-x-auto">
         <table className="w-full border-collapse font-sans text-sm">
           <thead>
             <tr style={{ borderBottom: `2px solid ${LINE}` }}>
-              <th className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wider" style={{ color: BOT }}>
+              <th className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wider" style={{ color: FLAG }}>
                 Handle
               </th>
               <th className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wider" style={{ color: MUT }}>
                 Classification
               </th>
               <th className="px-3 py-2 text-right text-xs font-bold uppercase tracking-wider" style={{ color: MUT }}>
-                Bot Score
+                Outlier Score
               </th>
               <th className="px-3 py-2 text-right text-xs font-bold uppercase tracking-wider" style={{ color: MUT }}>
                 Total Tokens
@@ -241,7 +250,7 @@ export default function BotDetectionPanel({
             </tr>
           </thead>
           <tbody>
-            {confirmedBots.map((b) => (
+            {confirmedOutliers.map((b) => (
               <tr
                 key={b.handle}
                 style={{ borderBottom: `1px solid ${LINE}` }}
@@ -253,9 +262,9 @@ export default function BotDetectionPanel({
                   <span
                     className="rounded px-2 py-0.5 text-xs font-bold uppercase"
                     style={{
-                      background: `${BOT}22`,
-                      color: BOT,
-                      border: `1px solid ${BOT}55`,
+                      background: `${FLAG}22`,
+                      color: FLAG,
+                      border: `1px solid ${FLAG}55`,
                     }}
                   >
                     {b.classification}
@@ -268,7 +277,7 @@ export default function BotDetectionPanel({
                   {fmtTokens(b.total_tokens)}
                 </td>
                 <td className="px-3 py-2 text-xs" style={{ color: MUT }}>
-                  {b.signals.join(" · ")}
+                  {b.signals?.join(" · ") ?? "—"}
                 </td>
               </tr>
             ))}

@@ -1,16 +1,19 @@
 /**
- * BotZoneShading — overlay legend for bot exclusion zones.
+ * BotZoneShading — overlay legend for outlier exclusion zones.
  *
  * Not a standalone chart — a small legend component that explains the red
  * shaded exclusion regions visible on the distribution charts. Placed near
- * the bot detection section to contextualize the zone shading.
+ * the outlier detection section to contextualize the zone shading.
+ *
+ * Note: component name retains "Bot" for git-history continuity, but display
+ * text says "outliers" (owner 2026-07-17: no separate bot category).
  */
 
 export default function BotZoneShading() {
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
       <h4 className="font-sans text-sm font-bold text-text-primary">
-        Bot Exclusion Zones
+        Outlier Exclusion Zones
       </h4>
       <div className="flex flex-col gap-2 text-xs">
         <div className="flex items-center gap-2">
@@ -19,7 +22,7 @@ export default function BotZoneShading() {
             <span className="font-mono font-bold text-red-400">
               input/total &lt; 0.1%
             </span>{" "}
-            - cache replay bots (zero fresh input)
+            - cache replay outliers (zero fresh input)
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -28,7 +31,7 @@ export default function BotZoneShading() {
             <span className="font-mono font-bold text-red-400">
               input/total &gt; 80%
             </span>{" "}
-            - input dump bots (no cache reuse)
+            - input dump outliers (no cache reuse)
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -51,7 +54,7 @@ export default function BotZoneShading() {
         </div>
       </div>
       <p className="text-xs text-text-muted">
-        Bots and outliers are not deleted. They get their own category and
+        Outliers are not deleted. They get their own category and
         rank against each other. They just do not set the numbers for the
         Human Center of Mass.
       </p>
