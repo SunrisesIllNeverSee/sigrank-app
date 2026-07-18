@@ -36,6 +36,14 @@ const REPORTS: ReportListing[] = [
     date: "2026-06-30",
     quarter: "Q1 2026",
   },
+  {
+    slug: "q2-2026",
+    title: "State of AI Operator Token Efficiency — Q2 2026",
+    description:
+      "The second SigRank Index report. Quarter-over-quarter trends, platform leadership shifts, class distribution, and the GhostRank quadrant.",
+    date: "2026-07-18",
+    quarter: "Q2 2026",
+  },
 ];
 
 export default function ResearchIndexPage() {
