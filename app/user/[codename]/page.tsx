@@ -58,13 +58,13 @@ import { operatorProfile } from "@/lib/jsonld";
 import HeatBar from "@/components/charts/HeatBar";
 import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 
-// ISR: revalidate every 10 minutes so profile data stays current. The page reads
+// ISR: revalidate every hour so profile data stays current. The page reads
 // no cookies/searchParams (pure public profile), so it's ISR-eligible. The
 // data-layer cache (unstable_cache on getOperator etc.) provides the first-tier
 // cache; this export makes the CDN hold the rendered page too. On-demand
 // revalidation via revalidateTouchedWindows fires on snapshot submit, so the
-// 600s ISR is just a safety net — 120s was over-validating.
-export const revalidate = 600;
+// 3600s ISR is just a safety net — 600s was over-validating.
+export const revalidate = 3600;
 
 /**
  * Resolve the display name for an operator. display_name now carries both the

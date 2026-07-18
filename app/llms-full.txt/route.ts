@@ -12,7 +12,7 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 
-export const revalidate = 3600; // 1h
+export const revalidate = 86400; // 24h
 
 export async function GET() {
   // Fetch top operators for the inline board snapshot

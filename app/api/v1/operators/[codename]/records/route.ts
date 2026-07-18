@@ -15,7 +15,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getOperatorRecords } from "@/lib/data";
 import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function GET(
   req: NextRequest,
