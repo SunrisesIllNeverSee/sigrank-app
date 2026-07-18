@@ -33,10 +33,10 @@ import { leaderboardItemList, sigrankDataset, faqPage } from "@/lib/jsonld";
 import { withOG } from "@/lib/seo";
 import { BoardTableClient } from "@/components/board/BoardTableClient";
 
-// D19: cache leaderboard reads for 1800s (30 min). Board data changes only on
+// D19: cache leaderboard reads for 3600s (1 hour). Board data changes only on
 // snapshot submit, which triggers on-demand revalidation via revalidateTouchedWindows.
-// The 300s ISR was over-validating — 1800s cuts ~83% of ISR invocations.
-export const revalidate = 1800;
+// The 300s ISR was over-validating — 3600s cuts ~92% of ISR invocations.
+export const revalidate = 3600;
 
 /** Statically render the four known windows + the "off" (filter-off) board. */
 export function generateStaticParams() {
