@@ -65,8 +65,8 @@ export function generateMetadata({
   })();
 }
 
-// ISR: revalidate every 30 minutes so figures stay current within the quarter.
-export const revalidate = 1800;
+// ISR: revalidate daily so figures stay current within the quarter.
+export const revalidate = 86400;
 
 /** Format yield for display. */
 function fmtY(y: number): string {
