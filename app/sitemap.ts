@@ -121,6 +121,11 @@ const STATIC_ROUTES: {
     priority: 0.6,
     changeFrequency: "monthly",
   },
+  {
+    path: "/guides/cache-write-convergence",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
 
   // Metric definition pages — definitional intent
   { path: "/metrics/yield-cascade", priority: 0.6, changeFrequency: "monthly" },
