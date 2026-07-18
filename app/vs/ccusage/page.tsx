@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -122,6 +122,11 @@ export default function VsCcusagePage() {
             { name: "SigRank vs ccusage", path: "/vs/ccusage" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs ccusage — Sensor to Instrument Panel",
+            description: "ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.",
+            path: "/vs/ccusage",
+          }),
         ]}
       />
 

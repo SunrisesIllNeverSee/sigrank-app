@@ -16,7 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "How SigRank Measures Operator Efficiency",
@@ -37,7 +37,7 @@ function articleJsonLd() {
       "The yield metric (Υ = cache_read × output / input²) measures how well AI operators convert tokens into useful output. How it works and why it matters.",
     url,
     datePublished: "2026-07-07",
-    author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "AI operator efficiency measurement and the yield cascade metric",

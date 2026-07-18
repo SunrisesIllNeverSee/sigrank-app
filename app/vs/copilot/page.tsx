@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -117,6 +117,11 @@ export default function VsCopilotPage() {
             { name: "SigRank vs GitHub Copilot", path: "/vs/copilot" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs Copilot — Token Tracking for AI Tools",
+            description: "Copilot is an AI pair programmer. SigRank measures how efficiently you drive it. Copilot shows what you wrote; SigRank shows how you drove the AI.",
+            path: "/vs/copilot",
+          }),
         ]}
       />
 
