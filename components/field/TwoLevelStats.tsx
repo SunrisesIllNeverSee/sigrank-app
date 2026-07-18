@@ -16,6 +16,7 @@ export interface TwoLevelStatsProps {
     total_tokens: number;
     tokens_per_day: number;
     compression: number;
+    cache_read_pct?: number;
   };
   iqrFences?: {
     yield?: { q1: number; q3: number; iqr: number };

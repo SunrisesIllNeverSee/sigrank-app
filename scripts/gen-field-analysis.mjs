@@ -159,8 +159,18 @@ function median(arr) {
 
 function quartiles(arr) {
   const sorted = [...arr].sort((a, b) => a - b);
-  const q1 = sorted[Math.floor(sorted.length * 0.25)];
-  const q3 = sorted[Math.floor(sorted.length * 0.75)];
+  const n = sorted.length;
+  // Linear interpolation (Type 7 — R/default, numpy default, Excel PERCENTILE)
+  // pos = p * (n - 1), interpolate between floor and ceil
+  const interp = (p) => {
+    const pos = p * (n - 1);
+    const lo = Math.floor(pos);
+    const hi = Math.min(lo + 1, n - 1);
+    const frac = pos - lo;
+    return sorted[lo] + frac * (sorted[hi] - sorted[lo]);
+  };
+  const q1 = interp(0.25);
+  const q3 = interp(0.75);
   const iqr = q3 - q1;
   return {
     q1,
@@ -184,11 +194,11 @@ const medians = {
   velocity: r(median(humans.map((h) => h.velocity)), 2),
   tokens_per_day: r(median(humans.map((h) => h.tokens_per_day)), 0),
   total_tokens: r(median(humans.map((h) => h.total_tokens)), 0),
-  // NOTE: meta.medians.compression is median(CR/total), NOT median of the per-operator
-  // compression field (which is (CR+CW)/total). The deployed JSON has this inconsistency
-  // — the per-operator field includes cache write, but the meta median is cache-read-only.
-  // This preserves backward compat with the deployed data. See blog [22a] for context.
-  compression: r(median(humans.map((h) => (h.total_tokens > 0 ? h.cache_read_tokens / h.total_tokens : 0))), 4),
+  // cache_read_pct: median(CR/total) — the share of total tokens that are cache reads.
+  // NOTE: This is DIFFERENT from the per-operator `compression` field, which is (CR+CW)/total.
+  // The old deployed JSON labeled this "compression" but it was actually CR/total. Renamed
+  // for clarity. See blog [22a] for context.
+  cache_read_pct: r(median(humans.map((h) => (h.total_tokens > 0 ? h.cache_read_tokens / h.total_tokens : 0))), 4),
 };
 
 const iqrFences = {
