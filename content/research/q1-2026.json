@@ -1,0 +1,53 @@
+{
+  "snapshotDate": "2026-07-18T17:30:00Z",
+  "asOf": "2026-06-30",
+  "quarter": "Q1 2026",
+  "operatorCount": 1640,
+  "rankedCount": 1502,
+  "topYield": 2462655.8046822385,
+  "medianY": 2.1540544151329355,
+  "topDecile": 232.42382526912147,
+  "bottomDecile": 0.1011279010531187,
+  "gap": 1143265.363855842,
+  "wastePct": 99,
+  "platformStats": [
+    {
+      "platform": "claude",
+      "avgYield": 13512.87992967961,
+      "count": 752
+    },
+    {
+      "platform": "anthropic",
+      "avgYield": 394.614360844686,
+      "count": 1
+    },
+    {
+      "platform": "chatgpt",
+      "avgYield": 191.23931963378848,
+      "count": 582
+    },
+    {
+      "platform": "other",
+      "avgYield": 40.148095992479135,
+      "count": 148
+    },
+    {
+      "platform": "gemini",
+      "avgYield": 0.3458663173059535,
+      "count": 19
+    }
+  ],
+  "topPlatform": {
+    "platform": "claude",
+    "avgYield": 13512.87992967961,
+    "count": 752
+  },
+  "otherPlatformsAvg": 156.58691069706492,
+  "cachePct": 18,
+  "topEntry": {
+    "anonId": "furic",
+    "codename": "furic",
+    "yield": 2462655.8046822385,
+    "platform": "claude"
+  }
+}
