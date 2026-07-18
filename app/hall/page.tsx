@@ -16,10 +16,10 @@ export const metadata: Metadata = withOG({
   path: "/hall",
 });
 
-// ISR: cache the page for 300s. The page no longer reads searchParams
+// ISR: cache the page for 3600s. The page no longer reads searchParams
 // (which forced dynamic rendering + no-store). All 4 windows' data is
 // pre-fetched on the server; the client wrapper filters by class/platform/window.
-export const revalidate = 300;
+export const revalidate = 3600;
 
 /**
  * /hall — Hall of Signal (D15 canonical route; /hall-of-signal redirects here).
