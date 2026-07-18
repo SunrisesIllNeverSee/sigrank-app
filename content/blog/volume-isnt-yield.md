@@ -38,11 +38,11 @@ Y = (cache_read × output) / input^2
 
 [8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,628 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
 
-[9] The first thing the margins show: **92.4% of the median operator's tokens are cached context — cache reads plus cache writes.** Not input. Not output. Cached context. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
+[9] The first thing the margins show: **92.4% of the median operator's tokens are cache reads.** Not input. Not output. Cache reads. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
 
 | Pillar | Median % | What it means |
 |--------|----------|---------------|
-| Cache Read | 92.4% | Reused context, the harvest (includes cache write — see compression in [22a]) |
+| Cache Read | 92.4% | Reused context, the harvest |
 | Input | 5.0% | Fresh tokens an operator provides |
 | Cache Write | 1.6% | Context committed for reuse |
 | Output | 0.5% | What the model generates |
@@ -97,7 +97,7 @@ Y = (cache_read × output) / input^2
 
 [17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's an outlier dumping synthetic input. This single operator skews the field average by 248,000%.
 
-[18] **The outliers don't get deleted.** They get their own category. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else. The 96 extreme-human outliers — extreme humans like `furic` who have real output and real cache construction but near-zero input — get their own toggle on the leaderboard. They're not flagged outliers. They're just not the center of mass. The [field page](/field) shows the full outlier detection methodology — the 6-signal score, the input/total ratio zones, the scatter plot.
+[18] **The outliers don't get deleted.** They get their own category. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else. The 89 extreme-human outliers — extreme humans like `furic` who have real output and real cache construction but near-zero input — get their own toggle on the leaderboard. They're not flagged outliers. They're just not the center of mass. The [field page](/field) shows the full outlier detection methodology — the 6-signal score, the input/total ratio zones, the scatter plot.
 
 ## The Human Center of Mass
 
@@ -114,7 +114,7 @@ Y = (cache_read × output) / input^2
 | Velocity | 0.09 | 0.05 – 0.19 |
 | SNR | .084 | .049 – .159 |
 | Total tokens | 5.28B | 1.78B – 16.0B |
-| Compression | 0.924 | 0.902 – 0.973 |
+| Cache Read % | 0.924 | 0.884 – 0.946 |
 
 [21] The middle 50% of operators (the IQR) live between 1.8B and 16B total tokens. The median yield is 1.68, meaning the typical operator gets about 1.7x more signal out of their cascade than they put in as input. The top 1% pulls 10,000x or more.
 
@@ -122,7 +122,7 @@ Y = (cache_read × output) / input^2
 
 [22b] **How does this compare to the "average AI user"?** The [Artificial Analysis](https://artificialanalysis.ai) pricing baseline models a 7:2:1 cache-read : cache-write : input ratio — the "average AI user" has a yield of 1.75, leverage of 3.5×, and velocity of 0.50. The real SigRank field median (yield 1.68, leverage 18.6×, velocity 0.09) tells a very different story: actual operators who install a token scanner read **5× more cache** than the model assumes (18.6× vs 3.5× leverage) but produce **5× less output per input** (0.09 vs 0.50 velocity). Net yield is about the same (1.68 vs 1.75) — but the composition is cache-heavy, output-light. The [Four Degrees of Leverage chart](/wiki/four-degrees) shows this side by side: the AA baseline column (static, the modeled average) next to the Human Center of Mass column (live, the real field median). The gap between them is the selection effect: people who care enough to measure their token cascade are cache-efficient, not output-prolific.
 
-[22a] Three more metrics in the table above need defining. **Velocity** is output divided by input: how much the model generates per token of fresh context. The median is 0.09, meaning 9 tokens of output for every 100 tokens of input. **SNR** (signal-to-noise ratio) is output as a fraction of input plus output: what fraction of the operator's interaction was actual generated signal versus prompt overhead. The median is .084, which makes sense when 92.4% of tokens are cache replay — the cascade is dominated by context reuse, not fresh interaction. **Compression** is the share of total tokens that are cached (cache read + cache write): how much of the operator's world is stored context versus fresh interaction. The median is 0.924, meaning 92.4% of everything an operator touches is cached context they built earlier.
+[22a] Three more metrics in the table above need defining. **Velocity** is output divided by input: how much the model generates per token of fresh context. The median is 0.09, meaning 9 tokens of output for every 100 tokens of input. **SNR** (signal-to-noise ratio) is output as a fraction of input plus output: what fraction of the operator's interaction was actual generated signal versus prompt overhead. The median is .084, which makes sense when 92.4% of tokens are cache replay — the cascade is dominated by context reuse, not fresh interaction. **Cache Read %** is the share of total tokens that are cache reads: how much of the operator's world is reused context versus fresh interaction or output. The median is 0.924, meaning 92.4% of everything an operator touches is cached context they built earlier. (Cache write is separate — 1.6% — so total cached context including writes is ~94.4%.)
 
 [23] This is where you land when you open SigRank. Not the outliers. The Human Center of Mass. Where you probably are.
 
@@ -143,7 +143,7 @@ Cache Write:      72M tokens   (1.6%)
 Cache Read:      4.77B tokens  (92.4%)
 ```
 
-[25] 92.4% cached context. That's the economy. The typical operator isn't typing new prompts; they're reusing cached context.
+[25] 92.4% cache read. That's the economy. The typical operator isn't typing new prompts; they're reusing cached context.
 
 [26] The **operating ratio** compresses this into one number. For the median operator:
 
@@ -192,11 +192,11 @@ C : I : O = 19 : 1 : 0.09
 
 ### Outliers (the 8th archetype)
 
-[39] The 130 outliers — 113 from the input/total ratio analysis plus 17 flagged by the 6-signal score (see [15a]) — form the 8th archetype. The 113 from the ratio analysis split into 96 extreme-human outliers (real output, real cache construction, near-zero input) and 17 replay/input-dump outliers (near-zero output, no cache reuse). Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The 17 flagged don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
+[39] The 130 outliers — 113 from the input/total ratio analysis plus 17 flagged by the 6-signal score (see [15a]) — form the 8th archetype. The 113 from the ratio analysis split into 89 extreme-human outliers (real output, real cache construction, near-zero input) and 24 replay/input-dump outliers (near-zero output, no cache reuse). Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The 17 flagged don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
 
-[40] **Extreme-human outliers (96 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
+[40] **Extreme-human outliers (89 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
 
-[40a] **Replay/input-dump outliers (17 operators):** The other 17 from the ratio analysis. These have near-zero output and no cache reuse — they're either cycling cached context without producing anything (replay outliers from zone 0) or dumping raw input with no compounding (input dumpers from zone 1). They look like noise, not human patterns. Examples: operators with 99%+ input and zero cache reads, or near-zero output despite billions of total tokens.
+[40a] **Replay/input-dump outliers (24 operators):** The other 24 from the ratio analysis. These have near-zero output and no cache reuse — they're either cycling cached context without producing anything (replay outliers from zone 0) or dumping raw input with no compounding (input dumpers from zone 1). They look like noise, not human patterns. Examples: operators with 99%+ input and zero cache reads, or near-zero output despite billions of total tokens.
 
 [41] **Flagged outliers (17 operators):** Two extreme outliers — `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output) and `stelle-w` (450B tokens, 75% input, 25% output, zero cache). Plus 15 more flagged by a multi-signal outlier score (3–4 signals): anomalous token ratios that don't match human patterns but aren't as clear-cut as the extreme outliers. Examples: `iamtheavoc1` (7T tokens, 14% input, 18% output, 64% cache read — flagged, score 4), `logcjj` (115B tokens, 52% input, near-zero yield — flagged, score 3).
 
