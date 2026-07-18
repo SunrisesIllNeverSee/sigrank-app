@@ -50,6 +50,7 @@ ranks the humans using AI — not the models themselves.
 - [Methodology Refinement](${SITE_ORIGIN}/wiki/methodology-refinement)
 
 ## Metrics (definitions + formulas)
+- [All Metrics](${SITE_ORIGIN}/metrics): index of all six metric definition pages
 - [Yield (Υ)](${SITE_ORIGIN}/metrics/yield-cascade): cache_read × output / input² — the headline efficiency metric
 - [Cache Hit Rate](${SITE_ORIGIN}/metrics/cache-hit-rate): cache_read / (cache_read + cache_write) — context reuse efficiency
 - [Compression Ratio](${SITE_ORIGIN}/metrics/compression-ratio): output / input — output per input token
@@ -58,6 +59,7 @@ ranks the humans using AI — not the models themselves.
 - [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): signal_tokens / total_tokens — signal density
 
 ## Guides (how-to)
+- [All Guides](${SITE_ORIGIN}/guides): index of all eight how-to guides
 - [How to Measure AI Coding Efficiency](${SITE_ORIGIN}/guides/how-to-measure-ai-coding-efficiency)
 - [How to Improve Your Yield](${SITE_ORIGIN}/guides/how-to-improve-your-yield)
 - [How to Reduce Token Waste](${SITE_ORIGIN}/guides/how-to-reduce-token-waste)
@@ -68,6 +70,7 @@ ranks the humans using AI — not the models themselves.
 - [Cache Write Convergence](${SITE_ORIGIN}/guides/cache-write-convergence)
 
 ## Tools (interactive)
+- [All Tools](${SITE_ORIGIN}/tools): index of all four interactive calculators
 - [Yield Calculator](${SITE_ORIGIN}/tools/yield-calculator): enter four token pillars, get Υ Yield + class tier
 - [Operator Class Checker](${SITE_ORIGIN}/tools/operator-class-checker): map yield to IGNITER/SEEKER/BUILDER/TRANSMITTER
 - [Cascade Comparator](${SITE_ORIGIN}/tools/cascade-comparator): compare two operators side by side
@@ -82,6 +85,7 @@ ranks the humans using AI — not the models themselves.
 - [Token Telemetry](${SITE_ORIGIN}/token-telemetry): privacy-preserving measurement of AI coding activity
 
 ## Comparisons
+- [All Comparisons](${SITE_ORIGIN}/vs): index of all eight head-to-head comparison pages
 - [SigRank vs ccusage](${SITE_ORIGIN}/vs/ccusage)
 - [SigRank vs WakaTime](${SITE_ORIGIN}/vs/wakatime)
 - [SigRank vs LMSYS Arena](${SITE_ORIGIN}/vs/lmsys-arena)
@@ -90,6 +94,7 @@ ranks the humans using AI — not the models themselves.
 - [SigRank vs Braintrust](${SITE_ORIGIN}/vs/braintrust)
 - [SigRank vs LangChain](${SITE_ORIGIN}/vs/langchain)
 - [SigRank vs Langfuse](${SITE_ORIGIN}/vs/langfuse)
+- [All Alternatives](${SITE_ORIGIN}/alternatives): index of all four ranked listicles
 - [AI Coding Metrics Tools](${SITE_ORIGIN}/alternatives/ai-coding-metrics): 7 best tools compared
 - [ccusage Alternatives](${SITE_ORIGIN}/alternatives/ccusage-alternatives): 5 best alternatives
 - [AI Benchmarking Tools](${SITE_ORIGIN}/alternatives/ai-benchmarking-tools): best tools for benchmarking AI coding performance
