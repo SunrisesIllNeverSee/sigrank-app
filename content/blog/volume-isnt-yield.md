@@ -38,11 +38,11 @@ Y = (cache_read × output) / input^2
 
 [8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,628 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
 
-[9] The first thing the margins show: **92.4% of the median operator's tokens are cache reads.** Not input. Not output. Cache reads. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
+[9] The first thing the margins show: **92.4% of the median operator's tokens are cached context — cache reads plus cache writes.** Not input. Not output. Cached context. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
 
 | Pillar | Median % | What it means |
 |--------|----------|---------------|
-| Cache Read | 92.4% | Reused context, the harvest |
+| Cache Read | 92.4% | Reused context, the harvest (includes cache write — see compression in [22a]) |
 | Input | 5.0% | Fresh tokens an operator provides |
 | Cache Write | 1.6% | Context committed for reuse |
 | Output | 0.5% | What the model generates |
@@ -65,11 +65,11 @@ Y = (cache_read × output) / input^2
 |--------|---|--------|---------|
 | Input tokens | 1,628 | 1.65 | PASS |
 | Output tokens | 1,628 | 5.54 | PASS |
-| Cache Read | 1,608 | 4.09 | PASS |
-| Cache Write | 1,482 | 5.47 | PASS |
+| Cache Read | 1,625 | 4.09 | PASS |
+| Cache Write | 1,495 | 5.47 | PASS |
 | Total tokens | 1,628 | 0.77 | PASS |
 
-> **Why N is smaller for Cache Read and Cache Write.** 3 operators had zero cache read and 129 had zero cache write — no leading digit to test, so they're excluded from that pillar's chi-square only. All other pillars use the full 1,628.
+> **Why N is smaller for Cache Read and Cache Write.** 3 operators had zero cache read and 133 had zero cache write — no leading digit to test, so they're excluded from that pillar's chi-square only. All other pillars use the full 1,628.
 
 [14] All 5 pillars pass. The observed first-digit distribution matches the expected Benford distribution almost perfectly. This is real telemetry, not fabricated.
 
@@ -80,9 +80,9 @@ Y = (cache_read × output) / input^2
 | Zone | Signal | Count | % | What they're doing |
 |------|--------|-------|---|-------------------|
 | Zone 0 | input/total < 0.1% | 64 | 4.0% | Near-zero input — splits into extreme humans + replay outliers (see [15a]) |
-| Zone 1 | input/total > 80% | 11 | 0.7% | Input dumpers, massive input, no cache reuse, yield=0 |
+| Zone 1 | input/total > 80% | 12 | 0.7% | Input dumpers, massive input, no cache reuse, yield=0 |
 | Gray zone | 0.1–1% | 210 | 13.0% | Low input — splits into MOSES-like humans + extreme outliers (see [15a]) |
-| Human | 1–80% | 1,326 | 82.3% | Real operators, healthy input/cache mix |
+| Human | 1–80% | 1,342 | 82.4% | Real operators, healthy input/cache mix |
 
 [15a] **Zone 0 is not all outliers.** This is the critical distinction. Of the 64 operators with input < 0.1%, 51 have real output (median 4M tokens) and real cache writes (median 64M tokens) — they're extreme humans, not flagged outliers. They've built cached context so efficient that they barely need fresh input. The other 13 have near-zero output and near-zero cache writes — they look like replay outliers, just cycling cached context without producing anything. The gray zone (0.1–1% input) splits similarly: 172 operators pass a MOSES-like filter (velocity ≤ 2x, yield ≤ 1,000, real output > 1M, real cache write > 1M) and stay in the Human Center of Mass. 38 fail the filter and join the outliers. The final outlier classification uses a 6-signal score (inhuman throughput, zero cache reads, single-model fixation, zero sessions, anomalous input ratio, near-zero output) — 17 operators score high enough to be flagged as outliers via the 6-signal score, joining the 113 from the input/total ratio analysis for a total of 130 outliers, removed from the Human Center of Mass but kept visible in their own category.
 
@@ -116,7 +116,7 @@ Y = (cache_read × output) / input^2
 | Total tokens | 5.28B | 1.78B – 16.0B |
 | Compression | 0.924 | 0.902 – 0.973 |
 
-[21] 80% of operators live between 1.8B and 16B total tokens. The median yield is 1.68, meaning the typical operator gets about 1.7x more signal out of their cascade than they put in as input. The top 1% pulls 10,000x or more.
+[21] The middle 50% of operators (the IQR) live between 1.8B and 16B total tokens. The median yield is 1.68, meaning the typical operator gets about 1.7x more signal out of their cascade than they put in as input. The top 1% pulls 10,000x or more.
 
 [22] The median leverage is 18.6x. For every token of fresh input, the median operator reads 19 tokens of cached context. That's the cascade economy in one number.
 
@@ -143,7 +143,7 @@ Cache Write:      72M tokens   (1.6%)
 Cache Read:      4.77B tokens  (92.4%)
 ```
 
-[25] 92.4% cache read. That's the economy. The typical operator isn't typing new prompts; they're reusing cached context.
+[25] 92.4% cached context. That's the economy. The typical operator isn't typing new prompts; they're reusing cached context.
 
 [26] The **operating ratio** compresses this into one number. For the median operator:
 
@@ -157,7 +157,7 @@ C : I : O = 19 : 1 : 0.09
 
 ![Volume vs Yield: The Central Finding](/article-charts/03-volume-vs-yield.png)
 
-[29] Volume-based leaderboards rank by total tokens. SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's 497,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant." Yield says "elite."
+[29] Volume-based leaderboards rank by total tokens. SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's ~500,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant." Yield says "elite."
 
 ## The 8 Archetypes
 
@@ -192,9 +192,11 @@ C : I : O = 19 : 1 : 0.09
 
 ### Outliers (the 8th archetype)
 
-[39] The 130 outliers — 113 from the input/total ratio analysis plus 17 flagged by the 6-signal score (see [15a]) — form the 8th archetype. Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The 17 flagged don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
+[39] The 130 outliers — 113 from the input/total ratio analysis plus 17 flagged by the 6-signal score (see [15a]) — form the 8th archetype. The 113 from the ratio analysis split into 96 extreme-human outliers (real output, real cache construction, near-zero input) and 17 replay/input-dump outliers (near-zero output, no cache reuse). Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The 17 flagged don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
 
-[40] **Outliers (96 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
+[40] **Extreme-human outliers (96 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
+
+[40a] **Replay/input-dump outliers (17 operators):** The other 17 from the ratio analysis. These have near-zero output and no cache reuse — they're either cycling cached context without producing anything (replay outliers from zone 0) or dumping raw input with no compounding (input dumpers from zone 1). They look like noise, not human patterns. Examples: operators with 99%+ input and zero cache reads, or near-zero output despite billions of total tokens.
 
 [41] **Flagged outliers (17 operators):** Two extreme outliers — `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output) and `stelle-w` (450B tokens, 75% input, 25% output, zero cache). Plus 15 more flagged by a multi-signal outlier score (3–4 signals): anomalous token ratios that don't match human patterns but aren't as clear-cut as the extreme outliers. Examples: `iamtheavoc1` (7T tokens, 14% input, 18% output, 64% cache read — flagged, score 4), `logcjj` (115B tokens, 52% input, near-zero yield — flagged, score 3).
 
@@ -202,20 +204,20 @@ C : I : O = 19 : 1 : 0.09
 
 ### What Each Type Looks Like
 
-[42a] To make this concrete, here's what the cascade composition actually looks like for representative operators from each archetype. The numbers are real — pulled from the live leaderboard.
+[42a] To make this concrete, here's what the cascade composition actually looks like for representative operators from each archetype. The numbers are real — pulled from the live leaderboard. Yield shown is the archetype median (the typical yield for that group), not the individual operator's yield.
 
-| Archetype | Example | Total | Input % | Output % | Cache Write % | Cache Read % | Yield |
+| Archetype | Example | Total | Input % | Output % | Cache Write % | Cache Read % | Archetype Yield |
 |-----------|---------|-------|---------|----------|---------------|--------------|-------|
-| The Field | `Xavierhorwood` | 4.91B | 0.73% | 0.3% | 0.8% | 95.9% | ~1 |
-| Context Builders | `gwbiubiu` | 1.66B | 0.94% | 0.4% | 4.0% | 90% | ~7 |
-| Cache Architects | `furic` | 6.72B | 0.003% | 0.05% | 1.0% | 96.8% | 444 |
-| Input-Heavy | `wuwangzhang1216` | 487B | 33.7% | 0.2% | 1.0% | 60.9% | 0.02 |
-| Cache Builders | `gabsh` | 253M | 0.01% | 0.3% | 5.2% | 90% | 1,825 |
-| Cascade Operators | `honggilgim` | 7.2M | 0.01% | 1.0% | 4.0% | 96.4% | 135 |
-| Outlier | `sadw1q` | 17.75B | 0.14% | 30% | 2.0% | 67% | 110,251 |
+| The Field | `Xavierhorwood` | 4.91B | 0.73% | 0.36% | 3.0% | 95.9% | 1.24 |
+| Context Builders | `gwbiubiu` | 1.66B | 0.94% | 0.67% | 4.0% | 94.4% | 6.71 |
+| Cache Architects | `furic` | 6.72B | 0.003% | 0.26% | 2.9% | 96.8% | 444 |
+| Input-Heavy | `wuwangzhang1216` | 487B | 33.7% | 5.3% | 0.03% | 60.9% | 0.02 |
+| Cache Builders | `gabsh` | 253M | 0.01% | 0.63% | 5.2% | 94.2% | 1,825 |
+| Cascade Operators | `honggilgim` | 7.2M | 0.01% | 1.3% | 2.3% | 96.4% | 135 |
+| Outlier | `sadw1q` | 17.75B | 0.14% | 30% | 0.0% | 69.7% | 110,251 |
 | Outlier (input dump) | `grenadeoftacoss` | 9Q | 99.9999% | ~0% | ~0% | ~0% | 0 |
 
-[42b] Read the table left to right and the shape jumps out. The Field operator puts in 0.73% fresh input and reads 95.9% cache — a 130:1 read-to-input ratio. The Cache Architect puts in 0.003% — one fresh token for every 30,000 cache reads. The Input-Heavy operator flips the pattern: 33.7% input, only 60.9% cache, yield near zero. The flagged outlier is just noise: 9 quadrillion tokens, 99.9999% input, zero compounding. The outlier (`sadw1q`) is the strangest shape — 30% output, which is 60x higher than the field median. That's why it's flagged as an extreme-human outlier, not a flagged outlier: it has real output, just at a composition nobody else hits.
+[42b] Read the table left to right and the shape jumps out. The Field operator puts in 0.73% fresh input and reads 95.9% cache — a 132:1 read-to-input ratio. The Cache Architect puts in 0.003% — one fresh token for every 30,000 cache reads. The Input-Heavy operator flips the pattern: 33.7% input, only 60.9% cache, yield near zero. The flagged outlier is just noise: 9 quadrillion tokens, 99.9999% input, zero compounding. The outlier (`sadw1q`) is the strangest shape — 30% output, which is 68x higher than the field median. That's why it's flagged as an extreme-human outlier, not a flagged outlier: it has real output, just at a composition nobody else hits.
 
 ## Notes from Building This
 
