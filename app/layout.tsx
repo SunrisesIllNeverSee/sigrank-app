@@ -16,6 +16,8 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { organization, website, product } from "@/lib/jsonld";
 import { siteMetadata } from "@/lib/seo";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
 // foundation). Wired to the existing --font-geist-sans var name so all
@@ -96,6 +98,8 @@ export default function RootLayout({
           <Footer />
           <NavNpxCTA />
         </PostHogProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

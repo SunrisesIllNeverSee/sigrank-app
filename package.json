@@ -29,6 +29,8 @@
     "@stripe/stripe-js": "^9.9.0",
     "@supabase/ssr": "^0.12.1",
     "@supabase/supabase-js": "^2.110.1",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "clackboard": "^1.1.2",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
