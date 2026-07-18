@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -113,6 +113,11 @@ export default function VsCursorPage() {
             { name: "SigRank vs Cursor", path: "/vs/cursor" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs Cursor — Cross-Tool Token Metrics",
+            description: "Cursor is an AI editor with built-in metrics. SigRank is platform-neutral — works with Cursor, Claude Code, Copilot, and 15+ tools.",
+            path: "/vs/cursor",
+          }),
         ]}
       />
 

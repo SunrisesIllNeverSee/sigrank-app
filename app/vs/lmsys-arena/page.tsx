@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -120,6 +120,11 @@ export default function VsLmsysArenaPage() {
             { name: "SigRank vs LMSYS Chatbot Arena", path: "/vs/lmsys-arena" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs LMSYS Arena — Rank Driver, Not Car",
+            description: "LMSYS ranks AI models by preference votes. SigRank ranks operators by cascade efficiency. Models don't drive — operators do. Rank the driver, not the car.",
+            path: "/vs/lmsys-arena",
+          }),
         ]}
       />
 

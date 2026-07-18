@@ -16,7 +16,7 @@ import remarkGfm from "remark-gfm";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb } from "@/lib/jsonld";
+import { breadcrumb, personAuthor } from "@/lib/jsonld";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
 
@@ -93,10 +93,7 @@ export default async function BlogPost({
     "@type": "Article",
     headline: title,
     description,
-    author: {
-      "@type": "Person",
-      name: author,
-    },
+    author: personAuthor(),
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
     datePublished: date,
     url: `${SITE_ORIGIN}/blog/${slug}`,
