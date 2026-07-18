@@ -51,7 +51,7 @@ export const metadata: Metadata = withOG({
   path: "/blog",
 });
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export default async function BlogIndex() {
   const posts = await getAllPosts();
