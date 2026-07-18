@@ -15,7 +15,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Best ccusage Alternatives (2026)",
@@ -164,6 +164,7 @@ export default function CcusageAlternativesPage() {
             },
           ]),
           faqPage(FAQS),
+          alternativesItemList(ALTS, "/alternatives/ccusage-alternatives", "Best ccusage Alternatives (2026)"),
         ]}
       />
 

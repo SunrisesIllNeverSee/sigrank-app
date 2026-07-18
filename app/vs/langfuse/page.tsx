@@ -14,7 +14,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -117,6 +117,11 @@ export default function VsLangfusePage() {
             { name: "SigRank vs Langfuse", path: "/vs/langfuse" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs Langfuse — Observability vs Competition",
+            description: "Langfuse traces LLM calls for debugging and evaluation. SigRank scores the operator's token efficiency for ranking. Observability vs competition.",
+            path: "/vs/langfuse",
+          }),
         ]}
       />
 

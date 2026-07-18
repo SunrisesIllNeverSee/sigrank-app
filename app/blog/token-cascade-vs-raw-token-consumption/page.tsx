@@ -17,7 +17,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Token Yield vs Token Count: Why Volume Lies About AI Skill",
@@ -38,7 +38,7 @@ function articleJsonLd() {
       "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
     url,
     datePublished: "2026-07-07",
-    author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "Token yield versus raw token count as a measure of AI operator skill",

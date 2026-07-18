@@ -17,6 +17,61 @@ import type { HallRecord } from "@/lib/data";
 const ORG_ID = `${SITE_ORIGIN}/#org`;
 const SITE_ID = `${SITE_ORIGIN}/#website`;
 
+/** Person — the site author (Deric J. McHenry) for E-E-A-T author attribution.
+ *  Used as the `author` on blog posts, comparison articles, and research. */
+export function personAuthor() {
+  return {
+    "@type": "Person",
+    name: "Deric J. McHenry",
+    sameAs: "https://orcid.org/0009-0002-9904-5390",
+    url: `${SITE_ORIGIN}/about`,
+  };
+}
+
+/** ItemList — for /alternatives/ listicles. Ordered list of compared tools. */
+export function alternativesItemList(
+  items: { name: string }[],
+  path: string,
+  name: string,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    url: `${SITE_ORIGIN}${path}`,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+    })),
+  };
+}
+
+/** TechArticle — for /vs/ comparison pages. Wraps the comparison content with
+ *  author attribution (E-E-A-T) so Google and AI engines treat it as an article. */
+export function comparisonArticle(opts: {
+  title: string;
+  description: string;
+  path: string;
+  datePublished?: string;
+}) {
+  const url = `${SITE_ORIGIN}${opts.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "@id": url,
+    headline: opts.title,
+    description: opts.description,
+    url,
+    ...(opts.datePublished ? { datePublished: opts.datePublished } : {}),
+    author: personAuthor(),
+    publisher: { "@id": ORG_ID },
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    about: "AI operator performance measurement and comparison",
+  };
+}
+
 /** Organization — site-wide, rendered in app/layout.tsx. */
 export function organization() {
   return {
