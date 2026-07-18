@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -116,6 +116,11 @@ export default function VsLangChainPage() {
             { name: "SigRank vs LangChain", path: "/vs/langchain" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs LangChain — Framework vs Operator Measurement",
+            description: "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the humans driving AI tools. Different layers entirely — framework vs operator measurement.",
+            path: "/vs/langchain",
+          }),
         ]}
       />
 

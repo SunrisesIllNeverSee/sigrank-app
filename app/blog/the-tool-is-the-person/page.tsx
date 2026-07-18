@@ -16,7 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "The Tool Is the Person: Why Token Telemetry Measures AI Skill",
@@ -36,7 +36,7 @@ function articleJsonLd() {
       "Every token the AI tool burns is a decision the person made. Measuring the tool IS measuring the person. Your token cascade is your skill signature.",
     url,
     datePublished: "2026-07-12",
-    author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "Why AI token telemetry measures human operator skill, not just tool usage",

@@ -16,7 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "AI Power User Benchmarking with SigRank",
@@ -37,7 +37,7 @@ function articleJsonLd() {
       "How to benchmark yourself against other AI power users. SigRank's operator classes and yield metrics tell you if you're a power user — and how to become one.",
     url,
     datePublished: "2026-07-07",
-    author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "Benchmarking AI power users with operator classes and yield metrics",

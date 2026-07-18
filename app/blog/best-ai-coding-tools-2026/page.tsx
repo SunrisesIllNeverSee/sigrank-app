@@ -16,7 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Best AI Coding Tools for Dev Performance (2026)",
@@ -37,7 +37,7 @@ function articleJsonLd() {
       "The shift from time-based to token-based developer metrics. Why traditional dev metrics fail in the AI coding era, the new metrics that matter, and 7 tools reviewed.",
     url,
     datePublished: "2026-07-07",
-    author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "AI developer performance measurement and token-based metrics",

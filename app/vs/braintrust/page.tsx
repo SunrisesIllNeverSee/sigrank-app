@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -116,6 +116,11 @@ export default function VsBraintrustPage() {
             { name: "SigRank vs Braintrust", path: "/vs/braintrust" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs Braintrust — Marketplace vs Measurement",
+            description: "Braintrust connects you with AI talent. SigRank measures how efficiently that talent drives AI. Braintrust finds AI workers; SigRank scores how well they use AI.",
+            path: "/vs/braintrust",
+          }),
         ]}
       />
 

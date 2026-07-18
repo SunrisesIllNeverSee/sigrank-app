@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -116,6 +116,11 @@ export default function VsWakatimePage() {
             { name: "SigRank vs WakaTime", path: "/vs/wakatime" },
           ]),
           faqPage(FAQS),
+          comparisonArticle({
+            title: "SigRank vs WakaTime — Time vs Token Efficiency",
+            description: "WakaTime tracks hours coding. SigRank tracks token cascade efficiency. Time ≠ signal — an hour with good cache reuse beats 10 hours of burning input.",
+            path: "/vs/wakatime",
+          }),
         ]}
       />
 
