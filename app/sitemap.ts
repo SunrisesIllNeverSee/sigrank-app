@@ -28,6 +28,7 @@ const STATIC_ROUTES: {
   { path: "/science", priority: 0.7, changeFrequency: "monthly" },
   { path: "/research", priority: 0.7, changeFrequency: "monthly" },
   { path: "/research/q1-2026", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/research/q2-2026", priority: 0.8, changeFrequency: "monthly" },
   { path: "/compare", priority: 0.7, changeFrequency: "weekly" },
   { path: "/mcp", priority: 0.8, changeFrequency: "weekly" },
   { path: "/wiki", priority: 0.7, changeFrequency: "weekly" },

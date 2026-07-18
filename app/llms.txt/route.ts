@@ -40,6 +40,7 @@ ranks the humans using AI — not the models themselves.
 
 ## Research
 - [Q1 2026 Report](${SITE_ORIGIN}/research/q1-2026?utm_source=ai&utm_medium=answer_engine): State of AI Operator Token Efficiency — the inaugural quarterly report. Headline findings, platform breakdown, citation block.
+- [Q2 2026 Report](${SITE_ORIGIN}/research/q2-2026?utm_source=ai&utm_medium=answer_engine): State of AI Operator Token Efficiency — Q2 report. Quarter-over-quarter trends, platform leadership, class distribution. Frozen snapshot with BibTeX citation.
 
 ## Concepts (definitions)
 - [Verification](${SITE_ORIGIN}/wiki/verification)
