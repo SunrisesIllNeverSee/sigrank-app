@@ -486,6 +486,33 @@ sigrank submit
           </Link>
         </div>
       </section>
+
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{" "}
+          <Link
+            href="/mcp"
+            className="text-gold underline underline-offset-2"
+          >
+            MCP Server
+          </Link>
+          {" · "}
+          <Link
+            href="/tools/yield-calculator"
+            className="text-gold underline underline-offset-2"
+          >
+            Yield Calculator
+          </Link>
+          {" · "}
+          <Link
+            href="/guides/how-to-measure-ai-coding-efficiency"
+            className="text-gold underline underline-offset-2"
+          >
+            How to Measure AI Coding Efficiency
+          </Link>
+        </p>
+      </section>
     </div>
   );
 }

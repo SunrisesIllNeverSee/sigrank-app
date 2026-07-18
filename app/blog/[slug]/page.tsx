@@ -7,6 +7,7 @@
  */
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readdir, readFile } from "fs/promises";
 import { join } from "path";
@@ -147,6 +148,33 @@ export default async function BlogPost({
       <div className="prose-sigrank mt-2">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
+
+      {/* ── Cross-links ── */}
+      <section className="mt-10 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{" "}
+          <Link
+            href="/metrics/yield-cascade"
+            className="text-gold underline underline-offset-2"
+          >
+            Yield (Υ) Metric
+          </Link>
+          {" · "}
+          <Link
+            href="/field"
+            className="text-gold underline underline-offset-2"
+          >
+            Field Analysis
+          </Link>
+          {" · "}
+          <Link
+            href="/guides/how-to-improve-your-yield"
+            className="text-gold underline underline-offset-2"
+          >
+            How to Improve Your Yield
+          </Link>
+        </p>
+      </section>
     </article>
   );
 }

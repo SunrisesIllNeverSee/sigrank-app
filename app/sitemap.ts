@@ -53,6 +53,13 @@ const STATIC_ROUTES: {
   { path: "/login", priority: 0.3, changeFrequency: "yearly" },
 
   // ── SEO content pages (2026-07-07) ──────────────────────────────────────
+  // Topic-hub index pages — hub priority 0.8 (higher than children)
+  { path: "/metrics", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/vs", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/guides", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/tools", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/alternatives", priority: 0.8, changeFrequency: "weekly" },
+
   // Comparison pages — commercial intent
   { path: "/vs/ccusage", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/wakatime", priority: 0.7, changeFrequency: "monthly" },
@@ -222,11 +229,15 @@ const STATIC_ROUTES: {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  // Static content pages use a fixed last-modified date (the last content update)
+  // instead of `now` — this prevents Google from seeing every URL as "just changed"
+  // on every sitemap fetch, which dilutes the lastmod signal.
+  const STATIC_LAST_MODIFIED = new Date("2026-07-18T22:50:00Z");
 
   // Static routes
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: `${SITE_ORIGIN}${r.path}`,
-    lastModified: now,
+    lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }));
@@ -247,7 +258,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // shareable). Falls back to an empty array if the API is unreachable.
   let operatorEntries: MetadataRoute.Sitemap = [];
   try {
-    const res = await fetch(`${SITE_ORIGIN}/api/v1/leaderboard?limit=100`, {
+    const res = await fetch(`${SITE_ORIGIN}/api/v1/leaderboard?limit=500`, {
       next: { revalidate: 300 },
     });
     if (res.ok) {

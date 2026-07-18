@@ -8,10 +8,12 @@ import Link from "next/link";
  */
 const FOOTER_COLUMNS: {
   heading: string;
+  headingHref?: string;
   links: { href: string; label: string }[];
 }[] = [
   {
     heading: "Metrics",
+    headingHref: "/metrics",
     links: [
       { href: "/metrics/yield-cascade", label: "Yield (Υ)" },
       { href: "/metrics/cache-hit-rate", label: "Cache Hit Rate" },
@@ -21,6 +23,7 @@ const FOOTER_COLUMNS: {
   },
   {
     heading: "Guides",
+    headingHref: "/guides",
     links: [
       {
         href: "/guides/how-to-measure-ai-coding-efficiency",
@@ -39,6 +42,7 @@ const FOOTER_COLUMNS: {
   },
   {
     heading: "Tools",
+    headingHref: "/tools",
     links: [
       { href: "/tools/yield-calculator", label: "Yield Calculator" },
       { href: "/tools/cascade-comparator", label: "Cascade Comparator" },
@@ -51,6 +55,7 @@ const FOOTER_COLUMNS: {
   },
   {
     heading: "Compare",
+    headingHref: "/vs",
     links: [
       { href: "/vs/ccusage", label: "vs ccusage" },
       { href: "/vs/wakatime", label: "vs WakaTime" },
@@ -148,9 +153,18 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-3 lg:grid-cols-6">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} className="flex flex-col gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-                {col.heading}
-              </p>
+              {col.headingHref ? (
+                <Link
+                  href={col.headingHref}
+                  className="text-[11px] font-semibold uppercase tracking-wider text-text-muted transition-colors hover:text-gold"
+                >
+                  {col.heading}
+                </Link>
+              ) : (
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                  {col.heading}
+                </p>
+              )}
               <ul className="flex flex-col gap-1.5">
                 {col.links.map((l) => (
                   <li key={l.href}>
