@@ -10,9 +10,12 @@
  *   - public/data/field-analysis.json (trimmed, with medians + IQR + ghost-ranks)
  *
  * Outlier handling: the 17 former bots/suspects are kept IN the operators array
- * with a `classification` field. They're not removed — they're part of the 113
- * outliers (96 extreme humans + 17 flagged). The `bots` array is kept empty for
- * backward compat.
+ * with a `classification` field. They're not removed — they're part of the 130
+ * outliers (113 from ratio analysis + 17 flagged). The 113 ratio outliers split
+ * into 89 extreme-human (real output, near-zero input) and 24 replay/input-dump
+ * (near-zero output, no cache reuse). Medians are computed on the 1,498 Human
+ * Center of Mass (non-flagged minus ratio outliers). The `bots` array is kept
+ * empty for backward compat.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -60,7 +63,7 @@ function computeMetrics(u) {
   const totalTokens = u.total_tokens || s.totalTokens || 0;
   const activeDays = s.activeDays || 1;
   const yield_ = u.seed_sigrank || (cacheRead * output) / (input * input || 1);
-  const snr = totalTokens > 0 ? output / totalTokens : 0;
+  const snr = input + output > 0 ? output / (input + output) : 0;
   const leverage = input > 0 ? cacheRead / input : 0;
   const velocity = input > 0 ? output / input : 0;
   const tokensPerDay = activeDays > 0 ? totalTokens / activeDays : 0;
@@ -92,7 +95,7 @@ function computeMetrics(u) {
 
 // ── Build operators array (all 1,628, flagged outliers get classification) ──
 const operators = [];
-const humans = []; // still needed for median computation (Human Center of Mass only)
+const nonFlagged = []; // 1,611 operators (excludes 17 flagged)
 
 for (const u of allUsers) {
   const metrics = computeMetrics(u);
@@ -106,9 +109,46 @@ for (const u of allUsers) {
     });
   } else {
     operators.push(metrics);
-    humans.push(metrics);
+    nonFlagged.push(metrics);
   }
 }
+
+// ── Classify ratio-based outliers (113 from input/total ratio analysis) ──
+// Zone 0: input/total < 0.1% — near-zero input
+// Zone 1: input/total > 80% — input dumpers
+// Gray zone: 0.1–1% input — split by MOSES-like filter
+//   Pass: velocity ≤ 2, yield ≤ 1000, output > 1M, cache_write > 1M → stays in HCM
+//   Fail: joins outliers
+// Total ratio outliers: zone0 + zone1 + gray_fail = 64 + 11 + 38 = 113
+const RATIO_OUTLIER_COUNT = 113;
+const ratioOutlierHandles = new Set();
+
+for (const o of nonFlagged) {
+  const inputRatio = o.total_tokens > 0 ? o.input_tokens / o.total_tokens : 0;
+  if (inputRatio < 0.001) {
+    // Zone 0: all 64 are ratio outliers (split into extreme/replay, but all excluded from HCM)
+    ratioOutlierHandles.add(o.handle);
+  } else if (inputRatio > 0.8) {
+    // Zone 1: input dumpers
+    ratioOutlierHandles.add(o.handle);
+  } else if (inputRatio >= 0.001 && inputRatio < 0.01) {
+    // Gray zone: apply MOSES-like filter
+    const passesMoses =
+      o.velocity <= 2 &&
+      o.yield <= 1000 &&
+      o.output_tokens > 1_000_000 &&
+      o.cache_write_tokens > 1_000_000;
+    if (!passesMoses) {
+      ratioOutlierHandles.add(o.handle);
+    }
+  }
+}
+
+console.log(`Ratio outliers (from input/total analysis): ${ratioOutlierHandles.size}`);
+
+// Human Center of Mass: non-flagged minus ratio outliers = 1611 - 113 = 1498
+const humans = nonFlagged.filter((o) => !ratioOutlierHandles.has(o.handle));
+console.log(`Human Center of Mass (for medians): ${humans.length}`);
 
 // ── Compute medians ──
 function median(arr) {
@@ -131,14 +171,24 @@ function quartiles(arr) {
   };
 }
 
+// Compute medians from ROUNDED per-operator values, then floor to deployed precision.
+// (The deployed JSON computes medians from the rounded per-operator fields, not raw values,
+//  and uses Math.floor for the final rounding — e.g. yield median 1.685 → 1.68, not 1.69.)
+const r = (v, d) => Math.floor(v * 10 ** d) / 10 ** d;
 const medians = {
-  yield: median(humans.map((h) => h.yield)),
-  snr: median(humans.map((h) => h.snr)),
-  leverage: median(humans.map((h) => h.leverage)),
-  velocity: median(humans.map((h) => h.velocity)),
-  tokens_per_day: median(humans.map((h) => h.tokens_per_day)),
-  total_tokens: median(humans.map((h) => h.total_tokens)),
-  compression: median(humans.map((h) => h.compression)),
+  yield: r(median(humans.map((h) => h.yield)), 2),
+  // SNR median computed from raw input/output tokens (per-operator snr is only 4 decimals,
+  // but the deployed median has 6 — so compute from raw integer token values)
+  snr: r(median(humans.map((h) => (h.input_tokens + h.output_tokens > 0 ? h.output_tokens / (h.input_tokens + h.output_tokens) : 0))), 6),
+  leverage: r(median(humans.map((h) => h.leverage)), 2),
+  velocity: r(median(humans.map((h) => h.velocity)), 2),
+  tokens_per_day: r(median(humans.map((h) => h.tokens_per_day)), 0),
+  total_tokens: r(median(humans.map((h) => h.total_tokens)), 0),
+  // NOTE: meta.medians.compression is median(CR/total), NOT median of the per-operator
+  // compression field (which is (CR+CW)/total). The deployed JSON has this inconsistency
+  // — the per-operator field includes cache write, but the meta median is cache-read-only.
+  // This preserves backward compat with the deployed data. See blog [22a] for context.
+  compression: r(median(humans.map((h) => (h.total_tokens > 0 ? h.cache_read_tokens / h.total_tokens : 0))), 4),
 };
 
 const iqrFences = {
