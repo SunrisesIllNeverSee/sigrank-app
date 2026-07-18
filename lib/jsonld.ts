@@ -367,17 +367,18 @@ export function researchArticle(opts: {
   description: string;
   datePublished: string;
   headlineFindings: string[];
+  doi?: string;
 }) {
   const url = `${SITE_ORIGIN}/research/${opts.slug}`;
-  return {
+  const article: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
-    "@id": url,
+    "@id": opts.doi ? `https://doi.org/${opts.doi}` : url,
     headline: opts.title,
     description: opts.description,
     url,
     datePublished: opts.datePublished,
-    author: { "@id": ORG_ID },
+    author: personAuthor(),
     publisher: { "@id": ORG_ID },
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "AI operator token efficiency",
@@ -393,6 +394,15 @@ export function researchArticle(opts: {
       },
     },
   };
+  if (opts.doi) {
+    article.identifier = {
+      "@type": "PropertyValue",
+      propertyID: "DOI",
+      value: opts.doi,
+    };
+    article.sameAs = `https://doi.org/${opts.doi}`;
+  }
+  return article;
 }
 
 /** ScholarlyArticle — the Conservation Law paper (Zenodo DOI). */
