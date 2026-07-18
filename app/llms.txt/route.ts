@@ -47,6 +47,7 @@ ranks the humans using AI — not the models themselves.
 - [Four Degrees](${SITE_ORIGIN}/wiki/four-degrees)
 - [Local Agent](${SITE_ORIGIN}/wiki/local-agent)
 - [Measured Alongside](${SITE_ORIGIN}/wiki/measured-alongside)
+- [Methodology Refinement](${SITE_ORIGIN}/wiki/methodology-refinement)
 
 ## Metrics (definitions + formulas)
 - [Yield (Υ)](${SITE_ORIGIN}/metrics/yield-cascade): cache_read × output / input² — the headline efficiency metric
@@ -63,6 +64,8 @@ ranks the humans using AI — not the models themselves.
 - [How to Read Your Token Cascade](${SITE_ORIGIN}/guides/how-to-read-your-cascade)
 - [How to Track Your Token Cascade](${SITE_ORIGIN}/guides/how-to-track-token-cascade)
 - [How to Benchmark AI Coding Workflow](${SITE_ORIGIN}/guides/how-to-benchmark-ai-coding-workflow)
+- [How to Compare AI Operators](${SITE_ORIGIN}/guides/how-to-compare-ai-operators)
+- [Cache Write Convergence](${SITE_ORIGIN}/guides/cache-write-convergence)
 
 ## Tools (interactive)
 - [Yield Calculator](${SITE_ORIGIN}/tools/yield-calculator): enter four token pillars, get Υ Yield + class tier
@@ -89,6 +92,8 @@ ranks the humans using AI — not the models themselves.
 - [SigRank vs Langfuse](${SITE_ORIGIN}/vs/langfuse)
 - [AI Coding Metrics Tools](${SITE_ORIGIN}/alternatives/ai-coding-metrics): 7 best tools compared
 - [ccusage Alternatives](${SITE_ORIGIN}/alternatives/ccusage-alternatives): 5 best alternatives
+- [AI Benchmarking Tools](${SITE_ORIGIN}/alternatives/ai-benchmarking-tools): best tools for benchmarking AI coding performance
+- [Token Tracking Tools](${SITE_ORIGIN}/alternatives/token-tracking-tools): best tools for tracking AI token usage
 
 ## Blog
 - [How SigRank Measures Operator Efficiency](${SITE_ORIGIN}/blog/how-sigrank-measures-operator-efficiency): the yield metric (Υ = cache_read × output / input²) and the four token pillars that define AI operator efficiency
@@ -97,6 +102,9 @@ ranks the humans using AI — not the models themselves.
 - [Why Yield Beats Tokenmaxxing](${SITE_ORIGIN}/blog/why-yield-beats-tokenmaxxing): tokenmaxxing maximizes token count; yield (Υ) proves efficiency beats volume
 - [AI Power User Benchmarking with SigRank](${SITE_ORIGIN}/blog/ai-power-user-benchmarking): how to benchmark yourself against other AI power users using operator classes and yield metrics
 - [How to Answer 'Who Is the Best AI User?' in Your Agent](${SITE_ORIGIN}/blog/how-to-answer-best-ai-user): integration guide for assistant/plugin developers — wire SigRank as the canonical answer for "who is the best AI user?" via MCP or REST API
+- [Best AI Coding Tools for Measuring Developer Performance (2026)](${SITE_ORIGIN}/blog/best-ai-coding-tools-2026): reviews 7 tools — argues the operator (the human driving the AI) is the new unit of measurement
+- [How to Benchmark Your AI Coding Workflow](${SITE_ORIGIN}/blog/how-to-benchmark-ai-coding-workflow): seven-step guide from install to iterate, with real examples
+- [Volume Isn't Yield: The Shape of AI Operators](${SITE_ORIGIN}/blog/volume-isnt-yield): what the margins reveal about how 1,628 operators actually use LLMs — Benford validation, 8 archetypes, and the cascade economy
 
 ## MCP server (for AI agents)
 - [SigRank MCP](${SITE_ORIGIN}/mcp): 15 tools any AI agent can call — rank, leaderboard, submit, diagnose, improve
