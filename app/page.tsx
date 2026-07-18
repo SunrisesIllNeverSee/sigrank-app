@@ -278,6 +278,13 @@ export default async function HomePage() {
           >
             Cascade Analysis
           </Link>
+          {" · "}
+          <Link
+            href="/token-telemetry"
+            className="text-gold underline underline-offset-2"
+          >
+            Token Telemetry
+          </Link>
         </p>
       </section>
 
