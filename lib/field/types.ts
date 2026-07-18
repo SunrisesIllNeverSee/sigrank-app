@@ -24,6 +24,7 @@ export interface FieldMedians {
   tokens_per_day: number;
   total_tokens: number;
   compression: number;
+  cache_read_pct?: number;
 }
 
 export interface FieldMeta {
