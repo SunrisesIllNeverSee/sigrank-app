@@ -2,7 +2,7 @@
   "method": "hybrid_yield_tiers + composition_shapes",
   "description": "K-Means on log(yield, leverage, velocity, snr) for 3 yield tiers, then K-Means on token composition proportions for sub-shapes",
   "n_operators": 1611,
-  "n_archetypes": 7,
+  "n_archetypes": 8,
   "archetypes": [
     {
       "archetype_id": 0,
@@ -155,6 +155,29 @@
         "honggilgim",
         "henmmi",
         "shpark-daim"
+      ]
+    },
+    {
+      "archetype_id": 7,
+      "name": "Outliers",
+      "description": "Too extreme to set the median for everyone else. 89 extreme-human outliers (real output, real cache, near-zero input) + 24 replay/input-dump outliers + 17 flagged by 6-signal score. Categorized, not deleted. Some also appear in Cache Architects or Cache Builders — they carry both labels.",
+      "n": 113,
+      "overlay": true,
+      "yield_median": 5237,
+      "leverage_median": 1282,
+      "velocity_median": 4.09,
+      "snr_median": 0.78,
+      "input_pct": 0.000744,
+      "output_pct": 0.00266,
+      "cache_read_pct": 0.956,
+      "cache_write_pct": 0.0404,
+      "total_tokens_median": 1882400000,
+      "tokens_per_day_median": 50000000,
+      "top_platform": "anthropic",
+      "sample_handles": [
+        "furic",
+        "grishin43",
+        "gabsh"
       ]
     }
   ]

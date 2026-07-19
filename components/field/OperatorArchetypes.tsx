@@ -1,5 +1,5 @@
 /**
- * OperatorArchetypes — 7 archetype cards from clustering-archetypes.json.
+ * OperatorArchetypes — 8 archetype cards from archetypes.json.
  *
  * Renders a responsive grid of cards, one per archetype, showing: name,
  * operator count + percentage, median yield/leverage/velocity, four-pillar
@@ -28,6 +28,7 @@ export interface ArchetypeData {
   tokens_per_day_median: number;
   top_platform: string;
   sample_handles: string[];
+  overlay?: boolean;
 }
 
 export interface OperatorArchetypesProps {
@@ -43,6 +44,7 @@ const ARCHETYPE_COLORS: Record<string, string> = {
   "Cache Builders": "#e17055",
   "Cascade Operators": "#a29bfe",
   "Steady Cascaders": "#00b894",
+  "Outliers": "#6a6a6a",
 };
 
 function fmtTokens(n: number): string {
@@ -57,8 +59,14 @@ export default function OperatorArchetypes({
   archetypes,
   totalOperators,
 }: OperatorArchetypesProps) {
-  // Sort by operator count descending (largest archetype first)
-  const sorted = [...archetypes].sort((a, b) => b.n - a.n);
+  // Sort by operator count descending (largest archetype first).
+  // Overlay archetypes (e.g. Outliers) sort to the end regardless of n,
+  // since they are dual-labeled categories on top of the K-Means clusters.
+  const sorted = [...archetypes].sort((a, b) => {
+    if (a.overlay && !b.overlay) return 1;
+    if (!a.overlay && b.overlay) return -1;
+    return b.n - a.n;
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -171,8 +179,10 @@ export default function OperatorArchetypes({
       </div>
       <p className="text-xs text-text-muted">
         Archetypes emerge from K-Means clustering on log(yield, leverage,
-        velocity, SNR) with RobustScaler. 7 groups arise from a hybrid
-        approach: 3 yield tiers + composition sub-shapes. Silhouette = 0.625.
+        velocity, SNR) with RobustScaler. 7 human groups arise from a hybrid
+        approach: 3 yield tiers + composition sub-shapes. The 8th (Outliers)
+        is an overlay category from input/total ratio analysis — some
+        outliers also appear in other archetypes. Silhouette = 0.625.
       </p>
     </div>
   );

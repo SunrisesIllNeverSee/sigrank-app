@@ -510,7 +510,7 @@ export default async function FieldPage() {
           Operator Archetypes
         </h2>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The field separates into 7 emergent archetypes. These are not
+          The field separates into 8 emergent archetypes. These are not
           invented categories. They emerged from K-Means clustering on
           log(yield, leverage, velocity, SNR) with a RobustScaler on the
           1,611 non-flagged operators. The data
@@ -519,7 +519,9 @@ export default async function FieldPage() {
         </p>
         <OperatorArchetypes
           archetypes={archetypes}
-          totalOperators={archetypes.reduce((s, a) => s + (a.n ?? 0), 0)}
+          totalOperators={archetypes
+            .filter((a) => !a.overlay)
+            .reduce((s, a) => s + (a.n ?? 0), 0)}
         />
       </section>
 
