@@ -33,11 +33,11 @@ const ARCHETYPE_YIELDS = [
 
 export default function YieldFormulaVisual() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col items-center gap-3 text-center">
       <div className="font-mono text-xs uppercase tracking-widest text-gold">
         The yield formula
       </div>
-      <p className="max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
+      <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
         Yield (Υ) is the headline number. It measures how much your
         cascade compounds. Two factors: how much you reuse (leverage)
         and how much you produce (velocity).
@@ -45,7 +45,7 @@ export default function YieldFormulaVisual() {
 
       <svg
         viewBox="0 0 560 200"
-        className="w-full max-w-xl"
+        className="mx-auto w-full max-w-xl"
         role="img"
         aria-label="Yield formula: velocity (output divided by input) times leverage (cache read divided by input) equals yield."
       >
@@ -123,7 +123,7 @@ export default function YieldFormulaVisual() {
         })}
       </svg>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="mx-auto grid w-full max-w-xl grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded border border-bg-border bg-bg-surface px-3 py-2">
           <div className="font-mono text-xs text-text-muted">velocity</div>
           <div className="font-mono text-sm font-bold text-text-primary">

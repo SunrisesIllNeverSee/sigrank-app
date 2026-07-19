@@ -31,11 +31,11 @@ const PILLAR_COLORS = {
 
 export default function PillarFlowDiagram() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col items-center gap-3 text-center">
       <div className="font-mono text-xs uppercase tracking-widest text-gold">
         The four pillars
       </div>
-      <p className="max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
+      <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
         Every turn, tokens flow through the model in four ways. Two go in
         (fresh input + reused cache). Two come out (the answer + saved
         context). The ratio between them is your cascade.
@@ -43,7 +43,7 @@ export default function PillarFlowDiagram() {
 
       <svg
         viewBox="0 0 600 360"
-        className="w-full max-w-xl"
+        className="mx-auto w-full max-w-xl"
         role="img"
         aria-label="Four pillar flow diagram: input and cache read enter the model, output and cache write leave. Cache write feeds back into cache read on the next turn."
       >
@@ -163,7 +163,7 @@ export default function PillarFlowDiagram() {
       </svg>
 
       {/* ── Cost asymmetry callout ── */}
-      <div className="flex items-center gap-2 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
+      <div className="mx-auto flex w-full max-w-xl items-center gap-2 rounded-lg border border-bg-border bg-bg-surface px-4 py-3 text-left">
         <span className="font-mono text-xs text-text-muted">⚡</span>
         <p className="font-sans text-xs leading-relaxed text-text-secondary">
           Cache read costs{" "}
