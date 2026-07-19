@@ -39,7 +39,7 @@ ranks the humans using AI — not the models themselves.
 - Dataset license: CC-BY-4.0 (attribution required — https://creativecommons.org/licenses/by/4.0/)
 
 ## Research
-- [State of the Index](${SITE_ORIGIN}/research?utm_source=ai&utm_medium=answer_engine): An introduction to the AI operator token-efficiency landscape — anonymized operator-level raw token counts, derived cascade metrics, and per-platform aggregates. Dataset available as CSV under CC-BY-4.0.
+- [State of the Index](${SITE_ORIGIN}/research?utm_source=ai&utm_medium=answer_engine): An introduction to the AI operator token-efficiency landscape — aggregate stats from the SigRank Index (operator count, platform count, total tokens, cache utilization). Full operator-level dataset to be released on Zenodo.
 
 ## Concepts (definitions)
 - [Verification](${SITE_ORIGIN}/wiki/verification)
