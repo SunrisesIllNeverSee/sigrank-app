@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.11.0...v0.11.1) (2026-07-19)
+
+
+### Bug Fixes
+
+* replace 2MB-busted unstable_cache with in-memory memo cache + clean ESLint ([5542773](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/55427732b0c381fc79ebe5f11426b6d0823abd3c))
+
 ## [0.11.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.10.0...v0.11.0) (2026-07-18)
 
 
