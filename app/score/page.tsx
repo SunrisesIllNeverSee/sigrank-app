@@ -5,42 +5,29 @@ import { CopyButton } from "@/components/marketing/CopyButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { scoreCalculator, scoreHowTo, cliTool } from "@/lib/jsonld";
 import PillarFlowDiagram from "@/components/score/PillarFlowDiagram";
-import CascadeSnowball from "@/components/score/CascadeSnowball";
-import YieldFormulaVisual from "@/components/score/YieldFormulaVisual";
+import WhereYouSit from "@/components/score/WhereYouSit";
+import HowToGetScored from "@/components/score/HowToGetScored";
 
 /**
  * app/score/page.tsx — the "Measure" page.
  *
- * Primary content: the agent path (install → enroll → submit) + data privacy.
- * The paste calculator is a backup, linked at the bottom — not the main flow.
- * The agent reads your local logs on-device; paste is for when you can't
- * install or just want a quick preview.
+ * Conversion-first layout:
+ *   1. Hero (tight)
+ *   2. Two-column glowing CTA (paste left, install right)
+ *   3. One diagram (the four pillars — most intuitive)
+ *   4. "Where do you sit?" hook (archetype yield range)
+ *   5. Step-by-step "how to get scored" guide with visuals
+ *   6. Privacy section
+ *
+ * The deeper diagrams (cascade snowball + yield formula) live on /learn.
  */
 
 export const metadata: Metadata = withOG({
   title: "Score your cascade",
   description:
-    "Install the SigRank agent to read your token cascade from local logs on-device. No paste, no prompts read — only the four token counts leave your machine.",
+    "Paste four token counts for an instant cascade preview, or install the agent to read your logs on-device. Find out which archetype you are.",
   path: "/score",
 });
-
-const PIPELINE = [
-  {
-    step: "01",
-    title: "Agent reads your local logs",
-    body: "tokenpull reads local session logs from 15+ platforms — Claude Code, Codex, Amp, Kimi, Gemini CLI, GitHub Copilot CLI, Goose, Kilo, Hermes, and more — and counts the four token pillars across each window. Never prompt content; only the four integers.",
-  },
-  {
-    step: "02",
-    title: "Cascade derived on-device",
-    body: "The cascade math runs locally: Υ Yield, SNR, Leverage, Velocity, 10xDEV, and your class tier. You see your full cascade before anything leaves your machine.",
-  },
-  {
-    step: "03",
-    title: "Pillars submitted to the board",
-    body: "sigrank submit posts the four canonical pillars per window. The server re-scores them authoritatively. Only the four integers are transmitted — never your prompts, never your outputs, never your code.",
-  },
-];
 
 const PRIVACY_POINTS = [
   {
@@ -64,7 +51,6 @@ const PRIVACY_POINTS = [
 export default function ScorePage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-      {/* JSON-LD: WebApplication (the calculator) + HowTo (the flow) + SoftwareApplication (the CLI) */}
       <JsonLd data={[scoreCalculator(), scoreHowTo(), cliTool()]} />
 
       {/* Hero */}
@@ -76,27 +62,77 @@ export default function ScorePage() {
           How much signal does your token cascade actually compound?
         </h1>
         <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
-          Install the agent. It reads your local AI session logs on-device,
-          derives your cascade, and submits a signed snapshot to the board. No
-          paste, no prompts read — only the four token counts leave your
-          machine.
+          Two paths. Paste four numbers for an instant preview, or install
+          the agent to read your logs automatically. Find out which
+          archetype you are — and where you rank.
         </p>
       </div>
 
-      {/* ── Visual explainers (the "what the fuck is this" section) ── */}
-      <div className="mt-12 flex flex-col gap-10">
-        {/* The four pillars */}
-        <PillarFlowDiagram />
+      {/* ── Two-column glowing CTA ── */}
+      <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* LEFT: Manual upload (paste) */}
+        <Link
+          href="/score/paste"
+          className="box-glow-soft group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-8 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
+        >
+          <span className="absolute inset-x-0 top-0 h-[2px] bg-gold/0 transition-colors group-hover:bg-gold" />
+          <span className="font-mono text-4xl leading-none text-gold transition-transform duration-200 group-hover:scale-110">
+            ⌨
+          </span>
+          <span className="font-mono text-sm font-semibold uppercase leading-tight tracking-[0.12em] text-text-secondary transition-colors group-hover:text-text-primary">
+            Manual upload
+          </span>
+          <span className="font-sans text-xs leading-relaxed text-text-muted">
+            Paste four token counts. Instant score. No account, no
+            install. 30 seconds.
+          </span>
+          <span className="mt-1 font-mono text-xs font-bold text-gold">
+            → Paste your numbers
+          </span>
+        </Link>
 
-        {/* The cascade */}
-        <CascadeSnowball />
-
-        {/* The yield formula */}
-        <YieldFormulaVisual />
+        {/* RIGHT: Agent install */}
+        <a
+          href="#install"
+          className="box-glow-soft group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-8 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
+        >
+          <span className="absolute inset-x-0 top-0 h-[2px] bg-gold/0 transition-colors group-hover:bg-gold" />
+          <span className="font-mono text-4xl leading-none text-gold transition-transform duration-200 group-hover:scale-110">
+            ⚡
+          </span>
+          <span className="font-mono text-sm font-semibold uppercase leading-tight tracking-[0.12em] text-text-secondary transition-colors group-hover:text-text-primary">
+            Agent install
+          </span>
+          <span className="font-sans text-xs leading-relaxed text-text-muted">
+            Auto-reads your logs. Signed submissions. You're on the
+            board. The real path.
+          </span>
+          <span className="mt-1 font-mono text-xs font-bold text-gold">
+            → Install the agent
+          </span>
+        </a>
       </div>
 
-      {/* Install — three steps with copy buttons */}
-      <div className="mt-10 flex flex-col gap-3">
+      {/* ── One diagram: the four pillars ── */}
+      <div className="mt-12">
+        <PillarFlowDiagram />
+      </div>
+
+      {/* ── "Where do you sit?" hook ── */}
+      <div className="mt-12">
+        <WhereYouSit />
+      </div>
+
+      {/* ── Step-by-step guide ── */}
+      <div className="mt-16">
+        <HowToGetScored />
+      </div>
+
+      {/* ── Install commands (anchor target for the agent CTA) ── */}
+      <div id="install" className="mt-12 scroll-mt-8 flex flex-col gap-3">
+        <h2 className="text-center font-mono text-sm font-semibold uppercase tracking-wider text-text-muted">
+          Install the agent
+        </h2>
         <div className="flex items-center gap-3 rounded-lg border border-bg-border bg-bg-base px-4 py-3">
           <span className="font-mono text-xs font-semibold text-text-muted">
             1
@@ -124,15 +160,15 @@ export default function ScorePage() {
           </code>
           <CopyButton text="sigrank submit" />
         </div>
-        <p className="font-sans text-xs leading-relaxed text-text-muted">
-          Pulls the agent + ccusage + tokscale + tokendash in one install. Node
-          ≥18, macOS + Linux.
+        <p className="text-center font-sans text-xs leading-relaxed text-text-muted">
+          Pulls the agent + ccusage + tokscale + tokendash in one install.
+          Node ≥18, macOS + Linux.
         </p>
       </div>
 
-      {/* MCP install — bash button like tokscale */}
+      {/* ── MCP install ── */}
       <div className="mt-6 flex flex-col gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <span className="font-mono text-xs uppercase tracking-widest text-gold">
             ⊙ Or wire it as an MCP server
           </span>
@@ -146,9 +182,10 @@ export default function ScorePage() {
           </code>
           <CopyButton text="npx sigrank" />
         </div>
-        <p className="font-sans text-xs leading-relaxed text-text-muted">
+        <p className="text-center font-sans text-xs leading-relaxed text-text-muted">
           Works with Claude Desktop, Cursor, Cline, Windsurf, and any
-          MCP-compatible client. No API key required for read tools. See the{" "}
+          MCP-compatible client. No API key required for read tools. See
+          the{" "}
           <Link
             href="/mcp"
             className="text-text-accent underline-offset-2 hover:underline"
@@ -159,31 +196,20 @@ export default function ScorePage() {
         </p>
       </div>
 
-      {/* How it works — the pipeline */}
-      <div className="mt-12 flex flex-col gap-4">
-        <h2 className="font-mono text-sm font-semibold uppercase tracking-wider text-text-muted">
-          How the agent path works
-        </h2>
-        <div className="flex flex-col gap-4">
-          {PIPELINE.map((p) => (
-            <div key={p.step} className="flex gap-4">
-              <span className="font-mono text-sm font-bold text-gold">
-                {p.step}
-              </span>
-              <div className="flex flex-col gap-1">
-                <h3 className="font-sans text-sm font-semibold text-text-primary">
-                  {p.title}
-                </h3>
-                <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                  {p.body}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* ── Learn more ── */}
+      <div className="mt-10 border-t border-bg-border-subtle pt-6 text-center">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Want to understand the cascade model in depth?{" "}
+          <Link
+            href="/learn"
+            className="text-text-accent underline-offset-2 hover:underline"
+          >
+            Learn how it works →
+          </Link>
+        </p>
       </div>
 
-      {/* Data privacy */}
+      {/* ── Data privacy ── */}
       <div className="mt-12 rounded-xl border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-sm font-semibold uppercase tracking-wider text-gold">
           ⊙ Data privacy
@@ -202,23 +228,6 @@ export default function ScorePage() {
         </div>
         <p className="mt-4 font-mono text-xs text-text-muted">
           Token counts only. Never your prompts.
-        </p>
-      </div>
-
-      {/* Paste — backup link at the bottom */}
-      <div className="mt-12 border-t border-bg-border-subtle pt-6">
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Can&apos;t install the agent? Just want a quick preview?{" "}
-          <Link
-            href="/score/paste"
-            className="text-text-accent underline-offset-2 hover:underline"
-          >
-            Paste four token counts →
-          </Link>
-        </p>
-        <p className="mt-1 font-sans text-xs leading-relaxed text-text-muted">
-          The paste calculator is a backup — no account, no save, just the
-          numbers. The agent path is how you compete.
         </p>
       </div>
     </main>
