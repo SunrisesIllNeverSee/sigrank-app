@@ -4,7 +4,7 @@ import "server-only";
  * lib/api/gate.ts — CORPUS gate (Gate #3) for the public /api/v1 read endpoints.
  *
  * Problem (SIGRANK_EXPOSURE_AUDIT_RESULTS.md §5): the public API has no auth and
- * no rate-limit, so the verified corpus is bulk-scrapable via large `limit`
+ * no rate-limit, so the verified corpus is bulk-accessible via large `limit`
  * values and per-operator sweeps.
  *
  * Policy:
@@ -23,7 +23,7 @@ import "server-only";
  * EXTERNAL consumers, so gating them does not touch the site's own rendering.
  *
  * Every helper is total (never throws): a gate that can crash a read path is a
- * worse outage than the scraping it prevents.
+ * worse outage than the bulk access it prevents.
  */
 
 import { NextResponse, type NextRequest } from "next/server";
@@ -100,7 +100,7 @@ export interface RateResult {
  * DEFENSE-IN-DEPTH only — it does not coordinate across instances and resets on
  * cold start. A real cross-instance limit needs a durable store; wire
  * @upstash/ratelimit (sliding window on Upstash Redis) for production-grade
- * enforcement. Until then this raises the cost of casual bulk scraping without
+ * enforcement. Until then this raises the cost of casual bulk access without
  * any external dependency.
  */
 const windowCounters = new Map<string, { count: number; resetAt: number }>();

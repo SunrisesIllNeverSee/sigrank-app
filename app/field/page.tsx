@@ -175,7 +175,7 @@ export default async function FieldPage() {
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The tokscale leaderboard ranks by total token volume. SigRank ranks by yield — how
+          Public token-volume leaderboards rank by total token volume. SigRank ranks by yield — how
           efficiently an operator converts input tokens into output tokens using cache compounding.
           These two rankings have almost zero correlation. The operator with the most tokens (9
           quadrillion) has a yield of 0. The operator with the highest yield (2.46M) ranks #697
@@ -415,8 +415,8 @@ export default async function FieldPage() {
           operators worth recruiting — they have skill, not just spend.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The data reveals {ghost_ranks.length} ghost-rank operators — above median yield but with tokscale
-          ranks in the hundreds or thousands. Their median tokscale rank is{" "}
+          The data reveals {ghost_ranks.length} ghost-rank operators — above median yield but with volume
+          ranks in the hundreds or thousands. Their median volume rank is{" "}
           {(() => {
             const ranks = ghost_ranks.map((g) => g.tokscale_rank).sort((a, b) => a - b);
             const mid = Math.floor(ranks.length / 2);
@@ -571,7 +571,7 @@ export default async function FieldPage() {
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer className="mt-8 flex flex-col gap-3 border-t border-bg-border pt-6">
         <p className="text-sm text-text-secondary">
-          Data scraped {meta.scraped_at} from{" "}
+          Data collected {meta.scraped_at} from{" "}
           <a
             href={meta.source}
             className="text-gold underline hover:text-text-primary"
@@ -580,7 +580,7 @@ export default async function FieldPage() {
           >
             tokscale.ai/leaderboard
           </a>
-          . {meta.total_scraped.toLocaleString()} operators scraped, {meta.outliers} outliers
+          . {meta.total_scraped.toLocaleString()} operators collected, {meta.outliers} outliers
           separated, {meta.humans_included.toLocaleString()} humans
           analyzed.
         </p>
