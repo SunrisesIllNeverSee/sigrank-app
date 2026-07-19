@@ -68,12 +68,13 @@ export default function ScorePage() {
         </p>
       </div>
 
-      {/* ── Two-column glowing CTA ── */}
+      {/* ── Two-column glowing CTA (matches landing page tile style) ── */}
       <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* LEFT: Manual upload (paste) */}
         <Link
           href="/score/paste"
-          className="box-glow-soft group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-8 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
+          style={{ ["--shine-delay" as string]: "0s" }}
+          className="box-glow-soft shine-sweep group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-8 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
         >
           <span className="absolute inset-x-0 top-0 h-[2px] bg-gold/0 transition-colors group-hover:bg-gold" />
           <span className="font-mono text-4xl leading-none text-gold transition-transform duration-200 group-hover:scale-110">
@@ -94,7 +95,8 @@ export default function ScorePage() {
         {/* RIGHT: Agent install */}
         <a
           href="#install"
-          className="box-glow-soft group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-8 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
+          style={{ ["--shine-delay" as string]: "0.7s" }}
+          className="box-glow-soft shine-sweep group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-8 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
         >
           <span className="absolute inset-x-0 top-0 h-[2px] bg-gold/0 transition-colors group-hover:bg-gold" />
           <span className="font-mono text-4xl leading-none text-gold transition-transform duration-200 group-hover:scale-110">
