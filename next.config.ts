@@ -53,11 +53,25 @@ const nextConfig: NextConfig = {
   //
   // /wiki/three-degrees → /wiki/four-degrees (owner 2026-07-17: renamed after expanding
   // from 3 to 4 columns. Keep the redirect so old bookmarks + search indexes resolve.)
+  //
+  // /research/q1-2026 + /research/q2-2026 → /research (owner 2026-07-19: Q1/Q2 reports
+  // archived, replaced by State of the Index. 301 so old bookmarks + search indexes
+  // resolve to the current page instead of a 404 dead end.)
   async redirects() {
     return [
       {
         source: "/wiki/three-degrees",
         destination: "/wiki/four-degrees",
+        permanent: true,
+      },
+      {
+        source: "/research/q1-2026",
+        destination: "/research",
+        permanent: true,
+      },
+      {
+        source: "/research/q2-2026",
+        destination: "/research",
         permanent: true,
       },
     ];
