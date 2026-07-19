@@ -4,6 +4,9 @@ import { withOG } from "@/lib/seo";
 import { CopyButton } from "@/components/marketing/CopyButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { scoreCalculator, scoreHowTo, cliTool } from "@/lib/jsonld";
+import PillarFlowDiagram from "@/components/score/PillarFlowDiagram";
+import CascadeSnowball from "@/components/score/CascadeSnowball";
+import YieldFormulaVisual from "@/components/score/YieldFormulaVisual";
 
 /**
  * app/score/page.tsx — the "Measure" page.
@@ -78,6 +81,18 @@ export default function ScorePage() {
           paste, no prompts read — only the four token counts leave your
           machine.
         </p>
+      </div>
+
+      {/* ── Visual explainers (the "what the fuck is this" section) ── */}
+      <div className="mt-12 flex flex-col gap-10">
+        {/* The four pillars */}
+        <PillarFlowDiagram />
+
+        {/* The cascade */}
+        <CascadeSnowball />
+
+        {/* The yield formula */}
+        <YieldFormulaVisual />
       </div>
 
       {/* Install — three steps with copy buttons */}
