@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.11.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.10.0...v0.11.0) (2026-07-18)
+
+
+### Features
+
+* add Cloudflare Workers deployment via @opennextjs/cloudflare ([2f7b6d5](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/2f7b6d5146f54552df3b23df337e29100f51a9b5))
+* add score_calculated + compare_viewed PostHog events ([cff4986](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/cff4986da6c7fa3ad286bd1551ab5fd18e1752d3))
+* add signaaf.com custom domain to Cloudflare worker ([2a12175](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/2a121755c19b4b3cfe1ec07dc18f4bf494f702f1))
+* **board:** add operator search bar to leaderboard ([52a257e](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/52a257e6b2a948b549bb5fce255f831e3a902df6))
+* deploy to Cloudflare Workers + archive OG image routes ([e7f16ed](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e7f16ed428e307515a59abbecaf9de716bca8fe6))
+* expand Three Degrees → Four Degrees of Leverage ([319dd9a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/319dd9a75b30922b654b5a3a9542cdc54f8a58cf))
+* thread the AA baseline → HCM → outlier narrative across all surfaces ([0230a36](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/0230a36065d69be98fa14d3be3ecb5a76d6a6f0b))
+* track operator claims + retirements via PostHog + admin script ([5d82d1a](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/5d82d1a01b1c43e225c9d17b25fb003018fea38d))
+* wire Vercel Speed Insights + Web Analytics into root layout ([e1d2215](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/e1d22153bd7e86ed1dae60f6fb7c5f12ba2605ec))
+
+
+### Bug Fixes
+
+* archetype image + blog number consistency for X post ([0e294b4](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/0e294b4b04cee2b4c1b9420d20417717df94a4a0))
+* blog audit — 9 errors found and fixed in volume-isnt-yield ([5aad5ce](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/5aad5ce090c8bb5dd15f3b7a3969787c276b4699))
+* blog follow-up — revert [9], fix [22a] compression, correct outlier counts ([13e8b89](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/13e8b892fce3cc406895902798d824a9dc9b8407))
+* **board:** show real board rank when searching ([7a7a5bb](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7a7a5bbe09087ee4174620ebfade7b0d2cbca3b6))
+* correct outlier count — 130 not 113, HCM stays 1,498 ([5242c84](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/5242c84ba905690439d39bbf79048872d3fbf214))
+* donut now has 8 segments — Outliers as 8th category, aligned with table ([8ed58aa](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8ed58aab82f4e9c7ba763eccb0c97b8977045994))
+* drop hard operator count from both images — percentages + date only ([264b10c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/264b10c7b7a64d1da4e2466bfba9c874edafac45))
+* field page review — 7 errors found and fixed ([2cf8981](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/2cf898169510fe6c4d08d357e12f192338b045ec))
+* IQR quartile method + rename meta.medians.compression → cache_read_pct ([ef707a7](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/ef707a756da493f248b4677a1b40c6bbf57581a1))
+* leverage hero card 18.57× → 18.6× (toFixed(1)) ([2f6a79c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/2f6a79cd524d31a40d414662230d924153f40cf5))
+* platform-aware cache reuse threshold for Codex ([1ff31e2](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/1ff31e251cd2f98c7245d5893f04345a284a8a89))
+* rebuild donut chart with correct data (1,611 operators) ([c669856](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c669856362cd43e6152c65e9c9e5874186184a8d))
+* remaining 1,611 → 1,628 in blog + cross-reference grounding ([7d3cd26](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/7d3cd2653de9aa9a9573a1700b8d5169fd02f1f3))
+* SNR displayed as decimal (.084) not percentage (8.4%) ([9a3bbfa](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/9a3bbfa0af42b2925d2cd79820ceb3b5c3141a43))
+* sync blog + field page numbers, fix velocity definition ([4d35bc6](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/4d35bc6db14089ce218749c7925d229015abc791))
+* sync gen-field-analysis.mjs with deployed field-analysis.json ([c26de0e](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c26de0ec7816cfc093badb2a0d8a8ba0f92a9e9b))
+* sync MCP_VERSION 0.18.0→0.19.0 + PLATFORM_COUNT 16→17 ([c5c53c1](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c5c53c159fb80bef2f8050d2149fde5c6bdd7319))
+* sync MCP_VERSION 0.19.0→0.0.178 (3-digit versioning) ([1a3f6da](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/1a3f6da8e191ddb2657ce2ff115c5637bd397e28))
+* velocity definition aligned across all surfaces (output/input) ([09d0268](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/09d026826514c2b036abd60f59991ea6b6f6c90d))
+* wrong HCM count + remaining bot references ([ec217c2](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/ec217c2f21184d7c5e71e8db5d1515e2ee4cd991))
+
+
+### Performance Improvements
+
+* bump /hall ISR from 300s to 3600s (missed in previous pass) ([6db9969](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/6db99699e1b12c067ffb567cc31959bf5ea30280))
+* cut PostHog overhead + increase ISR intervals ([c0d70eb](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/c0d70ebd2aec388f06242f57d51750f1935576dd))
+* lengthen ISR revalidate windows to cut Vercel Pro usage bleed ([0ae415e](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/0ae415ef8d673fcf8b451caf1c17c772826298ea))
+
+
+### Reverts
+
+* Cloudflare Workers migration — back to Vercel-only ([8d9794c](https://github.com/SunrisesIllNeverSee/sigrank-app/commit/8d9794ccb1ff10d3eb1ce9c647b85088f382b61d))
+
 ## [0.10.0](https://github.com/SunrisesIllNeverSee/sigrank-app/compare/v0.9.0...v0.10.0) (2026-07-14)
 
 
