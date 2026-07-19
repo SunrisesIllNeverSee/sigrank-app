@@ -369,7 +369,9 @@ export function researchArticle(opts: {
   headlineFindings: string[];
   doi?: string;
 }) {
-  const url = `${SITE_ORIGIN}/research/${opts.slug}`;
+  const url = opts.slug
+    ? `${SITE_ORIGIN}/research/${opts.slug}`
+    : `${SITE_ORIGIN}/research`;
   const article: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
