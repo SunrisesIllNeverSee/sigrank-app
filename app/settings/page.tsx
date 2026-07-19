@@ -173,7 +173,7 @@ export default async function SettingsPage({
         </p>
       </Section>
 
-      <Section title="Support" desc="Back the build as a founding supporter.">
+      <Section title="Support" desc="Support the build with a one-time contribution.">
         <Link
           href="/upgrade"
           className="w-fit rounded-md bg-gold px-4 py-2 font-semibold text-bg-base transition-colors hover:bg-gold/90"
