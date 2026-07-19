@@ -357,10 +357,14 @@ export async function getLeaderboard(
       return params.windowFilter ? [] : filterMockBoard(params);
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
+    // Filter on the row's platform (snapshot.platform, falling back to
+    // primary_domain) — NOT operator.primary_domain alone. This way operators
+    // who submitted on codex/multi/pi appear under those platform filters even
+    // if their primary_domain is "claude" or "other".
     if (params.platform && params.platform !== "all") {
       rows = rows.filter(
         (r) =>
-          r.operator.primary_domain.toLowerCase() ===
+          (r.platform ?? r.operator.primary_domain)?.toLowerCase() ===
           params.platform!.toLowerCase(),
       );
     }
