@@ -5,15 +5,13 @@ import { withOG } from "@/lib/seo";
 export const metadata: Metadata = withOG({
   title: "Payment complete",
   description:
-    "Thank you for backing SigRank — your founding-supporter perks are locked in.",
+    "Thank you for supporting SigRank.",
   path: "/upgrade/success",
 });
 
 /**
- * Stripe Checkout success_url target (subscription + claim flows).
- * Stub for the token-only launch — exists so a completed TEST-mode Checkout
- * lands on a real page instead of a 404. Reading ?session_id / ?claim to show
- * the finalized tier wires in at billing finalize (Gate-2).
+ * Stripe Checkout success_url target.
+ * Exists so a completed Checkout lands on a real page instead of a 404.
  */
 export default function UpgradeSuccessPage() {
   return (
@@ -21,10 +19,10 @@ export default function UpgradeSuccessPage() {
       <div className="text-3xl" aria-hidden>
         ✓
       </div>
-      <h1 className="text-2xl font-semibold">Payment complete</h1>
+      <h1 className="text-2xl font-semibold">Thank you</h1>
       <p className="opacity-70">
-        Your supporter tier is active. Pro metrics and any claimed operator
-        entry unlock on the next board read.
+        Your contribution is appreciated. The leaderboard stays free for
+        everyone because of supporters like you.
       </p>
       <Link
         href="/"
