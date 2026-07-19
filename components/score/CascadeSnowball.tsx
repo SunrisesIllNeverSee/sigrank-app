@@ -74,11 +74,11 @@ export default function CascadeSnowball() {
   const totalWidth = START_X * 2 + TURNS.length * BAR_W + (TURNS.length - 1) * GAP;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col items-center gap-3 text-center">
       <div className="font-mono text-xs uppercase tracking-widest text-gold">
         The cascade
       </div>
-      <p className="max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
+      <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
         Each turn, output becomes cache write, which becomes cache read
         for the next turn. Fresh input shrinks. Cache grows. Output
         compounds. This is the snowball.
@@ -86,7 +86,7 @@ export default function CascadeSnowball() {
 
       <svg
         viewBox={`0 0 ${totalWidth} 280`}
-        className="w-full max-w-xl"
+        className="mx-auto w-full max-w-xl"
         role="img"
         aria-label="Cascade snowball diagram: four turns showing fresh input shrinking to near-zero while cache read grows enormous. Yield compounds from 0.02 to 1,825."
       >
@@ -166,7 +166,7 @@ export default function CascadeSnowball() {
         </g>
       </svg>
 
-      <p className="max-w-xl font-sans text-xs leading-relaxed text-text-muted">
+      <p className="mx-auto max-w-xl font-sans text-xs leading-relaxed text-text-muted">
         By turn 50, fresh input is 2 tokens. Cache read is 2.5 million.
         The model already knows the whole project. You stopped
         re-explaining. The cascade compounds on its own.
