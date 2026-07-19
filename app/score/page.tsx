@@ -196,56 +196,10 @@ export default function ScorePage() {
         </p>
       </div>
 
-      {/* ── Closing CTA band (matches landing page style) ── */}
-      <section className="box-glow mt-16 overflow-hidden rounded-2xl border border-gold/25 bg-gradient-to-b from-gold/5 to-bg-surface px-6 py-14 text-center">
-        <div className="font-mono text-xs uppercase tracking-widest text-gold">
-          ⊙ Get on the board
-        </div>
-        <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-          Four integers in, full ledger out.
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
-          Paste your numbers or run the agent — see your Υ Yield, your
-          archetype, and your rank in under a minute.
-        </p>
-
-        {/* Two glowing action buttons */}
-        <div className="mx-auto mt-8 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
-          <Link
-            href="/score/paste"
-            className="box-glow-soft group relative flex flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
-          >
-            <span className="absolute inset-x-0 top-0 h-[2px] bg-gold/0 transition-colors group-hover:bg-gold" />
-            <span className="font-mono text-3xl leading-none text-gold transition-transform duration-200 group-hover:scale-110">
-              ⌨
-            </span>
-            <span className="font-mono text-sm font-semibold uppercase tracking-[0.12em] text-text-secondary transition-colors group-hover:text-text-primary">
-              Paste your numbers
-            </span>
-            <span className="font-sans text-xs text-text-muted">
-              30 seconds · no install
-            </span>
-          </Link>
-          <a
-            href="#install"
-            className="box-glow-soft group relative flex flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border border-bg-border bg-bg-surface/80 px-6 py-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/50 hover:bg-bg-elevated hover:shadow-lg hover:shadow-gold/10"
-          >
-            <span className="absolute inset-x-0 top-0 h-[2px] bg-gold/0 transition-colors group-hover:bg-gold" />
-            <span className="font-mono text-3xl leading-none text-gold transition-transform duration-200 group-hover:scale-110">
-              ⚡
-            </span>
-            <span className="font-mono text-sm font-semibold uppercase tracking-[0.12em] text-text-secondary transition-colors group-hover:text-text-primary">
-              Install the agent
-            </span>
-            <span className="font-sans text-xs text-text-muted">
-              auto-reads logs · signed
-            </span>
-          </a>
-        </div>
-
-        {/* Learn more link */}
-        <p className="mt-6 font-sans text-xs text-text-muted">
-          Want to understand the model first?{" "}
+      {/* ── Learn more ── */}
+      <div className="mt-10 border-t border-bg-border-subtle pt-6 text-center">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Want to understand the cascade model in depth?{" "}
           <Link
             href="/learn"
             className="text-text-accent underline-offset-2 hover:underline"
@@ -253,7 +207,7 @@ export default function ScorePage() {
             Learn how it works →
           </Link>
         </p>
-      </section>
+      </div>
 
       {/* ── Data privacy ── */}
       <div className="mt-12 rounded-xl border border-bg-border bg-bg-surface p-6">
