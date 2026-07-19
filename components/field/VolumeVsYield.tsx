@@ -46,8 +46,6 @@ export default function VolumeVsYield({
   operators,
   medianYield,
   medianTokens,
-  yieldFence,
-  tokensFence,
 }: VolumeVsYieldProps) {
   const points = operators
     .filter((o) => o.total_tokens > 0 && o.yield >= 0)

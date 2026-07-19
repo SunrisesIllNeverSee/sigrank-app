@@ -8,6 +8,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { readdir, readFile } from "fs/promises";
 import { join } from "path";
@@ -136,9 +137,11 @@ export default async function BlogPost({
       {/* Hero image */}
       {hero && (
         <div className="mb-10 overflow-hidden rounded-xl border border-bg-border">
-          <img
+          <Image
             src={hero}
             alt={title}
+            width={1200}
+            height={630}
             className="h-auto w-full object-cover"
           />
         </div>

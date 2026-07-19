@@ -25,6 +25,13 @@
  * moves to Next 16 (parked, state/NEXT16_MIGRATION_DEFERRED.md), swap to
  * `"use cache"` directives. The cache policy (tags, revalidate windows)
  * stays the same.
+ *
+ * ⚠ 2MB LIMIT WORKAROUND: `getLeaderboard` returns ~2.5MB (1,640 operators ×
+ * full nested objects), which exceeds `unstable_cache`'s 2MB per-entry cap
+ * on Vercel. The Data Cache silently fails to set, so every request re-queries
+ * Supabase. We use an in-memory memo cache (`./memo.ts`) instead — no size
+ * limit, deduplicates concurrent requests, persists across warm serverless
+ * invocations. See `./memo.ts` for the full rationale.
  */
 
 import { unstable_cache } from "next/cache";
@@ -44,6 +51,8 @@ import {
   getOperatorReport as _getOperatorReport,
   getOperatorRecords as _getOperatorRecords,
 } from "@/lib/data/queries";
+
+import { memoize } from "./memo";
 
 import type {
   LeaderboardRow,
@@ -66,10 +75,16 @@ import type {
 
 // ── Board-tagged reads (revalidate: 300s) ────────────────────────────────
 
-export const getLeaderboard = unstable_cache(_getLeaderboard, ["leaderboard"], {
-  revalidate: 300,
-  tags: ["board"],
-});
+// ⚠ getLeaderboard uses the in-memory memo cache instead of unstable_cache
+// because the serialized payload (~2.5MB for 1,640 operators) exceeds
+// Vercel's 2MB Data Cache limit. The memo cache has no size limit and
+// deduplicates concurrent requests (a 100-request burst = 1 DB hit).
+// Cache key includes JSON-serialized params so different filters cache
+// separately. TTL matches the original unstable_cache revalidate (300s).
+export function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
+  const key = `board:leaderboard:${JSON.stringify(params)}`;
+  return memoize(key, 300, () => _getLeaderboard(params));
+}
 
 export const getHallOfSignal = unstable_cache(
   _getHallOfSignal,
