@@ -15,14 +15,12 @@ interface Tier {
 }
 
 /**
- * PricingCards — the launch pitch: Operator (free, always) + Early Supporter.
+ * PricingCards — the launch pitch: Operator (free, always) + Support the build.
  *
- * Pro is not ironed out yet (owner, 2026-06-18): rather than sell a fixed paid
- * tier of precision features that aren't built, the second card invites people
- * to SUPPORT THE BUILD as early backers and lock in lifetime founding-supporter
- * perks (TBD). The "Support the build" CTA maps to the existing patron /
- * claim_lifetime Stripe tiers — no invented Pro price. Server component, static
- * copy. Free-tier features are the REAL launched cascade product (no word-era).
+ * Owner directive 2026-07-19: no paid tiers, no subscriptions, no "precision
+ * tier" promises. The second card is a one-time "pay what helps" donation via
+ * Stripe. Server component, static copy. Free-tier features are the REAL
+ * launched cascade product.
  */
 const TIERS: Tier[] = [
   {
@@ -43,26 +41,24 @@ const TIERS: Tier[] = [
     ctaHref: "/score",
   },
   {
-    badge: "EARLY SUPPORTER",
+    badge: "SUPPORT",
     name: "Back the build",
     price: (
       <Placeholder
         value="Pay what helps"
-        title="Founding-supporter contribution — maps to the patron / lifetime tier"
+        title="One-time contribution via Stripe"
       />
     ),
-    priceSuffix: " · lock in founding-supporter perks",
+    priceSuffix: " · one-time, no subscription",
     features: [
-      "Pro is being built — back it early and shape it",
-      "Lifetime founding-supporter status + badge",
-      "First access to the precision tier when it ships",
-      "Founder perks (TBD) grandfathered in at this rate",
-      "Direct line on what gets built next",
+      "Support the ongoing build if you find SigRank useful",
+      "Help cover server costs and data infrastructure",
+      "Keep the corpus verified + independent",
+      "No subscriptions, no tiers, no paywalls",
       "The free board stays free — this funds the build",
-      "Help keep the corpus verified + independent",
     ],
     cta: "Support the build",
-    ctaHref: "/upgrade?tier=patron",
+    ctaHref: "/upgrade",
     featured: true,
   },
 ];
@@ -78,9 +74,8 @@ export function PricingCards() {
       </h2>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
         The leaderboard is free and stays free — your cascade metrics, your
-        class, your rank, no paywall. A precision tier is in the works; until
-        it&apos;s ironed out, early supporters fund the build and lock in
-        lifetime founding-supporter perks.
+        class, your rank, no paywall. If you find SigRank useful, consider a
+        one-time contribution to support the build.
       </p>
 
       <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-2">
