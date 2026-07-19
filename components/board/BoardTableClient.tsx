@@ -80,17 +80,19 @@ export function BoardTableClient({
   }
 
   // Windowed board: select the right dataset + filter by platform.
+  // When a platform filter is active, use platformEntries (perPlatform: one row
+  // per operator×platform) so operators who submitted on the filtered platform
+  // appear even if their primary_domain is different. The operatorTotal dataset
+  // rolls up to a single 'multi' row per operator, which won't match individual
+  // platform filters like 'codex' or 'claude'.
   let entries: LeaderboardEntryWithPlatforms[];
-  if (viewPlatforms) {
+  if (viewPlatforms || platformFilter) {
     entries = platformEntries;
     if (platformFilter) {
-      entries = entries.filter((e) => e.primaryDomain === platformFilter);
+      entries = entries.filter((e) => e.platform === platformFilter);
     }
   } else {
     entries = totalEntries;
-    if (platformFilter) {
-      entries = entries.filter((e) => e.primaryDomain === platformFilter);
-    }
   }
 
   return (
