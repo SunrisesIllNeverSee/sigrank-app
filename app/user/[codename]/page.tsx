@@ -602,12 +602,12 @@ export default async function OperatorProfilePage({
       />
       <TrackProfileView codename={operator.codename} />
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <a
+        <Link
           href="/board/all"
           className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
         >
           ← Leaderboard
-        </a>
+        </Link>
         <div className="flex flex-wrap items-center gap-2">
           <a
             href={`/compare?a=${encodeURIComponent(operator.codename)}`}
