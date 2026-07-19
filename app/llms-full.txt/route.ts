@@ -155,7 +155,7 @@ ${operators || "| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |"}
 
 ## Research
 
-- [Q1 2026 Report](${SITE_ORIGIN}/research/q1-2026?utm_source=ai&utm_medium=answer_engine): State of AI Operator Token Efficiency — the inaugural quarterly report.
+- [State of the Index](${SITE_ORIGIN}/research?utm_source=ai&utm_medium=answer_engine): An introduction to the AI operator token-efficiency landscape — aggregate stats (operator count, platform breakdown, total tokens, cache utilization). Full operator-level dataset to be released via Zenodo with DOI.
 
 ## Data
 
