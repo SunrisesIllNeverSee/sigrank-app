@@ -6,20 +6,20 @@ import { SupportCheckout } from "@/components/billing/SupportCheckout";
 /**
  * app/upgrade/page.tsx — the "back the build" checkout-start page.
  *
- * Target of the Pro page's "Support the build" CTA (and the PricingModal). The
- * heavy lifting is the client SupportCheckout island, which POSTs to
+ * Target of the homepage's "Support the build" CTA. The heavy lifting is the
+ * client SupportCheckout island, which POSTs to
  * /api/v1/billing/create-checkout-session and redirects to Stripe. With no
  * Stripe creds the API 503s and the island shows "not live yet" — it NEVER
  * falsely completes a sale. ?tier= preselects patron (the early-supporter tier).
  *
- * Pro is not ironed out (owner, 2026-06-18): this page funds the build as an
- * early-supporter contribution, not a fixed Pro subscription.
+ * Owner directive 2026-07-19: no paid tiers, no subscriptions, no "precision
+ * tier" promises. This page is a one-time "pay what helps" donation only.
  */
 
 export const metadata: Metadata = withOG({
   title: "Back the build",
   description:
-    "Support SigRank as an early backer. The leaderboard stays free; supporters fund the precision tier and lock in lifetime founding-supporter perks.",
+    "Support SigRank with a one-time contribution. The leaderboard is free and stays free.",
   path: "/upgrade",
 });
 
@@ -37,43 +37,26 @@ export default async function UpgradePage({
           ◈ Back the build
         </span>
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
-          Become a founding supporter
+          Support the build
         </h1>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The leaderboard is free and stays free. A precision tier is in the
-          works — early supporters fund it and lock in lifetime
-          founding-supporter perks at today&apos;s rate. Thank you for backing
-          the build.
+          The leaderboard is free and stays free. If you find SigRank useful,
+          consider a one-time contribution to support the ongoing build. No
+          subscriptions, no tiers, no paywalls — just support if you want to.
         </p>
       </header>
 
       <SupportCheckout />
 
-      {/* ── Founding supporter perks ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Founding supporter perks
+          What your support does
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Founding supporters lock in{" "}
-          <strong className="text-text-primary">lifetime perks</strong> at
-          today&apos;s rate — the price never changes for you, even as the
-          precision tier matures and pricing increases for new subscribers. You
-          get permanent{" "}
-          <strong className="text-text-primary">
-            founding-supporter status
-          </strong>{" "}
-          on your profile, marking you as someone who backed the build before it
-          was polished.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The precision tier unlocks deeper analytics: per-session cascade
-          breakdowns, historical yield trajectories, head-to-head comparisons
-          without rate limits, and exportable reports. Founding supporters get
-          all of this at the early-backer rate for as long as SigRank exists.
-          The leaderboard itself — the board, the Hall, the metrics pages —
-          stays free for everyone. Your contribution funds the precision layer
-          and the ongoing build.
+          Your contribution funds the ongoing build — server costs, data
+          infrastructure, and the time it takes to keep the leaderboard
+          accurate and independent. The leaderboard itself — the board, the
+          Hall, the metrics pages — stays free for everyone.
         </p>
       </section>
 
