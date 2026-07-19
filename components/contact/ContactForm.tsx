@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { WaveHero } from "@/components/ui/WaveHero";
 
 /**
  * Contact form client component. Posts to /api/v1/contact (Resend).

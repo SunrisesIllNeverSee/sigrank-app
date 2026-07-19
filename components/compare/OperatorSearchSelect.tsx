@@ -16,7 +16,6 @@
  *   - Shows "No operators found" when the filter matches nothing
  */
 
-import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useMemo } from "react";
 
 export interface CompareOption {
@@ -37,7 +36,6 @@ export function OperatorSearchSelect({
   sideLabel: string;
   disabledCode?: string;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(0);
