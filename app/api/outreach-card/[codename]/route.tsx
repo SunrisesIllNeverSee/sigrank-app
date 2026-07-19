@@ -18,7 +18,7 @@ import { getOperator, getLeaderboard } from "@/lib/data";
 import { decodeCodename } from "@/lib/route-params";
 import { sortValue } from "@/lib/data/sort-value";
 import { recordValue } from "@/lib/hall/record-value";
-import { DISPLAY_METRICS, DISPLAY_RAW, CLASS_TIERS, CLASS_NAME_TO_GLYPH } from "@/lib/canon/ids";
+import { DISPLAY_METRICS, DISPLAY_RAW, CLASS_NAME_TO_GLYPH } from "@/lib/canon/ids";
 import type { LeaderboardRow } from "@/lib/data";
 
 export const runtime = "nodejs";
@@ -36,12 +36,6 @@ const C_DULL = "#6e8a6e";
 const MONO = 'ui-monospace, "SF Mono", Menlo, monospace';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-function fmtTokens(n: number): string {
-  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
-  return n.toFixed(0);
-}
 
 const k = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(1)}K` : n.toFixed(1);
@@ -181,7 +175,7 @@ export async function GET(
     );
   }
 
-  const { operator, snapshot, telemetry } = row;
+  const { operator, snapshot } = row;
   const c = snapshot.cascade;
   const ranked = c && !c.nonCompounding;
   const classTier = snapshot.class_tier;

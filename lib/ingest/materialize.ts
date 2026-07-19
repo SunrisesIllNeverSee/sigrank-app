@@ -31,6 +31,7 @@ import { getSupabaseService } from "@/lib/supabase/server";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import { scoreSnapshot } from "@/lib/scoring/engine";
 import { boardWindowByEnum } from "@/lib/data/windows";
+import { memoInvalidatePrefix } from "@/lib/data/memo";
 import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
 import type { GateResult } from "@/lib/ingest/gates";
 
@@ -324,6 +325,10 @@ export function revalidateTouchedWindows(
   revalidatePath("/board/off");
   revalidateTag("operator");
   revalidateTag("board");
+  // Also bust the in-memory memo cache for getLeaderboard (the 2MB workaround).
+  // revalidateTag("board") only invalidates unstable_cache entries; the memo
+  // cache is a separate layer and needs explicit invalidation.
+  memoInvalidatePrefix("board:");
   if (codename) {
     revalidatePath(`/user/${codename}`);
     revalidatePath(`/user/${codename.toLowerCase()}`);

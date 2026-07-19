@@ -72,8 +72,6 @@ export default function PlatformYieldQuartile({
   const barGap = barW * 0.2;
   const innerBarW = barW - barGap;
 
-  const yForCount = (c: number) => padT + plotH - (c / maxTotal) * plotH;
-
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
