@@ -5,7 +5,7 @@
  * time and returns it typed. The page calls this once and passes slices to
  * the chart components (charts never fetch themselves).
  *
- * Also loads public/data/archetypes.json (7 operator archetypes from
+ * Also loads public/data/archetypes.json (8 operator archetypes from
  * K-Means clustering) for the OperatorArchetypes component.
  *
  * Uses JSON imports instead of fs.readFile() for serverless compatibility.
