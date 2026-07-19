@@ -91,7 +91,7 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   if (params.platform && params.platform !== "all") {
     rows = rows.filter(
       (r) =>
-        r.operator.primary_domain.toLowerCase() ===
+        (r.platform ?? r.operator.primary_domain)?.toLowerCase() ===
         params.platform!.toLowerCase(),
     );
   }

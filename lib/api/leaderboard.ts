@@ -14,9 +14,6 @@ import type { LeaderboardRow } from "@/lib/data";
 export const LEADERBOARD_CACHE_CONTROL =
   "public, max-age=300, s-maxage=300, stale-while-revalidate=600";
 
-/** Deterministic generated_at — no wall-clock read (mock parity, build-safe). */
-const GENERATED_AT = "2026-05-19T00:00:00Z";
-
 /**
  * Serialize one row to the api_spec.md leaderboard entry shape.
  * class_tier is emitted UPPERCASE (it is already the canonical SignalClass).
@@ -33,7 +30,9 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     display_name: operator.display_name ?? null,
     claimed: operator.claimed,
     class_tier: snapshot.class_tier, // UPPERCASE canonical SignalClass
-    platform: operator.primary_domain,
+    platform: (row.platform ?? operator.primary_domain ?? "other").toLowerCase(),
+    // The window bucket this row's snapshot belongs to ('7d'/'30d'/'90d'/'all_time').
+    window: row.window_type ?? null,
     // Primary rank metric: Υ yield from the token cascade.
     yield_: c && !c.nonCompounding ? c.yield_ : null,
     leverage: c && !c.nonCompounding ? c.leverage : null,
@@ -62,7 +61,7 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     cascade_str: c ? c.cascadeStr : null,
     non_compounding: c ? c.nonCompounding : null,
     percentile: row.percentile,
-    last_seen: GENERATED_AT,
+    last_seen: snapshot.snapshot_date ?? null,
     movement_24h: snapshot.movement_24h,
     movement_7d: snapshot.movement_7d,
     is_placeholder: operator.isPlaceholder ?? false,

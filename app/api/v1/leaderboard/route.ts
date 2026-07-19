@@ -23,16 +23,25 @@ import {
 /** Note surfaced when an unauthenticated caller is clamped to the public top-N. */
 const GATED_NOTE = "top N public; full corpus requires an API key";
 
-/** Deterministic generated_at — no wall-clock read (mock parity, build-safe). */
-const GENERATED_AT = "2026-05-19T00:00:00Z";
-
 const MAX_LIMIT = 2000;
 const DEFAULT_LIMIT = 25;
 
-/** Map the metric query alias (api_spec.md) to a metric_snapshots sort column. */
+/** Map the metric query alias (api_spec.md) to a metric_snapshots sort column.
+ * Covers all 9 canonical metrics (sigarena/lib/prompts.ts) + legacy aliases. */
 const METRIC_PARAM_TO_SORT: Record<string, string> = {
   yield: "yield_",
   yield_: "yield_",
+  velocity: "velocity",
+  leverage: "leverage",
+  snr: "snr",
+  dev10x: "dev10x",
+  scale_v: "scaleV",
+  scaleV: "scaleV",
+  efficiency: "efficiency",
+  cost_per_million: "costPerMillion",
+  costPerMillion: "costPerMillion",
+  op_ratio: "opRatio",
+  opRatio: "opRatio",
   signa_rate: "signa_rate",
   compression: "compression_ratio",
   depth: "session_depth",
@@ -68,9 +77,15 @@ export async function GET(req: NextRequest) {
   // x-api-key lifts the cap for bulk/full corpus reads.
   const { limit, gated } = enforceListGate(req, requestedLimit);
 
+  const hasPlatformFilter = platformParam && platformParam !== "all";
+
   const rows = await getLeaderboard({
     window: windowParam,
-    platform: platformParam && platformParam !== "all" ? platformParam : null,
+    windowFilter: true,
+    platform: hasPlatformFilter ? platformParam : null,
+    // When filtering by platform, use perPlatform mode so operators who
+    // submitted on multiple platforms appear under each one.
+    perPlatform: !!hasPlatformFilter,
     classScope: classParam ?? undefined,
     sort,
     limit,
@@ -79,7 +94,7 @@ export async function GET(req: NextRequest) {
   const body = {
     metric: metricParam,
     window: windowParam,
-    generated_at: GENERATED_AT,
+    generated_at: new Date().toISOString(),
     ruleset_version: "1.0",
     total_operators: rows.length,
     entries: rows.map(serializeLeaderboardEntry),
