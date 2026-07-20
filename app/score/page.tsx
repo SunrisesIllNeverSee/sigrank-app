@@ -13,9 +13,9 @@ import WhyItMatters from "@/components/score/WhyItMatters";
  *
  * Conversion-first layout:
  *   1. Hero (tight)
- *   2. Why it matters (volume isn't yield — the dumper vs the compounder)
- *   3. Two vertical glowing banners (how to get scored: paste + agent)
- *   4. One diagram (the four pillars — most intuitive)
+ *   2. One diagram (the four pillars — most intuitive)
+ *   3. Why it matters (volume isn't yield — real data, no moralizing)
+ *   4. Two vertical glowing banners (how to get scored: paste + agent)
  *   5. "Where do you sit?" hook (archetype yield range)
  *   6. Learn link + privacy
  *
@@ -66,19 +66,19 @@ export default function ScorePage() {
         </p>
       </div>
 
-      {/* ── Why it matters ── */}
+      {/* ── One diagram: the four pillars ── */}
       <div className="mt-12">
+        <PillarFlowDiagram />
+      </div>
+
+      {/* ── Why it matters ── */}
+      <div className="mt-16">
         <WhyItMatters />
       </div>
 
       {/* ── Two vertical glowing banners (how to get scored) ── */}
       <div className="mt-16">
         <HowToGetScored />
-      </div>
-
-      {/* ── One diagram: the four pillars ── */}
-      <div className="mt-16">
-        <PillarFlowDiagram />
       </div>
 
       {/* ── "Where do you sit?" hook ── */}
