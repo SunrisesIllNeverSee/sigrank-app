@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { toPng } from "html-to-image";
+
 import { track } from "@/lib/infra/posthog/events";
 import type { FieldAverages } from "@/lib/analytics/field-average";
 
@@ -1270,6 +1270,7 @@ export function SplitFlapCard(props: SplitFlapCardProps) {
     if (!cardRef.current) return;
     setBusy(true);
     try {
+      const { toPng } = await import("html-to-image");
       const dataUrl = await toPng(cardRef.current, {
         width: 1200,
         height: 630,
