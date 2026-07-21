@@ -1,23 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { SignOutButton } from "@/components/auth/SignOutButton";
-import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
-import { ConnectDevicePanel } from "@/components/settings/ConnectDevicePanel";
-import { DangerZone } from "@/components/settings/DangerZone";
-import { DataPrivacy } from "@/components/settings/DataPrivacy";
 import { RemovalRequest } from "@/components/settings/RemovalRequest";
+import { SettingsAccount } from "@/components/settings/SettingsAccount";
 import { withOG } from "@/lib/seo";
 
 /**
  * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
  *
- * Profile *content* editing lives in the profile workspace (/me/edit, D6) — settings
- * is now account-level only: who you're signed in as, links to your profile, sign out,
- * appearance, and privacy info. force-dynamic so it reads the live session (this is a
- * single authed page in the middleware matcher — the board is never affected).
+ * Static shell for Lighthouse performance. The auth-dependent sections
+ * (Account, Connect device, Privacy & Data, Danger Zone) are rendered by
+ * the SettingsAccount client island, which fetches GET /api/v1/profile.
+ * The shell (header, appearance, privacy info, removal request) is static.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata: Metadata = withOG({
   title: "Settings",
@@ -47,15 +43,11 @@ function Section({
   );
 }
 
-const rowLink =
-  "shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary";
-
 export default async function SettingsPage({
   searchParams,
 }: {
   searchParams: Promise<{ claimed?: string }>;
 }) {
-  const op = await getSessionOperator();
   const { claimed } = await searchParams;
 
   return (
@@ -65,107 +57,17 @@ export default async function SettingsPage({
           ◈ Settings
         </h1>
         <p className="font-sans text-sm text-text-secondary">
-          {op
-            ? "Manage your account and appearance. Edit your public profile from your profile page."
-            : "Appearance works now. Account controls unlock when you sign in."}
+          Manage your account and appearance. Edit your public profile from
+          your profile page.
         </p>
       </header>
 
-      {claimed === "1" && op && (
-        <div className="flex flex-col gap-2 rounded-lg border border-gold/40 bg-gold/5 p-4">
-          <div className="flex items-center gap-2">
-            <span className="text-base">✓</span>
-            <h2 className="font-mono text-sm font-bold tracking-wide text-gold">
-              Profile claimed!
-            </h2>
-          </div>
-          <p className="font-sans text-xs leading-relaxed text-text-secondary">
-            Your operator profile is now linked to your account. Next step:
-            connect your agent so your live token runs cascade to the
-            leaderboard. Generate a connect code below and paste it into{" "}
-            <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-[11px] text-text-primary">
-              npx sigrank
-            </code>{" "}
-            → Connect tab.
-          </p>
-        </div>
-      )}
+      {/* Auth-dependent sections (client island) */}
+      <SettingsAccount claimed={claimed} />
 
       <Section title="Appearance" desc="Theme is saved to this browser.">
         <ThemeToggle />
       </Section>
-
-      <Section title="Account" desc="Your operator identity and profile.">
-        {op ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-4 rounded-md border border-bg-border bg-bg-base/40 px-3 py-2.5">
-              <div className="flex min-w-0 flex-col">
-                <span className="font-mono text-xs text-text-secondary">
-                  Signed in
-                </span>
-                {op.email && (
-                  <span
-                    className="truncate font-mono text-[11px] text-text-primary"
-                    title={op.email}
-                  >
-                    {op.email} <span className="text-text-dim">· private</span>
-                  </span>
-                )}
-                <span className="font-mono text-[11px] text-text-dim">
-                  {op.codename}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <Link href="/me/edit" className={rowLink}>
-                  Edit profile
-                </Link>
-                <Link
-                  href={`/user/${encodeURIComponent(op.codename)}`}
-                  className={rowLink}
-                >
-                  View profile
-                </Link>
-              </div>
-            </div>
-            <SignOutButton />
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-4 rounded-md border border-dashed border-bg-border bg-bg-base/40 px-3 py-2.5">
-            <div className="flex flex-col">
-              <span className="font-mono text-xs text-text-secondary">
-                Sign in to manage your account
-              </span>
-              <span className="font-sans text-[11px] text-text-dim">
-                Claim your profile, set your handle, and edit your details.
-              </span>
-            </div>
-            <Link
-              href="/login?next=/settings"
-              className="shrink-0 rounded-md border border-gold/40 px-3 py-1 font-mono text-[11px] text-gold transition-colors hover:bg-gold/10"
-            >
-              Log in
-            </Link>
-          </div>
-        )}
-      </Section>
-
-      {op && (
-        <Section
-          title="Connect a device"
-          desc="Link your local agent so your token runs cascade to the leaderboard."
-        >
-          <ConnectDevicePanel />
-        </Section>
-      )}
-
-      {op && (
-        <Section
-          title="Privacy & Data"
-          desc="Manage what we collect, pause collection, or delete your data."
-        >
-          <DataPrivacy codename={op.codename} initialOptOut={op.dataOptOut} />
-        </Section>
-      )}
 
       <Section
         title="Remove your data"
@@ -191,12 +93,6 @@ export default async function SettingsPage({
           for details on data retention and your rights.
         </p>
       </Section>
-
-      {op && (
-        <div id="danger-zone">
-          <DangerZone codename={op.codename} />
-        </div>
-      )}
     </div>
   );
 }
