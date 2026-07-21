@@ -62,6 +62,8 @@ export interface SessionOperator {
   /** The verified auth email — PRIVATE (P5): shown only to the user (e.g. /settings),
    *  read live from auth.users; never stored in or read from a public operator column. */
   email: string | null;
+  /** D1: whether the operator has paused data collection. */
+  dataOptOut: boolean;
 }
 
 /**
@@ -78,7 +80,7 @@ export async function getSessionOperator(): Promise<SessionOperator | null> {
   const { data } = await svc
     .from("operator_accounts")
     .select(
-      "operator_id, operators:operator_id ( codename, display_name, avatar_url )",
+      "operator_id, operators:operator_id ( codename, display_name, avatar_url, data_opt_out )",
     )
     .eq("user_id", user.id)
     .maybeSingle();
@@ -88,6 +90,7 @@ export async function getSessionOperator(): Promise<SessionOperator | null> {
       codename: string | null;
       display_name: string | null;
       avatar_url: string | null;
+      data_opt_out: boolean | null;
     } | null;
   } | null;
   if (!row?.operator_id) return null;
@@ -98,5 +101,6 @@ export async function getSessionOperator(): Promise<SessionOperator | null> {
     displayName: row.operators?.display_name ?? null,
     avatarUrl: row.operators?.avatar_url ?? null,
     email: user.email ?? null,
+    dataOptOut: row.operators?.data_opt_out ?? false,
   };
 }

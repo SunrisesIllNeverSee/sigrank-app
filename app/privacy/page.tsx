@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="font-mono text-[11px] text-text-dim">
-          Last updated 2026-07-16
+          Last updated 2026-07-21
         </p>
       </header>
 
@@ -139,17 +139,73 @@ export default function PrivacyPage() {
           <p>
             Your token telemetry snapshots are retained as long as your
             account is active — they are the historical record that powers
-            your rank trajectory and cascade analysis. You can delete your
-            account at any time from{" "}
+            your rank trajectory and cascade analysis.
+          </p>
+          <p>
+            From{" "}
+            <Link
+              href="/settings"
+              className="text-text-muted underline hover:text-text-secondary"
+            >
+              Settings
+            </Link>{" "}
+            you have two deletion options:
+          </p>
+          <ul className="flex list-disc flex-col gap-1 pl-5">
+            <li>
+              <span className="text-text-primary">Delete my data</span> — erase
+              all snapshots, scored metrics, ranks, devices, and enrollment codes.
+              Your account, profile, and billing stay intact. This also pauses
+              future data collection.
+            </li>
+            <li>
+              <span className="text-text-primary">Delete my account</span> —
+              fully sever your identity. Runs Delete my data first, then
+              anonymizes your board row (kept as aggregate data), removes your
+              name, email, and device keys, and cancels any active billing. This
+              is permanent and cannot be undone.
+            </li>
+          </ul>
+        </section>
+
+        <section className="flex flex-col gap-1.5">
+          <h2 className="font-semibold text-text-primary">
+            Consent &amp; opt-out
+          </h2>
+          <p>
+            Before a device can send token telemetry, you must agree to the
+            current{" "}
+            <Link
+              href="/terms"
+              className="text-text-muted underline hover:text-text-secondary"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              className="text-text-muted underline hover:text-text-secondary"
+            >
+              Privacy Policy
+            </Link>
+            . We record the timestamp and version you accepted for audit and
+            compliance purposes.
+          </p>
+          <p>
+            You can pause data collection at any time from{" "}
             <Link
               href="/settings"
               className="text-text-muted underline hover:text-text-secondary"
             >
               Settings
             </Link>
-            . Account deletion anonymizes your board row (kept as aggregate
-            data), removes your name, email, and device keys, and cancels any
-            active billing. This is permanent and cannot be undone.
+            . While paused, your agent submissions will be rejected and no new
+            telemetry is stored. Existing snapshots remain until you delete them.
+          </p>
+          <p>
+            You can also delete your historical telemetry and revoke all connected
+            devices from Settings while keeping your account. Account deletion
+            permanently severs your identity and anonymizes your board row.
           </p>
         </section>
 
@@ -171,6 +227,16 @@ export default function PrivacyPage() {
             </li>
             <li>
               Change your codename (updates your profile URL).
+            </li>
+            <li>
+              Pause data collection or delete your historical telemetry from{" "}
+              <Link
+                href="/settings"
+                className="text-text-muted underline hover:text-text-secondary"
+              >
+                Settings
+              </Link>
+              .
             </li>
             <li>
               Delete your account permanently from{" "}
