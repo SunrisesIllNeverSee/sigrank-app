@@ -21,7 +21,7 @@
 
 import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
-import { track } from "@/lib/posthog/events";
+import { track } from "@/lib/infra/posthog/events";
 
 export interface ProfileShareCardProps {
   codename: string;

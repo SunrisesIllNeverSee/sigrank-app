@@ -5,7 +5,7 @@
  * boundaries dashed. Pure inline SVG, no chart libraries.
  */
 
-import type { FieldOperator, IqrFence } from "@/lib/field/types";
+import type { FieldOperator, IqrFence } from "@/lib/analytics/field-types";
 
 const GOLD = "#c4923a";
 const SEEK = "#10b981";

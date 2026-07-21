@@ -11,7 +11,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BOARD_WINDOWS } from "@/lib/data/windows";
+import { BOARD_WINDOWS } from "@/lib/board/windows";
 
 // Theme-reactive (L-THEME): the selector sits on the board, follows the active theme.
 const T = {

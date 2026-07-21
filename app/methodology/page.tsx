@@ -13,8 +13,8 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLeaderboard } from "@/lib/data";
-import { toEntry } from "@/lib/leaderboard/to-entry";
+import { getLeaderboard } from "@/lib/board";
+import { toEntry } from "@/lib/board/to-entry";
 import { PLATFORM_COUNT } from "@/lib/constants";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";

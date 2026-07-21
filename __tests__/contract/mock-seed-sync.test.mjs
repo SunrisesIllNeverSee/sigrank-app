@@ -3,7 +3,7 @@
  *
  * MOCK/SEED SYNC TEST — the dev-vs-prod drift guard.
  *
- * lib/data/mock.ts is the fallback data source (used when Supabase is not
+ * lib/board/mock.ts is the fallback data source (used when Supabase is not
  * configured). supabase/seed.sql is the live DB seed. Both are supposed to
  * define the SAME set of base operators. If they drift, dev behavior (mock)
  * diverges from prod behavior (seed) silently.
@@ -25,7 +25,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..", "..");
 
 /**
- * Extract operator codenames from lib/data/mock.ts.
+ * Extract operator codenames from lib/board/mock.ts.
  * Matches: codename: 'SomeCodename' or { codename: 'SomeCodename', ... }
  * Skips: function params (codename: string), type defs, and non-operator
  * fields like top_operator_codename / operator_codename (those are references,
@@ -193,7 +193,7 @@ function extractSeedCodenames(filePath) {
 
 // ── Tests ─────────────────────────────────────────────────────────────────
 
-const mockPath = join(repoRoot, "lib/data/mock.ts");
+const mockPath = join(repoRoot, "lib/board/mock.ts");
 const seedPath = join(repoRoot, "supabase/seed.sql");
 
 const { shared: mockCodenames, mockOnly: knownMockOnly } =
@@ -227,7 +227,7 @@ test("mock.ts and seed.sql define the same operator codename set (excluding know
       (seedOnly.length > 0
         ? `  Only in seed.sql: [${seedOnly.join(", ")}]\n`
         : "") +
-      `  FIX: add the missing operator(s) to BOTH lib/data/mock.ts and supabase/seed.sql`;
+      `  FIX: add the missing operator(s) to BOTH lib/board/mock.ts and supabase/seed.sql`;
     assert.fail(msg);
   }
 

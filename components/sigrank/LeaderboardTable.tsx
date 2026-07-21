@@ -20,7 +20,7 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LeaderboardEntry } from "./types";
-import { glyphFor } from "@/lib/canon/ids";
+import { glyphFor } from "@/lib/identity/canon-ids";
 import {
   PLATFORM_UI,
   PLATFORM_DOMAIN_MAP,
@@ -29,8 +29,8 @@ import {
 } from "@/lib/constants";
 import { OperatorAvatar } from "./OperatorAvatar";
 import { PlatformIcon } from "./PlatformIcon";
-import { track } from "@/lib/posthog/events";
-import { isOutlierEntry } from "@/lib/data/outlier-classify";
+import { track } from "@/lib/infra/posthog/events";
+import { isOutlierEntry } from "@/lib/analytics/outlier-classify";
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
 // SPECIES colors stay literal (semantic identity for the class glyph, theme-invariant).

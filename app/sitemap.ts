@@ -9,7 +9,7 @@
 
 import type { MetadataRoute } from "next";
 import { SITE_ORIGIN } from "@/lib/seo";
-import { BOARD_WINDOWS } from "@/lib/data/windows";
+import { BOARD_WINDOWS } from "@/lib/board/windows";
 
 /** Static routes (manually maintained — add new static pages here). */
 const STATIC_ROUTES: {

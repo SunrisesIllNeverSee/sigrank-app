@@ -24,12 +24,12 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseService } from "@/lib/supabase/server";
-import { requireSession } from "@/lib/api/auth";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
+import { requireSession } from "@/lib/infra/api-auth";
 import { ingestMeta } from "@/lib/ingest";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
-import { scoreSnapshot } from "@/lib/scoring/engine";
-import { captureServer } from "@/lib/posthog/server";
+import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 const SCORING_ETA_SECONDS = 10;
 

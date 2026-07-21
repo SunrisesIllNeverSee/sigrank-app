@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { startCheckout } from "./CheckoutRedirect";
-import { track } from "@/lib/posthog/events";
+import { track } from "@/lib/infra/posthog/events";
 
 /**
  * components/billing/SupportCheckout.tsx — the "Support the Build" checkout.

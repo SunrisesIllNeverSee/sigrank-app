@@ -15,9 +15,9 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getHallOfSignal } from "@/lib/data";
-import { REWARDS } from "@/lib/canon/ids";
-import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
+import { getHallOfSignal } from "@/lib/board";
+import { REWARDS } from "@/lib/identity/canon-ids";
+import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 const FIVEFOLD_HOLD_REWARD_ID = "RW.34";
 

@@ -11,7 +11,7 @@
 
 import { CanonId } from "@/components/ui/CanonId";
 import { Placeholder } from "@/components/ui/Placeholder";
-import { CLASS_NAME_TO_ID, CLASS_TIERS } from "@/lib/canon/ids";
+import { CLASS_NAME_TO_ID, CLASS_TIERS } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
 
 interface Props {

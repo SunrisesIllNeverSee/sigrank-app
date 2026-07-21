@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import type { SupporterTier } from "@/lib/scoring/types";
-import { captureServer } from "@/lib/posthog/server";
+import { getStripe } from "@/lib/infra/stripe/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import type { SupporterTier } from "@/lib/analytics/scoring-types";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 /**
  * POST /api/v1/billing/create-checkout-session

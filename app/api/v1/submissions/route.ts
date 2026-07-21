@@ -25,14 +25,14 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getLeaderboard, type LeaderboardRow } from "@/lib/data";
+import { getLeaderboard, type LeaderboardRow } from "@/lib/board";
 import { SORT_DEFAULT } from "@/lib/constants";
-import { LEADERBOARD_CACHE_CONTROL } from "@/lib/api/leaderboard";
+import { LEADERBOARD_CACHE_CONTROL } from "@/lib/board/api-leaderboard";
 import {
   enforceListGate,
   rateLimit,
   rateLimitedResponse,
-} from "@/lib/api/gate";
+} from "@/lib/infra/api-gate";
 
 /** Note surfaced when an unauthenticated caller is clamped to the public top-N. */
 const GATED_NOTE = "top N public; full corpus requires an API key";

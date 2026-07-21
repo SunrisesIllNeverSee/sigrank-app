@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { withOG } from "@/lib/seo";
 
 /**

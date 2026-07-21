@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
-import { signInWithGitHub, signOut } from "@/lib/supabase/auth";
+import { signInWithGitHub, signOut } from "@/lib/infra/supabase/auth";
 
 /**
  * AccountMenu — right-side account / profile entry point.

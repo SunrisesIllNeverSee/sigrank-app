@@ -16,9 +16,9 @@ import {
   getOperator,
   getOperatorHistory,
   type LeaderboardRow,
-} from "@/lib/data";
-import { bumpComparisonsRan } from "@/lib/data/queries";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+} from "@/lib/board";
+import { bumpComparisonsRan } from "@/lib/board/queries";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { CompareMatchup } from "@/components/compare/CompareMatchup";
 import { type CompareOption } from "@/components/compare/CompareSelectors";
@@ -32,7 +32,7 @@ import { CompareHistoryChart } from "@/components/compare/CompareHistoryChart";
 // just unmounted — not archived).
 import { ChallengeBar } from "@/components/compare/ChallengeBar";
 import { ChallengeOnX } from "@/components/compare/ChallengeOnX";
-import { getChallengeBetween } from "@/lib/challenges/server";
+import { getChallengeBetween } from "@/lib/identity/challenges-server";
 import { GATE_CHALLENGES } from "@/lib/features";
 import { TrackCompareView } from "@/components/analytics/TrackCompareView";
 import {
@@ -40,8 +40,8 @@ import {
   type CompareOperand,
 } from "@/components/share/CompareShareCard";
 import { CompareMatchupCard } from "@/components/share/CompareMatchupCard";
-import { operatorDisplayName } from "@/lib/compare/operator-name";
-import { isOutlierRow } from "@/lib/data/outlier-classify";
+import { operatorDisplayName } from "@/lib/identity/operator-name";
+import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 
 export const metadata: Metadata = withOG({
   title: "Compare Operators",

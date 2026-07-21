@@ -1,4 +1,4 @@
-import { getHomepageStats } from "@/lib/data";
+import { getHomepageStats } from "@/lib/board";
 import { MotionPause } from "@/components/home/MotionPause";
 import { DeletedNotice } from "@/components/home/DeletedNotice";
 import { HowItWorks } from "@/components/marketing/HowItWorks";

@@ -1,4 +1,4 @@
-import type { ScoredSnapshot } from "@/lib/scoring/types";
+import type { ScoredSnapshot } from "@/lib/analytics/scoring-types";
 
 /**
  * MetricRadar — hand-rolled SVG pentagon radar of the Core 5, normalized to each

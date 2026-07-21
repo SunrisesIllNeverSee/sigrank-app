@@ -10,7 +10,7 @@
  */
 
 import React, { useState } from "react";
-import { track } from "@/lib/posthog/events";
+import { track } from "@/lib/infra/posthog/events";
 
 interface ParsePreview {
   input: number;

@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import type { SignalClass } from "@/components/sigrank/types";
 import { colors } from "@/components/sigrank/tokens";
-import { glyphFor } from "@/lib/canon/ids";
+import { glyphFor } from "@/lib/identity/canon-ids";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Trophy } from "@/components/hall/Trophy";
 

@@ -16,7 +16,7 @@ test("applyRS06Penalty is never called outside its own definition file", () => {
   const files = [
     "lib/ingest/materialize.ts",
     "lib/ingest/gates.ts",
-    "lib/scoring/engine.ts",
+    "lib/analytics/scoring-engine.ts",
     "app/api/v1/snapshots/route.ts",
   ];
   for (const f of files) {

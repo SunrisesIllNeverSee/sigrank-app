@@ -5,7 +5,7 @@ import {
   signInWithGitHub,
   signInWithTwitter,
   signInWithEmail,
-} from "@/lib/supabase/auth";
+} from "@/lib/infra/supabase/auth";
 
 /**
  * components/auth/LoginButtons.tsx — the three locked sign-in providers

@@ -10,7 +10,7 @@
  */
 
 import { useState } from "react";
-import { TOKEN_METRICS, CLASS_TIERS } from "@/lib/canon/ids";
+import { TOKEN_METRICS, CLASS_TIERS } from "@/lib/identity/canon-ids";
 
 type Tab = "metrics" | "classes";
 

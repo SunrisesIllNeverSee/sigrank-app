@@ -17,7 +17,7 @@ import React from "react";
 import { useSearchParams } from "next/navigation";
 import { LeaderboardTable } from "@/components/sigrank";
 import { PLATFORM_DOMAIN_MAP, type PlatformUI } from "@/lib/constants";
-import type { LeaderboardEntryWithPlatforms } from "@/lib/leaderboard/to-entry";
+import type { LeaderboardEntryWithPlatforms } from "@/lib/board/to-entry";
 
 interface Props {
   /** operatorTotal entries (one row per operator, the default board). */

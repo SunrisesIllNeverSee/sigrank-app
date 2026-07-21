@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
-import type { LeaderboardRow } from "@/lib/data";
+import type { LeaderboardRow } from "@/lib/board";
 import {
   METRICS,
   TOKEN_METRICS,
   DISPLAY_RAW,
   DISPLAY_METRICS,
-} from "@/lib/canon/ids";
-import { recordValue } from "@/lib/hall/record-value";
-import { isOutlierRow } from "@/lib/data/outlier-classify";
+} from "@/lib/identity/canon-ids";
+import { recordValue } from "@/lib/analytics/record-value";
+import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 import { HallSubmissionRow } from "./HallSubmissionRow";
 
 interface Props {

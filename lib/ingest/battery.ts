@@ -13,7 +13,7 @@ import "server-only";
  * Pure + deterministic — no wall-clock, no RNG, no external state.
  */
 
-import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
 import type { GateReason, VerificationTier } from "@/lib/ingest/gates";
 
 const flag = (code: string, detail: string): GateReason => ({

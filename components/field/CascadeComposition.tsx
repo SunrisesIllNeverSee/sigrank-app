@@ -6,7 +6,7 @@
  * operators compose their token spend. Pure inline SVG, no chart libraries.
  */
 
-import type { FieldOperator } from "@/lib/field/types";
+import type { FieldOperator } from "@/lib/analytics/field-types";
 
 const BOT = "#c0392b";
 const SEEK = "#10b981";

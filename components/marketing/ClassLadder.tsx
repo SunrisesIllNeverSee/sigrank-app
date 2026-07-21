@@ -1,5 +1,5 @@
 import React from "react";
-import { CLASS_TIERS } from "@/lib/canon/ids";
+import { CLASS_TIERS } from "@/lib/identity/canon-ids";
 import { CanonId } from "@/components/ui/CanonId";
 
 interface LadderRow {

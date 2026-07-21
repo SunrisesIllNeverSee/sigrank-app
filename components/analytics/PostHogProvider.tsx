@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { initPostHog, posthog } from "@/lib/posthog/client";
+import { initPostHog, posthog } from "@/lib/infra/posthog/client";
 import { PostHogIdentify } from "./PostHogIdentify";
 
 /**

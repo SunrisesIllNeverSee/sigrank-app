@@ -14,9 +14,9 @@ import {
   DISPLAY_RAW,
   DISPLAY_METRICS,
   type DisplayMetric,
-} from "@/lib/canon/ids";
-import type { ScoredSnapshot } from "@/lib/scoring/types";
-import type { TelemetryRaw } from "@/lib/data/types";
+} from "@/lib/identity/canon-ids";
+import type { ScoredSnapshot } from "@/lib/analytics/scoring-types";
+import type { TelemetryRaw } from "@/lib/board/types";
 
 interface Props {
   snapshot: ScoredSnapshot;

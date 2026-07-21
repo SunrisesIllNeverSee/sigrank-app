@@ -26,7 +26,7 @@ import {
   computeCascadeMetrics,
   fmt,
   type RawPillars,
-} from "@/lib/cascade/metrics";
+} from "@/lib/analytics/cascade";
 import { CascadeGenome } from "@/components/sandbox/CascadeGenome";
 import type { SignalClass } from "@/components/sigrank/types";
 

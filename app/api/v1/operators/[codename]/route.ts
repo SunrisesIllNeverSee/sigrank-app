@@ -9,8 +9,8 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getOperator, isOperatorRetired } from "@/lib/data";
-import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
+import { getOperator, isOperatorRetired } from "@/lib/board";
+import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 const GENERATED_AT = "2026-05-19T00:00:00Z";
 
