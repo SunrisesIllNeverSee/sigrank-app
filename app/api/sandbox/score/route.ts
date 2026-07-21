@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { scoreSnapshot } from "@/lib/scoring/engine";
+import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import type { RawPillars } from "@/lib/ingest/types";
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "@/lib/supabase/auth";
+import { signOut } from "@/lib/infra/supabase/auth";
 
 /**
  * components/auth/SignOutButton.tsx — clears the Supabase session cookie and returns

@@ -10,8 +10,8 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLeaderboard } from "@/lib/data";
-import { toEntry } from "@/lib/leaderboard/to-entry";
+import { getLeaderboard } from "@/lib/board";
+import { toEntry } from "@/lib/board/to-entry";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";

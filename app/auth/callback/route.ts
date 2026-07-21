@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/supabase/server";
-import { captureServer } from "@/lib/posthog/server";
+import { createServerClient } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 /**
  * GET /auth/callback — OAuth (GitHub) + magic-link return point.

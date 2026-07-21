@@ -10,7 +10,7 @@
  * into the 113 outliers (owner 2026-07-17: no separate bot category).
  */
 
-import type { FieldOperator } from "@/lib/field/types";
+import type { FieldOperator } from "@/lib/analytics/field-types";
 
 const FLAG = "#c0392b";
 const CASCADE = "#8b5cf6";

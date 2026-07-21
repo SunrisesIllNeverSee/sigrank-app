@@ -5,7 +5,7 @@
  * shows the midpoint. Pure inline SVG, no chart libraries.
  */
 
-import type { PlatformAdoption as PlatformAdoptionData } from "@/lib/field/types";
+import type { PlatformAdoption as PlatformAdoptionData } from "@/lib/analytics/field-types";
 
 const GOLD = "#c4923a";
 const CASCADE = "#8b5cf6";

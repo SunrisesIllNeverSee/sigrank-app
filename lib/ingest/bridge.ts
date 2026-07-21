@@ -33,8 +33,8 @@
  */
 
 import type { RawPillars } from "./types";
-import type { Core5Raw } from "@/lib/scoring/types";
-import { logNorm } from "@/lib/scoring/engine";
+import type { Core5Raw } from "@/lib/analytics/scoring-types";
+import { logNorm } from "@/lib/analytics/scoring-engine";
 
 export interface BridgeInput {
   pillars: RawPillars;

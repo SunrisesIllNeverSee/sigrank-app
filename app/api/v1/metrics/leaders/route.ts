@@ -8,16 +8,16 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getMetricLeaders } from "@/lib/data";
+import { getMetricLeaders } from "@/lib/board";
 import {
   LEADERBOARD_CACHE_CONTROL,
   serializeLeaderboardEntry,
-} from "@/lib/api/leaderboard";
+} from "@/lib/board/api-leaderboard";
 import {
   enforceListGate,
   rateLimit,
   rateLimitedResponse,
-} from "@/lib/api/gate";
+} from "@/lib/infra/api-gate";
 
 /** Note surfaced when an unauthenticated caller is clamped to the public top-N. */
 const GATED_NOTE = "top N public; full corpus requires an API key";

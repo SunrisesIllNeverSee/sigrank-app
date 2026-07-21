@@ -23,7 +23,7 @@ import "server-only";
  * unit-testable and the proprietary battery is a server-only plug-in, not shipped code.
  */
 
-import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
 import { snapshotHash, verifySignature } from "@/lib/ingest/signature";
 
 export type GateDecision = "accept" | "flag" | "reject";

@@ -23,9 +23,9 @@
 import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
-import { getLeaderboard } from "@/lib/data";
-import { toEntry } from "@/lib/leaderboard/to-entry";
-import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/data/windows";
+import { getLeaderboard } from "@/lib/board";
+import { toEntry } from "@/lib/board/to-entry";
+import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
 import { JsonLd } from "@/components/seo/JsonLd";

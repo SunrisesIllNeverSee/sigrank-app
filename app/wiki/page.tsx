@@ -20,7 +20,7 @@
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
 
-import { TOKEN_METRICS } from "@/lib/canon/ids";
+import { TOKEN_METRICS } from "@/lib/identity/canon-ids";
 import { MCP_VERSION, PLATFORM_COUNT } from "@/lib/constants";
 import { ClassLadder } from "@/components/marketing/ClassLadder";
 import { ScorePasteCard } from "@/components/score/ScorePasteCard";

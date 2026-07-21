@@ -18,7 +18,7 @@
  * filter on a metric sub-board is the window, supplied by the page via props.
  */
 
-import { getMetricLeaders, type LeaderboardRow } from "@/lib/data";
+import { getMetricLeaders, type LeaderboardRow } from "@/lib/board";
 import { WINDOW_API_MAP, type WindowUI } from "@/lib/constants";
 import { CanonId } from "@/components/ui/CanonId";
 import { Placeholder } from "@/components/ui/Placeholder";
