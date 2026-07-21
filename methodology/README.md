@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Methodology
+description: How SignalAF moves from submitted telemetry to public measurements and bounded interpretations via the knowledge pyramid. Active.
+tags: [sigrank, methodology, metrics, signals, observations, reference]
+timestamp: 2026-07-21
+---
+
 # Methodology
 
 Methodology specifies how SignalAF moves from submitted telemetry to public measurements and bounded interpretations.

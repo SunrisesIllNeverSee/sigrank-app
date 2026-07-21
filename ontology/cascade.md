@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Cascade
+description: Token-flow decomposition from input through output, cache commitment, and cache reuse, yielding the Upsilon metric. Active.
+tags: [sigrank, cascade, token-flow, upsilon, metrics, reference]
+timestamp: 2026-07-21
+---
+
 # Cascade
 
 A cascade is the token-flow decomposition from fresh input through generated output, cache commitment, and cache reuse.

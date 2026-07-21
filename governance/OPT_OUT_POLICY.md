@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Opt-Out Policy
+description: Three opt-out choices: pause collection, delete history, and delete account. Phase 5 controls planned; contact path available now.
+tags: [sigrank, opt-out, pause, deletion, account-removal, spec]
+timestamp: 2026-07-21
+---
+
 # Opt-out policy
 
 SignalAF provides three distinct choices:

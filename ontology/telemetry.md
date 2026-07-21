@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Telemetry Pillars
+description: Four non-negative token counts (input, output, cache_create, cache_read) that form the cascade model basis. Active.
+tags: [sigrank, telemetry, pillars, tokens, cascade, reference]
+timestamp: 2026-07-21
+---
+
 # Telemetry pillars
 
 The cascade model uses four non-negative token counts:

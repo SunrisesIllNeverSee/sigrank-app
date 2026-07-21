@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Limitations
+description: What Upsilon and cascade metrics do not measure, sensitivity issues, and conditions that limit comparisons. Active.
+tags: [sigrank, limitations, caveats, scope, methodology, spec]
+timestamp: 2026-07-21
+---
+
 # Limitations
 
 Upsilon measures a token-flow relationship: cache reads and output relative to fresh input. It does not measure correctness, novelty, user satisfaction, economic value, code quality, safety, talent, effort, or intelligence.

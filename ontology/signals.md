@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Signals
+description: Conditional interpretations layered on observations and metrics. Always carry uncertainty and must not infer motive or identity. Active.
+tags: [sigrank, signals, interpretation, integrity, caution, reference]
+timestamp: 2026-07-21
+---
+
 # Signals
 
 A signal is an interpretation layered on observations and metrics. It is always conditional: “this pattern is consistent with…” rather than “this proves…”.

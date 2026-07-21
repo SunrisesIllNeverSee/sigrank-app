@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Data Retention
+description: Purpose-limited retention rules for active data, paused collection, history deletion, and backups. Phase 1; durations pending.
+tags: [sigrank, data-retention, retention, deletion, backups, spec]
+timestamp: 2026-07-21
+---
+
 # Data retention
 
 Retention is purpose-limited. Keep active account links, submissions, derived metrics, and integrity records only while needed to operate the service, support reproducibility, prevent abuse, or meet documented legal obligations.

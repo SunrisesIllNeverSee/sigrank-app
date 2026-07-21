@@ -1,3 +1,11 @@
+---
+type: Reference
+title: SignalAF Observatory
+description: Overview of the SignalAF observatory for AI-assisted work, its knowledge pyramid, and verification context. Active.
+tags: [sigrank, observatory, overview, knowledge-pyramid, telemetry, reference]
+timestamp: 2026-07-21
+---
+
 # SignalAF Observatory
 
 SignalAF is an observatory for AI-assisted work. It records submitted token telemetry, derives reproducible cascade metrics, and presents those measurements with their verification context.

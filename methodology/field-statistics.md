@@ -1,3 +1,11 @@
+---
+type: Analysis
+title: Field Statistics
+description: Dataset-specific field comparisons using medians, quartiles, IQR fences, and percentile computation. Outlier handling must be explicit. Active.
+tags: [sigrank, field-statistics, percentiles, iqr, outliers, analysis]
+timestamp: 2026-07-21
+---
+
 # Field statistics
 
 Field comparisons are dataset-specific. The field-analysis schema provides medians, quartiles, and IQR fences for yield, SNR, leverage, velocity, tokens per day, and total tokens. An IQR fence stores `q1`, `q3`, `iqr`, and lower/upper bounds.

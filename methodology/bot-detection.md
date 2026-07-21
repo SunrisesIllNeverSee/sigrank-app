@@ -1,3 +1,11 @@
+---
+type: Analysis
+title: Bot Detection and Benford Validation
+description: Aggregate Benford's Law check for leading-digit anomalies in token counts. Flags evidence for review, not proof of fabrication. Active.
+tags: [sigrank, bot-detection, benford, validation, ingest, analysis]
+timestamp: 2026-07-21
+---
+
 # Bot detection and Benford validation
 
 Benford's Law expects leading digit `d` with probability `log10(1 + 1/d)`. SignalAF's aggregate check extracts leading digits from positive finite token counts, compares observed and expected counts, and calculates chi-squared.

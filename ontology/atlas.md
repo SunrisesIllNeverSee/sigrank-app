@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Atlas
+description: Placeholder for operator behavioral profiles based on documented metric patterns. Not yet released.
+tags: [sigrank, atlas, behavioral-profiles, taxonomy, placeholder, reference]
+timestamp: 2026-07-21
+---
+
 # Atlas
 
 Placeholder for operator behavioral profiles.

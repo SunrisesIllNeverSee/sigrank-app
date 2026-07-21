@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Metrics
+description: Public cascade metrics including Upsilon, SNR, Velocity, Leverage, and 10xDEV as deterministic diagnostics over raw pillars. Active.
+tags: [sigrank, metrics, upsilon, snr, velocity, leverage, 10xdev, reference]
+timestamp: 2026-07-21
+---
+
 # Metrics
 
 Public cascade metrics are deterministic diagnostics over raw pillars:

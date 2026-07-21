@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Consent Model
+description: Target consent model capturing enrollment consent with terms and privacy versions. Phase 1 defines the model; enforcement pending Phase 2.
+tags: [sigrank, consent-model, enrollment, terms-version, privacy, spec]
+timestamp: 2026-07-21
+---
+
 # Consent model
 
 Consent should be captured at enrollment before routine submission collection begins. The record should include the timestamp, the accepted terms version, the accepted privacy version, the action or interface that captured consent, and the linked operator/account.

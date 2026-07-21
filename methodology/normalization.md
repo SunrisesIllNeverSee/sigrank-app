@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Normalization
+description: How raw pillars are made comparable through ratios, denominator clamping, and scoring-engine normalization to [0,100]. Active.
+tags: [sigrank, normalization, ratios, scoring, comparability, spec]
+timestamp: 2026-07-21
+---
+
 # Normalization
 
 Raw pillars are made comparable through ratios rather than direct token totals: velocity divides output by fresh input, leverage divides cache reads by fresh input, and SNR uses the input-plus-output total. The cascade implementation clamps the input denominator to at least one to avoid division by zero.
