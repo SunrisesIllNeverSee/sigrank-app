@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseService } from "@/lib/supabase/server";
-import { getStripe } from "@/lib/stripe/server";
-import { captureServer } from "@/lib/posthog/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
+import { getStripe } from "@/lib/infra/stripe/server";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 /**
  * POST /api/v1/account/delete — permanent account deletion (owner 2026-06-27).

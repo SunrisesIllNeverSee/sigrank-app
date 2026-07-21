@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { OperatorReport } from "@/lib/data";
+import type { OperatorReport } from "@/lib/board";
 import { BadgeCollection } from "./BadgeCollection";
 import { HealthScore } from "./HealthScore";
 import { DnaCard } from "./DnaCard";

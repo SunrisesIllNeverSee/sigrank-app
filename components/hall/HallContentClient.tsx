@@ -16,17 +16,17 @@
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
-import type { LeaderboardRow } from "@/lib/data";
-import { sortValue } from "@/lib/data/sort-value";
+import type { LeaderboardRow } from "@/lib/board";
+import { sortValue } from "@/lib/analytics/sort-value";
 import {
   PLATFORM_UI,
   PLATFORM_DEFAULT,
   type PlatformUI,
 } from "@/lib/constants";
-import { boardWindowBySlug } from "@/lib/data/windows";
-import { isOutlierRow } from "@/lib/data/outlier-classify";
-import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/canon/ids";
-import { recordValue } from "@/lib/hall/record-value";
+import { boardWindowBySlug } from "@/lib/board/windows";
+import { isOutlierRow } from "@/lib/analytics/outlier-classify";
+import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/identity/canon-ids";
+import { recordValue } from "@/lib/analytics/record-value";
 import { HallHeader } from "@/components/hall/HallHeader";
 import { MetricTopTen } from "@/components/hall/MetricTopTen";
 import { RecordTicker } from "@/components/hall/RecordTicker";

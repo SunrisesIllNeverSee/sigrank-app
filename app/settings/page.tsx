@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SignOutButton } from "@/components/auth/SignOutButton";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { ConnectDevicePanel } from "@/components/settings/ConnectDevicePanel";
 import { DangerZone } from "@/components/settings/DangerZone";
+import { DataPrivacy } from "@/components/settings/DataPrivacy";
 import { withOG } from "@/lib/seo";
 
 /**
@@ -156,18 +157,42 @@ export default async function SettingsPage({
         </Section>
       )}
 
+      {op && (
+        <Section
+          title="Data & Privacy"
+          desc="Manage what we collect and when collection stops."
+        >
+          <DataPrivacy codename={op.codename} initialOptOut={op.dataOptOut} />
+        </Section>
+      )}
+
       <Section
         title="Privacy"
         desc="SigRank only ever stores token counts — never conversation content."
       >
         <p className="font-sans text-[11px] leading-relaxed text-text-dim">
           The free tier reads token counts, model ids, and content lengths
-          locally. No transcripts leave your device. See{" "}
+          locally. No transcripts leave your device. You can pause collection
+          or delete your data anytime from{" "}
+          <Link
+            href="/settings"
+            className="text-text-muted underline hover:text-text-secondary"
+          >
+            Settings
+          </Link>
+          . See{" "}
           <Link
             href="/about"
             className="text-text-muted underline hover:text-text-secondary"
           >
             how it works
+          </Link>{" "}
+          and our{" "}
+          <Link
+            href="/privacy"
+            className="text-text-muted underline hover:text-text-secondary"
+          >
+            Privacy Policy
           </Link>
           .
         </p>
@@ -182,7 +207,11 @@ export default async function SettingsPage({
         </Link>
       </Section>
 
-      {op && <DangerZone codename={op.codename} />}
+      {op && (
+        <div id="danger-zone">
+          <DangerZone codename={op.codename} />
+        </div>
+      )}
     </div>
   );
 }

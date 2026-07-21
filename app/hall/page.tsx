@@ -1,8 +1,8 @@
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
-import { getLeaderboard } from "@/lib/data";
-import { BOARD_WINDOWS } from "@/lib/data/windows";
+import { getLeaderboard } from "@/lib/board";
+import { BOARD_WINDOWS } from "@/lib/board/windows";
 import { HallHero } from "@/components/hall/HallHero";
 import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
 import { HallContentClient } from "@/components/hall/HallContentClient";

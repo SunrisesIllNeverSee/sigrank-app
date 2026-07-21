@@ -19,9 +19,9 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
-import { getOperator, getOperatorHistory, isOperatorRetired } from "@/lib/data";
+import { getOperator, getOperatorHistory, isOperatorRetired } from "@/lib/board";
 import { decodeCodename } from "@/lib/route-params";
-import type { HistoryPoint, LeaderboardRow } from "@/lib/data";
+import type { HistoryPoint, LeaderboardRow } from "@/lib/board";
 import { WrappedStats } from "@/components/sigrank/WrappedStats";
 import type { Badge } from "@/components/sigrank/types";
 import { SignaHistoryChart } from "@/components/charts/SignaHistoryChart";

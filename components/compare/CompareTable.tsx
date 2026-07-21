@@ -1,6 +1,6 @@
 import React from "react";
-import type { LeaderboardRow } from "@/lib/data";
-import { operatorDisplayName } from "@/lib/compare/operator-name";
+import type { LeaderboardRow } from "@/lib/board";
+import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { SignalClassBadge } from "@/components/sigrank";
 import { CanonId } from "@/components/ui/CanonId";
 import { Placeholder } from "@/components/ui/Placeholder";

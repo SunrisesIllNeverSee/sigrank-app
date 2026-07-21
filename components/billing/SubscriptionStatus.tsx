@@ -1,6 +1,6 @@
 import React from "react";
-import type { SupporterTier } from "@/lib/scoring/types";
-import type { SubscriptionStatus as SubStatus } from "@/lib/stripe/tier";
+import type { SupporterTier } from "@/lib/analytics/scoring-types";
+import type { SubscriptionStatus as SubStatus } from "@/lib/infra/stripe/tier";
 import { Placeholder } from "@/components/ui/Placeholder";
 
 /**

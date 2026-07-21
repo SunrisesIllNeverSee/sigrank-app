@@ -25,18 +25,18 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { validateSnapshot } from "@/lib/payload/schema";
+import { validateSnapshot } from "@/lib/ingest/payload-schema";
 import { runIngestGates, type GateContext } from "@/lib/ingest/gates";
 import { runBattery } from "@/lib/ingest/battery";
 import { checkAndStoreAttestation } from "@/lib/ingest/attestation";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import {
   materializeVerifiedSnapshot,
   insertSubmissionOnly,
   revalidateTouchedWindows,
   type MaterializeResult,
 } from "@/lib/ingest/materialize";
-import { captureServer } from "@/lib/posthog/server";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 const SCORING_ETA_SECONDS = 30;
 
@@ -52,13 +52,18 @@ interface ResolvedDeviceRow {
   agent_public_key: string;
   trust_status: string;
   codename: string | null;
+  data_opt_out: boolean;
 }
 
-/** Normalize a supabase to-one embed (object) vs to-many (array) to the codename. */
-function embeddedCodename(operators: unknown): string | null {
-  if (Array.isArray(operators))
-    return (operators[0] as { codename?: string })?.codename ?? null;
-  return (operators as { codename?: string } | null)?.codename ?? null;
+interface EmbeddedOperator {
+  codename?: string;
+  data_opt_out?: boolean;
+}
+
+/** Normalize a supabase to-one embed (object) vs to-many (array) to the operator row. */
+function embeddedOperators(operators: unknown): EmbeddedOperator | null {
+  if (Array.isArray(operators)) return (operators[0] as EmbeddedOperator) ?? null;
+  return (operators as EmbeddedOperator | null) ?? null;
 }
 
 /**
@@ -127,7 +132,7 @@ export async function POST(req: NextRequest) {
       svc
         .from("devices")
         .select(
-          "device_id, operator_id, agent_public_key, trust_status, operators:operator_id(codename)",
+          "device_id, operator_id, agent_public_key, trust_status, operators:operator_id(codename, data_opt_out)",
         )
         .eq("device_id", payload.device_id)
         .maybeSingle(),
@@ -149,16 +154,31 @@ export async function POST(req: NextRequest) {
       operators: unknown;
     } | null;
     if (d) {
+      const op = embeddedOperators(d.operators);
       device = {
         device_id: d.device_id,
         operator_id: d.operator_id,
         agent_public_key: d.agent_public_key,
         trust_status: d.trust_status,
-        codename: embeddedCodename(d.operators),
+        codename: op?.codename ?? null,
+        data_opt_out: op?.data_opt_out ?? false,
       };
     }
     dupHash = (dupRes.count ?? 0) > 0;
     recentCount = throttleRes.count ?? 0;
+  }
+
+  // 3b. Operator-level opt-out gate: reject submissions when data collection is paused.
+  if (device?.data_opt_out) {
+    return NextResponse.json(
+      {
+        status: "rejected",
+        reason: "data_opt_out",
+        detail:
+          "Data collection is paused for this operator. Re-enable in Settings.",
+      },
+      { status: 403 },
+    );
   }
 
   const ctx: GateContext = {

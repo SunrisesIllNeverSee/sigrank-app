@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import {
   enrollRateLimit,
   rateLimitedResponse,
   getClientIp,
-} from "@/lib/api/gate";
-import { generateConnectCode } from "@/lib/devices/connect-code";
+} from "@/lib/infra/api-gate";
+import { generateConnectCode } from "@/lib/identity/connect-code";
 
 /**
  * POST /api/v1/devices/new-key — FIX O: 2FA-style re-key (2026-06-26).

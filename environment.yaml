@@ -1,0 +1,41 @@
+name: sigrank-app
+version: "0.11.0"
+description: |
+  SignalAF web application. Next.js 15 + React 19 + TypeScript strict.
+  Deploy target. Push `main` → Vercel auto-builds → signalaf.com.
+  After the observatory-spine restructure, lib/ is split into domain layers:
+  lib/analytics, lib/board, lib/ingest, lib/infra, lib/identity.
+
+runtime: nodejs
+node_version: "22"
+package_manager: npm
+
+install: npm install
+build: npm run build
+lint: npm run lint
+typecheck: npx tsc --noEmit
+
+test:
+  - npm run test:canonical
+  - npm test
+  - npm run test:ui
+
+env_file: .env.example
+env:
+  NODE_ENV: development
+
+notes: |
+  Local machine runs Node 25, but the repo pins Node 22 (.nvmrc).
+  `next dev` and `next build` may fail locally on Node 25. Prefer CI or nvm.
+  Standard verification before committing:
+    1. npx tsc --noEmit
+    2. npm run test:canonical   (11/11, MOSES Υ 18436.98)
+    3. npm test
+
+  Frozen invariants:
+    - MOSES seed values must not change.
+    - Upsilon (Υ) formula: (cache_read × output) / input²
+    - 10xDEV formula: log10(Leverage)
+
+  The canonical knowledge layer (observatory/, ontology/, methodology/, governance/)
+  lives in this repo. sigrank-mcp mirrors it; see scripts/sync-spine.mjs there.

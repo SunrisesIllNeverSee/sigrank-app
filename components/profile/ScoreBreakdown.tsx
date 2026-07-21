@@ -20,7 +20,7 @@ import { CanonId } from "@/components/ui/CanonId";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { TelemetryStrip } from "./TelemetryStrip";
 import { BlackBoxEngine } from "./BlackBoxEngine";
-import type { TelemetryRaw } from "@/lib/data";
+import type { TelemetryRaw } from "@/lib/board";
 
 /** A reserved Pro metric slot, resolved server-side via getProMetric(). */
 export interface ProMetricSlot {

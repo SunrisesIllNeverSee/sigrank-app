@@ -17,12 +17,12 @@
  * client island. The 5-highlights + per-axis lead strip stay in CompareTitleCard.
  */
 
-import type { LeaderboardRow } from "@/lib/data";
-import { operatorDisplayName } from "@/lib/compare/operator-name";
+import type { LeaderboardRow } from "@/lib/board";
+import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
 import { colors } from "@/components/sigrank/tokens";
-import { glyphFor } from "@/lib/canon/ids";
-import { regimeOf } from "@/lib/compare/narrate";
+import { glyphFor } from "@/lib/identity/canon-ids";
+import { regimeOf } from "@/lib/analytics/compare-narrate";
 
 function nameOf(row: LeaderboardRow): string {
   return operatorDisplayName(row);

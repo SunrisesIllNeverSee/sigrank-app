@@ -18,7 +18,7 @@
  */
 
 import { ImageResponse } from "next/og";
-import { getOperator } from "@/lib/data";
+import { getOperator } from "@/lib/board";
 import { decodeCodename } from "@/lib/route-params";
 
 export const size = { width: 1200, height: 630 };

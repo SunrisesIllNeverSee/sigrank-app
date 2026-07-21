@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe/server";
-import { getSupabaseService } from "@/lib/supabase/server";
-import { dispatchEvent } from "@/lib/stripe/handlers";
+import { getStripe } from "@/lib/infra/stripe/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
+import { dispatchEvent } from "@/lib/infra/stripe/handlers";
 
 /**
  * logAudit — append-only audit_log write, getSupabaseService()-guarded. With no

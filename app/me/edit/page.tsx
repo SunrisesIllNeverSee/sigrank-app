@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import {
   ProfileEditForm,
   type ProfileInitial,

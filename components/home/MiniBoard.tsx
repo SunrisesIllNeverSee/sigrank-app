@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import type { LeaderboardRow } from "@/lib/data";
+import type { LeaderboardRow } from "@/lib/board";
 
 /**
  * MiniBoard — a compact top-5 leaderboard for one metric, for the landing-page

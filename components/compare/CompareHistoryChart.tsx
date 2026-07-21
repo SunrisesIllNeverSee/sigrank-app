@@ -16,7 +16,7 @@
  * Server component — pure render from props.
  */
 
-import type { HistoryPoint } from "@/lib/data";
+import type { HistoryPoint } from "@/lib/board";
 
 interface Props {
   /** Operator A history (ascending by date). */

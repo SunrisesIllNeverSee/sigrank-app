@@ -15,7 +15,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import type { ActiveChallenge } from "@/lib/challenges/types";
+import type { ActiveChallenge } from "@/lib/identity/challenges-types";
 
 interface ChallengeBarProps {
   codeA: string;

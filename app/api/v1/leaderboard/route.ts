@@ -8,17 +8,17 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getLeaderboard } from "@/lib/data";
+import { getLeaderboard } from "@/lib/board";
 import { SORT_DEFAULT } from "@/lib/constants";
 import {
   LEADERBOARD_CACHE_CONTROL,
   serializeLeaderboardEntry,
-} from "@/lib/api/leaderboard";
+} from "@/lib/board/api-leaderboard";
 import {
   enforceListGate,
   rateLimit,
   rateLimitedResponse,
-} from "@/lib/api/gate";
+} from "@/lib/infra/api-gate";
 
 /** Note surfaced when an unauthenticated caller is clamped to the public top-N. */
 const GATED_NOTE = "top N public; full corpus requires an API key";
