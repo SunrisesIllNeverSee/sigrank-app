@@ -23,7 +23,9 @@
     "cf:build": "opennextjs-cloudflare build",
     "cf:dev": "wrangler dev --port 8787",
     "cf:deploy": "opennextjs-cloudflare build && wrangler deploy",
-    "cf:preview": "opennextjs-cloudflare build && wrangler deploy --name sigrank-app-preview"
+    "cf:preview": "opennextjs-cloudflare build && wrangler deploy --name sigrank-app-preview",
+    "verify": "npx tsc --noEmit && npm run test:canonical && npm test",
+    "spine:check": "cd ../sigrank-mcp && node scripts/sync-spine.mjs --check"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.9.0",
