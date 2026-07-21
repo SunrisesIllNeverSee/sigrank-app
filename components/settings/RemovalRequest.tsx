@@ -15,8 +15,6 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const btnGold =
-  "shrink-0 rounded-md bg-gold px-4 py-2 font-mono text-xs font-semibold text-bg-base transition-colors hover:bg-gold/90";
 const btnGhost =
   "shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary";
 const inputCls =
