@@ -1721,94 +1721,102 @@ export function LeaderboardTable({
           )}
         </div>
         {pageCount > 1 ? (
-          <div style={st.pager}>
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={safePage === 0}
-              style={{
-                ...st.pagerBtn,
-                ...(safePage === 0 ? st.pagerOff : null),
-              }}
-            >
-              ← Prev
-            </button>
-            {/* Page number buttons — shows a window of pages around the current
-                one with ellipses for gaps. Click any number to jump directly. */}
-            {(() => {
-              const pages: (number | "...")[] = [];
-              const windowSize = 2; // pages on each side of current
-              const start = Math.max(0, safePage - windowSize);
-              const end = Math.min(pageCount - 1, safePage + windowSize);
-              if (start > 0) {
-                pages.push(0);
-                if (start > 1) pages.push("...");
-              }
-              for (let i = start; i <= end; i++) pages.push(i);
-              if (end < pageCount - 1) {
-                if (end < pageCount - 2) pages.push("...");
-                pages.push(pageCount - 1);
-              }
-              return pages.map((p, idx) =>
-                p === "..." ? (
-                  <span key={`e${idx}`} style={{ color: T.mut, padding: "0 4px" }}>
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setPage(p)}
-                    style={{
-                      ...st.pagerBtn,
-                      ...(p === safePage
-                        ? { background: "rgb(var(--gold))", color: "rgb(var(--bg-base))", borderColor: "rgb(var(--gold))" }
-                        : null),
-                    }}
-                  >
-                    {p + 1}
-                  </button>
-                ),
-              );
-            })()}
-            {/* Jump-to-page input — type a page number and press Enter */}
-            <input
-              type="number"
-              min={1}
-              max={pageCount}
-              placeholder="Go to"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const v = parseInt((e.target as HTMLInputElement).value, 10);
-                  if (!isNaN(v) && v >= 1 && v <= pageCount) {
-                    setPage(v - 1);
-                    (e.target as HTMLInputElement).value = "";
-                  }
+          <div style={{ ...st.pager, flexDirection: "column", gap: 10 }}>
+            {/* Row 1: Prev / Next */}
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={safePage === 0}
+                style={{
+                  ...st.pagerBtn,
+                  ...(safePage === 0 ? st.pagerOff : null),
+                }}
+              >
+                ← Prev
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                disabled={safePage >= pageCount - 1}
+                style={{
+                  ...st.pagerBtn,
+                  ...(safePage >= pageCount - 1 ? st.pagerOff : null),
+                }}
+              >
+                Next →
+              </button>
+            </div>
+            {/* Row 2: page number buttons */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
+              {(() => {
+                const pages: (number | "...")[] = [];
+                const windowSize = 2;
+                const start = Math.max(0, safePage - windowSize);
+                const end = Math.min(pageCount - 1, safePage + windowSize);
+                if (start > 0) {
+                  pages.push(0);
+                  if (start > 1) pages.push("...");
                 }
-              }}
-              style={{
-                width: 64,
-                background: "rgb(var(--bg-elevated))",
-                border: `1px solid ${T.line}`,
-                color: T.ink,
-                padding: "6px 8px",
-                borderRadius: 8,
-                fontSize: 12,
-                fontFamily: "inherit",
-                textAlign: "center",
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-              disabled={safePage >= pageCount - 1}
-              style={{
-                ...st.pagerBtn,
-                ...(safePage >= pageCount - 1 ? st.pagerOff : null),
-              }}
-            >
-              Next →
-            </button>
+                for (let i = start; i <= end; i++) pages.push(i);
+                if (end < pageCount - 1) {
+                  if (end < pageCount - 2) pages.push("...");
+                  pages.push(pageCount - 1);
+                }
+                return pages.map((p, idx) =>
+                  p === "..." ? (
+                    <span key={`e${idx}`} style={{ color: T.mut, padding: "0 4px" }}>
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setPage(p)}
+                      style={{
+                        ...st.pagerBtn,
+                        ...(p === safePage
+                          ? { background: "rgb(var(--gold))", color: "rgb(var(--bg-base))", borderColor: "rgb(var(--gold))" }
+                          : null),
+                      }}
+                    >
+                      {p + 1}
+                    </button>
+                  ),
+                );
+              })()}
+            </div>
+            {/* Row 3: jump-to-page input */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ color: T.mut, fontSize: 11 }}>Page</span>
+              <input
+                type="number"
+                min={1}
+                max={pageCount}
+                placeholder={`${safePage + 1}`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const v = parseInt((e.target as HTMLInputElement).value, 10);
+                    if (!isNaN(v) && v >= 1 && v <= pageCount) {
+                      setPage(v - 1);
+                      (e.target as HTMLInputElement).value = "";
+                    }
+                  }
+                }}
+                style={{
+                  width: 56,
+                  background: "rgb(var(--bg-elevated))",
+                  border: `1px solid ${T.line}`,
+                  color: T.ink,
+                  padding: "6px 8px",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontFamily: "inherit",
+                  textAlign: "center",
+                }}
+              />
+              <span style={{ color: T.mut, fontSize: 11 }}>of {pageCount}</span>
+            </div>
           </div>
         ) : null}
         <div style={st.note}>
