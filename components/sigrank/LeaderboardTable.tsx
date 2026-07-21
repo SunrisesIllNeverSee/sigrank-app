@@ -16,7 +16,7 @@
  *  - Raw view: headers click-sort too; last column is TOTAL COST ($), keeping Total (tokens).
  */
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LeaderboardEntry } from "./types";
@@ -31,6 +31,7 @@ import { OperatorAvatar } from "./OperatorAvatar";
 import { PlatformIcon } from "./PlatformIcon";
 import { track } from "@/lib/infra/posthog/events";
 import { isOutlierEntry } from "@/lib/analytics/outlier-classify";
+import { BoardCapture } from "@/components/board/BoardCapture";
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
 // SPECIES colors stay literal (semantic identity for the class glyph, theme-invariant).
@@ -391,6 +392,8 @@ export function LeaderboardTable({
   // OP RATIO dropdown (multi-sort): the column header opens a menu of 6 sort
   // options instead of the simple click-to-sort every other column uses.
   const [opRatioOpen, setOpRatioOpen] = useState(false);
+  // Screenshot capture: ref to the table container for html-to-image
+  const tableRef = useRef<HTMLDivElement | null>(null);
 
   // board_viewed funnel event (no-ops without the PostHog key). Fires on mount and
   // when the window/platform/breakdown changes; URL-driven boards remount so it stays fresh.
@@ -781,7 +784,7 @@ export function LeaderboardTable({
               </div>
             ) : null}
           </div>
-          <div style={st.toggleRow}>
+          <div style={{ ...st.toggleRow, alignItems: "center" }}>
             <button
               onClick={() => switchView("metrics")}
               style={{
@@ -797,6 +800,19 @@ export function LeaderboardTable({
             >
               Raw · the fuel
             </button>
+            <BoardCapture
+              targetRef={tableRef}
+              filters={{
+                window: win,
+                platform: platform,
+                view: view,
+                classFilter: classFilter,
+                category: categoryFilter,
+                sort: sort,
+                page: safePage,
+                totalPages: pageCount,
+              }}
+            />
           </div>
         </div>
 
@@ -967,7 +983,7 @@ export function LeaderboardTable({
         </ul>
 
         {/* Desktop (md+). */}
-        <div style={{ overflowX: "auto" }} className="hidden md:block">
+        <div ref={tableRef} style={{ overflowX: "auto" }} className="hidden md:block">
           {view === "metrics" ? (
             <table style={st.table}>
               <thead>

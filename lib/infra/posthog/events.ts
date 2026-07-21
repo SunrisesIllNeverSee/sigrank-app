@@ -61,4 +61,10 @@ export const track = {
   }) => {
     if (on()) posthog.capture("checkout_clicked", props);
   },
+  boardShared: (
+    channel: "download" | "clipboard",
+    extra?: Record<string, unknown>,
+  ) => {
+    if (on()) posthog.capture("board_shared", { channel, ...extra });
+  },
 };
