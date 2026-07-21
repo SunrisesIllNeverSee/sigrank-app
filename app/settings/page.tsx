@@ -8,10 +8,10 @@ import { withOG } from "@/lib/seo";
 /**
  * app/settings/page.tsx — ACCOUNT-LEVEL settings (AUTH_LAUNCH_DIRECTIVES D4).
  *
- * Static shell for Lighthouse performance. The auth-dependent sections
- * (Account, Connect device, Privacy & Data, Danger Zone) are rendered by
- * the SettingsAccount client island, which fetches GET /api/v1/profile.
- * The shell (header, appearance, privacy info, removal request) is static.
+ * Fully static shell for Lighthouse performance. The auth-dependent sections
+ * (Account, Connect device, Privacy & Data, Danger Zone) and the ?claimed=1
+ * banner are rendered by the SettingsAccount client island, which fetches
+ * GET /api/v1/profile and reads window.location.search for the claimed flag.
  */
 export const revalidate = 3600;
 
@@ -43,13 +43,7 @@ function Section({
   );
 }
 
-export default async function SettingsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ claimed?: string }>;
-}) {
-  const { claimed } = await searchParams;
-
+export default function SettingsPage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 py-6">
       <header className="flex flex-col gap-1">
@@ -62,8 +56,8 @@ export default async function SettingsPage({
         </p>
       </header>
 
-      {/* Auth-dependent sections (client island) */}
-      <SettingsAccount claimed={claimed} />
+      {/* Auth-dependent sections + claimed banner (client island) */}
+      <SettingsAccount />
 
       <Section title="Appearance" desc="Theme is saved to this browser.">
         <ThemeToggle />

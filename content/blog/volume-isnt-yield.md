@@ -5,7 +5,7 @@ description: SigRank, a measurement layer for how humans operate AI coding agent
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
 author: Deric (@SunrisesIllNeverSee)
-hero: /article-charts/03-volume-vs-yield.png
+hero: /article-charts/webp/03-volume-vs-yield.webp
 ---
 
 # Volume Isn't Yield: The Shape of AI Operators
@@ -59,7 +59,7 @@ Y = (cache_read × output) / input^2
 
 [13] A proper chi-square goodness-of-fit test was run on all 5 raw token pillars: input, output, cache read, cache write, total. Degrees of freedom 8, critical value 15.51 at p=0.05.
 
-![Benford's Law Validation](/article-charts/01-benford-law.png)
+![Benford's Law Validation](/article-charts/webp/01-benford-law.webp)
 
 | Pillar | N | chi-sq | Verdict |
 |--------|---|--------|---------|
@@ -75,7 +75,7 @@ Y = (cache_read × output) / input^2
 
 [15] **But aggregate Benford isn't enough.** It proves the dataset isn't wholesale fabricated; it doesn't catch individual outliers hiding in the tails. So a complementary test was added: the input/total ratio. Real humans have a healthy mix of fresh input and cache reuse. Outliers don't.
 
-![Outlier Detection: Input/Total Ratio](/article-charts/06-outlier-zones.png)
+![Outlier Detection: Input/Total Ratio](/article-charts/webp/06-outlier-zones.webp)
 
 | Zone | Signal | Count | % | What they're doing |
 |------|--------|-------|---|-------------------|
@@ -105,7 +105,7 @@ Y = (cache_read × output) / input^2
 
 [20] The **median** is the real center. SigRank calls it the **Human Center of Mass**: where real operators naturally cluster, not the average including trillion-token outliers.
 
-![Yield Distribution: Human Center of Mass](/article-charts/02-yield-distribution.png)
+![Yield Distribution: Human Center of Mass](/article-charts/webp/02-yield-distribution.webp)
 
 | Metric | Median | IQR (25th-75th) |
 |--------|--------|-----------------|
@@ -155,7 +155,7 @@ C : I : O = 19 : 1 : 0.09
 
 [28] This is why volume != yield. An operator with 10 trillion tokens and 0.01x yield is less efficient than an operator with 1 billion tokens and 1,000x yield. The first is pumping. The second is compounding.
 
-![Volume vs Yield: The Central Finding](/article-charts/03-volume-vs-yield.png)
+![Volume vs Yield: The Central Finding](/article-charts/webp/03-volume-vs-yield.webp)
 
 [29] Volume-based leaderboards rank by total tokens. SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's ~500,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant." Yield says "elite."
 
@@ -165,7 +165,7 @@ C : I : O = 19 : 1 : 0.09
 
 [31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,611 non-flagged operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 113 extreme humans from the 1,628, plus 17 flagged by the 6-signal score, for a total of 130 outliers. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
 
-![7 Human Archetypes: Token Composition](/article-charts/04-archetype-composition.png)
+![7 Human Archetypes: Token Composition](/article-charts/webp/04-archetype-composition.webp)
 
 ### The Field (n=963, 59.8%)
 [32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
@@ -176,7 +176,7 @@ C : I : O = 19 : 1 : 0.09
 ### Cache Architects (n=137, 8.5%)
 [34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 360x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 98.0% cache read, yield 84).
 
-![8 Archetypes: Distribution Across the Field](/article-charts/26-eight-categories-donut.png)
+![8 Archetypes: Distribution Across the Field](/article-charts/webp/26-eight-categories-donut.webp)
 
 ### Input-Heavy Operators (n=102, 6.3%)
 [35] 43% of their tokens are input. Only 54% cache read. Yield 0.02, effectively zero. These operators are dumping tokens in without building cache. They're the opposite of Cache Architects. Whether they're beginners, using tools that don't support caching, or just inefficient, their cascade isn't compounding. Examples: `wuwangzhang1216` (487B tokens, 33.7% input, 60.9% cache read), `jake8655`, `gaorf30153`, `Gioxaa` (18.5B tokens, 27% input, 72% cache read, yield 0.003), `bnmbanhmi` (2.56B tokens, 56% input, 44% cache read, yield 0).
