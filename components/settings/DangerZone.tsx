@@ -72,12 +72,12 @@ export function DangerZone({ codename }: { codename: string }) {
         <div className="flex flex-col gap-3 rounded-md border border-red-500/30 bg-bg-base/40 p-4">
           <ul className="flex flex-col gap-1 font-sans text-[11px] leading-relaxed text-text-secondary">
             <li>
-              · Your active support subscription (if any) is cancelled
-              immediately.
+              · All your telemetry, metrics, device data, and board history
+              are permanently deleted.
             </li>
             <li>
-              · Your board row is anonymized — kept as data, no longer tied to
-              you.
+              · Your active support subscription (if any) is cancelled
+              immediately.
             </li>
             <li>· Your name, email, and device keys are removed.</li>
             <li>· You are signed out. This is permanent — there is no undo.</li>
