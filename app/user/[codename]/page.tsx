@@ -47,11 +47,9 @@ import { ClaimTab } from "@/components/profile/ClaimTab";
 import { ReportTab } from "@/components/profile/ReportTab";
 import dynamic from "next/dynamic";
 const LabTab = dynamic(() => import("@/components/profile/LabTab").then((m) => m.LabTab), {
-  ssr: false,
   loading: () => <div className="h-48 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" />,
 });
 const SplitFlapCard = dynamic(() => import("@/components/signature/SplitFlapCard").then((m) => m.SplitFlapCard), {
-  ssr: false,
   loading: () => <div className="h-48 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" />,
 });
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
