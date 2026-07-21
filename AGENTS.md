@@ -93,6 +93,25 @@ client (`sigrank-mcp`) has a curl fallback in `tools.mjs` — when `fetch` gets 
 403, it retries via `execFileSync('curl', ...)`. If 403s return, verify the curl
 fallback is still working before investigating server-side causes.
 
+## Opt-out scrubbing (mandatory)
+
+When an operator requests data removal (opt-out, deletion, retirement), their
+handle, display name, and all identifying data MUST be scrubbed from EVERY
+file in this repo — not just the database. This includes:
+
+- `public/data/field-analysis.json` — scraped dataset served live on `/field`
+- `supabase/migrations/tokscale_seed_full.sql` — seed migration
+- `supabase/migrations/tokscale_seed_preview.sql` — preview seed
+- Any other data file, CSV, JSON, or SQL that contains operator handles
+
+**Before committing any opt-out/deletion work:**
+1. `git grep -i "<handle>"` across the entire repo
+2. Remove the operator from every matching file
+3. Verify zero hits remain: `git grep -i "<handle>"` returns nothing
+
+This is non-negotiable. An opt-out is not complete while the operator's name
+or handle still appears in any tracked file in this repo.
+
 ## Coordination
 
 This repo is worked on by Drep1 (lead) and Drep2 (one-off tasks) via
