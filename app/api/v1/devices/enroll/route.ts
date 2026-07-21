@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
     typeof body.agent_version === "string"
       ? body.agent_version.trim().slice(0, 60)
       : null;
-  const consentAcknowledged = body.consent_acknowledged === true;
   const termsVersion =
     typeof body.terms_version === "string"
       ? body.terms_version.trim().slice(0, 40)
