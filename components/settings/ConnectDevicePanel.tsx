@@ -16,7 +16,11 @@
  * happens in the TUI: `npx sigrank` → Connect tab (key 6) → paste the code → Enter.
  */
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+
+const TERMS_VERSION = "2026-07-16";
+const PRIVACY_VERSION = "2026-07-16";
 
 interface DeviceRow {
   device_id: string;
@@ -55,6 +59,7 @@ export function ConnectDevicePanel() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [newKeyNotice, setNewKeyNotice] = useState<string | null>(null); // FIX O: "prior keys retired" message
+  const [consentChecked, setConsentChecked] = useState(false);
 
   const loadDevices = useCallback(async () => {
     try {
@@ -200,8 +205,11 @@ export function ConnectDevicePanel() {
           <button
             type="button"
             onClick={mint}
-            disabled={minting}
+            disabled={minting || !consentChecked}
             className={`w-fit ${btnPrimary}`}
+            title={
+              consentChecked ? undefined : "Agree to Terms and Privacy to continue"
+            }
           >
             {minting ? "Generating…" : "Generate connect code"}
           </button>
@@ -209,8 +217,11 @@ export function ConnectDevicePanel() {
           <button
             type="button"
             onClick={newKey}
-            disabled={newKeying}
+            disabled={newKeying || !consentChecked}
             className="w-fit rounded-md border border-gold/60 px-4 py-2 font-mono text-sm font-semibold text-gold transition-colors hover:bg-gold/10 disabled:opacity-50"
+            title={
+              consentChecked ? undefined : "Agree to Terms and Privacy to continue"
+            }
           >
             {newKeying ? "Issuing new key…" : "New key"}
           </button>
@@ -222,6 +233,33 @@ export function ConnectDevicePanel() {
       )}
 
       {error && <p className="font-mono text-[11px] text-red-400">{error}</p>}
+
+      <label className="flex cursor-pointer items-start gap-2 rounded-md border border-bg-border bg-bg-base/40 p-3">
+        <input
+          type="checkbox"
+          checked={consentChecked}
+          onChange={(e) => setConsentChecked(e.target.checked)}
+          className="mt-0.5 h-4 w-4 accent-gold"
+        />
+        <span className="font-sans text-[11px] leading-relaxed text-text-secondary">
+          I agree to the{" "}
+          <Link
+            href="/terms"
+            className="text-text-muted underline hover:text-text-secondary"
+          >
+            Terms of Service
+          </Link>{" "}
+          (v{TERMS_VERSION}) and{" "}
+          <Link
+            href="/privacy"
+            className="text-text-muted underline hover:text-text-secondary"
+          >
+            Privacy Policy
+          </Link>{" "}
+          (v{PRIVACY_VERSION}). Connecting a device will send token telemetry to
+          SigRank.
+        </span>
+      </label>
 
       <ol className="flex flex-col gap-1 font-sans text-[11px] text-text-dim">
         <li>

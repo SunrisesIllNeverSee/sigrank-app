@@ -44,6 +44,15 @@ export async function POST(req: NextRequest) {
     typeof body.agent_version === "string"
       ? body.agent_version.trim().slice(0, 60)
       : null;
+  const consentAcknowledged = body.consent_acknowledged === true;
+  const termsVersion =
+    typeof body.terms_version === "string"
+      ? body.terms_version.trim().slice(0, 40)
+      : null;
+  const privacyVersion =
+    typeof body.privacy_version === "string"
+      ? body.privacy_version.trim().slice(0, 40)
+      : null;
 
   if (
     !code ||
@@ -75,6 +84,25 @@ export async function POST(req: NextRequest) {
     p_device_label: deviceLabel,
     p_agent_version: agentVersion,
   });
+
+  // Record consent on successful enrollment (D1: consent tracking).
+  if (!error) {
+    const row = Array.isArray(data)
+      ? (data[0] as { status?: string; operator_id?: string } | undefined)
+      : null;
+    if (row?.status === "enrolled" && row?.operator_id) {
+      await svc
+        .from("operators")
+        .update({
+          consented_at: new Date().toISOString(),
+          terms_version: termsVersion,
+          privacy_version: privacyVersion,
+          data_opt_out: false,
+          data_opt_out_at: null,
+        })
+        .eq("operator_id", row.operator_id);
+    }
+  }
   if (error) {
     return NextResponse.json(
       { reason: "enroll_failed", detail: error.message },
