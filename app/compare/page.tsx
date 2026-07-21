@@ -39,7 +39,11 @@ import {
   CompareShareCard,
   type CompareOperand,
 } from "@/components/share/CompareShareCard";
-import { CompareMatchupCard } from "@/components/share/CompareMatchupCard";
+import dynamic from "next/dynamic";
+const CompareMatchupCard = dynamic(
+  () => import("@/components/share/CompareMatchupCard").then((m) => m.CompareMatchupCard),
+  { ssr: false, loading: () => <div className="h-96 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" /> },
+);
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 
