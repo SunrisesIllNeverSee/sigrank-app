@@ -257,7 +257,7 @@ export default async function ComparePage({
   );
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <div className="flex flex-col gap-8">
       <TrackCompareView isDefault={!(a && b)} />
       <WaveHero
         eyebrow="🤖⚔️🤖 Throw Down"

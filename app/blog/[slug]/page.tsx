@@ -134,7 +134,7 @@ export default async function BlogPost({
   };
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-8 md:py-12">
+    <article className="px-4 py-8 md:py-12">
       <JsonLd
         data={[
           articleLd,

@@ -57,7 +57,7 @@ export default async function HallPage() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div>
       <JsonLd data={breadcrumb([{ name: "Hall of Signal", path: "/hall" }])} />
       {/* HALL-1: animated masthead. */}
       <HallHero />
