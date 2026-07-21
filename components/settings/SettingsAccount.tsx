@@ -48,10 +48,15 @@ function Section({
   );
 }
 
-export function SettingsAccount({ claimed }: { claimed?: string }) {
+export function SettingsAccount() {
   const [op, setOp] = useState<SessionOperator | null | undefined>(undefined);
+  const [claimed, setClaimed] = useState<string | undefined>(undefined);
 
   useEffect(() => {
+    // Read ?claimed=1 from the URL (was previously a server-side searchParam)
+    const params = new URLSearchParams(window.location.search);
+    setClaimed(params.get("claimed") ?? undefined);
+
     let alive = true;
     fetch("/api/v1/profile", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { operator: null }))
