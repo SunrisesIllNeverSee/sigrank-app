@@ -14,6 +14,7 @@ import { readdir, readFile } from "fs/promises";
 import { join } from "path";
 import matter from "gray-matter";
 import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
@@ -73,6 +74,36 @@ export async function generateMetadata({
 }
 
 export const revalidate = 86400;
+
+// ─── Custom ReactMarkdown components ────────────────────────────────────────
+// Route inline markdown images through next/image for optimization (WebP,
+// responsive srcset, lazy loading). Without this, react-markdown renders
+// raw <img> tags that bypass Next.js image optimization entirely.
+const markdownComponents: Components = {
+  img: ({ src, alt, title }) => {
+    if (!src || typeof src !== "string") return null;
+    // Only optimize local images (skip external URLs — those go through
+    // next/image's remote patterns config separately)
+    const isLocal = src.startsWith("/") || src.startsWith("./") || !src.startsWith("http");
+    if (!isLocal) {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={src} alt={alt ?? ""} loading="lazy" />;
+    }
+    // Normalize relative paths
+    const imgSrc = src.startsWith("./") ? src.slice(1) : src;
+    return (
+      <Image
+        src={imgSrc}
+        alt={alt ?? ""}
+        title={title}
+        width={1200}
+        height={800}
+        className="h-auto w-full rounded-lg border border-bg-border my-6"
+        loading="lazy"
+      />
+    );
+  },
+};
 
 export default async function BlogPost({
   params,
@@ -149,7 +180,7 @@ export default async function BlogPost({
 
       {/* Markdown body */}
       <div className="prose-sigrank mt-2">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{content}</ReactMarkdown>
       </div>
 
       {/* ── Cross-links ── */}
