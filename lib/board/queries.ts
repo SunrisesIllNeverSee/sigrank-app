@@ -268,6 +268,22 @@ export async function getLeaderboard(
       params.windowFilter && params.window
         ? filterToWindow(allSnaps, params.window)
         : allSnaps;
+    // Ghost-row guard: drop snapshots with null/zero input or output tokens.
+    // Yield = (cache_read × output) / input² — null/zero input or output makes
+    // yield uncomputable, so these rows render as empty "—" rows on the board.
+    // This mirrors the compute_board_ranks RPC filter (migration 0028):
+    //   WHERE input_tokens IS NOT NULL AND input_tokens > 0
+    //     AND output_tokens IS NOT NULL AND output_tokens > 0
+    // Codex-gap operators (cache_creation = 0) are NOT filtered here — the
+    // existing cascade layer nulls their yield intentionally, and they still
+    // show on the board. Only null/zero input/output rows are dropped.
+    const yieldable = windowed.filter(
+      (s) =>
+        s.input_tokens != null &&
+        s.input_tokens > 0 &&
+        s.output_tokens != null &&
+        s.output_tokens > 0,
+    );
     // Collapse ladder (precedence top→bottom):
     //   allSnapshots  — keep EVERY (operator, platform, window) point ("off" board).
     //   operatorTotal — ONE total row per operator: the operator's 'multi' snapshot
@@ -280,15 +296,15 @@ export async function getLeaderboard(
     let platformsByOperator: Map<string, string[]> | null = null;
     let snapRows: DbMetricSnapshot[];
     if (params.allSnapshots) {
-      snapRows = windowed;
+      snapRows = yieldable;
     } else if (params.operatorTotal) {
-      const collapsed = operatorTotalCollapse(windowed);
+      const collapsed = operatorTotalCollapse(yieldable);
       platformsByOperator = collapsed.platformsByOperator;
       snapRows = [...collapsed.byOperator.values()];
     } else if (params.perPlatform) {
-      snapRows = [...latestPerOperatorPlatform(windowed).values()];
+      snapRows = [...latestPerOperatorPlatform(yieldable).values()];
     } else {
-      snapRows = [...latestPerOperator(windowed).values()];
+      snapRows = [...latestPerOperator(yieldable).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
