@@ -91,7 +91,12 @@ export default async function BoardWindowPage({
   // PERF (2026-07-21): Only fetch the first page (25 entries) for SSR + SEO.
   // The client fetches subsequent pages + perPlatform via the API.
   // This cuts /board/all from 3.8MB to ~100KB.
-  const PER_PAGE = 25;
+  //
+  // HCM NOTE: The LeaderboardTable defaults to categoryFilter="human" (Human
+  // Center of Mass), which filters out outliers (input/total < 1% or > 80%).
+  // The top 290+ operators by yield are all outliers, so we need to fetch
+  // enough entries to have 25 humans after filtering. 400 is a safe margin.
+  const SERVER_FETCH_LIMIT = 400;
   let totalEntries: ReturnType<typeof toEntry>[] = [];
   let totalCount = 0;
   let offEntries: ReturnType<typeof toEntry>[] = [];
@@ -102,14 +107,16 @@ export default async function BoardWindowPage({
     offEntries = rows.map(toEntry);
   } else {
     // operatorTotal: fetch ALL rows to get the count, but only serialize
-    // the first 25 to the client. The count lets the client build pagination.
+    // the first SERVER_FETCH_LIMIT to the client. The client-side HCM filter
+    // will reduce these to ~25 visible rows. The count lets the client build
+    // pagination.
     const totalRows = await getLeaderboard({
       window: win!.enum,
       windowFilter: true,
       operatorTotal: true,
     });
     totalCount = totalRows.length;
-    totalEntries = totalRows.slice(0, PER_PAGE).map(toEntry);
+    totalEntries = totalRows.slice(0, SERVER_FETCH_LIMIT).map(toEntry);
   }
 
   // JsonLd from the default (operatorTotal) entries — search engines see the
