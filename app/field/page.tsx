@@ -74,7 +74,7 @@ export default async function FieldPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-10 py-2">
+    <div className="flex flex-col gap-10 py-2">
       <JsonLd
         data={[
           fieldDataset,

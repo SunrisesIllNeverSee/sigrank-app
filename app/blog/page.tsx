@@ -57,7 +57,7 @@ export default async function BlogIndex() {
   const posts = await getAllPosts();
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <div className="flex flex-col gap-8 py-2">
       <header className="flex flex-col gap-3">
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           ◈ SigRank Blog
