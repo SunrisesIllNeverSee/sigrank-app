@@ -248,7 +248,8 @@ export default async function FieldPage() {
           <img
           src="/field-charts/platform-yield-quartile.svg"
           alt="Platform × Yield Quartile — Claude dominance in top quartile"
-          className="w-full"
+          className="h-auto w-full"
+          style={{ aspectRatio: "800 / 380" }}
           loading="lazy"
         />
         </div>
@@ -275,7 +276,8 @@ export default async function FieldPage() {
           <img
           src="/field-charts/cascade-composition.svg"
           alt="Cascade composition — 4 notable operators, log-scaled segments"
-          className="w-full"
+          className="h-auto w-full"
+          style={{ aspectRatio: "800 / 400" }}
           loading="lazy"
         />
         </div>
@@ -308,7 +310,8 @@ export default async function FieldPage() {
           <img
           src="/field-charts/yield-quartile-boxplots.svg"
           alt="Yield quartile box plots — 4 metrics × 4 quartiles"
-          className="w-full"
+          className="h-auto w-full"
+          style={{ aspectRatio: "800 / 420" }}
           loading="lazy"
         />
         </div>
@@ -417,7 +420,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/ghost-rank-quadrant.svg"
             alt="Ghost rank quadrant — Q2 low volume high yield operators, 1,598 operators on log-log scale"
-            className="w-full"
+            className="h-auto w-full"
+            style={{ aspectRatio: "800 / 480" }}
             loading="lazy"
           />
         </div>
@@ -520,7 +524,8 @@ export default async function FieldPage() {
         <img
         src="/field-charts/outlier-detection.svg"
         alt="Outlier detection — SNR vs total tokens, 1,610 humans, 17 flagged outliers"
-        className="w-full"
+        className="h-auto w-full"
+        style={{ aspectRatio: "800 / 320" }}
         loading="lazy"
       />
         <BotZoneShading />
