@@ -51,7 +51,7 @@ export default async function HomePage() {
   const homeStats = await getHomepageStats();
 
   return (
-    <div className="flex flex-col gap-8 py-2">
+    <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">
       {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product) */}
       <JsonLd data={cliTool()} />
 

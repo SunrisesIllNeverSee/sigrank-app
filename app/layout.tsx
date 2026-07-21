@@ -94,7 +94,7 @@ export default function RootLayout({
           <ThemeCycleShortcut />
           <Nav />
           <DemoBanner />
-          <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>
+          <main className="mx-auto w-full max-w-[1600px] px-4 py-8">{children}</main>
           <Footer />
           <NavNpxCTA />
         </PostHogProvider>
