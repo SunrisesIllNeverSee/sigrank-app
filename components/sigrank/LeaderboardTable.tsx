@@ -1733,15 +1733,71 @@ export function LeaderboardTable({
             >
               ← Prev
             </button>
-            <span style={st.pagerInfo}>
-              Page {safePage + 1} of {pageCount}
-              <span style={{ color: T.mut }}>
-                {"  ·  "}
-                {safePage * PER_PAGE + 1}–
-                {Math.min((safePage + 1) * PER_PAGE, sorted.length)} of{" "}
-                {sorted.length}
-              </span>
-            </span>
+            {/* Page number buttons — shows a window of pages around the current
+                one with ellipses for gaps. Click any number to jump directly. */}
+            {(() => {
+              const pages: (number | "...")[] = [];
+              const windowSize = 2; // pages on each side of current
+              const start = Math.max(0, safePage - windowSize);
+              const end = Math.min(pageCount - 1, safePage + windowSize);
+              if (start > 0) {
+                pages.push(0);
+                if (start > 1) pages.push("...");
+              }
+              for (let i = start; i <= end; i++) pages.push(i);
+              if (end < pageCount - 1) {
+                if (end < pageCount - 2) pages.push("...");
+                pages.push(pageCount - 1);
+              }
+              return pages.map((p, idx) =>
+                p === "..." ? (
+                  <span key={`e${idx}`} style={{ color: T.mut, padding: "0 4px" }}>
+                    …
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPage(p)}
+                    style={{
+                      ...st.pagerBtn,
+                      ...(p === safePage
+                        ? { background: "rgb(var(--gold))", color: "rgb(var(--bg-base))", borderColor: "rgb(var(--gold))" }
+                        : null),
+                    }}
+                  >
+                    {p + 1}
+                  </button>
+                ),
+              );
+            })()}
+            {/* Jump-to-page input — type a page number and press Enter */}
+            <input
+              type="number"
+              min={1}
+              max={pageCount}
+              placeholder="Go to"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const v = parseInt((e.target as HTMLInputElement).value, 10);
+                  if (!isNaN(v) && v >= 1 && v <= pageCount) {
+                    setPage(v - 1);
+                    (e.target as HTMLInputElement).value = "";
+                  }
+                }
+              }}
+              style={{
+                width: 64,
+                background: "rgb(var(--bg-elevated))",
+                border: `1px solid ${T.line}`,
+                color: T.ink,
+                padding: "6px 8px",
+                borderRadius: 8,
+                fontSize: 12,
+                fontFamily: "inherit",
+                textAlign: "center",
+              }}
+            />
             <button
               type="button"
               onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
@@ -1797,20 +1853,23 @@ const st: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: 16,
+    gap: 8,
     marginTop: 16,
     fontSize: 12,
+    flexWrap: "wrap",
   },
   pagerBtn: {
     background: "rgb(var(--bg-elevated))",
     border: `1px solid ${T.line}`,
     color: T.ink,
-    padding: "6px 14px",
+    padding: "6px 10px",
     borderRadius: 8,
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
     fontFamily: "inherit",
+    minWidth: 32,
+    textAlign: "center" as const,
   },
   pagerOff: { opacity: 0.4, cursor: "not-allowed" },
   pagerInfo: {

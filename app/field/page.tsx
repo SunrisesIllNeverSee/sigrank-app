@@ -138,7 +138,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/volume-vs-yield.svg"
             alt="Volume vs Yield scatter plot — 1,627 operators on log-log scale showing near-zero correlation between total tokens and yield"
-            className="w-full"
+            className="h-auto w-full"
+            style={{ aspectRatio: "800 / 480" }}
             loading="lazy"
           />
         </div>
@@ -189,7 +190,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/snr-distribution.svg"
             alt="SNR distribution histogram — 1,627 human operators, 20 buckets, log scale"
-            className="w-full"
+            className="h-auto w-full"
+            style={{ aspectRatio: "800 / 340" }}
             loading="lazy"
           />
         </div>
@@ -215,7 +217,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/leverage-vs-velocity.svg"
             alt="Leverage vs Velocity scatter plot — IQR-trimmed, showing yield as rectangle area"
-            className="w-full"
+            className="h-auto w-full"
+            style={{ aspectRatio: "800 / 420" }}
             loading="lazy"
           />
         </div>
