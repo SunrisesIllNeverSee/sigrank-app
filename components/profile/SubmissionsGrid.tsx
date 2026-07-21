@@ -11,7 +11,7 @@
  * Presentational + server-rendered (no client island): the data comes pre-resolved
  * from getOperatorSubmissions() in the profile page.
  */
-import type { OperatorSubmission } from "@/lib/data";
+import type { OperatorSubmission } from "@/lib/board";
 
 // Window columns in the owner's order (7 · 30 · 90 · all).
 const WINDOW_ORDER = ["7d", "30d", "90d", "all_time"] as const;

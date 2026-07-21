@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
-import { getFieldAnalysis, getArchetypes } from "@/lib/field/data";
+import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";

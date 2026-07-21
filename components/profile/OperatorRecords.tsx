@@ -1,13 +1,13 @@
 import React from "react";
 import Link from "next/link";
-import type { LeaderboardRow, HallRecord } from "@/lib/data";
-import { getHallOfSignal } from "@/lib/data";
-import { sortValue } from "@/lib/data/sort-value";
+import type { LeaderboardRow, HallRecord } from "@/lib/board";
+import { getHallOfSignal } from "@/lib/board";
+import { sortValue } from "@/lib/analytics/sort-value";
 import {
   DISPLAY_RAW,
   DISPLAY_METRICS,
-} from "@/lib/canon/ids";
-import { recordValue } from "@/lib/hall/record-value";
+} from "@/lib/identity/canon-ids";
+import { recordValue } from "@/lib/analytics/record-value";
 
 /**
  * OperatorRecords — the "Records" badge strip on an operator profile.

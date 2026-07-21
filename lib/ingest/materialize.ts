@@ -27,12 +27,12 @@ import "server-only";
  */
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
-import { scoreSnapshot } from "@/lib/scoring/engine";
-import { boardWindowByEnum } from "@/lib/data/windows";
-import { memoInvalidatePrefix } from "@/lib/data/memo";
-import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
+import { boardWindowByEnum } from "@/lib/board/windows";
+import { memoInvalidatePrefix } from "@/lib/board/memo";
+import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
 import type { GateResult } from "@/lib/ingest/gates";
 
 /** The enrolled-device facts the persist path needs (resolved FROM the device, §5.4). */

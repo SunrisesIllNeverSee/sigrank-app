@@ -12,7 +12,7 @@
  */
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
-import type { HallRecord } from "@/lib/data";
+import type { HallRecord } from "@/lib/board";
 
 const ORG_ID = `${SITE_ORIGIN}/#org`;
 const SITE_ID = `${SITE_ORIGIN}/#website`;

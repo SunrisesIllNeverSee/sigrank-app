@@ -27,10 +27,10 @@
  */
 
 import React from "react";
-import type { LeaderboardRow } from "@/lib/data";
-import { operatorDisplayName } from "@/lib/compare/operator-name";
+import type { LeaderboardRow } from "@/lib/board";
+import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { CanonId } from "@/components/ui/CanonId";
-import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/canon/ids";
+import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/identity/canon-ids";
 
 const A_COLOR = "rgb(var(--class-arch))"; // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
 const B_COLOR = "rgb(var(--class-seeker))";

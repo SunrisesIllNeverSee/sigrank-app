@@ -12,8 +12,8 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getOperatorRecords } from "@/lib/data";
-import { rateLimit, rateLimitedResponse } from "@/lib/api/gate";
+import { getOperatorRecords } from "@/lib/board";
+import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 export const revalidate = 3600;
 

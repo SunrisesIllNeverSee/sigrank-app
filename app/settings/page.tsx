@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SignOutButton } from "@/components/auth/SignOutButton";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { ConnectDevicePanel } from "@/components/settings/ConnectDevicePanel";
 import { DangerZone } from "@/components/settings/DangerZone";
 import { withOG } from "@/lib/seo";

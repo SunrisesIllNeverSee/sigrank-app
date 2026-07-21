@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { MiniBoard } from "@/components/home/MiniBoard";
-import type { LeaderboardRow } from "@/lib/data";
+import type { LeaderboardRow } from "@/lib/board";
 
 /**
  * Draft2BoardsGrid — the "live proof" section for /draft2.

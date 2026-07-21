@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 
 /**
  * POST /api/v1/devices/revoke — kill-switch for a leaked device key (D7 §4.6).

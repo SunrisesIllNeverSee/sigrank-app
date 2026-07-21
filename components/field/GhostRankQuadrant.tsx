@@ -10,7 +10,7 @@
  * Pure inline SVG, no chart libraries.
  */
 
-import type { FieldOperator, GhostRank, FieldMedians } from "@/lib/field/types";
+import type { FieldOperator, GhostRank, FieldMedians } from "@/lib/analytics/field-types";
 
 const GOLD = "#c4923a";
 const CYAN = "#10b981";

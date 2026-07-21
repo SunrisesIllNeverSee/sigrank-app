@@ -8,7 +8,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getOperator, getOperatorHistory } from "@/lib/data";
+import { getOperator, getOperatorHistory } from "@/lib/board";
 
 const MAX_LIMIT = 365;
 

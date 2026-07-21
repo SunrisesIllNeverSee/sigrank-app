@@ -10,8 +10,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { toPng } from "html-to-image";
-import { track } from "@/lib/posthog/events";
-import type { FieldAverages } from "@/lib/data/field-average";
+import { track } from "@/lib/infra/posthog/events";
+import type { FieldAverages } from "@/lib/analytics/field-average";
 
 export interface SplitFlapCardProps {
   codename: string;

@@ -7,7 +7,7 @@
  * Pure inline SVG, no chart libraries.
  */
 
-import type { YieldQuartile } from "@/lib/field/types";
+import type { YieldQuartile } from "@/lib/analytics/field-types";
 
 const GOLD = "#c4923a";
 const CASCADE = "#8b5cf6";

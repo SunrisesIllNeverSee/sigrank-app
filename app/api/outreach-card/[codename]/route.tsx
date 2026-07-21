@@ -14,12 +14,12 @@
  */
 
 import { ImageResponse } from "next/og";
-import { getOperator, getLeaderboard } from "@/lib/data";
+import { getOperator, getLeaderboard } from "@/lib/board";
 import { decodeCodename } from "@/lib/route-params";
-import { sortValue } from "@/lib/data/sort-value";
-import { recordValue } from "@/lib/hall/record-value";
-import { DISPLAY_METRICS, DISPLAY_RAW, CLASS_NAME_TO_GLYPH } from "@/lib/canon/ids";
-import type { LeaderboardRow } from "@/lib/data";
+import { sortValue } from "@/lib/analytics/sort-value";
+import { recordValue } from "@/lib/analytics/record-value";
+import { DISPLAY_METRICS, DISPLAY_RAW, CLASS_NAME_TO_GLYPH } from "@/lib/identity/canon-ids";
+import type { LeaderboardRow } from "@/lib/board";
 
 export const runtime = "nodejs";
 

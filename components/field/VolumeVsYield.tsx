@@ -8,7 +8,7 @@
  * Pure inline SVG, no chart libraries.
  */
 
-import type { FieldOperator, IqrFence } from "@/lib/field/types";
+import type { FieldOperator, IqrFence } from "@/lib/analytics/field-types";
 
 const GOLD = "#c4923a";
 const CASCADE = "#8b5cf6";

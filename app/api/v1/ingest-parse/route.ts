@@ -13,7 +13,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { ingestMeta } from "@/lib/ingest";
 import { pillarsToCore5, computeCascadeMetrics } from "@/lib/ingest/bridge";
-import { scoreSnapshot } from "@/lib/scoring/engine";
+import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
 
 export async function POST(req: NextRequest) {
   let body: unknown;

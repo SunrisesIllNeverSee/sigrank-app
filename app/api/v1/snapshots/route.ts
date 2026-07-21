@@ -25,18 +25,18 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { validateSnapshot } from "@/lib/payload/schema";
+import { validateSnapshot } from "@/lib/ingest/payload-schema";
 import { runIngestGates, type GateContext } from "@/lib/ingest/gates";
 import { runBattery } from "@/lib/ingest/battery";
 import { checkAndStoreAttestation } from "@/lib/ingest/attestation";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import {
   materializeVerifiedSnapshot,
   insertSubmissionOnly,
   revalidateTouchedWindows,
   type MaterializeResult,
 } from "@/lib/ingest/materialize";
-import { captureServer } from "@/lib/posthog/server";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 const SCORING_ETA_SECONDS = 30;
 

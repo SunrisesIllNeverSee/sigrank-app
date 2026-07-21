@@ -1,4 +1,4 @@
-import type { HistoryPoint } from "@/lib/data";
+import type { HistoryPoint } from "@/lib/board";
 
 /**
  * SignaHistoryChart — hand-rolled SVG line+area chart of an operator's SIGNA

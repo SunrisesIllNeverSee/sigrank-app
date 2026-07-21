@@ -9,7 +9,7 @@
  * across the six cascade metrics. All derived from the same rows — no fetch.
  */
 
-import type { LeaderboardRow } from "@/lib/data";
+import type { LeaderboardRow } from "@/lib/board";
 
 // canon superscripts reference the Y.xx token cascade (CANON.md §I-b / lib/canon/ids.ts).
 interface Axis {

@@ -9,7 +9,7 @@
 
 import { CanonId } from "@/components/ui/CanonId";
 import { Placeholder } from "@/components/ui/Placeholder";
-import type { TelemetryRaw } from "@/lib/data";
+import type { TelemetryRaw } from "@/lib/board";
 
 interface Props {
   telemetry: TelemetryRaw;

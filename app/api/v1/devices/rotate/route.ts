@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { isValidAgentPublicKey } from "@/lib/ingest/signature";
-import { captureServer } from "@/lib/posthog/server";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 /**
  * POST /api/v1/devices/rotate — re-enroll a new device key after revocation (D7 §4.6 follow-up).
