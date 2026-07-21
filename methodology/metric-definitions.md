@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Metric Definitions
+description: Formal definitions and formulas for Upsilon, SNR, Velocity, Leverage, 10xDEV, Scale V, and Efficiency with limitations. Active.
+tags: [sigrank, metric-definitions, formulas, upsilon, snr, velocity, spec]
+timestamp: 2026-07-21
+---
+
 # Metric definitions
 
 Let `i = input`, `o = output`, `cw = cache_create`, and `cr = cache_read`. The client-safe implementation uses `safeI = max(i, 1)`.

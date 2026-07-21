@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Ethics
+description: Ethical principles including user agency, no silent collection, transparency, non-maleficence, and data containment. Active.
+tags: [sigrank, ethics, user-agency, transparency, non-maleficence, spec]
+timestamp: 2026-07-21
+---
+
 # Ethics
 
 - **User agency:** people control participation, visibility where available, and deletion choices.

@@ -6,6 +6,7 @@ import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { ConnectDevicePanel } from "@/components/settings/ConnectDevicePanel";
 import { DangerZone } from "@/components/settings/DangerZone";
 import { DataPrivacy } from "@/components/settings/DataPrivacy";
+import { RemovalRequest } from "@/components/settings/RemovalRequest";
 import { withOG } from "@/lib/seo";
 
 /**
@@ -165,6 +166,13 @@ export default async function SettingsPage({
           <DataPrivacy codename={op.codename} initialOptOut={op.dataOptOut} />
         </Section>
       )}
+
+      <Section
+        title="Remove your data"
+        desc="On the board but don't have an account? Request removal here."
+      >
+        <RemovalRequest />
+      </Section>
 
       <Section
         title="Privacy"

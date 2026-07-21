@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Cascade Model
+description: Mathematical decomposition of the cascade into transmission, commitment, and reuse stages telescoping to Upsilon. Active.
+tags: [sigrank, cascade-model, upsilon, transmission, commitment, reuse, spec]
+timestamp: 2026-07-21
+---
+
 # Cascade model
 
 For positive input `i`, output `o`, cache creation `cw`, and cache read `cr`:

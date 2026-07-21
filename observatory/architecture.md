@@ -1,3 +1,11 @@
+---
+type: Design
+title: Architecture
+description: System architecture for the SignalAF app, ingest gate chain, and data layer. Active.
+tags: [sigrank, architecture, ingest, supabase, nextjs, design]
+timestamp: 2026-07-21
+---
+
 # Architecture
 
 ```text

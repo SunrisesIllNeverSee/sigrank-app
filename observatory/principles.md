@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Principles
+description: Foundational principles governing observations, metrics, methodology, user agency, and scientific humility. Active.
+tags: [sigrank, principles, methodology, user-agency, humility, spec]
+timestamp: 2026-07-21
+---
+
 # Principles
 
 1. **Immutable observations.** Preserve submitted observations and their context; correct derived views through explicit recomputation rather than rewriting history.

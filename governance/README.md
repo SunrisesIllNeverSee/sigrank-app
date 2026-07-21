@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Data Governance
+description: How SignalAF collects, derives, presents, retains, and removes data with user agency and data minimization. Active.
+tags: [sigrank, governance, data-policy, user-agency, provenance, reference]
+timestamp: 2026-07-21
+---
+
 # Data governance
 
 Governance defines how SignalAF collects, derives, presents, retains, and removes data. It applies user agency, data minimization, provenance, and a clear separation between live-board identity and research outputs.

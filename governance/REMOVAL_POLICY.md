@@ -1,3 +1,11 @@
+---
+type: Spec
+title: Removal Policy
+description: Self-serve and contact paths for pausing collection, deleting history, or deleting an account with scope and consequence explanation. Active.
+tags: [sigrank, removal-policy, self-service, deletion, account-removal, spec]
+timestamp: 2026-07-21
+---
+
 # Removal policy
 
 Operators should have a self-serve path to pause collection, delete history, or delete an account. The interface must explain scope, consequences, and expected completion state before confirmation.

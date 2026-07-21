@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Ontology
+description: Defines the terms SignalAF uses, from operator submissions through telemetry pillars to cascade metrics and signals. Active.
+tags: [sigrank, ontology, definitions, glossary, terms, reference]
+timestamp: 2026-07-21
+---
+
 # Ontology
 
 This directory defines the terms SignalAF uses. Definitions describe the current product model; they are not claims about an operator beyond the data and method supporting them.

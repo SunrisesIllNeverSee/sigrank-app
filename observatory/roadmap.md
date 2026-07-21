@@ -1,3 +1,11 @@
+---
+type: Roadmap
+title: Roadmap
+description: Near-term and long-term roadmap for the observatory spine, atlas, dataset releases, and research. Active.
+tags: [sigrank, roadmap, atlas, dataset-releases, research, roadmap]
+timestamp: 2026-07-21
+---
+
 # Roadmap
 
 ## Near term

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Field
+description: Comparison distribution defined by a dataset, inclusion policy, time, and metric. Not a universal population. Active.
+tags: [sigrank, field, comparison, distribution, dataset, reference]
+timestamp: 2026-07-21
+---
+
 # Field
 
 The field is the comparison distribution defined by a particular dataset, inclusion policy, time, and metric. It is not a universal population of AI users.
