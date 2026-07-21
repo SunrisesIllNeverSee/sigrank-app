@@ -16,15 +16,7 @@ import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";
-import FieldSNRDistribution from "@/components/field/FieldSNRDistribution";
-import VolumeVsYield from "@/components/field/VolumeVsYield";
-import LeverageVsVelocity from "@/components/field/LeverageVsVelocity";
 import PlatformAdoption from "@/components/field/PlatformAdoption";
-import PlatformYieldQuartile from "@/components/field/PlatformYieldQuartile";
-import CascadeComposition from "@/components/field/CascadeComposition";
-import YieldQuartileBoxPlot from "@/components/field/YieldQuartileBoxPlot";
-import GhostRankQuadrant from "@/components/field/GhostRankQuadrant";
-import BotDetectionPanel from "@/components/field/BotDetectionPanel";
 import CascadeSankey from "@/components/field/CascadeSankey";
 import PercentileBands from "@/components/field/PercentileBands";
 import OperatorArchetypes from "@/components/field/OperatorArchetypes";
@@ -46,30 +38,7 @@ export const revalidate = 3600;
 export default async function FieldPage() {
   const data = await getFieldAnalysis();
   const archetypes = await getArchetypes();
-  const { meta, operators, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
-
-  // Compute platform × yield-quartile breakdown for the stacked bar chart
-  const opsSorted = [...operators].sort((a, b) => a.yield - b.yield);
-  const n = opsSorted.length;
-  const qSize = Math.floor(n / 4);
-  const quartileSlices = [
-    opsSorted.slice(0, qSize),
-    opsSorted.slice(qSize, 2 * qSize),
-    opsSorted.slice(2 * qSize, 3 * qSize),
-    opsSorted.slice(3 * qSize),
-  ];
-  const topPlatforms = ["anthropic", "openai", "google", "zhipu", "deepseek", "other"];
-  const quartilePlatformData = quartileSlices.map((slice, i) => {
-    const counts = new Map<string, number>();
-    for (const op of slice) {
-      const plat = topPlatforms.includes(op.platform) ? op.platform : "other";
-      counts.set(plat, (counts.get(plat) ?? 0) + 1);
-    }
-    return {
-      quartile: yield_quartiles[i]?.label ?? `Q${i + 1}`,
-      platforms: topPlatforms.map((p) => ({ platform: p, count: counts.get(p) ?? 0 })),
-    };
-  });
+  const { meta, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
 
   // JSON-LD Dataset schema for the field analysis
   const fieldDataset = {
@@ -166,12 +135,11 @@ export default async function FieldPage() {
           Volume ≠ Yield
         </h2>
         <div className="overflow-x-auto">
-          <VolumeVsYield
-            operators={operators}
-            medianYield={meta.medians.yield}
-            medianTokens={meta.medians.total_tokens}
-            yieldFence={meta.iqr_fences.yield}
-            tokensFence={meta.iqr_fences.total_tokens}
+          <img
+            src="/field-charts/volume-vs-yield.svg"
+            alt="Volume vs Yield scatter plot — 1,627 operators on log-log scale showing near-zero correlation between total tokens and yield"
+            className="w-full"
+            loading="lazy"
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -218,10 +186,11 @@ export default async function FieldPage() {
           The SNR Separation
         </h2>
         <div className="overflow-x-auto">
-          <FieldSNRDistribution
-            operators={operators}
-            median={meta.medians.snr}
-            fence={meta.iqr_fences.snr}
+          <img
+            src="/field-charts/snr-distribution.svg"
+            alt="SNR distribution histogram — 1,627 human operators, 20 buckets, log scale"
+            className="w-full"
+            loading="lazy"
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -243,12 +212,11 @@ export default async function FieldPage() {
           Leverage × Velocity
         </h2>
         <div className="overflow-x-auto">
-          <LeverageVsVelocity
-            operators={operators}
-            medianLeverage={meta.medians.leverage}
-            medianVelocity={meta.medians.velocity}
-            leverageFence={meta.iqr_fences.leverage}
-            velocityFence={meta.iqr_fences.velocity}
+          <img
+            src="/field-charts/leverage-vs-velocity.svg"
+            alt="Leverage vs Velocity scatter plot — IQR-trimmed, showing yield as rectangle area"
+            className="w-full"
+            loading="lazy"
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -274,7 +242,12 @@ export default async function FieldPage() {
           <PlatformAdoption platforms={platform_adoption} />
         </div>
         <div className="mt-2 overflow-x-auto">
-          <PlatformYieldQuartile data={quartilePlatformData} />
+          <img
+          src="/field-charts/platform-yield-quartile.svg"
+          alt="Platform × Yield Quartile — Claude dominance in top quartile"
+          className="w-full"
+          loading="lazy"
+        />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
           Anthropic-primary operators dominate the top yield quartile — 98.5% of the highest-yield
@@ -296,7 +269,12 @@ export default async function FieldPage() {
           Cascade Composition
         </h2>
         <div className="overflow-x-auto">
-          <CascadeComposition operators={notable_operators} />
+          <img
+          src="/field-charts/cascade-composition.svg"
+          alt="Cascade composition — 4 notable operators, log-scaled segments"
+          className="w-full"
+          loading="lazy"
+        />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
           Four notable operators, four radically different cascade architectures. The stacked bars
@@ -324,7 +302,12 @@ export default async function FieldPage() {
           Yield Quartile Box Plots
         </h2>
         <div className="overflow-x-auto">
-          <YieldQuartileBoxPlot quartiles={yield_quartiles} />
+          <img
+          src="/field-charts/yield-quartile-boxplots.svg"
+          alt="Yield quartile box plots — 4 metrics × 4 quartiles"
+          className="w-full"
+          loading="lazy"
+        />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
           The box plots break down four metrics — yield, leverage, velocity, and SNR — across the
@@ -428,10 +411,11 @@ export default async function FieldPage() {
           the hundreds of thousands. Volume metrics hide them. Yield metrics find them.
         </p>
         <div className="overflow-x-auto">
-          <GhostRankQuadrant
-            operators={operators}
-            ghostRanks={ghost_ranks}
-            medians={meta.medians}
+          <img
+            src="/field-charts/ghost-rank-quadrant.svg"
+            alt="Ghost rank quadrant — Q2 low volume high yield operators, 1,598 operators on log-log scale"
+            className="w-full"
+            loading="lazy"
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -530,7 +514,12 @@ export default async function FieldPage() {
         <h2 className="font-sans text-2xl font-bold text-text-primary">
           Outlier Detection
         </h2>
-        <BotDetectionPanel operators={operators} bots={[]} />
+        <img
+        src="/field-charts/outlier-detection.svg"
+        alt="Outlier detection — SNR vs total tokens, 1,610 humans, 17 flagged outliers"
+        className="w-full"
+        loading="lazy"
+      />
         <BotZoneShading />
         <p className="text-sm leading-relaxed text-text-secondary">
           SigRank&apos;s metrics catch gaming automatically. A 6-signal outlier-likelihood score
