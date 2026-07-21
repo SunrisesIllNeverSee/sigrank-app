@@ -159,8 +159,8 @@ export default async function SettingsPage({
 
       {op && (
         <Section
-          title="Data & Privacy"
-          desc="Manage what we collect and when collection stops."
+          title="Privacy & Data"
+          desc="Manage what we collect, pause collection, or delete your data."
         >
           <DataPrivacy codename={op.codename} initialOptOut={op.dataOptOut} />
         </Section>
@@ -173,38 +173,15 @@ export default async function SettingsPage({
         <p className="font-sans text-[11px] leading-relaxed text-text-dim">
           The free tier reads token counts, model ids, and content lengths
           locally. No transcripts leave your device. You can pause collection
-          or delete your data anytime from{" "}
-          <Link
-            href="/settings"
-            className="text-text-muted underline hover:text-text-secondary"
-          >
-            Settings
-          </Link>
-          . See{" "}
-          <Link
-            href="/about"
-            className="text-text-muted underline hover:text-text-secondary"
-          >
-            how it works
-          </Link>{" "}
-          and our{" "}
+          or delete your data anytime from this page. See our{" "}
           <Link
             href="/privacy"
             className="text-text-muted underline hover:text-text-secondary"
           >
             Privacy Policy
-          </Link>
-          .
+          </Link>{" "}
+          for details on data retention and your rights.
         </p>
-      </Section>
-
-      <Section title="Support" desc="Support the build with a one-time contribution.">
-        <Link
-          href="/upgrade"
-          className="w-fit rounded-md bg-gold px-4 py-2 font-semibold text-bg-base transition-colors hover:bg-gold/90"
-        >
-          Support the build →
-        </Link>
       </Section>
 
       {op && (

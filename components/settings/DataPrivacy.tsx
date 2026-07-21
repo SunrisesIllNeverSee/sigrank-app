@@ -199,21 +199,15 @@ export function DataPrivacy({ codename, initialOptOut }: DataPrivacyProps) {
       )}
 
       <p className="font-sans text-[11px] leading-relaxed text-text-dim">
-        To permanently delete your account (including your profile and login), use{" "}
+        To permanently delete your account (including your profile and login),
+        use{" "}
         <Link
           href="#danger-zone"
           className="text-text-muted underline hover:text-text-secondary"
         >
-          Danger zone
+          Delete account
         </Link>{" "}
-        below. See{" "}
-        <Link
-          href="/privacy"
-          className="text-text-muted underline hover:text-text-secondary"
-        >
-          Privacy Policy
-        </Link>{" "}
-        for details on data retention and your rights.
+        below.
       </p>
     </div>
   );
