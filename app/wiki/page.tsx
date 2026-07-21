@@ -51,7 +51,7 @@ export const metadata: Metadata = withOG({
  * from the hub. Owner 2026-06-23: proof goes per-topic; console stays the browse UI. */
 function withPermalink(slug: string, node: React.ReactNode) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="mx-auto flex max-w-6xl flex-col gap-3">
       <Link
         href={`/wiki/${slug}`}
         className="w-fit font-mono text-[11px] uppercase tracking-wide text-text-accent underline-offset-2 hover:underline"

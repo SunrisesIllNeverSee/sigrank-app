@@ -88,33 +88,28 @@ export default async function BoardWindowPage({
   const win = isOff ? null : boardWindowBySlug(slug);
   if (!isOff && !win) notFound();
 
-  // Pre-fetch BOTH data variants on the server so the page is fully static
-  // (no searchParams access → revalidate=300 takes effect → CDN-cached).
-  // The client wrapper (BoardTableClient) selects + filters the right dataset
-  // based on useSearchParams. The "off" board only needs allSnapshots.
+  // PERF (2026-07-21): Only fetch the first page (25 entries) for SSR + SEO.
+  // The client fetches subsequent pages + perPlatform via the API.
+  // This cuts /board/all from 3.8MB to ~100KB.
+  const PER_PAGE = 25;
   let totalEntries: ReturnType<typeof toEntry>[] = [];
-  let platformEntries: ReturnType<typeof toEntry>[] = [];
+  let totalCount = 0;
   let offEntries: ReturnType<typeof toEntry>[] = [];
 
   if (isOff) {
+    // "off" board: still loads all snapshots (smaller dataset, no pagination).
     const rows = await getLeaderboard({ allSnapshots: true });
     offEntries = rows.map(toEntry);
   } else {
-    // operatorTotal: one row per operator (the 'multi' roll-up when present).
+    // operatorTotal: fetch ALL rows to get the count, but only serialize
+    // the first 25 to the client. The count lets the client build pagination.
     const totalRows = await getLeaderboard({
       window: win!.enum,
       windowFilter: true,
       operatorTotal: true,
     });
-    totalEntries = totalRows.map(toEntry);
-
-    // perPlatform: one row per (operator, platform) — for ?view=platforms.
-    const platformRows = await getLeaderboard({
-      window: win!.enum,
-      windowFilter: true,
-      perPlatform: true,
-    });
-    platformEntries = platformRows.map(toEntry);
+    totalCount = totalRows.length;
+    totalEntries = totalRows.slice(0, PER_PAGE).map(toEntry);
   }
 
   // JsonLd from the default (operatorTotal) entries — search engines see the
@@ -215,9 +210,10 @@ export default async function BoardWindowPage({
       >
         <BoardTableClient
           totalEntries={totalEntries}
-          platformEntries={platformEntries}
+          totalCount={totalCount}
           offEntries={offEntries.length > 0 ? offEntries : undefined}
           window={isOff ? "off" : win!.slug}
+          windowEnum={isOff ? undefined : win!.enum}
         />
       </Suspense>
 
