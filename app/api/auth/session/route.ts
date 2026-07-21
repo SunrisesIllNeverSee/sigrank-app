@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 
 /**
  * GET /api/auth/session — the current signed-in operator's PUBLIC display fields

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionUser } from "@/lib/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/supabase/server";
-import { captureServer } from "@/lib/posthog/server";
+import { getSessionUser } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 /**
  * POST /api/v1/claim — claim an existing unclaimed seeded operator profile.

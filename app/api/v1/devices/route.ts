@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseService } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 
 /**
  * GET /api/v1/devices — the signed-in operator's enrolled devices (D7 §4.4).

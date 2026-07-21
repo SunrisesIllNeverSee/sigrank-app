@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Placeholder } from "@/components/ui/Placeholder";
-import type { HomepageStats } from "@/lib/data";
+import type { HomepageStats } from "@/lib/board";
 
 /**
  * Draft2LiveActivity — the macro-stats "live activity" block. Five cells: Operators

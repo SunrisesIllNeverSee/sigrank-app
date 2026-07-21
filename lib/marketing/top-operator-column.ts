@@ -1,5 +1,5 @@
-import { getLeaderboard, type LeaderboardRow } from "@/lib/data";
-import { isOutlierRow } from "@/lib/data/outlier-classify";
+import { getLeaderboard, type LeaderboardRow } from "@/lib/board";
+import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 
 /**
  * lib/marketing/top-operator-column.ts — the live columns for the Four Degrees chart

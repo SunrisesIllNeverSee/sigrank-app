@@ -8,7 +8,7 @@ import {
   CLASS_FILTER,
   type PlatformUI,
 } from "@/lib/constants";
-import { BOARD_WINDOWS } from "@/lib/data/windows";
+import { BOARD_WINDOWS } from "@/lib/board/windows";
 
 /** The Hall record-state tabs (verification / dispute lifecycle). */
 export const HALL_STATE_TABS = [

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe/server";
-import { getSupabaseServer } from "@/lib/supabase/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
+import { getStripe } from "@/lib/infra/stripe/server";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 
 /**
  * POST /api/v1/billing/portal

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionOperator } from "@/lib/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
 
 /**
  * POST /api/v1/profile/codename — change the signed-in operator's codename.

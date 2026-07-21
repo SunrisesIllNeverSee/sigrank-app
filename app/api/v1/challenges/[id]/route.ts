@@ -24,8 +24,8 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseServer } from "@/lib/supabase/server";
-import { resolveAuth } from "@/lib/api/auth";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { resolveAuth } from "@/lib/infra/api-auth";
 
 function compositeScore(
   d: number,

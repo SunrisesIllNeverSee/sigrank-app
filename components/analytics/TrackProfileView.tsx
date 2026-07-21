@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { track } from "@/lib/posthog/events";
+import { track } from "@/lib/infra/posthog/events";
 
 /**
  * Fires profile_viewed on mount. is_own is resolved exactly like ProfileEditModal:

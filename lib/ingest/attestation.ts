@@ -16,8 +16,8 @@ import "server-only";
  * their JSONL files between submissions is caught by the inconsistency.
  */
 
-import { getSupabaseService } from "@/lib/supabase/server";
-import type { SnapshotPayloadV1 } from "@/lib/payload/schema";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
+import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
 import type { GateReason } from "@/lib/ingest/gates";
 
 const flag = (code: string, detail: string): GateReason => ({

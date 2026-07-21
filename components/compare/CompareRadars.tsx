@@ -16,8 +16,8 @@
  */
 
 import React from "react";
-import type { LeaderboardRow } from "@/lib/data";
-import { operatorDisplayName } from "@/lib/compare/operator-name";
+import type { LeaderboardRow } from "@/lib/board";
+import { operatorDisplayName } from "@/lib/identity/operator-name";
 import CascadeRadar, {
   type CascadeRadarSeries,
 } from "@/components/charts/CascadeRadar";

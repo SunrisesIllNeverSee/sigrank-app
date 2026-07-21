@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { track } from "@/lib/posthog/events";
+import { track } from "@/lib/infra/posthog/events";
 
 /**
  * Fires compare_viewed when a user lands on /compare with both operators

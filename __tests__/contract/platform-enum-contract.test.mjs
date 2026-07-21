@@ -83,11 +83,11 @@ function extractMcpEnum(filePath) {
 
 /**
  * Detect which repo we're in by looking for the marker files.
- * sigrank-app has `lib/payload/schema.ts`; sigrank-mcp has `submit.mjs`.
+ * sigrank-app has `lib/ingest/payload-schema.ts`; sigrank-mcp has `submit.mjs`.
  */
 function detectRepo(rootDir) {
   try {
-    readFileSync(join(rootDir, "lib/payload/schema.ts"), "utf8");
+    readFileSync(join(rootDir, "lib/ingest/payload-schema.ts"), "utf8");
     return "web";
   } catch {
     try {
@@ -95,7 +95,7 @@ function detectRepo(rootDir) {
       return "mcp";
     } catch {
       throw new Error(
-        `Could not detect repo type at ${rootDir} (no schema.ts or submit.mjs)`,
+        `Could not detect repo type at ${rootDir} (no payload-schema.ts or submit.mjs)`,
       );
     }
   }
@@ -107,7 +107,7 @@ function detectRepo(rootDir) {
 function getEnumForRepo(repoDir) {
   const type = detectRepo(repoDir);
   if (type === "web") {
-    return extractWebEnum(join(repoDir, "lib/payload/schema.ts"));
+    return extractWebEnum(join(repoDir, "lib/ingest/payload-schema.ts"));
   } else {
     return extractMcpEnum(join(repoDir, "submit.mjs"));
   }

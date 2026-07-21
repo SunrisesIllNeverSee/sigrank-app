@@ -11,12 +11,12 @@
  * server component over two rows + the shared narrate/facts helpers — no fetch.
  */
 
-import type { LeaderboardRow } from "@/lib/data";
-import { operatorDisplayName } from "@/lib/compare/operator-name";
+import type { LeaderboardRow } from "@/lib/board";
+import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
 import { colors } from "@/components/sigrank/tokens";
-import { glyphFor } from "@/lib/canon/ids";
-import { deriveFacts, type OperatorFact } from "@/lib/compare/facts";
+import { glyphFor } from "@/lib/identity/canon-ids";
+import { deriveFacts, type OperatorFact } from "@/lib/analytics/compare-facts";
 import {
   CompareSelectors,
   type CompareOption,

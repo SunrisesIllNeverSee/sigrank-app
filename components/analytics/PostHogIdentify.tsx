@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { initPostHog, posthog } from "@/lib/posthog/client";
+import { initPostHog, posthog } from "@/lib/infra/posthog/client";
 
 // Marks that THIS browser identified an operator, so a later logged-out load can
 // reset() to a fresh anonymous id instead of leaking the prior person.
