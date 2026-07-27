@@ -138,6 +138,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/volume-vs-yield.svg"
             alt="Volume vs Yield scatter plot — 1,627 operators on log-log scale showing near-zero correlation between total tokens and yield"
+            width={800}
+            height={480}
             className="h-auto w-full"
             style={{ aspectRatio: "800 / 480" }}
             loading="lazy"
@@ -190,6 +192,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/snr-distribution.svg"
             alt="SNR distribution histogram — 1,627 human operators, 20 buckets, log scale"
+            width={800}
+            height={340}
             className="h-auto w-full"
             style={{ aspectRatio: "800 / 340" }}
             loading="lazy"
@@ -217,6 +221,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/leverage-vs-velocity.svg"
             alt="Leverage vs Velocity scatter plot — IQR-trimmed, showing yield as rectangle area"
+            width={800}
+            height={420}
             className="h-auto w-full"
             style={{ aspectRatio: "800 / 420" }}
             loading="lazy"
@@ -248,6 +254,8 @@ export default async function FieldPage() {
           <img
           src="/field-charts/platform-yield-quartile.svg"
           alt="Platform × Yield Quartile — Claude dominance in top quartile"
+          width={800}
+          height={380}
           className="h-auto w-full"
           style={{ aspectRatio: "800 / 380" }}
           loading="lazy"
@@ -276,6 +284,8 @@ export default async function FieldPage() {
           <img
           src="/field-charts/cascade-composition.svg"
           alt="Cascade composition — 4 notable operators, log-scaled segments"
+          width={800}
+          height={400}
           className="h-auto w-full"
           style={{ aspectRatio: "800 / 400" }}
           loading="lazy"
@@ -310,6 +320,8 @@ export default async function FieldPage() {
           <img
           src="/field-charts/yield-quartile-boxplots.svg"
           alt="Yield quartile box plots — 4 metrics × 4 quartiles"
+          width={800}
+          height={420}
           className="h-auto w-full"
           style={{ aspectRatio: "800 / 420" }}
           loading="lazy"
@@ -420,6 +432,8 @@ export default async function FieldPage() {
           <img
             src="/field-charts/ghost-rank-quadrant.svg"
             alt="Ghost rank quadrant — Q2 low volume high yield operators, 1,598 operators on log-log scale"
+            width={800}
+            height={480}
             className="h-auto w-full"
             style={{ aspectRatio: "800 / 480" }}
             loading="lazy"
@@ -524,6 +538,8 @@ export default async function FieldPage() {
         <img
         src="/field-charts/outlier-detection.svg"
         alt="Outlier detection — SNR vs total tokens, 1,610 humans, 17 flagged outliers"
+        width={800}
+        height={320}
         className="h-auto w-full"
         style={{ aspectRatio: "800 / 320" }}
         loading="lazy"
