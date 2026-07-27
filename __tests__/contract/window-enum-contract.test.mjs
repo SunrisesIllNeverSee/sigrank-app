@@ -104,7 +104,7 @@ function getWindowsForRepo(repoDir) {
   if (type === "web") {
     return extractWebWindows(join(repoDir, "lib/constants.ts"));
   } else {
-    return extractMcpWindows(join(repoDir, "submit.mjs"));
+    return extractMcpWindows(join(repoDir, "submit/index.mjs"));
   }
 }
 
