@@ -64,6 +64,13 @@ export const snapshotPayloadSchema = z
     device_id: z.string().uuid(),
     submitted_at: isoDateTime,
 
+    // D1 consent tracking (migration 0029): the agent sends these so the server
+    // can record which terms/privacy version the operator acknowledged. Optional
+    // — v1.0 payloads without them are still accepted (backward compat).
+    consent_acknowledged: z.boolean().optional(),
+    terms_version: z.string().optional(),
+    privacy_version: z.string().optional(),
+
     window: z
       .object({
         type: windowTypeEnum,
