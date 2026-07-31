@@ -1,0 +1,67 @@
+name: Sync MCP version
+
+# Receives a repository_dispatch event from sigrank-mcp when it publishes a new
+# npm version. Updates MCP_VERSION in lib/constants.ts and commits to main.
+# Vercel auto-deploys from main, so the app's install instructions + platform
+# counts stay in sync with the live npm package automatically.
+#
+# Trigger: repository_dispatch event_type=sync-mcp-version
+# Payload: { "version": "0.0.181", "mcp_sha": "abc123..." }
+#
+# Requires: CROSS_REPO_PAT secret (same PAT as sigrank-mcp uses to dispatch)
+
+on:
+  repository_dispatch:
+    types: [sync-mcp-version]
+
+permissions:
+  contents: write # needed to commit the version update
+
+jobs:
+  sync:
+    name: Update MCP_VERSION → ${{ github.event.client_payload.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.CROSS_REPO_PAT }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Update MCP_VERSION in lib/constants.ts
+        run: |
+          NEW_VERSION="${{ github.event.client_payload.version }}"
+          CURRENT_VERSION=$(node -p "require('./lib/constants.ts'.replace('.ts',''))" 2>/dev/null || \
+            grep -oP "MCP_VERSION\s*=\s*\"[^\"]+\"" lib/constants.ts | grep -oP "\"[^\"]+\"" | tr -d '"')
+
+          if [ "$NEW_VERSION" = "$CURRENT_VERSION" ]; then
+            echo "MCP_VERSION is already $NEW_VERSION — nothing to do."
+            exit 0
+          fi
+
+          echo "Updating MCP_VERSION: $CURRENT_VERSION → $NEW_VERSION"
+          sed -i "s/export const MCP_VERSION = \"[^\"]*\"/export const MCP_VERSION = \"$NEW_VERSION\"/" lib/constants.ts
+
+          # Verify the sed worked
+          UPDATED=$(grep -oP "MCP_VERSION\s*=\s*\"[^\"]+\"" lib/constants.ts | grep -oP "\"[^\"]+\"" | tr -d '"')
+          if [ "$UPDATED" != "$NEW_VERSION" ]; then
+            echo "✗ FAIL: MCP_VERSION not updated correctly. Expected $NEW_VERSION, got $UPDATED"
+            exit 1
+          fi
+          echo "✓ MCP_VERSION updated to $NEW_VERSION"
+
+      - name: Commit + push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add lib/constants.ts
+          if git diff --cached --quiet; then
+            echo "No changes — MCP_VERSION was already up to date."
+          else
+            git commit -m "chore: sync MCP_VERSION → ${{ github.event.client_payload.version }} [skip ci]"
+            git push origin main
+            echo "✓ Pushed MCP_VERSION update. Vercel will auto-deploy."
+          fi
