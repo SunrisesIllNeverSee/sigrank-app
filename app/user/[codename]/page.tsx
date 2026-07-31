@@ -144,22 +144,34 @@ export default async function OperatorProfilePage({
 
   const { operator, snapshot, telemetry } = row;
   const pending = row.pending ?? false;
-  const history = await getOperatorHistory(codename);
-  // FIX I3: every (platform × window) submission for the Submissions-tab grid.
-  const submissions = await getOperatorSubmissions(codename);
-  // Cascade Report System Phase 1: fetch the operator's latest report block.
-  // Returns null if no report exists (operator hasn't submitted with sigrank@0.16.0+).
-  const operatorReport = await getOperatorReport(operator.operator_id);
+
+  // PERF (2026-07-31): parallelize all independent data fetches.
+  // Was 7 sequential awaits (7 round trips); now 1 Promise.all after the
+  // initial getOperator (which is needed for operator.operator_id).
+  // getOperatorHistory, getOperatorSubmissions, getSessionOperator,
+  // getSessionUser, getLeaderboard, getHallOfSignal are all independent.
+  // getOperatorReport depends on operator.operator_id from the row above.
+  const [
+    history,
+    submissions,
+    operatorReport,
+    session,
+    sessionUser,
+    boardRows,
+    hallRecords,
+  ] = await Promise.all([
+    getOperatorHistory(codename),
+    getOperatorSubmissions(codename),
+    getOperatorReport(operator.operator_id),
+    getSessionOperator(),
+    getSessionUser(),
+    getLeaderboard(),
+    getHallOfSignal(),
+  ]);
 
   // Owner check: is the signed-in user viewing their own profile?
   // Used to show the privacy toggle on the Report tab and interactive sliders on the Lab tab.
-  const session = await getSessionOperator();
   const isOwner = !!(session && session.codename === operator.codename);
-  // For the ClaimTab: is the viewer signed in (auth user exists), and do they
-  // already have a linked operator? getSessionOperator returns null both when
-  // not signed in AND when signed in but not linked — so we check getSessionUser
-  // separately to distinguish the two states.
-  const sessionUser = await getSessionUser();
 
   const topPct = Math.max(0, 100 - row.percentile);
 
@@ -170,14 +182,8 @@ export default async function OperatorProfilePage({
   // the card (AVG USER column, radar field polygon, op-ratio footer) comes
   // from the live board, so they always agree and move with the field.
   // (owner 2026-07-14: filtered to Human Center of Mass — outliers/bots excluded.)
-  const boardRows = await getLeaderboard();
   const humanRows = boardRows.filter((r) => !isOutlierRow(r));
   const fieldAvg = computeFieldAverages(humanRows);
-
-  // Hall of Signal records for this operator — fed to the profile JSON-LD
-  // (achievement schema). OperatorRecords fetches the Hall again internally
-  // (it's cached via unstable_cache), so no duplicate DB hit.
-  const hallRecords = await getHallOfSignal();
   const operatorHallNames = new Set<string>([operator.codename]);
   if (operator.display_name) operatorHallNames.add(operator.display_name);
   const operatorRecords: HallRecord[] = hallRecords.filter((r) =>
