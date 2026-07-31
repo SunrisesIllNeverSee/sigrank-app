@@ -1,67 +1,84 @@
 name: Sync MCP version
 
-# Receives a repository_dispatch event from sigrank-mcp when it publishes a new
-# npm version. Updates MCP_VERSION in lib/constants.ts and commits to main.
-# Vercel auto-deploys from main, so the app's install instructions + platform
-# counts stay in sync with the live npm package automatically.
+# Checks npm for the latest sigrank-mcp version and updates MCP_VERSION in
+# lib/constants.ts if it's behind. Runs on schedule (daily) + on push to main.
 #
-# Trigger: repository_dispatch event_type=sync-mcp-version
-# Payload: { "version": "0.0.181", "mcp_sha": "abc123..." }
+# No CROSS_REPO_PAT needed — this repo checks npm directly (public, no auth)
+# and commits to its own main using the default GITHUB_TOKEN.
 #
-# Requires: CROSS_REPO_PAT secret (same PAT as sigrank-mcp uses to dispatch)
+# This replaces the old repository_dispatch approach which required a PAT
+# on both repos. Simpler, fewer secrets, same result.
 
 on:
-  repository_dispatch:
-    types: [sync-mcp-version]
+  schedule:
+    # Daily at 07:00 UTC (1h after the MCP publish window at 06:00)
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-mcp-version.yml"
 
 permissions:
-  contents: write # needed to commit the version update
+  contents: write
 
 jobs:
   sync:
-    name: Update MCP_VERSION → ${{ github.event.client_payload.version }}
+    name: Check npm + sync MCP_VERSION
     runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 0
-          token: ${{ secrets.CROSS_REPO_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v7
         with:
           node-version: 22
 
-      - name: Update MCP_VERSION in lib/constants.ts
+      - name: Check npm version vs MCP_VERSION
+        id: check
         run: |
-          NEW_VERSION="${{ github.event.client_payload.version }}"
-          CURRENT_VERSION=$(node -p "require('./lib/constants.ts'.replace('.ts',''))" 2>/dev/null || \
-            grep -oP "MCP_VERSION\s*=\s*\"[^\"]+\"" lib/constants.ts | grep -oP "\"[^\"]+\"" | tr -d '"')
+          NPM_VERSION=$(npm view sigrank version 2>/dev/null)
+          CURRENT_VERSION=$(grep -oP 'MCP_VERSION\s*=\s*"[^"]+"' lib/constants.ts | grep -oP '"[^"]+"' | tr -d '"')
 
-          if [ "$NEW_VERSION" = "$CURRENT_VERSION" ]; then
-            echo "MCP_VERSION is already $NEW_VERSION — nothing to do."
+          echo "npm:     $NPM_VERSION"
+          echo "current: $CURRENT_VERSION"
+
+          if [ -z "$NPM_VERSION" ]; then
+            echo "✗ Could not fetch npm version — skipping"
             exit 0
           fi
 
-          echo "Updating MCP_VERSION: $CURRENT_VERSION → $NEW_VERSION"
+          if [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
+            echo "Already in sync ($NPM_VERSION) — nothing to do."
+            echo "needs_update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Drift detected: $CURRENT_VERSION → $NPM_VERSION"
+            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+            echo "npm_version=$NPM_VERSION" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update MCP_VERSION
+        if: steps.check.outputs.needs_update == 'true'
+        run: |
+          NEW_VERSION="${{ steps.check.outputs.npm_version }}"
           sed -i "s/export const MCP_VERSION = \"[^\"]*\"/export const MCP_VERSION = \"$NEW_VERSION\"/" lib/constants.ts
 
-          # Verify the sed worked
-          UPDATED=$(grep -oP "MCP_VERSION\s*=\s*\"[^\"]+\"" lib/constants.ts | grep -oP "\"[^\"]+\"" | tr -d '"')
+          # Verify
+          UPDATED=$(grep -oP 'MCP_VERSION\s*=\s*"[^"]+"' lib/constants.ts | grep -oP '"[^"]+"' | tr -d '"')
           if [ "$UPDATED" != "$NEW_VERSION" ]; then
-            echo "✗ FAIL: MCP_VERSION not updated correctly. Expected $NEW_VERSION, got $UPDATED"
+            echo "✗ FAIL: MCP_VERSION not updated correctly"
             exit 1
           fi
-          echo "✓ MCP_VERSION updated to $NEW_VERSION"
+          echo "✓ MCP_VERSION → $NEW_VERSION"
 
       - name: Commit + push
+        if: steps.check.outputs.needs_update == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add lib/constants.ts
-          if git diff --cached --quiet; then
-            echo "No changes — MCP_VERSION was already up to date."
-          else
-            git commit -m "chore: sync MCP_VERSION → ${{ github.event.client_payload.version }} [skip ci]"
-            git push origin main
-            echo "✓ Pushed MCP_VERSION update. Vercel will auto-deploy."
-          fi
+          git commit -m "chore: sync MCP_VERSION → ${{ steps.check.outputs.npm_version }} [skip ci]"
+          git push origin main
+          echo "✓ Pushed. Vercel will auto-deploy."
