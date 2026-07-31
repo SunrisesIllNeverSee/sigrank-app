@@ -25,6 +25,7 @@ import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { getLeaderboard } from "@/lib/board";
 import { toEntry } from "@/lib/board/to-entry";
+import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
@@ -38,9 +39,9 @@ import { BoardTableClient } from "@/components/board/BoardTableClient";
 // The 300s ISR was over-validating — 3600s cuts ~92% of ISR invocations.
 export const revalidate = 3600;
 
-/** Statically render the four known windows + the "off" (filter-off) board. */
+/** Statically render the four known windows. "off" board disabled (egress fix). */
 export function generateStaticParams() {
-  return [...BOARD_WINDOWS.map((w) => ({ window: w.slug })), { window: "off" }];
+  return BOARD_WINDOWS.map((w) => ({ window: w.slug }));
 }
 
 /** Per-window OG metadata. */
@@ -50,10 +51,9 @@ export async function generateMetadata({
   params: Promise<{ window: string }>;
 }): Promise<Metadata> {
   const { window: slug } = await params;
-  const isOff = slug === "off";
-  const win = isOff ? null : boardWindowBySlug(slug);
-  if (!isOff && !win) return { title: "Board not found" };
-  const label = isOff ? "All-time" : win!.label;
+  const win = boardWindowBySlug(slug);
+  if (!win) return { title: "Board not found" };
+  const label = win.label;
   return withOG({
     title: `${label} Leaderboard`,
     description: `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
@@ -75,37 +75,33 @@ export default async function BoardWindowPage({
   const { window: slug } = await params;
 
   // Legacy alias (owner 2026-06-25): the old "everything" firehose was removed. Any
-  // surviving /board/everything link forwards to the new default so it never 404s.
-  if (slug === "everything") redirect("/board/off");
+  // surviving /board/everything link forwards to /board/all so it never 404s.
+  if (slug === "everything") redirect("/board/all");
 
-  // "off" board (owner 2026-06-26 — FIX F): filters off shows ALL of an operator's
-  // submissions broken out by (platform × window) — every snapshot point, no collapse —
-  // each row LABELED (codename · platform · window) so the breakouts read as intentional,
-  // not the old unlabeled "everything" firehose. allSnapshots keeps every row; the window
-  // label (LeaderboardTable, win==='off') + platform column disambiguate the duplicates.
-  const isOff = slug === "off";
-  // The route slug is the primary WINDOW selector (default board = /board/all = all_time).
-  const win = isOff ? null : boardWindowBySlug(slug);
-  if (!isOff && !win) notFound();
+  // "off" board disabled (egress fix 2026-07-31): the allSnapshots path pulled
+  // all 2,413 rows on every ISR cycle. Redirect to /board/all (the static
+  // all_time board covers the same operators).
+  if (slug === "off") redirect("/board/all");
 
-  // PERF (2026-07-21): Fetch all operatorTotal entries for the client-side
-  // HCM filter + pagination. The perPlatform dataset (3,690 entries) was
-  // removed — it's now fetched via API only when ?view=platforms is clicked.
-  // This cuts /board/all from 3.8MB to ~2MB (operatorTotal only, no perPlatform).
+  const win = boardWindowBySlug(slug);
+  if (!win) notFound();
+
+  // EGRESS FIX (2026-07-31): all_time board reads a static JSON snapshot
+  // (public/data/board-all_time.json, generated daily by GitHub Action).
+  // This eliminates ~90% of Supabase egress (2,184 rows → 0 per request).
+  // 7d/30d/90d stay LIVE via DB-side window-filtered queries (~42 KB each).
   let totalEntries: ReturnType<typeof toEntry>[] = [];
   let totalCount = 0;
-  let offEntries: ReturnType<typeof toEntry>[] = [];
 
-  if (isOff) {
-    // "off" board: still loads all snapshots (smaller dataset, no pagination).
-    const rows = await getLeaderboard({ allSnapshots: true });
-    offEntries = rows.map(toEntry);
+  if (win.enum === "all_time") {
+    // Static path: read pre-generated JSON from public/data/
+    totalEntries = getStaticAllTimeBoard() as ReturnType<typeof toEntry>[];
+    totalCount = totalEntries.length;
   } else {
-    // operatorTotal: one row per operator (the 'multi' roll-up when present).
-    // Fetch ALL rows — the client-side HCM filter needs the full pool to
-    // produce 33 pages (825 humans out of 1,638 total).
+    // Live path: DB-side window-filtered query (egress fix — fetches only
+    // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
     const totalRows = await getLeaderboard({
-      window: win!.enum,
+      window: win.enum,
       windowFilter: true,
       operatorTotal: true,
     });
@@ -115,16 +111,14 @@ export default async function BoardWindowPage({
 
   // JsonLd from the default (operatorTotal) entries — search engines see the
   // default board. Filtered variants are client-side and don't need structured data.
-  const jsonLdEntries = isOff ? offEntries : totalEntries;
+  const jsonLdEntries = totalEntries;
 
   // Dynamic H1 label: each board window gets a unique page heading (e.g.
   // "30-Day Leaderboard" vs "All-Time Leaderboard") so /board/all and /board/30d
   // don't share the same H1. "Burners, Builders & 10×ers" moves to the eyebrow.
-  const boardLabel = isOff
+  const boardLabel = win.slug === "all"
     ? "All-Time"
-    : win!.slug === "all"
-      ? "All-Time"
-      : `${win!.days}-Day`;
+    : `${win.days}-Day`;
 
   return (
     <div className="flex flex-col gap-6">
@@ -212,9 +206,8 @@ export default async function BoardWindowPage({
         <BoardTableClient
           totalEntries={totalEntries}
           totalCount={totalCount}
-          offEntries={offEntries.length > 0 ? offEntries : undefined}
-          window={isOff ? "off" : win!.slug}
-          windowEnum={isOff ? undefined : win!.enum}
+          window={win.slug}
+          windowEnum={win.enum}
         />
       </Suspense>
 

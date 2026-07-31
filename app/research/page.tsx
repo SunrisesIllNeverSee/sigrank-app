@@ -10,8 +10,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLeaderboard } from "@/lib/board";
-import { toEntry } from "@/lib/board/to-entry";
+import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -38,8 +37,7 @@ function fmt(n: number): string {
 // ── Data ───────────────────────────────────────────────────────────────
 
 async function loadIndexStats() {
-  const rows = await getLeaderboard({ window: "all_time", windowFilter: true });
-  const entries = rows.map(toEntry);
+  const entries = getStaticAllTimeBoard();
 
   const platformSet = new Set<string>();
   let totalInput = 0;

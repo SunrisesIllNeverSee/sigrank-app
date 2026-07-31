@@ -13,8 +13,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLeaderboard } from "@/lib/board";
-import { toEntry } from "@/lib/board/to-entry";
+import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 import { PLATFORM_COUNT } from "@/lib/constants";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
@@ -39,9 +38,8 @@ function fmtYield(y: number): string {
 }
 
 export default async function MethodologyPage() {
-  // Fetch the all-time board for real figures.
-  const rows = await getLeaderboard({ window: "all_time", windowFilter: true });
-  const entries = rows.map(toEntry);
+  // Read the static all_time board snapshot (egress fix 2026-07-31).
+  const entries = getStaticAllTimeBoard();
 
   // ── Compute quotable stats from real data ────────────────────────────
   const ranked = entries.filter(

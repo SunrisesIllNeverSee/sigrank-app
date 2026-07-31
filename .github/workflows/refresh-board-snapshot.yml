@@ -1,0 +1,41 @@
+name: Refresh board snapshot
+
+on:
+  schedule:
+    # Daily at 06:00 UTC — refreshes the static all_time board JSON.
+    # The board only changes when operators submit new snapshots, so daily is sufficient.
+    - cron: "0 6 * * *"
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: write # Needed to commit the refreshed JSON
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Generate static all_time board snapshot
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/generate-board-snapshot.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/board-all_time.json
+          if git diff --cached --quiet; then
+            echo "No changes — snapshot is up to date."
+          else
+            git commit -m "chore: refresh static all_time board snapshot [skip ci]"
+            git push
+          fi
