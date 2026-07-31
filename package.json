@@ -21,7 +21,9 @@
     "e2e:report": "playwright show-report",
     "snapshot": "node scripts/snapshot-db.mjs",
     "verify": "npx tsc --noEmit && npm run test:canonical && npm test",
-    "spine:check": "cd ../sigrank-mcp && node scripts/sync-spine.mjs --check"
+    "spine:check": "cd ../sigrank-mcp && node scripts/sync-spine.mjs --check",
+    "db:parity": "node scripts/check-migration-parity.mjs",
+    "db:parity:ci": "node scripts/check-migration-parity.mjs --ci"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.9.0",
