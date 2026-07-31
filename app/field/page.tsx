@@ -36,8 +36,11 @@ export const metadata: Metadata = withOG({
 export const revalidate = 3600;
 
 export default async function FieldPage() {
-  const data = await getFieldAnalysis();
-  const archetypes = await getArchetypes();
+  // PERF (2026-07-31): parallelize the two data loads.
+  const [data, archetypes] = await Promise.all([
+    getFieldAnalysis(),
+    getArchetypes(),
+  ]);
   const { meta, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
 
   // JSON-LD Dataset schema for the field analysis

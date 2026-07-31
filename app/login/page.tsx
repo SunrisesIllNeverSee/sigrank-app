@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { LoginButtons } from "@/components/auth/LoginButtons";
+import { Suspense } from "react";
+import { LoginContent } from "@/components/auth/LoginContent";
 import { withOG } from "@/lib/seo";
 
 /**
@@ -10,7 +10,15 @@ import { withOG } from "@/lib/seo";
  * email magic-link). Honors a same-origin `?next=` hop (e.g. /login?next=/me) so the
  * post-login callback returns the user where they started. The leaderboard stays free
  * to browse without an account.
+ *
+ * PERF (2026-07-31): searchParams reading moved to a client component (LoginContent)
+ * so this page can be statically rendered + ISR-cached. Previously, reading
+ * searchParams in the server component forced force-dynamic (no caching), which
+ * gave Vercel a "Needs Improvement" score (59). Now the page is static; the
+ * ?next= and ?error= params are read on the client via useSearchParams().
  */
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = withOG({
   title: "Sign in",
@@ -18,57 +26,27 @@ export const metadata: Metadata = withOG({
   path: "/login",
 });
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string; error?: string }>;
-}) {
-  const { next, error } = await searchParams;
-  const safeNext =
-    typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
-      ? next
-      : undefined;
-  const errorMsg =
-    error === "auth"
-      ? "Sign-in didn’t complete — please try again, or use a different provider below."
-      : error
-        ? "Something went wrong signing in. Please try again."
-        : null;
-
+export default function LoginPage() {
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 py-12">
-      <header className="flex flex-col items-center gap-2 text-center">
-        <span className="font-mono text-3xl font-bold tracking-[0.1em] text-gold">
-          SIGRANK
-        </span>
-        <h1 className="font-mono text-lg font-bold tracking-wide text-text-primary">
-          Sign in
-        </h1>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Claim your operator profile, set your handle, and back the build. The
-          leaderboard is free to browse without an account.
-        </p>
-      </header>
-
-      {errorMsg && (
-        <p className="rounded-md border border-bg-border bg-bg-base/50 px-3 py-2.5 text-center font-sans text-xs text-text-secondary">
-          {errorMsg}
-        </p>
-      )}
-
-      <LoginButtons next={safeNext} />
-
-      <p className="text-center font-sans text-[11px] leading-relaxed text-text-dim">
-        SigRank stores token counts only — never conversation content. By
-        signing in you agree to the{" "}
-        <Link
-          href="/about"
-          className="text-text-muted underline hover:text-text-secondary"
-        >
-          terms &amp; privacy
-        </Link>
-        .
-      </p>
-    </div>
+    <Suspense
+      fallback={
+        <div className="mx-auto flex max-w-md flex-col gap-6 py-12">
+          <header className="flex flex-col items-center gap-2 text-center">
+            <span className="font-mono text-3xl font-bold tracking-[0.1em] text-gold">
+              SIGRANK
+            </span>
+            <h1 className="font-mono text-lg font-bold tracking-wide text-text-primary">
+              Sign in
+            </h1>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Claim your operator profile, set your handle, and back the build.
+              The leaderboard is free to browse without an account.
+            </p>
+          </header>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
