@@ -86,7 +86,7 @@
     },
     {
       "handle": "olafurns7",
-      "display_name": "Ólafur Nils Sigurðsson",
+      "display_name": "\u00d3lafur Nils Sigur\u00f0sson",
       "tokscale_rank": 6,
       "total_tokens": 634700576612,
       "input_tokens": 21397410640,
@@ -1052,7 +1052,7 @@
     },
     {
       "handle": "voidmatcha",
-      "display_name": "YONGJAE LEE (이용재)",
+      "display_name": "YONGJAE LEE (\uc774\uc6a9\uc7ac)",
       "tokscale_rank": 61,
       "total_tokens": 93710688144,
       "input_tokens": 1189601070,
@@ -1535,7 +1535,7 @@
     },
     {
       "handle": "sieu-n",
-      "display_name": "Sieun Park (박시은)",
+      "display_name": "Sieun Park (\ubc15\uc2dc\uc740)",
       "tokscale_rank": 85,
       "total_tokens": 68449917367,
       "input_tokens": 1506470216,
@@ -1976,7 +1976,7 @@
     },
     {
       "handle": "yongsk0066",
-      "display_name": "YongSeok Jang (장용석)",
+      "display_name": "YongSeok Jang (\uc7a5\uc6a9\uc11d)",
       "tokscale_rank": 107,
       "total_tokens": 56354469352,
       "input_tokens": 1061474103,
@@ -2501,7 +2501,7 @@
     },
     {
       "handle": "Lee-Kang-Jun0705",
-      "display_name": "이강준",
+      "display_name": "\uc774\uac15\uc900",
       "tokscale_rank": 132,
       "total_tokens": 49268220853,
       "input_tokens": 2096996704,
@@ -3257,7 +3257,7 @@
     },
     {
       "handle": "cuipengfei",
-      "display_name": "崔鹏飞 Cui Pengfei",
+      "display_name": "\u5d14\u9e4f\u98de Cui Pengfei",
       "tokscale_rank": 168,
       "total_tokens": 39611616912,
       "input_tokens": 7965997755,
@@ -3530,7 +3530,7 @@
     },
     {
       "handle": "speculatingwook",
-      "display_name": "윤병욱/Wook",
+      "display_name": "\uc724\ubcd1\uc6b1/Wook",
       "tokscale_rank": 181,
       "total_tokens": 35664033187,
       "input_tokens": 686033807,
@@ -3592,8 +3592,8 @@
       "sigrank_yield": 1.2704194724847844
     },
     {
-      "handle": "devswha",
-      "display_name": "Hako",
+      "handle": null,
+      "display_name": null,
       "tokscale_rank": 184,
       "total_tokens": 35340226258,
       "input_tokens": 1125143274,
@@ -4097,7 +4097,7 @@
     },
     {
       "handle": "pinion05",
-      "display_name": "ParkMyeongCheol_박명철",
+      "display_name": "ParkMyeongCheol_\ubc15\uba85\ucca0",
       "tokscale_rank": 208,
       "total_tokens": 32878852033,
       "input_tokens": 5081855671,
@@ -4139,7 +4139,7 @@
     },
     {
       "handle": "jongko54",
-      "display_name": "전종호",
+      "display_name": "\uc804\uc885\ud638",
       "tokscale_rank": 210,
       "total_tokens": 32723454877,
       "input_tokens": 1432794474,
@@ -4202,7 +4202,7 @@
     },
     {
       "handle": "geonu",
-      "display_name": "이건우(geonu)",
+      "display_name": "\uc774\uac74\uc6b0(geonu)",
       "tokscale_rank": 213,
       "total_tokens": 31976422560,
       "input_tokens": 178174498,
@@ -4265,7 +4265,7 @@
     },
     {
       "handle": "JosXa",
-      "display_name": "Joscha Götzer",
+      "display_name": "Joscha G\u00f6tzer",
       "tokscale_rank": 216,
       "total_tokens": 31590665676,
       "input_tokens": 4422463289,
@@ -4370,7 +4370,7 @@
     },
     {
       "handle": "jak-pan",
-      "display_name": "Jakub Pánik",
+      "display_name": "Jakub P\u00e1nik",
       "tokscale_rank": 221,
       "total_tokens": 30493647803,
       "input_tokens": 752642056,
@@ -4433,7 +4433,7 @@
     },
     {
       "handle": "NoeFabris",
-      "display_name": "Noè",
+      "display_name": "No\u00e8",
       "tokscale_rank": 224,
       "total_tokens": 29820088159,
       "input_tokens": 707669722,
@@ -4454,7 +4454,7 @@
     },
     {
       "handle": "SwiftyJunnos",
-      "display_name": "Junnos ",
+      "display_name": "Junnos \uf8ff",
       "tokscale_rank": 225,
       "total_tokens": 29690041270,
       "input_tokens": 1656222908,
@@ -4916,7 +4916,7 @@
     },
     {
       "handle": "esc5221",
-      "display_name": "최병욱",
+      "display_name": "\ucd5c\ubcd1\uc6b1",
       "tokscale_rank": 247,
       "total_tokens": 26955905621,
       "input_tokens": 529647921,
@@ -5063,7 +5063,7 @@
     },
     {
       "handle": "rycont",
-      "display_name": "정한 Rycont",
+      "display_name": "\uc815\ud55c Rycont",
       "tokscale_rank": 254,
       "total_tokens": 25913866519,
       "input_tokens": 116685992,
@@ -6176,7 +6176,7 @@
     },
     {
       "handle": "raravel",
-      "display_name": "개발자 윤군",
+      "display_name": "\uac1c\ubc1c\uc790 \uc724\uad70",
       "tokscale_rank": 307,
       "total_tokens": 20853183991,
       "input_tokens": 164687867,
@@ -6659,7 +6659,7 @@
     },
     {
       "handle": "jaeyoung3048",
-      "display_name": "홍재영",
+      "display_name": "\ud64d\uc7ac\uc601",
       "tokscale_rank": 331,
       "total_tokens": 18885917908,
       "input_tokens": 680171215,
@@ -6680,7 +6680,7 @@
     },
     {
       "handle": "jiyeongjun",
-      "display_name": "지영준",
+      "display_name": "\uc9c0\uc601\uc900",
       "tokscale_rank": 332,
       "total_tokens": 18870747967,
       "input_tokens": 918661331,
@@ -6722,7 +6722,7 @@
     },
     {
       "handle": "flyingsquirrel0419",
-      "display_name": "날다람쥐",
+      "display_name": "\ub0a0\ub2e4\ub78c\uc950",
       "tokscale_rank": 334,
       "total_tokens": 18659547148,
       "input_tokens": 1041543779,
@@ -6932,7 +6932,7 @@
     },
     {
       "handle": "nnnnoel",
-      "display_name": "Noel Kim (김민혁)",
+      "display_name": "Noel Kim (\uae40\ubbfc\ud601)",
       "tokscale_rank": 344,
       "total_tokens": 18228220110,
       "input_tokens": 461055993,
@@ -6953,7 +6953,7 @@
     },
     {
       "handle": "taetaetae",
-      "display_name": "권태관(Kwon Tae Kwan)",
+      "display_name": "\uad8c\ud0dc\uad00(Kwon Tae Kwan)",
       "tokscale_rank": 345,
       "total_tokens": 18209368892,
       "input_tokens": 9046186706,
@@ -7583,7 +7583,7 @@
     },
     {
       "handle": "cosmosjeon",
-      "display_name": "전도현",
+      "display_name": "\uc804\ub3c4\ud604",
       "tokscale_rank": 375,
       "total_tokens": 16753207111,
       "input_tokens": 833267838,
@@ -7877,7 +7877,7 @@
     },
     {
       "handle": "niklasschaeffer",
-      "display_name": "Niklas Schäffer",
+      "display_name": "Niklas Sch\u00e4ffer",
       "tokscale_rank": 389,
       "total_tokens": 16089254469,
       "input_tokens": 15877559407,
@@ -8129,7 +8129,7 @@
     },
     {
       "handle": "myungkeun02",
-      "display_name": "초뜨",
+      "display_name": "\ucd08\ub728",
       "tokscale_rank": 401,
       "total_tokens": 15808001245,
       "input_tokens": 38836218,
@@ -8213,7 +8213,7 @@
     },
     {
       "handle": "ewanjee-m",
-      "display_name": "지예환(Ewan Jee)",
+      "display_name": "\uc9c0\uc608\ud658(Ewan Jee)",
       "tokscale_rank": 405,
       "total_tokens": 15657422151,
       "input_tokens": 51932444,
@@ -8822,7 +8822,7 @@
     },
     {
       "handle": "clovis1122",
-      "display_name": "Clovis Ramírez",
+      "display_name": "Clovis Ram\u00edrez",
       "tokscale_rank": 434,
       "total_tokens": 14186934961,
       "input_tokens": 562083884,
@@ -8864,7 +8864,7 @@
     },
     {
       "handle": "junghyun-cha",
-      "display_name": "차정현(Junghyun Cha)",
+      "display_name": "\ucc28\uc815\ud604(Junghyun Cha)",
       "tokscale_rank": 437,
       "total_tokens": 13960345961,
       "input_tokens": 173084244,
@@ -8927,7 +8927,7 @@
     },
     {
       "handle": "Kaspik",
-      "display_name": "Jakub Kašpar",
+      "display_name": "Jakub Ka\u0161par",
       "tokscale_rank": 440,
       "total_tokens": 13847916383,
       "input_tokens": 413006067,
@@ -9242,7 +9242,7 @@
     },
     {
       "handle": "juwon-park1_kolon",
-      "display_name": "박주원/AX플랫폼팀/KBN",
+      "display_name": "\ubc15\uc8fc\uc6d0/AX\ud50c\ub7ab\ud3fc\ud300/KBN",
       "tokscale_rank": 455,
       "total_tokens": 13162154488,
       "input_tokens": 1400404069,
@@ -9263,7 +9263,7 @@
     },
     {
       "handle": "centraldogma99",
-      "display_name": "최준영",
+      "display_name": "\ucd5c\uc900\uc601",
       "tokscale_rank": 456,
       "total_tokens": 13128613916,
       "input_tokens": 652752499,
@@ -9662,7 +9662,7 @@
     },
     {
       "handle": "soilSpoon",
-      "display_name": "이대희",
+      "display_name": "\uc774\ub300\ud76c",
       "tokscale_rank": 476,
       "total_tokens": 12272435221,
       "input_tokens": 1570809423,
@@ -9977,7 +9977,7 @@
     },
     {
       "handle": "pedrorj2",
-      "display_name": "Pedro Rodríguez Jiménez",
+      "display_name": "Pedro Rodr\u00edguez Jim\u00e9nez",
       "tokscale_rank": 491,
       "total_tokens": 11540041855,
       "input_tokens": 40729597,
@@ -10103,7 +10103,7 @@
     },
     {
       "handle": "dondonjang",
-      "display_name": "장병돈 (DonDon Jang)",
+      "display_name": "\uc7a5\ubcd1\ub3c8 (DonDon Jang)",
       "tokscale_rank": 497,
       "total_tokens": 11408507123,
       "input_tokens": 434448906,
@@ -10166,7 +10166,7 @@
     },
     {
       "handle": "felixfong227",
-      "display_name": "FeliΞ",
+      "display_name": "Feli\u039e",
       "tokscale_rank": 500,
       "total_tokens": 11318153535,
       "input_tokens": 1392626636,
@@ -10271,7 +10271,7 @@
     },
     {
       "handle": "quangdang46",
-      "display_name": "Trần Quang Đãng",
+      "display_name": "Tr\u1ea7n Quang \u0110\u00e3ng",
       "tokscale_rank": 505,
       "total_tokens": 11138269226,
       "input_tokens": 2562756257,
@@ -10418,7 +10418,7 @@
     },
     {
       "handle": "theophile-wallez",
-      "display_name": "Théophile Wallez",
+      "display_name": "Th\u00e9ophile Wallez",
       "tokscale_rank": 512,
       "total_tokens": 10933225941,
       "input_tokens": 214291740,
@@ -10502,7 +10502,7 @@
     },
     {
       "handle": "michalsek",
-      "display_name": "Michał Sęk",
+      "display_name": "Micha\u0142 S\u0119k",
       "tokscale_rank": 516,
       "total_tokens": 10811501132,
       "input_tokens": 389738152,
@@ -10565,7 +10565,7 @@
     },
     {
       "handle": "merenguesL",
-      "display_name": "霸霸的霸霸",
+      "display_name": "\u9738\u9738\u7684\u9738\u9738",
       "tokscale_rank": 519,
       "total_tokens": 10746029993,
       "input_tokens": 742643471,
@@ -10649,7 +10649,7 @@
     },
     {
       "handle": "alexization",
-      "display_name": "백효석",
+      "display_name": "\ubc31\ud6a8\uc11d",
       "tokscale_rank": 523,
       "total_tokens": 10673026484,
       "input_tokens": 605119138,
@@ -11216,7 +11216,7 @@
     },
     {
       "handle": "Ingwannu",
-      "display_name": "이완우",
+      "display_name": "\uc774\uc644\uc6b0",
       "tokscale_rank": 550,
       "total_tokens": 10123889482,
       "input_tokens": 514906746,
@@ -11258,7 +11258,7 @@
     },
     {
       "handle": "BackGwa",
-      "display_name": "강찬영",
+      "display_name": "\uac15\ucc2c\uc601",
       "tokscale_rank": 552,
       "total_tokens": 10052903793,
       "input_tokens": 491848793,
@@ -11489,7 +11489,7 @@
     },
     {
       "handle": "IamJuho",
-      "display_name": "전주호",
+      "display_name": "\uc804\uc8fc\ud638",
       "tokscale_rank": 563,
       "total_tokens": 9959550843,
       "input_tokens": 670036415,
@@ -11510,7 +11510,7 @@
     },
     {
       "handle": "wuyutaott",
-      "display_name": "绊倒帕萨特",
+      "display_name": "\u7eca\u5012\u5e15\u8428\u7279",
       "tokscale_rank": 564,
       "total_tokens": 9953896766,
       "input_tokens": 124960672,
@@ -11573,7 +11573,7 @@
     },
     {
       "handle": "tudoanh",
-      "display_name": "Đỗ Anh Tú",
+      "display_name": "\u0110\u1ed7 Anh T\u00fa",
       "tokscale_rank": 567,
       "total_tokens": 9882921689,
       "input_tokens": 222221203,
@@ -11678,7 +11678,7 @@
     },
     {
       "handle": "CNife",
-      "display_name": "潭渊",
+      "display_name": "\u6f6d\u6e0a",
       "tokscale_rank": 572,
       "total_tokens": 9657302976,
       "input_tokens": 2982994104,
@@ -12623,7 +12623,7 @@
     },
     {
       "handle": "artpods56",
-      "display_name": "Artur Podsiadły",
+      "display_name": "Artur Podsiad\u0142y",
       "tokscale_rank": 617,
       "total_tokens": 8574311933,
       "input_tokens": 439656327,
@@ -12644,7 +12644,7 @@
     },
     {
       "handle": "hpware",
-      "display_name": "皓",
+      "display_name": "\u7693",
       "tokscale_rank": 618,
       "total_tokens": 8551342141,
       "input_tokens": 608448760,
@@ -12665,7 +12665,7 @@
     },
     {
       "handle": "nahyeongjin1",
-      "display_name": "나형진(Hyeongjin Na)",
+      "display_name": "\ub098\ud615\uc9c4(Hyeongjin Na)",
       "tokscale_rank": 619,
       "total_tokens": 8506245381,
       "input_tokens": 4356985,
@@ -12749,7 +12749,7 @@
     },
     {
       "handle": "sunghwan-automator",
-      "display_name": "박성환",
+      "display_name": "\ubc15\uc131\ud658",
       "tokscale_rank": 623,
       "total_tokens": 8357134420,
       "input_tokens": 406903785,
@@ -12791,7 +12791,7 @@
     },
     {
       "handle": "qingwei0326",
-      "display_name": "青微",
+      "display_name": "\u9752\u5fae",
       "tokscale_rank": 625,
       "total_tokens": 8310957279,
       "input_tokens": 597503286,
@@ -13106,7 +13106,7 @@
     },
     {
       "handle": "smart-edgar",
-      "display_name": "홍승표(Seungpyo Hong)",
+      "display_name": "\ud64d\uc2b9\ud45c(Seungpyo Hong)",
       "tokscale_rank": 640,
       "total_tokens": 7976956406,
       "input_tokens": 4275581,
@@ -13148,7 +13148,7 @@
     },
     {
       "handle": "chrisryugj",
-      "display_name": "딴짓하는 류주임",
+      "display_name": "\ub534\uc9d3\ud558\ub294 \ub958\uc8fc\uc784",
       "tokscale_rank": 642,
       "total_tokens": 7949184658,
       "input_tokens": 192723589,
@@ -13568,7 +13568,7 @@
     },
     {
       "handle": "Emuzex",
-      "display_name": "Futó Mirkó",
+      "display_name": "Fut\u00f3 Mirk\u00f3",
       "tokscale_rank": 662,
       "total_tokens": 7505802145,
       "input_tokens": 2449974261,
@@ -13946,7 +13946,7 @@
     },
     {
       "handle": "husodrn46",
-      "display_name": "Hüseyin Durna",
+      "display_name": "H\u00fcseyin Durna",
       "tokscale_rank": 680,
       "total_tokens": 7069544285,
       "input_tokens": 269380394,
@@ -13988,7 +13988,7 @@
     },
     {
       "handle": "SaulMoreno3",
-      "display_name": "Saúl Moreno",
+      "display_name": "Sa\u00fal Moreno",
       "tokscale_rank": 682,
       "total_tokens": 7065150820,
       "input_tokens": 568725677,
@@ -14030,7 +14030,7 @@
     },
     {
       "handle": "jokull",
-      "display_name": "Jökull Sólberg Auðunsson",
+      "display_name": "J\u00f6kull S\u00f3lberg Au\u00f0unsson",
       "tokscale_rank": 684,
       "total_tokens": 6991024016,
       "input_tokens": 18403946,
@@ -14471,7 +14471,7 @@
     },
     {
       "handle": "huang-ml",
-      "display_name": "Nguyễn Huy Hoàng",
+      "display_name": "Nguy\u1ec5n Huy Ho\u00e0ng",
       "tokscale_rank": 705,
       "total_tokens": 6556759122,
       "input_tokens": 2422430082,
@@ -14660,7 +14660,7 @@
     },
     {
       "handle": "chi2nagisa",
-      "display_name": "凪咲",
+      "display_name": "\u51ea\u54b2",
       "tokscale_rank": 714,
       "total_tokens": 6414839738,
       "input_tokens": 488976449,
@@ -14723,7 +14723,7 @@
     },
     {
       "handle": "kimdogyeom",
-      "display_name": "김도겸",
+      "display_name": "\uae40\ub3c4\uacb8",
       "tokscale_rank": 717,
       "total_tokens": 6400995580,
       "input_tokens": 406259747,
@@ -14996,7 +14996,7 @@
     },
     {
       "handle": "eunve1y",
-      "display_name": "김은영",
+      "display_name": "\uae40\uc740\uc601",
       "tokscale_rank": 730,
       "total_tokens": 6223800789,
       "input_tokens": 425452806,
@@ -15227,7 +15227,7 @@
     },
     {
       "handle": "mconcepcionb",
-      "display_name": "Marce Concepción",
+      "display_name": "Marce Concepci\u00f3n",
       "tokscale_rank": 741,
       "total_tokens": 6080714987,
       "input_tokens": 227421210,
@@ -15290,7 +15290,7 @@
     },
     {
       "handle": "djkang-daim",
-      "display_name": "강동재",
+      "display_name": "\uac15\ub3d9\uc7ac",
       "tokscale_rank": 744,
       "total_tokens": 6007475309,
       "input_tokens": 14023666,
@@ -15437,7 +15437,7 @@
     },
     {
       "handle": "kimjisub",
-      "display_name": "김지섭",
+      "display_name": "\uae40\uc9c0\uc12d",
       "tokscale_rank": 751,
       "total_tokens": 5849963074,
       "input_tokens": 35065854,
@@ -15584,7 +15584,7 @@
     },
     {
       "handle": "adelrodriguez",
-      "display_name": "Adel Rodríguez",
+      "display_name": "Adel Rodr\u00edguez",
       "tokscale_rank": 758,
       "total_tokens": 5749519619,
       "input_tokens": 211830293,
@@ -15941,7 +15941,7 @@
     },
     {
       "handle": "PeraSite",
-      "display_name": "정제훈",
+      "display_name": "\uc815\uc81c\ud6c8",
       "tokscale_rank": 775,
       "total_tokens": 5503662590,
       "input_tokens": 339919292,
@@ -16256,7 +16256,7 @@
     },
     {
       "handle": "kristjaningi",
-      "display_name": "Kristján Ingi",
+      "display_name": "Kristj\u00e1n Ingi",
       "tokscale_rank": 790,
       "total_tokens": 5268665190,
       "input_tokens": 205145547,
@@ -17390,7 +17390,7 @@
     },
     {
       "handle": "nghyane",
-      "display_name": "Hoàng Văn Anh Nghĩa",
+      "display_name": "Ho\u00e0ng V\u0103n Anh Ngh\u0129a",
       "tokscale_rank": 844,
       "total_tokens": 4595717273,
       "input_tokens": 1985479771,
@@ -17474,7 +17474,7 @@
     },
     {
       "handle": "sedipsek",
-      "display_name": "치킨무",
+      "display_name": "\uce58\ud0a8\ubb34",
       "tokscale_rank": 848,
       "total_tokens": 4569199281,
       "input_tokens": 369104673,
@@ -17684,7 +17684,7 @@
     },
     {
       "handle": "say8425",
-      "display_name": "박천(Cheon Park)",
+      "display_name": "\ubc15\ucc9c(Cheon Park)",
       "tokscale_rank": 858,
       "total_tokens": 4471362205,
       "input_tokens": 78722168,
@@ -18335,7 +18335,7 @@
     },
     {
       "handle": "rebixpl",
-      "display_name": "Krystian Gułaś",
+      "display_name": "Krystian Gu\u0142a\u015b",
       "tokscale_rank": 889,
       "total_tokens": 4114068298,
       "input_tokens": 447127064,
@@ -18734,7 +18734,7 @@
     },
     {
       "handle": "muyangsx",
-      "display_name": "~小红帽",
+      "display_name": "~\u5c0f\u7ea2\u5e3d",
       "tokscale_rank": 908,
       "total_tokens": 3897189398,
       "input_tokens": 10491098,
@@ -19217,7 +19217,7 @@
     },
     {
       "handle": "vinsalmont",
-      "display_name": "Vinícius Salmont",
+      "display_name": "Vin\u00edcius Salmont",
       "tokscale_rank": 931,
       "total_tokens": 3749488524,
       "input_tokens": 28463781,
@@ -19301,7 +19301,7 @@
     },
     {
       "handle": "Cuuper22",
-      "display_name": "Cúper (Yousef) Anas",
+      "display_name": "C\u00faper (Yousef) Anas",
       "tokscale_rank": 935,
       "total_tokens": 3679055308,
       "input_tokens": 107906689,
@@ -19574,7 +19574,7 @@
     },
     {
       "handle": "jiangcheng2016",
-      "display_name": "叫我姜同学",
+      "display_name": "\u53eb\u6211\u59dc\u540c\u5b66",
       "tokscale_rank": 948,
       "total_tokens": 3592919769,
       "input_tokens": 178763618,
@@ -20036,7 +20036,7 @@
     },
     {
       "handle": "jakublala",
-      "display_name": "Jakub Lála",
+      "display_name": "Jakub L\u00e1la",
       "tokscale_rank": 970,
       "total_tokens": 3351955531,
       "input_tokens": 135578128,
@@ -20099,7 +20099,7 @@
     },
     {
       "handle": "b3nguang",
-      "display_name": "本光",
+      "display_name": "\u672c\u5149",
       "tokscale_rank": 973,
       "total_tokens": 3336815765,
       "input_tokens": 59487848,
@@ -20162,7 +20162,7 @@
     },
     {
       "handle": "IanYang95",
-      "display_name": "양성민",
+      "display_name": "\uc591\uc131\ubbfc",
       "tokscale_rank": 976,
       "total_tokens": 3309621710,
       "input_tokens": 121212181,
@@ -20246,7 +20246,7 @@
     },
     {
       "handle": "calvinxhk",
-      "display_name": "邢怀康",
+      "display_name": "\u90a2\u6000\u5eb7",
       "tokscale_rank": 980,
       "total_tokens": 3275104419,
       "input_tokens": 135781628,
@@ -20309,7 +20309,7 @@
     },
     {
       "handle": "davidfesteban",
-      "display_name": "David Fernández Esteban",
+      "display_name": "David Fern\u00e1ndez Esteban",
       "tokscale_rank": 983,
       "total_tokens": 3227615348,
       "input_tokens": 160398720,
@@ -20330,7 +20330,7 @@
     },
     {
       "handle": "snaeji",
-      "display_name": "Snæbjörn Valur Lilliendahl",
+      "display_name": "Sn\u00e6bj\u00f6rn Valur Lilliendahl",
       "tokscale_rank": 984,
       "total_tokens": 3223573636,
       "input_tokens": 17973495,
@@ -20792,7 +20792,7 @@
     },
     {
       "handle": "ghrlt",
-      "display_name": "Gaëtan",
+      "display_name": "Ga\u00ebtan",
       "tokscale_rank": 1006,
       "total_tokens": 3077330442,
       "input_tokens": 7969169,
@@ -20813,7 +20813,7 @@
     },
     {
       "handle": "mfroembgen",
-      "display_name": "Marco Frömbgen",
+      "display_name": "Marco Fr\u00f6mbgen",
       "tokscale_rank": 1007,
       "total_tokens": 3073048797,
       "input_tokens": 303360523,
@@ -20834,7 +20834,7 @@
     },
     {
       "handle": "netsus",
-      "display_name": "조원준",
+      "display_name": "\uc870\uc6d0\uc900",
       "tokscale_rank": 1008,
       "total_tokens": 3069655703,
       "input_tokens": 127061128,
@@ -20855,7 +20855,7 @@
     },
     {
       "handle": "2minjoon",
-      "display_name": "이민준(Minjoon Lee)",
+      "display_name": "\uc774\ubbfc\uc900(Minjoon Lee)",
       "tokscale_rank": 1009,
       "total_tokens": 3058078192,
       "input_tokens": 16958638,
@@ -21044,7 +21044,7 @@
     },
     {
       "handle": "taegyeongkim-musinsa",
-      "display_name": "김태경(Taegyeong Kim)",
+      "display_name": "\uae40\ud0dc\uacbd(Taegyeong Kim)",
       "tokscale_rank": 1018,
       "total_tokens": 2980790685,
       "input_tokens": 2459617,
@@ -21191,7 +21191,7 @@
     },
     {
       "handle": "narunami001",
-      "display_name": "황준환(R&D)",
+      "display_name": "\ud669\uc900\ud658(R&D)",
       "tokscale_rank": 1025,
       "total_tokens": 2910671518,
       "input_tokens": 17309089,
@@ -21716,7 +21716,7 @@
     },
     {
       "handle": "sunghwan-daim",
-      "display_name": "방성환",
+      "display_name": "\ubc29\uc131\ud658",
       "tokscale_rank": 1050,
       "total_tokens": 2662712036,
       "input_tokens": 3466301,
@@ -21884,7 +21884,7 @@
     },
     {
       "handle": "MrLinda",
-      "display_name": "咸鱼一条",
+      "display_name": "\u54b8\u9c7c\u4e00\u6761",
       "tokscale_rank": 1058,
       "total_tokens": 2635947335,
       "input_tokens": 253733502,
@@ -22031,7 +22031,7 @@
     },
     {
       "handle": "sumhwang",
-      "display_name": "황섬",
+      "display_name": "\ud669\uc12c",
       "tokscale_rank": 1065,
       "total_tokens": 2592470784,
       "input_tokens": 316279837,
@@ -22220,7 +22220,7 @@
     },
     {
       "handle": "bnmbanhmi",
-      "display_name": "Bạch Nhật Minh",
+      "display_name": "B\u1ea1ch Nh\u1eadt Minh",
       "tokscale_rank": 1074,
       "total_tokens": 2555289667,
       "input_tokens": 1429292508,
@@ -22283,7 +22283,7 @@
     },
     {
       "handle": "yeolyi",
-      "display_name": "이성열",
+      "display_name": "\uc774\uc131\uc5f4",
       "tokscale_rank": 1077,
       "total_tokens": 2539122879,
       "input_tokens": 25612571,
@@ -22430,7 +22430,7 @@
     },
     {
       "handle": "haitaodesign",
-      "display_name": "Brett（Old Sea）",
+      "display_name": "Brett\uff08Old Sea\uff09",
       "tokscale_rank": 1084,
       "total_tokens": 2509597519,
       "input_tokens": 190057420,
@@ -23102,7 +23102,7 @@
     },
     {
       "handle": "maggisk",
-      "display_name": "Magnús Skúlason",
+      "display_name": "Magn\u00fas Sk\u00falason",
       "tokscale_rank": 1116,
       "total_tokens": 2214436489,
       "input_tokens": 1313063,
@@ -23165,7 +23165,7 @@
     },
     {
       "handle": "tobytaken",
-      "display_name": "Tobias Steinhäusler",
+      "display_name": "Tobias Steinh\u00e4usler",
       "tokscale_rank": 1119,
       "total_tokens": 2190979704,
       "input_tokens": 139171003,
@@ -23333,7 +23333,7 @@
     },
     {
       "handle": "ChangHyun2",
-      "display_name": "창현",
+      "display_name": "\ucc3d\ud604",
       "tokscale_rank": 1127,
       "total_tokens": 2141337398,
       "input_tokens": 96619664,
@@ -23732,7 +23732,7 @@
     },
     {
       "handle": "Equinxe",
-      "display_name": "Ràki",
+      "display_name": "R\u00e0ki",
       "tokscale_rank": 1146,
       "total_tokens": 2031589076,
       "input_tokens": 7653622,
@@ -23774,7 +23774,7 @@
     },
     {
       "handle": "EroPerez",
-      "display_name": "Erodis Pérez Michel",
+      "display_name": "Erodis P\u00e9rez Michel",
       "tokscale_rank": 1148,
       "total_tokens": 2027150242,
       "input_tokens": 101963881,
@@ -23858,7 +23858,7 @@
     },
     {
       "handle": "smilebank7",
-      "display_name": "이주형 JhinLee",
+      "display_name": "\uc774\uc8fc\ud615 JhinLee",
       "tokscale_rank": 1152,
       "total_tokens": 2015247277,
       "input_tokens": 20159974,
@@ -24005,7 +24005,7 @@
     },
     {
       "handle": "seanhannn",
-      "display_name": "한성환(Sean)",
+      "display_name": "\ud55c\uc131\ud658(Sean)",
       "tokscale_rank": 1159,
       "total_tokens": 1976192190,
       "input_tokens": 23393761,
@@ -24635,7 +24635,7 @@
     },
     {
       "handle": "yuqi",
-      "display_name": "于琦",
+      "display_name": "\u4e8e\u7426",
       "tokscale_rank": 1189,
       "total_tokens": 1788550214,
       "input_tokens": 10583295,
@@ -24887,7 +24887,7 @@
     },
     {
       "handle": "gwbiubiu",
-      "display_name": "咸鱼是我我是咸鱼",
+      "display_name": "\u54b8\u9c7c\u662f\u6211\u6211\u662f\u54b8\u9c7c",
       "tokscale_rank": 1201,
       "total_tokens": 1658153405,
       "input_tokens": 15579942,
@@ -25244,7 +25244,7 @@
     },
     {
       "handle": "mck-daim",
-      "display_name": "김명철",
+      "display_name": "\uae40\uba85\ucca0",
       "tokscale_rank": 1218,
       "total_tokens": 1562275992,
       "input_tokens": 82239993,
@@ -25727,7 +25727,7 @@
     },
     {
       "handle": "raikasdev",
-      "display_name": "Roni Äikäs",
+      "display_name": "Roni \u00c4ik\u00e4s",
       "tokscale_rank": 1241,
       "total_tokens": 1435383461,
       "input_tokens": 77898057,
@@ -25916,7 +25916,7 @@
     },
     {
       "handle": "bongbong2da",
-      "display_name": "장은봉",
+      "display_name": "\uc7a5\uc740\ubd09",
       "tokscale_rank": 1250,
       "total_tokens": 1390540617,
       "input_tokens": 92405116,
@@ -26546,7 +26546,7 @@
     },
     {
       "handle": "hjs-daim",
-      "display_name": "한재성",
+      "display_name": "\ud55c\uc7ac\uc131",
       "tokscale_rank": 1280,
       "total_tokens": 1224401315,
       "input_tokens": 604546,
@@ -26693,7 +26693,7 @@
     },
     {
       "handle": "Yurijpereira",
-      "display_name": "Yuri Jovêncio Pereira",
+      "display_name": "Yuri Jov\u00eancio Pereira",
       "tokscale_rank": 1287,
       "total_tokens": 1185106774,
       "input_tokens": 81589119,
@@ -26735,7 +26735,7 @@
     },
     {
       "handle": "ikchan-daim",
-      "display_name": "주익찬",
+      "display_name": "\uc8fc\uc775\ucc2c",
       "tokscale_rank": 1289,
       "total_tokens": 1182479080,
       "input_tokens": 12591832,
@@ -27407,7 +27407,7 @@
     },
     {
       "handle": "hyunsikshin",
-      "display_name": "신현식(hyunsik)",
+      "display_name": "\uc2e0\ud604\uc2dd(hyunsik)",
       "tokscale_rank": 1321,
       "total_tokens": 1036274983,
       "input_tokens": 366211,
@@ -27554,7 +27554,7 @@
     },
     {
       "handle": "Emirfs",
-      "display_name": "Emir Furkan Sarı",
+      "display_name": "Emir Furkan Sar\u0131",
       "tokscale_rank": 1328,
       "total_tokens": 998236291,
       "input_tokens": 38753281,
@@ -28058,7 +28058,7 @@
     },
     {
       "handle": "jyj1289",
-      "display_name": "전유진",
+      "display_name": "\uc804\uc720\uc9c4",
       "tokscale_rank": 1352,
       "total_tokens": 867334059,
       "input_tokens": 12801721,
@@ -28163,7 +28163,7 @@
     },
     {
       "handle": "FleetAdmiralJakob",
-      "display_name": "Jakob Rössner",
+      "display_name": "Jakob R\u00f6ssner",
       "tokscale_rank": 1357,
       "total_tokens": 859231121,
       "input_tokens": 74558442,
@@ -28205,7 +28205,7 @@
     },
     {
       "handle": "lgladysz",
-      "display_name": "Łukasz Gładysz",
+      "display_name": "\u0141ukasz G\u0142adysz",
       "tokscale_rank": 1359,
       "total_tokens": 850960724,
       "input_tokens": 181948345,
@@ -28226,7 +28226,7 @@
     },
     {
       "handle": "agmmnn",
-      "display_name": "Gökçe",
+      "display_name": "G\u00f6k\u00e7e",
       "tokscale_rank": 1360,
       "total_tokens": 846921874,
       "input_tokens": 47310651,
@@ -28982,7 +28982,7 @@
     },
     {
       "handle": "deopa0402",
-      "display_name": "김재민",
+      "display_name": "\uae40\uc7ac\ubbfc",
       "tokscale_rank": 1396,
       "total_tokens": 726485789,
       "input_tokens": 94281583,
@@ -29066,7 +29066,7 @@
     },
     {
       "handle": "snowtie",
-      "display_name": "설연",
+      "display_name": "\uc124\uc5f0",
       "tokscale_rank": 1400,
       "total_tokens": 712909134,
       "input_tokens": 344768552,
@@ -29234,7 +29234,7 @@
     },
     {
       "handle": "hauxir",
-      "display_name": "Haukur Rósinkranz",
+      "display_name": "Haukur R\u00f3sinkranz",
       "tokscale_rank": 1408,
       "total_tokens": 692367052,
       "input_tokens": 102222,
@@ -29801,7 +29801,7 @@
     },
     {
       "handle": "teong-geuri",
-      "display_name": "텅그리",
+      "display_name": "\ud145\uadf8\ub9ac",
       "tokscale_rank": 1435,
       "total_tokens": 584565400,
       "input_tokens": 28164440,
@@ -30767,7 +30767,7 @@
     },
     {
       "handle": "kskim-musinsa",
-      "display_name": "김광섭(KwangSub Kim)",
+      "display_name": "\uae40\uad11\uc12d(KwangSub Kim)",
       "tokscale_rank": 1481,
       "total_tokens": 352678119,
       "input_tokens": 1924298,
@@ -30998,7 +30998,7 @@
     },
     {
       "handle": "dydehowl",
-      "display_name": "양태수(Taesu Yang)",
+      "display_name": "\uc591\ud0dc\uc218(Taesu Yang)",
       "tokscale_rank": 1492,
       "total_tokens": 305327754,
       "input_tokens": 214315,
@@ -31019,7 +31019,7 @@
     },
     {
       "handle": "wheon06",
-      "display_name": "이희연 Lee Hee Yeon",
+      "display_name": "\uc774\ud76c\uc5f0 Lee Hee Yeon",
       "tokscale_rank": 1493,
       "total_tokens": 305275145,
       "input_tokens": 5362468,
@@ -31166,7 +31166,7 @@
     },
     {
       "handle": "sungtaek-tmap",
-      "display_name": "AI Agent/이성택",
+      "display_name": "AI Agent/\uc774\uc131\ud0dd",
       "tokscale_rank": 1500,
       "total_tokens": 271619443,
       "input_tokens": 36320419,
@@ -31187,7 +31187,7 @@
     },
     {
       "handle": "enihsyou",
-      "display_name": "九条涼果",
+      "display_name": "\u4e5d\u6761\u6dbc\u679c",
       "tokscale_rank": 1501,
       "total_tokens": 267907221,
       "input_tokens": 33316499,
@@ -31271,7 +31271,7 @@
     },
     {
       "handle": "shpark-daim",
-      "display_name": "박소희",
+      "display_name": "\ubc15\uc18c\ud76c",
       "tokscale_rank": 1505,
       "total_tokens": 263202906,
       "input_tokens": 57752,
@@ -31292,7 +31292,7 @@
     },
     {
       "handle": "tmap-jueunlim",
-      "display_name": "임주은/Analytics",
+      "display_name": "\uc784\uc8fc\uc740/Analytics",
       "tokscale_rank": 1506,
       "total_tokens": 259668159,
       "input_tokens": 16014993,
@@ -31712,7 +31712,7 @@
     },
     {
       "handle": "deokdory",
-      "display_name": "심재민 ",
+      "display_name": "\uc2ec\uc7ac\ubbfc ",
       "tokscale_rank": 1526,
       "total_tokens": 211647124,
       "input_tokens": 2248945,
@@ -32195,7 +32195,7 @@
     },
     {
       "handle": "martinpark-ctr",
-      "display_name": "박성현",
+      "display_name": "\ubc15\uc131\ud604",
       "tokscale_rank": 1549,
       "total_tokens": 156535308,
       "input_tokens": 586144,
@@ -32804,7 +32804,7 @@
     },
     {
       "handle": "sam0323place",
-      "display_name": "맵플랫폼/이한샘",
+      "display_name": "\ub9f5\ud50c\ub7ab\ud3fc/\uc774\ud55c\uc0d8",
       "tokscale_rank": 1578,
       "total_tokens": 85971537,
       "input_tokens": 5096149,
@@ -32825,7 +32825,7 @@
     },
     {
       "handle": "Jxx5o2",
-      "display_name": "이준서",
+      "display_name": "\uc774\uc900\uc11c",
       "tokscale_rank": 1579,
       "total_tokens": 83994861,
       "input_tokens": 47196,
@@ -33161,7 +33161,7 @@
     },
     {
       "handle": "wmh-daim",
-      "display_name": "원민후",
+      "display_name": "\uc6d0\ubbfc\ud6c4",
       "tokscale_rank": 1595,
       "total_tokens": 45146030,
       "input_tokens": 1486094,
@@ -33266,7 +33266,7 @@
     },
     {
       "handle": "khil94",
-      "display_name": "김효일",
+      "display_name": "\uae40\ud6a8\uc77c",
       "tokscale_rank": 1600,
       "total_tokens": 41017464,
       "input_tokens": 9285651,
@@ -33560,7 +33560,7 @@
     },
     {
       "handle": "itou-mizuki",
-      "display_name": "伊藤瑞基",
+      "display_name": "\u4f0a\u85e4\u745e\u57fa",
       "tokscale_rank": 1614,
       "total_tokens": 14187611,
       "input_tokens": 1285335,
@@ -33896,7 +33896,7 @@
       "classification": "bot",
       "bot_score": 6,
       "signals": [
-        "input:output 4484710:1 (extreme — data pumping)",
+        "input:output 4484710:1 (extreme \u2014 data pumping)",
         "26.0T tokens/day (inhuman throughput)"
       ]
     },
@@ -34390,7 +34390,7 @@
     },
     {
       "handle": "shpark-daim",
-      "display_name": "박소희",
+      "display_name": "\ubc15\uc18c\ud76c",
       "tokscale_rank": 1505,
       "yield": 196930.72,
       "total_tokens": 263202906,
@@ -34454,7 +34454,7 @@
     },
     {
       "handle": "hauxir",
-      "display_name": "Haukur Rósinkranz",
+      "display_name": "Haukur R\u00f3sinkranz",
       "tokscale_rank": 1408,
       "yield": 67390.67,
       "total_tokens": 692367052,
@@ -34542,7 +34542,7 @@
     },
     {
       "handle": "hjs-daim",
-      "display_name": "한재성",
+      "display_name": "\ud55c\uc7ac\uc131",
       "tokscale_rank": 1280,
       "yield": 15521.95,
       "total_tokens": 1224401315,
@@ -34582,7 +34582,7 @@
     },
     {
       "handle": "Jxx5o2",
-      "display_name": "이준서",
+      "display_name": "\uc774\uc900\uc11c",
       "tokscale_rank": 1579,
       "yield": 11396.88,
       "total_tokens": 83994861,
@@ -34598,7 +34598,7 @@
     },
     {
       "handle": "hyunsikshin",
-      "display_name": "신현식(hyunsik)",
+      "display_name": "\uc2e0\ud604\uc2dd(hyunsik)",
       "tokscale_rank": 1321,
       "yield": 9285.5,
       "total_tokens": 1036274983,
@@ -34686,7 +34686,7 @@
     },
     {
       "handle": "sunghwan-daim",
-      "display_name": "방성환",
+      "display_name": "\ubc29\uc131\ud658",
       "tokscale_rank": 1050,
       "yield": 3676.76,
       "total_tokens": 2662712036,
@@ -34702,7 +34702,7 @@
     },
     {
       "handle": "maggisk",
-      "display_name": "Magnús Skúlason",
+      "display_name": "Magn\u00fas Sk\u00falason",
       "tokscale_rank": 1116,
       "yield": 3244.6,
       "total_tokens": 2214436489,
