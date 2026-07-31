@@ -10,10 +10,13 @@ import { SupportCheckout } from "@/components/billing/SupportCheckout";
  * client SupportCheckout island, which POSTs to
  * /api/v1/billing/create-checkout-session and redirects to Stripe. With no
  * Stripe creds the API 503s and the island shows "not live yet" — it NEVER
- * falsely completes a sale. ?tier= preselects patron (the early-supporter tier).
+ * falsely completes a sale.
  *
  * Owner directive 2026-07-19: no paid tiers, no subscriptions, no "precision
  * tier" promises. This page is a one-time "pay what helps" donation only.
+ *
+ * PERF (2026-07-31): removed unused searchParams await — it forced dynamic
+ * rendering (no ISR) and caused 9.2s LCP on cold starts. Page is now fully static.
  */
 
 export const metadata: Metadata = withOG({
@@ -23,13 +26,7 @@ export const metadata: Metadata = withOG({
   path: "/upgrade",
 });
 
-export default async function UpgradePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tier?: string }>;
-}) {
-  const { tier } = await searchParams;
-  void tier; // preset selection is handled inside SupportCheckout
+export default function UpgradePage() {
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6 py-8">
       <header className="flex flex-col gap-2 text-center">

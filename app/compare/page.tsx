@@ -119,14 +119,17 @@ export default async function ComparePage({
     const h = await headers();
     const isPrefetch =
       h.get("next-router-prefetch") === "1" || h.get("purpose") === "prefetch";
-    if (!isPrefetch) await bumpComparisonsRan();
+    if (!isPrefetch) void bumpComparisonsRan();
   }
-  // Full operator corpus for the opponent pickers (owner 2026-06-22: "do the static
-  // seed all") — every operator, not just the top 500. Owner 2026-07-16: removed the
-  // 500 limit so the searchable combobox can find ANY operator. board[] (yield-ranked)
-  // still supplies the defaults. (owner 2026-07-14: outliers/bots filtered from the
-  // default A pool + field median, but remain selectable in the dropdown.)
-  const board = await getLeaderboard();
+  // PERF (2026-07-31): parallelize independent fetches.
+  // getLeaderboard, getSessionOperator, getOperator(a), getOperator("the-field")
+  // are all independent — was 3-4 sequential round trips.
+  const [board, session, operatorA, fieldRow] = await Promise.all([
+    getLeaderboard(),
+    getSessionOperator(),
+    a ? getOperator(a) : Promise.resolve(null),
+    getOperator("the-field"),
+  ]);
   const humanBoard = board.filter((r) => !isOutlierRow(r));
 
   // Default opponent B is "The Field" — the median-Υ baseline operator (owner
@@ -140,7 +143,6 @@ export default async function ComparePage({
   // Math.random() (which would break RSC/ISR caching) — stable within a cache
   // window, varies day to day. The Field itself is excluded from the A pool.
   let defaultA: LeaderboardRow | null = null;
-  const session = await getSessionOperator();
   if (session?.codename) defaultA = await getOperator(session.codename);
   if (!defaultA) {
     const pool = humanBoard.filter((r) => r.operator.codename !== "the-field");
@@ -154,10 +156,10 @@ export default async function ComparePage({
   }
 
   const rowA: LeaderboardRow | null =
-    (a ? await getOperator(a) : null) ?? defaultA ?? board[0] ?? null;
+    operatorA ?? defaultA ?? board[0] ?? null;
   let rowB: LeaderboardRow | null =
     (b ? await getOperator(b) : null) ??
-    (await getOperator("the-field")) ??
+    fieldRow ??
     board[1] ??
     null;
   if (rowA && rowB && rowA.operator.codename === rowB.operator.codename) {
