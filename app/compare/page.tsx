@@ -119,7 +119,7 @@ export default async function ComparePage({
     const h = await headers();
     const isPrefetch =
       h.get("next-router-prefetch") === "1" || h.get("purpose") === "prefetch";
-    if (!isPrefetch) void bumpComparisonsRan();
+    if (!isPrefetch) await bumpComparisonsRan();
   }
   // PERF (2026-07-31): parallelize independent fetches.
   // getLeaderboard, getSessionOperator, getOperator(a), getOperator("the-field")
