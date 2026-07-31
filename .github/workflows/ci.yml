@@ -105,3 +105,39 @@ jobs:
 
       - name: Cross-repo MCP version + platform-count drift test
         run: node __tests__/contract/mcp-version-drift.test.mjs ${{ github.workspace }}/_sigrank-mcp
+
+  # Migration parity guardrail — fails if the Supabase migration ledger has
+  # drifted from the local migrations/ directory. Prevents the catastrophic
+  # db-push scenario (re-running all migrations) from silently returning.
+  # Only runs when supabase/ files change. Requires SUPABASE_ACCESS_TOKEN secret.
+  migration-parity:
+    name: Supabase migration parity
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Supabase CLI
+        run: |
+          npm install -g supabase
+          supabase --version
+
+      - name: Link project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase link --project-ref copqtaqzsdvpdbhpwjmt
+
+      - name: Check migration parity (guardrail)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: npm run db:parity:ci
