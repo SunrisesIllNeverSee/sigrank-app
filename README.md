@@ -240,9 +240,30 @@ Copy `.env.example` to `.env.local` and fill values as needed. All are optional 
 | `NEXT_PUBLIC_SITE_URL`                                                                   | Stripe redirects and public URLs                        |
 | `SIGRANK_RULESET`                                                                        | **Server-only** proprietary RS.xx scoring overrides     |
 | `SIGRANK_API_KEY`                                                                        | Optional trusted bulk-read key for public API consumers |
+| `SIGRANK_INGEST_WRITE`                                                                   | Ingest-write flip: `1` = persist verified snapshots to the board (see note below)        |
 | `NEXT_PUBLIC_GATE_*`                                                                     | Optional feature gates for unfinished surfaces          |
 
 **Never commit real secrets or proprietary ruleset values.**
+
+### SIGRANK_INGEST_WRITE — the ingest-write flip
+
+**Status: LIVE in Production (`1`).** The board persists verified signed snapshots
+from enrolled MCP devices. Set in Vercel for both Production and Preview.
+
+> **Do NOT mark this variable as sensitive in Vercel.** It is a boolean on/off
+> flag (`1` or `""`), not a secret. When marked sensitive, `vercel env pull`
+> returns `""` even though the runtime has `1` — which misleads agents and
+> operators into thinking the flip is OFF. If `vercel env pull` shows `""` but
+> the board is receiving verified submissions, the var is likely marked
+> sensitive again. Fix it in the Vercel dashboard (remove the sensitive flag).
+
+**Authoritative verification is RUNTIME behavior, not the CLI pull:**
+1. PostHog: `snapshot_submitted` events with `source: "agent"` and `persisted: true`
+2. Supabase: rows in `snapshot_submissions` with `verification_tier = 'verified'` and `status = 'scored'`
+3. A real signed submit via `npx sigrank submit` returning `ranked: true`
+
+If any of those show verified rows landing, the flip is ON regardless of what
+`vercel env pull` says.
 
 ## Supabase
 
