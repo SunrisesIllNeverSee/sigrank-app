@@ -249,13 +249,26 @@ export async function getLeaderboard(
     // We sort/filter/re-rank in JS so the live board is shape- and order-
     // identical to filterMockBoard (the schema-parity contract).
     // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
+    //
+    // DB-side window filter (egress optimization 2026-07-31): when windowFilter
+    // is true and a window is specified, push the window_type filter to PostgREST
+    // so we only fetch rows for that window (e.g. 87 rows for 30d vs 2,413 total).
+    // This cuts Supabase egress ~60× for the 7d/30d/90d board pages. The JS-side
+    // filterToWindow is still applied for the recency/buffer check (age-based),
+    // but the DB filter eliminates the bulk of the data transfer.
+    const useDbWindowFilter = params.windowFilter && !!params.window;
     const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
       sb,
-      (s) =>
-        s
+      (s) => {
+        let q = s
           .from("metric_snapshots")
           .select(SNAPSHOT_COLUMNS)
-          .order("snapshot_date", { ascending: false }),
+          .order("snapshot_date", { ascending: false });
+        if (useDbWindowFilter) {
+          q = q.eq("window_type", params.window!);
+        }
+        return q;
+      },
       "metric_snapshots (getLeaderboard)",
     );
     // DB empty/unreachable → mock fallback (graceful-degradation contract).
@@ -264,6 +277,9 @@ export async function getLeaderboard(
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
     // home/transmitters/hall) keep their pre-730 full-field behaviour.
+    // When useDbWindowFilter is true, allSnaps is already window-scoped from the DB,
+    // so filterToWindow's window_type match is a no-op — only the recency/buffer
+    // check (age-based) does additional filtering.
     const windowed =
       params.windowFilter && params.window
         ? filterToWindow(allSnaps, params.window)

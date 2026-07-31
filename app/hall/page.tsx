@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
 import { getLeaderboard } from "@/lib/board";
+import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 import { BOARD_WINDOWS } from "@/lib/board/windows";
 import { HallHero } from "@/components/hall/HallHero";
 import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
@@ -48,11 +49,21 @@ export default async function HallPage() {
   > = {};
   await Promise.all(
     BOARD_WINDOWS.map(async (w) => {
-      windowsData[w.slug] = await getLeaderboard({
-        window: w.enum,
-        windowFilter: true,
-        limit: 30,
-      });
+      if (w.enum === "all_time") {
+        // Egress fix: all_time reads the static snapshot (no Supabase query).
+        // The static board is already sorted by yield desc; slice to 30.
+        const staticEntries = getStaticAllTimeBoard();
+        // The hall expects LeaderboardRow[] shape, but static entries are
+        // LeaderboardEntry shape. Cast — HallContentClient reads .yield_ etc.
+        // which exist on both. The limit=30 is applied client-side anyway.
+        windowsData[w.slug] = staticEntries.slice(0, 30) as unknown as Awaited<ReturnType<typeof getLeaderboard>>;
+      } else {
+        windowsData[w.slug] = await getLeaderboard({
+          window: w.enum,
+          windowFilter: true,
+          limit: 30,
+        });
+      }
     }),
   );
 
