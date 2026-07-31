@@ -11,17 +11,17 @@
  *      valid ed25519 signature → tier 'verified'; a bad signature on an enrolled
  *      device → HARD reject (422); an unenrolled/revoked device → 'unverified'
  *      (accepted, never ranked).
- *   4. PERSIST — gated by SIGRANK_INGEST_WRITE (default OFF) and only for an
- *      ENROLLED device (operator_id resolved FROM THE DEVICE, §5.4, never the
- *      payload codename):
+ *   4. PERSIST — gated by SIGRANK_INGEST_WRITE (LIVE in prod since ~2026-07-20)
+ *      and only for an ENROLLED device (operator_id resolved FROM THE DEVICE,
+ *      §5.4, never the payload codename):
  *        verified+accept   → materialize_verified_snapshot RPC (one tx) + revalidate
  *        flagged/unverified → audit row only (insertSubmissionOnly), never ranked
- *      An unenrolled device OR the flag being OFF → persist nothing (the safe
- *      pre-flip behavior this route shipped with).
+ *      An unenrolled device OR the flag being OFF → persist nothing.
  *
- * THE FLIP (§0.8/§7): set SIGRANK_INGEST_WRITE=1 in prod ONLY after the 3 pre-flip
- * gates are green (canon-parity, getSupabaseService loud-fail, real-Postgres insert)
- * + LEAD sign-off. Merging this code does NOT enable writes.
+ * The 3 pre-flip gates (canon-parity, getSupabaseService loud-fail, real-Postgres
+ * insert) were designed for the paste era (manual self-reported token verification).
+ * The MCP eliminated that need — it pulls real token counts from local session logs
+ * and signs them with a device key. The flip was enabled ~2026-07-20.
  */
 
 import { NextResponse, type NextRequest } from "next/server";
@@ -40,7 +40,12 @@ import { captureServer } from "@/lib/infra/posthog/server";
 
 const SCORING_ETA_SECONDS = 30;
 
-/** Persist stays OFF until this is set in prod — the verify-before-write flip (§0.8/§7). */
+/**
+ * The verify-before-write flip (§0.8/§7). LIVE in prod since ~2026-07-20.
+ * NOTE: if this var is marked "sensitive" in Vercel, `vercel env pull` returns
+ * "" even though the runtime has "1" — verify via PostHog/Supabase, not the CLI.
+ * See README.md § SIGRANK_INGEST_WRITE for details.
+ */
 const PERSIST_ENABLED = process.env.SIGRANK_INGEST_WRITE === "1";
 
 /** Throttle window: count a device's submissions in the trailing 60s (cap = GATE_LIMITS). */
