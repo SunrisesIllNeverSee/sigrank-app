@@ -90,8 +90,8 @@ export default async function BoardWindowPage({
   // (public/data/board-all_time.json, generated daily by GitHub Action).
   // This eliminates ~90% of Supabase egress (2,184 rows → 0 per request).
   // 7d/30d/90d stay LIVE via DB-side window-filtered queries (~42 KB each).
-  let totalEntries: ReturnType<typeof toEntry>[] = [];
-  let totalCount = 0;
+  let totalEntries: ReturnType<typeof toEntry>[];
+  let totalCount: number;
 
   if (win.enum === "all_time") {
     // Static path: read pre-generated JSON from public/data/
