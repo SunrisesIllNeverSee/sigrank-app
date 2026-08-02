@@ -19,7 +19,7 @@ owner-confirmed canonical `n_operators = 1628` (the previous header said 1611, w
 counted only non-flagged operators).
 
 Two snapshot quirks are carried through as-is: one row has a scrubbed (`null`) handle and is
-keyed by its tokscale rank, and one operator (`sachin1245`) appears as two identical rows, so
+referenced by its tokscale rank, and one operator (`sachin1245`) appears as two identical rows, so
 the per-operator label artifacts contain one entry fewer than the number of clustered rows.
 
 ## Method

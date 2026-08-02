@@ -174,10 +174,11 @@ export default function OperatorArchetypes({
       </div>
       <p className="text-xs text-text-muted">
         Archetypes emerge from K-Means clustering on log(yield, leverage,
-        velocity, SNR) with RobustScaler. 7 human groups arise from a hybrid
-        approach: 3 yield tiers + composition sub-shapes. The 8th (Outliers)
-        is an overlay category from input/total ratio analysis — some
-        outliers also appear in other archetypes. Silhouette = 0.625.
+        velocity, SNR). 7 human groups arise from a hybrid approach: 3 yield
+        tiers + composition sub-shapes. The 8th (Outliers) is an overlay
+        category from input/total ratio analysis — some outliers also appear
+        in other archetypes. Silhouette = 0.544 on the yield tiers, 0.377 on
+        the flat labelling.
       </p>
     </div>
   );
