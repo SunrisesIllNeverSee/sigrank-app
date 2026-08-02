@@ -44,6 +44,9 @@ const ARCHETYPE_COLORS: Record<string, string> = {
   "Cache Builders": "#e17055",
   "Cascade Operators": "#a29bfe",
   "Steady Cascaders": "#00b894",
+  "High-Yield Steady Cascaders": "#00b894",
+  "Low-Yield Field": "#5dade2",
+  "Mid-Yield Input-Heavy Operators": "#e74c3c",
   "Outliers": "#6a6a6a",
 };
 
