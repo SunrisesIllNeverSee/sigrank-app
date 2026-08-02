@@ -8,24 +8,40 @@
  *     signal_text:       string,
  *     engine:            string,          // gemini|claude|gpt|grok|deepseek|perplexity
  *     scores: {
- *       density:  number,  // 0–100
+ *       density:  number,  // 0–100 (CLIENT-REPORTED — NOT authoritative)
  *       clarity:  number,
  *       fidelity: number,
  *       brevity:  number,
  *       impact:   number,
  *     },
- *     certificate_json?: object           // signal-Areana fidelity cert
+ *     certificate_json?: {                // SIGNED scoring certificate (authoritative)
+ *       challenge_id: string,
+ *       operator_id:  string,
+ *       scores: { density, clarity, fidelity, brevity, impact },
+ *       composite:    number,
+ *       engine:       string,
+ *       timestamp:    string,
+ *       signature:    string,             // ed25519 base64 over canonical bytes (minus signature)
+ *     }
  *   }
  *
- * Composite score = (density×0.30)+(clarity×0.20)+(fidelity×0.20)+(brevity×0.15)+(impact×0.15)
+ * F1 SECURITY FIX (2026-07-31): Body-supplied pillar scores are NO LONGER
+ * authoritative. The composite used for ranking must come from either:
+ *   (a) a verified ed25519-signed certificate_json (scoring worker), or
+ *   (b) a future server-side scorer (not yet implemented).
  *
- * When both challenger and challenged have submitted, the scoring worker
- * auto-resolves: sets winner_id, margin, status='complete', completed_at.
+ * Without a verified cert, the submission is stored with scoring_mode="pending"
+ * and composite_score=0. Auto-resolve only fires when BOTH submissions have
+ * scoring_mode="api_verified" (signed cert verified by SCORING_WORKER_PUBKEY).
+ *
+ * The client-reported scores are still stored in score_density etc. columns
+ * for display and future re-scoring, but they are NOT used for ranking.
  */
 
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { resolveAuth } from "@/lib/infra/api-auth";
+import { extractVerifiedCert } from "@/lib/identity/challenge-cert";
 
 function compositeScore(
   d: number,
@@ -131,6 +147,7 @@ export async function PATCH(
   const engine = typeof b.engine === "string" ? b.engine : "claude";
   const certJson = b.certificate_json ?? null;
 
+  // Client-reported scores (stored for display, NOT used for ranking)
   const rawScores = b.scores as Record<string, unknown> | undefined;
   const density = Number(rawScores?.density ?? 0);
   const clarity = Number(rawScores?.clarity ?? 0);
@@ -144,6 +161,7 @@ export async function PATCH(
       { status: 400 },
     );
   }
+  // Secondary guard: range validation (primary guard is the signature)
   if (
     [density, clarity, fidelity, brevity, impact].some((v) => v < 0 || v > 100)
   ) {
@@ -153,7 +171,14 @@ export async function PATCH(
     );
   }
 
-  const composite = compositeScore(density, clarity, fidelity, brevity, impact);
+  // F1 FIX: Check for a verified signed certificate. If present, use its
+  // scores as authoritative. If not, the submission is "pending" — the
+  // client-reported composite is NOT used for ranking.
+  const verifiedCert = extractVerifiedCert(certJson);
+  const scoringMode = verifiedCert ? "api_verified" : "pending";
+  const authoritativeComposite = verifiedCert
+    ? verifiedCert.composite
+    : 0; // pending submissions have composite=0 (not ranked)
 
   const sb = getSupabaseServer();
   if (!sb) {
@@ -162,7 +187,8 @@ export async function PATCH(
       submission_id: `sub_mock_${Date.now()}`,
       challenge_id: id,
       operator_codename: operatorCodename,
-      composite_score: composite,
+      composite_score: authoritativeComposite,
+      scoring_mode: scoringMode,
       status: "submitted",
       mock: true,
     });
@@ -212,6 +238,10 @@ export async function PATCH(
   }
 
   // Upsert submission (UNIQUE constraint on challenge_id + operator_id)
+  // F1 FIX: composite_score uses the AUTHORITATIVE composite (from verified
+  // cert), not the client-reported one. scoring_mode reflects whether the
+  // composite was verified. Client-reported scores are still stored in
+  // score_density etc. for display / future re-scoring.
   const { data: sub, error: subErr } = await sb
     .from("challenge_submissions")
     .upsert(
@@ -224,10 +254,10 @@ export async function PATCH(
         score_fidelity: fidelity,
         score_brevity: brevity,
         score_impact: impact,
-        composite_score: composite,
+        composite_score: authoritativeComposite,
         engine,
         certificate_json: certJson,
-        scoring_mode: "local_sim",
+        scoring_mode: scoringMode,
       },
       { onConflict: "challenge_id,operator_id" },
     )
@@ -241,7 +271,9 @@ export async function PATCH(
     );
   }
 
-  // Auto-resolve: if throwdown and both sides have submitted, compute winner
+  // Auto-resolve: if throwdown and both sides have submitted with VERIFIED
+  // composites (scoring_mode="api_verified"), compute winner.
+  // F1 FIX: NEVER auto-resolve from client-reported (pending) scores.
   let resolved = false;
   let winner_codename: string | null = null;
 
@@ -252,7 +284,7 @@ export async function PATCH(
   ) {
     const { data: subs } = await sb
       .from("challenge_submissions")
-      .select("operator_id, composite_score")
+      .select("operator_id, composite_score, scoring_mode")
       .eq("challenge_id", id);
 
     if (subs && subs.length >= 2) {
@@ -263,7 +295,14 @@ export async function PATCH(
         (s) => s.operator_id === challenge.challenged_id,
       );
 
-      if (challSub && challdSub) {
+      // F1 FIX: only resolve when BOTH submissions have verified composites.
+      // Pending submissions (no signed cert) cannot win — their composite is 0.
+      if (
+        challSub &&
+        challdSub &&
+        challSub.scoring_mode === "api_verified" &&
+        challdSub.scoring_mode === "api_verified"
+      ) {
         const challScore = Number(challSub.composite_score);
         const challdScore = Number(challdSub.composite_score);
         const winnerId =
@@ -282,8 +321,8 @@ export async function PATCH(
             margin,
             completed_at: new Date().toISOString(),
             score_breakdown: {
-              challenger: { density: challSub.composite_score },
-              challenged: { density: challdSub.composite_score },
+              challenger: { composite: challScore },
+              challenged: { composite: challdScore },
             },
           })
           .eq("challenge_id", id);
@@ -305,7 +344,8 @@ export async function PATCH(
       submission_id: sub.submission_id,
       challenge_id: id,
       operator_codename: operatorCodename,
-      composite_score: composite,
+      composite_score: authoritativeComposite,
+      scoring_mode: scoringMode,
       status: "submitted",
       resolved,
       winner_codename,
