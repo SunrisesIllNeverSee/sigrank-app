@@ -520,8 +520,8 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The field separates into 8 emergent archetypes. These are not
           invented categories. They emerged from K-Means clustering on
-          log(yield, leverage, velocity, SNR) with a RobustScaler on the
-          1,611 non-flagged operators. The data
+          log(yield, leverage, velocity, SNR) across the full 1,628-operator
+          scrape. The data
           separates by magnitude first (yield tiers), then by shape (token
           composition). Each archetype has its own fingerprint.
         </p>
