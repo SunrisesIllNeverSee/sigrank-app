@@ -67,29 +67,29 @@ export const RS04_PC_WEIGHTS = {
 } as const;
 
 /**
- * RS.05 — Class threshold exact breakpoints (the numerical realization of the
- * public qualitative cuts K.01–K.09). Each entry is the floor pair the class
- * requires; `signaMin` is null when a class has no SIGNA gate.
+ * RS.05 — Experience tier breakpoints (TOKEN-PURE v4). Each entry is the
+ * total-token floor for the tier; assignment is a descending first-match scan
+ * (highest tier first). 9 tiers: TRANSMITTER at top (500B+), down to IGNITER (0).
  *
- * NOTE: the LOCKED assignment FUNCTION FORM lives in engine.ts (assignClass) —
- * descending cuts, NOT an overlapping range table. This table only documents the
- * exact breakpoints; do not re-derive class assignment from it as a range scan.
+ * Calibrated from the HCM cut (1,497 operators) via equal-population octiles
+ * for tiers 2-9; TRANSMITTER floor set at 500B (top of field, p95+).
+ * Committed values are PROVISIONAL placeholders; the operator sets real cuts
+ * via SIGRANK_RULESET config out-of-band.
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.05
 export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
   class: string;
-  compMin: number;
-  signaMin: number | null;
+  totalMin: number;
 }> = [
-  { class: "TRANSMITTER", compMin: 0.85, signaMin: 85 },
-  { class: "ARCH+", compMin: 0.75, signaMin: 75 },
-  { class: "ARCH", compMin: 0.65, signaMin: 65 },
-  { class: "POWER", compMin: 0.5, signaMin: 50 },
-  { class: "BASE", compMin: 0.4, signaMin: null },
-  { class: "SEEKER", compMin: 0.3, signaMin: null },
-  { class: "REFINER", compMin: 0.2, signaMin: null },
-  { class: "BEARER", compMin: 0.15, signaMin: null },
-  { class: "IGNITER", compMin: 0, signaMin: null },
+  { class: "TRANSMITTER", totalMin: 5e11 },
+  { class: "ARCH+", totalMin: 3.3e10 },
+  { class: "ARCH", totalMin: 1.6e10 },
+  { class: "POWER", totalMin: 9.2e9 },
+  { class: "BASE", totalMin: 5.3e9 },
+  { class: "SEEKER", totalMin: 3.2e9 },
+  { class: "REFINER", totalMin: 1.8e9 },
+  { class: "BEARER", totalMin: 7.0e8 },
+  { class: "IGNITER", totalMin: 0 },
 ];
 
 /**

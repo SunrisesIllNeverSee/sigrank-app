@@ -51,8 +51,7 @@ type PcWeights = {
 };
 type ClassThreshold = {
   class: string;
-  compMin: number;
-  signaMin: number | null;
+  totalMin: number;
 };
 type AntiGaming = { enabled: boolean };
 
@@ -88,14 +87,13 @@ function validBuckets(v: unknown): v is DepthBucket[] {
   );
 }
 
-/** Thresholds are valid when non-empty and each has class/compMin/signaMin shape. */
+/** Thresholds are valid when non-empty and each has class/totalMin shape. */
 function validThresholds(v: unknown): v is ClassThreshold[] {
   if (!Array.isArray(v) || v.length === 0) return false;
   return v.every((t) => {
     if (typeof t !== "object" || t === null) return false;
     const o = t as Record<string, unknown>;
-    const okSigna = o.signaMin === null || isFiniteNumber(o.signaMin);
-    return typeof o.class === "string" && isFiniteNumber(o.compMin) && okSigna;
+    return typeof o.class === "string" && isFiniteNumber(o.totalMin);
   });
 }
 
