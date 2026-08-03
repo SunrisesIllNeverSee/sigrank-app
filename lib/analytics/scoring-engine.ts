@@ -63,30 +63,20 @@ export function computeSignaRate(scores: Core5Scores): number {
 /**
  * assignClass — LOCKED FUNCTION FORM (CANON §V, class_tiers.md).
  *
- * Descending cuts: the FIRST condition met wins. Top four classes gate on BOTH
- * compression AND SIGNA RATE (anti-gaming); lower classes gate on compression
- * only. This is intentionally NOT an overlapping range table — do not refactor
+ * Descending cuts: the FIRST condition met wins. The permanent class is an
+ * EXPERIENCE tier keyed on TOTAL TOKENS — not compression or SIGNA rate.
+ * This is intentionally NOT an overlapping range table — do not refactor
  * into a range scan, which would change tie/edge behavior.
  *
- * Breakpoints now load from RS05_CLASS_THRESHOLDS in ./secret-config (the active,
+ * Breakpoints load from RS05_CLASS_THRESHOLDS in ./secret-config (the active,
  * env-overridable ruleset; falls back to the public placeholders when no env is
- * set). The iteration is a DESCENDING FIRST-MATCH scan over that table, NOT a
- * range scan: for each threshold in order, a non-null signaMin requires BOTH
- * compression >= compMin AND signaRate >= signaMin; a null signaMin requires only
- * compression >= compMin. First match wins; fallthrough returns the last class.
- * For the placeholder thresholds this is byte-identical to the prior if-chain,
- * preserving exact >= edge semantics.
+ * set). The iteration is a DESCENDING FIRST-MATCH scan over that table:
+ * for each threshold in order, totalTokens >= totalMin wins. First match wins;
+ * fallthrough returns the last class (IGNITER, floor 0).
  */
-export function assignClass(
-  compression: number,
-  signaRate: number,
-): SignalClass {
+export function assignClass(totalTokens: number): SignalClass {
   for (const t of RS05_CLASS_THRESHOLDS) {
-    const met =
-      t.signaMin !== null
-        ? compression >= t.compMin && signaRate >= t.signaMin
-        : compression >= t.compMin;
-    if (met) return t.class as SignalClass;
+    if (totalTokens >= t.totalMin) return t.class as SignalClass;
   }
   return RS05_CLASS_THRESHOLDS[RS05_CLASS_THRESHOLDS.length - 1]
     .class as SignalClass;
@@ -137,7 +127,7 @@ export interface ScoreSnapshotResult {
 export function scoreSnapshot(input: ScoreSnapshotInput): ScoreSnapshotResult {
   const scores = normalizeCore5(input.raw);
   const signa_rate = computeSignaRate(scores);
-  const class_tier = assignClass(input.raw.compression_ratio, signa_rate);
+  const class_tier = assignClass(input.raw.token_throughput);
   const sf = computeSignalForce(
     input.totalMessagesLifetime,
     input.raw.session_depth,

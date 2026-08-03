@@ -355,18 +355,19 @@ export interface ClassTierDef {
   glyph: string;
   /** Hex color (pulled from the shared design tokens). */
   hex: string;
-  /** Compression floor (qualitative public cut). */
-  compMin: number;
-  /** SIGNA RATE floor — null for classes that have no SIGNA gate. */
-  signaMin: number | null;
+  /** Total-token floor (experience-based). */
+  totalMin: number;
   /** One-line public meaning. */
   meaning: string;
 }
 
 /**
- * CLASS_TIERS — the 9-class hierarchy K.01..K.09.
- * Qualitative cuts are public (CANON §V); exact numeric breakpoints live
- * server-side as RS.05 in lib/scoring/ruleset.ts.
+ * CLASS_TIERS — the 9-tier EXPERIENCE ladder K.01..K.09, descending.
+ *
+ * The permanent class is an experience tier keyed on TOTAL TOKENS: TRANSMITTER
+ * is the deepest experience, IGNITER is the entry point. Cascade identity
+ * (archetypes) is a SEPARATE axis — operators have both a class AND an archetype.
+ * Exact numeric breakpoints live server-side as RS.05 in lib/analytics/ruleset.ts.
  */
 export const CLASS_TIERS: Record<string, ClassTierDef> = {
   "K.01": {
@@ -374,8 +375,7 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "TRANSMITTER",
     glyph: "◈",
     hex: colors.class.TRANSMITTER,
-    compMin: 0.85,
-    signaMin: 85,
+    totalMin: 5e11,
     meaning: "You don't just use the system. You are the system.",
   },
   "K.02": {
@@ -383,71 +383,63 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "ARCH+",
     glyph: "▲",
     hex: colors.class["ARCH+"],
-    compMin: 0.75,
-    signaMin: 75,
-    meaning: "Precision creators. Structure from signal.",
+    totalMin: 3.3e10,
+    meaning: "Deepest field experience. Volume that became architecture.",
   },
   "K.03": {
     id: "K.03",
     name: "ARCH",
     glyph: "▽",
     hex: colors.class.ARCH,
-    compMin: 0.65,
-    signaMin: 65,
-    meaning: "System builders. Coherent operators.",
+    totalMin: 1.6e10,
+    meaning: "System builders. Sustained volume, coherent output.",
   },
   "K.04": {
     id: "K.04",
     name: "POWER",
     glyph: "⬡",
     hex: colors.class.POWER,
-    compMin: 0.5,
-    signaMin: 50,
-    meaning: "Forming forge. Active but noisy.",
+    totalMin: 9.2e9,
+    meaning: "Above the center. Volume compounding.",
   },
   "K.05": {
     id: "K.05",
     name: "BASE",
     glyph: "↓",
     hex: colors.class.BASE,
-    compMin: 0.4,
-    signaMin: null,
-    meaning: "Signal breaking through. Clarity is emerging.",
+    totalMin: 5.3e9,
+    meaning: "The center of the field. The average operator's experience.",
   },
   "K.06": {
     id: "K.06",
     name: "SEEKER",
     glyph: "◎",
     hex: colors.class.SEEKER,
-    compMin: 0.3,
-    signaMin: null,
-    meaning: "Active explorers. High prompts, low refinement.",
+    totalMin: 3.2e9,
+    meaning: "Approaching the center. Experience accumulating.",
   },
   "K.07": {
     id: "K.07",
     name: "REFINER",
     glyph: "⟳",
     hex: colors.class.REFINER,
-    compMin: 0.2,
-    signaMin: null,
-    meaning: "Practicing with purpose. Consistent mid-tier.",
+    totalMin: 1.8e9,
+    meaning: "Practicing with purpose. Early sustained volume.",
   },
   "K.08": {
     id: "K.08",
     name: "BEARER",
     glyph: "◇",
     hex: colors.class.BEARER,
-    compMin: 0.15,
-    signaMin: null,
-    meaning: "Quiet insight holders. Deep threads, low activity.",
+    totalMin: 7.0e8,
+    meaning: "Quiet accumulation. The first real volume.",
   },
   "K.09": {
     id: "K.09",
     name: "IGNITER",
     glyph: "·",
     hex: colors.class.IGNITER,
-    compMin: 0,
-    signaMin: null,
+    totalMin: 0,
     meaning: "Dormant potential. The still soul. Waiting.",
   },
 };
