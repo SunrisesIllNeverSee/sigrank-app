@@ -58,8 +58,9 @@ const SPECIES_SWATCH: Record<string, string> = {
 
 function speciesOf(cls: string): "casc" | "arch" | "power" | "base" {
   if (cls === "TRANSMITTER") return "casc";
-  if (cls === "ARCH+" || cls === "ARCH") return "arch";
-  if (cls === "POWER") return "power";
+  // Sub-stage names: "ARCH+ I", "ARCH III", "POWER II", etc.
+  if (cls.startsWith("ARCH")) return "arch";
+  if (cls.startsWith("POWER")) return "power";
   return "base";
 }
 

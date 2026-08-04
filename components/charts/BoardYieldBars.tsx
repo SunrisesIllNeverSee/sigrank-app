@@ -38,8 +38,8 @@ const SPECIES: Record<string, string> = {
 
 function speciesOf(cls: string): keyof typeof SPECIES {
   if (cls === "TRANSMITTER") return "casc";
-  if (cls === "ARCH+" || cls === "ARCH") return "arch";
-  if (cls === "POWER") return "power";
+  if (cls.startsWith("ARCH")) return "arch";
+  if (cls.startsWith("POWER")) return "power";
   return "base";
 }
 

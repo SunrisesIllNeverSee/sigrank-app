@@ -122,7 +122,14 @@ export function HallSubmissionRow({
       aria-label={classTier}
       title={classTier}
       className="font-mono text-xs leading-none"
-      style={{ color: colors.class[classTier] ?? colors.text.muted }}
+      style={{
+        color:
+          (colors.class as Record<string, string>)[
+            classTier === "TRANSMITTER"
+              ? "TRANSMITTER"
+              : classTier.split(" ").slice(0, -1).join(" ")
+          ] ?? colors.text.muted,
+      }}
     >
       {glyphFor(classTier)}
     </span>

@@ -11,7 +11,7 @@
 
 import { CanonId } from "@/components/ui/CanonId";
 import { Placeholder } from "@/components/ui/Placeholder";
-import { CLASS_NAME_TO_ID, CLASS_TIERS } from "@/lib/identity/canon-ids";
+import { classToTierId, CLASS_TIERS } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
 
 interface Props {
@@ -52,7 +52,7 @@ export function SignaHero({
   movement7d,
   isPlaceholder = false,
 }: Props) {
-  const classId = CLASS_NAME_TO_ID[classTier];
+  const classId = classToTierId(classTier);
   const glyph = CLASS_TIERS[classId]?.glyph ?? "◈";
   const signaDisplay = signaRate.toFixed(1);
 

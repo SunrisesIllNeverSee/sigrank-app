@@ -29,12 +29,16 @@ function nameOf(row: LeaderboardRow): string {
 }
 
 function classColor(cls: SignalClass): string {
-  return colors.class[cls] ?? colors.class.BASE;
+  if (cls === "TRANSMITTER") return colors.class.TRANSMITTER;
+  const tier = cls.split(" ").slice(0, -1).join(" ");
+  return (colors.class as Record<string, string>)[tier] ?? colors.class.BASE;
 }
 
-/** The CSS-var token name for a class (e.g. 'ARCH+' → 'class-archplus'). */
+/** The CSS-var token name for a class (e.g. 'ARCH+ I' → 'class-archplus'). */
 function classVar(cls: SignalClass): string {
-  return "class-" + cls.toLowerCase().replace("+", "plus");
+  if (cls === "TRANSMITTER") return "class-transmitter";
+  const tier = cls.split(" ").slice(0, -1).join(" ");
+  return "class-" + tier.toLowerCase().replace("+", "plus");
 }
 
 function yieldStr(r: LeaderboardRow): string {
