@@ -69,10 +69,12 @@ export const RS04_PC_WEIGHTS = {
 /**
  * RS.05 — Experience tier breakpoints (TOKEN-PURE v4). Each entry is the
  * total-token floor for the tier; assignment is a descending first-match scan
- * (highest tier first). 9 tiers: TRANSMITTER at top (500B+), down to IGNITER (0).
+ * (highest tier first). 8 permanent tiers: ARCH+ at top (33B+), down to IGNITER (0).
  *
- * Calibrated from the HCM cut (1,497 operators) via equal-population octiles
- * for tiers 2-9; TRANSMITTER floor set at 500B (top of field, p95+).
+ * TRANSMITTER is NOT on this ladder — it is a temporary peak badge (RS.08)
+ * that any tier can earn during a high-frequency, high-resonance window.
+ *
+ * Calibrated from the HCM cut (1,497 operators) via equal-population octiles.
  * Committed values are PROVISIONAL placeholders; the operator sets real cuts
  * via SIGRANK_RULESET config out-of-band.
  */
@@ -81,7 +83,6 @@ export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
   class: string;
   totalMin: number;
 }> = [
-  { class: "TRANSMITTER", totalMin: 5e11 },
   { class: "ARCH+", totalMin: 3.3e10 },
   { class: "ARCH", totalMin: 1.6e10 },
   { class: "POWER", totalMin: 9.2e9 },
@@ -91,6 +92,27 @@ export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
   { class: "BEARER", totalMin: 7.0e8 },
   { class: "IGNITER", totalMin: 0 },
 ];
+
+/**
+ * RS.08 — TRANSMITTER windowed peak badge threshold.
+ *
+ * TRANSMITTER is NOT a permanent class — it is a temporary peak state that any
+ * experience tier can earn. An operator "transmits" when they hit BOTH:
+ *   - High frequency: token throughput (total tokens in window) >= freqMin
+ *   - High resonance: SIGNA RATE (composite signal quality) >= signaMin
+ *
+ * The badge is per-window (daily/weekly). It lapses when the operator's
+ * frequency or resonance drops below the floor in subsequent windows.
+ */
+// OPERATOR_OVERRIDE_REQUIRED RS.08
+export const RS08_TRANSMITTER_BADGE = {
+  /** Minimum SIGNA RATE (resonance) to transmit. */
+  signaMin: 85,
+  /** Minimum token throughput (frequency) to transmit — total tokens in window. */
+  freqMin: 1e9,
+  /** Window granularity for badge evaluation. */
+  window: "daily" as const,
+};
 
 /**
  * RS.06 — Anti-gaming penalty rules. Enabled 2026-07-02 with a gentle penalty curve

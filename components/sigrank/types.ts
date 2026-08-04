@@ -1,3 +1,9 @@
+/**
+ * SignalClass — the 8-tier EXPERIENCE ladder (K.01..K.08), keyed on total
+ * tokens. TRANSMITTER is a temporary peak badge (RS.08), not a permanent
+ * class — any tier can earn it during a high-frequency, high-resonance window.
+ * It remains in the union so the UI can render the badge state.
+ */
 export type SignalClass =
   | "TRANSMITTER"
   | "ARCH+"
