@@ -1,0 +1,150 @@
+{
+  "method": "equal_population_24_stages",
+  "source": "field-analysis.json (1,626 operators, HCM cut)",
+  "stages": [
+    {
+      "stage": "ARCH+ I",
+      "floor": 84192600517,
+      "ceiling": 7068201104626,
+      "operators": 67
+    },
+    {
+      "stage": "ARCH+ II",
+      "floor": 46527844056,
+      "ceiling": 83796808622,
+      "operators": 68
+    },
+    {
+      "stage": "ARCH+ III",
+      "floor": 33120868087,
+      "ceiling": 46007607687,
+      "operators": 68
+    },
+    {
+      "stage": "ARCH I",
+      "floor": 23895612426,
+      "ceiling": 33113877006,
+      "operators": 68
+    },
+    {
+      "stage": "ARCH II",
+      "floor": 18399442026,
+      "ceiling": 23885338222,
+      "operators": 67
+    },
+    {
+      "stage": "ARCH III",
+      "floor": 15525069887,
+      "ceiling": 18389930093,
+      "operators": 68
+    },
+    {
+      "stage": "POWER I",
+      "floor": 12272435221,
+      "ceiling": 15507589875,
+      "operators": 68
+    },
+    {
+      "stage": "POWER II",
+      "floor": 10216353881,
+      "ceiling": 12111995587,
+      "operators": 68
+    },
+    {
+      "stage": "POWER III",
+      "floor": 8773397273,
+      "ceiling": 10189224970,
+      "operators": 67
+    },
+    {
+      "stage": "BASE I",
+      "floor": 7078191068,
+      "ceiling": 8674592599,
+      "operators": 68
+    },
+    {
+      "stage": "BASE II",
+      "floor": 5889127180,
+      "ceiling": 7069544285,
+      "operators": 68
+    },
+    {
+      "stage": "BASE III",
+      "floor": 4912670550,
+      "ceiling": 5877345282,
+      "operators": 68
+    },
+    {
+      "stage": "SEEKER I",
+      "floor": 4147659079,
+      "ceiling": 4908070645,
+      "operators": 67
+    },
+    {
+      "stage": "SEEKER II",
+      "floor": 3589503354,
+      "ceiling": 4147377146,
+      "operators": 68
+    },
+    {
+      "stage": "SEEKER III",
+      "floor": 2980790685,
+      "ceiling": 3589126331,
+      "operators": 68
+    },
+    {
+      "stage": "REFINER I",
+      "floor": 2497415246,
+      "ceiling": 2961798768,
+      "operators": 68
+    },
+    {
+      "stage": "REFINER II",
+      "floor": 2014103899,
+      "ceiling": 2497406487,
+      "operators": 67
+    },
+    {
+      "stage": "REFINER III",
+      "floor": 1546788054,
+      "ceiling": 1994830571,
+      "operators": 68
+    },
+    {
+      "stage": "BEARER I",
+      "floor": 1182479080,
+      "ceiling": 1544290660,
+      "operators": 68
+    },
+    {
+      "stage": "BEARER II",
+      "floor": 859231121,
+      "ceiling": 1173256210,
+      "operators": 68
+    },
+    {
+      "stage": "BEARER III",
+      "floor": 640084482,
+      "ceiling": 859181137,
+      "operators": 67
+    },
+    {
+      "stage": "IGNITER I",
+      "floor": 305327754,
+      "ceiling": 638638241,
+      "operators": 68
+    },
+    {
+      "stage": "IGNITER II",
+      "floor": 131960531,
+      "ceiling": 305275145,
+      "operators": 68
+    },
+    {
+      "stage": "IGNITER III",
+      "floor": 123324,
+      "ceiling": 131012254,
+      "operators": 68
+    }
+  ]
+}

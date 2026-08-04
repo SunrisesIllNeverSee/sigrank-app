@@ -1,6 +1,6 @@
 import React from "react";
 import { colors, fonts, radius, shadow } from "./tokens";
-import type { K2ClassEntry, RegionalCount, SignalClass } from "./types";
+import type { K2ClassEntry, RegionalCount, TierName } from "./types";
 
 interface Props {
   rank?: number;
@@ -77,7 +77,7 @@ const SAMPLE_REGIONS: RegionalCount[] = [
   { region: "Other/Unknown", count: 97 },
 ];
 
-const CLASS_ICONS: Partial<Record<SignalClass, string>> = {
+const CLASS_ICONS: Record<TierName | "TRANSMITTER", string> = {
   TRANSMITTER: "◈",
   "ARCH+": "▲",
   ARCH: "▽",
@@ -89,7 +89,7 @@ const CLASS_ICONS: Partial<Record<SignalClass, string>> = {
   IGNITER: "·",
 };
 
-const CLASS_DEFS: Partial<Record<SignalClass, string>> = {
+const CLASS_DEFS: Record<TierName | "TRANSMITTER", string> = {
   TRANSMITTER:
     "You don't just use the system. You are the system. — Composite Score > 0.85",
   "ARCH+": "Precision creators. Structure from signal. — Score 0.75–0.84",
@@ -107,16 +107,9 @@ const CLASS_DEFS: Partial<Record<SignalClass, string>> = {
 
 function LiveCountBar({ count, max }: { count: number; max: number }) {
   const pct = Math.min(100, (count / max) * 100);
-  const color =
-    colors.class[
-      count > 500
-        ? "IGNITER"
-        : count > 200
-          ? "BEARER"
-          : count > 50
-            ? "SEEKER"
-            : "TRANSMITTER"
-    ] ?? colors.text.accent;
+  const tier: TierName =
+    count > 500 ? "IGNITER" : count > 200 ? "BEARER" : count > 50 ? "SEEKER" : "IGNITER";
+  const color = colors.class[tier] ?? colors.text.accent;
 
   return (
     <div style={barStyles.wrapper}>

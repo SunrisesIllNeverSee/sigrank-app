@@ -18,7 +18,7 @@ import { getOperator, getLeaderboard } from "@/lib/board";
 import { decodeCodename } from "@/lib/route-params";
 import { sortValue } from "@/lib/analytics/sort-value";
 import { recordValue } from "@/lib/analytics/record-value";
-import { DISPLAY_METRICS, DISPLAY_RAW, CLASS_NAME_TO_GLYPH } from "@/lib/identity/canon-ids";
+import { DISPLAY_METRICS, DISPLAY_RAW, glyphFor } from "@/lib/identity/canon-ids";
 import type { LeaderboardRow } from "@/lib/board";
 
 export const runtime = "nodejs";
@@ -179,7 +179,7 @@ export async function GET(
   const c = snapshot.cascade;
   const ranked = c && !c.nonCompounding;
   const classTier = snapshot.class_tier;
-  const classGlyph = CLASS_NAME_TO_GLYPH[classTier] ?? "·";
+  const classGlyph = glyphFor(classTier);
   const name = (operator.display_name ?? operator.codename).toUpperCase();
 
   const DASH = "—";

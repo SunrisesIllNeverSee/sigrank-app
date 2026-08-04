@@ -19,7 +19,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { SORT_DEFAULT } from "@/lib/constants";
 import { filterToWindow } from "@/lib/board/windows";
-import { CLASS_NAME_TO_ID, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids";
+import { classToTierId, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
 import {
   MOCK_CLASS_DISTRIBUTION,
@@ -916,19 +916,18 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
 
     // Emit in the same canonical class order the mock board uses.
     const order: SignalClass[] = [
-      "TRANSMITTER",
-      "ARCH+",
-      "ARCH",
-      "POWER",
-      "BASE",
-      "SEEKER",
-      "REFINER",
-      "BEARER",
-      "IGNITER",
+      "ARCH+ I", "ARCH+ II", "ARCH+ III",
+      "ARCH I", "ARCH II", "ARCH III",
+      "POWER I", "POWER II", "POWER III",
+      "BASE I", "BASE II", "BASE III",
+      "SEEKER I", "SEEKER II", "SEEKER III",
+      "REFINER I", "REFINER II", "REFINER III",
+      "BEARER I", "BEARER II", "BEARER III",
+      "IGNITER I", "IGNITER II", "IGNITER III",
     ];
     return order.map((cls) => ({
       class_tier: cls,
-      class_id: CLASS_NAME_TO_ID[cls],
+      class_id: classToTierId(cls),
       count: counts.get(cls) ?? 0,
     }));
   } catch {

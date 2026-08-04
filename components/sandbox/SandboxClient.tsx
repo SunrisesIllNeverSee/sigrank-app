@@ -57,7 +57,7 @@ interface HistoryEntry {
   timestamp: string;
 }
 
-const CLASS_COLORS: Record<SignalClass, string> = {
+const TIER_COLORS: Record<string, string> = {
   TRANSMITTER: "rgb(var(--class-transmitter))",
   "ARCH+": "rgb(var(--class-archplus))",
   ARCH: "rgb(var(--class-arch))",
@@ -68,6 +68,13 @@ const CLASS_COLORS: Record<SignalClass, string> = {
   BEARER: "rgb(var(--class-bearer))",
   IGNITER: "rgb(var(--class-igniter))",
 };
+
+/** Get the tier color for a SignalClass (extracts tier from sub-stage name). */
+function tierColorFor(cls: SignalClass): string {
+  if (cls === "TRANSMITTER") return TIER_COLORS["TRANSMITTER"];
+  const tier = cls.split(" ").slice(0, -1).join(" ");
+  return TIER_COLORS[tier] ?? TIER_COLORS["IGNITER"];
+}
 
 const PILLAR_PRESETS: Record<
   string,
@@ -314,7 +321,7 @@ export function SandboxClient({
     Leverage: Math.round(h.cascade.leverage * 10) / 10,
   }));
 
-  const classColor = score ? CLASS_COLORS[score.class_tier] : undefined;
+  const classColor = score ? tierColorFor(score.class_tier) : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -673,7 +680,7 @@ export function SandboxClient({
                     </td>
                     <td
                       className="py-1 pr-3"
-                      style={{ color: CLASS_COLORS[h.classTier] }}
+                      style={{ color: tierColorFor(h.classTier) }}
                     >
                       {h.classTier}
                     </td>

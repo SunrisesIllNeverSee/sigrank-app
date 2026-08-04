@@ -25,6 +25,7 @@
 
 import type { SignalClass } from "@/components/sigrank/types";
 import { colors } from "@/components/sigrank/tokens";
+import type { TierName } from "@/components/sigrank/types";
 
 /** Functional grouping of a metric within the 11-core stack (or extras). */
 export type MetricGroup = "core5" | "background3" | "composite" | "extra";
@@ -349,14 +350,12 @@ export const METRICS: Record<string, MetricDef> = {
 export interface ClassTierDef {
   /** Canonical ID, e.g. "K.01". */
   id: string;
-  /** Public class name as used by SignalClass. */
-  name: SignalClass;
+  /** Public tier name (without sub-stage). */
+  name: TierName;
   /** Public glyph. */
   glyph: string;
   /** Hex color (pulled from the shared design tokens). */
   hex: string;
-  /** Total-token floor (experience-based). */
-  totalMin: number;
   /** One-line public meaning. */
   meaning: string;
 }
@@ -364,12 +363,12 @@ export interface ClassTierDef {
 /**
  * CLASS_TIERS — the 8-tier EXPERIENCE ladder K.01..K.08, descending.
  *
- * The permanent class is an experience tier keyed on TOTAL TOKENS: ARCH+ is the
- * deepest experience, IGNITER is the entry point. TRANSMITTER is NOT on this
- * ladder — it is a temporary peak badge (RS.08) that any tier can earn during
- * a high-frequency, high-resonance window. Cascade identity (archetypes) is a
- * SEPARATE axis — operators have both a class AND an archetype.
- * Exact numeric breakpoints live server-side as RS.05 in lib/analytics/ruleset.ts.
+ * Each tier has 3 sub-stages (I/II/III) defined in RS05_CLASS_THRESHOLDS.
+ * The tier-level info (glyph, color, meaning) is here; the exact token
+ * breakpoints per sub-stage live server-side as RS.05 in lib/analytics/ruleset.ts.
+ *
+ * TRANSMITTER is NOT on this ladder — it is a temporary peak badge (RS.08).
+ * Cascade identity (archetypes) is a SEPARATE axis.
  */
 export const CLASS_TIERS: Record<string, ClassTierDef> = {
   "K.01": {
@@ -377,7 +376,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "ARCH+",
     glyph: "▲",
     hex: colors.class["ARCH+"],
-    totalMin: 3.3e10,
     meaning: "Deepest field experience. Volume that became architecture.",
   },
   "K.02": {
@@ -385,7 +383,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "ARCH",
     glyph: "▽",
     hex: colors.class.ARCH,
-    totalMin: 1.6e10,
     meaning: "System builders. Sustained volume, coherent output.",
   },
   "K.03": {
@@ -393,7 +390,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "POWER",
     glyph: "⬡",
     hex: colors.class.POWER,
-    totalMin: 9.2e9,
     meaning: "Above the center. Volume compounding.",
   },
   "K.04": {
@@ -401,7 +397,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "BASE",
     glyph: "↓",
     hex: colors.class.BASE,
-    totalMin: 5.3e9,
     meaning: "The center of the field. The average operator's experience.",
   },
   "K.05": {
@@ -409,7 +404,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "SEEKER",
     glyph: "◎",
     hex: colors.class.SEEKER,
-    totalMin: 3.2e9,
     meaning: "Approaching the center. Experience accumulating.",
   },
   "K.06": {
@@ -417,7 +411,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "REFINER",
     glyph: "⟳",
     hex: colors.class.REFINER,
-    totalMin: 1.8e9,
     meaning: "Practicing with purpose. Early sustained volume.",
   },
   "K.07": {
@@ -425,7 +418,6 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "BEARER",
     glyph: "◇",
     hex: colors.class.BEARER,
-    totalMin: 7.0e8,
     meaning: "Quiet accumulation. The first real volume.",
   },
   "K.08": {
@@ -433,38 +425,69 @@ export const CLASS_TIERS: Record<string, ClassTierDef> = {
     name: "IGNITER",
     glyph: "·",
     hex: colors.class.IGNITER,
-    totalMin: 0,
     meaning: "Dormant potential. The still soul. Waiting.",
   },
 };
 
-/** Map a public SignalClass name back to its canonical K.xx id. */
-export const CLASS_NAME_TO_ID: Record<SignalClass, string> = Object.values(
+/** Map a tier name back to its canonical K.xx id. */
+export const TIER_NAME_TO_ID: Record<TierName, string> = Object.values(
   CLASS_TIERS,
 ).reduce(
   (acc, tier) => {
     acc[tier.name] = tier.id;
     return acc;
   },
-  {} as Record<SignalClass, string>,
+  {} as Record<TierName, string>,
 );
 
-/** Map a public SignalClass name to its canonical K.xx glyph (◈ ▲ ▽ ⬡ ↓ ◎ ⟳ ◇ ·).
+/**
+ * Map a SignalClass (sub-stage name like "ARCH+ I") to its canonical K.xx id.
+ * Works with both sub-stage names and bare tier names.
+ * @deprecated Use classToTierId() for new code.
+ */
+export const CLASS_NAME_TO_ID: Record<string, string> = Object.values(
+  CLASS_TIERS,
+).reduce(
+  (acc, tier) => {
+    acc[tier.name] = tier.id;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+/** Map a SignalClass (sub-stage or bare tier) to its canonical K.xx id. */
+export function classToTierId(cls: SignalClass): string {
+  if (cls === "TRANSMITTER") return "K.00"; // badge, not a tier
+  const tierName = cls.split(" ").slice(0, -1).join(" ");
+  return TIER_NAME_TO_ID[tierName as TierName] ?? "K.08";
+}
+
+/** Map a tier name to its canonical K.xx glyph (◈ ▲ ▽ ⬡ ↓ ◎ ⟳ ◇ ·).
  * Single source of truth for the leaderboard class mark (LB-5), hall dropdowns,
  * and operator profile — read from CLASS_TIERS so glyphs stay canon-locked. */
-export const CLASS_NAME_TO_GLYPH: Record<SignalClass, string> = Object.values(
+export const TIER_NAME_TO_GLYPH: Record<string, string> = Object.values(
   CLASS_TIERS,
 ).reduce(
   (acc, tier) => {
     acc[tier.name] = tier.glyph;
     return acc;
   },
-  {} as Record<SignalClass, string>,
+  {} as Record<string, string>,
 );
 
-/** Canonical glyph for a SignalClass name (falls back to '·' / IGNITER). */
+/**
+ * Map a SignalClass to its glyph. @deprecated use glyphFor().
+ * Kept for backward compat — delegates to TIER_NAME_TO_GLYPH.
+ */
+export const CLASS_NAME_TO_GLYPH: Record<string, string> = TIER_NAME_TO_GLYPH;
+
+/** Canonical glyph for a SignalClass name (falls back to '·' / IGNITER).
+ * Works with both sub-stage names ("ARCH+ I") and bare tier names ("ARCH+"). */
 export function glyphFor(name: SignalClass): string {
-  return CLASS_NAME_TO_GLYPH[name] ?? "·";
+  if (name === "TRANSMITTER") return "◈";
+  // Extract tier name from sub-stage (e.g. "ARCH+ I" → "ARCH+")
+  const tierName = name.split(" ").slice(0, -1).join(" ");
+  return TIER_NAME_TO_GLYPH[tierName] ?? "·";
 }
 
 export interface WindowDef {

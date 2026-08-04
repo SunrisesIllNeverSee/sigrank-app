@@ -67,30 +67,46 @@ export const RS04_PC_WEIGHTS = {
 } as const;
 
 /**
- * RS.05 — Experience tier breakpoints (TOKEN-PURE v4). Each entry is the
- * total-token floor for the tier; assignment is a descending first-match scan
- * (highest tier first). 8 permanent tiers: ARCH+ at top (33B+), down to IGNITER (0).
+ * RS.05 — Experience ladder breakpoints (TOKEN-PURE v4). 24 stages = 8 tiers ×
+ * 3 sub-stages (I/II/III). Assignment is a descending first-match scan (highest
+ * stage first). TRANSMITTER is NOT on this ladder — it is a temporary peak
+ * badge (RS.08) that any tier can earn during a high-frequency, high-resonance
+ * window.
  *
- * TRANSMITTER is NOT on this ladder — it is a temporary peak badge (RS.08)
- * that any tier can earn during a high-frequency, high-resonance window.
- *
- * Calibrated from the HCM cut (1,497 operators) via equal-population octiles.
- * Committed values are PROVISIONAL placeholders; the operator sets real cuts
- * via SIGRANK_RULESET config out-of-band.
+ * Calibrated from the HCM cut (1,626 operators) using target population
+ * distribution (Option C): IGNITER 10%, BEARER 12.5%, REFINER 15%, SEEKER 22.5%,
+ * BASE 20%, POWER 15%, ARCH 5%, ARCH+ 0% (aspirational). Each tier split into
+ * 3 equal-population sub-stages.
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.05
 export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
   class: string;
   totalMin: number;
 }> = [
-  { class: "ARCH+", totalMin: 3.3e10 },
-  { class: "ARCH", totalMin: 1.6e10 },
-  { class: "POWER", totalMin: 9.2e9 },
-  { class: "BASE", totalMin: 5.3e9 },
-  { class: "SEEKER", totalMin: 3.2e9 },
-  { class: "REFINER", totalMin: 1.8e9 },
-  { class: "BEARER", totalMin: 7.0e8 },
-  { class: "IGNITER", totalMin: 0 },
+  { class: "ARCH+ I", totalMin: 7068201104627 },
+  { class: "ARCH+ II", totalMin: 7068201104627 },
+  { class: "ARCH+ III", totalMin: 7068201104627 },
+  { class: "ARCH I", totalMin: 186207267611 },
+  { class: "ARCH II", totalMin: 98543134083 },
+  { class: "ARCH III", totalMin: 68766193943 },
+  { class: "POWER I", totalMin: 39958782379 },
+  { class: "POWER II", totalMin: 26955905621 },
+  { class: "POWER III", totalMin: 19141226889 },
+  { class: "BASE I", totalMin: 13960345961 },
+  { class: "BASE II", totalMin: 10189224970 },
+  { class: "BASE III", totalMin: 7747041813 },
+  { class: "SEEKER I", totalMin: 5446673659 },
+  { class: "SEEKER II", totalMin: 4014577247 },
+  { class: "SEEKER III", totalMin: 2961798768 },
+  { class: "REFINER I", totalMin: 2358346840 },
+  { class: "REFINER II", totalMin: 1845750357 },
+  { class: "REFINER III", totalMin: 1334876308 },
+  { class: "BEARER I", totalMin: 984078167 },
+  { class: "BEARER II", totalMin: 714619043 },
+  { class: "BEARER III", totalMin: 431702990 },
+  { class: "IGNITER I", totalMin: 216393332 },
+  { class: "IGNITER II", totalMin: 88999166 },
+  { class: "IGNITER III", totalMin: 0 },
 ];
 
 /**

@@ -64,7 +64,8 @@ export function computeSignaRate(scores: Core5Scores): number {
  * assignClass — LOCKED FUNCTION FORM (CANON §V, class_tiers.md).
  *
  * Descending cuts: the FIRST condition met wins. The permanent class is an
- * EXPERIENCE tier keyed on TOTAL TOKENS — 8 tiers (ARCH+ → IGNITER).
+ * EXPERIENCE stage keyed on TOTAL TOKENS — 24 stages (8 tiers × 3 sub-stages:
+ * ARCH+ I → IGNITER III).
  * TRANSMITTER is NOT assigned here — it is a temporary peak badge (RS.08)
  * evaluated separately via lib/analytics/transmitter-badge.ts.
  *

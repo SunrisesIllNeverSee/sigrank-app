@@ -1,6 +1,6 @@
 import React from "react";
 import { colors, fonts, radius } from "./tokens";
-import type { SignalClass } from "./types";
+import type { SignalClass, TierName } from "./types";
 
 interface Props {
   signalClass: SignalClass;
@@ -8,8 +8,7 @@ interface Props {
   showFull?: boolean;
 }
 
-const ABBREV: Record<SignalClass, string> = {
-  TRANSMITTER: "Trans",
+const TIER_ABBREV: Record<TierName, string> = {
   "ARCH+": "Arch+",
   ARCH: "Arch",
   POWER: "Power",
@@ -20,13 +19,28 @@ const ABBREV: Record<SignalClass, string> = {
   IGNITER: "Igniter",
 };
 
+/** Extract the base tier name from a SignalClass (e.g. "ARCH+ I" → "ARCH+"). */
+function tierOf(cls: SignalClass): TierName | "TRANSMITTER" {
+  if (cls === "TRANSMITTER") return "TRANSMITTER";
+  return cls.split(" ").slice(0, -1).join(" ") as TierName;
+}
+
 export function SignalClassBadge({
   signalClass,
   size = "md",
   showFull = false,
 }: Props) {
-  const color = colors.class[signalClass] ?? colors.text.muted;
-  const label = showFull ? signalClass : ABBREV[signalClass];
+  const tier = tierOf(signalClass);
+  const color =
+    tier === "TRANSMITTER"
+      ? colors.class.TRANSMITTER
+      : colors.class[tier as keyof typeof colors.class] ?? colors.text.muted;
+  const label =
+    signalClass === "TRANSMITTER"
+      ? "Trans"
+      : showFull
+        ? signalClass
+        : TIER_ABBREV[tier as TierName] ?? signalClass;
 
   const style: React.CSSProperties = {
     display: "inline-block",

@@ -1,11 +1,42 @@
 /**
- * SignalClass — the 8-tier EXPERIENCE ladder (K.01..K.08), keyed on total
- * tokens. TRANSMITTER is a temporary peak badge (RS.08), not a permanent
- * class — any tier can earn it during a high-frequency, high-resonance window.
- * It remains in the union so the UI can render the badge state.
+ * SignalClass — the 24-stage EXPERIENCE ladder (8 tiers × 3 sub-stages),
+ * keyed on total tokens. TRANSMITTER is a temporary peak badge (RS.08),
+ * not a permanent class — any tier can earn it during a high-frequency,
+ * high-resonance window. It remains in the union so the UI can render the
+ * badge state.
+ *
+ * Sub-stages use Roman numerals: I (top of tier), II (middle), III (bottom).
+ * Example: "ARCH+ I" = top of ARCH+, "IGNITER III" = entry level.
  */
 export type SignalClass =
   | "TRANSMITTER"
+  | "ARCH+ I"
+  | "ARCH+ II"
+  | "ARCH+ III"
+  | "ARCH I"
+  | "ARCH II"
+  | "ARCH III"
+  | "POWER I"
+  | "POWER II"
+  | "POWER III"
+  | "BASE I"
+  | "BASE II"
+  | "BASE III"
+  | "SEEKER I"
+  | "SEEKER II"
+  | "SEEKER III"
+  | "REFINER I"
+  | "REFINER II"
+  | "REFINER III"
+  | "BEARER I"
+  | "BEARER II"
+  | "BEARER III"
+  | "IGNITER I"
+  | "IGNITER II"
+  | "IGNITER III";
+
+/** The 8 base tier names (without sub-stage). */
+export type TierName =
   | "ARCH+"
   | "ARCH"
   | "POWER"
@@ -14,6 +45,20 @@ export type SignalClass =
   | "REFINER"
   | "BEARER"
   | "IGNITER";
+
+/** Extract the base tier name from a SignalClass (e.g. "ARCH+ I" → "ARCH+"). */
+export function tierOf(cls: SignalClass): TierName | "TRANSMITTER" {
+  if (cls === "TRANSMITTER") return "TRANSMITTER";
+  return cls.split(" ").slice(0, -1).join(" ") as TierName;
+}
+
+/** Extract the sub-stage from a SignalClass (e.g. "ARCH+ I" → "I"). */
+export function stageOf(cls: SignalClass): "I" | "II" | "III" | null {
+  if (cls === "TRANSMITTER") return null;
+  const parts = cls.split(" ");
+  const stage = parts[parts.length - 1];
+  return stage === "I" || stage === "II" || stage === "III" ? stage : null;
+}
 
 export type MetricView =
   | "yield"
@@ -111,7 +156,7 @@ export interface UserProfile {
 }
 
 export interface K2ClassEntry {
-  signalClass: SignalClass;
+  signalClass: TierName | "TRANSMITTER";
   trait: string;
   liveCount: number;
   maxCount?: number;

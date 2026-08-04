@@ -168,16 +168,16 @@ const VERIFICATION_STATUSES: ReadonlySet<string> = new Set<
   Operator["verification_status"]
 >(["unverified", "verified", "audited"]);
 
-/** Permanent experience tiers — TRANSMITTER is a badge, not a permanent class. */
+/** Permanent experience stages — TRANSMITTER is a badge, not a permanent class. */
 const SIGNAL_CLASSES: ReadonlySet<string> = new Set<SignalClass>([
-  "ARCH+",
-  "ARCH",
-  "POWER",
-  "BASE",
-  "SEEKER",
-  "REFINER",
-  "BEARER",
-  "IGNITER",
+  "ARCH+ I", "ARCH+ II", "ARCH+ III",
+  "ARCH I", "ARCH II", "ARCH III",
+  "POWER I", "POWER II", "POWER III",
+  "BASE I", "BASE II", "BASE III",
+  "SEEKER I", "SEEKER II", "SEEKER III",
+  "REFINER I", "REFINER II", "REFINER III",
+  "BEARER I", "BEARER II", "BEARER III",
+  "IGNITER I", "IGNITER II", "IGNITER III",
 ]);
 
 /**
@@ -209,9 +209,9 @@ export function toVerification(
     : "unverified";
 }
 
-/** Narrow a free-text class_tier to the SignalClass union (defaults IGNITER). */
+/** Narrow a free-text class_tier to the SignalClass union (defaults IGNITER III). */
 export function toSignalClass(v: string | null | undefined): SignalClass {
-  return v && SIGNAL_CLASSES.has(v) ? (v as SignalClass) : "IGNITER";
+  return v && SIGNAL_CLASSES.has(v) ? (v as SignalClass) : "IGNITER III";
 }
 
 /** Map a DB operators row → facade Operator (live rows are never placeholders). */
