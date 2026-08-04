@@ -29,6 +29,7 @@ import {
   RS05_CLASS_THRESHOLDS as PLACEHOLDER_RS05_CLASS_THRESHOLDS,
   RS06_ANTI_GAMING as PLACEHOLDER_RS06_ANTI_GAMING,
   RS07_PROMOTION_CYCLES as PLACEHOLDER_RS07_PROMOTION_CYCLES,
+  RS08_TRANSMITTER_BADGE as PLACEHOLDER_RS08_TRANSMITTER_BADGE,
 } from "@/lib/analytics/ruleset";
 
 // ─── Resolved-value types (structurally identical to the placeholders) ────────
@@ -54,6 +55,11 @@ type ClassThreshold = {
   totalMin: number;
 };
 type AntiGaming = { enabled: boolean };
+type TransmitterBadge = {
+  signaMin: number;
+  freqMin: number;
+  window: string;
+};
 
 // ─── Validation helpers (pure, total — never throw) ───────────────────────────
 
@@ -95,6 +101,17 @@ function validThresholds(v: unknown): v is ClassThreshold[] {
     const o = t as Record<string, unknown>;
     return typeof o.class === "string" && isFiniteNumber(o.totalMin);
   });
+}
+
+/** Transmitter badge is valid when signaMin/freqMin are finite and window is a string. */
+function validTransmitterBadge(v: unknown): v is TransmitterBadge {
+  if (typeof v !== "object" || v === null) return false;
+  const o = v as Record<string, unknown>;
+  return (
+    isFiniteNumber(o.signaMin) &&
+    isFiniteNumber(o.freqMin) &&
+    typeof o.window === "string"
+  );
 }
 
 // ─── Env load (once, at module init) ─────────────────────────────────────────
@@ -199,4 +216,10 @@ export const RS07_PROMOTION_CYCLES: number = pick(
   "RS07_PROMOTION_CYCLES",
   isFiniteNumber,
   PLACEHOLDER_RS07_PROMOTION_CYCLES,
+);
+
+export const RS08_TRANSMITTER_BADGE: TransmitterBadge = pick(
+  "RS08_TRANSMITTER_BADGE",
+  validTransmitterBadge,
+  PLACEHOLDER_RS08_TRANSMITTER_BADGE,
 );

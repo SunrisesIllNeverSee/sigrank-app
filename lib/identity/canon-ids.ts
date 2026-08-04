@@ -362,80 +362,74 @@ export interface ClassTierDef {
 }
 
 /**
- * CLASS_TIERS — the 9-tier EXPERIENCE ladder K.01..K.09, descending.
+ * CLASS_TIERS — the 8-tier EXPERIENCE ladder K.01..K.08, descending.
  *
- * The permanent class is an experience tier keyed on TOTAL TOKENS: TRANSMITTER
- * is the deepest experience, IGNITER is the entry point. Cascade identity
- * (archetypes) is a SEPARATE axis — operators have both a class AND an archetype.
+ * The permanent class is an experience tier keyed on TOTAL TOKENS: ARCH+ is the
+ * deepest experience, IGNITER is the entry point. TRANSMITTER is NOT on this
+ * ladder — it is a temporary peak badge (RS.08) that any tier can earn during
+ * a high-frequency, high-resonance window. Cascade identity (archetypes) is a
+ * SEPARATE axis — operators have both a class AND an archetype.
  * Exact numeric breakpoints live server-side as RS.05 in lib/analytics/ruleset.ts.
  */
 export const CLASS_TIERS: Record<string, ClassTierDef> = {
   "K.01": {
     id: "K.01",
-    name: "TRANSMITTER",
-    glyph: "◈",
-    hex: colors.class.TRANSMITTER,
-    totalMin: 5e11,
-    meaning: "You don't just use the system. You are the system.",
-  },
-  "K.02": {
-    id: "K.02",
     name: "ARCH+",
     glyph: "▲",
     hex: colors.class["ARCH+"],
     totalMin: 3.3e10,
     meaning: "Deepest field experience. Volume that became architecture.",
   },
-  "K.03": {
-    id: "K.03",
+  "K.02": {
+    id: "K.02",
     name: "ARCH",
     glyph: "▽",
     hex: colors.class.ARCH,
     totalMin: 1.6e10,
     meaning: "System builders. Sustained volume, coherent output.",
   },
-  "K.04": {
-    id: "K.04",
+  "K.03": {
+    id: "K.03",
     name: "POWER",
     glyph: "⬡",
     hex: colors.class.POWER,
     totalMin: 9.2e9,
     meaning: "Above the center. Volume compounding.",
   },
-  "K.05": {
-    id: "K.05",
+  "K.04": {
+    id: "K.04",
     name: "BASE",
     glyph: "↓",
     hex: colors.class.BASE,
     totalMin: 5.3e9,
     meaning: "The center of the field. The average operator's experience.",
   },
-  "K.06": {
-    id: "K.06",
+  "K.05": {
+    id: "K.05",
     name: "SEEKER",
     glyph: "◎",
     hex: colors.class.SEEKER,
     totalMin: 3.2e9,
     meaning: "Approaching the center. Experience accumulating.",
   },
-  "K.07": {
-    id: "K.07",
+  "K.06": {
+    id: "K.06",
     name: "REFINER",
     glyph: "⟳",
     hex: colors.class.REFINER,
     totalMin: 1.8e9,
     meaning: "Practicing with purpose. Early sustained volume.",
   },
-  "K.08": {
-    id: "K.08",
+  "K.07": {
+    id: "K.07",
     name: "BEARER",
     glyph: "◇",
     hex: colors.class.BEARER,
     totalMin: 7.0e8,
     meaning: "Quiet accumulation. The first real volume.",
   },
-  "K.09": {
-    id: "K.09",
+  "K.08": {
+    id: "K.08",
     name: "IGNITER",
     glyph: "·",
     hex: colors.class.IGNITER,

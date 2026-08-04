@@ -64,9 +64,9 @@ export function computeSignaRate(scores: Core5Scores): number {
  * assignClass — LOCKED FUNCTION FORM (CANON §V, class_tiers.md).
  *
  * Descending cuts: the FIRST condition met wins. The permanent class is an
- * EXPERIENCE tier keyed on TOTAL TOKENS — not compression or SIGNA rate.
- * This is intentionally NOT an overlapping range table — do not refactor
- * into a range scan, which would change tie/edge behavior.
+ * EXPERIENCE tier keyed on TOTAL TOKENS — 8 tiers (ARCH+ → IGNITER).
+ * TRANSMITTER is NOT assigned here — it is a temporary peak badge (RS.08)
+ * evaluated separately via lib/analytics/transmitter-badge.ts.
  *
  * Breakpoints load from RS05_CLASS_THRESHOLDS in ./secret-config (the active,
  * env-overridable ruleset; falls back to the public placeholders when no env is

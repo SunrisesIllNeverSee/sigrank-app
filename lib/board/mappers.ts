@@ -168,8 +168,8 @@ const VERIFICATION_STATUSES: ReadonlySet<string> = new Set<
   Operator["verification_status"]
 >(["unverified", "verified", "audited"]);
 
+/** Permanent experience tiers — TRANSMITTER is a badge, not a permanent class. */
 const SIGNAL_CLASSES: ReadonlySet<string> = new Set<SignalClass>([
-  "TRANSMITTER",
   "ARCH+",
   "ARCH",
   "POWER",
