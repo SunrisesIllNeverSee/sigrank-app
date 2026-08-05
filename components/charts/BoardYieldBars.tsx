@@ -38,6 +38,8 @@ const SPECIES: Record<string, string> = {
 
 function speciesOf(cls: string): keyof typeof SPECIES {
   if (cls === "TRANSMITTER") return "casc";
+  // Check ARCH+ before ARCH so the intent is explicit.
+  if (cls.startsWith("ARCH+")) return "arch";
   if (cls.startsWith("ARCH")) return "arch";
   if (cls.startsWith("POWER")) return "power";
   return "base";

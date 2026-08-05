@@ -678,7 +678,7 @@ export function scoreCalculator() {
     publisher: { "@id": ORG_ID },
     featureList: [
       "Yield (Υ) calculation from token cascade",
-      "Class tier classification (IGNITER to TRANSMITTER)",
+      "Class tier classification (IGNITER to ARCH+)",
       "Compression ratio analysis",
       "No account required",
     ],
@@ -763,7 +763,7 @@ export function scoreHowTo() {
         "@type": "HowToStep",
         position: 3,
         name: "See your yield and class",
-        text: "The calculator computes your Υ Yield = (cache_read × output) / input², your class tier (IGNITER to TRANSMITTER), and your compression ratio instantly.",
+        text: "The calculator computes your Υ Yield = (cache_read × output) / input², your class tier (IGNITER to ARCH+), and your compression ratio instantly.",
       },
     ],
   };

@@ -8,9 +8,11 @@ import "server-only";
  * the scoring engine and MUST NOT be shipped to the browser or rendered into
  * markup. Only lib/scoring/engine.ts (also server-side) reads them.
  *
- * Every constant below is a PROVISIONAL value from Ruleset v1.0 (CANON §VIII).
- * Each carries an OPERATOR_OVERRIDE_REQUIRED marker — these are the placeholder
- * values the operator replaces with the real Railway scoring-worker config.
+ * Every constant below is a calibrated value from Ruleset v1.0 (CANON §VIII).
+ * The OPERATOR_OVERRIDE_REQUIRED marker indicates the operator can override
+ * these at runtime via SIGRANK_RULESET env vars (see lib/analytics/secret-config.ts).
+ * RS.05 thresholds are calibrated from the HCM cut (1,626 operators) using
+ * target population distribution (Option C). RS.08 is the TRANSMITTER badge gate.
  */
 
 /**
@@ -84,8 +86,8 @@ export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{
   totalMin: number;
 }> = [
   { class: "ARCH+ I", totalMin: 7068201104627 },
-  { class: "ARCH+ II", totalMin: 7068201104627 },
-  { class: "ARCH+ III", totalMin: 7068201104627 },
+  { class: "ARCH+ II", totalMin: 3000000000000 },
+  { class: "ARCH+ III", totalMin: 1000000000000 },
   { class: "ARCH I", totalMin: 186207267611 },
   { class: "ARCH II", totalMin: 98543134083 },
   { class: "ARCH III", totalMin: 68766193943 },

@@ -62,7 +62,7 @@ export function LeaderboardKey() {
                       : "rounded px-3 py-1 font-mono text-xs text-text-muted hover:text-text-primary"
                   }
                 >
-                  The nine classes
+                  The eight tiers
                 </button>
               </div>
               <button
@@ -120,9 +120,10 @@ export function LeaderboardKey() {
                   </div>
                 ))}
                 <p className="mt-2 font-sans text-[11px] leading-relaxed text-text-muted">
-                  Class is assigned from your cascade — SNR and 10xDEV,
-                  whichever is more restrictive. TRANSMITTER is rare on purpose.
-                  Exact breakpoints are proprietary (RS.05).
+                  Class is assigned from total tokens — eight tiers, each
+                  split into three sub-stages. TRANSMITTER is a temporary
+                  peak badge, not a permanent class. Exact breakpoints are
+                  proprietary (RS.05).
                 </p>
               </div>
             )}

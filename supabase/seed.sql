@@ -54,8 +54,8 @@ INSERT INTO rulesets (
   -- threshold_json -----------------------------------------------------------
   '{
     "class_thresholds": [
-      {"class": "TRANSMITTER", "comp_min": 0.85, "signa_min": 85},
-      {"class": "ARCH+",       "comp_min": 0.75, "signa_min": 75},
+      {"class": "ARCH+ I", "comp_min": 0.85, "signa_min": 85},
+      {"class": "ARCH+ III",   "comp_min": 0.75, "signa_min": 75},
       {"class": "ARCH",        "comp_min": 0.65, "signa_min": 65},
       {"class": "POWER",       "comp_min": 0.50, "signa_min": 50},
       {"class": "BASE",        "comp_min": 0.40, "signa_min": null},
@@ -165,7 +165,7 @@ SELECT
   NULL, 119, 53960,
   96.4, NULL, NULL, 12.8, NULL,
   1251211, 11296121, 128196310, 2555179769,  -- §5b token-pillar spine (0005) → Υ 18436.98 on read
-  'TRANSMITTER', '2026-05-14T00:00:00Z', 1.00, 96.4,
+  'ARCH+ I', '2026-05-14T00:00:00Z', 1.00, 96.4,
   0, 0, '1.0'
 FROM operators o
 WHERE o.codename = 'TransVaultOrigin'
@@ -202,7 +202,7 @@ SELECT
       'operator_id', o.operator_id,
       'codename', 'TransVaultOrigin',
       'display_name', 'TheSignalVault',
-      'class_tier', 'TRANSMITTER',
+      'class_tier', 'ARCH+ I',
       'signa_rate', 96.4,
       'live_signa_rate', 96.4,
       'compression_ratio', 0.9694,
@@ -236,17 +236,17 @@ ON CONFLICT (codename) DO NOTHING;
 INSERT INTO metric_snapshots (operator_id, snapshot_date, window_type, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, signal_force, class_tier, last_seen, recency_modifier, live_signa_rate, movement_24h, movement_7d, ruleset_version)
 SELECT o.operator_id, DATE '2026-05-14', '30d', v.input, v.output, v.cc, v.cr, v.signa, v.comp, v.pc, v.ct, v.sd, v.tt, v.sf, v.cls, TIMESTAMPTZ '2026-05-14T00:00:00Z', 1.00, v.signa, 0, 0, '1.0'
 FROM (VALUES
-  ('TransVaultOrigin·tokscale', 61349259::bigint, 17117729::bigint, 161665905::bigint, 3570556236::bigint, 96.4, 0.218, 92, 37, 26.1, 18450, 12.8, 'TRANSMITTER')
-,  ('OrcaVanguard', 20500000000, 1900000000, 1400000000, 572400000000, 88.0, 0.88, 84, 36, 23.0, 16000, 11.4, 'TRANSMITTER')
-,  ('IronLattice', 17000000000, 1300000000, 352600, 512000000000, 84.0, 0.84, 80, 33, 21.6, 14800, 10.6, 'TRANSMITTER')
-,  ('PrismCartographer', 26900000000, 2000000000, 238300, 475400000000, 79.3, 0.792, 73, 28, 19.2, 12400, 9.4, 'ARCH+')
-,  ('MeridianScribe', 16200000000, 1100000000, 1100000000, 361400000000, 76.1, 0.764, 70, 26, 17.8, 11200, 8.8, 'ARCH+')
-,  ('VectorHerald', 8300000000, 495200000, 111400000, 210600000000, 71.0, 0.701, 66, 24, 16.0, 10100, 8.1, 'ARCH')
-,  ('EmberCoil', 36900000000, 3000000000, 1000000000, 824400000000, 57.8, 0.561, 53, 18, 12.0, 7400, 6.2, 'POWER')
-,  ('DriftPilgrim', 7400000000, 415100000, 223700000, 233400000000, 47.2, 0.452, 44, 14, 9.6, 5800, 5.1, 'BASE')
-,  ('SignalFledgling', 67700000000, 64000000000, 168800000, 36800000000, 36.5, 0.354, 33, 10, 7.2, 4100, 3.9, 'SEEKER')
-,  ('QuietHollow', 164100000000, 26000000000, 170100000, 296800000000, 24.0, 0.224, 21, 6, 5.4, 2600, 2.6, 'REFINER')
-,  ('AshIgnition', 4036000000000, 1258000000000, 99000000000, 1661000000000, 11.8, 0.118, 12, 3, 2.8, 1200, 1.4, 'IGNITER')
+  ('TransVaultOrigin·tokscale', 61349259::bigint, 17117729::bigint, 161665905::bigint, 3570556236::bigint, 96.4, 0.218, 92, 37, 26.1, 18450, 12.8, 'SEEKER III')
+,  ('OrcaVanguard', 20500000000, 1900000000, 1400000000, 572400000000, 88.0, 0.88, 84, 36, 23.0, 16000, 11.4, 'ARCH I')
+,  ('IronLattice', 17000000000, 1300000000, 352600, 512000000000, 84.0, 0.84, 80, 33, 21.6, 14800, 10.6, 'ARCH I')
+,  ('PrismCartographer', 26900000000, 2000000000, 238300, 475400000000, 79.3, 0.792, 73, 28, 19.2, 12400, 9.4, 'ARCH I')
+,  ('MeridianScribe', 16200000000, 1100000000, 1100000000, 361400000000, 76.1, 0.764, 70, 26, 17.8, 11200, 8.8, 'ARCH I')
+,  ('VectorHerald', 8300000000, 495200000, 111400000, 210600000000, 71.0, 0.701, 66, 24, 16.0, 10100, 8.1, 'ARCH I')
+,  ('EmberCoil', 36900000000, 3000000000, 1000000000, 824400000000, 57.8, 0.561, 53, 18, 12.0, 7400, 6.2, 'ARCH I')
+,  ('DriftPilgrim', 7400000000, 415100000, 223700000, 233400000000, 47.2, 0.452, 44, 14, 9.6, 5800, 5.1, 'ARCH I')
+,  ('SignalFledgling', 67700000000, 64000000000, 168800000, 36800000000, 36.5, 0.354, 33, 10, 7.2, 4100, 3.9, 'ARCH II')
+,  ('QuietHollow', 164100000000, 26000000000, 170100000, 296800000000, 24.0, 0.224, 21, 6, 5.4, 2600, 2.6, 'ARCH I')
+,  ('AshIgnition', 4036000000000, 1258000000000, 99000000000, 1661000000000, 11.8, 0.118, 12, 3, 2.8, 1200, 1.4, 'ARCH+ II')
 ) AS v(codename, input, output, cc, cr, signa, comp, pc, ct, sd, tt, sf, cls)
 JOIN operators o ON o.codename = v.codename
 ON CONFLICT (operator_id, snapshot_date, window_type) DO NOTHING;

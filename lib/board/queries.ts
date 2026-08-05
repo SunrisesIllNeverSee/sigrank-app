@@ -21,6 +21,7 @@ import { SORT_DEFAULT } from "@/lib/constants";
 import { filterToWindow } from "@/lib/board/windows";
 import { classToTierId, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
+import { tierOf } from "@/components/sigrank/types";
 import {
   MOCK_CLASS_DISTRIBUTION,
   MOCK_COUNTRIES,
@@ -401,10 +402,10 @@ export async function getLeaderboard(
       );
     }
     if (params.classScope && params.classScope !== "all") {
+      const scope = params.classScope!.toLowerCase();
       rows = rows.filter(
         (r) =>
-          r.snapshot.class_tier.toLowerCase() ===
-          params.classScope!.toLowerCase(),
+          tierOf(r.snapshot.class_tier).toLowerCase() === scope,
       );
     }
     const sort = params.sort ?? SORT_DEFAULT;
