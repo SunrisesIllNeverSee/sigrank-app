@@ -69,12 +69,13 @@ export interface ClassFilterOption {
 }
 
 /**
- * CLASS_FILTER — class scope filter options (lowercase tier ids).
- * 'all' clears the class scope.
+ * CLASS_FILTER — class scope filter options (lowercase tier names).
+ * Filters match on the base tier (tierOf), not the full sub-stage.
+ * 'all' clears the class scope. TRANSMITTER is a badge, not a class —
+ * not filterable here.
  */
 export const CLASS_FILTER: ClassFilterOption[] = [
   { id: "all", label: "All Classes" },
-  { id: "transmitter", label: "Transmitter" },
   { id: "arch+", label: "Architect+" },
   { id: "arch", label: "Architect" },
   { id: "power", label: "Power" },

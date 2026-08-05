@@ -108,7 +108,7 @@ const CLASS_DEFS: Record<TierName | "TRANSMITTER", string> = {
 function LiveCountBar({ count, max }: { count: number; max: number }) {
   const pct = Math.min(100, (count / max) * 100);
   const tier: TierName =
-    count > 500 ? "IGNITER" : count > 200 ? "BEARER" : count > 50 ? "SEEKER" : "IGNITER";
+    count > 500 ? "IGNITER" : count > 200 ? "BEARER" : count > 50 ? "SEEKER" : "REFINER";
   const color = colors.class[tier] ?? colors.text.accent;
 
   return (

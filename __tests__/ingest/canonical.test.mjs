@@ -37,14 +37,18 @@ function compute(i, o, cw, cr) {
   const yield_ = leverage * velocity;
 
   let dev10x = null;
-  if (cw > 0 && o > 0 && i > 0 && cr > 0) {
-    const T = o / i;
-    const C = cw / o;
-    const R = cr / cw;
-    dev10x = Math.log10(T * C * R);
+  let cascadeStr = "—";
+  if (i > 0 && cr > 0) {
+    dev10x = Math.log10(cr / i);
+    if (cw > 0 && o > 0) {
+      const T = o / i;
+      const C = cw / o;
+      const R = cr / cw;
+      cascadeStr = `${T.toFixed(1)}×${C.toFixed(1)}×${R.toFixed(1)}`;
+    }
   }
 
-  return { snr, velocity, leverage, yield_, dev10x, total };
+  return { snr, velocity, leverage, yield_, dev10x, cascadeStr, nonCompounding: cw === 0, total };
 }
 
 /** Mirrors pillarsToCore5 in bridge.ts */
@@ -165,10 +169,13 @@ test("Manual four-number path: all values ≥ 0", () => {
   assert.ok(nums.every((n) => n >= 0));
 });
 
-test("vincentkoc: nonCompounding flag (no dev10x when cw=0)", () => {
-  // cw=6530 so actually has dev10x — but verify the guard works for zero-cw
+test("vincentkoc: nonCompounding flag (dev10x defined when cr>0 even if cw=0)", () => {
+  // cw=0 but cr>0 and i>0 → dev10x = log10(cr/i) is finite.
+  // cascadeStr stays "—" because the T×C×R decomposition needs cw>0 && o>0.
   const m = compute(10_000, 500, 0, 295_500);
-  assert.equal(m.dev10x, null, "dev10x should be null when cw=0");
+  assert.ok(m.dev10x !== null, "dev10x should be defined when cr>0 && i>0 (even if cw=0)");
+  assert.equal(m.cascadeStr, "—", "cascadeStr should be '—' when cw=0 (no T×C×R decomposition)");
+  assert.ok(m.nonCompounding, "nonCompounding flag should be true when cw=0");
 });
 
 test("Empty input throws", () => {

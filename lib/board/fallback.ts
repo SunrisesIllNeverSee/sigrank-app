@@ -16,6 +16,7 @@ import { filterToWindow } from "@/lib/board/windows";
 import coldStore from "@/lib/board/snapshot.json";
 import { MOCK_LEADERBOARD } from "@/lib/board/mock";
 import type { LeaderboardRow } from "@/lib/board/types";
+import { tierOf } from "@/components/sigrank/types";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -96,10 +97,10 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
     );
   }
   if (params.classScope && params.classScope !== "all") {
+    const scope = params.classScope!.toLowerCase();
     rows = rows.filter(
       (r) =>
-        r.snapshot.class_tier.toLowerCase() ===
-        params.classScope!.toLowerCase(),
+        tierOf(r.snapshot.class_tier).toLowerCase() === scope,
     );
   }
   const sort = params.sort ?? SORT_DEFAULT;

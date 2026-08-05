@@ -1,7 +1,8 @@
 /**
  * __tests__/scoring/signa-ceiling.test.mjs
  * CLAIM 3: RS01 weights sum to 0.85 (tt muted), so max achievable SIGNA is 85.0 —
- * exactly the TRANSMITTER signaMin gate, making it reachable only at perfection.
+ * exactly the TRANSMITTER badge signaMin gate (RS.08), making the badge reachable
+ * only at perfection. TRANSMITTER is a windowed peak badge, not a permanent class.
  * Also: the live weights fail secret-config's sum≈1 validator. PASSES if TRUE.
  * Run: node --test __tests__/scoring/signa-ceiling.test.mjs
  */
@@ -35,8 +36,8 @@ test("max achievable SIGNA (all components = 100) is exactly 85", () => {
   );
 });
 
-test("TRANSMITTER (signaMin 85) requires a PERFECT operator", () => {
-  // Drop any single surviving axis below 100 → SIGNA < 85 → TRANSMITTER unreachable.
+test("TRANSMITTER badge (signaMin 85) requires a PERFECT operator", () => {
+  // Drop any single surviving axis below 100 → SIGNA < 85 → TRANSMITTER badge unreachable.
   const almost = signa({ comp: 100, sd: 100, pc: 100, ct: 99, tt: 100 });
   assert.ok(
     almost < 85,

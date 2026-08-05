@@ -66,12 +66,16 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
   let dev10x: number | null = null;
   let cascadeStr = "—";
 
-  if (cw > 0 && o > 0 && i > 0 && cr > 0) {
-    const transmission = o / i;
-    const commitment = cw / o;
-    const reuse = cr / cw;
-    dev10x = Math.log10(transmission * commitment * reuse);
-    cascadeStr = `${transmission.toFixed(1)}×${commitment.toFixed(1)}×${reuse.toFixed(1)}`;
+  // dev10x = log10(leverage) = log10(cache_read / input) — needs only i > 0 && cr > 0.
+  // The T×C×R cascade decomposition additionally needs cw > 0 && o > 0.
+  if (i > 0 && cr > 0) {
+    dev10x = Math.log10(cr / i);
+    if (cw > 0 && o > 0) {
+      const transmission = o / i;
+      const commitment = cw / o;
+      const reuse = cr / cw;
+      cascadeStr = `${transmission.toFixed(1)}×${commitment.toFixed(1)}×${reuse.toFixed(1)}`;
+    }
   }
 
   return {

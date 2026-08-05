@@ -75,12 +75,12 @@ export function ClassLadder() {
         ⊙ The hierarchy
       </div>
       <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-        Nine classes. One ladder.
+        Eight tiers. One ladder.
       </h2>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
         Your class is identity. Your rank is position. Class is assigned from
-        your cascade SNR and 10xDEV — whichever is more restrictive wins.
-        TRANSMITTER is rare on purpose.
+        total tokens — eight tiers, each split into three sub-stages.
+        TRANSMITTER is a temporary peak badge, not a permanent class.
       </p>
 
       <div className="mt-10 overflow-hidden rounded-2xl border border-bg-border-subtle bg-bg-surface">
