@@ -52,17 +52,35 @@ INSERT INTO rulesets (
     "promotion_cycles": 3
   }'::jsonb,  -- OPERATOR_OVERRIDE_REQUIRED RS.01 / OPERATOR_OVERRIDE_REQUIRED RS.04 / OPERATOR_OVERRIDE_REQUIRED RS.06 / OPERATOR_OVERRIDE_REQUIRED RS.07
   -- threshold_json -----------------------------------------------------------
+  -- RS.05 class thresholds: 24-stage experience ladder (8 tiers × 3 sub-stages).
+  -- Class is assigned from total tokens only; comp_min/signa_min are vestigial
+  -- from the old 9-tier model and kept for DB schema compatibility only.
   '{
     "class_thresholds": [
-      {"class": "ARCH+ I", "comp_min": 0.85, "signa_min": 85},
-      {"class": "ARCH+ III",   "comp_min": 0.75, "signa_min": 75},
-      {"class": "ARCH",        "comp_min": 0.65, "signa_min": 65},
-      {"class": "POWER",       "comp_min": 0.50, "signa_min": 50},
-      {"class": "BASE",        "comp_min": 0.40, "signa_min": null},
-      {"class": "SEEKER",      "comp_min": 0.30, "signa_min": null},
-      {"class": "REFINER",     "comp_min": 0.20, "signa_min": null},
-      {"class": "BEARER",      "comp_min": 0.15, "signa_min": null},
-      {"class": "IGNITER",     "comp_min": 0.00, "signa_min": null}
+      {"class": "ARCH+ I",   "total_min": 7068201104627},
+      {"class": "ARCH+ II",  "total_min": 3000000000000},
+      {"class": "ARCH+ III", "total_min": 1000000000000},
+      {"class": "ARCH I",    "total_min": 186207267611},
+      {"class": "ARCH II",   "total_min": 98543134083},
+      {"class": "ARCH III",  "total_min": 68766193943},
+      {"class": "POWER I",   "total_min": 39958782379},
+      {"class": "POWER II",  "total_min": 26955905621},
+      {"class": "POWER III", "total_min": 19141226889},
+      {"class": "BASE I",    "total_min": 13960345961},
+      {"class": "BASE II",   "total_min": 10189224970},
+      {"class": "BASE III",  "total_min": 7747041813},
+      {"class": "SEEKER I",  "total_min": 5446673659},
+      {"class": "SEEKER II", "total_min": 4014577247},
+      {"class": "SEEKER III","total_min": 2961798768},
+      {"class": "REFINER I", "total_min": 2358346840},
+      {"class": "REFINER II","total_min": 1845750357},
+      {"class": "REFINER III","total_min": 1334876308},
+      {"class": "BEARER I",  "total_min": 984078167},
+      {"class": "BEARER II", "total_min": 714619043},
+      {"class": "BEARER III","total_min": 431702990},
+      {"class": "IGNITER I", "total_min": 216393332},
+      {"class": "IGNITER II","total_min": 88999166},
+      {"class": "IGNITER III","total_min": 0}
     ],
     "depth_buckets": [[30,100],[25,92],[20,84],[15,72],[10,58],[5,42]],
     "depth_fallback": 25,
@@ -165,7 +183,7 @@ SELECT
   NULL, 119, 53960,
   96.4, NULL, NULL, 12.8, NULL,
   1251211, 11296121, 128196310, 2555179769,  -- §5b token-pillar spine (0005) → Υ 18436.98 on read
-  'ARCH+ I', '2026-05-14T00:00:00Z', 1.00, 96.4,
+  'REFINER I', '2026-05-14T00:00:00Z', 1.00, 96.4,
   0, 0, '1.0'
 FROM operators o
 WHERE o.codename = 'TransVaultOrigin'
@@ -202,7 +220,7 @@ SELECT
       'operator_id', o.operator_id,
       'codename', 'TransVaultOrigin',
       'display_name', 'TheSignalVault',
-      'class_tier', 'ARCH+ I',
+      'class_tier', 'REFINER I',
       'signa_rate', 96.4,
       'live_signa_rate', 96.4,
       'compression_ratio', 0.9694,

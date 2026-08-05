@@ -913,9 +913,9 @@ export const MOCK_HOMEPAGE_STATS: HomepageStats = {
   total_operators: MOCK_OPERATORS.length,
   total_snapshots: 1240,
   total_tokens_scored: 1123252011,
-  transmitter_count: MOCK_LEADERBOARD.filter(
-    (r) => r.snapshot.class_tier === "TRANSMITTER",
-  ).length,
+  transmitter_count: 0, // TRANSMITTER is a windowed peak badge (RS.08), not a
+                        // permanent class. Badge evaluator exists but is not yet
+                        // wired to snapshots. Will count badge holders once wired.
   top_operator_codename: "TransVaultOrigin",
   top_signa_rate: 96.4,
   active_last_hour: 0,
