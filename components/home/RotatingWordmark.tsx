@@ -1,6 +1,31 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { Space_Grotesk, Bitter, Archivo_Black } from "next/font/google";
+import "./wordmark.css";
+
+// Wordmark font pool — used ONLY here (the rotating SIGRANK logo on the
+// homepage). Moved from app/layout.tsx so these 3 font families don't
+// load on every page on the site. Each letter of "SIGRANK" cycles through
+// these via the .wordmark-letter CSS animation in globals.css.
+const wmGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--wm-grotesk",
+  display: "swap",
+});
+const wmSerif = Bitter({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--wm-serif",
+  display: "swap",
+});
+const wmBlack = Archivo_Black({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--wm-black",
+  display: "swap",
+});
 
 /**
  * RotatingWordmark — the landing hero wordmark, EXAGGERATED.
@@ -40,7 +65,7 @@ export function RotatingWordmark() {
   if (hidden) return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+    <div className={`${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} flex flex-wrap items-center justify-center gap-x-3 gap-y-2`}>
       <h1
         aria-label="SIGRANK"
         className="flex select-none items-baseline text-[clamp(3.5rem,13vw,9rem)] font-bold leading-none tracking-[0.04em] text-gold"

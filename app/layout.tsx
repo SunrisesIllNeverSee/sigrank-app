@@ -1,11 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Roboto,
-  Geist_Mono,
-  Space_Grotesk,
-  Bitter,
-  Archivo_Black,
-} from "next/font/google";
+import { Roboto, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
@@ -32,28 +26,6 @@ const geistSans = Roboto({
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
-  display: "swap",
-});
-
-// Wordmark font pool — used ONLY by the landing RotatingWordmark, where each
-// letter of SIGRANK cycles through these on a stagger. Kept off the global
-// font-family chain (variables only) so they don't affect the locked theme.
-const wmGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["700"],
-  variable: "--wm-grotesk",
-  display: "swap",
-});
-const wmSerif = Bitter({
-  subsets: ["latin"],
-  weight: ["700"],
-  variable: "--wm-serif",
-  display: "swap",
-});
-const wmBlack = Archivo_Black({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--wm-black",
   display: "swap",
 });
 
@@ -85,7 +57,7 @@ export default function RootLayout({
       lang="en"
       data-theme="terminal"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} font-sans`}
+      className={`${geistSans.variable} ${geistMono.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
         <JsonLd data={[organization(), website(), product()]} />

@@ -1,8 +1,19 @@
 import React from "react";
+import dynamic from "next/dynamic";
 import { CascadeHeader } from "@/components/home/CascadeHeader";
-import { RotatingWordmark } from "@/components/home/RotatingWordmark";
-import { TerminalWordmark } from "@/components/home/TerminalWordmark";
 import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
+
+// Lazy-load the wordmark components — they're client islands with font
+// downloads (Space_Grotesk, Bitter, Archivo_Black) + MutationObserver setup.
+// Code-splitting keeps their JS (and the 3 wordmark fonts) in a separate
+// chunk that loads after the critical path. SSR is preserved so the <h1>
+// (SIGRANK) stays in the initial HTML for SEO.
+const RotatingWordmark = dynamic(
+  () => import("@/components/home/RotatingWordmark").then((m) => m.RotatingWordmark),
+);
+const TerminalWordmark = dynamic(
+  () => import("@/components/home/TerminalWordmark").then((m) => m.TerminalWordmark),
+);
 
 /**
  * Draft2Hero — the launch-landing intro block for /draft2 (owner edit 2026-06-21).

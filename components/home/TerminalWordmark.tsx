@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { TerminalBlockText } from "@/components/home/TerminalBlockText";
+import "./wordmark.css";
 
 /**
  * TerminalWordmark — the terminal-theme hero wordmark (Layer 3, FIX O-adjacent).

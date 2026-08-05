@@ -14,11 +14,13 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { cliTool, faqPage } from "@/lib/jsonld";
 import Link from "next/link";
 
-// ISR: the Four Degrees chart now auto-pulls the top operator's live all-time metrics
-// (lib/marketing/top-operator-column.ts). Revalidate hourly so the page stays prerendered
-// (○ Static) + refreshes the gold column + metadata/brand edits propagate within the hour
-// (was 86400 — a metadata change took up to 24h to show in-browser).
-export const revalidate = 3600;
+// ISR: the Four Degrees chart auto-pulls the top operator's live all-time metrics
+// (lib/marketing/top-operator-column.ts). Revalidate daily — the homepage aggregate
+// stats + four degrees columns don't need to be fresher than that (board pages have
+// their own 1h ISR for real-time data). Data-layer unstable_cache (5min) still
+// refreshes the underlying DB reads independently. Metadata/brand edits propagate
+// within 24h, or instantly on deploy (Vercel rebuilds all static pages).
+export const revalidate = 86400;
 
 // Home title carries the dual brand: SigRank (the product) · SignalAF (the domain identity),
 // near-equal parallel per owner. Sub-pages get just "· SigRank" via the root template
