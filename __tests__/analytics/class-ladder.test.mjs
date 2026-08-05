@@ -8,11 +8,24 @@
  * - TRANSMITTER is not a permanent class (not in RS05 thresholds)
  * - cache_write=0 operator gets finite dev10x (log10(cr/i)), no NaN/Infinity
  * - cascadeStr is "—" when cw=0 but dev10x is still computed
+ * - Source drift guard: inlined thresholds must match lib/analytics/ruleset.ts
+ *
+ * NOTE: thresholds and cascade math are inlined (not imported) because the test
+ * runs as .mjs and the source is .ts. The source-drift guard test below reads
+ * the .ts file as text and verifies the numbers match, so source drift will
+ * fail the test.
  *
  * Run: node --test __tests__/analytics/class-ladder.test.mjs
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const RULESET_PATH = join(__dirname, "../../lib/analytics/ruleset.ts");
+const CASCADE_PATH = join(__dirname, "../../lib/analytics/cascade.ts");
 
 // ── RS05 thresholds (mirrors lib/analytics/ruleset.ts) ──
 const RS05_CLASS_THRESHOLDS = [
@@ -127,4 +140,32 @@ test("all 24 stages have unique, non-decreasing floors", () => {
   // 24 stages + last floor is 0
   assert.equal(RS05_CLASS_THRESHOLDS.length, 24);
   assert.equal(floors[floors.length - 1], 0, "last stage (IGNITER III) must have floor 0");
+});
+
+// ── Source drift guards ──
+// These tests read the .ts source files as text and verify the inlined
+// threshold values match. If someone edits ruleset.ts without updating
+// this test, the guard fails.
+
+test("source drift guard: inlined thresholds match lib/analytics/ruleset.ts", () => {
+  const src = readFileSync(RULESET_PATH, "utf8");
+  for (const t of RS05_CLASS_THRESHOLDS) {
+    const expected = `{ class: "${t.class}", totalMin: ${t.totalMin} }`;
+    assert.ok(
+      src.includes(expected),
+      `ruleset.ts does not contain "${expected}" — update the test or the source`,
+    );
+  }
+});
+
+test("source drift guard: cascade.ts uses i>0 && cr>0 for dev10x (not cw>0)", () => {
+  const src = readFileSync(CASCADE_PATH, "utf8");
+  assert.ok(
+    src.includes("i > 0 && cr > 0"),
+    "cascade.ts must gate dev10x on i > 0 && cr > 0 (not cw > 0)",
+  );
+  assert.ok(
+    !src.includes("cw > 0 && o > 0 && i > 0 && cr > 0"),
+    "cascade.ts must NOT use the old 4-condition guard for dev10x",
+  );
 });
