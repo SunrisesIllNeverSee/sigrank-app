@@ -42,6 +42,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const FIELD_ANALYSIS_PATH = resolve(ROOT, "public/data/field-analysis.json");
+const BOARD_SNAPSHOT_PATH = resolve(ROOT, "public/data/board-all_time.json");
 const ARCHETYPES_PATH = resolve(ROOT, "public/data/archetypes.json");
 const LABELS_FULL_PATH = resolve(ROOT, "public/data/archetype-labels-1628.json");
 const LABELS_HCM_PATH = resolve(ROOT, "public/data/archetype-labels-1498.json");
@@ -331,7 +332,7 @@ function clusterStats(members) {
   for (const m of members) platforms.set(m.platform, (platforms.get(m.platform) || 0) + 1);
   const topPlatform = [...platforms.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "unknown";
   const sampleHandles = [...members]
-    .filter((m) => m.handle)
+    .filter((m) => m.handle && boardCodenames.has(m.handle))
     .sort((a, b) => b.total_tokens - a.total_tokens)
     .slice(0, 3)
     .map((m) => m.handle);
@@ -750,6 +751,22 @@ Regenerate with \`node scripts/gen-archetypes.mjs\` from the repo root.
 
 // ── Main ──
 const field = JSON.parse(readFileSync(FIELD_ANALYSIS_PATH, "utf-8"));
+
+// Load the committed board snapshot so sample_handles only includes handles
+// that have live /user/* profiles. The board uses `codename` as the URL key;
+// field-analysis uses `handle` (the tokscale username). We build a set of
+// board codenames and filter against it in clusterStats().
+let boardCodenames = new Set();
+try {
+  const board = JSON.parse(readFileSync(BOARD_SNAPSHOT_PATH, "utf-8"));
+  for (const e of (board.entries || [])) {
+    if (e.codename) boardCodenames.add(e.codename);
+  }
+  console.log(`Board snapshot: ${boardCodenames.size} live codenames loaded for sample_handle filtering`);
+} catch {
+  console.warn("Warning: could not load board snapshot — sample_handles will not be filtered");
+}
+
 const allOperators = field.operators;
 const { flagged, ratioOutliers, outliers } = splitPopulations(allOperators);
 const hcmOperators = allOperators.filter((o) => !outliers.has(opKey(o)));
