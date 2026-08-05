@@ -1,0 +1,172 @@
+/*
+ * wordmark.css — homepage wordmark animations.
+ *
+ * Extracted from globals.css so the ~140 lines of wordmark keyframes +
+ * terminal-wordmark color-cycle only load on the homepage (imported by
+ * RotatingWordmark + TerminalWordmark). Keeps the critical-path CSS
+ * (globals.css) leaner for every other page on the site.
+ */
+
+/* ── Terminal wordmark — block-letter SIGRANK with color-cycle (Layer 3) ──────
+ * The terminal-theme hero wordmark: the TUI splash block-letter art (SPLASH_ART
+ * from sigrank-mcp/tui.mjs) rendered as a <pre>, with a continuous color-cycle
+ * through the TUI MOSES_PAL palette (warm golds/ambers: 256-colors 220/178/214/
+ * 208/222/230 → #e0b240 #f0c862 #e8a0d0 #f08c3c #f0d878 #fef0c0). The cycle
+ * sweeps a background-clip:text gradient across the art so the color "flashes"
+ * travel left→right. Per-line stagger via --tw-delay so the sweep reads as
+ * flowing down the wordmark.
+ *
+ * Reduced motion (owner: keep movement, do NOT freeze): slow the cycle to a
+ * 30s drift + lower the palette contrast so it's barely perceptible — never a
+ * strobe (seizure risk). The animation still runs, just gently.
+ */
+@keyframes terminal-wordmark-cycle {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+.terminal-wordmark-line {
+  background: linear-gradient(
+    90deg,
+    #e0b240,
+    #f0c862,
+    #e8a0d0,
+    #f08c3c,
+    #f0d878,
+    #fef0c0,
+    #e0b240,
+    #f0c862,
+    #e8a0d0,
+    #f08c3c,
+    #f0d878,
+    #fef0c0
+  );
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: terminal-wordmark-cycle 8s linear var(--tw-delay, 0s) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .terminal-wordmark-line {
+    /* Owner: keep movement, slow it to a gentle drift — never a strobe.
+       30s cycle + the wide gradient makes the shift barely perceptible. */
+    animation-duration: 30s;
+  }
+}
+
+/* ── Landing cascade-header pulse ──────────────────────────────────────────
+ * Drives the travelling dash in components/home/CascadeHeader.tsx. The dash is
+ * normalized via pathLength=1, so animating stroke-dashoffset 1→0 runs one pulse
+ * the full length of the path. var(--dur)/var(--delay) are set per-stream inline.
+ */
+@keyframes cascade-pulse {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.cascade-pulse {
+  animation: cascade-pulse var(--dur, 6s) linear var(--delay, 0s) infinite;
+}
+
+/* ── Landing rotating wordmark ─────────────────────────────────────────────
+ * Each letter of SIGRANK cycles through a small font pool on a stagger (per-
+ * letter animation-delay set inline), so the wordmark reads as alive without
+ * being chaotic. font-family swaps are stepwise (not interpolated) — the slow
+ * 8s cycle + 4 keyframe holds make each swap feel intentional. Reduced-motion
+ * locks to the base mono face.
+ */
+@keyframes wordmark-rotate {
+  0%,
+  18% {
+    font-family: var(--font-geist-mono), monospace;
+  }
+  20%,
+  38% {
+    font-family: var(--wm-grotesk), sans-serif;
+  }
+  40%,
+  58% {
+    font-family: var(--wm-serif), serif;
+  }
+  60%,
+  78% {
+    font-family: var(--wm-black), sans-serif;
+  }
+  80%,
+  98% {
+    font-family: var(--font-geist-mono), monospace;
+  }
+  100% {
+    font-family: var(--font-geist-mono), monospace;
+  }
+}
+.wordmark-letter {
+  display: inline-block;
+  animation: wordmark-rotate 8s steps(1, end) var(--wm-delay, 0s) infinite;
+}
+
+/* ── S → § swap: the leading S of SIGRANK gets a 5th rotational character.
+ * The ::before pseudo cycles through five glyphs: S across four font slots,
+ * then § on its own slot (the 5th character), then back to S. The real
+ * character is hidden with color:transparent so we never get a double image.
+ */
+@keyframes wordmark-s-char {
+  0%,
+  18% {
+    content: "S";
+  }
+  20%,
+  38% {
+    content: "S";
+  }
+  40%,
+  58% {
+    content: "S";
+  }
+  60%,
+  78% {
+    content: "S";
+  }
+  80%,
+  98% {
+    content: "§";
+  }
+  100% {
+    content: "S";
+  }
+}
+.wordmark-letter-s {
+  color: transparent;
+  position: relative;
+}
+.wordmark-letter-s::before {
+  content: "S";
+  position: absolute;
+  left: 0;
+  /* Lock to the exact gold token (not currentColor) so the S matches the other
+     letters precisely — currentColor on the pseudo rendered a faintly different
+     shade across the font-rotation keyframes (owner 2026-06-24). */
+  color: rgb(var(--gold));
+  animation: wordmark-s-char 8s steps(1, end) var(--wm-delay, 0s) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-letter {
+    animation: none;
+    font-family: var(--font-geist-mono), monospace;
+  }
+  .wordmark-letter-s {
+    color: inherit;
+  }
+  .wordmark-letter-s::before {
+    display: none;
+  }
+}
