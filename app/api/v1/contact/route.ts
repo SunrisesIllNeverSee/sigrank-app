@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const CONTACT_TO = "hello@signalaf.com";
-const CONTACT_FROM = "SigRank Contact <onboarding@resend.dev>";
+const CONTACT_FROM = "SigRank <hello@signalaf.com>";
 
 // Simple in-memory rate limit (per server instance, best-effort).
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
