@@ -173,6 +173,8 @@ export default async function BlogPost({
             alt={title}
             width={1200}
             height={630}
+            priority
+            sizes="(max-width: 768px) 100vw, 1200px"
             className="h-auto w-full object-cover"
           />
         </div>
