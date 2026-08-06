@@ -18,6 +18,10 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import type { LeaderboardRow, TelemetryRaw } from "@/lib/board/types";
+import type { Operator, ScoredSnapshot } from "@/lib/analytics/scoring-types";
+import type { CascadeMetrics } from "@/lib/ingest/bridge";
+import type { SignalClass } from "@/components/sigrank/types";
 
 export interface StaticBoardEntry {
   rank: number;
@@ -89,4 +93,110 @@ export function getStaticAllTimeBoard(): StaticBoardEntry[] {
 /** Clear the in-memory cache (for tests or after regeneration). */
 export function clearStaticBoardCache(): void {
   cached = null;
+}
+
+/**
+ * Convert a flat StaticBoardEntry (the toEntry() output shape stored in the
+ * static JSON) into a LeaderboardRow (the nested shape that sortValue(),
+ * recordValue(), and isOutlierRow() expect).
+ *
+ * The hall page (app/hall/page.tsx) needs LeaderboardRow[] for its in-memory
+ * sort + record-ticker pipeline. The static board JSON stores flat entries
+ * (same shape as toEntry() produces for the board page). This function bridges
+ * the two shapes so the hall page can use the static all_time snapshot without
+ * a Supabase query.
+ *
+ * The cascade metrics are reconstructed from the flat fields (yield_, leverage,
+ * etc.) rather than recomputed from pillars — the static JSON already carries
+ * the computed values, so we trust them. nonCompounding is inferred from
+ * cacheWrite === 0 (matching bridge.ts:192).
+ */
+export function staticEntryToLeaderboardRow(e: StaticBoardEntry): LeaderboardRow {
+  const input = e.input ?? 0;
+  const output = e.output ?? 0;
+  const cacheRead = e.cacheRead ?? 0;
+  const cacheWrite = e.cacheWrite ?? 0;
+  const total = e.totalTokens ?? input + output + cacheRead + cacheWrite;
+  const nonCompounding = cacheWrite === 0;
+
+  const cascade: CascadeMetrics | null =
+    e.yield_ != null && e.leverage != null
+      ? {
+          yield_: e.yield_,
+          velocity: e.velocity ?? 0,
+          leverage: e.leverage,
+          snr: e.snr ?? 0,
+          dev10x: e.dev10x ?? null,
+          scaleV: e.scaleV ?? 0,
+          costPerMillion: e.costPerMillion ?? 0,
+          efficiency: e.efficiency ?? 0,
+          opRatio: e.opRatio ?? "",
+          cascadeStr: nonCompounding ? "—" : `${(output / Math.max(input, 1)).toFixed(1)}×${(cacheWrite / Math.max(output, 1)).toFixed(1)}×${(cacheRead / Math.max(cacheWrite, 1)).toFixed(1)}`,
+          nonCompounding,
+        }
+      : null;
+
+  const telemetry: TelemetryRaw = {
+    fresh_input: input,
+    output,
+    cache_read: cacheRead,
+    cache_create: cacheWrite,
+    sessions: 0,
+    turns: 0,
+  };
+
+  const operator: Operator = {
+    operator_id: e.codename,
+    codename: e.codename,
+    display_name: e.anonId !== e.codename ? e.anonId : null,
+    claimed: false,
+    claimed_at: null,
+    claim_payment_id: null,
+    claim_contact: null,
+    current_supporter_tier: "free",
+    verification_status: "verified",
+    primary_domain: e.primaryDomain ?? e.platform ?? "claude",
+    account_age_days: parseInt(e.acctAge) || 0,
+    total_messages_lifetime: 0,
+    isPlaceholder: false,
+    status: e.status ?? "active",
+  };
+
+  const snapshot: ScoredSnapshot = {
+    signa_rate: 0,
+    class_tier: (e.signalClass as SignalClass) ?? "SEEKER I",
+    compression_ratio: e.snr ?? 0,
+    prompt_complexity: { value: e.promptComplexity ?? 0, confidence: "low" },
+    cross_thread: e.threadsRecalled ?? 0,
+    session_depth: e.sessionDepth ?? 0,
+    token_throughput: total,
+    signal_force: e.compositeScore ?? 0,
+    drift_ratio: null,
+    sdot_score: null,
+    sdrm_score: null,
+    movement_24h: 0,
+    movement_7d: 0,
+    ruleset_version: "1.0",
+    snapshot_date: e.lastSeen ?? null,
+    cascade,
+  };
+
+  return {
+    operator,
+    snapshot,
+    global_rank: e.rank,
+    percentile: e.percentile ?? 0,
+    telemetry,
+    window_type: "all_time",
+    platform: e.platform ?? null,
+    snapshot_date: e.lastSeen ?? null,
+    ...(e.platforms && e.platforms.length > 0 ? { platforms: e.platforms } : {}),
+  };
+}
+
+/** Convert an array of StaticBoardEntry to LeaderboardRow[] (the hall page shape). */
+export function staticEntriesToLeaderboardRows(
+  entries: StaticBoardEntry[],
+): LeaderboardRow[] {
+  return entries.map(staticEntryToLeaderboardRow);
 }
