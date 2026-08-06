@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const TO = "hello@signalaf.com";
-const FROM = "SigRank Removal <onboarding@resend.dev>";
+const FROM = "SigRank <hello@signalaf.com>";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 3;
