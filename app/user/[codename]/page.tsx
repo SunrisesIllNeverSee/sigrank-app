@@ -49,9 +49,7 @@ import dynamic from "next/dynamic";
 const LabTab = dynamic(() => import("@/components/profile/LabTab").then((m) => m.LabTab), {
   loading: () => <div className="h-48 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" />,
 });
-const SplitFlapCard = dynamic(() => import("@/components/signature/SplitFlapCard").then((m) => m.SplitFlapCard), {
-  loading: () => <div className="h-48 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" />,
-});
+import { DeferredSplitFlapCard } from "@/components/profile/DeferredSplitFlapCard";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 import { ClaimedBadge } from "@/components/claim/ClaimedBadge";
 import CascadeRadar from "@/components/charts/CascadeRadar";
@@ -709,7 +707,7 @@ export default async function OperatorProfilePage({
           Each character flips through glyphs and lands on its value. Loops.
           Only shown for ranked operators with cascade data. */}
       {ranked && c && !c.nonCompounding && (
-        <SplitFlapCard
+        <DeferredSplitFlapCard
           codename={operator.codename}
           name={nameShown}
           yieldValue={c.yield_}
@@ -756,7 +754,7 @@ export default async function OperatorProfilePage({
 
       <ProfileTabs
         stats={pending ? pendingPanel : rankedStatsPanel}
-        report={<ReportTab report={operatorReport} isOwner={isOwner} />}
+        report={operatorReport ? <ReportTab report={operatorReport} isOwner={isOwner} /> : undefined}
         lab={
           ranked && c ? (
             <LabTab

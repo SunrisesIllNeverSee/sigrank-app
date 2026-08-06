@@ -39,11 +39,7 @@ import {
   CompareShareCard,
   type CompareOperand,
 } from "@/components/share/CompareShareCard";
-import dynamic from "next/dynamic";
-const CompareMatchupCard = dynamic(
-  () => import("@/components/share/CompareMatchupCard").then((m) => m.CompareMatchupCard),
-  { loading: () => <div className="h-96 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" /> },
-);
+import { DeferredCompareMatchupCard } from "@/components/share/DeferredCompareMatchupCard";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 
@@ -310,7 +306,7 @@ export default async function ComparePage({
       />
 
       {/* Matchup + radars card — the full visual snapshot (matchup + dual radars). */}
-      <CompareMatchupCard
+      <DeferredCompareMatchupCard
         a={rowA}
         b={rowB}
         href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
