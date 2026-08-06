@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
 import { getLeaderboard } from "@/lib/board";
-import { getStaticAllTimeBoard } from "@/lib/board/static-board";
+import { getStaticAllTimeBoard, staticEntriesToLeaderboardRows } from "@/lib/board/static-board";
 import { BOARD_WINDOWS, boardWindowBySlug } from "@/lib/board/windows";
 import { HallHero } from "@/components/hall/HallHero";
 import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
@@ -100,8 +100,12 @@ export default async function HallPage({
     BOARD_WINDOWS.map(async (w) => {
       if (w.enum === "all_time") {
         // Egress fix: all_time reads the static snapshot (no Supabase query).
+        // Convert flat StaticBoardEntry[] → LeaderboardRow[] so sortValue,
+        // recordValue, and isOutlierRow can access the nested shape they expect.
         const staticEntries = getStaticAllTimeBoard();
-        windowsData[w.slug] = staticEntries.slice(0, 30) as unknown as Awaited<ReturnType<typeof getLeaderboard>>;
+        windowsData[w.slug] = staticEntriesToLeaderboardRows(
+          staticEntries.slice(0, 30),
+        );
       } else {
         windowsData[w.slug] = await getLeaderboard({
           window: w.enum,
