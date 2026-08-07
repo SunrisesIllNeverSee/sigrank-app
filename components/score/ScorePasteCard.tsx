@@ -106,8 +106,8 @@ export function ScorePasteCard() {
           aria-label="Token counts paste"
         />
         <span className="text-[11px] text-text-muted">
-          Accepts: four bare numbers, ccusage JSON, or partial fragments. Order:
-          input output cacheCreate cacheRead.
+          Accepts: four bare numbers, ccusage JSON, oh-my-pi session JSON/JSONL,
+          or partial fragments. Order: input output cacheCreate cacheRead.
         </span>
       </label>
 
