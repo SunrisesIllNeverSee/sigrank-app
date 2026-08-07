@@ -13,18 +13,21 @@ const wmGrotesk = Space_Grotesk({
   weight: ["700"],
   variable: "--wm-grotesk",
   display: "swap",
+  preload: false,
 });
 const wmSerif = Bitter({
   subsets: ["latin"],
   weight: ["700"],
   variable: "--wm-serif",
   display: "swap",
+  preload: false,
 });
 const wmBlack = Archivo_Black({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--wm-black",
   display: "swap",
+  preload: false,
 });
 
 /**

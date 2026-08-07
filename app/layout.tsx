@@ -21,6 +21,7 @@ const geistSans = Roboto({
   weight: ["400", "700"],
   variable: "--font-geist-sans",
   display: "swap",
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
