@@ -18,13 +18,14 @@ import { Analytics } from "@vercel/analytics/next";
 // globals.css + tailwind fontFamily references resolve to it app-wide.
 const geistSans = Roboto({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   variable: "--font-geist-sans",
   display: "swap",
 });
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
+  weight: ["700"],
   variable: "--font-geist-mono",
   display: "swap",
 });
