@@ -1,12 +1,13 @@
 "use client";
 
 /**
- * PasteForm — ccusage / Codex JSON paste submission.
+ * PasteForm — ccusage / Codex / oh-my-pi JSON paste submission.
  *
  * The fast path for Claude Code operators: paste the output of
- * `ccusage --json` (or a Codex JSON export) directly. The ingest
- * pipeline extracts the four token pillars, computes Core 5 metrics,
- * and POSTs a SnapshotPayload to /api/v1/ingest-paste.
+ * `ccusage --json` (or a Codex JSON export, or an oh-my-pi session
+ * JSON/JSONL dump) directly. The ingest pipeline extracts the four token
+ * pillars, computes Core 5 metrics, and POSTs a SnapshotPayload to
+ * /api/v1/ingest-paste.
  *
  * This is the web equivalent of sigrank.py (the local CLI auto-ingest).
  * Confidence is 'medium' — higher than manual (which is 'low') because
@@ -293,7 +294,7 @@ export function PasteForm() {
         <span className="text-xs font-medium text-text-secondary">
           Paste{" "}
           <code className="font-mono text-text-primary">ccusage --json</code>{" "}
-          output
+          output (or a Codex / oh-my-pi export)
         </span>
         <textarea
           value={paste}
@@ -311,8 +312,8 @@ export function PasteForm() {
           aria-label="ccusage JSON paste"
         />
         <span className="text-[11px] text-text-muted">
-          Accepts: full ccusage JSON, partial fragments, Codex exports, or four
-          bare numbers.
+          Accepts: full ccusage JSON, partial fragments, Codex exports, oh-my-pi
+          session JSON/JSONL, or four bare numbers.
         </span>
       </label>
 
