@@ -34,14 +34,19 @@ import type {
 // ---------------------------------------------------------------------------
 
 const ALIASES = {
-  input: ["inputTokens", "input_tokens"],
-  output: ["outputTokens", "output_tokens"],
-  cacheCreate: ["cacheCreationTokens", "cache_creation_input_tokens"],
+  input: ["inputTokens", "input_tokens", "input"],
+  output: ["outputTokens", "output_tokens", "output"],
+  cacheCreate: [
+    "cacheCreationTokens",
+    "cache_creation_input_tokens",
+    "cacheWrite",
+  ],
   cacheRead: [
     "cacheReadTokens",
     "cache_read_input_tokens",
     "cachedInputTokens",
     "cached_input_tokens",
+    "cacheRead",
   ],
   cost: ["totalCost", "costUSD", "cost"],
   reasoning: ["reasoningOutputTokens", "reasoning_output_tokens"],
@@ -59,6 +64,16 @@ const CODEX_KEYS = new Set([
   "reasoning_output_tokens",
   "reasoningOutputTokens",
 ]);
+
+/**
+ * Key that indicates an oh-my-pi (`omp`) payload. `cacheWrite` is unique to
+ * oh-my-pi: ccusage spells cache creation `cacheCreationTokens` /
+ * `cache_creation_input_tokens`, and Codex has no cache-write field at all.
+ *
+ * Detection only needs ONE occurrence anywhere in the payload. Summation must
+ * NOT depend on every occurrence — see accumulateOmpUsage().
+ */
+const OMP_KEYS = new Set(["cacheWrite"]);
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -136,9 +151,137 @@ function isCodexShape(d: unknown): boolean {
   return false;
 }
 
+function isOmpShape(d: unknown): boolean {
+  const keys = new Set<string>();
+  collectKeys(d, keys);
+  for (const k of OMP_KEYS) {
+    if (keys.has(k)) return true;
+  }
+  return false;
+}
+
 function safeInt(v: unknown): number {
   const n = Number(v);
   return Number.isFinite(n) ? Math.floor(n) : 0;
+}
+
+// ---------------------------------------------------------------------------
+// oh-my-pi (omp) JSON parser
+// ---------------------------------------------------------------------------
+
+/**
+ * Read one usage object into the accumulator. Called only on objects already
+ * recognized as usage, and deliberately non-recursive: `usage.cost` repeats
+ * the same four key names (`input`/`output`/`cacheRead`/`cacheWrite`) holding
+ * USD floats, so descending would add dollars to the token pillars. Only
+ * `cost.total` is read, and only as money.
+ */
+function consumeOmpUsage(
+  usage: Record<string, unknown>,
+  acc: {
+    input: number;
+    output: number;
+    cacheCreate: number;
+    cacheRead: number;
+    cost: number;
+  },
+): void {
+  acc.input += safeInt(usage.input);
+  acc.output += safeInt(usage.output);
+  acc.cacheCreate += safeInt(usage.cacheWrite);
+  acc.cacheRead += safeInt(usage.cacheRead);
+  const cost = usage.cost;
+  if (cost && typeof cost === "object") {
+    acc.cost += Number((cost as Record<string, unknown>).total) || 0;
+  }
+}
+
+/**
+ * Walk an omp payload and sum every usage object it contains.
+ *
+ * A usage object is recognized by EITHER discriminator: a property literally
+ * named `usage`, or an object carrying `cacheWrite`. Both are needed — omp
+ * omits cache fields it has none of, so an entry without `cacheWrite` would
+ * otherwise contribute zero input and output and silently under-count the
+ * pillars (a wrong Υ, not a cosmetic bug).
+ *
+ * A named `usage` child is consumed and the walk CONTINUES into its siblings —
+ * they can hold further usage-bearing entries. Only the consumed child itself
+ * is excluded, so nothing is counted twice. An object recognized by its own
+ * `cacheWrite` is a leaf: that is what keeps the USD `cost` child out.
+ */
+function accumulateOmpUsage(
+  node: unknown,
+  acc: {
+    input: number;
+    output: number;
+    cacheCreate: number;
+    cacheRead: number;
+    cost: number;
+  },
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((v) => accumulateOmpUsage(v, acc));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  const named = obj.usage;
+  if (named && typeof named === "object" && !Array.isArray(named)) {
+    consumeOmpUsage(named as Record<string, unknown>, acc);
+    for (const [k, v] of Object.entries(obj)) {
+      if (k !== "usage") accumulateOmpUsage(v, acc);
+    }
+    return;
+  }
+  if ("cacheWrite" in obj) {
+    consumeOmpUsage(obj, acc);
+    return;
+  }
+  Object.values(obj).forEach((v) => accumulateOmpUsage(v, acc));
+}
+
+function parseOmpSubmission(d: unknown, parsingMode: string): IngestResult {
+  const acc = { input: 0, output: 0, cacheCreate: 0, cacheRead: 0, cost: 0 };
+  accumulateOmpUsage(d, acc);
+  return {
+    pillars: {
+      input: acc.input,
+      output: acc.output,
+      cacheCreate: acc.cacheCreate,
+      cacheRead: acc.cacheRead,
+    },
+    meta: {
+      source: "omp",
+      estimated: false,
+      caveat: null,
+      parsingMode,
+      costUsd: acc.cost > 0 ? acc.cost : null,
+    },
+  };
+}
+
+/**
+ * Split a raw JSONL paste (one JSON object per line) into entries. Returns
+ * null unless every non-blank line is a standalone JSON value — pretty-printed
+ * JSON and prose both fall through to the later strategies.
+ */
+function parseJsonlEntries(text: string): unknown[] | null {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length < 2) return null;
+  const entries: unknown[] = [];
+  for (const line of lines) {
+    if (line[0] !== "{" && line[0] !== "[") return null;
+    try {
+      entries.push(JSON.parse(line));
+    } catch {
+      return null;
+    }
+  }
+  return entries;
 }
 
 // ---------------------------------------------------------------------------
@@ -396,6 +539,21 @@ function extractByName(
     };
   }
 
+  // A bare `"cacheWrite"` key marks an oh-my-pi fragment. Measured, not
+  // estimated — same values as ccusage, different provenance tag.
+  if (text.includes('"cacheWrite"')) {
+    return {
+      pillars: { input: i, output: totalO, cacheCreate: cw, cacheRead: cr },
+      meta: {
+        source: "omp",
+        estimated: false,
+        caveat: null,
+        parsingMode: "oh-my-pi named fields",
+        costUsd,
+      },
+    };
+  }
+
   return {
     pillars: { input: i, output: totalO, cacheCreate: cw, cacheRead: cr },
     meta: {
@@ -451,10 +609,11 @@ export function totalMismatchCaveat(
 // ---------------------------------------------------------------------------
 
 /**
- * ingestMeta — parse any supported ccusage/Codex/manual input into four token
- * pillars and metadata. Mirrors moses-sigrank/ingest.py `ingest_meta()`.
+ * ingestMeta — parse any supported ccusage/Codex/oh-my-pi/manual input into
+ * four token pillars and metadata. Mirrors moses-sigrank/ingest.py
+ * `ingest_meta()`.
  *
- * Throws a descriptive error if parsing fails at all three strategies.
+ * Throws a descriptive error if parsing fails at every strategy.
  */
 export function ingestMeta(
   text: string,
@@ -480,10 +639,11 @@ export function ingestMeta(
     (candidate ? tryFixJson(candidate) : null) ??
     (t[0] in ["{", "[", '"'] ? tryFixJson(t) : null);
 
-  // Strategy 1: JSON (ccusage or Codex)
+  // Strategy 1: JSON (oh-my-pi, ccusage or Codex)
   if (fixed) {
     try {
       const d = JSON.parse(fixed);
+      if (isOmpShape(d)) return parseOmpSubmission(d, "oh-my-pi usage object");
       if (isCodexShape(d)) return parseCodexSubmission(d, profile);
       const { pillars, costUsd } = parseCcusage(d);
       return {
@@ -501,13 +661,19 @@ export function ingestMeta(
     }
   }
 
-  // Strategy 2: Named fields in plain text
+  // Strategy 2: Raw JSONL session paste (oh-my-pi writes one entry per line)
+  const jsonlEntries = parseJsonlEntries(t);
+  if (jsonlEntries && isOmpShape(jsonlEntries)) {
+    return parseOmpSubmission(jsonlEntries, "oh-my-pi session JSONL");
+  }
+
+  // Strategy 3: Named fields in plain text
   if (hasNamedFields(t)) {
     const result = extractByName(t, profile);
     if (result) return result;
   }
 
-  // Strategy 3: Four bare numbers
+  // Strategy 4: Four bare numbers
   const pillars = parseFourNumbers(t);
   if (pillars) {
     return {
@@ -523,6 +689,6 @@ export function ingestMeta(
   }
 
   throw new Error(
-    "Telemetry format unrecognized. Paste ccusage --json output, Codex JSON, or four numbers: input output cache_create cache_read",
+    "Telemetry format unrecognized. Paste ccusage --json output, Codex JSON, oh-my-pi (omp) session JSON/JSONL, or four numbers: input output cache_create cache_read",
   );
 }
