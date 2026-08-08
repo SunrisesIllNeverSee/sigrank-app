@@ -61,13 +61,18 @@ import { operatorProfile } from "@/lib/jsonld";
 import HeatBar from "@/components/charts/HeatBar";
 import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 
-// ISR: revalidate every hour so profile data stays current. The page reads
-// no cookies/searchParams (pure public profile), so it's ISR-eligible. The
-// data-layer cache (unstable_cache on getOperator etc.) provides the first-tier
-// cache; this export makes the CDN hold the rendered page too. On-demand
-// revalidation via revalidateTouchedWindows fires on snapshot submit, so the
-// 3600s ISR is just a safety net — 600s was over-validating.
-export const revalidate = 3600;
+// ISR: revalidate every 6 hours. Profile data doesn't change frequently —
+// operators submit snapshots at most a few times per day, and on-demand
+// revalidation via revalidateTouchedWindows fires on snapshot submit so
+// the page updates immediately after a submission regardless of the ISR
+// window. The 21600s ISR is a safety net that cuts cold-miss DB queries
+// 6x vs the previous 3600s, which matters because the /user/[codename]
+// route does 8 DB queries on a cold miss and Supabase compute is a cost
+// constraint. The data-layer cache (unstable_cache on getOperator etc.)
+// provides a second tier at 120s; the edge Cache-Control header
+// (s-maxage=21600 in next.config.ts) keeps the CDN serving stale-while-
+// revalidate for 24h.
+export const revalidate = 21600;
 
 /**
  * Resolve the display name for an operator. display_name now carries both the
