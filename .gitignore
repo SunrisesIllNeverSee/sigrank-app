@@ -36,3 +36,6 @@ vercel*.env
 
 # Design mockups (reference only, not production assets)
 public/mockup-*
+
+# Bun lockfile (npm lockfile is canonical)
+bun.lock
