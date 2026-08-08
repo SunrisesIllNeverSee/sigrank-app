@@ -128,29 +128,39 @@ export const getOnlineByCountry = unstable_cache(
   { revalidate: 300, tags: ["board"] },
 );
 
-// ── Operator-tagged reads (revalidate: 120s) ─────────────────────────────
+// ── Operator-tagged reads (staggered revalidate) ─────────────────────────
+// Staggered windows so they don't all expire simultaneously on a cold miss.
+// The /user/[codename] page fires 8 queries in parallel; if all caches
+// expire at the same 120s mark, every query hits Supabase at once. With
+// staggered windows, only 1-2 queries miss at any given time — the rest
+// serve from cache, spreading the DB load over time.
+//
+// getOperator is the critical-path query (needed before the other 7 can
+// fire), so it gets the shortest window (90s) — it's also the most likely
+// to be revalidated on-demand via revalidateTouchedWindows.
+// The rest get progressively longer windows.
 
 export const getOperator = unstable_cache(_getOperator, ["operator"], {
-  revalidate: 120,
+  revalidate: 90,
   tags: ["operator"],
 });
 
 export const getOperatorSubmissions = unstable_cache(
   _getOperatorSubmissions,
   ["operator-submissions"],
-  { revalidate: 120, tags: ["operator"] },
+  { revalidate: 180, tags: ["operator"] },
 );
 
 export const getOperatorHistory = unstable_cache(
   _getOperatorHistory,
   ["operator-history"],
-  { revalidate: 120, tags: ["operator"] },
+  { revalidate: 150, tags: ["operator"] },
 );
 
 export const getOperatorReport = unstable_cache(
   _getOperatorReport,
   ["operator-report"],
-  { revalidate: 120, tags: ["operator"] },
+  { revalidate: 240, tags: ["operator"] },
 );
 
 export const getOperatorRecords = unstable_cache(

@@ -26,16 +26,18 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Cache operator profile pages at the edge — they're ISR (revalidate=3600)
+        // Cache operator profile pages at the edge — they're ISR (revalidate=21600)
         // but without an explicit Cache-Control the CDN treats them as MISS every
         // time. 2026-07-24: Googlebot crawl caused 2,449 serverless invocations on
-        // /user/* pages because none were edge-cached. s-maxage=3600 matches the
-        // ISR revalidate window; stale-while-revalidate keeps serving during refresh.
+        // /user/* pages because none were edge-cached. s-maxage=21600 matches the
+        // ISR revalidate window (6h); stale-while-revalidate keeps serving during
+        // refresh. On-demand revalidation via revalidateTouchedWindows fires on
+        // snapshot submit, so the CDN purges immediately after a submission.
         source: "/user/:codename*",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, s-maxage=3600, stale-while-revalidate=86400",
+            value: "public, s-maxage=21600, stale-while-revalidate=86400",
           },
         ],
       },
