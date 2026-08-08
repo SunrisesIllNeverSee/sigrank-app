@@ -22,6 +22,7 @@ export interface CascadeMetrics {
   yield_: number;
   velocity: number;
   leverage: number;
+  construction: number;
   snr: number;
   dev10x: number | null;
   scaleV: number;
@@ -50,6 +51,7 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
   const snr = i + o > 0 ? o / (i + o) : 0;
   const velocity = o / safeI;
   const leverage = cr / safeI;
+  const construction = cr > 0 ? cw / cr : 0;
   const yield_ = leverage * velocity;
 
   const total = i + o + cw + cr;
@@ -82,6 +84,7 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
     yield_,
     velocity,
     leverage,
+    construction,
     snr,
     dev10x,
     scaleV,

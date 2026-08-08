@@ -103,6 +103,7 @@ export function CompareVersus({
     regimeOf({
       velocity: r.snapshot.cascade?.velocity ?? 0,
       leverage: r.snapshot.cascade?.leverage ?? 0,
+      construction: r.snapshot.cascade?.construction ?? 0,
       nonCompounding: r.snapshot.cascade?.nonCompounding,
     });
   const regA = regOf(a);

@@ -357,7 +357,7 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The yield distribution is heavily right-skewed. 80% of human
           operators fall within the shaded band. The long tail to the right
-          is where the Cache Architects and Cache Builders live. The bulk of
+          is where the Compound Amplifiers and Convergent operators live. The bulk of
           the field clusters near the median. This is why the median is used
           instead of the mean: the mean is pulled by outliers, the median
           reflects where operators actually are.
@@ -515,21 +515,20 @@ export default async function FieldPage() {
       {/* ── Operator Archetypes ──────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Operator Archetypes
+          Build Archetypes
         </h2>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The field separates into 8 emergent archetypes. These are not
-          invented categories. They emerged from K-Means clustering on
-          log(yield, leverage, velocity, SNR) across the full 1,628-operator
-          scrape. The data
-          separates by magnitude first (yield tiers), then by shape (token
-          composition). Each archetype has its own fingerprint.
+          The field separates into 10 build archetypes based on how operators
+          move tokens through the cascade. Each type is defined by a different
+          primary dimension — input, cache_read, cache_write, output, or
+          multi-axis excellence. CONVERGENT is checked first and pulls out
+          operators who are elite on all three derived dimensions
+          (leverage, velocity, construction). The remaining types are
+          classified by their dominant axis.
         </p>
         <OperatorArchetypes
           archetypes={archetypes}
-          totalOperators={archetypes
-            .filter((a) => !a.overlay)
-            .reduce((s, a) => s + (a.n ?? 0), 0)}
+          totalOperators={archetypes.reduce((s, a) => s + (a.n ?? 0), 0)}
         />
       </section>
 
