@@ -101,7 +101,7 @@ const CLIENTS = [
   { name: "Cursor", config: "Settings → MCP → Add Server" },
   { name: "Cline", config: 'Marketplace → search "SigRank"' },
   { name: "Windsurf", config: "Settings → MCP Servers → Add" },
-  { name: "Any MCP client", config: "npx sigrank (stdio transport)" },
+  { name: "Any MCP client", config: "npx sigrank or bunx sigrank (stdio transport)" },
 ];
 
 export default function MCPPage() {
@@ -151,7 +151,11 @@ export default function MCPPage() {
             <code className="font-mono text-text-secondary">
               npx sigrank-mcp
             </code>{" "}
-            — same thing. No API key required for read tools. Submit tools need
+            — same thing. Bun users:{" "}
+            <code className="font-mono text-text-secondary">
+              bunx sigrank
+            </code>
+            . No API key required for read tools. Submit tools need
             a Supabase anon key (free, set during{" "}
             <code className="font-mono text-text-secondary">
               sigrank enroll
