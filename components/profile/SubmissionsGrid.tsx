@@ -25,6 +25,7 @@ const WINDOW_HEAD: Record<string, string> = {
 const PLATFORM_HEAD: Record<string, string> = {
   claude: "Claude",
   codex: "Codex",
+  omp: "Oh My Pi",
   chatgpt: "ChatGPT",
   gemini: "Gemini",
   pi: "Pi",

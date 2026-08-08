@@ -38,6 +38,8 @@ const PROVIDER_MAP = {
   "claude": "claude",
   "codex cli": "codex",
   "codex": "codex",
+  "omp": "omp",
+  "oh-my-pi": "omp",
   "chatgpt": "chatgpt",
   "openai": "chatgpt",
   "gemini": "gemini",

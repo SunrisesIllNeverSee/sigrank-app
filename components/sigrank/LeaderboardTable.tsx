@@ -74,6 +74,7 @@ const PLATFORM_LABEL: Record<string, string> = {
   gemini: "Gemini",
   pi: "Pi",
   codex: "Codex",
+  omp: "Oh My Pi",
   devin: "Devin",
   multi: "Multi",
   other: "Other",

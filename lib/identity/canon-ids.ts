@@ -554,6 +554,14 @@ export const PLATFORMS: Record<string, PlatformDef> = {
     domain: "codex",
     hex: colors.platform.Codex,
   },
+  // P.08 oh-my-pi (2026-08-08): appended, NOT merged into P.04 (Pi = the older
+  // pi-agent omp forked from). Distinct color; ids are append-only and stable.
+  "P.08": {
+    id: "P.08",
+    label: "Oh My Pi",
+    domain: "omp",
+    hex: colors.platform.OhMyPi,
+  },
 };
 
 export type BadgeCategory =

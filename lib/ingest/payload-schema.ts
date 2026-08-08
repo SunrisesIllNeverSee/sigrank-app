@@ -17,7 +17,14 @@ import { z } from "zod";
 /** window.type — the scoring window enum (snapshot_payload.md §window). */
 export const windowTypeEnum = z.enum(["today", "7d", "30d", "90d", "all_time"]);
 
-/** platform.primary — the AI platform enum (snapshot_payload.md §platform). */
+/**
+ * platform.primary — the AI platform enum (snapshot_payload.md §platform).
+ *
+ * 'omp' (oh-my-pi, P.08) is appended, never folded into 'pi' — P.04 is the older
+ * pi-agent that omp forked from. Kept as bare string literals with no interleaved
+ * comments: the cross-repo parity test extracts this array with a regex that splits
+ * on commas, so a comment inside the brackets would be read as an enum member.
+ */
 export const platformPrimaryEnum = z.enum([
   "claude",
   "chatgpt",
@@ -26,6 +33,7 @@ export const platformPrimaryEnum = z.enum([
   "codex",
   "multi",
   "other",
+  "omp",
 ]);
 
 /** tier — submission tier (snapshot_payload.md §tier). */
