@@ -118,6 +118,7 @@ Or explore first, no sign-in:
 ```bash
 sigrank                    # full tabbed TUI: dashboard · compare · board · watch
 npx sigrank board --once   # print the live leaderboard once
+bunx sigrank board --once  # same, via Bun (faster startup if you have it)
 ```
 
 Cautious? `sigrank submit --dry-run` prints the exact signed payload — four token
