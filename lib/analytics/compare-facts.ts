@@ -77,11 +77,14 @@ export function deriveFacts(
   const reg = regimeOf({
     velocity: c.velocity,
     leverage: c.leverage,
+    construction: c.construction,
     nonCompounding: c.nonCompounding,
   });
   push(
-    reg.key === "transient" || reg.key === "stateless" ? "down" : "up",
-    "Regime",
+    reg.key === "raw-injector" || reg.key === "cache-warming" || reg.key === "stateless"
+      ? "down"
+      : "up",
+    "Build Archetype",
     reg.word,
     1.5,
   );

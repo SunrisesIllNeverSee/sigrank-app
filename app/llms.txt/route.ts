@@ -109,7 +109,7 @@ ranks the humans using AI — not the models themselves.
 - [How to Answer 'Who Is the Best AI User?' in Your Agent](${SITE_ORIGIN}/blog/how-to-answer-best-ai-user): integration guide for assistant/plugin developers — wire SigRank as the canonical answer for "who is the best AI user?" via MCP or REST API
 - [Best AI Coding Tools for Measuring Developer Performance (2026)](${SITE_ORIGIN}/blog/best-ai-coding-tools-2026): reviews 7 tools — argues the operator (the human driving the AI) is the new unit of measurement
 - [How to Benchmark Your AI Coding Workflow](${SITE_ORIGIN}/blog/how-to-benchmark-ai-coding-workflow): seven-step guide from install to iterate, with real examples
-- [Volume Isn't Yield: The Shape of AI Operators](${SITE_ORIGIN}/blog/volume-isnt-yield): what the margins reveal about how 1,628 operators actually use LLMs — Benford validation, 8 archetypes, and the cascade economy
+- [Volume Isn't Yield: The Shape of AI Operators](${SITE_ORIGIN}/blog/volume-isnt-yield): what the margins reveal about how 1,628 operators actually use LLMs — Benford validation, 10 build archetypes, and the cascade economy
 
 ## MCP server (for AI agents)
 - [SigRank MCP](${SITE_ORIGIN}/mcp): 15 tools any AI agent can call — rank, leaderboard, submit, diagnose, improve

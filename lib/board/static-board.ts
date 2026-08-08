@@ -125,6 +125,7 @@ export function staticEntryToLeaderboardRow(e: StaticBoardEntry): LeaderboardRow
           yield_: e.yield_,
           velocity: e.velocity ?? 0,
           leverage: e.leverage,
+          construction: cacheRead > 0 ? cacheWrite / cacheRead : 0,
           snr: e.snr ?? 0,
           dev10x: e.dev10x ?? null,
           scaleV: e.scaleV ?? 0,

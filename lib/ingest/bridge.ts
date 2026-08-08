@@ -116,6 +116,8 @@ export interface CascadeMetrics {
   velocity: number;
   /** Leverage: cr/i. Cache reuse per fresh input. */
   leverage: number;
+  /** Construction: cw/cr. Cache writes per cache read — how much new context is built per read. */
+  construction: number;
   /** SNR (alias: compression_ratio). Duplicate for display clarity. */
   snr: number;
   /** log10(transmission × commitment × reuse). null if any component is zero. */
@@ -154,6 +156,7 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
   const snr = i + o > 0 ? o / (i + o) : 0;
   const velocity = o / safeI;
   const leverage = cr / safeI;
+  const construction = cr > 0 ? cw / cr : 0;
   const yield_ = leverage * velocity;
 
   const total = i + o + cw + cr;
@@ -182,6 +185,7 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
     yield_,
     velocity,
     leverage,
+    construction,
     snr,
     dev10x,
     scaleV,

@@ -1,5 +1,5 @@
 /**
- * OperatorArchetypes — 8 archetype cards from archetypes.json.
+ * OperatorArchetypes — 10 build archetype cards from archetypes.json.
  *
  * Renders a responsive grid of cards, one per archetype, showing: name,
  * operator count + percentage, median yield/leverage/velocity, four-pillar
@@ -13,8 +13,10 @@ import Link from "next/link";
 
 export interface ArchetypeData {
   archetype_id: number;
+  key: string;
   name: string;
   description: string;
+  defined_by: string;
   n: number;
   yield_median: number;
   leverage_median: number;
@@ -37,31 +39,24 @@ export interface OperatorArchetypesProps {
 }
 
 const ARCHETYPE_COLORS: Record<string, string> = {
-  "The Field": "#3498db",
-  "Context Builders": "#2ecc71",
-  "Cache Architects": "#d4af37",
-  "Input-Heavy Operators": "#e74c3c",
-  "Cache Builders": "#e17055",
-  "Cascade Operators": "#a29bfe",
-  "Steady Cascaders": "#00b894",
-  "High-Yield Steady Cascaders": "#00b894",
-  "Low-Yield Field": "#5dade2",
-  "Mid-Yield Input-Heavy Operators": "#e74c3c",
-  "Outliers": "#6a6a6a",
+  CONVERGENT: "#9b59b6",
+  "KINETIC PRODUCER": "#e74c3c",
+  "RAW INJECTOR": "#3498db",
+  "CACHE WARMING": "#5dade2",
+  "SHALLOW READER": "#48c9b0",
+  READER: "#2ecc71",
+  ARCHIVAL: "#27ae60",
+  BUILDER: "#f39c12",
+  "RECURSIVE MOMENTUM": "#d4af37",
+  "COMPOUND AMPLIFIER": "#c0392b",
 };
 
 export default function OperatorArchetypes({
   archetypes,
   totalOperators,
 }: OperatorArchetypesProps) {
-  // Sort by operator count descending (largest archetype first).
-  // Overlay archetypes (e.g. Outliers) sort to the end regardless of n,
-  // since they are dual-labeled categories on top of the K-Means clusters.
-  const sorted = [...archetypes].sort((a, b) => {
-    if (a.overlay && !b.overlay) return 1;
-    if (!a.overlay && b.overlay) return -1;
-    return b.n - a.n;
-  });
+  // Sort by archetype_id (classification order — CONVERGENT first, COMPOUND AMPLIFIER last).
+  const sorted = [...archetypes].sort((a, b) => a.archetype_id - b.archetype_id);
 
   return (
     <div className="flex flex-col gap-4">
@@ -111,6 +106,9 @@ export default function OperatorArchetypes({
               {/* Description */}
               <p className="text-xs leading-relaxed text-text-secondary">
                 {arch.description}
+              </p>
+              <p className="font-mono text-xs text-text-muted">
+                {arch.defined_by}
               </p>
 
               {/* Stats row */}
@@ -173,12 +171,11 @@ export default function OperatorArchetypes({
         })}
       </div>
       <p className="text-xs text-text-muted">
-        Archetypes emerge from K-Means clustering on log(yield, leverage,
-        velocity, SNR). 7 human groups arise from a hybrid approach: 3 yield
-        tiers + composition sub-shapes. The 8th (Outliers) is an overlay
-        category from input/total ratio analysis — some outliers also appear
-        in other archetypes. Silhouette = 0.544 on the yield tiers, 0.377 on
-        the flat labelling.
+        Build archetypes are deterministic classifications based on token
+        cascade dimensions — leverage (cache_read/input), velocity
+        (output/input), and construction (cache_write/cache_read). Each type
+        is defined by a different primary dimension. CONVERGENT is checked
+        first and pulls out operators who are elite on all three axes.
       </p>
     </div>
   );
