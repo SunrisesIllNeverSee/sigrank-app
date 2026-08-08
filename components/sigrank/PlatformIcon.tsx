@@ -16,7 +16,14 @@
 import React from "react";
 
 export type PlatformKey =
-  "claude" | "chatgpt" | "gemini" | "pi" | "codex" | "multi" | "other";
+  | "claude"
+  | "chatgpt"
+  | "gemini"
+  | "pi"
+  | "codex"
+  | "omp"
+  | "multi"
+  | "other";
 
 const LABEL: Record<PlatformKey, string> = {
   claude: "Claude",
@@ -24,6 +31,7 @@ const LABEL: Record<PlatformKey, string> = {
   gemini: "Gemini",
   pi: "Pi",
   codex: "Codex",
+  omp: "Oh My Pi",
   multi: "Multi",
   other: "Other",
 };
@@ -32,7 +40,7 @@ const LABEL: Record<PlatformKey, string> = {
 export function platformKey(p: string | null | undefined): PlatformKey {
   const k = (p ?? "").toLowerCase();
   return (
-    ["claude", "chatgpt", "gemini", "pi", "codex", "multi"] as const
+    ["claude", "chatgpt", "gemini", "pi", "codex", "omp", "multi"] as const
   ).includes(k as never)
     ? (k as PlatformKey)
     : "other";
@@ -93,6 +101,18 @@ const GLYPH: Record<PlatformKey, React.ReactNode> = {
       strokeLinecap="round"
       strokeLinejoin="round"
       d="M5.6 4.5 2.5 8l3.1 3.5M10.4 4.5 13.5 8l-3.1 3.5"
+    />
+  ),
+  // Oh My Pi — a forked π: the pi letterform whose right leg branches, marking
+  // omp as a fork of the older pi-agent (P.04) rather than the same platform.
+  omp: (
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3.4 4.3h9.2M6.2 4.3v8.4M10.4 4.3V8m0 0-2.2 4.7M10.4 8l2.2 4.7"
     />
   ),
   // Multi — overlapping nodes (a small constellation).

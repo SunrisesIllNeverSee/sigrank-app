@@ -41,6 +41,7 @@ export const colors = {
     Pi: c("platform-pi"),
     Gemini: c("platform-gemini"),
     Codex: c("platform-codex"),
+    OhMyPi: c("platform-omp"),
   },
   rank: {
     1: c("rank-1"),

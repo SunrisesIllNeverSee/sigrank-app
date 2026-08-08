@@ -11,6 +11,7 @@ export default defineConfig({
     include: [
       "__tests__/ui/**/*.test.{ts,tsx}",
       "__tests__/ingest/**/*.test.ts",
+      "__tests__/identity/**/*.test.ts",
     ],
   },
   resolve: {
