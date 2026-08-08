@@ -15,6 +15,21 @@
 | Build | `npm run build` (needs Node 22; local machine has Node 25 — may fail) |
 | Dev server | `npm run dev` (needs Node 22; local machine has Node 25 — won't start) |
 
+**Bun (faster alternative):** All test/typecheck commands also work with Bun,
+which is ~10-30x faster than npm for install + script startup:
+
+| What | Bun command |
+|------|-------------|
+| Install deps | `bun install` |
+| Type check | `bunx tsc --noEmit` |
+| Canonical tests | `bun run test:canonical` |
+| All unit tests | `bun run test` |
+| Lint | `bun run lint` |
+
+Bun is installed at `~/.bun/bin/bun` (v1.3.13). It reads the same `package.json`
+scripts and `package-lock.json` — no migration needed. Use `bunx` instead of
+`npx` for one-off package execution (e.g. `bunx tsc`, `bunx vitest`).
+
 **Local dev caveat:** Machine runs Node 25, repo pins Node 22 (`.nvmrc`).
 `next dev` and `next build` may not start locally. Verify via `tsc --noEmit` +
 canonical tests + live-DOM checks against deployed signalaf.com.
