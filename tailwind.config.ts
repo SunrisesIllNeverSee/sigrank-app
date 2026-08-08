@@ -40,6 +40,8 @@ const config: Config = {
         "platform-claude": v("platform-claude"),
         "platform-pi": v("platform-pi"),
         "platform-gemini": v("platform-gemini"),
+        "platform-codex": v("platform-codex"),
+        "platform-omp": v("platform-omp"),
 
         "rank-1": v("rank-1"),
         "rank-2": v("rank-2"),

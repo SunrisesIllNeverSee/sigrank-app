@@ -40,6 +40,7 @@ export const PLATFORM_UI = [
   "Gemini",
   "Pi",
   "Codex",
+  "Oh My Pi",
   "Multi",
 ] as const;
 export type PlatformUI = (typeof PLATFORM_UI)[number];
@@ -58,8 +59,41 @@ export const PLATFORM_DOMAIN_MAP: Record<PlatformUI, string | null> = {
   Gemini: "gemini",
   Pi: "pi",
   Codex: "codex",
+  "Oh My Pi": "omp",
   Multi: "multi",
 };
+
+/**
+ * SAVABLE_PLATFORM_DOMAINS — the `operator_domains` values the profile write path
+ * (app/api/v1/profile/route.ts) persists. Anything else a caller sends is dropped.
+ *
+ * Scoped to the domains with a FIRST-CLASS UI representation: a PLATFORM_UI filter
+ * label, a PlatformIcon glyph, and a --platform-* colour token. That boundary is
+ * empirical, not stylistic — `primary_domain` is derived from this field and is
+ * rendered raw on /user/<codename> ("Platform" stat), the submissions grid, the
+ * split-flap card, and /api/v1/operators. A domain outside PLATFORM_UI renders as
+ * bare lowercase text ("droid") next to Title-Case peers and falls back to the
+ * generic 'other' diamond icon. It does not crash or blank, but it looks unfinished,
+ * so a platform becomes savable only once it has the full treatment.
+ *
+ * 'codex' and 'omp' are in this list; the rest of the picker's rows are not, which
+ * means the picker still shows checkboxes that do not persist. That mismatch is
+ * PRE-EXISTING (this list was `["claude","chatgpt","gemini","pi"]` and silently
+ * dropped codex from the day it shipped) and is left for an owner decision rather
+ * than widened here — see the CAVEAT in components/auth/PlatformPicker.tsx.
+ *
+ * The picker's "Other" free-text entries are likewise not persisted; accepting
+ * arbitrary operator-typed strings into public profile data is a policy call
+ * (abuse surface + the opt-out scrubbing regime in AGENTS.md).
+ */
+export const SAVABLE_PLATFORM_DOMAINS: ReadonlySet<string> = new Set([
+  "claude",
+  "chatgpt",
+  "gemini",
+  "pi",
+  "codex",
+  "omp",
+]);
 
 export interface ClassFilterOption {
   /** Lowercase tier id used as the scope_value filter (e.g. "transmitter"). */
@@ -133,4 +167,4 @@ export const MCP_VERSION = "0.0.188" as const;
  * marketing copy never drifts (it was hardcoded as "14+" while the registry had 15).
  * Bump when the MCP ships a new adapter.
  */
-export const PLATFORM_COUNT = 17 as const;
+export const PLATFORM_COUNT = 18 as const;

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { SAVABLE_PLATFORM_DOMAINS } from "@/lib/constants";
 
 /**
  * POST /api/v1/profile — update the signed-in operator's own profile fields.
@@ -14,7 +15,6 @@ import { getSupabaseServer } from "@/lib/infra/supabase/server";
  */
 export const dynamic = "force-dynamic";
 
-const PLATFORMS = new Set(["claude", "chatgpt", "gemini", "pi"]);
 const LINK_KEYS = ["github", "site", "x"] as const;
 
 /** Trim a string field; '' or non-string → null; capped defensively. */
@@ -106,7 +106,8 @@ export async function POST(req: NextRequest) {
   const operator_domains = [
     ...new Set(
       domainsIn.filter(
-        (d): d is string => typeof d === "string" && PLATFORMS.has(d),
+        (d): d is string =>
+          typeof d === "string" && SAVABLE_PLATFORM_DOMAINS.has(d),
       ),
     ),
   ];

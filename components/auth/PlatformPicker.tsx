@@ -6,22 +6,29 @@ import { createPortal } from "react-dom";
 /**
  * components/auth/PlatformPicker.tsx — the profile "Platforms" selector as a popup.
  *
- * Owner 2026-06-26: the inline 4-pill picker was too narrow. Show ALL 15 platforms
- * SigRank's local agent can read (mirrors sigrank-mcp ALL_PLATFORMS / PLATFORM_COUNT=15)
- * as checkboxes in a modal, plus a 16th "Other" escape hatch so a platform we don't list
- * can still be declared by name. Selection is generative (it tells the agent where to
- * read), never a gate — nothing is required.
+ * Owner 2026-06-26: the inline 4-pill picker was too narrow. Show all the platforms
+ * SigRank's local agent can read (mirrors sigrank-mcp ALL_PLATFORMS) as checkboxes in
+ * a modal, plus an "Other" escape hatch so a platform we don't list can still be
+ * declared by name. Selection is generative (it tells the agent where to read), never
+ * a gate — nothing is required.
+ *
+ * CAVEAT (pre-existing): only the domains in SAVABLE_PLATFORM_DOMAINS (lib/constants)
+ * survive a save — the write path in app/api/v1/profile/route.ts allow-lists them.
+ * The remaining checkboxes here, and any "Other" free-text entry, are silently
+ * dropped on save. That predates this list and awaits an owner decision.
  *
  * Stateless on its own: holds the selected domains in the parent (ProfileEditForm) and
  * reports changes via onChange. The selected set is `operator_domains` — known domains
  * plus any custom strings the user typed under Other.
  */
 
-// The 16 known platforms (popular first, then the rest). Mirrors the MCP adapter
-// registry; keep in sync with sigrank-mcp `ALL_PLATFORMS` when adapters are added.
+// The 17 platforms the local agent can read, popular first. These are the sigrank-mcp
+// ALL_PLATFORMS entries minus 'other', which is the free-text hatch below rather than a
+// checkbox; keep in sync when an adapter ships.
 const KNOWN_PLATFORMS: { domain: string; label: string }[] = [
   { domain: "claude", label: "Claude" },
   { domain: "codex", label: "Codex" },
+  { domain: "omp", label: "Oh My Pi" },
   { domain: "gemini", label: "Gemini" },
   { domain: "copilot", label: "Copilot" },
   { domain: "amp", label: "Amp" },
@@ -152,7 +159,7 @@ export function PlatformPicker({
                 these. Pick all that apply.
               </p>
 
-              {/* The 16 known platforms as checkboxes. */}
+              {/* The known platforms as checkboxes. */}
               <div className="grid grid-cols-2 gap-1.5">
                 {KNOWN_PLATFORMS.map((p) => {
                   const on = selected.includes(p.domain);
@@ -185,7 +192,7 @@ export function PlatformPicker({
                 })}
               </div>
 
-              {/* The 16th: Other — a free-text escape hatch for unlisted platforms. */}
+              {/* Other — a free-text escape hatch for unlisted platforms. */}
               <div className="mt-4 border-t border-bg-border pt-3">
                 <span className="font-mono text-xs font-semibold uppercase tracking-wide text-text-secondary">
                   Other
