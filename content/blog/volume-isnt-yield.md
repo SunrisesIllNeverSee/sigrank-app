@@ -10,6 +10,8 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 
 # Volume Isn't Yield: The Shape of AI Operators
 
+> **Update (2026-08-09):** The 8 K-Means archetypes described in this article have been superseded by a [10 build archetype system](/field#archetypes) based on three deterministic dimensions — leverage, velocity, and construction. The original clustering analysis is preserved here as a historical record; the current classification is available on the [field page](/field).
+
 > [1] We ranked 1,628 AI coding operators by token volume. Then we measured what they actually *did* with those tokens. The field separates into 8 archetypes — 7 human clusters plus an 8th for outliers. The median operator gets 19x more signal from cache than they put in as input. The shape is not what you'd expect.
 
 ---
