@@ -303,8 +303,8 @@ export default function HowToImproveYourYieldPage() {
           <strong className="text-text-primary">
             signal-to-noise ratio (SNR)
           </strong>{" "}
-          = signal tokens / total tokens. A high SNR means your context is
-          focused; a low SNR means you&rsquo;re carrying noise.
+          = output / (input + output). A high SNR means most of your fresh
+          traffic is output; a low SNR means most is input.
         </p>
       </section>
 

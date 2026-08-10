@@ -56,7 +56,8 @@ ranks the humans using AI — not the models themselves.
 - [Compression Ratio](${SITE_ORIGIN}/metrics/compression-ratio): output / input — output per input token
 - [Leverage](${SITE_ORIGIN}/metrics/leverage): cache_read / input — cached context amplification
 - [Velocity](${SITE_ORIGIN}/metrics/velocity): output / input — output efficiency ratio
-- [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): signal_tokens / total_tokens — signal density
+- [Signal-to-Noise Ratio](${SITE_ORIGIN}/metrics/signal-to-noise-ratio): output / (input + output) — output share of fresh conversational traffic
+- [Efficiency](${SITE_ORIGIN}/metrics/efficiency): (cache_read + cache_write + output) / (4 * input) — operational amplification versus the AA 7:2:1 baseline
 
 ## Guides (how-to)
 - [All Guides](${SITE_ORIGIN}/guides): index of all eight how-to guides

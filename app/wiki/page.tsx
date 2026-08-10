@@ -475,6 +475,123 @@ function CascadeList() {
           don&apos;t actually compose.
         </p>
       </section>
+
+      {/* The metric architecture: three dimensions, seven views */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Three operating dimensions, seven analytical views
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank is not seven independent measurements. It is a{" "}
+          <strong className="text-text-primary">coordinate system</strong> for
+          AI operating behavior. Three structural ratios describe the actual
+          operating state. Four analytical transformations interpret that state.
+          One narrative representation communicates it in natural language.
+        </p>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="flex flex-col gap-1 rounded border border-bg-border-subtle p-3">
+            <span className="font-mono text-xs font-bold text-text-accent">
+              Structural coordinates
+            </span>
+            <span className="font-mono text-[11px] text-text-muted">
+              L = R/I, V = O/I, W/I
+            </span>
+            <span className="font-sans text-xs text-text-secondary">
+              The actual operating state: how much you reuse, generate, and
+              commit per unit of fresh input.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded border border-bg-border-subtle p-3">
+            <span className="font-mono text-xs font-bold text-text-accent">
+              Analytical transformations
+            </span>
+            <span className="font-mono text-[11px] text-text-muted">
+              Y = L x V, S = V/(1+V), D = log10(L), E = (R+W+O)/(4I)
+            </span>
+            <span className="font-sans text-xs text-text-secondary">
+              Interpretations of the state: interaction, bounded views,
+              logarithmic scales, total amplification.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded border border-bg-border-subtle p-3">
+            <span className="font-mono text-xs font-bold text-text-accent">
+              Narrative representation
+            </span>
+            <span className="font-mono text-[11px] text-text-muted">
+              R:I:O (operating ratio)
+            </span>
+            <span className="font-sans text-xs text-text-secondary">
+              The state in natural language: for every 1 input token, this
+              operator reuses R and produces O.
+            </span>
+          </div>
+        </div>
+
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The mathematical dependence between these views is not a defect. A
+          speedometer and an odometer depend on the same underlying motion while
+          answering different questions. SNR (S = V/(1+V)) places the unbounded
+          velocity ratio onto a 0-1 scale for comparison. 10xDEV (D = log10(L))
+          makes differences between 10x, 100x, and 1000x leverage legible. Yield
+          (Y = L x V) measures the interaction between reuse and output - both
+          must survive for Yield to be high. The dependence is the architecture.
+        </p>
+
+        <div className="rounded border border-gold/20 bg-gold/5 p-3">
+          <p className="font-mono text-xs text-gold">
+            One operating state. Seven analytical views.
+          </p>
+        </div>
+      </section>
+
+      {/* Same Yield, different machine */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Same Yield, different machine
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Yield gives coupled strength. Operating Ratio reveals how that
+          strength was constructed. Two operators can produce the same Yield
+          through completely different operating structures:
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded border border-bg-border-subtle p-3">
+            <p className="font-mono text-sm text-text-primary">
+              100 : 1 : 2
+            </p>
+            <p className="font-sans text-xs text-text-secondary mt-1">
+              Cache-dominant. 100x leverage, 2x velocity. Yield = 200. This
+              operator reuses enormous amounts of cached context and produces
+              modest output per input token.
+            </p>
+          </div>
+          <div className="rounded border border-bg-border-subtle p-3">
+            <p className="font-mono text-sm text-text-primary">
+              20 : 1 : 10
+            </p>
+            <p className="font-sans text-xs text-text-secondary mt-1">
+              Output-dominant. 20x leverage, 10x velocity. Yield = 200. This
+              operator produces substantial output per input token with moderate
+              cache reuse.
+            </p>
+          </div>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Both produce Yield 200. But one is a cache compounding machine and the
+          other is an output generation machine. Yield alone hides that
+          distinction. Operating Ratio reveals it immediately. This is why the
+          system shows several dependent metrics together - each answers a
+          different question about the same operating state.
+        </p>
+        <div className="rounded border border-gold/20 bg-gold/5 p-3">
+          <p className="font-mono text-xs text-gold">
+            Yield is an AND-gate: if reuse is zero OR output is zero, Yield is
+            zero. High reuse cannot compensate for producing nothing. High
+            output cannot compensate for preserving nothing.
+          </p>
+        </div>
+      </section>
     </section>
   );
 }

@@ -1,9 +1,9 @@
 /**
  * app/metrics/signal-to-noise-ratio/page.tsx — "Signal-to-Noise Ratio (SNR)"
  *
- * Defines SNR: the fraction of total tokens that are signal (cached + output)
- * versus noise (fresh input that doesn't compound). Connects to the Conservation
- * Law of Commitment.
+ * Defines SNR: output / (input + output) — the share of fresh conversational
+ * traffic represented by model output. A bounded (0-1) view of Velocity.
+ * Connects to the Conservation Law of Commitment.
  *
  * JSON-LD: breadcrumb + definedTerm + faqPage.
  */
@@ -18,7 +18,7 @@ import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Signal-to-Noise Ratio (SNR) — Signal Density",
   description:
-    "Signal-to-noise ratio (SNR) measures signal density in AI coding. Learn what signal vs noise means, why SNR matters, and its link to the Conservation Law.",
+    "SNR = output / (input + output) — the share of fresh conversational traffic represented by model output. A bounded view of Velocity. Learn what signal vs noise means and its link to the Conservation Law.",
   path: "/metrics/signal-to-noise-ratio",
 });
 
@@ -36,19 +36,19 @@ export default function SignalToNoiseRatioPage() {
           ]),
           definedTerm(
             "Signal-to-Noise Ratio (SNR)",
-            "SNR = signal_tokens / total_tokens. The fraction of an operator's total token flow that is signal (cached context reused + output generated) versus noise (fresh input that does not compound). High SNR means most of your token budget is productive; low SNR means most of it is spent re-establishing context from scratch.",
+            "SNR = output / (input + output). The share of fresh conversational traffic represented by model output. A bounded (0-1) view of Velocity: S = V/(1+V). High SNR means most of your fresh traffic is output; low SNR means most is input. SNR measures the compression/transmission structure, not the semantic quality of the output.",
             "/metrics/signal-to-noise-ratio",
           ),
           faqPage([
             {
               question: "What is signal-to-noise ratio in AI coding?",
               answer:
-                "SNR = signal_tokens / total_tokens, where signal tokens are cached context reused (cache_read) plus output generated, and total tokens are all tokens processed. High SNR means most of your token budget is productive signal; low SNR means most of it is noise — fresh input that does not compound.",
+                "SNR = output / (input + output). It measures the share of fresh conversational traffic represented by model output. High SNR means most of your fresh traffic is output; low SNR means most is input. It is a bounded (0-1) view of Velocity: S = V/(1+V). SNR measures the compression/transmission structure, not the semantic quality of the output.",
             },
             {
               question: "What counts as signal vs noise in AI coding?",
               answer:
-                "Signal tokens are cached context reused from prior turns (cache_read) and output tokens the model generates. Noise tokens are fresh input that does not compound — re-explained context, redundant instructions, pasted code already in cache. Signal accumulates; noise evaporates.",
+                "In SigRank, signal is model output and noise is fresh input. Output is the work the model generates for you; input is the fresh context you provide. SNR measures what fraction of the fresh traffic (input + output) is actually output. It does not independently judge the semantic quality of that output — a brilliant response and a mediocre one both count as signal. The distinction is about transmission structure, not content quality.",
             },
             {
               question:
@@ -71,9 +71,9 @@ export default function SignalToNoiseRatioPage() {
         title="Signal-to-Noise Ratio (SNR)"
         subtitle={
           <>
-            The fraction of your token flow that is{" "}
-            <span className="text-gold">signal</span> versus noise. High SNR
-            means your context is compounding, not evaporating.
+            The share of fresh conversational traffic that is{" "}
+            <span className="text-gold">output</span> versus input. A bounded
+            view of Velocity.
           </>
         }
       />
@@ -85,25 +85,25 @@ export default function SignalToNoiseRatioPage() {
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="text-center font-mono text-2xl text-gold">
-            SNR = signal_tokens / total_tokens
+            SNR = output / (input + output)
           </p>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Where <strong className="text-text-primary">signal_tokens</strong> ={" "}
-          cache_read + output (tokens that compound — reused context plus
-          generated output), and{" "}
-          <strong className="text-text-primary">total_tokens</strong> = input +
-          cache_read + cache_write + output (all tokens processed in the
-          cascade). The ratio ranges from 0 to 1. An SNR of 0.8 means 80% of
-          your token flow is signal; an SNR of 0.2 means 80% is noise.
+          Where <strong className="text-text-primary">output</strong> is tokens
+          the model generates and{" "}
+          <strong className="text-text-primary">input</strong> is fresh context
+          you provide. The ratio ranges from 0 to 1. An SNR of 0.8 means 80% of
+          your fresh conversational traffic is model output; an SNR of 0.2 means
+          80% is fresh input.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The intuition is simple:{" "}
-          <strong className="text-text-primary">signal accumulates</strong>{" "}
-          (cached context carries forward, output builds on prior output), while{" "}
-          <strong className="text-text-primary">noise evaporates</strong> (fresh
-          input is processed once and, if not cached, never compounds). SNR
-          measures the balance between the two.
+          SNR is a bounded transformation of Velocity (V = output / input). The
+          relationship is exact:{" "}
+          <strong className="text-text-primary">S = V / (1 + V)</strong>. This
+          places the unbounded velocity ratio onto a 0-1 scale, making it easier
+          to compare, threshold, and visualize. SNR does not independently judge
+          the semantic quality of the output — it measures transmission
+          structure, not content quality.
         </p>
       </section>
 
@@ -114,46 +114,38 @@ export default function SignalToNoiseRatioPage() {
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-gold">
-            Signal tokens
+            Signal (output)
           </p>
           <ul className="mt-2 flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
             <li>
-              <strong className="text-text-primary">cache_read</strong> — cached
-              context reused from prior turns. This is signal you already paid
-              for, now compounding for free.
-            </li>
-            <li>
               <strong className="text-text-primary">output</strong> — tokens the
-              model generates. Productive work that becomes the basis for future
-              turns.
+              model generates in response to your input. This is the productive
+              work: code, explanations, analysis, refactors. Output is what you
+              want from the interaction.
             </li>
           </ul>
         </div>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-muted">
-            Noise tokens
+            Noise (input)
           </p>
           <ul className="mt-2 flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
             <li>
               <strong className="text-text-primary">fresh input</strong> —
-              tokens you send that don&rsquo;t get cached or don&rsquo;t build
-              on prior context. Re-explained context, redundant instructions,
-              pasted code that&rsquo;s already in the window.
-            </li>
-            <li>
-              <strong className="text-text-primary">cache_write</strong> —
-              tokens written to cache that are never read back. An investment
-              that didn&rsquo;t pay off because the session ended or the context
-              was abandoned.
+              tokens you send to the model: prompts, instructions, pasted code,
+              context. Input is necessary but not the goal. High input relative
+              to output means you&rsquo;re spending more than you&rsquo;re
+              getting.
             </li>
           </ul>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The distinction is not about content quality — it&rsquo;s about
-          whether tokens <em>compound</em>. A brilliantly written prompt that
-          gets sent once and never cached is noise. A mediocre cached prefix
-          that gets reused 50 times is signal. SNR measures the architecture of
-          accumulation, not the brilliance of any individual turn.
+          transmission structure. A brilliant prompt and a redundant one both
+          count as input. A correct response and an incorrect one both count as
+          output. SNR measures what fraction of the fresh traffic is output, not
+          whether that output is good. Quality is a separate question that
+          requires external evaluation.
         </p>
       </section>
 
@@ -163,25 +155,24 @@ export default function SignalToNoiseRatioPage() {
           Why high SNR matters
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          High SNR means your token budget is being spent productively. Most of
-          what you process is either reused context (free signal) or generated
-          output (new signal). Little is wasted on re-establishing baseline
-          context. This is the signature of an operator who maintains a stable,
-          structured context across turns — the cascade is a flywheel, not a
-          restart loop.
+          High SNR means most of your fresh conversational traffic is output.
+          You send relatively little input and get relatively much output back.
+          This is the signature of an operator who writes efficient prompts —
+          concise instructions that produce substantial responses.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Low SNR means most of your token flow is noise. You&rsquo;re spending
-          the bulk of your budget on fresh input that doesn&rsquo;t compound —
-          re-pasting files, re-explaining project structure, re-establishing
-          conventions. Every turn starts from near-zero. The model processes
-          your input, gives a response, and the context evaporates.
+          Low SNR means most of your fresh traffic is input. You&rsquo;re
+          sending large prompts, pasting extensive context, or re-explaining
+          things — and getting relatively little output back. The model
+          processes your input, gives a short response, and you need to send
+          more input to continue.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SNR is also a cost and latency indicator. High-SNR sessions process
-          more tokens from cache (which is cheaper and faster) and fewer from
-          fresh input (which is expensive and slow). Low-SNR sessions are the
-          opposite — you pay full price on every turn.
+          SNR is also a cost indicator. Output tokens are typically more
+          expensive than input tokens, but high SNR means you&rsquo;re getting
+          more value per token of input you provide. Low SNR means
+          you&rsquo;re paying for input that doesn&rsquo;t produce proportional
+          output.
         </p>
       </section>
 
@@ -287,10 +278,10 @@ export default function SignalToNoiseRatioPage() {
               What is signal-to-noise ratio in AI coding?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              SNR = signal_tokens / total_tokens, where signal is cached context
-              reused plus output generated, and total is all tokens processed.
-              High SNR means most of your token budget is productive signal; low
-              SNR means most is noise — fresh input that does not compound.
+              SNR = output / (input + output). It measures the share of fresh
+              conversational traffic represented by model output. High SNR
+              means most of your fresh traffic is output; low SNR means most is
+              input. It is a bounded view of Velocity: S = V/(1+V).
             </dd>
           </div>
           <div className="flex flex-col gap-1">
@@ -298,11 +289,11 @@ export default function SignalToNoiseRatioPage() {
               What counts as signal vs noise in AI coding?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Signal tokens are cache_read (reused context) and output
-              (generated work). Noise tokens are fresh input that doesn&rsquo;t
-              compound and cache_write that&rsquo;s never read back. Signal
-              accumulates; noise evaporates. The distinction is about
-              compounding, not content quality.
+              Signal is model output; noise is fresh input. SNR measures what
+              fraction of the fresh traffic (input + output) is output. It does
+              not independently judge the semantic quality of the output — a
+              brilliant response and a mediocre one both count as signal. The
+              distinction is about transmission structure, not content quality.
             </dd>
           </div>
           <div className="flex flex-col gap-1">

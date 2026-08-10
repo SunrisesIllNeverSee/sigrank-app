@@ -110,3 +110,29 @@ export function fmt(
     maximumFractionDigits: d,
   });
 }
+
+/**
+ * Self-auditing residual checks. The cascade metrics are algebraically locked:
+ * Y = L*V, S = V/(1+V), D = log10(L), W/I = 4E - L - V. Any nonzero residual
+ * indicates rounding, stale data, mismatched code paths, or corrupted records.
+ *
+ * Returns null for any check that doesn't apply (e.g. dev10x when gate doesn't fire).
+ */
+export function computeResiduals(m: CascadeMetrics, p: RawPillars): {
+  epsilonY: number;
+  epsilonS: number;
+  epsilonD: number | null;
+  epsilonW: number;
+} {
+  const safeI = Math.max(p.input, 1);
+  const expectedSnr = m.velocity / (1 + m.velocity);
+  const expectedWi = 4 * m.efficiency - m.leverage - m.velocity;
+  const actualWi = p.cacheCreate / safeI;
+
+  return {
+    epsilonY: Math.abs(m.yield_ - m.leverage * m.velocity),
+    epsilonS: Math.abs(m.snr - expectedSnr),
+    epsilonD: m.dev10x !== null ? Math.abs(m.dev10x - Math.log10(m.leverage)) : null,
+    epsilonW: Math.abs(actualWi - expectedWi),
+  };
+}

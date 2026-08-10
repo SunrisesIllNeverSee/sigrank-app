@@ -200,8 +200,8 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               Signal-to-Noise Ratio (SNR)
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              signal tokens / total tokens. Signal density. High SNR = focused
-              context; low SNR = noisy context carrying irrelevant tokens.
+              output / (input + output). Output share of fresh traffic. High
+              SNR = most fresh traffic is model output; low SNR = most is input.
             </p>
           </div>
         </div>
