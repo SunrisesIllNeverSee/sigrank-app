@@ -82,12 +82,12 @@ export default function AboutPage() {
           {
             question: "How do you score an AI user?",
             answer:
-              "SigRank scores AI users with Yield (Υ = cache_read × output / input²). The score is computed from four token pillars read locally by the sigrank CLI: cache_read, cache_write, input, and output. The snapshot is cryptographically signed and submitted to the leaderboard. Each operator gets a Yield score and an operator class tier (IGNITER, SEEKER, BUILDER, TRANSMITTER, etc.) based on their efficiency.",
+              "SigRank scores AI users with Yield (Υ = cache_read × output / input²). The score is computed from four token pillars read locally by the sigrank CLI: cache_read, cache_write, input, and output. The snapshot is cryptographically signed and submitted to the leaderboard. Each operator gets a Yield score and an operator class tier (IGNITER through ARCH+) based on total tokens accumulated. TRANSMITTER is a separate peak badge, not a tier.",
           },
           {
             question: "What is a good yield score?",
             answer:
-              "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER, SEEKER, BUILDER, TRANSMITTER, etc.). Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard.",
+              "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER through ARCH+). TRANSMITTER is a separate peak badge, not a tier. Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard.",
           },
           {
             question: "Is there a user-based AI leaderboard?",
@@ -160,7 +160,7 @@ export default function AboutPage() {
             <span className="text-text-primary">operator</span>, not the model —
             who gets the most signal per token (cascade yield, leverage, 10×DEV)
             across every platform, on one leaderboard.{" "}
-            <span className="text-gold">Volume is noise. Yield is signal.</span>
+            <span className="text-gold">Volume alone is noise. Yield is signal.</span>
           </>
         }
       />
@@ -283,8 +283,8 @@ export default function AboutPage() {
             <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
               Yield (Υ = cache_read × output / input²), computed from four token
               pillars read locally by the sigrank CLI. Each operator gets a yield
-              score and a class tier (IGNITER, SEEKER, BUILDER, TRANSMITTER,
-              etc.). See the{" "}
+              score and a class tier (IGNITER through ARCH+). TRANSMITTER is a
+              separate peak badge, not a tier. See the{" "}
               <Link href="/tools/operator-class-checker" className="text-gold underline underline-offset-2">
                 class checker
               </Link>{" "}

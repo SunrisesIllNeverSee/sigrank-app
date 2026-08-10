@@ -60,7 +60,7 @@ const COMPARE_ROWS: { feature: string; lmsys: string; sigrank: string }[] = [
     sigrank: "Yes (on-device scanner)",
   },
   {
-    feature: "Class tier (IGNITER → TRANSMITTER)",
+    feature: "Class tier (IGNITER to ARCH+)",
     lmsys: "No",
     sigrank: "Yes",
   },

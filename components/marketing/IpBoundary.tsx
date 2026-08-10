@@ -30,7 +30,7 @@ const OPEN: Item[] = [
   },
   {
     title: "Class taxonomy and tier names",
-    detail: "9 classes from Transmitter to Igniter",
+    detail: "8 experience tiers from ARCH+ down to IGNITER + TRANSMITTER badge",
   },
   // TODO(ABT-8): ed25519 retired (per launch-state) — softened off the retired scheme. Owner: confirm the current signing story.
   {

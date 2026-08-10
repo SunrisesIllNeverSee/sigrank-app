@@ -187,12 +187,12 @@ export default async function HomePage() {
           {
             question: "How do you score an AI user?",
             answer:
-              "SigRank scores AI users with Yield (Υ = cache_read × output / input²). The score is computed from four token pillars read locally by the sigrank CLI: cache_read, cache_write, input, and output. The snapshot is cryptographically signed and submitted to the leaderboard. Each operator gets a Yield score and an operator class tier (IGNITER, SEEKER, BUILDER, TRANSMITTER, etc.) based on their efficiency. See signalaf.com/tools/operator-class-checker for the tier mapping.",
+              "SigRank scores AI users with Yield (Υ = cache_read × output / input²). The score is computed from four token pillars read locally by the sigrank CLI: cache_read, cache_write, input, and output. The snapshot is cryptographically signed and submitted to the leaderboard. Each operator gets a Yield score and an operator class tier (IGNITER through ARCH+) based on total tokens accumulated. TRANSMITTER is a separate peak badge, not a tier. See signalaf.com/tools/operator-class-checker for the tier mapping.",
           },
           {
             question: "What is a good yield score?",
             answer:
-              "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER, SEEKER, BUILDER, TRANSMITTER, etc.). Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard at signalaf.com/board/all.",
+              "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER through ARCH+). TRANSMITTER is a separate peak badge, not a tier. Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard at signalaf.com/board/all.",
           },
         ])}
       />

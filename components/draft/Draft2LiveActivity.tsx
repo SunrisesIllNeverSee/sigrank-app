@@ -4,7 +4,7 @@ import type { HomepageStats } from "@/lib/board";
 
 /**
  * Draft2LiveActivity — the macro-stats "live activity" block. Five cells: Operators
- * ranked · Active last hour · TRANSMITTER K.01 · Comparisons ran · Total tokens
+ * ranked · Active last hour · TRANSMITTER badge · Comparisons ran · Total tokens
  * measured. Real values where getHomepageStats() has them; gold-star <Placeholder>
  * where the telemetry isn't wired yet.
  *
@@ -61,10 +61,10 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
       accent: true,
     },
     {
-      // TRANSMITTER class (K.01) — the real count from system_stats.transmitter_count.
+      // TRANSMITTER badge - the real count from system_stats.transmitter_count.
       // Was ∞ (read as broken, not exclusive); now the honest integer, "—" until live.
       value: real ? (
-        <span title="TRANSMITTER class (K.01)" className="text-gold">
+        <span title="TRANSMITTER badge" className="text-gold">
           {stats.transmitter_count > 0
             ? fmtCount(stats.transmitter_count)
             : "—"}

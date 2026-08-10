@@ -49,7 +49,7 @@ export default function YieldCascadePage() {
             {
               question: "What is a good yield score?",
               answer:
-                "Yield ranges map to class tiers: IGNITER (low yield, just starting), SEEKER (improving), BUILDER (efficient cascade), and TRANSMITTER (top decile, signal compounding). The exact thresholds are calibrated from the live leaderboard. The median operator sits well below the top decile — the gap between median and TRANSMITTER is where most improvement lives.",
+                "Yield ranges map to class tiers: IGNITER (low yield, just starting) through ARCH+ (deepest field experience). TRANSMITTER is a separate peak badge, not a tier. The exact thresholds are calibrated from the live leaderboard. The median operator sits well below the top decile - the gap between median and the top is where most improvement lives.",
             },
             {
               question: "How do I improve my yield?",
@@ -126,7 +126,7 @@ export default function YieldCascadePage() {
           and gets back 2,000 output tokens is burning tokens.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Volume is noise; yield is signal. Raw token counts tell you how much
+          Volume alone is noise; yield is signal. Raw token counts tell you how much
           you spent. Yield tells you how much you got for what you spent — and
           whether your context strategy is working.
         </p>
@@ -262,14 +262,9 @@ export default function YieldCascadePage() {
             modest.
           </li>
           <li>
-            <strong className="text-text-primary">BUILDER</strong> — Efficient
-            cascade. Consistent cache reuse, economical input, substantial
-            output. Signal is compounding.
-          </li>
-          <li>
-            <strong className="text-text-primary">TRANSMITTER</strong> — Top
-            decile. The cascade is a flywheel: minimal fresh input, heavy cache
-            reuse, high output. Signal compounds across the entire session.
+            <strong className="text-text-primary">ARCH+</strong> - Deepest
+            field experience. Sustained high-volume cascade across all
+            dimensions.
           </li>
         </ul>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
@@ -359,10 +354,11 @@ export default function YieldCascadePage() {
               What is a good yield score?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Yield ranges map to class tiers: IGNITER (low), SEEKER
-              (improving), BUILDER (efficient), and TRANSMITTER (top decile).
-              Thresholds are calibrated from the live leaderboard. The gap
-              between median and TRANSMITTER is where most improvement lives.
+              Yield ranges map to class tiers: IGNITER (low) through ARCH+
+              (deepest field experience). TRANSMITTER is a separate peak badge,
+              not a tier. Thresholds are calibrated from the live leaderboard.
+              The gap between median and the top is where most improvement
+              lives.
             </dd>
           </div>
           <div className="flex flex-col gap-1">

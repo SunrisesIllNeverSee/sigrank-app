@@ -20,26 +20,42 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Operator Performance \u2014 Score the Human, Not Model",
   description:
-    "Operator performance scores the human driving the AI, not the model. SigRank class tiers from IGNITER to TRANSMITTER, and why the operator matters.",
+    "Operator performance scores the human driving the AI, not the model. SigRank class tiers from IGNITER to ARCH+, and why the operator matters.",
   path: "/operator-performance",
 });
 
 const TIERS = [
   {
     name: "IGNITER",
-    desc: "The entry tier. Operators here are lighting the first sparks — high input, low cache reuse, output still finding its footing. Everyone starts here.",
+    desc: "The entry tier. Operators here are lighting the first sparks - high input, low cache reuse, output still finding its footing. Everyone starts here.",
+  },
+  {
+    name: "BEARER",
+    desc: "Quiet accumulation. Token flow is growing but the cascade hasn't compounded yet.",
+  },
+  {
+    name: "REFINER",
+    desc: "Practicing with purpose. Cache reuse is growing, yield is rising but not yet compounding.",
   },
   {
     name: "SEEKER",
-    desc: "Cache reuse is growing. The operator is learning to reuse context and reduce fresh input. Yield is rising but not yet compounding.",
+    desc: "Active exploration. The operator is learning to reuse context and reduce fresh input.",
   },
   {
-    name: "BUILDER",
-    desc: "The cascade is taking shape. Cache hit rate is healthy, output is dense, and yield is climbing. The operator is constructing signal, not just consuming it.",
+    name: "BASE",
+    desc: "The center of the field. Mid-tier operators with consistent, balanced token flow.",
   },
   {
-    name: "TRANSMITTER",
-    desc: "The top tier. Signal compounds: small fresh input rides a large cached foundation into high output. The operator transmits more than they spend. This is the top percentile of the board.",
+    name: "POWER",
+    desc: "Above center. The cascade is taking shape - cache hit rate is healthy, output is dense, yield is climbing.",
+  },
+  {
+    name: "ARCH",
+    desc: "System builders. Coherent operators with consistent output and deep context reuse.",
+  },
+  {
+    name: "ARCH+",
+    desc: "The deepest field experience. Sustained high-volume cascade across all dimensions.",
   },
 ];
 
@@ -98,7 +114,7 @@ export default function OperatorPerformancePage() {
             {
               question: "What are the SigRank class tiers?",
               answer:
-                "Operators are classified into tiers from low to high: IGNITER (entry, high input, low cache reuse), SEEKER (cache reuse growing, yield rising), BUILDER (cascade taking shape, signal compounding), and TRANSMITTER (top tier, signal compounds, small input rides large cache into high output). The tiers are assigned from the scoring ruleset based on yield and the composite SIGNA rate.",
+                "Operators are classified into 8 experience tiers from low to high: IGNITER (entry, high input, low cache reuse), BEARER (quiet accumulation), REFINER (practicing with purpose), SEEKER (cache reuse growing, yield rising), BASE (center of the field), POWER (above center, cascade taking shape), ARCH (system builders), and ARCH+ (deepest field experience). Tiers are assigned from total tokens accumulated. TRANSMITTER is a separate peak badge, not a tier.",
             },
             {
               question: "How is operator performance scored?",
@@ -268,10 +284,10 @@ export default function OperatorPerformancePage() {
               What are the class tiers?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              IGNITER (entry), SEEKER (cache reuse growing), BUILDER (cascade
-              taking shape), and TRANSMITTER (top tier, signal compounds). Tiers
-              are assigned from the scoring ruleset based on yield and the
-              composite SIGNA rate.
+              8 experience tiers: IGNITER (entry), BEARER, REFINER, SEEKER,
+              BASE, POWER, ARCH, and ARCH+ (deepest field experience). Tiers
+              are assigned from total tokens accumulated. TRANSMITTER is a
+              separate peak badge, not a tier.
             </dd>
           </div>
           <div className="flex flex-col gap-1">

@@ -139,7 +139,7 @@ export default async function BoardWindowPage({
           <>
             Four integers in, full ledger out. Every operator ranked by{" "}
             <strong className="text-text-primary">Υ Yield</strong> — the
-            architecture of the cascade, not raw spend. Volume is noise; yield
+            architecture of the cascade, not raw spend. Volume alone is noise; yield
             is signal.{" "}
             <span className="text-text-secondary">
               See how you rank. Compare against top operators. Beat the average.
@@ -211,7 +211,7 @@ export default async function BoardWindowPage({
         />
       </Suspense>
 
-      {/* Key popup (owner 2026-06-24): metrics + the nine classes — moved to the END
+      {/* Key popup (owner 2026-06-24): metrics + the eight experience tiers + TRANSMITTER badge - moved to the END
           of the board (after the table) per owner. */}
       <LeaderboardKey />
 

@@ -47,7 +47,7 @@ const COMPARE_ROWS: { feature: string; ccusage: string; sigrank: string }[] = [
     sigrank: "Yes (derived metrics)",
   },
   {
-    feature: "Class tier (IGNITER → TRANSMITTER)",
+    feature: "Class tier (IGNITER to ARCH+)",
     ccusage: "No",
     sigrank: "Yes",
   },

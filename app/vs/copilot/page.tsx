@@ -45,7 +45,7 @@ const COMPARE_ROWS: { feature: string; copilot: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Class tier (IGNITER → TRANSMITTER)",
+    feature: "Class tier (IGNITER to ARCH+)",
     copilot: "No",
     sigrank: "Yes",
   },
@@ -97,7 +97,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Why use SigRank if I only use Copilot?",
     answer:
-      "Two reasons. First, Copilot&apos;s own metrics are quota-scoped, not efficiency-scoped — they tell you whether you are near your limit, not whether you are driving well. SigRank tells you the latter. Second, even Copilot-only operators benefit from a leaderboard: you see how your cascade efficiency compares to thousands of other operators, get a class tier (IGNITER to TRANSMITTER), and can track your Υ trajectory over time. Copilot gives you a tool; SigRank gives you a rank.",
+      "Two reasons. First, Copilot&apos;s own metrics are quota-scoped, not efficiency-scoped — they tell you whether you are near your limit, not whether you are driving well. SigRank tells you the latter. Second, even Copilot-only operators benefit from a leaderboard: you see how your cascade efficiency compares to thousands of other operators, get a class tier (IGNITER to ARCH+), and can track your Υ trajectory over time. Copilot gives you a tool; SigRank gives you a rank.",
   },
   {
     question:

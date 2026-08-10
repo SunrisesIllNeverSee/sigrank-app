@@ -161,6 +161,15 @@ function SigRankDefinition() {
           shifts. Archetype describes shape. Class describes qualification. Rank
           describes position. All three are recomputed every scoring window.
         </p>
+        <p className="font-sans text-xs text-text-dim">
+          <strong className="text-text-muted">Branding note:</strong> Burner,
+          Builder, and 10xer are informal marketing labels, not the canonical
+          archetype system. The actual system classifies operators into 10 build
+          archetypes (CONVERGENT, KINETIC, BUILDER, RECURSIVE, AMPLIFIER,
+          INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, ARCHIVIST). Rough
+          mapping: Burner ~ INPUT-BOUND/PRIMING, Builder ~ BUILDER/RECURSIVE,
+          10xer ~ AMPLIFIER/CONVERGENT.
+        </p>
       </section>
     </div>
   );

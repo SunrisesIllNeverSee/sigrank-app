@@ -153,7 +153,7 @@ export default async function FieldPage() {
           efficiently an operator converts input tokens into output tokens using cache compounding.
           These two rankings have almost zero correlation. The operator with the most tokens (9
           quadrillion) has a yield of 0. The operator with the highest yield (2.46M) ranks #697
-          by volume. Volume is noise. Yield is signal.
+          by volume. Volume alone is noise. Yield is signal.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The scatter plot above makes this visible. The median lines divide the field into four

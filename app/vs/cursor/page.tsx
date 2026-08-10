@@ -45,7 +45,7 @@ const COMPARE_ROWS: { feature: string; cursor: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Class tier (IGNITER → TRANSMITTER)",
+    feature: "Class tier (IGNITER to ARCH+)",
     cursor: "No",
     sigrank: "Yes",
   },
