@@ -11,7 +11,7 @@
 const TURNS = [
   {
     label: "Turn 1",
-    sublabel: "Raw Injector",
+    sublabel: "Input-Bound",
     input: 500,
     cacheRead: 0,
     cacheWrite: 500,
@@ -20,7 +20,7 @@ const TURNS = [
   },
   {
     label: "Turn 5",
-    sublabel: "Reader",
+    sublabel: "Deep Reader",
     input: 80,
     cacheRead: 2000,
     cacheWrite: 2080,
@@ -29,12 +29,12 @@ const TURNS = [
   },
   {
     label: "Turn 15",
-    sublabel: "Archival",
+    sublabel: "Archivist",
     input: 12,
     cacheRead: 50000,
     cacheWrite: 50012,
     output: 8000,
-    yield: "3.7",
+    yield: "3.54",
   },
   {
     label: "Turn 50",
@@ -43,7 +43,7 @@ const TURNS = [
     cacheRead: 2500000,
     cacheWrite: 2500002,
     output: 15000,
-    yield: "258",
+    yield: "257.3",
   },
 ];
 

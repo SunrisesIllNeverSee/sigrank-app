@@ -2,23 +2,23 @@
  * WhereYouSit — the "where do you sit?" hook.
  *
  * Shows the 10 build archetype yield ranges as a horizontal bar chart, from
- * RAW INJECTOR (0.05) to KINETIC PRODUCER (469). The visual punchline:
+ * INPUT-BOUND (0.05) to KINETIC (469). The visual punchline:
  * there's a ~9,000× spread between the worst and the best. Where are you?
  *
  * Pure inline SVG. Server component. No client JS.
  */
 
 const ARCHETYPES = [
-  { label: "Raw Injector", sub: "10.5%", yield: 0.05, color: "#3498db" },
-  { label: "Cache Warming", sub: "12.4%", yield: 0.33, color: "#5dade2" },
-  { label: "Shallow Reader", sub: "11.7%", yield: 0.84, color: "#48c9b0" },
-  { label: "Reader", sub: "10.7%", yield: 1.52, color: "#2ecc71" },
-  { label: "Builder", sub: "10.9%", yield: 1.97, color: "#f39c12" },
-  { label: "Archival", sub: "11.7%", yield: 3.74, color: "#27ae60" },
-  { label: "Recursive Momentum", sub: "8.3%", yield: 7.27, color: "#d4af37" },
-  { label: "Compound Amplifier", sub: "10.2%", yield: 26.84, color: "#c0392b" },
-  { label: "Convergent", sub: "6.6%", yield: 258.14, color: "#9b59b6" },
-  { label: "Kinetic Producer ★", sub: "7.1%", yield: 469.35, color: "#e74c3c" },
+  { label: "Input-Bound", sub: "6.8%", yield: 0.05, color: "#3498db" },
+  { label: "Priming", sub: "9.4%", yield: 0.32, color: "#5dade2" },
+  { label: "Contextual", sub: "11.7%", yield: 0.84, color: "#48c9b0" },
+  { label: "Deep Reader", sub: "10.7%", yield: 1.52, color: "#2ecc71" },
+  { label: "Builder", sub: "17.5%", yield: 1.12, color: "#f39c12" },
+  { label: "Archivist", sub: "11.7%", yield: 3.54, color: "#27ae60" },
+  { label: "Recursive", sub: "8.3%", yield: 7.23, color: "#d4af37" },
+  { label: "Amplifier", sub: "10.2%", yield: 26.53, color: "#c0392b" },
+  { label: "Convergent", sub: "6.6%", yield: 257.3, color: "#9b59b6" },
+  { label: "Kinetic ★", sub: "7.1%", yield: 469.35, color: "#e74c3c" },
 ];
 
 // Log scale: yield ranges from 0.05 to 469 — need compression
@@ -44,9 +44,9 @@ export default function WhereYouSit() {
       </div>
       <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
         The field separates into 10 build archetypes. Yield ranges from{" "}
-        <span className="font-bold text-text-primary">0.05</span> (Raw Injector)
+        <span className="font-bold text-text-primary">0.05</span> (Input-Bound)
         {" "}to{" "}
-        <span className="font-bold text-text-primary">469</span> (Kinetic Producer)
+        <span className="font-bold text-text-primary">469</span> (Kinetic)
         {" "}— a{" "}
         <span className="font-bold text-gold">9,000× spread</span>.
         Your cascade shape decides which one you are. Where are you?
@@ -56,7 +56,7 @@ export default function WhereYouSit() {
         viewBox={`0 0 ${START_X + BAR_MAX_W + 70} ${totalH}`}
         className="mx-auto w-full max-w-xl"
         role="img"
-        aria-label="Build archetype yield comparison: 10 archetypes from Raw Injector at 0.05 to Kinetic Producer at 469. A 9,000x spread."
+        aria-label="Build archetype yield comparison: 10 archetypes from Input-Bound at 0.05 to Kinetic at 469. A 9,000x spread."
       >
         {ARCHETYPES.map((arch, i) => {
           const y = i * (BAR_H + ROW_GAP) + 10;

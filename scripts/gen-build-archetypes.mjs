@@ -7,16 +7,10 @@
  * primary dimension of the token cascade.
  *
  * Classification order (priority — first match wins):
- *   1. CONVERGENT         — P80 on all 3: leverage + velocity + construction
- *   2. KINETIC PRODUCER    — velocity >= 0.8
- *   3. RAW INJECTOR        — leverage < 5
- *   4. CACHE WARMING       — leverage 5-10
- *   5. SHALLOW READER      — leverage 10-15, passive (construction < 0.02)
- *   6. READER              — leverage 15-23, passive
- *   7. ARCHIVAL            — leverage 23+, passive
- *   8. BUILDER             — construction >= 0.02, leverage < 30
- *   9. RECURSIVE MOMENTUM  — construction >= 0.02, leverage 30-50
- *  10. COMPOUND AMPLIFIER  — construction >= 0.02, leverage 50+
+ *   1. CONVERGENT     — P80 on all 3: leverage + velocity + construction
+ *   2. KINETIC        — velocity >= 0.8
+ *   3. Construction   — construction >= 0.02 (BUILDER / RECURSIVE / AMPLIFIER by leverage)
+ *   4. Reuse depth    — else (INPUT-BOUND / PRIMING / CONTEXTUAL / DEEP READER / ARCHIVIST by leverage)
  *
  * Reads:
  *   - public/data/field-analysis.json (committed; raw token pillars + derived
@@ -53,14 +47,14 @@ const LABELS_PATH = resolve(ROOT, "public/data/archetype-labels-hcm.json");
 // P80 thresholds calibrated from HCM cut (1,586 operators).
 const CONVERGENT_T = { levP80: 74.6, velP80: 0.34, constrP80: 0.0431 };
 
-const VEL_OUTPUT = 0.8;
-const LEV_INPUT_LOW = 5;
-const LEV_INPUT_HIGH = 10;
-const LEV_READ_LOW = 15;
-const LEV_READ_HIGH = 23;
+const VEL_KINETIC = 0.8;
+const LEV_INPUT_BOUND = 5;
+const LEV_PRIMING = 10;
+const LEV_CONTEXTUAL = 15;
+const LEV_DEEP_READER = 23;
 const CONSTR_ACTIVE = 0.02;
-const LEV_COMPOUND_LOW = 30;
-const LEV_COMPOUND_HIGH = 50;
+const LEV_BUILDER = 30;
+const LEV_RECURSIVE = 50;
 
 // ── Archetype metadata ─────────────────────────────────────────────────────
 
@@ -69,81 +63,101 @@ const ARCHETYPE_META = [
     archetype_id: 0,
     key: "convergent",
     name: "CONVERGENT",
+    family: "convergence",
+    family_label: "Convergence",
     description:
-      "Elite on all three axes — deep reuse, active construction, and high generation. The rare operator who breaks the tradeoffs.",
-    defined_by: "multi-axis (P80 on leverage + velocity + construction)",
+      "Deep reuse, active construction, and high generation rise together. A rare composition where all three operating axes are elevated without the usual tradeoffs.",
+    defined_by: "P80 on all 3 axes (leverage + velocity + construction)",
   },
   {
     archetype_id: 1,
-    key: "kinetic-producer",
-    name: "KINETIC PRODUCER",
+    key: "kinetic",
+    name: "KINETIC",
+    family: "generation",
+    family_label: "Generation",
     description:
-      "Output exceeds input — generating more than consumed. High velocity, the engine of the field.",
-    defined_by: "output (velocity >= 0.8)",
+      "Generation has broken out. Output approaches or exceeds fresh input, making transmission the defining feature of the composition.",
+    defined_by: "velocity >= 0.80",
   },
   {
     archetype_id: 2,
-    key: "raw-injector",
-    name: "RAW INJECTOR",
+    key: "input-bound",
+    name: "INPUT-BOUND",
+    family: "reuse",
+    family_label: "Reuse Depth",
     description:
-      "High input proportion, barely any cache reuse. Tokens going in, not much coming back.",
-    defined_by: "input (leverage < 5)",
+      "Fresh input still carries most of the workload. Little prior context is returning, so each cycle depends heavily on new input.",
+    defined_by: "leverage < 5",
   },
   {
     archetype_id: 3,
-    key: "cache-warming",
-    name: "CACHE WARMING",
+    key: "priming",
+    name: "PRIMING",
+    family: "reuse",
+    family_label: "Reuse Depth",
     description:
-      "Reuse is forming but shallow. Cache is starting to build, still finding its rhythm.",
-    defined_by: "input (leverage 5-10)",
+      "Reuse is beginning to form. Prior context is returning, but the system has not yet developed deep leverage.",
+    defined_by: "leverage 5–10",
   },
   {
     archetype_id: 4,
-    key: "shallow-reader",
-    name: "SHALLOW READER",
+    key: "contextual",
+    name: "CONTEXTUAL",
+    family: "reuse",
+    family_label: "Reuse Depth",
     description:
-      "Moderate cache reads, passive consumption. Reading context but not building new context.",
-    defined_by: "cache_read (leverage 10-15, passive)",
+      "Retained context is now materially supporting the workflow. Reuse is established, while active construction remains limited.",
+    defined_by: "leverage 10–15, passive",
   },
   {
     archetype_id: 5,
-    key: "reader",
-    name: "READER",
+    key: "deep-reader",
+    name: "DEEP READER",
+    family: "reuse",
+    family_label: "Reuse Depth",
     description:
-      "Solid cache reuse, still passive. Holds context well, executes little with it.",
-    defined_by: "cache_read (leverage 15-23, passive)",
+      "Strong accumulated context is carrying the workflow. The operator draws deeply from retained context while creating relatively little new context.",
+    defined_by: "leverage 15–23, passive",
   },
   {
     archetype_id: 6,
-    key: "archival",
-    name: "ARCHIVAL",
+    key: "archivist",
+    name: "ARCHIVIST",
+    family: "reuse",
+    family_label: "Reuse Depth",
     description:
-      "Extreme cache reuse — near-total reads, deep context library. Holds everything, generates little.",
-    defined_by: "cache_read (leverage 23+, passive)",
+      "Extreme reuse of accumulated context. A deep context library carries the system while new construction remains limited.",
+    defined_by: "leverage >= 23, passive",
   },
   {
     archetype_id: 7,
     key: "builder",
     name: "BUILDER",
+    family: "construction",
+    family_label: "Active Construction",
     description:
-      "Actively writing cache, building new context. Construction is happening, reuse is moderate.",
-    defined_by: "cache_write (construction >= 0.02, leverage < 30)",
+      "Active context construction has begun. The system is creating material for future reuse while leverage is still developing.",
+    defined_by: "construction >= 0.02, leverage < 30",
   },
   {
     archetype_id: 8,
-    key: "recursive-momentum",
-    name: "RECURSIVE MOMENTUM",
+    key: "recursive",
+    name: "RECURSIVE",
+    family: "construction",
+    family_label: "Active Construction",
     description:
-      "Building on built — the feedback loop. Deep reuse plus active construction, compounding forward.",
-    defined_by: "compound (construction >= 0.02, leverage 30-50)",
+      "New context is being built on top of an already substantial reusable base. Construction and reuse are now feeding the same operating loop.",
+    defined_by: "construction >= 0.02, leverage 30–50",
   },
   {
     archetype_id: 9,
-    key: "compound-amplifier",
-    name: "COMPOUND AMPLIFIER",
+    key: "amplifier",
+    name: "AMPLIFIER",
+    family: "construction",
+    family_label: "Active Construction",
     description:
-      "The loop at scale — massive context library, still growing. Returns amplifying on returns.",
-    defined_by: "compound (construction >= 0.02, leverage 50+)",
+      "Deep reuse and active construction are operating together at scale. Existing context produces new work that expands the context available for future cycles.",
+    defined_by: "construction >= 0.02, leverage >= 50",
   },
 ];
 
@@ -168,28 +182,24 @@ function classify(o) {
     return "convergent";
   }
 
-  // 2. KINETIC PRODUCER — output
-  if (velocity >= VEL_OUTPUT) {
-    return "kinetic-producer";
+  // 2. KINETIC — generation breakout
+  if (velocity >= VEL_KINETIC) {
+    return "kinetic";
   }
 
-  // 3-4. Input types
-  if (leverage < LEV_INPUT_LOW) return "raw-injector";
-  if (leverage < LEV_INPUT_HIGH) return "cache-warming";
-
-  // 5-7. Cache read types (passive)
-  if (construction < CONSTR_ACTIVE) {
-    if (leverage < LEV_READ_LOW) return "shallow-reader";
-    if (leverage < LEV_READ_HIGH) return "reader";
-    return "archival";
+  // 3. Construction branch — active context construction
+  if (construction >= CONSTR_ACTIVE) {
+    if (leverage >= LEV_RECURSIVE) return "amplifier";
+    if (leverage >= LEV_BUILDER) return "recursive";
+    return "builder";
   }
 
-  // 8. Builder
-  if (leverage < LEV_COMPOUND_LOW) return "builder";
-
-  // 9-10. Compounder
-  if (leverage < LEV_COMPOUND_HIGH) return "recursive-momentum";
-  return "compound-amplifier";
+  // 4. Reuse depth branch — passive (construction < 0.02)
+  if (leverage >= LEV_DEEP_READER) return "archivist";
+  if (leverage >= LEV_CONTEXTUAL) return "deep-reader";
+  if (leverage >= LEV_PRIMING) return "contextual";
+  if (leverage >= LEV_INPUT_BOUND) return "priming";
+  return "input-bound";
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -238,6 +248,8 @@ function clusterStats(ops, meta, boardCodenames) {
     archetype_id: meta.archetype_id,
     key: meta.key,
     name: meta.name,
+    family: meta.family,
+    family_label: meta.family_label,
     description: meta.description,
     defined_by: meta.defined_by,
     n,
@@ -313,13 +325,14 @@ const output = {
   n_archetypes: archetypes.length,
   thresholds: {
     convergent: CONVERGENT_T,
-    velocity_output: VEL_OUTPUT,
-    leverage_input_low: LEV_INPUT_LOW,
-    leverage_read_low: LEV_READ_LOW,
-    leverage_read_high: LEV_READ_HIGH,
+    velocity_kinetic: VEL_KINETIC,
+    leverage_input_bound: LEV_INPUT_BOUND,
+    leverage_priming: LEV_PRIMING,
+    leverage_contextual: LEV_CONTEXTUAL,
+    leverage_deep_reader: LEV_DEEP_READER,
     construction_active: CONSTR_ACTIVE,
-    leverage_compound_low: LEV_COMPOUND_LOW,
-    leverage_compound_high: LEV_COMPOUND_HIGH,
+    leverage_builder: LEV_BUILDER,
+    leverage_recursive: LEV_RECURSIVE,
   },
   silhouette: null, // Not applicable — deterministic classifier, not clustering
   archetypes,
