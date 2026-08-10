@@ -328,7 +328,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Check your global rank and class tier. The tiers —{" "}
           <strong className="text-text-primary">
-            IGNITER → SEEKER → BUILDER → TRANSMITTER
+            IGNITER → BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+
           </strong>{" "}
           — give you a quick read on where you stand. Then use the{" "}
           <Link

@@ -220,7 +220,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           A yield of 5,000 is solid. 50,000 is excellent. The top operators on
           the SigRank leaderboard push well into six figures. Your class tier
-          (IGNITER → SEEKER → BUILDER → TRANSMITTER) is assigned from your yield
+          (IGNITER → BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+) is assigned from your yield
           and the cascade shape.
         </p>
       </section>

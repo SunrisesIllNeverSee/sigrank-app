@@ -1,41 +1,40 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { CLASS_TIERS } from "@/lib/identity/canon-ids";
 
 /**
  * ClassChecker — client-side operator-class tier checker.
  *
- * Accepts either a direct yield score OR four token pillars to compute one,
- * then maps the yield to a class tier (IGNITER → SEEKER → BUILDER → TRANSMITTER)
- * with a description of what that tier means.
+ * Accepts either a direct yield score OR four token pillars. Class tier is
+ * based on TOTAL TOKENS (input + output + cacheCreate + cacheRead), not yield.
+ * When four pillars are provided, total tokens are computed and classified
+ * against the canonical 8-tier experience ladder (IGNITER → BEARER → REFINER
+ * → SEEKER → BASE → POWER → ARCH → ARCH+) with a description of what that
+ * tier means. When only a yield score is given, an approximate mapping is
+ * shown for context only. TRANSMITTER is a separate peak badge, not on the
+ * ladder.
  */
 
-const TIERS = [
-  {
-    name: "TRANSMITTER",
-    min: 10,
-    color: "text-gold",
-    desc: "Signal compounds aggressively. Cached context amplifies every fresh input into outsized output — the cascade is a multiplier, not a cost. The top tier of the board.",
-  },
-  {
-    name: "BUILDER",
-    min: 2,
-    color: "text-accent",
-    desc: "A productive, compounding cascade. Good cache reuse and solid output density. Most strong operators live here — efficient without being extraordinary.",
-  },
-  {
-    name: "SEEKER",
-    min: 0.5,
-    color: "text-text-primary",
-    desc: "A working cascade, but most input is spent once. Cache reuse and output-per-input have clear headroom. The middle of the field — learning to compound.",
-  },
-  {
-    name: "IGNITER",
-    min: 0,
-    color: "text-text-muted",
-    desc: "Early-stage cascade. Tokens are largely burned for context, not yet compounding. Every operator starts here; the first gains come from caching, not from typing more.",
-  },
-] as const;
+/** Tier-level minimum total-token thresholds (descending first-match scan). */
+const TIER_MIN_TOKENS: Record<string, number> = {
+  "ARCH+": 1_000_000_000_000,
+  ARCH: 68_766_193_943,
+  POWER: 19_141_226_889,
+  BASE: 7_747_041_813,
+  SEEKER: 2_961_798_768,
+  REFINER: 1_334_876_308,
+  BEARER: 431_702_990,
+  IGNITER: 0,
+};
+
+const TIERS = Object.values(CLASS_TIERS).map((t) => ({
+  name: t.name,
+  glyph: t.glyph,
+  hex: t.hex,
+  meaning: t.meaning,
+  totalMin: TIER_MIN_TOKENS[t.name] ?? 0,
+}));
 
 const PILLARS = [
   { key: "input", label: "Input tokens" },
@@ -46,9 +45,26 @@ const PILLARS = [
 
 type PillarKey = (typeof PILLARS)[number]["key"];
 
-function classForYield(y: number) {
-  for (const t of TIERS) if (y >= t.min) return t;
+function classForTotalTokens(total: number) {
+  for (const t of TIERS) if (total >= t.totalMin) return t;
   return TIERS[TIERS.length - 1];
+}
+
+function formatTokens(n: number): string {
+  if (n >= 1e12) return `${(n / 1e12).toFixed(1)}T`;
+  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+  return String(n);
+}
+
+function thresholdLabel(idx: number): string {
+  const tier = TIERS[idx];
+  if (tier.totalMin === 0) {
+    const upper = TIERS[idx - 1];
+    return upper ? `< ${formatTokens(upper.totalMin)}` : "0+";
+  }
+  return `≥ ${formatTokens(tier.totalMin)}`;
 }
 
 export function ClassChecker() {
@@ -61,6 +77,15 @@ export function ClassChecker() {
     cacheWrite: "15000",
   });
 
+  const totalTokens = useMemo(() => {
+    if (mode === "yield") return 0;
+    const input = Number(pillars.input) || 0;
+    const output = Number(pillars.output) || 0;
+    const cacheRead = Number(pillars.cacheRead) || 0;
+    const cacheWrite = Number(pillars.cacheWrite) || 0;
+    return input + output + cacheRead + cacheWrite;
+  }, [mode, pillars]);
+
   const yield_ = useMemo(() => {
     if (mode === "yield") return Number(yieldInput) || 0;
     const input = Number(pillars.input) || 0;
@@ -69,7 +94,7 @@ export function ClassChecker() {
     return input > 0 ? (cacheRead * output) / (input * input) : 0;
   }, [mode, yieldInput, pillars]);
 
-  const tier = classForYield(yield_);
+  const tier = mode === "pillars" ? classForTotalTokens(totalTokens) : null;
 
   function updatePillar(key: PillarKey, v: string) {
     setPillars((prev) => ({ ...prev, [key]: v }));
@@ -139,27 +164,55 @@ export function ClassChecker() {
 
       {/* Result */}
       <div className="mt-6 rounded-lg border border-bg-border bg-bg-elevated p-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="font-mono text-xs uppercase tracking-widest text-text-muted">
-            Computed yield
-          </span>
-          <span className="font-mono text-2xl font-bold text-gold">
-            {yield_ >= 1000
-              ? `${(yield_ / 1000).toFixed(1)}K`
-              : yield_.toFixed(2)}
-          </span>
-        </div>
-        <div className={`mt-4 font-mono text-lg font-bold ${tier.color}`}>
-          {tier.name}
-        </div>
-        <p className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
-          {tier.desc}
-        </p>
+        {mode === "pillars" ? (
+          <>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="font-mono text-xs uppercase tracking-widest text-text-muted">
+                Total tokens
+              </span>
+              <span className="font-mono text-2xl font-bold text-gold">
+                {formatTokens(totalTokens)}
+              </span>
+            </div>
+            {tier && (
+              <>
+                <div
+                  className="mt-4 font-mono text-lg font-bold"
+                  style={{ color: tier.hex }}
+                >
+                  {tier.glyph} {tier.name}
+                </div>
+                <p className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
+                  {tier.meaning}
+                </p>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="font-mono text-xs uppercase tracking-widest text-text-muted">
+                Yield score
+              </span>
+              <span className="font-mono text-2xl font-bold text-gold">
+                {yield_ >= 1000
+                  ? `${(yield_ / 1000).toFixed(1)}K`
+                  : yield_.toFixed(2)}
+              </span>
+            </div>
+            <p className="mt-3 font-sans text-xs leading-relaxed text-text-muted">
+              NOTE: Class tier is based on TOTAL TOKENS (input + output +
+              cacheCreate + cacheRead), not yield. The yield score above is
+              shown for context only — switch to pillar input to determine
+              your class tier.
+            </p>
+          </>
+        )}
 
         {/* Tier ladder */}
         <div className="mt-5 flex flex-col gap-1.5">
-          {[...TIERS].reverse().map((t) => {
-            const active = t.name === tier.name;
+          {TIERS.map((t, idx) => {
+            const active = tier?.name === t.name;
             return (
               <div
                 key={t.name}
@@ -169,16 +222,14 @@ export function ClassChecker() {
                     : "border-bg-border-subtle text-text-muted"
                 }`}
               >
-                <span className="w-28">{t.name}</span>
-                <span className="text-text-muted">
-                  {t.min === 0
-                    ? "< 0.5"
-                    : t.min === 0.5
-                      ? "0.5 – 2"
-                      : t.min === 2
-                        ? "2 – 10"
-                        : "10+"}
+                <span
+                  className="w-5 text-center"
+                  style={{ color: t.hex }}
+                >
+                  {t.glyph}
                 </span>
+                <span className="w-24">{t.name}</span>
+                <span className="text-text-muted">{thresholdLabel(idx)}</span>
                 {active && <span className="ml-auto">◆ you are here</span>}
               </div>
             );
@@ -187,9 +238,10 @@ export function ClassChecker() {
       </div>
 
       <p className="mt-4 font-sans text-xs leading-relaxed text-text-muted">
-        Class thresholds are approximate (IGNITER &lt; 0.5, SEEKER 0.5–2,
-        BUILDER 2–10, TRANSMITTER 10+). Authoritative tiers are assigned
-        server-side from signed snapshots.
+        Class tier is based on total tokens (input + output + cacheCreate +
+        cacheRead). Authoritative tiers are assigned server-side from signed
+        snapshots. TRANSMITTER is a separate peak badge, not on the experience
+        ladder.
       </p>
     </div>
   );

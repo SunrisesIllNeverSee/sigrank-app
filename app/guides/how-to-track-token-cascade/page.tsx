@@ -217,8 +217,8 @@ export default function HowToTrackTokenCascadePage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               The model is productive and has good context. You&rsquo;re getting
-              a lot of signal out per unit of fresh input. This is a
-              TRANSMITTER-class cascade.
+              a lot of signal out per unit of fresh input. This is an
+              ARCH+-class cascade.
             </p>
           </li>
           <li className="rounded-lg border border-bg-border bg-bg-surface p-5">

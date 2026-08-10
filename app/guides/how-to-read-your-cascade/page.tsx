@@ -54,7 +54,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 5,
       name: "Interpret your class tier",
-      text: "Your class tier (IGNITER → SEEKER → BUILDER → TRANSMITTER) summarizes your cascade shape. Use it as a quick diagnostic and a target for improvement.",
+      text: "Your class tier (IGNITER → BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+) summarizes your cascade shape. Use it as a quick diagnostic and a target for improvement.",
     },
   ],
 };
@@ -91,12 +91,12 @@ export default function HowToReadYourCascadePage() {
             {
               question: "What does a balanced cascade look like?",
               answer:
-                "A balanced cascade has high cache-read (good context reuse), low input (small deltas on top of cache), and high output (productive model responses). The cache-write pillar shows early investment that converts to cache-read over time. This is the cascade shape of a TRANSMITTER-class operator.",
+                "A balanced cascade has high cache-read (good context reuse), low input (small deltas on top of cache), and high output (productive model responses). The cache-write pillar shows early investment that converts to cache-read over time. This is the cascade shape of an ARCH+-class operator.",
             },
             {
               question: "How do I interpret my class tier?",
               answer:
-                "Class tiers go from IGNITER (lowest) through SEEKER and BUILDER to TRANSMITTER (highest). IGNITERs have low yield — mostly fresh input, little cache reuse. SEEKERs are improving but inconsistent. BUILDERs have solid cache reuse and decent output. TRANSMITTERs have high cache-read, low input, and high output — the ideal cascade shape.",
+                "Class tiers go from IGNITER (lowest) through BEARER, REFINER, SEEKER, BASE, POWER, and ARCH to ARCH+ (highest). IGNITERs have low yield — mostly fresh input, little cache reuse. BEARERs are investing in cache but haven't compounded yet. REFINERs are growing cache-read and shrinking input. SEEKERs are improving but inconsistent. BASEs have solid cache reuse and decent output. POWERs have high cache-read and efficient prompting. ARCHs have excellent cascade architecture with minimal input. ARCH+ operators have high cache-read, low input, and high output — the ideal cascade shape.",
             },
           ]),
           howTo,
@@ -307,7 +307,7 @@ export default function HowToReadYourCascadePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           In numbers: input 5,000, output 12,000, cache-read 40,000, cache-write
           8,000. Cache-read dominates, input is minimal. Yield = (40,000 ×
-          12,000) / 5,000² = 19,200 — a BUILDER or TRANSMITTER-class cascade.
+          12,000) / 5,000² = 19,200 — a POWER or ARCH-class cascade.
         </p>
       </section>
 
@@ -330,6 +330,21 @@ export default function HowToReadYourCascadePage() {
             </p>
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">BEARER</p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Early cache investment. Cache-write is growing but cache-read is
+              still low. The cascade is forming but hasn&rsquo;t compounded yet.
+              Focus: keep your context window stable so cache matures.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">REFINER</p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Cache-read is rising and input is shrinking. The cascade begins to
+              compound. Focus: refine prompt structure and reduce re-pastes.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
             <p className="font-mono text-sm font-bold text-gold">SEEKER</p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Improving but inconsistent. Some cache reuse, but input still
@@ -338,7 +353,7 @@ export default function HowToReadYourCascadePage() {
             </p>
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-            <p className="font-mono text-sm font-bold text-gold">BUILDER</p>
+            <p className="font-mono text-sm font-bold text-gold">BASE</p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Solid cache reuse and decent output. The cascade is compounding
               reliably. Input is controlled. Focus: increase output per turn
@@ -346,11 +361,27 @@ export default function HowToReadYourCascadePage() {
             </p>
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-            <p className="font-mono text-sm font-bold text-gold">TRANSMITTER</p>
+            <p className="font-mono text-sm font-bold text-gold">POWER</p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              High cache-read, low input, high output — the ideal cascade shape.
-              Signal compounds efficiently. Focus: maintain discipline and push
-              yield higher.
+              High cache-read and efficient prompting. The cascade amplifies
+              signal well. Output is strong relative to input. Focus: push
+              output higher and sustain discipline.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">ARCH</p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Excellent cascade architecture. Cache-read dominates, input is
+              minimal, output is high. Signal compounds efficiently. Focus:
+              optimize edge cases and maintain the discipline.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">ARCH+</p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              The ideal cascade shape. High cache-read, low input, high output.
+              Signal compounds at maximum efficiency. Focus: maintain discipline
+              and push yield higher.
             </p>
           </div>
         </div>
@@ -409,10 +440,11 @@ export default function HowToReadYourCascadePage() {
               How do I interpret my class tier?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              IGNITER (low yield, burning tokens) → SEEKER (improving,
-              inconsistent cache) → BUILDER (solid reuse, decent output) →
-              TRANSMITTER (ideal cascade shape, high yield). Use it as a
-              diagnostic and a target.
+              IGNITER (low yield, burning tokens) → BEARER (cache forming) →
+              REFINER (cache growing) → SEEKER (improving, inconsistent cache)
+              → BASE (solid reuse, decent output) → POWER (high cache-read,
+              efficient) → ARCH (excellent architecture) → ARCH+ (ideal cascade
+              shape, high yield). Use it as a diagnostic and a target.
             </dd>
           </div>
         </dl>
