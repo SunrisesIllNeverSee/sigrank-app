@@ -245,6 +245,18 @@ export default function SciencePage() {
               DOI: 10.5281/zenodo.20031715
             </a>
           </li>
+          <li className="flex flex-wrap items-baseline gap-1">
+            <strong className="text-text-primary">
+              Two-Axis Operator Taxonomy:
+            </strong>{" "}
+            <a
+              href="https://doi.org/10.5281/zenodo.21875676"
+              className="text-gold underline underline-offset-2"
+              rel="external"
+            >
+              DOI: 10.5281/zenodo.21875676
+            </a>
+          </li>
         </ul>
       </section>
 
