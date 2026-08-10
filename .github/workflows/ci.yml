@@ -106,6 +106,9 @@ jobs:
       - name: Cross-repo MCP version + platform-count drift test
         run: node __tests__/contract/mcp-version-drift.test.mjs ${{ github.workspace }}/_sigrank-mcp
 
+      - name: Intra-repo mock/seed sync contract (dev fallback ↔ prod seed)
+        run: node --test __tests__/contract/mock-seed-sync.test.mjs
+
   # Migration parity guardrail — fails if the Supabase migration ledger has
   # drifted from the local migrations/ directory. Prevents the catastrophic
   # db-push scenario (re-running all migrations) from silently returning.
