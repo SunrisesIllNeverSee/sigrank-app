@@ -85,7 +85,7 @@ your own logs.
 - **SNR** (Signal-to-Noise Ratio) = output / (input + cache_write) — signal vs overhead
 - **10xDEV** = log₁₀(Leverage) — leverage on a readable scale
 - **Compression Ratio** = cache_read / (cache_read + input) — cache efficiency
-- **SIGNA RATE** = the class credential (proprietary weights, not the rank metric)
+- **SIGNA RATE** = a composite signal quality score (proprietary weights, used for the TRANSMITTER badge, not for class assignment)
 
 ## The telescoping identity
 
@@ -97,17 +97,18 @@ internal-consistency guarantee that makes the board trustworthy.
 
 ## The class ladder
 
-The class system falls out of the math. From lowest to highest:
+Class is assigned from total tokens accumulated - not compression, not yield, not SIGNA RATE. 8 experience tiers, each split into 3 sub-stages (24 stages total). From lowest to highest:
 
 1. **IGNITER** — dormant potential, high burn, zero reuse
 2. **BEARER** — quiet insight, minimal structure
 3. **REFINER** — deliberate practice, starting to compound
-4. **SEEER** — high exploration, broad context
+4. **SEEKER** — high exploration, broad context
 5. **BASE** — signal starting to break through
 6. **POWER** — forging, real leverage emerging
 7. **ARCH** — system builder, structural compounding
 8. **ARCH+** — precision creator, surgical input
-9. **TRANSMITTER** — you don't just use the system, you *are* the system
+
+**TRANSMITTER** is a separate peak badge (RS.08), not a class tier. It is awarded temporarily when an operator sustains the highest cascade performance.
 
 ## Headline stats (owner-verified, 2026-07-02)
 
