@@ -159,7 +159,7 @@ export const DEMO_BANNER =
  * every web reference tracks ONE source (was hardcoded in ≥2 places, went stale
  * at 0.9.5 once). Bump this when the MCP package is published.
  */
-export const MCP_VERSION = "0.0.196" as const;
+export const MCP_VERSION = "0.0.197" as const;
 
 /**
  * PLATFORM_COUNT — how many platforms the MCP's adapter registry reads. Mirrors
@@ -167,4 +167,4 @@ export const MCP_VERSION = "0.0.196" as const;
  * marketing copy never drifts (it was hardcoded as "14+" while the registry had 15).
  * Bump when the MCP ships a new adapter.
  */
-export const PLATFORM_COUNT = 18 as const;
+export const PLATFORM_COUNT = 19 as const;
