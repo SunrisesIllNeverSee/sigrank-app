@@ -4,7 +4,7 @@
  *
  * Renders the full population distribution from
  * public/data/class-distribution-reference.json as a formatted table + bar
- * chart: stage name, floor/ceiling token ranges, operator count, and a
+ * chart: stage name, observed token ranges, operator count, and a
  * horizontal bar showing relative population. Server component.
  */
 
@@ -12,8 +12,9 @@ import classDistRaw from "@/public/data/class-distribution-reference.json";
 
 interface StageRow {
   stage: string;
-  floor: number;
-  ceiling: number;
+  totalMin_inclusive: number;
+  observed_min_total_tokens: number;
+  observed_max_total_tokens: number;
   operators: number;
 }
 
@@ -60,10 +61,11 @@ export function TierLadderDistribution() {
         24-stage distribution
       </h3>
       <p className="max-w-2xl font-sans text-xs text-text-muted">
-        Equal-population calibration from the HCM cut ({totalOps.toLocaleString()}{" "}
-        operators). Each of the 24 stages holds ~{Math.round(totalOps / 24)}{" "}
-        operators. Floor and ceiling are total-token boundaries (input + output +
-        cacheCreate + cacheRead).
+        Canonical classifier applied to all {totalOps.toLocaleString()} eligible
+        operators. Stage populations follow Option C target shares (not
+        equal-population): each base tier has a different target percentage,
+        then divides approximately into thirds (III, II, I). Observed min/max
+        are empirical ranges within each stage, not classifier thresholds.
       </p>
 
       {/* Tier summary bars */}
@@ -101,8 +103,8 @@ export function TierLadderDistribution() {
           <thead>
             <tr className="border-b border-bg-border">
               <th className="py-2 pr-3 text-text-muted">Stage</th>
-              <th className="py-2 pr-3 text-right text-text-muted">Floor</th>
-              <th className="py-2 pr-3 text-right text-text-muted">Ceiling</th>
+              <th className="py-2 pr-3 text-right text-text-muted">Observed min</th>
+              <th className="py-2 pr-3 text-right text-text-muted">Observed max</th>
               <th className="py-2 pr-3 text-right text-text-muted">Operators</th>
               <th className="py-2 pr-3 text-text-muted">Distribution</th>
             </tr>
@@ -123,10 +125,10 @@ export function TierLadderDistribution() {
                     </span>
                   </td>
                   <td className="py-1.5 pr-3 text-right text-text-secondary">
-                    {fmtTokens(s.floor)}
+                    {fmtTokens(s.observed_min_total_tokens)}
                   </td>
                   <td className="py-1.5 pr-3 text-right text-text-secondary">
-                    {fmtTokens(s.ceiling)}
+                    {fmtTokens(s.observed_max_total_tokens)}
                   </td>
                   <td className="py-1.5 pr-3 text-right text-text-secondary">
                     {s.operators}
@@ -151,10 +153,10 @@ export function TierLadderDistribution() {
       </div>
 
       <p className="font-sans text-[11px] text-text-dim">
-        Floor = minimum total tokens for this stage. Ceiling = maximum (next
-        stage&apos;s floor). Stages are equal-population by design (Option C
-        calibration). TRANSMITTER is not shown here — it is a peak badge, not
-        a ladder stage.
+        Observed min/max are empirical token ranges within each stage under the
+        canonical classifier (experience_ladder.json). Stage populations differ
+        by design — each base tier has a different target share (Option C).
+        TRANSMITTER is not shown here — it is a peak badge, not a ladder stage.
       </p>
     </section>
   );

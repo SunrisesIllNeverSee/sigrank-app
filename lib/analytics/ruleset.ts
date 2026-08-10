@@ -11,8 +11,8 @@ import "server-only";
  * Every constant below is a calibrated value from Ruleset v1.0 (CANON §VIII).
  * The OPERATOR_OVERRIDE_REQUIRED marker indicates the operator can override
  * these at runtime via SIGRANK_RULESET env vars (see lib/analytics/secret-config.ts).
- * RS.05 thresholds are calibrated from the HCM cut (1,626 operators) using
- * target population distribution (Option C). RS.08 is the TRANSMITTER badge gate.
+ * RS.05 thresholds are calibrated from the full eligible field (1,627 operators)
+ * using target population distribution (Option C). RS.08 is the TRANSMITTER badge gate.
  */
 
 /**
@@ -75,10 +75,10 @@ export const RS04_PC_WEIGHTS = {
  * badge (RS.08) that any tier can earn during a high-frequency, high-resonance
  * window.
  *
- * Calibrated from the HCM cut (1,626 operators) using target population
- * distribution (Option C): IGNITER 10%, BEARER 12.5%, REFINER 15%, SEEKER 22.5%,
- * BASE 20%, POWER 15%, ARCH 5%, ARCH+ 0% (aspirational). Each tier split into
- * 3 equal-population sub-stages.
+ * Calibrated from the full eligible field (1,627 operators) using target
+ * population shares (Option C): IGNITER 10%, BEARER 12.5%, REFINER 15%,
+ * SEEKER 22.5%, BASE 20%, POWER 15%, ARCH 5%, ARCH+ aspirational. Each
+ * ordinary tier divided approximately into thirds (III, II, I).
  */
 // OPERATOR_OVERRIDE_REQUIRED RS.05
 export const RS05_CLASS_THRESHOLDS: ReadonlyArray<{

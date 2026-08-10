@@ -1,0 +1,57 @@
+{
+  "method": "descending_first_match",
+  "description": "Canonical experience-ladder classifier. After null, non-finite, and all-zero cascades are assigned UNCLASSED, each eligible operator is assigned to exactly one stage by a descending first-match scan over totalMin thresholds. The first match wins and all thresholds are inclusive lower bounds (>=). Within each tier, III is entry, II is intermediate, and I is the top sub-stage.",
+  "cohort": "All operators with non-null, finite total_tokens and at least one non-zero pillar. This is a population-agnostic classifier — the same thresholds apply regardless of which cohort is being classified.",
+  "stages": [
+    { "stage": "ARCH+ I",   "totalMin_inclusive": 7068201104627 },
+    { "stage": "ARCH+ II",  "totalMin_inclusive": 3000000000000 },
+    { "stage": "ARCH+ III", "totalMin_inclusive": 1000000000000 },
+    { "stage": "ARCH I",    "totalMin_inclusive": 186207267611 },
+    { "stage": "ARCH II",   "totalMin_inclusive": 98543134083 },
+    { "stage": "ARCH III",  "totalMin_inclusive": 68766193943 },
+    { "stage": "POWER I",   "totalMin_inclusive": 39958782379 },
+    { "stage": "POWER II",  "totalMin_inclusive": 26955905621 },
+    { "stage": "POWER III", "totalMin_inclusive": 19141226889 },
+    { "stage": "BASE I",    "totalMin_inclusive": 13960345961 },
+    { "stage": "BASE II",   "totalMin_inclusive": 10189224970 },
+    { "stage": "BASE III",  "totalMin_inclusive": 7747041813 },
+    { "stage": "SEEKER I",  "totalMin_inclusive": 5446673659 },
+    { "stage": "SEEKER II", "totalMin_inclusive": 4014577247 },
+    { "stage": "SEEKER III","totalMin_inclusive": 2961798768 },
+    { "stage": "REFINER I", "totalMin_inclusive": 2358346840 },
+    { "stage": "REFINER II","totalMin_inclusive": 1845750357 },
+    { "stage": "REFINER III","totalMin_inclusive": 1334876308 },
+    { "stage": "BEARER I",  "totalMin_inclusive": 984078167 },
+    { "stage": "BEARER II", "totalMin_inclusive": 714619043 },
+    { "stage": "BEARER III","totalMin_inclusive": 431702990 },
+    { "stage": "IGNITER I", "totalMin_inclusive": 216393332 },
+    { "stage": "IGNITER II","totalMin_inclusive": 88999166 },
+    { "stage": "IGNITER III","totalMin_inclusive": 0 }
+  ],
+  "unclassified": {
+    "stage": "UNCLASSED",
+    "condition": "total_tokens is null, non-finite, or all four pillars are zero",
+    "note": "Distinct from IGNITER III so callers can distinguish 'no data' from 'bottom tier'."
+  },
+  "tier_grouping": {
+    "ARCH+":  ["ARCH+ I", "ARCH+ II", "ARCH+ III"],
+    "ARCH":   ["ARCH I", "ARCH II", "ARCH III"],
+    "POWER":  ["POWER I", "POWER II", "POWER III"],
+    "BASE":   ["BASE I", "BASE II", "BASE III"],
+    "SEEKER": ["SEEKER I", "SEEKER II", "SEEKER III"],
+    "REFINER":["REFINER I", "REFINER II", "REFINER III"],
+    "BEARER": ["BEARER I", "BEARER II", "BEARER III"],
+    "IGNITER":["IGNITER I", "IGNITER II", "IGNITER III"]
+  },
+  "transmitter_badge": {
+    "type": "peak_badge",
+    "not_on_ladder": true,
+    "description": "TRANSMITTER is a temporary peak badge (RS.08) that any experience tier can earn during a high-frequency, high-resonance window. It lapses when frequency or resonance drops. It is not a permanent class and is not part of the 24-stage ladder.",
+    "criteria": {
+      "high_frequency": "total tokens in window >= 1B",
+      "high_resonance": "SIGNA RATE (composite signal quality) >= 85"
+    }
+  },
+  "source": "lib/analytics/ruleset.ts RS05_CLASS_THRESHOLDS in sigrank-app commit 809a949db33bbf2a6c43ad8e7e77305e0ddae8c7",
+  "calibration": "Thresholds were calibrated against the field distribution using Option C target shares: IGNITER 10%, BEARER 12.5%, REFINER 15%, SEEKER 22.5%, BASE 20%, POWER 15%, ARCH 5%, and ARCH+ aspirational. Each ordinary base tier is divided approximately into thirds (III, II, I). The thresholds are fixed classifier cutpoints — they do not change with the population."
+}
