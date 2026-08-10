@@ -1,10 +1,11 @@
 name: Sync MCP version
 
-# Checks npm for the latest sigrank-mcp version and updates MCP_VERSION in
-# lib/constants.ts if it's behind. Runs on schedule (daily) + on push to main.
+# Checks npm for the latest sigrank-mcp version AND checks out the MCP repo to
+# count ALL_PLATFORMS.length. Updates MCP_VERSION and PLATFORM_COUNT in
+# lib/constants.ts if either has drifted. Runs on schedule (daily) + on demand.
 #
 # No CROSS_REPO_PAT needed — this repo checks npm directly (public, no auth)
-# and commits to its own main using the default GITHUB_TOKEN.
+# and the MCP repo is public. Commits to its own main using GITHUB_TOKEN.
 #
 # This replaces the old repository_dispatch approach which required a PAT
 # on both repos. Simpler, fewer secrets, same result.
@@ -24,7 +25,7 @@ permissions:
 
 jobs:
   sync:
-    name: Check npm + sync MCP_VERSION
+    name: Check npm + sync MCP_VERSION + PLATFORM_COUNT
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
     steps:
@@ -36,42 +37,82 @@ jobs:
         with:
           node-version: 22
 
-      - name: Check npm version vs MCP_VERSION
+      # Check out the MCP repo to count ALL_PLATFORMS at runtime (the only
+      # source of truth for platform count). npm metadata doesn't expose this.
+      - name: Checkout sigrank-mcp
+        uses: actions/checkout@v7
+        with:
+          repository: SunrisesIllNeverSee/sigrank-mcp
+          path: _sigrank-mcp
+
+      - name: Check npm version + platform count vs constants
         id: check
         run: |
           NPM_VERSION=$(npm view sigrank version 2>/dev/null)
           CURRENT_VERSION=$(grep -oP 'MCP_VERSION\s*=\s*"[^"]+"' lib/constants.ts | grep -oP '"[^"]+"' | tr -d '"')
+          CURRENT_COUNT=$(grep -oP 'PLATFORM_COUNT\s*=\s*\d+' lib/constants.ts | grep -oP '\d+')
 
-          echo "npm:     $NPM_VERSION"
-          echo "current: $CURRENT_VERSION"
+          # Count ALL_PLATFORMS by importing the MCP's adapters module
+          MCP_COUNT=$(node -e "
+            import('${{ github.workspace }}/_sigrank-mcp/adapters.mjs')
+              .then(m => process.stdout.write(String(m.ALL_PLATFORMS.length)))
+              .catch(() => process.stdout.write('0'));
+          ")
+
+          echo "npm version:     $NPM_VERSION"
+          echo "current version: $CURRENT_VERSION"
+          echo "mcp platforms:   $MCP_COUNT"
+          echo "current count:   $CURRENT_COUNT"
+
+          NEEDS_UPDATE=false
 
           if [ -z "$NPM_VERSION" ]; then
-            echo "✗ Could not fetch npm version — skipping"
-            exit 0
-          fi
-
-          if [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
-            echo "Already in sync ($NPM_VERSION) — nothing to do."
-            echo "needs_update=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "Drift detected: $CURRENT_VERSION → $NPM_VERSION"
-            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+            echo "✗ Could not fetch npm version — skipping version sync"
+          elif [ "$NPM_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "Version drift: $CURRENT_VERSION → $NPM_VERSION"
+            NEEDS_UPDATE=true
             echo "npm_version=$NPM_VERSION" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version already in sync ($NPM_VERSION)"
           fi
 
-      - name: Update MCP_VERSION
+          if [ -z "$MCP_COUNT" ] || [ "$MCP_COUNT" = "0" ]; then
+            echo "✗ Could not count MCP ALL_PLATFORMS — skipping platform sync"
+          elif [ "$MCP_COUNT" != "$CURRENT_COUNT" ]; then
+            echo "Platform count drift: $CURRENT_COUNT → $MCP_COUNT"
+            NEEDS_UPDATE=true
+            echo "mcp_platform_count=$MCP_COUNT" >> "$GITHUB_OUTPUT"
+          else
+            echo "Platform count already in sync ($MCP_COUNT)"
+          fi
+
+          echo "needs_update=$NEEDS_UPDATE" >> "$GITHUB_OUTPUT"
+
+      - name: Update MCP_VERSION + PLATFORM_COUNT
         if: steps.check.outputs.needs_update == 'true'
         run: |
-          NEW_VERSION="${{ steps.check.outputs.npm_version }}"
-          sed -i "s/export const MCP_VERSION = \"[^\"]*\"/export const MCP_VERSION = \"$NEW_VERSION\"/" lib/constants.ts
+          NPM_VERSION="${{ steps.check.outputs.npm_version }}"
+          MCP_COUNT="${{ steps.check.outputs.mcp_platform_count }}"
 
-          # Verify
-          UPDATED=$(grep -oP 'MCP_VERSION\s*=\s*"[^"]+"' lib/constants.ts | grep -oP '"[^"]+"' | tr -d '"')
-          if [ "$UPDATED" != "$NEW_VERSION" ]; then
-            echo "✗ FAIL: MCP_VERSION not updated correctly"
-            exit 1
+          if [ -n "$NPM_VERSION" ]; then
+            sed -i "s/export const MCP_VERSION = \"[^\"]*\"/export const MCP_VERSION = \"$NPM_VERSION\"/" lib/constants.ts
+            UPDATED_V=$(grep -oP 'MCP_VERSION\s*=\s*"[^"]+"' lib/constants.ts | grep -oP '"[^"]+"' | tr -d '"')
+            if [ "$UPDATED_V" != "$NPM_VERSION" ]; then
+              echo "✗ FAIL: MCP_VERSION not updated correctly"
+              exit 1
+            fi
+            echo "✓ MCP_VERSION → $NPM_VERSION"
           fi
-          echo "✓ MCP_VERSION → $NEW_VERSION"
+
+          if [ -n "$MCP_COUNT" ]; then
+            sed -i "s/export const PLATFORM_COUNT = [0-9]*/export const PLATFORM_COUNT = $MCP_COUNT/" lib/constants.ts
+            UPDATED_C=$(grep -oP 'PLATFORM_COUNT\s*=\s*\d+' lib/constants.ts | grep -oP '\d+')
+            if [ "$UPDATED_C" != "$MCP_COUNT" ]; then
+              echo "✗ FAIL: PLATFORM_COUNT not updated correctly"
+              exit 1
+            fi
+            echo "✓ PLATFORM_COUNT → $MCP_COUNT"
+          fi
 
       - name: Commit + push
         if: steps.check.outputs.needs_update == 'true'
@@ -79,6 +120,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add lib/constants.ts
-          git commit -m "chore: sync MCP_VERSION → ${{ steps.check.outputs.npm_version }} [skip ci]"
+          git commit -m "chore: sync MCP_VERSION + PLATFORM_COUNT [skip ci]"
           git push origin main
           echo "✓ Pushed. Vercel will auto-deploy."
