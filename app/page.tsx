@@ -27,7 +27,7 @@ export const revalidate = 86400;
 // (SITE_NAME); the home title is the root segment so it's set in full here. Description is
 // the hero's voice (kept in sync with SITE_TAGLINE).
 export const metadata: Metadata = withOG({
-  title: "SigRank · SignalAF — The Evaluation Platform for AI Operators",
+  title: "SigRank · SignalAF - The Evaluation Platform for AI Operators",
   description:
     "Models are benchmarked constantly. The people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.",
   path: "/",
