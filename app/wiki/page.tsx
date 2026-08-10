@@ -4,7 +4,7 @@
  * A basic, navigable wiki over the core SigRank topics — the foundation the
  * deepwiki grows from later. Owner-specified root-column order (2026-06-21):
  *   1. SigRank console (definition)   2. Submit   3. Metrics (four pillars +
- *   the token cascade — NO word-era)  4. Transmitters (the 9 classes)
+ *   the token cascade - NO word-era)  4. Transmitters (8 experience tiers + TRANSMITTER badge)
  *   5. MO§ES™ (commitment theory + founding story — owner-authored)
  *
  * Plus a sign bar (WikiSignBar) with a login dropdown carrying Contact +
@@ -42,7 +42,7 @@ import Link from "next/link";
 export const metadata: Metadata = withOG({
   title: "Wiki",
   description:
-    "SigRank wiki — the console, four pillars, token cascade, nine transmitter classes, and MO§ES governance framework.",
+    "SigRank wiki - the console, four pillars, token cascade, eight experience tiers + TRANSMITTER badge, and MO§ES governance framework.",
   path: "/wiki",
 });
 
@@ -76,9 +76,9 @@ function SigRankDefinition() {
         full ledger out, ranked live.
       </p>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
-        Volume is noise. Yield is signal. The same four token counts reveal
-        whether you compound signal or burn it — and whether you&apos;re a
-        Burner, a Builder, or a 10×er.
+        Volume alone is noise. Yield is signal. The same four token counts
+        reveal whether you compound signal or burn it - and whether
+        you&apos;re a Burner, a Builder, or a 10xer.
       </p>
 
       {/* What the board shows */}
@@ -91,7 +91,7 @@ function SigRankDefinition() {
           <strong className="text-text-primary">Υ Yield</strong> — the headline
           cascade metric — across four scoring windows: 7-day, 30-day, 90-day,
           and all-time. Each row shows the operator&apos;s class tier
-          (Transmitter down to Igniter), their four raw token pillars, the full
+          (ARCH+ down to IGNITER), their four raw token pillars, the full
           cascade (Υ Yield, SNR, Leverage, Velocity, 10xDEV), cost per million
           tokens, and their efficiency vs the Artificial Analysis 7:2:1
           baseline.
@@ -100,9 +100,10 @@ function SigRankDefinition() {
           Every number is derived from four raw integers: input, output,
           cache-read, cache-write. No word counts, no message content, no
           self-reported fields. The server recomputes everything from the raw
-          payload — you cannot inflate a metric without inflating the pillars
-          that feed it, and the telescoping identity (Test 3) catches any
-          mismatch.
+          payload. Derived metrics cannot be altered independently of the four
+          pillars. The telescoping identity detects inconsistent calculations.
+          Fabricated pillars are handled separately through signed telemetry,
+          provenance, plausibility checks, and review.
         </p>
       </section>
 
@@ -155,13 +156,62 @@ function SigRankDefinition() {
           </div>
         </div>
         <p className="font-sans text-xs text-text-dim">
-          These are not fixed labels — they are cascade shapes. An operator can
-          be a Burner on Monday and a 10×er by Friday if their architecture
-          shifts. The class tier (K.01–K.09) is the stable read; the archetype
-          is the live one.
+          These are not fixed labels - they are cascade shapes. An operator can
+          be a Burner on Monday and a 10xer by Friday if their architecture
+          shifts. Archetype describes shape. Class describes qualification. Rank
+          describes position. All three are recomputed every scoring window.
         </p>
       </section>
     </div>
+  );
+}
+
+/* ───────────────────── PRODUCT HIERARCHY ───────────────────── */
+
+function ProductHierarchy() {
+  const rows: { layer: string; question: string; persistence: string }[] = [
+    { layer: "Pillars", question: "What raw activity occurred?", persistence: "Raw record (signed)" },
+    { layer: "Operating Ratio", question: "What is the current composition?", persistence: "Window-specific" },
+    { layer: "Archetype", question: "What shape does the cascade resemble?", persistence: "Dynamic (per window)" },
+    { layer: "Class", question: "Which qualification tier?", persistence: "Recomputed by window" },
+    { layer: "Rank", question: "Where does the operator stand?", persistence: "Dynamic (board)" },
+    { layer: "Drift", question: "How far from own signature?", persistence: "Temporal" },
+  ];
+  return (
+    <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
+      <h3 className="font-mono text-sm font-bold text-text-primary">
+        The product hierarchy
+      </h3>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
+        Six layers, each answering a different question. They are independent:
+        knowing one does not determine the others.
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full font-mono text-xs">
+          <thead>
+            <tr className="border-b border-bg-border text-text-muted">
+              <th className="py-2 pr-4 text-left font-bold">Layer</th>
+              <th className="py-2 pr-4 text-left font-bold">Question answered</th>
+              <th className="py-2 text-left font-bold">Persistence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.layer} className="border-b border-bg-border-subtle last:border-b-0">
+                <td className="py-2 pr-4 font-bold text-text-primary">{r.layer}</td>
+                <td className="py-2 pr-4 text-text-secondary">{r.question}</td>
+                <td className="py-2 text-text-muted">{r.persistence}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="font-sans text-xs leading-relaxed text-text-muted">
+        Archetype describes shape. Class describes qualification. Rank
+        describes position. None are permanent. All are recomputed per scoring
+        window (7d / 30d / 90d / all-time).
+      </p>
+    </section>
   );
 }
 
@@ -306,10 +356,27 @@ function FourPillars() {
           The Artificial Analysis pricing baseline sets a 7:2:1 ratio for
           cache-read : cache-write : fresh input. SigRank&apos;s Efficiency
           metric (Y.08) measures how an operator&apos;s cascade compares to that
-          baseline — are they above or below the field average for their token
+          baseline - are they above or below the field average for their token
           mix? It&apos;s not a pass/fail; it&apos;s a reference point. The
           baseline comes from published model pricing data, not from
           SigRank&apos;s own sample.
+        </p>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          <strong className="text-text-secondary">The derivation.</strong> The
+          AA baseline uses two ratios. The 7:2:1 pricing ratio
+          (cache-read:cache-write:input) gives the calibration divisor:{" "}
+          <code className="font-mono text-text-primary">4.0 = (7+1)/2</code>.
+          The operating ratio (cache-read:input:output = 3.5:1:0.5, cache-write
+          ~ 0) gives the reference pillars. At those pillars:
+        </p>
+        <pre className="overflow-x-auto rounded-md border border-bg-border bg-bg-base px-4 py-3 font-mono text-xs leading-relaxed text-text-secondary">
+{`  I = 1, O = 0.5, R = 3.5, W ~ 0
+  (R + W + O) / I = (3.5 + 0 + 0.5) / 1 = 4.0
+  Efficiency = 4.0 / 4.0 = 1.00  (by construction)`}
+        </pre>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          The two 4.0s are the same number by design - that is the calibration.
+          Every other operator is measured against this reference point.
         </p>
       </section>
     </section>
@@ -400,23 +467,107 @@ function CascadeList() {
   );
 }
 
-/* ───────────────────── 4 · TRANSMITTERS (the 9 classes) ───────────────────── */
+/* ───────────────────── WORKED OPERATOR READ (MOSES example) ───────────────────── */
+
+function WorkedOperatorRead() {
+  return (
+    <section className="flex flex-col gap-3 rounded-lg border border-gold/30 bg-gold/[0.04] p-5">
+      <h2 className="font-mono text-lg font-bold text-text-primary">
+        A worked read: MOSES
+      </h2>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
+        One operator, four pillars, the full cascade. This is how the numbers
+        compose - from raw integers to every derived metric.
+      </p>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+          <span className="font-mono text-xs font-bold text-text-muted">
+            The four pillars (raw)
+          </span>
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
+{`  Input       = 1,251,211
+  Output      = 11,296,121
+  Cache-write = 128,196,310
+  Cache-read  = 2,555,179,769
+  Total       = 2,695,923,411`}
+          </pre>
+        </div>
+        <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+          <span className="font-mono text-xs font-bold text-text-muted">
+            The derived cascade
+          </span>
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
+{`  Leverage   = R/I = 2,042x
+  Velocity   = O/I = 9.03
+  Yield      = L*V = 18,436.98
+  SNR        = O/(O+I) = 0.900
+  10xDEV     = log10(L) = 3.31
+  Efficiency = (R+W+O)/I/4.0 = 538
+  Scale V    = log10(total) = 9.43
+  Op Ratio   = 2042:1:9.03`}
+          </pre>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">How to read it.</strong> The
+          operator sends 1.25M fresh tokens and reuses 2.56B from cache - a{" "}
+          <strong className="text-text-primary">2,042x</strong> leverage ratio.
+          They produce 11.3M output tokens on that 1.25M input - a{" "}
+          <strong className="text-text-primary">9.03</strong> velocity. Yield
+          is the product: <strong className="text-text-primary">18,436.98</strong>.
+          The cascade compounds: cache-read dwarfs input by three orders of
+          magnitude, and output is 9x the fresh input. This is the 10xer shape.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          <strong className="text-text-secondary">The telescoping check.</strong>{" "}
+          Transmission (O/I) = 9.03. Commitment (W/O) = 11.35. Reuse (R/W) =
+          19.93. Product = 9.03 x 11.35 x 19.93 = 2,042 = Leverage. The identity
+          holds - the derived metrics compose exactly.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          <strong className="text-text-secondary">Archetype and class.</strong>{" "}
+          Construction = W/R = 0.050 (active context building). Leverage = 2042
+          (far above the P80 gate of 74.6). Velocity = 9.03 (far above the P80
+          gate of 0.34). All three axes elevated - this is the{" "}
+          <strong className="text-gold">CONVERGENT</strong> archetype. Class:
+          2.7B total tokens places this operator in the{" "}
+          <strong className="text-text-primary">ARCH+</strong> experience tier.
+        </p>
+        <p className="font-sans text-xs leading-relaxed text-text-dim">
+          The signature describes the structure of this workflow - extreme
+          cache reuse, high output velocity, active context construction. It
+          does not describe whether the work was correct, original, or
+          valuable. It says: this is how the operator works the tools.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────────────── 4 · TRANSMITTERS (the 8 experience tiers + TRANSMITTER badge) ───────────────────── */
 
 function TransmitterClasses() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="font-mono text-lg font-bold text-text-primary">
-          The nine classes
+          The experience ladder
         </h2>
         <span className="rounded-full border border-gold/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-gold">
-          still calibrating
+          8 tiers + TRANSMITTER badge
         </span>
       </div>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
-        Nine cascade classes from Transmitter down. The ranges shown are
-        qualitative cuts — exact breakpoints are still calibrating as the
-        leaderboard fills, so class assignments may shift.
+        Eight experience tiers from ARCH+ down to IGNITER, each split into three
+        sub-stages (I/II/III) - 24 stages total. Plus the TRANSMITTER peak
+        badge, a temporary state any tier can earn during a high-frequency,
+        high-resonance window. Class is assigned from{" "}
+        <strong className="text-text-primary">total tokens accumulated</strong>{" "}
+        - not compression, not yield, not SIGNA. It tracks how much real work
+        the operator has put in, not how efficient that work is.
       </p>
 
       {/* What the classes measure */}
@@ -425,21 +576,21 @@ function TransmitterClasses() {
           What the classes measure
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Class tier is a two-axis read:{" "}
-          <strong className="text-text-primary">compression</strong>
-          (how much of your total token flow is reuse vs fresh input) and{" "}
-          <strong className="text-text-primary">SIGNA RATE</strong> (a composite
-          signal-quality score, currently calibrating). The higher your
-          compression, the higher your class. The higher your SIGNA, the more
-          your compression is <em>meaningful</em> reuse rather than idle
-          re-reading.
+          Class tier is a single-axis read:{" "}
+          <strong className="text-text-primary">total tokens accumulated</strong>
+          . The more real token flow an operator has logged, the higher their
+          tier. It is a qualification ladder, not a quality ranking - a
+          high-tier operator is not necessarily more efficient than a low-tier
+          one. A small operator can out-yield a large one; class tracks volume,
+          yield tracks efficiency.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          The top three classes (Transmitter, ARCH+, ARCH) require both
-          compression AND SIGNA gates — you cannot get there by re-reading the
-          same context without producing. The lower six classes (POWER down to
-          IGNITER) are compression-only — SIGNA is not yet enforced there
-          because the calibration sample is still growing.
+          The TRANSMITTER badge is separate. It is a temporary peak state that
+          any tier can earn during a window where the operator hits both high
+          frequency (token throughput) and high resonance (SIGNA RATE, a
+          composite signal-quality score currently under recalibration). The
+          badge lapses when frequency or resonance drops. It is not a permanent
+          class - it is a windowed peak.
         </p>
       </section>
 
@@ -452,22 +603,17 @@ function TransmitterClasses() {
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Class is not a lifetime label. It is recomputed every scoring window
-          (7d / 30d / 90d / all-time). An operator who shifts from burning to
-          compounding — building cache, reusing context, producing more per
-          input — will see their class rise within a week. An operator who stops
-          reusing context will see it fall.
+          (7d / 30d / 90d / all-time). The more tokens you log in a window, the
+          higher your tier for that window. An operator who stops working will
+          see their class drift down as the window rolls forward.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          The practical path upward:{" "}
-          <strong className="text-text-primary">hold context longer</strong>
-          (reduce fresh input by reusing what the model already knows),{" "}
-          <strong className="text-text-primary">
-            produce more per turn
-          </strong>{" "}
-          (let the model generate complete outputs rather than stopping early),
-          and <strong className="text-text-primary">build cache forward</strong>{" "}
-          (write context that future turns will read back). The cascade metrics
-          track all three; the class tier summarizes the result.
+          Class tracks <strong className="text-text-primary">volume</strong>{" "}
+          (how much real work you have done). Yield tracks{" "}
+          <strong className="text-text-primary">efficiency</strong> (how well
+          you compound that work). They are independent: a high-volume operator
+          can have low yield, and a low-volume operator can have high yield. The
+          board ranks on yield; the class ladder tracks experience.
         </p>
       </section>
     </section>
@@ -659,8 +805,9 @@ function MosesSection() {
           <li>
             <strong className="text-text-primary">Creators and writers</strong>{" "}
             &mdash; measure augmentation efficiency, not just output volume. The
-            cascade reveals whether the AI is helping you think or just
-            generating text. The four pillars separate signal from noise.
+            cascade reveals whether the workflow is reusing context or
+            repeatedly starting fresh. The four pillars separate signal from
+            noise.
           </li>
           <li>
             <strong className="text-text-primary">
@@ -672,9 +819,10 @@ function MosesSection() {
           </li>
           <li>
             <strong className="text-text-primary">Enterprise teams</strong>{" "}
-            &mdash; quantify operator effectiveness for hiring, training, and
-            tooling decisions. The board is an objective surface, not a
-            self-reported one. Signed snapshots mean the numbers are verifiable.
+            &mdash; a verifiable workflow signal that can supplement work
+            samples and outcomes for training and tooling decisions. The board
+            is a measured surface, not a self-reported one. Signed snapshots
+            mean the numbers are verifiable.
           </li>
         </ul>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
@@ -834,6 +982,19 @@ npx sigrank`}
         </a>
         .
       </p>
+
+      {/* Compact contamination constraint box */}
+      <div className="rounded-lg border-l-2 border-gold/50 bg-bg-surface px-4 py-3">
+        <p className="font-sans text-xs leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">Verified-passive measurement.</strong>{" "}
+          The agent reads token counts. It does not read your prompts, your
+          replies, your code, or your file contents. The four integers are all
+          that leaves your machine. The server derives the cascade from those
+          four - no content is transmitted, stored, or seen by anyone. This is
+          not a privacy compromise we tolerate; it is the architecture the
+          Conservation Law predicts. Full detail in the Proof section below.
+        </p>
+      </div>
     </section>
   );
 }
@@ -1015,6 +1176,65 @@ function ContactCard() {
   );
 }
 
+/* ───────────────────── PROOF LEVELS (the trust box) ───────────────────── */
+
+function ProofLevels() {
+  return (
+    <section className="flex flex-col gap-3 rounded-lg border border-gold/30 bg-gold/[0.04] p-5">
+      <h2 className="font-mono text-lg font-bold text-text-primary">
+        What is proven, what is verified, what is open
+      </h2>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
+        SigRank is precise about what it can and cannot claim. Three levels:
+      </p>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+          <span className="font-mono text-xs font-bold text-gold">
+            Proven algebraically
+          </span>
+          <ul className="flex flex-col gap-0.5 font-sans text-xs leading-relaxed text-text-muted">
+            <li>Derived metrics agree with the four pillars (every metric is a deterministic function of I, O, R, W).</li>
+            <li>Y = L x V (Yield = Leverage x Velocity, by construction).</li>
+            <li>10^(10xDEV) = L (telescoping identity: intermediate terms cancel).</li>
+            <li>Efficiency = (R + W + O) / I / 4.0 (deterministic from pillars).</li>
+          </ul>
+        </div>
+
+        <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+          <span className="font-mono text-xs font-bold text-text-accent">
+            Verified operationally
+          </span>
+          <ul className="flex flex-col gap-0.5 font-sans text-xs leading-relaxed text-text-muted">
+            <li>Source telemetry is read locally (the agent reads session logs, not prompts).</li>
+            <li>Snapshots are ed25519-signed on device and verified server-side.</li>
+            <li>Server recomputes all derived metrics from the four raw pillars (no client-supplied derived values are trusted).</li>
+            <li>Plausibility checks: range checks, cross-field ratios, cadence bounds.</li>
+            <li>Benford&apos;s Law runs as an aggregate backstop.</li>
+            <li>Contamination detection catches observer-inflated tooling.</li>
+          </ul>
+        </div>
+
+        <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
+          <span className="font-mono text-xs font-bold text-text-secondary">
+            Still under evaluation
+          </span>
+          <ul className="flex flex-col gap-0.5 font-sans text-xs leading-relaxed text-text-muted">
+            <li>Whether a cascade predicts work quality.</li>
+            <li>Whether a cascade predicts hiring performance.</li>
+            <li>Whether a cascade predicts better reasoning or outcomes.</li>
+          </ul>
+          <p className="mt-1 font-sans text-xs italic leading-relaxed text-text-dim">
+            The signature describes the structure of the measured workflow. It
+            does not judge whether the work was correct, original, useful, or
+            valuable.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ───────────────────── CONSOLE GROUPS (owner-ordered) ───────────────────── */
 
 export default function Draft1Page() {
@@ -1028,8 +1248,14 @@ export default function Draft1Page() {
         {
           id: "what-it-is",
           label: "What it is",
-          hint: "Ranks the operator, not the model — four integers in, full ledger out.",
+          hint: "Ranks the operator, not the model - four integers in, full ledger out.",
           node: <SigRankDefinition />,
+        },
+        {
+          id: "product-hierarchy",
+          label: "The product hierarchy",
+          hint: "Six layers: Pillars, Operating Ratio, Archetype, Class, Rank, Drift. Each answers a different question.",
+          node: <ProductHierarchy />,
         },
       ],
     },
@@ -1105,14 +1331,26 @@ export default function Draft1Page() {
           hint: "Υ Yield / SNR / Leverage / Velocity / 10×DEV / Scale / $1M / Efficiency (Y.01–Y.08).",
           node: <CascadeList />,
         },
+        {
+          id: "worked-read",
+          label: "A worked read (MOSES)",
+          hint: "One operator, four pillars, the full cascade derived step by step. How the numbers compose.",
+          node: <WorkedOperatorRead />,
+        },
       ],
     },
     {
       id: "proof",
       groupLabel: "Proof",
       description:
-        "How we know the numbers are real — verification tests, integrity checks, the calibration story, and the tools SigRank reads alongside.",
+        "How we know the numbers are real - verification tests, integrity checks, the calibration story, and the tools SigRank reads alongside.",
       items: [
+        {
+          id: "proof-levels",
+          label: "What is proven, what is verified, what is open",
+          hint: "Three levels: algebraically proven (composition), operationally verified (telemetry + integrity), still under evaluation (quality/hiring/reasoning).",
+          node: <ProofLevels />,
+        },
         {
           id: "four-degrees",
           label: "The four degrees of leverage",
@@ -1163,12 +1401,12 @@ export default function Draft1Page() {
       id: "transmitters",
       groupLabel: "Transmitters",
       description:
-        "The nine cascade classes from Transmitter down — where the breakpoints are and what each class means.",
+        "The eight experience tiers (ARCH+ down to IGNITER) plus the TRANSMITTER peak badge - 24 stages total, assigned by total tokens accumulated.",
       items: [
         {
-          id: "nine-classes",
-          label: "The nine classes",
-          hint: "K.01–K.09, Transmitter down — qualitative ranges (exact breaks RS.05).",
+          id: "experience-ladder",
+          label: "The experience ladder",
+          hint: "8 tiers x 3 sub-stages = 24 stages, assigned by total tokens. Plus the TRANSMITTER peak badge.",
           node: <TransmitterClasses />,
         },
       ],
