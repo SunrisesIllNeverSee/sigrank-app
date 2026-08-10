@@ -1,11 +1,11 @@
 /**
- * app/vs/vals-ai/page.tsx — "SigRank vs VALS AI" SEO comparison page.
+ * app/vs/vals-ai/page.tsx - "SigRank vs VALS AI" SEO comparison page.
  *
  * Angle: VALS evaluates AI systems. SigRank evaluates AI operators and their
  * workflows. The leaderboard is proof, not the product. The product is the
  * operator-evaluation standard.
  *
- * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
+ * RSC only - no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
  * WaveHero, and a styled comparison table matching the repo's conventions.
  */
 
@@ -17,9 +17,9 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs VALS AI — Operator Evaluation vs System Evaluation",
+  title: "SigRank vs VALS AI - Operator Evaluation vs System Evaluation",
   description:
-    "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly — the people operating them are not. SigRank is the evaluation platform for AI operators.",
+    "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not. SigRank is the evaluation platform for AI operators.",
   path: "/vs/vals-ai",
 });
 
@@ -32,7 +32,7 @@ const COMPARE_ROWS: { feature: string; vals: string; sigrank: string }[] = [
   {
     feature: "Unit of analysis",
     vals: "Test cases, model outputs, system behavior",
-    sigrank: "Token cascade — how operators move tokens through sessions",
+    sigrank: "Token cascade - how operators move tokens through sessions",
   },
   {
     feature: "Core metrics",
@@ -57,7 +57,7 @@ const COMPARE_ROWS: { feature: string; vals: string; sigrank: string }[] = [
   {
     feature: "Leaderboard",
     vals: "Model performance rankings",
-    sigrank: "SigRank Index — operator benchmark (the proof, not the product)",
+    sigrank: "SigRank Index - operator benchmark (the proof, not the product)",
   },
   {
     feature: "Evaluation standard",
@@ -67,7 +67,7 @@ const COMPARE_ROWS: { feature: string; vals: string; sigrank: string }[] = [
   {
     feature: "Privacy model",
     vals: "Varies (test data may be shared)",
-    sigrank: "Token counts only — never prompt content leaves the machine",
+    sigrank: "Token counts only - never prompt content leaves the machine",
   },
   {
     feature: "Platform coverage",
@@ -85,27 +85,27 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "How is SigRank different from VALS AI?",
     answer:
-      "VALS evaluates AI systems — models, agents, pipelines. SigRank evaluates AI operators — the humans who drive AI tools. VALS asks &quot;which system is better?&quot; SigRank asks &quot;who is the better operator?&quot; They are complementary: VALS measures the machine, SigRank measures the person driving it. The SigRank leaderboard is proof of the evaluation standard, not the product itself — the product is the operator-evaluation methodology.",
+      "VALS evaluates AI systems - models, agents, pipelines. SigRank evaluates AI operators - the humans who drive AI tools. VALS asks &quot;which system is better?&quot; SigRank asks &quot;who is the better operator?&quot; They are complementary: VALS measures the machine, SigRank measures the person driving it. The SigRank leaderboard is proof of the evaluation standard, not the product itself - the product is the operator-evaluation methodology.",
   },
   {
     question: "Why evaluate AI operators instead of AI systems?",
     answer:
-      "Models are benchmarked constantly — LMSYS, VALS, HELM, Open LLM Leaderboard. The people operating them are not. In AI-assisted work, the model does the keystrokes; the operator&apos;s job is to drive it efficiently. Two operators using the same model can get a 10× difference in signal. That variance is in the operator, not the model. SigRank measures it using privacy-preserving token telemetry: Yield (Υ = cache_read × output / input²), Leverage, Velocity, and 10xDEV.",
+      "Models are benchmarked constantly - LMSYS, VALS, HELM, Open LLM Leaderboard. The people operating them are not. In AI-assisted work, the model does the keystrokes; the operator&apos;s job is to drive it efficiently. Two operators using the same model can get a 10× difference in signal. That variance is in the operator, not the model. SigRank measures it using privacy-preserving token telemetry: Yield (Υ = cache_read × output / input²), Leverage, Velocity, and 10xDEV.",
   },
   {
     question: "Can I use SigRank alongside VALS AI?",
     answer:
-      "Yes — they measure different layers. VALS tells you which AI system to deploy. SigRank tells you how effectively your team operates it once deployed. Together they answer &quot;is the system good?&quot; and &quot;are we using it well?&quot; An operator with high Yield on a mid-tier model can outperform one with low Yield on a top-tier model — the operator-evaluation layer is where workflow efficiency lives.",
+      "Yes - they measure different layers. VALS tells you which AI system to deploy. SigRank tells you how effectively your team operates it once deployed. Together they answer &quot;is the system good?&quot; and &quot;are we using it well?&quot; An operator with high Yield on a mid-tier model can outperform one with low Yield on a top-tier model - the operator-evaluation layer is where workflow efficiency lives.",
   },
   {
     question: "What does VALS AI not see that SigRank does?",
     answer:
-      "VALS sees system-level behavior — model outputs, accuracy, safety, robustness. It does not see the token cascade: how much input an operator sends, how much context they reuse from cache, how much output they produce per token of input. SigRank reads exactly those four pillars (input, output, cache-read, cache-write) and derives the cascade architecture — Yield, compression ratio, SNR, Leverage, and Velocity. That cascade is where operator efficiency lives, and it is invisible to a system-level evaluator.",
+      "VALS sees system-level behavior - model outputs, accuracy, safety, robustness. It does not see the token cascade: how much input an operator sends, how much context they reuse from cache, how much output they produce per token of input. SigRank reads exactly those four pillars (input, output, cache-read, cache-write) and derives the cascade architecture - Yield, compression ratio, SNR, Leverage, and Velocity. That cascade is where operator efficiency lives, and it is invisible to a system-level evaluator.",
   },
   {
     question: "Is the SigRank leaderboard the product?",
     answer:
-      "No. The leaderboard is proof, not the product. The product is the operator-evaluation standard — the methodology, metrics, and signed telemetry that make operator performance measurable and comparable. The leaderboard demonstrates that the standard works: real operators, real cascades, real rankings. The strategic path is personal measurement → benchmark → trend tracking → team evaluation → industry index. The leaderboard is the first step, not the destination.",
+      "No. The leaderboard is proof, not the product. The product is the operator-evaluation standard - the methodology, metrics, and signed telemetry that make operator performance measurable and comparable. The leaderboard demonstrates that the standard works: real operators, real cascades, real rankings. The strategic path is personal measurement → benchmark → trend tracking → team evaluation → industry index. The leaderboard is the first step, not the destination.",
   },
 ];
 
@@ -120,9 +120,9 @@ export default function VsValsAiPage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs VALS AI — Operator Evaluation vs System Evaluation",
+            title: "SigRank vs VALS AI - Operator Evaluation vs System Evaluation",
             description:
-              "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly — the people operating them are not.",
+              "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not.",
             path: "/vs/vals-ai",
           }),
         ]}
@@ -135,7 +135,7 @@ export default function VsValsAiPage() {
           <>
             VALS evaluates <span className="text-gold">AI systems</span>.
             SigRank evaluates <span className="text-gold">AI operators</span>.
-            Models are benchmarked constantly — the people operating them are
+            Models are benchmarked constantly - the people operating them are
             not. The leaderboard is proof, not the product.
           </>
         }
@@ -148,17 +148,17 @@ export default function VsValsAiPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           VALS AI is a system evaluator. It tests AI models, agents, and
-          pipelines against benchmarks — measuring accuracy, robustness, safety,
+          pipelines against benchmarks - measuring accuracy, robustness, safety,
           and alignment. That is the <strong className="text-text-primary">system
           layer</strong>. SigRank is an operator evaluator. It measures how
-          effectively humans drive AI tools — using privacy-preserving token
+          effectively humans drive AI tools - using privacy-preserving token
           telemetry to compute Yield, Leverage, Velocity, and workflow
           signatures. That is the <strong className="text-text-primary">operator
           layer</strong>.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The distinction matters because in AI-assisted work, the model does
-          the keystrokes — the operator&apos;s skill is in{" "}
+          the keystrokes - the operator&apos;s skill is in{" "}
           <em>driving</em> it efficiently. Two operators using the same model
           can produce a 10× difference in signal. VALS can&apos;t see that
           variance because it lives in the operator, not the system. SigRank
@@ -188,7 +188,7 @@ export default function VsValsAiPage() {
                 ["Evaluate an AI system", "Evaluate an AI operator / workflow"],
                 ["Test cases", "Time windows, sessions, task contexts, platform data"],
                 ["Scores", "Yield, SNR, Leverage, Velocity, 10xDEV"],
-                ["Leaderboard", "SigRank Index — operator benchmark"],
+                ["Leaderboard", "SigRank Index - operator benchmark"],
                 ["Regression tracking", "Operator trend and workflow improvement"],
                 ["Evaluation standard", "Signed token-telemetry methodology"],
               ].map(([vals, sigrank]) => (
@@ -252,7 +252,7 @@ export default function VsValsAiPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The product is the <strong className="text-text-primary">operator-evaluation
-          standard</strong> — the methodology, metrics, and signed telemetry that
+          standard</strong> - the methodology, metrics, and signed telemetry that
           make human-AI collaboration measurable and comparable. The leaderboard
           demonstrates that the standard works: real operators, real cascades,
           real rankings. But the strategic path is bigger:
@@ -266,7 +266,7 @@ export default function VsValsAiPage() {
           That path is more durable than &quot;who is the best AI user?&quot;
           while retaining the viral sharpness of the public board. VALS owns the
           system-evaluation layer. SigRank owns the operator-evaluation layer.
-          They don&apos;t compete — they stack.
+          They don&apos;t compete - they stack.
         </p>
       </section>
 

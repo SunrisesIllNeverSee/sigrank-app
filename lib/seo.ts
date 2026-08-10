@@ -17,7 +17,7 @@ import type { Metadata } from "next";
 export const SITE_ORIGIN = "https://signalaf.com";
 export const SITE_NAME = "SigRank";
 export const SITE_TAGLINE =
-  "The evaluation platform for AI operators. Models are benchmarked constantly — the people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.";
+  "The evaluation platform for AI operators. Models are benchmarked constantly. The people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.";
 
 /** Static OG image (1200×630 brand card). MUST be a raster PNG/JPG — X, LinkedIn,
  *  Facebook, iMessage, Slack, and Discord all reject SVG for link-preview cards, so

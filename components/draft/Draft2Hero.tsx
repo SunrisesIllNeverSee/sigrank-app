@@ -76,7 +76,7 @@ export function Draft2Hero() {
             performance evaluation: your{" "}
             <strong className="text-text-primary">Yield</strong>, workflow
             signature, benchmark, and progress over time. The leaderboard is
-            proof, not the product — the product is the{" "}
+            proof, not the product. The product is the{" "}
             <strong className="text-text-primary">operator-evaluation standard</strong>.
           </p>
           <p className="text-balance font-sans text-lg font-medium leading-relaxed text-text-primary sm:text-xl">

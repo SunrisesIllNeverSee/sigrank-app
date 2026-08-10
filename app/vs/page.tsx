@@ -32,8 +32,8 @@ const COMPARISONS = [
   },
   {
     href: "/vs/vals-ai",
-    title: "SigRank vs VALS AI — Operator Evaluation vs System Evaluation",
-    desc: "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly — the people operating them are not. The leaderboard is proof, not the product.",
+    title: "SigRank vs VALS AI - Operator Evaluation vs System Evaluation",
+    desc: "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not. The leaderboard is proof, not the product.",
   },
   {
     href: "/vs/lmsys-arena",
