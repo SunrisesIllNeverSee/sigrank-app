@@ -38,6 +38,8 @@ import {
 } from "@/components/marketing/SignalIntegrity";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
+import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
 import Link from "next/link";
 
 export const metadata: Metadata = withOG({
@@ -1732,6 +1734,12 @@ export default function Draft1Page() {
           hint: "8 tiers x 3 sub-stages = 24 stages, assigned by total tokens. Plus the TRANSMITTER peak badge.",
           node: <TransmitterClasses />,
         },
+        {
+          id: "tier-distribution",
+          label: "24-stage distribution data",
+          hint: "Population statistics for every stage: token floor/ceiling, operator count, distribution bars. From the HCM cut.",
+          node: <TierLadderDistribution />,
+        },
       ],
     },
     {
@@ -1745,6 +1753,12 @@ export default function Draft1Page() {
           label: "The 10 build archetypes",
           hint: "Convergence, Generation, Reuse Depth, Active Construction. Classified from leverage, velocity, and construction ratios.",
           node: <BuildArchetypesSection />,
+        },
+        {
+          id: "archetype-data",
+          label: "Population statistics",
+          hint: "Full dataset: N, %, median yield/leverage/velocity, four-pillar composition, top platform for all 10 archetypes.",
+          node: <ArchetypeDataTable />,
         },
       ],
     },
