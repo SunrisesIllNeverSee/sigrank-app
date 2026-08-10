@@ -9,7 +9,7 @@ import { YieldCalculator } from "./YieldCalculator";
 export const metadata: Metadata = withOG({
   title: "Yield (Υ) Calculator — Token Cascade Efficiency",
   description:
-    "Free yield calculator for AI token cascades. Enter your four token pillars to compute \u03A5 Yield, compression ratio, cache hit rate, and class tier instantly.",
+    "Free yield calculator for AI token cascades. Enter your four token pillars to compute \u03A5 Yield, compression ratio, cache hit rate, and yield interpretation instantly.",
   path: "/tools/yield-calculator",
 });
 
@@ -32,7 +32,7 @@ const FAQS = [
   {
     question: "What is a good yield score?",
     answer:
-      "Roughly: below 0.5 is IGNITER (just starting), 0.5–2 is SEEKER, 2–10 is BUILDER (a productive compounding cascade), and 10+ is TRANSMITTER (signal compounds aggressively). These thresholds are approximate.",
+      "Roughly: below 0.5 is low yield (just starting), 0.5–2 is moderate yield, 2–10 is high yield (a productive compounding cascade), and 10+ is very high yield (signal compounds aggressively). These thresholds are approximate. Class tier is based on total tokens, not yield — see the class checker tool.",
   },
   {
     question: "Does the yield calculator send my data anywhere?",
@@ -57,7 +57,7 @@ export default function YieldCalculatorPage() {
             name: "SigRank Yield (Υ) Calculator",
             url: "https://signalaf.com/tools/yield-calculator",
             description:
-              "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield token-cascade efficiency score, compression ratio, cache hit rate, and class tier.",
+              "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield token-cascade efficiency score, compression ratio, cache hit rate, and yield interpretation.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Any (web browser)",
             browserRequirements: "Requires JavaScript",
@@ -66,7 +66,7 @@ export default function YieldCalculatorPage() {
               "Υ Yield calculation",
               "Compression ratio",
               "Cache hit rate",
-              "Class tier classification",
+              "Yield interpretation",
             ],
           },
         ]}
@@ -78,9 +78,8 @@ export default function YieldCalculatorPage() {
         subtitle={
           <>
             Enter your pillars for Υ Yield and see your{" "}
-            <span className="text-gold">Υ Yield</span> score, class tier, and
-            cascade shape instantly. Pure arithmetic — nothing leaves your
-            browser.
+            <span className="text-gold">Υ Yield</span> score and cascade shape
+            instantly. Pure arithmetic — nothing leaves your browser.
           </>
         }
       />

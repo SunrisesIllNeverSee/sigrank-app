@@ -97,7 +97,7 @@ export default function HowToImproveYourYieldPage() {
             {
               question: "What yield is considered good?",
               answer:
-                "A yield of 5,000 is solid. 50,000 is excellent. The top operators on the SigRank leaderboard push well into six figures. Your class tier (IGNITER → SEEKER → BUILDER → TRANSMITTER) is assigned from your yield and cascade shape.",
+                "A yield of 5,000 is solid. 50,000 is excellent. The top operators on the SigRank leaderboard push well into six figures. Your class tier (IGNITER → BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+) is assigned from your yield and cascade shape.",
             },
           ]),
           howTo,
@@ -394,8 +394,9 @@ export default function HowToImproveYourYieldPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               5,000 is solid. 50,000 is excellent. Top operators push into six
-              figures. Your class tier (IGNITER → SEEKER → BUILDER →
-              TRANSMITTER) is assigned from yield and cascade shape.
+              figures. Your class tier (IGNITER → BEARER → REFINER → SEEKER →
+              BASE → POWER → ARCH → ARCH+) is assigned from yield and cascade
+              shape.
             </dd>
           </div>
         </dl>

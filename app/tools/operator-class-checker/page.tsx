@@ -9,7 +9,7 @@ import { ClassChecker } from "./ClassChecker";
 export const metadata: Metadata = withOG({
   title: "Operator Class Checker — AI Tier Calculator",
   description:
-    "Check your AI operator class tier from a yield score or four token pillars. Maps \u03A5 Yield to IGNITER, SEEKER, BUILDER, or TRANSMITTER.",
+    "Check your AI operator class tier from four token pillars. Maps total tokens to IGNITER, BEARER, REFINER, SEEKER, BASE, POWER, ARCH, or ARCH+.",
   path: "/tools/operator-class-checker",
 });
 
@@ -17,12 +17,12 @@ const FAQS = [
   {
     question: "What are the AI operator class tiers?",
     answer:
-      "SigRank assigns every operator a class tier based on their Υ Yield score, from low to high: IGNITER, SEEKER, BUILDER, and TRANSMITTER. The tier describes the architecture of the operator’s token cascade — whether signal is compounding or tokens are being burned — not the AI model being driven.",
+      "SigRank assigns every operator a class tier based on TOTAL TOKENS (input + output + cacheCreate + cacheRead), on an 8-tier experience ladder from low to high: IGNITER, BEARER, REFINER, SEEKER, BASE, POWER, ARCH, and ARCH+. Each tier is split into three sub-stages (I/II/III). TRANSMITTER is a separate peak badge, not a permanent class. The tier describes the operator’s accumulated experience, not the AI model being driven.",
   },
   {
     question: "What yield score do I need for each tier?",
     answer:
-      "Approximate thresholds: IGNITER is below 0.5, SEEKER is 0.5–2, BUILDER is 2–10, and TRANSMITTER is 10 and above. These are approximate bands; the authoritative tier is assigned server-side from signed token-telemetry snapshots on the leaderboard.",
+      "Class tier is not based on yield — it is based on total tokens (input + output + cacheCreate + cacheRead). The 8 tiers, from lowest to highest, are IGNITER, BEARER, REFINER, SEEKER, BASE, POWER, ARCH, and ARCH+. The authoritative tier is assigned server-side from signed token-telemetry snapshots on the leaderboard.",
   },
   {
     question: "Does the class tier depend on which AI model I use?",
@@ -37,7 +37,7 @@ const FAQS = [
   {
     question: "Is the class tier the same as a rank?",
     answer:
-      "No. Rank is your ordinal position on the leaderboard (1st, 50th, etc.). Class tier is a performance band derived from your yield score. Many operators share a tier; only one holds a given rank.",
+      "No. Rank is your ordinal position on the leaderboard (1st, 50th, etc.). Class tier is an experience band derived from your total tokens. Many operators share a tier; only one holds a given rank.",
   },
 ];
 
@@ -60,13 +60,13 @@ export default function OperatorClassCheckerPage() {
             name: "SigRank Operator Class Checker",
             url: "https://signalaf.com/tools/operator-class-checker",
             description:
-              "Enter a yield score or four token pillars to determine your AI operator class tier — IGNITER, SEEKER, BUILDER, or TRANSMITTER — with a description of what each tier means.",
+              "Enter four token pillars to determine your AI operator class tier — IGNITER, BEARER, REFINER, SEEKER, BASE, POWER, ARCH, or ARCH+ — with a description of what each tier means.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Any (web browser)",
             browserRequirements: "Requires JavaScript",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
-              "Class tier from yield score",
+              "Class tier from total tokens",
               "Class tier from four token pillars",
               "Tier ladder visualization",
               "Per-tier description",
@@ -80,10 +80,10 @@ export default function OperatorClassCheckerPage() {
         title="Operator Class Checker"
         subtitle={
           <>
-            Which tier are you? Enter a yield score — or four token pillars to
-            compute one — and see your{" "}
-            <span className="text-gold">class tier</span> on the ladder from
-            IGNITER to TRANSMITTER.
+            Which tier are you? Enter four token pillars to compute your total
+            tokens — and see your{" "}
+            <span className="text-gold">class tier</span> on the experience
+            ladder from IGNITER to ARCH+.
           </>
         }
       />
@@ -96,17 +96,24 @@ export default function OperatorClassCheckerPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Every operator starts as an{" "}
-          <strong className="text-text-primary">IGNITER</strong> — tokens burned
-          for context, nothing yet compounding. The first promotion comes from
-          caching, not from typing more.{" "}
-          <strong className="text-text-primary">SEEKER</strong> operators have a
-          working cascade but spend most input once.{" "}
-          <strong className="text-text-primary">BUILDER</strong> operators
-          compound: good cache reuse, dense output.{" "}
-          <strong className="text-text-primary">TRANSMITTER</strong> operators
-          turn cached context into a multiplier — every fresh input yields
-          outsized output. The ladder measures the <em>architecture</em> of your
-          cascade, not your raw spend.
+          <strong className="text-text-primary">IGNITER</strong> — dormant
+          potential, the still soul, waiting. The first promotion comes from
+          accumulating real volume.{" "}
+          <strong className="text-text-primary">BEARER</strong> operators have
+          quiet accumulation — the first real volume.{" "}
+          <strong className="text-text-primary">REFINER</strong> operators are
+          practicing with purpose, building early sustained volume.{" "}
+          <strong className="text-text-primary">SEEKER</strong> operators are
+          approaching the center, experience accumulating.{" "}
+          <strong className="text-text-primary">BASE</strong> is the center of
+          the field — the average operator’s experience.{" "}
+          <strong className="text-text-primary">POWER</strong> operators are
+          above the center, with volume compounding.{" "}
+          <strong className="text-text-primary">ARCH</strong> operators are
+          system builders — sustained volume, coherent output.{" "}
+          <strong className="text-text-primary">ARCH+</strong> is the deepest
+          field experience — volume that became architecture. The ladder
+          measures accumulated <em>experience</em>, not your raw spend.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Thresholds shown here are approximate. The authoritative tier is

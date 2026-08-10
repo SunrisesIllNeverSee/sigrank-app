@@ -220,7 +220,7 @@ export default function HowToCompareAIOperatorsPage() {
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
             <p className="font-mono text-sm font-bold text-gold">Class Tier</p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              IGNITER → SEEKER → BUILDER → TRANSMITTER. The performance band
+              IGNITER → BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+. The performance band
               assigned from yield and cascade shape. A quick summary of where
               each operator stands relative to the field.
             </p>
@@ -298,8 +298,8 @@ export default function HowToCompareAIOperatorsPage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Check your class tier on the leaderboard. If you&rsquo;re a
-              SEEKER, look for BUILDERs. If you&rsquo;re a BUILDER, look for
-              TRANSMITTERs.
+              SEEKER, look for BASE or POWER operators. If you&rsquo;re a BASE,
+              look for POWER or ARCH operators.
             </p>
           </li>
           <li className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5">

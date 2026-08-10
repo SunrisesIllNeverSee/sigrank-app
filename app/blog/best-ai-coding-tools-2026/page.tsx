@@ -299,7 +299,7 @@ export default function BestAiCodingTools2026Page() {
             Privacy-preserving: reads token counts only, never prompt content;
             snapshots are ed25519-signed on-device. Bundles ccusage, tokscale,
             and the Token Dashboard. Publishes a live cross-platform leaderboard
-            with class tiers (IGNITER → TRANSMITTER).
+            with class tiers (IGNITER to ARCH+).
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Newer

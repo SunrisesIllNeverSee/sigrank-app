@@ -71,7 +71,7 @@ function howToJsonLd() {
         "@type": "HowToStep",
         position: 6,
         name: "Compare against the field",
-        text: "Submit your snapshot with `sigrank submit` and check the leaderboard. See your class tier (IGNITER to TRANSMITTER) and your rank. Compare your pillar ratios against the top decile to find your next gap.",
+        text: "Submit your snapshot with `sigrank submit` and check the leaderboard. See your class tier (IGNITER to ARCH+) and your rank. Compare your pillar ratios against the top decile to find your next gap.",
       },
       {
         "@type": "HowToStep",
@@ -92,7 +92,7 @@ const faqs = [
   {
     question: "What is a good yield (Υ) score for an AI coding workflow?",
     answer:
-      "Yield varies by class tier. IGNITER is the entry tier; TRANSMITTER is the top. The median yield on the SigRank leaderboard sits in the BUILDER band. Rather than chasing an absolute number, benchmark against your own baseline week-over-week and against the leaderboard's top decile for your platform. The goal is consistent upward movement, not a single target.",
+      "Yield varies by class tier. IGNITER is the entry tier; ARCH+ is the top. The median yield on the SigRank leaderboard sits in the BASE band. Rather than chasing an absolute number, benchmark against your own baseline week-over-week and against the leaderboard's top decile for your platform. The goal is consistent upward movement, not a single target.",
   },
   {
     question: "How long should I wait before re-measuring my workflow?",
@@ -270,7 +270,7 @@ sigrank enroll`}</code>
 # │  Yield (Υ):          14,237          │
 # │  Cache hit rate:        80.9%        │
 # │  Leverage:              0.72         │
-# │  Class tier:          BUILDER        │
+# │  Class tier:            BASE         │
 # └──────────────────────────────────────┘`}</code>
           </pre>
         </div>
@@ -278,7 +278,7 @@ sigrank enroll`}</code>
           <strong className="text-text-primary">Real example:</strong> A
           developer we&apos;ll call &ldquo;Seeker-7&rdquo; ran this after their
           first week. Their yield was 14,237 — solidly in the{" "}
-          <span className="text-gold">BUILDER</span> tier, but their cache hit
+          <span className="text-gold">BASE</span> tier, but their cache hit
           rate was only 53% and their input was unusually high at 1.24M tokens.
           The baseline told them two things: they were doing okay, and they were
           re-explaining context far more than they should be.
@@ -405,13 +405,13 @@ sigrank enroll`}</code>
 # │  Yield (Υ):          39,801   ↑180%   │
 # │  Cache hit rate:        82.4%  ↑29pp  │
 # │  Leverage:              1.14   ↑58%   │
-# │  Class tier:       TRANSMITTER        │
+# │  Class tier:          ARCH+          │
 # └──────────────────────────────────────┘`}</code>
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           One fix. One week. Yield up 180%, cache hit rate from 53% to 82%,
-          class tier jumped from BUILDER to TRANSMITTER. The numbers confirm the
+          class tier jumped from BASE to ARCH+. The numbers confirm the
           hypothesis: the problem was session fragmentation, and consolidating
           sessions fixed it. If the yield had stayed flat or dropped, the fix
           was wrong — revert and try the next-weakest pillar.
@@ -453,7 +453,8 @@ sigrank board --window 30d`}</code>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The leaderboard shows your{" "}
           <strong className="text-text-primary">class tier</strong> (IGNITER →
-          SEEKER → BUILDER → TRANSMITTER and beyond), your global rank, and —
+          BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+), your global
+          rank, and —
           critically — the{" "}
           <strong className="text-text-primary">
             pillar ratios of the top decile
@@ -464,7 +465,7 @@ sigrank board --window 30d`}</code>
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">Real example:</strong> Seeker-7
-          hit TRANSMITTER after one cycle but ranked #847 globally. The top
+          hit ARCH+ after one cycle but ranked #847 globally. The top
           decile&apos;s leverage was 1.8 — theirs was 1.14. Next cycle&apos;s
           fix: increase cache depth by referencing larger shared context blocks
           early in each session, so the cache-read base grows faster than input.

@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 /**
  * YieldCalculator — client-side interactive calculator for the Υ Yield metric.
  *
- * Four token-pillar inputs → Υ Yield score, class tier, and a plain-language
+ * Four token-pillar inputs → Υ Yield score and a plain-language
  * interpretation. Pure arithmetic; no network calls.
  */
 
@@ -34,28 +34,28 @@ const PILLARS = [
 
 type PillarKey = (typeof PILLARS)[number]["key"];
 
-/** Class tier from a yield score (approximate thresholds — see page copy). */
-function classForYield(y: number): { tier: string; blurb: string } {
+/** Yield interpretation from a yield score (approximate thresholds — see page copy). */
+function interpForYield(y: number): { label: string; blurb: string } {
   if (y >= 10)
     return {
-      tier: "TRANSMITTER",
+      label: "Very high yield",
       blurb:
         "Signal compounds aggressively — cached context amplifies every fresh input into outsized output.",
     };
   if (y >= 2)
     return {
-      tier: "BUILDER",
+      label: "High yield",
       blurb:
         "A productive cascade — good cache reuse and solid output per input. Compounding, not just burning.",
     };
   if (y >= 0.5)
     return {
-      tier: "SEEKER",
+      label: "Moderate yield",
       blurb:
         "A working cascade, but most input is spent once. Cache reuse and output density have clear headroom.",
     };
   return {
-    tier: "IGNITER",
+    label: "Low yield",
     blurb:
       "Early-stage cascade — tokens are largely burned for context, not yet compounding. The starting line.",
   };
@@ -95,7 +95,7 @@ export function YieldCalculator() {
         ? cacheRead / (cacheRead + (nums.cacheWrite || 0))
         : 0;
     const leverage = input > 0 ? cacheRead / input : 0;
-    const cls = classForYield(yield_);
+    const cls = interpForYield(yield_);
     return { yield_, compression, cacheHitRate, leverage, ...cls };
   }, [nums]);
 
@@ -166,7 +166,7 @@ export function YieldCalculator() {
         </div>
         <div className="mt-4 flex flex-col gap-1">
           <span className="font-mono text-sm font-bold text-accent">
-            {result.tier}
+            {result.label}
           </span>
           <p className="font-sans text-sm leading-relaxed text-text-secondary">
             {result.blurb}
@@ -175,8 +175,9 @@ export function YieldCalculator() {
       </div>
 
       <p className="mt-4 font-sans text-xs leading-relaxed text-text-muted">
-        Class thresholds are approximate (IGNITER &lt; 0.5, SEEKER 0.5–2,
-        BUILDER 2–10, TRANSMITTER 10+). For the full paste-based scoring
+        Yield thresholds are approximate (low &lt; 0.5, moderate 0.5–2,
+        high 2–10, very high 10+). Class tier is based on total tokens, not
+        yield — see the class checker. For the full paste-based scoring
         experience with signed submission, see{" "}
         <a
           href="/score"
