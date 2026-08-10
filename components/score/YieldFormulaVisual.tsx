@@ -7,7 +7,7 @@
  *   velocity × leverage = YIELD
  *
  * Plus a compact "where you sit" comparison bar showing yield ranges
- * for The Field vs Cache Architects vs Cache Builders.
+ * for Raw Injector vs Reader vs Compound Amplifier.
  *
  * Pure inline SVG. Server component. No client JS.
  */
@@ -24,11 +24,11 @@ const COLORS = {
 };
 
 const ARCHETYPE_YIELDS = [
-  { label: "Input-Heavy", yield: 0.02, color: "#e74c3c", width: 2 },
-  { label: "The Field", yield: 1.24, color: "#3498db", width: 8 },
-  { label: "Context Builders", yield: 6.71, color: "#2ecc71", width: 14 },
-  { label: "Cache Architects", yield: 444, color: "#d4af37", width: 30 },
-  { label: "Cache Builders ★", yield: 1825, color: "#e17055", width: 48 },
+  { label: "Raw Injector", yield: 0.05, color: "#3498db", width: 2 },
+  { label: "Reader", yield: 1.52, color: "#2ecc71", width: 8 },
+  { label: "Archival", yield: 3.74, color: "#27ae60", width: 14 },
+  { label: "Compound Amp.", yield: 26.84, color: "#c0392b", width: 30 },
+  { label: "Convergent ★", yield: 258.14, color: "#9b59b6", width: 48 },
 ];
 
 export default function YieldFormulaVisual() {
@@ -157,7 +157,7 @@ export default function YieldFormulaVisual() {
             1.24
           </div>
           <div className="font-sans text-[10px] text-text-dim">
-            the 59.8% center of mass
+            the human center of mass
           </div>
         </div>
       </div>

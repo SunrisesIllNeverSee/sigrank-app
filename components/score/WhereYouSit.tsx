@@ -1,31 +1,33 @@
 /**
  * WhereYouSit — the "where do you sit?" hook.
  *
- * Shows the 8 archetype yield ranges as a horizontal bar chart, from
- * Input-Heavy (0.02) to Cache Builders (1,825). The visual punchline:
- * there's a 90,000× spread between the worst and the best. Where are you?
+ * Shows the 10 build archetype yield ranges as a horizontal bar chart, from
+ * RAW INJECTOR (0.05) to KINETIC PRODUCER (469). The visual punchline:
+ * there's a ~9,000× spread between the worst and the best. Where are you?
  *
  * Pure inline SVG. Server component. No client JS.
  */
 
 const ARCHETYPES = [
-  { label: "Input-Heavy", sub: "6.3%", yield: 0.02, color: "#e74c3c" },
-  { label: "The Field", sub: "59.8%", yield: 1.24, color: "#3498db" },
-  { label: "Context Builders", sub: "19.4%", yield: 6.71, color: "#2ecc71" },
-  { label: "Steady Cascaders", sub: "0.2%", yield: 13.5, color: "#00b894" },
-  { label: "Cascade Operators", sub: "2.9%", yield: 135, color: "#a29bfe" },
-  { label: "Cache Architects", sub: "8.5%", yield: 444, color: "#d4af37" },
-  { label: "Cache Builders ★", sub: "2.9%", yield: 1825, color: "#e17055" },
-  { label: "Outliers", sub: "7.0%", yield: 5237, color: "#6a6a6a" },
+  { label: "Raw Injector", sub: "10.5%", yield: 0.05, color: "#3498db" },
+  { label: "Cache Warming", sub: "12.4%", yield: 0.33, color: "#5dade2" },
+  { label: "Shallow Reader", sub: "11.7%", yield: 0.84, color: "#48c9b0" },
+  { label: "Reader", sub: "10.7%", yield: 1.52, color: "#2ecc71" },
+  { label: "Builder", sub: "10.9%", yield: 1.97, color: "#f39c12" },
+  { label: "Archival", sub: "11.7%", yield: 3.74, color: "#27ae60" },
+  { label: "Recursive Momentum", sub: "8.3%", yield: 7.27, color: "#d4af37" },
+  { label: "Compound Amplifier", sub: "10.2%", yield: 26.84, color: "#c0392b" },
+  { label: "Convergent", sub: "6.6%", yield: 258.14, color: "#9b59b6" },
+  { label: "Kinetic Producer ★", sub: "7.1%", yield: 469.35, color: "#e74c3c" },
 ];
 
-// Log scale: yield ranges from 0.02 to 5,237 — need compression
+// Log scale: yield ranges from 0.05 to 469 — need compression
 function yieldToWidth(y: number, maxLog: number, maxWidth: number): number {
   if (y <= 0) return 0;
   return Math.max(3, (Math.log10(y + 1) / maxLog) * maxWidth);
 }
 
-const MAX_LOG = Math.log10(5237 + 1);
+const MAX_LOG = Math.log10(469.35 + 1);
 const BAR_MAX_W = 280;
 const BAR_H = 22;
 const ROW_GAP = 8;
@@ -41,20 +43,20 @@ export default function WhereYouSit() {
         Where do you sit?
       </div>
       <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
-        The field separates into 8 archetypes. Yield ranges from{" "}
-        <span className="font-bold text-text-primary">0.02</span> (Input-Heavy)
+        The field separates into 10 build archetypes. Yield ranges from{" "}
+        <span className="font-bold text-text-primary">0.05</span> (Raw Injector)
         {" "}to{" "}
-        <span className="font-bold text-text-primary">5,237</span> (Outliers)
+        <span className="font-bold text-text-primary">469</span> (Kinetic Producer)
         {" "}— a{" "}
-        <span className="font-bold text-gold">260,000× spread</span>.
-        Your composition decides which one you are. Where are you?
+        <span className="font-bold text-gold">9,000× spread</span>.
+        Your cascade shape decides which one you are. Where are you?
       </p>
 
       <svg
         viewBox={`0 0 ${START_X + BAR_MAX_W + 70} ${totalH}`}
         className="mx-auto w-full max-w-xl"
         role="img"
-        aria-label="Archetype yield comparison: 8 archetypes from Input-Heavy at 0.02 to Outliers at 5,237. A 260,000x spread."
+        aria-label="Build archetype yield comparison: 10 archetypes from Raw Injector at 0.05 to Kinetic Producer at 469. A 9,000x spread."
       >
         {ARCHETYPES.map((arch, i) => {
           const y = i * (BAR_H + ROW_GAP) + 10;
@@ -122,7 +124,7 @@ export default function WhereYouSit() {
           fontSize="9"
           fill="#9e937c"
         >
-          log scale · 260,000× spread from worst to best
+          log scale · 9,000× spread from worst to best
         </text>
       </svg>
 

@@ -25,7 +25,7 @@
     "db:parity": "node scripts/check-migration-parity.mjs",
     "db:parity:ci": "node scripts/check-migration-parity.mjs --ci",
     "board:snapshot": "node scripts/generate-board-snapshot.mjs",
-    "archetypes": "node scripts/gen-archetypes.mjs"
+    "archetypes": "node scripts/gen-build-archetypes.mjs"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.9.0",
