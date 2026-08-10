@@ -53,7 +53,12 @@ const METRICS = [
   {
     href: "/metrics/signal-to-noise-ratio",
     title: "Signal-to-Noise Ratio (SNR) — Signal Density",
-    desc: "signal_tokens / total_tokens — signal density in AI coding. What signal vs noise means and its link to the Conservation Law.",
+    desc: "output / (input + output) — output share of fresh conversational traffic. What signal vs noise means and its link to the Conservation Law.",
+  },
+  {
+    href: "/metrics/efficiency",
+    title: "Efficiency — Operational Amplification",
+    desc: "(cache_read + cache_write + output) / (4 * input) — total operational amplification versus the AA 7:2:1 baseline. The only public metric that includes cache_write.",
   },
 ];
 

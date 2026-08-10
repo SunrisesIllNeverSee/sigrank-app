@@ -40,8 +40,8 @@ const METRICS = [
   {
     href: "/metrics/signal-to-noise-ratio",
     name: "Signal-to-Noise Ratio (SNR)",
-    formula: "signal tokens / total tokens",
-    desc: "The density of useful output in your cascade. High SNR means most of what flows through is signal, not boilerplate or repetition.",
+    formula: "output / (input + output)",
+    desc: "Output share of fresh conversational traffic. High SNR means most of your fresh traffic is model output, not input.",
     priority: "Quality lens",
   },
   {

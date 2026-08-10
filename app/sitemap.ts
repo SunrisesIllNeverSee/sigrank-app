@@ -147,6 +147,11 @@ const STATIC_ROUTES: {
     changeFrequency: "monthly",
   },
   {
+    path: "/metrics/efficiency",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
+  {
     path: "/metrics/cache-hit-rate",
     priority: 0.6,
     changeFrequency: "monthly",

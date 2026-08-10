@@ -82,7 +82,7 @@ your own logs.
 
 - **Leverage** = cache_read / input — how much you reuse vs re-type
 - **Velocity** = output / input — how much real output per token in
-- **SNR** (Signal-to-Noise Ratio) = output / (input + cache_write) — signal vs overhead
+- **SNR** (Signal-to-Noise Ratio) = output / (input + output) — output share of fresh conversational traffic
 - **10xDEV** = log₁₀(Leverage) — leverage on a readable scale
 - **Compression Ratio** = cache_read / (cache_read + input) — cache efficiency
 - **SIGNA RATE** = a composite signal quality score (proprietary weights, used for the TRANSMITTER badge, not for class assignment)

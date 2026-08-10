@@ -76,7 +76,7 @@ const RELATED = [
   {
     href: "/metrics/signal-to-noise-ratio",
     title: "Signal-to-Noise Ratio (SNR)",
-    desc: "The density of useful output in your cascade — signal tokens over total tokens.",
+    desc: "Output share of fresh conversational traffic — output over input plus output.",
   },
   {
     href: "/metrics/velocity",
