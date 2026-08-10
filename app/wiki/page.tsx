@@ -5,7 +5,8 @@
  * deepwiki grows from later. Owner-specified root-column order (2026-06-21):
  *   1. SigRank console (definition)   2. Submit   3. Metrics (four pillars +
  *   the token cascade - NO word-era)  4. Transmitters (8 experience tiers + TRANSMITTER badge)
- *   5. MO§ES™ (commitment theory + founding story — owner-authored)
+ *   5. Build Archetypes (10 composition types across 4 families)
+ *   6. MO§ES™ (commitment theory + founding story — owner-authored)
  *
  * Plus a sign bar (WikiSignBar) with a login dropdown carrying Contact +
  * "Submit now / get ranked". Login is a stub until auth is wired.
@@ -629,7 +630,320 @@ function TransmitterClasses() {
   );
 }
 
-/* ───────────────────── 5 · MO§ES™ (commitment theory) ───────────────────── */
+/* ───────────────────── 5 · BUILD ARCHETYPES (the 10 composition types) ───────────────────── */
+
+const ARCHETYPE_FAMILIES = [
+  {
+    name: "Convergence",
+    color: "#9b59b6",
+    members: ["CONVERGENT"],
+    desc: "All three operating axes elevated without the usual tradeoffs. The rare composition where deep reuse, active construction, and high generation rise together.",
+  },
+  {
+    name: "Generation",
+    color: "#e74c3c",
+    members: ["KINETIC"],
+    desc: "Generation has broken out. Output approaches or exceeds fresh input, making transmission the defining feature.",
+  },
+  {
+    name: "Reuse Depth",
+    color: "#3498db",
+    members: ["INPUT-BOUND", "PRIMING", "CONTEXTUAL", "DEEP READER", "ARCHIVIST"],
+    desc: "The passive reuse axis. How deeply an operator draws on accumulated context, from almost none (INPUT-BOUND) to extreme (ARCHIVIST).",
+  },
+  {
+    name: "Active Construction",
+    color: "#2ecc71",
+    members: ["BUILDER", "RECURSIVE", "AMPLIFIER"],
+    desc: "The active construction axis. How much new context an operator writes for future reuse, scaled by how much leverage they already have.",
+  },
+] as const;
+
+const ARCHETYPE_DETAILS: Record<
+  string,
+  { family: string; blurb: string; definedBy: string }
+> = {
+  CONVERGENT: {
+    family: "Convergence",
+    blurb:
+      "Deep reuse, active construction, and high generation rise together. A rare composition where all three operating axes are elevated without the usual tradeoffs.",
+    definedBy: "P80+ on all 3 axes (leverage + velocity + construction)",
+  },
+  KINETIC: {
+    family: "Generation",
+    blurb:
+      "Generation has broken out. Output approaches or exceeds fresh input, making transmission the defining feature of the composition.",
+    definedBy: "velocity >= 0.80",
+  },
+  "INPUT-BOUND": {
+    family: "Reuse Depth",
+    blurb:
+      "Fresh input still carries most of the workload. Little prior context is returning, so each cycle depends heavily on new input.",
+    definedBy: "leverage < 5",
+  },
+  PRIMING: {
+    family: "Reuse Depth",
+    blurb:
+      "Reuse is beginning to form. Prior context is returning, but the system has not yet developed deep leverage.",
+    definedBy: "leverage 5-10",
+  },
+  CONTEXTUAL: {
+    family: "Reuse Depth",
+    blurb:
+      "Retained context is now materially supporting the workflow. Reuse is established, while active construction remains limited.",
+    definedBy: "leverage 10-15, passive",
+  },
+  "DEEP READER": {
+    family: "Reuse Depth",
+    blurb:
+      "Strong accumulated context is carrying the workflow. The operator draws deeply from retained context while creating relatively little new context.",
+    definedBy: "leverage 15-23, passive",
+  },
+  ARCHIVIST: {
+    family: "Reuse Depth",
+    blurb:
+      "Extreme reuse of accumulated context. A deep context library carries the system while new construction remains limited.",
+    definedBy: "leverage >= 23, passive",
+  },
+  BUILDER: {
+    family: "Active Construction",
+    blurb:
+      "Active context construction has begun. The system is creating material for future reuse while leverage is still developing.",
+    definedBy: "construction >= 0.02, leverage < 30",
+  },
+  RECURSIVE: {
+    family: "Active Construction",
+    blurb:
+      "New context is being built on top of an already substantial reusable base. Construction and reuse are now feeding the same operating loop.",
+    definedBy: "construction >= 0.02, leverage 30-50",
+  },
+  AMPLIFIER: {
+    family: "Active Construction",
+    blurb:
+      "Deep reuse and active construction are operating together at scale. Existing context produces new work that expands the context available for future cycles.",
+    definedBy: "construction >= 0.02, leverage >= 50",
+  },
+};
+
+const ARCHETYPE_ORDER = [
+  "CONVERGENT",
+  "KINETIC",
+  "INPUT-BOUND",
+  "PRIMING",
+  "CONTEXTUAL",
+  "DEEP READER",
+  "ARCHIVIST",
+  "BUILDER",
+  "RECURSIVE",
+  "AMPLIFIER",
+] as const;
+
+function BuildArchetypesSection() {
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="font-mono text-lg font-bold text-text-primary">
+          The 10 build archetypes
+        </h2>
+        <span className="rounded-full border border-gold/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-gold">
+          composition classifier
+        </span>
+      </div>
+      <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
+        Every operator lands in exactly one build archetype - a composition
+        classifier that describes <strong>how</strong> they operate, not how
+        much. This is a <strong className="text-text-primary">separate axis</strong>{" "}
+        from the experience ladder. An ARCH+ can be INPUT-BOUND (deep
+        experience but currently burning fresh input). An IGNITER can be an
+        AMPLIFIER (new but already compounding cache). Archetype describes
+        shape. Class describes qualification. Rank describes position.
+      </p>
+
+      {/* The three dimensions */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          The three dimensions
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Archetypes are classified from three derived ratios of the four
+          token pillars:
+        </p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="flex flex-col gap-1 rounded border border-bg-border-subtle p-3">
+            <span className="font-mono text-xs font-bold text-text-accent">
+              Leverage
+            </span>
+            <span className="font-mono text-[11px] text-text-muted">
+              cache_read / input
+            </span>
+            <span className="font-sans text-xs text-text-secondary">
+              How much you reuse vs fresh input.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded border border-bg-border-subtle p-3">
+            <span className="font-mono text-xs font-bold text-text-accent">
+              Velocity
+            </span>
+            <span className="font-mono text-[11px] text-text-muted">
+              output / input
+            </span>
+            <span className="font-sans text-xs text-text-secondary">
+              How much you generate vs take in.
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded border border-bg-border-subtle p-3">
+            <span className="font-mono text-xs font-bold text-text-accent">
+              Construction
+            </span>
+            <span className="font-mono text-[11px] text-text-muted">
+              cache_write / cache_read
+            </span>
+            <span className="font-sans text-xs text-text-secondary">
+              How much new context you build per read.
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Classification precedence */}
+      <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Classification precedence
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          First match wins. The classifier checks in this order:
+        </p>
+        <ol className="flex flex-col gap-1 pl-4 font-sans text-xs text-text-muted">
+          <li>
+            <strong className="text-text-primary">1. CONVERGENT</strong> - P80+
+            on all 3 axes (leverage + velocity + construction)
+          </li>
+          <li>
+            <strong className="text-text-primary">2. KINETIC</strong> - velocity
+            &gt;= 0.80 (generation breakout)
+          </li>
+          <li>
+            <strong className="text-text-primary">3. Construction branch</strong>{" "}
+            - construction &gt;= 0.02 (BUILDER / RECURSIVE / AMPLIFIER, split by
+            leverage)
+          </li>
+          <li>
+            <strong className="text-text-primary">4. Reuse depth branch</strong>{" "}
+            - else (INPUT-BOUND / PRIMING / CONTEXTUAL / DEEP READER /
+            ARCHIVIST, split by leverage)
+          </li>
+        </ol>
+      </section>
+
+      {/* The four families */}
+      <section className="flex flex-col gap-2">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          The four families
+        </h3>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {ARCHETYPE_FAMILIES.map((fam) => (
+            <div
+              key={fam.name}
+              className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3"
+              style={{ borderLeftColor: fam.color, borderLeftWidth: "3px" }}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: fam.color }}
+                />
+                <span className="font-mono text-sm font-bold text-text-primary">
+                  {fam.name}
+                </span>
+              </div>
+              <span className="font-sans text-xs leading-relaxed text-text-muted">
+                {fam.desc}
+              </span>
+              <span className="font-mono text-[11px] text-text-secondary">
+                {fam.members.join(" - ")}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* All 10 archetypes */}
+      <section className="flex flex-col gap-2">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          All 10 archetypes
+        </h3>
+        <div className="flex flex-col gap-0">
+          {ARCHETYPE_ORDER.map((name) => {
+            const details = ARCHETYPE_DETAILS[name];
+            const fam = ARCHETYPE_FAMILIES.find(
+              (f) => f.name === details.family,
+            );
+            return (
+              <div
+                key={name}
+                className="flex flex-col gap-1 border-b border-bg-border-subtle py-3 last:border-b-0"
+              >
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="font-mono text-sm font-bold"
+                    style={{ color: fam?.color ?? "#text-primary" }}
+                  >
+                    {name}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-wide text-text-muted">
+                    {details.family}
+                  </span>
+                </div>
+                <p className="font-sans text-xs leading-relaxed text-text-secondary">
+                  {details.blurb}
+                </p>
+                <p className="font-mono text-[11px] text-text-muted">
+                  {details.definedBy}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* How the two axes interact */}
+      <section className="flex flex-col gap-2 rounded-lg border border-gold/30 bg-gold/5 p-4">
+        <h3 className="font-mono text-sm font-bold text-text-primary">
+          Archetype vs class tier - two independent axes
+        </h3>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The experience ladder (class tier) tracks{" "}
+          <strong className="text-text-primary">how much</strong> you have
+          operated - total tokens accumulated. The build archetype tracks{" "}
+          <strong className="text-text-primary">how</strong> you operate - the
+          composition of your cascade. They are independent:
+        </p>
+        <ul className="flex flex-col gap-1 pl-4 font-sans text-xs text-text-muted">
+          <li>
+            <strong className="text-text-primary">ARCH+ + INPUT-BOUND</strong> -
+            deep experience but currently burning fresh input
+          </li>
+          <li>
+            <strong className="text-text-primary">IGNITER + AMPLIFIER</strong> -
+            new but already compounding cache at scale
+          </li>
+          <li>
+            <strong className="text-text-primary">BASE + CONVERGENT</strong> -
+            mid-field with all three axes elevated
+          </li>
+        </ul>
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          Both are recomputed every scoring window (7d / 30d / 90d / all-time).
+          An operator can shift from INPUT-BOUND to AMPLIFIER within a week if
+          their architecture changes - the archetype tracks the live shape,
+          not a lifetime label.
+        </p>
+      </section>
+    </section>
+  );
+}
+
+/* ───────────────────── 6 · MO§ES™ (commitment theory) ───────────────────── */
 
 function MosesSection() {
   return (
@@ -1417,6 +1731,20 @@ export default function Draft1Page() {
           label: "The experience ladder",
           hint: "8 tiers x 3 sub-stages = 24 stages, assigned by total tokens. Plus the TRANSMITTER peak badge.",
           node: <TransmitterClasses />,
+        },
+      ],
+    },
+    {
+      id: "archetypes",
+      groupLabel: "Build Archetypes",
+      description:
+        "The 10 composition types across 4 families - how operators work, not how much. Separate axis from the experience ladder.",
+      items: [
+        {
+          id: "ten-archetypes",
+          label: "The 10 build archetypes",
+          hint: "Convergence, Generation, Reuse Depth, Active Construction. Classified from leverage, velocity, and construction ratios.",
+          node: <BuildArchetypesSection />,
         },
       ],
     },
