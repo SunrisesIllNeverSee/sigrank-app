@@ -81,7 +81,7 @@ export function deriveFacts(
     nonCompounding: c.nonCompounding,
   });
   push(
-    reg.key === "raw-injector" || reg.key === "cache-warming" || reg.key === "stateless"
+    reg.key === "input-bound" || reg.key === "priming" || reg.key === "stateless"
       ? "down"
       : "up",
     "Build Archetype",

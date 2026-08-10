@@ -9,16 +9,10 @@
  *   - construction = cache_write / cache_read
  *
  * Classification order (priority — first match wins):
- *   1. CONVERGENT         — P80 on all 3 dims (multi-axis elite)
- *   2. KINETIC PRODUCER    — velocity >= 0.8
- *   3. RAW INJECTOR        — leverage < 5
- *   4. CACHE WARMING       — leverage 5-10
- *   5. SHALLOW READER      — leverage 10-15, passive (construction < 0.02)
- *   6. READER              — leverage 15-23, passive
- *   7. ARCHIVAL            — leverage 23+, passive
- *   8. BUILDER             — construction >= 0.02, leverage < 30
- *   9. RECURSIVE MOMENTUM  — construction >= 0.02, leverage 30-50
- *  10. COMPOUND AMPLIFIER  — construction >= 0.02, leverage 50+
+ *   1. CONVERGENT     — P80 on all 3 dims (multi-axis elite)
+ *   2. KINETIC        — velocity >= 0.8
+ *   3. Construction   — construction >= 0.02 (BUILDER / RECURSIVE / AMPLIFIER by leverage)
+ *   4. Reuse depth    — else (INPUT-BOUND / PRIMING / CONTEXTUAL / DEEP READER / ARCHIVIST by leverage)
  *
  * TODO(OPERATOR_OVERRIDE_REQUIRED): the breakpoints below are proprietary
  * tuning constants the owner owns (RS.xx-class). Surface them from the
@@ -41,15 +35,15 @@ export interface RegimeInput {
 
 export type RegimeKey =
   | "convergent"
-  | "kinetic-producer"
-  | "raw-injector"
-  | "cache-warming"
-  | "shallow-reader"
-  | "reader"
-  | "archival"
+  | "kinetic"
+  | "input-bound"
+  | "priming"
+  | "contextual"
+  | "deep-reader"
+  | "archivist"
   | "builder"
-  | "recursive-momentum"
-  | "compound-amplifier"
+  | "recursive"
+  | "amplifier"
   | "stateless";
 
 export interface Regime {

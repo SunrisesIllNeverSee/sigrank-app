@@ -17,6 +17,8 @@ export interface ArchetypeData {
   name: string;
   description: string;
   defined_by: string;
+  family?: string;
+  family_label?: string;
   n: number;
   yield_median: number;
   leverage_median: number;
@@ -40,22 +42,22 @@ export interface OperatorArchetypesProps {
 
 const ARCHETYPE_COLORS: Record<string, string> = {
   CONVERGENT: "#9b59b6",
-  "KINETIC PRODUCER": "#e74c3c",
-  "RAW INJECTOR": "#3498db",
-  "CACHE WARMING": "#5dade2",
-  "SHALLOW READER": "#48c9b0",
-  READER: "#2ecc71",
-  ARCHIVAL: "#27ae60",
+  KINETIC: "#e74c3c",
+  "INPUT-BOUND": "#3498db",
+  PRIMING: "#5dade2",
+  CONTEXTUAL: "#48c9b0",
+  "DEEP READER": "#2ecc71",
+  ARCHIVIST: "#27ae60",
   BUILDER: "#f39c12",
-  "RECURSIVE MOMENTUM": "#d4af37",
-  "COMPOUND AMPLIFIER": "#c0392b",
+  RECURSIVE: "#d4af37",
+  AMPLIFIER: "#c0392b",
 };
 
 export default function OperatorArchetypes({
   archetypes,
   totalOperators,
 }: OperatorArchetypesProps) {
-  // Sort by archetype_id (classification order — CONVERGENT first, COMPOUND AMPLIFIER last).
+  // Sort by archetype_id (classification order — CONVERGENT first, AMPLIFIER last).
   const sorted = [...archetypes].sort((a, b) => a.archetype_id - b.archetype_id);
 
   return (
@@ -108,7 +110,7 @@ export default function OperatorArchetypes({
                 {arch.description}
               </p>
               <p className="font-mono text-xs text-text-muted">
-                {arch.defined_by}
+                {arch.family_label ? `${arch.family_label} · ` : ""}{arch.defined_by}
               </p>
 
               {/* Stats row */}

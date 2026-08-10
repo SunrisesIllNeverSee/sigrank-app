@@ -18,18 +18,24 @@ their token cascade:
 Classification order (priority — first match wins):
 
 1. **CONVERGENT** — P80 on all 3: leverage + velocity + construction
-2. **KINETIC PRODUCER** — velocity >= 0.8
-3. **RAW INJECTOR** — leverage < 5
-4. **CACHE WARMING** — leverage 5-10
-5. **SHALLOW READER** — leverage 10-15, passive (construction < 0.02)
-6. **READER** — leverage 15-23, passive
-7. **ARCHIVAL** — leverage 23+, passive
-8. **BUILDER** — construction >= 0.02, leverage < 30
-9. **RECURSIVE MOMENTUM** — construction >= 0.02, leverage 30-50
-10. **COMPOUND AMPLIFIER** — construction >= 0.02, leverage 50+
+2. **KINETIC** — velocity >= 0.8
+3. **Construction branch** — construction >= 0.02 (BUILDER / RECURSIVE / AMPLIFIER by leverage)
+4. **Reuse depth branch** — else (INPUT-BOUND / PRIMING / CONTEXTUAL / DEEP READER / ARCHIVIST by leverage)
 
 CONVERGENT is checked first and pulls out operators who are elite on all three
-dimensions. The remaining types are classified by their dominant axis.
+dimensions. KINETIC captures high-velocity generation. The Construction branch
+captures active context builders (construction >= 0.02). The Reuse Depth branch
+captures passive context reusers. Each type is defined by a different primary
+dimension of the token cascade.
+
+## Families
+
+| Family | Types | Family label |
+|--------|-------|-------------|
+| convergence | CONVERGENT | Convergence |
+| generation | KINETIC | Generation |
+| reuse | INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, ARCHIVIST | Reuse Depth |
+| construction | BUILDER, RECURSIVE, AMPLIFIER | Active Construction |
 
 ## Population
 
@@ -51,19 +57,21 @@ construction P80 = 0.0431
 | # | Name | N | % | Yield median | Leverage median | Velocity median |
 |---|------|---|---|-------------|----------------|----------------|
 | 0 | CONVERGENT | 104 | 6.6% | 257.3 | 245.34 | 1.049 |
-| 1 | KINETIC PRODUCER | 113 | 7.1% | 469.35 | 361.50 | 1.520 |
-| 2 | RAW INJECTOR | 166 | 10.5% | 0.05 | 2.80 | 0.020 |
-| 3 | CACHE WARMING | 196 | 12.4% | 0.33 | 7.50 | 0.100 |
-| 4 | SHALLOW READER | 186 | 11.7% | 0.84 | 12.30 | 0.080 |
-| 5 | READER | 169 | 10.7% | 1.52 | 18.20 | 0.090 |
-| 6 | ARCHIVAL | 186 | 11.7% | 3.54 | 42.10 | 0.130 |
-| 7 | BUILDER | 173 | 10.9% | 1.97 | 20.40 | 0.110 |
-| 8 | RECURSIVE MOMENTUM | 132 | 8.3% | 7.23 | 38.60 | 0.190 |
-| 9 | COMPOUND AMPLIFIER | 161 | 10.2% | 26.53 | 79.20 | 0.330 |
+| 1 | KINETIC | 113 | 7.1% | 469.35 | 361.48 | 1.520 |
+| 2 | INPUT-BOUND | 108 | 6.8% | 0.05 | 2.71 | 0.019 |
+| 3 | PRIMING | 149 | 9.4% | 0.32 | 7.70 | 0.042 |
+| 4 | CONTEXTUAL | 186 | 11.7% | 0.84 | 12.68 | 0.066 |
+| 5 | DEEP READER | 169 | 10.7% | 1.52 | 18.45 | 0.081 |
+| 6 | ARCHIVIST | 186 | 11.7% | 3.54 | 29.81 | 0.124 |
+| 7 | BUILDER | 278 | 17.5% | 1.12 | 13.71 | 0.077 |
+| 8 | RECURSIVE | 132 | 8.3% | 7.23 | 38.86 | 0.191 |
+| 9 | AMPLIFIER | 161 | 10.2% | 26.53 | 77.23 | 0.329 |
 
-8 of 10 types fall in the 10-12.4% population target range. CONVERGENT (6.6%)
-and KINETIC PRODUCER (7.1%) are smaller by design — they're priority
-classifications that pull operators out of other categories.
+6 of 10 types fall in the 8-12% population range. BUILDER (17.5%) is the
+largest type — the construction branch captures all operators with active
+cache writing (construction >= 0.02) and leverage < 30. CONVERGENT (6.6%)
+and KINETIC (7.1%) are smaller by design — they're priority classifications
+that pull operators out of other categories.
 
 ## Reproducibility
 

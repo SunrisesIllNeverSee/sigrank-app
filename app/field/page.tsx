@@ -357,7 +357,7 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The yield distribution is heavily right-skewed. 80% of human
           operators fall within the shaded band. The long tail to the right
-          is where the Compound Amplifiers and Convergent operators live. The bulk of
+          is where the AMPLIFIERS and CONVERGENT operators live. The bulk of
           the field clusters near the median. This is why the median is used
           instead of the mean: the mean is pulled by outliers, the median
           reflects where operators actually are.
@@ -518,13 +518,14 @@ export default async function FieldPage() {
           Build Archetypes
         </h2>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The field separates into 10 build archetypes based on how operators
-          move tokens through the cascade. Each type is defined by a different
-          primary dimension — input, cache_read, cache_write, output, or
-          multi-axis excellence. CONVERGENT is checked first and pulls out
-          operators who are elite on all three derived dimensions
-          (leverage, velocity, construction). The remaining types are
-          classified by their dominant axis.
+          The field separates into 10 build archetypes across four families:
+          Convergence, Generation, Reuse Depth, and Active Construction.
+          CONVERGENT is checked first and pulls out operators who are elite
+          on all three derived dimensions (leverage, velocity, construction).
+          KINETIC captures high-velocity generation. The Construction branch
+          captures active context builders. The Reuse Depth branch captures
+          passive context reusers. Each type is defined by a different
+          primary dimension of the token cascade.
         </p>
         <OperatorArchetypes
           archetypes={archetypes}

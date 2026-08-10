@@ -7,7 +7,7 @@
  *   velocity × leverage = YIELD
  *
  * Plus a compact "where you sit" comparison bar showing yield ranges
- * for Raw Injector vs Reader vs Compound Amplifier.
+ * for Input-Bound vs Deep Reader vs Amplifier.
  *
  * Pure inline SVG. Server component. No client JS.
  */
@@ -24,11 +24,11 @@ const COLORS = {
 };
 
 const ARCHETYPE_YIELDS = [
-  { label: "Raw Injector", yield: 0.05, color: "#3498db", width: 2 },
-  { label: "Reader", yield: 1.52, color: "#2ecc71", width: 8 },
-  { label: "Archival", yield: 3.74, color: "#27ae60", width: 14 },
-  { label: "Compound Amp.", yield: 26.84, color: "#c0392b", width: 30 },
-  { label: "Convergent ★", yield: 258.14, color: "#9b59b6", width: 48 },
+  { label: "Input-Bound", yield: 0.05, color: "#3498db", width: 2 },
+  { label: "Deep Reader", yield: 1.52, color: "#2ecc71", width: 8 },
+  { label: "Archivist", yield: 3.54, color: "#27ae60", width: 14 },
+  { label: "Amplifier", yield: 26.53, color: "#c0392b", width: 30 },
+  { label: "Convergent ★", yield: 257.3, color: "#9b59b6", width: 48 },
 ];
 
 export default function YieldFormulaVisual() {
