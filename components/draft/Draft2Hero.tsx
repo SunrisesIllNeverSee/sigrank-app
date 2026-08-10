@@ -38,11 +38,11 @@ export function Draft2Hero() {
       <div className="relative z-10 flex flex-col items-center gap-5">
         {/* intro line (lead-in above the logo) */}
         <p className="font-mono text-base font-bold leading-tight tracking-tight text-text-primary sm:whitespace-nowrap md:text-xl lg:text-2xl">
-          Introducing the new standard in{" "}
-          <span className="text-gold">AI evaluation &amp; benchmarks</span>
+          The evaluation platform for{" "}
+          <span className="text-gold">AI operators</span>
         </p>
         <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary sm:text-base">
-          Operator Performance Signature
+          Models are benchmarked constantly. The people operating them are not.
         </p>
 
         {/* the original SIGRANK logo — animated wordmark + § coin.
@@ -72,13 +72,12 @@ export function Draft2Hero() {
             line lengths so there's no one-word orphan line (owner 2026-06-24). */}
         <div className="flex max-w-2xl flex-col gap-2 text-center">
           <p className="text-balance font-sans text-lg leading-relaxed text-text-secondary sm:text-xl">
-            We measure the{" "}
-            <strong className="text-text-primary">
-              architecture of users&apos; token cascade
-            </strong>{" "}
-            to identify patterns, margins, and operator signature — revealing
-            whether signal is compounded or tokens burned. Most platforms reward
-            volume. SigRank rewards structure.
+            SigRank turns privacy-preserving token telemetry into a repeatable
+            performance evaluation: your{" "}
+            <strong className="text-text-primary">Yield</strong>, workflow
+            signature, benchmark, and progress over time. The leaderboard is
+            proof, not the product — the product is the{" "}
+            <strong className="text-text-primary">operator-evaluation standard</strong>.
           </p>
           <p className="text-balance font-sans text-lg font-medium leading-relaxed text-text-primary sm:text-xl">
             Fair warning: the blade cuts both ways.

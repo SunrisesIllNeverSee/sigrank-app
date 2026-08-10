@@ -18,7 +18,7 @@ import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "SigRank vs Other Tools — AI Operator Measurement Comparisons",
   description:
-    "How SigRank compares to ccusage, WakaTime, LMSYS Arena, Cursor, Copilot, Braintrust, LangChain, and Langfuse. Operator measurement vs time tracking, model leaderboards, and observability.",
+    "How SigRank compares to ccusage, VALS AI, LMSYS Arena, Cursor, Copilot, Braintrust, LangChain, and Langfuse. Operator evaluation vs system evaluation, time tracking, model leaderboards, and observability.",
   path: "/vs",
 });
 
@@ -31,9 +31,9 @@ const COMPARISONS = [
     desc: "ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.",
   },
   {
-    href: "/vs/wakatime",
-    title: "SigRank vs WakaTime — Time vs Token Efficiency",
-    desc: "WakaTime tracks hours coding. SigRank tracks token cascade efficiency. Time ≠ signal — an hour with good cache reuse beats 10 hours of burning input.",
+    href: "/vs/vals-ai",
+    title: "SigRank vs VALS AI — Operator Evaluation vs System Evaluation",
+    desc: "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly — the people operating them are not. The leaderboard is proof, not the product.",
   },
   {
     href: "/vs/lmsys-arena",
