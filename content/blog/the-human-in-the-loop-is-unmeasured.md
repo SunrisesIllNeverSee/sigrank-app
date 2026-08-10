@@ -122,7 +122,7 @@ Each step compounds. Personal measurement gives an operator their cascade. Bench
 4. **A platform-agnostic ingest layer** that works across Claude, Cursor, Copilot, Gemini, and 15+ other tools. The sigrank CLI provides this.
 5. **A field large enough to establish norms.** 1,498 human operators provide a first Human Center of Mass for this AI coding-agent population — the median, the IQR, the archetype distribution. This is not the center of mass of all AI users; it is the center of mass of operators who install a token scanner and submit signed telemetry. That selection effect matters and is studied explicitly in the field analysis.
 
-[24] All five prerequisites now exist. The category is buildable. SigRank is pursuing an open-standard model — the methodology is published, the dataset will be on Zenodo with a DOI, and the CLI is open-source. A full open standard requires a versioned specification, governance, a reference implementation, conformance rules, licensing, and independent adoption. Those are the milestones; the ambition is stated, the status is early.
+[24] All five prerequisites now exist. The category is buildable. SigRank is pursuing an open-standard model — the methodology is published, the two-axis taxonomy dataset is on Zenodo ([DOI: 10.5281/zenodo.21875676](https://doi.org/10.5281/zenodo.21875676)), and the CLI is open-source. A full open standard requires a versioned specification, governance, a reference implementation, conformance rules, licensing, and independent adoption. Those are the milestones; the ambition is stated, the status is early.
 
 ## 8. What this changes
 
@@ -146,7 +146,7 @@ Outcome = μ + α_model + β_operator + (αβ)_interaction + ε
 
 This is the experiment that could turn the category thesis into a serious research result. Until this is done, the cascade is a measured signal whose predictive value is not yet established.
 
-2. **Dataset release.** The full operator-level dataset will be published on Zenodo with a DOI, making it citable in academic papers.
+2. **Dataset release.** The two-axis taxonomy (10 build archetypes + 24-stage experience ladder) is published on Zenodo ([DOI: 10.5281/zenodo.21875676](https://doi.org/10.5281/zenodo.21875676)). The full operator-level dataset will follow.
 
 3. **Longitudinal analysis.** How operators move between archetypes over time. Does a BUILDER become an AMPLIFIER? Does an INPUT-BOUND operator develop leverage with experience?
 
