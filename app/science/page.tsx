@@ -250,11 +250,11 @@ export default function SciencePage() {
               Two-Axis Operator Taxonomy:
             </strong>{" "}
             <a
-              href="https://doi.org/10.5281/zenodo.21875676"
+              href="https://doi.org/10.5281/zenodo.21875675"
               className="text-gold underline underline-offset-2"
               rel="external"
             >
-              DOI: 10.5281/zenodo.21875676
+              DOI: 10.5281/zenodo.21875675
             </a>
           </li>
         </ul>
