@@ -61,7 +61,7 @@ const STATIC_ROUTES: {
 
   // Comparison pages — commercial intent
   { path: "/vs/ccusage", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/vs/wakatime", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/vals-ai", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/lmsys-arena", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/cursor", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/copilot", priority: 0.7, changeFrequency: "monthly" },

@@ -87,7 +87,7 @@ ranks the humans using AI — not the models themselves.
 ## Comparisons
 - [All Comparisons](${SITE_ORIGIN}/vs): index of all eight head-to-head comparison pages
 - [SigRank vs ccusage](${SITE_ORIGIN}/vs/ccusage)
-- [SigRank vs WakaTime](${SITE_ORIGIN}/vs/wakatime)
+- [SigRank vs VALS AI](${SITE_ORIGIN}/vs/vals-ai)
 - [SigRank vs LMSYS Arena](${SITE_ORIGIN}/vs/lmsys-arena)
 - [SigRank vs Cursor](${SITE_ORIGIN}/vs/cursor)
 - [SigRank vs Copilot](${SITE_ORIGIN}/vs/copilot)

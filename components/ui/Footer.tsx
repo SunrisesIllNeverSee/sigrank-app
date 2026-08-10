@@ -58,7 +58,7 @@ const FOOTER_COLUMNS: {
     headingHref: "/vs",
     links: [
       { href: "/vs/ccusage", label: "vs ccusage" },
-      { href: "/vs/wakatime", label: "vs WakaTime" },
+      { href: "/vs/vals-ai", label: "vs VALS AI" },
       { href: "/vs/lmsys-arena", label: "vs LMSYS Arena" },
       { href: "/vs/cursor", label: "vs Cursor" },
       { href: "/vs/braintrust", label: "vs Braintrust" },
