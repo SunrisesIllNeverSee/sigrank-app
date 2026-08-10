@@ -130,6 +130,7 @@ ranks the humans using AI — not the models themselves.
 - Experimental Record (Zenodo): https://doi.org/10.5281/zenodo.19105225
 - Public Recursive Transformation Harness (Zenodo): https://doi.org/10.5281/zenodo.19109397
 - P-000 Propositions Prospectus (Zenodo): https://doi.org/10.5281/zenodo.20031715
+- Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (Zenodo): https://doi.org/10.5281/zenodo.21875676
 - Commitment Theory (34-paper research program): https://github.com/SunrisesIllNeverSee/Commitment_Theory
 
 ## Governance
