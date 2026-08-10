@@ -28,7 +28,7 @@ const RELATED = [
   {
     href: "/operator-performance",
     title: "Operator Performance — Scoring the Human",
-    desc: "The companion hub: why the operator is the variable, how SigRank scores operators, and the class tiers from IGNITER to TRANSMITTER.",
+    desc: "The companion hub: why the operator is the variable, how SigRank scores operators, and the class tiers from IGNITER to ARCH+.",
   },
   {
     href: "/methodology",
@@ -85,7 +85,7 @@ export default function AIOperatorScoringPage() {
             {
               question: "What is the SigRank scoring system?",
               answer:
-                "SigRank scores operators from four on-device token pillars (input, output, cache-read, cache-write). The yield metric Υ = cache_read × output / input² is the headline. The composite SIGNA rate blends yield with signal-force and drift components. Proprietary weights (RS.xx) govern the composite and stay server-side to prevent gaming. Operators are classified into tiers (IGNITER to TRANSMITTER) and ranked over 7-day, 30-day, 90-day, and all-time windows. Snapshots are ed25519-signed and verified server-side.",
+                "SigRank scores operators from four on-device token pillars (input, output, cache-read, cache-write). The yield metric Υ = cache_read × output / input² is the headline. The composite SIGNA rate blends yield with signal-force and drift components. Proprietary weights (RS.xx) govern the composite and stay server-side to prevent gaming. Operators are classified into tiers (IGNITER to ARCH+) and ranked over 7-day, 30-day, 90-day, and all-time windows. Snapshots are ed25519-signed and verified server-side.",
             },
             {
               question: "Is operator scoring private?",
@@ -198,8 +198,8 @@ export default function AIOperatorScoringPage() {
           scoring shape is public, the exact weights are not, to prevent gaming.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Operators are classified into tiers — IGNITER, SEEKER, BUILDER,
-          TRANSMITTER — and ranked over 7-day, 30-day, 90-day, and all-time
+          Operators are classified into 8 experience tiers - IGNITER through
+          ARCH+ - and ranked over 7-day, 30-day, 90-day, and all-time
           windows. Snapshots are ed25519-signed on-device and verified
           server-side with replay and plausibility guards. The system is
           platform-neutral: it works across Claude, ChatGPT, Gemini, Copilot,
@@ -300,7 +300,7 @@ export default function AIOperatorScoringPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Four on-device token pillars feed yield (Υ = cache_read × output /
               input²) and the composite SIGNA rate. Weights (RS.xx) are
-              server-side. Operators are tiered (IGNITER to TRANSMITTER) and
+              server-side. Operators are tiered (IGNITER to ARCH+) and
               ranked over multiple windows. Snapshots are ed25519-signed and
               verified.
             </dd>

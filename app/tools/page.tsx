@@ -38,7 +38,7 @@ const TOOLS = [
   {
     href: "/tools/operator-class-checker",
     title: "Operator Class Checker — AI Tier Calculator",
-    desc: "Enter a yield score or four token pillars to determine your AI operator class tier — IGNITER, SEEKER, BUILDER, or TRANSMITTER.",
+    desc: "Enter a yield score or four token pillars to determine your AI operator class tier - IGNITER through ARCH+. TRANSMITTER is a separate peak badge, not a tier.",
   },
   {
     href: "/tools/token-waste-calculator",

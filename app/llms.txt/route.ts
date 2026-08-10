@@ -72,7 +72,7 @@ ranks the humans using AI — not the models themselves.
 ## Tools (interactive)
 - [All Tools](${SITE_ORIGIN}/tools): index of all four interactive calculators
 - [Yield Calculator](${SITE_ORIGIN}/tools/yield-calculator): enter four token pillars, get Υ Yield + class tier
-- [Operator Class Checker](${SITE_ORIGIN}/tools/operator-class-checker): map yield to IGNITER/SEEKER/BUILDER/TRANSMITTER
+- [Operator Class Checker](${SITE_ORIGIN}/tools/operator-class-checker): map yield to IGNITER through ARCH+
 - [Cascade Comparator](${SITE_ORIGIN}/tools/cascade-comparator): compare two operators side by side
 - [Token Waste Calculator](${SITE_ORIGIN}/tools/token-waste-calculator): estimate wasted tokens by category
 

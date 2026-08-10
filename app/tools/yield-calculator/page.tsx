@@ -99,7 +99,7 @@ export default function YieldCalculatorPage() {
           input). An operator who re-sends the same large context every turn
           burns input without compounding — low yield. An operator who caches
           aggressively and extracts high signal per fresh token compounds — high
-          yield. Volume is noise; yield is signal.
+          yield. Volume alone is noise; yield is signal.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The four pillars map directly to the metrics most AI platforms now

@@ -44,7 +44,7 @@ const ALTS: Alt[] = [
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",
       "Platform-neutral: Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "MCP server mode for AI-agent integration — your agent can read its own metrics",
-      "Class tiers (IGNITER → TRANSMITTER) give your efficiency a stable label",
+      "Class tiers (IGNITER to ARCH+) give your efficiency a stable label",
     ],
     cons: [
       "More to set up than bare ccusage (enroll + submit vs. just run)",

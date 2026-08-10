@@ -11,7 +11,7 @@ interface LadderRow {
 }
 
 /**
- * ClassLadder — the nine-class hierarchy (K.01..K.09) from intro.html.
+ * ClassLadder - the eight-tier experience ladder (K.01..K.08) from intro.html.
  *
  * Glyph / name / hex are pulled from the canonical CLASS_TIERS registry so the
  * ladder stays in lockstep with the contract; the descriptive copy + public
@@ -58,11 +58,6 @@ const ROW_COPY: Record<string, LadderRow> = {
     id: "K.08",
     desc: "Quiet insight holders. Deep threads, low activity volume.",
     range: "0.15 – 0.19",
-  },
-  "K.09": {
-    id: "K.09",
-    desc: "Dormant potential. The still soul. Waiting for the spark.",
-    range: "< 0.15",
   },
 };
 
