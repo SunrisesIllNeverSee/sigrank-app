@@ -1,150 +1,45 @@
 {
-  "method": "equal_population_24_stages",
-  "source": "field-analysis.json (1,626 operators, HCM cut)",
+  "method": "canonical_classifier_observed_distribution_24_stages",
+  "description": "Observed token ranges and population counts produced by applying the fixed thresholds in experience_ladder.json to the stated analysis cohort. These are descriptive results under the canonical classifier, not alternate classifier thresholds.",
+  "cohort": {
+    "source": "field-analysis.json",
+    "total_operators": 1627,
+    "operators_in_this_distribution": 1627,
+    "excluded_operators": 0,
+    "exclusion": "Operators are excluded only when total_tokens is null or non-finite, or all four token pillars are zero. No records in the 2026-07-13 source snapshot met those conditions.",
+    "scrape_date": "2026-07-13T18:51:35Z",
+    "scrape_source": "https://tokscale.ai/leaderboard"
+  },
+  "classifier": {
+    "source": "experience_ladder.json",
+    "method": "descending_first_match",
+    "assignment": "Descending first-match over totalMin_inclusive; first match wins."
+  },
   "stages": [
-    {
-      "stage": "ARCH+ I",
-      "floor": 84192600517,
-      "ceiling": 7068201104626,
-      "operators": 67
-    },
-    {
-      "stage": "ARCH+ II",
-      "floor": 46527844056,
-      "ceiling": 83796808622,
-      "operators": 68
-    },
-    {
-      "stage": "ARCH+ III",
-      "floor": 33120868087,
-      "ceiling": 46007607687,
-      "operators": 68
-    },
-    {
-      "stage": "ARCH I",
-      "floor": 23895612426,
-      "ceiling": 33113877006,
-      "operators": 68
-    },
-    {
-      "stage": "ARCH II",
-      "floor": 18399442026,
-      "ceiling": 23885338222,
-      "operators": 67
-    },
-    {
-      "stage": "ARCH III",
-      "floor": 15525069887,
-      "ceiling": 18389930093,
-      "operators": 68
-    },
-    {
-      "stage": "POWER I",
-      "floor": 12272435221,
-      "ceiling": 15507589875,
-      "operators": 68
-    },
-    {
-      "stage": "POWER II",
-      "floor": 10216353881,
-      "ceiling": 12111995587,
-      "operators": 68
-    },
-    {
-      "stage": "POWER III",
-      "floor": 8773397273,
-      "ceiling": 10189224970,
-      "operators": 67
-    },
-    {
-      "stage": "BASE I",
-      "floor": 7078191068,
-      "ceiling": 8674592599,
-      "operators": 68
-    },
-    {
-      "stage": "BASE II",
-      "floor": 5889127180,
-      "ceiling": 7069544285,
-      "operators": 68
-    },
-    {
-      "stage": "BASE III",
-      "floor": 4912670550,
-      "ceiling": 5877345282,
-      "operators": 68
-    },
-    {
-      "stage": "SEEKER I",
-      "floor": 4147659079,
-      "ceiling": 4908070645,
-      "operators": 67
-    },
-    {
-      "stage": "SEEKER II",
-      "floor": 3589503354,
-      "ceiling": 4147377146,
-      "operators": 68
-    },
-    {
-      "stage": "SEEKER III",
-      "floor": 2980790685,
-      "ceiling": 3589126331,
-      "operators": 68
-    },
-    {
-      "stage": "REFINER I",
-      "floor": 2497415246,
-      "ceiling": 2961798768,
-      "operators": 68
-    },
-    {
-      "stage": "REFINER II",
-      "floor": 2014103899,
-      "ceiling": 2497406487,
-      "operators": 67
-    },
-    {
-      "stage": "REFINER III",
-      "floor": 1546788054,
-      "ceiling": 1994830571,
-      "operators": 68
-    },
-    {
-      "stage": "BEARER I",
-      "floor": 1182479080,
-      "ceiling": 1544290660,
-      "operators": 68
-    },
-    {
-      "stage": "BEARER II",
-      "floor": 859231121,
-      "ceiling": 1173256210,
-      "operators": 68
-    },
-    {
-      "stage": "BEARER III",
-      "floor": 640084482,
-      "ceiling": 859181137,
-      "operators": 67
-    },
-    {
-      "stage": "IGNITER I",
-      "floor": 305327754,
-      "ceiling": 638638241,
-      "operators": 68
-    },
-    {
-      "stage": "IGNITER II",
-      "floor": 131960531,
-      "ceiling": 305275145,
-      "operators": 68
-    },
-    {
-      "stage": "IGNITER III",
-      "floor": 123324,
-      "ceiling": 131012254,
-      "operators": 68
-    }
-  ]
+    { "stage": "ARCH+ I",    "totalMin_inclusive": 7068201104627, "observed_min_total_tokens": 9025906844219236, "observed_max_total_tokens": 9025906844219236, "operators": 1 },
+    { "stage": "ARCH+ II",   "totalMin_inclusive": 3000000000000, "observed_min_total_tokens": 7068201104625, "observed_max_total_tokens": 7068201104626, "operators": 2 },
+    { "stage": "ARCH+ III",  "totalMin_inclusive": 1000000000000, "observed_min_total_tokens": 1191754939292, "observed_max_total_tokens": 1191754939292, "operators": 1 },
+    { "stage": "ARCH I",     "totalMin_inclusive": 186207267611,  "observed_min_total_tokens": 186207267611,  "observed_max_total_tokens": 897095954477,  "operators": 25 },
+    { "stage": "ARCH II",    "totalMin_inclusive": 98543134083,   "observed_min_total_tokens": 98543134083,   "observed_max_total_tokens": 182619371269,  "operators": 27 },
+    { "stage": "ARCH III",   "totalMin_inclusive": 68766193943,   "observed_min_total_tokens": 68766193943,   "observed_max_total_tokens": 98248689712,   "operators": 27 },
+    { "stage": "POWER I",    "totalMin_inclusive": 39958782379,   "observed_min_total_tokens": 39958782379,   "observed_max_total_tokens": 68658355593,   "operators": 82 },
+    { "stage": "POWER II",   "totalMin_inclusive": 26955905621,   "observed_min_total_tokens": 26955905621,   "observed_max_total_tokens": 39818716597,   "operators": 81 },
+    { "stage": "POWER III",  "totalMin_inclusive": 19141226889,   "observed_min_total_tokens": 19141226889,   "observed_max_total_tokens": 26528630158,   "operators": 81 },
+    { "stage": "BASE I",     "totalMin_inclusive": 13960345961,   "observed_min_total_tokens": 13960345961,   "observed_max_total_tokens": 19094211884,   "operators": 109 },
+    { "stage": "BASE II",    "totalMin_inclusive": 10189224970,   "observed_min_total_tokens": 10189224970,   "observed_max_total_tokens": 13893793810,   "operators": 108 },
+    { "stage": "BASE III",   "totalMin_inclusive": 7747041813,    "observed_min_total_tokens": 7747041813,    "observed_max_total_tokens": 10180251592,   "operators": 108 },
+    { "stage": "SEEKER I",   "totalMin_inclusive": 5446673659,    "observed_min_total_tokens": 5446673659,    "observed_max_total_tokens": 7737520639,    "operators": 123 },
+    { "stage": "SEEKER II",  "totalMin_inclusive": 4014577247,    "observed_min_total_tokens": 4014577247,    "observed_max_total_tokens": 5439146611,    "operators": 122 },
+    { "stage": "SEEKER III", "totalMin_inclusive": 2961798768,    "observed_min_total_tokens": 2961798768,    "observed_max_total_tokens": 4002879977,    "operators": 121 },
+    { "stage": "REFINER I",  "totalMin_inclusive": 2358346840,    "observed_min_total_tokens": 2358346840,    "observed_max_total_tokens": 2957006829,    "operators": 82 },
+    { "stage": "REFINER II", "totalMin_inclusive": 1845750357,    "observed_min_total_tokens": 1845750357,    "observed_max_total_tokens": 2351618474,    "operators": 81 },
+    { "stage": "REFINER III","totalMin_inclusive": 1334876308,    "observed_min_total_tokens": 1334876308,    "observed_max_total_tokens": 1844751628,    "operators": 81 },
+    { "stage": "BEARER I",   "totalMin_inclusive": 984078167,     "observed_min_total_tokens": 984078167,     "observed_max_total_tokens": 1332518550,    "operators": 68 },
+    { "stage": "BEARER II",  "totalMin_inclusive": 714619043,     "observed_min_total_tokens": 714619043,     "observed_max_total_tokens": 983514118,     "operators": 68 },
+    { "stage": "BEARER III", "totalMin_inclusive": 431702990,     "observed_min_total_tokens": 431702990,     "observed_max_total_tokens": 712909134,     "operators": 67 },
+    { "stage": "IGNITER I",  "totalMin_inclusive": 216393332,     "observed_min_total_tokens": 216393332,     "observed_max_total_tokens": 430503739,     "operators": 55 },
+    { "stage": "IGNITER II", "totalMin_inclusive": 88999166,      "observed_min_total_tokens": 88999166,      "observed_max_total_tokens": 215961659,     "operators": 54 },
+    { "stage": "IGNITER III","totalMin_inclusive": 0,             "observed_min_total_tokens": 123324,        "observed_max_total_tokens": 87025203,      "operators": 53 }
+  ],
+  "note": "Stage populations differ by design because the eight base tiers use different target shares of the field; each tier is then divided approximately into thirds (III, II, I). ARCH+ remains aspirational."
 }
