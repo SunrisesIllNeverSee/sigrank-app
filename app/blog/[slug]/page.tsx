@@ -82,6 +82,20 @@ export const revalidate = 86400;
 const markdownComponents: Components = {
   img: ({ src, alt, title }) => {
     if (!src || typeof src !== "string") return null;
+    // SVGs bypass next/image — it blocks them by default (XSS policy)
+    // and SVGs are vector graphics that don't need raster optimization.
+    if (src.endsWith(".svg")) {
+      // eslint-disable-next-line @next/next/no-img-element
+      return (
+        <img
+          src={src}
+          alt={alt ?? ""}
+          title={title}
+          className="h-auto w-full rounded-lg border border-bg-border my-6"
+          loading="lazy"
+        />
+      );
+    }
     // Only optimize local images (skip external URLs — those go through
     // next/image's remote patterns config separately)
     const isLocal = src.startsWith("/") || src.startsWith("./") || !src.startsWith("http");
