@@ -29,6 +29,8 @@ author: Deric (@SunrisesIllNeverSee)
 
 ## 2. The variance model benchmarks cannot see
 
+![Yield vs Leverage — 1,532 operators on log-log scale. The compounding cloud shows that yield (Υ) rises with leverage (cache reuse), not with raw token volume. Colored by build archetype.](/scatter-yield-vs-leverage.svg)
+
 [5] The case for operator evaluation starts with an empirical observation. Even within the same broad AI coding-agent ecosystem, operator token cascades diverge by orders of magnitude.
 
 [6] SigRank analyzed 1,498 human operators from public AI coding agent leaderboards. Each operator was measured on four token pillars: input (fresh context provided), output (tokens generated), cache-write (context committed for reuse), and cache-read (context retrieved on subsequent turns). These four integers are the raw material. Everything else is derived.
@@ -75,6 +77,8 @@ Transmission × commitment × reuse = leverage. The intermediate terms cancel. T
 
 [14] Once you measure the cascade, structure emerges that is invisible to model evaluation. The 1,498 operators in the SigRank field separate into **10 build archetypes** — composition types that describe how an operator works, not how much.
 
+![The 10 Build Archetypes — deterministic classification of 1,586 operators by leverage, velocity, and construction. Each bar shows population share with median yield, leverage, and velocity.](/archetypes-10.svg)
+
 [15] The archetypes fall into four families:
 
 - **Convergence** — CONVERGENT: all three operating axes (leverage, velocity, construction) elevated without the usual tradeoffs. The rare composition.
@@ -83,6 +87,10 @@ Transmission × commitment × reuse = leverage. The intermediate terms cancel. T
 - **Active Construction** — BUILDER, RECURSIVE, AMPLIFIER: the active construction axis, from early cache-building to deep reuse + active construction at scale.
 
 [16] An archetype describes shape. A class tier describes qualification (total tokens accumulated). A rank describes position (yield relative to the field). All three are recomputed every scoring window. An experienced operator (ARCH+) can be INPUT-BOUND (deep experience but currently burning fresh input). A new operator (IGNITER) can be an AMPLIFIER (new but already compounding cache). The three axes are independent, and measuring all three gives a richer picture than any single label.
+
+![The 24-Stage Experience Ladder — 8 tiers × 3 sub-stages, keyed on total tokens. Equal-population calibration (Option C). Each stage shows its token floor and operator count.](/tier-ladder-24.svg)
+
+![Velocity vs Leverage — the operating plane. Each point is one operator. The position reveals workflow shape: high-velocity operators generate more than they take in; high-leverage operators reuse more than they retype. Colored by archetype.](/scatter-velocity-vs-leverage.svg)
 
 [17] This is what operator evaluation reveals that model evaluation does not: the structure of how someone works with AI. Not whether the model is good, but how the operator is using it. Not whether the result is correct, but whether the workflow is fresh-input-heavy, context-reusing, output-heavy, or actively constructing reusable state. The archetype is a workflow signature — a description of composition, not a verdict on quality.
 
@@ -103,6 +111,13 @@ Transmission × commitment × reuse = leverage. The intermediate terms cancel. T
 [20] The SigRank leaderboard is the visible surface. It ranks operators by Yield across 7-day, 30-day, 90-day, and all-time windows. It shows the cascade, the archetype, the class tier, and the rank for every operator. It is live, it is public, and it is the thing people see first.
 
 [21] But the leaderboard is not the product. The product is the **operator-evaluation standard**: the methodology, the metrics, the signed telemetry protocol, and the verification battery that make operator performance measurable and comparable. The leaderboard demonstrates that the measurement system can operate on a real field — collection works, derivation works, comparison works, ranking can be instantiated. It does not yet demonstrate construct validity. That requires external outcome validation, which is the first item on the research roadmap.
+
+**Interactive dashboards** (embedded data, Chart.js CDN):
+
+- [Archetype Analytics](/field#archetype-dashboard) — 9-chart breakdown of the 10 build archetypes
+- [Tier-Ladder Analytics](/field#tier-dashboard) — 6-chart experience-ladder distribution
+- [Cross-Metric Analytics](/field#cross-metric-dashboard) — yield vs leverage vs velocity vs SNR
+- [Operator Scatterplots](/field#operator-scatter) — 1,598 operators across 9 metric pairs
 
 [22] The strategic path:
 
@@ -168,5 +183,27 @@ This is the experiment that could turn the category thesis into a serious resear
 
 *This work is part of a broader research program on [Commitment Theory](https://github.com/SunrisesIllNeverSee/Commitment_Theory) — a 34-paper investigation into how governance structures emerge from measurable behavior in autonomous systems. SigRank applies the same principle to AI operators: you don't measure trust by asking, you measure it by observing the cascade.*
 
-*- djm · [MO§ES™](https://mos2es.com)*
-*[@burnmydays on X](https://x.com/burnmydays) · [GitHub](https://github.com/SunrisesIllneverSee)*
+*- djm · [MO§ES™](https://github.com/SunrisesIllNeverSee)*
+*[@burnmydays on X](https://x.com/burnmydays) · [GitHub](https://github.com/SunrisesIllNeverSee)*
+
+---
+
+**Citation:**
+
+McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21876660
+
+- **DOI:** [10.5281/zenodo.21876660](https://doi.org/10.5281/zenodo.21876660) · **Concept DOI:** [10.5281/zenodo.21875675](https://doi.org/10.5281/zenodo.21875675)
+- **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) · **ORCID:** [0009-0002-9904-5390](https://orcid.org/0009-0002-9904-5390)
+- **Author:** Deric J. McHenry · [signalaf.com](https://signalaf.com) · [MO§ES™](https://github.com/SunrisesIllNeverSee)
+
+```
+@dataset{mchenry2026sigrank,
+  author    = {McHenry, Deric J.},
+  title     = {{SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0)}},
+  year      = 2026,
+  publisher = {Zenodo},
+  version   = {3.0},
+  doi       = {10.5281/zenodo.21876660},
+  url       = {https://doi.org/10.5281/zenodo.21876660}
+}
+```

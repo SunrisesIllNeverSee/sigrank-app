@@ -14,7 +14,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb } from "@/lib/jsonld";
+import { breadcrumb, personAuthor } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";
 import PlatformAdoption from "@/components/field/PlatformAdoption";
 import CascadeSankey from "@/components/field/CascadeSankey";
@@ -53,10 +53,12 @@ export default async function FieldPage() {
       "Volume vs yield correlation, SNR separation, platform dominance, outlier detection. " +
       "Outliers separated via 6-signal outlier-likelihood score + input/total ratio analysis.",
     url: `${SITE_ORIGIN}/field`,
-    creator: { "@id": `${SITE_ORIGIN}/#org` },
+    creator: personAuthor(),
+    author: personAuthor(),
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
     isAccessibleForFree: true,
     license: "https://creativecommons.org/licenses/by/4.0/",
+    citation: "McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21876660",
     keywords: [
       "AI operator distribution",
       "token efficiency",
