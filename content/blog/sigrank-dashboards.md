@@ -17,7 +17,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 [2] 9-chart breakdown of the 10 build archetypes: distribution pie, yield bars, leverage bars, velocity bars, 4-pillar token composition, total tokens, tokens/day, SNR, and top platform per archetype. HCM cohort (1,586 operators).
 
-<iframe src="/dashboards/archetype-analytics.html" width="100%" height="2400" style="border:1px solid #332d20;border-radius:8px;margin:16px 0;" loading="lazy"></iframe>
+**[Open Archetype Analytics →](/dashboards/archetype-analytics.html)**
 
 ---
 
@@ -25,7 +25,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 [3] 6-chart experience-ladder distribution: tier pie, stage bars, token floor bars, token ceiling bars, stacked column by tier, tier population bars. 24 stages across 8 tiers, 1,627 operators.
 
-<iframe src="/dashboards/tier-ladder-analytics.html" width="100%" height="1800" style="border:1px solid #332d20;border-radius:8px;margin:16px 0;" loading="lazy"></iframe>
+**[Open Tier-Ladder Analytics →](/dashboards/tier-ladder-analytics.html)**
 
 ---
 
@@ -33,7 +33,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 [4] 10-chart cross-metric analysis: leverage vs yield scatter, archetype radar, yield bars + velocity line, construction vs leverage scatter, stacked composition + SNR overlay, metric heatmap (z-scores), tokens/day vs yield, family radar (4 workflow families), population vs yield sorted.
 
-<iframe src="/dashboards/cross-metric-analytics.html" width="100%" height="3200" style="border:1px solid #332d20;border-radius:8px;margin:16px 0;" loading="lazy"></iframe>
+**[Open Cross-Metric Analytics →](/dashboards/cross-metric-analytics.html)**
 
 ---
 
@@ -41,7 +41,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 [5] 9 scatterplots covering 1,598 operators across metric pairs: yield vs leverage, yield vs total tokens, velocity vs leverage, SNR vs leverage, input share vs yield, cache read % vs cache write %, tokens/day vs yield, active days vs yield, velocity vs SNR.
 
-<iframe src="/dashboards/operator-scatter.html" width="100%" height="2800" style="border:1px solid #332d20;border-radius:8px;margin:16px 0;" loading="lazy"></iframe>
+**[Open Operator Scatterplots →](/dashboards/operator-scatter.html)**
 
 ---
 
@@ -49,7 +49,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 [6] 17 platforms ranked by token volume. Three tables: raw token/cost stats, operator aggregate medians, and derived metrics (yield, SNR, leverage, velocity, compression, tokens/day).
 
-<iframe src="/dashboards/platform-board.html" width="100%" height="1600" style="border:1px solid #332d20;border-radius:8px;margin:16px 0;" loading="lazy"></iframe>
+**[Open Platform Board →](/dashboards/platform-board.html)**
 
 ---
 
@@ -57,7 +57,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 [7] 3,304 models ranked by adoption and token volume (top 100 shown). Two tables: by total token volume and by operator adoption count.
 
-<iframe src="/dashboards/model-board.html" width="100%" height="2200" style="border:1px solid #332d20;border-radius:8px;margin:16px 0;" loading="lazy"></iframe>
+**[Open Model Board →](/dashboards/model-board.html)**
 
 ---
 
