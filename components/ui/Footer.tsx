@@ -64,13 +64,35 @@ const FOOTER_COLUMNS: {
       { href: "/vs/braintrust", label: "vs Braintrust" },
       { href: "/vs/langchain", label: "vs LangChain" },
       { href: "/vs/langfuse", label: "vs Langfuse" },
+      { href: "/vs/tokscale", label: "vs Tokscale" },
+      { href: "/vs/mytokentracker", label: "vs mytokentracker" },
+      { href: "/vs/clawdboard", label: "vs clawdboard" },
+      { href: "/vs/tokenrank", label: "vs TokenRank" },
+      { href: "/vs/tokentracker", label: "vs Token Tracker" },
+      { href: "/vs/costhawk", label: "vs CostHawk" },
+    ],
+  },
+  {
+    heading: "Platforms",
+    headingHref: "/platforms",
+    links: [
+      { href: "/platforms", label: "All supported platforms" },
+      { href: "/platforms", label: "Claude Code" },
+      { href: "/platforms", label: "Codex CLI" },
+      { href: "/platforms", label: "Gemini CLI" },
+      { href: "/platforms", label: "Copilot CLI" },
+      { href: "/platforms", label: "OpenCode" },
+      { href: "/platforms", label: "Goose" },
+      { href: "/platforms", label: "Hermes Agent" },
+      { href: "/platforms", label: "OMP (Oh My Pi)" },
+      { href: "/platforms", label: "Devin" },
     ],
   },
   {
     heading: "Explore",
     links: [
       {
-        href: "https://sigarena.signalaf.com",
+        href: "https://sigeconomy.com",
         label: "AI User Leaderboard →",
       },
       {
@@ -150,7 +172,7 @@ export function Footer() {
         </div>
 
         {/* SEO link columns */}
-        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-7">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} className="flex flex-col gap-2">
               {col.headingHref ? (
