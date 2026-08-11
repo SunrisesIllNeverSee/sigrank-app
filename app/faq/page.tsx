@@ -42,7 +42,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Am I an AI power user?",
     answer:
-      "SigRank classifies operators into tiers (Burner, Builder, 10xer) based on yield and leverage. A 10xer is the AI power user archetype: high cache reuse, high output per input, disciplined token architecture. Check your class at /score.",
+      "SigRank classifies operators on two independent axes: build archetype (how you work) and class tier (how experienced you are). The 10 build archetypes include CONVERGENT, KINETIC, BUILDER, RECURSIVE, AMPLIFIER, INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, and ARCHIVIST. The 8-tier experience ladder runs from ARCH+ (deepest field experience) down to IGNITER (just starting). A power user is typically an ARCH or POWER tier operator with a compounding archetype like AMPLIFIER or CONVERGENT. Check your archetype and tier at /score.",
   },
   {
     question: "What is token cascade efficiency?",
@@ -68,6 +68,26 @@ const FAQS: { question: string; answer: string }[] = [
     question: "How is SigRank different from token-count leaderboards?",
     answer:
       "Token-count leaderboards (clawdboard, CCgather, TrustMRT) rank by how many tokens you burned or dollars you spent — they measure the tool, not the person. SigRank ranks by yield (Υ = cache_read × output / input²), which measures how efficiently you use the tool. It's the difference between ranking hammers by how many nails they hit and ranking carpenters by what they built.",
+  },
+  {
+    question: "What are ccusage alternatives?",
+    answer:
+      "ccusage shows your token usage and cost. SigRank scores your token efficiency. ccusage tells you how much you spent; SigRank tells you how well you spent it. Other alternatives include tokentracker.cc (desktop widgets), aiusage (local tracker), toktrack (Rust cache tracker), and a2zusage (multi-model tracker). SigRank is the only one that measures cascade efficiency and provides a public leaderboard. See /alternatives/ccusage-alternatives for the full comparison.",
+  },
+  {
+    question: "How is SigRank different from LMSYS Arena or LiveBench?",
+    answer:
+      "LMSYS Arena and LiveBench benchmark AI models. SigRank benchmarks AI operators — the humans using the models. Model leaderboards ask 'which model is best?' SigRank asks 'who uses AI best?' They measure different things: model leaderboards measure task completion accuracy; SigRank measures token cascade efficiency. See /vs/lmsys-arena for the full comparison.",
+  },
+  {
+    question: "What are the 10 build archetypes?",
+    answer:
+      "SigRank classifies every operator into one of 10 build archetypes based on three ratios: leverage (cache_read / input), velocity (output / input), and construction (cache_write / cache_read). The 10 archetypes across 4 families are: Convergence (CONVERGENT), Generation (KINETIC), Reuse Depth (INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, ARCHIVIST), and Active Construction (BUILDER, RECURSIVE, AMPLIFIER). Your archetype describes how you work, not how much. See /wiki for the full reference.",
+  },
+  {
+    question: "What is the experience ladder?",
+    answer:
+      "The experience ladder is an 8-tier qualification system separate from archetype. From deepest experience to newest: ARCH+, ARCH, POWER, BASE, SEEKER, REFINER, BEARER, IGNITER. Each tier has 3 sub-stages (I/II/III), making 24 stages total. TRANSMITTER is a temporary peak badge, not a ladder tier. Your tier is recomputed every scoring window based on accumulated token volume. See /wiki for the full reference.",
   },
 ];
 

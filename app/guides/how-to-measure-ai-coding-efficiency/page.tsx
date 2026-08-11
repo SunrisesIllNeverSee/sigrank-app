@@ -100,6 +100,11 @@ export default function HowToMeasureAICodingEfficiencyPage() {
               answer:
                 "Install the sigrank CLI (npm: sigrank), which bundles ccusage for local Claude Code log parsing, tokscale for token scaling, and token-dashboard for visualization. Alternatively, use `npx sigrank` without a global install, or paste your ccusage JSON into the /score calculator.",
             },
+            {
+              question: "What are build archetypes and class tiers?",
+              answer:
+                "SigRank classifies operators on two independent axes. Build archetype (how you work) is one of 10 types: CONVERGENT, KINETIC, BUILDER, RECURSIVE, AMPLIFIER, INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, ARCHIVIST. Class tier (how experienced you are) is one of 8 levels: ARCH+, ARCH, POWER, BASE, SEEKER, REFINER, BEARER, IGNITER. An experienced operator can have a non-compounding archetype, and a new operator can have a compounding one. Both are recomputed every scoring window.",
+            },
           ]),
           howTo,
         ]}
@@ -222,6 +227,57 @@ export default function HowToMeasureAICodingEfficiencyPage() {
           the SigRank leaderboard push well into six figures. Your class tier
           (IGNITER → BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+) is assigned from your yield
           and the cascade shape.
+        </p>
+      </section>
+
+      {/* ── Your archetype and tier ─────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Your archetype and tier
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Yield is the headline number, but SigRank also classifies you on two
+          independent axes:
+        </p>
+        <div className="flex flex-col gap-3">
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              Build archetype (how you work)
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              10 archetypes across 4 families: Convergence (CONVERGENT),
+              Generation (KINETIC), Reuse Depth (INPUT-BOUND, PRIMING,
+              CONTEXTUAL, DEEP READER, ARCHIVIST), and Active Construction
+              (BUILDER, RECURSIVE, AMPLIFIER). Your archetype is derived from
+              three ratios: leverage, velocity, and construction. It describes
+              the shape of your cascade, not how much you burned.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              Class tier (how experienced you are)
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              8 tiers from IGNITER (just starting) to ARCH+ (deepest field
+              experience). Each tier has 3 sub-stages (I/II/III). TRANSMITTER is
+              a temporary peak badge, not a ladder tier. Your tier is recomputed
+              every scoring window based on accumulated token volume.
+            </p>
+          </div>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The two axes are independent. An experienced operator (ARCH+) can be
+          INPUT-BOUND (deep experience but currently burning fresh input). A new
+          operator (IGNITER) can be an AMPLIFIER (new but already compounding
+          cache). Measuring both gives a richer picture than either alone. See
+          the{" "}
+          <Link
+            href="/wiki"
+            className="text-gold underline underline-offset-2"
+          >
+            wiki
+          </Link>{" "}
+          for the full archetype and tier reference.
         </p>
       </section>
 
