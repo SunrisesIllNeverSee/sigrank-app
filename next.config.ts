@@ -67,6 +67,26 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Dashboards use Chart.js from CDN — allow jsdelivr in script-src
+        source: "/dashboards/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.vercel-scripts.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https:",
+              "font-src 'self' data:",
+              "connect-src 'self'",
+              "frame-ancestors 'self'",
+            ].join("; "),
+          },
+        ],
+      },
     ];
   },
   // Note (owner 2026-06-22): the /operators → /leaderboard + /user redirects were REMOVED
