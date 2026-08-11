@@ -112,13 +112,6 @@ Transmission × commitment × reuse = leverage. The intermediate terms cancel. T
 
 [21] But the leaderboard is not the product. The product is the **operator-evaluation standard**: the methodology, the metrics, the signed telemetry protocol, and the verification battery that make operator performance measurable and comparable. The leaderboard demonstrates that the measurement system can operate on a real field — collection works, derivation works, comparison works, ranking can be instantiated. It does not yet demonstrate construct validity. That requires external outcome validation, which is the first item on the research roadmap.
 
-**Interactive dashboards** (embedded data, Chart.js CDN):
-
-- [Archetype Analytics](/field#archetype-dashboard) — 9-chart breakdown of the 10 build archetypes
-- [Tier-Ladder Analytics](/field#tier-dashboard) — 6-chart experience-ladder distribution
-- [Cross-Metric Analytics](/field#cross-metric-dashboard) — yield vs leverage vs velocity vs SNR
-- [Operator Scatterplots](/field#operator-scatter) — 1,598 operators across 9 metric pairs
-
 [22] The strategic path:
 
 ```

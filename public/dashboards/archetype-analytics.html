@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SigRank — Build Archetype Analytics (Finalized)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; color: #f0c862; }
+  h2 { font-size: 1.2rem; font-weight: 600; margin: 32px 0 12px; color: #6e8a6e; }
+  .subtitle { color: #6e8a6e; font-size: 0.9rem; margin-bottom: 24px; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label { font-size: 0.7rem; color: #6e8a6e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .stat-card .value { font-size: 1.5rem; font-weight: 700; color: #f0c862; }
+  .stat-card .sub { font-size: 0.75rem; color: #6e8a6e; margin-top: 2px; }
+
+  .chart-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-title { font-size: 0.9rem; font-weight: 600; color: #6e8a6e; margin-bottom: 12px; }
+  .chart-wrap { position: relative; height: 320px; }
+  .chart-wrap.tall { height: 420px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  table th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 2px solid #222;
+    color: #6e8a6e;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+  table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #1a1a1a;
+    color: #c4c4c4;
+  }
+  table td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Fira Code', monospace; }
+  table tr:hover td { background: #0a0a0a; }
+
+  .arch-color { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  .family-tag { display: inline-block; font-size: 0.65rem; background: #1a1a1a; color: #6e8a6e; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+  .comp-bar { display: flex; height: 8px; width: 80px; overflow: hidden; border-radius: 2px; }
+  .comp-bar > div { height: 100%; }
+
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #222; color: #6e8a6e; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>SigRank — Build Archetype Analytics</h1>
+  <p class="subtitle">When the field is filtered by composition type, the yield spreads 9,000x and leverage spreads 133x · 1,586 operators (HCM) · Generated 2026-08-10</p>
+
+  <!-- Summary stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Yield spread</div>
+      <div class="value">9,000x</div>
+      <div class="sub">0.05 (INPUT-BOUND) → 469 (KINETIC)</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Leverage spread</div>
+      <div class="value">133x</div>
+      <div class="sub">2.7x (INPUT-BOUND) → 361x (KINETIC)</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Fresh input range</div>
+      <div class="value">0.4% → 26.6%</div>
+      <div class="sub">CONVERGENT vs INPUT-BOUND</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Field separates into</div>
+      <div class="value">10 types</div>
+      <div class="sub">4 families · deterministic filter</div>
+    </div>
+  </div>
+
+  <!-- Chart 1: Distribution pie -->
+  <h2>Archetype Distribution</h2>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Operators per Archetype</div>
+      <div class="chart-wrap"><canvas id="distPie"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Median Yield (Υ) per Archetype (log scale)</div>
+      <div class="chart-wrap"><canvas id="yieldBar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Median leverage + velocity -->
+  <h2>Leverage & Velocity</h2>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Median Leverage per Archetype (log scale)</div>
+      <div class="chart-wrap"><canvas id="levBar"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Median Velocity per Archetype (log scale)</div>
+      <div class="chart-wrap"><canvas id="velBar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Token composition stacked bars -->
+  <h2>Token Composition (4-Pillar Breakdown)</h2>
+  <div class="chart-box">
+    <div class="chart-title">Median token composition: Input / Output / Cache Read / Cache Write (%)</div>
+    <div class="chart-wrap tall"><canvas id="compositionBar"></canvas></div>
+  </div>
+
+  <!-- Chart 4: Tokens per day -->
+  <h2>Activity Level</h2>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Median Total Tokens (log scale)</div>
+      <div class="chart-wrap"><canvas id="tokensBar"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Median Tokens Per Day (log scale)</div>
+      <div class="chart-wrap"><canvas id="tpdBar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart 5: SNR -->
+  <h2>Signal Quality</h2>
+  <div class="chart-box">
+    <div class="chart-title">Median SNR (signal-to-noise ratio) per Archetype</div>
+    <div class="chart-wrap"><canvas id="snrBar"></canvas></div>
+  </div>
+
+  <!-- Chart 6: Platform distribution -->
+  <h2>Top Platform per Archetype</h2>
+  <div class="chart-box">
+    <div class="chart-title">Dominant platform for each archetype</div>
+    <div class="chart-wrap"><canvas id="platformBar"></canvas></div>
+  </div>
+
+  <!-- Full data table -->
+  <h2>Full Archetype Data Table</h2>
+  <div class="chart-box" style="padding: 12px; overflow-x: auto;">
+    <table id="archTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Family</th>
+          <th class="num">N</th>
+          <th class="num">%</th>
+          <th class="num">Yield Υ</th>
+          <th class="num">Leverage</th>
+          <th class="num">Velocity</th>
+          <th class="num">SNR</th>
+          <th class="num">Tokens (med)</th>
+          <th class="num">Tok/Day</th>
+          <th>Platform</th>
+          <th>Composition</th>
+        </tr>
+      </thead>
+      <tbody id="archTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Methodology -->
+  <h2>Methodology</h2>
+  <div class="chart-box" style="padding: 16px;">
+    <p style="color: #6e8a6e; font-size: 0.85rem; line-height: 1.6;">
+      <strong style="color: #f0c862;">Method:</strong> deterministic_build_archetypes — no clustering, no randomness<br><br>
+      <strong style="color: #f0c862;">Classification:</strong> Each operator is classified into one of 10 build archetypes based on three derived dimensions of their token cascade:<br>
+      &nbsp;&nbsp;<strong>Leverage</strong> = cache_read / input (how much you reuse vs fresh input)<br>
+      &nbsp;&nbsp;<strong>Velocity</strong> = output / input (how much you generate vs take in)<br>
+      &nbsp;&nbsp;<strong>Construction</strong> = cache_write / cache_read (how much new context you build per read)<br><br>
+      <strong style="color: #f0c862;">Precedence (first match wins):</strong><br>
+      &nbsp;&nbsp;1. <strong>CONVERGENT</strong> — P80 on all 3 axes (leverage ≥ 74.6, velocity ≥ 0.34, construction ≥ 0.043)<br>
+      &nbsp;&nbsp;2. <strong>KINETIC</strong> — velocity ≥ 0.80<br>
+      &nbsp;&nbsp;3. <strong>Construction branch</strong> — construction ≥ 0.02 (BUILDER / RECURSIVE / AMPLIFIER by leverage)<br>
+      &nbsp;&nbsp;4. <strong>Reuse depth branch</strong> — else (INPUT-BOUND / PRIMING / CONTEXTUAL / DEEP READER / ARCHIVIST by leverage)<br><br>
+      <strong style="color: #f0c862;">Source:</strong> <code style="color: #7c3aed;">public/data/archetypes.json</code> generated by <code style="color: #7c3aed;">scripts/gen-build-archetypes.mjs</code> from <code style="color: #7c3aed;">public/data/field-analysis.json</code><br>
+      <strong style="color: #f0c862;">Population:</strong> human_center_of_mass (1,627 total, 1,586 HCM, outliers excluded)<br>
+      <strong style="color: #f0c862;">Replaces:</strong> Previous 8 K-Means archetypes (silhouette 0.544/0.377) — now deterministic with clear definitions
+    </p>
+  </div>
+
+  <div class="footer">
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Citation</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;line-height:1.6;">
+        McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. <a href="https://doi.org/10.5281/zenodo.21876660" style="color:#f0c862;text-decoration:none">https://doi.org/10.5281/zenodo.21876660</a>
+      </span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Concept DOI</strong> <span style="color:#6e8a6e;font-size:0.75rem">(resolves to latest version)</span><br>
+      <a href="https://doi.org/10.5281/zenodo.21875675" style="color:#f0c862;text-decoration:none;font-size:0.8rem">https://doi.org/10.5281/zenodo.21875675</a>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Author</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;">
+        Deric J. McHenry &middot; ORCID <a href="https://orcid.org/0009-0002-9904-5390" style="color:#f0c862;text-decoration:none">0009-0002-9904-5390</a><br>
+        SigRank &middot; <a href="https://signalaf.com" style="color:#f0c862;text-decoration:none">signalaf.com</a> &middot; <a href="https://mos2es.com" style="color:#f0c862;text-decoration:none">MO&sect;ES&trade;</a> &middot; @burnmydays
+      </span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">License</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;">Creative Commons Attribution 4.0 International (<a href="https://creativecommons.org/licenses/by/4.0/" style="color:#f0c862;text-decoration:none">CC-BY 4.0</a>)</span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">BibTeX</strong><br>
+      <code style="color:#6e8a6e;font-size:0.7rem;display:block;white-space:pre-wrap;background:#0a0a0a;padding:8px;border-radius:4px;margin-top:4px;">@dataset{mchenry2026sigrank,
+  author       = {McHenry, Deric J.},
+  title        = {{SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0)}},
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {3.0},
+  doi          = {10.5281/zenodo.21876660},
+  url          = {https://doi.org/10.5281/zenodo.21876660}
+}</code>
+    </div>
+    <div style="margin-top:8px;color:#555;font-size:0.7rem;">SigRank Build Archetype Analytics · 10 deterministic archetypes · 1,586 operators · Generated 2026-08-10</div>
+  </div>
+</div>
+
+<script>
+const ARCH_COLORS = {
+  "CONVERGENT":   "#7c3aed",
+  "KINETIC":      "#dc2626",
+  "INPUT-BOUND":  "#2563eb",
+  "PRIMING":      "#3b82f6",
+  "CONTEXTUAL":   "#06b6d4",
+  "DEEP READER":  "#10b981",
+  "ARCHIVIST":    "#059669",
+  "BUILDER":      "#f59e0b",
+  "RECURSIVE":    "#d97706",
+  "AMPLIFIER":    "#b45309",
+};
+
+const PILLAR_COLORS = {
+  input:       "#2563eb",
+  output:      "#f97316",
+  cache_read:  "#7c3aed",
+  cache_write: "#10b981",
+};
+
+const ARCHETYPES = [
+  {id:0,name:"CONVERGENT",family:"Convergence",n:104,yield_med:257.3,lev_med:245.34,vel_med:1.049,snr_med:0.5119,input_pct:0.0038,output_pct:0.0046,cache_read_pct:0.9314,cache_write_pct:0.0581,tokens_med:2302501447,tokens_per_day_med:46454363,platform:"anthropic"},
+  {id:1,name:"KINETIC",family:"Generation",n:113,yield_med:469.35,lev_med:361.48,vel_med:1.52,snr_med:0.6032,input_pct:0.0027,output_pct:0.0043,cache_read_pct:0.9646,cache_write_pct:0.0285,tokens_med:3822057631,tokens_per_day_med:72125262,platform:"anthropic"},
+  {id:2,name:"INPUT-BOUND",family:"Reuse Depth",n:108,yield_med:0.05,lev_med:2.71,vel_med:0.019,snr_med:0.0191,input_pct:0.2662,output_pct:0.0051,cache_read_pct:0.7251,cache_write_pct:0.0028,tokens_med:2534210568,tokens_per_day_med:36852303,platform:"openai"},
+  {id:3,name:"PRIMING",family:"Reuse Depth",n:149,yield_med:0.32,lev_med:7.7,vel_med:0.042,snr_med:0.0407,input_pct:0.1142,output_pct:0.0049,cache_read_pct:0.875,cache_write_pct:0.002,tokens_med:3073048797,tokens_per_day_med:40553036,platform:"openai"},
+  {id:4,name:"CONTEXTUAL",family:"Reuse Depth",n:186,yield_med:0.84,lev_med:12.68,vel_med:0.066,snr_med:0.0618,input_pct:0.0718,output_pct:0.0047,cache_read_pct:0.9152,cache_write_pct:0.0028,tokens_med:4546157293,tokens_per_day_med:49949919,platform:"openai"},
+  {id:5,name:"DEEP READER",family:"Reuse Depth",n:169,yield_med:1.52,lev_med:18.45,vel_med:0.081,snr_med:0.075,input_pct:0.0512,output_pct:0.0041,cache_read_pct:0.9387,cache_write_pct:0.0032,tokens_med:7963011233,tokens_per_day_med:95717721,platform:"openai"},
+  {id:6,name:"ARCHIVIST",family:"Reuse Depth",n:186,yield_med:3.54,lev_med:29.81,vel_med:0.124,snr_med:0.11,input_pct:0.0319,output_pct:0.0035,cache_read_pct:0.9555,cache_write_pct:0.0113,tokens_med:16628211938,tokens_per_day_med:172789367,platform:"openai"},
+  {id:7,name:"BUILDER",family:"Active Construction",n:278,yield_med:1.12,lev_med:13.71,vel_med:0.077,snr_med:0.0715,input_pct:0.0651,output_pct:0.005,cache_read_pct:0.8883,cache_write_pct:0.0304,tokens_med:4010020161,tokens_per_day_med:44996605,platform:"anthropic"},
+  {id:8,name:"RECURSIVE",family:"Active Construction",n:132,yield_med:7.23,lev_med:38.86,vel_med:0.191,snr_med:0.1602,input_pct:0.0237,output_pct:0.0047,cache_read_pct:0.9321,cache_write_pct:0.0374,tokens_med:6690606496,tokens_per_day_med:79628677,platform:"anthropic"},
+  {id:9,name:"AMPLIFIER",family:"Active Construction",n:161,yield_med:26.53,lev_med:77.23,vel_med:0.329,snr_med:0.2474,input_pct:0.0122,output_pct:0.0038,cache_read_pct:0.9525,cache_write_pct:0.0318,tokens_med:6553771279,tokens_per_day_med:92702442,platform:"anthropic"},
+];
+
+const TOTAL = 1586;
+
+function fmt(v) {
+  if (v === null || v === undefined) return "—";
+  if (v >= 1e12) return (v/1e12).toFixed(2)+"T";
+  if (v >= 1e9) return (v/1e9).toFixed(2)+"B";
+  if (v >= 1e6) return (v/1e6).toFixed(1)+"M";
+  if (v >= 1e3) return Math.round(v/1e3)+"K";
+  return v.toFixed(2);
+}
+
+function colorFor(name) { return ARCH_COLORS[name] ?? "#3b82f6"; }
+
+// Sort by archetype_id (classification order)
+const sorted = [...ARCHETYPES].sort((a, b) => a.id - b.id);
+
+const labels = sorted.map(a => a.name);
+const colors = sorted.map(a => colorFor(a.name));
+
+// === Chart 1: Distribution pie ===
+new Chart(document.getElementById("distPie"), {
+  type: "doughnut",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.n), backgroundColor: colors, borderColor: "#111", borderWidth: 2 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "right", labels: { color: "#6e8a6e", font: { size: 10 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: c => ` ${c.label}: ${c.raw} (${(c.raw/TOTAL*100).toFixed(1)}%)` } }
+    }
+  }
+});
+
+// === Chart 2: Yield bar (log) ===
+new Chart(document.getElementById("yieldBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.yield_med > 0 ? a.yield_med : 0.001), backgroundColor: colors, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e" }, grid: { color: "#222" } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` Median Υ: ${c.raw < 0.01 ? 0 : c.raw.toFixed(2)}` } } }
+  }
+});
+
+// === Chart 3: Leverage bar (log) ===
+new Chart(document.getElementById("levBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.lev_med > 0 ? a.lev_med : 0.001), backgroundColor: colors, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e" }, grid: { color: "#222" } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` Median Leverage: ${c.raw.toFixed(2)}x` } } }
+  }
+});
+
+// === Chart 4: Velocity bar (log) ===
+new Chart(document.getElementById("velBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.vel_med > 0 ? a.vel_med : 0.001), backgroundColor: colors, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e" }, grid: { color: "#222" } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` Median Velocity: ${c.raw.toFixed(3)}` } } }
+  }
+});
+
+// === Chart 5: Composition stacked bar ===
+new Chart(document.getElementById("compositionBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [
+      { label: "Input",      data: sorted.map(a => a.input_pct * 100),       backgroundColor: PILLAR_COLORS.input },
+      { label: "Output",     data: sorted.map(a => a.output_pct * 100),      backgroundColor: PILLAR_COLORS.output },
+      { label: "Cache Read", data: sorted.map(a => a.cache_read_pct * 100),  backgroundColor: PILLAR_COLORS.cache_read },
+      { label: "Cache Write",data: sorted.map(a => a.cache_write_pct * 100), backgroundColor: PILLAR_COLORS.cache_write },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { stacked: true, ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { stacked: true, max: 100, ticks: { color: "#6e8a6e", callback: v => v + "%" }, grid: { color: "#222" } }
+    },
+    plugins: {
+      legend: { position: "right", labels: { color: "#6e8a6e", font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.raw.toFixed(1)}%` } }
+    }
+  }
+});
+
+// === Chart 6: Tokens median (log) ===
+new Chart(document.getElementById("tokensBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.tokens_med), backgroundColor: colors, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e", callback: v => fmt(v) }, grid: { color: "#222" } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` Median: ${fmt(c.raw)}` } } }
+  }
+});
+
+// === Chart 7: Tokens per day (log) ===
+new Chart(document.getElementById("tpdBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.tokens_per_day_med), backgroundColor: colors, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e", callback: v => fmt(v) }, grid: { color: "#222" } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` Per day: ${fmt(c.raw)}` } } }
+  }
+});
+
+// === Chart 8: SNR bar ===
+new Chart(document.getElementById("snrBar"), {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{ data: sorted.map(a => a.snr_med), backgroundColor: colors, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { ticks: { color: "#6e8a6e" }, grid: { color: "#222" } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` Median SNR: ${c.raw.toFixed(4)}` } } }
+  }
+});
+
+// === Chart 9: Platform bar ===
+new Chart(document.getElementById("platformBar"), {
+  type: "bar",
+  data: {
+    labels: sorted.map(a => a.name),
+    datasets: [{
+      label: "Operators",
+      data: sorted.map(a => a.n),
+      backgroundColor: sorted.map(a => a.platform === "anthropic" ? "#7c3aed" : "#2563eb"),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: "#222" } },
+      y: { ticks: { color: "#6e8a6e" }, grid: { color: "#222" } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` ${c.raw} operators · top platform: ${sorted[c.dataIndex].platform}` } }
+    }
+  }
+});
+
+// === Full data table ===
+const archBody = document.getElementById("archTableBody");
+ARCHETYPES.forEach(a => {
+  const pct = (a.n / TOTAL * 100).toFixed(1);
+  const color = colorFor(a.name);
+  const compBar = `
+    <div class="comp-bar" title="In:${(a.input_pct*100).toFixed(1)}% Out:${(a.output_pct*100).toFixed(1)}% CR:${(a.cache_read_pct*100).toFixed(1)}% CW:${(a.cache_write_pct*100).toFixed(1)}%">
+      <div style="width:${a.input_pct*100}%;background:#2563eb"></div>
+      <div style="width:${a.output_pct*100}%;background:#f97316"></div>
+      <div style="width:${a.cache_read_pct*100}%;background:#7c3aed"></div>
+      <div style="width:${a.cache_write_pct*100}%;background:#10b981"></div>
+    </div>
+  `;
+  archBody.innerHTML += `
+    <tr>
+      <td>${a.id}</td>
+      <td><span class="arch-color" style="background:${color}"></span>${a.name}</td>
+      <td><span class="family-tag">${a.family}</span></td>
+      <td class="num">${a.n}</td>
+      <td class="num">${pct}%</td>
+      <td class="num">${a.yield_med.toFixed(2)}</td>
+      <td class="num">${a.lev_med.toFixed(1)}x</td>
+      <td class="num">${a.vel_med.toFixed(3)}</td>
+      <td class="num">${a.snr_med.toFixed(4)}</td>
+      <td class="num">${fmt(a.tokens_med)}</td>
+      <td class="num">${fmt(a.tokens_per_day_med)}</td>
+      <td>${a.platform}</td>
+      <td>${compBar}</td>
+    </tr>
+  `;
+});
+</script>
+</body>
+</html>
