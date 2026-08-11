@@ -117,6 +117,19 @@ const markdownComponents: Components = {
       />
     );
   },
+  iframe: ({ src, width, height, style, loading }) => {
+    if (!src || typeof src !== "string") return null;
+    return (
+      <iframe
+        src={src}
+        width={width ?? "100%"}
+        height={height ?? "600"}
+        style={style ? { border: "1px solid #332d20", borderRadius: "8px", margin: "16px 0" } : undefined}
+        loading={loading ?? "lazy"}
+        title="SigRank dashboard"
+      />
+    );
+  },
 };
 
 export default async function BlogPost({
