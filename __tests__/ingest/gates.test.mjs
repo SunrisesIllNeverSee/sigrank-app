@@ -70,11 +70,11 @@ function plausibilityGate(p) {
   return out;
 }
 
-/** Faithful port of runIngestGates decision aggregation (plausibility-only here). */
+/** Faithful port of runIngestGates decision aggregation (plausibility-only here).
+ * Flags are INTERNAL SIGNALS — they do NOT change the decision. Only rejects block. */
 function decisionOf(reasons) {
   const hasReject = reasons.some((r) => r[1] === "reject");
-  const hasFlag = reasons.some((r) => r[1] === "flag");
-  return hasReject ? "reject" : hasFlag ? "flag" : "accept";
+  return hasReject ? "reject" : "accept";
 }
 
 const codes = (reasons) => reasons.map((r) => r[0]);
@@ -151,8 +151,8 @@ test("implausible output rate (huge output, tiny active minutes) → flag", () =
     }),
   );
   assert.ok(codes(r).includes("implausible_output_rate"));
-  // flag (not reject) when totals stay consistent — a degraded, accepted-but-flagged submission
-  assert.equal(decisionOf(r), "flag");
+  // flag is recorded as a signal but does NOT block — decision stays "accept"
+  assert.equal(decisionOf(r), "accept");
 });
 
 test("active minutes exceed the window span → flag active_exceeds_window", () => {
@@ -174,7 +174,7 @@ test("cache_read > 1000 with cache_creation = 0 → flag cache_without_creation"
     }),
   );
   assert.ok(codes(r).includes("cache_without_creation"));
-  assert.equal(decisionOf(r), "flag");
+  assert.equal(decisionOf(r), "accept");
 });
 
 test("cache_read/cache_creation > 100:1 → flag extreme_cache_ratio", () => {
@@ -184,7 +184,7 @@ test("cache_read/cache_creation > 100:1 → flag extreme_cache_ratio", () => {
     }),
   );
   assert.ok(codes(r).includes("extreme_cache_ratio"));
-  assert.equal(decisionOf(r), "flag");
+  assert.equal(decisionOf(r), "accept");
 });
 
 test("turns/active_minutes > 50 → flag implausible_cadence", () => {
@@ -194,5 +194,5 @@ test("turns/active_minutes > 50 → flag implausible_cadence", () => {
     }),
   );
   assert.ok(codes(r).includes("implausible_cadence"));
-  assert.equal(decisionOf(r), "flag");
+  assert.equal(decisionOf(r), "accept");
 });

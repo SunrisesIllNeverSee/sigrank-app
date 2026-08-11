@@ -394,14 +394,16 @@ export function runIngestGates(
     if (b.signals) Object.assign(signals, b.signals);
   }
 
+  // Flags are INTERNAL SIGNALS, not blockers. They are recorded in `reasons`
+  // (and surfaced to PostHog + email alerts by the route) for review, but they
+  // do NOT downgrade the tier or prevent the submission from materializing to
+  // the board. Only `reject` severity blocks. This was the original intent —
+  // the plausibility gate comments say "flag, not reject (avoids false positives
+  // on power users)" — but the old wiring upgraded flags to effective rejects,
+  // silently dropping 313 legitimate submissions (including 3 users who tried
+  // 184+24+8 times and gave up).
   const hasReject = reasons.some((r) => r.severity === "reject");
-  const hasFlag = reasons.some((r) => r.severity === "flag");
-  const decision: GateDecision = hasReject
-    ? "reject"
-    : hasFlag
-      ? "flag"
-      : "accept";
-  if (hasFlag && tier === "verified") tier = "flagged";
+  const decision: GateDecision = hasReject ? "reject" : "accept";
 
   return { decision, tier, reasons, signals };
 }
