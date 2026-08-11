@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Don't 308-redirect /ingest → /ingest/ ; PostHog ingestion paths are exact.
   skipTrailingSlashRedirect: true,
+  // Include content/blog/ in serverless function file tracing so ISR
+  // revalidation of /blog can read markdown files at runtime.
+  outputFileTracingIncludes: {
+    "/blog": ["./content/blog/**/*"],
+    "/blog/[slug]": ["./content/blog/**/*"],
+  },
   // Analytics reverse proxy: the browser POSTs to signalaf.com/ingest (same origin)
   // and Next forwards to PostHog cloud — survives ad-blockers, no third-party domain.
   async rewrites() {
