@@ -31,7 +31,7 @@ async function getPost(slug: string) {
       frontmatter: data as {
         title?: string;
         description?: string;
-        timestamp?: string;
+        timestamp?: string | Date;
         author?: string;
         tags?: string[];
         hero?: string;
