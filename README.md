@@ -21,6 +21,8 @@ Most platforms reward volume. SigRank rewards structure.
 [![E2E](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/e2e.yml)
 [![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
 [![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold&label=sigrank)](https://www.npmjs.com/package/sigrank)
+[![npm downloads](https://img.shields.io/npm/dm/sigrank.svg?style=flat-square&color=blue&label=npm%20downloads)](https://www.npmjs.com/package/sigrank)
+[![GitHub stars](https://img.shields.io/github/stars/SunrisesIllNeverSee/sigrank-app.svg?style=flat-square&color=yellow&label=%E2%98%85%20stars)](https://github.com/SunrisesIllNeverSee/sigrank-app/stargazers)
 [![deploy](https://img.shields.io/badge/deploy-Vercel-black.svg?style=flat-square)](https://vercel.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg?style=flat-square)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev)
@@ -33,6 +35,8 @@ Most platforms reward volume. SigRank rewards structure.
 
 <p align="center">
   <a href="https://www.npmjs.com/package/sigrank"><img src="https://img.shields.io/badge/$%20npx%20sigrank-gold?style=for-the-badge&logo=npm&logoColor=white&labelColor=1a1a1a&color=daa520" alt="npx sigrank" /></a>
+  &nbsp;
+  <a href="https://github.com/SunrisesIllNeverSee/sigrank-app/stargazers"><img src="https://img.shields.io/badge/★%20Star%20this%20repo-yellow?style=for-the-badge&logo=github&labelColor=1a1a1a" alt="Star this repo" /></a>
 </p>
 
 ## Table of Contents
