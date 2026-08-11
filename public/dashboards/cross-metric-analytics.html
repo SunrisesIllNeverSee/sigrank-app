@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SigRank Cross-Metric Analytics · Divergences & Convergences</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-radial@2.0.0/dist/chartjs-chart-radial.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; color: #f0c862; }
+  h2 { font-size: 1.2rem; font-weight: 600; margin: 32px 0 12px; color: #6e8a6e; }
+  .subtitle { color: #6e8a6e; font-size: 0.9rem; margin-bottom: 24px; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label { font-size: 0.7rem; color: #6e8a6e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .stat-card .value { font-size: 1.5rem; font-weight: 700; color: #f0c862; }
+  .stat-card .sub { font-size: 0.75rem; color: #6e8a6e; margin-top: 2px; }
+
+  .chart-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-title { font-size: 0.9rem; font-weight: 600; color: #6e8a6e; margin-bottom: 4px; }
+  .chart-desc { font-size: 0.75rem; color: #555; margin-bottom: 12px; line-height: 1.4; }
+  .chart-wrap { position: relative; height: 380px; }
+  .chart-wrap.tall { height: 500px; }
+  .chart-wrap.radar { height: 450px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .insight-box {
+    background: #111;
+    border: 1px solid #222;
+    border-left: 3px solid #f0c862;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .insight-box .insight-label { font-size: 0.65rem; color: #f0c862; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .insight-box p { font-size: 0.82rem; color: #c4c4c4; line-height: 1.5; }
+
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #222; color: #6e8a6e; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Cross-Metric Analytics</h1>
+  <p class="subtitle">Divergences & convergences across the 10 build archetypes · multi-metric combined charts · 1,586 HCM operators · 2026-08-10</p>
+
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Yield spread</div>
+      <div class="value">4,694×</div>
+      <div class="sub">KINETIC vs INPUT-BOUND median Υ</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Leverage spread</div>
+      <div class="value">134×</div>
+      <div class="sub">KINETIC vs INPUT-BOUND median L</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Velocity convergence</div>
+      <div class="value">0.04–0.12</div>
+      <div class="sub">6 of 10 archetypes cluster here</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Cache read dominance</div>
+      <div class="value">88–96%</div>
+      <div class="sub">All archetypes are cache-read heavy</div>
+    </div>
+  </div>
+
+  <!-- Insight: the big divergence -->
+  <div class="insight-box">
+    <div class="insight-label">Key divergence</div>
+    <p>The field splits on <strong>leverage</strong>, not velocity. 6 of 10 archetypes have velocity between 0.04 and 0.12 — they all generate at similar rates. What separates them is how much they reuse: INPUT-BOUND reads 2.7× its input in cache; ARCHIVIST reads 30×; KINETIC reads 362×. Yield compounds this gap multiplicatively, producing a 4,694× spread from the same basic operating tempo.</p>
+  </div>
+
+  <!-- 1. Scatter: Leverage vs Yield (log-log, colored by family) -->
+  <h2>1. Leverage vs Yield — the compounding scatter</h2>
+  <div class="chart-box">
+    <div class="chart-title">Median leverage vs median yield per archetype (log-log)</div>
+    <div class="chart-desc">Each dot is an archetype. Bubble size = operator count. Color = family. The relationship is near-linear on log-log — yield is leverage compounding on velocity. The outliers tell the story: KINETIC sits above the line (high velocity amplifies), INPUT-BOUND sits below (zero leverage kills yield even at low velocity).</div>
+    <div class="chart-wrap"><canvas id="scatterLevYield"></canvas></div>
+  </div>
+
+  <!-- 2. Radar: 4 archetype profiles overlaid -->
+  <h2>2. Archetype radar — four workflow signatures</h2>
+  <div class="chart-box">
+    <div class="chart-title">Normalized metric profiles: CONVERGENT vs KINETIC vs AMPLIFIER vs INPUT-BOUND</div>
+    <div class="chart-desc">Six axes, each normalized to the field max. CONVERGENT and KINETIC are broad (everything elevated). AMPLIFIER is the "reuse specialist" — high leverage + construction but moderate velocity. INPUT-BOUND collapses to near-zero on every axis except input share — the "fresh input burner" signature.</div>
+    <div class="chart-wrap radar"><canvas id="radarArchetypes"></canvas></div>
+  </div>
+
+  <!-- 3. Combined bar+line: Yield (bars) + Velocity (line) per archetype -->
+  <h2>3. Yield bars + Velocity line — where velocity diverges from yield</h2>
+  <div class="chart-box">
+    <div class="chart-title">Median yield (bars, log scale) with median velocity overlaid (line)</div>
+    <div class="chart-desc">Yield and velocity tell different stories. KINETIC has the highest yield AND the highest velocity — it's the "transmission monster." But RECURSIVE has 7.2 yield with only 0.19 velocity — it earns yield through leverage, not speed. And BUILDER has 1.1 yield with 0.077 velocity — average speed, below-average yield, because its construction ratio hasn't converted to reuse yet.</div>
+    <div class="chart-wrap"><canvas id="barLineYieldVel"></canvas></div>
+  </div>
+
+  <!-- 4. Scatter: Construction vs Leverage — the build-to-reuse pipeline -->
+  <h2>4. Construction vs Leverage — the build-to-reuse pipeline</h2>
+  <div class="chart-box">
+    <div class="chart-title">Median construction ratio vs median leverage per archetype</div>
+    <div class="chart-desc">Construction (cache_write/cache_read) measures how much new context you build per read. The Active Construction family (BUILDER, RECURSIVE, AMPLIFIER) sits in the upper-left-to-right diagonal — they build more AND reuse more. The Reuse Depth family (bottom-left cluster) barely builds. CONVERGENT is the only archetype that does both at extreme levels — the rare composition.</div>
+    <div class="chart-wrap"><canvas id="scatterConstrLev"></canvas></div>
+  </div>
+
+  <!-- Insight: the convergence -->
+  <div class="insight-box">
+    <div class="insight-label">Key convergence</div>
+    <p>Cache-read percentage converges across the entire field: 88–96% of all tokens are cache reads for every archetype. The field is <strong>unanimously cache-read dominant</strong>. The divergence is in what feeds those reads — construction ratio. The Active Construction family writes 3–6% of their token budget as new cache. The Reuse Depth family writes 0.2–0.3%. Same read behavior, completely different write behavior. That's where the archetype signal lives.</p>
+  </div>
+
+  <!-- 5. Stacked composition + SNR line overlay -->
+  <h2>5. Token composition (stacked) + SNR overlay</h2>
+  <div class="chart-box">
+    <div class="chart-title">Four-pillar composition per archetype with SNR line</div>
+    <div class="chart-desc">Bars show what fraction of each archetype's token budget goes to input, output, cache-write, cache-read. The SNR line shows signal-to-noise (output / total). The paradox: SNR is nearly flat across archetypes (0.02–0.60) despite massive yield differences. SNR doesn't separate the field — leverage does. The operators with the highest SNR (KINETIC, CONVERGENT) are also the ones with the smallest input share.</div>
+    <div class="chart-wrap tall"><canvas id="stackedCompSNR"></canvas></div>
+  </div>
+
+  <!-- 6. Matrix heatmap: archetype × metric z-scores -->
+  <h2>6. Metric heatmap — archetype z-scores across 6 dimensions</h2>
+  <div class="chart-box">
+    <div class="chart-title">Standardized scores (z-score) per archetype per metric</div>
+    <div class="chart-desc">Green = above field mean, red = below. This shows the full signature at a glance. CONVERGENT and KINETIC are green across the board. INPUT-BOUND is red everywhere except input share. The Reuse Depth family forms a gradient: PRIMING → CONTEXTUAL → DEEP READER → ARCHIVIST, each greener on leverage and yield as you go. BUILDER is the "average" archetype — near-zero on most axes.</div>
+    <div class="chart-wrap tall"><canvas id="heatmap"></canvas></div>
+  </div>
+
+  <!-- 7. Scatter: Tokens/day vs Yield — the throughput paradox -->
+  <h2>7. Tokens/day vs Yield — the throughput paradox</h2>
+  <div class="chart-box">
+    <div class="chart-title">Median tokens/day vs median yield per archetype (log-log)</div>
+    <div class="chart-desc">If more tokens meant more yield, this would be a positive correlation. It's not. INPUT-BOUND burns 65M tokens/day for 0.1 yield. ARCHIVIST burns 20M for 3.5 yield. KINETIC burns 31M for 469 yield. Throughput doesn't predict yield — composition does. The operators moving the most tokens are often the least efficient at converting them to signal.</div>
+    <div class="chart-wrap"><canvas id="scatterThroughputYield"></canvas></div>
+  </div>
+
+  <!-- 8. Family-level radar: 4 families compared -->
+  <h2>8. Family radar — the four workflow families</h2>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Convergence vs Generation family</div>
+      <div class="chart-desc">CONVERGENT (all axes) vs KINETIC (velocity + leverage, low construction)</div>
+      <div class="chart-wrap radar"><canvas id="radarFamilies1"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Reuse Depth vs Active Construction</div>
+      <div class="chart-desc">ARCHIVIST (passive reuse) vs AMPLIFIER (active construction + reuse)</div>
+      <div class="chart-wrap radar"><canvas id="radarFamilies2"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 9. Dual-axis: Population (bars) + Yield median (line) sorted by yield -->
+  <h2>9. Population vs Yield — where the field concentrates</h2>
+  <div class="chart-box">
+    <div class="chart-title">Operator count (bars) and median yield (line) per archetype, sorted by yield</div>
+    <div class="chart-desc">The field's center of mass is in the low-yield archetypes. BUILDER (278 operators, yield 1.1) and CONTEXTUAL/ARCHIVIST (186 each, yield 0.8–3.5) hold the bulk. The high-yield archetypes are rare: KINETIC (113, yield 469) and CONVERGENT (104, yield 257) together are only 14% of the field but produce the top of the yield distribution. This is the power-law shape of operator skill.</div>
+    <div class="chart-wrap"><canvas id="popYieldSorted"></canvas></div>
+  </div>
+
+  <!-- Insight: the power law -->
+  <div class="insight-box">
+    <div class="insight-label">The power law</div>
+    <p>The top 2 archetypes (KINETIC + CONVERGENT = 217 operators, 13.7% of the field) have a combined median yield of <strong>363</strong>. The bottom 4 (INPUT-BOUND + PRIMING + CONTEXTUAL + BUILDER = 721 operators, 45.5% of the field) have a combined median yield of <strong>0.6</strong>. That's a 605× gap between the top eighth and the bottom half. The field is not normally distributed — it's a power law, and the archetype system makes the structure visible.</p>
+  </div>
+
+  <!-- Methodology -->
+  <h2>Methodology</h2>
+  <div class="chart-box" style="padding: 16px;">
+    <p style="color: #6e8a6e; font-size: 0.85rem; line-height: 1.6;">
+      <strong style="color: #f0c862;">Charts:</strong> All charts use per-archetype medians from <code style="color: #7c3aed;">archetypes.json</code> (10 deterministic build archetypes, 1,586 HCM operators). Radar charts normalize each metric to the field maximum (0–1 scale). The heatmap uses z-scores (standard deviations from the field mean). Scatter plots use log-log axes where indicated.<br><br>
+      <strong style="color: #f0c862;">Metrics:</strong> Yield (Υ = cache_read × output / input²), Leverage (cache_read / input), Velocity (output / input), SNR (output / total), Construction (cache_write / cache_read), Input share (input / total tokens).<br><br>
+      <strong style="color: #f0c862;">Population:</strong> human_center_of_mass (1,627 total, 1,586 HCM, outliers excluded). Input/total ratio analysis separates extreme humans from replay outliers.<br><br>
+      <strong style="color: #f0c862;">Source:</strong> <code style="color: #7c3aed;">public/data/archetypes.json</code> generated by <code style="color: #7c3aed;">scripts/gen-build-archetypes.mjs</code> from <code style="color: #7c3aed;">public/data/field-analysis.json</code>
+    </p>
+  </div>
+
+  <div class="footer">
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Citation</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;line-height:1.6;">
+        McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. <a href="https://doi.org/10.5281/zenodo.21876660" style="color:#f0c862;text-decoration:none">https://doi.org/10.5281/zenodo.21876660</a>
+      </span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Concept DOI</strong> <span style="color:#6e8a6e;font-size:0.75rem">(resolves to latest version)</span><br>
+      <a href="https://doi.org/10.5281/zenodo.21875675" style="color:#f0c862;text-decoration:none;font-size:0.8rem">https://doi.org/10.5281/zenodo.21875675</a>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Author</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;">
+        Deric J. McHenry &middot; ORCID <a href="https://orcid.org/0009-0002-9904-5390" style="color:#f0c862;text-decoration:none">0009-0002-9904-5390</a><br>
+        SigRank &middot; <a href="https://signalaf.com" style="color:#f0c862;text-decoration:none">signalaf.com</a> &middot; <a href="https://mos2es.com" style="color:#f0c862;text-decoration:none">MO&sect;ES&trade;</a> &middot; @burnmydays
+      </span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">License</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;">Creative Commons Attribution 4.0 International (<a href="https://creativecommons.org/licenses/by/4.0/" style="color:#f0c862;text-decoration:none">CC-BY 4.0</a>)</span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">BibTeX</strong><br>
+      <code style="color:#6e8a6e;font-size:0.7rem;display:block;white-space:pre-wrap;background:#0a0a0a;padding:8px;border-radius:4px;margin-top:4px;">@dataset{mchenry2026sigrank,
+  author       = {McHenry, Deric J.},
+  title        = {{SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0)}},
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {3.0},
+  doi          = {10.5281/zenodo.21876660},
+  url          = {https://doi.org/10.5281/zenodo.21876660}
+}</code>
+    </div>
+    <div style="margin-top:8px;color:#555;font-size:0.7rem;">SigRank Cross-Metric Analytics · 10 archetypes · 6 metrics · 1,586 operators · Generated 2026-08-10</div>
+  </div>
+</div>
+
+<script>
+// ── Data ──
+const ARCHETYPES = [
+  {name:"CONVERGENT",  family:"convergence",  n:104, yield:257.3,  lev:245.34, vel:1.049, snr:0.512,  constr:0.0625, input:0.38,  output:0.46,  cr:93.14, cw:5.81,  tpd:46454363},
+  {name:"KINETIC",     family:"generation",   n:113, yield:469.4,  lev:361.50, vel:1.520, snr:0.603,  constr:0.0296, input:0.27,  output:0.43,  cr:96.46, cw:2.85,  tpd:31100000},
+  {name:"INPUT-BOUND", family:"reuse",        n:108, yield:0.1,    lev:2.70,   vel:0.019, snr:0.019,  constr:0.0039, input:26.62, output:0.51,  cr:72.51, cw:0.28,  tpd:65000000},
+  {name:"PRIMING",     family:"reuse",        n:149, yield:0.3,    lev:7.70,   vel:0.042, snr:0.041,  constr:0.0023, input:11.42, output:0.49,  cr:87.50, cw:0.20,  tpd:55000000},
+  {name:"CONTEXTUAL",  family:"reuse",        n:186, yield:0.8,    lev:12.70,  vel:0.066, snr:0.062,  constr:0.0031, input:7.18,  output:0.47,  cr:91.52, cw:0.28,  tpd:48000000},
+  {name:"DEEP READER", family:"reuse",        n:169, yield:1.5,    lev:18.40,  vel:0.081, snr:0.075,  constr:0.0034, input:5.12,  output:0.41,  cr:93.87, cw:0.32,  tpd:42000000},
+  {name:"ARCHIVIST",   family:"reuse",        n:186, yield:3.5,    lev:29.80,  vel:0.124, snr:0.110,  constr:0.0118, input:3.19,  output:0.35,  cr:95.55, cw:1.13,  tpd:20000000},
+  {name:"BUILDER",     family:"construction", n:278, yield:1.1,    lev:13.70,  vel:0.077, snr:0.071,  constr:0.0342, input:6.51,  output:0.50,  cr:88.83, cw:3.04,  tpd:52000000},
+  {name:"RECURSIVE",   family:"construction", n:132, yield:7.2,    lev:38.90,  vel:0.191, snr:0.160,  constr:0.0402, input:2.37,  output:0.47,  cr:93.21, cw:3.74,  tpd:38000000},
+  {name:"AMPLIFIER",   family:"construction", n:161, yield:26.5,   lev:77.20,  vel:0.329, snr:0.247,  constr:0.0334, input:1.22,  output:0.38,  cr:95.25, cw:3.18,  tpd:30000000},
+];
+
+const FAMILY_COLORS = {
+  convergence:  "#9b59b6",
+  generation:   "#e74c3c",
+  reuse:        "#3498db",
+  construction: "#f39c12",
+};
+const ARCH_COLORS = {
+  "CONVERGENT":"#9b59b6","KINETIC":"#e74c3c","INPUT-BOUND":"#1abc9c","PRIMING":"#2ecc71",
+  "CONTEXTUAL":"#3498db","DEEP READER":"#2980b9","ARCHIVIST":"#8e44ad","BUILDER":"#e67e22",
+  "RECURSIVE":"#d35400","AMPLIFIER":"#f39c12",
+};
+
+const GRID = "#222";
+const TICK = "#6e8a6e";
+const LEGEND = { labels: { color: TICK, font: { size: 10 } } };
+
+// ── 1. Scatter: Leverage vs Yield ──
+new Chart(document.getElementById("scatterLevYield"), {
+  type: "bubble",
+  data: {
+    datasets: ARCHETYPES.map(a => ({
+      label: a.name,
+      data: [{x: a.lev, y: a.yield, r: Math.sqrt(a.n) * 1.5}],
+      backgroundColor: FAMILY_COLORS[a.family] + "99",
+      borderColor: FAMILY_COLORS[a.family],
+      borderWidth: 2,
+    })),
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { type: "logarithmic", title: { display: true, text: "Median Leverage (cache_read/input)", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+      y: { type: "logarithmic", title: { display: true, text: "Median Yield (Υ)", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+    },
+    plugins: {
+      legend: { ...LEGEND, position: "right" },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: L=${c.raw.x.toFixed(1)}× · Υ=${c.raw.y.toFixed(1)} · n=${ARCHETYPES.find(a=>a.name===c.dataset.label).n}` } },
+    },
+  },
+});
+
+// ── 2. Radar: 4 archetype profiles ──
+const radarMetrics = ["Leverage","Velocity","SNR","Construction","Yield","Cache Read %"];
+const maxLev = Math.max(...ARCHETYPES.map(a=>a.lev));
+const maxVel = Math.max(...ARCHETYPES.map(a=>a.vel));
+const maxSnr = Math.max(...ARCHETYPES.map(a=>a.snr));
+const maxConstr = Math.max(...ARCHETYPES.map(a=>a.constr));
+const maxYield = Math.max(...ARCHETYPES.map(a=>a.yield));
+const maxCr = 100;
+
+function radarData(a) {
+  return [
+    a.lev/maxLev, a.vel/maxVel, a.snr/maxSnr, a.constr/maxConstr,
+    a.yield/maxYield, a.cr/maxCr,
+  ];
+}
+
+new Chart(document.getElementById("radarArchetypes"), {
+  type: "radar",
+  data: {
+    labels: radarMetrics,
+    datasets: [
+      {label:"CONVERGENT",  data:radarData(ARCHETYPES[0]), backgroundColor:"rgba(155,89,182,0.15)", borderColor:"#9b59b6", borderWidth:2, pointBackgroundColor:"#9b59b6"},
+      {label:"KINETIC",     data:radarData(ARCHETYPES[1]), backgroundColor:"rgba(231,76,60,0.15)",  borderColor:"#e74c3c", borderWidth:2, pointBackgroundColor:"#e74c3c"},
+      {label:"AMPLIFIER",   data:radarData(ARCHETYPES[9]), backgroundColor:"rgba(243,156,18,0.15)", borderColor:"#f39c12", borderWidth:2, pointBackgroundColor:"#f39c12"},
+      {label:"INPUT-BOUND", data:radarData(ARCHETYPES[2]), backgroundColor:"rgba(26,188,156,0.15)", borderColor:"#1abc9c", borderWidth:2, pointBackgroundColor:"#1abc9c"},
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { r: { beginAtZero: true, max: 1, ticks: { color: TICK, backdropColor: "transparent", stepSize: 0.25 }, grid: { color: GRID }, angleLines: { color: GRID }, pointLabels: { color: TICK, font: { size: 11 } } } },
+    plugins: { legend: { ...LEGEND, position: "bottom" } },
+  },
+});
+
+// ── 3. Bar+Line: Yield bars + Velocity line ──
+const sortedByYield = [...ARCHETYPES].sort((a,b) => b.yield - a.yield);
+new Chart(document.getElementById("barLineYieldVel"), {
+  type: "bar",
+  data: {
+    labels: sortedByYield.map(a => a.name),
+    datasets: [
+      {
+        type: "bar",
+        label: "Median Yield (Υ)",
+        data: sortedByYield.map(a => a.yield),
+        backgroundColor: sortedByYield.map(a => FAMILY_COLORS[a.family] + "88"),
+        borderColor: sortedByYield.map(a => FAMILY_COLORS[a.family]),
+        borderWidth: 1,
+        yAxisID: "y",
+      },
+      {
+        type: "line",
+        label: "Median Velocity (O/I)",
+        data: sortedByYield.map(a => a.vel),
+        borderColor: "#f0c862",
+        backgroundColor: "#f0c862",
+        borderWidth: 2,
+        pointRadius: 5,
+        pointBackgroundColor: "#f0c862",
+        yAxisID: "y1",
+        tension: 0.3,
+      },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: TICK, font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: GRID } },
+      y: { type: "logarithmic", position: "left", title: { display: true, text: "Yield (log)", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+      y1: { position: "right", title: { display: true, text: "Velocity", color: "#f0c862" }, ticks: { color: "#f0c862" }, grid: { display: false }, min: 0, max: 1.6 },
+    },
+    plugins: { legend: { ...LEGEND, position: "top" } },
+  },
+});
+
+// ── 4. Scatter: Construction vs Leverage ──
+new Chart(document.getElementById("scatterConstrLev"), {
+  type: "bubble",
+  data: {
+    datasets: ARCHETYPES.map(a => ({
+      label: a.name,
+      data: [{x: a.constr * 100, y: a.lev, r: Math.sqrt(a.n) * 1.5}],
+      backgroundColor: FAMILY_COLORS[a.family] + "99",
+      borderColor: FAMILY_COLORS[a.family],
+      borderWidth: 2,
+    })),
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { type: "linear", title: { display: true, text: "Construction Ratio (cache_write/cache_read %)", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+      y: { type: "logarithmic", title: { display: true, text: "Leverage (cache_read/input)", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+    },
+    plugins: {
+      legend: { ...LEGEND, position: "right" },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: Constr=${c.raw.x.toFixed(2)}% · L=${c.raw.y.toFixed(1)}×` } },
+    },
+  },
+});
+
+// ── 5. Stacked composition + SNR line ──
+const compSorted = [...ARCHETYPES].sort((a,b) => b.yield - a.yield);
+new Chart(document.getElementById("stackedCompSNR"), {
+  type: "bar",
+  data: {
+    labels: compSorted.map(a => a.name),
+    datasets: [
+      { type:"bar", label:"Cache Read",  data: compSorted.map(a => a.cr),  backgroundColor: "rgba(52,152,219,0.7)",  stack: "comp" },
+      { type:"bar", label:"Cache Write", data: compSorted.map(a => a.cw),  backgroundColor: "rgba(243,156,18,0.7)",  stack: "comp" },
+      { type:"bar", label:"Output",      data: compSorted.map(a => a.output), backgroundColor: "rgba(46,204,113,0.7)", stack: "comp" },
+      { type:"bar", label:"Input",       data: compSorted.map(a => a.input),  backgroundColor: "rgba(231,76,60,0.7)",  stack: "comp" },
+      { type:"line", label:"SNR",        data: compSorted.map(a => a.snr * 100), borderColor: "#f0c862", backgroundColor: "#f0c862", borderWidth: 2, pointRadius: 4, yAxisID: "y1", tension: 0.3 },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { stacked: true, ticks: { color: TICK, font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: GRID } },
+      y: { stacked: true, max: 100, ticks: { color: TICK, callback: v => v + "%" }, grid: { color: GRID } },
+      y1: { position: "right", max: 65, title: { display: true, text: "SNR (%)", color: "#f0c862" }, ticks: { color: "#f0c862", callback: v => v + "%" }, grid: { display: false } },
+    },
+    plugins: {
+      legend: { ...LEGEND, position: "right" },
+      tooltip: { callbacks: { label: c => c.dataset.type === "line" ? ` SNR: ${(c.raw/100).toFixed(3)}` : ` ${c.dataset.label}: ${c.raw.toFixed(2)}%` } },
+    },
+  },
+});
+
+// ── 6. Heatmap: z-scores ──
+const heatMetrics = ["Yield","Leverage","Velocity","SNR","Construction","Input Share"];
+const heatData = ARCHETYPES.map(a => {
+  const vals = [a.yield, a.lev, a.vel, a.snr, a.constr, a.input];
+  const means = heatMetrics.map((_,i) => ARCHETYPES.map(x => [x.yield,x.lev,x.vel,x.snr,x.constr,x.input][i]).reduce((s,v)=>s+v,0)/ARCHETYPES.length);
+  const stds = heatMetrics.map((_,i) => {
+    const m = means[i];
+    return Math.sqrt(ARCHETYPES.map(x => [x.yield,x.lev,x.vel,x.snr,x.constr,x.input][i]).reduce((s,v)=>s+(v-m)**2,0)/ARCHETYPES.length);
+  });
+  return {
+    x: a.name,
+    y: heatMetrics,
+    v: vals.map((v,i) => stds[i] > 0 ? (v - means[i]) / stds[i] : 0),
+  };
+});
+
+// Flatten for matrix display
+const flatData = [];
+heatData.forEach(row => {
+  row.v.forEach((val, i) => {
+    flatData.push({ x: row.x, y: heatMetrics[i], v: val });
+  });
+});
+
+new Chart(document.getElementById("heatmap"), {
+  type: "matrix",
+  data: {
+    datasets: [{
+      label: "z-score",
+      data: flatData,
+      backgroundColor: ctx => {
+        const v = ctx.dataset.data[ctx.dataIndex]?.v ?? 0;
+        if (v > 0.5) return "rgba(46,204,113,0.8)";
+        if (v > 0) return "rgba(46,204,113,0.4)";
+        if (v > -0.5) return "rgba(231,76,60,0.4)";
+        return "rgba(231,76,60,0.8)";
+      },
+      borderColor: "#222",
+      borderWidth: 1,
+      width: ({chart}) => (chart.chartArea || {}).width / 10 - 2,
+      height: ({chart}) => (chart.chartArea || {}).height / 6 - 2,
+    }],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { type: "category", labels: ARCHETYPES.map(a=>a.name), ticks: { color: TICK, font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: GRID } },
+      y: { type: "category", labels: heatMetrics, ticks: { color: TICK, font: { size: 10 } }, grid: { color: GRID } },
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { title: () => "", label: c => `${c.raw.x} · ${c.raw.y}: z=${c.raw.v.toFixed(2)}` } },
+    },
+  },
+});
+
+// ── 7. Scatter: Tokens/day vs Yield ──
+new Chart(document.getElementById("scatterThroughputYield"), {
+  type: "bubble",
+  data: {
+    datasets: ARCHETYPES.map(a => ({
+      label: a.name,
+      data: [{x: a.tpd, y: a.yield, r: Math.sqrt(a.n) * 1.5}],
+      backgroundColor: FAMILY_COLORS[a.family] + "99",
+      borderColor: FAMILY_COLORS[a.family],
+      borderWidth: 2,
+    })),
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { type: "logarithmic", title: { display: true, text: "Median Tokens/Day", color: TICK }, ticks: { color: TICK, callback: v => v >= 1e6 ? (v/1e6).toFixed(0)+"M" : v }, grid: { color: GRID } },
+      y: { type: "logarithmic", title: { display: true, text: "Median Yield (Υ)", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+    },
+    plugins: {
+      legend: { ...LEGEND, position: "right" },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${(c.raw.x/1e6).toFixed(1)}M tok/day · Υ=${c.raw.y.toFixed(1)}` } },
+    },
+  },
+});
+
+// ── 8. Family radars ──
+function makeRadar(canvasId, datasets) {
+  new Chart(document.getElementById(canvasId), {
+    type: "radar",
+    data: { labels: radarMetrics, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { r: { beginAtZero: true, max: 1, ticks: { color: TICK, backdropColor: "transparent", stepSize: 0.25 }, grid: { color: GRID }, angleLines: { color: GRID }, pointLabels: { color: TICK, font: { size: 10 } } } },
+      plugins: { legend: { ...LEGEND, position: "bottom" } },
+    },
+  });
+}
+
+makeRadar("radarFamilies1", [
+  {label:"CONVERGENT", data:radarData(ARCHETYPES[0]), backgroundColor:"rgba(155,89,182,0.2)", borderColor:"#9b59b6", borderWidth:2, pointBackgroundColor:"#9b59b6"},
+  {label:"KINETIC",    data:radarData(ARCHETYPES[1]), backgroundColor:"rgba(231,76,60,0.2)",  borderColor:"#e74c3c", borderWidth:2, pointBackgroundColor:"#e74c3c"},
+]);
+
+makeRadar("radarFamilies2", [
+  {label:"ARCHIVIST", data:radarData(ARCHETYPES[6]), backgroundColor:"rgba(142,68,173,0.2)", borderColor:"#8e44ad", borderWidth:2, pointBackgroundColor:"#8e44ad"},
+  {label:"AMPLIFIER", data:radarData(ARCHETYPES[9]), backgroundColor:"rgba(243,156,18,0.2)", borderColor:"#f39c12", borderWidth:2, pointBackgroundColor:"#f39c12"},
+]);
+
+// ── 9. Population bars + Yield line, sorted by yield ──
+new Chart(document.getElementById("popYieldSorted"), {
+  type: "bar",
+  data: {
+    labels: sortedByYield.map(a => a.name),
+    datasets: [
+      {
+        type: "bar",
+        label: "Operator count",
+        data: sortedByYield.map(a => a.n),
+        backgroundColor: sortedByYield.map(a => FAMILY_COLORS[a.family] + "88"),
+        borderColor: sortedByYield.map(a => FAMILY_COLORS[a.family]),
+        borderWidth: 1,
+        yAxisID: "y",
+      },
+      {
+        type: "line",
+        label: "Median Yield (Υ)",
+        data: sortedByYield.map(a => a.yield),
+        borderColor: "#f0c862",
+        backgroundColor: "#f0c862",
+        borderWidth: 2,
+        pointRadius: 5,
+        pointBackgroundColor: "#f0c862",
+        yAxisID: "y1",
+        tension: 0.3,
+      },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: TICK, font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { color: GRID } },
+      y: { position: "left", title: { display: true, text: "Operators", color: TICK }, ticks: { color: TICK }, grid: { color: GRID } },
+      y1: { type: "logarithmic", position: "right", title: { display: true, text: "Yield (log)", color: "#f0c862" }, ticks: { color: "#f0c862" }, grid: { display: false } },
+    },
+    plugins: { legend: { ...LEGEND, position: "top" } },
+  },
+});
+</script>
+</body>
+</html>

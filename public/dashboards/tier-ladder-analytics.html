@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SigRank — Experience Ladder Analytics (Finalized)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; color: #f0c862; }
+  h2 { font-size: 1.2rem; font-weight: 600; margin: 32px 0 12px; color: #6e8a6e; }
+  .subtitle { color: #6e8a6e; font-size: 0.9rem; margin-bottom: 24px; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label { font-size: 0.7rem; color: #6e8a6e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .stat-card .value { font-size: 1.5rem; font-weight: 700; color: #f0c862; }
+  .stat-card .sub { font-size: 0.75rem; color: #6e8a6e; margin-top: 2px; }
+
+  .chart-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-title { font-size: 0.9rem; font-weight: 600; color: #6e8a6e; margin-bottom: 12px; }
+  .chart-wrap { position: relative; height: 320px; }
+  .chart-wrap.tall { height: 480px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  table th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 2px solid #222;
+    color: #6e8a6e;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+  table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #1a1a1a;
+    color: #c4c4c4;
+  }
+  table td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Fira Code', monospace; }
+  table tr:hover td { background: #0a0a0a; }
+
+  .tier-color { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #222; color: #6e8a6e; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>SigRank — Experience Ladder Analytics</h1>
+  <p class="subtitle">When the field is filtered by total tokens, the experience span ranges from 0 to 84 billion · 1,626 operators · 24 equal-population stages · Generated 2026-08-10</p>
+
+  <!-- Summary stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Experience span</div>
+      <div class="value">84B tokens</div>
+      <div class="sub">IGNITER III (0) → ARCH+ I floor (84.19B)</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Stage width</div>
+      <div class="value">~68 ops</div>
+      <div class="sub">Equal-population calibration</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Tiers</div>
+      <div class="value">8 + 1</div>
+      <div class="sub">8 base + TRANSMITTER peak badge</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Stages</div>
+      <div class="value">24</div>
+      <div class="sub">8 tiers × 3 sub-stages (I/II/III)</div>
+    </div>
+  </div>
+
+  <!-- Chart 1: Tier distribution (donut) -->
+  <h2>Tier Distribution</h2>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Operators per Tier (8 base tiers)</div>
+      <div class="chart-wrap"><canvas id="tierPie"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Operators per Stage (24 stages)</div>
+      <div class="chart-wrap"><canvas id="stageBar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Token range per tier -->
+  <h2>Token Ranges</h2>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Token Floor per Stage (log scale)</div>
+      <div class="chart-wrap"><canvas id="floorBar"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Token Ceiling per Stage (log scale)</div>
+      <div class="chart-wrap"><canvas id="ceilingBar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Full 24-stage stacked column -->
+  <h2>Stage Distribution by Tier</h2>
+  <div class="chart-box">
+    <div class="chart-title">Operators per stage, color-coded by tier (ARCH+ at top → IGNITER at bottom)</div>
+    <div class="chart-wrap tall"><canvas id="stackedColumn"></canvas></div>
+  </div>
+
+  <!-- Chart 4: Tier population bars -->
+  <h2>Tier Population</h2>
+  <div class="chart-box">
+    <div class="chart-title">Total operators per tier (sum of 3 sub-stages)</div>
+    <div class="chart-wrap"><canvas id="tierPopBar"></canvas></div>
+  </div>
+
+  <!-- Full data table -->
+  <h2>Full 24-Stage Data Table</h2>
+  <div class="chart-box" style="padding: 12px; overflow-x: auto;">
+    <table id="stageTable">
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Tier</th>
+          <th class="num">Floor</th>
+          <th class="num">Ceiling</th>
+          <th class="num">Operators</th>
+          <th class="num">% of field</th>
+        </tr>
+      </thead>
+      <tbody id="stageTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Methodology -->
+  <h2>Methodology</h2>
+  <div class="chart-box" style="padding: 16px;">
+    <p style="color: #6e8a6e; font-size: 0.85rem; line-height: 1.6;">
+      <strong style="color: #f0c862;">Method:</strong> equal_population_24_stages — Option C calibration<br><br>
+      <strong style="color: #f0c862;">Classification:</strong> Each operator is assigned to one of 24 experience stages based on their <strong>total tokens</strong> (input + output + cacheCreate + cacheRead). The ladder tracks how much real work an operator has done — not how efficient that work is.<br><br>
+      <strong style="color: #f0c862;">Tier structure:</strong> 8 base tiers, each split into 3 sub-stages (I/II/III):<br>
+      &nbsp;&nbsp;<strong>ARCH+</strong> (K.01) — deepest field experience · volume that became architecture<br>
+      &nbsp;&nbsp;<strong>ARCH</strong> (K.02) — system builders · sustained volume, coherent output<br>
+      &nbsp;&nbsp;<strong>POWER</strong> (K.03) — above the center · volume compounding<br>
+      &nbsp;&nbsp;<strong>BASE</strong> (K.04) — the center of the field · the average operator's experience<br>
+      &nbsp;&nbsp;<strong>SEEKER</strong> (K.05) — approaching the center · experience accumulating<br>
+      &nbsp;&nbsp;<strong>REFINER</strong> (K.06) — practicing with purpose · early sustained volume<br>
+      &nbsp;&nbsp;<strong>BEARER</strong> (K.07) — quiet accumulation · the first real volume<br>
+      &nbsp;&nbsp;<strong>IGNITER</strong> (K.08) — dormant potential · the still soul, waiting<br><br>
+      <strong style="color: #f0c862;">TRANSMITTER</strong> is not on the ladder. It is a temporary peak badge (RS.08) that any tier can earn during a high-frequency, high-resonance window. It lapses when frequency or resonance drops.<br><br>
+      <strong style="color: #f0c862;">Source:</strong> <code style="color: #7c3aed;">public/data/class-distribution-reference.json</code> from <code style="color: #7c3aed;">public/data/field-analysis.json</code> (1,626 operators, HCM cut)<br>
+      <strong style="color: #f0c862;">Calibration:</strong> Equal-population (Option C) — each stage holds ~68 operators. Floor = minimum total tokens; ceiling = next stage's floor.<br>
+      <strong style="color: #f0c862;">Replaces:</strong> Previous yield-based 4-tier system (IGNITER/SEEKER/BUILDER/TRANSMITTER by yield range)
+    </p>
+  </div>
+
+  <div class="footer">
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Citation</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;line-height:1.6;">
+        McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. <a href="https://doi.org/10.5281/zenodo.21876660" style="color:#f0c862;text-decoration:none">https://doi.org/10.5281/zenodo.21876660</a>
+      </span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Concept DOI</strong> <span style="color:#6e8a6e;font-size:0.75rem">(resolves to latest version)</span><br>
+      <a href="https://doi.org/10.5281/zenodo.21875675" style="color:#f0c862;text-decoration:none;font-size:0.8rem">https://doi.org/10.5281/zenodo.21875675</a>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">Author</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;">
+        Deric J. McHenry &middot; ORCID <a href="https://orcid.org/0009-0002-9904-5390" style="color:#f0c862;text-decoration:none">0009-0002-9904-5390</a><br>
+        SigRank &middot; <a href="https://signalaf.com" style="color:#f0c862;text-decoration:none">signalaf.com</a> &middot; <a href="https://mos2es.com" style="color:#f0c862;text-decoration:none">MO&sect;ES&trade;</a> &middot; @burnmydays
+      </span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">License</strong><br>
+      <span style="color:#c4c4c4;font-size:0.8rem;">Creative Commons Attribution 4.0 International (<a href="https://creativecommons.org/licenses/by/4.0/" style="color:#f0c862;text-decoration:none">CC-BY 4.0</a>)</span>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <strong style="color:#f0c862;">BibTeX</strong><br>
+      <code style="color:#6e8a6e;font-size:0.7rem;display:block;white-space:pre-wrap;background:#0a0a0a;padding:8px;border-radius:4px;margin-top:4px;">@dataset{mchenry2026sigrank,
+  author       = {McHenry, Deric J.},
+  title        = {{SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0)}},
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {3.0},
+  doi          = {10.5281/zenodo.21876660},
+  url          = {https://doi.org/10.5281/zenodo.21876660}
+}</code>
+    </div>
+    <div style="margin-top:8px;color:#555;font-size:0.7rem;">SigRank Experience Ladder Analytics · 24 stages · 1,626 operators · Generated 2026-08-10</div>
+  </div>
+</div>
+
+<script>
+const TIER_COLORS = {
+  "ARCH+":  "#dc2626",
+  "ARCH":   "#ea580c",
+  "POWER":  "#f59e0b",
+  "BASE":   "#10b981",
+  "SEEKER": "#06b6d4",
+  "REFINER":"#3b82f6",
+  "BEARER": "#7c3aed",
+  "IGNITER":"#64748b",
+};
+
+const STAGES = [
+  {stage:"ARCH+ I",floor:84192600517,ceiling:7068201104626,operators:67},
+  {stage:"ARCH+ II",floor:46527844056,ceiling:83796808622,operators:68},
+  {stage:"ARCH+ III",floor:33120868087,ceiling:46007607687,operators:68},
+  {stage:"ARCH I",floor:23895612426,ceiling:33113877006,operators:68},
+  {stage:"ARCH II",floor:18399442026,ceiling:23885338222,operators:67},
+  {stage:"ARCH III",floor:15525069887,ceiling:18389930093,operators:68},
+  {stage:"POWER I",floor:12272435221,ceiling:15507589875,operators:68},
+  {stage:"POWER II",floor:10216353881,ceiling:12111995587,operators:68},
+  {stage:"POWER III",floor:8773397273,ceiling:10189224970,operators:67},
+  {stage:"BASE I",floor:7078191068,ceiling:8674592599,operators:68},
+  {stage:"BASE II",floor:5889127180,ceiling:7069544285,operators:68},
+  {stage:"BASE III",floor:4912670550,ceiling:5877345282,operators:68},
+  {stage:"SEEKER I",floor:4147659079,ceiling:4908070645,operators:67},
+  {stage:"SEEKER II",floor:3589503354,ceiling:4147377146,operators:68},
+  {stage:"SEEKER III",floor:2980790685,ceiling:3589126331,operators:68},
+  {stage:"REFINER I",floor:2497415246,ceiling:2961798768,operators:68},
+  {stage:"REFINER II",floor:2014103899,ceiling:2497406487,operators:67},
+  {stage:"REFINER III",floor:1546788054,ceiling:1994830571,operators:68},
+  {stage:"BEARER I",floor:1182479080,ceiling:1544290660,operators:68},
+  {stage:"BEARER II",floor:859231121,ceiling:1173256210,operators:68},
+  {stage:"BEARER III",floor:640084482,ceiling:859181137,operators:67},
+  {stage:"IGNITER I",floor:305327754,ceiling:638638241,operators:68},
+  {stage:"IGNITER II",floor:131960531,ceiling:305275145,operators:68},
+  {stage:"IGNITER III",floor:123324,ceiling:131012254,operators:68},
+];
+
+const TOTAL = 1626;
+
+function fmt(v) {
+  if (v === null || v === undefined) return "—";
+  if (v >= 1e12) return (v/1e12).toFixed(2)+"T";
+  if (v >= 1e9) return (v/1e9).toFixed(2)+"B";
+  if (v >= 1e6) return (v/1e6).toFixed(0)+"M";
+  if (v >= 1e3) return Math.round(v/1e3)+"K";
+  return v.toString();
+}
+
+function tierOf(stage) { return stage.split(" ")[0]; }
+function colorForTier(tier) { return TIER_COLORS[tier] ?? "#64748b"; }
+
+// Tier groups
+const TIER_ORDER = ["ARCH+","ARCH","POWER","BASE","SEEKER","REFINER","BEARER","IGNITER"];
+const tierGroups = {};
+TIER_ORDER.forEach(t => { tierGroups[t] = { name: t, n: 0, stages: [] }; });
+STAGES.forEach(s => {
+  const t = tierOf(s.stage);
+  tierGroups[t].n += s.operators;
+  tierGroups[t].stages.push(s);
+});
+
+const stageLabels = STAGES.map(s => s.stage);
+const stageColors = STAGES.map(s => colorForTier(tierOf(s.stage)));
+
+// === Chart 1a: Tier distribution donut ===
+new Chart(document.getElementById("tierPie"), {
+  type: "doughnut",
+  data: {
+    labels: TIER_ORDER,
+    datasets: [{
+      data: TIER_ORDER.map(t => tierGroups[t].n),
+      backgroundColor: TIER_ORDER.map(t => colorForTier(t)),
+      borderColor: "#111",
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "right", labels: { color: "#6e8a6e", font: { size: 11 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: c => ` ${c.label}: ${c.raw} (${(c.raw/TOTAL*100).toFixed(1)}%)` } }
+    }
+  }
+});
+
+// === Chart 1b: Stage distribution bar ===
+new Chart(document.getElementById("stageBar"), {
+  type: "bar",
+  data: {
+    labels: stageLabels,
+    datasets: [{ data: STAGES.map(s => s.operators), backgroundColor: stageColors, borderRadius: 3 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 8 }, maxRotation: 90, minRotation: 45 }, grid: { color: "#222" } },
+      y: { ticks: { color: "#6e8a6e" }, grid: { color: "#222" }, min: 60, max: 70 }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` ${c.raw} operators` } }
+    }
+  }
+});
+
+// === Chart 2a: Token floor bar (log) ===
+new Chart(document.getElementById("floorBar"), {
+  type: "bar",
+  data: {
+    labels: stageLabels,
+    datasets: [{ data: STAGES.map(s => s.floor), backgroundColor: stageColors, borderRadius: 3 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 8 }, maxRotation: 90, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e", callback: v => fmt(v) }, grid: { color: "#222" } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` Floor: ${fmt(c.raw)}` } }
+    }
+  }
+});
+
+// === Chart 2b: Token ceiling bar (log) ===
+new Chart(document.getElementById("ceilingBar"), {
+  type: "bar",
+  data: {
+    labels: stageLabels,
+    datasets: [{ data: STAGES.map(s => s.ceiling), backgroundColor: stageColors, borderRadius: 3 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 8 }, maxRotation: 90, minRotation: 45 }, grid: { color: "#222" } },
+      y: { type: "logarithmic", ticks: { color: "#6e8a6e", callback: v => fmt(v) }, grid: { color: "#222" } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` Ceiling: ${fmt(c.raw)}` } }
+    }
+  }
+});
+
+// === Chart 3: Stacked column by tier (horizontal) ===
+const tierDatasets = TIER_ORDER.map(tier => ({
+  label: tier,
+  data: STAGES.map(s => tierOf(s.stage) === tier ? s.operators : 0),
+  backgroundColor: colorForTier(tier),
+  borderRadius: 3,
+}));
+new Chart(document.getElementById("stackedColumn"), {
+  type: "bar",
+  data: { labels: stageLabels, datasets: tierDatasets },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: "y",
+    scales: {
+      x: { stacked: true, ticks: { color: "#6e8a6e" }, grid: { color: "#222" } },
+      y: { stacked: true, ticks: { color: "#6e8a6e", font: { size: 9 } }, grid: { color: "#222" } }
+    },
+    plugins: {
+      legend: { position: "right", labels: { color: "#6e8a6e", font: { size: 10 }, boxWidth: 10 } },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.raw} operators` } }
+    }
+  }
+});
+
+// === Chart 4: Tier population bar ===
+new Chart(document.getElementById("tierPopBar"), {
+  type: "bar",
+  data: {
+    labels: TIER_ORDER,
+    datasets: [{
+      data: TIER_ORDER.map(t => tierGroups[t].n),
+      backgroundColor: TIER_ORDER.map(t => colorForTier(t)),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { color: "#6e8a6e", font: { size: 11 } }, grid: { color: "#222" } },
+      y: { ticks: { color: "#6e8a6e" }, grid: { color: "#222" } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` ${c.raw} operators (${(c.raw/TOTAL*100).toFixed(1)}%)` } }
+    }
+  }
+});
+
+// === Full data table ===
+const stageBody = document.getElementById("stageTableBody");
+STAGES.forEach(s => {
+  const tier = tierOf(s.stage);
+  const color = colorForTier(tier);
+  const pct = (s.operators / TOTAL * 100).toFixed(1);
+  stageBody.innerHTML += `
+    <tr>
+      <td><span class="tier-color" style="background:${color}"></span>${s.stage}</td>
+      <td><span style="color:${color};font-weight:600">${tier}</span></td>
+      <td class="num">${fmt(s.floor)}</td>
+      <td class="num">${fmt(s.ceiling)}</td>
+      <td class="num">${s.operators}</td>
+      <td class="num">${pct}%</td>
+    </tr>
+  `;
+});
+</script>
+</body>
+</html>

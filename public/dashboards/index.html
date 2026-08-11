@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SigRank — Interactive Dashboards</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; padding: 24px; min-height: 100vh; }
+.container { max-width: 1000px; margin: 0 auto; }
+h1 { font-size: 1.8rem; font-weight: 800; color: #f0c862; margin-bottom: 4px; }
+.subtitle { color: #6e8a6e; font-size: 0.9rem; margin-bottom: 32px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.card { background: #111; border: 1px solid #222; border-radius: 10px; padding: 24px; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.1s; }
+.card:hover { border-color: #f0c862; transform: translateY(-2px); }
+.card h2 { font-size: 1.1rem; color: #f0c862; margin-bottom: 8px; font-weight: 600; }
+.card p { font-size: 0.8rem; color: #8a9a8a; line-height: 1.5; }
+.card .meta { margin-top: 12px; font-size: 0.7rem; color: #555; font-family: 'SF Mono', monospace; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 0.65rem; font-family: 'SF Mono', monospace; margin-right: 4px; }
+.badge-chart { background: #1a1a1a; color: #f0c862; border: 1px solid #332d20; }
+.badge-table { background: #1a1a1a; color: #6e8a6e; border: 1px solid #1a2a1a; }
+.citation { margin-top: 40px; padding: 16px; background: #0d0d0d; border: 1px solid #222; border-radius: 8px; font-size: 0.75rem; color: #666; line-height: 1.6; }
+.citation a { color: #888; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>SigRank Interactive Dashboards</h1>
+<p class="subtitle">1,628 operators · 17 platforms · 3,304 models · Chart.js (CDN) · embedded data</p>
+<div class="grid">
+<a class="card" href="archetype-analytics.html">
+<h2>Archetype Analytics</h2>
+<p>9-chart breakdown of the 10 build archetypes: distribution, yield, leverage, velocity, token composition, activity, SNR, top platform.</p>
+<div class="meta"><span class="badge badge-chart">9 charts</span> 10 archetypes · 1,586 HCM operators</div>
+</a>
+<a class="card" href="tier-ladder-analytics.html">
+<h2>Tier-Ladder Analytics</h2>
+<p>6-chart experience-ladder distribution: tier pie, stage bars, token ranges, stacked column, tier population.</p>
+<div class="meta"><span class="badge badge-chart">6 charts</span> 24 stages · 1,627 operators</div>
+</a>
+<a class="card" href="cross-metric-analytics.html">
+<h2>Cross-Metric Analytics</h2>
+<p>10-chart cross-metric analysis: leverage vs yield scatter, archetype radar, yield bars + velocity line, construction vs leverage, heatmap, family radar.</p>
+<div class="meta"><span class="badge badge-chart">10 charts</span> 6 metric dimensions</div>
+</a>
+<a class="card" href="operator-scatter.html">
+<h2>Operator Scatterplots</h2>
+<p>9 scatterplots covering 1,598 operators across metric pairs: yield vs leverage, yield vs tokens, velocity vs leverage, SNR vs leverage, and more.</p>
+<div class="meta"><span class="badge badge-chart">9 charts</span> 1,598 operators · 9 metric pairs</div>
+</a>
+<a class="card" href="platform-board.html">
+<h2>Platform Board</h2>
+<p>17 platforms ranked by token volume: operator counts, token sums/medians/quartiles, cost, derived metrics (yield, SNR, leverage, velocity).</p>
+<div class="meta"><span class="badge badge-table">3 tables</span> 17 platforms</div>
+</a>
+<a class="card" href="model-board.html">
+<h2>Model Board</h2>
+<p>3,304 models ranked by adoption and token volume: operator counts, token sums, cost, average percentage of operator total.</p>
+<div class="meta"><span class="badge badge-table">2 tables</span> 3,304 models · top 100 shown</div>
+</a>
+</div>
+<div class="citation">
+McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. <a href="https://doi.org/10.5281/zenodo.21876660">https://doi.org/10.5281/zenodo.21876660</a><br>
+DOI: 10.5281/zenodo.21876660 · CC-BY 4.0 · ORCID: 0009-0002-9904-5390 · <a href="https://signalaf.com">signalaf.com</a> · <a href="https://github.com/SunrisesIllNeverSee">MO§ES™</a>
+</div>
+</div>
+</body>
+</html>
