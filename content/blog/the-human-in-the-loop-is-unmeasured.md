@@ -29,7 +29,7 @@ author: Deric (@SunrisesIllNeverSee)
 
 ## 2. The variance model benchmarks cannot see
 
-![Yield vs Leverage — 1,532 operators on log-log scale. The compounding cloud shows that yield (Υ) rises with leverage (cache reuse), not with raw token volume. Colored by build archetype.](/scatter-yield-vs-leverage.svg)
+![Population vs Yield — 1,634 operators sorted by yield (descending). The field concentrates at low yield with a long tail of elite operators. Colored by build archetype.](/population-vs-yield.svg)
 
 [5] The case for operator evaluation starts with an empirical observation. Even within the same broad AI coding-agent ecosystem, operator token cascades diverge by orders of magnitude.
 
@@ -90,7 +90,7 @@ Transmission × commitment × reuse = leverage. The intermediate terms cancel. T
 
 ![The 24-Stage Experience Ladder — 8 tiers × 3 sub-stages, keyed on total tokens. Equal-population calibration (Option C). Each stage shows its token floor and operator count.](/tier-ladder-24.svg)
 
-![Velocity vs Leverage — the operating plane. Each point is one operator. The position reveals workflow shape: high-velocity operators generate more than they take in; high-leverage operators reuse more than they retype. Colored by archetype.](/scatter-velocity-vs-leverage.svg)
+![Archetype Radar — four workflow families compared across 6 dimensions (yield, leverage, velocity, SNR, construction, tokens/day). KINETIC dominates generation; Reuse Depth dominates construction; Convergence is balanced.](/archetype-radar.svg)
 
 [17] This is what operator evaluation reveals that model evaluation does not: the structure of how someone works with AI. Not whether the model is good, but how the operator is using it. Not whether the result is correct, but whether the workflow is fresh-input-heavy, context-reusing, output-heavy, or actively constructing reusable state. The archetype is a workflow signature — a description of composition, not a verdict on quality.
 
