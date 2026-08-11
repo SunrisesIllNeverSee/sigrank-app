@@ -118,7 +118,9 @@ export default async function BlogPost({
   const title = frontmatter.title ?? slug;
   const description = frontmatter.description ?? "";
   const author = frontmatter.author ?? "SigRank";
-  const date = frontmatter.timestamp ?? "";
+  const date = frontmatter.timestamp instanceof Date
+    ? frontmatter.timestamp.toISOString()
+    : (frontmatter.timestamp as string) ?? "";
   const hero = frontmatter.hero;
 
   const articleLd = {

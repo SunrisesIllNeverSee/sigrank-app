@@ -34,7 +34,9 @@ async function getAllPosts(): Promise<PostSummary[]> {
         slug: file.replace(/\.md$/, ""),
         title: (data.title as string) ?? file,
         description: (data.description as string) ?? "",
-        date: (data.timestamp as string) ?? "",
+        date: data.timestamp instanceof Date
+          ? data.timestamp.toISOString()
+          : (data.timestamp as string) ?? "",
         tags: (data.tags as string[]) ?? [],
       });
     }
