@@ -93,6 +93,14 @@ export default async function FieldSectionPage({
         ]}
       />
 
+      <CitationMeta
+        title={section.title}
+        description={section.blurb}
+        date={meta.scraped_at}
+        slug={`/field/${slug}`}
+        doi="10.5281/zenodo.21876660"
+      />
+
       <WaveHero
         eyebrow={`📊 Field Analysis · ${String(section.order).padStart(2, "0")}`}
         terminalText={section.title.toUpperCase().slice(0, 11)}

@@ -14,6 +14,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CitationMeta } from "@/components/seo/CitationMeta";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, personAuthor } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";
@@ -86,6 +87,14 @@ export default async function FieldPage() {
           fieldDataset,
           breadcrumb([{ name: "Field Analysis", path: "/field" }]),
         ]}
+      />
+
+      <CitationMeta
+        title="AI Operator Field Analysis — The True Distribution of Token Efficiency"
+        description="Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed."
+        date={meta.scraped_at}
+        slug="/field"
+        doi="10.5281/zenodo.21876660"
       />
 
       <WaveHero
