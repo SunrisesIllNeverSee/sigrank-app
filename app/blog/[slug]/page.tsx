@@ -177,7 +177,7 @@ export default async function BlogPost({
       />
 
       {/* Header — Forerunner-style: date, title, author */}
-      <header className="mx-auto mb-8 flex max-w-[42rem] flex-col gap-3 px-6 pb-6">
+      <header className="mx-auto mb-8 flex max-w-[50rem] flex-col gap-3 px-6 pb-6">
         {date && (
           <p className="font-sans text-sm text-text-muted">
             {new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
@@ -199,7 +199,7 @@ export default async function BlogPost({
 
       {/* Hero image */}
       {hero && (
-        <div className="mx-auto mb-8 max-w-[42rem] px-6">
+        <div className="mx-auto mb-8 max-w-[50rem] px-6">
           <div className="overflow-hidden rounded-xl border border-bg-border">
             <Image
               src={hero}
@@ -220,7 +220,7 @@ export default async function BlogPost({
       </div>
 
       {/* ── Cross-links — contained within article width ── */}
-      <section className="mx-auto mt-8 max-w-[42rem] px-6 border-t border-bg-border pt-6">
+      <section className="mx-auto mt-8 max-w-[50rem] px-6 border-t border-bg-border pt-6">
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
           <Link
