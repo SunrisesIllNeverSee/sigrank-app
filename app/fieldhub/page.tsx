@@ -1,9 +1,10 @@
 /**
- * app/fieldhub/page.tsx — Field Analysis hub.
+ * app/fieldhub/page.tsx — Field Hub.
  *
- * TOC landing page with blurbs + hero previews for each field analysis
- * section. Each section links to /field/<slug> for the full content.
- * The full article is at /field.
+ * Section landing page for SigRank's academic field analysis and
+ * dataset publications. Two entry points:
+ *   - Field Analysis (→ /field) — the full article
+ *   - State of the Index  (→ /research) — the dataset landing page
  */
 
 import type { Metadata } from "next";
@@ -13,15 +14,12 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { breadcrumb, personAuthor } from "@/lib/jsonld";
-import { FIELD_SECTIONS } from "@/lib/field/sections";
-import FieldStatCards from "@/components/field/FieldStatCards";
-import BenfordTrustBadge from "@/components/field/BenfordTrustBadge";
+import { breadcrumb } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Field Hub — AI Operator Field Analysis",
+  title: "Field Hub — SigRank Research",
   description:
-    "Table of contents for the 12 field analysis sections: volume vs yield, the token cascade, SNR separation, ghost ranks, build archetypes, and more.",
+    "The academic field analysis and dataset publication hub for SigRank. Field Analysis and State of the Index.",
   path: "/fieldhub",
 });
 
@@ -31,182 +29,107 @@ export default async function FieldHubPage() {
   const data = await getFieldAnalysis();
   const { meta } = data;
 
-  const fieldDataset = {
+  const collectionPage = {
     "@context": "https://schema.org",
-    "@type": "Dataset",
-    name: "AI Operator Field Distribution Analysis — SigRank",
+    "@type": "CollectionPage",
+    name: "Field Hub — SigRank Research",
     description:
-      "Distribution analysis of 1,498 human AI operators (Human Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
-      "Volume vs yield correlation, SNR separation, platform dominance, outlier detection. " +
-      "Outliers separated via 6-signal outlier-likelihood score + input/total ratio analysis.",
-    url: `${SITE_ORIGIN}/field`,
-    creator: personAuthor(),
-    author: personAuthor(),
-    publisher: { "@id": `${SITE_ORIGIN}/#org` },
-    isAccessibleForFree: true,
-    license: "https://creativecommons.org/licenses/by/4.0/",
-    citation: "McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21900519",
-    keywords: [
-      "AI operator distribution",
-      "token efficiency",
-      "yield vs volume",
-      "AI operator field analysis",
-      "outlier detection",
-      "token cascade",
+      "The academic field analysis and dataset publication hub for SigRank.",
+    url: `${SITE_ORIGIN}/fieldhub`,
+    isPartOf: { "@id": `${SITE_ORIGIN}/#website` },
+    hasPart: [
+      {
+        "@type": "Article",
+        name: "AI Operator Field Analysis — The True Distribution of Token Efficiency",
+        url: `${SITE_ORIGIN}/field`,
+      },
+      {
+        "@type": "Article",
+        name: "State of the Index — AI Operator Token Efficiency",
+        url: `${SITE_ORIGIN}/research`,
+      },
     ],
-    variableMeasured: [
-      { "@type": "PropertyValue", name: "Yield (Υ)", description: "cache_read × output / input²" },
-      { "@type": "PropertyValue", name: "SNR", description: "output / (input + output)" },
-      { "@type": "PropertyValue", name: "Leverage", description: "cache_read / input" },
-      { "@type": "PropertyValue", name: "Velocity", description: "output / input" },
-    ],
-    measurementTechnique:
-      "On-device token telemetry from 1,498 human operators (Human Center of Mass). Outliers separated via input/total ratio analysis.",
-    temporalCoverage: meta.scraped_at,
   };
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
       <JsonLd
         data={[
-          fieldDataset,
+          collectionPage,
           breadcrumb([{ name: "Field Hub", path: "/fieldhub" }]),
         ]}
       />
 
       <WaveHero
-        eyebrow="📊 Field Analysis"
-        terminalText="THE FIELD"
-        title="Field Analysis"
+        eyebrow="📊 SigRank Research"
+        terminalText="FIELD HUB"
+        title="Field Hub"
         subtitle={
           <>
-            The true distribution of token efficiency.{" "}
-            {meta.humans_included.toLocaleString()} human AI operators,
-            outliers separated. Volume ranked. Yield revealed.
+            The academic research hub for SigRank. This is where we
+            document field analysis and publish dataset findings.
           </>
         }
       />
 
-      {/* ── Headline stats ───────────────────────────────────────────── */}
-      <FieldStatCards
-        medians={{
-          yield: meta.medians.yield,
-          snr: meta.medians.snr,
-          leverage: meta.medians.leverage,
-          tokens_per_day: meta.medians.tokens_per_day,
-        }}
-      />
-
-      {/* ── Benford trust badge ──────────────────────────────────────── */}
-      <BenfordTrustBadge />
-
-      {/* ── TOC ──────────────────────────────────────────────────────── */}
-      <nav className="flex flex-wrap gap-x-4 gap-y-1 border-b border-bg-border pb-3 text-xs">
-        {FIELD_SECTIONS.map((s) => (
-          <a
-            key={s.slug}
-            href={`#${s.slug}`}
-            className="font-mono text-text-muted transition-colors hover:text-gold"
-          >
-            {s.title}
-          </a>
-        ))}
-      </nav>
-
-      {/* ── Section previews ─────────────────────────────────────────── */}
-      <div className="flex flex-col gap-6">
-        {FIELD_SECTIONS.map((section) => (
-          <section
-            key={section.slug}
-            id={section.slug}
-            className="flex flex-col gap-3 scroll-mt-20 rounded-lg border border-bg-border bg-bg-surface px-5 py-4"
-          >
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="font-sans text-lg font-bold text-text-primary">
-                {section.title}
-              </h2>
-              <span className="font-mono text-xs text-text-dim">
-                {String(section.order).padStart(2, "0")}
-              </span>
-            </div>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              {section.blurb}
-            </p>
-            {section.chart && (
-              <Link
-                href={`/field/${section.slug}`}
-                className="overflow-hidden rounded-lg border border-bg-border transition-opacity hover:opacity-90"
-              >
-                <img
-                  src={section.chart}
-                  alt={section.title}
-                  width={800}
-                  height={400}
-                  className="h-auto w-full"
-                  style={{ aspectRatio: "800 / 400" }}
-                  loading="lazy"
-                />
-              </Link>
-            )}
-            <Link
-              href={`/field/${section.slug}`}
-              className="self-start font-mono text-xs text-gold underline underline-offset-2 transition-colors hover:text-text-primary"
-            >
-              Read {section.title} →
-            </Link>
-          </section>
-        ))}
-      </div>
-
-      {/* ── Footer links ─────────────────────────────────────────────── */}
-      <footer className="mt-4 flex flex-col gap-3 border-t border-bg-border pt-6">
-        <p className="text-sm text-text-secondary">
-          Data collected {meta.scraped_at} from{" "}
-          <a
-            href={meta.source}
-            className="text-gold underline hover:text-text-primary"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            tokscale.ai/leaderboard
-          </a>
-          . {meta.total_scraped.toLocaleString()} operators collected,{" "}
-          {meta.outliers} outliers separated,{" "}
-          {meta.humans_included.toLocaleString()} humans analyzed.
+      {/* ── Blurb ───────────────────────────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <p className="text-lg text-text-primary">
+          This section is where we document academic field analysis of the
+          SigRank Index — the distribution of AI operator efficiency, the
+          volume-vs-yield thesis, outlier detection, and the dataset that
+          underpins every finding published on this site.
         </p>
-        <div className="flex flex-wrap gap-4 text-sm">
-          <Link
-            href="/field"
-            className="text-gold underline hover:text-text-primary"
-          >
-            Read full article →
-          </Link>
-          <Link
-            href="/research"
-            className="text-gold underline hover:text-text-primary"
-          >
-            State of the Index
-          </Link>
-          <Link
-            href="/methodology"
-            className="text-gold underline hover:text-text-primary"
-          >
-            Methodology
-          </Link>
-          <Link
-            href="/hall"
-            className="text-gold underline hover:text-text-primary"
-          >
-            Hall of Signal
-          </Link>
-          <Link
-            href="/board/all"
-            className="text-gold underline hover:text-text-primary"
-          >
-            Live Leaderboard
-          </Link>
+        <p className="text-base text-text-secondary">
+          Each entry below is a primary source. The Field Analysis is the
+          full visual article. The State of the Index is the dataset
+          landing page with DOI, citation, and downloadable files.
+        </p>
+      </section>
+
+      {/* ── Field Analysis card ─────────────────────────────────────── */}
+      <Link
+        href="/field"
+        className="group flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
+      >
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
+            Field Analysis
+          </h2>
+          <span className="font-mono text-xs text-text-dim">Article →</span>
         </div>
-      </footer>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The true distribution of token efficiency.{" "}
+          {meta.humans_included.toLocaleString()} human AI operators,
+          outliers separated. Volume ranked. Yield revealed. The field has
+          a shape — and it proves that volume ≠ yield.
+        </p>
+        <p className="font-mono text-xs text-text-dim">
+          {new Date(meta.scraped_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} · Deric J. McHenry
+        </p>
+      </Link>
+
+      {/* ── State of the Index card ─────────────────────────────────── */}
+      <Link
+        href="/research"
+        className="group flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
+      >
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
+            State of the Index
+          </h2>
+          <span className="font-mono text-xs text-text-dim">Dataset →</span>
+        </div>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          The primary anonymized dataset. 1,628 operators across 17
+          platforms and 3,304 models. 9.07Q total tokens. Available on
+          Zenodo under CC-BY-4.0 with DOI, citation, and downloadable
+          CSVs and JSON.
+        </p>
+        <p className="font-mono text-xs text-text-dim">
+          2026-07-13 · v3.1 · DOI 10.5281/zenodo.21900519
+        </p>
+      </Link>
     </div>
   );
 }
