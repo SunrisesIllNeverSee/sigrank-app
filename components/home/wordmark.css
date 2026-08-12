@@ -29,7 +29,7 @@
   }
 }
 .terminal-wordmark-line {
-  background: linear-gradient(
+  background-image: linear-gradient(
     90deg,
     #e0b240,
     #f0c862,
@@ -51,24 +51,6 @@
   -webkit-text-fill-color: transparent;
   color: transparent;
   animation: terminal-wordmark-cycle 8s linear var(--tw-delay, 0s) infinite;
-}
-/* Terminal theme: keep the gold/amber wordmark palette (TUI gold #e0b240) */
-[data-theme="terminal"] .terminal-wordmark-line {
-  background: linear-gradient(
-    90deg,
-    #e0b240,
-    #f0c862,
-    #e8a0d0,
-    #f08c3c,
-    #f0d878,
-    #fef0c0,
-    #e0b240,
-    #f0c862,
-    #e8a0d0,
-    #f08c3c,
-    #f0d878,
-    #fef0c0
-  );
 }
 @media (prefers-reduced-motion: reduce) {
   .terminal-wordmark-line {
