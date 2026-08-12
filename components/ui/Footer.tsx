@@ -96,6 +96,10 @@ const FOOTER_COLUMNS: {
         label: "AI User Leaderboard →",
       },
       {
+        href: "/research",
+        label: "State of the Index",
+      },
+      {
         href: "/field",
         label: "Field Analysis",
       },
