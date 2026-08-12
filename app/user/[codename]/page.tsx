@@ -79,7 +79,7 @@ export const revalidate = 21600;
 // (120s for operator reads, 300s for board reads), so data freshness is
 // unaffected. On-demand revalidation via revalidateTouchedWindows fires on
 // snapshot submit, immediately purging the CDN cache.
-export const fetchCache = "default-cache";
+export const fetchCache = "force-cache";
 
 /**
  * Resolve the display name for an operator. display_name now carries both the
