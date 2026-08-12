@@ -87,48 +87,48 @@ export default async function FieldHubPage() {
         </p>
       </section>
 
-      {/* ── Field Analysis card ─────────────────────────────────────── */}
+      {/* ── Field Analysis hero card ────────────────────────────────── */}
       <Link
         href="/field"
-        className="group flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
+        className="group block rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
       >
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
-            Field Analysis
+        <header className="flex flex-col gap-2">
+          <p className="font-sans text-sm text-text-muted">
+            {new Date(meta.scraped_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          </p>
+          <h2 className="font-sans text-xl font-bold leading-tight text-text-primary group-hover:text-gold md:text-2xl">
+            AI Operator Field Analysis — The True Distribution of Token Efficiency
           </h2>
-          <span className="font-mono text-xs text-text-dim">Article →</span>
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The true distribution of token efficiency.{" "}
-          {meta.humans_included.toLocaleString()} human AI operators,
-          outliers separated. Volume ranked. Yield revealed. The field has
-          a shape — and it proves that volume ≠ yield.
-        </p>
-        <p className="font-mono text-xs text-text-dim">
-          {new Date(meta.scraped_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} · Deric J. McHenry
-        </p>
+          <p className="font-sans text-sm leading-relaxed text-text-muted">
+            Real data from {meta.humans_included.toLocaleString()} human AI operators. Outliers separated. Volume ranked. Yield revealed. The field has a shape — and it proves that volume ≠ yield.
+          </p>
+          <p className="font-sans text-xs text-text-secondary pt-1">
+            <span className="font-medium text-text-primary">Deric J. McHenry</span>
+            <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
+          </p>
+        </header>
       </Link>
 
-      {/* ── State of the Index card ─────────────────────────────────── */}
+      {/* ── State of the Index hero card ────────────────────────────── */}
       <Link
         href="/research"
-        className="group flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
+        className="group block rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
       >
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
+        <header className="flex flex-col gap-2">
+          <p className="font-sans text-sm text-text-muted">
+            {new Date("2026-07-13").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          </p>
+          <h2 className="font-sans text-xl font-bold leading-tight text-text-primary group-hover:text-gold md:text-2xl">
             State of the Index
           </h2>
-          <span className="font-mono text-xs text-text-dim">Dataset →</span>
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The primary anonymized dataset. 1,628 operators across 17
-          platforms and 3,304 models. 9.07Q total tokens. Available on
-          Zenodo under CC-BY-4.0 with DOI, citation, and downloadable
-          CSVs and JSON.
-        </p>
-        <p className="font-mono text-xs text-text-dim">
-          2026-07-13 · v3.1 · DOI 10.5281/zenodo.21900519
-        </p>
+          <p className="font-sans text-sm leading-relaxed text-text-muted">
+            The primary anonymized dataset. 1,628 operators across 17 platforms and 3,304 models. 9.07Q total tokens. Available on Zenodo under CC-BY-4.0 with DOI, citation, and downloadable CSVs and JSON.
+          </p>
+          <p className="font-sans text-xs text-text-secondary pt-1">
+            <span className="font-medium text-text-primary">Deric J. McHenry</span>
+            <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
+          </p>
+        </header>
       </Link>
     </div>
   );
