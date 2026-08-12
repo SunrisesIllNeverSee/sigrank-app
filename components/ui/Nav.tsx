@@ -34,7 +34,7 @@ export function Nav() {
   useEffect(() => {
     const onScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+      if (currentScrollY > 80) {
         setHidden(true);
       } else {
         setHidden(false);
