@@ -256,6 +256,24 @@ export function Footer() {
               your machine.
             </span>
           </div>
+          {/* Directory badges */}
+          <div className="flex items-center gap-2 pt-2">
+            <a
+              href="https://whatsthebigdata.com/ai-tools/"
+              target="_blank"
+              rel="noopener"
+              title="Whatsthebigdata AI Tools Directory"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://whatsthebigdata.com/badges/featured-on-whatsthebigdata-color.png"
+                alt="Featured on Whatsthebigdata"
+                width={200}
+                height={42}
+                style={{ maxWidth: "100%", height: "auto" }}
+              />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
