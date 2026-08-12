@@ -9,7 +9,6 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -43,6 +42,18 @@ const CSV_FILES = [
   { name: "model-metrics.csv", rows: "3,304", desc: "Model adoption patterns" },
 ];
 
+// Dataset stats (from Zenodo v3.1 package, not the live board)
+const DATASET = {
+  operatorCount: 1628,
+  platformCount: 17,
+  modelCount: 3304,
+  totalTokens: 9_071_333_906_075_020,
+  totalInput: 9_033_520_362_816_918,
+  totalOutput: 2_863_764_919_168,
+  totalCacheRead: 34_112_884_055_111,
+  totalCacheWrite: 801_057_987_773,
+};
+
 // ── Helpers ────────────────────────────────────────────────────────────
 
 function fmt(n: number): string {
@@ -58,40 +69,6 @@ function fmtYield(n: number): string {
   if (n >= 100) return n.toFixed(0);
   if (n >= 1) return n.toFixed(2);
   return n.toFixed(3);
-}
-
-// ── Data ───────────────────────────────────────────────────────────────
-
-async function loadIndexStats() {
-  const entries = getStaticAllTimeBoard();
-
-  const platformSet = new Set<string>();
-  let totalInput = 0;
-  let totalOutput = 0;
-  let totalCacheRead = 0;
-  let totalTokens = 0;
-
-  for (const e of entries) {
-    const platform = e.platform ?? "other";
-    platformSet.add(platform);
-    const input = e.input ?? 0;
-    const output = e.output ?? 0;
-    const cacheWrite = e.cacheWrite ?? 0;
-    const cacheRead = e.cacheRead ?? 0;
-    totalInput += input;
-    totalOutput += output;
-    totalCacheRead += cacheRead;
-    totalTokens += input + output + cacheWrite + cacheRead;
-  }
-
-  return {
-    operatorCount: entries.length,
-    platformCount: platformSet.size,
-    totalInput,
-    totalOutput,
-    totalCacheRead,
-    totalTokens,
-  };
 }
 
 // ── Types for JSON imports ─────────────────────────────────────────────
@@ -133,10 +110,9 @@ const ladderPopulation = stages.reduce((sum, s) => sum + s.operators, 0);
 
 // ── Page ───────────────────────────────────────────────────────────────
 
-export default async function StateOfTheIndexPage() {
-  const { operatorCount, platformCount, totalTokens, totalInput, totalOutput, totalCacheRead } =
-    await loadIndexStats();
-  const cachePct = totalTokens > 0 ? Math.round((totalCacheRead / totalTokens) * 100) : 0;
+export default function StateOfTheIndexPage() {
+  const { operatorCount, platformCount, totalTokens, totalInput, totalOutput, totalCacheRead } = DATASET;
+  const cachePct = totalTokens > 0 ? ((totalCacheRead / totalTokens) * 100).toFixed(1) : "0";
 
   const headlineFindings = [
     `${operatorCount.toLocaleString("en-US")} anonymized operators across ${platformCount} platforms.`,
@@ -212,9 +188,10 @@ export default async function StateOfTheIndexPage() {
       </section>
 
       {/* ── Headline stats ───────────────────────────────────────────── */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatCard label="Operators" value={operatorCount.toLocaleString("en-US")} />
         <StatCard label="Platforms" value={String(platformCount)} />
+        <StatCard label="Models" value={DATASET.modelCount.toLocaleString("en-US")} />
         <StatCard label="Total tokens" value={fmt(totalTokens)} />
         <StatCard label="Cache %" value={`${cachePct}%`} />
       </section>
