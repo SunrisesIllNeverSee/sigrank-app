@@ -6,6 +6,7 @@ tags: [article, sigrank, operator-evaluation, measurement, token-cascade, yield,
 timestamp: 2026-08-10T12:00:00Z
 author: Deric (@SunrisesIllNeverSee)
 hero: /blog-hero-human-loop.svg
+doi: 10.5281/zenodo.21876660
 ---
 
 AI evaluation has a missing unit of analysis.

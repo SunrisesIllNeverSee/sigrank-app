@@ -35,6 +35,7 @@ async function getPost(slug: string) {
         author?: string;
         tags?: string[];
         hero?: string;
+        doi?: string;
       },
       content,
     };
@@ -164,8 +165,26 @@ export default async function BlogPost({
     keywords: frontmatter.tags?.join(", "),
   };
 
+  // Google Scholar citation meta tags — these are the tags Scholar looks for
+  // to index articles. Without them, articles won't appear in Scholar results.
+  const citationTags = [
+    { name: "citation_title", content: title },
+    { name: "citation_author", content: "McHenry, Deric J." },
+    { name: "citation_publication_date", content: date },
+    { name: "citation_journal_title", content: "SigRank" },
+    { name: "citation_publisher", content: "MO§ES™ Research" },
+    { name: "citation_abstract", content: description },
+    { name: "citation_pdf_url", content: `${SITE_ORIGIN}/blog/${slug}` },
+    { name: "citation_fulltext_html_url", content: `${SITE_ORIGIN}/blog/${slug}` },
+    ...(frontmatter.doi ? [{ name: "citation_doi", content: frontmatter.doi }] : []),
+  ];
+
   return (
     <article className="px-4 py-8 md:py-12">
+      {/* Google Scholar citation meta tags */}
+      {citationTags.map((tag) => (
+        <meta key={tag.name} name={tag.name} content={tag.content} />
+      ))}
       <JsonLd
         data={[
           articleLd,
