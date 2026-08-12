@@ -15,6 +15,7 @@ const FOOTER_COLUMNS: {
     heading: "Analysis",
     links: [
       { href: "/research", label: "State of the Index" },
+      { href: "/fieldhub", label: "Field Hub" },
       { href: "/field", label: "Field Analysis" },
       { href: "/blog/volume-isnt-yield", label: "Volume Isn't Yield" },
       { href: "/blog/the-human-in-the-loop-is-unmeasured", label: "The Human in the Loop" },

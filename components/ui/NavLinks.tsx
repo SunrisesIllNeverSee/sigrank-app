@@ -17,7 +17,7 @@ import { usePathname } from "next/navigation";
 // entry; /board/* routes are all part of the same tab.
 const ACTIVE_PREFIX: Record<string, string[]> = {
   "/board/all": ["/board"],
-  "/field": ["/field", "/research"],
+  "/fieldhub": ["/fieldhub", "/field", "/research"],
   "/compare": ["/compare"],
   "/hall": ["/hall"],
   "/wiki": ["/wiki"],
