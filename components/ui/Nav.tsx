@@ -17,7 +17,6 @@ import { NavLinks } from "./NavLinks";
 const LINKS: { href: string; label: string }[] = [
   { href: "/board/all", label: "Leaderboard" },
   { href: "/field", label: "Field" },
-  { href: "/research", label: "Research" },
   { href: "/compare", label: "Compare" },
   { href: "/hall", label: "Hall" },
   { href: "/wiki", label: "Wiki" },
