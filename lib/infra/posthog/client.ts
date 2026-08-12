@@ -50,6 +50,9 @@ export async function initPostHog() {
     // none are on any dashboard. Disable to cut ~7,100 events/30d + serverless
     // invocations on the /ingest proxy. Re-enable if we start monitoring CWV.
     capture_performance: false,
+    // Error tracking — capture unhandled client-side exceptions as $exception events.
+    // PostHog's Error Tracking UI groups them into issues for triage.
+    capture_exceptions: true,
     // Privacy is the moat ("we don't read your content"). Even if session replay is
     // enabled in the PostHog project, mask ALL input + textarea values and all text by
     // config — so pasted ccusage token data is never recorded. Belt-and-suspenders with
