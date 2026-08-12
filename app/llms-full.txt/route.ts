@@ -190,7 +190,9 @@ A: An 8-tier qualification system: ARCH+, ARCH, POWER, BASE, SEEKER, REFINER, BE
 
 ## Research
 
-- [State of the Index](${SITE_ORIGIN}/research?utm_source=ai&utm_medium=answer_engine): An introduction to the AI operator token-efficiency landscape — aggregate stats (operator count, platform breakdown, total tokens, cache utilization). Full operator-level dataset to be released via Zenodo with DOI.
+- [State of the Index](${SITE_ORIGIN}/research?utm_source=ai&utm_medium=answer_engine): The primary anonymized dataset on Zenodo — 1,628 operators, 17 platforms, 3,304 models. DOI: 10.5281/zenodo.21876660. CC-BY-4.0.
+- [Field Analysis](${SITE_ORIGIN}/field?utm_source=ai&utm_medium=answer_engine): Full field distribution analysis — 12 sections covering volume vs yield, token cascade, SNR separation, leverage × velocity, platform dominance, cascade composition, yield quartiles, 80% band, percentile ladder, ghost ranks, build archetypes, and outlier detection.
+- [Field Analysis Hub](${SITE_ORIGIN}/fieldhub?utm_source=ai&utm_medium=answer_engine): Overview hub with headline stats and Benford validation badge.
 
 ## Data
 
