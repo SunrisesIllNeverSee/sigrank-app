@@ -564,8 +564,8 @@ html[data-landing-motion="paused"] .cascade-pulse {
   max-width: 42rem;
   margin: 0 auto;
   padding: 0 1.5rem;
-  border-left: 1px solid rgb(var(--border) / 0.4);
-  border-right: 1px solid rgb(var(--border) / 0.4);
+  border-left: 1px solid rgba(var(--bg-border), 0.4);
+  border-right: 1px solid rgba(var(--bg-border), 0.4);
 }
 .prose-sigrank > * + * {
   margin-top: 1.1em;
@@ -631,15 +631,15 @@ html[data-landing-motion="paused"] .cascade-pulse {
   font-size: 0.82em;
   padding: 0.15em 0.4em;
   border-radius: 5px;
-  background: rgb(var(--elevated));
+  background: rgb(var(--bg-elevated));
   color: rgb(var(--gold));
-  border: 1px solid rgb(var(--border) / 0.5);
+  border: 1px solid rgb(var(--bg-border) / 0.5);
 }
 .prose-sigrank pre {
   padding: 1em 1.3em;
   border-radius: 8px;
-  background: rgb(var(--surface));
-  border: 1px solid rgb(var(--border));
+  background: rgb(var(--bg-surface));
+  border: 1px solid rgb(var(--bg-border));
   overflow-x: auto;
   margin: 1.2em 0;
 }
@@ -692,7 +692,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  border: 1px solid rgb(var(--border) / 0.6);
+  border: 1px solid rgb(var(--bg-border) / 0.6);
   margin: 1.5em 0;
   display: block;
 }
@@ -709,7 +709,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
   -webkit-overflow-scrolling: touch;
 }
 .prose-sigrank thead {
-  background: rgb(var(--surface) / 0.6);
+  background: rgb(var(--bg-surface) / 0.6);
 }
 .prose-sigrank th {
   padding: 0.7em 1em;
@@ -725,15 +725,15 @@ html[data-landing-motion="paused"] .cascade-pulse {
 }
 .prose-sigrank td {
   padding: 0.65em 1em;
-  border-bottom: 1px solid rgb(var(--border) / 0.4);
+  border-bottom: 1px solid rgb(var(--bg-border) / 0.4);
   color: rgb(var(--text-secondary));
   white-space: nowrap;
 }
 .prose-sigrank tbody tr:nth-child(even) td {
-  background: rgb(var(--surface) / 0.2);
+  background: rgb(var(--bg-surface) / 0.2);
 }
 .prose-sigrank tbody tr:hover td {
-  background: rgb(var(--surface) / 0.4);
+  background: rgb(var(--bg-surface) / 0.4);
 }
 
 /* Horizontal rules — gold-tinted separator */

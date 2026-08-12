@@ -91,6 +91,8 @@ const markdownComponents: Components = {
           src={src}
           alt={alt ?? ""}
           title={title}
+          width={1200}
+          height={800}
           className="h-auto w-full rounded-lg border border-bg-border my-6"
           loading="lazy"
         />
