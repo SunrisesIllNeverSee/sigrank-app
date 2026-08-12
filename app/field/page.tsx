@@ -14,6 +14,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, personAuthor } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";
 import PlatformAdoption from "@/components/field/PlatformAdoption";
@@ -87,22 +88,18 @@ export default async function FieldPage() {
         ]}
       />
 
-      {/* ── Hero — Forerunner-style: date, title, author ─────────────── */}
-      <header className="mx-auto mb-2 flex max-w-[50rem] flex-col gap-3 px-6 pb-6 w-full">
-        <p className="font-sans text-sm text-text-muted">
-          {new Date(meta.scraped_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-        </p>
-        <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary md:text-3xl">
-          AI Operator Field Analysis — The True Distribution of Token Efficiency
-        </h1>
-        <p className="font-sans text-base leading-relaxed text-text-muted">
-          Real data from {meta.humans_included.toLocaleString()} human AI operators. Outliers separated. Volume ranked. Yield revealed. The field has a shape — and it proves that volume ≠ yield.
-        </p>
-        <p className="font-sans text-sm text-text-secondary pt-1">
-          <span className="font-medium text-text-primary">Deric J. McHenry</span>
-          <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
-        </p>
-      </header>
+      <WaveHero
+        eyebrow="📊 Field Analysis"
+        terminalText="THE FIELD"
+        title="Field Analysis"
+        subtitle={
+          <>
+            The true distribution of token efficiency.{" "}
+            {meta.humans_included.toLocaleString()} human AI operators,
+            outliers separated. Volume ranked. Yield revealed.
+          </>
+        }
+      />
 
       {/* ── Stat cards ───────────────────────────────────────────────── */}
       <FieldStatCards
