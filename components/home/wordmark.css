@@ -52,6 +52,24 @@
   color: transparent;
   animation: terminal-wordmark-cycle 8s linear var(--tw-delay, 0s) infinite;
 }
+/* Terminal theme: phosphor-green wordmark instead of gold */
+[data-theme="terminal"] .terminal-wordmark-line {
+  background: linear-gradient(
+    90deg,
+    #4af262,
+    #5fff7a,
+    #3dd957,
+    #6bff8e,
+    #2ec84a,
+    #5fff7a,
+    #4af262,
+    #5fff7a,
+    #3dd957,
+    #6bff8e,
+    #2ec84a,
+    #5fff7a
+  );
+}
 @media (prefers-reduced-motion: reduce) {
   .terminal-wordmark-line {
     /* Owner: keep movement, slow it to a gentle drift — never a strobe.

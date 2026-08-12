@@ -76,8 +76,8 @@
 /* ── Paper — light (Vercel-white) ─────────────────────────────────────────── */
 [data-theme="paper"] {
   color-scheme: light;
-  --bg-base: 240 240 242; /* light-to-mid gray body (was pure white) */
-  --bg-surface: 255 255 255; /* white header/cards on gray body */
+  --bg-base: 225 225 228; /* darker gray body */
+  --bg-surface: 245 245 248; /* off-white header/cards on darker gray body */
   --bg-elevated: 248 248 250;
   --bg-hover: 237 237 240;
   --bg-border: 220 220 224;
