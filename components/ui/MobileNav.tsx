@@ -42,7 +42,8 @@ export function MobileNav({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-bg-border bg-bg-elevated text-text-secondary transition-colors hover:text-text-primary"
+        className="flex h-9 w-9 items-center justify-center rounded-md transition-colors"
+        style={{ color: "rgb(var(--bg-base) / 0.8)" }}
       >
         {/* hamburger / close glyph */}
         <span className="font-mono text-base leading-none">

@@ -27,16 +27,17 @@ const LINKS: { href: string; label: string }[] = [
  */
 export function Nav() {
   return (
-    <nav className="sticky top-0 z-40 w-full border-b bg-bg-surface/90 backdrop-blur-md" style={{ borderBottomColor: "rgb(var(--nav-accent) / 0.5)", background: "linear-gradient(to bottom, rgb(var(--nav-accent) / 0.08), rgb(var(--bg-surface) / 0.9))" }}>
+    <nav className="sticky top-0 z-40 w-full border-b backdrop-blur-md" style={{ background: "rgb(var(--nav-accent))", borderBottomColor: "rgb(var(--nav-accent))" }}>
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6">
         {/* Mobile: hamburger (links collapse here below md). */}
         <MobileNav links={LINKS} />
 
         <Link
           href="/"
-          className="font-mono text-sm font-semibold tracking-tight text-text-primary"
+          className="font-mono text-sm font-semibold tracking-tight"
+          style={{ color: "rgb(var(--bg-base))" }}
         >
-          <span style={{ color: "rgb(var(--nav-accent))" }}>◈</span> SIGRANK
+          <span style={{ opacity: 0.7 }}>◈</span> SIGRANK
         </Link>
 
         {/* Desktop: inline links (hidden on mobile — MobileNav covers it).

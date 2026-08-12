@@ -120,7 +120,8 @@ export function AccountMenu() {
       {loaded && !operator && (
         <Link
           href="/login"
-          className="rounded-md bg-gold px-3 py-1.5 font-sans text-sm font-semibold text-bg-base transition-colors hover:bg-gold/90"
+          className="rounded-md px-3 py-1.5 font-sans text-sm font-semibold transition-colors"
+          style={{ background: "rgb(var(--bg-base))", color: "rgb(var(--nav-accent))" }}
         >
           Get ranked →
         </Link>
@@ -132,7 +133,8 @@ export function AccountMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-md border border-bg-border bg-bg-elevated px-2.5 py-1.5 font-sans text-sm text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
+        className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-sans text-sm transition-colors"
+        style={{ color: "rgb(var(--bg-base) / 0.8)" }}
       >
         {operator ? (
           <>
@@ -146,15 +148,15 @@ export function AccountMenu() {
                 className="h-5 w-5 rounded-full object-cover"
               />
             ) : (
-              <span className="text-gold">◎</span>
+              <span style={{ opacity: 0.7 }}>◎</span>
             )}
-            <span className="max-w-[10rem] truncate text-text-primary">
+            <span className="max-w-[10rem] truncate font-medium" style={{ color: "rgb(var(--bg-base))" }}>
               {displayName}
             </span>
           </>
         ) : (
           <>
-            <span className="text-gold">◎</span> Log in
+            <span style={{ opacity: 0.7 }}>◎</span> Log in
           </>
         )}
       </button>

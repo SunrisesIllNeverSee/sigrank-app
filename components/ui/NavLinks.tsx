@@ -46,8 +46,12 @@ export function NavLinks({
               aria-current={active ? "page" : undefined}
               className={
                 active
-                  ? "rounded-md px-2.5 py-1.5 font-sans text-sm font-semibold text-gold underline decoration-gold/60 underline-offset-4"
-                  : "rounded-md px-2.5 py-1.5 font-sans text-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
+                  ? "rounded-md px-2.5 py-1.5 font-sans text-sm font-semibold underline underline-offset-4"
+                  : "rounded-md px-2.5 py-1.5 font-sans text-sm transition-colors hover:bg-black/10"
+              }
+              style={active
+                ? { color: "rgb(var(--bg-base))", textDecorationColor: "rgb(var(--bg-base) / 0.5)" }
+                : { color: "rgb(var(--bg-base) / 0.7)" }
               }
             >
               {link.label}
