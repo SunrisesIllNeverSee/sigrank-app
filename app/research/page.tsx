@@ -27,6 +27,7 @@ export const metadata: Metadata = withOG({
 const ZENODO_VERSION_DOI = "10.5281/zenodo.21900519";
 const ZENODO_CONCEPT_DOI = "10.5281/zenodo.21875675";
 const ZENODO_URL = "https://zenodo.org/records/21900519";
+const ZENODO_FILE = (name: string) => `${ZENODO_URL}/files/${name}`;
 const SNAPSHOT_DATE = "2026-07-13";
 
 // Dataset stats (from Zenodo v3.1 package)
@@ -119,13 +120,14 @@ export default function StateOfTheIndexPage() {
 
       <WaveHero
         eyebrow="📊 SigRank Index"
-        terminalText="THE INDEX"
+        terminalText="THE DATA-STATE"
         title="State of the Index"
         subtitle={
           <>
             The primary anonymized dataset.{" "}
             {operatorCount.toLocaleString("en-US")} operators across{" "}
-            {platformCount} platforms. Data as of {SNAPSHOT_DATE}.
+            {platformCount} platforms and {DATASET.modelCount.toLocaleString("en-US")} models.{" "}
+            {fmt(totalTokens)} total tokens. Data as of {SNAPSHOT_DATE}.
           </>
         }
       />
@@ -193,7 +195,15 @@ export default function StateOfTheIndexPage() {
             <tbody>
               {DATA_FILES.map((f) => (
                 <tr key={f.name} className="border-b border-bg-border/30 last:border-0">
-                  <td className="py-1.5 pr-3 font-mono text-text-primary whitespace-nowrap">{f.name}</td>
+                  <td className="py-1.5 pr-3 whitespace-nowrap">
+                    <Link
+                      href={ZENODO_FILE(f.name)}
+                      className="font-mono text-gold underline underline-offset-2"
+                      rel="external"
+                    >
+                      {f.name}
+                    </Link>
+                  </td>
                   <td className="py-1.5 pr-3 text-right tabular-nums text-text-secondary whitespace-nowrap">{f.rows}</td>
                   <td className="py-1.5 text-text-dim">{f.desc}</td>
                 </tr>
@@ -210,7 +220,15 @@ export default function StateOfTheIndexPage() {
             <tbody>
               {DOCS.map((f) => (
                 <tr key={f.name} className="border-b border-bg-border/30 last:border-0">
-                  <td className="py-1.5 pr-3 font-mono text-text-primary whitespace-nowrap">{f.name}</td>
+                  <td className="py-1.5 pr-3 whitespace-nowrap">
+                    <Link
+                      href={ZENODO_FILE(f.name)}
+                      className="font-mono text-gold underline underline-offset-2"
+                      rel="external"
+                    >
+                      {f.name}
+                    </Link>
+                  </td>
                   <td className="py-1.5 text-text-dim">{f.desc}</td>
                 </tr>
               ))}
