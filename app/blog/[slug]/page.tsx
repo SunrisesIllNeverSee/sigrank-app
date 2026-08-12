@@ -176,38 +176,41 @@ export default async function BlogPost({
         ]}
       />
 
-      {/* Header — contained, document-style */}
-      <header className="mx-auto mb-8 flex max-w-[42rem] flex-col gap-2 px-6 border-b border-bg-border pb-6">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gold/70">
-          ◈ SigRank
-        </p>
+      {/* Header — Forerunner-style: date, title, author */}
+      <header className="mx-auto mb-8 flex max-w-[42rem] flex-col gap-3 px-6 pb-6">
+        {date && (
+          <p className="font-sans text-sm text-text-muted">
+            {new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          </p>
+        )}
         <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary md:text-3xl">
           {title}
         </h1>
         {description && (
-          <p className="font-sans text-sm leading-relaxed text-text-muted">
+          <p className="font-sans text-base leading-relaxed text-text-muted">
             {description}
           </p>
         )}
-        <div className="flex items-center gap-2 font-mono text-xs text-text-dim pt-1">
-          {date && <time>{new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>}
-          <span className="text-gold/30">·</span>
-          <span>{author}</span>
-        </div>
+        <p className="font-sans text-sm text-text-secondary pt-1">
+          <span className="font-medium text-text-primary">Deric J. McHenry</span>
+          <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
+        </p>
       </header>
 
       {/* Hero image */}
       {hero && (
-        <div className="mb-10 overflow-hidden rounded-xl border border-bg-border">
-          <Image
-            src={hero}
-            alt={title}
-            width={1200}
-            height={630}
-            priority
-            sizes="(max-width: 768px) 100vw, 1200px"
-            className="h-auto w-full object-cover"
-          />
+        <div className="mx-auto mb-8 max-w-[42rem] px-6">
+          <div className="overflow-hidden rounded-xl border border-bg-border">
+            <Image
+              src={hero}
+              alt={title}
+              width={1200}
+              height={630}
+              priority
+              sizes="(max-width: 768px) 100vw, 1200px"
+              className="h-auto w-full object-cover"
+            />
+          </div>
         </div>
       )}
 

@@ -552,15 +552,15 @@ html[data-landing-motion="paused"] .cascade-pulse {
 
 /* ── Blog / article prose (owner 2026-07-14, revised 2026-08-12) ───────────────
  * Document-style: white body text, tight spacing, framed article.
- * Serif body (Lora) + sans headings (Roboto) + mono code.
+ * Inter for body (professional sans) + Roboto for headings + mono code.
  * Inspired by Forerunner Ventures perspectives layout.
  */
 .prose-sigrank {
   color: rgb(var(--text-primary));
-  font-family: var(--font-article), Georgia, "Times New Roman", serif;
-  font-size: 1.0625rem;
-  line-height: 1.7;
-  letter-spacing: 0.002em;
+  font-family: var(--font-article), Inter, system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  letter-spacing: 0.001em;
   max-width: 42rem;
   margin: 0 auto;
   padding: 0 1.5rem;
@@ -659,7 +659,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
   background: none;
   border-radius: 0;
   color: rgb(var(--text-primary));
-  font-size: 1.0625rem;
+  font-size: 0.9375rem;
   line-height: 1.6;
   font-style: italic;
   margin: 1.4em 0;
