@@ -116,7 +116,7 @@ function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
                 key={c.label}
                 className={
                   "px-4 py-4 text-right text-sm font-bold sm:text-base " +
-                  (c.tone === "gold" ? "text-gold" : c.tone === "muted" ? "text-text-muted" : "text-white")
+                  (c.tone === "gold" ? "text-gold" : c.tone === "muted" ? "text-text-muted" : "text-text-primary")
                 }
               >
                 {c.label}
@@ -142,7 +142,8 @@ function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
                       ? "text-xl text-gold sm:text-2xl"
                       : i === 0
                         ? "text-lg text-text-muted sm:text-xl"
-                        : "text-lg text-white/85 sm:text-xl")
+                        : "text-lg text-text-primary sm:text-xl") +
+                    (r.metric === "Operating Ratio (C:I:O)" ? " !text-xs sm:!text-sm whitespace-nowrap" : "")
                   }
                 >
                   {v}

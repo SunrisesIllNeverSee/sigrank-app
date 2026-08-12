@@ -27,7 +27,7 @@ const LINKS: { href: string; label: string }[] = [
  */
 export function Nav() {
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-bg-border bg-bg-surface/90 backdrop-blur-md" style={{ borderBottomColor: "rgb(var(--nav-accent) / 0.4)" }}>
+    <nav className="sticky top-0 z-40 w-full border-b bg-bg-surface/90 backdrop-blur-md" style={{ borderBottomColor: "rgb(var(--nav-accent) / 0.5)", background: "linear-gradient(to bottom, rgb(var(--nav-accent) / 0.08), rgb(var(--bg-surface) / 0.9))" }}>
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6">
         {/* Mobile: hamburger (links collapse here below md). */}
         <MobileNav links={LINKS} />
