@@ -1,24 +1,28 @@
 /**
  * app/compare/page.tsx — head-to-head operator comparison. The Nav links here.
  *
- * RSC: resolves operators A and B from ?a=&b= codenames (defaulting to the top
- * two on the board), reads through the @/lib/data facade (mock fallback when no
- * creds), and renders the presentational CompareTable (metric table + shape
- * radar + Pro gate). A row of quick-swap links re-targets slot B while keeping A.
+ * RSC: resolves operators A and B from ?a=&b= codenames (defaulting to a
+ * day-seeded rotating pick vs "the-field"), reads through the @/lib/data facade
+ * (mock fallback when no creds), and renders the presentational CompareTable
+ * (metric table + shape radar + Pro gate). A row of quick-swap links re-targets
+ * slot B while keeping A.
+ *
+ * ISR (2026-08-12): page is force-static + revalidate=300. Auth-dependent
+ * "compare against me" moved client-side (CompareAgainstMe). The
+ * bumpComparisonsRan counter moved to a client-side API call. The page no
+ * longer reads cookies or headers, so it can be edge-cached. Each unique
+ * ?a=X&b=Y combination is SSR'd on first request then cached.
  */
 
 import type { Metadata } from "next";
 import { withOG, SITE_ORIGIN } from "@/lib/seo";
 
-import { headers } from "next/headers";
 import {
   getLeaderboard,
   getOperator,
   getOperatorHistory,
   type LeaderboardRow,
 } from "@/lib/board";
-import { bumpComparisonsRan } from "@/lib/board/queries";
-import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { CompareMatchup } from "@/components/compare/CompareMatchup";
 import { type CompareOption } from "@/components/compare/CompareSelectors";
@@ -35,6 +39,7 @@ import { ChallengeOnX } from "@/components/compare/ChallengeOnX";
 import { getChallengeBetween } from "@/lib/identity/challenges-server";
 import { GATE_CHALLENGES } from "@/lib/features";
 import { TrackCompareView } from "@/components/analytics/TrackCompareView";
+import { CompareAgainstMe } from "@/components/compare/CompareAgainstMe";
 import {
   CompareShareCard,
   type CompareOperand,
@@ -49,6 +54,15 @@ export const metadata: Metadata = withOG({
     "Head-to-head operator comparison across the cascade layer — Υ Yield, SNR, Leverage, Velocity, 10xDEV & blended cost — with a shape radar.",
   path: "/compare",
 });
+
+// PERF (2026-08-12): page is now ISR. The default view (no ?a= or ?b= params)
+// is prerendered with a day-seeded pick vs the-field. When ?a= and ?b= are
+// present, Next.js SSRs on demand and caches the result. Auth-dependent
+// "compare against me" moved client-side (CompareAgainstMe) so the page no
+// longer reads cookies/headers. The bumpComparisonsRan counter moved to a
+// client-side API call (TrackCompareView → /api/v1/stats/compare-bump).
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 // The canonical name rule lives in lib/compare/operator-name.ts so the page, matchup,
 // radars, ledger + share card all agree (was duplicated + drifted — components stayed
@@ -108,21 +122,9 @@ export default async function ComparePage({
 }) {
   const { a, b } = await searchParams;
 
-  // Count a user-specified head-to-head as a "comparison ran" (the fogged homepage
-  // stat). Only when BOTH operands are chosen, and skip prefetch so hovering a
-  // compare link doesn't inflate it. Fire-and-forget + fully defensive.
-  if (a && b) {
-    const h = await headers();
-    const isPrefetch =
-      h.get("next-router-prefetch") === "1" || h.get("purpose") === "prefetch";
-    if (!isPrefetch) await bumpComparisonsRan();
-  }
-  // PERF (2026-07-31): parallelize independent fetches.
-  // getLeaderboard, getSessionOperator, getOperator(a), getOperator("the-field")
-  // are all independent — was 3-4 sequential round trips.
-  const [board, session, operatorA, fieldRow] = await Promise.all([
+  // PERF: parallelize independent fetches.
+  const [board, operatorA, fieldRow] = await Promise.all([
     getLeaderboard(),
-    getSessionOperator(),
     a ? getOperator(a) : Promise.resolve(null),
     getOperator("the-field"),
   ]);
@@ -133,13 +135,15 @@ export default async function ComparePage({
   // Note: this is the LIVE field median (computed from real operators' Υ),
   // distinct from the AA-modeled 3.5:1:0.5 baseline in SplitFlapCard/FourDegreesChart.
   //
-  // Default side A (owner 2026-06-27): the SIGNED-IN operator (true "you vs.
-  // average"); when signed out, a rotating board pick rather than always #1 (so
-  // the matchup isn't the lopsided top-vs-average). The pick is day-seeded, not
-  // Math.random() (which would break RSC/ISR caching) — stable within a cache
+  // Default side A (owner 2026-06-27): a rotating board pick rather than always
+  // #1 (so the matchup isn't the lopsided top-vs-average). The pick is day-seeded,
+  // not Math.random() (which would break ISR caching) — stable within a cache
   // window, varies day to day. The Field itself is excluded from the A pool.
+  //
+  // "Compare yourself" (signed-in operator as side A) is now handled client-side
+  // by CompareAgainstMe, which navigates to /compare?a=<codename> — preserving
+  // the ISR cache for the default view.
   let defaultA: LeaderboardRow | null = null;
-  if (session?.codename) defaultA = await getOperator(session.codename);
   if (!defaultA) {
     const pool = humanBoard.filter((r) => r.operator.codename !== "the-field");
     if (pool.length > 0) {
@@ -273,6 +277,10 @@ export default async function ComparePage({
           </>
         }
       />
+
+      {/* "Compare yourself" — client-side auth gate (replaces server-side
+          getSessionOperator). Shows a button when signed in. */}
+      <CompareAgainstMe />
 
       {/* MAIN MATCHUP BOX — selectors + two operator panels: identity (logo/name/
           class/Υ) outboard, 5 derived facts inboard (owner 2026-06-22). */}
