@@ -146,8 +146,8 @@
 
   --gold: 224 178 64; /* TUI gold (#e0b240) */
   --accent: 120 220 130; /* terminal green accent */
-  --nav-accent: 34 139 34; /* dark terminal green (#228b22) for header bar */
-  --nav-text: 222 230 210; /* bone-green text on dark green header */
+  --nav-accent: 74 242 98; /* terminal green (#4AF262) — classic CRT phosphor green */
+  --nav-text: 5 6 5; /* dark text on bright green header */
 
   --bar-low: 24 38 26;
   --rank-low: 224 178 64;
