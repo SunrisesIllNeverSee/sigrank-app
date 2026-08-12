@@ -159,7 +159,7 @@ A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators — 
 - Experimental Record (Zenodo): https://doi.org/10.5281/zenodo.19105225
 - Public Recursive Transformation Harness (Zenodo): https://doi.org/10.5281/zenodo.19109397
 - P-000 Propositions Prospectus (Zenodo): https://doi.org/10.5281/zenodo.20031715
-- Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (Zenodo): https://doi.org/10.5281/zenodo.21875675
+- Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (Zenodo, v3.1): https://doi.org/10.5281/zenodo.21900519 (concept: https://doi.org/10.5281/zenodo.21875675)
 - Commitment Theory (34-paper research program): https://github.com/SunrisesIllNeverSee/Commitment_Theory
 
 ## Governance
