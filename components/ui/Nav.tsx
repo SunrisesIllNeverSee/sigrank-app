@@ -34,8 +34,8 @@ export function Nav() {
 
         <Link
           href="/"
-          className="font-mono text-sm font-semibold tracking-tight"
-          style={{ color: "rgb(var(--bg-base))" }}
+          className="font-mono text-sm font-bold tracking-tight"
+          style={{ color: "rgb(var(--nav-text))" }}
         >
           <span style={{ opacity: 0.7 }}>◈</span> SIGRANK
         </Link>
