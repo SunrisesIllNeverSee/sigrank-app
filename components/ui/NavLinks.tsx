@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 const ACTIVE_PREFIX: Record<string, string[]> = {
   "/board/all": ["/board"],
   "/field": ["/field"],
+  "/research": ["/research"],
   "/compare": ["/compare"],
   "/hall": ["/hall"],
   "/wiki": ["/wiki"],
