@@ -9,8 +9,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, sigrankDataset, researchArticle } from "@/lib/jsonld";
 
 export const revalidate = 3600; // 1h — the seed corpus is stable
@@ -118,19 +118,30 @@ export default function StateOfTheIndexPage() {
         ]}
       />
 
-      <WaveHero
-        eyebrow="📊 SigRank Index"
-        terminalText="THE DATA-STATE"
-        title="State of the Index"
-        subtitle={
-          <>
-            The primary anonymized dataset.{" "}
-            {operatorCount.toLocaleString("en-US")} operators across{" "}
-            {platformCount} platforms and {DATASET.modelCount.toLocaleString("en-US")} models.{" "}
-            {fmt(totalTokens)} total tokens. Data as of {SNAPSHOT_DATE}.
-          </>
-        }
+      <CitationMeta
+        title="State of the Index — AI Operator Token Efficiency"
+        description="The primary anonymized dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo under CC-BY-4.0."
+        date={SNAPSHOT_DATE}
+        slug="/research"
+        doi={ZENODO_VERSION_DOI}
       />
+
+      {/* ── Hero — Forerunner-style: date, title, author ─────────────── */}
+      <header className="mx-auto mb-2 flex max-w-[50rem] flex-col gap-3 px-6 pb-6 w-full">
+        <p className="font-sans text-sm text-text-muted">
+          {new Date(SNAPSHOT_DATE).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+        </p>
+        <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary md:text-3xl">
+          State of the Index
+        </h1>
+        <p className="font-sans text-base leading-relaxed text-text-muted">
+          The primary anonymized dataset. {operatorCount.toLocaleString("en-US")} operators across {platformCount} platforms and {DATASET.modelCount.toLocaleString("en-US")} models. {fmt(totalTokens)} total tokens. Data as of {SNAPSHOT_DATE}.
+        </p>
+        <p className="font-sans text-sm text-text-secondary pt-1">
+          <span className="font-medium text-text-primary">Deric J. McHenry</span>
+          <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
+        </p>
+      </header>
 
       {/* ── Table of contents ───────────────────────────────────────── */}
       <nav className="flex flex-wrap gap-x-4 gap-y-1 border-b border-bg-border pb-3 text-xs">
