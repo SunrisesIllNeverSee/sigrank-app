@@ -180,7 +180,7 @@
       &nbsp;&nbsp;<strong>IGNITER</strong> (K.08) — dormant potential · the still soul, waiting<br><br>
       <strong style="color: #f0c862;">TRANSMITTER</strong> is not on the ladder. It is a temporary peak badge (RS.08) that any tier can earn during a high-frequency, high-resonance window. It lapses when frequency or resonance drops.<br><br>
       <strong style="color: #f0c862;">Source:</strong> <code style="color: #7c3aed;">public/data/class-distribution-reference.json</code> from <code style="color: #7c3aed;">public/data/field-analysis.json</code> (1,626 operators, HCM cut)<br>
-      <strong style="color: #f0c862;">Calibration:</strong> Equal-population (Option C) — each stage holds ~68 operators. Floor = minimum total tokens; ceiling = next stage's floor.<br>
+      <strong style="color: #f0c862;">Calibration:</strong> Canonical classifier — fixed total-token thresholds from experience_ladder.json applied to the observed field. Stage populations reflect the real distribution, not equal bins.<br>
       <strong style="color: #f0c862;">Replaces:</strong> Previous yield-based 4-tier system (IGNITER/SEEKER/BUILDER/TRANSMITTER by yield range)
     </p>
   </div>
@@ -236,33 +236,33 @@ const TIER_COLORS = {
 };
 
 const STAGES = [
-  {stage:"ARCH+ I",floor:84192600517,ceiling:7068201104626,operators:67},
-  {stage:"ARCH+ II",floor:46527844056,ceiling:83796808622,operators:68},
-  {stage:"ARCH+ III",floor:33120868087,ceiling:46007607687,operators:68},
-  {stage:"ARCH I",floor:23895612426,ceiling:33113877006,operators:68},
-  {stage:"ARCH II",floor:18399442026,ceiling:23885338222,operators:67},
-  {stage:"ARCH III",floor:15525069887,ceiling:18389930093,operators:68},
-  {stage:"POWER I",floor:12272435221,ceiling:15507589875,operators:68},
-  {stage:"POWER II",floor:10216353881,ceiling:12111995587,operators:68},
-  {stage:"POWER III",floor:8773397273,ceiling:10189224970,operators:67},
-  {stage:"BASE I",floor:7078191068,ceiling:8674592599,operators:68},
-  {stage:"BASE II",floor:5889127180,ceiling:7069544285,operators:68},
-  {stage:"BASE III",floor:4912670550,ceiling:5877345282,operators:68},
-  {stage:"SEEKER I",floor:4147659079,ceiling:4908070645,operators:67},
-  {stage:"SEEKER II",floor:3589503354,ceiling:4147377146,operators:68},
-  {stage:"SEEKER III",floor:2980790685,ceiling:3589126331,operators:68},
-  {stage:"REFINER I",floor:2497415246,ceiling:2961798768,operators:68},
-  {stage:"REFINER II",floor:2014103899,ceiling:2497406487,operators:67},
-  {stage:"REFINER III",floor:1546788054,ceiling:1994830571,operators:68},
-  {stage:"BEARER I",floor:1182479080,ceiling:1544290660,operators:68},
-  {stage:"BEARER II",floor:859231121,ceiling:1173256210,operators:68},
-  {stage:"BEARER III",floor:640084482,ceiling:859181137,operators:67},
-  {stage:"IGNITER I",floor:305327754,ceiling:638638241,operators:68},
-  {stage:"IGNITER II",floor:131960531,ceiling:305275145,operators:68},
-  {stage:"IGNITER III",floor:123324,ceiling:131012254,operators:68},
+  {stage:"ARCH+ I",floor:7068201104627,ceiling:9025906844219236,operators:1},
+  {stage:"ARCH+ II",floor:3000000000000,ceiling:7068201104626,operators:2},
+  {stage:"ARCH+ III",floor:1000000000000,ceiling:1191754939292,operators:1},
+  {stage:"ARCH I",floor:186207267611,ceiling:897095954477,operators:25},
+  {stage:"ARCH II",floor:98543134083,ceiling:182619371269,operators:27},
+  {stage:"ARCH III",floor:68766193943,ceiling:98248689712,operators:27},
+  {stage:"POWER I",floor:39958782379,ceiling:68658355593,operators:82},
+  {stage:"POWER II",floor:26955905621,ceiling:39818716597,operators:81},
+  {stage:"POWER III",floor:19141226889,ceiling:26528630158,operators:81},
+  {stage:"BASE I",floor:13960345961,ceiling:19094211884,operators:109},
+  {stage:"BASE II",floor:10189224970,ceiling:13893793810,operators:108},
+  {stage:"BASE III",floor:7747041813,ceiling:10180251592,operators:108},
+  {stage:"SEEKER I",floor:5446673659,ceiling:7737520639,operators:123},
+  {stage:"SEEKER II",floor:4014577247,ceiling:5439146611,operators:122},
+  {stage:"SEEKER III",floor:2961798768,ceiling:4002879977,operators:121},
+  {stage:"REFINER I",floor:2358346840,ceiling:2957006829,operators:82},
+  {stage:"REFINER II",floor:1845750357,ceiling:2351618474,operators:81},
+  {stage:"REFINER III",floor:1334876308,ceiling:1844751628,operators:81},
+  {stage:"BEARER I",floor:984078167,ceiling:1332518550,operators:68},
+  {stage:"BEARER II",floor:714619043,ceiling:983514118,operators:68},
+  {stage:"BEARER III",floor:431702990,ceiling:712909134,operators:67},
+  {stage:"IGNITER I",floor:216393332,ceiling:430503739,operators:55},
+  {stage:"IGNITER II",floor:88999166,ceiling:215961659,operators:54},
+  {stage:"IGNITER III",floor:0,ceiling:87025203,operators:53},
 ];
 
-const TOTAL = 1626;
+const TOTAL = 1627;
 
 function fmt(v) {
   if (v === null || v === undefined) return "—";
