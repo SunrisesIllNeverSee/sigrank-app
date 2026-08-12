@@ -132,3 +132,27 @@ or handle still appears in any tracked file in this repo.
 This repo is worked on by Drep1 (lead) and Drep2 (one-off tasks) via
 `~/Developer/active/SigRank-repos/D-REP-SCRATCH.md`. All task assignment and reporting
 goes through that scratchpad. Do not bypass it.
+
+## Google Search Console (GSC)
+
+GSC is verified via service account + DNS — NOT in this repo. Do not search for a
+google-site-verification meta tag or HTML file. The toolkit lives outside the app:
+
+- Service account key: `~/.config/sigrank/gsc-sa.json`
+- Script: `~/Developer/active/SigRank/scripts/gsc/gsc.mjs`
+- Instructions: `~/Developer/active/SigRank/scripts/gsc/README.md`
+- Property: `sc-domain:signalaf.com` (Domain property)
+
+```bash
+export GSC_SA_KEY=~/.config/sigrank/gsc-sa.json
+cd ~/Developer/active/SigRank/scripts/gsc
+node gsc.mjs sitemaps:list          # registered sitemaps + error counts
+node gsc.mjs sitemaps:submit        # resubmit sitemap.xml
+node gsc.mjs index <url> [url...]   # push URL(s) to Indexing API
+node gsc.mjs inspect <url>          # URL inspection (verdict + coverage)
+node gsc.mjs check:index --push     # inspect all sitemap URLs + auto-push unindexed
+node gsc.mjs analytics 28           # clicks/impressions last N days
+```
+
+After deploying new pages or updating sitemap, run `sitemaps:submit` + `index` for
+new URLs.
