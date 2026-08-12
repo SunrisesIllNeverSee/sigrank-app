@@ -60,7 +60,7 @@ export default async function FieldPage() {
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
     isAccessibleForFree: true,
     license: "https://creativecommons.org/licenses/by/4.0/",
-    citation: "McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21876660",
+    citation: "McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21900519",
     keywords: [
       "AI operator distribution",
       "token efficiency",
@@ -94,7 +94,7 @@ export default async function FieldPage() {
         description="Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed."
         date={meta.scraped_at}
         slug="/field"
-        doi="10.5281/zenodo.21876660"
+        doi="10.5281/zenodo.21900519"
       />
 
       <WaveHero
