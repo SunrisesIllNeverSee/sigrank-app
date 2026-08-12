@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { LeaderboardRow } from "@/lib/board";
 import {
@@ -59,9 +59,14 @@ interface Props {
  */
 export function HallClient({ windowsData }: Props) {
   const sp = useSearchParams();
-  const classParam = sp.get("class") ?? "all";
-  const platformParam = sp.get("platform");
-  const windowParam = sp.get("window") ?? "all";
+  // Avoid hydration mismatch: useSearchParams() returns null during SSR
+  // prerender but the actual params on the client. Render with defaults
+  // until mounted, then switch to URL params.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const classParam = (mounted ? sp.get("class") : null) ?? "all";
+  const platformParam = mounted ? sp.get("platform") : null;
+  const windowParam = (mounted ? sp.get("window") : null) ?? "all";
 
   const activeClass = classParam;
   const platform = coerce<PlatformUI>(
