@@ -134,12 +134,43 @@ export default function StateOfTheIndexPage() {
 
       {/* ── Table of contents ───────────────────────────────────────── */}
       <nav className="flex flex-wrap gap-x-4 gap-y-1 border-b border-bg-border pb-3 text-xs">
+        <a href="#finding" className="font-mono text-text-muted transition-colors hover:text-gold">The Finding</a>
         <a href="#source" className="font-mono text-text-muted transition-colors hover:text-gold">Source</a>
         <a href="#dataset" className="font-mono text-text-muted transition-colors hover:text-gold">Dataset</a>
+        <a href="#field" className="font-mono text-text-muted transition-colors hover:text-gold">Field Analysis</a>
         <a href="#methodology" className="font-mono text-text-muted transition-colors hover:text-gold">Methodology</a>
         <a href="#cite" className="font-mono text-text-muted transition-colors hover:text-gold">Cite</a>
         <a href="#license" className="font-mono text-text-muted transition-colors hover:text-gold">License</a>
       </nav>
+
+      {/* ── The Finding ─────────────────────────────────────────────── */}
+      <section id="finding" className="flex flex-col gap-4 scroll-mt-20">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          The Finding
+        </h2>
+        <p className="text-lg text-text-primary">
+          When you measure 1,628 AI operators across 17 platforms, the first
+          thing that jumps out is that <strong>volume is not yield</strong>.
+          The operators who burn the most tokens are not the most efficient.
+          The most efficient operators reuse context — cache reads dominate
+          their cascade, and their Yield (Υ) is orders of magnitude higher
+          than the heavy-input majority.
+        </p>
+        <p className="text-base text-text-secondary">
+          The aggregate numbers tell the story: {fmt(totalInput)} of the{" "}
+          {fmt(totalTokens)} total tokens observed are fresh input. Only{" "}
+          {fmt(totalCacheRead)} are cache reads — just {cachePct}% of all
+          traffic. The cascade economy exists, but barely. Most operators are
+          paying full price for every token. The ones who aren&apos;t are the
+          ones at the top of the leaderboard.
+        </p>
+        <p className="text-base text-text-secondary">
+          This is the founding insight. The dataset is the evidence. Every
+          quarter we will re-snapshot the index, publish a new version, and
+          track how the distribution shifts as prompt caching becomes standard
+          practice. This is v3.1 — the baseline.
+        </p>
+      </section>
 
       {/* ── The Source ──────────────────────────────────────────────── */}
       <section id="source" className="flex flex-col gap-4 scroll-mt-20">
@@ -253,13 +284,29 @@ export default function StateOfTheIndexPage() {
           >
             View on Zenodo →
           </Link>
-          <Link
-            href="/field"
-            className="inline-flex items-center gap-2 rounded-lg border border-bg-border bg-bg-surface px-4 py-2 font-mono text-sm text-text-secondary transition hover:border-text-dim"
-          >
-            Field Analysis →
-          </Link>
         </div>
+      </section>
+
+      {/* ── Field Analysis ──────────────────────────────────────────── */}
+      <section id="field" className="flex flex-col gap-3 scroll-mt-20">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Field Analysis
+        </h2>
+        <p className="text-base text-text-secondary">
+          The full field analysis lives at{" "}
+          <Link href="/field" className="text-gold underline underline-offset-2">
+            /field
+          </Link>
+          {" "}— interactive charts, archetype distributions, platform adoption
+          curves, Benford validation, percentile bands, and the cascade Sankey.
+          It is the visual companion to this dataset.
+        </p>
+        <Link
+          href="/field"
+          className="inline-flex w-fit items-center gap-2 rounded-lg border border-bg-border bg-bg-surface px-4 py-2 font-mono text-sm text-text-secondary transition hover:border-text-dim"
+        >
+          Open Field Analysis →
+        </Link>
       </section>
 
       {/* ── Methodology ─────────────────────────────────────────────── */}
