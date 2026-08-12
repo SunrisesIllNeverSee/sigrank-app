@@ -7,177 +7,854 @@ timestamp: 2026-08-10T12:00:00Z
 author: Deric (@SunrisesIllNeverSee)
 ---
 
-# The Human in the Loop Is Unmeasured: The Case for AI Operator Evaluation
+# The Human in the Loop Is Unmeasured
 
-> [1] AI evaluation has a blind spot the size of an entire profession. Model leaderboards rank systems. Safety frameworks test alignment. Benchmark suites measure accuracy, robustness, and reasoning. All of it targets the AI-side artifact or its output. None treats the human operator as the primary unit of comparison. That operator is the unmeasured layer.
+## The Case for AI Operator Evaluation
+
+**Models are benchmarked constantly. Systems are safety-tested. Applications are evaluated against tasks. But the human operating the AI system remains largely absent as a public unit of measurement. SigRank is an attempt to change that — using operational telemetry rather than self-report.**
+
+**August 10, 2026**  
+Deric (@SunrisesIllNeverSee)
 
 ---
 
-## 1. The missing unit of analysis
+AI evaluation has a missing unit of analysis.
 
-[2] The current AI evaluation stack has three layers, each well-established:
+We benchmark models. We test systems for safety and robustness. We evaluate applications against tasks.
 
-1. **Model evaluation** — LMSYS Arena, HELM, Open LLM Leaderboard, HumanEval. They rank models by accuracy, reasoning, coding ability, and human preference. The unit of analysis is the model. The question is "which system is better?"
+But deployed AI capability is not produced by a model alone.
 
-2. **System evaluation** — Safety benchmarks, alignment tests, red-teaming, robustness suites. They test whether an AI system behaves reliably under stress. The unit of analysis is the system. The question is "is it safe and reliable?"
+Someone decides what context enters the system. Someone decides what survives. Someone decides when to reuse prior state, when to reconstruct it, when to abandon a thread, how much generation to request, and how interaction is sequenced over time.
 
-3. **Application evaluation** — Task-specific metrics: pass@k for code, BLEU for translation, F1 for extraction, RAG evaluation, agent orchestration testing. They measure whether the AI produces correct outputs for a specific use case. The unit of analysis is the task. The question is "does it work for this?"
+Those decisions leave a measurable trace.
 
-[3] All three primarily evaluate the AI-side artifact or its output. The operator — the human deciding what to prompt, when to reuse context, how to structure a session, when to break and restart — is not absent from research. Human-computer interaction, human-AI teaming, AI literacy, and productivity measurement all study the human side. But the operator is largely absent from the benchmark stack. There is no widely adopted public standard that measures how an individual operator structures real AI work from passive telemetry and makes that behavior comparable across a field. That is the gap this article addresses.
+Yet there is no widely adopted public framework for comparing individual AI operators from that trace.
 
-[4] The proposed name for that gap: **operator evaluation**. And the measurement framework that makes it possible.
+That is the category SigRank is attempting to formalize:
 
-## 2. The variance model benchmarks cannot see
+**operator evaluation.**
+
+Not another model benchmark.
+
+Not another prompt contest.
+
+Not a self-reported measure of whether someone is "good at AI."
+
+A measurement layer for the human side of human-AI operation.
+
+---
+
+# 1. AI evaluation measures almost everything except the operator
+
+The contemporary evaluation stack has three mature layers.
+
+**Model evaluation** asks which model performs better.
+
+Systems such as LMArena, HELM, HumanEval, SWE-bench, and other benchmark suites compare models by capability, preference, reasoning, coding performance, robustness, or task completion.
+
+The unit is the **model**.
+
+**System evaluation** asks whether an AI system is safe, robust, reliable, or aligned under expected and adversarial conditions.
+
+The unit is the **system**.
+
+**Application evaluation** asks whether an implementation succeeds at a particular job: code generation, extraction, retrieval, translation, agent completion, or another domain-specific task.
+
+The unit is the **application or outcome**.
+
+All three are necessary.
+
+None makes the individual human operator its primary object of measurement.
+
+This is not because humans have been ignored by research. Human-computer interaction, AI literacy, human-AI teaming, prompting behavior, productivity research, and behavioral telemetry already study parts of the human side.
+
+The missing layer is narrower:
+
+> **a public, comparable, cross-platform framework that treats the individual AI operator as a unit of analysis and derives workflow measurements from passive operational telemetry.**
+
+SigRank is an attempt to build that layer.
+
+---
+
+# 2. The operator leaves a measurable structure behind
+
+The starting point is empirical.
+
+**Operator-associated token cascades vary enormously.**
+
+SigRank analyzed an initial field of **1,628 human operator records** drawn from public AI coding-agent leaderboards.
+
+A separate set of **130 statistical outliers** was removed from the primary analytic population and retained for separate analysis, leaving **1,498 operators** in the principal field.
+
+Each record was reduced to four raw token pillars:
+
+- **Input (I)** — fresh context entering the system
+- **Output (O)** — generated tokens
+- **Cache Write (W)** — context committed for later reuse
+- **Cache Read (R)** — previously committed context retrieved during subsequent processing
+
+Four integers.
+
+No prompt interpretation is required.
+
+From them, the operating cascade can be reconstructed.
 
 ![Population vs Yield — 1,634 operators sorted by yield (descending). The field concentrates at low yield with a long tail of elite operators. Colored by build archetype.](/population-vs-yield.svg)
 
-[5] The case for operator evaluation starts with an empirical observation. Even within the same broad AI coding-agent ecosystem, operator token cascades diverge by orders of magnitude.
-
-[6] SigRank analyzed 1,498 human operators from public AI coding agent leaderboards. Each operator was measured on four token pillars: input (fresh context provided), output (tokens generated), cache-write (context committed for reuse), and cache-read (context retrieved on subsequent turns). These four integers are the raw material. Everything else is derived.
-
-[7] The derived metrics tell the story:
-
 | Metric | Formula | Median | Top 1% |
-|--------|---------|--------|--------|
-| Yield (Υ) | (cache_read × output) / input² | 1.68 | 10,000+ |
-| Leverage | cache_read / input | 18.6× | 1,000+ |
-| Velocity | output / input | 0.09 | 10+ |
-| SNR | output / (input + output) | 0.084 | 0.90+ |
+|---|---|---:|---:|
+| Yield (Υ) | `(R × O) / I²` | 1.68 | 10,000+ |
+| Leverage | `R / I` | 18.6× | 1,000+ |
+| Velocity | `O / I` | 0.09 | 10+ |
+| SigRank SNR | `O / (I + O)` | 0.084 | 0.90+ |
 
-[8] The median operator reads 19 tokens of cached context for every 1 token of fresh input. The top 1% reads 1,000 or more. That is not a 10% difference. It is a 50× difference in leverage alone. When you multiply leverage by velocity to get Yield, the gap compounds: the median operator scores 1.68. The top operator (MOSES) scores 18,436.98. That is a 10,000× spread within the same broad ecosystem of AI coding agents.
+At the median, the observed sessions reuse roughly **19 cache-read tokens for every token of fresh input**.
 
-[9] The field shows large operator-level variation that model leaderboards do not represent. The next question — and the one that matters most — is how much of that variance persists when model, platform, and task are controlled. That is a future experiment, not a current claim. What the field data does establish is that the variation is real, it is large, and it is invisible to every existing evaluation layer.
+At the upper tail, that ratio exceeds **1,000 to 1**.
 
-> **What SigRank does not yet claim to know:** which operator compositions produce better work. It claims something more basic: the operator is a measurable part of the AI system, the variation is large enough to matter, and we now have a way to study it. What the cascade predicts is a research question, not a marketing claim.
+That is not a small difference in usage intensity.
 
-## 3. The measurement system
+It is a radically different operating composition.
 
-[10] Operator evaluation requires a measurement primitive — a unit of analysis that captures operator behavior without capturing operator content. SigRank's primitive is the **token cascade**: the flow of tokens through four pillars (input, output, cache-write, cache-read), measured per scoring window.
+And because Yield combines reuse and generation, differences in those dimensions compound.
 
-[11] The cascade is content-private at the content layer by construction. The four pillars are integer counts. They contain no prompt text, no generated content, no file contents, no code. The operator's agent reads token counts locally and submits signed snapshots. The server derives the cascade from four integers. No content leaves the machine. This does not eliminate all privacy considerations — telemetry can still leak behavioral information through timing, volumes, identifiers, and metadata. But it does mean the measurement is content-free: you can measure the flow without measuring the substance.
+The important finding is not that the operator with the larger number is necessarily better.
 
-[12] From the four pillars, every derived metric follows algebraically:
+It is that:
 
-- **Yield** (Υ) = (cache_read × output) / input² — the headline cascade metric. Yield captures the interaction of cache leverage and output velocity per unit of fresh input.
-- **Leverage** = cache_read / input — how much you reuse vs re-type
-- **Velocity** = output / input — how much you generate vs take in
-- **SNR** = output / (input + output) — signal vs overhead
-- **10xDEV** = log₁₀(Leverage) — leverage on a readable scale
-- **Construction** = cache_write / cache_read — how much new context you build per read
+> **human-associated operating structures differ dramatically, those differences are observable, and conventional model evaluation does not represent them.**
 
-[13] These metrics are not independent. They compose through the **telescoping identity**:
+The dataset does not yet establish how much of that variance is caused by the operator.
+
+Observed differences may also reflect:
+
+- model
+- platform
+- task
+- workload
+- caching architecture
+- project type
+- session duration
+- tool defaults
+- scoring window
+- model × operator interaction
+
+Those variables need controlled experiments.
+
+For now, the claim is narrower:
+
+**the variation exists.**
+
+**It is large.**
+
+**It is measurable.**
+
+What that variation predicts remains a research question.
+
+---
+
+# 3. The token cascade
+
+Operator evaluation needs a measurement primitive that does not depend on reading the semantic contents of the work.
+
+SigRank uses the **token cascade**:
 
 ```
-(O/I) × (W/O) × (R/W) = R/I = Leverage
+I, O, W, R
 ```
 
-Transmission × commitment × reuse = leverage. The intermediate terms cancel. The identities make the derived layer internally auditable: Yield, Leverage, Velocity, SNR, and 10xDEV must agree with the submitted pillars and with one another. A derived row that violates those relationships is internally invalid. Coherently fabricated pillars require separate provenance and plausibility controls — the telescoping identity catches inconsistent calculations, not coherent fabrications.
+measured over a defined scoring window.
 
-## 4. What the signal reveals
+At the content layer, these are counts rather than text.
 
-[14] Once you measure the cascade, structure emerges that is invisible to model evaluation. The 1,498 operators in the SigRank field separate into **10 build archetypes** — composition types that describe how an operator works, not how much.
+The scoring system does not inherently require:
+
+- prompt contents
+- generated contents
+- source files
+- code contents
+- document contents
+- message semantics
+
+In SigRank's native architecture, a local agent reads token telemetry and submits signed snapshots from which the server derives the cascade.
+
+That does not make telemetry anonymous or privacy-free.
+
+Metadata can still disclose information through timing, volume, cadence, identifiers, usage patterns, tool choice, and repeated activity.
+
+The claim is therefore deliberately narrower:
+
+> **SigRank can measure token flow without requiring semantic inspection of the work itself.**
+
+From the four pillars, several public views are derived.
+
+### Leverage
+
+```
+L = R / I
+```
+
+How much previously committed context is reused relative to fresh input.
+
+### Velocity
+
+```
+V = O / I
+```
+
+How much generated output is produced relative to fresh input.
+
+### Yield
+
+```
+Υ = (R × O) / I²
+```
+
+Because:
+
+```
+L = R / I
+```
+
+and:
+
+```
+V = O / I
+```
+
+then:
+
+```
+Υ = L × V
+```
+
+Yield is therefore not an independent signal.
+
+It is the interaction between Leverage and Velocity.
+
+### SigRank SNR
+
+```
+S = O / (I + O)
+```
+
+SigRank uses this as a bounded output-share measure.
+
+It is not conventional engineering signal-to-noise ratio.
+
+Because:
+
+```
+V = O / I
+```
+
+then:
+
+```
+S = V / (1 + V)
+```
+
+SNR is therefore an exact monotonic transformation of Velocity.
+
+### 10xDEV
+
+```
+D = log₁₀(L)
+```
+
+A logarithmic representation of Leverage that makes very large differences easier to read.
+
+### Construction
+
+```
+C = W / R
+```
+
+The amount of newly committed reusable state relative to reused state, where the denominator is defined.
+
+These metrics are intentionally redundant views of a smaller underlying structure.
+
+They should not be mistaken for six independent variables.
+
+Some are transformations:
+
+```
+S = V / (1 + V)
+D = log₁₀(L)
+```
+
+Others are compositions:
+
+```
+Υ = L × V
+```
+
+That matters because a measurement system should reveal its algebra rather than hide it behind a collection of branded scores.
+
+SigRank can also be decomposed through a telescoping relationship.
+
+For windows where:
+
+```
+I > 0, O > 0, W > 0
+```
+
+then:
+
+```
+(O/I) × (W/O) × (R/W) = R/I
+```
+
+or:
+
+```
+Transmission × Commitment × Reuse = Leverage
+```
+
+The intermediate terms cancel.
+
+That provides an internal consistency test.
+
+Derived metrics must agree with both the submitted pillars and the algebra connecting them.
+
+If they do not, the row is invalid.
+
+This does not prove that the submitted telemetry is genuine.
+
+It proves something narrower but useful:
+
+**the measurement system can detect internally inconsistent computation.**
+
+Telemetry authenticity is a separate problem.
+
+---
+
+# 4. From numbers to operating shape
+
+Raw ratios are useful.
+
+Composition is more useful.
+
+Using the current SigRank classification rules, the 1,498-person analytic field can be described through **10 build archetypes**.
+
+These archetypes are not personality types.
+
+They do not measure intelligence.
+
+They do not establish work quality.
+
+They describe the **shape of the observed token cascade**.
 
 ![The 10 Build Archetypes — deterministic classification of 1,586 operators by leverage, velocity, and construction. Each bar shows population share with median yield, leverage, and velocity.](/archetypes-10.svg)
 
-[15] The archetypes fall into four families:
+## Convergence
 
-- **Convergence** — CONVERGENT: all three operating axes (leverage, velocity, construction) elevated without the usual tradeoffs. The rare composition.
-- **Generation** — KINETIC: output approaches or exceeds input. Transmission is the defining feature.
-- **Reuse Depth** — INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, ARCHIVIST: the passive reuse axis, from almost no leverage to extreme leverage.
-- **Active Construction** — BUILDER, RECURSIVE, AMPLIFIER: the active construction axis, from early cache-building to deep reuse + active construction at scale.
+### CONVERGENT
 
-[16] An archetype describes shape. A class tier describes qualification (total tokens accumulated). A rank describes position (yield relative to the field). All three are recomputed every scoring window. An experienced operator (ARCH+) can be INPUT-BOUND (deep experience but currently burning fresh input). A new operator (IGNITER) can be an AMPLIFIER (new but already compounding cache). The three axes are independent, and measuring all three gives a richer picture than any single label.
+Leverage, Velocity, and active Construction are simultaneously elevated without the usual tradeoffs.
 
-![The 24-Stage Experience Ladder — 8 tiers × 3 sub-stages, keyed on total tokens. Equal-population calibration (Option C). Each stage shows its token floor and operator count.](/tier-ladder-24.svg)
+This is the rarest composition in the present field.
+
+## Generation
+
+### KINETIC
+
+Generated output approaches or exceeds fresh input.
+
+Transmission is the defining characteristic.
+
+## Reuse Depth
+
+### INPUT-BOUND  
+### PRIMING  
+### CONTEXTUAL  
+### DEEP READER  
+### ARCHIVIST
+
+These represent increasing levels of context reuse, from low leverage through extreme dependence on previously accumulated state.
+
+## Active Construction
+
+### BUILDER  
+### RECURSIVE  
+### AMPLIFIER
+
+These represent increasing levels of reusable-state construction, from early context formation through large-scale combinations of continued construction and reuse.
+
+![The 24-Stage Experience Ladder — 8 tiers × 3 sub-stages, keyed on total tokens. Each stage shows its token floor and operator count.](/tier-ladder-24.svg)
 
 ![Archetype Radar — four workflow families compared across 6 dimensions (yield, leverage, velocity, SNR, construction, tokens/day). KINETIC dominates generation; Reuse Depth dominates construction; Convergence is balanced.](/archetype-radar.svg)
 
-[17] This is what operator evaluation reveals that model evaluation does not: the structure of how someone works with AI. Not whether the model is good, but how the operator is using it. Not whether the result is correct, but whether the workflow is fresh-input-heavy, context-reusing, output-heavy, or actively constructing reusable state. The archetype is a workflow signature — a description of composition, not a verdict on quality.
+The taxonomy separates three properties that are often collapsed into one.
 
-## 5. What is proven and what isn't
+**Archetype describes shape.**
 
-[18] A measurement framework is only credible if the data can be trusted and the claims are precisely bounded. SigRank separates three levels:
+What does this operator's current cascade look like?
 
-**Proven (algebraically).** The telescoping identity. The four pillars compose. Derived metrics cannot be altered independently of the pillars they are derived from. This is a mathematical identity, not a heuristic.
+**Class describes accumulated operating scale or qualification.**
 
-**Verified (operationally).** The first-digit distributions of all four raw pillars plus total-token volume are consistent with Benford's Law at the chosen significance threshold. That does not authenticate individual records — Benford can be consistent with organic data, fabricated data can follow Benford, and a failure to reject at p=0.05 does not establish the null as true. But it provides one population-level check against obvious synthetic or manually fabricated distributions. Additional operational controls: signed snapshots (ed25519 on-device, verified server-side) authenticate origin and prevent post-signature alteration. Provenance tracking, cadence analysis, and plausibility gates address whether the underlying telemetry is credible. Signatures prove this device/key signed this payload; they do not by themselves prove the local source data were genuine unless the entire collection path is strongly attested.
+How much qualifying activity has accumulated under the specification?
 
-**Under evaluation.** Whether a cascade predicts work quality. Whether it predicts team performance. Whether it predicts better reasoning or outcomes. Whether the same model produces systematically different operating structures across operators. These are open questions, not established claims.
+**Rank describes relative field position.**
 
-[19] The honesty of this separation is the point. Operator evaluation is a new category. It should be held to the standard of any new measurement framework: prove what you can prove, verify what you can verify, and label the rest as open.
+Where does this operator sit against the comparison population under a selected metric and scoring window?
 
-## 6. The leaderboard demonstrates that measurement can operate on a real field
+They are not interchangeable.
 
-[20] The SigRank leaderboard is the visible surface. It ranks operators by Yield across 7-day, 30-day, 90-day, and all-time windows. It shows the cascade, the archetype, the class tier, and the rank for every operator. It is live, it is public, and it is the thing people see first.
+A highly experienced operator can exhibit an INPUT-BOUND cascade.
 
-[21] But the leaderboard is not the product. The product is the **operator-evaluation standard**: the methodology, the metrics, the signed telemetry protocol, and the verification battery that make operator performance measurable and comparable. The leaderboard demonstrates that the measurement system can operate on a real field — collection works, derivation works, comparison works, ranking can be instantiated. It does not yet demonstrate construct validity. That requires external outcome validation, which is the first item on the research roadmap.
+A newer operator can exhibit an AMPLIFIER composition.
 
-[22] The strategic path:
+Experience does not determine shape.
+
+Shape does not determine rank.
+
+And rank does not establish quality.
+
+What operator evaluation reveals is something more basic:
+
+> **the operating form through which fresh effort becomes output, retained context, and future leverage.**
+
+That is the object SigRank is trying to measure.
+
+---
+
+# 5. What we know — and what we do not
+
+A credible measurement system has to distinguish exact results from empirical evidence and from open questions.
+
+SigRank currently has all three.
+
+## What is known exactly
+
+The metric dependencies are algebraic.
+
+For valid domains:
 
 ```
-Personal measurement → benchmark → trend tracking → team evaluation → industry index
+Υ = Leverage × Velocity
+SNR = Velocity / (1 + Velocity)
+10xDEV = log₁₀(Leverage)
 ```
 
-Each step compounds. Personal measurement gives an operator their cascade. Benchmarking places them against the field. Trend tracking shows whether they're improving. Team evaluation aggregates operators within an organization. The industry index is the eventual goal: a standard measurement layer for human-AI collaboration, the way model leaderboards are the standard measurement layer for AI systems. The leaderboard is the first step, not the destination.
+The telescoping decomposition also reduces exactly to Leverage.
 
-## 7. Why this category doesn't exist yet
+These claims do not depend on statistical inference.
 
-[23] Operator evaluation hasn't been built before because the prerequisites didn't exist. You need:
+They are identities.
 
-1. **A measurement primitive** that captures operator behavior without capturing content. Token telemetry provides this — the four pillars are content-free integers.
-2. **A derived metric set** that is internally auditable, so inconsistent derived values are detectable. The telescoping identity provides this.
-3. **A verification battery** that addresses inconsistency, manipulation, and anomalous telemetry at the algebraic, statistical, and operational levels. Benford + telescoping + signed telemetry provide this.
-4. **A platform-agnostic ingest layer** that works across Claude, Cursor, Copilot, Gemini, and 15+ other tools. The sigrank CLI provides this.
-5. **A field large enough to establish norms.** 1,498 human operators provide a first Human Center of Mass for this AI coding-agent population — the median, the IQR, the archetype distribution. This is not the center of mass of all AI users; it is the center of mass of operators who install a token scanner and submit signed telemetry. That selection effect matters and is studied explicitly in the field analysis.
+## What has been checked operationally
 
-[24] All five prerequisites now exist. The category is buildable. SigRank is pursuing an open-standard model — the methodology is published, the two-axis taxonomy dataset is on Zenodo ([DOI: 10.5281/zenodo.21875675](https://doi.org/10.5281/zenodo.21875675)), and the CLI is open-source. A full open standard requires a versioned specification, governance, a reference implementation, conformance rules, licensing, and independent adoption. Those are the milestones; the ambition is stated, the status is early.
+The field has been subjected to several statistical and operational checks.
 
-## 8. What this changes
+First-digit distributions across the four raw pillars, together with aggregate token volume, are consistent with Benford's Law at the selected significance threshold.
 
-[25] If operator evaluation becomes a standard layer, it changes three things:
+That result has a narrow meaning.
 
-1. **Hiring and training.** A verifiable workflow signal that supplements work samples and outcomes — not a replacement for judgment, and subject to validation for the specific role and task domain. Signed snapshots mean the numbers are verifiable. The signal describes workflow structure, not work quality.
+It does not authenticate individual records.
 
-2. **Tooling decisions.** Enterprise teams can quantify how effectively their operators use a given tool, not just whether the tool is deployed. The cascade reveals whether the workflow is reusing context or repeatedly starting fresh — information that no tool analytics dashboard provides.
+It does not establish that the data is genuine.
 
-3. **AI-assisted work as a discipline.** GitHub measures commits. Stack Overflow measured reputation. Kaggle measures competitions. None of them measure how humans operate AI models. Operator evaluation creates the measurement layer for a category of work now used by millions of people — a category that didn't exist five years ago.
+It does not mean fabricated data could not reproduce similar distributions.
 
-## 9. The research program
+Benford analysis is one population-level screen against some obvious forms of manipulation.
 
-[26] The immediate roadmap, in priority order:
+Native SigRank telemetry adds another control:
 
-1. **External outcome validation.** Pair SigRank telemetry with independently scored tasks to test how much variance is attributable to the model, the operator, and their interaction. Formally:
+**signed snapshots.**
+
+An on-device Ed25519 signature can establish that a particular key signed a particular payload and that the payload was not altered after signing.
+
+It cannot prove that the local telemetry was truthful before it was signed.
+
+That requires a broader collection architecture.
+
+The verification layer therefore includes:
+
+- algebraic consistency
+- provenance
+- cadence analysis
+- plausibility gates
+- anomaly detection
+- source-specific validation
+- collection-path hardening
+
+No single test establishes truth.
+
+The system is deliberately layered because different attacks require different controls.
+
+## What is not yet known
+
+SigRank has not established whether cascade structure predicts:
+
+- work quality
+- reasoning quality
+- task success
+- professional skill
+- team productivity
+- business outcomes
+- model-independent operator ability
+
+Nor has it established how much observed variance belongs independently to the operator rather than to the model, task, platform, or interaction among them.
+
+Those are not footnotes.
+
+They are the research program.
+
+---
+
+# 6. The leaderboard is the surface, not the product
+
+SigRank currently presents itself publicly as a leaderboard.
+
+That makes the project easy to misunderstand.
+
+A leaderboard is useful because comparison forces a measurement system to become concrete.
+
+There must be:
+
+- a unit
+- a scoring window
+- a field
+- a ranking rule
+- a classification system
+- a collection protocol
+- a verification process
+
+The board proves that those pieces can be assembled into a functioning system.
+
+Operators can be measured.
+
+Cascades can be reconstructed.
+
+Derived values can be computed.
+
+Workflow structures can be classified.
+
+Field position can be calculated.
+
+But the leaderboard is not the deeper product.
+
+The deeper product is the **operator-evaluation layer** beneath it:
+
+- measurement primitives
+- metric specification
+- telemetry protocol
+- classification rules
+- scoring windows
+- provenance controls
+- verification tests
+- cross-platform ingestion
+- reference distributions
+
+And the leaderboard still does not establish construct validity.
+
+A high-Yield operator has not yet been shown to produce better work than a low-Yield operator.
+
+That requires independent outcome measurement.
+
+The intended progression is therefore:
+
+**Personal measurement → Benchmarking → Longitudinal tracking → Team analysis → Industry index**
+
+Personal measurement reveals an operator's own composition.
+
+Benchmarking compares that composition against a field.
+
+Longitudinal tracking reveals how the operating form changes over time.
+
+Team analysis asks whether meaningful patterns emerge across organizations.
+
+And, if the measurements survive validation, an industry index could eventually provide a standardized way to describe human-AI operation across tools and environments.
+
+The leaderboard is simply the first visible implementation.
+
+---
+
+# 7. Why this becomes possible now
+
+A public operator-evaluation layer requires several pieces to exist at once.
+
+### An observable primitive
+
+There has to be a behavioral trace that can be captured without requiring the evaluator to read the work itself.
+
+Token telemetry provides one candidate.
+
+### An auditable metric system
+
+Derived values should be reconstructible from their source measurements.
+
+The algebra makes that possible.
+
+### Collection at the operator level
+
+The measurement has to follow the human through actual work rather than exist only inside controlled benchmark sessions.
+
+### Cross-platform translation
+
+The same conceptual specification has to survive across different AI systems, interfaces, and providers.
+
+This is difficult because platform architecture itself changes the telemetry.
+
+Caching behavior is especially important.
+
+A cache-read token is partly a property of the operator's workflow and partly a property of how the platform implements context reuse.
+
+That means cross-platform operator evaluation cannot simply assume all token events are equivalent.
+
+It has to model the instrumentation layer explicitly.
+
+### A reference field
+
+Individual measurements become more interpretable when there is a population against which they can be compared.
+
+SigRank currently has two distinct regimes.
+
+**Seed field**
+
+Public AI coding-agent leaderboard records used to establish an initial analytical distribution.
+
+**Native SigRank field**
+
+Operators who independently collect and submit telemetry through the native SigRank protocol.
+
+Those populations should not be conflated.
+
+They have different provenance, selection effects, and collection constraints.
+
+That distinction is part of the specification, not an inconvenience to be hidden.
+
+---
+
+# 8. From implementation to standard
+
+SigRank is pursuing an open-standard model.
+
+The methodology is being published.
+
+The current taxonomy dataset is available on Zenodo:
+
+**DOI: 10.5281/zenodo.21875675**
+
+The CLI is open source.
+
+But an open-source implementation is not automatically a standard.
+
+A real standard requires more:
+
+- stable and versioned definitions
+- reference implementations
+- conformance tests
+- governance
+- licensing
+- independent replication
+- independent adoption
+
+SigRank is not there yet.
+
+The relevant distinction is simple:
+
+**the specification can be opened before the standard is established.**
+
+That is the current stage.
+
+---
+
+# 9. What operator evaluation could eventually make possible
+
+If these measurements demonstrate construct validity, operator evaluation could become useful far beyond a public leaderboard.
+
+## Training
+
+Instead of asking whether someone "uses AI well," longitudinal telemetry could show how their operating composition changes.
+
+Does fresh-input dependence fall?
+
+Does context reuse increase?
+
+Does active state construction emerge?
+
+Does an operator move between recognizable build states over time?
+
+The measurement does not tell us whether those changes are improvements.
+
+Outcome validation has to answer that.
+
+## Tool comparison
+
+The same operator could be measured across multiple systems.
+
+Does Claude produce one cascade and Codex another?
+
+Does a workflow become more reuse-heavy in one environment?
+
+Does active construction increase in another?
+
+How much of the resulting difference comes from the operator, and how much from the platform?
+
+This is a different question from model benchmarking.
+
+It measures the **relationship between operator and system**.
+
+## Teams
+
+Once longitudinal individual measurements exist, team-level distributions become possible.
+
+Organizations could examine how work is actually being structured across AI systems rather than relying solely on seat utilization, deployment counts, or survey responses.
+
+## Hiring
+
+This is the highest-risk application and therefore requires the strongest evidence.
+
+A validated operator measurement could eventually supplement work samples and role-specific evaluation.
+
+It should not replace them.
+
+And today's SigRank metrics are not validated for employment decisions.
+
+At present they describe operating structure, not professional value.
+
+---
+
+# 10. The experiment that matters
+
+The strongest test of the operator-evaluation thesis is not another leaderboard.
+
+It is a controlled experiment.
+
+Give multiple operators the same tasks.
+
+Vary the models.
+
+Measure the cascades.
+
+Score the outcomes independently.
+
+Then estimate how much outcome variation belongs to:
+
+- model
+- operator
+- model × operator interaction
+- residual factors
+
+A basic formulation is:
 
 ```
 Outcome = μ + α_model + β_operator + (αβ)_interaction + ε
 ```
 
-This is the experiment that could turn the category thesis into a serious research result. Until this is done, the cascade is a measured signal whose predictive value is not yet established.
+If a stable operator effect survives controls, the case becomes substantially stronger.
 
-2. **Dataset release.** The two-axis taxonomy (10 build archetypes + 24-stage experience ladder) is published on Zenodo ([DOI: 10.5281/zenodo.21875675](https://doi.org/10.5281/zenodo.21875675)). The full operator-level dataset will follow.
+If particular cascade structures predict outcomes across models and tasks, stronger still.
 
-3. **Longitudinal analysis.** How operators move between archetypes over time. Does a BUILDER become an AMPLIFIER? Does an INPUT-BOUND operator develop leverage with experience?
+If the effect disappears, the measurement framework has learned something equally important about its own limits.
 
-4. **Cross-platform comparison.** Does a CONVERGENT operator on Claude look the same as one on Cursor? Do platform differences in caching architecture affect the cascade shape?
+That is how SigRank should be judged.
 
-5. **The paper.** "Benford's Law and Token Ratio Analysis for Outlier Detection in AI Coding Agent Leaderboards." The data is done. The analysis is done. It's writing time.
+Not by whether the leaderboard looks persuasive.
 
-[27] The deeper question — the one that makes this more than "AI users need a leaderboard" — is whether the model itself becomes a measurably different effective system depending on who operates it. Operator evaluation does not end with ranking people. It creates a way to study the interaction term between human and model. If the same model produces systematically different operating structures and outcomes across operators, then "model capability" is not sufficient to describe deployed capability. The effective unit becomes the human + model + context system. That is newer and bigger than a ranking surface. That is the intellectual center of this work.
-
----
-
-*Data: 1,498 human operators (1,628 scraped, 130 outliers separated) from public AI coding agent leaderboards*
-*Metrics: Yield (Υ = cache_read × output / input²), Leverage, Velocity, SNR, 10xDEV, Construction*
-*Verification: Benford chi-square (consistency check, not authentication), telescoping identity (algebraic), signed telemetry (ed25519)*
-*Tool: SigRank, `npx sigrank` on npm*
-*Live board: [signalaf.com](https://signalaf.com) · [Field analysis](/field) · [Methodology](/methodology) · [Wiki](/wiki)*
+By whether the proposed unit of analysis survives falsification.
 
 ---
 
-*This work is part of a broader research program on [Commitment Theory](https://github.com/SunrisesIllNeverSee/Commitment_Theory) — a 34-paper investigation into how governance structures emerge from measurable behavior in autonomous systems. SigRank applies the same principle to AI operators: you don't measure trust by asking, you measure it by observing the cascade.*
+# 11. The deeper question
 
-*- djm · [MO§ES™](https://github.com/SunrisesIllNeverSee)*
-*[@burnmydays on X](https://x.com/burnmydays) · [GitHub](https://github.com/SunrisesIllNeverSee)*
+The larger question is not whether AI needs another leaderboard.
+
+It is whether we have been measuring the wrong effective system.
+
+Most benchmark logic implicitly begins with:
+
+```
+Model
+```
+
+But deployed capability looks more like:
+
+```
+Human + Model + Context + Interaction
+```
+
+The model contributes capability.
+
+The human determines what enters.
+
+Context determines what survives.
+
+Interaction determines how capability is repeatedly invoked, redirected, accumulated, and reused.
+
+If two people using the same model on the same task consistently construct different operating forms — and those forms consistently produce different outcomes — then model capability alone is not enough to describe deployed capability.
+
+The operator is part of the system.
+
+The interaction is part of the system.
+
+And the relevant object may be closer to:
+
+```
+Human × Model × Context
+```
+
+That is the intellectual center of SigRank.
+
+The goal is not merely to rank people.
+
+It is to determine whether human-AI operation itself can become a measurable object.
+
+First descriptive.
+
+Then reproducible.
+
+Then longitudinal.
+
+And, if the evidence supports it, predictive.
+
+Before we can explain who operates AI systems well, we need to establish something more basic:
+
+**what exactly an operator is doing.**
+
+SigRank is building the measurement layer for that question.
+
+---
+
+## Field Summary
+
+**Seed field:** 1,628 public operator records collected; 130 statistical outliers separated; 1,498 included in the primary analytic field.
+
+**Raw pillars:** Input, Output, Cache Write, Cache Read.
+
+**Derived views:** Yield, Leverage, Velocity, SigRank SNR, 10xDEV, Construction.
+
+**Primary structural dimensions:** reuse, generation, and active context construction.
+
+**Verification layers:** algebraic consistency, distributional checks, provenance controls, plausibility analysis, anomaly detection, and native signed telemetry.
+
+**Native telemetry:** Ed25519 signed snapshots generated on-device.
+
+**Tool:** `npx sigrank`
+
+**Live board:** signalaf.com
+
+**Taxonomy dataset:** DOI 10.5281/zenodo.21875675
+
+---
+
+## A Note on Commitment Theory
+
+SigRank sits inside a broader research program on **Commitment Theory**: the study of what system structure can be recovered from observable traces of operation rather than from self-description alone.
+
+SigRank applies that idea to human-AI interaction.
+
+The claim at this stage is intentionally constrained:
+
+> **before we can explain, compare, or evaluate how humans operate AI systems, we need a reproducible way to measure the structure of that operation.**
+
+That is the layer SigRank is attempting to build.
+
+— djm · MO§ES™ · @burnmydays on X · GitHub
+
+**Related:** Yield (Υ) Metric · Field Analysis · Methodology · Wiki · How to Improve Your Yield
 
 ---
 
