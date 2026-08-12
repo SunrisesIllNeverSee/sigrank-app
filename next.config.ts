@@ -116,6 +116,14 @@ const nextConfig: NextConfig = {
         destination: "/research",
         permanent: true,
       },
+      // External links to /blog/volume-isnt-yield sometimes append an em-dash
+      // (URL-encoded as %E2%80%94), causing a 404 that PostHog recorded as a
+      // 10-second LCP. Redirect to the correct slug.
+      {
+        source: "/blog/volume-isnt-yield%E2%80%94",
+        destination: "/blog/volume-isnt-yield",
+        permanent: true,
+      },
     ];
   },
 };

@@ -43,6 +43,7 @@ export function NavLinks({
           <li key={link.href}>
             <Link
               href={link.href}
+              prefetch={link.href === "/board/all" ? false : undefined}
               aria-current={active ? "page" : undefined}
               className={
                 active
