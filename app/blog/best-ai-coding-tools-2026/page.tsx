@@ -16,6 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -85,6 +86,7 @@ const faqs = [
 export default function BestAiCodingTools2026Page() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+      <CitationMeta title={"Best AI Coding Tools for Measuring Developer Performance (2026)"} description={"The best AI coding tools for developer performance in 2026. Why LOC, commits, and hours fail \u2014 and the token metrics that replace them. 7 tools reviewed."} date={"2026-07-07"} slug={"/blog/best-ai-coding-tools-2026"} />
       <JsonLd
         data={[
           articleJsonLd(),
