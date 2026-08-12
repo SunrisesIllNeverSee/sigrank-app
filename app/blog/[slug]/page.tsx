@@ -174,22 +174,22 @@ export default async function BlogPost({
         ]}
       />
 
-      {/* Header */}
-      <header className="mb-10 flex flex-col gap-4 border-b border-bg-border pb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+      {/* Header — hero title in sans, clearly distinct from article body */}
+      <header className="mb-12 flex flex-col gap-3 border-b border-bg-border pb-8">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gold/80">
           ◈ SigRank Blog
         </p>
-        <h1 className="font-sans text-3xl font-bold leading-tight text-text-primary md:text-4xl">
+        <h1 className="font-sans text-3xl font-bold leading-tight text-text-primary md:text-5xl md:tracking-tight">
           {title}
         </h1>
         {description && (
-          <p className="text-lg leading-relaxed text-text-secondary">
+          <p className="font-sans text-base leading-relaxed text-text-muted md:text-lg">
             {description}
           </p>
         )}
-        <div className="flex items-center gap-3 font-mono text-xs text-text-muted">
+        <div className="flex items-center gap-3 font-mono text-xs text-text-dim">
           {date && <time>{new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>}
-          <span>·</span>
+          <span className="text-gold/40">·</span>
           <span>{author}</span>
         </div>
       </header>
