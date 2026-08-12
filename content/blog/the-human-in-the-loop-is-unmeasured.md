@@ -14,7 +14,7 @@ author: Deric (@SunrisesIllNeverSee)
 **Models are benchmarked constantly. Systems are safety-tested. Applications are evaluated against tasks. But the human operating the AI system remains largely absent as a public unit of measurement. SigRank is an attempt to change that — using operational telemetry rather than self-report.**
 
 **August 10, 2026**  
-Deric (@SunrisesIllNeverSee)
+**Deric J. McHenry** · @SunrisesIllNeverSee · ORCID [0009-0002-9904-5390](https://orcid.org/0009-0002-9904-5390)
 
 ---
 
@@ -99,7 +99,7 @@ No prompt interpretation is required.
 
 From them, the operating cascade can be reconstructed.
 
-![Population vs Yield — 1,634 operators sorted by yield (descending). The field concentrates at low yield with a long tail of elite operators. Colored by build archetype.](/population-vs-yield.svg)
+![Population vs Yield — 1,625 operators sorted by yield (descending). The field concentrates at low yield with a long tail of elite operators. Colored by build archetype.](/population-vs-yield.png)
 
 | Metric | Formula | Median | Top 1% |
 |---|---|---:|---:|
@@ -852,9 +852,31 @@ The claim at this stage is intentionally constrained:
 
 That is the layer SigRank is attempting to build.
 
-— djm · MO§ES™ · @burnmydays on X · GitHub
+— **Deric J. McHenry** · MO§ES™ · @burnmydays on X · GitHub · ORCID [0009-0002-9904-5390](https://orcid.org/0009-0002-9904-5390)
 
-**Related:** Yield (Υ) Metric · Field Analysis · Methodology · Wiki · How to Improve Your Yield
+**Related:** Yield (Υ) Metric · Field Analysis · Methodology · Wiki · How to Improve Your Yield · [Interactive Dashboards](/blog/sigrank-dashboards)
+
+---
+
+## Reproducibility
+
+The anonymized taxonomy dataset, methodology, provenance documentation, and analytics dashboards are published on Zenodo under CC-BY 4.0:
+
+- **Dataset:** [10.5281/zenodo.21876660](https://doi.org/10.5281/zenodo.21876660)
+- **Concept DOI:** [10.5281/zenodo.21875675](https://doi.org/10.5281/zenodo.21875675)
+- **CLI:** `npx sigrank` (open source)
+- **Interactive dashboards:** [signalaf.com/dashboards](/dashboards)
+
+The package includes:
+
+- Anonymized operator-level CSV (1,498 operators, 4 raw pillars + 6 derived metrics)
+- 10-archetype classification reference
+- 24-stage experience ladder distribution
+- 6 interactive HTML dashboards (archetype, tier ladder, cross-metric, operator scatter, platform board, model board)
+- Methodology and provenance documentation
+- SHA-256 file hashes for integrity verification
+
+Independent replication is encouraged. The metric definitions are algebraic and can be recomputed from the four raw pillars without access to the original collection infrastructure.
 
 ---
 
