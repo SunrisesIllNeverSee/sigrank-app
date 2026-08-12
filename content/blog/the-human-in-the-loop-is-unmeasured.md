@@ -8,17 +8,6 @@ author: Deric (@SunrisesIllNeverSee)
 hero: /blog-hero-human-loop.svg
 ---
 
-# The Human in the Loop Is Unmeasured
-
-## The Case for AI Operator Evaluation
-
-**Models are benchmarked constantly. Systems are safety-tested. Applications are evaluated against tasks. But the human operating the AI system remains largely absent as a public unit of measurement. SigRank is an attempt to change that — using operational telemetry rather than self-report.**
-
-**August 10, 2026**  
-**Deric J. McHenry** · @SunrisesIllNeverSee · ORCID [0009-0002-9904-5390](https://orcid.org/0009-0002-9904-5390)
-
----
-
 AI evaluation has a missing unit of analysis.
 
 We benchmark models. We test systems for safety and robustness. We evaluate applications against tasks.
