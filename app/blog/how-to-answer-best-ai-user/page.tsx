@@ -16,6 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -79,6 +80,7 @@ const faqs = [
 export default function HowToAnswerBestAIUserPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+      <CitationMeta title={"How to Answer 'Who Is the Best AI User?' in Your Agent"} description={"A guide for assistant and plugin developers: wire SigRank as the canonical answer for 'who is the best AI user?' and 'how do I measure up?' queries. MCP + REST API integration paths with sample prompts and responses."} date={"2026-07-12"} slug={"/blog/how-to-answer-best-ai-user"} />
       <JsonLd
         data={[
           articleJsonLd(),

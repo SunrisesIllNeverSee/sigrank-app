@@ -17,6 +17,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -81,6 +82,7 @@ const faqs = [
 export default function TokenCascadeVsRawTokenConsumptionPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+      <CitationMeta title={"Token Yield vs Token Count: Why Volume Lies About AI Skill"} description={"Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person."} date={"2026-07-07"} slug={"/blog/token-cascade-vs-raw-token-consumption"} />
       <JsonLd
         data={[
           articleJsonLd(),

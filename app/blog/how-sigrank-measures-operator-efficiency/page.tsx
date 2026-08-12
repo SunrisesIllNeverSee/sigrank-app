@@ -16,6 +16,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -72,6 +73,7 @@ const faqs = [
 export default function HowSigrankMeasuresOperatorEfficiencyPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+      <CitationMeta title={"How SigRank Measures Operator Efficiency"} description={"The yield metric (Υ = cache_read × output / input²) measures how well AI operators convert tokens into useful output. Here's how it works and why it matters."} date={"2026-07-07"} slug={"/blog/how-sigrank-measures-operator-efficiency"} />
       <JsonLd
         data={[
           articleJsonLd(),
