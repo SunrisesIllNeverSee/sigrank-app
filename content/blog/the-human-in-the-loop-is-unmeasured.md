@@ -373,8 +373,6 @@ These represent increasing levels of reusable-state construction, from early con
 
 ![The 24-Stage Experience Ladder — 8 tiers × 3 sub-stages, keyed on total tokens. Each stage shows its token floor and operator count.](/tier-ladder-24.svg)
 
-![Archetype Radar — four workflow families compared across 6 dimensions (yield, leverage, velocity, SNR, construction, tokens/day). KINETIC dominates generation; Reuse Depth dominates construction; Convergence is balanced.](/archetype-radar.svg)
-
 The taxonomy separates three properties that are often collapsed into one.
 
 **Archetype describes shape.**
@@ -498,6 +496,8 @@ They are the research program.
 SigRank currently presents itself publicly as a leaderboard.
 
 That makes the project easy to misunderstand.
+
+![Archetype Radar — four workflow families compared across 6 dimensions (yield, leverage, velocity, SNR, construction, tokens/day). KINETIC dominates generation; Reuse Depth dominates construction; Convergence is balanced.](/archetype-radar.svg)
 
 A leaderboard is useful because comparison forces a measurement system to become concrete.
 
@@ -713,6 +713,8 @@ The strongest test of the operator-evaluation thesis is not another leaderboard.
 
 It is a controlled experiment.
 
+![Yield vs Leverage — each point is an operator. The field spreads across orders of magnitude, suggesting the interaction term between operator and model is worth measuring.](/scatter-yield-vs-leverage.svg)
+
 Give multiple operators the same tasks.
 
 Vary the models.
@@ -753,6 +755,8 @@ By whether the proposed unit of analysis survives falsification.
 The larger question is not whether AI needs another leaderboard.
 
 It is whether we have been measuring the wrong effective system.
+
+![Velocity vs Leverage — operators distribute across the full plane, not along a single axis. Two dimensions, not one.](/scatter-velocity-vs-leverage.svg)
 
 Most benchmark logic implicitly begins with:
 
