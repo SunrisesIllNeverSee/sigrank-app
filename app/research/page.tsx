@@ -132,16 +132,25 @@ export default function StateOfTheIndexPage() {
         }
       />
 
+      {/* ── Table of contents ───────────────────────────────────────── */}
+      <nav className="flex flex-wrap gap-x-4 gap-y-1 border-b border-bg-border pb-3 text-xs">
+        <a href="#source" className="font-mono text-text-muted transition-colors hover:text-gold">Source</a>
+        <a href="#dataset" className="font-mono text-text-muted transition-colors hover:text-gold">Dataset</a>
+        <a href="#methodology" className="font-mono text-text-muted transition-colors hover:text-gold">Methodology</a>
+        <a href="#cite" className="font-mono text-text-muted transition-colors hover:text-gold">Cite</a>
+        <a href="#license" className="font-mono text-text-muted transition-colors hover:text-gold">License</a>
+      </nav>
+
       {/* ── The Source ──────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="source" className="flex flex-col gap-4 scroll-mt-20">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           The Source
         </h2>
-        <p className="text-base text-text-secondary">
-          This is the source material. Every article, dashboard, field
-          analysis, and finding published by SigRank derives from this dataset.
-          It is available on Zenodo under CC-BY-4.0 — download the CSVs and
-          JSON to run your own analysis.
+        <p className="text-lg text-text-primary">
+          This is the source material. Every article, dashboard, and finding
+          published by SigRank derives from this dataset. It is available on
+          Zenodo under CC-BY-4.0 — download the CSVs and JSON to run your own
+          analysis.
         </p>
         <p className="text-base text-text-secondary">
           The dataset measures AI operators — the humans driving AI tools —
@@ -164,7 +173,7 @@ export default function StateOfTheIndexPage() {
       </section>
 
       {/* ── The Dataset ──────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
+      <section id="dataset" className="flex flex-col gap-3 scroll-mt-20">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           The Dataset
         </h2>
@@ -254,7 +263,7 @@ export default function StateOfTheIndexPage() {
       </section>
 
       {/* ── Methodology ─────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
+      <section id="methodology" className="flex flex-col gap-3 scroll-mt-20">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           Methodology
         </h2>
@@ -272,7 +281,7 @@ export default function StateOfTheIndexPage() {
       </section>
 
       {/* ── Cite this dataset ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
+      <section id="cite" className="flex flex-col gap-3 scroll-mt-20">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           Cite this dataset
         </h2>
@@ -294,7 +303,7 @@ export default function StateOfTheIndexPage() {
       </section>
 
       {/* ── License ─────────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
+      <section id="license" className="flex flex-col gap-3 scroll-mt-20">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           License
         </h2>
