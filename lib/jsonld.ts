@@ -93,6 +93,7 @@ export function organization() {
       "https://doi.org/10.5281/zenodo.19109397",
       "https://doi.org/10.5281/zenodo.20031715",
       "https://doi.org/10.5281/zenodo.21875675",
+      "https://doi.org/10.5281/zenodo.21900519",
       "https://signomy.xyz",
       "https://mos2es.com",
     ],
@@ -296,6 +297,7 @@ export function sigrankDataset(opts?: {
       "https://doi.org/10.5281/zenodo.19109397",
       "https://doi.org/10.5281/zenodo.20031715",
       "https://doi.org/10.5281/zenodo.21875675",
+      "https://doi.org/10.5281/zenodo.21900519",
     ],
     keywords: [
       "AI operator leaderboard",

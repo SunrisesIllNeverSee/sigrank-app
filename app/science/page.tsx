@@ -247,15 +247,26 @@ export default function SciencePage() {
           </li>
           <li className="flex flex-wrap items-baseline gap-1">
             <strong className="text-text-primary">
-              Two-Axis Operator Taxonomy:
+              Two-Axis Operator Taxonomy (v3.1):
             </strong>{" "}
             <a
-              href="https://doi.org/10.5281/zenodo.21875675"
+              href="https://doi.org/10.5281/zenodo.21900519"
               className="text-gold underline underline-offset-2"
               rel="external"
             >
-              DOI: 10.5281/zenodo.21875675
-            </a>
+              DOI: 10.5281/zenodo.21900519
+            </a>{" "}
+            <span className="text-text-dim">
+              (concept:{" "}
+              <a
+                href="https://doi.org/10.5281/zenodo.21875675"
+                className="text-gold underline underline-offset-2"
+                rel="external"
+              >
+                10.5281/zenodo.21875675
+              </a>
+              )
+            </span>
           </li>
         </ul>
       </section>
