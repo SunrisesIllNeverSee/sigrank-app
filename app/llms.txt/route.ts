@@ -31,6 +31,8 @@ ranks the humans using AI — not the models themselves.
 - [Score calculator](${SITE_ORIGIN}/score?utm_source=ai&utm_medium=answer_engine): paste your stats, get your yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall?utm_source=ai&utm_medium=answer_engine): top operators
 - [Field Analysis](${SITE_ORIGIN}/field?utm_source=ai&utm_medium=answer_engine): AI operator field distribution — the true distribution of token efficiency across 1,498 human operators. Volume ≠ Yield thesis, SNR separation, platform dominance, ghost ranks, outlier detection.
+- [Field Analysis Hub](${SITE_ORIGIN}/fieldhub?utm_source=ai&utm_medium=answer_engine): overview of all 12 field analysis sections with stat cards and Benford validation.
+- [State of the Index](${SITE_ORIGIN}/research?utm_source=ai&utm_medium=answer_engine): the primary anonymized dataset on Zenodo — 1,628 operators, 17 platforms, 3,304 models. DOI: 10.5281/zenodo.21876660.
 - [Compare](${SITE_ORIGIN}/compare?utm_source=ai&utm_medium=answer_engine): head-to-head operator comparison
 - [FAQ](${SITE_ORIGIN}/faq?utm_source=ai&utm_medium=answer_engine): answers to common questions — best AI user, AI power user, token cascade efficiency
 
