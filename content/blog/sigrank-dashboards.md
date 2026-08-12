@@ -7,8 +7,6 @@ timestamp: 2026-08-11T14:00:00Z
 author: Deric (@SunrisesIllNeverSee)
 ---
 
-# SigRank Interactive Dashboards
-
 > [1] The full analytical surface of the SigRank two-axis operator taxonomy, rendered as interactive Chart.js dashboards. All data is embedded — no server calls, no API dependencies. Each dashboard is self-contained and can be viewed independently.
 
 ---

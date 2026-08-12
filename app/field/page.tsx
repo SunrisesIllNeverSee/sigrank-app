@@ -87,18 +87,20 @@ export default async function FieldPage() {
         ]}
       />
 
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-          ◈ Field Distribution Analysis
+      {/* ── Hero — Forerunner-style: date, title, author ─────────────── */}
+      <header className="mx-auto mb-2 flex max-w-[50rem] flex-col gap-3 px-6 pb-6 w-full">
+        <p className="font-sans text-sm text-text-muted">
+          {new Date(meta.scraped_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
         </p>
-        <h1 className="font-sans text-3xl font-bold leading-tight text-text-primary md:text-4xl">
+        <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary md:text-3xl">
           AI Operator Field Analysis — The True Distribution of Token Efficiency
         </h1>
-        <p className="text-base leading-relaxed text-text-secondary">
-          Real data from <strong className="text-text-primary">{meta.humans_included.toLocaleString()}</strong> human AI
-          operators. Outliers separated. Volume ranked. Yield revealed. The field has a shape — and it
-          proves that <strong className="text-gold">volume ≠ yield</strong>.
+        <p className="font-sans text-base leading-relaxed text-text-muted">
+          Real data from {meta.humans_included.toLocaleString()} human AI operators. Outliers separated. Volume ranked. Yield revealed. The field has a shape — and it proves that volume ≠ yield.
+        </p>
+        <p className="font-sans text-sm text-text-secondary pt-1">
+          <span className="font-medium text-text-primary">Deric J. McHenry</span>
+          <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
         </p>
       </header>
 
