@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Roboto, Geist_Mono } from "next/font/google";
+import { Roboto, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
@@ -31,6 +31,17 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+// Lora — serif reading face for long-form blog articles only.
+// Scoped to --font-article so it only applies inside .prose-sigrank.
+const articleSerif = Lora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-article",
+  display: "swap",
+  preload: false,
+});
+
 export const metadata: Metadata = siteMetadata;
 
 // Viewport — themeColor matches the SSR default theme (terminal = #050605). The site
@@ -59,7 +70,7 @@ export default function RootLayout({
       lang="en"
       data-theme="terminal"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} font-sans`}
+      className={`${geistSans.variable} ${geistMono.variable} ${articleSerif.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
         <JsonLd data={[organization(), website(), product()]} />

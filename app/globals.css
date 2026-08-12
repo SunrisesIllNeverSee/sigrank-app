@@ -550,46 +550,52 @@ html[data-landing-motion="paused"] .cascade-pulse {
   animation-play-state: paused !important;
 }
 
-/* ── Blog / article prose (owner 2026-07-14) ────────────────────────────────────
- * Lightweight markdown styling for /blog posts. Uses the theme's CSS vars so it
- * swaps with data-theme like everything else. Not @tailwindcss/typography — just
- * enough to make react-markdown output read like an article, not raw HTML.
+/* ── Blog / article prose (owner 2026-07-14, revised 2026-08-12) ───────────────
+ * Serif body (Lora) + sans headings (Roboto) + mono code/labels.
+ * Color hierarchy: gold for H1/H2, text-primary for H3, text-secondary for
+ * body, text-muted for meta. Clear separation from the page header hero.
  */
 .prose-sigrank {
   color: rgb(var(--text-secondary));
-  font-size: 1.0625rem;
-  line-height: 1.8;
-  letter-spacing: 0.005em;
+  font-family: var(--font-article), Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.85;
+  letter-spacing: 0.003em;
 }
 .prose-sigrank > * + * {
   margin-top: 1.4em;
 }
 
-/* Headings */
+/* Headings — sans font, gold for top-level, clear size hierarchy */
 .prose-sigrank h1,
 .prose-sigrank h2,
 .prose-sigrank h3 {
-  color: rgb(var(--text-primary));
+  font-family: var(--font-geist-sans), Roboto, system-ui, sans-serif;
   font-weight: 700;
   line-height: 1.3;
   scroll-margin-top: 5rem;
 }
 .prose-sigrank h1 {
-  font-size: 1.85rem;
-  margin-top: 2.5em;
+  font-size: 1.75rem;
+  margin-top: 2.8em;
+  margin-bottom: 0.2em;
+  color: rgb(var(--gold));
   letter-spacing: -0.01em;
 }
 .prose-sigrank h2 {
-  font-size: 1.45rem;
+  font-size: 1.4rem;
   margin-top: 2.5em;
+  margin-bottom: 0.2em;
   padding-bottom: 0.35em;
-  border-bottom: 1px solid rgb(var(--border));
+  border-bottom: 1px solid rgb(var(--gold) / 0.25);
+  color: rgb(var(--gold));
   letter-spacing: -0.005em;
 }
 .prose-sigrank h3 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   margin-top: 2em;
   color: rgb(var(--text-primary));
+  font-weight: 600;
 }
 
 /* Paragraphs + inline elements */
@@ -611,12 +617,13 @@ html[data-landing-motion="paused"] .cascade-pulse {
 }
 .prose-sigrank em {
   color: rgb(var(--text-secondary));
+  font-style: italic;
 }
 
 /* Inline code + code blocks */
 .prose-sigrank code {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.85em;
+  font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+  font-size: 0.82em;
   padding: 0.15em 0.4em;
   border-radius: 5px;
   background: rgb(var(--elevated));
@@ -647,8 +654,9 @@ html[data-landing-motion="paused"] .cascade-pulse {
   background: rgb(var(--surface) / 0.4);
   border-radius: 0 8px 8px 0;
   color: rgb(var(--text-secondary));
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.7;
+  font-style: italic;
   margin: 1.6em 0;
 }
 .prose-sigrank blockquote p {
@@ -659,6 +667,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
 }
 .prose-sigrank blockquote strong {
   color: rgb(var(--text-primary));
+  font-style: normal;
 }
 
 /* Lists */
@@ -683,11 +692,12 @@ html[data-landing-motion="paused"] .cascade-pulse {
   display: block;
 }
 
-/* Tables — scrollable wrapper, styled headers, zebra rows */
+/* Tables — sans font for data, scrollable wrapper, zebra rows */
 .prose-sigrank table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+  font-family: var(--font-geist-sans), Roboto, system-ui, sans-serif;
   display: block;
   overflow-x: auto;
   white-space: nowrap;
@@ -700,9 +710,9 @@ html[data-landing-motion="paused"] .cascade-pulse {
   padding: 0.7em 1em;
   text-align: left;
   font-weight: 700;
-  color: rgb(var(--text-primary));
-  border-bottom: 2px solid rgb(var(--border));
-  font-family: var(--font-mono, monospace);
+  color: rgb(var(--gold));
+  border-bottom: 2px solid rgb(var(--gold) / 0.3);
+  font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -721,9 +731,9 @@ html[data-landing-motion="paused"] .cascade-pulse {
   background: rgb(var(--surface) / 0.4);
 }
 
-/* Horizontal rules */
+/* Horizontal rules — gold-tinted separator */
 .prose-sigrank hr {
   border: none;
-  border-top: 1px solid rgb(var(--border));
+  border-top: 1px solid rgb(var(--gold) / 0.2);
   margin: 2.5em 0;
 }
