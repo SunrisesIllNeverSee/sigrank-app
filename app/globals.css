@@ -65,6 +65,7 @@
   --gold: 196 146 58; /* #c4923a brand accent */
   --accent: 156 196 255; /* cascade-blue, harmonized with locked palette */
   --nav-accent: 196 146 58; /* MOSES yellow-gold for header bar */
+  --nav-text: 13 11 8; /* dark text on gold header */
 
   --rank-low: 167 139 250; /* #a78bfa — ranks 4–10 trophy-purple (dark) */
 
@@ -89,7 +90,8 @@
 
   --gold: 180 83 9; /* amber-700, readable on white */
   --accent: 29 78 216; /* blue-700 */
-  --nav-accent: 120 120 130; /* neutral for white header */
+  --nav-accent: 255 255 255; /* white header on gray body */
+  --nav-text: 9 9 11; /* dark text on white header */
 
   --bar-low: 228 228 231;
   --rank-low: 124 58 237; /* #7c3aed — ranks 4–10 trophy-purple (light) */
@@ -114,7 +116,8 @@
 
   --gold: 167 139 250; /* brand accent becomes violet in this theme */
   --accent: 139 92 246;
-  --nav-accent: 167 139 250; /* rail purple for header bar */
+  --nav-accent: 91 33 182; /* deep purple (#5b21b6) for header bar */
+  --nav-text: 244 242 251; /* light text on deep purple header */
 
   --bar-low: 47 40 68;
   --rank-low: 167 139 250; /* #a78bfa — ranks 4–10 trophy-purple (railway) */
@@ -143,7 +146,8 @@
 
   --gold: 224 178 64; /* TUI gold (#e0b240) */
   --accent: 120 220 130; /* terminal green accent */
-  --nav-accent: 120 220 130; /* terminal green for header bar */
+  --nav-accent: 34 139 34; /* dark terminal green (#228b22) for header bar */
+  --nav-text: 222 230 210; /* bone-green text on dark green header */
 
   --bar-low: 24 38 26;
   --rank-low: 224 178 64;
