@@ -12,6 +12,21 @@ const FOOTER_COLUMNS: {
   links: { href: string; label: string }[];
 }[] = [
   {
+    heading: "Analysis",
+    links: [
+      { href: "/research", label: "State of the Index" },
+      { href: "/field", label: "Field Analysis" },
+      { href: "/blog/volume-isnt-yield", label: "Volume Isn't Yield" },
+      { href: "/blog/the-human-in-the-loop-is-unmeasured", label: "The Human in the Loop" },
+      { href: "/blog/sigrank-dashboards", label: "Interactive Dashboards" },
+      { href: "/blog/the-tool-is-the-person", label: "The Tool Is the Person" },
+      { href: "/blog/token-cascade-vs-raw-token-consumption", label: "Token Yield vs Token Count" },
+      { href: "/blog/why-yield-beats-tokenmaxxing", label: "Why Yield Beats Tokenmaxxing" },
+      { href: "/blog/how-sigrank-measures-operator-efficiency", label: "How SigRank Measures" },
+      { href: "/blog/ai-power-user-benchmarking", label: "AI Power User Benchmarking" },
+    ],
+  },
+  {
     heading: "Metrics",
     headingHref: "/metrics",
     links: [
@@ -86,21 +101,6 @@ const FOOTER_COLUMNS: {
       { href: "/platforms", label: "Hermes Agent" },
       { href: "/platforms", label: "OMP (Oh My Pi)" },
       { href: "/platforms", label: "Devin" },
-    ],
-  },
-  {
-    heading: "Analysis",
-    links: [
-      { href: "/research", label: "State of the Index" },
-      { href: "/field", label: "Field Analysis" },
-      { href: "/blog/volume-isnt-yield", label: "Volume Isn't Yield" },
-      { href: "/blog/the-human-in-the-loop-is-unmeasured", label: "The Human in the Loop" },
-      { href: "/blog/sigrank-dashboards", label: "Interactive Dashboards" },
-      { href: "/blog/the-tool-is-the-person", label: "The Tool Is the Person" },
-      { href: "/blog/token-cascade-vs-raw-token-consumption", label: "Token Yield vs Token Count" },
-      { href: "/blog/why-yield-beats-tokenmaxxing", label: "Why Yield Beats Tokenmaxxing" },
-      { href: "/blog/how-sigrank-measures-operator-efficiency", label: "How SigRank Measures" },
-      { href: "/blog/ai-power-user-benchmarking", label: "AI Power User Benchmarking" },
     ],
   },
   {
