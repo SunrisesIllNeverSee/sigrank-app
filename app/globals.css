@@ -558,9 +558,10 @@ html[data-landing-motion="paused"] .cascade-pulse {
 .prose-sigrank {
   color: rgb(var(--text-primary));
   font-family: var(--font-article), Inter, system-ui, sans-serif;
-  font-size: 0.9375rem;
-  line-height: 1.65;
+  font-size: 0.875rem;
+  line-height: 1.55;
   letter-spacing: 0.001em;
+  font-weight: 400;
   max-width: 42rem;
   margin: 0 auto;
   padding: 0 1.5rem;
@@ -568,7 +569,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
   border-right: 1px solid rgba(var(--bg-border), 0.4);
 }
 .prose-sigrank > * + * {
-  margin-top: 1.1em;
+  margin-top: 0.8em;
 }
 
 /* Headings — sans font, gold for top-level, clear size hierarchy */
@@ -581,24 +582,24 @@ html[data-landing-motion="paused"] .cascade-pulse {
   scroll-margin-top: 5rem;
 }
 .prose-sigrank h1 {
-  font-size: 1.6rem;
-  margin-top: 2.2em;
-  margin-bottom: 0.15em;
+  font-size: 1.4rem;
+  margin-top: 1.8em;
+  margin-bottom: 0.1em;
   color: rgb(var(--gold));
   letter-spacing: -0.01em;
 }
 .prose-sigrank h2 {
-  font-size: 1.3rem;
-  margin-top: 2em;
-  margin-bottom: 0.15em;
-  padding-bottom: 0.3em;
+  font-size: 1.15rem;
+  margin-top: 1.6em;
+  margin-bottom: 0.1em;
+  padding-bottom: 0.25em;
   border-bottom: 1px solid rgb(var(--gold) / 0.2);
   color: rgb(var(--gold));
   letter-spacing: -0.005em;
 }
 .prose-sigrank h3 {
-  font-size: 1.1rem;
-  margin-top: 1.6em;
+  font-size: 1rem;
+  margin-top: 1.4em;
   color: rgb(var(--text-primary));
   font-weight: 600;
 }
@@ -618,7 +619,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
 }
 .prose-sigrank strong {
   color: rgb(var(--text-primary));
-  font-weight: 700;
+  font-weight: 500;
 }
 .prose-sigrank em {
   color: rgb(var(--text-primary));
@@ -659,10 +660,10 @@ html[data-landing-motion="paused"] .cascade-pulse {
   background: none;
   border-radius: 0;
   color: rgb(var(--text-primary));
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font-size: 0.875rem;
+  line-height: 1.5;
   font-style: italic;
-  margin: 1.4em 0;
+  margin: 1em 0;
 }
 .prose-sigrank blockquote p {
   margin: 0;
@@ -681,7 +682,7 @@ html[data-landing-motion="paused"] .cascade-pulse {
   padding-left: 1.5em;
 }
 .prose-sigrank li {
-  margin-top: 0.4em;
+  margin-top: 0.25em;
 }
 .prose-sigrank li::marker {
   color: rgb(var(--gold) / 0.6);
