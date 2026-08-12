@@ -174,22 +174,22 @@ export default async function BlogPost({
         ]}
       />
 
-      {/* Header — hero title in sans, clearly distinct from article body */}
-      <header className="mb-12 flex flex-col gap-3 border-b border-bg-border pb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gold/80">
-          ◈ SigRank Blog
+      {/* Header — contained, document-style */}
+      <header className="mx-auto mb-8 flex max-w-[42rem] flex-col gap-2 px-6 border-b border-bg-border pb-6">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gold/70">
+          ◈ SigRank
         </p>
-        <h1 className="font-sans text-3xl font-bold leading-tight text-text-primary md:text-5xl md:tracking-tight">
+        <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary md:text-3xl">
           {title}
         </h1>
         {description && (
-          <p className="font-sans text-base leading-relaxed text-text-muted md:text-lg">
+          <p className="font-sans text-sm leading-relaxed text-text-muted">
             {description}
           </p>
         )}
-        <div className="flex items-center gap-3 font-mono text-xs text-text-dim">
+        <div className="flex items-center gap-2 font-mono text-xs text-text-dim pt-1">
           {date && <time>{new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>}
-          <span className="text-gold/40">·</span>
+          <span className="text-gold/30">·</span>
           <span>{author}</span>
         </div>
       </header>
@@ -214,8 +214,8 @@ export default async function BlogPost({
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{content}</ReactMarkdown>
       </div>
 
-      {/* ── Cross-links ── */}
-      <section className="mt-10 border-t border-bg-border-subtle pt-6">
+      {/* ── Cross-links — contained within article width ── */}
+      <section className="mx-auto mt-8 max-w-[42rem] px-6 border-t border-bg-border pt-6">
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
           <Link
