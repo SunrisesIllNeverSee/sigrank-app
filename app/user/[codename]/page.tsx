@@ -69,17 +69,16 @@ import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 // (s-maxage=21600 in next.config.ts) keeps the CDN serving stale-while-
 // revalidate for 24h.
 export const revalidate = 21600;
-// Next.js 15 changed the default fetch caching from 'force-cache' to 'no-store'.
-// The Supabase client's internal fetch calls don't set cache options, so they
-// default to 'no-store' which forces this page into dynamic rendering —
-// overriding the edge Cache-Control header (s-maxage=21600). Setting
-// fetchCache='default-cache' restores the Next.js 14 behavior: fetch calls
-// are cached by default, allowing the page to be ISR. The unstable_cache
-// wrapper in lib/board/cached.ts handles per-function revalidate windows
-// (120s for operator reads, 300s for board reads), so data freshness is
-// unaffected. On-demand revalidation via revalidateTouchedWindows fires on
-// snapshot submit, immediately purging the CDN cache.
-export const fetchCache = "force-cache";
+// Force the page to be static (ISR) — Next.js 15's default fetch caching
+// changed from 'force-cache' to 'no-store', which was causing the page to
+// be treated as dynamic (overriding the edge Cache-Control header with
+// 'private, no-cache, no-store'). force-static ensures the page is ISR:
+// first request renders + caches, subsequent requests serve from the edge
+// CDN (s-maxage=21600 in next.config.ts). On-demand revalidation via
+// revalidateTouchedWindows fires on snapshot submit, immediately purging
+// the CDN cache. The unstable_cache wrapper in lib/board/cached.ts handles
+// per-function revalidate windows (90-300s) for data freshness.
+export const dynamic = "force-static";
 
 /**
  * Resolve the display name for an operator. display_name now carries both the
