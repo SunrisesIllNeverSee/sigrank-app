@@ -46,9 +46,11 @@ export async function initPostHog() {
     capture_pageview: false, // SPA pageviews are sent manually in PostHogProvider
     capture_pageleave: true,
     persistence: "localStorage+cookie",
-    // Web vitals auto-collection is the #1 event source (37% of all events) and
-    // none are on any dashboard. Disable to cut ~7,100 events/30d + serverless
-    // invocations on the /ingest proxy. Re-enable if we start monitoring CWV.
+    // Web vitals: the client-side `capture_performance: false` is overridden by
+    // the PostHog project setting `autocapture_web_vitals_opt_in: true` (set in
+    // the PostHog dashboard). The server-side setting wins, so $web_vitals
+    // events ARE collected — this is intentional, the data feeds our CWV
+    // monitoring. Keep both settings in sync if you change one.
     capture_performance: false,
     // Error tracking — capture unhandled client-side exceptions as $exception events.
     // PostHog's Error Tracking UI groups them into issues for triage.
