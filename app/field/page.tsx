@@ -133,9 +133,12 @@ export default async function FieldPage() {
         humanCount={meta.humans_included}
       />
 
+      {/* ── Article-formatted analysis sections ─────────────────────── */}
+      <div className="prose-sigrank mt-4">
+
       {/* ── Volume ≠ Yield ───────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Volume ≠ Yield
         </h2>
         <div className="overflow-x-auto">
@@ -166,7 +169,7 @@ export default async function FieldPage() {
 
       {/* ── The Cascade (hero Sankey) ────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           The Token Cascade
         </h2>
         <CascadeSankey />
@@ -189,7 +192,7 @@ export default async function FieldPage() {
 
       {/* ── The SNR Separation ───────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           The SNR Separation
         </h2>
         <div className="overflow-x-auto">
@@ -218,7 +221,7 @@ export default async function FieldPage() {
 
       {/* ── Leverage × Velocity ──────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Leverage × Velocity
         </h2>
         <div className="overflow-x-auto">
@@ -248,7 +251,7 @@ export default async function FieldPage() {
 
       {/* ── Platform Dominance ───────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Platform Dominance
         </h2>
         <div className="overflow-x-auto">
@@ -281,7 +284,7 @@ export default async function FieldPage() {
 
       {/* ── Cascade Composition ──────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Cascade Composition
         </h2>
         <div className="overflow-x-auto">
@@ -317,7 +320,7 @@ export default async function FieldPage() {
 
       {/* ── Yield Quartile Box Plots ─────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Yield Quartile Box Plots
         </h2>
         <div className="overflow-x-auto">
@@ -347,7 +350,7 @@ export default async function FieldPage() {
 
       {/* ── 80% Distribution Band ────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Where 80% of Operators Live
         </h2>
         <EightyPercentBand
@@ -396,7 +399,7 @@ export default async function FieldPage() {
 
       {/* ── Percentile Ladder (Where am I?) ──────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Where Are You?
         </h2>
         <PercentileBands medianYield={meta.medians.yield} />
@@ -411,7 +414,7 @@ export default async function FieldPage() {
 
       {/* ── Ghost Ranks ──────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Ghost Ranks: The Hidden Operators
         </h2>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -515,7 +518,7 @@ export default async function FieldPage() {
 
       {/* ── Operator Archetypes ──────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Build Archetypes
         </h2>
         <p className="text-sm leading-relaxed text-text-secondary">
@@ -536,7 +539,7 @@ export default async function FieldPage() {
 
       {/* ── Outlier Detection ───────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
+        <h2>
           Outlier Detection
         </h2>
         <img
@@ -616,6 +619,8 @@ export default async function FieldPage() {
           </Link>
         </div>
       </footer>
+
+      </div>
     </div>
   );
 }

@@ -152,9 +152,12 @@ export default function StateOfTheIndexPage() {
         <a href="#license" className="font-mono text-text-muted transition-colors hover:text-gold">License</a>
       </nav>
 
+      {/* ── Article-formatted content ────────────────────────────────── */}
+      <div className="prose-sigrank mt-4">
+
       {/* ── The Finding ─────────────────────────────────────────────── */}
       <section id="finding" className="flex flex-col gap-4 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           The Finding
         </h2>
         <p className="text-lg text-text-primary">
@@ -183,7 +186,7 @@ export default function StateOfTheIndexPage() {
 
       {/* ── The Source ──────────────────────────────────────────────── */}
       <section id="source" className="flex flex-col gap-4 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           The Source
         </h2>
         <p className="text-lg text-text-primary">
@@ -214,7 +217,7 @@ export default function StateOfTheIndexPage() {
 
       {/* ── The Dataset ──────────────────────────────────────────────── */}
       <section id="dataset" className="flex flex-col gap-3 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           The Dataset
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
@@ -298,7 +301,7 @@ export default function StateOfTheIndexPage() {
 
       {/* ── Field Analysis ──────────────────────────────────────────── */}
       <section id="field" className="flex flex-col gap-3 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           Field Analysis
         </h2>
         <p className="text-base text-text-secondary">
@@ -320,7 +323,7 @@ export default function StateOfTheIndexPage() {
 
       {/* ── Methodology ─────────────────────────────────────────────── */}
       <section id="methodology" className="flex flex-col gap-3 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           Methodology
         </h2>
         <p className="text-base text-text-secondary">
@@ -338,7 +341,7 @@ export default function StateOfTheIndexPage() {
 
       {/* ── Cite this dataset ───────────────────────────────────────── */}
       <section id="cite" className="flex flex-col gap-3 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           Cite this dataset
         </h2>
         <div className="rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
@@ -360,7 +363,7 @@ export default function StateOfTheIndexPage() {
 
       {/* ── License ─────────────────────────────────────────────────── */}
       <section id="license" className="flex flex-col gap-3 scroll-mt-20">
-        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+        <h2>
           License
         </h2>
         <p className="text-base text-text-secondary">
@@ -375,6 +378,8 @@ export default function StateOfTheIndexPage() {
           . Attribution required — cite as shown above.
         </p>
       </section>
+
+      </div>
     </div>
   );
 }

@@ -100,7 +100,8 @@ export default async function FieldSectionPage({
         subtitle={section.blurb}
       />
 
-      {/* ── Section content ─────────────────────────────────────────── */}
+      {/* ── Section content (article-formatted) ─────────────────────── */}
+      <div className="prose-sigrank mt-4">
       <FieldSectionContent
         slug={slug}
         meta={meta}
@@ -108,6 +109,7 @@ export default async function FieldSectionPage({
         platformAdoption={platform_adoption}
         archetypes={archetypes}
       />
+      </div>
 
       {/* ── Prev / Next nav ──────────────────────────────────────────── */}
       <nav className="flex justify-between gap-4 border-t border-bg-border pt-6">
