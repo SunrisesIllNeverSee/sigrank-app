@@ -56,6 +56,8 @@ export interface WaveHeroProps {
    * SIGRANK wordmark). Omit → the styled <h1> renders in every theme as before.
    */
   terminalText?: string;
+  /** Compact mode: ~25% size for TOC/preview cards. */
+  compact?: boolean;
 }
 
 export function WaveHero({
@@ -63,12 +65,15 @@ export function WaveHero({
   title,
   subtitle,
   terminalText,
+  compact = false,
 }: WaveHeroProps) {
   return (
     // w-full so the masthead exactly fills its max-w-6xl page container (the same
     // box the table sits in) — hero and table share one width + centering, no
     // scrollbar-gutter drift between them.
-    <header className="relative mb-8 w-full overflow-hidden rounded-xl border border-bg-border bg-bg-surface">
+    <header
+      className={`relative w-full overflow-hidden rounded-xl border border-bg-border bg-bg-surface ${compact ? "mb-0" : "mb-8"}`}
+    >
       {/* Animated signal-wave backdrop */}
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
@@ -83,7 +88,7 @@ export function WaveHero({
             d={w.d}
             fill="none"
             stroke={w.stroke}
-            strokeWidth={w.width}
+            strokeWidth={compact ? w.width * 0.5 : w.width}
             strokeLinecap="round"
             opacity={w.opacity}
             pathLength={1}
@@ -96,13 +101,31 @@ export function WaveHero({
       </svg>
 
       {/* Title content */}
-      <div className="relative flex flex-col items-center gap-2 px-6 py-12 text-center sm:py-16">
-        <span className="font-mono text-xs uppercase tracking-[0.4em] text-text-gold">
+      <div
+        className={`relative flex flex-col items-center text-center ${
+          compact
+            ? "gap-1 px-4 py-3"
+            : "gap-2 px-6 py-12 sm:py-16"
+        }`}
+      >
+        <span
+          className={`font-mono uppercase tracking-[0.4em] text-text-gold ${
+            compact ? "text-[9px]" : "text-xs"
+          }`}
+        >
           {eyebrow}
         </span>
-        <WaveHeroTitle title={title} terminalText={terminalText} />
+        <WaveHeroTitle
+          title={title}
+          terminalText={terminalText}
+          compact={compact}
+        />
         {subtitle ? (
-          <p className="max-w-xl font-sans text-sm text-text-secondary">
+          <p
+            className={`font-sans text-text-secondary ${
+              compact ? "max-w-md text-xs" : "max-w-xl text-sm"
+            }`}
+          >
             {subtitle}
           </p>
         ) : null}
