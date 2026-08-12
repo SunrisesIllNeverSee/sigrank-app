@@ -5,6 +5,7 @@ description: Models are benchmarked constantly. Systems are safety-tested. But t
 tags: [article, sigrank, operator-evaluation, measurement, token-cascade, yield, ai-operators, category-creation, human-model-context]
 timestamp: 2026-08-10T12:00:00Z
 author: Deric (@SunrisesIllNeverSee)
+hero: /blog-hero-human-loop.svg
 ---
 
 # The Human in the Loop Is Unmeasured

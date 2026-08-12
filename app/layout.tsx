@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Roboto, Geist_Mono, Lora } from "next/font/google";
+import { Roboto, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
@@ -31,12 +31,11 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-// Lora — serif reading face for long-form blog articles only.
+// Inter — clean professional sans for long-form blog articles only.
 // Scoped to --font-article so it only applies inside .prose-sigrank.
-const articleSerif = Lora({
+const articleSerif = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
   variable: "--font-article",
   display: "swap",
   preload: false,
