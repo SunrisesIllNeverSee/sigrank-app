@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 /**
  * ProfileAuthGate — resolves the viewer's auth state CLIENT-SIDE so the profile
  * page can stay ISR-cached (edge-cached via s-maxage=21600).
  *
  * The server renders with isOwner=false, isSignedIn=false, hasOperator=false.
- * This gate fetches /api/auth/session on mount and passes the resolved auth
- * state to its children via a render prop.
+ * This gate fetches /api/auth/session on mount and provides the resolved auth
+ * state to descendant client components via React Context.
  *
  * Three states:
  *   1. Not signed in           → signedIn=false, hasOperator=false, isOwner=false
@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
  *   - ReportTab: shows without the owner privacy toggle until auth resolves
  *   - LabTab: shows read-only until auth resolves
  */
+
 export interface ProfileAuthState {
   isOwner: boolean;
   isSignedIn: boolean;
@@ -30,12 +31,23 @@ export interface ProfileAuthState {
   loaded: boolean;
 }
 
+const ProfileAuthContext = createContext<ProfileAuthState>({
+  isOwner: false,
+  isSignedIn: false,
+  hasOperator: false,
+  loaded: false,
+});
+
+export function useProfileAuth(): ProfileAuthState {
+  return useContext(ProfileAuthContext);
+}
+
 export function ProfileAuthGate({
   codename,
   children,
 }: {
   codename: string;
-  children: (auth: ProfileAuthState) => React.ReactNode;
+  children: React.ReactNode;
 }) {
   const [auth, setAuth] = useState<ProfileAuthState>({
     isOwner: false,
@@ -67,5 +79,9 @@ export function ProfileAuthGate({
     };
   }, [codename]);
 
-  return <>{children(auth)}</>;
+  return (
+    <ProfileAuthContext.Provider value={auth}>
+      {children}
+    </ProfileAuthContext.Provider>
+  );
 }

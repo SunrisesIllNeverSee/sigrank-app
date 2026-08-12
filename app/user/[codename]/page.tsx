@@ -42,14 +42,9 @@ import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { OperatorRecords } from "@/components/profile/OperatorRecords";
-import { ClaimTab } from "@/components/profile/ClaimTab";
-import { ReportTab } from "@/components/profile/ReportTab";
 import { ProfileAuthGate } from "@/components/profile/ProfileAuthGate";
+import { ClaimTabGate, ReportTabGate, LabTabGate } from "@/components/profile/ProfileAuthGates";
 import { CompareAgainstMe } from "@/components/profile/CompareAgainstMe";
-import dynamic from "next/dynamic";
-const LabTab = dynamic(() => import("@/components/profile/LabTab").then((m) => m.LabTab), {
-  loading: () => <div className="h-48 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" />,
-});
 import { DeferredSplitFlapCard } from "@/components/profile/DeferredSplitFlapCard";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 import { ClaimedBadge } from "@/components/claim/ClaimedBadge";
@@ -748,51 +743,36 @@ export default async function OperatorProfilePage({
         boardRows={boardRows}
       />
 
-      {/* Claim this profile — shown only on unclaimed seeded profiles. Lets
-          the real operator verify ownership (via exact tokscale token count)
-          and take over the profile. Hidden once claimed. Auth state resolved
-          client-side via ProfileAuthGate so the page stays ISR-cached. */}
-      {!operator.claimed && (
-        <ProfileAuthGate codename={operator.codename}>
-          {({ isSignedIn, hasOperator, loaded }) =>
-            loaded ? (
-              <ClaimTab
-                codename={operator.codename}
-                isSignedIn={isSignedIn}
-                hasOperator={hasOperator}
-              />
-            ) : null
-          }
-        </ProfileAuthGate>
-      )}
+      {/* Auth-dependent components are wrapped in a single ProfileAuthGate
+          that resolves auth state client-side via /api/auth/session. This
+          keeps the page ISR-cached (edge s-maxage=21600) — the server
+          renders with isOwner=false (correct for non-owners), and the
+          client gate reveals owner-only features after hydration. */}
+      <ProfileAuthGate codename={operator.codename}>
+        {/* Claim this profile — shown only on unclaimed seeded profiles. */}
+        {!operator.claimed && <ClaimTabGate codename={operator.codename} />}
 
-      <ProfileTabs
-        stats={pending ? pendingPanel : rankedStatsPanel}
-        report={operatorReport ? (
-          <ProfileAuthGate codename={operator.codename}>
-            {({ isOwner: owner }) => <ReportTab report={operatorReport} isOwner={owner} />}
-          </ProfileAuthGate>
-        ) : undefined}
-        lab={
-          ranked && c ? (
-            <ProfileAuthGate codename={operator.codename}>
-              {({ isOwner: owner }) => (
-                <LabTab
-                  pillars={{
-                    input: telemetry.fresh_input,
-                    output: telemetry.output,
-                    cacheCreate: telemetry.cache_create,
-                    cacheRead: telemetry.cache_read,
-                  }}
-                  isOwner={owner}
-                />
-              )}
-            </ProfileAuthGate>
-          ) : undefined
-        }
-        submissions={submissionsPanel}
-        social={socialPanel}
-      />
+        <ProfileTabs
+          stats={pending ? pendingPanel : rankedStatsPanel}
+          report={operatorReport ? (
+            <ReportTabGate report={operatorReport} />
+          ) : undefined}
+          lab={
+            ranked && c ? (
+              <LabTabGate
+                pillars={{
+                  input: telemetry.fresh_input,
+                  output: telemetry.output,
+                  cacheCreate: telemetry.cache_create,
+                  cacheRead: telemetry.cache_read,
+                }}
+              />
+            ) : undefined
+          }
+          submissions={submissionsPanel}
+          social={socialPanel}
+        />
+      </ProfileAuthGate>
 
       {/* ── Cross-links to SEO/AEO/GEO pages ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
