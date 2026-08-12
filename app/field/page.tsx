@@ -1,49 +1,35 @@
 /**
- * app/field/page.tsx — AI Operator Field Distribution Analysis.
+ * app/field/page.tsx — Field Analysis hub.
  *
- * The SEO-heavy page proving the "Volume ≠ Yield" thesis with real data from
- * 1,498 human operators (Human Center of Mass, outliers separated). Server component, ISR (1h).
- * Renders 9 pure-SVG chart components + analysis text + JSON-LD Dataset schema.
- *
- * Data source: public/data/field-analysis.json (pre-generated, 1,628 total, 1,498 Human Center of Mass).
+ * TOC landing page with blurbs + hero previews for each field analysis
+ * section. Each section links to /field/<slug> for the full content.
  */
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
-import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
+import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, personAuthor } from "@/lib/jsonld";
+import { FIELD_SECTIONS } from "@/lib/field/sections";
 import FieldStatCards from "@/components/field/FieldStatCards";
-import PlatformAdoption from "@/components/field/PlatformAdoption";
-import CascadeSankey from "@/components/field/CascadeSankey";
-import PercentileBands from "@/components/field/PercentileBands";
-import OperatorArchetypes from "@/components/field/OperatorArchetypes";
 import BenfordTrustBadge from "@/components/field/BenfordTrustBadge";
-import BotZoneShading from "@/components/field/BotZoneShading";
-import TwoLevelStats from "@/components/field/TwoLevelStats";
-import EightyPercentBand from "@/components/field/EightyPercentBand";
 
 export const metadata: Metadata = withOG({
-  title:
-    "AI Operator Field Analysis — The True Distribution of Token Efficiency",
+  title: "AI Operator Field Analysis — The True Distribution of Token Efficiency",
   description:
-    "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
+    "Real data from 1,498 human AI operators proves volume ≠ yield. 12 field analysis sections: volume vs yield, the token cascade, SNR separation, ghost ranks, build archetypes, and more.",
   path: "/field",
 });
 
 export const revalidate = 3600;
 
-export default async function FieldPage() {
-  // PERF (2026-07-31): parallelize the two data loads.
-  const [data, archetypes] = await Promise.all([
-    getFieldAnalysis(),
-    getArchetypes(),
-  ]);
-  const { meta, ghost_ranks, yield_quartiles, platform_adoption, notable_operators } = data;
+export default async function FieldHubPage() {
+  const data = await getFieldAnalysis();
+  const { meta } = data;
 
-  // JSON-LD Dataset schema for the field analysis
   const fieldDataset = {
     "@context": "https://schema.org",
     "@type": "Dataset",
@@ -58,7 +44,7 @@ export default async function FieldPage() {
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
     isAccessibleForFree: true,
     license: "https://creativecommons.org/licenses/by/4.0/",
-    citation: "McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.0) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21876660",
+    citation: "McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards (v3.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21900519",
     keywords: [
       "AI operator distribution",
       "token efficiency",
@@ -79,7 +65,7 @@ export default async function FieldPage() {
   };
 
   return (
-    <div className="flex flex-col gap-10 py-2">
+    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           fieldDataset,
@@ -87,24 +73,20 @@ export default async function FieldPage() {
         ]}
       />
 
-      {/* ── Hero — Forerunner-style: date, title, author ─────────────── */}
-      <header className="mx-auto mb-2 flex max-w-[50rem] flex-col gap-3 px-6 pb-6 w-full">
-        <p className="font-sans text-sm text-text-muted">
-          {new Date(meta.scraped_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-        </p>
-        <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary md:text-3xl">
-          AI Operator Field Analysis — The True Distribution of Token Efficiency
-        </h1>
-        <p className="font-sans text-base leading-relaxed text-text-muted">
-          Real data from {meta.humans_included.toLocaleString()} human AI operators. Outliers separated. Volume ranked. Yield revealed. The field has a shape — and it proves that volume ≠ yield.
-        </p>
-        <p className="font-sans text-sm text-text-secondary pt-1">
-          <span className="font-medium text-text-primary">Deric J. McHenry</span>
-          <span className="text-text-dim"> · Founder, MO§ES™ Research</span>
-        </p>
-      </header>
+      <WaveHero
+        eyebrow="📊 Field Analysis"
+        terminalText="THE FIELD"
+        title="Field Analysis"
+        subtitle={
+          <>
+            The true distribution of token efficiency.{" "}
+            {meta.humans_included.toLocaleString()} human AI operators,
+            outliers separated. Volume ranked. Yield revealed.
+          </>
+        }
+      />
 
-      {/* ── Stat cards ───────────────────────────────────────────────── */}
+      {/* ── Headline stats ───────────────────────────────────────────── */}
       <FieldStatCards
         medians={{
           yield: meta.medians.yield,
@@ -117,479 +99,66 @@ export default async function FieldPage() {
       {/* ── Benford trust badge ──────────────────────────────────────── */}
       <BenfordTrustBadge />
 
-      {/* ── Two-level stats (Quick View + Statistical Details) ───────── */}
-      <TwoLevelStats
-        medians={meta.medians}
-        iqrFences={{
-          yield: meta.iqr_fences.yield,
-          snr: meta.iqr_fences.snr,
-          leverage: meta.iqr_fences.leverage,
-          velocity: meta.iqr_fences.velocity,
-        }}
-        benfordResults={{
-          input_chi2: 1.65,
-          output_chi2: 5.54,
-          cache_read_chi2: 4.09,
-          cache_write_chi2: 5.47,
-          total_chi2: 0.77,
-        }}
-        humanCount={meta.humans_included}
-      />
+      {/* ── TOC ──────────────────────────────────────────────────────── */}
+      <nav className="flex flex-wrap gap-x-4 gap-y-1 border-b border-bg-border pb-3 text-xs">
+        {FIELD_SECTIONS.map((s) => (
+          <a
+            key={s.slug}
+            href={`#${s.slug}`}
+            className="font-mono text-text-muted transition-colors hover:text-gold"
+          >
+            {s.title}
+          </a>
+        ))}
+      </nav>
 
-      {/* ── Volume ≠ Yield ───────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Volume ≠ Yield
-        </h2>
-        <div className="overflow-x-auto">
-          <img
-            src="/field-charts/volume-vs-yield.svg"
-            alt="Volume vs Yield scatter plot — 1,627 operators on log-log scale showing near-zero correlation between total tokens and yield"
-            width={800}
-            height={480}
-            className="h-auto w-full"
-            style={{ aspectRatio: "800 / 480" }}
-            loading="lazy"
-          />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          Public token-volume leaderboards rank by total token volume. SigRank ranks by yield — how
-          efficiently an operator converts input tokens into output tokens using cache compounding.
-          These two rankings have almost zero correlation. The operator with the most tokens (9
-          quadrillion) has a yield of 0. The operator with the highest yield (2.46M) ranks #697
-          by volume. Volume alone is noise. Yield is signal.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The scatter plot above makes this visible. The median lines divide the field into four
-          quadrants — and the top-right (high volume, high yield) is nearly empty. The highest-yield
-          operators cluster in the bottom-right: modest token spend, extraordinary efficiency. This
-          is the ghost-rank phenomenon, explored below.
-        </p>
-      </section>
-
-      {/* ── The Cascade (hero Sankey) ────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          The Token Cascade
-        </h2>
-        <CascadeSankey />
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The median operator puts in 238M tokens of fresh input. They produce
-          24M tokens of output. They write 72M tokens to cache. And they read
-          4.77B tokens from cache. That last number is the harvest: 20.5x the
-          seed. This is leverage. The cascade is not a chain of
-          amplifications. It is a seed (input), a tiny sprout (output), a
-          small store (cache write), and a massive harvest (cache read).
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The operating ratio compresses this into one fingerprint:{" "}
-          <span className="font-mono font-bold text-gold">C : I : O = 19 : 1 : 0.09</span>.
-          For every 1 token of fresh input, the median operator reads 19 from
-          cache and produces 0.09 output. Yield is what happens when cache
-          compounding meets output production.
-        </p>
-      </section>
-
-      {/* ── The SNR Separation ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          The SNR Separation
-        </h2>
-        <div className="overflow-x-auto">
-          <img
-            src="/field-charts/snr-distribution.svg"
-            alt="SNR distribution histogram — 1,627 human operators, 20 buckets, log scale"
-            width={800}
-            height={340}
-            className="h-auto w-full"
-            style={{ aspectRatio: "800 / 340" }}
-            loading="lazy"
-          />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          Signal-to-Noise Ratio (SNR) = output / (input + output). It measures what fraction of your
-          interaction produced actual output versus prompt overhead. Outliers have SNR near zero.
-          Humans have SNR above .05. One number separates signal producers from token burners.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The histogram shows the field clustering tightly around the median SNR of{" "}
-          {meta.medians.snr.toFixed(3)}. The IQR fences (dashed lines) bracket the middle
-          50% of operators. The long tail to the right — operators with SNR above .10 — are the
-          ghost-rank operators: they produce disproportionate output from minimal input.
-        </p>
-      </section>
-
-      {/* ── Leverage × Velocity ──────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Leverage × Velocity
-        </h2>
-        <div className="overflow-x-auto">
-          <img
-            src="/field-charts/leverage-vs-velocity.svg"
-            alt="Leverage vs Velocity scatter plot — IQR-trimmed, showing yield as rectangle area"
-            width={800}
-            height={420}
-            className="h-auto w-full"
-            style={{ aspectRatio: "800 / 420" }}
-            loading="lazy"
-          />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          Leverage (cache_read / input) measures how much cached context amplifies each fresh input
-          token. Velocity (output / input) measures how much the model generates per token of fresh
-          context. Together, they define the yield rectangle — the area of leverage × velocity
-          approximates how efficiently an operator turns cached knowledge into produced signal.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The median crosshair divides the field. Operators in the top-right quadrant — high
-          leverage and high velocity — are the architectural elite. They read deeply from cache and
-          produce rapidly. The bottom-left cluster (low leverage, low velocity) represents the
-          volume-burning majority: fresh input, minimal caching, slow output.
-        </p>
-      </section>
-
-      {/* ── Platform Dominance ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Platform Dominance
-        </h2>
-        <div className="overflow-x-auto">
-          <PlatformAdoption platforms={platform_adoption} />
-        </div>
-        <div className="mt-2 overflow-x-auto">
-          <img
-          src="/field-charts/platform-yield-quartile.svg"
-          alt="Platform × Yield Quartile — Claude dominance in top quartile"
-          width={800}
-          height={380}
-          className="h-auto w-full"
-          style={{ aspectRatio: "800 / 380" }}
-          loading="lazy"
-        />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          Anthropic-primary operators dominate the top yield quartile — 98.5% of the highest-yield
-          operators use Claude as their primary platform. This isn&apos;t coincidence: Anthropic&apos;s
-          mature prompt caching infrastructure produces higher cacheRead values, which directly
-          drives yield.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The adoption chart shows raw volume — OpenAI and Anthropic lead in total operator count.
-          But the quartile breakdown reveals the efficiency story: OpenAI dominates the bottom
-          quartiles (high volume, low yield), while Anthropic owns the top. The platform you choose
-          shapes the ceiling of your yield architecture.
-        </p>
-      </section>
-
-      {/* ── Cascade Composition ──────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Cascade Composition
-        </h2>
-        <div className="overflow-x-auto">
-          <img
-          src="/field-charts/cascade-composition.svg"
-          alt="Cascade composition — 4 notable operators, log-scaled segments"
-          width={800}
-          height={400}
-          className="h-auto w-full"
-          style={{ aspectRatio: "800 / 400" }}
-          loading="lazy"
-        />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          Four notable operators, four radically different cascade architectures. The stacked bars
-          show how each operator composes their token spend across the four pillars: input (fresh
-          tokens), output (produced signal), cache write (context stored), and cache read (context
-          reused). The outlier at left burns input with zero cache. The high-yield operators at right
-          are dominated by cache read — they reuse context, not burn it.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          These operators illustrate the yield spectrum. See their full profiles on the{" "}
-          <Link href="/hall" className="text-gold underline hover:text-text-primary">
-            Hall of Signal
-          </Link>{" "}
-          and learn how the metrics are computed on the{" "}
-          <Link href="/methodology" className="text-gold underline hover:text-text-primary">
-            methodology page
-          </Link>
-          .
-        </p>
-      </section>
-
-      {/* ── Yield Quartile Box Plots ─────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Yield Quartile Box Plots
-        </h2>
-        <div className="overflow-x-auto">
-          <img
-          src="/field-charts/yield-quartile-boxplots.svg"
-          alt="Yield quartile box plots — 4 metrics × 4 quartiles"
-          width={800}
-          height={420}
-          className="h-auto w-full"
-          style={{ aspectRatio: "800 / 420" }}
-          loading="lazy"
-        />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The box plots break down four metrics — yield, leverage, velocity, and SNR — across the
-          four yield quartiles. The progression is stark: leverage jumps from a median of ~5× in Q1
-          to ~200× in Q4. Velocity climbs from 0.03 to nearly 1.0. But SNR stays flat across all
-          quartiles — the signal density of output doesn't change. What changes is how much cached
-          context amplifies that output.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          This is the architectural insight: high-yield operators don&apos;t produce denser signal —
-          they produce more signal from the same density by leveraging cache. The yield gap is a
-          leverage gap, not a talent gap.
-        </p>
-      </section>
-
-      {/* ── 80% Distribution Band ────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Where 80% of Operators Live
-        </h2>
-        <EightyPercentBand
-          p10={meta.iqr_fences.yield?.q1 ? meta.iqr_fences.yield.q1 * 0.7 : 0.04}
-          p90={meta.iqr_fences.yield?.q3 ? meta.iqr_fences.yield.q3 * 31 : 394}
-          median={meta.medians.yield}
-        />
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The yield distribution is heavily right-skewed. 80% of human
-          operators fall within the shaded band. The long tail to the right
-          is where the AMPLIFIERS and CONVERGENT operators live. The bulk of
-          the field clusters near the median. This is why the median is used
-          instead of the mean: the mean is pulled by outliers, the median
-          reflects where operators actually are.
-        </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
-          <p className="text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">The average-user anchor.</strong>{" "}
-            The median yield of {meta.medians.yield.toFixed(2)} sits close to the{" "}
-            <a
-              href="https://artificialanalysis.ai"
-              className="text-gold underline underline-offset-2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Artificial Analysis
-            </a>{" "}
-            modeled &ldquo;average AI user&rdquo; baseline of 1.75 (the 7:2:1
-            cache-read : cache-write : input ratio). But the composition is very
-            different: the real field has <strong className="text-text-primary">{meta.medians.leverage.toFixed(1)}× leverage</strong>{" "}
-            vs the model&apos;s 3.5× — real operators read far more cache — but
-            only <strong className="text-text-primary">{meta.medians.velocity.toFixed(2)} velocity</strong>{" "}
-            vs the model&apos;s 0.50 — they produce less output per input token.
-            Cache-heavy, output-light. Net yield is close to the modeled average;
-            the path there is not. See the{" "}
+      {/* ── Section previews ─────────────────────────────────────────── */}
+      <div className="flex flex-col gap-6">
+        {FIELD_SECTIONS.map((section) => (
+          <section
+            key={section.slug}
+            id={section.slug}
+            className="flex flex-col gap-3 scroll-mt-20 rounded-lg border border-bg-border bg-bg-surface px-5 py-4"
+          >
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="font-sans text-lg font-bold text-text-primary">
+                {section.title}
+              </h2>
+              <span className="font-mono text-xs text-text-dim">
+                {String(section.order).padStart(2, "0")}
+              </span>
+            </div>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              {section.blurb}
+            </p>
+            {section.chart && (
+              <Link
+                href={`/field/${section.slug}`}
+                className="overflow-hidden rounded-lg border border-bg-border transition-opacity hover:opacity-90"
+              >
+                <img
+                  src={section.chart}
+                  alt={section.title}
+                  width={800}
+                  height={400}
+                  className="h-auto w-full"
+                  style={{ aspectRatio: "800 / 400" }}
+                  loading="lazy"
+                />
+              </Link>
+            )}
             <Link
-              href="/wiki/four-degrees"
-              className="text-gold underline underline-offset-2"
+              href={`/field/${section.slug}`}
+              className="self-start font-mono text-xs text-gold underline underline-offset-2 transition-colors hover:text-text-primary"
             >
-              Four Degrees of Leverage
-            </Link>{" "}
-            for the full cascade.
-          </p>
-        </div>
-      </section>
+              Read {section.title} →
+            </Link>
+          </section>
+        ))}
+      </div>
 
-      {/* ── Percentile Ladder (Where am I?) ──────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Where Are You?
-        </h2>
-        <PercentileBands medianYield={meta.medians.yield} />
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The percentile ladder shows the yield thresholds for each tier. The
-          median is where most operators land. The top 1% is where cache
-          architecture becomes an art form. If you use AI coding agents, you
-          are probably near the median. Claim your profile to see exactly
-          where you fit.
-        </p>
-      </section>
-
-      {/* ── Ghost Ranks ──────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Ghost Ranks: The Hidden Operators
-        </h2>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          Ghost-rank operators are invisible on volume-based leaderboards but dominate yield-based
-          rankings. They use fewer tokens but achieve higher output efficiency. These are the
-          operators worth recruiting — they have skill, not just spend.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The data reveals {ghost_ranks.length} ghost-rank operators — above median yield but with volume
-          ranks in the hundreds or thousands. Their median volume rank is{" "}
-          {(() => {
-            const ranks = ghost_ranks.map((g) => g.tokscale_rank).sort((a, b) => a - b);
-            const mid = Math.floor(ranks.length / 2);
-            return ranks.length % 2 === 0
-              ? Math.round((ranks[mid - 1] + ranks[mid]) / 2)
-              : ranks[mid];
-          })()},
-          meaning they are buried deep on any volume leaderboard. But their yield values reach into
-          the hundreds of thousands. Volume metrics hide them. Yield metrics find them.
-        </p>
-        <div className="overflow-x-auto">
-          <img
-            src="/field-charts/ghost-rank-quadrant.svg"
-            alt="Ghost rank quadrant — Q2 low volume high yield operators, 1,598 operators on log-log scale"
-            width={800}
-            height={480}
-            className="h-auto w-full"
-            style={{ aspectRatio: "800 / 480" }}
-            loading="lazy"
-          />
-        </div>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The quadrant chart above plots every human operator on a log-log grid of total tokens
-          versus yield. The dashed gold lines mark the median on each axis, splitting the field into
-          four quadrants. Q2 — the top-left, low volume and high yield — is the ghost-rank region,
-          highlighted in cyan. These operators would be invisible on any volume-ranked leaderboard,
-          yet they dominate on yield. They are the operators worth recruiting.
-        </p>
-        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
-          <table className="w-full border-collapse font-sans text-sm">
-            <thead>
-              <tr className="border-b border-bg-border">
-                <th className="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider text-text-muted">
-                  Handle
-                </th>
-                <th className="px-4 py-2 text-right text-xs font-bold uppercase tracking-wider text-text-muted">
-                  Tokscale Rank
-                </th>
-                <th className="px-4 py-2 text-right text-xs font-bold uppercase tracking-wider text-gold">
-                  Yield (Υ)
-                </th>
-                <th className="px-4 py-2 text-right text-xs font-bold uppercase tracking-wider text-text-muted">
-                  Total Tokens
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider text-text-muted">
-                  Platform
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ghost_ranks.slice(0, 20).map((g) => (
-                <tr key={g.handle} className="border-b border-bg-border-subtle">
-                  <td className="px-4 py-2 font-mono text-text-primary">
-                    <Link
-                      href={`/user/${g.handle}`}
-                      className="underline hover:text-text-primary"
-                      style={{ color: "#10b981" }}
-                    >
-                      {g.handle}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono text-text-muted">
-                    #{g.tokscale_rank.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono font-bold text-gold">
-                    {g.yield >= 1000
-                      ? `${(g.yield / 1000).toFixed(1)}K`
-                      : g.yield.toFixed(1)}
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono text-text-muted">
-                    {g.total_tokens >= 1_000_000_000
-                      ? `${(g.total_tokens / 1e9).toFixed(1)}B`
-                      : `${(g.total_tokens / 1e6).toFixed(1)}M`}
-                  </td>
-                  <td className="px-4 py-2 text-text-secondary">{g.platform}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="text-xs text-text-muted">
-          Showing 20 of {ghost_ranks.length} ghost-rank operators.
-        </p>
-        <Link
-          href="/login"
-          className="self-start rounded-md border border-gold bg-bg-surface px-5 py-2.5 font-sans text-sm font-bold text-gold transition-colors hover:bg-gold hover:text-bg-primary"
-        >
-          Claim your profile →
-        </Link>
-      </section>
-
-      {/* ── Operator Archetypes ──────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Build Archetypes
-        </h2>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The field separates into 10 build archetypes across four families:
-          Convergence, Generation, Reuse Depth, and Active Construction.
-          CONVERGENT is checked first and pulls out operators who are elite
-          on all three derived dimensions (leverage, velocity, construction).
-          KINETIC captures high-velocity generation. The Construction branch
-          captures active context builders. The Reuse Depth branch captures
-          passive context reusers. Each type is defined by a different
-          primary dimension of the token cascade.
-        </p>
-        <OperatorArchetypes
-          archetypes={archetypes}
-          totalOperators={archetypes.reduce((s, a) => s + (a.n ?? 0), 0)}
-        />
-      </section>
-
-      {/* ── Outlier Detection ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-sans text-2xl font-bold text-text-primary">
-          Outlier Detection
-        </h2>
-        <img
-        src="/field-charts/outlier-detection.svg"
-        alt="Outlier detection — SNR vs total tokens, 1,610 humans, 17 flagged outliers"
-        width={800}
-        height={320}
-        className="h-auto w-full"
-        style={{ aspectRatio: "800 / 320" }}
-        loading="lazy"
-      />
-        <BotZoneShading />
-        <p className="text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s metrics catch gaming automatically. A 6-signal outlier-likelihood score
-          identifies operators with inhuman throughput, zero cache usage, single-model fixation,
-          and zero sessions. {meta.outliers} outliers were separated from the field distribution.
-          An additional input/total ratio analysis separates extreme humans from replay outliers
-          and input dump outliers, keeping the Human Center of Mass clean.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          The scatter plot shows why outliers are detectable: they cluster in the bottom-right —
-          massive token volume with near-zero SNR. They pump input tokens without producing
-          proportionate output. No human operator occupies that region. The 6-signal score makes
-          this structural: inhuman throughput, zero cache reads, single-model fixation, and zero
-          sessions are individually suspicious; together they are conclusive.
-        </p>
-        <p className="text-sm leading-relaxed text-text-secondary">
-          This is why the Four Degrees chart&apos;s columns are honest: the{" "}
-          {meta.outliers} outliers are separated before the median is computed. Without
-          separation, `grenadeoftacoss` alone skews the field average by
-          248,000%. The median is immune. Read the{" "}
-          <Link
-            href="/blog/volume-isnt-yield"
-            className="text-gold underline underline-offset-2"
-          >
-            full analysis
-          </Link>{" "}
-          or see the{" "}
-          <Link
-            href="/wiki/four-degrees"
-            className="text-gold underline underline-offset-2"
-          >
-            Four Degrees of Leverage
-          </Link>{" "}
-          to see how the clean median compares to the modeled average.
-        </p>
-      </section>
-
-      {/* ── Footer ───────────────────────────────────────────────────── */}
-      <footer className="mt-8 flex flex-col gap-3 border-t border-bg-border pt-6">
+      {/* ── Footer links ─────────────────────────────────────────────── */}
+      <footer className="mt-4 flex flex-col gap-3 border-t border-bg-border pt-6">
         <p className="text-sm text-text-secondary">
           Data collected {meta.scraped_at} from{" "}
           <a
@@ -600,21 +169,33 @@ export default async function FieldPage() {
           >
             tokscale.ai/leaderboard
           </a>
-          . {meta.total_scraped.toLocaleString()} operators collected, {meta.outliers} outliers
-          separated, {meta.humans_included.toLocaleString()} humans
-          analyzed.
+          . {meta.total_scraped.toLocaleString()} operators collected,{" "}
+          {meta.outliers} outliers separated,{" "}
+          {meta.humans_included.toLocaleString()} humans analyzed.
         </p>
         <div className="flex flex-wrap gap-4 text-sm">
-          <Link href="/blog/volume-isnt-yield" className="text-gold underline hover:text-text-primary">
-            Read the full analysis
+          <Link
+            href="/research"
+            className="text-gold underline hover:text-text-primary"
+          >
+            State of the Index
           </Link>
-          <Link href="/methodology" className="text-gold underline hover:text-text-primary">
+          <Link
+            href="/methodology"
+            className="text-gold underline hover:text-text-primary"
+          >
             Methodology
           </Link>
-          <Link href="/hall" className="text-gold underline hover:text-text-primary">
+          <Link
+            href="/hall"
+            className="text-gold underline hover:text-text-primary"
+          >
             Hall of Signal
           </Link>
-          <Link href="/board/all" className="text-gold underline hover:text-text-primary">
+          <Link
+            href="/board/all"
+            className="text-gold underline hover:text-text-primary"
+          >
             Live Leaderboard
           </Link>
         </div>
