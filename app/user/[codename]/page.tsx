@@ -32,7 +32,6 @@ import {
 import type { HallRecord } from "@/lib/board";
 import { computeFieldAverages } from "@/lib/analytics/field-average";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
-import { getSessionOperator, getSessionUser } from "@/lib/infra/supabase/auth-server";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
 import type { Operator } from "@/lib/analytics/scoring-types";
@@ -45,6 +44,8 @@ import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { OperatorRecords } from "@/components/profile/OperatorRecords";
 import { ClaimTab } from "@/components/profile/ClaimTab";
 import { ReportTab } from "@/components/profile/ReportTab";
+import { ProfileAuthGate } from "@/components/profile/ProfileAuthGate";
+import { CompareAgainstMe } from "@/components/profile/CompareAgainstMe";
 import dynamic from "next/dynamic";
 const LabTab = dynamic(() => import("@/components/profile/LabTab").then((m) => m.LabTab), {
   loading: () => <div className="h-48 animate-pulse rounded-lg border border-bg-border bg-bg-base/40" />,
@@ -73,6 +74,17 @@ import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 // (s-maxage=21600 in next.config.ts) keeps the CDN serving stale-while-
 // revalidate for 24h.
 export const revalidate = 21600;
+// Next.js 15 changed the default fetch caching from 'force-cache' to 'no-store'.
+// The Supabase client's internal fetch calls don't set cache options, so they
+// default to 'no-store' which forces this page into dynamic rendering —
+// overriding the edge Cache-Control header (s-maxage=21600). Setting
+// fetchCache='default-cache' restores the Next.js 14 behavior: fetch calls
+// are cached by default, allowing the page to be ISR. The unstable_cache
+// wrapper in lib/board/cached.ts handles per-function revalidate windows
+// (120s for operator reads, 300s for board reads), so data freshness is
+// unaffected. On-demand revalidation via revalidateTouchedWindows fires on
+// snapshot submit, immediately purging the CDN cache.
+export const fetchCache = "default-cache";
 
 /**
  * Resolve the display name for an operator. display_name now carries both the
@@ -155,8 +167,6 @@ export default async function OperatorProfilePage({
     history,
     submissions,
     operatorReport,
-    session,
-    sessionUser,
     boardRows,
     hallRecords,
   ] = await Promise.all([
@@ -166,14 +176,6 @@ export default async function OperatorProfilePage({
     // Cascade Report System Phase 1: fetch the operator's latest report block.
     // Returns null if no report exists (operator hasn't submitted with sigrank@0.16.0+).
     getOperatorReport(operator.operator_id),
-    // Owner check: is the signed-in user viewing their own profile?
-    // Used to show the privacy toggle on the Report tab and interactive sliders on the Lab tab.
-    getSessionOperator(),
-    // For the ClaimTab: is the viewer signed in (auth user exists), and do they
-    // already have a linked operator? getSessionOperator returns null both when
-    // not signed in AND when signed in but not linked — so we check getSessionUser
-    // separately to distinguish the two states.
-    getSessionUser(),
     // Field averages for the share card: every "average operator" reference on
     // the card (AVG USER column, radar field polygon, op-ratio footer) comes
     // from the live board, so they always agree and move with the field.
@@ -185,7 +187,13 @@ export default async function OperatorProfilePage({
     getHallOfSignal(),
   ]);
 
-  const isOwner = !!(session && session.codename === operator.codename);
+  // Auth state (isOwner, isSignedIn, hasOperator) is resolved CLIENT-SIDE via
+  // ProfileAuthGate so this page stays ISR-cached (edge s-maxage=21600).
+  // Server renders with isOwner=false — correct for non-owners and for the
+  // (currently zero) private profiles. Owners see a brief default state before
+  // the client gate resolves, then interactive features (ReportTab toggle,
+  // LabTab sliders, ClaimTab) appear.
+  const isOwner = false;
 
   const topPct = Math.max(0, 100 - row.percentile);
 
@@ -639,15 +647,9 @@ export default async function OperatorProfilePage({
           {/* "Compare against me" — shows when a signed-in operator is viewing
               someone else's profile (owner 2026-07-16: "on every profile show be a
               compare again me butten"). Links to /compare with the viewer as A and
-              the profile operator as B. Hidden when viewing your own profile. */}
-          {session && session.codename !== operator.codename && (
-            <a
-              href={`/compare?a=${encodeURIComponent(session.codename)}&b=${encodeURIComponent(operator.codename)}`}
-              className="rounded-md border border-text-accent/40 bg-text-accent/10 px-3 py-1.5 font-mono text-xs text-text-accent transition-colors hover:bg-text-accent/20"
-            >
-              ⚔ Compare against me
-            </a>
-          )}
+              the profile operator as B. Hidden when viewing your own profile.
+              Auth resolved client-side so the page stays ISR-cached. */}
+          <CompareAgainstMe codename={operator.codename} />
           {/* Claimed operators show a badge. The old pay-to-claim CTA was removed
               (HARDENING_0625 §2): claiming is free + automatic on login, and seed
               operators are never user-claimable (identity-takeover risk). */}
@@ -748,29 +750,44 @@ export default async function OperatorProfilePage({
 
       {/* Claim this profile — shown only on unclaimed seeded profiles. Lets
           the real operator verify ownership (via exact tokscale token count)
-          and take over the profile. Hidden once claimed. */}
+          and take over the profile. Hidden once claimed. Auth state resolved
+          client-side via ProfileAuthGate so the page stays ISR-cached. */}
       {!operator.claimed && (
-        <ClaimTab
-          codename={operator.codename}
-          isSignedIn={!!sessionUser}
-          hasOperator={!!session}
-        />
+        <ProfileAuthGate codename={operator.codename}>
+          {({ isSignedIn, hasOperator, loaded }) =>
+            loaded ? (
+              <ClaimTab
+                codename={operator.codename}
+                isSignedIn={isSignedIn}
+                hasOperator={hasOperator}
+              />
+            ) : null
+          }
+        </ProfileAuthGate>
       )}
 
       <ProfileTabs
         stats={pending ? pendingPanel : rankedStatsPanel}
-        report={operatorReport ? <ReportTab report={operatorReport} isOwner={isOwner} /> : undefined}
+        report={operatorReport ? (
+          <ProfileAuthGate codename={operator.codename}>
+            {({ isOwner: owner }) => <ReportTab report={operatorReport} isOwner={owner} />}
+          </ProfileAuthGate>
+        ) : undefined}
         lab={
           ranked && c ? (
-            <LabTab
-              pillars={{
-                input: telemetry.fresh_input,
-                output: telemetry.output,
-                cacheCreate: telemetry.cache_create,
-                cacheRead: telemetry.cache_read,
-              }}
-              isOwner={isOwner}
-            />
+            <ProfileAuthGate codename={operator.codename}>
+              {({ isOwner: owner }) => (
+                <LabTab
+                  pillars={{
+                    input: telemetry.fresh_input,
+                    output: telemetry.output,
+                    cacheCreate: telemetry.cache_create,
+                    cacheRead: telemetry.cache_read,
+                  }}
+                  isOwner={owner}
+                />
+              )}
+            </ProfileAuthGate>
           ) : undefined
         }
         submissions={submissionsPanel}
