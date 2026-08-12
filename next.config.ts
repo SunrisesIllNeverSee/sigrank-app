@@ -124,6 +124,26 @@ const nextConfig: NextConfig = {
         destination: "/blog/volume-isnt-yield",
         permanent: true,
       },
+      // /how-it-works is a wiki section anchor, not a standalone page. Real
+      // users hit it directly (3 visitors/30d per PostHog) — redirect to the
+      // wiki section instead of 404.
+      {
+        source: "/how-it-works",
+        destination: "/wiki#how-it-works",
+        permanent: true,
+      },
+      // /research/raw and /research/metrics were removed during the Q1/Q2
+      // archive. Redirect to /research so old bookmarks resolve.
+      {
+        source: "/research/raw",
+        destination: "/research",
+        permanent: true,
+      },
+      {
+        source: "/research/metrics",
+        destination: "/research",
+        permanent: true,
+      },
     ];
   },
 };
