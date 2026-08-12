@@ -88,49 +88,37 @@ export default async function FieldHubPage() {
       </section>
 
       {/* ── Field Analysis hero card ────────────────────────────────── */}
-      <Link
-        href="/field"
-        className="group block rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
-      >
-        <div className="flex flex-col gap-2">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-            📊 Field Analysis
-          </p>
-          <h2 className="font-sans text-xl font-bold leading-tight text-text-primary group-hover:text-gold md:text-2xl">
-            Field Analysis
-          </h2>
-          <p className="font-mono text-sm text-gold">
-            THE FIELD
-          </p>
-          <p className="text-sm leading-relaxed text-text-secondary">
-            The true distribution of token efficiency.{" "}
-            {meta.humans_included.toLocaleString()} human AI operators,
-            outliers separated. Volume ranked. Yield revealed.
-          </p>
-        </div>
+      <Link href="/field" className="group block transition-transform hover:scale-[1.01]">
+        <WaveHero
+          eyebrow="📊 Field Analysis"
+          terminalText="THE FIELD"
+          title="Field Analysis"
+          subtitle={
+            <>
+              The true distribution of token efficiency.{" "}
+              {meta.humans_included.toLocaleString()} human AI operators,
+              outliers separated. Volume ranked. Yield revealed.
+            </>
+          }
+          compact
+        />
       </Link>
 
       {/* ── State of the Index hero card ────────────────────────────── */}
-      <Link
-        href="/research"
-        className="group block rounded-lg border border-bg-border bg-bg-surface px-6 py-5 transition-colors hover:border-gold/40"
-      >
-        <div className="flex flex-col gap-2">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-            📊 SigRank Index
-          </p>
-          <h2 className="font-sans text-xl font-bold leading-tight text-text-primary group-hover:text-gold md:text-2xl">
-            State of the Index
-          </h2>
-          <p className="font-mono text-sm text-gold">
-            THE DATA-STATE
-          </p>
-          <p className="text-sm leading-relaxed text-text-secondary">
-            The primary anonymized dataset. 1,628 operators across 17
-            platforms and 3,304 models. 9.07Q total tokens. Available on
-            Zenodo under CC-BY-4.0.
-          </p>
-        </div>
+      <Link href="/research" className="group block transition-transform hover:scale-[1.01]">
+        <WaveHero
+          eyebrow="📊 SigRank Index"
+          terminalText="THE DATA-STATE"
+          title="State of the Index"
+          subtitle={
+            <>
+              The primary anonymized dataset. 1,628 operators across 17
+              platforms and 3,304 models. 9.07Q total tokens. Available on
+              Zenodo under CC-BY-4.0.
+            </>
+          }
+          compact
+        />
       </Link>
     </div>
   );

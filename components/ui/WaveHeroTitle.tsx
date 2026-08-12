@@ -21,9 +21,11 @@ export interface WaveHeroTitleProps {
   title: React.ReactNode;
   /** Plain string for the terminal block-letter hero. Omit → never block-render. */
   terminalText?: string;
+  /** Compact mode: ~25% size for TOC/preview cards. */
+  compact?: boolean;
 }
 
-export function WaveHeroTitle({ title, terminalText }: WaveHeroTitleProps) {
+export function WaveHeroTitle({ title, terminalText, compact = false }: WaveHeroTitleProps) {
   const [isTerminal, setIsTerminal] = useState(false);
 
   useEffect(() => {
@@ -45,19 +47,26 @@ export function WaveHeroTitle({ title, terminalText }: WaveHeroTitleProps) {
   if (isTerminal && terminalText) {
     // Wider words need a smaller clamp ceiling so they fit without an x-scroll
     // gutter; scale the max down as the word grows past ~7 chars (SIGRANK).
-    const maxRem =
+    const baseMax =
       terminalText.length <= 7 ? 1.3 : terminalText.length <= 11 ? 0.95 : 0.7;
+    const maxRem = compact ? baseMax * 0.35 : baseMax;
     return (
       <TerminalBlockText
         text={terminalText}
         label={terminalText}
-        fontClassName={`text-[clamp(0.4rem,1.9vw,${maxRem}rem)]`}
+        fontClassName={`text-[clamp(0.3rem,${compact ? 0.7 : 1.9}vw,${maxRem}rem)]`}
       />
     );
   }
 
   return (
-    <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl">
+    <h1
+      className={
+        compact
+          ? "font-mono text-base font-bold tracking-wide text-text-primary sm:text-lg"
+          : "font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl"
+      }
+    >
       {title}
     </h1>
   );
