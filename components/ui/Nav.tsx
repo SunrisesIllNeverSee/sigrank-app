@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AccountMenu } from "./AccountMenu";
 import { MobileNav } from "./MobileNav";
@@ -22,12 +24,36 @@ const LINKS: { href: string; label: string }[] = [
 ];
 
 /**
- * Top navigation chrome. Sticky + hairline border + translucent blur (sharp /
- * modern). The ThemeToggle island is the only client piece.
+ * Top navigation chrome. Hides on scroll down, reappears on scroll up.
+ * The ThemeToggle island is the only other client piece.
  */
 export function Nav() {
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <nav className="sticky top-0 z-40 w-full border-b backdrop-blur-md" style={{ background: "rgb(var(--nav-accent))", borderBottomColor: "rgb(var(--nav-accent))" }}>
+    <nav
+      className="sticky top-0 z-40 w-full border-b backdrop-blur-md transition-transform duration-300"
+      style={{
+        background: "rgb(var(--nav-accent))",
+        borderBottomColor: "rgb(var(--nav-accent))",
+        transform: hidden ? "translateY(-100%)" : "translateY(0)",
+      }}
+    >
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6">
         {/* Mobile: hamburger (links collapse here below md). */}
         <MobileNav links={LINKS} />
