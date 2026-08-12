@@ -48,6 +48,30 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Hall of Signal is ISR (force-static + revalidate=300). Edge-cache
+        // the prerendered HTML so LCP is instant. s-maxage=300 matches the
+        // revalidate window; stale-while-revalidate keeps serving during refresh.
+        source: "/hall",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=300, stale-while-revalidate=600",
+          },
+        ],
+      },
+      {
+        // /compare is ISR (force-static + revalidate=300). The default view
+        // (day-seeded pick vs the-field) is prerendered and edge-cached.
+        // Each unique ?a=X&b=Y combination is SSR'd on first request then cached.
+        source: "/compare",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=300, stale-while-revalidate=600",
+          },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
