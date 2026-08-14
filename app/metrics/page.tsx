@@ -13,7 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
+import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Metrics — AI Operator Token Efficiency Definitions",
@@ -70,6 +70,40 @@ export default function MetricsIndex() {
           breadcrumb([{ name: "Metrics", path: "/metrics" }]),
           alternativesItemList(METRICS.map((m) => ({ name: m.title })), "/metrics", "SigRank Metrics — All Six Definitions"),
         ]}
+      />
+      <JsonLd
+        data={faqPage([
+          {
+            question: "What is Yield (Υ) in AI coding?",
+            answer:
+              "Yield (Υ) is the headline SigRank metric: Υ = (cache_read × output) / input². It measures how much reusable signal you create from each unit of fresh input. High yield means you're compounding cached context, not burning tokens. Input is squared because re-pasting the same context costs quadratically.",
+          },
+          {
+            question: "What is cache hit rate?",
+            answer:
+              "Cache hit rate = cache_read / (cache_read + cache_write). It measures how well you reuse prompt-cached context versus writing new context. A high cache hit rate means you're warming the cache and reusing it — the highest-leverage AI coding metric for reducing cost.",
+          },
+          {
+            question: "What is leverage in SigRank?",
+            answer:
+              "Leverage = cache_read / input. It measures how much cached context amplifies your fresh input. A leverage of 20× means you're reusing 20 tokens of cached context for every 1 token of fresh input. High leverage is the hallmark of efficient AI operators.",
+          },
+          {
+            question: "What is velocity in AI coding?",
+            answer:
+              "Velocity = output / input. It measures how much real output you get per token of fresh input. Velocity is a secondary metric — high velocity with low leverage means you're productive but not compounding. Yield combines both reuse (leverage) and output (velocity).",
+          },
+          {
+            question: "What is signal-to-noise ratio (SNR)?",
+            answer:
+              "SNR = output / (input + output). It measures the output share of fresh conversational traffic — what fraction of your token flow is actual output vs input. High SNR means your sessions are output-heavy, not input-heavy. SNR is linked to the Conservation Law of Commitment.",
+          },
+          {
+            question: "What is the efficiency metric?",
+            answer:
+              "Efficiency = (cache_read + cache_write + output) / (4 × input). It measures total operational amplification versus the AA 7:2:1 baseline. It's the only public SigRank metric that includes cache_write, making it the most complete measure of cascade utilization.",
+          },
+        ])}
       />
 
       <WaveHero

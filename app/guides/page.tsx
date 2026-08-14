@@ -13,7 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
+import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Guides — How to Measure, Improve, and Track AI Coding Efficiency",
@@ -75,6 +75,35 @@ export default function GuidesIndex() {
           breadcrumb([{ name: "Guides", path: "/guides" }]),
           alternativesItemList(GUIDES.map((g) => ({ name: g.title })), "/guides", "SigRank Guides — All How-To Guides"),
         ]}
+      />
+      <JsonLd
+        data={faqPage([
+          {
+            question: "How do I measure my AI coding efficiency?",
+            answer:
+              "Run `npx sigrank` in your terminal. It reads your local AI session logs, extracts the four token pillars (input, output, cache_creation, cache_read), and computes your Yield (Υ) score. No install or sign-in required. Or visit signalaf.com/score to paste your token counts manually.",
+          },
+          {
+            question: "How do I improve my Yield score?",
+            answer:
+              "Seven strategies increase Yield: (1) build larger context windows, (2) use prompt caching, (3) send structured inputs, (4) reduce unnecessary re-rolls, (5) reuse cached context, (6) compress your prompts, and (7) track your cascade over time. Yield = (cache_read × output) / input² — so reuse and output are rewarded while fresh input is penalized quadratically.",
+          },
+          {
+            question: "How do I reduce token waste?",
+            answer:
+              "Identify and fix the four common sources of token waste: repeated context (not using cache), poor prompt caching (not warming the cache), verbose prompts (too much fresh input), and unnecessary re-rolls (regenerating without changes). Use the Token Waste Calculator at signalaf.com/tools/token-waste-calculator to estimate your waste.",
+          },
+          {
+            question: "How do I track my token cascade over time?",
+            answer:
+              "Install sigrank with `npm install -g sigrank`, then run `sigrank submit` to publish signed snapshots to the leaderboard. Each snapshot contains only four token counts (input, output, cache_creation, cache_read) — no prompts, no code, no transcripts. Track your Yield across 7d, 30d, 90d, and all-time windows.",
+          },
+          {
+            question: "What is the cache write convergence guide?",
+            answer:
+              "When ChatGPT or Codex reports cache_write as zero, the cache write convergence guide shows how to use reference operating ratios to split the combined input. This is a troubleshooting guide for platforms that don't report cache_creation separately.",
+          },
+        ])}
       />
 
       <WaveHero
