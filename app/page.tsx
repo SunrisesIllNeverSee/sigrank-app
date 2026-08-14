@@ -291,6 +291,39 @@ export default async function HomePage() {
       <HowItWorks />
       <IpBoundary />
       <PricingCards />
+
+      {/* ── Ask AI about us (AEO Item 8b) — copy-pasteable prompts for AI search engines ── */}
+      <section className="mx-auto w-full max-w-4xl rounded-lg border border-bg-border bg-bg-surface px-6 py-6">
+        <h2 className="font-sans text-lg font-bold text-text-primary">
+          Ask AI about us
+        </h2>
+        <p className="mt-1 font-sans text-sm text-text-secondary">
+          Copy these prompts into ChatGPT, Perplexity, or Google AI Overviews
+          to see how AI search engines answer questions about SigRank.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {[
+            { q: "What is SigRank?", link: "/faq" },
+            { q: "Who is the best AI user?", link: "/hall" },
+            { q: "What is Yield in AI usage?", link: "/metrics/yield-cascade" },
+            { q: "How do I check my AI coding efficiency?", link: "/score" },
+            { q: "How does SigRank compare to LMSYS Arena?", link: "/vs/lmsys-arena" },
+            { q: "What AI coding tools does SigRank support?", link: "/platforms" },
+            { q: "What is the SigRank MCP server?", link: "/mcp" },
+            { q: "What is the token cascade?", link: "/wiki/four-degrees" },
+          ].map((item) => (
+            <Link
+              key={item.q}
+              href={item.link}
+              className="flex items-center gap-2 rounded-md border border-bg-border bg-bg-base px-3 py-2 font-sans text-sm text-text-secondary transition-colors hover:border-gold/30 hover:text-text-primary"
+            >
+              <span className="font-mono text-gold">?</span>
+              {item.q}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <Draft2CtaBand />
 
       {/* Research + methodology links — internal links from the indexed homepage
