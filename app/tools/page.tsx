@@ -13,7 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
+import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Tools — AI Token Efficiency Calculators",
@@ -55,6 +55,35 @@ export default function ToolsIndex() {
           breadcrumb([{ name: "Tools", path: "/tools" }]),
           alternativesItemList(TOOLS.map((t) => ({ name: t.title })), "/tools", "SigRank Tools — All Calculators"),
         ]}
+      />
+      <JsonLd
+        data={faqPage([
+          {
+            question: "What is the Yield (Υ) Calculator?",
+            answer:
+              "The Yield Calculator is a free tool that computes your Υ = (cache_read × output) / input² score from four token pillars (input, output, cache-read, cache-write). It also shows your compression ratio, cache hit rate, and class tier. No account needed — visit signalaf.com/tools/yield-calculator.",
+          },
+          {
+            question: "What is the Cascade Comparator?",
+            answer:
+              "The Cascade Comparator lets you compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, compression ratio, cache hit rate, and leverage for each operator. Useful for benchmarking yourself against top operators or comparing two time windows.",
+          },
+          {
+            question: "What is the Operator Class Checker?",
+            answer:
+              "The Operator Class Checker maps your Yield score to one of 8 class tiers: IGNITER, BEARER, REFINER, SEEKER, BASE, POWER, ARCH, or ARCH+. TRANSMITTER is a separate peak badge, not a class tier. Enter a yield score or four token pillars to determine your tier.",
+          },
+          {
+            question: "What is the Token Waste Calculator?",
+            answer:
+              "The Token Waste Calculator estimates wasted AI tokens from your four token pillars. It shows an efficiency percentage and a waste breakdown by category — repeated context, poor caching, verbose prompts, and unnecessary re-rolls. Free, no account needed.",
+          },
+          {
+            question: "Are SigRank calculators free?",
+            answer:
+              "Yes. All four SigRank calculators (Yield Calculator, Cascade Comparator, Operator Class Checker, and Token Waste Calculator) are free and require no account. Visit signalaf.com/tools to use them.",
+          },
+        ])}
       />
 
       <WaveHero

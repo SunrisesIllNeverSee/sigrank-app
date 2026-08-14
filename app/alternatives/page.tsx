@@ -13,7 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
+import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Alternatives — Best AI Coding, Benchmarking, and Token Tracking Tools",
@@ -55,6 +55,35 @@ export default function AlternativesIndex() {
           breadcrumb([{ name: "Alternatives", path: "/alternatives" }]),
           alternativesItemList(ALTS.map((a) => ({ name: a.title })), "/alternatives", "SigRank Alternatives — All Listicles"),
         ]}
+      />
+      <JsonLd
+        data={faqPage([
+          {
+            question: "What are the best alternatives to ccusage?",
+            answer:
+              "The 5 best ccusage alternatives in 2026 are SigRank (yield scoring + leaderboard), Token Dashboard (desktop widgets), manual ccusage + scripts, Tokscale (Rust cache tracker), and Tiktoken (token counting). SigRank is the only one that scores token efficiency with the Yield metric and provides a public leaderboard.",
+          },
+          {
+            question: "What are the best AI coding metrics tools?",
+            answer:
+              "The 7 best AI coding metrics tools in 2026 are SigRank, ccusage, WakaTime, LMSYS Arena, Cursor, Copilot, and Token Dashboard. SigRank is the only tool that scores operator efficiency using the Yield (Υ) cascade metric. The others measure usage, time, or model performance — not human operator skill.",
+          },
+          {
+            question: "What are the best AI benchmarking tools?",
+            answer:
+              "The 6 best AI benchmarking tools in 2026 are SigRank, LMSYS Arena, HELM, Open LLM Leaderboard, and HumanEval. SigRank benchmarks AI operators (the humans); the others benchmark AI models. If you want to know which model is best, use LMSYS or HELM. If you want to know who uses AI best, use SigRank.",
+          },
+          {
+            question: "What are the best token tracking tools?",
+            answer:
+              "The 5 best token tracking tools in 2026 are SigRank, ccusage, Tokscale, Token Dashboard, and Tiktoken. SigRank tracks tokens and scores efficiency. ccusage counts tokens from Claude Code logs. Tokscale is a Rust-based cache tracker. Token Dashboard provides desktop widgets. Tiktoken is OpenAI's token counter.",
+          },
+          {
+            question: "How is SigRank different from other AI tools?",
+            answer:
+              "SigRank is the only tool that scores AI operator efficiency using the Yield (Υ = cache_read × output / input²) metric and ranks operators on a public leaderboard. Other tools either count tokens (ccusage), benchmark models (LMSYS), trace LLM calls (Langfuse), or provide AI editing (Cursor). SigRank measures the human, not the tool.",
+          },
+        ])}
       />
 
       <WaveHero

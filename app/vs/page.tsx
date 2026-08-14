@@ -13,7 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
+import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "SigRank vs Other Tools — AI Operator Measurement Comparisons",
@@ -75,6 +75,35 @@ export default function VsIndex() {
           breadcrumb([{ name: "Comparisons", path: "/vs" }]),
           alternativesItemList(COMPARISONS.map((c) => ({ name: c.title })), "/vs", "SigRank vs Other Tools — All Comparisons"),
         ]}
+      />
+      <JsonLd
+        data={faqPage([
+          {
+            question: "How does SigRank compare to ccusage?",
+            answer:
+              "ccusage reads Claude Code token logs and shows usage stats. SigRank bundles ccusage's data and adds cascade scoring (Yield), a public leaderboard, operator profiles, class tiers, and MCP integration. ccusage tells you how much you spent; SigRank tells you how well you spent it.",
+          },
+          {
+            question: "How does SigRank compare to LMSYS Arena?",
+            answer:
+              "LMSYS Arena ranks AI models by human preference votes. SigRank ranks AI operators by cascade efficiency (Yield). LMSYS asks 'which model is best?' SigRank asks 'who uses AI best?' They measure different things — models vs operators.",
+          },
+          {
+            question: "How does SigRank compare to VALS AI?",
+            answer:
+              "VALS AI evaluates AI systems. SigRank evaluates AI operators — the humans driving the systems. VALS asks whether the AI is safe and effective. SigRank asks whether the person using the AI is efficient. The leaderboard is proof of operator skill, not system quality.",
+          },
+          {
+            question: "How does SigRank compare to Cursor?",
+            answer:
+              "Cursor is an AI code editor with built-in usage metrics. SigRank is platform-neutral — it works with Cursor, Claude Code, Copilot, and 15+ other tools. Cursor shows what you wrote; SigRank shows how efficiently you drove the AI to write it.",
+          },
+          {
+            question: "How does SigRank compare to Langfuse?",
+            answer:
+              "Langfuse traces LLM calls for debugging and evaluation observability. SigRank scores the operator's token efficiency for ranking and competition. Langfuse is for engineers debugging AI systems; SigRank is for operators competing on efficiency.",
+          },
+        ])}
       />
 
       <WaveHero
