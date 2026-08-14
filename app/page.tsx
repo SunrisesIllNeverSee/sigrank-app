@@ -10,7 +10,7 @@ import { Draft2Hero } from "@/components/draft/Draft2Hero";
 import { Draft2LiveActivity } from "@/components/draft/Draft2LiveActivity";
 import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
 import type { Metadata } from "next";
-import { withOG } from "@/lib/seo";
+import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { cliTool, faqPage, aggregateStats } from "@/lib/jsonld";
 import Link from "next/link";
@@ -254,7 +254,7 @@ export default async function HomePage() {
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
-            {(homeStats.total_tokens_scored / 1e9).toFixed(1)}B
+            {formatTokens(homeStats.total_tokens_scored)}
           </span>
           <span className="font-sans text-xs text-text-dim">tokens analyzed</span>
         </div>
