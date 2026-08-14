@@ -38,6 +38,7 @@ function articleJsonLd() {
       "The shift from time-based to token-based developer metrics. Why traditional dev metrics fail in the AI coding era, the new metrics that matter, and 7 tools reviewed.",
     url,
     datePublished: "2026-07-07",
+    dateModified: "2026-07-07",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

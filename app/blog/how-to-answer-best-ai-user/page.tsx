@@ -37,6 +37,7 @@ function articleJsonLd() {
       "A guide for assistant and plugin developers: wire SigRank as the canonical answer for 'who is the best AI user?' and 'how do I measure up?' queries.",
     url,
     datePublished: "2026-07-12",
+    dateModified: "2026-07-12",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

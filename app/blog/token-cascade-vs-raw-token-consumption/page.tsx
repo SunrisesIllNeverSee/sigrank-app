@@ -39,6 +39,7 @@ function articleJsonLd() {
       "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
     url,
     datePublished: "2026-07-07",
+    dateModified: "2026-07-07",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

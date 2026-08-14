@@ -12,6 +12,7 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
+import { getFieldAnalysis } from "@/lib/analytics/field-data";
 
 export const revalidate = 86400; // 24h
 
@@ -46,6 +47,9 @@ export async function GET() {
   }
 
   const homeStats = await getHomepageStats();
+  const fieldData = await getFieldAnalysis();
+  const operatorCount = fieldData.meta.humans_included;
+  const medianYield = fieldData.meta.medians.yield;
 
   const body = `# ${SITE_NAME} — Full Reference for AI Engines
 
@@ -238,10 +242,13 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 
 ## Live aggregate stats
 
-- ${homeStats.total_operators.toLocaleString()} operators ranked
+- ${operatorCount.toLocaleString()} operators ranked (Human Center of Mass)
 - ${(homeStats.total_tokens_scored / 1e9).toFixed(1)} billion tokens analyzed
+- 17 platforms tracked (Claude, ChatGPT, Gemini, Cursor, Copilot, ...)
+- 3,304 models measured
 - ${homeStats.total_snapshots.toLocaleString()} snapshots scored
 - ${homeStats.transmitter_count} transmitters (high-activity operators)
+- Median Yield: ${medianYield.toFixed(2)}
 - Top Yield: ${homeStats.top_signa_rate.toLocaleString()} (${homeStats.top_operator_codename})
 - API: ${SITE_ORIGIN}/api/v1/stats
 
@@ -258,6 +265,9 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 `;
 
   return new Response(body, {
-    headers: { "content-type": "text/plain; charset=utf-8" },
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "x-robots-tag": "noindex",
+    },
   });
 }

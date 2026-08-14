@@ -162,6 +162,7 @@ export default async function BlogPost({
     author: personAuthor(),
     publisher: { "@id": `${SITE_ORIGIN}/#org` },
     datePublished: date,
+    dateModified: date,
     url: `${SITE_ORIGIN}/blog/${slug}`,
     keywords: frontmatter.tags?.join(", "),
   };

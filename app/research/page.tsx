@@ -12,7 +12,7 @@ import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { CitationMeta } from "@/components/seo/CitationMeta";
-import { breadcrumb, sigrankDataset, researchArticle } from "@/lib/jsonld";
+import { breadcrumb, sigrankDataset, researchArticle, faqPage } from "@/lib/jsonld";
 
 export const revalidate = 3600; // 1h — the seed corpus is stable
 
@@ -116,6 +116,23 @@ export default function StateOfTheIndexPage() {
             doi: ZENODO_VERSION_DOI,
           }),
           breadcrumb([{ name: "Research", path: "/research" }]),
+          faqPage([
+            {
+              question: "What is the SigRank dataset?",
+              answer:
+                "The SigRank dataset is an anonymized collection of AI operator token telemetry — 1,628 operators across 17 platforms and 3,304 models. It contains raw token counts (input, output, cache creation, cache read) and derived cascade metrics (Yield, Leverage, Velocity, SNR). Available on Zenodo under CC-BY-4.0 at DOI 10.5281/zenodo.21900519.",
+            },
+            {
+              question: "How many AI operators are in the SigRank dataset?",
+              answer:
+                "The SigRank dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. The Human Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
+            },
+            {
+              question: "Is the SigRank dataset free to download?",
+              answer:
+                "Yes. The SigRank dataset is available on Zenodo under a CC-BY-4.0 license. You can download the CSVs and JSON to run your own analysis. The dataset includes per-operator token pillars, derived cascade metrics, and platform breakdowns. Cite as: McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy (v3.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21900519.",
+            },
+          ]),
         ]}
       />
 

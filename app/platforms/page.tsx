@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, alternativesItemList } from "@/lib/jsonld";
+import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
@@ -201,6 +201,23 @@ export default function PlatformsPage() {
             "/platforms",
             "Supported AI Coding Platforms",
           ),
+          faqPage([
+            {
+              question: "Which AI coding platforms does SigRank support?",
+              answer:
+                "SigRank reads session logs from 19+ AI coding agents including Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Amp, Qwen Code, Goose, OpenCode, Kilo CLI, Hermes Agent, Devin, OMP, Pi, OpenClaw, Droid, and Codebuff. Run `npx sigrank` to get ranked regardless of which tool you use.",
+            },
+            {
+              question: "How does SigRank read my AI coding tool's session logs?",
+              answer:
+                "SigRank's local agent (MCP server) reads your AI tool's session log files on-device. It counts the four token pillars (input, output, cache creation, cache read) without reading your prompts or code. Each supported platform has an adapter that knows where its logs live and how to parse the token counts.",
+            },
+            {
+              question: "Can I use SigRank with Claude Code?",
+              answer:
+                "Yes. Claude Code is fully supported. Run `npx sigrank` and the local agent will read your Claude Code session logs, count your token pillars, compute your cascade metrics (Yield, Leverage, Velocity, SNR), and rank you on the SigRank leaderboard at signalaf.com/board/all.",
+            },
+          ]),
         ]}
       />
 

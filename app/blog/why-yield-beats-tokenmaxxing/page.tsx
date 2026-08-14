@@ -38,6 +38,7 @@ function articleJsonLd() {
       "Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator.",
     url,
     datePublished: "2026-07-07",
+    dateModified: "2026-07-07",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

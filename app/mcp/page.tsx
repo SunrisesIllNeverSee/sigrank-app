@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { faqPage } from "@/lib/jsonld";
 
 /**
  * app/mcp/page.tsx — the MCP server landing page.
@@ -127,7 +128,26 @@ export default function MCPPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <JsonLd data={mcpJsonLd} />
+      <JsonLd data={[
+        mcpJsonLd,
+        faqPage([
+          {
+            question: "What is the SigRank MCP server?",
+            answer:
+              "The SigRank MCP server is a Model Context Protocol server that gives AI agents 15 tools to measure, rank, and improve token efficiency. Agents can pull the live leaderboard, get operator profiles, submit snapshots, diagnose cascades, and suggest improvements. Install with `npx sigrank`.",
+          },
+          {
+            question: "How many tools does the SigRank MCP server expose?",
+            answer:
+              "The SigRank MCP server exposes 15 tools: rank_paste, get_leaderboard, get_operator, submit_paste, submit_verified, tokenpull, tokenpull_submit, watch_tokenpull, rank_windows, tokenpull_compare, enroll, simulate_change, diagnose_cascade, suggest_improvements, and self_improve.",
+          },
+          {
+            question: "Which AI clients support the SigRank MCP server?",
+            answer:
+              "The SigRank MCP server works with any MCP-compatible client, including Claude, Cursor, Cline, Windsurf, and Codex. Install it by running `npx sigrank` — the server runs locally as a stdio process, reading your session logs on-device without sending prompts or code to any server.",
+          },
+        ]),
+      ]} />
 
       <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary">
         SigRank MCP Server

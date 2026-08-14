@@ -37,6 +37,7 @@ function articleJsonLd() {
       "Every token the AI tool burns is a decision the person made. Measuring the tool IS measuring the person. Your token cascade is your skill signature.",
     url,
     datePublished: "2026-07-12",
+    dateModified: "2026-07-12",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

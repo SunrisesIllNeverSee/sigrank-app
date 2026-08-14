@@ -1,4 +1,5 @@
 import { getHomepageStats } from "@/lib/board";
+import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { MotionPause } from "@/components/home/MotionPause";
 import { DeletedNotice } from "@/components/home/DeletedNotice";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
@@ -51,6 +52,9 @@ export const metadata: Metadata = withOG({
  */
 export default async function HomePage() {
   const homeStats = await getHomepageStats();
+  const fieldData = await getFieldAnalysis();
+  const operatorCount = fieldData.meta.humans_included;
+  const medianYield = fieldData.meta.medians.yield;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">
@@ -61,12 +65,15 @@ export default async function HomePage() {
           improve AI citation rates by up to 41% (Princeton GEO-Bench). */}
       <JsonLd
         data={aggregateStats({
-          totalOperators: homeStats.total_operators,
+          totalOperators: operatorCount,
           totalTokens: homeStats.total_tokens_scored,
           totalSnapshots: homeStats.total_snapshots,
           transmitterCount: homeStats.transmitter_count,
           topOperator: homeStats.top_operator_codename,
           topYield: homeStats.top_signa_rate,
+          medianYield,
+          platformCount: 17,
+          modelCount: 3304,
         })}
       />
 
@@ -232,6 +239,39 @@ export default async function HomePage() {
 
       <DeletedNotice />
       <Draft2Hero />
+
+      {/* ── Stats bar (AEO Item 2b) — visible aggregate stats for AI engine citation ── */}
+      <section
+        aria-label="SigRank aggregate statistics"
+        className="grid grid-cols-2 gap-4 rounded-lg border border-bg-border bg-bg-surface px-6 py-5 sm:grid-cols-5"
+      >
+        <div className="flex flex-col gap-0.5 text-center">
+          <span className="font-mono text-2xl font-bold text-gold">
+            {operatorCount.toLocaleString()}
+          </span>
+          <span className="font-sans text-xs text-text-dim">operators ranked</span>
+        </div>
+        <div className="flex flex-col gap-0.5 text-center">
+          <span className="font-mono text-2xl font-bold text-gold">
+            {(homeStats.total_tokens_scored / 1e9).toFixed(1)}B
+          </span>
+          <span className="font-sans text-xs text-text-dim">tokens analyzed</span>
+        </div>
+        <div className="flex flex-col gap-0.5 text-center">
+          <span className="font-mono text-2xl font-bold text-gold">17</span>
+          <span className="font-sans text-xs text-text-dim">platforms tracked</span>
+        </div>
+        <div className="flex flex-col gap-0.5 text-center">
+          <span className="font-mono text-2xl font-bold text-gold">3,304</span>
+          <span className="font-sans text-xs text-text-dim">models measured</span>
+        </div>
+        <div className="flex flex-col gap-0.5 text-center">
+          <span className="font-mono text-2xl font-bold text-gold">
+            {medianYield.toFixed(2)}
+          </span>
+          <span className="font-sans text-xs text-text-dim">median Yield (Υ)</span>
+        </div>
+      </section>
 
       {/* The four degrees of leverage — our show-stopper, directly under the hero
           (owner 2026-07-02: moved above the live board so the comparison table leads,
