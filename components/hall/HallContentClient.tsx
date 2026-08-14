@@ -85,9 +85,18 @@ export function HallContentClient({ windowsData }: Props) {
   );
   const win = boardWindowBySlug(windowParam) ?? boardWindowBySlug("all")!;
   const windowSlug = win.slug;
+  const scopeParam = searchParams.get("scope") ?? "active";
+  const scope = scopeParam === "all" ? "all" : "active";
 
-  // Select the right window's data, then filter by class + platform.
+  // Select the right window's data, then filter by scope + class + platform.
   let baseRows = windowsData[win.slug] ?? [];
+  if (scope === "active") {
+    baseRows = baseRows.filter(
+      (r) => r.operator.claimed && r.operator.status !== "retired",
+    );
+  } else {
+    baseRows = baseRows.filter((r) => r.operator.status !== "retired");
+  }
   if (platform !== PLATFORM_DEFAULT) {
     const domain = platform.toLowerCase();
     baseRows = baseRows.filter(
@@ -136,6 +145,7 @@ export function HallContentClient({ windowsData }: Props) {
           platform={platform}
           windowSlug={windowSlug}
           classScope={activeClass}
+          scope={scope}
         />
       </div>
 
