@@ -10,7 +10,7 @@
  * Spec: https://llmstxt.org (the "full" variant)
  */
 
-import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
 
@@ -243,7 +243,7 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 ## Live aggregate stats
 
 - ${operatorCount.toLocaleString()} operators ranked (Human Center of Mass)
-- ${(homeStats.total_tokens_scored / 1e9).toFixed(1)} billion tokens analyzed
+- ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked (Claude, ChatGPT, Gemini, Cursor, Copilot, ...)
 - 3,304 models measured
 - ${homeStats.total_snapshots.toLocaleString()} snapshots scored

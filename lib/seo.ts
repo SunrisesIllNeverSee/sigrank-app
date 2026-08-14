@@ -102,3 +102,24 @@ export const siteMetadata: Metadata = {
     images: [OG_IMAGE.url],
   },
 };
+
+/** Format a raw token count into a human-readable compact string.
+ *  Handles the full range from thousands to quadrillions.
+ *  e.g. 1_123_000_000 → "1.1B", 18_153_843_000_000_000 → "18.2Q" */
+export function formatTokens(n: number): string {
+  if (n < 1_000) return String(n);
+  if (n < 1_000_000) return `${(n / 1_000).toFixed(1)}K`;
+  if (n < 1_000_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n < 1_000_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n < 1_000_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(1)}T`;
+  return `${(n / 1_000_000_000_000_000).toFixed(1)}Q`;
+}
+
+/** Format a raw token count into a human-readable long string for llms.txt.
+ *  e.g. 18_153_843_000_000_000 → "18.2 quadrillion" */
+export function formatTokensLong(n: number): string {
+  if (n < 1_000_000_000) return `${(n / 1_000_000).toFixed(1)} million`;
+  if (n < 1_000_000_000_000) return `${(n / 1_000_000_000).toFixed(1)} billion`;
+  if (n < 1_000_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(1)} trillion`;
+  return `${(n / 1_000_000_000_000_000).toFixed(1)} quadrillion`;
+}
