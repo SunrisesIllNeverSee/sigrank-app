@@ -32,7 +32,7 @@ const DURATION_SECONDS = 90;
 
 const MODEL_A: DemoSnapshot = {
   label: "A",
-  operator: "DERIC",
+  operator: "MOSSES",
   model: "CLAUDE SONNET 4.5",
   context: "SIGRANK / LIVE INSTRUMENT",
   observedAt: "",
@@ -46,7 +46,7 @@ const MODEL_A: DemoSnapshot = {
 
 const MODEL_B: DemoSnapshot = {
   label: "B",
-  operator: "DERIC",
+  operator: "MOSSES",
   model: "CODEX",
   context: "SIGRANK / LIVE INSTRUMENT",
   observedAt: "",
@@ -79,7 +79,7 @@ const SCENE_STARTS: Record<Scene, number> = {
 const SIGNATURE_CANDIDATES = [
   { name: "OPERATOR 128", match: 41.6 },
   { name: "OPERATOR 407", match: 58.3 },
-  { name: "DERIC", match: 94.2 },
+  { name: "MOSSES", match: 94.2 },
   { name: "OPERATOR 811", match: 63.9 },
 ];
 
@@ -290,7 +290,7 @@ function SignatureScene() {
         <div className={styles.candidates}>
           {SIGNATURE_CANDIDATES.map((candidate) => (
             <div
-              className={candidate.name === "DERIC" ? styles.candidateMatch : styles.candidate}
+              className={candidate.name === "MOSSES" ? styles.candidateMatch : styles.candidate}
               key={candidate.name}
             >
               <span>{candidate.name}</span>
@@ -302,7 +302,7 @@ function SignatureScene() {
       </div>
       <div className={styles.signatureAcquired}>
         <span>OPERATOR SIGNATURE ACQUIRED</span>
-        <strong>DERIC</strong>
+        <strong>MOSSES</strong>
         <small>PROTOTYPE SHAPE MATCH · 94.2%</small>
       </div>
     </div>
@@ -315,6 +315,21 @@ function FinalScene() {
       <div className={styles.finalRule} />
       <p>MODELS HAVE EVALS.</p>
       <h2>NOW THEIR OPERATORS DO TOO.</h2>
+      <div className={styles.finalBoardFrame}>
+        <img
+          src="/live/leaderboard-board.png"
+          alt="SigRank live leaderboard — operators ranked by Yield"
+          className={styles.finalBoardImage}
+        />
+      </div>
+      <a
+        href="https://signalaf.com/score"
+        className={styles.finalCta}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GET RANKED NOW <span>→</span>
+      </a>
       <div className={styles.finalBrand}>SIGNALAF.COM <span>◈</span></div>
     </div>
   );
