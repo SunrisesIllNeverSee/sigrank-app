@@ -36,28 +36,38 @@ export const revalidate = 300;
  */
 export default async function HallPage() {
   // Pre-fetch base rows for all 4 windows (no class/platform filter).
-  // Limit 100 per window gives headroom for the claimed+active filter
-  // (Hall shows real users only, not seed data) before slicing to top 10.
-  const windowsData: Record<
-    string,
-    LeaderboardRow[]
-  > = {};
+  // The Hall has two scopes:
+  //   Active = claimed operators only (needs live DB to catch all claimed ops)
+  //   All = full field including seed data (static board is fine for this)
+  // For all_time: fetch BOTH the static board (for All scope) and the live DB
+  // (for Active scope — claimed operators are buried below rank 100 in the
+  // static board, so we need a larger live fetch to include them all).
+  // For 7d/30d/90d: live DB with limit 100 is enough (claimed ops rank higher
+  // in recent windows).
+  const windowsData: Record<string, LeaderboardRow[]> = {};
+  const windowsDataAll: Record<string, LeaderboardRow[]> = {};
   await Promise.all(
     BOARD_WINDOWS.map(async (w) => {
       if (w.enum === "all_time") {
-        // Egress fix: all_time reads the static snapshot (no Supabase query).
-        // Convert flat StaticBoardEntry[] → LeaderboardRow[] so sortValue,
-        // recordValue, and isOutlierRow can access the nested shape they expect.
+        // Active scope: live DB, high limit to catch all claimed operators.
+        windowsData[w.slug] = await getLeaderboard({
+          window: w.enum,
+          windowFilter: true,
+          limit: 1000,
+        });
+        // All scope: static board (includes seed data, top 100 by yield).
         const staticEntries = getStaticAllTimeBoard();
-        windowsData[w.slug] = staticEntriesToLeaderboardRows(
+        windowsDataAll[w.slug] = staticEntriesToLeaderboardRows(
           staticEntries.slice(0, 100),
         );
       } else {
-        windowsData[w.slug] = await getLeaderboard({
+        const liveRows = await getLeaderboard({
           window: w.enum,
           windowFilter: true,
           limit: 100,
         });
+        windowsData[w.slug] = liveRows;
+        windowsDataAll[w.slug] = liveRows;
       }
     }),
   );
@@ -70,7 +80,7 @@ export default async function HallPage() {
 
       {/* HALL-4/2/3: record ticker + filter dropdowns + 18 metric boards.
           All filtering is client-side (HallClient reads URL params). */}
-      <HallClient windowsData={windowsData} />
+      <HallClient windowsData={windowsData} windowsDataAll={windowsDataAll} />
 
       {/* ── What is the Hall? — moved to bottom (owner 2026-07-09) ── */}
       <section className="mx-auto mt-8 max-w-2xl px-4 pb-6">

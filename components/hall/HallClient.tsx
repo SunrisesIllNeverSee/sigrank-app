@@ -44,8 +44,10 @@ function coerce<T extends string>(
 }
 
 interface Props {
-  /** Pre-fetched data for all 4 windows (30 rows each, unfiltered). */
+  /** Active scope: pre-fetched data for all 4 windows (live DB, for claimed filter). */
   windowsData: Record<string, LeaderboardRow[]>;
+  /** All scope: pre-fetched data for all 4 windows (static board for all_time, live for rest). */
+  windowsDataAll?: Record<string, LeaderboardRow[]>;
 }
 
 /**
@@ -57,7 +59,7 @@ interface Props {
  * is prerendered and edge-cached — instant LCP — while filtering stays instant
  * (no server round-trip on dropdown change).
  */
-export function HallClient({ windowsData }: Props) {
+export function HallClient({ windowsData, windowsDataAll }: Props) {
   const sp = useSearchParams();
   // Avoid hydration mismatch: useSearchParams() returns null during SSR
   // prerender but the actual params on the client. Render with defaults
@@ -85,7 +87,10 @@ export function HallClient({ windowsData }: Props) {
   // Active scope: only claimed operators with real verified submissions.
   // All scope: everyone (the full field, including seed data).
   const baseRows = useMemo(() => {
-    let rows: LeaderboardRow[] = windowsData[win.slug] ?? [];
+    const source = scope === "all" && windowsDataAll
+      ? (windowsDataAll[win.slug] ?? [])
+      : (windowsData[win.slug] ?? []);
+    let rows: LeaderboardRow[] = source;
     if (scope === "active") {
       rows = rows.filter(
         (r) => r.operator.claimed && r.operator.status !== "retired",
@@ -106,7 +111,7 @@ export function HallClient({ windowsData }: Props) {
       );
     }
     return rows;
-  }, [windowsData, win.slug, platform, activeClass, scope]);
+  }, [windowsData, windowsDataAll, win.slug, platform, activeClass, scope]);
 
   // Sort into 18 boards (one base fetch, N in-memory sorts).
   const metricRows = useMemo(
