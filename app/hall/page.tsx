@@ -50,10 +50,13 @@ export default async function HallPage() {
     BOARD_WINDOWS.map(async (w) => {
       if (w.enum === "all_time") {
         // Active scope: live DB, high limit to catch all claimed operators.
+        // operatorTotal=true collapses to the "multi" cross-platform total per
+        // operator (so MOSES shows 23.9B, not just the 5.8B claude-only row).
         windowsData[w.slug] = await getLeaderboard({
           window: w.enum,
           windowFilter: true,
           limit: 1000,
+          operatorTotal: true,
         });
         // All scope: static board (includes seed data, top 100 by yield).
         const staticEntries = getStaticAllTimeBoard();
@@ -65,6 +68,7 @@ export default async function HallPage() {
           window: w.enum,
           windowFilter: true,
           limit: 100,
+          operatorTotal: true,
         });
         windowsData[w.slug] = liveRows;
         windowsDataAll[w.slug] = liveRows;
