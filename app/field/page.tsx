@@ -16,7 +16,7 @@ import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { breadcrumb, personAuthor } from "@/lib/jsonld";
+import { breadcrumb, personAuthor, faqPage } from "@/lib/jsonld";
 import FieldStatCards from "@/components/field/FieldStatCards";
 import PlatformAdoption from "@/components/field/PlatformAdoption";
 import CascadeSankey from "@/components/field/CascadeSankey";
@@ -86,6 +86,23 @@ export default async function FieldPage() {
         data={[
           fieldDataset,
           breadcrumb([{ name: "Field Analysis", path: "/field" }]),
+          faqPage([
+            {
+              question: "Does volume correlate with yield in AI usage?",
+              answer:
+                "No. Real data from 1,498 human AI operators proves volume does not equal yield. The median yield is 1.68, meaning most operators compound signal poorly despite high token usage. The top operators achieve leverage of 18.6× through cache reuse, not by spending more tokens. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached volume.",
+            },
+            {
+              question: "How many AI operators are in the field analysis?",
+              answer:
+                "The field analysis covers 1,498 human AI operators (the Human Center of Mass) from a total dataset of 1,628 operators. The remaining 130 are classified as outliers or bots. The analysis separates genuine human usage patterns from automated traffic using the Hermes bot control and outlier classification.",
+            },
+            {
+              question: "What is the median Yield of AI operators?",
+              answer:
+                "The median Yield (Υ) across 1,498 human AI operators is 1.68. This means half of all operators score below 1.68 — most AI users compound signal poorly. The top operator achieves a Yield of 18,436.98, demonstrating that the difference between median and elite is not incremental but structural — cache reuse, not volume.",
+            },
+          ]),
         ]}
       />
 

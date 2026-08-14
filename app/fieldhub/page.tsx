@@ -14,7 +14,7 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { breadcrumb } from "@/lib/jsonld";
+import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Field Hub — SigRank Research",
@@ -57,6 +57,23 @@ export default async function FieldHubPage() {
         data={[
           collectionPage,
           breadcrumb([{ name: "Field Hub", path: "/fieldhub" }]),
+          faqPage([
+            {
+              question: "What is the SigRank Field Hub?",
+              answer:
+                "The Field Hub is the academic research hub for SigRank. It provides two entry points: the Field Analysis (signalaf.com/field), which presents the full distribution analysis of AI operator token efficiency, and the State of the Index (signalaf.com/research), which is the Zenodo dataset landing page with downloadable CSVs and JSON.",
+            },
+            {
+              question: "Where can I download the SigRank dataset?",
+              answer:
+                "The SigRank dataset is available on Zenodo under CC-BY-4.0. Visit the State of the Index page at signalaf.com/research for the DOI link. The dataset includes 1,628 AI operators across 17 platforms with raw token telemetry and derived cascade metrics.",
+            },
+            {
+              question: "What research does SigRank publish?",
+              answer:
+                "SigRank publishes field analysis showing the true distribution of AI operator token efficiency (1,498 human operators, median yield 1.68), the Zenodo dataset with full anonymized telemetry, and the academic foundation page covering the Conservation Law of Commitment and MOSES enforcement architecture.",
+            },
+          ]),
         ]}
       />
 

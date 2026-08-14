@@ -22,6 +22,7 @@ import {
   experimentalRecordDataset,
   transformationHarnessDataset,
   propositionsDataset,
+  faqPage,
 } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -42,6 +43,23 @@ export default function SciencePage() {
           transformationHarnessDataset(),
           propositionsDataset(),
           breadcrumb([{ name: "Science", path: "/science" }]),
+          faqPage([
+            {
+              question: "What is the Conservation Law of Commitment?",
+              answer:
+                "The Conservation Law of Commitment is a published conservation law for language that grounds SigRank's theoretical foundation. It establishes that token commitment (input, output, cache creation, cache read) is conserved across transformations, providing the mathematical basis for cascade efficiency metrics like Yield.",
+            },
+            {
+              question: "What is the MOSES enforcement architecture?",
+              answer:
+                "MOSES is the enforcement architecture that ensures SigRank's measurements remain integrity-verified. It combines signed, server-verifiable snapshots with telescoping identity locks to prevent metric inflation and gaming. The architecture is documented with Zenodo deposits as an empirical record.",
+            },
+            {
+              question: "Is SigRank backed by academic research?",
+              answer:
+                "Yes. SigRank is built on the Conservation Law of Commitment, the Commitment Theory research program, and the MOSES enforcement architecture. The theoretical foundation and empirical records are deposited on Zenodo with DOIs, making SigRank a data source grounded in published science rather than proprietary heuristics.",
+            },
+          ]),
         ]}
       />
 

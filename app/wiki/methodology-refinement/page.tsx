@@ -25,7 +25,7 @@
 import type { Metadata } from "next";
 import { TopicPage } from "@/components/wiki/TopicPage";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
@@ -160,6 +160,23 @@ export default function MethodologyRefinementPage() {
             "The dual-reader and memory-pair entries used to bracket and verify the SigRank Index scoring before live operators populated the board.",
             "/wiki/methodology-refinement",
           ),
+          faqPage([
+            {
+              question: "How was the SigRank Index calibrated?",
+              answer:
+                "The SigRank Index was calibrated using dual-reader and memory-pair entries: one operator measured by two different token readers, and the same operator measured with and without conversation memory. These bracketing entries established the scoring bounds before live operators populated the board.",
+            },
+            {
+              question: "What is the inflation gap in AI token metrics?",
+              answer:
+                "The inflation gap is the difference between an operator's metrics measured with conversation memory (cached context) versus without (fresh input every turn). SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached prompting, so the gap between with-memory and clean reads reveals how much an operator benefits from context reuse.",
+            },
+            {
+              question: "Why does SigRank trust the ordinal rank over the raw magnitude?",
+              answer:
+                "The raw Yield magnitude can diverge when input tokens approach zero (the I² denominator inflates the score). The ordinal rank — who is above whom — is more robust because it preserves relative ordering even when absolute magnitudes are uncertain. SigRank leads with what survives: the rank, not the raw number.",
+            },
+          ]),
         ]}
       />
 

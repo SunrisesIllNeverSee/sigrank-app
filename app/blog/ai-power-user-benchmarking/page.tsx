@@ -38,6 +38,7 @@ function articleJsonLd() {
       "How to benchmark yourself against other AI power users. SigRank's operator classes and yield metrics tell you if you're a power user — and how to become one.",
     url,
     datePublished: "2026-07-07",
+    dateModified: "2026-07-07",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

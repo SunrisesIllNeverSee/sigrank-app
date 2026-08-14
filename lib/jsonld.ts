@@ -162,16 +162,37 @@ export function aggregateStats(opts: {
   transmitterCount: number;
   topOperator: string;
   topYield: number;
+  medianYield?: number;
+  averageYield?: number;
+  platformCount?: number;
+  modelCount?: number;
 }) {
+  const descriptionParts: string[] = [
+    `${opts.totalOperators} AI operators ranked.`,
+    `${(opts.totalTokens / 1e9).toFixed(1)} billion tokens analyzed.`,
+  ];
+  if (opts.platformCount) descriptionParts.push(`${opts.platformCount} platforms tracked.`);
+  if (opts.modelCount) descriptionParts.push(`${opts.modelCount.toLocaleString()} models measured.`);
+  if (opts.medianYield !== undefined) descriptionParts.push(`Median Yield: ${opts.medianYield.toFixed(2)}.`);
+  descriptionParts.push(`Top Yield: ${opts.topYield.toLocaleString()} (${opts.topOperator}).`);
+
+  const variableMeasured: { name: string; value: number | string }[] = [
+    { name: "total_operators", value: opts.totalOperators },
+    { name: "total_tokens_scored", value: opts.totalTokens },
+    { name: "total_snapshots", value: opts.totalSnapshots },
+    { name: "transmitter_count", value: opts.transmitterCount },
+    { name: "top_yield", value: opts.topYield },
+  ];
+  if (opts.medianYield !== undefined) variableMeasured.push({ name: "median_yield", value: opts.medianYield });
+  if (opts.averageYield !== undefined) variableMeasured.push({ name: "average_yield", value: opts.averageYield });
+  if (opts.platformCount) variableMeasured.push({ name: "platform_count", value: opts.platformCount });
+  if (opts.modelCount) variableMeasured.push({ name: "models_tracked", value: opts.modelCount });
+
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
     name: "SigRank Operator Leaderboard Statistics",
-    description:
-      `${opts.totalOperators} AI operators ranked. ` +
-      `${(opts.totalTokens / 1e9).toFixed(1)} billion tokens analyzed. ` +
-      `${opts.transmitterCount} transmitters. ` +
-      `Top Yield: ${opts.topYield.toLocaleString()} (${opts.topOperator}).`,
+    description: descriptionParts.join(" "),
     url: `${SITE_ORIGIN}/api/v1/stats`,
     creator: { "@id": ORG_ID },
     isAccessibleForFree: true,
@@ -182,13 +203,7 @@ export function aggregateStats(opts: {
       "AI user ranking",
       "token telemetry",
     ],
-    variableMeasured: [
-      { name: "total_operators", value: opts.totalOperators },
-      { name: "total_tokens_scored", value: opts.totalTokens },
-      { name: "total_snapshots", value: opts.totalSnapshots },
-      { name: "transmitter_count", value: opts.transmitterCount },
-      { name: "top_yield", value: opts.topYield },
-    ],
+    variableMeasured,
   };
 }
 

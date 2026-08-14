@@ -38,6 +38,7 @@ function articleJsonLd() {
       "The yield metric (Υ = cache_read × output / input²) measures how well AI operators convert tokens into useful output. How it works and why it matters.",
     url,
     datePublished: "2026-07-07",
+    dateModified: "2026-07-07",
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",

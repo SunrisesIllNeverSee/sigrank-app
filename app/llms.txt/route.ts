@@ -10,11 +10,15 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
+import { getFieldAnalysis } from "@/lib/analytics/field-data";
 
 export const revalidate = 86400; // 24h
 
 export async function GET() {
   const homeStats = await getHomepageStats();
+  const fieldData = await getFieldAnalysis();
+  const operatorCount = fieldData.meta.humans_included;
+  const medianYield = fieldData.meta.medians.yield;
   const body = `# ${SITE_NAME}
 
 SigRank is a privacy-preserving leaderboard that ranks AI coding operators by token cascade efficiency (Yield). It measures the humans using AI tools, not the AI models themselves. Run \`npx sigrank\` to see your efficiency score.
@@ -146,10 +150,13 @@ A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators — 
 - [The Human in the Loop Is Unmeasured](${SITE_ORIGIN}/blog/the-human-in-the-loop-is-unmeasured): the case for AI operator evaluation — the variance model benchmarks cannot see, the token cascade primitive, and what is proven vs under evaluation
 
 ## The numbers
-- ${homeStats.total_operators.toLocaleString()} operators ranked
+- ${operatorCount.toLocaleString()} operators ranked (Human Center of Mass)
 - ${(homeStats.total_tokens_scored / 1e9).toFixed(1)} billion tokens analyzed
+- 17 platforms tracked (Claude, ChatGPT, Gemini, Cursor, Copilot, ...)
+- 3,304 models measured
 - ${homeStats.total_snapshots.toLocaleString()} snapshots scored
 - ${homeStats.transmitter_count} transmitters (high-activity operators)
+- Median Yield: ${medianYield.toFixed(2)}
 - Top Yield: ${homeStats.top_signa_rate.toLocaleString()} (${homeStats.top_operator_codename})
 - Dataset DOI: 10.5281/zenodo.21900519
 - Install: \`npx sigrank\`
@@ -193,6 +200,9 @@ A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators — 
 `;
 
   return new Response(body, {
-    headers: { "content-type": "text/plain; charset=utf-8" },
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "x-robots-tag": "noindex",
+    },
   });
 }
