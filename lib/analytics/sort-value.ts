@@ -41,11 +41,9 @@ export function sortValue(row: LeaderboardRow, key: string): number {
       // Non-compounding operators sort last.
       return c && !c.nonCompounding ? c.leverage : -1;
     case "opCache":
-      // Best cache op ratio — ranks on pure cache efficiency (cache_read / input).
-      // Non-compounding operators sort last.
-      return c && !c.nonCompounding
-        ? t.cache_read / Math.max(t.fresh_input, 1)
-        : -1;
+      // Best cache op ratio — ranks on cache-read volume (who reads the most
+      // cache, the raw cache leverage signal). Non-compounding sort last.
+      return c && !c.nonCompounding ? t.cache_read : -1;
     case "opOutput":
       // Best output op ratio — ranks on the velocity (output) term.
       return c ? c.velocity : -1;
