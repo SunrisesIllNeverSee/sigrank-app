@@ -407,6 +407,206 @@ server.registerTool(
   },
 )
 
+// ─── Tool: get_hall_of_signal ─────────────────────────────────────────────
+//
+// Get the Hall of Signal — prestige records and achievements.
+
+server.registerTool(
+  'get_hall_of_signal',
+  {
+    title: 'Get Hall of Signal',
+    description:
+      'Get the SigRank Hall of Signal — prestige records, achievements, and ' +
+      'all-time highs. Categories include Highest Compression Ever, Deepest ' +
+      'Single Session, Most Cross-Thread Continuity, Longest Transmitter ' +
+      'Streak, Largest 24h Rank Climb, First Verified Transmitter, and ' +
+      'Fivefold Hold Recipients. Use when someone asks about records or ' +
+      'achievements.',
+    inputSchema: {},
+  },
+  async () => {
+    const data = await fetchJson('/hall-of-signal') as { categories?: Array<Record<string, unknown>>; error?: string }
+
+    if (data.error) {
+      return { content: [{ type: 'text', text: `Error: ${data.error}` }] }
+    }
+
+    const categories = data.categories ?? []
+    const lines: string[] = ['SigRank Hall of Signal — Prestige Records\n']
+
+    for (const cat of categories) {
+      const title = cat.title ?? cat.name ?? 'Unknown'
+      const records = (cat.records as Array<Record<string, unknown>>) ?? []
+      if (records.length === 0) {
+        lines.push(`  ${title}: (no records yet)`)
+      } else {
+        lines.push(`  ${title}:`)
+        for (const r of records) {
+          const op = r.operator ?? r.display_name ?? '—'
+          const val = r.value ?? '—'
+          const date = (r.achieved_at ?? '').toString().slice(0, 10)
+          lines.push(`    ${val} — ${op} (${date})`)
+        }
+      }
+    }
+
+    return { content: [{ type: 'text', text: lines.join('\n') }] }
+  },
+)
+
+// ─── Tool: get_operator_records ───────────────────────────────────────────
+//
+// Get an operator's ranked records — which metrics they hold and their rank.
+
+server.registerTool(
+  'get_operator_records',
+  {
+    title: 'Get Operator Records',
+    description:
+      'Get an operator\'s ranked records — which metrics they appear in and ' +
+      'their rank for each. Shows metric ID, name, rank, value, and window. ' +
+      'Useful for "what is operator X best at?" or "where does operator X rank?"',
+    inputSchema: {
+      codename: z.string().min(1).max(100).describe('Operator codename'),
+    },
+  },
+  async ({ codename }) => {
+    const data = await fetchJson(
+      `/operators/${encodeURIComponent(codename)}/records`,
+    ) as { static_records?: Array<Record<string, unknown>>; dynamic_records?: Array<Record<string, unknown>>; error?: string }
+
+    if (data.error) {
+      return { content: [{ type: 'text', text: `Error: ${data.error}` }] }
+    }
+
+    const staticR = data.static_records ?? []
+    const dynamicR = data.dynamic_records ?? []
+
+    if (staticR.length === 0 && dynamicR.length === 0) {
+      return { content: [{ type: 'text', text: `No records found for "${codename}".` }] }
+    }
+
+    const lines: string[] = [`Records for ${codename}:\n`]
+
+    if (dynamicR.length > 0) {
+      lines.push('Dynamic Records (current rankings):')
+      for (const r of dynamicR) {
+        lines.push(`  ${r.metric} ${r.metric_name} — rank #${r.rank} = ${r.value} (${r.window})`)
+      }
+    }
+
+    if (staticR.length > 0) {
+      lines.push('\nStatic Records (all-time achievements):')
+      for (const r of staticR) {
+        lines.push(`  ${r.metric} ${r.metric_name} — ${r.value} (${r.achieved_at ?? ''})`)
+      }
+    }
+
+    return { content: [{ type: 'text', text: lines.join('\n') }] }
+  },
+)
+
+// ─── Tool: search_operators ───────────────────────────────────────────────
+//
+// Search for operators by name or codename (fuzzy match via leaderboard scan).
+
+server.registerTool(
+  'search_operators',
+  {
+    title: 'Search Operators',
+    description:
+      'Search for operators by name or codename. Returns matching operators ' +
+      'with their rank, class, and Yield. Use when someone asks "find operator ' +
+      'X" or "is there an operator named Y?" — searches both display_name and ' +
+      'codename, case-insensitive, partial match.',
+    inputSchema: {
+      query: z.string().min(1).max(100).describe('Search query (name or codename fragment)'),
+      limit: z.number().int().min(1).max(20).default(10).describe('Max results (default: 10)'),
+    },
+  },
+  async ({ query, limit }) => {
+    // Fetch a large board and filter client-side (the API doesn't have a
+    // search endpoint, so we scan the leaderboard for matches)
+    const data = await fetchJson(
+      `/leaderboard?metric=yield&window=all_time&limit=2000`,
+    ) as { entries?: Array<Record<string, unknown>>; error?: string }
+
+    if (data.error) {
+      return { content: [{ type: 'text', text: `Error: ${data.error}` }] }
+    }
+
+    const entries = data.entries ?? []
+    const q = query.toLowerCase()
+    const matches = entries.filter((e: Record<string, unknown>) => {
+      const name = ((e.display_name as string) ?? '').toLowerCase()
+      const code = ((e.codename as string) ?? '').toLowerCase()
+      return name.includes(q) || code.includes(q)
+    }).slice(0, limit)
+
+    if (matches.length === 0) {
+      return { content: [{ type: 'text', text: `No operators found matching "${query}".` }] }
+    }
+
+    const lines = matches.map((e: Record<string, unknown>) => {
+      const rank = e.rank
+      const name = e.display_name ?? e.codename
+      const code = e.codename
+      const cls = e.class_tier ?? ''
+      const y = fmt(e.yield_ as number)
+      return `#${rank} ${name} (${code}) [${cls}] — Υ ${y}`
+    })
+
+    const text = `Found ${matches.length} operator(s) matching "${query}":\n` + lines.join('\n')
+    return { content: [{ type: 'text', text }] }
+  },
+)
+
+// ─── Tool: get_submissions ────────────────────────────────────────────────
+//
+// Get raw snapshot submissions (distinct from the collapsed leaderboard).
+
+server.registerTool(
+  'get_submissions',
+  {
+    title: 'Get Raw Submissions',
+    description:
+      'Get raw snapshot submissions — every individual (operator, platform, ' +
+      'window) data point, ranked by Yield. DISTINCT from get_leaderboard: ' +
+      'the leaderboard collapses to one row per operator; this shows every ' +
+      'submission. Useful for "show me all recent submissions" or analyzing ' +
+      'per-platform or per-window performance.',
+    inputSchema: {
+      metric: z.enum([
+        'yield', 'velocity', 'leverage', 'snr', 'dev10x',
+        'scale_v', 'efficiency', 'cost_per_million', 'op_ratio', 'signa_rate',
+      ]).default('yield').describe('Sort metric (default: yield)'),
+      limit: z.number().int().min(1).max(100).default(10).describe('Number of submissions (default: 10, max: 100)'),
+    },
+  },
+  async ({ metric, limit }) => {
+    const data = await fetchJson(
+      `/submissions?metric=${metric}&limit=${limit}`,
+    ) as { entries?: Array<Record<string, unknown>>; total_operators?: number; error?: string }
+
+    if (data.error) {
+      return { content: [{ type: 'text', text: `Error: ${data.error}` }] }
+    }
+
+    const entries = data.entries ?? []
+    const lines = entries.map((e: Record<string, unknown>) => {
+      const rank = e.rank
+      const name = e.display_name ?? e.codename
+      const platform = e.platform ?? ''
+      const window = e.window ?? ''
+      const y = fmt(e.yield_ as number)
+      return `#${rank} ${name} (${platform}/${window}) — Υ ${y}`
+    })
+
+    const header = `Raw Submissions — ${metric} (${data.total_operators ?? entries.length} total)\n`
+    return { content: [{ type: 'text', text: header + lines.join('\n') }] }
+  },
+)
+
 // ─── Hono app + MCP transport ─────────────────────────────────────────────
 
 const app = new Hono().basePath('/sigrank-mcp')
