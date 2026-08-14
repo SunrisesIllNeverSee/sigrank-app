@@ -239,7 +239,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static content pages use a fixed last-modified date (the last content update)
   // instead of `now` — this prevents Google from seeing every URL as "just changed"
   // on every sitemap fetch, which dilutes the lastmod signal.
-  const STATIC_LAST_MODIFIED = new Date("2026-07-18T22:50:00Z");
+  const STATIC_LAST_MODIFIED = new Date("2026-08-14T09:50:00Z");
 
   // Static routes
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
