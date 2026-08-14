@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 
 /** Canonical production origin (no trailing slash). */
 export const SITE_ORIGIN = "https://signalaf.com";
-export const SITE_NAME = "SigRank";
+export const SITE_NAME = "SigRank SignalAF";
 export const SITE_TAGLINE =
   "The evaluation platform for AI operators. Models are benchmarked constantly. The people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.";
 

@@ -11,7 +11,7 @@
  * structured data per the Schema.org spec.
  */
 
-import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import type { HallRecord } from "@/lib/board";
 
 const ORG_ID = `${SITE_ORIGIN}/#org`;
@@ -79,7 +79,7 @@ export function organization() {
     "@type": "Organization",
     "@id": ORG_ID,
     name: SITE_NAME,
-    alternateName: ["SignalAF", "signalaf", "SigRank"],
+    alternateName: ["SigRank", "SignalAF", "signalaf", "SigRank SignalAF"],
     url: SITE_ORIGIN,
     description: SITE_TAGLINE,
     logo: `${SITE_ORIGIN}/og-v2.png`,
@@ -112,7 +112,7 @@ export function product() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "SigRank — AI Operator Performance Rankings",
+    name: "SigRank SignalAF — AI Operator Performance Rankings",
     description:
       "Leaderboard measuring AI users (operators) by token cascade efficiency " +
       "(Υ Yield, C:I:O) and operator classes. Privacy-preserving, on-device telemetry " +
@@ -145,11 +145,11 @@ export function website() {
     "@type": "WebSite",
     "@id": SITE_ID,
     name: SITE_NAME,
-    alternateName: ["SigRank", "SignalAF", "signalaf"],
+    alternateName: ["SigRank", "SignalAF", "signalaf", "SigRank SignalAF"],
     url: SITE_ORIGIN,
     publisher: { "@id": ORG_ID },
     description:
-      "SigRank ranks AI operators by Yield (Υ = cache_read × output / input²) — " +
+      "SigRank SignalAF ranks AI operators by Yield (Υ = cache_read × output / input²) — " +
       "token-cascade efficiency, not raw spend. Privacy-preserving: token counts only, never prompts.",
   };
 }
@@ -169,7 +169,7 @@ export function aggregateStats(opts: {
 }) {
   const descriptionParts: string[] = [
     `${opts.totalOperators} AI operators ranked.`,
-    `${(opts.totalTokens / 1e9).toFixed(1)} billion tokens analyzed.`,
+    `${formatTokensLong(opts.totalTokens)} tokens analyzed.`,
     `${opts.transmitterCount} transmitters.`,
   ];
   if (opts.platformCount) descriptionParts.push(`${opts.platformCount} platforms tracked.`);
@@ -192,7 +192,7 @@ export function aggregateStats(opts: {
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    name: "SigRank Operator Leaderboard Statistics",
+    name: "SigRank SignalAF Operator Leaderboard Statistics",
     description: descriptionParts.join(" "),
     url: `${SITE_ORIGIN}/api/v1/stats`,
     creator: { "@id": ORG_ID },
@@ -221,7 +221,7 @@ export function leaderboardItemList(
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "SigRank Leaderboard",
+    name: "SigRank SignalAF Leaderboard",
     url: `${SITE_ORIGIN}${path}`,
     numberOfItems: entries.length,
     itemListElement: entries.map((e) => ({
@@ -295,7 +295,7 @@ export function definedTerm(term: string, definition: string, path: string) {
     url: `${SITE_ORIGIN}${path}`,
     inDefinedTermSet: {
       "@type": "DefinedTermSet",
-      name: "SigRank Wiki",
+      name: "SigRank SignalAF Wiki",
       url: `${SITE_ORIGIN}/wiki`,
     },
   };
@@ -825,7 +825,7 @@ export function scoreCalculator() {
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "SigRank Score Calculator",
+    name: "SigRank SignalAF Score Calculator",
     url: `${SITE_ORIGIN}/score`,
     description:
       "Paste your ccusage JSON to see your Υ Yield, class tier, and compression ratio instantly. No account needed — just run the numbers.",

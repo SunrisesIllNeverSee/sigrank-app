@@ -15,7 +15,7 @@ export async function GET() {
     name: SITE_NAME,
     type: "leaderboard",
     description:
-      "SigRank ranks AI operators by Yield (Υ) — token-cascade efficiency. Privacy-preserving: token counts only, never prompts.",
+      "SigRank SignalAF ranks AI operators by Yield (Υ) — token-cascade efficiency. Privacy-preserving: token counts only, never prompts.",
     url: SITE_ORIGIN,
     api: {
       v1: `${SITE_ORIGIN}/api/v1`,
