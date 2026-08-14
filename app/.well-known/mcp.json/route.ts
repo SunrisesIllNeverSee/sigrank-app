@@ -32,7 +32,7 @@ export async function GET() {
     protocolVersion: "2025-06-18",
     serverInfo: {
       name: "sigrank",
-      title: "SigRank — AI Operator Leaderboard",
+      title: "SigRank SignalAF — AI Operator Leaderboard",
       version: "1.0.0",
     },
     description:

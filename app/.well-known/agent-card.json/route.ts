@@ -43,10 +43,10 @@ export async function GET() {
   }
 
   const card = {
-    name: "SigRank — AI Operator Leaderboard",
+    name: "SigRank SignalAF — AI Operator Leaderboard",
     version: "1.0.0",
     description:
-      "SigRank ranks AI operators by Yield (Υ = cache_read × output / input²) — token-cascade efficiency, not raw spend. Run `npx sigrank` to measure your efficiency. Privacy-preserving: token counts only, never prompts.",
+      "SigRank SignalAF ranks AI operators by Yield (Υ = cache_read × output / input²) — token-cascade efficiency, not raw spend. Run `npx sigrank` to measure your efficiency. Privacy-preserving: token counts only, never prompts.",
     url: SITE_ORIGIN,
     protocolVersion: "0.3.0",
     supportedInterfaces,
@@ -86,7 +86,7 @@ export async function GET() {
       },
     ],
     provider: {
-      name: "SigRank",
+      name: "SigRank SignalAF",
       url: SITE_ORIGIN,
     },
     privacy: {

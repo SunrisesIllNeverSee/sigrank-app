@@ -23,12 +23,12 @@ import Link from "next/link";
 // within 24h, or instantly on deploy (Vercel rebuilds all static pages).
 export const revalidate = 86400;
 
-// Home title carries the dual brand: SigRank (the product) · SignalAF (the domain identity),
-// near-equal parallel per owner. Sub-pages get just "· SigRank" via the root template
-// (SITE_NAME); the home title is the root segment so it's set in full here. Description is
-// the hero's voice (kept in sync with SITE_TAGLINE).
+// Home title carries the canonical brand: SigRank SignalAF. Sub-pages get
+// "· SigRank SignalAF" via the root template (SITE_NAME); the home title is the
+// root segment so it's set in full here. Description is the hero's voice (kept
+// in sync with SITE_TAGLINE).
 export const metadata: Metadata = withOG({
-  title: "SigRank · SignalAF - The Evaluation Platform for AI Operators",
+  title: "SigRank SignalAF — The Evaluation Platform for AI Operators",
   description:
     "Models are benchmarked constantly. The people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.",
   path: "/",
