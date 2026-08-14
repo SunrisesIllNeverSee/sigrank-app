@@ -338,7 +338,7 @@ function FinalScene() {
 export function SignalLiveDemo({ fieldYields }: { fieldYields: number[] }) {
   const [mode, setMode] = useState<Mode>("simulated");
   const [elapsed, setElapsed] = useState(0);
-  const [running, setRunning] = useState(false);
+  const [running, setRunning] = useState(true);
   const [speed, setSpeed] = useState<1 | 4>(1);
   const [liveState, setLiveState] = useState<LiveTelemetryState>({
     status: "waiting",
