@@ -79,6 +79,7 @@ export function organization() {
     "@type": "Organization",
     "@id": ORG_ID,
     name: SITE_NAME,
+    alternateName: ["SignalAF", "signalaf", "SigRank"],
     url: SITE_ORIGIN,
     description: SITE_TAGLINE,
     logo: `${SITE_ORIGIN}/og-v2.png`,
@@ -144,8 +145,50 @@ export function website() {
     "@type": "WebSite",
     "@id": SITE_ID,
     name: SITE_NAME,
+    alternateName: ["SigRank", "SignalAF", "signalaf"],
     url: SITE_ORIGIN,
     publisher: { "@id": ORG_ID },
+    description:
+      "SigRank ranks AI operators by Yield (Υ = cache_read × output / input²) — " +
+      "token-cascade efficiency, not raw spend. Privacy-preserving: token counts only, never prompts.",
+  };
+}
+
+/** Aggregate stats for JSON-LD (AEO Item 2c). Quantified stats improve AI citation rates. */
+export function aggregateStats(opts: {
+  totalOperators: number;
+  totalTokens: number;
+  totalSnapshots: number;
+  transmitterCount: number;
+  topOperator: string;
+  topYield: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: "SigRank Operator Leaderboard Statistics",
+    description:
+      `${opts.totalOperators} AI operators ranked. ` +
+      `${(opts.totalTokens / 1e9).toFixed(1)} billion tokens analyzed. ` +
+      `${opts.transmitterCount} transmitters. ` +
+      `Top Yield: ${opts.topYield.toLocaleString()} (${opts.topOperator}).`,
+    url: `${SITE_ORIGIN}/api/v1/stats`,
+    creator: { "@id": ORG_ID },
+    isAccessibleForFree: true,
+    keywords: [
+      "AI operator leaderboard",
+      "token cascade efficiency",
+      "Yield metric",
+      "AI user ranking",
+      "token telemetry",
+    ],
+    variableMeasured: [
+      { name: "total_operators", value: opts.totalOperators },
+      { name: "total_tokens_scored", value: opts.totalTokens },
+      { name: "total_snapshots", value: opts.totalSnapshots },
+      { name: "transmitter_count", value: opts.transmitterCount },
+      { name: "top_yield", value: opts.topYield },
+    ],
   };
 }
 

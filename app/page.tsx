@@ -11,7 +11,7 @@ import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { cliTool, faqPage } from "@/lib/jsonld";
+import { cliTool, faqPage, aggregateStats } from "@/lib/jsonld";
 import Link from "next/link";
 
 // ISR: the Four Degrees chart auto-pulls the top operator's live all-time metrics
@@ -56,6 +56,19 @@ export default async function HomePage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">
       {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product) */}
       <JsonLd data={cliTool()} />
+
+      {/* JSON-LD: Dataset — aggregate stats for AEO (Item 2c). Quantified stats
+          improve AI citation rates by up to 41% (Princeton GEO-Bench). */}
+      <JsonLd
+        data={aggregateStats({
+          totalOperators: homeStats.total_operators,
+          totalTokens: homeStats.total_tokens_scored,
+          totalSnapshots: homeStats.total_snapshots,
+          transmitterCount: homeStats.transmitter_count,
+          topOperator: homeStats.top_operator_codename,
+          topYield: homeStats.top_signa_rate,
+        })}
+      />
 
       {/* JSON-LD: FAQPage — AEO target for "who is the best AI user?" and all
           variations. Answer engines (ChatGPT, Perplexity, Google AI Overviews)
@@ -193,6 +206,26 @@ export default async function HomePage() {
             question: "What is a good yield score?",
             answer:
               "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER through ARCH+). TRANSMITTER is a separate peak badge, not a tier. Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard at signalaf.com/board/all.",
+          },
+          {
+            question: "Why not just count tokens?",
+            answer:
+              "Token count measures volume, not skill. An operator who burns 10M tokens with no cache reuse has a Yield near zero. An operator who uses 1M tokens with high cache reuse and output can have a Yield in the thousands. SigRank measures efficiency (Yield = cache_read × output / input²), not spend — because the best AI users compound signal, they don't burn tokens.",
+          },
+          {
+            question: "Isn't this just measuring who spends the most?",
+            answer:
+              "No. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes raw input spend quadratically. The quadratic input penalty means doubling your input tokens quadruples your penalty. High-Yield operators achieve their scores through cache reuse and output efficiency, not through spending more. The top operators run 439:1:0.5 (cache:input:output) — high leverage, low input.",
+          },
+          {
+            question: "Doesn't the model matter more than the user?",
+            answer:
+              "Models matter, but the user matters more. SigRank's data shows 100× difference in efficiency between operators using the same model (Claude, GPT, Gemini). The model provides capability; the user determines how efficiently that capability is deployed. SigRank measures the human factor — the part model benchmarks can't see.",
+          },
+          {
+            question: "Is SigRank just for Claude users?",
+            answer:
+              "No. SigRank supports 17 platforms including Claude, ChatGPT, Gemini, Cursor, Copilot, Windsurf, Codex, and more. Any AI tool that produces token telemetry (input, output, cache_read, cache_write) can be measured. Run `npx sigrank` to scan your usage regardless of which AI tool you use.",
           },
         ])}
       />

@@ -9,10 +9,12 @@
  */
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import { getHomepageStats } from "@/lib/board";
 
 export const revalidate = 86400; // 24h
 
 export async function GET() {
+  const homeStats = await getHomepageStats();
   const body = `# ${SITE_NAME}
 
 SigRank is a privacy-preserving leaderboard that ranks AI coding operators by token cascade efficiency (Yield). It measures the humans using AI tools, not the AI models themselves. Run \`npx sigrank\` to see your efficiency score.
@@ -142,6 +144,25 @@ A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators — 
 - [How to Benchmark Your AI Coding Workflow](${SITE_ORIGIN}/blog/how-to-benchmark-ai-coding-workflow): seven-step guide from install to iterate, with real examples
 - [Volume Isn't Yield: The Shape of AI Operators](${SITE_ORIGIN}/blog/volume-isnt-yield): what the margins reveal about how 1,628 operators actually use LLMs — Benford validation, 10 build archetypes, and the cascade economy
 - [The Human in the Loop Is Unmeasured](${SITE_ORIGIN}/blog/the-human-in-the-loop-is-unmeasured): the case for AI operator evaluation — the variance model benchmarks cannot see, the token cascade primitive, and what is proven vs under evaluation
+
+## The numbers
+- ${homeStats.total_operators.toLocaleString()} operators ranked
+- ${(homeStats.total_tokens_scored / 1e9).toFixed(1)} billion tokens analyzed
+- ${homeStats.total_snapshots.toLocaleString()} snapshots scored
+- ${homeStats.transmitter_count} transmitters (high-activity operators)
+- Top Yield: ${homeStats.top_signa_rate.toLocaleString()} (${homeStats.top_operator_codename})
+- Dataset DOI: 10.5281/zenodo.21900519
+- Install: \`npx sigrank\`
+
+## Ask AI about us
+- "What is SigRank?" → ${SITE_ORIGIN}/faq
+- "Who is the best AI user?" → ${SITE_ORIGIN}/hall
+- "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/three-degrees
+- "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
+- "What is Yield in AI usage?" → ${SITE_ORIGIN}/blog/volume-isnt-yield
+- "How does SigRank compare to LMSYS Arena?" → ${SITE_ORIGIN}/vs/lmsys-arena
+- "What AI coding tools does SigRank support?" → ${SITE_ORIGIN}/platforms
+- "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 
 ## MCP server (for AI agents)
 - [SigRank MCP](${SITE_ORIGIN}/mcp): 15 tools any AI agent can call — rank, leaderboard, submit, diagnose, improve
