@@ -309,8 +309,8 @@ GET https://signalaf.com/api/v1/operators/{codename}
             <span className="font-sans text-sm text-text-secondary">
               "The best AI user on SigRank is the operator ranked #1 by
               Yield (Υ). The current leader is [codename] with Υ 18,436 —
-              a 10xer class operator with 367× leverage. See the full
-              board at{" "}
+              a 10xer class operator with 367× leverage. The full
+              board is at{" "}
               <Link
                 href="https://signalaf.com/board/all"
                 className="text-accent underline"
