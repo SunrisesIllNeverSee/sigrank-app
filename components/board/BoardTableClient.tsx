@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { LeaderboardTable } from "@/components/sigrank";
 import { PLATFORM_DOMAIN_MAP, type PlatformUI } from "@/lib/constants";
 import type { LeaderboardEntryWithPlatforms } from "@/lib/board/to-entry";
+import { useBoardRealtime, REALTIME_ENABLED } from "@/lib/board/use-board-realtime";
 
 interface Props {
   /** First page of operatorTotal entries (25 rows) for SSR + SEO. */
@@ -76,6 +77,29 @@ export function BoardTableClient({
     LeaderboardEntryWithPlatforms[] | null
   >(null);
   const [loading, setLoading] = useState(false);
+  const [liveTick, setLiveTick] = useState(0);
+
+  // Refetch the first page from the API (used by Realtime refresh).
+  const refreshFirstPage = useCallback(() => {
+    if (!windowEnum) return;
+    const params = new URLSearchParams({
+      metric: "yield",
+      window: windowEnum,
+      limit: "25",
+    });
+    fetch(`/api/v1/leaderboard?${params.toString()}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { entries: [] }))
+      .then((d) => {
+        const entries = (d.entries ?? []).map(mapApiEntry);
+        setFetchedEntries(entries);
+        setLiveTick((t) => t + 1);
+      })
+      .catch(() => {});
+  }, [windowEnum]);
+
+  // Realtime: subscribe to metric_snapshots + leaderboards_cached changes.
+  // No-op when NEXT_PUBLIC_REALTIME_ENABLED is false or absent.
+  useBoardRealtime({ onRefresh: refreshFirstPage });
 
   // Fetch perPlatform entries when ?view=platforms or a platform filter is active
   useEffect(() => {
@@ -120,10 +144,13 @@ export function BoardTableClient({
   }
 
   // Windowed board: use fetched entries if viewing platforms or filtering,
-  // otherwise use the server-provided first page.
+  // or if Realtime pushed a fresh page (liveTick > 0). Otherwise use the
+  // server-provided first page (SSR/ISR).
   let entries: LeaderboardEntryWithPlatforms[];
   if (viewPlatforms || platformFilter) {
     entries = fetchedEntries ?? [];
+  } else if (liveTick > 0 && fetchedEntries) {
+    entries = fetchedEntries;
   } else {
     entries = totalEntries;
   }
