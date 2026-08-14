@@ -37,7 +37,7 @@ import {
   Credits,
 } from "@/components/marketing/SignalIntegrity";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
 import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
 import Link from "next/link";
@@ -1914,6 +1914,30 @@ export default function Draft1Page() {
           "C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it. Commitment content (obligations, prohibitions, modal constraints) persists under recursive transformative compression when an enforcement gate is present. Published under CC-BY-4.0 (DOI: 10.5281/zenodo.20029607). Enforced by MO§ES™ (Modus Operandi §ignal Scaling Expansion System) — constitutional governance framework co-authored by nine rival AI architectures. Patent portfolio: Provisional 63/877,177 + 63/883,018 + 63/991,282 + Utility 19/426,028 + trademark TM 99408355 (IC 042).",
           "/wiki#conservation-law-of-commitment",
         )}
+      />
+      <JsonLd
+        data={faqPage([
+          {
+            question: "What is the SigRank wiki?",
+            answer:
+              "The SigRank wiki is the living reference for AI operator evaluation. It covers the four token pillars (input, output, cache-read, cache-write), the cascade metrics derived from them, the eight experience tiers, build archetypes, and the MO§ES governance framework. Every concept is grounded in token telemetry — no prompts, no code, no self-reported fields.",
+          },
+          {
+            question: "What are the four token pillars?",
+            answer:
+              "The four token pillars are Input (fresh prompt tokens you send), Output (tokens the model generates back), Cache-read (tokens served from cache — cheap reuse of held context), and Cache-write (tokens written to cache — context you build forward). Every SigRank metric is derived from these four integers. No prompt content or code is ever read.",
+          },
+          {
+            question: "What is the token cascade?",
+            answer:
+              "The token cascade is the relationship between the four token pillars. An operator who writes cache and reads it back is compounding — their cache-read dwarfs their input. An operator who sends fresh input every turn is burning — their input dwarfs everything else. The cascade is a loop: cache-read feeds back into the next turn's input, reducing what you need to send.",
+          },
+          {
+            question: "How does SigRank classify operators?",
+            answer:
+              "SigRank classifies operators by archetype (cascade shape), class (qualification tier), and rank (leaderboard position). Archetypes include Burner, Builder, and 10xer. Classes range from IGNITER to ARCH+. All three are recomputed every scoring window (7-day, 30-day, 90-day, all-time) — none are permanent.",
+          },
+        ])}
       />
 
       {/* Two-column layout: sticky TOC nav + scrolling doc */}
