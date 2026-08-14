@@ -582,10 +582,53 @@
   animation: finale-in 700ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
-.finalRule { width: 1px; height: 65px; margin-bottom: 26px; background: linear-gradient(transparent, #fff); }
-.finalScene p { margin: 0 0 10px; color: #969696; font-size: clamp(12px, 1.2vw, 17px); letter-spacing: .3em; }
-.finalScene h2 { margin: 0; font-family: var(--font-geist-sans), Roboto, sans-serif; font-size: clamp(38px, 6.2vw, 100px); letter-spacing: -.065em; line-height: .95; }
-.finalBrand { margin-top: 46px; font-size: 11px; font-weight: 700; letter-spacing: .27em; }
+.finalRule { width: 1px; height: 45px; margin-bottom: 20px; background: linear-gradient(transparent, #fff); }
+.finalScene p { margin: 0 0 8px; color: #969696; font-size: clamp(11px, 1vw, 15px); letter-spacing: .3em; }
+.finalScene h2 { margin: 0 0 24px; font-family: var(--font-geist-sans), Roboto, sans-serif; font-size: clamp(32px, 5vw, 80px); letter-spacing: -.065em; line-height: .95; }
+
+.finalBoardFrame {
+  width: min(680px, 70vw);
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  animation: scene-reveal 800ms cubic-bezier(.22, 1, .36, 1) 200ms both;
+}
+
+.finalBoardImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: brightness(0.92) contrast(1.05);
+}
+
+.finalCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 14px 32px;
+  font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: #000;
+  background: #fff;
+  border: none;
+  border-radius: 2px;
+  text-decoration: none;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  animation: scene-reveal 600ms cubic-bezier(.22, 1, .36, 1) 600ms both;
+}
+
+.finalCta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.25);
+}
+
+.finalCta span { font-size: 18px; }
+
+.finalBrand { margin-top: 32px; font-size: 11px; font-weight: 700; letter-spacing: .27em; }
 .finalBrand span { margin-left: 12px; }
 
 @keyframes live-pulse {
