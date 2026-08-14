@@ -36,8 +36,8 @@ export const revalidate = 300;
  */
 export default async function HallPage() {
   // Pre-fetch base rows for all 4 windows (no class/platform filter).
-  // Limit 30 per window gives headroom for platform/class filtering before
-  // slicing to the top 10 per metric.
+  // Limit 100 per window gives headroom for the claimed+active filter
+  // (Hall shows real users only, not seed data) before slicing to top 10.
   const windowsData: Record<
     string,
     LeaderboardRow[]
@@ -50,13 +50,13 @@ export default async function HallPage() {
         // recordValue, and isOutlierRow can access the nested shape they expect.
         const staticEntries = getStaticAllTimeBoard();
         windowsData[w.slug] = staticEntriesToLeaderboardRows(
-          staticEntries.slice(0, 30),
+          staticEntries.slice(0, 100),
         );
       } else {
         windowsData[w.slug] = await getLeaderboard({
           window: w.enum,
           windowFilter: true,
-          limit: 30,
+          limit: 100,
         });
       }
     }),

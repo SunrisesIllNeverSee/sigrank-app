@@ -77,9 +77,13 @@ export function HallClient({ windowsData }: Props) {
   const win = boardWindowBySlug(windowParam) ?? boardWindowBySlug("all")!;
   const windowSlug = win.slug;
 
-  // Filter the selected window's data by platform + class (client-side).
+  // Filter the selected window's data to REAL operators only (claimed + active),
+  // then by platform + class (client-side). The Hall is for active users with
+  // real verified submissions — not seed/scraped data (owner 2026-08-12).
   const baseRows = useMemo(() => {
-    let rows: LeaderboardRow[] = windowsData[win.slug] ?? [];
+    let rows: LeaderboardRow[] = (windowsData[win.slug] ?? []).filter(
+      (r) => r.operator.claimed && r.operator.status !== "retired",
+    );
     if (platform !== PLATFORM_DEFAULT) {
       const domain = platform.toLowerCase();
       rows = rows.filter(
