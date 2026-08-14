@@ -245,6 +245,7 @@ export default async function HomePage() {
         aria-label="SigRank aggregate statistics"
         className="grid grid-cols-2 gap-4 rounded-lg border border-bg-border bg-bg-surface px-6 py-5 sm:grid-cols-5"
       >
+        <meta itemProp="dateModified" content="2026-08-14" />
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
             {operatorCount.toLocaleString()}
@@ -272,6 +273,9 @@ export default async function HomePage() {
           <span className="font-sans text-xs text-text-dim">median Yield (Υ)</span>
         </div>
       </section>
+      <p className="-mt-4 font-mono text-xs text-text-dim">
+        Last updated: August 14, 2026
+      </p>
 
       {/* The four degrees of leverage — our show-stopper, directly under the hero
           (owner 2026-07-02: moved above the live board so the comparison table leads,

@@ -133,7 +133,10 @@ export default async function MethodologyPage() {
           <>
             The canonical source for AI operator token-efficiency data. Ranked
             by <strong className="text-text-primary">Υ Yield</strong> — the
-            architecture of the cascade, not raw spend.
+            architecture of the cascade, not raw spend.{" "}
+            <span className="font-mono text-xs text-text-dim">
+              Last updated: August 14, 2026
+            </span>
           </>
         }
       />

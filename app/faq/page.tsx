@@ -109,7 +109,10 @@ export default function FaqPage() {
           <>
             Answers to the most common questions about{" "}
             <span className="text-gold">AI operator performance</span> — who is
-            the best, how to measure up, and what makes a top AI user.
+            the best, how to measure up, and what makes a top AI user.{" "}
+            <span className="font-mono text-xs text-text-dim">
+              Last updated: August 14, 2026
+            </span>
           </>
         }
       />
