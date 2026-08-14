@@ -25,6 +25,8 @@ interface Props {
   /** Canonical 730 window slug ('7d' | '30d' | '90d' | 'all'). */
   windowSlug: string;
   classScope: string;
+  /** "active" = claimed operators only, "all" = everyone including seed data. */
+  scope: "active" | "all";
 }
 
 /** One shared label+<select> field so all three Hall filters are identical size/style.
@@ -89,9 +91,60 @@ function FilterSelect({
  * which didn't match the class dropdown — replaced with Hall-local uniform selects.
  * The leaderboard's segmented selectors are untouched.)
  */
-export function HallHeader({ platform, windowSlug, classScope }: Props) {
+export function HallHeader({ platform, windowSlug, classScope, scope }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const onScopeChange = useCallback(
+    (next: "active" | "all") => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === "active") params.delete("scope");
+      else params.set("scope", "all");
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
+    },
+    [router, pathname, searchParams],
+  );
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Active/All scope toggle — Active = real verified users, All = full field including seed data. */}
+      <div className="flex items-center gap-2">
+        <span className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
+          Scope
+        </span>
+        <div className="inline-flex rounded-md border border-bg-border bg-bg-surface p-0.5">
+          <button
+            type="button"
+            onClick={() => onScopeChange("active")}
+            className={`rounded px-3 py-1 font-sans text-xs font-medium transition-colors ${
+              scope === "active"
+                ? "bg-text-accent text-bg-base"
+                : "text-text-muted hover:text-text-primary"
+            }`}
+          >
+            Active
+          </button>
+          <button
+            type="button"
+            onClick={() => onScopeChange("all")}
+            className={`rounded px-3 py-1 font-sans text-xs font-medium transition-colors ${
+              scope === "all"
+                ? "bg-text-accent text-bg-base"
+                : "text-text-muted hover:text-text-primary"
+            }`}
+          >
+            All
+          </button>
+        </div>
+        <span className="font-sans text-[10px] text-text-muted">
+          {scope === "active"
+            ? "Verified operators with real submissions"
+            : "Full field including seeded data"}
+        </span>
+      </div>
+
       {/* Filter order: Window · Class · Platform (owner 2026-06-22). */}
       <div className="flex flex-wrap items-end gap-4">
         <FilterSelect

@@ -76,14 +76,23 @@ export function HallClient({ windowsData }: Props) {
   );
   const win = boardWindowBySlug(windowParam) ?? boardWindowBySlug("all")!;
   const windowSlug = win.slug;
+  // scope: "active" = claimed operators with real submissions only (default),
+  // "all" = full field including seed/scraped data.
+  const scopeParam = (mounted ? sp.get("scope") : null) ?? "active";
+  const scope = scopeParam === "all" ? "all" : "active";
 
-  // Filter the selected window's data to REAL operators only (claimed + active),
-  // then by platform + class (client-side). The Hall is for active users with
-  // real verified submissions — not seed/scraped data (owner 2026-08-12).
+  // Filter the selected window's data by scope, then platform + class.
+  // Active scope: only claimed operators with real verified submissions.
+  // All scope: everyone (the full field, including seed data).
   const baseRows = useMemo(() => {
-    let rows: LeaderboardRow[] = (windowsData[win.slug] ?? []).filter(
-      (r) => r.operator.claimed && r.operator.status !== "retired",
-    );
+    let rows: LeaderboardRow[] = windowsData[win.slug] ?? [];
+    if (scope === "active") {
+      rows = rows.filter(
+        (r) => r.operator.claimed && r.operator.status !== "retired",
+      );
+    } else {
+      rows = rows.filter((r) => r.operator.status !== "retired");
+    }
     if (platform !== PLATFORM_DEFAULT) {
       const domain = platform.toLowerCase();
       rows = rows.filter(
@@ -97,7 +106,7 @@ export function HallClient({ windowsData }: Props) {
       );
     }
     return rows;
-  }, [windowsData, win.slug, platform, activeClass]);
+  }, [windowsData, win.slug, platform, activeClass, scope]);
 
   // Sort into 18 boards (one base fetch, N in-memory sorts).
   const metricRows = useMemo(
@@ -143,6 +152,7 @@ export function HallClient({ windowsData }: Props) {
           platform={platform}
           windowSlug={windowSlug}
           classScope={activeClass}
+          scope={scope}
         />
       </div>
 
