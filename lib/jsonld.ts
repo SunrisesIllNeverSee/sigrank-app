@@ -170,6 +170,7 @@ export function aggregateStats(opts: {
   const descriptionParts: string[] = [
     `${opts.totalOperators} AI operators ranked.`,
     `${(opts.totalTokens / 1e9).toFixed(1)} billion tokens analyzed.`,
+    `${opts.transmitterCount} transmitters.`,
   ];
   if (opts.platformCount) descriptionParts.push(`${opts.platformCount} platforms tracked.`);
   if (opts.modelCount) descriptionParts.push(`${opts.modelCount.toLocaleString()} models measured.`);
