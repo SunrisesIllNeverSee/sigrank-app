@@ -39,3 +39,4 @@ public/mockup-*
 
 # Bun lockfile (npm lockfile is canonical)
 bun.lock
+/.swc
