@@ -150,7 +150,7 @@ export function staticEntryToLeaderboardRow(e: StaticBoardEntry): LeaderboardRow
     operator_id: e.codename,
     codename: e.codename,
     display_name: e.anonId !== e.codename ? e.anonId : null,
-    claimed: false,
+    claimed: !e.isSeed,
     claimed_at: null,
     claim_payment_id: null,
     claim_contact: null,
