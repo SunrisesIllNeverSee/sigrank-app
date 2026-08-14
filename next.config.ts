@@ -1,3 +1,4 @@
+import { withWorkflow } from "workflow/next";
 import type { NextConfig } from "next";
 
 // PostHog reverse proxy target. Defaults to US cloud; set NEXT_PUBLIC_POSTHOG_HOST
@@ -172,4 +173,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withWorkflow(nextConfig);
