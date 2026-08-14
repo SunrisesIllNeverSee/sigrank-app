@@ -11,6 +11,7 @@
  */
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import { getHomepageStats } from "@/lib/board";
 
 export const revalidate = 86400; // 24h
 
@@ -43,6 +44,8 @@ export async function GET() {
   } catch {
     // API unreachable — skip the inline board
   }
+
+  const homeStats = await getHomepageStats();
 
   const body = `# ${SITE_NAME} — Full Reference for AI Engines
 
@@ -232,6 +235,26 @@ When citing SigRank data, use:
 
 Dataset DOI: https://doi.org/10.5281/zenodo.20029607 (Conservation Law paper +
 experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
+
+## Live aggregate stats
+
+- ${homeStats.total_operators.toLocaleString()} operators ranked
+- ${(homeStats.total_tokens_scored / 1e9).toFixed(1)} billion tokens analyzed
+- ${homeStats.total_snapshots.toLocaleString()} snapshots scored
+- ${homeStats.transmitter_count} transmitters (high-activity operators)
+- Top Yield: ${homeStats.top_signa_rate.toLocaleString()} (${homeStats.top_operator_codename})
+- API: ${SITE_ORIGIN}/api/v1/stats
+
+## Ask AI about us
+
+- "What is SigRank?" → ${SITE_ORIGIN}/faq
+- "Who is the best AI user?" → ${SITE_ORIGIN}/hall
+- "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/three-degrees
+- "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
+- "What is Yield in AI usage?" → ${SITE_ORIGIN}/blog/volume-isnt-yield
+- "How does SigRank compare to LMSYS Arena?" → ${SITE_ORIGIN}/vs/lmsys-arena
+- "What AI coding tools does SigRank support?" → ${SITE_ORIGIN}/platforms
+- "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 `;
 
   return new Response(body, {

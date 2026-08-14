@@ -20,7 +20,7 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
-import { breadcrumb, personAuthor } from "@/lib/jsonld";
+import { breadcrumb, personAuthor, faqPage } from "@/lib/jsonld";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
 
@@ -166,6 +166,21 @@ export default async function BlogPost({
     keywords: frontmatter.tags?.join(", "),
   };
 
+  const blogFaq = faqPage([
+    {
+      question: title,
+      answer: description || `SigRank blog post: ${title}. Read the full article at signalaf.com/blog/${slug}.`,
+    },
+    {
+      question: `What is SigRank?`,
+      answer: `SigRank is a privacy-preserving leaderboard that ranks AI operators by token cascade efficiency (Yield). It measures the humans using AI, not the AI models. Run \`npx sigrank\` to see your score.`,
+    },
+    {
+      question: `How does this relate to AI operator efficiency?`,
+      answer: `This article is part of SigRank's research on AI operator performance. SigRank measures operators by Yield (Υ = cache_read × output / input²) — token-cascade efficiency, not raw spend. See signalaf.com/board/all for the live leaderboard.`,
+    },
+  ]);
+
   return (
     <article className="px-4 py-8 md:py-12">
       <CitationMeta
@@ -178,6 +193,7 @@ export default async function BlogPost({
       <JsonLd
         data={[
           articleLd,
+          blogFaq,
           breadcrumb([
             { name: "Blog", path: "/blog" },
             { name: title, path: `/blog/${slug}` },
