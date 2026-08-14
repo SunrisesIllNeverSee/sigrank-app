@@ -157,7 +157,7 @@ A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators — 
 ## Ask AI about us
 - "What is SigRank?" → ${SITE_ORIGIN}/faq
 - "Who is the best AI user?" → ${SITE_ORIGIN}/hall
-- "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/three-degrees
+- "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/four-degrees
 - "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
 - "What is Yield in AI usage?" → ${SITE_ORIGIN}/blog/volume-isnt-yield
 - "How does SigRank compare to LMSYS Arena?" → ${SITE_ORIGIN}/vs/lmsys-arena

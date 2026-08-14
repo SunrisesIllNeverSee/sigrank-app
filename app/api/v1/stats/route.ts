@@ -6,6 +6,13 @@
  * aggregate stats that llms.txt, JSON-LD, and the homepage all reference.
  *
  * GET /api/v1/stats → { total_operators, total_tokens, median_yield, ... }
+ *
+ * Yield aggregates (median/average/max) and token breakdowns
+ * (input/output/cache_read/cache_creation) are computed from the
+ * `metric_snapshots` table (all_time window, yieldable rows only —
+ * input > 0 AND output > 0, matching the board's ghost-row guard).
+ * Platform + class-tier breakdowns are grouped from `operators_public`
+ * and `metric_snapshots` respectively.
  */
 
 import { NextResponse } from "next/server";
@@ -13,6 +20,16 @@ import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { getHomepageStats } from "@/lib/board";
 
 export const revalidate = 3600;
+
+/** Median of a sorted numeric array (returns 0 for empty input). */
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+}
 
 export async function GET() {
   const sb = getSupabaseServer();
@@ -34,6 +51,53 @@ export async function GET() {
   // Enrich with computed aggregates from the DB if available
   if (sb) {
     try {
+      // Yield aggregates + token breakdowns from all_time snapshots.
+      // Only rows with input > 0 AND output > 0 are yieldable (matches the
+      // board's ghost-row guard in lib/board/queries.ts).
+      const { data: snapData } = await sb
+        .from("metric_snapshots")
+        .select(
+          "signa_rate, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
+        )
+        .eq("window_type", "all_time")
+        .gt("input_tokens", 0)
+        .gt("output_tokens", 0);
+
+      if (snapData && snapData.length > 0) {
+        const yields: number[] = [];
+        let totalInput = 0;
+        let totalOutput = 0;
+        let totalCacheCreation = 0;
+        let totalCacheRead = 0;
+
+        for (const row of snapData) {
+          const y = row.signa_rate;
+          if (typeof y === "number" && y > 0) yields.push(y);
+          totalInput += row.input_tokens ?? 0;
+          totalOutput += row.output_tokens ?? 0;
+          totalCacheCreation += row.cache_creation_tokens ?? 0;
+          totalCacheRead += row.cache_read_tokens ?? 0;
+        }
+
+        stats.total_input_tokens = totalInput;
+        stats.total_output_tokens = totalOutput;
+        stats.total_cache_creation_tokens = totalCacheCreation;
+        stats.total_cache_read_tokens = totalCacheRead;
+        stats.total_tokens = totalInput + totalOutput + totalCacheCreation + totalCacheRead;
+
+        if (yields.length > 0) {
+          stats.median_yield = median(yields);
+          stats.average_yield = yields.reduce((a, b) => a + b, 0) / yields.length;
+          stats.max_yield = Math.max(...yields);
+          stats.yieldable_operator_count = yields.length;
+        } else {
+          stats.median_yield = 0;
+          stats.average_yield = 0;
+          stats.max_yield = 0;
+          stats.yieldable_operator_count = 0;
+        }
+      }
+
       // Count operators by platform
       const { data: platformData } = await sb
         .from("operators_public")
@@ -50,11 +114,12 @@ export async function GET() {
         stats.platform_count = Object.keys(platforms).length;
       }
 
-      // Count operators by class tier (from latest snapshots)
+      // Count operators by class tier (from all_time snapshots)
       const { data: classData } = await sb
         .from("metric_snapshots")
-        .select("class_tier, window_type")
-        .eq("window_type", "all_time");
+        .select("class_tier")
+        .eq("window_type", "all_time")
+        .not("class_tier", "is", null);
 
       if (classData) {
         const classes: Record<string, number> = {};
@@ -70,6 +135,7 @@ export async function GET() {
   }
 
   // Add known constants
+  stats.models_tracked = 3304;
   stats.zenodo_doi = "10.5281/zenodo.21900519";
   stats.install = "npx sigrank";
   stats.privacy = "Token counts only. Never prompts.";

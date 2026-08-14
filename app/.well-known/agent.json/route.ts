@@ -32,7 +32,7 @@ export async function GET() {
       leaderboard: `${SITE_ORIGIN}/board/all`,
       hall: `${SITE_ORIGIN}/hall`,
       score: `${SITE_ORIGIN}/score`,
-      methodology: `${SITE_ORIGIN}/wiki/three-degrees`,
+      methodology: `${SITE_ORIGIN}/wiki/four-degrees`,
       faq: `${SITE_ORIGIN}/faq`,
       blog: `${SITE_ORIGIN}/blog`,
       research: `${SITE_ORIGIN}/research`,
