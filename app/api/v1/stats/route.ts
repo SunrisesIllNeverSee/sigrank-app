@@ -57,11 +57,8 @@ export async function GET() {
         .eq("window_type", "all_time");
 
       if (classData) {
-        // Dedupe by operator (take first all_time snapshot per operator)
-        const seen = new Set<string>();
         const classes: Record<string, number> = {};
         for (const row of classData) {
-          // We don't have operator_id in the select, so just count all
           const c = row.class_tier as string;
           if (c) classes[c] = (classes[c] || 0) + 1;
         }
