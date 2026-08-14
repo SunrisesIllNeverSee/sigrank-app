@@ -6,10 +6,10 @@
  * vercel.json). The handler starts the durable workflow, which runs
  * the three recompute steps with automatic retries and observability.
  *
- * Security: Vercel Cron requests include a CRON_SECRET header we verify
- * to prevent external abuse. If CRON_SECRET is not set, we fall back to
- * checking the user-agent for vercel-cron (less secure but works on
- * Hobby where you can't always set custom headers).
+ * Security: Vercel Cron sends an Authorization: Bearer <CRON_SECRET>
+ * header. We require CRON_SECRET to be set and match it exactly — no
+ * user-agent fallback (trivially spoofable). If CRON_SECRET is unset
+ * the endpoint returns 500 so the misconfiguration is loud, not silent.
  */
 
 import { start } from "workflow/api";
@@ -18,16 +18,16 @@ import { dailyRecompute } from "@/workflows/daily-recompute";
 export const maxDuration = 300;
 
 export async function GET(request: Request) {
-  // Verify this is a Vercel Cron request
-  const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
-  const userAgent = request.headers.get("user-agent") ?? "";
+  if (!cronSecret) {
+    return Response.json(
+      { ok: false, error: "CRON_SECRET is not set — cannot verify cron request" },
+      { status: 500 },
+    );
+  }
 
-  if (cronSecret) {
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-  } else if (!userAgent.includes("vercel-cron")) {
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 
