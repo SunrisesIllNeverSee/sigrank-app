@@ -41,7 +41,7 @@ then post a four-pillar snapshot:
 curl -X POST http://localhost:3000/api/live \
   -H 'content-type: application/json' \
   --data '{
-    "operator": "MOSSES",
+    "operator": "MO§ES™",
     "model": "CLAUDE SONNET 4.5",
     "context": "SIGRANK / LIVE INSTRUMENT",
     "input": 18000,
@@ -57,7 +57,7 @@ Post another snapshot with a different `model` to trigger the comparison:
 curl -X POST http://localhost:3000/api/live \
   -H 'content-type: application/json' \
   --data '{
-    "operator": "MOSSES",
+    "operator": "MO§ES™",
     "model": "CODEX",
     "context": "SIGRANK / LIVE INSTRUMENT",
     "input": 28000,
