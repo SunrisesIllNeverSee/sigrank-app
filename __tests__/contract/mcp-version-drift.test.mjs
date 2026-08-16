@@ -100,16 +100,25 @@ const mcpActualCount = await extractMcpPlatformCount(otherRoot);
 let failed = false;
 
 // ── Version check ──────────────────────────────────────────────────────────
+//
+// Version-only drift is NON-BLOCKING (warn, not fail). The MCP auto-publish
+// workflow bumps the npm version on every push to main, but the app's
+// MCP_VERSION constant is synced by the daily `sync-mcp-version` workflow
+// (07:00 UTC). Between the MCP publish and the next sync, the version will
+// always drift by exactly one patch. Blocking CI on this creates a
+// recurring failure window that can only be closed by the daily sync —
+// not by any human action. Platform count drift remains blocking because
+// it reflects a real code change in the MCP adapter registry.
 if (webVersion === mcpActualVersion) {
   console.log(
     `✓ MCP_VERSION: web "${webVersion}" matches MCP package.json "${mcpActualVersion}"`,
   );
 } else {
-  console.error(
-    `✗ MCP_VERSION DRIFT: web says "${webVersion}" but MCP package.json says "${mcpActualVersion}"\n` +
-      `  FIX: update lib/constants.ts → MCP_VERSION to "${mcpActualVersion}"`,
+  console.warn(
+    `⚠ MCP_VERSION DRIFT (non-blocking): web says "${webVersion}" but MCP package.json says "${mcpActualVersion}"\n` +
+      `  The daily sync-mcp-version workflow will update this automatically.\n` +
+      `  To fix immediately: update lib/constants.ts → MCP_VERSION to "${mcpActualVersion}"`,
   );
-  failed = true;
 }
 
 // ── Platform count check ──────────────────────────────────────────────────
