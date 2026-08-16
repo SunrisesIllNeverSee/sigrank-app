@@ -139,15 +139,16 @@ GSC is verified via service account + DNS — NOT in this repo. Do not search fo
 google-site-verification meta tag or HTML file. The toolkit lives outside the app:
 
 - Service account key: `~/.config/sigrank/gsc-sa.json`
-- Script: `~/Developer/active/SigRank/scripts/gsc/gsc.mjs`
-- Instructions: `~/Developer/active/SigRank/scripts/gsc/README.md`
+- Script: `~/Developer/active/SigRank-repos/scripts/gsc/gsc.mjs`
+- Instructions: `~/Developer/active/SigRank-repos/scripts/gsc/README.md`
 - Property: `sc-domain:signalaf.com` (Domain property)
 
 ```bash
 export GSC_SA_KEY=~/.config/sigrank/gsc-sa.json
-cd ~/Developer/active/SigRank/scripts/gsc
+cd ~/Developer/active/SigRank-repos/scripts/gsc
 node gsc.mjs sitemaps:list          # registered sitemaps + error counts
 node gsc.mjs sitemaps:submit        # resubmit sitemap.xml
+node gsc.mjs sitemaps:delete <url>  # remove a stale sitemap
 node gsc.mjs index <url> [url...]   # push URL(s) to Indexing API
 node gsc.mjs inspect <url>          # URL inspection (verdict + coverage)
 node gsc.mjs check:index --push     # inspect all sitemap URLs + auto-push unindexed
