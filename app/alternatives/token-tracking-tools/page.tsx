@@ -402,10 +402,66 @@ export default function TokenTrackingToolsPage() {
           </Link>
           {" · "}
           <Link
+            href="/token-cascade"
+            className="text-gold underline underline-offset-2"
+          >
+            Token Cascade
+          </Link>
+          {" · "}
+          <Link
             href="/vs/ccusage"
             className="text-gold underline underline-offset-2"
           >
             vs ccusage
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/tokentracker"
+            className="text-gold underline underline-offset-2"
+          >
+            vs Token Tracker
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/tokscale"
+            className="text-gold underline underline-offset-2"
+          >
+            vs Tokscale
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/tokenrank"
+            className="text-gold underline underline-offset-2"
+          >
+            vs TokenRank
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/clawdboard"
+            className="text-gold underline underline-offset-2"
+          >
+            vs Clawdboard
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/costhawk"
+            className="text-gold underline underline-offset-2"
+          >
+            vs CostHawk
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/mytokentracker"
+            className="text-gold underline underline-offset-2"
+          >
+            vs MyTokenTracker
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/wakatime"
+            className="text-gold underline underline-offset-2"
+          >
+            vs WakaTime
           </Link>
           {" · "}
           <Link

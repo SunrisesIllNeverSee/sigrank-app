@@ -86,6 +86,51 @@ const RELATED = [
     title: "Yield Calculator",
     desc: "Paste your token stats and see your Υ Yield, class tier, and compression ratio instantly.",
   },
+  {
+    href: "/token-cascade",
+    title: "Token Cascade",
+    desc: "The definitional page: what a token cascade is, the four pillars, and why architecture — not volume — determines AI coding efficiency.",
+  },
+  {
+    href: "/vs/ccusage",
+    title: "SigRank vs ccusage",
+    desc: "ccusage counts Claude Code tokens. SigRank scores the cascade. Counting vs measuring skill.",
+  },
+  {
+    href: "/vs/tokentracker",
+    title: "SigRank vs Token Tracker",
+    desc: "Token Tracker monitors 29 tools with desktop widgets. SigRank measures cascade efficiency with Yield.",
+  },
+  {
+    href: "/vs/tokscale",
+    title: "SigRank vs Tokscale",
+    desc: "Tokscale normalizes token usage across sessions. SigRank scores the cascade and ranks operators.",
+  },
+  {
+    href: "/vs/tokenrank",
+    title: "SigRank vs TokenRank",
+    desc: "TokenRank ranks by token volume. SigRank ranks by cascade efficiency. Volume vs yield.",
+  },
+  {
+    href: "/vs/clawdboard",
+    title: "SigRank vs Clawdboard",
+    desc: "Clawdboard tracks Claude Code usage. SigRank measures cascade architecture across 19+ platforms.",
+  },
+  {
+    href: "/vs/costhawk",
+    title: "SigRank vs CostHawk",
+    desc: "CostHawk monitors API spend. SigRank measures token cascade efficiency — skill, not cost.",
+  },
+  {
+    href: "/vs/mytokentracker",
+    title: "SigRank vs MyTokenTracker",
+    desc: "MyTokenTracker tracks personal token usage. SigRank scores and ranks cascade efficiency globally.",
+  },
+  {
+    href: "/vs/wakatime",
+    title: "SigRank vs WakaTime",
+    desc: "WakaTime tracks coding time. SigRank tracks token cascade efficiency. Time vs yield.",
+  },
 ];
 
 export default function TokenTelemetryPage() {
