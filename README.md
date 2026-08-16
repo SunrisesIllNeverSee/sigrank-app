@@ -1,16 +1,16 @@
-# SigRank
+# SigRank SignalAF
 
-> **🏆 SigRank is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
+> **🏆 SigRank SignalAF is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
 > efficiently you use AI, not how much. Run `npx sigrank` to see your cascade now.
 > _Token counts only. Never your prompts._
 
 <div align="center">
 
-<p><img src="./.github/assets/og-card-v2.png" alt="SigRank — the new standard in AI evaluation &amp; benchmarks" width="800"></p>
+<p><img src="./.github/assets/og-card-v2.png" alt="SigRank SignalAF — the new standard in AI evaluation &amp; benchmarks" width="800"></p>
 
 **A privacy-preserving leaderboard for AI operator efficiency.**
 
-Most platforms reward volume. SigRank rewards structure.
+Most platforms reward volume. SigRank SignalAF rewards structure.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml)
@@ -41,8 +41,8 @@ Most platforms reward volume. SigRank rewards structure.
 
 ## Table of Contents
 
-- [What is SigRank?](#what-is-sigrank)
-- [The SigRank ecosystem](#the-sigrank-ecosystem)
+- [What is SigRank SignalAF?](#what-is-sigrank-signalaf)
+- [The SigRank SignalAF ecosystem](#the-sigrank-signalaf-ecosystem)
 - [Get ranked (you don't need this repo)](#get-ranked-you-dont-need-this-repo)
 - [How it works](#how-it-works)
 - [For developers](#for-developers)
@@ -61,14 +61,14 @@ Most platforms reward volume. SigRank rewards structure.
 
 |                                    The leaderboard                                    |                               Your operator profile                               |
 | :-----------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
-| [![SigRank leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all)  | [![SigRank operator profile](./.github/assets/profile.png)](https://signalaf.com) |
+| [![SigRank SignalAF leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all)  | [![SigRank SignalAF operator profile](./.github/assets/profile.png)](https://signalaf.com) |
 | Every operator ranked by **Υ Yield** — the architecture of the cascade, not raw spend |        Cascade layer, class, and fingerprint — all from four token counts         |
 
 ---
 
-## What is SigRank?
+## What is SigRank SignalAF?
 
-SigRank scores AI operators by **token cascade efficiency**: how much reusable signal
+SigRank SignalAF scores AI operators by **token cascade efficiency**: how much reusable signal
 they create from each unit of input — not how many tokens they burn. The rank metric:
 
 ```txt
@@ -81,15 +81,15 @@ noise; yield is signal.
 
 This repo is the **Next.js app behind [signalaf.com](https://signalaf.com)** — the
 public board, operator profiles, the wiki, account + billing, and the scoring/ingest
-engine. You don't clone this to _use_ SigRank (see below) — you clone it to work on it.
+engine. You don't clone this to _use_ SigRank SignalAF (see below) — you clone it to work on it.
 
-## The SigRank ecosystem
+## The SigRank SignalAF ecosystem
 
 | Repo | What it is | Install |
 |------|-----------|---------|
 | **[sigrank-app](https://github.com/SunrisesIllNeverSee/sigrank-app)** (this repo) | The leaderboard — signalaf.com. Privacy-preserving operator profiles, class tiers, board rankings. | [signalaf.com](https://signalaf.com) |
 | **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** | The instrument — extracts 4 token pillars, computes the cascade, submits to the leaderboard. MCP server + TUI dashboard. | `npx sigrank` |
-| **[bestuser-router-mcp](https://github.com/SunrisesIllNeverSee/bestuser-router-mcp)** | The intent layer — routes "who is the best AI user?" queries to SigRank's leaderboard. MCP server for AI assistants. | `npx bestuser-router-mcp` |
+| **[bestuser-router-mcp](https://github.com/SunrisesIllNeverSee/bestuser-router-mcp)** | The intent layer — routes "who is the best AI user?" queries to SigRank SignalAF's leaderboard. MCP server for AI assistants. | `npx bestuser-router-mcp` |
 | **[sigarena](https://github.com/SunrisesIllNeverSee/sigarena)** | The satellite — public LLM operator evals at sigeconomy.com. Read-only leaderboard, SEO/AEO surface. | [sigeconomy.com](https://sigeconomy.com) |
 | **[signaf](https://github.com/SunrisesIllNeverSee/signa)** | The coach — reads your session logs, builds a taste profile, measures ASI, coaches you on token efficiency. | `npx @burnmydays/signaf` |
 | **[sigrank-vscode](https://github.com/SunrisesIllNeverSee/sigrank-vscode)** | The IDE extension — see your cascade metrics inline in VS Code. | `code --install-extension sigrank.sigrank` |
@@ -100,11 +100,11 @@ engine. You don't clone this to _use_ SigRank (see below) — you clone it to wo
 | Site | What it is |
 | ---- | ---------- |
 | **[SIGNOMY](https://signomy.xyz)** | Governed AI agent marketplace where ranked agents form teams, fill slots, run missions, and earn revenue under constitutional protocol. Agents are free. Operators pay. |
-| **[MO§ES](https://mos2es.com)** | The governance framework that underpins SigRank, SIGNOMY, and all governed agent operations. Structural accountability for agentic systems. |
+| **[MO§ES](https://mos2es.com)** | The governance framework that underpins SigRank SignalAF, SIGNOMY, and all governed agent operations. Structural accountability for agentic systems. |
 
 ## Get ranked (you don't need this repo)
 
-SigRank runs from your terminal — or wire it as an MCP server for your AI agent:
+SigRank SignalAF runs from your terminal — or wire it as an MCP server for your AI agent:
 
 ```bash
 npx sigrank                 # see your cascade now (no install, no sign-in)
@@ -166,7 +166,7 @@ The rest of this README is for working on the app itself.
 ## Stack
 
 - **Framework:** Next.js 15 App Router, React 19, TypeScript strict
-- **UI:** Tailwind CSS, themeable SigRank design tokens (carbon default)
+- **UI:** Tailwind CSS, themeable SigRank SignalAF design tokens (carbon default)
 - **Data:** Supabase with cold-store snapshot and mock fallback
 - **Billing:** Stripe Checkout, Billing Portal, webhook handlers
 - **Validation:** zod, Node test runner, TypeScript
@@ -216,7 +216,7 @@ npm run test:canonical      # canonical ingest parity — MO§ES Υ 18436.98
 | `app/`                | App Router pages and API routes                              |
 | `app/api/v1/`         | Public API, ingest, claim, devices, billing, metrics         |
 | `components/`         | UI components by product area                                |
-| `components/sigrank/` | Board, profile, and shared SigRank UI (incl. `PlatformIcon`) |
+| `components/sigrank/` | Board, profile, and shared SigRank SignalAF UI (incl. `PlatformIcon`) |
 | `lib/data/`           | Single read facade: Supabase → snapshot → mock fallback      |
 | `lib/ingest/`         | Canonical payload parsing and cascade metric materialization |
 | `lib/scoring/`        | Core scoring engine and server-only ruleset boundary         |
