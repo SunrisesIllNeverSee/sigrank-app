@@ -71,6 +71,13 @@ const STATIC_ROUTES: {
   { path: "/vs/braintrust", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/langchain", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/langfuse", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/clawdboard", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/costhawk", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/mytokentracker", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/tokenrank", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/tokentracker", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/tokscale", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/wakatime", priority: 0.7, changeFrequency: "monthly" },
 
   // Alternatives / listicle pages — commercial intent
   {
@@ -189,6 +196,7 @@ const STATIC_ROUTES: {
   { path: "/operator-performance", priority: 0.6, changeFrequency: "monthly" },
   { path: "/ai-benchmarking", priority: 0.6, changeFrequency: "monthly" },
   { path: "/cascade-analysis", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
   { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly" },
 
   // Blog pages — content marketing

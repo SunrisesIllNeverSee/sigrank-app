@@ -93,6 +93,11 @@ const RELATED = [
     title: "Token Telemetry",
     desc: "How the four token pillars are captured on-device from real coding sessions — the data layer that makes cascade analysis possible.",
   },
+  {
+    href: "/token-cascade",
+    title: "Token Cascade",
+    desc: "The definitional page: what a token cascade is, the four pillars, and why architecture — not volume — determines AI coding efficiency.",
+  },
 ];
 
 export default function CascadeAnalysisPage() {
