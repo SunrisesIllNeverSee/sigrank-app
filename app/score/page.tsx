@@ -97,6 +97,21 @@ export default function ScorePage() {
         <WhyItMatters />
       </div>
 
+      {/* ── bunx sigrank — the fast path ── */}
+      <div className="mt-12 rounded-lg border border-gold/30 bg-gold/5 p-5 text-center">
+        <p className="font-mono text-xs font-semibold text-gold">
+          Fastest path:
+        </p>
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <code className="rounded bg-bg-elevated px-3 py-1.5 font-mono text-base text-text-primary sm:text-lg">
+            $ bunx sigrank
+          </code>
+        </div>
+        <p className="mt-2 font-sans text-xs text-text-muted">
+          Reads your local logs, scores your cascade, puts you on the board.
+        </p>
+      </div>
+
       {/* ── Two vertical glowing banners (how to get scored) ── */}
       <div className="mt-16">
         <HowToGetScored />

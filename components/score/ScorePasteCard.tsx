@@ -89,6 +89,21 @@ export function ScorePasteCard() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* bunx sigrank — the fast path */}
+      <div className="rounded-lg border border-gold/30 bg-gold/5 p-4">
+        <p className="font-mono text-xs font-semibold text-gold">
+          Or just run it:
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <code className="rounded bg-bg-elevated px-2 py-1 font-mono text-sm text-text-primary">
+            $ bunx sigrank
+          </code>
+          <span className="font-sans text-xs text-text-muted">
+            reads your logs, scores your cascade, puts you on the board
+          </span>
+        </div>
+      </div>
+
       {/* Paste area */}
       <label className="flex flex-col gap-1">
         <span className="text-xs font-medium text-text-secondary">
