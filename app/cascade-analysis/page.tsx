@@ -351,6 +351,23 @@ export default function CascadeAnalysisPage() {
           </div>
         </dl>
       </section>
+
+      {/* ── CTA: measure your cascade ── */}
+      <section className="rounded-lg border border-gold/30 bg-gold/5 p-6 text-center">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Measure your token cascade
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          Paste your four token counts and see where your cascade ranks —
+          compounding or burning. No install needed.
+        </p>
+        <Link
+          href="/score"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold/50 bg-gold/10 px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:bg-gold/20"
+        >
+          Measure &amp; rank your cascade →
+        </Link>
+      </section>
     </div>
   );
 }
