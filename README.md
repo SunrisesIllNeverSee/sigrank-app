@@ -1,16 +1,17 @@
 # SigRank SignalAF
 
-> **🏆 SigRank SignalAF is live: [signalaf.com](https://signalaf.com)** — the leaderboard for how
-> efficiently you use AI, not how much. Run `npx sigrank` to see your cascade now.
-> _Token counts only. Never your prompts._
+> **🏆 SigRank SignalAF is live: [signalaf.com](https://signalaf.com)** — the AI operator
+> evaluation leaderboard. Ranks how efficiently you use AI by token cascade
+> efficiency (Υ = cache_read × output / input²), not how much. Run `npx sigrank`
+> to see your cascade now. _Token counts only. Never your prompts._
 
 <div align="center">
 
-<p><img src="./.github/assets/og-card-v2.png" alt="SigRank SignalAF — the new standard in AI evaluation &amp; benchmarks" width="800"></p>
+<p><img src="./.github/assets/og-card-v2.png" alt="SigRank SignalAF — AI operator evaluation and token cascade efficiency leaderboard" width="800"></p>
 
-**A privacy-preserving leaderboard for AI operator efficiency.**
+**A privacy-preserving AI operator evaluation leaderboard.**
 
-Most platforms reward volume. SigRank SignalAF rewards structure.
+SigRank evaluates the human using the AI — not the AI model itself. Most platforms reward volume. SigRank SignalAF rewards structure.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml)
