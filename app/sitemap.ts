@@ -78,6 +78,15 @@ const STATIC_ROUTES: {
   { path: "/vs/tokentracker", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/tokscale", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/wakatime", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/aider", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/cline", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/continue", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/roo-code", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/windsurf", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/zed", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/tabnine", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/amazon-q", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/sourcegraph-cody", priority: 0.7, changeFrequency: "monthly" },
 
   // Alternatives / listicle pages — commercial intent
   {
@@ -112,6 +121,31 @@ const STATIC_ROUTES: {
   },
   {
     path: "/alternatives/cursor-ai-metrics-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/alternatives/ai-operator-ranking-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/alternatives/token-cost-tracking-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/alternatives/ai-coding-benchmark-platforms",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/alternatives/ai-coding-roi-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/alternatives/mcp-ai-developer-tools",
     priority: 0.7,
     changeFrequency: "monthly",
   },

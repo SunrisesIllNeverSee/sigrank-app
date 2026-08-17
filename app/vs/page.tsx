@@ -65,6 +65,51 @@ const COMPARISONS = [
     title: "SigRank vs Langfuse — Observability vs Competition",
     desc: "Langfuse traces LLM calls for debugging and evaluation. SigRank scores the operator's token efficiency for ranking. Observability vs competition.",
   },
+  {
+    href: "/vs/aider",
+    title: "SigRank vs aider — Cross-Tool Scoring for Terminal AI Agents",
+    desc: "aider is a terminal AI coding agent with /usage. SigRank is platform-neutral — scores the operator across aider, Claude Code, Copilot, and 15+ tools.",
+  },
+  {
+    href: "/vs/cline",
+    title: "SigRank vs Cline — Cross-Tool Scoring for VS Code AI Agents",
+    desc: "Cline is a VS Code AI agent. SigRank is platform-neutral — scores the operator across Cline, Claude Code, Copilot, Cursor, and 15+ tools.",
+  },
+  {
+    href: "/vs/continue",
+    title: "SigRank vs Continue — Cross-Tool Scoring for IDE Autocomplete",
+    desc: "Continue is an open-source IDE extension for AI autocomplete and chat. SigRank scores how efficiently you drive any AI tool, including Continue.",
+  },
+  {
+    href: "/vs/roo-code",
+    title: "SigRank vs Roo Code — Cross-Tool Scoring for VS Code AI Agents",
+    desc: "Roo Code is a VS Code AI agent (Cline fork). SigRank is platform-neutral — scores the operator across Roo Code, Claude Code, Copilot, and 15+ tools.",
+  },
+  {
+    href: "/vs/windsurf",
+    title: "SigRank vs Windsurf — Cross-Tool Scoring for AI-Native IDEs",
+    desc: "Windsurf is an AI-native IDE (formerly Codeium). SigRank is platform-neutral — scores the operator across Windsurf, Claude Code, Copilot, and 15+ tools.",
+  },
+  {
+    href: "/vs/zed",
+    title: "SigRank vs Zed — Cross-Tool Scoring for High-Performance Editors",
+    desc: "Zed is a high-performance editor with Zed AI. SigRank is platform-neutral — scores the operator across Zed, Claude Code, Copilot, and 15+ tools.",
+  },
+  {
+    href: "/vs/tabnine",
+    title: "SigRank vs Tabnine — Cross-Tool Scoring for Code Completion",
+    desc: "Tabnine is an AI code completion tool. SigRank is platform-neutral — scores the operator across Tabnine, Claude Code, Copilot, and 15+ tools.",
+  },
+  {
+    href: "/vs/amazon-q",
+    title: "SigRank vs Amazon Q Developer — Cross-Cloud Operator Scoring",
+    desc: "Amazon Q Developer is AWS's AI coding assistant. SigRank is platform-neutral — scores the operator across Amazon Q, Claude Code, Copilot, and 15+ tools.",
+  },
+  {
+    href: "/vs/sourcegraph-cody",
+    title: "SigRank vs Sourcegraph Cody — Cross-Tool Scoring for Codebase-Aware AI",
+    desc: "Sourcegraph Cody is a code-aware AI assistant. SigRank is platform-neutral — scores the operator across Cody, Claude Code, Copilot, and 15+ tools.",
+  },
 ];
 
 export default function VsIndex() {

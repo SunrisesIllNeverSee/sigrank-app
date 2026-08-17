@@ -65,8 +65,8 @@ A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators — 
 - [Topic hubs](${SITE_ORIGIN}/ai-benchmarking): AI benchmarking, coding metrics, operator scoring, cascade analysis, token telemetry
 
 ## Comparisons & Blog
-- [All Comparisons](${SITE_ORIGIN}/vs): SigRank vs ccusage, VALS AI, LMSYS Arena, Cursor, Copilot, Braintrust, LangChain, Langfuse
-- [All Alternatives](${SITE_ORIGIN}/alternatives): ranked listicles — AI coding metrics tools, ccusage alternatives, benchmarking tools, token trackers, efficiency tools, Claude Code usage tools, Cursor AI metrics tools
+- [All Comparisons](${SITE_ORIGIN}/vs): SigRank vs ccusage, VALS AI, LMSYS Arena, Cursor, Copilot, Braintrust, LangChain, Langfuse, aider, Cline, Continue, Roo Code, Windsurf, Zed, Tabnine, Amazon Q, Sourcegraph Cody
+- [All Alternatives](${SITE_ORIGIN}/alternatives): ranked listicles — AI coding metrics, ccusage alternatives, benchmarking tools, token trackers, efficiency tools, Claude Code usage, Cursor AI metrics, operator ranking, token cost tracking, benchmark platforms, coding ROI, MCP developer tools
 - [Blog](${SITE_ORIGIN}/blog): analysis on operator efficiency, token cascade economics, and outlier detection
 - Key posts: [Volume Isn't Yield](${SITE_ORIGIN}/blog/volume-isnt-yield), [The Tool Is the Person](${SITE_ORIGIN}/blog/the-tool-is-the-person), [How to Answer "Best AI User"](${SITE_ORIGIN}/blog/how-to-answer-best-ai-user)
 
