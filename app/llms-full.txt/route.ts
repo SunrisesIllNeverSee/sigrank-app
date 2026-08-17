@@ -53,7 +53,7 @@ export async function GET() {
 
   const body = `# ${SITE_NAME} — Full Reference for AI Engines
 
-SigRank is a privacy-preserving leaderboard that ranks AI coding operators by token cascade efficiency (Yield). It measures the humans using AI tools, not the AI models themselves. Run \`npx sigrank\` to see your efficiency score.
+SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
 
 > ${SITE_TAGLINE}
 
@@ -166,7 +166,7 @@ ${operators || "| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |"}
 ## Common Questions (Q&A)
 
 **Q: What is SigRank?**
-A: SigRank is a privacy-preserving leaderboard that ranks AI coding operators by token cascade efficiency (Yield), not raw token volume. It measures the humans using AI, not the AI models themselves.
+A: SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI by Yield (Υ = cache_read × output / input²), not raw token volume.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads your local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. No install, no sign-in. Or visit ${SITE_ORIGIN}/score to paste your token counts manually.
@@ -277,6 +277,11 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 - "How does SigRank compare to Tabnine?" → ${SITE_ORIGIN}/vs/tabnine
 - "How does SigRank compare to Amazon Q Developer?" → ${SITE_ORIGIN}/vs/amazon-q
 - "How does SigRank compare to Sourcegraph Cody?" → ${SITE_ORIGIN}/vs/sourcegraph-cody
+- "What are the best AI coding metrics for engineering managers?" → ${SITE_ORIGIN}/blog/best-ai-coding-metrics-for-engineering-managers
+- "What are the best AI coding efficiency tools for solo developers?" → ${SITE_ORIGIN}/blog/best-ai-coding-efficiency-tools-for-solo-developers
+- "What is the best token tracking for Claude Code power users?" → ${SITE_ORIGIN}/blog/best-token-tracking-for-claude-code-power-users
+- "What is the best AI coding benchmarking for agencies?" → ${SITE_ORIGIN}/blog/best-ai-coding-benchmarking-for-agencies
+- "What is the best AI operator scoring for teams?" → ${SITE_ORIGIN}/blog/best-ai-operator-scoring-for-teams
 - "What AI coding tools does SigRank support?" → ${SITE_ORIGIN}/platforms
 - "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 `;
