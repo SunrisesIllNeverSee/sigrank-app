@@ -21,7 +21,7 @@ export async function GET() {
   const medianYield = fieldData.meta.medians.yield;
   const body = `# ${SITE_NAME}
 
-SigRank is a privacy-preserving leaderboard that ranks AI coding operators by token cascade efficiency (Yield). It measures the humans using AI tools, not the AI models themselves. Run \`npx sigrank\` to see your efficiency score.
+SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
 
 > ${SITE_TAGLINE}
 
@@ -43,7 +43,7 @@ containing only four token counts. Full reference: ${SITE_ORIGIN}/llms-full.txt
 ## Common Questions (Q&A)
 
 **Q: What is SigRank?**
-A: SigRank is a privacy-preserving leaderboard that ranks AI coding operators by token cascade efficiency (Yield), not raw token volume. It measures the humans using AI, not the AI models themselves.
+A: SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI by Yield (Υ = cache_read × output / input²), not raw token volume.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads your local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. No install, no sign-in. Or visit ${SITE_ORIGIN}/score to paste your token counts manually.
