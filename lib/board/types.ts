@@ -59,6 +59,11 @@ export interface HistoryPoint {
   yield_: number;
   global_rank: number;
   class_tier: SignalClass;
+  /** Raw token pillars (optional — present when the DB row carries them). */
+  input_tokens?: number;
+  output_tokens?: number;
+  cache_read_tokens?: number;
+  cache_creation_tokens?: number;
 }
 
 /** Aggregate homepage stat block. */

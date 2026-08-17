@@ -727,6 +727,10 @@ export async function getOperatorHistory(
         yield_,
         global_rank: rankByDate.get(s.snapshot_date) ?? 0,
         class_tier: toSignalClass(s.class_tier),
+        input_tokens: input,
+        output_tokens: output,
+        cache_read_tokens: cacheRead,
+        cache_creation_tokens: num(s.cache_creation_tokens),
       };
     });
     return params.limit && params.limit > 0

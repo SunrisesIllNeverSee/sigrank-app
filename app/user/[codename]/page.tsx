@@ -39,6 +39,7 @@ import type { Operator } from "@/lib/analytics/scoring-types";
 import { SignalClassBadge } from "@/components/sigrank";
 import { OperatorAvatar } from "@/components/sigrank/OperatorAvatar";
 import { ArchetypeChip } from "@/components/profile/ArchetypeChip";
+import { OverviewTab } from "@/components/profile/OverviewTab";
 import { CanonId } from "@/components/ui/CanonId";
 import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
@@ -765,6 +766,17 @@ export default async function OperatorProfilePage({
         {!operator.claimed && <ClaimTabGate codename={operator.codename} />}
 
         <ProfileTabs
+          overview={
+            ranked ? (
+              <OverviewTab
+                history={history}
+                classTier={snapshot.class_tier}
+                archetype={archetype}
+                fieldAvgYield={fieldAvg.yield_}
+                globalRank={row.global_rank}
+              />
+            ) : undefined
+          }
           stats={pending ? pendingPanel : rankedStatsPanel}
           report={operatorReport ? (
             <ReportTabGate report={operatorReport} archetype={archetype} />
