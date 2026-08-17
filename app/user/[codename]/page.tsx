@@ -32,11 +32,13 @@ import {
 import type { HallRecord } from "@/lib/board";
 import { computeFieldAverages } from "@/lib/analytics/field-average";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
+import { buildArchetypeOf } from "@/lib/analytics/build-archetypes";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
 import type { Operator } from "@/lib/analytics/scoring-types";
 import { SignalClassBadge } from "@/components/sigrank";
 import { OperatorAvatar } from "@/components/sigrank/OperatorAvatar";
+import { ArchetypeChip } from "@/components/profile/ArchetypeChip";
 import { CanonId } from "@/components/ui/CanonId";
 import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
@@ -193,6 +195,15 @@ export default async function OperatorProfilePage({
 
   // ── Chart-kit data, all derived from real telemetry + cascade fields ──────
   const c = snapshot.cascade;
+
+  const archetype =
+    c && !c.nonCompounding
+      ? buildArchetypeOf({
+          leverage: c.leverage,
+          velocity: c.velocity,
+          construction: c.construction,
+        })
+      : null;
 
   const humanRows = boardRows.filter((r) => !isOutlierRow(r));
   const fieldAvg = computeFieldAverages(humanRows);
@@ -680,6 +691,7 @@ export default async function OperatorProfilePage({
             ) : (
               <SignalClassBadge signalClass={snapshot.class_tier} />
             )}
+            {archetype && <ArchetypeChip archetype={archetype} />}
             {viewerRedacted && (
               <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
                 🔒 Private
