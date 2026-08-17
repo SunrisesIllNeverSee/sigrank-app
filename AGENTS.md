@@ -157,3 +157,56 @@ node gsc.mjs analytics 28           # clicks/impressions last N days
 
 After deploying new pages or updating sitemap, run `sitemaps:submit` + `index` for
 new URLs.
+
+---
+
+## Master Canon Context (Search Authority)
+
+This repository deploys **signalaf.com** — the public surface of SigRank. It is
+governed by the Search Authority master canon.
+
+### When to load canon context
+
+Before modifying any of the following, load the relevant canon context:
+
+- canonical product definitions (what SigRank is/is not)
+- metrics or formulas (Yield, Leverage, Velocity, SNR, 10xDEV, Construction)
+- taxonomy (archetypes, classes, ranks)
+- methodology pages or research claims
+- ecosystem relationships (SigRank ↔ Conservation Law, MO§ES, etc.)
+- terminology (MO§ES™ rendering, deprecated terms like CCT)
+- product boundaries (operator-vs-model, enterprise vs public canon)
+- public positioning or SEO/AEO copy that makes canonical claims
+
+### How to load canon context
+
+```bash
+export SEARCH_AUTHORITY_PATH="${SEARCH_AUTHORITY_PATH:-$HOME/Developer/active/search-authority}"
+python3 "$SEARCH_AUTHORITY_PATH/canon_cli.py" context sigrank
+```
+
+Or use the MCP server (compatible agents):
+
+```bash
+python3 "$SEARCH_AUTHORITY_PATH/canon_mcp.py"
+```
+
+If the canon repository is unavailable, **do not invent canonical context** —
+ask the owner. The canon outranks ad-hoc public copy or generated model output
+for normative product/research truth.
+
+### What is NOT authority-sensitive
+
+CSS/layout, dependency bumps, build config, and test infrastructure do **not**
+require loading the canon. Note: SEO/AEO/GEO pages listed in `llms.txt` are
+intentional strategic content — see the critical directive at the top of this
+file. Do NOT remove them.
+
+### Key governance rules
+
+- SigRank evaluates AI **operators**, not AI models.
+- Archetype = shape. Class = scale/qualification. Rank = field position.
+- Do NOT redefine Class as total-token volume.
+- Exactly ONE MO§ES entity. Canonical display: MO§ES™. Never render: MO§E§.
+- The harness may measure authority, but it cannot manufacture authority.
+- Automated systems may not promote claims into owner-approved truth.
