@@ -741,6 +741,7 @@ export default async function OperatorProfilePage({
           cascadeStr={c.cascadeStr}
           radarAxes={radarAxes}
           fieldAvg={fieldAvg}
+          archetypeWord={archetype?.word}
         />
       )}
 
