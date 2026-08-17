@@ -289,6 +289,31 @@ const STATIC_ROUTES: {
     priority: 0.7,
     changeFrequency: "monthly",
   },
+  {
+    path: "/blog/best-ai-coding-metrics-for-engineering-managers",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/best-ai-coding-efficiency-tools-for-solo-developers",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/best-token-tracking-for-claude-code-power-users",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/best-ai-coding-benchmarking-for-agencies",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/blog/best-ai-operator-scoring-for-teams",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
