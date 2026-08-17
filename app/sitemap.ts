@@ -105,6 +105,16 @@ const STATIC_ROUTES: {
     priority: 0.7,
     changeFrequency: "monthly",
   },
+  {
+    path: "/alternatives/claude-code-usage-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/alternatives/cursor-ai-metrics-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
 
   // Guide pages — educational intent
   {

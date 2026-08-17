@@ -50,6 +50,16 @@ const ALTS = [
     title: "Best AI Coding Efficiency Tools (2026)",
     desc: "The 7 best AI coding efficiency tools in 2026. SigRank, Cursor insights, Copilot metrics, aider, Langfuse, WakaTime, and ccusage — which measures efficiency, not just usage.",
   },
+  {
+    href: "/alternatives/claude-code-usage-tools",
+    title: "Best Claude Code Usage Tracking Tools (2026)",
+    desc: "The 6 best tools for tracking Claude Code usage in 2026. SigRank, ccusage, Token Dashboard, Tokscale, Claude Code /cost, and manual log parsing — compared on scoring, dashboards, and multi-platform.",
+  },
+  {
+    href: "/alternatives/cursor-ai-metrics-tools",
+    title: "Best Cursor AI Metrics Tools (2026)",
+    desc: "The 6 best tools for measuring Cursor AI usage in 2026. SigRank, Cursor insights, ccusage, WakaTime, Langfuse, and manual export — compared on cross-platform scoring, cascade efficiency, and leaderboards.",
+  },
 ];
 
 export default function AlternativesIndex() {
@@ -87,6 +97,16 @@ export default function AlternativesIndex() {
             question: "What are the best AI coding efficiency tools?",
             answer:
               "The 7 best AI coding efficiency tools in 2026 are SigRank, Cursor insights, Copilot metrics, aider, Langfuse, WakaTime, and ccusage. SigRank is the only tool that scores true token-cascade efficiency with the Yield (Υ = cache_read × output / input²) metric. The others measure usage (acceptance rate, hours, token counts) and call it efficiency — but none score whether your context is compounding or burning.",
+          },
+          {
+            question: "What are the best tools for tracking Claude Code usage?",
+            answer:
+              "The 6 best tools for tracking Claude Code usage in 2026 are SigRank, ccusage, Token Dashboard, Tokscale, Claude Code's built-in /cost command, and manual log parsing. For raw token counts, ccusage is the standard. For efficiency scoring and ranking, SigRank bundles ccusage and adds Yield (Υ = cache_read × output / input²), a live leaderboard, class tiers, and multi-platform support. For a quick per-session cost check, Claude Code's /cost command works without installing anything.",
+          },
+          {
+            question: "What are the best Cursor AI metrics tools?",
+            answer:
+              "The 6 best tools for measuring Cursor AI usage in 2026 are SigRank, Cursor's built-in insights, ccusage, WakaTime, Langfuse, and manual export. Cursor's built-in insights show acceptance rate and edit counts but are editor-locked. SigRank is the only platform-neutral tool that reads Cursor token telemetry and scores it with Yield (Υ), then ranks you on a live leaderboard alongside operators who use Claude Code, Copilot, ChatGPT, and 15+ other platforms.",
           },
           {
             question: "How is SigRank different from other AI tools?",

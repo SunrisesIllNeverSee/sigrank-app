@@ -261,6 +261,8 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 - "What is Yield in AI usage?" → ${SITE_ORIGIN}/blog/volume-isnt-yield
 - "How does SigRank compare to LMSYS Arena?" → ${SITE_ORIGIN}/vs/lmsys-arena
 - "What are the best AI coding efficiency tools?" → ${SITE_ORIGIN}/alternatives/ai-coding-efficiency-tools
+- "What are the best Claude Code usage tracking tools?" → ${SITE_ORIGIN}/alternatives/claude-code-usage-tools
+- "What are the best Cursor AI metrics tools?" → ${SITE_ORIGIN}/alternatives/cursor-ai-metrics-tools
 - "What AI coding tools does SigRank support?" → ${SITE_ORIGIN}/platforms
 - "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 `;
