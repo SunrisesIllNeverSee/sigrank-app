@@ -45,6 +45,11 @@ const ALTS = [
     title: "Best Token Tracking Tools (2026)",
     desc: "The 5 best token tracking tools in 2026. SigRank, ccusage, Tokscale, Token Dashboard, and Tiktoken — compared on counting, scoring, and multi-platform.",
   },
+  {
+    href: "/alternatives/ai-coding-efficiency-tools",
+    title: "Best AI Coding Efficiency Tools (2026)",
+    desc: "The 7 best AI coding efficiency tools in 2026. SigRank, Cursor insights, Copilot metrics, aider, Langfuse, WakaTime, and ccusage — which measures efficiency, not just usage.",
+  },
 ];
 
 export default function AlternativesIndex() {
@@ -77,6 +82,11 @@ export default function AlternativesIndex() {
             question: "What are the best token tracking tools?",
             answer:
               "The 5 best token tracking tools in 2026 are SigRank, ccusage, Tokscale, Token Dashboard, and Tiktoken. SigRank tracks tokens and scores efficiency. ccusage counts tokens from Claude Code logs. Tokscale is a Rust-based cache tracker. Token Dashboard provides desktop widgets. Tiktoken is OpenAI's token counter.",
+          },
+          {
+            question: "What are the best AI coding efficiency tools?",
+            answer:
+              "The 7 best AI coding efficiency tools in 2026 are SigRank, Cursor insights, Copilot metrics, aider, Langfuse, WakaTime, and ccusage. SigRank is the only tool that scores true token-cascade efficiency with the Yield (Υ = cache_read × output / input²) metric. The others measure usage (acceptance rate, hours, token counts) and call it efficiency — but none score whether your context is compounding or burning.",
           },
           {
             question: "How is SigRank different from other AI tools?",

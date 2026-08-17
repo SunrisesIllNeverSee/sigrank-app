@@ -100,6 +100,11 @@ const STATIC_ROUTES: {
     priority: 0.7,
     changeFrequency: "monthly",
   },
+  {
+    path: "/alternatives/ai-coding-efficiency-tools",
+    priority: 0.7,
+    changeFrequency: "monthly",
+  },
 
   // Guide pages — educational intent
   {
