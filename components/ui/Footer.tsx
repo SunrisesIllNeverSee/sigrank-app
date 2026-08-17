@@ -32,9 +32,12 @@ const FOOTER_COLUMNS: {
     headingHref: "/metrics",
     links: [
       { href: "/metrics/yield-cascade", label: "Yield (Υ)" },
+      { href: "/metrics/leverage", label: "Leverage" },
+      { href: "/metrics/velocity", label: "Velocity" },
+      { href: "/metrics/signal-to-noise-ratio", label: "Signal-to-Noise Ratio" },
+      { href: "/metrics/efficiency", label: "10xDEV" },
       { href: "/metrics/cache-hit-rate", label: "Cache Hit Rate" },
       { href: "/metrics/compression-ratio", label: "Compression Ratio" },
-      { href: "/metrics/leverage", label: "Leverage" },
     ],
   },
   {
@@ -111,6 +114,11 @@ const FOOTER_COLUMNS: {
         href: "https://sigeconomy.com",
         label: "AI User Leaderboard →",
       },
+      { href: "/hall", label: "Best AI Users — Hall of Signal" },
+      { href: "/score", label: "Benchmark Your AI Usage" },
+      { href: "/research", label: "AI Power User Statistics" },
+      { href: "/vs/lmsys-arena", label: "Human vs Model Performance" },
+      { href: "/privacy", label: "Privacy-Preserving AI Measurement" },
       {
         href: "/alternatives/ai-coding-metrics",
         label: "AI Coding Metrics Tools",
@@ -120,25 +128,12 @@ const FOOTER_COLUMNS: {
         label: "ccusage Alternatives",
       },
       {
-        href: "/blog/best-ai-coding-tools-2026",
-        label: "Best AI Coding Tools 2026",
-      },
-      { href: "/token-telemetry", label: "Token Telemetry" },
-      {
         href: "/alternatives/ai-benchmarking-tools",
         label: "AI Benchmarking Tools",
       },
       {
         href: "/alternatives/token-tracking-tools",
         label: "Token Tracking Tools",
-      },
-      {
-        href: "/blog/how-to-benchmark-ai-coding-workflow",
-        label: "How to Benchmark AI Coding",
-      },
-      {
-        href: "/guides/how-to-benchmark-ai-coding-workflow",
-        label: "Benchmark Workflow Guide",
       },
     ],
   },
