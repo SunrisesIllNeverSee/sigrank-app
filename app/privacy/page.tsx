@@ -31,6 +31,8 @@ export default function PrivacyPage() {
 
       <div className="flex flex-col gap-4 font-sans text-sm leading-relaxed text-text-secondary">
         <p>
+          SigRank collects four token counts: input, output, cache-read, and
+          cache-write. No prompt content, no code, no conversation text.
           SigRank (&ldquo;we&rdquo;, operated under MO§ES™ / Ello Cello LLC)
           is built privacy-first. This policy explains what we collect, what
           we never collect, and how your data is used.

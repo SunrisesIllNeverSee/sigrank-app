@@ -256,6 +256,23 @@ export default async function MethodologyPage() {
         </p>
       </section>
 
+      {/* ── How does SigRank verify submissions? ──────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          How does SigRank verify submissions?
+        </h2>
+        <p className="text-base text-text-secondary">
+          SigRank verifies submissions using ed25519 cryptographic signatures,
+          server-side rescoring, plausibility gates, and replay controls. Each
+          device generates a keypair during enrollment; every snapshot is signed
+          and the server verifies the signature before accepting. The server
+          recomputes all derived metrics from the four raw token pillars —
+          operators cannot submit inflated yield or leverage values directly.
+          Replay attacks are blocked by nonce tracking, and implausible token
+          ratios are flagged for review.
+        </p>
+      </section>
+
       {/* ── License ────────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">

@@ -156,7 +156,8 @@ export default function AboutPage() {
         title="The Operator, Not the Model"
         subtitle={
           <>
-            SigRank ranks the{" "}
+            SignalAF is the web platform for SigRank, an AI operator
+            evaluation leaderboard — not Signal Messenger. SigRank ranks the{" "}
             <span className="text-text-primary">operator</span>, not the model —
             who gets the most signal per token (cascade yield, leverage, 10×DEV)
             across every platform, on one leaderboard.{" "}
