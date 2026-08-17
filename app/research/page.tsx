@@ -19,7 +19,7 @@ export const revalidate = 3600; // 1h — the seed corpus is stable
 export const metadata: Metadata = withOG({
   title: "State of the Index — AI Operator Token Efficiency",
   description:
-    "The primary anonymized dataset: 1,628 AI operators across 17 platforms and 3,304 models. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo under CC-BY-4.0.",
+    "The primary anonymized seed dataset: 1,628 AI operators across 17 platforms and 3,304 models. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
   path: "/research",
 });
 
@@ -110,7 +110,7 @@ export default function StateOfTheIndexPage() {
             slug: "",
             title: "State of the Index — AI Operator Token Efficiency",
             description:
-              "The primary anonymized dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo under CC-BY-4.0.",
+              "The primary anonymized seed dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
             datePublished: SNAPSHOT_DATE,
             headlineFindings,
             doi: ZENODO_VERSION_DOI,
@@ -120,12 +120,12 @@ export default function StateOfTheIndexPage() {
             {
               question: "What is the SigRank dataset?",
               answer:
-                "The SigRank dataset is an anonymized collection of AI operator token telemetry — 1,628 operators across 17 platforms and 3,304 models. It contains raw token counts (input, output, cache creation, cache read) and derived cascade metrics (Yield, Leverage, Velocity, SNR). Available on Zenodo under CC-BY-4.0 at DOI 10.5281/zenodo.21900519.",
+                "The SigRank seed dataset is an anonymized collection of AI operator token telemetry — 1,628 operators across 17 platforms and 3,304 models. It contains raw token counts (input, output, cache creation, cache read) and derived cascade metrics (Yield, Leverage, Velocity, SNR). Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
             },
             {
               question: "How many AI operators are in the SigRank dataset?",
               answer:
-                "The SigRank dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. The Human Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
+                "The SigRank seed dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. This is the seed corpus — the live leaderboard at signalaf.com/board/all includes additional enrolled operators. The Human Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
             },
             {
               question: "Is the SigRank dataset free to download?",
@@ -138,7 +138,7 @@ export default function StateOfTheIndexPage() {
 
       <CitationMeta
         title="State of the Index — AI Operator Token Efficiency"
-        description="The primary anonymized dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo under CC-BY-4.0."
+        description="The primary anonymized seed dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0."
         date={SNAPSHOT_DATE}
         slug="/research"
         doi={ZENODO_VERSION_DOI}
@@ -150,10 +150,12 @@ export default function StateOfTheIndexPage() {
         title="State of the Index"
         subtitle={
           <>
-            The primary anonymized dataset.{" "}
+            The primary anonymized seed dataset —{" "}
             {operatorCount.toLocaleString("en-US")} operators across{" "}
             {platformCount} platforms and {DATASET.modelCount.toLocaleString("en-US")} models.{" "}
-            {fmt(totalTokens)} total tokens. Data as of {SNAPSHOT_DATE}.
+            {fmt(totalTokens)} total tokens. Available on Zenodo at DOI{" "}
+            <span className="text-gold">10.5281/zenodo.21900519</span>. Data as
+            of {SNAPSHOT_DATE}.
           </>
         }
       />
@@ -178,8 +180,9 @@ export default function StateOfTheIndexPage() {
           The Finding
         </h2>
         <p className="text-lg text-text-primary">
-          When you measure 1,628 AI operators across 17 platforms, the first
-          thing that jumps out is that <strong>volume is not yield</strong>.
+          When you measure 1,628 AI operators in the seed dataset across 17
+          platforms, the first thing that jumps out is that{" "}
+          <strong>volume is not yield</strong>.
           The operators who burn the most tokens are not the most efficient.
           The most efficient operators reuse context — cache reads dominate
           their cascade, and their Yield (Υ) is orders of magnitude higher

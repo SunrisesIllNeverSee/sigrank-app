@@ -66,7 +66,7 @@ export default async function FieldHubPage() {
             {
               question: "Where can I download the SigRank dataset?",
               answer:
-                "The SigRank dataset is available on Zenodo under CC-BY-4.0. Visit the State of the Index page at signalaf.com/research for the DOI link. The dataset includes 1,628 AI operators across 17 platforms with raw token telemetry and derived cascade metrics.",
+                "The SigRank seed dataset is available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0. Visit the State of the Index page at signalaf.com/research for the full details. The seed dataset includes 1,628 AI operators across 17 platforms with raw token telemetry and derived cascade metrics. The live leaderboard at signalaf.com/board/all includes additional enrolled operators.",
             },
             {
               question: "What research does SigRank publish?",
@@ -129,9 +129,9 @@ export default async function FieldHubPage() {
           title="State of the Index"
           subtitle={
             <>
-              The primary anonymized dataset. 1,628 operators across 17
+              The primary anonymized seed dataset. 1,628 operators across 17
               platforms and 3,304 models. 9.07Q total tokens. Available on
-              Zenodo under CC-BY-4.0.
+              Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
             </>
           }
           compact

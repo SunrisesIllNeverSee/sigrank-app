@@ -95,7 +95,7 @@ export default async function FieldPage() {
             {
               question: "How many AI operators are in the field analysis?",
               answer:
-                "The field analysis covers 1,498 human AI operators (the Human Center of Mass) from a total dataset of 1,628 operators. The remaining 130 are classified as outliers or bots. The analysis separates genuine human usage patterns from automated traffic using the Hermes bot control and outlier classification.",
+                "The field analysis covers 1,498 human AI operators (the Human Center of Mass) from a total seed dataset of 1,628 operators. The remaining 130 are classified as outliers or bots. The live leaderboard at signalaf.com/board/all includes additional enrolled operators beyond the seed corpus. The analysis separates genuine human usage patterns from automated traffic using the Hermes bot control and outlier classification.",
             },
             {
               question: "What is the median Yield of AI operators?",

@@ -219,17 +219,20 @@ export default async function BoardWindowPage({
       <section className="mx-auto max-w-2xl px-4 pb-6">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The SigRank leaderboard ranks AI operators by token-cascade efficiency
-          — Υ Yield = (cache_read × output) / input². Operators are tiered into
-          Burners, Builders, and 10×ers based on how well they compound signal
-          across their token cascade. Higher yield means more signal per token
-          spent — not more time, not more output, but better architecture.
+          — Υ Yield = (cache_read × output) / input². Operators are classified
+          into 8 experience tiers (ARCH+, ARCH, POWER, BASE, SEEKER, REFINER,
+          BEARER, IGNITER) based on accumulated token volume, with the
+          TRANSMITTER peak badge for temporary signal highs. Higher yield means
+          more signal per token spent — not more time, not more output, but
+          better architecture.
         </p>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
           The board refreshes every hour during active periods. Operators are
-          ranked by yield, not output volume — a 10×er produces more signal per
-          token than a Burner, regardless of how many hours they code. Class
-          tiers are yield thresholds, so climbing the board means improving your
-          cascade architecture, not just spending more time in the editor.
+          ranked by yield, not output volume — a high-yield operator produces
+          more signal per token than a low-yield one, regardless of how many
+          hours they code. Class tiers are yield thresholds, so climbing the
+          board means improving your cascade architecture, not just spending
+          more time in the editor.
         </p>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
           To get listed, install the SigRank CLI (
