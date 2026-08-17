@@ -772,8 +772,15 @@ export default async function OperatorProfilePage({
                 history={history}
                 classTier={snapshot.class_tier}
                 archetype={archetype}
+                cascade={c}
                 fieldAvgYield={fieldAvg.yield_}
                 globalRank={row.global_rank}
+                topPct={topPct}
+                platform={operator.primary_domain}
+                accountAgeDays={operator.account_age_days}
+                lifetimeTurns={operator.total_messages_lifetime}
+                deltaFromAvg={deltaFromAvg}
+                deltaFromTop={deltaFromTop}
               />
             ) : undefined
           }

@@ -199,6 +199,9 @@ export function OverviewTab({
               </span>
             </div>
           )}
+          {deltaFromTop == null && deltaFromAvg == null && (
+            <span className="font-mono text-xs text-text-muted">No competitive data yet.</span>
+          )}
         </div>
       )}
 
