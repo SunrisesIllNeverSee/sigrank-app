@@ -216,7 +216,7 @@ export default async function MethodologyPage() {
         <p className="text-base text-text-secondary">
           Every operator&rsquo;s cascade falls into one of 10 build archetypes,
           classified by leverage, velocity, and construction. Archetypes are
-          distinct from class (a cumulative tier based on total tokens) and
+          distinct from class (scale/qualification) and
           rank (a leaderboard position by Yield).
         </p>
         <ul className="flex flex-col gap-2 text-base text-text-secondary">
