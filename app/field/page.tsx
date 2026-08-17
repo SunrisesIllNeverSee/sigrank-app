@@ -595,7 +595,7 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           This is why the Four Degrees chart&apos;s columns are honest: the{" "}
           {meta.outliers} outliers are separated before the median is computed. Without
-          separation, `grenadeoftacoss` alone skews the field average by
+          separation, the top outlier alone skews the field average by
           248,000%. The median is immune. Read the{" "}
           <Link
             href="/blog/volume-isnt-yield"

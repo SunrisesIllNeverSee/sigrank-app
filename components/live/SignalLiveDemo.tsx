@@ -580,7 +580,7 @@ export function SignalLiveDemo({ fieldYields }: { fieldYields: number[] }) {
             <strong>{archetype.name}</strong>
           </div>
           <div className={styles.fieldScale}>
-            <div><span>FIELD POSITION</span><b>1,627 MEASURED OPERATORS</b></div>
+            <div><span>FIELD POSITION</span><b>{fieldYields.length.toLocaleString()} MEASURED OPERATORS</b></div>
             <div className={styles.scaleLine}>
               <i style={{ left: `${clamp(percentile, 1, 99)}%` }}><b>YOU</b></i>
             </div>
