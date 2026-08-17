@@ -357,6 +357,27 @@ export default async function HomePage() {
         </h2>
         <p className="font-sans text-sm text-text-muted">
           <Link
+            href="/hall"
+            className="text-gold underline underline-offset-2"
+          >
+            Best AI Users
+          </Link>
+          {" · "}
+          <Link
+            href="/score"
+            className="text-gold underline underline-offset-2"
+          >
+            Benchmark Your AI Usage
+          </Link>
+          {" · "}
+          <Link
+            href="/ai-operator-scoring"
+            className="text-gold underline underline-offset-2"
+          >
+            AI Operator Evaluation
+          </Link>
+          {" · "}
+          <Link
             href="/ai-benchmarking"
             className="text-gold underline underline-offset-2"
           >
@@ -371,10 +392,24 @@ export default async function HomePage() {
           </Link>
           {" · "}
           <Link
-            href="/ai-operator-scoring"
+            href="/research"
             className="text-gold underline underline-offset-2"
           >
-            AI Operator Scoring
+            AI Power User Statistics
+          </Link>
+          {" · "}
+          <Link
+            href="/vs/lmsys-arena"
+            className="text-gold underline underline-offset-2"
+          >
+            Human vs Model Performance
+          </Link>
+          {" · "}
+          <Link
+            href="/privacy"
+            className="text-gold underline underline-offset-2"
+          >
+            Privacy-Preserving AI Measurement
           </Link>
           {" · "}
           <Link
