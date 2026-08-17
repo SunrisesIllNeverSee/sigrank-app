@@ -167,8 +167,8 @@ export default function SciencePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The architecture is a 5-layer stack: Layer -1 (proprietary axioms)
           through Layer 4 (extensions and applications). SigRank is one
-          application. MO§ES™ is the enforcement engine. The law is the
-          foundation.
+          application. MO§ES™ is the enforcement engine. The Conservation Law
+          of Commitment is the theoretical foundation for SigRank.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Full research program:{" "}
@@ -227,7 +227,18 @@ export default function SciencePage() {
               rel="external"
             >
               DOI: 10.5281/zenodo.20029607
-            </a>
+            </a>{" "}
+            <span className="text-text-dim">
+              (concept:{" "}
+              <a
+                href="https://doi.org/10.5281/zenodo.18267278"
+                className="text-gold underline underline-offset-2"
+                rel="external"
+              >
+                10.5281/zenodo.18267278
+              </a>
+              )
+            </span>
           </li>
           <li>
             <strong className="text-text-primary">Experimental Record:</strong>{" "}

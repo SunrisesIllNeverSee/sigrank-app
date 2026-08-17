@@ -69,7 +69,7 @@ SigRank evaluates the human using the AI — not the AI model itself. Most platf
 
 ## What is SigRank SignalAF?
 
-SigRank SignalAF scores AI operators by **token cascade efficiency**: how much reusable signal
+SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It scores AI operators by **token cascade efficiency**: how much reusable signal
 they create from each unit of input — not how many tokens they burn. The rank metric:
 
 ```txt

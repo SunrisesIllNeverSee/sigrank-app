@@ -19,6 +19,7 @@ import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { sigrankDataset, faqPage, breadcrumb } from "@/lib/jsonld";
+import { BUILD_ARCHETYPES } from "@/lib/analytics/build-archetypes";
 
 export const metadata: Metadata = withOG({
   title: "The SigRank Index — Methodology",
@@ -205,6 +206,29 @@ export default async function MethodologyPage() {
           fresh input) or tokens are burned (low cache, low output). Volume is
           noise; yield is signal.
         </p>
+      </section>
+
+      {/* ── The 10 build archetypes ─────────────────────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          The 10 build archetypes
+        </h2>
+        <p className="text-base text-text-secondary">
+          Every operator&rsquo;s cascade falls into one of 10 build archetypes,
+          classified by leverage, velocity, and construction. Archetypes are
+          distinct from class (a cumulative tier based on total tokens) and
+          rank (a leaderboard position by Yield).
+        </p>
+        <ul className="flex flex-col gap-2 text-base text-text-secondary">
+          {BUILD_ARCHETYPES.map((a) => (
+            <li key={a.key}>
+              <strong className="text-text-primary">{a.name}</strong>{" "}
+              <span className="text-text-dim">({a.familyLabel})</span> —{" "}
+              {a.blurb}{" "}
+              <span className="text-text-dim">Defined by: {a.definedBy}.</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ── Methodology ────────────────────────────────────────────────── */}

@@ -72,8 +72,9 @@ export function Draft2Hero() {
             line lengths so there's no one-word orphan line (owner 2026-06-24). */}
         <div className="flex max-w-2xl flex-col gap-2 text-center">
           <p className="text-balance font-sans text-lg leading-relaxed text-text-secondary sm:text-xl">
-            SigRank turns privacy-preserving token telemetry into a repeatable
-            performance evaluation: your{" "}
+            SigRank is an AI operator benchmark measuring token cascade
+            efficiency, not AI models. It turns privacy-preserving token
+            telemetry into a repeatable performance evaluation: your{" "}
             <strong className="text-text-primary">Yield</strong>, workflow
             signature, benchmark, and progress over time. The leaderboard is
             proof, not the product. The product is the{" "}
