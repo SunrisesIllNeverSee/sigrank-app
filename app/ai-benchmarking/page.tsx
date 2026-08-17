@@ -89,10 +89,12 @@ export default function AIBenchmarkingPage() {
         title="AI Benchmarking — Beyond Model Leaderboards"
         subtitle={
           <>
-            Model leaderboards rank the AI.{" "}
+            AI benchmarking tools for operators measure how effectively humans
+            use AI — not the AI models themselves. Traditional AI benchmarking
+            ranks models.{" "}
             <span className="text-gold">Operator benchmarking</span> ranks the
-            human. A new category — built on real telemetry, not preference
-            votes.
+            human driving the AI — built on real token telemetry, not
+            preference votes.
           </>
         }
       />

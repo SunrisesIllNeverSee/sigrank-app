@@ -102,10 +102,11 @@ export default function AIOperatorScoringPage() {
         title="AI Operator Scoring — The New Performance Layer"
         subtitle={
           <>
-            Not the model. Not the clock. The{" "}
-            <span className="text-gold">operator</span>. A performance layer
-            that ranks who drives their AI best — built on real telemetry, not
-            preference votes.
+            Model evaluation measures the AI model itself. Operator evaluation
+            measures the{" "}
+            <span className="text-gold">human using the AI</span>. SigRank is
+            an operator evaluation system — it ranks who drives their AI best,
+            built on real token telemetry, not preference votes.
           </>
         }
       />

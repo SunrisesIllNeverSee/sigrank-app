@@ -71,7 +71,10 @@ export default function YieldCascadePage() {
         title="Yield (Υ) — Token Cascade Efficiency"
         subtitle={
           <>
-            The headline SigRank metric. Measures whether your token cascade is{" "}
+            Yield in AI usage measures how efficiently you turn fresh input
+            tokens into useful output, amplified by cached context reuse. The
+            SigRank Yield formula (Υ) captures this in one number — whether
+            your token cascade is{" "}
             <span className="text-gold">compounding signal</span> or burning
             tokens.
           </>

@@ -111,8 +111,10 @@ export default function AICodingMetricsPage() {
         title="AI Coding Metrics — The Complete Guide"
         subtitle={
           <>
-            Six metrics, four token pillars, one cascade. The complete map of
-            how SigRank measures{" "}
+            AI coding metrics tools measure how efficiently you use AI to write
+            code. SigRank defines six core metrics from four token pillars —
+            yield, compression ratio, SNR, cache hit rate, leverage, and
+            velocity. The complete map of{" "}
             <span className="text-gold">AI coding efficiency</span> — and which
             number to look at first.
           </>
