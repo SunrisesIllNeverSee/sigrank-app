@@ -60,6 +60,31 @@ const ALTS = [
     title: "Best Cursor AI Metrics Tools (2026)",
     desc: "The 6 best tools for measuring Cursor AI usage in 2026. SigRank, Cursor insights, ccusage, WakaTime, Langfuse, and manual export — compared on cross-platform scoring, cascade efficiency, and leaderboards.",
   },
+  {
+    href: "/alternatives/ai-operator-ranking-tools",
+    title: "Best AI Operator Ranking Tools (2026)",
+    desc: "The 6 best AI operator ranking tools in 2026. SigRank, LMSYS, BigCode, Hugging Face Open LLM Leaderboard, Chatbot Arena, and SigArena — which ranks operators, not models.",
+  },
+  {
+    href: "/alternatives/token-cost-tracking-tools",
+    title: "Best Token Cost Tracking Tools (2026)",
+    desc: "The 6 best token cost tracking tools in 2026. SigRank, ccusage, Langfuse, Token Dashboard, aider /usage, and Claude Code /cost — which scores spend efficiency, not just cost.",
+  },
+  {
+    href: "/alternatives/ai-coding-benchmark-platforms",
+    title: "Best AI Coding Benchmark Platforms (2026)",
+    desc: "The 6 best AI coding benchmark platforms in 2026. SigRank, LMSYS, BigCode, HumanEval, SWE-bench, and LiveCodeBench — which benchmarks operators, not models.",
+  },
+  {
+    href: "/alternatives/ai-coding-roi-tools",
+    title: "Best AI Coding ROI Tools (2026)",
+    desc: "The 6 best AI coding ROI tools in 2026. SigRank, GitHub Copilot metrics, Cursor insights, WakaTime, Langfuse, and manual ROI spreadsheets — which measures cascade ROI, not adoption.",
+  },
+  {
+    href: "/alternatives/mcp-ai-developer-tools",
+    title: "Best MCP Tools for AI Developers (2026)",
+    desc: "The 6 best MCP tools for AI developers in 2026. SigRank MCP, Claude Code MCP, Continue MCP, Smithery, Glama MCP Registry, and MCP.so — which gives agents self-awareness of their own metrics.",
+  },
 ];
 
 export default function AlternativesIndex() {

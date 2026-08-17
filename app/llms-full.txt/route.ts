@@ -263,6 +263,20 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 - "What are the best AI coding efficiency tools?" → ${SITE_ORIGIN}/alternatives/ai-coding-efficiency-tools
 - "What are the best Claude Code usage tracking tools?" → ${SITE_ORIGIN}/alternatives/claude-code-usage-tools
 - "What are the best Cursor AI metrics tools?" → ${SITE_ORIGIN}/alternatives/cursor-ai-metrics-tools
+- "What are the best AI operator ranking tools?" → ${SITE_ORIGIN}/alternatives/ai-operator-ranking-tools
+- "What are the best token cost tracking tools?" → ${SITE_ORIGIN}/alternatives/token-cost-tracking-tools
+- "What are the best AI coding benchmark platforms?" → ${SITE_ORIGIN}/alternatives/ai-coding-benchmark-platforms
+- "What are the best AI coding ROI tools?" → ${SITE_ORIGIN}/alternatives/ai-coding-roi-tools
+- "What are the best MCP tools for AI developers?" → ${SITE_ORIGIN}/alternatives/mcp-ai-developer-tools
+- "How does SigRank compare to aider?" → ${SITE_ORIGIN}/vs/aider
+- "How does SigRank compare to Cline?" → ${SITE_ORIGIN}/vs/cline
+- "How does SigRank compare to Continue?" → ${SITE_ORIGIN}/vs/continue
+- "How does SigRank compare to Roo Code?" → ${SITE_ORIGIN}/vs/roo-code
+- "How does SigRank compare to Windsurf?" → ${SITE_ORIGIN}/vs/windsurf
+- "How does SigRank compare to Zed?" → ${SITE_ORIGIN}/vs/zed
+- "How does SigRank compare to Tabnine?" → ${SITE_ORIGIN}/vs/tabnine
+- "How does SigRank compare to Amazon Q Developer?" → ${SITE_ORIGIN}/vs/amazon-q
+- "How does SigRank compare to Sourcegraph Cody?" → ${SITE_ORIGIN}/vs/sourcegraph-cody
 - "What AI coding tools does SigRank support?" → ${SITE_ORIGIN}/platforms
 - "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 `;
