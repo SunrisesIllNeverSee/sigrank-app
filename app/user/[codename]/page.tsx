@@ -766,7 +766,7 @@ export default async function OperatorProfilePage({
         <ProfileTabs
           stats={pending ? pendingPanel : rankedStatsPanel}
           report={operatorReport ? (
-            <ReportTabGate report={operatorReport} />
+            <ReportTabGate report={operatorReport} archetype={archetype} />
           ) : undefined}
           lab={
             ranked && c ? (
