@@ -11,10 +11,15 @@ import { WaveHero } from "@/components/ui/WaveHero";
 export function HallHero() {
   return (
     <WaveHero
-      eyebrow="🏛️ Hall of Signal"
+      eyebrow="TRIUMPHUS FAMAE ET GLORIAE"
       terminalText="FAMAE ET GLORIA"
-      title="Triumphus Famae Et Gloriae"
-      subtitle="The permanent record — the highest marks ever set across the SigRank leaderboard."
+      title="The Top AI Users in the World"
+      subtitle={
+        <>
+          Hall of Signal — record-setting AI operators ranked by measured
+          global token-cascade efficiency.
+        </>
+      }
     />
   );
 }

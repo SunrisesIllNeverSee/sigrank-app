@@ -12,9 +12,9 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 import type { LeaderboardRow } from "@/lib/board";
 
 export const metadata: Metadata = withOG({
-  title: "Hall of Signal",
+  title: "Best AI Users & Top AI Operators | Hall of Signal",
   description:
-    "Triumphus Famae Et Gloriae — the permanent record of peak signal across the SigRank leaderboard.",
+    "The top AI users in the world, ranked by measured token-cascade efficiency. Record-setting AI operators on the global SigRank leaderboard.",
   path: "/hall",
 });
 

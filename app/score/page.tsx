@@ -77,13 +77,18 @@ export default function ScorePage() {
       {/* Hero */}
       <div className="flex flex-col gap-3 text-center">
         <span className="font-mono text-xs uppercase tracking-widest text-gold">
-          ◈ Score your cascade
+          ◈ Check your AI coding efficiency
         </span>
         <h1 className="font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
-          How much signal does your token cascade actually compound?
+          How do I check my AI coding efficiency?
         </h1>
         <p className="mx-auto max-w-xl font-sans text-sm leading-relaxed text-text-secondary">
-          Two paths. Both get you scored. Pick the one that fits.
+          How much signal does your token cascade actually compound? Run{" "}
+          <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
+            bunx sigrank
+          </code>{" "}
+          to read your local logs and score your cascade automatically, or
+          paste your four token counts below for an instant global preview.
         </p>
       </div>
 

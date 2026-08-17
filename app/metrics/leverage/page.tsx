@@ -67,10 +67,11 @@ export default function LeveragePage() {
         title="Leverage — Cached Context Amplification"
         subtitle={
           <>
-            How much your cached context{" "}
-            <span className="text-gold">amplifies</span> your fresh input. High
-            leverage means you&rsquo;re building on a foundation, not starting
-            over.
+            Leverage in AI token usage measures how much cached context you
+            reuse relative to fresh input. High leverage means your cached
+            context{" "}
+            <span className="text-gold">amplifies</span> your input many times
+            over — you&rsquo;re building on a foundation, not starting over.
           </>
         }
       />

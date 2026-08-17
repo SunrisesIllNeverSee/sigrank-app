@@ -67,7 +67,10 @@ export default function VelocityPage() {
         title="Velocity — Token Production Rate"
         subtitle={
           <>
-            How fast you produce output. A{" "}
+            Velocity in AI token usage measures how much output you generate
+            relative to fresh input. It&rsquo;s the ratio of output tokens to
+            input tokens — how much the model produces per unit of new context
+            you provide. A{" "}
             <span className="text-gold">secondary metric</span> — high velocity
             without yield is just fast waste.
           </>

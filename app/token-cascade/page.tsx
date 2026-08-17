@@ -147,9 +147,10 @@ export default function TokenCascadePage() {
         title="Token Cascade — The Flow of Tokens Through AI Coding Sessions"
         subtitle={
           <>
-            Every AI coding session moves tokens through a{" "}
-            <span className="text-gold">cascade</span>. Architecture — not
-            volume — determines whether tokens compound or burn.
+            Token cascade efficiency measures how effectively tokens flow
+            through an AI coding session. Every session moves tokens through a{" "}
+            <span className="text-gold">cascade</span> — architecture, not
+            volume, determines whether tokens compound or burn.
           </>
         }
       />

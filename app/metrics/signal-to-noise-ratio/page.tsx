@@ -71,9 +71,12 @@ export default function SignalToNoiseRatioPage() {
         title="Signal-to-Noise Ratio (SNR)"
         subtitle={
           <>
-            The share of fresh conversational traffic that is{" "}
-            <span className="text-gold">output</span> versus input. A bounded
-            view of Velocity.
+            SNR in AI coding measures the share of your fresh token traffic
+            that is{" "}
+            <span className="text-gold">output</span> versus input. A high
+            signal-to-noise ratio means most of your fresh traffic is
+            productive output; a low SNR means most is input. A bounded view of
+            Velocity.
           </>
         }
       />
