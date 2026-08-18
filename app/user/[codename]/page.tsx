@@ -789,6 +789,8 @@ export default async function OperatorProfilePage({
                 deltaFromTop={deltaFromTop}
                 trophyCounts={trophyCounts}
                 tierProgress={tierProgress}
+                boardRows={boardRows}
+                operatorCodename={operator.codename}
               />
             ) : undefined
           }

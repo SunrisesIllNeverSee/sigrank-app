@@ -8,6 +8,8 @@ import { SignalClassBadge } from "@/components/sigrank";
 import { ArchetypeChip } from "./ArchetypeChip";
 import { OverviewChart } from "./OverviewChart";
 import { TrophyRoom } from "./TrophyRoom";
+import { FieldScatter } from "./FieldScatter";
+import type { LeaderboardRow } from "@/lib/board";
 
 interface Props {
   history: HistoryPoint[];
@@ -24,6 +26,8 @@ interface Props {
   deltaFromTop: number | null;
   trophyCounts: TrophyCounts | null;
   tierProgress: TierProgress | null;
+  boardRows: LeaderboardRow[];
+  operatorCodename: string;
 }
 
 function fmtNum(n: number): string {
@@ -64,6 +68,8 @@ export function OverviewTab({
   deltaFromTop,
   trophyCounts,
   tierProgress,
+  boardRows,
+  operatorCodename,
 }: Props) {
   const firstRank = history.length > 0 ? history[0].global_rank : 0;
   const lastRank =
@@ -79,36 +85,25 @@ export function OverviewTab({
       {/* Trophy Room */}
       <TrophyRoom counts={trophyCounts} />
 
-      {/* Tier + Archetype side by side */}
+      {/* Tier + Archetype side by side — equal size */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Experience Tier box */}
-        <div className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
-          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-            Experience Tier
-          </span>
+        <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
+          {/* Header — matches Trophy Room style */}
           <div className="flex items-center gap-2">
-            <SignalClassBadge signalClass={classTier} showFull size="md" />
+            <span className="text-base">🎖️</span>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
+              Experience Tier
+            </h3>
           </div>
-          <p className="font-sans text-[12px] leading-relaxed text-text-secondary">
-            {TIER_DESC[tierBase(classTier)] ?? ""}
-          </p>
-          {/* Percentile vs all */}
-          <div className="mt-2 flex flex-col gap-0.5">
-            <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
-              Percentile — where this operator ranks against the entire field
-            </span>
-            <span className="font-mono text-sm text-gold">Top {topPct.toFixed(2)}%</span>
-            <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
-              <div className="h-full rounded-full bg-gold" style={{ width: `${Math.min(topPct, 100)}%` }} />
-            </div>
-          </div>
-          {/* Progress to next tier */}
+
+          {/* Progress bar at top */}
           {tp && tp.nextClass && (
-            <div className="mt-2 flex flex-col gap-0.5">
+            <div className="flex flex-col gap-0.5">
               <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
-                Progress to {tp.nextClass} — total token threshold
+                Progress to {tp.nextClass}
               </span>
-              <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
                 <div className="h-full rounded-full bg-accent" style={{ width: `${tp.progressPct.toFixed(1)}%` }} />
               </div>
               <span className="font-mono text-[10px] text-text-muted">
@@ -117,17 +112,42 @@ export function OverviewTab({
             </div>
           )}
           {tp && !tp.nextClass && (
-            <span className="mt-2 font-mono text-[10px] text-gold">
+            <span className="font-mono text-[10px] text-gold">
               Highest tier reached — no further promotion available
             </span>
           )}
+
+          {/* Badge */}
+          <div className="flex items-center gap-2">
+            <SignalClassBadge signalClass={classTier} showFull size="md" />
+            <span className="font-mono text-sm text-gold">Top {topPct.toFixed(2)}%</span>
+          </div>
+
+          {/* Description */}
+          <p className="font-sans text-[12px] leading-relaxed text-text-secondary">
+            {TIER_DESC[tierBase(classTier)] ?? ""}
+          </p>
+
+          {/* Field scatter — where this operator sits in the field */}
+          <div className="mt-1 flex flex-col gap-1">
+            <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+              Field position — Υ Yield vs Rank
+            </span>
+            <FieldScatter boardRows={boardRows} operatorCodename={operatorCodename} />
+          </div>
         </div>
 
-        {/* Build Archetype box */}
-        <div className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
-          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-            Build Archetype
-          </span>
+        {/* Build Archetype box — equal shape */}
+        <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
+          {/* Header — matches Trophy Room style */}
+          <div className="flex items-center gap-2">
+            <span className="text-base">🧬</span>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
+              Build Archetype
+            </h3>
+          </div>
+
+          {/* Chip */}
           <div className="flex items-center gap-2">
             {archetype ? (
               <ArchetypeChip archetype={archetype} />
@@ -135,12 +155,14 @@ export function OverviewTab({
               <span className="font-mono text-xs text-text-muted">—</span>
             )}
           </div>
+
+          {/* Description */}
           {archetype && (
             <>
               <p className="font-sans text-[12px] leading-relaxed text-text-secondary">
                 {archetype.blurb}
               </p>
-              <div className="mt-2 flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
                 <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
                   How this archetype is classified
                 </span>
@@ -148,7 +170,7 @@ export function OverviewTab({
                   {archetype.definedBy}
                 </span>
               </div>
-              <div className="mt-1 flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
                 <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
                   Family — the operating composition group
                 </span>
@@ -163,9 +185,12 @@ export function OverviewTab({
 
       {/* Key Stats — full width */}
       <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
-        <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-          Key Stats
-        </span>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-base">📊</span>
+          <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
+            Key Stats
+          </h3>
+        </div>
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           <div className="flex flex-col gap-0.5">
             <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Rank</span>
