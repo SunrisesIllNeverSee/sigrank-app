@@ -144,17 +144,47 @@ export async function OperatorRecords({
   const total = staticRecords.length + dynamicRecords.length;
   if (total === 0) return null;
 
+  const goldCount = dynamicRecords.filter((r) => r.rank === 1).length + staticRecords.length;
+  const silverCount = dynamicRecords.filter((r) => r.rank === 2).length;
+  const bronzeCount = dynamicRecords.filter((r) => r.rank === 3).length;
+
   return (
-    <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm">🏆</span>
-        <h2 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
-          Records
-        </h2>
+    <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
+      {/* Header: trophy icon + title + medal totals */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-base">🏆</span>
+          <h2 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
+            Trophy Room
+          </h2>
+        </div>
+        <div className="flex items-center gap-3 font-mono text-xs">
+          {goldCount > 0 && (
+            <span className="flex items-center gap-1">
+              <span className="text-gold">●</span>
+              <span className="text-gold font-bold">{goldCount}</span>
+              <span className="text-text-dim">gold</span>
+            </span>
+          )}
+          {silverCount > 0 && (
+            <span className="flex items-center gap-1">
+              <span style={{ color: "#c0c0c0" }}>●</span>
+              <span style={{ color: "#c0c0c0" }} className="font-bold">{silverCount}</span>
+              <span className="text-text-dim">silver</span>
+            </span>
+          )}
+          {bronzeCount > 0 && (
+            <span className="flex items-center gap-1">
+              <span style={{ color: "#cd7f32" }}>●</span>
+              <span style={{ color: "#cd7f32" }} className="font-bold">{bronzeCount}</span>
+              <span className="text-text-dim">bronze</span>
+            </span>
+          )}
+        </div>
       </div>
 
+      {/* Current positioning on Hall top-10 categories */}
       <div className="flex flex-wrap gap-2">
-        {/* Static curated records — trophy chips. */}
         {staticRecords.map((r, i) => (
           <Link
             key={`static-${i}`}
@@ -170,7 +200,6 @@ export async function OperatorRecords({
           </Link>
         ))}
 
-        {/* Dynamic metric records — medal chips. */}
         {dynamicRecords.map((r) => {
           const color = medalColor(r.rank);
           const isGold = r.rank === 1;
