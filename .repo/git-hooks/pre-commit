@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+root="$(git rev-parse --show-toplevel)"
+python3 "$root/.repo/scripts/repo_check.py"

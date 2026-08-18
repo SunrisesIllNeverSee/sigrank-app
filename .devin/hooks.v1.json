@@ -1,0 +1,26 @@
+{
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash .coord/micro/scripts/hooks/session-start.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "^(write|edit)$",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash .coord/micro/scripts/hooks/stamp.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+}

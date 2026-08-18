@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: repo-standard
+        name: repo-standard
+        entry: python3 .repo/scripts/repo_check.py
+        language: system
+        pass_filenames: false
+        always_run: true
