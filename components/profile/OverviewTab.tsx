@@ -49,8 +49,111 @@ const TIER_DESC: Record<string, string> = {
   IGNITER: "New operator — first signals detected. The spark of the cascade. The operator has submitted their first verified snapshots and appears on the leaderboard. Everything from here is accumulation: build context, develop reuse, and let the cascade compound. Every Transmitter started here.",
 };
 
+// Richer archetype descriptions: why it matters + characteristics
+const ARCHETYPE_CONTEXT: Record<string, { why: string; characteristics: string[] }> = {
+  convergent: {
+    why: "The rarest composition. All three cascade axes — reuse, generation, and construction — are firing simultaneously. This is the signature of an operator who has solved the full problem: they read deeply from cache, generate at scale, and actively build new context for future sessions. Most operators max out one or two axes; convergent operators don't have to choose.",
+    characteristics: [
+      "Deep cache reuse (leverage P80+)",
+      "High generation (velocity P80+)",
+      "Active construction (construction P80+)",
+      "No axis tradeoffs — all three elevated",
+    ],
+  },
+  kinetic: {
+    why: "Generation is the defining feature. Output approaches or exceeds fresh input, meaning the operator is transmitting more signal than they consume. This is the profile of an operator whose context library is mature enough that they spend most of their energy producing, not accumulating. High-velocity operators climb the yield leaderboard fast.",
+    characteristics: [
+      "Output ≥ 80% of fresh input",
+      "Transmission-dominated composition",
+      "Mature context library driving generation",
+      "Yield scales with velocity, not just leverage",
+    ],
+  },
+  "input-bound": {
+    why: "The cascade hasn't formed yet. Fresh input is doing almost all the work — little prior context is returning from cache. This is normal for new operators or those working with rapidly-shifting contexts. The path forward is simple: keep submitting. Every snapshot adds to the context library that will eventually compound.",
+    characteristics: [
+      "Leverage below 5× (cache reads < 5× input)",
+      "Each cycle depends on new input",
+      "No accumulated context to reuse yet",
+      "Every Transmitter started here",
+    ],
+  },
+  priming: {
+    why: "The cascade is starting to form. Prior context is beginning to return from cache, but the leverage ratio hasn't deepened yet. This is the transition phase — the operator is building the context library that will eventually compound. The key metric to watch is leverage: as it climbs past 10×, reuse becomes the primary fuel source.",
+    characteristics: [
+      "Leverage 5–10× (reuse forming)",
+      "Prior context starting to return",
+      "Transition from input-dependence to reuse",
+      "Leverage growth is the leading indicator",
+    ],
+  },
+  contextual: {
+    why: "Reuse is now established. The operator's prior context is materially supporting the workflow — cache reads are 10–15× the fresh input. This is where the cascade starts to pay dividends: each session builds on the last without starting from scratch. Construction is still limited, meaning the operator is consuming their context library faster than they're expanding it.",
+    characteristics: [
+      "Leverage 10–15× (reuse established)",
+      "Prior context materially supporting workflow",
+      "Passive reuse — construction still limited",
+      "Next step: start building new context",
+    ],
+  },
+  "deep-reader": {
+    why: "A deep context library is carrying the workflow. The operator draws heavily from accumulated cache (15–23× input) while creating relatively little new context. This is the profile of an operator working within a mature, well-structured knowledge base — efficient, but construction is the bottleneck for further growth.",
+    characteristics: [
+      "Leverage 15–23× (deep reuse)",
+      "Mature context library as primary fuel",
+      "Low construction — consuming faster than building",
+      "Efficient but growth-limited without construction",
+    ],
+  },
+  archivist: {
+    why: "Extreme reuse of a deep context library. Cache reads dwarf fresh input (23×+), meaning the operator is working almost entirely from accumulated context. This is the most reuse-heavy passive composition — highly efficient per token, but the operator is drawing down their context library rather than expanding it.",
+    characteristics: [
+      "Leverage 23×+ (extreme reuse)",
+      "Almost entirely cache-driven",
+      "Minimal fresh input or new construction",
+      "Maximum efficiency, minimum growth",
+    ],
+  },
+  builder: {
+    why: "The operator has started actively constructing new context. Cache writes are growing relative to cache reads, meaning the system is creating material that future sessions will reuse. Leverage is still developing, so the payoff isn't immediate — but this is the foundation of long-term compounding. Builders are investing in their future cascade.",
+    characteristics: [
+      "Construction ≥ 2% of cache reads",
+      "Actively writing new context for future reuse",
+      "Leverage still developing (< 30×)",
+      "Investment phase — compounding payoff comes later",
+    ],
+  },
+  recursive: {
+    why: "Construction and reuse are now feeding each other. The operator is building new context on top of an already substantial reusable base (30–50× leverage). This is the compounding loop in action: each new cache write becomes future cache read, which enables more output, which drives more construction. Recursive operators are on the trajectory to ARCH.",
+    characteristics: [
+      "Leverage 30–50× with active construction",
+      "Construction feeds reuse feeds construction",
+      "The compounding loop is self-sustaining",
+      "On trajectory to ARCH tier",
+    ],
+  },
+  amplifier: {
+    why: "The most advanced construction composition. A massive context library (50×+ leverage) is being actively expanded through construction. The operator is both the deepest reader and an active builder — amplifying their existing context base rather than just consuming it. This is the rare operator who has solved reuse and is now solving growth.",
+    characteristics: [
+      "Leverage 50×+ with active construction",
+      "Deep reuse + active construction simultaneously",
+      "Amplifying an already-massive context base",
+      "The frontier of the construction family",
+    ],
+  },
+};
+
 function tierBase(cls: SignalClass): string {
   return cls.split(" ").slice(0, -1).join(" ") || cls;
+}
+
+function StatRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">{label}</span>
+      <span className={`font-mono text-[11px] ${accent ? "text-gold" : "text-text-secondary"}`}>{value}</span>
+    </div>
+  );
 }
 
 export function OverviewTab({
@@ -79,17 +182,18 @@ export function OverviewTab({
   const rankUnchanged = deltaRank === 0;
   const c = cascade;
   const tp = tierProgress;
+  const archCtx = archetype ? ARCHETYPE_CONTEXT[archetype.key] : null;
 
   return (
     <div className="flex flex-col gap-4">
       {/* Trophy Room */}
       <TrophyRoom counts={trophyCounts} />
 
-      {/* Tier + Archetype side by side — equal size */}
+      {/* Tier + Archetype side by side — equal size, stats at bottom */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Experience Tier box */}
         <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
-          {/* Header — matches Trophy Room style */}
+          {/* Header */}
           <div className="flex items-center gap-2">
             <span className="text-base">🎖️</span>
             <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
@@ -117,7 +221,7 @@ export function OverviewTab({
             </span>
           )}
 
-          {/* Badge */}
+          {/* Badge + percentile */}
           <div className="flex items-center gap-2">
             <SignalClassBadge signalClass={classTier} showFull size="md" />
             <span className="font-mono text-sm text-gold">Top {topPct.toFixed(2)}%</span>
@@ -128,18 +232,39 @@ export function OverviewTab({
             {TIER_DESC[tierBase(classTier)] ?? ""}
           </p>
 
-          {/* Field scatter — where this operator sits in the field */}
-          <div className="mt-1 flex flex-col gap-1">
+          {/* Field scatter */}
+          <div className="flex flex-col gap-1">
             <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
               Field position — Υ Yield vs Rank
             </span>
             <FieldScatter boardRows={boardRows} operatorCodename={operatorCodename} />
           </div>
+
+          {/* Tier-relevant stats at bottom */}
+          <div className="mt-auto flex flex-col gap-1.5 border-t border-bg-border-subtle pt-3">
+            <StatRow label="Global rank" value={`#${globalRank}`} accent />
+            <StatRow label="Platform" value={platform ?? "—"} />
+            {accountAgeDays != null && <StatRow label="Account age" value={`${accountAgeDays}d`} />}
+            {lifetimeTurns != null && <StatRow label="Lifetime turns" value={fmtNum(lifetimeTurns)} />}
+            {deltaFromAvg != null && (
+              <StatRow
+                label="vs. field avg"
+                value={`${deltaFromAvg >= 0 ? "▲" : "▼"} ${Math.abs(deltaFromAvg).toFixed(1)}%`}
+                accent={deltaFromAvg >= 0}
+              />
+            )}
+            {deltaFromTop != null && (
+              <StatRow
+                label="vs. top operator"
+                value={`${deltaFromTop > 0 ? "▼" : "▲"} ${Math.abs(deltaFromTop).toFixed(1)}%`}
+              />
+            )}
+          </div>
         </div>
 
         {/* Build Archetype box — equal shape */}
         <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
-          {/* Header — matches Trophy Room style */}
+          {/* Header */}
           <div className="flex items-center gap-2">
             <span className="text-base">🧬</span>
             <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
@@ -156,12 +281,32 @@ export function OverviewTab({
             )}
           </div>
 
-          {/* Description */}
-          {archetype && (
+          {/* Description + why it matters */}
+          {archetype && archCtx && (
             <>
               <p className="font-sans text-[12px] leading-relaxed text-text-secondary">
                 {archetype.blurb}
               </p>
+              <p className="font-sans text-[12px] leading-relaxed text-text-muted">
+                {archCtx.why}
+              </p>
+
+              {/* Characteristics */}
+              <div className="flex flex-col gap-1">
+                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+                  Characteristics
+                </span>
+                <ul className="flex flex-col gap-0.5">
+                  {archCtx.characteristics.map((ch, i) => (
+                    <li key={i} className="font-mono text-[10px] leading-relaxed text-text-muted flex gap-1.5">
+                      <span className="text-gold">▸</span>
+                      <span>{ch}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Classification */}
               <div className="flex flex-col gap-1">
                 <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
                   How this archetype is classified
@@ -170,110 +315,44 @@ export function OverviewTab({
                   {archetype.definedBy}
                 </span>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
-                  Family — the operating composition group
-                </span>
-                <span className="font-mono text-[10px] leading-relaxed text-text-muted">
-                  {archetype.familyLabel}
-                </span>
-              </div>
             </>
           )}
-        </div>
-      </div>
 
-      {/* Key Stats — full width */}
-      <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-base">📊</span>
-          <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
-            Key Stats
-          </h3>
-        </div>
-        <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-          <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Rank</span>
-            <span className="font-mono text-base text-text-primary">#{globalRank}</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Platform</span>
-            <span className="font-mono text-sm text-text-secondary">{platform ?? "—"}</span>
-          </div>
+          {/* Archetype-relevant stats at bottom — the 3 defining axes */}
           {c && (
-            <>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Υ Yield</span>
-                <span className="font-mono text-sm text-gold">
-                  {c.yield_ >= 1_000 ? `${(c.yield_ / 1_000).toFixed(1)}K` : c.yield_.toFixed(1)}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Leverage</span>
-                <span className="font-mono text-sm text-text-secondary">
-                  {c.leverage >= 1_000 ? `${(c.leverage / 1_000).toFixed(1)}K` : c.leverage.toFixed(1)}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">10xDEV</span>
-                <span className="font-mono text-sm text-text-secondary">
-                  {c.dev10x !== null ? c.dev10x.toFixed(2) : "—"}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">SNR</span>
-                <span className="font-mono text-sm text-text-secondary">{(c.snr * 100).toFixed(1)}%</span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Velocity</span>
-                <span className="font-mono text-sm text-text-secondary">
-                  {c.velocity >= 10 ? c.velocity.toFixed(1) : c.velocity.toFixed(2)}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">$ / 1M</span>
-                <span className="font-mono text-sm text-text-secondary">${c.costPerMillion.toFixed(2)}</span>
-              </div>
-            </>
-          )}
-          {accountAgeDays != null && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Account age</span>
-              <span className="font-mono text-sm text-text-secondary">{accountAgeDays}d</span>
-            </div>
-          )}
-          {lifetimeTurns != null && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Turns</span>
-              <span className="font-mono text-sm text-text-secondary">{fmtNum(lifetimeTurns)}</span>
+            <div className="mt-auto flex flex-col gap-1.5 border-t border-bg-border-subtle pt-3">
+              <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim mb-0.5">
+                Cascade composition — the 3 defining axes
+              </span>
+              <StatRow
+                label="Leverage (cache R / input)"
+                value={c.leverage >= 1_000 ? `${(c.leverage / 1_000).toFixed(1)}K×` : `${c.leverage.toFixed(1)}×`}
+                accent
+              />
+              <StatRow
+                label="Velocity (output / input)"
+                value={c.velocity >= 10 ? c.velocity.toFixed(1) : c.velocity.toFixed(2)}
+              />
+              <StatRow
+                label="Construction (cache W / R)"
+                value={c.construction.toFixed(3)}
+              />
+              <StatRow
+                label="Υ Yield (R × O / I²)"
+                value={c.yield_ >= 1_000 ? `${(c.yield_ / 1_000).toFixed(1)}K` : c.yield_.toFixed(1)}
+                accent
+              />
+              <StatRow
+                label="SNR (signal/noise)"
+                value={`${(c.snr * 100).toFixed(1)}%`}
+              />
+              <StatRow
+                label="$ / 1M tokens"
+                value={`$${c.costPerMillion.toFixed(2)}`}
+              />
             </div>
           )}
         </div>
-        {/* Competitive deltas */}
-        {(deltaFromAvg != null || deltaFromTop != null) && (
-          <div className="mt-3 flex flex-wrap gap-4 border-t border-bg-border-subtle pt-3">
-            {deltaFromAvg != null && (
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
-                  vs. field average
-                </span>
-                <span className={`font-mono text-sm ${deltaFromAvg >= 0 ? "text-gold" : "text-text-secondary"}`}>
-                  {deltaFromAvg >= 0 ? "▲" : "▼"} {Math.abs(deltaFromAvg).toFixed(1)}% {deltaFromAvg >= 0 ? "above" : "below"} average
-                </span>
-              </div>
-            )}
-            {deltaFromTop != null && (
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
-                  vs. top operator
-                </span>
-                <span className="font-mono text-sm text-text-secondary">
-                  {deltaFromTop > 0 ? "▼" : "▲"} {Math.abs(deltaFromTop).toFixed(1)}% {deltaFromTop > 0 ? "below" : "at"} top
-                </span>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Δ-rank trajectory */}
@@ -293,9 +372,12 @@ export function OverviewTab({
 
       {/* Trajectory chart */}
       <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
-        <h3 className="mb-3 font-mono text-[11px] uppercase tracking-[0.06em] text-text-muted">
-          Cascade Trajectory
-        </h3>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-base">📈</span>
+          <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-text-primary">
+            Cascade Trajectory
+          </h3>
+        </div>
         <OverviewChart history={history} fieldAvgYield={fieldAvgYield} />
       </div>
     </div>
