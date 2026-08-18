@@ -1,10 +1,13 @@
 import type { HistoryPoint } from "@/lib/board";
 import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { CascadeMetrics } from "@/lib/analytics/cascade";
+import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
+import type { TierProgress } from "@/lib/analytics/tier-progress";
 import type { SignalClass } from "@/components/sigrank/types";
 import { SignalClassBadge } from "@/components/sigrank";
 import { ArchetypeChip } from "./ArchetypeChip";
 import { OverviewChart } from "./OverviewChart";
+import { TrophyRoom } from "./TrophyRoom";
 
 interface Props {
   history: HistoryPoint[];
@@ -19,6 +22,8 @@ interface Props {
   lifetimeTurns: number | null;
   deltaFromAvg: number | null;
   deltaFromTop: number | null;
+  trophyCounts: TrophyCounts | null;
+  tierProgress: TierProgress | null;
 }
 
 function fmtNum(n: number): string {
@@ -29,20 +34,19 @@ function fmtNum(n: number): string {
 }
 
 const TIER_DESC: Record<string, string> = {
-  TRANSMITTER: "The apex — verified signal transmission at scale.",
-  "ARCH+": "Top-tier operator. Deep compounding cascade with sustained yield.",
+  TRANSMITTER: "The apex — verified signal transmission at scale. Less than 0.1% of operators reach this tier.",
+  "ARCH+": "Elite compounding. Deep cascade with sustained yield across all metrics.",
   ARCH: "Top-tier operator. Deep compounding cascade with sustained yield.",
-  POWER: "High-volume operator with strong cascade efficiency.",
-  BASE: "Established operator building toward compounding.",
+  POWER: "High-volume operator with strong cascade efficiency and leverage.",
+  BASE: "Established operator building toward compounding. Signal is forming.",
   SEEKER: "Early-stage operator accumulating context. The cascade is forming.",
-  REFINER: "Mid-tier operator refining signal from noise.",
-  BEARER: "Active operator carrying meaningful signal load.",
-  IGNITER: "New operator — first signals detected. The spark.",
+  REFINER: "Mid-tier operator refining signal from noise. Growing leverage.",
+  BEARER: "Active operator carrying meaningful signal load. Building momentum.",
+  IGNITER: "New operator — first signals detected. The spark of the cascade.",
 };
 
-function tierDesc(cls: SignalClass): string {
-  const base = cls.split(" ").slice(0, -1).join(" ");
-  return TIER_DESC[base] ?? TIER_DESC[cls] ?? "";
+function tierBase(cls: SignalClass): string {
+  return cls.split(" ").slice(0, -1).join(" ") || cls;
 }
 
 export function OverviewTab({
@@ -58,6 +62,8 @@ export function OverviewTab({
   lifetimeTurns,
   deltaFromAvg,
   deltaFromTop,
+  trophyCounts,
+  tierProgress,
 }: Props) {
   const firstRank = history.length > 0 ? history[0].global_rank : 0;
   const lastRank =
@@ -66,59 +72,103 @@ export function OverviewTab({
   const rankImproved = deltaRank < 0;
   const rankUnchanged = deltaRank === 0;
   const c = cascade;
+  const tp = tierProgress;
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Top row: identity + key stats */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-        {/* Identity: CLASS + ARCHETYPE */}
-        <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
-          <div className="flex flex-col gap-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-              Experience Tier
-            </span>
-            <div className="flex items-center gap-2">
-              <SignalClassBadge signalClass={classTier} showFull size="md" />
-            </div>
-            <p className="font-sans text-[11px] leading-relaxed text-text-muted">
-              {tierDesc(classTier)}
-            </p>
+      {/* Trophy Room */}
+      <TrophyRoom counts={trophyCounts} />
+
+      {/* Three boxes: Experience Tier | Build Archetype | Key Stats */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Experience Tier box */}
+        <div className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+            Experience Tier
+          </span>
+          <div className="flex items-center gap-2">
+            <SignalClassBadge signalClass={classTier} showFull size="md" />
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-              Build Archetype
+          <p className="font-sans text-[11px] leading-relaxed text-text-muted">
+            {TIER_DESC[tierBase(classTier)] ?? ""}
+          </p>
+          {/* Percentile vs all */}
+          <div className="mt-1 flex flex-col gap-0.5">
+            <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+              Percentile
             </span>
-            <div className="flex items-center gap-2">
-              {archetype ? (
-                <ArchetypeChip archetype={archetype} />
-              ) : (
-                <span className="font-mono text-xs text-text-muted">—</span>
-              )}
+            <span className="font-mono text-sm text-gold">Top {topPct.toFixed(2)}%</span>
+            <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
+              <div className="h-full rounded-full bg-gold" style={{ width: `${Math.min(topPct, 100)}%` }} />
             </div>
-            {archetype && (
+          </div>
+          {/* Progress to next tier */}
+          {tp && tp.nextClass && (
+            <div className="mt-1 flex flex-col gap-0.5">
+              <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+                Progress to {tp.nextClass}
+              </span>
+              <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${tp.progressPct.toFixed(1)}%` }} />
+              </div>
+              <span className="font-mono text-[10px] text-text-muted">
+                {tp.progressPct.toFixed(0)}% · {fmtNum(tp.tokensToNext ?? 0)} tokens to go
+              </span>
+            </div>
+          )}
+          {tp && !tp.nextClass && (
+            <span className="mt-1 font-mono text-[10px] text-gold">
+              Highest tier reached
+            </span>
+          )}
+        </div>
+
+        {/* Build Archetype box */}
+        <div className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
+          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
+            Build Archetype
+          </span>
+          <div className="flex items-center gap-2">
+            {archetype ? (
+              <ArchetypeChip archetype={archetype} />
+            ) : (
+              <span className="font-mono text-xs text-text-muted">—</span>
+            )}
+          </div>
+          {archetype && (
+            <>
               <p className="font-sans text-[11px] leading-relaxed text-text-muted">
                 {archetype.blurb}
               </p>
-            )}
-          </div>
+              <div className="mt-1 flex flex-col gap-1">
+                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+                  Defined by
+                </span>
+                <span className="font-mono text-[10px] text-text-secondary">
+                  {archetype.definedBy}
+                </span>
+              </div>
+              <div className="mt-1 flex flex-col gap-1">
+                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+                  Family
+                </span>
+                <span className="font-mono text-[10px] text-text-secondary">
+                  {archetype.familyLabel}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Key stats grid */}
-        <div className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-4">
+        {/* Key Stats box */}
+        <div className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4">
           <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
             Key Stats
           </span>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-0.5">
               <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Rank</span>
-              <span className="font-mono text-lg text-text-primary">#{globalRank}</span>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Percentile</span>
-              <span className="font-mono text-sm text-gold">Top {topPct.toFixed(2)}%</span>
-              <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
-                <div className="h-full rounded-full bg-gold" style={{ width: `${Math.min(topPct, 100)}%` }} />
-              </div>
+              <span className="font-mono text-base text-text-primary">#{globalRank}</span>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">Platform</span>
@@ -173,37 +223,29 @@ export function OverviewTab({
               </div>
             )}
           </div>
+          {/* Competitive deltas inside key stats */}
+          {(deltaFromAvg != null || deltaFromTop != null) && (
+            <div className="mt-2 flex flex-col gap-1 border-t border-bg-border-subtle pt-2">
+              {deltaFromAvg != null && (
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">vs. field avg</span>
+                  <span className={`font-mono text-[11px] ${deltaFromAvg >= 0 ? "text-gold" : "text-text-secondary"}`}>
+                    {deltaFromAvg >= 0 ? "▲" : "▼"} {Math.abs(deltaFromAvg).toFixed(1)}%
+                  </span>
+                </div>
+              )}
+              {deltaFromTop != null && (
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">vs. top op</span>
+                  <span className="font-mono text-[11px] text-text-secondary">
+                    {deltaFromTop > 0 ? "▼" : "▲"} {Math.abs(deltaFromTop).toFixed(1)}%
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Competitive deltas */}
-      {(deltaFromAvg != null || deltaFromTop != null) && (
-        <div className="flex flex-wrap gap-4 rounded-lg border border-bg-border bg-bg-surface px-4 py-3">
-          {deltaFromAvg != null && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                vs. field average
-              </span>
-              <span className={`font-mono text-sm ${deltaFromAvg >= 0 ? "text-gold" : "text-text-secondary"}`}>
-                {deltaFromAvg >= 0 ? "▲" : "▼"} {Math.abs(deltaFromAvg).toFixed(1)}% {deltaFromAvg >= 0 ? "above" : "below"} average
-              </span>
-            </div>
-          )}
-          {deltaFromTop != null && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                vs. top operator
-              </span>
-              <span className="font-mono text-sm text-text-secondary">
-                {deltaFromTop > 0 ? "▼" : "▲"} {Math.abs(deltaFromTop).toFixed(1)}% {deltaFromTop > 0 ? "below" : "at"} top
-              </span>
-            </div>
-          )}
-          {deltaFromTop == null && deltaFromAvg == null && (
-            <span className="font-mono text-xs text-text-muted">No competitive data yet.</span>
-          )}
-        </div>
-      )}
 
       {/* Δ-rank trajectory */}
       {history.length >= 2 && !rankUnchanged && (

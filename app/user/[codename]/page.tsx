@@ -44,7 +44,9 @@ import { CanonId } from "@/components/ui/CanonId";
 import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
-import { OperatorRecords } from "@/components/profile/OperatorRecords";
+import { TrophyBadge } from "@/components/profile/TrophyBadge";
+import { computeTrophyCounts } from "@/lib/analytics/trophy-counts";
+import { computeTierProgress } from "@/lib/analytics/tier-progress";
 import { ProfileAuthGate } from "@/components/profile/ProfileAuthGate";
 import { ClaimTabGate, ReportTabGate, LabTabGate } from "@/components/profile/ProfileAuthGates";
 import { CompareAgainstMe } from "@/components/profile/CompareAgainstMe";
@@ -333,6 +335,19 @@ export default async function OperatorProfilePage({
   const location_ = viewerRedacted ? null : operator.location;
   const links_ = viewerRedacted ? null : operator.links;
   const nameShown = viewerRedacted ? operator.codename : name;
+
+  // Trophy counts for header badge + Overview tab Trophy Room
+  const trophyCounts = ranked
+    ? await computeTrophyCounts(operator.codename, displayName ?? undefined, boardRows)
+    : null;
+
+  // Tier progress (how close to next class upgrade)
+  const totalTokens = ranked
+    ? telemetry.fresh_input + telemetry.output + telemetry.cache_read + telemetry.cache_create
+    : 0;
+  const tierProgress = ranked
+    ? computeTierProgress(snapshot.class_tier, totalTokens)
+    : null;
 
   const hasLinks = Boolean(
     links_ && (links_.github || links_.site || links_.x),
@@ -693,6 +708,7 @@ export default async function OperatorProfilePage({
               <SignalClassBadge signalClass={snapshot.class_tier} />
             )}
             {archetype && <ArchetypeChip archetype={archetype} />}
+            {trophyCounts && <TrophyBadge counts={trophyCounts} />}
             {viewerRedacted && (
               <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
                 🔒 Private
@@ -746,16 +762,6 @@ export default async function OperatorProfilePage({
         />
       )}
 
-      {/* Hall of Signal — where this operator ranks on every board. Renders
-          only if the operator is in the top 10 on at least one metric. Uses
-          the same boardRows already fetched for field averages — no extra DB
-          call. Placed above the tabs so prestige is visible immediately. */}
-      <OperatorRecords
-        codename={operator.codename}
-        display_name={displayName ?? undefined}
-        boardRows={boardRows}
-      />
-
       {/* Auth-dependent components are wrapped in a single ProfileAuthGate
           that resolves auth state client-side via /api/auth/session. This
           keeps the page ISR-cached (edge s-maxage=21600) — the server
@@ -781,6 +787,8 @@ export default async function OperatorProfilePage({
                 lifetimeTurns={operator.total_messages_lifetime}
                 deltaFromAvg={deltaFromAvg}
                 deltaFromTop={deltaFromTop}
+                trophyCounts={trophyCounts}
+                tierProgress={tierProgress}
               />
             ) : undefined
           }

@@ -69,8 +69,12 @@ export function OverviewChart({ history, fieldAvgYield, height = 260 }: Props) {
   const xAt = (i: number) =>
     padL + (innerW * i) / Math.max(1, dates.length - 1);
 
-  // Raw series: total tokens per snapshot
-  const rawVals = history.map(
+  // Raw series: 4 individual pillars
+  const inputVals = history.map((h) => h.input_tokens ?? 0);
+  const outputVals = history.map((h) => h.output_tokens ?? 0);
+  const cacheReadVals = history.map((h) => h.cache_read_tokens ?? 0);
+  const cacheWriteVals = history.map((h) => h.cache_creation_tokens ?? 0);
+  const rawTotalVals = history.map(
     (h) =>
       (h.input_tokens ?? 0) +
       (h.output_tokens ?? 0) +
@@ -84,8 +88,9 @@ export function OverviewChart({ history, fieldAvgYield, height = 260 }: Props) {
   const showMetrics = mode === "both" || mode === "metrics";
 
   // Y-scales (independent — dual axis)
-  const rawMin = Math.min(...rawVals);
-  const rawMax = Math.max(...rawVals);
+  const allRaw = [...inputVals, ...outputVals, ...cacheReadVals, ...cacheWriteVals, ...rawTotalVals];
+  const rawMin = Math.min(...allRaw);
+  const rawMax = Math.max(...allRaw);
   const rawRange = rawMax - rawMin || 1;
   const rawPad = rawRange * 0.15;
   const rawLo = Math.max(0, rawMin - rawPad);
@@ -104,16 +109,27 @@ export function OverviewChart({ history, fieldAvgYield, height = 260 }: Props) {
   const yieldYAt = (v: number) =>
     padT + innerH * (1 - (v - yLo) / yScale);
 
-  const rawCoords = rawVals.map((v, i) => ({ x: xAt(i), y: rawYAt(v) }));
+  const rawColors = {
+    input: "rgb(156 196 255)",    // accent blue
+    output: "rgb(196 146 58)",    // gold
+    cacheRead: "rgb(167 139 250)", // purple
+    cacheWrite: "rgb(52 211 153)", // green
+  };
+  const rawSeries = [
+    { key: "input", vals: inputVals, color: rawColors.input, label: "Input" },
+    { key: "output", vals: outputVals, color: rawColors.output, label: "Output" },
+    { key: "cacheRead", vals: cacheReadVals, color: rawColors.cacheRead, label: "Cache R" },
+    { key: "cacheWrite", vals: cacheWriteVals, color: rawColors.cacheWrite, label: "Cache W" },
+  ];
+  const rawPaths = rawSeries.map((s) => ({
+    ...s,
+    coords: s.vals.map((v, i) => ({ x: xAt(i), y: rawYAt(v) })),
+  }));
   const yieldCoords = yieldVals.map((v, i) => ({ x: xAt(i), y: yieldYAt(v) }));
 
-  const rawPath = smoothPath(rawCoords);
   const yieldPath = smoothPath(yieldCoords);
   const baseline = padT + innerH;
 
-  const rawArea =
-    rawPath +
-    ` L${rawCoords[rawCoords.length - 1].x.toFixed(2)},${baseline} L${rawCoords[0].x.toFixed(2)},${baseline} Z`;
   const yieldArea =
     yieldPath +
     ` L${yieldCoords[yieldCoords.length - 1].x.toFixed(2)},${baseline} L${yieldCoords[0].x.toFixed(2)},${baseline} Z`;
@@ -201,42 +217,42 @@ export function OverviewChart({ history, fieldAvgYield, height = 260 }: Props) {
 
         {/* legend */}
         <g>
-          {showRaw && (
-            <>
+          {showRaw && rawPaths.map((s, i) => (
+            <g key={`leg-${s.key}`}>
               <rect
-                x={W - padR - 200}
+                x={W - padR - 280 + i * 60}
                 y={8}
-                width={10}
-                height={10}
-                rx={2}
-                fill={BLUE}
+                width={8}
+                height={8}
+                rx={1}
+                fill={s.color}
               />
               <text
-                x={W - padR - 186}
-                y={17}
+                x={W - padR - 270 + i * 60}
+                y={15}
                 fill={BONE}
-                fontSize={10}
+                fontSize={9}
                 fontFamily={MONO}
               >
-                Raw tokens
+                {s.label}
               </text>
-            </>
-          )}
+            </g>
+          ))}
           {showMetrics && (
             <>
               <rect
-                x={W - padR - 110}
+                x={W - padR - 50}
                 y={8}
-                width={10}
-                height={10}
-                rx={2}
+                width={8}
+                height={8}
+                rx={1}
                 fill={GOLD}
               />
               <text
-                x={W - padR - 96}
-                y={17}
+                x={W - padR - 40}
+                y={15}
                 fill={BONE}
-                fontSize={10}
+                fontSize={9}
                 fontFamily={MONO}
               >
                 Υ Yield
@@ -321,20 +337,24 @@ export function OverviewChart({ history, fieldAvgYield, height = 260 }: Props) {
           </>
         )}
 
-        {/* raw area + line */}
-        {showRaw && rawPath && (
-          <>
-            <path d={rawArea} fill="url(#ov-grad-raw)" stroke="none" />
-            <path
-              d={rawPath}
-              fill="none"
-              stroke={BLUE}
-              strokeWidth={2.4}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </>
-        )}
+        {/* raw lines — 4 individual pillars */}
+        {showRaw &&
+          rawPaths.map((s) => {
+            const path = smoothPath(s.coords);
+            if (!path) return null;
+            return (
+              <path
+                key={`raw-${s.key}`}
+                d={path}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={1.8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.85}
+              />
+            );
+          })}
 
         {/* yield area + line */}
         {showMetrics && yieldPath && (
@@ -351,19 +371,20 @@ export function OverviewChart({ history, fieldAvgYield, height = 260 }: Props) {
           </>
         )}
 
-        {/* raw data points */}
+        {/* raw data points — last point of each series */}
         {showRaw &&
-          rawCoords.map((c, i) => {
-            const isLast = i === rawCoords.length - 1;
+          rawPaths.map((s) => {
+            const last = s.coords[s.coords.length - 1];
+            if (!last) return null;
             return (
               <circle
-                key={`rp-${i}`}
-                cx={c.x.toFixed(2)}
-                cy={c.y.toFixed(2)}
-                r={isLast ? 4 : 2.5}
-                fill={isLast ? BLUE : SURF}
-                stroke={BLUE}
-                strokeWidth={1.5}
+                key={`rp-${s.key}`}
+                cx={last.x.toFixed(2)}
+                cy={last.y.toFixed(2)}
+                r={3}
+                fill={s.color}
+                stroke={SURF}
+                strokeWidth={1}
               />
             );
           })}
