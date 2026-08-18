@@ -8,8 +8,10 @@ import { SignalClassBadge } from "@/components/sigrank";
 import { ArchetypeChip } from "./ArchetypeChip";
 import { OverviewChart } from "./OverviewChart";
 import { TrophyRoom } from "./TrophyRoom";
-import { FieldScatter } from "./FieldScatter";
+import { TierScatter } from "./TierScatter";
+import { ArchetypeBubble } from "./ArchetypeBubble";
 import type { LeaderboardRow } from "@/lib/board";
+import { RS05_CLASS_THRESHOLDS } from "@/lib/analytics/ruleset";
 
 interface Props {
   history: HistoryPoint[];
@@ -232,12 +234,12 @@ export function OverviewTab({
             {TIER_DESC[tierBase(classTier)] ?? ""}
           </p>
 
-          {/* Field scatter */}
+          {/* Tier scatter — total tokens vs yield, with tier threshold lines */}
           <div className="flex flex-col gap-1">
             <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
-              Field position — Υ Yield vs Rank
+              Field position — total tokens vs Υ Yield (tier thresholds marked)
             </span>
-            <FieldScatter boardRows={boardRows} operatorCodename={operatorCodename} />
+            <TierScatter boardRows={boardRows} operatorCodename={operatorCodename} tierThresholds={RS05_CLASS_THRESHOLDS.map(t => ({ class: t.class, totalMin: t.totalMin }))} />
           </div>
 
           {/* Tier-relevant stats at bottom */}
@@ -314,6 +316,14 @@ export function OverviewTab({
                 <span className="font-mono text-[10px] leading-relaxed text-text-muted">
                   {archetype.definedBy}
                 </span>
+              </div>
+
+              {/* Bubble chart — leverage vs velocity, bubble size = construction */}
+              <div className="flex flex-col gap-1">
+                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-text-dim">
+                  Field composition — leverage vs velocity (bubble = construction)
+                </span>
+                <ArchetypeBubble boardRows={boardRows} operatorCodename={operatorCodename} />
               </div>
             </>
           )}
