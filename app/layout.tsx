@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Roboto, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
@@ -84,6 +85,13 @@ export default function RootLayout({
         </PostHogProvider>
         <SpeedInsights />
         <Analytics />
+        <Script
+          id="promptwatch-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var s=document.createElement('script');s.setAttribute('data-project-id','ada98bea-805c-4808-89e8-e56dbb9e199e');s.src='https://ingest.promptwatch.com/js/client.min.js';document.head.appendChild(s);})();`,
+          }}
+        />
       </body>
     </html>
   );
