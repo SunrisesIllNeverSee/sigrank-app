@@ -53,24 +53,44 @@ export function useBoardRealtime({ onRefresh, debounceMs = 2000 }: Options) {
       onRefresh();
     };
 
-    const channel = sb
-      .channel("board-realtime")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "metric_snapshots" },
-        debouncedRefresh,
-      )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "leaderboards_cached" },
-        debouncedRefresh,
-      )
-      .subscribe();
+    let channel: ReturnType<typeof sb.channel> | null = null;
+    try {
+      channel = sb
+        .channel("board-realtime")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "metric_snapshots" },
+          debouncedRefresh,
+        )
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "leaderboards_cached" },
+          debouncedRefresh,
+        )
+        .subscribe((status) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            try {
+              sb.removeChannel(channel!);
+            } catch {
+              // ignore
+            }
+            channelRef.current = null;
+          }
+        });
+    } catch {
+      // WebSocket may be blocked by CSP or unavailable (e.g. insecure context).
+      // Fail silently — the board still works via polling/refresh.
+      return;
+    }
 
     channelRef.current = channel;
 
     return () => {
-      sb.removeChannel(channel);
+      try {
+        sb.removeChannel(channel);
+      } catch {
+        // ignore cleanup errors
+      }
       channelRef.current = null;
     };
   }, [onRefresh, debounceMs]);

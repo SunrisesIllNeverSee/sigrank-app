@@ -86,7 +86,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.posthog.com https://*.supabase.co",
+              "connect-src 'self' https://*.posthog.com https://*.supabase.co wss://*.supabase.co",
               "frame-ancestors 'self'",
             ].join("; "),
           },
