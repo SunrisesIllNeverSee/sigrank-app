@@ -13,8 +13,8 @@ repo:
 
 structure:
   profile: product
-  allowed_root_dirs_extra: [__tests__, app, components, content, datasets, Devins_Plans, e2e, governance, lib, methodology, observatory, ontology, papers, research, supabase, workflows, system-devin]
-  allowed_root_files_extra: [banner.svg, lighthouserc.json, middleware.ts, NOTICE, playwright.config.ts, postcss.config.mjs, skills-lock.json, tailwind.config.ts, vitest.config.ts, vitest.setup.ts]
+  allowed_root_dirs_extra: [__tests__, app, components, content, datasets, Devins_Plans, e2e, governance, lib, methodology, observatory, ontology, papers, research, supabase, workflows, system-devin, .agents, .claude, .swc]
+  allowed_root_files_extra: [banner.svg, lighthouserc.json, middleware.ts, NOTICE, playwright.config.ts, postcss.config.mjs, skills-lock.json, tailwind.config.ts, vitest.config.ts, vitest.setup.ts, .env.example, .gitleaks.toml, .gitleaksignore]
   document_roots: [docs]
   artifact_roots: [artifacts]
   archive_roots: [archive, docs/archive]

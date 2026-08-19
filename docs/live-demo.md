@@ -1,3 +1,11 @@
+---
+type: Reference
+title: SignalAF Live Demo
+description: Single-screen 90-second demonstration of the SignalAF thesis (HUMAN × CONTEXT × MODEL).
+tags: [sigrank, signalaf, demo, live]
+timestamp: 2026-08-18
+---
+
 # SignalAF Live demo
 
 `/live` is a single-screen, 90-second demonstration of the SignalAF thesis:
