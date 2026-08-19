@@ -14,6 +14,9 @@
 | Lint | `npm run lint` |
 | Build | `npm run build` (needs Node 22; local machine has Node 25 — may fail) |
 | Dev server | `npm run dev` (needs Node 22; local machine has Node 25 — won't start) |
+| DNS-AID publish (sigeconomy.com) | `CLOUDFLARE_API_TOKEN=<dns-write> node scripts/dns-aid/cloudflare-dns-aid.mjs` |
+| DNS-AID publish (signalaf.com) | `PORKBUN_API_KEY=... PORKBUN_SECRET_API_KEY=... node scripts/dns-aid/porkbun-dns-aid.mjs` |
+| DNS-AID verify | `node scripts/dns-aid/verify-dns-aid.mjs [domain]` |
 
 **Bun (faster alternative):** All test/typecheck commands also work with Bun,
 which is ~10-30x faster than npm for install + script startup:
