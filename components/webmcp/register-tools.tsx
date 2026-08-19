@@ -15,12 +15,15 @@ import { useEffect } from "react";
 declare global {
   interface Navigator {
     modelContext?: {
-      registerTool: (tool: {
-        name: string;
-        description: string;
-        inputSchema: Record<string, unknown>;
-        execute: (input: Record<string, unknown>) => Promise<unknown>;
-      }) => Promise<unknown>;
+      registerTool: (
+        tool: {
+          name: string;
+          description: string;
+          inputSchema: Record<string, unknown>;
+          execute: (input: Record<string, unknown>) => Promise<unknown>;
+        },
+        options?: { signal?: AbortSignal },
+      ) => Promise<unknown>;
     };
   }
 }
@@ -71,7 +74,7 @@ export function WebMcpRegistrar() {
           }
           return entries;
         },
-      })
+      }, { signal: controller.signal })
       .catch(() => {});
 
     // Tool: get operator detail
@@ -97,7 +100,7 @@ export function WebMcpRegistrar() {
           );
           return await res.json();
         },
-      })
+      }, { signal: controller.signal })
       .catch(() => {});
 
     // Tool: get leaderboard
@@ -132,7 +135,7 @@ export function WebMcpRegistrar() {
           );
           return await res.json();
         },
-      })
+      }, { signal: controller.signal })
       .catch(() => {});
 
     // Tool: get methodology
@@ -149,7 +152,7 @@ export function WebMcpRegistrar() {
           const res = await fetch("https://signalaf.com/llms.txt");
           return await res.text();
         },
-      })
+      }, { signal: controller.signal })
       .catch(() => {});
 
     return () => controller.abort();
