@@ -94,6 +94,21 @@ export async function GET() {
       dataNotCollected: "Prompts, code, file contents, personal data",
       storage: "Signed, server-verifiable snapshots",
     },
+    // AP2 (Agent Payments Protocol) extension — declares SigRank's role in
+    // agentic commerce so AI agents can securely transact payments using
+    // cryptographically-signed mandates.
+    // Spec: https://ap2-protocol.org/
+    extensions: [
+      {
+        uri: "https://github.com/google-agentic-commerce/AP2/tree/v0.1.0",
+        description:
+          "Agent Payments Protocol — SigRank acts as a merchant, accepting payments for premium API access and operator scoring services.",
+        required: true,
+        params: {
+          roles: ["merchant"],
+        },
+      },
+    ],
   };
 
   return new NextResponse(JSON.stringify(card, null, 2), {
