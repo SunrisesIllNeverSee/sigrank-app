@@ -13,6 +13,7 @@ import { siteMetadata } from "@/lib/seo";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { WebMcpRegistrar } from "@/components/webmcp/register-tools";
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
 // foundation). Wired to the existing --font-geist-sans var name so all
@@ -85,6 +86,7 @@ export default function RootLayout({
         </PostHogProvider>
         <SpeedInsights />
         <Analytics />
+        <WebMcpRegistrar />
         <Script
           id="promptwatch-analytics"
           strategy="afterInteractive"
