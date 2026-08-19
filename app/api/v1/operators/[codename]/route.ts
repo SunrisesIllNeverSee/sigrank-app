@@ -10,6 +10,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { getOperator, isOperatorRetired } from "@/lib/board";
+import { computeBatchedWindows } from "@/lib/board/batched-windows";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 const GENERATED_AT = "2026-05-19T00:00:00Z";
@@ -56,6 +57,12 @@ export async function GET(
     operator.current_supporter_tier === "pro" ||
     operator.current_supporter_tier === "circle_sponsor";
   const driftRatio = isPrecision ? snapshot.drift_ratio : null;
+
+  // Batched windows: submission-based rolled-forward 90d and all-time totals.
+  // Computes from the append-only snapshot_submissions archive so all-time
+  // never decreases when platforms delete old session log files.
+  // Returns null when no submission history exists (graceful fallback).
+  const batched = await computeBatchedWindows(operator.operator_id);
 
   const body = {
     operator_id: operator.operator_id,
@@ -113,6 +120,26 @@ export async function GET(
           op_ratio: c.opRatio,
           cascade_str: c.cascadeStr,
           non_compounding: c.nonCompounding,
+        }
+      : {}),
+    // Batched windows — submission-based rolled-forward totals (never decrease).
+    // Present when the operator has submission history; absent for fresh/pending accounts.
+    ...(batched
+      ? {
+          batched: {
+            per_platform: Object.fromEntries(
+              Object.entries(batched.perPlatform).map(([plat, pw]) => [
+                plat,
+                {
+                  "90d": pw["90d"],
+                  all: pw.all,
+                  submission_count: pw.submissionCount,
+                  baseline_date: pw.baselineDate,
+                },
+              ]),
+            ),
+            combined: batched.combined,
+          },
         }
       : {}),
   };
