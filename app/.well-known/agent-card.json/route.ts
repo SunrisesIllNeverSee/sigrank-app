@@ -84,6 +84,13 @@ export async function GET() {
         description: "Head-to-head comparison of two operators",
         inputSchema: { a: "string", b: "string" },
       },
+      {
+        id: "discover-peers",
+        name: "Discover Peers and Mentors",
+        description:
+          "Find mentors (1-2 class tiers above with similar cascade shapes + pillar deltas), peers (same tier), and complementary operators (whose strength is your weakness). Uses enrolled device identity — no codename needed.",
+        inputSchema: { platform: "string", n: "number" },
+      },
     ],
     provider: {
       name: "SigRank SignalAF",
