@@ -73,6 +73,14 @@ export async function GET() {
           endpoint: mcpEndpoint,
           methods: ["MCP"],
         },
+        {
+          id: "peer-discovery",
+          name: "Peer and Mentor Discovery",
+          description:
+            "Find mentors (1-2 class tiers above with similar cascade shapes), peers (same tier), and complementary operators. Returns pillar deltas that explain yield gaps. Available via sigrank-mcp (discover_peers tool) and bestuser-router-mcp.",
+          endpoint: `${SITE_ORIGIN}/api/v1/leaderboard`,
+          methods: ["GET"],
+        },
       ],
     },
     authentication: {

@@ -105,6 +105,18 @@ export async function GET() {
           model: "free",
         },
       },
+      {
+        id: "peer-discovery",
+        name: "Peer and Mentor Discovery",
+        type: "data",
+        description:
+          "Find mentors (1-2 class tiers above with similar cascade shapes + pillar deltas), peers (same tier), and complementary operators (whose strength is your weakness). Available via sigrank-mcp discover_peers tool and bestuser-router-mcp. Also available as a WebMCP browser tool on sigeconomy.com.",
+        endpoint: `${SITE_ORIGIN}/api/v1/leaderboard`,
+        method: "GET",
+        pricing: {
+          model: "free",
+        },
+      },
     ],
     capabilities: {
       payment_protocols: ["x402", "stripe"],

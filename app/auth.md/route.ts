@@ -59,6 +59,29 @@ Write endpoints require a Supabase session cookie obtained via OAuth:
 - **Opt out:** POST https://signalaf.com/api/v1/account/data-opt-out
 - **Contact:** POST https://signalaf.com/api/v1/contact
 
+## Agent Workflow
+
+The full agent loop for an operator's AI assistant (via sigrank-mcp):
+
+1. **ENROLL** — bind your device with \`npx sigrank-mcp enroll <code>\`
+   (get the code at signalaf.com → Settings → New key)
+2. **SUBMIT** — publish verified snapshots with the \`submit_verified\` tool
+   (pulls local token logs, signs with ed25519, POSTs to /api/v1/snapshots)
+3. **DISCOVER** — find mentors and peers with the \`discover_peers\` tool
+   (uses your enrolled identity — no codename needed. Returns operators
+   1-2 class tiers above with similar cascade shapes + pillar deltas, same-tier
+   peers, and complementary operators whose strength is your weakness)
+4. **IMPROVE** — run \`self_improve\` for actionable suggestions
+   (diagnose cascade leaks, simulate changes, get ranked improvements)
+5. **REPEAT** — submit again after making changes to track your progress
+
+The discover → improve → submit loop is the core cycle. Each submission
+updates your yield on the board; each discover_peers call finds new mentors
+as you climb tiers.
+
+For browser-based agents: sigeconomy.com (the satellite site) exposes the
+same discover_peers capability via WebMCP (\`navigator.modelContext\`).
+
 ## Agent Registration
 
 ### Registration Methods
