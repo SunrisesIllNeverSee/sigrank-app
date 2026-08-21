@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { withX402 } from "@x402/next";
 import { x402Server, x402Config } from "@/lib/x402";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 const handler = async (request: NextRequest): Promise<NextResponse> => {
   const codename = request.nextUrl.searchParams.get("codename");
