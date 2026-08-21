@@ -87,6 +87,19 @@ export default function RootLayout({
         <SpeedInsights />
         <Analytics />
         <WebMcpRegistrar />
+        {/* Google Analytics 4 (gtag.js) — measurement ID G-YQCKR06LBH */}
+        <Script
+          id="ga4-gtag-src"
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-YQCKR06LBH"
+        />
+        <Script
+          id="ga4-gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQCKR06LBH');`,
+          }}
+        />
         <Script
           id="promptwatch-analytics"
           strategy="afterInteractive"
