@@ -2,31 +2,10 @@ import "server-only";
 
 /**
  * lib/api/gate.ts — CORPUS gate (Gate #3) for the public /api/v1 read endpoints.
- *
- * Problem (SIGRANK_EXPOSURE_AUDIT_RESULTS.md §5): the public API has no auth and
- * no rate-limit, so the verified corpus is bulk-accessible via large `limit`
- * values and per-operator sweeps.
- *
- * Policy:
- *   - Unauthenticated reads get TOP-N only (PUBLIC_TOP_N). Asking for more is
- *     silently clamped and the response carries a small `gated:true` note.
- *   - A valid `x-api-key` (matching SIGRANK_API_KEY) lifts the cap to API_KEY_CAP
- *     for bulk/full corpus reads.
- *   - Best-effort per-IP fixed-window rate-limit (defense-in-depth).
- *
- * Lives outside `app/` on purpose: Next.js `route.ts` files may ONLY export HTTP
- * handlers + route-segment config, so shared gate logic lives in a normal module
- * the three read routes import.
- *
- * NOTE on the normal path: the site's own board does NOT call these endpoints —
- * it reads server-side through the @/lib/data facade. These endpoints are for
- * EXTERNAL consumers, so gating them does not touch the site's own rendering.
- *
- * Every helper is total (never throws): a gate that can crash a read path is a
- * worse outage than the bulk access it prevents.
  */
 
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, type NextResponse } from "next/server";
+import { problemResponse } from "@/lib/infra/problem";
 
 /** Max entries an unauthenticated caller may read (the public "top N"). */
 export const PUBLIC_TOP_N = 2000;
@@ -35,17 +14,13 @@ export const PUBLIC_TOP_N = 2000;
 export const API_KEY_CAP = 5000;
 
 /** Per-IP request budget for list reads, per RATE_WINDOW_MS. */
-const LIST_RATE_LIMIT = 60;
+export const LIST_RATE_LIMIT = 60;
 
 /** Fixed-window length for the rate limiter, in milliseconds. */
-const RATE_WINDOW_MS = 60_000;
+export const RATE_WINDOW_MS = 60_000;
 
 /**
  * Is the request authenticated for bulk/full reads?
- *
- * True only when SIGRANK_API_KEY is set AND the `x-api-key` header matches it.
- * If the env is unset the API stays public-only — there is no implicit bypass.
- * No secret is stored here; the key is read from the environment at call time.
  */
 export function apiKeyValid(req: NextRequest): boolean {
   const expected = process.env.SIGRANK_API_KEY;
@@ -54,24 +29,11 @@ export function apiKeyValid(req: NextRequest): boolean {
   return provided != null && provided === expected;
 }
 
-/** Outcome of the list-size gate. */
 export interface ListGate {
-  /** The effective (possibly clamped) limit the caller is allowed to read. */
   limit: number;
-  /** True when the caller's request was clamped below what they asked for. */
   gated: boolean;
 }
 
-/**
- * Clamp a requested list size to what the caller is entitled to.
- *
- * Authenticated (valid key) → allow up to API_KEY_CAP.
- * Unauthenticated           → clamp to PUBLIC_TOP_N; `gated` is true only when
- *                             the caller actually asked for more than PUBLIC_TOP_N
- *                             (so a normal small request reports gated:false).
- *
- * `requestedLimit` is the caller's already-sanitized limit (finite, >= 1).
- */
 export function enforceListGate(
   req: NextRequest,
   requestedLimit: number,
@@ -87,25 +49,16 @@ export function enforceListGate(
 
 /** Outcome of a rate-limit check. */
 export interface RateResult {
-  /** False when the caller has exceeded their window budget. */
   ok: boolean;
-  /** Seconds until the current window resets (for the Retry-After header). */
+  /** Seconds until the current fixed window resets. */
   retryAfter: number;
+  limit: number;
+  remaining: number;
+  reset: number;
 }
 
-/**
- * In-memory fixed-window counters, keyed by client IP.
- *
- * TODO(RATELIMIT.DURABLE): this Map is per-serverless-instance, so it is
- * DEFENSE-IN-DEPTH only — it does not coordinate across instances and resets on
- * cold start. A real cross-instance limit needs a durable store; wire
- * @upstash/ratelimit (sliding window on Upstash Redis) for production-grade
- * enforcement. Until then this raises the cost of casual bulk access without
- * any external dependency.
- */
 const windowCounters = new Map<string, { count: number; resetAt: number }>();
 
-/** Best-effort client IP from the proxy chain (first x-forwarded-for hop). */
 function clientIp(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) {
@@ -115,12 +68,17 @@ function clientIp(req: NextRequest): string {
   return req.headers.get("x-real-ip")?.trim() || "unknown";
 }
 
-/**
- * Best-effort per-IP fixed-window rate limit for read endpoints.
- *
- * Never throws — any failure degrades open ({ ok:true }) so the gate can never
- * take down a read path. See windowCounters note re: per-instance scope.
- */
+function openRateResult(limit: number, windowMs: number): RateResult {
+  return {
+    ok: true,
+    retryAfter: 0,
+    limit,
+    remaining: limit,
+    reset: Math.ceil(windowMs / 1000),
+  };
+}
+
+/** Best-effort per-IP fixed-window rate limit for read endpoints. */
 export function rateLimit(req: NextRequest): RateResult {
   try {
     const now = Date.now();
@@ -129,65 +87,100 @@ export function rateLimit(req: NextRequest): RateResult {
 
     if (!entry || now >= entry.resetAt) {
       windowCounters.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
-      return { ok: true, retryAfter: 0 };
+      return {
+        ok: true,
+        retryAfter: 0,
+        limit: LIST_RATE_LIMIT,
+        remaining: LIST_RATE_LIMIT - 1,
+        reset: Math.ceil(RATE_WINDOW_MS / 1000),
+      };
     }
 
     entry.count += 1;
+    const reset = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
+    const remaining = Math.max(0, LIST_RATE_LIMIT - entry.count);
     if (entry.count > LIST_RATE_LIMIT) {
       return {
         ok: false,
-        retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
+        retryAfter: reset,
+        limit: LIST_RATE_LIMIT,
+        remaining: 0,
+        reset,
       };
     }
-    return { ok: true, retryAfter: 0 };
+    return {
+      ok: true,
+      retryAfter: 0,
+      limit: LIST_RATE_LIMIT,
+      remaining,
+      reset,
+    };
   } catch {
-    // Degrade open: a broken limiter must not break reads.
-    return { ok: true, retryAfter: 0 };
+    return openRateResult(LIST_RATE_LIMIT, RATE_WINDOW_MS);
   }
 }
 
-/** Build the standard 429 (rate-limited) response with a Retry-After header. */
-export function rateLimitedResponse(retryAfter: number): NextResponse {
-  return NextResponse.json(
-    {
-      status: "rate_limited",
-      detail:
-        "Too many requests. Slow down and retry after the indicated delay.",
-      retry_after: retryAfter,
-    },
-    {
-      status: 429,
-      headers: {
-        "Retry-After": String(retryAfter),
-        "Cache-Control": "no-store",
-      },
-    },
-  );
+/**
+ * IETF HTTPAPI RateLimit structured fields (draft-ietf-httpapi-ratelimit-headers)
+ * plus legacy field names used by existing clients and readiness probes.
+ */
+export function rateLimitHeaders(result: RateResult): Record<string, string> {
+  const windowSeconds = Math.ceil(RATE_WINDOW_MS / 1000);
+  return {
+    "RateLimit-Policy": `"public-api";q=${result.limit};w=${windowSeconds}`,
+    "RateLimit": `"public-api";r=${result.remaining};t=${result.reset}`,
+    "RateLimit-Limit": String(result.limit),
+    "RateLimit-Remaining": String(result.remaining),
+    "RateLimit-Reset": String(result.reset),
+  };
 }
 
-/** Build a 401 (unauthorized) response for endpoints that require an API key. */
+/** Build the standard 429 response. */
+export function rateLimitedResponse(result: RateResult | number): NextResponse {
+  const normalized =
+    typeof result === "number"
+      ? {
+          ok: false,
+          retryAfter: result,
+          limit: LIST_RATE_LIMIT,
+          remaining: 0,
+          reset: result,
+        }
+      : result;
+
+  return problemResponse({
+    status: 429,
+    title: "Too Many Requests",
+    detail: "The public API request budget for this window has been exhausted.",
+    code: "rate_limited",
+    hint: `Retry after ${normalized.retryAfter} seconds and use the RateLimit headers to self-throttle.`,
+    type: "https://signalaf.com/developers#errors",
+    headers: {
+      ...rateLimitHeaders(normalized),
+      "Retry-After": String(normalized.retryAfter),
+    },
+  });
+}
+
+/** Build a 401 response for endpoints that require an API key. */
 export function unauthorizedResponse(detail: string): NextResponse {
-  return NextResponse.json(
-    { status: "unauthorized", detail },
-    { status: 401, headers: { "Cache-Control": "no-store" } },
-  );
+  return problemResponse({
+    status: 401,
+    title: "Unauthorized",
+    detail,
+    code: "unauthorized",
+    hint: "See https://signalaf.com/auth.md for supported authentication methods.",
+    type: "https://signalaf.com/developers#authentication",
+  });
 }
 
-/** Best-effort client IP — exported for write endpoints that log created_ip (§4.2). */
 export function getClientIp(req: NextRequest): string {
   return clientIp(req);
 }
 
-/** Per-IP budget + window for the device mint/enroll endpoints (brute-force defense). */
 const ENROLL_RATE_LIMIT = 10;
-const ENROLL_WINDOW_MS = 600_000; // 10 minutes
+const ENROLL_WINDOW_MS = 600_000;
 
-/**
- * Stricter per-IP fixed-window limit for the device mint-code / enroll endpoints
- * (§4.2/§4.3). Bucketed key (`enroll:<ip>`) so it never shares counters with the
- * read-path rateLimit(). With ~75-bit codes + 10-min expiry + one live code per
- * operator, this cap makes brute force infeasible. Degrades open on any error.
- */
 export function enrollRateLimit(req: NextRequest): RateResult {
   try {
     const now = Date.now();
@@ -195,17 +188,25 @@ export function enrollRateLimit(req: NextRequest): RateResult {
     const entry = windowCounters.get(key);
     if (!entry || now >= entry.resetAt) {
       windowCounters.set(key, { count: 1, resetAt: now + ENROLL_WINDOW_MS });
-      return { ok: true, retryAfter: 0 };
-    }
-    entry.count += 1;
-    if (entry.count > ENROLL_RATE_LIMIT) {
       return {
-        ok: false,
-        retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
+        ok: true,
+        retryAfter: 0,
+        limit: ENROLL_RATE_LIMIT,
+        remaining: ENROLL_RATE_LIMIT - 1,
+        reset: Math.ceil(ENROLL_WINDOW_MS / 1000),
       };
     }
-    return { ok: true, retryAfter: 0 };
+    entry.count += 1;
+    const reset = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
+    const remaining = Math.max(0, ENROLL_RATE_LIMIT - entry.count);
+    return {
+      ok: entry.count <= ENROLL_RATE_LIMIT,
+      retryAfter: entry.count > ENROLL_RATE_LIMIT ? reset : 0,
+      limit: ENROLL_RATE_LIMIT,
+      remaining,
+      reset,
+    };
   } catch {
-    return { ok: true, retryAfter: 0 };
+    return openRateResult(ENROLL_RATE_LIMIT, ENROLL_WINDOW_MS);
   }
 }
