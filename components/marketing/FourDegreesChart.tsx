@@ -521,9 +521,9 @@ export async function FourDegreesChart({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
+        <h2 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           The Four Degrees of Leverage
-        </h1>
+        </h2>
         <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
           Read it as a token cascade:{" "}
           <strong className="text-text-primary">Cache : Input : Output</strong>.

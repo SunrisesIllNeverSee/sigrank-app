@@ -58,6 +58,8 @@ export interface WaveHeroProps {
   terminalText?: string;
   /** Compact mode: ~25% size for TOC/preview cards. */
   compact?: boolean;
+  /** Heading level: "h1" (default) or "h2" (for sub-sections / card titles). */
+  headingLevel?: "h1" | "h2";
 }
 
 export function WaveHero({
@@ -66,6 +68,7 @@ export function WaveHero({
   subtitle,
   terminalText,
   compact = false,
+  headingLevel = "h1",
 }: WaveHeroProps) {
   return (
     // w-full so the masthead exactly fills its max-w-6xl page container (the same
@@ -119,6 +122,7 @@ export function WaveHero({
           title={title}
           terminalText={terminalText}
           compact={compact}
+          headingLevel={headingLevel}
         />
         {subtitle ? (
           <p

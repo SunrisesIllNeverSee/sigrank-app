@@ -14,7 +14,7 @@ export const metadata: Metadata = withOG({
 
 export default function MeasuredAlongsidePage() {
   return (
-    <TopicPage>
+    <TopicPage title="Measured Alongside">
       <JsonLd
         data={[
           breadcrumb([

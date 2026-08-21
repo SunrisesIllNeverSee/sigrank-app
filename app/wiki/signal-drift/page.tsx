@@ -14,7 +14,7 @@ export const metadata: Metadata = withOG({
 
 export default function SignalDriftPage() {
   return (
-    <TopicPage>
+    <TopicPage title="Signature Drift">
       <JsonLd
         data={[
           breadcrumb([
