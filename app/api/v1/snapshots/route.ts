@@ -435,6 +435,26 @@ export async function POST(req: NextRequest) {
       );
     }
     persisted = true;
+
+    // Update last_seen on the device + operator so engagement tracking works.
+    // Without this, last_seen stays at created_at forever and it looks like no
+    // one ever comes back (the submission timestamps are the only source of truth).
+    // Fire-and-forget — never block the response on this.
+    if (svc) {
+      const nowIso = new Date().toISOString();
+      void Promise.resolve(
+        svc
+          .from("devices")
+          .update({ last_seen: nowIso })
+          .eq("device_id", device.device_id),
+      ).catch(() => {});
+      void Promise.resolve(
+        svc
+          .from("operators")
+          .update({ last_seen: nowIso })
+          .eq("operator_id", device.operator_id),
+      ).catch(() => {});
+    }
   }
 
   // Response: real operator_id when the device is known; deterministic handles otherwise.
