@@ -118,6 +118,7 @@ export default async function FieldHubPage() {
             </>
           }
           compact
+          headingLevel="h2"
         />
       </Link>
 
@@ -135,6 +136,7 @@ export default async function FieldHubPage() {
             </>
           }
           compact
+          headingLevel="h2"
         />
       </Link>
     </div>

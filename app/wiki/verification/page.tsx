@@ -14,7 +14,7 @@ export const metadata: Metadata = withOG({
 
 export default function VerificationPage() {
   return (
-    <TopicPage>
+    <TopicPage title="Verification & Integrity Tests">
       <JsonLd
         data={[
           breadcrumb([

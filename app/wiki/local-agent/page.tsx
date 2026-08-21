@@ -14,7 +14,7 @@ export const metadata: Metadata = withOG({
 
 export default function LocalAgentPage() {
   return (
-    <TopicPage>
+    <TopicPage title="The Local Agent (MCP)">
       <JsonLd
         data={[
           breadcrumb([

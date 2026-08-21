@@ -18,7 +18,7 @@ export const revalidate = 86400;
 
 export default function FourDegreesPage() {
   return (
-    <TopicPage>
+    <TopicPage title="The Four Degrees of Leverage">
       <JsonLd
         data={[
           breadcrumb([

@@ -13,7 +13,7 @@
 import React from "react";
 import Link from "next/link";
 
-export function TopicPage({ children }: { children: React.ReactNode }) {
+export function TopicPage({ children, title }: { children: React.ReactNode; title?: string }) {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
       <Link
@@ -22,6 +22,11 @@ export function TopicPage({ children }: { children: React.ReactNode }) {
       >
         ← Wiki
       </Link>
+      {title && (
+        <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl">
+          {title}
+        </h1>
+      )}
       {children}
       <div className="mt-4 border-t border-bg-border-subtle pt-4">
         <Link

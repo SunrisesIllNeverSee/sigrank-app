@@ -23,9 +23,11 @@ export interface WaveHeroTitleProps {
   terminalText?: string;
   /** Compact mode: ~25% size for TOC/preview cards. */
   compact?: boolean;
+  /** Heading level: "h1" (default) or "h2" (for sub-sections / card titles). */
+  headingLevel?: "h1" | "h2";
 }
 
-export function WaveHeroTitle({ title, terminalText, compact = false }: WaveHeroTitleProps) {
+export function WaveHeroTitle({ title, terminalText, compact = false, headingLevel = "h1" }: WaveHeroTitleProps) {
   const [isTerminal, setIsTerminal] = useState(false);
 
   useEffect(() => {
@@ -59,8 +61,9 @@ export function WaveHeroTitle({ title, terminalText, compact = false }: WaveHero
     );
   }
 
+  const Tag = headingLevel === "h2" ? "h2" : "h1";
   return (
-    <h1
+    <Tag
       className={
         compact
           ? "font-mono text-base font-bold tracking-wide text-text-primary sm:text-lg"
@@ -68,6 +71,6 @@ export function WaveHeroTitle({ title, terminalText, compact = false }: WaveHero
       }
     >
       {title}
-    </h1>
+    </Tag>
   );
 }

@@ -90,9 +90,9 @@ export function VerificationTests() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
+        <h2 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           Verification &amp; Integrity Tests
-        </h1>
+        </h2>
         <P>
           SigRank ranks operators on token telemetry. The obvious question:{" "}
           <em>

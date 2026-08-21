@@ -134,6 +134,14 @@ const markdownComponents: Components = {
       />
     );
   },
+  // Markdown `#` headings render as <h2> — the page already has an <h1> for the
+  // blog title (line ~212). Without this override, every `#` section in the
+  // markdown becomes a duplicate <h1>, which is an SEO structural error.
+  h1: ({ children }) => (
+    <h2 className="font-sans text-xl font-bold leading-tight text-text-primary md:text-2xl mt-8 mb-4">
+      {children}
+    </h2>
+  ),
 };
 
 export default async function BlogPost({
