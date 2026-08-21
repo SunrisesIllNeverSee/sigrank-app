@@ -178,7 +178,7 @@ Before modifying any of the following, load the relevant canon context:
 ### How to load canon context
 
 ```bash
-export SEARCH_AUTHORITY_PATH="${SEARCH_AUTHORITY_PATH:-$HOME/Developer/active/search-authority}"
+export SEARCH_AUTHORITY_PATH="${SEARCH_AUTHORITY_PATH:-$HOME/Developer/_control/search-authority}"
 python3 "$SEARCH_AUTHORITY_PATH/canon_cli.py" context sigrank
 ```
 
