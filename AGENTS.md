@@ -130,12 +130,6 @@ file in this repo — not just the database. This includes:
 This is non-negotiable. An opt-out is not complete while the operator's name
 or handle still appears in any tracked file in this repo.
 
-## Coordination
-
-This repo is worked on by Drep1 (lead) and Drep2 (one-off tasks) via
-`~/Developer/active/SigRank-repos/D-REP-SCRATCH.md`. All task assignment and reporting
-goes through that scratchpad. Do not bypass it.
-
 ## Google Search Console (GSC)
 
 GSC is verified via service account + DNS — NOT in this repo. Do not search for a
