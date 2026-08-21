@@ -9,7 +9,7 @@ repo:
   lifecycle: superseded
   repo_id: sigrank_app
   family: sigrank
-  purpose: SigRank SignalAF — AI operator evaluation leaderboard. Ranks how efficiently you use AI by token cascade efficiency. Privacy-preserving: token counts only, never prompt content.
+  purpose: 'SigRank SignalAF — AI operator evaluation leaderboard. Ranks how efficiently you use AI by token cascade efficiency. Privacy-preserving: token counts only, never prompt content.'
 
 structure:
   profile: product
