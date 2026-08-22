@@ -75,6 +75,14 @@ export default function RootLayout({
       url: `${SITE_ORIGIN}/contact`,
       availableLanguage: ["en"],
     },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "84 W Utica St",
+      addressLocality: "Buffalo",
+      addressRegion: "NY",
+      postalCode: "14209",
+      addressCountry: "US",
+    },
   };
 
   return (
