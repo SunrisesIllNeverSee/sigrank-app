@@ -4,6 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Space_Grotesk, Bitter, Archivo_Black } from "next/font/google";
 import "./wordmark.css";
 
+// Wordmark font pool — used ONLY here (the rotating SIGRANK logo on the
+// homepage). Moved from app/layout.tsx so these 3 font families don't
+// load on every page on the site. Each letter of "SIGRANK" cycles through
+// these via the .wordmark-letter CSS animation in globals.css.
 const wmGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["700"],
@@ -26,6 +30,23 @@ const wmBlack = Archivo_Black({
   preload: false,
 });
 
+/**
+ * RotatingWordmark — the landing hero wordmark, EXAGGERATED.
+ *
+ * "SIGRANK" rendered letter-by-letter, each letter independently cycling
+ * through a small font pool (mono → grotesk → serif → archivo-black) on a
+ * per-letter stagger, so the word visibly morphs across faces without changing
+ * in unison. Driven by the `.wordmark-letter` / `@keyframes wordmark-rotate`
+ * rule in globals.css; per-letter delay is set inline via the --wm-delay var.
+ *
+ * Hero-scale: clamped huge (up to ~9rem), heavy weight, tight tracking. The §
+ * coin sits after the word. Reduced-motion locks every letter to the mono face.
+ *
+ * Self-gates: renders null when data-theme === 'terminal' (the TerminalWordmark
+ * takes over the hero under that theme). Watches data-theme via MutationObserver.
+ * The semantic page H1 is server-rendered by Draft2Hero; this animated treatment
+ * is exposed as an image-like accessible brand label to avoid a duplicate H1.
+ */
 const WORD = "SIGRANK".split("");
 
 export function RotatingWordmark() {
@@ -59,6 +80,8 @@ export function RotatingWordmark() {
           <span
             key={i}
             aria-hidden
+            // i===0 is the S — gets the extra wordmark-letter-s class so it
+            // briefly swaps to § (the MO§ES™ glyph) on the serif keyframe slot.
             className={
               i === 0 ? "wordmark-letter wordmark-letter-s" : "wordmark-letter"
             }
