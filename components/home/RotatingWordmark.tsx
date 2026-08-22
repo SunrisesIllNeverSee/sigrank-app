@@ -44,6 +44,8 @@ const wmBlack = Archivo_Black({
  *
  * Self-gates: renders null when data-theme === 'terminal' (the TerminalWordmark
  * takes over the hero under that theme). Watches data-theme via MutationObserver.
+ * The semantic page H1 is server-rendered by Draft2Hero; this animated treatment
+ * is exposed as an image-like accessible brand label to avoid a duplicate H1.
  */
 const WORD = "SIGRANK".split("");
 
@@ -69,8 +71,9 @@ export function RotatingWordmark() {
 
   return (
     <div className={`${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} flex flex-wrap items-center justify-center gap-x-3 gap-y-2`}>
-      <h1
+      <div
         aria-label="SIGRANK"
+        role="img"
         className="flex select-none items-baseline text-[clamp(3.5rem,13vw,9rem)] font-bold leading-none tracking-[0.04em] text-gold"
       >
         {WORD.map((ch, i) => (
@@ -87,7 +90,7 @@ export function RotatingWordmark() {
             {ch}
           </span>
         ))}
-      </h1>
+      </div>
       <span className="flex h-[clamp(2.5rem,7vw,5rem)] w-[clamp(2.5rem,7vw,5rem)] items-center justify-center rounded-full border-[3px] border-gold font-mono text-[clamp(1.25rem,3.5vw,2.5rem)] text-gold">
         §
       </span>

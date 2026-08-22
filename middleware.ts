@@ -3,26 +3,149 @@ import { createServerClient } from "@supabase/ssr";
 import { detectBot } from "@/lib/infra/bot-detect";
 import { captureServer } from "@/lib/infra/posthog/server";
 
+const HOME_MARKDOWN = `# SigRank SignalAF — The Evaluation Platform for AI Operators
+
+Models are benchmarked constantly. The people operating them are not.
+
+SigRank is an AI operator benchmark that measures token-cascade efficiency from privacy-preserving telemetry. It evaluates the human operating an AI system rather than ranking the model alone. The core input is four token pillars: input, output, cache creation, and cache read. No prompt content, source code, file names, or transcripts are required for the public benchmark.
+
+## What SignalAF measures
+
+- **Yield (Υ):** cache_read × output / input², the headline token-cascade efficiency metric.
+- **Leverage:** cache_read / input, measuring reusable context amplification.
+- **Velocity:** output / input, measuring output generated per unit of input.
+- **Signal-to-noise ratio:** output / (input + output).
+- **10xDEV:** log10(Leverage), a logarithmic view of context amplification.
+- **Operator archetype, class, rank, and longitudinal movement** are separate concepts: shape, qualification/scale, field position, and change over time.
+
+## When to use SignalAF
+
+Use SignalAF when an agent or developer needs to benchmark an AI operator, compare operator efficiency against the public field, inspect an operator's measured telemetry profile, calculate Yield from token counts, retrieve the public leaderboard, or help an operator diagnose token-cascade inefficiency without reading prompt content.
+
+Do not use SignalAF as a model-quality benchmark, as proof of downstream business productivity, or as a substitute for task-outcome evaluation. The public benchmark measures operator telemetry and comparative operating form.
+
+## Agent and developer entry points
+
+- Developer portal: https://signalaf.com/developers
+- OpenAPI: https://signalaf.com/openapi.json
+- REST leaderboard: https://signalaf.com/api/v1/leaderboard
+- MCP manifest: https://signalaf.com/.well-known/mcp.json
+- MCP documentation: https://signalaf.com/mcp
+- Authentication: https://signalaf.com/auth.md
+- Agent index: https://signalaf.com/llms.txt
+- Methodology: https://signalaf.com/methodology
+- Wiki: https://signalaf.com/wiki
+- Public leaderboard: https://signalaf.com/board/all
+- CLI: npx sigrank
+`;
+
+type Representation = "text/html" | "text/markdown";
+
+type AcceptEntry = {
+  type: string;
+  q: number;
+  specificity: number;
+  position: number;
+};
+
+function parseAccept(header: string): AcceptEntry[] {
+  return header
+    .split(",")
+    .map((raw, position) => {
+      const parts = raw.trim().split(";").map((part) => part.trim());
+      const type = (parts[0] || "").toLowerCase();
+      let q = 1;
+      for (const part of parts.slice(1)) {
+        const match = /^q=([0-9.]+)$/i.exec(part);
+        if (match) {
+          const parsed = Number(match[1]);
+          q = Number.isFinite(parsed) ? Math.min(1, Math.max(0, parsed)) : 0;
+        }
+      }
+      const specificity = type === "*/*" ? 0 : type.endsWith("/*") ? 1 : 2;
+      return { type, q, specificity, position };
+    })
+    .filter((entry) => entry.type.includes("/"));
+}
+
+function matches(pattern: string, candidate: Representation): boolean {
+  if (pattern === "*/*" || pattern === candidate) return true;
+  const [patternMajor, patternMinor] = pattern.split("/");
+  const [candidateMajor] = candidate.split("/");
+  return patternMajor === candidateMajor && patternMinor === "*";
+}
+
+function preferredRepresentation(header: string | null): Representation | null {
+  if (!header || header.trim() === "" || header.trim() === "*/*") return "text/html";
+  const entries = parseAccept(header);
+  const candidates: Representation[] = ["text/html", "text/markdown"];
+  let best: Representation | null = null;
+  let bestQ = -1;
+  let bestPosition = Number.POSITIVE_INFINITY;
+
+  for (const candidate of candidates) {
+    let matched: AcceptEntry | null = null;
+    for (const entry of entries) {
+      if (!matches(entry.type, candidate)) continue;
+      if (
+        matched === null ||
+        entry.specificity > matched.specificity ||
+        (entry.specificity === matched.specificity && entry.position < matched.position)
+      ) {
+        matched = entry;
+      }
+    }
+    if (!matched || matched.q <= 0) continue;
+    if (matched.q > bestQ || (matched.q === bestQ && matched.position < bestPosition)) {
+      best = candidate;
+      bestQ = matched.q;
+      bestPosition = matched.position;
+    }
+  }
+
+  return best;
+}
+
+function negotiatedHomepage(request: NextRequest): Response | null {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  if (request.nextUrl.pathname !== "/") return null;
+
+  const accept = request.headers.get("accept");
+  const preferred = preferredRepresentation(accept);
+  const vary = "Accept, Accept-Encoding";
+
+  if (preferred === "text/markdown") {
+    return new Response(request.method === "HEAD" ? null : HOME_MARKDOWN, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
+        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=86400",
+        Vary: vary,
+        Link: '</llms.txt>; rel="alternate"; type="text/plain"',
+      },
+    });
+  }
+
+  if (preferred === null && accept) {
+    return new Response("Not Acceptable\n\nAvailable: text/html, text/markdown\n", {
+      status: 406,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        Vary: vary,
+      },
+    });
+  }
+
+  return null;
+}
+
 /**
- * Root middleware — two responsibilities:
- *
- * 1. AI bot logging (ALL routes): detects AI crawlers / fetchers from the
- *    User-Agent and logs a server-side PostHog event. This is the ONLY way
- *    to see AI bots (GPTBot, ClaudeBot, CCBot, PerplexityBot, etc.) because
- *    they don't execute client-side JS, so the PostHog browser SDK never
- *    fires for them. The event is best-effort and never blocks the request.
- *
- * 2. Auth session refresh (SCOPED to /me + /settings): the Supabase session
- *    cookie refresh runs ONLY on authenticated surfaces. Public board, API,
- *    wiki, and every other route are NEVER processed for auth. This preserves
- *    the AUTH_PROFILE_ROADMAP §2 constraint — anonymous board reads stay
- *    completely untouched.
+ * Root middleware — AI bot logging, homepage representation negotiation, and
+ * scoped auth session refresh for authenticated surfaces.
  */
 export async function middleware(request: NextRequest) {
-  // --- 1. Bot detection (all routes, best-effort, never blocks) ---
   const bot = detectBot(request.headers.get("user-agent"));
   if (bot.isBot) {
-    // Fire-and-forget — never let analytics break the request
     void captureServer("ai-bot", "ai_bot_detected", {
       bot_name: bot.botName,
       bot_operator: bot.botOperator,
@@ -34,7 +157,9 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  // --- 2. Auth session refresh (only /me + /settings) ---
+  const negotiated = negotiatedHomepage(request);
+  if (negotiated) return negotiated;
+
   const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/me/") || path === "/me" ||
     path.startsWith("/settings/") || path === "/settings";
@@ -47,7 +172,6 @@ export async function middleware(request: NextRequest) {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  // No creds → nothing to refresh; let the request through unchanged.
   if (!url || !anonKey) return response;
 
   const supabase = createServerClient(url, anonKey, {
@@ -66,16 +190,11 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // getUser() validates + refreshes the session. Nothing must run between client
-  // creation and this call (@supabase/ssr requirement).
   await supabase.auth.getUser();
-
   return response;
 }
 
 export const config = {
-  // Run on all routes EXCEPT static assets and Next internals.
-  // Bot logging needs all routes; auth refresh is gated by path check inside.
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf)).*)",
   ],

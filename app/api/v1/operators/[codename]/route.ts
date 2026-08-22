@@ -11,7 +11,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getOperator, isOperatorRetired } from "@/lib/board";
 import { computeBatchedWindows } from "@/lib/board/batched-windows";
-import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
+import {
+  rateLimit,
+  rateLimitHeaders,
+  rateLimitedResponse,
+} from "@/lib/infra/api-gate";
+import { problemResponse } from "@/lib/infra/problem";
 
 const GENERATED_AT = "2026-05-19T00:00:00Z";
 
@@ -23,29 +28,36 @@ export async function GET(
   // (defense-in-depth). Single-operator reads have no list limit, so only the
   // rate limit applies here.
   const rl = rateLimit(req);
-  if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
+  if (!rl.ok) return rateLimitedResponse(rl);
 
   const { codename } = await params;
 
   // Retired operators (opt-out): no profile data via API. They stay on the
   // leaderboard with their tokens but have no profile endpoint.
   if (await isOperatorRetired(codename)) {
-    return NextResponse.json(
-      { status: "retired", detail: "This operator has opted out and has no public profile." },
-      { status: 404 },
-    );
+    return problemResponse({
+      status: 404,
+      title: "Operator profile unavailable",
+      detail: "This operator has opted out and has no public profile.",
+      code: "operator_retired",
+      hint: "Use the public leaderboard for non-profile aggregate ranking data.",
+      type: "https://signalaf.com/developers#errors",
+      instance: req.nextUrl.pathname,
+    });
   }
 
   const row = await getOperator(codename);
 
   if (!row) {
-    return NextResponse.json(
-      {
-        status: "not_found",
-        detail: `No operator with codename "${codename}".`,
-      },
-      { status: 404 },
-    );
+    return problemResponse({
+      status: 404,
+      title: "Operator not found",
+      detail: `No operator with codename "${codename}".`,
+      code: "operator_not_found",
+      hint: "Check the codename or query the public leaderboard for current operators.",
+      type: "https://signalaf.com/developers#errors",
+      instance: req.nextUrl.pathname,
+    });
   }
 
   const { operator, snapshot } = row;
@@ -69,7 +81,7 @@ export async function GET(
     codename: operator.codename,
     display_name: operator.display_name,
     claimed: operator.claimed,
-    class_tier: snapshot.class_tier, // UPPERCASE canonical SignalClass
+    class_tier: snapshot.class_tier,
     platform: operator.primary_domain,
     supporter_tier: operator.current_supporter_tier,
     verification_status: operator.verification_status,
@@ -148,6 +160,7 @@ export async function GET(
     headers: {
       "Cache-Control":
         "public, max-age=120, s-maxage=120, stale-while-revalidate=600",
+      ...rateLimitHeaders(rl),
     },
   });
 }

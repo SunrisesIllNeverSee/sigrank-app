@@ -1,12 +1,9 @@
 import React from "react";
+import Link from "next/link";
 import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
 
 /**
- * Draft2CtaBand — the closing conversion band for /draft2.
- *
- * A single high-contrast call-to-action after the value + trust case has been
- * made: the canonical closing micro-line ("Four integers in, full ledger out")
- * over the two primary actions. Server component, static copy, native tokens.
+ * Draft2CtaBand — the closing conversion band for the homepage.
  */
 export function Draft2CtaBand() {
   return (
@@ -23,9 +20,22 @@ export function Draft2CtaBand() {
         projected rank in under a minute.
       </p>
 
-      {/* same four action tiles as the hero, with the premium shine-sweep glint
-          (owner 2026-06-22: "flash fade" on the CTA boxes). */}
       <Draft2ActionTiles className="mt-8" shine />
+
+      <p className="mt-7 font-mono text-xs text-text-muted">
+        Building against SignalAF?{" "}
+        <Link href="/developers" className="text-gold hover:text-text-primary">
+          Developer portal
+        </Link>{" "}
+        ·{" "}
+        <Link href="/openapi.json" className="text-gold hover:text-text-primary">
+          OpenAPI
+        </Link>{" "}
+        ·{" "}
+        <Link href="/mcp" className="text-gold hover:text-text-primary">
+          MCP
+        </Link>
+      </p>
     </section>
   );
 }

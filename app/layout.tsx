@@ -9,7 +9,7 @@ import { Footer } from "@/components/ui/Footer";
 import { ThemeCycleShortcut } from "@/components/ui/ThemeCycleShortcut";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organization, website, product } from "@/lib/jsonld";
-import { siteMetadata } from "@/lib/seo";
+import { SITE_ORIGIN, siteMetadata } from "@/lib/seo";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
@@ -66,6 +66,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const org = {
+    ...organization(),
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "hello@signalaf.com",
+      url: `${SITE_ORIGIN}/contact`,
+      availableLanguage: ["en"],
+    },
+  };
+
   return (
     <html
       lang="en"
@@ -74,7 +85,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${articleSerif.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
-        <JsonLd data={[organization(), website(), product()]} />
+        <JsonLd data={[org, website(), product()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <PostHogProvider>
           <ThemeCycleShortcut />
