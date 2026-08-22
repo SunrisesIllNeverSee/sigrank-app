@@ -6,8 +6,8 @@ import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
 // Lazy-load the wordmark components — they're client islands with font
 // downloads (Space_Grotesk, Bitter, Archivo_Black) + MutationObserver setup.
 // Code-splitting keeps their JS (and the 3 wordmark fonts) in a separate
-// chunk that loads after the critical path. SSR is preserved so the <h1>
-// (SIGRANK) stays in the initial HTML for SEO.
+// chunk that loads after the critical path. SSR is preserved while the visible
+// lead-in below owns the canonical server-rendered <h1>.
 const RotatingWordmark = dynamic(
   () => import("@/components/home/RotatingWordmark").then((m) => m.RotatingWordmark),
 );
@@ -24,11 +24,11 @@ const TerminalWordmark = dynamic(
  * (Measure / Board / Compare / Info·Wiki) → "Identifying Burners, Builders, and
  * 10×ers." → SIGNAL AF.
  *
- * The wordmark owns the only <h1> (the SIGRANK reveal); the "Introducing…" line is
- * a lead-in <p>, so the page has exactly one h1. CascadeHeader + RotatingWordmark
- * are reused from the live landing ("like the original") — never forked. Server
- * component: both are client islands rendered as children, never imported into a
- * client file. No props, no data reads.
+ * The visible intro line owns the only semantic <h1> so it is present in raw
+ * server HTML; the animated SIGRANK wordmarks are decorative brand treatments.
+ * CascadeHeader + RotatingWordmark are reused from the live landing ("like the
+ * original") — never forked. Server component: both are client islands rendered
+ * as children, never imported into a client file. No props, no data reads.
  */
 export function Draft2Hero() {
   return (
@@ -36,11 +36,11 @@ export function Draft2Hero() {
       <CascadeHeader slowFactor={1.8} />
 
       <div className="relative z-10 flex flex-col items-center gap-5">
-        {/* intro line (lead-in above the logo) */}
-        <p className="font-mono text-base font-bold leading-tight tracking-tight text-text-primary sm:whitespace-nowrap md:text-xl lg:text-2xl">
+        {/* intro line — canonical server-rendered H1 */}
+        <h1 className="font-mono text-base font-bold leading-tight tracking-tight text-text-primary sm:whitespace-nowrap md:text-xl lg:text-2xl">
           The evaluation platform for{" "}
           <span className="text-gold">AI operators</span>
-        </p>
+        </h1>
         <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary sm:text-base">
           Models are benchmarked constantly. The people operating them are not.
         </p>
