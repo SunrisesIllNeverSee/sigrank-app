@@ -20,6 +20,8 @@ test("homepage markdown negotiation exposes the required media type, Vary, q par
   assert.match(middleware, /\^q=/);
   assert.match(middleware, /status: 406/);
   assert.match(middleware, /HOME_MARKDOWN/);
+  assert.match(middleware, /isHomepageHtml/);
+  assert.match(middleware, /response\.headers\.set\("Vary", "Accept, Accept-Encoding"\)/);
 });
 
 test("web 404 includes deterministic agent recovery links", async () => {
