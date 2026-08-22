@@ -15,13 +15,24 @@ test("homepage H1 is server-rendered, not owned by client wordmark", async () =>
 
 test("homepage markdown negotiation exposes the required media type, Vary, q parsing and 406", async () => {
   const middleware = await source("middleware.ts");
+  const vercel = JSON.parse(await source("vercel.json"));
   assert.match(middleware, /text\/markdown; charset=utf-8/);
   assert.match(middleware, /Accept, Accept-Encoding/);
   assert.match(middleware, /\^q=/);
   assert.match(middleware, /status: 406/);
   assert.match(middleware, /HOME_MARKDOWN/);
-  assert.match(middleware, /isHomepageHtml/);
-  assert.match(middleware, /response\.headers\.set\("Vary", "Accept, Accept-Encoding"\)/);
+
+  const rootRoute = vercel.routes?.find((route) => route.src === "^/$");
+  assert.ok(rootRoute, "vercel edge config must match the homepage");
+  const varyTransform = rootRoute.transforms?.find(
+    (transform) =>
+      transform.type === "response.headers" &&
+      transform.op === "append" &&
+      transform.target?.key?.toLowerCase() === "vary",
+  );
+  assert.ok(varyTransform, "homepage must append Vary at the final edge response layer");
+  assert.deepEqual(varyTransform.args, ["Accept", "Accept-Encoding"]);
+  assert.equal(rootRoute.continue, true);
 });
 
 test("web 404 includes deterministic agent recovery links", async () => {
