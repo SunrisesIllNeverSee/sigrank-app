@@ -161,18 +161,11 @@ export async function middleware(request: NextRequest) {
   if (negotiated) return negotiated;
 
   const path = request.nextUrl.pathname;
-  const isHomepageHtml = path === "/" &&
-    (request.method === "GET" || request.method === "HEAD") &&
-    preferredRepresentation(request.headers.get("accept")) === "text/html";
   const isAuthRoute = path.startsWith("/me/") || path === "/me" ||
     path.startsWith("/settings/") || path === "/settings";
 
   if (!isAuthRoute) {
-    const response = NextResponse.next({ request });
-    if (isHomepageHtml) {
-      response.headers.set("Vary", "Accept, Accept-Encoding");
-    }
-    return response;
+    return NextResponse.next({ request });
   }
 
   let response = NextResponse.next({ request });
