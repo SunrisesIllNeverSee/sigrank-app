@@ -97,10 +97,16 @@ test("MCP manifest points to a Streamable HTTP endpoint with a valid lifecycle i
   assert.match(mcp, /message\.method === "tools\/call"/);
 });
 
-test("organization JSON-LD exposes the published SignalAF support contact", async () => {
+test("organization JSON-LD exposes the published SignalAF support contact and postal address", async () => {
   const layout = await source("app/layout.tsx");
   assert.match(layout, /"@type": "ContactPoint"/);
   assert.match(layout, /contactType: "customer support"/);
   assert.match(layout, /hello@signalaf\.com/);
   assert.match(layout, /SITE_ORIGIN.*contact/);
+  assert.match(layout, /"@type": "PostalAddress"/);
+  assert.match(layout, /84 W Utica St/);
+  assert.match(layout, /addressLocality: "Buffalo"/);
+  assert.match(layout, /addressRegion: "NY"/);
+  assert.match(layout, /postalCode: "14209"/);
+  assert.match(layout, /addressCountry: "US"/);
 });
