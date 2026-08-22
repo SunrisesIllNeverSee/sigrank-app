@@ -40,13 +40,16 @@ test("unknown REST routes use RFC 9457 problem responses", async () => {
   assert.match(catchall, /status: 404/);
 });
 
-test("public leaderboard advertises rate-limit state and 429 recovery", async () => {
+test("public REST reads advertise rate-limit state and typed errors", async () => {
   const gate = await source("lib/infra/api-gate.ts");
   const leaderboard = await source("app/api/v1/leaderboard/route.ts");
+  const operator = await source("app/api/v1/operators/[codename]/route.ts");
   assert.match(gate, /RateLimit-Policy/);
   assert.match(gate, /RateLimit-Remaining/);
   assert.match(gate, /Retry-After/);
   assert.match(leaderboard, /rateLimitHeaders\(rl\)/);
+  assert.match(operator, /rateLimitHeaders\(rl\)/);
+  assert.match(operator, /operator_not_found/);
 });
 
 test("OpenAPI defines typed reusable Problem responses", async () => {
@@ -90,4 +93,12 @@ test("MCP manifest points to a Streamable HTTP endpoint with a valid lifecycle i
   assert.match(mcp, /message\.method === "notifications\/initialized"/);
   assert.match(mcp, /message\.method === "tools\/list"/);
   assert.match(mcp, /message\.method === "tools\/call"/);
+});
+
+test("organization JSON-LD exposes the published SignalAF support contact", async () => {
+  const layout = await source("app/layout.tsx");
+  assert.match(layout, /"@type": "ContactPoint"/);
+  assert.match(layout, /contactType: "customer support"/);
+  assert.match(layout, /hello@signalaf\.com/);
+  assert.match(layout, /SITE_ORIGIN.*contact/);
 });
