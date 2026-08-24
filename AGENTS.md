@@ -87,6 +87,31 @@ scripts/      — Utility scripts (snapshot-db.mjs)
 public/       — Static assets
 ```
 
+## GitHub hygiene (mandatory)
+
+**No personalizations in GitHub titles or commit messages.**
+
+This is non-negotiable. Personal names, handles, emails, or identifying
+information must NEVER appear in:
+
+- PR titles
+- Issue titles
+- Commit messages (subject or body)
+- Branch names
+- PR/issue descriptions
+
+Use neutral, technical language only. Examples:
+
+- GOOD: `fix(pricing): unified perks box instead of hollow tier cells`
+- BAD: `Deric's pricing fix` or `fix by djm`
+
+The git author/committer name and email are set by the local git config and
+are not part of the commit message — those are fine. The rule applies to the
+human-readable text content of titles and messages.
+
+If an agent (Devin, Vercel Agent, or any other) adds personalizations to a
+title or commit message, reject and rewrite before pushing.
+
 ## Deploy
 
 Push to `main` → Vercel auto-builds → signalaf.com. No manual `vercel --prod`.
