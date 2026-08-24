@@ -24,18 +24,27 @@ test("homepage markdown negotiation exposes the required media type, Vary, q par
   // Markdown response must not be CDN-cached — prevents Vary: Accept
   // from fragmenting the HTML cache.
   assert.match(middleware, /private, no-store/);
+  // Bot-gated Vary: middleware sets Vary for AI bots only (no CDN
+  // fragmentation for browser visitors).
+  assert.match(middleware, /bot\.isBot/);
+  assert.match(middleware, /isHomepage && bot\.isBot/);
   // vercel.json must NOT append Vary to the homepage — that fragments
   // the CDN cache across browser Accept variations.
   const rootRoute = vercel.routes?.find((route) => route.src === "^/$");
   assert.equal(rootRoute, undefined, "vercel.json must not have a homepage Vary route");
 });
 
-test("web 404 includes deterministic agent recovery links", async () => {
+test("web 404 includes deterministic agent recovery links and markdown negotiation", async () => {
   const page = await source("app/not-found.tsx");
+  const middleware = await source("middleware.ts");
   assert.match(page, /sitemap\.xml/);
   assert.match(page, /llms\.txt/);
   assert.match(page, /openapi\.json/);
   assert.match(page, /developers/);
+  // Middleware must serve a markdown 404 body to agents asking for markdown
+  assert.match(middleware, /NOT_FOUND_MARKDOWN/);
+  assert.match(middleware, /negotiatedNotFound/);
+  assert.match(middleware, /status: 404/);
 });
 
 test("unknown REST routes use RFC 9457 problem responses", async () => {
@@ -52,12 +61,25 @@ test("public REST reads advertise rate-limit state and typed errors", async () =
   const gate = await source("lib/infra/api-gate.ts");
   const leaderboard = await source("app/api/v1/leaderboard/route.ts");
   const operator = await source("app/api/v1/operators/[codename]/route.ts");
+  const hall = await source("app/api/v1/hall-of-signal/route.ts");
+  const leaders = await source("app/api/v1/metrics/leaders/route.ts");
+  const challenges = await source("app/api/v1/challenges/route.ts");
   assert.match(gate, /RateLimit-Policy/);
   assert.match(gate, /RateLimit-Remaining/);
   assert.match(gate, /Retry-After/);
   assert.match(leaderboard, /rateLimitHeaders\(rl\)/);
   assert.match(operator, /rateLimitHeaders\(rl\)/);
+  assert.match(hall, /rateLimitHeaders\(rl\)/);
+  assert.match(leaders, /rateLimitHeaders\(rl\)/);
+  assert.match(challenges, /rateLimit\(req\)/);
+  assert.match(challenges, /rateLimitHeaders\(rl\)/);
   assert.match(operator, /operator_not_found/);
+});
+
+test("API responses advertise deprecation policy via Link header", async () => {
+  const middleware = await source("middleware.ts");
+  assert.match(middleware, /deprecation-policy/);
+  assert.match(middleware, /\/developers#versioning/);
 });
 
 test("OpenAPI defines typed reusable Problem responses", async () => {

@@ -20,6 +20,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { resolveAuth } from "@/lib/infra/api-auth";
+import { rateLimit, rateLimitHeaders, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 const DEFAULT_WINDOW_HOURS = 24;
 const DEFAULT_BRIEF =
@@ -207,6 +208,9 @@ export async function POST(req: NextRequest) {
 // GET — list recent challenges
 // ---------------------------------------------------------------------------
 export async function GET(req: NextRequest) {
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl);
+
   const { searchParams } = new URL(req.url);
   const codename = searchParams.get("codename") ?? "";
   const format = searchParams.get("format") ?? "";
@@ -214,7 +218,10 @@ export async function GET(req: NextRequest) {
 
   const sb = getSupabaseServer();
   if (!sb) {
-    return NextResponse.json({ challenges: [], mock: true });
+    return NextResponse.json(
+      { challenges: [], mock: true },
+      { headers: rateLimitHeaders(rl) },
+    );
   }
 
   let q = sb
@@ -257,5 +264,8 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ challenges: data ?? [] });
+  return NextResponse.json(
+    { challenges: data ?? [] },
+    { headers: rateLimitHeaders(rl) },
+  );
 }

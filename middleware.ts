@@ -106,6 +106,54 @@ function preferredRepresentation(header: string | null): Representation | null {
   return best;
 }
 
+const NOT_FOUND_MARKDOWN = `# 404 — SignalAF resource not found
+
+The requested path does not exist on signalaf.com.
+
+## Recovery map
+
+- Sitemap: https://signalaf.com/sitemap.xml
+- Agent index: https://signalaf.com/llms.txt
+- Developer portal: https://signalaf.com/developers
+- OpenAPI: https://signalaf.com/openapi.json
+- Documentation: https://signalaf.com/wiki
+- MCP manifest: https://signalaf.com/.well-known/mcp.json
+- Methodology: https://signalaf.com/methodology
+
+If this URL was linked from an external source, the page may exist as HTML.
+Retry with \`Accept: text/html\` or visit the URL in a browser.
+`;
+
+function isApiOrStaticPath(path: string): boolean {
+  if (path.startsWith("/api/")) return true;
+  if (path.startsWith("/_next/")) return true;
+  if (path.startsWith("/.well-known/")) return true;
+  if (/\.(svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf|md)$/.test(path)) return true;
+  return false;
+}
+
+function negotiatedNotFound(request: NextRequest): Response | null {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const path = request.nextUrl.pathname;
+  if (path === "/" || isApiOrStaticPath(path)) return null;
+
+  const accept = request.headers.get("accept");
+  const preferred = preferredRepresentation(accept);
+
+  if (preferred === "text/markdown") {
+    return new Response(request.method === "HEAD" ? null : NOT_FOUND_MARKDOWN, {
+      status: 404,
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
+        "Cache-Control": "private, no-store",
+        Vary: "Accept, Accept-Encoding",
+      },
+    });
+  }
+
+  return null;
+}
+
 function negotiatedHomepage(request: NextRequest): Response | null {
   if (request.method !== "GET" && request.method !== "HEAD") return null;
   if (request.nextUrl.pathname !== "/") return null;
@@ -162,12 +210,35 @@ export async function middleware(request: NextRequest) {
   const negotiated = negotiatedHomepage(request);
   if (negotiated) return negotiated;
 
+  const notFoundMd = negotiatedNotFound(request);
+  if (notFoundMd) return notFoundMd;
+
   const path = request.nextUrl.pathname;
+  const isHomepage = path === "/";
+  const isApiPath = path.startsWith("/api/v1/");
   const isAuthRoute = path.startsWith("/me/") || path === "/me" ||
     path.startsWith("/settings/") || path === "/settings";
 
   if (!isAuthRoute) {
-    return NextResponse.next({ request });
+    const response = NextResponse.next({ request });
+    // Bot-gated Vary: Accept — gives AI agents the Vary header for
+    // acceptmarkdown.com compliance without fragmenting the CDN cache
+    // for browser visitors (who send varied Accept strings).
+    // Next.js 15.5 may strip this on the final HTML response; the
+    // markdown response already carries Vary and is private/no-store,
+    // so cache collision is impossible regardless.
+    if (isHomepage && bot.isBot) {
+      response.headers.set("Vary", "Accept, Accept-Encoding");
+    }
+    // Deprecation policy discovery — point agents at the versioning
+    // and deprecation policy on every /api/v1/ response.
+    if (isApiPath) {
+      response.headers.set(
+        "Link",
+        '</developers#versioning>; rel="deprecation-policy"',
+      );
+    }
+    return response;
   }
 
   let response = NextResponse.next({ request });
