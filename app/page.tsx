@@ -308,6 +308,22 @@ export default async function HomePage() {
           </Link>
           .
         </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          The dataset spans {operatorCount.toLocaleString()} human operators
+          across 17 platforms and 3,304 models, with{" "}
+          {formatTokens(homeStats.total_tokens_scored)} tokens analyzed. The
+          median Yield is {medianYield.toFixed(2)}, and the top operator
+          achieves a Yield of {homeStats.top_signa_rate.toLocaleString()}. The
+          full methodology, metric definitions, and evidence boundary are
+          documented at{" "}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            /methodology
+          </Link>
+          . The anonymized research dataset is available on Zenodo (DOI:
+          10.5281/zenodo.21900519) under a CC-BY-4.0 license. The theoretical
+          foundation, the Conservation Law of Commitment, is published
+          separately (Zenodo: 10.5281/zenodo.20029607).
+        </p>
       </section>
 
       {/* The four degrees of leverage — our show-stopper, directly under the hero
