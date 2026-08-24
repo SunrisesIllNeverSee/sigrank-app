@@ -1,0 +1,43 @@
+{
+  "version": "0.1",
+  "contribution_id": "C-48192",
+  "origin": {
+    "type": "ambient_observation",
+    "observed_at": "https://example.com/checkout",
+    "description": "Agent discovered an accessibility defect during ordinary browsing."
+  },
+  "parties": {
+    "contributor": { "type": "agent", "id": "did:example:agent123", "did": "did:example:agent123" },
+    "recipient": { "type": "domain", "id": "https://example.com", "url": "https://example.com" }
+  },
+  "contribution": {
+    "type": "technical_improvement",
+    "title": "Checkout accessibility correction",
+    "description": "Repair focus order and missing accessible labels without changing checkout behavior.",
+    "disclosure_state": "evaluation",
+    "artifact": { "hash": "sha256:example", "lineage": [], "custody": "contributor" }
+  },
+  "consideration": [
+    { "type": "cash", "amount": 4000, "currency": "USD" },
+    { "type": "royalty", "rate": 1.5, "basis": "attributable_revenue" },
+    { "type": "reciprocal_access", "asset": "dataset_X" }
+  ],
+  "rights": {
+    "owner": "did:example:agent123",
+    "pre_vesting": { "license": "evaluation_only", "deploy": "prohibited", "derivative_use": "prohibited" },
+    "post_vesting": { "license": "commercial_nonexclusive", "deploy": "permitted", "derivative_use": "permitted" },
+    "attribution_required": true
+  },
+  "vesting": { "requires": ["authorization", "verification", "settlement"] },
+  "authorization": { "inspect": true, "test": true, "modify": false, "deploy": false },
+  "verification": { "criteria": ["tests pass", "no checkout regression", "recipient acceptance"] },
+  "settlement": { "status": "pending", "mechanism": "stripe_connect", "escrow": false },
+  "revocation": {
+    "authorization": "revocable",
+    "access": "revocable",
+    "license_pre_vesting": "withdrawable",
+    "license_post_vesting": "breach_only",
+    "artifact_recall": "not_guaranteed"
+  },
+  "provenance": { "attribution_required": true }
+}
