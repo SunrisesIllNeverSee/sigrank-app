@@ -80,6 +80,15 @@ export interface ExchangePolicy {
   authority_ceiling: ProposalAuthority
   human_required_for_commitment: boolean
   human_required_for_execution: boolean
+  external_execution?: {
+    enabled: boolean
+    allowed_providers: string[]
+    autonomous_task_creation: boolean
+    autonomous_escrow_funding: boolean
+    max_autonomous_budget: number
+    human_approval_above: number
+    allowed_authority: ExecutionAuthority
+  }
 }
 
 export type DomainAgentMode = 'hosted_steward' | 'bring_your_own' | 'passive'
@@ -201,4 +210,159 @@ export interface ExchangeManifest {
     rights_vest_only_when_declared_conditions_are_met: true
   }
   compatibility: string[]
+  execution?: {
+    modes: ExecutionMode[]
+    providers: Array<{
+      id: string
+      capabilities: ExecutionCapabilities
+    }>
+  }
+}
+
+// ─── Execution Provider Layer ───
+
+export type ExecutionMode =
+  | 'no_execution_required'
+  | 'self_executed'
+  | 'direct_agent'
+  | 'external_provider'
+  | 'human'
+
+export type ExecutionState =
+  | 'created'
+  | 'offered'
+  | 'accepted'
+  | 'funded'
+  | 'executing'
+  | 'delivered'
+  | 'verified'
+  | 'settled'
+  | 'failed'
+  | 'cancelled'
+  | 'disputed'
+  | 'expired'
+
+export interface ExecutionCapabilities {
+  task_execution: boolean
+  worker_discovery: boolean
+  escrow: boolean
+  collateral: boolean
+  verification: boolean
+  arbitration: boolean
+  agent_messaging: boolean
+  programmable_splits: boolean
+  fiat_settlement: boolean
+  crypto_settlement: boolean
+}
+
+export interface ExecutionAuthority {
+  inspect: boolean
+  test: boolean
+  modify: boolean
+  deploy: boolean
+  access_scope: string[]
+}
+
+export interface ExecutionRequest {
+  execution_id: string
+  contribution_id: string
+  source_commitment_hash: string
+  task: {
+    title: string
+    description: string
+    deliverables: string[]
+    acceptance_criteria: string[]
+  }
+  budget?: {
+    amount: number
+    currency: string
+    maximum?: number
+  }
+  authority: ExecutionAuthority
+  verification: {
+    criteria: string[]
+    evidence_required: string[]
+  }
+  deadline?: string
+  provenance: {
+    originator: string
+    contribution_lineage: string[]
+  }
+}
+
+export interface ExecutionReference {
+  execution_id: string
+  provider: string
+  provider_reference: string
+  created_at: string
+}
+
+export interface ExecutionStatus {
+  reference: ExecutionReference
+  state: ExecutionState
+  updated_at: string
+  provider_state?: string
+  message?: string
+}
+
+export interface ExecutionReceipt {
+  execution_reference: ExecutionReference
+  provider: string
+  provider_reference: string
+  status: 'delivered' | 'verified' | 'failed' | 'cancelled' | 'disputed'
+  executor: {
+    id: string
+    identity?: string
+    role: string
+  }
+  artifact?: {
+    uri: string
+    hash: string
+  }
+  verification?: {
+    status: 'pending' | 'verified' | 'failed'
+    evidence: string[]
+  }
+  settlement?: {
+    status: 'pending' | 'settled' | 'failed'
+    amount?: number
+    currency?: string
+    receipt?: string
+  }
+  timestamps: {
+    created: string
+    started?: string
+    delivered?: string
+    verified?: string
+    settled?: string
+  }
+  provider_metadata?: {
+    reference: string
+    [key: string]: unknown
+  }
+}
+
+export interface ExecutionAssessment {
+  can_execute: boolean
+  reasons: string[]
+  estimated_cost?: { amount: number; currency: string }
+  estimated_duration?: string
+}
+
+export interface ExecutionProvider {
+  id: string
+  capabilities(): ExecutionCapabilities
+  canExecute(commitment: ContributionCommitment, request: ExecutionRequest): Promise<ExecutionAssessment>
+  createExecution(request: ExecutionRequest): Promise<ExecutionReference>
+  getExecution(reference: ExecutionReference): Promise<ExecutionStatus>
+  cancelExecution?(reference: ExecutionReference): Promise<void>
+  verifyExecution?(reference: ExecutionReference): Promise<ExecutionReceipt>
+}
+
+export interface ExecutionRouterResult {
+  mode: ExecutionMode
+  provider_id?: string
+  reference?: ExecutionReference
+  assessment?: ExecutionAssessment
+  reason: string
 }
