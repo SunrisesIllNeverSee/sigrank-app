@@ -19,11 +19,11 @@ const freeFeatures = [
 ];
 
 const earlyTiers = [
-  { range: "1–100", label: "Founding operators", perk: "Permanent free access, priority features, direct input on roadmap" },
-  { range: "101–250", label: "Early operators", perk: "Permanent free access, early feature access" },
-  { range: "251–500", label: "Build-stage operators", perk: "Permanent free access" },
-  { range: "501–750", label: "Build-stage operators", perk: "Permanent free access" },
-  { range: "751–1000", label: "Launch operators", perk: "Permanent free access" },
+  { range: "1–100", label: "Founding operators" },
+  { range: "101–250", label: "Early operators" },
+  { range: "251–500", label: "Build-stage operators" },
+  { range: "501–750", label: "Build-stage operators" },
+  { range: "751–1000", label: "Launch operators" },
 ];
 
 export default function PricingPage() {
@@ -77,9 +77,20 @@ export default function PricingPage() {
           sign up, the more perks you keep. Specific perks are being finalized,
           but your signup position is locked the moment you join.
         </p>
-        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          Examples of what early tiers receive:
-        </p>
+
+        <div className="mt-4 rounded-lg border border-bg-border bg-bg-surface p-5">
+          <h3 className="font-mono text-sm font-bold text-text-primary">
+            What early operators get
+          </h3>
+          <ul className="mt-3 space-y-2 font-sans text-sm text-text-secondary">
+            <li>Permanent free access to all current and future public features</li>
+            <li>Special features and tools built specifically for early operators that will not be available to later users</li>
+            <li>Priority access to new capabilities before they launch publicly</li>
+            <li>Direct input on roadmap and product direction — the earlier you join, the more weight your voice carries</li>
+            <li>Permanent recognition as a founding or build-stage operator on your profile</li>
+          </ul>
+        </div>
+
         <div className="mt-4 overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -87,11 +98,8 @@ export default function PricingPage() {
                 <th className="py-2 pr-4 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
                   Signup #
                 </th>
-                <th className="py-2 pr-4 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
-                  Tier
-                </th>
                 <th className="py-2 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
-                  What they get
+                  Tier
                 </th>
               </tr>
             </thead>
@@ -101,11 +109,8 @@ export default function PricingPage() {
                   <td className="py-3 pr-4 font-mono text-text-primary">
                     {tier.range}
                   </td>
-                  <td className="py-3 pr-4 font-sans text-text-primary">
+                  <td className="py-3 font-sans text-text-primary">
                     {tier.label}
-                  </td>
-                  <td className="py-3 font-sans text-text-secondary">
-                    {tier.perk}
                   </td>
                 </tr>
               ))}
@@ -113,8 +118,8 @@ export default function PricingPage() {
           </table>
         </div>
         <p className="mt-3 font-sans text-xs leading-relaxed text-text-tertiary">
-          Additional perks are being finalized. The tier structure and
-          signup-order commitment will not change.
+          The earlier your tier, the more of the above you receive. The tier
+          structure and signup-order commitment will not change.
         </p>
       </section>
 
