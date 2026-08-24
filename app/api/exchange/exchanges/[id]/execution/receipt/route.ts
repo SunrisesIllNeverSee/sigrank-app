@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SubmitReceiptSchema } from '@/exchange-gateway/src/schema'
-import { getProvider } from '@/exchange-gateway/src/execution-router'
 import { updateInternalExecutionState } from '@/exchange-gateway/src/providers/internal'
 import { appendExchangeEvent, authenticateCompany, authenticateProposer, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
 
@@ -23,7 +22,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Exchange must be in delivering, delivered, or verified state to accept execution receipts' }, { status: 409 })
   }
 
-  // Either the company admin or the proposer can submit a receipt
   const companyKey = req.headers.get('x-exchange-company-key')
   const proposerKey = req.headers.get('x-exchange-proposer-key')
   const isCompany = await authenticateCompany(record.target_domain, companyKey)
@@ -46,7 +44,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const receipt = parsed.data.receipt
 
-  // Verify the execution exists
   const { data: execution } = await admin.from('exchange_executions')
     .select('*')
     .eq('execution_id', receipt.execution_reference.execution_id)
@@ -57,8 +54,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Execution not found for this exchange' }, { status: 404 })
   }
 
-  // Persist the receipt
-  await admin.from('exchange_execution_receipts').insert({
+  if (
+    receipt.provider !== execution.provider ||
+    receipt.execution_reference.provider !== execution.provider ||
+    receipt.provider_reference !== execution.provider_reference ||
+    receipt.execution_reference.provider_reference !== execution.provider_reference
+  ) {
+    return NextResponse.json({ error: 'Receipt provider reference does not match the persisted execution' }, { status: 409 })
+  }
+
+  if (execution.provider !== 'internal' && !isCompany) {
+    return NextResponse.json({ error: 'External execution receipts require company-principal ingestion until provider authentication is configured' }, { status: 403 })
+  }
+
+  const { error: receiptError } = await admin.from('exchange_execution_receipts').insert({
     execution_id: receipt.execution_reference.execution_id,
     exchange_id: record.id,
     provider: receipt.provider,
@@ -72,52 +81,43 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     provider_metadata: receipt.provider_metadata ?? null,
     raw: receipt,
   })
+  if (receiptError) return NextResponse.json({ error: 'Execution receipt persistence failed' }, { status: 500 })
 
-  // Update execution state
   const newState = receipt.status === 'verified' ? 'verified' : receipt.status === 'delivered' ? 'delivered' : receipt.status === 'failed' ? 'failed' : receipt.status === 'cancelled' ? 'cancelled' : receipt.status === 'disputed' ? 'disputed' : 'delivered'
-  await admin.from('exchange_executions').update({ state: newState, updated_at: new Date().toISOString() }).eq('execution_id', receipt.execution_reference.execution_id)
+  const { error: executionError } = await admin.from('exchange_executions')
+    .update({ state: newState, updated_at: new Date().toISOString() })
+    .eq('execution_id', receipt.execution_reference.execution_id)
+    .eq('exchange_id', record.id)
+  if (executionError) return NextResponse.json({ error: 'Execution state update failed' }, { status: 500 })
 
-  // Update internal provider state if applicable
   if (receipt.provider === 'internal') {
     updateInternalExecutionState(receipt.execution_reference.execution_id, newState)
   }
 
-  // Move the exchange forward if the receipt indicates delivery or verification
-  if (receipt.status === 'delivered' && record.state === 'delivering') {
-    await admin.from('exchange_records').update({ state: 'delivered', updated_at: new Date().toISOString() }).eq('id', record.id)
-    await appendExchangeEvent({
-      exchangeId: record.id,
-      eventType: 'execution_receipt_delivered',
-      actor: { type: isCompany ? 'company' : 'proposer', id: isCompany ? record.target_domain : 'proposer' },
-      fromState: 'delivering',
-      toState: 'delivered',
-      payload: { execution_id: receipt.execution_reference.execution_id, provider: receipt.provider, artifact_hash: receipt.artifact?.hash },
-    })
-  } else if (receipt.status === 'verified' && record.state !== 'verified' && record.state !== 'settled') {
-    await admin.from('exchange_records').update({ state: 'verified', updated_at: new Date().toISOString() }).eq('id', record.id)
-    await appendExchangeEvent({
-      exchangeId: record.id,
-      eventType: 'execution_receipt_verified',
-      actor: { type: isCompany ? 'company' : 'proposer', id: isCompany ? record.target_domain : 'proposer' },
-      fromState: record.state,
-      toState: 'verified',
-      payload: { execution_id: receipt.execution_reference.execution_id, provider: receipt.provider, verification_status: receipt.verification?.status },
-    })
-  } else {
-    await appendExchangeEvent({
-      exchangeId: record.id,
-      eventType: 'execution_receipt_submitted',
-      actor: { type: isCompany ? 'company' : 'proposer', id: isCompany ? record.target_domain : 'proposer' },
-      fromState: record.state as any,
-      toState: record.state as any,
-      payload: { execution_id: receipt.execution_reference.execution_id, provider: receipt.provider, status: receipt.status },
-    })
-  }
+  await appendExchangeEvent({
+    exchangeId: record.id,
+    eventType: 'execution_receipt_submitted',
+    actor: { type: isCompany ? 'company' : 'proposer', id: isCompany ? record.target_domain : 'proposer' },
+    fromState: record.state as any,
+    toState: record.state as any,
+    payload: {
+      execution_id: receipt.execution_reference.execution_id,
+      provider: receipt.provider,
+      execution_status: receipt.status,
+      artifact_hash: receipt.artifact?.hash,
+      verification_status: receipt.verification?.status,
+      authoritative_exchange_state_advanced: false,
+    },
+  })
 
   return NextResponse.json({
     accepted: true,
     execution_id: receipt.execution_reference.execution_id,
-    status: receipt.status,
-    exchange_state: receipt.status === 'delivered' ? 'delivered' : receipt.status === 'verified' ? 'verified' : undefined,
+    execution_status: receipt.status,
+    exchange_state: record.state,
+    authoritative_exchange_state_advanced: false,
+    next: receipt.status === 'delivered' || receipt.status === 'verified'
+      ? 'Use the governed exchange transition endpoint to evaluate and advance Contribution Exchange state independently.'
+      : undefined,
   })
 }
