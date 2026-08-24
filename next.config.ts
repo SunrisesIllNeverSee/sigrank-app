@@ -127,6 +127,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/docs",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/documentation",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
         source: "/wiki/three-degrees",
         destination: "/wiki/four-degrees",
         permanent: true,

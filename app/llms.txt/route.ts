@@ -34,6 +34,7 @@ Do not use SignalAF as a model-quality leaderboard, proof of downstream business
 
 ## Developer and agent resources
 - [Developer Portal](${SITE_ORIGIN}/developers): API quickstart, errors, rate limits, versioning, authentication, MCP, CLI
+- [Pricing](${SITE_ORIGIN}/pricing): SignalAF is free — public leaderboard, API, MCP, CLI, and score calculator at no cost
 - [OpenAPI](${SITE_ORIGIN}/openapi.json): machine-readable REST API contract
 - [Authentication](${SITE_ORIGIN}/auth.md): public reads, OAuth/session writes, API-key conventions
 - [MCP Manifest](${SITE_ORIGIN}/.well-known/mcp.json): Streamable HTTP + stdio discovery
