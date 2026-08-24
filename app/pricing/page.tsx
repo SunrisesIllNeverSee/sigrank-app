@@ -3,9 +3,9 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: "Pricing — SignalAF is Free · SigRank SignalAF",
+  title: "Pricing — Free During Build Stage · SigRank SignalAF",
   description:
-    "SignalAF is free. The public leaderboard, REST API, MCP server, CLI, and score calculator are all free. Optional support and premium insights are available.",
+    "SignalAF is free during the build stage. Early users who sign up now are grandfathered into tiered perks based on their signup number. Public leaderboard, REST API, MCP server, CLI, and score calculator are all free.",
   path: "/pricing",
 });
 
@@ -18,6 +18,14 @@ const freeFeatures = [
   ["Field analysis", "/field", "1,498 operator field distribution and statistics"],
 ];
 
+const earlyTiers = [
+  { range: "1–100", label: "Founding operators", perk: "Maximum perks — the earliest supporters get the most" },
+  { range: "101–250", label: "Early operators", perk: "Strong perks — still early, still rewarded" },
+  { range: "251–500", label: "Build-stage operators", perk: "Build-stage perks" },
+  { range: "501–750", label: "Build-stage operators", perk: "Build-stage perks" },
+  { range: "751–1000", label: "Launch operators", perk: "Launch-window perks" },
+];
+
 export default function PricingPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
@@ -25,17 +33,22 @@ export default function PricingPage() {
         SignalAF pricing
       </p>
       <h1 className="mt-3 font-mono text-3xl font-bold text-text-primary sm:text-4xl">
-        SignalAF is free
+        Free during the build stage
       </h1>
       <p className="mt-4 max-w-3xl font-sans text-base leading-relaxed text-text-secondary">
-        The public SigRank benchmark is free to use. The leaderboard, REST API,
-        MCP server, CLI, score calculator, and field analysis are all available
-        at no cost. No credit card, no trial, no freemium gates.
+        SignalAF is free right now. The public leaderboard, REST API, MCP server,
+        CLI, score calculator, and field analysis are all available at no cost
+        during the active build stage. No credit card, no trial, no freemium gates.
+      </p>
+      <p className="mt-3 max-w-3xl font-sans text-base leading-relaxed text-text-secondary">
+        Pricing may change as the platform matures. Operators who sign up during
+        the build stage keep their access and receive tiered perks based on when
+        they joined.
       </p>
 
       <section className="mt-10">
         <h2 className="font-mono text-xl font-bold text-text-primary">
-          What is free
+          What is free now
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {freeFeatures.map(([title, href, desc]) => (
@@ -53,6 +66,54 @@ export default function PricingPage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-mono text-xl font-bold text-text-primary">
+          Early operator perks
+        </h2>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          Operators who sign up during the build stage are grandfathered into
+          perks based on their signup number. The earlier you join, the more you
+          keep. Specific perks are being finalized, but the tier structure is
+          locked:
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-bg-border">
+                <th className="py-2 pr-4 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
+                  Signup #
+                </th>
+                <th className="py-2 pr-4 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
+                  Tier
+                </th>
+                <th className="py-2 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
+                  Perks
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {earlyTiers.map((tier) => (
+                <tr key={tier.range} className="border-b border-bg-border/50">
+                  <td className="py-3 pr-4 font-mono text-text-primary">
+                    {tier.range}
+                  </td>
+                  <td className="py-3 pr-4 font-sans text-text-primary">
+                    {tier.label}
+                  </td>
+                  <td className="py-3 font-sans text-text-secondary">
+                    {tier.perk}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 font-sans text-xs leading-relaxed text-text-tertiary">
+          Perk details are being finalized. The tier structure and signup-order
+          commitment will not change.
+        </p>
       </section>
 
       <section className="mt-10">
