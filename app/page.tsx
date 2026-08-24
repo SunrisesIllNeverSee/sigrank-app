@@ -277,6 +277,39 @@ export default async function HomePage() {
         Last updated: August 14, 2026
       </p>
 
+      {/* ── Plain-text product description (AEO + content efficiency) — gives AI
+          crawlers a dense, indexable summary of what SigRank is and does. ── */}
+      <section className="mx-auto w-full max-w-3xl">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank is the evaluation platform for AI operators — the humans using
+          AI tools, not the AI models themselves. It ranks operators by Yield
+          (Υ = cache_read × output / input²), a composite efficiency metric
+          computed from four token pillars: cache_read (reused context),
+          cache_write (new context stored), input (tokens sent to the model),
+          and output (tokens produced). Unlike model leaderboards such as LMSYS
+          Chatbot Arena that rank AI models by human voting, SigRank measures
+          the human factor — how efficiently each operator uses AI capabilities.
+          The platform supports 17 AI tools including Claude Code, ChatGPT,
+          Cursor, Copilot, Windsurf, and Codex. Operators run a local scanner
+          that reads token telemetry and submits signed, privacy-preserving
+          snapshots. No prompt content, code, or conversation text ever leaves
+          the machine — only four token counts. The leaderboard ranks operators
+          across 7-day, 30-day, 90-day, and all-time windows, with operator
+          classes from IGNITER through ARCH+ based on total tokens accumulated.
+          TRANSMITTER is a separate peak-activity badge, not a tier. The public
+          REST API, OpenAPI specification, MCP server, and CLI tool are
+          documented at{" "}
+          <Link href="/developers" className="text-gold underline underline-offset-2">
+            /developers
+          </Link>
+          . Pricing is free during the build stage at{" "}
+          <Link href="/pricing" className="text-gold underline underline-offset-2">
+            /pricing
+          </Link>
+          .
+        </p>
+      </section>
+
       {/* The four degrees of leverage — our show-stopper, directly under the hero
           (owner 2026-07-02: moved above the live board so the comparison table leads,
           with the explanation underneath). Sources/footnotes + a link to the full wiki

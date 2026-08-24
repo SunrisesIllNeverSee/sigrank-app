@@ -15,9 +15,10 @@
  * and `metric_snapshots` respectively.
  */
 
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { getHomepageStats } from "@/lib/board";
+import { rateLimit, rateLimitHeaders, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 export const revalidate = 3600;
 
@@ -31,7 +32,10 @@ function median(values: number[]): number {
     : sorted[mid];
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl);
+
   const sb = getSupabaseServer();
   const homeStats = await getHomepageStats();
 
@@ -144,6 +148,7 @@ export async function GET() {
     headers: {
       "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
       "Access-Control-Allow-Origin": "*",
+      ...rateLimitHeaders(rl),
     },
   });
 }
