@@ -329,7 +329,9 @@ export default async function HomePage() {
           </Link>
           , or run the full local scanner with{" "}
           <code className="font-mono text-text-primary">npx sigrank</code> to
-          submit a signed snapshot to the leaderboard.
+          submit a signed snapshot to the leaderboard. The CLI also runs a
+          local MCP server exposing leaderboard, operator profile, and
+          rank-paste tools to AI agents via the Model Context Protocol.
         </p>
       </section>
 
