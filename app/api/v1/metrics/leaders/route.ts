@@ -16,6 +16,7 @@ import {
 import {
   enforceListGate,
   rateLimit,
+  rateLimitHeaders,
   rateLimitedResponse,
 } from "@/lib/infra/api-gate";
 
@@ -114,6 +115,9 @@ export async function GET(req: NextRequest) {
   };
 
   return NextResponse.json(body, {
-    headers: { "Cache-Control": LEADERBOARD_CACHE_CONTROL },
+    headers: {
+      "Cache-Control": LEADERBOARD_CACHE_CONTROL,
+      ...rateLimitHeaders(rl),
+    },
   });
 }
