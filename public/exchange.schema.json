@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mos2es.xyz/exchange.schema.json",
+  "title": "Contribution Commitment v0.1",
+  "type": "object",
+  "required": ["version", "contribution_id", "origin", "parties", "contribution", "consideration", "rights", "vesting", "authorization", "verification", "settlement", "revocation", "provenance"],
+  "properties": {
+    "version": { "const": "0.1" },
+    "contribution_id": { "type": "string" },
+    "origin": { "type": "object", "required": ["type"], "properties": { "type": { "enum": ["ambient_observation", "published_need", "published_offer", "direct_request", "other"] }, "observed_at": { "type": "string", "format": "uri" }, "description": { "type": "string" } } },
+    "parties": { "type": "object", "required": ["contributor", "recipient"] },
+    "contribution": { "type": "object", "required": ["type", "title", "description", "disclosure_state"] },
+    "consideration": { "type": "array" },
+    "rights": { "type": "object", "required": ["owner", "pre_vesting", "post_vesting"] },
+    "vesting": { "type": "object", "required": ["requires"] },
+    "authorization": { "type": "object", "required": ["inspect", "test", "modify", "deploy"] },
+    "verification": { "type": "object", "required": ["criteria"] },
+    "settlement": { "type": "object", "required": ["status"] },
+    "revocation": { "type": "object", "required": ["authorization", "access", "license_pre_vesting", "license_post_vesting", "artifact_recall"] },
+    "provenance": { "type": "object" }
+  }
+}
