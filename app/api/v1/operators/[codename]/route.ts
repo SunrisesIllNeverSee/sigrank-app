@@ -43,6 +43,7 @@ export async function GET(
       hint: "Use the public leaderboard for non-profile aggregate ranking data.",
       type: "https://signalaf.com/developers#errors",
       instance: req.nextUrl.pathname,
+      headers: rateLimitHeaders(rl),
     });
   }
 
@@ -57,6 +58,7 @@ export async function GET(
       hint: "Check the codename or query the public leaderboard for current operators.",
       type: "https://signalaf.com/developers#errors",
       instance: req.nextUrl.pathname,
+      headers: rateLimitHeaders(rl),
     });
   }
 

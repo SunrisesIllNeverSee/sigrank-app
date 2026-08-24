@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
         reason: "metric_required",
         detail: "The `metric` query parameter is required.",
       },
-      { status: 400 },
+      { status: 400, headers: rateLimitHeaders(rl) },
     );
   }
   const sort = METRIC_PARAM_TO_SORT[metricParam];
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
         reason: "metric_invalid",
         detail: `Unknown metric "${metricParam}". Allowed: ${Object.keys(METRIC_PARAM_TO_SORT).join(", ")}.`,
       },
-      { status: 400 },
+      { status: 400, headers: rateLimitHeaders(rl) },
     );
   }
 

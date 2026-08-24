@@ -22,12 +22,13 @@ export async function GET() {
       title: "SigRank SignalAF API",
       version: "1.0.0",
       description:
-        "Versioned public API for AI operator benchmark data. Read endpoints are public unless stated otherwise. Errors use RFC 9457 Problem Details.",
+        "Versioned public API for AI operator benchmark data. Read endpoints are public unless stated otherwise. Errors use RFC 9457 Problem Details. API versioning uses URL path segments (/api/v1, /api/v2, etc.). Breaking changes ship under a new major version. Deprecated operations return a Deprecation header (RFC 8594) and a Sunset header with the retirement date. See the versioning and deprecation policy at /developers#versioning.",
       contact: {
         name: "SigRank SignalAF",
         url: `${SITE_ORIGIN}/contact`,
       },
       "x-deprecation-policy": `${SITE_ORIGIN}/developers#versioning`,
+      "x-sunset-policy": `${SITE_ORIGIN}/developers#versioning`,
     },
     externalDocs: {
       description: "SignalAF Developer Portal",
@@ -276,14 +277,35 @@ export async function GET() {
         RateLimited: {
           description: "Rate limit exceeded",
           headers: {
-            "Retry-After": { schema: { type: "integer" } },
-            "RateLimit-Policy": { schema: { type: "string" } },
-            RateLimit: { schema: { type: "string" } },
+            "Retry-After": { schema: { type: "integer" }, description: "Seconds to wait before retrying." },
+            "RateLimit-Policy": { schema: { type: "string" }, description: "Rate limit policy description." },
+            RateLimit: { schema: { type: "string" }, description: "Current rate limit state." },
+            "RateLimit-Limit": { schema: { type: "integer" }, description: "Maximum requests per window." },
+            "RateLimit-Remaining": { schema: { type: "integer" }, description: "Remaining requests in window." },
+            "RateLimit-Reset": { schema: { type: "integer" }, description: "Seconds until window resets." },
           },
           content: problemContent,
         },
         InternalError: {
           description: "Unexpected server error",
+          content: problemContent,
+        },
+        Deprecated: {
+          description: "This operation is deprecated and will be retired. See the Deprecation and Sunset headers for details.",
+          headers: {
+            Deprecation: {
+              schema: { type: "boolean" },
+              description: "Present and true when the operation is deprecated (RFC 8594).",
+            },
+            Sunset: {
+              schema: { type: "string", format: "http-date" },
+              description: "HTTP-date after which the deprecated operation will no longer be available (RFC 8594).",
+            },
+            Link: {
+              schema: { type: "string" },
+              description: "Link to the replacement operation or deprecation policy (rel='successor-version' or rel='deprecation-policy').",
+            },
+          },
           content: problemContent,
         },
       },

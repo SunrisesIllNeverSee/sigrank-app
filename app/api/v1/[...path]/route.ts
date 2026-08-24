@@ -1,7 +1,9 @@
 import type { NextRequest } from "next/server";
 import { problemResponse } from "@/lib/infra/problem";
+import { rateLimit, rateLimitHeaders } from "@/lib/infra/api-gate";
 
 function notFound(req: NextRequest) {
+  const rl = rateLimit(req);
   return problemResponse({
     status: 404,
     title: "API endpoint not found",
@@ -10,6 +12,7 @@ function notFound(req: NextRequest) {
     hint: "Inspect https://signalaf.com/openapi.json or https://signalaf.com/developers for supported endpoints.",
     type: "https://signalaf.com/developers#errors",
     instance: req.nextUrl.pathname,
+    headers: rateLimitHeaders(rl),
   });
 }
 
