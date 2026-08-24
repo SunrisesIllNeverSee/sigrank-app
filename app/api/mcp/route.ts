@@ -7,41 +7,114 @@ const SUPPORTED_VERSIONS = new Set(["2025-06-18", "2025-03-26"]);
 const TOOLS = [
   {
     name: "rank_paste",
+    title: "Rank Paste — Local Token Cascade Calculator",
     description:
-      "Calculate SigRank cascade metrics from four non-negative token counts without submitting data.",
+      "Calculate SigRank cascade metrics from four non-negative token counts without submitting data. Returns Yield, Leverage, Velocity, SNR, and 10xDEV. No data is persisted.",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: "object",
       additionalProperties: false,
       required: ["input", "output", "cache_read", "cache_write"],
       properties: {
-        input: { type: "number", minimum: 0 },
-        output: { type: "number", minimum: 0 },
-        cache_read: { type: "number", minimum: 0 },
-        cache_write: { type: "number", minimum: 0 },
+        input: { type: "number", minimum: 0, description: "Total input tokens consumed in the session." },
+        output: { type: "number", minimum: 0, description: "Total output tokens generated." },
+        cache_read: { type: "number", minimum: 0, description: "Tokens read from prompt cache (reused context)." },
+        cache_write: { type: "number", minimum: 0, description: "Tokens written to prompt cache (new context stored for reuse)." },
+      },
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        input: { type: "number", description: "Echoed input token count." },
+        output: { type: "number", description: "Echoed output token count." },
+        cache_read: { type: "number", description: "Echoed cache-read token count." },
+        cache_write: { type: "number", description: "Echoed cache-write token count." },
+        yield_: { type: "number", description: "Yield (Υ) = (cache_read × output) / input². Headline cascade efficiency." },
+        leverage: { type: "number", description: "Leverage = cache_read / input. Reusable context amplification." },
+        velocity: { type: "number", description: "Velocity = output / input. Output per unit of input." },
+        snr: { type: "number", description: "Signal-to-noise ratio = output / (input + output)." },
+        dev10x: { type: ["number", "null"], description: "log₁₀(Leverage). Logarithmic context amplification." },
+        non_compounding: { type: "boolean", description: "True if cache_write is zero (no compounding context)." },
       },
     },
   },
   {
     name: "get_leaderboard",
-    description: "Read the current public SigRank operator leaderboard.",
+    title: "Get Leaderboard — Public Operator Rankings",
+    description:
+      "Read the current public SigRank operator leaderboard. Returns ranked operators with Yield, Leverage, class tier, and display name.",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: "object",
       additionalProperties: false,
       properties: {
-        limit: { type: "integer", minimum: 1, maximum: 100, default: 25 },
-        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d" },
+        limit: { type: "integer", minimum: 1, maximum: 100, default: 25, description: "Maximum number of operators to return (1–100, default 25)." },
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d", description: "Time window for the leaderboard: 7d, 30d, 90d, or all_time." },
+      },
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        window: { type: "string", description: "The time window used for the query." },
+        total_operators: { type: "integer", description: "Number of operators returned." },
+        entries: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              rank: { type: "integer", description: "Global rank position." },
+              codename: { type: "string", description: "Operator's unique codename (URL key, not display name)." },
+              display_name: { type: "string", description: "Human-readable operator display name." },
+              class_tier: { type: "string", description: "Operator class tier." },
+              yield_: { type: ["number", "null"], description: "Yield (Υ) if compounding, else null." },
+              leverage: { type: ["number", "null"], description: "Leverage if compounding, else null." },
+            },
+          },
+        },
       },
     },
   },
   {
     name: "get_operator",
-    description: "Read one public operator profile by codename.",
+    title: "Get Operator — Public Profile by Codename",
+    description:
+      "Read one public operator profile by codename. Returns class tier, rank, percentile, Yield, Leverage, Velocity, and SNR.",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: "object",
       additionalProperties: false,
       required: ["codename"],
       properties: {
-        codename: { type: "string", minLength: 1, maxLength: 128 },
+        codename: { type: "string", minLength: 1, maxLength: 128, description: "The operator's unique codename (e.g. signal-ae3b5c3c55). Not the display name." },
+      },
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        codename: { type: "string", description: "Operator's unique codename." },
+        display_name: { type: "string", description: "Human-readable display name." },
+        class_tier: { type: "string", description: "Operator class tier." },
+        rank: { type: "integer", description: "Global rank position." },
+        percentile: { type: "number", description: "Percentile in the public field." },
+        yield_: { type: ["number", "null"], description: "Yield (Υ) if compounding, else null." },
+        leverage: { type: ["number", "null"], description: "Leverage if compounding, else null." },
+        velocity: { type: ["number", "null"], description: "Velocity = output / input." },
+        snr: { type: ["number", "null"], description: "Signal-to-noise ratio." },
       },
     },
   },
@@ -223,6 +296,8 @@ export async function POST(req: NextRequest) {
         name: "sigrank-signalaf",
         title: "SigRank SignalAF",
         version: "1.0.0",
+        description: "AI operator benchmark measuring token-cascade efficiency from privacy-preserving telemetry.",
+        websiteUrl: "https://signalaf.com",
       },
       instructions:
         "Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Use rank_paste for local calculations, get_leaderboard for public field position, and get_operator for a public operator profile. Do not treat these metrics as a model-quality or downstream-productivity benchmark.",
