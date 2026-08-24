@@ -45,9 +45,22 @@ const ALERT_TO = "hello@signalaf.com";
 const ALERT_FROM = "SigRank Alerts <hello@signalaf.com>";
 
 /**
+ * Email rate limiter — max 1 email per operator per hour.
+ * Prevents email spam when a user submits 30 times in 10 minutes
+ * (each flagged submission would otherwise send a separate email).
+ * In-memory Map: survives within a single serverless instance
+ * (burst protection across rapid re-invocations).
+ */
+const EMAIL_RATE_LIMIT_MS = 60 * 60 * 1000; // 1 hour
+const lastEmailSent = new Map<string, number>();
+
+/**
  * Notify the owner about a submission issue (rejected or flagged).
  * Fires BOTH a PostHog event (for querying/dashboards) AND an email alert
  * (for real-time awareness). Best-effort — never blocks the response.
+ *
+ * Email is rate-limited to 1 per operator per hour to prevent spam.
+ * PostHog is always fired (no rate limit) so every event is queryable.
  *
  * Privacy: codename + platform + reason codes only. No token values,
  * no gate internals, no PII beyond what's already public on the board.
@@ -72,8 +85,12 @@ async function notifySubmissionIssue(
     flag_codes: meta.flagCodes ?? [],
   }).catch(() => {});
 
-  // 2. Email alert — best-effort, never throws
+  // 2. Email alert — best-effort, never throws. Rate-limited to 1 per operator per hour.
   if (!RESEND_API_KEY) return;
+  const now = Date.now();
+  const lastSent = lastEmailSent.get(codename) ?? 0;
+  if (now - lastSent < EMAIL_RATE_LIMIT_MS) return; // already emailed about this operator recently
+  lastEmailSent.set(codename, now);
   try {
     const resend = new Resend(RESEND_API_KEY);
     const subject =
