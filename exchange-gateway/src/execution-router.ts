@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type {
   ContributionCommitment,
-  ExecutionAssessment,
   ExecutionAuthority,
   ExecutionCapabilities,
   ExecutionMode,
@@ -12,47 +11,21 @@ import type {
 } from './types'
 import { internalProvider } from './providers/internal'
 
-/**
- * Execution Router
- *
- * After a Contribution Commitment is authorized, the router determines
- * how the work should be executed. It selects a provider based on:
- * - the domain's external_execution policy
- * - the provider's capabilities
- * - the commitment's authorization scope
- *
- * The router NEVER expands authorization. The execution authority
- * is always a subset of the commitment's authorization.
- */
-
 const providers = new Map<string, ExecutionProvider>()
 providers.set('internal', internalProvider)
 
-/**
- * Register an external execution provider.
- */
 export function registerProvider(provider: ExecutionProvider): void {
   providers.set(provider.id, provider)
 }
 
-/**
- * Get a registered provider by ID.
- */
 export function getProvider(id: string): ExecutionProvider | undefined {
   return providers.get(id)
 }
 
-/**
- * List all registered provider IDs.
- */
 export function listProviderIds(): string[] {
   return Array.from(providers.keys())
 }
 
-/**
- * Derive the execution authority from the commitment's authorization.
- * This is always a subset — never an expansion.
- */
 export function deriveExecutionAuthority(commitment: ContributionCommitment): ExecutionAuthority {
   return {
     inspect: commitment.authorization.inspect,
@@ -63,12 +36,9 @@ export function deriveExecutionAuthority(commitment: ContributionCommitment): Ex
   }
 }
 
-/**
- * Check if execution authority exceeds the policy's allowed authority.
- */
 export function authorityWithinPolicy(auth: ExecutionAuthority, policy: ExchangePolicy): boolean {
   const allowed = policy.external_execution?.allowed_authority
-  if (!allowed) return true // no restriction if not configured
+  if (!allowed) return true
   if (auth.inspect && !allowed.inspect) return false
   if (auth.test && !allowed.test) return false
   if (auth.modify && !allowed.modify) return false
@@ -76,41 +46,26 @@ export function authorityWithinPolicy(auth: ExecutionAuthority, policy: Exchange
   return true
 }
 
-/**
- * Check if the budget exceeds the autonomous limit.
- */
 export function budgetRequiresHuman(budget: { amount: number } | undefined, policy: ExchangePolicy): boolean {
   if (!budget) return false
-  const limit = policy.external_execution?.human_approval_above ?? 0
-  return budget.amount > limit
+  const configured = policy.external_execution
+  if (!configured) return true
+  const limits = [configured.max_autonomous_budget, configured.human_approval_above].filter((value) => value > 0)
+  if (limits.length === 0) return budget.amount > 0
+  return budget.amount > Math.min(...limits)
 }
 
-/**
- * Determine the execution mode for a commitment.
- *
- * Default routing logic:
- * 1. If external_execution is not enabled → self_executed
- * 2. If a specific provider_id is requested and allowed → external_provider
- * 3. If no provider is specified → self_executed (internal)
- */
 export function determineMode(
-  commitment: ContributionCommitment,
+  _commitment: ContributionCommitment,
   policy: ExchangePolicy,
   requestedProviderId?: string,
 ): ExecutionMode {
-  if (!policy.external_execution?.enabled) return 'self_executed'
   if (!requestedProviderId) return 'self_executed'
-  if (!policy.external_execution.allowed_providers.includes(requestedProviderId)) return 'self_executed'
+  if (!policy.external_execution?.enabled) return 'human'
+  if (!policy.external_execution.allowed_providers.includes(requestedProviderId)) return 'human'
   return 'external_provider'
 }
 
-/**
- * Build an ExecutionRequest from a ContributionCommitment.
- *
- * Uses least disclosure — only includes what the executor needs.
- * Strips private negotiation history, unrelated rights clauses,
- * internal company policies, and private participant information.
- */
 export function buildExecutionRequest(
   commitment: ContributionCommitment,
   options?: {
@@ -122,11 +77,13 @@ export function buildExecutionRequest(
     deadline?: string
   },
 ): ExecutionRequest {
-  const authority = deriveExecutionAuthority(commitment)
+  const termsHash = commitment.provenance.terms_hash
+  if (!termsHash) throw new Error('Contribution Commitment must have a finalized terms hash before execution')
+
   return {
     execution_id: `exec_${randomUUID().replace(/-/g, '').slice(0, 20)}`,
     contribution_id: commitment.contribution_id,
-    source_commitment_hash: commitment.provenance.terms_hash ?? '',
+    source_commitment_hash: termsHash,
     task: {
       title: options?.task_title ?? commitment.contribution.title,
       description: options?.task_description ?? commitment.contribution.description,
@@ -134,7 +91,7 @@ export function buildExecutionRequest(
       acceptance_criteria: options?.acceptance_criteria ?? commitment.verification.criteria,
     },
     budget: options?.budget,
-    authority,
+    authority: deriveExecutionAuthority(commitment),
     verification: {
       criteria: commitment.verification.criteria,
       evidence_required: commitment.verification.evidence ?? [],
@@ -147,18 +104,13 @@ export function buildExecutionRequest(
   }
 }
 
-/**
- * Route an authorized commitment to an execution provider.
- *
- * This is the main entry point after authorization.
- * It determines the mode, selects a provider, and creates the execution.
- */
 export async function routeExecution(
   commitment: ContributionCommitment,
   policy: ExchangePolicy,
   options?: {
     provider_id?: string
     mode?: ExecutionMode
+    principal_approved?: boolean
     task_title?: string
     task_description?: string
     deliverables?: string[]
@@ -167,54 +119,90 @@ export async function routeExecution(
     deadline?: string
   },
 ): Promise<ExecutionRouterResult> {
+  if (!commitment.provenance.terms_hash) {
+    return {
+      mode: 'human',
+      reason: 'Contribution Commitment is missing a finalized terms hash; execution is blocked',
+    }
+  }
+
   const mode = options?.mode ?? determineMode(commitment, policy, options?.provider_id)
-  const request = buildExecutionRequest(commitment, options)
-
-  // Check policy constraints
-  if (!authorityWithinPolicy(request.authority, policy)) {
-    return {
-      mode: 'human',
-      reason: 'execution authority exceeds policy allowed_authority — human approval required',
-    }
-  }
-
-  if (budgetRequiresHuman(request.budget, policy)) {
-    return {
-      mode: 'human',
-      reason: `budget exceeds autonomous limit (${policy.external_execution?.human_approval_above}) — human approval required`,
-    }
-  }
 
   if (mode === 'no_execution_required') {
     return { mode, reason: 'no execution required for this commitment' }
   }
 
   if (mode === 'human') {
-    return { mode, reason: 'human execution required by policy or request' }
+    const providerReason = options?.provider_id
+      ? `external provider '${options.provider_id}' is disabled or outside the domain allowlist`
+      : 'human execution required by policy or request'
+    return { mode, reason: providerReason }
   }
 
-  // Select provider
-  const providerId = mode === 'external_provider' ? (options?.provider_id ?? 'internal') : 'internal'
+  if (policy.human_required_for_execution && !options?.principal_approved) {
+    return {
+      mode: 'human',
+      reason: 'domain policy requires principal approval before execution routing',
+    }
+  }
+
+  if (mode === 'external_provider') {
+    const external = policy.external_execution
+    if (!external?.enabled) {
+      return { mode: 'human', reason: 'external execution is disabled by domain policy' }
+    }
+    if (!options?.provider_id || !external.allowed_providers.includes(options.provider_id)) {
+      return { mode: 'human', reason: 'requested execution provider is outside the domain allowlist' }
+    }
+    if (!external.autonomous_task_creation && !options?.principal_approved) {
+      return { mode: 'human', reason: 'domain policy requires principal approval to create an external execution task' }
+    }
+  }
+
+  const request = buildExecutionRequest(commitment, options)
+
+  if (!authorityWithinPolicy(request.authority, policy)) {
+    return {
+      mode: 'human',
+      reason: 'execution authority exceeds policy allowed_authority; principal review required',
+    }
+  }
+
+  if (budgetRequiresHuman(request.budget, policy) && !options?.principal_approved) {
+    return {
+      mode: 'human',
+      reason: `execution budget exceeds autonomous policy limits; principal review required`,
+    }
+  }
+
+  const providerId = mode === 'external_provider' ? options!.provider_id! : 'internal'
   const provider = providers.get(providerId)
 
   if (!provider) {
     return {
-      mode: 'self_executed',
-      reason: `provider '${providerId}' not registered — falling back to internal self-execution`,
+      mode: 'human',
+      reason: `provider '${providerId}' is not registered; no fallback execution was created`,
     }
   }
 
-  // Assess
-  const assessment = await provider.canExecute(commitment, request)
+  let assessment
+  try {
+    assessment = await provider.canExecute(commitment, request)
+  } catch (err) {
+    return {
+      mode: 'human',
+      reason: `provider '${providerId}' assessment failed; no fallback execution was created: ${err instanceof Error ? err.message : String(err)}`,
+    }
+  }
+
   if (!assessment.can_execute) {
     return {
-      mode: 'self_executed',
+      mode: 'human',
       assessment,
-      reason: `provider '${providerId}' cannot execute: ${assessment.reasons.join('; ')}`,
+      reason: `provider '${providerId}' cannot execute; no fallback execution was created: ${assessment.reasons.join('; ')}`,
     }
   }
 
-  // Create execution
   try {
     const reference = await provider.createExecution(request)
     return {
@@ -226,16 +214,13 @@ export async function routeExecution(
     }
   } catch (err) {
     return {
-      mode: 'self_executed',
+      mode: 'human',
       assessment,
-      reason: `provider '${providerId}' failed to create execution: ${err instanceof Error ? err.message : String(err)}`,
+      reason: `provider '${providerId}' failed to create execution; no fallback execution was created: ${err instanceof Error ? err.message : String(err)}`,
     }
   }
 }
 
-/**
- * Get the capabilities of all registered providers.
- */
 export function allProviderCapabilities(): Array<{ id: string; capabilities: ExecutionCapabilities }> {
   return Array.from(providers.entries()).map(([id, p]) => ({ id, capabilities: p.capabilities() }))
 }
