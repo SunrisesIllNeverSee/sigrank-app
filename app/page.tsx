@@ -322,7 +322,14 @@ export default async function HomePage() {
           . The anonymized research dataset is available on Zenodo (DOI:
           10.5281/zenodo.21900519) under a CC-BY-4.0 license. The theoretical
           foundation, the Conservation Law of Commitment, is published
-          separately (Zenodo: 10.5281/zenodo.20029607).
+          separately (Zenodo: 10.5281/zenodo.20029607). Operators can check
+          their efficiency without installing anything using the{" "}
+          <Link href="/score" className="text-gold underline underline-offset-2">
+            score calculator
+          </Link>
+          , or run the full local scanner with{" "}
+          <code className="font-mono text-text-primary">npx sigrank</code> to
+          submit a signed snapshot to the leaderboard.
         </p>
       </section>
 
