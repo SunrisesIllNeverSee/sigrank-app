@@ -123,6 +123,13 @@ test("MCP manifest points to a Streamable HTTP endpoint with a valid lifecycle i
   assert.match(mcp, /message\.method === "notifications\/initialized"/);
   assert.match(mcp, /message\.method === "tools\/list"/);
   assert.match(mcp, /message\.method === "tools\/call"/);
+  // MCP tool metadata (agent-ready.dev M2/M4/M5/M6)
+  assert.match(mcp, /websiteUrl/);
+  assert.match(mcp, /readOnlyHint/);
+  assert.match(mcp, /outputSchema/);
+  // Every parameter must have a description
+  const paramDescCount = (mcp.match(/description: ".*"/g) || []).length;
+  assert.ok(paramDescCount >= 10, `expected >=10 description fields (params + outputs), got ${paramDescCount}`);
 });
 
 test("organization JSON-LD exposes the published SignalAF support contact and postal address", async () => {
