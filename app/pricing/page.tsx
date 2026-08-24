@@ -19,11 +19,11 @@ const freeFeatures = [
 ];
 
 const earlyTiers = [
-  { range: "1–100", label: "Founding operators", perk: "Maximum perks — the earliest supporters get the most" },
-  { range: "101–250", label: "Early operators", perk: "Strong perks — still early, still rewarded" },
-  { range: "251–500", label: "Build-stage operators", perk: "Build-stage perks" },
-  { range: "501–750", label: "Build-stage operators", perk: "Build-stage perks" },
-  { range: "751–1000", label: "Launch operators", perk: "Launch-window perks" },
+  { range: "1–100", label: "Founding operators", perk: "Permanent free access, priority features, direct input on roadmap" },
+  { range: "101–250", label: "Early operators", perk: "Permanent free access, early feature access" },
+  { range: "251–500", label: "Build-stage operators", perk: "Permanent free access" },
+  { range: "501–750", label: "Build-stage operators", perk: "Permanent free access" },
+  { range: "751–1000", label: "Launch operators", perk: "Permanent free access" },
 ];
 
 export default function PricingPage() {
@@ -73,10 +73,12 @@ export default function PricingPage() {
           Early operator perks
         </h2>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          Operators who sign up during the build stage are grandfathered into
-          perks based on their signup number. The earlier you join, the more you
-          keep. Specific perks are being finalized, but the tier structure is
-          locked:
+          The first 1,000 operators get permanent free access. The earlier you
+          sign up, the more perks you keep. Specific perks are being finalized,
+          but your signup position is locked the moment you join.
+        </p>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          Examples of what early tiers receive:
         </p>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full border-collapse text-sm">
@@ -89,7 +91,7 @@ export default function PricingPage() {
                   Tier
                 </th>
                 <th className="py-2 text-left font-mono text-xs uppercase tracking-wide text-text-secondary">
-                  Perks
+                  What they get
                 </th>
               </tr>
             </thead>
@@ -111,8 +113,8 @@ export default function PricingPage() {
           </table>
         </div>
         <p className="mt-3 font-sans text-xs leading-relaxed text-text-tertiary">
-          Perk details are being finalized. The tier structure and signup-order
-          commitment will not change.
+          Additional perks are being finalized. The tier structure and
+          signup-order commitment will not change.
         </p>
       </section>
 
