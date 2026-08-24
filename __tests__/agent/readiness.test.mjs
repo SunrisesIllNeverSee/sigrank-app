@@ -21,18 +21,13 @@ test("homepage markdown negotiation exposes the required media type, Vary, q par
   assert.match(middleware, /\^q=/);
   assert.match(middleware, /status: 406/);
   assert.match(middleware, /HOME_MARKDOWN/);
-
+  // Markdown response must not be CDN-cached — prevents Vary: Accept
+  // from fragmenting the HTML cache.
+  assert.match(middleware, /private, no-store/);
+  // vercel.json must NOT append Vary to the homepage — that fragments
+  // the CDN cache across browser Accept variations.
   const rootRoute = vercel.routes?.find((route) => route.src === "^/$");
-  assert.ok(rootRoute, "vercel edge config must match the homepage");
-  const varyTransform = rootRoute.transforms?.find(
-    (transform) =>
-      transform.type === "response.headers" &&
-      transform.op === "append" &&
-      transform.target?.key?.toLowerCase() === "vary",
-  );
-  assert.ok(varyTransform, "homepage must append Vary at the final edge response layer");
-  assert.deepEqual(varyTransform.args, ["Accept", "Accept-Encoding"]);
-  assert.equal(rootRoute.continue, true);
+  assert.equal(rootRoute, undefined, "vercel.json must not have a homepage Vary route");
 });
 
 test("web 404 includes deterministic agent recovery links", async () => {

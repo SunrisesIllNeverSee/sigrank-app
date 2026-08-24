@@ -119,7 +119,9 @@ function negotiatedHomepage(request: NextRequest): Response | null {
       status: 200,
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=86400",
+        // Don't CDN-cache the markdown variant — it's rare (AI agent fetches)
+        // and caching it with Vary: Accept fragments the HTML cache.
+        "Cache-Control": "private, no-store",
         Vary: vary,
         Link: '</llms.txt>; rel="alternate"; type="text/plain"',
       },
