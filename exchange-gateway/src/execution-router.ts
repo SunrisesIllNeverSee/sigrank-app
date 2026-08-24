@@ -43,6 +43,7 @@ export function authorityWithinPolicy(auth: ExecutionAuthority, policy: Exchange
   if (auth.test && !allowed.test) return false
   if (auth.modify && !allowed.modify) return false
   if (auth.deploy && !allowed.deploy) return false
+  if (auth.access_scope.some((scope) => !allowed.access_scope.includes(scope))) return false
   return true
 }
 
@@ -171,7 +172,7 @@ export async function routeExecution(
   if (budgetRequiresHuman(request.budget, policy) && !options?.principal_approved) {
     return {
       mode: 'human',
-      reason: `execution budget exceeds autonomous policy limits; principal review required`,
+      reason: 'execution budget exceeds autonomous policy limits; principal review required',
     }
   }
 
