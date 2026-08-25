@@ -14,13 +14,17 @@ import type {
  * Internal provider — the default no-op/self-executed provider.
  *
  * This provider does not route work to any external system.
- * It records the execution reference and returns a synthetic
- * "delivered" status so the exchange lifecycle can proceed
- * when no external execution is needed.
+ * It creates an execution reference and returns it. The canonical
+ * execution state lives in the database (exchange_executions),
+ * NOT in this provider's memory.
  *
  * The contributor (or domain agent) is expected to perform
  * the work themselves. The receipt must be submitted manually
  * via the receipt API route.
+ *
+ * P0.3: In-memory state has been removed. The DB is the canonical
+ * source of execution state. getExecution returns a synthetic
+ * observation labeled as non-authoritative.
  */
 const INTERNAL_CAPABILITIES: ExecutionCapabilities = {
   task_execution: true,
@@ -34,9 +38,6 @@ const INTERNAL_CAPABILITIES: ExecutionCapabilities = {
   fiat_settlement: false,
   crypto_settlement: false,
 }
-
-// In-memory store for internal executions (cleared on restart)
-const internalExecutions = new Map<string, { reference: ExecutionReference; request: ExecutionRequest; state: ExecutionStatus['state'] }>()
 
 export const internalProvider: ExecutionProvider = {
   id: 'internal',
@@ -54,38 +55,32 @@ export const internalProvider: ExecutionProvider = {
 
   async createExecution(request: ExecutionRequest): Promise<ExecutionReference> {
     const now = new Date().toISOString()
-    const reference: ExecutionReference = {
+    return {
       execution_id: request.execution_id,
       provider: 'internal',
       provider_reference: `int_${randomUUID().replace(/-/g, '').slice(0, 16)}`,
       created_at: now,
     }
-    internalExecutions.set(reference.execution_id, {
-      reference,
-      request,
-      state: 'created',
-    })
-    return reference
   },
 
   async getExecution(reference: ExecutionReference): Promise<ExecutionStatus> {
-    const record = internalExecutions.get(reference.execution_id)
+    // The internal provider does not own durable state.
+    // Return a non-authoritative observation. The caller (status endpoint)
+    // must use the DB as the canonical source.
     return {
       reference,
-      state: record?.state ?? 'created',
+      state: 'created',
       updated_at: new Date().toISOString(),
-      provider_state: record?.state,
-      message: record ? undefined : 'execution not found in memory (may have been after restart)',
+      provider_state: 'created',
+      message: 'internal provider does not own durable state; database is canonical',
     }
   },
 
-  async cancelExecution(reference: ExecutionReference): Promise<void> {
-    const record = internalExecutions.get(reference.execution_id)
-    if (record) record.state = 'cancelled'
+  async cancelExecution(_reference: ExecutionReference): Promise<void> {
+    // No-op — state transitions go through the DB
   },
 
   async verifyExecution(reference: ExecutionReference): Promise<ExecutionReceipt> {
-    const record = internalExecutions.get(reference.execution_id)
     const now = new Date().toISOString()
     return {
       execution_reference: reference,
@@ -93,7 +88,7 @@ export const internalProvider: ExecutionProvider = {
       provider_reference: reference.provider_reference,
       status: 'delivered',
       executor: {
-        id: record?.request.provenance.originator ?? 'unknown',
+        id: 'internal',
         role: 'self',
       },
       timestamps: {
@@ -102,12 +97,4 @@ export const internalProvider: ExecutionProvider = {
       },
     }
   },
-}
-
-/**
- * Update an internal execution's state (called when a receipt is submitted).
- */
-export function updateInternalExecutionState(executionId: string, state: ExecutionStatus['state']): void {
-  const record = internalExecutions.get(executionId)
-  if (record) record.state = state
 }
