@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createHmac, timingSafeEqual, createHash } from 'node:crypto'
 
 // ─── Provider Callback Authentication ───
 //
@@ -182,7 +182,6 @@ export class VerificationError extends Error {
  * Compute SHA-256 hash of a buffer, return hex string.
  */
 function createHashSha256(data: Uint8Array): string {
-  const { createHash } = require('node:crypto')
   return createHash('sha256').update(Buffer.from(data)).digest('hex')
 }
 

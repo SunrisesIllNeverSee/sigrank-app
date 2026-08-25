@@ -18,7 +18,7 @@ test('receipt ingestion binds provider identity to the persisted execution', () 
   assert.match(receiptRoute, /receipt\.provider\s*!==\s*execution\.provider/)
   assert.match(receiptRoute, /receipt\.execution_reference\.provider\s*!==\s*execution\.provider/)
   assert.match(receiptRoute, /receipt\.provider_reference\s*!==\s*execution\.provider_reference/)
-  assert.match(receiptRoute, /External execution receipts require company-principal ingestion until provider authentication is configured/)
+  assert.match(receiptRoute, /External execution receipts require provider callback authentication or company-principal ingestion/)
 })
 
 test('company-admin execution route marks principal approval explicitly', () => {
