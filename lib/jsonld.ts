@@ -197,6 +197,7 @@ export function aggregateStats(opts: {
     url: `${SITE_ORIGIN}/api/v1/stats`,
     creator: { "@id": ORG_ID },
     isAccessibleForFree: true,
+    license: "https://creativecommons.org/licenses/by/4.0/",
     keywords: [
       "AI operator leaderboard",
       "token cascade efficiency",
