@@ -1,99 +1,20 @@
 import type { NextRequest } from "next/server";
 import { getLeaderboard, getOperator } from "@/lib/board";
+import {
+  cascade,
+  classify,
+  round,
+  fieldStats,
+  percentileOf,
+  rankOf,
+  operatorSignature,
+  evaluateOperator,
+  type CascadeResult,
+  type OperatorEvaluation,
+} from "@/lib/cascade";
 
 const PROTOCOL_VERSION = "2025-06-18";
 const SUPPORTED_VERSIONS = new Set(["2025-06-18", "2025-03-26"]);
-
-// ─── Cascade math (mirrors sigrank-mcp/analytics/cascade.mjs) ───────────────
-// Pure functions, no deps. Canonical MO§ES Υ 18436.98 from (1251211, 11296121, 128196310, 2555179769).
-
-const round = (n: number, d: number): number | null =>
-  Number.isFinite(n) ? Number(n.toFixed(d)) : null;
-
-const RS05_CLASS_THRESHOLDS: { class: string; totalMin: number }[] = [
-  { class: "ARCH+ I", totalMin: 7068201104627 },
-  { class: "ARCH+ II", totalMin: 3000000000000 },
-  { class: "ARCH+ III", totalMin: 1000000000000 },
-  { class: "ARCH I", totalMin: 186207267611 },
-  { class: "ARCH II", totalMin: 98543134083 },
-  { class: "ARCH III", totalMin: 68766193943 },
-  { class: "POWER I", totalMin: 39958782379 },
-  { class: "POWER II", totalMin: 26955905621 },
-  { class: "POWER III", totalMin: 19141226889 },
-  { class: "BASE I", totalMin: 13960345961 },
-  { class: "BASE II", totalMin: 10189224970 },
-  { class: "BASE III", totalMin: 7747041813 },
-  { class: "SEEKER I", totalMin: 5446673659 },
-  { class: "SEEKER II", totalMin: 4014577247 },
-  { class: "SEEKER III", totalMin: 2961798768 },
-  { class: "REFINER I", totalMin: 2358346840 },
-  { class: "REFINER II", totalMin: 1845750357 },
-  { class: "REFINER III", totalMin: 1334876308 },
-  { class: "BEARER I", totalMin: 984078167 },
-  { class: "BEARER II", totalMin: 714619043 },
-  { class: "BEARER III", totalMin: 431702990 },
-  { class: "IGNITER I", totalMin: 216393332 },
-  { class: "IGNITER II", totalMin: 88999166 },
-  { class: "IGNITER III", totalMin: 0 },
-];
-
-function classify(totalTokens: number): string {
-  if (!Number.isFinite(totalTokens)) return "UNCLASSED";
-  for (const t of RS05_CLASS_THRESHOLDS) {
-    if (totalTokens >= t.totalMin) return t.class;
-  }
-  return "IGNITER III";
-}
-
-interface CascadeResult {
-  pillars: { input: number; output: number; cacheCreate: number; cacheRead: number; total: number };
-  yield: number | null;
-  snr: number | null;
-  leverage: number | null;
-  velocity: number | null;
-  dev10x: number | null;
-  class: string;
-  warnings?: string[];
-}
-
-function cascade(input: number, output: number, cacheCreate: number, cacheRead: number): CascadeResult {
-  const i = Number(input), o = Number(output), cw = Number(cacheCreate), cr = Number(cacheRead);
-  const total = i + o + cw + cr;
-  const warnings: string[] = [];
-
-  const snrDenom = i + o;
-  const snr = snrDenom > 0 ? o / snrDenom : null;
-  if (snr === null) warnings.push("snr_undefined: input+output=0");
-
-  const velocity = i > 0 ? o / i : null;
-  if (velocity === null) warnings.push("velocity_undefined: input=0");
-
-  const leverage = i > 0 ? cr / i : null;
-  if (leverage === null) warnings.push("leverage_undefined: input=0");
-
-  const yield_ = leverage !== null && velocity !== null ? leverage * velocity : null;
-  if (yield_ === null && !warnings.some((w) => w.startsWith("yield")))
-    warnings.push("yield_undefined: requires input>0");
-
-  let dev10x: number | null = null;
-  if (i > 0 && o > 0 && cw > 0 && cr > 0) {
-    dev10x = Math.log10((o / i) * (cw / o) * (cr / cw));
-  } else {
-    warnings.push("dev10x_undefined: requires all four pillars > 0");
-  }
-
-  const result: CascadeResult = {
-    pillars: { input: i, output: o, cacheCreate: cw, cacheRead: cr, total },
-    yield: round(yield_ ?? 0, 2),
-    snr: round(snr ?? 0, 4),
-    leverage: round(leverage ?? 0, 1),
-    velocity: round(velocity ?? 0, 3),
-    dev10x: round(dev10x ?? 0, 2),
-    class: classify(total),
-  };
-  if (warnings.length > 0) result.warnings = warnings;
-  return result;
-}
 
 const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
@@ -389,6 +310,101 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: "operator_gap",
+    title: "Operator Gap — What Separates Two Operators",
+    description:
+      "Answers 'What specifically separates operator A from operator B?' — not just 'A has more Yield', but the primary cause, secondary cause, and offsetting weakness. Takes two codenames or two sets of pillars, computes both cascades, and decomposes the yield gap into leverage, velocity, SNR, and scale contributions. Returns the most explanatory factor.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        a_codename: { type: "string", description: "Codename for operator A (alternative to a_* pillars)" },
+        b_codename: { type: "string", description: "Codename for operator B (alternative to b_* pillars)" },
+        a_input: { type: "number", minimum: 0 },
+        a_output: { type: "number", minimum: 0 },
+        a_cache_read: { type: "number", minimum: 0 },
+        a_cache_write: { type: "number", minimum: 0 },
+        b_input: { type: "number", minimum: 0 },
+        b_output: { type: "number", minimum: 0 },
+        b_cache_read: { type: "number", minimum: 0 },
+        b_cache_write: { type: "number", minimum: 0 },
+      },
+    },
+  },
+  {
+    name: "field_anomaly",
+    title: "Field Anomaly — Unusual Patterns in the Leaderboard",
+    description:
+      "Finds unusual operators, metric relationships, and outliers in the live leaderboard — without user prompting. Returns: highest velocity among below-median leverage operators, only top-50 operator with near-zero cache write, largest 30-day yield improvement, rarest signature, and extreme divergence. Powers automated micro-marketing and field insights.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d" },
+      },
+    },
+  },
+  {
+    name: "who_operates_like_me",
+    title: "Who Operates Like Me — Nearest Neighbor Finder",
+    description:
+      "Finds operators whose operating signature most resembles yours. Takes 4 pillars or a codename, computes your signature, then searches the live leaderboard for the nearest neighbors by signature distance. Returns: nearest operators, similarity %, where they outperform you, where you outperform them, and what separates you from the better operator. Makes the leaderboard feel like a network, not a list.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        input: { type: "number", minimum: 0 },
+        output: { type: "number", minimum: 0 },
+        cache_read: { type: "number", minimum: 0 },
+        cache_write: { type: "number", minimum: 0 },
+        codename: { type: "string", description: "Operator codename (alternative to pillars)" },
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d" },
+        limit: { type: "number", minimum: 1, maximum: 20, default: 5, description: "Number of nearest neighbors to return (default 5)" },
+      },
+    },
+  },
+  {
+    name: "compare_to_field",
+    title: "Compare to Field — You vs Field vs Top 10% vs Top 1%",
+    description:
+      "Creates a 'YOU vs FIELD vs TOP 10% vs TOP 1%' comparison table for your cascade metrics. Takes 4 pillars or a codename, fetches the live leaderboard, and returns your metrics alongside field median, top quartile, top decile, and top percentile for yield, leverage, velocity, and SNR. Simple, useful, and immediately understandable.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        input: { type: "number", minimum: 0 },
+        output: { type: "number", minimum: 0 },
+        cache_read: { type: "number", minimum: 0 },
+        cache_write: { type: "number", minimum: 0 },
+        codename: { type: "string", description: "Operator codename (alternative to pillars)" },
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d" },
+      },
+    },
+  },
+  {
+    name: "operator_signature",
+    title: "Operator Signature — Portable Identity Object",
+    description:
+      "Computes a normalized operating signature from 4 token pillars or a codename. Returns: signature code (L240-V0.31-S0.24-C0.08 format), archetype (CONTEXTUAL, GENERATOR, BALANCED_ELITE, READER, COMMITTER, STANDARD), dominant trait, and closest comparable operators from the live board. A portable identity object that can feed profile cards, social sharing, enterprise clustering, peer discovery, and longitudinal drift.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        input: { type: "number", minimum: 0 },
+        output: { type: "number", minimum: 0 },
+        cache_read: { type: "number", minimum: 0 },
+        cache_write: { type: "number", minimum: 0 },
+        codename: { type: "string", description: "Operator codename (alternative to pillars)" },
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d" },
+      },
+    },
+  },
 ] as const;
 
 type RpcId = string | number | null;
@@ -484,27 +500,21 @@ async function callTool(name: string, args: Record<string, unknown>) {
         true,
       );
     }
-    const safeInput = Math.max(input as number, 1);
-    const leverage = (cacheRead as number) / safeInput;
-    const velocity = (output as number) / safeInput;
-    const yield_ = leverage * velocity;
-    const snr = (input as number) + (output as number) > 0
-      ? (output as number) / ((input as number) + (output as number))
-      : 0;
+    const c = cascade(input as number, output as number, cacheWrite as number, cacheRead as number);
     const nonCompounding = (cacheWrite as number) === 0;
     return textResult({
       input,
       output,
       cache_read: cacheRead,
       cache_write: cacheWrite,
-      yield_,
-      leverage,
-      velocity,
-      snr,
-      dev10x: (input as number) > 0 && (cacheRead as number) > 0
-        ? Math.log10((cacheRead as number) / (input as number))
-        : null,
+      yield_: c.yield,
+      leverage: c.leverage,
+      velocity: c.velocity,
+      snr: c.snr,
+      dev10x: c.dev10x,
+      class: c.class,
       non_compounding: nonCompounding,
+      ...(c.warnings ? { warnings: c.warnings } : {}),
     });
   }
 
@@ -1435,6 +1445,437 @@ async function callTool(name: string, args: Record<string, unknown>) {
       best_path: bestPath,
       all_paths: strategies,
       interpretation: `To move from the ${currentPercentile}th to the ${targetPercentile}th percentile, the smallest change is: ${bestPath.strategy}. This would move you from rank #${currentRank} to ~#${simRank} (${simPercentile}th percentile).`,
+    });
+  }
+
+  // ─── #2: operator_gap, field_anomaly, who_operates_like_me, compare_to_field, operator_signature
+
+  if (name === "operator_gap") {
+    // Parse operator A
+    let aPillars: { input: number; output: number; cacheCreate: number; cacheRead: number };
+    let aName: string | null = null;
+    if (typeof args.a_codename === "string") {
+      const row = await getOperator(args.a_codename.trim());
+      if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${args.a_codename}".` }, true);
+      aName = row.operator.display_name || row.operator.codename;
+      const tel = row.telemetry;
+      if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${args.a_codename}" has no telemetry.` }, true);
+      aPillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
+    } else {
+      const parsed = parsePillars({
+        input: args.a_input, output: args.a_output,
+        cache_read: args.a_cache_read, cache_write: args.a_cache_write,
+      });
+      if ("error" in parsed) return textResult({ code: "invalid_arguments", message: "Operator A: " + parsed.error + " Or provide a_codename." }, true);
+      aPillars = parsed;
+    }
+
+    // Parse operator B
+    let bPillars: { input: number; output: number; cacheCreate: number; cacheRead: number };
+    let bName: string | null = null;
+    if (typeof args.b_codename === "string") {
+      const row = await getOperator(args.b_codename.trim());
+      if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${args.b_codename}".` }, true);
+      bName = row.operator.display_name || row.operator.codename;
+      const tel = row.telemetry;
+      if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${args.b_codename}" has no telemetry.` }, true);
+      bPillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
+    } else {
+      const parsed = parsePillars({
+        input: args.b_input, output: args.b_output,
+        cache_read: args.b_cache_read, cache_write: args.b_cache_write,
+      });
+      if ("error" in parsed) return textResult({ code: "invalid_arguments", message: "Operator B: " + parsed.error + " Or provide b_codename." }, true);
+      bPillars = parsed;
+    }
+
+    const aC = cascade(aPillars.input, aPillars.output, aPillars.cacheCreate, aPillars.cacheRead);
+    const bC = cascade(bPillars.input, bPillars.output, bPillars.cacheCreate, bPillars.cacheRead);
+    const aYield = aC.yield ?? 0;
+    const bYield = bC.yield ?? 0;
+    const yieldGap = aYield - bYield;
+
+    // Decompose the yield gap into metric contributions
+    // Υ = leverage × velocity = (cr/i) × (o/i)
+    const aLev = aC.leverage ?? 0;
+    const bLev = bC.leverage ?? 0;
+    const aVel = aC.velocity ?? 0;
+    const bVel = bC.velocity ?? 0;
+    const aSnr = aC.snr ?? 0;
+    const bSnr = bC.snr ?? 0;
+
+    const levGap = aLev - bLev;
+    const velGap = aVel - bVel;
+    const snrGap = aSnr - bSnr;
+
+    // Rank the contributing factors
+    const factors: Array<{ factor: string; gap: number; description: string }> = [
+      { factor: "leverage", gap: levGap, description: `cache reuse (${aLev.toFixed(1)}× vs ${bLev.toFixed(1)}×)` },
+      { factor: "velocity", gap: velGap, description: `output rate (${aVel.toFixed(2)}× vs ${bVel.toFixed(2)}×)` },
+      { factor: "snr", gap: snrGap, description: `signal-to-noise (${aSnr.toFixed(3)} vs ${bSnr.toFixed(3)})` },
+    ];
+    factors.sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
+
+    const primary = factors[0];
+    const secondary = factors[1];
+    const offsetting = factors.find((f) => f.gap < 0);
+
+    const winner = yieldGap > 0 ? (aName || "A") : (bName || "B");
+    const rankDiff = Math.abs(yieldGap) > 0 ? `${Math.abs(yieldGap).toFixed(1)} Υ` : "tied";
+
+    return textResult({
+      operator_a: { codename: args.a_codename ?? null, display_name: aName, yield: aYield, leverage: aLev, velocity: aVel, snr: aSnr, class: aC.class },
+      operator_b: { codename: args.b_codename ?? null, display_name: bName, yield: bYield, leverage: bLev, velocity: bVel, snr: bSnr, class: bC.class },
+      yield_gap: Number(yieldGap.toFixed(2)),
+      winner,
+      margin: rankDiff,
+      primary_cause: { factor: primary.factor, gap: Number(primary.gap.toFixed(4)), description: primary.description },
+      secondary_cause: { factor: secondary.factor, gap: Number(secondary.gap.toFixed(4)), description: secondary.description },
+      ...(offsetting ? { offsetting_weakness: { factor: offsetting.factor, gap: Number(offsetting.gap.toFixed(4)), description: offsetting.description } } : {}),
+      most_explanatory_factor: primary.factor,
+      interpretation: `${winner} outranks by ${rankDiff}. Primary cause: ${primary.description}. Secondary: ${secondary.description}.${offsetting ? ` Offsetting weakness: ${offsetting.description}.` : ""}`,
+    });
+  }
+
+  if (name === "field_anomaly") {
+    const window = typeof args.window === "string" ? args.window : "30d";
+    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    if (board.length === 0) {
+      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
+    }
+
+    // Collect compounding operators
+    const ops: Array<{ codename: string; display_name: string; yield: number; leverage: number; velocity: number; snr: number; cache_write: number; rank: number; movement_7d: number; class: string }> = [];
+    for (const row of board) {
+      const c = row.snapshot.cascade;
+      if (!c || c.nonCompounding) continue;
+      ops.push({
+        codename: row.operator.codename,
+        display_name: row.operator.display_name || row.operator.codename,
+        yield: c.yield_ ?? 0,
+        leverage: c.leverage ?? 0,
+        velocity: c.velocity ?? 0,
+        snr: c.snr ?? 0,
+        cache_write: row.telemetry?.cache_create ?? 0,
+        rank: row.global_rank,
+        movement_7d: row.snapshot.movement_7d,
+        class: row.snapshot.class_tier,
+      });
+    }
+
+    if (ops.length < 5) {
+      return textResult({ code: "insufficient_field", message: `Only ${ops.length} compounding operators — not enough for anomaly detection.` });
+    }
+
+    const medianLev = [...ops.map((o) => o.leverage)].sort((a, b) => a - b)[Math.floor(ops.length / 2)];
+    const anomalies: Array<Record<string, unknown>> = [];
+
+    // 1. Highest velocity among below-median leverage operators
+    const belowMedianLev = ops.filter((o) => o.leverage < medianLev);
+    if (belowMedianLev.length > 0) {
+      const top = [...belowMedianLev].sort((a, b) => b.velocity - a.velocity)[0];
+      anomalies.push({
+        type: "high_velocity_low_leverage",
+        title: `Highest Velocity among below-median Leverage operators`,
+        operator: top.codename,
+        display_name: top.display_name,
+        velocity: top.velocity,
+        leverage: top.leverage,
+        finding: `${top.display_name} has velocity ${top.velocity.toFixed(2)}× with only ${top.leverage.toFixed(1)}× leverage — generating fast without much context reuse.`,
+      });
+    }
+
+    // 2. Only top-50 operator with near-zero cache write
+    const top50 = ops.slice(0, Math.min(50, ops.length));
+    const nearZeroCw = top50.filter((o) => o.cache_write < o.yield * 0.01);
+    if (nearZeroCw.length > 0 && nearZeroCw.length <= 3) {
+      for (const op of nearZeroCw) {
+        anomalies.push({
+          type: "top_50_zero_cache_write",
+          title: `Top-50 operator with near-zero cache write`,
+          operator: op.codename,
+          display_name: op.display_name,
+          rank: op.rank,
+          cache_write: op.cache_write,
+          finding: `${op.display_name} is rank #${op.rank} with near-zero cache creation — non-compounding or barely committing context.`,
+        });
+      }
+    }
+
+    // 3. Largest 7-day yield improvement
+    const movers = [...ops].filter((o) => o.movement_7d > 0).sort((a, b) => b.movement_7d - a.movement_7d);
+    if (movers.length > 0) {
+      const top = movers[0];
+      anomalies.push({
+        type: "largest_7d_improvement",
+        title: `Largest 7-day rank improvement`,
+        operator: top.codename,
+        display_name: top.display_name,
+        movement_7d: top.movement_7d,
+        finding: `${top.display_name} climbed ${top.movement_7d} positions in the last 7 days — the largest field movement.`,
+      });
+    }
+
+    // 4. Extreme divergence: highest yield with lowest class
+    const sortedByYield = [...ops].sort((a, b) => b.yield - a.yield);
+    const topYield = sortedByYield[0];
+    const bottomYield = sortedByYield[sortedByYield.length - 1];
+    if (topYield && bottomYield && topYield.yield > 0) {
+      const ratio = bottomYield.yield > 0 ? topYield.yield / bottomYield.yield : Infinity;
+      if (ratio > 100) {
+        anomalies.push({
+          type: "extreme_yield_divergence",
+          title: `Extreme yield divergence`,
+          top: { operator: topYield.codename, yield: topYield.yield },
+          bottom: { operator: bottomYield.codename, yield: bottomYield.yield },
+          ratio: ratio === Infinity ? "infinite" : Number(ratio.toFixed(1)),
+          finding: `Top operator ${topYield.display_name} (Υ ${topYield.yield.toFixed(1)}) outperforms bottom ${bottomYield.display_name} (Υ ${bottomYield.yield.toFixed(1)}) by ${ratio === Infinity ? "∞" : ratio.toFixed(0) + "×"}.`,
+        });
+      }
+    }
+
+    // 5. Rarest signature (compute signatures and find the most unusual)
+    const sigs = ops.map((o) => operatorSignature(cascade(0, 0, 0, 0))); // placeholder — would need pillars
+    // Skip signature rarity for now — needs pillar data from the board
+
+    return textResult({
+      window,
+      total_operators: ops.length,
+      anomalies,
+      summary: `${anomalies.length} anomalies detected across ${ops.length} compounding operators.`,
+    });
+  }
+
+  if (name === "who_operates_like_me") {
+    const window = typeof args.window === "string" ? args.window : "30d";
+    const limit = typeof args.limit === "number" ? Math.min(20, Math.max(1, Math.trunc(args.limit))) : 5;
+    const codename = typeof args.codename === "string" ? args.codename.trim() : null;
+
+    let myPillars: { input: number; output: number; cacheCreate: number; cacheRead: number };
+    let myName: string | null = null;
+
+    if (codename) {
+      const row = await getOperator(codename);
+      if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
+      myName = row.operator.display_name || row.operator.codename;
+      const tel = row.telemetry;
+      if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry.` }, true);
+      myPillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
+    } else {
+      const parsed = parsePillars(args);
+      if ("error" in parsed) return textResult({ code: "invalid_arguments", message: parsed.error + " Or provide a codename." }, true);
+      myPillars = parsed;
+    }
+
+    const myC = cascade(myPillars.input, myPillars.output, myPillars.cacheCreate, myPillars.cacheRead);
+    const mySig = operatorSignature(myC);
+    const myLev = myC.leverage ?? 0;
+    const myVel = myC.velocity ?? 0;
+    const mySnr = myC.snr ?? 0;
+
+    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    if (board.length === 0) {
+      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
+    }
+
+    // Compute signature distance to each board operator
+    const neighbors: Array<Record<string, unknown>> = [];
+    for (const row of board) {
+      const c = row.snapshot.cascade;
+      if (!c || c.nonCompounding) continue;
+      if (codename && row.operator.codename.toLowerCase() === codename.toLowerCase()) continue;
+
+      const theirLev = c.leverage ?? 0;
+      const theirVel = c.velocity ?? 0;
+      const theirSnr = c.snr ?? 0;
+
+      // Normalized Euclidean distance on (leverage, velocity, snr)
+      // Normalize by field scale: leverage ~100s, velocity ~1-10, snr ~0-1
+      const dLev = (myLev - theirLev) / 100;
+      const dVel = (myVel - theirVel) / 5;
+      const dSnr = (mySnr - theirSnr) / 1;
+      const distance = Math.sqrt(dLev * dLev + dVel * dVel + dSnr * dSnr);
+      const similarity = Math.max(0, Number((100 - distance * 10).toFixed(1)));
+
+      neighbors.push({
+        codename: row.operator.codename,
+        display_name: row.operator.display_name || row.operator.codename,
+        rank: row.global_rank,
+        yield: c.yield_,
+        leverage: theirLev,
+        velocity: theirVel,
+        snr: theirSnr,
+        class: row.snapshot.class_tier,
+        signature_distance: Number(distance.toFixed(3)),
+        similarity_pct: similarity,
+        ...(theirLev > myLev ? { they_outperform_you_on: "leverage" } : {}),
+        ...(theirVel > myVel ? { they_outperform_you_on_velocity: true } : {}),
+        ...(c.yield_ && c.yield_ > (myC.yield ?? 0) ? { separates_you_from_better: `+${Number((c.yield_ - (myC.yield ?? 0)).toFixed(1))} Υ` } : {}),
+      });
+    }
+
+    neighbors.sort((a, b) => (a.signature_distance as number) - (b.signature_distance as number));
+    const top = neighbors.slice(0, limit);
+
+    return textResult({
+      you: {
+        codename: codename,
+        display_name: myName,
+        signature: mySig.code,
+        archetype: mySig.archetype,
+        dominant_trait: mySig.dominant_trait,
+        yield: myC.yield,
+        leverage: myLev,
+        velocity: myVel,
+        snr: mySnr,
+      },
+      nearest_neighbors: top,
+      window,
+      total_compared: neighbors.length,
+    });
+  }
+
+  if (name === "compare_to_field") {
+    const window = typeof args.window === "string" ? args.window : "30d";
+    const codename = typeof args.codename === "string" ? args.codename.trim() : null;
+
+    let pillars: { input: number; output: number; cacheCreate: number; cacheRead: number };
+    let myName: string | null = null;
+
+    if (codename) {
+      const row = await getOperator(codename);
+      if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
+      myName = row.operator.display_name || row.operator.codename;
+      const tel = row.telemetry;
+      if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry.` }, true);
+      pillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
+    } else {
+      const parsed = parsePillars(args);
+      if ("error" in parsed) return textResult({ code: "invalid_arguments", message: parsed.error + " Or provide a codename." }, true);
+      pillars = parsed;
+    }
+
+    const myC = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
+    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    if (board.length === 0) {
+      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
+    }
+
+    const yields: number[] = [], leverages: number[] = [], velocities: number[] = [], snrs: number[] = [];
+    for (const row of board) {
+      const c = row.snapshot.cascade;
+      if (!c || c.nonCompounding) continue;
+      if (typeof c.yield_ === "number") yields.push(c.yield_);
+      if (typeof c.leverage === "number") leverages.push(c.leverage);
+      if (typeof c.velocity === "number") velocities.push(c.velocity);
+      if (typeof c.snr === "number") snrs.push(c.snr);
+    }
+
+    if (yields.length < 5) {
+      return textResult({ code: "insufficient_field", message: `Only ${yields.length} compounding operators.` });
+    }
+
+    const bands = (arr: number[]) => {
+      const s = [...arr].sort((a, b) => a - b);
+      return {
+        median: s[Math.floor(s.length / 2)],
+        top_25: s[Math.floor(s.length * 0.75)] ?? s[s.length - 1],
+        top_10: s[Math.floor(s.length * 0.9)] ?? s[s.length - 1],
+        top_1: s[Math.floor(s.length * 0.99)] ?? s[s.length - 1],
+      };
+    };
+
+    const yB = bands(yields), lB = bands(leverages), vB = bands(velocities), sB = bands(snrs);
+
+    const row = (label: string, mine: number | null, field: { median: number; top_25: number; top_10: number; top_1: number }) => ({
+      metric: label,
+      you: mine,
+      field_median: Number(field.median.toFixed(4)),
+      top_25_percent: Number(field.top_25.toFixed(4)),
+      top_10_percent: Number(field.top_10.toFixed(4)),
+      top_1_percent: Number(field.top_1.toFixed(4)),
+      delta_from_median: mine !== null ? Number((mine - field.median).toFixed(4)) : null,
+    });
+
+    return textResult({
+      operator: myName ? { codename, display_name: myName } : null,
+      window,
+      total_operators: yields.length,
+      comparison: [
+        row("yield", myC.yield, yB),
+        row("leverage", myC.leverage, lB),
+        row("velocity", myC.velocity, vB),
+        row("snr", myC.snr, sB),
+      ],
+    });
+  }
+
+  if (name === "operator_signature") {
+    const window = typeof args.window === "string" ? args.window : "30d";
+    const codename = typeof args.codename === "string" ? args.codename.trim() : null;
+
+    let pillars: { input: number; output: number; cacheCreate: number; cacheRead: number };
+    let myName: string | null = null;
+
+    if (codename) {
+      const row = await getOperator(codename);
+      if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
+      myName = row.operator.display_name || row.operator.codename;
+      const tel = row.telemetry;
+      if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry.` }, true);
+      pillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
+    } else {
+      const parsed = parsePillars(args);
+      if ("error" in parsed) return textResult({ code: "invalid_arguments", message: parsed.error + " Or provide a codename." }, true);
+      pillars = parsed;
+    }
+
+    const myC = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
+    const sig = operatorSignature(myC);
+
+    // Find closest comparable operators from the board
+    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const comparables: Array<Record<string, unknown>> = [];
+    if (board.length > 0) {
+      const myLev = myC.leverage ?? 0;
+      const myVel = myC.velocity ?? 0;
+      const mySnr = myC.snr ?? 0;
+      const candidates: Array<Record<string, unknown>> = [];
+      for (const row of board) {
+        const c = row.snapshot.cascade;
+        if (!c || c.nonCompounding) continue;
+        if (codename && row.operator.codename.toLowerCase() === codename.toLowerCase()) continue;
+        const dLev = (myLev - (c.leverage ?? 0)) / 100;
+        const dVel = (myVel - (c.velocity ?? 0)) / 5;
+        const dSnr = (mySnr - (c.snr ?? 0)) / 1;
+        const dist = Math.sqrt(dLev * dLev + dVel * dVel + dSnr * dSnr);
+        candidates.push({
+          codename: row.operator.codename,
+          display_name: row.operator.display_name || row.operator.codename,
+          rank: row.global_rank,
+          yield: c.yield_,
+          signature_distance: Number(dist.toFixed(3)),
+        });
+      }
+      candidates.sort((a, b) => (a.signature_distance as number) - (b.signature_distance as number));
+      comparables.push(...candidates.slice(0, 5));
+    }
+
+    return textResult({
+      operator: myName ? { codename, display_name: myName } : null,
+      signature: sig.code,
+      archetype: sig.archetype,
+      dominant_trait: sig.dominant_trait,
+      metrics: {
+        yield: myC.yield,
+        leverage: myC.leverage,
+        velocity: myC.velocity,
+        snr: myC.snr,
+        dev10x: myC.dev10x,
+        class: myC.class,
+      },
+      closest_comparables: comparables,
+      window,
     });
   }
 
