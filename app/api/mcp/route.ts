@@ -491,7 +491,7 @@ function metricDelta(curr: number | null, sim: number | null) {
 /** Generate a shareable URL and text snippet for a tool result. */
 function shareable(toolName: string, params: Record<string, unknown>, summary: string): { share_url: string; share_text: string } {
   const encoded = encodeURIComponent(JSON.stringify(params));
-  const url = `https://signalaf.com/share/mcp?t=${toolName}&d=${encoded.slice(0, 200)}`;
+  const url = `https://signalaf.com/share/mcp?t=${toolName}&d=${encoded}`;
   return {
     share_url: url,
     share_text: summary,
@@ -512,6 +512,9 @@ async function callTool(name: string, args: Record<string, unknown>) {
     }
     const c = cascade(input as number, output as number, cacheWrite as number, cacheRead as number);
     const nonCompounding = (cacheWrite as number) === 0;
+    const evaluation = evaluateOperator(
+      { input: input as number, output: output as number, cache_read: cacheRead as number, cache_write: cacheWrite as number },
+    );
     return textResult({
       input,
       output,
@@ -525,6 +528,7 @@ async function callTool(name: string, args: Record<string, unknown>) {
       class: c.class,
       non_compounding: nonCompounding,
       ...(c.warnings ? { warnings: c.warnings } : {}),
+      evaluation,
     });
   }
 
@@ -1232,6 +1236,10 @@ async function callTool(name: string, args: Record<string, unknown>) {
       },
       interpretation,
       share: shareable("benchmark_me", { input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate, window }, interpretation),
+      evaluation: evaluateOperator(
+        { input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate },
+        { codename: codename ?? undefined, display_name: operatorName ?? undefined, fieldYields, fieldLeverages, fieldVelocities, fieldSnrs, window },
+      ),
     });
   }
 
@@ -1744,6 +1752,10 @@ async function callTool(name: string, args: Record<string, unknown>) {
       nearest_neighbors: top,
       window,
       total_compared: neighbors.length,
+      evaluation: evaluateOperator(
+        { input: myPillars.input, output: myPillars.output, cache_read: myPillars.cacheRead, cache_write: myPillars.cacheCreate },
+        { codename: codename ?? undefined, display_name: myName ?? undefined, window },
+      ),
     });
   }
 
@@ -1819,6 +1831,10 @@ async function callTool(name: string, args: Record<string, unknown>) {
         row("velocity", myC.velocity, vB),
         row("snr", myC.snr, sB),
       ],
+      evaluation: evaluateOperator(
+        { input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate },
+        { codename: codename ?? undefined, display_name: myName ?? undefined, fieldYields: yields, fieldLeverages: leverages, fieldVelocities: velocities, fieldSnrs: snrs, window },
+      ),
     });
   }
 
@@ -1889,6 +1905,10 @@ async function callTool(name: string, args: Record<string, unknown>) {
       closest_comparables: comparables,
       window,
       share: shareable("operator_signature", { codename: codename, input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate, window }, `${sig.archetype} operator — ${sig.code} — ${sig.dominant_trait}`),
+      evaluation: evaluateOperator(
+        { input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate },
+        { codename: codename ?? undefined, display_name: myName ?? undefined, window },
+      ),
     });
   }
 
@@ -1920,7 +1940,7 @@ export async function POST(req: NextRequest) {
       : PROTOCOL_VERSION;
     return jsonRpc(id, {
       protocolVersion: negotiated,
-      capabilities: { tools: {}, resources: { listChanged: false } },
+      capabilities: { tools: {}, resources: { listChanged: false }, prompts: { listChanged: false } },
       serverInfo: {
         name: "sigrank-signalaf",
         title: "SigRank SignalAF",
@@ -2206,6 +2226,116 @@ These formulas are frozen. Do not modify without owner approval.`,
     }
 
     return rpcError(id, -32602, "Unknown resource", { uri });
+  }
+
+  // ── prompts/list ──
+  if (message.method === "prompts/list") {
+    return jsonRpc(id, {
+      prompts: [
+        {
+          name: "benchmark-my-operator",
+          title: "Benchmark My AI Operator",
+          description: "Compute your cascade metrics, compare against the live field, and get a one-line interpretation of where you stand.",
+          arguments: [
+            { name: "input", description: "Total input tokens", required: true },
+            { name: "output", description: "Total output tokens", required: true },
+            { name: "cache_read", description: "Cache-read tokens", required: true },
+            { name: "cache_write", description: "Cache-write tokens", required: true },
+            { name: "window", description: "Time window (7d, 30d, 90d, all_time)", required: false },
+          ],
+        },
+        {
+          name: "how-do-i-reach-top-10",
+          title: "How Do I Reach Top 10%?",
+          description: "Counterfactual analysis — finds the smallest pillar change needed to reach a target percentile.",
+          arguments: [
+            { name: "input", description: "Current input tokens", required: true },
+            { name: "output", description: "Current output tokens", required: true },
+            { name: "cache_read", description: "Current cache-read tokens", required: true },
+            { name: "cache_write", description: "Current cache-write tokens", required: true },
+            { name: "target_percentile", description: "Target percentile (0-100, e.g. 90 for top 10%)", required: true },
+          ],
+        },
+        {
+          name: "explain-my-signature",
+          title: "Explain My Operating Signature",
+          description: "Computes your operating archetype, dominant trait, and finds comparable operators on the live board.",
+          arguments: [
+            { name: "input", description: "Total input tokens", required: true },
+            { name: "output", description: "Total output tokens", required: true },
+            { name: "cache_read", description: "Cache-read tokens", required: true },
+            { name: "cache_write", description: "Cache-write tokens", required: true },
+          ],
+        },
+        {
+          name: "diagnose-inefficiency",
+          title: "Diagnose My Inefficiency",
+          description: "Identifies efficiency leaks in your token cascade with severity, findings, and estimated yield impact per fix.",
+          arguments: [
+            { name: "input", description: "Total input tokens", required: true },
+            { name: "output", description: "Total output tokens", required: true },
+            { name: "cache_read", description: "Cache-read tokens", required: true },
+            { name: "cache_write", description: "Cache-write tokens", required: true },
+          ],
+        },
+        {
+          name: "field-anomaly-report",
+          title: "Field Anomaly Report",
+          description: "Scans the live leaderboard for unusual patterns — no input required.",
+          arguments: [
+            { name: "window", description: "Time window (7d, 30d, 90d, all_time)", required: false },
+          ],
+        },
+      ],
+    });
+  }
+
+  // ── prompts/get ──
+  if (message.method === "prompts/get") {
+    const promptName = message.params?.name;
+    const promptArgs = (message.params?.arguments ?? {}) as Record<string, string | number>;
+    if (typeof promptName !== "string") {
+      return rpcError(id, -32602, "Invalid params", { required: "params.name" });
+    }
+
+    const prompts: Record<string, { messages: Array<{ role: string; content: { type: string; text: string } }> }> = {
+      "benchmark-my-operator": {
+        messages: [{
+          role: "user",
+          content: { type: "text", text: `I have an AI operator with these token counts:\n  input: ${promptArgs.input || "?"}\n  output: ${promptArgs.output || "?"}\n  cache_read: ${promptArgs.cache_read || "?"}\n  cache_write: ${promptArgs.cache_write || "?"}\n\nUse the benchmark_me tool to compute my cascade metrics, compare me against the live field, and tell me:\n1. My percentile and estimated rank\n2. My strongest and weakest metric vs the field median\n3. What that means in plain English\n\nThen use the operator_signature tool to tell me my operating archetype and dominant trait.` },
+        }],
+      },
+      "how-do-i-reach-top-10": {
+        messages: [{
+          role: "user",
+          content: { type: "text", text: `My current token counts:\n  input: ${promptArgs.input || "?"}\n  output: ${promptArgs.output || "?"}\n  cache_read: ${promptArgs.cache_read || "?"}\n  cache_write: ${promptArgs.cache_write || "?"}\n\nI want to reach the ${promptArgs.target_percentile || 90}th percentile. Use the rank_if tool to find the smallest pillar change that would get me there. Tell me:\n1. My current rank and percentile\n2. The best path to reach the target\n3. What the simulated rank would be after the change` },
+        }],
+      },
+      "explain-my-signature": {
+        messages: [{
+          role: "user",
+          content: { type: "text", text: `My token counts:\n  input: ${promptArgs.input || "?"}\n  output: ${promptArgs.output || "?"}\n  cache_read: ${promptArgs.cache_read || "?"}\n  cache_write: ${promptArgs.cache_write || "?"}\n\nUse the operator_signature tool to compute my operating signature. Then use who_operates_like_me to find operators with similar signatures. Tell me:\n1. My archetype and dominant trait\n2. Who operates like me\n3. Where they outperform me` },
+        }],
+      },
+      "diagnose-inefficiency": {
+        messages: [{
+          role: "user",
+          content: { type: "text", text: `My token counts:\n  input: ${promptArgs.input || "?"}\n  output: ${promptArgs.output || "?"}\n  cache_read: ${promptArgs.cache_read || "?"}\n  cache_write: ${promptArgs.cache_write || "?"}\n\nUse the diagnose_cascade tool to identify efficiency leaks in my token cascade. Then use suggest_improvements to rank potential fixes by yield impact. Tell me:\n1. My most severe inefficiency\n2. The top 3 recommended fixes\n3. The estimated yield improvement for each` },
+        }],
+      },
+      "field-anomaly-report": {
+        messages: [{
+          role: "user",
+          content: { type: "text", text: `Use the field_anomaly tool to scan the live leaderboard for unusual patterns. Then summarize the most interesting anomalies in plain English — who is doing something unusual, what they're doing, and why it matters.` },
+        }],
+      },
+    };
+
+    const prompt = prompts[promptName];
+    if (!prompt) {
+      return rpcError(id, -32602, "Unknown prompt", { name: promptName });
+    }
+    return jsonRpc(id, prompt);
   }
 
   return rpcError(id, -32601, "Method not found", { method: message.method });
