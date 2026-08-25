@@ -350,6 +350,45 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: "benchmark_me",
+    title: "Benchmark Me — Field Position Analyzer",
+    description:
+      "Answers 'How good am I?' — benchmarks your token cascade against the live field. Takes 4 token pillars (or a codename), computes your cascade, then compares against the live leaderboard: percentile, rank, distance from median, distance from top 10%, strongest metric, weakest metric, and a one-line interpretation. This is the human-question tool — use it when someone asks 'am I a power user?' or 'how do I compare?'.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        input: { type: "number", minimum: 0, description: "Total input tokens. Required if codename is not provided." },
+        output: { type: "number", minimum: 0, description: "Total output tokens. Required if codename is not provided." },
+        cache_read: { type: "number", minimum: 0, description: "Cache-read tokens. Required if codename is not provided." },
+        cache_write: { type: "number", minimum: 0, description: "Cache-write tokens. Required if codename is not provided." },
+        codename: { type: "string", description: "Operator codename (alternative to providing pillars). If provided, fetches live profile from the board." },
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d", description: "Time window for field comparison (default 30d)." },
+      },
+    },
+  },
+  {
+    name: "rank_if",
+    title: "Rank If — Counterfactual Rank Simulator",
+    description:
+      "Answers 'What would it take to reach a target rank?' — takes your current 4 token pillars and a target percentile (e.g. 90 for top 10%), then simulates the smallest metric changes needed to reach that position. Returns: current rank/percentile, simulated rank/percentile, the specific pillar changes required, and the yield delta. This turns SigRank from a scoreboard into a simulator. Use it when someone asks 'what would move my rank?' or 'how do I get to top 10%?'.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["input", "output", "cache_read", "cache_write", "target_percentile"],
+      properties: {
+        input: { type: "number", minimum: 0, description: "Current input tokens." },
+        output: { type: "number", minimum: 0, description: "Current output tokens." },
+        cache_read: { type: "number", minimum: 0, description: "Current cache-read tokens." },
+        cache_write: { type: "number", minimum: 0, description: "Current cache-write tokens." },
+        target_percentile: { type: "number", minimum: 0, maximum: 100, description: "Target percentile (0-100). E.g. 90 for top 10%, 99 for top 1%." },
+        window: { type: "string", enum: ["7d", "30d", "90d", "all_time"], default: "30d", description: "Time window for field comparison (default 30d)." },
+      },
+    },
+  },
 ] as const;
 
 type RpcId = string | number | null;
@@ -1017,6 +1056,388 @@ async function callTool(name: string, args: Record<string, unknown>) {
     });
   }
 
+  // ─── Field-relative tools (need leaderboard data) ──────────────────
+
+  if (name === "benchmark_me") {
+    const window = typeof args.window === "string" ? args.window : "30d";
+    const codename = typeof args.codename === "string" ? args.codename.trim() : null;
+
+    let pillars: { input: number; output: number; cacheCreate: number; cacheRead: number };
+    let operatorName: string | null = null;
+
+    if (codename) {
+      const row = await getOperator(codename);
+      if (!row) {
+        return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
+      }
+      const t = row.operator;
+      operatorName = t.display_name || t.codename;
+      const tel = row.telemetry;
+      if (!tel) {
+        return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry data.` }, true);
+      }
+      pillars = {
+        input: tel.fresh_input,
+        output: tel.output,
+        cacheCreate: tel.cache_create,
+        cacheRead: tel.cache_read,
+      };
+    } else {
+      const parsed = parsePillars(args);
+      if ("error" in parsed) {
+        return textResult({ code: "invalid_arguments", message: parsed.error + " Or provide a codename instead." }, true);
+      }
+      pillars = parsed;
+    }
+
+    const myCascade = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
+    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+
+    if (board.length === 0) {
+      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable. Try again later." }, true);
+    }
+
+    // Extract cascade metrics from board rows, filtering to compounding operators
+    const fieldYields: number[] = [];
+    const fieldLeverages: number[] = [];
+    const fieldVelocities: number[] = [];
+    const fieldSnrs: number[] = [];
+    for (const row of board) {
+      const c = row.snapshot.cascade;
+      if (!c || c.nonCompounding) continue;
+      if (typeof c.yield_ === "number") fieldYields.push(c.yield_);
+      if (typeof c.leverage === "number") fieldLeverages.push(c.leverage);
+      if (typeof c.velocity === "number") fieldVelocities.push(c.velocity);
+      if (typeof c.snr === "number") fieldSnrs.push(c.snr);
+    }
+
+    if (fieldYields.length < 5) {
+      return textResult({
+        pillars: { input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate },
+        cascade: { yield_: myCascade.yield, snr: myCascade.snr, leverage: myCascade.leverage, velocity: myCascade.velocity, dev10x: myCascade.dev10x, class: myCascade.class },
+        code: "insufficient_field",
+        message: `Only ${fieldYields.length} compounding operators on the ${window} board — not enough for a meaningful benchmark.`,
+      });
+    }
+
+    const myYield = myCascade.yield ?? 0;
+    const sortedYields = [...fieldYields].sort((a, b) => a - b);
+    const median = sortedYields[Math.floor(sortedYields.length / 2)];
+    const top10Idx = Math.floor(sortedYields.length * 0.9);
+    const top1Idx = Math.floor(sortedYields.length * 0.99);
+    const top10Yield = sortedYields[top10Idx] ?? sortedYields[sortedYields.length - 1];
+    const top1Yield = sortedYields[top1Idx] ?? sortedYields[sortedYields.length - 1];
+
+    // Compute my percentile against the field
+    let below = 0;
+    for (const y of fieldYields) {
+      if (y < myYield) below++;
+    }
+    const myPercentile = Number(((below / fieldYields.length) * 100).toFixed(1));
+    const myRank = fieldYields.filter((y) => y > myYield).length + 1;
+
+    // Strongest / weakest metric (compare my metrics to field medians)
+    const fieldMedian = (arr: number[]) => {
+      const s = [...arr].sort((a, b) => a - b);
+      return s[Math.floor(s.length / 2)];
+    };
+    const medLev = fieldMedian(fieldLeverages);
+    const medVel = fieldMedian(fieldVelocities);
+    const medSnr = fieldMedian(fieldSnrs);
+
+    const myLev = myCascade.leverage ?? 0;
+    const myVel = myCascade.velocity ?? 0;
+    const mySnr = myCascade.snr ?? 0;
+
+    const metricRatios: Array<{ metric: string; ratio: number; mine: number; field: number }> = [
+      { metric: "leverage", ratio: medLev > 0 ? myLev / medLev : 0, mine: myLev, field: medLev },
+      { metric: "velocity", ratio: medVel > 0 ? myVel / medVel : 0, mine: myVel, field: medVel },
+      { metric: "snr", ratio: medSnr > 0 ? mySnr / medSnr : 0, mine: mySnr, field: medSnr },
+    ];
+    metricRatios.sort((a, b) => b.ratio - a.ratio);
+    const strongest = metricRatios[0];
+    const weakest = metricRatios[metricRatios.length - 1];
+
+    const distFromMedian = Number(((myYield / median - 1) * 100).toFixed(1));
+    const distFromTop10 = Number(((myYield / top10Yield - 1) * 100).toFixed(1));
+
+    // One-line interpretation
+    let interpretation: string;
+    if (myPercentile >= 95) {
+      interpretation = `Top ${Math.round(100 - myPercentile)}% of the field — elite operator. ${strongest.metric.charAt(0).toUpperCase() + strongest.metric.slice(1)} is your engine (${strongest.ratio.toFixed(1)}× field median).`;
+    } else if (myPercentile >= 75) {
+      interpretation = `${myPercentile}th percentile — above average. ${weakest.metric.charAt(0).toUpperCase() + weakest.metric.slice(1)} is holding you back (${weakest.ratio.toFixed(1)}× field median). Push it to break into the top 10%.`;
+    } else if (myPercentile >= 50) {
+      interpretation = `${myPercentile}th percentile — middle of the pack. ${weakest.metric.charAt(0).toUpperCase() + weakest.metric.slice(1)} is your weak link (${weakest.ratio.toFixed(1)}× field median). Fix it to climb.`;
+    } else {
+      interpretation = `${myPercentile}th percentile — below median. ${weakest.metric.charAt(0).toUpperCase() + weakest.metric.slice(1)} is critically low (${weakest.ratio.toFixed(1)}× field median). Focus there first.`;
+    }
+
+    return textResult({
+      operator: operatorName ? { codename: codename, display_name: operatorName } : null,
+      pillars: { input: pillars.input, output: pillars.output, cache_read: pillars.cacheRead, cache_write: pillars.cacheCreate },
+      your_cascade: {
+        yield_: myCascade.yield, snr: myCascade.snr, leverage: myCascade.leverage,
+        velocity: myCascade.velocity, dev10x: myCascade.dev10x, class: myCascade.class,
+      },
+      field_position: {
+        percentile: myPercentile,
+        estimated_rank: myRank,
+        total_operators: fieldYields.length,
+        window: window,
+      },
+      field_benchmarks: {
+        median_yield: Number(median.toFixed(2)),
+        top_10_percent_yield: Number(top10Yield.toFixed(2)),
+        top_1_percent_yield: Number(top1Yield.toFixed(2)),
+        median_leverage: Number(medLev.toFixed(1)),
+        median_velocity: Number(medVel.toFixed(3)),
+        median_snr: Number(medSnr.toFixed(4)),
+      },
+      distance: {
+        from_median_pct: distFromMedian,
+        from_top_10_pct: distFromTop10,
+      },
+      strongest_metric: {
+        metric: strongest.metric,
+        yours: Number(strongest.mine.toFixed(2)),
+        field_median: Number(strongest.field.toFixed(2)),
+        ratio_to_median: Number(strongest.ratio.toFixed(2)),
+      },
+      weakest_metric: {
+        metric: weakest.metric,
+        yours: Number(weakest.mine.toFixed(2)),
+        field_median: Number(weakest.field.toFixed(2)),
+        ratio_to_median: Number(weakest.ratio.toFixed(2)),
+      },
+      interpretation,
+    });
+  }
+
+  if (name === "rank_if") {
+    const parsed = parsePillars(args);
+    if ("error" in parsed) {
+      return textResult({ code: "invalid_arguments", message: parsed.error }, true);
+    }
+    const targetPercentile = args.target_percentile;
+    if (typeof targetPercentile !== "number" || !Number.isFinite(targetPercentile) || targetPercentile < 0 || targetPercentile > 100) {
+      return textResult({ code: "invalid_arguments", message: "target_percentile must be a number between 0 and 100." }, true);
+    }
+    const window = typeof args.window === "string" ? args.window : "30d";
+
+    const myCascade = cascade(parsed.input, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+    const myYield = myCascade.yield ?? 0;
+
+    // Fetch the live board to find the target yield threshold
+    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    if (board.length === 0) {
+      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable. Try again later." }, true);
+    }
+
+    const fieldYields: number[] = [];
+    for (const row of board) {
+      const c = row.snapshot.cascade;
+      if (!c || c.nonCompounding) continue;
+      if (typeof c.yield_ === "number") fieldYields.push(c.yield_);
+    }
+
+    if (fieldYields.length < 5) {
+      return textResult({ code: "insufficient_field", message: `Only ${fieldYields.length} compounding operators on the ${window} board — not enough for a meaningful simulation.` }, true);
+    }
+
+    const sortedYields = [...fieldYields].sort((a, b) => a - b);
+    // target_percentile = 90 means "be better than 90% of the field"
+    // → the yield at the 90th percentile of the sorted array
+    const targetIdx = Math.floor(sortedYields.length * (targetPercentile / 100));
+    const targetYield = sortedYields[Math.min(targetIdx, sortedYields.length - 1)];
+
+    // Current position
+    let below = 0;
+    for (const y of fieldYields) {
+      if (y < myYield) below++;
+    }
+    const currentPercentile = Number(((below / fieldYields.length) * 100).toFixed(1));
+    const currentRank = fieldYields.filter((y) => y > myYield).length + 1;
+
+    // If already at or above target
+    if (currentPercentile >= targetPercentile) {
+      return textResult({
+        pillars: { input: parsed.input, output: parsed.output, cache_read: parsed.cacheRead, cache_write: parsed.cacheCreate },
+        current: { yield: myYield, percentile: currentPercentile, rank: currentRank, class: myCascade.class },
+        target: { percentile: targetPercentile, required_yield: Number(targetYield.toFixed(2)) },
+        already_achieved: true,
+        message: `You're already at the ${currentPercentile}th percentile — above your target of ${targetPercentile}th.`,
+      });
+    }
+
+    const yieldGap = targetYield - myYield;
+    if (yieldGap <= 0) {
+      return textResult({
+        pillars: { input: parsed.input, output: parsed.output, cache_read: parsed.cacheRead, cache_write: parsed.cacheCreate },
+        current: { yield: myYield, percentile: currentPercentile, rank: currentRank, class: myCascade.class },
+        target: { percentile: targetPercentile, required_yield: Number(targetYield.toFixed(2)) },
+        already_achieved: true,
+        message: `Your yield already exceeds the ${targetPercentile}th percentile threshold.`,
+      });
+    }
+
+    // Simulate strategies to find the smallest change that reaches targetYield
+    // Υ = (cacheRead / input) × (output / input) = (cacheRead × output) / input²
+    // Strategies: increase cacheRead, decrease input, increase output, or combinations
+    const strategies: Array<Record<string, unknown>> = [];
+
+    // Strategy 1: Increase cache reads only — find the multiplier needed
+    // myYield × mult = targetYield → mult = targetYield / myYield
+    if (myYield > 0 && parsed.cacheRead > 0) {
+      const crMult = targetYield / myYield;
+      const newCr = Math.round(parsed.cacheRead * crMult);
+      const sim = cascade(parsed.input, parsed.output, parsed.cacheCreate, newCr);
+      if (sim.yield !== null && sim.yield >= targetYield) {
+        strategies.push({
+          strategy: `Increase cache reads by ${Math.round((crMult - 1) * 100)}%`,
+          pillar_changed: "cache_read",
+          change: `+${(newCr - parsed.cacheRead).toLocaleString()} tokens`,
+          new_value: newCr,
+          simulated_yield: Number(sim.yield.toFixed(2)),
+          yield_delta: Number((sim.yield - myYield).toFixed(2)),
+          simulated_class: sim.class,
+          class_changed: myCascade.class !== sim.class,
+        });
+      }
+    }
+
+    // Strategy 2: Decrease input only
+    // Υ = (cr × o) / i² → targetYield = (cr × o) / i² → i = sqrt(cr × o / targetYield)
+    if (targetYield > 0 && parsed.cacheRead > 0 && parsed.output > 0) {
+      const newInput = Math.floor(Math.sqrt((parsed.cacheRead * parsed.output) / targetYield));
+      if (newInput > 0 && newInput < parsed.input) {
+        const sim = cascade(newInput, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+        if (sim.yield !== null && sim.yield >= targetYield) {
+          strategies.push({
+            strategy: `Reduce fresh input by ${Math.round((1 - newInput / parsed.input) * 100)}%`,
+            pillar_changed: "input",
+            change: `-${(parsed.input - newInput).toLocaleString()} tokens`,
+            new_value: newInput,
+            simulated_yield: Number(sim.yield.toFixed(2)),
+            yield_delta: Number((sim.yield - myYield).toFixed(2)),
+            simulated_class: sim.class,
+            class_changed: myCascade.class !== sim.class,
+          });
+        }
+      }
+    }
+
+    // Strategy 3: Increase output only
+    // targetYield = (cr × o_new) / i² → o_new = targetYield × i² / cr
+    if (targetYield > 0 && parsed.cacheRead > 0 && parsed.input > 0) {
+      const newOutput = Math.ceil((targetYield * parsed.input * parsed.input) / parsed.cacheRead);
+      if (newOutput > parsed.output) {
+        const sim = cascade(parsed.input, newOutput, parsed.cacheCreate, parsed.cacheRead);
+        if (sim.yield !== null && sim.yield >= targetYield) {
+          strategies.push({
+            strategy: `Increase output by ${Math.round((newOutput / parsed.output - 1) * 100)}%`,
+            pillar_changed: "output",
+            change: `+${(newOutput - parsed.output).toLocaleString()} tokens`,
+            new_value: newOutput,
+            simulated_yield: Number(sim.yield.toFixed(2)),
+            yield_delta: Number((sim.yield - myYield).toFixed(2)),
+            simulated_class: sim.class,
+            class_changed: myCascade.class !== sim.class,
+          });
+        }
+      }
+    }
+
+    // Strategy 4: Balanced — 50% from cache reads, 50% from input reduction
+    if (myYield > 0 && parsed.cacheRead > 0) {
+      const sqrtMult = Math.sqrt(targetYield / myYield);
+      const newCr2 = Math.round(parsed.cacheRead * sqrtMult);
+      const newInput2 = Math.round(parsed.input / sqrtMult);
+      if (newInput2 > 0) {
+        const sim = cascade(newInput2, parsed.output, parsed.cacheCreate, newCr2);
+        if (sim.yield !== null && sim.yield >= targetYield) {
+          strategies.push({
+            strategy: `Balanced: +${Math.round((sqrtMult - 1) * 100)}% cache reads, -${Math.round((1 - 1 / sqrtMult) * 100)}% input`,
+            pillar_changed: "cache_read + input",
+            change: `cache_read: +${(newCr2 - parsed.cacheRead).toLocaleString()}, input: -${(parsed.input - newInput2).toLocaleString()}`,
+            new_values: { cache_read: newCr2, input: newInput2 },
+            simulated_yield: Number(sim.yield.toFixed(2)),
+            yield_delta: Number((sim.yield - myYield).toFixed(2)),
+            simulated_class: sim.class,
+            class_changed: myCascade.class !== sim.class,
+          });
+        }
+      }
+    }
+
+    // Strategy 5: If no cache, enable caching
+    if (parsed.cacheRead === 0 && parsed.cacheCreate === 0 && parsed.input > 0 && parsed.output > 0) {
+      // Need cr such that (cr × output) / input² >= targetYield
+      const minCr = Math.ceil((targetYield * parsed.input * parsed.input) / parsed.output);
+      const sim = cascade(parsed.input, parsed.output, Math.round(minCr * 0.5), minCr);
+      if (sim.yield !== null && sim.yield >= targetYield) {
+        strategies.push({
+          strategy: `Enable caching with ${minCr.toLocaleString()} cache reads`,
+          pillar_changed: "cache_read",
+          change: `+${minCr.toLocaleString()} tokens (from zero)`,
+          new_value: minCr,
+          simulated_yield: Number(sim.yield.toFixed(2)),
+          yield_delta: Number((sim.yield - myYield).toFixed(2)),
+          simulated_class: sim.class,
+          class_changed: myCascade.class !== sim.class,
+        });
+      }
+    }
+
+    if (strategies.length === 0) {
+      return textResult({
+        pillars: { input: parsed.input, output: parsed.output, cache_read: parsed.cacheRead, cache_write: parsed.cacheCreate },
+        current: { yield: myYield, percentile: currentPercentile, rank: currentRank, class: myCascade.class },
+        target: { percentile: targetPercentile, required_yield: Number(targetYield.toFixed(2)) },
+        yield_gap: Number(yieldGap.toFixed(2)),
+        message: `No single-pillar strategy could reach the ${targetPercentile}th percentile from your current position. The gap (${yieldGap.toFixed(1)} Υ) is too large for one change — consider combining multiple improvements.`,
+      });
+    }
+
+    // Sort by smallest token change (simplest path)
+    strategies.sort((a, b) => (a.yield_delta as number) - (b.yield_delta as number));
+    const bestPath = strategies[0] as Record<string, unknown>;
+
+    // Compute simulated rank
+    const simYield = bestPath.simulated_yield as number;
+    let simBelow = 0;
+    for (const y of fieldYields) {
+      if (y < simYield) simBelow++;
+    }
+    const simPercentile = Number(((simBelow / fieldYields.length) * 100).toFixed(1));
+    const simRank = fieldYields.filter((y) => y > simYield).length + 1;
+
+    return textResult({
+      pillars: { input: parsed.input, output: parsed.output, cache_read: parsed.cacheRead, cache_write: parsed.cacheCreate },
+      current: {
+        yield: myYield,
+        percentile: currentPercentile,
+        rank: currentRank,
+        class: myCascade.class,
+      },
+      target: {
+        percentile: targetPercentile,
+        required_yield: Number(targetYield.toFixed(2)),
+        yield_gap: Number(yieldGap.toFixed(2)),
+      },
+      simulated: {
+        yield: simYield,
+        percentile: simPercentile,
+        rank: simRank,
+        class: bestPath.simulated_class,
+        class_changed: bestPath.class_changed,
+      },
+      best_path: bestPath,
+      all_paths: strategies,
+      interpretation: `To move from the ${currentPercentile}th to the ${targetPercentile}th percentile, the smallest change is: ${bestPath.strategy}. This would move you from rank #${currentRank} to ~#${simRank} (${simPercentile}th percentile).`,
+    });
+  }
+
   return textResult({ code: "tool_not_found", message: `Unknown tool: ${name}` }, true);
 }
 
@@ -1054,7 +1475,7 @@ export async function POST(req: NextRequest) {
         websiteUrl: "https://signalaf.com",
       },
       instructions:
-        "Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Read tools: rank_paste (compute cascade from 4 token counts), get_leaderboard (public rankings), get_operator (operator profile by codename). Analytical tools (pure math, no submission): simulate_change (what-if pillar changes), diagnose_cascade (efficiency leak finder), suggest_improvements (ranked yield optimizer), self_improve (one-click full cycle), rank_windows (multi-window cascade). Do not treat these metrics as a model-quality or downstream-productivity benchmark.",
+        "Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Read tools: rank_paste (compute cascade from 4 token counts), get_leaderboard (public rankings), get_operator (operator profile by codename). Analytical tools (pure math): simulate_change (what-if pillar changes), diagnose_cascade (efficiency leak finder), suggest_improvements (ranked yield optimizer), self_improve (one-click full cycle), rank_windows (multi-window cascade). Field-relative tools (need leaderboard): benchmark_me (answers 'how good am I?' — percentile, rank, strongest/weakest metric vs field), rank_if (answers 'what would it take to reach top 10%?' — counterfactual rank simulator). Do not treat these metrics as a model-quality or downstream-productivity benchmark.",
     });
   }
 
