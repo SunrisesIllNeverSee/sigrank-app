@@ -44,6 +44,8 @@ export async function GET() {
       "suggest_improvements",
       "self_improve",
       "rank_windows",
+      "benchmark_me",
+      "rank_if",
     ],
     install: "npx sigrank",
     docs: `${SITE_ORIGIN}/developers`,
