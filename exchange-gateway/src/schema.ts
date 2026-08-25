@@ -321,4 +321,7 @@ export const CreateExecutionSchema = z.object({
 
 export const SubmitReceiptSchema = z.object({
   receipt: ExecutionReceiptSchema,
+  provider_event_id: z.string().trim().min(1).max(200).optional(),
+  provider_event_timestamp: z.string().datetime().optional(),
+  nonce: z.string().trim().min(1).max(200).optional(),
 })
