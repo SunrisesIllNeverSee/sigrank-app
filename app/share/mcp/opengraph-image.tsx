@@ -17,6 +17,7 @@ import { buildShareCard } from "@/lib/share/mcp-card";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "SigRank MCP tool result — SignalAF";
+export const dynamic = "force-dynamic";
 
 // ── Palette (mirrors the operator OG card + ProfileShareCard) ──────────────
 const GOLD = "#c4923a";
