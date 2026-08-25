@@ -1,0 +1,10 @@
+# Ello Satellite runtime state (do not commit)
+
+observations/
+authority/
+state/
+inbox/
+outbox/
+requests/
+knowledge/
+agent/

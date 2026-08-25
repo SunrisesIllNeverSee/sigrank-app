@@ -1,0 +1,5 @@
+repo_id: sigrank_app
+satellite_version: 1
+control_plane: ello-repo-control
+authority_plane: search-authority
+initialized_at: '2026-08-25T03:38:24.366142-04:00'
