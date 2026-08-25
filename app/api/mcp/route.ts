@@ -4,18 +4,111 @@ import { getLeaderboard, getOperator } from "@/lib/board";
 const PROTOCOL_VERSION = "2025-06-18";
 const SUPPORTED_VERSIONS = new Set(["2025-06-18", "2025-03-26"]);
 
+// ─── Cascade math (mirrors sigrank-mcp/analytics/cascade.mjs) ───────────────
+// Pure functions, no deps. Canonical MO§ES Υ 18436.98 from (1251211, 11296121, 128196310, 2555179769).
+
+const round = (n: number, d: number): number | null =>
+  Number.isFinite(n) ? Number(n.toFixed(d)) : null;
+
+const RS05_CLASS_THRESHOLDS: { class: string; totalMin: number }[] = [
+  { class: "ARCH+ I", totalMin: 7068201104627 },
+  { class: "ARCH+ II", totalMin: 3000000000000 },
+  { class: "ARCH+ III", totalMin: 1000000000000 },
+  { class: "ARCH I", totalMin: 186207267611 },
+  { class: "ARCH II", totalMin: 98543134083 },
+  { class: "ARCH III", totalMin: 68766193943 },
+  { class: "POWER I", totalMin: 39958782379 },
+  { class: "POWER II", totalMin: 26955905621 },
+  { class: "POWER III", totalMin: 19141226889 },
+  { class: "BASE I", totalMin: 13960345961 },
+  { class: "BASE II", totalMin: 10189224970 },
+  { class: "BASE III", totalMin: 7747041813 },
+  { class: "SEEKER I", totalMin: 5446673659 },
+  { class: "SEEKER II", totalMin: 4014577247 },
+  { class: "SEEKER III", totalMin: 2961798768 },
+  { class: "REFINER I", totalMin: 2358346840 },
+  { class: "REFINER II", totalMin: 1845750357 },
+  { class: "REFINER III", totalMin: 1334876308 },
+  { class: "BEARER I", totalMin: 984078167 },
+  { class: "BEARER II", totalMin: 714619043 },
+  { class: "BEARER III", totalMin: 431702990 },
+  { class: "IGNITER I", totalMin: 216393332 },
+  { class: "IGNITER II", totalMin: 88999166 },
+  { class: "IGNITER III", totalMin: 0 },
+];
+
+function classify(totalTokens: number): string {
+  if (!Number.isFinite(totalTokens)) return "UNCLASSED";
+  for (const t of RS05_CLASS_THRESHOLDS) {
+    if (totalTokens >= t.totalMin) return t.class;
+  }
+  return "IGNITER III";
+}
+
+interface CascadeResult {
+  pillars: { input: number; output: number; cacheCreate: number; cacheRead: number; total: number };
+  yield: number | null;
+  snr: number | null;
+  leverage: number | null;
+  velocity: number | null;
+  dev10x: number | null;
+  class: string;
+  warnings?: string[];
+}
+
+function cascade(input: number, output: number, cacheCreate: number, cacheRead: number): CascadeResult {
+  const i = Number(input), o = Number(output), cw = Number(cacheCreate), cr = Number(cacheRead);
+  const total = i + o + cw + cr;
+  const warnings: string[] = [];
+
+  const snrDenom = i + o;
+  const snr = snrDenom > 0 ? o / snrDenom : null;
+  if (snr === null) warnings.push("snr_undefined: input+output=0");
+
+  const velocity = i > 0 ? o / i : null;
+  if (velocity === null) warnings.push("velocity_undefined: input=0");
+
+  const leverage = i > 0 ? cr / i : null;
+  if (leverage === null) warnings.push("leverage_undefined: input=0");
+
+  const yield_ = leverage !== null && velocity !== null ? leverage * velocity : null;
+  if (yield_ === null && !warnings.some((w) => w.startsWith("yield")))
+    warnings.push("yield_undefined: requires input>0");
+
+  let dev10x: number | null = null;
+  if (i > 0 && o > 0 && cw > 0 && cr > 0) {
+    dev10x = Math.log10((o / i) * (cw / o) * (cr / cw));
+  } else {
+    warnings.push("dev10x_undefined: requires all four pillars > 0");
+  }
+
+  const result: CascadeResult = {
+    pillars: { input: i, output: o, cacheCreate: cw, cacheRead: cr, total },
+    yield: round(yield_ ?? 0, 2),
+    snr: round(snr ?? 0, 4),
+    leverage: round(leverage ?? 0, 1),
+    velocity: round(velocity ?? 0, 3),
+    dev10x: round(dev10x ?? 0, 2),
+    class: classify(total),
+  };
+  if (warnings.length > 0) result.warnings = warnings;
+  return result;
+}
+
+const READ_ONLY_ANNOTATIONS = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+};
+
 const TOOLS = [
   {
     name: "rank_paste",
     title: "Rank Paste — Local Token Cascade Calculator",
     description:
       "Calculate SigRank cascade metrics from four non-negative token counts without submitting data. Returns Yield, Leverage, Velocity, SNR, and 10xDEV. No data is persisted.",
-    annotations: {
-      readOnlyHint: true,
-      destructiveHint: false,
-      idempotentHint: true,
-      openWorldHint: false,
-    },
+    annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",
       additionalProperties: false,
@@ -118,6 +211,145 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: "simulate_change",
+    title: "Simulate Change — What-If Cascade Predictor",
+    description:
+      "Prescriptive 'what if' tool — takes your current 4 token pillars and proposed changes, runs the cascade on both, returns the exact Υ Yield delta, class change, and per-metric diffs. Test proposed pillar changes and see the payoff before changing your workflow. Changes can be absolute numbers (replace) or strings starting with +/- for relative deltas.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["input", "output", "cache_read", "cache_write", "changes"],
+      properties: {
+        input: { type: "number", minimum: 0, description: "Current input tokens." },
+        output: { type: "number", minimum: 0, description: "Current output tokens." },
+        cache_read: { type: "number", minimum: 0, description: "Current cache-read tokens." },
+        cache_write: { type: "number", minimum: 0, description: "Current cache-write tokens." },
+        changes: {
+          type: "object",
+          description: "Proposed changes. Keys: input, output, cache_read, cache_write. Values are absolute numbers (replace) or strings starting with +/- for relative deltas. Omitted pillars are unchanged.",
+          properties: {
+            input: { type: ["number", "string"], description: "New input (absolute) or '+/-N' (relative)" },
+            output: { type: ["number", "string"], description: "New output (absolute) or '+/-N' (relative)" },
+            cache_read: { type: ["number", "string"], description: "New cache_read (absolute) or '+/-N' (relative)" },
+            cache_write: { type: ["number", "string"], description: "New cache_write (absolute) or '+/-N' (relative)" },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: "diagnose_cascade",
+    title: "Diagnose Cascade — Efficiency Leak Finder",
+    description:
+      "Analyzes your token cascade and diagnoses where you're leaking efficiency. Takes 4 token pillars and produces a ranked list of efficiency leaks with severity (critical/warning/info), findings, recommendations, and estimated Υ impact. Checks: cache leverage, velocity, SNR, cache creation ratio, input bloat, and 10xDEV compounding. Use this before simulate_change to understand what's wrong.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["input", "output", "cache_read", "cache_write"],
+      properties: {
+        input: { type: "number", minimum: 0, description: "Total input tokens." },
+        output: { type: "number", minimum: 0, description: "Total output tokens." },
+        cache_read: { type: "number", minimum: 0, description: "Cache-read tokens." },
+        cache_write: { type: "number", minimum: 0, description: "Cache-write tokens." },
+      },
+    },
+  },
+  {
+    name: "suggest_improvements",
+    title: "Suggest Improvements — Ranked Yield Optimizer",
+    description:
+      "Generates ranked, simulated improvement suggestions for your token cascade. Takes 4 token pillars, tests multiple strategies (increase cache reads, reduce input, increase output, optimize cache creation), simulates each, and returns them ranked by Υ yield impact. Each suggestion includes the action, pillar to change, projected Υ, yield delta, projected class, and rationale. Returns the single highest-impact change as best_single_change.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["input", "output", "cache_read", "cache_write"],
+      properties: {
+        input: { type: "number", minimum: 0, description: "Total input tokens." },
+        output: { type: "number", minimum: 0, description: "Total output tokens." },
+        cache_read: { type: "number", minimum: 0, description: "Cache-read tokens." },
+        cache_write: { type: "number", minimum: 0, description: "Cache-write tokens." },
+      },
+    },
+  },
+  {
+    name: "self_improve",
+    title: "Self-Improve — One-Click Cascade Optimizer",
+    description:
+      "Runs the full self-improvement cycle in one call: (1) computes your current cascade from 4 token pillars, (2) diagnoses efficiency leaks, (3) generates ranked improvement suggestions, (4) simulates the top suggestion, and (5) returns the complete cycle: diagnosis + suggestions + simulated impact of the best change. The 'one-click optimize' tool — call it at the end of a session to see what to improve next time.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["input", "output", "cache_read", "cache_write"],
+      properties: {
+        input: { type: "number", minimum: 0, description: "Total input tokens." },
+        output: { type: "number", minimum: 0, description: "Total output tokens." },
+        cache_read: { type: "number", minimum: 0, description: "Cache-read tokens." },
+        cache_write: { type: "number", minimum: 0, description: "Cache-write tokens." },
+      },
+    },
+  },
+  {
+    name: "rank_windows",
+    title: "Rank Windows — Multi-Window Cascade",
+    description:
+      "Score up to 4 time windows (7d, 30d, 90d, all-time) in one call. Each window is scored independently with the full cascade (Υ, SNR, Leverage, Velocity, 10xDEV, class). Omit windows you don't have — partial input is allowed (1-4 windows). Does NOT submit to the board.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        "7d": {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            input: { type: "number", minimum: 0 },
+            output: { type: "number", minimum: 0 },
+            cache_read: { type: "number", minimum: 0 },
+            cache_write: { type: "number", minimum: 0 },
+          },
+          description: "7-day window token pillars (optional)",
+        },
+        "30d": {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            input: { type: "number", minimum: 0 },
+            output: { type: "number", minimum: 0 },
+            cache_read: { type: "number", minimum: 0 },
+            cache_write: { type: "number", minimum: 0 },
+          },
+          description: "30-day window token pillars (optional)",
+        },
+        "90d": {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            input: { type: "number", minimum: 0 },
+            output: { type: "number", minimum: 0 },
+            cache_read: { type: "number", minimum: 0 },
+            cache_write: { type: "number", minimum: 0 },
+          },
+          description: "90-day window token pillars (optional)",
+        },
+        all: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            input: { type: "number", minimum: 0 },
+            output: { type: "number", minimum: 0 },
+            cache_read: { type: "number", minimum: 0 },
+            cache_write: { type: "number", minimum: 0 },
+          },
+          description: "All-time window token pillars (optional)",
+        },
+      },
+    },
+  },
 ] as const;
 
 type RpcId = string | number | null;
@@ -179,6 +411,26 @@ function allowedOrigin(req: NextRequest): boolean {
 
 function validNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
+}
+
+function parsePillars(args: Record<string, unknown>): { input: number; output: number; cacheCreate: number; cacheRead: number } | { error: string } {
+  const { input, output, cache_read, cache_write } = args;
+  if (![input, output, cache_read, cache_write].every(validNumber)) {
+    return { error: "input, output, cache_read, and cache_write must be non-negative finite numbers" };
+  }
+  return {
+    input: input as number,
+    output: output as number,
+    cacheCreate: cache_write as number,
+    cacheRead: cache_read as number,
+  };
+}
+
+function metricDelta(curr: number | null, sim: number | null) {
+  if (curr == null && sim == null) return null;
+  if (curr == null) return { from: null, to: sim, delta: null };
+  if (sim == null) return { from: curr, to: null, delta: null };
+  return { from: curr, to: sim, delta: Number((sim - curr).toFixed(4)) };
 }
 
 async function callTool(name: string, args: Record<string, unknown>) {
@@ -263,6 +515,508 @@ async function callTool(name: string, args: Record<string, unknown>) {
     });
   }
 
+  // ─── Pure-math tools (no network, no filesystem) ───────────────────
+
+  if (name === "simulate_change") {
+    const parsed = parsePillars(args);
+    if ("error" in parsed) {
+      return textResult({ code: "invalid_arguments", message: parsed.error }, true);
+    }
+    const changes = args.changes;
+    if (!changes || typeof changes !== "object" || Array.isArray(changes)) {
+      return textResult({ code: "invalid_arguments", message: "changes must be an object with at least one pillar change" }, true);
+    }
+    const current = cascade(parsed.input, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+    const PILLAR_MAP: Record<string, keyof typeof parsed> = {
+      input: "input", output: "output", cache_read: "cacheRead", cache_write: "cacheCreate",
+    };
+    const simulated = { ...parsed };
+    const appliedChanges: Record<string, { from: number; to: number; delta: number }> = {};
+    for (const [apiKey, pillarKey] of Object.entries(PILLAR_MAP)) {
+      const raw = (changes as Record<string, unknown>)[apiKey];
+      if (raw == null) continue;
+      let newVal: number;
+      if (typeof raw === "number") {
+        newVal = raw;
+      } else if (typeof raw === "string") {
+        const trimmed = raw.trim();
+        if (trimmed.startsWith("+") || trimmed.startsWith("-")) {
+          const delta = Number(trimmed);
+          if (!Number.isFinite(delta)) {
+            return textResult({ code: "invalid_change", detail: `changes.${apiKey}: "${raw}" is not a valid relative delta.` }, true);
+          }
+          newVal = parsed[pillarKey] + delta;
+        } else {
+          newVal = Number(trimmed);
+        }
+      } else {
+        return textResult({ code: "invalid_change", detail: `changes.${apiKey}: expected number or string, got ${typeof raw}.` }, true);
+      }
+      if (!Number.isFinite(newVal) || newVal < 0) {
+        return textResult({ code: "invalid_change", detail: `changes.${apiKey}: result ${newVal} is invalid — token counts must be >= 0.` }, true);
+      }
+      simulated[pillarKey] = newVal;
+      appliedChanges[apiKey] = { from: parsed[pillarKey], to: newVal, delta: newVal - parsed[pillarKey] };
+    }
+    if (Object.keys(appliedChanges).length === 0) {
+      return textResult({ code: "no_changes", detail: "No pillar changes specified in the changes object." }, true);
+    }
+    const simResult = cascade(simulated.input, simulated.output, simulated.cacheCreate, simulated.cacheRead);
+    const classChanged = current.class !== simResult.class;
+    return textResult({
+      current: {
+        pillars: { input: parsed.input, output: parsed.output, cache_read: parsed.cacheRead, cache_write: parsed.cacheCreate },
+        yield: current.yield, snr: current.snr, leverage: current.leverage, velocity: current.velocity, dev10x: current.dev10x, class: current.class,
+      },
+      simulated: {
+        pillars: { input: simulated.input, output: simulated.output, cache_read: simulated.cacheRead, cache_write: simulated.cacheCreate },
+        yield: simResult.yield, snr: simResult.snr, leverage: simResult.leverage, velocity: simResult.velocity, dev10x: simResult.dev10x, class: simResult.class,
+      },
+      changes: appliedChanges,
+      deltas: {
+        yield: metricDelta(current.yield, simResult.yield),
+        snr: metricDelta(current.snr, simResult.snr),
+        leverage: metricDelta(current.leverage, simResult.leverage),
+        velocity: metricDelta(current.velocity, simResult.velocity),
+        dev10x: metricDelta(current.dev10x, simResult.dev10x),
+      },
+      class_changed: classChanged,
+      ...(classChanged ? { class_transition: `${current.class} → ${simResult.class}` } : {}),
+      ...(simResult.warnings ? { simulated_warnings: simResult.warnings } : {}),
+      note: "Local simulation only — no submission. The actual score depends on server-side RS.xx weights and class thresholds.",
+    });
+  }
+
+  if (name === "diagnose_cascade") {
+    const parsed = parsePillars(args);
+    if ("error" in parsed) {
+      return textResult({ code: "invalid_arguments", message: parsed.error }, true);
+    }
+    const result = cascade(parsed.input, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+    const { input: i, output: o, cacheCreate: cw, cacheRead: cr } = parsed;
+    const diagnosis: Array<Record<string, unknown>> = [];
+
+    // Cache leverage check
+    const leverage = result.leverage;
+    if (leverage !== null) {
+      if (leverage < 10) {
+        diagnosis.push({
+          metric: "cache_leverage", severity: "critical",
+          finding: `Cache leverage is ${leverage}× — you're reading only ${leverage}× your fresh input from cache. Top-tier operators hit 200×+.`,
+          recommendation: "Increase context reuse: load prior session context, use longer conversation threads, reference earlier outputs.",
+          estimated_yield_impact: `+${Math.round((1 - leverage / 50) * 100)}% Υ potential`,
+        });
+      } else if (leverage < 50) {
+        diagnosis.push({
+          metric: "cache_leverage", severity: "warning",
+          finding: `Cache leverage is ${leverage}× — decent but below the ARCH+ threshold (~100×+).`,
+          recommendation: "Push cache reads higher by reusing prior context more aggressively.",
+          estimated_yield_impact: `+${Math.round((1 - leverage / 100) * 50)}% Υ potential`,
+        });
+      }
+    }
+
+    // Velocity check
+    const velocity = result.velocity;
+    if (velocity !== null) {
+      if (velocity < 0.5) {
+        diagnosis.push({
+          metric: "velocity", severity: "critical",
+          finding: `Velocity is ${velocity} — generating only ${velocity}× your input as output. You're reading more than you produce.`,
+          recommendation: "Increase output: ask the agent to generate more code/text per turn, reduce over-reading.",
+          estimated_yield_impact: `+${Math.round((0.5 - velocity) * 100)}% Υ per 0.1 velocity gain`,
+        });
+      } else if (velocity < 1.0) {
+        diagnosis.push({
+          metric: "velocity", severity: "warning",
+          finding: `Velocity is ${velocity} — below 1.0 (output < input). Healthy operators hit 1.5×+.`,
+          recommendation: "Generate more output per input token — larger edits, more complete responses.",
+          estimated_yield_impact: `+${Math.round((1 - velocity) * 30)}% Υ potential`,
+        });
+      }
+    }
+
+    // SNR check
+    const snr = result.snr;
+    if (snr !== null && snr < 0.3) {
+      diagnosis.push({
+        metric: "snr", severity: "warning",
+        finding: `SNR is ${snr} — less than 30% of your token flow is output. Input is dominating.`,
+        recommendation: "Reduce fresh input (reuse context) or increase output generation.",
+        estimated_yield_impact: "Indirect — improves both velocity and leverage",
+      });
+    }
+
+    // Cache creation ratio
+    if (cw > 0 && o > 0) {
+      const commitRatio = cw / o;
+      if (commitRatio > 20) {
+        diagnosis.push({
+          metric: "cache_creation", severity: "info",
+          finding: `Cache creation is ${commitRatio.toFixed(1)}× your output — high commitment. Fine if you're rereading it (check leverage), but wasteful if not.`,
+          recommendation: "Ensure you're rereading committed context. If leverage is low, you're writing cache you never read.",
+          estimated_yield_impact: "Cost reduction, not Υ directly",
+        });
+      }
+    }
+
+    // Input bloat
+    const total = i + o + cw + cr;
+    if (total > 0) {
+      const inputPct = (i / total) * 100;
+      if (inputPct > 10) {
+        diagnosis.push({
+          metric: "input_bloat", severity: "warning",
+          finding: `Fresh input is ${inputPct.toFixed(1)}% of your total token flow — high. Efficient operators keep input under 1% by leaning on cache.`,
+          recommendation: "Reduce fresh input by reusing prior context instead of re-pasting it.",
+          estimated_yield_impact: `+${Math.round((inputPct - 1) * 5)}% Υ potential`,
+        });
+      }
+    }
+
+    // 10xDEV check
+    if (result.dev10x === null && cw === 0) {
+      diagnosis.push({
+        metric: "10xdev", severity: "critical",
+        finding: "No cache creation — the cascade cannot compound. You're operating in a non-compounding mode (like ChatGPT without prompt caching).",
+        recommendation: "Switch to a platform with prompt caching (Claude Code) or enable caching if available.",
+        estimated_yield_impact: "Enables the full cascade — potentially 10×+ Υ",
+      });
+    } else if (result.dev10x !== null && result.dev10x < 1.0) {
+      diagnosis.push({
+        metric: "10xdev", severity: "info",
+        finding: `10xDEV is ${result.dev10x} — below 1.0 (BASE threshold). The cascade is compounding but not strongly.`,
+        recommendation: "Improve both leverage AND velocity — 10xDEV = log10(transmission × commitment × reuse).",
+        estimated_yield_impact: "Class tier improvement",
+      });
+    }
+
+    const sevOrder: Record<string, number> = { critical: 0, warning: 1, info: 2 };
+    diagnosis.sort((a, b) => sevOrder[a.severity as string] - sevOrder[b.severity as string]);
+    const healthScore = diagnosis.filter((d) => d.severity === "critical").length;
+    const summary =
+      healthScore === 0
+        ? `Cascade is healthy — Υ ${result.yield}, class ${result.class}. ${diagnosis.length} minor optimizations available.`
+        : `Cascade has ${healthScore} critical leak${healthScore > 1 ? "s" : ""} — Υ ${result.yield}, class ${result.class}. Fix the critical items first.`;
+
+    return textResult({
+      pillars: { input: i, output: o, cache_read: cr, cache_write: cw },
+      cascade: {
+        yield_: result.yield, snr: result.snr, leverage: result.leverage,
+        velocity: result.velocity, tenx_dev: result.dev10x, class: result.class,
+        warnings: result.warnings,
+      },
+      diagnosis,
+      summary,
+    });
+  }
+
+  if (name === "suggest_improvements") {
+    const parsed = parsePillars(args);
+    if ("error" in parsed) {
+      return textResult({ code: "invalid_arguments", message: parsed.error }, true);
+    }
+    const current = cascade(parsed.input, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+    const { input: i, output: o, cacheCreate: cw, cacheRead: cr } = parsed;
+    const candidates: Array<Record<string, unknown>> = [];
+
+    // Strategy 1: Increase cache reads
+    const crBoosts = cr > 0 ? [1.5, 2, 3, 5] : [];
+    for (const mult of crBoosts) {
+      const sim = cascade(parsed.input, parsed.output, parsed.cacheCreate, Math.round(cr * mult));
+      if (sim.yield !== null) {
+        candidates.push({
+          action: `Increase cache reads by ${Math.round((mult - 1) * 100)}%`,
+          pillar: "cache_read",
+          delta: `+${Math.round(cr * (mult - 1)).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (current.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Cache reads are the strongest Υ multiplier. More reuse = higher leverage = higher yield.",
+        });
+      }
+    }
+    if (cr === 0 && cw === 0) {
+      const starterAmounts = [Math.round(i * 10), Math.round(i * 50), Math.round(i * 100)];
+      for (const amt of starterAmounts) {
+        const sim = cascade(parsed.input, parsed.output, Math.round(amt * 0.5), amt);
+        if (sim.yield !== null && sim.yield > 0) {
+          candidates.push({
+            action: `Enable caching with ${amt.toLocaleString()} cache reads`,
+            pillar: "cache_read", delta: `+${amt.toLocaleString()}`,
+            simulated_yield: sim.yield,
+            yield_delta: Number((sim.yield - (current.yield ?? 0)).toFixed(2)),
+            class_after: sim.class,
+            rationale: "You have no cache — enabling it unlocks the cascade. Start by reusing prior context.",
+          });
+        }
+      }
+    }
+
+    // Strategy 2: Reduce fresh input
+    for (const mult of [0.9, 0.75, 0.5]) {
+      const newInput = Math.round(i * mult);
+      if (newInput < 1) continue;
+      const sim = cascade(newInput, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+      if (sim.yield !== null) {
+        candidates.push({
+          action: `Reduce fresh input by ${Math.round((1 - mult) * 100)}%`,
+          pillar: "input", delta: `-${Math.round(i * (1 - mult)).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (current.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Input is squared in the Υ denominator (Υ = Cr·O/I²). Reducing input has a quadratic payoff.",
+        });
+      }
+    }
+
+    // Strategy 3: Increase output
+    for (const mult of [1.25, 1.5, 2]) {
+      const sim = cascade(parsed.input, Math.round(o * mult), parsed.cacheCreate, parsed.cacheRead);
+      if (sim.yield !== null) {
+        candidates.push({
+          action: `Increase output by ${Math.round((mult - 1) * 100)}%`,
+          pillar: "output", delta: `+${Math.round(o * (mult - 1)).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (current.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Output is a linear multiplier in Υ. More output per session = higher yield.",
+        });
+      }
+    }
+
+    // Strategy 4: Optimize cache creation
+    if (cw > o * 10) {
+      const sim = cascade(parsed.input, parsed.output, Math.round(o * 5), parsed.cacheRead);
+      if (sim.yield !== null) {
+        candidates.push({
+          action: "Reduce cache creation to 5× output",
+          pillar: "cache_write", delta: `-${Math.round(cw - o * 5).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (current.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "You're over-committing cache (cw >> output). Trimming to a healthy ratio reduces cost without hurting yield.",
+        });
+      }
+    }
+
+    candidates.sort((a, b) => (b.yield_delta as number) - (a.yield_delta as number));
+    const top: Array<Record<string, unknown>> = candidates.slice(0, 8).map((c, idx) => ({ rank: idx + 1, ...c }));
+    const best = top[0] as Record<string, unknown> | undefined;
+    return textResult({
+      suggestions: top,
+      current_yield: current.yield,
+      current_class: current.class,
+      best_single_change: best
+        ? `${best.action} (Υ ${current.yield} → ${best.simulated_yield}, +${best.yield_delta} yield, class ${best.class_after})`
+        : "No improvements found — your cascade is already optimized.",
+    });
+  }
+
+  if (name === "self_improve") {
+    const parsed = parsePillars(args);
+    if ("error" in parsed) {
+      return textResult({ code: "invalid_arguments", message: parsed.error }, true);
+    }
+    const currentResult = cascade(parsed.input, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+    const { input: i, output: o, cacheCreate: cw, cacheRead: cr } = parsed;
+
+    // Step 1: Diagnose (inline)
+    const diagnosis: Array<Record<string, unknown>> = [];
+    const leverage = currentResult.leverage;
+    if (leverage !== null && leverage < 10) {
+      diagnosis.push({
+        metric: "cache_leverage", severity: "critical",
+        finding: `Cache leverage is ${leverage}× — top-tier operators hit 200×+.`,
+        recommendation: "Increase context reuse: load prior session context, use longer threads.",
+      });
+    } else if (leverage !== null && leverage < 50) {
+      diagnosis.push({
+        metric: "cache_leverage", severity: "warning",
+        finding: `Cache leverage is ${leverage}× — below ARCH+ threshold (~100×+).`,
+        recommendation: "Push cache reads higher by reusing prior context.",
+      });
+    }
+    const velocity = currentResult.velocity;
+    if (velocity !== null && velocity < 0.5) {
+      diagnosis.push({
+        metric: "velocity", severity: "critical",
+        finding: `Velocity is ${velocity} — generating only ${velocity}× input as output.`,
+        recommendation: "Increase output per turn, reduce over-reading.",
+      });
+    } else if (velocity !== null && velocity < 1.0) {
+      diagnosis.push({
+        metric: "velocity", severity: "warning",
+        finding: `Velocity is ${velocity} — below 1.0. Healthy operators hit 1.5×+.`,
+        recommendation: "Generate more output per input token.",
+      });
+    }
+    if (currentResult.dev10x === null && cw === 0) {
+      diagnosis.push({
+        metric: "10xdev", severity: "critical",
+        finding: "No cache creation — cascade cannot compound.",
+        recommendation: "Switch to a platform with prompt caching (Claude Code).",
+      });
+    }
+    const total = i + o + cw + cr;
+    if (total > 0 && (i / total) * 100 > 10) {
+      diagnosis.push({
+        metric: "input_bloat", severity: "warning",
+        finding: `Fresh input is ${((i / total) * 100).toFixed(1)}% of total flow — efficient operators keep it under 1%.`,
+        recommendation: "Reduce fresh input by reusing prior context.",
+      });
+    }
+
+    // Step 2: Suggest (inline)
+    const candidates: Array<Record<string, unknown>> = [];
+    const crBoosts = cr > 0 ? [1.5, 2, 3, 5] : [];
+    for (const mult of crBoosts) {
+      const sim = cascade(parsed.input, parsed.output, parsed.cacheCreate, Math.round(cr * mult));
+      if (sim.yield !== null) {
+        candidates.push({
+          action: `Increase cache reads by ${Math.round((mult - 1) * 100)}%`,
+          pillar: "cache_read", delta: `+${Math.round(cr * (mult - 1)).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (currentResult.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Cache reads are the strongest Υ multiplier.",
+        });
+      }
+    }
+    if (cr === 0 && cw === 0) {
+      for (const amt of [Math.round(i * 10), Math.round(i * 50), Math.round(i * 100)]) {
+        const sim = cascade(parsed.input, parsed.output, Math.round(amt * 0.5), amt);
+        if (sim.yield !== null && sim.yield > 0) {
+          candidates.push({
+            action: `Enable caching with ${amt.toLocaleString()} cache reads`,
+            pillar: "cache_read", delta: `+${amt.toLocaleString()}`,
+            simulated_yield: sim.yield,
+            yield_delta: Number((sim.yield - (currentResult.yield ?? 0)).toFixed(2)),
+            class_after: sim.class,
+            rationale: "You have no cache — enabling it unlocks the cascade.",
+          });
+        }
+      }
+    }
+    for (const mult of [0.9, 0.75, 0.5]) {
+      const newInput = Math.round(i * mult);
+      if (newInput < 1) continue;
+      const sim = cascade(newInput, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+      if (sim.yield !== null) {
+        candidates.push({
+          action: `Reduce fresh input by ${Math.round((1 - mult) * 100)}%`,
+          pillar: "input", delta: `-${Math.round(i * (1 - mult)).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (currentResult.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Input is squared in the Υ denominator. Reducing input has a quadratic payoff.",
+        });
+      }
+    }
+    for (const mult of [1.25, 1.5, 2]) {
+      const sim = cascade(parsed.input, Math.round(o * mult), parsed.cacheCreate, parsed.cacheRead);
+      if (sim.yield !== null) {
+        candidates.push({
+          action: `Increase output by ${Math.round((mult - 1) * 100)}%`,
+          pillar: "output", delta: `+${Math.round(o * (mult - 1)).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (currentResult.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Output is a linear multiplier in Υ.",
+        });
+      }
+    }
+    if (cw > o * 10) {
+      const sim = cascade(parsed.input, parsed.output, Math.round(o * 5), parsed.cacheRead);
+      if (sim.yield !== null) {
+        candidates.push({
+          action: "Reduce cache creation to 5× output",
+          pillar: "cache_write", delta: `-${Math.round(cw - o * 5).toLocaleString()}`,
+          simulated_yield: sim.yield,
+          yield_delta: Number((sim.yield - (currentResult.yield ?? 0)).toFixed(2)),
+          class_after: sim.class,
+          rationale: "Over-committing cache. Trimming reduces cost without hurting yield.",
+        });
+      }
+    }
+    candidates.sort((a, b) => (b.yield_delta as number) - (a.yield_delta as number));
+    const suggestions: Array<Record<string, unknown>> = candidates.slice(0, 8).map((c, idx) => ({ rank: idx + 1, ...c }));
+
+    // Step 3: Simulate the best suggestion
+    const best = suggestions[0] as Record<string, unknown> | undefined;
+    let bestSimulation: Record<string, unknown> | null = null;
+    if (best) {
+      const bestPillar = best.pillar as string;
+      const bestDeltaStr = best.delta as string;
+      const isRelative = bestDeltaStr.startsWith("+") || bestDeltaStr.startsWith("-");
+      const deltaNum = Number(bestDeltaStr.replace(/[+,]/g, ""));
+      const simPillars = { ...parsed };
+      if (bestPillar === "cache_read") {
+        simPillars.cacheRead = isRelative ? parsed.cacheRead + deltaNum : deltaNum;
+      } else if (bestPillar === "input") {
+        simPillars.input = isRelative ? parsed.input + deltaNum : deltaNum;
+      } else if (bestPillar === "output") {
+        simPillars.output = isRelative ? parsed.output + deltaNum : deltaNum;
+      } else if (bestPillar === "cache_write") {
+        simPillars.cacheCreate = isRelative ? parsed.cacheCreate + deltaNum : deltaNum;
+      }
+      const simResult = cascade(simPillars.input, simPillars.output, simPillars.cacheCreate, simPillars.cacheRead);
+      bestSimulation = {
+        action: best.action,
+        simulated_yield: simResult.yield,
+        yield_delta: Number(((simResult.yield ?? 0) - (currentResult.yield ?? 0)).toFixed(2)),
+        class_after: simResult.class,
+        class_changed: currentResult.class !== simResult.class,
+      };
+    }
+
+    const sevOrder: Record<string, number> = { critical: 0, warning: 1, info: 2 };
+    diagnosis.sort((a, b) => sevOrder[a.severity as string] - sevOrder[b.severity as string]);
+
+    return textResult({
+      pillars: { input: i, output: o, cache_read: cr, cache_write: cw },
+      current_cascade: {
+        yield_: currentResult.yield, snr: currentResult.snr, leverage: currentResult.leverage,
+        velocity: currentResult.velocity, dev10x: currentResult.dev10x, class: currentResult.class,
+      },
+      diagnosis,
+      suggestions,
+      best_simulation: bestSimulation,
+      cycle_summary: best
+        ? `Diagnosis: ${diagnosis.length} findings. Best change: ${best.action} (+${best.yield_delta} Υ, class ${best.class_after}).`
+        : `Diagnosis: ${diagnosis.length} findings. No improvements found — cascade is already optimized.`,
+    });
+  }
+
+  if (name === "rank_windows") {
+    const WINDOW_KEYS = ["7d", "30d", "90d", "all"] as const;
+    const windows: Array<Record<string, unknown>> = [];
+    for (const wk of WINDOW_KEYS) {
+      const w = args[wk];
+      if (!w || typeof w !== "object" || Array.isArray(w)) continue;
+      const wArgs = w as Record<string, unknown>;
+      const parsed = parsePillars(wArgs);
+      if ("error" in parsed) continue;
+      const c = cascade(parsed.input, parsed.output, parsed.cacheCreate, parsed.cacheRead);
+      windows.push({
+        window: wk,
+        pillars: { input: parsed.input, output: parsed.output, cache_read: parsed.cacheRead, cache_write: parsed.cacheCreate },
+        cascade: {
+          yield_: c.yield, snr: c.snr, leverage: c.leverage,
+          velocity: c.velocity, dev10x: c.dev10x, class: c.class,
+          warnings: c.warnings,
+        },
+      });
+    }
+    if (windows.length === 0) {
+      return textResult({ code: "invalid_arguments", message: "rank_windows requires at least one window (7d, 30d, 90d, or all) with valid token pillars." }, true);
+    }
+    return textResult({
+      windows,
+      note: "Local preview only — use the npm package (npx sigrank) to submit to the board.",
+    });
+  }
+
   return textResult({ code: "tool_not_found", message: `Unknown tool: ${name}` }, true);
 }
 
@@ -300,7 +1054,7 @@ export async function POST(req: NextRequest) {
         websiteUrl: "https://signalaf.com",
       },
       instructions:
-        "Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Use rank_paste for local calculations, get_leaderboard for public field position, and get_operator for a public operator profile. Do not treat these metrics as a model-quality or downstream-productivity benchmark.",
+        "Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Read tools: rank_paste (compute cascade from 4 token counts), get_leaderboard (public rankings), get_operator (operator profile by codename). Analytical tools (pure math, no submission): simulate_change (what-if pillar changes), diagnose_cascade (efficiency leak finder), suggest_improvements (ranked yield optimizer), self_improve (one-click full cycle), rank_windows (multi-window cascade). Do not treat these metrics as a model-quality or downstream-productivity benchmark.",
     });
   }
 
