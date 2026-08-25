@@ -51,10 +51,11 @@ const STATIC_ROUTES: {
   { path: "/about", priority: 0.5, changeFrequency: "monthly" },
   { path: "/developers", priority: 0.8, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/openapi.json", priority: 0.6, changeFrequency: "weekly" },
-  { path: "/auth.md", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/llms.txt", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/llms-full.txt", priority: 0.5, changeFrequency: "monthly" },
+  // Machine-readable files (openapi.json, auth.md, llms.txt, llms-full.txt) are
+  // excluded from the sitemap — they are not HTML pages, have no canonical, and
+  // llms.txt/llms-full.txt have x-robots-tag: noindex. Including them causes
+  // "Excluded by noindex tag" and "Duplicate without user-selected canonical"
+  // errors in Google Search Console.
   { path: "/upgrade", priority: 0.4, changeFrequency: "monthly" },
   { path: "/login", priority: 0.3, changeFrequency: "yearly" },
 
@@ -335,12 +336,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: r.priority,
   }));
 
-  // Board window routes (/board/7d, /board/30d, /board/90d, /board/all, /board/off)
-  const boardEntries: MetadataRoute.Sitemap = [
-    ...BOARD_WINDOWS.map((w) => w.slug),
-    "off",
-  ].map((slug) => ({
-    url: `${SITE_ORIGIN}/board/${slug}`,
+  // Board window routes (/board/7d, /board/30d, /board/90d, /board/all)
+  // /board/off is excluded — it 307-redirects to /board/all, which causes
+  // "Duplicate without user-selected canonical" in Google Search Console.
+  const boardEntries: MetadataRoute.Sitemap = BOARD_WINDOWS.map((w) => ({
+    url: `${SITE_ORIGIN}/board/${w.slug}`,
     lastModified: now,
     changeFrequency: "hourly" as const,
     priority: 0.9,
