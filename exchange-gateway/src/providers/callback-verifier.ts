@@ -169,12 +169,12 @@ export function createHmacVerifier(
  * Contains a safe code that can be logged without exposing secrets.
  */
 export class VerificationError extends Error {
-  constructor(
-    public readonly code: string,
-    message: string,
-  ) {
+  readonly code: string
+
+  constructor(code: string, message: string) {
     super(message)
     this.name = 'VerificationError'
+    this.code = code
   }
 }
 

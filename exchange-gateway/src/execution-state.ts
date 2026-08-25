@@ -109,14 +109,16 @@ export function isTerminalState(state: ExecutionState): boolean {
 
 /**
  * Map a receipt status to a normalized execution state.
+ * Returns null for unknown statuses so the caller can reject fail-closed
+ * instead of defaulting to a positive state.
  */
-export function receiptStatusToState(status: string): ExecutionState {
+export function receiptStatusToState(status: string): ExecutionState | null {
   switch (status) {
     case 'delivered': return 'delivered'
     case 'verified': return 'verified'
     case 'failed': return 'failed'
     case 'cancelled': return 'cancelled'
     case 'disputed': return 'disputed'
-    default: return 'delivered'
+    default: return null
   }
 }
