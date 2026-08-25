@@ -17,6 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     result: 'ok',
   })
 
+  // ─── Canonical state from the database ───
   const { data: executions } = await admin.from('exchange_executions')
     .select('*')
     .eq('exchange_id', record.id)
@@ -27,8 +28,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .eq('exchange_id', record.id)
     .order('created_at', { ascending: false })
 
-  // If there's an active execution, try to get live status from the provider
-  const liveStatuses: Record<string, unknown> = {}
+  // ─── Live provider observations (non-authoritative) ───
+  // These are labeled as observations. They must NOT silently overwrite
+  // the database or the Contribution Exchange record.
+  const providerObservations: Record<string, { state: string; observed_at: string; authoritative: boolean; message?: string }> = {}
   for (const exec of executions ?? []) {
     if (exec.state === 'created' || exec.state === 'accepted' || exec.state === 'executing' || exec.state === 'funded') {
       const provider = getProvider(exec.provider)
@@ -40,17 +43,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             provider_reference: exec.provider_reference,
             created_at: exec.created_at,
           })
-          liveStatuses[exec.execution_id] = status
+          providerObservations[exec.execution_id] = {
+            state: status.state,
+            observed_at: status.updated_at,
+            authoritative: false,
+            message: status.message,
+          }
         } catch {
-          // Provider may be unavailable — skip live status
+          // Provider may be unavailable — skip observation
         }
       }
     }
   }
 
   return NextResponse.json({
-    executions: executions ?? [],
+    executions: (executions ?? []).map((e: any) => ({
+      ...e,
+      state_source: 'database',
+    })),
     receipts: receipts ?? [],
-    live_status: liveStatuses,
+    provider_observations: providerObservations,
   })
 }
