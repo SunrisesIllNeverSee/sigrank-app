@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CreateExecutionSchema } from '@/exchange-gateway/src/schema'
-import { routeExecution, getProvider } from '@/exchange-gateway/src/execution-router'
+import { routeExecution } from '@/exchange-gateway/src/execution-router'
 import { mergeExchangePolicy } from '@/exchange-gateway/src/policy'
 import { appendExchangeEvent, authenticateCompany, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
 import type { ContributionCommitment } from '@/exchange-gateway/src/types'
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const commitment = record.commitment as ContributionCommitment | undefined
   if (!commitment) {
-    return NextResponse.json({ error: 'No commitment found on this exchange — cannot route execution' }, { status: 409 })
+    return NextResponse.json({ error: 'No commitment found on this exchange; cannot route execution' }, { status: 409 })
   }
 
   const company = await admin.from('exchange_companies').select('exchange_policy, categories').eq('domain', record.target_domain).maybeSingle()
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const result = await routeExecution(commitment, policy, {
     provider_id: parsed.data.provider_id,
     mode: parsed.data.mode,
+    principal_approved: true,
     task_title: parsed.data.task_title,
     task_description: parsed.data.task_description,
     deliverables: parsed.data.deliverables,
@@ -59,59 +60,76 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     deadline: parsed.data.deadline,
   })
 
-  // Persist the execution record
-  if (result.reference) {
-    await admin.from('exchange_executions').insert({
-      exchange_id: record.id,
-      execution_id: result.reference.execution_id,
-      contribution_id: commitment.contribution_id,
-      source_commitment_hash: commitment.provenance.terms_hash,
-      provider: result.reference.provider,
-      provider_reference: result.reference.provider_reference,
+  if (!result.reference) {
+    const status = result.mode === 'no_execution_required' ? 200 : 409
+    return NextResponse.json({
+      execution_created: false,
       mode: result.mode,
-      state: 'created',
-      task: {
-        title: parsed.data.task_title ?? commitment.contribution.title,
-        description: parsed.data.task_description ?? commitment.contribution.description,
-        deliverables: parsed.data.deliverables ?? ['Work as described in the contribution'],
-        acceptance_criteria: parsed.data.acceptance_criteria ?? commitment.verification.criteria,
-      },
-      budget: parsed.data.budget_amount ? { amount: parsed.data.budget_amount, currency: parsed.data.budget_currency ?? 'USD' } : null,
-      authority: {
-        inspect: commitment.authorization.inspect,
-        test: commitment.authorization.test,
-        modify: commitment.authorization.modify,
-        deploy: commitment.authorization.deploy,
-        access_scope: commitment.authorization.access_scope ?? [],
-      },
-      verification: {
-        criteria: commitment.verification.criteria,
-        evidence_required: commitment.verification.evidence ?? [],
-      },
-      deadline: parsed.data.deadline ?? null,
-      provenance: {
-        originator: commitment.parties.contributor.id,
-        contribution_lineage: commitment.provenance.parent ? [commitment.provenance.parent] : [],
-      },
-      message: result.reason,
-    })
+      provider: result.provider_id,
+      assessment: result.assessment,
+      reason: result.reason,
+    }, { status })
+  }
 
-    // If mode is self_executed or external_provider and we have a reference, move to delivering
-    if (record.state === 'authorized' && (result.mode === 'self_executed' || result.mode === 'external_provider' || result.mode === 'direct_agent')) {
-      await admin.from('exchange_records').update({ state: 'delivering', updated_at: new Date().toISOString() }).eq('id', record.id)
-      await appendExchangeEvent({
-        exchangeId: record.id,
-        eventType: 'execution_routed',
-        actor: { type: 'company', id: record.target_domain },
-        fromState: 'authorized',
-        toState: 'delivering',
-        payload: { mode: result.mode, provider: result.reference.provider, execution_id: result.reference.execution_id },
-      })
+  const { error: executionInsertError } = await admin.from('exchange_executions').insert({
+    exchange_id: record.id,
+    execution_id: result.reference.execution_id,
+    contribution_id: commitment.contribution_id,
+    source_commitment_hash: commitment.provenance.terms_hash,
+    provider: result.reference.provider,
+    provider_reference: result.reference.provider_reference,
+    mode: result.mode,
+    state: 'created',
+    task: {
+      title: parsed.data.task_title ?? commitment.contribution.title,
+      description: parsed.data.task_description ?? commitment.contribution.description,
+      deliverables: parsed.data.deliverables ?? ['Work as described in the contribution'],
+      acceptance_criteria: parsed.data.acceptance_criteria ?? commitment.verification.criteria,
+    },
+    budget: parsed.data.budget_amount ? { amount: parsed.data.budget_amount, currency: parsed.data.budget_currency ?? 'USD' } : null,
+    authority: {
+      inspect: commitment.authorization.inspect,
+      test: commitment.authorization.test,
+      modify: commitment.authorization.modify,
+      deploy: commitment.authorization.deploy,
+      access_scope: commitment.authorization.access_scope ?? [],
+    },
+    verification: {
+      criteria: commitment.verification.criteria,
+      evidence_required: commitment.verification.evidence ?? [],
+    },
+    deadline: parsed.data.deadline ?? null,
+    provenance: {
+      originator: commitment.parties.contributor.id,
+      contribution_lineage: commitment.provenance.parent ? [commitment.provenance.parent] : [],
+    },
+    message: result.reason,
+  })
+  if (executionInsertError) {
+    return NextResponse.json({ error: 'Execution was created by the provider but could not be persisted', execution_id: result.reference.execution_id }, { status: 500 })
+  }
+
+  if (record.state === 'authorized' && (result.mode === 'self_executed' || result.mode === 'external_provider' || result.mode === 'direct_agent')) {
+    const { error: exchangeUpdateError } = await admin.from('exchange_records')
+      .update({ state: 'delivering', updated_at: new Date().toISOString() })
+      .eq('id', record.id)
+    if (exchangeUpdateError) {
+      return NextResponse.json({ error: 'Execution persisted but exchange state could not advance to delivering', execution_id: result.reference.execution_id }, { status: 500 })
     }
+
+    await appendExchangeEvent({
+      exchangeId: record.id,
+      eventType: 'execution_routed',
+      actor: { type: 'company', id: record.target_domain },
+      fromState: 'authorized',
+      toState: 'delivering',
+      payload: { mode: result.mode, provider: result.reference.provider, execution_id: result.reference.execution_id },
+    })
   }
 
   return NextResponse.json({
-    execution_id: result.reference?.execution_id,
+    execution_created: true,
+    execution_id: result.reference.execution_id,
     mode: result.mode,
     provider: result.provider_id,
     reference: result.reference,
