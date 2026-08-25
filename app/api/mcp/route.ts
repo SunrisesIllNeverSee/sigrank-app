@@ -1310,7 +1310,7 @@ async function callTool(name: string, args: Record<string, unknown>) {
     // Υ = (cr × o) / i² → targetYield = (cr × o) / i² → i = sqrt(cr × o / targetYield)
     if (targetYield > 0 && parsed.cacheRead > 0 && parsed.output > 0) {
       const newInput = Math.floor(Math.sqrt((parsed.cacheRead * parsed.output) / targetYield));
-      if (newInput > 0 && newInput < parsed.input) {
+      if (newInput >= 1000 && newInput < parsed.input) {
         const sim = cascade(newInput, parsed.output, parsed.cacheCreate, parsed.cacheRead);
         if (sim.yield !== null && sim.yield >= targetYield) {
           strategies.push({
@@ -1353,7 +1353,7 @@ async function callTool(name: string, args: Record<string, unknown>) {
       const sqrtMult = Math.sqrt(targetYield / myYield);
       const newCr2 = Math.round(parsed.cacheRead * sqrtMult);
       const newInput2 = Math.round(parsed.input / sqrtMult);
-      if (newInput2 > 0) {
+      if (newInput2 >= 1000) {
         const sim = cascade(newInput2, parsed.output, parsed.cacheCreate, newCr2);
         if (sim.yield !== null && sim.yield >= targetYield) {
           strategies.push({
