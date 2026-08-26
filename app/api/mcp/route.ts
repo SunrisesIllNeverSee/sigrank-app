@@ -38,6 +38,7 @@ import {
   deriveAgentIdentity,
   deriveAuthTier,
 } from "@/lib/exchange/mcp-observability";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
@@ -1883,6 +1884,8 @@ async function callTool(name: string, args: Record<string, unknown>, req: NextRe
   // Clients calling /api/mcp with a known exchange_* tool name are dispatched
   // through the shared Exchange dispatcher with a deprecation notice.
   // Migration target: https://signalaf.com/api/exchange/mcp
+  // Removal date: 2026-12-31 (6 months after separation). After this date,
+  // legacy Exchange calls through /api/mcp will return method-not-found.
   if (isExchangeTool(name)) {
     const result = await dispatchExchangeTool(name, args, req);
     // Attach deprecation metadata to the text content
@@ -1893,11 +1896,12 @@ async function callTool(name: string, args: Record<string, unknown>, req: NextRe
           const parsed = JSON.parse(content[0].text);
           parsed._deprecated_endpoint = true;
           parsed._migration_target = "https://signalaf.com/api/exchange/mcp";
-          parsed._deprecation_notice = "Exchange tools have moved to the dedicated Contribution Exchange MCP at /api/exchange/mcp. This compatibility bridge will be removed.";
+          parsed._deprecation_notice = "Exchange tools have moved to the dedicated Contribution Exchange MCP at /api/exchange/mcp. This compatibility bridge will be removed on 2026-12-31.";
+          parsed._removal_date = "2026-12-31";
           content[0].text = JSON.stringify(parsed, null, 2);
         } catch {
           // If JSON parse fails, append a note
-          content[0].text += '\n\n[DEPRECATED] Exchange tools have moved to /api/exchange/mcp';
+          content[0].text += '\n\n[DEPRECATED] Exchange tools have moved to /api/exchange/mcp (bridge removed 2026-12-31)';
         }
       }
     }
@@ -1949,7 +1953,7 @@ export async function POST(req: NextRequest) {
       protocolVersion: negotiated,
       capabilities: { tools: {}, resources: { listChanged: false }, prompts: { listChanged: false } },
       serverInfo: {
-        name: "sigrank-signalaf",
+        name: "sigrank",
         title: "SigRank SignalAF",
         version: "1.0.0",
         description: "AI operator benchmark measuring token-cascade efficiency from privacy-preserving telemetry.",
@@ -2056,6 +2060,24 @@ export async function POST(req: NextRequest) {
       client_version: clientVersion,
       metadata: isExchange ? { legacy_bridge: true } : undefined,
     });
+    // Emit a distinct migration telemetry event for legacy Exchange bridge
+    // calls so the owner can track migration progress independently from
+    // the standard call record. This event is only emitted when a client
+    // calls an Exchange tool through the SigRank endpoint.
+    if (isExchange) {
+      await captureServer(
+        "mcp-legacy-bridge",
+        "exchange_mcp_legacy_bridge_call",
+        {
+          tool_name: name,
+          migration_target: "https://signalaf.com/api/exchange/mcp",
+          removal_date: "2026-12-31",
+          client_name: clientName ?? null,
+        },
+      ).catch(() => {
+        // Telemetry must never break the request
+      });
+    }
     return jsonRpc(id, result);
   }
 

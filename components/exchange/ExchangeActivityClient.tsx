@@ -161,6 +161,8 @@ export function ExchangeActivityClient() {
           MCP and WebMCP call analytics (initializations, tool listings, tool
           calls, denials, rate limits, latency) are available via the
           observability API. This endpoint requires admin authentication.
+          Data sources: Supabase (durable), PostHog (behavioral), Vercel
+          (operational).
         </p>
         <div className="mt-4">
           <Link
@@ -168,24 +170,6 @@ export function ExchangeActivityClient() {
             className="font-sans text-sm text-gold hover:text-text-primary"
           >
             View MCP observability summary (requires admin auth) →
-          </Link>
-        </div>
-      </div>
-
-      {/* Encounter data (auth-gated) */}
-      <div className="rounded-xl border border-bg-border bg-bg-surface p-6">
-        <h2 className="font-mono text-xl font-semibold">Encounter data</h2>
-        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          Agent encounter records (domain visits, profile reads, steward
-          conversations) are available via the encounter API. This endpoint also
-          requires authentication.
-        </p>
-        <div className="mt-4">
-          <Link
-            href="/api/exchange/observability/summary?period=7d"
-            className="font-sans text-sm text-gold hover:text-text-primary"
-          >
-            View encounter data (requires auth) →
           </Link>
         </div>
       </div>

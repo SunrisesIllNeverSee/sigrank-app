@@ -20,6 +20,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
+import { captureServer } from "@/lib/infra/posthog/server";
 
 export type McpServerId = "sigrank" | "contribution-exchange";
 export type McpTransport = "remote_mcp" | "webmcp" | "direct_http";
@@ -135,6 +136,35 @@ export async function recordMcpCall(record: McpCallRecord): Promise<void> {
       // Log but don't throw — observability is non-blocking
       console.error("[mcp-observability] insert failed:", error.message);
     }
+
+    // Emit a privacy-safe PostHog event for behavioral analytics.
+    // Supabase is the durable source; PostHog is behavioral analytics.
+    // No secrets, no full payloads — only enum-like properties.
+    const durationBucket = record.duration_ms == null
+      ? "unknown"
+      : record.duration_ms < 50 ? "<50ms"
+      : record.duration_ms < 200 ? "50-200ms"
+      : record.duration_ms < 1000 ? "200ms-1s"
+      : ">1s";
+    await captureServer(
+      record.agent_identity ?? "mcp-anonymous",
+      "exchange_mcp_call",
+      {
+        server_id: record.server_id,
+        transport: record.transport,
+        operation: record.operation,
+        tool_name: record.tool_name ?? null,
+        target_domain: record.target_domain ?? null,
+        auth_tier: record.auth_tier ?? "anonymous",
+        result: record.result,
+        error_code: record.error_code ?? null,
+        duration_bucket: durationBucket,
+        idempotent_replay: record.idempotent_replay ?? false,
+        client_name: record.client_name ?? null,
+      },
+    ).catch(() => {
+      // PostHog failure must never break the request
+    });
   } catch (err) {
     // Never let observability break the actual request
     console.error("[mcp-observability] recordMcpCall error:", err);
