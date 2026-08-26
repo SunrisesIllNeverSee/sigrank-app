@@ -9,7 +9,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { withX402 } from "@x402/next";
-import { x402Server, x402Config } from "@/lib/x402";
+import { getX402Server, x402Config } from "@/lib/x402";
 
 export const dynamic = "force-dynamic";
 
@@ -56,5 +56,5 @@ export const GET = withX402(
     },
     description: "Premium operator insights — cascade analysis, archetype distribution, and efficiency projections",
   },
-  x402Server,
+  getX402Server(),
 );

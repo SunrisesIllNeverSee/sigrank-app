@@ -300,6 +300,63 @@ export default function MCPPage() {
         </div>
       </section>
 
+      {/* Resources */}
+      <section className="mt-10">
+        <h2 className="font-mono text-xl font-bold text-text-primary">
+          Resources (6)
+        </h2>
+        <div className="mt-4 flex flex-col gap-2">
+          {[
+            { uri: "sigrank://methodology", desc: "How SigRank measures AI operators — the cascade metric system, formulas, and class taxonomy" },
+            { uri: "sigrank://metrics", desc: "Definitions of Yield (Υ), Leverage, Velocity, SNR, 10xDEV, Scale V, and class tiers" },
+            { uri: "sigrank://platforms", desc: "AI platforms tracked by SigRank" },
+            { uri: "sigrank://formulas", desc: "The frozen canonical formulas — Υ, Leverage, Velocity, SNR, 10xDEV, Scale V" },
+            { uri: "sigrank://classes", desc: "The 24-stage class taxonomy from IGNITER III to ARCH+ I with token thresholds" },
+            { uri: "sigrank://benchmarks", desc: "Current field-wide benchmark statistics (median, top 10%, top 1%) from the live leaderboard" },
+          ].map((r) => (
+            <div
+              key={r.uri}
+              className="flex flex-col gap-1 rounded-md border border-bg-border/50 bg-bg-surface/50 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4"
+            >
+              <code className="font-mono text-sm font-bold text-gold sm:min-w-[220px]">
+                {r.uri}
+              </code>
+              <span className="font-sans text-sm text-text-secondary">
+                {r.desc}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Prompts */}
+      <section className="mt-10">
+        <h2 className="font-mono text-xl font-bold text-text-primary">
+          Prompts (5)
+        </h2>
+        <div className="mt-4 flex flex-col gap-2">
+          {[
+            { name: "benchmark-my-operator", desc: "Compute cascade metrics, compare against the live field, and get a one-line interpretation" },
+            { name: "how-do-i-reach-top-10", desc: "Counterfactual analysis — finds the smallest pillar change needed to reach a target percentile" },
+            { name: "explain-my-signature", desc: "Computes operating archetype, dominant trait, and finds comparable operators" },
+            { name: "diagnose-inefficiency", desc: "Identifies efficiency leaks with severity, findings, and estimated yield impact per fix" },
+            { name: "field-anomaly-report", desc: "Scans the live leaderboard for unusual patterns — no input required" },
+          ].map((p) => (
+            <div
+              key={p.name}
+              className="flex flex-col gap-1 rounded-md border border-bg-border/50 bg-bg-surface/50 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4"
+            >
+              <code className="font-mono text-sm font-bold text-text-primary sm:min-w-[220px]">
+                {p.name}
+              </code>
+              <span className="font-sans text-sm text-text-secondary">
+                {p.desc}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Local install */}
       <section className="mt-10">
         <h2 className="font-mono text-xl font-bold text-text-primary">
