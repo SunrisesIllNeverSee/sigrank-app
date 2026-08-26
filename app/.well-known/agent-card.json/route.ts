@@ -91,6 +91,13 @@ export async function GET() {
           "Find mentors (1-2 class tiers above with similar cascade shapes + pillar deltas), peers (same tier), and complementary operators (whose strength is your weakness). Uses enrolled device identity — no codename needed.",
         inputSchema: { platform: "string", n: "number" },
       },
+      {
+        id: "contribution-exchange",
+        name: "Contribution Exchange",
+        description:
+          "Discover domain-published signals or propose useful unsolicited contributions. Signals describe problems, requests, challenges, bounties, verification tasks, discoveries, and experiments. Neither a signal nor a proposal grants execution authority or creates a payment obligation — Commitments require separate bilateral acceptance.",
+        tags: ["contributions", "exchange", "agent-work", "signals"],
+      },
     ],
     provider: {
       name: "SigRank SignalAF",
@@ -113,6 +120,18 @@ export async function GET() {
         required: true,
         params: {
           roles: ["merchant"],
+        },
+      },
+      {
+        uri: "https://signalaf.com/spec/contribution-exchange",
+        description:
+          "Contribution Exchange discovery and proposal support. Agents can discover domain-published signals, submit bounded attempts, and propose unsolicited contributions. Neither a signal nor a proposal grants execution authority or creates a payment obligation.",
+        required: false,
+        params: {
+          profile: `${SITE_ORIGIN}/.well-known/exchange.json`,
+          agentGuide: `${SITE_ORIGIN}/agents.md`,
+          steward: `${SITE_ORIGIN}/api/exchange/steward/${new URL(SITE_ORIGIN).hostname}`,
+          signals: `${SITE_ORIGIN}/api/exchange/signals`,
         },
       },
     ],

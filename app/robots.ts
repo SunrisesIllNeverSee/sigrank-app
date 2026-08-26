@@ -59,9 +59,12 @@ export default function robots(): MetadataRoute.Robots {
       // Default: all crawlers
       {
         userAgent: "*",
-        allow: "/",
-        // Don't index API routes or auth callback — they're not content pages
-        disallow: ["/api/", "/auth/"],
+        allow: ["/", "/api/exchange/signals"],
+        // Don't index API routes or auth callback — they're not content pages.
+        // Exception: /api/exchange/signals is a public discovery surface for
+        // agents (spec §11.4). The more specific Allow rule wins over the
+        // broader Disallow: /api/ rule per RFC 9309.
+        disallow: ["/api/", "/auth/", "/internal/"],
         // Throttle aggressive crawlers — 10s between requests prevents edge-request
         // spikes (2026-07-24: Googlebot crawl caused 16K requests/hour).
         crawlDelay: 10,

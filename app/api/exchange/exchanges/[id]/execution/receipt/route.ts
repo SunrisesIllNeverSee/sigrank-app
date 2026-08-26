@@ -249,10 +249,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // The read-then-insert above handles the common case. The unique index on
   // (provider, provider_event_id) is the atomic backstop: if two concurrent
   // callbacks race past the read, exactly one insert succeeds and the other
-  // gets a 23505 unique-violation, which we coerce to idempotent success.
-  // Similarly the unique index on (provider, nonce) enforces nonce replay
-  // protection atomically — a reused nonce inside its validity window is
-  // rejected with 23505.
+  // gets a 23505 unique-violation.
+  //
+  // The unique index on (provider, nonce) enforces nonce replay protection.
+  // A legitimate retry will resend the same event_id + same payload + same
+  // nonce — if it races another copy, the nonce constraint may fire. We
+  // handle this by re-checking the event_id: if the same event was already
+  // accepted with the same authenticated digest, it's an idempotent
+  // duplicate (not a replay). Only a nonce reused with a DIFFERENT event
+  // or different payload is treated as a replay attack.
+  //
+  // Classification is done by re-reading the event_id, NOT by parsing the
+  // constraint name out of the error message. This is robust against
+  // PostgreSQL/PostgREST error-message format changes and avoids
+  // misclassifying a nonce violation as an event-id duplicate (or vice
+  // versa), which would be a security regression.
   const { error: receiptError } = await admin.from('exchange_execution_receipts').insert({
     execution_id: receipt.execution_reference.execution_id,
     exchange_id: record.id,
@@ -273,43 +284,89 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     verified_provider_id: authenticatedProviderId,
   })
   if (receiptError) {
-    // 23505 = unique violation. Could be a concurrent duplicate event ID OR
-    // a replayed nonce. Both are safe to treat as idempotent/conflict.
+    // 23505 = unique violation. Could be a concurrent duplicate event ID,
+    // a replayed nonce, OR a concurrent duplicate that happens to carry the
+    // same nonce (legitimate retry). We classify by re-reading the
+    // event_id — NOT by parsing the constraint name from the error message.
+    // This is robust against PostgreSQL/PostgREST message-format changes.
+    //
+    // Classification logic:
+    //   (a) event_id found + same payload_hash → idempotent success
+    //       (covers both event-id concurrent duplicate AND nonce concurrent
+    //       duplicate where the same event won the race)
+    //   (b) event_id found + different payload_hash → conflict
+    //       (same event ID, different content — audited, no mutation)
+    //   (c) event_id NOT found → a different constraint fired (the nonce
+    //       index) → genuine replay attack (same nonce, different event)
     if (receiptError.code === '23505') {
-      // Determine which constraint fired so we can respond appropriately.
-      // A nonce violation is a replay attempt; an event-id violation is a
-      // concurrent duplicate. Both result in no mutation.
-      const isNonceViolation = receiptError.message.includes('idx_execution_receipts_provider_nonce')
-      if (isNonceViolation) {
+      const { data: existing } = await admin.from('exchange_execution_receipts')
+        .select('id, payload_hash, provider_event_id')
+        .eq('provider', execution.provider)
+        .eq('provider_event_id', verifiedEventId)
+        .maybeSingle()
+
+      // Case (a): legitimate concurrent duplicate — idempotent success.
+      if (existing && existing.payload_hash === payloadHash) {
+        return NextResponse.json({
+          accepted: true,
+          idempotent: true,
+          execution_id: receipt.execution_reference.execution_id,
+          execution_status: receipt.status,
+          exchange_state: record.state,
+          authoritative_exchange_state_advanced: false,
+          existing_receipt_id: existing.id,
+        })
+      }
+
+      // Case (b): same event ID with a different payload — conflict.
+      if (existing && existing.payload_hash !== payloadHash) {
         await appendExchangeEvent({
           exchangeId: record.id,
-          eventType: 'execution_nonce_replay_rejected',
-          actor: { type: 'system', id: 'nonce-guard' },
+          eventType: 'execution_receipt_conflict',
+          actor: { type: 'system', id: 'idempotency-guard' },
           fromState: record.state as any,
           toState: record.state as any,
           payload: {
             execution_id: receipt.execution_reference.execution_id,
             provider: execution.provider,
-            nonce: verifiedNonce,
+            provider_event_id: verifiedEventId,
+            conflict: 'payload_hash_mismatch',
             authoritative_exchange_state_advanced: false,
           },
         })
         return NextResponse.json({
-          accepted: false,
-          rejected: true,
-          reason: 'nonce replay: this nonce has already been used by this provider',
-          execution_id: receipt.execution_reference.execution_id,
+          error: 'Provider event ID conflict: same event ID with different payload',
+          provider_event_id: verifiedEventId,
         }, { status: 409 })
       }
-      // Concurrent duplicate event ID — idempotent success, no mutation
-      return NextResponse.json({
-        accepted: true,
-        idempotent: true,
-        execution_id: receipt.execution_reference.execution_id,
-        execution_status: receipt.status,
-        exchange_state: record.state,
-        authoritative_exchange_state_advanced: false,
+
+      // Case (c): event_id not found but we got a unique violation — the
+      // nonce constraint fired with a different event. This is a genuine
+      // replay attack. Include the raw error details in the audit trail for
+      // diagnosis, but do NOT branch on error-message text for control flow.
+      await appendExchangeEvent({
+        exchangeId: record.id,
+        eventType: 'execution_nonce_replay_rejected',
+        actor: { type: 'system', id: 'nonce-guard' },
+        fromState: record.state as any,
+        toState: record.state as any,
+        payload: {
+          execution_id: receipt.execution_reference.execution_id,
+          provider: execution.provider,
+          nonce: verifiedNonce,
+          provider_event_id: verifiedEventId,
+          pg_error_code: receiptError.code,
+          pg_error_details: receiptError.details ?? null,
+          pg_error_hint: receiptError.hint ?? null,
+          authoritative_exchange_state_advanced: false,
+        },
       })
+      return NextResponse.json({
+        accepted: false,
+        rejected: true,
+        reason: 'nonce replay: this nonce has already been used by this provider for a different event',
+        execution_id: receipt.execution_reference.execution_id,
+      }, { status: 409 })
     }
     return NextResponse.json({ error: 'Execution receipt persistence failed', detail: receiptError.message }, { status: 500 })
   }

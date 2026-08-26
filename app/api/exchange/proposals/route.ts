@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ProposalSchema } from '@/exchange-gateway/src/schema'
-import { appendExchangeEvent, findCompany, getExchangeAdmin, hashSecret, logEncounter, newPublicId, newSecret, requestIdentity } from '@/lib/exchange/server'
+import { appendExchangeEvent, findCompany, getExchangeAdmin, hashSecret, logEncounter, newPublicId, newSecret, requestIdentity, safeEqual } from '@/lib/exchange/server'
 import { dispatchToDomainAgent } from '@/lib/exchange/steward'
 import { rateLimitAllow } from '@/lib/exchange/rate-limit'
 import { captureServer } from '@/lib/infra/posthog/server'
@@ -29,7 +29,7 @@ export async function POST(req:NextRequest){
   if(p.agentId){
     const agentKey=req.headers.get('x-exchange-agent-key')
     const {data:agent}=await admin.from('exchange_agents').select('id,agent_key_hash').eq('id',p.agentId).maybeSingle()
-    if(!agent||!agentKey||hashSecret(agentKey)!==agent.agent_key_hash) {
+    if(!agent||!agentKey||!safeEqual(hashSecret(agentKey),agent.agent_key_hash)) {
       await logEncounter({targetDomain:p.targetDomain,endpoint:'/api/exchange/proposals',req,result:'auth_error'})
       return NextResponse.json({error:'Invalid registered-agent credential'},{status:401})
     }

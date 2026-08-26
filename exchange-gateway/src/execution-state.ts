@@ -37,6 +37,10 @@ const STATE_ORDER: Record<ExecutionState, number> = {
 /**
  * Allowed transitions from each state.
  * A state can transition to itself (idempotent duplicate).
+ *
+ * Note: `verified` cannot transition directly to `failed`. Once work is
+ * verified, overturning that verification requires the dispute path
+ * (verified → disputed → failed), not a silent failure declaration.
  */
 const ALLOWED_TRANSITIONS: Record<ExecutionState, Set<ExecutionState>> = {
   created: new Set(['offered', 'accepted', 'funded', 'executing', 'delivered', 'verified', 'settled', 'failed', 'cancelled', 'disputed', 'expired']),
@@ -45,7 +49,7 @@ const ALLOWED_TRANSITIONS: Record<ExecutionState, Set<ExecutionState>> = {
   funded: new Set(['executing', 'delivered', 'verified', 'settled', 'failed', 'cancelled', 'disputed', 'expired', 'funded']),
   executing: new Set(['delivered', 'verified', 'settled', 'failed', 'cancelled', 'disputed', 'expired', 'executing']),
   delivered: new Set(['verified', 'settled', 'failed', 'cancelled', 'disputed', 'expired', 'delivered']),
-  verified: new Set(['settled', 'disputed', 'failed', 'verified']),
+  verified: new Set(['settled', 'disputed', 'verified']),
   settled: new Set(['disputed', 'settled']),
   failed: new Set(['disputed', 'failed']),
   cancelled: new Set(['cancelled']),

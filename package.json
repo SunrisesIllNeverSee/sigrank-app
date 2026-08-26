@@ -31,6 +31,7 @@
     "@stripe/stripe-js": "^9.9.0",
     "@supabase/ssr": "^0.12.1",
     "@supabase/supabase-js": "^2.110.1",
+    "@upstash/redis": "^1.34.9",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "@x402/core": "2.0.0",

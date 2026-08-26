@@ -217,6 +217,13 @@ export interface ExchangeManifest {
       capabilities: ExecutionCapabilities
     }>
   }
+  signals?: {
+    schema: string
+    collection: string
+    human: string
+    authentication: string
+    supported_types: string[]
+  }
 }
 
 // ─── Execution Provider Layer ───

@@ -23,7 +23,7 @@ export async function GET() {
     },
     mcp: {
       endpoint: `${SITE_ORIGIN}/mcp`,
-      tools: 15,
+      tools: 25,
     },
     metrics: ["Yield", "SNR", "Leverage", "Velocity", "10xDEV", "Scale V", "Efficiency", "Cost per 1M", "Op Ratio"],
     install: "npx sigrank",

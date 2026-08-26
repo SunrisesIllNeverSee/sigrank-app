@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mos2es.xyz/exchange.schema.json",
+  "$id": "https://signalaf.com/exchange.schema.json",
   "title": "Contribution Commitment v0.1",
   "type": "object",
   "required": ["version", "contribution_id", "origin", "parties", "contribution", "consideration", "rights", "vesting", "authorization", "verification", "settlement", "revocation", "provenance"],
