@@ -8,7 +8,7 @@ import type { SignalStatus } from "@/exchange-gateway/src/signal-types";
  * Shared handler for signal status transitions (pause/close/withdraw).
  * Only the authenticated publishing domain or authorized Steward may transition.
  */
-export async function statusTransitionHandler(
+async function statusTransitionHandler(
   req: NextRequest,
   signalId: string,
   toStatus: SignalStatus,
