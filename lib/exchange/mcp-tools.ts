@@ -844,11 +844,41 @@ export async function handlePropose(
     payload: { title: p.title, category: p.category, proposal_detail: proposalDetail },
   });
 
-  // Record lineage: unsolicited origin
-  await admin.from("contribution_proposal_origins").insert({
-    proposal_id: data.id,
-    origin_kind: "unsolicited_opportunity",
-  }).then(() => null, () => null); // best-effort — table may not exist yet
+  // Record lineage: unsolicited origin. Lineage is protocol data, not
+  // decoration — a failure here means the proposal's provenance is lost. We
+  // log the failure for operational alerting and surface it in the response
+  // rather than silently swallowing it. The proposal itself is still valid
+  // (the exchange event was already recorded), but the origin classification
+  // is missing and should be repaired operationally.
+  let lineagePersisted = true;
+  let lineageError: string | undefined;
+  try {
+    const { error: lineageInsertError } = await admin.from("contribution_proposal_origins").insert({
+      proposal_id: data.id,
+      origin_kind: "unsolicited_opportunity",
+    });
+    if (lineageInsertError) throw lineageInsertError;
+  } catch (e) {
+    lineagePersisted = false;
+    lineageError = e instanceof Error ? e.message : "unknown";
+    // Log the lineage failure for operational alerting — this is not a
+    // client-visible error, but it must be visible to operators.
+    await logEncounter({
+      targetDomain: normalized,
+      endpoint: "/api/mcp",
+      req,
+      method: "POST",
+      result: "ok",
+      agentIdentity: initiator,
+      metadata: {
+        tool: "exchange_propose",
+        category: p.category,
+        public_id: data.public_id,
+        lineage_persisted: false,
+        lineage_error: lineageError,
+      },
+    });
+  }
 
   // Dispatch to domain agent (same logic as HTTP route)
   const { dispatchToDomainAgent } = await import("./steward");
@@ -867,15 +897,18 @@ export async function handlePropose(
   const humanReviewRequired = finalState === "proposed";
 
   // Log the successful encounter — same as the HTTP proposal route.
-  await logEncounter({
-    targetDomain: normalized,
-    endpoint: "/api/mcp",
-    req,
-    method: "POST",
-    result: "ok",
-    agentIdentity: initiator,
-    metadata: { tool: "exchange_propose", category: p.category, public_id: data.public_id },
-  });
+  // Skip if we already logged a lineage-failure encounter above.
+  if (lineagePersisted) {
+    await logEncounter({
+      targetDomain: normalized,
+      endpoint: "/api/mcp",
+      req,
+      method: "POST",
+      result: "ok",
+      agentIdentity: initiator,
+      metadata: { tool: "exchange_propose", category: p.category, public_id: data.public_id },
+    });
+  }
 
   return {
     operation: "proposal_created",
@@ -886,6 +919,8 @@ export async function handlePropose(
     counterparty,
     proposer_key: proposerKey,
     human_review_required: humanReviewRequired,
+    lineage_persisted: lineagePersisted,
+    ...(lineagePersisted ? {} : { lineage_warning: "Unsolicited origin lineage could not be persisted. The proposal is valid but its provenance classification is missing — operators should repair this." }),
     authoritative_exchange_state_advanced: false,
     commitment_created: false,
     authorization_granted: false,
