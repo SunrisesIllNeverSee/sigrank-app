@@ -28,6 +28,7 @@
     "archetypes": "node scripts/gen-build-archetypes.mjs"
   },
   "dependencies": {
+    "@sigrank/cascade": "^0.1.1",
     "@stripe/stripe-js": "^9.9.0",
     "@supabase/ssr": "^0.12.1",
     "@supabase/supabase-js": "^2.110.1",
