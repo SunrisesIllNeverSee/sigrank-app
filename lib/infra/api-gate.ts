@@ -4,8 +4,21 @@ import "server-only";
  * lib/api/gate.ts — CORPUS gate (Gate #3) for the public /api/v1 read endpoints.
  */
 
+import { createHash, timingSafeEqual } from "node:crypto";
 import { type NextRequest, type NextResponse } from "next/server";
 import { problemResponse } from "@/lib/infra/problem";
+import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
+
+/**
+ * Length-safe constant-time string comparison for API key validation.
+ * Hashes both inputs to fixed-length digests before timingSafeEqual,
+ * avoiding the early-exit timing leak on length mismatch.
+ */
+function safeEqualStrings(a: string, b: string): boolean {
+  const ha = createHash("sha256").update(a).digest();
+  const hb = createHash("sha256").update(b).digest();
+  return timingSafeEqual(ha, hb);
+}
 
 /** Max entries an unauthenticated caller may read (the public "top N"). */
 export const PUBLIC_TOP_N = 2000;
@@ -26,7 +39,7 @@ export function apiKeyValid(req: NextRequest): boolean {
   const expected = process.env.SIGRANK_API_KEY;
   if (!expected) return false;
   const provided = req.headers.get("x-api-key");
-  return provided != null && provided === expected;
+  return provided != null && safeEqualStrings(provided, expected);
 }
 
 export interface ListGate {
@@ -118,6 +131,27 @@ export function rateLimit(req: NextRequest): RateResult {
   } catch {
     return openRateResult(LIST_RATE_LIMIT, RATE_WINDOW_MS);
   }
+}
+
+/**
+ * Distributed per-IP rate limit using Upstash Redis.
+ * Falls back to the in-memory `rateLimit` when Redis is not configured.
+ * Use this in async route handlers for consistent cross-instance enforcement.
+ */
+export async function rateLimitDistributed(req: NextRequest): Promise<RateResult> {
+  const ip = clientIp(req);
+  const result = await checkDistributedRateLimit(
+    ["api-v1", ip],
+    { windowMs: RATE_WINDOW_MS, max: LIST_RATE_LIMIT },
+    false, // read paths: best-effort, not fail-closed
+  );
+  return {
+    ok: result.ok,
+    retryAfter: result.retryAfter,
+    limit: result.limit,
+    remaining: result.remaining,
+    reset: result.reset,
+  };
 }
 
 /**

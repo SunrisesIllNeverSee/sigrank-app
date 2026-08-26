@@ -154,6 +154,57 @@ export function website() {
   };
 }
 
+/** Contribution Exchange Service — describes the Exchange as a domain service.
+ *  Reuses existing ORG_ID and SITE_ID nodes rather than duplicating them. */
+export function contributionExchangeService() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${SITE_ORIGIN}/exchange/#service`,
+    name: "Contribution Exchange",
+    description:
+      "A domain-native economic agent interface. AI agents can discover domain-published signals " +
+      "(problems, requests, challenges, bounties, verification tasks, discoveries, experiments) " +
+      "and propose useful unsolicited contributions. Neither a signal nor a proposal grants " +
+      "execution authority or creates a payment obligation — Commitments require separate " +
+      "bilateral acceptance.",
+    url: `${SITE_ORIGIN}/exchange`,
+    provider: { "@id": ORG_ID },
+    serviceType: "Contribution Exchange",
+    areaServed: "Global",
+    availableChannel: {
+      "@type": "ServiceChannel",
+      serviceUrl: `${SITE_ORIGIN}/exchange`,
+      availableLanguage: ["en"],
+    },
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Contribution Exchange Capabilities",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Exchange Signal Discovery",
+            description: "Discover domain-published work signals.",
+            url: `${SITE_ORIGIN}/exchange/signals`,
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Unsolicited Contribution Proposal",
+            description: "Propose useful contributions the domain did not request.",
+            url: `${SITE_ORIGIN}/exchange/propose`,
+          },
+        },
+      ],
+    },
+    isRelatedTo: { "@id": SITE_ID },
+  };
+}
+
 /** Aggregate stats for JSON-LD (AEO Item 2c). Quantified stats improve AI citation rates. */
 export function aggregateStats(opts: {
   totalOperators: number;

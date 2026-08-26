@@ -1,8 +1,25 @@
 import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js'
-import { createHash, randomBytes } from 'node:crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import type { ExchangeState } from '@/exchange-gateway/src/types'
 import { captureServer } from '@/lib/infra/posthog/server'
+
+/**
+ * Length-safe constant-time string comparison.
+ *
+ * Compares two strings by hashing both to a fixed-length digest first,
+ * then using `timingSafeEqual` on the digests. This avoids the early-exit
+ * timing leak that `===` introduces on length mismatch, and avoids the
+ * `timingSafeEqual` requirement that both Buffer inputs have the same byte
+ * length (the hash normalizes them).
+ *
+ * Returns true iff the strings are byte-identical.
+ */
+export function safeEqual(a: string, b: string): boolean {
+  const ha = createHash('sha256').update(a).digest()
+  const hb = createHash('sha256').update(b).digest()
+  return timingSafeEqual(ha, hb)
+}
 
 export function getExchangeAdmin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -51,19 +68,19 @@ export async function authenticateCompany(domain: string, key: string | null): P
   if (!key) return false
   const normalized = normalizeDomain(domain)
   const referenceKey = process.env.EXCHANGE_REFERENCE_ADMIN_KEY
-  if (normalized === normalizeDomain(process.env.EXCHANGE_REFERENCE_DOMAIN ?? 'signalaf.com') && referenceKey && key === referenceKey) return true
+  if (normalized === normalizeDomain(process.env.EXCHANGE_REFERENCE_DOMAIN ?? 'signalaf.com') && referenceKey && safeEqual(key, referenceKey)) return true
   const company = await findCompany(normalized)
-  return !!company?.admin_key_hash && hashSecret(key) === company.admin_key_hash
+  return !!company?.admin_key_hash && safeEqual(hashSecret(key), company.admin_key_hash)
 }
 
 export async function authenticateDomainAgent(domain: string, key: string | null): Promise<boolean> {
   if (!key) return false
   const company = await findCompany(domain)
-  return !!company?.domain_agent_key_hash && hashSecret(key) === company.domain_agent_key_hash
+  return !!company?.domain_agent_key_hash && safeEqual(hashSecret(key), company.domain_agent_key_hash)
 }
 
 export function authenticateProposer(record: { proposer_key_hash?: string | null }, key: string | null): boolean {
-  return !!key && !!record.proposer_key_hash && hashSecret(key) === record.proposer_key_hash
+  return !!key && !!record.proposer_key_hash && safeEqual(hashSecret(key), record.proposer_key_hash)
 }
 
 export async function appendExchangeEvent(input: {

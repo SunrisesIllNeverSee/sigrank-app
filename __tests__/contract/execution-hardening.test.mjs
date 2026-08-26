@@ -7,10 +7,10 @@ import { createServer } from 'node:http'
 //
 // These tests exercise actual behavior (HMAC sign/verify cycles, state
 // transition logic, HTTP-boundary callback flows) rather than source-code
-// string matching. DB-backed assertions (RLS, constraints) are verified
-// against the live remote Supabase via the test runner's MCP connection
-// in a separate integration step; here we cover the crypto + logic layers
-// that can be tested without a DB connection.
+// string matching. DB-backed assertions (RLS, constraints) live in a
+// companion file: execution-hardening-db.test.mjs. That file is env-gated
+// — it runs real inserts/reads against the remote Supabase when
+// credentials are present and skips gracefully otherwise.
 
 import {
   createHmacVerifier,
@@ -237,6 +237,18 @@ test('P0.2: dispute can be raised after settlement', () => {
   assert.equal(result.allowed, true)
 })
 
+test('P0.2: verified cannot transition directly to failed (dispute required)', () => {
+  // Once work is verified, overturning verification requires the dispute
+  // path (verified → disputed → failed), not a silent failure declaration.
+  const result = validateTransition('verified', 'failed')
+  assert.equal(result.allowed, false)
+})
+
+test('P0.2: verified can still transition to settled and disputed', () => {
+  assert.equal(validateTransition('verified', 'settled').allowed, true)
+  assert.equal(validateTransition('verified', 'disputed').allowed, true)
+})
+
 test('P0.2: terminal state (cancelled) cannot transition except to itself', () => {
   assert.equal(validateTransition('cancelled', 'cancelled').allowed, true)
   assert.equal(validateTransition('cancelled', 'executing').allowed, false)
@@ -271,6 +283,98 @@ test('P0.2: isTerminalState identifies terminal states', () => {
   assert.equal(isTerminalState('expired'), true)
   assert.equal(isTerminalState('executing'), false)
   assert.equal(isTerminalState('delivered'), false)
+})
+
+// ─── P0.2: 23505 unique-violation classification logic ───
+//
+// A legitimate provider retry will resend the same event_id, same payload,
+// same timestamp, and possibly the same nonce. The receipt route must
+// distinguish:
+//   (a) same event_id + same payload → idempotent SUCCESS
+//       (this is a retry, not an attack — covers both event-id and nonce
+//       concurrent duplicates)
+//   (b) same event_id + different payload → conflict REJECTION
+//   (c) event_id not found + 23505 → replay REJECTION
+//       (a different constraint fired — the nonce index — meaning the
+//       nonce was reused with a different event)
+//
+// These tests verify the decision logic the route uses when a 23505 unique
+// violation fires. The route re-reads the event_id to classify the
+// violation, NOT the constraint name from the error message. This is
+// robust against PostgreSQL/PostgREST error-message format changes.
+
+/**
+ * Simulate the 23505 classification logic from the receipt route.
+ * Returns 'idempotent' if the event was already accepted with the same
+ * payload, 'conflict' if the event_id exists with a different payload, or
+ * 'replay' if the event_id is not found (a different constraint fired).
+ */
+function classifyUniqueViolation({ existingReceipt, payloadHash }) {
+  if (existingReceipt && existingReceipt.payload_hash === payloadHash) {
+    return 'idempotent'
+  }
+  if (existingReceipt && existingReceipt.payload_hash !== payloadHash) {
+    return 'conflict'
+  }
+  return 'replay'
+}
+
+test('P0.2: same event + same payload = idempotent success (not replay)', () => {
+  // Legitimate retry: provider resends the exact same event with the same
+  // nonce. The other copy of the callback won the insert race, so this
+  // copy hits a unique constraint. But the event_id + payload_hash match
+  // the existing receipt — this is a retry, not an attack.
+  const payloadHash = createHash('sha256').update('body1').digest('hex')
+  const result = classifyUniqueViolation({
+    existingReceipt: { id: 'rec_1', payload_hash: payloadHash },
+    payloadHash,
+  })
+  assert.equal(result, 'idempotent')
+})
+
+test('P0.2: event_id not found + 23505 = replay rejection', () => {
+  // Genuine replay attack: the nonce was reused with a different event_id.
+  // The event_id lookup finds no existing receipt (different event), so
+  // this is classified as a replay — a different constraint (the nonce
+  // index) must have fired.
+  const payloadHash = createHash('sha256').update('body2').digest('hex')
+  const result = classifyUniqueViolation({
+    existingReceipt: null, // different event_id → no match
+    payloadHash,
+  })
+  assert.equal(result, 'replay')
+})
+
+test('P0.2: same event + different payload = conflict (not replay)', () => {
+  // The event_id exists but with a different payload_hash. This is a
+  // conflict (same event ID, different content), not a nonce replay.
+  const payloadHash1 = createHash('sha256').update('body_a').digest('hex')
+  const payloadHash2 = createHash('sha256').update('body_b').digest('hex')
+  const result = classifyUniqueViolation({
+    existingReceipt: { id: 'rec_2', payload_hash: payloadHash1 },
+    payloadHash: payloadHash2,
+  })
+  assert.equal(result, 'conflict')
+})
+
+test('P0.2: receipt route classifies 23505 by re-reading event_id, not by parsing error message', async () => {
+  // Structural guard: the receipt route source must NOT parse the
+  // constraint name from the error message to classify a 23505. Instead
+  // it must re-read the event_id and classify based on what it finds.
+  // This is robust against PostgreSQL/PostgREST message-format changes.
+  const { readFileSync } = await import('node:fs')
+  const { resolve } = await import('node:path')
+  const root = resolve(import.meta.dirname, '..', '..')
+  const receiptRoute = readFileSync(resolve(root, 'app/api/exchange/exchanges/[id]/execution/receipt/route.ts'), 'utf8')
+  // The 23505 handler must re-read the event_id for classification
+  assert.match(receiptRoute, /Case \(a\): legitimate concurrent duplicate/)
+  assert.match(receiptRoute, /Case \(b\): same event ID with a different payload/)
+  assert.match(receiptRoute, /Case \(c\): event_id not found/)
+  // The route must NOT use error-message string matching for control flow
+  assert.doesNotMatch(receiptRoute, /isNonceViolation/)
+  assert.doesNotMatch(receiptRoute, /receiptError\.message\.includes\('idx_execution_receipts_provider_nonce'\)/)
+  // The replay rejection must mention "different event"
+  assert.match(receiptRoute, /different event/)
 })
 
 // ─── P2.1: Runtime HTTP test provider — real HTTP boundary ───

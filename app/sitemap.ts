@@ -59,6 +59,13 @@ const STATIC_ROUTES: {
   { path: "/upgrade", priority: 0.4, changeFrequency: "monthly" },
   { path: "/login", priority: 0.3, changeFrequency: "yearly" },
 
+  // ── Contribution Exchange pages ──────────────────────────────────────────
+  { path: "/exchange", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/exchange/propose", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/exchange/signals", priority: 0.8, changeFrequency: "hourly" },
+  { path: "/agents.md", priority: 0.5, changeFrequency: "weekly" },
+  { path: "/exchange.schema.json", priority: 0.3, changeFrequency: "monthly" },
+
   // ── SEO content pages (2026-07-07) ──────────────────────────────────────
   // Topic-hub index pages — hub priority 0.8 (higher than children)
   { path: "/metrics", priority: 0.8, changeFrequency: "weekly" },

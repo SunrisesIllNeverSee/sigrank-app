@@ -20,5 +20,12 @@ export function buildExchangeManifest(baseUrl = process.env.NEXT_PUBLIC_SITE_URL
       modes:['no_execution_required','self_executed','direct_agent','external_provider','human'],
       providers:allProviderCapabilities().map(p=>({id:p.id,capabilities:p.capabilities})),
     },
+    signals:{
+      schema:`${base}/schemas/exchange-signal/1.0`,
+      collection:`${base}/api/exchange/signals`,
+      human:`${base}/exchange/signals`,
+      authentication:`${base}/agents.md#signal-authentication`,
+      supported_types:['problem','request','challenge','bounty','verification','discovery','experiment'],
+    },
   }
 }
