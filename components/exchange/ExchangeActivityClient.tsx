@@ -154,6 +154,24 @@ export function ExchangeActivityClient() {
         )}
       </div>
 
+      {/* MCP observability data (auth-gated) */}
+      <div className="rounded-xl border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-xl font-semibold">MCP observability</h2>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          MCP and WebMCP call analytics (initializations, tool listings, tool
+          calls, denials, rate limits, latency) are available via the
+          observability API. This endpoint requires admin authentication.
+        </p>
+        <div className="mt-4">
+          <Link
+            href="/api/exchange/observability/summary?period=7d"
+            className="font-sans text-sm text-gold hover:text-text-primary"
+          >
+            View MCP observability summary (requires admin auth) →
+          </Link>
+        </div>
+      </div>
+
       {/* Encounter data (auth-gated) */}
       <div className="rounded-xl border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-xl font-semibold">Encounter data</h2>
@@ -164,7 +182,7 @@ export function ExchangeActivityClient() {
         </p>
         <div className="mt-4">
           <Link
-            href="/api/exchange/encounters?domain=signalaf.com"
+            href="/api/exchange/observability/summary?period=7d"
             className="font-sans text-sm text-gold hover:text-text-primary"
           >
             View encounter data (requires auth) →

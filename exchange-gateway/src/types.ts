@@ -224,6 +224,12 @@ export interface ExchangeManifest {
     authentication: string
     supported_types: string[]
   }
+  mcp?: {
+    server_name: string
+    endpoint: string
+    server_card: string
+    transport: 'streamable-http'
+  }
 }
 
 // ─── Execution Provider Layer ───

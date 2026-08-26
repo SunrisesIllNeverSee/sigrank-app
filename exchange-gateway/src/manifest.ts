@@ -27,5 +27,11 @@ export function buildExchangeManifest(baseUrl = process.env.NEXT_PUBLIC_SITE_URL
       authentication:`${base}/agents.md#signal-authentication`,
       supported_types:['problem','request','challenge','bounty','verification','discovery','experiment'],
     },
+    mcp:{
+      server_name:'contribution-exchange',
+      endpoint:`${base}/api/exchange/mcp`,
+      server_card:`${base}/.well-known/exchange-mcp.json`,
+      transport:'streamable-http',
+    },
   }
 }

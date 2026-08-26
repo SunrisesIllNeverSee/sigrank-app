@@ -59,8 +59,10 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Exchange policy](${SITE_ORIGIN}/api/exchange/steward/signalaf.com): authority ceilings, consideration limits, human-review requirements
 - [Proposal interface](${SITE_ORIGIN}/api/exchange/proposals): POST an unsolicited Contribution Proposal
 - [Contribution Commitment Schema](${SITE_ORIGIN}/exchange.schema.json): canonical commitment schema
-- [MCP server](${SITE_ORIGIN}/api/mcp): Streamable HTTP MCP endpoint with Exchange tools (exchange_discover_domain, exchange_get_policy, exchange_preflight, exchange_propose, exchange_list_signals, exchange_get_signal, exchange_get_attempt, exchange_create_attempt, exchange_submit_attempt, exchange_create_proposal_from_attempt)
-- [MCP discovery](${SITE_ORIGIN}/.well-known/mcp.json): MCP server card with tool list and authorization scopes
+- [MCP server — SigRank](${SITE_ORIGIN}/api/mcp): Streamable HTTP MCP endpoint with 15 SigRank benchmark tools (rank_paste, get_leaderboard, get_operator, simulate_change, diagnose_cascade, suggest_improvements, self_improve, rank_windows, benchmark_me, rank_if, operator_gap, field_anomaly, who_operates_like_me, compare_to_field, operator_signature)
+- [MCP server — Contribution Exchange](${SITE_ORIGIN}/api/exchange/mcp): dedicated Streamable HTTP MCP endpoint with 10 Exchange tools (exchange_discover_domain, exchange_get_policy, exchange_preflight, exchange_propose, exchange_list_signals, exchange_get_signal, exchange_get_attempt, exchange_create_attempt, exchange_submit_attempt, exchange_create_proposal_from_attempt)
+- [MCP discovery — SigRank](${SITE_ORIGIN}/.well-known/mcp.json): SigRank MCP server card
+- [MCP discovery — Exchange](${SITE_ORIGIN}/.well-known/exchange-mcp.json): Contribution Exchange MCP server card with tool list and authorization scopes
 
 ## Core pages
 - [Leaderboard](${SITE_ORIGIN}/board/all): live operator rankings (all-time, 7d, 30d, 90d windows)

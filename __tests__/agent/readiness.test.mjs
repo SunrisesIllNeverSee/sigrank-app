@@ -116,13 +116,16 @@ test("developer portal documents auth, rate limits, errors and version lifecycle
 test("MCP manifest points to a Streamable HTTP endpoint with a valid lifecycle implementation", async () => {
   const manifest = await source("app/.well-known/mcp.json/route.ts");
   const mcp = await source("app/api/mcp/route.ts");
+  const protocol = await source("lib/mcp/protocol.ts");
   assert.match(manifest, /streamable-http/);
   assert.match(manifest, /\/api\/mcp/);
-  assert.match(mcp, /2025-06-18/);
-  assert.match(mcp, /message\.method === "initialize"/);
-  assert.match(mcp, /message\.method === "notifications\/initialized"/);
-  assert.match(mcp, /message\.method === "tools\/list"/);
-  assert.match(mcp, /message\.method === "tools\/call"/);
+  // Protocol version is defined in the shared protocol module
+  assert.match(protocol, /2025-06-18/);
+  assert.match(mcp, /PROTOCOL_VERSION/);
+  assert.match(mcp, /method === "initialize"/);
+  assert.match(mcp, /method === "notifications\/initialized"/);
+  assert.match(mcp, /method === "tools\/list"/);
+  assert.match(mcp, /method === "tools\/call"/);
   // MCP tool metadata (agent-ready.dev M2/M4/M5/M6)
   assert.match(mcp, /websiteUrl/);
   assert.match(mcp, /readOnlyHint/);

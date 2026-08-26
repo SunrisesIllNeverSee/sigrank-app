@@ -49,113 +49,131 @@ const EXPECTED_EXCHANGE_TOOLS = [
   "exchange_create_proposal_from_attempt",
 ];
 
-test("MCP route includes all expected Exchange tools", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
+test("Exchange MCP server module includes all expected Exchange tools", async () => {
+  const mod = await source("lib/exchange/mcp-server.ts");
   for (const tool of EXPECTED_EXCHANGE_TOOLS) {
-    assert.match(mcp, new RegExp(`name: "${tool}"`), `Tool ${tool} must be registered`);
+    assert.match(mod, new RegExp(`name: "${tool}"`), `Tool ${tool} must be registered`);
   }
 });
 
-test("Exchange tools are registered after existing SigRank tools (deterministic order)", async () => {
+test("SigRank MCP route does NOT include Exchange tool definitions", async () => {
   const mcp = await source("app/api/mcp/route.ts");
-  const lastSigRankTool = "operator_signature";
-  const firstExchangeTool = "exchange_discover_domain";
-  const srIdx = mcp.indexOf(`name: "${lastSigRankTool}"`);
-  const exIdx = mcp.indexOf(`name: "${firstExchangeTool}"`);
-  assert.ok(srIdx > -1, "operator_signature must exist");
-  assert.ok(exIdx > -1, "exchange_discover_domain must exist");
-  assert.ok(srIdx < exIdx, "Exchange tools must come after existing SigRank tools");
+  for (const tool of EXPECTED_EXCHANGE_TOOLS) {
+    // Exchange tools should not be defined as tool entries in the SigRank TOOLS array
+    // The compatibility bridge dispatches them but doesn't define them
+    const toolDefPattern = new RegExp(`name: "${tool}"`);
+    assert.doesNotMatch(mcp, toolDefPattern, `SigRank route must NOT define ${tool} as a tool entry`);
+  }
+});
+
+test("Exchange MCP route includes all expected Exchange tools in dispatch", async () => {
+  const route = await source("app/api/exchange/mcp/route.ts");
+  // The route imports from mcp-server which has the definitions
+  assert.match(route, /filterExchangeToolsByScope/);
+  assert.match(route, /dispatchExchangeTool/);
 });
 
 test("Exchange tool schemas reject unknown properties (additionalProperties: false)", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  // Find the Exchange tools section
-  const exchangeStart = mcp.indexOf("// ── Contribution Exchange tools");
-  const exchangeEnd = mcp.indexOf("] as const;", exchangeStart);
-  const exchangeSection = mcp.slice(exchangeStart, exchangeEnd);
-  // Every inputSchema in the Exchange section must have additionalProperties: false
-  const schemaCount = (exchangeSection.match(/inputSchema:/g) || []).length;
-  const additionalPropsCount = (exchangeSection.match(/additionalProperties:\s*false/g) || []).length;
+  const mod = await source("lib/exchange/mcp-server.ts");
+  const schemaCount = (mod.match(/inputSchema:/g) || []).length;
+  const additionalPropsCount = (mod.match(/additionalProperties:\s*false/g) || []).length;
   assert.equal(schemaCount, additionalPropsCount, "Every Exchange tool schema must have additionalProperties: false");
 });
 
 test("Read-only Exchange tools have readOnlyHint: true", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
+  const mod = await source("lib/exchange/mcp-server.ts");
   const readOnlyTools = ["exchange_discover_domain", "exchange_get_policy", "exchange_preflight", "exchange_list_signals", "exchange_get_signal", "exchange_get_attempt"];
   for (const tool of readOnlyTools) {
-    // Find the tool definition and check its annotations
-    const toolIdx = mcp.indexOf(`name: "${tool}"`);
+    const toolIdx = mod.indexOf(`name: "${tool}"`);
     assert.ok(toolIdx > -1, `Tool ${tool} must exist`);
-    // Look for readOnlyHint: true within 500 chars of the tool name
-    const section = mcp.slice(toolIdx, toolIdx + 800);
+    const section = mod.slice(toolIdx, toolIdx + 800);
     assert.match(section, /readOnlyHint:\s*true/, `Tool ${tool} must have readOnlyHint: true`);
   }
 });
 
 test("Mutation Exchange tools have readOnlyHint: false", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
+  const mod = await source("lib/exchange/mcp-server.ts");
   const mutationTools = ["exchange_propose", "exchange_create_attempt", "exchange_submit_attempt", "exchange_create_proposal_from_attempt"];
   for (const tool of mutationTools) {
-    const toolIdx = mcp.indexOf(`name: "${tool}"`);
+    const toolIdx = mod.indexOf(`name: "${tool}"`);
     assert.ok(toolIdx > -1, `Tool ${tool} must exist`);
-    const section = mcp.slice(toolIdx, toolIdx + 800);
+    const section = mod.slice(toolIdx, toolIdx + 800);
     assert.match(section, /readOnlyHint:\s*false/, `Tool ${tool} must have readOnlyHint: false`);
   }
 });
 
 test("All Exchange tools have destructiveHint: false", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
+  const mod = await source("lib/exchange/mcp-server.ts");
   for (const tool of EXPECTED_EXCHANGE_TOOLS) {
-    const toolIdx = mcp.indexOf(`name: "${tool}"`);
-    const section = mcp.slice(toolIdx, toolIdx + 800);
+    const toolIdx = mod.indexOf(`name: "${tool}"`);
+    const section = mod.slice(toolIdx, toolIdx + 800);
     assert.match(section, /destructiveHint:\s*false/, `Tool ${tool} must have destructiveHint: false`);
   }
 });
 
 test("All Exchange tools have idempotentHint: true", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
+  const mod = await source("lib/exchange/mcp-server.ts");
   for (const tool of EXPECTED_EXCHANGE_TOOLS) {
-    const toolIdx = mcp.indexOf(`name: "${tool}"`);
-    const section = mcp.slice(toolIdx, toolIdx + 800);
+    const toolIdx = mod.indexOf(`name: "${tool}"`);
+    const section = mod.slice(toolIdx, toolIdx + 800);
     assert.match(section, /idempotentHint:\s*true/, `Tool ${tool} must have idempotentHint: true`);
   }
 });
 
 test("exchange_preflight description says READ-ONLY and no state transition", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  const toolIdx = mcp.indexOf(`name: "exchange_preflight"`);
-  const section = mcp.slice(toolIdx, toolIdx + 1000);
+  const mod = await source("lib/exchange/mcp-server.ts");
+  const toolIdx = mod.indexOf(`name: "exchange_preflight"`);
+  const section = mod.slice(toolIdx, toolIdx + 1000);
   assert.match(section, /READ-ONLY/i, "exchange_preflight description must say READ-ONLY");
   assert.match(section, /no.*proposal insertion|no.*state transition/i, "exchange_preflight description must say no state transition");
 });
 
 test("exchange_propose description says NON-BINDING and NOT a Commitment", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  const toolIdx = mcp.indexOf(`name: "exchange_propose"`);
-  const section = mcp.slice(toolIdx, toolIdx + 1000);
+  const mod = await source("lib/exchange/mcp-server.ts");
+  const toolIdx = mod.indexOf(`name: "exchange_propose"`);
+  const section = mod.slice(toolIdx, toolIdx + 1000);
   assert.match(section, /NON-BINDING/i, "exchange_propose description must say NON-BINDING");
   assert.match(section, /NOT.*Commitment/i, "exchange_propose description must say it does NOT create a Commitment");
 });
 
 // ─── MCP handler tests ───────────────────────────────────────────────────────
 
-test("callTool accepts req parameter for Exchange tools", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  assert.match(mcp, /async function callTool\(name: string, args: Record<string, unknown>, req: NextRequest\)/);
-});
-
-test("Exchange tool handlers are dispatched in callTool", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
+test("Exchange MCP server module dispatches all Exchange tools", async () => {
+  const mod = await source("lib/exchange/mcp-server.ts");
   for (const tool of EXPECTED_EXCHANGE_TOOLS) {
-    assert.match(mcp, new RegExp(`name === "${tool}"`), `Handler for ${tool} must exist in callTool`);
+    assert.match(mod, new RegExp(`name === "${tool}"`), `Handler for ${tool} must exist in dispatchExchangeTool`);
   }
 });
 
-test("tools/list implements scope-based filtering", async () => {
+test("Exchange MCP route implements scope-based filtering", async () => {
+  const route = await source("app/api/exchange/mcp/route.ts");
+  assert.match(route, /resolveScopes/);
+  assert.match(route, /filterExchangeToolsByScope/);
+});
+
+test("Exchange MCP route enforces scopes at tools/call time", async () => {
+  const route = await source("app/api/exchange/mcp/route.ts");
+  assert.match(route, /enforceScopeForCall/);
+});
+
+test("SigRank MCP route has compatibility bridge for legacy Exchange calls", async () => {
   const mcp = await source("app/api/mcp/route.ts");
-  assert.match(mcp, /resolveScopes/);
-  assert.match(mcp, /scopes\.has\("exchange:propose"\)/);
-  assert.match(mcp, /scopes\.has\("exchange:attempt"\)/);
+  assert.match(mcp, /isExchangeTool/);
+  assert.match(mcp, /dispatchExchangeTool/);
+  assert.match(mcp, /_deprecated_endpoint/);
+  assert.match(mcp, /_migration_target/);
+});
+
+test("SigRank MCP route does NOT advertise Exchange tools in tools/list", async () => {
+  const mcp = await source("app/api/mcp/route.ts");
+  // tools/list should return TOOLS directly without Exchange scope filtering
+  assert.match(mcp, /tools: TOOLS/);
+  // Should NOT have Exchange scope filtering in tools/list
+  const listSection = mcp.slice(
+    mcp.indexOf('method === "tools/list"'),
+    mcp.indexOf('method === "tools/call"'),
+  );
+  assert.doesNotMatch(listSection, /filterExchangeToolsByScope/, "SigRank tools/list must not filter Exchange tools");
 });
 
 // ─── MCP tools module tests ──────────────────────────────────────────────────
@@ -395,37 +413,78 @@ test("sitemap does NOT include private/admin routes", async () => {
 
 // ─── MCP server card tests ───────────────────────────────────────────────────
 
-test("MCP server card advertises Exchange tools", async () => {
+test("SigRank MCP server card does NOT advertise Exchange tools", async () => {
   const card = await source("app/.well-known/mcp.json/route.ts");
   for (const tool of EXPECTED_EXCHANGE_TOOLS) {
-    assert.match(card, new RegExp(`"${tool}"`), `MCP card must list ${tool}`);
+    assert.doesNotMatch(card, new RegExp(`"${tool}"`), `SigRank MCP card must NOT list ${tool}`);
   }
 });
 
-test("MCP server card declares authorization scopes", async () => {
+test("SigRank MCP server card does NOT declare Exchange authorization scopes", async () => {
   const card = await source("app/.well-known/mcp.json/route.ts");
+  assert.doesNotMatch(card, /exchange:read/);
+  assert.doesNotMatch(card, /exchange:attempt/);
+  assert.doesNotMatch(card, /exchange:propose/);
+});
+
+test("Exchange MCP server card advertises all Exchange tools", async () => {
+  const card = await source("app/.well-known/exchange-mcp.json/route.ts");
+  for (const tool of EXPECTED_EXCHANGE_TOOLS) {
+    assert.match(card, new RegExp(`"${tool}"`), `Exchange MCP card must list ${tool}`);
+  }
+});
+
+test("Exchange MCP server card declares authorization scopes", async () => {
+  const card = await source("app/.well-known/exchange-mcp.json/route.ts");
   assert.match(card, /authorization/);
   assert.match(card, /exchange:read/);
   assert.match(card, /exchange:attempt/);
   assert.match(card, /exchange:propose/);
 });
 
-test("MCP server card declares user control expectations", async () => {
-  const card = await source("app/.well-known/mcp.json/route.ts");
+test("Exchange MCP server card declares user control expectations", async () => {
+  const card = await source("app/.well-known/exchange-mcp.json/route.ts");
   assert.match(card, /userControl/);
   assert.match(card, /State-changing tools/);
   assert.match(card, /No tool can create a Commitment/);
 });
 
+test("Exchange MCP server card points to correct endpoint", async () => {
+  const card = await source("app/.well-known/exchange-mcp.json/route.ts");
+  assert.match(card, /api\/exchange\/mcp/);
+  assert.match(card, /contribution-exchange/);
+});
+
+test("Exchange MCP server card links to Exchange profile and guide", async () => {
+  const card = await source("app/.well-known/exchange-mcp.json/route.ts");
+  assert.match(card, /exchange\.json/);
+  assert.match(card, /agents\.md/);
+  assert.match(card, /\/exchange/);
+  assert.match(card, /exchange\.schema\.json/);
+});
+
 // ─── Initialize instructions test ────────────────────────────────────────────
 
-test("MCP initialize instructions mention Exchange tools and invariants", async () => {
+test("Exchange MCP initialize instructions mention Exchange tools and invariants", async () => {
+  const mod = await source("lib/exchange/mcp-server.ts");
+  assert.match(mod, /EXCHANGE_INSTRUCTIONS/);
+  assert.match(mod, /exchange_discover_domain/);
+  assert.match(mod, /exchange_preflight/);
+  assert.match(mod, /exchange_propose/);
+  assert.match(mod, /No Exchange tool creates a Commitment/);
+});
+
+test("SigRank MCP initialize instructions do NOT advertise Exchange tools", async () => {
   const mcp = await source("app/api/mcp/route.ts");
-  assert.match(mcp, /Contribution Exchange tools/);
-  assert.match(mcp, /exchange_discover_domain/);
-  assert.match(mcp, /exchange_preflight/);
-  assert.match(mcp, /exchange_propose/);
-  assert.match(mcp, /No Exchange tool creates a Commitment/);
+  // Should mention the dedicated Exchange MCP endpoint
+  assert.match(mcp, /api\/exchange\/mcp/);
+  // Should NOT list individual Exchange tool names in instructions
+  const initStart = mcp.indexOf('method === "initialize"');
+  const initEnd = mcp.indexOf("}", initStart + 200);
+  const initSection = mcp.slice(initStart, initEnd + 500);
+  assert.doesNotMatch(initSection, /exchange_discover_domain/);
+  assert.doesNotMatch(initSection, /exchange_preflight/);
+  assert.doesNotMatch(initSection, /exchange_propose/);
 });
 
 // ─── Domain discovery SSRF tests ─────────────────────────────────────────────
@@ -448,17 +507,17 @@ test("normalizeDomainInput rejects prohibited hosts", async () => {
 // ─── Invariant: no Commitment creation ───────────────────────────────────────
 
 test("No Exchange MCP tool description claims to create a Commitment", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  // Find all Exchange tool descriptions
-  const exchangeStart = mcp.indexOf("// ── Contribution Exchange tools");
-  const exchangeEnd = mcp.indexOf("] as const;", exchangeStart);
-  const exchangeSection = mcp.slice(exchangeStart, exchangeEnd);
-  // None should say "creates a Commitment" without negation
-  const lines = exchangeSection.split("\n");
-  for (const line of lines) {
-    if (line.includes("Commitment") && line.includes("description")) {
-      // Must be negated
-      assert.match(line, /NOT.*Commitment|does not.*Commitment|NON-BINDING/i, "Commitment mentions must be negated");
+  const mod = await source("lib/exchange/mcp-server.ts");
+  // Check all tool descriptions for un-negated Commitment claims
+  for (const tool of EXPECTED_EXCHANGE_TOOLS) {
+    const toolIdx = mod.indexOf(`name: "${tool}"`);
+    const section = mod.slice(toolIdx, toolIdx + 2000);
+    const lines = section.split("\n");
+    for (const line of lines) {
+      if (line.includes("Commitment") && (line.includes("description") || line.includes("NOT") || line.includes("does not") || line.includes("NON-BINDING"))) {
+        // Must be negated
+        assert.match(line, /NOT.*Commitment|does not.*Commitment|NON-BINDING/i, "Commitment mentions must be negated");
+      }
     }
   }
 });
@@ -497,31 +556,31 @@ test("Fix 1: handleDiscoverDomain enforces redirect limit", async () => {
 // must require an idempotency_key in their schemas.
 
 test("Fix 2: exchange_submit_attempt schema requires idempotency_key", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  const toolIdx = mcp.indexOf(`name: "exchange_submit_attempt"`);
-  const section = mcp.slice(toolIdx, toolIdx + 1500);
+  const mod = await source("lib/exchange/mcp-server.ts");
+  const toolIdx = mod.indexOf(`name: "exchange_submit_attempt"`);
+  const section = mod.slice(toolIdx, toolIdx + 1500);
   assert.match(section, /idempotency_key/, "exchange_submit_attempt must have idempotency_key property");
   assert.match(section, /required:.*"idempotency_key"/, "idempotency_key must be in required array");
 });
 
 test("Fix 2: exchange_create_proposal_from_attempt schema requires idempotency_key", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  const toolIdx = mcp.indexOf(`name: "exchange_create_proposal_from_attempt"`);
-  const section = mcp.slice(toolIdx, toolIdx + 1500);
+  const mod = await source("lib/exchange/mcp-server.ts");
+  const toolIdx = mod.indexOf(`name: "exchange_create_proposal_from_attempt"`);
+  const section = mod.slice(toolIdx, toolIdx + 1500);
   assert.match(section, /idempotency_key/, "exchange_create_proposal_from_attempt must have idempotency_key property");
   assert.match(section, /required:.*"idempotency_key"/, "idempotency_key must be in required array");
 });
 
-test("Fix 2: callTool passes idempotency_key to handleSubmitAttempt", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  assert.match(mcp, /exchange_submit_attempt[\s\S]*idempotency_key[\s\S]*handleSubmitAttempt/s,
-    "callTool must extract and pass idempotency_key to handleSubmitAttempt");
+test("Fix 2: dispatchExchangeTool passes idempotency_key to handleSubmitAttempt", async () => {
+  const mod = await source("lib/exchange/mcp-server.ts");
+  assert.match(mod, /exchange_submit_attempt[\s\S]*idempotency_key[\s\S]*handleSubmitAttempt/s,
+    "dispatchExchangeTool must extract and pass idempotency_key to handleSubmitAttempt");
 });
 
-test("Fix 2: callTool passes idempotency_key to handleCreateProposalFromAttempt", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  assert.match(mcp, /exchange_create_proposal_from_attempt[\s\S]*idempotency_key[\s\S]*handleCreateProposalFromAttempt/s,
-    "callTool must extract and pass idempotency_key to handleCreateProposalFromAttempt");
+test("Fix 2: dispatchExchangeTool passes idempotency_key to handleCreateProposalFromAttempt", async () => {
+  const mod = await source("lib/exchange/mcp-server.ts");
+  assert.match(mod, /exchange_create_proposal_from_attempt[\s\S]*idempotency_key[\s\S]*handleCreateProposalFromAttempt/s,
+    "dispatchExchangeTool must extract and pass idempotency_key to handleCreateProposalFromAttempt");
 });
 
 test("Fix 2: handleSubmitAttempt handler signature includes idempotency_key", async () => {
@@ -803,27 +862,39 @@ test("R2-Fix 5b: enforceScopeForCall returns error when scope is missing", async
     "Must include available_scopes in error");
 });
 
-test("R2-Fix 5c: MCP route enforces scopes at tools/call time", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  assert.match(mcp, /enforceScopeForCall/,
-    "MCP route must import and call enforceScopeForCall");
-  // The enforcement must be in the tools/call handler, before the callTool
-  // dispatch. Find the tools/call handler section and verify enforceScopeForCall
-  // appears within it, before the `await callTool(` call.
-  const callHandlerStart = mcp.indexOf('message.method === "tools/call"');
-  const callHandlerEnd = mcp.indexOf("return jsonRpc(id, result);", callHandlerStart);
-  const callSection = mcp.slice(callHandlerStart, callHandlerEnd);
+test("R2-Fix 5c: Exchange MCP route enforces scopes at tools/call time", async () => {
+  const route = await source("app/api/exchange/mcp/route.ts");
+  assert.match(route, /enforceScopeForCall/,
+    "Exchange MCP route must import and call enforceScopeForCall");
+  // The enforcement must be in the tools/call handler, before the dispatch
+  const callHandlerStart = route.indexOf('method === "tools/call"');
+  const callHandlerEnd = route.indexOf("return jsonRpc(id, result);", callHandlerStart);
+  const callSection = route.slice(callHandlerStart, callHandlerEnd);
   assert.match(callSection, /enforceScopeForCall/,
     "enforceScopeForCall must be called in the tools/call handler");
   assert.match(callSection, /scopeError/,
     "Must check the scope error result");
-  // enforceScopeForCall must appear before callTool in the handler
+  // enforceScopeForCall must appear before dispatchExchangeTool in the handler
   const enforcePos = callSection.indexOf("enforceScopeForCall");
-  const callToolPos = callSection.indexOf("callTool(");
-  assert.ok(enforcePos > -1 && callToolPos > -1,
-    "Both enforceScopeForCall and callTool must be present in the handler");
-  assert.ok(enforcePos < callToolPos,
-    "enforceScopeForCall must be called before callTool");
+  const dispatchPos = callSection.indexOf("dispatchExchangeTool");
+  assert.ok(enforcePos > -1 && dispatchPos > -1,
+    "Both enforceScopeForCall and dispatchExchangeTool must be present in the handler");
+  assert.ok(enforcePos < dispatchPos,
+    "enforceScopeForCall must be called before dispatchExchangeTool");
+});
+
+test("R2-Fix 5c: SigRank MCP route enforces scopes for legacy Exchange calls", async () => {
+  const mcp = await source("app/api/mcp/route.ts");
+  assert.match(mcp, /enforceScopeForCall/,
+    "SigRank MCP route must call enforceScopeForCall for legacy Exchange calls");
+  // The enforcement must be gated on isExchangeTool
+  const callHandlerStart = mcp.indexOf('method === "tools/call"');
+  const callHandlerEnd = mcp.indexOf("return jsonRpc(id, result);", callHandlerStart);
+  const callSection = mcp.slice(callHandlerStart, callHandlerEnd);
+  assert.match(callSection, /isExchangeTool/,
+    "Scope enforcement must be gated on isExchangeTool check");
+  assert.match(callSection, /enforceScopeForCall/,
+    "enforceScopeForCall must be called for Exchange tools");
 });
 
 test("R2-Fix 5d: read-only tools pass scope enforcement (return null)", async () => {
