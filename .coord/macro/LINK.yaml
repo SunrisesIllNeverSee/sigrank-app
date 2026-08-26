@@ -1,0 +1,5 @@
+macro:
+  mode: standalone
+  build_id: ""
+  system_id: ""
+  hub_path: ""
