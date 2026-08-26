@@ -402,6 +402,13 @@ export default function TokenCascadeVsRawTokenConsumptionPage() {
           </Link>
           {" · "}
           <Link
+            href="/metrics/cache-hit-rate"
+            className="text-gold underline underline-offset-2"
+          >
+            Cache Hit Rate
+          </Link>
+          {" · "}
+          <Link
             href="/score"
             className="text-gold underline underline-offset-2"
           >
