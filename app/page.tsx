@@ -490,6 +490,13 @@ export default async function HomePage() {
           >
             Token Telemetry
           </Link>
+          {" · "}
+          <Link
+            href="/metrics/cache-hit-rate"
+            className="text-gold underline underline-offset-2"
+          >
+            Cache Hit Rate
+          </Link>
         </p>
       </section>
 

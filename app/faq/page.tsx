@@ -172,6 +172,33 @@ export default function FaqPage() {
             </Link>{" "}
             — the full methodology behind the SigRank Index.
           </li>
+          <li>
+            <Link
+              href="/metrics/cache-hit-rate"
+              className="text-gold underline-offset-2 hover:underline"
+            >
+              /metrics/cache-hit-rate
+            </Link>{" "}
+            — why cache hit rate is the highest-leverage AI coding metric.
+          </li>
+          <li>
+            <Link
+              href="/token-telemetry"
+              className="text-gold underline-offset-2 hover:underline"
+            >
+              /token-telemetry
+            </Link>{" "}
+            — real-time token telemetry for AI operators.
+          </li>
+          <li>
+            <Link
+              href="/alternatives/ccusage-alternatives"
+              className="text-gold underline-offset-2 hover:underline"
+            >
+              /alternatives/ccusage-alternatives
+            </Link>{" "}
+            — alternatives to ccusage for AI token tracking.
+          </li>
         </ul>
       </section>
     </div>
