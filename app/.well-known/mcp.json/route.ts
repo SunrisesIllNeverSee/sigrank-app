@@ -62,6 +62,13 @@ export async function GET() {
       "exchange_submit_attempt",
       "exchange_create_proposal_from_attempt",
     ],
+    prompts: [
+      "benchmark-my-operator",
+      "how-do-i-reach-top-10",
+      "explain-my-signature",
+      "diagnose-inefficiency",
+      "field-anomaly-report",
+    ],
     authorization: {
       scopes: [
         { name: "exchange:read", description: "Read-only Exchange discovery: domain profiles, policy, signals, attempts. Always granted." },

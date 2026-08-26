@@ -28,10 +28,17 @@ const NETWORK = (process.env.X402_NETWORK ?? "eip155:84532") as `${string}:${str
 
 const facilitatorClient = new HTTPFacilitatorClient({ url: FACILITATOR_URL });
 
-export const x402Server = new x402ResourceServer(facilitatorClient).register(
-  NETWORK,
-  new ExactEvmScheme(),
-);
+let _x402Server: InstanceType<typeof x402ResourceServer> | null = null;
+
+export function getX402Server() {
+  if (!_x402Server) {
+    _x402Server = new x402ResourceServer(facilitatorClient).register(
+      NETWORK,
+      new ExactEvmScheme(),
+    );
+  }
+  return _x402Server;
+}
 
 export const x402Config: {
   payTo: string;
