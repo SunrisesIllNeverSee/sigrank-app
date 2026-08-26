@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeaderboard } from "@/lib/board";
-import { fieldStats } from "@/lib/cascade";
+import { fieldStats } from "@sigrank/cascade";
 
 export const revalidate = 300;
 
