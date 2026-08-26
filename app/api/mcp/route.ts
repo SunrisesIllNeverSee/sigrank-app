@@ -1912,6 +1912,12 @@ export async function POST(req: NextRequest) {
     return new Response("Forbidden", { status: 403 });
   }
 
+  const startTime = Date.now();
+  const requestId = req.headers.get("x-request-id") ?? crypto.randomUUID();
+  const clientName = req.headers.get("mcp-client-name") ?? undefined;
+  const clientVersion = req.headers.get("mcp-client-version") ?? undefined;
+  const ipHash = hashIp(req.headers.get("x-forwarded-for")?.split(",")[0]?.trim());
+
   let message: RpcRequest;
   try {
     message = (await req.json()) as RpcRequest;
@@ -1924,9 +1930,21 @@ export async function POST(req: NextRequest) {
   }
 
   const id = message.id ?? null;
+  const method = message.method;
 
-  if (message.method === "initialize") {
+  if (method === "initialize") {
     const negotiated = negotiateProtocolVersion(message.params?.protocolVersion);
+    await recordMcpCall({
+      request_id: requestId,
+      server_id: "sigrank",
+      transport: "remote_mcp",
+      operation: "initialize",
+      result: "success",
+      duration_ms: Date.now() - startTime,
+      ip_hash: ipHash,
+      client_name: clientName,
+      client_version: clientVersion,
+    });
     return jsonRpc(id, {
       protocolVersion: negotiated,
       capabilities: { tools: {}, resources: { listChanged: false }, prompts: { listChanged: false } },
@@ -1942,7 +1960,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  if (message.method === "notifications/initialized") {
+  if (method === "notifications/initialized") {
     return new Response(null, {
       status: 202,
       headers: { "MCP-Protocol-Version": PROTOCOL_VERSION },
@@ -1957,14 +1975,26 @@ export async function POST(req: NextRequest) {
     }, 400);
   }
 
-  if (message.method === "ping") return jsonRpc(id, {});
-  if (message.method === "tools/list") {
+  if (method === "ping") return jsonRpc(id, {});
+  if (method === "tools/list") {
     // SigRank-only: all 15 tools are read-only and always visible.
     // Exchange tools have moved to /api/exchange/mcp.
+    await recordMcpCall({
+      request_id: requestId,
+      server_id: "sigrank",
+      transport: "remote_mcp",
+      operation: "tools_list",
+      auth_tier: "anonymous",
+      result: "success",
+      duration_ms: Date.now() - startTime,
+      ip_hash: ipHash,
+      client_name: clientName,
+      client_version: clientVersion,
+    });
     return jsonRpc(id, { tools: TOOLS });
   }
 
-  if (message.method === "tools/call") {
+  if (method === "tools/call") {
     const name = message.params?.name;
     const args = message.params?.arguments;
     if (typeof name !== "string") {
@@ -1977,6 +2007,23 @@ export async function POST(req: NextRequest) {
       const scopes = resolveScopes(req);
       const scopeError = enforceScopeForCall(name, scopes);
       if (scopeError) {
+        const authTier = deriveAuthTier(scopes);
+        await recordMcpCall({
+          request_id: requestId,
+          server_id: "sigrank",
+          transport: "remote_mcp",
+          operation: "tools_call",
+          tool_name: name,
+          auth_tier: authTier,
+          scopes: [...scopes],
+          result: "denied",
+          error_code: "missing_scope",
+          duration_ms: Date.now() - startTime,
+          ip_hash: ipHash,
+          client_name: clientName,
+          client_version: clientVersion,
+          metadata: { legacy_bridge: true },
+        });
         return jsonRpc(id, scopeError);
       }
     }
@@ -1987,11 +2034,33 @@ export async function POST(req: NextRequest) {
         : {},
       req,
     );
+    // Record the call (SigRank tools or legacy Exchange bridge)
+    const isExchange = isExchangeTool(name);
+    const scopes = isExchange ? resolveScopes(req) : new Set<string>();
+    const authTier = isExchange ? deriveAuthTier(scopes) : "anonymous" as const;
+    const isError = result && typeof result === "object" && "isError" in result
+      ? (result as { isError: boolean }).isError
+      : false;
+    await recordMcpCall({
+      request_id: requestId,
+      server_id: "sigrank",
+      transport: "remote_mcp",
+      operation: "tools_call",
+      tool_name: name,
+      auth_tier: authTier,
+      scopes: isExchange ? [...scopes] : undefined,
+      result: isError ? "error" : "success",
+      duration_ms: Date.now() - startTime,
+      ip_hash: ipHash,
+      client_name: clientName,
+      client_version: clientVersion,
+      metadata: isExchange ? { legacy_bridge: true } : undefined,
+    });
     return jsonRpc(id, result);
   }
 
   // ── resources/list ──
-  if (message.method === "resources/list") {
+  if (method === "resources/list") {
     return jsonRpc(id, {
       resources: [
         {
@@ -2035,7 +2104,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── resources/read ──
-  if (message.method === "resources/read") {
+  if (method === "resources/read") {
     const uri = message.params?.uri;
     if (typeof uri !== "string") {
       return rpcError(id, -32602, "Invalid params", { required: "params.uri" });
@@ -2233,7 +2302,7 @@ These formulas are frozen. Do not modify without owner approval.`,
   }
 
   // ── prompts/list ──
-  if (message.method === "prompts/list") {
+  if (method === "prompts/list") {
     return jsonRpc(id, {
       prompts: [
         {
@@ -2295,7 +2364,7 @@ These formulas are frozen. Do not modify without owner approval.`,
   }
 
   // ── prompts/get ──
-  if (message.method === "prompts/get") {
+  if (method === "prompts/get") {
     const promptName = message.params?.name;
     const promptArgs = (message.params?.arguments ?? {}) as Record<string, string | number>;
     if (typeof promptName !== "string") {
@@ -2342,7 +2411,7 @@ These formulas are frozen. Do not modify without owner approval.`,
     return jsonRpc(id, prompt);
   }
 
-  return rpcError(id, -32601, "Method not found", { method: message.method });
+  return rpcError(id, -32601, "Method not found", { method });
 }
 
 export async function GET() {

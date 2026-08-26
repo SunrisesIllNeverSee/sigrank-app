@@ -1,6 +1,10 @@
 /**
  * MCP server card for SigRank SignalAF.
  * The same product is available remotely over Streamable HTTP and locally over stdio.
+ *
+ * Contribution Exchange tools have moved to a dedicated MCP server:
+ *   https://signalaf.com/.well-known/exchange-mcp.json
+ *   https://signalaf.com/api/exchange/mcp
  */
 
 import { NextResponse } from "next/server";
@@ -19,7 +23,7 @@ export async function GET() {
       version: "1.0.0",
     },
     description:
-      "SigRank SignalAF exposes AI-operator benchmark data, token-cascade calculations, and Contribution Exchange tools to MCP clients. Use it for operator ranking, comparison, privacy-preserving telemetry analysis, domain contribution discovery, and unsolicited proposals — not as a model-quality benchmark.",
+      "SigRank SignalAF exposes AI-operator benchmark data and token-cascade calculations to MCP clients. Use it for operator ranking, comparison, and privacy-preserving telemetry analysis — not as a model-quality benchmark. Contribution Exchange tools are available at a separate MCP endpoint (see exchange-mcp.json).",
     transports: [
       {
         type: "streamable-http",
@@ -51,16 +55,6 @@ export async function GET() {
       "who_operates_like_me",
       "compare_to_field",
       "operator_signature",
-      "exchange_discover_domain",
-      "exchange_get_policy",
-      "exchange_preflight",
-      "exchange_propose",
-      "exchange_list_signals",
-      "exchange_get_signal",
-      "exchange_get_attempt",
-      "exchange_create_attempt",
-      "exchange_submit_attempt",
-      "exchange_create_proposal_from_attempt",
     ],
     prompts: [
       "benchmark-my-operator",
@@ -69,14 +63,6 @@ export async function GET() {
       "diagnose-inefficiency",
       "field-anomaly-report",
     ],
-    authorization: {
-      scopes: [
-        { name: "exchange:read", description: "Read-only Exchange discovery: domain profiles, policy, signals, attempts. Always granted." },
-        { name: "exchange:attempt", description: "Create and submit signal attempts. Requires x-exchange-actor-id header." },
-        { name: "exchange:propose", description: "Submit unsolicited proposals and create proposals from verified attempts. Requires x-exchange-agent-key or x-exchange-proposer-key header." },
-      ],
-      userControl: "State-changing tools (exchange_propose, exchange_create_attempt, exchange_submit_attempt, exchange_create_proposal_from_attempt) require authentication headers. Read-only tools are always available. No tool can create a Commitment, authorization, or settlement.",
-    },
     install: "npx sigrank",
     docs: `${SITE_ORIGIN}/developers`,
     homepage: SITE_ORIGIN,

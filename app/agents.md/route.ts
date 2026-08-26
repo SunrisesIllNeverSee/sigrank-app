@@ -235,7 +235,11 @@ Signals are one of two ingress paths. You do NOT need a signal to propose. The u
 
 ## MCP tools
 
-The Contribution Exchange is exposed through MCP tools on the SignalAF MCP server (${base}/api/mcp). Connect as an MCP client to discover and use these tools.
+The Contribution Exchange has a dedicated MCP server at ${base}/api/exchange/mcp (server name: \`contribution-exchange\`). The SigRank benchmark MCP server remains at ${base}/api/mcp (server name: \`sigrank\`). Connect as an MCP client to the appropriate endpoint.
+
+### Exchange MCP server (${base}/api/exchange/mcp)
+
+Server card: ${base}/.well-known/exchange-mcp.json
 
 ### Read-only tools (always available)
 
