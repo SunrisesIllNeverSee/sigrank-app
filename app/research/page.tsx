@@ -113,7 +113,10 @@ export default function StateOfTheIndexPage() {
               "The primary anonymized seed dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
             datePublished: SNAPSHOT_DATE,
             headlineFindings,
-            doi: ZENODO_VERSION_DOI,
+            // No doi: the Dataset entity owns the Zenodo DOI @id.
+            // The article is about the dataset, not the dataset itself.
+            // Passing the DOI here would create a duplicate @id collision
+            // with sigrankDataset() on the same page.
           }),
           breadcrumb([{ name: "Research", path: "/research" }]),
           faqPage([

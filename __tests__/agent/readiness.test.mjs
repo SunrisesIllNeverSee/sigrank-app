@@ -116,22 +116,26 @@ test("developer portal documents auth, rate limits, errors and version lifecycle
 test("MCP manifest points to a Streamable HTTP endpoint with a valid lifecycle implementation", async () => {
   const manifest = await source("app/.well-known/mcp.json/route.ts");
   const mcp = await source("app/api/mcp/route.ts");
+  const server = await source("lib/mcp/server.ts");
   const protocol = await source("lib/mcp/protocol.ts");
   assert.match(manifest, /streamable-http/);
   assert.match(manifest, /\/api\/mcp/);
   // Protocol version is defined in the shared protocol module
   assert.match(protocol, /2025-06-18/);
-  assert.match(mcp, /PROTOCOL_VERSION/);
-  assert.match(mcp, /method === "initialize"/);
-  assert.match(mcp, /method === "notifications\/initialized"/);
-  assert.match(mcp, /method === "tools\/list"/);
-  assert.match(mcp, /method === "tools\/call"/);
+  // The SDK handles initialize, notifications/initialized, tools/list, tools/call
+  // internally. The route delegates to the SDK handler via mcpHandler.fetch.
+  assert.match(mcp, /mcpHandler\.fetch/);
+  assert.match(mcp, /createMcpHandler/);
+  // Server registers tools with the SDK
+  assert.match(server, /registerTool/);
   // MCP tool metadata (agent-ready.dev M2/M4/M5/M6)
-  assert.match(mcp, /websiteUrl/);
-  assert.match(mcp, /readOnlyHint/);
-  assert.match(mcp, /outputSchema/);
+  assert.match(server, /websiteUrl/);
+  // readOnlyHint and outputSchema are in the tool definitions (lib/mcp/tools)
+  const toolsSource = await source("lib/mcp/tools/index.ts");
+  assert.match(toolsSource, /readOnlyHint/);
+  assert.match(toolsSource, /outputSchema/);
   // Every parameter must have a description
-  const paramDescCount = (mcp.match(/description: ".*"/g) || []).length;
+  const paramDescCount = (toolsSource.match(/description: ".*"/g) || []).length;
   assert.ok(paramDescCount >= 10, `expected >=10 description fields (params + outputs), got ${paramDescCount}`);
 });
 

@@ -14,9 +14,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Improve Your AI Coding Yield",
+  title: "How to Improve Your AI Coding Yield \u2014 Token Efficiency Guide",
   description:
-    "Seven concrete strategies to improve your \u03A5 Yield \u2014 better prompt caching, structured inputs, cache reuse, and fewer re-rolls. With before/after examples.",
+    "Seven concrete strategies to improve your \u03A5 Yield and token efficiency \u2014 better prompt caching, structured inputs, cache reuse, and fewer re-rolls. With before/after examples.",
   path: "/guides/how-to-improve-your-yield",
 });
 

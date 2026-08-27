@@ -14,9 +14,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Track Your Token Cascade",
+  title: "How to Track Your Token Cascade \u2014 Multi-Tool Token Tracking Guide",
   description:
-    "A complete guide to token cascade tracking. Learn the four pillars \u2014 input, output, cache-read, cache-write \u2014 and how to track them with sigrank.",
+    "A complete guide to token cascade tracking and multi-tool token tracking. Learn the four pillars \u2014 input, output, cache-read, cache-write \u2014 and how to track them across Claude Code, Cursor, and 15+ tools.",
   path: "/guides/how-to-track-token-cascade",
 });
 

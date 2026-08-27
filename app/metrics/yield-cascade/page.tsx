@@ -15,9 +15,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Yield (Υ) — Token Cascade Efficiency",
+  title: "Yield (\u03A5) \u2014 Token Efficiency Metric for AI Coding",
   description:
-    "Yield (\u03A5) = (cache_read \u00D7 output) / input\u00B2 \u2014 the headline SigRank metric. Learn what cascade yield measures, how to improve it, and class tier mapping.",
+    "Yield (\u03A5) = (cache_read \u00D7 output) / input\u00B2 \u2014 the token efficiency metric that measures cascade yield. Learn what yield means, how to improve token efficiency, and class tier mapping.",
   path: "/metrics/yield-cascade",
 });
 

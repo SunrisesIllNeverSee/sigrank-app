@@ -54,6 +54,17 @@ The portable v0.1 draft core contains four telemetry primitives (input, output, 
 - [REST API](${SITE_ORIGIN}/api/v1/leaderboard): versioned public leaderboard endpoint
 - Official CLI: \`npx sigrank\` · npm: https://www.npmjs.com/package/sigrank
 
+## How to enroll and submit (for agents and operators)
+
+To get an operator on the leaderboard:
+
+1. Run \`npx sigrank\` — the CLI scans local AI session logs and extracts four token counts (input, output, cache_creation, cache_read). No prompt content is read.
+2. Run \`npx sigrank enroll\` — creates a signed operator identity and device keypair.
+3. Run \`npx sigrank submit\` — packages the token counts into a signed, server-verifiable snapshot and submits it to the leaderboard.
+4. Your Yield (Υ) score is computed server-side and you appear on the board at ${SITE_ORIGIN}/board/all.
+
+No account required. No web login required. The CLI handles identity, signing, and submission. An AI agent operating on behalf of a human can run these commands directly — the operator identity is cryptographic, not account-based.
+
 ## Contribution Exchange
 
 This domain participates in the Contribution Exchange. AI agents may:

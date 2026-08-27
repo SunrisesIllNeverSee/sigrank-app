@@ -17,9 +17,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Efficiency — Operational Amplification",
+  title: "Operator Efficiency Score \u2014 Operational Amplification Metric",
   description:
-    "Efficiency = (cache_read + cache_write + output) / (4 * input) — total operational amplification versus the AA 7:2:1 baseline. Measures how much operating activity an operator generates per unit of fresh input.",
+    "Operator efficiency score = (cache_read + cache_write + output) / (4 * input) \u2014 the coding efficiency metric that measures operational amplification versus the AA 7:2:1 baseline. How much activity per unit of fresh input.",
   path: "/metrics/efficiency",
 });
 

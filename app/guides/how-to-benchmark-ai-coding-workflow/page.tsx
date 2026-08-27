@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Benchmark Your AI Coding Workflow",
+  title: "How to Benchmark Your AI Coding Workflow \u2014 Step-by-Step Guide",
   description:
-    "A step-by-step guide to benchmarking your AI coding workflow. Measure the four pillars + yield, set a baseline, and compare on the leaderboard.",
+    "A step-by-step guide to benchmarking your AI coding workflow. Measure the four pillars + yield, set a baseline, and compare on the leaderboard. The AI coding benchmark guide.",
   path: "/guides/how-to-benchmark-ai-coding-workflow",
 });
 
