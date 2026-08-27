@@ -174,6 +174,10 @@ export async function recordMcpCall(record: McpCallRecord): Promise<void> {
 /**
  * Get aggregate observability summary for the owner dashboard.
  * Returns aggregated counts, not raw rows.
+ *
+ * Uses the `mcp_observability_summary` Postgres RPC (migration 0043) to
+ * aggregate SQL-side. This replaced the previous approach of fetching up to
+ * 10K rows and aggregating in JavaScript (issue #75).
  */
 export async function getObservabilitySummary(filters: {
   period?: string;    // e.g. "24h", "7d", "30d"
@@ -203,29 +207,28 @@ export async function getObservabilitySummary(filters: {
   };
 }> {
   const client = getAdminClient();
-  if (!client) {
-    return {
-      total_calls: 0,
-      by_server: {},
-      by_transport: {},
-      by_operation: {},
-      by_tool: {},
-      by_domain: {},
-      by_result: {},
-      by_auth_tier: {},
-      avg_duration_ms: null,
-      idempotent_replays: 0,
-      funnel: {
-        initializations: 0,
-        tool_list_requests: 0,
-        tool_calls: 0,
-        signals_viewed: 0,
-        attempts_created: 0,
-        submissions_received: 0,
-        proposals_created: 0,
-      },
-    };
-  }
+  const emptyResult = {
+    total_calls: 0,
+    by_server: {},
+    by_transport: {},
+    by_operation: {},
+    by_tool: {},
+    by_domain: {},
+    by_result: {},
+    by_auth_tier: {},
+    avg_duration_ms: null,
+    idempotent_replays: 0,
+    funnel: {
+      initializations: 0,
+      tool_list_requests: 0,
+      tool_calls: 0,
+      signals_viewed: 0,
+      attempts_created: 0,
+      submissions_received: 0,
+      proposals_created: 0,
+    },
+  };
+  if (!client) return emptyResult;
 
   // Calculate time filter
   const periodHours = filters.period === "24h" ? 24
@@ -234,104 +237,45 @@ export async function getObservabilitySummary(filters: {
     : 168; // default 7d
   const since = new Date(Date.now() - periodHours * 60 * 60 * 1000).toISOString();
 
-  const queryBuilder = client.from("exchange_mcp_calls").select("*").gte("occurred_at", since) as unknown as {
-    eq: (col: string, val: string) => typeof queryBuilder;
-    limit: (n: number) => Promise<{ data: Array<Record<string, unknown>> | null; error: { message: string } | null }>;
-  };
-  let query: typeof queryBuilder = queryBuilder;
-  if (filters.domain) query = query.eq("target_domain", filters.domain);
-  if (filters.transport) query = query.eq("transport", filters.transport);
-  if (filters.tool) query = query.eq("tool_name", filters.tool);
-  if (filters.result) query = query.eq("result", filters.result);
-
-  const { data, error } = await query.limit(10000);
+  // SQL-side aggregation via RPC — no raw rows transferred
+  const { data, error } = await (client.rpc as unknown as (name: string, args: Record<string, unknown>) => Promise<{
+    data: Record<string, unknown> | null;
+    error: { message: string } | null;
+  }>)("mcp_observability_summary", {
+    p_since: since,
+    p_domain: filters.domain ?? null,
+    p_transport: filters.transport ?? null,
+    p_tool: filters.tool ?? null,
+    p_result: filters.result ?? null,
+  });
 
   if (error || !data) {
-    console.error("[mcp-observability] summary query failed:", error?.message);
-    return {
-      total_calls: 0,
-      by_server: {},
-      by_transport: {},
-      by_operation: {},
-      by_tool: {},
-      by_domain: {},
-      by_result: {},
-      by_auth_tier: {},
-      avg_duration_ms: null,
-      idempotent_replays: 0,
-      funnel: {
-        initializations: 0,
-        tool_list_requests: 0,
-        tool_calls: 0,
-        signals_viewed: 0,
-        attempts_created: 0,
-        submissions_received: 0,
-        proposals_created: 0,
-      },
+    console.error("[mcp-observability] summary RPC failed:", error?.message);
+    return emptyResult;
+  }
+
+  // RPC returns a JSONB object matching our summary shape
+  const summary = data as unknown as {
+    total_calls: number;
+    by_server: Record<string, number>;
+    by_transport: Record<string, number>;
+    by_operation: Record<string, number>;
+    by_tool: Record<string, number>;
+    by_domain: Record<string, number>;
+    by_result: Record<string, number>;
+    by_auth_tier: Record<string, number>;
+    avg_duration_ms: number | null;
+    idempotent_replays: number;
+    funnel: {
+      initializations: number;
+      tool_list_requests: number;
+      tool_calls: number;
+      signals_viewed: number;
+      attempts_created: number;
+      submissions_received: number;
+      proposals_created: number;
     };
-  }
-
-  // Aggregate in JS (avoids complex SQL for cross-database compatibility)
-  const byServer: Record<string, number> = {};
-  const byTransport: Record<string, number> = {};
-  const byOperation: Record<string, number> = {};
-  const byTool: Record<string, number> = {};
-  const byDomain: Record<string, number> = {};
-  const byResult: Record<string, number> = {};
-  const byAuthTier: Record<string, number> = {};
-  let totalDuration = 0;
-  let durationCount = 0;
-  let idempotentReplays = 0;
-
-  for (const row of data) {
-    const r = row as Record<string, unknown>;
-    const sid = r.server_id as string;
-    const tid = r.transport as string;
-    const oid = r.operation as string;
-    const res = r.result as string;
-    const tier = r.auth_tier as string;
-    byServer[sid] = (byServer[sid] ?? 0) + 1;
-    byTransport[tid] = (byTransport[tid] ?? 0) + 1;
-    byOperation[oid] = (byOperation[oid] ?? 0) + 1;
-    if (r.tool_name) byTool[r.tool_name as string] = (byTool[r.tool_name as string] ?? 0) + 1;
-    if (r.target_domain) byDomain[r.target_domain as string] = (byDomain[r.target_domain as string] ?? 0) + 1;
-    byResult[res] = (byResult[res] ?? 0) + 1;
-    byAuthTier[tier] = (byAuthTier[tier] ?? 0) + 1;
-    if (r.duration_ms != null) {
-      totalDuration += r.duration_ms as number;
-      durationCount++;
-    }
-    if (r.idempotent_replay) idempotentReplays++;
-  }
-
-  // Funnel
-  const funnel = {
-    initializations: data.filter((r) => (r as Record<string, unknown>).operation === "initialize").length,
-    tool_list_requests: data.filter((r) => (r as Record<string, unknown>).operation === "tools_list").length,
-    tool_calls: data.filter((r) => (r as Record<string, unknown>).operation === "tools_call").length,
-    signals_viewed: data.filter((r) => {
-      const t = (r as Record<string, unknown>).tool_name;
-      return t === "exchange_get_signal" || t === "exchange_list_signals";
-    }).length,
-    attempts_created: data.filter((r) => (r as Record<string, unknown>).tool_name === "exchange_create_attempt").length,
-    submissions_received: data.filter((r) => (r as Record<string, unknown>).tool_name === "exchange_submit_attempt").length,
-    proposals_created: data.filter((r) => {
-      const t = (r as Record<string, unknown>).tool_name;
-      return t === "exchange_propose" || t === "exchange_create_proposal_from_attempt";
-    }).length,
   };
 
-  return {
-    total_calls: data.length,
-    by_server: byServer,
-    by_transport: byTransport,
-    by_operation: byOperation,
-    by_tool: byTool,
-    by_domain: byDomain,
-    by_result: byResult,
-    by_auth_tier: byAuthTier,
-    avg_duration_ms: durationCount > 0 ? Math.round(totalDuration / durationCount) : null,
-    idempotent_replays: idempotentReplays,
-    funnel,
-  };
+  return summary;
 }
