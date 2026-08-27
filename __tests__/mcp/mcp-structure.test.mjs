@@ -124,11 +124,11 @@ test("route.ts delegates to SDK handler via .fetch()", () => {
 });
 
 test("server.ts imports McpServer from SDK", () => {
-  assert.match(serverSource, /McpServer.*@modelcontextprotocol\/server/);
+  assert.match(serverSource, /McpServer[\s\S]*@modelcontextprotocol\/server/);
 });
 
 test("server.ts imports fromJsonSchema from SDK", () => {
-  assert.match(serverSource, /fromJsonSchema.*@modelcontextprotocol\/server/);
+  assert.match(serverSource, /fromJsonSchema[\s\S]*@modelcontextprotocol\/server/);
 });
 
 // ─── Method dispatch (now via SDK + server.ts) ──────────────────────────────

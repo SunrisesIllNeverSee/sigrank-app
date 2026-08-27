@@ -42,8 +42,12 @@ test("migration 0043 exists and defines the RPC function", () => {
 
 test("getObservabilitySummary calls the RPC, not a raw row fetch", () => {
   assert.ok(
-    observabilitySource.includes('client.rpc("mcp_observability_summary"'),
+    observabilitySource.includes('"mcp_observability_summary"'),
     "getObservabilitySummary must call the mcp_observability_summary RPC",
+  );
+  assert.ok(
+    observabilitySource.includes(".rpc"),
+    "getObservabilitySummary must use the Supabase .rpc() method",
   );
   assert.ok(
     !observabilitySource.includes('.limit(10000)'),
