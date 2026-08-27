@@ -9,15 +9,15 @@ export function Draft2CtaBand() {
   return (
     <section className="box-glow my-16 overflow-hidden rounded-2xl border border-gold/25 bg-gradient-to-b from-gold/5 to-bg-surface px-6 py-14 text-center">
       <div className="font-mono text-xs uppercase tracking-widest text-gold">
-        ⊙ Get on the board
+        ⊙ Measure your operating efficiency
       </div>
       <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-        Four integers in, full ledger out.
+        Four integers in, full evaluation out.
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
         Architecture is the only variable that matters. Run the local agent or
-        just paste your numbers — see your Υ Yield, your class, and your
-        projected rank in under a minute.
+        just paste your numbers — see your Υ Yield, your class, and where your
+        operating efficiency actually stands in under a minute.
       </p>
 
       <Draft2ActionTiles className="mt-8" shine />

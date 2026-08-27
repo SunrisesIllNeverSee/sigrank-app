@@ -99,6 +99,26 @@ const STATIC_ROUTES: {
   { path: "/vs/tabnine", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/amazon-q", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/sourcegraph-cody", priority: 0.7, changeFrequency: "monthly" },
+  // Competitor /vs/ pages (2026-08-27 batch — token tracker & leaderboard competitors)
+  { path: "/vs/viberank", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/tokenmaxxer", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/whoburnedmore", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/aiusage", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ccburn", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ccflare", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ccstatusline", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/token-forest", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/sessionwatcher", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/omnara", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/sculptor", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/vibe-island", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/notch-pilot", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/opcode", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/lineman", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/codeburn", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/claudecount", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ccgather", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/clauderank", priority: 0.7, changeFrequency: "monthly" },
 
   // Alternatives / listicle pages — commercial intent
   {

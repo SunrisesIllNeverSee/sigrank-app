@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Velocity — Token Production Rate in AI Coding",
+  title: "Velocity Metric \u2014 Token Production Rate in AI Coding",
   description:
-    "Velocity = output / input \u2014 output efficiency ratio in AI coding. Learn why it\u2019s a secondary metric and how it interacts with yield.",
+    "Velocity = output / input \u2014 the token production rate metric for AI coding. Learn why velocity is a secondary metric, how it interacts with yield, and what it reveals about your workflow.",
   path: "/metrics/velocity",
 });
 

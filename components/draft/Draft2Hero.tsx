@@ -1,6 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { CascadeHeader } from "@/components/home/CascadeHeader";
+import { EnrollCta } from "@/components/home/EnrollCta";
 import { Draft2ActionTiles } from "@/components/draft/Draft2ActionTiles";
 
 // Lazy-load the wordmark components — they're client islands with font
@@ -88,6 +89,10 @@ export function Draft2Hero() {
         {/* action tiles — Measure (→ /score) · Board · Compare · Info·Wiki (shared
             component). Shine-sweep glint on too (owner 2026-06-22). */}
         <Draft2ActionTiles className="mt-3" shine />
+
+        {/* Direct enroll CTA — the exact command to run, copy-to-clipboard.
+            Surfaces the path to the leaderboard without requiring navigation. */}
+        <EnrollCta className="mt-5" />
 
         {/* taglines — bigger (owner 2026-06-22: increase size of these last two) */}
         <p className="font-mono text-lg font-semibold text-text-secondary sm:text-xl">
