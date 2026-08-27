@@ -11,19 +11,30 @@
  * structured data per the Schema.org spec.
  */
 
-import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
+import { SITE_ORIGIN, formatTokensLong } from "@/lib/seo";
+import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry } from "@/lib/canon-entities";
+import { activeProfile } from "@/lib/site-profile";
 import type { HallRecord } from "@/lib/board";
 
 const ORG_ID = `${SITE_ORIGIN}/#org`;
 const SITE_ID = `${SITE_ORIGIN}/#website`;
 
 /** Person — the site author (Deric J. McHenry) for E-E-A-T author attribution.
- *  Used as the `author` on blog posts, comparison articles, and research. */
+ *  Used as the `author` on blog posts, comparison articles, and research.
+ *
+ *  Canon-backed values (canonical @id, name, sameAs, affiliation, provenance)
+ *  come from lib/canon-entities.ts. Page-specific value (url) is derived from
+ *  SITE_ORIGIN. */
 export function personAuthor() {
   return {
     "@type": "Person",
-    name: "Deric J. McHenry",
-    sameAs: "https://orcid.org/0009-0002-9904-5390",
+    "@id": dericMcHenry.canonical_entity_id,
+    name: dericMcHenry.name,
+    sameAs: dericMcHenry.sameAs,
+    affiliation: { "@id": dericMcHenry.affiliation },
+    sourceSystem: dericMcHenry.sourceSystem,
+    canonBacked: dericMcHenry.canonBacked,
+    authorityApprovalRef: dericMcHenry.authorityApprovalRef,
     url: `${SITE_ORIGIN}/about`,
   };
 }
@@ -72,16 +83,21 @@ export function comparisonArticle(opts: {
   };
 }
 
-/** Organization — site-wide, rendered in app/layout.tsx. */
+/** Organization — site-wide, rendered in app/layout.tsx.
+ *
+ *  Canon-backed values (name, description, provenance, associatedWith) come
+ *  from lib/canon-entities.ts. The #org @id is site-local (preserved).
+ *  Page-specific values (logo, sameAs, url, alternateName) are preserved
+ *  from the existing builder. */
 export function organization() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": ORG_ID,
-    name: SITE_NAME,
-    alternateName: ["SigRank", "SignalAF", "signalaf", "SigRank SignalAF"],
+    name: elloCelloLLC.name,
+    alternateName: activeProfile.alternateNames,
     url: SITE_ORIGIN,
-    description: SITE_TAGLINE,
+    description: elloCelloLLC.description,
     logo: `${SITE_ORIGIN}/og-v2.png`,
     sameAs: [
       "https://orcid.org/0009-0002-9904-5390",
@@ -98,6 +114,10 @@ export function organization() {
       "https://signomy.xyz",
       "https://mos2es.com",
     ],
+    sourceSystem: elloCelloLLC.sourceSystem,
+    canonBacked: elloCelloLLC.canonBacked,
+    authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
+    associatedWith: { "@id": elloCelloLLC.associatedWith },
   };
 }
 
@@ -107,18 +127,23 @@ export function organization() {
  *  aggregateRating + review + availability. SigRank is a free CLI/MCP tool, not a
  *  retail product — SoftwareApplication is the correct type and doesn't trigger the
  *  review/rating requirements. Offer keeps availability for completeness.
- */
+ *
+ *  Canon-backed values (@id, name, description, applicationCategory,
+ *  disambiguatingDescription, isBasedOn, provenance) come from
+ *  lib/canon-entities.ts. Page-specific values (operatingSystem, offers,
+ *  keywords, category, brand) are preserved from the existing builder.
+ *  The SEO description (if profile-specific) is kept in `seoDescription`
+ *  as a page-specific field, NOT substituted for the canon description. */
 export function product() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "SigRank SignalAF — AI Operator Performance Rankings",
-    description:
-      "Leaderboard measuring AI users (operators) by token cascade efficiency " +
-      "(Υ Yield, C:I:O) and operator classes. Privacy-preserving, on-device telemetry " +
-      "with ed25519-signed submissions.",
+    "@id": sigrankCanon.canonical_entity_id,
+    name: sigrankCanon.name,
+    description: sigrankCanon.description,
+    disambiguatingDescription: sigrankCanon.disambiguatingDescription,
     url: SITE_ORIGIN,
-    applicationCategory: "DeveloperApplication",
+    applicationCategory: sigrankCanon.applicationCategory,
     operatingSystem: "Cross-platform (Node.js 18+)",
     brand: { "@id": ORG_ID },
     offers: {
@@ -135,22 +160,31 @@ export function product() {
       "compare AI users",
       "token efficiency benchmark",
     ],
+    isBasedOn: { "@id": sigrankCanon.isBasedOn },
+    codeRepository: sigrankCanon.codeRepository,
+    publisher: { "@id": ORG_ID },
+    sourceSystem: sigrankCanon.sourceSystem,
+    canonBacked: sigrankCanon.canonBacked,
+    authorityApprovalRef: sigrankCanon.authorityApprovalRef,
   };
 }
 
-/** WebSite — site-wide, rendered in app/layout.tsx. */
+/** WebSite — site-wide, rendered in app/layout.tsx.
+ *
+ *  Site-specific values (name, alternateName, description) come from the
+ *  active site profile (lib/site-profile.ts). The publisher reference
+ *  points to #org (Ello Cello LLC via canon). No canon-sensitive values
+ *  on this block — it describes the site, not a canonical entity. */
 export function website() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": SITE_ID,
-    name: SITE_NAME,
-    alternateName: ["SigRank", "SignalAF", "signalaf", "SigRank SignalAF"],
+    name: activeProfile.siteName,
+    alternateName: activeProfile.alternateNames,
     url: SITE_ORIGIN,
     publisher: { "@id": ORG_ID },
-    description:
-      "SigRank SignalAF ranks AI operators by Yield (Υ = cache_read × output / input²) — " +
-      "token-cascade efficiency, not raw spend. Privacy-preserving: token counts only, never prompts.",
+    description: activeProfile.siteTagline,
   };
 }
 
@@ -409,7 +443,7 @@ export function sigrankDataset(opts?: {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: SITE_NAME,
+      name: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     citation: [
@@ -678,7 +712,7 @@ export function mosesPatent() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: SITE_NAME,
+      name: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     about: "AI governance enforcement architecture",
@@ -716,7 +750,7 @@ export function experimentalRecordDataset() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: SITE_NAME,
+      name: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -784,7 +818,7 @@ export function transformationHarnessDataset() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: SITE_NAME,
+      name: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -837,7 +871,7 @@ export function propositionsDataset() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: SITE_NAME,
+      name: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -858,7 +892,7 @@ export function propositionsDataset() {
       publisher: {
         "@type": "Organization",
         "@id": ORG_ID,
-        name: SITE_NAME,
+        name: elloCelloLLC.name,
         url: SITE_ORIGIN,
       },
     },

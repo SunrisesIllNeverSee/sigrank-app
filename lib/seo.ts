@@ -13,8 +13,10 @@
 
 import type { Metadata } from "next";
 
-/** Canonical production origin (no trailing slash). */
-export const SITE_ORIGIN = "https://signalaf.com";
+/** Canonical production origin (no trailing slash).
+ *  Env-configurable so the same codebase can deploy to signalaf.com or
+ *  sigeconomy.com. Defaults to signalaf.com for backward compatibility. */
+export const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://signalaf.com").replace(/\/$/, "");
 export const SITE_NAME = "SigRank SignalAF";
 export const SITE_TAGLINE =
   "The evaluation platform for AI operators. Models are benchmarked constantly. The people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.";
