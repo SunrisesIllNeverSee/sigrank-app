@@ -22,6 +22,15 @@ const SCHEMA = JSON.parse(
     "utf8",
   ),
 );
+const PUBLIC_SCHEMA = JSON.parse(
+  readFileSync(
+    path.join(
+      ROOT,
+      "public/standard/sigrank-operator-record-v0.1.schema.json",
+    ),
+    "utf8",
+  ),
+);
 
 test("v0.1 canonical vector matches @sigrank/cascade", () => {
   const t = VECTOR.telemetry;
@@ -51,6 +60,10 @@ test("v0.1 schema declares the standard wire primitives", () => {
   ]);
   assert.equal(SCHEMA.properties.warnings.type, "array");
   assert.equal(SCHEMA.properties.warnings.items.type, "string");
+});
+
+test("public Standard schema stays synchronized with the canonical schema", () => {
+  assert.deepEqual(PUBLIC_SCHEMA, SCHEMA);
 });
 
 test("reference math preserves null semantics", () => {
