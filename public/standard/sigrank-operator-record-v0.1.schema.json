@@ -37,8 +37,7 @@
         "leverage": { "type": ["number", "null"] },
         "velocity": { "type": ["number", "null"] },
         "snr": { "type": ["number", "null"] },
-        "dev10x": { "type": ["number", "null"] },
-        "construction": { "type": ["number", "null"] }
+        "dev10x": { "type": ["number", "null"] }
       }
     },
     "context": {
