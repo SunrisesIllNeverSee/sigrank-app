@@ -59,7 +59,7 @@ A compatible implementation MUST preserve semantics when translating aliases.
 
 ## Normative core metrics in v0.1-draft
 
-These are the metrics implemented by the current canonical `@sigrank/cascade` package and exposed by the production MCP surface.
+These are the five portable core metrics implemented by the current canonical cascade path.
 
 ### Yield (Υ)
 
@@ -83,19 +83,22 @@ These are the metrics implemented by the current canonical `@sigrank/cascade` pa
 
 The current canonical implementation only computes 10xDEV when all four pillars are positive, and otherwise returns `null` with a warning.
 
-## Important reconciliation from the first draft
+## Classification and terminology decisions
 
-The earlier package treated **Depth** and **Cache Ratio** as core standard metrics. That did not match the current production source of truth.
+Standardization has now separated the portable core from SignalAF's interpretation layers:
 
-This revised package therefore:
+- **Depth** is not the normative name for `log10(Leverage)`; use **10xDEV**.
+- **Cache Ratio** is not a v0.1 core metric.
+- **Construction** is reserved outside the v0.1 portable core because existing product code uses the same word for two different ratios. It must be canonically reconciled before standardization.
+- **Build Archetype** is a SignalAF reference extension. The current canonical SignalAF classifier has 10 deterministic types across reuse, construction, generation, and convergence families.
+- **RS05 Class Tier** is a SignalAF reference extension for accumulated experience/volume: 8 base tiers × 3 sub-stages = 24 stages.
+- Neither Build Archetype nor RS05 is required for base `SigRank Compatible — v0.1-draft` status.
 
-- uses **10xDEV** as the canonical `log10(Leverage)` name;
-- removes **Cache Ratio** from the normative v0.1 core;
-- treats **Construction** (`cache_write / output`) as an implementation-derived signature component, not yet a normative core metric;
-- keeps archetypes non-normative until the existing taxonomy mismatch is resolved;
-- keeps RS05 class/rank/leaderboard logic outside the base metric standard.
+See:
 
-See `CANON_RECONCILIATION.md`.
+- `CANON_RECONCILIATION.md`
+- `ARCHETYPE_STATUS.md`
+- `RS05_STATUS.md`
 
 ## Product relationship
 
@@ -129,7 +132,7 @@ Distribution / extensions:
 ### Open standard layer
 
 - primitive semantics
-- core metric equations
+- five core metric equations
 - null semantics
 - interchange schema
 - versioning
@@ -139,12 +142,14 @@ Distribution / extensions:
 
 ### Reference/product layer
 
+- Build Archetype taxonomy and thresholds
+- RS05 Class Tier taxonomy and thresholds
 - public board eligibility
 - rank presentation
 - anti-gaming systems
 - proprietary server-side cuts
 - reference-field composition
-- RS05 / badge policy if not explicitly standardized
+- badge policy
 - operator identity / claim systems
 - enterprise benchmark corpus
 
@@ -165,9 +170,11 @@ to calculate the core SigRank metrics.
 
 1. `SPEC.md`
 2. `CANON_RECONCILIATION.md`
-3. `reference/IMPLEMENTATION_MAP.md`
-4. `launch/TONIGHT_30_STEP_EXECUTION.md`
-5. `launch/TOMORROW_DISTRIBUTION_PLAN.md`
-6. `strategy/LAND_GRAB_FLYWHEEL.md`
-7. `integrations/`
-8. `REPO_EXTRACTION.md`
+3. `ARCHETYPE_STATUS.md`
+4. `RS05_STATUS.md`
+5. `reference/IMPLEMENTATION_MAP.md`
+6. `launch/TONIGHT_30_STEP_EXECUTION.md`
+7. `launch/TOMORROW_DISTRIBUTION_PLAN.md`
+8. `strategy/LAND_GRAB_FLYWHEEL.md`
+9. `integrations/`
+10. `REPO_EXTRACTION.md`
