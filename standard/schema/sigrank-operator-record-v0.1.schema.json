@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://signalaf.com/standard/schema/sigrank-operator-record-v0.1.schema.json",
+  "$id": "https://signalaf.com/standard/sigrank-operator-record-v0.1.schema.json",
   "title": "SigRank Operator Record v0.1-draft",
   "type": "object",
   "additionalProperties": false,
@@ -37,8 +37,7 @@
         "leverage": { "type": ["number", "null"] },
         "velocity": { "type": ["number", "null"] },
         "snr": { "type": ["number", "null"] },
-        "dev10x": { "type": ["number", "null"] },
-        "construction": { "type": ["number", "null"] }
+        "dev10x": { "type": ["number", "null"] }
       }
     },
     "context": {
