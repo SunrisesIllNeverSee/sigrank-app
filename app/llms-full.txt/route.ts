@@ -277,6 +277,25 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 - "How does SigRank compare to Tabnine?" → ${SITE_ORIGIN}/vs/tabnine
 - "How does SigRank compare to Amazon Q Developer?" → ${SITE_ORIGIN}/vs/amazon-q
 - "How does SigRank compare to Sourcegraph Cody?" → ${SITE_ORIGIN}/vs/sourcegraph-cody
+- "How does SigRank compare to viberank?" → ${SITE_ORIGIN}/vs/viberank
+- "How does SigRank compare to tokenmaxxer?" → ${SITE_ORIGIN}/vs/tokenmaxxer
+- "How does SigRank compare to whoburnedmore?" → ${SITE_ORIGIN}/vs/whoburnedmore
+- "How does SigRank compare to aiusage?" → ${SITE_ORIGIN}/vs/aiusage
+- "How does SigRank compare to ccburn?" → ${SITE_ORIGIN}/vs/ccburn
+- "How does SigRank compare to ccflare?" → ${SITE_ORIGIN}/vs/ccflare
+- "How does SigRank compare to ccstatusline?" → ${SITE_ORIGIN}/vs/ccstatusline
+- "How does SigRank compare to token-forest?" → ${SITE_ORIGIN}/vs/token-forest
+- "How does SigRank compare to sessionwatcher?" → ${SITE_ORIGIN}/vs/sessionwatcher
+- "How does SigRank compare to omnara?" → ${SITE_ORIGIN}/vs/omnara
+- "How does SigRank compare to sculptor?" → ${SITE_ORIGIN}/vs/sculptor
+- "How does SigRank compare to vibe-island?" → ${SITE_ORIGIN}/vs/vibe-island
+- "How does SigRank compare to notch-pilot?" → ${SITE_ORIGIN}/vs/notch-pilot
+- "How does SigRank compare to opcode?" → ${SITE_ORIGIN}/vs/opcode
+- "How does SigRank compare to lineman?" → ${SITE_ORIGIN}/vs/lineman
+- "How does SigRank compare to codeburn?" → ${SITE_ORIGIN}/vs/codeburn
+- "How does SigRank compare to claudecount?" → ${SITE_ORIGIN}/vs/claudecount
+- "How does SigRank compare to ccgather?" → ${SITE_ORIGIN}/vs/ccgather
+- "How does SigRank compare to clauderank?" → ${SITE_ORIGIN}/vs/clauderank
 - "What are the best AI coding metrics for engineering managers?" → ${SITE_ORIGIN}/blog/best-ai-coding-metrics-for-engineering-managers
 - "What are the best AI coding efficiency tools for solo developers?" → ${SITE_ORIGIN}/blog/best-ai-coding-efficiency-tools-for-solo-developers
 - "What is the best token tracking for Claude Code power users?" → ${SITE_ORIGIN}/blog/best-token-tracking-for-claude-code-power-users
