@@ -142,23 +142,26 @@ Current reference implementation policy:
 
 A v0.1-compatible implementation SHOULD preserve this reference policy so results remain comparable.
 
-## 8. Implementation-derived but non-normative metrics
+## 8. Reserved and unresolved derived terminology
 
 ### 8.1 Construction
 
-The current `operatorSignature()` reference implementation derives:
+`Construction` is **not a v0.1 core metric** and MUST NOT appear in a v0.1 portable record as though one formula were standardized.
 
-`Construction = W / O`
+Standardization work found two existing product usages:
 
-when `O > 0`.
+- the canonical SignalAF Build Archetype classifier uses `construction = W / R`;
+- the current `@sigrank/cascade.operatorSignature()` convenience implementation derives a separate ratio equivalent to `W / O`.
 
-Construction is informative in v0.1-draft and is not yet a required core metric.
+Until that naming conflict is resolved under product canon, the word `Construction` is reserved outside the normative v0.1 metric set.
 
-### 8.2 Deprecated/unresolved naming
+### 8.2 Depth
 
-`Depth` MUST NOT be presented as the normative name for `log10(Leverage)` in v0.1-draft. The current canonical implementation and product canon use `10xDEV`.
+`Depth` MUST NOT be presented as the normative name for `log10(Leverage)` in v0.1-draft. The current canonical metric name is `10xDEV`.
 
-`Cache Ratio = W / R` is not part of the normative v0.1 core.
+### 8.3 Cache Ratio
+
+`Cache Ratio` is not part of the normative v0.1 core.
 
 ## 9. Null semantics
 
@@ -172,13 +175,18 @@ The base standard distinguishes:
 
 - **Metric** — quantitative measurement;
 - **Signature** — compact measurement fingerprint;
-- **Archetype** — descriptive classification;
-- **Class** — reference implementation progression/taxonomy;
+- **Build Archetype** — descriptive composition classification;
+- **Class Tier** — reference implementation experience/volume stage;
 - **Rank** — relative position in a defined field;
 - **Credential** — externally verifiable assertion;
 - **Outcome** — external task/business measurement.
 
-Archetype and class taxonomies are not normative in v0.1-draft.
+Build Archetype and RS05 Class Tier are SignalAF reference extensions, not base v0.1 compatibility requirements.
+
+See:
+
+- `ARCHETYPE_STATUS.md`
+- `RS05_STATUS.md`
 
 ## 11. Comparative context
 
@@ -264,11 +272,13 @@ when it:
 
 ## 18. Reference implementation
 
-`@sigrank/cascade` is the current pure-math reference implementation.
+`@sigrank/cascade` is the current pure-math reference implementation for the core metric equations.
 
 SignalAF is the public reference platform.
 
 `sigrank-mcp` is the portable measurement instrument.
+
+Reference-product classifications and convenience outputs are not automatically normative merely because they are currently emitted by a reference package.
 
 ## 19. Reference field
 
