@@ -1,93 +1,155 @@
-# mos2es.org Integration — Enterprise / Business Surface
+# mos2es.org Integration — Public Enterprise Commercial Front Face
 
 ## Role
 
-mos2es.org should consume SigRank as the **private enterprise implementation layer**, not redefine the standard.
+**mos2es.org is the public commercial enterprise face that markets, explains, and converts MO§ES™ pilots.**
 
-Primary offer:
+It is not itself a "private deployment surface."
 
-> **Private SigRank Deployment**
->
-> Deploy the SigRank operator-measurement layer privately across an AI workforce, establish a 30-day cohort baseline, compare internal operating structure against internal and external reference populations, and identify high-value interventions.
+The deployment and enterprise telemetry environment may be private, pseudonymous, isolated, VPC-hosted, or otherwise restricted. The website is the public-facing commercial front door that sells and explains those engagements.
+
+The current mos2es.org repository explicitly describes itself as the public marketing website for MO§ES™, including a 30-day enterprise pilot for 25–100 users, product modules, methodology, privacy, docs, OpenAPI, and MCP surfaces.
+
+## Terminology boundary
+
+mos2es.org intentionally uses its **own professional and commercial terminology**.
+
+That terminology SHOULD NOT be mechanically replaced with the public SigRank Standard vocabulary.
+
+The relationship is:
+
+```text
+SigRank Standard
+canonical operator-measurement vocabulary
+        ↓
+translation / evidence mapping
+        ↓
+MO§ES™ enterprise methodology
+professional commercial terminology
+        ↓
+mos2es.org
+public pilot marketing + enterprise conversion
+```
+
+The public commercial terminology can be different while still maintaining internal lineage to the underlying measurements.
+
+## Existing MO§ES enterprise metric language
+
+The current mos2es.org repository documents its own enterprise measurement language, including:
+
+- Leverage = `(R + W) / I`
+- Yield = `O / (I + O + R + W)`
+- Token SNR
+- Log Leverage
+- Construction = `W / R`
+
+Those are **not the same definitions as the SigRank Standard core metrics** and MUST NOT be silently presented as if they were.
+
+This is not necessarily a defect. It is a product-boundary decision.
+
+The correct implementation is to maintain an explicit mapping between:
+
+1. source telemetry primitives;
+2. SigRank Standard metrics;
+3. MO§ES enterprise-derived metrics;
+4. enterprise outcome/context joins.
 
 ## Pilot baseline
 
+Public commercial offer:
+
 - 25–100 AI users
 - 30 days
-- I / O / W / R telemetry
-- normative SigRank metrics
-- internal cohort
-- external SignalAF reference field
-- no prompt/code collection required for core metrics
-- no firing / punitive ranking use
-- no unsupported productivity causality claims
+- content-free telemetry baseline
+- internal cohort analysis
+- external reference context where appropriate
+- workflow and organizational analysis
+- intervention hypotheses
+- re-evaluation
 
-## Enterprise analysis modules
+## Commercial analysis modules
 
-### 1. Field position
-Where the cohort sits against an external reference field.
+### Operator Evaluations
 
-### 2. Distribution
-Shape, spread, tails, concentration, and internal heterogeneity.
+Evaluate how people actually operate AI systems using the MO§ES enterprise methodology.
 
-### 3. Movement
-30-day change in operator metrics and relative position.
+### Performative Benchmarks
 
-### 4. Stability / volatility
-Which measurements remain stable vs fluctuate.
+Benchmark operating patterns against relevant cohorts and work contexts.
 
-### 5. Workflow fit
-How operator measurement profiles vary by workflow context.
+### Bespoke Enterprise Evals
 
-### 6. Development engine
-Associate operator telemetry with external development events:
-- PRs
-- reviews
-- deploys
-- incidents
-- rollbacks
-- cost
+Build organization-specific evaluations around the workflows and decisions that matter to the buyer.
 
-### 7. Team composition
-Complementarity and concentration across teams.
+### Workflow Fit
 
-### 8. Capability dependency risk
-Where AI-operating capability is concentrated in a small number of operators.
+Relate operating patterns to actual workflow stages and tool environments.
 
-### 9. Experiment as product
-Controlled model/tool/workflow comparisons.
+### Development Engine
 
-### 10. Organizational AI topology
-Network/distribution view of operator measurement patterns.
+Associate measurement with external development events such as PRs, review time, deploys, incidents, rollbacks, and cost.
 
-### 11. Operator similarity
-Find comparable measurement signatures.
+### Team Composition
 
-### 12. AI learning curve
-Longitudinal movement, stability, and divergence.
+Analyze distribution and complementary operating patterns across teams.
 
-## Business conversion
+### Capability Dependency Risk
 
-### Entry
-30-day diagnostic cohort.
+Identify where AI-operating capability or workflow knowledge is concentrated in too few operators.
 
-### Expansion
-Recurring measurement + intervention cycle.
+### Experiment as Product
 
-### Platform
-Private deployment / API / MCP / warehouse integration.
+Run controlled model, tool, or workflow experiments and compare resulting operating patterns.
 
-### Governance
-MO§ES governance can consume the measurements as governed state/evidence, but should not alter the canonical metric definitions.
+### Organizational AI Topology
 
-## Executive reporting rule
+Map the distribution and relationships of AI-operating characteristics across teams and workflows.
 
-Preferred:
+### Operator Similarity
 
-> During the observation window, cohort A showed lower input per accepted change and higher cache leverage.
+Find comparable operating profiles for coaching, workflow design, and cohort analysis.
 
-Avoid:
+### AI Learning Curve
 
-> SigRank made cohort A 31% more productive.
+Measure longitudinal movement, stability, and divergence through repeated use.
 
-The first is measurement/association. The second is a causal claim.
+## Enterprise governance guardrails
+
+Preserve the current MO§ES public-commercial governance posture:
+
+- developmental, not personnel scoring;
+- diagnoses are hypotheses, not facts;
+- outcome joins are associations unless causal design supports stronger claims;
+- no bottom-employee leaderboard;
+- no automatic adverse employment action;
+- no punitive labels;
+- no prompt-content inspection for the base telemetry layer.
+
+## Conversion architecture
+
+```text
+Public enterprise buyer
+        ↓
+mos2es.org
+commercial explanation
+        ↓
+30-day pilot
+        ↓
+private / controlled deployment environment
+        ↓
+telemetry + enterprise methodology
+        ↓
+cohort / workflow / organizational analysis
+        ↓
+intervention hypotheses
+        ↓
+re-evaluation
+        ↓
+expanded enterprise engagement
+```
+
+## Standard relationship
+
+The SigRank Standard may provide a portable underlying measurement layer or external reference context.
+
+MO§ES enterprise methodology is free to derive additional enterprise metrics and use different public terminology provided the lineage is explicit internally and the two systems are not falsely described as mathematically identical.
