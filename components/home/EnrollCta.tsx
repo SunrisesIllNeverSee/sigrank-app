@@ -41,7 +41,7 @@ export function EnrollCta({ className = "" }: { className?: string }) {
         </button>
       </div>
       <p className="text-center font-sans text-xs text-text-muted sm:text-sm">
-        No install required. No account needed.{" "}
+        Measure how you operate AI. Token counts only — never your prompts.{" "}
         <Link
           href="/score"
           className="text-gold underline underline-offset-2 hover:text-text-primary"
