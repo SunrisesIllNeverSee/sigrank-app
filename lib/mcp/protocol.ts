@@ -5,11 +5,20 @@
  * Both routes serve the same MCP protocol version but have distinct server
  * identities, tool catalogs, and instructions. These helpers ensure
  * consistent wire-level behavior without coupling the two products.
+ *
+ * NOTE: The SigRank /api/mcp route delegates protocol negotiation entirely
+ * to createMcpHandler in the SDK (modern 2026-07-28 + legacy 2025-era).
+ * SUPPORTED_VERSIONS and negotiateProtocolVersion below are retained for
+ * the Contribution Exchange route (/api/exchange/mcp), which is a legacy
+ * endpoint with its own protocol handling.
  */
 
-import type { NextRequest } from "next/server";
+import { allowedOrigin } from "@/lib/mcp/security";
+export { allowedOrigin };
 
 export const PROTOCOL_VERSION = "2025-06-18";
+// Used by the Exchange route only. The SigRank /api/mcp route does NOT
+// apply this ceiling — it delegates to the SDK for era classification.
 export const SUPPORTED_VERSIONS = new Set(["2025-06-18", "2025-03-26"]);
 
 export type RpcId = string | number | null;
@@ -62,12 +71,6 @@ export function textResult(value: unknown, isError = false) {
     content: [{ type: "text", text: JSON.stringify(value, null, 2) }],
     ...(isError ? { isError: true } : {}),
   };
-}
-
-export function allowedOrigin(req: NextRequest): boolean {
-  const origin = req.headers.get("origin");
-  if (!origin) return true;
-  return origin === req.nextUrl.origin;
 }
 
 export function negotiateProtocolVersion(requested: unknown): string {
