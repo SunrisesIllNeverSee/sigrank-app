@@ -145,46 +145,7 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: npm run db:parity:ci
 
-  # One-time repair job. It patches the missing Dataset license, restores this
-  # workflow from the parent commit, and removes its temporary helper workflow.
-  dataset-license-fix:
-    name: Repair Dataset license JSON-LD
-    if: github.event_name == 'push' && contains(github.event.head_commit.message, 'trigger Dataset license repair')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 2
-
-      - name: Patch structured data and self-clean
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("lib/jsonld.ts")
-          text = path.read_text()
-          needle = '''    creator: { "@id": ORG_ID },
-    isAccessibleForFree: true,
-    keywords: [
-'''
-          replacement = '''    creator: { "@id": ORG_ID },
-    isAccessibleForFree: true,
-    license: "https://creativecommons.org/licenses/by/4.0/",
-    keywords: [
-'''
-          count = text.count(needle)
-          if count != 1:
-              raise SystemExit(f"Expected exactly one aggregate Dataset target, found {count}")
-          path.write_text(text.replace(needle, replacement, 1))
-          PY
-
-          git checkout HEAD^ -- .github/workflows/ci.yml
-          rm -f .github/workflows/fix-dataset-license.yml
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add lib/jsonld.ts .github/workflows/ci.yml .github/workflows/fix-dataset-license.yml
-          git commit -m "fix: add Dataset license structured data [skip ci]"
-          git push
+  # One-time repair job — COMPLETED (commit feac0058). Removed to fix YAML
+  # syntax error caused by Python triple-quoted string indentation inside the
+  # YAML literal block scalar. The repair already ran; this job was dead code
+  # that broke every CI run since Aug 24.
