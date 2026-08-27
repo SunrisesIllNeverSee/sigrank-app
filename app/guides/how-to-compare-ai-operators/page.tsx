@@ -15,9 +15,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Compare AI Operators",
+  title: "How to Compare AI Operators \u2014 Operator Ranking Guide",
   description:
-    "A guide to comparing AI operators \u2014 not models. Compare yield, cache hit rate, leverage, and class tier, and benchmark against the field.",
+    "A guide to comparing AI operators \u2014 not models. Compare yield, cache hit rate, leverage, and class tier. The AI operator ranking guide for benchmarking against the field.",
   path: "/guides/how-to-compare-ai-operators",
 });
 

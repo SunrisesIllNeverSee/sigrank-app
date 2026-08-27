@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Signal-to-Noise Ratio (SNR) — Signal Density",
+  title: "Token SNR \u2014 Signal-to-Noise Ratio in AI Coding",
   description:
-    "SNR = output / (input + output) — the share of fresh conversational traffic represented by model output. A bounded view of Velocity. Learn what signal vs noise means and its link to the Conservation Law.",
+    "Token SNR (signal-to-noise ratio) = output / (input + output) \u2014 the signal density metric for AI coding. Learn what signal vs noise means, how SNR links to the Conservation Law, and why it matters.",
   path: "/metrics/signal-to-noise-ratio",
 });
 
