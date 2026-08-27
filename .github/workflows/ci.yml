@@ -96,7 +96,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: SunrisesIllNeverSee/sigrank-mcp
-          ref: fix/sigrank-standard-contract
           path: _sigrank-mcp
           # Public repo — no token needed. If it goes private, add a PAT secret.
           # token: ${{ secrets.CROSS_REPO_PAT }}
