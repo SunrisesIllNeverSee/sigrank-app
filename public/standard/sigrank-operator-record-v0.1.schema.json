@@ -40,6 +40,10 @@
         "dev10x": { "type": ["number", "null"] }
       }
     },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "context": {
       "type": "object",
       "additionalProperties": true,

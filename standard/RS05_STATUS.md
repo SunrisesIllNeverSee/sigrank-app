@@ -4,11 +4,11 @@
 
 **RS05 Class Tier is a SignalAF reference-implementation extension, not a requirement for base SigRank v0.1 compatibility.**
 
-The taxonomy is real, cross-repo contracted, and operationally important. It is intentionally kept outside the base standard because it measures a different axis from the core operator metrics.
+The taxonomy is real, cross-repo contracted, and operationally important. It is intentionally kept outside the base standard because it represents a different classification axis from the core operator metrics.
 
-## What RS05 measures
+## Current reference implementation
 
-RS05 classifies accumulated **total token volume**:
+The current production threshold implementation assigns the 24 RS05 stages from aggregate token volume:
 
 `total = input + output + cache_write + cache_read`
 
@@ -16,7 +16,7 @@ The current reference system contains:
 
 - 8 base tiers;
 - 3 sub-stages per tier;
-- 24 experience stages total;
+- 24 stages total;
 - UNCLASSED for no/non-finite data.
 
 Base tiers:
@@ -43,7 +43,7 @@ Class Tier is not:
 - intelligence;
 - employment suitability.
 
-It is an **experience / accumulated-volume axis** in the SignalAF reference implementation.
+Class canonically means **scale/qualification**, not merely total-token volume. The current volume-threshold implementation is therefore a reference-product behavior under canon reconciliation, not a normative definition that this extension-status document promotes into standard truth.
 
 ## Why it stays outside base compatibility
 
@@ -53,7 +53,7 @@ The portable core should answer:
 
 It should not require:
 
-> Do two systems use SignalAF's current experience ladder and field-controlled thresholds?
+> Do two systems use SignalAF's current 24-stage ladder and field-controlled thresholds?
 
 Keeping RS05 separate lets external systems implement the SigRank measurement standard without adopting SignalAF's presentation/classification policy.
 
@@ -102,6 +102,6 @@ It MUST NOT be added as a 25th class stage in standard documentation.
 
 If external adoption warrants it, publish a separate extension:
 
-`SigRank Experience Class Extension / RS05`
+`SigRank Class Tier Extension / RS05`
 
 That extension could freeze a specific threshold version without making it mandatory for the base operator-measurement standard.

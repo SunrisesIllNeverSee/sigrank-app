@@ -91,7 +91,7 @@ Standardization has now separated the portable core from SignalAF's interpretati
 - **Cache Ratio** is not a v0.1 core metric.
 - **Construction** is reserved outside the v0.1 portable core because existing product code uses the same word for two different ratios. It must be canonically reconciled before standardization.
 - **Build Archetype** is a SignalAF reference extension. The current canonical SignalAF classifier has 10 deterministic types across reuse, construction, generation, and convergence families.
-- **RS05 Class Tier** is a SignalAF reference extension for accumulated experience/volume: 8 base tiers × 3 sub-stages = 24 stages.
+- **RS05 Class Tier** is a 24-stage SignalAF reference extension: 8 base tiers × 3 sub-stages. Its current volume-threshold implementation is a reference-product detail under canon reconciliation, not the normative definition of Class.
 - Neither Build Archetype nor RS05 is required for base `SigRank Compatible — v0.1-draft` status.
 
 See:
