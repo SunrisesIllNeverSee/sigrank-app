@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signalaf.com/standard/sigrank-operator-record-v0.1.schema.json",
+  "title": "SigRank Operator Record v0.1-draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "timestamp", "source", "telemetry"],
+  "properties": {
+    "spec": { "const": "sigrank/0.1-draft" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model", "tool"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "tool": { "type": "string", "minLength": 1 }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "output"],
+      "properties": {
+        "input": { "type": "integer", "minimum": 0 },
+        "output": { "type": "integer", "minimum": 0 },
+        "cache_write": { "type": ["integer", "null"], "minimum": 0 },
+        "cache_read": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "yield": { "type": ["number", "null"] },
+        "leverage": { "type": ["number", "null"] },
+        "velocity": { "type": ["number", "null"] },
+        "snr": { "type": ["number", "null"] },
+        "dev10x": { "type": ["number", "null"] }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "operator_id": { "type": ["string", "null"] },
+        "cohort_id": { "type": ["string", "null"] },
+        "window": { "type": ["string", "null"] },
+        "privacy_mode": { "enum": ["anonymous", "pseudonymous", "private", "identified", null] }
+      }
+    }
+  }
+}
