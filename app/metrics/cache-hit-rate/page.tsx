@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Cache Hit Rate — Context Reuse Efficiency",
+  title: "Cache Hit Rate \u2014 Prompt Cache Reuse for AI Coding",
   description:
-    "Cache hit rate measures how well you reuse prompt-cached context. Learn why it\u2019s the highest-leverage AI coding metric and how to improve it.",
+    "Cache hit rate (prompt cache hit rate) measures how well you reuse cached context in AI coding. Learn what cache hit rate means, why it\u2019s the highest-leverage metric, and how to improve cache performance.",
   path: "/metrics/cache-hit-rate",
 });
 

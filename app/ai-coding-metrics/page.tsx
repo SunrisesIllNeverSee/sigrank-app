@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Coding Metrics — The Complete Guide",
+  title: "AI Coding Metrics \u2014 The Complete Guide for 2026",
   description:
-    "The complete guide to AI coding metrics: yield, compression ratio, SNR, cache hit rate, leverage, and velocity. What each reveals about your cascade.",
+    "The complete guide to AI coding metrics: yield, compression ratio, SNR, cache hit rate, leverage, and velocity. What each metric reveals about your cascade and how to measure AI coding efficiency.",
   path: "/ai-coding-metrics",
 });
 
