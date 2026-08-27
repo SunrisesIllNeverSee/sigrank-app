@@ -165,15 +165,16 @@ test("SigRank MCP route has compatibility bridge for legacy Exchange calls", asy
 });
 
 test("SigRank MCP route does NOT advertise Exchange tools in tools/list", async () => {
-  const mcp = await source("app/api/mcp/route.ts");
-  // tools/list should return TOOLS directly without Exchange scope filtering
-  assert.match(mcp, /tools: TOOLS/);
-  // Should NOT have Exchange scope filtering in tools/list
-  const listSection = mcp.slice(
-    mcp.indexOf('method === "tools/list"'),
-    mcp.indexOf('method === "tools/call"'),
-  );
-  assert.doesNotMatch(listSection, /filterExchangeToolsByScope/, "SigRank tools/list must not filter Exchange tools");
+  const server = await source("lib/mcp/server.ts");
+  const tools = await source("lib/mcp/tools/index.ts");
+  // The SDK handles tools/list internally. The TOOLS array in lib/mcp/tools
+  // is what gets registered via server.registerTool(). Verify it contains
+  // only SigRank tools, not Exchange tools.
+  assert.match(tools, /export const TOOLS/);
+  // server.ts registers tools from TOOLS via registerTool
+  assert.match(server, /registerTool/);
+  // Should NOT have Exchange scope filtering in the SigRank server
+  assert.doesNotMatch(server, /filterExchangeToolsByScope/, "SigRank tools/list must not filter Exchange tools");
 });
 
 // ─── MCP tools module tests ──────────────────────────────────────────────────

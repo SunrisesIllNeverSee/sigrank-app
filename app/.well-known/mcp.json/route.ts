@@ -16,7 +16,8 @@ export async function GET() {
   const card = {
     $schema: "https://static.modelcontextprotocol.io/schemas/mcp-server-card/v1.json",
     version: "1.0",
-    protocolVersion: "2025-06-18",
+    protocolVersion: "2026-07-28",
+    supportedProtocolVersions: ["2026-07-28", "2025-11-25", "2025-06-18", "2025-03-26"],
     serverInfo: {
       name: "sigrank",
       title: "SigRank SignalAF — AI Operator Benchmark",
