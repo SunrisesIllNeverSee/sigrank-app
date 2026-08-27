@@ -78,15 +78,10 @@ ALTER TABLE exchange_mcp_calls ENABLE ROW LEVEL SECURITY;
 CREATE POLICY mcp_calls_insert_service ON exchange_mcp_calls
   FOR INSERT TO service_role WITH CHECK (true);
 
--- Authenticated users with admin access can read
-CREATE POLICY mcp_calls_read_admin ON exchange_mcp_calls
-  FOR SELECT TO authenticated USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role IN ('admin', 'owner')
-    )
-  );
+-- Service role can read (the observability route uses service_role and
+-- does its own admin/owner check in app code before calling the RPC)
+CREATE POLICY mcp_calls_read_service ON exchange_mcp_calls
+  FOR SELECT TO service_role USING (true);
 
 -- No public access
 CREATE POLICY mcp_calls_no_public ON exchange_mcp_calls
