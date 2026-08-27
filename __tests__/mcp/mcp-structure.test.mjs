@@ -6,6 +6,11 @@
  * as regression tests for the structural renovation — if the migration
  * accidentally removes a tool, resource, or prompt, these tests fail.
  *
+ * After Phase 2 of the MCP structural renovation, tool/resource/prompt
+ * definitions were extracted into separate modules under lib/mcp/. These
+ * tests now check the appropriate module files for those definitions while
+ * still verifying the route.ts transport-level structure.
+ *
  * Run:
  *   node --test __tests__/mcp/mcp-structure.test.mjs
  */
@@ -20,9 +25,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const routePath = join(__dirname, "..", "..", "app", "api", "mcp", "route.ts");
 const protocolPath = join(__dirname, "..", "..", "lib", "mcp", "protocol.ts");
+const toolsPath = join(__dirname, "..", "..", "lib", "mcp", "tools", "index.ts");
+const resourcesPath = join(__dirname, "..", "..", "lib", "mcp", "resources", "index.ts");
+const promptsPath = join(__dirname, "..", "..", "lib", "mcp", "prompts", "index.ts");
+const securityPath = join(__dirname, "..", "..", "lib", "mcp", "security.ts");
 
 const routeSource = readFileSync(routePath, "utf-8");
 const protocolSource = readFileSync(protocolPath, "utf-8");
+const toolsSource = readFileSync(toolsPath, "utf-8");
+const resourcesSource = readFileSync(resourcesPath, "utf-8");
+const promptsSource = readFileSync(promptsPath, "utf-8");
+const securitySource = readFileSync(securityPath, "utf-8");
 
 // ─── Protocol helpers ───────────────────────────────────────────────────────
 
@@ -46,8 +59,12 @@ test("protocol.ts exports textResult helper", () => {
   assert.match(protocolSource, /export\s+function\s+textResult/);
 });
 
-test("protocol.ts exports allowedOrigin helper", () => {
-  assert.match(protocolSource, /export\s+function\s+allowedOrigin/);
+test("protocol.ts re-exports allowedOrigin from security.ts", () => {
+  assert.match(protocolSource, /export\s*\{\s*allowedOrigin\s*\}/);
+});
+
+test("security.ts exports allowedOrigin helper", () => {
+  assert.match(securitySource, /export\s+function\s+allowedOrigin/);
 });
 
 test("protocol.ts exports negotiateProtocolVersion helper", () => {
@@ -126,7 +143,7 @@ test("route.ts handles prompts/get method", () => {
   assert.match(routeSource, /method\s*===\s*["']prompts\/get["']/);
 });
 
-// ─── Tool definitions ───────────────────────────────────────────────────────
+// ─── Tool definitions (lib/mcp/tools/index.ts) ──────────────────────────────
 
 const EXPECTED_TOOLS = [
   "rank_paste",
@@ -147,23 +164,31 @@ const EXPECTED_TOOLS = [
 ];
 
 for (const toolName of EXPECTED_TOOLS) {
-  test(`route.ts defines tool: ${toolName}`, () => {
+  test(`tools/index.ts defines tool: ${toolName}`, () => {
     assert.match(
-      routeSource,
+      toolsSource,
       new RegExp(`name:\\s*["']${toolName.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}["']`),
     );
   });
 }
 
-test("route.ts defines exactly 15 SigRank tools", () => {
-  const matches = routeSource.match(/name:\s*["'](rank_paste|get_leaderboard|get_operator|simulate_change|diagnose_cascade|suggest_improvements|self_improve|rank_windows|benchmark_me|rank_if|operator_gap|field_anomaly|who_operates_like_me|compare_to_field|operator_signature)["']/g);
+test("tools/index.ts defines exactly 15 SigRank tools", () => {
+  const matches = toolsSource.match(/name:\s*["'](rank_paste|get_leaderboard|get_operator|simulate_change|diagnose_cascade|suggest_improvements|self_improve|rank_windows|benchmark_me|rank_if|operator_gap|field_anomaly|who_operates_like_me|compare_to_field|operator_signature)["']/g);
   assert.ok(matches, "No tool definitions found");
   // Some tool names may appear in multiple contexts (definition + dispatch)
   const uniqueTools = new Set(matches.map((m) => m.match(/["']([^"']+)["']/)[1]));
   assert.equal(uniqueTools.size, 15, `Expected 15 unique tools, found ${uniqueTools.size}`);
 });
 
-// ─── Resource definitions ───────────────────────────────────────────────────
+test("route.ts imports TOOLS from lib/mcp/tools", () => {
+  assert.match(routeSource, /import\s*\{.*TOOLS.*\}\s*from\s*["']@\/lib\/mcp\/tools["']/);
+});
+
+test("route.ts imports callTool from lib/mcp/tools", () => {
+  assert.match(routeSource, /import\s*\{.*callTool.*\}\s*from\s*["']@\/lib\/mcp\/tools["']/);
+});
+
+// ─── Resource definitions (lib/mcp/resources/index.ts) ──────────────────────
 
 const EXPECTED_RESOURCES = [
   "sigrank://methodology",
@@ -175,13 +200,17 @@ const EXPECTED_RESOURCES = [
 ];
 
 for (const uri of EXPECTED_RESOURCES) {
-  test(`route.ts defines resource: ${uri}`, () => {
+  test(`resources/index.ts defines resource: ${uri}`, () => {
     const escaped = uri.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    assert.match(routeSource, new RegExp(escaped));
+    assert.match(resourcesSource, new RegExp(escaped));
   });
 }
 
-// ─── Prompt definitions ─────────────────────────────────────────────────────
+test("route.ts imports RESOURCES from lib/mcp/resources", () => {
+  assert.match(routeSource, /import\s*\{.*RESOURCES.*\}\s*from\s*["']@\/lib\/mcp\/resources["']/);
+});
+
+// ─── Prompt definitions (lib/mcp/prompts/index.ts) ──────────────────────────
 
 const EXPECTED_PROMPTS = [
   "benchmark-my-operator",
@@ -192,11 +221,15 @@ const EXPECTED_PROMPTS = [
 ];
 
 for (const promptName of EXPECTED_PROMPTS) {
-  test(`route.ts defines prompt: ${promptName}`, () => {
+  test(`prompts/index.ts defines prompt: ${promptName}`, () => {
     const escaped = promptName.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-    assert.match(routeSource, new RegExp(escaped));
+    assert.match(promptsSource, new RegExp(escaped));
   });
 }
+
+test("route.ts imports PROMPTS from lib/mcp/prompts", () => {
+  assert.match(routeSource, /import\s*\{.*PROMPTS.*\}\s*from\s*["']@\/lib\/mcp\/prompts["']/);
+});
 
 // ─── Server identity ────────────────────────────────────────────────────────
 
@@ -222,11 +255,11 @@ test("route.ts imports Exchange compatibility bridge", () => {
   assert.match(routeSource, /dispatchExchangeTool|isExchangeTool/);
 });
 
-test("route.ts does NOT advertise Exchange tools in tools/list", () => {
+test("tools/index.ts does NOT advertise Exchange tools in TOOLS array", () => {
   // The TOOLS array should not include exchange_ prefixed tools
   // Check that exchange tool names don't appear in the TOOLS array definition
-  const toolsSection = routeSource.match(/const\s+TOOLS\s*=\s*\[([\s\S]*?)\];/);
-  assert.ok(toolsSection, "TOOLS array not found");
+  const toolsSection = toolsSource.match(/export\s+const\s+TOOLS\s*=\s*\[([\s\S]*?)\]\s+as\s+const/);
+  assert.ok(toolsSection, "TOOLS array not found in tools/index.ts");
   assert.doesNotMatch(toolsSection[1], /exchange_discover_domain/);
   assert.doesNotMatch(toolsSection[1], /exchange_propose/);
 });
