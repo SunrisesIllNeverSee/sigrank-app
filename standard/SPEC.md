@@ -251,6 +251,11 @@ Compatible portable records SHOULD conform to:
 
 Every record MUST declare its SigRank specification version.
 
+Every record MUST include the five-field `metrics` object. A metric whose
+required telemetry is unavailable or whose denominator is undefined MUST be
+represented as `null`; implementations MUST NOT omit the metric or fabricate
+an observed zero.
+
 ## 16. Compatibility
 
 A system MAY claim:

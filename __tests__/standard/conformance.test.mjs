@@ -37,11 +37,18 @@ test("v0.1 canonical vector matches @sigrank/cascade", () => {
 
 test("v0.1 schema declares the standard wire primitives", () => {
   assert.equal(SCHEMA.properties.spec.const, "sigrank/0.1-draft");
-  assert.deepEqual(SCHEMA.required, ["spec", "timestamp", "source", "telemetry"]);
+  assert.deepEqual(SCHEMA.required, ["spec", "timestamp", "source", "telemetry", "metrics"]);
   assert.ok(SCHEMA.properties.telemetry.properties.input);
   assert.ok(SCHEMA.properties.telemetry.properties.output);
   assert.ok(SCHEMA.properties.telemetry.properties.cache_write);
   assert.ok(SCHEMA.properties.telemetry.properties.cache_read);
+  assert.deepEqual(SCHEMA.properties.metrics.required, [
+    "yield",
+    "leverage",
+    "velocity",
+    "snr",
+    "dev10x",
+  ]);
   assert.equal(SCHEMA.properties.warnings.type, "array");
   assert.equal(SCHEMA.properties.warnings.items.type, "string");
 });

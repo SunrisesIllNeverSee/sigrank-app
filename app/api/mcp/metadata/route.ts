@@ -1,5 +1,3 @@
-import { PROTOCOL_VERSION } from "@/lib/mcp/protocol";
-
 export const dynamic = "force-static";
 
 const STANDARD_VERSION = "sigrank/0.1-draft";
@@ -8,7 +6,7 @@ export function GET() {
   return Response.json(
     {
       mcp_endpoint: "https://signalaf.com/api/mcp",
-      mcp_protocol_version: PROTOCOL_VERSION,
+      mcp_discovery_url: "https://signalaf.com/.well-known/mcp.json",
       server: "SignalAF SigRank HTTP MCP",
       sigrank_standard: STANDARD_VERSION,
       standard_status: "proposed_open_standard",
