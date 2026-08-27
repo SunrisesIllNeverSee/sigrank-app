@@ -7,7 +7,8 @@
  * consistent wire-level behavior without coupling the two products.
  */
 
-import type { NextRequest } from "next/server";
+import { allowedOrigin } from "@/lib/mcp/security";
+export { allowedOrigin };
 
 export const PROTOCOL_VERSION = "2025-06-18";
 export const SUPPORTED_VERSIONS = new Set(["2025-06-18", "2025-03-26"]);
@@ -62,12 +63,6 @@ export function textResult(value: unknown, isError = false) {
     content: [{ type: "text", text: JSON.stringify(value, null, 2) }],
     ...(isError ? { isError: true } : {}),
   };
-}
-
-export function allowedOrigin(req: NextRequest): boolean {
-  const origin = req.headers.get("origin");
-  if (!origin) return true;
-  return origin === req.nextUrl.origin;
 }
 
 export function negotiateProtocolVersion(requested: unknown): string {
