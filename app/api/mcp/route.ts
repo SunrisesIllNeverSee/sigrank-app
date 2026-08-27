@@ -9,7 +9,9 @@
  * Transport-level concerns retained in this route:
  *   - Origin validation (allowedOrigin)
  *   - Exchange compatibility bridge (legacy tool dispatch + deprecation metadata)
- *   - Observability (recordMcpCall for initialize/tools_list/tools_call)
+ *   - Observability (recordMcpCall for initialize/tools_list + Exchange bridge;
+ *     SigRank tools/call observability is recorded in lib/mcp/server.ts after
+ *     callTool returns, with the actual result and duration)
  *   - Protocol version header validation
  *
  * Domain logic lives in:
@@ -236,31 +238,23 @@ export async function POST(req: NextRequest) {
       return jsonRpc(id, result);
     }
 
-    // For SigRank tool calls, record observability
-    if (typeof name === "string") {
-      await recordMcpCall({
-        request_id: requestId,
-        server_id: "sigrank",
-        transport: "remote_mcp",
-        operation: "tools_call",
-        tool_name: name,
-        auth_tier: "anonymous",
-        result: "success",
-        duration_ms: Date.now() - startTime,
-        ip_hash: ipHash,
-        client_name: clientName,
-        client_version: clientVersion,
-      }).catch(() => {
-        // Observability must never break the request
-      });
-    }
+    // SigRank tool-call observability is recorded inside the tool handler in
+    // lib/mcp/server.ts (after callTool returns) so it captures the ACTUAL
+    // result and ACTUAL duration. The route stamps the per-request context
+    // onto the forwarded request via headers below.
   }
 
   // 6. Delegate to the SDK handler for standard MCP protocol methods
-  // Reconstruct the request with the original body (we consumed it above)
+  // Reconstruct the request with the original body (we consumed it above).
+  // Stamp observability context onto the forwarded request so the server
+  // factory / tool handler can record accurate result + duration.
+  const forwardedHeaders = new Headers(req.headers);
+  forwardedHeaders.set("x-mcp-start-time", String(startTime));
+  if (requestId) forwardedHeaders.set("x-request-id", requestId);
+
   const sdkRequest = new Request(req.url, {
     method: "POST",
-    headers: req.headers,
+    headers: forwardedHeaders,
     body: rawBody,
   });
 
