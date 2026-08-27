@@ -88,11 +88,15 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: npm
+
+      - run: npm ci
 
       - name: Checkout sigrank-mcp (the other half of the contract)
         uses: actions/checkout@v7
         with:
           repository: SunrisesIllNeverSee/sigrank-mcp
+          ref: fix/sigrank-standard-contract
           path: _sigrank-mcp
           # Public repo — no token needed. If it goes private, add a PAT secret.
           # token: ${{ secrets.CROSS_REPO_PAT }}
@@ -108,6 +112,14 @@ jobs:
 
       - name: Intra-repo mock/seed sync contract (dev fallback ↔ prod seed)
         run: node --test __tests__/contract/mock-seed-sync.test.mjs
+
+      - name: Install sigrank-mcp dependencies
+        run: npm ci --prefix _sigrank-mcp
+
+      - name: Generated Standard record validates against public schema
+        env:
+          OTHER_REPO_ROOT: ${{ github.workspace }}/_sigrank-mcp
+        run: node --test __tests__/standard/generated-record-contract.test.mjs
 
   # Migration parity guardrail — fails if the Supabase migration ledger has
   # drifted from the local migrations/ directory. Prevents the catastrophic
