@@ -179,6 +179,17 @@ export function Draft2LiveActivity({ stats }: { stats: HomepageStats }) {
         The leaderboard is the product — scored live by the same engine that
         scores you.
       </p>
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-gold/20 bg-gold/5 px-4 py-3">
+        <span className="font-mono text-sm text-text-primary">
+          You could be on this board.
+        </span>
+        <code className="font-mono text-sm font-semibold text-gold">
+          npx sigrank
+        </code>
+        <span className="font-sans text-xs text-text-muted">
+          → enroll, submit, get ranked
+        </span>
+      </div>
     </section>
   );
 }
