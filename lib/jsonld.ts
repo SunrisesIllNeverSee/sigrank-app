@@ -12,7 +12,7 @@
  */
 
 import { SITE_ORIGIN, formatTokensLong } from "@/lib/seo";
-import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry, CANON_LD_CONTEXT } from "@/lib/canon-entities";
+import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry, CANON_LD_CONTEXT, CANON_ENTITY_IDS } from "@/lib/canon-entities";
 import { activeProfile } from "@/lib/site-profile";
 import type { HallRecord } from "@/lib/board";
 
@@ -80,7 +80,9 @@ export function comparisonArticle(opts: {
     author: personAuthor(),
     publisher: { "@id": ORG_ID },
     license: "https://creativecommons.org/licenses/by/4.0/",
-    about: "AI operator performance measurement and comparison",
+    about: [
+      { "@id": sigrankCanon.canonical_entity_id },
+    ],
   };
 }
 
@@ -167,6 +169,13 @@ export function product() {
     sourceSystem: sigrankCanon.sourceSystem,
     canonBacked: sigrankCanon.canonBacked,
     authorityApprovalRef: sigrankCanon.authorityApprovalRef,
+    about: [
+      { "@id": sigrankCanon.canonical_entity_id },
+      { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
+    ],
+    mentions: [
+      { "@id": CANON_ENTITY_IDS.moses },
+    ],
   };
 }
 
@@ -292,6 +301,9 @@ export function aggregateStats(opts: {
       "token telemetry",
     ],
     variableMeasured,
+    about: [
+      { "@id": sigrankCanon.canonical_entity_id },
+    ],
   };
 }
 
@@ -590,6 +602,13 @@ export function sigrankDataset(opts?: {
         contentUrl: ZENODO_FILE("experience_ladder.json"),
       },
     ],
+    about: [
+      { "@id": sigrankCanon.canonical_entity_id },
+      { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
+    ],
+    mentions: [
+      { "@id": CANON_ENTITY_IDS.moses },
+    ],
   };
 }
 
@@ -632,7 +651,10 @@ export function researchArticle(opts: {
     author: personAuthor(),
     publisher: { "@id": ORG_ID },
     license: "https://creativecommons.org/licenses/by/4.0/",
-    about: "AI operator token efficiency",
+    about: [
+      { "@id": sigrankCanon.canonical_entity_id },
+      { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
+    ],
     abstract: opts.headlineFindings.join(" "),
     citation: `${SITE_ORIGIN}/methodology`,
     isPartOf: {
