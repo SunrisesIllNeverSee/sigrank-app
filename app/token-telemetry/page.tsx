@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Token Telemetry — Measuring AI Coding Activity",
+  title: "What Is Token Telemetry? AI Operator Evaluation Without Reading Prompts",
   description:
-    "Token telemetry measures AI coding activity privately. Four pillars \u2014 input, output, cache-read, cache-write \u2014 capture the cascade without reading prompts.",
+    "Token telemetry measures how effectively you operate AI using four counters \u2014 input, output, cache-read, cache-write. No prompt text. No code. Just the yield cascade that ranks operators.",
   path: "/token-telemetry",
 });
 
