@@ -1,15 +1,17 @@
 /**
  * __tests__/mcp/mcp-structure.test.mjs
  *
- * Structural tests for the SignalAF MCP route. These tests read the route
- * source file and verify the MCP protocol structure is intact. They serve
- * as regression tests for the structural renovation — if the migration
+ * Structural tests for the SignalAF MCP server. These tests read the source
+ * files and verify the MCP protocol structure is intact. They serve as
+ * regression tests for the structural renovation — if the migration
  * accidentally removes a tool, resource, or prompt, these tests fail.
  *
- * After Phase 2 of the MCP structural renovation, tool/resource/prompt
- * definitions were extracted into separate modules under lib/mcp/. These
- * tests now check the appropriate module files for those definitions while
- * still verifying the route.ts transport-level structure.
+ * After Phase 3 of the MCP structural renovation, the route delegates to the
+ * official MCP SDK v2 (createMcpHandler) for protocol negotiation and method
+ * dispatch. Tool/resource/prompt definitions live in lib/mcp/{tools,resources,
+ * prompts}/. Server identity and registration live in lib/mcp/server.ts.
+ * The route retains transport-level concerns: origin validation, Exchange
+ * compatibility bridge, observability, and protocol version header checks.
  *
  * Run:
  *   node --test __tests__/mcp/mcp-structure.test.mjs
@@ -25,6 +27,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const routePath = join(__dirname, "..", "..", "app", "api", "mcp", "route.ts");
 const protocolPath = join(__dirname, "..", "..", "lib", "mcp", "protocol.ts");
+const serverPath = join(__dirname, "..", "..", "lib", "mcp", "server.ts");
 const toolsPath = join(__dirname, "..", "..", "lib", "mcp", "tools", "index.ts");
 const resourcesPath = join(__dirname, "..", "..", "lib", "mcp", "resources", "index.ts");
 const promptsPath = join(__dirname, "..", "..", "lib", "mcp", "prompts", "index.ts");
@@ -32,6 +35,7 @@ const securityPath = join(__dirname, "..", "..", "lib", "mcp", "security.ts");
 
 const routeSource = readFileSync(routePath, "utf-8");
 const protocolSource = readFileSync(protocolPath, "utf-8");
+const serverSource = readFileSync(serverPath, "utf-8");
 const toolsSource = readFileSync(toolsPath, "utf-8");
 const resourcesSource = readFileSync(resourcesPath, "utf-8");
 const promptsSource = readFileSync(promptsPath, "utf-8");
@@ -85,11 +89,11 @@ test("route.ts exports POST handler", () => {
   assert.match(routeSource, /export\s+async\s+function\s+POST/);
 });
 
-test("route.ts exports GET handler (returns 405)", () => {
+test("route.ts exports GET handler", () => {
   assert.match(routeSource, /export\s+async\s+function\s+GET/);
 });
 
-test("route.ts exports DELETE handler (returns 405)", () => {
+test("route.ts exports DELETE handler", () => {
   assert.match(routeSource, /export\s+async\s+function\s+DELETE/);
 });
 
@@ -105,42 +109,57 @@ test("route.ts handles invalid request with -32600", () => {
   assert.match(routeSource, /-32600.*Invalid Request/);
 });
 
-// ─── Method dispatch ────────────────────────────────────────────────────────
+// ─── SDK integration ────────────────────────────────────────────────────────
 
-test("route.ts handles initialize method", () => {
-  assert.match(routeSource, /method\s*===\s*["']initialize["']/);
+test("route.ts imports createMcpHandler from SDK", () => {
+  assert.match(routeSource, /createMcpHandler.*@modelcontextprotocol\/server/);
 });
 
-test("route.ts handles notifications/initialized method", () => {
-  assert.match(routeSource, /notifications\/initialized/);
+test("route.ts imports createSigrankServer from lib/mcp/server", () => {
+  assert.match(routeSource, /createSigrankServer.*@\/lib\/mcp\/server/);
 });
 
-test("route.ts handles ping method", () => {
-  assert.match(routeSource, /method\s*===\s*["']ping["']/);
+test("route.ts delegates to SDK handler via .fetch()", () => {
+  assert.match(routeSource, /mcpHandler\.fetch/);
 });
 
-test("route.ts handles tools/list method", () => {
-  assert.match(routeSource, /method\s*===\s*["']tools\/list["']/);
+test("server.ts imports McpServer from SDK", () => {
+  assert.match(serverSource, /McpServer.*@modelcontextprotocol\/server/);
 });
 
-test("route.ts handles tools/call method", () => {
+test("server.ts imports fromJsonSchema from SDK", () => {
+  assert.match(serverSource, /fromJsonSchema.*@modelcontextprotocol\/server/);
+});
+
+// ─── Method dispatch (now via SDK + server.ts) ──────────────────────────────
+// The SDK handles initialize, ping, notifications/initialized, tools/list,
+// tools/call, resources/list, resources/read, prompts/list, prompts/get.
+// server.ts registers all tools/resources/prompts with the SDK.
+// The route intercepts tools/call for the Exchange compatibility bridge
+// and records observability for initialize/tools_list/tools_call.
+
+test("route.ts intercepts tools/call for Exchange bridge", () => {
   assert.match(routeSource, /method\s*===\s*["']tools\/call["']/);
 });
 
-test("route.ts handles resources/list method", () => {
-  assert.match(routeSource, /method\s*===\s*["']resources\/list["']/);
+test("route.ts records initialize observability", () => {
+  assert.match(routeSource, /method\s*===\s*["']initialize["']/);
 });
 
-test("route.ts handles resources/read method", () => {
-  assert.match(routeSource, /method\s*===\s*["']resources\/read["']/);
+test("route.ts records tools/list observability", () => {
+  assert.match(routeSource, /method\s*===\s*["']tools\/list["']/);
 });
 
-test("route.ts handles prompts/list method", () => {
-  assert.match(routeSource, /method\s*===\s*["']prompts\/list["']/);
+test("server.ts registers tools via registerTool", () => {
+  assert.match(serverSource, /registerTool/);
 });
 
-test("route.ts handles prompts/get method", () => {
-  assert.match(routeSource, /method\s*===\s*["']prompts\/get["']/);
+test("server.ts registers resources via registerResource", () => {
+  assert.match(serverSource, /registerResource/);
+});
+
+test("server.ts registers prompts via registerPrompt", () => {
+  assert.match(serverSource, /registerPrompt/);
 });
 
 // ─── Tool definitions (lib/mcp/tools/index.ts) ──────────────────────────────
@@ -180,12 +199,12 @@ test("tools/index.ts defines exactly 15 SigRank tools", () => {
   assert.equal(uniqueTools.size, 15, `Expected 15 unique tools, found ${uniqueTools.size}`);
 });
 
-test("route.ts imports TOOLS from lib/mcp/tools", () => {
-  assert.match(routeSource, /import\s*\{.*TOOLS.*\}\s*from\s*["']@\/lib\/mcp\/tools["']/);
+test("server.ts imports TOOLS from lib/mcp/tools", () => {
+  assert.match(serverSource, /import\s*\{.*TOOLS.*\}\s*from\s*["']@\/lib\/mcp\/tools["']/);
 });
 
-test("route.ts imports callTool from lib/mcp/tools", () => {
-  assert.match(routeSource, /import\s*\{.*callTool.*\}\s*from\s*["']@\/lib\/mcp\/tools["']/);
+test("server.ts imports callTool from lib/mcp/tools", () => {
+  assert.match(serverSource, /import\s*\{.*callTool.*\}\s*from\s*["']@\/lib\/mcp\/tools["']/);
 });
 
 // ─── Resource definitions (lib/mcp/resources/index.ts) ──────────────────────
@@ -206,8 +225,8 @@ for (const uri of EXPECTED_RESOURCES) {
   });
 }
 
-test("route.ts imports RESOURCES from lib/mcp/resources", () => {
-  assert.match(routeSource, /import\s*\{.*RESOURCES.*\}\s*from\s*["']@\/lib\/mcp\/resources["']/);
+test("server.ts imports RESOURCES from lib/mcp/resources", () => {
+  assert.match(serverSource, /import\s*\{.*RESOURCES.*\}\s*from\s*["']@\/lib\/mcp\/resources["']/);
 });
 
 // ─── Prompt definitions (lib/mcp/prompts/index.ts) ──────────────────────────
@@ -227,26 +246,26 @@ for (const promptName of EXPECTED_PROMPTS) {
   });
 }
 
-test("route.ts imports PROMPTS from lib/mcp/prompts", () => {
-  assert.match(routeSource, /import\s*\{.*PROMPTS.*\}\s*from\s*["']@\/lib\/mcp\/prompts["']/);
+test("server.ts imports PROMPTS from lib/mcp/prompts", () => {
+  assert.match(serverSource, /import\s*\{.*PROMPTS.*\}\s*from\s*["']@\/lib\/mcp\/prompts["']/);
 });
 
-// ─── Server identity ────────────────────────────────────────────────────────
+// ─── Server identity (lib/mcp/server.ts) ────────────────────────────────────
 
-test("route.ts server name is 'sigrank'", () => {
-  assert.match(routeSource, /name:\s*["']sigrank["']/);
+test("server.ts server name is 'sigrank'", () => {
+  assert.match(serverSource, /name:\s*["']sigrank["']/);
 });
 
-test("route.ts server title includes 'SigRank'", () => {
-  assert.match(routeSource, /title:\s*["']SigRank/);
+test("server.ts server title includes 'SigRank'", () => {
+  assert.match(serverSource, /title:\s*["']SigRank/);
 });
 
-test("route.ts server version is 1.0.0", () => {
-  assert.match(routeSource, /version:\s*["']1\.0\.0["']/);
+test("server.ts server version is 1.0.0", () => {
+  assert.match(serverSource, /version:\s*["']1\.0\.0["']/);
 });
 
-test("route.ts server websiteUrl is signalaf.com", () => {
-  assert.match(routeSource, /websiteUrl:\s*["']https:\/\/signalaf\.com["']/);
+test("server.ts server websiteUrl is signalaf.com", () => {
+  assert.match(serverSource, /websiteUrl:\s*["']https:\/\/signalaf\.com["']/);
 });
 
 // ─── Exchange compatibility bridge ──────────────────────────────────────────
