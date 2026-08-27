@@ -267,13 +267,29 @@ test("WebMCP: observability module emits PostHog exchange_mcp_call event", () =>
 });
 
 // ─── Cross-domain discovery tests ───────────────────────────────────────────
+// These tests fetch exchange.json from the live domains rather than reading
+// sibling repo files (which don't exist in CI). Falls back to local files
+// when available (local dev with sibling repos checked out).
 
-test("WebMCP: signomy.xyz exchange.json has MCP block", () => {
-  const signomySrc = readFileSync(
+async function fetchExchangeJson(domain, localPath) {
+  // Try local file first (dev environment with sibling repos)
+  try {
+    const local = readFileSync(localPath, "utf8");
+    return JSON.parse(local);
+  } catch {
+    // Fall back to live fetch (CI environment)
+    const res = await fetch(`https://${domain}/.well-known/exchange.json`);
+    if (!res.ok) throw new Error(`${domain} exchange.json fetch failed: ${res.status}`);
+    return res.json();
+  }
+}
+
+test("WebMCP: signomy.xyz exchange.json has MCP block", async () => {
+  const parsed = await fetchExchangeJson(
+    "signomy.xyz",
     resolve(root, "..", "..", "..", "_5_Signomy", "1_agent-universe",
-      "frontend", ".well-known", "exchange.json"), "utf8"
+      "frontend", ".well-known", "exchange.json")
   );
-  const parsed = JSON.parse(signomySrc);
   assert.ok(parsed.mcp, "signomy.xyz exchange.json must have mcp block");
   assert.equal(parsed.mcp.server_name, "contribution-exchange");
   assert.equal(parsed.mcp.endpoint, "https://signalaf.com/api/exchange/mcp");
@@ -282,12 +298,12 @@ test("WebMCP: signomy.xyz exchange.json has MCP block", () => {
     "signomy.xyz must declare central hosting (not its own MCP server)");
 });
 
-test("WebMCP: mos2es.com exchange.json has MCP block", () => {
-  const mos2esSrc = readFileSync(
+test("WebMCP: mos2es.com exchange.json has MCP block", async () => {
+  const parsed = await fetchExchangeJson(
+    "mos2es.com",
     resolve(root, "..", "..", "..", "_1_moses", "1_mos2es-site",
-      ".well-known", "exchange.json"), "utf8"
+      ".well-known", "exchange.json")
   );
-  const parsed = JSON.parse(mos2esSrc);
   assert.ok(parsed.mcp, "mos2es.com exchange.json must have mcp block");
   assert.equal(parsed.mcp.server_name, "contribution-exchange");
   assert.equal(parsed.mcp.endpoint, "https://signalaf.com/api/exchange/mcp");
