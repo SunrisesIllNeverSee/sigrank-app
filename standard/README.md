@@ -16,7 +16,7 @@ This draft has been reconciled against the connected production repositories:
 - `sigrank-cascade` — canonical pure-math implementation package
 - `sigarena` — `sigeconomy.com` read-only satellite / SEO-AEO surface
 
-The connected `mos2es-site` repository is verified as the static `mos2es.com` governance site. The package also includes a separate integration plan for **mos2es.org** as requested, but does **not** falsely assert that `mos2es-site` deploys `mos2es.org`.
+The connected `mos2es-site` repository is verified as the static `mos2es.com` governance site. The separate `moses` repository is verified as the public commercial marketing site live at **mos2es.org**. These are intentionally distinct surfaces.
 
 ## Core category claim
 
@@ -120,8 +120,8 @@ INSTRUMENT               REFERENCE PLATFORM
 
 Distribution / extensions:
 - sigeconomy.com → read-only public discovery, comparison, SEO/AEO/GEO
-- mos2es.org → enterprise/private organizational implementation surface
-- mos2es.com → governance framework / architecture context
+- mos2es.org → public enterprise commercial front face for pilots; controlled/private deployment can sit behind the offer; enterprise terminology remains intentionally distinct
+- mos2es.com → current governance/research face; broader MO§ES umbrella/hub architecture is a separate ecosystem decision and is not defined by this standard
 ```
 
 ## What is open vs what remains product-specific
