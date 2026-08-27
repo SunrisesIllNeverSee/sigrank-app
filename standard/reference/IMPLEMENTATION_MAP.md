@@ -85,13 +85,13 @@ Required standard integration:
 
 ## `mos2es.org`
 
-Role requested for the standard architecture: **enterprise / private organizational implementation and commercial conversion surface**
+Role: **public commercial enterprise pilot front face**
 
-This mapping is an ecosystem design requirement from the current project plan. The connected repository inspected in this session is `mos2es-site`, which explicitly describes itself as `mos2es.com`; therefore this document does not claim that repo deploys `mos2es.org`.
+The public website markets, explains, and converts MO§ES™ enterprise pilots using its own professional terminology. A private or controlled telemetry and deployment environment may sit behind the engagement; mos2es.org itself is not the private deployment surface.
 
 Required `mos2es.org` integration:
 
-- Private SigRank Deployment enterprise offer;
+- public enterprise offer for private or controlled pilot deployments;
 - 25–100 operator, 30-day baseline;
 - cohort/field comparison;
 - workflow fit;
@@ -102,10 +102,13 @@ Required `mos2es.org` integration:
 - privacy modes;
 - governance boundary;
 - outcome correlation with explicit no-causality overclaim guardrail.
+- preserve MO§ES™ enterprise terminology and maintain internal lineage rather than mechanically replacing it with SigRank Standard copy.
 
 ## `mos2es.com`
 
 Role: **governance-framework context**
+
+This describes the current surface only. A broader mos2es.com/MO§ES™ umbrella-hub redesign is a separate ecosystem conversation and is outside this standard package.
 
 The connected `mos2es-site` repo is an 11ty static site for mos2es.com and describes MO§ES as a governance framework.
 

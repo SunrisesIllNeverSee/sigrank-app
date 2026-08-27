@@ -20,10 +20,10 @@ Query capture, comparisons, leaderboards, public field narratives.
 Implementation / agent distribution.
 
 ### mos2es.org
-Enterprise conversion and private cohort deployment.
+Public enterprise pilot marketing and conversion; private or controlled cohort deployment may sit behind the engagement.
 
 ### mos2es.com
-Governance context.
+Current governance context. Any MO§ES™ umbrella-hub redesign is a separate ecosystem conversation.
 
 ## Integration order
 

@@ -52,7 +52,7 @@ A compact fingerprint assembled from standardized measurements.
 A descriptive classification derived from measurement structure. Non-normative in v0.1-draft.
 
 ## RS05 Class
-A SignalAF/SigRank reference taxonomy currently implemented as a 24-stage total-token progression. Not part of the base v0.1 standard.
+A 24-stage SignalAF/SigRank reference taxonomy for scale/qualification. The current product implementation uses volume thresholds, but that implementation detail is canon-disputed and does not redefine Class as merely total-token volume. Not part of the base v0.1 standard.
 
 ## Field
 A defined reference population.

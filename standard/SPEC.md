@@ -176,7 +176,7 @@ The base standard distinguishes:
 - **Metric** — quantitative measurement;
 - **Signature** — compact measurement fingerprint;
 - **Build Archetype** — descriptive composition classification;
-- **Class Tier** — reference implementation experience/volume stage;
+- **Class Tier** — reference implementation scale/qualification stage;
 - **Rank** — relative position in a defined field;
 - **Credential** — externally verifiable assertion;
 - **Outcome** — external task/business measurement.

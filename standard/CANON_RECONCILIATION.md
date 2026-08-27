@@ -100,9 +100,9 @@ Action:
 
 See `ARCHETYPE_STATUS.md`.
 
-### 5. RS05 status resolved at the reference-product layer
+### 5. RS05 extension status resolved; class semantics remain canon-controlled
 
-Current production contains a cross-repo contracted 24-stage total-token experience ladder:
+Current production contains a cross-repo contracted 24-stage ladder whose present thresholds use aggregate token volume:
 
 - 8 base tiers;
 - 3 sub-stages each;
@@ -113,6 +113,8 @@ Action:
 - retain RS05 as a SignalAF reference extension;
 - do not require third-party SigRank compatibility to implement the ladder;
 - continue cross-repo parity tests between SignalAF and sigrank-mcp.
+- do not redefine Class as merely total-token volume; Class remains a scale/qualification concept under Search Authority canon;
+- treat the current volume thresholds as reference-product implementation policy pending canon reconciliation, not as base-standard semantics.
 
 See `RS05_STATUS.md`.
 

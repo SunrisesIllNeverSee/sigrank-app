@@ -17,6 +17,8 @@
 - Construction
 - compact Operator Signature
 
+Implementation-only in v0.1. Construction is excluded from portable records pending canon reconciliation.
+
 ## Layer D — operator states
 - archetypes
 - classes

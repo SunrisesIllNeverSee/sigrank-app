@@ -42,6 +42,8 @@ test("v0.1 schema declares the standard wire primitives", () => {
   assert.ok(SCHEMA.properties.telemetry.properties.output);
   assert.ok(SCHEMA.properties.telemetry.properties.cache_write);
   assert.ok(SCHEMA.properties.telemetry.properties.cache_read);
+  assert.equal(SCHEMA.properties.warnings.type, "array");
+  assert.equal(SCHEMA.properties.warnings.items.type, "string");
 });
 
 test("reference math preserves null semantics", () => {

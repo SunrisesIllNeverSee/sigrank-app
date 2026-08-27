@@ -57,7 +57,7 @@ Build Archetype
 composition shape derived from measurements
 
 Class Tier
-experience/volume stage
+scale/qualification stage
 
 Rank
 relative field ordering
