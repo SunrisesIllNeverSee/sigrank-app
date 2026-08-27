@@ -12,16 +12,20 @@ Current pure-math source of truth for:
 - Velocity
 - SNR
 - 10xDEV
-- RS05 24-stage class thresholds
+- RS05 24-stage thresholds
 - field stats / rank / percentile
-- operator signature / reference archetype implementation
+- a compact `operatorSignature()` convenience classifier
 - normalized `OperatorEvaluation`
 
 ### `sigrank-mcp`
 Consumes `@sigrank/cascade` and exposes the portable CLI/TUI/MCP instrument.
 
+Its ontology explicitly distinguishes Class Tier from the 10-type Build Archetype system.
+
 ### `sigrank-app`
 Consumes `@sigrank/cascade`, deploys SignalAF, and exposes the public HTTP MCP/reference platform.
+
+`lib/analytics/build-archetypes.ts` implements the current 10-type Build Archetype classifier.
 
 ### Search Authority
 `sigrank-app/AGENTS.md` states that a separate Search Authority master canon governs public product definitions, metrics/formulas, taxonomy, methodology claims, ecosystem relationships, and terminology.
@@ -52,39 +56,65 @@ Current `@sigrank/cascade` does not expose this as a canonical core metric.
 Action:
 - exclude from v0.1 core.
 
-### 3. Construction retained only as informative
+### 3. `Construction` removed from the portable standard record
 
-Current `operatorSignature()` uses:
+Standardization exposed a naming conflict:
 
-`Construction = cacheCreate / output`
+- SignalAF Build Archetypes use `construction = cache_write / cache_read`;
+- `@sigrank/cascade.operatorSignature()` currently derives a separate convenience ratio using `cache_write / output`.
 
 Action:
-- document as implementation-derived signature component;
-- do not make normative until Search Authority review.
+- do not standardize either ratio under the bare name `Construction` in v0.1;
+- remove Construction from the portable schema and canonical reference record;
+- preserve the product implementations until a canon-led rename/reconciliation is agreed;
+- treat any future Construction metric as a separately defined/versioned term.
 
-### 4. Archetype mismatch preserved as unresolved
+### 4. Build Archetype authority resolved at the reference-product layer
 
-Current `@sigrank/cascade` reference archetypes:
+The canonical SignalAF Build Archetype taxonomy is the 10-type composition classifier implemented in `sigrank-app/lib/analytics/build-archetypes.ts` and documented in `sigrank-mcp/ontology/taxonomy.md`:
+
+Reuse depth:
+- INPUT-BOUND
+- PRIMING
 - CONTEXTUAL
-- GENERATOR
-- BALANCED_ELITE
-- READER
-- COMMITTER
-- STANDARD
+- DEEP READER
+- ARCHIVIST
 
-Existing broader SigRank materials have used a different 10-archetype taxonomy.
+Construction:
+- BUILDER
+- RECURSIVE
+- AMPLIFIER
+
+Generation:
+- KINETIC
+
+Convergence:
+- CONVERGENT
+
+The six convenience labels currently emitted by `@sigrank/cascade.operatorSignature()` are not the canonical Build Archetype taxonomy.
 
 Action:
-- v0.1 defines the concept `archetype`;
-- v0.1 does not freeze a normative archetype enumeration.
+- v0.1 defines Build Archetype as a concept but does not require the taxonomy for base compatibility;
+- the 10-type classifier is a SignalAF reference extension;
+- the six-label convenience field should eventually be renamed/deprecated rather than silently called the canonical archetype system.
 
-### 5. RS05 class is separated from base metric standard
+See `ARCHETYPE_STATUS.md`.
 
-Current implementation contains a 24-stage total-token RS05 class ladder.
+### 5. RS05 status resolved at the reference-product layer
+
+Current production contains a cross-repo contracted 24-stage total-token experience ladder:
+
+- 8 base tiers;
+- 3 sub-stages each;
+- 24 stages;
+- UNCLASSED for no/non-finite data.
 
 Action:
-- treat as reference implementation taxonomy;
-- do not require third-party SigRank compatibility to implement the ladder.
+- retain RS05 as a SignalAF reference extension;
+- do not require third-party SigRank compatibility to implement the ladder;
+- continue cross-repo parity tests between SignalAF and sigrank-mcp.
+
+See `RS05_STATUS.md`.
 
 ### 6. Primitive naming normalized without breaking implementation aliases
 
@@ -101,7 +131,7 @@ Current implementation aliases:
 Action:
 - allow aliases with semantic mapping.
 
-## 7. Canonical README SNR example is stale relative to executable math
+### 7. Canonical README SNR example is stale relative to executable math
 
 The current `@sigrank/cascade` README example comments `snr // 0.9001` for the MO§ES reference vector.
 
@@ -121,8 +151,8 @@ Action:
 Before calling v0.1 stable:
 
 - [ ] load Search Authority `sigrank` context;
-- [ ] confirm terminology for Construction;
-- [ ] confirm archetype authority;
-- [ ] confirm whether RS05 belongs in open spec, extension, or proprietary reference layer;
+- [ ] resolve the two existing Construction usages and names;
+- [x] identify the current SignalAF Build Archetype authority;
+- [x] classify RS05 as a reference extension rather than base compatibility requirement;
 - [ ] confirm public language around "standard";
 - [ ] confirm final license/trademark policy.
