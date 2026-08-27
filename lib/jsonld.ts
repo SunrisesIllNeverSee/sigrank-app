@@ -12,7 +12,7 @@
  */
 
 import { SITE_ORIGIN, formatTokensLong } from "@/lib/seo";
-import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry } from "@/lib/canon-entities";
+import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry, CANON_LD_CONTEXT } from "@/lib/canon-entities";
 import { activeProfile } from "@/lib/site-profile";
 import type { HallRecord } from "@/lib/board";
 
@@ -27,6 +27,7 @@ const SITE_ID = `${SITE_ORIGIN}/#website`;
  *  SITE_ORIGIN. */
 export function personAuthor() {
   return {
+    "@context": CANON_LD_CONTEXT,
     "@type": "Person",
     "@id": dericMcHenry.canonical_entity_id,
     name: dericMcHenry.name,
@@ -91,7 +92,7 @@ export function comparisonArticle(opts: {
  *  from the existing builder. */
 export function organization() {
   return {
-    "@context": "https://schema.org",
+    "@context": CANON_LD_CONTEXT,
     "@type": "Organization",
     "@id": ORG_ID,
     name: elloCelloLLC.name,
@@ -136,7 +137,7 @@ export function organization() {
  *  as a page-specific field, NOT substituted for the canon description. */
 export function product() {
   return {
-    "@context": "https://schema.org",
+    "@context": CANON_LD_CONTEXT,
     "@type": "SoftwareApplication",
     "@id": sigrankCanon.canonical_entity_id,
     name: sigrankCanon.name,

@@ -28,6 +28,22 @@ export const CANON_ENTITY_IDS = {
   moses: "https://mos2es.com/ontology/0.1/entity/moses",
 } as const;
 
+// ─── JSON-LD @context for canon-backed blocks ───────────────────────────────
+//
+// Custom provenance fields (sourceSystem, canonBacked, authorityApprovalRef,
+// associatedWith) are NOT Schema.org properties. They must be mapped to the
+// moses namespace so the JSON-LD is semantically valid. This context is
+// shared with mos2es-site's .eleventy.js transform — same namespace, same
+// field mappings.
+export const CANON_LD_CONTEXT = {
+  "@vocab": "https://schema.org/",
+  moses: "https://mos2es.com/ontology/0.1/",
+  sourceSystem: "moses:sourceSystem",
+  canonBacked: "moses:canonBacked",
+  authorityApprovalRef: "moses:authorityApprovalRef",
+  associatedWith: "moses:associatedWith",
+} as const;
+
 // ─── Provenance fields (shared across all canon-backed entities) ────────────
 
 const CANON_PROVENANCE = {
