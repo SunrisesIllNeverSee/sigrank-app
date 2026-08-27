@@ -85,6 +85,45 @@ function makeJsonRpc(
   return { jsonrpc: "2.0", id, method, ...(params ? { params } : {}) };
 }
 
+function makeModernJsonRpc(
+  method: string,
+  params?: Record<string, unknown>,
+  id: string | number = 1,
+): JsonRpcRequest {
+  const meta = {
+    "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+    "io.modelcontextprotocol/clientCapabilities": {},
+  };
+  return {
+    jsonrpc: "2.0",
+    id,
+    method,
+    params: { ...(params ?? {}), _meta: meta },
+  };
+}
+
+function makeModernPostRequest(
+  body: unknown,
+  headers: Record<string, string> = {},
+): NextRequest {
+  const bodyObj = typeof body === "string" ? JSON.parse(body) : (body as Record<string, unknown>);
+  const method = bodyObj?.method as string | undefined;
+  const name = (bodyObj?.params as Record<string, unknown>)?.name as string | undefined;
+  return new NextRequest(BASE_URL, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json, text/event-stream",
+      origin: VALID_ORIGIN,
+      "mcp-protocol-version": "2026-07-28",
+      ...(method ? { "mcp-method": method } : {}),
+      ...(name ? { "mcp-name": name } : {}),
+      ...headers,
+    },
+    body: typeof body === "string" ? body : JSON.stringify(body),
+  });
+}
+
 /**
  * Parse the response body. The SDK may return either:
  *   - Plain JSON (content-type: application/json)
@@ -164,16 +203,36 @@ describe("Initialization", () => {
     expect(body.result).toBeDefined();
   });
 
-  it("rejects unsupported protocol version header with -32602", async () => {
+  it("negotiates SDK latest legacy protocol version 2025-11-25", async () => {
+    const res = await POST(
+      makePostRequest(
+        makeJsonRpc("initialize", {
+          protocolVersion: "2025-11-25",
+          capabilities: {},
+          clientInfo: { name: "test", version: "1.0" },
+        }),
+      ),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+    expect(body.result).toBeDefined();
+  });
+
+  it("rejects future protocol version header without envelope claim", async () => {
     const res = await POST(
       makePostRequest(makeJsonRpc("initialize"), {
         "mcp-protocol-version": "2099-01-01",
       }),
     );
 
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error.code).toBe(-32602);
+    // The SDK classifies 2099-01-01 as a modern version (>= 2026-07-28)
+    // but since there is no envelope claim in params._meta, it returns
+    // an error rather than dispatching the request.
+    expect(res.status).not.toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeDefined();
   });
 
   it("handles malformed initialization (missing params)", async () => {
@@ -186,6 +245,104 @@ describe("Initialization", () => {
     // Either succeeds with defaults or returns an error — both are acceptable
     // as long as the server doesn't crash
     expect(body.jsonrpc).toBe("2.0");
+  });
+});
+
+// ── Modern protocol (2026-07-28) ────────────────────────────────────────────
+
+describe("Modern protocol (2026-07-28)", () => {
+  it("server/discover returns server info", async () => {
+    const res = await POST(
+      makeModernPostRequest(makeModernJsonRpc("server/discover", undefined, 50)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+    expect(body.result).toBeDefined();
+    const result = body.result as Record<string, unknown>;
+    expect(result.serverInfo ?? result.capabilities).toBeDefined();
+  });
+
+  it("modern tools/list returns all 15 tools", async () => {
+    const res = await POST(
+      makeModernPostRequest(makeModernJsonRpc("tools/list", undefined, 51)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+
+    const result = body.result as Record<string, unknown>;
+    const tools = result.tools as Array<Record<string, unknown>>;
+    expect(tools.length).toBe(15);
+  });
+
+  it("modern tools/call executes rank_paste", async () => {
+    const res = await POST(
+      makeModernPostRequest(
+        makeModernJsonRpc(
+          "tools/call",
+          {
+            name: "rank_paste",
+            arguments: {
+              input: 1_251_211,
+              output: 11_296_121,
+              cache_read: 2_555_179_769,
+              cache_write: 128_196_310,
+            },
+          },
+          52,
+        ),
+      ),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+
+    const result = body.result as Record<string, unknown>;
+    expect(result.content).toBeDefined();
+    const content = result.content as Array<Record<string, unknown>>;
+    expect(content[0].type).toBe("text");
+  });
+
+  it("modern resources/list returns resources", async () => {
+    const res = await POST(
+      makeModernPostRequest(makeModernJsonRpc("resources/list", undefined, 53)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+
+    const result = body.result as Record<string, unknown>;
+    expect(result.resources).toBeDefined();
+  });
+
+  it("modern prompts/list returns prompts", async () => {
+    const res = await POST(
+      makeModernPostRequest(makeModernJsonRpc("prompts/list", undefined, 54)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+
+    const result = body.result as Record<string, unknown>;
+    expect(result.prompts).toBeDefined();
+  });
+
+  it("MCP-Protocol-Version 2026-07-28 header without envelope claim is rejected", async () => {
+    const res = await POST(
+      makePostRequest(makeJsonRpc("tools/list"), {
+        "mcp-protocol-version": "2026-07-28",
+      }),
+    );
+
+    expect(res.status).not.toBe(200);
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeDefined();
   });
 });
 
