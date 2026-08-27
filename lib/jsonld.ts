@@ -1002,6 +1002,12 @@ export function cliTool() {
       "cli",
       "yield-cascade",
     ],
+    about: [
+      { "@id": sigrankCanon.canonical_entity_id },
+    ],
+    mentions: [
+      { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
+    ],
   };
 }
 
