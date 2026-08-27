@@ -4,7 +4,7 @@
   "title": "SigRank Operator Record v0.1-draft",
   "type": "object",
   "additionalProperties": false,
-  "required": ["spec", "timestamp", "source", "telemetry"],
+  "required": ["spec", "timestamp", "source", "telemetry", "metrics"],
   "properties": {
     "spec": { "const": "sigrank/0.1-draft" },
     "timestamp": { "type": "string", "format": "date-time" },
@@ -32,6 +32,7 @@
     "metrics": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["yield", "leverage", "velocity", "snr", "dev10x"],
       "properties": {
         "yield": { "type": ["number", "null"] },
         "leverage": { "type": ["number", "null"] },
@@ -51,7 +52,9 @@
         "operator_id": { "type": ["string", "null"] },
         "cohort_id": { "type": ["string", "null"] },
         "window": { "type": ["string", "null"] },
-        "privacy_mode": { "enum": ["anonymous", "pseudonymous", "private", "identified", null] }
+        "privacy_mode": {
+          "enum": ["anonymous", "pseudonymous", "private", "identified", null]
+        }
       }
     }
   }
