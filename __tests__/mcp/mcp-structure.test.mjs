@@ -51,6 +51,15 @@ test("protocol.ts exports SUPPORTED_VERSIONS with 2025-06-18 and 2025-03-26", ()
   assert.match(protocolSource, /SUPPORTED_VERSIONS.*2025-06-18.*2025-03-26/s);
 });
 
+test("route.ts does NOT import SUPPORTED_VERSIONS (delegates to SDK)", () => {
+  assert.doesNotMatch(routeSource, /SUPPORTED_VERSIONS/);
+});
+
+test("route.ts does NOT apply a protocol version ceiling", () => {
+  assert.doesNotMatch(routeSource, /SUPPORTED_VERSIONS/);
+  assert.doesNotMatch(routeSource, /negotiateProtocolVersion/);
+});
+
 test("protocol.ts exports jsonRpc helper", () => {
   assert.match(protocolSource, /export\s+function\s+jsonRpc/);
 });

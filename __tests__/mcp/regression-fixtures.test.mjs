@@ -27,7 +27,17 @@ import { cascade, classify } from "@sigrank/cascade";
 // ─── Frozen MCP protocol constants ──────────────────────────────────────────
 
 const PROTOCOL_VERSION = "2025-06-18";
-const SUPPORTED_VERSIONS = ["2025-06-18", "2025-03-26"];
+// The SDK supports a modern era (2026-07-28 via server/discover) and a legacy
+// era (2025-11-25, 2025-06-18, 2025-03-26, 2024-11-05, 2024-10-07 via
+// initialize). The SigRank /api/mcp route delegates protocol negotiation
+// entirely to the SDK — no ceiling check in the route.
+const MODERN_PROTOCOL_VERSION = "2026-07-28";
+const SUPPORTED_VERSIONS = [
+  "2026-07-28",
+  "2025-11-25",
+  "2025-06-18",
+  "2025-03-26",
+];
 
 // ─── Expected tool catalog (15 tools) ───────────────────────────────────────
 
@@ -167,9 +177,18 @@ test("MCP protocol version is 2025-06-18", () => {
   assert.equal(PROTOCOL_VERSION, "2025-06-18");
 });
 
-test("MCP supported versions include current and legacy", () => {
+test("MCP modern protocol version is 2026-07-28", () => {
+  assert.equal(MODERN_PROTOCOL_VERSION, "2026-07-28");
+});
+
+test("MCP supported versions include modern, current, and legacy", () => {
+  assert.ok(SUPPORTED_VERSIONS.includes("2026-07-28"), "Must support modern protocol version");
   assert.ok(SUPPORTED_VERSIONS.includes("2025-06-18"), "Must support current protocol version");
   assert.ok(SUPPORTED_VERSIONS.includes("2025-03-26"), "Must support legacy protocol version");
+});
+
+test("MCP supported versions include SDK latest legacy 2025-11-25", () => {
+  assert.ok(SUPPORTED_VERSIONS.includes("2025-11-25"), "Must support SDK latest legacy version");
 });
 
 // ─── Cascade math regression (rank_paste equivalent) ────────────────────────

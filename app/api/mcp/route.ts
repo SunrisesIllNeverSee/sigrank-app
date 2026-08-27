@@ -14,6 +14,11 @@
  *     callTool returns, with the actual result and duration)
  *   - Protocol version header validation
  *
+ * Protocol negotiation (modern 2026-07-28 + legacy 2025-era) is delegated
+ * entirely to createMcpHandler / classifyInboundRequest in the SDK. The route
+ * does NOT apply a protocol version ceiling — the SDK handles era routing,
+ * version validation, and error framing.
+ *
  * Domain logic lives in:
  *   - lib/mcp/server.ts (McpServer factory + tool/resource/prompt registration)
  *   - lib/mcp/tools/index.ts (15 tool definitions + callTool dispatcher)
@@ -25,7 +30,6 @@ import type { NextRequest } from "next/server";
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import {
   PROTOCOL_VERSION,
-  SUPPORTED_VERSIONS,
   jsonRpc,
   rpcError,
   allowedOrigin,
@@ -89,16 +93,7 @@ export async function POST(req: NextRequest) {
   const id = message.id ?? null;
   const method = message.method;
 
-  // 3. Protocol version header check
-  const version = req.headers.get("mcp-protocol-version");
-  if (version && !SUPPORTED_VERSIONS.has(version)) {
-    return rpcError(id, -32602, "Unsupported protocol version", {
-      supported: [...SUPPORTED_VERSIONS],
-      requested: version,
-    }, 400);
-  }
-
-  // 4. Observability for initialize and tools/list
+  // 3. Observability for initialize and tools/list
   if (method === "initialize") {
     await recordMcpCall({
       request_id: requestId,
@@ -128,7 +123,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 5. Exchange compatibility bridge for tools/call
+  // 4. Exchange compatibility bridge for tools/call
   if (method === "tools/call") {
     const name = message.params?.name;
     if (typeof name === "string" && isExchangeTool(name)) {
@@ -244,7 +239,7 @@ export async function POST(req: NextRequest) {
     // onto the forwarded request via headers below.
   }
 
-  // 6. Delegate to the SDK handler for standard MCP protocol methods
+  // 5. Delegate to the SDK handler for standard MCP protocol methods
   // Reconstruct the request with the original body (we consumed it above).
   // Stamp observability context onto the forwarded request so the server
   // factory / tool handler can record accurate result + duration.

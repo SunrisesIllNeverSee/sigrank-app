@@ -147,6 +147,10 @@ test("route.ts preserves observability (recordMcpCall)", () => {
   assert.match(routeSource, /recordMcpCall/);
 });
 
+test("route.ts does NOT import SUPPORTED_VERSIONS (delegates to SDK)", () => {
+  assert.doesNotMatch(routeSource, /SUPPORTED_VERSIONS/);
+});
+
 // ─── Protocol constants preserved ───────────────────────────────────────────
 
 test("protocol.ts preserves PROTOCOL_VERSION = 2025-06-18", () => {
