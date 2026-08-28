@@ -274,6 +274,10 @@ export function Footer() {
                 style={{ maxWidth: "100%", height: "auto" }}
               />
             </a>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <a href="https://saascity.io" target="_blank" rel="noopener">
+              <img src="https://saascity.io/badges/featured-dark.svg" alt="Featured on SaaSCity" width="150" height="54" />
+            </a>
           </div>
         </div>
       </div>
