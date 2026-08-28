@@ -166,13 +166,14 @@ to calculate the core SigRank metrics.
 
 ## Start here
 
-1. `SPEC.md`
-2. `CANON_RECONCILIATION.md`
-3. `ARCHETYPE_STATUS.md`
-4. `RS05_STATUS.md`
-5. `reference/IMPLEMENTATION_MAP.md`
-6. `launch/TONIGHT_30_STEP_EXECUTION.md`
-7. `launch/TOMORROW_DISTRIBUTION_PLAN.md`
-8. `strategy/LAND_GRAB_FLYWHEEL.md`
-9. `integrations/`
-10. `REPO_EXTRACTION.md`
+1. `strategy/PHASE_1_BUILD_HANDOFF.md`
+2. `SPEC.md`
+3. `CANON_RECONCILIATION.md`
+4. `ARCHETYPE_STATUS.md`
+5. `RS05_STATUS.md`
+6. `reference/IMPLEMENTATION_MAP.md`
+7. `launch/TONIGHT_30_STEP_EXECUTION.md`
+8. `launch/TOMORROW_DISTRIBUTION_PLAN.md`
+9. `strategy/LAND_GRAB_FLYWHEEL.md`
+10. `integrations/`
+11. `REPO_EXTRACTION.md`
