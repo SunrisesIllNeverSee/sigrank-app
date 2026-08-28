@@ -47,7 +47,8 @@ Category research, the URL audit, security-document inventory, and enterprise-pl
 - [ ] Approve or revise `REPO_DOMAIN_OWNERSHIP_MAP.md`.
 - [ ] Confirm the two-part Standard model.
 - [ ] Confirm that the original 37 items remain the completion checklist.
-- [ ] Record standalone-authority, licensing, canonical-URL, and pilot-compatibility decisions.
+- [ ] Decide whether the existing standalone authority candidate at `3a150f4` is designated after its course-alignment audit.
+- [ ] Record licensing, canonical-URL, and pilot-compatibility decisions.
 
 **Gate A:** owner approves the course. This does not authorize merge.
 
@@ -68,7 +69,7 @@ Category research, the URL audit, security-document inventory, and enterprise-pl
 
 ### Standard and conformance
 
-- Designate the standalone Standard authority or explicitly retain authority in `sigrank-app`.
+- Audit the existing `sigrank-standard` candidate, narrow its “AI operator performance” wording, and either designate it or explicitly retain authority in `sigrank-app`.
 - Publish an earned draft release path, changelog, RFC/change control, contribution policy, compatibility policy, and citation metadata.
 - Build the executable fixture pack for schema, aliases, canonical vector, zero/missing/null behavior, warnings, rounding, version, privacy separation, and provenance.
 - Make installed npm/CLI/MCP output and SignalAF HTTP output validate against the same authoritative schema and fixtures.
@@ -90,7 +91,7 @@ Category research, the URL audit, security-document inventory, and enterprise-pl
 
 ### Day-30 gate
 
-- one designated Standard authority;
+- one designated Standard authority, with the existing candidate either approved or explicitly declined;
 - identical producer/consumer contract tests;
 - no unresolved base-versus-extension ambiguity;
 - one URL/intent ledger covering the current public footprint;
@@ -168,7 +169,7 @@ Category research, the URL audit, security-document inventory, and enterprise-pl
 
 | # | Original opportunity | Architecture owner | Current evidence | Reconciled action | Target gate |
 |---:|---|---|---|---|---|
-| 1 | Clarify what is open | Standard authority | open/proprietary draft exists | independently version every open and closed component | Day 30 |
+| 1 | Clarify what is open | Standard authority | open/proprietary draft and standalone candidate exist | designate authority, then independently version every open and closed component | Day 30 |
 | 2 | Benchmark map against leaders | SigEconomy + SignalAF | layer language exists | publish neutral model/task/system/operator/team/outcome map | Day 60 |
 | 3 | Move from private to trusted | Upsilon + MO§ES™ | privacy boundary and pilot mapping exist | complete assurance pack and controlled deployment evidence | Day 60 |
 | 4 | Documentation that generalizes | SigEconomy + SignalAF | generic explainers seeded | enforce unique intent, answer blocks, evidence, and canonical links | Day 60 |

@@ -15,7 +15,7 @@
 | `SunrisesIllNeverSee/sigarena` | `sigeconomy.com` | category explanation, ecosystem discovery, hosted public MCP | neutral category interpretation, generic-query capture, benchmark-layer education, and distribution into SignalAF/Upsilon/SigRank | normative Standard definitions; duplicate formulas; enterprise product authority |
 | `SunrisesIllNeverSee/moses` | `mos2es.org` | public enterprise pilot marketing and qualification | Upsilon's public commercial enterprise-pilot face, governed by MO§ES™, with its own professional terminology and a versioned translation/lineage boundary | claiming the website itself is private; forcing SigRank public language into sales copy; becoming the mos2es.com umbrella hub |
 | existing Upsilon enterprise platform | controlled/private deployment surface | substantial pilot implementation requiring direct audit | tenant-scoped pilot operations, private dashboards, workflow joins, controlled reporting, and enterprise derivations | redefining the portable Standard; mixing enterprise derivations into the portable namespace |
-| proposed standalone Standard authority | GitHub and archive/DOI; exact name pending approval | not yet created/designated | normative spec releases, schemas, fixtures, conformance runner, RFC/governance, citation, and compatibility marks | leaderboard data, enterprise customer data, hidden anti-gaming logic, product sales |
+| `SunrisesIllNeverSee/sigrank-standard` authority candidate | public GitHub repository; archive/DOI pending | created on `main` at `3a150f4` from the superseded handoff; 12/12 conformance fixtures pass; not yet designated by the owner | after Gate C, normative spec releases, schemas, fixtures, conformance runner, RFC/governance, citation, and compatibility marks | declaring its own authority; leaderboard data; enterprise customer data; hidden anti-gaming logic; product sales |
 | SigRank public board and Reference Field | `signalaf.com/board/*`, field/research surfaces | ranking, field analysis, public evidence | proof surface fed by eligible Upsilon/compatible observations under explicit field governance | being sold as the enterprise measurement engine; proving employment fitness or output quality |
 | mos2es.com / MO§ES hub | separate conversation | umbrella/ecosystem concept not governed by this program | future constitutional ecosystem hub if separately designed and approved | blocking the Standard or Upsilon pilot program; being silently redesigned inside these PRs |
 
@@ -31,6 +31,19 @@
 | SigRank field eligibility and rank policy | SignalAF application | SigRank governance under MO§ES™ | public board, field reports, citations |
 | category and generic-query interpretation | SigEconomy plus canonical SignalAF hubs | product/growth editorial governance | partner and comparison pages |
 | pilot sales terminology and qualification | mos2es.org | Upsilon enterprise commercial owner | proposals, SOWs, pilot collateral |
+
+## Existing authority candidate
+
+The standalone repository is useful work that arrived before the governing decision:
+
+- repository: [`SunrisesIllNeverSee/sigrank-standard`](https://github.com/SunrisesIllNeverSee/sigrank-standard);
+- current commit: `3a150f4` on `main`;
+- evidence: 12/12 executable fixtures pass and the Python example reproduces the canonical Yield value of 18436.98;
+- governance status: candidate, not owner-designated authority;
+- alignment gap: the repository description and README use “AI operator performance,” which should be narrowed to the approved token-processing/efficiency construct before designation;
+- process gap: the initial implementation was pushed directly to `main` under the now-superseded handoff rather than passing through the course and authority gates.
+
+Do not create a second standalone repository. Audit, align, and either designate or explicitly decline this one.
 
 ## Data movement boundary
 

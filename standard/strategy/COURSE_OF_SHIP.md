@@ -125,7 +125,7 @@ Review the four Phase 0 draft PRs as one architecture release. Approve, revise, 
 
 ### Gate C — designate Standard authority
 
-Choose whether a standalone repository becomes the normative release authority. Recommended default: yes, while `signalaf.com/standard` remains the canonical human distribution URL.
+Choose whether the existing [`SunrisesIllNeverSee/sigrank-standard`](https://github.com/SunrisesIllNeverSee/sigrank-standard) candidate becomes the normative release authority. Recommended default: approve it after a course-alignment audit, while `signalaf.com/standard` remains the canonical human distribution URL.
 
 ### Gate D — freeze conformance and interpretation
 
@@ -142,10 +142,11 @@ Require field eligibility, confidence/coverage, provenance, appeal, anti-gaming,
 ## What happens now
 
 1. Treat the four current Phase 0 PRs as the technical foundation candidate.
-2. Use the repository ownership map to stop domain and product-role drift.
-3. Use the reconciled 90-day roadmap as the only program backlog derived from the original plan.
-4. Give builders the execution handoff only after Gate A; give merge instructions only after Gate B.
-5. Audit the existing Upsilon enterprise platform before authorizing any rebuild.
+2. Treat the standalone `sigrank-standard` repository at `3a150f4` as a technically working authority candidate, not as approved authority merely because it exists on `main`.
+3. Use the repository ownership map to stop domain and product-role drift.
+4. Use the reconciled 90-day roadmap as the only program backlog derived from the original plan.
+5. Give builders the execution handoff only after Gate A; give merge instructions only after Gate B.
+6. Audit the existing Upsilon enterprise platform before authorizing any rebuild.
 
 ## What is deliberately not happening now
 

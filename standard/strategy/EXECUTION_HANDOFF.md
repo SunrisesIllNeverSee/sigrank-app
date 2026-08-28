@@ -38,6 +38,7 @@ If any implementation request conflicts with the first three documents or explic
 | `sigrank-mcp` | `feat/upsilon-product-architecture` | [#42](https://github.com/SunrisesIllNeverSee/sigrank-mcp/pull/42) | local Upsilon-compatible producer with stable `sigrank` package/protocol identity |
 | `sigarena` | `feat/sigrank-phase-0-distribution-hygiene` | [#7](https://github.com/SunrisesIllNeverSee/sigarena/pull/7) | category and distribution layer |
 | `moses` | `feat/upsilon-pilot-architecture` | [#2](https://github.com/SunrisesIllNeverSee/moses/pull/2) | public Upsilon enterprise-pilot commercial face |
+| `sigrank-standard` candidate | `main` at `3a150f4` | no PR was used | technically working conformance candidate awaiting course-alignment audit and owner designation |
 
 All remain draft. All are mergeable at the status date. Configured GitHub checks are green; `moses` has no configured GitHub check suite and passed repository-native contracts plus a Cloudflare dry-run.
 
@@ -81,14 +82,16 @@ Do not modify unrelated user files. In particular, preserve untracked or dirty-w
 
 After Gate C:
 
-- create/designate the authority repository;
+- audit and align the existing `sigrank-standard` candidate; do not create a duplicate repository;
+- narrow “AI operator performance” language to the governed token-processing/efficiency construct;
+- record whether the owner designates this repository as authority;
 - transfer normative documents with attribution and history notes;
 - implement fixture pack and conformance runner;
 - validate real installed producer outputs against the authoritative schema;
 - add compatibility/conformance mark rules;
 - keep `signalaf.com/standard` as the recommended stable human URL unless the owner decides otherwise.
 
-First PR scope: repository skeleton, normative draft, schema, fixtures, runner interface, CI, governance, and citation metadata only.
+The candidate already contains a repository skeleton, normative draft, schema, 12 fixtures, runner, CI, governance, licenses, and examples. The next change should be a reviewable alignment PR, not a second bootstrap commit on `main`.
 
 ### Task 3 — Build trust package and enterprise lineage in parallel
 
