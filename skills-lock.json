@@ -12,6 +12,13 @@
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
       "computedHash": "e14e276241805c97dbcfe40dcbea1a3035269cc7293cac4b1832dda41a835e60"
+    },
+    "tiun-sdk": {
+      "source": "mcp.tiun.business",
+      "sourceUrl": "https://mcp.tiun.business",
+      "sourceType": "well-known",
+      "computedHash": "1d10e43ba8bc78d0921e389babbaeb54c35a186d18f969e51c4ea2d04be954f7",
+      "wellKnownDigest": "sha256:8a8df5a8daac6c519691aee08bfba847f054c35bfabd6fb23ca55a1bc439b012"
     }
   }
 }
