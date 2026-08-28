@@ -49,7 +49,7 @@ test("being an AI bot cannot activate or route into Contribution Exchange", asyn
   assert.match(middleware, /HOME_MARKDOWN/);
 });
 
-test("dedicated Exchange MCP points back to SignalAF and not vice versa", async () => {
+test("dedicated Exchange MCP points back to the primary SignalAF MCP", async () => {
   const exchangeMcp = await source("app/.well-known/exchange-mcp.json/route.ts");
   const primaryMcp = await source("app/.well-known/mcp.json/route.ts");
 
@@ -57,7 +57,9 @@ test("dedicated Exchange MCP points back to SignalAF and not vice versa", async 
   assert.match(exchangeMcp, /primaryMcp/);
   assert.match(exchangeMcp, /activation: "explicit_exchange_endpoint_only"/);
   assert.match(exchangeMcp, /homepage: `\$\{SITE_ORIGIN\}\/exchange`/);
-  assert.doesNotMatch(primaryMcp, /api\/exchange\/mcp/);
+  assert.match(primaryMcp, /name: "sigrank"/);
+  assert.match(primaryMcp, /endpoint: `\$\{SITE_ORIGIN\}\/api\/mcp`/);
+  assert.match(primaryMcp, /homepage: SITE_ORIGIN/);
 });
 
 test("llms index establishes SignalAF before the optional Exchange section", async () => {
