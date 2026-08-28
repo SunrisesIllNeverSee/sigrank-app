@@ -175,6 +175,7 @@ test("server.ts registers prompts via registerPrompt", () => {
 
 const EXPECTED_TOOLS = [
   "rank_paste",
+  "get_sigrank_standard_record",
   "get_leaderboard",
   "get_operator",
   "simulate_change",
@@ -200,12 +201,12 @@ for (const toolName of EXPECTED_TOOLS) {
   });
 }
 
-test("tools/index.ts defines exactly 15 SigRank tools", () => {
-  const matches = toolsSource.match(/name:\s*["'](rank_paste|get_leaderboard|get_operator|simulate_change|diagnose_cascade|suggest_improvements|self_improve|rank_windows|benchmark_me|rank_if|operator_gap|field_anomaly|who_operates_like_me|compare_to_field|operator_signature)["']/g);
+test("tools/index.ts defines exactly 16 SigRank tools", () => {
+  const matches = toolsSource.match(/name:\s*["'](rank_paste|get_sigrank_standard_record|get_leaderboard|get_operator|simulate_change|diagnose_cascade|suggest_improvements|self_improve|rank_windows|benchmark_me|rank_if|operator_gap|field_anomaly|who_operates_like_me|compare_to_field|operator_signature)["']/g);
   assert.ok(matches, "No tool definitions found");
   // Some tool names may appear in multiple contexts (definition + dispatch)
   const uniqueTools = new Set(matches.map((m) => m.match(/["']([^"']+)["']/)[1]));
-  assert.equal(uniqueTools.size, 15, `Expected 15 unique tools, found ${uniqueTools.size}`);
+  assert.equal(uniqueTools.size, 16, `Expected 16 unique tools, found ${uniqueTools.size}`);
 });
 
 test("server.ts imports TOOLS from lib/mcp/tools", () => {
@@ -219,6 +220,8 @@ test("server.ts imports callTool from lib/mcp/tools", () => {
 // ─── Resource definitions (lib/mcp/resources/index.ts) ──────────────────────
 
 const EXPECTED_RESOURCES = [
+  "sigrank://standard",
+  "sigrank://standard/schema",
   "sigrank://methodology",
   "sigrank://metrics",
   "sigrank://platforms",
@@ -265,8 +268,10 @@ test("server.ts server name is 'sigrank'", () => {
   assert.match(serverSource, /name:\s*["']sigrank["']/);
 });
 
-test("server.ts server title includes 'SigRank'", () => {
-  assert.match(serverSource, /title:\s*["']SigRank/);
+test("server.ts presents Upsilon while preserving the sigrank protocol name", () => {
+  assert.match(serverSource, /title:\s*["']Upsilon/);
+  assert.match(serverSource, /name:\s*["']sigrank["']/);
+  assert.match(serverSource, /SigRank is its public leaderboard and proof surface/);
 });
 
 test("server.ts server version is 1.0.0", () => {

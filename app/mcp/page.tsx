@@ -13,13 +13,17 @@ import { faqPage } from "@/lib/jsonld";
  */
 
 export const metadata: Metadata = withOG({
-  title: "MCP Server — 15 remote tools + 24 local tools for AI agents",
+  title: "MCP Server — 16 remote tools + 25 local tools for AI agents",
   description:
-    "SigRank MCP server gives AI agents 15 remote tools (HTTP, no install) and 24 local tools (npx sigrank, stdio) to measure, rank, benchmark, compare, and improve token efficiency. Works with Claude, Cursor, Cline, Windsurf, Cloudflare Playground, and any MCP-compatible client.",
+    "SigRank MCP server gives AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable SigRank Standard records. Works with Claude, Cursor, Cline, Windsurf, Cloudflare Playground, and any MCP-compatible client.",
   path: "/mcp",
 });
 
 const REMOTE_TOOLS = [
+  {
+    name: "get_sigrank_standard_record",
+    desc: "Return a portable sigrank/0.1-draft record from I/O/W/R telemetry, with only the five base metrics",
+  },
   {
     name: "rank_paste",
     desc: "Compute cascade metrics (Υ, SNR, Leverage, Velocity, 10xDEV) from 4 token counts — no install needed",
@@ -83,6 +87,10 @@ const REMOTE_TOOLS = [
 ];
 
 const LOCAL_TOOLS = [
+  {
+    name: "get_sigrank_standard_record",
+    desc: "Return the portable SigRank Standard record for four token counts",
+  },
   {
     name: "rank_paste",
     desc: "Paste token counts, get projected SigRank rank in seconds",
@@ -212,7 +220,7 @@ export default function MCPPage() {
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Cross-platform (Node.js)",
     description:
-      "MCP server giving AI agents 15 remote tools (HTTP, no install) and 24 local tools (npx sigrank, stdio) to measure, rank, benchmark, compare, and improve token efficiency. The yield cascade metric and live leaderboard as MCP tools.",
+      "MCP server giving AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable SigRank Standard records. The yield cascade metric and live leaderboard are also available as MCP tools.",
     url: "https://signalaf.com/mcp",
     downloadUrl: "https://www.npmjs.com/package/sigrank",
     installUrl: "npx sigrank",
@@ -233,12 +241,12 @@ export default function MCPPage() {
           {
             question: "What is the SigRank MCP server?",
             answer:
-              "The SigRank MCP server is a Model Context Protocol server that gives AI agents 15 remote tools (HTTP, no install) and 24 local tools (npx sigrank, stdio) to measure, rank, benchmark, compare, and improve token efficiency. Agents can pull the live leaderboard, get operator profiles, compute cascade metrics, diagnose inefficiencies, simulate changes, benchmark against the field, and find what it takes to reach a target rank. Remote tools work over Streamable HTTP; local tools run as a stdio process reading your session logs on-device.",
+              "The SigRank MCP server is a Model Context Protocol server that gives AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio). Agents can export portable Standard records, pull the live leaderboard, compute cascade metrics, diagnose patterns, benchmark against the field, and compare operators. Remote tools work over Streamable HTTP; local tools run as a stdio process reading session logs on-device.",
           },
           {
             question: "How many tools does the SigRank MCP server expose?",
             answer:
-              "The SigRank MCP server exposes 15 remote tools (rank_paste, get_leaderboard, get_operator, simulate_change, diagnose_cascade, suggest_improvements, self_improve, rank_windows, benchmark_me, rank_if, operator_gap, field_anomaly, who_operates_like_me, compare_to_field, operator_signature) over Streamable HTTP at https://signalaf.com/api/mcp, and 24 local tools via `npx sigrank` (stdio). The local tools include the remote analytical tools plus submit_paste, submit_verified, tokenpull, tokenpull_submit, watch_tokenpull, tokenpull_compare, enroll, discover_peers, and 8 tokscale analytics tools.",
+              "The SigRank MCP server exposes 16 remote tools, including get_sigrank_standard_record, over Streamable HTTP at https://signalaf.com/api/mcp, and 25 local tools via `npx sigrank` (stdio). The local instrument can generate the same portable sigrank/0.1-draft record while keeping unavailable cache telemetry null.",
           },
           {
             question: "Which AI clients support the SigRank MCP server?",
@@ -252,7 +260,7 @@ export default function MCPPage() {
         SigRank MCP Server
       </h1>
       <p className="mt-3 font-sans text-base text-text-secondary">
-        15 remote tools (HTTP, no install) + 24 local tools (npx sigrank) —
+        16 remote tools (HTTP, no install) + 25 local tools (npx sigrank) —
         measure, rank, benchmark, compare, and improve token efficiency. The yield
         cascade and live leaderboard as MCP tools.
       </p>

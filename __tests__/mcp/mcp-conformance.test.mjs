@@ -171,17 +171,17 @@ test("protocol.ts preserves MCP-Protocol-Version header", () => {
 
 // ─── Tool/resource/prompt counts preserved ──────────────────────────────────
 
-test("tools/index.ts defines 15 tools", () => {
-  const matches = toolsSource.match(/name:\s*["'](rank_paste|get_leaderboard|get_operator|simulate_change|diagnose_cascade|suggest_improvements|self_improve|rank_windows|benchmark_me|rank_if|operator_gap|field_anomaly|who_operates_like_me|compare_to_field|operator_signature)["']/g);
+test("tools/index.ts defines 16 tools", () => {
+  const matches = toolsSource.match(/name:\s*["'](rank_paste|get_sigrank_standard_record|get_leaderboard|get_operator|simulate_change|diagnose_cascade|suggest_improvements|self_improve|rank_windows|benchmark_me|rank_if|operator_gap|field_anomaly|who_operates_like_me|compare_to_field|operator_signature)["']/g);
   assert.ok(matches);
   const unique = new Set(matches.map((m) => m.match(/["']([^"']+)["']/)[1]));
-  assert.equal(unique.size, 15);
+  assert.equal(unique.size, 16);
 });
 
-test("resources/index.ts defines 6 resources", () => {
+test("resources/index.ts defines 8 resources", () => {
   const matches = resourcesSource.match(/uri:\s*["']sigrank:\/\//g);
   assert.ok(matches);
-  assert.equal(matches.length, 6);
+  assert.equal(matches.length, 8);
 });
 
 test("prompts/index.ts defines 5 prompts", () => {

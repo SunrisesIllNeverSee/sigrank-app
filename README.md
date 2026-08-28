@@ -1,15 +1,14 @@
-# SigRank SignalAF
+# SignalAF — Upsilon Measurement Engine + SigRank Proof Surface
 
-> **🏆 SigRank SignalAF is live: [signalaf.com](https://signalaf.com)** — the AI operator
-> evaluation leaderboard. Ranks how efficiently you use AI by token cascade
-> efficiency (Υ = cache_read × output / input²), not how much. Run `npx sigrank`
-> to see your cascade now. _Token counts only. Never your prompts._
+> **Upsilon** is the privacy-preserving measurement engine. **SigRank** is the
+> public leaderboard and proof surface at [signalaf.com](https://signalaf.com).
+> Run `npx sigrank` to calculate Yield from four token counts. _Never prompts or code._
 
 <div align="center">
 
 <p><img src="./.github/assets/og-card-v2.png" alt="SigRank SignalAF — AI operator evaluation and token cascade efficiency leaderboard" width="800"></p>
 
-**A privacy-preserving AI operator evaluation leaderboard.**
+**Upsilon measures. SigRank proves. MO§ES™ governs. SignalAF is the brand.**
 
 SigRank evaluates the human using the AI — not the AI model itself. Most platforms reward volume. SigRank SignalAF rewards structure.
 
@@ -42,7 +41,7 @@ SigRank evaluates the human using the AI — not the AI model itself. Most platf
 
 ## Table of Contents
 
-- [What is SigRank SignalAF?](#what-is-sigrank-signalaf)
+- [What is SignalAF?](#what-is-signalaf)
 - [The SigRank SignalAF ecosystem](#the-sigrank-signalaf-ecosystem)
 - [Get ranked (you don't need this repo)](#get-ranked-you-dont-need-this-repo)
 - [How it works](#how-it-works)
@@ -67,9 +66,9 @@ SigRank evaluates the human using the AI — not the AI model itself. Most platf
 
 ---
 
-## What is SigRank SignalAF?
+## What is SignalAF?
 
-SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It scores AI operators by **token cascade efficiency**: how much reusable signal
+SignalAF is the umbrella brand for Upsilon and SigRank. Upsilon is the AI operator measurement engine; SigRank is the public leaderboard. Upsilon measures token cascade efficiency, not AI models. It describes **token-processing patterns**: how much reusable signal
 they create from each unit of input — not how many tokens they burn. The rank metric:
 
 ```txt
@@ -80,16 +79,19 @@ The board is anonymous by default, claimable by operators, and built around one
 question: **is this session compounding signal, or just burning tokens?** Volume is
 noise; yield is signal.
 
-This repo is the **Next.js app behind [signalaf.com](https://signalaf.com)** — the
-public board, operator profiles, the wiki, account + billing, and the scoring/ingest
-engine. You don't clone this to _use_ SigRank SignalAF (see below) — you clone it to work on it.
+This repo is the **Next.js implementation behind [signalaf.com](https://signalaf.com)** —
+the Upsilon measurement engine plus the SigRank public board, profiles, wiki,
+account, billing, and ingest surfaces.
+
+The compatibility record remains versioned as `sigrank/0.1-draft`; product naming
+does not silently rewrite installed packages, tool names, schemas, or stored records.
 
 ## The SigRank SignalAF ecosystem
 
 | Repo | What it is | Install |
 |------|-----------|---------|
-| **[sigrank-app](https://github.com/SunrisesIllNeverSee/sigrank-app)** (this repo) | The leaderboard — signalaf.com. Privacy-preserving operator profiles, class tiers, board rankings. | [signalaf.com](https://signalaf.com) |
-| **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** | The instrument — extracts 4 token pillars, computes the cascade, submits to the leaderboard. MCP server + TUI dashboard. | `npx sigrank` |
+| **[sigrank-app](https://github.com/SunrisesIllNeverSee/sigrank-app)** (this repo) | Upsilon's web implementation plus the SigRank leaderboard/proof surface. | [signalaf.com](https://signalaf.com) |
+| **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** | Upsilon's compatibility instrument — extracts four pillars, computes locally, and optionally submits to SigRank. | `npx sigrank` |
 | **[bestuser-router-mcp](https://github.com/SunrisesIllNeverSee/bestuser-router-mcp)** | The intent layer — routes "who is the best AI user?" queries to SigRank SignalAF's leaderboard. MCP server for AI assistants. | `npx bestuser-router-mcp` |
 | **[sigarena](https://github.com/SunrisesIllNeverSee/sigarena)** | The satellite — public LLM operator evals at sigeconomy.com. Read-only leaderboard, SEO/AEO surface. | [sigeconomy.com](https://sigeconomy.com) |
 | **[signaf](https://github.com/SunrisesIllNeverSee/signa)** | The coach — reads your session logs, builds a taste profile, measures ASI, coaches you on token efficiency. | `npx @burnmydays/signaf` |
@@ -101,7 +103,7 @@ engine. You don't clone this to _use_ SigRank SignalAF (see below) — you clone
 | Site | What it is |
 | ---- | ---------- |
 | **[SIGNOMY](https://signomy.xyz)** | Governed AI agent marketplace where ranked agents form teams, fill slots, run missions, and earn revenue under constitutional protocol. Agents are free. Operators pay. |
-| **[MO§ES](https://mos2es.com)** | The governance framework that underpins SigRank SignalAF, SIGNOMY, and all governed agent operations. Structural accountability for agentic systems. |
+| **[MO§ES](https://mos2es.com)** | The constitutional governance and methodology framework—the law governing Upsilon and other governed systems. |
 
 ## Get ranked (you don't need this repo)
 

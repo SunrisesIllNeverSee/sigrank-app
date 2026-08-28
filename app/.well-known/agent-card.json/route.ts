@@ -7,46 +7,30 @@
  *
  * Interface bindings point to actual endpoints, not documentation pages:
  * - HTTP+JSON → /api/v1 (the REST API)
- * - MCP → Supabase Edge Function (streamable-http transport)
- *   The /mcp route is a documentation landing page, not an MCP endpoint.
+ * - MCP → /api/mcp (streamable-http transport)
+ *   The /mcp route remains the documentation landing page.
  */
 
 import { NextResponse } from "next/server";
 import { SITE_ORIGIN } from "@/lib/seo";
+import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
 export const revalidate = 3600;
 
 export async function GET() {
-  // Supabase Edge Function URL for the MCP streamable-http transport.
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const mcpEndpoint = supabaseUrl
-    ? `${supabaseUrl}/functions/v1/sigrank-mcp`
-    : null;
-
   const supportedInterfaces: Array<Record<string, unknown>> = [
     {
-      url: `${SITE_ORIGIN}/api/v1`,
-      protocolBinding: "HTTP+JSON",
-      protocolVersion: "0.3.0",
+      url: `${SITE_ORIGIN}/api/mcp`,
+      protocolBinding: "MCP",
+      protocolVersion: "2025-06-18",
     },
   ];
 
-  // Only advertise the MCP binding when the Edge Function URL is
-  // configured. Without it, the only MCP transport is stdio (npx sigrank),
-  // which is not an HTTP endpoint and doesn't belong in supportedInterfaces.
-  if (mcpEndpoint) {
-    supportedInterfaces.push({
-      url: mcpEndpoint,
-      protocolBinding: "MCP",
-      protocolVersion: "2025-06-18",
-    });
-  }
-
   const card = {
-    name: "SigRank SignalAF — AI Operator Leaderboard",
+    name: "Upsilon by SignalAF — AI Operator Measurement Engine",
     version: "1.0.0",
     description:
-      "SigRank SignalAF ranks AI operators by Yield (Υ = cache_read × output / input²) — token-cascade efficiency, not raw spend. Run `npx sigrank` to measure your efficiency. Privacy-preserving: token counts only, never prompts.",
+      "Upsilon is SignalAF's privacy-preserving AI operator measurement engine. It computes Yield from four token counts; SigRank is the public leaderboard and proof surface. It does not read prompts or code.",
     url: SITE_ORIGIN,
     protocolVersion: "0.3.0",
     supportedInterfaces,
@@ -71,7 +55,19 @@ export async function GET() {
       {
         id: "metrics",
         name: "Metric Definitions",
-        description: "Get definitions and formulas for all SigRank metrics",
+        description: "Get definitions and formulas for SigRank core and product metrics",
+      },
+      {
+        id: "standard-record",
+        name: "Portable Upsilon Measurement Record",
+        description:
+          `Create a ${SIGRANK_STANDARD_VERSION} record from I/O/W/R telemetry. The base record excludes Construction, Build Archetypes, and RS05.`,
+        inputSchema: {
+          input: "non-negative integer",
+          output: "non-negative integer",
+          cache_write: "non-negative integer or null",
+          cache_read: "non-negative integer or null",
+        },
       },
       {
         id: "hall-of-signal",
@@ -100,7 +96,7 @@ export async function GET() {
       },
     ],
     provider: {
-      name: "SigRank SignalAF",
+      name: "SignalAF",
       url: SITE_ORIGIN,
     },
     privacy: {

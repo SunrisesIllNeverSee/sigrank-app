@@ -27,7 +27,8 @@ const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 25;
 
 /** Map the metric query alias (api_spec.md) to a metric_snapshots sort column.
- * Covers all 9 canonical metrics (sigarena/lib/prompts.ts) + legacy aliases. */
+ * Covers all nine leaderboard dimensions (five portable core metrics plus
+ * product-level views) and legacy aliases. */
 const METRIC_PARAM_TO_SORT: Record<string, string> = {
   yield: "yield_",
   yield_: "yield_",

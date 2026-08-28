@@ -28,6 +28,13 @@ const STATIC_ROUTES: {
   { path: "/blog/the-human-in-the-loop-is-unmeasured", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/sigrank-dashboards", priority: 0.8, changeFrequency: "weekly" },
   { path: "/methodology", priority: 0.8, changeFrequency: "daily" },
+  { path: "/upsilon", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/standard", priority: 0.9, changeFrequency: "weekly" },
+  {
+    path: "/standard/open-vs-proprietary",
+    priority: 0.8,
+    changeFrequency: "monthly",
+  },
   { path: "/science", priority: 0.7, changeFrequency: "monthly" },
   { path: "/research", priority: 0.8, changeFrequency: "monthly" },
   { path: "/compare", priority: 0.7, changeFrequency: "weekly" },

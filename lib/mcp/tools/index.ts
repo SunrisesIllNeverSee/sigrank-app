@@ -15,6 +15,10 @@ import {
   evaluateOperator,
 } from "@sigrank/cascade";
 import { textResult } from "@/lib/mcp/protocol";
+import {
+  buildSigRankStandardRecord,
+  SIGRANK_STANDARD_VERSION,
+} from "@/lib/mcp/standard";
 
 export const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
@@ -54,6 +58,71 @@ export const TOOLS = [
         snr: { type: ["number", "null"], description: "Signal-to-noise ratio = output / (input + output). Null when input is zero." },
         dev10x: { type: ["number", "null"], description: "log₁₀(Leverage). Logarithmic context amplification." },
         non_compounding: { type: "boolean", description: "True if cache_write is zero (no compounding context)." },
+      },
+    },
+  },
+  {
+    name: "get_sigrank_standard_record",
+    title: "Export SigRank Standard Record",
+    description:
+      "Build a SigRank Standard v0.1-draft portable operator record from available token telemetry. Input and output are required; unavailable cache telemetry remains null. Computes only the five-metric portable core through @sigrank/cascade and does not submit or persist data.",
+    annotations: READ_ONLY_ANNOTATIONS,
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["input", "output"],
+      properties: {
+        input: { type: "integer", minimum: 0, description: "Fresh input tokens." },
+        output: { type: "integer", minimum: 0, description: "Output tokens." },
+        cache_write: { type: ["integer", "null"], minimum: 0, description: "Cache-write / cache-creation tokens, or null when unavailable." },
+        cache_read: { type: ["integer", "null"], minimum: 0, description: "Cache-read tokens, or null when unavailable." },
+        provider: { type: "string", minLength: 1, description: "Optional provider identifier." },
+        model: { type: "string", minLength: 1, description: "Optional model identifier." },
+        tool: { type: "string", minLength: 1, description: "Optional tool/client identifier." },
+        timestamp: { type: "string", format: "date-time", description: "Optional ISO-8601 timestamp. Defaults to the current time." },
+      },
+    },
+    outputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["spec", "timestamp", "source", "telemetry", "metrics", "warnings"],
+      properties: {
+        spec: { const: SIGRANK_STANDARD_VERSION },
+        timestamp: { type: "string", format: "date-time" },
+        source: {
+          type: "object",
+          additionalProperties: false,
+          required: ["provider", "model", "tool"],
+          properties: {
+            provider: { type: "string" },
+            model: { type: "string" },
+            tool: { type: "string" },
+          },
+        },
+        telemetry: {
+          type: "object",
+          additionalProperties: false,
+          required: ["input", "output", "cache_write", "cache_read"],
+          properties: {
+            input: { type: "integer", minimum: 0 },
+            output: { type: "integer", minimum: 0 },
+            cache_write: { type: ["integer", "null"], minimum: 0 },
+            cache_read: { type: ["integer", "null"], minimum: 0 },
+          },
+        },
+        metrics: {
+          type: "object",
+          additionalProperties: false,
+          required: ["yield", "leverage", "velocity", "snr", "dev10x"],
+          properties: {
+            yield: { type: ["number", "null"] },
+            leverage: { type: ["number", "null"] },
+            velocity: { type: ["number", "null"] },
+            snr: { type: ["number", "null"] },
+            dev10x: { type: ["number", "null"] },
+          },
+        },
+        warnings: { type: "array", items: { type: "string" } },
       },
     },
   },
@@ -390,7 +459,7 @@ export const TOOLS = [
     name: "operator_signature",
     title: "Operator Signature — Portable Identity Object",
     description:
-      "Computes a normalized operating signature from 4 token pillars or a codename. Returns: signature code (L240-V0.31-S0.24-C0.08 format), archetype (CONTEXTUAL, GENERATOR, BALANCED_ELITE, READER, COMMITTER, STANDARD), dominant trait, and closest comparable operators from the live board. A portable identity object that can feed profile cards, social sharing, enterprise clustering, peer discovery, and longitudinal drift.",
+      "Computes a normalized operating signature from 4 token pillars or a codename. Returns a signature code, a legacy six-label signature_label, dominant trait, and closest comparable operators from the live board. The deprecated archetype field is retained as a compatibility alias; these labels are not the 10-type Build Archetypes reference extension.",
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",
@@ -442,6 +511,20 @@ export function shareable(toolName: string, params: Record<string, unknown>, sum
 }
 
 export async function callTool(name: string, args: Record<string, unknown>, req: NextRequest) {
+  if (name === "get_sigrank_standard_record") {
+    try {
+      return textResult(buildSigRankStandardRecord(args));
+    } catch (error) {
+      return textResult(
+        {
+          code: "invalid_arguments",
+          message: error instanceof Error ? error.message : "Invalid Standard record arguments.",
+        },
+        true,
+      );
+    }
+  }
+
   if (name === "rank_paste") {
     const input = args.input;
     const output = args.output;
@@ -1835,6 +1918,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     return textResult({
       operator: myName ? { codename, display_name: myName } : null,
       signature: sig.code,
+      signature_label: sig.archetype,
       archetype: sig.archetype,
       dominant_trait: sig.dominant_trait,
       metrics: {
