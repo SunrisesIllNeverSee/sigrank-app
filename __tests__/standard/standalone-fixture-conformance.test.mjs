@@ -156,6 +156,12 @@ if (!standardRoot) {
     return Math.abs(a - b) < tolerance;
   }
 
+  function arraysEqual(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+
   // Build a Standard record from cascade output + fixture input
   function buildRecord(fixture) {
     const telemetry = fixture.input?.telemetry || {};
@@ -195,6 +201,22 @@ if (!standardRoot) {
       metrics.dev10x = null;
     }
 
+    // Standard warning order: cache-unavailability warnings precede the
+    // cascade's dev10x_undefined warning (the "why" before the "what").
+    // This mirrors buildSigRankStandardRecord in lib/mcp/standard.ts.
+    const warnings = [];
+    if (cacheWrite === null) {
+      warnings.push("cache_write is unavailable; 10xDEV is undefined.");
+    }
+    if (cacheRead === null) {
+      warnings.push(
+        "cache_read is unavailable; Yield, Leverage, and 10xDEV are undefined.",
+      );
+    }
+    for (const w of result.warnings ?? []) {
+      if (!warnings.includes(w)) warnings.push(w);
+    }
+
     // Build the record in sigrank/0.1-draft shape
     return {
       spec: "sigrank/0.1-draft",
@@ -211,7 +233,7 @@ if (!standardRoot) {
         cache_read: cacheRead,
       },
       metrics,
-      warnings: [],
+      warnings,
     };
   }
 
@@ -255,12 +277,21 @@ if (!standardRoot) {
         }
       }
 
-      // 4. Version declaration
+      // 4. Warnings (ordered arrays — same warnings in the same order)
+      if (expected.warnings !== undefined) {
+        if (!arraysEqual(record.warnings, expected.warnings)) {
+          errors.push(
+            `${id}: warnings mismatch: expected ${JSON.stringify(expected.warnings)}, got ${JSON.stringify(record.warnings)}`,
+          );
+        }
+      }
+
+      // 5. Version declaration
       if (expected.spec !== undefined && record.spec !== expected.spec) {
         errors.push(`${id}: version: expected ${expected.spec}, got ${record.spec}`);
       }
 
-      // 5. Alias translation — cache_creation must normalize to cache_write
+      // 6. Alias translation — cache_creation must normalize to cache_write
       if (expected.output_telemetry_keys !== undefined) {
         const actualKeys = Object.keys(record.telemetry).sort();
         const expectedKeys = [...expected.output_telemetry_keys].sort();
@@ -274,7 +305,7 @@ if (!standardRoot) {
         }
       }
 
-      // 6. Content independence
+      // 7. Content independence
       if (expected.forbidden_fields !== undefined) {
         for (const forbidden of expected.forbidden_fields) {
           if (forbidden in record.telemetry)
@@ -284,7 +315,7 @@ if (!standardRoot) {
         }
       }
 
-      // 7. Required fields
+      // 8. Required fields
       if (expected.required_fields !== undefined) {
         for (const required of expected.required_fields) {
           if (!(required in record))
@@ -292,7 +323,7 @@ if (!standardRoot) {
         }
       }
 
-      // 8. Extension exclusion
+      // 9. Extension exclusion
       if (expected.forbidden_metrics !== undefined) {
         for (const forbidden of expected.forbidden_metrics) {
           if (forbidden in record.metrics)
@@ -300,7 +331,7 @@ if (!standardRoot) {
         }
       }
 
-      // 9. Required metrics
+      // 10. Required metrics
       if (expected.required_metrics !== undefined) {
         for (const required of expected.required_metrics) {
           if (!(required in record.metrics))
