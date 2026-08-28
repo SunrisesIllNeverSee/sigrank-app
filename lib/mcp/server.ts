@@ -189,10 +189,10 @@ export function createSigrankServer(req?: NextRequest): McpServer {
  */
 export const SERVER_INFO = {
   name: "sigrank",
-  title: "SigRank SignalAF",
+  title: "Upsilon — SignalAF Measurement Engine",
   version: "1.0.0",
   description:
-    `AI operator benchmark and reference implementation for ${SIGRANK_STANDARD_VERSION}, built from privacy-preserving token telemetry.`,
+    `Upsilon is SignalAF's privacy-preserving AI operator measurement engine and reference implementation for ${SIGRANK_STANDARD_VERSION}. SigRank is its public leaderboard and proof surface.`,
   websiteUrl: "https://signalaf.com",
 } as const;
 
@@ -200,4 +200,4 @@ export const SERVER_INFO = {
  * Instructions sent to clients during initialization.
  */
 export const SERVER_INSTRUCTIONS =
-  `Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Use get_sigrank_standard_record for a portable ${SIGRANK_STANDARD_VERSION} record containing only I/O/W/R and Yield, Leverage, Velocity, SNR, and 10xDEV. Benchmark tools: rank_paste (compute cascade from 4 token counts), get_leaderboard (public rankings), get_operator (operator profile by codename). Analytical tools (pure math): simulate_change, diagnose_cascade, suggest_improvements, self_improve, rank_windows. Field-relative tools: benchmark_me, rank_if, operator_gap, field_anomaly, who_operates_like_me, compare_to_field, operator_signature. Construction, Scale V, RS05, Build Archetypes, rank, and percentile are outside base Standard compatibility. Contribution Exchange tools are available at https://signalaf.com/api/exchange/mcp. Do not treat benchmark metrics as model-quality, work-quality, employee-productivity, or business-value measures.`;
+  `Use Upsilon to measure AI operator token-processing patterns from privacy-preserving telemetry. Use get_sigrank_standard_record for a portable ${SIGRANK_STANDARD_VERSION} compatibility record containing only I/O/W/R and Yield, Leverage, Velocity, SNR, and 10xDEV. Use SigRank tools for the public leaderboard and proof surface: get_leaderboard, get_operator, benchmark_me, rank_if, operator_gap, field_anomaly, who_operates_like_me, compare_to_field, and operator_signature. Analytical tools: rank_paste, simulate_change, diagnose_cascade, suggest_improvements, self_improve, and rank_windows. Construction, Scale V, RS05, Build Archetypes, rank, and percentile are outside base wire compatibility. Contribution Exchange tools are available at https://signalaf.com/api/exchange/mcp. Upsilon describes observable token-processing patterns; do not treat its metrics as cognition, model quality, work quality, employee productivity, or business value.`;

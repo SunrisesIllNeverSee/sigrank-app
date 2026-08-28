@@ -21,7 +21,7 @@ export async function GET() {
     name: SITE_NAME,
     type: "leaderboard",
     description:
-      "SigRank SignalAF ranks AI operators by Yield (Υ) — token-cascade efficiency. Privacy-preserving: token counts only, never prompts.",
+      "SignalAF hosts Upsilon, the privacy-preserving measurement engine, and SigRank, its public AI operator leaderboard and proof surface.",
     url: SITE_ORIGIN,
     api: {
       v1: `${SITE_ORIGIN}/api/v1`,
@@ -39,6 +39,13 @@ export async function GET() {
       schema: SIGRANK_STANDARD_SCHEMA_URL,
       record_tool: "get_sigrank_standard_record",
       core_metrics: ["Yield", "Leverage", "Velocity", "SNR", "10xDEV"],
+    },
+    architecture: {
+      brand: "SignalAF",
+      governance: "MO§ES™",
+      product: "Upsilon",
+      leaderboard: "SigRank",
+      compatibility_wire_spec: SIGRANK_STANDARD_VERSION,
     },
     product_metrics: ["Scale V", "Efficiency", "Cost per 1M", "Op Ratio"],
     install: "npx sigrank",

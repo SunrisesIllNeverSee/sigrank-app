@@ -103,27 +103,25 @@ See:
 ## Product relationship
 
 ```text
-SigRank Standard
-OPEN MEASUREMENT SPECIFICATION
+SignalAF
+UMBRELLA BRAND
         │
         ↓
-@sigrank/cascade
-REFERENCE MATH IMPLEMENTATION
+MO§ES™
+GOVERNANCE + METHODOLOGY
         │
-        ├────────────────────┐
-        ↓                    ↓
-sigrank-mcp              sigrank-app
-INSTRUMENT               REFERENCE PLATFORM
-        │                    │
-        └─────────┬──────────┘
-                  ↓
-          SignalAF Reference Field
-                  ↓
-                 Board
+        ↓
+Upsilon
+COMMERCIAL MEASUREMENT ENGINE + PILOT
+        │
+        ├──────────────────────┐
+        ↓                      ↓
+sigrank/0.1-draft          SigRank
+COMPATIBILITY RECORD       PUBLIC LEADERBOARD + PROOF
 
 Distribution / extensions:
 - sigeconomy.com → read-only public discovery, comparison, SEO/AEO/GEO
-- mos2es.org → public enterprise commercial front face for pilots; controlled/private deployment can sit behind the offer; enterprise terminology remains intentionally distinct
+- mos2es.org → public commercial front face for Upsilon pilots; controlled/private deployment can sit behind the offer; enterprise terminology remains intentionally distinct
 - mos2es.com → current governance/research face; broader MO§ES umbrella/hub architecture is a separate ecosystem decision and is not defined by this standard
 ```
 

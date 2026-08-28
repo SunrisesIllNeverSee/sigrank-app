@@ -21,10 +21,30 @@ test("public discovery surfaces advertise the live HTTP MCP endpoint", () => {
 test("standard pages are distributed through sitemap and footer", () => {
   const sitemap = read("app/sitemap.ts");
   const footer = read("components/ui/Footer.tsx");
-  for (const route of ["/standard", "/standard/open-vs-proprietary"]) {
+  for (const route of ["/upsilon", "/standard", "/standard/open-vs-proprietary"]) {
     assert.ok(sitemap.includes(route), `sitemap is missing ${route}`);
     assert.ok(footer.includes(route), `footer is missing ${route}`);
   }
+});
+
+test("locked product roles stay distinct without renaming the wire protocol", () => {
+  const standard = read("lib/mcp/standard.ts");
+  assert.match(standard, /brand:\s*"SignalAF"/);
+  assert.match(standard, /governance:\s*"MO§ES™"/);
+  assert.match(standard, /product:\s*"Upsilon"/);
+  assert.match(standard, /leaderboard:\s*"SigRank"/);
+  assert.match(standard, /SIGRANK_STANDARD_VERSION = "sigrank\/0\.1-draft"/);
+
+  const page = read("app/upsilon/page.tsx");
+  assert.match(page, /The EKG for AI processing/);
+  assert.match(page, /does not, by itself, establish cognition/);
+});
+
+test("standard page explains the Upsilon and SigRank product boundary", () => {
+  const page = read("app/standard/page.tsx");
+  assert.match(page, /Upsilon is SignalAF/);
+  assert.match(page, /SigRank is the public leaderboard and proof/);
+  assert.match(page, /sigrank\/0\.1-draft/);
 });
 
 test("base compatibility exclusions remain explicit", () => {
