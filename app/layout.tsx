@@ -8,7 +8,7 @@ import { DemoBanner } from "@/components/ui/DemoBanner";
 import { Footer } from "@/components/ui/Footer";
 import { ThemeCycleShortcut } from "@/components/ui/ThemeCycleShortcut";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { organization, website, product, contributionExchangeService } from "@/lib/jsonld";
+import { organization, website, product } from "@/lib/jsonld";
 import { SITE_ORIGIN, siteMetadata } from "@/lib/seo";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -93,7 +93,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${articleSerif.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
-        <JsonLd data={[org, website(), product(), contributionExchangeService()]} />
+        <JsonLd data={[org, website(), product()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <PostHogProvider>
           <ThemeCycleShortcut />
