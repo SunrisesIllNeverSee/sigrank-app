@@ -120,6 +120,23 @@ jobs:
           OTHER_REPO_ROOT: ${{ github.workspace }}/_sigrank-mcp
         run: node --test __tests__/standard/generated-record-contract.test.mjs
 
+      # Standalone Standard conformance gate — validates the HTTP MCP producer
+      # against the authoritative fixture pack from sigrank-standard. The
+      # Standard ref is pinned via SIGRANK_STANDARD_REF so upstream changes
+      # cannot silently alter consumer builds.
+      - name: Checkout sigrank-standard (authoritative fixture pack)
+        uses: actions/checkout@v7
+        with:
+          repository: SunrisesIllNeverSee/sigrank-standard
+          path: _sigrank-standard
+          ref: ${{ vars.SIGRANK_STANDARD_REF || '224505a' }}
+
+      - name: Standalone Standard conformance gate
+        env:
+          SIGRANK_STANDARD_REF: ${{ vars.SIGRANK_STANDARD_REF || '224505a' }}
+          SIGRANK_STANDARD_PATH: ${{ github.workspace }}/_sigrank-standard
+        run: node --test __tests__/mcp/standalone-conformance.test.mjs
+
   # Migration parity guardrail — fails if the Supabase migration ledger has
   # drifted from the local migrations/ directory. Prevents the catastrophic
   # db-push scenario (re-running all migrations) from silently returning.
