@@ -9,6 +9,17 @@
 
 SigRank Standard defines a portable measurement vocabulary for the **human operator layer** of generative AI systems.
 
+## Start here
+
+Read the program documents in this order:
+
+1. [`strategy/COURSE_OF_SHIP.md`](./strategy/COURSE_OF_SHIP.md) — governing direction, two-part Standard, invariants, and decision gates
+2. [`strategy/REPO_DOMAIN_OWNERSHIP_MAP.md`](./strategy/REPO_DOMAIN_OWNERSHIP_MAP.md) — current and target ownership across repositories, domains, authority, and data flow
+3. [`strategy/90_DAY_RECONCILED_ROADMAP.md`](./strategy/90_DAY_RECONCILED_ROADMAP.md) — gated 30/60/90 program and all 37 original opportunities reconciled
+4. [`strategy/EXECUTION_HANDOFF.md`](./strategy/EXECUTION_HANDOFF.md) — dependency-ordered brief for the next implementation owner
+
+The older [`strategy/PHASE_1_BUILD_HANDOFF.md`](./strategy/PHASE_1_BUILD_HANDOFF.md) is retained only as superseded historical context.
+
 This draft has been reconciled against the connected production repositories:
 
 - `sigrank-app` — SignalAF public reference platform
