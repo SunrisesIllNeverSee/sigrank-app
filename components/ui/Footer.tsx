@@ -140,6 +140,7 @@ const FOOTER_COLUMNS: {
   {
     heading: "Topics",
     links: [
+      { href: "/upsilon", label: "Upsilon Measurement Engine" },
       { href: "/ai-benchmarking", label: "AI Benchmarking" },
       { href: "/ai-coding-metrics", label: "AI Coding Metrics" },
       { href: "/ai-operator-scoring", label: "AI Operator Scoring" },

@@ -22,11 +22,11 @@ export async function GET() {
     supportedProtocolVersions: ["2026-07-28", "2025-11-25", "2025-06-18", "2025-03-26"],
     serverInfo: {
       name: "sigrank",
-      title: "SigRank SignalAF — AI Operator Benchmark",
+      title: "Upsilon — SignalAF Measurement Engine",
       version: "1.0.0",
     },
     description:
-      `SigRank SignalAF is the reference implementation for ${SIGRANK_STANDARD_VERSION} and exposes portable operator records, benchmark data, and token-cascade calculations. Use it for operator-layer measurement — not as a model-quality, work-quality, or productivity benchmark.`,
+      `Upsilon is SignalAF's commercial measurement engine and the reference implementation for ${SIGRANK_STANDARD_VERSION}. It exposes privacy-preserving operator records and calculations; SigRank is the public leaderboard and proof surface. Use the metrics for operator-layer measurement, not as cognition, model-quality, work-quality, productivity, or business-value claims.`,
     transports: [
       {
         type: "streamable-http",

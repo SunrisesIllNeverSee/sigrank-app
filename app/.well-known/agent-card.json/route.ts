@@ -27,10 +27,10 @@ export async function GET() {
   ];
 
   const card = {
-    name: "SigRank SignalAF — AI Operator Leaderboard",
+    name: "Upsilon by SignalAF — AI Operator Measurement Engine",
     version: "1.0.0",
     description:
-      "SigRank SignalAF ranks AI operators by Yield (Υ = cache_read × output / input²) — token-cascade efficiency, not raw spend. Run `npx sigrank` to measure your efficiency. Privacy-preserving: token counts only, never prompts.",
+      "Upsilon is SignalAF's privacy-preserving AI operator measurement engine. It computes Yield from four token counts; SigRank is the public leaderboard and proof surface. It does not read prompts or code.",
     url: SITE_ORIGIN,
     protocolVersion: "0.3.0",
     supportedInterfaces,
@@ -59,7 +59,7 @@ export async function GET() {
       },
       {
         id: "standard-record",
-        name: "Portable SigRank Standard Record",
+        name: "Portable Upsilon Measurement Record",
         description:
           `Create a ${SIGRANK_STANDARD_VERSION} record from I/O/W/R telemetry. The base record excludes Construction, Build Archetypes, and RS05.`,
         inputSchema: {
@@ -96,7 +96,7 @@ export async function GET() {
       },
     ],
     provider: {
-      name: "SigRank SignalAF",
+      name: "SignalAF",
       url: SITE_ORIGIN,
     },
     privacy: {

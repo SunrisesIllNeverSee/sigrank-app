@@ -7,6 +7,16 @@ export const SIGRANK_STANDARD_SCHEMA_URL =
   "https://signalaf.com/standard/sigrank-operator-record-v0.1.schema.json" as const;
 export const SIGRANK_STANDARD_SCHEMA = standardSchema;
 
+export const PRODUCT_ARCHITECTURE = {
+  brand: "SignalAF",
+  governance: "MO§ES™",
+  product: "Upsilon",
+  leaderboard: "SigRank",
+  wire_spec: SIGRANK_STANDARD_VERSION,
+  compatibility_note:
+    "Upsilon is the product identity. The sigrank/0.1-draft wire identifier remains stable for existing records and consumers.",
+} as const;
+
 export const SIGRANK_CORE_TELEMETRY = [
   "input",
   "output",
@@ -119,8 +129,13 @@ export const SIGRANK_STANDARD_IDENTITY = {
   standard_url: SIGRANK_STANDARD_URL,
   schema_url: SIGRANK_STANDARD_SCHEMA_URL,
   reference_math: "@sigrank/cascade",
-  reference_platform: "SignalAF",
-  reference_field: "SignalAF Reference Field",
+  product: PRODUCT_ARCHITECTURE.product,
+  product_role: "commercial_measurement_engine",
+  governance_framework: PRODUCT_ARCHITECTURE.governance,
+  umbrella_brand: PRODUCT_ARCHITECTURE.brand,
+  public_proof_surface: PRODUCT_ARCHITECTURE.leaderboard,
+  reference_platform: "Upsilon on SignalAF",
+  reference_field: "SigRank Public Reference Field",
   instrument: "sigrank-mcp",
   core_telemetry: SIGRANK_CORE_TELEMETRY,
   core_metrics: SIGRANK_CORE_METRICS,
@@ -133,5 +148,7 @@ export const SIGRANK_STANDARD_IDENTITY = {
     "percentile",
   ],
   privacy:
-    "Core SigRank measurements do not require prompt text, response text, source code, or repository contents.",
+    "Core Upsilon measurements do not require prompt text, response text, source code, or repository contents.",
+  interpretation_boundary:
+    "Upsilon describes observable token-processing patterns. It does not, by itself, establish cognition, work quality, employee productivity, or business outcomes.",
 } as const;

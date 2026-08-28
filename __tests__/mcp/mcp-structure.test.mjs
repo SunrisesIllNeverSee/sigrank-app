@@ -268,8 +268,10 @@ test("server.ts server name is 'sigrank'", () => {
   assert.match(serverSource, /name:\s*["']sigrank["']/);
 });
 
-test("server.ts server title includes 'SigRank'", () => {
-  assert.match(serverSource, /title:\s*["']SigRank/);
+test("server.ts presents Upsilon while preserving the sigrank protocol name", () => {
+  assert.match(serverSource, /title:\s*["']Upsilon/);
+  assert.match(serverSource, /name:\s*["']sigrank["']/);
+  assert.match(serverSource, /SigRank is its public leaderboard and proof surface/);
 });
 
 test("server.ts server version is 1.0.0", () => {
