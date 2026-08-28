@@ -1,9 +1,9 @@
 /**
  * MCP server card for the Contribution Exchange.
  *
- * This is a separate MCP server from SigRank, with its own endpoint,
- * identity, and tool catalog. It exposes the Contribution Exchange
- * discovery and ingress layer.
+ * This is a separate, optional MCP server from SigRank, with its own endpoint,
+ * identity, and tool catalog. It exposes the Contribution Exchange discovery
+ * and ingress layer only when a client explicitly connects to it.
  *
  * Endpoint: https://signalaf.com/api/exchange/mcp
  * Server identity: contribution-exchange
@@ -21,11 +21,17 @@ export async function GET() {
     protocolVersion: "2025-06-18",
     serverInfo: {
       name: "contribution-exchange",
-      title: "Contribution Exchange MCP",
+      title: "SignalAF Contribution Exchange MCP — Optional Capability",
       version: "1.0.0",
     },
     description:
-      "The Contribution Exchange MCP exposes domain profiles, published Exchange Signals, and unsolicited Contribution Proposal submission to MCP clients. No tool creates a Commitment, authorization, or settlement. Signals and proposals are invitational, not binding. Bilateral terms-hash acceptance is required for Commitment formation.",
+      "Optional economic-interaction capability provided by SignalAF. This dedicated MCP server exposes domain profiles, published Exchange Signals, and unsolicited Contribution Proposal submission only to clients that explicitly connect to the Exchange endpoint. It does not replace SignalAF / SigRank's normal site, API, or MCP identity. No tool creates a Commitment, authorization, or settlement. Signals and proposals are invitational, not binding. Bilateral terms-hash acceptance is required for Commitment formation.",
+    host: {
+      name: "SignalAF / SigRank",
+      url: SITE_ORIGIN,
+      primaryMcp: `${SITE_ORIGIN}/api/mcp`,
+    },
+    activation: "explicit_exchange_endpoint_only",
     transports: [
       {
         type: "streamable-http",
@@ -77,13 +83,15 @@ export async function GET() {
         "Commitment formation requires separate bilateral terms-hash acceptance outside this MCP server.",
     },
     links: {
+      host: SITE_ORIGIN,
+      primaryMcp: `${SITE_ORIGIN}/api/mcp`,
       exchangeProfile: `${SITE_ORIGIN}/.well-known/exchange.json`,
       agentGuide: `${SITE_ORIGIN}/agents.md`,
       exchangePage: `${SITE_ORIGIN}/exchange`,
       signalsPage: `${SITE_ORIGIN}/exchange/signals`,
       schema: `${SITE_ORIGIN}/exchange.schema.json`,
     },
-    homepage: SITE_ORIGIN,
+    homepage: `${SITE_ORIGIN}/exchange`,
   };
 
   return new NextResponse(JSON.stringify(card, null, 2), {
