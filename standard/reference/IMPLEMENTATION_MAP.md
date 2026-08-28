@@ -102,7 +102,7 @@ Required `mos2es.org` integration:
 - privacy modes;
 - governance boundary;
 - outcome correlation with explicit no-causality overclaim guardrail.
-- preserve MO§ES™ enterprise terminology and maintain internal lineage rather than mechanically replacing it with SigRank Standard copy.
+- preserve MO§ES™ enterprise terminology and maintain internal lineage rather than mechanically replacing it with Upsilon Standard copy.
 
 ## `mos2es.com`
 

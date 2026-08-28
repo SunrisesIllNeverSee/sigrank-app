@@ -1,4 +1,4 @@
-# SigRank Standard v0.1-draft
+# Upsilon Standard v0.1-draft
 
 ## 1. Status
 

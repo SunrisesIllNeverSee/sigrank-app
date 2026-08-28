@@ -79,7 +79,7 @@ export default function AICodingMetricsPage() {
             {
               question: "What are AI coding metrics?",
               answer:
-                "AI coding metrics quantify how efficiently an operator drives AI coding tools. SigRank defines six core metrics from four token pillars: yield (Υ), compression ratio, signal-to-noise ratio, cache hit rate, leverage, and velocity. Each measures a different facet of the token cascade — the flow of tokens through an AI coding session.",
+                "AI coding metrics quantify how efficiently an operator drives AI coding tools. Upsilon defines six core metrics from four token pillars: yield (Υ), compression ratio, signal-to-noise ratio, cache hit rate, leverage, and velocity. Each measures a different facet of the token cascade — the flow of tokens through an AI coding session.",
             },
             {
               question: "Which AI coding metric should I prioritize?",

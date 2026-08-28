@@ -2,7 +2,7 @@
 
 The connected `mos2es-site` repository identifies itself as the static `mos2es.com` site and describes MO§ES as a governance framework.
 
-This document records that current surface only. A broader mos2es.com/MO§ES™ umbrella-hub redesign is a separate ecosystem conversation and is not specified by SigRank Standard v0.1.
+This document records that current surface only. A broader mos2es.com/MO§ES™ umbrella-hub redesign is a separate ecosystem conversation and is not specified by Upsilon Standard v0.1.
 
 Recommended relationship:
 

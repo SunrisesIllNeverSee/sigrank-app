@@ -41,14 +41,14 @@ export default function OpenVsProprietaryPage() {
       <JsonLd
         data={[
           breadcrumb([
-            { name: "SigRank Standard", path: "/standard" },
+            { name: "Upsilon Standard", path: "/standard" },
             { name: "Open vs Proprietary", path: "/standard/open-vs-proprietary" },
           ]),
           faqPage([
             {
               question: "Is the SigRank formula open?",
               answer:
-                "Yes. The SigRank Standard draft publishes the core telemetry semantics and equations for Yield, Leverage, Velocity, SNR, and 10xDEV. A compatible implementation can compute the core measurements independently.",
+                "Yes. The Upsilon Standard draft publishes the core telemetry semantics and equations for Yield, Leverage, Velocity, SNR, and 10xDEV. A compatible implementation can compute the core measurements independently.",
             },
             {
               question: "Is the SignalAF leaderboard part of the open standard?",
@@ -66,7 +66,7 @@ export default function OpenVsProprietaryPage() {
 
       <header className="space-y-4">
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-gold">
-          SigRank Standard v0.1-draft
+          Upsilon Standard v0.1-draft
         </p>
         <h1 className="font-mono text-4xl font-bold text-text-primary sm:text-5xl">
           Open measurement. Defensible reference network.
@@ -131,7 +131,7 @@ export default function OpenVsProprietaryPage() {
 
       <div className="flex flex-wrap gap-4 font-mono text-sm">
         <Link href="/standard" className="text-gold hover:underline">
-          ← SigRank Standard
+          ← Upsilon Standard
         </Link>
         <Link
           href="/standard/sigrank-operator-record-v0.1.schema.json"

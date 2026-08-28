@@ -104,12 +104,12 @@ export default function OperatorPerformancePage() {
             {
               question: "What is operator performance in AI coding?",
               answer:
-                "Operator performance measures how efficiently the human driving the AI tool uses it — not how good the model is. SigRank scores the operator by the architecture of their token cascade: how well they reuse cached context, how much output they produce per fresh input, and whether signal is compounding or tokens are burning. The model is held constant; the operator is the variable.",
+                "Operator performance measures how efficiently the human driving the AI tool uses it — not how good the model is. Upsilon scores the operator by the architecture of their token cascade: how well they reuse cached context, how much output they produce per fresh input, and whether signal is compounding or tokens are burning. The model is held constant; the operator is the variable.",
             },
             {
               question: "Why score the operator, not the model?",
               answer:
-                "Because the model is not the variable. Two operators on the same model, same platform, same session length can produce wildly different token cascades. One compounds signal; the other burns tokens. The difference is the operator — how they structure prompts, how they reuse context, how they manage the cascade. Model leaderboards already exist (LMSYS Arena). SigRank measures the layer no one else does: the human.",
+                "Because the model is not the variable. Two operators on the same model, same platform, same session length can produce wildly different token cascades. One compounds signal; the other burns tokens. The difference is the operator — how they structure prompts, how they reuse context, how they manage the cascade. Model leaderboards already exist (LMSYS Arena). Upsilon measures the layer no one else does: the human.",
             },
             {
               question: "What are the SigRank class tiers?",
@@ -172,10 +172,10 @@ export default function OperatorPerformancePage() {
         </p>
       </section>
 
-      {/* ── How SigRank scores operators ── */}
+      {/* ── How Upsilon scores operators ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          How SigRank scores operators
+          How Upsilon scores operators
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Scoring starts with token telemetry — four counts captured on-device
@@ -263,7 +263,7 @@ export default function OperatorPerformancePage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               It measures how efficiently the human driving the AI uses it — not
-              how good the model is. SigRank scores the operator by the
+              how good the model is. Upsilon scores the operator by the
               architecture of their token cascade. The model is held constant;
               the operator is the variable.
             </dd>
@@ -275,7 +275,7 @@ export default function OperatorPerformancePage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Because the model is not the variable. Two operators on the same
               model can produce wildly different cascades. Model leaderboards
-              already exist — SigRank measures the layer no one else does: the
+              already exist — Upsilon measures the layer no one else does: the
               human.
             </dd>
           </div>

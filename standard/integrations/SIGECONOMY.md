@@ -51,7 +51,7 @@ sigeconomy.com CTA hierarchy:
 
 Generic query
 → category explainer
-→ SigRank Standard
+→ Upsilon Standard
 → SignalAF reference implementation
 → `npx/bunx sigrank`
 → optional enterprise path.

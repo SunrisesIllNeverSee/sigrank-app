@@ -2,7 +2,7 @@
 
 ## Freeze
 
-1. Name: **SigRank Standard**
+1. Name: **Upsilon Standard**
 2. Scope: operator layer
 3. Publish measurement stack
 4. Freeze I/O/W/R semantics

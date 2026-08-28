@@ -1,4 +1,4 @@
-const BODY = `# SigRank Standard v0.1-draft
+const BODY = `# Upsilon Standard v0.1-draft
 
 > The new standard in operator metrics.
 
@@ -39,7 +39,7 @@ The term Construction is not standardized in v0.1 because existing product imple
 
 ## Reference architecture
 
-- SigRank Standard: measurement specification
+- Upsilon Standard: measurement specification
 - @sigrank/cascade: reference math implementation
 - sigrank-mcp: portable measurement instrument
 - SignalAF: public reference platform

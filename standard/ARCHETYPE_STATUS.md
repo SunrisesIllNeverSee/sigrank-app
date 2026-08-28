@@ -1,8 +1,8 @@
-# Archetype Status — SigRank Standard v0.1-draft
+# Archetype Status — Upsilon Standard v0.1-draft
 
 ## Decision
 
-**Build Archetype is a reference-implementation classification, not a normative core requirement of SigRank Standard v0.1.**
+**Build Archetype is a reference-implementation classification, not a normative core requirement of Upsilon Standard v0.1.**
 
 The concept is defined because it is useful and already part of SignalAF, but third-party SigRank compatibility does not require implementation of the SignalAF archetype classifier.
 
