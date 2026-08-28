@@ -143,6 +143,11 @@ const FOOTER_COLUMNS: {
       { href: "/ai-benchmarking", label: "AI Benchmarking" },
       { href: "/ai-coding-metrics", label: "AI Coding Metrics" },
       { href: "/ai-operator-scoring", label: "AI Operator Scoring" },
+      { href: "/standard", label: "SigRank Standard" },
+      {
+        href: "/standard/open-vs-proprietary",
+        label: "Open vs Proprietary",
+      },
       { href: "/operator-performance", label: "Operator Performance" },
       { href: "/cascade-analysis", label: "Cascade Analysis" },
     ],
