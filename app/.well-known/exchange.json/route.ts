@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildExchangeManifest } from '@/exchange-gateway/src/manifest'
-import { logEncounter, requestIdentity } from '@/lib/exchange/server'
+import { logEncounter } from '@/lib/exchange/server'
 
 export async function GET(req: NextRequest) {
   const base = `${req.nextUrl.protocol}//${req.nextUrl.host}`
   const manifest = buildExchangeManifest(base)
   // Log every encounter with the exchange profile — this is the top-of-funnel
-  // observability layer. Every agent that reads this file gets recorded.
+  // observability layer. Every agent that explicitly reads this file gets recorded.
   await logEncounter({
     targetDomain: manifest.domain,
     endpoint: '/.well-known/exchange.json',
@@ -18,6 +18,9 @@ export async function GET(req: NextRequest) {
     headers: {
       'cache-control': 'public, max-age=300',
       'access-control-allow-origin': '*',
+      'link': `<${base}/>; rel="up"; title="SignalAF / SigRank"`,
+      'x-signalaf-capability': 'contribution_exchange',
+      'x-signalaf-activation': 'explicit_request',
     },
   })
 }
