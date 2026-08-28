@@ -65,20 +65,16 @@ import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 // 6x vs the previous 3600s, which matters because the /user/[codename]
 // route does 8 DB queries on a cold miss and Supabase compute is a cost
 // constraint. The data-layer cache (unstable_cache on getOperator etc.)
-// provides a second tier at 120s; the edge Cache-Control header
-// (s-maxage=21600 in next.config.ts) keeps the CDN serving stale-while-
-// revalidate for 24h.
+// provides a second tier at 90-300s for data freshness.
+//
+// FIX (2026-08-28): removed `force-static` and the explicit Cache-Control
+// header in next.config.ts. force-static + the explicit s-maxage=21600
+// header overrode Vercel's native ISR edge caching, preventing
+// revalidatePath() from busting the edge CDN cache after a snapshot submit.
+// Without force-static, `revalidate` alone gives ISR with native Vercel
+// edge caching that respects revalidatePath — the profile now updates
+// immediately after a submission instead of serving stale HTML for up to 6h.
 export const revalidate = 21600;
-// Force the page to be static (ISR) — Next.js 15's default fetch caching
-// changed from 'force-cache' to 'no-store', which was causing the page to
-// be treated as dynamic (overriding the edge Cache-Control header with
-// 'private, no-cache, no-store'). force-static ensures the page is ISR:
-// first request renders + caches, subsequent requests serve from the edge
-// CDN (s-maxage=21600 in next.config.ts). On-demand revalidation via
-// revalidateTouchedWindows fires on snapshot submit, immediately purging
-// the CDN cache. The unstable_cache wrapper in lib/board/cached.ts handles
-// per-function revalidate windows (90-300s) for data freshness.
-export const dynamic = "force-static";
 
 /**
  * Resolve the display name for an operator. display_name now carries both the

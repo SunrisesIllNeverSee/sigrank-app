@@ -7,11 +7,11 @@
  * (metric table + shape radar + Pro gate). A row of quick-swap links re-targets
  * slot B while keeping A.
  *
- * ISR (2026-08-12): page is force-static + revalidate=300. Auth-dependent
+ * ISR (2026-08-12): page is ISR (revalidate=300). Auth-dependent
  * "compare against me" moved client-side (CompareAgainstMe). The
  * bumpComparisonsRan counter moved to a client-side API call. The page no
  * longer reads cookies or headers, so it can be edge-cached. Each unique
- * ?a=X&b=Y combination is SSR'd on first request then cached.
+ * ?a=X&b=Y combination is generated on first request then cached.
  */
 
 import type { Metadata } from "next";
@@ -57,13 +57,18 @@ export const metadata: Metadata = withOG({
   path: "/compare",
 });
 
-// PERF (2026-08-12): page is now ISR. The default view (no ?a= or ?b= params)
+// PERF (2026-08-12): page is ISR. The default view (no ?a= or ?b= params)
 // is prerendered with a day-seeded pick vs the-field. When ?a= and ?b= are
-// present, Next.js SSRs on demand and caches the result. Auth-dependent
-// "compare against me" moved client-side (CompareAgainstMe) so the page no
-// longer reads cookies/headers. The bumpComparisonsRan counter moved to a
+// present, Next.js generates the page on-demand and caches the result for
+// `revalidate` seconds (per unique param combo). Auth-dependent "compare
+// against me" moved client-side (CompareAgainstMe) so the page no longer
+// reads cookies/headers. The bumpComparisonsRan counter moved to a
 // client-side API call (TrackCompareView → /api/v1/stats/compare-bump).
-export const dynamic = "force-static";
+//
+// FIX (2026-08-28): removed `force-static` — it prerendered the page once at
+// build time with empty searchParams, so ?a=&b= were ignored at runtime and
+// the page always showed the default matchup. Without force-static, `revalidate`
+// alone gives ISR with per-searchParams on-demand generation.
 export const revalidate = 300;
 
 // The canonical name rule lives in lib/compare/operator-name.ts so the page, matchup,

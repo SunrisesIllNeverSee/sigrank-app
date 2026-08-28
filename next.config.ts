@@ -32,22 +32,14 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      {
-        // Cache operator profile pages at the edge — they're ISR (revalidate=21600)
-        // but without an explicit Cache-Control the CDN treats them as MISS every
-        // time. 2026-07-24: Googlebot crawl caused 2,449 serverless invocations on
-        // /user/* pages because none were edge-cached. s-maxage=21600 matches the
-        // ISR revalidate window (6h); stale-while-revalidate keeps serving during
-        // refresh. On-demand revalidation via revalidateTouchedWindows fires on
-        // snapshot submit, so the CDN purges immediately after a submission.
-        source: "/user/:codename*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, s-maxage=21600, stale-while-revalidate=86400",
-          },
-        ],
-      },
+      // NOTE (2026-08-28): the explicit Cache-Control header for /user/:codename*
+      // was REMOVED. It was overriding Vercel's native ISR edge caching, which
+      // prevented revalidatePath() from busting the edge CDN cache after a
+      // snapshot submit. With native ISR (revalidate=21600 on the page), Vercel
+      // edge-caches the page AND respects revalidatePath — so the profile
+      // updates immediately after a submission. The original header was added
+      // 2026-07-24 because the page was force-dynamic (no edge caching); now
+      // that the page is ISR, Vercel handles edge caching natively.
       {
         // Hall of Signal is ISR (force-static + revalidate=300). Edge-cache
         // the prerendered HTML so LCP is instant. s-maxage=300 matches the
