@@ -1,7 +1,7 @@
 /**
  * lib/mcp/server.ts — SignalAF MCP server built on the official MCP SDK v2.
  *
- * Creates an McpServer instance with all 15 SigRank tools, 6 resources, and
+ * Creates an McpServer instance with all 16 SigRank tools, 8 resources, and
  * 5 prompts registered. Uses the SDK's native protocol negotiation, capability
  * declaration, and Streamable HTTP transport.
  *
@@ -31,6 +31,7 @@ import {
   type ToolCallObservability,
 } from "@/lib/mcp/telemetry";
 import type { NextRequest } from "next/server";
+import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
 /**
  * Create a SignalAF MCP server with all tools, resources, and prompts registered.
@@ -50,24 +51,18 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     : undefined;
 
   const server = new McpServer(
-    {
-      name: "sigrank",
-      version: "1.0.0",
-      title: "SigRank SignalAF",
-      description:
-        "AI operator benchmark measuring token-cascade efficiency from privacy-preserving telemetry.",
-      websiteUrl: "https://signalaf.com",
-    },
+    SERVER_INFO,
     {
       capabilities: {
         tools: {},
         resources: { subscribe: false },
         prompts: {},
       },
+      instructions: SERVER_INSTRUCTIONS,
     },
   );
 
-  // ── Register all 15 SigRank tools ──────────────────────────────────────
+  // ── Register all 16 SigRank tools ──────────────────────────────────────
   // Each tool's handler delegates to the existing callTool dispatcher,
   // preserving the exact behavior from the pre-migration implementation.
   // fromJsonSchema wraps raw JSON Schema into StandardSchema for the SDK.
@@ -138,7 +133,7 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     server.registerTool(toolName, toolConfig, toolHandler);
   }
 
-  // ── Register all 6 resources ───────────────────────────────────────────
+  // ── Register all 8 resources ───────────────────────────────────────────
   for (const resource of RESOURCES) {
     const resourceConfig = {
       description: resource.description,
@@ -194,10 +189,10 @@ export function createSigrankServer(req?: NextRequest): McpServer {
  */
 export const SERVER_INFO = {
   name: "sigrank",
-  title: "SigRank SignalAF",
+  title: "Upsilon — SignalAF Measurement Engine",
   version: "1.0.0",
   description:
-    "AI operator benchmark measuring token-cascade efficiency from privacy-preserving telemetry.",
+    `Upsilon is SignalAF's privacy-preserving AI operator measurement engine and reference implementation for ${SIGRANK_STANDARD_VERSION}. SigRank is its public leaderboard and proof surface.`,
   websiteUrl: "https://signalaf.com",
 } as const;
 
@@ -205,4 +200,4 @@ export const SERVER_INFO = {
  * Instructions sent to clients during initialization.
  */
 export const SERVER_INSTRUCTIONS =
-  "Use SignalAF to benchmark AI operators from privacy-preserving token telemetry. Benchmark tools: rank_paste (compute cascade from 4 token counts), get_leaderboard (public rankings), get_operator (operator profile by codename). Analytical tools (pure math): simulate_change, diagnose_cascade, suggest_improvements, self_improve, rank_windows. Field-relative tools: benchmark_me, rank_if, operator_gap, field_anomaly, who_operates_like_me, compare_to_field, operator_signature. Contribution Exchange tools are now available at a dedicated MCP endpoint: https://signalaf.com/api/exchange/mcp. Do not treat benchmark metrics as a model-quality or downstream-productivity benchmark.";
+  `Use Upsilon to measure AI operator token-processing patterns from privacy-preserving telemetry. Use get_sigrank_standard_record for a portable ${SIGRANK_STANDARD_VERSION} compatibility record containing only I/O/W/R and Yield, Leverage, Velocity, SNR, and 10xDEV. Use SigRank tools for the public leaderboard and proof surface: get_leaderboard, get_operator, benchmark_me, rank_if, operator_gap, field_anomaly, who_operates_like_me, compare_to_field, and operator_signature. Analytical tools: rank_paste, simulate_change, diagnose_cascade, suggest_improvements, self_improve, and rank_windows. Construction, Scale V, RS05, Build Archetypes, rank, and percentile are outside base wire compatibility. Contribution Exchange tools are available at https://signalaf.com/api/exchange/mcp. Upsilon describes observable token-processing patterns; do not treat its metrics as cognition, model quality, work quality, employee productivity, or business value.`;

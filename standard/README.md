@@ -9,6 +9,17 @@
 
 SigRank Standard defines a portable measurement vocabulary for the **human operator layer** of generative AI systems.
 
+## Start here
+
+Read the program documents in this order:
+
+1. [`strategy/COURSE_OF_SHIP.md`](./strategy/COURSE_OF_SHIP.md) — governing direction, two-part Standard, invariants, and decision gates
+2. [`strategy/REPO_DOMAIN_OWNERSHIP_MAP.md`](./strategy/REPO_DOMAIN_OWNERSHIP_MAP.md) — current and target ownership across repositories, domains, authority, and data flow
+3. [`strategy/90_DAY_RECONCILED_ROADMAP.md`](./strategy/90_DAY_RECONCILED_ROADMAP.md) — gated 30/60/90 program and all 37 original opportunities reconciled
+4. [`strategy/EXECUTION_HANDOFF.md`](./strategy/EXECUTION_HANDOFF.md) — dependency-ordered brief for the next implementation owner
+
+The older [`strategy/PHASE_1_BUILD_HANDOFF.md`](./strategy/PHASE_1_BUILD_HANDOFF.md) is retained only as superseded historical context.
+
 This draft has been reconciled against the connected production repositories:
 
 - `sigrank-app` — SignalAF public reference platform
@@ -103,27 +114,25 @@ See:
 ## Product relationship
 
 ```text
-SigRank Standard
-OPEN MEASUREMENT SPECIFICATION
+SignalAF
+UMBRELLA BRAND
         │
         ↓
-@sigrank/cascade
-REFERENCE MATH IMPLEMENTATION
+MO§ES™
+GOVERNANCE + METHODOLOGY
         │
-        ├────────────────────┐
-        ↓                    ↓
-sigrank-mcp              sigrank-app
-INSTRUMENT               REFERENCE PLATFORM
-        │                    │
-        └─────────┬──────────┘
-                  ↓
-          SignalAF Reference Field
-                  ↓
-                 Board
+        ↓
+Upsilon
+COMMERCIAL MEASUREMENT ENGINE + PILOT
+        │
+        ├──────────────────────┐
+        ↓                      ↓
+sigrank/0.1-draft          SigRank
+COMPATIBILITY RECORD       PUBLIC LEADERBOARD + PROOF
 
 Distribution / extensions:
 - sigeconomy.com → read-only public discovery, comparison, SEO/AEO/GEO
-- mos2es.org → public enterprise commercial front face for pilots; controlled/private deployment can sit behind the offer; enterprise terminology remains intentionally distinct
+- mos2es.org → public commercial front face for Upsilon pilots; controlled/private deployment can sit behind the offer; enterprise terminology remains intentionally distinct
 - mos2es.com → current governance/research face; broader MO§ES umbrella/hub architecture is a separate ecosystem decision and is not defined by this standard
 ```
 
@@ -168,13 +177,14 @@ to calculate the core SigRank metrics.
 
 ## Start here
 
-1. `SPEC.md`
-2. `CANON_RECONCILIATION.md`
-3. `ARCHETYPE_STATUS.md`
-4. `RS05_STATUS.md`
-5. `reference/IMPLEMENTATION_MAP.md`
-6. `launch/TONIGHT_30_STEP_EXECUTION.md`
-7. `launch/TOMORROW_DISTRIBUTION_PLAN.md`
-8. `strategy/LAND_GRAB_FLYWHEEL.md`
-9. `integrations/`
-10. `REPO_EXTRACTION.md`
+1. `strategy/PHASE_1_BUILD_HANDOFF.md`
+2. `SPEC.md`
+3. `CANON_RECONCILIATION.md`
+4. `ARCHETYPE_STATUS.md`
+5. `RS05_STATUS.md`
+6. `reference/IMPLEMENTATION_MAP.md`
+7. `launch/TONIGHT_30_STEP_EXECUTION.md`
+8. `launch/TOMORROW_DISTRIBUTION_PLAN.md`
+9. `strategy/LAND_GRAB_FLYWHEEL.md`
+10. `integrations/`
+11. `REPO_EXTRACTION.md`

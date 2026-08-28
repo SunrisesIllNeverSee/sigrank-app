@@ -264,7 +264,7 @@ describe("Modern protocol (2026-07-28)", () => {
     expect(result.serverInfo ?? result.capabilities).toBeDefined();
   });
 
-  it("modern tools/list returns all 15 tools", async () => {
+  it("modern tools/list returns all 16 tools", async () => {
     const res = await POST(
       makeModernPostRequest(makeModernJsonRpc("tools/list", undefined, 51)),
     );
@@ -275,7 +275,7 @@ describe("Modern protocol (2026-07-28)", () => {
 
     const result = body.result as Record<string, unknown>;
     const tools = result.tools as Array<Record<string, unknown>>;
-    expect(tools.length).toBe(15);
+    expect(tools.length).toBe(16);
   });
 
   it("modern tools/call executes rank_paste", async () => {
@@ -349,7 +349,7 @@ describe("Modern protocol (2026-07-28)", () => {
 // ── Tools ───────────────────────────────────────────────────────────────────
 
 describe("Tools", () => {
-  it("tools/list returns all 15 tools with correct names", async () => {
+  it("tools/list returns all 16 tools with correct names", async () => {
     const res = await POST(
       makePostRequest(makeJsonRpc("tools/list", undefined, 2)),
     );
@@ -360,11 +360,12 @@ describe("Tools", () => {
 
     const result = body.result as Record<string, unknown>;
     const tools = result.tools as Array<Record<string, unknown>>;
-    expect(tools.length).toBe(15);
+    expect(tools.length).toBe(16);
 
     const names = tools.map((t) => t.name);
     const expected = [
       "rank_paste",
+      "get_sigrank_standard_record",
       "get_leaderboard",
       "get_operator",
       "simulate_change",
@@ -545,7 +546,7 @@ describe("Tools", () => {
 // ── Resources ───────────────────────────────────────────────────────────────
 
 describe("Resources", () => {
-  it("resources/list returns all 6 resources", async () => {
+  it("resources/list returns all 8 resources", async () => {
     const res = await POST(
       makePostRequest(makeJsonRpc("resources/list", undefined, 10)),
     );
@@ -556,9 +557,11 @@ describe("Resources", () => {
 
     const result = body.result as Record<string, unknown>;
     const resources = result.resources as Array<Record<string, unknown>>;
-    expect(resources.length).toBe(6);
+    expect(resources.length).toBe(8);
 
     const uris = resources.map((r) => r.uri);
+    expect(uris).toContain("sigrank://standard");
+    expect(uris).toContain("sigrank://standard/schema");
     expect(uris).toContain("sigrank://methodology");
     expect(uris).toContain("sigrank://metrics");
     expect(uris).toContain("sigrank://platforms");
@@ -582,6 +585,28 @@ describe("Resources", () => {
     expect(contents.length).toBeGreaterThan(0);
     expect(contents[0].uri).toBe("sigrank://methodology");
     expect(contents[0].text).toBeDefined();
+  });
+
+  it("resources/read resolves the canonical Standard schema", async () => {
+    const res = await POST(
+      makePostRequest(
+        makeJsonRpc("resources/read", { uri: "sigrank://standard/schema" }, 13),
+      ),
+    );
+
+    const body = await parseResponseBody(res);
+    expect(body.error).toBeUndefined();
+    const result = body.result as Record<string, unknown>;
+    const contents = result.contents as Array<Record<string, unknown>>;
+    const schema = JSON.parse(contents[0].text as string);
+    expect(schema.properties.spec.const).toBe("sigrank/0.1-draft");
+    expect(schema.properties.metrics.required).toEqual([
+      "yield",
+      "leverage",
+      "velocity",
+      "snr",
+      "dev10x",
+    ]);
   });
 
   it("resources/read resolves sigrank://formulas", async () => {

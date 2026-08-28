@@ -9,6 +9,8 @@
 
 import { NextResponse } from "next/server";
 import { SITE_ORIGIN } from "@/lib/seo";
+import { TOOLS } from "@/lib/mcp/tools";
+import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
 export const revalidate = 3600;
 
@@ -20,11 +22,11 @@ export async function GET() {
     supportedProtocolVersions: ["2026-07-28", "2025-11-25", "2025-06-18", "2025-03-26"],
     serverInfo: {
       name: "sigrank",
-      title: "SigRank SignalAF — AI Operator Benchmark",
+      title: "Upsilon — SignalAF Measurement Engine",
       version: "1.0.0",
     },
     description:
-      "SigRank SignalAF exposes AI-operator benchmark data and token-cascade calculations to MCP clients. Use it for operator ranking, comparison, and privacy-preserving telemetry analysis — not as a model-quality benchmark. Contribution Exchange tools are available at a separate MCP endpoint (see exchange-mcp.json).",
+      `Upsilon is SignalAF's commercial measurement engine and the reference implementation for ${SIGRANK_STANDARD_VERSION}. It exposes privacy-preserving operator records and calculations; SigRank is the public leaderboard and proof surface. Use the metrics for operator-layer measurement, not as cognition, model-quality, work-quality, productivity, or business-value claims.`,
     transports: [
       {
         type: "streamable-http",
@@ -40,23 +42,7 @@ export async function GET() {
       required: false,
       documentation: `${SITE_ORIGIN}/auth.md`,
     },
-    tools: [
-      "rank_paste",
-      "get_leaderboard",
-      "get_operator",
-      "simulate_change",
-      "diagnose_cascade",
-      "suggest_improvements",
-      "self_improve",
-      "rank_windows",
-      "benchmark_me",
-      "rank_if",
-      "operator_gap",
-      "field_anomaly",
-      "who_operates_like_me",
-      "compare_to_field",
-      "operator_signature",
-    ],
+    tools: TOOLS.map((tool) => tool.name),
     prompts: [
       "benchmark-my-operator",
       "how-do-i-reach-top-10",

@@ -12,8 +12,8 @@
  *   node --test __tests__/mcp/regression-fixtures.test.mjs
  *
  * Covers:
- *   - Tool catalog (15 tools, names, schemas)
- *   - Resource catalog (6 resources, URIs)
+ *   - Tool catalog (16 tools, names, schemas)
+ *   - Resource catalog (8 resources, URIs)
  *   - Prompt catalog (5 prompts, names)
  *   - Initialize response (server info, capabilities, protocol version)
  *   - Cascade math (rank_paste with MOSES seed values)
@@ -39,10 +39,11 @@ const SUPPORTED_VERSIONS = [
   "2025-03-26",
 ];
 
-// ─── Expected tool catalog (15 tools) ───────────────────────────────────────
+// ─── Expected tool catalog (16 tools) ───────────────────────────────────────
 
 const EXPECTED_TOOLS = [
   "rank_paste",
+  "get_sigrank_standard_record",
   "get_leaderboard",
   "get_operator",
   "simulate_change",
@@ -60,6 +61,8 @@ const EXPECTED_TOOLS = [
 ];
 
 const EXPECTED_RESOURCES = [
+  "sigrank://standard",
+  "sigrank://standard/schema",
   "sigrank://methodology",
   "sigrank://metrics",
   "sigrank://platforms",
@@ -95,8 +98,8 @@ const MOSES_EXPECTED = {
 
 // ─── Tool catalog tests ─────────────────────────────────────────────────────
 
-test("MCP tool catalog has exactly 15 tools", () => {
-  assert.equal(EXPECTED_TOOLS.length, 15);
+test("MCP tool catalog has exactly 16 tools", () => {
+  assert.equal(EXPECTED_TOOLS.length, 16);
 });
 
 test("MCP tool catalog names are stable", () => {
@@ -108,6 +111,7 @@ test("MCP tool catalog names are stable", () => {
 test("MCP tool catalog includes all expected tools", () => {
   const required = [
     "rank_paste",
+    "get_sigrank_standard_record",
     "get_leaderboard",
     "get_operator",
     "simulate_change",
@@ -148,8 +152,8 @@ test("MCP tool catalog does NOT include Exchange tools", () => {
 
 // ─── Resource catalog tests ─────────────────────────────────────────────────
 
-test("MCP resource catalog has exactly 6 resources", () => {
-  assert.equal(EXPECTED_RESOURCES.length, 6);
+test("MCP resource catalog has exactly 8 resources", () => {
+  assert.equal(EXPECTED_RESOURCES.length, 8);
 });
 
 test("MCP resource URIs are stable", () => {
@@ -289,7 +293,7 @@ test("JSON-RPC error codes: invalid params is -32602", () => {
 // ─── Tool annotation tests ──────────────────────────────────────────────────
 
 test("All SigRank MCP tools are read-only", () => {
-  // All 15 SigRank tools must have readOnlyHint: true
+  // All 16 SigRank tools must have readOnlyHint: true
   // This is a structural invariant — no mutation tools in the SigRank MCP
   const READ_ONLY_ANNOTATIONS = {
     readOnlyHint: true,

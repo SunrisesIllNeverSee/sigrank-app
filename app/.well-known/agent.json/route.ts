@@ -7,6 +7,12 @@
 
 import { NextResponse } from "next/server";
 import { SITE_ORIGIN, SITE_NAME } from "@/lib/seo";
+import { TOOLS } from "@/lib/mcp/tools";
+import {
+  SIGRANK_STANDARD_SCHEMA_URL,
+  SIGRANK_STANDARD_URL,
+  SIGRANK_STANDARD_VERSION,
+} from "@/lib/mcp/standard";
 
 export const revalidate = 3600;
 
@@ -15,17 +21,33 @@ export async function GET() {
     name: SITE_NAME,
     type: "leaderboard",
     description:
-      "SigRank SignalAF ranks AI operators by Yield (Υ) — token-cascade efficiency. Privacy-preserving: token counts only, never prompts.",
+      "SignalAF hosts Upsilon, the privacy-preserving measurement engine, and SigRank, its public AI operator leaderboard and proof surface.",
     url: SITE_ORIGIN,
     api: {
       v1: `${SITE_ORIGIN}/api/v1`,
       docs: `${SITE_ORIGIN}/mcp`,
     },
     mcp: {
-      endpoint: `${SITE_ORIGIN}/mcp`,
-      tools: 25,
+      endpoint: `${SITE_ORIGIN}/api/mcp`,
+      discovery: `${SITE_ORIGIN}/.well-known/mcp.json`,
+      tools: TOOLS.length,
     },
-    metrics: ["Yield", "SNR", "Leverage", "Velocity", "10xDEV", "Scale V", "Efficiency", "Cost per 1M", "Op Ratio"],
+    standard: {
+      version: SIGRANK_STANDARD_VERSION,
+      status: "proposed_open_standard",
+      url: SIGRANK_STANDARD_URL,
+      schema: SIGRANK_STANDARD_SCHEMA_URL,
+      record_tool: "get_sigrank_standard_record",
+      core_metrics: ["Yield", "Leverage", "Velocity", "SNR", "10xDEV"],
+    },
+    architecture: {
+      brand: "SignalAF",
+      governance: "MO§ES™",
+      product: "Upsilon",
+      leaderboard: "SigRank",
+      compatibility_wire_spec: SIGRANK_STANDARD_VERSION,
+    },
+    product_metrics: ["Scale V", "Efficiency", "Cost per 1M", "Op Ratio"],
     install: "npx sigrank",
     privacy: "Token counts only. Never prompts.",
     links: {
