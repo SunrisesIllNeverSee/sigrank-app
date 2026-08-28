@@ -7,40 +7,24 @@
  *
  * Interface bindings point to actual endpoints, not documentation pages:
  * - HTTP+JSON → /api/v1 (the REST API)
- * - MCP → Supabase Edge Function (streamable-http transport)
- *   The /mcp route is a documentation landing page, not an MCP endpoint.
+ * - MCP → /api/mcp (streamable-http transport)
+ *   The /mcp route remains the documentation landing page.
  */
 
 import { NextResponse } from "next/server";
 import { SITE_ORIGIN } from "@/lib/seo";
+import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
 export const revalidate = 3600;
 
 export async function GET() {
-  // Supabase Edge Function URL for the MCP streamable-http transport.
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const mcpEndpoint = supabaseUrl
-    ? `${supabaseUrl}/functions/v1/sigrank-mcp`
-    : null;
-
   const supportedInterfaces: Array<Record<string, unknown>> = [
     {
-      url: `${SITE_ORIGIN}/api/v1`,
-      protocolBinding: "HTTP+JSON",
-      protocolVersion: "0.3.0",
-    },
-  ];
-
-  // Only advertise the MCP binding when the Edge Function URL is
-  // configured. Without it, the only MCP transport is stdio (npx sigrank),
-  // which is not an HTTP endpoint and doesn't belong in supportedInterfaces.
-  if (mcpEndpoint) {
-    supportedInterfaces.push({
-      url: mcpEndpoint,
+      url: `${SITE_ORIGIN}/api/mcp`,
       protocolBinding: "MCP",
       protocolVersion: "2025-06-18",
-    });
-  }
+    },
+  ];
 
   const card = {
     name: "SigRank SignalAF — AI Operator Leaderboard",
@@ -71,7 +55,19 @@ export async function GET() {
       {
         id: "metrics",
         name: "Metric Definitions",
-        description: "Get definitions and formulas for all SigRank metrics",
+        description: "Get definitions and formulas for SigRank core and product metrics",
+      },
+      {
+        id: "standard-record",
+        name: "Portable SigRank Standard Record",
+        description:
+          `Create a ${SIGRANK_STANDARD_VERSION} record from I/O/W/R telemetry. The base record excludes Construction, Build Archetypes, and RS05.`,
+        inputSchema: {
+          input: "non-negative integer",
+          output: "non-negative integer",
+          cache_write: "non-negative integer or null",
+          cache_read: "non-negative integer or null",
+        },
       },
       {
         id: "hall-of-signal",

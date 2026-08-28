@@ -7,18 +7,34 @@
  */
 
 import { getLeaderboard } from "@/lib/board";
+import {
+  SIGRANK_STANDARD_IDENTITY,
+  SIGRANK_STANDARD_SCHEMA,
+} from "@/lib/mcp/standard";
 
 export const RESOURCES = [
   {
+    uri: "sigrank://standard",
+    name: "SigRank Standard Identity",
+    description: "Version, scope, canonical URLs, portable core, and explicit compatibility exclusions for the SigRank Standard",
+    mimeType: "application/json",
+  },
+  {
+    uri: "sigrank://standard/schema",
+    name: "SigRank Standard Record Schema",
+    description: "Canonical JSON Schema for a portable sigrank/0.1-draft operator record",
+    mimeType: "application/schema+json",
+  },
+  {
     uri: "sigrank://methodology",
     name: "Methodology",
-    description: "How SigRank measures AI operators — the cascade metric system, formulas, and class taxonomy",
+    description: "How SignalAF implements the SigRank portable core alongside optional reference and product layers",
     mimeType: "text/plain",
   },
   {
     uri: "sigrank://metrics",
     name: "Metric Definitions",
-    description: "Definitions of Yield (Υ), Leverage, Velocity, SNR, 10xDEV, Scale V, and class tiers",
+    description: "Definitions of the five-metric SigRank portable core and the boundary around optional SignalAF extensions",
     mimeType: "text/plain",
   },
   {
@@ -30,13 +46,13 @@ export const RESOURCES = [
   {
     uri: "sigrank://formulas",
     name: "Canonical Formulas",
-    description: "The frozen canonical formulas — Υ, Leverage, Velocity, SNR, 10xDEV, Scale V",
+    description: "The five SigRank portable-core formulas plus clearly separated SignalAF reference and product formulas",
     mimeType: "text/plain",
   },
   {
     uri: "sigrank://classes",
     name: "RS05 Class Taxonomy",
-    description: "The 24-stage class taxonomy from IGNITER III to ARCH+ I with token thresholds",
+    description: "Optional 24-stage RS05 SignalAF reference extension; not required for base SigRank compatibility",
     mimeType: "application/json",
   },
   {
@@ -54,6 +70,26 @@ export const RESOURCES = [
 export async function readResource(
   uri: string,
 ): Promise<{ contents: Array<{ uri: string; mimeType: string; text: string }> } | null> {
+  if (uri === "sigrank://standard") {
+    return {
+      contents: [{
+        uri,
+        mimeType: "application/json",
+        text: JSON.stringify(SIGRANK_STANDARD_IDENTITY, null, 2),
+      }],
+    };
+  }
+
+  if (uri === "sigrank://standard/schema") {
+    return {
+      contents: [{
+        uri,
+        mimeType: "application/schema+json",
+        text: JSON.stringify(SIGRANK_STANDARD_SCHEMA, null, 2),
+      }],
+    };
+  }
+
   if (uri === "sigrank://methodology") {
     return {
       contents: [{
@@ -61,28 +97,25 @@ export async function readResource(
         mimeType: "text/plain",
         text: `SigRank Methodology
 
-SigRank measures AI operator efficiency from privacy-preserving token telemetry.
-No prompts, no code, no content — only token counts.
+SigRank measures AI operator token-cascade relationships from privacy-preserving
+numeric telemetry. It evaluates operators, not models, and does not establish
+correctness, work quality, employee productivity, or business value.
 
-Core metric: Yield (Υ)
+SigRank v0.1 portable core — required for base compatibility:
   Υ = (cache_read × output) / input²
-
-Yield captures how efficiently an operator converts input tokens into output
-through context reuse. Higher Yield = more efficient operator.
-
-Supporting metrics:
   Leverage = cache_read / input
   Velocity = output / input
   SNR = output / (input + output)
-  10xDEV = log10(cache_read / input)
-  Scale V = log10(total_tokens)
+  10xDEV = log10(cache_read / input) under the reference null policy
 
-Class taxonomy (24 stages, RS05): IGNITER III → ARCH+ I
-Class is determined by total token volume. Rank is field position by Yield.
-Archetype is operating shape (leverage/velocity/SNR ratios).
+Optional SignalAF reference extensions — not required for base compatibility:
+  Scale V — a leaderboard scale dimension
+  RS05 — a 24-stage reference classification
+  Build Archetypes — a 10-type operating-shape classification
 
-SigRank evaluates AI operators, not models. The harness measures authority
-but cannot manufacture authority.`,
+Rank and the SignalAF Reference Field are product/context layers, not portable
+record requirements. Archetype = shape. Class = scale or qualification. Rank =
+field position. These concepts must remain separate.`,
       }],
     };
   }
@@ -94,8 +127,10 @@ but cannot manufacture authority.`,
         mimeType: "text/plain",
         text: `SigRank Metric Definitions
 
+Portable core — required for sigrank/0.1-draft base compatibility
+
 Yield (Υ): (cache_read × output) / input²
-  The canonical efficiency metric.
+  Compound token-flow relationship between context reuse and output relative to fresh input.
 
 Leverage: cache_read / input
   How many cache-read tokens per input token.
@@ -107,21 +142,19 @@ SNR: output / (input + output)
   What fraction of total flow is output.
 
 10xDEV: log10(cache_read / input)
-  Log-scale leverage. Requires all four pillars > 0.
+  Log-scale cascade summary under the reference null policy.
+
+Optional SignalAF reference extensions — not required for base compatibility
 
 Scale V: log10(total_tokens)
-  Total volume on a log scale. Used for class tier assignment.
+  A leaderboard scale dimension outside the portable core.
 
-Class Tier: 24-stage taxonomy from IGNITER III to ARCH+ I.
-  Determined by total token volume thresholds (RS05).
+RS05:
+  A 24-stage SignalAF reference classification outside the portable core.
 
-Archetype: Operating shape.
-  CONTEXTUAL: high leverage, low velocity
-  GENERATOR: low leverage, high velocity
-  BALANCED_ELITE: high leverage AND high velocity
-  READER: very low velocity
-  COMMITTER: high cache creation
-  STANDARD: moderate all-around`,
+Build Archetypes:
+  A separately versioned 10-type SignalAF operating-shape reference extension.
+  Legacy signature labels are not Build Archetypes.`,
       }],
     };
   }
@@ -144,24 +177,23 @@ Archetype: Operating shape.
       contents: [{
         uri,
         mimeType: "text/plain",
-        text: `Canonical SigRank Formulas (frozen)
+        text: `SigRank v0.1 Portable-Core Formulas
 
 Yield (Υ):        (cache_read × output) / input²
 Leverage:         cache_read / input
 Velocity:         output / input
 SNR:              output / (input + output)
 10xDEV:           log10(cache_read / input)
+
+Required portable telemetry: input, output, cache_write, cache_read.
+Unavailable cache telemetry remains null and must not be fabricated as zero.
+
+SignalAF reference/product formulas — excluded from base compatibility:
 Scale V:          log10(total_tokens)
 Construction:     cache_write / cache_read
 
-Canonical seed values:
-  input       = 1,251,211
-  output      = 11,296,121
-  cache_read  = 128,196,310
-  cache_write = 2,555,179,769
-  Υ           = 18,436.98
-
-These formulas are frozen. Do not modify without owner approval.`,
+Construction may support the optional Build Archetypes reference extension.
+It is not a sixth SigRank portable-core metric.`,
       }],
     };
   }
@@ -172,7 +204,10 @@ These formulas are frozen. Do not modify without owner approval.`,
         uri,
         mimeType: "application/json",
         text: JSON.stringify({
-          taxonomy: "RS05",
+          extension: "RS05",
+          status: "reference_extension",
+          required_for_base_compatibility: false,
+          concept_boundary: "Class = scale or qualification; Class is not Archetype or Rank.",
           stages: 24,
           thresholds: [
             { class: "ARCH+ I", totalMin: 7068201104627 },

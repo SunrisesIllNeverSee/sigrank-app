@@ -9,6 +9,8 @@
 
 import { NextResponse } from "next/server";
 import { SITE_ORIGIN } from "@/lib/seo";
+import { TOOLS } from "@/lib/mcp/tools";
+import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
 export const revalidate = 3600;
 
@@ -24,7 +26,7 @@ export async function GET() {
       version: "1.0.0",
     },
     description:
-      "SigRank SignalAF exposes AI-operator benchmark data and token-cascade calculations to MCP clients. Use it for operator ranking, comparison, and privacy-preserving telemetry analysis — not as a model-quality benchmark. Contribution Exchange tools are available at a separate MCP endpoint (see exchange-mcp.json).",
+      `SigRank SignalAF is the reference implementation for ${SIGRANK_STANDARD_VERSION} and exposes portable operator records, benchmark data, and token-cascade calculations. Use it for operator-layer measurement — not as a model-quality, work-quality, or productivity benchmark.`,
     transports: [
       {
         type: "streamable-http",
@@ -40,23 +42,7 @@ export async function GET() {
       required: false,
       documentation: `${SITE_ORIGIN}/auth.md`,
     },
-    tools: [
-      "rank_paste",
-      "get_leaderboard",
-      "get_operator",
-      "simulate_change",
-      "diagnose_cascade",
-      "suggest_improvements",
-      "self_improve",
-      "rank_windows",
-      "benchmark_me",
-      "rank_if",
-      "operator_gap",
-      "field_anomaly",
-      "who_operates_like_me",
-      "compare_to_field",
-      "operator_signature",
-    ],
+    tools: TOOLS.map((tool) => tool.name),
     prompts: [
       "benchmark-my-operator",
       "how-do-i-reach-top-10",

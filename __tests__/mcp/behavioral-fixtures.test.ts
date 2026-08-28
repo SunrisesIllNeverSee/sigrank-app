@@ -145,6 +145,62 @@ describe("rank_paste behavioral fixtures", () => {
   });
 });
 
+describe("get_sigrank_standard_record behavioral fixtures", () => {
+  it("returns the portable five-metric record for complete telemetry", async () => {
+    const result = await callTool(
+      "get_sigrank_standard_record",
+      { ...MOSES, timestamp: "2026-08-27T00:00:00.000Z" },
+      {} as never,
+    );
+    const data = JSON.parse(result.content[0].text as string);
+    expect(data.spec).toBe("sigrank/0.1-draft");
+    expect(data.telemetry).toEqual(MOSES);
+    expect(data.metrics).toEqual({
+      yield: 18436.98,
+      leverage: 2042.2,
+      velocity: 9.028,
+      snr: 0.9003,
+      dev10x: 3.31,
+    });
+    expect(data.metrics.construction).toBeUndefined();
+  });
+
+  it("preserves unavailable cache telemetry as null", async () => {
+    const result = await callTool(
+      "get_sigrank_standard_record",
+      { input: 100, output: 50, cache_write: null, cache_read: null },
+      {} as never,
+    );
+    const data = JSON.parse(result.content[0].text as string);
+    expect(data.telemetry.cache_write).toBeNull();
+    expect(data.telemetry.cache_read).toBeNull();
+    expect(data.metrics.yield).toBeNull();
+    expect(data.metrics.leverage).toBeNull();
+    expect(data.metrics.dev10x).toBeNull();
+    expect(data.metrics.velocity).toBe(0.5);
+    expect(data.metrics.snr).toBe(0.3333);
+  });
+
+  it("rejects fractional token counts", async () => {
+    const result = await callTool(
+      "get_sigrank_standard_record",
+      { input: 1.5, output: 1 },
+      {} as never,
+    );
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("non-negative integer token count");
+  });
+});
+
+describe("operator_signature compatibility", () => {
+  it("adds signature_label while preserving the legacy archetype alias", async () => {
+    const result = await callTool("operator_signature", MOSES, {} as never);
+    const data = JSON.parse(result.content[0].text as string);
+    expect(data.signature_label).toBeDefined();
+    expect(data.archetype).toBe(data.signature_label);
+  });
+});
+
 // ── simulate_change: modified cascade math ──────────────────────────────────
 
 describe("simulate_change behavioral fixtures", () => {
@@ -373,9 +429,9 @@ describe("Prompt behavioral fixtures", () => {
 // ── Tool catalog integrity ──────────────────────────────────────────────────
 
 describe("Tool catalog integrity", () => {
-  it("TOOLS array has exactly 15 tools", async () => {
+  it("TOOLS array has exactly 16 tools", async () => {
     const { TOOLS } = await import("@/lib/mcp/tools");
-    expect(TOOLS.length).toBe(15);
+    expect(TOOLS.length).toBe(16);
   });
 
   it("all tools have required fields", async () => {
@@ -390,9 +446,9 @@ describe("Tool catalog integrity", () => {
     }
   });
 
-  it("RESOURCES array has exactly 6 resources", async () => {
+  it("RESOURCES array has exactly 8 resources", async () => {
     const { RESOURCES } = await import("@/lib/mcp/resources");
-    expect(RESOURCES.length).toBe(6);
+    expect(RESOURCES.length).toBe(8);
   });
 
   it("PROMPTS array has exactly 5 prompts", async () => {
