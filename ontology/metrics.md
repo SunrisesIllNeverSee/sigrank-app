@@ -1,8 +1,8 @@
 ---
 type: Reference
 title: Metrics
-description: Public cascade metrics including Upsilon, SNR, Velocity, Leverage, and 10xDEV as deterministic diagnostics over raw pillars. Active.
-tags: [sigrank, metrics, upsilon, snr, velocity, leverage, 10xdev, reference]
+description: Public cascade metrics including Yield (Υ), SNR, Velocity, Leverage, and 10xDEV as deterministic diagnostics over raw pillars. Active.
+tags: [sigrank, metrics, yield, upsilon, snr, velocity, leverage, 10xdev, reference]
 timestamp: 2026-07-21
 ---
 
@@ -10,7 +10,7 @@ timestamp: 2026-07-21
 
 Public cascade metrics are deterministic diagnostics over raw pillars:
 
-- **Upsilon (Υ, yield):** `(cache_read × output) / input²`.
+- **Yield (Υ):** `(cache_read × output) / input²`.
 - **SNR:** `output / (input + output)` when the denominator is positive, otherwise `0`.
 - **Velocity:** `output / max(input, 1)`.
 - **Leverage:** `cache_read / max(input, 1)`.

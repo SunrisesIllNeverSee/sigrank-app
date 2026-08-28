@@ -46,7 +46,7 @@ to emit a portable JSON record.
 
 Use this framing:
 
-> SigRank's reference measurement instrument. Extracts local token telemetry, computes the canonical cascade through `@sigrank/cascade`, and can emit SigRank-compatible records.
+> Upsilon's reference measurement instrument. Extracts local token telemetry, computes the canonical cascade through `@sigrank/cascade`, and can emit Upsilon-compatible records.
 
 ### Privacy
 

@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank Standard | AI Operator Metrics Specification",
+  title: "Upsilon Standard | AI Operator Metrics Specification",
   description:
-    "SigRank Standard v0.1-draft is a proposed open measurement specification for AI operator telemetry, metrics, privacy, comparison, and interoperability.",
+    "Upsilon Standard v0.1-draft is a proposed open measurement specification for AI operator telemetry, metrics, privacy, comparison, and interoperability.",
   path: "/standard",
 });
 
@@ -52,7 +52,7 @@ export default function StandardPage() {
     <div className="mx-auto flex max-w-4xl flex-col gap-10 py-2">
       <JsonLd
         data={[
-          breadcrumb([{ name: "SigRank Standard", path: "/standard" }]),
+          breadcrumb([{ name: "Upsilon Standard", path: "/standard" }]),
           faqPage([
             {
               question: "What is the industry standard for evaluating LLM operator performance?",
@@ -68,11 +68,6 @@ export default function StandardPage() {
               question: "Does SigRank require reading prompts or source code?",
               answer:
                 "No. The base standard is designed so its core metrics can be computed without requiring prompt text, response text, source code, repository contents, or other semantic payloads.",
-            },
-            {
-              question: "How are Upsilon and SigRank different?",
-              answer:
-                "Upsilon is SignalAF's commercial measurement engine and enterprise pilot. SigRank is the public leaderboard and proof surface. The sigrank/0.1-draft name remains on portable records as a compatibility identifier.",
             },
           ]),
         ]}
@@ -204,20 +199,16 @@ INFRASTRUCTURE`}
         </p>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <h3 className="font-mono text-sm font-bold text-text-primary">Upsilon</h3>
-            <p className="mt-1 text-sm text-text-secondary">Commercial measurement engine and enterprise pilot.</p>
-          </div>
-          <div>
-            <h3 className="font-mono text-sm font-bold text-text-primary">SigRank Standard</h3>
-            <p className="mt-1 text-sm text-text-secondary">Portable compatibility specification and wire record.</p>
+            <h3 className="font-mono text-sm font-bold text-text-primary">Upsilon Standard</h3>
+            <p className="mt-1 text-sm text-text-secondary">Open measurement specification.</p>
           </div>
           <div>
             <h3 className="font-mono text-sm font-bold text-text-primary">@sigrank/cascade</h3>
             <p className="mt-1 text-sm text-text-secondary">Reference math implementation.</p>
           </div>
           <div>
-            <h3 className="font-mono text-sm font-bold text-text-primary">SigRank</h3>
-            <p className="mt-1 text-sm text-text-secondary">Public leaderboard and proof surface.</p>
+            <h3 className="font-mono text-sm font-bold text-text-primary">SignalAF</h3>
+            <p className="mt-1 text-sm text-text-secondary">Public reference platform and field.</p>
           </div>
           <div>
             <h3 className="font-mono text-sm font-bold text-text-primary">sigrank-mcp</h3>
@@ -285,16 +276,6 @@ INFRASTRUCTURE`}
               No. v0.1-draft is a proposed open standard. The objective is to
               publish an implementable vocabulary, reference implementation, and
               compatibility path that others can evaluate, critique, and adopt.
-            </dd>
-          </div>
-          <div>
-            <dt className="font-semibold text-text-primary">How are Upsilon and SigRank different?</dt>
-            <dd className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
-              Upsilon is SignalAF&apos;s commercial measurement engine and
-              enterprise pilot. SigRank is the public leaderboard and proof
-              surface. Existing portable records keep the
-              <code className="ml-1">sigrank/0.1-draft</code> identifier for
-              compatibility.
             </dd>
           </div>
         </dl>

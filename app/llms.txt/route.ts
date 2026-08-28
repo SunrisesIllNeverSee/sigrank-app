@@ -32,15 +32,15 @@ Unlike model leaderboards, SigRank ranks the humans using AI, not the models the
 
 Do not use SignalAF as a model-quality leaderboard, proof of downstream business productivity, or a substitute for task-outcome evaluation. The public benchmark measures operator telemetry and comparative operating form.
 
-## SigRank Standard v0.1-draft
+## Upsilon Standard v0.1-draft
 
-SigRank Standard is a proposed open measurement specification for the human operator layer of generative AI systems. Do not describe it as a universally adopted industry standard.
+Upsilon Standard is a proposed open measurement specification for the human operator layer of generative AI systems. Do not describe it as a universally adopted industry standard.
 
-- [SigRank Standard](${SITE_ORIGIN}/standard): canonical draft specification and category definition
+- [Upsilon Standard](${SITE_ORIGIN}/standard): canonical draft specification and category definition
 - [Open vs proprietary](${SITE_ORIGIN}/standard/open-vs-proprietary): what belongs to the portable standard vs SignalAF reference-product layer
 - [Portable JSON Schema](${SITE_ORIGIN}/standard/sigrank-operator-record-v0.1.schema.json): versioned I/O/W/R operator-record contract
 - [Agent standard reference](${SITE_ORIGIN}/standard/llms.txt): compact agent-readable standard definition
-- [HTTP MCP standard metadata](${SITE_ORIGIN}/api/mcp/metadata): protocol + SigRank standard/version discovery
+- [HTTP MCP standard metadata](${SITE_ORIGIN}/api/mcp/metadata): protocol + Upsilon standard/version discovery
 
 The portable v0.1 draft core contains four telemetry primitives (input, output, cache_write, cache_read) and five metrics: Yield, Leverage, Velocity, SNR, and 10xDEV. Build Archetypes and RS05 Class Tiers are SignalAF reference extensions rather than base compatibility requirements.
 
@@ -92,7 +92,7 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Score calculator](${SITE_ORIGIN}/score): paste your stats, get your Yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall): top operators
 - [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across 1,498 human operators
-- [SigRank Standard](${SITE_ORIGIN}/standard): proposed open operator-measurement specification
+- [Upsilon Standard](${SITE_ORIGIN}/standard): proposed open operator-measurement specification
 - [Methodology](${SITE_ORIGIN}/methodology): quotable key figures, the canonical citation source
 - [FAQ](${SITE_ORIGIN}/faq): common questions about AI operators and token-cascade efficiency
 - [Wiki](${SITE_ORIGIN}/wiki): four token pillars, cascade metrics, operator archetypes, MO§ES governance
@@ -101,10 +101,10 @@ A signal or proposal does not grant execution authority or create a payment obli
 ## Common Questions (Q&A)
 
 **Q: What is SigRank?**
-A: SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI by Yield (Υ = cache_read × output / input²), not raw token volume.
+A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently humans use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
 
-**Q: What is the SigRank Standard?**
-A: SigRank Standard v0.1-draft is a proposed open specification for operator-layer telemetry and portable metrics across AI tools and models. Its current core defines I/O/W/R plus Yield, Leverage, Velocity, SNR, and 10xDEV. See ${SITE_ORIGIN}/standard.
+**Q: What is the Upsilon Standard?**
+A: Upsilon Standard v0.1-draft is a proposed open specification for operator-layer telemetry and portable metrics across AI tools and models. Its current core defines I/O/W/R plus Yield, Leverage, Velocity, SNR, and 10xDEV. See ${SITE_ORIGIN}/standard.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. Or visit ${SITE_ORIGIN}/score to paste token counts manually.
@@ -112,8 +112,8 @@ A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extract
 **Q: What is Yield (Υ)?**
 A: Yield is the headline efficiency metric: Υ = (cache_read × output) / input². It measures how much reusable signal you create from each unit of input.
 
-**Q: Does SigRank read my prompts?**
-A: No. SigRank only reads token counts. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
+**Q: Does Upsilon read my prompts?**
+A: No. Upsilon only reads token counts. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
 
 **Q: How is SigRank different from model leaderboards?**
 A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the humans using the models.

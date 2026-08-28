@@ -14,12 +14,12 @@ The current mos2es.org repository explicitly describes itself as the public mark
 
 mos2es.org intentionally uses its **own professional and commercial terminology**.
 
-That terminology SHOULD NOT be mechanically replaced with the public SigRank Standard vocabulary.
+That terminology SHOULD NOT be mechanically replaced with the public Upsilon Standard vocabulary.
 
 The relationship is:
 
 ```text
-SigRank Standard
+Upsilon Standard
 canonical operator-measurement vocabulary
         ↓
 translation / evidence mapping
@@ -43,14 +43,14 @@ The current mos2es.org repository documents its own enterprise measurement langu
 - Log Leverage
 - Construction = `W / R`
 
-Those are **not the same definitions as the SigRank Standard core metrics** and MUST NOT be silently presented as if they were.
+Those are **not the same definitions as the Upsilon Standard core metrics** and MUST NOT be silently presented as if they were.
 
 This is not necessarily a defect. It is a product-boundary decision.
 
 The correct implementation is to maintain an explicit mapping between:
 
 1. source telemetry primitives;
-2. SigRank Standard metrics;
+2. Upsilon Standard metrics;
 3. MO§ES enterprise-derived metrics;
 4. enterprise outcome/context joins.
 
@@ -150,6 +150,6 @@ expanded enterprise engagement
 
 ## Standard relationship
 
-The SigRank Standard may provide a portable underlying measurement layer or external reference context.
+The Upsilon Standard may provide a portable underlying measurement layer or external reference context.
 
 MO§ES enterprise methodology is free to derive additional enterprise metrics and use different public terminology provided the lineage is explicit internally and the two systems are not falsely described as mathematically identical.
