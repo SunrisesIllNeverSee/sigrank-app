@@ -1,9 +1,17 @@
-# Phase 1 Build Handoff
+# Phase 1 Build Handoff — Superseded
 
-**Handoff date:** 2026-08-28  
-**Foundation status:** Phase 0 implemented, pushed, and verified  
-**Current compatibility record:** `sigrank/0.1-draft`  
-**Merge rule:** Do not merge, publish, or deploy without explicit owner approval.
+**Superseded:** 2026-08-28
+
+**Reason:** the original handoff moved directly from the Phase 0 technical bridge into implementation before the course, authority, repository ownership, and complete 90-day checklist were reconciled.
+
+Use these documents instead, in order:
+
+1. [`COURSE_OF_SHIP.md`](./COURSE_OF_SHIP.md)
+2. [`REPO_DOMAIN_OWNERSHIP_MAP.md`](./REPO_DOMAIN_OWNERSHIP_MAP.md)
+3. [`90_DAY_RECONCILED_ROADMAP.md`](./90_DAY_RECONCILED_ROADMAP.md)
+4. [`EXECUTION_HANDOFF.md`](./EXECUTION_HANDOFF.md)
+
+The historical content below is retained as implementation context. It is not the governing execution sequence. No merge, publication, or deployment is authorized by either version of this handoff.
 
 ## Objective
 
