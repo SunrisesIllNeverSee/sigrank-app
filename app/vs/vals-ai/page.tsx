@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs VALS AI",
+  title: "SigRank vs VALS AI — Operator vs Model Eval",
   description:
     "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not. SigRank is the evaluation platform for AI operators.",
   path: "/vs/vals-ai",
@@ -120,7 +120,7 @@ export default function VsValsAiPage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs VALS AI",
+            title: "SigRank vs VALS AI — Operator vs Model Eval",
             description:
               "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not.",
             path: "/vs/vals-ai",
@@ -154,7 +154,8 @@ export default function VsValsAiPage() {
           effectively humans drive AI tools - using privacy-preserving token
           telemetry to compute Yield, Leverage, Velocity, and workflow
           signatures. That is the <strong className="text-text-primary">operator
-          layer</strong>.
+          layer</strong>. Both are AI evaluation tools, but they evaluate
+          different things.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The distinction matters because in AI-assisted work, the model does
