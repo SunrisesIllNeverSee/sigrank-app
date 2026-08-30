@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs sessionwatcher \u2014 Session Watching vs Operator Ranking",
+  title: "SigRank vs sessionwatcher",
   description:
     "sessionwatcher monitors individual Claude Code sessions for token usage. SigRank scores and ranks operators globally. Watching one session is not ranking every operator.",
   path: "/vs/sessionwatcher",

@@ -16,7 +16,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs Other Tools — AI Operator Measurement Comparisons",
+  title: "SigRank vs Other Tools",
   description:
     "How SigRank compares to ccusage, VALS AI, LMSYS Arena, Cursor, Copilot, Braintrust, LangChain, and Langfuse. Operator evaluation vs system evaluation, time tracking, model leaderboards, and observability.",
   path: "/vs",

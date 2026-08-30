@@ -20,7 +20,7 @@ import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "The Tool Is the Person: Why Token Telemetry Measures AI Skill",
+  title: "The Tool Is the Person",
   description:
     "Every token the AI tool burns is a decision the person made. Measuring the tool IS measuring the person. Your token cascade is your skill signature.",
   path: "/blog/the-tool-is-the-person",

@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs ccstatusline \u2014 Status Widget vs Instrument Panel",
+  title: "SigRank vs ccstatusline",
   description:
     "ccstatusline shows a token count in your terminal status bar. SigRank turns that number into a ranked score. A status widget is not an instrument panel.",
   path: "/vs/ccstatusline",

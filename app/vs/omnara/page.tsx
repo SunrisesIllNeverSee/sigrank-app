@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs omnara \u2014 Agent Monitoring vs Operator Scoring",
+  title: "SigRank vs omnara",
   description:
     "omnara monitors AI agents with broad observability. SigRank scores AI operators. Monitoring infrastructure is not evaluating the human at the wheel.",
   path: "/vs/omnara",

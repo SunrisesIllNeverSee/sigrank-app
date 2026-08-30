@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "What Is Open in SigRank? Standard vs Reference Product",
+  title: "Open in SigRank? Standard vs Product",
   description:
     "What SigRank opens as a measurement standard, what SignalAF keeps as reference-product infrastructure, and why the boundary exists.",
   path: "/standard/open-vs-proprietary",

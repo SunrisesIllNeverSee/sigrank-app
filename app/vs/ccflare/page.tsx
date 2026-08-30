@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs ccflare \u2014 Consumption Charts vs Production Scores",
+  title: "SigRank vs ccflare",
   description:
     "ccflare visualizes Claude Code token consumption with pretty charts. SigRank scores production. Charts of what you spent is not a score for what you produced.",
   path: "/vs/ccflare",

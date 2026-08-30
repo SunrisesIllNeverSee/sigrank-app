@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs codeburn \u2014 Cost Tracking vs Efficiency Scoring",
+  title: "SigRank vs codeburn",
   description:
     "codeburn tracks AI coding cost across tools. SigRank scores efficiency. Cost tracking is accounting; efficiency scoring is evaluation. Cost is the input; yield is the output.",
   path: "/vs/codeburn",

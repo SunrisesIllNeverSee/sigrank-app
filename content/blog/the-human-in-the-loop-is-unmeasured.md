@@ -1,6 +1,6 @@
 ---
 type: article
-title: "The Human in the Loop Is Unmeasured: The Case for AI Operator Evaluation"
+title: "The Human in the Loop Is Unmeasured"
 description: Models are benchmarked constantly. Systems are safety-tested. But the humans driving the tools have no widely adopted public evaluation standard based on passive telemetry. SigRank is building one - from token cascades, not self-report.
 tags: [article, sigrank, operator-evaluation, measurement, token-cascade, yield, ai-operators, category-creation, human-model-context]
 timestamp: 2026-08-10T12:00:00Z

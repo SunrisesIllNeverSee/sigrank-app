@@ -17,7 +17,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Benchmarking \u2014 Beyond Model Leaderboards to Operator Benchmarks",
+  title: "AI Benchmarking — Beyond Model Leaderboards",
   description:
     "AI coding benchmark tools rank the model, not the operator. SigRank benchmarks the human driving the AI \u2014 cascade efficiency, not preference votes. The new AI benchmarking standard.",
   path: "/ai-benchmarking",
