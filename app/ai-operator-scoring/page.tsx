@@ -18,7 +18,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Operator Scoring",
+  title: "AI Operator Scoring — Ranking the Human Behind AI",
   description:
     "AI operator scoring ranks the human driving the AI, not the model. The coding efficiency score and operator ranking system that measures who is best at operating AI \u2014 not which AI is best.",
   path: "/ai-operator-scoring",
@@ -102,10 +102,10 @@ export default function AIOperatorScoringPage() {
         title="AI Operator Scoring — The New Performance Layer"
         subtitle={
           <>
-            Model evaluation measures the AI model itself. Operator evaluation
-            measures the{" "}
+            Model evaluation measures the AI model itself. Operator performance
+            scoring measures the{" "}
             <span className="text-gold">human using the AI</span>. SigRank is
-            an operator evaluation system — it ranks who drives their AI best,
+            an operator scoring system — it ranks who drives their AI best,
             built on real token telemetry, not preference votes.
           </>
         }
