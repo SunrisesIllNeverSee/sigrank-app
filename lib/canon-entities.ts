@@ -30,12 +30,17 @@ export const CANON_ENTITY_IDS = {
 
 // ─── JSON-LD @context for canon-backed blocks ───────────────────────────────
 //
-// Custom provenance fields (sourceSystem, canonBacked, authorityApprovalRef,
-// associatedWith) are NOT Schema.org properties. They must be mapped to the
-// moses namespace so the JSON-LD is semantically valid. This context is
-// shared with mos2es-site's .eleventy.js transform — same namespace, same
-// field mappings.
-export const CANON_LD_CONTEXT = {
+// Google's structured data validator only accepts @context as the string
+// "https://schema.org". Custom provenance fields (sourceSystem, canonBacked,
+// authorityApprovalRef, associatedWith) are NOT Schema.org properties and
+// cause Google to flag the structured data as invalid. They are kept in the
+// canon entity objects for internal use but NOT emitted in Google-facing
+// JSON-LD.
+export const CANON_LD_CONTEXT = "https://schema.org" as const;
+
+// Extended context with the moses namespace — used only by separate
+// provenance JSON-LD blocks that are not intended for Google rich results.
+export const CANON_PROVENANCE_CONTEXT = {
   "@vocab": "https://schema.org/",
   moses: "https://mos2es.com/ontology/0.1/",
   sourceSystem: "moses:sourceSystem",
