@@ -54,7 +54,7 @@ export default function CascadeComparatorPage() {
             description:
               "Compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, compression ratio, cache hit rate, and leverage for each, with the winning cascade flagged per metric.",
             applicationCategory: "CalculatorApplication",
-            operatingSystem: "Any (web browser)",
+            operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Side-by-side yield comparison",

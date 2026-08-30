@@ -59,7 +59,7 @@ export default function YieldCalculatorPage() {
             description:
               "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield token-cascade efficiency score, compression ratio, cache hit rate, and yield interpretation.",
             applicationCategory: "CalculatorApplication",
-            operatingSystem: "Any (web browser)",
+            operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Υ Yield calculation",

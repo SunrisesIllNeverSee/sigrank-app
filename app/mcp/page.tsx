@@ -218,12 +218,11 @@ export default function MCPPage() {
     "@type": "SoftwareApplication",
     name: "SigRank MCP Server",
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "Cross-platform (Node.js)",
+    operatingSystem: "Cross-platform",
     description:
       "MCP server giving AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable SigRank Standard records. The yield cascade metric and live leaderboard are also available as MCP tools.",
     url: "https://signalaf.com/mcp",
     downloadUrl: "https://www.npmjs.com/package/sigrank",
-    installUrl: "npx sigrank",
     author: {
       "@type": "Organization",
       name: "SigRank",
