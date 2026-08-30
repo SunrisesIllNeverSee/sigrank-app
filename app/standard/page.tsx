@@ -87,6 +87,18 @@ export default function StandardPage() {
 
       <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
         <p className="font-mono text-xs uppercase tracking-wider text-gold">
+          Product boundary
+        </p>
+        <h2 className="mt-2 font-mono text-xl font-bold text-text-primary">
+          Upsilon, SigRank, and the wire protocol
+        </h2>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+          Upsilon is SignalAF's commercial measurement engine and the reference implementation for sigrank/0.1-draft. SigRank is the public leaderboard and proof surface for eligible observations. The wire protocol identifier remains <code className="font-mono text-gold">sigrank/0.1-draft</code> for all existing records and consumers.
+        </p>
+      </section>
+
+      <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
+        <p className="font-mono text-xs uppercase tracking-wider text-gold">
           Category definition
         </p>
         <h2 className="mt-2 font-mono text-xl font-bold text-text-primary">
