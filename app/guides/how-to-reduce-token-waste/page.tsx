@@ -12,7 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Reduce Token Waste in AI Coding \u2014 Practical Guide",
+  title: "How to Reduce Token Waste in AI Coding — Guide",
   description:
     "A practical guide to reducing AI token waste. Identify common waste sources, apply concrete fixes, and measure your improvement with yield. Stop burning tokens and start compounding.",
   path: "/guides/how-to-reduce-token-waste",

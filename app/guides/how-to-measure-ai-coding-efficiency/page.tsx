@@ -15,7 +15,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Measure AI Coding Efficiency \u2014 Step-by-Step Guide",
+  title: "How to Measure AI Coding Efficiency — Guide",
   description:
     "A step-by-step guide to measuring AI coding efficiency with the four token pillars and \u03A5 Yield. Learn why time-based metrics fail, how to compute yield, and track AI coding metrics.",
   path: "/guides/how-to-measure-ai-coding-efficiency",

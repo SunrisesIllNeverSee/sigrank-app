@@ -395,7 +395,7 @@ export default async function HomePage() {
           Methodology & data →
         </Link>
         <Link
-          href="/research/q1-2026"
+          href="/research"
           className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
         >
           Q1 2026 report →
