@@ -237,14 +237,15 @@ test("mcp-tools.ts does not import or call Commitment state transition functions
 
 // ─── Agent Card tests ────────────────────────────────────────────────────────
 
-test("Agent Card includes contribution-exchange skill", async () => {
+test("Agent Card includes contribution-exchange as an optional extension (not a primary skill)", async () => {
   const card = await source("app/.well-known/agent-card.json/route.ts");
-  assert.match(card, /id: "contribution-exchange"/);
-  assert.match(card, /name: "Contribution Exchange"/);
-  assert.match(card, /tags:\s*\[/);
-  assert.match(card, /"contributions"/);
-  assert.match(card, /"exchange"/);
-  assert.match(card, /"signals"/);
+  // Exchange is an optional extension, not a primary skill — the boundary
+  // test (exchange-boundary.test.mjs) enforces that id: "contribution-exchange"
+  // does NOT appear in the skills array. Here we verify the extension exists.
+  assert.match(card, /uri: "https:\/\/signalaf\.com\/spec\/contribution-exchange"/);
+  assert.match(card, /Optional SignalAF economic-interaction capability/);
+  assert.match(card, /required: false/);
+  assert.match(card, /activation: "explicit_exchange_endpoint_only"/);
 });
 
 test("Agent Card includes contribution-exchange extension with domain-specific URLs", async () => {
@@ -372,9 +373,13 @@ test("contributionExchangeService function exists and returns valid JSON-LD", as
   assert.match(jsonld, /signal/i);
 });
 
-test("layout.tsx renders contributionExchangeService JSON-LD", async () => {
-  const layout = await source("app/layout.tsx");
-  assert.match(layout, /contributionExchangeService/);
+test("exchange layout renders contributionExchangeService JSON-LD (scoped to /exchange routes)", async () => {
+  const exchangeLayout = await source("app/exchange/layout.tsx");
+  assert.match(exchangeLayout, /contributionExchangeService/);
+  // Root layout must NOT emit Exchange structured data — the boundary test
+  // (exchange-boundary.test.mjs) enforces this scoping.
+  const rootLayout = await source("app/layout.tsx");
+  assert.doesNotMatch(rootLayout, /contributionExchangeService/);
 });
 
 // ─── Sitemap tests ───────────────────────────────────────────────────────────
