@@ -18,7 +18,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Operator Scoring \u2014 Ranking the Human Behind the AI",
+  title: "AI Operator Scoring",
   description:
     "AI operator scoring ranks the human driving the AI, not the model. The coding efficiency score and operator ranking system that measures who is best at operating AI \u2014 not which AI is best.",
   path: "/ai-operator-scoring",

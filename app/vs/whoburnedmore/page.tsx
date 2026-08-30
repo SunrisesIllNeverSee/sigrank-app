@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs whoburnedmore \u2014 Most Burned vs Best Yield",
+  title: "SigRank vs whoburnedmore",
   description:
     "whoburnedmore celebrates the biggest token burners. SigRank celebrates the most efficient operators. Burning more tokens is not a skill — compounding them is.",
   path: "/vs/whoburnedmore",

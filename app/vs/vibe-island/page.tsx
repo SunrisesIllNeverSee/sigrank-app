@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs vibe-island \u2014 Vibe Community vs Operator Ranking",
+  title: "SigRank vs vibe-island",
   description:
     "vibe-island is a vibe coding community. SigRank is an operator ranking system. Vibing is not operating. Community is not competition.",
   path: "/vs/vibe-island",

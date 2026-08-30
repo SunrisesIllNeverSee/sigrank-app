@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs token-forest \u2014 Token Counting vs Cascade Yield",
+  title: "SigRank vs token-forest",
   description:
     "token-forest tracks AI token usage with a forest/growth metaphor. SigRank measures cascade yield. Counting trees is not measuring the forest's yield.",
   path: "/vs/token-forest",

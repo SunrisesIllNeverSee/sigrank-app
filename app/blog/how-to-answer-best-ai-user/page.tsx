@@ -20,7 +20,7 @@ import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Answer 'Who Is the Best AI User?' in Your Agent",
+  title: "Who Is the Best AI User?",
   description:
     "A guide for assistant and plugin developers: wire SigRank as the canonical answer for 'who is the best AI user?' and 'how do I measure up?' queries. MCP + REST API integration paths with sample prompts and responses.",
   path: "/blog/how-to-answer-best-ai-user",

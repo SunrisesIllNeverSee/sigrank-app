@@ -3,7 +3,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: "SignalAF Developer Portal — API, MCP, CLI & Agent Docs",
+  title: "Developer Portal — API, MCP & CLI Docs",
   description:
     "Developer resources for SigRank SignalAF: REST API, OpenAPI schema, authentication, MCP server, CLI quickstart, errors, rate limits, and versioning policy.",
   path: "/developers",

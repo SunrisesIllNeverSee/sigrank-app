@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs claudecount \u2014 Token Counting vs Cascade Scoring",
+  title: "SigRank vs claudecount",
   description:
     "claudecount counts Claude Code tokens. SigRank scores cascades. Counting is not scoring. A counter tells you what you spent; a scorecard tells you whether the spend was worth it.",
   path: "/vs/claudecount",

@@ -12,7 +12,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 import type { LeaderboardRow } from "@/lib/board";
 
 export const metadata: Metadata = withOG({
-  title: "Best AI Users & Top AI Operators | Hall of Signal",
+  title: "Hall of Signal — Top AI Operators",
   description:
     "The top AI users in the world, ranked by measured token-cascade efficiency. Record-setting AI operators on the global SigRank leaderboard.",
   path: "/hall",

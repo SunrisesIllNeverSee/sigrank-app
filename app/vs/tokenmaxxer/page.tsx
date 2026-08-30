@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs tokenmaxxer \u2014 Tokenmaxxing vs Token Efficiency",
+  title: "SigRank vs tokenmaxxer",
   description:
     "tokenmaxxer gamifies token burning with streaks and badges. SigRank measures token efficiency. Maxxing tokens is the opposite of efficient operating.",
   path: "/vs/tokenmaxxer",

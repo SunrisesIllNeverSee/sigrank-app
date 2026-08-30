@@ -3,7 +3,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: "Pricing — Free During Build Stage · SigRank SignalAF",
+  title: "Pricing — Free During Build Stage",
   description:
     "SignalAF is free during the build stage. Early users who sign up now are grandfathered into tiered perks based on their signup number. Public leaderboard, REST API, MCP server, CLI, and score calculator are all free.",
   path: "/pricing",

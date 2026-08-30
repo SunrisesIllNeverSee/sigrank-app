@@ -18,7 +18,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs Sourcegraph Cody — Cross-Tool Token Metrics",
+  title: "SigRank vs Sourcegraph Cody",
   description:
     "Sourcegraph Cody is a code-aware AI assistant. SigRank is platform-neutral \u2014 works with Cody, Claude Code, Copilot, Cursor, and 15+ tools.",
   path: "/vs/sourcegraph-cody",
@@ -115,7 +115,7 @@ export default function VsSourcegraphCodyPage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs Sourcegraph Cody — Cross-Tool Token Metrics",
+            title: "SigRank vs Sourcegraph Cody",
             description: "Sourcegraph Cody is a code-aware AI assistant. SigRank is platform-neutral — works with Cody, Claude Code, Copilot, Cursor, and 15+ tools.",
             path: "/vs/sourcegraph-cody",
           }),

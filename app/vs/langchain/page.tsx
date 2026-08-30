@@ -117,7 +117,7 @@ export default function VsLangChainPage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs LangChain — Framework vs Operator Measurement",
+            title: "SigRank vs LangChain",
             description: "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the humans driving AI tools. Different layers entirely — framework vs operator measurement.",
             path: "/vs/langchain",
           }),

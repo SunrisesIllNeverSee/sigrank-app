@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs lineman \u2014 Spend Tracking vs Yield Scoring",
+  title: "SigRank vs lineman",
   description:
     "lineman tracks Claude Code spend. SigRank scores yield. Spend tracking is accounting; yield scoring is evaluation. Cost is the input; yield is the output.",
   path: "/vs/lineman",

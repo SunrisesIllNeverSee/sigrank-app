@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs VALS AI - Operator Evaluation vs System Evaluation",
+  title: "SigRank vs VALS AI",
   description:
     "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not. SigRank is the evaluation platform for AI operators.",
   path: "/vs/vals-ai",
@@ -120,7 +120,7 @@ export default function VsValsAiPage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs VALS AI - Operator Evaluation vs System Evaluation",
+            title: "SigRank vs VALS AI",
             description:
               "VALS evaluates AI systems. SigRank evaluates AI operators and their workflows. Models are benchmarked constantly - the people operating them are not.",
             path: "/vs/vals-ai",
