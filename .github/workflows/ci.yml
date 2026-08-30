@@ -130,6 +130,7 @@ jobs:
           repository: SunrisesIllNeverSee/sigrank-standard
           path: _sigrank-standard
           ref: ${{ vars.SIGRANK_STANDARD_REF || '224505a' }}
+          fetch-depth: 0
 
       - name: Standalone Standard conformance gate
         env:
