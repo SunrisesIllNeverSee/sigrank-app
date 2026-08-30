@@ -29,7 +29,7 @@ import EightyPercentBand from "@/components/field/EightyPercentBand";
 
 export const metadata: Metadata = withOG({
   title:
-    "AI Operator Field Analysis — The True Distribution of Token Efficiency",
+    "AI Operator Field Analysis",
   description:
     "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
   path: "/field",

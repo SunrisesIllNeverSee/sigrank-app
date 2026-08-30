@@ -13,7 +13,7 @@ import { faqPage } from "@/lib/jsonld";
  */
 
 export const metadata: Metadata = withOG({
-  title: "MCP Server — 16 remote tools + 25 local tools for AI agents",
+  title: "MCP Server — Tools for AI Agents",
   description:
     "SigRank MCP server gives AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable SigRank Standard records. Works with Claude, Cursor, Cline, Windsurf, Cloudflare Playground, and any MCP-compatible client.",
   path: "/mcp",

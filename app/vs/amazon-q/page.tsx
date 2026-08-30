@@ -18,7 +18,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs Amazon Q Developer — Cross-Tool Token Metrics",
+  title: "SigRank vs Amazon Q Developer",
   description:
     "Amazon Q Developer is AWS's AI coding assistant. SigRank is platform-neutral \u2014 works with Amazon Q, Claude Code, Copilot, Cursor, and 15+ tools.",
   path: "/vs/amazon-q",
@@ -119,7 +119,7 @@ export default function VsAmazonQPage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs Amazon Q Developer — Cross-Tool Token Metrics",
+            title: "SigRank vs Amazon Q Developer",
             description: "Amazon Q Developer is AWS's AI coding assistant. SigRank is platform-neutral — works with Amazon Q, Claude Code, Copilot, Cursor, and 15+ tools.",
             path: "/vs/amazon-q",
           }),

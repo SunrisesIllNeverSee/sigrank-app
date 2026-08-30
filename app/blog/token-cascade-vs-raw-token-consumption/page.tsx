@@ -21,7 +21,7 @@ import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Token Yield vs Token Count: Why Volume Lies About AI Skill",
+  title: "Token Yield vs Token Count",
   description:
     "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
   path: "/blog/token-cascade-vs-raw-token-consumption",

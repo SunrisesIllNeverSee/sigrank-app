@@ -3,7 +3,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: "SignalAF Developer Portal — API, MCP, CLI & Agent Docs",
+  title: "Developer Portal — API, MCP & CLI Docs",
   description:
     "Developer resources for SigRank SignalAF: REST API, OpenAPI schema, authentication, MCP server, CLI quickstart, errors, rate limits, and versioning policy.",
   path: "/developers",
@@ -25,7 +25,7 @@ export default function DevelopersPage() {
         SignalAF developers
       </p>
       <h1 className="mt-3 font-mono text-3xl font-bold text-text-primary sm:text-4xl">
-        API, MCP, CLI and agent integration
+        SignalAF Developer Portal
       </h1>
       <p className="mt-4 max-w-3xl font-sans text-base leading-relaxed text-text-secondary">
         SigRank SignalAF exposes public operator-benchmark data through a versioned

@@ -19,7 +19,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Token Cascade — The Flow of Tokens Through AI Coding Sessions",
+  title: "Token Cascade — Flow Through AI Sessions",
   description:
     "A token cascade is the flow of tokens through an AI coding session: input, output, cache-read, cache-write. Cascade architecture — not raw volume — determines AI coding efficiency.",
   path: "/token-cascade",
