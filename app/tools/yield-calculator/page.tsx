@@ -53,14 +53,13 @@ export default function YieldCalculatorPage() {
           faqPage(FAQS),
           {
             "@context": "https://schema.org",
-            "@type": "WebApplication",
+            "@type": "SoftwareApplication",
             name: "SigRank Yield (Υ) Calculator",
             url: "https://signalaf.com/tools/yield-calculator",
             description:
               "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield token-cascade efficiency score, compression ratio, cache hit rate, and yield interpretation.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Any (web browser)",
-            browserRequirements: "Requires JavaScript",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Υ Yield calculation",
