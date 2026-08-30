@@ -286,6 +286,21 @@ const STATIC_ROUTES: {
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
   { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly" },
 
+  // AI evaluation topic pages — from content brief (2026-09-15)
+  { path: "/ai-evaluation", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/ai-evaluation-tools", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/best-ai-evaluation-tools-for-production", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/ai-evaluation-frameworks", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/ai-agent-evaluation", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/ai-evaluator", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/ai-evaluation-platform", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/evaluating-ai", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/ai-evaluation-news", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/ai-compliance-standards", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/ai-model-evaluation", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/confirmation-hacking-ai-evaluation", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/ai-model-safety-evaluation-benchmark-continuous-testing", priority: 0.7, changeFrequency: "monthly" },
+
   // Blog pages — content marketing
   {
     path: "/blog/best-ai-coding-tools-2026",

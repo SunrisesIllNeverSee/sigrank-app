@@ -124,6 +124,19 @@ A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the 
 - [All Tools](${SITE_ORIGIN}/tools): interactive calculators and comparators
 - [Wiki concepts](${SITE_ORIGIN}/wiki): verification, signal drift, four degrees, local agent, methodology
 - [Topic hubs](${SITE_ORIGIN}/ai-benchmarking): AI benchmarking, coding metrics, operator scoring, cascade analysis, token telemetry
+- [AI Evaluation](${SITE_ORIGIN}/ai-evaluation): what AI evaluation means — the four layers (model, output, safety, operator) and where SigRank fits
+- [AI Evaluation Tools](${SITE_ORIGIN}/ai-evaluation-tools): the complete tools landscape across all four layers
+- [Best AI Evaluation Tools for Production](${SITE_ORIGIN}/best-ai-evaluation-tools-for-production): the production evaluation stack
+- [AI Evaluation Frameworks](${SITE_ORIGIN}/ai-evaluation-frameworks): NIST AI RMF, OpenAI Evals, DeepEval, Braintrust, and SigRank
+- [AI Agent Evaluation](${SITE_ORIGIN}/ai-agent-evaluation): evaluating AI agents and the humans who direct them
+- [AI Evaluator](${SITE_ORIGIN}/ai-evaluator): what an AI evaluator is and what SigRank does differently
+- [AI Evaluation Platform](${SITE_ORIGIN}/ai-evaluation-platform): SigRank as an evaluation platform for operators
+- [Evaluating AI](${SITE_ORIGIN}/evaluating-ai): the operator layer is the missing piece
+- [AI Evaluation News](${SITE_ORIGIN}/ai-evaluation-news): trends and developments in AI evaluation for 2026
+- [AI Compliance Standards](${SITE_ORIGIN}/ai-compliance-standards): NIST AI RMF, EU AI Act, and governed operator evaluation
+- [AI Model Evaluation](${SITE_ORIGIN}/ai-model-evaluation): model evaluation vs operator evaluation
+- [Confirmation Hacking](${SITE_ORIGIN}/confirmation-hacking-ai-evaluation): when evaluation confirms what you already believe — and how content-free telemetry avoids it
+- [AI Model Safety Evaluation](${SITE_ORIGIN}/ai-model-safety-evaluation-benchmark-continuous-testing): safety benchmarks and continuous testing, extended to operators
 
 ## Comparisons & Blog
 - [All Comparisons](${SITE_ORIGIN}/vs): comparisons with model, coding, observability, and AI developer tools
