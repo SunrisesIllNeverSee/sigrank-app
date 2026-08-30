@@ -33,9 +33,6 @@ export function personAuthor() {
     name: dericMcHenry.name,
     sameAs: dericMcHenry.sameAs,
     affiliation: { "@id": dericMcHenry.affiliation },
-    sourceSystem: dericMcHenry.sourceSystem,
-    canonBacked: dericMcHenry.canonBacked,
-    authorityApprovalRef: dericMcHenry.authorityApprovalRef,
     url: `${SITE_ORIGIN}/about`,
   };
 }
@@ -117,10 +114,6 @@ export function organization() {
       "https://signomy.xyz",
       "https://mos2es.com",
     ],
-    sourceSystem: elloCelloLLC.sourceSystem,
-    canonBacked: elloCelloLLC.canonBacked,
-    authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
-    associatedWith: { "@id": elloCelloLLC.associatedWith },
   };
 }
 
@@ -164,11 +157,7 @@ export function product() {
       "token efficiency benchmark",
     ],
     isBasedOn: { "@id": sigrankCanon.isBasedOn },
-    codeRepository: sigrankCanon.codeRepository,
     publisher: { "@id": ORG_ID },
-    sourceSystem: sigrankCanon.sourceSystem,
-    canonBacked: sigrankCanon.canonBacked,
-    authorityApprovalRef: sigrankCanon.authorityApprovalRef,
     about: [
       { "@id": sigrankCanon.canonical_entity_id },
       { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
@@ -964,7 +953,7 @@ export function scoreCalculator() {
 export function cliTool() {
   return {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+    "@type": ["SoftwareApplication", "SoftwareSourceCode"],
     name: "sigrank",
     alternateName: "SigRank CLI",
     description:
