@@ -16,7 +16,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Leverage Score \u2014 Cached Context Amplification in AI Coding",
+  title: "Leverage Score — Cached Context Amplification",
   description:
     "Leverage score = cache_read / input \u2014 how much cached context amplifies your fresh input. Learn what token leverage means, how to increase your leverage score, and why it drives yield.",
   path: "/metrics/leverage",

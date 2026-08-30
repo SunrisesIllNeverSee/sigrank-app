@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Upsilon Standard | AI Operator Metrics Specification",
+  title: "Upsilon Standard | AI Operator Metrics Spec",
   description:
     "Upsilon Standard v0.1-draft is a proposed open measurement specification for AI operator telemetry, metrics, privacy, comparison, and interoperability.",
   path: "/standard",
