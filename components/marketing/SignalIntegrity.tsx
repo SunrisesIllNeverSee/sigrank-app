@@ -626,8 +626,8 @@ npx sigrank
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://smithery.ai/badge/burnmydays/sigrank-mcp"
-            alt="Smithery quality score"
+            src="https://img.shields.io/badge/MCP-Smithery-blue?style=flat-square"
+            alt="Smithery MCP server"
             width={120}
             height={20}
           />
