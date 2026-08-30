@@ -226,7 +226,7 @@ export default async function ShareMcpPage({
     "@type": "SoftwareApplication",
     name: card.ok ? card.toolTitle : "SigRank MCP Share",
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "Cross-platform (Node.js)",
+    operatingSystem: "Cross-platform",
     url: `${SITE_ORIGIN}/share/mcp`,
     author: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
