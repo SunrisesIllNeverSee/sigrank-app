@@ -1,6 +1,6 @@
 /**
  * app/blog/best-ai-coding-efficiency-tools-for-solo-developers/page.tsx —
- * "Best AI Coding Efficiency Tools for Solo Developers (2026)".
+ * "Best AI Coding Tools for Solo Devs (2026)".
  *
  * Niche persona post targeting "best ai coding efficiency tools for solo
  * developers". Reviews 4 tools for individual AI coding efficiency, with

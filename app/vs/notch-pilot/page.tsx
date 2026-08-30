@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs notch-pilot \u2014 The Copilot vs The Pilot Score",
+  title: "SigRank vs notch-pilot",
   description:
     "notch-pilot is an AI coding copilot. SigRank scores the pilot, not the plane. The assistant isn't the operator; the human at the wheel is what gets measured.",
   path: "/vs/notch-pilot",

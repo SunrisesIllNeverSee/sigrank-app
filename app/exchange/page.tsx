@@ -3,7 +3,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
-  title: "Contribution Exchange — Give your website an economic agent interface",
+  title: "Contribution Exchange",
   description:
     "Let agents preserve value they discover while browsing by negotiating directly with your domain agent. Governed commitments, authorization, verification and settlement.",
   path: "/exchange",

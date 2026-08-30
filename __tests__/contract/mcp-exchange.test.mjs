@@ -404,9 +404,9 @@ test("sitemap includes /agents.md route", async () => {
   assert.match(sitemap, /path: "\/agents\.md"/);
 });
 
-test("sitemap includes /exchange.schema.json route", async () => {
+test("sitemap does NOT include /exchange.schema.json (JSON file, not a page)", async () => {
   const sitemap = await source("app/sitemap.ts");
-  assert.match(sitemap, /path: "\/exchange\.schema\.json"/);
+  assert.doesNotMatch(sitemap, /path: "\/exchange\.schema\.json"/);
 });
 
 test("sitemap does NOT include private/admin routes", async () => {

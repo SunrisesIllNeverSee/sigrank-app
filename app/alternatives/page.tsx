@@ -16,7 +16,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Alternatives — Best AI Coding, Benchmarking, and Token Tracking Tools",
+  title: "Alternatives — Best AI Coding Tools",
   description:
     "Ranked alternatives for AI coding metrics, ccusage replacements, AI benchmarking tools, and token tracking tools. Compared on scoring, leaderboards, multi-platform support, and MCP integration.",
   path: "/alternatives",

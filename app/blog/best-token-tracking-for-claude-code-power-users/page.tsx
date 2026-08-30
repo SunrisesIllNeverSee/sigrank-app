@@ -1,6 +1,6 @@
 /**
  * app/blog/best-token-tracking-for-claude-code-power-users/page.tsx —
- * "Best Token Tracking for Claude Code Power Users (2026)".
+ * "Token Tracking for Claude Code Power Users".
  *
  * Niche persona post targeting "best token tracking for claude code power
  * users". Reviews 4 tools for Claude Code power-user token tracking, with

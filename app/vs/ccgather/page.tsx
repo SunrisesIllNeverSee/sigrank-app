@@ -16,7 +16,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs ccgather \u2014 Claude Code Leaderboard vs Cross-Platform Ranking",
+  title: "SigRank vs ccgather",
   description:
     "ccgather ranks Claude Code users by usage stats. SigRank ranks operators by cascade yield across 15+ platforms. Claude Code only is not the whole field.",
   path: "/vs/ccgather",

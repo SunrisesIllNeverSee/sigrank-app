@@ -1,6 +1,6 @@
 /**
  * app/blog/best-ai-coding-metrics-for-engineering-managers/page.tsx —
- * "Best AI Coding Metrics for Engineering Managers (2026)".
+ * "AI Coding Metrics for Eng Managers (2026)".
  *
  * Niche persona post targeting "best ai coding metrics for engineering
  * managers". Reviews 4 tools for team-level AI coding measurement, with SigRank

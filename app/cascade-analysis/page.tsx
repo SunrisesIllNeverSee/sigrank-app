@@ -18,7 +18,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Cascade Analysis \u2014 Understanding Token Flow in AI Coding",
+  title: "Cascade Analysis — Token Flow in AI Coding",
   description:
     "Cascade analysis studies token flow through AI coding sessions. What a cascade is, how to read yours, and the patterns separating signal from burning tokens. The guide to cascade analysis.",
   path: "/cascade-analysis",

@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs aiusage \u2014 Usage Counting vs Operator Scoring",
+  title: "SigRank vs aiusage",
   description:
     "aiusage tracks API calls and token usage across providers. SigRank scores operator skill. Counting calls is accounting; scoring cascades is evaluation.",
   path: "/vs/aiusage",
