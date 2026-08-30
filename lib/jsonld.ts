@@ -47,7 +47,6 @@ export function alternativesItemList(
     "@context": "https://schema.org",
     "@type": "ItemList",
     name,
-    url: `${SITE_ORIGIN}${path}`,
     numberOfItems: items.length,
     itemListElement: items.map((item, i) => ({
       "@type": "ListItem",
@@ -139,8 +138,8 @@ export function product() {
     description: sigrankCanon.description,
     disambiguatingDescription: sigrankCanon.disambiguatingDescription,
     url: SITE_ORIGIN,
-    applicationCategory: sigrankCanon.applicationCategory,
-    operatingSystem: "Cross-platform (Node.js 18+)",
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Cross-platform",
     brand: { "@id": ORG_ID },
     offers: {
       "@type": "Offer",
@@ -148,7 +147,6 @@ export function product() {
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
     },
-    category: "AI Developer Tools",
     keywords: [
       "AI operator leaderboard",
       "token cascade efficiency",
@@ -310,7 +308,6 @@ export function leaderboardItemList(
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "SigRank SignalAF Leaderboard",
-    url: `${SITE_ORIGIN}${path}`,
     numberOfItems: entries.length,
     itemListElement: entries.map((e) => ({
       "@type": "ListItem",
@@ -848,8 +845,6 @@ export function transformationHarnessDataset() {
       "python",
       "research methods",
     ],
-    programmingLanguage: "Python",
-    runtimePlatform: "Python 3",
     isBasedOn: "https://doi.org/10.5281/zenodo.20029607",
     citation: "https://doi.org/10.5281/zenodo.20029607",
   };
@@ -889,7 +884,7 @@ export function propositionsDataset() {
     license: "https://creativecommons.org/licenses/by/4.0/",
     isAccessibleForFree: true,
     datePublished: "2026-04-20",
-    version: "V.1",
+    version: "1.0.0",
     keywords: [
       "commitment theory",
       "conservation law",
@@ -928,7 +923,7 @@ export function scoreCalculator() {
     description:
       "Paste your ccusage JSON to see your Υ Yield, class tier, and compression ratio instantly. No account needed — just run the numbers.",
     applicationCategory: "CalculatorApplication",
-    operatingSystem: "Any (web browser)",
+    operatingSystem: "Web",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -962,7 +957,7 @@ export function cliTool() {
     installUrl: "https://www.npmjs.com/package/sigrank",
     codeRepository: "https://github.com/SunrisesIllNeverSee/sigrank-mcp",
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "macOS, Linux",
+    operatingSystem: "Cross-platform",
     runtimePlatform: "Node.js >= 18",
     softwareVersion: "0.16.0",
     offers: {

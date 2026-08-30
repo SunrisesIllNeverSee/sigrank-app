@@ -62,7 +62,7 @@ export default function TokenWasteCalculatorPage() {
             description:
               "Estimate wasted AI tokens from the four token pillars. Shows an efficiency percentage and a waste breakdown by category — excess input, unreused cache writes, and repeated context.",
             applicationCategory: "CalculatorApplication",
-            operatingSystem: "Any (web browser)",
+            operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Estimated wasted-token total",
