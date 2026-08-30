@@ -78,6 +78,31 @@ export function BoardTableClient({
   >(null);
   const [loading, setLoading] = useState(false);
   const [liveTick, setLiveTick] = useState(0);
+  // Lazy-loaded full dataset for all_time board (fetched on first pagination)
+  const [fullEntries, setFullEntries] = useState<
+    LeaderboardEntryWithPlatforms[] | null
+  >(null);
+
+  // Lazy-load the full all_time dataset from the static JSON when the user
+  // paginates beyond page 0. The static JSON is served from /public/data/ as a
+  // CDN-cached asset — no DB cost. This keeps SSR HTML small (25 entries) while
+  // preserving full client-side pagination.
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page > 0 && win === "all" && !fullEntries && !loading) {
+        setLoading(true);
+        fetch("/data/board-all_time.json", { cache: "force-cache" })
+          .then((r) => (r.ok ? r.json() : { entries: [] }))
+          .then((d) => {
+            const entries = (d.entries ?? []).map(mapStaticEntry);
+            setFullEntries(entries);
+          })
+          .catch(() => setFullEntries([]))
+          .finally(() => setLoading(false));
+      }
+    },
+    [win, fullEntries, loading],
+  );
 
   // Refetch the first page from the API (used by Realtime refresh).
   const refreshFirstPage = useCallback(() => {
@@ -145,12 +170,15 @@ export function BoardTableClient({
 
   // Windowed board: use fetched entries if viewing platforms or filtering,
   // or if Realtime pushed a fresh page (liveTick > 0). Otherwise use the
-  // server-provided first page (SSR/ISR).
+  // server-provided first page (SSR/ISR). For all_time, once the user paginates,
+  // swap to the lazy-loaded full dataset.
   let entries: LeaderboardEntryWithPlatforms[];
   if (viewPlatforms || platformFilter) {
     entries = fetchedEntries ?? [];
   } else if (liveTick > 0 && fetchedEntries) {
     entries = fetchedEntries;
+  } else if (fullEntries) {
+    entries = fullEntries;
   } else {
     entries = totalEntries;
   }
@@ -162,8 +190,50 @@ export function BoardTableClient({
       window={win}
       platform={platformLabel}
       view={viewPlatforms ? "platforms" : "total"}
+      onPageChange={handlePageChange}
     />
   );
+}
+
+/** Map a static JSON board entry (from /data/board-all_time.json) to the
+ *  LeaderboardEntryWithPlatforms shape. The static JSON already stores entries
+ *  in the toEntry() output shape, so this is a near-identity mapping. */
+function mapStaticEntry(e: Record<string, unknown>): LeaderboardEntryWithPlatforms {
+  return {
+    rank: (e.rank as number) ?? 0,
+    percentile: (e.percentile as number) ?? null,
+    isSeed: (e.isSeed as boolean) ?? false,
+    anonId: (e.anonId as string) ?? (e.codename as string) ?? "?",
+    codename: (e.codename as string) ?? "?",
+    subLabel: (e.subLabel as string) ?? undefined,
+    signalClass: (e.signalClass as string) ?? "BURNER",
+    platform: (e.platform as string) ?? undefined,
+    yield_: (e.yield_ as number) ?? null,
+    leverage: (e.leverage as number) ?? null,
+    snr: (e.snr as number) ?? undefined,
+    dev10x: (e.dev10x as number) ?? null,
+    velocity: (e.velocity as number) ?? null,
+    totalTokens: (e.totalTokens as number) ?? null,
+    input: (e.input as number) ?? null,
+    output: (e.output as number) ?? null,
+    cacheRead: (e.cacheRead as number) ?? null,
+    cacheWrite: (e.cacheWrite as number) ?? null,
+    scaleV: (e.scaleV as number) ?? null,
+    costPerMillion: (e.costPerMillion as number) ?? null,
+    efficiency: (e.efficiency as number) ?? null,
+    opRatio: (e.opRatio as string) ?? undefined,
+    snRatio: (e.snRatio as number) ?? undefined,
+    messageVolume: (e.messageVolume as number) ?? undefined,
+    sessionDepth: (e.sessionDepth as number) ?? undefined,
+    promptComplexity: (e.promptComplexity as number) ?? undefined,
+    threadsRecalled: (e.threadsRecalled as number) ?? undefined,
+    compositeScore: (e.compositeScore as number) ?? undefined,
+    acctAge: (e.acctAge as string) ?? "—",
+    lastSeen: (e.lastSeen as string) ?? null,
+    status: (e.status as string) ?? undefined,
+    platforms: (e.platforms as string[]) ?? undefined,
+    primaryDomain: (e.primaryDomain as string) ?? undefined,
+  } as LeaderboardEntryWithPlatforms;
 }
 
 /** Map an API leaderboard entry to the LeaderboardEntryWithPlatforms shape. */
