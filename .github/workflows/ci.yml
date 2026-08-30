@@ -129,12 +129,16 @@ jobs:
         with:
           repository: SunrisesIllNeverSee/sigrank-standard
           path: _sigrank-standard
-          ref: ${{ vars.SIGRANK_STANDARD_REF || '224505a' }}
+          ref: main
           fetch-depth: 0
+
+      - name: Pin sigrank-standard to pinned ref
+        working-directory: _sigrank-standard
+        run: git reset --hard ${{ vars.SIGRANK_STANDARD_REF || 'c73f152' }}
 
       - name: Standalone Standard conformance gate
         env:
-          SIGRANK_STANDARD_REF: ${{ vars.SIGRANK_STANDARD_REF || '224505a' }}
+          SIGRANK_STANDARD_REF: ${{ vars.SIGRANK_STANDARD_REF || 'c73f152' }}
           SIGRANK_STANDARD_PATH: ${{ github.workspace }}/_sigrank-standard
         run: node --test __tests__/mcp/standalone-conformance.test.mjs
 

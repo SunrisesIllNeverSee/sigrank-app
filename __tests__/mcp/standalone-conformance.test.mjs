@@ -10,7 +10,7 @@
  * fixtures the standalone conformance runner enforces.
  *
  * Pin: the Standard commit is pinned via SIGRANK_STANDARD_REF env var
- * (default: the merged baseline `224505a`).
+ * (default: the merged baseline `c73f152`).
  *
  * Usage (CI):
  *   node --experimental-strip-types --test __tests__/mcp/standalone-conformance.test.mjs
@@ -79,7 +79,7 @@ function buildSigRankStandardRecord(args) {
   };
 }
 
-const SIGRANK_STANDARD_REF = process.env.SIGRANK_STANDARD_REF || "224505a";
+const SIGRANK_STANDARD_REF = process.env.SIGRANK_STANDARD_REF || "c73f152";
 
 const standardRoot = process.env.SIGRANK_STANDARD_PATH ||
   join(process.cwd(), "..", "_sigrank-standard");
