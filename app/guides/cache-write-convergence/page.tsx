@@ -14,7 +14,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Cache Write Convergence — Troubleshooting ChatGPT Token Telemetry",
+  title: "Cache Write Convergence — ChatGPT Token Telemetry",
   description:
     "ChatGPT and Codex bundle cache_write into input and report cache_write as zero. This guide explains the discrepancy, how operating ratios split the signal, and why cache_write convergence validates ratio selection.",
   path: "/guides/cache-write-convergence",
