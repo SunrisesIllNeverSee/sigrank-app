@@ -408,13 +408,13 @@ export default async function MethodologyPage() {
         </dl>
       </section>
 
-      {/* Cross-link to the Q1 report — internal link from /methodology (the citation
-          page) to /research/q1-2026 so Google discovers the report (G3/G4). */}
+      {/* Cross-link to the research report — internal link from /methodology
+          (the citation page) to /research so Google discovers the report (G3/G4). */}
       <section className="mt-8 border-t border-bg-border-subtle pt-6">
         <p className="text-sm text-text-muted">
           Looking for the quarterly findings?{" "}
           <Link
-            href="/research/q1-2026"
+            href="/research"
             className="text-gold underline underline-offset-2"
           >
             Read the Q1 2026 State of AI Operator Token Efficiency →
