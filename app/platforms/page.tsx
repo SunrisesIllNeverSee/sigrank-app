@@ -14,7 +14,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "Supported AI Coding Platforms — 19+ Agents Measured by SigRank",
+  title: "AI Coding Platforms — 19+ Agents Measured",
   description:
     "SigRank reads session logs from 19+ AI coding agents: Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Amp, Qwen Code, Goose, OpenCode, Kilo CLI, Hermes Agent, Devin, OMP, Pi, OpenClaw, Droid, Codebuff, and more. Run npx sigrank to get ranked.",
   path: "/platforms",
@@ -228,9 +228,9 @@ export default function PlatformsPage() {
           <>
             SigRank reads session logs from{" "}
             <span className="text-gold">{SUPPORTED.length} AI coding agents</span>{" "}
-            and counting. Every platform listed here can be scored with{" "}
-            <span className="font-mono text-gold">npx sigrank</span>. No install, no
-            sign-in, token counts only.
+            and counting. Every AI coding platform listed here can be scored
+            with <span className="font-mono text-gold">npx sigrank</span>. No
+            install, no sign-in, token counts only.
           </>
         }
       />

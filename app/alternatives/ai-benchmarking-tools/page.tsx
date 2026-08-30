@@ -192,7 +192,7 @@ export default function AIBenchmarkingToolsPage() {
         title="Best AI Benchmarking Tools (2026)"
         subtitle={
           <>
-            Six tools that benchmark AI. Most benchmark{" "}
+            Six benchmark tools that benchmark AI. Most benchmark{" "}
             <span className="text-gold">models</span>. Only one benchmarks the{" "}
             <span className="text-gold">operator</span>.
           </>

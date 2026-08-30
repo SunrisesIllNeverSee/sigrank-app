@@ -17,7 +17,7 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs Braintrust \u2014 Marketplace vs Measurement",
+  title: "SigRank vs Braintrust",
   description:
     "Braintrust connects you with AI talent. SigRank measures how efficiently that talent drives AI. Braintrust finds AI workers; SigRank scores how well they use AI.",
   path: "/vs/braintrust",
