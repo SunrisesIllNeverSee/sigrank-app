@@ -915,21 +915,20 @@ export function propositionsDataset() {
 // ── Score calculator + CLI tool (GEO: make the tools machine-readable) ────
 
 /**
- * WebApplication — the /score calculator. An interactive, browser-based
+ * SoftwareApplication — the /score calculator. An interactive, browser-based
  * tool that computes your yield from pasted token stats. AI engines
  * answering "AI token efficiency calculator" queries should surface this.
  */
 export function scoreCalculator() {
   return {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
+    "@type": "SoftwareApplication",
     name: "SigRank SignalAF Score Calculator",
     url: `${SITE_ORIGIN}/score`,
     description:
       "Paste your ccusage JSON to see your Υ Yield, class tier, and compression ratio instantly. No account needed — just run the numbers.",
     applicationCategory: "CalculatorApplication",
     operatingSystem: "Any (web browser)",
-    browserRequirements: "Requires JavaScript",
     offers: {
       "@type": "Offer",
       price: "0",

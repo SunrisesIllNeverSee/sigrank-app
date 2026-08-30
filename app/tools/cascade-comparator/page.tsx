@@ -48,14 +48,13 @@ export default function CascadeComparatorPage() {
           faqPage(FAQS),
           {
             "@context": "https://schema.org",
-            "@type": "WebApplication",
+            "@type": "SoftwareApplication",
             name: "SigRank Cascade Comparator",
             url: "https://signalaf.com/tools/cascade-comparator",
             description:
               "Compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, compression ratio, cache hit rate, and leverage for each, with the winning cascade flagged per metric.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Any (web browser)",
-            browserRequirements: "Requires JavaScript",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Side-by-side yield comparison",
