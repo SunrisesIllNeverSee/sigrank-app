@@ -16,7 +16,7 @@
  *  - Raw view: headers click-sort too; last column is TOTAL COST ($), keeping Total (tokens).
  */
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LeaderboardEntry } from "./types";
@@ -367,6 +367,9 @@ interface Props {
    *  row (default), 'platforms' = the per-platform breakdown (?view=platforms). The
    *  "by platform" toggle drives the URL. Off boards ignore it. */
   view?: "total" | "platforms";
+  /** Called when the user navigates to a page beyond 0. Used by BoardTableClient
+   *  to lazy-load the full dataset from the static JSON on first pagination. */
+  onPageChange?: (page: number) => void;
 }
 
 export function LeaderboardTable({
@@ -375,6 +378,7 @@ export function LeaderboardTable({
   window: win = "30d",
   platform: platformProp = "All",
   view: breakdownProp = "total",
+  onPageChange,
 }: Props) {
   const router = useRouter();
   const [view, setView] = useState<ViewMode>("metrics");
@@ -393,6 +397,17 @@ export function LeaderboardTable({
   // name), codename, and subLabel (@handle). Filters the visible rows in real time.
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState(0); // 0-based; 25 rows/page (owner 2026-06-24)
+  // Wrapper: notify parent when page changes beyond 0 (for lazy-loading full dataset)
+  const handlePageChange = useCallback(
+    (next: number | ((prev: number) => number)) => {
+      setPage((prev) => {
+        const resolved = typeof next === "function" ? next(prev) : next;
+        if (resolved > 0 && onPageChange) onPageChange(resolved);
+        return resolved;
+      });
+    },
+    [onPageChange],
+  );
   // OP RATIO dropdown (multi-sort): the column header opens a menu of 6 sort
   // options instead of the simple click-to-sort every other column uses.
   const [opRatioOpen, setOpRatioOpen] = useState(false);
@@ -1746,7 +1761,7 @@ export function LeaderboardTable({
             <div style={{ display: "flex", gap: 8 }}>
               <button
                 type="button"
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                onClick={() => handlePageChange((p) => Math.max(0, p - 1))}
                 disabled={safePage === 0}
                 style={{
                   ...st.pagerBtn,
@@ -1757,7 +1772,7 @@ export function LeaderboardTable({
               </button>
               <button
                 type="button"
-                onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                onClick={() => handlePageChange((p) => Math.min(pageCount - 1, p + 1))}
                 disabled={safePage >= pageCount - 1}
                 style={{
                   ...st.pagerBtn,
@@ -1792,7 +1807,7 @@ export function LeaderboardTable({
                     <button
                       key={p}
                       type="button"
-                      onClick={() => setPage(p)}
+                      onClick={() => handlePageChange(p)}
                       style={{
                         ...st.pagerBtn,
                         ...(p === safePage
@@ -1818,7 +1833,7 @@ export function LeaderboardTable({
                   if (e.key === "Enter") {
                     const v = parseInt((e.target as HTMLInputElement).value, 10);
                     if (!isNaN(v) && v >= 1 && v <= pageCount) {
-                      setPage(v - 1);
+                      handlePageChange(v - 1);
                       (e.target as HTMLInputElement).value = "";
                     }
                   }

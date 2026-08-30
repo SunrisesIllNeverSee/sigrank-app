@@ -92,11 +92,18 @@ export default async function BoardWindowPage({
   // 7d/30d/90d stay LIVE via DB-side window-filtered queries (~42 KB each).
   let totalEntries: ReturnType<typeof toEntry>[];
   let totalCount: number;
+  let jsonLdEntries: ReturnType<typeof toEntry>[];
 
   if (win.enum === "all_time") {
     // Static path: read pre-generated JSON from public/data/
-    totalEntries = getStaticAllTimeBoard() as ReturnType<typeof toEntry>[];
-    totalCount = totalEntries.length;
+    const allEntries = getStaticAllTimeBoard() as ReturnType<typeof toEntry>[];
+    totalCount = allEntries.length;
+    // PERF: only send the first 25 entries as RSC props (page 0 for SSR + SEO).
+    // Subsequent pages are fetched client-side via /api/v1/leaderboard.
+    // Previously all 1,649 entries were serialized into RSC flight data (~2MB HTML).
+    totalEntries = allEntries.slice(0, 25);
+    // JsonLd: top 100 for SEO (crawlers don't need all 1,649)
+    jsonLdEntries = allEntries.slice(0, 100);
   } else {
     // Live path: DB-side window-filtered query (egress fix — fetches only
     // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
@@ -107,11 +114,10 @@ export default async function BoardWindowPage({
     });
     totalCount = totalRows.length;
     totalEntries = totalRows.map(toEntry);
+    // JsonLd from the default (operatorTotal) entries — search engines see the
+    // default board. Filtered variants are client-side and don't need structured data.
+    jsonLdEntries = totalEntries;
   }
-
-  // JsonLd from the default (operatorTotal) entries — search engines see the
-  // default board. Filtered variants are client-side and don't need structured data.
-  const jsonLdEntries = totalEntries;
 
   // Dynamic H1 label: each board window gets a unique page heading (e.g.
   // "30-Day Leaderboard" vs "All-Time Leaderboard") so /board/all and /board/30d
