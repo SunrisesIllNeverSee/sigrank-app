@@ -104,6 +104,9 @@ export function organization() {
       "https://github.com/SunrisesIllNeverSee/sigrank-app",
       "https://github.com/SunrisesIllNeverSee/sigrank-mcp",
       "https://www.npmjs.com/package/sigrank",
+      "https://pypi.org/project/sigrank/",
+      "https://smithery.ai/servers/burnmydays/sigrank-mcp",
+      "https://x.com/signalaf",
       "https://doi.org/10.5281/zenodo.20029607",
       "https://doi.org/10.5281/zenodo.19105225",
       "https://doi.org/10.5281/zenodo.19109397",
@@ -112,6 +115,7 @@ export function organization() {
       "https://doi.org/10.5281/zenodo.21900519",
       "https://signomy.xyz",
       "https://mos2es.com",
+      "https://sigeconomy.com",
     ],
   };
 }
