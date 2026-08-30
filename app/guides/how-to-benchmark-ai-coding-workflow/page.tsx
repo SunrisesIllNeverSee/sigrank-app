@@ -1,11 +1,10 @@
 /**
  * app/guides/how-to-benchmark-ai-coding-workflow/page.tsx
  *
- * SEO guide targeting "benchmark ai coding workflow" and
- * "ai developer benchmark". Explains why benchmarking your workflow
- * matters, what to measure, how to establish a baseline, how to compare
- * across time periods, and how to use the SigRank leaderboard for external
- * comparison.
+ * SEO guide targeting "ai coding benchmarks" (390 vol, KD 47%) and
+ * "ai coding benchmark" (110 vol, KD 41%). Explains what AI coding
+ * benchmarks are, types of benchmarks, how to benchmark your workflow
+ * with token cascade metrics, and how SigRank ranks operators not models.
  */
 
 import type { Metadata } from "next";
@@ -16,9 +15,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "How to Benchmark AI Coding Workflow — Guide",
+  title: "AI Coding Benchmarks — How to Benchmark Your AI Coding Workflow",
   description:
-    "A step-by-step guide to benchmarking your AI coding workflow. Measure the four pillars + yield, set a baseline, and compare on the leaderboard. The AI coding benchmark guide.",
+    "Complete guide to AI coding benchmarks. What they are, types of benchmarks, how to measure AI coding productivity with token cascade metrics, and how to compare on the SigRank leaderboard.",
   path: "/guides/how-to-benchmark-ai-coding-workflow",
 });
 
@@ -77,6 +76,21 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
           ]),
           faqPage([
             {
+              question: "What are AI coding benchmarks?",
+              answer:
+                "AI coding benchmarks measure how effectively AI is used for software development. Model benchmarks (SWE-bench, LiveBench) evaluate which AI writes better code. Operator benchmarks (SigRank) evaluate how well the human drives the AI. Both matter, but only operator benchmarks improve when you change your workflow.",
+            },
+            {
+              question: "What is the best AI coding benchmark in 2026?",
+              answer:
+                "It depends on what you are measuring. SWE-bench is the standard for model capability. SigRank is the standard for operator efficiency — it measures real workflows passively, without controlled tasks. The best benchmark is one that measures what you actually do.",
+            },
+            {
+              question: "How do I measure AI coding productivity?",
+              answer:
+                "Track the four token pillars (input, output, cache-read, cache-write) and derive yield, leverage, velocity, and cache hit rate. SigRank does this automatically — run `sigrank me` to read your cascade. The field average is 4.67M tokens per task; top operators use 810K.",
+            },
+            {
               question: "Why should I benchmark my AI coding workflow?",
               answer:
                 "Without a benchmark, you cannot tell whether a workflow change helped or hurt. Benchmarking gives you a numeric baseline (Υ Yield, cache hit rate, leverage) so you can measure the impact of changes like better prompt caching, structured inputs, or fewer re-rolls. It turns intuition into data.",
@@ -108,15 +122,84 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
 
       <WaveHero
         eyebrow="◈ Guide"
-        title="How to Benchmark Your AI Coding Workflow"
+        title="AI Coding Benchmarks"
         subtitle={
           <>
-            You can&rsquo;t improve what you don&rsquo;t measure. Here&rsquo;s
-            how to establish a <span className="text-gold">baseline</span>,
-            track it over time, and compare against the field.
+            How to benchmark your AI coding workflow with token cascade
+            metrics. What AI coding benchmarks are, the types that matter,
+            and how to measure your productivity against the field.
           </>
         }
       />
+
+      {/* ── What are AI coding benchmarks ──────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          What are AI coding benchmarks?
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          AI coding benchmarks measure how effectively AI tools are used for
+          software development. Traditional benchmarks like SWE-bench and
+          LiveBench evaluate <em>models</em> — which AI writes better code.
+          But they miss the human side: the operator driving the tool. A
+          great operator with a mid-tier model can outperform a poor operator
+          with the best model. AI coding benchmarks need to measure the
+          <strong className="text-text-primary"> operator</strong>, not just
+          the model.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank fills this gap. It benchmarks AI coding workflows using
+          token cascade telemetry — four raw measurements (input, output,
+          cache-read, cache-write) that capture how efficiently an operator
+          drives their AI. No prompts read. No code stored. Just four
+          integers signed with ed25519.
+        </p>
+      </section>
+
+      {/* ── Types of AI coding benchmarks ──────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Types of AI coding benchmarks
+        </h2>
+        <div className="flex flex-col gap-3">
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              Model benchmarks
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Evaluate which AI model performs best. SWE-bench, LiveBench,
+              HumanEval, Vals AI vibe-code. These test the model in isolation
+              — given a task, does it produce correct code? Useful for model
+              selection, but they don&rsquo;t tell you how well{" "}
+              <em>you</em> use the model.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              Operator benchmarks (SigRank)
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Evaluate the human driving the AI. SigRank measures token
+              cascade efficiency — how much output you generate per token of
+              input, how much context you reuse via cache, how much yield you
+              compound. This is the benchmark that improves when{" "}
+              <em>you</em> get better, not when the model upgrades.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              Productivity metrics
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              AI coding productivity metrics measure throughput: tokens per
+              task, time per task, cost per line of code. SigRank tracks
+              these alongside yield to give a complete picture of operator
+              efficiency. The field average is 4.67M tokens per task; the top
+              operator uses 810K — 5.8x fewer.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* ── Why benchmarking matters ────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
@@ -350,12 +433,113 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
         </p>
       </section>
 
+      {/* ── Current AI coding benchmarks landscape ─────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Current AI coding benchmarks in 2026
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The AI coding benchmark landscape has shifted in 2026. Model
+          benchmarks (SWE-bench, LiveBench, HumanEval) still dominate
+          headlines, but operator benchmarks are emerging as the more
+          actionable metric. Here&rsquo;s how the latest AI coding benchmarks
+          compare:
+        </p>
+        <div className="flex flex-col gap-3">
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              SWE-bench
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Tests whether an AI model can resolve real GitHub issues.
+              Measures model capability in isolation. High scores mean the
+              model <em>can</em> code — not that <em>you</em> code well with
+              it.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              LiveBench
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Continuously updated model evaluation. Tests reasoning, coding,
+              and data analysis. Again, model-side — no operator signal.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              Vals AI vibe-code
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              Evaluates AI coding agents in controlled environments. Closer to
+              real-world usage, but still tests the agent, not the operator.
+            </p>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-sm font-bold text-gold">
+              SigRank (operator benchmark)
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-text-secondary">
+              The only benchmark that measures the human behind the AI. Uses
+              passive token telemetry — no tasks to complete, no controlled
+              environments. Just your real workflow, measured continuously.
+              Ranks operators by Yield (&#933;), not by model choice.
+            </p>
+          </div>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The best AI coding benchmark is one that measures what you actually
+          do, not what a model can do in a lab. SigRank runs passively in the
+          background, reading only token counts — never prompts, never code,
+          never transcripts. It&rsquo;s the only AI coding benchmark that
+          improves when <em>you</em> get better at driving your AI.
+        </p>
+      </section>
+
       {/* ── FAQ ─────────────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
           FAQ
         </h2>
         <dl className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <dt className="font-semibold text-text-primary">
+              What are AI coding benchmarks?
+            </dt>
+            <dd className="font-sans text-sm leading-relaxed text-text-secondary">
+              AI coding benchmarks measure how effectively AI is used for
+              software development. Model benchmarks (SWE-bench, LiveBench)
+              evaluate which AI writes better code. Operator benchmarks
+              (SigRank) evaluate how well the human drives the AI. Both
+              matter, but only operator benchmarks improve when you change
+              your workflow.
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="font-semibold text-text-primary">
+              What is the best AI coding benchmark in 2026?
+            </dt>
+            <dd className="font-sans text-sm leading-relaxed text-text-secondary">
+              It depends on what you&rsquo;re measuring. SWE-bench is the
+              standard for model capability. SigRank is the standard for
+              operator efficiency — it measures real workflows passively,
+              without controlled tasks. The best benchmark is one that
+              measures what you actually do.
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="font-semibold text-text-primary">
+              How do I measure AI coding productivity?
+            </dt>
+            <dd className="font-sans text-sm leading-relaxed text-text-secondary">
+              Track the four token pillars (input, output, cache-read,
+              cache-write) and derive yield, leverage, velocity, and cache hit
+              rate. SigRank does this automatically — run{" "}
+              <code className="font-mono text-gold">sigrank me</code> to read
+              your cascade. The field average is 4.67M tokens per task; top
+              operators use 810K.
+            </dd>
+          </div>
           <div className="flex flex-col gap-1">
             <dt className="font-semibold text-text-primary">
               Why should I benchmark my AI coding workflow?
