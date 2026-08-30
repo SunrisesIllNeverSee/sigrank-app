@@ -56,7 +56,7 @@ export default function AIBenchmarkingPage() {
             {
               question: "What is AI benchmarking?",
               answer:
-                "AI benchmarking is the systematic measurement and comparison of AI system performance. Traditional AI benchmarking ranks models — which LLM scores highest on a test suite or wins the most preference votes. SigRank introduces a new category: operator benchmarking, which ranks the humans driving the AI by token-cascade efficiency rather than ranking the models themselves.",
+                "AI benchmarking is the systematic measurement and comparison of AI system performance. Traditional AI benchmarking ranks models — which LLM scores highest on a test suite or wins the most preference votes. SigRank introduces a new category: operator benchmarking, which ranks the humans driving the AI by token-cascade efficiency rather than ranking the models themselves. AI coding benchmarks specifically measure how effectively AI tools are used for software development.",
             },
             {
               question: "What is wrong with model-only benchmarking?",
@@ -114,7 +114,8 @@ export default function AIBenchmarkingPage() {
           the operator as a constant. In practice the opposite is true: the
           model is a constant (you pick one and drive it), and the operator is
           the variable (two people on the same model produce wildly different
-          results).
+          results). AI coding benchmarks that only test models miss this
+          entirely.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           There is a second problem. Model benchmarks rely on synthetic test
