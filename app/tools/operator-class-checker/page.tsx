@@ -56,14 +56,13 @@ export default function OperatorClassCheckerPage() {
           faqPage(FAQS),
           {
             "@context": "https://schema.org",
-            "@type": "WebApplication",
+            "@type": "SoftwareApplication",
             name: "SigRank Operator Class Checker",
             url: "https://signalaf.com/tools/operator-class-checker",
             description:
               "Enter four token pillars to determine your AI operator class tier — IGNITER, BEARER, REFINER, SEEKER, BASE, POWER, ARCH, or ARCH+ — with a description of what each tier means.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Any (web browser)",
-            browserRequirements: "Requires JavaScript",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Class tier from total tokens",

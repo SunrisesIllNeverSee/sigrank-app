@@ -56,14 +56,13 @@ export default function TokenWasteCalculatorPage() {
           faqPage(FAQS),
           {
             "@context": "https://schema.org",
-            "@type": "WebApplication",
+            "@type": "SoftwareApplication",
             name: "SigRank Token Waste Calculator",
             url: "https://signalaf.com/tools/token-waste-calculator",
             description:
               "Estimate wasted AI tokens from the four token pillars. Shows an efficiency percentage and a waste breakdown by category — excess input, unreused cache writes, and repeated context.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Any (web browser)",
-            browserRequirements: "Requires JavaScript",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Estimated wasted-token total",
