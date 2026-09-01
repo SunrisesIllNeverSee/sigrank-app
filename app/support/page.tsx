@@ -112,11 +112,6 @@ export default function SupportPage() {
             href="/vercel/config"
           />
           <SupportRow
-            title="Import existing resources"
-            description="Import your operator identity, MCP configuration, and exchange signals into your Vercel project."
-            href="/vercel/import"
-          />
-          <SupportRow
             title="Diagnostic tool"
             description="Verify your Vercel deployment is correctly serving the MCP relay."
             href="/vercel#diagnostic"
