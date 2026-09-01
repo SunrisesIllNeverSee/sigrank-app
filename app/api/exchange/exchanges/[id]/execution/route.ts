@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getProvider } from '@/exchange-gateway/src/execution-router'
-import { getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
+import { authenticateCompany, authenticateDomainAgent, authenticateProposer, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const publicId = (await params).id
   const admin = getExchangeAdmin()
 
-  const { data: record } = await admin.from('exchange_records').select('id, target_domain').eq('public_id', publicId).maybeSingle()
+  const { data: record } = await admin.from('exchange_records').select('id, target_domain, proposer_key_hash').eq('public_id', publicId).maybeSingle()
   if (!record) return NextResponse.json({ error: 'Exchange not found' }, { status: 404 })
+
+  // ─── Authentication ───
+  // Execution data (executions + receipts + live provider observations) is
+  // sensitive. Only authenticated principals may read it: the company admin,
+  // the domain agent, or the proposer who created the exchange. This mirrors
+  // the auth model on GET /api/exchange/exchanges/{id}.
+  const isCompany = await authenticateCompany(record.target_domain, req.headers.get('x-exchange-company-key'))
+  const isProposer = authenticateProposer(record, req.headers.get('x-exchange-proposer-key'))
+  const isDomainAgent = await authenticateDomainAgent(record.target_domain, req.headers.get('x-exchange-domain-agent-key'))
+  if (!isCompany && !isProposer && !isDomainAgent) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   await logEncounter({
     targetDomain: record.target_domain,
@@ -18,13 +30,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   })
 
   // ─── Canonical state from the database ───
+  // Explicit field projection — never select('*') on execution records.
   const { data: executions } = await admin.from('exchange_executions')
-    .select('*')
+    .select('execution_id, provider, provider_reference, mode, state, task, budget, deadline, created_at')
     .eq('exchange_id', record.id)
     .order('created_at', { ascending: false })
 
   const { data: receipts } = await admin.from('exchange_execution_receipts')
-    .select('*')
+    .select('execution_id, receipt_id, provider, amount, currency, state, created_at')
     .eq('exchange_id', record.id)
     .order('created_at', { ascending: false })
 
