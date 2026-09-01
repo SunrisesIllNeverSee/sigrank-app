@@ -32,7 +32,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/best-ai-coding-efficiency-tools-for-solo-developers`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Best AI Coding Efficiency Tools for Solo Developers (2026)",
     description:

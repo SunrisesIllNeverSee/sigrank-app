@@ -32,7 +32,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/best-ai-coding-metrics-for-engineering-managers`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Best AI Coding Metrics for Engineering Managers (2026)",
     description:

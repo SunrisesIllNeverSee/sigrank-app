@@ -12,7 +12,7 @@ import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
 import type { Metadata } from "next";
 import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { cliTool, faqPage, aggregateStats } from "@/lib/jsonld";
+import { cliTool, faqPage, aggregateStats, product } from "@/lib/jsonld";
 import Link from "next/link";
 
 // ISR: the Four Degrees chart auto-pulls the top operator's live all-time metrics
@@ -60,6 +60,11 @@ export default async function HomePage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">
       {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product) */}
       <JsonLd data={cliTool()} />
+
+      {/* JSON-LD: SoftwareApplication — canonical SigRank product block.
+          Rendered on the homepage only (not site-wide) to avoid triggering
+          aggregateRating/review requirements on non-product pages. */}
+      <JsonLd data={product()} />
 
       {/* JSON-LD: Dataset — aggregate stats for AEO (Item 2c). Quantified stats
           improve AI citation rates by up to 41% (Princeton GEO-Bench). */}

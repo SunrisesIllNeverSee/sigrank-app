@@ -39,7 +39,7 @@ export function personAuthor() {
 
 /** ItemList — for /alternatives/ listicles. Ordered list of compared tools. */
 export function alternativesItemList(
-  items: { name: string }[],
+  items: { name: string; url?: string }[],
   path: string,
   name: string,
 ) {
@@ -52,6 +52,7 @@ export function alternativesItemList(
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
+      url: item.url ?? `${SITE_ORIGIN}${path}#${item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
     })),
   };
 }
@@ -800,6 +801,14 @@ export function experimentalRecordDataset() {
       "Recursive transformative compression with NLI bidirectional entailment (microsoft/deberta-v3-base-mnli) + Jaccard surface stability. 10 iterations per signal.",
     isBasedOn: "https://doi.org/10.5281/zenodo.20029607",
     citation: "https://doi.org/10.5281/zenodo.20029607",
+    distribution: [
+      {
+        "@type": "DataDownload",
+        encodingFormat: "application/zip",
+        name: "Experimental data archive",
+        contentUrl: "https://zenodo.org/records/19105225",
+      },
+    ],
   };
 }
 
@@ -851,6 +860,14 @@ export function transformationHarnessDataset() {
     ],
     isBasedOn: "https://doi.org/10.5281/zenodo.20029607",
     citation: "https://doi.org/10.5281/zenodo.20029607",
+    distribution: [
+      {
+        "@type": "DataDownload",
+        encodingFormat: "application/zip",
+        name: "Harness code archive",
+        contentUrl: "https://zenodo.org/records/19109397",
+      },
+    ],
   };
 }
 
@@ -908,6 +925,14 @@ export function propositionsDataset() {
       },
     },
     references: "https://doi.org/10.5281/zenodo.20029607",
+    distribution: [
+      {
+        "@type": "DataDownload",
+        encodingFormat: "application/pdf",
+        name: "Research prospectus",
+        contentUrl: "https://zenodo.org/records/20031715",
+      },
+    ],
   };
 }
 

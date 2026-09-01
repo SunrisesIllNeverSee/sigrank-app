@@ -8,7 +8,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
@@ -197,7 +197,7 @@ export default function PlatformsPage() {
         data={[
           breadcrumb([{ name: "Platforms", path: "/platforms" }]),
           alternativesItemList(
-            SUPPORTED.map((p) => ({ name: p.name })),
+            SUPPORTED.map((p) => ({ name: p.name, url: p.url })),
             "/platforms",
             "Supported AI Coding Platforms",
           ),
