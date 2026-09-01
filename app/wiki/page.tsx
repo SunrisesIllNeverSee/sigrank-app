@@ -29,6 +29,7 @@ import { SubmitForm } from "@/components/submit/SubmitForm";
 
 import { WikiDoc, type WikiDocGroup } from "@/components/wiki/WikiDoc";
 import { WikiTOC, type TocItem } from "@/components/wiki/WikiTOC";
+import { WikiCategoryIndex } from "@/components/wiki/WikiCategoryIndex";
 import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
 import { VerificationTests } from "@/components/marketing/VerificationTests";
 import {
@@ -1942,10 +1943,14 @@ export default function Draft1Page() {
 
       {/* Two-column layout: sticky TOC nav + scrolling doc */}
       <h1 className="sr-only">SigRank Wiki — Operator Evaluation Reference</h1>
-      <div className="flex flex-col gap-0 lg:flex-row lg:gap-8">
-        <WikiTOC items={tocItems} />
-        <div className="min-w-0 flex-1 pt-6 lg:pt-8">
-          <WikiDoc groups={groups} />
+      <div className="flex flex-col gap-8">
+        {/* Evidence Layer category index — Phase 1 ecosystem split */}
+        <WikiCategoryIndex />
+        <div className="flex flex-col gap-0 lg:flex-row lg:gap-8">
+          <WikiTOC items={tocItems} />
+          <div className="min-w-0 flex-1 pt-6 lg:pt-8">
+            <WikiDoc groups={groups} />
+          </div>
         </div>
       </div>
     </div>
