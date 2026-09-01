@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateDeploymentUrl } from "@/lib/vercel/diagnostic";
+import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 
 type Check = {
   key: string;
@@ -20,32 +22,10 @@ type FetchResult = {
 const FETCH_TIMEOUT_MS = 5000;
 const MAX_TEXT_BYTES = 200_000;
 
-function validateDeploymentUrl(raw: unknown): URL | null {
-  if (typeof raw !== "string" || raw.length > 500) return null;
-
-  try {
-    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
-    const hostname = url.hostname.toLowerCase();
-
-    if (
-      url.protocol !== "https:" ||
-      !hostname.endsWith(".vercel.app") ||
-      hostname === "vercel.app" ||
-      url.username ||
-      url.password ||
-      url.port
-    ) {
-      return null;
-    }
-
-    url.pathname = "/";
-    url.search = "";
-    url.hash = "";
-    return url;
-  } catch {
-    return null;
-  }
-}
+// Rate limit: 10 diagnostic scans per minute per IP.
+// Best-effort (failClosed=false) — falls back to in-memory if Redis is unavailable.
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 10;
 
 async function readTextBounded(response: Response): Promise<string> {
   if (!response.body) return "";
@@ -124,6 +104,26 @@ function hasTag(html: string, pattern: RegExp) {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit — public, unauthenticated endpoint that makes outbound fetches.
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("cf-connecting-ip") ??
+    "unknown";
+  const rateLimit = await checkDistributedRateLimit(
+    ["vercel-diagnostic", ip],
+    { windowMs: RATE_LIMIT_WINDOW_MS, max: RATE_LIMIT_MAX },
+    false,
+  );
+  if (!rateLimit.ok) {
+    return NextResponse.json(
+      { error: "Too many diagnostic requests. Please wait a minute and try again." },
+      {
+        status: 429,
+        headers: { "retry-after": String(rateLimit.retryAfter) },
+      },
+    );
+  }
+
   let body: { url?: string };
 
   try {

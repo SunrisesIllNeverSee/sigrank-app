@@ -12,7 +12,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { WIKI_CATEGORIES } from "@/lib/wiki/evidence-ladder";
+import { WIKI_CATEGORIES, wikiCategoryHubAnchor } from "@/lib/wiki/evidence-ladder";
 
 interface Props {
   /** Optional: entries count per category, if known. */
@@ -29,14 +29,14 @@ export function WikiCategoryIndex({ entryCounts }: Props) {
         <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
           The reference wiki: definitions, tests, data, falsifiers, and lineage
           for every claim. Each entry carries an evidence maturity badge — from
-          hypothesized to canonical.
+          concept (LEVEL 0) to production evidence (LEVEL 6).
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {WIKI_CATEGORIES.map((cat) => (
           <Link
             key={cat.id}
-            href={`/wiki#${cat.id}`}
+            href={`/wiki#${wikiCategoryHubAnchor(cat.id)}`}
             className="group flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-gold/30"
           >
             <div className="flex items-center justify-between">
