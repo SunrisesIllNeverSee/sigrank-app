@@ -24,7 +24,7 @@ const mcpConfig = `{
 
 export default function VercelPage() {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
+    <div className="py-4 sm:py-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold">SigRank × Vercel</p>
       <h1 className="mt-3 max-w-4xl font-mono text-3xl font-bold leading-tight text-text-primary sm:text-5xl">
         Measure the people and agents operating your AI stack.
@@ -105,6 +105,6 @@ export default function VercelPage() {
           Runtime logs, traces, tokens, and application telemetry tell you what the software did. SigRank adds a complementary evaluation layer for how human operators and AI workflows compound, reuse context, produce output, and move against a field benchmark.
         </p>
       </section>
-    </main>
+    </div>
   );
 }

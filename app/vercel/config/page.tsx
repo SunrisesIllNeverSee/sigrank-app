@@ -39,7 +39,7 @@ async function VercelConfigContent({
 }`;
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
+    <div className="py-4 sm:py-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold">SigRank × Vercel</p>
       <h1 className="mt-3 font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
         Integration Configuration
@@ -148,6 +148,6 @@ async function VercelConfigContent({
           </p>
         </div>
       )}
-    </main>
+    </div>
   );
 }
