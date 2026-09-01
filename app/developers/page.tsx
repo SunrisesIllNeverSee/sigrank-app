@@ -5,7 +5,7 @@ import { withOG } from "@/lib/seo";
 export const metadata: Metadata = withOG({
   title: "Developer Portal — API, MCP & CLI Docs",
   description:
-    "Developer resources for SigRank SignalAF: REST API, OpenAPI schema, authentication, MCP server, CLI quickstart, errors, rate limits, and versioning policy.",
+    "Developer resources for SigRank SignalAF: REST API, OpenAPI schema, authentication, MCP server, Vercel integration, CLI quickstart, errors, rate limits, and versioning policy.",
   path: "/developers",
 });
 
@@ -13,6 +13,7 @@ const resources = [
   ["OpenAPI 3.0", "/openapi.json", "Machine-readable REST API contract"],
   ["Authentication", "/auth.md", "OAuth, public reads, protected writes"],
   ["MCP server", "/mcp", "Model Context Protocol setup and tools"],
+  ["SigRank for Vercel", "/vercel", "Deploy MCP, run the free diagnostic, and connect Agent Tools"],
   ["MCP manifest", "/.well-known/mcp.json", "Machine-readable MCP discovery"],
   ["Agent index", "/llms.txt", "When to use SignalAF and canonical resources"],
   ["Methodology", "/methodology", "Metric definitions and evidence boundary"],
@@ -30,7 +31,7 @@ export default function DevelopersPage() {
       <p className="mt-4 max-w-3xl font-sans text-base leading-relaxed text-text-secondary">
         SigRank SignalAF exposes public operator-benchmark data through a versioned
         REST API, an OpenAPI document, the official <code className="font-mono">sigrank</code>{" "}
-        CLI, and Model Context Protocol tools. Public read endpoints do not require
+        CLI, Model Context Protocol tools, and a Vercel-native deployment path. Public read endpoints do not require
         credentials. Protected writes use the authentication flow documented in{" "}
         <Link href="/auth.md" className="text-gold hover:text-text-primary">auth.md</Link>.
       </p>
@@ -44,7 +45,10 @@ curl -s https://signalaf.com/api/v1/leaderboard
 # Inspect the API contract
 curl -s https://signalaf.com/openapi.json
 
-# Run the official CLI / MCP server
+# Connect the remote MCP server
+https://signalaf.com/api/mcp
+
+# Run the official CLI / local MCP server
 npx sigrank`}</pre>
         </div>
       </section>
@@ -110,7 +114,7 @@ npx sigrank`}</pre>
       <section id="sandbox" className="mt-10 scroll-mt-24">
         <h2 className="font-mono text-xl font-bold text-text-primary">Sandbox</h2>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          No separate hosted sandbox exists today. For non-mutating integration work,
+          No separate hosted write sandbox exists today. For non-mutating integration work,
           use the public read API or run <code className="font-mono">npx sigrank</code>{" "}
           locally. Do not send test writes to production. A hosted write sandbox is a
           separate product/infrastructure decision.
