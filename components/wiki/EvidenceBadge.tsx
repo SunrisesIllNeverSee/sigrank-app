@@ -9,9 +9,9 @@ import React from "react";
 import { evidenceLevelById } from "@/lib/wiki/evidence-ladder";
 
 interface Props {
-  /** The evidence level ID (hypothesized | observed | tested | verified | canonical). */
+  /** The evidence level ID (concept | operational-definition | demonstration | repeated-experiment | cross-model-replication | controlled-validation | production-evidence). */
   level: string;
-  /** Optional: show the numeric rank (0-4) alongside the label. Default true. */
+  /** Optional: show the numeric rank (0-6) alongside the label. Default true. */
   showRank?: boolean;
 }
 

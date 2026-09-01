@@ -30,6 +30,8 @@ import { SubmitForm } from "@/components/submit/SubmitForm";
 import { WikiDoc, type WikiDocGroup } from "@/components/wiki/WikiDoc";
 import { WikiTOC, type TocItem } from "@/components/wiki/WikiTOC";
 import { WikiCategoryIndex } from "@/components/wiki/WikiCategoryIndex";
+import { WikiCategorySections } from "@/components/wiki/WikiCategorySections";
+import { EcosystemDiagram } from "@/components/wiki/EcosystemDiagram";
 import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
 import { VerificationTests } from "@/components/marketing/VerificationTests";
 import {
@@ -1946,6 +1948,13 @@ export default function Draft1Page() {
       <div className="flex flex-col gap-8">
         {/* Evidence Layer category index — Phase 1 ecosystem split */}
         <WikiCategoryIndex />
+        {/* Ecosystem connection diagram — Phase 5 cross-property wiring */}
+        <EcosystemDiagram />
+        {/* Evidence Layer category sections — the anchor targets for the
+            category index cards and all 38 wiki page breadcrumbs. Each
+            section has id="evidence-<category>" and lists the pages in
+            that category. */}
+        <WikiCategorySections />
         <div className="flex flex-col gap-0 lg:flex-row lg:gap-8">
           <WikiTOC items={tocItems} />
           <div className="min-w-0 flex-1 pt-6 lg:pt-8">
