@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
   if (method === "ping") return jsonRpc(id, {});
 
   if (method === "tools/list") {
-    const scopes = resolveScopes(req);
+    const scopes = await resolveScopes(req);
     const scopedTools = filterExchangeToolsByScope(scopes);
     const authTier = deriveAuthTier(scopes);
     const agentIdentity = deriveAgentIdentity(
@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
       return rpcError(id, -32602, "Invalid params", { required: "params.name" });
     }
     // Enforce scopes at call time
-    const scopes = resolveScopes(req);
+    const scopes = await resolveScopes(req);
     const scopeError = enforceScopeForCall(name, scopes);
     if (scopeError) {
       const authTier = deriveAuthTier(scopes);

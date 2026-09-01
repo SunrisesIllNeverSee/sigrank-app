@@ -189,7 +189,7 @@ GET ${base}/.well-known/exchange.json     — manifest (includes signals block)
 
 ### Signal authentication
 
-Signal attempts require an authenticated exchange actor identity. Use the same authentication conventions as the rest of the exchange (x-exchange-actor-id + x-exchange-agent-key headers). Anonymous attempts are only accepted if the signal explicitly permits them.
+Signal attempts require an authenticated exchange actor identity. Provide a valid x-exchange-agent-key or x-exchange-proposer-key header. The actor identity is derived from the validated credential — do not send x-exchange-actor-id as an authority-bearing header (it is treated as metadata only). Anonymous attempts are only accepted if the signal explicitly permits them.
 
 ### The signal loop
 
@@ -260,8 +260,8 @@ Server card: ${base}/.well-known/exchange-mcp.json
 ### Authorization scopes
 
 - **exchange:read** — always granted. Covers all read-only tools.
-- **exchange:attempt** — granted when x-exchange-actor-id header is present. Covers exchange_create_attempt and exchange_submit_attempt.
-- **exchange:propose** — granted when x-exchange-agent-key or x-exchange-proposer-key header is present. Covers exchange_propose and exchange_create_proposal_from_attempt.
+- **exchange:attempt** — granted when a valid x-exchange-agent-key or x-exchange-proposer-key is presented (validated against the database). Covers exchange_create_attempt and exchange_submit_attempt.
+- **exchange:propose** — granted when a valid x-exchange-agent-key or x-exchange-proposer-key is presented (validated against the database). Covers exchange_propose and exchange_create_proposal_from_attempt.
 
 ### What MCP tools do NOT do
 

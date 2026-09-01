@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         : {};
 
       // Scope enforcement for Exchange tools
-      const scopes = resolveScopes(req);
+      const scopes = await resolveScopes(req);
       const scopeError = enforceScopeForCall(name, scopes);
       if (scopeError) {
         const authTier = deriveAuthTier(scopes);

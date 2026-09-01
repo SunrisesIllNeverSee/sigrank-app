@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { CreateExecutionSchema } from '@/exchange-gateway/src/schema'
 import { routeExecution } from '@/exchange-gateway/src/execution-router'
 import { mergeExchangePolicy } from '@/exchange-gateway/src/policy'
-import { appendExchangeEvent, authenticateCompany, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
+import { appendExchangeEvent, authenticateCompany, authenticateDomainAgent, authenticateProposer, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
 import type { ContributionCommitment } from '@/exchange-gateway/src/types'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -142,20 +142,31 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const publicId = (await params).id
   const admin = getExchangeAdmin()
 
-  const { data: record } = await admin.from('exchange_records').select('id, target_domain').eq('public_id', publicId).maybeSingle()
+  const { data: record } = await admin.from('exchange_records').select('id, target_domain, proposer_key_hash').eq('public_id', publicId).maybeSingle()
   if (!record) return NextResponse.json({ error: 'Exchange not found' }, { status: 404 })
 
+  // Authentication: require proposer, company, or domain-agent credentials.
+  // Mirrors the auth boundary on GET /api/exchange/exchanges/{id}.
+  const proposer = authenticateProposer(record, req.headers.get('x-exchange-proposer-key'))
+  const company = await authenticateCompany(record.target_domain, req.headers.get('x-exchange-company-key'))
+  const domainAgent = await authenticateDomainAgent(record.target_domain, req.headers.get('x-exchange-domain-agent-key'))
+  if (!proposer && !company && !domainAgent) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Explicit field projection — never select('*') on execution records.
   const { data: executions } = await admin.from('exchange_executions')
-    .select('*')
+    .select('execution_id, provider, provider_reference, mode, state, task, budget, deadline, created_at')
     .eq('exchange_id', record.id)
     .order('created_at', { ascending: false })
 
   const { data: receipts } = await admin.from('exchange_execution_receipts')
-    .select('*')
+    .select('execution_id, receipt_id, provider, amount, currency, state, created_at')
     .eq('exchange_id', record.id)
     .order('created_at', { ascending: false })
 
   return NextResponse.json({
+    actor: proposer ? 'proposer' : domainAgent ? 'domain_agent' : 'company_admin',
     executions: executions ?? [],
     receipts: receipts ?? [],
   })
