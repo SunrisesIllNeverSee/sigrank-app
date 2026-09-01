@@ -984,11 +984,14 @@ export function scoreCalculator() {
  */
 export function cliTool() {
   return {
-    "@context": "https://schema.org",
+    "@context": CANON_PROVENANCE_CONTEXT,
     "@type": ["SoftwareApplication", "SoftwareSourceCode"],
     "@id": sigrankCanon.canonical_entity_id,
     name: "sigrank",
     alternateName: "SigRank CLI",
+    sourceSystem: sigrankCanon.sourceSystem,
+    canonBacked: sigrankCanon.canonBacked,
+    authorityApprovalRef: sigrankCanon.authorityApprovalRef,
     description:
       "A privacy-preserving terminal tool that parses your AI coding logs locally, computes token-cascade efficiency metrics, and publishes signed snapshots to the SigRank leaderboard. Bundles ccusage, tokscale, and token-dashboard.",
     url: SITE_ORIGIN,
