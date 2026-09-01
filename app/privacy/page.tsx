@@ -271,12 +271,24 @@ export default function PrivacyPage() {
         </section>
       </div>
 
-      <div className="border-t border-bg-border pt-4">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-bg-border pt-4">
         <Link
           href="/terms"
           className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
         >
           Terms of Service →
+        </Link>
+        <Link
+          href="/eula"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          EULA →
+        </Link>
+        <Link
+          href="/docs/integrations/vercel"
+          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+        >
+          Vercel Integration Docs →
         </Link>
       </div>
     </div>
