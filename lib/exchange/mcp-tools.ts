@@ -27,6 +27,7 @@ import {
   newSecret,
   normalizeDomain,
   requestIdentity,
+  resolveActorId,
   safeEqual,
 } from "./server";
 import { companyPolicy } from "./steward";
@@ -62,19 +63,76 @@ export type ExchangeScope = "exchange:read" | "exchange:attempt" | "exchange:pro
  * There is no formal OAuth scope system. We derive scopes from the credentials
  * present:
  * - exchange:read is always granted (public discovery)
- * - exchange:attempt is granted when an actor identity is present
- * - exchange:propose is granted when an agent key or proposer key is present
+ * - exchange:attempt is granted when a valid agent key is presented (the actor
+ *   identity is derived from the validated credential, NOT from a caller-supplied
+ *   header — see {@link resolveActorId})
+ * - exchange:propose is granted when a valid agent key or proposer key is
+ *   presented (validated against the database or the reference admin key)
  *
- * This is a best-effort mapping. The canonical proposal route enforces its own
- * validation independently — MCP tools never bypass it.
+ * Scopes are never granted on header presence alone. The key must validate
+ * against a known record before the scope is assigned. This prevents actor-ID
+ * spoofing: a caller cannot claim another actor's identity by sending a fake
+ * x-exchange-actor-id header.
+ *
+ * The canonical proposal route enforces its own validation independently — MCP
+ * tools never bypass it.
  */
-export function resolveScopes(req: NextRequest): Set<ExchangeScope> {
+export async function resolveScopes(req: NextRequest): Promise<Set<ExchangeScope>> {
   const scopes = new Set<ExchangeScope>(["exchange:read"]);
-  const actorId = req.headers.get("x-exchange-actor-id");
-  if (actorId) scopes.add("exchange:attempt");
   const agentKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
-  if (agentKey) scopes.add("exchange:propose");
+
+  if (agentKey) {
+    // Validate the key against the database before granting any scope.
+    // A key that matches no record grants nothing.
+    const isValid = await validateAgentKey(agentKey);
+    if (isValid) {
+      scopes.add("exchange:attempt");
+      scopes.add("exchange:propose");
+    }
+  }
+
   return scopes;
+}
+
+/**
+ * Validate an agent/proposer key against known records.
+ *
+ * Checks (in order):
+ * 1. The reference admin key (env EXCHANGE_REFERENCE_ADMIN_KEY) — a bootstrap
+ *    credential for the reference domain.
+ * 2. Any exchange_agents row whose agent_key_hash matches the supplied key.
+ * 3. Any exchange_records contribution_proposal row whose proposer_key_hash
+ *    matches the supplied key (proposer keys returned by exchange_propose).
+ *
+ * Returns true if the key matches any record, false otherwise.
+ */
+async function validateAgentKey(key: string): Promise<boolean> {
+  const keyHash = hashSecret(key);
+
+  // 1. Reference admin key
+  const referenceKey = process.env.EXCHANGE_REFERENCE_ADMIN_KEY;
+  if (referenceKey && safeEqual(key, referenceKey)) return true;
+
+  const admin = getExchangeAdmin();
+
+  // 2. Registered agent key
+  const { data: agent } = await admin
+    .from("exchange_agents")
+    .select("id")
+    .eq("agent_key_hash", keyHash)
+    .maybeSingle();
+  if (agent) return true;
+
+  // 3. Proposer key (returned by a prior exchange_propose call)
+  const { data: proposal } = await admin
+    .from("exchange_records")
+    .select("id")
+    .eq("kind", "contribution_proposal")
+    .eq("proposer_key_hash", keyHash)
+    .maybeSingle();
+  if (proposal) return true;
+
+  return false;
 }
 
 /**
@@ -1006,7 +1064,8 @@ export async function handleGetAttempt(
   },
 ): Promise<Record<string, unknown>> {
   const ip = requestIdentity(req);
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const agentKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = resolveActorId(req, agentKey);
   const attempt = await getAttempt(args.signal_id, args.attempt_id, actorId);
   if (!attempt) {
     return { outcome: "not_found", signal_id: args.signal_id, attempt_id: args.attempt_id };
@@ -1046,8 +1105,8 @@ export async function handleCreateAttempt(
     return rateLimited;
   }
 
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
   const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = resolveActorId(req, actorKey);
 
   const signal = await getSignal(args.signal_id);
   if (!signal) {
@@ -1167,7 +1226,8 @@ export async function handleSubmitAttempt(
     return rateLimited;
   }
 
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = resolveActorId(req, actorKey);
 
   const signal = await getSignal(args.signal_id);
   if (!signal) {
@@ -1355,7 +1415,8 @@ export async function handleCreateProposalFromAttempt(
     return rateLimited;
   }
 
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = resolveActorId(req, actorKey);
 
   const signal = await getSignal(args.signal_id);
   if (!signal) {

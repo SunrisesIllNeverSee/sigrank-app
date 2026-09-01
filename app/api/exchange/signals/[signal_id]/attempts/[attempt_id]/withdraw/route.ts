@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withdrawAttempt } from "@/lib/exchange/signal-server";
 import { requestIdentity } from "@/lib/exchange/server";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
+import { createHash } from "node:crypto";
 
 export async function POST(
   req: NextRequest,
@@ -12,7 +13,8 @@ export async function POST(
   const rl = await checkDistributedRateLimit(["signal-attempt", ip], { windowMs: 60 * 60 * 1000, max: 30 }, true);
   if (!rl.ok) return NextResponse.json({ error: "Rate limited" }, { status: 429, headers: { "Retry-After": String(rl.retryAfter), ...distributedRateLimitHeaders(rl, "signal-attempt") } });
 
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
   try {
     const result = await withdrawAttempt({ signalId: signal_id, attemptId: attempt_id, actorId });
     return NextResponse.json({ attempt_id: result.attempt_id, status: result.status }, { headers: distributedRateLimitHeaders(rl, "signal-attempt") });

@@ -53,9 +53,11 @@ export async function POST(
     );
   }
 
-  // Authentication: require authenticated actor unless anonymous_attempts is true
+  // Authentication: require authenticated actor unless anonymous_attempts is true.
+  // The actor ID is derived from the validated credential, NOT from a caller-
+  // supplied header — this prevents actor-ID spoofing.
   const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
 
   if (!signal.participation.anonymous_attempts && !actorKey) {
     return NextResponse.json(
