@@ -2,13 +2,16 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 test("leaderboard renders + sort works", async ({ page }) => {
-  await page.goto("/board/all");
+  await page.goto("/board/all", { waitUntil: "domcontentloaded" });
   // Table renders with rows. The board table is inside a <Suspense> boundary
   // and renders after hydration, so wait for rows to appear (not just the table shell).
+  // The board uses ISR (revalidate=3600) — if CI hits the page during an ISR
+  // rebuild, the Suspense fallback (skeleton) renders first and the real rows
+  // appear after hydration. 30s timeout covers slow hydration + ISR rebuild.
   const table = page.locator("table");
-  await expect(table).toBeVisible();
+  await expect(table).toBeVisible({ timeout: 30_000 });
   const rows = page.locator("table tbody tr");
-  await expect(rows.first()).toBeVisible({ timeout: 15000 });
+  await expect(rows.first()).toBeVisible({ timeout: 30_000 });
   expect(await rows.count()).toBeGreaterThan(0);
 
   // Click a column header — sort order should change
