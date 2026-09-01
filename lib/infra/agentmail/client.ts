@@ -12,6 +12,34 @@
  * without email notifications, they're additive.
  *
  * API docs: https://agentmail.to/docs/api-reference
+ *
+ * ── AgentMail SDK quickstart (reference) ──────────────────────────────
+ *
+ * This file uses fetch() directly to avoid adding a dependency. The official
+ * AgentMail SDKs are available for projects that prefer them:
+ *
+ * TypeScript SDK:
+ *   import { AgentMailClient } from "agentmail";
+ *   const client = new AgentMailClient({ apiKey: "YOUR_API_KEY" });
+ *   const sentMessage = await client.inboxes.messages.send(
+ *     "outreach@agentmail.to",
+ *     { to: "recipient@domain.com", subject: "Hello", text: "Body" }
+ *   );
+ *   const allMessages = await client.inboxes.messages.list("outreach@agentmail.to");
+ *
+ * Python SDK:
+ *   from agentmail import AgentMail
+ *   from agentmail.environment import AgentMailEnvironment
+ *   client = AgentMail(
+ *     environment=AgentMailEnvironment.PROD,
+ *     api_key="YOUR_TOKEN_HERE"
+ *   )
+ *   client.inboxes.threads.list(inbox_id="inbox_id")
+ *
+ * The fetch-based implementation below mirrors the same API surface:
+ *   POST /v0/inboxes                          → createAgentInbox()
+ *   POST /v0/inboxes/{id}/messages/send       → sendAgentNotification()
+ *   GET  /v0/inboxes                          → getInboxByClientId()
  */
 
 const AGENTMAIL_API_BASE = "https://api.agentmail.to/v0";
