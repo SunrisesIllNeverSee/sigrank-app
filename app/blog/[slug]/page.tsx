@@ -172,6 +172,7 @@ export default async function BlogPost({
     datePublished: date,
     dateModified: date,
     url: `${SITE_ORIGIN}/blog/${slug}`,
+    ...(hero ? { image: `${SITE_ORIGIN}${hero}` } : { image: `${SITE_ORIGIN}/og-v2.png` }),
     keywords: frontmatter.tags?.join(", "),
   };
 

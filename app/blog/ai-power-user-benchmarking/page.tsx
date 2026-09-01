@@ -31,7 +31,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/ai-power-user-benchmarking`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "AI Power User Benchmarking with SigRank",
     description:

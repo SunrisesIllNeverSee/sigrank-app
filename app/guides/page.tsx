@@ -10,7 +10,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
@@ -73,7 +73,7 @@ export default function GuidesIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Guides", path: "/guides" }]),
-          alternativesItemList(GUIDES.map((g) => ({ name: g.title })), "/guides", "SigRank Guides — All How-To Guides"),
+          alternativesItemList(GUIDES.map((g) => ({ name: g.title, url: `${SITE_ORIGIN}${g.href}` })), "/guides", "SigRank Guides — All How-To Guides"),
         ]}
       />
       <JsonLd

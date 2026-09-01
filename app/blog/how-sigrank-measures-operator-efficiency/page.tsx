@@ -31,7 +31,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/how-sigrank-measures-operator-efficiency`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "How SigRank Measures Operator Efficiency",
     description:

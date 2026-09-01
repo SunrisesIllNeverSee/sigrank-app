@@ -31,7 +31,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/best-ai-coding-tools-2026`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Best AI Coding Tools for Measuring Developer Performance (2026)",
     description:

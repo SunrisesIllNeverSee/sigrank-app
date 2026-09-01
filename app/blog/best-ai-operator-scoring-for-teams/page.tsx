@@ -31,7 +31,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/best-ai-operator-scoring-for-teams`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Best AI Operator Scoring for Teams (2026)",
     description:
