@@ -352,7 +352,7 @@ get_wiki_entry(topic="yield")
             </li>
             <li>
               <strong className="text-text-primary">Analytics</strong> — SigRank uses PostHog for
-              product analytics. Page views on the configuration and import pages are tracked
+              product analytics. Page views on the configuration page are tracked
               anonymously. No token content, no source code, no deployment secrets are ever
               tracked. See our{" "}
               <Link href="/privacy" className="text-text-muted underline hover:text-text-secondary">Privacy Policy</Link>{" "}

@@ -92,7 +92,6 @@ export default function EulaPage() {
           <ul className="flex list-disc flex-col gap-1 pl-5">
             <li>An OAuth callback that handles installation redirects from Vercel;</li>
             <li>A configuration page that displays installation status and MCP connection details;</li>
-            <li>An import page that lets you import existing SigRank resources;</li>
             <li>Environment variable management that adds the MCP endpoint URL to your project;</li>
             <li>The canonical MCP endpoint at <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-[11px] text-text-primary">https://signalaf.com/api/mcp</code>;</li>
             <li>An optional project-owned relay starter kit available in the sigrank-mcp repository.</li>
