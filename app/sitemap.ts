@@ -57,6 +57,7 @@ const STATIC_ROUTES: {
   { path: "/faq", priority: 0.6, changeFrequency: "monthly" },
   { path: "/about", priority: 0.5, changeFrequency: "monthly" },
   { path: "/developers", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/vercel", priority: 0.8, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.7, changeFrequency: "monthly" },
   // Machine-readable files (openapi.json, auth.md, llms.txt, llms-full.txt) are
   // excluded from the sitemap — they are not HTML pages, have no canonical, and
