@@ -17,9 +17,18 @@
 const AGENTMAIL_API_BASE = "https://api.agentmail.to/v0";
 
 function apiKey(): string | null {
-  // Check the Vercel-integration-prefixed env var first (SIGRANK_AGENTMAIL_API_KEY),
-  // then fall back to the unprefixed version for local dev / non-Vercel deploys.
-  return process.env.SIGRANK_AGENTMAIL_API_KEY ?? process.env.AGENTMAIL_API_KEY ?? null;
+  // Vercel marketplace integration applies the custom prefix as-is to the env
+  // var name. The owner entered "SIGRANK_" but Vercel lowercased the prefix
+  // portion, producing "sigrank_AGENTMAIL_API_KEY". Check all variants:
+  // 1. sigrank_AGENTMAIL_API_KEY — what Vercel actually created (lowercase prefix)
+  // 2. SIGRANK_AGENTMAIL_API_KEY — if Vercel preserves case in the future
+  // 3. AGENTMAIL_API_KEY — unprefixed fallback for local dev / non-Vercel deploys
+  return (
+    process.env.sigrank_AGENTMAIL_API_KEY ??
+    process.env.SIGRANK_AGENTMAIL_API_KEY ??
+    process.env.AGENTMAIL_API_KEY ??
+    null
+  );
 }
 
 export interface AgentInbox {
