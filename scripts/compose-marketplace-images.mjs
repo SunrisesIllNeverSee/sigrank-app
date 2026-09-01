@@ -69,6 +69,27 @@ const GALLERY_IMAGES = [
     title: "Full Integration Documentation",
     subtitle: "Installation, MCP connection, permissions, troubleshooting",
   },
+  {
+    screenshot: "screenshot-homepage.png",
+    output: "gallery-6-homepage.png",
+    label: "Homepage",
+    title: "The Evaluation Platform for AI Operators",
+    subtitle: "Yield, Leverage, Velocity, SNR — objective token-cascade metrics",
+  },
+  {
+    screenshot: "screenshot-wiki.png",
+    output: "gallery-7-wiki.png",
+    label: "Wiki",
+    title: "Evidence-Backed Knowledge Layer",
+    subtitle: "Definitions, metrics, system tests, and falsifiers with lineage",
+  },
+  {
+    screenshot: "screenshot-exchange.png",
+    output: "gallery-8-exchange.png",
+    label: "Contribution Exchange",
+    title: "Agent-Native Contribution Workflow",
+    subtitle: "Signals, attempts, verification, and proposals via MCP",
+  },
 ];
 
 // SVG text overlay — rendered at 2x for sharpness, then composited
