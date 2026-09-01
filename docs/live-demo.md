@@ -17,8 +17,8 @@ HUMAN × CONTEXT × MODEL
 It has two operating modes:
 
 - **Simulated** — a deterministic two-model run with a complete narrative arc.
-- **Live input** — polls `/api/live` for token-pillar snapshots. A model-name
-  change automatically opens the comparison scene.
+- **Live input** — subscribes to `/api/live/stream` (SSE) for token-pillar
+  snapshots. A model-name change automatically opens the comparison scene.
 
 ## Run locally
 
@@ -92,10 +92,11 @@ curl -X POST https://signalaf.com/api/live \
 ```
 
 The current live bridge is deliberately minimal and keeps the most recent
-snapshot in process memory. That is reliable for a local or single-instance
-demo. A multi-instance production deployment needs a shared realtime channel
-(for example Supabase Realtime) so the writer and viewer always see the same
-instance. Simulated mode is fully deployment-safe and has no such dependency.
+snapshot in process memory. SSE delivers updates to viewers on the same
+instance without polling. A multi-instance production deployment needs a
+shared realtime channel (for example Supabase Realtime) so the writer and
+viewer always see the same instance. Simulated mode is fully deployment-safe
+and has no such dependency.
 
 ## Metric integrity
 

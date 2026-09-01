@@ -380,33 +380,35 @@ export function SignalLiveDemo({ fieldYields }: { fieldYields: number[] }) {
   useEffect(() => {
     if (mode !== "live") return;
     let cancelled = false;
-    const poll = async () => {
-      try {
-        const response = await fetch("/api/live", { cache: "no-store" });
-        if (!response.ok) return;
-        const next = (await response.json()) as LiveTelemetryState;
-        if (cancelled) return;
-        setLiveState((current) => {
-          if (next.sequence === current.sequence || !next.snapshot) return next;
-          const incoming: DemoSnapshot = { ...next.snapshot, label: "LIVE" };
-          const previous = previousLiveRef.current;
-          if (previous && previous.model !== incoming.model) {
-            setLivePair([previous, incoming]);
-          }
-          previousLiveRef.current = incoming;
-          return next;
-        });
-      } catch {
-        if (!cancelled) {
-          setLiveState((current) => ({ ...current, status: "waiting" }));
+    const applyState = (next: LiveTelemetryState) => {
+      if (cancelled) return;
+      setLiveState((current) => {
+        if (next.sequence === current.sequence || !next.snapshot) return next;
+        const incoming: DemoSnapshot = { ...next.snapshot, label: "LIVE" };
+        const previous = previousLiveRef.current;
+        if (previous && previous.model !== incoming.model) {
+          setLivePair([previous, incoming]);
         }
+        previousLiveRef.current = incoming;
+        return next;
+      });
+    };
+    const source = new EventSource("/api/live/stream");
+    source.onmessage = (event) => {
+      try {
+        applyState(JSON.parse(event.data) as LiveTelemetryState);
+      } catch {
+        // ignore malformed frames
       }
     };
-    void poll();
-    const timer = window.setInterval(poll, 700);
+    source.onerror = () => {
+      if (!cancelled) {
+        setLiveState((current) => ({ ...current, status: "waiting" }));
+      }
+    };
     return () => {
       cancelled = true;
-      window.clearInterval(timer);
+      source.close();
     };
   }, [mode]);
 
