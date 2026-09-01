@@ -28,6 +28,7 @@
     "archetypes": "node scripts/gen-build-archetypes.mjs"
   },
   "dependencies": {
+    "@flags-sdk/posthog": "^1.0.1",
     "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "@sigrank/cascade": "^0.1.1",
@@ -41,6 +42,7 @@
     "@x402/evm": "2.0.0",
     "@x402/next": "2.0.0",
     "clackboard": "^1.1.2",
+    "flags": "^4.3.0",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
     "next": "^15.5.19",
