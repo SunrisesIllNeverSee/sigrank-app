@@ -14,7 +14,6 @@ const NAV_SECTIONS = [
     items: [
       { href: "/vercel", label: "Integration Home" },
       { href: "/vercel/config", label: "Configuration" },
-      { href: "/vercel/import", label: "Import Resources" },
     ],
   },
   {
