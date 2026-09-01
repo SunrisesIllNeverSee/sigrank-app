@@ -12,7 +12,7 @@
  */
 
 import { SITE_ORIGIN, formatTokensLong } from "@/lib/seo";
-import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry, CANON_LD_CONTEXT, CANON_ENTITY_IDS } from "@/lib/canon-entities";
+import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry, CANON_PROVENANCE_CONTEXT, CANON_ENTITY_IDS } from "@/lib/canon-entities";
 import { activeProfile } from "@/lib/site-profile";
 import type { HallRecord } from "@/lib/board";
 
@@ -27,13 +27,16 @@ const SITE_ID = `${SITE_ORIGIN}/#website`;
  *  SITE_ORIGIN. */
 export function personAuthor() {
   return {
-    "@context": CANON_LD_CONTEXT,
+    "@context": CANON_PROVENANCE_CONTEXT,
     "@type": "Person",
     "@id": dericMcHenry.canonical_entity_id,
     name: dericMcHenry.name,
     sameAs: dericMcHenry.sameAs,
     affiliation: { "@id": dericMcHenry.affiliation },
     url: `${SITE_ORIGIN}/about`,
+    sourceSystem: dericMcHenry.sourceSystem,
+    canonBacked: dericMcHenry.canonBacked,
+    authorityApprovalRef: dericMcHenry.authorityApprovalRef,
   };
 }
 
@@ -91,7 +94,7 @@ export function comparisonArticle(opts: {
  *  from the existing builder. */
 export function organization() {
   return {
-    "@context": CANON_LD_CONTEXT,
+    "@context": CANON_PROVENANCE_CONTEXT,
     "@type": "Organization",
     "@id": ORG_ID,
     name: elloCelloLLC.name,
@@ -101,9 +104,9 @@ export function organization() {
     logo: `${SITE_ORIGIN}/og-v2.png`,
     sameAs: [
       "https://orcid.org/0009-0002-9904-5390",
-      "https://github.com/SunrisesIllNeverSee",
-      "https://github.com/SunrisesIllNeverSee/sigrank-app",
-      "https://github.com/SunrisesIllNeverSee/sigrank-mcp",
+      "https://github.com/SunrisesIllneverSee",
+      "https://github.com/SunrisesIllneverSee/sigrank-app",
+      "https://github.com/SunrisesIllneverSee/sigrank-mcp",
       "https://www.npmjs.com/package/sigrank",
       "https://pypi.org/project/sigrank/",
       "https://smithery.ai/servers/burnmydays/sigrank-mcp",
@@ -118,6 +121,10 @@ export function organization() {
       "https://mos2es.com",
       "https://sigeconomy.com",
     ],
+    sourceSystem: elloCelloLLC.sourceSystem,
+    canonBacked: elloCelloLLC.canonBacked,
+    authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
+    associatedWith: { "@id": elloCelloLLC.associatedWith },
   };
 }
 
@@ -136,7 +143,7 @@ export function organization() {
  *  as a page-specific field, NOT substituted for the canon description. */
 export function product() {
   return {
-    "@context": CANON_LD_CONTEXT,
+    "@context": CANON_PROVENANCE_CONTEXT,
     "@type": "SoftwareApplication",
     "@id": sigrankCanon.canonical_entity_id,
     name: sigrankCanon.name,
@@ -144,6 +151,9 @@ export function product() {
     disambiguatingDescription: sigrankCanon.disambiguatingDescription,
     url: SITE_ORIGIN,
     applicationCategory: "DeveloperApplication",
+    sourceSystem: sigrankCanon.sourceSystem,
+    canonBacked: sigrankCanon.canonBacked,
+    authorityApprovalRef: sigrankCanon.authorityApprovalRef,
     operatingSystem: "Cross-platform",
     offers: {
       "@type": "Offer",
