@@ -3,6 +3,7 @@ import { submitAttempt, getSignal } from "@/lib/exchange/signal-server";
 import { logEncounter, requestIdentity } from "@/lib/exchange/server";
 import { createHash } from "node:crypto";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
+import { notifyAgent } from "@/lib/exchange/agent-notifications";
 
 /**
  * POST /api/exchange/signals/{signal_id}/attempts/{attempt_id}/submit — submit work (§10.2).
@@ -120,6 +121,15 @@ export async function POST(
       result: "ok",
       metadata: { attempt_id, body_hash: bodyHash },
     });
+
+    // Fire-and-forget agent notification (no-ops if AgentMail not configured)
+    notifyAgent({
+      agentKey: actorKey,
+      resourceId: signal_id,
+      resourceType: "signal",
+      eventType: "attempt_submitted",
+      details: { attempt_id, body_hash: bodyHash },
+    }).catch(() => {});
 
     return NextResponse.json(
       {
