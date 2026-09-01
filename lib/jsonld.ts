@@ -184,11 +184,11 @@ export function product() {
  *
  *  Site-specific values (name, alternateName, description) come from the
  *  active site profile (lib/site-profile.ts). The publisher reference
- *  points to #org (Ello Cello LLC via canon). No canon-sensitive values
- *  on this block — it describes the site, not a canonical entity. */
+ *  points to #org (Ello Cello LLC via canon). Canon provenance fields
+ *  mark this as a Search Authority-backed canonical entity. */
 export function website() {
   return {
-    "@context": "https://schema.org",
+    "@context": CANON_PROVENANCE_CONTEXT,
     "@type": "WebSite",
     "@id": SITE_ID,
     name: activeProfile.siteName,
@@ -196,6 +196,13 @@ export function website() {
     url: SITE_ORIGIN,
     publisher: { "@id": ORG_ID },
     description: activeProfile.siteTagline,
+    sourceSystem: elloCelloLLC.sourceSystem,
+    canonBacked: elloCelloLLC.canonBacked,
+    authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
+    associatedWith: [
+      { "@id": ORG_ID },
+      { "@id": elloCelloLLC.associatedWith },
+    ],
   };
 }
 
