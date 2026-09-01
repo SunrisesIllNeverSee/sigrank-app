@@ -120,18 +120,14 @@ export default function VercelIntegrationDocs() {
             Integrations → SigRank → Configure.
           </p>
 
-          <h3 className="mt-4 font-semibold text-text-primary">Importing resources</h3>
+          <h3 className="mt-4 font-semibold text-text-primary">Existing accounts</h3>
           <p>
-            If you have an existing SigRank account, you can import your resources via the{" "}
-            <Link href="/vercel/import" className="text-text-muted underline hover:text-text-secondary">import page</Link>.
-            Importable resources include:
+            If you already have a SigRank account, your operator identity and MCP
+            configuration are automatically available after installation — no
+            separate import step is needed. Your codename, agent key, and exchange
+            signals are accessible via the{" "}
+            <Link href="/vercel/config" className="text-text-muted underline hover:text-text-secondary">configuration page</Link>.
           </p>
-          <ul className="flex list-disc flex-col gap-1 pl-5">
-            <li><strong className="text-text-primary">Operator identity</strong> — your codename and agent key for exchange participation</li>
-            <li><strong className="text-text-primary">MCP configuration</strong> — the endpoint URL (added as an environment variable)</li>
-            <li><strong className="text-text-primary">Exchange signals</strong> — your published signals for agent discovery</li>
-            <li><strong className="text-text-primary">Wiki contributions</strong> — your evidence pages for citation by agents</li>
-          </ul>
         </div>
       </section>
 
