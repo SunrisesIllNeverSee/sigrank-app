@@ -6,6 +6,7 @@
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
+import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 
 export const revalidate = 86400;
 
@@ -14,6 +15,13 @@ export async function GET() {
   const fieldData = await getFieldAnalysis();
   const operatorCount = fieldData.meta.humans_included;
   const medianYield = fieldData.meta.medians.yield;
+
+  // Pull the real top Yield (Υ) from the all-time board — NOT from
+  // system_stats.top_signa_rate (which is a 0-100 signal metric, not Yield).
+  const allTimeBoard = getStaticAllTimeBoard();
+  const topEntry = allTimeBoard[0];
+  const topYield = topEntry ? (topEntry.yield_ ?? 0) : 0;
+  const topOperatorName = topEntry ? (topEntry.anonId || topEntry.codename) : "unknown";
   const body = `# ${SITE_NAME}
 
 SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
@@ -157,7 +165,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - ${homeStats.total_snapshots.toLocaleString()} snapshots scored
 - ${homeStats.transmitter_count} transmitters (high-activity operators)
 - Median Yield: ${medianYield.toFixed(2)}
-- Top Yield: ${homeStats.top_signa_rate.toLocaleString()} (${homeStats.top_operator_codename})
+- Top Yield: ${topYield.toLocaleString()} (${topOperatorName})
 - Dataset DOI: 10.5281/zenodo.21900519
 - Install: \`npx sigrank\`
 
