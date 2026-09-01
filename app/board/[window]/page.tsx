@@ -98,10 +98,13 @@ export default async function BoardWindowPage({
     // Static path: read pre-generated JSON from public/data/
     const allEntries = getStaticAllTimeBoard() as ReturnType<typeof toEntry>[];
     totalCount = allEntries.length;
-    // PERF: only send the first 25 entries as RSC props (page 0 for SSR + SEO).
-    // Subsequent pages are fetched client-side via /api/v1/leaderboard.
-    // Previously all 1,649 entries were serialized into RSC flight data (~2MB HTML).
-    totalEntries = allEntries.slice(0, 25);
+    // PERF: only send the first 400 entries as RSC props. The client-side HCM
+    // filter (categoryFilter="human") excludes outliers (input/total < 1%),
+    // and the top 290+ operators by yield are all outliers — so we need 400
+    // to have ~25 humans visible after filtering (fix from 7832f10c, regressed
+    // in e0cda8ab). Subsequent pages are fetched client-side via the static
+    // JSON. Previously all 1,649 entries were serialized (~2MB HTML).
+    totalEntries = allEntries.slice(0, 400);
     // JsonLd: top 100 for SEO (crawlers don't need all 1,649)
     jsonLdEntries = allEntries.slice(0, 100);
   } else {
