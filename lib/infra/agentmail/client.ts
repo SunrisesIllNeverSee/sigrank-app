@@ -12,14 +12,51 @@
  * without email notifications, they're additive.
  *
  * API docs: https://agentmail.to/docs/api-reference
+ *
+ * ── AgentMail SDK quickstart (reference) ──────────────────────────────
+ *
+ * This file uses fetch() directly to avoid adding a dependency. The official
+ * AgentMail SDKs are available for projects that prefer them:
+ *
+ * TypeScript SDK:
+ *   import { AgentMailClient } from "agentmail";
+ *   const client = new AgentMailClient({ apiKey: "YOUR_API_KEY" });
+ *   const sentMessage = await client.inboxes.messages.send(
+ *     "outreach@agentmail.to",
+ *     { to: "recipient@domain.com", subject: "Hello", text: "Body" }
+ *   );
+ *   const allMessages = await client.inboxes.messages.list("outreach@agentmail.to");
+ *
+ * Python SDK:
+ *   from agentmail import AgentMail
+ *   from agentmail.environment import AgentMailEnvironment
+ *   client = AgentMail(
+ *     environment=AgentMailEnvironment.PROD,
+ *     api_key="YOUR_TOKEN_HERE"
+ *   )
+ *   client.inboxes.threads.list(inbox_id="inbox_id")
+ *
+ * The fetch-based implementation below mirrors the same API surface:
+ *   POST /v0/inboxes                          → createAgentInbox()
+ *   POST /v0/inboxes/{id}/messages/send       → sendAgentNotification()
+ *   GET  /v0/inboxes                          → getInboxByClientId()
  */
 
 const AGENTMAIL_API_BASE = "https://api.agentmail.to/v0";
 
 function apiKey(): string | null {
-  // Check the Vercel-integration-prefixed env var first (SIGRANK_AGENTMAIL_API_KEY),
-  // then fall back to the unprefixed version for local dev / non-Vercel deploys.
-  return process.env.SIGRANK_AGENTMAIL_API_KEY ?? process.env.AGENTMAIL_API_KEY ?? null;
+  // Vercel marketplace integration applies the custom prefix as-is to the env
+  // var name. The owner entered "SIGRANK_" but Vercel lowercased the prefix
+  // portion, producing "sigrank_AGENTMAIL_API_KEY". Check all variants:
+  // 1. sigrank_AGENTMAIL_API_KEY — what Vercel actually created (lowercase prefix)
+  // 2. SIGRANK_AGENTMAIL_API_KEY — if Vercel preserves case in the future
+  // 3. AGENTMAIL_API_KEY — unprefixed fallback for local dev / non-Vercel deploys
+  return (
+    process.env.sigrank_AGENTMAIL_API_KEY ??
+    process.env.SIGRANK_AGENTMAIL_API_KEY ??
+    process.env.AGENTMAIL_API_KEY ??
+    null
+  );
 }
 
 export interface AgentInbox {
