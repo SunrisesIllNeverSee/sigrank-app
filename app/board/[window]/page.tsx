@@ -25,7 +25,6 @@ import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { getLeaderboard } from "@/lib/board";
 import { toEntry } from "@/lib/board/to-entry";
-import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
@@ -95,18 +94,24 @@ export default async function BoardWindowPage({
   let jsonLdEntries: ReturnType<typeof toEntry>[];
 
   if (win.enum === "all_time") {
-    // Static path: read pre-generated JSON from public/data/
-    const allEntries = getStaticAllTimeBoard() as ReturnType<typeof toEntry>[];
-    totalCount = allEntries.length;
-    // PERF: only send the first 400 entries as RSC props. The client-side HCM
-    // filter (categoryFilter="human") excludes outliers (input/total < 1%),
-    // and the top 290+ operators by yield are all outliers — so we need 400
-    // to have ~25 humans visible after filtering (fix from 7832f10c, regressed
-    // in e0cda8ab). Subsequent pages are fetched client-side via the static
-    // JSON. Previously all 1,649 entries were serialized (~2MB HTML).
-    totalEntries = allEntries.slice(0, 400);
-    // JsonLd: top 100 for SEO (crawlers don't need all 1,649)
-    jsonLdEntries = allEntries.slice(0, 100);
+    // LIVE path (2026-09-01): the all_time board now queries the DB directly
+    // like 7d/30d/90d. Previously this read from a static JSON snapshot
+    // (public/data/board-all_time.json) refreshed daily by a GitHub Action,
+    // which meant users who submitted didn't appear on the all-time board
+    // until the next daily refresh. The static JSON is still generated for
+    // /research, /methodology, and /hall (which don't need real-time data).
+    //
+    // Egress: the query returns ~1,649 rows but we only serialize 400 to RSC
+    // props (HCM filter needs 400 to show 25 humans). ISR (revalidate=3600)
+    // bounds this to 1 query/hour. The full count is kept for pagination.
+    const totalRows = await getLeaderboard({
+      window: win.enum,
+      windowFilter: true,
+      operatorTotal: true,
+    });
+    totalCount = totalRows.length;
+    totalEntries = totalRows.slice(0, 400).map(toEntry);
+    jsonLdEntries = totalRows.slice(0, 100).map(toEntry);
   } else {
     // Live path: DB-side window-filtered query (egress fix — fetches only
     // rows for this window, e.g. 87 rows for 30d vs 2,413 total).

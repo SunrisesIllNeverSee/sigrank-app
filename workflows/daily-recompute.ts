@@ -4,10 +4,11 @@
  * Replaces the fragile pg_cron-only pipeline with a Vercel Workflow that
  * survives crashes, retries failed steps, and provides observability.
  *
- * Pipeline (3 steps, matching the existing pg_cron jobs):
- *   1. recompute_the_field  — recalculate all operator pillars + ranks
- *   2. refresh_system_stats — update aggregate counters
+ * Pipeline (4 steps):
+ *   1. recompute_the_field   — recalculate all operator pillars + ranks
+ *   2. refresh_system_stats  — update aggregate counters
  *   3. backfill_rank_history — persist daily rank snapshot
+ *   4. compute_rank_movement — compute movement_24h/7d from rank_history deltas
  *
  * Each step calls the existing Supabase RPC function via the service-role
  * client. If a step fails, the workflow retries it automatically. If the
@@ -26,8 +27,14 @@ export async function dailyRecompute() {
   const step1 = await recomputeField();
   const step2 = await refreshStats();
   const step3 = await backfillHistory();
+  const step4 = await computeMovement();
 
-  return { recomputed: step1, statsRefreshed: step2, historyBackfilled: step3 };
+  return {
+    recomputed: step1,
+    statsRefreshed: step2,
+    historyBackfilled: step3,
+    movementComputed: step4,
+  };
 }
 
 /** Step 1: Recalculate all operator pillars and board ranks. */
@@ -65,6 +72,19 @@ async function backfillHistory() {
 
   const { error } = await sb.rpc("backfill_rank_history");
   if (error) throw new Error(`backfill_rank_history failed: ${error.message}`);
+
+  return { ok: true, ranAt: new Date().toISOString() };
+}
+
+/** Step 4: Compute movement_24h / movement_7d from rank_history deltas. */
+async function computeMovement() {
+  "use step";
+
+  const sb = getSupabaseService();
+  if (!sb) throw new Error("Service client unavailable");
+
+  const { error } = await sb.rpc("compute_rank_movement");
+  if (error) throw new Error(`compute_rank_movement failed: ${error.message}`);
 
   return { ok: true, ranAt: new Date().toISOString() };
 }
