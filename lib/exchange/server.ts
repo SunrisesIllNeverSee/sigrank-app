@@ -53,6 +53,25 @@ export function requestIdentity(req: NextRequest): string {
   return forwarded || req.headers.get('x-real-ip') || 'unknown'
 }
 
+/**
+ * Derive the actor identity from the validated credential, NOT from a
+ * caller-supplied header. The x-exchange-actor-id header is treated as
+ * metadata at most — it must NOT be used as the actor identity for
+ * authorization decisions. Anyone can set that header to any value.
+ *
+ * If no valid credential is present, the actor falls back to the IP-based
+ * anonymous identity (used for anonymous-attempt signals).
+ *
+ * This is the SSRF/IDOR boundary for attempt ownership: using the raw
+ * header would allow any caller to impersonate any actor and read/submit/
+ * withdraw their attempts.
+ */
+export function resolveActorId(req: NextRequest, validatedKey: string | null): string {
+  const ip = requestIdentity(req)
+  if (!validatedKey) return `anonymous:${ip}`
+  return `actor:${hashSecret(validatedKey).slice(0, 16)}`
+}
+
 export function ipHash(ip: string): string {
   return createHash('sha256').update(ip).digest('hex').slice(0, 16)
 }

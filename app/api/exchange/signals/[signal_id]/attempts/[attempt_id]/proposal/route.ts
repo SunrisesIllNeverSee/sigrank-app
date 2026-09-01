@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSignal, getAttempt, getVerification, getQualification, consumeQualification, recordProposalOrigin } from "@/lib/exchange/signal-server";
 import { getExchangeAdmin, hashSecret, newPublicId, newSecret, requestIdentity, logEncounter } from "@/lib/exchange/server";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
+import { createHash } from "node:crypto";
 
 /**
  * POST /api/exchange/signals/{signal_id}/attempts/{attempt_id}/proposal (§10.4).
@@ -32,7 +33,8 @@ export async function POST(
     return NextResponse.json({ error: "Signal does not allow proposal follow-on" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
   }
 
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
   const attempt = await getAttempt(signal_id, attempt_id, actorId);
   if (!attempt) return NextResponse.json({ error: "Attempt not found" }, { status: 404, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
 

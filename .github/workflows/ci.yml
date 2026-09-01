@@ -22,11 +22,11 @@ jobs:
       # annotations silently don't appear.
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # Full history so gitleaks can scan past commits, not just the diff.
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v3
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -35,9 +35,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload coverage report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: coverage-report
           path: coverage/
@@ -83,9 +83,9 @@ jobs:
   cross-repo-contract:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
@@ -93,7 +93,7 @@ jobs:
       - run: npm ci
 
       - name: Checkout sigrank-mcp (the other half of the contract)
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: SunrisesIllNeverSee/sigrank-mcp
           path: _sigrank-mcp
@@ -125,7 +125,7 @@ jobs:
       # Standard ref is pinned via SIGRANK_STANDARD_REF so upstream changes
       # cannot silently alter consumer builds.
       - name: Checkout sigrank-standard (authoritative fixture pack)
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: SunrisesIllNeverSee/sigrank-standard
           path: _sigrank-standard
@@ -145,17 +145,19 @@ jobs:
   # Migration parity guardrail — fails if the Supabase migration ledger has
   # drifted from the local migrations/ directory. Prevents the catastrophic
   # db-push scenario (re-running all migrations) from silently returning.
-  # Only runs when supabase/ files change. Requires SUPABASE_ACCESS_TOKEN secret.
+  # Only runs on push to main (not on PRs) to avoid exposing the
+  # SUPABASE_ACCESS_TOKEN secret in a pull_request context on a public repo.
+  # For PRs, the build job's local migration syntax check is sufficient.
   migration-parity:
     name: Supabase migration parity
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm

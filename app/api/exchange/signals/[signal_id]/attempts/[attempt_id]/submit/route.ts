@@ -41,7 +41,8 @@ export async function POST(
   }
 
   const bodyHash = `sha256:${createHash("sha256").update(body).digest("hex")}`;
-  const actorId = req.headers.get("x-exchange-actor-id") ?? `anonymous:${ip}`;
+  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
 
   // Validate required_fields (§10.2). The signal declares which fields must
   // be present in the submission body. For JSON submissions, we parse the

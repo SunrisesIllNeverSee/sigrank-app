@@ -43,8 +43,8 @@ export async function GET() {
       documentation: `${SITE_ORIGIN}/exchange`,
       scopes: [
         { name: "exchange:read", description: "Read-only Exchange discovery: domain profiles, policy, signals, attempts. Always granted." },
-        { name: "exchange:attempt", description: "Create and submit signal attempts. Requires x-exchange-actor-id header." },
-        { name: "exchange:propose", description: "Submit unsolicited proposals and create proposals from verified attempts. Requires x-exchange-agent-key or x-exchange-proposer-key header." },
+        { name: "exchange:attempt", description: "Create and submit signal attempts. Requires a valid x-exchange-agent-key or x-exchange-proposer-key header. The actor identity is derived from the validated credential." },
+        { name: "exchange:propose", description: "Submit unsolicited proposals and create proposals from verified attempts. Requires a valid x-exchange-agent-key or x-exchange-proposer-key header (validated against the database)." },
       ],
       userControl:
         "State-changing tools (exchange_propose, exchange_create_attempt, exchange_submit_attempt, exchange_create_proposal_from_attempt) require authentication headers. " +
