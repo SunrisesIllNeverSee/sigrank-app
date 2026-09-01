@@ -29,6 +29,7 @@ Unlike model leaderboards, SigRank ranks the humans using AI, not the models the
 - Retrieve a public operator rank, profile, history, or leaderboard position.
 - Diagnose token-cascade inefficiency from token counts.
 - Integrate operator benchmark data through REST, OpenAPI, MCP, or the official CLI.
+- Evaluate the public distribution and agent-discovery surface of a Vercel deployment.
 
 Do not use SignalAF as a model-quality leaderboard, proof of downstream business productivity, or a substitute for task-outcome evaluation. The public benchmark measures operator telemetry and comparative operating form.
 
@@ -46,6 +47,7 @@ The portable v0.1 draft core contains four telemetry primitives (input, output, 
 
 ## Developer and agent resources
 - [Developer Portal](${SITE_ORIGIN}/developers): API quickstart, errors, rate limits, versioning, authentication, MCP, CLI
+- [SigRank for Vercel](${SITE_ORIGIN}/vercel): one-click Vercel MCP deployment, Agent Tools integration surface, and free public deployment diagnostic
 - [Pricing](${SITE_ORIGIN}/pricing): Free during the build stage — early operators are grandfathered into tiered perks by signup number
 - [OpenAPI](${SITE_ORIGIN}/openapi.json): machine-readable REST API contract
 - [Authentication](${SITE_ORIGIN}/auth.md): public reads, OAuth/session writes, API-key conventions
@@ -97,6 +99,7 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [FAQ](${SITE_ORIGIN}/faq): common questions about AI operators and token-cascade efficiency
 - [Wiki](${SITE_ORIGIN}/wiki): four token pillars, cascade metrics, operator archetypes, MO§ES governance
 - [Compare](${SITE_ORIGIN}/compare): head-to-head operator comparison
+- [SigRank for Vercel](${SITE_ORIGIN}/vercel): Vercel-native MCP distribution and public deployment diagnostic
 
 ## Common Questions (Q&A)
 
@@ -117,6 +120,9 @@ A: No. Upsilon only reads token counts. It never reads, stores, or transmits pro
 
 **Q: How is SigRank different from model leaderboards?**
 A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the humans using the models.
+
+**Q: How do I use SigRank with Vercel?**
+A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or deploy a project-owned Vercel relay from ${SITE_ORIGIN}/vercel. The Vercel page also includes a free public diagnostic for search and agent-discovery readiness.
 
 ## Metrics, Guides & Tools
 - [All Metrics](${SITE_ORIGIN}/metrics): metric definitions and formulas
@@ -162,6 +168,7 @@ A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the 
 - "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/four-degrees
 - "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
 - "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
+- "How do I use SigRank with Vercel?" → ${SITE_ORIGIN}/vercel
 
 ## MCP, Research & Governance
 - [SigRank MCP](${SITE_ORIGIN}/mcp): local MCP/CLI tool suite; remote Streamable HTTP: ${SITE_ORIGIN}/api/mcp
