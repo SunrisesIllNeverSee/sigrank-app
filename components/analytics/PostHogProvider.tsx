@@ -10,6 +10,10 @@ import { PostHogIdentify } from "./PostHogIdentify";
  * layout stays a server component; this wraps the body content so every route
  * change is captured and `posthog` is available to downstream client components.
  * Everything no-ops when NEXT_PUBLIC_POSTHOG_KEY is unset.
+ *
+ * Feature flags are loaded automatically by posthog-js on init. The
+ * `useFeatureFlag` hook in lib/infra/posthog/flags.ts subscribes to flag
+ * changes via `posthog.onFeatureFlags()` and re-renders when flags update.
  */
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
