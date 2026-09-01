@@ -27,16 +27,13 @@ const SITE_ID = `${SITE_ORIGIN}/#website`;
  *  SITE_ORIGIN. */
 export function personAuthor() {
   return {
-    "@context": CANON_PROVENANCE_CONTEXT,
+    "@context": "https://schema.org",
     "@type": "Person",
     "@id": dericMcHenry.canonical_entity_id,
     name: dericMcHenry.name,
     sameAs: dericMcHenry.sameAs,
     affiliation: { "@id": dericMcHenry.affiliation },
     url: `${SITE_ORIGIN}/about`,
-    sourceSystem: dericMcHenry.sourceSystem,
-    canonBacked: dericMcHenry.canonBacked,
-    authorityApprovalRef: dericMcHenry.authorityApprovalRef,
   };
 }
 
@@ -94,7 +91,7 @@ export function comparisonArticle(opts: {
  *  from the existing builder. */
 export function organization() {
   return {
-    "@context": CANON_PROVENANCE_CONTEXT,
+    "@context": "https://schema.org",
     "@type": "Organization",
     "@id": ORG_ID,
     name: elloCelloLLC.name,
@@ -121,10 +118,6 @@ export function organization() {
       "https://mos2es.com",
       "https://sigeconomy.com",
     ],
-    sourceSystem: elloCelloLLC.sourceSystem,
-    canonBacked: elloCelloLLC.canonBacked,
-    authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
-    associatedWith: { "@id": elloCelloLLC.associatedWith },
   };
 }
 
@@ -143,7 +136,7 @@ export function organization() {
  *  as a page-specific field, NOT substituted for the canon description. */
 export function product() {
   return {
-    "@context": CANON_PROVENANCE_CONTEXT,
+    "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": sigrankCanon.canonical_entity_id,
     name: sigrankCanon.name,
@@ -151,9 +144,6 @@ export function product() {
     disambiguatingDescription: sigrankCanon.disambiguatingDescription,
     url: SITE_ORIGIN,
     applicationCategory: "DeveloperApplication",
-    sourceSystem: sigrankCanon.sourceSystem,
-    canonBacked: sigrankCanon.canonBacked,
-    authorityApprovalRef: sigrankCanon.authorityApprovalRef,
     operatingSystem: "Cross-platform",
     offers: {
       "@type": "Offer",
@@ -188,7 +178,7 @@ export function product() {
  *  mark this as a Search Authority-backed canonical entity. */
 export function website() {
   return {
-    "@context": CANON_PROVENANCE_CONTEXT,
+    "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": SITE_ID,
     name: activeProfile.siteName,
@@ -196,13 +186,6 @@ export function website() {
     url: SITE_ORIGIN,
     publisher: { "@id": ORG_ID },
     description: activeProfile.siteTagline,
-    sourceSystem: elloCelloLLC.sourceSystem,
-    canonBacked: elloCelloLLC.canonBacked,
-    authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
-    associatedWith: [
-      { "@id": ORG_ID },
-      { "@id": elloCelloLLC.associatedWith },
-    ],
   };
 }
 
@@ -991,14 +974,11 @@ export function scoreCalculator() {
  */
 export function cliTool() {
   return {
-    "@context": CANON_PROVENANCE_CONTEXT,
+    "@context": "https://schema.org",
     "@type": ["SoftwareApplication", "SoftwareSourceCode"],
     "@id": sigrankCanon.canonical_entity_id,
     name: "sigrank",
     alternateName: "SigRank CLI",
-    sourceSystem: sigrankCanon.sourceSystem,
-    canonBacked: sigrankCanon.canonBacked,
-    authorityApprovalRef: sigrankCanon.authorityApprovalRef,
     description:
       "A privacy-preserving terminal tool that parses your AI coding logs locally, computes token-cascade efficiency metrics, and publishes signed snapshots to the SigRank leaderboard. Bundles ccusage, tokscale, and token-dashboard.",
     url: SITE_ORIGIN,
