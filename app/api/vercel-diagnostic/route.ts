@@ -18,7 +18,7 @@ type FetchResult = {
 };
 
 const FETCH_TIMEOUT_MS = 5000;
-const MAX_TEXT_CHARS = 200_000;
+const MAX_TEXT_BYTES = 200_000;
 
 function validateDeploymentUrl(raw: unknown): URL | null {
   if (typeof raw !== "string" || raw.length > 500) return null;
@@ -47,6 +47,37 @@ function validateDeploymentUrl(raw: unknown): URL | null {
   }
 }
 
+async function readTextBounded(response: Response): Promise<string> {
+  if (!response.body) return "";
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let bytesRead = 0;
+  let text = "";
+
+  try {
+    while (bytesRead < MAX_TEXT_BYTES) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const remaining = MAX_TEXT_BYTES - bytesRead;
+      const chunk = value.byteLength > remaining ? value.subarray(0, remaining) : value;
+      bytesRead += chunk.byteLength;
+      text += decoder.decode(chunk, { stream: bytesRead < MAX_TEXT_BYTES });
+
+      if (value.byteLength > remaining || bytesRead >= MAX_TEXT_BYTES) {
+        await reader.cancel("SigRank diagnostic response limit reached");
+        break;
+      }
+    }
+
+    if (bytesRead < MAX_TEXT_BYTES) text += decoder.decode();
+    return text;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 async function safeFetch(base: URL, path: string): Promise<FetchResult> {
   const target = new URL(path, base);
 
@@ -69,9 +100,7 @@ async function safeFetch(base: URL, path: string): Promise<FetchResult> {
       contentType.includes("xml") ||
       contentType === "";
 
-    const text = canReadText
-      ? (await response.text()).slice(0, MAX_TEXT_CHARS)
-      : "";
+    const text = canReadText ? await readTextBounded(response) : "";
 
     return {
       status: response.status,
