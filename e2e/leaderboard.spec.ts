@@ -3,10 +3,12 @@ import AxeBuilder from "@axe-core/playwright";
 
 test("leaderboard renders + sort works", async ({ page }) => {
   await page.goto("/board/all");
-  // Table renders with rows
+  // Table renders with rows. The board table is inside a <Suspense> boundary
+  // and renders after hydration, so wait for rows to appear (not just the table shell).
   const table = page.locator("table");
   await expect(table).toBeVisible();
   const rows = page.locator("table tbody tr");
+  await expect(rows.first()).toBeVisible({ timeout: 15000 });
   expect(await rows.count()).toBeGreaterThan(0);
 
   // Click a column header — sort order should change
