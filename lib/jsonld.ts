@@ -145,7 +145,6 @@ export function product() {
     url: SITE_ORIGIN,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Cross-platform",
-    brand: { "@id": ORG_ID },
     offers: {
       "@type": "Offer",
       price: "0",
@@ -977,6 +976,7 @@ export function cliTool() {
   return {
     "@context": "https://schema.org",
     "@type": ["SoftwareApplication", "SoftwareSourceCode"],
+    "@id": sigrankCanon.canonical_entity_id,
     name: "sigrank",
     alternateName: "SigRank CLI",
     description:
@@ -1014,11 +1014,13 @@ export function cliTool() {
       "cli",
       "yield-cascade",
     ],
+    isBasedOn: { "@id": sigrankCanon.isBasedOn },
     about: [
       { "@id": sigrankCanon.canonical_entity_id },
+      { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
     ],
     mentions: [
-      { "@id": CANON_ENTITY_IDS.conservation_law_of_commitment },
+      { "@id": CANON_ENTITY_IDS.moses },
     ],
   };
 }
