@@ -32,7 +32,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/token-cascade-vs-raw-token-consumption`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Token Yield vs Token Count: Why Volume Lies About AI Skill",
     description:

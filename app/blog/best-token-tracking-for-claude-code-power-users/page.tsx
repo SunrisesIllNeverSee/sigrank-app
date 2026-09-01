@@ -32,7 +32,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/best-token-tracking-for-claude-code-power-users`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Best Token Tracking for Claude Code Power Users (2026)",
     description:

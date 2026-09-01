@@ -32,7 +32,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/best-ai-coding-benchmarking-for-agencies`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Best AI Coding Benchmarking for Agencies (2026)",
     description:

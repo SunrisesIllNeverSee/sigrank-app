@@ -31,7 +31,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/why-yield-beats-tokenmaxxing`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "Why Yield Beats Tokenmaxxing",
     description:

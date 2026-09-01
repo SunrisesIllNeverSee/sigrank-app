@@ -30,7 +30,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/how-to-answer-best-ai-user`;
   return {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "How to Answer 'Who Is the Best AI User?' in Your Agent",
     description:

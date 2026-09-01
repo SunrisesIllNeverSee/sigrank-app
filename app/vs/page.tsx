@@ -10,7 +10,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
@@ -118,7 +118,7 @@ export default function VsIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Comparisons", path: "/vs" }]),
-          alternativesItemList(COMPARISONS.map((c) => ({ name: c.title })), "/vs", "SigRank vs Other Tools — All Comparisons"),
+          alternativesItemList(COMPARISONS.map((c) => ({ name: c.title, url: `${SITE_ORIGIN}${c.href}` })), "/vs", "SigRank vs Other Tools — All Comparisons"),
         ]}
       />
       <JsonLd

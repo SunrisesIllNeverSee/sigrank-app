@@ -10,7 +10,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
@@ -53,7 +53,7 @@ export default function ToolsIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Tools", path: "/tools" }]),
-          alternativesItemList(TOOLS.map((t) => ({ name: t.title })), "/tools", "SigRank Tools — All Calculators"),
+          alternativesItemList(TOOLS.map((t) => ({ name: t.title, url: `${SITE_ORIGIN}${t.href}` })), "/tools", "SigRank Tools — All Calculators"),
         ]}
       />
       <JsonLd

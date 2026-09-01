@@ -30,7 +30,7 @@ function articleJsonLd() {
   const url = `${SITE_ORIGIN}/blog/the-tool-is-the-person`;
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
+    "@type": "BlogPosting",
     "@id": url,
     headline: "The Tool Is the Person: Why Token Telemetry Measures AI Skill",
     description:

@@ -10,7 +10,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
@@ -68,7 +68,7 @@ export default function MetricsIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Metrics", path: "/metrics" }]),
-          alternativesItemList(METRICS.map((m) => ({ name: m.title })), "/metrics", "SigRank Metrics — All Six Definitions"),
+          alternativesItemList(METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })), "/metrics", "SigRank Metrics — All Six Definitions"),
         ]}
       />
       <JsonLd
