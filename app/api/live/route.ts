@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import type {
-  LiveTelemetrySnapshot,
-  LiveTelemetryState,
-} from "@/lib/live/types";
+import { liveStore, liveState, publishLiveState } from "@/lib/live/store";
 
 export const dynamic = "force-dynamic";
 
@@ -18,29 +15,8 @@ const snapshotSchema = z.object({
   observedAt: z.string().datetime().optional(),
 });
 
-interface LiveStore {
-  sequence: number;
-  snapshot: LiveTelemetrySnapshot | null;
-}
-
-const globalStore = globalThis as typeof globalThis & {
-  __signalafLiveStore?: LiveStore;
-};
-
-const store =
-  globalStore.__signalafLiveStore ??
-  (globalStore.__signalafLiveStore = { sequence: 0, snapshot: null });
-
-function state(): LiveTelemetryState {
-  return {
-    status: store.snapshot ? "live" : "waiting",
-    sequence: store.sequence,
-    snapshot: store.snapshot,
-  };
-}
-
 export async function GET() {
-  return NextResponse.json(state(), {
+  return NextResponse.json(liveState(), {
     headers: { "Cache-Control": "no-store" },
   });
 }
@@ -73,8 +49,8 @@ export async function POST(request: Request) {
   }
 
   const { input, output, cacheCreate, cacheRead, ...meta } = parsed.data;
-  store.sequence += 1;
-  store.snapshot = {
+  liveStore.sequence += 1;
+  liveStore.snapshot = {
     operator: meta.operator,
     model: meta.model,
     context: meta.context,
@@ -82,7 +58,10 @@ export async function POST(request: Request) {
     pillars: { input, output, cacheCreate, cacheRead },
   };
 
-  return NextResponse.json(state(), {
+  const nextState = liveState();
+  publishLiveState(nextState);
+
+  return NextResponse.json(nextState, {
     headers: { "Cache-Control": "no-store" },
   });
 }
