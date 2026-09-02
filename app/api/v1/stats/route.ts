@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     total_tokens_scored: homeStats.total_tokens_scored,
     transmitter_count: homeStats.transmitter_count,
     top_operator: homeStats.top_operator_codename,
-    top_yield: homeStats.top_signa_rate,
+    top_yield: homeStats.top_yield,
     active_last_hour: homeStats.active_last_hour,
     comparisons_ran: homeStats.comparisons_ran,
     is_placeholder: homeStats.isPlaceholder,
