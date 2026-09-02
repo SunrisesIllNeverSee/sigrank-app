@@ -10,8 +10,11 @@
 --
 -- This migration:
 -- 1. Adds top_yield DOUBLE PRECISION column to system_stats.
--- 2. Rewrites refresh_system_stats() to pick the top operator by yield_
---    (from the latest 30d snapshot, excluding seeds + The Field).
+-- 2. Rewrites refresh_system_stats() to pick the top operator by Yield (Υ),
+--    computed inline from raw pillars (cache_read × output / input²) since
+--    metric_snapshots does NOT store yield_ as a column (see migration 0013:
+--    cascade values are deliberately computed on read). Matches the proven
+--    pattern in backfill_rank_history() (migration 0031).
 -- 3. Preserves top_signa_rate for backward compatibility (still populated,
 --    just no longer the "top" selector).
 -- 4. Backfills top_yield from the current best 30d snapshot.
@@ -20,7 +23,7 @@
 -- Step 1: Add top_yield column
 alter table system_stats add column if not exists top_yield double precision;
 
--- Step 2: Rewrite refresh_system_stats() to select by yield_
+-- Step 2: Rewrite refresh_system_stats() to select by Yield (Υ)
 create or replace function public.refresh_system_stats()
 returns void
 language plpgsql
@@ -60,13 +63,24 @@ begin
      or class_tier ilike '%ARCH%';
 
   -- Top operator by Yield (Υ) — latest 30d snapshot per operator,
-  -- excluding seeds + The Field. Yield_ is the canonical efficiency metric.
+  -- excluding seeds + The Field. Yield is computed inline from raw pillars
+  -- (cache_read × output / input²) because metric_snapshots does NOT store
+  -- yield_ as a column (migration 0013: cascade values computed on read).
+  -- Cast to numeric BEFORE multiplication to avoid bigint overflow, matching
+  -- the proven pattern in backfill_rank_history() (migration 0031).
   -- Use DISTINCT ON to get one row per operator (the latest 30d snapshot).
-  select operator_id, yield_, signa_rate
+  select operator_id, computed_yield, signa_rate
     into v_top_operator_id, v_top_yield, v_top_signa_rate
   from (
     select distinct on (operator_id)
-      operator_id, yield_, signa_rate
+      operator_id,
+      case
+        when input_tokens > 0 then
+          (cache_read_tokens::numeric * output_tokens::numeric) /
+          (input_tokens::numeric * input_tokens::numeric)
+        else 0::numeric
+      end as computed_yield,
+      signa_rate
     from metric_snapshots
     where window_type = '30d'
       and operator_id not in (
@@ -76,10 +90,10 @@ begin
         select operator_id from operators
         where codename ilike 'static seed%' or codename ilike 'app seed%'
       )
-      and yield_ is not null and yield_ > 0
+      and input_tokens is not null and input_tokens > 0
     order by operator_id, generated_at desc
   ) latest
-  order by yield_ desc
+  order by computed_yield desc
   limit 1;
 
   -- Upsert the singleton
