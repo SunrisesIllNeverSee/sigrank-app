@@ -23,26 +23,32 @@ export const metadata: Metadata = withOG({
 // useSearchParams(), so dropdown changes are instant (no server round-trip).
 // Previous setup (2026-07-31) used force-dynamic to read searchParams server-
 // side, which gave a 3.4s LCP and 100% bounce rate (44 visitors, 44s median).
+//
+// PERF (2026-09-02): Active all_time scope was fetching 1000 rows and passing
+// ALL of them into RSC flight data (2.15MB HTML). Now filters for claimed
+// operators server-side before serialization — ~22 rows instead of 1000.
+// Other windows reduced from 100 to 50 (enough for top-10 boards + light
+// platform/class filtering). Total SSR rows: ~22 + 50 + 3×50 = 172 (was 1400).
 export const dynamic = "force-static";
 export const revalidate = 300;
 
 /**
  * /hall — Hall of Signal (D15 canonical route; /hall-of-signal redirects here).
  *
- * ISR page: fetches data for ALL 4 windows (30 rows each, unfiltered) at build
- * time, passes it to HallClient for client-side filtering by platform/class/window.
+ * ISR page: fetches data for ALL 4 windows at build time, passes it to HallClient
+ * for client-side filtering by platform/class/window.
  * Default window = All time (the Hall is the all-time record book).
  */
 export default async function HallPage() {
   // Pre-fetch base rows for all 4 windows (no class/platform filter).
   // The Hall has two scopes:
-  //   Active = claimed operators only (needs live DB to catch all claimed ops)
-  //   All = full field including seed data (static board is fine for this)
-  // For all_time: fetch BOTH the static board (for All scope) and the live DB
-  // (for Active scope — claimed operators are buried below rank 100 in the
-  // static board, so we need a larger live fetch to include them all).
-  // For 7d/30d/90d: live DB with limit 100 is enough (claimed ops rank higher
-  // in recent windows).
+  //   Active = claimed operators only (server-side filtered for all_time)
+  //   All = full field including seed data
+  // For all_time Active: fetch 1000 rows (claimed ops are buried below rank
+  // 100), then filter for claimed && !retired SERVER-SIDE before passing to
+  // the client — avoids serializing 1000 rows into RSC flight data.
+  // For all_time All: top 50 by yield (includes seed data).
+  // For 7d/30d/90d: top 50 (claimed ops rank higher in recent windows).
   const windowsData: Record<string, LeaderboardRow[]> = {};
   const windowsDataAll: Record<string, LeaderboardRow[]> = {};
   await Promise.all(
@@ -51,24 +57,28 @@ export default async function HallPage() {
         // Active scope: live DB, high limit to catch all claimed operators.
         // operatorTotal=true collapses to the "multi" cross-platform total per
         // operator (so MOSES shows 23.9B, not just the 5.8B claude-only row).
-        windowsData[w.slug] = await getLeaderboard({
+        // Filter for claimed server-side to avoid serializing 1000 rows.
+        const activeRows = await getLeaderboard({
           window: w.enum,
           windowFilter: true,
           limit: 1000,
           operatorTotal: true,
         });
-        // All scope: live DB, top 100 by yield (includes seed data).
+        windowsData[w.slug] = activeRows.filter(
+          (r) => r.operator.claimed && r.operator.status !== "retired",
+        );
+        // All scope: live DB, top 50 by yield (includes seed data).
         windowsDataAll[w.slug] = await getLeaderboard({
           window: w.enum,
           windowFilter: true,
-          limit: 100,
+          limit: 50,
           operatorTotal: true,
         });
       } else {
         const liveRows = await getLeaderboard({
           window: w.enum,
           windowFilter: true,
-          limit: 100,
+          limit: 50,
           operatorTotal: true,
         });
         windowsData[w.slug] = liveRows;
