@@ -918,6 +918,7 @@ export const MOCK_HOMEPAGE_STATS: HomepageStats = {
                         // wired to snapshots. Will count badge holders once wired.
   top_operator_codename: "TransVaultOrigin",
   top_signa_rate: 96.4,
+  top_yield: 0,
   active_last_hour: 0,
   comparisons_ran: 0,
   isPlaceholder: true,

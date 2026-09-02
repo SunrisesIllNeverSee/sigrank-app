@@ -72,7 +72,7 @@ export default async function HomePage() {
           totalSnapshots: homeStats.total_snapshots,
           transmitterCount: homeStats.transmitter_count,
           topOperator: homeStats.top_operator_codename,
-          topYield: homeStats.top_signa_rate,
+          topYield: homeStats.top_yield,
           medianYield,
           platformCount: 17,
           modelCount: 3304,
@@ -315,7 +315,7 @@ export default async function HomePage() {
           across 17 platforms and 3,304 models, with{" "}
           {formatTokens(homeStats.total_tokens_scored)} tokens analyzed. The
           median Yield is {medianYield.toFixed(2)}, and the top operator
-          achieves a Yield of {homeStats.top_signa_rate.toLocaleString()}. The
+          achieves a Yield of {homeStats.top_yield.toLocaleString()}. The
           full methodology, metric definitions, and evidence boundary are
           documented at{" "}
           <Link href="/methodology" className="text-gold underline underline-offset-2">

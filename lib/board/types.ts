@@ -69,6 +69,8 @@ export interface HomepageStats {
   transmitter_count: number;
   top_operator_codename: string;
   top_signa_rate: number;
+  /** Top Yield (Υ) across all operators — the canonical efficiency metric. */
+  top_yield: number;
   /** Operators active in the last hour (by operators.last_seen). */
   active_last_hour: number;
   /** Total head-to-head comparisons run (site_counters.comparisons_ran). */

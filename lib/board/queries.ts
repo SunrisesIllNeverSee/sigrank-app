@@ -811,7 +811,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       .from("system_stats")
       .select(
         "total_operators, total_snapshots, total_tokens_scored, transmitter_count, " +
-          "top_signa_rate, operators:top_operator_id ( codename )",
+          "top_signa_rate, top_yield, operators:top_operator_id ( codename )",
       )
       .limit(1)
       .maybeSingle();
@@ -822,6 +822,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       total_tokens_scored: number | null;
       transmitter_count: number | null;
       top_signa_rate: number | null;
+      top_yield: number | null;
       operators: { codename: string | null } | null;
     } | null;
     if (!s) return MOCK_HOMEPAGE_STATS;
@@ -860,6 +861,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       top_operator_codename:
         s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
       top_signa_rate: num(s.top_signa_rate),
+      top_yield: num(s.top_yield),
       active_last_hour,
       comparisons_ran,
       isPlaceholder: false,
