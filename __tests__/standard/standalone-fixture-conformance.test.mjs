@@ -1,12 +1,23 @@
 /**
  * __tests__/standard/standalone-fixture-conformance.test.mjs
  *
- * Cross-repository conformance gate: validates @sigrank/cascade's output
- * against the authoritative fixture pack from SunrisesIllNeverSee/sigrank-standard.
+ * LEGACY ALIAS COMPATIBILITY TEST — TEMPORARY MIGRATION GATE (item 6).
  *
- * The fixture pack is the source of truth for sigrank/0.1-draft conformance.
- * This test ensures the cascade engine produces records that pass the same
- * fixtures the standalone conformance runner enforces.
+ * This is NOT the primary protocol-conformance authority. The primary gate is
+ * __tests__/standard/tteop-conformance.test.mjs, which validates @sigrank/cascade
+ * against the TTEOP protocol authority (tteop-spec@0.1.5-draft).
+ *
+ * This test validates @sigrank/cascade's output against the fixture pack from
+ * the legacy sigrank-standard repository (sigrank/0.1-draft). It exists ONLY to
+ * prove that the legacy alias sigrank/0.1-draft resolves to current TTEOP
+ * semantics — i.e., the product implementation produces identical results
+ * whether the fixture pack is labeled sigrank/0.1-draft or tteop/0.1-draft.
+ *
+ * Per the owner-directed authority architecture baseline (2026-09-02):
+ *   - sigrank-standard is a LEGACY PREDECESSOR, not a second active standard.
+ *   - The legacy version alias sigrank/0.1-draft resolves to current TTEOP
+ *     semantics.
+ *   - This test is TEMPORARY and may be removed once migration is complete.
  *
  * Pin: the Standard commit is pinned via the SIGRANK_STANDARD_REF env var
  * (default: the merged baseline `c73f152`). Upstream changes to the Standard

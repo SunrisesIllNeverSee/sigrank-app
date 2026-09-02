@@ -105,38 +105,38 @@ second active standard.
 ## Known limitations
 
 - SignalAF's local `standard/` directory contains a historical copy of the
-  sigrank-standard specification. This is being migrated to TTEOP-pinned
-  conformance. See CI migration section below.
+  sigrank-standard specification. It is retained for the legacy compatibility
+  fixture test only and is NOT the primary conformance authority.
 - The `@sigrank/cascade` package implements the TTEOP canonical formulas but
   is not yet version-pinned to `tteop-spec`. A future release will align the
   cascade package version with the TTEOP version pin.
 
-## CI migration (items 5 + 6)
+## CI gate (items 5 + 6 — DONE)
 
-### Current state
+### Primary conformance authority
 
-The sigrank-app CI workflows are currently archived (commit dba56cbe). The
-archived CI validated against a pinned `sigrank-standard` commit (`c73f152`).
-
-### Target state
-
-When CI is restored:
+The primary protocol-conformance gate is
+`__tests__/standard/tteop-conformance.test.mjs`. It imports the TTEOP protocol
+authority (`tteop-spec@0.1.5-draft`) and the product implementation
+(`@sigrank/cascade`) as two independent code paths and asserts they agree on
+the canonical MO§ES vector and every TTEOP null-semantics edge case. It also
+validates envelopes via the `tteop-spec` builder + validator.
 
 ```
-PRIMARY CONFORMANCE
-  SignalAF → tteop-spec@0.1.5-draft
-  MUST PASS
+PRIMARY CONFORMANCE (MUST PASS)
+  __tests__/standard/tteop-conformance.test.mjs
+  SignalAF @sigrank/cascade  ↔  tteop-spec@0.1.5-draft (protocol authority)
 
-SIGNALAF LOCAL TESTS
+SIGNALAF LOCAL TESTS (MUST PASS)
   __tests__/ingest/canonical.test.mjs (11/11)
-  MUST PASS
 
-LEGACY ALIAS COMPATIBILITY
-  sigrank/0.1-draft fixture test
-  TEMPORARY MIGRATION TEST
+LEGACY ALIAS COMPATIBILITY (TEMPORARY)
+  __tests__/standard/legacy-alias-compatibility.test.mjs
+  __tests__/standard/standalone-fixture-conformance.test.mjs
+  __tests__/mcp/standalone-conformance.test.mjs
+  These verify sigrank/0.1-draft resolves to current TTEOP semantics.
+  Removable once migration is complete.
 ```
-
-Once compatibility migration is complete, the legacy test becomes removable.
 
 ### What must NOT happen
 
@@ -145,7 +145,7 @@ Once compatibility migration is complete, the legacy test becomes removable.
 - SignalAF must NOT redefine TTEOP I/O/W/R meaning, formulas, null semantics,
   privacy, or conformance.
 - The local `standard/` directory must NOT be treated as a second active
-  standard. It is a historical copy being migrated.
+  standard. It is a historical copy retained for the legacy fixture test.
 
 ## Authority boundary
 
