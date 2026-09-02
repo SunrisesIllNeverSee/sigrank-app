@@ -16,12 +16,19 @@ export async function GET() {
   const operatorCount = fieldData.meta.humans_included;
   const medianYield = fieldData.meta.medians.yield;
 
-  // Pull the real top Yield (Υ) from the all-time board — NOT from
-  // system_stats.top_signa_rate (which is a 0-100 signal metric, not Yield).
-  const allTimeBoard = getStaticAllTimeBoard();
-  const topEntry = allTimeBoard[0];
-  const topYield = topEntry ? (topEntry.yield_ ?? 0) : 0;
-  const topOperatorName = topEntry ? (topEntry.anonId || topEntry.codename) : "unknown";
+  // Top Yield (Υ) — from system_stats.top_yield (populated by
+  // refresh_system_stats() which now selects by yield_). Falls back to
+  // the static all-time board if top_yield is 0 (migration not yet applied).
+  let topYield = homeStats.top_yield ?? 0;
+  let topOperatorName = homeStats.top_operator_codename ?? "unknown";
+  if (!topYield) {
+    const allTimeBoard = getStaticAllTimeBoard();
+    const topEntry = allTimeBoard[0];
+    if (topEntry) {
+      topYield = topEntry.yield_ ?? 0;
+      topOperatorName = topEntry.anonId || topEntry.codename;
+    }
+  }
   const body = `# ${SITE_NAME}
 
 SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
