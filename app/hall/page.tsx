@@ -55,13 +55,12 @@ export default async function HallPage() {
   await Promise.all(
     BOARD_WINDOWS.map(async (w) => {
       if (w.enum === "all_time") {
-        // Active scope: live DB, high limit to catch all claimed operators.
-        // operatorTotal=true collapses to the "multi" cross-platform total per
-        // operator (so MOSES shows 23.9B, not just the 5.8B claude-only row).
-        // Filter for claimed server-side to avoid serializing 1000 rows.
+        // Active scope: fetch ALL snapshots (no window_type filter) so
+        // operators who only submitted 7d/30d/90d also appear. Filter for
+        // claimed server-side to avoid serializing 1000 rows.
         const activeRows = await getLeaderboard({
           window: w.enum,
-          windowFilter: true,
+          windowFilter: false,
           limit: 1000,
           operatorTotal: true,
         });
