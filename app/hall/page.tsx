@@ -2,7 +2,6 @@ import React from "react";
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
 import { getLeaderboard } from "@/lib/board";
-import { getStaticAllTimeBoard, staticEntriesToLeaderboardRows } from "@/lib/board/static-board";
 import { BOARD_WINDOWS } from "@/lib/board/windows";
 import { HallHero } from "@/components/hall/HallHero";
 import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
@@ -58,11 +57,13 @@ export default async function HallPage() {
           limit: 1000,
           operatorTotal: true,
         });
-        // All scope: static board (includes seed data, top 100 by yield).
-        const staticEntries = getStaticAllTimeBoard();
-        windowsDataAll[w.slug] = staticEntriesToLeaderboardRows(
-          staticEntries.slice(0, 100),
-        );
+        // All scope: live DB, top 100 by yield (includes seed data).
+        windowsDataAll[w.slug] = await getLeaderboard({
+          window: w.enum,
+          windowFilter: true,
+          limit: 100,
+          operatorTotal: true,
+        });
       } else {
         const liveRows = await getLeaderboard({
           window: w.enum,
