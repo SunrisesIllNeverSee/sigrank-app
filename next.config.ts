@@ -171,6 +171,15 @@ const nextConfig: NextConfig = {
         destination: "/research",
         permanent: true,
       },
+      // The full seeded leaderboard (all operators including unclaimed seed
+      // data) moved to sigeconomy.com/all-time. Redirect so old bookmarks +
+      // search indexes find the seeded board.
+      {
+        source: "/board/seeded",
+        destination: "https://sigeconomy.com/all-time",
+        permanent: true,
+        basePath: false,
+      },
     ];
   },
 };
