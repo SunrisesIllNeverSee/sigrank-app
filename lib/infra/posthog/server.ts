@@ -5,10 +5,14 @@ import { PostHog } from "posthog-node";
 let client: PostHog | null = null;
 
 function ph(): PostHog | null {
-  const key = process.env.POSTHOG_KEY;
+  // Fall back to Vercel PostHog integration env var if the standard name is unset.
+  const key = process.env.POSTHOG_KEY
+    || process.env.sigrank_POSTHOG_PROJECT_TOKEN;
   if (!key) return null;
   client ??= new PostHog(key, {
-    host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
+    host: process.env.NEXT_PUBLIC_POSTHOG_HOST
+      ?? process.env.NEXT_PUBLIC_sigrank_POSTHOG_HOST
+      ?? "https://us.i.posthog.com",
     flushAt: 1, // serverless: send on the first event...
     flushInterval: 0, // ...don't wait on a timer
   });
