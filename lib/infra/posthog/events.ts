@@ -3,7 +3,8 @@ import { posthog } from "@/lib/infra/posthog/client";
 // Single typed surface for client funnel events so names never drift. Each helper
 // no-ops when the PostHog key is unset (guards on the public env key), so calls are
 // safe to leave in place on local/mock builds.
-const on = () => !!process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const on = () => !!process.env.NEXT_PUBLIC_POSTHOG_KEY
+  || !!process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN;
 
 export const track = {
   boardViewed: (
