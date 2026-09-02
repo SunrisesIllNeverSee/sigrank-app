@@ -86,14 +86,16 @@ export default async function BoardWindowPage({
   if (!win) notFound();
 
   // All windows now query the DB directly. ISR (revalidate=3600) bounds
-  // egress to 1 query/hour. 7d/30d/90d use DB-side window-filtered queries
-  // (~42 KB each); all_time fetches up to 400 rows for RSC props.
+  // egress to 1 query/hour. Only claimed/live operators are shown — the
+  // full seeded board (including unclaimed seed operators) lives on
+  // sigeconomy.com/all-time.
   let totalEntries: ReturnType<typeof toEntry>[];
   let totalCount: number;
   let jsonLdEntries: ReturnType<typeof toEntry>[];
 
   if (win.enum === "all_time") {
     // LIVE path: the all_time board queries the DB directly like 7d/30d/90d.
+    // Only claimed operators are shown (seed operators are on sigeconomy.com).
     // Egress: the query returns ~1,649 rows but we only serialize 400 to RSC
     // props (HCM filter needs 400 to show 25 humans). ISR (revalidate=3600)
     // bounds this to 1 query/hour. The full count is kept for pagination.
@@ -102,19 +104,22 @@ export default async function BoardWindowPage({
       windowFilter: true,
       operatorTotal: true,
     });
-    totalCount = totalRows.length;
-    totalEntries = totalRows.slice(0, 400).map(toEntry);
-    jsonLdEntries = totalRows.slice(0, 100).map(toEntry);
+    const liveRows = totalRows.filter((r) => r.operator.claimed);
+    totalCount = liveRows.length;
+    totalEntries = liveRows.slice(0, 400).map(toEntry);
+    jsonLdEntries = liveRows.slice(0, 100).map(toEntry);
   } else {
     // Live path: DB-side window-filtered query (egress fix — fetches only
     // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
+    // Only claimed operators are shown.
     const totalRows = await getLeaderboard({
       window: win.enum,
       windowFilter: true,
       operatorTotal: true,
     });
-    totalCount = totalRows.length;
-    totalEntries = totalRows.map(toEntry);
+    const liveRows = totalRows.filter((r) => r.operator.claimed);
+    totalCount = liveRows.length;
+    totalEntries = liveRows.map(toEntry);
     // JsonLd from the default (operatorTotal) entries — search engines see the
     // default board. Filtered variants are client-side and don't need structured data.
     jsonLdEntries = totalEntries;
@@ -250,6 +255,21 @@ export default async function BoardWindowPage({
           four token pillars and publishes a signed record. No prompt content
           leaves your machine — only the four counts.
         </p>
+        {win.slug === "all" && (
+          <p className="mt-4 border-t border-bg-border-subtle pt-4 font-sans text-xs leading-relaxed text-text-muted">
+            This board shows claimed operators with verified submissions. The
+            full seeded archive (all operators including the historical seed
+            corpus) is at{" "}
+            <a
+              href="https://sigeconomy.com/all-time"
+              className="text-gold underline underline-offset-2 hover:text-text-primary"
+              rel="noopener"
+            >
+              sigeconomy.com/all-time
+            </a>
+            .
+          </p>
+        )}
       </section>
     </div>
   );
