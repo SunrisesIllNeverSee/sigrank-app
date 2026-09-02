@@ -94,14 +94,16 @@ export default async function BoardWindowPage({
   let jsonLdEntries: ReturnType<typeof toEntry>[];
 
   if (win.enum === "all_time") {
-    // LIVE path: the all_time board queries the DB directly like 7d/30d/90d.
-    // Only claimed operators are shown (seed operators are on sigeconomy.com).
-    // Egress: the query returns ~1,649 rows but we only serialize 400 to RSC
-    // props (HCM filter needs 400 to show 25 humans). ISR (revalidate=3600)
-    // bounds this to 1 query/hour. The full count is kept for pagination.
+    // LIVE path: the all_time board fetches ALL snapshots (no window_type
+    // filter) so operators who only submitted 7d/30d/90d snapshots also
+    // appear. operatorTotalCollapse picks the latest 'multi' snapshot per
+    // operator (or latest single-platform). Only claimed operators are
+    // shown (seed operators are on sigeconomy.com).
+    // Egress: fetches ~2,400 rows but ISR (revalidate=3600) bounds to
+    // 1 query/hour. We serialize 400 to RSC props; full count for pagination.
     const totalRows = await getLeaderboard({
       window: win.enum,
-      windowFilter: true,
+      windowFilter: false,
       operatorTotal: true,
     });
     const liveRows = totalRows.filter((r) => r.operator.claimed);

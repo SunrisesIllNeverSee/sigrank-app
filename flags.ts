@@ -40,7 +40,8 @@ const ANONYMOUS_DISTINCT_ID = "anonymous";
  */
 export const identify = dedupe(async () => {
   // No PostHog key → no point resolving identity, return anonymous.
-  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY
+    && !process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN) {
     return { distinctId: ANONYMOUS_DISTINCT_ID };
   }
 

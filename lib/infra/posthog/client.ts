@@ -33,7 +33,10 @@ const posthog = new Proxy({} as typeof posthogType, {
  * it's NOT in the initial JS bundle. The proxy above no-ops until this resolves.
  */
 export async function initPostHog() {
-  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  // Fall back to Vercel PostHog integration env vars if the standard names are unset.
+  // The integration creates vars like NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN.
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
+    || process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN;
   if (!key || typeof window === "undefined" || initialized) return;
   initialized = true;
   const mod = await import("posthog-js");
@@ -42,7 +45,9 @@ export async function initPostHog() {
     // Talk to our own origin (/ingest) — the next.config.ts reverse proxy forwards
     // to PostHog cloud. Keeps analytics alive past ad-blockers + no third-party domain.
     api_host: "/ingest",
-    ui_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
+    ui_host: process.env.NEXT_PUBLIC_POSTHOG_HOST
+      ?? process.env.NEXT_PUBLIC_sigrank_POSTHOG_HOST
+      ?? "https://us.i.posthog.com",
     capture_pageview: false, // SPA pageviews are sent manually in PostHogProvider
     capture_pageleave: true,
     persistence: "localStorage+cookie",
