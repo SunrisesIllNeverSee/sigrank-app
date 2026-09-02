@@ -58,6 +58,19 @@ import { ProfileBody } from "./ProfileBody";
 export const revalidate = 21600;
 
 /**
+ * On-demand ISR: return [] so no profiles are prerendered at build time,
+ * but each profile is generated on first visit then ISR-cached for 21600s (6h).
+ * Without this, Next.js 15 treats the dynamic route as fully dynamic (ƒ),
+ * rendering every request on demand with no caching — the p95 3.8s TTFB.
+ * With generateStaticParams returning [], the route becomes ISR (○ with
+ * dynamicParams=true default), so the first visit generates + caches, and
+ * subsequent visits hit the edge cache until revalidate expires.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+/**
  * Resolve the display name for an operator. display_name now carries both the
  * claimed operator's chosen name AND the seed's real handle (public tokscale
  * footprints, migrated from SEED_IDENTITY → Supabase 2026-06-20); otherwise the

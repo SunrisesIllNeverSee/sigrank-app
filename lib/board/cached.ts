@@ -107,7 +107,7 @@ export const getMetricLeaders = unstable_cache(
 export const getHomepageStats = unstable_cache(
   _getHomepageStats,
   ["homepage-stats"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 export const getOnlineHourly = unstable_cache(
