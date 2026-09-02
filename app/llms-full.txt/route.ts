@@ -13,7 +13,6 @@
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
-import { getStaticAllTimeBoard } from "@/lib/board/static-board";
 
 export const revalidate = 86400; // 24h
 
@@ -53,18 +52,9 @@ export async function GET() {
   const medianYield = fieldData.meta.medians.yield;
 
   // Top Yield (Υ) — from system_stats.top_yield (populated by
-  // refresh_system_stats() which now selects by yield_). Falls back to
-  // the static all-time board if top_yield is 0 (migration not yet applied).
-  let topYield = homeStats.top_yield ?? 0;
-  let topOperatorName = homeStats.top_operator_codename ?? "unknown";
-  if (!topYield) {
-    const allTimeBoard = getStaticAllTimeBoard();
-    const topEntry = allTimeBoard[0];
-    if (topEntry) {
-      topYield = topEntry.yield_ ?? 0;
-      topOperatorName = topEntry.anonId || topEntry.codename;
-    }
-  }
+  // refresh_system_stats() which selects by yield_).
+  const topYield = homeStats.top_yield ?? 0;
+  const topOperatorName = homeStats.top_operator_codename ?? "unknown";
 
   const body = `# ${SITE_NAME} — Full Reference for AI Engines
 
