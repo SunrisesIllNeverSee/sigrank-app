@@ -43,11 +43,12 @@ export default async function HallPage() {
   // Pre-fetch base rows for all 4 windows (no class/platform filter).
   // The Hall has two scopes:
   //   Active = claimed operators only (server-side filtered for all_time)
-  //   All = full field including seed data
-  // For all_time Active: fetch 1000 rows (claimed ops are buried below rank
+  //   All = same as Active — only claimed/live operators. The full seeded
+  //         board (including unclaimed seed operators) lives on
+  //         sigeconomy.com/all-time.
+  // For all_time: fetch 1000 rows (claimed ops are buried below rank
   // 100), then filter for claimed && !retired SERVER-SIDE before passing to
   // the client — avoids serializing 1000 rows into RSC flight data.
-  // For all_time All: top 50 by yield (includes seed data).
   // For 7d/30d/90d: top 50 (claimed ops rank higher in recent windows).
   const windowsData: Record<string, LeaderboardRow[]> = {};
   const windowsDataAll: Record<string, LeaderboardRow[]> = {};
@@ -67,13 +68,9 @@ export default async function HallPage() {
         windowsData[w.slug] = activeRows.filter(
           (r) => r.operator.claimed && r.operator.status !== "retired",
         );
-        // All scope: live DB, top 50 by yield (includes seed data).
-        windowsDataAll[w.slug] = await getLeaderboard({
-          window: w.enum,
-          windowFilter: true,
-          limit: 50,
-          operatorTotal: true,
-        });
+        // All scope: same as Active — only claimed/live operators. The
+        // full seeded board is on sigeconomy.com/all-time.
+        windowsDataAll[w.slug] = windowsData[w.slug];
       } else {
         const liveRows = await getLeaderboard({
           window: w.enum,

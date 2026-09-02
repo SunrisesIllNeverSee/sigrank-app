@@ -41,12 +41,15 @@ function fmtYield(y: number): string {
 
 export default async function MethodologyPage() {
   // Live all_time board query (ISR revalidate=86400, so this runs once/day).
+  // Only claimed/live operators — the full seeded board is on
+  // sigeconomy.com/all-time.
   const rows = await getLeaderboard({
     window: "all_time",
     windowFilter: true,
     operatorTotal: true,
   });
-  const entries = rows.map(toEntry);
+  const liveRows = rows.filter((r) => r.operator.claimed);
+  const entries = liveRows.map(toEntry);
 
   // ── Compute quotable stats from real data ────────────────────────────
   const ranked = entries.filter(
