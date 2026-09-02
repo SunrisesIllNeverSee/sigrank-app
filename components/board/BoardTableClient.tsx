@@ -83,18 +83,22 @@ export function BoardTableClient({
     LeaderboardEntryWithPlatforms[] | null
   >(null);
 
-  // Lazy-load the full all_time dataset from the static JSON when the user
-  // paginates beyond page 0. The static JSON is served from /public/data/ as a
-  // CDN-cached asset — no DB cost. This keeps SSR HTML small (25 entries) while
-  // preserving full client-side pagination.
+  // Lazy-load the full all_time dataset from the API when the user paginates
+  // beyond page 0. This keeps SSR HTML small (25 entries) while preserving
+  // full client-side pagination.
   const handlePageChange = useCallback(
     (page: number) => {
       if (page > 0 && win === "all" && !fullEntries && !loading) {
         setLoading(true);
-        fetch("/data/board-all_time.json", { cache: "force-cache" })
+        const params = new URLSearchParams({
+          metric: "yield",
+          window: "all_time",
+          limit: "2000",
+        });
+        fetch(`/api/v1/leaderboard?${params.toString()}`, { cache: "force-cache" })
           .then((r) => (r.ok ? r.json() : { entries: [] }))
           .then((d) => {
-            const entries = (d.entries ?? []).map(mapStaticEntry);
+            const entries = (d.entries ?? []).map(mapApiEntry);
             setFullEntries(entries);
           })
           .catch(() => setFullEntries([]))
@@ -193,47 +197,6 @@ export function BoardTableClient({
       onPageChange={handlePageChange}
     />
   );
-}
-
-/** Map a static JSON board entry (from /data/board-all_time.json) to the
- *  LeaderboardEntryWithPlatforms shape. The static JSON already stores entries
- *  in the toEntry() output shape, so this is a near-identity mapping. */
-function mapStaticEntry(e: Record<string, unknown>): LeaderboardEntryWithPlatforms {
-  return {
-    rank: (e.rank as number) ?? 0,
-    percentile: (e.percentile as number) ?? null,
-    isSeed: (e.isSeed as boolean) ?? false,
-    anonId: (e.anonId as string) ?? (e.codename as string) ?? "?",
-    codename: (e.codename as string) ?? "?",
-    subLabel: (e.subLabel as string) ?? undefined,
-    signalClass: (e.signalClass as string) ?? "BURNER",
-    platform: (e.platform as string) ?? undefined,
-    yield_: (e.yield_ as number) ?? null,
-    leverage: (e.leverage as number) ?? null,
-    snr: (e.snr as number) ?? undefined,
-    dev10x: (e.dev10x as number) ?? null,
-    velocity: (e.velocity as number) ?? null,
-    totalTokens: (e.totalTokens as number) ?? null,
-    input: (e.input as number) ?? null,
-    output: (e.output as number) ?? null,
-    cacheRead: (e.cacheRead as number) ?? null,
-    cacheWrite: (e.cacheWrite as number) ?? null,
-    scaleV: (e.scaleV as number) ?? null,
-    costPerMillion: (e.costPerMillion as number) ?? null,
-    efficiency: (e.efficiency as number) ?? null,
-    opRatio: (e.opRatio as string) ?? undefined,
-    snRatio: (e.snRatio as number) ?? undefined,
-    messageVolume: (e.messageVolume as number) ?? undefined,
-    sessionDepth: (e.sessionDepth as number) ?? undefined,
-    promptComplexity: (e.promptComplexity as number) ?? undefined,
-    threadsRecalled: (e.threadsRecalled as number) ?? undefined,
-    compositeScore: (e.compositeScore as number) ?? undefined,
-    acctAge: (e.acctAge as string) ?? "—",
-    lastSeen: (e.lastSeen as string) ?? null,
-    status: (e.status as string) ?? undefined,
-    platforms: (e.platforms as string[]) ?? undefined,
-    primaryDomain: (e.primaryDomain as string) ?? undefined,
-  } as LeaderboardEntryWithPlatforms;
 }
 
 /** Map an API leaderboard entry to the LeaderboardEntryWithPlatforms shape. */
