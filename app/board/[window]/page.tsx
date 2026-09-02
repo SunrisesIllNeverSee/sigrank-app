@@ -85,22 +85,15 @@ export default async function BoardWindowPage({
   const win = boardWindowBySlug(slug);
   if (!win) notFound();
 
-  // EGRESS FIX (2026-07-31): all_time board reads a static JSON snapshot
-  // (public/data/board-all_time.json, generated daily by GitHub Action).
-  // This eliminates ~90% of Supabase egress (2,184 rows → 0 per request).
-  // 7d/30d/90d stay LIVE via DB-side window-filtered queries (~42 KB each).
+  // All windows now query the DB directly. ISR (revalidate=3600) bounds
+  // egress to 1 query/hour. 7d/30d/90d use DB-side window-filtered queries
+  // (~42 KB each); all_time fetches up to 400 rows for RSC props.
   let totalEntries: ReturnType<typeof toEntry>[];
   let totalCount: number;
   let jsonLdEntries: ReturnType<typeof toEntry>[];
 
   if (win.enum === "all_time") {
-    // LIVE path (2026-09-01): the all_time board now queries the DB directly
-    // like 7d/30d/90d. Previously this read from a static JSON snapshot
-    // (public/data/board-all_time.json) refreshed daily by a GitHub Action,
-    // which meant users who submitted didn't appear on the all-time board
-    // until the next daily refresh. The static JSON is still generated for
-    // /research, /methodology, and /hall (which don't need real-time data).
-    //
+    // LIVE path: the all_time board queries the DB directly like 7d/30d/90d.
     // Egress: the query returns ~1,649 rows but we only serialize 400 to RSC
     // props (HCM filter needs 400 to show 25 humans). ISR (revalidate=3600)
     // bounds this to 1 query/hour. The full count is kept for pagination.
