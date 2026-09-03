@@ -57,9 +57,14 @@ async function pb(path, body) {
   return data;
 }
 
+/** Escape all regex special characters in a string. */
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Convert a fully-qualified record name to the Porkbun subdomain form (strip the apex). */
 function toSubdomain(fqdn, domain) {
-  const sub = fqdn.replace(new RegExp(`\\.?${domain.replace(/\./g, "\\.")}$`), "");
+  const sub = fqdn.replace(new RegExp(`\\.?${escapeRegExp(domain)}$`), "");
   return sub; // "" for apex, "_index._agents" for _index._agents.<domain>
 }
 

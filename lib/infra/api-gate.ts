@@ -13,9 +13,17 @@ import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
  * Length-safe constant-time string comparison for API key validation.
  * Hashes both inputs to fixed-length digests before timingSafeEqual,
  * avoiding the early-exit timing leak on length mismatch.
+ *
+ * Note: SHA-256 is used here as a fixed-length digest for constant-time
+ * comparison, NOT as a password hash. API keys are high-entropy secrets
+ * that do not require slow KDF hashing. CodeQL's "insufficient computational
+ * effort" warning is a false positive in this context.
  */
 function safeEqualStrings(a: string, b: string): boolean {
+  // SHA-256 used as a fixed-length digest for timingSafeEqual, not as a password hash.
+  // lgtm[js/hashing-insufficient-computational-effort]
   const ha = createHash("sha256").update(a).digest();
+  // lgtm[js/hashing-insufficient-computational-effort]
   const hb = createHash("sha256").update(b).digest();
   return timingSafeEqual(ha, hb);
 }
