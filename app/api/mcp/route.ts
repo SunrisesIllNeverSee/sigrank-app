@@ -51,6 +51,7 @@ import {
   deriveAuthTier,
 } from "@/lib/exchange/mcp-observability";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { posthogMcp } from "@/lib/mcp/server";
 
 // ── SDK handler ─────────────────────────────────────────────────────────────
 // createMcpHandler returns an object with a .fetch(request) method that
@@ -253,7 +254,9 @@ export async function POST(req: NextRequest) {
     body: rawBody,
   });
 
-  return mcpHandler.fetch(sdkRequest);
+  const response = await mcpHandler.fetch(sdkRequest);
+  await posthogMcp?.flush().catch(() => {});
+  return response;
 }
 
 // ── GET handler ─────────────────────────────────────────────────────────────
@@ -262,7 +265,9 @@ export async function GET(req: NextRequest) {
   if (!allowedOrigin(req)) {
     return new Response("Forbidden", { status: 403 });
   }
-  return mcpHandler.fetch(req as unknown as Request);
+  const response = await mcpHandler.fetch(req as unknown as Request);
+  await posthogMcp?.flush().catch(() => {});
+  return response;
 }
 
 // ── DELETE handler ──────────────────────────────────────────────────────────
@@ -271,5 +276,7 @@ export async function DELETE(req: NextRequest) {
   if (!allowedOrigin(req)) {
     return new Response("Forbidden", { status: 403 });
   }
-  return mcpHandler.fetch(new Request(req.url, { method: "DELETE", headers: req.headers }));
+  const response = await mcpHandler.fetch(new Request(req.url, { method: "DELETE", headers: req.headers }));
+  await posthogMcp?.flush().catch(() => {});
+  return response;
 }
