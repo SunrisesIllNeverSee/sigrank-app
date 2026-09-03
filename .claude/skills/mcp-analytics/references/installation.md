@@ -1,0 +1,433 @@
+> AI agents: this is one page from PostHog's docs. Full index of Markdown docs for LLMs: https://posthog.com/llms.txt
+
+# Installing the MCP Analytics SDK - Docs
+
+Copy page
+
+# Installing the MCP Analytics SDK - Docs
+
+**Beta SDK**
+
+`@posthog/mcp` is in beta (pre-1.0). The API may still change – including breaking changes in minor `0.x` releases – until `v1`, so pin a version while we iterate.
+
+## Requirements
+
+-   Node.js 20.20+ or 22.22+ (TypeScript/JavaScript), or Python 3.10+ — see [Python](#python) below
+-   An MCP server built on the MCP TypeScript SDK — either major, `@modelcontextprotocol/sdk` (v1) or `@modelcontextprotocol/{core,server,client}` (v2) — or the Python MCP SDK, also either major (`mcp>=1.26,<3`). See [MCP SDK v2](/docs/mcp-analytics/sdk-v2.md). (Running a custom dispatcher with no server object to wrap? See [Custom servers](/docs/mcp-analytics/custom-servers.md).)
+-   A PostHog [project API key](/docs/getting-started/project-token.md) (`phc_…`)
+
+## AI wizard
+
+The fastest way to get set up is our wizard, which installs the package, adds your `posthog-node` client, and wires up the `instrument()` call for you (it also works for [LLM coding agents](/blog/envoy-wizard-llm-agent.md) like Cursor and Bolt):
+
+`npx @posthog/wizard mcp-analytics`
+
+[Learn more](/wizard.md)
+
+Prefer to set things up manually, or want to understand each piece? Follow the steps below.
+
+## Install
+
+Terminal
+
+PostHog AI
+
+```bash
+npm install @posthog/mcp posthog-node
+# or pnpm add @posthog/mcp posthog-node
+# or yarn add @posthog/mcp posthog-node
+```
+
+You bring your own [`posthog-node`](/docs/libraries/node.md) client (the same pattern as [`@posthog/ai`](/docs/ai-engineering.md)) and pass it to `instrument()` as the required second argument. You own its lifecycle — call `posthog.shutdown()` or `posthog.flush()` yourself.
+
+## Wrap your server
+
+`instrument(server, posthog, options?)` is the only function you need to call. The `posthog` client is a required positional argument; `options` is optional. It returns an analytics handle (used for [custom events](/docs/mcp-analytics/custom-events.md)). It's idempotent per server — calling it twice on the same server logs a warning and returns early.
+
+### Low-level `Server`
+
+If you registered your tools against the raw protocol `Server` from `@modelcontextprotocol/sdk/server/index.js`:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { PostHog } from "posthog-node"
+import { instrument } from "@posthog/mcp"
+const server = new Server({ name: "my-mcp-server", version: "1.0.0" })
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+  host: "https://us.i.posthog.com", // or https://eu.i.posthog.com
+})
+// register your tools as usual...
+const analytics = instrument(server, posthog)
+```
+
+### High-level `McpServer`
+
+If you use the typed `McpServer` wrapper, pass it in directly — the SDK will unwrap it and also install a proxy on `_registeredTools`, so any tool you register *after* `instrument()` is also wrapped:
+
+PostHog AI
+
+### SDK-v1
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { PostHog } from "posthog-node"
+import { instrument } from "@posthog/mcp"
+const server = new McpServer({ name: "my-mcp-server", version: "1.0.0" })
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+  host: "https://us.i.posthog.com",
+})
+const analytics = instrument(server, posthog)
+server.tool("search_events", { /* ... */ }, async (args) => {
+  // your handler runs untouched
+})
+```
+
+### SDK-v2
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/server"
+import { PostHog } from "posthog-node"
+import { instrument } from "@posthog/mcp"
+const server = new McpServer({ name: "my-mcp-server", version: "1.0.0" })
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+  host: "https://us.i.posthog.com",
+})
+const analytics = instrument(server, posthog)
+server.registerTool("search_events", { /* ... */ }, async (args) => {
+  // your handler runs untouched
+})
+```
+
+Everything past this point — options, callbacks, events — is identical on both majors. See [MCP SDK v2](/docs/mcp-analytics/sdk-v2.md) for the two places they differ.
+
+### Next.js / Vercel (`mcp-handler`)
+
+[`mcp-handler`](https://github.com/vercel/mcp-handler) gives you a standard `McpServer` in its setup callback, so you instrument it the same way — one line, before or after you register tools:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+import { createMcpHandler } from "mcp-handler"
+import { PostHog, instrument } from "@posthog/mcp"
+// Create the client once at module scope (not per request).
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+  host: "https://us.i.posthog.com", // or https://eu.i.posthog.com
+})
+const handler = createMcpHandler(
+  (server) => {
+    instrument(server, posthog)
+    server.registerTool("roll_dice", { /* ... */ }, async ({ sides }) => { /* ... */ })
+  },
+  {},
+  { basePath: "/api" },
+)
+export { handler as GET, handler as POST }
+```
+
+#### Grouping a client's calls
+
+On Vercel, `mcp-handler`'s streamable-HTTP transport is **stateless**: it spins up a fresh server per request and issues no `Mcp-Session-Id`, so there's no connection for the SDK to derive a shared `$session_id` from — left alone, every request lands in its own session.
+
+The robust way to group is **by user**. Pass [`identify`](/docs/mcp-analytics/identifying-users.md) and return a `distinctId` from your auth (e.g. the OAuth subject) — that sets `distinct_id`, so a person's calls group together no matter how many stateless requests they span, and it requires nothing from the client:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+instrument(server, posthog, {
+  identify: (request, extra) => ({ distinctId: getUserId(extra) }),
+})
+```
+
+For finer, per-conversation grouping you can also enable [`enableConversationId`](/docs/mcp-analytics/conversation-id.md): the SDK adds a `conversation_id` argument, generates one when the client doesn't send it, and asks the agent to echo it on later calls, correlating them via `$mcp_conversation_id`. It's **best-effort** — it works by appending a short instruction to the tool result, which a cooperative agent echoes but some clients ignore or treat as untrusted server content (the same wariness they apply to prompt injection). Use it when you control the client or that trade-off is acceptable; otherwise stick with `identify`.
+
+#### Flushing
+
+`posthog-node` batches events, and a serverless function can freeze before they send. Flush at the end of the invocation — `await posthog.flush()`, or `ctx.waitUntil(posthog.flush())` to keep the runtime alive until it completes.
+
+### NestJS (`@rekog/mcp-nest`)
+
+With [`@rekog/mcp-nest`](https://github.com/rekog-labs/MCP-Nest) you don't construct the server yourself — `McpModule.forRoot(...)` does, and you define tools with `@Tool()` decorators. Instrument it through the module's `serverMutator` hook using `instrumentMutator`, which returns the server for you:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+import { Module } from "@nestjs/common"
+import { McpModule } from "@rekog/mcp-nest"
+import { PostHog, instrumentMutator } from "@posthog/mcp"
+// Create the client once at module scope.
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+  host: "https://us.i.posthog.com", // or https://eu.i.posthog.com
+})
+@Module({
+  imports: [
+    McpModule.forRoot({
+      name: "my-mcp-server",
+      version: "1.0.0",
+      serverMutator: instrumentMutator(posthog),
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+`instrumentMutator(posthog)` is shorthand for `(server) => { instrument(server, posthog); return server }`. It returns the *server*, not the analytics handle, so it slots straight into `serverMutator`. The tools mcp-nest registers after the mutator runs are still captured.
+
+If you need the analytics handle for [custom events](/docs/mcp-analytics/custom-events.md), call `instrument()` directly inside the mutator and return the server yourself:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+serverMutator: (server) => {
+  const analytics = instrument(server, posthog)
+  // ...use `analytics.capture(...)` elsewhere...
+  return server
+}
+```
+
+## Stateless and multi-pod servers
+
+A stateless server keeps nothing between requests — a fresh server instance each time, often on a different pod. Left alone, every request becomes its own `$session_id`, and `$mcp_client_name` / `$mcp_client_version` (only sent at `initialize`) go missing from every event after the handshake.
+
+The SDK handles this with no session store and no sticky routing. At `initialize` it mints the `Mcp-Session-Id` response header as a token carrying the session id and client metadata. Clients replay that header on every subsequent request, so any pod reads the same values back — nothing changes on the client side.
+
+**This applies to 2025-11-25 traffic**
+
+The `2026-07-28` revision has no `initialize` and no `Mcp-Session-Id`, so none of this section reaches it. See [Sessions on 2026-07-28](/docs/mcp-analytics/sdk-v2.md#sessions-on-2026-07-28).
+
+### Streamable HTTP needs `enableJsonResponse: true`
+
+Minting only reaches the wire in JSON mode. In SSE (streaming) mode, `StreamableHTTPServerTransport` builds the response headers *before* your `initialize` handler runs, so the minted header never lands and the SDK silently falls back to a session per request:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+new StreamableHTTPServerTransport({
+  sessionIdGenerator: undefined, // stateless
+  enableJsonResponse: true,      // lets the SDK mint the session header
+})
+```
+
+Use a fresh transport per request, which stateless mode requires anyway. With [`@rekog/mcp-nest`](https://github.com/rekog-labs/MCP-Nest), set the same option on the module: `streamableHttp: { statelessMode: true, enableJsonResponse: true }`.
+
+### If you must stream (SSE)
+
+Set the header yourself at the HTTP layer with `encodeSessionId`, reading `clientInfo` off the `initialize` body. The SDK decodes it either way:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+import { MCP_SESSION_HEADER, encodeSessionId, newSessionId } from "@posthog/mcp"
+// after parsing the POST body, before flushing response headers:
+if (body?.method === "initialize" && !req.headers[MCP_SESSION_HEADER]) {
+  res.setHeader(
+    MCP_SESSION_HEADER,
+    encodeSessionId({
+      sessionId: newSessionId(),
+      clientName: body.params?.clientInfo?.name,
+      clientVersion: body.params?.clientInfo?.version,
+    })
+  )
+}
+```
+
+### When you can't use a session token
+
+Some frameworks construct the transport for you and don't expose `enableJsonResponse`, and a client that ignores the header falls back to a generated session per request either way. In both cases, group by user with [`identify`](/docs/mcp-analytics/identifying-users.md) — `distinct_id` groups a person's calls however many requests they span, and it requires nothing from the client. [Conversation IDs](/docs/mcp-analytics/conversation-id.md) give finer, per-conversation grouping when the agent cooperates.
+
+## Python
+
+A Python SDK ships inside the [`posthog`](/docs/libraries/python.md) package (the same way [`posthog.ai`](/docs/ai-engineering.md) does), so there's nothing extra to install:
+
+Terminal
+
+PostHog AI
+
+```bash
+pip install posthog
+```
+
+`instrument()` needs the MCP SDK at runtime, but you already have it — you built your server with `mcp` or `fastmcp`, so it's treated as a peer dependency rather than bundled. Both `mcp` majors are supported (`mcp>=1.26,<3`), detected at runtime. (`PostHogMCP` for custom dispatchers needs nothing beyond `posthog`.)
+
+`instrument(server, posthog_client, options?)` works with every common Python MCP server:
+
+-   `FastMCP` and the low-level `Server` from the official [`modelcontextprotocol/python-sdk`](https://github.com/modelcontextprotocol/python-sdk) (the `mcp` package, 1.x)
+-   `MCPServer` — FastMCP's new name on `mcp` 2.x — and the v2 low-level `Server`, see [MCP SDK v2](/docs/mcp-analytics/sdk-v2.md#python)
+-   [jlowin's standalone **FastMCP 2.0**](https://github.com/jlowin/fastmcp) (the separate `fastmcp` package)
+-   `PostHogMCP` for custom dispatchers with no server object (see below)
+
+Python
+
+PostHog AI
+
+```python
+from posthog import Posthog
+from posthog.mcp import instrument
+from mcp.server.fastmcp import FastMCP
+posthog = Posthog(
+    "phc_your_project_api_key",
+    host="https://us.i.posthog.com",  # or https://eu.i.posthog.com
+)
+server = FastMCP("my-server")
+# On MCP SDK 2.x, FastMCP was renamed — instrument() works the same:
+# from mcp.server.mcpserver import MCPServer
+# server = MCPServer("my-server")
+# register your tools as usual...
+analytics = instrument(server, posthog)
+```
+
+Options are passed as `MCPAnalyticsOptions`, the snake\_case equivalent of the TypeScript options:
+
+Python
+
+PostHog AI
+
+```python
+from posthog.mcp import instrument
+from posthog.mcp.types import MCPAnalyticsOptions, UserIdentity
+instrument(server, posthog, MCPAnalyticsOptions(
+    context=True,                 # inject the `context` intent argument (default)
+    report_missing=True,          # register the get_more_tools virtual tool
+    enable_conversation_id=True,  # stitch calls across reconnects
+    identify=lambda request, extra: UserIdentity(distinct_id="user_123"),
+))
+```
+
+`MCPAnalyticsOptions` fields (the TypeScript [Configuration](#configuration) table below uses camelCase — these are the Python names):
+
+| Option | Type | Default | What it does |
+| --- | --- | --- | --- |
+| context | bool \\\| MCPAnalyticsContextOptions | True | Inject the context intent argument into every tool. |
+| report_missing | bool | False | Register the get_more_tools virtual tool. |
+| missing_capability_tool_name | str | "get_more_tools" | Rename the virtual tool registered by report_missing. |
+| enable_conversation_id | bool | False | Inject an optional conversation_id argument to stitch calls. |
+| enable_exception_autocapture | bool | True | Emit a $exception sibling on failed tool calls. |
+| identify | (request, extra) -> UserIdentity \\\| None (sync or async) | — | Map a request to one of your users. |
+| intent_fallback | (request, extra) -> str \\\| None | — | Provide intent when the agent didn't pass context. |
+| before_send | (event) -> event \\\| None | — | Inspect/modify/drop each event before send. |
+| event_properties | (request, extra) -> dict | — | Properties merged onto every event. |
+| logger | (message: str) -> None | no-op | STDIO-safe log sink. |
+
+### Stateless and multi-pod servers
+
+Same problem as [above](#stateless-and-multi-pod-servers) — a stateless deployment fragments `$session_id` and loses the client name/version after `initialize`. Python fixes it with the same self-encoded session token (minted onto the `Mcp-Session-Id` header, replayed by the client), but from an ASGI layer, so there's **no `enableJsonResponse` caveat** — JSON and SSE both work.
+
+On a **FastMCP** server (official `mcp.server.fastmcp` or jlowin's `fastmcp` 2.0) it's zero-config: `instrument()` wraps the server's `streamable_http_app()` / `sse_app()` factories (which `run()` uses too), so just make the server stateless:
+
+Python
+
+PostHog AI
+
+```python
+server = FastMCP("my-server", stateless_http=True)
+instrument(server, posthog)
+server.run(transport="streamable-http")  # or: app = server.streamable_http_app()
+```
+
+When you build the ASGI app yourself — a low-level `Server`, or a custom [`PostHogMCP`](/docs/mcp-analytics/custom-servers.md) dispatcher — add the middleware to that app once:
+
+Python
+
+PostHog AI
+
+```python
+from posthog.mcp import PostHogMcpStatelessSessionMiddleware
+app.add_middleware(PostHogMcpStatelessSessionMiddleware)
+```
+
+### Flushing on exit
+
+The `posthog` client batches events asynchronously and you own its lifecycle. On the `instrument()` path, auto-captured events are scheduled in the background — `await analytics.flush()` waits for in-flight events, then `posthog.flush()` / `posthog.shutdown()` sends them. Call this from your shutdown/`SIGTERM` handler so trailing events aren't dropped (see [`examples/mcp_analytics_demo.py`](https://github.com/PostHog/posthog-python/blob/main/examples/mcp_analytics_demo.py) for a runnable end-to-end example):
+
+Python
+
+PostHog AI
+
+```python
+analytics = instrument(server, posthog)
+# ... serve ...
+await analytics.flush()   # drain in-flight auto-capture events
+posthog.shutdown()        # flush + stop the posthog client
+```
+
+No server object to wrap (a custom HTTP/edge dispatcher)? Use `PostHogMCP`, a `posthog` client subclass (needs nothing beyond `posthog` — no MCP SDK) with `capture_tool_call()`, `capture_initialize()`, `capture_tools_list()`, `capture_missing_capability()`, `prepare_tool_list()`, and `prepare_tool_call()` — the Python equivalent of [Custom servers](/docs/mcp-analytics/custom-servers.md).
+
+**Python SDK is beta**
+
+The Python SDK is in beta (pre-1.0); the API may still change before `v1`, and some TypeScript-only features may land first. It emits the identical `$mcp_*` events documented on the [events](/docs/mcp-analytics/events.md) page.
+
+It supports both `mcp` majors and the `2026-07-28` protocol revision. See [MCP SDK v2](/docs/mcp-analytics/sdk-v2.md) for what that revision changes.
+
+## Configuration
+
+The `posthog` client is passed as the required second positional argument — not in this options object. `instrument()` accepts these options as an optional third argument:
+
+| Option | Type | Default | What it does |
+| --- | --- | --- | --- |
+| logger | (message: string) => void | no-op | STDIO-safe log sink for SDK-internal warnings. MCP STDIO transports cannot use console.*, so the default discards. Wire your own to surface warnings during development. |
+| enableExceptionAutocapture | boolean | true | When false, a failed tool call does not emit the $exception sibling event. |
+| context | boolean \\\| { description: string } | true | Inject a required context argument into every tool schema. See [Capturing agent intent](/docs/mcp-analytics/intent.md). |
+| intentFallback | (request, extra) => string \\\| Promise<string \\\| null \\\| undefined> | — | Called when the agent didn't pass a context argument. See [Capturing agent intent](/docs/mcp-analytics/intent.md). |
+| enableConversationId | boolean | false | Inject an optional conversation_id argument into every tool. See [Conversation IDs](/docs/mcp-analytics/conversation-id.md). |
+| reportMissing | boolean | false | Register the get_more_tools virtual tool. See [Missing capability](/docs/mcp-analytics/missing-capability.md). |
+| identify | async (request, extra) => UserIdentity \\\| null \\\| UserIdentity | — | Map an MCP request to one of your users. See [Identifying users](/docs/mcp-analytics/identifying-users.md). |
+| beforeSend | (event) => event \\\| null \\\| undefined \\\| Promise<...> | — | Runs on each fully-built PostHog payload right before send. Return the (possibly mutated) event to send it, or a nullish value to drop it. See [Privacy](/docs/mcp-analytics/privacy.md). |
+| eventProperties | async (request, extra) => Record<string, unknown> | — | Properties merged onto every event. See [Custom events and metadata](/docs/mcp-analytics/custom-events.md). |
+
+## Graceful shutdown
+
+The `posthog-node` client queues and batches events asynchronously, and you own its lifecycle. Call `posthog.shutdown()` from your `SIGTERM` / `beforeExit` handler so in-flight events aren't dropped:
+
+TypeScript
+
+PostHog AI
+
+```typescript
+import { PostHog } from "posthog-node"
+import { instrument } from "@posthog/mcp"
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN)
+instrument(server, posthog)
+process.on("SIGTERM", async () => {
+  await posthog.shutdown()
+  process.exit(0)
+})
+```
+
+If you only want to drain the queue without tearing the client down, call `posthog.flush()` instead.
+
+In serverless or edge environments where `SIGTERM` isn't reliable, flush explicitly at the end of each invocation — `await posthog.flush()`, or `ctx.waitUntil(posthog.flush())` on platforms that support it — rather than relying on a shutdown signal.
+
+## What happens after install
+
+As soon as the wrapper is in place, every MCP request handled by the server emits a PostHog event:
+
+-   `$mcp_tool_call` per tool invocation
+-   `$mcp_tools_list` per `tools/list` response
+-   `$mcp_initialize` per client handshake
+-   `$mcp_resource_read`, `$mcp_resources_list`, `$mcp_prompt_get`, `$mcp_prompts_list` as applicable
+-   `$exception` whenever a tool throws or returns `isError: true`
+
+All events share a `$session_id` derived from the MCP protocol session, so the same connection always maps to the same PostHog session — including on stateless deployments, where the SDK carries the session across pods itself (see [Stateless and multi-pod servers](#stateless-and-multi-pod-servers)). See the [event reference](/docs/mcp-analytics/events.md) for the full catalog.
+
+### Still have questions?
+
+Ask PostHog AI
+
+### Was this page useful?
+
+HelpfulCould be better
