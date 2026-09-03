@@ -57,7 +57,12 @@ const PROFILES: Record<SiteProfileId, SiteProfile> = {
 };
 
 function detectProfile(): SiteProfileId {
-  if (SITE_ORIGIN.includes("sigeconomy.com")) return "sigeconomy";
+  try {
+    const host = new URL(SITE_ORIGIN).hostname;
+    if (host === "sigeconomy.com" || host.endsWith(".sigeconomy.com")) return "sigeconomy";
+  } catch {
+    // SITE_ORIGIN is not a valid URL — fall through to default
+  }
   return "signalaf";
 }
 
