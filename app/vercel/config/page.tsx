@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { VercelMcpCopyButton } from "@/components/vercel/VercelAcquisition";
+import { TestMcpButton } from "@/components/vercel/TestMcpButton";
 
 export const metadata: Metadata = {
   ...withOG({
@@ -126,14 +127,7 @@ async function VercelConfigContent({
         >
           View all MCP tools
         </Link>
-        <a
-          href="https://signalaf.com/api/mcp"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center justify-center rounded-md border border-bg-border px-5 py-3 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold/60"
-        >
-          Test MCP endpoint
-        </a>
+        <TestMcpButton />
       </section>
 
       {/* No configurationId — show generic help */}
