@@ -191,11 +191,7 @@ const nextConfig: NextConfig = {
         destination: "/metrics/yield-cascade",
         permanent: true,
       },
-      {
-        source: "/privacy-preserving-ai-telemetry",
-        destination: "/standard/open-vs-proprietary",
-        permanent: true,
-      },
+      // /privacy-preserving-ai-telemetry is now a real page (NS-02.05 privacy portal)
       {
         source: "/ai-coding-analytics",
         destination: "/ai-coding-metrics",

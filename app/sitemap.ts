@@ -340,7 +340,7 @@ const STATIC_ROUTES: {
   // NS-02.04 named category pages (301 redirects to nearest equivalents)
   { path: "/ai-operator-benchmark", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-efficiency", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/privacy-preserving-ai-telemetry", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/privacy-preserving-ai-telemetry", priority: 0.8, changeFrequency: "monthly" },
   { path: "/ai-coding-analytics", priority: 0.6, changeFrequency: "monthly" },
 
   // AI evaluation topic pages — from content brief (2026-09-15)
