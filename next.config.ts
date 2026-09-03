@@ -180,6 +180,27 @@ const nextConfig: NextConfig = {
         permanent: true,
         basePath: false,
       },
+      // NS-02.04 named category pages — redirect to nearest existing equivalents
+      {
+        source: "/ai-operator-benchmark",
+        destination: "/ai-operator-scoring",
+        permanent: true,
+      },
+      {
+        source: "/token-efficiency",
+        destination: "/metrics/yield-cascade",
+        permanent: true,
+      },
+      {
+        source: "/privacy-preserving-ai-telemetry",
+        destination: "/standard/open-vs-proprietary",
+        permanent: true,
+      },
+      {
+        source: "/ai-coding-analytics",
+        destination: "/ai-coding-metrics",
+        permanent: true,
+      },
     ];
   },
 };
