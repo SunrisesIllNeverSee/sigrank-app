@@ -110,6 +110,21 @@ const COMPARISONS = [
     title: "SigRank vs Sourcegraph Cody — Cross-Tool Scoring for Codebase-Aware AI",
     desc: "Sourcegraph Cody is a code-aware AI assistant. SigRank is platform-neutral — scores the operator across Cody, Claude Code, Copilot, and 15+ tools.",
   },
+  {
+    href: "/vs/swe-bench",
+    title: "SigRank vs SWE-bench — Model Benchmark vs Operator Benchmark",
+    desc: "SWE-bench evaluates AI models on real software engineering tasks. SigRank evaluates operators by token cascade efficiency. SWE-bench asks can the model fix the bug. SigRank asks how efficiently did you drive it.",
+  },
+  {
+    href: "/vs/chatbot-arena",
+    title: "SigRank vs Chatbot Arena — Rank the Driver, Not the Car",
+    desc: "Chatbot Arena ranks AI models by human preference votes. SigRank ranks operators by cascade efficiency. Models don't drive — operators do. Rank the driver, not the car.",
+  },
+  {
+    href: "/vs/ai-productivity-dashboards",
+    title: "SigRank vs AI Productivity Dashboards — Dashboards vs Competition",
+    desc: "AI productivity dashboards show usage metrics. SigRank scores operators by token cascade efficiency and ranks them on a public leaderboard. Dashboards show what you spent; SigRank scores how well you spent it.",
+  },
 ];
 
 export default function VsIndex() {

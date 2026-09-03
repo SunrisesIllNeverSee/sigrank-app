@@ -154,6 +154,9 @@ const STATIC_ROUTES: {
   { path: "/vs/tabnine", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/amazon-q", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/sourcegraph-cody", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/swe-bench", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/chatbot-arena", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ai-productivity-dashboards", priority: 0.7, changeFrequency: "monthly" },
   // Competitor /vs/ pages (2026-08-27 batch — token tracker & leaderboard competitors)
   { path: "/vs/viberank", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/tokenmaxxer", priority: 0.7, changeFrequency: "monthly" },
