@@ -31,6 +31,7 @@
     "@flags-sdk/posthog": "^1.0.1",
     "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
+    "@posthog/mcp": "0.12.0",
     "@sigrank/cascade": "^0.1.1",
     "@stripe/stripe-js": "^9.9.0",
     "@supabase/ssr": "^0.12.1",
