@@ -1,13 +1,22 @@
 /**
  * __tests__/mcp/standalone-conformance.test.mjs
  *
- * Cross-repository conformance gate: validates the SignalAF HTTP MCP
- * server's get_sigrank_standard_record tool output against the
- * authoritative fixture pack from sigrank-standard.
+ * LEGACY ALIAS COMPATIBILITY TEST (MCP producer) — TEMPORARY MIGRATION GATE.
  *
- * The fixture pack is the source of truth for sigrank/0.1-draft conformance.
- * This test ensures the HTTP MCP producer emits records that pass the same
- * fixtures the standalone conformance runner enforces.
+ * This is NOT the primary protocol-conformance authority. The primary gate is
+ * __tests__/standard/tteop-conformance.test.mjs, which validates @sigrank/cascade
+ * against the TTEOP protocol authority (tteop-spec@0.1.5-draft).
+ *
+ * This test validates the SignalAF HTTP MCP server's get_sigrank_standard_record
+ * tool output against the fixture pack from the legacy sigrank-standard
+ * repository (sigrank/0.1-draft). It exists ONLY to prove that the legacy alias
+ * sigrank/0.1-draft resolves to current TTEOP semantics for the MCP producer
+ * path — i.e., the HTTP MCP tool emits records that pass the same fixtures
+ * whether labeled sigrank/0.1-draft or tteop/0.1-draft.
+ *
+ * Per the owner-directed authority architecture baseline (2026-09-02):
+ *   - sigrank-standard is a LEGACY PREDECESSOR, not a second active standard.
+ *   - This test is TEMPORARY and may be removed once migration is complete.
  *
  * Pin: the Standard commit is pinned via SIGRANK_STANDARD_REF env var
  * (default: the merged baseline `c73f152`).
