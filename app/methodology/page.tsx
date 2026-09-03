@@ -275,6 +275,191 @@ export default async function MethodologyPage() {
         </ul>
       </section>
 
+      {/* ── Derived metrics ────────────────────────────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Derived metrics
+        </h2>
+        <p className="text-base text-text-secondary">
+          Yield is the headline metric, but the cascade produces four derived
+          metrics that describe different aspects of operator behavior:
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse font-sans text-sm">
+            <thead>
+              <tr className="border-b border-bg-border bg-bg-elevated">
+                <th className="px-4 py-2 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                  Metric
+                </th>
+                <th className="px-4 py-2 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                  Formula
+                </th>
+                <th className="px-4 py-2 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                  Meaning
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-bg-border-subtle">
+                <td className="px-4 py-2 text-text-primary">SNR</td>
+                <td className="px-4 py-2 font-mono text-gold">output / (input + output)</td>
+                <td className="px-4 py-2 text-text-secondary">Output share of the direct exchange</td>
+              </tr>
+              <tr className="border-b border-bg-border-subtle">
+                <td className="px-4 py-2 text-text-primary">Leverage</td>
+                <td className="px-4 py-2 font-mono text-gold">cache_read / input</td>
+                <td className="px-4 py-2 text-text-secondary">Cache reuse relative to fresh input</td>
+              </tr>
+              <tr className="border-b border-bg-border-subtle">
+                <td className="px-4 py-2 text-text-primary">Velocity</td>
+                <td className="px-4 py-2 font-mono text-gold">output / input</td>
+                <td className="px-4 py-2 text-text-secondary">Output tokens per fresh input token</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 text-text-primary">10xDEV</td>
+                <td className="px-4 py-2 font-mono text-gold">log₁₀(cache_read / input)</td>
+                <td className="px-4 py-2 text-text-secondary">Log-scale Leverage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── Normalization ──────────────────────────────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Normalization
+        </h2>
+        <p className="text-base text-text-secondary">
+          Raw pillars are made comparable through ratios rather than direct
+          token totals. The cascade clamps the input denominator to at least
+          one to avoid division by zero. Volume is separately represented as{" "}
+          <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
+            log10(total pillars)
+          </code>{" "}
+          rather than folded into every ratio. The scoring engine normalizes
+          selected Core 5 inputs to [0,100]: compression is multiplied by 100,
+          throughput uses{" "}
+          <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
+            min(100, 20 × log10(x + 1))
+          </code>
+          , and session depth uses a server-side bucket table.
+        </p>
+        <p className="text-base text-text-secondary">
+          Normalization improves comparability but cannot remove differences
+          in tools, models, workloads, windows, or reporting practices.
+        </p>
+      </section>
+
+      {/* ── Limitations ─────────────────────────────────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Limitations
+        </h2>
+        <p className="text-base text-text-secondary">
+          Upsilon measures a token-flow relationship: cache reads and output
+          relative to fresh input. It does{" "}
+          <strong className="text-text-primary">not</strong> measure
+          correctness, novelty, user satisfaction, economic value, code
+          quality, safety, talent, effort, or intelligence.
+        </p>
+        <p className="text-base text-text-secondary">
+          Yield is especially sensitive to small input denominators. The app
+          uses a denominator floor and ingest plausibility checks, but neither
+          turns a ratio into proof. Cache behavior also depends on provider,
+          model, prompt structure, session design, and collection tooling.
+        </p>
+        <p className="text-base text-text-secondary">
+          Scores and classes are conditional on submitted data, verification
+          tier, scoring version, and selection into the field. Missing
+          telemetry, unverified submissions, changing tools, and uneven
+          sampling limit comparisons. Treat rank and signals as observations
+          to investigate, not final judgments.
+        </p>
+      </section>
+
+      {/* ── Gaming threat model ─────────────────────────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Gaming threat model
+        </h2>
+        <p className="text-base text-text-secondary">
+          SigRank defends against leaderboard gaming through multiple layers:
+        </p>
+        <ul className="flex flex-col gap-2 text-base text-text-secondary">
+          <li>
+            <strong className="text-text-primary">Cryptographic signing:</strong>{" "}
+            every snapshot is ed25519-signed by the operator&apos;s device
+            key. The server verifies the signature before accepting.
+          </li>
+          <li>
+            <strong className="text-text-primary">Server-side rescoring:</strong>{" "}
+            the server recomputes all derived metrics from the four raw token
+            pillars. Operators cannot submit inflated yield or leverage values
+            directly.
+          </li>
+          <li>
+            <strong className="text-text-primary">Replay protection:</strong>{" "}
+            nonce tracking blocks resubmission of identical snapshots.
+          </li>
+          <li>
+            <strong className="text-text-primary">Plausibility gates:</strong>{" "}
+            implausible token ratios are flagged for review before appearing
+            on the public board.
+          </li>
+          <li>
+            <strong className="text-text-primary">Benford&apos;s Law check:</strong>{" "}
+            aggregate leading-digit analysis flags statistical anomalies in
+            token counts. A Benford flag is evidence for review, not proof of
+            fabrication — it is considered alongside data coverage,
+            independence, and collection behavior.
+          </li>
+          <li>
+            <strong className="text-text-primary">Proprietary weights:</strong>{" "}
+            the composite SIGNA rate uses server-only weights (RS.xx) that
+            are not published, preventing targeted optimization against the
+            composite.
+          </li>
+        </ul>
+        <p className="text-sm text-text-muted">
+          The leaderboard is discovery, not judgment. No single metric can
+          fully prevent gaming — the goal is to make gaming harder and more
+          detectable than honest participation.
+        </p>
+      </section>
+
+      {/* ── Protocol authority ──────────────────────────────────────────── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
+          Protocol authority
+        </h2>
+        <p className="text-base text-text-secondary">
+          The canonical metric definitions and conformance suite are governed
+          by the{" "}
+          <a
+            href="https://www.npmjs.com/package/tteop-spec"
+            className="text-gold underline underline-offset-2"
+          >
+            TTEOP specification
+          </a>{" "}
+          (Token-Telemetry Exchange Protocol, v0.1.5-draft). SigRank is the
+          public reference implementation; Upsilon is the enterprise
+          measurement engine. Both implement TTEOP. The governance framework
+          (MO§ES™, patent pending) enforces submission integrity.
+        </p>
+        <p className="text-base text-text-secondary">
+          The scoring is grounded in published science — the Conservation Law
+          of Commitment (DOI:{" "}
+          <a
+            href="https://doi.org/10.5281/zenodo.20029607"
+            className="text-gold underline underline-offset-2"
+          >
+            10.5281/zenodo.20029607
+          </a>
+          ).
+        </p>
+      </section>
+
       {/* ── How the data updates ───────────────────────────────────────── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
