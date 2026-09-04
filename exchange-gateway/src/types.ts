@@ -237,6 +237,19 @@ export interface ExchangeManifest {
     verified: boolean
     verified_at?: string
   }
+  rate_limits?: {
+    proposals_per_hour: number
+    preflight_per_hour: number
+    signal_attempts_per_hour: number
+    messages_per_hour: number
+    abuse_handling: string
+  }
+  terms_hash?: {
+    algorithm: 'sha256'
+    serialization: 'rfc8785_jcs'
+    fields_included: string[]
+    immutable_after_acceptance: true
+  }
 }
 
 // ─── Execution Provider Layer ───

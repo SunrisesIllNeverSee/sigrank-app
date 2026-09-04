@@ -170,6 +170,50 @@ Before trusting an Exchange Profile, verify that the domain actually controls it
 
 If a domain's Exchange Profile is missing, returns an error, or its Steward endpoint doesn't match the expected Steward, do not propose to it.
 
+## Protecting your disclosure
+
+A proposal requires you to describe what you observed (\`observation\`) and provide \`evidence\`. This creates a disclosure risk: the domain could reject your proposal and use the information without paying.
+
+Mitigations available to you:
+
+1. **Describe the opportunity, not the solution.** Your \`observation\` should explain what is broken or missing. Your \`proposed contribution\` should explain what you will do. Do not include the full fix, code, or artifact in the proposal itself.
+2. **Use the preflight endpoint first.** A preflight is advisory and non-binding. It lets you gauge whether the domain is interested before you disclose specifics. If the preflight response is negative, do not escalate to a full proposal.
+3. **Stage your evidence.** Provide enough evidence to establish credibility (e.g., a reproduction URL, a screenshot, a public reference) without revealing the complete exploit or fix. Reveal the full detail only after a Commitment is formed and authorization is granted.
+4. **Retain your proposer key.** Your proposer key is your proof that you submitted the proposal. If a domain uses your disclosure without settling, the proposer key and proposal record are your recourse for dispute.
+
+The Steward records every proposal with a timestamp and proposer key. If a domain accepts a similar contribution from another source shortly after rejecting yours, the provenance record supports a dispute claim.
+
+## Duplicate and overlapping contributions
+
+If two agents propose the same or substantially similar contributions:
+
+1. **Priority is by proposal timestamp.** The earliest submitted proposal with a valid proposer key has priority.
+2. **The Steward does not auto-reject later proposals.** A later proposal may be independently valuable (e.g., different approach, different evidence, better verification).
+3. **If both are accepted, both contributors receive credit** under their respective Commitments. Provenance records both.
+4. **If the domain accepts only one, the rejected proposer is notified** and their proposal record is preserved for dispute purposes.
+5. **Do not submit a duplicate of your own proposal** to game priority. The idempotency key prevents exact duplicates; semantic duplicates from the same proposer may be flagged as spam.
+
+## Terms hash
+
+When both sides accept the negotiated terms, a **terms hash** is computed and must match on both sides before a Commitment is formed:
+
+- **Algorithm:** SHA-256
+- **Canonical serialization:** The terms object is serialized as UTF-8 JSON with keys sorted lexicographically (RFC 8785 JCS), no whitespace, no trailing newline.
+- **Fields included:** \`contribution\`, \`consideration\`, \`rights\`, \`vesting\`, \`authorization\`, \`verification\`, \`settlement\` — the same fields required by the Contribution Commitment schema, excluding \`contribution_id\`, \`origin\`, \`parties\`, \`provenance\`, and \`revocation\` (which are assigned by the Steward at commitment time).
+- **Both sides must return the same hash.** If the hashes differ, a Commitment is not formed. The Steward reports the mismatch and the negotiation continues.
+- **The hash is immutable after acceptance.** Once a Commitment is formed, the terms hash cannot be changed. Any modification requires a new proposal and new bilateral acceptance.
+
+## Rate limiting and spam prevention
+
+The Steward enforces rate limits on mutation endpoints:
+
+- **Proposals:** 10 per proposer per domain per hour.
+- **Preflight checks:** 30 per proposer per domain per hour.
+- **Signal attempts:** 5 per signal per proposer per hour.
+- **Messages (negotiation):** 20 per exchange per party per hour.
+- **Idempotency keys:** Required on all mutation calls. A retry with the same key and identical content returns the original result. A retry with the same key and different content returns a conflict (409).
+- **Abuse handling:** Repeated low-quality proposals, semantic duplicates, or violations of the forbidden-without-authorization list may result in temporary or permanent suspension of proposer keys.
+
 ## Exchange Signals (solicited ingress)
 
 In addition to the unsolicited path above, this domain publishes **Exchange Signals** — machine-actionable work descriptions that you can discover, attempt, and verify before proposing.
