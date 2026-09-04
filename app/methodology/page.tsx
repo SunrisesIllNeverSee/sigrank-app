@@ -120,7 +120,7 @@ export default async function MethodologyPage() {
             {
               question: "How is operator efficiency measured?",
               answer:
-                "Each operator runs an on-device scanner that reads four token pillars (fresh input, output, cache_read, cache_create) locally. The yield metric Υ = cache_read × output / input² measures the architecture of the token cascade — whether signal is compounding or tokens are burned. No message content is ever read or transmitted.",
+                "Each operator runs an on-device scanner that reads four token pillars (fresh input, output, cache_read, cache_write) locally. The yield metric Υ = cache_read × output / input² measures the architecture of the token cascade — whether signal is compounding or tokens are burned. No message content is ever read or transmitted.",
             },
             {
               question: "Is the data private?",
@@ -249,7 +249,7 @@ export default async function MethodologyPage() {
         <ul className="flex flex-col gap-2 text-base text-text-secondary">
           <li>
             <strong className="text-text-primary">Inputs:</strong> on-device
-            token counts (fresh input, output, cache_read, cache_create) per
+            token counts (fresh input, output, cache_read, cache_write) per
             session per platform.
           </li>
           <li>
@@ -442,7 +442,7 @@ export default async function MethodologyPage() {
           >
             TTEOP specification
           </a>{" "}
-          (Token-Telemetry Exchange Protocol, v0.1.5-draft). SigRank is the
+          (Token Telemetry Evaluation Operator Protocol, v0.1.5-draft). SigRank is the
           public reference implementation; Upsilon is the enterprise
           measurement engine. Both implement TTEOP. The governance framework
           (MO§ES™, patent pending) enforces submission integrity.
