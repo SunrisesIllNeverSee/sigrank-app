@@ -976,7 +976,7 @@ export function cliTool() {
   return {
     "@context": "https://schema.org",
     "@type": ["SoftwareApplication", "SoftwareSourceCode"],
-    "@id": sigrankCanon.canonical_entity_id,
+    "@id": `${SITE_ORIGIN}/#sigrank-cli`,
     name: "sigrank",
     alternateName: "SigRank CLI",
     description:

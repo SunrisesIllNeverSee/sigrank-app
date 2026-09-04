@@ -1,9 +1,11 @@
 /**
- * app/vs/codeburn/page.tsx — "SigRank vs codeburn" SEO comparison page.
+ * app/vs/codeburn/page.tsx — "SigRank vs CodeBurn" SEO comparison page.
  *
- * Angle: codeburn tracks AI coding cost across tools. SigRank scores efficiency.
- * Cost is the input; yield is the output. Cost tracking is accounting; efficiency
- * scoring is evaluation.
+ * Angle: CodeBurn is a local-first cost and waste optimizer across 41 tools —
+ * it finds inefficiency in your setup and can apply fixes. SigRank scores the
+ * operator's cascade efficiency (Υ) and ranks them on a public leaderboard.
+ * CodeBurn optimizes your spend; SigRank measures your skill. Both read the
+ * same token logs. They answer different questions and can run side by side.
  *
  * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
  * WaveHero, and a styled comparison table matching the repo's table conventions.
@@ -17,34 +19,68 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs codeburn",
+  title: "SigRank vs CodeBurn \u2014 Spend Optimization vs Operator Scoring",
   description:
-    "codeburn tracks AI coding cost across tools. SigRank scores efficiency. Cost tracking is accounting; efficiency scoring is evaluation. Cost is the input; yield is the output.",
+    "CodeBurn optimizes AI coding spend across 41 tools — waste scanning, model comparison, budget guarding, and git-linked yield. SigRank scores operator cascade efficiency (Υ) and ranks on a public leaderboard. Different questions, same token logs.",
   path: "/vs/codeburn",
 });
 
 const COMPARE_ROWS: { feature: string; codeburn: string; sigrank: string }[] = [
   {
-    feature: "What it tracks",
-    codeburn: "AI coding cost across tools (dollars)",
-    sigrank: "Operator cascade yield (Υ = cache_read × output / input²)",
+    feature: "Primary question",
+    codeburn: "\u201CHow do I reduce my AI coding spend?\u201D",
+    sigrank: "\u201CHow efficiently am I driving my AI tools?\u201D",
   },
   {
-    feature: "Cascade efficiency score (Υ Yield)",
+    feature: "What it measures",
+    codeburn: "Cost, waste patterns, model efficiency, git-linked productivity",
+    sigrank: "Operator cascade yield (\u03A5 = cache_read \u00D7 output / input\u00B2) + derived metrics",
+  },
+  {
+    feature: "Tools supported",
+    codeburn: "41 tools and agents (Claude Code, Cursor, Codex, Gemini, Grok, \u2026)",
+    sigrank: "15+ platforms via on-device scanner (bundles ccusage for Claude Code)",
+  },
+  {
+    feature: "Waste scanning + fix application",
+    codeburn: "Yes (optimize + --apply, with undo and auto-revert)",
+    sigrank: "No (scores the outcome, does not modify your config)",
+  },
+  {
+    feature: "Budget guarding (session caps)",
+    codeburn: "Yes (guard hooks with soft/hard caps)",
+    sigrank: "No",
+  },
+  {
+    feature: "Model comparison",
+    codeburn: "Yes (one-shot rate, retry rate, cost per edit, cache hit)",
+    sigrank: "No (ranks operators, not models)",
+  },
+  {
+    feature: "Git-linked yield (did spend ship?)",
+    codeburn: "Yes (correlates sessions to commits: productive/reverted/abandoned)",
+    sigrank: "No (cascade yield is a token-efficiency metric, not a git-attribution metric)",
+  },
+  {
+    feature: "Cascade efficiency score (\u03A5 Yield)",
     codeburn: "No",
-    sigrank: "Yes",
+    sigrank: "Yes (\u03A5 = cache_read \u00D7 output / input\u00B2)",
   },
   {
     feature: "Compression ratio + SNR + Leverage + Velocity",
-    codeburn: "No (cost only)",
-    sigrank: "Yes (derived metrics)",
+    codeburn: "No (cost and waste metrics, not cascade architecture)",
+    sigrank: "Yes (derived cascade metrics)",
   },
   {
     feature: "Class tier (IGNITER to ARCH+)",
     codeburn: "No",
     sigrank: "Yes",
   },
-  { feature: "Global operator leaderboard", codeburn: "No", sigrank: "Yes" },
+  {
+    feature: "Global operator leaderboard",
+    codeburn: "No",
+    sigrank: "Yes (public, ed25519-signed, 7d/30d/90d/all-time)",
+  },
   {
     feature: "Operator profiles + head-to-head compare",
     codeburn: "No",
@@ -52,7 +88,7 @@ const COMPARE_ROWS: { feature: string; codeburn: string; sigrank: string }[] = [
   },
   {
     feature: "MCP server for AI-agent integration",
-    codeburn: "No",
+    codeburn: "Yes",
     sigrank: "Yes",
   },
   {
@@ -61,47 +97,37 @@ const COMPARE_ROWS: { feature: string; codeburn: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Platform-neutral (Claude Code, Cursor, Copilot, Gemini, 15+)",
-    codeburn: "Multi-tool cost tracking",
-    sigrank: "Yes",
-  },
-  {
-    feature: "Bundled tools (tokscale, token-dashboard)",
-    codeburn: "No",
-    sigrank: "Yes",
-  },
-  {
     feature: "Privacy-preserving (token counts only)",
-    codeburn: "Yes",
-    sigrank: "Yes",
+    codeburn: "Yes (local-first, nothing leaves your machine)",
+    sigrank: "Yes (token counts only, never prompts)",
   },
 ];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: "Is SigRank a codeburn alternative?",
+    question: "Is SigRank a CodeBurn alternative?",
     answer:
-      "They overlap on reading AI coding telemetry but diverge on what they do with it. codeburn tracks cost — how many dollars you've burned across your AI coding tools. SigRank scores yield — how efficiently you're converting those dollars into signal. If you want a cross-tool cost dashboard, codeburn is that. If you want to know whether your spend is producing efficient output, SigRank answers that. You can run both — they read the same logs.",
+      "They overlap on reading AI coding token logs but answer different questions. CodeBurn optimizes your spend — it scans for waste patterns (re-read files, low read:edit ratio, unused MCP servers, bloated CLAUDE.md), can apply fixes automatically, guards your budget with session caps, compares models, and correlates sessions to git commits. SigRank scores your cascade efficiency (Υ Yield) and ranks you on a public leaderboard against other operators. If you want to reduce your AI bill, CodeBurn is built for that. If you want to know how efficiently you drive your AI tools compared to everyone else, SigRank answers that. You can run both — they read the same logs.",
   },
   {
-    question: "Why is cost tracking not enough?",
+    question: "CodeBurn has a \u201Cyield\u201D feature. How is it different from SigRank\u2019s Yield?",
     answer:
-      "Cost tracking tells you what you paid, not what you got. Two operators can spend the same $100 across tools and get wildly different outcomes. One reuses cached context efficiently and produces 60K output tokens; the other re-sends the same context every turn and produces 6K. Same cost, ten-fold difference in signal. On a cost tracker, they look identical. On a yield leaderboard, the gap is obvious. Cost is the input; yield is the output.",
+      "They use the same word for different things. CodeBurn\u2019s yield correlates AI sessions to git commits — it classifies spend as productive, reverted, abandoned, or ambiguous based on whether commits landed in main. It answers \u201Cdid the money I spent actually ship?\u201D SigRank\u2019s Yield (Υ = cache_read × output / input²) measures the architecture of your token cascade — whether cached context is compounding into output or fresh input is burning without leverage. It answers \u201Cam I driving my AI tools efficiently?\u201D One is a git-attribution metric; the other is a token-efficiency metric. Both are useful; they are not the same thing.",
   },
   {
-    question: "What does codeburn not measure that SigRank does?",
+    question: "What does CodeBurn do that SigRank doesn\u2019t?",
     answer:
-      "codeburn reports dollars spent across AI coding tools. SigRank reads the same token telemetry and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). codeburn tells you what you paid; SigRank tells you whether the cascade it funded is compounding or burning.",
+      "CodeBurn does several things SigRank doesn\u2019t: (1) waste scanning — it identifies specific inefficiencies like re-read files, low read:edit ratios, unused MCP servers, and bloated CLAUDE.md files; (2) fix application — it can apply fixes to your config interactively, with undo and auto-revert; (3) budget guarding — it installs hooks into Claude Code that warn or stop sessions at configurable cost caps; (4) model comparison — it compares models on one-shot rate, retry rate, cost per edit, and cache hit rate; (5) git-linked yield — it attributes sessions to commits to classify spend as productive or abandoned. SigRank doesn\u2019t modify your config, guard your budget, or compare models. It scores the operator.",
   },
   {
-    question: "Can I use both codeburn and SigRank?",
+    question: "What does SigRank do that CodeBurn doesn\u2019t?",
     answer:
-      "Yes. codeburn gives you the cross-tool cost dashboard for budget tracking. SigRank gives you the efficiency layer that cost tracking cannot provide. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep codeburn for the budget view. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "SigRank scores and ranks operators. The headline metric, Υ Yield = cache_read × output / input², measures cascade architecture — whether signal is compounding or burning. SigRank derives compression ratio, SNR, Leverage, Velocity, and 10xDEV from the same four token pillars. It assigns class tiers (IGNITER to ARCH+), publishes ed25519-signed snapshots to a public leaderboard, and supports head-to-head operator comparisons. CodeBurn optimizes your local setup; SigRank measures where you stand against the field. If you want to improve your spending efficiency, CodeBurn is the tool. If you want to know whether your cascade architecture is competitive, SigRank is the tool.",
   },
   {
-    question: "Which is better for improving my AI coding efficiency?",
+    question: "Can I use both CodeBurn and SigRank?",
     answer:
-      "SigRank. Cost tracking can tell you when you're burning too much, but it can't tell you why. Yield tracks the root cause: an operator whose Υ is low is burning fresh input without compounding cached context. Fix the cascade and the cost drops automatically. codeburn shows the symptom; SigRank shows the disease.",
+      "Yes, and they complement each other well. Run CodeBurn to find and fix waste in your setup, guard your budget, and see whether your spend actually ships. Run SigRank to score your cascade efficiency and see where you rank. Both read the same local token logs — CodeBurn reads session files from 41 tools, SigRank\u2019s scanner reads token counts on-device. Install SigRank with \u2018npm install -g sigrank\u2019, enroll, and submit a signed snapshot to the leaderboard. Keep CodeBurn for the budget and waste view.",
   },
 ];
 
@@ -112,25 +138,26 @@ export default function VsCodeburnPage() {
         data={[
           breadcrumb([
             { name: "Comparisons", path: "/vs" },
-            { name: "SigRank vs codeburn", path: "/vs/codeburn" },
+            { name: "SigRank vs CodeBurn", path: "/vs/codeburn" },
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs codeburn \u2014 Cost Tracking vs Efficiency Scoring",
-            description: "codeburn tracks AI coding cost across tools. SigRank scores efficiency. Cost tracking is accounting; efficiency scoring is evaluation. Cost is the input; yield is the output.",
+            title: "SigRank vs CodeBurn \u2014 Spend Optimization vs Operator Scoring",
+            description: "CodeBurn optimizes AI coding spend across 41 tools. SigRank scores operator cascade efficiency and ranks on a public leaderboard. Different questions, same token logs.",
             path: "/vs/codeburn",
           }),
         ]}
       />
 
       <WaveHero
-        eyebrow="\u25C8 SigRank vs codeburn"
-        title="Cost Is the Input. Yield Is the Output."
+        eyebrow="◈ SigRank vs CodeBurn"
+        title="Spend Optimization vs Operator Scoring"
         subtitle={
           <>
-            codeburn tracks AI coding cost across tools. SigRank scores
-            <span className="text-gold"> how efficiently you produce</span>.
-            Cost tracking is accounting; efficiency scoring is evaluation.
+            CodeBurn finds and fixes waste in your AI coding spend across 41
+            tools. SigRank scores <span className="text-gold">how efficiently
+            you drive them</span>. Both read the same token logs. They answer
+            different questions.
           </>
         }
       />
@@ -138,24 +165,27 @@ export default function VsCodeburnPage() {
       {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version: codeburn
+          The short version
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          codeburn is an AI coding cost tracker. It reads your token logs across
-          tools and shows how much you&apos;re spending — dollars burned, cost
-          per session, spend over time. It does its job well: it <em>accounts
-          for the cost</em>. But cost is the input, not the output. Two operators
-          can spend the same $100 and get wildly different results. codeburn
-          can&apos;t tell them apart.
+          CodeBurn is a free, local-first tool that tracks AI coding token
+          usage and cost across 41 tools and agents. It goes beyond cost
+          tracking: it scans for waste patterns (re-read files, low read:edit
+          ratio, unused MCP servers, bloated CLAUDE.md), can apply fixes
+          automatically with undo, guards your budget with session caps,
+          compares models on one-shot rate and cost per edit, and correlates
+          sessions to git commits to see whether spend actually shipped. It
+          is a serious spend-optimization tool.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank reads the same token telemetry and asks a different question:
-          <strong className="text-text-primary"> is the cascade compounding or
-          burning?</strong> The headline metric, Υ Yield = cache_read × output /
-          input², rewards the operator who reuses cached context efficiently and
-          penalizes the one who burns fresh input without leverage. codeburn
-          counts the cost; SigRank measures the yield. Both matter. Only one
-          tells you whether you&apos;re winning.
+          <strong className="text-text-primary"> is your cascade compounding
+          or burning?</strong> The headline metric, Υ Yield = cache_read ×
+          output / input², measures the architecture of your token cascade.
+          SigRank derives compression ratio, SNR, Leverage, Velocity, and
+          10xDEV, assigns class tiers, and publishes ed25519-signed snapshots
+          to a public leaderboard. CodeBurn optimizes your setup; SigRank
+          scores your skill. Both matter. They are not substitutes.
         </p>
       </section>
 
@@ -172,7 +202,7 @@ export default function VsCodeburnPage() {
                   Feature
                 </th>
                 <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  codeburn
+                  CodeBurn
                 </th>
                 <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-gold">
                   SigRank
@@ -199,84 +229,61 @@ export default function VsCodeburnPage() {
         </div>
       </section>
 
-      {/* Why cost isn't yield */}
+      {/* Two "yield" concepts */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Why cost tracking isn&apos;t efficiency scoring
+          Two “yield” concepts, different meanings
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          codeburn answers <em>&quot;how much did I spend?&quot;</em> That&apos;s
-          accounting, not evaluation. Two operators can spend the same $100
-          across tools and get wildly different outcomes. One reuses cached
-          context efficiently and produces 60K output tokens; the other re-sends
-          the same context every turn and produces 6K. Same cost, ten-fold
-          difference in signal. On a cost tracker, they look identical. On a
-          yield leaderboard, the gap is obvious.
+          Both tools use the word “yield,” but they measure different
+          things. CodeBurn’s <span className="font-mono text-gold">yield</span>{" "}
+          correlates AI sessions to git commits — it classifies spend as
+          productive, reverted, abandoned, or ambiguous based on whether commits
+          landed in main. It answers “did the money I spent actually
+          ship?”
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s headline metric,{" "}
-          <span className="font-mono text-gold">
-            Υ = cache_read × output / input²
-          </span>
-          , measures exactly that gap. It rewards the operator who compounds
-          cached context into output and penalizes the one who burns fresh input
-          without leverage. codeburn gives you the bill; SigRank tells you
-          whether the cascade it funded is <em>compounding or burning</em>.
+          SigRank’s <span className="font-mono text-gold">Υ Yield</span>{" "}
+          (cache_read × output / input²) measures the architecture of
+          your token cascade — whether cached context is compounding into output
+          or fresh input is burning without leverage. It answers “am I
+          driving my AI tools efficiently?” One is a git-attribution
+          metric; the other is a token-efficiency metric. Both are useful; they
+          are not the same thing.
         </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-          <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
-            The four token pillars (both tools read these)
-          </p>
-          <ul className="mt-3 flex flex-col gap-1.5 font-sans text-sm text-text-secondary">
-            <li>
-              <strong className="text-text-primary">Input</strong>: tokens you
-              send to the model
-            </li>
-            <li>
-              <strong className="text-text-primary">Output</strong>: tokens the
-              model generates back
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-read</strong>: cached
-              tokens reused from prior context
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-write</strong>: new
-              tokens written to cache for future reuse
-            </li>
-          </ul>
-        </div>
       </section>
 
-      {/* The upgrade path */}
+      {/* When to use which */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          From cost to yield
+          When to use which
         </h2>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          If you already run codeburn, you have the token counts. SigRank reads
-          the same telemetry and adds the scoring layer cost tracking never had:
-        </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
-            {`npm install -g sigrank
-sigrank enroll      # create your operator identity
-sigrank submit      # reads logs, scores, signs, publishes`}
-          </pre>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <h3 className="font-mono text-sm font-bold text-text-primary">
+              Use CodeBurn if…
+            </h3>
+            <ul className="mt-3 flex flex-col gap-1.5 font-sans text-sm text-text-secondary">
+              <li>You want to reduce your AI coding spend</li>
+              <li>You want to find and fix waste in your Claude Code setup</li>
+              <li>You want budget caps that warn or stop expensive sessions</li>
+              <li>You want to compare models on cost and one-shot rate</li>
+              <li>You want to see whether your sessions actually shipped to git</li>
+            </ul>
+          </div>
+          <div className="rounded-lg border border-gold/30 bg-gold/5 p-5">
+            <h3 className="font-mono text-sm font-bold text-text-primary">
+              Use SigRank if…
+            </h3>
+            <ul className="mt-3 flex flex-col gap-1.5 font-sans text-sm text-text-secondary">
+              <li>You want to know how efficiently you drive your AI tools</li>
+              <li>You want a cascade efficiency score (Υ Yield) and class tier</li>
+              <li>You want to compare yourself against other operators on a leaderboard</li>
+              <li>You want head-to-head operator comparisons with radar visuals</li>
+              <li>You want an MCP server that lets your agent read its own metrics</li>
+            </ul>
+          </div>
         </div>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Prefer to inspect before you submit? Run{" "}
-          <span className="font-mono text-text-primary">
-            sigrank me --dry-run
-          </span>{" "}
-          to see your scored payload locally, or paste your token counts into
-          the{" "}
-          <Link href="/score" className="text-gold underline underline-offset-2">
-            /score calculator
-          </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
-          no account, no submission, just the numbers.
-        </p>
       </section>
 
       {/* FAQ */}
@@ -299,17 +306,17 @@ sigrank submit      # reads logs, scores, signs, publishes`}
       {/* CTA */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Ready to see your yield?
+          Run both
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Keep your cost tracker for the budget. Add the efficiency layer that
-          cost tracking cannot provide. Install SigRank and submit your first
-          signed snapshot in under a minute.
+          Keep CodeBurn for spend optimization and budget guarding. Add SigRank
+          to score your cascade efficiency and see where you rank. Both read
+          the same local token logs.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/score"
-            className="rounded-lg border border-bg-border bg-bg-elevated px-4 py-2 font-mono text-xs uppercase tracking-wide text-text-primary transition-colors hover:border-gold"
+            className="rounded-lg border border-gold/30 bg-gold/10 px-4 py-2 font-mono text-xs uppercase tracking-wide text-gold transition-colors hover:bg-gold/20"
           >
             Calculate your Υ Yield
           </Link>
@@ -319,6 +326,13 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           >
             See the leaderboard
           </Link>
+          <a
+            href="https://github.com/getagentseal/codeburn"
+            className="rounded-lg border border-bg-border bg-bg-elevated px-4 py-2 font-mono text-xs uppercase tracking-wide text-text-primary transition-colors hover:border-gold"
+            rel="external"
+          >
+            CodeBurn on GitHub
+          </a>
         </div>
       </section>
 
@@ -334,17 +348,24 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           </Link>
           {" \u00B7 "}
           <Link
+            href="/vs/tokscale"
+            className="text-gold underline underline-offset-2"
+          >
+            SigRank vs Tokscale
+          </Link>
+          {" \u00B7 "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            Methodology
+          </Link>
+          {" \u00B7 "}
+          <Link
             href="/tools/yield-calculator"
             className="text-gold underline underline-offset-2"
           >
             Yield Calculator
-          </Link>
-          {" \u00B7 "}
-          <Link
-            href="/wiki/local-agent"
-            className="text-gold underline underline-offset-2"
-          >
-            The Local Agent (MCP)
           </Link>
         </p>
       </section>
