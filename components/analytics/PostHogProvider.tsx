@@ -42,7 +42,23 @@ function PageViews() {
     // init here too (idempotent) — otherwise the very first pageview would be lost.
     initPostHog();
     if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
-    posthog.capture("$pageview", { $current_url: window.location.href });
+    // A01-7: Parse UTM params on landing and register as super properties so
+    // they persist across the session for first-touch attribution.
+    const utm = searchParams;
+    const utmProps: Record<string, string> = {};
+    for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]) {
+      const val = utm.get(key);
+      if (val) utmProps[key] = val;
+    }
+    if (Object.keys(utmProps).length > 0) {
+      posthog.register(utmProps);
+    }
+    posthog.capture("$pageview", {
+      $current_url: window.location.href,
+      domain: window.location.hostname,
+      env: process.env.NEXT_PUBLIC_VERCEL_ENV
+        ?? (process.env.NODE_ENV === "production" ? "production" : "development"),
+    });
   }, [pathname, searchParams]);
 
   return null;
