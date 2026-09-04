@@ -171,6 +171,14 @@ const nextConfig: NextConfig = {
         destination: "/research",
         permanent: true,
       },
+      // /open-vs-closed is the North Star P0 route name for the open-vs-proprietary
+      // boundary page. Content lives at /standard/open-vs-proprietary; redirect so
+      // the P0 route resolves instead of 404.
+      {
+        source: "/open-vs-closed",
+        destination: "/standard/open-vs-proprietary",
+        permanent: true,
+      },
       // The full seeded leaderboard (all operators including unclaimed seed
       // data) moved to sigeconomy.com/all-time. Redirect so old bookmarks +
       // search indexes find the seeded board.

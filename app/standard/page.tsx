@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Upsilon Standard | AI Operator Metrics Spec",
+  title: "TTEOP Standard | AI Operator Metrics Protocol",
   description:
-    "Upsilon Standard v0.1-draft is a proposed open measurement specification for AI operator telemetry, metrics, privacy, comparison, and interoperability.",
+    "TTEOP (Token Telemetry Evaluation Operator Protocol) is the open measurement specification for AI operator telemetry, metrics, privacy, comparison, and interoperability. SignalAF is the reference implementation.",
   path: "/standard",
 });
 
@@ -52,7 +52,7 @@ export default function StandardPage() {
     <div className="mx-auto flex max-w-4xl flex-col gap-10 py-2">
       <JsonLd
         data={[
-          breadcrumb([{ name: "Upsilon Standard", path: "/standard" }]),
+          breadcrumb([{ name: "TTEOP Standard", path: "/standard" }]),
           faqPage([
             {
               question: "What is the industry standard for evaluating LLM operator performance?",
@@ -74,9 +74,9 @@ export default function StandardPage() {
       />
 
       <WaveHero
-        eyebrow="SIGRANK STANDARD · v0.1-draft"
+        eyebrow="TTEOP · tteop/0.1-draft"
         terminalText="STANDARD"
-        title="The New Standard in Operator Metrics"
+        title="The Open Standard for Operator Metrics"
         subtitle={
           <>
             A proposed open measurement specification for the{" "}
@@ -121,10 +121,10 @@ export default function StandardPage() {
           Product boundary
         </p>
         <h2 className="mt-2 font-mono text-xl font-bold text-text-primary">
-          Upsilon, SigRank, and the wire protocol
+          TTEOP, Upsilon, and the wire protocol
         </h2>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          Upsilon is SignalAF's commercial measurement engine and the reference implementation for sigrank/0.1-draft. SigRank is the public leaderboard and proof surface for eligible observations. The wire protocol identifier remains <code className="font-mono text-gold">sigrank/0.1-draft</code> for all existing records and consumers.
+          TTEOP (Token Telemetry Evaluation Operator Protocol) is the open interoperability protocol authority. Upsilon is SignalAF's commercial measurement engine and the reference implementation for TTEOP. SigRank is the public leaderboard and proof surface for eligible observations. The wire protocol identifier remains <code className="font-mono text-gold">tteop/0.1-draft</code> for all records and consumers.
         </p>
       </section>
 
@@ -242,8 +242,8 @@ INFRASTRUCTURE`}
         </p>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <h3 className="font-mono text-sm font-bold text-text-primary">Upsilon Standard</h3>
-            <p className="mt-1 text-sm text-text-secondary">Open measurement specification.</p>
+            <h3 className="font-mono text-sm font-bold text-text-primary">TTEOP</h3>
+            <p className="mt-1 text-sm text-text-secondary">Open interoperability protocol authority.</p>
           </div>
           <div>
             <h3 className="font-mono text-sm font-bold text-text-primary">@sigrank/cascade</h3>
