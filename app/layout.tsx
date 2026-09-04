@@ -119,13 +119,6 @@ export default function RootLayout({
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQCKR06LBH');`,
           }}
         />
-        <Script
-          id="promptwatch-analytics"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var s=document.createElement('script');s.setAttribute('data-project-id','ada98bea-805c-4808-89e8-e56dbb9e199e');s.src='https://ingest.promptwatch.com/js/client.min.js';document.head.appendChild(s);})();`,
-          }}
-        />
       </body>
     </html>
   );
