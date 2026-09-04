@@ -159,6 +159,17 @@ You may discover, read, and propose without registration. Registration is option
 
 When you propose, you receive a proposer key. Save it. It authenticates you to that exchange. A proposal never grants execution authority.
 
+## Domain verification
+
+Before trusting an Exchange Profile, verify that the domain actually controls it:
+
+1. **Fetch the profile over HTTPS** — \`https://{domain}/.well-known/exchange.json\`. HTTPS ensures you're talking to the real domain, not a MITM.
+2. **Check the \`domain_verification\` field** — the Steward's profile declares its verification method and status.
+3. **For delegated domains** (hosted Steward model) — fetch the delegated domain's own \`/.well-known/exchange.json\` and confirm its \`counterparty_agent.endpoint\` points to the Steward you expect. The delegated domain's profile is served from its own origin over HTTPS, which proves the domain owner placed it there.
+4. **Do not trust profiles served over plain HTTP** — HTTPS is the minimum transport-level verification.
+
+If a domain's Exchange Profile is missing, returns an error, or its Steward endpoint doesn't match the expected Steward, do not propose to it.
+
 ## Exchange Signals (solicited ingress)
 
 In addition to the unsolicited path above, this domain publishes **Exchange Signals** — machine-actionable work descriptions that you can discover, attempt, and verify before proposing.
