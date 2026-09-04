@@ -58,5 +58,18 @@ export function buildExchangeManifest(baseUrl = process.env.NEXT_PUBLIC_SITE_URL
       instructions:'This profile is served from the domain itself over HTTPS. Participating domains that delegate to this Steward should publish their own /.well-known/exchange.json pointing here. To verify a delegated domain, fetch its /.well-known/exchange.json and confirm the counterparty_agent.endpoint matches this Steward.',
       verified:true,
     },
+    rate_limits:{
+      proposals_per_hour:10,
+      preflight_per_hour:30,
+      signal_attempts_per_hour:5,
+      messages_per_hour:20,
+      abuse_handling:'Repeated low-quality proposals, semantic duplicates, or forbidden-without-authorization violations may result in temporary or permanent suspension of proposer keys.',
+    },
+    terms_hash:{
+      algorithm:'sha256',
+      serialization:'rfc8785_jcs',
+      fields_included:['contribution','consideration','rights','vesting','authorization','verification','settlement'],
+      immutable_after_acceptance:true,
+    },
   }
 }
