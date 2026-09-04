@@ -224,7 +224,7 @@ export default async function HomePage() {
           {
             question: "Isn't this just measuring who spends the most?",
             answer:
-              "No. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes raw input spend quadratically. The quadratic input penalty means doubling your input tokens quadruples your penalty. High-Yield operators achieve their scores through cache reuse and output efficiency, not through spending more. The top operators run 439:1:0.5 (cache:input:output) — high leverage, low input.",
+              "No. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes raw input spend quadratically. The quadratic input penalty means doubling your input tokens quadruples your penalty. High-Yield operators achieve their scores through cache reuse and output efficiency, not through spending more. The top operators run 439:1:1.7 (cache:input:output) — high leverage and high velocity both at once.",
           },
           {
             question: "Doesn't the model matter more than the user?",
