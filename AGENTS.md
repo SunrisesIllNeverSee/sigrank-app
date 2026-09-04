@@ -309,3 +309,13 @@ Key libraries in this stack:
 
 Do not rely on training data for library APIs. Do not call more than 3 times
 per question.
+
+
+## Repomix MCP — Codebase orientation
+
+When starting work in this repo or picking up a handoff, use Repomix MCP to
+pack the codebase and grep for key patterns (function names, formulas, config,
+dependencies) to orient yourself in 2-3 calls instead of reading files one
+by one. Useful for canon alignment audits (grep for formula implementations
+and compare against Search Authority definitions) and cross-repo consistency
+checks.
