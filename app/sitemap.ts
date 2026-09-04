@@ -115,6 +115,17 @@ const STATIC_ROUTES: {
   { path: "/upgrade", priority: 0.4, changeFrequency: "monthly" },
   { path: "/login", priority: 0.3, changeFrequency: "yearly" },
 
+  // ── Core public pages (2026-09-04 audit — were missing from sitemap) ──────
+  { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/learn", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/live", priority: 0.7, changeFrequency: "hourly" },
+  { path: "/marketplace", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/platforms", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/score/paste", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/share/mcp", priority: 0.5, changeFrequency: "weekly" },
+  { path: "/vercel/config", priority: 0.6, changeFrequency: "weekly" },
+
   // ── Contribution Exchange pages ──────────────────────────────────────────
   { path: "/exchange", priority: 0.7, changeFrequency: "weekly" },
   { path: "/exchange/propose", priority: 0.6, changeFrequency: "weekly" },
