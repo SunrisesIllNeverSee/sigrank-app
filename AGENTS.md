@@ -233,13 +233,13 @@ file. Do NOT remove them.
 - The harness may measure authority, but it cannot manufacture authority.
 - Automated systems may not promote claims into owner-approved truth.
 
-## ELLO OPS — check the shared board
+## stickypads — check the shared board
 
 Before starting work, check the shared operational board for tasks assigned
 to you or this repo:
 
 ```bash
-python3 ~/Developer/_control/ello-ops-template/scripts/check_in.py --agent <your-name>
+python3 ~/Developer/_control/stickypads/scripts/check_in.py --agent <your-name>
 ```
 
 Or clone the ello-ops repo and run from there. The board has:
@@ -252,21 +252,21 @@ drop a note:
 
 ```bash
 # Create a formal task
-python3 ~/Developer/_control/ello-ops-template/scripts/create_task.py \
+python3 ~/Developer/_control/stickypads/scripts/create_task.py \
     --title "Specific actionable title" \
     --project <this-repo-name> \
     --owner <your-name>
 
 # Drop a quick memo (no format required)
-python3 ~/Developer/_control/ello-ops-template/scripts/drop.py \
+python3 ~/Developer/_control/stickypads/scripts/drop.py \
     --from <this-repo-name> \
     "Quick note about what needs attention"
 ```
 
 At session end or meaningful completion, reconcile this repo's coord kit
-state into ELLO OPS:
+state into stickypads:
 
 ```bash
-python3 ~/Developer/_control/ello-ops-template/scripts/reconcile_coord.py \
+python3 ~/Developer/_control/stickypads/scripts/reconcile_coord.py \
     --repo-path . --dry-run
 ```
