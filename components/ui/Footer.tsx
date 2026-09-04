@@ -110,10 +110,6 @@ const FOOTER_COLUMNS: {
   {
     heading: "Explore",
     links: [
-      {
-        href: "https://sigeconomy.com",
-        label: "AI User Leaderboard →",
-      },
       { href: "/hall", label: "Best AI Users — Hall of Signal" },
       { href: "/score", label: "Benchmark Your AI Usage" },
       { href: "/research", label: "AI Power User Statistics" },
@@ -153,6 +149,31 @@ const FOOTER_COLUMNS: {
       { href: "/cascade-analysis", label: "Cascade Analysis" },
     ],
   },
+  {
+    heading: "Ecosystem",
+    links: [
+      {
+        href: "https://mos2es.org",
+        label: "MO§ES™ Enterprise →",
+      },
+      {
+        href: "https://mos2es.com",
+        label: "Governance Framework →",
+      },
+      {
+        href: "https://signomy.xyz",
+        label: "Signomy City-State →",
+      },
+      {
+        href: "https://sigeconomy.com",
+        label: "SigEconomy Leaderboard →",
+      },
+      {
+        href: "https://mos2es.xyz",
+        label: "AQUA Application Hub →",
+      },
+    ],
+  },
 ];
 
 /**
@@ -185,7 +206,7 @@ export function Footer() {
         </div>
 
         {/* SEO link columns */}
-        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-9">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} className="flex flex-col gap-2">
               {col.headingHref ? (
