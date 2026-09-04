@@ -230,6 +230,13 @@ export interface ExchangeManifest {
     server_card: string
     transport: 'streamable-http'
   }
+  domain_verification?: {
+    method: 'dns_txt' | 'dns_cname' | 'well_known_meta' | 'https_well_known'
+    record: string
+    instructions: string
+    verified: boolean
+    verified_at?: string
+  }
 }
 
 // ─── Execution Provider Layer ───

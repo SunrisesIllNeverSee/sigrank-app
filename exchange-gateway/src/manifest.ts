@@ -52,5 +52,11 @@ export function buildExchangeManifest(baseUrl = process.env.NEXT_PUBLIC_SITE_URL
       server_card:`${base}/.well-known/exchange-mcp.json`,
       transport:'streamable-http',
     },
+    domain_verification:{
+      method:'https_well_known',
+      record:`${base}/.well-known/exchange.json`,
+      instructions:'This profile is served from the domain itself over HTTPS. Participating domains that delegate to this Steward should publish their own /.well-known/exchange.json pointing here. To verify a delegated domain, fetch its /.well-known/exchange.json and confirm the counterparty_agent.endpoint matches this Steward.',
+      verified:true,
+    },
   }
 }
