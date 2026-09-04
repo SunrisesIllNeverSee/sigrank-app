@@ -96,8 +96,8 @@ your own logs.
 
 - **Leverage** = cache_read / input — how much you reuse vs re-type
 - **Velocity** = output / input — how much real output per token in
-- **SNR** (Signal-to-Noise Ratio) = output / (input + output) — output share of fresh conversational traffic
-- **10xDEV** = log₁₀(Leverage) — leverage on a readable scale
+- **output_fraction** (displayed as SNR) = output / (input + output) — output share of fresh conversational traffic. Note: SNR is a display alias; the canonical TTEOP name is output_fraction, and the formula is not a signal-to-noise ratio in the signal-processing sense.
+- **log_leverage** (displayed as 10xDEV) = log₁₀(Leverage) — leverage on a readable scale. 10xDEV is a display alias; the canonical TTEOP name is log_leverage.
 - **Compression Ratio** = cache_read / (cache_read + input) — cache efficiency
 - **SIGNA RATE** = a composite signal quality score (proprietary weights, used for the TRANSMITTER badge, not for class assignment)
 
