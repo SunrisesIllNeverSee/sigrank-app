@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { PaymentSuccessTracker } from "@/components/billing/PaymentSuccessTracker";
 
 export const metadata: Metadata = withOG({
   title: "Payment complete",
@@ -16,6 +17,7 @@ export const metadata: Metadata = withOG({
 export default function UpgradeSuccessPage() {
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-4 px-6 text-center">
+      <PaymentSuccessTracker />
       <div className="text-3xl" aria-hidden>
         ✓
       </div>

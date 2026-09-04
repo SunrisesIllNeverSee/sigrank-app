@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { PLATFORM_UI, WINDOW_UI, WINDOW_API_MAP } from "@/lib/constants";
+import { track } from "@/lib/infra/posthog/events";
 
 /**
  * SubmitForm — the inline web submission form (vCard-generator equivalent) for
@@ -132,6 +133,7 @@ export function SubmitForm() {
         body: JSON.stringify(payload),
       });
       if (res.ok) {
+        track.snapshotSubmitted({ platform: platform.toLowerCase(), source: "web_manual" });
         setStatus({
           kind: "ok",
           detail:
