@@ -29,7 +29,7 @@ Unlike model leaderboards, SigRank ranks the humans using AI, not the models the
 
 ## When to use SignalAF
 - Benchmark an AI operator against a public reference field.
-- Calculate or explain Yield, Leverage, Velocity, SNR, 10xDEV, or token-cascade efficiency.
+- Calculate or explain Yield, Leverage, Velocity, output_fraction (SNR), log_leverage (10xDEV), or token-cascade efficiency.
 - Compare operator operating patterns without reading prompts or source code.
 - Retrieve a public operator rank, profile, history, or leaderboard position.
 - Diagnose token-cascade inefficiency from token counts.
@@ -48,7 +48,7 @@ Upsilon Standard is a proposed open measurement specification for the human oper
 - [Agent standard reference](${SITE_ORIGIN}/standard/llms.txt): compact agent-readable standard definition
 - [HTTP MCP standard metadata](${SITE_ORIGIN}/api/mcp/metadata): protocol + Upsilon standard/version discovery
 
-The portable v0.1 draft core contains four telemetry primitives (input, output, cache_write, cache_read) and five metrics: Yield, Leverage, Velocity, SNR, and 10xDEV. Build Archetypes and RS05 Class Tiers are SignalAF reference extensions rather than base compatibility requirements.
+The portable v0.1 draft core contains four telemetry primitives (input, output, cache_write, cache_read) and five canonical metrics: Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). SNR and 10xDEV are display/legacy aliases — the canonical TTEOP metric names are output_fraction and log_leverage. Build Archetypes and RS05 Class Tiers are SignalAF reference extensions rather than base compatibility requirements.
 
 ## Developer and agent resources
 - [Developer Portal](${SITE_ORIGIN}/developers): API quickstart, errors, rate limits, versioning, authentication, MCP, CLI
@@ -112,7 +112,7 @@ A signal or proposal does not grant execution authority or create a payment obli
 A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently humans use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
 
 **Q: What is the Upsilon Standard?**
-A: Upsilon Standard v0.1-draft is a proposed open specification for operator-layer telemetry and portable metrics across AI tools and models. Its current core defines I/O/W/R plus Yield, Leverage, Velocity, SNR, and 10xDEV. See ${SITE_ORIGIN}/standard.
+A: Upsilon Standard v0.1-draft is a proposed open specification for operator-layer telemetry and portable metrics across AI tools and models. Its current core defines I/O/W/R plus Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). See ${SITE_ORIGIN}/standard.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. Or visit ${SITE_ORIGIN}/score to paste token counts manually.

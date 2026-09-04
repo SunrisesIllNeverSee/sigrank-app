@@ -85,6 +85,37 @@ export default function StandardPage() {
         }
       />
 
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+        <p className="font-mono text-xs uppercase tracking-wider text-amber-400">
+          Legacy specification
+        </p>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          The SigRank Standard (<code className="font-mono text-gold">sigrank/0.1-draft</code>) is a
+          legacy specification. The current protocol authority is{" "}
+          <a
+            href="https://www.npmjs.com/package/tteop-spec"
+            className="text-gold underline underline-offset-2"
+          >
+            TTEOP
+          </a>{" "}
+          (Token Telemetry Evaluation Operator Protocol, <code className="font-mono text-gold">tteop/0.1-draft</code>).
+          The wire protocol identifier <code className="font-mono text-gold">sigrank/0.1-draft</code>{" "}
+          remains an accepted compatibility alias that resolves to current TTEOP semantics — it is
+          not a second active standard. This page is retained for historical reference and existing
+          consumers. For current protocol semantics, see the{" "}
+          <a href="/methodology" className="text-gold underline underline-offset-2">
+            methodology page
+          </a>{" "}
+          and the{" "}
+          <a
+            href="https://github.com/SunrisesIllNeverSee/tteop-spec"
+            className="text-gold underline underline-offset-2"
+          >
+            tteop-spec repository
+          </a>.
+        </p>
+      </div>
+
       <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
         <p className="font-mono text-xs uppercase tracking-wider text-gold">
           Product boundary
