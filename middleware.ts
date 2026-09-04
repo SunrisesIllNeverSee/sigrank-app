@@ -194,6 +194,26 @@ function negotiatedHomepage(request: NextRequest): Response | null {
  * scoped auth session refresh for authenticated surfaces.
  */
 export async function middleware(request: NextRequest) {
+  // ─── /api/search — proxy to analytics worker (AI Search binding) ──────
+  if (request.nextUrl.pathname === "/api/search") {
+    const proxyUrl = new URL("https://moses-analytics.sigrank.workers.dev/api/search");
+    request.nextUrl.searchParams.forEach((v, k) => proxyUrl.searchParams.set(k, v));
+    const searchReq = new Request(proxyUrl.toString(), {
+      method: request.method,
+      headers: { "Content-Type": "application/json", "X-Original-Host": "sigeconomy.com" },
+      body: request.method === "POST" ? await request.text() : undefined,
+    });
+    const searchResp = await fetch(searchReq);
+    return new Response(searchResp.body, {
+      status: searchResp.status,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      },
+    });
+  }
+
   const bot = detectBot(request.headers.get("user-agent"));
   if (bot.isBot) {
     void captureServer("ai-bot", "ai_bot_detected", {
