@@ -306,7 +306,7 @@ Product contracts, not implementation details:
 - **[signalaf.com](https://signalaf.com)** — the live board
 - **[signalaf.com/score](https://signalaf.com/score)** — paste four token counts, get projected yield + ghost rank
 - **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npx sigrank`)
-- **[Smithery](https://smithery.ai/servers/burnmydays/sigrank-mcp)** — one-click MCP install for Claude Desktop, Cursor, and more
+- **[Smithery](https://smithery.ai/servers/burnmydays/sigrank)** — one-click MCP install for Claude Desktop, Cursor, and more
 - **[Glama](https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp)** — MCP server directory listing
 
 ## Community
