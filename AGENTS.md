@@ -319,3 +319,29 @@ dependencies) to orient yourself in 2-3 calls instead of reading files one
 by one. Useful for canon alignment audits (grep for formula implementations
 and compare against Search Authority definitions) and cross-repo consistency
 checks.
+
+
+## MCP Server Recommendations for This Repo
+
+Full index: `Moses_Enterprise_B2BPilot_/_workspace/MCP_INDEX.md`
+
+**Primary (use regularly):**
+- `supabase` — database schema, migrations, logs, advisors for this app's backend
+- `vercel` — deploy, project management, docs for this app's hosting
+- `gsc-seo-sigeconomy` — Google Search Console for sigeconomy.com SEO data
+- `sigeconomy-search` / `signalaf-search` — AI Search for sigeconomy.com and signalaf.com
+- `posthog` — product analytics, user events, session replay for signalaf.com
+- `indexnow` — submit new/changed URLs to Bing/Yandex after deploys
+- `no-slop` / `ai-slop-checker` — check landing page copy for AI writing tells
+
+**Secondary (use as needed):**
+- `context7` — verify Next.js 15 / Supabase / Stripe API patterns before writing
+- `playwright` / `chrome-devtools` — E2E testing, visual verification of live pages
+- `web-scrape` — extract structured data from live pages, check JSON-LD
+- `repomix` — pack codebase for handoffs
+- `brave-search` — research competitor benchmarks/tools
+
+**Not needed here:**
+- `sigadmin` — that's for the SigRank-gtm outreach repo
+- `ds-server` — that's for the b2bpilot telemetry workers
+- `blender` / `worldmonitor` — unrelated
