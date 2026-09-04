@@ -162,7 +162,7 @@ export default function ExchangePage() {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
               <a
                 className="inline-block rounded-lg bg-gold px-6 py-3 font-sans font-semibold text-bg-base hover:bg-gold/90"
-                href="mailto:exchange@signalaf.com?subject=Contribution%20Exchange%20inquiry"
+                href="mailto:hello@signalaf.com?subject=Contribution%20Exchange%20inquiry"
               >
                 Email the Exchange team
               </a>
