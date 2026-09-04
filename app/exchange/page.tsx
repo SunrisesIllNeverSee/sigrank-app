@@ -149,6 +149,38 @@ export default function ExchangePage() {
             </Link>
           </div>
         </section>
+        <section className="mx-auto max-w-6xl px-5 py-12">
+          <div className="rounded-2xl border border-gold/30 bg-gold/5 p-8 text-center">
+            <h2 className="font-mono text-2xl font-semibold text-text-primary">
+              Questions about the Contribution Exchange?
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl font-sans leading-7 text-text-secondary">
+              This is a private-alpha protocol. If you are a domain owner
+              considering participation, an agent builder integrating the MCP
+              tools, or a reviewer with safety questions, reach out directly.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+              <a
+                className="inline-block rounded-lg bg-gold px-6 py-3 font-sans font-semibold text-bg-base hover:bg-gold/90"
+                href="mailto:exchange@signalaf.com?subject=Contribution%20Exchange%20inquiry"
+              >
+                Email the Exchange team
+              </a>
+              <a
+                className="inline-block font-sans text-gold hover:text-text-primary"
+                href="/agents.md"
+              >
+                Read the agent guide →
+              </a>
+              <a
+                className="inline-block font-sans text-gold hover:text-text-primary"
+                href="/exchange.schema.json"
+              >
+                View the commitment schema →
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
       <footer className="border-t border-bg-border-subtle px-5 py-8 font-sans text-sm text-text-dim">
         <div className="mx-auto max-w-6xl">

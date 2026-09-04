@@ -3,10 +3,11 @@
   "$id": "https://signalaf.com/exchange.schema.json",
   "title": "Contribution Commitment v0.1",
   "type": "object",
-  "required": ["version", "contribution_id", "origin", "parties", "contribution", "consideration", "rights", "vesting", "authorization", "verification", "settlement", "revocation", "provenance"],
+  "required": ["version", "contribution_id", "origin", "parties", "contribution", "consideration", "rights", "vesting", "authorization", "verification", "settlement", "revocation", "provenance", "terms_hash"],
   "properties": {
     "version": { "const": "0.1" },
     "contribution_id": { "type": "string" },
+    "terms_hash": { "type": "object", "required": ["algorithm", "value", "fields_included"], "properties": { "algorithm": { "const": "sha256" }, "value": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "fields_included": { "type": "array", "items": { "type": "string" } }, "immutable": { "const": true } } },
     "origin": { "type": "object", "required": ["type"], "properties": { "type": { "enum": ["ambient_observation", "published_need", "published_offer", "direct_request", "other"] }, "observed_at": { "type": "string", "format": "uri" }, "description": { "type": "string" } } },
     "parties": { "type": "object", "required": ["contributor", "recipient"] },
     "contribution": { "type": "object", "required": ["type", "title", "description", "disclosure_state"] },
