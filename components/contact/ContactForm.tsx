@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@/lib/infra/posthog/events";
 
 /**
  * Contact form client component. Posts to /api/v1/contact (Resend).
@@ -33,6 +34,7 @@ export function ContactForm() {
         return;
       }
 
+      track.contactSubmitted({ topic: "contact" });
       setStatus("sent");
       setName("");
       setEmail("");

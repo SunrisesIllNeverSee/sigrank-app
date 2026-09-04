@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { track } from "@/lib/infra/posthog/events";
 
 /**
  * ClaimTab — the "Claim this profile" section shown on unclaimed seeded operator
@@ -54,6 +55,7 @@ export function ClaimTab({ codename, isSignedIn, hasOperator }: Props) {
       const data = await res.json();
 
       if (res.ok && data.status === "claimed") {
+        track.profileClaimed();
         setStatus("success");
         // Redirect to Settings with ?claimed=1 so the user lands on the
         // Connect a device section and knows what to do next.
