@@ -96,7 +96,7 @@ These are non-negotiable. If any gate fails, the PR will not be merged.
 
 - **The Υ formula** — `(cache_read × output) / input²` is a frozen invariant.
 - **RS.xx scoring weights** — server-only, marked `OPERATOR_OVERRIDE_REQUIRED`.
-- **MO§ES SEED values** — `(1_251_211, 11_296_121, 128_196_310, 2_555_179,769)`.
+- **MO§ES SEED values** — `(1_251_211, 11_296_121, 128_196_310, 2_555_179_769)`.
 - **The cascade identity** — `T × C × R = Cr/I = Leverage`.
 
 These are the mathematical foundation of SigRank. If you want to change them,

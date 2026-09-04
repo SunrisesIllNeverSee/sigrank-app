@@ -39,7 +39,7 @@ CI also runs (in addition to the above + cross-repo contract tests):
 
 Do not change these without explicit owner approval:
 
-- **MO§ES SEED values:** `(1_251_211, 11_296_121, 128_196_310, 2_555_179,769)` -> Υ 18436.98
+- **MO§ES SEED values:** `(1_251_211, 11_296_121, 128_196_310, 2_555_179_769)` → Υ 18436.98
 - **The Υ formula:** `(cache_read * output) / input^2`
 - **The cascade identity:** `T * C * R = Cr/I = Leverage`
 - **10xDEV:** `log10(Leverage)`
