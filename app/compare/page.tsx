@@ -15,6 +15,7 @@
  */
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
@@ -210,7 +211,7 @@ export default async function ComparePage({
     return (
       <div className="flex flex-col gap-3">
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
-          🤖⚔️🤖 Throw Down
+          Compare AI Operators
         </h1>
         <p className="font-sans text-sm text-text-secondary">
           Not enough operators to compare yet.
@@ -293,9 +294,9 @@ export default async function ComparePage({
       ]} />
       <TrackCompareView isDefault={!(a && b)} />
       <WaveHero
-        eyebrow="🤖⚔️🤖 Throw Down"
-        terminalText="MANUS AD MANUM"
-        title="Manus ad Manum"
+        eyebrow="🤖⚔️🤖 Manus ad Manum"
+        terminalText="COMPARE"
+        title="Compare AI Operators"
         subtitle={
           <>
             Two operators. One cascade layer. Υ Yield, SNR, Leverage, Velocity,
@@ -349,6 +350,40 @@ export default async function ComparePage({
 
       {/* Throw-Downs "coming soon" line — page tail. */}
       {ThrowDownLine}
+
+      {/* ── Cross-links ── */}
+      <section className="mt-4 border-t border-bg-border-subtle pt-6">
+        <p className="font-sans text-sm text-text-muted">
+          Related:{" "}
+          <Link
+            href="/board/all"
+            className="text-gold underline underline-offset-2"
+          >
+            All-Time Leaderboard
+          </Link>
+          {" · "}
+          <Link
+            href="/hall"
+            className="text-gold underline underline-offset-2"
+          >
+            Hall of Signal
+          </Link>
+          {" · "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            Methodology
+          </Link>
+          {" · "}
+          <Link
+            href="/metrics/yield-cascade"
+            className="text-gold underline underline-offset-2"
+          >
+            Yield (Υ) Cascade
+          </Link>
+        </p>
+      </section>
     </div>
   );
 }
