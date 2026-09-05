@@ -56,14 +56,14 @@ export default function AIEvaluationToolsPage() {
           ]),
           definedTerm(
             "AI Evaluation Tools",
-            "AI evaluation tools are software systems that measure and compare AI system performance. They fall into four categories: model evaluation tools (MMLU, LMSYS Arena, SWE-bench), output evaluation tools (LLM-as-judge, rubric scorers, human review platforms), safety evaluation tools (red-teaming frameworks, alignment benchmarks), and operator evaluation tools. SigRank is the only operator evaluation tool — it measures the humans driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²).",
+            "AI evaluation tools are software systems that measure and compare AI system performance. They fall into four categories: model evaluation tools (MMLU, LMSYS Arena, SWE-bench), output evaluation tools (LLM-as-judge, rubric scorers, human review platforms), safety evaluation tools (red-teaming frameworks, alignment benchmarks), and operator evaluation tools. SigRank is the only operator evaluation tool — it measures the operators driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²).",
             "/ai-evaluation-tools",
           ),
           faqPage([
             {
               question: "What are AI evaluation tools?",
               answer:
-                "AI evaluation tools are software systems that measure and compare AI system performance. They fall into four categories: model evaluation tools (which model is best), output evaluation tools (is the output correct), safety evaluation tools (is the system safe), and operator evaluation tools (who uses the AI best). Most AI evaluation tools address the first three categories. SigRank is the only tool that addresses the operator layer — measuring the humans driving the AI via privacy-preserving token telemetry.",
+                "AI evaluation tools are software systems that measure and compare AI system performance. They fall into four categories: model evaluation tools (which model is best), output evaluation tools (is the output correct), safety evaluation tools (is the system safe), and operator evaluation tools (who uses the AI best). Most AI evaluation tools address the first three categories. SigRank is the only tool that addresses the operator layer — measuring the operators driving the AI via privacy-preserving token telemetry.",
             },
             {
               question: "What are the categories of AI evaluation tools?",
@@ -78,7 +78,7 @@ export default function AIEvaluationToolsPage() {
             {
               question: "What makes SigRank different from other AI evaluation tools?",
               answer:
-                "Every other AI evaluation tool measures the model, the output, or the safety of the system. SigRank is the only tool that measures the operator — the human driving the AI. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read — only token counts. It is a new category, not a competitor to existing tools.",
+                "Every other AI evaluation tool measures the model, the output, or the safety of the system. SigRank is the only tool that measures the operator — the operator driving the AI. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read — only token counts. It is a new category, not a competitor to existing tools.",
             },
           ]),
         ]}
@@ -151,7 +151,7 @@ export default function AIEvaluationToolsPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The operator category has been empty for a simple reason: measuring
-          the human driving the AI requires access to real session telemetry,
+          the operator driving the AI requires access to real session telemetry,
           and reading prompts is invasive. Model evaluation tools avoid this
           by running synthetic tests in a controlled harness. Output
           evaluation tools avoid it by scoring the result after the fact.
@@ -258,7 +258,7 @@ export default function AIEvaluationToolsPage() {
               What makes SigRank different?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              It is the only tool that measures the operator — the human
+              It is the only tool that measures the operator — the person
               driving the AI. Four token pillars, the Yield metric,
               ed25519-signed snapshots, and no prompt content ever read. A new
               category, not a competitor to existing tools.

@@ -42,9 +42,9 @@ dimension of the token cascade.
 | Population | n | Notes |
 |------------|---|-------|
 | FULL | 1627 | Whole scrape |
-| HCM | 1586 | FULL minus outliers (input/total >= 0.5 + flagged) |
+| OCM | 1586 | FULL minus outliers (input/total >= 0.5 + flagged) |
 
-## P80 thresholds (HCM calibration)
+## P80 thresholds (OCM calibration)
 
 ```
 leverage P80     = 74.6

@@ -33,7 +33,7 @@ Terminal
 PostHog AI
 
 ```bash
-npm install @posthog/mcp posthog-node
+npm install @posthog/mcp@0.12.0 posthog-node
 # or pnpm add @posthog/mcp posthog-node
 # or yarn add @posthog/mcp posthog-node
 ```

@@ -58,7 +58,7 @@ const COMPARISONS = [
   {
     href: "/vs/langchain",
     title: "SigRank vs LangChain — Framework vs Operator Measurement",
-    desc: "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the humans driving AI tools. Different layers entirely — framework vs operator measurement.",
+    desc: "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the operators driving AI tools. Different layers entirely — framework vs operator measurement.",
   },
   {
     href: "/vs/langfuse",
@@ -151,7 +151,7 @@ export default function VsIndex() {
           {
             question: "How does SigRank compare to VALS AI?",
             answer:
-              "VALS AI evaluates AI systems. SigRank evaluates AI operators — the humans driving the systems. VALS asks whether the AI is safe and effective. SigRank asks whether the person using the AI is efficient. The leaderboard is proof of operator skill, not system quality.",
+              "VALS AI evaluates AI systems. SigRank evaluates AI operators — the operators driving the systems. VALS asks whether the AI is safe and effective. SigRank asks whether the person using the AI is efficient. The leaderboard is proof of operator skill, not system quality.",
           },
           {
             question: "How does SigRank compare to Cursor?",

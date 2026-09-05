@@ -28,7 +28,7 @@ const RELATED = [
   {
     href: "/ai-benchmarking",
     title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the humans driving them. The complement to model-only benchmarking that AI evaluation has been missing.",
+    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking that AI evaluation has been missing.",
   },
   {
     href: "/methodology",
@@ -55,19 +55,19 @@ export default function AIEvaluationPage() {
           breadcrumb([{ name: "AI Evaluation", path: "/ai-evaluation" }]),
           definedTerm(
             "AI Evaluation",
-            "AI evaluation is the systematic measurement and comparison of AI system performance across four layers: model (which model is best), output (is the output correct), safety (is the system safe), and operator (who uses the AI best). SigRank covers the operator layer — measuring the humans driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²).",
+            "AI evaluation is the systematic measurement and comparison of AI system performance across four layers: model (which model is best), output (is the output correct), safety (is the system safe), and operator (who uses the AI best). SigRank covers the operator layer — measuring the operators driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²).",
             "/ai-evaluation",
           ),
           faqPage([
             {
               question: "What is AI evaluation?",
               answer:
-                "AI evaluation is the systematic measurement and comparison of AI system performance. It spans four layers: model evaluation (which model is best, e.g. MMLU, LMSYS Arena), output evaluation (is the output correct, e.g. human review, LLM-as-judge), safety evaluation (is the system safe, e.g. red-teaming, alignment benchmarks), and operator evaluation (who uses the AI best). The first three are well-served. The operator layer — measuring the humans driving the AI — is the missing piece, and the one SigRank covers.",
+                "AI evaluation is the systematic measurement and comparison of AI system performance. It spans four layers: model evaluation (which model is best, e.g. MMLU, LMSYS Arena), output evaluation (is the output correct, e.g. human review, LLM-as-judge), safety evaluation (is the system safe, e.g. red-teaming, alignment benchmarks), and operator evaluation (who uses the AI best). The first three are well-served. The operator layer — measuring the operators driving the AI — is the missing piece, and the one SigRank covers.",
             },
             {
               question: "What is the difference between model evaluation and operator evaluation?",
               answer:
-                'Model evaluation asks "which AI is best?" and ranks models using test suites or preference votes. Operator evaluation asks "who is best at using the AI?" and ranks humans using real token telemetry from live sessions. Model evaluation holds the model as the variable and the operator as a constant. Operator evaluation inverts that: the model is a constant (you pick one and drive it), and the operator is the variable. They are complements, not competitors — both layers matter for complete AI evaluation.',
+                'Model evaluation asks "which AI is best?" and ranks models using test suites or preference votes. Operator evaluation asks "who is best at using the AI?" and ranks operators using real token telemetry from live sessions. Model evaluation holds the model as the variable and the operator as a constant. Operator evaluation inverts that: the model is a constant (you pick one and drive it), and the operator is the variable. They are complements, not competitors — both layers matter for complete AI evaluation.',
             },
             {
               question: "How does SigRank evaluate AI operators?",
@@ -97,7 +97,7 @@ export default function AIEvaluationPage() {
             AI evaluation has four layers: model, output, safety, and
             operator. The first three are well-served. The{" "}
             <span className="text-gold">operator layer</span> — measuring the
-            humans driving the AI — is the missing piece. SigRank covers it
+            operators driving the AI — is the missing piece. SigRank covers it
             with privacy-preserving token telemetry and the Yield metric.
           </>
         }
@@ -243,7 +243,7 @@ export default function AIEvaluationPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Model evaluation asks &ldquo;which AI is best?&rdquo; and ranks
               models. Operator evaluation asks &ldquo;who uses the AI best?&rdquo;
-              and ranks humans. They are complements — both layers matter for
+              and ranks operators. They are complements — both layers matter for
               complete AI evaluation.
             </dd>
           </div>

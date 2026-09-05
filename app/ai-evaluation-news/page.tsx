@@ -62,7 +62,7 @@ export default function AIEvaluationNewsPage() {
             {
               question: "What is the latest trend in AI evaluation?",
               answer:
-                "The shift from model benchmarks to operator evaluation. For years, AI evaluation meant model evaluation — MMLU, LMSYS Arena, HumanEval. In 2026, the conversation is expanding to include the operator layer: measuring the humans driving the AI, not just the AI itself. SigRank leads this shift with content-free token telemetry and the Yield metric. The trend reflects a growing recognition that the model is a constant in production and the operator is the variable that determines real-world performance.",
+                "The shift from model benchmarks to operator evaluation. For years, AI evaluation meant model evaluation — MMLU, LMSYS Arena, HumanEval. In 2026, the conversation is expanding to include the operator layer: measuring the operators driving the AI, not just the AI itself. SigRank leads this shift with content-free token telemetry and the Yield metric. The trend reflects a growing recognition that the model is a constant in production and the operator is the variable that determines real-world performance.",
             },
             {
               question: "Why are model benchmarks saturating?",

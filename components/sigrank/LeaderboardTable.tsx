@@ -389,7 +389,7 @@ export function LeaderboardTable({
   // the prop (the URL's value); changing it pushes a new URL rather than filtering in JS.
   const [platform, setPlatform] = useState<PlatformUI>(platformProp);
   const [classFilter, setClassFilter] = useState<string>("all");
-  // Category filter (owner 2026-07-14): default = "human" (Human Center of Mass only).
+  // Category filter (owner 2026-07-14): default = "human" (Operator Center of Mass only).
   // "outliers" adds outliers & bots (input/total < 0.1% or > 80%) — one category.
   // "all" shows everything unfiltered.
   const [categoryFilter, setCategoryFilter] = useState<string>("human");
@@ -543,7 +543,7 @@ export function LeaderboardTable({
   // filter is applied IN JS only on the "off" board (which ships every row); on windowed
   // boards the server already returned the selected platform's rows (URL-driven), so
   // re-filtering in JS would wrongly hide the operator-total 'multi' roll-up rows.
-  // Category filter (owner 2026-07-14): defaults to "human" (Human Center of Mass) —
+  // Category filter (owner 2026-07-14): defaults to "human" (Operator Center of Mass) —
   // excludes outliers (input/total < 0.1%) and bots (input/total > 80%).
   const filtered = useMemo(() => {
     const domain = PLATFORM_DOMAIN_MAP[platform]; // null = All
@@ -552,7 +552,7 @@ export function LeaderboardTable({
       if (isOff && domain && (e.platform ?? "other") !== domain) return false;
       if (classFilter !== "all" && e.signalClass.toLowerCase() !== classFilter)
         return false;
-      // Category filter: Human Center of Mass / + Outliers & Bots / All
+      // Category filter: Operator Center of Mass / + Outliers & Bots / All
       if (categoryFilter === "human") {
         if (isOutlierEntry(e)) return false;
       }
@@ -716,7 +716,7 @@ export function LeaderboardTable({
                 label: c.label,
               }))}
             />
-            {/* Category filter (owner 2026-07-14): Human Center of Mass by default.
+            {/* Category filter (owner 2026-07-14): Operator Center of Mass by default.
                 Toggle to add outliers & bots (one category). */}
             <div style={st.fieldCol}>
               <span style={st.flab}>Category</span>
@@ -729,7 +729,7 @@ export function LeaderboardTable({
                     ...(categoryFilter === "human" ? st.modeOn : null),
                   }}
                 >
-                  Human
+                  Operator
                 </button>
                 <button
                   type="button"

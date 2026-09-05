@@ -78,7 +78,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
             {
               question: "Why do time-based metrics fail for AI coding?",
               answer:
-                "Time-based metrics (hours logged, commits per hour) measure the human clock, not the AI token cascade. A 10-minute session with excellent cache reuse can outproduce a 4-hour session that burns fresh input tokens. Yield (Υ) measures the architecture of the cascade — whether signal compounds or tokens are burned — independent of wall-clock time.",
+                "Time-based metrics (hours logged, commits per hour) measure the operator clock, not the AI token cascade. A 10-minute session with excellent cache reuse can outproduce a 4-hour session that burns fresh input tokens. Yield (Υ) measures the architecture of the cascade — whether signal compounds or tokens are burned — independent of wall-clock time.",
             },
             {
               question: "What are the four token pillars?",
@@ -136,10 +136,10 @@ export default function HowToMeasureAICodingEfficiencyPage() {
           breaks the moment an AI agent enters the loop.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          An AI-assisted session doesn&rsquo;t follow the human clock. A
+          An AI-assisted session doesn&rsquo;t follow the operator clock. A
           well-structured 10-minute session with excellent prompt caching can
           produce more useful code than a 4-hour session that re-sends the same
-          context from scratch every turn. The human spent less time — but the
+          context from scratch every turn. The operator spent less time — but the
           cascade was far more efficient. Time-based metrics reward the slow,
           verbose session and penalize the sharp, cache-rich one. They measure
           the wrong axis entirely.
@@ -430,7 +430,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
               Why do time-based metrics fail for AI coding?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Time-based metrics measure the human clock, not the AI token
+              Time-based metrics measure the operator clock, not the AI token
               cascade. A 10-minute session with excellent cache reuse can
               outproduce a 4-hour session that burns fresh input tokens. Yield
               measures the cascade architecture, independent of wall-clock time.

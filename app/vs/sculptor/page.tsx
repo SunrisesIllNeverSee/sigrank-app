@@ -32,7 +32,7 @@ const COMPARE_ROWS: { feature: string; sculptor: string; sigrank: string }[] = [
   {
     feature: "What it evaluates",
     sculptor: "Writes code with AI (the tool itself)",
-    sigrank: "The human operator driving any AI tool",
+    sigrank: "The operator driving any AI tool",
   },
   {
     feature: "Cascade efficiency score (Υ Yield)",
@@ -90,12 +90,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank a sculptor alternative?",
     answer:
-      "They are not the same category. sculptor is an AI coding agent — a tool that helps you write code with AI. SigRank is an operator scoring system — it evaluates the human who drives any AI coding agent, including sculptor. sculptor is the tool; SigRank scores the operator who uses it. The tool is not the operator. You do not choose between them — you use sculptor to code, and SigRank to measure how efficiently you drove it.",
+      "They are not the same category. sculptor is an AI coding agent — a tool that helps you write code with AI. SigRank is an operator scoring system — it evaluates the operator who drives any AI coding agent, including sculptor. sculptor is the tool; SigRank scores the operator who uses it. The tool is not the operator. You do not choose between them — you use sculptor to code, and SigRank to measure how efficiently you drove it.",
   },
   {
     question: "Why is the tool not the operator?",
     answer:
-      "A coding agent is a tool — it executes instructions, generates code, processes context. The operator is the human who drives it: what context they provide, how they manage the cascade, how efficiently they compound cached context into output. Two operators can use the same sculptor agent and have wildly different efficiency. One reuses cached context efficiently and produces 30K output tokens; the other re-sends the same context every turn and produces 3K. Same tool, ten-fold difference in signal. The tool does not determine the operator's skill.",
+      "A coding agent is a tool — it executes instructions, generates code, processes context. The operator is the operator who drives it: what context they provide, how they manage the cascade, how efficiently they compound cached context into output. Two operators can use the same sculptor agent and have wildly different efficiency. One reuses cached context efficiently and produces 30K output tokens; the other re-sends the same context every turn and produces 3K. Same tool, ten-fold difference in signal. The tool does not determine the operator's skill.",
   },
   {
     question: "Can SigRank score me if I use sculptor?",
@@ -155,7 +155,7 @@ export default function VsSculptorPage() {
           Cursor, Copilot, Gemini, and sculptor among them. It does the coding
           agent layer well: it processes your instructions, generates code,
           manages context. But sculptor is the <em>tool</em>, not the operator.
-          The tool does not measure the skill of the human driving it.
+          The tool does not measure the skill of the operator driving it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is a different thing entirely: an{" "}
@@ -215,7 +215,7 @@ export default function VsSculptorPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           sculptor is a coding agent — it executes instructions and generates
-          code. The operator is the human who drives it: what context they
+          code. The operator is the operator who drives it: what context they
           provide, how they manage the cascade, how efficiently they compound
           cached context into output. Two operators can use the same sculptor
           agent and have wildly different efficiency. One reuses cached context

@@ -39,7 +39,7 @@ const TOOLS: Tool[] = [
     measures:
       "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier.",
     pros: [
-      "Scores the operator, not the model — the only tool that ranks the human driving the AI",
+      "Scores the operator, not the model — the only tool that ranks the operator driving the AI",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "Privacy-preserving: on-device scanning, token counts only, ed25519-signed submissions",
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",
@@ -161,7 +161,7 @@ const FAQS = [
   {
     question: "What are AI coding metrics tools?",
     answer:
-      "AI coding metrics tools measure how you use AI assistants during coding. They range from simple token counters (ccusage) to time trackers (WakaTime) to model-quality leaderboards (LMSYS). SigRank is the only tool that scores the operator — the human driving the AI — by token-cascade efficiency (Υ Yield = cache_read × output / input²) and ranks them on a live, cross-platform leaderboard.",
+      "AI coding metrics tools measure how you use AI assistants during coding. They range from simple token counters (ccusage) to time trackers (WakaTime) to model-quality leaderboards (LMSYS). SigRank is the only tool that scores the operator — the operator driving the AI — by token-cascade efficiency (Υ Yield = cache_read × output / input²) and ranks them on a live, cross-platform leaderboard.",
   },
   {
     question: "How is SigRank different from ccusage?",
@@ -226,7 +226,7 @@ export default function AICodingMetricsPage() {
           context across a session, or burning fresh tokens every turn? The
           tools below each measure some slice of AI-assisted coding, from raw
           token counts to time-on-task to model quality. Only SigRank scores the{" "}
-          <strong className="text-text-primary">operator</strong> — the human
+          <strong className="text-text-primary">operator</strong> — the person
           driving the AI — by token-cascade efficiency and ranks them on a live
           leaderboard.
         </p>

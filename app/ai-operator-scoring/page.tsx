@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "AI Operator Scoring — Ranking the Operator Behind AI",
   description:
-    "AI operator scoring ranks the account-level subject driving the AI, not the model. The coding efficiency score and operator ranking system that measures who ranks highest at operating AI under the stated metric and time window \u2014 not which AI is best.",
+    "AI operator scoring ranks the account driving the AI, not the model. The coding efficiency score and operator ranking system that measures who ranks highest at operating AI under the stated metric and time window \u2014 not which AI is best.",
   path: "/ai-operator-scoring",
 });
 
@@ -69,7 +69,7 @@ export default function AIOperatorScoringPage() {
             {
               question: "What is AI operator scoring?",
               answer:
-                "AI operator scoring is the systematic ranking of operators — the account-level subjects associated with AI-work telemetry — by the efficiency of their token cascade. Instead of ranking which AI model is best (model benchmarking) or how many hours a developer spent (time tracking), it ranks who ranks highest at operating their AI under the stated metric and time window — measured by yield (Υ = cache_read × output / input²) and the composite SIGNA rate. It is a new performance layer that sits between model benchmarks and time trackers.",
+                "AI operator scoring is the systematic ranking of operators — the accounts associated with AI-work telemetry — by the efficiency of their token cascade. Instead of ranking which AI model is best (model benchmarking) or how many hours a developer spent (time tracking), it ranks who ranks highest at operating their AI under the stated metric and time window — measured by yield (Υ = cache_read × output / input²) and the composite SIGNA rate. It is a new performance layer that sits between model benchmarks and time trackers.",
             },
             {
               question:
@@ -118,7 +118,7 @@ export default function AIOperatorScoringPage() {
           What is an AI operator?
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          An operator is the account-level subject associated with AI-work
+          An operator is the account associated with AI-work
           telemetry. It is not necessarily a legal person, employer, or unique
           human: one operator can have devices, submissions, and an optional
           authenticated account link. In practice, an operator is the entity
@@ -129,7 +129,7 @@ export default function AIOperatorScoringPage() {
           The term has multiple meanings in the wild. OpenAI&apos;s Operator
           product is an autonomous agent. In business, an &quot;AI
           operator&quot; can be a job title. In SigRank&apos;s measurement
-          layer, an operator is the account-level subject whose token
+          layer, an operator is the account whose token
           telemetry is collected and scored. This is a measurement
           definition, not a job-title definition.
         </p>
@@ -151,7 +151,7 @@ export default function AIOperatorScoringPage() {
             <tbody className="text-text-secondary">
               <tr className="border-b border-bg-border/50">
                 <td className="py-2 pr-4 font-semibold text-text-primary">Operator</td>
-                <td className="py-2">The account-level subject associated with AI-work telemetry — the unit of analysis for measurement.</td>
+                <td className="py-2">The individual whose AI-work telemetry is measured — the unit of analysis for measurement.</td>
               </tr>
               <tr className="border-b border-bg-border/50">
                 <td className="py-2 pr-4 font-semibold text-text-primary">Agent</td>
@@ -266,7 +266,7 @@ export default function AIOperatorScoringPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           AI operator scoring is the systematic ranking of operators — the
-          account-level subjects associated with AI-work telemetry — by the
+          accounts associated with AI-work telemetry — by the
           efficiency of their token cascade. It does not rank which model is
           smartest. It does not rank who spent the most hours at the keyboard.
           It ranks who ranks highest at operating their AI under the stated
@@ -416,7 +416,7 @@ export default function AIOperatorScoringPage() {
               What is AI operator scoring?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              The systematic ranking of operators — the account-level subjects
+              The systematic ranking of operators — the accounts
               associated with AI-work telemetry — by token-cascade efficiency.
               It ranks who ranks highest at operating their AI under the stated
               metric and time window — measured by yield and the composite SIGNA

@@ -48,7 +48,7 @@ export async function GET() {
 
   const homeStats = await getHomepageStats();
   const fieldData = await getFieldAnalysis();
-  const operatorCount = fieldData.meta.humans_included;
+  const operatorCount = fieldData.meta.operators_included;
   const medianYield = fieldData.meta.medians.yield;
 
   // Top Yield (Υ) — from system_stats.top_yield (populated by
@@ -58,7 +58,7 @@ export async function GET() {
 
   const body = `# ${SITE_NAME} — Full Reference for AI Engines
 
-SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the account-level subjects operating AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
+SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the accounts operating AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
 
 > ${SITE_TAGLINE}
 
@@ -171,7 +171,7 @@ ${operators || "| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |"}
 ## Common Questions (Q&A)
 
 **Q: What is SigRank?**
-A: SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the account-level subjects operating AI by Yield (Υ = cache_read × output / input²), not raw token volume.
+A: SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the accounts operating AI by Yield (Υ = cache_read × output / input²), not raw token volume.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads your local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. No install, no sign-in. Or visit ${SITE_ORIGIN}/score to paste your token counts manually.
@@ -192,7 +192,7 @@ A: ccusage shows your token usage. SigRank scores your token efficiency. ccusage
 A: The operator with the highest Yield (Υ) on the SigRank leaderboard. Yield measures cascade efficiency, not token volume. See ${SITE_ORIGIN}/board/all.
 
 **Q: How is SigRank different from LMSYS or LiveBench?**
-A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators: the account-level subjects operating the models. Model leaderboards ask "which model is best?" SigRank asks "who ranks highest at operating AI under the stated metric and time window?"
+A: LMSYS and LiveBench benchmark AI models. SigRank benchmarks AI operators: the accounts operating the models. Model leaderboards ask "which model is best?" SigRank asks "who ranks highest at operating AI under the stated metric and time window?"
 
 **Q: What are the 10 build archetypes?**
 A: SigRank classifies every operator into one of 10 build archetypes based on three ratios (leverage, velocity, construction). The 10 types: CONVERGENT, KINETIC, BUILDER, RECURSIVE, AMPLIFIER, INPUT-BOUND, PRIMING, CONTEXTUAL, DEEP READER, ARCHIVIST. See ${SITE_ORIGIN}/wiki.
@@ -247,7 +247,7 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 
 ## Live aggregate stats
 
-- ${operatorCount.toLocaleString()} operators ranked (Human Center of Mass)
+- ${operatorCount.toLocaleString()} operators ranked (Operator Center of Mass)
 - ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked (Claude, ChatGPT, Gemini, Cursor, Copilot, ...)
 - 3,304 models measured

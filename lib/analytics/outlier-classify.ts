@@ -1,7 +1,7 @@
 /**
  * lib/data/outlier-classify.ts — shared outlier classification.
  *
- * One source of truth for whether an operator is in the Human Center of Mass
+ * One source of truth for whether an operator is in the Operator Center of Mass
  * or classified as an Outlier. Used by:
  *   - Leaderboard category filter (components/sigrank/LeaderboardTable.tsx)
  *   - Three Degrees chart (lib/marketing/top-operator-column.ts isRealOperator)
@@ -12,20 +12,20 @@
  * (owner 2026-07-14: hand-picked + auto-classify approach.)
  */
 
-/** Hand-picked humans — verified operators that bypass the input/total ratio filter.
- * These are real humans whose input/total falls below 1% but are confirmed not bots/outliers. */
-export const HUMAN_WHITELIST = new Set([
-  "signal-92b4f9f485", // MOSES — canonical anchor, verified human
+/** Hand-picked operators — verified operators that bypass the input/total ratio filter.
+ * These are real operators whose input/total falls below 1% but are confirmed not bots/outliers. */
+export const OPERATOR_WHITELIST = new Set([
+  "signal-92b4f9f485", // MOSES — canonical anchor, verified operator
   "transvaultorigin", // MOSES mock codename (fallback path)
 ]);
 
-/** Classify an operator as an outlier or a human.
+/** Classify an operator as an outlier or an operator.
  *
- * Human Center of Mass:
+ * Operator Center of Mass:
  *   - input/total 1%–80% (normal range), OR
  *   - input/total < 1% BUT passes the MOSES-like filter:
  *     velocity ≤ 2x, yield ≤ 1000, output > 1M, cache_write > 1M, OR
- *   - in the HUMAN_WHITELIST (hand-picked, bypasses all checks)
+ *   - in the OPERATOR_WHITELIST (hand-picked, bypasses all checks)
  *
  * Outliers & Bots:
  *   - input/total > 80% (input dump bots), OR
@@ -42,14 +42,14 @@ export function isOutlier(params: {
   yield_: number;
 }): boolean {
   const code = params.codename.toLowerCase();
-  if (HUMAN_WHITELIST.has(code)) return false;
+  if (OPERATOR_WHITELIST.has(code)) return false;
 
   const total = params.input + params.output + params.cacheRead + params.cacheWrite;
   if (total <= 0) return false;
 
   const inputPct = params.input / total;
   if (inputPct > 0.8) return true; // input dump bots
-  if (inputPct >= 0.01) return false; // normal human range
+  if (inputPct >= 0.01) return false; // normal operator range
 
   // Gray zone (input < 1%): MOSES-like filter
   if (
@@ -60,7 +60,7 @@ export function isOutlier(params: {
   ) {
     return true; // extreme outlier
   }
-  return false; // MOSES-like — stays human
+  return false; // MOSES-like — stays in OCM
 }
 
 /** Convenience: classify a LeaderboardRow. */

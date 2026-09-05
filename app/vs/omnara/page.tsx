@@ -2,7 +2,7 @@
  * app/vs/omnara/page.tsx — "SigRank vs omnara" SEO comparison page.
  *
  * Angle: omnara monitors AI agents. SigRank scores AI operators. Monitoring
- * infrastructure ≠ evaluating the human at the wheel.
+ * infrastructure ≠ evaluating the operator at the wheel.
  *
  * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
  * WaveHero, and a styled comparison table matching the repo's table conventions.
@@ -18,7 +18,7 @@ import { WaveHero } from "@/components/ui/WaveHero";
 export const metadata: Metadata = withOG({
   title: "SigRank vs omnara",
   description:
-    "omnara monitors AI agents with broad observability. SigRank scores AI operators. Monitoring infrastructure is not evaluating the human at the wheel.",
+    "omnara monitors AI agents with broad observability. SigRank scores AI operators. Monitoring infrastructure is not evaluating the operator at the wheel.",
   path: "/vs/omnara",
 });
 
@@ -32,7 +32,7 @@ const COMPARE_ROWS: { feature: string; omnara: string; sigrank: string }[] = [
   {
     feature: "What it evaluates",
     omnara: "AI agent behavior and infrastructure",
-    sigrank: "The human operator driving the AI",
+    sigrank: "The operator driving the AI",
   },
   {
     feature: "Cascade efficiency score (Υ Yield)",
@@ -90,12 +90,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank an omnara alternative?",
     answer:
-      "They evaluate different things. omnara is an AI monitoring platform — it monitors AI agents with broad observability and infrastructure monitoring. SigRank is an operator scoring system — it evaluates the human at the wheel, not the agent they are driving. omnara tells you what your agents are doing; SigRank tells you how efficiently you are driving them. Monitoring infrastructure is not evaluating the operator. You can run both — they solve different problems.",
+      "They evaluate different things. omnara is an AI monitoring platform — it monitors AI agents with broad observability and infrastructure monitoring. SigRank is an operator scoring system — it evaluates the operator at the wheel, not the agent they are driving. omnara tells you what your agents are doing; SigRank tells you how efficiently you are driving them. Monitoring infrastructure is not evaluating the operator. You can run both — they solve different problems.",
   },
   {
     question: "Why is monitoring agents not the same as scoring operators?",
     answer:
-      "Monitoring agents tells you what the AI is doing — is it running, is it healthy, what calls is it making. Scoring operators tells you how efficiently the human is driving the AI — are they compounding cached context or burning fresh input? The agent is the car; the operator is the driver. omnara monitors the car; SigRank scores the driver. A healthy car does not mean a skilled driver. Monitoring infrastructure is not evaluating the human at the wheel.",
+      "Monitoring agents tells you what the AI is doing — is it running, is it healthy, what calls is it making. Scoring operators tells you how efficiently the operator is driving the AI — are they compounding cached context or burning fresh input? The agent is the car; the operator is the driver. omnara monitors the car; SigRank scores the driver. A healthy car does not mean a skilled driver. Monitoring infrastructure is not evaluating the operator at the wheel.",
   },
   {
     question: "What does omnara not measure that SigRank does?",
@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both omnara and SigRank?",
     answer:
-      "Yes, and they are complementary. Use omnara to monitor your AI agents and infrastructure health. Use SigRank to score the human operator who drives those agents. The SigRank CLI reads token telemetry locally (token counts only, never agent behavior logs), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. omnara sees the agents; SigRank scores the operator behind them. Run `sigrank enroll` then `sigrank submit` to get your rank.",
+      "Yes, and they are complementary. Use omnara to monitor your AI agents and infrastructure health. Use SigRank to score the operator who drives those agents. The SigRank CLI reads token telemetry locally (token counts only, never agent behavior logs), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. omnara sees the agents; SigRank scores the operator behind them. Run `sigrank enroll` then `sigrank submit` to get your rank.",
   },
   {
     question: "What is the difference between agent monitoring and operator scoring?",
@@ -126,7 +126,7 @@ export default function VsOmnaraPage() {
           faqPage(FAQS),
           comparisonArticle({
             title: "SigRank vs omnara \u2014 Agent Monitoring vs Operator Scoring",
-            description: "omnara monitors AI agents with broad observability. SigRank scores AI operators. Monitoring infrastructure is not evaluating the human at the wheel.",
+            description: "omnara monitors AI agents with broad observability. SigRank scores AI operators. Monitoring infrastructure is not evaluating the operator at the wheel.",
             path: "/vs/omnara",
           }),
         ]}
@@ -155,7 +155,7 @@ export default function VsOmnaraPage() {
           for AI agents. It monitors what your agents are doing: their state,
           their calls, their health, their behavior. It is excellent at what it
           does, which is <em>infrastructure monitoring</em>. What it does not do
-          is score the human operator who drives those agents or rank them
+          is score the operator who drives those agents or rank them
           against anyone.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">

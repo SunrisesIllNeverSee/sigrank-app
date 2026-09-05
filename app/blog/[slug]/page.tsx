@@ -183,7 +183,7 @@ export default async function BlogPost({
     },
     {
       question: `What is SigRank?`,
-      answer: `SigRank is a privacy-preserving leaderboard that ranks AI operators by token cascade efficiency (Yield). It measures the humans using AI, not the AI models. Run \`npx sigrank\` to see your score.`,
+      answer: `SigRank is a privacy-preserving leaderboard that ranks AI operators by token cascade efficiency (Yield). It measures the accounts using AI, not the AI models. Run \`npx sigrank\` to see your score.`,
     },
     {
       question: `How does this relate to AI operator efficiency?`,

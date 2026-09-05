@@ -27,7 +27,7 @@ const COMPARE_ROWS: { feature: string; vals: string; sigrank: string }[] = [
   {
     feature: "What it evaluates",
     vals: "AI systems (models, agents, pipelines)",
-    sigrank: "AI operators (the humans driving AI tools)",
+    sigrank: "AI operators (the operators driving AI tools)",
   },
   {
     feature: "Unit of analysis",
@@ -85,7 +85,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "How is SigRank different from VALS AI?",
     answer:
-      "VALS evaluates AI systems - models, agents, pipelines. SigRank evaluates AI operators - the humans who drive AI tools. VALS asks &quot;which system is better?&quot; SigRank asks &quot;who is the better operator?&quot; They are complementary: VALS measures the machine, SigRank measures the person driving it. The SigRank leaderboard is proof of the evaluation standard, not the product itself - the product is the operator-evaluation methodology.",
+      "VALS evaluates AI systems - models, agents, pipelines. SigRank evaluates AI operators - the operators who drive AI tools. VALS asks &quot;which system is better?&quot; SigRank asks &quot;who is the better operator?&quot; They are complementary: VALS measures the machine, SigRank measures the person driving it. The SigRank leaderboard is proof of the evaluation standard, not the product itself - the product is the operator-evaluation methodology.",
   },
   {
     question: "Why evaluate AI operators instead of AI systems?",
@@ -151,7 +151,7 @@ export default function VsValsAiPage() {
           pipelines against benchmarks - measuring accuracy, robustness, safety,
           and alignment. That is the <strong className="text-text-primary">system
           layer</strong>. SigRank is an operator evaluator. It measures how
-          effectively humans drive AI tools - using privacy-preserving token
+          effectively operators drive AI tools - using privacy-preserving token
           telemetry to compute Yield, Leverage, Velocity, and workflow
           signatures. That is the <strong className="text-text-primary">operator
           layer</strong>. Both are AI evaluation tools, but they evaluate

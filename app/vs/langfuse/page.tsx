@@ -83,7 +83,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank replace Langfuse?",
     answer:
-      "No — they solve different problems. Langfuse is an LLM observability platform: it traces LLM calls — logs, spans, generations, prompts, completions — so you can debug, monitor, and evaluate your AI application. SigRank is an operator leaderboard: it scores how efficiently a human drives AI tools and ranks them globally. Langfuse is for understanding your app&apos;s LLM usage; SigRank is for ranking the operator behind it. Observability vs competition — different goals, different layers.",
+      "No — they solve different problems. Langfuse is an LLM observability platform: it traces LLM calls — logs, spans, generations, prompts, completions — so you can debug, monitor, and evaluate your AI application. SigRank is an operator leaderboard: it scores how efficiently an operator drives AI tools and ranks them globally. Langfuse is for understanding your app&apos;s LLM usage; SigRank is for ranking the operator behind it. Observability vs competition — different goals, different layers.",
   },
   {
     question: "Does Langfuse measure operator token efficiency?",
@@ -98,7 +98,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use SigRank alongside Langfuse?",
     answer:
-      "Yes — they are complementary. Use Langfuse to trace and debug your application&apos;s LLM calls. Use SigRank to score the human operator who drives your AI tools — including the app Langfuse is observing. The SigRank CLI reads token telemetry locally (token counts only, never prompt content), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Langfuse sees the app&apos;s calls; SigRank scores the operator behind them. Run `sigrank enroll` then `sigrank submit` to get your rank.",
+      "Yes — they are complementary. Use Langfuse to trace and debug your application&apos;s LLM calls. Use SigRank to score the operator who drives your AI tools — including the app Langfuse is observing. The SigRank CLI reads token telemetry locally (token counts only, never prompt content), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Langfuse sees the app&apos;s calls; SigRank scores the operator behind them. Run `sigrank enroll` then `sigrank submit` to get your rank.",
   },
   {
     question: "What is the difference between LLM tracing and operator scoring?",
@@ -148,7 +148,7 @@ export default function VsLangfusePage() {
           spans, generations, prompt management, evaluation pipelines, cost
           analytics: Langfuse gives you a dashboard into what your app&apos;s LLM
           calls are doing. It is excellent at what it does, which is{" "}
-          <em>observability</em>. What it does not do is score the human operator
+          <em>observability</em>. What it does not do is score the operator
           or rank them against anyone.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">

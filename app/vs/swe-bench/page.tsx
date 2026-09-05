@@ -28,7 +28,7 @@ const COMPARE_ROWS: { feature: string; swebench: string; sigrank: string }[] = [
   {
     feature: "What gets evaluated",
     swebench: "AI models (GPT-4, Claude, Gemini\u2026)",
-    sigrank: "AI operators (the humans driving)",
+    sigrank: "AI operators (the operators driving)",
   },
   {
     feature: "Evaluation signal",
@@ -87,12 +87,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What is the difference between SWE-bench and SigRank?",
     answer:
-      "SWE-bench evaluates AI MODELS on real software engineering tasks \u2014 given a GitHub issue, can the model produce a patch that passes the test suite? SigRank evaluates OPERATORS \u2014 the humans driving the AI \u2014 by measuring token cascade efficiency (\u03A5 = cache_read \u00D7 output / input\u00B2) from on-device, signed telemetry. SWE-bench answers &quot;can the model fix the bug?&quot;; SigRank answers &quot;how efficiently did the operator drive the model to fix the bug?&quot; They measure different layers of the human-AI stack.",
+      "SWE-bench evaluates AI MODELS on real software engineering tasks \u2014 given a GitHub issue, can the model produce a patch that passes the test suite? SigRank evaluates OPERATORS \u2014 the operators driving the AI \u2014 by measuring token cascade efficiency (\u03A5 = cache_read \u00D7 output / input\u00B2) from on-device, signed telemetry. SWE-bench answers &quot;can the model fix the bug?&quot;; SigRank answers &quot;how efficiently did the operator drive the model to fix the bug?&quot; They measure different layers of the operator-AI stack.",
   },
   {
     question: "Is SigRank an alternative to SWE-bench?",
     answer:
-      "They are complementary, not replacements. SWE-bench is the gold standard for model-level coding capability \u2014 it tells you which model can resolve real issues. SigRank is the standard for operator-level efficiency \u2014 it tells you how well the human used the model. You pick the model with SWE-bench; you measure your driving skill with SigRank. If you want a benchmark that ranks the human side of AI-assisted coding, SigRank is the one that does that.",
+      "They are complementary, not replacements. SWE-bench is the gold standard for model-level coding capability \u2014 it tells you which model can resolve real issues. SigRank is the standard for operator-level efficiency \u2014 it tells you how well the human used the model. You pick the model with SWE-bench; you measure your driving skill with SigRank. If you want a benchmark that ranks the operator side of AI-assisted coding, SigRank is the one that does that.",
   },
   {
     question: "Why rank operators instead of models?",
@@ -137,7 +137,7 @@ export default function VsSweBenchPage() {
             SWE-bench asks <span className="text-gold">can the model fix the bug?</span>{" "}
             SigRank asks{" "}
             <span className="text-gold">how efficiently did you drive it?</span>{" "}
-            Different layers of the human-AI stack.
+            Different layers of the operator-AI stack.
           </>
         }
       />

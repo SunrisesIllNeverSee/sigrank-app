@@ -59,7 +59,7 @@ export default function AIEvaluationFrameworksPage() {
           ]),
           definedTerm(
             "AI Evaluation Frameworks",
-            "AI evaluation frameworks are structured methodologies for measuring and comparing AI system performance. Examples include NIST AI RMF (a risk management framework), OpenAI Evals (a model evaluation harness), DeepEval (an LLM output testing framework), Braintrust (an evaluation platform), and SigRank (the operator evaluation framework). SigRank is the framework for the operator layer — it measures the humans driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²).",
+            "AI evaluation frameworks are structured methodologies for measuring and comparing AI system performance. Examples include NIST AI RMF (a risk management framework), OpenAI Evals (a model evaluation harness), DeepEval (an LLM output testing framework), Braintrust (an evaluation platform), and SigRank (the operator evaluation framework). SigRank is the framework for the operator layer — it measures the operators driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²).",
             "/ai-evaluation-frameworks",
           ),
           faqPage([
@@ -71,7 +71,7 @@ export default function AIEvaluationFrameworksPage() {
             {
               question: "How does SigRank differ from other AI evaluation frameworks?",
               answer:
-                "Other frameworks measure the model, the output, or the safety of the system. SigRank measures the operator — the human driving the AI. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read. It is a new category of framework, not a competitor to model or output evaluation frameworks.",
+                "Other frameworks measure the model, the output, or the safety of the system. SigRank measures the operator — the operator driving the AI. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read. It is a new category of framework, not a competitor to model or output evaluation frameworks.",
             },
             {
               question: "What is the NIST AI RMF?",
@@ -139,7 +139,7 @@ export default function AIEvaluationFrameworksPage() {
           </li>
           <li>
             <strong className="text-text-primary">SigRank.</strong> The
-            operator evaluation framework. Measures the humans driving the AI
+            operator evaluation framework. Measures the operators driving the AI
             via real token telemetry. Answers: who is best at using the AI?
           </li>
         </ul>
@@ -183,7 +183,7 @@ export default function AIEvaluationFrameworksPage() {
           provides the governance structure that tells you to evaluate
           operators. OpenAI Evals and MMLU tell you which model to deploy.
           DeepEval and Braintrust tell you whether the output is good. SigRank
-          tells you whether the humans driving the deployed model are driving
+          tells you whether the operators driving the deployed model are driving
           it well. A mature organization runs frameworks from multiple layers
           — the operator layer is the one most organizations are missing.
         </p>
@@ -233,7 +233,7 @@ export default function AIEvaluationFrameworksPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Other frameworks measure the model, output, or safety. SigRank
-              measures the operator — the human driving the AI. Four token
+              measures the operator — the operator driving the AI. Four token
               pillars, the Yield metric, ed25519-signed snapshots. A new
               category of framework.
             </dd>

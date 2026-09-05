@@ -157,7 +157,7 @@ export default function YieldFormulaVisual() {
             1.24
           </div>
           <div className="font-sans text-[10px] text-text-dim">
-            the human center of mass
+            the operator center of mass
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
  * app/vs/langchain/page.tsx — "SigRank vs LangChain" SEO comparison page.
  *
  * Angle: LangChain is an LLM application framework (chains, agents, RAG).
- * SigRank measures the human operator's efficiency driving AI tools. Different
+ * SigRank measures the operator's efficiency driving AI tools. Different
  * layers entirely — framework vs operator measurement.
  *
  * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
@@ -19,7 +19,7 @@ import { WaveHero } from "@/components/ui/WaveHero";
 export const metadata: Metadata = withOG({
   title: "SigRank vs LangChain \u2014 Framework vs Operator Measurement",
   description:
-    "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the humans driving AI tools. Different layers entirely — framework vs operator measurement.",
+    "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the operators driving AI tools. Different layers entirely — framework vs operator measurement.",
   path: "/vs/langchain",
 });
 
@@ -35,7 +35,7 @@ const COMPARE_ROWS: { feature: string; langchain: string; sigrank: string }[] = 
     sigrank: "No (measures operators, not apps)",
   },
   {
-    feature: "Measures human operator token efficiency",
+    feature: "Measures operator token efficiency",
     langchain: "No",
     sigrank: "Yes (cascade-derived)",
   },
@@ -82,12 +82,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank replace LangChain?",
     answer:
-      "No — they operate at completely different layers. LangChain is an LLM application framework: it gives developers the primitives to build AI apps — chains, agents, RAG pipelines, tool-calling, memory. SigRank is an operator scoring layer: it measures how efficiently a human drives AI tools and ranks them on a leaderboard. LangChain is for building AI software; SigRank is for measuring the humans who use AI software. You can build an app with LangChain and still score the operator who drives it with SigRank.",
+      "No — they operate at completely different layers. LangChain is an LLM application framework: it gives developers the primitives to build AI apps — chains, agents, RAG pipelines, tool-calling, memory. SigRank is an operator scoring layer: it measures how efficiently an operator drives AI tools and ranks them on a leaderboard. LangChain is for building AI software; SigRank is for measuring the operators who use AI software. You can build an app with LangChain and still score the operator who drives it with SigRank.",
   },
   {
     question: "Does LangChain measure token efficiency?",
     answer:
-      "LangChain provides tracing and callback hooks that can log token usage within an application — useful for debugging your chain or agent. That is application-level observability, not operator-level scoring. LangChain tells you how many tokens a specific chain call consumed; SigRank tells you how efficiently the human operator driving the tool compounds signal across an entire session. The first is a debug log; the second is a leaderboard rank. Different questions, different layers.",
+      "LangChain provides tracing and callback hooks that can log token usage within an application — useful for debugging your chain or agent. That is application-level observability, not operator-level scoring. LangChain tells you how many tokens a specific chain call consumed; SigRank tells you how efficiently the operator driving the tool compounds signal across an entire session. The first is a debug log; the second is a leaderboard rank. Different questions, different layers.",
   },
   {
     question: "Why is operator measurement different from framework tracing?",
@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What is the difference between an AI framework and an operator leaderboard?",
     answer:
-      "A framework (LangChain) is a set of software primitives — abstractions, libraries, runtimes — that developers use to build AI applications. A leaderboard (SigRank) is a ranking surface that measures and compares human operators on a canonical efficiency metric. The first is a tool for building software; the second is a measurement system for ranking people. LangChain is the layer where AI apps are constructed; SigRank is the layer where the humans driving those apps (and every other AI tool) are scored. Framework vs operator measurement — different layers entirely.",
+      "A framework (LangChain) is a set of software primitives — abstractions, libraries, runtimes — that developers use to build AI applications. A leaderboard (SigRank) is a ranking surface that measures and compares operators on a canonical efficiency metric. The first is a tool for building software; the second is a measurement system for ranking people. LangChain is the layer where AI apps are constructed; SigRank is the layer where the operators driving those apps (and every other AI tool) are scored. Framework vs operator measurement — different layers entirely.",
   },
 ];
 
@@ -118,7 +118,7 @@ export default function VsLangChainPage() {
           faqPage(FAQS),
           comparisonArticle({
             title: "SigRank vs LangChain",
-            description: "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the humans driving AI tools. Different layers entirely — framework vs operator measurement.",
+            description: "LangChain builds AI apps with chains, agents, and RAG. SigRank ranks the operators driving AI tools. Different layers entirely — framework vs operator measurement.",
             path: "/vs/langchain",
           }),
         ]}
@@ -130,7 +130,7 @@ export default function VsLangChainPage() {
         subtitle={
           <>
             LangChain builds AI apps with chains, agents, and RAG. SigRank{" "}
-            <span className="text-gold">ranks the humans</span> driving AI tools.
+            <span className="text-gold">ranks the operators</span> driving AI tools.
             Different layers entirely — framework vs operator measurement.
           </>
         }
@@ -147,7 +147,7 @@ export default function VsLangChainPage() {
           tool-calling, memory, retrieval: LangChain provides the primitives that
           turn a raw model API into a working application. It is excellent at what
           it does, which is <em>building AI software</em>. What it does not do is
-          measure the human operator who drives that software.
+          measure the operator who drives that software.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank operates at a different layer entirely. It is not a framework
@@ -156,7 +156,7 @@ export default function VsLangChainPage() {
           reads token telemetry from any AI tool an operator drives, computes the
           cascade efficiency (Υ Yield), and ranks them on a global leaderboard.
           LangChain is the layer where AI apps are constructed; SigRank is the
-          layer where the humans driving those apps are scored.
+          layer where the operators driving those apps are scored.
         </p>
       </section>
 
@@ -281,7 +281,7 @@ export default function VsLangChainPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           LangChain is the framework where AI apps are built. SigRank is the
-          layer where the humans driving those apps are scored. Install the CLI,
+          layer where the operators driving those apps are scored. Install the CLI,
           submit a signed snapshot, and get a rank that measures the operator,
           not the app.
         </p>

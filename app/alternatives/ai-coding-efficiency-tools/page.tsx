@@ -43,7 +43,7 @@ const TOOLS: Tool[] = [
     measures:
       "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that scores whether your AI usage is compounding or burning.",
     pros: [
-      "Scores the operator, not the model — the only tool that ranks the human driving the AI",
+      "Scores the operator, not the model — the only tool that ranks the operator driving the AI",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "Privacy-preserving: on-device scanning, token counts only, ed25519-signed submissions",
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",

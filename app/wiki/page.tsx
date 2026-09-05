@@ -1857,7 +1857,7 @@ export default function Draft1Page() {
         {
           id: "tier-distribution",
           label: "24-stage distribution data",
-          hint: "Population statistics for every stage: token floor/ceiling, operator count, distribution bars. From the HCM cut.",
+          hint: "Population statistics for every stage: token floor/ceiling, operator count, distribution bars. From the OCM cut.",
           node: <TierLadderDistribution />,
         },
       ],

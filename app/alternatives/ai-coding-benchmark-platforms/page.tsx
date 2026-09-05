@@ -6,7 +6,7 @@
  * benchmarks", "code generation benchmarks". Distinct from
  * /alternatives/ai-benchmarking-tools (which is broader): this page focuses on
  * platforms that run code-generation benchmarks specifically, and argues that
- * SigRank benchmarks operators (humans driving AI) while the others benchmark
+ * SigRank benchmarks operators (operators driving AI) while the others benchmark
  * models on coding tasks — a different unit of measurement.
  *
  * RSC (no "use client"). Uses withOG, JsonLd (breadcrumb + faqPage +
@@ -41,9 +41,9 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only platform that benchmarks the human driving the AI, not the model on coding tasks.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only platform that benchmarks the operator driving the AI, not the model on coding tasks.",
     pros: [
-      "Benchmarks operators (humans), not models — a different unit of measurement entirely",
+      "Benchmarks operators, not models — a different unit of measurement entirely",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "Privacy-preserving: on-device scanning, token counts only, ed25519-signed submissions",
       "Live benchmarking with 7d/30d/90d/all-time windows and head-to-head operator comparison",
@@ -67,7 +67,7 @@ const TOOLS: Tool[] = [
       "Elo-style ranking is well-understood and frequently updated",
     ],
     cons: [
-      "Benchmarks models, not operators — blind to the human driving the AI",
+      "Benchmarks models, not operators — blind to the operator driving the AI",
       "Preference votes, not efficiency metrics — no yield, leverage, or cascade scoring",
       "No operator identity, no per-user telemetry, no real-session benchmarking",
     ],
@@ -84,7 +84,7 @@ const TOOLS: Tool[] = [
       "Ranks open and closed models side-by-side on coding tasks",
     ],
     cons: [
-      "Benchmarks models, not operators — blind to the human driving the AI",
+      "Benchmarks models, not operators — blind to the operator driving the AI",
       "Synthetic benchmark tasks — not real-world coding sessions",
       "No token-cascade metrics, no operator identity, no live operator benchmarking",
     ],
@@ -101,7 +101,7 @@ const TOOLS: Tool[] = [
       "Pass@1 and pass@10 metrics are well-understood",
     ],
     cons: [
-      "Benchmarks models, not operators — no human in the loop",
+      "Benchmarks models, not operators — no operator in the loop",
       "Synthetic tasks — completing a function from a docstring is not real coding",
       "Saturated — top models now score 90%+, making it a weak differentiator",
     ],
@@ -118,7 +118,7 @@ const TOOLS: Tool[] = [
       "Rigorous methodology with verified test patches",
     ],
     cons: [
-      "Benchmarks models, not operators — blind to the human driving the AI",
+      "Benchmarks models, not operators — blind to the operator driving the AI",
       "Expensive to run — requires full repo checkout and test execution",
       "No token-cascade metrics, no operator identity, no per-session efficiency",
     ],
@@ -135,7 +135,7 @@ const TOOLS: Tool[] = [
       "Covers multiple coding competition platforms (LeetCode, AtCoder, Codeforces)",
     ],
     cons: [
-      "Benchmarks models, not operators — no human in the loop",
+      "Benchmarks models, not operators — no operator in the loop",
       "Competition-style problems — not representative of real coding sessions",
       "No token-cascade metrics, no operator identity, no real-session data",
     ],
@@ -148,27 +148,27 @@ const FAQS = [
   {
     question: "What are AI coding benchmark platforms?",
     answer:
-      "AI coding benchmark platforms run standardized tests to measure coding performance. Most (HumanEval, SWE-bench, LiveCodeBench, BigCode, LMSYS) benchmark models — they test whether an LLM can complete functions, resolve GitHub issues, or win coding competitions. SigRank is the only platform that benchmarks operators — the humans driving AI in real coding sessions — using token-cascade efficiency (Υ Yield: cache_read × output / input²).",
+      "AI coding benchmark platforms run standardized tests to measure coding performance. Most (HumanEval, SWE-bench, LiveCodeBench, BigCode, LMSYS) benchmark models — they test whether an LLM can complete functions, resolve GitHub issues, or win coding competitions. SigRank is the only platform that benchmarks operators — the operators driving AI in real coding sessions — using token-cascade efficiency (Υ Yield: cache_read × output / input²).",
   },
   {
     question: "How is operator benchmarking different from model benchmarking?",
     answer:
-      "Model benchmarking asks 'can this LLM write code?' — it tests the model on synthetic or real tasks and reports pass@1, Elo, or resolution rate. Operator benchmarking asks 'can this person use AI to write code efficiently?' — it measures the human's cascade architecture across real sessions. A great operator with a mid-tier model can outperform a poor operator with the best model. SigRank benchmarks the operator; the others benchmark the model.",
+      "Model benchmarking asks 'can this LLM write code?' — it tests the model on synthetic or real tasks and reports pass@1, Elo, or resolution rate. Operator benchmarking asks 'can this person use AI to write code efficiently?' — it measures the operator's cascade architecture across real sessions. A great operator with a mid-tier model can outperform a poor operator with the best model. SigRank benchmarks the operator; the others benchmark the model.",
   },
   {
     question: "Which platform is best for benchmarking AI coding?",
     answer:
-      "It depends on what you're benchmarking. For model code-completion ability, HumanEval is the standard. For real-world SWE tasks, SWE-bench. For contamination-free coding, LiveCodeBench. For crowd-sourced model preference, LMSYS. For open model code quality, BigCode. But for benchmarking operators — the humans driving AI — SigRank is the only platform that scores real-session cascade efficiency and ranks you on a live leaderboard.",
+      "It depends on what you're benchmarking. For model code-completion ability, HumanEval is the standard. For real-world SWE tasks, SWE-bench. For contamination-free coding, LiveCodeBench. For crowd-sourced model preference, LMSYS. For open model code quality, BigCode. But for benchmarking operators — the operators driving AI — SigRank is the only platform that scores real-session cascade efficiency and ranks you on a live leaderboard.",
   },
   {
-    question: "Do these platforms measure human performance?",
+    question: "Do these platforms measure operator performance?",
     answer:
-      "No — with one exception. HumanEval, SWE-bench, LiveCodeBench, BigCode, and LMSYS all measure model performance on coding tasks. No human is in the loop; they test the LLM directly. SigRank is the only platform that measures human performance — specifically, how efficiently an operator drives AI across real coding sessions, scored by Υ Yield (cache_read × output / input²) and ranked on a live leaderboard.",
+      "No — with one exception. HumanEval, SWE-bench, LiveCodeBench, BigCode, and LMSYS all measure model performance on coding tasks. No operator is in the loop; they test the LLM directly. SigRank is the only platform that measures operator performance — specifically, how efficiently an operator drives AI across real coding sessions, scored by Υ Yield (cache_read × output / input²) and ranked on a live leaderboard.",
   },
   {
     question: "Are AI coding benchmark platforms free?",
     answer:
-      "Yes. SigRank, HumanEval, SWE-bench, LiveCodeBench, BigCode Leaderboard, and LMSYS Chatbot Arena are all free and open-source. The difference is that only SigRank benchmarks operators — the rest benchmark models and are free to use but cannot measure or rank your performance as a human driving AI.",
+      "Yes. SigRank, HumanEval, SWE-bench, LiveCodeBench, BigCode Leaderboard, and LMSYS Chatbot Arena are all free and open-source. The difference is that only SigRank benchmarks operators — the rest benchmark models and are free to use but cannot measure or rank your performance as an operator driving AI.",
   },
 ];
 
@@ -217,13 +217,13 @@ export default function AICodingBenchmarkPlatformsPage() {
           coding ability without training contamination. BigCode ranks models
           on code generation. LMSYS ranks which model humans prefer in coding
           chats. None of these benchmark <strong className="text-text-primary">operators</strong> —
-          the humans who actually drive AI in real coding sessions.
+          the operators who actually drive AI in real coding sessions.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is the only platform that benchmarks operators on
           token-cascade efficiency with the Υ Yield metric (
           <span className="font-mono text-gold">cache_read × output / input²</span>).
-          It measures a different unit — the human, not the model. The five
+          It measures a different unit — the operator, not the model. The five
           model-benchmarking platforms below are excellent at what they do, but
           they answer a different question: "can this model code?" not "can
           this operator use AI to code efficiently?"

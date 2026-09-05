@@ -105,7 +105,7 @@ export default function BotDetectionPanel({
           fill={MUT}
           textAnchor="end"
         >
-          {humanPoints.length} humans · {outlierPoints.length} flagged outliers
+          {humanPoints.length} operators · {outlierPoints.length} flagged outliers
         </text>
 
         {/* Grid X */}

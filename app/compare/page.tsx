@@ -193,7 +193,7 @@ export default async function ComparePage({
         ])
       : [[], []];
 
-  // Field average Υ Yield — mean of all ranked, compounding HUMAN operators
+  // Field average Υ Yield — mean of all ranked, compounding OCM operators
   // (outliers/bots excluded, owner 2026-07-14). Drawn as a horizontal reference
   // line on the overtime chart.
   const fieldYields = humanBoard

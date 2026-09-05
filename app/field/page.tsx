@@ -2,10 +2,10 @@
  * app/field/page.tsx — AI Operator Field Distribution Analysis.
  *
  * The SEO-heavy page proving the "Volume ≠ Yield" thesis with real data from
- * 1,498 human operators (Human Center of Mass, outliers separated). Server component, ISR (1h).
+ * 1,498 operators (Operator Center of Mass, outliers separated). Server component, ISR (1h).
  * Renders 9 pure-SVG chart components + analysis text + JSON-LD Dataset schema.
  *
- * Data source: public/data/field-analysis.json (pre-generated, 1,628 total, 1,498 Human Center of Mass).
+ * Data source: public/data/field-analysis.json (pre-generated, 1,628 total, 1,498 Operator Center of Mass).
  */
 
 import type { Metadata } from "next";
@@ -31,7 +31,7 @@ export const metadata: Metadata = withOG({
   title:
     "AI Operator Field Analysis",
   description:
-    "Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
+    "Real data from 1,498 AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
   path: "/field",
 });
 
@@ -51,7 +51,7 @@ export default async function FieldPage() {
     "@type": "Dataset",
     name: "AI Operator Field Distribution Analysis — SigRank",
     description:
-      "Distribution analysis of 1,498 human AI operators (Human Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
+      "Distribution analysis of 1,498 AI operators (Operator Center of Mass) ranked by token-cascade efficiency (yield Υ). " +
       "Volume vs yield correlation, SNR separation, platform dominance, outlier detection. " +
       "Outliers separated via 6-signal outlier-likelihood score + input/total ratio analysis.",
     url: `${SITE_ORIGIN}/field`,
@@ -76,7 +76,7 @@ export default async function FieldPage() {
       { "@type": "PropertyValue", name: "Velocity", description: "output / input" },
     ],
     measurementTechnique:
-      "On-device token telemetry from 1,498 human operators (Human Center of Mass). Outliers separated via input/total ratio analysis.",
+      "On-device token telemetry from 1,498 operators (Operator Center of Mass). Outliers separated via input/total ratio analysis.",
     temporalCoverage: meta.scraped_at,
   };
 
@@ -90,17 +90,17 @@ export default async function FieldPage() {
             {
               question: "Does volume correlate with yield in AI usage?",
               answer:
-                "No. Real data from 1,498 human AI operators proves volume does not equal yield. The median yield is 1.68, meaning most operators compound signal poorly despite high token usage. The top operators achieve leverage of 18.6× through cache reuse, not by spending more tokens. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached volume.",
+                "No. Real data from 1,498 AI operators proves volume does not equal yield. The median yield is 1.68, meaning most operators compound signal poorly despite high token usage. The top operators achieve leverage of 18.6× through cache reuse, not by spending more tokens. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached volume.",
             },
             {
               question: "How many AI operators are in the field analysis?",
               answer:
-                "The field analysis covers 1,498 human AI operators (the Human Center of Mass) from a total seed dataset of 1,628 operators. The remaining 130 are classified as outliers or bots. The live leaderboard at signalaf.com/board/all includes additional enrolled operators beyond the seed corpus. The analysis separates genuine human usage patterns from automated traffic using the Hermes bot control and outlier classification.",
+                "The field analysis covers 1,498 AI operators (the Operator Center of Mass) from a total seed dataset of 1,628 operators. The remaining 130 are classified as outliers or bots. The live leaderboard at signalaf.com/board/all includes additional enrolled operators beyond the seed corpus. The analysis separates genuine operator usage patterns from automated traffic using the Hermes bot control and outlier classification.",
             },
             {
               question: "What is the median Yield of AI operators?",
               answer:
-                "The median Yield (Υ) across 1,498 human AI operators is 1.68. This means half of all operators score below 1.68 — most AI users compound signal poorly. The top operator achieves a Yield of 18,436.98, demonstrating that the difference between median and elite is not incremental but structural — cache reuse, not volume.",
+                "The median Yield (Υ) across 1,498 AI operators is 1.68. This means half of all operators score below 1.68 — most AI users compound signal poorly. The top operator achieves a Yield of 18,436.98, demonstrating that the difference between median and elite is not incremental but structural — cache reuse, not volume.",
             },
           ]),
         ]}
@@ -108,7 +108,7 @@ export default async function FieldPage() {
 
       <CitationMeta
         title="AI Operator Field Analysis — The True Distribution of Token Efficiency"
-        description="Real data from 1,498 human AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed."
+        description="Real data from 1,498 AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed."
         date={meta.scraped_at}
         slug="/field"
         doi="10.5281/zenodo.21900519"
@@ -121,7 +121,7 @@ export default async function FieldPage() {
         subtitle={
           <>
             The true distribution of token efficiency.{" "}
-            {meta.humans_included.toLocaleString()} human AI operators,
+            {meta.operators_included.toLocaleString()} AI operators,
             outliers separated. Volume ranked. Yield revealed.
           </>
         }
@@ -156,7 +156,7 @@ export default async function FieldPage() {
           cache_write_chi2: 5.47,
           total_chi2: 0.77,
         }}
-        humanCount={meta.humans_included}
+        operatorCount={meta.operators_included}
       />
 
       {/* ── Article-formatted analysis sections ─────────────────────── */}
@@ -224,7 +224,7 @@ export default async function FieldPage() {
         <div className="overflow-x-auto">
           <img
             src="/field-charts/snr-distribution.svg"
-            alt="SNR distribution histogram — 1,627 human operators, 20 buckets, log scale"
+            alt="SNR distribution histogram — 1,627 operators, 20 buckets, log scale"
             width={800}
             height={340}
             className="h-auto w-full"
@@ -385,7 +385,7 @@ export default async function FieldPage() {
           median={meta.medians.yield}
         />
         <p className="text-sm leading-relaxed text-text-secondary">
-          The yield distribution is heavily right-skewed. 80% of human
+          The yield distribution is heavily right-skewed. 80% of
           operators fall within the shaded band. The long tail to the right
           is where the AMPLIFIERS and CONVERGENT operators live. The bulk of
           the field clusters near the median. This is why the median is used
@@ -473,7 +473,7 @@ export default async function FieldPage() {
           />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The quadrant chart above plots every human operator on a log-log grid of total tokens
+          The quadrant chart above plots every operator on a log-log grid of total tokens
           versus yield. The dashed gold lines mark the median on each axis, splitting the field into
           four quadrants. Q2 — the top-left, low volume and high yield — is the ghost-rank region,
           highlighted in cyan. These operators would be invisible on any volume-ranked leaderboard,
@@ -570,7 +570,7 @@ export default async function FieldPage() {
         </h2>
         <img
         src="/field-charts/outlier-detection.svg"
-        alt="Outlier detection — SNR vs total tokens, 1,610 humans, 17 flagged outliers"
+        alt="Outlier detection — SNR vs total tokens, 1,610 operators, 17 flagged outliers"
         width={800}
         height={320}
         className="h-auto w-full"
@@ -582,13 +582,13 @@ export default async function FieldPage() {
           SigRank&apos;s metrics catch gaming automatically. A 6-signal outlier-likelihood score
           identifies operators with inhuman throughput, zero cache usage, single-model fixation,
           and zero sessions. {meta.outliers} outliers were separated from the field distribution.
-          An additional input/total ratio analysis separates extreme humans from replay outliers
-          and input dump outliers, keeping the Human Center of Mass clean.
+          An additional input/total ratio analysis separates extreme operators from replay outliers
+          and input dump outliers, keeping the Operator Center of Mass clean.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The scatter plot shows why outliers are detectable: they cluster in the bottom-right —
           massive token volume with near-zero SNR. They pump input tokens without producing
-          proportionate output. No human operator occupies that region. The 6-signal score makes
+          proportionate output. No operator occupies that region. The 6-signal score makes
           this structural: inhuman throughput, zero cache reads, single-model fixation, and zero
           sessions are individually suspicious; together they are conclusive.
         </p>
@@ -627,7 +627,7 @@ export default async function FieldPage() {
             tokscale.ai/leaderboard
           </a>
           . {meta.total_scraped.toLocaleString()} operators collected, {meta.outliers} outliers
-          separated, {meta.humans_included.toLocaleString()} humans
+          separated, {meta.operators_included.toLocaleString()} operators
           analyzed.
         </p>
         <div className="flex flex-wrap gap-4 text-sm">

@@ -34,7 +34,7 @@ Terminal
 PostHog AI
 
 ```bash
-npm install @posthog/mcp posthog-node
+npm install @posthog/mcp@0.12.0 posthog-node
 ```
 
 TypeScript

@@ -4,9 +4,9 @@ import { withOG } from "@/lib/seo";
 import { SignalLiveDemo } from "@/components/live/SignalLiveDemo";
 
 export const metadata: Metadata = withOG({
-  title: "SignalAF Live — Human × Context × Model",
+  title: "SignalAF Live — Operator × Context × Model",
   description:
-    "A live instrument for the human, context, and model system. Watch token-cascade telemetry resolve into Yield, Leverage, Velocity, SNR, and an operator signature.",
+    "A live instrument for the operator, context, and model system. Watch token-cascade telemetry resolve into Yield, Leverage, Velocity, SNR, and an operator signature.",
   path: "/live",
 });
 

@@ -6,7 +6,7 @@ Status: proposed open standard. Do not describe SigRank as a universally adopted
 
 ## Scope
 
-SigRank defines a portable measurement vocabulary for the human operator layer of generative AI systems.
+SigRank defines a portable measurement vocabulary for the operator layer of generative AI systems.
 
 It complements model benchmarks, task evals, agent evals, observability, and business-outcome systems. It does not replace them.
 

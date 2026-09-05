@@ -32,7 +32,7 @@ const RELATED = [
   {
     href: "/ai-benchmarking",
     title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the humans driving them. The complement that evaluating AI has been missing.",
+    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement that evaluating AI has been missing.",
   },
   {
     href: "/methodology",
@@ -61,7 +61,7 @@ export default function EvaluatingAIPage() {
             {
               question: "What does evaluating AI mean?",
               answer:
-                "Evaluating AI means systematically measuring and comparing AI system performance. It spans four layers: model evaluation (which model is best), output evaluation (is the output correct), safety evaluation (is the system safe), and operator evaluation (who uses the AI best). Most AI evaluation conversation covers the first three. The operator layer — measuring the humans driving the AI — is the missing piece, and the one SigRank covers.",
+                "Evaluating AI means systematically measuring and comparing AI system performance. It spans four layers: model evaluation (which model is best), output evaluation (is the output correct), safety evaluation (is the system safe), and operator evaluation (who uses the AI best). Most AI evaluation conversation covers the first three. The operator layer — measuring the operators driving the AI — is the missing piece, and the one SigRank covers.",
             },
             {
               question: "Why is the operator layer the missing piece?",

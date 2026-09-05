@@ -37,7 +37,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     benchmarks:
-      "Operators — the humans driving AI. Scores token-cascade efficiency (Υ Yield = cache_read × output / input²) and ranks operators on a live, cross-platform leaderboard with class tiers.",
+      "Operators — the operators driving AI. Scores token-cascade efficiency (Υ Yield = cache_read × output / input²) and ranks operators on a live, cross-platform leaderboard with class tiers.",
     pros: [
       "The only tool that benchmarks the operator, not the model",
       "Platform-neutral: Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
@@ -83,7 +83,7 @@ const TOOLS: Tool[] = [
     cons: [
       "Evaluates models, not operators",
       "Heavy to run — designed for researchers, not everyday developers",
-      "No live leaderboard of human operators",
+      "No live leaderboard of operators",
     ],
     pricing: "Free (open-source)",
     bestFor: "Researchers needing rigorous, multi-metric model evaluation",
@@ -145,13 +145,13 @@ const FAQS = [
   {
     question: "What are AI benchmarking tools?",
     answer:
-      "AI benchmarking tools measure and rank AI systems. Most — like LMSYS Chatbot Arena, HELM, the Open LLM Leaderboard, and HumanEval — benchmark AI models on quality, correctness, or human preference. SigRank is the only tool that benchmarks the operator (the human driving the AI) by token-cascade efficiency (Υ Yield = cache_read × output / input²) and ranks them on a live, cross-platform leaderboard.",
+      "AI benchmarking tools measure and rank AI systems. Most — like LMSYS Chatbot Arena, HELM, the Open LLM Leaderboard, and HumanEval — benchmark AI models on quality, correctness, or human preference. SigRank is the only tool that benchmarks the operator (the operator driving the AI) by token-cascade efficiency (Υ Yield = cache_read × output / input²) and ranks them on a live, cross-platform leaderboard.",
   },
   {
     question:
       "What is the difference between benchmarking models and benchmarking operators?",
     answer:
-      'Model benchmarking (LMSYS, HELM, HumanEval, Open LLM Leaderboard) answers "which AI model is best?" by testing the model on standardized tasks. Operator benchmarking (SigRank) answers "who uses AI most efficiently?" by measuring the token cascade of the human driving the model — whether their context compounds or burns. The two are complementary: pick the best model, then operate it efficiently.',
+      'Model benchmarking (LMSYS, HELM, HumanEval, Open LLM Leaderboard) answers "which AI model is best?" by testing the model on standardized tasks. Operator benchmarking (SigRank) answers "who uses AI most efficiently?" by measuring the token cascade of the operator driving the model — whether their context compounds or burns. The two are complementary: pick the best model, then operate it efficiently.',
   },
   {
     question: "Is SigRank an LLM benchmark?",

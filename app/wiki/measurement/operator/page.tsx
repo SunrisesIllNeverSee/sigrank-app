@@ -7,7 +7,7 @@ import { breadcrumb, definedTerm } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Operator",
   description:
-    "The account-level subject associated with AI-work telemetry — the unit of analysis for AI processing efficiency.",
+    "The individual whose AI-work telemetry is measured — the unit of analysis for AI processing efficiency.",
   path: "/wiki/measurement/operator",
 });
 
@@ -30,20 +30,20 @@ export default function OperatorPage() {
           ]),
           definedTerm(
             "Operator",
-            "The account-level subject associated with AI-work telemetry — the unit of analysis for AI processing efficiency.",
+            "The individual whose AI-work telemetry is measured — the unit of analysis for AI processing efficiency.",
             "/wiki/measurement/operator",
           ),
         ]}
       />
       <WikiEntry
         title="Operator"
-        summary="The account-level subject associated with AI-work telemetry — the unit of analysis for AI processing efficiency."
+        summary="The individual whose AI-work telemetry is measured — the unit of analysis for AI processing efficiency."
         category="measurement"
         evidenceLevel="repeated-experiment"
         specVersion="SigRank Standard v1.0"
         definition={
           <>
-            An operator is the account-level subject associated with AI-work
+            An operator is the account associated with AI-work
             telemetry. Not necessarily a legal person, employer, or unique human.
             One operator can have devices, submissions, and an optional
             authenticated account link.

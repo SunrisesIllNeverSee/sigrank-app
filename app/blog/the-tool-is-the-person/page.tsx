@@ -4,7 +4,7 @@
  *
  * Bridge blog post connecting tool queries (ccusage, token tracking) to person
  * queries (who is the best AI user, am I an AI power user). The core thesis:
- * measuring the AI tool IS measuring the human operator. Your token cascade
+ * measuring the AI tool IS measuring the operator. Your token cascade
  * is your skill signature.
  *
  * JSON-LD: ScholarlyArticle + BreadcrumbList + FAQPage.
@@ -41,7 +41,7 @@ function articleJsonLd() {
     author: personAuthor(),
     publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
     license: "https://creativecommons.org/licenses/by/4.0/",
-    about: "Why AI token telemetry measures human operator skill, not just tool usage",
+    about: "Why AI token telemetry measures operator skill, not just tool usage",
     keywords: [
       "ai operator skill",
       "ai power user",
@@ -58,7 +58,7 @@ const faqs = [
   {
     question: "What does 'the tool is the person' mean?",
     answer:
-      "It means that every token an AI tool consumes reflects a decision the human operator made. High cache reuse shows discipline. Low fresh input shows restraint. High output per input shows leverage. The tool's token cascade IS the person's skill signature — you don't need a quiz to assess AI skill if you have the telemetry.",
+      "It means that every token an AI tool consumes reflects a decision the operator made. High cache reuse shows discipline. Low fresh input shows restraint. High output per input shows leverage. The tool's token cascade IS the person's skill signature — you don't need a quiz to assess AI skill if you have the telemetry.",
   },
   {
     question: "How is SigRank different from token-count leaderboards?",
@@ -98,7 +98,7 @@ export default function TheToolIsThePersonPage() {
         subtitle={
           <>
             Why measuring the AI tool{" "}
-            <span className="text-gold">IS</span> measuring the human operator.
+            <span className="text-gold">IS</span> measuring the operator.
             Your token cascade is your skill signature.
           </>
         }
@@ -177,7 +177,7 @@ export default function TheToolIsThePersonPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Here&apos;s the core insight. When an AI tool consumes tokens, those
           tokens aren&apos;t random. They&apos;re the product of decisions the
-          human operator made:
+          operator made:
         </p>
         <ul className="flex flex-col gap-2 font-sans text-sm leading-relaxed text-text-secondary">
           <li>

@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "AI Operator Performance",
   description:
-    "AI operator performance scores the account-level subject driving the AI, not the model. SigRank class tiers from IGNITER to ARCH+ \u2014 the operator performance measurement system for AI coding.",
+    "AI operator performance scores the account driving the AI, not the model. SigRank class tiers from IGNITER to ARCH+ \u2014 the operator performance measurement system for AI coding.",
   path: "/operator-performance",
 });
 
@@ -104,7 +104,7 @@ export default function OperatorPerformancePage() {
             {
               question: "What is operator performance in AI coding?",
               answer:
-                "Operator performance measures how efficiently the operator — the account-level subject driving the AI tool — uses it, not how good the model is. Upsilon scores the operator by the architecture of their token cascade: how well they reuse cached context, how much output they produce per fresh input, and whether signal is compounding or tokens are burning. The model is held constant; the operator is the variable.",
+                "Operator performance measures how efficiently the operator — the account driving the AI tool — uses it, not how good the model is. Upsilon scores the operator by the architecture of their token cascade: how well they reuse cached context, how much output they produce per fresh input, and whether signal is compounding or tokens are burning. The model is held constant; the operator is the variable.",
             },
             {
               question: "Why score the operator, not the model?",
@@ -138,7 +138,7 @@ export default function OperatorPerformancePage() {
           <>
             The model is held constant. The{" "}
             <span className="text-gold">operator</span> is the variable. SigRank
-            scores the account-level subject driving the AI — because that is
+            scores the account driving the AI — because that is
             where the signal lives.
           </>
         }

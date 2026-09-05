@@ -27,7 +27,7 @@ const RELATED = [
   {
     href: "/ai-benchmarking",
     title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the humans driving them. The complement to model-only benchmarking.",
+    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking.",
   },
   {
     href: "/vs/lmsys-arena",
@@ -68,7 +68,7 @@ export default function AIModelEvaluationPage() {
             {
               question: "What is the difference between model evaluation and operator evaluation?",
               answer:
-                'Model evaluation asks "which AI is best?" and ranks models using test suites or preference votes. Operator evaluation asks "who is best at using the AI?" and ranks humans using real token telemetry from live sessions. Model evaluation holds the model as the variable and the operator as a constant. Operator evaluation inverts that: the model is a constant (you pick one and drive it), and the operator is the variable. They are complements, not competitors — both layers matter for complete AI evaluation.',
+                'Model evaluation asks "which AI is best?" and ranks models using test suites or preference votes. Operator evaluation asks "who is best at using the AI?" and ranks operators using real token telemetry from live sessions. Model evaluation holds the model as the variable and the operator as a constant. Operator evaluation inverts that: the model is a constant (you pick one and drive it), and the operator is the variable. They are complements, not competitors — both layers matter for complete AI evaluation.',
             },
             {
               question: "Why do you need both model and operator evaluation?",
@@ -78,7 +78,7 @@ export default function AIModelEvaluationPage() {
             {
               question: "How does SigRank complement model evaluation?",
               answer:
-                "SigRank measures the operator — the human driving the model that model evaluation helped you choose. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read. SigRank does not replace MMLU or LMSYS Arena; it sits beside them as the operator layer — the layer that model evaluation cannot see.",
+                "SigRank measures the operator — the operator driving the model that model evaluation helped you choose. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read. SigRank does not replace MMLU or LMSYS Arena; it sits beside them as the operator layer — the layer that model evaluation cannot see.",
             },
           ]),
         ]}
@@ -153,7 +153,7 @@ export default function AIModelEvaluationPage() {
           How SigRank complements model evaluation
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank measures the operator — the human driving the model that
+          SigRank measures the operator — the operator driving the model that
           model evaluation helped you choose. Four token pillars — input,
           output, cache-read, cache-write — are captured on-device from real
           sessions. The yield metric{" "}
@@ -218,7 +218,7 @@ export default function AIModelEvaluationPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Model evaluation ranks models; operator evaluation ranks the
-              humans driving them. Model evaluation holds the operator as a
+              operators driving them. Model evaluation holds the operator as a
               constant; operator evaluation treats the operator as the
               variable. Complements, not competitors.
             </dd>

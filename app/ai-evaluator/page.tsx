@@ -53,19 +53,19 @@ export default function AIEvaluatorPage() {
           breadcrumb([{ name: "AI Evaluator", path: "/ai-evaluator" }]),
           definedTerm(
             "AI Evaluator",
-            "An AI evaluator is a system that assesses AI performance. Most AI evaluators assess models (MMLU, LMSYS Arena), outputs (LLM-as-judge), or safety (red-teaming frameworks). SigRank is an AI evaluator for the operator layer — it assesses the humans driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²). Five capabilities set it apart: content-free telemetry, the Yield metric, cohort-relative ranking, ed25519-signed provenance, and continuous scoring.",
+            "An AI evaluator is a system that assesses AI performance. Most AI evaluators assess models (MMLU, LMSYS Arena), outputs (LLM-as-judge), or safety (red-teaming frameworks). SigRank is an AI evaluator for the operator layer — it assesses the operators driving the AI via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²). Five capabilities set it apart: content-free telemetry, the Yield metric, cohort-relative ranking, ed25519-signed provenance, and continuous scoring.",
             "/ai-evaluator",
           ),
           faqPage([
             {
               question: "What is an AI evaluator?",
               answer:
-                "An AI evaluator is a system that assesses AI performance. Most AI evaluators fall into three categories: model evaluators (MMLU, LMSYS Arena) that rank models, output evaluators (LLM-as-judge, human review) that assess output quality, and safety evaluators (red-teaming frameworks) that test for harm. SigRank is a fourth kind — an operator evaluator that assesses the humans driving the AI. It is a new category of AI evaluator, not a competitor to the existing three.",
+                "An AI evaluator is a system that assesses AI performance. Most AI evaluators fall into three categories: model evaluators (MMLU, LMSYS Arena) that rank models, output evaluators (LLM-as-judge, human review) that assess output quality, and safety evaluators (red-teaming frameworks) that test for harm. SigRank is a fourth kind — an operator evaluator that assesses the operators driving the AI. It is a new category of AI evaluator, not a competitor to the existing three.",
             },
             {
               question: "What makes SigRank a different kind of AI evaluator?",
               answer:
-                "Every other AI evaluator measures the model, the output, or the safety of the system. SigRank measures the operator — the human driving the AI. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read. It is the only AI evaluator that answers \"who is best at using the AI?\"",
+                "Every other AI evaluator measures the model, the output, or the safety of the system. SigRank measures the operator — the operator driving the AI. It captures four token pillars (input, output, cache-read, cache-write) on-device from real sessions, computes Yield (Υ = cache_read × output / input²), and ranks operators cohort-relative. Snapshots are ed25519-signed and verified server-side. No prompt content is ever read. It is the only AI evaluator that answers \"who is best at using the AI?\"",
             },
             {
               question: "What are SigRank's five evaluator capabilities?",
@@ -111,7 +111,7 @@ export default function AIEvaluatorPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is a fourth kind of AI evaluator — an operator evaluator. It
-          assesses the humans driving the AI, not the AI itself. The question
+          assesses the operators driving the AI, not the AI itself. The question
           it answers — &ldquo;who is best at using the AI?&rdquo; — has had no
           evaluator until now, because there was no privacy-preserving way to
           measure it. Token counts make it possible; reading prompts does not.

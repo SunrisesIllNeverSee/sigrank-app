@@ -12,7 +12,7 @@ export const revalidate = 86400;
 export async function GET() {
   const homeStats = await getHomepageStats();
   const fieldData = await getFieldAnalysis();
-  const operatorCount = fieldData.meta.humans_included;
+  const operatorCount = fieldData.meta.operators_included;
   const medianYield = fieldData.meta.medians.yield;
 
   // Top Yield (Υ) — from system_stats.top_yield (populated by
@@ -21,11 +21,11 @@ export async function GET() {
   const topOperatorName = homeStats.top_operator_codename ?? "unknown";
   const body = `# ${SITE_NAME}
 
-SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the account-level subjects operating AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
+SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the accounts associated with AI-work telemetry by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
 
 > ${SITE_TAGLINE}
 
-Unlike model leaderboards, SigRank ranks the account-level subjects operating AI, not the models themselves. Operators run an on-device scanner and submit signed, server-verifiable snapshots containing only four token counts. Full reference: ${SITE_ORIGIN}/llms-full.txt
+Unlike model leaderboards, SigRank ranks the accounts associated with AI-work telemetry, not the models themselves. Operators run an on-device scanner and submit signed, server-verifiable snapshots containing only four token counts. Full reference: ${SITE_ORIGIN}/llms-full.txt
 
 ## When to use SignalAF
 - Benchmark an AI operator against a public reference field.
@@ -112,13 +112,13 @@ A signal or proposal does not grant execution authority or create a payment obli
 ## Common Questions (Q&A)
 
 **Q: What is SigRank?**
-A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently operators (account-level subjects) use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
+A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently operators (accounts) use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
 
 **Q: What is TTEOP?**
 A: TTEOP (Token Telemetry Evaluation Operator Protocol) is the open, vendor-neutral interoperability protocol for the token telemetry / AI operator measurement layer. Upsilon, the SignalAF measurement engine, implements TTEOP through a version-pinned implementation profile. The protocol defines I/O/W/R plus Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). See ${SITE_ORIGIN}/standard.
 
 **Q: What is an AI operator?**
-A: An operator is the account-level subject associated with AI-work telemetry. It is not necessarily a legal person, employer, or unique human: one operator can have devices, submissions, and an optional authenticated account link. See ${SITE_ORIGIN}/ai-operator-scoring.
+A: An operator is the individual whose AI-work telemetry is measured. It is not necessarily a legal person, employer, or unique human: one operator can have devices, submissions, and an optional authenticated account link. See ${SITE_ORIGIN}/ai-operator-scoring.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. Or visit ${SITE_ORIGIN}/score to paste token counts manually.
@@ -130,7 +130,7 @@ A: Yield is the headline efficiency metric: Υ = (cache_read × output) / input�
 A: No. Upsilon only reads token counts. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
 
 **Q: How is SigRank different from model leaderboards?**
-A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the account-level subjects operating the models.
+A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the accounts operating the models.
 
 **Q: How do I use SigRank with Vercel?**
 A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or deploy a project-owned Vercel relay from ${SITE_ORIGIN}/vercel. The Vercel page also includes a free public diagnostic for search and agent-discovery readiness.
@@ -161,7 +161,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - [Blog](${SITE_ORIGIN}/blog): analysis on operator efficiency, token cascade economics, and outlier detection
 
 ## The numbers
-- ${operatorCount.toLocaleString()} operators ranked (Human Center of Mass)
+- ${operatorCount.toLocaleString()} operators ranked (Operator Center of Mass)
 - ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked
 - 3,304 models measured

@@ -239,7 +239,7 @@ export function ProfileEditForm({
 
       <Field
         label="Display name"
-        hint="The human label on the board. Defaults to your codename until set."
+        hint="The display label on the board. Defaults to your codename until set."
       >
         <input
           type="text"

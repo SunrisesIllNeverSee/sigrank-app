@@ -31,7 +31,7 @@ export default function EightyPercentBand({
         />
       </div>
       <p className="text-xs text-text-muted">
-        80% of human operators have a yield between{" "}
+        80% of operators have a yield between{" "}
         <span className="font-mono text-gold">{p10.toFixed(2)}</span> and{" "}
         <span className="font-mono text-gold">{p90.toFixed(2)}</span>. The
         median is <span className="font-mono text-gold">{median.toFixed(2)}</span>.

@@ -102,7 +102,7 @@ export default function VercelPage() {
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-gold">Why this exists</p>
         <h2 className="mt-2 font-mono text-2xl font-bold text-text-primary">Vercel measures the application. SigRank measures the operating layer.</h2>
         <p className="mt-3 max-w-4xl font-sans text-sm leading-relaxed text-text-secondary">
-          Runtime logs, traces, tokens, and application telemetry tell you what the software did. SigRank adds a complementary evaluation layer for how human operators and AI workflows compound, reuse context, produce output, and move against a field benchmark.
+          Runtime logs, traces, tokens, and application telemetry tell you what the software did. SigRank adds a complementary evaluation layer for how operators and AI workflows compound, reuse context, produce output, and move against a field benchmark.
         </p>
       </section>
     </div>

@@ -82,7 +82,7 @@ export default function AIModelSafetyEvaluationBenchmarkContinuousTestingPage() 
             {
               question: "How do benchmarks and continuous testing fit together?",
               answer:
-                "Benchmarks and continuous testing are complements, not alternatives. Benchmarks test the model in a controlled harness at a point in time — they tell you the model can be safe under test conditions. Continuous testing monitors behavior on real traffic over time — it tells you the model is safe in practice. SigRank extends continuous testing to the operator: instead of monitoring only the model, you monitor the human driving it. A safety evaluation program that runs benchmarks on the model, continuous testing on production traffic, and SigRank on operators covers all three dimensions — model, system, and operator.",
+                "Benchmarks and continuous testing are complements, not alternatives. Benchmarks test the model in a controlled harness at a point in time — they tell you the model can be safe under test conditions. Continuous testing monitors behavior on real traffic over time — it tells you the model is safe in practice. SigRank extends continuous testing to the operator: instead of monitoring only the model, you monitor the operator driving it. A safety evaluation program that runs benchmarks on the model, continuous testing on production traffic, and SigRank on operators covers all three dimensions — model, system, and operator.",
             },
           ]),
         ]}
@@ -98,7 +98,7 @@ export default function AIModelSafetyEvaluationBenchmarkContinuousTestingPage() 
             safety is not just a model property — it is also an operator
             property. SigRank extends{" "}
             <span className="text-gold">continuous testing</span> to the
-            humans driving the AI.
+            operators driving the AI.
           </>
         }
       />

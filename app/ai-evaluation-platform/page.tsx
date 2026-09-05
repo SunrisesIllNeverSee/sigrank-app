@@ -55,14 +55,14 @@ export default function AIEvaluationPlatformPage() {
           ]),
           definedTerm(
             "AI Evaluation Platform",
-            "An AI evaluation platform is a software system that systematically measures, compares, and reports AI performance. SigRank is an AI evaluation platform for operators — the humans driving the AI. It is content-free (token counts only, never prompt content), continuous (scores over 7-day, 30-day, 90-day, and all-time windows), cohort-relative (ranked against the live field), and governed (ed25519-signed snapshots verified server-side). The headline metric is Yield (Υ = cache_read × output / input²).",
+            "An AI evaluation platform is a software system that systematically measures, compares, and reports AI performance. SigRank is an AI evaluation platform for operators — the operators driving the AI. It is content-free (token counts only, never prompt content), continuous (scores over 7-day, 30-day, 90-day, and all-time windows), cohort-relative (ranked against the live field), and governed (ed25519-signed snapshots verified server-side). The headline metric is Yield (Υ = cache_read × output / input²).",
             "/ai-evaluation-platform",
           ),
           faqPage([
             {
               question: "What is an AI evaluation platform?",
               answer:
-                "An AI evaluation platform is a software system that systematically measures, compares, and reports AI performance. Most platforms evaluate models (MMLU, LMSYS Arena), outputs (LLM-as-judge platforms), or LLM applications (Braintrust, Langfuse). SigRank is an AI evaluation platform for operators — the humans driving the AI. It measures who is best at using the AI via privacy-preserving token telemetry, the Yield metric, and cohort-relative ranking.",
+                "An AI evaluation platform is a software system that systematically measures, compares, and reports AI performance. Most platforms evaluate models (MMLU, LMSYS Arena), outputs (LLM-as-judge platforms), or LLM applications (Braintrust, Langfuse). SigRank is an AI evaluation platform for operators — the operators driving the AI. It measures who is best at using the AI via privacy-preserving token telemetry, the Yield metric, and cohort-relative ranking.",
             },
             {
               question: "How is SigRank different from other AI evaluation platforms?",
@@ -113,7 +113,7 @@ export default function AIEvaluationPlatformPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is an AI evaluation platform for the operator layer. It
-          measures the humans driving the AI — the variable that determines
+          measures the operators driving the AI — the variable that determines
           whether the model you deployed is actually being driven well. No
           other platform covers this layer, because until now there was no
           privacy-preserving way to measure it. Token counts make it possible;
@@ -212,7 +212,7 @@ export default function AIEvaluationPlatformPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               A software system that measures, compares, and reports AI
-              performance. SigRank is a platform for operators — the humans
+              performance. SigRank is a platform for operators — the operators
               driving the AI. A new category, not a competitor to model or
               output platforms.
             </dd>

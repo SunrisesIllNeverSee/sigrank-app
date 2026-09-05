@@ -19,7 +19,12 @@ type HostAwareExchangeManifest = ExchangeManifest & {
 
 export function buildExchangeManifest(baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://signalaf.com'): HostAwareExchangeManifest {
   const base = baseUrl.replace(/\/$/, '')
-  const domain = new URL(base).hostname
+  let domain: string
+  try {
+    domain = new URL(base).hostname
+  } catch {
+    throw new Error(`buildExchangeManifest: invalid baseUrl "${baseUrl}" — must be a valid URL`)
+  }
   return {
     protocol: 'Contribution Exchange',version:'0.2',status:'private_alpha',domain,organization:'Ello Cello LLC',
     capability:'contribution_exchange',

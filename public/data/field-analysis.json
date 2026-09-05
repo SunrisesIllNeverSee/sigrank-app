@@ -5,7 +5,7 @@
     "total_scraped": 1627,
     "bots_removed": 0,
     "suspects_removed": 0,
-    "humans_included": 1498,
+    "operators_included": 1498,
     "medians": {
       "yield": 1.68,
       "snr": 0.083658,

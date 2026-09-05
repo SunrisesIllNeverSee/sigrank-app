@@ -80,7 +80,7 @@ const COMPARE_ROWS: {
   {
     feature: "Scores the operator, not the account",
     dashboards: "No \u2014 aggregates account spend",
-    sigrank: "Yes \u2014 ranks the human driving the AI",
+    sigrank: "Yes \u2014 ranks the operator driving the AI",
   },
   {
     feature: "Cross-provider comparison",

@@ -255,8 +255,11 @@ export async function POST(req: NextRequest) {
   });
 
   const response = await mcpHandler.fetch(sdkRequest);
-  await posthogMcp?.flush().catch(() => {});
-  return response;
+  try {
+    return response;
+  } finally {
+    await posthogMcp?.flush().catch(() => {});
+  }
 }
 
 // ── GET handler ─────────────────────────────────────────────────────────────
@@ -266,8 +269,11 @@ export async function GET(req: NextRequest) {
     return new Response("Forbidden", { status: 403 });
   }
   const response = await mcpHandler.fetch(req as unknown as Request);
-  await posthogMcp?.flush().catch(() => {});
-  return response;
+  try {
+    return response;
+  } finally {
+    await posthogMcp?.flush().catch(() => {});
+  }
 }
 
 // ── DELETE handler ──────────────────────────────────────────────────────────
@@ -277,6 +283,9 @@ export async function DELETE(req: NextRequest) {
     return new Response("Forbidden", { status: 403 });
   }
   const response = await mcpHandler.fetch(new Request(req.url, { method: "DELETE", headers: req.headers }));
-  await posthogMcp?.flush().catch(() => {});
-  return response;
+  try {
+    return response;
+  } finally {
+    await posthogMcp?.flush().catch(() => {});
+  }
 }

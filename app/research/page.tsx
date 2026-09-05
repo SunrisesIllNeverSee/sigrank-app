@@ -59,7 +59,7 @@ const DATA_FILES = [
 
 const DOCS = [
   { name: "README.md", desc: "Package overview, file descriptions, two-axis taxonomy summary" },
-  { name: "METHODS.md", desc: "All metric formulas, HCM cohort definition, archetype classification" },
+  { name: "METHODS.md", desc: "All metric formulas, OCM cohort definition, archetype classification" },
   { name: "PROVENANCE.md", desc: "Source, scrape date, exclusions, reproducibility" },
   { name: "ANONYMIZATION.md", desc: "ID scheme, stripped fields, shuffle seeds, re-identification risk" },
   { name: "DATASET-SPEC.md", desc: "Locked column specification for all 7 CSV files" },
@@ -128,7 +128,7 @@ export default function StateOfTheIndexPage() {
             {
               question: "How many AI operators are in the SigRank dataset?",
               answer:
-                "The SigRank seed dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. This is the seed corpus — the live leaderboard at signalaf.com/board/all includes additional enrolled operators. The Human Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
+                "The SigRank seed dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. This is the seed corpus — the live leaderboard at signalaf.com/board/all includes additional enrolled operators. The Operator Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
             },
             {
               question: "Is the SigRank dataset free to download?",
@@ -219,7 +219,7 @@ export default function StateOfTheIndexPage() {
           analysis.
         </p>
         <p className="text-base text-text-secondary">
-          The dataset measures AI operators — the humans driving AI tools —
+          The dataset measures AI operators — the operators driving AI tools —
           by four token pillars: <strong>input</strong> (fresh tokens sent),
           <strong> output</strong> (tokens generated), <strong>cache creation</strong>
           {" "}(context written to cache), and <strong>cache read</strong> (context

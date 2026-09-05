@@ -1,10 +1,10 @@
 {
   "method": "deterministic_build_archetypes",
   "description": "10 build archetypes classified by token cascade dimensions. Each type is defined by a different primary dimension. Replaces the K-Means population clusters.",
-  "population": "human_center_of_mass",
+  "population": "operator_center_of_mass",
   "n_operators": 1627,
   "n_clustered": 1586,
-  "n_human_center_of_mass": 1586,
+  "n_operator_center_of_mass": 1586,
   "n_archetypes": 10,
   "thresholds": {
     "convergent": {

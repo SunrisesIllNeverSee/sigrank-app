@@ -26,7 +26,7 @@
  * usual tradeoffs.
  *
  * TODO(OPERATOR_OVERRIDE_REQUIRED): the P80 thresholds below are calibrated
- * from the 1,586-operator HCM cut of field-analysis.json. They should be
+ * from the 1,586-operator OCM cut of field-analysis.json. They should be
  * surfaced from the ruleset (RS.xx) once finalized.
  */
 
@@ -72,7 +72,7 @@ export interface BuildArchetypeInput {
   construction: number;
 }
 
-// P80 thresholds calibrated from HCM cut (1,586 operators).
+// P80 thresholds calibrated from OCM cut (1,586 operators).
 // lev P80 = 74.6, vel P80 = 0.340, constr P80 = 0.0431
 const CONVERGENT_T = { levP80: 74.6, velP80: 0.34, constrP80: 0.0431 };
 

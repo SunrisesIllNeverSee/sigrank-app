@@ -152,7 +152,7 @@ export default function HowToAnswerBestAIUserPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is the first user-based AI leaderboard. It ranks{" "}
           <strong className="text-text-primary">operators</strong> (the
-          humans using AI tools) by token cascade efficiency — not AI
+          accounts using AI tools) by token cascade efficiency — not AI
           models by benchmark performance. The metric is{" "}
           <strong className="text-text-primary">Yield</strong> (Υ ={" "}
           cache_read × output / input²), computed from signed, on-device

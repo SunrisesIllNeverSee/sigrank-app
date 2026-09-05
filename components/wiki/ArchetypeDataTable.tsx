@@ -67,7 +67,7 @@ export function ArchetypeDataTable() {
         Population statistics
       </h3>
       <p className="max-w-2xl font-sans text-xs text-text-muted">
-        From the HCM cut ({total.toLocaleString()} operators). Each archetype
+        From the OCM cut ({total.toLocaleString()} operators). Each archetype
         is a deterministic classification — no clustering, no randomness.
         Medians are per-archetype; composition is the median four-pillar split.
       </p>
@@ -148,7 +148,7 @@ export function ArchetypeDataTable() {
         CR% = cache-read % of total tokens. CW% = cache-write %. I% = input %.
         O% = output %. Yield = median Υ. Lev = median leverage (cache_read/input).
         Vel = median velocity (output/input). Population = {total.toLocaleString()}{" "}
-        operators (HCM cut, outliers excluded).
+        operators (OCM cut, outliers excluded).
       </p>
     </section>
   );
