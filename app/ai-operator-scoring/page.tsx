@@ -111,6 +111,126 @@ export default function AIOperatorScoringPage() {
         }
       />
 
+      {/* ── Direct answer: What is an AI operator? ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What is an AI operator?
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          An operator is the account-level subject associated with AI-work
+          telemetry. It is not necessarily a legal person, employer, or unique
+          human: one operator can have devices, submissions, and an optional
+          authenticated account link. In practice, an operator is the entity
+          whose token usage is measured — the account driving the AI tool,
+          not the AI model itself.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The term has multiple meanings in the wild. OpenAI&apos;s Operator
+          product is an autonomous agent. In business, an &quot;AI
+          operator&quot; can be a job title. In SigRank&apos;s measurement
+          layer, an operator is the account-level subject whose token
+          telemetry is collected and scored. This is a measurement
+          definition, not a job-title definition.
+        </p>
+      </section>
+
+      {/* ── AI operator vs AI agent vs AI model ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          AI operator vs AI agent vs AI model
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-bg-border">
+                <th className="py-2 pr-4 text-left font-mono font-bold text-text-primary">Concept</th>
+                <th className="py-2 text-left font-mono font-bold text-text-primary">Role</th>
+              </tr>
+            </thead>
+            <tbody className="text-text-secondary">
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">Operator</td>
+                <td className="py-2">The account-level subject associated with AI-work telemetry — the unit of analysis for measurement.</td>
+              </tr>
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">Agent</td>
+                <td className="py-2">Software executing tasks autonomously. Distinct from the operator — the agent is a tool, not the measured subject.</td>
+              </tr>
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">Model</td>
+                <td className="py-2">The underlying inference system (GPT, Claude, Gemini). Model leaderboards rank models; operator scoring ranks operators.</td>
+              </tr>
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">Operator-system dyad</td>
+                <td className="py-2">The operator and AI system measured together. Telemetry captures the dyad&apos;s behavior, not the operator in isolation.</td>
+              </tr>
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">SigArena</td>
+                <td className="py-2">The public leaderboard surface (sigeconomy.com). Displays rankings.</td>
+              </tr>
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">SignalAF</td>
+                <td className="py-2">The public distribution and platform brand (signalaf.com). Hosts scoring, methodology, and enrollment.</td>
+              </tr>
+              <tr className="border-b border-bg-border/50">
+                <td className="py-2 pr-4 font-semibold text-text-primary">Upsilon</td>
+                <td className="py-2">The SignalAF measurement engine. Consumes telemetry, produces diagnostic measures. Implements TTEOP.</td>
+              </tr>
+              <tr>
+                <td className="py-2 pr-4 font-semibold text-text-primary">TTEOP</td>
+                <td className="py-2">The open, vendor-neutral interoperability protocol for token telemetry measurement. Defines primitives, metrics, and conformance.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── What telemetry can observe and cannot prove ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What telemetry can observe — and what it cannot prove
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Operator telemetry observes token-flow patterns: how much fresh
+          input an operator sends, how much output the system produces, and
+          how much cached context is read or written. From these four
+          primitives, Upsilon computes Yield and related metrics.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Token-flow metrics do <strong className="text-text-primary">not</strong>{" "}
+          measure productivity, work quality, professional skill, task
+          correctness, cognition, employee performance, or business value. A
+          high Yield means an operator ranks highly under the stated metric
+          and time window — nothing more. Conflating token-cascade efficiency
+          with any of these is a category error.
+        </p>
+      </section>
+
+      {/* ── Ecosystem relationships ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Relationship to the ecosystem
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Link href="/methodology" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
+            <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">Methodology</h3>
+            <p className="mt-1 font-sans text-xs text-text-secondary">How operator scores are computed from token telemetry.</p>
+          </Link>
+          <Link href="/science" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
+            <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">Conservation Law</h3>
+            <p className="mt-1 font-sans text-xs text-text-secondary">The academic foundation with Zenodo DOIs.</p>
+          </Link>
+          <a href="https://github.com/SunrisesIllNeverSee/otep-spec" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
+            <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">TTEOP protocol</h3>
+            <p className="mt-1 font-sans text-xs text-text-secondary">The open telemetry protocol (otep-spec repo).</p>
+          </a>
+          <a href="https://sigeconomy.com/ai-user-leaderboard" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
+            <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">AI User Leaderboard</h3>
+            <p className="mt-1 font-sans text-xs text-text-secondary">The public leaderboard on SigArena (sigeconomy.com).</p>
+          </a>
+        </div>
+      </section>
+
       {/* ── What operator scoring is ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
