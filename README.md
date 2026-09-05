@@ -10,7 +10,7 @@
 
 **Upsilon measures. SigRank proves. MO§ES™ governs. SignalAF is the brand.**
 
-SigRank evaluates the human using the AI; not the AI model itself. Most platforms reward volume. SigRank SignalAF rewards structure.
+SigRank evaluates the human using the AI, not the AI model itself. Most platforms reward volume. SigRank SignalAF rewards structure.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/codeql.yml)
@@ -69,7 +69,7 @@ SigRank evaluates the human using the AI; not the AI model itself. Most platform
 ## What is SignalAF?
 
 SignalAF is the umbrella brand for Upsilon and SigRank. Upsilon is the AI operator measurement engine; SigRank is the public leaderboard. Upsilon measures token cascade efficiency, not AI models. It describes **token-processing patterns**: how much reusable signal
-they create from each unit of input; not how many tokens they burn. The rank metric:
+they create from each unit of input, not how many tokens they burn. The rank metric:
 
 ```txt
 Υ = (cache_read × output) / input²
@@ -106,14 +106,14 @@ does not silently rewrite installed packages, tool names, schemas, or stored rec
 
 ## Get ranked (you don't need this repo)
 
-SigRank SignalAF runs from your terminal; or wire it as an MCP server for your AI agent:
+SigRank SignalAF runs from your terminal. Or wire it as an MCP server for your AI agent:
 
 ```bash
 npx sigrank                 # see your cascade now (no install, no sign-in)
 ```
 
 The client reads your local AI session logs on-device, derives your cascade,
-and publishes to the board; **token-only, no transcript content.**
+and publishes to the board, **token-only, no transcript content.**
 
 ```bash
 npm install -g sigrank     # bundles ccusage + tokscale + tokendash — no separate installs
@@ -129,8 +129,8 @@ npx sigrank board --once   # print the live leaderboard once
 bunx sigrank board --once  # same, via Bun (faster startup if you have it)
 ```
 
-Cautious? `sigrank submit --dry-run` prints the exact signed payload; four token
-counts and a signature; and sends nothing.
+Cautious? `sigrank submit --dry-run` prints the exact signed payload (four token
+counts and a signature) and sends nothing.
 
 ```bash
 $ sigrank submit --dry-run
@@ -183,7 +183,7 @@ npm run dev                     # http://localhost:3000
 
 The app is designed to run **without** Supabase or Stripe credentials. When env vars are
 missing, reads fall back to the cold-store snapshot and then deterministic mock data,
-while billing routes return configuration errors instead of crashing; so it stays
+while billing routes return configuration errors instead of crashing, so it stays
 buildable, previewable, and testable out of the box.
 
 > Requires **Node 22.x** (see `engines` in `package.json`). On a newer Node, `next dev`
@@ -261,7 +261,7 @@ from enrolled MCP devices. Set in Vercel for both Production and Preview.
 
 > **Do NOT mark this variable as sensitive in Vercel.** It is a boolean on/off
 > flag (`1` or `""`), not a secret. When marked sensitive, `vercel env pull`
-> returns `""` even though the runtime has `1`; which misleads agents and
+> returns `""` even though the runtime has `1`, which misleads agents and
 > operators into thinking the flip is OFF. If `vercel env pull` shows `""` but
 > the board is receiving verified submissions, the var is likely marked
 > sensitive again. Fix it in the Vercel dashboard (remove the sensitive flag).
