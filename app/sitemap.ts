@@ -348,9 +348,6 @@ const STATIC_ROUTES: {
   { path: "/cascade-analysis", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
   { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly" },
-  // ── SERP capture pages (2026-09-04 — targeting unclaimed "ai user leaderboard" and "ai operator" SERPs) ──
-  { path: "/ai-user-leaderboard", priority: 0.9, changeFrequency: "weekly" },
-  { path: "/ai-operator", priority: 0.9, changeFrequency: "weekly" },
   // NS-02.04 named category pages (301 redirects to nearest equivalents)
   { path: "/ai-operator-benchmark", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-efficiency", priority: 0.6, changeFrequency: "monthly" },
@@ -437,11 +434,6 @@ const STATIC_ROUTES: {
     path: "/blog/best-ai-operator-scoring-for-teams",
     priority: 0.7,
     changeFrequency: "monthly",
-  },
-  {
-    path: "/blog/google-doesnt-know-what-an-ai-user-leaderboard-is",
-    priority: 0.9,
-    changeFrequency: "weekly",
   },
 ];
 
