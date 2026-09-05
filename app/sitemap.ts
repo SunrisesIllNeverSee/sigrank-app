@@ -16,6 +16,7 @@ const STATIC_ROUTES: {
   path: string;
   priority: number;
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  lastModified?: Date;
 }[] = [
   { path: "/", priority: 1.0, changeFrequency: "daily" },
   { path: "/board/all", priority: 0.9, changeFrequency: "hourly" },
@@ -343,11 +344,11 @@ const STATIC_ROUTES: {
   // Topic hub pages — category intent
   { path: "/token-telemetry", priority: 0.6, changeFrequency: "monthly" },
   { path: "/ai-coding-metrics", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/operator-performance", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/operator-performance", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-04T00:00:00Z") },
   { path: "/ai-benchmarking", priority: 0.6, changeFrequency: "monthly" },
   { path: "/cascade-analysis", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-04T00:00:00Z") },
   // NS-02.04 named category pages (301 redirects to nearest equivalents)
   { path: "/ai-operator-benchmark", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-efficiency", priority: 0.6, changeFrequency: "monthly" },
@@ -447,7 +448,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static routes
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: `${SITE_ORIGIN}${r.path}`,
-    lastModified: STATIC_LAST_MODIFIED,
+    lastModified: r.lastModified ?? STATIC_LAST_MODIFIED,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }));
