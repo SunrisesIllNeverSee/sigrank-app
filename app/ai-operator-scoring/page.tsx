@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "AI Operator Scoring — Ranking the Operator Behind AI",
   description:
-    "AI operator scoring ranks the account-level subject driving the AI, not the model. The coding efficiency score and operator ranking system that measures who is best at operating AI \u2014 not which AI is best.",
+    "AI operator scoring ranks the account-level subject driving the AI, not the model. The coding efficiency score and operator ranking system that measures who ranks highest at operating AI under the stated metric and time window \u2014 not which AI is best.",
   path: "/ai-operator-scoring",
 });
 
@@ -69,13 +69,13 @@ export default function AIOperatorScoringPage() {
             {
               question: "What is AI operator scoring?",
               answer:
-                "AI operator scoring is the systematic ranking of operators — the account-level subjects associated with AI-work telemetry — by the efficiency of their token cascade. Instead of ranking which AI model is best (model benchmarking) or how many hours a developer spent (time tracking), it ranks who uses their AI most efficiently — measured by yield (Υ = cache_read × output / input²) and the composite SIGNA rate. It is a new performance layer that sits between model benchmarks and time trackers.",
+                "AI operator scoring is the systematic ranking of operators — the account-level subjects associated with AI-work telemetry — by the efficiency of their token cascade. Instead of ranking which AI model is best (model benchmarking) or how many hours a developer spent (time tracking), it ranks who ranks highest at operating their AI under the stated metric and time window — measured by yield (Υ = cache_read × output / input²) and the composite SIGNA rate. It is a new performance layer that sits between model benchmarks and time trackers.",
             },
             {
               question:
                 "How does operator scoring differ from model benchmarking?",
               answer:
-                'Model benchmarking ranks models by test-suite scores or preference votes — it asks "which AI is best?" Operator scoring ranks operators by real token telemetry from live coding sessions — it asks "who uses the AI best?" Model benchmarking holds the operator constant; operator scoring holds the model constant. They are complements: one helps you choose a model, the other helps you measure whether you are driving it well.',
+                'Model benchmarking ranks models by test-suite scores or preference votes — it asks "which AI is best?" Operator scoring ranks operators by real token telemetry from live coding sessions — it asks "who ranks highest at operating the AI under the stated metric and time window?" Model benchmarking holds the operator constant; operator scoring holds the model constant. They are complements: one helps you choose a model, the other helps you measure whether you are driving it well.',
             },
             {
               question: "How does operator scoring differ from time tracking?",
@@ -105,8 +105,9 @@ export default function AIOperatorScoringPage() {
             Model evaluation measures the AI model itself. Operator performance
             scoring measures the{" "}
             <span className="text-gold">operator using the AI</span>. SigRank is
-            an operator scoring system — it ranks who drives their AI best,
-            built on real token telemetry, not preference votes.
+            an operator scoring system — it ranks who ranks highest at driving
+            their AI under the stated metric and time window, built on real
+            token telemetry, not preference votes.
           </>
         }
       />
@@ -206,6 +207,33 @@ export default function AIOperatorScoringPage() {
         </p>
       </section>
 
+      {/* ── CTA: get your operator score ── */}
+      <section className="rounded-lg border border-gold/30 bg-gold/5 p-6 text-center">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Get your operator score
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          Install the SigRank CLI, enroll your operator identity, and submit a
+          signed token-telemetry snapshot. See your Yield, your class tier, and
+          your rank on the public leaderboard. Token counts only — never prompt
+          content, never code.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/score"
+            className="inline-flex items-center gap-2 rounded-lg border border-gold/50 bg-gold/10 px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:bg-gold/20"
+          >
+            Measure &amp; rank your cascade →
+          </Link>
+          <a
+            href="https://sigeconomy.com/ai-user-leaderboard"
+            className="inline-flex items-center gap-2 rounded-lg border border-bg-border bg-bg-surface px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-bg-border-subtle"
+          >
+            View the public leaderboard →
+          </a>
+        </div>
+      </section>
+
       {/* ── Ecosystem relationships ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
@@ -241,10 +269,11 @@ export default function AIOperatorScoringPage() {
           account-level subjects associated with AI-work telemetry — by the
           efficiency of their token cascade. It does not rank which model is
           smartest. It does not rank who spent the most hours at the keyboard.
-          It ranks who uses their AI most efficiently — who compounds signal,
-          who reuses context, who turns a small fresh input into dense output.
-          The unit of measurement is the token, and the architecture of the
-          cascade is the score.
+          It ranks who ranks highest at operating their AI under the stated
+          metric and time window — who compounds signal, who reuses context,
+          who turns a small fresh input into dense output. The unit of
+          measurement is the token, and the architecture of the cascade is the
+          score.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           It is a new performance layer because it sits between two existing
@@ -269,7 +298,9 @@ export default function AIOperatorScoringPage() {
           Operator scoring inverts that: it holds the model as a constant (you
           pick one and drive it) and varies the operator. The data is not a
           synthetic test or a vote; it is real token telemetry from live coding
-          sessions, captured on-device.
+          sessions, captured on-device. The question it answers is not
+          &ldquo;which AI is best?&rdquo; but &ldquo;who ranks highest at
+          operating the AI under the stated metric and time window?&rdquo;
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The two are complements. A model benchmark helps you choose a model.
@@ -387,9 +418,9 @@ export default function AIOperatorScoringPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               The systematic ranking of operators — the account-level subjects
               associated with AI-work telemetry — by token-cascade efficiency.
-              It ranks who uses their AI best — measured by yield and the
-              composite SIGNA rate — not which model is best or who spent the
-              most hours.
+              It ranks who ranks highest at operating their AI under the stated
+              metric and time window — measured by yield and the composite SIGNA
+              rate — not which model is best or who spent the most hours.
             </dd>
           </div>
           <div className="flex flex-col gap-1">
@@ -399,7 +430,8 @@ export default function AIOperatorScoringPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Model benchmarking ranks models by test scores or votes — it asks
               &ldquo;which AI is best?&rdquo; Operator scoring ranks operators by
-              real token telemetry — it asks &ldquo;who uses the AI best?&rdquo;
+              real token telemetry — it asks &ldquo;who ranks highest at
+              operating the AI under the stated metric and time window?&rdquo;
               One holds the operator constant; the other holds the model
               constant. They are complements.
             </dd>

@@ -1,6 +1,6 @@
 /**
  * app/operator-performance/page.tsx — "Operator Performance — Scoring the
- * Human, Not the Model"
+ * Operator, Not the Model"
  *
  * Topic hub for the operator-performance category. Explains why the operator
  * is the variable, how SigRank scores operators, the class tiers, and links
@@ -20,7 +20,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "AI Operator Performance",
   description:
-    "AI operator performance scores the human driving the AI, not the model. SigRank class tiers from IGNITER to ARCH+ \u2014 the operator performance measurement system for AI coding.",
+    "AI operator performance scores the account-level subject driving the AI, not the model. SigRank class tiers from IGNITER to ARCH+ \u2014 the operator performance measurement system for AI coding.",
   path: "/operator-performance",
 });
 
@@ -104,12 +104,12 @@ export default function OperatorPerformancePage() {
             {
               question: "What is operator performance in AI coding?",
               answer:
-                "Operator performance measures how efficiently the human driving the AI tool uses it — not how good the model is. Upsilon scores the operator by the architecture of their token cascade: how well they reuse cached context, how much output they produce per fresh input, and whether signal is compounding or tokens are burning. The model is held constant; the operator is the variable.",
+                "Operator performance measures how efficiently the operator — the account-level subject driving the AI tool — uses it, not how good the model is. Upsilon scores the operator by the architecture of their token cascade: how well they reuse cached context, how much output they produce per fresh input, and whether signal is compounding or tokens are burning. The model is held constant; the operator is the variable.",
             },
             {
               question: "Why score the operator, not the model?",
               answer:
-                "Because the model is not the variable. Two operators on the same model, same platform, same session length can produce wildly different token cascades. One compounds signal; the other burns tokens. The difference is the operator — how they structure prompts, how they reuse context, how they manage the cascade. Model leaderboards already exist (LMSYS Arena). Upsilon measures the layer no one else does: the human.",
+                "Because the model is not the variable. Two operators on the same model, same platform, same session length can produce wildly different token cascades. One compounds signal; the other burns tokens. The difference is the operator — how they structure prompts, how they reuse context, how they manage the cascade. Model leaderboards already exist (LMSYS Arena). Upsilon measures the layer no one else does: the operator.",
             },
             {
               question: "What are the SigRank class tiers?",
@@ -133,13 +133,13 @@ export default function OperatorPerformancePage() {
       <WaveHero
         eyebrow="◈ Topic Hub"
         terminalText="OPERATOR"
-        title="Operator Performance — Scoring the Human, Not the Model"
+        title="Operator Performance — Scoring the Operator, Not the Model"
         subtitle={
           <>
             The model is held constant. The{" "}
             <span className="text-gold">operator</span> is the variable. SigRank
-            scores the human driving the AI — because that is where the signal
-            lives.
+            scores the account-level subject driving the AI — because that is
+            where the signal lives.
           </>
         }
       />
@@ -150,7 +150,7 @@ export default function OperatorPerformancePage() {
           The operator is the variable
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Two developers sit down with the same model — the same Claude, the
+          Two operators sit down with the same model — the same Claude, the
           same ChatGPT, the same Gemini — on the same platform, for the same
           session length. One walks away with a token cascade that compounds:
           small fresh input riding a large cached foundation into dense output.
@@ -166,9 +166,10 @@ export default function OperatorPerformancePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           This is the inversion that makes SigRank a different category from
           model leaderboards. LMSYS Arena ranks which model humans prefer.
-          SigRank ranks which human drives their model best. The question is not
-          &ldquo;which AI is smarter?&rdquo; — it is &ldquo;who is better at
-          using the AI they have?&rdquo;
+          SigRank ranks which operator drives their model best — highest-ranked
+          under the stated metric and time window. The question is not
+          &ldquo;which AI is smarter?&rdquo; — it is &ldquo;who ranks highest
+          at operating the AI they have?&rdquo;
         </p>
       </section>
 
@@ -262,10 +263,10 @@ export default function OperatorPerformancePage() {
               What is operator performance in AI coding?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              It measures how efficiently the human driving the AI uses it — not
-              how good the model is. Upsilon scores the operator by the
-              architecture of their token cascade. The model is held constant;
-              the operator is the variable.
+              It measures how efficiently the operator — the account-level
+              subject driving the AI — uses it, not how good the model is.
+              Upsilon scores the operator by the architecture of their token
+              cascade. The model is held constant; the operator is the variable.
             </dd>
           </div>
           <div className="flex flex-col gap-1">
@@ -276,7 +277,7 @@ export default function OperatorPerformancePage() {
               Because the model is not the variable. Two operators on the same
               model can produce wildly different cascades. Model leaderboards
               already exist — Upsilon measures the layer no one else does: the
-              human.
+              operator.
             </dd>
           </div>
           <div className="flex flex-col gap-1">
