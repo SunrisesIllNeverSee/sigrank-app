@@ -248,9 +248,9 @@ export default function AIOperatorScoringPage() {
             <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">Conservation Law</h3>
             <p className="mt-1 font-sans text-xs text-text-secondary">The academic foundation with Zenodo DOIs.</p>
           </Link>
-          <a href="https://github.com/SunrisesIllNeverSee/otep-spec" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
+          <a href="https://github.com/SunrisesIllNeverSee/tteop-spec" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
             <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">TTEOP protocol</h3>
-            <p className="mt-1 font-sans text-xs text-text-secondary">The open telemetry protocol (otep-spec repo).</p>
+            <p className="mt-1 font-sans text-xs text-text-secondary">The open telemetry protocol (tteop-spec repo).</p>
           </a>
           <a href="https://sigeconomy.com/ai-user-leaderboard" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
             <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">AI User Leaderboard</h3>
