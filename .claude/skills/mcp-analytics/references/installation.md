@@ -40,6 +40,8 @@ npm install @posthog/mcp@0.12.0 posthog-node
 
 You bring your own [`posthog-node`](/docs/libraries/node.md) client (the same pattern as [`@posthog/ai`](/docs/ai-engineering.md)) and pass it to `instrument()` as the required second argument. You own its lifecycle — call `posthog.shutdown()` or `posthog.flush()` yourself.
 
+> **Guard the token in production code.** The examples below pass `process.env.POSTHOG_PROJECT_TOKEN` directly for brevity. In production, check that the token is set before constructing the `PostHog` client to avoid runtime errors.
+
 ## Wrap your server
 
 `instrument(server, posthog, options?)` is the only function you need to call. The `posthog` client is a required positional argument; `options` is optional. It returns an analytics handle (used for [custom events](/docs/mcp-analytics/custom-events.md)). It's idempotent per server — calling it twice on the same server logs a warning and returns early.
