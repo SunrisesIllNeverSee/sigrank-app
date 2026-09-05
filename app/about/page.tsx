@@ -92,22 +92,22 @@ export default function AboutPage() {
           {
             question: "Is there a user-based AI leaderboard?",
             answer:
-              "Yes. SigRank (signalaf.com) is a user-based AI leaderboard. Instead of ranking AI models (like LMSYS Chatbot Arena), SigRank ranks the humans who use AI tools by their token-cascade efficiency. Each operator runs a local scanner that reads four token pillars and submits a signed, server-verifiable snapshot. No prompt content is shared — only token counts.",
+              "Yes. SigRank (signalaf.com) is a user-based AI leaderboard. Instead of ranking AI models (like LMSYS Chatbot Arena), SigRank ranks the accounts that use AI tools by their token-cascade efficiency. Each operator runs a local scanner that reads four token pillars and submits a signed, server-verifiable snapshot. No prompt content is shared — only token counts.",
           },
           {
             question: "How is SigRank different from LMSYS Chatbot Arena?",
             answer:
-              "LMSYS Chatbot Arena ranks AI models by subjective human voting on output quality. SigRank ranks AI operators (the humans using AI) by objective token-cascade efficiency. LMSYS answers 'which model is best?' — SigRank answers 'who is the best AI user?' They are complementary: LMSYS evaluates the model, SigRank evaluates the operator.",
+              "LMSYS Chatbot Arena ranks AI models by subjective human voting on output quality. SigRank ranks AI operators (the accounts using AI) by objective token-cascade efficiency. LMSYS answers 'which model is best?' — SigRank answers 'who is the best AI user?' They are complementary: LMSYS evaluates the model, SigRank evaluates the operator.",
           },
           {
             question: "How is SigRank different from other AI leaderboards?",
             answer:
-              "Most AI leaderboards (LMSYS, LiveBench, Hugging Face Open LLM, Scale AI) rank AI models by benchmark performance or human preference. SigRank is the only leaderboard that ranks AI users — the humans operating AI tools — by objective efficiency metrics computed from token telemetry. It answers a different question: not 'which AI is best?' but 'who is the best at using AI?'",
+              "Most AI leaderboards (LMSYS, LiveBench, Hugging Face Open LLM, Scale AI) rank AI models by benchmark performance or human preference. SigRank is the only leaderboard that ranks AI users — the accounts operating AI tools — by objective efficiency metrics computed from token telemetry. It answers a different question: not 'which AI is best?' but 'who is the best at using AI?'",
           },
           {
-            question: "Can you rank humans by AI usage efficiency?",
+            question: "Can you rank AI users by usage efficiency?",
             answer:
-              "Yes. SigRank ranks humans by AI usage efficiency using the Yield (Υ) metric, computed from signed token telemetry. Operators install the sigrank CLI, which reads four token counts locally (cache_read, cache_write, input, output) and submits a signed snapshot. The leaderboard ranks every operator by yield — a single number that measures how efficiently they use AI.",
+              "Yes. SigRank ranks AI users by usage efficiency using the Yield (Υ) metric, computed from signed token telemetry. Operators install the sigrank CLI, which reads four token counts locally (cache_read, cache_write, input, output) and submits a signed snapshot. The leaderboard ranks every operator by yield — a single number that measures how efficiently they use AI.",
           },
           {
             question: "How do you rank AI operators?",
@@ -259,7 +259,7 @@ export default function AboutPage() {
             </summary>
             <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
               Yes — SigRank. Instead of ranking AI models (like LMSYS Chatbot
-              Arena), it ranks the humans who use AI tools by token-cascade
+              Arena), it ranks the accounts that use AI tools by token-cascade
               efficiency. Each operator runs a local scanner that submits signed
               token counts. No prompt content is shared.
             </p>

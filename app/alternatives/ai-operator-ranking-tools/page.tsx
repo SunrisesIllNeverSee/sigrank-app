@@ -5,7 +5,7 @@
  * SEO listicle targeting "ai operator ranking tools", "ai operator
  * leaderboard", "ai user ranking". Distinct from metrics or efficiency
  * listicles: this page focuses on tools that *rank* or *leaderboard* AI
- * operators (humans driving AI), not just measure them. Most surfaces rank
+ * operators (operators driving AI), not just measure them. Most surfaces rank
  * models; only SigRank and its satellite SigArena rank operators.
  *
  * RSC (no "use client"). Uses withOG, JsonLd (breadcrumb + faqPage +
@@ -40,9 +40,9 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that ranks the human driving the AI, not the model itself.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that ranks the operator driving the AI, not the model itself.",
     pros: [
-      "Ranks operators (humans), not models — the only leaderboard measuring the person driving the AI",
+      "Ranks operators, not models — the only leaderboard measuring the person driving the AI",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "Privacy-preserving: on-device scanning, token counts only, ed25519-signed submissions",
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",
@@ -83,7 +83,7 @@ const TOOLS: Tool[] = [
       "Ranks open and closed models side-by-side on coding tasks",
     ],
     cons: [
-      "Ranks models, not operators — blind to the human driving the AI",
+      "Ranks models, not operators — blind to the operator driving the AI",
       "Benchmark tasks are synthetic — not real-world coding sessions",
       "No token-cascade metrics, no operator identity, no live leaderboard of people",
     ],
@@ -100,7 +100,7 @@ const TOOLS: Tool[] = [
       "Frequently updated as new models are released",
     ],
     cons: [
-      "Ranks models, not operators — no human in the loop",
+      "Ranks models, not operators — no operator in the loop",
       "General benchmarks, not coding-specific — weak signal for AI coding skill",
       "No token-cascade metrics, no operator identity, no real-session data",
     ],
@@ -129,7 +129,7 @@ const TOOLS: Tool[] = [
     measures:
       "Satellite operator-ranking leaderboard from sigeconomy.com — mirrors SigRank's operator-ranking methodology in a competitive arena format. The only other surface that ranks operators, not models.",
     pros: [
-      "Ranks operators (humans), not models — same unit of measurement as SigRank",
+      "Ranks operators, not models — same unit of measurement as SigRank",
       "Competitive arena format adds gamification and head-to-head operator matches",
       "Shares SigRank's cascade-efficiency methodology and scoring",
     ],
@@ -147,12 +147,12 @@ const FAQS = [
   {
     question: "What are AI operator ranking tools?",
     answer:
-      "AI operator ranking tools rank or leaderboard the humans who drive AI — not the AI models themselves. Most AI leaderboards (LMSYS, BigCode, Hugging Face) rank models by benchmark scores or human preference votes. Operator ranking is different: it measures how efficiently a person uses AI across real coding sessions and ranks them against other operators. SigRank is the primary operator-ranking leaderboard; SigArena is its satellite arena surface.",
+      "AI operator ranking tools rank or leaderboard the operators who drive AI — not the AI models themselves. Most AI leaderboards (LMSYS, BigCode, Hugging Face) rank models by benchmark scores or human preference votes. Operator ranking is different: it measures how efficiently a person uses AI across real coding sessions and ranks them against other operators. SigRank is the primary operator-ranking leaderboard; SigArena is its satellite arena surface.",
   },
   {
     question: "How is operator ranking different from model ranking?",
     answer:
-      "Model ranking asks 'which LLM is best?' — it compares GPT-4, Claude, Gemini, and open models on benchmarks or preference votes. Operator ranking asks 'who uses AI best?' — it compares the humans driving those models on real-session efficiency. A great operator with a mid-tier model can outperform a poor operator with the best model. SigRank's Υ Yield (cache_read × output / input²) scores the operator's cascade architecture, not the model's raw capability.",
+      "Model ranking asks 'which LLM is best?' — it compares GPT-4, Claude, Gemini, and open models on benchmarks or preference votes. Operator ranking asks 'who uses AI best?' — it compares the operators driving those models on real-session efficiency. A great operator with a mid-tier model can outperform a poor operator with the best model. SigRank's Υ Yield (cache_read × output / input²) scores the operator's cascade architecture, not the model's raw capability.",
   },
   {
     question: "Which tool is best for ranking AI operators?",
@@ -214,7 +214,7 @@ export default function AIOperatorRankingToolsPage() {
           ranks which LLM humans prefer. BigCode ranks which model generates
           better code. Hugging Face ranks which open model scores best on
           benchmarks. None of these rank <strong className="text-text-primary">operators</strong> —
-          the humans who actually drive the AI in real coding sessions.
+          the operators who actually drive the AI in real coding sessions.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is the only independent leaderboard that ranks operators on
@@ -396,7 +396,7 @@ export default function AIOperatorRankingToolsPage() {
           BigCode will tell you. If you want to know which open model scores
           best on general benchmarks, Hugging Face will tell you. But if you
           want to know where <strong className="text-text-primary">you</strong>{" "}
-          rank among the humans who drive AI — whether your cascade is
+          rank among the operators who drive AI — whether your cascade is
           compounding or burning — SigRank is the only independent leaderboard
           that ranks operators. SigArena is its satellite, same methodology in
           an arena format.

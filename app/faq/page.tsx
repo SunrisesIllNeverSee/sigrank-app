@@ -77,7 +77,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "How is SigRank different from LMSYS Arena or LiveBench?",
     answer:
-      "LMSYS Arena and LiveBench benchmark AI models. SigRank benchmarks AI operators — the humans using the models. Model leaderboards ask 'which model is best?' SigRank asks 'who uses AI best?' They measure different things: model leaderboards measure task completion accuracy; SigRank measures token cascade efficiency. See /vs/lmsys-arena for the full comparison.",
+      "LMSYS Arena and LiveBench benchmark AI models. SigRank benchmarks AI operators — the accounts using the models. Model leaderboards ask 'which model is best?' SigRank asks 'who uses AI best?' They measure different things: model leaderboards measure task completion accuracy; SigRank measures token cascade efficiency. See /vs/lmsys-arena for the full comparison.",
   },
   {
     question: "What are the 10 build archetypes?",

@@ -71,7 +71,7 @@ export default async function FieldHubPage() {
             {
               question: "What research does SigRank publish?",
               answer:
-                "SigRank publishes field analysis showing the true distribution of AI operator token efficiency (1,498 human operators, median yield 1.68), the Zenodo dataset with full anonymized telemetry, and the academic foundation page covering the Conservation Law of Commitment and MOSES enforcement architecture.",
+                "SigRank publishes field analysis showing the true distribution of AI operator token efficiency (1,498 operators, median yield 1.68), the Zenodo dataset with full anonymized telemetry, and the academic foundation page covering the Conservation Law of Commitment and MOSES enforcement architecture.",
             },
           ]),
         ]}
@@ -113,7 +113,7 @@ export default async function FieldHubPage() {
           subtitle={
             <>
               The true distribution of token efficiency.{" "}
-              {meta.humans_included.toLocaleString()} human AI operators,
+              {meta.operators_included.toLocaleString()} AI operators,
               outliers separated. Volume ranked. Yield revealed.
             </>
           }

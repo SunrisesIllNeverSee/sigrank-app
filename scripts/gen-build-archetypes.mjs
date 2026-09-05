@@ -19,12 +19,12 @@
  *     include handles that have live /user/* profiles)
  *
  * Population:
- *   HCM — Human Center of Mass = FULL minus flagged + ratio outliers
+ *   OCM — Operator Center of Mass = FULL minus flagged + ratio outliers
  *   (input/total >= 0.5 are ratio outliers, same cut as gen-archetypes.mjs)
  *
  * Writes:
  *   - public/data/archetypes.json (canonical: 10 build archetypes)
- *   - public/data/archetype-labels-hcm.json (handle → archetype, HCM)
+ *   - public/data/archetype-labels-ocm.json (handle → archetype, OCM)
  *
  * Deterministic: same input → same output. No randomness, no K-Means.
  *
@@ -40,11 +40,11 @@ const ROOT = resolve(__dirname, "..");
 const FIELD_ANALYSIS_PATH = resolve(ROOT, "public/data/field-analysis.json");
 const BOARD_SNAPSHOT_PATH = resolve(ROOT, "public/data/board-all_time.json");
 const ARCHETYPES_PATH = resolve(ROOT, "public/data/archetypes.json");
-const LABELS_PATH = resolve(ROOT, "public/data/archetype-labels-hcm.json");
+const LABELS_PATH = resolve(ROOT, "public/data/archetype-labels-ocm.json");
 
 // ── Classification thresholds ──────────────────────────────────────────────
 
-// P80 thresholds calibrated from HCM cut (1,586 operators).
+// P80 thresholds calibrated from OCM cut (1,586 operators).
 const CONVERGENT_T = { levP80: 74.6, velP80: 0.34, constrP80: 0.0431 };
 
 const VEL_KINETIC = 0.8;
@@ -278,9 +278,9 @@ const boardCodenames = new Set(
   (board.operators || []).map((o) => o.codename || o.handle).filter(Boolean),
 );
 
-// HCM cut: drop flagged + ratio outliers (input/total >= 0.5)
+// OCM cut: drop flagged + ratio outliers (input/total >= 0.5)
 const allOps = field.operators || [];
-const hcmOps = allOps.filter((o) => {
+const ocmOps = allOps.filter((o) => {
   if (o.classification === "flagged") return false;
   const total = o.total_tokens || 1;
   const inputRatio = (o.input_tokens || 0) / total;
@@ -288,12 +288,12 @@ const hcmOps = allOps.filter((o) => {
 });
 
 console.error(`Field analysis: ${allOps.length} operators`);
-console.error(`HCM cut: ${hcmOps.length} operators`);
+console.error(`OCM cut: ${ocmOps.length} operators`);
 
-// Classify all HCM operators
+// Classify all OCM operators
 const byArchetype = {};
 const labels = {};
-for (const o of hcmOps) {
+for (const o of ocmOps) {
   const key = classify(o);
   if (!byArchetype[key]) byArchetype[key] = [];
   byArchetype[key].push(o);
@@ -307,7 +307,7 @@ for (const meta of ARCHETYPE_META) {
   const stats = clusterStats(ops, meta, boardCodenames);
   if (stats) {
     archetypes.push(stats);
-    console.error(`  ${meta.name.padEnd(20)} ${String(ops.length).padStart(5)}  ${pct(ops.length, hcmOps.length).toFixed(1)}%`);
+    console.error(`  ${meta.name.padEnd(20)} ${String(ops.length).padStart(5)}  ${pct(ops.length, ocmOps.length).toFixed(1)}%`);
   } else {
     console.error(`  ${meta.name.padEnd(20)}     0  (empty)`);
   }
@@ -318,10 +318,10 @@ const output = {
   method: "deterministic_build_archetypes",
   description:
     "10 build archetypes classified by token cascade dimensions. Each type is defined by a different primary dimension. Replaces the K-Means population clusters.",
-  population: "human_center_of_mass",
+  population: "operator_center_of_mass",
   n_operators: allOps.length,
-  n_clustered: hcmOps.length,
-  n_human_center_of_mass: hcmOps.length,
+  n_clustered: ocmOps.length,
+  n_operator_center_of_mass: ocmOps.length,
   n_archetypes: archetypes.length,
   thresholds: {
     convergent: CONVERGENT_T,

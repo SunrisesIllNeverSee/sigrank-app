@@ -98,7 +98,7 @@ const COMPARE_ROWS: { feature: string; codeburn: string; sigrank: string }[] = [
   },
   {
     feature: "Privacy-preserving (token counts only)",
-    codeburn: "Yes (local-first, nothing leaves your machine)",
+    codeburn: "Yes (local-first by default; opt-in desktop telemetry is the only exception)",
     sigrank: "Yes (token counts only, never prompts)",
   },
 ];

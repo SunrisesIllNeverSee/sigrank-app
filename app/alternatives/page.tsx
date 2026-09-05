@@ -106,12 +106,12 @@ export default function AlternativesIndex() {
           {
             question: "What are the best AI coding metrics tools?",
             answer:
-              "The 7 best AI coding metrics tools in 2026 are SigRank, ccusage, WakaTime, LMSYS Arena, Cursor, Copilot, and Token Dashboard. SigRank is the only tool that scores operator efficiency using the Yield (Υ) cascade metric. The others measure usage, time, or model performance — not human operator skill.",
+              "The 7 best AI coding metrics tools in 2026 are SigRank, ccusage, WakaTime, LMSYS Arena, Cursor, Copilot, and Token Dashboard. SigRank is the only tool that scores operator efficiency using the Yield (Υ) cascade metric. The others measure usage, time, or model performance — not operator skill.",
           },
           {
             question: "What are the best AI benchmarking tools?",
             answer:
-              "The 6 best AI benchmarking tools in 2026 are SigRank, LMSYS Arena, HELM, Open LLM Leaderboard, and HumanEval. SigRank benchmarks AI operators (the humans); the others benchmark AI models. If you want to know which model is best, use LMSYS or HELM. If you want to know who uses AI best, use SigRank.",
+              "The 6 best AI benchmarking tools in 2026 are SigRank, LMSYS Arena, HELM, Open LLM Leaderboard, and HumanEval. SigRank benchmarks AI operators (the operators); the others benchmark AI models. If you want to know which model is best, use LMSYS or HELM. If you want to know who uses AI best, use SigRank.",
           },
           {
             question: "What are the best token tracking tools?",
@@ -136,7 +136,7 @@ export default function AlternativesIndex() {
           {
             question: "How is SigRank different from other AI tools?",
             answer:
-              "SigRank is the only tool that scores AI operator efficiency using the Yield (Υ = cache_read × output / input²) metric and ranks operators on a public leaderboard. Other tools either count tokens (ccusage), benchmark models (LMSYS), trace LLM calls (Langfuse), or provide AI editing (Cursor). SigRank measures the human, not the tool.",
+              "SigRank is the only tool that scores AI operator efficiency using the Yield (Υ = cache_read × output / input²) metric and ranks operators on a public leaderboard. Other tools either count tokens (ccusage), benchmark models (LMSYS), trace LLM calls (Langfuse), or provide AI editing (Cursor). SigRank measures the operator, not the tool.",
           },
         ])}
       />

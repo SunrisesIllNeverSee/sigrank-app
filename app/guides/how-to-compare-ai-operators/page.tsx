@@ -78,7 +78,7 @@ export default function HowToCompareAIOperatorsPage() {
             {
               question: "Why compare operators instead of models?",
               answer:
-                "SigRank scores the human driving the AI, not the AI model itself. Two operators using the same model can have vastly different yields because their workflow — context management, prompt structure, cache reuse — is what determines efficiency. Comparing operators reveals workflow differences; comparing models only reveals model differences, which are already well-covered by LMSYS Chatbot Arena.",
+                "SigRank scores the operator driving the AI, not the AI model itself. Two operators using the same model can have vastly different yields because their workflow — context management, prompt structure, cache reuse — is what determines efficiency. Comparing operators reveals workflow differences; comparing models only reveals model differences, which are already well-covered by LMSYS Chatbot Arena.",
             },
             {
               question: "What is the SigRank compare tool?",
@@ -111,7 +111,7 @@ export default function HowToCompareAIOperatorsPage() {
         subtitle={
           <>
             The model matters less than you think. The{" "}
-            <span className="text-gold">operator</span> — the human driving the
+            <span className="text-gold">operator</span> — the operator driving the
             AI — is where efficiency lives. Here&rsquo;s how to compare them.
           </>
         }
@@ -347,7 +347,7 @@ export default function HowToCompareAIOperatorsPage() {
               Why compare operators instead of models?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              SigRank scores the human driving the AI, not the AI model. Two
+              SigRank scores the operator driving the AI, not the AI model. Two
               operators on the same model can have vastly different yields
               because their workflow determines efficiency. Comparing operators
               reveals workflow differences you can actually change.

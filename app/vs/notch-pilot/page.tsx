@@ -3,7 +3,7 @@
  *
  * Angle: notch-pilot is a copilot — an AI assistant that helps you write code.
  * SigRank scores the pilot, not the plane. The assistant isn't the operator;
- * the human at the wheel is what gets measured.
+ * the operator at the wheel is what gets measured.
  *
  * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
  * WaveHero, and a styled comparison table matching the repo's table conventions.
@@ -19,7 +19,7 @@ import { WaveHero } from "@/components/ui/WaveHero";
 export const metadata: Metadata = withOG({
   title: "SigRank vs notch-pilot",
   description:
-    "notch-pilot is an AI coding copilot. SigRank scores the pilot, not the plane. The assistant isn't the operator; the human at the wheel is what gets measured.",
+    "notch-pilot is an AI coding copilot. SigRank scores the pilot, not the plane. The assistant isn't the operator; the operator at the wheel is what gets measured.",
   path: "/vs/notch-pilot",
 });
 
@@ -118,7 +118,7 @@ export default function VsNotchPilotPage() {
           faqPage(FAQS),
           comparisonArticle({
             title: "SigRank vs notch-pilot \u2014 The Copilot vs The Pilot Score",
-            description: "notch-pilot is an AI coding copilot. SigRank scores the pilot, not the plane. The assistant isn't the operator; the human at the wheel is what gets measured.",
+            description: "notch-pilot is an AI coding copilot. SigRank scores the pilot, not the plane. The assistant isn't the operator; the operator at the wheel is what gets measured.",
             path: "/vs/notch-pilot",
           }),
         ]}
@@ -131,7 +131,7 @@ export default function VsNotchPilotPage() {
           <>
             notch-pilot is an AI coding copilot that helps you write code. SigRank
             scores <span className="text-gold">the pilot</span>, not the plane.
-            The assistant isn&apos;t the operator; the human at the wheel is what
+            The assistant isn&apos;t the operator; the operator at the wheel is what
             gets measured.
           </>
         }

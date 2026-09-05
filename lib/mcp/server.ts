@@ -53,6 +53,7 @@ export const posthogMcp: PostHog | null = _phToken
       host: _phHost,
       flushAt: 1,
       flushInterval: 0,
+      requestTimeout: 5000,
       enableExceptionAutocapture: true,
     })
   : null;

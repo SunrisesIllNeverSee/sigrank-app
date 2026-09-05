@@ -51,7 +51,7 @@ const flaggedHandles = new Set([...botHandles, ...suspectHandles]);
 console.log(`Total scraped: ${allUsers.length}`);
 console.log(`Flagged outliers (former bots): ${botHandles.size} — ${[...botHandles].join(", ")}`);
 console.log(`Flagged outliers (former suspects): ${suspectHandles.size}`);
-console.log(`Human Center of Mass: ${allUsers.length - flaggedHandles.size}`);
+console.log(`Operator Center of Mass: ${allUsers.length - flaggedHandles.size}`);
 
 // ── Compute derived metrics per operator ──
 function computeMetrics(u) {
@@ -117,7 +117,7 @@ for (const u of allUsers) {
 // Zone 0: input/total < 0.1% — near-zero input
 // Zone 1: input/total > 80% — input dumpers
 // Gray zone: 0.1–1% input — split by MOSES-like filter
-//   Pass: velocity ≤ 2, yield ≤ 1000, output > 1M, cache_write > 1M → stays in HCM
+//   Pass: velocity ≤ 2, yield ≤ 1000, output > 1M, cache_write > 1M → stays in OCM
 //   Fail: joins outliers
 // Total ratio outliers: zone0 + zone1 + gray_fail = 64 + 11 + 38 = 113
 const RATIO_OUTLIER_COUNT = 113;
@@ -126,7 +126,7 @@ const ratioOutlierHandles = new Set();
 for (const o of nonFlagged) {
   const inputRatio = o.total_tokens > 0 ? o.input_tokens / o.total_tokens : 0;
   if (inputRatio < 0.001) {
-    // Zone 0: all 64 are ratio outliers (split into extreme/replay, but all excluded from HCM)
+    // Zone 0: all 64 are ratio outliers (split into extreme/replay, but all excluded from OCM)
     ratioOutlierHandles.add(o.handle);
   } else if (inputRatio > 0.8) {
     // Zone 1: input dumpers
@@ -146,9 +146,9 @@ for (const o of nonFlagged) {
 
 console.log(`Ratio outliers (from input/total analysis): ${ratioOutlierHandles.size}`);
 
-// Human Center of Mass: non-flagged minus ratio outliers = 1611 - 113 = 1498
+// Operator Center of Mass: non-flagged minus ratio outliers = 1611 - 113 = 1498
 const humans = nonFlagged.filter((o) => !ratioOutlierHandles.has(o.handle));
-console.log(`Human Center of Mass (for medians): ${humans.length}`);
+console.log(`Operator Center of Mass (for medians): ${humans.length}`);
 
 // ── Compute medians ──
 function median(arr) {
@@ -287,7 +287,7 @@ const output = {
     scraped_at: leaderboard.scraped_at,
     source: leaderboard.source,
     total_scraped: allUsers.length,
-    humans_included: allUsers.length - OUTLIER_COUNT, // 1628 - 130 = 1498
+    operators_included: allUsers.length - OUTLIER_COUNT, // 1628 - 130 = 1498
     outliers: OUTLIER_COUNT,
     medians,
     iqr_fences: iqrFences,
