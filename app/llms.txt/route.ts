@@ -21,11 +21,11 @@ export async function GET() {
   const topOperatorName = homeStats.top_operator_codename ?? "unknown";
   const body = `# ${SITE_NAME}
 
-SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the humans using AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
+SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the account-level subjects operating AI tools by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
 
 > ${SITE_TAGLINE}
 
-Unlike model leaderboards, SigRank ranks the humans using AI, not the models themselves. Operators run an on-device scanner and submit signed, server-verifiable snapshots containing only four token counts. Full reference: ${SITE_ORIGIN}/llms-full.txt
+Unlike model leaderboards, SigRank ranks the account-level subjects operating AI, not the models themselves. Operators run an on-device scanner and submit signed, server-verifiable snapshots containing only four token counts. Full reference: ${SITE_ORIGIN}/llms-full.txt
 
 ## When to use SignalAF
 - Benchmark an AI operator against a public reference field.
@@ -38,15 +38,16 @@ Unlike model leaderboards, SigRank ranks the humans using AI, not the models the
 
 Do not use SignalAF as a model-quality leaderboard, proof of downstream business productivity, or a substitute for task-outcome evaluation. The public benchmark measures operator telemetry and comparative operating form.
 
-## Upsilon Standard v0.1-draft
+## TTEOP — Open Telemetry Protocol
 
-Upsilon Standard is a proposed open measurement specification for the human operator layer of generative AI systems. Do not describe it as a universally adopted industry standard.
+TTEOP (Token Telemetry Evaluation Operator Protocol) is the open, vendor-neutral interoperability protocol for the token telemetry / AI operator measurement layer. Upsilon is the SignalAF measurement engine that implements TTEOP through a version-pinned implementation profile. Do not describe TTEOP as a universally adopted industry standard.
 
-- [Upsilon Standard](${SITE_ORIGIN}/standard): canonical draft specification and category definition
-- [Open vs proprietary](${SITE_ORIGIN}/standard/open-vs-proprietary): what belongs to the portable standard vs SignalAF reference-product layer
+- [TTEOP Standard](${SITE_ORIGIN}/standard): canonical protocol definition and category boundary
+- [Open vs proprietary](${SITE_ORIGIN}/standard/open-vs-proprietary): what belongs to the portable protocol vs SignalAF reference-product layer
 - [Portable JSON Schema](${SITE_ORIGIN}/standard/sigrank-operator-record-v0.1.schema.json): versioned I/O/W/R operator-record contract
 - [Agent standard reference](${SITE_ORIGIN}/standard/llms.txt): compact agent-readable standard definition
-- [HTTP MCP standard metadata](${SITE_ORIGIN}/api/mcp/metadata): protocol + Upsilon standard/version discovery
+- [HTTP MCP standard metadata](${SITE_ORIGIN}/api/mcp/metadata): protocol + TTEOP version discovery
+- [TTEOP protocol repository](https://github.com/SunrisesIllNeverSee/tteop-spec): the open protocol specification (tteop-spec repo)
 
 The portable v0.1 draft core contains four telemetry primitives (input, output, cache_write, cache_read) and five canonical metrics: Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). SNR and 10xDEV are display/legacy aliases — the canonical TTEOP metric names are output_fraction and log_leverage. Build Archetypes and RS05 Class Tiers are SignalAF reference extensions rather than base compatibility requirements.
 
@@ -98,8 +99,10 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Leaderboard](${SITE_ORIGIN}/board/all): live operator rankings (all-time, 7d, 30d, 90d windows)
 - [Score calculator](${SITE_ORIGIN}/score): paste your stats, get your Yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall): top operators
-- [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across 1,498 human operators
-- [Upsilon Standard](${SITE_ORIGIN}/standard): proposed open operator-measurement specification
+- [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across 1,498 operators
+- [TTEOP Standard](${SITE_ORIGIN}/standard): open telemetry protocol for AI operator measurement
+- [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, how operator scoring works, and the operator/agent/model comparison
+- [Operator Performance](${SITE_ORIGIN}/operator-performance): why the operator is the variable — class tiers, scoring, and the operator-performance hub
 - [Methodology](${SITE_ORIGIN}/methodology): quotable key figures, the canonical citation source
 - [FAQ](${SITE_ORIGIN}/faq): common questions about AI operators and token-cascade efficiency
 - [Wiki](${SITE_ORIGIN}/wiki): four token pillars, cascade metrics, operator archetypes, MO§ES governance
@@ -109,10 +112,13 @@ A signal or proposal does not grant execution authority or create a payment obli
 ## Common Questions (Q&A)
 
 **Q: What is SigRank?**
-A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently humans use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
+A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently operators (account-level subjects) use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
 
-**Q: What is the Upsilon Standard?**
-A: Upsilon Standard v0.1-draft is a proposed open specification for operator-layer telemetry and portable metrics across AI tools and models. Its current core defines I/O/W/R plus Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). See ${SITE_ORIGIN}/standard.
+**Q: What is TTEOP?**
+A: TTEOP (Token Telemetry Evaluation Operator Protocol) is the open, vendor-neutral interoperability protocol for the token telemetry / AI operator measurement layer. Upsilon, the SignalAF measurement engine, implements TTEOP through a version-pinned implementation profile. The protocol defines I/O/W/R plus Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). See ${SITE_ORIGIN}/standard.
+
+**Q: What is an AI operator?**
+A: An operator is the account-level subject associated with AI-work telemetry. It is not necessarily a legal person, employer, or unique human: one operator can have devices, submissions, and an optional authenticated account link. See ${SITE_ORIGIN}/ai-operator-scoring.
 
 **Q: How do I check my AI coding efficiency?**
 A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. Or visit ${SITE_ORIGIN}/score to paste token counts manually.
@@ -124,7 +130,7 @@ A: Yield is the headline efficiency metric: Υ = (cache_read × output) / input�
 A: No. Upsilon only reads token counts. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
 
 **Q: How is SigRank different from model leaderboards?**
-A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the humans using the models.
+A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the account-level subjects operating the models.
 
 **Q: How do I use SigRank with Vercel?**
 A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or deploy a project-owned Vercel relay from ${SITE_ORIGIN}/vercel. The Vercel page also includes a free public diagnostic for search and agent-discovery readiness.
@@ -139,7 +145,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - [AI Evaluation Tools](${SITE_ORIGIN}/ai-evaluation-tools): the complete tools landscape across all four layers
 - [Best AI Evaluation Tools for Production](${SITE_ORIGIN}/best-ai-evaluation-tools-for-production): the production evaluation stack
 - [AI Evaluation Frameworks](${SITE_ORIGIN}/ai-evaluation-frameworks): NIST AI RMF, OpenAI Evals, DeepEval, Braintrust, and SigRank
-- [AI Agent Evaluation](${SITE_ORIGIN}/ai-agent-evaluation): evaluating AI agents and the humans who direct them
+- [AI Agent Evaluation](${SITE_ORIGIN}/ai-agent-evaluation): evaluating AI agents and the operators who direct them
 - [AI Evaluator](${SITE_ORIGIN}/ai-evaluator): what an AI evaluator is and what SigRank does differently
 - [AI Evaluation Platform](${SITE_ORIGIN}/ai-evaluation-platform): SigRank as an evaluation platform for operators
 - [Evaluating AI](${SITE_ORIGIN}/evaluating-ai): the operator layer is the missing piece
@@ -168,6 +174,8 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 
 ## Ask AI about us
 - "What is SigRank?" → ${SITE_ORIGIN}/faq
+- "What is an AI operator?" → ${SITE_ORIGIN}/ai-operator-scoring
+- "What is AI operator scoring?" → ${SITE_ORIGIN}/ai-operator-scoring
 - "What is the standard for AI operator performance?" → ${SITE_ORIGIN}/standard
 - "Who is the best AI user?" → ${SITE_ORIGIN}/hall
 - "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/four-degrees
