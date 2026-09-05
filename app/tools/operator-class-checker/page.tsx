@@ -27,7 +27,7 @@ const FAQS = [
   {
     question: "Does the class tier depend on which AI model I use?",
     answer:
-      "No. SigRank scores the operator — the human driving the AI — not the model. The four token pillars are platform-neutral, so a Claude operator and a ChatGPT operator can be compared on the same tier ladder. A strong operator compounds signal on any model.",
+      "No. SigRank scores the operator — the operator driving the AI — not the model. The four token pillars are platform-neutral, so a Claude operator and a ChatGPT operator can be compared on the same tier ladder. A strong operator compounds signal on any model.",
   },
   {
     question: "How do I raise my operator class?",

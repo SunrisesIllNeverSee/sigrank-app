@@ -2,7 +2,7 @@
  * app/guides/cache-write-convergence/page.tsx
  *
  * Troubleshooting guide: cache_write convergence, operating ratio stress test,
- * the cache_write red herring. Why HCM breaks on ChatGPT operators while
+ * the cache_write red herring. Why OCM breaks on ChatGPT operators while
  * AA avg and Codex PU hold.
  */
 
@@ -44,7 +44,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 3,
       name: "Apply each reference operating ratio",
-      text: "Run the AA avg (3.5:1:0.5), HCM (20:1:0.1), and Codex PU (243:1:1.03) ratios. Each ratio's velocity term splits combined input into true fresh input and cache_write.",
+      text: "Run the AA avg (3.5:1:0.5), OCM (20:1:0.1), and Codex PU (243:1:1.03) ratios. Each ratio's velocity term splits combined input into true fresh input and cache_write.",
     },
     {
       "@type": "HowToStep",
@@ -56,7 +56,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 5,
       name: "Select the validated ratio",
-      text: "The ratio that produces cache_write within the real range is the correct one. For most ChatGPT operators, AA avg and Codex PU pass. HCM fails on operators with small combined input relative to output.",
+      text: "The ratio that produces cache_write within the real range is the correct one. For most ChatGPT operators, AA avg and Codex PU pass. OCM fails on operators with small combined input relative to output.",
     },
   ],
 };
@@ -84,13 +84,13 @@ export default function CacheWriteConvergencePage() {
               question:
                 "What is the cache_write red herring?",
               answer:
-                "Cache_write is the derived number when re-parsing ChatGPT operators. It is what we solve for using operating ratios. When the derived cache_write matches what real operators produce (270-313M), the ratio fits. When it does not, the ratio is broken. HCM produces 44M cache_write for kr-yeon, 6x below the real range, proving it does not fit.",
+                "Cache_write is the derived number when re-parsing ChatGPT operators. It is what we solve for using operating ratios. When the derived cache_write matches what real operators produce (270-313M), the ratio fits. When it does not, the ratio is broken. OCM produces 44M cache_write for kr-yeon, 6x below the real range, proving it does not fit.",
             },
             {
               question:
                 "Which operating ratio should I use for ChatGPT operators?",
               answer:
-                "For most ChatGPT operators, AA avg (3.5:1:0.5) and Codex PU (243:1:1.03) both produce cache_write in the real range. HCM (20:1:0.1) fails on operators with small combined input relative to output because its low velocity forces input to consume most of the combined input, starving cache_write.",
+                "For most ChatGPT operators, AA avg (3.5:1:0.5) and Codex PU (243:1:1.03) both produce cache_write in the real range. OCM (20:1:0.1) fails on operators with small combined input relative to output because its low velocity forces input to consume most of the combined input, starving cache_write.",
             },
             {
               question:
@@ -134,7 +134,7 @@ export default function CacheWriteConvergencePage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="font-mono text-sm text-text-secondary overflow-x-auto">
 {`  AA avg:      3.5 : 1 : 0.5    (cache_read : input : output)
-  HCM:        20   : 1 : 0.1
+  OCM:        20   : 1 : 0.1
   Codex PU:  243   : 1 : 1.03`}
           </pre>
         </div>
@@ -205,7 +205,7 @@ export default function CacheWriteConvergencePage() {
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5 overflow-x-auto">
           <pre className="font-mono text-xs text-text-secondary">
-{`                      ChatGPT       AA avg         HCM       Codex PU
+{`                      ChatGPT       AA avg         OCM       Codex PU
                      (broken)    3.5:1:0.5     20:1:0.1   243:1:1.03
   ─────────────────  ────────────  ────────────  ────────────  ────────────
   Input                280,931,419    47,310,492  236,552,460    22,966,258
@@ -233,7 +233,7 @@ export default function CacheWriteConvergencePage() {
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5 overflow-x-auto">
           <pre className="font-mono text-xs text-text-secondary">
-{`  HCM operators (leverage 15-25x, n=276):
+{`  OCM operators (leverage 15-25x, n=276):
     avg cache_write:  313.4M
     avg input:      1,501.5M
 
@@ -251,37 +251,37 @@ export default function CacheWriteConvergencePage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="font-mono text-sm text-text-secondary overflow-x-auto">
 {`  AA avg:    233.6M cache_write    (within real range)
-  HCM:        44.4M cache_write    (6x below real range)
+  OCM:        44.4M cache_write    (6x below real range)
   Codex PU:  258.0M cache_write    (within real range)`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-gold">
-            HCM produces a cache_write number that does not exist in real data.
+            OCM produces a cache_write number that does not exist in real data.
           </strong>{" "}
           No cohort of operators at any leverage level produces 44M cache_write.
-          The HCM ratio is broken for this operator.
+          The OCM ratio is broken for this operator.
         </p>
       </section>
 
-      {/* ── Why HCM Breaks ──────────────────────────────────────────── */}
+      {/* ── Why OCM Breaks ──────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-          Why HCM breaks
+          Why OCM breaks
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          HCM&rsquo;s velocity is 0.1, meaning input = output / 0.1 = 236.6M.
+          OCM&rsquo;s velocity is 0.1, meaning input = output / 0.1 = 236.6M.
           That consumes 84% of the combined input (280.9M), leaving only 44.4M
           for cache_write.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Real HCM operators have 1,501.5M input. Their combined input is large
+          Real OCM operators have 1,501.5M input. Their combined input is large
           enough that even at 0.1 velocity, there&rsquo;s room for 313M of
           cache_write. kr-yeon&rsquo;s combined input is only 280.9M.
-          HCM&rsquo;s velocity assumption eats it alive.
+          OCM&rsquo;s velocity assumption eats it alive.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The HCM ratio works on real HCM operators because they have massive
+          The OCM ratio works on real OCM operators because they have massive
           input. It fails on ChatGPT operators whose combined input is small
           relative to their output, because the low velocity forces input to
           consume nearly all the combined input, starving cache_write.
@@ -322,7 +322,7 @@ export default function CacheWriteConvergencePage() {
           build a context library, and that library has a size.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Input is the variable that separates profiles. HCM operators use
+          Input is the variable that separates profiles. OCM operators use
           1,501.5M input. PU operators use 37.2M input. The difference is 40x.
           PU operators achieve the same or better results with 40x less input
           because they compound more efficiently.
@@ -347,10 +347,10 @@ export default function CacheWriteConvergencePage() {
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
             <p className="font-mono text-sm font-bold text-gold">
-              2. HCM breaks on low-combined-input operators
+              2. OCM breaks on low-combined-input operators
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              HCM&rsquo;s velocity of 0.1 forces input to consume most of the
+              OCM&rsquo;s velocity of 0.1 forces input to consume most of the
               combined input, producing an impossibly low cache_write. This
               ratio should not be used for ChatGPT operators with small combined
               input relative to output.
@@ -403,7 +403,7 @@ export default function CacheWriteConvergencePage() {
               operators. It is what we solve for using operating ratios. When
               the derived cache_write matches what real operators produce
               (270-313M), the ratio fits. When it does not, the ratio is broken.
-              HCM produces 44M cache_write for kr-yeon, 6x below the real range,
+              OCM produces 44M cache_write for kr-yeon, 6x below the real range,
               proving it does not fit.
             </dd>
           </div>
@@ -413,7 +413,7 @@ export default function CacheWriteConvergencePage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               For most ChatGPT operators, AA avg (3.5:1:0.5) and Codex PU
-              (243:1:1.03) both produce cache_write in the real range. HCM
+              (243:1:1.03) both produce cache_write in the real range. OCM
               (20:1:0.1) fails on operators with small combined input relative
               to output because its low velocity forces input to consume most of
               the combined input, starving cache_write.
@@ -446,7 +446,7 @@ export default function CacheWriteConvergencePage() {
             correctly.
           </li>
           <li className="font-sans text-sm leading-relaxed text-text-secondary">
-            HCM-like: cache_read/input between 15 and 25 (n=276)
+            OCM-like: cache_read/input between 15 and 25 (n=276)
           </li>
           <li className="font-sans text-sm leading-relaxed text-text-secondary">
             PU-like: cache_read/input between 200 and 300 (n=50)

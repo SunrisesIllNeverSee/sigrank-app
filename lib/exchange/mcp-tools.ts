@@ -391,6 +391,11 @@ export async function handleDiscoverDomain(args: {
       if (isProhibitedHost(redirectHost)) {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "redirect to prohibited host blocked (SSRF protection)" };
       }
+      // Reject cross-origin redirects — the manifest must be served from the
+      // requested domain, not a third-party host.
+      if (redirectHost !== domain) {
+        return { outcome: "invalid", domain, manifest_url: manifestUrl, error: `cross-origin redirect blocked: ${domain} → ${redirectHost}` };
+      }
       // Enforce HTTPS on the final destination
       if (!resolvedUrl.startsWith("https://")) {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "redirect to non-HTTPS URL blocked" };

@@ -80,7 +80,7 @@ export default function StandardPage() {
         subtitle={
           <>
             A proposed open measurement specification for the{" "}
-            <span className="text-gold">human operator layer</span> of generative AI.
+            <span className="text-gold">operator layer</span> of generative AI.
           </>
         }
       />
@@ -138,7 +138,7 @@ export default function StandardPage() {
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
           Model benchmarks measure models. Task evals measure task completion.
           Agent evals measure agent behavior. SigRank defines a portable
-          measurement vocabulary for the human operating the AI system. It is
+          measurement vocabulary for the operator driving the AI system. It is
           designed to complement those layers, not replace them.
         </p>
         <div className="mt-5 overflow-x-auto rounded border border-bg-border bg-bg-elevated p-4">

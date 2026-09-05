@@ -31,16 +31,16 @@ type Variant = "full" | "embed";
 /** The headline comparison table — the four degrees across seven metrics.
  * Owner-facing column headers (owner 2026-06-22, updated 2026-07-14, expanded to 4
  * degrees 2026-07-17). The first column is a static modeled baseline; the rest are
- * LIVE from the all-time board, filtered to the Human Center of Mass
+ * LIVE from the all-time board, filtered to the Operator Center of Mass
  * (outliers with input/total < 0.1% or > 80% are categorized separately):
  *   - "AA baseline"   = the Artificial Analysis 7:2:1 modeled reference (static)
- *   - "Human Center of Mass" = median of all real human operators (the typical operator)
- *   - "Power users"   = median of the top 100 real human operators (the typical elite)
- *   - "Top Evals"     = the single top real human operator (gold column)
- * `tone`: 'muted' = AA baseline, 'white' = HCM + Power user columns, 'gold' = Top Evals. */
+ *   - "Operator Center of Mass" = median of all real operators (the typical operator)
+ *   - "Power users"   = median of the top 100 real operators (the typical elite)
+ *   - "Top Evals"     = the single top real operator (gold column)
+ * `tone`: 'muted' = AA baseline, 'white' = OCM + Power user columns, 'gold' = Top Evals. */
 const COLS: { label: string; tone: "muted" | "white" | "gold" }[] = [
   { label: "AA baseline§", tone: "muted" },
-  { label: "Human Center of Mass*", tone: "white" },
+  { label: "Operator Center of Mass*", tone: "white" },
   { label: "Power users†", tone: "white" },
   { label: "Top Evals to date‡", tone: "gold" },
 ];
@@ -91,7 +91,7 @@ function buildDevRows(
 ): { degree: string; dev: string; linear: string }[] {
   return [
     { degree: "AA baseline (7:2:1 modeled reference)", dev: aa.dev10x, linear: aa.devLinear },
-    { degree: "Human Center of Mass (median, all human operators)*", dev: avg.dev10x, linear: avg.devLinear },
+    { degree: "Operator Center of Mass (median, all operators)*", dev: avg.dev10x, linear: avg.devLinear },
     { degree: "Power-user median (top 100)", dev: power.dev10x, linear: power.devLinear },
     {
       degree: "Top operator to date",
@@ -221,7 +221,7 @@ function SourceMarkers() {
       >
         all-time board
       </Link>{" "}
-      (auto-pulled at render). Human Center of Mass = median of all real operators;
+      (auto-pulled at render). Operator Center of Mass = median of all real operators;
       Power users = median of the top 100 by yield; Top Evals = the single leading
       operator. 130 outliers separated (see the{" "}
       <Link
@@ -382,9 +382,9 @@ function Provenance() {
         </p>
         <p>
           <span className="text-text-muted">*</span>{" "}
-          <strong>Human Center of Mass</strong>: median of all real operators on
+          <strong>Operator Center of Mass</strong>: median of all real operators on
           the all-time board, computed live at render. Excludes staged seeds, The
-          Field, retired/anonymized rows, and the 130 outliers (113 extreme humans + 17 flagged
+          Field, retired/anonymized rows, and the 130 outliers (113 extreme operators + 17 flagged
           flagged operators) that would skew the median. See the{" "}
           <Link
             href="/field"

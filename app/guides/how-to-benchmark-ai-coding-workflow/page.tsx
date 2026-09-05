@@ -78,7 +78,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
             {
               question: "What are AI coding benchmarks?",
               answer:
-                "AI coding benchmarks measure how effectively AI is used for software development. Model benchmarks (SWE-bench, LiveBench) evaluate which AI writes better code. Operator benchmarks (SigRank) evaluate how well the human drives the AI. Both matter, but only operator benchmarks improve when you change your workflow.",
+                "AI coding benchmarks measure how effectively AI is used for software development. Model benchmarks (SWE-bench, LiveBench) evaluate which AI writes better code. Operator benchmarks (SigRank) evaluate how well the operator drives the AI. Both matter, but only operator benchmarks improve when you change your workflow.",
             },
             {
               question: "What is the best AI coding benchmark in 2026?",
@@ -141,7 +141,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
           AI coding benchmarks measure how effectively AI tools are used for
           software development. Traditional benchmarks like SWE-bench and
           LiveBench evaluate <em>models</em> — which AI writes better code.
-          But they miss the human side: the operator driving the tool. A
+          But they miss the operator side: the operator driving the tool. A
           great operator with a mid-tier model can outperform a poor operator
           with the best model. AI coding benchmarks need to measure the
           <strong className="text-text-primary"> operator</strong>, not just
@@ -179,7 +179,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               Operator benchmarks (SigRank)
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              Evaluate the human driving the AI. SigRank measures token
+              Evaluate the operator driving the AI. SigRank measures token
               cascade efficiency — how much output you generate per token of
               input, how much context you reuse via cache, how much yield you
               compound. This is the benchmark that improves when{" "}
@@ -480,7 +480,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               SigRank (operator benchmark)
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              The only benchmark that measures the human behind the AI. Uses
+              The only benchmark that measures the operator behind the AI. Uses
               passive token telemetry — no tasks to complete, no controlled
               environments. Just your real workflow, measured continuously.
               Ranks operators by Yield (&#933;), not by model choice.
@@ -510,7 +510,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               AI coding benchmarks measure how effectively AI is used for
               software development. Model benchmarks (SWE-bench, LiveBench)
               evaluate which AI writes better code. Operator benchmarks
-              (SigRank) evaluate how well the human drives the AI. Both
+              (SigRank) evaluate how well the operator drives the AI. Both
               matter, but only operator benchmarks improve when you change
               your workflow.
             </dd>

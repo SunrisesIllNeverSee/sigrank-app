@@ -19,7 +19,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "AI Benchmarking — Beyond Model Leaderboards",
   description:
-    "AI coding benchmark tools rank the model, not the operator. SigRank benchmarks the human driving the AI \u2014 cascade efficiency, not preference votes. The new AI benchmarking standard.",
+    "AI coding benchmark tools rank the model, not the operator. SigRank benchmarks the operator driving the AI \u2014 cascade efficiency, not preference votes. The new AI benchmarking standard.",
   path: "/ai-benchmarking",
 });
 
@@ -56,7 +56,7 @@ export default function AIBenchmarkingPage() {
             {
               question: "What is AI benchmarking?",
               answer:
-                "AI benchmarking is the systematic measurement and comparison of AI system performance. Traditional AI benchmarking ranks models — which LLM scores highest on a test suite or wins the most preference votes. SigRank introduces a new category: operator benchmarking, which ranks the humans driving the AI by token-cascade efficiency rather than ranking the models themselves. AI coding benchmarks specifically measure how effectively AI tools are used for software development.",
+                "AI benchmarking is the systematic measurement and comparison of AI system performance. Traditional AI benchmarking ranks models — which LLM scores highest on a test suite or wins the most preference votes. SigRank introduces a new category: operator benchmarking, which ranks the operators driving the AI by token-cascade efficiency rather than ranking the models themselves. AI coding benchmarks specifically measure how effectively AI tools are used for software development.",
             },
             {
               question: "What is wrong with model-only benchmarking?",
@@ -67,7 +67,7 @@ export default function AIBenchmarkingPage() {
               question:
                 "What is the difference between operator benchmarking and model benchmarking?",
               answer:
-                'Model benchmarking asks "which AI is best?" and ranks models. Operator benchmarking asks "who is best at using the AI?" and ranks humans. Model benchmarking uses test suites or preference votes. Operator benchmarking uses real token telemetry from actual coding sessions. LMSYS Arena is a model benchmark. SigRank is an operator benchmark. They answer different questions.',
+                'Model benchmarking asks "which AI is best?" and ranks models. Operator benchmarking asks "who is best at using the AI?" and ranks operators. Model benchmarking uses test suites or preference votes. Operator benchmarking uses real token telemetry from actual coding sessions. LMSYS Arena is a model benchmark. SigRank is an operator benchmark. They answer different questions.',
             },
             {
               question: "How does SigRank benchmark AI operators?",
@@ -89,11 +89,11 @@ export default function AIBenchmarkingPage() {
         title="AI Benchmarking — Beyond Model Leaderboards"
         subtitle={
           <>
-            AI benchmarking tools for operators measure how effectively humans
+            AI benchmarking tools for operators measure how effectively operators
             use AI — not the AI models themselves. Traditional AI benchmarking
             ranks models.{" "}
             <span className="text-gold">Operator benchmarking</span> ranks the
-            human driving the AI — built on real token telemetry, not
+            operator driving the AI — built on real token telemetry, not
             preference votes.
           </>
         }
@@ -274,7 +274,7 @@ export default function AIBenchmarkingPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               The systematic measurement and comparison of AI system
               performance. Traditional benchmarking ranks models. SigRank
-              introduces operator benchmarking — ranking the humans driving the
+              introduces operator benchmarking — ranking the operators driving the
               AI by token-cascade efficiency.
             </dd>
           </div>
@@ -296,7 +296,7 @@ export default function AIBenchmarkingPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Model benchmarking asks &ldquo;which AI is best?&rdquo; and ranks
               models using test suites or votes. Operator benchmarking asks
-              &ldquo;who is best at using the AI?&rdquo; and ranks humans using
+              &ldquo;who is best at using the AI?&rdquo; and ranks operators using
               real token telemetry. They are complements, not competitors.
             </dd>
           </div>

@@ -174,7 +174,7 @@ export default function BestAiCodingBenchmarkingForAgenciesPage() {
           <strong className="text-text-primary">operator</strong>.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Agencies need to benchmark the operator — the human driving the AI.
+          Agencies need to benchmark the operator — the operator driving the AI.
           That means measuring the cascade: the flow of tokens between developer
           and model. Three metrics capture it:
         </p>

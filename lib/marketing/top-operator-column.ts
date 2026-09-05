@@ -12,7 +12,7 @@ import { isOutlierRow } from "@/lib/analytics/outlier-classify";
  *   1. "AA baseline"   — the Artificial Analysis 7:2:1 modeled reference (static).
  *                        Operating ratio 3.5:1:0.5 (cache_read : input : output).
  *                        Efficiency = 1.00 by definition. Not live data.
- *   2. "Human Center of Mass" — median of all real operators on the all-time board.
+ *   2. "Operator Center of Mass" — median of all real operators on the all-time board.
  *   3. "Power users"    — median of the top 100 real operators (by yield).
  *   4. "Top Evals"      — the single top real operator (gold column).
  *

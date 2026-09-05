@@ -38,7 +38,7 @@ const RELATED = [
   {
     href: "/ai-benchmarking",
     title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the humans driving them. The complement to model-only benchmarking in a production stack.",
+    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking in a production stack.",
   },
   {
     href: "/methodology",
@@ -182,7 +182,7 @@ export default function BestAIEvaluationToolsForProductionPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">Operator evaluation.</strong>{" "}
-          SigRank. The only tool that measures the human driving the AI. Four
+          SigRank. The only tool that measures the operator driving the AI. Four
           token pillars (input, output, cache-read, cache-write) captured
           on-device. Yield{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-xs text-gold">

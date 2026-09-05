@@ -45,13 +45,13 @@
        HEADER (compact)
        ═══════════════════════════════════════════════════════════════ -->
   <text x="40" y="38" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="3">SIGRANK · FIELD ANALYSIS</text>
-  <text x="40" y="66" font-family="Roboto, sans-serif" font-size="26" font-weight="900" fill="#f0c862">HCM vs Active Users</text>
+  <text x="40" y="66" font-family="Roboto, sans-serif" font-size="26" font-weight="900" fill="#f0c862">OCM vs Active Users</text>
   <text x="40" y="86" font-family="Roboto, sans-serif" font-size="12" fill="#6e8a6e">1,598 operators vs 8 claimed power users · the cache architect advantage</text>
 
   <!-- ═══════════════════════════════════════════════════════════════
        LEFT: CASCADE BLADE CHART (OP Ratio visualization)
        The OP ratio (cache_read : output : cache_write) drawn as blade shapes.
-       HCM = stubby triangle. Active Users = long sharp blade.
+       OCM = stubby triangle. Active Users = long sharp blade.
        This is the "wow" visual.
        ═══════════════════════════════════════════════════════════════ -->
   
@@ -66,13 +66,13 @@
   <text x="420" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">300</text>
   <text x="510" y="388" font-family="Roboto Mono, monospace" font-size="9" fill="#4a5a4a">428</text>
 
-  <!-- HCM blade (10.4:1:0.49) — normalized to max=428 -->
+  <!-- OCM blade (10.4:1:0.49) — normalized to max=428 -->
   <!-- cache_read=10.4 → 10.4/428*480 = 11.7px from center -->
   <!-- output=1 → 1/428*480 = 1.1px up -->
   <!-- cache_write=0.49 → 0.49/428*480 = 0.5px down -->
   <!-- Drawn as triangle from origin (60,370) -->
   <polygon points="60,370 71.7,369 71.7,371" fill="url(#bladeGray)" stroke="#5a6a5a" stroke-width="0.5"/>
-  <text x="80" y="355" font-family="Roboto Mono, monospace" font-size="11" fill="#6e8a6e">HCM</text>
+  <text x="80" y="355" font-family="Roboto Mono, monospace" font-size="11" fill="#6e8a6e">OCM</text>
   <text x="80" y="370" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a">10.4:1:0.49</text>
 
   <!-- PU blade (243:1:1.03) -->
@@ -96,7 +96,7 @@
 
   <!-- ═══════════════════════════════════════════════════════════════
        RIGHT: RADAR CHART (4 token categories, normalized)
-       Shows the shape difference between HCM and Active Users
+       Shows the shape difference between OCM and Active Users
        ═══════════════════════════════════════════════════════════════ -->
   
   <text x="620" y="120" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="2">TOKEN PROFILE · RADAR</text>
@@ -119,7 +119,7 @@
   <text x="800" y="375" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a" text-anchor="middle">CACHE W</text>
   <text x="675" y="254" font-family="Roboto Mono, monospace" font-size="9" fill="#5a6a5a" text-anchor="end">CACHE R</text>
 
-  <!-- HCM shape (normalized to max of each category = 100%)
+  <!-- OCM shape (normalized to max of each category = 100%)
        Input: 1.9B = 100% → top, 110px
        Output: 932M = 100% → right, 110px
        Cache Write: 440M = 100% → bottom, 110px
@@ -135,8 +135,8 @@
        Points: (800,249.6) (802.5,250) (800,304) (782,250) -->
   <polygon points="800,249.6 803,250 800,304 782,250" fill="#f0c862" fill-opacity="0.3" stroke="#f0c862" stroke-width="1.5"/>
 
-  <!-- HCM label -->
-  <text x="835" y="170" font-family="Roboto Mono, monospace" font-size="10" fill="#6e8a6e">HCM</text>
+  <!-- OCM label -->
+  <text x="835" y="170" font-family="Roboto Mono, monospace" font-size="10" fill="#6e8a6e">OCM</text>
   <rect x="833" y="174" width="20" height="2" fill="#5a6a5a"/>
 
   <!-- Active Users label -->
@@ -172,9 +172,9 @@
   
   <text x="860" y="425" font-family="Roboto Mono, monospace" font-size="10" fill="#5a8a5a" letter-spacing="2">TOKEN MIX</text>
 
-  <!-- HCM stacked bar (23.3B total) -->
+  <!-- OCM stacked bar (23.3B total) -->
   <!-- Cache Read 20B = 85.8%, Cache Write 440M = 1.9%, Output 932M = 4%, Input 1.9B = 8.2% -->
-  <text x="860" y="445" font-family="Roboto Mono, monospace" font-size="9" fill="#6e8a6e">HCM 23.3B</text>
+  <text x="860" y="445" font-family="Roboto Mono, monospace" font-size="9" fill="#6e8a6e">OCM 23.3B</text>
   <rect x="860" y="450" width="256" height="16" rx="2" fill="#141a14"/>
   <rect x="860" y="450" width="220" height="16" rx="2" fill="#3a4a3a"/>
   <rect x="1080" y="450" width="21" height="16" fill="#4a5a4a"/>
@@ -215,9 +215,9 @@
   <text x="52" y="622" font-family="Roboto Mono, monospace" font-size="15" font-weight="700" fill="#6e8a6e">3.5 : 1 : 0.5</text>
   <text x="52" y="636" font-family="Roboto, sans-serif" font-size="9" fill="#4a5a4a">all-users avg</text>
 
-  <!-- HCM -->
+  <!-- OCM -->
   <rect x="290" y="595" width="240" height="50" rx="6" fill="#0f1a10" stroke="#1a2a1a" stroke-width="1"/>
-  <text x="302" y="613" font-family="Roboto Mono, monospace" font-size="10" fill="#b0a060" letter-spacing="1">HCM</text>
+  <text x="302" y="613" font-family="Roboto Mono, monospace" font-size="10" fill="#b0a060" letter-spacing="1">OCM</text>
   <text x="302" y="632" font-family="Roboto Mono, monospace" font-size="15" font-weight="700" fill="#b0a060">20 : 1 : 0.1</text>
   <text x="302" y="646" font-family="Roboto, sans-serif" font-size="9" fill="#5a5a3a">human center of mass</text>
 

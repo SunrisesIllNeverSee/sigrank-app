@@ -40,7 +40,7 @@ export default function BotZoneShading() {
             <span className="font-mono font-bold text-green-400">
               1% - 80%
             </span>{" "}
-            - Human Center of Mass (1,498 operators)
+            - Operator Center of Mass (1,498 operators)
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export default function BotZoneShading() {
       <p className="text-xs text-text-muted">
         Outliers are not deleted. They get their own category and
         rank against each other. They just do not set the numbers for the
-        Human Center of Mass.
+        Operator Center of Mass.
       </p>
     </div>
   );

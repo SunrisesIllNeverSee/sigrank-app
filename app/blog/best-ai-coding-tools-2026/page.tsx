@@ -4,7 +4,7 @@
  *
  * Long-form blog post targeting "best ai coding tools 2026", "ai developer
  * performance tools", and "ai coding measurement". Reviews 7 tools, argues
- * that the operator (the human driving the AI) is the new unit of measurement.
+ * that the operator (the operator driving the AI) is the new unit of measurement.
  *
  * JSON-LD: ScholarlyArticle (inline, following lib/jsonld.ts pattern) +
  * BreadcrumbList + FAQPage.
@@ -58,7 +58,7 @@ const faqs = [
     question:
       "What are the best AI coding tools for measuring developer performance in 2026?",
     answer:
-      "SigRank, ccusage, and the Token Dashboard lead the field for token-based measurement. WakaTime remains useful for time tracking, while Cursor and GitHub Copilot offer limited built-in metrics. LMSYS ranks AI models, not operators. For measuring the human driving the AI, SigRank is the only tool that scores the operator directly.",
+      "SigRank, ccusage, and the Token Dashboard lead the field for token-based measurement. WakaTime remains useful for time tracking, while Cursor and GitHub Copilot offer limited built-in metrics. LMSYS ranks AI models, not operators. For measuring the operator driving the AI, SigRank is the only tool that scores the operator directly.",
   },
   {
     question:
@@ -80,7 +80,7 @@ const faqs = [
   {
     question: "How is SigRank different from LMSYS Chatbot Arena?",
     answer:
-      'LMSYS ranks AI MODELS by human preference in head-to-head matchups. SigRank ranks OPERATORS — the humans driving the AI — by token-cascade efficiency. LMSYS answers "which model is best?"; SigRank answers "which developer uses their model most efficiently?" They measure different units entirely.',
+      'LMSYS ranks AI MODELS by human preference in head-to-head matchups. SigRank ranks OPERATORS — the accounts driving the AI — by token-cascade efficiency. LMSYS answers "which model is best?"; SigRank answers "which developer uses their model most efficiently?" They measure different units entirely.',
   },
 ];
 

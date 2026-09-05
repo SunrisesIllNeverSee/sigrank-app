@@ -31,7 +31,7 @@ const COMPARE_ROWS: { feature: string; arena: string; sigrank: string }[] = [
   {
     feature: "What gets ranked",
     arena: "AI models (GPT, Claude, Gemini…)",
-    sigrank: "AI operators (the humans driving)",
+    sigrank: "AI operators (the operators driving)",
   },
   {
     feature: "Ranking signal",
@@ -90,12 +90,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What is the difference between Chatbot Arena and SigRank?",
     answer:
-      "Chatbot Arena — best known as LMSYS Chatbot Arena — ranks AI MODELS like GPT-4, Claude, and Gemini by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the humans driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. Chatbot Arena answers &quot;which model is best?&quot;; SigRank answers &quot;which operator drives best?&quot; Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
+      "Chatbot Arena — best known as LMSYS Chatbot Arena — ranks AI MODELS like GPT-4, Claude, and Gemini by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the operators driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. Chatbot Arena answers &quot;which model is best?&quot;; SigRank answers &quot;which operator drives best?&quot; Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
   },
   {
     question: "Is SigRank a Chatbot Arena alternative?",
     answer:
-      "They are complementary, not replacements. Chatbot Arena is the gold standard for model ranking — it tells you which AI to use. SigRank is the standard for operator ranking — it tells you how well you used it. You pick the model with Chatbot Arena; you measure your skill with SigRank. If you want an AI benchmarking leaderboard that ranks the human side of the human-AI loop, SigRank is the one that does that.",
+      "They are complementary, not replacements. Chatbot Arena is the gold standard for model ranking — it tells you which AI to use. SigRank is the standard for operator ranking — it tells you how well you used it. You pick the model with Chatbot Arena; you measure your skill with SigRank. If you want an AI benchmarking leaderboard that ranks the operator side of the operator-AI loop, SigRank is the one that does that.",
   },
   {
     question: "Is &quot;Chatbot Arena&quot; the same as LMSYS Chatbot Arena?",
@@ -170,8 +170,8 @@ export default function VsChatbotArenaPage() {
           Give ten operators the same model and the same task and you get ten
           different token cascades. The model didn&apos;t change — the driving
           did. Chatbot Arena ranks the car; SigRank ranks the driver. The
-          leaderboard that was missing was the one that scores the human in the
-          human-AI loop.
+          leaderboard that was missing was the one that scores the person in the
+          operator-AI loop.
         </p>
       </section>
 

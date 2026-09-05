@@ -120,7 +120,7 @@ export default function AIComplianceStandardsPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Most compliance effort has focused on the model, output, and safety
-          layers. The operator layer — whether the humans driving the AI are
+          layers. The operator layer — whether the operators driving the AI are
           driving it well — has been unmeasured. That is a compliance gap: you
           cannot fully govern AI risk if you cannot measure operator
           performance. SigRank closes it with governed, provenance-backed

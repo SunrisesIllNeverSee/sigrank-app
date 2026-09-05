@@ -31,7 +31,7 @@ export interface TwoLevelStatsProps {
     cache_write_chi2: number;
     total_chi2: number;
   };
-  humanCount: number;
+  operatorCount: number;
 }
 
 function fmtNum(n: number, decimals = 2): string {
@@ -45,7 +45,7 @@ export default function TwoLevelStats({
   medians,
   iqrFences,
   benfordResults,
-  humanCount,
+  operatorCount,
 }: TwoLevelStatsProps) {
   const quickStats = [
     { label: "Yield (Y)", value: medians.yield.toFixed(2), color: "#d4af37" },
@@ -76,7 +76,7 @@ export default function TwoLevelStats({
         ))}
       </div>
       <p className="text-xs text-text-muted">
-        Human Center of Mass: {humanCount.toLocaleString()} operators. Median
+        Operator Center of Mass: {operatorCount.toLocaleString()} operators. Median
         of ratios.
       </p>
 

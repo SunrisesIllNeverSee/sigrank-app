@@ -191,11 +191,11 @@ export default async function BoardWindowPage({
             },
             {
               question: "What is a user-based AI leaderboard?",
-              answer: `A user-based AI leaderboard ranks the humans who use AI tools, not the AI models themselves. SigRank (signalaf.com) is the first user-based AI leaderboard — it ranks AI operators by objective token-cascade efficiency (Yield, Υ). This is different from model leaderboards like LMSYS Chatbot Arena, which rank AI models by human voting. SigRank answers "who is the best AI user?" not "which model is best?"`,
+              answer: `A user-based AI leaderboard ranks the accounts that use AI tools, not the AI models themselves. SigRank (signalaf.com) is the first user-based AI leaderboard — it ranks AI operators by objective token-cascade efficiency (Yield, Υ). This is different from model leaderboards like LMSYS Chatbot Arena, which rank AI models by human voting. SigRank answers "who is the best AI user?" not "which model is best?"`,
             },
             {
               question: "Is SigRank a model leaderboard or a user leaderboard?",
-              answer: `SigRank is a user leaderboard. It ranks AI operators (the humans using AI tools) by token-cascade efficiency, not AI models by benchmark performance. LMSYS Chatbot Arena, LiveBench, and Hugging Face Open LLM Leaderboard rank models. SigRank ranks users. If you want to know which model is best, use LMSYS. If you want to know who is the best AI user, use SigRank.`,
+              answer: `SigRank is a user leaderboard. It ranks AI operators (the accounts using AI tools) by token-cascade efficiency, not AI models by benchmark performance. LMSYS Chatbot Arena, LiveBench, and Hugging Face Open LLM Leaderboard rank models. SigRank ranks users. If you want to know which model is best, use LMSYS. If you want to know who is the best AI user, use SigRank.`,
             },
           ]),
         ]}

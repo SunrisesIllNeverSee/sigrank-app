@@ -1,9 +1,9 @@
 /**
  * app/ai-agent-evaluation/page.tsx — "AI Agent Evaluation — Measuring the
- * Human Directing the Agent"
+ * Operator Directing the Agent"
  *
  * Frames AI agent evaluation as focusing on the agent, but agents are
- * directed by humans. SigRank measures the operator directing the agent.
+ * directed by operators. SigRank measures the operator directing the agent.
  * Links into /ai-evaluation, /methodology, /vs/braintrust, /vs/langfuse.
  *
  * JSON-LD: breadcrumb() + definedTerm() + faqPage().
@@ -17,9 +17,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Agent Evaluation — Measuring the Human Directing the Agent",
+  title: "AI Agent Evaluation — Measuring the Operator Directing the Agent",
   description:
-    "AI agent evaluation focuses on the agent. But agents are directed by humans. SigRank measures the operator directing the agent — privacy-preserving token telemetry, the Yield metric, and ed25519-signed snapshots.",
+    "AI agent evaluation focuses on the agent. But agents are directed by operators. SigRank measures the operator directing the agent — privacy-preserving token telemetry, the Yield metric, and ed25519-signed snapshots.",
   path: "/ai-agent-evaluation",
 });
 
@@ -27,7 +27,7 @@ const RELATED = [
   {
     href: "/ai-evaluation",
     title: "AI Evaluation — Measuring the Operator, Not Just the Model",
-    desc: "The four-layer model of AI evaluation: model, output, safety, operator. Agent evaluation sits at the operator layer — measuring the human directing the agent.",
+    desc: "The four-layer model of AI evaluation: model, output, safety, operator. Agent evaluation sits at the operator layer — measuring the operator directing the agent.",
   },
   {
     href: "/methodology",
@@ -42,7 +42,7 @@ const RELATED = [
   {
     href: "/vs/langfuse",
     title: "SigRank vs. Langfuse",
-    desc: "Langfuse traces LLM application behavior. SigRank measures the human driving the LLM. Tracing the agent vs. evaluating the operator.",
+    desc: "Langfuse traces LLM application behavior. SigRank measures the operator driving the LLM. Tracing the agent vs. evaluating the operator.",
   },
 ];
 
@@ -56,19 +56,19 @@ export default function AIAgentEvaluationPage() {
           ]),
           definedTerm(
             "AI Agent Evaluation",
-            "AI agent evaluation is the measurement and comparison of AI agent performance. Most agent evaluation focuses on the agent itself — task completion rate, tool-use accuracy, latency. But agents are directed by humans (operators), and two operators directing the same agent produce wildly different results. SigRank measures the operator directing the agent via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²). It is the operator layer of agent evaluation.",
+            "AI agent evaluation is the measurement and comparison of AI agent performance. Most agent evaluation focuses on the agent itself — task completion rate, tool-use accuracy, latency. But agents are directed by operators (operators), and two operators directing the same agent produce wildly different results. SigRank measures the operator directing the agent via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²). It is the operator layer of agent evaluation.",
             "/ai-agent-evaluation",
           ),
           faqPage([
             {
               question: "What is AI agent evaluation?",
               answer:
-                "AI agent evaluation is the measurement and comparison of AI agent performance. Most agent evaluation focuses on the agent itself — task completion rate, tool-use accuracy, latency, cost per task. These are necessary metrics, but they measure the agent, not the human directing it. Two operators directing the same agent produce wildly different results because the operator determines the context, the prompts, and the workflow. Complete agent evaluation must measure both the agent and the operator. SigRank covers the operator layer.",
+                "AI agent evaluation is the measurement and comparison of AI agent performance. Most agent evaluation focuses on the agent itself — task completion rate, tool-use accuracy, latency, cost per task. These are necessary metrics, but they measure the agent, not the operator directing it. Two operators directing the same agent produce wildly different results because the operator determines the context, the prompts, and the workflow. Complete agent evaluation must measure both the agent and the operator. SigRank covers the operator layer.",
             },
             {
               question: "Why evaluate the operator, not just the agent?",
               answer:
-                "Because the operator is the variable. You pick an agent and deploy it; the agent is a constant. The operator — the human directing the agent — is the variable that determines whether the agent succeeds or fails. Two operators on the same agent produce different task completion rates, different token efficiency, different cost per task. Agent-only evaluation averages that difference away. Operator evaluation with SigRank makes it visible, continuously, without reading a single prompt.",
+                "Because the operator is the variable. You pick an agent and deploy it; the agent is a constant. The operator — the operator directing the agent — is the variable that determines whether the agent succeeds or fails. Two operators on the same agent produce different task completion rates, different token efficiency, different cost per task. Agent-only evaluation averages that difference away. Operator evaluation with SigRank makes it visible, continuously, without reading a single prompt.",
             },
             {
               question: "How does SigRank evaluate agent operators?",
@@ -87,11 +87,11 @@ export default function AIAgentEvaluationPage() {
       <WaveHero
         eyebrow="◈ Agent Evaluation"
         terminalText="AGENT"
-        title="AI Agent Evaluation — Measuring the Human Directing the Agent"
+        title="AI Agent Evaluation — Measuring the Operator Directing the Agent"
         subtitle={
           <>
             AI agent evaluation focuses on the agent — task completion, tool
-            use, latency. But agents are directed by humans. SigRank measures
+            use, latency. But agents are directed by operators. SigRank measures
             the <span className="text-gold">operator</span> directing the
             agent — the variable that determines whether the agent succeeds.
           </>
@@ -109,7 +109,7 @@ export default function AIAgentEvaluationPage() {
           agent call the right tools in the right order? Latency: how long did
           the agent take? Cost per task: how many tokens did the agent burn?
           These are necessary metrics — but they measure the agent, not the
-          human directing it.
+          operator directing it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The blind spot is the operator. The operator determines the context
