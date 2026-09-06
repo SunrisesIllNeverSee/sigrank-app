@@ -7,7 +7,7 @@ import "server-only";
  * that no signal action can advance Contribution Exchange state.
  */
 
-import { getExchangeAdmin, normalizeDomain } from "./server";
+import { getExchangeAdmin, normalizeDomain, safeEqual } from "./server";
 import { computeRevisionHash, generateSignalId, generateAttemptId, generateVerificationId, generateQualificationId } from "@/exchange-gateway/src/signal-revision";
 import { type ExchangeSignalInput } from "@/exchange-gateway/src/signal-schema";
 import type { ExchangeSignal, SignalStatus, SignalType } from "@/exchange-gateway/src/signal-types";
@@ -581,7 +581,7 @@ export async function createAttempt(input: {
     .maybeSingle();
 
   if (existing) {
-    if (existing.request_hash !== input.requestHash) {
+    if (!safeEqual(existing.request_hash, input.requestHash)) {
       throw new Error("Idempotency key reuse with different request content");
     }
     return {
@@ -620,7 +620,7 @@ export async function createAttempt(input: {
         .eq("idempotency_key", input.idempotencyKey)
         .maybeSingle();
 
-      if (concurrent && concurrent.request_hash === input.requestHash) {
+      if (concurrent && safeEqual(concurrent.request_hash, input.requestHash)) {
         // Legitimate concurrent duplicate — idempotent success
         return {
           attempt_id: concurrent.id,

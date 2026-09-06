@@ -25,6 +25,7 @@ import "server-only";
 
 import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
 import { snapshotHash, verifySignature } from "@/lib/ingest/signature";
+import { safeEqual } from "@/lib/exchange/server";
 
 export type GateDecision = "accept" | "flag" | "reject";
 export type VerificationTier = "verified" | "flagged" | "unverified";
@@ -334,7 +335,7 @@ export function verificationGate(
   // not a hard reject; a MATCH is a positive integrity signal.
   if (p.agent.snapshot_hash) {
     const expected = snapshotHash(p);
-    if (expected !== p.agent.snapshot_hash) {
+    if (!safeEqual(expected, p.agent.snapshot_hash)) {
       reasons.push(
         flag(
           "verification",
