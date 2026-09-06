@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Roboto, Geist_Mono, Inter, Geist } from "next/font/google";
+import { Roboto, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
@@ -14,10 +14,6 @@ import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { WebMcpRegistrar } from "@/components/webmcp/register-tools";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
 // foundation). Wired to the existing --font-geist-sans var name so all
@@ -94,7 +90,7 @@ export default function RootLayout({
       lang="en"
       data-theme="terminal"
       suppressHydrationWarning
-      className={cn(geistSans.variable, geistMono.variable, articleSerif.variable, "font-sans", geist.variable)}
+      className={`${geistSans.variable} ${geistMono.variable} ${articleSerif.variable} font-sans`}
     >
       <body className="min-h-screen bg-bg-base text-text-primary">
         <JsonLd data={[org, website()]} />
