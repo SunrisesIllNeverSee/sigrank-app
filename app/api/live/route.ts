@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { timingSafeEqual } from "node:crypto";
 import { liveStore, liveState, publishLiveState } from "@/lib/live/store";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,14 @@ const snapshotSchema = z.object({
   observedAt: z.string().datetime().optional(),
 });
 
+function safeTokenEqual(supplied: string | undefined, expected: string): boolean {
+  if (!supplied) return false;
+  const a = Buffer.from(supplied);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
 export async function GET() {
   return NextResponse.json(liveState(), {
     headers: { "Cache-Control": "no-store" },
@@ -29,7 +38,7 @@ export async function POST(request: Request) {
     .get("authorization")
     ?.replace(/^Bearer\s+/i, "");
 
-  if (configuredToken ? suppliedToken !== configuredToken : !isLocal) {
+  if (configuredToken ? !safeTokenEqual(suppliedToken, configuredToken) : !isLocal) {
     return NextResponse.json(
       {
         error: configuredToken
