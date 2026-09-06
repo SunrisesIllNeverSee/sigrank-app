@@ -47,3 +47,5 @@ bun.lock
 .coord/micro/state/snapshots/
 .coord/micro/scratchpad-archive/
 .repo/.cache/
+skylos-output.json
+.skylos/
