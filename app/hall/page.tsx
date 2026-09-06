@@ -11,9 +11,9 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 import type { LeaderboardRow } from "@/lib/board";
 
 export const metadata: Metadata = withOG({
-  title: "Hall of Signal — Top AI Operators",
+  title: "AI Operator Hall of Fame — SigRank SignalAF",
   description:
-    "The top AI users in the world, ranked by measured token-cascade efficiency. Record-setting AI operators on the global SigRank leaderboard.",
+    "The AI operator hall of fame — top AI users ranked by measured token-cascade efficiency. Record-setting AI operators on the global SigRank leaderboard.",
   path: "/hall",
 });
 
@@ -86,22 +86,22 @@ export default async function HallPage() {
   return (
     <div>
       <JsonLd data={[
-        breadcrumb([{ name: "Hall of Signal", path: "/hall" }]),
+        breadcrumb([{ name: "AI Operator Hall of Fame", path: "/hall" }]),
         faqPage([
           {
-            question: "What is the Hall of Signal?",
+            question: "What is the AI Operator Hall of Fame?",
             answer:
-              "The Hall of Signal is the permanent record of peak signal across the SigRank leaderboard. It showcases the top AI operators by all-time Yield (Υ) across 18 metric boards — the record book for the best AI users measured by token cascade efficiency.",
+              "The AI Operator Hall of Fame is the permanent record of peak signal across the SigRank leaderboard. It showcases the top AI operators by all-time Yield (Υ) across 18 metric boards — the record book for the best AI users measured by token cascade efficiency.",
           },
           {
-            question: "Who qualifies for the Hall of Signal?",
+            question: "Who qualifies for the AI Operator Hall of Fame?",
             answer:
-              "The Hall of Signal shows claimed operators with real verified submissions. Operators who have enrolled, submitted signed token telemetry snapshots, and have active status appear in the Hall. Seed and scraped data are excluded from the Active scope — only real users are in the record book.",
+              "The AI Operator Hall of Fame shows claimed operators with real verified submissions. Operators who have enrolled, submitted signed token telemetry snapshots, and have active status appear in the Hall. Seed and scraped data are excluded from the Active scope — only real users are in the record book.",
           },
           {
-            question: "How many metric boards are in the Hall of Signal?",
+            question: "How many metric boards are in the AI Operator Hall of Fame?",
             answer:
-              "The Hall of Signal has 18 metric boards covering Yield, Leverage, Velocity, SNR, 10xDEV, Efficiency, Scale V, Cost per 1M tokens, Op Ratio, and more. Each board shows the top operators across 7-day, 30-day, 90-day, and all-time windows.",
+              "The AI Operator Hall of Fame has 18 metric boards covering Yield, Leverage, Velocity, SNR, 10xDEV, Efficiency, Scale V, Cost per 1M tokens, Op Ratio, and more. Each board shows the top operators across 7-day, 30-day, 90-day, and all-time windows.",
           },
         ]),
       ]} />
