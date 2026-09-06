@@ -276,7 +276,7 @@ async function checkSignalProposalRateLimit(ip: string): Promise<RateLimitedResu
  * Prevents SSRF attacks against loopback, link-local, private networks,
  * and cloud metadata services.
  */
-function isProhibitedHost(hostname: string): boolean {
+export function isProhibitedHost(hostname: string): boolean {
   const h = hostname.toLowerCase();
   // Loopback
   if (h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "[::1]") return true;

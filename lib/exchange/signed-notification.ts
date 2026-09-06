@@ -19,6 +19,7 @@ import "server-only";
 
 import { createHmac, createHash, randomUUID } from "node:crypto";
 import { safeEqual } from "./server";
+import { isProhibitedHost } from "./mcp-tools";
 
 export interface SignedNotificationHeaders {
   "x-exchange-signature": string;
@@ -137,10 +138,21 @@ export async function deliverSignedNotification(params: {
   };
 
   try {
+    const parsedUrl = new URL(endpoint);
+    if (isProhibitedHost(parsedUrl.hostname)) {
+      return {
+        delivered: false,
+        reason: "endpoint_host_prohibited",
+        event_id: eventId,
+        nonce,
+        signature,
+      };
+    }
     const response = await fetch(endpoint, {
       method: "POST",
       headers,
       body,
+      redirect: "manual",
       signal: AbortSignal.timeout(5000),
     });
     return {

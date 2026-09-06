@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ExchangePolicyUpdateSchema } from '@/exchange-gateway/src/schema'
 import { mergeExchangePolicy } from '@/exchange-gateway/src/policy'
 import { authenticateCompany, findCompany, getExchangeAdmin, hashSecret, newSecret, normalizeDomain } from '@/lib/exchange/server'
+import { isProhibitedHost } from '@/lib/exchange/mcp-tools'
 
 export async function GET(req:NextRequest){
   const domain=normalizeDomain(req.nextUrl.searchParams.get('domain')||'')
@@ -29,6 +30,7 @@ export async function POST(req:NextRequest){
   const p=parsed.data
   if(!(await authenticateCompany(p.domain,req.headers.get('x-exchange-company-key')))) return NextResponse.json({error:'Unauthorized'},{status:401})
   if(p.agentMode==='bring_your_own'&&!p.exchangeAgentEndpoint) return NextResponse.json({error:'Bring-your-own-agent mode requires an agent endpoint'},{status:400})
+  if(p.exchangeAgentEndpoint){try{const u=new URL(p.exchangeAgentEndpoint);if(isProhibitedHost(u.hostname))return NextResponse.json({error:'Agent endpoint must not point to private/loopback/metadata hosts'},{status:400})}catch{return NextResponse.json({error:'Agent endpoint must be a valid URL'},{status:400})}}
   const company=await findCompany(p.domain)
   if(!company) return NextResponse.json({error:'Company not found'},{status:404})
   const policy=mergeExchangePolicy(company.exchange_policy,company.categories||[])
