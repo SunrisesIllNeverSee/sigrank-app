@@ -1317,7 +1317,7 @@ export async function handleSubmitAttempt(
       existingAttempt.status === "inconclusive" ||
       existingAttempt.status === "verifier_error")) {
     const existingHash = existingAttempt.submission_body_hash as string | undefined;
-    if (existingHash === bodyHash) {
+    if (existingHash && safeEqual(existingHash, bodyHash)) {
       return {
         operation: "attempt_submitted",
         outcome: "idempotent_replay",
