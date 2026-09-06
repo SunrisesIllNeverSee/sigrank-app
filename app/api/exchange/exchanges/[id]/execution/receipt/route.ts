@@ -3,7 +3,7 @@ import { SubmitReceiptSchema } from '@/exchange-gateway/src/schema'
 import { getVerifier, VerificationError } from '@/exchange-gateway/src/providers/callback-verifier'
 import { bootstrapVerifiers } from '@/exchange-gateway/src/providers/verifier-bootstrap'
 import { validateTransition, receiptStatusToState } from '@/exchange-gateway/src/execution-state'
-import { appendExchangeEvent, authenticateCompany, authenticateProposer, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
+import { appendExchangeEvent, authenticateCompany, authenticateProposer, getExchangeAdmin, logEncounter, safeEqual } from '@/lib/exchange/server'
 import { createHash } from 'node:crypto'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .maybeSingle()
 
   if (existingReceipt) {
-    if (existingReceipt.payload_hash === payloadHash) {
+    if (safeEqual(existingReceipt.payload_hash, payloadHash)) {
       // Idempotent duplicate — return success, no new receipt, no state change
       return NextResponse.json({
         accepted: true,
@@ -306,7 +306,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .maybeSingle()
 
       // Case (a): legitimate concurrent duplicate — idempotent success.
-      if (existing && existing.payload_hash === payloadHash) {
+      if (existing && safeEqual(existing.payload_hash, payloadHash)) {
         return NextResponse.json({
           accepted: true,
           idempotent: true,
@@ -319,7 +319,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
 
       // Case (b): same event ID with a different payload — conflict.
-      if (existing && existing.payload_hash !== payloadHash) {
+      if (existing && !safeEqual(existing.payload_hash, payloadHash)) {
         await appendExchangeEvent({
           exchangeId: record.id,
           eventType: 'execution_receipt_conflict',

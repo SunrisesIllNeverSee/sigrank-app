@@ -12,7 +12,11 @@
  * without email notifications, they're additive.
  *
  * API docs: https://agentmail.to/docs/api-reference
- *
+ */
+
+import "server-only";
+
+/**
  * ── AgentMail SDK quickstart (reference) ──────────────────────────────
  *
  * This file uses fetch() directly to avoid adding a dependency. The official

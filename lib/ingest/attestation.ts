@@ -17,6 +17,7 @@ import "server-only";
  */
 
 import { getSupabaseService } from "@/lib/infra/supabase/server";
+import { safeEqual } from "@/lib/exchange/server";
 import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
 import type { GateReason } from "@/lib/ingest/gates";
 
@@ -88,7 +89,7 @@ export async function checkAndStoreAttestation(
 
         // Tampering signal 1: content_hash changed but timestamps are identical.
         if (
-          hRow.content_hash !== e.content_hash &&
+          !safeEqual(hRow.content_hash, e.content_hash) &&
           hRow.first_ts === e.first_ts &&
           hRow.last_ts === e.last_ts
         ) {

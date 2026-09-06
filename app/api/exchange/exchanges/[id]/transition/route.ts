@@ -5,7 +5,7 @@ import { finalizeCommitment } from '@/exchange-gateway/src/commitment'
 import { commitmentAuthorizationWithinCeiling } from '@/exchange-gateway/src/policy'
 import type { ExchangeState } from '@/exchange-gateway/src/types'
 import { companyPolicy } from '@/lib/exchange/steward'
-import { appendExchangeEvent, authenticateCompany, authenticateDomainAgent, authenticateProposer, findCompany, getExchangeAdmin } from '@/lib/exchange/server'
+import { appendExchangeEvent, authenticateCompany, authenticateDomainAgent, authenticateProposer, findCompany, getExchangeAdmin, safeEqual } from '@/lib/exchange/server'
 
 export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>}){
   const publicId=(await params).id
@@ -39,7 +39,7 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
     if(!parsed.data.commitment) return NextResponse.json({error:'Commitment object required'},{status:400})
     const commitment=finalizeCommitment(parsed.data.commitment)
     const hash=commitment.provenance.terms_hash!
-    const existing=record.terms_hash===hash ? (record.commitment_acceptances||{}) : {}
+    const existing=record.terms_hash && safeEqual(record.terms_hash, hash) ? (record.commitment_acceptances||{}) : {}
     const acceptanceRole=role==='company'?'company':'proposer'
     const acceptances={...existing,[acceptanceRole]:{terms_hash:hash,accepted_at:new Date().toISOString(),accepted_by:domainAgent&&!companyAdmin?'domain_agent':acceptanceRole}}
     const both=!!acceptances.company&&!!acceptances.proposer
