@@ -19,6 +19,10 @@
 import React, { useCallback, useRef, useState } from "react";
 import { track } from "@/lib/infra/posthog/events";
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 interface BoardCaptureProps {
   /** The table container element to capture. */
   targetRef: React.RefObject<HTMLDivElement | null>;
@@ -87,9 +91,9 @@ export function BoardCapture({ targetRef, filters }: BoardCaptureProps) {
         <span style="color:rgb(var(--text-muted));font-weight:400;">— Leaderboard Snapshot</span>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;color:rgb(var(--text-muted));font-size:11px;">
-        ${parts.map((p) => `<span style="padding:2px 8px;border:1px solid rgb(var(--bg-border));border-radius:4px;">${p}</span>`).join("")}
+        ${parts.map((p) => `<span style="padding:2px 8px;border:1px solid rgb(var(--bg-border));border-radius:4px;">${escapeHtml(p)}</span>`).join("")}
       </div>
-      <div style="color:rgb(var(--text-muted));font-size:11px;font-variant-numeric:tabular-nums;">${ts}</div>
+      <div style="color:rgb(var(--text-muted));font-size:11px;font-variant-numeric:tabular-nums;">${escapeHtml(ts)}</div>
     `;
     return overlay;
   }, [filters]);

@@ -3,6 +3,7 @@ import { CompanyRegistrationSchema } from '@/exchange-gateway/src/schema'
 import { defaultExchangePolicy } from '@/exchange-gateway/src/policy'
 import { getExchangeAdmin, hashSecret, newSecret, normalizeDomain, requestIdentity } from '@/lib/exchange/server'
 import { rateLimitAllow } from '@/lib/exchange/rate-limit'
+import { isProhibitedHost } from '@/lib/exchange/mcp-tools'
 
 export async function POST(req: NextRequest){
   if(!rateLimitAllow(requestIdentity(req),'exchange_company_signup')) return NextResponse.json({error:'Rate limited'},{status:429})
@@ -11,6 +12,7 @@ export async function POST(req: NextRequest){
   const p=parsed.data
   if(p.honeypot) return NextResponse.json({error:'Rejected'},{status:400})
   if(p.agentMode==='bring_your_own'&&!p.exchangeAgentEndpoint) return NextResponse.json({error:'Bring-your-own-agent mode requires an HTTPS agent endpoint'},{status:400})
+  if(p.exchangeAgentEndpoint){try{const u=new URL(p.exchangeAgentEndpoint);if(isProhibitedHost(u.hostname))return NextResponse.json({error:'Agent endpoint must not point to private/loopback/metadata hosts'},{status:400})}catch{return NextResponse.json({error:'Agent endpoint must be a valid URL'},{status:400})}}
   const admin=getExchangeAdmin()
   const domain=normalizeDomain(p.domain)
   const {data:existing}=await admin.from('exchange_companies').select('id,verification_status').eq('domain',domain).maybeSingle()
