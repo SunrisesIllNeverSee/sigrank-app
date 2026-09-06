@@ -11,13 +11,13 @@ import { WaveHero } from "@/components/ui/WaveHero";
 export function HallHero() {
   return (
     <WaveHero
-      eyebrow="AI OPERATOR HALL OF FAME"
-      terminalText="HALL OF FAME"
-      title="The Top AI Users in the World"
+      eyebrow="TRIUMPHUS FAMAE ET GLORIAE"
+      terminalText="FAMAE ET GLORIA"
+      title="AI Operator Hall of Fame"
       subtitle={
         <>
-          AI operator hall of fame — record-setting AI operators ranked by
-          measured global token-cascade efficiency.
+          Hall of Signal — record-setting AI operators ranked by measured
+          global token-cascade efficiency.
         </>
       }
     />
