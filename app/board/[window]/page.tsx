@@ -53,15 +53,19 @@ export async function generateMetadata({
   const win = boardWindowBySlug(slug);
   if (!win) return { title: "Board not found" };
   const label = win.label;
+  const isAllTime = win.slug === "all";
+  const titleLabel = isAllTime ? "AI User Leaderboard" : `${label} Leaderboard`;
   return withOG({
-    title: `${label} Leaderboard`,
-    description: `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
+    title: titleLabel,
+    description: isAllTime
+      ? `The SigRank AI user leaderboard — AI users ranked by Υ Yield (token cascade efficiency). See how top AI operators compare all-time.`
+      : `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
     path: `/board/${slug}`,
     ogImage: {
       url: `/board/${slug}/og`,
       width: 1200,
       height: 630,
-      alt: `SigRank ${label} Leaderboard`,
+      alt: `SigRank ${titleLabel}`,
     },
   });
 }
@@ -84,6 +88,7 @@ export default async function BoardWindowPage({
 
   const win = boardWindowBySlug(slug);
   if (!win) notFound();
+  const isAllTime = win.slug === "all";
 
   // All windows now query the DB directly. ISR (revalidate=3600) bounds
   // egress to 1 query/hour. Only claimed/live operators are shown — the
@@ -128,10 +133,10 @@ export default async function BoardWindowPage({
   }
 
   // Dynamic H1 label: each board window gets a unique page heading (e.g.
-  // "30-Day Leaderboard" vs "All-Time Leaderboard") so /board/all and /board/30d
-  // don't share the same H1. "Burners, Builders & 10×ers" moves to the eyebrow.
-  const boardLabel = win.slug === "all"
-    ? "All-Time"
+  // "30-Day Leaderboard" vs "AI User Leaderboard") so /board/all and /board/30d
+  // don't share the same H1.
+  const boardLabel = isAllTime
+    ? "AI User"
     : `${win.days}-Day`;
 
   return (
@@ -139,7 +144,7 @@ export default async function BoardWindowPage({
       {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
           same animated <WaveHero/> as the Hall, with board-specific copy. */}
       <WaveHero
-        eyebrow="Burners, Builders & 10×ers"
+        eyebrow={isAllTime ? "AI USER LEADERBOARD" : "SIGNALBOARD"}
         terminalText="SIGNALBOARD"
         title={
           <>
