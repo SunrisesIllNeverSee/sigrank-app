@@ -144,7 +144,7 @@ export default async function BoardWindowPage({
       {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
           same animated <WaveHero/> as the Hall, with board-specific copy. */}
       <WaveHero
-        eyebrow={isAllTime ? "AI USER LEADERBOARD" : "SIGNALBOARD"}
+        eyebrow="Burners, Builders & 10×ers"
         terminalText="SIGNALBOARD"
         title={
           <>
