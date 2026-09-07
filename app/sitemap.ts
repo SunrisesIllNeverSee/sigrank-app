@@ -114,7 +114,7 @@ const STATIC_ROUTES: {
   // "Excluded by noindex tag" and "Duplicate without user-selected canonical"
   // errors in Google Search Console.
   { path: "/upgrade", priority: 0.4, changeFrequency: "monthly" },
-  { path: "/login", priority: 0.3, changeFrequency: "yearly" },
+  // /login removed from sitemap — utility page, not index-worthy (P8)
 
   // ── Core public pages (2026-09-04 audit — were missing from sitemap) ──────
   { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
@@ -349,8 +349,7 @@ const STATIC_ROUTES: {
   { path: "/cascade-analysis", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
   { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-04T00:00:00Z") },
-  // NS-02.04 named category pages (301 redirects to nearest equivalents)
-  { path: "/ai-operator-benchmark", priority: 0.6, changeFrequency: "monthly" },
+  // /ai-operator-benchmark removed from sitemap — 308-redirects to /ai-operator-scoring (P8)
   { path: "/token-efficiency", priority: 0.6, changeFrequency: "monthly" },
   { path: "/privacy-preserving-ai-telemetry", priority: 0.8, changeFrequency: "monthly" },
   { path: "/ai-coding-analytics", priority: 0.6, changeFrequency: "monthly" },
