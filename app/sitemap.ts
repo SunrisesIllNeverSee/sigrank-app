@@ -350,9 +350,9 @@ const STATIC_ROUTES: {
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
   { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-04T00:00:00Z") },
   // /ai-operator-benchmark removed from sitemap — 308-redirects to /ai-operator-scoring (P8)
-  { path: "/token-efficiency", priority: 0.6, changeFrequency: "monthly" },
+  // /token-efficiency removed from sitemap — 308-redirects to /metrics/yield-cascade (P8)
   { path: "/privacy-preserving-ai-telemetry", priority: 0.8, changeFrequency: "monthly" },
-  { path: "/ai-coding-analytics", priority: 0.6, changeFrequency: "monthly" },
+  // /ai-coding-analytics removed from sitemap — 308-redirects to /ai-coding-metrics (P8)
 
   // AI evaluation topic pages — from content brief (2026-09-15)
   { path: "/ai-evaluation", priority: 0.8, changeFrequency: "monthly" },
