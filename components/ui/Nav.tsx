@@ -21,6 +21,7 @@ const LINKS: { href: string; label: string }[] = [
   { href: "/hall", label: "Hall" },
   { href: "/wiki", label: "Wiki" },
   { href: "/blog", label: "Blog" },
+  { href: "https://mos2es.org/baseline-assessment", label: "Enterprise" },
 ];
 
 /**
