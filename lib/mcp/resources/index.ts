@@ -105,8 +105,8 @@ SigRank v0.1 portable core — required for base compatibility:
   Υ = (cache_read × output) / input²
   Leverage = cache_read / input
   Velocity = output / input
-  SNR = output / (input + output)
-  10xDEV = log10(cache_read / input) under the reference null policy
+  SNR (output_fraction) = output / (input + output)
+  10xDEV (log_leverage) = log10(cache_read / input) under the reference null policy
 
 Optional SignalAF reference extensions — not required for base compatibility:
   Scale V — a leaderboard scale dimension
@@ -138,11 +138,11 @@ Leverage: cache_read / input
 Velocity: output / input
   How many output tokens per input token.
 
-SNR: output / (input + output)
-  What fraction of total flow is output.
+SNR (output_fraction): output / (input + output)
+  What fraction of total flow is output. The canonical TTEOP name is output_fraction; SNR is the display label.
 
-10xDEV: log10(cache_read / input)
-  Log-scale cascade summary under the reference null policy.
+10xDEV (log_leverage): log10(cache_read / input)
+  Log-scale cascade summary under the reference null policy. The canonical TTEOP name is log_leverage; 10xDEV is the display label.
 
 Optional SignalAF reference extensions — not required for base compatibility
 
