@@ -18,9 +18,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "ccusage Alternatives: Token Tracking & Analysis",
+  title: "cc usage Alternatives: Token Tracking & Analysis Tools",
   description:
-    "The 5 best ccusage alternatives in 2026. SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale \u2014 compared on scoring, leaderboards, and MCP.",
+    "The 5 best cc usage alternatives in 2026. Compare SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale on scoring, leaderboards, and MCP integration.",
   path: "/alternatives/ccusage-alternatives",
 });
 
@@ -170,7 +170,7 @@ export default function CcusageAlternativesPage() {
 
       <WaveHero
         eyebrow="◈ Alternatives"
-        title="ccusage Alternatives for Token Tracking & Analysis"
+        title="cc usage Alternatives for Token Tracking & Analysis"
         subtitle={
           <>
             ccusage is great for reading token usage. These five alternatives
@@ -186,17 +186,18 @@ export default function CcusageAlternativesPage() {
       {/* Intro */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          What ccusage does well — and where it stops
+          What cc usage does well — and where it stops
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          <strong className="text-text-primary">ccusage</strong> is a clean,
-          reliable CLI that reads Claude Code token logs locally and reports
-          your input, output, cache-read, and cache-write counts. It does one
-          thing well: measurement. But it stops there. It does not score your
-          efficiency, rank you against other operators, support multiple AI
-          platforms, or expose an MCP interface for agents. If you want any of
-          those, you need an alternative — and the best one bundles ccusage
-          rather than replacing it.
+          <strong className="text-text-primary">ccusage</strong> (often
+          searched as &quot;cc usage&quot;) is a clean, reliable CLI that reads
+          Claude Code token logs locally and reports your input, output,
+          cache-read, and cache-write counts. It does one thing well:
+          measurement. But it stops there. It does not score your efficiency,
+          rank you against other operators, support multiple AI platforms, or
+          expose an MCP interface for agents. If you want any of those, you need
+          an alternative — and the best one bundles ccusage rather than
+          replacing it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           Here are the five best ccusage alternatives in 2026.
