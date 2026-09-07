@@ -89,6 +89,42 @@ export function deriveAgentIdentity(
 }
 
 /**
+ * Known MCP scanner/probe/monitor client names.
+ * These bots crawl public MCP servers for directories, uptime monitoring,
+ * and registry indexing. They generate ~99% of initialize/tools_list noise
+ * but almost no real tool_call usage.
+ *
+ * We still record their calls to Supabase (durable log) but skip PostHog
+ * for initialize/tools_list to keep behavioral analytics clean.
+ * tools_call events are always recorded (even from scanners) because
+ * those represent actual tool invocations.
+ */
+const SCANNER_CLIENT_PATTERNS = [
+  "probe",
+  "scan",
+  "watch",
+  "monitor",
+  "beat",
+  "drift",
+  "index",
+  "hub",
+  "bench",
+  "audit",
+  "centinela",
+  "glama",
+  "agent-tools.cloud",
+  "rugpull",
+  "reliability-bureau",
+  "acton-skill",
+];
+
+function isScannerClient(clientName: string | undefined): boolean {
+  if (!clientName) return false;
+  const lower = clientName.toLowerCase();
+  return SCANNER_CLIENT_PATTERNS.some((p) => lower.includes(p));
+}
+
+/**
  * Derive auth tier from scopes.
  */
 export function deriveAuthTier(scopes: Set<string>): McpAuthTier {
@@ -140,6 +176,16 @@ export async function recordMcpCall(record: McpCallRecord): Promise<void> {
     // Emit a privacy-safe PostHog event for behavioral analytics.
     // Supabase is the durable source; PostHog is behavioral analytics.
     // No secrets, no full payloads — only enum-like properties.
+    //
+    // Scanner filter: skip PostHog for initialize/tools_list from known
+    // scanner/probe/monitor bots. These generate ~99% of MCP traffic noise
+    // (directory crawlers, uptime monitors, registry indexers) but almost
+    // no real usage. tools_call events are always recorded because they
+    // represent actual tool invocations. Supabase still gets the full log.
+    const isScannerNoise = isScannerClient(record.client_name)
+      && (record.operation === "initialize" || record.operation === "tools_list");
+    if (isScannerNoise) return;
+
     const durationBucket = record.duration_ms == null
       ? "unknown"
       : record.duration_ms < 50 ? "<50ms"
