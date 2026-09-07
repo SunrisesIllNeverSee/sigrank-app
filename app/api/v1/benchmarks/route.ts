@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getLeaderboard } from "@/lib/board";
 import { fieldStats } from "@sigrank/cascade";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 /**
  * GET /api/v1/benchmarks
@@ -86,7 +86,7 @@ export async function GET(req: Request) {
     snr: computeBands(snrs),
   }, {
     headers: {
-      "Cache-Control": "public, max-age=300",
+      "Cache-Control": "public, max-age=1800, s-maxage=1800, stale-while-revalidate=3600",
     },
   });
 }

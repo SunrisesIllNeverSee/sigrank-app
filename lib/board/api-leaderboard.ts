@@ -10,9 +10,12 @@
 
 import type { LeaderboardRow } from "@/lib/board";
 
-/** D19: leaderboard responses carry Cache-Control max-age=300 + s-maxage for CDN. */
+/** D19: leaderboard responses carry Cache-Control for CDN caching.
+ * TTL increased from 300s to 1800s — on-demand revalidation via
+ * revalidateTouchedWindows() busts caches on submission, so the TTL
+ * is only a fallback for idle periods. */
 export const LEADERBOARD_CACHE_CONTROL =
-  "public, max-age=300, s-maxage=300, stale-while-revalidate=600";
+  "public, max-age=1800, s-maxage=1800, stale-while-revalidate=3600";
 
 /**
  * Serialize one row to the api_spec.md leaderboard entry shape.

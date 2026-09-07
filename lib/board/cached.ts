@@ -73,35 +73,39 @@ import type {
   OperatorRecordsResult,
 } from "@/lib/board/queries";
 
-// ── Board-tagged reads (revalidate: 300s) ────────────────────────────────
+// ── Board-tagged reads (revalidate: 3600s) ───────────────────────────────
+// TTL is a fallback only — revalidateTouchedWindows() fires on every verified
+// submission and busts all board + operator caches on-demand. The 3600s TTL
+// means that if no submissions arrive for an hour, the cache refreshes once
+// instead of every 5 minutes (12x fewer DB hits during idle periods).
 
 // ⚠ getLeaderboard uses the in-memory memo cache instead of unstable_cache
 // because the serialized payload (~2.5MB for 1,640 operators) exceeds
 // Vercel's 2MB Data Cache limit. The memo cache has no size limit and
 // deduplicates concurrent requests (a 100-request burst = 1 DB hit).
 // Cache key includes JSON-serialized params so different filters cache
-// separately. TTL matches the original unstable_cache revalidate (300s).
+// separately. TTL matches the original unstable_cache revalidate (3600s).
 export function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
   const key = `board:leaderboard:${JSON.stringify(params)}`;
-  return memoize(key, 300, () => _getLeaderboard(params));
+  return memoize(key, 3600, () => _getLeaderboard(params));
 }
 
 export const getHallOfSignal = unstable_cache(
   _getHallOfSignal,
   ["hall-of-signal"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 export const getClassDistribution = unstable_cache(
   _getClassDistribution,
   ["class-distribution"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 export const getMetricLeaders = unstable_cache(
   _getMetricLeaders,
   ["metric-leaders"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 export const getHomepageStats = unstable_cache(
@@ -113,19 +117,19 @@ export const getHomepageStats = unstable_cache(
 export const getOnlineHourly = unstable_cache(
   _getOnlineHourly,
   ["online-hourly"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 export const getOnlineWeekly = unstable_cache(
   _getOnlineWeekly,
   ["online-weekly"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 export const getOnlineByCountry = unstable_cache(
   _getOnlineByCountry,
   ["online-by-country"],
-  { revalidate: 300, tags: ["board"] },
+  { revalidate: 3600, tags: ["board"] },
 );
 
 // ── Operator-tagged reads (staggered revalidate) ─────────────────────────

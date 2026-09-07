@@ -41,26 +41,27 @@ const nextConfig: NextConfig = {
       // 2026-07-24 because the page was force-dynamic (no edge caching); now
       // that the page is ISR, Vercel handles edge caching natively.
       {
-        // Hall of Signal is ISR (force-static + revalidate=300). Edge-cache
-        // the prerendered HTML so LCP is instant. s-maxage=300 matches the
+        // Hall of Signal is ISR (force-static + revalidate=3600). Edge-cache
+        // the prerendered HTML so LCP is instant. s-maxage=3600 matches the
         // revalidate window; stale-while-revalidate keeps serving during refresh.
+        // On-demand revalidation via revalidateTouchedWindows() busts on submit.
         source: "/hall",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, s-maxage=300, stale-while-revalidate=600",
+            value: "public, s-maxage=3600, stale-while-revalidate=7200",
           },
         ],
       },
       {
-        // /compare is ISR (force-static + revalidate=300). The default view
+        // /compare is ISR (force-static + revalidate=3600). The default view
         // (day-seeded pick vs the-field) is prerendered and edge-cached.
         // Each unique ?a=X&b=Y combination is SSR'd on first request then cached.
         source: "/compare",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, s-maxage=300, stale-while-revalidate=600",
+            value: "public, s-maxage=3600, stale-while-revalidate=7200",
           },
         ],
       },
