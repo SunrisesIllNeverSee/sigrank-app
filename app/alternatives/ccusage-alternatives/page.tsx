@@ -18,7 +18,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Best ccusage Alternatives (2026)",
+  title: "ccusage Alternatives: Token Tracking & Analysis",
   description:
     "The 5 best ccusage alternatives in 2026. SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale \u2014 compared on scoring, leaderboards, and MCP.",
   path: "/alternatives/ccusage-alternatives",
@@ -170,7 +170,7 @@ export default function CcusageAlternativesPage() {
 
       <WaveHero
         eyebrow="◈ Alternatives"
-        title="Best ccusage Alternatives (2026)"
+        title="ccusage Alternatives for Token Tracking & Analysis"
         subtitle={
           <>
             ccusage is great for reading token usage. These five alternatives
@@ -484,6 +484,25 @@ export default function CcusageAlternativesPage() {
             Yield Calculator
           </Link>
         </p>
+      </section>
+
+      {/* ── Enterprise CTA ── */}
+      <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Need a team baseline, not just personal tracking?
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          These tools track individual token usage. If you need a private
+          baseline for a team or workflow — cohort-level analysis, intervention
+          testing, and a defensible baseline report — MO§ES™ offers a 30-day
+          baseline assessment using the same content-free telemetry.
+        </p>
+        <a
+          href="https://mos2es.org/baseline-assessment"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Explore the baseline assessment →
+        </a>
       </section>
     </div>
   );

@@ -18,9 +18,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Operator Scoring — Ranking the Operator Behind AI",
+  title: "AI Operator Evaluation with Token Telemetry",
   description:
-    "AI operator scoring ranks the account driving the AI, not the model. The coding efficiency score and operator ranking system that measures who ranks highest at operating AI under the stated metric and time window \u2014 not which AI is best.",
+    "AI operator evaluation ranks the account driving the AI, not the model. See how SigRank evaluates token-flow patterns, what the metrics can and cannot establish, and how to get a private team baseline.",
   path: "/ai-operator-scoring",
 });
 
@@ -98,16 +98,16 @@ export default function AIOperatorScoringPage() {
 
       <WaveHero
         eyebrow="◈ Topic Hub"
-        terminalText="SCORING"
-        title="AI Operator Scoring — The New Performance Layer"
+        terminalText="EVALUATION"
+        title="AI Operator Evaluation with Token Telemetry"
         subtitle={
           <>
-            Model evaluation measures the AI model itself. Operator performance
-            scoring measures the{" "}
-            <span className="text-gold">operator using the AI</span>. SigRank is
-            an operator scoring system — it ranks who ranks highest at driving
-            their AI under the stated metric and time window, built on real
-            token telemetry, not preference votes.
+            Model evaluation measures the AI model itself. Operator evaluation
+            measures the{" "}
+            <span className="text-gold">operator using the AI</span>. SigRank
+            evaluates who ranks highest at driving their AI under the stated
+            metric and time window, built on real token telemetry, not
+            preference votes.
           </>
         }
       />
@@ -232,6 +232,26 @@ export default function AIOperatorScoringPage() {
             View the public leaderboard →
           </a>
         </div>
+      </section>
+
+      {/* ── Enterprise CTA ── */}
+      <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Evaluating a team, not just yourself?
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          The public leaderboard ranks individual operators. If you need a
+          private evaluation for a team or workflow — cohort-level analysis,
+          intervention testing, and a defensible baseline report — MO§ES™
+          offers a 30-day baseline assessment using the same content-free
+          telemetry.
+        </p>
+        <a
+          href="https://mos2es.org/baseline-assessment"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Explore the baseline assessment →
+        </a>
       </section>
 
       {/* ── Ecosystem relationships ── */}

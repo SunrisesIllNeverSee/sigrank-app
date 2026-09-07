@@ -18,9 +18,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "AI Operator Performance",
+  title: "AI Operator Performance: Metrics & Limits",
   description:
-    "AI operator performance scores the account driving the AI, not the model. SigRank class tiers from IGNITER to ARCH+ \u2014 the operator performance measurement system for AI coding.",
+    "How to measure and interpret AI operator performance. SigRank class tiers from IGNITER to ARCH+, what token-flow metrics can and cannot establish, and how to get a private team baseline.",
   path: "/operator-performance",
 });
 
@@ -132,8 +132,8 @@ export default function OperatorPerformancePage() {
 
       <WaveHero
         eyebrow="◈ Topic Hub"
-        terminalText="OPERATOR"
-        title="Operator Performance — Scoring the Operator, Not the Model"
+        terminalText="PERFORMANCE"
+        title="How to Measure and Interpret AI Operator Performance"
         subtitle={
           <>
             The model is held constant. The{" "}
@@ -196,6 +196,28 @@ export default function OperatorPerformancePage() {
           Snapshots are ed25519-signed and verified server-side with replay and
           plausibility guards. Operators are ranked over 7-day, 30-day, 90-day,
           and all-time windows.
+        </p>
+      </section>
+
+      {/* ── What performance metrics cannot establish ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What performance metrics cannot establish
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Token-flow metrics describe the architecture of how an operator uses
+          AI. They do not measure productivity, work quality, task correctness,
+          professional skill, employee performance, or business value. A high
+          yield means an operator ranks highly under the stated metric and time
+          window — nothing more.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Model effects are not always held constant across operators. Someone
+          using a model with better prompt caching may show higher cache-read
+          counts independent of their own skill. Task complexity, domain
+          familiarity, and workflow structure all influence the cascade shape.
+          Use operator performance metrics as a signal worth investigating, not
+          a verdict on the person.
         </p>
       </section>
 
@@ -313,6 +335,26 @@ export default function OperatorPerformancePage() {
             </dd>
           </div>
         </dl>
+      </section>
+
+      {/* ── Enterprise CTA ── */}
+      <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Need a team-level performance baseline?
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          The public leaderboard ranks individual operators. If you need a
+          private baseline for a team or workflow — cohort-level analysis,
+          intervention testing, and a defensible baseline report — MO§ES™
+          offers a 30-day baseline assessment using the same content-free
+          telemetry.
+        </p>
+        <a
+          href="https://mos2es.org/baseline-assessment"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Explore the baseline assessment →
+        </a>
       </section>
     </div>
   );

@@ -502,6 +502,26 @@ export default async function HomePage() {
         </p>
       </section>
 
+      {/* ── Enterprise CTA ── */}
+      <section className="mx-auto w-full max-w-4xl rounded-lg border border-bg-border bg-bg-surface px-6 py-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Working across a team?
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          The public leaderboard ranks individual operators. If you need a
+          private baseline for a team or workflow, MO§ES™ offers a 30-day
+          baseline assessment using the same content-free telemetry — with
+          cohort-level analysis, intervention testing, and a defensible
+          baseline report.
+        </p>
+        <a
+          href="https://mos2es.org/baseline-assessment"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Explore the baseline assessment →
+        </a>
+      </section>
+
       <MotionPause />
     </div>
   );

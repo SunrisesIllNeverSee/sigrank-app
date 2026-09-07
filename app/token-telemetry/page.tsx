@@ -16,9 +16,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "What Is Token Telemetry?",
+  title: "Token Telemetry: AI Usage Metrics Explained",
   description:
-    "Token telemetry measures how effectively you operate AI using four counters \u2014 input, output, cache-read, cache-write. No prompt text. No code. Just the yield cascade that ranks operators.",
+    "Token telemetry measures how effectively you operate AI using four counters \u2014 input, output, cache-read, cache-write. No prompt text. No code. Just the yield cascade that ranks operators. Understand what it can and cannot prove.",
   path: "/token-telemetry",
 });
 
@@ -172,7 +172,7 @@ export default function TokenTelemetryPage() {
       <WaveHero
         eyebrow="◈ Topic Hub"
         terminalText="TELEMETRY"
-        title="Token Telemetry — Measuring AI Coding Activity"
+        title="What Token Telemetry Measures — and What It Cannot Prove"
         subtitle={
           <>
             The privacy-preserving unit of measurement for AI coding. Four
@@ -262,6 +262,58 @@ export default function TokenTelemetryPage() {
           that is safe enough to run continuously, across 15+ platforms, and
           publish to a public leaderboard. Token counts are the unit that makes
           a global operator ranking possible without a privacy scandal.
+        </p>
+      </section>
+
+      {/* ── Worked example ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          A worked example
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Consider two operators using the same model for a 30-minute coding
+          session. Operator A sends 12,000 input tokens, gets 8,000 output
+          tokens, reuses 45,000 cache-read tokens, and writes 5,000 cache-write
+          tokens. Operator B sends 40,000 input tokens, gets 3,000 output
+          tokens, reuses 2,000 cache-read, and writes 1,000 cache-write.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Operator A&apos;s yield is{" "}
+          <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-xs text-gold">
+            (45,000 × 8,000) / 12,000² = 2.5
+          </code>
+          . Operator B&apos;s yield is{" "}
+          <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-xs text-gold">
+            (2,000 × 3,000) / 40,000² = 0.00375
+          </code>
+          . Same model, same clock time, wildly different cascades. Operator A
+          compounds signal; Operator B burns tokens. Four integers per session
+          are enough to see the difference — no prompt content required.
+        </p>
+      </section>
+
+      {/* ── What token telemetry cannot prove ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What token telemetry cannot prove
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Token telemetry measures the architecture of token flow. It does not
+          measure productivity, work quality, task correctness, professional
+          skill, employee performance, or business value. A high yield means an
+          operator ranks highly under the stated metric and time window —
+          nothing more. Conflating token-cascade efficiency with any of these is
+          a category error.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Telemetry also cannot tell you{" "}
+          <em>why</em> an operator&apos;s cascade looks the way it does. A low
+          yield might reflect a difficult task, a new codebase, an unfamiliar
+          model, or a deliberate exploration phase — not poor operator skill.
+          Context that telemetry does not capture (task complexity, domain
+          familiarity, model differences) can explain cascade shape as much as
+          operator behavior. Use telemetry as a signal worth investigating, not
+          a verdict.
         </p>
       </section>
 
@@ -372,6 +424,26 @@ export default function TokenTelemetryPage() {
         >
           Measure &amp; rank your cascade →
         </Link>
+      </section>
+
+      {/* ── Enterprise CTA ── */}
+      <section className="rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Working across a team?
+        </h2>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+          The public leaderboard ranks individual operators. If you need a
+          private baseline for a team or workflow, MO§ES™ offers a 30-day
+          baseline assessment using the same content-free telemetry — with
+          cohort-level analysis, intervention testing, and a defensible
+          baseline report.
+        </p>
+        <a
+          href="https://mos2es.org/baseline-assessment"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Explore the baseline assessment →
+        </a>
       </section>
     </div>
   );
