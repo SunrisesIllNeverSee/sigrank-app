@@ -211,3 +211,5 @@ const nextConfig: NextConfig = {
 };
 
 export default withWorkflow(nextConfig);
+
+import('@opennextjs/cloudflare').then(m => m.initOpenNextCloudflareForDev());
