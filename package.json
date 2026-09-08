@@ -7,8 +7,8 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
+    "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
     "test": "node --experimental-strip-types --test __tests__/**/*.test.mjs",
@@ -25,10 +25,13 @@
     "db:parity": "node scripts/check-migration-parity.mjs",
     "db:parity:ci": "node scripts/check-migration-parity.mjs --ci",
     "board:snapshot": "node scripts/generate-board-snapshot.mjs",
-    "archetypes": "node scripts/gen-build-archetypes.mjs"
+    "archetypes": "node scripts/gen-build-archetypes.mjs",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@base-ui/react": "^1.8.0",
     "@flags-sdk/posthog": "^1.0.1",
     "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
@@ -47,9 +50,8 @@
     "flags": "^4.3.0",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
-    "lucide-react": "^1.41.0",
     "next": "^15.5.19",
-    "posthog-js": "^1.427.2",
+    "posthog-js": "^1.399.5",
     "posthog-node": "^5.41.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -68,6 +70,7 @@
     "@axe-core/playwright": "^4.12.1",
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.2.10",
+    "@opennextjs/cloudflare": "^1.20.6",
     "@playwright/test": "^1.61.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -87,7 +90,8 @@
     "tteop-spec": "0.1.5-draft",
     "typescript": "5.8.2",
     "typescript-eslint": "^8.64.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.129.1"
   },
   "overrides": {
     "sharp": "^0.35.0",
