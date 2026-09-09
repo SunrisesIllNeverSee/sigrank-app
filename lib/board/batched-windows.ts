@@ -244,8 +244,13 @@ export async function computeBatchedWindows(
         baselineDate: baselineBatch?.date ?? null,
       };
 
-      combined90d = addPillars(combined90d, p90d);
-      combinedAll = addPillars(combinedAll, pAll);
+      // "multi" is the combined cross-platform cascade (sum of all individual
+      // platforms). Including it in the combined total double-counts every
+      // platform. Skip it — the combined total is the sum of individual platforms.
+      if (platform !== "multi") {
+        combined90d = addPillars(combined90d, p90d);
+        combinedAll = addPillars(combinedAll, pAll);
+      }
     }
 
     return {
@@ -333,8 +338,12 @@ export function computeBatchedWindowsFromRows(
       baselineDate: baselineBatch?.date ?? null,
     };
 
-    combined90d = addPillars(combined90d, p90d);
-    combinedAll = addPillars(combinedAll, pAll);
+    // "multi" is the combined cross-platform cascade — skip it in the combined
+    // total to avoid double-counting the individual platforms it sums.
+    if (platform !== "multi") {
+      combined90d = addPillars(combined90d, p90d);
+      combinedAll = addPillars(combinedAll, pAll);
+    }
   }
 
   return {
