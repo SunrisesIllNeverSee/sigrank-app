@@ -99,7 +99,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank a dashboard alternative?",
     answer:
-      "No \u2014 SigRank is not a dashboard replacement. Dashboards are excellent at what they do: showing you your spend, your request volume, your error rates. You should keep using them. SigRank answers a question dashboards cannot: &quot;given what I spent, how efficiently did I drive?&quot; A dashboard tells you the bill; SigRank tells you whether you drove well enough to climb the leaderboard. They are complementary \u2014 the dashboard reports, SigRank ranks.",
+      "No \u2014 SigRank is not a dashboard replacement. Dashboards are excellent at what they do: showing you your spend, your request volume, your error rates. You should keep using them. SigRank answers a question dashboards cannot: \u201Cgiven what I spent, how efficiently did I drive?\u201D A dashboard tells you the bill; SigRank tells you whether you drove well enough to climb the leaderboard. They are complementary \u2014 the dashboard reports, SigRank ranks.",
   },
   {
     question: "Why competition instead of just monitoring?",
@@ -114,7 +114,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What makes SigRank different from just tracking token usage?",
     answer:
-      "Tracking token usage gives you a number. SigRank gives you a score and a rank. A dashboard says &quot;you used 1.2M tokens this week.&quot; SigRank says &quot;your \u03a5 Yield is 47.3, you qualify for the BUILDER class, you rank 142nd, and the operator at rank 12 achieves 8\u00d7 your cache reuse on similar input.&quot; The difference is a reference frame. Usage tracking is absolute and isolated; SigRank is relative and competitive. The cascade metric \u03a5 = cache_read \u00d7 output / input\u00b2 turns four token integers into a single efficiency score that is comparable across operators, models, and platforms \u2014 something no single-provider dashboard can do.",
+      "Tracking token usage gives you a number. SigRank gives you a score and a rank. A dashboard says \u201Cyou used 1.2M tokens this week.\u201D SigRank says \u201Cyour \u03a5 Yield is 47.3, you qualify for the POWER class, you rank 142nd, and the operator at rank 12 achieves 8\u00d7 your cache reuse on similar input.\u201D The difference is a reference frame. Usage tracking is absolute and isolated; SigRank is relative and competitive. The cascade metric \u03a5 = cache_read \u00d7 output / input\u00b2 turns four token integers into a single efficiency score that is comparable across operators, models, and platforms \u2014 something no single-provider dashboard can do.",
   },
 ];
 

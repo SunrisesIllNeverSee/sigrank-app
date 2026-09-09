@@ -392,8 +392,14 @@ export async function handleDiscoverDomain(args: {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "redirect to prohibited host blocked (SSRF protection)" };
       }
       // Reject cross-origin redirects — the manifest must be served from the
-      // requested domain, not a third-party host.
-      if (redirectHost !== domain) {
+      // requested domain, not a third-party host. Allow apex ↔ www variants
+      // of the same site (e.g. example.com ↔ www.example.com).
+      const isSameSite = (a: string, b: string): boolean => {
+        if (a === b) return true;
+        const stripWww = (h: string) => h.startsWith("www.") ? h.slice(4) : h;
+        return stripWww(a) === stripWww(b);
+      };
+      if (!isSameSite(redirectHost, domain)) {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: `cross-origin redirect blocked: ${domain} → ${redirectHost}` };
       }
       // Enforce HTTPS on the final destination

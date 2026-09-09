@@ -42,10 +42,15 @@ export function VercelMcpCopyButton() {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
-    await navigator.clipboard.writeText(endpoint);
-    setCopied(true);
-    track("vercel_mcp_copy", { source: "signalaf_vercel" });
-    window.setTimeout(() => setCopied(false), 1800);
+    try {
+      await navigator.clipboard.writeText(endpoint);
+      setCopied(true);
+      track("vercel_mcp_copy", { source: "signalaf_vercel" });
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Clipboard API can reject (permissions, insecure context, etc.) —
+      // silently ignore so the button doesn't throw an unhandled rejection.
+    }
   }
 
   return (
@@ -78,9 +83,23 @@ export function VercelDiagnostic() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ url }),
       });
+
+      if (!response.ok) {
+        let errorMsg = "Diagnostic failed.";
+        try {
+          const errData = await response.json();
+          errorMsg = errData.error ?? errorMsg;
+        } catch {
+          // response body wasn't JSON — use generic message
+        }
+        throw new Error(errorMsg);
+      }
+
       const data = await response.json();
 
-      if (!response.ok) throw new Error(data.error ?? "Diagnostic failed.");
+      if (!data || !Array.isArray(data.checks)) {
+        throw new Error("Diagnostic returned an invalid response.");
+      }
 
       setResult(data);
       track("vercel_diagnostic_complete", {
