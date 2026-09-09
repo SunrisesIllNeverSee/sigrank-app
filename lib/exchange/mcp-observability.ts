@@ -107,7 +107,7 @@ const SCANNER_CLIENT_PATTERNS = [
   "beat",
   "drift",
   "index",
-  "hub",
+  "hubspot",
   "bench",
   "audit",
   "centinela",

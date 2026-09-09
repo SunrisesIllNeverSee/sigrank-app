@@ -79,7 +79,7 @@ export async function getFeatureFlagServer(
     const c = ph();
     if (!c || !distinctId) return null;
     const result = await c.getFeatureFlag(key, distinctId);
-    return (result as string) ?? null;
+    return typeof result === "string" ? result : null;
   } catch {
     return null;
   }

@@ -385,7 +385,7 @@ function Provenance() {
           <strong>Operator Center of Mass</strong>: median of all real operators on
           the all-time board, computed live at render. Excludes staged seeds, The
           Field, retired/anonymized rows, and the 130 outliers (113 extreme operators + 17 flagged
-          flagged operators) that would skew the median. See the{" "}
+          operators) that would skew the median. See the{" "}
           <Link
             href="/field"
             className="text-text-accent underline-offset-2 hover:underline"

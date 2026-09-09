@@ -33,7 +33,7 @@ export function validateDeploymentUrl(raw: unknown): URL | null {
   if (typeof raw !== "string" || raw.length > MAX_INPUT_LENGTH) return null;
 
   try {
-    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    const url = new URL(/^[a-z][a-z\d+.-]*:/i.test(raw) ? raw : `https://${raw}`);
     const hostname = url.hostname.toLowerCase();
 
     if (

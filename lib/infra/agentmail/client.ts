@@ -104,6 +104,7 @@ export async function createAgentInbox(
           agent_key_hash: agentKeyHash,
         },
       }),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) {
@@ -160,6 +161,7 @@ export async function sendAgentNotification(
         html: html ?? text,
         labels: ["sigrank-exchange"],
       }),
+        signal: AbortSignal.timeout(8000),
       },
     );
 
@@ -196,6 +198,7 @@ export async function getInboxByClientId(
     // grows large, we cache the mapping in Supabase (agent_mailboxes table).
     const res = await fetch(`${AGENTMAIL_API_BASE}/inboxes`, {
       headers: { Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) return null;

@@ -89,6 +89,7 @@ export async function checkAndStoreAttestation(
 
         // Tampering signal 1: content_hash changed but timestamps are identical.
         if (
+          typeof e.content_hash === "string" && typeof hRow.content_hash === "string" &&
           !safeEqual(hRow.content_hash, e.content_hash) &&
           hRow.first_ts === e.first_ts &&
           hRow.last_ts === e.last_ts

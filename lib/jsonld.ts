@@ -805,6 +805,10 @@ export function experimentalRecordDataset() {
         "@type": "DataDownload",
         encodingFormat: "application/zip",
         name: "Experimental data archive",
+        // TODO: contentUrl should point to the actual downloadable file URL,
+        // not the Zenodo record-page URL. Update to the direct download link
+        // (e.g. https://zenodo.org/records/19105225/files/<archive>.zip) once
+        // the exact file path is confirmed.
         contentUrl: "https://zenodo.org/records/19105225",
       },
     ],

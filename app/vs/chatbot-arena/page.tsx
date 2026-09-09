@@ -90,7 +90,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What is the difference between Chatbot Arena and SigRank?",
     answer:
-      "Chatbot Arena — best known as LMSYS Chatbot Arena — ranks AI MODELS like GPT-4, Claude, and Gemini by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the operators driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. Chatbot Arena answers &quot;which model is best?&quot;; SigRank answers &quot;which operator drives best?&quot; Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
+      "Chatbot Arena — best known as LMSYS Chatbot Arena — ranks AI MODELS like GPT-4, Claude, and Gemini by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the operators driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. Chatbot Arena answers \u201Cwhich model is best?\u201D; SigRank answers \u201Cwhich operator drives best?\u201D Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
   },
   {
     question: "Is SigRank a Chatbot Arena alternative?",
@@ -98,19 +98,19 @@ const FAQS: { question: string; answer: string }[] = [
       "They are complementary, not replacements. Chatbot Arena is the gold standard for model ranking — it tells you which AI to use. SigRank is the standard for operator ranking — it tells you how well you used it. You pick the model with Chatbot Arena; you measure your skill with SigRank. If you want an AI benchmarking leaderboard that ranks the operator side of the operator-AI loop, SigRank is the one that does that.",
   },
   {
-    question: "Is &quot;Chatbot Arena&quot; the same as LMSYS Chatbot Arena?",
+    question: "Is \u201CChatbot Arena\u201D the same as LMSYS Chatbot Arena?",
     answer:
-      "&quot;Chatbot Arena&quot; is the broader term people search for. LMSYS Chatbot Arena is the most well-known instance — the one that popularized blind pairwise model voting and the Elo leaderboard. When most people say &quot;Chatbot Arena&quot; they mean LMSYS. SigRank is not a model arena at all; it is an operator leaderboard. See our dedicated comparison at /vs/lmsys-arena for the LMSYS-specific breakdown.",
+      "\u201CChatbot Arena\u201D is the broader term people search for. LMSYS Chatbot Arena is the most well-known instance — the one that popularized blind pairwise model voting and the Elo leaderboard. When most people say \u201CChatbot Arena\u201D they mean LMSYS. SigRank is not a model arena at all; it is an operator leaderboard. See our dedicated comparison at /vs/lmsys-arena for the LMSYS-specific breakdown.",
   },
   {
     question: "Why rank operators instead of models?",
     answer:
-      "Because the model is a constant across operators, but the outcome is not. Give ten operators the same Claude model and the same task and you get ten different token cascades — different input sizes, different cache reuse, different output. The model didn't change; the driving did. Chatbot Arena controls for the operator to isolate the model. SigRank controls for the model to isolate the operator. Both are valid; only SigRank answers &quot;how well did I drive?&quot;",
+      "Because the model is a constant across operators, but the outcome is not. Give ten operators the same Claude model and the same task and you get ten different token cascades — different input sizes, different cache reuse, different output. The model didn't change; the driving did. Chatbot Arena controls for the operator to isolate the model. SigRank controls for the model to isolate the operator. Both are valid; only SigRank answers \u201Chow well did I drive?\u201D",
   },
   {
     question: "How is SigRank objective while Chatbot Arena is subjective?",
     answer:
-      "Chatbot Arena uses human preference votes — which response &quot;feels better.&quot; That is a subjective, taste-based signal, vulnerable to length bias and style preference. SigRank reads four token integers (input, output, cache-read, cache-write) from your local logs and computes Υ Yield = cache_read × output / input². No human judges, no prompt content read, no opinion — just the arithmetic of the cascade. The score is reproducible from your own logs; anyone can verify it.",
+      "Chatbot Arena uses human preference votes — which response \u201Cfeels better.\u201D That is a subjective, taste-based signal, vulnerable to length bias and style preference. SigRank reads four token integers (input, output, cache-read, cache-write) from your local logs and computes Υ Yield = cache_read × output / input². No human judges, no prompt content read, no opinion — just the arithmetic of the cascade. The score is reproducible from your own logs; anyone can verify it.",
   },
   {
     question: "Does SigRank ignore model quality?",

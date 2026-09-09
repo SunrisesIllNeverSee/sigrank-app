@@ -219,7 +219,7 @@ export default function StateOfTheIndexPage() {
           analysis.
         </p>
         <p className="text-base text-text-secondary">
-          The dataset measures AI operators — the operators driving AI tools —
+          The dataset measures AI operators — the accounts driving AI tools —
           by four token pillars: <strong>input</strong> (fresh tokens sent),
           <strong> output</strong> (tokens generated), <strong>cache creation</strong>
           {" "}(context written to cache), and <strong>cache read</strong> (context

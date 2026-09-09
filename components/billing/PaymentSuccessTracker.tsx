@@ -10,13 +10,22 @@ import { track } from "@/lib/infra/posthog/events";
  */
 export function PaymentSuccessTracker() {
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const kind = params.get("kind") === "subscription" ? "subscription" : "donation";
-    const amount = Number(params.get("amount_usd") ?? 0);
-    track.paymentSucceeded({
-      kind,
-      amount_usd: amount,
-    });
+    // TODO: Move payment success recording to server-side validation.
+    // Anyone can open this URL directly and send arbitrary kind and
+    // amount_usd via query params. This should be recorded from a verified
+    // Stripe webhook or server-validated Checkout session data, not from
+    // client-readable URL parameters.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const kind = params.get("kind") === "subscription" ? "subscription" : "donation";
+      const amount = Number(params.get("amount_usd") ?? 0);
+      track.paymentSucceeded({
+        kind,
+        amount_usd: amount,
+      });
+    } catch {
+      // Best-effort analytics — never break the success page render.
+    }
   }, []);
 
   return null;

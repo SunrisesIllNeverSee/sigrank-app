@@ -27,7 +27,8 @@ export function useFeatureFlag(
   const [enabled, setEnabled] = useState(fallback);
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    const configured = !!process.env.NEXT_PUBLIC_POSTHOG_KEY || !!process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN;
+    if (!configured) return;
 
     let mounted = true;
 
@@ -69,7 +70,8 @@ export function useFeatureFlagPayload<T = unknown>(
   const [payload, setPayload] = useState<T | null>(null);
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    const configured = !!process.env.NEXT_PUBLIC_POSTHOG_KEY || !!process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN;
+    if (!configured) return;
 
     let mounted = true;
 

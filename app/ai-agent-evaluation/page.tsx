@@ -56,7 +56,7 @@ export default function AIAgentEvaluationPage() {
           ]),
           definedTerm(
             "AI Agent Evaluation",
-            "AI agent evaluation is the measurement and comparison of AI agent performance. Most agent evaluation focuses on the agent itself — task completion rate, tool-use accuracy, latency. But agents are directed by operators (operators), and two operators directing the same agent produce wildly different results. SigRank measures the operator directing the agent via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²). It is the operator layer of agent evaluation.",
+            "AI agent evaluation is the measurement and comparison of AI agent performance. Most agent evaluation focuses on the agent itself — task completion rate, tool-use accuracy, latency. But agents are directed by operators, and two operators directing the same agent produce wildly different results. SigRank measures the operator directing the agent via privacy-preserving token telemetry and the Yield metric (Υ = cache_read × output / input²). It is the operator layer of agent evaluation.",
             "/ai-agent-evaluation",
           ),
           faqPage([
