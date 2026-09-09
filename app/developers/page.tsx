@@ -46,7 +46,7 @@ curl -s https://signalaf.com/api/v1/leaderboard
 curl -s https://signalaf.com/openapi.json
 
 # Connect the remote MCP server
-https://signalaf.com/api/mcp
+# https://signalaf.com/api/mcp
 
 # Run the official CLI / local MCP server
 npx sigrank`}</pre>

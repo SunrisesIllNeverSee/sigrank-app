@@ -86,7 +86,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What is the difference between LMSYS Chatbot Arena and SigRank?",
     answer:
-      "LMSYS Chatbot Arena ranks AI MODELS — GPT-4, Claude, Gemini — by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the operators driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. LMSYS answers &quot;which model is best?&quot;; SigRank answers &quot;which operator drives best?&quot; Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
+      "LMSYS Chatbot Arena ranks AI MODELS — GPT-4, Claude, Gemini — by collecting blind pairwise human preference votes and computing an Elo score. SigRank ranks OPERATORS — the operators driving the AI — by measuring token cascade efficiency (Υ = cache_read × output / input²) from on-device, signed telemetry. LMSYS answers \u201Cwhich model is best?\u201D; SigRank answers \u201Cwhich operator drives best?\u201D Models don't drive — operators do. The leaderboard should rank the driver, not the car.",
   },
   {
     question: "Is SigRank an LMSYS alternative?",
@@ -96,12 +96,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Why rank operators instead of models?",
     answer:
-      "Because the model is a constant across operators, but the outcome is not. Give ten operators the same Claude model and the same task and you get ten different token cascades — different input sizes, different cache reuse, different output. The model didn't change; the driving did. LMSYS controls for the operator to isolate the model. SigRank controls for the model to isolate the operator. Both are valid; only SigRank answers &quot;how well did I drive?&quot;",
+      "Because the model is a constant across operators, but the outcome is not. Give ten operators the same Claude model and the same task and you get ten different token cascades — different input sizes, different cache reuse, different output. The model didn't change; the driving did. LMSYS controls for the operator to isolate the model. SigRank controls for the model to isolate the operator. Both are valid; only SigRank answers \u201Chow well did I drive?\u201D",
   },
   {
     question: "How is SigRank objective while LMSYS is subjective?",
     answer:
-      "LMSYS uses human preference votes — which response &quot;feels better.&quot; That is a subjective, taste-based signal, vulnerable to length bias and style preference. SigRank reads four token integers (input, output, cache-read, cache-write) from your local logs and computes Υ Yield = cache_read × output / input². No human judges, no prompt content read, no opinion — just the arithmetic of the cascade. The score is reproducible from your own logs; anyone can verify it.",
+      "LMSYS uses human preference votes — which response \u201Cfeels better.\u201D That is a subjective, taste-based signal, vulnerable to length bias and style preference. SigRank reads four token integers (input, output, cache-read, cache-write) from your local logs and computes Υ Yield = cache_read × output / input². No human judges, no prompt content read, no opinion — just the arithmetic of the cascade. The score is reproducible from your own logs; anyone can verify it.",
   },
   {
     question: "Does SigRank ignore model quality?",
