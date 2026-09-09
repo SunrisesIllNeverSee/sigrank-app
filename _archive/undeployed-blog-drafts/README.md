@@ -14,6 +14,31 @@ Archive of blog articles that were generated but never deployed to signalaf.com.
   operator-vs-model boundary in the Search Authority canon.
 - **Archived:** 2026-09-08
 
+## 12-million-tokens-rewrite.md
+
+- **Source:** Rewrite of the original 2025-08-14 Medium article
+  "12 Million Tokens and 28 Days Later: The First User-Based AI Leaderboard Is Born"
+  Original: https://medium.com/@burnmydays/12-million-tokens-later-...
+  Original source file: `_7_labs/assets/articles/medium/12-million-tokens-later.md`
+- **Date:** ~2026-08/09 (rewrite, date uncertain)
+- **Status:** Never deployed. The original Medium article IS published.
+  This rewrite is not in any repo or on signalaf.com.
+- **Content:** Two versions (markdown + HTML) of the same rewrite.
+  Structured/explanatory, unlike the original personal narrative.
+- **Canon concerns (DO NOT DEPLOY AS-IS):**
+  - SignaRate™ — HISTORICAL/SUPERSEDED in canon. Current metric is Yield (Υ),
+    which this article does NOT mention.
+  - SDOT — HISTORICAL in canon. Retired then un-retired 2026-05-21.
+  - "Interaction signature" — not a canon term. Canon uses "operator" +
+    "telemetry-derived metrics."
+  - Ghost Tokens, Cheese Tax, sigdrunk — colorful terms from the original
+    2025 article, not current canon metrics.
+  - Frames SigRank as ranking "interaction patterns" rather than the canon
+    definition: ranking AI OPERATORS by telemetry-derived metrics (Yield).
+- **Positioning:** On-position in spirit (user/operator side, not model side).
+  Needs significant rewriting to be canon-compliant.
+- **Archived:** 2026-09-08
+
 ## 5-key-strategies-effective-ai-evaluation.html
 
 - **Source:** Unknown — possibly generated from keyword research
