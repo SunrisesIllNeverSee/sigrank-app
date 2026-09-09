@@ -104,8 +104,12 @@ function computeBatchedWindowsFromRows(rows, nowMs = Date.now()) {
       baselineDate: baselineBatch?.date ?? null,
     };
 
-    combined90d = addPillars(combined90d, p90d);
-    combinedAll = addPillars(combinedAll, pAll);
+    // "multi" is the combined cross-platform cascade — skip it in the combined
+    // total to avoid double-counting the individual platforms it sums.
+    if (platform !== "multi") {
+      combined90d = addPillars(combined90d, p90d);
+      combinedAll = addPillars(combinedAll, pAll);
+    }
   }
 
   return {
@@ -317,4 +321,42 @@ test("batch ageDays computed correctly", () => {
   const result = computeBatchedWindowsFromRows(rows, T0 + 45 * DAY);
   assert.ok(result);
   assert.equal(result.perPlatform.claude.batches[0].ageDays, 45);
+});
+
+test("multi platform excluded from combined total (no double-counting)", () => {
+  // Simulate: claude + codex individual submissions, plus a "multi" submission
+  // that is the sum of both. The combined total must NOT include multi.
+  const claudeP = { input: 40_000_000, output: 5_000_000, cacheCreate: 8_000_000, cacheRead: 2_000_000 };
+  const codexP = { input: 10_000_000, output: 1_000_000, cacheCreate: 2_000_000, cacheRead: 500_000 };
+  const multiP = {
+    input: claudeP.input + codexP.input,
+    output: claudeP.output + codexP.output,
+    cacheCreate: claudeP.cacheCreate + codexP.cacheCreate,
+    cacheRead: claudeP.cacheRead + codexP.cacheRead,
+  };
+  const rows = [
+    mkRow("2026-01-01T00:00:00Z", claudeP, "claude"),
+    mkRow("2026-01-01T00:00:00Z", codexP, "codex"),
+    mkRow("2026-01-01T00:00:00Z", multiP, "multi"),
+  ];
+  const result = computeBatchedWindowsFromRows(rows, T0 + 30 * DAY);
+  assert.ok(result);
+
+  // per_platform should still include multi
+  assert.ok(result.perPlatform.multi);
+  assert.deepEqual(result.perPlatform.multi.all, multiP);
+
+  // combined must equal claude + codex only (NOT + multi)
+  assert.deepEqual(result.combined.all, {
+    input: 50_000_000,
+    output: 6_000_000,
+    cacheCreate: 10_000_000,
+    cacheRead: 2_500_000,
+  });
+
+  // combined must NOT be 2x (which would happen if multi was included)
+  const combinedTotal = result.combined.all.input + result.combined.all.output +
+    result.combined.all.cacheCreate + result.combined.all.cacheRead;
+  const multiTotal = multiP.input + multiP.output + multiP.cacheCreate + multiP.cacheRead;
+  assert.notEqual(combinedTotal, multiTotal * 2, "combined should not be double-counted");
 });

@@ -21,6 +21,7 @@ export type PlatformKey =
   | "gemini"
   | "pi"
   | "codex"
+  | "devin"
   | "omp"
   | "multi"
   | "other";
@@ -31,6 +32,7 @@ const LABEL: Record<PlatformKey, string> = {
   gemini: "Gemini",
   pi: "Pi",
   codex: "Codex",
+  devin: "Devin",
   omp: "Oh My Pi",
   multi: "Multi",
   other: "Other",
@@ -40,7 +42,7 @@ const LABEL: Record<PlatformKey, string> = {
 export function platformKey(p: string | null | undefined): PlatformKey {
   const k = (p ?? "").toLowerCase();
   return (
-    ["claude", "chatgpt", "gemini", "pi", "codex", "omp", "multi"] as const
+    ["claude", "chatgpt", "gemini", "pi", "codex", "devin", "omp", "multi"] as const
   ).includes(k as never)
     ? (k as PlatformKey)
     : "other";
@@ -113,6 +115,17 @@ const GLYPH: Record<PlatformKey, React.ReactNode> = {
       strokeLinecap="round"
       strokeLinejoin="round"
       d="M3.4 4.3h9.2M6.2 4.3v8.4M10.4 4.3V8m0 0-2.2 4.7M10.4 8l2.2 4.7"
+    />
+  ),
+  // Devin — a chevron-arrow (the agent's forward-motion motif).
+  devin: (
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5 3.5 11 8l-6 4.5M9 3.5 11 8l-2 4.5"
     />
   ),
   // Multi — overlapping nodes (a small constellation).

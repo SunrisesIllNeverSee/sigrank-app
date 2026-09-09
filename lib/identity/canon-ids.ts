@@ -562,6 +562,14 @@ export const PLATFORMS: Record<string, PlatformDef> = {
     domain: "omp",
     hex: colors.platform.OhMyPi,
   },
+  // P.09 Devin (2026-09-08): the Devin CLI agent. Appended — ids are append-only
+  // and stable. Distinct color (cyan), never mapped to 'other'.
+  "P.09": {
+    id: "P.09",
+    label: "Devin",
+    domain: "devin",
+    hex: colors.platform.Devin,
+  },
 };
 
 export type BadgeCategory =
