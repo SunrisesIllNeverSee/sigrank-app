@@ -14,6 +14,20 @@ Archive of blog articles that were generated but never deployed to signalaf.com.
   operator-vs-model boundary in the Search Authority canon.
 - **Archived:** 2026-09-08
 
+## 5-key-strategies-effective-ai-evaluation.html
+
+- **Source:** Unknown — possibly generated from keyword research
+- **Date:** ~2026-08/09
+- **Status:** Never deployed. Not in `app/blog/`. Not on signalaf.com.
+  Not in any repo as a file.
+- **Positioning conflict:** This article is about AI **model/system**
+  evaluation (performance metrics, ethical guidelines, compliance
+  standards, safety benchmarking of AI models). SigRank evaluates AI
+  **operators** (the humans using AI), not AI models or systems. Also
+  references unrelated companies (Clay, BigQuery, Ninjio) with no
+  connection to SigRank's product surface.
+- **Archived:** 2026-09-08
+
 ## open-spec-closed-generation-moats.md
 
 - **Source:** Founder/architect essay, likely generated for blog or LinkedIn
