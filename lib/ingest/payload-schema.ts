@@ -31,6 +31,7 @@ export const platformPrimaryEnum = z.enum([
   "gemini",
   "pi",
   "codex",
+  "devin",
   "multi",
   "other",
   "omp",

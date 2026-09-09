@@ -40,6 +40,7 @@ export const PLATFORM_UI = [
   "Gemini",
   "Pi",
   "Codex",
+  "Devin",
   "Oh My Pi",
   "Multi",
 ] as const;
@@ -59,6 +60,7 @@ export const PLATFORM_DOMAIN_MAP: Record<PlatformUI, string | null> = {
   Gemini: "gemini",
   Pi: "pi",
   Codex: "codex",
+  Devin: "devin",
   "Oh My Pi": "omp",
   Multi: "multi",
 };
@@ -92,6 +94,7 @@ export const SAVABLE_PLATFORM_DOMAINS: ReadonlySet<string> = new Set([
   "gemini",
   "pi",
   "codex",
+  "devin",
   "omp",
 ]);
 
