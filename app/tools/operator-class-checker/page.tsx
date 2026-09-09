@@ -9,7 +9,7 @@ import { ClassChecker } from "./ClassChecker";
 export const metadata: Metadata = withOG({
   title: "What Is a Tier 1 AI Operator? Class Tier Checker",
   description:
-    "A tier 1 AI operator (IGNITER) is just starting to accumulate token volume. Check your operator class tier from four token pillars and see where you place on the 8-tier ladder from IGNITER to ARCH+.",
+    "What is a tier 1 operator in AI? A tier 1 AI operator (IGNITER) is just starting to accumulate token volume. Check your AI operator class tier from four token pillars and see where you place on the 8-tier ladder from IGNITER to ARCH+.",
   path: "/tools/operator-class-checker",
 });
 
@@ -71,6 +71,19 @@ export default function OperatorClassCheckerPage() {
               "Per-tier description",
             ],
           },
+          {
+            "@context": "https://schema.org",
+            "@type": "DefinedTerm",
+            name: "Tier 1 AI Operator",
+            description:
+              "In AI operations, a tier 1 operator (IGNITER) is an operator who is just starting to accumulate token volume. SigRank ranks AI operators — the humans driving AI coding agents — not AI models. This is distinct from the military usage of 'tier 1 operator' which refers to special mission units.",
+            inDefinedTermSet: {
+              "@type": "DefinedTermSet",
+              name: "SigRank AI Operator Class Taxonomy",
+              url: "https://signalaf.com/methodology",
+            },
+            termCode: "IGNITER",
+          },
         ]}
       />
 
@@ -113,6 +126,18 @@ export default function OperatorClassCheckerPage() {
           sessions: prompt caching raises cache-read, denser output raises
           output tokens, and both grow your total volume. The calculator below
           shows which tier your current token counts place you in.
+        </p>
+      </section>
+
+      {/* ── Disambiguation: AI operator vs military tier 1 ── */}
+      <section className="rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
+        <p className="font-sans text-xs leading-relaxed text-text-muted">
+          <strong className="text-text-secondary">Not the military term.</strong>{" "}
+          &ldquo;Tier 1 operator&rdquo; also refers to special mission units in
+          military contexts (Delta Force, Navy SEALs, 75th Ranger Regiment, etc.).
+          SigRank&apos;s tier 1 refers to <strong className="text-text-secondary">AI coding operators</strong>{" "}
+          — the human driving an AI coding agent — ranked by accumulated token
+          telemetry, not military classification.
         </p>
       </section>
 
@@ -198,6 +223,34 @@ export default function OperatorClassCheckerPage() {
             className="text-gold underline underline-offset-2"
           >
             Read Your Cascade
+          </Link>
+          {" · "}
+          <Link
+            href="/metrics/cache-hit-rate"
+            className="text-gold underline underline-offset-2"
+          >
+            Cache Hit Rate
+          </Link>
+          {" · "}
+          <Link
+            href="/leaderboard"
+            className="text-gold underline underline-offset-2"
+          >
+            Leaderboard
+          </Link>
+          {" · "}
+          <Link
+            href="/score"
+            className="text-gold underline underline-offset-2"
+          >
+            Submit Your Score
+          </Link>
+          {" · "}
+          <Link
+            href="/ai-operator-scoring"
+            className="text-gold underline underline-offset-2"
+          >
+            AI Operator Scoring
           </Link>
         </p>
       </section>
