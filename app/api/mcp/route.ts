@@ -238,6 +238,19 @@ export async function POST(req: NextRequest) {
     // lib/mcp/server.ts (after callTool returns) so it captures the ACTUAL
     // result and ACTUAL duration. The route stamps the per-request context
     // onto the forwarded request via headers below.
+
+    // Intercept MCP client auth-probe tool calls. Some MCP clients (e.g.
+    // Claude) send a synthetic `__verifymcp_auth_probe_<hash>__` tools/call
+    // to test whether the server requires authentication. The SDK returns
+    // a ProtocolError ("Tool not found") which PostHog captures as an
+    // exception — 9 occurrences in the last week. Return a clean JSON-RPC
+    // error ourselves so it doesn't surface as an unhandled exception.
+    if (typeof name === "string" && name.startsWith("__verifymcp_auth_probe_") && name.endsWith("__")) {
+      return jsonRpc(id, {
+        isError: true,
+        content: [{ type: "text", text: JSON.stringify({ error: "Method not found", tool: name }) }],
+      });
+    }
   }
 
   // 5. Delegate to the SDK handler for standard MCP protocol methods
