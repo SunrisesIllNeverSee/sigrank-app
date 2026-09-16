@@ -1,5 +1,4 @@
 import { getHomepageStats } from "@/lib/board";
-import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { MotionPause } from "@/components/home/MotionPause";
 import { DeletedNotice } from "@/components/home/DeletedNotice";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
@@ -52,9 +51,8 @@ export const metadata: Metadata = withOG({
  */
 export default async function HomePage() {
   const homeStats = await getHomepageStats();
-  const fieldData = await getFieldAnalysis();
   const operatorCount = homeStats.total_operators;
-  const medianYield = fieldData.meta.medians.yield;
+  const medianYield = homeStats.median_yield;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">

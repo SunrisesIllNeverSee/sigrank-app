@@ -12,7 +12,6 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
-import { getFieldAnalysis } from "@/lib/analytics/field-data";
 
 export const revalidate = 86400; // 24h
 
@@ -47,9 +46,8 @@ export async function GET() {
   }
 
   const homeStats = await getHomepageStats();
-  const fieldData = await getFieldAnalysis();
   const operatorCount = homeStats.total_operators;
-  const medianYield = fieldData.meta.medians.yield;
+  const medianYield = homeStats.median_yield;
 
   // Top Yield (Υ) — from system_stats.top_yield (populated by
   // refresh_system_stats() which selects by yield_).
