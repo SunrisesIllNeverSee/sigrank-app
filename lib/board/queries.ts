@@ -853,6 +853,34 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       /* site_counters may not exist yet — leave 0 */
     }
 
+    // Median Yield from live submissions (same query as /api/v1/stats).
+    // Only yieldable rows (input > 0 AND output > 0) are included.
+    let median_yield = 0;
+    try {
+      const { data: snapData } = await sb
+        .from("metric_snapshots")
+        .select("signa_rate")
+        .eq("window_type", "all_time")
+        .gt("input_tokens", 0)
+        .gt("output_tokens", 0);
+      if (snapData && snapData.length > 0) {
+        const yields: number[] = [];
+        for (const row of snapData) {
+          const y = row.signa_rate;
+          if (typeof y === "number" && y > 0) yields.push(y);
+        }
+        if (yields.length > 0) {
+          const sorted = yields.sort((a, b) => a - b);
+          const mid = Math.floor(sorted.length / 2);
+          median_yield = sorted.length % 2 === 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2
+            : sorted[mid];
+        }
+      }
+    } catch {
+      /* median not critical — leave 0 */
+    }
+
     return {
       total_operators: num(s.total_operators),
       total_snapshots: num(s.total_snapshots),
@@ -862,6 +890,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
         s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
       top_signa_rate: num(s.top_signa_rate),
       top_yield: num(s.top_yield),
+      median_yield,
       active_last_hour,
       comparisons_ran,
       isPlaceholder: false,

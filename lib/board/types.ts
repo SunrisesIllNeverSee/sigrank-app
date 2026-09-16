@@ -71,6 +71,8 @@ export interface HomepageStats {
   top_signa_rate: number;
   /** Top Yield (Υ) across all operators — the canonical efficiency metric. */
   top_yield: number;
+  /** Median Yield (Υ) across yieldable operators (input > 0 AND output > 0). */
+  median_yield: number;
   /** Operators active in the last hour (by operators.last_seen). */
   active_last_hour: number;
   /** Total head-to-head comparisons run (site_counters.comparisons_ran). */
