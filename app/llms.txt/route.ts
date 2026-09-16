@@ -12,7 +12,7 @@ export const revalidate = 86400;
 export async function GET() {
   const homeStats = await getHomepageStats();
   const fieldData = await getFieldAnalysis();
-  const operatorCount = fieldData.meta.operators_included;
+  const operatorCount = homeStats.total_operators;
   const medianYield = fieldData.meta.medians.yield;
 
   // Top Yield (Υ) — from system_stats.top_yield (populated by
@@ -161,7 +161,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - [Blog](${SITE_ORIGIN}/blog): analysis on operator efficiency, token cascade economics, and outlier detection
 
 ## The numbers
-- ${operatorCount.toLocaleString()} operators ranked (Operator Center of Mass)
+- ${operatorCount.toLocaleString()} operators ranked
 - ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked
 - 3,304 models measured
