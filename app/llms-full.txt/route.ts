@@ -48,7 +48,7 @@ export async function GET() {
 
   const homeStats = await getHomepageStats();
   const fieldData = await getFieldAnalysis();
-  const operatorCount = fieldData.meta.operators_included;
+  const operatorCount = homeStats.total_operators;
   const medianYield = fieldData.meta.medians.yield;
 
   // Top Yield (Υ) — from system_stats.top_yield (populated by
@@ -247,7 +247,7 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 
 ## Live aggregate stats
 
-- ${operatorCount.toLocaleString()} operators ranked (Operator Center of Mass)
+- ${operatorCount.toLocaleString()} operators ranked
 - ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked (Claude, ChatGPT, Gemini, Cursor, Copilot, ...)
 - 3,304 models measured
