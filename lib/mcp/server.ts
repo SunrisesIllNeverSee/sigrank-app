@@ -88,7 +88,14 @@ export function createSigrankServer(req?: NextRequest): McpServer {
   );
 
   if (posthogMcp) {
-    instrument(server, posthogMcp);
+    // Disable exception autocapture for MCP tool errors. Tool handlers return
+    // isError: true for legitimate user errors (invalid_arguments,
+    // operator_not_found) — these are expected application-level errors, not
+    // bugs. Without this flag, @posthog/mcp captures every isError response
+    // as a $exception event, polluting PostHog error tracking with user errors.
+    // Tool errors are still captured as $mcp_tool_call events with isError: true
+    // in the properties, which is the correct way to track them as data.
+    instrument(server, posthogMcp, { enableExceptionAutocapture: false });
   }
 
   // ── Register all 16 SigRank tools ──────────────────────────────────────
