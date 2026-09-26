@@ -21,6 +21,8 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+# playwright-mcp browser evidence — PR descriptions/artifacts, not VCS
+.playwright-mcp/
 
 # coverage (c8 output)
 /coverage/

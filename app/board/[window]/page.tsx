@@ -4,8 +4,8 @@
  * One shareable route per window (/board/7d · /board/30d · /board/90d · /board/all).
  * Each is a board hero heading (LB-1) + the window switcher + the full
  * LeaderboardTable (which carries the Metrics ↔ Raw-pillars view toggle). The
- * window slug maps to a DB window_type enum; getLeaderboard applies the window
- * filter + buffer (lib/data/windows.ts). RSC; ISR-cached 300s (D19).
+ * window slug maps to a DB window_type enum; getLiveBoard applies the window
+ * filter + buffer (lib/board/windows.ts). RSC; ISR-cached 3600s (D19).
  *
  * LB-2 (owner 2026-06-20): the headline Υ-yield bar chart (BoardYieldBars) was
  * removed — the table already shows Υ with per-row species heat, so the big chart
@@ -23,10 +23,11 @@
 import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
-import { getLeaderboard } from "@/lib/board";
+import { getLiveBoard } from "@/lib/board";
+import type { LiveBoardResult } from "@/lib/board";
 import { toEntry } from "@/lib/board/to-entry";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
-import { WaveHero } from "@/components/ui/WaveHero";
+import { LiveBoardShell } from "@/components/live-board/LiveBoardShell";
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { leaderboardItemList, sigrankDataset, faqPage } from "@/lib/jsonld";
@@ -90,47 +91,25 @@ export default async function BoardWindowPage({
   if (!win) notFound();
   const isAllTime = win.slug === "all";
 
-  // All windows now query the DB directly. ISR (revalidate=3600) bounds
-  // egress to 1 query/hour. Only claimed/live operators are shown — the
-  // full seeded board (including unclaimed seed operators) lives on
+  // All windows now read through the LIVE-BOARD contract (lib/board/live.ts):
+  // eligibility = claimed operators + The Field baseline, applied before
+  // sort/rank/limit INSIDE the query (previously the page filtered `claimed`
+  // post-rank — which also silently dropped The Field, violating its
+  // on-board invariant). The same scope backs /api/v1/leaderboard?scope=live,
+  // so client-side pagination/filter fetches see the identical population.
+  // The full seeded board (unclaimed seed corpus) lives on
   // sigeconomy.com/all-time.
-  let totalEntries: ReturnType<typeof toEntry>[];
-  let totalCount: number;
-  let jsonLdEntries: ReturnType<typeof toEntry>[];
-
-  if (win.enum === "all_time") {
-    // LIVE path: the all_time board fetches ALL snapshots (no window_type
-    // filter) so operators who only submitted 7d/30d/90d snapshots also
-    // appear. operatorTotalCollapse picks the latest 'multi' snapshot per
-    // operator (or latest single-platform). Only claimed operators are
-    // shown (seed operators are on sigeconomy.com).
-    // Egress: fetches ~2,400 rows but ISR (revalidate=3600) bounds to
-    // 1 query/hour. We serialize 400 to RSC props; full count for pagination.
-    const totalRows = await getLeaderboard({
-      window: win.enum,
-      windowFilter: false,
-      operatorTotal: true,
-    });
-    const liveRows = totalRows.filter((r) => r.operator.claimed);
-    totalCount = liveRows.length;
-    totalEntries = liveRows.slice(0, 400).map(toEntry);
-    jsonLdEntries = liveRows.slice(0, 100).map(toEntry);
-  } else {
-    // Live path: DB-side window-filtered query (egress fix — fetches only
-    // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
-    // Only claimed operators are shown.
-    const totalRows = await getLeaderboard({
-      window: win.enum,
-      windowFilter: true,
-      operatorTotal: true,
-    });
-    const liveRows = totalRows.filter((r) => r.operator.claimed);
-    totalCount = liveRows.length;
-    totalEntries = liveRows.map(toEntry);
-    // JsonLd from the default (operatorTotal) entries — search engines see the
-    // default board. Filtered variants are client-side and don't need structured data.
-    jsonLdEntries = totalEntries;
-  }
+  const board: LiveBoardResult = await getLiveBoard({
+    window: win.enum,
+    breakdown: "total",
+  });
+  const totalCount = board.population;
+  const totalEntries = (isAllTime ? board.rows.slice(0, 400) : board.rows).map(
+    toEntry,
+  );
+  const jsonLdEntries = isAllTime
+    ? board.rows.slice(0, 100).map(toEntry)
+    : totalEntries;
 
   // Dynamic H1 label: each board window gets a unique page heading (e.g.
   // "30-Day Leaderboard" vs "AI User Leaderboard") so /board/all and /board/30d
@@ -141,32 +120,6 @@ export default async function BoardWindowPage({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
-          same animated <WaveHero/> as the Hall, with board-specific copy. */}
-      <WaveHero
-        eyebrow="Burners, Builders & 10×ers"
-        terminalText="SIGNALBOARD"
-        title={
-          <>
-            {boardLabel}{" "}
-            <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
-              Leaderboard
-            </span>
-          </>
-        }
-        subtitle={
-          <>
-            Four integers in, full ledger out. Every operator ranked by{" "}
-            <strong className="text-text-primary">Υ Yield</strong> — the
-            architecture of the cascade, not raw spend. Volume alone is noise; yield
-            is signal.{" "}
-            <span className="text-text-secondary">
-              See how you rank. Compare against top operators. Beat the average.
-            </span>
-          </>
-        }
-      />
-
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
@@ -206,29 +159,40 @@ export default async function BoardWindowPage({
         ]}
       />
 
-      {/* Client wrapper: reads useSearchParams for platform/view filter state,
-          selects + filters from the pre-fetched datasets. Wrapped in <Suspense>
-          so useSearchParams() doesn't force a client-side render bailout during
-          static generation — the fallback renders in the static HTML. */}
-      <Suspense
-        fallback={
-          <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
-            <div className="mb-4 h-8 rounded bg-bg-elevated" />
-            <div className="space-y-2">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-6 rounded bg-bg-elevated" />
-              ))}
-            </div>
-          </div>
-        }
+      <LiveBoardShell
+        windowSlug={win.slug}
+        windowEnum={win.enum}
+        boardLabel={boardLabel}
+        windowShort={isAllTime ? "all-time" : win.short}
+        windowLabel={win.label}
+        population={totalCount}
+        source={board.source}
+        sourceDate={board.sourceDate}
       >
-        <BoardTableClient
-          totalEntries={totalEntries}
-          totalCount={totalCount}
-          window={win.slug}
-          windowEnum={win.enum}
-        />
-      </Suspense>
+        {/* Client wrapper: reads useSearchParams for platform/view filter
+            state and fetches the same live scope via scope=live. Wrapped in
+            <Suspense> so useSearchParams() doesn't force a client render
+            bailout during static generation. */}
+        <Suspense
+          fallback={
+            <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
+              <div className="mb-4 h-8 rounded bg-bg-elevated" />
+              <div className="space-y-2">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-6 rounded bg-bg-elevated" />
+                ))}
+              </div>
+            </div>
+          }
+        >
+          <BoardTableClient
+            totalEntries={totalEntries}
+            totalCount={totalCount}
+            window={win.slug}
+            windowEnum={win.enum}
+          />
+        </Suspense>
+      </LiveBoardShell>
 
       {/* Key popup (owner 2026-06-24): metrics + the eight experience tiers + TRANSMITTER badge - moved to the END
           of the board (after the table) per owner. */}
@@ -246,12 +210,12 @@ export default async function BoardWindowPage({
           better architecture.
         </p>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-          The board refreshes every hour during active periods. Operators are
+          The board refreshes as new verified snapshots land. Operators are
           ranked by yield, not output volume — a high-yield operator produces
           more signal per token than a low-yield one, regardless of how many
-          hours they code. Class tiers are yield thresholds, so climbing the
-          board means improving your cascade architecture, not just spending
-          more time in the editor.
+          hours they code. Class tiers reflect accumulated token volume, so
+          climbing the board means improving your cascade architecture, not
+          just spending more time in the editor.
         </p>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
           To get listed, install the SigRank CLI (

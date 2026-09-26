@@ -38,6 +38,7 @@ import { unstable_cache } from "next/cache";
 
 import {
   getLeaderboard as _getLeaderboard,
+  getLiveBoard as _getLiveBoard,
   getOperator as _getOperator,
   getOperatorSubmissions as _getOperatorSubmissions,
   getOperatorHistory as _getOperatorHistory,
@@ -52,7 +53,7 @@ import {
   getOperatorRecords as _getOperatorRecords,
 } from "@/lib/board/queries";
 
-import { memoize } from "./memo";
+import { memoize, memoInvalidate } from "./memo";
 
 import type {
   LeaderboardRow,
@@ -65,6 +66,7 @@ import type {
   HistoryPoint,
 } from "@/lib/board/types";
 import type { BoardParams, HistoryParams } from "@/lib/board/mappers";
+import type { LiveBoardQuery, LiveBoardResult } from "@/lib/board/live";
 import type {
   OperatorSubmission,
   OperatorReport,
@@ -88,6 +90,22 @@ import type {
 export function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
   const key = `board:leaderboard:${JSON.stringify(params)}`;
   return memoize(key, 3600, () => _getLeaderboard(params));
+}
+
+// getLiveBoard shares the memo layer (the result can exceed unstable_cache's
+// 2MB Data Cache cap on Vercel — same reason getLeaderboard isn't cached
+// there). Its 'board:live:' key prefix keeps live-scope results in DISTINCT
+// cache entries from legacy callers' rows — a legacy 25-row page can't poison
+// the live population and vice-versa (2026-09-26 contract requirement).
+export function getLiveBoard(q: LiveBoardQuery): Promise<LiveBoardResult> {
+  const key = `board:live:${JSON.stringify(q)}`;
+  // 'unavailable' is a transient failure state, not data — evict it so the
+  // next request retries the DB/snapshot ladder instead of pinning the
+  // outage for the full TTL (the ISR page still serves its last render).
+  return memoize(key, 3600, () => _getLiveBoard(q)).then((r) => {
+    if (r.source === "unavailable") memoInvalidate(key);
+    return r;
+  });
 }
 
 export const getHallOfSignal = unstable_cache(

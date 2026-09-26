@@ -35,6 +35,29 @@ export type SignalClass =
   | "IGNITER II"
   | "IGNITER III";
 
+/**
+ * The 24 PERMANENT experience stages — TRANSMITTER is deliberately absent:
+ * it's a temporary peak badge (RS.08), never a stored class_tier. Shared
+ * single source for server coercion (mappers.toSignalClass) and client-side
+ * API mapping (BoardTableClient.mapApiEntry) so both paths default unknown
+ * values identically.
+ */
+export const SIGNAL_CLASSES: ReadonlySet<string> = new Set<SignalClass>([
+  "ARCH+ I", "ARCH+ II", "ARCH+ III",
+  "ARCH I", "ARCH II", "ARCH III",
+  "POWER I", "POWER II", "POWER III",
+  "BASE I", "BASE II", "BASE III",
+  "SEEKER I", "SEEKER II", "SEEKER III",
+  "REFINER I", "REFINER II", "REFINER III",
+  "BEARER I", "BEARER II", "BEARER III",
+  "IGNITER I", "IGNITER II", "IGNITER III",
+]);
+
+/** Narrow a free-text class_tier to the SignalClass union (defaults IGNITER III). */
+export function toSignalClass(v: string | null | undefined): SignalClass {
+  return v && SIGNAL_CLASSES.has(v) ? (v as SignalClass) : "IGNITER III";
+}
+
 /** The 8 base tier names (without sub-stage). */
 export type TierName =
   | "ARCH+"

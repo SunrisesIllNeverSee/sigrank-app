@@ -43,6 +43,10 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
   const c = snapshot.cascade;
   const t = row.telemetry;
   const platforms = (row as RowWithPlatforms).platforms;
+  // Migration 0021 privacy contract: 'private' operators render as codename
+  // only on the board — identity fields (display_name, handle, location) are
+  // owner-visible on their own profile, never on the public leaderboard.
+  const isPrivate = operator.profile_visibility === "private";
   return {
     rank: global_rank,
     percentile: row.percentile,
@@ -56,7 +60,7 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     // names are backfilled in Supabase — else the generated codename. The prior
     // `claimed &&` gate hid those backfilled names and is dropped. Never invent
     // PII: this only surfaces an operator-set / owner-backfilled name.
-    anonId: operator.display_name ? operator.display_name : operator.codename,
+    anonId: isPrivate ? operator.codename : (operator.display_name ?? operator.codename),
     // Profile-route key — ALWAYS the codename (the /user/<codename> lookup key), even
     // when anonId is a display_name. Linking by anonId 404s for renamed operators.
     codename: operator.codename,
@@ -64,10 +68,16 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     // username, e.g. @olafurns7). Primary line is the real name (codename); the 2nd
     // line is the @handle so the cell reads "Ólafur Nils Sigurðsson / @olafurns7".
     // Falls back to the platform (no @) when there's no handle.
-    subLabel: operator.handle ? `@${operator.handle}` : operator.primary_domain,
+    // profile_visibility='private' (migration 0021): board row shows codename
+    // only — handle, display_name, location are owner-only fields.
+    subLabel: isPrivate
+      ? operator.primary_domain
+      : operator.handle
+        ? `@${operator.handle}`
+        : operator.primary_domain,
     // Operator-supplied public location (city/country). Rendered only when present
     // (post-auth profiles set it; seeds without it render no location). Data-gated.
-    location: operator.location ?? undefined,
+    location: isPrivate ? undefined : (operator.location ?? undefined),
     signalClass: snapshot.class_tier,
     // Real cascade metrics computed from the operator's four-integer pillars by
     // the engine (computeCascadeMetrics). The compounding metrics (yield/leverage/
@@ -102,7 +112,10 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     promptComplexity: snapshot.prompt_complexity.value,
     messageVolume: operator.total_messages_lifetime,
     compositeScore: snapshot.signa_rate,
-    acctAge: `${operator.account_age_days}d`,
+    acctAge:
+      operator.account_age_days != null
+        ? `${operator.account_age_days}d`
+        : "—",
     // LAST column (2026-06-28): the snapshot's date ('YYYY-MM-DD') — the recency of
     // this scored window — so the board shows a real date like BlitzStars instead of
     // the old literal "active". The table (fmtLast) formats it to "May 14" + a full
