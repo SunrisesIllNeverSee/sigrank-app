@@ -1,7 +1,7 @@
 /**
  * app/vs/tokscale/page.tsx — "SigRank vs Tokscale" SEO comparison page.
  *
- * Angle: Tokscale has the biggest board (1,797 users, 40+ tools) but ranks by
+ * Angle: Tokscale has the biggest board (2,100+ users, 40+ tools) but ranks by
  * volume. SigRank ranks by Yield efficiency. Volume is noise; Yield is signal.
  *
  * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
@@ -57,7 +57,7 @@ const COMPARE_ROWS: { feature: string; tokscale: string; sigrank: string }[] = [
   },
   {
     feature: "Global operator leaderboard",
-    tokscale: "Yes (1,797 users, volume-ranked)",
+    tokscale: "Yes (2,100+ users, volume-ranked)",
     sigrank: "Yes (Yield-ranked)",
   },
   {
@@ -109,7 +109,7 @@ const FAQS: { question: string; answer: string }[] = [
       "SigRank. Volume leaderboards conflate activity with skill. An operator who burns 50M tokens re-sending the same context every turn will outrank one who burns 5M tokens but compounds cached context into high-yield output. Yield filters out that noise: it rewards the operator whose cascade is compounding, not the one whose burn rate is highest. If you want to find the best drivers, look at lap times, not fuel consumption.",
   },
   {
-    question: "Tokscale has 1,797 users and 40+ tools. Why is SigRank's board smaller?",
+    question: "Tokscale has 2,100+ users and 40+ tools. Why is SigRank's board smaller?",
     answer:
       "Because SigRank measures a harder thing. Counting tokens is easy and scales to anyone with a log file. Computing a signed, cascade-scored, class-tiered snapshot requires the four pillars to be present and the operator to enroll an ed25519 identity. The SigRank board is smaller by design: every entry is a verified, scored, comparable signal, not a raw volume counter. Bigger is not better when bigger means noisier.",
   },
@@ -138,7 +138,7 @@ export default function VsTokscalePage() {
         title="Volume Is Noise. Yield Is Signal."
         subtitle={
           <>
-            Tokscale has the biggest board (1,797 users, 40+ tools) and ranks
+            Tokscale has the biggest board (2,100+ users, 40+ tools) and ranks
             by total tokens burned. SigRank ranks by{" "}
             <span className="text-gold">Υ Yield efficiency</span>. Same data,
             different question. Volume tells you who typed the most; Yield
