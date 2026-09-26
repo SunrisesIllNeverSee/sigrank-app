@@ -27,7 +27,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, "..", "lib", "data", "snapshot.json");
+const OUT = join(__dirname, "..", "lib", "board", "snapshot.json");
 
 // Load .env.local if present (no dotenv dep — parse the few KEY=VALUE lines we need).
 function loadEnv() {
@@ -55,7 +55,7 @@ const sb = createClient(url, key, { auth: { persistSession: false } });
 const { data: operators, error: opErr } = await sb
   .from("operators")
   .select(
-    "operator_id, codename, display_name, claimed, claimed_at, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime",
+    "operator_id, codename, display_name, claimed, claimed_at, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, handle, location, status, profile_visibility",
   );
 if (opErr) {
   console.error("[snapshot] operators read failed:", opErr.message);
@@ -65,7 +65,7 @@ if (opErr) {
 const { data: snaps, error: snErr } = await sb
   .from("metric_snapshots")
   .select(
-    "operator_id, snapshot_date, window_type, class_tier, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, message_volume, account_age_days, total_messages, signal_force, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
+    "operator_id, snapshot_date, window_type, platform, class_tier, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, message_volume, account_age_days, total_messages, signal_force, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
   );
 if (snErr) {
   console.error("[snapshot] metric_snapshots read failed:", snErr.message);
@@ -79,8 +79,18 @@ if (!operators?.length || !snaps?.length) {
   process.exit(1);
 }
 
+// Privacy (migration 0021): this file is COMMITTED — it must never carry a
+// private operator's identity. Redact at write time so the artifact is safe
+// by construction, matching the board's "codename only" contract for
+// profile_visibility='private'.
+const opsRedacted = operators.map((o) =>
+  o.profile_visibility === "private"
+    ? { ...o, display_name: null, handle: null, location: null }
+    : o,
+);
+
 // Deterministic ordering: operators by codename, snapshots by (operator_id, window_type).
-const opsSorted = [...operators].sort((a, b) =>
+const opsSorted = [...opsRedacted].sort((a, b) =>
   a.codename.localeCompare(b.codename),
 );
 const snapsSorted = [...snaps].sort((a, b) =>

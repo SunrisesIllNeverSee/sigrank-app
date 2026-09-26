@@ -14,8 +14,9 @@ export function LiveWorldNav({ active }: { active: string }) {
   return (
     <nav className={styles.worldNav} aria-label="Board windows and destinations">
       {/* Plain page navigations, not tab widgets — no tablist/tab roles,
-          aria-current="page" carries the active state. */}
-      <div className={styles.windowTabs} aria-label="Board window">
+          aria-current="page" carries the active state. role="group" gives
+          the aria-label a landmark to hang on (a bare div's label is inert). */}
+      <div className={styles.windowTabs} role="group" aria-label="Board window">
         {BOARD_WINDOWS.map((w) => (
           <Link
             key={w.slug}

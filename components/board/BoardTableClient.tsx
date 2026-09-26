@@ -96,21 +96,30 @@ export function BoardTableClient({
   const viewPlatforms = searchParams.get("view") === "platforms";
   const platformLabel = platformLabelFor(platformFilter);
 
-  // Two separate fetch slots — NEVER shared (a platform-breakdown result set
-  // and a totals refresh are different row shapes; mixing them rendered
-  // totals rows as platform rows when Realtime was enabled):
-  //   breakdown      — per-platform rows for ?view=platforms / ?platform=
+  // Fetched slots — each a different row shape, each keyed to the window it
+  // was fetched for. Keying (not just reset) is required because soft
+  // navigation /board/all → /board/30d preserves component state AND a fetch
+  // in flight during the transition can commit AFTER the window changed:
+  // an unkeyed slot would render the previous window's rows under new chrome.
+  //   breakdown       — per-platform rows for ?view=platforms / ?platform=
   //   refreshedTotals — Realtime-refreshed first page of the totals board
+  //   fullBoard       — lazy-loaded full dataset for the all-time board
   const [breakdown, setBreakdown] = useState<{
+    windowEnum: string;
     entries: LeaderboardEntryWithPlatforms[];
     /** Distinct live operators in this breakdown query (the honest "N of M"
      *  denominator — a platform filter shrinks M; per-platform rows can
      *  outnumber operators). */
     operators: number | null;
   } | null>(null);
-  const [refreshedTotals, setRefreshedTotals] = useState<
-    LeaderboardEntryWithPlatforms[] | null
-  >(null);
+  const [refreshedTotals, setRefreshedTotals] = useState<{
+    windowEnum: string;
+    entries: LeaderboardEntryWithPlatforms[];
+  } | null>(null);
+  const [fullBoard, setFullBoard] = useState<{
+    windowEnum: string;
+    entries: LeaderboardEntryWithPlatforms[];
+  } | null>(null);
   // Separate loading flags — the breakdown fetch and the all-time lazy-load
   // are independent requests; one shared flag let a breakdown in flight
   // silently block pagination.
@@ -118,14 +127,6 @@ export function BoardTableClient({
   const [totalsLoading, setTotalsLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [retryTick, setRetryTick] = useState(0);
-  const [liveTick, setLiveTick] = useState(0);
-  // Lazy-loaded all_time dataset, keyed to the window it belongs to — on
-  // client-side navigation /board/all → /board/30d the component state
-  // survives, so an unkeyed slot would render all-time rows under 30d chrome.
-  const [fullBoard, setFullBoard] = useState<{
-    windowEnum: string;
-    entries: LeaderboardEntryWithPlatforms[];
-  } | null>(null);
   // Stale-response guards: only the newest request may commit. One sequence
   // per fetch family so a breakdown fetch can't cancel a totals lazy-load.
   const breakdownSeq = useRef(0);
@@ -135,6 +136,14 @@ export function BoardTableClient({
   const fullBoardForWindow =
     fullBoard && fullBoard.windowEnum === resolvedWindowEnum
       ? fullBoard.entries
+      : null;
+  const refreshedTotalsForWindow =
+    refreshedTotals && refreshedTotals.windowEnum === resolvedWindowEnum
+      ? refreshedTotals.entries
+      : null;
+  const breakdownForWindow =
+    breakdown && breakdown.windowEnum === resolvedWindowEnum
+      ? breakdown
       : null;
 
   // Lazy-load the full all_time dataset when the user paginates beyond page 0.
@@ -183,23 +192,33 @@ export function BoardTableClient({
 
   // If the window changes while a totals fetch is in flight, invalidate it —
   // its commit guard also keys on windowEnum, this just frees the flag early.
+  // refreshedTotals + breakdown are keyed slots too: a realtime/breakdown
+  // response landing after a window change is discarded at render time by the
+  // windowEnum check, and stale slots never match the new window.
   useEffect(() => {
     setTotalsLoading(false);
+    setBreakdownLoading(false);
     totalsSeq.current += 1;
+    breakdownSeq.current += 1;
   }, [resolvedWindowEnum]);
 
   // Refetch the first page from the API (Realtime refresh). Live scope keeps
-  // the refreshed rows consistent with the SSR population.
+  // the refreshed rows consistent with the SSR population. Note: the server
+  // memoizes live reads (~1h TTL) so "refresh" means latest-memoized, not
+  // just-now — the page's provenance strip is the honest freshness signal.
   const refreshFirstPage = useCallback(() => {
     if (!windowEnum) return;
-    fetch(liveBoardUrl(windowEnum, "total", { limit: 25 }), {
+    const we = windowEnum;
+    fetch(liveBoardUrl(we, "total", { limit: 25 }), {
       cache: "no-store",
     })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (!d) return; // transient failure → keep the last good data
-        setRefreshedTotals((d.entries ?? []).map(mapApiEntry));
-        setLiveTick((t) => t + 1);
+        setRefreshedTotals({
+          windowEnum: we,
+          entries: (d.entries ?? []).map(mapApiEntry),
+        });
       })
       .catch(() => {});
   }, [windowEnum]);
@@ -234,6 +253,7 @@ export function BoardTableClient({
       .then((d) => {
         if (controller.signal.aborted || breakdownSeq.current !== seq) return;
         setBreakdown({
+          windowEnum,
           entries: (d.entries ?? []).map(mapApiEntry),
           operators:
             typeof d.operators_returned === "number"
@@ -256,16 +276,16 @@ export function BoardTableClient({
   }, [viewPlatforms, platformFilter, windowEnum, retryTick]);
 
   // Windowed board: platform views use breakdown rows; a Realtime refresh
-  // (liveTick > 0) swaps the totals first page; the all-time board swaps to
-  // the lazy-loaded dataset once fetched — keyed to THIS window so a stale
-  // all-time payload can't render under a different window's chrome.
+  // swaps the totals first page; the all-time board swaps to the lazy-loaded
+  // dataset once fetched. Every fetched slot is keyed to the window it came
+  // from — a response from the previous window can never render here.
   let entries: LeaderboardEntryWithPlatforms[];
   if (viewPlatforms || platformFilter) {
     // Fetched breakdown rows — or empty while loading/failed (the error strip
     // communicates the failure; never substitute the totals population here).
-    entries = breakdown?.entries ?? [];
-  } else if (liveTick > 0 && refreshedTotals) {
-    entries = refreshedTotals;
+    entries = breakdownForWindow?.entries ?? [];
+  } else if (refreshedTotalsForWindow) {
+    entries = refreshedTotalsForWindow;
   } else if (win === "all" && fullBoardForWindow) {
     entries = fullBoardForWindow;
   } else {
@@ -276,7 +296,7 @@ export function BoardTableClient({
   // live operator count (right population scope) instead of flashing "0".
   const totalUsers =
     viewPlatforms || platformFilter
-      ? (breakdown?.operators ?? totalCount)
+      ? (breakdownForWindow?.operators ?? totalCount)
       : totalCount;
 
   const loading = breakdownLoading || totalsLoading;

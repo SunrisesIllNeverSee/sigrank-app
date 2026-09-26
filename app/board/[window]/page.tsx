@@ -4,8 +4,8 @@
  * One shareable route per window (/board/7d · /board/30d · /board/90d · /board/all).
  * Each is a board hero heading (LB-1) + the window switcher + the full
  * LeaderboardTable (which carries the Metrics ↔ Raw-pillars view toggle). The
- * window slug maps to a DB window_type enum; getLeaderboard applies the window
- * filter + buffer (lib/data/windows.ts). RSC; ISR-cached 300s (D19).
+ * window slug maps to a DB window_type enum; getLiveBoard applies the window
+ * filter + buffer (lib/board/windows.ts). RSC; ISR-cached 3600s (D19).
  *
  * LB-2 (owner 2026-06-20): the headline Υ-yield bar chart (BoardYieldBars) was
  * removed — the table already shows Υ with per-row species heat, so the big chart
@@ -161,6 +161,7 @@ export default async function BoardWindowPage({
 
       <LiveBoardShell
         windowSlug={win.slug}
+        windowEnum={win.enum}
         boardLabel={boardLabel}
         windowShort={isAllTime ? "all-time" : win.short}
         windowLabel={win.label}

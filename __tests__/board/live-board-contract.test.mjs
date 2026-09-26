@@ -131,15 +131,12 @@ test("queries.ts counts the eligible population as DISTINCT operators", () => {
 test("fallback.ts exposes a live-only path over the cold store — never mock", () => {
   const src = read("lib/board/fallback.ts");
   assert.ok(src.includes("filterLiveFallbackBoard"), "live fallback exists");
-  // The live fallback must read COLD_STORE_ROWS directly — NOT fallbackRows()
+  // The live fallback must read the COLD_STORE snapshots — NOT fallbackRows()
   // (which degrades to MOCK_LEADERBOARD when the store is empty).
   const fnStart = src.indexOf("export function filterLiveFallbackBoard");
   const fnEnd = src.indexOf("\n}", fnStart);
   const body = src.slice(fnStart, fnEnd);
-  assert.ok(
-    body.includes("COLD_STORE_ROWS"),
-    "live fallback reads the cold store",
-  );
+  assert.ok(body.includes("COLD_STORE"), "live fallback reads the cold store");
   assert.ok(
     !body.includes("MOCK_LEADERBOARD") && !body.includes("fallbackRows()"),
     "live fallback must never serve hand-authored mock rows",
@@ -217,5 +214,112 @@ test("legacy API path (no scope) is unchanged — no live filtering", () => {
   assert.ok(
     !legacyBody.includes("isLiveBoardOperator"),
     "legacy branch must not apply live eligibility",
+  );
+});
+
+// ── Review-pass 2 regression coverage (stale window state, privacy, fallback) ──
+
+test("BoardTableClient keys EVERY fetched slot to windowEnum (no stale-window rows)", () => {
+  const src = read("components/board/BoardTableClient.tsx");
+  // All three fetch slots carry the window they were fetched for — an
+  // unkeyed slot would render the previous window's rows after soft nav.
+  for (const slot of ["breakdown", "refreshedTotals", "fullBoard"]) {
+    const stateDecl = src.indexOf(`[${slot}, set`);
+    assert.ok(stateDecl > -1, `${slot} state exists`);
+    const declBlock = src.slice(stateDecl, src.indexOf(">(null)", stateDecl));
+    assert.ok(
+      declBlock.includes("windowEnum: string"),
+      `${slot} must be keyed to windowEnum`,
+    );
+  }
+  // The render branch must consult the *_ForWindow projections, never the
+  // raw slots.
+  assert.ok(src.includes("refreshedTotalsForWindow"), "keyed totals guard");
+  assert.ok(src.includes("breakdownForWindow"), "keyed breakdown guard");
+  assert.ok(src.includes("fullBoardForWindow"), "keyed full-board guard");
+});
+
+test("private operators render codename-only on the board + API (migration 0021)", () => {
+  const toEntry = read("lib/board/to-entry.ts");
+  const api = read("lib/board/api-leaderboard.ts");
+  assert.ok(
+    toEntry.includes('profile_visibility === "private"'),
+    "toEntry consults profile_visibility",
+  );
+  assert.ok(
+    api.includes('profile_visibility === "private"'),
+    "API serializer consults profile_visibility",
+  );
+  // Both surfaces must gate the identity fields the profile page hides:
+  // display_name, handle, location.
+  for (const field of ["display_name", "handle", "location"]) {
+    assert.ok(
+      api.includes(`${field}: isPrivate`),
+      `serializer redacts ${field} for private operators`,
+    );
+  }
+});
+
+test("live fallback mirrors the live collapse ladder + platform-set matching", () => {
+  const src = read("lib/board/fallback.ts");
+  assert.ok(
+    src.includes("latestPerOperatorPlatform"),
+    "breakdown=platforms collapse exists under fallback",
+  );
+  assert.ok(
+    src.includes("operatorTotalCollapse"),
+    "breakdown=total collapse exists under fallback",
+  );
+  // Window filtering must happen on SNAPSHOTS before collapse — collapsing
+  // first would pick all_time rows and drop them in the window filter.
+  const fn = src.indexOf("function liveColdStoreRows");
+  assert.ok(fn > -1, "live collapse builder exists");
+  const body = src.slice(fn, src.indexOf("return buildRows", fn));
+  const winIdx = body.indexOf("filterToWindow(COLD_STORE.snaps");
+  const collapseIdx = body.indexOf("operatorTotalCollapse");
+  assert.ok(
+    winIdx > -1 && collapseIdx > -1 && winIdx < collapseIdx,
+    "window filter must precede the collapse ladder",
+  );
+  // Platform filter must match the submitted platform SET, not just the row's
+  // single platform (a 'multi' total row must still match platform=claude).
+  assert.ok(
+    src.includes(".platforms?.some("),
+    "platform filter checks the operator's platform set",
+  );
+});
+
+test("unavailable live reads are evicted from the memo cache (retry works)", () => {
+  const src = read("lib/board/cached.ts");
+  assert.ok(
+    src.includes('r.source === "unavailable"') &&
+      src.includes("memoInvalidate(key)"),
+    "an 'unavailable' result must not pin the outage for the full TTL",
+  );
+});
+
+test("unavailable state exposes a retry affordance wired to the live API", () => {
+  const shell = read("components/live-board/LiveBoardShell.tsx");
+  assert.ok(shell.includes("BoardRetry"), "shell renders the retry control");
+  const retry = read("components/live-board/BoardRetry.tsx");
+  assert.ok(
+    retry.includes("scope=live"),
+    "retry probes the live-scope API (not ISR-cached)",
+  );
+});
+
+test("snapshot script writes the board path and redacts private operators", () => {
+  const src = read("scripts/snapshot-db.mjs");
+  assert.ok(
+    src.includes('"lib", "board", "snapshot.json"'),
+    "snapshot output path must be lib/board (the module moved out of lib/data)",
+  );
+  assert.ok(
+    src.includes('profile_visibility === "private"'),
+    "committed snapshot must redact private identity fields at write time",
+  );
+  assert.ok(
+    src.includes("platform,"),
+    "snapshots must capture per-submission platform for collapse parity",
   );
 });

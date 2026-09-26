@@ -8,9 +8,12 @@
  * selects the row shape: 'total' (default; one operator-total row per
  * operator) or 'platforms' (one row per operator×platform).
  *
- * Without `scope`, the legacy behaviour is preserved byte-for-byte: the full
- * field (including unclaimed seed operators), windowFilter on the given
- * window_type, and the implicit platform→perPlatform collapse.
+ * Without `scope`, the legacy behaviour is preserved: the full field
+ * (including unclaimed seed operators), windowFilter on the given
+ * window_type, and the implicit platform→perPlatform collapse. ONE
+ * intentional compatibility change: `?window=all` is now normalized to the
+ * `all_time` window enum (it names the same window the UI routes use) —
+ * previously it matched no window_type and returned empty entries.
  */
 
 import { NextResponse, type NextRequest } from "next/server";

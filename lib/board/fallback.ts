@@ -22,6 +22,8 @@ import {
   type DbMetricSnapshot,
   type DbOperator,
   latestPerOperator,
+  latestPerOperatorPlatform,
+  operatorTotalCollapse,
   mapOperator,
   mapSnapshot,
   telemetryFromSnapshot,
@@ -39,7 +41,16 @@ import { isLiveBoardOperator } from "@/lib/board/live";
  * (mapOperator / mapSnapshot / telemetryFromSnapshot) so cold-store rows are
  * shape-identical to live rows. Ranking is recomputed per query in filterMockBoard.
  */
-const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
+/** Row type extension: operatorTotal-collapse rows carry the operator's
+ *  distinct submitted-platform SET (same as the live path in queries.ts). */
+type RowWithPlatforms = LeaderboardRow & { platforms?: string[] };
+
+interface ColdStore {
+  opById: Map<string, DbOperator>;
+  snaps: DbMetricSnapshot[];
+}
+
+const COLD_STORE: ColdStore | null = (() => {
   try {
     // The snapshot is a PARTIAL DB shape (script selects only the columns the
     // mappers read; mapOperator/mapSnapshot coalesce the rest with ?? null), so
@@ -50,34 +61,84 @@ const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
     };
     const ops = store.operators ?? [];
     const snaps = store.metric_snapshots ?? [];
-    if (!ops.length || !snaps.length) return [];
-    const opById = new Map(ops.map((o) => [o.operator_id, o]));
-    // Deduplicate: same as latestPerOperator on the live path — one row per
-    // operator_id (first encountered, which is the most-recent after DB ordering).
-    // Without this, a snapshot.json with both '30d' + 'all_time' rows per operator
-    // produces duplicate leaderboard entries. (Bug: COLD_STORE_ROWS was iterating
-    // all snaps blindly; latestPerOperator was only called on the live DB path.)
-    const latestSnap = latestPerOperator(snaps);
-    const rows: LeaderboardRow[] = [];
-    for (const [, snap] of latestSnap) {
-      const op = opById.get(snap.operator_id);
-      if (!op) continue;
-      rows.push({
-        operator: mapOperator(op),
-        snapshot: mapSnapshot(snap),
-        global_rank: 0,
-        percentile: 0,
-        telemetry: telemetryFromSnapshot(snap),
-        window_type: snap.window_type ?? null,
-        platform: snap.platform ?? op.primary_domain ?? null,
-        snapshot_date: snap.snapshot_date ?? null,
-      });
-    }
-    return rows;
+    if (!ops.length || !snaps.length) return null;
+    return { opById: new Map(ops.map((o) => [o.operator_id, o])), snaps };
   } catch {
-    return [];
+    return null;
   }
 })();
+
+/** Build LeaderboardRows from chosen snapshots (shared by both collapse paths). */
+function buildRows(
+  snaps: Iterable<DbMetricSnapshot>,
+  platformsByOperator?: Map<string, string[]> | null,
+): RowWithPlatforms[] {
+  if (!COLD_STORE) return [];
+  const rows: RowWithPlatforms[] = [];
+  for (const snap of snaps) {
+    const op = COLD_STORE.opById.get(snap.operator_id);
+    if (!op) continue;
+    const platforms = platformsByOperator?.get(snap.operator_id);
+    rows.push({
+      operator: mapOperator(op),
+      snapshot: mapSnapshot(snap),
+      global_rank: 0,
+      percentile: 0,
+      telemetry: telemetryFromSnapshot(snap),
+      window_type: snap.window_type ?? null,
+      platform: snap.platform ?? op.primary_domain ?? null,
+      snapshot_date: snap.snapshot_date ?? null,
+      ...(platforms && platforms.length > 0 ? { platforms } : {}),
+    });
+  }
+  return rows;
+}
+
+const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
+  if (!COLD_STORE) return [];
+  // Deduplicate: same as latestPerOperator on the live path — one row per
+  // operator_id (first encountered, which is the most-recent after DB ordering).
+  // Without this, a snapshot.json with both '30d' + 'all_time' rows per operator
+  // produces duplicate leaderboard entries.
+  return buildRows(latestPerOperator(COLD_STORE.snaps).values());
+})();
+
+/**
+ * Live-scope cold-store rows — mirrors the live pipeline's ordering exactly:
+ * window filter on SNAPSHOTS (before collapse, so a windowed board picks each
+ * operator's latest in-window row rather than collapsing to all_time first),
+ * then the ghost-row guard, then the same collapse ladder (allSnapshots /
+ * operatorTotal / perPlatform / latestPerOperator) with the operator's
+ * platform SET attached on the total path.
+ */
+function liveColdStoreRows(params: BoardParams): RowWithPlatforms[] {
+  if (!COLD_STORE) return [];
+  const windowed =
+    params.windowFilter && params.window
+      ? filterToWindow(COLD_STORE.snaps, params.window)
+      : COLD_STORE.snaps;
+  const yieldable = windowed.filter(
+    (s) =>
+      s.input_tokens != null &&
+      s.input_tokens > 0 &&
+      s.output_tokens != null &&
+      s.output_tokens > 0,
+  );
+  let platformsByOperator: Map<string, string[]> | null = null;
+  let snapRows: DbMetricSnapshot[];
+  if (params.allSnapshots) {
+    snapRows = yieldable;
+  } else if (params.operatorTotal) {
+    const collapsed = operatorTotalCollapse(yieldable);
+    platformsByOperator = collapsed.platformsByOperator;
+    snapRows = [...collapsed.byOperator.values()];
+  } else if (params.perPlatform) {
+    snapRows = [...latestPerOperatorPlatform(yieldable).values()];
+  } else {
+    snapRows = [...latestPerOperator(yieldable).values()];
+  }
+  return buildRows(snapRows, platformsByOperator);
+}
 
 /** The fallback base: cold-store snapshot if we have one, else the mock seeds. */
 export function fallbackRows(): LeaderboardRow[] {
@@ -103,11 +164,15 @@ export function coldStoreGeneratedAt(): string | null {
 function applyBoardFilters(
   base: readonly LeaderboardRow[],
   params: BoardParams,
+  /** True when `base` was already window-filtered at the SNAPSHOT level
+   *  (liveColdStoreRows) — the row-level filter would be a redundant second
+   *  pass whose recency reference is computed over the collapsed subset. */
+  alreadyWindowed = false,
 ): { rows: LeaderboardRow[]; eligible: number | null } {
   let rows = [...base];
   // 730: narrow to the window ONLY when the caller opts in (the /board route);
   // legacy callers keep the full field. Mirrors the live path's windowFilter gate.
-  if (params.windowFilter && params.window)
+  if (params.windowFilter && params.window && !alreadyWindowed)
     rows = filterToWindow(rows, params.window);
   // LIVE SCOPE (2026-09-26): claimed operators + The Field only, before any
   // user filter/rank/limit — same position as the eligibility filter in
@@ -119,10 +184,16 @@ function applyBoardFilters(
     ? new Set(rows.map((r) => r.operator.operator_id)).size
     : null;
   if (params.platform && params.platform !== "all") {
+    // Match the live path (queries.ts): the row's platform, OR the operator's
+    // submitted platform SET on operatorTotal rows — a 'multi' row still
+    // matches platform=claude when they submitted on claude.
+    const want = params.platform.toLowerCase();
     rows = rows.filter(
       (r) =>
-        (r.platform ?? r.operator.primary_domain)?.toLowerCase() ===
-        params.platform!.toLowerCase(),
+        (r.platform ?? r.operator.primary_domain)?.toLowerCase() === want ||
+        ((r as RowWithPlatforms).platforms?.some(
+          (p) => p.toLowerCase() === want,
+        ) ?? false),
     );
   }
   if (params.classScope && params.classScope !== "all") {
@@ -149,13 +220,17 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
  * production live shell must not silently render synthetic operators. An
  * empty/absent cold store yields an honest empty result (callers render the
  * unavailable state, not fabricated data).
+ *
+ * Parity with the live path (queries.ts): window filtering happens on
+ * snapshots BEFORE the collapse ladder, and breakdown=platforms returns
+ * per-(operator,platform) rows — not operator-total-shaped ones.
  */
 export function filterLiveFallbackBoard(
   params: BoardParams = {},
 ): { rows: LeaderboardRow[]; eligible: number | null; hasStore: boolean } {
-  if (COLD_STORE_ROWS.length === 0)
+  if (!COLD_STORE || COLD_STORE.snaps.length === 0)
     return { rows: [], eligible: 0, hasStore: false };
-  const out = applyBoardFilters(COLD_STORE_ROWS, params);
+  const out = applyBoardFilters(liveColdStoreRows(params), params, true);
   return { ...out, hasStore: true };
 }
 

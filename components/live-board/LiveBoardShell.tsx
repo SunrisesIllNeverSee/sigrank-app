@@ -17,12 +17,16 @@ import type { ReactNode } from "react";
 import { LiveBoardHeader } from "./LiveBoardHeader";
 import { LiveWorldNav } from "./LiveWorldNav";
 import { FieldRail } from "./FieldRail";
+import { BoardRetry } from "./BoardRetry";
 import type { LiveBoardSource } from "@/lib/board/live";
 import styles from "./live-board.module.css";
 
 interface Props {
   /** Active window slug ('7d' | '30d' | '90d' | 'all'). */
   windowSlug: string;
+  /** Active window DB enum ('7d' | '30d' | '90d' | 'all_time') — the retry
+   *  probe needs the enum form. */
+  windowEnum: string;
   /** H1 lead-in: 'AI User' (all-time) or '<n>-Day'. */
   boardLabel: string;
   /** Window short label for the provenance strip, e.g. '30d' / 'all-time'. */
@@ -39,6 +43,7 @@ interface Props {
 
 export function LiveBoardShell({
   windowSlug,
+  windowEnum,
   boardLabel,
   windowShort,
   windowLabel,
@@ -73,6 +78,7 @@ export function LiveBoardShell({
                 </a>
                 .
               </p>
+              <BoardRetry windowEnum={windowEnum} />
             </div>
           ) : (
             children

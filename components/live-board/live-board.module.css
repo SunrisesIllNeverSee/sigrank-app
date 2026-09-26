@@ -336,6 +336,44 @@
   color: var(--live-muted);
 }
 
+.retryRow {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.retryBtn {
+  appearance: none;
+  cursor: pointer;
+  padding: 6px 14px;
+  border: 1px solid var(--live-border);
+  border-radius: 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--live-secondary);
+  background: var(--live-surface);
+}
+
+.retryBtn:hover:not(:disabled) {
+  color: var(--live-text);
+  border-color: var(--live-accent);
+}
+
+.retryBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.retryNote {
+  font-size: 12px;
+  color: var(--live-muted);
+}
+
 /* ── Focus + motion ───────────────────────────────────────────────────────── */
 
 .shell :is(a, button, select, input):focus-visible {

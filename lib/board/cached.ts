@@ -53,7 +53,7 @@ import {
   getOperatorRecords as _getOperatorRecords,
 } from "@/lib/board/queries";
 
-import { memoize } from "./memo";
+import { memoize, memoInvalidate } from "./memo";
 
 import type {
   LeaderboardRow,
@@ -99,7 +99,13 @@ export function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow
 // the live population and vice-versa (2026-09-26 contract requirement).
 export function getLiveBoard(q: LiveBoardQuery): Promise<LiveBoardResult> {
   const key = `board:live:${JSON.stringify(q)}`;
-  return memoize(key, 3600, () => _getLiveBoard(q));
+  // 'unavailable' is a transient failure state, not data — evict it so the
+  // next request retries the DB/snapshot ladder instead of pinning the
+  // outage for the full TTL (the ISR page still serves its last render).
+  return memoize(key, 3600, () => _getLiveBoard(q)).then((r) => {
+    if (r.source === "unavailable") memoInvalidate(key);
+    return r;
+  });
 }
 
 export const getHallOfSignal = unstable_cache(
