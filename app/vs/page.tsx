@@ -255,6 +255,36 @@ const COMPARISONS = [
     title: "SigRank vs whoburnedmore — Burning vs Compounding",
     desc: "whoburnedmore celebrates the biggest token burners. SigRank celebrates the most efficient operators. Burning more tokens is not a skill — compounding them is.",
   },
+  {
+    href: "/vs/ccrank",
+    title: "SigRank vs ccrank — Derived Ratios vs an Evaluation Framework",
+    desc: "ccrank exposes efficiency-adjacent ratios (Output/$, Cache Rate, Output Ratio) — the closest neighbor in the category. SigRank integrates those signals into one defined score.",
+  },
+  {
+    href: "/vs/tokenmaxxing",
+    title: "SigRank vs tokenmaxxing.sh — Spend Board vs Efficiency Score",
+    desc: "tokenmaxxing.sh is the minimalist spend leaderboard — the honest counter. SigRank scores whether the spend compounded.",
+  },
+  {
+    href: "/vs/straude",
+    title: "SigRank vs Straude — Practice History vs Operator Evaluation",
+    desc: "Straude is the Strava for AI coding — pace, streaks, practice history. SigRank measures how well each session drove the cascade.",
+  },
+  {
+    href: "/vs/ccclub",
+    title: "SigRank vs ccclub — Private Leagues vs the Global Field",
+    desc: "ccclub is the invite-code leaderboard among friends. SigRank is the signed, yield-ranked global field.",
+  },
+  {
+    href: "/vs/ccwarriors",
+    title: "SigRank vs ccwarriors — The Burn Arena vs the Efficiency Score",
+    desc: "ccwarriors ranks token burn with warrior cards, badges, and org boards. SigRank scores what the burn became.",
+  },
+  {
+    href: "/vs/devburn",
+    title: "SigRank vs DevBurn — Activity Points vs Operator Evaluation",
+    desc: "DevBurn scores sessions, turns, and spend with a consistency formula. SigRank evaluates the operator behind the activity.",
+  },
 ];
 
 export default function VsIndex() {
