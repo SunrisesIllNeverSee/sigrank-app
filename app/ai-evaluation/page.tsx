@@ -45,6 +45,71 @@ const RELATED = [
     title: "Yield (Υ) — Token Cascade Efficiency",
     desc: "The headline operator-evaluation metric: Υ = cache_read × output / input². The single number that captures how efficiently an operator drives the AI.",
   },
+  {
+    href: "/ai-evaluation-tools",
+    title: "AI Evaluation Tools — The Complete Landscape",
+    desc: "AI evaluation tools fall into four categories: model, output, safety, and operator. SigRank is the only operator evaluation tool — privacy-preserving token telemetry, the Yield metric, and ed25519-signed snapshots.",
+  },
+  {
+    href: "/ai-evaluation-frameworks",
+    title: "AI Evaluation Frameworks — From Models to Operators",
+    desc: "AI evaluation frameworks compared: NIST AI RMF, OpenAI Evals, DeepEval, Braintrust, and SigRank. SigRank is the framework for the operator layer.",
+  },
+  {
+    href: "/ai-evaluation-platform",
+    title: "AI Evaluation Platform — SigRank",
+    desc: "SigRank is an AI evaluation platform for operators. Content-free, continuous, cohort-relative, and governed. Integrate via CLI, MCP, or API.",
+  },
+  {
+    href: "/ai-evaluator",
+    title: "AI Evaluator — What SigRank Does Differently",
+    desc: "An AI evaluator assesses AI performance. SigRank is an AI evaluator for the operator layer — cohort-relative ranking, signed snapshots, content-free telemetry.",
+  },
+  {
+    href: "/ai-agent-evaluation",
+    title: "AI Agent Evaluation — Measuring the Operator Directing the Agent",
+    desc: "AI agent evaluation focuses on the agent. But agents are directed by operators. SigRank measures the operator directing the agent.",
+  },
+  {
+    href: "/ai-model-evaluation",
+    title: "AI Model Evaluation vs Operator Evaluation",
+    desc: "AI model evaluation is necessary but not sufficient. SigRank is the complementary operator layer — model vs operator evaluation.",
+  },
+  {
+    href: "/ai-model-safety-evaluation-benchmark-continuous-testing",
+    title: "AI Model Safety Evaluation, Benchmarks, and Continuous Testing",
+    desc: "Safety evaluation uses benchmarks and continuous testing. SigRank extends continuous testing to operators — safety is not just a model property.",
+  },
+  {
+    href: "/best-ai-evaluation-tools-for-production",
+    title: "Best AI Evaluation Tools for Production",
+    desc: "The production AI evaluation stack: model, output, safety, and operator layers. The best tool for each — and why SigRank is the operator layer.",
+  },
+  {
+    href: "/ai-compliance-standards",
+    title: "AI Compliance Standards and Operator Evaluation",
+    desc: "NIST AI RMF and the EU AI Act require auditable AI evaluation. SigRank provides governed operator evaluation with cryptographic provenance.",
+  },
+  {
+    href: "/confirmation-hacking-ai-evaluation",
+    title: "Confirmation Hacking in AI Evaluation",
+    desc: "Confirmation hacking is designing evaluations that confirm what you already believe. SigRank avoids it with content-free telemetry — token counts only, no bias.",
+  },
+  {
+    href: "/evaluating-ai",
+    title: "Evaluating AI — The Operator Layer Is the Missing Piece",
+    desc: "Evaluating AI without evaluating the operator is like evaluating a car without evaluating the driver. SigRank fills the gap.",
+  },
+  {
+    href: "/ai-evaluation-news",
+    title: "AI Evaluation News and Trends — 2026",
+    desc: "The shift from model benchmarks to operator evaluation. AI evaluation trends, milestones, and what to watch in 2026.",
+  },
+  {
+    href: "/privacy-preserving-ai-telemetry",
+    title: "Privacy-Preserving AI Telemetry — SigRank",
+    desc: "Token counts only — never prompts, code, or conversation text. Four token pillars, ed25519-signed, server-side rescoring, replay protection.",
+  },
 ];
 
 export default function AIEvaluationPage() {
