@@ -26,6 +26,7 @@ import {
   mapSnapshot,
   telemetryFromSnapshot,
 } from "@/lib/board/mappers";
+import { isLiveBoardOperator } from "@/lib/board/live";
 
 /**
  * Cold-store fallback base (owner 2026-06-20). The build-time snapshot.json is a
@@ -83,12 +84,40 @@ export function fallbackRows(): LeaderboardRow[] {
   return COLD_STORE_ROWS.length > 0 ? COLD_STORE_ROWS : MOCK_LEADERBOARD;
 }
 
-export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
-  let rows = [...fallbackRows()];
+/** The cold-store's capture timestamp (snapshot.json header), for provenance labels. */
+export function coldStoreGeneratedAt(): string | null {
+  const g = (coldStore as { generated_at?: string | null }).generated_at;
+  return typeof g === "string" && g ? g.slice(0, 10) : null;
+}
+
+/**
+ * Shared board pipeline for the fallback paths: window → LIVE eligibility →
+ * platform → class → sort → re-rank → limit. Mirrors the live path's ordering
+ * in queries.ts (eligibility before rank/limit) so scope=live means the same
+ * thing on both data sources.
+ *
+ * Returns the ranked rows plus `eligible` — the live-population count measured
+ * after eligibility but before user filters (platform/class) and limit; null
+ * when params.live isn't set (legacy callers don't pay for the extra count).
+ */
+function applyBoardFilters(
+  base: readonly LeaderboardRow[],
+  params: BoardParams,
+): { rows: LeaderboardRow[]; eligible: number | null } {
+  let rows = [...base];
   // 730: narrow to the window ONLY when the caller opts in (the /board route);
   // legacy callers keep the full field. Mirrors the live path's windowFilter gate.
   if (params.windowFilter && params.window)
     rows = filterToWindow(rows, params.window);
+  // LIVE SCOPE (2026-09-26): claimed operators + The Field only, before any
+  // user filter/rank/limit — same position as the eligibility filter in
+  // queries.ts. The Field is unclaimed but stays (owner-confirmed baseline).
+  if (params.live) rows = rows.filter((r) => isLiveBoardOperator(r.operator));
+  // Eligible = distinct OPERATORS, not rows — a per-platform breakdown emits
+  // several rows per operator, but the live population is counted in people.
+  const eligible = params.live
+    ? new Set(rows.map((r) => r.operator.operator_id)).size
+    : null;
   if (params.platform && params.platform !== "all") {
     rows = rows.filter(
       (r) =>
@@ -98,9 +127,8 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   }
   if (params.classScope && params.classScope !== "all") {
     const scope = params.classScope!.toLowerCase();
-    rows = rows.filter(
-      (r) =>
-        tierOf(r.snapshot.class_tier).toLowerCase() === scope,
+    rows = rows.filter((r) =>
+      tierOf(r.snapshot.class_tier).toLowerCase() === scope,
     );
   }
   const sort = params.sort ?? SORT_DEFAULT;
@@ -108,7 +136,27 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   // Re-rank within the filtered/sorted view for stable display ranks.
   rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
   if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
-  return rows;
+  return { rows, eligible };
+}
+
+export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
+  return applyBoardFilters(fallbackRows(), params).rows;
+}
+
+/**
+ * LIVE-SCOPE fallback (2026-09-26): the cold-store snapshot ONLY — a real,
+ * dated copy of the production board. NEVER the hand-authored mock rows: the
+ * production live shell must not silently render synthetic operators. An
+ * empty/absent cold store yields an honest empty result (callers render the
+ * unavailable state, not fabricated data).
+ */
+export function filterLiveFallbackBoard(
+  params: BoardParams = {},
+): { rows: LeaderboardRow[]; eligible: number | null; hasStore: boolean } {
+  if (COLD_STORE_ROWS.length === 0)
+    return { rows: [], eligible: 0, hasStore: false };
+  const out = applyBoardFilters(COLD_STORE_ROWS, params);
+  return { ...out, hasStore: true };
 }
 
 /** Pull a numeric sort value from a row for a given sort key.

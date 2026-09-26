@@ -18,7 +18,10 @@
 
 import { computeCascadeMetrics } from "@/lib/ingest/bridge";
 import type { TelemetryRaw } from "@/lib/board/types";
-import type { SignalClass } from "@/components/sigrank/types";
+import {
+  type SignalClass,
+  toSignalClass as toSignalClassShared,
+} from "@/components/sigrank/types";
 import type {
   Operator,
   ScoredSnapshot,
@@ -144,6 +147,16 @@ export interface BoardParams {
   sort?: string;
   /** Max rows. */
   limit?: number;
+  /**
+   * LIVE-BOARD SCOPE (2026-09-26): when true, restrict to the live population —
+   * claimed operators + The Field baseline (lib/board/live.ts) — applied after
+   * the operator join but BEFORE platform/class filters, sort, rank and limit,
+   * so ranks/counts describe the live population. The pipeline also reports the
+   * eligible count via the query's meta channel, and the fallback path uses the
+   * real cold-store only (never hand-authored mocks). Unset → legacy behaviour
+   * (full field incl. unclaimed seeds), unchanged for all existing callers.
+   */
+  live?: boolean;
 }
 
 /** History query params. */
@@ -168,17 +181,8 @@ const VERIFICATION_STATUSES: ReadonlySet<string> = new Set<
   Operator["verification_status"]
 >(["unverified", "verified", "audited"]);
 
-/** Permanent experience stages — TRANSMITTER is a badge, not a permanent class. */
-const SIGNAL_CLASSES: ReadonlySet<string> = new Set<SignalClass>([
-  "ARCH+ I", "ARCH+ II", "ARCH+ III",
-  "ARCH I", "ARCH II", "ARCH III",
-  "POWER I", "POWER II", "POWER III",
-  "BASE I", "BASE II", "BASE III",
-  "SEEKER I", "SEEKER II", "SEEKER III",
-  "REFINER I", "REFINER II", "REFINER III",
-  "BEARER I", "BEARER II", "BEARER III",
-  "IGNITER I", "IGNITER II", "IGNITER III",
-]);
+// SIGNAL_CLASSES (the 24 permanent stages) lives in components/sigrank/types.ts
+// — shared by this coercer and the client-side API mapper.
 
 /**
  * Cast a Supabase `.select()` result to our hand-written row type. The supabase
@@ -209,9 +213,10 @@ export function toVerification(
     : "unverified";
 }
 
-/** Narrow a free-text class_tier to the SignalClass union (defaults IGNITER III). */
+/** Narrow a free-text class_tier to the SignalClass union (defaults IGNITER III).
+ *  Delegates to the shared coercer in components/sigrank/types.ts. */
 export function toSignalClass(v: string | null | undefined): SignalClass {
-  return v && SIGNAL_CLASSES.has(v) ? (v as SignalClass) : "IGNITER III";
+  return toSignalClassShared(v);
 }
 
 /** Map a DB operators row → facade Operator (live rows are never placeholders). */

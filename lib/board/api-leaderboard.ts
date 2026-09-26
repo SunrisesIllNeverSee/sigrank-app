@@ -9,6 +9,7 @@
  */
 
 import type { LeaderboardRow } from "@/lib/board";
+import type { LeaderboardRowWithPlatforms } from "@/lib/board/queries";
 
 /** D19: leaderboard responses carry Cache-Control for CDN caching.
  * TTL increased from 300s to 1800s — on-demand revalidation via
@@ -26,12 +27,24 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
   const { operator, snapshot } = row;
   const c = snapshot.cascade;
   const t = row.telemetry;
+  // operatorTotal rows carry the distinct submitted-platform SET (attached in
+  // queries.ts); other collapse modes leave it undefined → omitted.
+  const platforms = (row as LeaderboardRowWithPlatforms).platforms;
   return {
     rank: row.global_rank,
     operator_id: operator.operator_id,
     codename: operator.codename,
     display_name: operator.display_name ?? null,
     claimed: operator.claimed,
+    // Identity/status fields the board needs to preserve across client fetches
+    // (2026-09-26 live-scope fix — previously dropped by the API mapper, so
+    // fetched rows lost handle sub-labels, retirement state, and the platform
+    // set badge that SSR rows carried).
+    status: operator.status ?? "active",
+    handle: operator.handle ?? null,
+    primary_domain: operator.primary_domain ?? null,
+    account_age_days: operator.account_age_days ?? null,
+    ...(platforms && platforms.length > 0 ? { platforms } : {}),
     class_tier: snapshot.class_tier, // UPPERCASE canonical SignalClass
     platform: (row.platform ?? operator.primary_domain ?? "other").toLowerCase(),
     // The window bucket this row's snapshot belongs to ('7d'/'30d'/'90d'/'all_time').
@@ -65,6 +78,9 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     non_compounding: c ? c.nonCompounding : null,
     percentile: row.percentile,
     last_seen: snapshot.snapshot_date ?? null,
+    // Operator-lifetime message count — kept in the API contract so
+    // client-fetched rows carry the same Message Volume the SSR rows render.
+    message_volume: operator.total_messages_lifetime ?? null,
     movement_24h: snapshot.movement_24h,
     movement_7d: snapshot.movement_7d,
     is_placeholder: operator.isPlaceholder ?? false,

@@ -23,7 +23,8 @@
 import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
-import { getLeaderboard } from "@/lib/board";
+import { getLiveBoard } from "@/lib/board";
+import type { LiveBoardResult } from "@/lib/board";
 import { toEntry } from "@/lib/board/to-entry";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
@@ -90,47 +91,25 @@ export default async function BoardWindowPage({
   if (!win) notFound();
   const isAllTime = win.slug === "all";
 
-  // All windows now query the DB directly. ISR (revalidate=3600) bounds
-  // egress to 1 query/hour. Only claimed/live operators are shown — the
-  // full seeded board (including unclaimed seed operators) lives on
+  // All windows now read through the LIVE-BOARD contract (lib/board/live.ts):
+  // eligibility = claimed operators + The Field baseline, applied before
+  // sort/rank/limit INSIDE the query (previously the page filtered `claimed`
+  // post-rank — which also silently dropped The Field, violating its
+  // on-board invariant). The same scope backs /api/v1/leaderboard?scope=live,
+  // so client-side pagination/filter fetches see the identical population.
+  // The full seeded board (unclaimed seed corpus) lives on
   // sigeconomy.com/all-time.
-  let totalEntries: ReturnType<typeof toEntry>[];
-  let totalCount: number;
-  let jsonLdEntries: ReturnType<typeof toEntry>[];
-
-  if (win.enum === "all_time") {
-    // LIVE path: the all_time board fetches ALL snapshots (no window_type
-    // filter) so operators who only submitted 7d/30d/90d snapshots also
-    // appear. operatorTotalCollapse picks the latest 'multi' snapshot per
-    // operator (or latest single-platform). Only claimed operators are
-    // shown (seed operators are on sigeconomy.com).
-    // Egress: fetches ~2,400 rows but ISR (revalidate=3600) bounds to
-    // 1 query/hour. We serialize 400 to RSC props; full count for pagination.
-    const totalRows = await getLeaderboard({
-      window: win.enum,
-      windowFilter: false,
-      operatorTotal: true,
-    });
-    const liveRows = totalRows.filter((r) => r.operator.claimed);
-    totalCount = liveRows.length;
-    totalEntries = liveRows.slice(0, 400).map(toEntry);
-    jsonLdEntries = liveRows.slice(0, 100).map(toEntry);
-  } else {
-    // Live path: DB-side window-filtered query (egress fix — fetches only
-    // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
-    // Only claimed operators are shown.
-    const totalRows = await getLeaderboard({
-      window: win.enum,
-      windowFilter: true,
-      operatorTotal: true,
-    });
-    const liveRows = totalRows.filter((r) => r.operator.claimed);
-    totalCount = liveRows.length;
-    totalEntries = liveRows.map(toEntry);
-    // JsonLd from the default (operatorTotal) entries — search engines see the
-    // default board. Filtered variants are client-side and don't need structured data.
-    jsonLdEntries = totalEntries;
-  }
+  const board: LiveBoardResult = await getLiveBoard({
+    window: win.enum,
+    breakdown: "total",
+  });
+  const totalCount = board.population;
+  const totalEntries = (isAllTime ? board.rows.slice(0, 400) : board.rows).map(
+    toEntry,
+  );
+  const jsonLdEntries = isAllTime
+    ? board.rows.slice(0, 100).map(toEntry)
+    : totalEntries;
 
   // Dynamic H1 label: each board window gets a unique page heading (e.g.
   // "30-Day Leaderboard" vs "AI User Leaderboard") so /board/all and /board/30d

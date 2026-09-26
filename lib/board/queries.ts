@@ -58,7 +58,19 @@ import {
   toSignalClass,
   ZERO_TELEMETRY,
 } from "@/lib/board/mappers";
-import { fallbackRows, filterMockBoard, sortValue } from "@/lib/board/fallback";
+import {
+  coldStoreGeneratedAt,
+  fallbackRows,
+  filterLiveFallbackBoard,
+  filterMockBoard,
+  sortValue,
+} from "@/lib/board/fallback";
+import {
+  isLiveBoardOperator,
+  liveBoardParams,
+  type LiveBoardQuery,
+  type LiveBoardResult,
+} from "@/lib/board/live";
 import { recordValue } from "@/lib/analytics/record-value";
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -239,12 +251,83 @@ export const OPERATOR_COLUMNS =
 // Facade functions.
 // ───────────────────────────────────────────────────────────────────────────
 
-/** Global / filtered leaderboard. */
-export async function getLeaderboard(
-  params: BoardParams = {},
-): Promise<LeaderboardRow[]> {
+/** Provenance + population meta a board query reports alongside its rows. */
+interface BoardQueryMeta {
+  /**
+   * Live-scope eligible population — distinct operators counted AFTER the
+   * eligibility filter (claimed + The Field) but BEFORE platform/class filters
+   * and limit. Null for non-live queries.
+   */
+  eligible: number | null;
+  /** Newest snapshot_date among eligible rows ('YYYY-MM-DD'), null when n/a. */
+  latestSnapshotDate: string | null;
+  /** Where the rows came from: live DB, the real cold-store snapshot, the
+   *  legacy fallback base (cold-store OR mock — legacy callers ignore this),
+   *  or 'unavailable' when the live path had no real data to serve. */
+  source: "supabase" | "snapshot" | "fallback" | "unavailable";
+}
+
+interface BoardQueryResult {
+  rows: LeaderboardRowWithPlatforms[];
+  meta: BoardQueryMeta;
+}
+
+/** Newest snapshot_date across rows ('YYYY-MM-DD' strings sort correctly). */
+function latestSnapshotDate(rows: readonly LeaderboardRow[]): string | null {
+  let max: string | null = null;
+  for (const r of rows) {
+    const d = r.snapshot_date;
+    if (d && (max === null || d > max)) max = d;
+  }
+  return max;
+}
+
+/**
+ * queryBoard — the shared leaderboard pipeline. `getLeaderboard` is the
+ * legacy public shape (rows only); `getLiveBoard` adds the live-population
+ * scope + provenance on top of the same code path.
+ *
+ * LIVE SCOPE (params.live, 2026-09-26):
+ *   - Eligibility (claimed operators + The Field) is applied after the
+ *     operator join and BEFORE platform/class filters, sort, rank and limit —
+ *     ranks and counts describe the live population, not a post-limit subset.
+ *   - Fallbacks resolve through filterLiveFallbackBoard (the real cold-store
+ *     snapshot only) — the hand-authored mock corpus is never served to the
+ *     live shell. No cold store → 'unavailable' + empty rows.
+ */
+async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
+  const live = params.live === true;
+
+  /** Route through the live-safe fallback (cold-store only) or the legacy
+   *  fallback (cold-store, else mock) depending on scope. */
+  const fallbackResult = (): BoardQueryResult => {
+    if (live) {
+      const f = filterLiveFallbackBoard(params);
+      return {
+        rows: f.rows,
+        meta: {
+          eligible: f.eligible,
+          latestSnapshotDate: coldStoreGeneratedAt(),
+          source: f.hasStore ? "snapshot" : "unavailable",
+        },
+      };
+    }
+    return {
+      rows: filterMockBoard(params),
+      meta: { eligible: null, latestSnapshotDate: null, source: "fallback" },
+    };
+  };
+
+  /** Honest empty — the DB answered, the window/population is legitimately
+   *  empty. Reported as supabase-sourced (the data path was healthy) so the UI
+   *  shows an empty board, not an unavailable state. */
+  const emptyResult = (): BoardQueryResult => ({
+    rows: [],
+    meta: { eligible: live ? 0 : null, latestSnapshotDate: null, source: "supabase" },
+  });
+
   const sb = getSupabaseServer();
-  if (!sb) return filterMockBoard(params);
+  if (!sb) return fallbackResult();
   try {
     // Live path: read latest metric_snapshots, join operators + rank_history.
     // We sort/filter/re-rank in JS so the live board is shape- and order-
@@ -272,8 +355,8 @@ export async function getLeaderboard(
       },
       "metric_snapshots (getLeaderboard)",
     );
-    // DB empty/unreachable → mock fallback (graceful-degradation contract).
-    if (allSnaps.length === 0) return filterMockBoard(params);
+    // DB empty/unreachable → fallback (graceful-degradation contract).
+    if (allSnaps.length === 0) return fallbackResult();
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
@@ -326,7 +409,9 @@ export async function getLeaderboard(
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
     if (snapRows.length === 0)
-      return params.windowFilter ? [] : filterMockBoard(params);
+      return params.windowFilter
+        ? emptyResult()
+        : fallbackResult();
 
     const opIds = new Set(snapRows.map((s) => s.operator_id));
     // Fetch all operators_public (paginated) — the IN clause with 1600+ UUIDs
@@ -387,7 +472,22 @@ export async function getLeaderboard(
     // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key deploy),
     // a windowFilter board returns [] rather than fabricated mock seeds.
     if (rows.length === 0)
-      return params.windowFilter ? [] : filterMockBoard(params);
+      return params.windowFilter
+        ? emptyResult()
+        : fallbackResult();
+
+    // LIVE SCOPE eligibility (2026-09-26): claimed operators + The Field
+    // baseline — applied BEFORE user filters, sort, rank and limit so the
+    // displayed ranks and the reported population describe the live field,
+    // not a post-limit subset (Codex finding: the page previously filtered
+    // claimed AFTER ranking, and the API never filtered at all).
+    if (live) rows = rows.filter((r) => isLiveBoardOperator(r.operator));
+    // Eligible = distinct OPERATORS (a per-platform breakdown emits several
+    // rows per operator — the population is people, not row-records).
+    const eligible = live
+      ? new Set(rows.map((r) => r.operator.operator_id)).size
+      : null;
+    const eligibleLatest = live ? latestSnapshotDate(rows) : null;
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
     // Filter on the row's platform (snapshot.platform, falling back to
@@ -412,10 +512,54 @@ export async function getLeaderboard(
     rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
     rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
     if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
-    return rows;
+    return {
+      rows,
+      meta: {
+        eligible,
+        latestSnapshotDate: eligibleLatest,
+        source: "supabase",
+      },
+    };
   } catch {
-    return filterMockBoard(params);
+    return fallbackResult();
   }
+}
+
+/** Public legacy shape — rows only, identical behaviour to pre-live-scope. */
+export async function getLeaderboard(
+  params: BoardParams = {},
+): Promise<LeaderboardRow[]> {
+  return (await queryBoard(params)).rows;
+}
+
+/**
+ * getLiveBoard — the explicit live-board read contract (lib/board/live.ts).
+ *
+ * Returns the ranked live rows PLUS the meta the shell + API need to be
+ * truthful: provenance (live DB vs dated cold-store snapshot vs unavailable),
+ * the eligible population before filters/limit, and the distinct-operator
+ * count actually returned. Eligibility = claimed operators + The Field,
+ * applied before rank/limit. The production live shell never receives
+ * hand-authored mock rows — no real data → source:'unavailable' + [].
+ */
+export async function getLiveBoard(
+  q: LiveBoardQuery,
+): Promise<LiveBoardResult> {
+  const { rows, meta } = await queryBoard(liveBoardParams(q));
+  const source: LiveBoardResult["source"] =
+    meta.source === "supabase" || meta.source === "snapshot"
+      ? meta.source
+      : "unavailable";
+  const returnedOperators = new Set(
+    rows.map((r) => r.operator.operator_id),
+  ).size;
+  return {
+    rows,
+    source,
+    sourceDate: meta.latestSnapshotDate,
+    population: meta.eligible ?? 0,
+    returnedOperators,
+  };
 }
 
 /**

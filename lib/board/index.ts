@@ -25,11 +25,13 @@
 
 export * from "@/lib/board/mappers";
 export * from "@/lib/board/fallback";
+export * from "@/lib/board/live";
 
 // Cached read functions (data-layer caching via unstable_cache).
 // These shadow the raw query exports — consumers get caching transparently.
 export {
   getLeaderboard,
+  getLiveBoard,
   getOperator,
   getOperatorSubmissions,
   getOperatorHistory,

@@ -38,6 +38,7 @@ import { unstable_cache } from "next/cache";
 
 import {
   getLeaderboard as _getLeaderboard,
+  getLiveBoard as _getLiveBoard,
   getOperator as _getOperator,
   getOperatorSubmissions as _getOperatorSubmissions,
   getOperatorHistory as _getOperatorHistory,
@@ -65,6 +66,7 @@ import type {
   HistoryPoint,
 } from "@/lib/board/types";
 import type { BoardParams, HistoryParams } from "@/lib/board/mappers";
+import type { LiveBoardQuery, LiveBoardResult } from "@/lib/board/live";
 import type {
   OperatorSubmission,
   OperatorReport,
@@ -88,6 +90,16 @@ import type {
 export function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
   const key = `board:leaderboard:${JSON.stringify(params)}`;
   return memoize(key, 3600, () => _getLeaderboard(params));
+}
+
+// getLiveBoard shares the memo layer (the result can exceed unstable_cache's
+// 2MB Data Cache cap on Vercel — same reason getLeaderboard isn't cached
+// there). Its 'board:live:' key prefix keeps live-scope results in DISTINCT
+// cache entries from legacy callers' rows — a legacy 25-row page can't poison
+// the live population and vice-versa (2026-09-26 contract requirement).
+export function getLiveBoard(q: LiveBoardQuery): Promise<LiveBoardResult> {
+  const key = `board:live:${JSON.stringify(q)}`;
+  return memoize(key, 3600, () => _getLiveBoard(q));
 }
 
 export const getHallOfSignal = unstable_cache(
