@@ -1,0 +1,395 @@
+/**
+ * live-board.module.css — scoped structural layer for the LIVE board shell
+ * (Phase 1, 2026-09-26). Mounted only on /board/{all,7d,30d,90d}.
+ *
+ * Token contract: the shell never hardcodes a theme colour. It declares
+ * --live-* aliases ONCE, pointed at the existing theme vars (bg-base,
+ * bg-surface, accent, gold, ring…). Since those vars are re-defined per
+ * [data-theme] on <html>, the same layout renders terminal green, carbon
+ * gold, railway violet and paper light with zero per-theme overrides.
+ *
+ * Semantic metric/class colours (--class-*, --rank-*, --bar-*) are NOT
+ * aliased — they keep their canonical meaning independent of theme accent.
+ *
+ * Terminal traps avoided on purpose: the global [data-theme="terminal"]
+ * rules that add dashed borders + ◈ corner marks target Tailwind utility
+ * classes (.rounded-lg.border, .border-bg-border). The shell uses only
+ * module classes, so those decorations never attach to shell chrome. The
+ * table inside keeps its existing styles untouched.
+ */
+
+.shell {
+  --live-bg: rgb(var(--bg-base));
+  --live-surface: rgb(var(--bg-surface));
+  --live-elevated: rgb(var(--bg-elevated));
+  --live-hover: rgb(var(--bg-hover));
+  --live-border: rgb(var(--bg-border));
+  --live-border-subtle: rgb(var(--bg-border-subtle));
+  --live-text: rgb(var(--text-primary));
+  --live-secondary: rgb(var(--text-secondary));
+  --live-muted: rgb(var(--text-muted));
+  --live-dim: rgb(var(--text-dim));
+  --live-accent: rgb(var(--accent));
+  --live-gold: rgb(var(--gold));
+  --live-focus: rgb(var(--ring));
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--live-text);
+  min-width: 0;
+}
+
+/* ── Header: compact hero replacing the 40vh WaveHero ────────────────────── */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 18px 14px;
+  background: var(--live-surface);
+  border: 1px solid var(--live-border-subtle);
+  border-radius: 8px;
+}
+
+.eyebrowRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--live-accent);
+}
+
+.liveDot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--live-muted);
+  border: 1px solid var(--live-border-subtle);
+  border-radius: 999px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+.liveDot::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--live-accent);
+}
+
+.liveDotStale::before {
+  background: var(--live-gold);
+}
+
+.liveDotDown::before {
+  background: rgb(180 70 60);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(22px, 3.4vw, 34px);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--live-text);
+  text-wrap: balance;
+}
+
+.titleAccent {
+  color: var(--live-gold);
+}
+
+.subline {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--live-secondary);
+}
+
+.subline strong {
+  color: var(--live-text);
+  font-weight: 600;
+}
+
+/* provenance strip — factual source/freshness, no realtime claims */
+.provenance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--live-muted);
+}
+
+.provenance strong {
+  color: var(--live-secondary);
+  font-weight: 600;
+}
+
+.provenance .sep {
+  color: var(--live-dim);
+}
+
+/* ── World nav: window tabs + primary destinations ───────────────────────── */
+
+.worldNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.windowTabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--live-surface);
+  border: 1px solid var(--live-border-subtle);
+  border-radius: 8px;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.windowTab {
+  appearance: none;
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--live-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.windowTab:hover {
+  color: var(--live-text);
+  background: var(--live-hover);
+}
+
+.windowTabActive,
+.windowTabActive:hover {
+  color: var(--live-bg);
+  background: var(--live-accent);
+}
+
+.destinations {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.destination {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid var(--live-border);
+  border-radius: 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--live-secondary);
+  text-decoration: none;
+  background: var(--live-surface);
+  white-space: nowrap;
+}
+
+.destination:hover {
+  color: var(--live-text);
+  border-color: var(--live-accent);
+}
+
+.destinationPrimary {
+  color: var(--live-bg);
+  background: var(--live-gold);
+  border-color: var(--live-gold);
+}
+
+.destinationPrimary:hover {
+  color: var(--live-bg);
+  border-color: var(--live-gold);
+  filter: brightness(1.08);
+}
+
+/* ── Grid: board column + restrained field rail ──────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 14px;
+  align-items: start;
+}
+
+.boardCol {
+  min-width: 0; /* contain the table's horizontal scroll */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 12px;
+}
+
+.railCard {
+  background: var(--live-surface);
+  border: 1px solid var(--live-border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.railTitle {
+  margin: 0 0 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--live-accent);
+}
+
+.railBody {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--live-secondary);
+}
+
+.railLink {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--live-gold);
+  text-decoration: none;
+}
+
+.railLink:hover {
+  text-decoration: underline;
+}
+
+.railStat {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--live-muted);
+  padding: 4px 0;
+  border-top: 1px dashed var(--live-border-subtle);
+}
+
+.railStat:first-of-type {
+  border-top: 0;
+}
+
+.railStat strong {
+  color: var(--live-text);
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ── Unavailable / empty state ────────────────────────────────────────────── */
+
+.unavailable {
+  background: var(--live-surface);
+  border: 1px solid var(--live-border);
+  border-radius: 8px;
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.unavailableTitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--live-text);
+}
+
+.unavailableBody {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--live-muted);
+}
+
+/* ── Focus + motion ───────────────────────────────────────────────────────── */
+
+.shell :is(a, button, select, input):focus-visible {
+  outline: 2px solid var(--live-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell *,
+  .shell *::before,
+  .shell *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Responsive: rail drops below the board, tabs scroll, no page overflow ── */
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rail {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .railCard {
+    flex: 1 1 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 14px 14px 12px;
+  }
+  .worldNav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .windowTabs {
+    width: 100%;
+  }
+  .windowTab {
+    flex: 1 0 auto;
+    text-align: center;
+    padding: 6px 10px;
+  }
+  .destinations {
+    width: 100%;
+  }
+  .destination {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
