@@ -125,6 +125,136 @@ const COMPARISONS = [
     title: "SigRank vs AI Productivity Dashboards — Dashboards vs Competition",
     desc: "AI productivity dashboards show usage metrics. SigRank scores operators by token cascade efficiency and ranks them on a public leaderboard. Dashboards show what you spent; SigRank scores how well you spent it.",
   },
+  {
+    href: "/vs/wakatime",
+    title: "SigRank vs WakaTime — Time vs Token Efficiency",
+    desc: "WakaTime tracks hours coding. SigRank tracks token cascade efficiency. Time ≠ signal — an hour with good cache reuse beats 10 hours of burning input.",
+  },
+  {
+    href: "/vs/clawdboard",
+    title: "SigRank vs clawdboard — Cascade vs Streaks",
+    desc: "clawdboard ranks by cost, tokens, streaks, and active days. SigRank ranks by cascade efficiency. Streaks measure consistency; Yield measures skill.",
+  },
+  {
+    href: "/vs/costhawk",
+    title: "SigRank vs CostHawk — Yield vs Consumption",
+    desc: "CostHawk has an anonymized AI tools leaderboard ranked by total token consumption. SigRank ranks by Yield efficiency. Consumption counts. Efficiency matters.",
+  },
+  {
+    href: "/vs/mytokentracker",
+    title: "SigRank vs mytokentracker — Efficiency vs Spend",
+    desc: "mytokentracker ranks operators by dollars spent across 2,300+ models. SigRank ranks by Yield efficiency. Spend is a receipt; Yield is a result.",
+  },
+  {
+    href: "/vs/tokenrank",
+    title: "SigRank vs TokenRank — Yield vs Burn-to-Rank",
+    desc: "TokenRank uses burn-to-rank: aggregate token activity across Codex, Claude, Gemini, Qwen, Cursor, Copilot. SigRank ranks by Yield efficiency. Burning to rank vs building to rank.",
+  },
+  {
+    href: "/vs/tokentracker",
+    title: "SigRank vs Token Tracker — Efficiency vs Tracking",
+    desc: "Token Tracker monitors 29 AI coding tools with desktop widgets. SigRank measures cascade efficiency with Yield. Tracking tokens vs measuring skill.",
+  },
+  {
+    href: "/vs/tokscale",
+    title: "SigRank vs Tokscale — Yield vs Volume Leaderboard",
+    desc: "Tokscale ranks by total tokens burned across 40+ tools. SigRank ranks by Yield efficiency. Volume is noise; Yield is signal.",
+  },
+  {
+    href: "/vs/aiusage",
+    title: "SigRank vs aiusage — Call Counting vs Cascade Scoring",
+    desc: "aiusage tracks API calls and token usage across providers. SigRank scores operator skill. Counting calls is accounting; scoring cascades is evaluation.",
+  },
+  {
+    href: "/vs/ccburn",
+    title: "SigRank vs ccburn — Burn Rate vs Yield Rate",
+    desc: "ccburn shows your Claude Code burn rate in real time. SigRank shows your yield rate. Speed of burning is not quality of operating.",
+  },
+  {
+    href: "/vs/ccflare",
+    title: "SigRank vs ccflare — Charts vs Scores",
+    desc: "ccflare visualizes Claude Code token consumption with pretty charts. SigRank scores production. Charts of what you spent is not a score for what you produced.",
+  },
+  {
+    href: "/vs/ccgather",
+    title: "SigRank vs ccgather — One Platform vs the Whole Field",
+    desc: "ccgather ranks Claude Code users by usage stats. SigRank ranks operators by cascade yield across 15+ platforms. Claude Code only is not the whole field.",
+  },
+  {
+    href: "/vs/ccstatusline",
+    title: "SigRank vs ccstatusline — Status Widget vs Instrument Panel",
+    desc: "ccstatusline shows a token count in your terminal status bar. SigRank turns that number into a ranked score. A status widget is not an instrument panel.",
+  },
+  {
+    href: "/vs/claudecount",
+    title: "SigRank vs claudecount — Counting vs Scoring",
+    desc: "claudecount counts Claude Code tokens. SigRank scores cascades. Counting is not scoring. A counter tells you what you spent; a scorecard tells you whether the spend was worth it.",
+  },
+  {
+    href: "/vs/clauderank",
+    title: "SigRank vs clauderank — One Tool vs Every Platform",
+    desc: "clauderank ranks Claude Code users. SigRank ranks AI operators across every platform. One tool is not the whole field. Cascade yield is platform-neutral.",
+  },
+  {
+    href: "/vs/codeburn",
+    title: "SigRank vs CodeBurn — Spend Optimization vs Operator Scoring",
+    desc: "CodeBurn optimizes AI coding spend across 41 tools — waste scanning, model comparison, budget guarding, and git-linked yield. SigRank scores operator cascade efficiency (Υ) and ranks on a public leaderboard. Different questions, same token logs.",
+  },
+  {
+    href: "/vs/lineman",
+    title: "SigRank vs lineman — Cost Input vs Yield Output",
+    desc: "lineman tracks Claude Code spend. SigRank scores yield. Spend tracking is accounting; yield scoring is evaluation. Cost is the input; yield is the output.",
+  },
+  {
+    href: "/vs/notch-pilot",
+    title: "SigRank vs notch-pilot — The Pilot, Not the Plane",
+    desc: "notch-pilot is an AI coding copilot. SigRank scores the pilot, not the plane. The assistant isn't the operator; the operator at the wheel is what gets measured.",
+  },
+  {
+    href: "/vs/omnara",
+    title: "SigRank vs omnara — Monitoring vs Evaluation",
+    desc: "omnara monitors AI agents with broad observability. SigRank scores AI operators. Monitoring infrastructure is not evaluating the operator at the wheel.",
+  },
+  {
+    href: "/vs/opcode",
+    title: "SigRank vs opcode — The CLI vs The Operator Score",
+    desc: "opcode is an AI coding CLI. SigRank scores the operator using any CLI. The tool isn't the skill; the cascade yield is what gets measured and ranked.",
+  },
+  {
+    href: "/vs/sculptor",
+    title: "SigRank vs sculptor — The Tool vs The Operator",
+    desc: "sculptor is an AI coding agent. SigRank scores the operator driving any agent. The tool is not the operator. Measure the driver, not the car.",
+  },
+  {
+    href: "/vs/sessionwatcher",
+    title: "SigRank vs sessionwatcher — One Session vs Every Operator",
+    desc: "sessionwatcher monitors individual Claude Code sessions for token usage. SigRank scores and ranks operators globally. Watching one session is not ranking every operator.",
+  },
+  {
+    href: "/vs/token-forest",
+    title: "SigRank vs token-forest — Counting Trees vs Measuring Yield",
+    desc: "token-forest tracks AI token usage with a forest/growth metaphor. SigRank measures cascade yield. Counting trees is not measuring the forest's yield.",
+  },
+  {
+    href: "/vs/tokenmaxxer",
+    title: "SigRank vs tokenmaxxer — Maxxing vs Efficiency",
+    desc: "tokenmaxxer gamifies token burning with streaks and badges. SigRank measures token efficiency. Maxxing tokens is the opposite of efficient operating.",
+  },
+  {
+    href: "/vs/vibe-island",
+    title: "SigRank vs vibe-island — Community vs Competition",
+    desc: "vibe-island is a vibe coding community. SigRank is an operator ranking system. Vibing is not operating. Community is not competition.",
+  },
+  {
+    href: "/vs/viberank",
+    title: "SigRank vs viberank — Burn Rate vs Cascade Yield",
+    desc: "viberank ranks developers by token burn for vibe coding. SigRank ranks by cascade yield efficiency. Burn rate is participation; cascade yield is skill.",
+  },
+  {
+    href: "/vs/whoburnedmore",
+    title: "SigRank vs whoburnedmore — Burning vs Compounding",
+    desc: "whoburnedmore celebrates the biggest token burners. SigRank celebrates the most efficient operators. Burning more tokens is not a skill — compounding them is.",
+  },
 ];
 
 export default function VsIndex() {

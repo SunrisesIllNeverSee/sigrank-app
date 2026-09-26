@@ -504,13 +504,7 @@ export default async function FieldPage() {
               {ghost_ranks.slice(0, 20).map((g) => (
                 <tr key={g.handle} className="border-b border-bg-border-subtle">
                   <td className="px-4 py-2 font-mono text-text-primary">
-                    <Link
-                      href={`/user/${g.handle}`}
-                      className="underline hover:text-text-primary"
-                      style={{ color: "#10b981" }}
-                    >
-                      {g.handle}
-                    </Link>
+                    <span style={{ color: "#10b981" }}>{g.handle}</span>
                   </td>
                   <td className="px-4 py-2 text-right font-mono text-text-muted">
                     #{g.tokscale_rank.toLocaleString()}

@@ -112,6 +112,11 @@ const FOOTER_COLUMNS: {
     links: [
       { href: "/hall", label: "Best AI Users — Hall of Signal" },
       { href: "/score", label: "Benchmark Your AI Usage" },
+      { href: "/score/paste", label: "Paste Your Stats" },
+      { href: "/live", label: "Live Board" },
+      { href: "/marketplace", label: "Marketplace" },
+      { href: "/exchange/signals", label: "Exchange Signals" },
+      { href: "/share/mcp", label: "Share via MCP" },
       { href: "/research", label: "AI Power User Statistics" },
       { href: "/vs/lmsys-arena", label: "Human vs Model Performance" },
       { href: "/privacy", label: "Privacy-Preserving AI Measurement" },
@@ -131,6 +136,17 @@ const FOOTER_COLUMNS: {
         href: "/alternatives/token-tracking-tools",
         label: "Token Tracking Tools",
       },
+    ],
+  },
+  {
+    heading: "Boards",
+    headingHref: "/board/all",
+    links: [
+      { href: "/board/7d", label: "7-Day Board" },
+      { href: "/board/30d", label: "30-Day Board" },
+      { href: "/board/90d", label: "90-Day Board" },
+      { href: "/board/all", label: "All-Time Board" },
+      { href: "/user/the-field", label: "The Field" },
     ],
   },
   {
@@ -206,7 +222,7 @@ export function Footer() {
         </div>
 
         {/* SEO link columns */}
-        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-9">
+        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-10">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} className="flex flex-col gap-2">
               {col.headingHref ? (
