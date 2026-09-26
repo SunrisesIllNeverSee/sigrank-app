@@ -96,50 +96,97 @@ export function BoardTableClient({
   const viewPlatforms = searchParams.get("view") === "platforms";
   const platformLabel = platformLabelFor(platformFilter);
 
-  // API-fetched entries: per-platform breakdown rows, or a Realtime-refreshed
-  // first page of the totals board.
-  const [fetchedEntries, setFetchedEntries] = useState<
+  // Two separate fetch slots — NEVER shared (a platform-breakdown result set
+  // and a totals refresh are different row shapes; mixing them rendered
+  // totals rows as platform rows when Realtime was enabled):
+  //   breakdown      — per-platform rows for ?view=platforms / ?platform=
+  //   refreshedTotals — Realtime-refreshed first page of the totals board
+  const [breakdown, setBreakdown] = useState<{
+    entries: LeaderboardEntryWithPlatforms[];
+    /** Distinct live operators in this breakdown query (the honest "N of M"
+     *  denominator — a platform filter shrinks M; per-platform rows can
+     *  outnumber operators). */
+    operators: number | null;
+  } | null>(null);
+  const [refreshedTotals, setRefreshedTotals] = useState<
     LeaderboardEntryWithPlatforms[] | null
   >(null);
-  /** Distinct live operators in the current breakdown query (the honest "N of
-   *  M operators" denominator — a platform filter shrinks M, and per-platform
-   *  rows can outnumber operators). */
-  const [fetchedOperators, setFetchedOperators] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Separate loading flags — the breakdown fetch and the all-time lazy-load
+  // are independent requests; one shared flag let a breakdown in flight
+  // silently block pagination.
+  const [breakdownLoading, setBreakdownLoading] = useState(false);
+  const [totalsLoading, setTotalsLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [retryTick, setRetryTick] = useState(0);
   const [liveTick, setLiveTick] = useState(0);
-  // Lazy-loaded full dataset for all_time board (fetched on first pagination)
-  const [fullEntries, setFullEntries] = useState<
-    LeaderboardEntryWithPlatforms[] | null
-  >(null);
-  // Stale-response guards: only the newest request may commit.
-  const requestSeq = useRef(0);
+  // Lazy-loaded all_time dataset, keyed to the window it belongs to — on
+  // client-side navigation /board/all → /board/30d the component state
+  // survives, so an unkeyed slot would render all-time rows under 30d chrome.
+  const [fullBoard, setFullBoard] = useState<{
+    windowEnum: string;
+    entries: LeaderboardEntryWithPlatforms[];
+  } | null>(null);
+  // Stale-response guards: only the newest request may commit. One sequence
+  // per fetch family so a breakdown fetch can't cancel a totals lazy-load.
+  const breakdownSeq = useRef(0);
+  const totalsSeq = useRef(0);
+
+  const resolvedWindowEnum = windowEnum ?? "all_time";
+  const fullBoardForWindow =
+    fullBoard && fullBoard.windowEnum === resolvedWindowEnum
+      ? fullBoard.entries
+      : null;
 
   // Lazy-load the full all_time dataset when the user paginates beyond page 0.
   // scope=live&breakdown=total = the same claimed+Field population and the
-  // same operator-total collapse the SSR page rendered.
+  // same operator-total collapse the SSR page rendered. Abortable + sequence
+  // guarded like the breakdown path — a slow response arriving after a window
+  // change can no longer commit the wrong window's rows.
+  const loadTotals = useCallback(() => {
+    if (fullBoardForWindow || totalsLoading) return;
+    const we = resolvedWindowEnum;
+    const seq = ++totalsSeq.current;
+    const controller = new AbortController();
+    setTotalsLoading(true);
+    setFetchError(false);
+    fetch(liveBoardUrl(we, "total"), {
+      cache: "force-cache",
+      signal: controller.signal,
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error(`board fetch failed (${r.status})`);
+        return r.json();
+      })
+      .then((d) => {
+        if (controller.signal.aborted || totalsSeq.current !== seq) return;
+        setFullBoard({
+          windowEnum: we,
+          entries: (d.entries ?? []).map(mapApiEntry),
+        });
+        setTotalsLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (controller.signal.aborted) return;
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        if (totalsSeq.current !== seq) return;
+        setFetchError(true);
+        setTotalsLoading(false);
+      });
+  }, [fullBoardForWindow, totalsLoading, resolvedWindowEnum]);
+
   const handlePageChange = useCallback(
     (page: number) => {
-      if (page > 0 && win === "all" && !fullEntries && !loading) {
-        setLoading(true);
-        setFetchError(false);
-        fetch(liveBoardUrl(windowEnum ?? "all_time", "total"), {
-          cache: "force-cache",
-        })
-          .then((r) => {
-            if (!r.ok) throw new Error(`board fetch failed (${r.status})`);
-            return r.json();
-          })
-          .then((d) => {
-            setFullEntries((d.entries ?? []).map(mapApiEntry));
-          })
-          .catch(() => setFetchError(true))
-          .finally(() => setLoading(false));
-      }
+      if (page > 0 && win === "all") loadTotals();
     },
-    [win, fullEntries, loading, windowEnum],
+    [win, loadTotals],
   );
+
+  // If the window changes while a totals fetch is in flight, invalidate it —
+  // its commit guard also keys on windowEnum, this just frees the flag early.
+  useEffect(() => {
+    setTotalsLoading(false);
+    totalsSeq.current += 1;
+  }, [resolvedWindowEnum]);
 
   // Refetch the first page from the API (Realtime refresh). Live scope keeps
   // the refreshed rows consistent with the SSR population.
@@ -151,7 +198,7 @@ export function BoardTableClient({
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (!d) return; // transient failure → keep the last good data
-        setFetchedEntries((d.entries ?? []).map(mapApiEntry));
+        setRefreshedTotals((d.entries ?? []).map(mapApiEntry));
         setLiveTick((t) => t + 1);
       })
       .catch(() => {});
@@ -166,15 +213,14 @@ export function BoardTableClient({
   // can't express via URL alone — the server hands the collapse to the API.
   useEffect(() => {
     if (!viewPlatforms && !platformFilter) {
-      setFetchedEntries(null);
-      setFetchedOperators(null);
+      setBreakdown(null);
       return;
     }
     if (!windowEnum) return;
 
-    const seq = ++requestSeq.current;
+    const seq = ++breakdownSeq.current;
     const controller = new AbortController();
-    setLoading(true);
+    setBreakdownLoading(true);
     setFetchError(false);
 
     fetch(
@@ -186,49 +232,54 @@ export function BoardTableClient({
         return r.json();
       })
       .then((d) => {
-        if (controller.signal.aborted || requestSeq.current !== seq) return;
-        setFetchedEntries((d.entries ?? []).map(mapApiEntry));
-        if (typeof d.operators_returned === "number") {
-          setFetchedOperators(d.operators_returned);
-        } else {
-          setFetchedOperators(null);
-        }
-        setLoading(false);
+        if (controller.signal.aborted || breakdownSeq.current !== seq) return;
+        setBreakdown({
+          entries: (d.entries ?? []).map(mapApiEntry),
+          operators:
+            typeof d.operators_returned === "number"
+              ? d.operators_returned
+              : null,
+        });
+        setBreakdownLoading(false);
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
-        if (requestSeq.current !== seq) return;
+        if (breakdownSeq.current !== seq) return;
         // Keep the last good breakdown on screen; flag the failure so the
         // user sees a retry affordance instead of a silently stale table.
         setFetchError(true);
-        setLoading(false);
+        setBreakdownLoading(false);
       });
     return () => controller.abort();
     // retryTick re-runs this effect on demand (error-strip Retry button).
   }, [viewPlatforms, platformFilter, windowEnum, retryTick]);
 
-  // Windowed board: use fetched entries if viewing platforms or filtering,
-  // or if Realtime pushed a fresh page (liveTick > 0). Otherwise use the
-  // server-provided first page (SSR/ISR). For all_time, once the user
-  // paginates, swap to the lazy-loaded full dataset.
+  // Windowed board: platform views use breakdown rows; a Realtime refresh
+  // (liveTick > 0) swaps the totals first page; the all-time board swaps to
+  // the lazy-loaded dataset once fetched — keyed to THIS window so a stale
+  // all-time payload can't render under a different window's chrome.
   let entries: LeaderboardEntryWithPlatforms[];
   if (viewPlatforms || platformFilter) {
     // Fetched breakdown rows — or empty while loading/failed (the error strip
     // communicates the failure; never substitute the totals population here).
-    entries = fetchedEntries ?? [];
-  } else if (liveTick > 0 && fetchedEntries) {
-    entries = fetchedEntries;
-  } else if (fullEntries) {
-    entries = fullEntries;
+    entries = breakdown?.entries ?? [];
+  } else if (liveTick > 0 && refreshedTotals) {
+    entries = refreshedTotals;
+  } else if (win === "all" && fullBoardForWindow) {
+    entries = fullBoardForWindow;
   } else {
     entries = totalEntries;
   }
 
+  // While the first breakdown request is in flight, fall back to the window's
+  // live operator count (right population scope) instead of flashing "0".
   const totalUsers =
     viewPlatforms || platformFilter
-      ? (fetchedOperators ?? entries.length)
+      ? (breakdown?.operators ?? totalCount)
       : totalCount;
+
+  const loading = breakdownLoading || totalsLoading;
 
   return (
     <div>
@@ -247,10 +298,7 @@ export function BoardTableClient({
             onClick={() => {
               setFetchError(false);
               if (viewPlatforms || platformFilter) setRetryTick((t) => t + 1);
-              else {
-                setFullEntries(null);
-                setLoading(false);
-              }
+              else loadTotals();
             }}
           >
             Retry
@@ -295,6 +343,7 @@ function mapApiEntry(api: Record<string, unknown>): LeaderboardEntryWithPlatform
     anonId: (api.display_name as string) ?? (api.codename as string) ?? "?",
     codename: (api.codename as string) ?? "?",
     subLabel: handle ? `@${handle}` : (primaryDomain ?? undefined),
+    location: (api.location as string) ?? undefined,
     signalClass: toSignalClass((api.class_tier as string) ?? null),
     platform: (api.platform as string) ?? undefined,
     window: (api.window as string) ?? undefined,

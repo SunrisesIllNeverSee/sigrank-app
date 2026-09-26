@@ -493,12 +493,15 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
     // Filter on the row's platform (snapshot.platform, falling back to
     // primary_domain) — NOT operator.primary_domain alone. This way operators
     // who submitted on codex/multi/pi appear under those platform filters even
-    // if their primary_domain is "claude" or "other".
+    // if their primary_domain is "claude" or "other". On the operator-total
+    // path the row additionally carries the operator's full platform SET — a
+    // 'multi' row still matches `platform=claude` when they submitted on claude.
     if (params.platform && params.platform !== "all") {
+      const want = params.platform.toLowerCase();
       rows = rows.filter(
         (r) =>
-          (r.platform ?? r.operator.primary_domain)?.toLowerCase() ===
-          params.platform!.toLowerCase(),
+          (r.platform ?? r.operator.primary_domain)?.toLowerCase() === want ||
+          (r.platforms?.some((p) => p.toLowerCase() === want) ?? false),
       );
     }
     if (params.classScope && params.classScope !== "all") {

@@ -44,6 +44,9 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     handle: operator.handle ?? null,
     primary_domain: operator.primary_domain ?? null,
     account_age_days: operator.account_age_days ?? null,
+    // Operator-supplied public location (already public via operators_public);
+    // without it every client-fetched row lost the ◍ location SSR renders.
+    location: operator.location ?? null,
     ...(platforms && platforms.length > 0 ? { platforms } : {}),
     class_tier: snapshot.class_tier, // UPPERCASE canonical SignalClass
     platform: (row.platform ?? operator.primary_domain ?? "other").toLowerCase(),

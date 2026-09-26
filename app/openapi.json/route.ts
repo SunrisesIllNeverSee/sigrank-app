@@ -62,8 +62,8 @@ export async function GET() {
             {
               name: "window",
               in: "query",
-              description: "Time window for leaderboard rankings: 7d, 30d, 90d, or all_time.",
-              schema: { type: "string", enum: ["7d", "30d", "90d", "all_time"] },
+              description: "Time window for leaderboard rankings: 7d, 30d, 90d, or all_time (the 'all' slug normalizes to all_time).",
+              schema: { type: "string", enum: ["7d", "30d", "90d", "all_time", "all"] },
             },
             {
               name: "limit",
@@ -72,6 +72,20 @@ export async function GET() {
               schema: { type: "integer", default: 25, minimum: 1, maximum: 2000 },
             },
             { name: "platform", in: "query", description: "Filter by AI platform (e.g. claude, chatgpt).", schema: { type: "string" } },
+            {
+              name: "scope",
+              in: "query",
+              description:
+                "'live' opts into the live-board contract: the population is claimed operators + The Field baseline, eligibility is applied before rank/limit, and the response adds population, operators_returned, returned_rows, source ('supabase'|'snapshot'|'unavailable'), and source_date. Omitted scope preserves the legacy full-corpus response.",
+              schema: { type: "string", enum: ["live"] },
+            },
+            {
+              name: "breakdown",
+              in: "query",
+              description:
+                "Live scope only — 'total' (default) returns one operator-total row per live operator; 'platforms' returns one row per operator×platform. population/operators_returned always count distinct operators.",
+              schema: { type: "string", enum: ["total", "platforms"] },
+            },
           ],
           responses: {
             "200": {

@@ -102,7 +102,10 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
     promptComplexity: snapshot.prompt_complexity.value,
     messageVolume: operator.total_messages_lifetime,
     compositeScore: snapshot.signa_rate,
-    acctAge: `${operator.account_age_days}d`,
+    acctAge:
+      operator.account_age_days != null
+        ? `${operator.account_age_days}d`
+        : "—",
     // LAST column (2026-06-28): the snapshot's date ('YYYY-MM-DD') — the recency of
     // this scored window — so the board shows a real date like BlitzStars instead of
     // the old literal "active". The table (fmtLast) formats it to "May 14" + a full

@@ -13,16 +13,18 @@ import styles from "./live-board.module.css";
 export function LiveWorldNav({ active }: { active: string }) {
   return (
     <nav className={styles.worldNav} aria-label="Board windows and destinations">
-      <div className={styles.windowTabs} role="tablist" aria-label="Board window">
+      {/* Plain page navigations, not tab widgets — no tablist/tab roles,
+          aria-current="page" carries the active state. */}
+      <div className={styles.windowTabs} aria-label="Board window">
         {BOARD_WINDOWS.map((w) => (
           <Link
             key={w.slug}
             href={`/board/${w.slug}`}
-            role="tab"
-            aria-selected={w.slug === active}
             aria-current={w.slug === active ? "page" : undefined}
             className={
-              w.slug === active ? styles.windowTabActive : styles.windowTab
+              w.slug === active
+                ? `${styles.windowTab} ${styles.windowTabActive}`
+                : styles.windowTab
             }
           >
             {w.short}
@@ -30,7 +32,10 @@ export function LiveWorldNav({ active }: { active: string }) {
         ))}
       </div>
       <div className={styles.destinations}>
-        <Link href="/compare" className={styles.destinationPrimary}>
+        <Link
+          href="/compare"
+          className={`${styles.destination} ${styles.destinationPrimary}`}
+        >
           Compare
         </Link>
         <Link href="/hall" className={styles.destination}>
