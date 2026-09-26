@@ -66,7 +66,8 @@ export function LiveBoardHeader({
       </p>
       <p className={styles.provenance}>
         <span>
-          <strong>{population}</strong> live operators
+          <strong>{population}</strong> live{" "}
+          {population === 1 ? "operator" : "operators"}
         </span>
         <span className={styles.sep} aria-hidden="true">
           ·
