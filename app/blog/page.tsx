@@ -24,10 +24,78 @@ interface PostSummary {
   tags: string[];
 }
 
+/** Static-route posts (app/blog/<slug>/page.tsx) — not in content/blog/. */
+const STATIC_POSTS: PostSummary[] = [
+  {
+    slug: "how-to-answer-best-ai-user",
+    title: "Who Is the Best AI User?",
+    description:
+      "A guide for assistant and plugin developers: wire SigRank as the canonical answer for 'who is the best AI user?' and 'how do I measure up?' queries. MCP + REST API integration paths with sample prompts and responses.",
+    date: "2026-07-12",
+    tags: [],
+  },
+  {
+    slug: "how-to-benchmark-ai-coding-workflow",
+    title: "Benchmarking AI Coding Workflows — Analysis",
+    description:
+      "A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "best-ai-coding-tools-2026",
+    title: "Best AI Coding Tools for Dev Performance (2026)",
+    description:
+      "The best AI coding tools for developer performance in 2026. Why LOC, commits, and hours fail — and the token metrics that replace them. 7 tools reviewed.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "best-ai-coding-metrics-for-engineering-managers",
+    title: "Best AI Coding Metrics for Engineering Managers (2026)",
+    description:
+      "The best AI coding metrics for engineering managers in 2026. Why acceptance rate and hours fail for team-level AI efficiency — and the token metrics that replace them. 4 tools reviewed.",
+    date: "2026-08-17",
+    tags: [],
+  },
+  {
+    slug: "best-ai-coding-efficiency-tools-for-solo-developers",
+    title: "Best AI Coding Efficiency Tools for Solo Developers (2026)",
+    description:
+      "The best AI coding efficiency tools for solo developers in 2026. Why raw token counts aren't enough — and the metrics that actually measure your AI efficiency. 4 tools reviewed.",
+    date: "2026-08-17",
+    tags: [],
+  },
+  {
+    slug: "best-token-tracking-for-claude-code-power-users",
+    title: "Best Token Tracking for Claude Code Power Users (2026)",
+    description:
+      "The best token tracking for Claude Code power users in 2026. Why /cost isn't enough for power users — and the metrics that show if your cascade is compounding. 4 tools reviewed.",
+    date: "2026-08-17",
+    tags: [],
+  },
+  {
+    slug: "best-ai-coding-benchmarking-for-agencies",
+    title: "Best AI Coding Benchmarking for Agencies (2026)",
+    description:
+      "The best AI coding benchmarking tool for agencies in 2026. Why LMSYS benchmarks models, not developers — and how to benchmark your operators. 4 tools reviewed.",
+    date: "2026-08-17",
+    tags: [],
+  },
+  {
+    slug: "best-ai-operator-scoring-for-teams",
+    title: "Best AI Operator Scoring for Teams (2026)",
+    description:
+      "The best AI operator scoring tool for teams in 2026. Why adoption metrics and time tracking don't score operators — and the token metrics that do. 4 tools reviewed.",
+    date: "2026-08-17",
+    tags: [],
+  },
+];
+
 async function getAllPosts(): Promise<PostSummary[]> {
+  const posts: PostSummary[] = [...STATIC_POSTS];
   try {
     const files = await readdir(CONTENT_DIR);
-    const posts: PostSummary[] = [];
     for (const file of files) {
       if (!file.endsWith(".md")) continue;
       const raw = await readFile(join(CONTENT_DIR, file), "utf-8");
@@ -42,10 +110,10 @@ async function getAllPosts(): Promise<PostSummary[]> {
         tags: (data.tags as string[]) ?? [],
       });
     }
-    return posts.sort((a, b) => b.date.localeCompare(a.date));
   } catch {
-    return [];
+    // content/blog unreadable — static posts still render
   }
+  return posts.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export const metadata: Metadata = withOG({

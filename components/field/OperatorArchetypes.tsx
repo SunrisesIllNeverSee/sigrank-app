@@ -9,8 +9,6 @@
  * as props by the page.
  */
 
-import Link from "next/link";
-
 export interface ArchetypeData {
   archetype_id: number;
   key: string;
@@ -154,17 +152,16 @@ export default function OperatorArchetypes({
                 </div>
               </div>
 
-              {/* Example handles */}
+              {/* Example handles — anonymized dataset handles, not profiles */}
               {arch.sample_handles.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {arch.sample_handles.slice(0, 5).map((handle) => (
-                    <Link
+                    <span
                       key={handle}
-                      href={`/user/${handle}`}
-                      className="rounded border border-bg-border px-2 py-0.5 font-mono text-xs text-text-secondary transition-colors hover:border-gold hover:text-gold"
+                      className="rounded border border-bg-border px-2 py-0.5 font-mono text-xs text-text-secondary"
                     >
                       {handle}
-                    </Link>
+                    </span>
                   ))}
                 </div>
               )}
