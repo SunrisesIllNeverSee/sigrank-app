@@ -72,19 +72,19 @@ const TOOLS: Tool[] = [
   },
   {
     name: "Tokscale",
-    what: "A token-scaling tool that aggregates token usage across sessions and normalizes metrics for comparison. Bundled with SigRank.",
+    what: "A token-tracking CLI and public leaderboard (tokscale.ai) that aggregates usage across 40+ AI coding tools and ranks by total tokens burned. The largest volume board in the category.",
     pros: [
-      "Aggregates and normalizes token usage across many sessions",
-      "Useful for comparing operators of very different scales",
-      "Free and open-source, bundled with SigRank",
+      "Widest tool coverage in the category — 40+ supported agents",
+      "Largest public volume leaderboard (2,100+ ranked users)",
+      "Free and open-source CLI with TUI dashboard",
     ],
     cons: [
-      "Scaling tool, not a scorer — no Υ Yield, no class tier, no leaderboard",
-      "Needs a data source (ccusage or sigrank) to feed it",
-      "No operator identity or signed submissions on its own",
+      "Ranks by raw volume, not efficiency — no Υ Yield, class tier, or cascade metrics",
+      "Volume leaders are the biggest spenders, not the most efficient operators",
+      "No operator-level scoring framework (SNR, Leverage, Velocity)",
     ],
-    pricing: "Free (open-source, bundled with SigRank)",
-    bestFor: "Normalizing token usage across sessions of different scales",
+    pricing: "Free (open-source)",
+    bestFor: "Tracking token usage across many tools and ranking by total volume",
   },
   {
     name: "Token Dashboard (tokendash)",

@@ -189,6 +189,13 @@ const STATIC_ROUTES: {
   { path: "/vs/claudecount", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/ccgather", priority: 0.7, changeFrequency: "monthly" },
   { path: "/vs/clauderank", priority: 0.7, changeFrequency: "monthly" },
+  // Ecosystem neighbors (2026-09-26 batch — verified live)
+  { path: "/vs/ccrank", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/vs/tokenmaxxing", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/straude", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ccclub", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/ccwarriors", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/vs/devburn", priority: 0.7, changeFrequency: "monthly" },
 
   // Alternatives / listicle pages — commercial intent
   {

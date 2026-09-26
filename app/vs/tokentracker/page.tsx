@@ -1,7 +1,7 @@
 /**
  * app/vs/tokentracker/page.tsx — "SigRank vs Token Tracker" SEO comparison page.
  *
- * Angle: Token Tracker (tokentracker.cc) has the widest tool coverage (29 tools)
+ * Angle: Token Tracker (tokentracker.cc) has the widest tool coverage of any tracker
  * with desktop widgets and native apps. But it tracks volume, not efficiency.
  * SigRank measures cascade efficiency. Tracking tokens vs measuring skill.
  */
@@ -16,14 +16,14 @@ import { WaveHero } from "@/components/ui/WaveHero";
 export const metadata: Metadata = withOG({
   title: "SigRank vs Token Tracker \u2014 Efficiency vs Tracking",
   description:
-    "Token Tracker monitors 29 AI coding tools with desktop widgets. SigRank measures cascade efficiency with Yield. Tracking tokens vs measuring skill.",
+    "Token Tracker monitors AI coding tools with desktop widgets. SigRank measures cascade efficiency with Yield. Tracking tokens vs measuring skill.",
   path: "/vs/tokentracker",
 });
 
 const COMPARE_ROWS: { feature: string; tokentracker: string; sigrank: string }[] = [
   {
     feature: "What it measures",
-    tokentracker: "Token counts and cost across 29 tools",
+    tokentracker: "Token counts and cost across dozens of tools",
     sigrank: "Token cascade efficiency (Yield, Leverage, SNR, Velocity)",
   },
   {
@@ -38,7 +38,7 @@ const COMPARE_ROWS: { feature: string; tokentracker: string; sigrank: string }[]
   },
   {
     feature: "Tool coverage",
-    tokentracker: "29 AI coding tools (widest coverage)",
+    tokentracker: "Dozens of AI coding tools (widest coverage)",
     sigrank: "19+ AI coding agents with dedicated adapters",
   },
   {
@@ -87,12 +87,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank a Token Tracker alternative?",
     answer:
-      "They serve different purposes. Token Tracker is the widest token monitoring tool: 29 AI coding tools, desktop widgets, native macOS and Windows apps, even a desktop pet. It excels at showing you what you spent across every tool you use. SigRank is the efficiency layer: it reads the same token logs and computes whether those tokens were well spent. If you want monitoring across many tools, Token Tracker is excellent. If you want to know whether you are actually good at using AI, SigRank answers that.",
+      "They serve different purposes. Token Tracker is the widest token monitoring tool: dozens of AI coding tools, desktop widgets, native macOS and Windows apps, even a desktop pet. It excels at showing you what you spent across every tool you use. SigRank is the efficiency layer: it reads the same token logs and computes whether those tokens were well spent. If you want monitoring across many tools, Token Tracker is excellent. If you want to know whether you are actually good at using AI, SigRank answers that.",
   },
   {
     question: "What does Token Tracker not measure that SigRank does?",
     answer:
-      "Token Tracker reports raw token counts and cost per tool. SigRank derives the cascade architecture from those counts: Yield (cache_read times output divided by input squared), compression ratio, SNR, Leverage, and Velocity. Token Tracker tells you how much you spent across 29 tools. SigRank tells you whether your token cascade is compounding signal or burning tokens. The same 50K input tokens can produce 30K output with high cache reuse or 3K output with zero reuse. Token Tracker sees the same number either way. SigRank sees the 10x difference.",
+      "Token Tracker reports raw token counts and cost per tool. SigRank derives the cascade architecture from those counts: Yield (cache_read times output divided by input squared), compression ratio, SNR, Leverage, and Velocity. Token Tracker tells you how much you spent across its supported tools. SigRank tells you whether your token cascade is compounding signal or burning tokens. The same 50K input tokens can produce 30K output with high cache reuse or 3K output with zero reuse. Token Tracker sees the same number either way. SigRank sees the 10x difference.",
   },
   {
     question: "Can I use both Token Tracker and SigRank?",
@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Which is better for multi-tool workflows?",
     answer:
-      "Token Tracker has wider tool coverage today (29 tools vs 19+). If you use many different AI coding agents and want a unified cost dashboard, Token Tracker is the better monitoring tool. If you want to know how efficiently you use those tools and where you rank against other operators, SigRank is the only one that answers that. The widest coverage does not help if the metric is volume instead of efficiency.",
+      "Token Tracker has wider tool coverage today. If you use many different AI coding agents and want a unified cost dashboard, Token Tracker is the better monitoring tool. If you want to know how efficiently you use those tools and where you rank against other operators, SigRank is the only one that answers that. The widest coverage does not help if the metric is volume instead of efficiency.",
   },
   {
     question: "Does Token Tracker have a leaderboard?",
@@ -124,7 +124,7 @@ export default function VsTokentrackerPage() {
           comparisonArticle({
             title: "SigRank vs Token Tracker \u2014 Efficiency vs Tracking",
             description:
-              "Token Tracker monitors 29 AI coding tools with desktop widgets. SigRank measures cascade efficiency with Yield. Tracking tokens vs measuring skill.",
+              "Token Tracker monitors AI coding tools with desktop widgets. SigRank measures cascade efficiency with Yield. Tracking tokens vs measuring skill.",
             path: "/vs/tokentracker",
           }),
         ]}
@@ -135,7 +135,7 @@ export default function VsTokentrackerPage() {
         title="Tracking Tokens vs Measuring Skill"
         subtitle={
           <>
-            Token Tracker has the widest tool coverage (29 tools) with desktop
+            Token Tracker has the widest tool coverage of any tracker with desktop
             widgets and native apps. SigRank measures{" "}
             <span className="text-gold">cascade efficiency</span>. Tracking
             what you spent is useful. Knowing whether it was worth it is better.
@@ -150,7 +150,7 @@ export default function VsTokentrackerPage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Token Tracker (tokentracker.cc) is a comprehensive token monitoring
-          tool. It covers 29 AI coding tools, offers desktop widgets, native
+          tool. It covers dozens of AI coding tools, offers desktop widgets, native
           macOS and Windows apps, and even a desktop pet. For seeing what you
           spent across every tool you use, it is excellent. But it tracks{" "}
           <em>volume</em>: how many tokens you burned and how much you spent.

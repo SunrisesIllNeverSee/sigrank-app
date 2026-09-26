@@ -52,8 +52,13 @@ const COMPARE_ROWS: { feature: string; viberank: string; sigrank: string }[] = [
   },
   {
     feature: "Operator profiles + head-to-head compare",
-    viberank: "Partial (profile pages)",
+    viberank: "Profiles w/ daily charts + tool breakdown; per-tool boards",
     sigrank: "Yes",
+  },
+  {
+    feature: "Verified identity + badges",
+    viberank: "Yes — GitHub OAuth verified badge + tier ladder (Spark→Supernova)",
+    sigrank: "Yes — ed25519 operator identity + class tiers",
   },
   {
     feature: "MCP server for AI-agent integration",
@@ -62,12 +67,12 @@ const COMPARE_ROWS: { feature: string; viberank: string; sigrank: string }[] = [
   },
   {
     feature: "ed25519-signed snapshot submission",
-    viberank: "No",
+    viberank: "Server-validated submissions (cost/token ratio guards)",
     sigrank: "Yes",
   },
   {
     feature: "Platform-neutral (Claude Code, Cursor, Copilot, Gemini, 15+)",
-    viberank: "Web-based, limited tool coverage",
+    viberank: "Multi-tool (v2): everything ccusage tracks — Claude, Codex, Gemini, Copilot, OpenCode",
     sigrank: "Yes",
   },
   {
@@ -147,14 +152,24 @@ export default function VsViberankPage() {
           The short version: viberank
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          viberank is a public leaderboard for AI coding token usage with a vibe
-          coding focus. It ranks developers by token burn — how many tokens you
-          consumed across your sessions. It is gamified, web-based, and built
-          around a simple premise: <em>more tokens burned = higher rank</em>.
-          That is a participation metric, not a skill metric. An operator who
-          re-sends the same context every turn and burns 50M input tokens will
-          top the board. An operator who compounds cached context and produces
-          the same output with 5M tokens will rank lower.
+          <a
+            href="https://www.viberank.app"
+            target="_blank"
+            rel="noopener"
+            className="text-gold underline underline-offset-2"
+          >
+            viberank
+          </a>{" "}
+          is the most complete leaderboard ecosystem in the category — v2 is
+          multi-tool (everything ccusage tracks: Claude Code, Codex, Gemini
+          CLI, Copilot, OpenCode), with GitHub-verified badges, a Spark→Supernova
+          tier ladder, per-tool boards, rich profiles with daily charts, and
+          an aggregate stats page. What it ranks is still token burn — how
+          many tokens you consumed across your sessions. That is a
+          participation metric, not a skill metric. An operator who re-sends
+          the same context every turn and burns 50M input tokens will top the
+          board. An operator who compounds cached context and produces the
+          same output with 5M tokens will rank lower.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank takes the same token telemetry and asks a different question:
