@@ -408,6 +408,11 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
+    // Asymmetry note: a bounded window with zero rows is ordinary (a quiet week)
+    // → honest empty. An UNFILTERED read (windowFilter:false, e.g. /board/all)
+    // with zero snapshots means a healthy board corpus somehow has no rows at
+    // all — anomalous enough to treat as a degraded source → cold-store/
+    // unavailable. Different verdicts for the same snapRows.length===0.
     if (snapRows.length === 0)
       return params.windowFilter
         ? emptyResult()

@@ -3,7 +3,7 @@
  * scripts/snapshot-db.mjs — cold-store snapshot of the live board.
  *
  * Reads the live Supabase board (operators + their latest metric_snapshot per
- * window) and writes a DETERMINISTIC JSON to lib/data/snapshot.json. That file is
+ * window) and writes a DETERMINISTIC JSON to lib/board/snapshot.json. That file is
  * the production FALLBACK: if Supabase is unreachable at request time, the site
  * serves this recent real snapshot instead of the hand-authored mock. Run 1–2×/day.
  *
@@ -52,25 +52,41 @@ if (!url || !key) {
 
 const sb = createClient(url, key, { auth: { persistSession: false } });
 
-const { data: operators, error: opErr } = await sb
-  .from("operators")
-  .select(
-    "operator_id, codename, display_name, claimed, claimed_at, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, handle, location, status, profile_visibility",
-  );
-if (opErr) {
-  console.error("[snapshot] operators read failed:", opErr.message);
+// PostgREST caps unbounded selects at ~1000 rows — the live corpus is well
+// past that, so paginate with a deterministic order (stable pages, stable
+// diffs) until a short page signals the end.
+const PAGE = 1000;
+const CEILING = 50_000;
+async function fetchAll(table, columns, orderCol) {
+  const all = [];
+  for (let from = 0; from < CEILING; from += PAGE) {
+    const { data, error } = await sb
+      .from(table)
+      .select(columns)
+      .order(orderCol)
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.error(`[snapshot] ${table} read failed:`, error.message);
+      process.exit(1);
+    }
+    all.push(...(data ?? []));
+    if ((data?.length ?? 0) < PAGE) return all;
+  }
+  console.error(`[snapshot] ${table} exceeded ${CEILING} rows — aborting.`);
   process.exit(1);
 }
 
-const { data: snaps, error: snErr } = await sb
-  .from("metric_snapshots")
-  .select(
-    "operator_id, snapshot_date, window_type, platform, class_tier, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, message_volume, account_age_days, total_messages, signal_force, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
-  );
-if (snErr) {
-  console.error("[snapshot] metric_snapshots read failed:", snErr.message);
-  process.exit(1);
-}
+const operators = await fetchAll(
+  "operators",
+  "operator_id, codename, display_name, claimed, claimed_at, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, handle, location, status, profile_visibility",
+  "operator_id",
+);
+
+const snaps = await fetchAll(
+  "metric_snapshots",
+  "operator_id, snapshot_date, window_type, platform, class_tier, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, message_volume, account_age_days, total_messages, signal_force, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
+  "operator_id",
+);
 
 if (!operators?.length || !snaps?.length) {
   console.error(

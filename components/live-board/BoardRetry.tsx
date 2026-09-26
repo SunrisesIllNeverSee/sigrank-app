@@ -2,18 +2,17 @@
 /**
  * BoardRetry — the unavailable-state retry affordance (Phase 1 shell).
  *
- * Probes /api/v1/leaderboard?scope=live directly: route handlers are not
- * ISR-cached and 'unavailable' results are evicted from the data-layer memo
- * on resolve, so this is a real liveness check, not a cached replay. On
- * recovery it router.refresh()es for the fresh server render; if the outage
- * persists it reports that honestly instead of spinning.
+ * POSTs to /api/board/retry, which (a) probes the live read — route handlers
+ * are not ISR-cached and 'unavailable' results are memo-evicted upstream, so
+ * it's a real liveness check — and (b) revalidatePath()s the board page,
+ * the only mechanism that regenerates a prerendered ISR page inside its
+ * revalidate window. On success we hard-reload for the fresh render; on a
+ * still-down response the panel reports it honestly instead of spinning.
  */
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "./live-board.module.css";
 
 export function BoardRetry({ windowEnum }: { windowEnum: string }) {
-  const router = useRouter();
   const [state, setState] = useState<"idle" | "busy" | "down">("idle");
   return (
     <div className={styles.retryRow}>
@@ -25,13 +24,10 @@ export function BoardRetry({ windowEnum }: { windowEnum: string }) {
           setState("busy");
           try {
             const r = await fetch(
-              `/api/v1/leaderboard?scope=live&window=${encodeURIComponent(windowEnum)}&limit=1`,
-              { cache: "no-store" },
+              `/api/board/retry?window=${encodeURIComponent(windowEnum)}`,
+              { method: "POST" },
             );
-            const d = r.ok ? await r.json() : null;
-            if (d && d.source && d.source !== "unavailable") {
-              // Data layer is back — pull a fresh server render.
-              router.refresh();
+            if (r.ok) {
               window.location.reload();
               return;
             }

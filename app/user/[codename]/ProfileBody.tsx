@@ -234,7 +234,11 @@ export async function ProfileBody({
           </div>
         </div>
         <Stat label="Platform">{operator.primary_domain}</Stat>
-        <Stat label="Account age">{operator.account_age_days} days</Stat>
+        <Stat label="Account age">
+          {operator.account_age_days != null
+            ? `${operator.account_age_days} days`
+            : "—"}
+        </Stat>
         <Stat label="Lifetime turns">
           {operator.total_messages_lifetime.toLocaleString("en-US")}
         </Stat>

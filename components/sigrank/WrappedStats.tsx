@@ -9,7 +9,7 @@ interface Props {
     totalTokens: number;
     timeWithDroid: string;
     longestSession: string;
-    daysSinceJoining: number;
+    daysSinceJoining: number | string;
     longestStreak: number;
     tokenBreakdown?: {
       input: number;
@@ -145,7 +145,13 @@ export function WrappedStats({
     { label: "Total Tokens", value: formatTokens(stats.totalTokens) },
     { label: "Time with Droid", value: stats.timeWithDroid },
     { label: "Longest Session", value: stats.longestSession },
-    { label: "Days Since Joining", value: `${stats.daysSinceJoining} days` },
+    {
+      label: "Days Since Joining",
+      value:
+        typeof stats.daysSinceJoining === "number"
+          ? `${stats.daysSinceJoining} days`
+          : stats.daysSinceJoining,
+    },
     { label: "Longest Streak", value: `${stats.longestStreak} days` },
   ];
 

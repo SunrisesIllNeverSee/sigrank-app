@@ -198,7 +198,7 @@ export default async function OperatorWrappedPage({
           // Wall-clock session duration / streak not in token-telemetry CANON.
           timeWithDroid: UNTRACKED,
           longestSession: UNTRACKED,
-          daysSinceJoining: operator.account_age_days,
+          daysSinceJoining: operator.account_age_days ?? UNTRACKED,
           longestStreak: 0,
           tokenBreakdown: {
             input: telemetry.fresh_input,

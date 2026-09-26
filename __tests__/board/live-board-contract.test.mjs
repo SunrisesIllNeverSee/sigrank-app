@@ -298,13 +298,22 @@ test("unavailable live reads are evicted from the memo cache (retry works)", () 
   );
 });
 
-test("unavailable state exposes a retry affordance wired to the live API", () => {
+test("unavailable state exposes a retry affordance that revalidates the ISR page", () => {
   const shell = read("components/live-board/LiveBoardShell.tsx");
   assert.ok(shell.includes("BoardRetry"), "shell renders the retry control");
   const retry = read("components/live-board/BoardRetry.tsx");
   assert.ok(
-    retry.includes("scope=live"),
-    "retry probes the live-scope API (not ISR-cached)",
+    retry.includes("/api/board/retry"),
+    "retry posts to the board retry route",
+  );
+  assert.ok(
+    !retry.includes("router.refresh"),
+    "one mechanism only — no redundant router.refresh before the reload",
+  );
+  const route = read("app/api/board/retry/route.ts");
+  assert.ok(
+    route.includes("getLiveBoard") && route.includes("revalidatePath"),
+    "route probes live liveness then revalidates the ISR page (the only path to fresh HTML inside the window)",
   );
 });
 
@@ -321,5 +330,28 @@ test("snapshot script writes the board path and redacts private operators", () =
   assert.ok(
     src.includes("platform,"),
     "snapshots must capture per-submission platform for collapse parity",
+  );
+});
+
+test("cold-store snaps are re-sorted date-desc before the collapse ladder", () => {
+  const src = read("lib/board/fallback.ts");
+  // The collapse helpers read date-desc input ("first-seen = latest"), but
+  // snapshot.json is sorted by (operator_id, window_type) for stable diffs —
+  // without the init sort, /board/all under fallback would present each
+  // operator's alphabetically-first window_type ('30d') as all-time metrics.
+  assert.ok(
+    src.includes("localeCompare(a.snapshot_date"),
+    "COLD_STORE.snaps must be sorted snapshot_date desc at init",
+  );
+});
+
+test("unknown scope values are rejected with 400 (not silent legacy passthrough)", () => {
+  const src = read("app/api/v1/leaderboard/route.ts");
+  const branch = src.indexOf('scopeParam === "live"');
+  assert.ok(branch > -1, "scope=live branch exists");
+  const head = src.slice(0, branch);
+  assert.ok(
+    head.includes("invalid scope") && head.includes("400"),
+    "scope=<unknown> must 400 — silently falling to legacy is a contract lie",
   );
 });

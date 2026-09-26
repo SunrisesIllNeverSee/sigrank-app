@@ -84,6 +84,16 @@ export async function GET(req: NextRequest) {
   const scopeParam = sp.get("scope");
   const breakdownParam = sp.get("breakdown") ?? "total";
 
+  // `scope` is a new param introduced by the live contract — a client that
+  // sends it is opting into the new contract, so an unknown value is a 400,
+  // not a silent fallthrough to the legacy field.
+  if (scopeParam != null && scopeParam !== "live") {
+    return NextResponse.json(
+      { error: `invalid scope '${scopeParam}' — expected live` },
+      { status: 400 },
+    );
+  }
+
   const limitRaw = Number.parseInt(sp.get("limit") ?? "", 10);
   const requestedLimit = Number.isFinite(limitRaw)
     ? Math.min(Math.max(limitRaw, 1), MAX_LIMIT)

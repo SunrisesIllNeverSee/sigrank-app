@@ -158,7 +158,8 @@ export interface Operator {
   verification_status: VerificationStatus;
   /** Which AI platform (claude / chatgpt / gemini / pi / multi). */
   primary_domain: string;
-  account_age_days: number;
+  /** Days since account creation; null = unknown (renders "—", not "0d"). */
+  account_age_days: number | null;
   total_messages_lifetime: number;
   /** True for mock / not-real rows — render with placeholder styling. */
   isPlaceholder?: boolean;

@@ -234,7 +234,9 @@ export function mapOperator(o: DbOperator): Operator {
     current_supporter_tier: toSupporterTier(o.current_supporter_tier),
     verification_status: toVerification(o.verification_status),
     primary_domain: o.primary_domain ?? "other",
-    account_age_days: num(o.account_age_days),
+    // Nullable pass-through (not num()): the board + API distinguish "0 days
+    // old" from "age unknown" — null renders '—', 0 renders '0d'.
+    account_age_days: o.account_age_days ?? null,
     total_messages_lifetime: num(o.total_messages_lifetime),
     isPlaceholder: false,
     // Phase-0 identity fields (migration 0007, apply post-move)

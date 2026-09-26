@@ -62,7 +62,20 @@ const COLD_STORE: ColdStore | null = (() => {
     const ops = store.operators ?? [];
     const snaps = store.metric_snapshots ?? [];
     if (!ops.length || !snaps.length) return null;
-    return { opById: new Map(ops.map((o) => [o.operator_id, o])), snaps };
+    return {
+      opById: new Map(ops.map((o) => [o.operator_id, o])),
+      // Collapse helpers (latestPerOperator / operatorTotalCollapse /
+      // latestPerOperatorPlatform) read DATE-DESC input — "first-seen =
+      // latest", mirroring the live path's PostgREST order(snapshot_date
+      // desc). snapshot.json is instead deterministically sorted by
+      // (operator_id, window_type) for clean git diffs, so without this sort
+      // the collapse would pick each operator's alphabetically-first
+      // window_type ('30d') and present 30-day metrics under the all-time
+      // label.
+      snaps: [...snaps].sort((a, b) =>
+        (b.snapshot_date ?? "").localeCompare(a.snapshot_date ?? ""),
+      ),
+    };
   } catch {
     return null;
   }
@@ -109,7 +122,9 @@ const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
  * operator's latest in-window row rather than collapsing to all_time first),
  * then the ghost-row guard, then the same collapse ladder (allSnapshots /
  * operatorTotal / perPlatform / latestPerOperator) with the operator's
- * platform SET attached on the total path.
+ * platform SET attached on the total path. Input snaps are date-desc (the
+ * COLD_STORE init sort) so "first-seen = latest" matches the live path's
+ * PostgREST ordering contract.
  */
 function liveColdStoreRows(params: BoardParams): RowWithPlatforms[] {
   if (!COLD_STORE) return [];
