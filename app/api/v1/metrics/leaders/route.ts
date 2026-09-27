@@ -9,6 +9,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { getMetricLeaders } from "@/lib/board";
+import { windowParamToEnum } from "@/lib/board/windows";
 import {
   LEADERBOARD_CACHE_CONTROL,
   serializeLeaderboardEntry,
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const windowParam = sp.get("window") ?? "30d";
+  const windowParam = windowParamToEnum(sp.get("window") ?? "30d");
   const platformParam = sp.get("platform");
   const classParam = sp.get("class");
   const limitRaw = Number.parseInt(sp.get("limit") ?? "", 10);

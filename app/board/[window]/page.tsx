@@ -103,28 +103,30 @@ export default async function BoardWindowPage({
     // filter) so operators who only submitted 7d/30d/90d snapshots also
     // appear. operatorTotalCollapse picks the latest 'multi' snapshot per
     // operator (or latest single-platform). Only claimed operators are
-    // shown (seed operators are on sigeconomy.com).
+    // shown (seed operators are on sigeconomy.com) — claimedOnly drops the
+    // unclaimed rows BEFORE ranking so global_rank is the position on this
+    // board, matching the profile rank.
     // Egress: fetches ~2,400 rows but ISR (revalidate=3600) bounds to
     // 1 query/hour. We serialize 400 to RSC props; full count for pagination.
-    const totalRows = await getLeaderboard({
+    const liveRows = await getLeaderboard({
       window: win.enum,
       windowFilter: false,
       operatorTotal: true,
+      claimedOnly: true,
     });
-    const liveRows = totalRows.filter((r) => r.operator.claimed);
     totalCount = liveRows.length;
     totalEntries = liveRows.slice(0, 400).map(toEntry);
     jsonLdEntries = liveRows.slice(0, 100).map(toEntry);
   } else {
     // Live path: DB-side window-filtered query (egress fix — fetches only
     // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
-    // Only claimed operators are shown.
-    const totalRows = await getLeaderboard({
+    // claimedOnly keeps only claimed operators, pre-rank (see above).
+    const liveRows = await getLeaderboard({
       window: win.enum,
       windowFilter: true,
       operatorTotal: true,
+      claimedOnly: true,
     });
-    const liveRows = totalRows.filter((r) => r.operator.claimed);
     totalCount = liveRows.length;
     totalEntries = liveRows.map(toEntry);
     // JsonLd from the default (operatorTotal) entries — search engines see the
