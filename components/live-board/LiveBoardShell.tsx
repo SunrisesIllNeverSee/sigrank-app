@@ -34,6 +34,9 @@ interface Props {
   /** Window label for the rail, e.g. 'All time' / '30 day'. */
   windowLabel: string;
   population: number;
+  /** Baseline (unclaimed-but-eligible) operators inside `population` — The
+   *  Field. Split out so labels never imply all operators are registered. */
+  baseline: number;
   source: LiveBoardSource;
   sourceDate: string | null;
   /** When the data source is unavailable, the board column renders an honest
@@ -48,6 +51,7 @@ export function LiveBoardShell({
   windowShort,
   windowLabel,
   population,
+  baseline,
   source,
   sourceDate,
   children,
@@ -57,6 +61,7 @@ export function LiveBoardShell({
       <LiveBoardHeader
         boardLabel={boardLabel}
         population={population}
+        baseline={baseline}
         windowShort={windowShort}
         source={source}
         sourceDate={sourceDate}
@@ -84,7 +89,11 @@ export function LiveBoardShell({
             children
           )}
         </div>
-        <FieldRail windowLabel={windowLabel} population={population} />
+        <FieldRail
+          windowLabel={windowLabel}
+          population={population}
+          baseline={baseline}
+        />
       </div>
     </section>
   );

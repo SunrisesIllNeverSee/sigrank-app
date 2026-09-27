@@ -13,9 +13,11 @@ interface Props {
   windowLabel: string;
   /** Eligible live population for the current window. */
   population: number;
+  /** Baseline (unclaimed-but-eligible) operators inside `population`. */
+  baseline: number;
 }
 
-export function FieldRail({ windowLabel, population }: Props) {
+export function FieldRail({ windowLabel, population, baseline }: Props) {
   return (
     <aside className={styles.rail} aria-label="Board context">
       <div className={styles.railCard}>
@@ -35,8 +37,12 @@ export function FieldRail({ windowLabel, population }: Props) {
           <strong>{windowLabel}</strong>
         </div>
         <div className={styles.railStat}>
-          <span>Live operators</span>
-          <strong>{population}</strong>
+          <span>Live population</span>
+          <strong>
+            {baseline > 0
+              ? `${population - baseline} claimed + ${baseline} baseline`
+              : `${population}`}
+          </strong>
         </div>
         <Link href="/hall" className={styles.railLink}>
           Full Hall of Signal →

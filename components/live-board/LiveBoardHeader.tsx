@@ -22,6 +22,9 @@ interface Props {
   boardLabel: string;
   /** Eligible live operators in this window (before filters/limit). */
   population: number;
+  /** Unclaimed-but-eligible baseline operators inside `population` (The
+   *  Field) — split out so the label never implies registered accounts. */
+  baseline: number;
   /** Window short label, e.g. "30d" / "all-time". */
   windowShort: string;
   source: LiveBoardSource;
@@ -38,6 +41,7 @@ const SOURCE_LABEL: Record<LiveBoardSource, string> = {
 export function LiveBoardHeader({
   boardLabel,
   population,
+  baseline,
   windowShort,
   source,
   sourceDate,
@@ -66,8 +70,14 @@ export function LiveBoardHeader({
       </p>
       <p className={styles.provenance}>
         <span>
-          <strong>{population}</strong> live{" "}
-          {population === 1 ? "operator" : "operators"}
+          <strong>{population - baseline}</strong> claimed{" "}
+          {population - baseline === 1 ? "operator" : "operators"}
+          {baseline > 0 ? (
+            <>
+              {" "}
+              + <strong>{baseline}</strong> baseline
+            </>
+          ) : null}
         </span>
         <span className={styles.sep} aria-hidden="true">
           ·

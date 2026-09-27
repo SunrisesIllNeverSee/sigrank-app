@@ -359,6 +359,10 @@ function Field({
 interface Props {
   entries: LeaderboardEntry[];
   totalUsers?: number;
+  /** Unclaimed-but-eligible baseline operators inside `totalUsers` (The
+   *  Field). Labeled separately so the footer never reads "N registered
+   *  operators" when N includes the baseline. */
+  baselineCount?: number;
   window?: string;
   /** Initial Platform filter (BOARD redesign 2026-06-27) — reflects the ?platform=
    *  URL param; the dropdown drives the URL (server re-queries). Default 'All'. */
@@ -375,6 +379,7 @@ interface Props {
 export function LeaderboardTable({
   entries,
   totalUsers,
+  baselineCount = 0,
   window: win = "30d",
   platform: platformProp = "All",
   view: breakdownProp = "total",
@@ -1859,7 +1864,18 @@ export function LeaderboardTable({
             ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column shows the current sort rank over the volume rank (Y/V) — switching metrics renumbers rows to match."
             : "Raw pillars — the four integers the engine derives every metric from. Click a header to sort; the last column is total cost ($). Top-3 per column boxed. The # column shows the current sort rank over the yield rank (V/Y)."}
           {totalUsers != null
-            ? ` · 25 per page · ${sorted.length} of ${totalUsers} operators.`
+            ? breakdownProp === "platforms"
+              ? // Platform view: rows are (operator × platform) records — label
+                // each side honestly (a platform filter shrinks the operator
+                // count; per-platform rows can outnumber operators).
+                ` · 25 per page · ${sorted.length} platform rows · ${totalUsers} operators` +
+                (baselineCount > 0 ? ` incl. ${baselineCount} baseline` : "") +
+                "."
+              : ` · 25 per page · ${sorted.length} of ${totalUsers} operators` +
+                (baselineCount > 0
+                  ? ` (${totalUsers - baselineCount} claimed + ${baselineCount} baseline)`
+                  : "") +
+                "."
             : null}
         </div>
       </div>

@@ -166,6 +166,7 @@ export default async function BoardWindowPage({
         windowShort={isAllTime ? "all-time" : win.short}
         windowLabel={win.label}
         population={totalCount}
+        baseline={board.baselinePopulation}
         source={board.source}
         sourceDate={board.sourceDate}
       >
@@ -188,6 +189,7 @@ export default async function BoardWindowPage({
           <BoardTableClient
             totalEntries={totalEntries}
             totalCount={totalCount}
+            baselineCount={board.baselinePopulation}
             window={win.slug}
             windowEnum={win.enum}
           />

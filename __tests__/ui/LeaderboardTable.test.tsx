@@ -76,3 +76,40 @@ describe("LeaderboardTable", () => {
     expect(hasItalic).toBe(false);
   });
 });
+
+describe("LeaderboardTable — population labels", () => {
+  const threeOps: LeaderboardEntry[] = [0, 1, 2].map((i) => ({
+    rank: i + 1,
+    anonId: `Op${i}`,
+    codename: `Op${i}`,
+    signalClass: "IGNITER I",
+    isSeed: false,
+    yield_: 10 - i,
+    leverage: null,
+    dev10x: null,
+    velocity: null,
+    acctAge: "—",
+    lastSeen: null,
+  }));
+
+  it("platform view labels rows vs operators distinctly", () => {
+    render(
+      <LeaderboardTable
+        entries={threeOps}
+        totalUsers={2}
+        view="platforms"
+      />,
+    );
+    // 3 (operator × platform) rows over 2 distinct operators — the footer
+    // must not call both sides 'operators'.
+    expect(screen.getByText(/platform rows/)).toBeTruthy();
+    expect(screen.getByText(/2 operators/)).toBeTruthy();
+  });
+
+  it("total view splits claimed vs baseline operators", () => {
+    render(
+      <LeaderboardTable entries={threeOps} totalUsers={3} baselineCount={1} />,
+    );
+    expect(screen.getByText(/2 claimed \+ 1 baseline/)).toBeTruthy();
+  });
+});

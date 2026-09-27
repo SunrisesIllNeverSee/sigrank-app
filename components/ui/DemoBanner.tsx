@@ -2,13 +2,19 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
  * Dismissible demo-data banner. Client component (local dismiss state).
  */
 export function DemoBanner() {
+  const pathname = usePathname();
   const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
+  // The live-board routes (/board/*) present a live claimed-operator
+  // population — a "curated seed" disclaimer above the board would directly
+  // contradict its provenance strip. Keep the banner on reference surfaces
+  // (legacy pages still render the seeded corpus).
+  if (dismissed || pathname?.startsWith("/board/")) return null;
 
   return (
     <div className="flex w-full items-center justify-center gap-3 border-b border-bg-border bg-bg-elevated px-4 py-2 text-center">

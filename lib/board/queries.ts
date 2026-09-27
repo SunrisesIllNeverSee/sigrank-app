@@ -259,6 +259,10 @@ interface BoardQueryMeta {
    * and limit. Null for non-live queries.
    */
   eligible: number | null;
+  /** Baseline operators inside `eligible` — unclaimed but eligible (The
+   *  Field). Lets labels say "N claimed + 1 baseline" instead of implying
+   *  the population is all registered operators. Null for non-live. */
+  eligibleBaseline: number | null;
   /** Newest snapshot_date among eligible rows ('YYYY-MM-DD'), null when n/a. */
   latestSnapshotDate: string | null;
   /** Where the rows came from: live DB, the real cold-store snapshot, the
@@ -307,6 +311,7 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
         rows: f.rows,
         meta: {
           eligible: f.eligible,
+          eligibleBaseline: f.eligibleBaseline,
           latestSnapshotDate: coldStoreGeneratedAt(),
           source: f.hasStore ? "snapshot" : "unavailable",
         },
@@ -314,7 +319,12 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
     }
     return {
       rows: filterMockBoard(params),
-      meta: { eligible: null, latestSnapshotDate: null, source: "fallback" },
+      meta: {
+        eligible: null,
+        eligibleBaseline: null,
+        latestSnapshotDate: null,
+        source: "fallback",
+      },
     };
   };
 
@@ -323,7 +333,12 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
    *  shows an empty board, not an unavailable state. */
   const emptyResult = (): BoardQueryResult => ({
     rows: [],
-    meta: { eligible: live ? 0 : null, latestSnapshotDate: null, source: "supabase" },
+    meta: {
+      eligible: live ? 0 : null,
+      eligibleBaseline: live ? 0 : null,
+      latestSnapshotDate: null,
+      source: "supabase",
+    },
   });
 
   const sb = getSupabaseServer();
@@ -492,6 +507,16 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
     const eligible = live
       ? new Set(rows.map((r) => r.operator.operator_id)).size
       : null;
+    // Baseline = the unclaimed-but-eligible operators inside that population
+    // (The Field) — the label can then say "N claimed + 1 baseline" instead of
+    // implying every live operator is a registered account.
+    const eligibleBaseline = live
+      ? new Set(
+          rows
+            .filter((r) => r.operator.claimed !== true)
+            .map((r) => r.operator.operator_id),
+        ).size
+      : null;
     const eligibleLatest = live ? latestSnapshotDate(rows) : null;
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
@@ -518,12 +543,28 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
     }
     const sort = params.sort ?? SORT_DEFAULT;
     rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
-    rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
+    const rankedCount = rows.length;
+    rows = rows.map((r, i) => ({
+      ...r,
+      global_rank: i + 1,
+      // Live scope: the percentile must describe the SAME population the rank
+      // does — the eligible, filtered live set. rank_history percentiles were
+      // computed over the broader (seed-inclusive) field and would silently
+      // overstate a live operator's position, so recompute against the
+      // displayed population rather than serve an unqualified number.
+      percentile: live
+        ? rankedCount > 1
+          ? Math.round(((rankedCount - (i + 1)) / (rankedCount - 1)) * 10000) /
+            100
+          : 100
+        : r.percentile,
+    }));
     if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
     return {
       rows,
       meta: {
         eligible,
+        eligibleBaseline,
         latestSnapshotDate: eligibleLatest,
         source: "supabase",
       },
@@ -566,6 +607,7 @@ export async function getLiveBoard(
     source,
     sourceDate: meta.latestSnapshotDate,
     population: meta.eligible ?? 0,
+    baselinePopulation: meta.eligibleBaseline ?? 0,
     returnedOperators,
   };
 }

@@ -92,6 +92,12 @@ export interface LiveBoardResult {
    * limit — the denominator the header names ("N live operators").
    */
   population: number;
+  /**
+   * Baseline operators inside `population` — unclaimed but eligible (The
+   * Field). Split out so labels can say "N claimed + M baseline" rather than
+   * implying the whole population is registered accounts.
+   */
+  baselinePopulation: number;
   /** Distinct operators in `rows` (post-filter, post-limit). */
   returnedOperators: number;
 }

@@ -134,8 +134,10 @@ test("fallback.ts exposes a live-only path over the cold store — never mock", 
   // The live fallback must read the COLD_STORE snapshots — NOT fallbackRows()
   // (which degrades to MOCK_LEADERBOARD when the store is empty).
   const fnStart = src.indexOf("export function filterLiveFallbackBoard");
-  const fnEnd = src.indexOf("\n}", fnStart);
-  const body = src.slice(fnStart, fnEnd);
+  // The signature's return-type annotation closes with `\n}` — the body ends
+  // at the NEXT top-level brace after it. Slice generously instead.
+  const fnEnd = src.indexOf("\n}\n", fnStart);
+  const body = src.slice(fnStart, fnEnd + 3);
   assert.ok(body.includes("COLD_STORE"), "live fallback reads the cold store");
   assert.ok(
     !body.includes("MOCK_LEADERBOARD") && !body.includes("fallbackRows()"),
@@ -219,24 +221,38 @@ test("legacy API path (no scope) is unchanged — no live filtering", () => {
 
 // ── Review-pass 2 regression coverage (stale window state, privacy, fallback) ──
 
-test("BoardTableClient keys EVERY fetched slot to windowEnum (no stale-window rows)", () => {
+test("BoardTableClient keys EVERY fetched slot to its query identity (no stale rows)", () => {
   const src = read("components/board/BoardTableClient.tsx");
-  // All three fetch slots carry the window they were fetched for — an
-  // unkeyed slot would render the previous window's rows after soft nav.
-  for (const slot of ["breakdown", "refreshedTotals", "fullBoard"]) {
-    const stateDecl = src.indexOf(`[${slot}, set`);
-    assert.ok(stateDecl > -1, `${slot} state exists`);
-    const declBlock = src.slice(stateDecl, src.indexOf(">(null)", stateDecl));
-    assert.ok(
-      declBlock.includes("windowEnum: string"),
-      `${slot} must be keyed to windowEnum`,
-    );
-  }
-  // The render branch must consult the *_ForWindow projections, never the
-  // raw slots.
-  assert.ok(src.includes("refreshedTotalsForWindow"), "keyed totals guard");
-  assert.ok(src.includes("breakdownForWindow"), "keyed breakdown guard");
-  assert.ok(src.includes("fullBoardForWindow"), "keyed full-board guard");
+  // Totals slot — the complete dataset for a window — is keyed by windowEnum;
+  // the breakdown slot is keyed by the FULL query identity (window + platform)
+  // so a failed platform=B fetch can never inherit platform=A's rows.
+  const totalsDecl = src.indexOf("[totals, set");
+  assert.ok(totalsDecl > -1, "totals state exists");
+  const totalsBlock = src.slice(totalsDecl, src.indexOf(">(null)", totalsDecl));
+  assert.ok(
+    totalsBlock.includes("windowEnum: string"),
+    "totals must be keyed to windowEnum",
+  );
+  const breakdownDecl = src.indexOf("[breakdown, set");
+  assert.ok(breakdownDecl > -1, "breakdown state exists");
+  const breakdownBlock = src.slice(
+    breakdownDecl,
+    src.indexOf(">(null)", breakdownDecl),
+  );
+  assert.ok(
+    breakdownBlock.includes("key: string"),
+    "breakdown must be keyed by the full query identity (window+platform)",
+  );
+  // The render branch must consult the keyed projections, never the raw slots.
+  assert.ok(src.includes("totalsForWindow"), "keyed totals guard");
+  assert.ok(src.includes("breakdownForQuery"), "keyed breakdown guard");
+  // Realtime refresh and pagination write the SAME totals slot — one dataset,
+  // no shadowing (the old refreshedTotals/fullBoard split let a limit=25
+  // refresh mask a complete lazy-load).
+  assert.ok(
+    src.includes("setTotals({"),
+    "refresh + pagination share the totals slot",
+  );
 });
 
 test("private operators render codename-only on the board + API (migration 0021)", () => {
@@ -353,5 +369,102 @@ test("unknown scope values are rejected with 400 (not silent legacy passthrough)
   assert.ok(
     head.includes("invalid scope") && head.includes("400"),
     "scope=<unknown> must 400 — silently falling to legacy is a contract lie",
+  );
+});
+
+// ── Correctness pass 2 (Codex findings): provenance + population labeling ──
+
+test("baseline operators are split out of the population on every layer", () => {
+  // queries.ts computes eligibleBaseline (distinct unclaimed-but-eligible ops
+  // — The Field) inside the eligible population…
+  assert.ok(
+    read("lib/board/queries.ts").includes("eligibleBaseline"),
+    "queryBoard meta carries eligibleBaseline",
+  );
+  // …fallback.ts mirrors it (parity — same count under the cold store)…
+  assert.ok(
+    read("lib/board/fallback.ts").includes("eligibleBaseline"),
+    "fallback path computes eligibleBaseline",
+  );
+  // …the live result type surfaces it…
+  assert.ok(
+    read("lib/board/live.ts").includes("baselinePopulation"),
+    "LiveBoardResult carries baselinePopulation",
+  );
+  // …the API exposes it…
+  assert.ok(
+    read("app/api/v1/leaderboard/route.ts").includes("baseline_population"),
+    "scope=live response carries baseline_population",
+  );
+  // …and the labels use it — 'N claimed + M baseline', never implying the
+  // whole population is registered accounts.
+  const header = read("components/live-board/LiveBoardHeader.tsx");
+  assert.ok(header.includes("baseline"), "header splits the baseline");
+  assert.match(header, /claimed/, "header labels the claimed share");
+  const rail = read("components/live-board/FieldRail.tsx");
+  assert.ok(rail.includes("baseline"), "rail splits the baseline");
+});
+
+test("live scope recomputes percentile over the displayed population", () => {
+  // rank_history percentiles describe the broader (seed-inclusive) field —
+  // serving them under a live rerank silently overstates position. Live scope
+  // recomputes percentile from the same ranked set the rank is drawn over,
+  // on BOTH data paths (supabase + cold-store fallback).
+  const q = read("lib/board/queries.ts");
+  const f = read("lib/board/fallback.ts");
+  for (const [src, name] of [
+    [q, "queries.ts"],
+    [f, "fallback.ts"],
+  ]) {
+    const recompute = src.indexOf("rankedCount");
+    assert.ok(
+      recompute > -1 && src.includes("percentile: live") ||
+        recompute > -1 && src.includes("percentile: params.live"),
+      `${name} recomputes percentile against the ranked live population`,
+    );
+  }
+});
+
+test("platform breakdown footer labels rows vs operators distinctly", () => {
+  // A per-platform row set can outnumber its distinct-operator count — the
+  // footer names each honestly instead of calling both sides 'operators'.
+  const src = read("components/sigrank/LeaderboardTable.tsx");
+  assert.ok(src.includes("platform rows"), "platform view labels rows");
+  assert.ok(src.includes("baselineCount"), "footer splits the baseline count");
+});
+
+test("client provenance: fetched metadata is consumed, unavailable never commits", () => {
+  const src = read("components/board/BoardTableClient.tsx");
+  // The API's source/source_date/population/baseline_population are parsed…
+  assert.ok(src.includes("metaFromApi"), "fetched meta is parsed");
+  assert.ok(src.includes("baseline_population"), "baseline meta consumed");
+  // …a degraded 200 (source:'unavailable') is handled as an error path, not a
+  // successful empty dataset…
+  assert.ok(
+    src.includes('d.source === "unavailable"'),
+    "unavailable responses are gated before commit",
+  );
+  // …and a snapshot-sourced response gets a provenance strip so the SSR
+  // 'Live data' header can't describe different data.
+  assert.ok(
+    src.includes('displayed?.source === "snapshot"'),
+    "snapshot provenance strip rendered for fetched fallback data",
+  );
+  // Breakdown slot is keyed by the FULL query identity (window + platform) —
+  // a failed platform=B fetch can never show platform=A rows under B's label.
+  assert.ok(
+    src.includes("platformFilter ??"),
+    "breakdown key includes the platform filter",
+  );
+  // Realtime refresh shares the totals slot and requests the complete
+  // dataset — never a limit=25 first page.
+  assert.ok(!/limit:\s*25/.test(src), "no 25-row refresh limit remains");
+});
+
+test("demo banner is suppressed on live-board routes", () => {
+  const src = read("components/ui/DemoBanner.tsx");
+  assert.ok(
+    src.includes("usePathname") && src.includes("/board/"),
+    "banner must not call a live claimed-operator population a curated seed",
   );
 });

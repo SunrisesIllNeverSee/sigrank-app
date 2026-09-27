@@ -183,7 +183,11 @@ function applyBoardFilters(
    *  (liveColdStoreRows) — the row-level filter would be a redundant second
    *  pass whose recency reference is computed over the collapsed subset. */
   alreadyWindowed = false,
-): { rows: LeaderboardRow[]; eligible: number | null } {
+): {
+  rows: LeaderboardRow[];
+  eligible: number | null;
+  eligibleBaseline: number | null;
+} {
   let rows = [...base];
   // 730: narrow to the window ONLY when the caller opts in (the /board route);
   // legacy callers keep the full field. Mirrors the live path's windowFilter gate.
@@ -197,6 +201,16 @@ function applyBoardFilters(
   // several rows per operator, but the live population is counted in people.
   const eligible = params.live
     ? new Set(rows.map((r) => r.operator.operator_id)).size
+    : null;
+  // Baseline = unclaimed-but-eligible operators in that population (The
+  // Field) — counted the same way (distinct) so the label can split
+  // "N claimed + M baseline" (parity with queries.ts).
+  const eligibleBaseline = params.live
+    ? new Set(
+        rows
+          .filter((r) => r.operator.claimed !== true)
+          .map((r) => r.operator.operator_id),
+      ).size
     : null;
   if (params.platform && params.platform !== "all") {
     // Match the live path (queries.ts): the row's platform, OR the operator's
@@ -220,9 +234,22 @@ function applyBoardFilters(
   const sort = params.sort ?? SORT_DEFAULT;
   rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
   // Re-rank within the filtered/sorted view for stable display ranks.
-  rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
+  // Live scope also recomputes percentile against the displayed population —
+  // parity with queries.ts (the cold store's stored percentiles describe the
+  // broader pre-eligibility field, not the live set the rank is drawn over).
+  const rankedCount = rows.length;
+  rows = rows.map((r, i) => ({
+    ...r,
+    global_rank: i + 1,
+    percentile: params.live
+      ? rankedCount > 1
+        ? Math.round(((rankedCount - (i + 1)) / (rankedCount - 1)) * 10000) /
+          100
+        : 100
+      : r.percentile,
+  }));
   if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
-  return { rows, eligible };
+  return { rows, eligible, eligibleBaseline };
 }
 
 export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
@@ -242,9 +269,14 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
  */
 export function filterLiveFallbackBoard(
   params: BoardParams = {},
-): { rows: LeaderboardRow[]; eligible: number | null; hasStore: boolean } {
+): {
+  rows: LeaderboardRow[];
+  eligible: number | null;
+  eligibleBaseline: number | null;
+  hasStore: boolean;
+} {
   if (!COLD_STORE || COLD_STORE.snaps.length === 0)
-    return { rows: [], eligible: 0, hasStore: false };
+    return { rows: [], eligible: 0, eligibleBaseline: 0, hasStore: false };
   const out = applyBoardFilters(liveColdStoreRows(params), params, true);
   return { ...out, hasStore: true };
 }

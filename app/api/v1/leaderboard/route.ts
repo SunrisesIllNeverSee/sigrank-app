@@ -134,9 +134,11 @@ export async function GET(req: NextRequest) {
         generated_at: new Date().toISOString(),
         ruleset_version: "1.0",
         // Counts the shell names honestly: the eligible population BEFORE
-        // filters/limit, the distinct operators actually returned, and the
-        // row count (per-platform breakdown can exceed operator count).
+        // filters/limit, the baseline (unclaimed-but-eligible) operators
+        // inside it, the distinct operators actually returned, and the row
+        // count (per-platform breakdown can exceed operator count).
         population: board.population,
+        baseline_population: board.baselinePopulation,
         operators_returned: board.returnedOperators,
         total_operators: board.returnedOperators,
         returned_rows: entries.length,
