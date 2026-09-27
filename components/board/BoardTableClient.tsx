@@ -224,16 +224,18 @@ export function BoardTableClient({
         })
         .then((d) => {
           if (controller.signal.aborted || totalsSeq.current !== seq) return;
-          // A 200 with source:'unavailable' is a degraded payload, not a
-          // successful empty board — never commit it over last-good data.
-          if (!d || d.source === "unavailable") {
+          // A 200 with source:'unavailable' — or a malformed body missing
+          // its entries array (proxy-mangled contract violation) — is a
+          // degraded payload, not a successful empty board: never commit it
+          // over last-good data.
+          if (!d || d.source === "unavailable" || !Array.isArray(d.entries)) {
             setTotalsError(true);
             setTotalsLoading(false);
             return;
           }
           setTotals({
             windowEnum: we,
-            entries: (d.entries ?? []).map(mapApiEntry),
+            entries: d.entries.map(mapApiEntry),
             meta: metaFromApi(d),
           });
           setTotalsError(false);
@@ -263,13 +265,12 @@ export function BoardTableClient({
       // No windowEnum = no live contract to fetch under (legacy SSR-only
       // render) — never guess a window for the fetch.
       if (!windowEnum) return;
-      // Bounded windows SSR the full row set — the fetch is needed only when
-      // the SSR slice may be incomplete (the all-time board caps at 400 rows)
-      // or the totals slot hasn't been populated yet on a window that paginates.
-      if (win === "all" || totalEntries.length < totalCount) loadTotals();
+      // Fetch only when the SSR slice may be incomplete — e.g. the all-time
+      // board caps SSR at 400 rows. When SSR already holds the complete set
+      // (length === totalCount), pagination is purely client-side.
+      if (totalEntries.length < totalCount) loadTotals();
     },
     [
-      win,
       viewPlatforms,
       platformFilter,
       windowEnum,
@@ -292,10 +293,13 @@ export function BoardTableClient({
 
   // Realtime refresh = the same complete-dataset fetch, run in the
   // background. A realtime event can never shrink the board to a page.
-  const refreshTotals = useCallback(
-    () => fetchTotals({ background: true }),
-    [fetchTotals],
-  );
+  // On a platform view the DISPLAYED dataset is the breakdown slot — refresh
+  // it too (via retryTick → effect re-fire) or realtime events silently
+  // leave stale platform rows on screen.
+  const refreshTotals = useCallback(() => {
+    fetchTotals({ background: true });
+    if (viewPlatforms || platformFilter) setRetryTick((t) => t + 1);
+  }, [fetchTotals, viewPlatforms, platformFilter]);
 
   // Realtime: subscribe to metric_snapshots changes. No-op when realtime is
   // disabled/unavailable — the board simply shows the ISR render.
@@ -327,17 +331,18 @@ export function BoardTableClient({
       })
       .then((d) => {
         if (controller.signal.aborted || breakdownSeq.current !== seq) return;
-        // source:'unavailable' is a degraded 200, not a successful empty —
-        // keep the last-good slot (keyed to ITS query, so a different
-        // platform's rows still can't render) and surface the error strip.
-        if (!d || d.source === "unavailable") {
+        // source:'unavailable' or a malformed body without an entries array
+        // is a degraded 200, not a successful empty — keep the last-good slot
+        // (keyed to ITS query, so a different platform's rows still can't
+        // render) and surface the error strip.
+        if (!d || d.source === "unavailable" || !Array.isArray(d.entries)) {
           setBreakdownError(true);
           setBreakdownLoading(false);
           return;
         }
         setBreakdown({
           key,
-          entries: (d.entries ?? []).map(mapApiEntry),
+          entries: d.entries.map(mapApiEntry),
           operators:
             typeof d.operators_returned === "number"
               ? d.operators_returned

@@ -388,6 +388,49 @@ describe("BoardTableClient — provenance handling", () => {
     expect(screen.getByText("ssr-op-0")).toBeTruthy();
   });
 
+  it("a malformed 200 (no entries array) never replaces last-good data", async () => {
+    const ssr = [makeEntry("ssr-op-0"), makeEntry("ssr-op-1")];
+    // Contract violation: 200 body with no `entries` — must not commit
+    // entries:[] over the SSR rows under a 'Live data' label.
+    fetchMock.mockImplementation(() =>
+      okJson({ scope: "live", source: "supabase" }),
+    );
+
+    renderBoard({ totalEntries: ssr, totalCount: 2 });
+    await React.act(async () => realtimeRefresh?.());
+
+    await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+    expect(screen.getByTestId("row-count").textContent).toBe("2");
+    expect(screen.getByText("ssr-op-0")).toBeTruthy();
+  });
+
+  it("realtime refresh refetches the DISPLAYED breakdown on a platform view", async () => {
+    currentParams = new URLSearchParams("platform=claude");
+    const calls: string[] = [];
+    fetchMock.mockImplementation((url: string) => {
+      calls.push(url);
+      return okJson(
+        apiResponse([apiEntry("claude-op")], { operators_returned: 1 }),
+      );
+    });
+
+    renderBoard();
+    await waitFor(() => expect(screen.getByText("claude-op")).toBeTruthy());
+    calls.length = 0;
+
+    await React.act(async () => realtimeRefresh?.());
+
+    // Both families fire: the totals slot AND the displayed platform query.
+    await waitFor(() => {
+      const breakdownCalls = calls.filter((u) =>
+        u.includes("breakdown=platforms"),
+      );
+      const totalCalls = calls.filter((u) => u.includes("breakdown=total"));
+      expect(breakdownCalls.length).toBeGreaterThan(0);
+      expect(totalCalls.length).toBeGreaterThan(0);
+    });
+  });
+
   it("platform-filtered view counts baseline among DISPLAYED rows only", async () => {
     // The Field is a claude-platform operator — filtering to codex must not
     // claim 'incl. 1 baseline' even though baseline_population=1 (pre-filter).

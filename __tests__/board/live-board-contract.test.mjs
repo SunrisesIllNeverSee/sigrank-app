@@ -489,7 +489,14 @@ test("client provenance: fetched metadata is consumed, unavailable never commits
 test("demo banner is suppressed on live-board routes", () => {
   const src = read("components/ui/DemoBanner.tsx");
   assert.ok(
-    src.includes("usePathname") && src.includes("/board/"),
+    src.includes("usePathname") && src.includes('"/board/"'),
     "banner must not call a live claimed-operator population a curated seed",
+  );
+  // Behavioral coverage (real component, controlled pathname) lives in
+  // __tests__/ui/DemoBanner.test.tsx — suppression on /board/all + /board/30d,
+  // presence + dismissal on reference surfaces.
+  assert.ok(
+    read("__tests__/ui/DemoBanner.test.tsx").includes("/board/all"),
+    "DemoBanner behavioral test exercises board + non-board routes",
   );
 });
