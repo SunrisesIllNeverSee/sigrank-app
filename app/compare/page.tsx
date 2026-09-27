@@ -52,7 +52,7 @@ import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 
 export const metadata: Metadata = withOG({
-  title: "Compare Operators",
+  title: "Compare AI Operators",
   description:
     "Head-to-head operator comparison across the cascade layer — Υ Yield, SNR, Leverage, Velocity, 10xDEV & blended cost — with a shape radar.",
   path: "/compare",
