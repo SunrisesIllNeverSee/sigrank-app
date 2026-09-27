@@ -60,6 +60,7 @@ import {
   ZERO_TELEMETRY,
 } from "@/lib/board/mappers";
 import { fallbackRows, filterMockBoard, sortValue } from "@/lib/board/fallback";
+import { memoize } from "@/lib/board/memo";
 import { recordValue } from "@/lib/analytics/record-value";
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -131,52 +132,46 @@ function assertOperatorLimit(rows: unknown[], codename: string) {
 }
 
 /**
- * Recompute an operator's global rank + percentile when rank_history is empty.
- * Fetches all latest snapshots, computes Υ yield for each (same as the board),
- * sorts descending, and finds the operator's 1-based position. Percentile is
- * computed as (operators_below / total) * 100.
+ * computeClaimedRanks — the rank map for the claimed-operator board, computed
+ * ONCE per corpus and shared by every profile render via memoize. The rank
+ * basis matches /board/all exactly: claimed operators only, the all_time
+ * operator-total collapse, sorted by Υ yield descending.
  *
- * This is the fallback for the P1 rank_history gap (2026-06-27): seeds have
- * rank_history rows, but operators added via the ingest pipeline don't.
+ * Perf (2026-09-27): the earlier version scanned the WHOLE metric_snapshots
+ * table (~2,700 rows, 3 paginated fetches) inside every cold profile render.
+ * This version filters DB-side to claimed ops' snapshots only (~50 ops × their
+ * window/platform rows ≈ 1 page) — the ranking set is identical because only
+ * claimed ops are ranked anyway.
  */
-async function recomputeRank(
+async function computeClaimedRanks(
   sb: SupabaseClient,
-  operatorId: string,
-  _thisSnap: DbMetricSnapshot,
-): Promise<{ rank: number; percentile: number }> {
+): Promise<Map<string, { rank: number; percentile: number }>> {
+  const out = new Map<string, { rank: number; percentile: number }>();
   try {
+    const { data: claimedData } = await sb
+      .from("operators_public")
+      .select("operator_id")
+      .eq("claimed", true)
+      .limit(10_000);
+    const claimedIds = (claimedData ?? []).map(
+      (r: { operator_id: string }) => r.operator_id,
+    );
+    if (claimedIds.length === 0) return out;
     const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
       sb,
       (s) =>
         s
           .from("metric_snapshots")
           .select(SNAPSHOT_COLUMNS)
+          .in("operator_id", claimedIds)
           .order("snapshot_date", { ascending: false }),
-      "metric_snapshots (recomputeRank)",
+      "metric_snapshots (claimedRanks)",
     );
-    if (allSnaps.length === 0) return { rank: 0, percentile: 0 };
-    // Collapse to the operator-TOTAL row per operator (BOARD redesign 2026-06-27):
-    // prefer each operator's 'multi' snapshot (already a cross-platform sum), else
-    // their latest single-platform snapshot — the SAME collapse the operator-total
-    // board uses, so a recomputed profile rank ranks the same yield the board does.
     const latest = operatorTotalCollapse(
       asDb<DbMetricSnapshot[]>(allSnaps) ?? [],
       "all_time",
     ).byOperator;
-    // Claimed-only basis (2026-09-27): the board ranks the displayed (claimed)
-    // set — the profile rank must use the SAME population or they disagree
-    // (rank_history counted every operator with a 30d snapshot, seeds included).
-    const { data: claimedData } = await sb
-      .from("operators_public")
-      .select("operator_id")
-      .eq("claimed", true)
-      .limit(10_000);
-    const claimedIds = new Set(
-      (claimedData ?? []).map((r: { operator_id: string }) => r.operator_id),
-    );
-    // Compute yield_ for each + sort descending
     const ranked = [...latest.values()]
-      .filter((s) => claimedIds.has(s.operator_id))
       .map((s) => {
         const snap = mapSnapshot(s);
         const y =
@@ -187,15 +182,31 @@ async function recomputeRank(
       })
       .sort((a, b) => b.yield_ - a.yield_);
     const total = ranked.length;
-    if (total === 0) return { rank: 0, percentile: 0 };
-    const idx = ranked.findIndex((r) => r.operator_id === operatorId);
-    if (idx === -1) return { rank: 0, percentile: 0 };
-    const rank = idx + 1;
-    const percentile = total > 1 ? ((total - rank) / (total - 1)) * 100 : 100;
-    return { rank, percentile: Math.round(percentile * 100) / 100 };
+    ranked.forEach((r, i) =>
+      out.set(r.operator_id, {
+        rank: i + 1,
+        percentile:
+          total > 1
+            ? Math.round(((total - (i + 1)) / (total - 1)) * 100 * 100) / 100
+            : 100,
+      }),
+    );
+    return out;
   } catch {
-    return { rank: 0, percentile: 0 };
+    return out;
   }
+}
+
+/**
+ * claimedRankMap — memoized accessor over computeClaimedRanks. The "board:"
+ * key prefix means revalidateTouchedWindows()'s memoInvalidatePrefix("board:")
+ * busts it on every verified submission; the 300s TTL bounds staleness
+ * otherwise. Concurrent cold renders share one in-flight scan (dedupe).
+ */
+function claimedRankMap(
+  sb: SupabaseClient,
+): Promise<Map<string, { rank: number; percentile: number }>> {
+  return memoize("board:claimed-ranks", 300, () => computeClaimedRanks(sb));
 }
 
 /** Minimal shape of a `rank_history` row we read. */
@@ -558,14 +569,15 @@ export async function getOperator(
     // yield. rank_history (nightly backfill_rank_history) ranks a different
     // population (every op with a 30d snapshot) on a different window, so it
     // disagreed with the board (#11 profile vs #105-on-corpus-basis board).
-    // Always recompute live — also self-healing: the profile number refreshes
-    // on every render rather than waiting for the nightly backfill. rank_history
-    // remains the fallback for operators the claimed board can't place (no
-    // yieldable snapshot, or unclaimed).
+    // The claimed rank map is computed once per corpus (memoized 300s, busted
+    // on submit) and shared by every profile render — fresh AND cheap.
+    // rank_history remains the fallback for operators the claimed board can't
+    // place (no yieldable snapshot, or unclaimed).
     let globalRank = 0;
     let percentile = 0;
-    const recomputed = await recomputeRank(sb, op.operator_id, snap);
-    if (recomputed.rank > 0) {
+    const claimedRanks = await claimedRankMap(sb);
+    const recomputed = claimedRanks.get(op.operator_id);
+    if (recomputed) {
       globalRank = recomputed.rank;
       percentile = recomputed.percentile;
     } else {
