@@ -397,12 +397,12 @@ test("baseline operators are split out of the population on every layer", () => 
     "scope=live response carries baseline_population",
   );
   // …and the labels use it — 'N claimed + M baseline', never implying the
-  // whole population is registered accounts.
-  const header = read("components/live-board/LiveBoardHeader.tsx");
-  assert.ok(header.includes("baseline"), "header splits the baseline");
-  assert.match(header, /claimed/, "header labels the claimed share");
-  const rail = read("components/live-board/FieldRail.tsx");
-  assert.ok(rail.includes("baseline"), "rail splits the baseline");
+  // whole population is registered accounts. The label lives on the client
+  // provenance strip (inside the island that owns the displayed dataset) —
+  // SSR chrome can't render it without going stale on a source transition.
+  const client = read("components/board/BoardTableClient.tsx");
+  assert.ok(client.includes("shownBaseline"), "strip splits the baseline");
+  assert.match(client, /claimed/, "strip labels the claimed share");
 });
 
 test("live scope recomputes percentile over the displayed population", () => {
@@ -444,17 +444,42 @@ test("client provenance: fetched metadata is consumed, unavailable never commits
     src.includes('d.source === "unavailable"'),
     "unavailable responses are gated before commit",
   );
-  // …and a snapshot-sourced response gets a provenance strip so the SSR
-  // 'Live data' header can't describe different data.
+  // …and the provenance strip renders the DISPLAYED dataset's meta — after a
+  // supabase→snapshot transition the same element flips to 'Cached snapshot',
+  // so stale SSR claims can't stay attached to different data.
   assert.ok(
-    src.includes('displayed?.source === "snapshot"'),
-    "snapshot provenance strip rendered for fetched fallback data",
+    src.includes("shownSource") && src.includes("Cached snapshot"),
+    "provenance strip renders the displayed dataset's source",
+  );
+  // The SSR header carries NO source badge/provenance line — only the static
+  // title/subline, plus the unreachable-when-mounted 'unavailable' badge.
+  // (Check render structure, not doc prose: the header's own comment explains
+  // why 'Live data' moved out of it.)
+  const header = read("components/live-board/LiveBoardHeader.tsx");
+  assert.ok(
+    !header.includes("styles.provenance") &&
+      !header.includes("liveDotStale") &&
+      !header.includes("SOURCE_LABEL"),
+    "SSR header makes no freshness claims the client can't update",
+  );
+  // Per-family error flags: a totals refresh success can't erase an open
+  // breakdown error strip (and vice versa).
+  assert.ok(
+    src.includes("totalsError") && src.includes("breakdownError"),
+    "totals/breakdown error state is split per fetch family",
   );
   // Breakdown slot is keyed by the FULL query identity (window + platform) —
   // a failed platform=B fetch can never show platform=A rows under B's label.
   assert.ok(
     src.includes("platformFilter ??"),
     "breakdown key includes the platform filter",
+  );
+  // Platform views count baseline among the DISPLAYED rows — the API's
+  // baseline_population is pre-filter and would claim membership the
+  // platform filter may have excluded.
+  assert.ok(
+    src.includes("baselineInRows"),
+    "platform baseline counted from displayed entries, not pre-filter meta",
   );
   // Realtime refresh shares the totals slot and requests the complete
   // dataset — never a limit=25 first page.

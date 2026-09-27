@@ -28,7 +28,10 @@ import {
   mapSnapshot,
   telemetryFromSnapshot,
 } from "@/lib/board/mappers";
-import { isLiveBoardOperator } from "@/lib/board/live";
+import {
+  isLiveBoardOperator,
+  liveRankPercentile,
+} from "@/lib/board/live";
 
 /**
  * Cold-store fallback base (owner 2026-06-20). The build-time snapshot.json is a
@@ -242,10 +245,7 @@ function applyBoardFilters(
     ...r,
     global_rank: i + 1,
     percentile: params.live
-      ? rankedCount > 1
-        ? Math.round(((rankedCount - (i + 1)) / (rankedCount - 1)) * 10000) /
-          100
-        : 100
+      ? liveRankPercentile(i + 1, rankedCount)
       : r.percentile,
   }));
   if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);

@@ -32,6 +32,7 @@ import type { LeaderboardEntryWithPlatforms } from "@/lib/board/to-entry";
 import { useBoardRealtime } from "@/lib/board/use-board-realtime";
 import { toSignalClass } from "@/components/sigrank/types";
 import type { LiveBoardSource } from "@/lib/board/live";
+import liveStyles from "@/components/live-board/live-board.module.css";
 
 interface Props {
   /** First page of operatorTotal entries (25 rows) for SSR + SEO. */
@@ -41,6 +42,13 @@ interface Props {
   /** Baseline (unclaimed-but-eligible) operators in the population — The
    *  Field. Shown separately so the count never implies registered users. */
   baselineCount?: number;
+  /** SSR provenance — the seed state of the strip; replaced by the meta of
+   *  whichever fetched dataset is displayed. */
+  source?: LiveBoardSource;
+  /** SSR freshness ('YYYY-MM-DD'), paired with `source`. */
+  sourceDate?: string | null;
+  /** Window short label for the provenance strip, e.g. '30d' / 'all-time'. */
+  windowShort?: string;
   /** The board window slug (7d/30d/90d/all). */
   window: string;
   /** The board window enum for API calls (e.g. "all_time"). */
@@ -116,10 +124,19 @@ function metaFromApi(d: Record<string, unknown>): FetchedMeta {
   };
 }
 
+const SOURCE_LABEL: Record<LiveBoardSource, string> = {
+  supabase: "Live data",
+  snapshot: "Cached snapshot",
+  unavailable: "Data unavailable",
+};
+
 export function BoardTableClient({
   totalEntries,
   totalCount,
   baselineCount: baselineProp,
+  source: ssrSource,
+  sourceDate: ssrSourceDate,
+  windowShort,
   window: win,
   windowEnum,
 }: Props) {
@@ -160,7 +177,11 @@ export function BoardTableClient({
   // silently block pagination.
   const [breakdownLoading, setBreakdownLoading] = useState(false);
   const [totalsLoading, setTotalsLoading] = useState(false);
-  const [fetchError, setFetchError] = useState(false);
+  // Per-family error flags — a successful totals refresh must not erase the
+  // error strip (and its Retry affordance) for an unresolved breakdown
+  // failure on a platform view, and vice versa.
+  const [totalsError, setTotalsError] = useState(false);
+  const [breakdownError, setBreakdownError] = useState(false);
   const [retryTick, setRetryTick] = useState(0);
   // Stale-response guards: only the newest request may commit. One sequence
   // per fetch family so a breakdown fetch can't cancel a totals lazy-load.
@@ -185,7 +206,11 @@ export function BoardTableClient({
   // the loading strip.
   const fetchTotals = useCallback(
     (opts: { background?: boolean } = {}) => {
-      const we = resolvedWindowEnum;
+      // No windowEnum = no live contract to fetch under (legacy SSR-only
+      // render) — never guess a window. resolvedWindowEnum is the SSR-default
+      // fallback used ONLY for slot-key projection, not for fetches.
+      if (!windowEnum) return;
+      const we = windowEnum;
       const seq = ++totalsSeq.current;
       const controller = new AbortController();
       if (!opts.background) setTotalsLoading(true);
@@ -202,7 +227,7 @@ export function BoardTableClient({
           // A 200 with source:'unavailable' is a degraded payload, not a
           // successful empty board — never commit it over last-good data.
           if (!d || d.source === "unavailable") {
-            setFetchError(true);
+            setTotalsError(true);
             setTotalsLoading(false);
             return;
           }
@@ -211,18 +236,18 @@ export function BoardTableClient({
             entries: (d.entries ?? []).map(mapApiEntry),
             meta: metaFromApi(d),
           });
-          setFetchError(false);
+          setTotalsError(false);
           setTotalsLoading(false);
         })
         .catch((err: unknown) => {
           if (controller.signal.aborted) return;
           if (err instanceof DOMException && err.name === "AbortError") return;
           if (totalsSeq.current !== seq) return;
-          setFetchError(true);
+          setTotalsError(true);
           setTotalsLoading(false);
         });
     },
-    [resolvedWindowEnum],
+    [windowEnum],
   );
 
   const loadTotals = useCallback(() => {
@@ -290,7 +315,7 @@ export function BoardTableClient({
     const controller = new AbortController();
     const key = `${windowEnum}|platforms|${platformFilter ?? ""}`;
     setBreakdownLoading(true);
-    setFetchError(false);
+    setBreakdownError(false);
 
     fetch(
       liveBoardUrl(windowEnum, "platforms", { platform: platformFilter }),
@@ -306,7 +331,7 @@ export function BoardTableClient({
         // keep the last-good slot (keyed to ITS query, so a different
         // platform's rows still can't render) and surface the error strip.
         if (!d || d.source === "unavailable") {
-          setFetchError(true);
+          setBreakdownError(true);
           setBreakdownLoading(false);
           return;
         }
@@ -327,7 +352,7 @@ export function BoardTableClient({
         if (breakdownSeq.current !== seq) return;
         // Keep the last good breakdown on screen; flag the failure so the
         // user sees a retry affordance instead of a silently stale table.
-        setFetchError(true);
+        setBreakdownError(true);
         setBreakdownLoading(false);
       });
     return () => controller.abort();
@@ -340,7 +365,8 @@ export function BoardTableClient({
   // a response from a different window/platform can never render here.
   let entries: LeaderboardEntryWithPlatforms[];
   let displayed: FetchedMeta | null = null;
-  if (viewPlatforms || platformFilter) {
+  const platformView = viewPlatforms || Boolean(platformFilter);
+  if (platformView) {
     // Fetched breakdown rows — or empty while loading/failed (the error strip
     // communicates the failure; never substitute the totals population here).
     entries = breakdownForQuery?.entries ?? [];
@@ -352,19 +378,118 @@ export function BoardTableClient({
     entries = totalEntries;
   }
 
-  // Displayed counts follow the displayed dataset: a fetched response carries
-  // its own population/operators — the SSR count stays only while SSR rows do.
-  const totalUsers =
-    viewPlatforms || platformFilter
-      ? (breakdownForQuery?.operators ?? totalCount)
-      : (totalsForWindow?.meta.population ?? totalCount);
-  const baselineOps = displayed?.baseline ?? baselineProp;
+  // ── Provenance strip ────────────────────────────────────────────────
+  // All volatile "what am I looking at" chrome lives here, inside the client
+  // island, driven by the meta of the dataset actually on screen. The SSR
+  // header deliberately renders no source/freshness claims — otherwise a
+  // supabase→snapshot fetch would leave stale "Live data" text attached to
+  // rows the server never sent.
+  const shownSource = displayed?.source ?? ssrSource ?? "supabase";
+  const shownDate = displayed ? displayed.sourceDate : (ssrSourceDate ?? null);
+  // Platform views count what the filter actually returned; the totals view
+  // shows the eligible population of the displayed dataset (SSR prop until a
+  // fetch supersedes it). A failed/absent breakdown reads 0, not the SSR
+  // total — the strip must describe the displayed dataset, and that's empty.
+  const distinctOpsInRows = new Set(entries.map((e) => e.codename)).size;
+  const shownOps = platformView
+    ? (breakdownForQuery?.operators ?? distinctOpsInRows)
+    : (displayed?.population ?? totalCount);
+  // Baseline counts only ever describe rows on screen: on platform views,
+  // count The Field (isSeed = unclaimed-but-eligible) among displayed
+  // entries — baseline_population is pre-filter and would assert membership
+  // the platform filter may have excluded.
+  const baselineInRows = new Set(
+    entries.filter((e) => e.isSeed).map((e) => e.codename),
+  ).size;
+  const shownBaseline = platformView
+    ? baselineInRows
+    : (displayed?.baseline ?? baselineProp ?? 0);
+  const claimedShown = Math.max(0, shownOps - shownBaseline);
+  const dotClass =
+    shownSource === "supabase"
+      ? liveStyles.liveDot
+      : shownSource === "snapshot"
+        ? `${liveStyles.liveDot} ${liveStyles.liveDotStale}`
+        : `${liveStyles.liveDot} ${liveStyles.liveDotDown}`;
 
+  // Per-family errors: the strip shows the failure for the view being
+  // rendered; a totals refresh success can't erase an open breakdown error.
+  const activeError = platformView ? breakdownError : totalsError;
   const loading = breakdownLoading || totalsLoading;
 
   return (
     <div>
-      {fetchError ? (
+      <p
+        className={liveStyles.provenance}
+        style={{ margin: "0 0 0.9rem" }}
+        role="status"
+        aria-live="polite"
+      >
+        <span className={dotClass}>{SOURCE_LABEL[shownSource]}</span>
+        <span aria-hidden="true" className={liveStyles.sep}>
+          ·
+        </span>
+        {platformView ? (
+          <span>
+            <strong>{shownOps}</strong>{" "}
+            {shownOps === 1 ? "operator" : "operators"}
+            {platformFilter && platformLabel ? ` on ${platformLabel}` : ""}
+            {entries.length > shownOps
+              ? ` · ${entries.length} platform rows`
+              : ""}
+            {shownBaseline > 0 ? ` incl. ${shownBaseline} baseline` : ""}
+          </span>
+        ) : (
+          <span>
+            <strong>{claimedShown}</strong> claimed{" "}
+            {claimedShown === 1 ? "operator" : "operators"}
+            {shownBaseline > 0 ? (
+              <>
+                {" "}
+                + <strong>{shownBaseline}</strong> baseline
+              </>
+            ) : null}
+          </span>
+        )}
+        {windowShort ? (
+          <>
+            <span aria-hidden="true" className={liveStyles.sep}>
+              ·
+            </span>
+            <span>
+              window <strong>{windowShort}</strong>
+            </span>
+          </>
+        ) : null}
+        {shownSource === "supabase" && shownDate ? (
+          <>
+            <span aria-hidden="true" className={liveStyles.sep}>
+              ·
+            </span>
+            <span>
+              snapshots through <strong>{shownDate}</strong>
+            </span>
+          </>
+        ) : null}
+        {shownSource === "snapshot" ? (
+          <>
+            <span aria-hidden="true" className={liveStyles.sep}>
+              ·
+            </span>
+            <span>
+              {shownDate ? (
+                <>
+                  captured <strong>{shownDate}</strong>
+                </>
+              ) : (
+                "captured date unknown"
+              )}{" "}
+              — live data temporarily unavailable
+            </span>
+          </>
+        ) : null}
+      </p>
+      {activeError ? (
         <div
           role="alert"
           className="mb-3 flex items-center gap-3 rounded border border-red-500/60 bg-red-500/10 px-3 py-2 text-xs text-text-secondary"
@@ -377,9 +502,13 @@ export function BoardTableClient({
             type="button"
             className="rounded border border-bg-border px-2 py-0.5 text-text-primary hover:border-gold"
             onClick={() => {
-              setFetchError(false);
-              if (viewPlatforms || platformFilter) setRetryTick((t) => t + 1);
-              else fetchTotals();
+              if (platformView) {
+                setBreakdownError(false);
+                setRetryTick((t) => t + 1);
+              } else {
+                setTotalsError(false);
+                fetchTotals();
+              }
             }}
           >
             Retry
@@ -387,30 +516,20 @@ export function BoardTableClient({
         </div>
       ) : null}
       {loading ? (
-        <p
-          aria-live="polite"
-          className="mb-2 text-[11px] text-text-muted"
-        >
-          Loading {win === "all" ? "all-time" : win} board…
-        </p>
-      ) : null}
-      {/* Provenance follows the displayed dataset: when a client fetch serves
-          snapshot data the SSR header's "Live data" claim no longer describes
-          what's on screen — label the fallback honestly instead. */}
-      {displayed?.source === "snapshot" ? (
-        <p
-          role="status"
-          className="mb-2 rounded border border-gold/40 bg-gold/10 px-3 py-1.5 text-[11px] text-text-secondary"
-        >
-          Cached snapshot
-          {displayed.sourceDate ? ` · captured ${displayed.sourceDate}` : ""}{" "}
-          — live data temporarily unavailable.
+        <p aria-live="polite" className="mb-2 text-[11px] text-text-muted">
+          Loading{" "}
+          {platformView
+            ? platformFilter
+              ? `${platformLabel ?? platformFilter} results`
+              : "platform breakdown"
+            : `${win === "all" ? "all-time" : win} board`}
+          …
         </p>
       ) : null}
       <LeaderboardTable
         entries={entries}
-        totalUsers={totalUsers}
-        baselineCount={baselineOps ?? 0}
+        totalUsers={shownOps}
+        baselineCount={shownBaseline}
         window={win}
         platform={platformLabel}
         view={viewPlatforms ? "platforms" : "total"}

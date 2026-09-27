@@ -49,6 +49,17 @@ export function isLiveBoardOperator(op: LiveEligibleOperator): boolean {
   );
 }
 
+/**
+ * Percentile for 1-based `rank` inside a live population of `n` ranked rows.
+ * Single definition shared by the Supabase path (queries.ts) and the cold
+ * store (fallback.ts) so the two pipelines can never drift apart — stored
+ * percentiles in rank_history/snapshots describe the broader pre-eligibility
+ * field, so the live scope always recomputes over its own displayed set.
+ */
+export function liveRankPercentile(rank: number, n: number): number {
+  return n > 1 ? Math.round(((n - rank) / (n - 1)) * 10000) / 100 : 100;
+}
+
 /** Where a live-board response's data came from. */
 export type LiveBoardSource = "supabase" | "snapshot" | "unavailable";
 

@@ -68,6 +68,7 @@ import {
 import {
   isLiveBoardOperator,
   liveBoardParams,
+  liveRankPercentile,
   type LiveBoardQuery,
   type LiveBoardResult,
 } from "@/lib/board/live";
@@ -552,12 +553,7 @@ async function queryBoard(params: BoardParams = {}): Promise<BoardQueryResult> {
       // computed over the broader (seed-inclusive) field and would silently
       // overstate a live operator's position, so recompute against the
       // displayed population rather than serve an unqualified number.
-      percentile: live
-        ? rankedCount > 1
-          ? Math.round(((rankedCount - (i + 1)) / (rankedCount - 1)) * 10000) /
-            100
-          : 100
-        : r.percentile,
+      percentile: live ? liveRankPercentile(i + 1, rankedCount) : r.percentile,
     }));
     if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
     return {

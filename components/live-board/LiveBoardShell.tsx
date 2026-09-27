@@ -6,7 +6,8 @@
  * carbon/railway/paper stay structurally compatible.
  *
  * Composition (server-side):
- *   header   — compact hero + provenance strip (LiveBoardHeader)
+ *   header   — compact hero, static only (LiveBoardHeader — provenance lives
+ *              inside the client island so it tracks the displayed dataset)
  *   worldNav — window tabs + Compare/Hall destinations (LiveWorldNav)
  *   grid     — board column (children) + FieldRail context aside
  *
@@ -29,16 +30,9 @@ interface Props {
   windowEnum: string;
   /** H1 lead-in: 'AI User' (all-time) or '<n>-Day'. */
   boardLabel: string;
-  /** Window short label for the provenance strip, e.g. '30d' / 'all-time'. */
-  windowShort: string;
   /** Window label for the rail, e.g. 'All time' / '30 day'. */
   windowLabel: string;
-  population: number;
-  /** Baseline (unclaimed-but-eligible) operators inside `population` — The
-   *  Field. Split out so labels never imply all operators are registered. */
-  baseline: number;
   source: LiveBoardSource;
-  sourceDate: string | null;
   /** When the data source is unavailable, the board column renders an honest
    *  unavailable state instead of an empty table. */
   children: ReactNode;
@@ -48,24 +42,13 @@ export function LiveBoardShell({
   windowSlug,
   windowEnum,
   boardLabel,
-  windowShort,
   windowLabel,
-  population,
-  baseline,
   source,
-  sourceDate,
   children,
 }: Props) {
   return (
     <section className={styles.shell} aria-label="Live board">
-      <LiveBoardHeader
-        boardLabel={boardLabel}
-        population={population}
-        baseline={baseline}
-        windowShort={windowShort}
-        source={source}
-        sourceDate={sourceDate}
-      />
+      <LiveBoardHeader boardLabel={boardLabel} source={source} />
       <LiveWorldNav active={windowSlug} />
       <div className={styles.grid}>
         <div className={styles.boardCol}>
@@ -89,11 +72,7 @@ export function LiveBoardShell({
             children
           )}
         </div>
-        <FieldRail
-          windowLabel={windowLabel}
-          population={population}
-          baseline={baseline}
-        />
+        <FieldRail windowLabel={windowLabel} />
       </div>
     </section>
   );

@@ -163,12 +163,8 @@ export default async function BoardWindowPage({
         windowSlug={win.slug}
         windowEnum={win.enum}
         boardLabel={boardLabel}
-        windowShort={isAllTime ? "all-time" : win.short}
         windowLabel={win.label}
-        population={totalCount}
-        baseline={board.baselinePopulation}
         source={board.source}
-        sourceDate={board.sourceDate}
       >
         {/* Client wrapper: reads useSearchParams for platform/view filter
             state and fetches the same live scope via scope=live. Wrapped in
@@ -190,6 +186,9 @@ export default async function BoardWindowPage({
             totalEntries={totalEntries}
             totalCount={totalCount}
             baselineCount={board.baselinePopulation}
+            source={board.source}
+            sourceDate={board.sourceDate}
+            windowShort={isAllTime ? "all-time" : win.short}
             window={win.slug}
             windowEnum={win.enum}
           />

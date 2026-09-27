@@ -11,13 +11,9 @@ import styles from "./live-board.module.css";
 interface Props {
   /** Window label shown in the rail's context line, e.g. "all-time". */
   windowLabel: string;
-  /** Eligible live population for the current window. */
-  population: number;
-  /** Baseline (unclaimed-but-eligible) operators inside `population`. */
-  baseline: number;
 }
 
-export function FieldRail({ windowLabel, population, baseline }: Props) {
+export function FieldRail({ windowLabel }: Props) {
   return (
     <aside className={styles.rail} aria-label="Board context">
       <div className={styles.railCard}>
@@ -36,14 +32,9 @@ export function FieldRail({ windowLabel, population, baseline }: Props) {
           <span>Window</span>
           <strong>{windowLabel}</strong>
         </div>
-        <div className={styles.railStat}>
-          <span>Live population</span>
-          <strong>
-            {baseline > 0
-              ? `${population - baseline} claimed + ${baseline} baseline`
-              : `${population}`}
-          </strong>
-        </div>
+        {/* The population stat lives on the client provenance strip — the rail
+            is SSR chrome and would go stale when a client fetch changes the
+            displayed dataset (e.g. supabase → snapshot). */}
         <Link href="/hall" className={styles.railLink}>
           Full Hall of Signal →
         </Link>

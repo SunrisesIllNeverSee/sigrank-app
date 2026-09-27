@@ -138,6 +138,9 @@ function renderBoard(
     totalEntries?: LeaderboardEntryWithPlatforms[];
     totalCount?: number;
     baselineCount?: number;
+    source?: "supabase" | "snapshot" | "unavailable";
+    sourceDate?: string | null;
+    windowShort?: string;
     window?: string;
     windowEnum?: string;
   } = {},
@@ -150,6 +153,9 @@ function renderBoard(
       totalEntries={totalEntries}
       totalCount={opts.totalCount ?? totalEntries.length}
       baselineCount={opts.baselineCount ?? 0}
+      source={opts.source ?? "supabase"}
+      sourceDate={opts.sourceDate ?? "2026-09-26"}
+      windowShort={opts.windowShort ?? "all-time"}
       window={opts.window ?? "all"}
       windowEnum={opts.windowEnum ?? "all_time"}
     />,
@@ -302,7 +308,24 @@ describe("BoardTableClient — query-keyed fetched slots", () => {
 });
 
 describe("BoardTableClient — provenance handling", () => {
-  it("labels snapshot-sourced fetched data instead of leaving SSR 'live' chrome", async () => {
+  it("renders the SSR-seeded live provenance before any fetch", () => {
+    fetchMock.mockImplementation(() => new Promise(() => {}));
+    renderBoard({
+      totalEntries: [makeEntry("ssr-op-0"), makeEntry("ssr-op-1")],
+      totalCount: 2,
+      baselineCount: 0,
+      source: "supabase",
+      sourceDate: "2026-09-26",
+      windowShort: "30d",
+    });
+    const strip = screen.getByRole("status");
+    expect(strip.textContent).toContain("Live data");
+    expect(strip.textContent).toContain("2 claimed");
+    expect(strip.textContent).toContain("30d");
+    expect(strip.textContent).toContain("snapshots through 2026-09-26");
+  });
+
+  it("supabase→snapshot: the SAME strip flips — no live claim survives", async () => {
     const ssr = [makeEntry("ssr-op-0"), makeEntry("ssr-op-1")];
     fetchMock.mockImplementation(() =>
       okJson(
@@ -315,14 +338,30 @@ describe("BoardTableClient — provenance handling", () => {
       ),
     );
 
-    renderBoard({ totalEntries: ssr, totalCount: 2 });
+    renderBoard({
+      totalEntries: ssr,
+      totalCount: 2,
+      source: "supabase",
+      sourceDate: "2026-09-26",
+    });
+    // SSR state: the strip claims live data through the SSR date.
+    const strip = screen.getByRole("status");
+    expect(strip.textContent).toContain("Live data");
+    expect(strip.textContent).toContain("2026-09-26");
+
     await React.act(async () => realtimeRefresh?.());
 
+    // After the transition the SAME element carries the snapshot's
+    // provenance — and NO 'Live data' / stale-date claim remains anywhere.
     await waitFor(() =>
-      expect(screen.getByText(/Cached snapshot/i)).toBeTruthy(),
+      expect(strip.textContent).toContain("Cached snapshot"),
     );
-    expect(screen.getByText(/captured 2026-09-20/)).toBeTruthy();
-    // Counts follow the fetched dataset, not the SSR render.
+    expect(strip.textContent).not.toContain("Live data");
+    expect(strip.textContent).not.toContain("2026-09-26");
+    expect(strip.textContent).toContain("captured 2026-09-20");
+    expect(strip.textContent).toContain("6 claimed");
+    expect(strip.textContent).toContain("+ 1 baseline");
+    // Counts handed to the table follow the fetched dataset, not the SSR render.
     expect(screen.getByTestId("total-users").textContent).toBe("7");
     expect(screen.getByTestId("baseline").textContent).toBe("1");
     expect(screen.getByText("snap-op-0")).toBeTruthy();
@@ -348,4 +387,92 @@ describe("BoardTableClient — provenance handling", () => {
     expect(screen.getByTestId("row-count").textContent).toBe("2");
     expect(screen.getByText("ssr-op-0")).toBeTruthy();
   });
+
+  it("platform-filtered view counts baseline among DISPLAYED rows only", async () => {
+    // The Field is a claude-platform operator — filtering to codex must not
+    // claim 'incl. 1 baseline' even though baseline_population=1 (pre-filter).
+    currentParams = new URLSearchParams("platform=codex");
+    fetchMock.mockImplementation(() =>
+      okJson(
+        apiResponse([apiEntry("codex-op-0"), apiEntry("codex-op-1")], {
+          operators_returned: 2,
+          // Pre-filter meta still reports the whole population's baseline…
+          baseline_population: 1,
+        }),
+      ),
+    );
+
+    const { rerender } = renderBoard({ baselineCount: 1 });
+    await waitFor(() => expect(screen.getByText("codex-op-0")).toBeTruthy());
+
+    const strip = screen.getByRole("status");
+    expect(strip.textContent).toContain("2 operators");
+    expect(strip.textContent).not.toContain("baseline");
+    expect(screen.getByTestId("baseline").textContent).toBe("0");
+
+    // …and when the filter DOES include The Field, 'incl.' is honest.
+    currentParams = new URLSearchParams("platform=claude");
+    fetchMock.mockImplementation(() =>
+      okJson(
+        apiResponse(
+          [
+            apiEntry("the-field", { claimed: false }),
+            apiEntry("claude-op"),
+          ],
+          { operators_returned: 2, baseline_population: 1 },
+        ),
+      ),
+    );
+    rerender(
+      <BoardTableClient
+        totalEntries={[makeEntry("ssr-op-0")]}
+        totalCount={1}
+        baselineCount={1}
+        source="supabase"
+        sourceDate="2026-09-26"
+        windowShort="all-time"
+        window="all"
+        windowEnum="all_time"
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("status").textContent).toContain(
+        "incl. 1 baseline",
+      ),
+    );
+  });
+
+  it("a totals refresh success does not erase an open breakdown error", async () => {
+    // Platform view fetch fails → breakdown error strip + retry. A background
+    // totals refresh (realtime) succeeding must NOT clear the platform error.
+    currentParams = new URLSearchParams("platform=codex");
+    let breakdownCalls = 0;
+    fetchMock.mockImplementation((url: string) => {
+      const u = new URL(url, "http://x");
+      if (u.searchParams.get("breakdown") === "platforms") {
+        breakdownCalls += 1;
+        return Promise.resolve({
+          ok: false,
+          status: 500,
+          json: () => Promise.resolve({}),
+        } as Response);
+      }
+      return okJson(apiResponse([apiEntry("op-0")], { population: 1 }));
+    });
+
+    renderBoard();
+    await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+    expect(breakdownCalls).toBe(1);
+
+    // A successful totals refresh leaves the breakdown error (and Retry) up.
+    await React.act(async () => realtimeRefresh?.());
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("breakdown=total"),
+        expect.anything(),
+      ),
+    );
+    expect(screen.getByRole("alert")).toBeTruthy();
+  });
 });
+
