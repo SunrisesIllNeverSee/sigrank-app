@@ -1,1 +1,14 @@
-repos: []
+# Requires `pre-commit install` once per clone (pipx/pip install pre-commit).
+repos:
+  - repo: local
+    hooks:
+      # REPO_CLEANUP_PLAN §16.1+§16.2 — broken tracked symlinks and
+      # tracked-but-ignored files (the supabase/.temp/cli-latest class).
+      # Runs before every commit so machine-local files can't slip into a
+      # staged changeset; zero cost (~2 git calls).
+      - id: repo-hygiene
+        name: repo hygiene — broken symlinks + tracked-ignored files
+        entry: node scripts/check-repo-hygiene.mjs
+        language: system
+        pass_filenames: false
+        always_run: true
