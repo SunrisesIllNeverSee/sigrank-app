@@ -75,4 +75,16 @@ describe("LeaderboardTable", () => {
     );
     expect(hasItalic).toBe(false);
   });
+
+  it("category toggle labels the outliers group '+ Outliers'", () => {
+    render(<LeaderboardTable entries={mockEntries} />);
+    // Owner 2026-09-27: the button reads "+ Outliers" (the category still
+    // covers bots internally — the label is the public copy).
+    const btn = screen.getByRole("button", { name: /outliers/i });
+    expect(btn.textContent?.trim()).toBe("+ Outliers");
+    const botsBtn = screen
+      .getAllByRole("button")
+      .filter((b) => /bots/i.test(b.textContent ?? ""));
+    expect(botsBtn).toHaveLength(0);
+  });
 });

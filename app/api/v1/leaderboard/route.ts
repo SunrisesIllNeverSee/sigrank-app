@@ -4,6 +4,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { getLeaderboard } from "@/lib/board";
+import { windowParamToEnum } from "@/lib/board/windows";
 import { SORT_DEFAULT } from "@/lib/constants";
 import {
   LEADERBOARD_CACHE_CONTROL,
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const metricParam = sp.get("metric") ?? "yield";
   const sort = METRIC_PARAM_TO_SORT[metricParam] ?? SORT_DEFAULT;
-  const windowParam = sp.get("window") ?? "30d";
+  const windowParam = windowParamToEnum(sp.get("window") ?? "30d");
   const platformParam = sp.get("platform");
   const classParam = sp.get("class");
 

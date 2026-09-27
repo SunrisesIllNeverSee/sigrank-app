@@ -218,6 +218,14 @@ export interface BoardParams {
   operatorTotal?: boolean;
   /** primary_domain filter, or null/undefined for all. */
   platform?: string | null;
+  /**
+   * Claimed-only board (2026-09-27): when true, drop unclaimed operators BEFORE
+   * the sort+re-rank so `global_rank` is the position on the displayed board —
+   * contiguous, and on the same basis as the profile rank (which ranks the
+   * claimed set). Without it the /board pages filtered claimed AFTER ranking,
+   * producing gappy corpus-wide ranks (#105 at display position ~10).
+   */
+  claimedOnly?: boolean;
   /** Lowercase class scope (e.g. 'transmitter'), or 'all'/undefined. */
   classScope?: string;
   /** Sort key (a metric_snapshots column). */
@@ -296,10 +304,17 @@ export function toSignalClass(v: string | null | undefined): SignalClass {
 
 /** Map a DB operators row → facade Operator (live rows are never placeholders). */
 export function mapOperator(o: DbOperator): Operator {
+  // profile_visibility='private' (migration 0021): only codename + computed
+  // metrics are public — display_name, handle, avatar, bio, links, location are
+  // owner-only. mapOperator is the funnel for EVERY public read path (board,
+  // profile, /api/v1/*, fallback rows), so redacting here covers all of them.
+  // Owner-facing reads (/me/edit, /api/v1/profile) hit the operators base table
+  // directly — they never pass through this mapper.
+  const priv = o.profile_visibility === "private";
   return {
     operator_id: o.operator_id,
     codename: o.codename,
-    display_name: o.display_name ?? null,
+    display_name: priv ? null : (o.display_name ?? null),
     claimed: o.claimed ?? false,
     claimed_at: o.claimed_at ?? null,
     // P5 (0008): never surfaced through the public read path — the operators_public
@@ -313,13 +328,12 @@ export function mapOperator(o: DbOperator): Operator {
     total_messages_lifetime: num(o.total_messages_lifetime),
     isPlaceholder: false,
     // Phase-0 identity fields (migration 0007, apply post-move)
-    handle: o.handle ?? null,
-    avatar_url: o.avatar_url ?? null,
-    bio: o.bio ?? null,
-    links: o.links ?? null,
-    location: o.location ?? null,
-    profile_visibility:
-      o.profile_visibility === "private" ? "private" : "public",
+    handle: priv ? null : (o.handle ?? null),
+    avatar_url: priv ? null : (o.avatar_url ?? null),
+    bio: priv ? null : (o.bio ?? null),
+    links: priv ? null : (o.links ?? null),
+    location: priv ? null : (o.location ?? null),
+    profile_visibility: priv ? "private" : "public",
     status: o.status ?? null,
   };
 }

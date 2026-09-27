@@ -90,6 +90,10 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   // legacy callers keep the full field. Mirrors the live path's windowFilter gate.
   if (params.windowFilter && params.window)
     rows = filterToWindow(rows, params.window);
+  // claimedOnly — mirrors the live path (queries.ts): unclaimed operators drop
+  // before re-rank so the cold-store board's rank column matches the claimed
+  // display positions too.
+  if (params.claimedOnly) rows = rows.filter((r) => r.operator.claimed);
   if (params.platform && params.platform !== "all") {
     rows = rows.filter(
       (r) =>
@@ -108,6 +112,16 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
   // Re-rank within the filtered/sorted view for stable display ranks.
   rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
+  if (params.claimedOnly) {
+    const n = rows.length;
+    rows = rows.map((r) => ({
+      ...r,
+      percentile:
+        n > 1
+          ? Math.round(((n - r.global_rank) / (n - 1)) * 100 * 100) / 100
+          : 100,
+    }));
+  }
   if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
   return rows;
 }

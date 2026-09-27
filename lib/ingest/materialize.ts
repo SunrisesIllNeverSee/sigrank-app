@@ -323,6 +323,10 @@ export function revalidateTouchedWindows(
   const win = boardWindowByEnum(windowType);
   if (win) revalidatePath(`/board/${win.slug}`);
   revalidatePath("/board/off");
+  // /board/all aggregates EVERY window (windowFilter:false + collapse), so a
+  // 7d-only submission still changes it — bust it unconditionally, not just
+  // when the submitted window_type is 'all_time'.
+  if (win?.slug !== "all") revalidatePath("/board/all");
   revalidateTag("operator");
   revalidateTag("board");
   // Also bust the in-memory memo cache for getLeaderboard (the 2MB workaround).
