@@ -10,6 +10,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     include: [
       "__tests__/ui/**/*.test.{ts,tsx}",
+      "__tests__/board/**/*.test.ts",
       "__tests__/ingest/**/*.test.ts",
       "__tests__/identity/**/*.test.ts",
       "__tests__/mcp/**/*.test.ts",
