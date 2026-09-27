@@ -979,7 +979,8 @@ export function scoreCalculator() {
 export function cliTool() {
   return {
     "@context": "https://schema.org",
-    "@type": ["SoftwareApplication", "SoftwareSourceCode"],
+    "@type": "SoftwareApplication",
+    additionalType: "https://schema.org/SoftwareSourceCode",
     "@id": `${SITE_ORIGIN}/#sigrank-cli`,
     name: "sigrank",
     alternateName: "SigRank CLI",
