@@ -43,6 +43,34 @@ canonical tests + live-DOM checks against deployed signalaf.com.
 2. `npm run test:canonical` — 11/11 pass
 3. If touching API routes or scoring logic, run full `npm test`
 
+## Blast-radius check (before changing data-layer code)
+
+Changes in `lib/board/queries.ts`, `lib/board/cached.ts`, `lib/ingest/*`, or any
+function called during page render can quietly move cost onto hot paths. Before
+committing, answer these — most perf regressions here have been a cheap helper
+promoted onto a per-render path:
+
+1. **Who calls this, and how often?** Trace callers up to the surface: per
+   request? per ISR cold render? per cache miss? per submission? A function
+   that runs "rarely" today may run on every render after your change.
+2. **What does it cost per invocation?** Count DB round trips added to each
+   cold path (page comments document the budgets — e.g. `/user/[codename]`
+   does ~5 reads on a cold miss). An unfiltered `fetchAllPaginated` is ~3
+   round trips + the whole table's egress — never put one inside a per-render
+   or per-miss path. Corpus-level work belongs behind a shared memo/cache key
+   (`lib/board/memo.ts`, `board:` prefix so `revalidateTouchedWindows` busts it)
+   or `unstable_cache` under the 2MB limit.
+3. **Does it interact with the cache layers?** `unstable_cache` (90–3600s,
+   tag-busted on submit) + memo (per-instance, 300s) + ISR (21600s). New reads
+   on a cached path must be inside the cached function, or they run uncached.
+4. **Time it.** `curl -w '%{time_total}'` a cold render before/after on the
+   dev server — correctness verification alone missed the 2026-09-27
+   profile-scan regression.
+5. **Regression test:** `__tests__/board/profile-query-budget.test.ts` counts
+   executed queries on the `getOperator` path and fails on unconstrained
+   `metric_snapshots` scans or per-render corpus work. Extend that pattern when
+   adding new data-layer reads.
+
 ## Frozen invariants (never change)
 
 - **MOSES seed values:** `(1_251_211, 11_296_121, 128_196_310, 2_555_179_769)` → Υ 18436.98
