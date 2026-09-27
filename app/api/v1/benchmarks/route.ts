@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeaderboard } from "@/lib/board";
+import { windowParamToEnum } from "@/lib/board/windows";
 import { fieldStats } from "@sigrank/cascade";
 
 export const revalidate = 3600;
@@ -27,7 +28,7 @@ export const revalidate = 3600;
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const window = url.searchParams.get("window") || "30d";
+  const window = windowParamToEnum(url.searchParams.get("window") || "30d");
 
   const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
 

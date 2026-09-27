@@ -3,7 +3,7 @@
  * scripts/snapshot-db.mjs — cold-store snapshot of the live board.
  *
  * Reads the live Supabase board (operators + their latest metric_snapshot per
- * window) and writes a DETERMINISTIC JSON to lib/data/snapshot.json. That file is
+ * window) and writes a DETERMINISTIC JSON to lib/board/snapshot.json. That file is
  * the production FALLBACK: if Supabase is unreachable at request time, the site
  * serves this recent real snapshot instead of the hand-authored mock. Run 1–2×/day.
  *
@@ -27,7 +27,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, "..", "lib", "data", "snapshot.json");
+const OUT = join(__dirname, "..", "lib", "board", "snapshot.json");
 
 // Load .env.local if present (no dotenv dep — parse the few KEY=VALUE lines we need).
 function loadEnv() {
@@ -52,23 +52,42 @@ if (!url || !key) {
 
 const sb = createClient(url, key, { auth: { persistSession: false } });
 
-const { data: operators, error: opErr } = await sb
-  .from("operators")
-  .select(
-    "operator_id, codename, display_name, claimed, claimed_at, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime",
-  );
-if (opErr) {
-  console.error("[snapshot] operators read failed:", opErr.message);
-  process.exit(1);
+// PostgREST caps unbounded selects at ~1000 rows — paginate with a total
+// ordering until a short page signals the end. The ordering must end in a
+// unique key (metric_snapshot_id): a page boundary splitting rows that share
+// the sort key can skip/duplicate records under a partial order.
+const PAGE = 1000;
+const CEILING = 50_000;
+async function fetchAll(table, columns, orderCols) {
+  const out = [];
+  for (let from = 0; from < CEILING; from += PAGE) {
+    let q = sb.from(table).select(columns);
+    for (const col of orderCols) q = q.order(col);
+    const { data, error } = await q.range(from, from + PAGE - 1);
+    if (error) throw error;
+    const rows = data ?? [];
+    out.push(...rows);
+    if (rows.length < PAGE) return out;
+  }
+  throw new Error(`${table} exceeded ${CEILING} rows — refusing a truncated snapshot.`);
 }
 
-const { data: snaps, error: snErr } = await sb
-  .from("metric_snapshots")
-  .select(
-    "operator_id, snapshot_date, window_type, class_tier, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, message_volume, account_age_days, total_messages, signal_force, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
+let operators, snaps;
+try {
+  operators = await fetchAll(
+    "operators",
+    "operator_id, codename, display_name, claimed, claimed_at, current_supporter_tier, verification_status, primary_domain, account_age_days, total_messages_lifetime, profile_visibility",
+    ["operator_id"],
   );
-if (snErr) {
-  console.error("[snapshot] metric_snapshots read failed:", snErr.message);
+  snaps = await fetchAll(
+    "metric_snapshots",
+    // metric_snapshot_id: deterministic pick tie-breaker (see pickPerKey).
+    // platform: needed for 'multi'-preference + the UI platform badge.
+    "metric_snapshot_id, operator_id, snapshot_date, window_type, platform, class_tier, signa_rate, compression_ratio, prompt_complexity, cross_thread, session_depth, token_throughput, message_volume, account_age_days, total_messages, signal_force, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
+    ["operator_id", "metric_snapshot_id"],
+  );
+} catch (err) {
+  console.error(`[snapshot] read failed: ${err?.message ?? err}`);
   process.exit(1);
 }
 
@@ -79,8 +98,14 @@ if (!operators?.length || !snaps?.length) {
   process.exit(1);
 }
 
+// This file is COMMITTED — a private operator's display_name must never land
+// in it. Redact at write time (migration 0021 contract: codename only).
+const opsRedacted = operators.map((o) =>
+  o.profile_visibility === "private" ? { ...o, display_name: null } : o,
+);
+
 // Deterministic ordering: operators by codename, snapshots by (operator_id, window_type).
-const opsSorted = [...operators].sort((a, b) =>
+const opsSorted = [...opsRedacted].sort((a, b) =>
   a.codename.localeCompare(b.codename),
 );
 const snapsSorted = [...snaps].sort((a, b) =>

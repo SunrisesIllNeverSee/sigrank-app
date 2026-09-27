@@ -9,6 +9,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { getOperator, getOperatorHistory } from "@/lib/board";
+import { windowParamToEnum } from "@/lib/board/windows";
 
 const MAX_LIMIT = 365;
 
@@ -30,7 +31,7 @@ export async function GET(
   }
 
   const sp = req.nextUrl.searchParams;
-  const windowParam = sp.get("window") ?? "30d";
+  const windowParam = windowParamToEnum(sp.get("window") ?? "30d");
   const limitRaw = Number.parseInt(sp.get("limit") ?? "", 10);
   const limit = Number.isFinite(limitRaw)
     ? Math.min(Math.max(limitRaw, 1), MAX_LIMIT)

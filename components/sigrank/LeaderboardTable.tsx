@@ -739,7 +739,7 @@ export function LeaderboardTable({
                     ...(categoryFilter === "outliers" ? st.modeOn : null),
                   }}
                 >
-                  + Outliers & Bots
+                  + Outliers
                 </button>
                 <button
                   type="button"
