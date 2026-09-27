@@ -87,6 +87,17 @@ export function boardWindowByEnum(enumValue: string): BoardWindow | undefined {
   return BY_ENUM.get(enumValue);
 }
 
+/**
+ * Normalize an API `window` param to a `window_type` enum. Accepts both the
+ * documented enum ('all_time') and the board slug ('all') — the route slug
+ * leaked into API usage (?window=all silently returned an empty board because
+ * nothing has window_type='all'). Unknown values pass through unchanged so
+ * callers keep their existing fallback behaviour.
+ */
+export function windowParamToEnum(param: string): string {
+  return BY_SLUG.get(param)?.enum ?? param;
+}
+
 const MS_PER_DAY = 86_400_000;
 
 /**

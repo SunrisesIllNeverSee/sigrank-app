@@ -63,6 +63,10 @@ export interface DbOperator {
 export interface DbMetricSnapshot {
   operator_id: string;
   snapshot_date: string;
+  /** PK — final tie-breaker when window/date/platform all tie (same-date
+   *  uploads stamp one row per window with identical dates). Optional: cold
+   *  snapshot.json rows predate its inclusion in the select. */
+  metric_snapshot_id?: string | null;
   /** 730 window bucket: '7d' | '30d' | '90d' | 'all_time' (TEXT, schema 0001). */
   window_type: string | null;
   /** Per-submission AI platform (migration 0015, FIX H). Backfilled from the
@@ -90,6 +94,82 @@ export interface DbMetricSnapshot {
   output_tokens: number | null;
   cache_creation_tokens: number | null;
   cache_read_tokens: number | null;
+  /** Per-snapshot account age / lifetime messages — used to backfill the
+   *  unmaintained operators rollup columns (see applySnapshotRollups). */
+  account_age_days?: number | null;
+  total_messages?: number | null;
+}
+
+/**
+ * The deterministic pick rule for "one snapshot per key" (2026-09-27 bug fix).
+ *
+ * Every upload stamps a row per (window_type, platform) with the SAME
+ * snapshot_date, so `ORDER BY snapshot_date DESC` leaves the interesting rows
+ * in a same-date tie — Postgres returns those in arbitrary order, and the
+ * board/profile collapsed onto whatever came back first (the all-time board
+ * rendered a 7d row; the profile landed on 90d). The ladder:
+ *
+ *   bucket 0 — preferWindow + platform='multi'   (the window's own total)
+ *   bucket 1 — preferWindow + single platform    (the window's own stats)
+ *   bucket 2 — other window + 'multi'            (a cross-platform total)
+ *   bucket 3 — anything else                     (freshest available data)
+ *
+ * Within a bucket the newest snapshot_date wins; same-date ties resolve on
+ * metric_snapshot_id so the pick is a TOTAL order independent of input order.
+ * preferWindow=null collapses buckets to (multi-first, then latest).
+ */
+function pickPerKey(
+  rows: readonly DbMetricSnapshot[],
+  keyOf: (r: DbMetricSnapshot) => string,
+  preferWindow?: string | null,
+): Map<string, DbMetricSnapshot> {
+  const buckets = new Map<string, (DbMetricSnapshot | undefined)[]>();
+  /** Better within a bucket: later date; same date → larger id (total order). */
+  const better = (r: DbMetricSnapshot, cur: DbMetricSnapshot | undefined) =>
+    !cur ||
+    r.snapshot_date > cur.snapshot_date ||
+    (r.snapshot_date === cur.snapshot_date &&
+      (r.metric_snapshot_id ?? "") > (cur.metric_snapshot_id ?? ""));
+  for (const r of rows) {
+    const key = keyOf(r);
+    let b = buckets.get(key);
+    if (!b) {
+      b = [undefined, undefined, undefined, undefined];
+      buckets.set(key, b);
+    }
+    const i =
+      (preferWindow != null && r.window_type === preferWindow ? 0 : 2) +
+      (r.platform === "multi" ? 0 : 1);
+    if (better(r, b[i])) b[i] = r;
+  }
+  const out = new Map<string, DbMetricSnapshot>();
+  for (const [key, b] of buckets) {
+    const pick = b[0] ?? b[1] ?? b[2] ?? b[3];
+    if (pick) out.set(key, pick);
+  }
+  return out;
+}
+
+/**
+ * Roll the per-snapshot account_age_days / total_messages onto the operator
+ * when the operators rollup columns are unmaintained (null / 0). The snapshot
+ * values are written by the ingest path on every submission, so they reflect
+ * the account at snapshot time — for the chosen (all-time) row that IS the
+ * operator's lifetime count.
+ */
+export function applySnapshotRollups(
+  operator: Operator,
+  snap: DbMetricSnapshot,
+): Operator {
+  if (operator.account_age_days === 0 && snap.account_age_days != null)
+    operator.account_age_days = snap.account_age_days;
+  if (
+    !operator.total_messages_lifetime &&
+    snap.total_messages != null &&
+    snap.total_messages > 0
+  )
+    operator.total_messages_lifetime = snap.total_messages;
+  return operator;
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -138,6 +218,14 @@ export interface BoardParams {
   operatorTotal?: boolean;
   /** primary_domain filter, or null/undefined for all. */
   platform?: string | null;
+  /**
+   * Claimed-only board (2026-09-27): when true, drop unclaimed operators BEFORE
+   * the sort+re-rank so `global_rank` is the position on the displayed board —
+   * contiguous, and on the same basis as the profile rank (which ranks the
+   * claimed set). Without it the /board pages filtered claimed AFTER ranking,
+   * producing gappy corpus-wide ranks (#105 at display position ~10).
+   */
+  claimedOnly?: boolean;
   /** Lowercase class scope (e.g. 'transmitter'), or 'all'/undefined. */
   classScope?: string;
   /** Sort key (a metric_snapshots column). */
@@ -216,10 +304,17 @@ export function toSignalClass(v: string | null | undefined): SignalClass {
 
 /** Map a DB operators row → facade Operator (live rows are never placeholders). */
 export function mapOperator(o: DbOperator): Operator {
+  // profile_visibility='private' (migration 0021): only codename + computed
+  // metrics are public — display_name, handle, avatar, bio, links, location are
+  // owner-only. mapOperator is the funnel for EVERY public read path (board,
+  // profile, /api/v1/*, fallback rows), so redacting here covers all of them.
+  // Owner-facing reads (/me/edit, /api/v1/profile) hit the operators base table
+  // directly — they never pass through this mapper.
+  const priv = o.profile_visibility === "private";
   return {
     operator_id: o.operator_id,
     codename: o.codename,
-    display_name: o.display_name ?? null,
+    display_name: priv ? null : (o.display_name ?? null),
     claimed: o.claimed ?? false,
     claimed_at: o.claimed_at ?? null,
     // P5 (0008): never surfaced through the public read path — the operators_public
@@ -233,13 +328,12 @@ export function mapOperator(o: DbOperator): Operator {
     total_messages_lifetime: num(o.total_messages_lifetime),
     isPlaceholder: false,
     // Phase-0 identity fields (migration 0007, apply post-move)
-    handle: o.handle ?? null,
-    avatar_url: o.avatar_url ?? null,
-    bio: o.bio ?? null,
-    links: o.links ?? null,
-    location: o.location ?? null,
-    profile_visibility:
-      o.profile_visibility === "private" ? "private" : "public",
+    handle: priv ? null : (o.handle ?? null),
+    avatar_url: priv ? null : (o.avatar_url ?? null),
+    bio: priv ? null : (o.bio ?? null),
+    links: priv ? null : (o.links ?? null),
+    location: priv ? null : (o.location ?? null),
+    profile_visibility: priv ? "private" : "public",
     status: o.status ?? null,
   };
 }
@@ -355,35 +449,33 @@ export function pendingSnapshot(): ScoredSnapshot {
 }
 
 /**
- * Dedupe snapshot rows ordered snapshot_date DESC down to the latest per
- * operator. Supabase JS has no DISTINCT ON, so we keep the first occurrence of
- * each operator_id from a descending-ordered result.
+ * Dedupe snapshot rows down to the representative per operator (see pickPerKey
+ * for the deterministic ladder). When preferWindow is set (the board's own
+ * window), that window's rows win; 'multi' — the cross-platform total — is
+ * preferred otherwise. Same-date ties break on metric_snapshot_id.
  */
 export function latestPerOperator(
   rows: DbMetricSnapshot[],
+  preferWindow?: string | null,
 ): Map<string, DbMetricSnapshot> {
-  const byOp = new Map<string, DbMetricSnapshot>();
-  for (const r of rows) {
-    if (!byOp.has(r.operator_id)) byOp.set(r.operator_id, r);
-  }
-  return byOp;
+  return pickPerKey(rows, (r) => r.operator_id, preferWindow);
 }
 
 /**
- * Per-platform dedupe (FIX H): latest snapshot per (operator_id, platform) from a
- * descending-ordered result. Same contract as latestPerOperator but keyed on the
- * platform too, so claude/codex/multi each keep their own row. A null platform
- * (pre-0015 row read before backfill) folds under the operator's '∅' bucket.
+ * Per-platform dedupe (FIX H): representative snapshot per (operator_id,
+ * platform). Same ladder as latestPerOperator but keyed on the platform too,
+ * so claude/codex/multi each keep their own row. A null platform (pre-0015
+ * row read before backfill) folds under the operator's '∅' bucket.
  */
 export function latestPerOperatorPlatform(
   rows: DbMetricSnapshot[],
+  preferWindow?: string | null,
 ): Map<string, DbMetricSnapshot> {
-  const byOpPlatform = new Map<string, DbMetricSnapshot>();
-  for (const r of rows) {
-    const key = `${r.operator_id}|${r.platform ?? "∅"}`;
-    if (!byOpPlatform.has(key)) byOpPlatform.set(key, r);
-  }
-  return byOpPlatform;
+  return pickPerKey(
+    rows,
+    (r) => `${r.operator_id}|${r.platform ?? "∅"}`,
+    preferWindow,
+  );
 }
 
 /** The output of operatorTotalCollapse: one chosen snapshot per operator + the
@@ -403,38 +495,31 @@ export interface OperatorTotalCollapse {
  * operator's total — we must NOT re-sum claude+codex+multi (multi already contains
  * them → double-count). So per operator we PREFER their latest 'multi' snapshot;
  * when an operator has no 'multi' row (single-platform operator) we fall back to
- * their latest single-platform snapshot. Input is date-DESC (same contract as
- * latestPerOperator), so "latest" = first-seen.
+ * their latest single-platform snapshot.
+ *
+ * `preferWindow` (2026-09-27): when set — the board's own window enum — a
+ * matching window_type row outranks every other window (see pickPerKey), so
+ * /board/all picks each operator's `all_time`+`multi` row and a same-date `7d`
+ * row can't leapfrog it. Operators with no `preferWindow` row fall back to
+ * their latest `multi`, then their latest of anything.
  *
  * Also returns the distinct platform SET per operator (all non-null platforms they
  * submitted) so the UI can badge "claude·codex·multi" on the single total row.
  */
 export function operatorTotalCollapse(
   rows: DbMetricSnapshot[],
+  preferWindow?: string | null,
 ): OperatorTotalCollapse {
-  // Latest 'multi' row per operator (first-seen wins under date-desc input).
-  const multiByOp = new Map<string, DbMetricSnapshot>();
-  // Latest ANY row per operator — the single-platform fallback.
-  const latestByOp = new Map<string, DbMetricSnapshot>();
+  const byOperator = pickPerKey(rows, (r) => r.operator_id, preferWindow);
   // Distinct submitted platforms per operator (first-seen order; null/∅ excluded).
   const platformsByOperator = new Map<string, string[]>();
-
   for (const r of rows) {
-    const op = r.operator_id;
-    if (!latestByOp.has(op)) latestByOp.set(op, r);
-    if (r.platform === "multi" && !multiByOp.has(op)) multiByOp.set(op, r);
     const p = r.platform;
     if (p != null && p !== "") {
-      const set = platformsByOperator.get(op);
-      if (!set) platformsByOperator.set(op, [p]);
+      const set = platformsByOperator.get(r.operator_id);
+      if (!set) platformsByOperator.set(r.operator_id, [p]);
       else if (!set.includes(p)) set.push(p);
     }
-  }
-
-  // Prefer the 'multi' total; fall back to the operator's latest single-platform row.
-  const byOperator = new Map<string, DbMetricSnapshot>();
-  for (const [op, latest] of latestByOp) {
-    byOperator.set(op, multiByOp.get(op) ?? latest);
   }
 
   return { byOperator, platformsByOperator };

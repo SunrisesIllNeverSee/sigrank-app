@@ -46,6 +46,7 @@ import {
   type DbMetricSnapshot,
   type DbOperator,
   type HistoryParams,
+  applySnapshotRollups,
   asDb,
   latestPerOperator,
   latestPerOperatorPlatform,
@@ -160,9 +161,22 @@ async function recomputeRank(
     // board uses, so a recomputed profile rank ranks the same yield the board does.
     const latest = operatorTotalCollapse(
       asDb<DbMetricSnapshot[]>(allSnaps) ?? [],
+      "all_time",
     ).byOperator;
+    // Claimed-only basis (2026-09-27): the board ranks the displayed (claimed)
+    // set — the profile rank must use the SAME population or they disagree
+    // (rank_history counted every operator with a 30d snapshot, seeds included).
+    const { data: claimedData } = await sb
+      .from("operators_public")
+      .select("operator_id")
+      .eq("claimed", true)
+      .limit(10_000);
+    const claimedIds = new Set(
+      (claimedData ?? []).map((r: { operator_id: string }) => r.operator_id),
+    );
     // Compute yield_ for each + sort descending
     const ranked = [...latest.values()]
+      .filter((s) => claimedIds.has(s.operator_id))
       .map((s) => {
         const snap = mapSnapshot(s);
         const y =
@@ -208,11 +222,15 @@ export interface LeaderboardRowWithPlatforms extends LeaderboardRow {
 
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
-  "operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, " +
+  "metric_snapshot_id, operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, " +
   "session_depth, token_throughput, signa_rate, sdot_score, sdrm_score, signal_force, " +
   "drift_ratio, class_tier, movement_24h, movement_7d, " +
   "ruleset_version, " +
-  "input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens";
+  "input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, " +
+  // account_age_days / total_messages live on the SNAPSHOT (written by ingest
+  // on every submission); the operators rollup columns are unmaintained, so
+  // the row builder backfills them from the chosen snapshot.
+  "account_age_days, total_messages";
 
 /**
  * All operators columns the mapper reads — these are exactly the columns the
@@ -310,18 +328,25 @@ export async function getLeaderboard(
     //   else          — latest snapshot per operator (legacy behaviour).
     // operatorTotal also yields the distinct platform SET per operator so the UI can
     // badge "claude·codex·multi" on the single total row.
+    // preferWindow (2026-09-27): uploads stamp every window_type with the same
+    // snapshot_date, so "latest" alone is ambiguous among same-date ties —
+    // without it /board/all rendered a 7d row (the DB returned it first) while
+    // the profile landed on 90d. Passing the board's own window makes the pick
+    // deterministic AND semantically right: 'all_time' shows lifetime stats.
     let platformsByOperator: Map<string, string[]> | null = null;
     let snapRows: DbMetricSnapshot[];
     if (params.allSnapshots) {
       snapRows = yieldable;
     } else if (params.operatorTotal) {
-      const collapsed = operatorTotalCollapse(yieldable);
+      const collapsed = operatorTotalCollapse(yieldable, params.window);
       platformsByOperator = collapsed.platformsByOperator;
       snapRows = [...collapsed.byOperator.values()];
     } else if (params.perPlatform) {
-      snapRows = [...latestPerOperatorPlatform(yieldable).values()];
+      snapRows = [
+        ...latestPerOperatorPlatform(yieldable, params.window).values(),
+      ];
     } else {
-      snapRows = [...latestPerOperator(yieldable).values()];
+      snapRows = [...latestPerOperator(yieldable, params.window).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
@@ -372,7 +397,7 @@ export async function getLeaderboard(
       // leave `platforms` undefined (the per-row platform column is the source there).
       const platforms = platformsByOperator?.get(snap.operator_id);
       rows.push({
-        operator: mapOperator(op),
+        operator: applySnapshotRollups(mapOperator(op), snap),
         snapshot: mapSnapshot(snap),
         global_rank: 0, // recomputed after sort
         percentile: pctById.get(snap.operator_id) ?? 0,
@@ -394,6 +419,11 @@ export async function getLeaderboard(
     // primary_domain) — NOT operator.primary_domain alone. This way operators
     // who submitted on codex/multi/pi appear under those platform filters even
     // if their primary_domain is "claude" or "other".
+    // claimedOnly (2026-09-27): drop unclaimed operators before re-rank so
+    // global_rank is contiguous over the displayed set (claimed ops only) —
+    // the same basis the profile rank uses. Applied with the other display
+    // filters so the rank column matches what the reader sees.
+    if (params.claimedOnly) rows = rows.filter((r) => r.operator.claimed);
     if (params.platform && params.platform !== "all") {
       rows = rows.filter(
         (r) =>
@@ -411,6 +441,19 @@ export async function getLeaderboard(
     const sort = params.sort ?? SORT_DEFAULT;
     rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
     rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
+    // claimedOnly: derive percentile over the same displayed set so the p-chip
+    // agrees with the rank column (rank_history's percentile counts a wider
+    // population — every op with a 30d snapshot — and disagrees).
+    if (params.claimedOnly) {
+      const n = rows.length;
+      rows = rows.map((r) => ({
+        ...r,
+        percentile:
+          n > 1
+            ? Math.round(((n - r.global_rank) / (n - 1)) * 100 * 100) / 100
+            : 100,
+      }));
+    }
     if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
     return rows;
   } catch {
@@ -485,7 +528,9 @@ export async function getOperator(
     const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? [];
     assertOperatorLimit(allOpSnaps, op.codename);
     const snap =
-      operatorTotalCollapse(allOpSnaps).byOperator.get(op.operator_id) ?? null;
+      operatorTotalCollapse(allOpSnaps, "all_time").byOperator.get(
+        op.operator_id,
+      ) ?? null;
     if (!snap) {
       // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
       // verified submission). Render an identity-only PENDING profile — never a 404.
@@ -508,25 +553,28 @@ export async function getOperator(
       .maybeSingle();
     const rank = asDb<DbRankHistory | null>(rankData);
 
-    // P1 fix (2026-06-27): rank_history is only populated for seed operators
-    // (manual insert). Operators added via the ingest pipeline
-    // (materialize_verified_snapshot) get NO rank_history row, so their profile
-    // shows "rank #0". When rank_history returns 0/null, recompute the rank
-    // the same way the board does: fetch all latest snapshots, compute Υ, sort
-    // descending, find this operator's position. This is O(n) but n is small
-    // (currently ~21 operators). The "right" fix is to populate rank_history
-    // in materialize_verified_snapshot (a future migration), but this fallback
-    // fixes every existing profile immediately without a DB change.
-    let globalRank = num(rank?.global_rank);
-    let percentile = num(rank?.percentile);
-    if (globalRank === 0) {
-      const recomputed = await recomputeRank(sb, op.operator_id, snap);
+    // Rank basis fix (2026-09-27): the displayed rank must equal the operator's
+    // position on /board/all — i.e. position among CLAIMED operators by all-time
+    // yield. rank_history (nightly backfill_rank_history) ranks a different
+    // population (every op with a 30d snapshot) on a different window, so it
+    // disagreed with the board (#11 profile vs #105-on-corpus-basis board).
+    // Always recompute live — also self-healing: the profile number refreshes
+    // on every render rather than waiting for the nightly backfill. rank_history
+    // remains the fallback for operators the claimed board can't place (no
+    // yieldable snapshot, or unclaimed).
+    let globalRank = 0;
+    let percentile = 0;
+    const recomputed = await recomputeRank(sb, op.operator_id, snap);
+    if (recomputed.rank > 0) {
       globalRank = recomputed.rank;
       percentile = recomputed.percentile;
+    } else {
+      globalRank = num(rank?.global_rank);
+      percentile = num(rank?.percentile);
     }
 
     return {
-      operator: mapOperator(op),
+      operator: applySnapshotRollups(mapOperator(op), snap),
       snapshot: mapSnapshot(snap),
       global_rank: globalRank,
       percentile,
