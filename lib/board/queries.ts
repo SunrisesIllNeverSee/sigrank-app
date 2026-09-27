@@ -46,6 +46,7 @@ import {
   type DbMetricSnapshot,
   type DbOperator,
   type HistoryParams,
+  applySnapshotRollups,
   asDb,
   latestPerOperator,
   latestPerOperatorPlatform,
@@ -160,6 +161,7 @@ async function recomputeRank(
     // board uses, so a recomputed profile rank ranks the same yield the board does.
     const latest = operatorTotalCollapse(
       asDb<DbMetricSnapshot[]>(allSnaps) ?? [],
+      "all_time",
     ).byOperator;
     // Compute yield_ for each + sort descending
     const ranked = [...latest.values()]
@@ -208,11 +210,15 @@ export interface LeaderboardRowWithPlatforms extends LeaderboardRow {
 
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
-  "operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, " +
+  "metric_snapshot_id, operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, " +
   "session_depth, token_throughput, signa_rate, sdot_score, sdrm_score, signal_force, " +
   "drift_ratio, class_tier, movement_24h, movement_7d, " +
   "ruleset_version, " +
-  "input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens";
+  "input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, " +
+  // account_age_days / total_messages live on the SNAPSHOT (written by ingest
+  // on every submission); the operators rollup columns are unmaintained, so
+  // the row builder backfills them from the chosen snapshot.
+  "account_age_days, total_messages";
 
 /**
  * All operators columns the mapper reads — these are exactly the columns the
@@ -310,18 +316,25 @@ export async function getLeaderboard(
     //   else          — latest snapshot per operator (legacy behaviour).
     // operatorTotal also yields the distinct platform SET per operator so the UI can
     // badge "claude·codex·multi" on the single total row.
+    // preferWindow (2026-09-27): uploads stamp every window_type with the same
+    // snapshot_date, so "latest" alone is ambiguous among same-date ties —
+    // without it /board/all rendered a 7d row (the DB returned it first) while
+    // the profile landed on 90d. Passing the board's own window makes the pick
+    // deterministic AND semantically right: 'all_time' shows lifetime stats.
     let platformsByOperator: Map<string, string[]> | null = null;
     let snapRows: DbMetricSnapshot[];
     if (params.allSnapshots) {
       snapRows = yieldable;
     } else if (params.operatorTotal) {
-      const collapsed = operatorTotalCollapse(yieldable);
+      const collapsed = operatorTotalCollapse(yieldable, params.window);
       platformsByOperator = collapsed.platformsByOperator;
       snapRows = [...collapsed.byOperator.values()];
     } else if (params.perPlatform) {
-      snapRows = [...latestPerOperatorPlatform(yieldable).values()];
+      snapRows = [
+        ...latestPerOperatorPlatform(yieldable, params.window).values(),
+      ];
     } else {
-      snapRows = [...latestPerOperator(yieldable).values()];
+      snapRows = [...latestPerOperator(yieldable, params.window).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
@@ -372,7 +385,7 @@ export async function getLeaderboard(
       // leave `platforms` undefined (the per-row platform column is the source there).
       const platforms = platformsByOperator?.get(snap.operator_id);
       rows.push({
-        operator: mapOperator(op),
+        operator: applySnapshotRollups(mapOperator(op), snap),
         snapshot: mapSnapshot(snap),
         global_rank: 0, // recomputed after sort
         percentile: pctById.get(snap.operator_id) ?? 0,
@@ -485,7 +498,9 @@ export async function getOperator(
     const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? [];
     assertOperatorLimit(allOpSnaps, op.codename);
     const snap =
-      operatorTotalCollapse(allOpSnaps).byOperator.get(op.operator_id) ?? null;
+      operatorTotalCollapse(allOpSnaps, "all_time").byOperator.get(
+        op.operator_id,
+      ) ?? null;
     if (!snap) {
       // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
       // verified submission). Render an identity-only PENDING profile — never a 404.
@@ -526,7 +541,7 @@ export async function getOperator(
     }
 
     return {
-      operator: mapOperator(op),
+      operator: applySnapshotRollups(mapOperator(op), snap),
       snapshot: mapSnapshot(snap),
       global_rank: globalRank,
       percentile,

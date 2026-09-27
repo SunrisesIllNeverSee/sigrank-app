@@ -21,6 +21,7 @@ import {
   type BoardParams,
   type DbMetricSnapshot,
   type DbOperator,
+  applySnapshotRollups,
   latestPerOperator,
   mapOperator,
   mapSnapshot,
@@ -62,7 +63,7 @@ const COLD_STORE_ROWS: LeaderboardRow[] = (() => {
       const op = opById.get(snap.operator_id);
       if (!op) continue;
       rows.push({
-        operator: mapOperator(op),
+        operator: applySnapshotRollups(mapOperator(op), snap),
         snapshot: mapSnapshot(snap),
         global_rank: 0,
         percentile: 0,
