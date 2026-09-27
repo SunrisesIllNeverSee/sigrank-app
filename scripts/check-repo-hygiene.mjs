@@ -27,13 +27,11 @@ const root = execFileSync("git", ["rev-parse", "--show-toplevel"], {
 const git = (args) =>
   execFileSync("git", args, { encoding: "utf8", cwd: root });
 
-/** Known tracked+ignored files — PR-2 scope (.swc binary untrack). Do NOT add
- *  new entries; a new violation should fail the check and be fixed instead.
- *  (Only the wasmer binary is tracked — .swc/.gitignore exists on disk but is
- *  untracked, so it must NOT be allowlisted here.) */
-const KNOWN_TRACKED_IGNORED = new Set([
-  ".swc/plugins/macos_aarch64_22.0.1/6ea9d3dec20e87696401db15d4c456817f842cb74b13af645633912dceb61bd5.wasmer-v7",
-]);
+/** Known tracked+ignored files — must stay EMPTY. The .swc wasmer binary was
+ *  untracked in PR-2; .swc/.gitignore exists on disk but is untracked, so it
+ *  must NOT be allowlisted here. Do NOT add new entries — a new violation
+ *  should fail the check and be fixed instead. */
+const KNOWN_TRACKED_IGNORED = new Set([]);
 
 let failed = false;
 
@@ -73,7 +71,7 @@ if (violations.length) {
   for (const p of violations) console.error(`  ${p}`);
 } else {
   console.log(
-    `✓ no new tracked+ignored files (${ignoredTracked.length} known pre-existing: .swc, PR-2 scope)`,
+    `✓ ${ignoredTracked.length} tracked+ignored files (0 new violations)`,
   );
 }
 
