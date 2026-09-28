@@ -71,7 +71,7 @@ Every PR must pass all three gates before merge:
 | Gate       | Command                                           | What it checks                                                     |
 | ---------- | ------------------------------------------------- | ------------------------------------------------------------------ |
 | TypeScript | `npx tsc --noEmit`                                | 0 type errors (strict mode)                                        |
-| Build      | `npm run build`                                   | Production build succeeds (31 routes)                              |
+| Build      | `npm run build`                                   | Production build succeeds                                          |
 | Canonical  | `node --test __tests__/ingest/canonical.test.mjs` | 11/11 tests pass — the MO§ES Υ invariant (18436.98) + scoring math |
 
 These are non-negotiable. If any gate fails, the PR will not be merged.
@@ -133,65 +133,73 @@ closed without merge.
 
 ## CI triage playbook
 
-CI runs several automated checks on every PR and on a schedule. Here's who
-triages what and how to handle findings.
+**What actually runs:** `.github/workflows/ci.yml` — one `verify` job on every
+PR to `main` and every push to `main`:
 
-### CodeQL alerts (Security tab)
+| Check | Command | Fails when |
+| ----- | ------- | ---------- |
+| Repo hygiene | `node scripts/check-repo-hygiene.mjs` | a tracked symlink breaks, or a file is both tracked and ignored |
+| Type check | `npx tsc --noEmit` | any type error |
+| Canonical | `npm run test:canonical` | a contract test fails |
 
-- **What:** Static analysis findings for JS/TS (taint flows, injection, crypto
-  misuse). Runs on every PR + weekly on Monday.
-- **Who triages:** the repo owner (or any maintainer with Security tab access).
-- **How to triage:**
-  1. Open the Security tab → Code scanning alerts.
-  2. For each alert: read the description, check if it's a true positive.
-  3. **True positive:** fix the code, push, the alert auto-closes.
-  4. **False positive:** click "Dismiss" → choose "Used in tests" or "Not
-     exploitable." Add a comment explaining why.
-- **CodeQL build-mode:** this repo uses `build-mode: none` (analyzes source
-  directly, no Next.js build needed). This is faster and independent of build
-  env vars, but may miss issues introduced by the build step (bundled/transformed
-  code). If you see false negatives, consider switching to autobuild for a
-  subset of runs.
+Nothing else is enforced. The wider suite was archived in PRs #108/#114 and
+lives at `_archived/workflows/` — **the subsections below are reference
+material for checks that are NOT currently running.** They preserve triage
+knowledge in case a workflow is restored; do not assume they protect your PR
+today.
 
-### Dependabot PRs
+### CodeQL alerts (Security tab) — ARCHIVED, not running
 
-- **What:** Weekly PRs for npm packages + GitHub Actions versions. Security
-  advisories open PRs immediately.
-- **Who triages:** any maintainer.
-- **How to triage:**
-  1. Check if CI passes on the Dependabot PR.
-  2. **Patch updates** (grouped): merge if CI is green.
-  3. **Minor updates:** review the changelog, merge if no breaking changes.
-  4. **Major updates:** review carefully — may break the build. Test locally
-     before merging.
-  5. **Security advisories:** prioritize over feature work. Merge the same day
-     if CI is green.
-- **Auto-merge:** not enabled by default. To enable, go to repo Settings →
-  General → "Allow Dependabot auto-merge" + set the auto-merge policy in
-  `.github/dependabot.yml`. Only enable for patch/minor after CI passes.
+Workflow file: `_archived/workflows/codeql.yml` (was: every PR + weekly
+Monday). If restored — how to triage:
 
-### Gitleaks (secret scan)
+1. Open the Security tab → Code scanning alerts.
+2. For each alert: read the description, check if it's a true positive.
+3. **True positive:** fix the code, push, the alert auto-closes.
+4. **False positive:** click "Dismiss" → choose "Used in tests" or "Not
+   exploitable." Add a comment explaining why.
 
-- **What:** Scans every commit for leaked keys/tokens. Runs on every PR with
-  full history (`fetch-depth: 0`).
-- **False positives:** the `.github/gitleaks.toml` config allow-lists test
-  fixtures, seed data, and ed25519 public keys. If a new false positive
-  appears, add the path/pattern to the allow-list and push.
-- **True positive:** if gitleaks finds a real secret, **do not just remove it
-  and push** — the secret is in git history. Rotate the secret immediately,
-  then use `git filter-repo` or BFG to scrub history.
+The archived workflow used `build-mode: none` (analyzes source directly, no
+Next.js build needed) — faster and independent of build env vars, but may
+miss issues in bundled/transformed output.
+
+### Dependabot PRs — DISABLED, not running
+
+`.github/dependabot.yml` exists but Dependabot is disabled at the repository
+level — no weekly PRs, no advisory PRs. Re-enable vs remove is a pending
+owner decision (cleanup PR-3C). If re-enabled — how to triage:
+
+1. Check if CI passes on the Dependabot PR.
+2. **Patch updates** (grouped): merge if CI is green.
+3. **Minor updates:** review the changelog, merge if no breaking changes.
+4. **Major updates:** review carefully — may break the build. Test locally
+   before merging.
+5. **Security advisories:** prioritize over feature work. Merge the same day
+   if CI is green.
+
+Auto-merge is not enabled. To enable: repo Settings → General → "Allow
+Dependabot auto-merge" + policy in `.github/dependabot.yml`.
+
+### Gitleaks (secret scan) — ARCHIVED, not running
+
+Was a job in the old `_archived/workflows/ci.yml`. The `.github/gitleaks.toml`
+allow-list config remains in place for reuse. **If a real secret is ever
+committed** — with or without a scanner — do not just remove it and push: the
+secret is in git history. Rotate it immediately, then scrub history with
+`git filter-repo` or BFG.
 
 ### Branch protection (owner action)
 
-Branch protection is configured in GitHub UI (Settings → Branches), not in
-code. The recommended rules for `main`:
+Branch rules live in GitHub UI (Settings → Rules → Rulesets), not in code.
+Current state: the `main-guardrails` ruleset is active on `main` and already
+blocks force-pushes and branch deletion — but does **not** require reviews or
+status checks.
 
-- Require CI (build job) to pass before merge.
-- Require CodeQL to pass.
-- Require dependency-audit to pass.
+Recommended additions for `main`:
+
+- Require the CI check `hygiene + types + canonical tests` to pass before merge.
 - Require at least 1 review for PRs from external contributors.
-- Allow force-push: **No**.
-- Allow deletions: **No**.
+- Keep: no force-push, no deletions (already enforced by `main-guardrails`).
 
 ## Questions?
 
