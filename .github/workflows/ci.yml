@@ -1,0 +1,49 @@
+name: CI
+
+# Restored in PR-3 (repo-cleanup): slim truthful gate mirroring AGENTS.md's
+# verification protocol + REPO_CLEANUP_PLAN §16 hygiene controls.
+# The wider suite (CodeQL, dependency-audit, Playwright E2E, Lighthouse,
+# gitleaks secret-scan) stays archived at _archived/workflows/ pending
+# separate owner decisions — do NOT re-enable by copying wholesale; each of
+# those carried its own secrets/trigger surface.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: hygiene + types + canonical tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22 # repo .nvmrc pin
+          cache: npm
+
+      # `npm ci` currently fails — package.json↔package-lock.json desync is a
+      # known baseline ledger item pending its own dependency PR (P-06).
+      # Until then `npm install` resolves from package.json; switch back to
+      # `npm ci` once the lockfile is resynced.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Repo hygiene (broken symlinks + tracked-ignored files)
+        run: node scripts/check-repo-hygiene.mjs
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Canonical contract tests
+        run: npm run test:canonical

@@ -27,13 +27,17 @@ node --test __tests__/ingest/canonical.test.mjs
 npm run build
 ```
 
-CI also runs (in addition to the above + cross-repo contract tests):
+CI (`.github/workflows/ci.yml`) runs on every PR to `main`:
 
-- **Secret scan** (gitleaks) — never commit real keys/tokens; `.env.example`
-  placeholders are allowlisted.
-- **CodeQL** — static analysis on JS/TS; fix or dismiss alerts it raises on your PR.
-- **Dependency audit** — `npm audit` fails on high/critical advisories (moderate
-  is reported only). If your PR bumps a dep with a high/critical advisory, CI blocks.
+- **Repo hygiene** — `node scripts/check-repo-hygiene.mjs` fails on broken
+  tracked symlinks or tracked-and-ignored files.
+- **Type check** — `npx tsc --noEmit`.
+- **Canonical contract tests** — `npm run test:canonical`.
+
+The wider suite is archived at `_archived/workflows/` and **not** currently
+enforced: no gitleaks secret scan, no CodeQL, no dependency audit, no E2E or
+Lighthouse gates. Do not rely on CI to catch committed secrets or vulnerable
+dependencies — check them yourself.
 
 ## Frozen invariants
 
