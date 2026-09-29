@@ -143,14 +143,14 @@ PR to `main` and every push to `main`:
 | Canonical | `npm run test:canonical` | a contract test fails |
 
 Nothing else is enforced. The wider suite was archived in PRs #108/#114 and
-lives at `_archived/workflows/` — **the subsections below are reference
+lives at `_archive/workflows/` — **the subsections below are reference
 material for checks that are NOT currently running.** They preserve triage
 knowledge in case a workflow is restored; do not assume they protect your PR
 today.
 
 ### CodeQL alerts (Security tab) — ARCHIVED, not running
 
-Workflow file: `_archived/workflows/codeql.yml` (was: every PR + weekly
+Workflow file: `_archive/workflows/codeql.yml` (was: every PR + weekly
 Monday). If restored — how to triage:
 
 1. Open the Security tab → Code scanning alerts.
@@ -183,8 +183,9 @@ Dependabot auto-merge" + policy in `.github/dependabot.yml`.
 
 ### Gitleaks (secret scan) — ARCHIVED, not running
 
-Was a job in the old `_archived/workflows/ci.yml`. The `.github/gitleaks.toml`
-allow-list config remains in place for reuse. **If a real secret is ever
+Was a job in the old `_archive/workflows/ci.yml`. The `gitleaks.toml`
+allow-list config is archived at `_archive/config/` for reuse (it was
+never under `.github/`). **If a real secret is ever
 committed** — with or without a scanner — do not just remove it and push: the
 secret is in git history. Rotate it immediately, then scrub history with
 `git filter-repo` or BFG.
