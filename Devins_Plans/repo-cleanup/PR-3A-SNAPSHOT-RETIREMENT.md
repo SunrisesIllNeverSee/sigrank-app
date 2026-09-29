@@ -6,7 +6,7 @@
 
 ## What was retired
 
-`_archived/workflows/snapshot-archive.yml` ran every 5 days (plus manual
+`_archive/workflows/snapshot-archive.yml` ran every 5 days (plus manual
 dispatch): created an annotated git tag `snapshot-YYYY-MM-DD-v<pkg>` and a
 matching GitHub Release as a rollback marker.
 
@@ -34,7 +34,7 @@ protection.
   protected cleanup baseline.
 - `backup/pre-major-2026-09-27` branch + `snapshot/pre-major-2026-09-27` tag
   remain.
-- The workflow file stays at `_archived/workflows/snapshot-archive.yml`
+- The workflow file stays at `_archive/workflows/snapshot-archive.yml`
   untouched until PR-4 archive consolidation decides its disposition.
 
 ## Replacement policy — manual annotated tags
@@ -62,5 +62,5 @@ was created exactly this way before Phase 1.
 ## Reversal
 
 If the policy is ever revisited: restore
-`_archived/workflows/snapshot-archive.yml` to `.github/workflows/` — a single
+`_archive/workflows/snapshot-archive.yml` to `.github/workflows/` — a single
 file move, no other coupling exists (the workflow wrote only tags/releases).
