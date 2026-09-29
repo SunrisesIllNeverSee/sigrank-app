@@ -201,6 +201,19 @@ Recommended additions for `main`:
 - Require at least 1 review for PRs from external contributors.
 - Keep: no force-push, no deletions (already enforced by `main-guardrails`).
 
+## Snapshots & rollback
+
+- **Production rollback:** Vercel deployments — any prior deploy can be
+  redeployed instantly.
+- **Repo recovery:** git history + milestone/release tags. The automated
+  5-day snapshot tag/release job is **retired**; existing tags and releases
+  are preserved. See `Devins_Plans/repo-cleanup/PR-3A-SNAPSHOT-RETIREMENT.md`.
+- **Before high-risk repo operations** (bulk cleanup, dependency surgery):
+  create + push a manual annotated tag —
+  `git tag -a pre-<operation>-YYYY-MM-DD -m "baseline before <operation>" && git push origin <tag>`.
+- **Data:** none of the above covers Supabase state — database backups are
+  managed on the Supabase side, not via repo tags.
+
 ## Questions?
 
 - Open an issue on this repository.
