@@ -13,6 +13,7 @@
 SigRank evaluates the human using the AI, not the AI model itself. Most platforms reward volume. SigRank SignalAF rewards structure.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?style=flat-square&logo=dependabot)](https://github.com/SunrisesIllNeverSee/sigrank-app/network/dependencies)
 [![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
 [![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold&label=sigrank)](https://www.npmjs.com/package/sigrank)
 [![npm downloads](https://img.shields.io/npm/dm/sigrank.svg?style=flat-square&color=blue&label=npm%20downloads)](https://www.npmjs.com/package/sigrank)
