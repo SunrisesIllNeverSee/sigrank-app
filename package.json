@@ -63,7 +63,7 @@
     "server-only": "^0.0.1",
     "simple-statistics": "^7.9.3",
     "stripe": "^22.3.1",
-    "workflow": "^4.8.2",
+    "workflow": "^4.8.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
