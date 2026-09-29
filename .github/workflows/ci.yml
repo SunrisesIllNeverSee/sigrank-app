@@ -3,7 +3,7 @@ name: CI
 # Restored in PR-3 (repo-cleanup): slim truthful gate mirroring AGENTS.md's
 # verification protocol + REPO_CLEANUP_PLAN §16 hygiene controls.
 # The wider suite (CodeQL, dependency-audit, Playwright E2E, Lighthouse,
-# gitleaks secret-scan) stays archived at _archived/workflows/ pending
+# gitleaks secret-scan) stays archived at _archive/workflows/ pending
 # separate owner decisions — do NOT re-enable by copying wholesale; each of
 # those carried its own secrets/trigger surface.
 
