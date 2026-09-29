@@ -9,14 +9,15 @@ page renders on deterministic mock data when no Supabase credentials are present
 
 | File                          | Purpose                                                                                                                                       |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `schema.sql`                  | Canonical, full DDL — all tables, indexes, and constraints. Authoritative snapshot of the initial schema.                                    |
-| `migrations/`                 | 32 migration files (0001–0030 numbered + 2 timestamp-prefixed). Ledger-reconciled 2026-07-31 — see "Migration ledger" below.                 |
+| `migrations/`                 | 51 migration files (0001–0031 numbered + 20 timestamp-prefixed). **Source of truth for the schema.** Ledger-reconciled 2026-07-31 — see "Migration ledger" below. |
 | `seeds/`                      | Seed data files (`tokscale_seed_full.sql`, `tokscale_seed_preview.sql`). NOT migrations — relocated out of `migrations/` during reconcile.   |
 | `seed.sql`                    | Ruleset v1.0, 16 badges (BG.01–BG.16), MO§ES operator + snapshot + rank + cached board, `system_stats` singleton. Mirrors `lib/data/mock.ts`. |
 | `policies.sql`                | Enables RLS on every table; public read-only on public tables; writes are service-role only (Phase-2 owner writes deferred).                  |
 
-> `schema.sql` ≡ `0001_init.sql` + `0002_billing.sql`. Apply **either** the
-> single `schema.sql` **or** the two migrations in order — not both.
+> The former single-file `schema.sql` is **archived** at
+> `_archive/docs/supabase-schema.sql` — a historical snapshot covering only
+> migrations 0001+0002, stale since 0003. It is NOT the schema. Apply the
+> `migrations/` directory in order — never that file.
 
 ## Apply
 
@@ -32,13 +33,14 @@ supabase db push --dry-run --linked
 
 See "Go-forward workflow" below for the full safe-push procedure.
 
-### Option B — plain psql (single-file schema, fresh project only)
+### Option B — plain psql (fresh project only)
 
 ```bash
 # Only for spinning up a NEW project from scratch. Never on the live project.
 export DATABASE_URL="postgresql://postgres:<pw>@<host>:5432/postgres"
 
-psql "$DATABASE_URL" -f supabase/schema.sql
+# Apply every migration in filename order (numbered then timestamped):
+for f in supabase/migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 psql "$DATABASE_URL" -f supabase/seed.sql
 psql "$DATABASE_URL" -f supabase/policies.sql
 ```
@@ -89,7 +91,7 @@ mapping table at 0023.
 7. Verified: `db push --dry-run` → "Remote database is up to date." Ledger
    count = 32, local file count = 32, all matched.
 
-### Current ledger (32 entries)
+### Ledger at reconcile time (32 entries — more migrations have landed since; `migrations/` is authoritative)
 
 | Version | Name | File |
 |---------|------|------|
@@ -165,7 +167,7 @@ This prevents accidental pushes when the ledger has drifted. See
 
 ## Extensions
 
-`schema.sql` / `0001_init.sql` create two extensions up front:
+`0001_init.sql` creates two extensions up front:
 
 - `pgcrypto` — for `gen_random_uuid()` primary keys.
 - `pg_trgm` — for the trigram index on `operators.codename` (fuzzy
