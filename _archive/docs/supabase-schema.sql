@@ -1,10 +1,14 @@
 -- ============================================================================
--- SigRank — Supabase / PostgreSQL schema (canonical, full).
+-- HISTORICAL SNAPSHOT — NOT AUTHORITATIVE. Archived in PR-5 (2026-09-28).
 --
--- This single file is the authoritative DDL. It is mirrored, split by concern,
--- into supabase/migrations/0001_init.sql (core leaderboard tables) and
--- supabase/migrations/0002_billing.sql (Stripe billing + claim + system tables).
--- Applying schema.sql once is equivalent to applying 0001 then 0002.
+-- This file captured the schema as of migrations 0001+0002 ONLY. It has been
+-- stale since migration 0003; the project has 50+ migrations. The source of
+-- truth is supabase/migrations/ applied in order — NEVER apply this file to
+-- a live project. Kept for provenance: code comments cite "schema.sql §N"
+-- section anchors that still resolve below.
+--
+-- (Original header claimed this file was "the authoritative DDL... equivalent
+-- to applying 0001 then 0002" — that claim expired with migration 0003.)
 --
 -- Design principle (db_schema.md): never store only final scores. Store
 -- canonical submissions, reusable features, derived metrics, and cached boards
