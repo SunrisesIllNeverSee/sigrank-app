@@ -13,12 +13,18 @@
  *   pre-existing violations with their own cleanup PRs; remove entries as they
  *   are untracked rather than letting the list grow.
  *
+ * Check 3 — Public schema copies must byte-match their sources (added PR-5):
+ *   Two schema pairs are duplicated source→public for static serving. Sync was
+ *   manual and had silently drifted three times (see "synchronize public schema
+ *   artifact" fix-commits). Byte-equality is now enforced here so a forgotten
+ *   copy step fails hygiene instead of shipping a stale public contract.
+ *
  * Usage: node scripts/check-repo-hygiene.mjs  (works from any subdirectory —
  * git commands are anchored to the repo root so subdirectory invocation can't
  * silently under-scope the scan)
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readlinkSync } from "node:fs";
+import { existsSync, readFileSync, readlinkSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = execFileSync("git", ["rev-parse", "--show-toplevel"], {
@@ -73,6 +79,38 @@ if (violations.length) {
   console.log(
     `✓ ${ignoredTracked.length} tracked+ignored files (0 new violations)`,
   );
+}
+
+// ── Check 3: public schema copies byte-match their sources ──────────────
+// [source, publicCopy] — edit the SOURCE, then `cp` it to the public path.
+const SCHEMA_PAIRS = [
+  ["exchange-gateway/exchange.schema.json", "public/exchange.schema.json"],
+  [
+    "standard/schema/sigrank-operator-record-v0.1.schema.json",
+    "public/standard/sigrank-operator-record-v0.1.schema.json",
+  ],
+];
+
+const drifted = SCHEMA_PAIRS.filter(([src, pub]) => {
+  const s = resolve(root, src);
+  const p = resolve(root, pub);
+  return (
+    !existsSync(s) ||
+    !existsSync(p) ||
+    !readFileSync(s).equals(readFileSync(p))
+  );
+});
+if (drifted.length) {
+  failed = true;
+  console.error("✗ public schema copy out of sync with source:");
+  for (const [src, pub] of drifted) {
+    console.error(`  ${src}  →  ${pub}`);
+  }
+  console.error(
+    "  fix: edit the source (left), then `cp <source> <public path>` — the public copy is served verbatim",
+  );
+} else {
+  console.log(`✓ ${SCHEMA_PAIRS.length} public schema copies match sources`);
 }
 
 process.exit(failed ? 1 : 0);
