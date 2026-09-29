@@ -163,11 +163,12 @@ The archived workflow used `build-mode: none` (analyzes source directly, no
 Next.js build needed) — faster and independent of build env vars, but may
 miss issues in bundled/transformed output.
 
-### Dependabot PRs — DISABLED, not running
+### Dependabot PRs — ENABLED
 
-`.github/dependabot.yml` exists but Dependabot is disabled at the repository
-level — no weekly PRs, no advisory PRs. Re-enable vs remove is a pending
-owner decision (cleanup PR-3C). If re-enabled — how to triage:
+Vulnerability alerts and automated security updates are enabled at the repo
+level (PR-3C). `.github/dependabot.yml` schedules weekly version-update PRs
+(Mondays) for npm and GitHub Actions — patch releases arrive grouped in one
+PR. How to triage:
 
 1. Check if CI passes on the Dependabot PR.
 2. **Patch updates** (grouped): merge if CI is green.
