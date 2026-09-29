@@ -90,7 +90,7 @@
     "tteop-spec": "0.1.5-draft",
     "typescript": "5.8.2",
     "typescript-eslint": "^8.64.0",
-    "vitest": "^4.1.10",
+    "vitest": "^4.1.11",
     "wrangler": "^4.129.1"
   },
   "overrides": {
