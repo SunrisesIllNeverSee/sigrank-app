@@ -34,7 +34,7 @@ CI (`.github/workflows/ci.yml`) runs on every PR to `main`:
 - **Type check** — `npx tsc --noEmit`.
 - **Canonical contract tests** — `npm run test:canonical`.
 
-The wider suite is archived at `_archived/workflows/` and **not** currently
+The wider suite is archived at `_archive/workflows/` and **not** currently
 enforced: no gitleaks secret scan, no CodeQL, no dependency audit, no E2E or
 Lighthouse gates. Do not rely on CI to catch committed secrets or vulnerable
 dependencies — check them yourself.
