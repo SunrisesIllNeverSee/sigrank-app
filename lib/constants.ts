@@ -161,7 +161,7 @@ export const DEMO_BANNER =
  * MCP_VERSION — the live sigrank-mcp npm package version. Centralized here so
  * every web reference tracks ONE source (was hardcoded in ≥2 places, went stale
  * at 0.9.5 once). Kept current by the daily sync-mcp-version workflow (PR gate
- * via `chore/mcp-version-sync` branch).
+ * via `bot/mcp-version-sync` branch).
  */
 export const MCP_VERSION = "1.0.40" as const;
 

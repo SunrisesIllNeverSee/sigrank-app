@@ -3,7 +3,7 @@ name: Sync MCP version
 # Restored in PR-3B — rewritten to open a PR instead of committing directly
 # to main (the archived version pushed straight to main, bypassing review).
 # No-op safe: exits green when constants already match npm/adapters.mjs.
-# Reuses a fixed branch (chore/mcp-version-sync) so repeat runs update the
+# Reuses a fixed branch (bot/mcp-version-sync) so repeat runs update the
 # SAME open PR rather than stacking duplicates.
 
 on:
@@ -72,7 +72,7 @@ jobs:
           NPM_VERSION: ${{ steps.check.outputs.npm_version }}
           MCP_COUNT: ${{ steps.check.outputs.mcp_count }}
         run: |
-          BRANCH="chore/mcp-version-sync"
+          BRANCH="bot/mcp-version-sync"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Reuse the remote branch if it exists — one open PR stays updated,
@@ -98,7 +98,7 @@ jobs:
           NPM_VERSION: ${{ steps.check.outputs.npm_version }}
           MCP_COUNT: ${{ steps.check.outputs.mcp_count }}
         run: |
-          BRANCH="chore/mcp-version-sync"
+          BRANCH="bot/mcp-version-sync"
           EXISTING=$(gh pr list --state open --head "$BRANCH" --json number --jq '.[0].number' || true)
           if [ -n "$EXISTING" ]; then
             gh pr comment "$EXISTING" --body "Sync updated: MCP_VERSION → \`${NPM_VERSION}\`, PLATFORM_COUNT → \`${MCP_COUNT}\`"
