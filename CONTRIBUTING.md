@@ -102,6 +102,17 @@ These are non-negotiable. If any gate fails, the PR will not be merged.
 These are the mathematical foundation of SigRank. If you want to change them,
 open an issue first to discuss the rationale.
 
+## `public/` assets are standalone-served — do not "clean up" by grep
+
+Everything under `public/` is served verbatim at `signalaf.com/<path>` and is
+consumed **externally**: verification files (IndexNow key), social-preview
+images, the `dashboards/` microsite (DOI-linked publication artifact),
+`article-charts/` (a reusable publishing chart library — an image is live if
+any article or external page may link it), screenshots, and shareable HTML
+pages. Repo-internal grep will not find their consumers, so "unreferenced"
+does NOT mean safe to remove. Do not delete or move `public/` files without
+an explicit owner decision — ask first.
+
 ## Code conventions
 
 - **Server Components by default.** Add `'use client'` only to files that use
