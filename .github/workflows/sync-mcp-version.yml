@@ -1,0 +1,111 @@
+name: Sync MCP version
+
+# Restored in PR-3B — rewritten to open a PR instead of committing directly
+# to main (the archived version pushed straight to main, bypassing review).
+# No-op safe: exits green when constants already match npm/adapters.mjs.
+# Reuses a fixed branch (bot/mcp-version-sync) so repeat runs update the
+# SAME open PR rather than stacking duplicates.
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # daily 07:00 UTC — same cadence as the archived job
+  workflow_dispatch:      # manual trigger
+  push:
+    branches: [main]
+    paths: [".github/workflows/sync-mcp-version.yml"]  # self-test on edits
+
+permissions:
+  contents: write           # push the sync branch
+  pull-requests: write      # open/comment on the sync PR
+
+concurrency:
+  group: sync-mcp-version
+  cancel-in-progress: false  # never cancel mid-PR-creation
+
+jobs:
+  sync:
+    name: Sync MCP_VERSION / PLATFORM_COUNT via PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.actor != 'github-actions[bot]'  # archived safeguard kept
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Checkout sigrank-mcp
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: SunrisesIllNeverSee/sigrank-mcp
+          path: _sigrank-mcp
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Compare npm version + adapter count against constants
+        id: check
+        run: |
+          NPM_VERSION=$(npm view sigrank version 2>/dev/null)
+          CURRENT_VERSION=$(grep -oP 'MCP_VERSION\s*=\s*"[^"]+"' lib/constants.ts | grep -oP '"[^"]+"' | tr -d '"')
+          CURRENT_COUNT=$(grep -oP 'PLATFORM_COUNT\s*=\s*\d+' lib/constants.ts | grep -oP '\d+')
+          MCP_COUNT=$(node -e "
+            import('${{ github.workspace }}/_sigrank-mcp/adapters.mjs')
+              .then(m => process.stdout.write(String(m.ALL_PLATFORMS.length)))
+              .catch(() => process.stdout.write('0'));
+          ")
+          echo "npm=$NPM_VERSION current=$CURRENT_VERSION adapters=$MCP_COUNT current_count=$CURRENT_COUNT"
+          NEEDS_UPDATE=false
+          [ -n "$NPM_VERSION" ] && [ "$NPM_VERSION" != "$CURRENT_VERSION" ] && NEEDS_UPDATE=true
+          [ "$MCP_COUNT" != "0" ] && [ "$MCP_COUNT" != "$CURRENT_COUNT" ] && NEEDS_UPDATE=true
+          {
+            echo "needs_update=$NEEDS_UPDATE"
+            echo "npm_version=$NPM_VERSION"
+            echo "mcp_count=$MCP_COUNT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: No-op exit — constants already current
+        if: steps.check.outputs.needs_update != 'true'
+        run: echo "✓ MCP_VERSION + PLATFORM_COUNT already match npm/adapters — no PR needed"
+
+      - name: Apply updates on the sync branch
+        if: steps.check.outputs.needs_update == 'true'
+        env:
+          NPM_VERSION: ${{ steps.check.outputs.npm_version }}
+          MCP_COUNT: ${{ steps.check.outputs.mcp_count }}
+        run: |
+          BRANCH="bot/mcp-version-sync"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Reuse the remote branch if it exists — one open PR stays updated,
+          # plain push only (no force-push, no branch pile-up)
+          if git fetch origin "$BRANCH" 2>/dev/null && git checkout "$BRANCH" 2>/dev/null; then
+            git merge --ff-only origin/"$BRANCH" || git reset --hard origin/"$BRANCH"
+          else
+            git checkout -b "$BRANCH"
+          fi
+          [ -n "$NPM_VERSION" ] && sed -i -E "s/MCP_VERSION = \"[^\"]+\"/MCP_VERSION = \"${NPM_VERSION}\"/" lib/constants.ts
+          [ "$MCP_COUNT" != "0" ] && sed -i -E "s/PLATFORM_COUNT = [0-9]+/PLATFORM_COUNT = ${MCP_COUNT}/" lib/constants.ts
+          # Verify edits actually landed before committing
+          [ -n "$NPM_VERSION" ] && { grep -q "MCP_VERSION = \"${NPM_VERSION}\"" lib/constants.ts || { echo "✗ version edit failed"; exit 1; }; }
+          [ "$MCP_COUNT" != "0" ] && { grep -q "PLATFORM_COUNT = ${MCP_COUNT}" lib/constants.ts || { echo "✗ count edit failed"; exit 1; }; }
+          git add lib/constants.ts
+          git commit -m "chore: sync MCP_VERSION → ${NPM_VERSION}, PLATFORM_COUNT → ${MCP_COUNT}"
+          git push origin "$BRANCH"
+
+      - name: Open or refresh the PR
+        if: steps.check.outputs.needs_update == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_VERSION: ${{ steps.check.outputs.npm_version }}
+          MCP_COUNT: ${{ steps.check.outputs.mcp_count }}
+        run: |
+          BRANCH="bot/mcp-version-sync"
+          EXISTING=$(gh pr list --state open --head "$BRANCH" --json number --jq '.[0].number' || true)
+          if [ -n "$EXISTING" ]; then
+            gh pr comment "$EXISTING" --body "Sync updated: MCP_VERSION → \`${NPM_VERSION}\`, PLATFORM_COUNT → \`${MCP_COUNT}\`"
+            echo "♻ updated existing PR #${EXISTING} — branch pushed, no new PR opened"
+          else
+            gh pr create \
+              --title "chore: sync MCP_VERSION → ${NPM_VERSION}, PLATFORM_COUNT → ${MCP_COUNT}" \
+              --body "Automated sync from sigrank-mcp. npm \`sigrank@${NPM_VERSION}\`; \`ALL_PLATFORMS.length = ${MCP_COUNT}\`. Changes \`lib/constants.ts\` only — safe to squash-merge." \
+              --head "$BRANCH" --base main
+          fi
