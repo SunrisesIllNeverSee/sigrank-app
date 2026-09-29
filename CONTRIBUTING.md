@@ -183,9 +183,11 @@ Dependabot auto-merge" + policy in `.github/dependabot.yml`.
 
 ### Gitleaks (secret scan) — ARCHIVED, not running
 
-Was a job in the old `_archive/workflows/ci.yml`. The `gitleaks.toml`
-allow-list config is archived at `_archive/config/` for reuse (it was
-never under `.github/`). **If a real secret is ever
+Was a job in the old `_archive/workflows/ci.yml`. The `.github/gitleaks.toml`
+allow-list config that job pinned (`config-path`) remains in place for
+reuse. (A separate, older root `.gitleaks.toml` + `.gitleaksignore` — an
+unused stray with different rules — was archived to `_archive/config/` in
+PR-4.) **If a real secret is ever
 committed** — with or without a scanner — do not just remove it and push: the
 secret is in git history. Rotate it immediately, then scrub history with
 `git filter-repo` or BFG.
