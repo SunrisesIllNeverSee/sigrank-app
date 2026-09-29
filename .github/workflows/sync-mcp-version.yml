@@ -29,13 +29,19 @@ jobs:
     timeout-minutes: 10
     if: github.actor != 'github-actions[bot]'  # archived safeguard kept
     steps:
+      # persist-credentials: false on BOTH checkouts — the check step import()s
+      # adapters.mjs from a second repo; no write token may sit on disk while
+      # that code runs. The push step materializes the token only when needed.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Checkout sigrank-mcp
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: SunrisesIllNeverSee/sigrank-mcp
           path: _sigrank-mcp
+          persist-credentials: false
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -69,12 +75,17 @@ jobs:
       - name: Apply updates on the sync branch
         if: steps.check.outputs.needs_update == 'true'
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_VERSION: ${{ steps.check.outputs.npm_version }}
           MCP_COUNT: ${{ steps.check.outputs.mcp_count }}
         run: |
           BRANCH="bot/mcp-version-sync"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Token enters .git/config only here — after the sigrank-mcp import
+          # in the check step has already run — so second-repo code never
+          # executes with a write credential reachable on disk.
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           # Reuse the remote branch if it exists — one open PR stays updated,
           # plain push only (no force-push, no branch pile-up)
           if git fetch origin "$BRANCH" 2>/dev/null && git checkout "$BRANCH" 2>/dev/null; then
@@ -83,13 +94,19 @@ jobs:
             git checkout -b "$BRANCH"
           fi
           [ -n "$NPM_VERSION" ] && sed -i -E "s/MCP_VERSION = \"[^\"]+\"/MCP_VERSION = \"${NPM_VERSION}\"/" lib/constants.ts
-          [ "$MCP_COUNT" != "0" ] && sed -i -E "s/PLATFORM_COUNT = [0-9]+/PLATFORM_COUNT = ${MCP_COUNT}/" lib/constants.ts
-          # Verify edits actually landed before committing
+          [ -n "$MCP_COUNT" ] && [ "$MCP_COUNT" != "0" ] && sed -i -E "s/PLATFORM_COUNT = [0-9]+/PLATFORM_COUNT = ${MCP_COUNT}/" lib/constants.ts
+          # Verify target values are present (passes on reused branches too)
           [ -n "$NPM_VERSION" ] && { grep -q "MCP_VERSION = \"${NPM_VERSION}\"" lib/constants.ts || { echo "✗ version edit failed"; exit 1; }; }
           [ "$MCP_COUNT" != "0" ] && { grep -q "PLATFORM_COUNT = ${MCP_COUNT}" lib/constants.ts || { echo "✗ count edit failed"; exit 1; }; }
           git add lib/constants.ts
-          git commit -m "chore: sync MCP_VERSION → ${NPM_VERSION}, PLATFORM_COUNT → ${MCP_COUNT}"
-          git push origin "$BRANCH"
+          # Guard: a reused branch may already carry the values (sync PR open,
+          # no newer upstream) — committing an empty diff exits 1 and goes red.
+          if git diff --cached --quiet; then
+            echo "✓ sync branch already carries target values — nothing to commit"
+          else
+            git commit -m "chore: sync MCP_VERSION → ${NPM_VERSION}, PLATFORM_COUNT → ${MCP_COUNT}"
+            git push origin "$BRANCH"
+          fi
 
       - name: Open or refresh the PR
         if: steps.check.outputs.needs_update == 'true'
@@ -101,7 +118,8 @@ jobs:
           BRANCH="bot/mcp-version-sync"
           EXISTING=$(gh pr list --state open --head "$BRANCH" --json number --jq '.[0].number' || true)
           if [ -n "$EXISTING" ]; then
-            gh pr comment "$EXISTING" --body "Sync updated: MCP_VERSION → \`${NPM_VERSION}\`, PLATFORM_COUNT → \`${MCP_COUNT}\`"
+            # comment is cosmetic — best-effort; the branch push already updated it
+            gh pr comment "$EXISTING" --body "Sync updated: MCP_VERSION → \`${NPM_VERSION}\`, PLATFORM_COUNT → \`${MCP_COUNT}\`" || true
             echo "♻ updated existing PR #${EXISTING} — branch pushed, no new PR opened"
           else
             gh pr create \
