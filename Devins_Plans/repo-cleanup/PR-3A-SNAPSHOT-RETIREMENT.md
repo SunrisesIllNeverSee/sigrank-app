@@ -12,8 +12,9 @@ matching GitHub Release as a rollback marker.
 
 - Ran 2026-07-07 → 2026-09-01: **11 snapshots**
   (`snapshot-2026-07-07-v0.5.0` … `snapshot-2026-09-01-v0.11.1`).
-- Stopped when all workflows were archived (Sep 9) — and nothing missed it
-  operationally for ~4 weeks, which is itself evidence the cadence exceeded
+- Stopped when the workflows were archived (Sep 1–2, via #108/#114); the
+  Sep-6 cron slot already produced nothing, and nothing has missed it
+  operationally in the ~4 weeks since — itself evidence the cadence exceeded
   actual need.
 - Scope note: it captured **git state only** — it never protected database or
   production data. Recovery semantics were always "redeploy this commit."
