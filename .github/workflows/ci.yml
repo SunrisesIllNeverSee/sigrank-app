@@ -47,3 +47,25 @@ jobs:
 
       - name: Canonical contract tests
         run: npm run test:canonical
+
+      - name: TTEOP protocol + legacy compatibility gates
+        run: >-
+          node --test
+          __tests__/standard/tteop-conformance.test.mjs
+          __tests__/standard/legacy-alias-compatibility.test.mjs
+          __tests__/standard/standalone-fixture-conformance.test.mjs
+
+      - name: Checkout sigrank-mcp for generated-record contract
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          repository: SunrisesIllNeverSee/sigrank-mcp
+          path: _sigrank-mcp
+
+      - name: Install sigrank-mcp contract dependencies
+        run: npm ci --prefix _sigrank-mcp --ignore-scripts --no-audit --no-fund
+
+      - name: Cross-repo generated-record contract
+        env:
+          OTHER_REPO_ROOT: ${{ github.workspace }}/_sigrank-mcp
+        run: node --test __tests__/standard/generated-record-contract.test.mjs
