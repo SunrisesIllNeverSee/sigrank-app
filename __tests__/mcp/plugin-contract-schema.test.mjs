@@ -21,3 +21,18 @@ test("plugin success schemas use the same data shape in both validation branches
     assert.deepEqual(conditional, outer, `${tool.name} has mismatched success data schemas`);
   }
 });
+
+test("measurement class may be unknown in every plugin response branch", () => {
+  let checked = 0;
+  function visit(value) {
+    if (!value || typeof value !== "object") return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key === "measurement_class" && child && typeof child === "object") {
+        assert.ok(child.anyOf?.some(option => option.type === "null"), "unknown measurement class must be permitted");
+        checked++;
+      } else visit(child);
+    }
+  }
+  visit(contracts);
+  assert.ok(checked > 0);
+});
