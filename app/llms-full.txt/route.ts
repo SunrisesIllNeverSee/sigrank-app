@@ -251,8 +251,8 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 - 3,304 models measured
 - ${homeStats.total_snapshots.toLocaleString()} snapshots scored
 - ${homeStats.transmitter_count} transmitters (high-activity operators)
-- Median Yield: ${medianYield.toFixed(2)}
-- Top Yield: ${topYield.toLocaleString()} (${topOperatorName})
+- Median Yield (all-time yieldable snapshots): ${medianYield.toFixed(2)}
+- Top Yield (latest 30-day snapshots): ${topYield.toLocaleString()} (${topOperatorName})
 - API: ${SITE_ORIGIN}/api/v1/stats
 
 ## Ask AI about us

@@ -62,6 +62,7 @@ import {
 import { fallbackRows, filterMockBoard, sortValue } from "@/lib/board/fallback";
 import { memoize } from "@/lib/board/memo";
 import { recordValue } from "@/lib/analytics/record-value";
+import { computeCascadeMetrics } from "@/lib/analytics/cascade";
 
 // ───────────────────────────────────────────────────────────────────────────
 // Bounded-query helpers (2026-07-02 — the (d) sweep).
@@ -928,15 +929,18 @@ export async function getHomepageStats(): Promise<HomepageStats> {
     try {
       const { data: snapData } = await sb
         .from("metric_snapshots")
-        .select("signa_rate")
+        .select("input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens")
         .eq("window_type", "all_time")
         .gt("input_tokens", 0)
         .gt("output_tokens", 0);
       if (snapData && snapData.length > 0) {
         const yields: number[] = [];
         for (const row of snapData) {
-          const y = row.signa_rate;
-          if (typeof y === "number" && y > 0) yields.push(y);
+          const y = computeCascadeMetrics({
+            input: num(row.input_tokens), output: num(row.output_tokens),
+            cacheCreate: num(row.cache_creation_tokens), cacheRead: num(row.cache_read_tokens),
+          }).yield_;
+          if (Number.isFinite(y) && y > 0) yields.push(y);
         }
         if (yields.length > 0) {
           const sorted = yields.sort((a, b) => a - b);

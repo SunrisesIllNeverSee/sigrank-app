@@ -56,6 +56,7 @@ function operatorDto(row: LeaderboardRow, scope: Scope) {
   const p = provenance(scope, row.snapshot_date ?? row.snapshot.snapshot_date ?? null,
     row.snapshot.ruleset_version || null,
     `https://signalaf.com/user/${encodeURIComponent(row.operator.codename)}`);
+  p.ranking_eligible = !row.pending && row.global_rank > 0;
   p.platforms = [row.platform || row.operator.primary_domain].filter(Boolean);
   const pillars = row.pending ? { input: null, output: null, cache_write: null, cache_read: null } : {
     input: safeNumber(row.telemetry.fresh_input), output: safeNumber(row.telemetry.output),
@@ -105,7 +106,7 @@ async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
   } catch {
     throw new ToolError("UPSTREAM_UNAVAILABLE", "Live leaderboard read failed.", true);
   }
-  return rows.filter(r => !r.operator.isPlaceholder && r.operator.status !== "retired");
+  return rows.filter(r => !r.operator.isPlaceholder && r.operator.status !== "retired" && !r.pending && r.global_rank > 0);
 }
 
 function percentile(values: number[], p: number): number | null {
@@ -161,7 +162,7 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       return envelope({ entries, scope, board_url: `https://signalaf.com/board/${scope.window}`,
         returned_count: entries.length, total_eligible: rows.length,
         gated: rows.length > Number(limit), next_cursor: null, sort_metric: "yield" }, scope,
-        [{code:"UNVERIFIED_LEGACY",message:"Existing board rows lack a stored measurement class and complete provenance."}]);
+        [{code:"UNVERIFIED_LEGACY",message:"Published board eligibility does not establish measurement verification. Existing rows lack a stored measurement class and complete provenance."}]);
     }
     if (name === "get_operator") {
       const codename = requireCodename(args.codename);
