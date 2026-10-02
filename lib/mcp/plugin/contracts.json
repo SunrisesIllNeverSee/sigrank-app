@@ -1,0 +1,6220 @@
+{
+  "contract_version": "1.0.0",
+  "status": "implemented_v1_with_explicit_scope_limitations",
+  "tools": [
+    {
+      "name": "get_leaderboard",
+      "title": "Get AI Operator Leaderboard",
+      "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators; a platform selection uses the broader By platform / All view. Results are ranked by published Yield and include the board link, scope, available operating ratios, provenance and access cap. Missing values are never estimated.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "window": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "all"
+            ],
+            "default": "30d"
+          },
+          "platform": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "default": "all"
+          },
+          "cohort": {
+            "type": "string",
+            "enum": [
+              "public",
+              "exact4",
+              "reconstructed4"
+            ],
+            "default": "public"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "entries": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/operator"
+                    }
+                  },
+                  "scope": {
+                    "$ref": "#/$defs/scope"
+                  },
+                  "returned_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "total_eligible": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "gated": {
+                    "type": "boolean"
+                  },
+                  "next_cursor": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "sort_metric": {
+                    "const": "yield"
+                  },
+                  "board_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "entries",
+                  "scope",
+                  "returned_count",
+                  "total_eligible",
+                  "gated",
+                  "next_cursor",
+                  "sort_metric",
+                  "board_url"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/warning"
+            }
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contract_version",
+          "status",
+          "data",
+          "provenance",
+          "warnings",
+          "error"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "window": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "window": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "platform": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "cohort": {
+                "type": "string",
+                "enum": [
+                  "public",
+                  "exact4",
+                  "reconstructed4"
+                ]
+              },
+              "view": {
+                "type": "string",
+                "enum": [
+                  "total",
+                  "platforms"
+                ]
+              },
+              "category": {
+                "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
+              }
+            },
+            "required": [
+              "window",
+              "platform",
+              "cohort",
+              "view",
+              "category",
+              "population"
+            ],
+            "additionalProperties": false
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "yield": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "leverage": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "construction": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dev10x": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scale_v": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "yield",
+              "leverage",
+              "velocity",
+              "snr",
+              "construction",
+              "dev10x",
+              "scale_v"
+            ],
+            "additionalProperties": false
+          },
+          "pillars": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "output": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_write": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_read": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "input",
+              "output",
+              "cache_write",
+              "cache_read"
+            ],
+            "additionalProperties": false
+          },
+          "warning": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          },
+          "operator": {
+            "type": "object",
+            "properties": {
+              "codename": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "display_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "profile_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://signalaf\\.com/user/"
+              },
+              "class_tier": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archetype": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "convergent",
+                      "kinetic",
+                      "input-bound",
+                      "priming",
+                      "contextual",
+                      "deep-reader",
+                      "archivist",
+                      "builder",
+                      "recursive",
+                      "amplifier"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rank": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "percentile": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pillars": {
+                "$ref": "#/$defs/pillars"
+              },
+              "metrics": {
+                "$ref": "#/$defs/metrics"
+              },
+              "provenance": {
+                "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "codename",
+              "display_name",
+              "profile_url",
+              "class_tier",
+              "archetype",
+              "rank",
+              "percentile",
+              "pillars",
+              "metrics",
+              "provenance",
+              "operating_ratio"
+            ],
+            "additionalProperties": false
+          },
+          "distribution": {
+            "type": "object",
+            "properties": {
+              "n": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "min": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p25": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "median": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p75": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n",
+              "min",
+              "p25",
+              "median",
+              "p75",
+              "max"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "n": {
+                      "const": 0
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "min": {
+                      "type": "null"
+                    },
+                    "p25": {
+                      "type": "null"
+                    },
+                    "median": {
+                      "type": "null"
+                    },
+                    "p75": {
+                      "type": "null"
+                    },
+                    "max": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "p25": {
+                      "type": "number"
+                    },
+                    "median": {
+                      "type": "number"
+                    },
+                    "p75": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "AUTH_REQUIRED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "INVALID_ARGUMENT",
+                  "INVALID_CURSOR",
+                  "UNSUPPORTED_SCOPE",
+                  "INCOMPARABLE_SCOPE",
+                  "RATE_LIMITED",
+                  "UPSTREAM_UNAVAILABLE",
+                  "PROVENANCE_UNAVAILABLE",
+                  "COUNT_OVERFLOW",
+                  "INTERNAL_ERROR"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          },
+          "record_provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "type": "string",
+                "enum": [
+                  "Exact-4",
+                  "Reconstructed-4",
+                  "Partial",
+                  "Unverified"
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ok"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/operator"
+                      }
+                    },
+                    "scope": {
+                      "$ref": "#/$defs/scope"
+                    },
+                    "returned_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "total_eligible": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "gated": {
+                      "type": "boolean"
+                    },
+                    "next_cursor": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 2048
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "sort_metric": {
+                      "const": "yield"
+                    }
+                  },
+                  "required": [
+                    "entries",
+                    "scope",
+                    "returned_count",
+                    "total_eligible",
+                    "gated",
+                    "next_cursor",
+                    "sort_metric"
+                  ],
+                  "additionalProperties": false
+                },
+                "provenance": {
+                  "$ref": "#/$defs/provenance"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "data": {
+                  "type": "null"
+                },
+                "error": {
+                  "$ref": "#/$defs/error"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_operator",
+      "title": "Get operator profile",
+      "description": "Retrieve a public SignalAF operator by codename for a requested window. Use for an existing public profile, not to measure local usage or identify the caller. Returns metrics, provenance and a source link, or a missing-measurement state. Does not change data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "codename": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "window": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "all"
+            ],
+            "default": "30d"
+          }
+        },
+        "required": [
+          "codename"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "profile_status": {
+                    "type": "string",
+                    "enum": [
+                      "measured",
+                      "no_measurement"
+                    ]
+                  },
+                  "operator": {
+                    "$ref": "#/$defs/operator"
+                  }
+                },
+                "required": [
+                  "profile_status",
+                  "operator"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/warning"
+            }
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contract_version",
+          "status",
+          "data",
+          "provenance",
+          "warnings",
+          "error"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "window": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "window": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "platform": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "cohort": {
+                "type": "string",
+                "enum": [
+                  "public",
+                  "exact4",
+                  "reconstructed4"
+                ]
+              },
+              "view": {
+                "type": "string",
+                "enum": [
+                  "total",
+                  "platforms"
+                ]
+              },
+              "category": {
+                "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
+              }
+            },
+            "required": [
+              "window",
+              "platform",
+              "cohort",
+              "view",
+              "category",
+              "population"
+            ],
+            "additionalProperties": false
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "yield": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "leverage": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "construction": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dev10x": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scale_v": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "yield",
+              "leverage",
+              "velocity",
+              "snr",
+              "construction",
+              "dev10x",
+              "scale_v"
+            ],
+            "additionalProperties": false
+          },
+          "pillars": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "output": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_write": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_read": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "input",
+              "output",
+              "cache_write",
+              "cache_read"
+            ],
+            "additionalProperties": false
+          },
+          "warning": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          },
+          "operator": {
+            "type": "object",
+            "properties": {
+              "codename": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "display_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "profile_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://signalaf\\.com/user/"
+              },
+              "class_tier": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archetype": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "convergent",
+                      "kinetic",
+                      "input-bound",
+                      "priming",
+                      "contextual",
+                      "deep-reader",
+                      "archivist",
+                      "builder",
+                      "recursive",
+                      "amplifier"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rank": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "percentile": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pillars": {
+                "$ref": "#/$defs/pillars"
+              },
+              "metrics": {
+                "$ref": "#/$defs/metrics"
+              },
+              "provenance": {
+                "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "codename",
+              "display_name",
+              "profile_url",
+              "class_tier",
+              "archetype",
+              "rank",
+              "percentile",
+              "pillars",
+              "metrics",
+              "provenance",
+              "operating_ratio"
+            ],
+            "additionalProperties": false
+          },
+          "distribution": {
+            "type": "object",
+            "properties": {
+              "n": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "min": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p25": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "median": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p75": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n",
+              "min",
+              "p25",
+              "median",
+              "p75",
+              "max"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "n": {
+                      "const": 0
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "min": {
+                      "type": "null"
+                    },
+                    "p25": {
+                      "type": "null"
+                    },
+                    "median": {
+                      "type": "null"
+                    },
+                    "p75": {
+                      "type": "null"
+                    },
+                    "max": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "p25": {
+                      "type": "number"
+                    },
+                    "median": {
+                      "type": "number"
+                    },
+                    "p75": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "AUTH_REQUIRED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "INVALID_ARGUMENT",
+                  "INVALID_CURSOR",
+                  "UNSUPPORTED_SCOPE",
+                  "INCOMPARABLE_SCOPE",
+                  "RATE_LIMITED",
+                  "UPSTREAM_UNAVAILABLE",
+                  "PROVENANCE_UNAVAILABLE",
+                  "COUNT_OVERFLOW",
+                  "INTERNAL_ERROR"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          },
+          "record_provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "type": "string",
+                "enum": [
+                  "Exact-4",
+                  "Reconstructed-4",
+                  "Partial",
+                  "Unverified"
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ok"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "profile_status": {
+                      "type": "string",
+                      "enum": [
+                        "measured",
+                        "no_measurement"
+                      ]
+                    },
+                    "operator": {
+                      "$ref": "#/$defs/operator"
+                    }
+                  },
+                  "required": [
+                    "profile_status",
+                    "operator"
+                  ],
+                  "additionalProperties": false
+                },
+                "provenance": {
+                  "$ref": "#/$defs/provenance"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "data": {
+                  "type": "null"
+                },
+                "error": {
+                  "$ref": "#/$defs/error"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_my_profile",
+      "title": "Get my SignalAF profile",
+      "description": "Retrieve the signed-in user’s linked SignalAF profile for a requested window using the SignalAF profile OAuth scope. Use when the user asks for their existing profile; never infer ownership from a codename. May require account linking. Does not scan local logs or publish measurements.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "window": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "all"
+            ],
+            "default": "30d"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "profile_status": {
+                    "type": "string",
+                    "enum": [
+                      "measured",
+                      "no_measurement",
+                      "no_profile"
+                    ]
+                  },
+                  "operator": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/operator"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "profile_status",
+                  "operator"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "profile_status": {
+                          "const": "no_profile"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "operator": {
+                          "type": "null"
+                        }
+                      }
+                    },
+                    "else": {
+                      "properties": {
+                        "operator": {
+                          "$ref": "#/$defs/operator"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/warning"
+            }
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contract_version",
+          "status",
+          "data",
+          "provenance",
+          "warnings",
+          "error"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "window": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "window": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "platform": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "cohort": {
+                "type": "string",
+                "enum": [
+                  "public",
+                  "exact4",
+                  "reconstructed4"
+                ]
+              },
+              "view": {
+                "type": "string",
+                "enum": [
+                  "total",
+                  "platforms"
+                ]
+              },
+              "category": {
+                "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
+              }
+            },
+            "required": [
+              "window",
+              "platform",
+              "cohort",
+              "view",
+              "category",
+              "population"
+            ],
+            "additionalProperties": false
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "yield": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "leverage": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "construction": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dev10x": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scale_v": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "yield",
+              "leverage",
+              "velocity",
+              "snr",
+              "construction",
+              "dev10x",
+              "scale_v"
+            ],
+            "additionalProperties": false
+          },
+          "pillars": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "output": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_write": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_read": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "input",
+              "output",
+              "cache_write",
+              "cache_read"
+            ],
+            "additionalProperties": false
+          },
+          "warning": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          },
+          "operator": {
+            "type": "object",
+            "properties": {
+              "codename": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "display_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "profile_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://signalaf\\.com/user/"
+              },
+              "class_tier": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archetype": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "convergent",
+                      "kinetic",
+                      "input-bound",
+                      "priming",
+                      "contextual",
+                      "deep-reader",
+                      "archivist",
+                      "builder",
+                      "recursive",
+                      "amplifier"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rank": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "percentile": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pillars": {
+                "$ref": "#/$defs/pillars"
+              },
+              "metrics": {
+                "$ref": "#/$defs/metrics"
+              },
+              "provenance": {
+                "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "codename",
+              "display_name",
+              "profile_url",
+              "class_tier",
+              "archetype",
+              "rank",
+              "percentile",
+              "pillars",
+              "metrics",
+              "provenance",
+              "operating_ratio"
+            ],
+            "additionalProperties": false
+          },
+          "distribution": {
+            "type": "object",
+            "properties": {
+              "n": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "min": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p25": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "median": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p75": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n",
+              "min",
+              "p25",
+              "median",
+              "p75",
+              "max"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "n": {
+                      "const": 0
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "min": {
+                      "type": "null"
+                    },
+                    "p25": {
+                      "type": "null"
+                    },
+                    "median": {
+                      "type": "null"
+                    },
+                    "p75": {
+                      "type": "null"
+                    },
+                    "max": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "p25": {
+                      "type": "number"
+                    },
+                    "median": {
+                      "type": "number"
+                    },
+                    "p75": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "AUTH_REQUIRED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "INVALID_ARGUMENT",
+                  "INVALID_CURSOR",
+                  "UNSUPPORTED_SCOPE",
+                  "INCOMPARABLE_SCOPE",
+                  "RATE_LIMITED",
+                  "UPSTREAM_UNAVAILABLE",
+                  "PROVENANCE_UNAVAILABLE",
+                  "COUNT_OVERFLOW",
+                  "INTERNAL_ERROR"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          },
+          "record_provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "type": "string",
+                "enum": [
+                  "Exact-4",
+                  "Reconstructed-4",
+                  "Partial",
+                  "Unverified"
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ok"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "profile_status": {
+                      "type": "string",
+                      "enum": [
+                        "measured",
+                        "no_measurement",
+                        "no_profile"
+                      ]
+                    },
+                    "operator": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/$defs/operator"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "profile_status",
+                    "operator"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "profile_status": {
+                            "const": "no_profile"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "operator": {
+                            "type": "null"
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "operator": {
+                            "$ref": "#/$defs/operator"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "$ref": "#/$defs/provenance"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "data": {
+                  "type": "null"
+                },
+                "error": {
+                  "$ref": "#/$defs/error"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "profile"
+          ]
+        }
+      ],
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "profile"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "compare_operators",
+      "title": "Compare operator structure",
+      "description": "Compare two public operators’ observable AI operating structure for a common window and cohort. Returns canonical metrics and differences only when evidence is compatible, otherwise incompatibility reasons. Does not infer intelligence, productivity, work quality or personality and does not change data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "codename_a": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "codename_b": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "window": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "all"
+            ],
+            "default": "30d"
+          },
+          "cohort": {
+            "type": "string",
+            "enum": [
+              "public",
+              "exact4",
+              "reconstructed4"
+            ],
+            "default": "public"
+          }
+        },
+        "required": [
+          "codename_a",
+          "codename_b"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "operator_a": {
+                    "$ref": "#/$defs/operator"
+                  },
+                  "operator_b": {
+                    "$ref": "#/$defs/operator"
+                  },
+                  "comparable": {
+                    "type": "boolean"
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    }
+                  },
+                  "scope": {
+                    "$ref": "#/$defs/scope"
+                  },
+                  "delta_a_minus_b": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/metrics"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "operator_a",
+                  "operator_b",
+                  "comparable",
+                  "reasons",
+                  "scope",
+                  "delta_a_minus_b"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "comparable": {
+                          "const": true
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "reasons": {
+                          "maxItems": 0
+                        },
+                        "delta_a_minus_b": {
+                          "$ref": "#/$defs/metrics"
+                        }
+                      }
+                    },
+                    "else": {
+                      "properties": {
+                        "reasons": {
+                          "minItems": 1
+                        },
+                        "delta_a_minus_b": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/warning"
+            }
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contract_version",
+          "status",
+          "data",
+          "provenance",
+          "warnings",
+          "error"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "window": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "window": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "platform": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "cohort": {
+                "type": "string",
+                "enum": [
+                  "public",
+                  "exact4",
+                  "reconstructed4"
+                ]
+              },
+              "view": {
+                "type": "string",
+                "enum": [
+                  "total",
+                  "platforms"
+                ]
+              },
+              "category": {
+                "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
+              }
+            },
+            "required": [
+              "window",
+              "platform",
+              "cohort",
+              "view",
+              "category",
+              "population"
+            ],
+            "additionalProperties": false
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "yield": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "leverage": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "construction": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dev10x": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scale_v": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "yield",
+              "leverage",
+              "velocity",
+              "snr",
+              "construction",
+              "dev10x",
+              "scale_v"
+            ],
+            "additionalProperties": false
+          },
+          "pillars": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "output": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_write": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_read": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "input",
+              "output",
+              "cache_write",
+              "cache_read"
+            ],
+            "additionalProperties": false
+          },
+          "warning": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          },
+          "operator": {
+            "type": "object",
+            "properties": {
+              "codename": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "display_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "profile_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://signalaf\\.com/user/"
+              },
+              "class_tier": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archetype": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "convergent",
+                      "kinetic",
+                      "input-bound",
+                      "priming",
+                      "contextual",
+                      "deep-reader",
+                      "archivist",
+                      "builder",
+                      "recursive",
+                      "amplifier"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rank": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "percentile": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pillars": {
+                "$ref": "#/$defs/pillars"
+              },
+              "metrics": {
+                "$ref": "#/$defs/metrics"
+              },
+              "provenance": {
+                "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "codename",
+              "display_name",
+              "profile_url",
+              "class_tier",
+              "archetype",
+              "rank",
+              "percentile",
+              "pillars",
+              "metrics",
+              "provenance",
+              "operating_ratio"
+            ],
+            "additionalProperties": false
+          },
+          "distribution": {
+            "type": "object",
+            "properties": {
+              "n": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "min": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p25": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "median": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p75": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n",
+              "min",
+              "p25",
+              "median",
+              "p75",
+              "max"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "n": {
+                      "const": 0
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "min": {
+                      "type": "null"
+                    },
+                    "p25": {
+                      "type": "null"
+                    },
+                    "median": {
+                      "type": "null"
+                    },
+                    "p75": {
+                      "type": "null"
+                    },
+                    "max": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "p25": {
+                      "type": "number"
+                    },
+                    "median": {
+                      "type": "number"
+                    },
+                    "p75": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "AUTH_REQUIRED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "INVALID_ARGUMENT",
+                  "INVALID_CURSOR",
+                  "UNSUPPORTED_SCOPE",
+                  "INCOMPARABLE_SCOPE",
+                  "RATE_LIMITED",
+                  "UPSTREAM_UNAVAILABLE",
+                  "PROVENANCE_UNAVAILABLE",
+                  "COUNT_OVERFLOW",
+                  "INTERNAL_ERROR"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          },
+          "record_provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "type": "string",
+                "enum": [
+                  "Exact-4",
+                  "Reconstructed-4",
+                  "Partial",
+                  "Unverified"
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ok"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "operator_a": {
+                      "$ref": "#/$defs/operator"
+                    },
+                    "operator_b": {
+                      "$ref": "#/$defs/operator"
+                    },
+                    "comparable": {
+                      "type": "boolean"
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048
+                      }
+                    },
+                    "scope": {
+                      "$ref": "#/$defs/scope"
+                    },
+                    "delta_a_minus_b": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/$defs/metrics"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "operator_a",
+                    "operator_b",
+                    "comparable",
+                    "reasons",
+                    "scope",
+                    "delta_a_minus_b"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "comparable": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "reasons": {
+                            "maxItems": 0
+                          },
+                          "delta_a_minus_b": {
+                            "$ref": "#/$defs/metrics"
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "reasons": {
+                            "minItems": 1
+                          },
+                          "delta_a_minus_b": {
+                            "type": "null"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "provenance": {
+                  "$ref": "#/$defs/provenance"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "data": {
+                  "type": "null"
+                },
+                "error": {
+                  "$ref": "#/$defs/error"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_field_stats",
+      "title": "Get field statistics",
+      "description": "Retrieve complete-cohort SignalAF metric distributions and archetype/evidence counts for a window and platform. Use for field context, not a top-page sample or individual measurement. Returns cohort definition and provenance; unavailable evidence is explicit. Does not change data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "window": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "all"
+            ],
+            "default": "30d"
+          },
+          "platform": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "default": "all"
+          },
+          "cohort": {
+            "type": "string",
+            "enum": [
+              "public",
+              "exact4",
+              "reconstructed4"
+            ],
+            "default": "public"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "$ref": "#/$defs/scope"
+                  },
+                  "population_size": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "included_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "excluded_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "coverage_complete": {
+                    "type": "boolean"
+                  },
+                  "cohort_definition": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  "distributions": {
+                    "type": "object",
+                    "properties": {
+                      "yield": {
+                        "$ref": "#/$defs/distribution"
+                      },
+                      "leverage": {
+                        "$ref": "#/$defs/distribution"
+                      },
+                      "velocity": {
+                        "$ref": "#/$defs/distribution"
+                      },
+                      "snr": {
+                        "$ref": "#/$defs/distribution"
+                      },
+                      "construction": {
+                        "$ref": "#/$defs/distribution"
+                      },
+                      "dev10x": {
+                        "$ref": "#/$defs/distribution"
+                      },
+                      "scale_v": {
+                        "$ref": "#/$defs/distribution"
+                      }
+                    },
+                    "required": [
+                      "yield",
+                      "leverage",
+                      "velocity",
+                      "snr",
+                      "construction",
+                      "dev10x",
+                      "scale_v"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "archetype_counts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "archetype": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 2048
+                        },
+                        "count": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "archetype",
+                        "count"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "measurement_class_counts": {
+                    "type": "object",
+                    "properties": {
+                      "Exact-4": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "Reconstructed-4": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "Partial": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "Unverified": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "scope",
+                  "population_size",
+                  "included_count",
+                  "excluded_count",
+                  "coverage_complete",
+                  "cohort_definition",
+                  "distributions",
+                  "archetype_counts",
+                  "measurement_class_counts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/warning"
+            }
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contract_version",
+          "status",
+          "data",
+          "provenance",
+          "warnings",
+          "error"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "window": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "start": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "window": {
+                "type": "string",
+                "enum": [
+                  "7d",
+                  "30d",
+                  "90d",
+                  "all"
+                ]
+              },
+              "platform": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "cohort": {
+                "type": "string",
+                "enum": [
+                  "public",
+                  "exact4",
+                  "reconstructed4"
+                ]
+              },
+              "view": {
+                "type": "string",
+                "enum": [
+                  "total",
+                  "platforms"
+                ]
+              },
+              "category": {
+                "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
+              }
+            },
+            "required": [
+              "window",
+              "platform",
+              "cohort",
+              "view",
+              "category",
+              "population"
+            ],
+            "additionalProperties": false
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "yield": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "leverage": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "construction": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dev10x": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scale_v": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "yield",
+              "leverage",
+              "velocity",
+              "snr",
+              "construction",
+              "dev10x",
+              "scale_v"
+            ],
+            "additionalProperties": false
+          },
+          "pillars": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "output": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_write": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cache_read": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "input",
+              "output",
+              "cache_write",
+              "cache_read"
+            ],
+            "additionalProperties": false
+          },
+          "warning": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          },
+          "operator": {
+            "type": "object",
+            "properties": {
+              "codename": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "display_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "profile_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://signalaf\\.com/user/"
+              },
+              "class_tier": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archetype": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "convergent",
+                      "kinetic",
+                      "input-bound",
+                      "priming",
+                      "contextual",
+                      "deep-reader",
+                      "archivist",
+                      "builder",
+                      "recursive",
+                      "amplifier"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rank": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "percentile": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pillars": {
+                "$ref": "#/$defs/pillars"
+              },
+              "metrics": {
+                "$ref": "#/$defs/metrics"
+              },
+              "provenance": {
+                "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "codename",
+              "display_name",
+              "profile_url",
+              "class_tier",
+              "archetype",
+              "rank",
+              "percentile",
+              "pillars",
+              "metrics",
+              "provenance",
+              "operating_ratio"
+            ],
+            "additionalProperties": false
+          },
+          "distribution": {
+            "type": "object",
+            "properties": {
+              "n": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "min": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p25": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "median": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p75": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n",
+              "min",
+              "p25",
+              "median",
+              "p75",
+              "max"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "n": {
+                      "const": 0
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "min": {
+                      "type": "null"
+                    },
+                    "p25": {
+                      "type": "null"
+                    },
+                    "median": {
+                      "type": "null"
+                    },
+                    "p75": {
+                      "type": "null"
+                    },
+                    "max": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "p25": {
+                      "type": "number"
+                    },
+                    "median": {
+                      "type": "number"
+                    },
+                    "p75": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "AUTH_REQUIRED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "INVALID_ARGUMENT",
+                  "INVALID_CURSOR",
+                  "UNSUPPORTED_SCOPE",
+                  "INCOMPARABLE_SCOPE",
+                  "RATE_LIMITED",
+                  "UPSTREAM_UNAVAILABLE",
+                  "PROVENANCE_UNAVAILABLE",
+                  "COUNT_OVERFLOW",
+                  "INTERNAL_ERROR"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          },
+          "record_provenance": {
+            "type": "object",
+            "properties": {
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                }
+              },
+              "retrieved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "observed_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dataset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "methodology_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ruleset_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxonomy_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "$ref": "#/$defs/window"
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              },
+              "data_origin": {
+                "type": "string",
+                "enum": [
+                  "live_submission",
+                  "historical_seed",
+                  "synthetic_demo",
+                  "unknown"
+                ]
+              },
+              "measurement_class": {
+                "type": "string",
+                "enum": [
+                  "Exact-4",
+                  "Reconstructed-4",
+                  "Partial",
+                  "Unverified"
+                ]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": [
+                  "not_submitted",
+                  "unverified",
+                  "signed",
+                  "server_verified",
+                  "rejected"
+                ]
+              },
+              "ranking_eligible": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "reconstruction_method": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unknown_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            },
+            "required": [
+              "source_urls",
+              "retrieved_at",
+              "observed_at",
+              "dataset_version",
+              "methodology_version",
+              "ruleset_version",
+              "adapter_version",
+              "taxonomy_version",
+              "window",
+              "platforms",
+              "models",
+              "data_origin",
+              "measurement_class",
+              "verification_status",
+              "ranking_eligible",
+              "coverage",
+              "reconstruction_method",
+              "unknown_fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ok"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "scope": {
+                      "$ref": "#/$defs/scope"
+                    },
+                    "population_size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "included_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "excluded_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "coverage_complete": {
+                      "type": "boolean"
+                    },
+                    "cohort_definition": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    },
+                    "distributions": {
+                      "type": "object",
+                      "properties": {
+                        "yield": {
+                          "$ref": "#/$defs/distribution"
+                        },
+                        "leverage": {
+                          "$ref": "#/$defs/distribution"
+                        },
+                        "velocity": {
+                          "$ref": "#/$defs/distribution"
+                        },
+                        "snr": {
+                          "$ref": "#/$defs/distribution"
+                        },
+                        "construction": {
+                          "$ref": "#/$defs/distribution"
+                        },
+                        "dev10x": {
+                          "$ref": "#/$defs/distribution"
+                        },
+                        "scale_v": {
+                          "$ref": "#/$defs/distribution"
+                        }
+                      },
+                      "required": [
+                        "yield",
+                        "leverage",
+                        "velocity",
+                        "snr",
+                        "construction",
+                        "dev10x",
+                        "scale_v"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "archetype_counts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "archetype": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 2048
+                          },
+                          "count": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "archetype",
+                          "count"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "measurement_class_counts": {
+                      "type": "object",
+                      "properties": {
+                        "Exact-4": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "Reconstructed-4": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "Partial": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "Unverified": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "Exact-4",
+                        "Reconstructed-4",
+                        "Partial",
+                        "Unverified"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "scope",
+                    "population_size",
+                    "included_count",
+                    "excluded_count",
+                    "coverage_complete",
+                    "cohort_definition",
+                    "distributions",
+                    "archetype_counts",
+                    "measurement_class_counts"
+                  ],
+                  "additionalProperties": false
+                },
+                "provenance": {
+                  "$ref": "#/$defs/provenance"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "data": {
+                  "type": "null"
+                },
+                "error": {
+                  "$ref": "#/$defs/error"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "report_beta_bug",
+      "title": "Send beta bug report",
+      "description": "Send a concise SigRank | SignalAF beta bug report to hello@signalaf.com only after the user explicitly asks to submit it. Collect steps, expected and actual behavior; omit prompt content, credentials, raw logs and private telemetry. Returns a delivery reference or an error; does not alter operator data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 160
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 300
+            }
+          },
+          "expected": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 400
+          },
+          "actual": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 800
+          },
+          "surface": {
+            "type": "string",
+            "enum": [
+              "ChatGPT",
+              "Codex",
+              "Website",
+              "Other"
+            ]
+          },
+          "plugin_version": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "window": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "all"
+            ]
+          },
+          "tool_name": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "reply_email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "consent_confirmed": {
+            "const": true
+          }
+        },
+        "required": [
+          "summary",
+          "steps",
+          "expected",
+          "actual",
+          "surface",
+          "consent_confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "pattern": "^SRB-[A-F0-9]{8}$"
+                  },
+                  "sent_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "destination": {
+                    "const": "hello@signalaf.com"
+                  },
+                  "sensitive_text_redacted": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "reference",
+                  "sent_at",
+                  "destination",
+                  "sensitive_text_redacted"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "type": "null"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "retryable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message",
+                  "retryable"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contract_version",
+          "status",
+          "data",
+          "provenance",
+          "warnings",
+          "error"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ok"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "pattern": "^SRB-[A-F0-9]{8}$"
+                    },
+                    "sent_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "destination": {
+                      "const": "hello@signalaf.com"
+                    },
+                    "sensitive_text_redacted": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "sent_at",
+                    "destination",
+                    "sensitive_text_redacted"
+                  ],
+                  "additionalProperties": false
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "data": {
+                  "type": "null"
+                },
+                "error": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "retryable": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "retryable"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    }
+  ]
+}

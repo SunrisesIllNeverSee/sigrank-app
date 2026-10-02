@@ -273,7 +273,10 @@ export async function getLeaderboard(
   params: BoardParams = {},
 ): Promise<LeaderboardRow[]> {
   const sb = getSupabaseServer();
-  if (!sb) return filterMockBoard(params);
+  if (!sb) {
+    if (params.strictLive) throw new Error("Live leaderboard is not configured");
+    return filterMockBoard(params);
+  }
   try {
     // Live path: read latest metric_snapshots, join operators + rank_history.
     // We sort/filter/re-rank in JS so the live board is shape- and order-
@@ -302,7 +305,7 @@ export async function getLeaderboard(
       "metric_snapshots (getLeaderboard)",
     );
     // DB empty/unreachable → mock fallback (graceful-degradation contract).
-    if (allSnaps.length === 0) return filterMockBoard(params);
+    if (allSnaps.length === 0) return params.strictLive ? [] : filterMockBoard(params);
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
@@ -362,7 +365,7 @@ export async function getLeaderboard(
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
     if (snapRows.length === 0)
-      return params.windowFilter ? [] : filterMockBoard(params);
+      return params.windowFilter || params.strictLive ? [] : filterMockBoard(params);
 
     const opIds = new Set(snapRows.map((s) => s.operator_id));
     // Fetch all operators_public (paginated) — the IN clause with 1600+ UUIDs
@@ -423,7 +426,7 @@ export async function getLeaderboard(
     // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key deploy),
     // a windowFilter board returns [] rather than fabricated mock seeds.
     if (rows.length === 0)
-      return params.windowFilter ? [] : filterMockBoard(params);
+      return params.windowFilter || params.strictLive ? [] : filterMockBoard(params);
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
     // Filter on the row's platform (snapshot.platform, falling back to
@@ -467,7 +470,8 @@ export async function getLeaderboard(
     }
     if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
     return rows;
-  } catch {
+  } catch (error) {
+    if (params.strictLive) throw error;
     return filterMockBoard(params);
   }
 }
@@ -498,13 +502,17 @@ export async function isOperatorRetired(codename: string): Promise<boolean> {
 /** Single operator by codename (identity + latest snapshot + rank). */
 export async function getOperator(
   codename: string,
+  strictLive = false,
 ): Promise<LeaderboardRow | null> {
   const sb = getSupabaseServer();
   const fromMock = () =>
     fallbackRows().find(
       (r) => r.operator.codename.toLowerCase() === codename.toLowerCase(),
     ) ?? null;
-  if (!sb) return fromMock();
+  if (!sb) {
+    if (strictLive) throw new Error("Live operator source is not configured");
+    return fromMock();
+  }
   try {
     // Identity by codename (case-insensitive), then latest snapshot + rank.
     const { data: opData, error: opError } = await sb
@@ -515,7 +523,7 @@ export async function getOperator(
       .maybeSingle();
     if (opError) throw opError;
     const op = asDb<DbOperator | null>(opData);
-    if (!op) return fromMock();
+    if (!op) return strictLive ? null : fromMock();
     // Retired operators (opt-out): no profile page. They stay on the leaderboard
     // with their tokens but are not clickable — getOperator returns null so the
     // profile route redirects to /leaderboard instead of rendering a profile.
@@ -592,7 +600,8 @@ export async function getOperator(
       percentile,
       telemetry: telemetryFromSnapshot(snap),
     };
-  } catch {
+  } catch (error) {
+    if (strictLive) throw error;
     return fromMock();
   }
 }
