@@ -2,7 +2,6 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
-import { createClient } from "@supabase/supabase-js";
 import { getLeaderboard, type LeaderboardRow } from "@/lib/board";
 import { getOperator } from "@/lib/board/queries";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
@@ -121,23 +120,6 @@ function distribution(values: Array<number | null>) {
     median: percentile(sorted, .5), p75: percentile(sorted, .75), max: sorted.at(-1) ?? null };
 }
 
-async function ownCodename(request: Request): Promise<string | null> {
-  const token = /^Bearer\s+(.+)$/i.exec(request.headers.get("authorization") ?? "")?.[1];
-  if (!token) throw new ToolError("AUTH_REQUIRED", "Connect your SignalAF account to see your profile.");
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const db = getSupabaseServer();
-  if (!url || !anon || !db) throw new ToolError("UPSTREAM_UNAVAILABLE", "Account lookup is unavailable.", true);
-  const auth = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false } });
-  const { data: { user }, error } = await auth.auth.getUser(token);
-  if (error || !user) throw new ToolError("AUTH_REQUIRED", "Your SignalAF connection has expired.");
-  const linked = await db.from("operator_accounts")
-    .select("operators:operator_id(codename)").eq("user_id", user.id).maybeSingle();
-  if (linked.error) throw new ToolError("UPSTREAM_UNAVAILABLE", "Account lookup failed.", true);
-  const op = linked.data?.operators as {codename?: string} | null | undefined;
-  return op?.codename || null;
-}
-
 export async function callPluginTool(name: string, args: Args, request: Request) {
   try {
     if (name === "report_beta_bug") {
@@ -181,9 +163,8 @@ export async function callPluginTool(name: string, args: Args, request: Request)
         gated: rows.length > Number(limit), next_cursor: null, sort_metric: "yield" }, scope,
         [{code:"UNVERIFIED_LEGACY",message:"Existing board rows lack a stored measurement class and complete provenance."}]);
     }
-    if (name === "get_operator" || name === "get_my_profile") {
-      const codename = name === "get_my_profile" ? await ownCodename(request) : requireCodename(args.codename);
-      if (!codename) return envelope({ profile_status: "no_profile", operator: null }, scope);
+    if (name === "get_operator") {
+      const codename = requireCodename(args.codename);
       let op: LeaderboardRow | null;
       try { op = await getOperator(codename, true); }
       catch { throw new ToolError("UPSTREAM_UNAVAILABLE", "Live operator read failed.", true); }
