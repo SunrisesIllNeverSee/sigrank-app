@@ -575,13 +575,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -1036,13 +1043,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -1719,13 +1733,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -2180,13 +2201,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -2889,13 +2917,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -3350,13 +3385,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -3709,13 +3751,19 @@
                         "type": "integer",
                         "minimum": 0,
                         "maximum": 9007199254740991
+                      },
+                      "Unknown": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
                       }
                     },
                     "required": [
                       "Exact-4",
                       "Reconstructed-4",
                       "Partial",
-                      "Unverified"
+                      "Unverified",
+                      "Unknown"
                     ],
                     "additionalProperties": false
                   }
@@ -4165,13 +4213,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -4626,13 +4681,20 @@
                 ]
               },
               "verification_status": {
-                "type": "string",
-                "enum": [
-                  "not_submitted",
-                  "unverified",
-                  "signed",
-                  "server_verified",
-                  "rejected"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "not_submitted",
+                      "unverified",
+                      "signed",
+                      "server_verified",
+                      "rejected"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "ranking_eligible": {
@@ -4812,13 +4874,19 @@
                           "type": "integer",
                           "minimum": 0,
                           "maximum": 9007199254740991
+                        },
+                        "Unknown": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
                         "Exact-4",
                         "Reconstructed-4",
                         "Partial",
-                        "Unverified"
+                        "Unverified",
+                        "Unknown"
                       ],
                       "additionalProperties": false
                     }

@@ -36,3 +36,23 @@ test("measurement class may be unknown in every plugin response branch", () => {
   visit(contracts);
   assert.ok(checked > 0);
 });
+
+test("board provenance may be unknown and field stats count unclassified rows", () => {
+  let statuses = 0;
+  let classCounts = 0;
+  function visit(value) {
+    if (!value || typeof value !== "object") return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key === "verification_status" && child && typeof child === "object") {
+        assert.ok(child.anyOf?.some(option => option.type === "null"));
+        statuses++;
+      } else if (key === "measurement_class_counts" && child && typeof child === "object") {
+        assert.ok(child.required?.includes("Unknown"));
+        classCounts++;
+      } else visit(child);
+    }
+  }
+  visit(contracts);
+  assert.ok(statuses > 0);
+  assert.ok(classCounts > 0);
+});
