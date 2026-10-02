@@ -25,14 +25,15 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="font-mono text-[11px] text-text-dim">
-          Last updated 2026-07-21
+          Last updated 2026-10-01
         </p>
       </header>
 
       <div className="flex flex-col gap-4 font-sans text-sm leading-relaxed text-text-secondary">
         <p>
-          SigRank collects four token counts: input, output, cache-read, and
-          cache-write. No prompt content, no code, no conversation text.
+          SigRank measures four token counts: input, output, cache-read, and
+          cache-write. The local measurement agent does not collect prompt
+          content, code, or conversation text.
           SigRank (&ldquo;we&rdquo;, operated under MO§ES™ / Ello Cello LLC)
           is built privacy-first. This policy explains what we collect, what
           we never collect, and how your data is used.
@@ -61,6 +62,13 @@ export default function PrivacyPage() {
               — display name, optional handle, bio, location, links, and an
               avatar image.
             </li>
+            <li>
+              <span className="text-text-primary">Support and beta reports</span>
+              {" "}— when you contact us or explicitly send a plugin bug report,
+              we receive the summary, reproduction steps, expected and actual
+              behavior, surface and optional reply email you provide. The plugin
+              does not attach your full chat, local logs, or token telemetry.
+            </li>
           </ul>
         </section>
 
@@ -69,9 +77,10 @@ export default function PrivacyPage() {
             What we never collect
           </h2>
           <p>
-            The content of your prompts or AI conversations. The local agent
-            reads only token counts and lengths — never the words. Transcripts
-            never leave your device, and we have no way to read them.
+            The local measurement agent reads only token counts and lengths —
+            never the words of your prompts or AI conversations. It does not
+            send transcripts. If you choose to include text in a support
+            message, that message is sent to our support inbox.
           </p>
         </section>
 
@@ -119,10 +128,10 @@ export default function PrivacyPage() {
           </h2>
           <p>
             We use Supabase (authentication, database, and avatar storage),
-            Vercel (hosting), your chosen sign-in provider (GitHub, X, or
-            email), and — only if you choose to support the build — Stripe for
-            payments. Stripe handles card data directly; we never see or store
-            it.
+            Vercel (hosting), Resend (support email delivery), your chosen
+            sign-in provider (GitHub, X, or email), and — only if you choose
+            to support the build — Stripe for payments. Stripe handles card
+            data directly; we never see or store it.
           </p>
         </section>
 
