@@ -1378,7 +1378,21 @@ export function LeaderboardTable({
                           ...podiumBox(top3.totalTokens, e.totalTokens),
                         }}
                       >
-                        {fmtBig(e.totalTokens)}
+                        <span style={{ display: "block" }}>{fmtBig(e.totalTokens)}</span>
+                        <span
+                          style={{
+                            display: "block",
+                            marginTop: 2,
+                            color: T.mut,
+                            fontSize: 9,
+                            fontWeight: 500,
+                            lineHeight: 1.15,
+                            whiteSpace: "nowrap",
+                          }}
+                          title="Raw pillars: I=input · O=output · W=cache-write · R=cache-read"
+                        >
+                          I {fmtBig(e.input)} · O {fmtBig(e.output)} · W {fmtBig(e.cacheWrite)} · R {fmtBig(e.cacheRead)}
+                        </span>
                       </td>
                       <td
                         style={{
