@@ -2282,7 +2282,7 @@
     {
       "name": "get_my_profile",
       "title": "Get my SignalAF profile",
-      "description": "Retrieve the signed-in user’s linked SignalAF profile for a requested window using profile:read authorization. Use when the user asks for their existing profile; never infer ownership from a codename. May require account linking. Does not scan local logs or publish measurements.",
+      "description": "Retrieve the signed-in user’s linked SignalAF profile for a requested window using the SignalAF profile OAuth scope. Use when the user asks for their existing profile; never infer ownership from a codename. May require account linking. Does not scan local logs or publish measurements.",
       "inputSchema": {
         "type": "object",
         "properties": {
