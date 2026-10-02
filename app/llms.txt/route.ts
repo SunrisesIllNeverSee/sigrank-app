@@ -165,8 +165,8 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - 3,304 models measured
 - ${homeStats.total_snapshots.toLocaleString()} snapshots scored
 - ${homeStats.transmitter_count} transmitters (high-activity operators)
-- Median Yield: ${medianYield.toFixed(2)}
-- Top Yield: ${topYield.toLocaleString()} (${topOperatorName})
+- Median Yield (all-time yieldable snapshots): ${medianYield.toFixed(2)}
+- Top Yield (latest 30-day snapshots): ${topYield.toLocaleString()} (${topOperatorName})
 - Dataset DOI: 10.5281/zenodo.21900519
 - Install: \`npx sigrank\`
 

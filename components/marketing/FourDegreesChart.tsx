@@ -411,8 +411,10 @@ function Provenance() {
 
 export async function FourDegreesChart({
   variant = "full",
+  averageColumn,
 }: {
   variant?: Variant;
+  averageColumn?: GoldColumn | null;
 }) {
   // Four columns:
   //   aa    = AA 7:2:1 modeled baseline (static, not live)
@@ -422,7 +424,7 @@ export async function FourDegreesChart({
   // The live columns fall back to frozen reference values when the board has no
   // qualifying data.
   const [avgCol, powerCol, goldCol] = await Promise.all([
-    getAverageUsersColumn(),
+    averageColumn === undefined ? getAverageUsersColumn() : averageColumn,
     getPowerUsersColumn(),
     getTopOperatorColumn(),
   ]);

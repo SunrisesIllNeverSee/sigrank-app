@@ -19,6 +19,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { getHomepageStats } from "@/lib/board";
 import { rateLimit, rateLimitHeaders, rateLimitedResponse } from "@/lib/infra/api-gate";
+import { computeCascadeMetrics } from "@/lib/analytics/cascade";
 
 export const revalidate = 3600;
 
@@ -62,7 +63,7 @@ export async function GET(req: NextRequest) {
       const { data: snapData } = await sb
         .from("metric_snapshots")
         .select(
-          "signa_rate, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
+          "input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens",
         )
         .eq("window_type", "all_time")
         .gt("input_tokens", 0)
@@ -76,8 +77,11 @@ export async function GET(req: NextRequest) {
         let totalCacheRead = 0;
 
         for (const row of snapData) {
-          const y = row.signa_rate;
-          if (typeof y === "number" && y > 0) yields.push(y);
+          const y = computeCascadeMetrics({
+            input: row.input_tokens ?? 0, output: row.output_tokens ?? 0,
+            cacheCreate: row.cache_creation_tokens ?? 0, cacheRead: row.cache_read_tokens ?? 0,
+          }).yield_;
+          if (Number.isFinite(y) && y > 0) yields.push(y);
           totalInput += row.input_tokens ?? 0;
           totalOutput += row.output_tokens ?? 0;
           totalCacheCreation += row.cache_creation_tokens ?? 0;
