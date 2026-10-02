@@ -178,6 +178,8 @@ export function applySnapshotRollups(
 
 /** Common query params for board-style reads. */
 export interface BoardParams {
+  /** Plugin reads fail closed instead of substituting demo/cold-store rows. */
+  strictLive?: boolean;
   /** API window enum (e.g. '30d'); maps from WINDOW_API_MAP. */
   window?: string;
   /**

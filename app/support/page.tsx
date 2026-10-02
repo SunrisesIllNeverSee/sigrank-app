@@ -31,6 +31,11 @@ export default function SupportPage() {
             description="Definitions, tests, data, falsifiers, and evidence lineage for every SigRank claim."
           />
           <SupportCard
+            href="/contact"
+            title="Plugin beta bug report"
+            description="Send a short description, steps to reproduce, and expected versus actual behavior to SignalAF support."
+          />
+          <SupportCard
             href="/mcp"
             title="MCP Documentation"
             description="How to connect to the SigRank MCP endpoint, available tools, and protocol details."
