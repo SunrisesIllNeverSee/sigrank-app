@@ -5,7 +5,7 @@
     {
       "name": "get_leaderboard",
       "title": "Get AI Operator Leaderboard",
-      "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators; a platform selection uses the broader By platform / All view. Results are ranked by published Yield and include the board link, scope, available operating ratios, provenance and access cap. Missing values are never estimated.",
+      "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators. Set view=platforms for the broader By platform / All view, including unclaimed public rows; a platform filter also uses that view. Results are ranked by published Yield and include the board link, scope, operating ratios, provenance and access cap. Unclaimed does not prove seeded origin.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -51,6 +51,13 @@
               }
             ],
             "default": null
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "total",
+              "platforms"
+            ]
           }
         },
         "required": [],
@@ -1221,6 +1228,13 @@
               "all"
             ],
             "default": "30d"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "total",
+              "platforms"
+            ]
           }
         },
         "required": [
@@ -2300,6 +2314,13 @@
               "all"
             ],
             "default": "30d"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "total",
+              "platforms"
+            ]
           }
         },
         "required": [],
@@ -3468,6 +3489,13 @@
               "reconstructed4"
             ],
             "default": "public"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "total",
+              "platforms"
+            ]
           }
         },
         "required": [
@@ -4645,7 +4673,7 @@
     {
       "name": "get_field_stats",
       "title": "Get field statistics",
-      "description": "Retrieve complete-cohort SignalAF metric distributions and archetype/evidence counts for a window and platform. Use for field context, not a top-page sample or individual measurement. Returns cohort definition and provenance; unavailable evidence is explicit. Does not change data.",
+      "description": "Get distributions and field size for the public SignalAF board. Defaults to the broader By platform / All population, including unclaimed rows; set view=total for the claimed-operator Total / All field. Returns available metric distributions and provenance. No unsupported evidence-class cohort or seed label is inferred.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4672,6 +4700,13 @@
               "reconstructed4"
             ],
             "default": "public"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "total",
+              "platforms"
+            ]
           }
         },
         "required": [],
