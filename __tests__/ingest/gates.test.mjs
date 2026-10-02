@@ -165,6 +165,21 @@ test("active minutes exceed the window span → flag active_exceeds_window", () 
   assert.ok(codes(r).includes("active_exceeds_window"));
 });
 
+test("extremely low input share alone is not a plausibility flag", () => {
+  const r = plausibilityGate(
+    cleanPayload({
+      raw_telemetry: {
+        tokens_input_fresh: 100,
+        tokens_output: 20_000,
+        tokens_cache_read: 350_000,
+        tokens_cache_creation: 10_000,
+        active_minutes_est: 10,
+      },
+    }),
+  );
+  assert.equal(codes(r).includes("implausible_input_share"), false);
+});
+
 // S1.2 cross-field ratio checks
 
 test("cache_read > 1000 with cache_creation = 0 → flag cache_without_creation", () => {

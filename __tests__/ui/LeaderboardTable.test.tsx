@@ -30,6 +30,11 @@ const mockEntries: LeaderboardEntry[] = [
     snr: 0.45,
     dev10x: 3.1,
     velocity: 2.1,
+    totalTokens: 1_000,
+    input: 100,
+    output: 200,
+    cacheWrite: 300,
+    cacheRead: 400,
     acctAge: "30d",
     lastSeen: "2026-07-04",
   },
@@ -46,6 +51,13 @@ describe("LeaderboardTable", () => {
     // Codename appears in the table — use getAllByText since it may render in multiple places
     const matches = screen.getAllByText("TestOperator");
     expect(matches.length).toBeGreaterThan(0);
+  });
+
+  it("shows raw I/O/W/R pillars in the default metrics view", () => {
+    render(<LeaderboardTable entries={mockEntries} />);
+    expect(
+      screen.getByText("I 100 · O 200 · W 300 · R 400"),
+    ).toBeInTheDocument();
   });
 
   it("renders seed operators with italic styling", () => {
