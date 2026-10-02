@@ -25,7 +25,7 @@ export default function PluginPage() {
           Explore the live 7-day, 30-day, 90-day and all-time boards, read public operator profiles,
           compare operating structures, and understand field statistics. The plugin helps explain
           relationships among fresh input, generated output, context construction and reuse.
-          A linked SignalAF account can request its own existing profile.
+          In Codex, an existing local SigRank identity can locate its public profile by codename.
         </p>
         <p>
           Tokenpull measures → SigRank evaluates → SignalAF publishes. The plugin interprets those

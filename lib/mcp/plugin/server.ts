@@ -20,9 +20,6 @@ export function createPluginServer(request: Request): McpServer {
         content: [{ type: "text", text: JSON.stringify(result) }],
         structuredContent: result,
         ...(result.status === "error" ? { isError: true } : {}),
-        ...(result.status === "error" && result.error?.code === "AUTH_REQUIRED"
-          ? { _meta: { "mcp/www_authenticate": ['Bearer resource_metadata="https://signalaf.com/.well-known/oauth-protected-resource", scope="profile", error="invalid_token", error_description="Connect your SignalAF account to continue"'] } }
-          : {}),
       };
     });
   }
