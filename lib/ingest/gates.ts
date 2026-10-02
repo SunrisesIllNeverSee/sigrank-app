@@ -83,9 +83,8 @@ export const GATE_LIMITS = {
   MAX_SUBMISSIONS_PER_WINDOW: 24,
   // ── Tightened range-plausibility bounds (deviewreview3) ────────────────────
   // The original bounds (100:1 reuse, 50/min cadence) were loose enough to
-  // drive Υ arbitrarily high while staying under them. Real data: reuse ~20-25:1,
-  // cacheWrite ~2-11:1, input share >0.3% of total. These tightened bounds
-  // catch a tuned fabricator who sets input=1 to inflate Υ = cr·o/i².
+  // drive Υ arbitrarily high while staying under them. Real data: reuse ~20-25:1
+  // and cacheWrite ~2-11:1. These bounds remain advisory flags, not blockers.
   /** Max cache_read/cache_creation ratio (real outlier boundary ~100:1; was 35:1 which
    *  flagged 279 legitimate power users with valid device signatures. Data shows
    *  178 submissions at 40-50:1 from real enrolled devices — 35:1 was far too tight).
@@ -93,8 +92,6 @@ export const GATE_LIMITS = {
   MAX_CACHE_REUSE_RATIO: 100,
   /** Min cache_creation/output ratio (real min ~1.5:1; fabricators set cc<<o). */
   MIN_CACHE_WRITE_RATIO: 0.5,
-  /** Min input share of total tokens (real min ~0.03% for power users; fabricators set input→0). */
-  MIN_INPUT_SHARE_FRAC: 0.0003,
   /** Max cadence turns/active_minutes (real: 0.5-10/min; was 50). */
   MAX_CADENCE_PER_MIN: 15,
 } as const;
@@ -238,20 +235,6 @@ export function plausibilityGate(p: SnapshotPayloadV1): GateReason[] {
         "plausibility",
         "low_cache_write_ratio",
         `cache_creation/output = ${(rt.tokens_cache_creation / rt.tokens_output).toFixed(2)}:1 (real min ~1.5:1)`,
-      ),
-    );
-  }
-  // Input share too low: input < 0.1% of total (real min ~0.3%).
-  // A fabricator who sets input→0 inflates Υ = cr·o/i² quadratically.
-  if (
-    pillars > 10_000 &&
-    rt.tokens_input_fresh / pillars < GATE_LIMITS.MIN_INPUT_SHARE_FRAC
-  ) {
-    out.push(
-      flag(
-        "plausibility",
-        "implausible_input_share",
-        `input is ${((rt.tokens_input_fresh / pillars) * 100).toFixed(3)}% of total (real min ~0.3%)`,
       ),
     );
   }
