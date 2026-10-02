@@ -12,8 +12,20 @@ const MCP_ROOT = path.resolve(
 );
 const HANDLER = path.join(MCP_ROOT, "tools/standard-record.mjs");
 
+function legacyProjection(record) {
+  assert.equal(record.spec_status, "legacy_alias");
+  assert.deepEqual(record.protocol, {
+    name: "TTEOP",
+    version: "tteop/0.1-draft",
+    authority: "tteop-spec@0.1.5-draft",
+  });
+
+  const { spec_status: _specStatus, protocol: _protocol, ...legacy } = record;
+  return legacy;
+}
+
 test(
-  "sigrank-mcp generated records validate against the public Standard schema",
+  "sigrank-mcp exposes TTEOP authority metadata and preserves the legacy Standard projection",
   { skip: !existsSync(HANDLER) && "sigrank-mcp checkout not available" },
   async () => {
     const schema = JSON.parse(
@@ -37,7 +49,8 @@ test(
       cache_read: 2_555_179_769,
       timestamp: "2026-08-27T00:00:00.000Z",
     });
-    assert.equal(validate(complete), true, JSON.stringify(validate.errors));
+    const completeLegacy = legacyProjection(complete);
+    assert.equal(validate(completeLegacy), true, JSON.stringify(validate.errors));
 
     const partial = await handleGetSigRankStandardRecord({
       input: 100,
@@ -46,9 +59,10 @@ test(
       cache_read: null,
       timestamp: "2026-08-27T00:00:00.000Z",
     });
-    assert.equal(validate(partial), true, JSON.stringify(validate.errors));
+    const partialLegacy = legacyProjection(partial);
+    assert.equal(validate(partialLegacy), true, JSON.stringify(validate.errors));
 
-    const withoutMetrics = { ...complete };
+    const withoutMetrics = { ...completeLegacy };
     delete withoutMetrics.metrics;
     assert.equal(validate(withoutMetrics), false);
   },
