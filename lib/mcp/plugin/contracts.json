@@ -5,7 +5,7 @@
     {
       "name": "get_leaderboard",
       "title": "Get AI Operator Leaderboard",
-      "description": "Read the current claimed-operator SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view, ranked by published Yield. A platform selection uses the By platform / All view. Returns the board link, scope, full operating ratios, provenance and access cap; never estimates missing values.",
+      "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators; a platform selection uses the broader By platform / All view. Results are ranked by published Yield and include the board link, scope, available operating ratios, provenance and access cap. Missing values are never estimated.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -253,6 +253,13 @@
               },
               "category": {
                 "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
               }
             },
             "required": [
@@ -260,7 +267,8 @@
               "platform",
               "cohort",
               "view",
-              "category"
+              "category",
+              "population"
             ],
             "additionalProperties": false
           },
@@ -706,6 +714,18 @@
               },
               "provenance": {
                 "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -718,7 +738,8 @@
               "percentile",
               "pillars",
               "metrics",
-              "provenance"
+              "provenance",
+              "operating_ratio"
             ],
             "additionalProperties": false
           },
@@ -1355,6 +1376,13 @@
               },
               "category": {
                 "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
               }
             },
             "required": [
@@ -1362,7 +1390,8 @@
               "platform",
               "cohort",
               "view",
-              "category"
+              "category",
+              "population"
             ],
             "additionalProperties": false
           },
@@ -1808,6 +1837,18 @@
               },
               "provenance": {
                 "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -1820,7 +1861,8 @@
               "percentile",
               "pillars",
               "metrics",
-              "provenance"
+              "provenance",
+              "operating_ratio"
             ],
             "additionalProperties": false
           },
@@ -2444,6 +2486,13 @@
               },
               "category": {
                 "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
               }
             },
             "required": [
@@ -2451,7 +2500,8 @@
               "platform",
               "cohort",
               "view",
-              "category"
+              "category",
+              "population"
             ],
             "additionalProperties": false
           },
@@ -2897,6 +2947,18 @@
               },
               "provenance": {
                 "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -2909,7 +2971,8 @@
               "percentile",
               "pillars",
               "metrics",
-              "provenance"
+              "provenance",
+              "operating_ratio"
             ],
             "additionalProperties": false
           },
@@ -3616,6 +3679,13 @@
               },
               "category": {
                 "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
               }
             },
             "required": [
@@ -3623,7 +3693,8 @@
               "platform",
               "cohort",
               "view",
-              "category"
+              "category",
+              "population"
             ],
             "additionalProperties": false
           },
@@ -4069,6 +4140,18 @@
               },
               "provenance": {
                 "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -4081,7 +4164,8 @@
               "percentile",
               "pillars",
               "metrics",
-              "provenance"
+              "provenance",
+              "operating_ratio"
             ],
             "additionalProperties": false
           },
@@ -4855,6 +4939,13 @@
               },
               "category": {
                 "const": "all"
+              },
+              "population": {
+                "type": "string",
+                "enum": [
+                  "claimed_operators",
+                  "public_operators"
+                ]
               }
             },
             "required": [
@@ -4862,7 +4953,8 @@
               "platform",
               "cohort",
               "view",
-              "category"
+              "category",
+              "population"
             ],
             "additionalProperties": false
           },
@@ -5308,6 +5400,18 @@
               },
               "provenance": {
                 "$ref": "#/$defs/record_provenance"
+              },
+              "operating_ratio": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -5320,7 +5424,8 @@
               "percentile",
               "pillars",
               "metrics",
-              "provenance"
+              "provenance",
+              "operating_ratio"
             ],
             "additionalProperties": false
           },

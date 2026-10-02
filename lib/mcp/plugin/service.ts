@@ -9,7 +9,7 @@ import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { formatBetaReport, prepareBetaReport } from "./bug-report";
 
-type Scope = { window: "7d" | "30d" | "90d" | "all"; platform: string; cohort: "public" | "exact4" | "reconstructed4"; view: "total" | "platforms"; category: "all" };
+type Scope = { window: "7d" | "30d" | "90d" | "all"; platform: string; cohort: "public" | "exact4" | "reconstructed4"; view: "total" | "platforms"; category: "all"; population: "claimed_operators" | "public_operators" };
 type Args = Record<string, unknown>;
 
 const WINDOWS = new Set(["7d", "30d", "90d", "all"]);
@@ -28,7 +28,7 @@ function scopeOf(args: Args): Scope {
   if (typeof platform !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(platform)) throw new ToolError("INVALID_ARGUMENT", "Invalid platform.");
   if (platform !== "all" && !["claude", "codex", "chatgpt", "gemini", "pi", "multi"].includes(platform)) throw new ToolError("UNSUPPORTED_SCOPE", "Platform is not supported.");
   if (cohort !== "public") throw new ToolError("UNSUPPORTED_SCOPE", "Evidence-class cohorts require stored provenance; existing board rows cannot support them yet.");
-  return { window: window as Scope["window"], platform, cohort: "public", view: platform === "all" ? "total" : "platforms", category: "all" };
+  return { window: window as Scope["window"], platform, cohort: "public", view: platform === "all" ? "total" : "platforms", category: "all", population: platform === "all" ? "claimed_operators" : "public_operators" };
 }
 
 function provenance(scope: Scope, observed: string | null, ruleset: string | null, url = SOURCE) {
@@ -73,6 +73,7 @@ function operatorDto(row: LeaderboardRow, scope: Scope) {
       snr: safeNumber(c?.snr), construction: safeNumber(c?.construction),
       dev10x: safeNumber(c?.dev10x), scale_v: safeNumber(c?.scaleV),
     },
+    operating_ratio: row.pending ? null : c?.opRatio ?? null,
     provenance: p,
   };
 }
@@ -97,8 +98,8 @@ async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
   let rows: LeaderboardRow[];
   try {
     rows = await getLeaderboard({ strictLive: true, window: scope.window === "all" ? "all_time" : scope.window,
-      windowFilter: scope.window !== "all", platform: scope.platform === "all" ? null : scope.platform,
-      perPlatform: scope.platform !== "all", operatorTotal: scope.platform === "all", claimedOnly: true, sort: "yield_" });
+      windowFilter: scope.window !== "all" || scope.platform !== "all", platform: scope.platform === "all" ? null : scope.platform,
+      perPlatform: scope.platform !== "all", operatorTotal: scope.platform === "all", claimedOnly: scope.platform === "all", sort: "yield_" });
   } catch {
     throw new ToolError("UPSTREAM_UNAVAILABLE", "Live leaderboard read failed.", true);
   }
