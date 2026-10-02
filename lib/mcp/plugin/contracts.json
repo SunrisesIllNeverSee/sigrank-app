@@ -1020,12 +1020,19 @@
                 ]
               },
               "measurement_class": {
-                "type": "string",
-                "enum": [
-                  "Exact-4",
-                  "Reconstructed-4",
-                  "Partial",
-                  "Unverified"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "verification_status": {
@@ -2157,12 +2164,19 @@
                 ]
               },
               "measurement_class": {
-                "type": "string",
-                "enum": [
-                  "Exact-4",
-                  "Reconstructed-4",
-                  "Partial",
-                  "Unverified"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "verification_status": {
@@ -3320,12 +3334,19 @@
                 ]
               },
               "measurement_class": {
-                "type": "string",
-                "enum": [
-                  "Exact-4",
-                  "Reconstructed-4",
-                  "Partial",
-                  "Unverified"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "verification_status": {
@@ -4589,12 +4610,19 @@
                 ]
               },
               "measurement_class": {
-                "type": "string",
-                "enum": [
-                  "Exact-4",
-                  "Reconstructed-4",
-                  "Partial",
-                  "Unverified"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Exact-4",
+                      "Reconstructed-4",
+                      "Partial",
+                      "Unverified"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "verification_status": {
