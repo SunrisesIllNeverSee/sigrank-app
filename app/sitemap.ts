@@ -40,6 +40,7 @@ const STATIC_ROUTES: {
   { path: "/research", priority: 0.8, changeFrequency: "monthly" },
   { path: "/compare", priority: 0.7, changeFrequency: "weekly" },
   { path: "/mcp", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/plugin", priority: 0.7, changeFrequency: "weekly" },
   { path: "/wiki", priority: 0.7, changeFrequency: "weekly" },
   { path: "/wiki/local-agent", priority: 0.6, changeFrequency: "monthly" },
   {
