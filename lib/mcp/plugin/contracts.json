@@ -1142,6 +1142,10 @@
                     },
                     "sort_metric": {
                       "const": "yield"
+                    },
+                    "board_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -1151,7 +1155,8 @@
                     "total_eligible",
                     "gated",
                     "next_cursor",
-                    "sort_metric"
+                    "sort_metric",
+                    "board_url"
                   ],
                   "additionalProperties": false
                 },
