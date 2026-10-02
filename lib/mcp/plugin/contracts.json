@@ -5,7 +5,7 @@
     {
       "name": "get_leaderboard",
       "title": "Get AI Operator Leaderboard",
-      "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators. Set view=platforms for the broader By platform / All view, including unclaimed public rows; a platform filter also uses that view. Results are ranked by published Yield and include the board link, scope, operating ratios, provenance and access cap. Unclaimed does not prove seeded origin.",
+      "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators. Set view=platforms for the broader By platform / All view, including unclaimed public rows; a platform filter also uses that view. Results are ranked by published Yield and include the board link, scope, operating ratios, provenance and access cap. Ranking eligibility means inclusion on this displayed board; it does not mean the underlying measurement is verified. Unclaimed does not prove seeded origin.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -585,6 +585,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -1038,6 +1039,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -1720,6 +1722,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -2173,6 +2176,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -2881,6 +2885,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -3334,6 +3339,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -4148,6 +4154,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {
@@ -4601,6 +4608,7 @@
                 ]
               },
               "ranking_eligible": {
+                "description": "On an operator row, eligible for the published board ranking in this scope; independent of measurement verification. False on the aggregate envelope because it is not an operator.",
                 "type": "boolean"
               },
               "coverage": {

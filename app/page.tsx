@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { IpBoundary } from "@/components/marketing/IpBoundary";
 import { PricingCards } from "@/components/marketing/PricingCards";
 import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
+import { getAverageUsersColumn } from "@/lib/marketing/top-operator-column";
 import { Draft2Hero } from "@/components/draft/Draft2Hero";
 import { Draft2LiveActivity } from "@/components/draft/Draft2LiveActivity";
 import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
@@ -50,9 +51,9 @@ export const metadata: Metadata = withOG({
  * now (functional; rename is a later cleanup).
  */
 export default async function HomePage() {
-  const homeStats = await getHomepageStats();
+  const [homeStats, averageColumn] = await Promise.all([getHomepageStats(), getAverageUsersColumn()]);
   const operatorCount = homeStats.total_operators;
-  const medianYield = homeStats.median_yield;
+  const medianYield = averageColumn ? Number(averageColumn.yield_) : null;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">
@@ -71,7 +72,7 @@ export default async function HomePage() {
           transmitterCount: homeStats.transmitter_count,
           topOperator: homeStats.top_operator_codename,
           topYield: homeStats.top_yield,
-          medianYield,
+          medianYield: medianYield ?? undefined,
           platformCount: 17,
           modelCount: 3304,
         })}
@@ -268,9 +269,9 @@ export default async function HomePage() {
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
-            {medianYield.toFixed(2)}
+            {medianYield === null ? "—" : medianYield.toFixed(2)}
           </span>
-          <span className="font-sans text-xs text-text-dim">median Yield (Υ)</span>
+          <span className="font-sans text-xs text-text-dim">all-time real-operator median Yield (Υ)</span>
         </div>
       </section>
       <p className="-mt-4 font-mono text-xs text-text-dim">
@@ -312,8 +313,8 @@ export default async function HomePage() {
           The dataset spans {operatorCount.toLocaleString()} operators
           across 17 platforms and 3,304 models, with{" "}
           {formatTokens(homeStats.total_tokens_scored)} tokens analyzed. The
-          median Yield is {medianYield.toFixed(2)}, and the top operator
-          achieves a Yield of {homeStats.top_yield.toLocaleString()}. The
+          all-time real-operator median Yield is {medianYield === null ? "unavailable" : medianYield.toFixed(2)}, and the top operator
+          achieves a 30-day Yield of {homeStats.top_yield.toLocaleString()}. The
           full methodology, metric definitions, and evidence boundary are
           documented at{" "}
           <Link href="/methodology" className="text-gold underline underline-offset-2">
@@ -339,7 +340,7 @@ export default async function HomePage() {
           (owner 2026-07-02: moved above the live board so the comparison table leads,
           with the explanation underneath). Sources/footnotes + a link to the full wiki
           description live inside the section. */}
-      <FourDegreesChart variant="embed" />
+      <FourDegreesChart variant="embed" averageColumn={averageColumn} />
 
       {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
           the 4 MiniBoards were archived; "Real operators. Real cascades." moved into it).
