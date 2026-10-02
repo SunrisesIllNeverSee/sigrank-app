@@ -50,10 +50,10 @@ test("rejects HTTP", () => {
   assert.equal(validateDeploymentUrl("http://my-project.vercel.app/"), null);
 });
 
-test("rejects bare hostname that starts with 'http' but is not a URL", () => {
-  // 'httpfoo.vercel.app' starts with 'http' → treated as URL → HTTPS forced fails
-  // Actually: starts with 'http' so it's used as-is, new URL('httpfoo.vercel.app') throws
-  assert.equal(validateDeploymentUrl("httpfoo.vercel.app"), null);
+test("accepts a bare hostname that starts with 'http'", () => {
+  const url = validateDeploymentUrl("httpfoo.vercel.app");
+  assert.ok(url);
+  assert.equal(url.href, "https://httpfoo.vercel.app/");
 });
 
 // ─── Rejected: host ───────────────────────────────────────────────────────────
@@ -124,4 +124,5 @@ test("rejects unparseable strings", () => {
   assert.equal(validateDeploymentUrl("not a url at all"), null);
   assert.equal(validateDeploymentUrl("://no-scheme"), null);
   assert.equal(validateDeploymentUrl("https://"), null);
+  assert.equal(validateDeploymentUrl("https//my-project.vercel.app"), null);
 });
