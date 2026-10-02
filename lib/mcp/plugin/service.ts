@@ -5,7 +5,7 @@ import { Resend } from "resend";
 import { getLeaderboard, type LeaderboardRow } from "@/lib/board";
 import { getOperator } from "@/lib/board/queries";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseServer, getSupabaseService } from "@/lib/infra/supabase/server";
 import { formatBetaReport, prepareBetaReport } from "./bug-report";
 
 type Scope = { window: "7d" | "30d" | "90d" | "all"; platform: string; cohort: "public" | "exact4" | "reconstructed4"; view: "total" | "platforms"; category: "all"; population: "claimed_operators" | "public_operators" };
@@ -41,7 +41,7 @@ function provenance(scope: Scope, observed: string | null, ruleset: string | nul
     adapter_version: null, taxonomy_version: null,
     window: { label: scope.window, start: null, end: null },
     platforms: scope.platform === "all" ? [] : [scope.platform], models: [],
-    data_origin: "unknown", measurement_class: "Unverified", verification_status: "unverified",
+    data_origin: "unknown", measurement_class: null as "Unverified" | null, verification_status: "unverified",
     ranking_eligible: false, coverage: "unknown", reconstruction_method: null,
     unknown_fields: ["dataset_version", "methodology_version", "adapter_version", "taxonomy_version", "actual_window_bounds", "measurement_class"],
   };
@@ -51,13 +51,22 @@ function safeNumber(value: number | null | undefined): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
-function operatorDto(row: LeaderboardRow, scope: Scope) {
+function operatorDto(row: LeaderboardRow, scope: Scope, verified = false) {
   const c = row.snapshot.cascade;
   const p = provenance(scope, row.snapshot_date ?? row.snapshot.snapshot_date ?? null,
     row.snapshot.ruleset_version || null,
     `https://signalaf.com/user/${encodeURIComponent(row.operator.codename)}`);
   p.ranking_eligible = !row.pending && row.global_rank > 0;
   p.platforms = [row.platform || row.operator.primary_domain].filter(Boolean);
+  if (verified) {
+    p.data_origin = "live_submission";
+    p.verification_status = "server_verified";
+    p.coverage = "complete";
+    // The upload protocol records four counters, but not whether each counter
+    // was exact or reconstructed. Keep the measurement class unknown.
+  } else if (!row.pending) {
+    p.measurement_class = "Unverified";
+  }
   const pillars = row.pending ? { input: null, output: null, cache_write: null, cache_read: null } : {
     input: safeNumber(row.telemetry.fresh_input), output: safeNumber(row.telemetry.output),
     cache_write: safeNumber(row.telemetry.cache_create), cache_read: safeNumber(row.telemetry.cache_read),
@@ -81,8 +90,13 @@ function operatorDto(row: LeaderboardRow, scope: Scope) {
   };
 }
 
-function envelope(data: unknown, scope: Scope, warnings: Array<{code: string; message: string}> = []) {
-  return { contract_version: "1.0.0", status: "ok", data, provenance: provenance(scope, null, null), warnings, error: null };
+function envelope(data: unknown, scope: Scope, warnings: Array<{code: string; message: string}> = [], allVerified = false) {
+  const p = provenance(scope, null, null);
+  if (allVerified) {
+    p.verification_status = "server_verified";
+    p.data_origin = "live_submission";
+  }
+  return { contract_version: "1.0.0", status: "ok", data, provenance: p, warnings, error: null };
 }
 
 function requireCodename(value: unknown): string {
@@ -107,6 +121,48 @@ async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
     throw new ToolError("UPSTREAM_UNAVAILABLE", "Live leaderboard read failed.", true);
   }
   return rows.filter(r => !r.operator.isPlaceholder && r.operator.status !== "retired" && !r.pending && r.global_rank > 0);
+}
+
+function evidenceKey(operatorId: string, window: string, platform: string, date: string, input: number, output: number, write: number, read: number) {
+  return JSON.stringify([operatorId, window, platform, date, input, output, write, read]);
+}
+
+function rowEvidenceKey(row: LeaderboardRow) {
+  return evidenceKey(row.operator.operator_id, row.window_type ?? "all_time", row.platform ?? row.operator.primary_domain, row.snapshot_date ?? "",
+    row.telemetry.fresh_input, row.telemetry.output, row.telemetry.cache_create, row.telemetry.cache_read);
+}
+
+/** Match published snapshots to scored, signed uploads without exposing upload payloads. */
+async function verifiedUploadKeys(rows: LeaderboardRow[]): Promise<Set<string>> {
+  if (!rows.length) return new Set();
+  const db = getSupabaseService();
+  if (!db) throw new ToolError("UPSTREAM_UNAVAILABLE", "Measurement verification is unavailable.", true);
+  const wanted = new Set(rows.map(rowEvidenceKey));
+  const verified = new Set<string>();
+  const ids = [...new Set(rows.map(row => row.operator.operator_id))];
+  const windows = [...new Set(rows.map(row => row.window_type ?? "all_time"))];
+  for (let offset = 0; offset < ids.length; offset += 100) {
+    const batch = ids.slice(offset, offset + 100);
+    for (let start = 0; ; start += 1000) {
+      const { data, error } = await db.from("snapshot_submissions")
+        .select("operator_id,window_type,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens,payload_json")
+        .in("operator_id", batch).in("window_type", windows)
+        .eq("status", "scored").eq("verification_tier", "verified")
+        .order("submitted_at", { ascending: false }).range(start, start + 999);
+      if (error || !data) throw new ToolError("UPSTREAM_UNAVAILABLE", "Measurement verification read failed.", true);
+      for (const submission of data) {
+        const payload = submission.payload_json as { platform?: { primary?: unknown }; window?: { end?: unknown } } | null;
+        const platform = payload?.platform?.primary;
+        const end = payload?.window?.end;
+        if (typeof platform !== "string" || typeof end !== "string" || !Number.isFinite(Date.parse(end))) continue;
+        const key = evidenceKey(submission.operator_id, submission.window_type, platform, new Date(end).toISOString().slice(0, 10),
+          submission.input_tokens, submission.output_tokens, submission.cache_creation_tokens, submission.cache_read_tokens);
+        if (wanted.has(key)) verified.add(key);
+      }
+      if (data.length < 1000 || [...wanted].every(key => verified.has(key))) break;
+    }
+  }
+  return verified;
 }
 
 function percentile(values: number[], p: number): number | null {
@@ -158,11 +214,13 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       const limit = args.limit ?? 25;
       if (!Number.isInteger(limit) || Number(limit) < 1 || Number(limit) > 100) throw new ToolError("INVALID_ARGUMENT", "limit must be 1–100.");
       const rows = await liveBoard(scope);
-      const entries = rows.slice(0, Number(limit)).map(r => operatorDto(r, scope));
+      const displayed = rows.slice(0, Number(limit));
+      const verified = await verifiedUploadKeys(displayed);
+      const entries = displayed.map(r => operatorDto(r, scope, verified.has(rowEvidenceKey(r))));
       return envelope({ entries, scope, board_url: `https://signalaf.com/board/${scope.window}`,
         returned_count: entries.length, total_eligible: rows.length,
         gated: rows.length > Number(limit), next_cursor: null, sort_metric: "yield" }, scope,
-        [{code:"UNVERIFIED_LEGACY",message:"Published board eligibility does not establish measurement verification. Existing rows lack a stored measurement class and complete provenance."}]);
+        [{code:"MEASUREMENT_CLASS_UNKNOWN",message:"Signed uploads are checked against the published rows. The upload schema does not record whether each token counter was exact or reconstructed."}], displayed.length > 0 && displayed.every(r => verified.has(rowEvidenceKey(r))));
     }
     if (name === "get_operator") {
       const codename = requireCodename(args.codename);
@@ -173,8 +231,9 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       const rows = await liveBoard(scope);
       const selected = rows.find(r => r.operator.codename.toLowerCase() === codename.toLowerCase());
       const row = selected ?? { ...op, pending: true };
-      return envelope({ profile_status: selected ? "measured" : "no_measurement", operator: operatorDto(row, scope) }, scope,
-        selected ? [] : [{code:"NO_WINDOW_MEASUREMENT",message:"No public measurement exists for the requested window."}]);
+      const verified = selected ? await verifiedUploadKeys([selected]) : new Set<string>();
+      return envelope({ profile_status: selected ? "measured" : "no_measurement", operator: operatorDto(row, scope, selected ? verified.has(rowEvidenceKey(selected)) : false) }, scope,
+        selected ? [] : [{code:"NO_WINDOW_MEASUREMENT",message:"No public measurement exists for the requested window."}], Boolean(selected && verified.has(rowEvidenceKey(selected))));
     }
     if (name === "compare_operators") {
       const a = requireCodename(args.codename_a), b = requireCodename(args.codename_b);
@@ -182,21 +241,23 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       const ar = rows.find(r => r.operator.codename.toLowerCase() === a.toLowerCase());
       const br = rows.find(r => r.operator.codename.toLowerCase() === b.toLowerCase());
       if (!ar || !br) throw new ToolError("NOT_FOUND", "One or both operators are unavailable in this scope.");
+      const verified = await verifiedUploadKeys([ar, br]);
       // Legacy snapshots lack actual bounds and dataset version. Display both but
       // suppress arithmetic deltas until those comparison prerequisites exist.
-      return envelope({ operator_a: operatorDto(ar, scope), operator_b: operatorDto(br, scope),
+      return envelope({ operator_a: operatorDto(ar, scope, verified.has(rowEvidenceKey(ar))), operator_b: operatorDto(br, scope, verified.has(rowEvidenceKey(br))),
         comparable: false, reasons: ["Actual window bounds and dataset version are not stored for these rows."],
-        scope, delta_a_minus_b: null }, scope);
+        scope, delta_a_minus_b: null }, scope, [], [ar, br].every(r => verified.has(rowEvidenceKey(r))));
     }
     if (name === "get_field_stats") {
       const rows = await liveBoard(scope);
-      const entries = rows.map(r => operatorDto(r, scope));
+      const verified = await verifiedUploadKeys(rows);
+      const entries = rows.map(r => operatorDto(r, scope, verified.has(rowEvidenceKey(r))));
       const distributions = Object.fromEntries(METRICS.map(m => [m, distribution(entries.map(e => e.metrics[m]))]));
       return envelope({ scope, population_size: rows.length, included_count: rows.length,
         excluded_count: 0, coverage_complete: true,
-        cohort_definition: `${scope.view === "total" ? "Claimed" : "Public including unclaimed"}, non-retired operators with one selected snapshot in the requested window; legacy evidence class unverified. Unclaimed does not prove a historical seed.`,
+        cohort_definition: `${scope.view === "total" ? "Claimed" : "Public including unclaimed"}, non-retired operators with one selected snapshot in the requested window. Verified uploads are identified by matching scored signed submissions; measurement classes remain unclassified because source exactness was not captured. Unclaimed does not prove a historical seed.`,
         distributions, archetype_counts: [],
-        measurement_class_counts: { "Exact-4": 0, "Reconstructed-4": 0, "Partial": 0, "Unverified": rows.length } }, scope);
+        measurement_class_counts: { "Exact-4": 0, "Reconstructed-4": 0, "Partial": 0, "Unverified": rows.filter(r => !verified.has(rowEvidenceKey(r))).length } }, scope, [], rows.length > 0 && rows.every(r => verified.has(rowEvidenceKey(r))));
     }
     throw new ToolError("INVALID_ARGUMENT", "Unknown tool.");
   } catch (error) {
