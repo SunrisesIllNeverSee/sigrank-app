@@ -20,15 +20,18 @@ class ToolError extends Error {
   constructor(public code: string, message: string, public retryable = false) { super(message); }
 }
 
-function scopeOf(args: Args): Scope {
+function scopeOf(args: Args, defaultView: Scope["view"] = "total"): Scope {
   const window = args.window ?? "30d";
   const platform = args.platform ?? "all";
   const cohort = args.cohort ?? "public";
+  const view = args.view ?? (platform === "all" ? defaultView : "platforms");
   if (typeof window !== "string" || !WINDOWS.has(window)) throw new ToolError("INVALID_ARGUMENT", "Unsupported window.");
   if (typeof platform !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(platform)) throw new ToolError("INVALID_ARGUMENT", "Invalid platform.");
   if (platform !== "all" && !["claude", "codex", "chatgpt", "gemini", "pi", "multi"].includes(platform)) throw new ToolError("UNSUPPORTED_SCOPE", "Platform is not supported.");
+  if (view !== "total" && view !== "platforms") throw new ToolError("INVALID_ARGUMENT", "view must be total or platforms.");
+  if (view === "total" && platform !== "all") throw new ToolError("UNSUPPORTED_SCOPE", "A platform filter requires the platforms view.");
   if (cohort !== "public") throw new ToolError("UNSUPPORTED_SCOPE", "Evidence-class cohorts require stored provenance; existing board rows cannot support them yet.");
-  return { window: window as Scope["window"], platform, cohort: "public", view: platform === "all" ? "total" : "platforms", category: "all", population: platform === "all" ? "claimed_operators" : "public_operators" };
+  return { window: window as Scope["window"], platform, cohort: "public", view, category: "all", population: view === "total" ? "claimed_operators" : "public_operators" };
 }
 
 function provenance(scope: Scope, observed: string | null, ruleset: string | null, url = SOURCE) {
@@ -98,8 +101,8 @@ async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
   let rows: LeaderboardRow[];
   try {
     rows = await getLeaderboard({ strictLive: true, window: scope.window === "all" ? "all_time" : scope.window,
-      windowFilter: scope.window !== "all" || scope.platform !== "all", platform: scope.platform === "all" ? null : scope.platform,
-      perPlatform: scope.platform !== "all", operatorTotal: scope.platform === "all", claimedOnly: scope.platform === "all", sort: "yield_" });
+      windowFilter: scope.window !== "all" || scope.view === "platforms", platform: scope.platform === "all" ? null : scope.platform,
+      perPlatform: scope.platform !== "all", operatorTotal: scope.view === "total", claimedOnly: scope.view === "total", sort: "yield_" });
   } catch {
     throw new ToolError("UPSTREAM_UNAVAILABLE", "Live leaderboard read failed.", true);
   }
@@ -166,7 +169,7 @@ export async function callPluginTool(name: string, args: Args, request: Request)
         reference, sent_at: sentAt, destination: "hello@signalaf.com", sensitive_text_redacted: report.redacted,
       }, provenance: null, warnings: [], error: null };
     }
-    const scope = scopeOf(args);
+    const scope = scopeOf(args, name === "get_field_stats" ? "platforms" : "total");
     if (name === "get_leaderboard") {
       if (args.cursor !== undefined && args.cursor !== null) throw new ToolError("INVALID_CURSOR", "Cursor pagination is not available in this release.");
       const limit = args.limit ?? 25;
@@ -209,7 +212,7 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       const distributions = Object.fromEntries(METRICS.map(m => [m, distribution(entries.map(e => e.metrics[m]))]));
       return envelope({ scope, population_size: rows.length, included_count: rows.length,
         excluded_count: 0, coverage_complete: true,
-        cohort_definition: "Visible, non-retired operators with one selected snapshot in the requested window; legacy evidence class unverified.",
+        cohort_definition: `${scope.view === "total" ? "Claimed" : "Public including unclaimed"}, non-retired operators with one selected snapshot in the requested window; legacy evidence class unverified. Unclaimed does not prove a historical seed.`,
         distributions, archetype_counts: [],
         measurement_class_counts: { "Exact-4": 0, "Reconstructed-4": 0, "Partial": 0, "Unverified": rows.length } }, scope);
     }
