@@ -112,6 +112,25 @@ second active standard.
   rounding are delegated to TTEOP; SignalAF retains product aliases and
   product-specific extensions.
 
+## Board/read-time cascade boundary
+
+SignalAF also has a client-safe/read-time cascade diagnostic path in
+`lib/analytics/cascade.ts`. It is a **product presentation/board layer**, not
+the TTEOP conformance authority.
+
+Rules for this path:
+
+- positive-domain core formulas MUST agree with `token-cascade` / TTEOP;
+- it may retain higher unrounded display precision;
+- its product-only fields (Construction, Scale V, cost, efficiency, operating
+  ratio, cascade string, non-compounding marker) are not TTEOP semantics;
+- 10xDEV follows the current TTEOP all-four-pillars null gate;
+- `lib/ingest/bridge.ts` re-exports this implementation instead of maintaining
+  a second copy.
+
+CI locks this boundary in
+`__tests__/standard/board-cascade-boundary.test.mjs`.
+
 ## CI gate (items 5 + 6 — DONE)
 
 ### Primary conformance authority
