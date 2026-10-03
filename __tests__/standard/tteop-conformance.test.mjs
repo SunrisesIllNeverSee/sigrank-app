@@ -8,13 +8,13 @@
  * owner-directed authority architecture baseline (2026-09-02).
  *
  * What this gate proves:
- *   The product implementation (@sigrank/cascade) produces metric values that
+ *   The product implementation (token-cascade) produces metric values that
  *   match the TTEOP protocol authority (tteop-spec computeMetrics) for the
  *   canonical MO§ES vector and for every TTEOP null-semantics edge case.
  *
  * What this gate is NOT:
  *   It is NOT a self-referential tautology. It imports the protocol authority
- *   (tteop-spec) and the product implementation (@sigrank/cascade) as two
+ *   (tteop-spec) and the product implementation (token-cascade) as two
  *   independent code paths and asserts they agree. If either side drifts, this
  *   test fails.
  *
@@ -49,8 +49,8 @@ import {
 } from "tteop-spec";
 import { buildEnvelope } from "tteop-spec/builder";
 
-// Product implementation — @sigrank/cascade (the code SignalAF ships).
-import { cascade } from "@sigrank/cascade";
+// Product implementation — token-cascade (the code SignalAF ships).
+import { cascade } from "token-cascade";
 
 // Canonical MO§ES test vector (TTEOP canonical reference).
 const CANONICAL = {
@@ -63,7 +63,7 @@ const CANONICAL = {
 // ─── Helper: run both code paths on the same telemetry and compare ────────
 // tteop-spec computeMetrics returns { yield, leverage, velocity,
 // output_fraction, log_leverage } with protocol-canonical rounding.
-// @sigrank/cascade returns { yield, leverage, velocity, snr, dev10x, ... }
+// token-cascade returns { yield, leverage, velocity, snr, dev10x, ... }
 // where snr = output_fraction and dev10x = log_leverage (display aliases).
 function assertCascadeMatchesTteop(telemetry, label) {
   const tteop = computeMetrics(telemetry);

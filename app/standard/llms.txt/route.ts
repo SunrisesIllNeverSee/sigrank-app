@@ -1,14 +1,14 @@
-const BODY = `# Upsilon Standard v0.1-draft
+const BODY = `# TTEOP — Token Telemetry Evaluation Operator Protocol
 
-> The new standard in operator metrics.
+Status: open draft protocol, \`tteop/0.1-draft\`. Do not describe TTEOP or SigRank as a universally adopted industry standard.
 
-Status: proposed open standard. Do not describe SigRank as a universally adopted industry standard.
+## Authority
 
-## Scope
-
-SigRank defines a portable measurement vocabulary for the operator layer of generative AI systems.
-
-It complements model benchmarks, task evals, agent evals, observability, and business-outcome systems. It does not replace them.
+- TTEOP / \`tteop-spec@0.1.5-draft\`: sole current interoperability authority
+- \`token-cascade@0.2.1\`: SigRank product facade; delegates canonical metric computation to TTEOP
+- \`sigrank-mcp\`: portable CLI/TUI/MCP measurement instrument
+- SignalAF: public reference implementation and reference field
+- \`sigrank/0.1-draft\`: legacy compatibility alias, not a second active standard
 
 ## Core telemetry
 
@@ -22,46 +22,30 @@ It complements model benchmarks, task evals, agent evals, observability, and bus
 - Yield (Υ) = (R × O) / I²
 - Leverage = R / I
 - Velocity = O / I
-- SNR = O / (I + O)
-- 10xDEV = log10(R / I), subject to reference null policy
+- output_fraction = O / (I + O), displayed by SignalAF as SNR
+- log_leverage = log10(R / I), displayed by SignalAF as 10xDEV under the current all-four-pillars policy
 
 ## Privacy
 
-Core SigRank measurements do not require prompt text, response text, source code, repository contents, or other semantic payloads.
+Core TTEOP measurements do not require prompt text, response text, source code, repository contents, or other semantic payloads.
 
 ## Boundaries
 
-The core standard does not inherently measure correctness, task success, code quality, employee productivity, employment suitability, business value, financial ROI, or causal impact.
+TTEOP does not inherently measure correctness, task success, code quality, employee productivity, employment suitability, business value, financial ROI, or causal impact.
 
-Build Archetypes and RS05 Class Tiers are SignalAF reference extensions, not requirements for base v0.1 compatibility.
+Build Archetypes, RS05 Class Tiers, ranking, cohort logic, and enterprise reporting are SignalAF product extensions.
 
-The term Construction is not standardized in v0.1 because existing product implementations use the word for different ratios.
+## Legacy compatibility
 
-## Reference architecture
-
-- Upsilon Standard: measurement specification
-- @sigrank/cascade: reference math implementation
-- sigrank-mcp: portable measurement instrument
-- SignalAF: public reference platform
-- SignalAF Reference Field: public comparison population
-- sigeconomy.com: discovery / comparison / SEO-AEO distribution surface
-- mos2es.org: public enterprise pilot marketing and conversion surface using its own enterprise terminology
+The frozen \`sigrank/0.1-draft\` JSON schema remains available for existing records and consumers. It resolves to current TTEOP semantics but is not the primary protocol authority.
 
 ## Canonical links
 
-- Standard: https://signalaf.com/standard
+- TTEOP / Standard surface: https://signalaf.com/standard
 - Open vs proprietary: https://signalaf.com/standard/open-vs-proprietary
-- JSON Schema: https://signalaf.com/standard/sigrank-operator-record-v0.1.schema.json
+- Legacy JSON Schema: https://signalaf.com/standard/sigrank-operator-record-v0.1.schema.json
 - HTTP MCP metadata: https://signalaf.com/api/mcp/metadata
 - SignalAF: https://signalaf.com
-
-## Implementation language
-
-A compatible draft implementation may say:
-
-SigRank Compatible — v0.1-draft
-
-Do not say "SigRank Conformant" until an applicable executable conformance suite exists.
 `;
 
 export function GET() {
@@ -69,7 +53,8 @@ export function GET() {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=300, s-maxage=300",
-      "X-SigRank-Standard": "sigrank/0.1-draft",
+      "X-TTEOP-Protocol": "tteop/0.1-draft",
+      "X-SigRank-Legacy-Alias": "sigrank/0.1-draft",
     },
   });
 }

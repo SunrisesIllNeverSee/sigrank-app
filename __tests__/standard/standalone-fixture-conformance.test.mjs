@@ -4,10 +4,10 @@
  * LEGACY ALIAS COMPATIBILITY TEST — TEMPORARY MIGRATION GATE (item 6).
  *
  * This is NOT the primary protocol-conformance authority. The primary gate is
- * __tests__/standard/tteop-conformance.test.mjs, which validates @sigrank/cascade
+ * __tests__/standard/tteop-conformance.test.mjs, which validates token-cascade
  * against the TTEOP protocol authority (tteop-spec@0.1.5-draft).
  *
- * This test validates @sigrank/cascade's output against the fixture pack from
+ * This test validates token-cascade's output against the fixture pack from
  * the legacy sigrank-standard repository (sigrank/0.1-draft). It exists ONLY to
  * prove that the legacy alias sigrank/0.1-draft resolves to current TTEOP
  * semantics — i.e., the product implementation produces identical results
@@ -39,7 +39,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { cascade } from "@sigrank/cascade";
+import { cascade } from "token-cascade";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -182,7 +182,7 @@ if (!standardRoot) {
     const cacheWrite = telemetry.cache_write ?? telemetry.cache_creation ?? null;
     const cacheRead = telemetry.cache_read ?? null;
 
-    // @sigrank/cascade takes numbers, not null. When cache is unavailable
+    // token-cascade takes numbers, not null. When cache is unavailable
     // (null), we pass 0 to cascade but then null out the dependent metrics
     // to match the Standard's null semantics (unavailable ≠ zero).
     const result = cascade(
@@ -250,7 +250,7 @@ if (!standardRoot) {
 
   // ─── Conformance gate: every fixture must pass ──────────────────────────
 
-  test(`@sigrank/cascade passes all 13 standalone fixtures (Standard ref ${SIGRANK_STANDARD_REF})`, () => {
+  test(`token-cascade passes all 13 standalone fixtures (Standard ref ${SIGRANK_STANDARD_REF})`, () => {
     const failures = [];
 
     for (const file of fixtureFiles) {
@@ -363,7 +363,7 @@ if (!standardRoot) {
     }
   });
 
-  test("@sigrank/cascade canonical vector matches MO§ES seed", () => {
+  test("token-cascade canonical vector matches MO§ES seed", () => {
     const r = cascade(1251211, 11296121, 128196310, 2555179769);
     assert.equal(r.yield, 18436.98);
     assert.equal(r.leverage, 2042.2);
@@ -372,7 +372,7 @@ if (!standardRoot) {
     assert.equal(r.dev10x, 3.31);
   });
 
-  test("@sigrank/cascade excludes Construction, Build Archetypes, RS05 from portable metrics", () => {
+  test("token-cascade excludes Construction, Build Archetypes, RS05 from portable metrics", () => {
     const r = cascade(1000, 5000, 500, 3000);
     assert.ok(!("construction" in r), "construction leaked into cascade output");
     assert.ok(!("scale_v" in r), "scale_v leaked into cascade output");

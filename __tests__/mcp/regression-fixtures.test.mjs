@@ -22,7 +22,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cascade, classify } from "@sigrank/cascade";
+import { cascade, classify } from "token-cascade";
 
 // ─── Frozen MCP protocol constants ──────────────────────────────────────────
 
