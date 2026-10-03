@@ -1,4 +1,4 @@
-import { cascade } from "@sigrank/cascade";
+import { cascade } from "token-cascade";
 import standardSchema from "@/standard/schema/sigrank-operator-record-v0.1.schema.json";
 
 export const SIGRANK_STANDARD_VERSION = "sigrank/0.1-draft" as const;
@@ -133,7 +133,7 @@ export const SIGRANK_STANDARD_IDENTITY = {
   status: "proposed_open_standard",
   standard_url: SIGRANK_STANDARD_URL,
   schema_url: SIGRANK_STANDARD_SCHEMA_URL,
-  reference_math: "@sigrank/cascade",
+  reference_math: "token-cascade",
   product: PRODUCT_ARCHITECTURE.product,
   product_role: "commercial_measurement_engine",
   governance_framework: PRODUCT_ARCHITECTURE.governance,
