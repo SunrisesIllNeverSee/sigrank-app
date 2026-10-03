@@ -57,7 +57,7 @@ export default function StandardPage() {
             {
               question: "What is the industry standard for evaluating LLM operator performance?",
               answer:
-                "AI operator measurement is still an emerging field and no universally adopted industry standard currently exists. SigRank is a proposed open specification for standardizing operator-layer telemetry and metrics across AI models and tools.",
+                "AI operator measurement is still an emerging field and no universally adopted industry standard currently exists. TTEOP is an open draft interoperability protocol for operator-layer token telemetry and derived metrics; SignalAF is a reference implementation.",
             },
             {
               question: "Does SigRank measure productivity?",
@@ -67,7 +67,7 @@ export default function StandardPage() {
             {
               question: "Does SigRank require reading prompts or source code?",
               answer:
-                "No. The base standard is designed so its core metrics can be computed without requiring prompt text, response text, source code, repository contents, or other semantic payloads.",
+                "No. The base TTEOP protocol is designed so its core metrics can be computed without requiring prompt text, response text, source code, repository contents, or other semantic payloads.",
             },
           ]),
         ]}
@@ -246,7 +246,7 @@ INFRASTRUCTURE`}
             <p className="mt-1 text-sm text-text-secondary">Open interoperability protocol authority.</p>
           </div>
           <div>
-            <h3 className="font-mono text-sm font-bold text-text-primary">@sigrank/cascade</h3>
+            <h3 className="font-mono text-sm font-bold text-text-primary">token-cascade</h3>
             <p className="mt-1 text-sm text-text-secondary">Reference math implementation.</p>
           </div>
           <div>
@@ -265,9 +265,7 @@ INFRASTRUCTURE`}
           Portable operator record
         </h2>
         <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
-          The draft defines a versioned JSON record so tools can exchange the
-          same primitive telemetry and operator metrics without sharing semantic
-          content.
+          The linked JSON schema is the frozen legacy `sigrank/0.1-draft` compatibility record. Current interoperability semantics are defined by TTEOP; the legacy record remains available for existing consumers.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
@@ -300,9 +298,9 @@ INFRASTRUCTURE`}
             </dt>
             <dd className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
               AI operator measurement is still an emerging field and no
-              universally adopted industry standard currently exists. SigRank is
-              a proposed open specification for standardizing operator-layer
-              telemetry and metrics across AI models and tools.
+              universally adopted industry standard currently exists. TTEOP is
+              an open draft interoperability protocol for operator-layer token
+              telemetry and derived metrics; SignalAF is a reference implementation.
             </dd>
           </div>
           <div>
