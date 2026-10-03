@@ -72,3 +72,6 @@ jobs:
         env:
           OTHER_REPO_ROOT: ${{ github.workspace }}/_sigrank-mcp
         run: node --test __tests__/standard/generated-record-contract.test.mjs
+
+      - name: Full Node test suite
+        run: npm test
