@@ -107,9 +107,10 @@ second active standard.
 - SignalAF's local `standard/` directory contains a historical copy of the
   sigrank-standard specification. It is retained for the legacy compatibility
   fixture test only and is NOT the primary conformance authority.
-- The `@sigrank/cascade` package implements the TTEOP canonical formulas but
-  is not yet version-pinned to `tteop-spec`. A future release will align the
-  cascade package version with the TTEOP version pin.
+- `token-cascade@0.2.1` is the SigRank product facade and exact-pins
+  `tteop-spec@0.1.5-draft`. Canonical metric computation and banker's
+  rounding are delegated to TTEOP; SignalAF retains product aliases and
+  product-specific extensions.
 
 ## CI gate (items 5 + 6 — DONE)
 
@@ -118,14 +119,14 @@ second active standard.
 The primary protocol-conformance gate is
 `__tests__/standard/tteop-conformance.test.mjs`. It imports the TTEOP protocol
 authority (`tteop-spec@0.1.5-draft`) and the product implementation
-(`@sigrank/cascade`) as two independent code paths and asserts they agree on
+(`token-cascade`) as two independent code paths and asserts they agree on
 the canonical MO§ES vector and every TTEOP null-semantics edge case. It also
 validates envelopes via the `tteop-spec` builder + validator.
 
 ```
 PRIMARY CONFORMANCE (MUST PASS)
   __tests__/standard/tteop-conformance.test.mjs
-  SignalAF @sigrank/cascade  ↔  tteop-spec@0.1.5-draft (protocol authority)
+  SignalAF token-cascade  ↔  tteop-spec@0.1.5-draft (protocol authority)
 
 SIGNALAF LOCAL TESTS (MUST PASS)
   __tests__/ingest/canonical.test.mjs (11/11)
