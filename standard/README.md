@@ -1,11 +1,14 @@
-# Upsilon Standard
+# Legacy SigRank / Upsilon Standard Snapshot
 
-> **The new standard in operator metrics.**
+> **Historical compatibility material. TTEOP is the sole current protocol authority.**
 
-**Status:** proposed open standard  
-**Draft:** `0.1-draft`  
-**Drop-in location:** `sigrank-app/standard/`  
-**Extraction target:** future standalone `sigrank-standard` repository
+**Status:** legacy predecessor snapshot  
+**Legacy wire identifier:** `sigrank/0.1-draft`  
+**Current protocol:** `tteop/0.1-draft` via `tteop-spec@0.1.5-draft`  
+**Purpose here:** legacy schema/fixture compatibility only  
+**Standalone predecessor:** `SunrisesIllNeverSee/sigrank-standard`
+
+This directory remains so existing `sigrank/0.1-draft` records and fixtures can be tested during migration. It MUST NOT be treated as a second active standards authority. Current protocol semantics are owned by TTEOP / `tteop-spec`.
 
 Upsilon Standard defines a portable measurement vocabulary for the **human operator layer** of generative AI systems.
 
