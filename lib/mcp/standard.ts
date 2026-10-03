@@ -13,8 +13,11 @@ export const PRODUCT_ARCHITECTURE = {
   product: "Upsilon",
   leaderboard: "SigRank",
   wire_spec: SIGRANK_STANDARD_VERSION,
+  wire_spec_status: "legacy_alias",
+  protocol: "tteop/0.1-draft",
+  protocol_authority: "tteop-spec@0.1.5-draft",
   compatibility_note:
-    "Upsilon is the product identity. The sigrank/0.1-draft wire identifier remains stable for existing records and consumers.",
+    "Upsilon is the product identity. sigrank/0.1-draft is retained only as a legacy compatibility alias for current TTEOP semantics.",
 } as const;
 
 export const SIGRANK_CORE_TELEMETRY = [
@@ -130,10 +133,12 @@ export function buildSigRankStandardRecord(args: Record<string, unknown>) {
 
 export const SIGRANK_STANDARD_IDENTITY = {
   spec: SIGRANK_STANDARD_VERSION,
-  status: "proposed_open_standard",
+  status: "legacy_alias",
   standard_url: SIGRANK_STANDARD_URL,
   schema_url: SIGRANK_STANDARD_SCHEMA_URL,
-  reference_math: "token-cascade",
+  protocol: PRODUCT_ARCHITECTURE.protocol,
+  protocol_authority: PRODUCT_ARCHITECTURE.protocol_authority,
+  reference_math: "token-cascade@0.2.1",
   product: PRODUCT_ARCHITECTURE.product,
   product_role: "commercial_measurement_engine",
   governance_framework: PRODUCT_ARCHITECTURE.governance,
