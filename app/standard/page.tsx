@@ -314,7 +314,7 @@ INFRASTRUCTURE`}
           <div>
             <dt className="font-semibold text-text-primary">Is this already a universal industry standard?</dt>
             <dd className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
-              No. v0.1-draft is a proposed open standard. The objective is to
+              No. TTEOP v0.1-draft is an open draft protocol, not a universally adopted industry standard. The objective is to
               publish an implementable vocabulary, reference implementation, and
               compatibility path that others can evaluate, critique, and adopt.
             </dd>
