@@ -21,7 +21,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { cascade } from "@sigrank/cascade";
+import { cascade } from "token-cascade";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

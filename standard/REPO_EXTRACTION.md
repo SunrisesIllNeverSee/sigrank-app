@@ -1,40 +1,32 @@
-# Incubate Inside SigRank, Extract Later
+# Legacy Standard Extraction Status
 
-## Now
+The extraction described by the original incubation plan has already occurred.
 
-Keep this directory at:
-
-`sigrank-app/standard/`
-
-This keeps the draft beside the public reference implementation while terminology and canon are being reconciled.
-
-## Later
-
-When ready to create a standalone repository:
-
-1. move the contents of `standard/` to the root of `sigrank-standard`;
-2. preserve Git history if desired with `git subtree split` or filter-repo;
-3. update canonical URLs;
-4. update SignalAF `/standard` to link to the standalone repository;
-5. update `sigrank-mcp` and `@sigrank/cascade` READMEs;
-6. retain SignalAF as reference implementation, not standards authority by accident;
-7. add formal license / trademark policy only after deliberate decision.
-
-## Suggested final standalone tree
+Current authority state:
 
 ```text
-sigrank-standard/
-├── README.md
-├── SPEC.md
-├── GLOSSARY.md
-├── PRIVACY.md
-├── CONFORMANCE.md
-├── LIMITATIONS.md
-├── GOVERNANCE.md
-├── CANON_RECONCILIATION.md
-├── schema/
-├── examples/
-├── reference/
-├── rfc/
-└── CHANGELOG.md
+sigrank-app/standard/          historical compatibility snapshot
+        ↓
+sigrank-standard              standalone legacy predecessor
+        ↓
+TTEOP / tteop-spec            sole current protocol authority
 ```
+
+## Why this directory remains
+
+Keep `sigrank-app/standard/` only while SignalAF needs the frozen
+`sigrank/0.1-draft` schema and fixture pack for backward-compatibility tests.
+
+It MUST NOT:
+
+- define current protocol semantics;
+- compete with TTEOP as a standards authority;
+- receive new normative metric changes;
+- be cited as the primary conformance target.
+
+Current protocol changes belong in TTEOP / `tteop-spec`. SignalAF's implementation contract is documented in `TTEOP-IMPLEMENTATION-PROFILE.md`.
+
+## Eventual removal
+
+The embedded snapshot may be removed once legacy `sigrank/0.1-draft`
+compatibility is no longer required and all remaining consumers have migrated.

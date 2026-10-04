@@ -68,16 +68,15 @@ export function computeCascadeMetrics(pillars: RawPillars): CascadeMetrics {
   let dev10x: number | null = null;
   let cascadeStr = "—";
 
-  // dev10x = log10(leverage) = log10(cache_read / input) — needs only i > 0 && cr > 0.
-  // The T×C×R cascade decomposition additionally needs cw > 0 && o > 0.
-  if (i > 0 && cr > 0) {
+  // Current TTEOP v0.1 product policy computes log_leverage/10xDEV only
+  // when all four pillars are positive. Keep the board/read-time diagnostic
+  // path aligned with that canonical null boundary.
+  if (i > 0 && o > 0 && cw > 0 && cr > 0) {
     dev10x = Math.log10(cr / i);
-    if (cw > 0 && o > 0) {
-      const transmission = o / i;
-      const commitment = cw / o;
-      const reuse = cr / cw;
-      cascadeStr = `${transmission.toFixed(1)}×${commitment.toFixed(1)}×${reuse.toFixed(1)}`;
-    }
+    const transmission = o / i;
+    const commitment = cw / o;
+    const reuse = cr / cw;
+    cascadeStr = `${transmission.toFixed(1)}×${commitment.toFixed(1)}×${reuse.toFixed(1)}`;
   }
 
   return {
