@@ -1,13 +1,13 @@
 /**
  * __tests__/analytics/class-ladder.test.mjs
- * Tests for the 24-stage experience ladder (RS05) and the cache_write=0 dev10x fix.
+ * Tests for the 24-stage experience ladder (RS05) and the current TTEOP 10xDEV boundary.
  *
  * Covers:
  * - Monotonicity: assignClass is monotonic in total tokens
  * - ARCH+ sub-stages are reachable (not all the same floor)
  * - TRANSMITTER is not a permanent class (not in RS05 thresholds)
- * - cache_write=0 operator gets finite dev10x (log10(cr/i)), no NaN/Infinity
- * - cascadeStr is "—" when cw=0 but dev10x is still computed
+ * - cache_write=0 produces null 10xDEV under the all-four-pillars TTEOP gate
+ * - cascadeStr is "—" when any required pillar is zero
  * - Source drift guard: inlined thresholds must match lib/analytics/ruleset.ts
  *
  * NOTE: thresholds and cascade math are inlined (not imported) because the test
@@ -67,14 +67,12 @@ function computeCascadeMetrics(i, o, cw, cr) {
   const safeI = Math.max(i, 1);
   let dev10x = null;
   let cascadeStr = "—";
-  if (i > 0 && cr > 0) {
+  if (i > 0 && o > 0 && cw > 0 && cr > 0) {
     dev10x = Math.log10(cr / i);
-    if (cw > 0 && o > 0) {
-      const T = o / i;
-      const C = cw / o;
-      const R = cr / cw;
-      cascadeStr = `${T.toFixed(1)}×${C.toFixed(1)}×${R.toFixed(1)}`;
-    }
+    const T = o / i;
+    const C = cw / o;
+    const R = cr / cw;
+    cascadeStr = `${T.toFixed(1)}×${C.toFixed(1)}×${R.toFixed(1)}`;
   }
   return { dev10x, cascadeStr, nonCompounding: cw === 0 };
 }
@@ -110,10 +108,9 @@ test("TRANSMITTER is not a permanent class (not in RS05 thresholds)", () => {
   assert.equal(hasTransmitter, false, "TRANSMITTER must not appear in RS05_CLASS_THRESHOLDS");
 });
 
-test("cache_write=0 operator gets finite dev10x (log10(cr/i))", () => {
+test("cache_write=0 operator gets null dev10x under TTEOP all-four-pillars gate", () => {
   const m = computeCascadeMetrics(10_000, 500, 0, 295_500);
-  assert.ok(m.dev10x !== null, "dev10x should be defined when cr>0 && i>0");
-  assert.ok(Number.isFinite(m.dev10x), "dev10x should be finite");
+  assert.equal(m.dev10x, null, "dev10x must be null when cache_write=0");
   assert.equal(m.cascadeStr, "—", "cascadeStr should be '—' when cw=0");
   assert.ok(m.nonCompounding, "nonCompounding should be true when cw=0");
 });
@@ -123,7 +120,7 @@ test("cache_write=0 with cr=0 → dev10x is null (no leverage)", () => {
   assert.equal(m.dev10x, null, "dev10x should be null when cr=0");
 });
 
-test("MO§ES dev10x is unchanged (3.31) after the cache_write fix", () => {
+test("MO§ES dev10x remains 3.31 under the TTEOP all-four-pillars gate", () => {
   // MO§ES: i=1_251_211  o=11_296_121  cw=128_196_310  cr=2_555_179_769
   const m = computeCascadeMetrics(1_251_211, 11_296_121, 128_196_310, 2_555_179_769);
   assert.ok(m.dev10x !== null);
@@ -158,14 +155,10 @@ test("source drift guard: inlined thresholds match lib/analytics/ruleset.ts", ()
   }
 });
 
-test("source drift guard: cascade.ts uses i>0 && cr>0 for dev10x (not cw>0)", () => {
+test("source drift guard: cascade.ts uses the TTEOP all-four-pillars dev10x gate", () => {
   const src = readFileSync(CASCADE_PATH, "utf8");
   assert.ok(
-    src.includes("i > 0 && cr > 0"),
-    "cascade.ts must gate dev10x on i > 0 && cr > 0 (not cw > 0)",
-  );
-  assert.ok(
-    !src.includes("cw > 0 && o > 0 && i > 0 && cr > 0"),
-    "cascade.ts must NOT use the old 4-condition guard for dev10x",
+    src.includes("i > 0 && o > 0 && cw > 0 && cr > 0"),
+    "cascade.ts must gate dev10x on all four positive pillars",
   );
 });
