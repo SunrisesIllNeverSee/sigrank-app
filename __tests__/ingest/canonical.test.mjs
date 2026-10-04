@@ -1,10 +1,11 @@
 /**
  * __tests__/ingest/canonical.test.mjs
  *
- * Canonical lock tests for the ingest bridge — mirrors test_metrics.py in
- * moses-sigrank. Runs with `node --test` (Node 18+, no extra dependencies).
+ * Canonical lock tests for the ingest bridge and current TTEOP-aligned
+ * cascade boundary. Runs with `node --test` (no extra test harness).
  *
- * These numbers MUST NOT change. If they do, the bridge is broken.
+ * The positive-domain canonical anchors are historical SigRank/MO§ES vectors.
+ * Edge/null semantics must follow the current TTEOP authority.
  *
  * To run:
  *   node --test __tests__/ingest/canonical.test.mjs
@@ -26,7 +27,7 @@ function logNorm(x) {
   return Math.min(100, 20 * Math.log10(x + 1));
 }
 
-/** Mirrors metrics.py compute() */
+/** Mirrors the current board/read-time cascade boundary. */
 function compute(i, o, cw, cr) {
   const safeI = Math.max(i, 1);
   const total = i + o + cw + cr;
