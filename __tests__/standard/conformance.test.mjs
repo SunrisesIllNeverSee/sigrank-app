@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { cascade } from "@sigrank/cascade";
+import { cascade } from "token-cascade";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "../..");
@@ -32,7 +32,7 @@ const PUBLIC_SCHEMA = JSON.parse(
   ),
 );
 
-test("v0.1 canonical vector matches @sigrank/cascade", () => {
+test("v0.1 canonical vector matches token-cascade", () => {
   const t = VECTOR.telemetry;
   const result = cascade(t.input, t.output, t.cache_write, t.cache_read);
 

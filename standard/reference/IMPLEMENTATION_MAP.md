@@ -2,15 +2,14 @@
 
 ## `sigrank-cascade`
 
-Role: **reference math implementation**
+Role: **SigRank product facade over TTEOP canonical math**
 
-Current package: `@sigrank/cascade`
+Current package: `token-cascade@0.2.1`
 
 Responsibilities:
 
-- canonical core equations;
-- null semantics;
-- test vectors;
+- delegates canonical core equations, rounding, and null semantics to `tteop-spec@0.1.5-draft`;
+- preserves SigRank display aliases and product extensions;
 - field rank / percentile helpers;
 - normalized OperatorEvaluation;
 - reference signature implementation.
@@ -37,7 +36,7 @@ Required standard integration:
 - expose a standard-record tool/output;
 - publish primitive alias mapping;
 - link the standard in README and MCP server description;
-- keep metric implementation sourced from `@sigrank/cascade`.
+- keep metric implementation sourced from `token-cascade`.
 
 ## `sigrank-app`
 
