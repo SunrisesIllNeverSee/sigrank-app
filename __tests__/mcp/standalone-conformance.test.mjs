@@ -4,7 +4,7 @@
  * LEGACY ALIAS COMPATIBILITY TEST (MCP producer) — TEMPORARY MIGRATION GATE.
  *
  * This is NOT the primary protocol-conformance authority. The primary gate is
- * __tests__/standard/tteop-conformance.test.mjs, which validates @sigrank/cascade
+ * __tests__/standard/tteop-conformance.test.mjs, which validates token-cascade
  * against the TTEOP protocol authority (tteop-spec@0.1.5-draft).
  *
  * This test validates the SignalAF HTTP MCP server's get_sigrank_standard_record
@@ -32,7 +32,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
-import { cascade } from "@sigrank/cascade";
+import { cascade } from "token-cascade";
 
 // ─── Local record builder — mirrors lib/mcp/standard.ts buildSigRankStandardRecord ─
 // This replicates the exact logic the HTTP MCP tool uses, so we test the same

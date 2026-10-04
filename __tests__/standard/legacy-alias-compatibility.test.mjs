@@ -5,7 +5,7 @@
  *
  * Verifies that the legacy version aliases sigrank/0.1-draft and otep/0.1-draft
  * resolve to current TTEOP semantics using the protocol authority (tteop-spec)
- * and the product implementation (@sigrank/cascade).
+ * and the product implementation (token-cascade).
  *
  * This is NOT the primary conformance authority — that role belongs to
  * tteop-conformance.test.mjs. This test proves the legacy alias is a LABEL
@@ -35,8 +35,8 @@ import {
 } from "tteop-spec";
 import { buildEnvelope } from "tteop-spec/builder";
 
-// Product implementation — @sigrank/cascade
-import { cascade } from "@sigrank/cascade";
+// Product implementation — token-cascade
+import { cascade } from "token-cascade";
 
 const CANONICAL = {
   input: 1_251_211,

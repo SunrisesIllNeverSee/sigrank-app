@@ -113,7 +113,7 @@ export default function OpenVsProprietaryPage() {
           The boundary
         </h2>
         <div className="mt-4 overflow-x-auto rounded-lg bg-bg-elevated p-5 font-mono text-sm text-text-secondary">
-          <pre>{`SIGRANK STANDARD\nmeasurement vocabulary + schema + compatibility\n        ↓\n@sigrank/cascade\nreference math\n        ↓\nSignalAF\nreference implementation + reference field\n        ↓\nBoard / integrity / longitudinal distributions / enterprise benchmarks`}</pre>
+          <pre>{`TTEOP\nprotocol semantics + schema + conformance\n        ↓\ntoken-cascade\nSigRank product facade\n        ↓\nSignalAF\nreference implementation + reference field\n        ↓\nBoard / integrity / longitudinal distributions / enterprise benchmarks`}</pre>
         </div>
         <p className="mt-4 font-sans text-sm leading-relaxed text-text-secondary">
           A third party does not need SignalAF's ranking rules to produce a compatible measurement. Conversely, a compatible measurement does not automatically qualify for the SignalAF public board. Those are separate contracts.
@@ -131,7 +131,7 @@ export default function OpenVsProprietaryPage() {
 
       <div className="flex flex-wrap gap-4 font-mono text-sm">
         <Link href="/standard" className="text-gold hover:underline">
-          ← Upsilon Standard
+          ← TTEOP Standard
         </Link>
         <Link
           href="/standard/sigrank-operator-record-v0.1.schema.json"

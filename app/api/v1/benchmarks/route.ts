@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeaderboard } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
-import { fieldStats } from "@sigrank/cascade";
 
 export const revalidate = 3600;
 

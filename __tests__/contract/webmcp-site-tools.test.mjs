@@ -22,6 +22,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..", "..");
+const RUN_LIVE_SITE_CONTRACTS =
+  process.env.RUN_LIVE_SITE_CONTRACTS === "1" || process.env.CI !== "true";
+const liveSiteOptions = RUN_LIVE_SITE_CONTRACTS
+  ? {}
+  : { skip: "live cross-domain contract; set RUN_LIVE_SITE_CONTRACTS=1 to enable in CI" };
 const COMPONENT_PATH = "components/webmcp/register-tools.tsx";
 
 function source() {
@@ -284,7 +289,7 @@ async function fetchExchangeJson(domain, localPath) {
   }
 }
 
-test("WebMCP: signomy.xyz exchange.json has MCP block", async () => {
+test("WebMCP: signomy.xyz exchange.json has MCP block", liveSiteOptions, async () => {
   const parsed = await fetchExchangeJson(
     "signomy.xyz",
     resolve(root, "..", "..", "..", "_5_Signomy", "1_agent-universe",
@@ -298,7 +303,7 @@ test("WebMCP: signomy.xyz exchange.json has MCP block", async () => {
     "signomy.xyz must declare central hosting (not its own MCP server)");
 });
 
-test("WebMCP: mos2es.com exchange.json has MCP block", async () => {
+test("WebMCP: mos2es.com exchange.json has MCP block", liveSiteOptions, async () => {
   const parsed = await fetchExchangeJson(
     "mos2es.com",
     resolve(root, "..", "..", "..", "_1_moses", "1_mos2es-site",
