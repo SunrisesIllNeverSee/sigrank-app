@@ -4,6 +4,7 @@ title: Data Policy
 description: What SignalAF collects, derives, and publishes, with anonymization requirements for research outputs. Active.
 tags: [sigrank, data-policy, collection, derived-data, anonymization, spec]
 timestamp: 2026-07-21
+canon: search-authority
 ---
 
 # Data policy

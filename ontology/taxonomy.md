@@ -4,6 +4,7 @@ title: Taxonomy
 description: Classification concepts including class tiers and archetypes. Neither is an identity claim. Active.
 tags: [sigrank, taxonomy, class-tier, archetype, classification, reference]
 timestamp: 2026-07-21
+canon: search-authority
 ---
 
 # Taxonomy
