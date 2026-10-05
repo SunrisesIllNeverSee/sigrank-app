@@ -4,6 +4,7 @@ title: Claim Policy
 description: Rules for claiming unclaimed profiles via authenticated proof of operator identity. Claims are auditable and reversible. Active.
 tags: [sigrank, claim-policy, profile-claim, authentication, provenance, spec]
 timestamp: 2026-07-21
+canon: search-authority
 ---
 
 # Claim policy
