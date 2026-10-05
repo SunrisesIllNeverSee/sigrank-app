@@ -1,17 +1,11 @@
-# `_archive/` — the single archive namespace
+---
+type: Pointer
+title: _archive moved
+description: Retired workflows, configs, and drafts relocated to the umbrella archive. Active.
+tags: [sigrank, archive]
+timestamp: 2026-10-05
+---
 
-Consolidated in PR-4 (was `_archived/` + `_archive/` + root strays). Everything
-here is inactive — kept for history/reference, nothing executes or deploys.
+# Moved
 
-| Subdir | Contents |
-|---|---|
-| `workflows/` | 8 retired GitHub Actions workflows (see `.github/workflows/ci.yml` + `sync-mcp-version.yml` for what is live) |
-| `docs/` | Historical docs + one-off reports (`STATIC-BOARD-MIGRATION.md`, `posthog-mcp-analytics-report.md`) |
-| `config/` | Dead configs of archived tooling (`lighthouserc.json` → lighthouse.yml; `.gitleaks.*` — root strays, **not** the wired config) |
-| `blog-drafts/` | Undeployed blog drafts (`.md` + `.html`) |
-
-Rules: files here are frozen snapshots — do not edit them; restore = move the
-file back. If you restore `workflows/lighthouse.yml`, grab `config/lighthouserc.json`.
-For the gitleaks job, its pinned config (`.github/gitleaks.toml`,
-`config-path` in the workflow) is **still in place** — the `.gitleaks.toml`
-here was an unused root stray with different rules.
+This directory's contents live at `SigRank-repos/_archive/sigrank-app-attic/` (umbrella archive — attic material, not a retired repo).

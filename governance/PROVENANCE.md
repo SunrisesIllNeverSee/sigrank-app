@@ -4,6 +4,7 @@ title: Provenance
 description: Provenance requirements for observations and releases, including source, window, transformations, and layered verification. Active.
 tags: [sigrank, provenance, verification, ingest, dataset-provenance, spec]
 timestamp: 2026-07-21
+canon: search-authority
 ---
 
 # Provenance
