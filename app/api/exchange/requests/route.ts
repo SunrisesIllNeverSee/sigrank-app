@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { RequestSchema } from '@/exchange-gateway/src/schema'
+import { RequestSchema } from '@/lib/exchange-gateway/src/schema'
 import { appendExchangeEvent, findCompany, getExchangeAdmin, hashSecret, logEncounter, newPublicId, newSecret, requestIdentity, safeEqual } from '@/lib/exchange/server'
 import { dispatchToDomainAgent } from '@/lib/exchange/steward'
 import { rateLimitAllow } from '@/lib/exchange/rate-limit'

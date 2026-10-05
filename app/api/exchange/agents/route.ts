@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { AgentRegistrationSchema } from '@/exchange-gateway/src/schema'
+import { AgentRegistrationSchema } from '@/lib/exchange-gateway/src/schema'
 import { getExchangeAdmin, hashSecret, newReferralCode, newSecret, requestIdentity } from '@/lib/exchange/server'
 import { rateLimitAllow } from '@/lib/exchange/rate-limit'
 export async function POST(req:NextRequest){

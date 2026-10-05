@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/infra/stripe/server'
-import { calculateFees } from '@/exchange-gateway/src/fees'
+import { calculateFees } from '@/lib/exchange-gateway/src/fees'
 import { appendExchangeEvent, authenticateCompany, findCompany, getExchangeAdmin } from '@/lib/exchange/server'
 
 export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>}){

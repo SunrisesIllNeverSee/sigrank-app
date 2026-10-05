@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SubmitReceiptSchema } from '@/exchange-gateway/src/schema'
-import { getVerifier, VerificationError } from '@/exchange-gateway/src/providers/callback-verifier'
-import { bootstrapVerifiers } from '@/exchange-gateway/src/providers/verifier-bootstrap'
-import { validateTransition, receiptStatusToState } from '@/exchange-gateway/src/execution-state'
+import { SubmitReceiptSchema } from '@/lib/exchange-gateway/src/schema'
+import { getVerifier, VerificationError } from '@/lib/exchange-gateway/src/providers/callback-verifier'
+import { bootstrapVerifiers } from '@/lib/exchange-gateway/src/providers/verifier-bootstrap'
+import { validateTransition, receiptStatusToState } from '@/lib/exchange-gateway/src/execution-state'
 import { appendExchangeEvent, authenticateCompany, authenticateProposer, getExchangeAdmin, logEncounter, safeEqual } from '@/lib/exchange/server'
 import { createHash } from 'node:crypto'
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { CompanyRegistrationSchema } from '@/exchange-gateway/src/schema'
-import { defaultExchangePolicy } from '@/exchange-gateway/src/policy'
+import { CompanyRegistrationSchema } from '@/lib/exchange-gateway/src/schema'
+import { defaultExchangePolicy } from '@/lib/exchange-gateway/src/policy'
 import { getExchangeAdmin, hashSecret, newSecret, normalizeDomain, requestIdentity } from '@/lib/exchange/server'
 import { rateLimitAllow } from '@/lib/exchange/rate-limit'
 import { isProhibitedHost } from '@/lib/exchange/mcp-tools'
