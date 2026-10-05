@@ -40,7 +40,7 @@ export default function TestRetestPage() {
         summary="Whether the same operator measured twice under the same conditions produces the same metrics."
         category="validation"
         evidenceLevel="concept"
-        specVersion="SigRank Standard v1.0 (proposed)"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft (proposed)"
         definition={
           <>
             Whether the same operator measured twice under the same conditions

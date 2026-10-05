@@ -15,7 +15,7 @@ import { faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "MCP Server — Tools for AI Agents",
   description:
-    "SigRank MCP server gives AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable SigRank Standard records. Works with Claude, Cursor, Cline, Windsurf, Cloudflare Playground, and any MCP-compatible client.",
+    "SigRank MCP server gives AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable TTEOP (Token Telemetry Evaluation Operator Protocol) records. Works with Claude, Cursor, Cline, Windsurf, Cloudflare Playground, and any MCP-compatible client.",
   path: "/mcp",
 });
 
@@ -89,7 +89,7 @@ const REMOTE_TOOLS = [
 const LOCAL_TOOLS = [
   {
     name: "get_sigrank_standard_record",
-    desc: "Return the portable SigRank Standard record for four token counts",
+    desc: "Return the portable TTEOP record for four token counts",
   },
   {
     name: "rank_paste",
@@ -220,7 +220,7 @@ export default function MCPPage() {
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Cross-platform",
     description:
-      "MCP server giving AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable SigRank Standard records. The yield cascade metric and live leaderboard are also available as MCP tools.",
+      "MCP server giving AI agents 16 remote tools (HTTP, no install) and 25 local tools (npx sigrank, stdio), including portable TTEOP records. The yield cascade metric and live leaderboard are also available as MCP tools.",
     url: "https://signalaf.com/mcp",
     downloadUrl: "https://www.npmjs.com/package/sigrank",
     author: {

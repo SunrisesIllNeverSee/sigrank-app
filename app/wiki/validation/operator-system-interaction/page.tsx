@@ -40,7 +40,7 @@ export default function OperatorSystemInteractionPage() {
         summary="Whether operator performance varies by system (model/tool/platform). Tests for interaction effects."
         category="validation"
         evidenceLevel="concept"
-        specVersion="SigRank Standard v1.0 (proposed)"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft (proposed)"
         definition={
           <>
             Whether operator performance varies by system

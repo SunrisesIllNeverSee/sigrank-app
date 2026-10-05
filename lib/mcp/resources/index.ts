@@ -15,13 +15,13 @@ import {
 export const RESOURCES = [
   {
     uri: "sigrank://standard",
-    name: "SigRank Standard Identity",
-    description: "Version, scope, canonical URLs, portable core, and explicit compatibility exclusions for the SigRank Standard",
+    name: "TTEOP Identity",
+    description: "Version, scope, canonical URLs, portable core, and explicit compatibility exclusions for TTEOP (Token Telemetry Evaluation Operator Protocol)",
     mimeType: "application/json",
   },
   {
     uri: "sigrank://standard/schema",
-    name: "SigRank Standard Record Schema",
+    name: "TTEOP Record Schema",
     description: "Canonical JSON Schema for a portable sigrank/0.1-draft operator record",
     mimeType: "application/schema+json",
   },

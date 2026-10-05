@@ -5,9 +5,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Open in SigRank? Standard vs Product",
+  title: "Open in TTEOP? Standard vs Product",
   description:
-    "What SigRank opens as a measurement standard, what SignalAF keeps as reference-product infrastructure, and why the boundary exists.",
+    "What TTEOP opens as a measurement standard, what SignalAF keeps as reference-product infrastructure, and why the boundary exists.",
   path: "/standard/open-vs-proprietary",
 });
 
@@ -41,14 +41,14 @@ export default function OpenVsProprietaryPage() {
       <JsonLd
         data={[
           breadcrumb([
-            { name: "Upsilon Standard", path: "/standard" },
+            { name: "TTEOP Standard", path: "/standard" },
             { name: "Open vs Proprietary", path: "/standard/open-vs-proprietary" },
           ]),
           faqPage([
             {
               question: "Is the SigRank formula open?",
               answer:
-                "Yes. The Upsilon Standard draft publishes the core telemetry semantics and equations for Yield, Leverage, Velocity, SNR, and 10xDEV. A compatible implementation can compute the core measurements independently.",
+                "Yes. The TTEOP draft publishes the core telemetry semantics and equations for Yield, Leverage, Velocity, SNR, and 10xDEV. A compatible implementation can compute the core measurements independently.",
             },
             {
               question: "Is the SignalAF leaderboard part of the open standard?",
@@ -66,13 +66,13 @@ export default function OpenVsProprietaryPage() {
 
       <header className="space-y-4">
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-gold">
-          Upsilon Standard v0.1-draft
+          TTEOP · tteop/0.1-draft
         </p>
         <h1 className="font-mono text-4xl font-bold text-text-primary sm:text-5xl">
           Open measurement. Defensible reference network.
         </h1>
         <p className="max-w-3xl font-sans text-lg leading-relaxed text-text-secondary">
-          SigRank separates the measurement language from the competitive product built on top of it. The ruler can be implemented openly. SignalAF remains the canonical public field where those measurements become comparative infrastructure.
+          TTEOP (Token Telemetry Evaluation Operator Protocol) separates the measurement language from the competitive product built on top of it. The ruler can be implemented openly. SignalAF remains the canonical public field where those measurements become comparative infrastructure.
         </p>
       </header>
 

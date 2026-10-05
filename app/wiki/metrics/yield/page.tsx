@@ -76,7 +76,7 @@ export default function YieldPage() {
         evidence={
           <>
             Canonical test passes 11/11. Seed values verified. Published in
-            SigRank Standard.
+            TTEOP (Token Telemetry Evaluation Operator Protocol).
           </>
         }
         limitations={
@@ -86,9 +86,9 @@ export default function YieldPage() {
             intelligence. Plausibility checks matter.
           </>
         }
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         lineage={
-          <>SigRank Standard, Search Authority canon, MO§ES seed values. Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</>
+          <>TTEOP, Search Authority canon, MO§ES seed values. Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</>
         }
         crossRefs={crossRefs}
         lastUpdated="2026-09-01"

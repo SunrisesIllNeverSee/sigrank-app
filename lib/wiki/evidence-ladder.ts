@@ -104,7 +104,7 @@ export const EVIDENCE_LEVELS: EvidenceLevel[] = [
     id: "production-evidence",
     label: "Production evidence",
     description:
-      "LEVEL 6 — Production evidence. Enshrined in the SigRank Standard / MO§ES™ production canon. Immutable. Changing this requires a spec revision.",
+      "LEVEL 6 — Production evidence. Enshrined in the TTEOP (Token Telemetry Evaluation Operator Protocol) / MO§ES™ production canon. Immutable. Changing this requires a spec revision.",
     color: "text-gold",
   },
 ];
