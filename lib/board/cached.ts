@@ -38,6 +38,7 @@ import { unstable_cache } from "next/cache";
 
 import {
   getLeaderboard as _getLeaderboard,
+  getIndexableOperatorRows as _getIndexableOperatorRows,
   getOperator as _getOperator,
   getOperatorSubmissions as _getOperatorSubmissions,
   getOperatorHistory as _getOperatorHistory,
@@ -171,6 +172,16 @@ export const getOperatorRecords = unstable_cache(
   _getOperatorRecords,
   ["operator-records"],
   { revalidate: 300, tags: ["board"] },
+);
+
+// Sitemap operator population (SEARCH-RECOVERY Phase 1): small claimed-only
+// corpus, well under the 2MB unstable_cache cap. Tagged both "board" and
+// "operator" so revalidateTouchedWindows busts it on any verified submission;
+// the 300s TTL matches the HTTP-fetch revalidate it replaced.
+export const getIndexableOperatorRows = unstable_cache(
+  _getIndexableOperatorRows,
+  ["indexable-operator-rows"],
+  { revalidate: 300, tags: ["board", "operator"] },
 );
 
 // ── Re-export types so consumers importing from @/lib/data still see them ──
