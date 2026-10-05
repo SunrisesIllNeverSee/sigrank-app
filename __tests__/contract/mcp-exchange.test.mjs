@@ -191,7 +191,7 @@ test("mcp-tools.ts imports from canonical Exchange services (not duplicating log
   assert.match(mod, /from "\.\/server"/, "Must import from ./server");
   assert.match(mod, /from "\.\/steward"/, "Must import from ./steward");
   assert.match(mod, /from "\.\/signal-server"/, "Must import from ./signal-server");
-  assert.match(mod, /from "@\/exchange-gateway\/src\/policy"/, "Must import from policy module");
+  assert.match(mod, /from "@\/lib\/exchange-gateway\/src\/policy"/, "Must import from policy module");
   assert.match(mod, /evaluateProposal/, "Must use evaluateProposal (same policy evaluation)");
 });
 

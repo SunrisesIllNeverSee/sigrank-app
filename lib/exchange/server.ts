@@ -1,7 +1,7 @@
 import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import type { NextRequest } from 'next/server'
-import type { ExchangeState } from '@/exchange-gateway/src/types'
+import type { ExchangeState } from '@/lib/exchange-gateway/src/types'
 import { captureServer } from '@/lib/infra/posthog/server'
 
 /**

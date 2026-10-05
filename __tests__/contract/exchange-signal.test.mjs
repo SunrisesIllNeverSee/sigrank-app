@@ -15,7 +15,7 @@ async function source(relPath) {
 // ─── Schema validation tests ─────────────────────────────────────────────────
 
 test("ExchangeSignal schema validates all seven signal types", async () => {
-  const schemaCode = await source("exchange-gateway/src/signal-schema.ts");
+  const schemaCode = await source("lib/exchange-gateway/src/signal-schema.ts");
   // All seven types must be in the enum
   for (const type of ["problem", "request", "challenge", "bounty", "verification", "discovery", "experiment"]) {
     assert.match(schemaCode, new RegExp(`"${type}"`), `Signal type ${type} must be in schema`);
@@ -23,7 +23,7 @@ test("ExchangeSignal schema validates all seven signal types", async () => {
 });
 
 test("ExchangeSignal schema enforces creates_obligation: false", async () => {
-  const schemaCode = await source("exchange-gateway/src/signal-schema.ts");
+  const schemaCode = await source("lib/exchange-gateway/src/signal-schema.ts");
   // The consideration schema must enforce creates_obligation as literal false
   assert.match(schemaCode, /creates_obligation:\s*z\.literal\(false\)/);
   // And there must be a refine check
@@ -31,20 +31,20 @@ test("ExchangeSignal schema enforces creates_obligation: false", async () => {
 });
 
 test("ExchangeSignal schema enforces commitment_automatic: false", async () => {
-  const schemaCode = await source("exchange-gateway/src/signal-schema.ts");
+  const schemaCode = await source("lib/exchange-gateway/src/signal-schema.ts");
   assert.match(schemaCode, /commitment_automatic:\s*z\.literal\(false\)/);
   assert.match(schemaCode, /authorization_automatic:\s*z\.literal\(false\)/);
 });
 
 test("ExchangeSignal schema enforces follow-on modes", async () => {
-  const schemaCode = await source("exchange-gateway/src/signal-schema.ts");
+  const schemaCode = await source("lib/exchange-gateway/src/signal-schema.ts");
   for (const mode of ["none", "domain_review", "proposal_allowed", "invite_to_propose", "draft_proposal"]) {
     assert.match(schemaCode, new RegExp(`"${mode}"`), `Follow-on mode ${mode} must be in schema`);
   }
 });
 
 test("ExchangeSignal types define authoritative_for_exchange_state: false", async () => {
-  const typesCode = await source("exchange-gateway/src/signal-types.ts");
+  const typesCode = await source("lib/exchange-gateway/src/signal-types.ts");
   assert.match(typesCode, /authoritative_for_exchange_state:\s*false/);
   assert.match(typesCode, /authoritative_for_signal:\s*true/);
 });
@@ -54,7 +54,7 @@ test("ExchangeSignal types define authoritative_for_exchange_state: false", asyn
 test("Signal revision hash is deterministic and content-bound", async () => {
   // We can't import the TS module directly in a .mjs test, so we verify
   // the canonicalization logic structurally.
-  const revCode = await source("exchange-gateway/src/signal-revision.ts");
+  const revCode = await source("lib/exchange-gateway/src/signal-revision.ts");
   // Must use SHA-256
   assert.match(revCode, /sha256/);
   // Must canonicalize by sorting keys
@@ -204,7 +204,7 @@ test("Status transition routes exist for pause, close, withdraw", async () => {
 // ─── Manifest integration tests ──────────────────────────────────────────────
 
 test("Manifest includes signals block with all seven types", async () => {
-  const manifestCode = await source("exchange-gateway/src/manifest.ts");
+  const manifestCode = await source("lib/exchange-gateway/src/manifest.ts");
   assert.match(manifestCode, /signals/);
   for (const type of ["problem", "request", "challenge", "bounty", "verification", "discovery", "experiment"]) {
     assert.match(manifestCode, new RegExp(`'${type}'`), `Manifest must advertise type ${type}`);
@@ -248,7 +248,7 @@ test("§18.2: Schema $id uses signalaf.com, not mos2es.xyz", async () => {
   assert.match(publicSchema, /signalaf\.com\/exchange\.schema\.json/);
   assert.doesNotMatch(publicSchema, /mos2es\.xyz/);
 
-  const gwSchema = await source("exchange-gateway/exchange.schema.json");
+  const gwSchema = await source("lib/exchange-gateway/exchange.schema.json");
   assert.match(gwSchema, /signalaf\.com\/exchange\.schema\.json/);
   assert.doesNotMatch(gwSchema, /mos2es\.xyz/);
 });
@@ -532,12 +532,12 @@ test("Fix 14: PATCH route uses getSignalMeta (not getSignal) so drafts are publi
 // ─── Round 3 review fix tests (verify bugs 1-3 + minors 1-4) ─────────────────
 
 test("Bug 1 (§12.6): verifier_error is a distinct attempt status in types", async () => {
-  const types = await source("exchange-gateway/src/signal-types.ts");
+  const types = await source("lib/exchange-gateway/src/signal-types.ts");
   assert.match(types, /"verifier_error"/);
 });
 
 test("Bug 1 (§12.6): verifier_error is a distinct attempt status in schema", async () => {
-  const schema = await source("exchange-gateway/src/signal-schema.ts");
+  const schema = await source("lib/exchange-gateway/src/signal-schema.ts");
   assert.match(schema, /"verifier_error"/);
 });
 
@@ -598,7 +598,7 @@ test("Bug 3: proposal route performs compensating delete on qualification failur
 });
 
 test("Minor 1: manifest signals.schema points to a schema URL, not the collection", async () => {
-  const manifest = await source("exchange-gateway/src/manifest.ts");
+  const manifest = await source("lib/exchange-gateway/src/manifest.ts");
   // schema must NOT equal collection (both pointing to /api/exchange/signals)
   const schemaMatch = manifest.match(/schema:`\$\{base\}([^`]+)`/);
   const collectionMatch = manifest.match(/collection:`\$\{base\}([^`]+)`/);
