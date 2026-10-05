@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSessionUser } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 
 /**
  * POST /api/v1/claim — claim an existing unclaimed seeded operator profile.
@@ -196,6 +197,11 @@ export async function POST(req: NextRequest) {
       .update({ handle })
       .eq("operator_id", op.operator_id);
   }
+
+  // claimed=true flips the profile's search-index eligibility and its
+  // membership in claimed-only surfaces — bust ISR/data caches so the page's
+  // robots directive and sitemap.xml stay in agreement.
+  revalidateOperatorIndexState(codename);
 
   // Fire operator_claimed event for trend tracking (best-effort, never blocks).
   await captureServer(codename, "operator_claimed", {

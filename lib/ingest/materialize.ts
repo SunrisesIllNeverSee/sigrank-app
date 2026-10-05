@@ -339,3 +339,27 @@ export function revalidateTouchedWindows(
     revalidatePath(`/user/${codename.toLowerCase()}`);
   }
 }
+
+/**
+ * revalidateOperatorIndexState — bust every surface that can serve stale
+ * index-state after a policy-relevant operator flag changes outside the
+ * snapshot pipeline (POST /api/v1/claim flips `claimed`; POST /api/v1/profile
+ * can flip `profile_visibility`). The sitemap↔robots contract
+ * (lib/seo/indexing-policy.ts) requires the ISR profile page (21600s), the
+ * prerendered sitemap, and the tagged data caches to agree — without this the
+ * sitemap can advertise a URL whose cached page still emits noindex.
+ */
+export function revalidateOperatorIndexState(codename: string): void {
+  revalidateTag("operator", "max");
+  revalidateTag("board", "max");
+  memoInvalidatePrefix("board:");
+  revalidatePath(`/user/${codename}`);
+  revalidatePath(`/user/${codename.toLowerCase()}`);
+  // Wrapped emits the same policy-driven robots (3600s ISR).
+  revalidatePath(`/user/${codename}/wrapped`);
+  revalidatePath(`/user/${codename.toLowerCase()}/wrapped`);
+  revalidatePath("/sitemap.xml");
+  // Claimed membership changes the claimed-only live board surfaces too.
+  revalidatePath("/board/all");
+  revalidatePath("/board/off");
+}
