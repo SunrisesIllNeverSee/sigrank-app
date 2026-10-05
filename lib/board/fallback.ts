@@ -17,6 +17,7 @@ import coldStore from "@/lib/board/snapshot.json";
 import { MOCK_LEADERBOARD } from "@/lib/board/mock";
 import type { LeaderboardRow } from "@/lib/board/types";
 import { tierOf } from "@/components/sigrank/types";
+import { includesBoardMode, resolveWorkflowMode } from "@/lib/board/workflow-mode";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -94,6 +95,19 @@ export function filterMockBoard(params: BoardParams = {}): LeaderboardRow[] {
   // before re-rank so the cold-store board's rank column matches the claimed
   // display positions too.
   if (params.claimedOnly) rows = rows.filter((r) => r.operator.claimed);
+  if (params.mode) {
+    rows = rows.flatMap((r) => {
+      const mode = resolveWorkflowMode({
+        inputTokens: r.telemetry.fresh_input,
+        outputTokens: r.telemetry.output,
+        cacheWriteTokens: r.telemetry.cache_create,
+        cacheReadTokens: r.telemetry.cache_read,
+        assessment: r.workflow_mode,
+        evidenceUrl: r.workflow_evidence_url,
+      });
+      return includesBoardMode(params.mode!, mode) ? [{ ...r, workflow_mode: mode }] : [];
+    });
+  }
   if (params.platform && params.platform !== "all") {
     rows = rows.filter(
       (r) =>

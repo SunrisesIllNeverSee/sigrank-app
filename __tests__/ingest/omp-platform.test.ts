@@ -69,7 +69,7 @@ describe("platformPrimaryEnum — omp", () => {
     expect(platformPrimaryEnum.safeParse("omp").success).toBe(true);
   });
 
-  it("keeps every pre-existing platform, in order, with omp appended", () => {
+  it("keeps every supported platform in canonical order", () => {
     expect(platformPrimaryEnum.options).toEqual([
       "claude",
       "chatgpt",
@@ -150,6 +150,7 @@ describe("SAVABLE_PLATFORM_DOMAINS — the profile write-path accept-list", () =
   });
 
   it("does not silently admit adapter-only platforms", () => {
+    expect(SAVABLE_PLATFORM_DOMAINS.has("devin")).toBe(true);
     for (const d of ["droid", "goose", "amp", "kilo"]) {
       expect(SAVABLE_PLATFORM_DOMAINS.has(d)).toBe(false);
     }

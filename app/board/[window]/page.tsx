@@ -113,6 +113,7 @@ export default async function BoardWindowPage({
       windowFilter: false,
       operatorTotal: true,
       claimedOnly: true,
+      mode: "all",
     });
     totalCount = liveRows.length;
     totalEntries = liveRows.slice(0, 400).map(toEntry);
@@ -126,6 +127,7 @@ export default async function BoardWindowPage({
       windowFilter: true,
       operatorTotal: true,
       claimedOnly: true,
+      mode: "all",
     });
     totalCount = liveRows.length;
     totalEntries = liveRows.map(toEntry);

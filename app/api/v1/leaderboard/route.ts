@@ -5,6 +5,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getLeaderboard } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
+import type { BoardMode } from "@/lib/board/workflow-mode";
 import { SORT_DEFAULT } from "@/lib/constants";
 import {
   LEADERBOARD_CACHE_CONTROL,
@@ -54,6 +55,12 @@ export async function GET(req: NextRequest) {
   const windowParam = windowParamToEnum(sp.get("window") ?? "30d");
   const platformParam = sp.get("platform");
   const classParam = sp.get("class");
+  const modeParam = sp.get("mode");
+  if (modeParam && !["all", "hitl", "agentic"].includes(modeParam)) {
+    return NextResponse.json({ error: "Invalid board mode" }, { status: 400 });
+  }
+  const mode = modeParam as BoardMode | null;
+  const viewPlatforms = sp.get("view") === "platforms";
 
   const limitRaw = Number.parseInt(sp.get("limit") ?? "", 10);
   const requestedLimit = Number.isFinite(limitRaw)
@@ -65,9 +72,12 @@ export async function GET(req: NextRequest) {
 
   const rows = await getLeaderboard({
     window: windowParam,
-    windowFilter: true,
+    windowFilter: mode && windowParam === "all_time" ? false : true,
     platform: hasPlatformFilter ? platformParam : null,
-    perPlatform: !!hasPlatformFilter,
+    perPlatform: !!hasPlatformFilter || (mode !== null && viewPlatforms),
+    operatorTotal: mode !== null && !hasPlatformFilter && !viewPlatforms,
+    claimedOnly: mode !== null,
+    mode: mode ?? undefined,
     classScope: classParam ?? undefined,
     sort,
     limit,
@@ -76,6 +86,7 @@ export async function GET(req: NextRequest) {
   const body = {
     metric: metricParam,
     window: windowParam,
+    ...(mode ? { mode } : {}),
     generated_at: new Date().toISOString(),
     ruleset_version: "1.0",
     total_operators: rows.length,

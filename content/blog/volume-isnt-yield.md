@@ -1,7 +1,7 @@
 ---
 type: article
 title: "Volume Isn't Yield: The Shape of AI Operators"
-description: SigRank, a measurement layer for how humans operate AI coding agents. What the margins reveal about how 1,628 operators actually use LLMs. Benford validation, 8 archetypes (7 human + outliers), and the cascade economy.
+description: A historical analysis of 1,628 AI coding operator records by volume, Yield, and token-flow composition. Statistical groups describe operating signatures, not the level of human intervention.
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
 author: Deric (@SunrisesIllNeverSee)
@@ -10,7 +10,9 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 
 > **Update (2026-08-09):** The 8 K-Means archetypes described in this article have been superseded by a [10 build archetype system](/field#archetypes) based on three deterministic dimensions — leverage, velocity, and construction. The original clustering analysis is preserved here as a historical record; the current classification is available on the [field page](/field).
 
-> [1] We ranked 1,628 AI coding operators by token volume. Then we measured what they actually *did* with those tokens. The field separates into 8 archetypes — 7 human clusters plus an 8th for outliers. The median operator gets 19x more signal from cache than they put in as input. The shape is not what you'd expect.
+> **Terminology correction (2026-10-03):** Earlier versions called productive low-input records “extreme humans” and used a statistical outlier screen as though it identified who steered a workflow. The screen measured token-flow shape. Below, **productive high-reuse signatures** names records with substantial output and cache writing despite little fresh input; replay and input-dump anomalies remain separate. The planned HITL and Agentic board modes will use cohort membership and workflow evidence, respectively. The historical counts and clustering remain dated findings, not board-mode labels.
+
+> [1] We ranked 1,628 AI coding operator records by token volume, then measured how their four token flows relate. This historical analysis separated seven composition clusters and a statistical outlier group. The median record had 19 cache-read tokens per fresh-input token. The shape is not what you'd expect.
 
 ---
 
@@ -18,7 +20,7 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 
 [2] Operator leaderboards rank by volume. Total tokens. Who burned the most. It's the only metric anyone publishes, and it's the wrong one.
 
-[3] Volume tells you who spent the most. It doesn't tell you who's good. An operator dumping 9 quadrillion tokens of synthetic input (99.999943% input, near-zero output, zero cache reuse) ranks #1 on every volume-based leaderboard. That's not a power user. That's an outlier.
+[3] Volume tells you how much token traffic was recorded. It does not reveal its operating structure. A record with 9 quadrillion tokens of almost entirely input traffic (99.999943% input, near-zero output, zero cache reuse) ranks #1 by volume despite showing no comparable reuse or generation. That's an input-dump anomaly, not the benchmark for a productive cascade.
 
 [4] The question isn't "who has the most tokens?" It's "what did they do with them?"
 
@@ -30,9 +32,9 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 Y = (cache_read × output) / input^2
 ```
 
-[7] Yield rewards building cache that produces output. Volume rewards burning tokens. They're not correlated. They're often inversely correlated. That's the whole thesis.
+[7] Yield combines cache reuse and generated output relative to fresh input. Cache writing is a separate pillar that helps explain context construction. Volume ranks total traffic; Yield ranks a relationship among token flows. That's the central distinction.
 
-> **Why input is squared.** Input appears in the denominator as input², not input. This is deliberate: an operator who provides almost no fresh context shouldn't score well just because their denominator is tiny. The square penalizes near-zero input sharply — which is exactly the signal we want, since operators with near-zero input are either (a) outliers replaying cache or (b) extreme humans whose cached context is so efficient they barely need to type. The gray-zone filter (see [15a]) separates those two cases. Without the square, yield would scale linearly with 1/input, making the metric trivially gameable by minimizing input rather than maximizing cache compounding.
+> **Why input is squared.** Input appears in the denominator as input², not input. With cache read and output held fixed, less fresh input increases Yield quadratically; the formula does not itself penalize a near-zero denominator. The outlier checks in [15a] separately examine whether a low-input record also has substantial output and cache writing, or resembles replay-only traffic. Neither the formula nor that screen determines how much human steering occurred.
 
 ## What the Numbers Show
 
@@ -55,7 +57,7 @@ Y = (cache_read × output) / input^2
 
 [11] Before analyzing anything, the telemetry had to be verified as real. Operator leaderboards are trivially gameable: fabricate token counts, replay cache, inflate your rank. So SigRank ran **Benford's Law** on the raw data.
 
-[12] Benford's Law is the mathematical principle that in naturally occurring datasets, the leading digit follows a logarithmic distribution. Digit 1 appears ~30% of the time. Digit 9 appears ~4.6%. It shows up in tax returns, river lengths, population counts, and stock prices. The IRS uses it to detect fraud. Outliers don't follow Benford. Real telemetry does.
+[12] Benford's Law describes a leading-digit distribution seen in some broad numeric datasets. Digit 1 appears ~30% of the time and digit 9 ~4.6% under that reference distribution. A goodness-of-fit check can reveal distribution-level anomalies; it cannot authenticate an individual record or decide whether a workflow was human-led or agentic.
 
 [13] A proper chi-square goodness-of-fit test was run on all 5 raw token pillars: input, output, cache read, cache write, total. Degrees of freedom 8, critical value 15.51 at p=0.05.
 
@@ -71,39 +73,39 @@ Y = (cache_read × output) / input^2
 
 > **Why N is smaller for Cache Read and Cache Write.** 3 operators had zero cache read and 133 had zero cache write — no leading digit to test, so they're excluded from that pillar's chi-square only. All other pillars use the full 1,628.
 
-[14] All 5 pillars pass. The observed first-digit distribution matches the expected Benford distribution almost perfectly. This is real telemetry, not fabricated.
+[14] All 5 tested pillars pass this distribution-level check. That supports further analysis of this corpus, but is not proof that every individual record is authentic.
 
-[15] **But aggregate Benford isn't enough.** It proves the dataset isn't wholesale fabricated; it doesn't catch individual outliers hiding in the tails. So a complementary test was added: the input/total ratio. Real humans have a healthy mix of fresh input and cache reuse. Outliers don't.
+[15] **Aggregate Benford is not a per-record screen.** A complementary input/total ratio analysis identified unusual token-flow shapes in the tails. That ratio describes composition; it does not divide human-led from agentic workflows.
 
 ![Outlier Detection: Input/Total Ratio](/article-charts/webp/06-outlier-zones.webp)
 
 | Zone | Signal | Count | % | What they're doing |
 |------|--------|-------|---|-------------------|
-| Zone 0 | input/total < 0.1% | 64 | 4.0% | Near-zero input — splits into extreme humans + replay outliers (see [15a]) |
+| Zone 0 | input/total < 0.1% | 64 | 4.0% | Near-zero input — includes productive high-reuse signatures and replay anomalies (see [15a]) |
 | Zone 1 | input/total > 80% | 12 | 0.7% | Input dumpers, massive input, no cache reuse, yield=0 |
-| Gray zone | 0.1–1% | 210 | 13.0% | Low input — splits into MOSES-like humans + extreme outliers (see [15a]) |
-| Human | 1–80% | 1,342 | 82.4% | Real operators, healthy input/cache mix |
+| Gray zone | 0.1–1% | 210 | 13.0% | Low input — includes productive mixed signatures and statistical outliers (see [15a]) |
+| Central range | 1–80% | 1,342 | 82.4% | Records within the historical input-share band |
 
-[15a] **Zone 0 is not all outliers.** This is the critical distinction. Of the 64 operators with input < 0.1%, 51 have real output (median 4M tokens) and real cache writes (median 64M tokens) — they're extreme humans, not flagged outliers. They've built cached context so efficient that they barely need fresh input. The other 13 have near-zero output and near-zero cache writes — they look like replay outliers, just cycling cached context without producing anything. The gray zone (0.1–1% input) splits similarly: 172 operators pass a MOSES-like filter (velocity ≤ 2x, yield ≤ 1,000, real output > 1M, real cache write > 1M) and stay in the Human Center of Mass. 38 fail the filter and join the outliers. The final outlier classification uses a 6-signal score (inhuman throughput, zero cache reads, single-model fixation, zero sessions, anomalous input ratio, near-zero output) — 17 operators score high enough to be flagged as outliers via the 6-signal score, joining the 113 from the input/total ratio analysis for a total of 130 outliers, removed from the Human Center of Mass but kept visible in their own category.
+[15a] **Near-zero input is not one operating pattern.** Of the 64 records with input < 0.1%, 51 also have substantial output (median 4M tokens) and cache writes (median 64M tokens): productive high-reuse signatures, not replay-only traffic. The other 13 have near-zero output and writes, consistent with replay anomalies. In the 0.1–1% band, 172 records pass the historical MOSES-like *composition* filter (velocity ≤ 2x, Yield ≤ 1,000, output > 1M, cache write > 1M) and remain in the dataset's Center of Mass; 38 fail that filter and join its outlier group. A separate 6-signal score flags 17 more records, for 130 statistical outliers in this historical analysis. These tests distinguish token-flow patterns; they did not record whether a person steered each step, supervised an agentic run, or used a hybrid workflow.
 
 **The classification:**
 
 | Category | Count | % | Criteria |
 |----------|-------|---|----------|
-| Human Center of Mass | 1,498 | 92.0% | Input 1–80%, or gray-zone passing MOSES-like filter |
+| Historical Center of Mass | 1,498 | 92.0% | Input 1–80%, or gray-zone passing the composition filter |
 | Outliers | 130 | 8.0% | 113 from input/total ratio analysis + 17 flagged (6-signal score) |
 
-[16] 130 operators (8.0%) are outliers. The aggregate Benford passes because 1,611 non-flagged operators dominate the first-digit distribution; 130 outliers out of 1,628 is 8.0%, not enough to break the aggregate. But if you don't separate them, they pollute every downstream metric.
+[16] The historical screen separated 130 records (8.0%). All five aggregate Benford tests passed, including the 113 ratio-screened records and 17 score-flagged records. Those aggregate results cannot validate each record; separating the statistical tails gives a clearer view of the cohort median.
 
-[17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That's not a human coding pattern; that's an outlier dumping synthetic input. This single operator skews the field average by 248,000%.
+[17] **The extreme case:** `grenadeoftacoss` has 9 quadrillion total tokens with 99.999943% being input. That is an input-dump anomaly in this dataset. This single record skews the field average by 248,000%.
 
-[18] **The outliers don't get deleted.** They get their own category. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else. The 89 extreme-human outliers — extreme humans like `furic` who have real output and real cache construction but near-zero input — get their own toggle on the leaderboard. They're not flagged outliers. They're just not the center of mass. The [field page](/field) shows the full outlier detection methodology — the 6-signal score, the input/total ratio zones, the scatter plot.
+[18] **The outliers don't get deleted.** The historical analysis kept them visible while separating them from median calculations. Of the ratio-screened group, 89 productive high-reuse signatures have substantial output and cache construction despite near-zero input; replay and input-dump anomalies have different profiles. That statistical split is not today's proposed HITL/Agentic board split. The [field page](/field) shows the original outlier-detection methodology and charts.
 
 ## The Human Center of Mass
 
-[19] After separating out the 130 outliers, 1,498 operators remain in the **Human Center of Mass**. The field average is meaningless; `grenadeoftacoss` alone skews it by 248,000%. The mean tells nobody anything.
+[19] After separating out the 130 statistical outliers, 1,498 records remain in the historically named **Human Center of Mass** cohort. The mean is pulled sharply by `grenadeoftacoss`; the median describes this screened cohort more clearly.
 
-[20] The **median** is the real center. SigRank calls it the **Human Center of Mass**: where real operators naturally cluster, not the average including trillion-token outliers.
+[20] The **median** is the center of this historical comparison group. The original analysis called it the **Human Center of Mass**; that is a cohort name, not evidence that every measured workflow was manually operated.
 
 ![Yield Distribution: Human Center of Mass](/article-charts/webp/02-yield-distribution.webp)
 
@@ -163,9 +165,9 @@ C : I : O = 19 : 1 : 0.09
 
 [30] K-Means clustering was run on the 1,611 non-flagged operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
 
-[31] **8 archetypes emerged** from the clustering and outlier analysis. 7 human archetypes came from K-Means on the 1,611 non-flagged operators. The 8th — Outliers — comes from the input/total ratio analysis (see [15a]), which flags 113 extreme humans from the 1,628, plus 17 flagged by the 6-signal score, for a total of 130 outliers. Some outliers like `furic` also appear in the Cache Architects archetype; the 8th category captures what's too extreme to set the median for everyone else. Silhouette score 0.625, which is "good structure," not noise.
+[31] **Eight statistical groups emerged** from the historical clustering and outlier analysis. Seven composition clusters came from K-Means on the 1,611 non-flagged records. The eighth — Outliers — combined 113 records from the input/total ratio analysis (including productive high-reuse signatures) and 17 flagged by the 6-signal score, for 130 outliers. Some records such as `furic` also appear in Cache Architects; the outlier group identifies values too extreme to set the cohort median. A silhouette score of 0.625 indicates separation in the measured feature space, not a human-versus-agentic classification.
 
-![7 Human Archetypes: Token Composition](/article-charts/webp/04-archetype-composition.webp)
+![Seven historical composition clusters](/article-charts/webp/04-archetype-composition.webp)
 
 ### The Field (n=963, 59.8%)
 [32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
@@ -188,19 +190,19 @@ C : I : O = 19 : 1 : 0.09
 [37] High yield (135) through balance, not extreme on any one dimension. 140x leverage, 0.99 velocity, 94% cache read, 4% cache write. They're efficient across the board, not relying on a single trick. Examples: `honggilgim` (7.2M tokens, 0.01% input, 96.4% cache read), `henmmi`, `shpark-daim`, `632781460` (10.5B tokens, 0.18% input, 97.3% cache read, yield 941, velocity 1.70), `headcha` (1.8B tokens, 0.28% input, 91.6% cache read, yield 291, velocity 0.90).
 
 ### Steady Cascaders (n=4, 0.2%)
-[38] A rare shape. 24% output, most operators are under 1%. These operators produce proportionally more output than the rest of the field. Yield 13.5, moderate. They're not the highest yield, but their composition is unique. Note: n=4 is small — this cluster is the most likely to dissolve or merge with reclassification. Examples: `rar-file` (9.08B tokens, 6.3% input, 13.3% output, yield 26), `cexll` (214B tokens, 33% input, 30% output, yield 1.0). (The originally listed `sadw1q` has been reclassified as an outlier — 0.14% input and yield of 110,251 places it in the extreme-human zone, not the Human Center of Mass.)
+[38] A rare shape. 24% output, most operators are under 1%. These operators produce proportionally more output than the rest of the field. Yield 13.5, moderate. They're not the highest yield, but their composition is unique. Note: n=4 is small — this cluster is the most likely to dissolve or merge with reclassification. Examples: `rar-file` (9.08B tokens, 6.3% input, 13.3% output, yield 26), `cexll` (214B tokens, 33% input, 30% output, yield 1.0). (The originally listed `sadw1q` was moved to the historical statistical outlier group based on its 0.14% input share and Yield of 110,251; that move does not identify its workflow mode.)
 
 ### Outliers (the 8th archetype)
 
-[39] The 130 outliers — 113 from the input/total ratio analysis plus 17 flagged by the 6-signal score (see [15a]) — form the 8th archetype. The 113 from the ratio analysis split into 89 extreme-human outliers (real output, real cache construction, near-zero input) and 24 replay/input-dump outliers (near-zero output, no cache reuse). Some outliers also appear in Cache Architects or Cache Builders — they carry both labels. The 17 flagged don't appear in any human archetype because they were excluded from clustering. Here's what the 8th category catches:
+[39] The 130 historical statistical outliers — 113 from the input/total ratio analysis plus 17 flagged by the 6-signal score (see [15a]) — form the eighth group. The 113 split into 89 productive high-reuse signatures (substantial output and cache construction, near-zero input) and 24 replay/input-dump anomalies. Some records also appear in Cache Architects or Cache Builders; the 17 flagged records were excluded from clustering. This was a distributional grouping, not a workflow-mode board:
 
-[40] **Extreme-human outliers (89 operators):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total) but output and cache writes are real: median 5M output, 76M cache write, 1.8B cache read. Yield 5,237. Leverage 1,282x. These are operators like `furic`, who have built such efficient cached context that they barely need fresh input. They have real output and real cache construction. They're just extreme — too extreme to set the median for everyone else. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
+[40] **Productive high-reuse signatures (89 records):** Extreme cache reuse. Input is near-zero (median 1.4M tokens, 0.075% of total), while median output is 5M, cache write 76M, and cache read 1.8B. Yield is 5,237 and Leverage 1,282x. These are active cascades, unlike replay-only records, and are too extreme to set the historical cohort median. Their token ratios alone do not say whether the workflow was human-led, hybrid, or agentic. Examples: `furic` (6.72B tokens, 0.003% input, yield 2.46M), `grishin43` (2.07B tokens, 0.006% input, yield 839K), `gabsh` (253M tokens, 0.014% input, yield 302K), `MaykThewessen` (6.41B tokens, 0.012% input, yield 254K), `shpark-daim` (260M tokens, 0.022% input, yield 197K).
 
-[40a] **Replay/input-dump outliers (24 operators):** The other 24 from the ratio analysis. These have near-zero output and no cache reuse — they're either cycling cached context without producing anything (replay outliers from zone 0) or dumping raw input with no compounding (input dumpers from zone 1). They look like noise, not human patterns. Examples: operators with 99%+ input and zero cache reads, or near-zero output despite billions of total tokens.
+[40a] **Replay/input-dump anomalies (24 records):** The other 24 from the ratio analysis. Replay cases show cache reads with little generation or construction; input-dump cases add fresh input without compounding. Examples include records with 99%+ input and zero cache reads, or near-zero output despite billions of total tokens. They should not be merged with productive high-reuse workflows simply because both sit outside the historical center.
 
-[41] **Flagged outliers (17 operators):** Two extreme outliers — `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output) and `stelle-w` (450B tokens, 75% input, 25% output, zero cache). Plus 15 more flagged by a multi-signal outlier score (3–4 signals): anomalous token ratios that don't match human patterns but aren't as clear-cut as the extreme outliers. Examples: `iamtheavoc1` (7T tokens, 14% input, 18% output, 64% cache read — flagged, score 4), `logcjj` (115B tokens, 52% input, near-zero yield — flagged, score 3).
+[41] **Flagged statistical outliers (17 records):** Two extreme cases — `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output) and `stelle-w` (450B tokens, 75% input, 25% output, zero cache). Fifteen more were flagged by a multi-signal outlier score (3–4 signals): unusual ratios and activity fields within this dataset, without a workflow-mode label. Examples: `iamtheavoc1` (7T tokens, 14% input, 18% output, 64% cache read — flagged, score 4), `logcjj` (115B tokens, 52% input, near-zero Yield — flagged, score 3).
 
-[42] Not deleted, categorized. They get their own toggle on the leaderboard. They rank against each other. The point isn't to pretend they don't exist. The point is to stop letting them set the numbers for everyone else.
+[42] Not deleted, categorized in this historical analysis. Separating statistical extremes makes the reference median more representative; it does not itself define today's HITL or Agentic board membership.
 
 ### What Each Type Looks Like
 
@@ -217,7 +219,7 @@ C : I : O = 19 : 1 : 0.09
 | Outlier | `sadw1q` | 17.75B | 0.14% | 30% | 0.0% | 69.7% | 110,251 |
 | Outlier (input dump) | `grenadeoftacoss` | 9Q | 99.9999% | ~0% | ~0% | ~0% | 0 |
 
-[42b] Read the table left to right and the shape jumps out. The Field operator puts in 0.73% fresh input and reads 95.9% cache — a 132:1 read-to-input ratio. The Cache Architect puts in 0.003% — one fresh token for every 30,000 cache reads. The Input-Heavy operator flips the pattern: 33.7% input, only 60.9% cache, yield near zero. The flagged outlier is just noise: 9 quadrillion tokens, 99.9999% input, zero compounding. The outlier (`sadw1q`) is the strangest shape — 30% output, which is 68x higher than the field median. That's why it's flagged as an extreme-human outlier, not a flagged outlier: it has real output, just at a composition nobody else hits.
+[42b] Read the table left to right and the shape jumps out. The Field example puts in 0.73% fresh input and reads 95.9% cache — a 132:1 read-to-input ratio. The Cache Architect example puts in 0.003% — one fresh token for every 30,000 cache reads. The Input-Heavy example flips the pattern: 33.7% input, only 60.9% cache, Yield near zero. The input-dump anomaly records 9 quadrillion tokens, 99.9999% input, and zero compounding. `sadw1q` shows another extreme: 30% output, 68x the field median. That is a distinctive productive composition, not evidence that a human typed or an agent acted without supervision.
 
 ## Notes from Building This
 
@@ -227,9 +229,9 @@ C : I : O = 19 : 1 : 0.09
 
 2. **Percentiles, not averages.** Operators don't care about the field average. They care about where they sit. Show percentile bands with a "YOU" marker. Athletic performance sites do this. It's addictive.
 
-3. **The Human Center of Mass.** This phrase stuck. Not "field average including trillion-token outliers" but "where real operators naturally cluster." That's the thing people remember.
+3. **The historical Center of Mass.** The median of the screened comparison group tells a clearer story than an average pulled by trillion-token anomalies. The original name referred to this statistical cohort, not a direct observation of each workflow's intervention mode.
 
-4. **The data naturally separates into 8 archetypes.** Not "8 operator types were invented." The 7 human clusters emerged from unsupervised K-Means; the 8th (outliers) emerged from the input/total ratio analysis. The groups emerged from the data, not from interpretation. That's a huge credibility difference.
+4. **The historical analysis found eight statistical groups.** Seven composition clusters came from K-Means; the eighth came from outlier screens. These groups describe measured features, while HITL and Agentic are workflow modes that require their own evidence.
 
 5. **This is something that doesn't exist yet.** GitHub measures commits. Stack Overflow measured reputation. Kaggle measures competitions. SigRank measures operator behavior, not models, not benchmarks, humans operating models. That's genuinely a different domain.
 
@@ -251,7 +253,7 @@ C : I : O = 19 : 1 : 0.09
 
 [50] The dataset is real. The outliers are categorized, not hidden. The archetypes emerged. The methodology is sound.
 
-[51] Volume isn't yield. The cascade economy rewards compounding, not pumping. And the shape of AI operators is not what you'd expect: it's a power law with a human center of mass, a hidden elite of cache architects, and a long tail of input-heavy operators still finding their footing.
+[51] Volume isn't Yield. The cascade shows different ways AI work can run: a screened center, productive high-reuse signatures far beyond it, and input-heavy or replay anomalies. Ratios make those differences visible; workflow evidence can show which signatures came from HITL or agentic execution.
 
 [52] This is the first cut. 1,628 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the outlier detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
 

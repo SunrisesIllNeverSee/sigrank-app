@@ -75,6 +75,12 @@ export type Platform = "ChatGPT" | "Claude" | "Pi" | "Gemini";
 
 export interface LeaderboardEntry {
   rank: number;
+  workflowMode?: "hitl" | "agentic" | null;
+  workflowEvidenceUrl?: string | null;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  processedTokensPerDay?: number | null;
+  outputTokensPerDay?: number | null;
   /** Percentile [0,100], higher = better. null when not available. */
   percentile?: number | null;
   anonId: string;
