@@ -20,6 +20,7 @@ import { isFeatureEnabledServer } from "@/lib/infra/posthog/server";
 export const FLAG_EXCHANGE_SEARCH = "exchange_search";
 export const FLAG_VERCEL_MARKETPLACE_BADGE = "vercel_marketplace_badge";
 export const FLAG_AGENT_EMAIL_NOTIFICATIONS = "agent_email_notifications";
+export const FLAG_FIELDHUB_PAGE = "fieldhub-page";
 
 /**
  * Site-wide gates are not personalized: a fixed distinctId keeps every
@@ -51,4 +52,14 @@ export function vercelMarketplaceBadgeEnabled(): Promise<boolean> {
  */
 export function agentEmailNotificationsEnabled(distinctId: string): Promise<boolean> {
   return isFeatureEnabledServer(distinctId, FLAG_AGENT_EMAIL_NOTIFICATIONS, true);
+}
+
+/**
+ * fieldhub-page — gates the /fieldhub landing page. Fails OPEN: the page is
+ * already live, so an undecidable evaluation (PostHog down/unconfigured)
+ * keeps it up; only an explicit off in PostHog takes it down (next ISR
+ * revalidation, ~1h).
+ */
+export function fieldhubPageEnabled(): Promise<boolean> {
+  return isFeatureEnabledServer(SITE_DISTINCT_ID, FLAG_FIELDHUB_PAGE, true);
 }
