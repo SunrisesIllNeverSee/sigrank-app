@@ -263,6 +263,8 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/upgrade": "UTILITY",
   "/exchange/propose": "UTILITY", // submission form
   "/agents.md": "UTILITY", // agent-facing doc route
+  "/marketplace": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
+  "/vercel/config": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
 
   // ── REDIRECT — known redirecting routes (never sitemap members) ─────────
   "/leaderboard": "REDIRECT", // → /board/all

@@ -194,7 +194,7 @@ Post-merge review produced a completeness addendum (§A–L). Executed on branch
 | F | Route classification manifest | **`config/search-index-policy.ts`** — 214 routes: CORE 19 · SUPPORTED 105 · HOLD 77 · UTILITY 8 · REDIRECT 5. **Manifest now gates sitemap membership** → emitted sitemap 234→~146 URLs. HOLD pages stay live + index,follow (omission ≠ noindex) |
 | G | Structured-data audit | **`SCHEMA-AUDIT.md`** — Organization `logo` present + resolving (flagged defect absent live); no dead operator URLs; no sigarena refs; no dupes |
 | H | Legacy hosts | **`LEGACY-HOSTS.md`** — all 3 hosts DNS-dead (nothing resolves → no live redirects needed today); route-mapping manifest + 410 policy recorded for any future re-point |
-| I | Interior navigation | Scope captured: footer architecture + §D operator link-graph — deferred to evidence gate (no nav changes shipped) |
+| I | Interior navigation | **`NAV-DESIGN.md`** — full hub topology + operator link-graph rules drafted as design manifest; implementation deferred to evidence gate (§L freeze) |
 | J | `/api/indexnow` hardening | **Rewritten** — bearer auth (`INDEXNOW_SUBMIT_SECRET`/`CRON_SECRET`), SITE_ORIGIN allowlist, key override removed, dedupe+cap(100), per-instance rate limit, submission logging. Contract tests added |
 | K | AI-search crawler access | **`CRAWLER-ACCESS.md`** — verified live: OAI-SearchBot/PerplexityBot/ClaudeBot/Googlebot all HTTP 200, no WAF/JS challenge; robots.txt policies intentional (Bytespider + meta-externalagent blocked; Google-Extended allowed) |
 | L | Spam-rollout monitoring/freeze | **Amended in SENTINEL.md** — Sept 2026 spam update still rolling out → no interpretation of fluctuations until completion; freeze list + allowed-exceptions recorded |
@@ -206,3 +206,13 @@ Post-merge review produced a completeness addendum (§A–L). Executed on branch
 ### Behavioral consequence of merging
 
 Sitemap membership drops from 234 → ~146 URLs (HOLD/UTILITY/REDIRECT excluded). This IS the addendum's Phase-2 manifest-as-source-of-truth — merging activates it. Merge timing controls activation timing.
+
+## Review round 2 (2026-10-05)
+
+- **Validator fixed**: `--file` is now a real offline mode (validated `.next/server/app/sitemap.xml.body` → 146 URLs, 0 violations); host invariant asserts `signalaf.com` on the declared `<loc>` rather than the fetch base, so `--live --base <preview>` works on preview deploys; live checks fetch `base+path` while canonical is still compared to the declared URL.
+- **CI gate is real**: sitemap emission extracted to `lib/seo/sitemap-entries.ts` (pure, dependency-free); `__tests__/seo/indexing-policy.test.mjs` now invokes `staticSitemapEntries`/`operatorSitemapEntries` on the real `STATIC_ROUTES` + `BOARD_WINDOWS` — uniqueness, host/scheme/utility/query invariants, manifest gating, and operator policy all assert on the actual emitted set under `npm test`. The script remains the post-deploy complement for live invariants (200/redirect/robots/canonical).
+- **Dead-link fix**: `MetricTopTen` no longer emits `href` on `isPlaceholder` rows — placeholder names render unlinked (LINK-GRAPH finding #2 closed; Hall window claimed-filter remains documented Phase-2 scope).
+- **IndexNow nits**: bearer comparison is now `crypto.timingSafeEqual`; dead post-dedupe empty check removed.
+- **Manifest completeness**: `/marketplace` + `/vercel/config` classified UTILITY (removed from STATIC_ROUTES in §A, recorded in the manifest).
+- **tsconfig**: `allowImportingTsExtensions` enabled so test-importable modules can carry explicit `.ts` specifiers (required by `node --experimental-strip-types`).
+- 43 → **46 contract tests**; full suite 685/681-pass/0-fail/4-skip; UI 132/132; canonical 11/11; tsc 0; build clean.

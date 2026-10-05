@@ -241,25 +241,31 @@ test("indexable-operator snapshot check chunks the IN clause below the PostgREST
 });
 
 // ── Sitemap URL uniqueness (closeout A) ─────────────────────────────────────
-// The emitted URL multiset must have no duplicates. Static and board-window
-// sources overlap historically: /board/all lived in both STATIC_ROUTES and
-// BOARD_WINDOWS.slug === "all", emitting the URL twice.
+// These tests invoke the real emission builders (lib/seo/sitemap-entries.ts)
+// on the real STATIC_ROUTES + BOARD_WINDOWS — the same call app/sitemap.ts
+// makes — so this is the CI gate for the structural sitemap invariants
+// (uniqueness, host, scheme, manifest gating). Historically /board/all lived
+// in both STATIC_ROUTES and BOARD_WINDOWS.slug === "all", emitting twice.
 
-async function emittedStaticPlusBoardUrls() {
-  const sitemapSrc = await source("app/sitemap.ts");
-  const windowsSrc = await source("lib/board/windows.ts");
-  const staticPaths = [...sitemapSrc.matchAll(/path:\s*"([^"]+)"/g)].map(
-    (m) => m[1],
-  );
-  const boardSlugs = [...windowsSrc.matchAll(/slug:\s*"([^"]+)"/g)].map(
-    (m) => `/board/${m[1]}`,
-  );
-  return { staticPaths, boardSlugs };
+import { BOARD_WINDOWS } from "../../lib/board/windows.ts";
+import {
+  STATIC_ROUTES,
+  staticSitemapEntries,
+  operatorSitemapEntries,
+} from "../../lib/seo/sitemap-entries.ts";
+
+// The exact emitted URL set app/sitemap.ts produces for static + board
+// entries (operator rows need the data layer; tested separately below).
+function emittedStaticPlusBoardUrls() {
+  return staticSitemapEntries(
+    STATIC_ROUTES,
+    BOARD_WINDOWS.map((w) => w.slug),
+    ORIGIN,
+  ).map((e) => e.url);
 }
 
-test("sitemap URLs are unique (static + board windows, no double emission)", async () => {
-  const { staticPaths, boardSlugs } = await emittedStaticPlusBoardUrls();
-  const urls = [...staticPaths, ...boardSlugs];
+test("sitemap URLs are unique (static + board windows, no double emission)", () => {
+  const urls = emittedStaticPlusBoardUrls();
   assert.equal(
     new Set(urls).size,
     urls.length,
@@ -267,17 +273,36 @@ test("sitemap URLs are unique (static + board windows, no double emission)", asy
   );
 });
 
-test("every board window URL is emitted exactly once", async () => {
-  const { staticPaths, boardSlugs } = await emittedStaticPlusBoardUrls();
+test("every board window URL is emitted exactly once", () => {
+  const urls = emittedStaticPlusBoardUrls();
   for (const w of ["/board/7d", "/board/30d", "/board/90d", "/board/all"]) {
-    const count = [...staticPaths, ...boardSlugs].filter((u) => u === w).length;
+    const count = urls.filter((u) => u === `${ORIGIN}${w}`).length;
     assert.equal(count, 1, `${w} emitted ${count} times in sitemap`);
   }
 });
 
-test("/board/all is not re-declared in STATIC_ROUTES (single emitter)", async () => {
-  const { staticPaths } = await emittedStaticPlusBoardUrls();
-  assert.ok(!staticPaths.includes("/board/all"));
+test("/board/all is not re-declared in STATIC_ROUTES (single emitter)", () => {
+  assert.ok(!STATIC_ROUTES.some((r) => r.path === "/board/all"));
+});
+
+test("emitted sitemap URLs satisfy the structural invariants (CI gate)", () => {
+  const siteHost = new URL(ORIGIN).host;
+  const utilityPrefixes = [
+    "/auth", "/login", "/logout", "/settings", "/account", "/me",
+    "/api/", "/admin", "/onboarding", "/claim",
+  ];
+  for (const u of emittedStaticPlusBoardUrls()) {
+    const parsed = new URL(u);
+    assert.equal(parsed.protocol, "https:", `${u} not HTTPS`);
+    assert.equal(parsed.host, siteHost, `${u} not on ${siteHost}`);
+    assert.equal(parsed.search, "", `${u} carries a query string`);
+    for (const p of utilityPrefixes) {
+      assert.ok(
+        parsed.pathname !== p && !parsed.pathname.startsWith(p + "/"),
+        `${u} is a utility/auth/internal route`,
+      );
+    }
+  }
 });
 
 // ── IndexNow hardening (closeout J) ─────────────────────────────────────────
@@ -289,6 +314,7 @@ test("indexnow endpoint requires bearer auth and has no anonymous path", async (
   assert.match(src, /INDEXNOW_SUBMIT_SECRET/);
   assert.match(src, /Bearer \$\{secret\}/);
   assert.match(src, /status:\s*401/);
+  assert.match(src, /timingSafeEqual/); // constant-time bearer comparison
 });
 
 test("indexnow endpoint cannot accept a request-supplied key override", async () => {
@@ -320,19 +346,19 @@ import {
   routesInClass,
 } from "../../config/search-index-policy.ts";
 
-test("every emitted static sitemap route is classified", async () => {
-  const sitemapSrc = await source("app/sitemap.ts");
-  const staticPaths = [...sitemapSrc.matchAll(/path:\s*"([^"]+)"/g)].map(
-    (m) => m[1],
+test("every emitted static sitemap route is classified", () => {
+  const unclassified = STATIC_ROUTES.map((r) => r.path).filter(
+    (p) => !(p in ROUTE_CLASSES),
   );
-  const unclassified = staticPaths.filter((p) => !(p in ROUTE_CLASSES));
   assert.deepEqual(unclassified, []);
 });
 
-test("every board window is classified and exactly once per URL", async () => {
+test("every board window is classified and emitted at most once per URL", () => {
   for (const w of ["/board/7d", "/board/30d", "/board/90d", "/board/all"]) {
     assert.ok(w in ROUTE_CLASSES, `${w} missing from manifest`);
   }
+  const slugs = BOARD_WINDOWS.map((w) => w.slug);
+  assert.equal(new Set(slugs).size, slugs.length, "duplicate board slugs");
 });
 
 test("the Phase-1 recovery cohort stays promoted (CORE or SUPPORTED)", () => {
@@ -357,7 +383,23 @@ test("UTILITY and REDIRECT routes are never sitemap-promoted", () => {
   }
 });
 
-test("sitemap gates static + board entries through the manifest", async () => {
-  const sitemapSrc = await source("app/sitemap.ts");
-  assert.match(sitemapSrc, /isSitemapPromoted/);
+test("sitemap emits only manifest-promoted static + board paths", () => {
+  for (const u of emittedStaticPlusBoardUrls()) {
+    const path = new URL(u).pathname;
+    assert.ok(
+      isSitemapPromoted(path),
+      `${path} emitted but not promoted by the manifest`,
+    );
+  }
+});
+
+test("operator sitemap entries pass the shared policy (no noindex rows emitted)", () => {
+  const rows = [
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "ok", has_metric_snapshot: true },
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "seed", claimed: false, has_metric_snapshot: true },
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "nosnap", has_metric_snapshot: false },
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "priv", profile_visibility: "private", has_metric_snapshot: true },
+  ];
+  const emitted = operatorSitemapEntries(rows, ORIGIN).map((e) => e.url);
+  assert.deepEqual(emitted, [`${ORIGIN}/user/ok`]);
 });

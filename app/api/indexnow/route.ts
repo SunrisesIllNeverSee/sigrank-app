@@ -29,6 +29,7 @@
  *     -d '{"urls":["https://signalaf.com/methodology"]}'
  */
 
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { SITE_ORIGIN } from "@/lib/seo";
 
@@ -55,7 +56,12 @@ function isAuthorized(req: NextRequest): { ok: boolean; status: number; error?: 
       error: "INDEXNOW_SUBMIT_SECRET/CRON_SECRET unset — cannot verify request",
     };
   }
-  if (req.headers.get("authorization") !== `Bearer ${secret}`) {
+  const provided = req.headers.get("authorization") ?? "";
+  const expected = `Bearer ${secret}`;
+  const same =
+    provided.length === expected.length &&
+    timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+  if (!same) {
     return { ok: false, status: 401, error: "Unauthorized" };
   }
   return { ok: true, status: 200 };
@@ -113,9 +119,6 @@ export async function POST(req: NextRequest) {
 
   // Dedupe + cap
   const urls = [...new Set(raw)].slice(0, MAX_URLS);
-  if (urls.length === 0) {
-    return NextResponse.json({ error: "No valid URLs provided" }, { status: 400 });
-  }
 
   recentCalls.push(now);
 
