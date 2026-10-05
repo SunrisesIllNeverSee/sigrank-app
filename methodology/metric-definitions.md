@@ -22,4 +22,4 @@ Let `i = input`, `o = output`, `cw = cache_create`, and `cr = cache_read`. The c
 
 The cascade implementation computes 10xDEV as `log10((o/i) × (cw/o) × (cr/cw))` when all four pillars are positive; this product algebraically simplifies to `log10(cr / i)`, which equals `log10(Leverage)` when `i > 0`. There is no discrepancy between the documented invariant and the implementation.
 
-Source: `lib/cascade/metrics.ts`.
+Source: `lib/analytics/cascade.ts`.

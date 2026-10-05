@@ -21,4 +21,4 @@ It is not a judgment of a person or a general measure of intelligence. A rank is
 
 The pyramid is intentionally one-way: interpretations do not alter observations. See `ontology/`, `methodology/`, and `governance/` for the canonical definitions, methods, and data commitments.
 
-Technical basis: `lib/cascade/metrics.ts`, `lib/ingest/gates.ts`.
+Technical basis: `lib/analytics/cascade.ts`, `lib/ingest/gates.ts`.

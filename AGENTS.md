@@ -97,7 +97,7 @@ If unsure whether something is SEO strategy or a real bug, ASK THE OWNER.
 - **Next.js 15 + React 19** — App Router (`app/` directory)
 - **Supabase** — database + auth
 - **Stripe** — billing (test mode in dev)
-- **Display names:** Use `operatorDisplayName()` from `lib/compare/operator-name.ts`
+- **Display names:** Use `operatorDisplayName()` from `lib/identity/operator-name.ts`
   for all visible user-facing text. Never render raw `.codename` as display text
   (use as URL keys / lookup values only).
 - **No new dependencies** without explicit approval. Use existing libraries.
@@ -150,7 +150,7 @@ README changes are zero-risk to builds.
 When a verified snapshot is persisted, `revalidateTouchedWindows()` in
 `lib/ingest/materialize.ts` must bust THREE cache layers:
 1. `revalidatePath("/board/<slug>")` — board page ISR cache
-2. `revalidateTag("operator")` — data-layer `unstable_cache` (getOperator, getOperatorHistory, etc. in `lib/data/cached.ts`)
+2. `revalidateTag("operator")` — data-layer `unstable_cache` (getOperator, getOperatorHistory, etc. in `lib/board/cached.ts`)
 3. `revalidatePath("/user/<codename>")` — profile page ISR cache (`export const revalidate = 120`)
 
 If profile or share card data looks stale after a submit, check that all three

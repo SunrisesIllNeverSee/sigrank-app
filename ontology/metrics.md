@@ -18,4 +18,4 @@ Public cascade metrics are deterministic diagnostics over raw pillars:
 
 The implementation also exposes scale, blended price display, efficiency, and an operation ratio. Metrics quantify token-flow relationships; they are not direct productivity or quality measures.
 
-Source: `lib/cascade/metrics.ts`.
+Source: `lib/analytics/cascade.ts`.
