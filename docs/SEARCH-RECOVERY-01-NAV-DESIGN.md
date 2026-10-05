@@ -11,7 +11,7 @@ related supporting pages`. Link count itself is not a penalty; topical
 relationships must be legible. The broad homepage discovery directory is
 kept — it is the site's own sitemap-equivalent surface for users.
 
-## Hub topology (derived from config/search-index-policy.ts families)
+## Hub topology (derived from lib/seo/search-index-policy.ts families)
 
 | Family | Parent hub | Child pages |
 |---|---|---|
@@ -22,7 +22,7 @@ kept — it is the site's own sitemap-equivalent surface for users.
 | Alternatives | `/alternatives` | `/alternatives/*` |
 | Guides | `/guides` | `/guides/*` |
 | Board windows | `/board/all` | `/board/7d`, `/board/30d`, `/board/90d` cross-link each other |
-| Extensions | `/extensions` | `/extensions/*` |
+| Standards/docs | `/standard`, `/docs` | `/standard/open-vs-proprietary`, `/docs/integrations/*` |
 
 Rules when implemented:
 

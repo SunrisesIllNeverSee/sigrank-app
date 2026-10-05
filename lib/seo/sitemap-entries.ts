@@ -12,7 +12,7 @@ import {
   operatorSitemapEntry,
   type SearchIndexableOperator,
 } from "./indexing-policy.ts";
-import { isSitemapPromoted } from "../../config/search-index-policy.ts";
+import { isSitemapPromoted } from "./search-index-policy.ts";
 
 export interface StaticRouteEntry {
   path: string;

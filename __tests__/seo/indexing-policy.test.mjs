@@ -336,7 +336,7 @@ test("indexnow endpoint dedupes and caps the batch", async () => {
 });
 
 // ── Static route classification manifest (closeout E+F) ─────────────────────
-// config/search-index-policy.ts is the source of truth for sitemap membership:
+// lib/seo/search-index-policy.ts is the source of truth for sitemap membership:
 // CORE + SUPPORTED are promoted; HOLD stays live but unadvertised; UTILITY and
 // REDIRECT are never promoted.
 
@@ -344,7 +344,7 @@ import {
   ROUTE_CLASSES,
   isSitemapPromoted,
   routesInClass,
-} from "../../config/search-index-policy.ts";
+} from "../../lib/seo/search-index-policy.ts";
 
 test("every emitted static sitemap route is classified", () => {
   const unclassified = STATIC_ROUTES.map((r) => r.path).filter(

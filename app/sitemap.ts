@@ -23,7 +23,7 @@ import {
 } from "@/lib/seo/sitemap-entries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Membership is governed by config/search-index-policy.ts (CORE +
+  // Membership is governed by lib/seo/search-index-policy.ts (CORE +
   // SUPPORTED promoted; HOLD stays live but unadvertised; UTILITY + REDIRECT
   // never promoted). lastModified only when the route entry declares a real
   // modification date; no shared fallback date, no generation time.

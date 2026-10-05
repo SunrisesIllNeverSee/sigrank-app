@@ -84,16 +84,24 @@ async function main() {
     urls.filter((u) => !u.startsWith("https://")),
   );
 
+  // Malformed <loc> values are reported once, under the host invariant —
+  // the remaining checks skip them instead of throwing an opaque error.
+  const malformed = new Set();
   const badHost = urls.filter((u) => {
     try {
       return new URL(u).host !== SITE_HOST;
     } catch {
+      malformed.add(u);
       return true;
     }
   });
-  failures += fail(`URLs not on host ${SITE_HOST}`, badHost);
+  failures += fail(
+    `URLs not on host ${SITE_HOST} (or unparseable)`,
+    badHost,
+  );
 
   const utility = urls.filter((u) => {
+    if (malformed.has(u)) return false;
     const path = new URL(u).pathname;
     return UTILITY_PREFIXES.some(
       (p) => path === p || path.startsWith(p + "/"),
@@ -101,7 +109,9 @@ async function main() {
   });
   failures += fail("utility/auth/internal routes in sitemap", utility);
 
-  const queryUrls = urls.filter((u) => new URL(u).search.length > 0);
+  const queryUrls = urls.filter(
+    (u) => !malformed.has(u) && new URL(u).search.length > 0,
+  );
   failures += fail("query-string URLs (possible duplicates)", queryUrls);
 
   // ── Live invariants (fetch each URL) ────────────────────────────────────
@@ -127,9 +137,10 @@ async function main() {
               return;
             }
             const html = await r.text();
-            const robots = html.match(
-              /<meta name="robots" content="([^"]*)"/i,
-            )?.[1];
+            // Match <meta name="robots" content="..."> in either attribute order.
+            const robots =
+              html.match(/<meta name="robots" content="([^"]*)"/i)?.[1] ??
+              html.match(/<meta content="([^"]*)" name="robots"/i)?.[1];
             if (robots && /noindex/i.test(robots)) {
               results.noindex.push(`${u} → robots: ${robots}`);
             }

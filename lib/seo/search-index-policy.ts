@@ -1,5 +1,5 @@
 /**
- * config/search-index-policy.ts — static-route sitemap classification manifest
+ * lib/seo/search-index-policy.ts — static-route sitemap classification manifest
  * (SEARCH-RECOVERY Phase 2, addendum §F).
  *
  * Separates "the page exists" from "we actively propose it to Google."
@@ -64,7 +64,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/faq": "SUPPORTED",
   "/learn": "SUPPORTED",
   "/developers": "SUPPORTED",
-  "/fieldhub": "SUPPORTED",
+  "/fieldhub": "SUPPORTED", // flag-coupled: a PostHog flag can 404 this route — sitemap:validate --live will catch it if the flag flips
   "/platforms": "SUPPORTED",
   "/standard/open-vs-proprietary": "SUPPORTED",
   "/ai-coding-metrics": "SUPPORTED",

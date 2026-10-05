@@ -32,6 +32,13 @@ Board surfaces filter `claimed`, but the index contract is `claimed ∧ ¬retire
 3. **`/user/the-field` sitewide footer link** — retained deliberately: The Field is the canonical aggregate persona used by `/compare`; page is `noindex,follow`. Documented reason; keep.
 4. **JSON-LD hygiene ✓** — `leaderboardItemList` draws from the claimed-only feed; `operatorProfile` emits only the profile's own URL; no dead operator URLs found in machine-readable output. Organization `logo` present (`/og-v2.png`, HTTP 200 verified).
 
+## Self/auth emitters (inert for the spec — recorded for completeness)
+
+| `SettingsAccount`, `ClaimTab` (`?next=` deep links) | auth-gated owner flows — link to the caller's own `/user/` URL | session operator only | Owner's own profile | No |
+| `/me` redirect | `redirect → /user/<me>` | session operator only | Owner's own profile | No |
+| `wrapped` self-link (`/user/<x>/wrapped`) | profile's own subpage | the profile itself | Same indexability as parent profile | No |
+| `lib/ingest/materialize.ts` `revalidatePath`s | cache invalidation, not rendered links | n/a | n/a | n/a |
+
 ## Non-emitters checked
 
 `/field` (aggregate analytics — no per-operator links), homepage (`Draft2LiveActivity` — no operator links; MiniBoards archived), `lib/mcp/plugin/service.ts` (data API — `profile_url` field, not crawlable HTML), `outreach-card` (image text only).

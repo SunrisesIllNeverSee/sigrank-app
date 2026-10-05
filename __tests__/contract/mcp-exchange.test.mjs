@@ -385,36 +385,36 @@ test("exchange layout renders contributionExchangeService JSON-LD (scoped to /ex
 // ─── Sitemap tests ───────────────────────────────────────────────────────────
 // STATIC_ROUTES lives in lib/seo/sitemap-entries.ts — it is the sitemap's
 // route inventory. Whether a declared route is emitted is governed by
-// config/search-index-policy.ts (e.g. /exchange/propose is UTILITY →
+// lib/seo/search-index-policy.ts (e.g. /exchange/propose is UTILITY →
 // declared but not advertised). Emission coverage is asserted in
 // __tests__/seo/indexing-policy.test.mjs against the real emitted set.
 
-test("sitemap includes /exchange route", async () => {
+test("sitemap inventory declares /exchange route", async () => {
   const sitemap = await source("lib/seo/sitemap-entries.ts");
   assert.match(sitemap, /path: "\/exchange"/);
 });
 
-test("sitemap includes /exchange/signals route", async () => {
+test("sitemap inventory declares /exchange/signals route", async () => {
   const sitemap = await source("lib/seo/sitemap-entries.ts");
   assert.match(sitemap, /path: "\/exchange\/signals"/);
 });
 
-test("sitemap includes /exchange/propose route", async () => {
+test("sitemap inventory declares /exchange/propose route", async () => {
   const sitemap = await source("lib/seo/sitemap-entries.ts");
   assert.match(sitemap, /path: "\/exchange\/propose"/);
 });
 
-test("sitemap includes /agents.md route", async () => {
+test("sitemap inventory declares /agents.md route", async () => {
   const sitemap = await source("lib/seo/sitemap-entries.ts");
   assert.match(sitemap, /path: "\/agents\.md"/);
 });
 
-test("sitemap does NOT include /exchange.schema.json (JSON file, not a page)", async () => {
+test("sitemap inventory does NOT declare /exchange.schema.json (JSON file, not a page)", async () => {
   const sitemap = await source("lib/seo/sitemap-entries.ts");
   assert.doesNotMatch(sitemap, /path: "\/exchange\.schema\.json"/);
 });
 
-test("sitemap does NOT include private/admin routes", async () => {
+test("sitemap inventory does NOT declare private/admin routes", async () => {
   const sitemap = await source("lib/seo/sitemap-entries.ts");
   // Should not include internal routes
   assert.doesNotMatch(sitemap, /path: "\/internal\//);

@@ -15,6 +15,10 @@
  *     CRON_SECRET so deploy/cron jobs can call it. Neither set → 500 (loud).
  *     There is intentionally no anonymous path — this endpoint is invoked by
  *     deployment tooling, not the public.
+ *     DEPLOY NOTE: INDEXNOW_SUBMIT_SECRET must be provisioned in the Vercel
+ *     env before first use (else the route 500s). Any external caller —
+ *     including the `indexnow` MCP in AGENTS.md — must present the bearer
+ *     token; anonymous POSTs now 401 by design.
  *   - Origin allowlist: every submitted URL must have origin === SITE_ORIGIN.
  *     Any cross-origin entry rejects the whole batch (400).
  *   - No key override: the request can no longer supply `key`. The payload
@@ -147,6 +151,9 @@ export async function POST(req: NextRequest) {
         ok,
         submitted: urls.length,
         deduped: raw.length - new Set(raw).size,
+        // Caller-visible so a >MAX_URLS batch can't silently drop URLs.
+        truncated: raw.length > MAX_URLS,
+        dropped: Math.max(0, new Set(raw).size - urls.length),
       },
       { status: 200, headers: { "Cache-Control": "no-store" } },
     );
