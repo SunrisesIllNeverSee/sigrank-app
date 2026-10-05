@@ -63,7 +63,7 @@
     "simple-statistics": "^7.9.3",
     "stripe": "^22.3.1",
     "token-cascade": "0.2.1",
-    "workflow": "^4.8.2",
+    "workflow": "^4.8.12",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -91,12 +91,12 @@
     "typescript": "5.8.2",
     "typescript-eslint": "^8.64.0",
     "vitest": "^4.1.10",
-    "wrangler": "^4.129.1"
+    "wrangler": "^4.147.0"
   },
   "overrides": {
     "sharp": "^0.35.0",
     "postcss": "^8.5.23",
-    "undici": "^7.29.0",
+    "undici": "^7.30.0",
     "nanoid": "^5.1.16"
   }
 }
