@@ -25,7 +25,6 @@ import {
   getOperator,
   isOperatorRetired,
 } from "@/lib/board";
-import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
 import type { Operator } from "@/lib/analytics/scoring-types";
@@ -171,14 +170,12 @@ export default async function OperatorProfilePage({
 
   const topPct = Math.max(0, 100 - row.percentile);
   const c = snapshot.cascade;
-  const ranked = !pending && c && !c.nonCompounding;
 
   // Header-only computations — these use only getOperator data (already
   // fetched above) so the header renders immediately without waiting for
   // the 5 heavy parallel queries in ProfileBody.
   const name = resolveName(operator);
   const hasDisplayName = name !== operator.codename;
-  const outlier = !pending && c && !c.nonCompounding ? isOutlierRow(row) : false;
 
   const isPrivate = operator.profile_visibility === "private";
   const viewerRedacted = isPrivate && !isOwner;
@@ -217,25 +214,21 @@ export default async function OperatorProfilePage({
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
               {nameShown}
-              {outlier && (
-                <span
-                  title="Outlier — excluded from Operator Center of Mass"
-                  className="ml-1 text-red-500"
-                >
-                  *
-                </span>
-              )}
             </h1>
-            {pending ? (
+            {pending || row.global_rank === 0 ? (
               <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
                 Unranked
               </span>
-            ) : outlier ? (
-              <span className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-red-400">
-                Outlier
-              </span>
             ) : (
               <SignalClassBadge signalClass={snapshot.class_tier} />
+            )}
+            {row.workflow_mode && (
+              <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-secondary">
+                {row.workflow_mode === "hitl" ? "HITL" : "Agentic"}
+              </span>
+            )}
+            {row.workflow_mode === "agentic" && row.workflow_evidence_url?.startsWith("https://") && (
+              <a href={row.workflow_evidence_url} target="_blank" rel="noopener noreferrer" className="font-mono text-[11px] text-gold underline">Workflow evidence ↗</a>
             )}
             {viewerRedacted && (
               <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
@@ -248,8 +241,8 @@ export default async function OperatorProfilePage({
             {handle_ && (
               <span className="text-text-secondary">@{handle_}</span>
             )}
-            {pending ? (
-              <span>No cascade data yet</span>
+            {pending || row.global_rank === 0 ? (
+              <span>{pending ? "No cascade data yet" : "Awaiting board placement"}</span>
             ) : (
               <>
                 <span>Rank #{row.global_rank}</span>

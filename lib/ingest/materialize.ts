@@ -274,6 +274,7 @@ export async function insertSubmissionOnly(
     // never let a client timestamp set the throttle-keyed column (review P2). The client's
     // claimed submitted_at remains in payload_json.
     window_type: payload.window.type,
+    platform: payload.platform.primary,
     window_start: payload.window.start,
     window_end: payload.window.end,
     schema_version: payload.schema_version,

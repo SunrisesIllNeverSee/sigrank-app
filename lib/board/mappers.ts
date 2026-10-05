@@ -63,6 +63,13 @@ export interface DbOperator {
 export interface DbMetricSnapshot {
   operator_id: string;
   snapshot_date: string;
+  source_submission_id?: string | null;
+  window_start?: string | null;
+  window_end?: string | null;
+  workflow_mode?: "hitl" | "agentic" | null;
+  workflow_evidence_url?: string | null;
+  workflow_mode_version?: string | null;
+  mode_assessed_at?: string | null;
   /** PK — final tie-breaker when window/date/platform all tie (same-date
    *  uploads stamp one row per window with identical dates). Optional: cold
    *  snapshot.json rows predate its inclusion in the select. */
@@ -178,6 +185,8 @@ export function applySnapshotRollups(
 
 /** Common query params for board-style reads. */
 export interface BoardParams {
+  /** Website workflow board; omitted by legacy API/MCP callers. */
+  mode?: import("@/lib/board/workflow-mode").BoardMode;
   /** Plugin reads fail closed instead of substituting demo/cold-store rows. */
   strictLive?: boolean;
   /** API window enum (e.g. '30d'); maps from WINDOW_API_MAP. */

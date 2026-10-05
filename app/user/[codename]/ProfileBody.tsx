@@ -24,11 +24,11 @@ import {
 } from "@/lib/board";
 import type { HallRecord } from "@/lib/board";
 import { computeFieldAverages } from "@/lib/analytics/field-average";
-import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 import type { Operator } from "@/lib/analytics/scoring-types";
 import { SignalClassBadge } from "@/components/sigrank";
 import { CascadePanel } from "@/components/profile/CascadePanel";
 import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
+import { SnapshotHistory } from "@/components/profile/SnapshotHistory";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { OperatorRecords } from "@/components/profile/OperatorRecords";
 import { ProfileAuthGate } from "@/components/profile/ProfileAuthGate";
@@ -90,7 +90,7 @@ export async function ProfileBody({
     getOperatorHistory(codename),
     getOperatorSubmissions(codename),
     getOperatorReport(operator.operator_id),
-    getLeaderboard(),
+    getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
     getHallOfSignal(),
   ]);
 
@@ -100,15 +100,14 @@ export async function ProfileBody({
   const topPct = Math.max(0, 100 - row.percentile);
   const c = snapshot.cascade;
 
-  const humanRows = boardRows.filter((r) => !isOutlierRow(r));
-  const fieldAvg = computeFieldAverages(humanRows);
+  const fieldAvg = computeFieldAverages(boardRows);
   const operatorHallNames = new Set<string>([operator.codename]);
   if (operator.display_name) operatorHallNames.add(operator.display_name);
   const operatorRecords: HallRecord[] = hallRecords.filter((r) =>
     operatorHallNames.has(r.operator_codename),
   );
 
-  const topOperator = humanRows.find(
+  const topOperator = boardRows.find(
     (r) => r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
   );
   const opYield = c && !c.nonCompounding ? c.yield_ : null;
@@ -196,7 +195,6 @@ export async function ProfileBody({
 
   const name = resolveName(operator);
   const hasDisplayName = name !== operator.codename;
-  const outlier = !pending && c && !c.nonCompounding ? isOutlierRow(row) : false;
 
   const isPrivate = operator.profile_visibility === "private";
   const viewerRedacted = isPrivate && !isOwner;
@@ -376,7 +374,10 @@ export async function ProfileBody({
   // ── Submissions tab ───────────────────────────────────────────────────────
   const submissionsPanel =
     submissions.length > 0 ? (
-      <SubmissionsGrid submissions={submissions} />
+      <>
+        <SubmissionsGrid submissions={submissions} />
+        {!isPrivate && <SnapshotHistory codename={codename} />}
+      </>
     ) : (
       <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
         <span className="font-mono text-2xl text-text-dim">◈</span>

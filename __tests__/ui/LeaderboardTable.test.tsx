@@ -1,10 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 
 // Mock next/navigation — LeaderboardTable uses useRouter
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push,
     replace: vi.fn(),
     prefetch: vi.fn(),
     back: vi.fn(),
@@ -88,15 +90,20 @@ describe("LeaderboardTable", () => {
     expect(hasItalic).toBe(false);
   });
 
-  it("category toggle labels the outliers group '+ Outliers'", () => {
+  it("opens All and offers HITL and Agentic workflow views", () => {
     render(<LeaderboardTable entries={mockEntries} />);
-    // Owner 2026-09-27: the button reads "+ Outliers" (the category still
-    // covers bots internally — the label is the public copy).
-    const btn = screen.getByRole("button", { name: /outliers/i });
-    expect(btn.textContent?.trim()).toBe("+ Outliers");
-    const botsBtn = screen
-      .getAllByRole("button")
-      .filter((b) => /bots/i.test(b.textContent ?? ""));
-    expect(botsBtn).toHaveLength(0);
+    expect(screen.getByRole("button", { name: "HITL" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Agentic" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All" })).toHaveStyle({ fontWeight: 700 });
+    expect(screen.queryByRole("button", { name: /outliers/i })).not.toBeInTheDocument();
+  });
+
+  it("uses shareable mode URLs and keeps All as the clean default", () => {
+    push.mockClear();
+    render(<LeaderboardTable entries={mockEntries} window="all" />);
+    fireEvent.click(screen.getByRole("button", { name: "Agentic" }));
+    expect(push).toHaveBeenCalledWith("/board/all?mode=agentic");
+    fireEvent.click(screen.getByRole("button", { name: "All" }));
+    expect(push).toHaveBeenLastCalledWith("/board/all");
   });
 });

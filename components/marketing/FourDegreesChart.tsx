@@ -221,7 +221,7 @@ function SourceMarkers() {
       >
         all-time board
       </Link>{" "}
-      (auto-pulled at render). Operator Center of Mass = median of all real operators;
+      (auto-pulled at render). Operator Center of Mass = median of the screened operator cohort;
       Power users = median of the top 100 by yield; Top Evals = the single leading
       operator. 130 outliers separated (see the{" "}
       <Link
@@ -318,9 +318,8 @@ function Provenance() {
           Average users (all operators median) · <span className="text-gold">measured live</span>
         </p>
         <p>
-          The median of ALL real operators on the all-time board, with the 130
-          outliers separated (they&apos;re not deleted — they get their own
-          category — but they don&apos;t set the median). Median, not mean: the
+          The median of the screened all-time operator cohort, with the historical
+          statistical outliers separated for this reference calculation. Median, not mean: the
           board is heavily right-skewed (a single IGNITER-class operator with 9
           quadrillion input tokens pulls the mean yield to 427 vs the median of
           2.5 — a 170× spread). The median is the exact 50th percentile, immune
