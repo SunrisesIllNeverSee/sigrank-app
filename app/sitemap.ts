@@ -2,13 +2,20 @@
  * app/sitemap.ts — dynamic sitemap for Google Search Console.
  *
  * Static routes are listed with their natural change frequency. Operator
- * profile routes (/user/<codename>) are fetched from the leaderboard API
- * so every ranked operator gets a sitemap entry. Board windows + wiki
- * subpages are enumerated from their source-of-truth arrays.
+ * profile routes (/user/<codename>) come from the claimed-operator data layer
+ * filtered through the shared search-indexing policy (lib/seo/indexing-policy.ts)
+ * — a URL appears here iff its page is eligible for `index,follow`. Board
+ * windows + wiki subpages are enumerated from their source-of-truth arrays.
+ *
+ * Freshness contract (SEARCH-RECOVERY Phase 1): no synthesized lastModified.
+ * An entry emits lastmod only when the route declares a real modification
+ * date; generation time and shared fallback dates are never sent.
  */
 
 import type { MetadataRoute } from "next";
 import { SITE_ORIGIN } from "@/lib/seo";
+import { operatorSitemapEntry } from "@/lib/seo/indexing-policy";
+import { getIndexableOperatorRows } from "@/lib/board";
 import { BOARD_WINDOWS } from "@/lib/board/windows";
 
 /** Static routes (manually maintained — add new static pages here). */
@@ -447,9 +454,6 @@ const STATIC_ROUTES: {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  // Static content pages use a fixed last-modified date (the last content update)
-  // instead of `now` — this prevents Google from seeing every URL as "just changed"
-  // on every sitemap fetch, which dilutes the lastmod signal.
   const STATIC_LAST_MODIFIED = new Date("2026-08-14T09:50:00Z");
 
   // Static routes
@@ -470,32 +474,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  // Operator profile routes — fetch the leaderboard to get every ranked codename.
-  // This is the highest-value sitemap content (each operator's profile is unique +
-  // shareable). Falls back to an empty array if the API is unreachable.
+  // Operator profile routes — the search-indexable population only. Sourced
+  // from the data layer (claimed operators + snapshot existence), never from
+  // the public leaderboard HTTP API (a rate-limited, 30d-windowed view that is
+  // not the indexing contract). Each row passes through the shared policy, so
+  // sitemap membership == the page's index,follow eligibility. Data-layer
+  // failure leaves a valid partial sitemap rather than erroring the route.
   let operatorEntries: MetadataRoute.Sitemap = [];
   try {
-    const res = await fetch(`${SITE_ORIGIN}/api/v1/leaderboard?limit=500`, {
-      next: { revalidate: 300 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const entries = data.entries ?? [];
-      operatorEntries = entries
-        .map((e: { codename?: string; operator?: { codename?: string } }) => {
-          const codename = e.codename ?? e.operator?.codename;
-          if (!codename) return null;
-          return {
-            url: `${SITE_ORIGIN}/user/${codename}`,
-            lastModified: now,
-            changeFrequency: "daily" as const,
-            priority: 0.8,
-          };
-        })
-        .filter(Boolean);
-    }
+    const rows = await getIndexableOperatorRows();
+    operatorEntries = rows
+      .map((r) => operatorSitemapEntry(r, r.has_metric_snapshot, SITE_ORIGIN))
+      .filter((e): e is NonNullable<typeof e> => e !== null);
   } catch {
-    // API unreachable — skip operator entries (sitemaps can be partial)
+    // Data layer unreachable — skip operator entries (sitemaps can be partial)
   }
 
   return [...staticEntries, ...boardEntries, ...operatorEntries];

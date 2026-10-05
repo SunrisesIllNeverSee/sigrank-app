@@ -607,6 +607,81 @@ export async function getOperator(
   }
 }
 
+/** Row shape for the sitemap indexing contract — the operator fields the
+ *  shared SEO indexing policy (lib/seo/indexing-policy.ts) needs, plus whether
+ *  the operator has at least one metric snapshot. */
+export interface IndexableOperatorRow {
+  codename: string;
+  claimed: boolean;
+  status: string | null;
+  profile_visibility: string | null;
+  has_metric_snapshot: boolean;
+}
+
+/**
+ * getIndexableOperatorRows — the operator population for sitemap.xml.
+ *
+ * Two bounded queries: the claimed operators (small — the live board's
+ * population), then an operator_id-only scan of their metric_snapshots for
+ * existence. Deliberately NOT getLeaderboard: that path scans the whole
+ * metric_snapshots table AND applies the ghost-row filter (drops rows with
+ * null/zero input/output tokens), while the profile page's eligibility signal
+ * is `!row.pending` — "has any snapshot at all". has_metric_snapshot here
+ * matches pending exactly, so sitemap inclusion and profile robots can never
+ * diverge on the snapshot clause.
+ *
+ * Fallback contract matches the rest of the facade: no creds / query error →
+ * [] (sitemap stays valid, just static), strictLive → throw.
+ */
+export async function getIndexableOperatorRows(
+  strictLive = false,
+): Promise<IndexableOperatorRow[]> {
+  const sb = getSupabaseServer();
+  if (!sb) {
+    if (strictLive) throw new Error("Live operator source is not configured");
+    return [];
+  }
+  try {
+    const { data, error } = await sb
+      .from("operators_public")
+      .select("operator_id, codename, claimed, status, profile_visibility")
+      .eq("claimed", true)
+      .limit(10_000);
+    if (error) throw error;
+    const ops =
+      asDb<
+        {
+          operator_id: string;
+          codename: string;
+          claimed: boolean | null;
+          status: string | null;
+          profile_visibility: string | null;
+        }[]
+      >(data) ?? [];
+    if (ops.length === 0) return [];
+
+    const ids = ops.map((o) => o.operator_id);
+    const snapRows = await fetchAllPaginated<{ operator_id: string }>(
+      sb,
+      (s) =>
+        s.from("metric_snapshots").select("operator_id").in("operator_id", ids),
+      "metric_snapshots (indexableOperators)",
+    );
+    const hasSnap = new Set(snapRows.map((r) => r.operator_id));
+
+    return ops.map((o) => ({
+      codename: o.codename,
+      claimed: o.claimed === true,
+      status: o.status ?? null,
+      profile_visibility: o.profile_visibility ?? null,
+      has_metric_snapshot: hasSnap.has(o.operator_id),
+    }));
+  } catch (error) {
+    if (strictLive) throw error;
+    return [];
+  }
+}
+
 /** One operator submission cell: a (platform, window) point with its score. */
 export interface OperatorSubmission {
   /** Lowercase platform ('claude'/'codex'/'multi'/…). */
