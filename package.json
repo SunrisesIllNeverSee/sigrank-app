@@ -23,7 +23,6 @@
     "verify": "npx tsc --noEmit && npm run test:canonical && npm test",
     "db:parity": "node scripts/check-migration-parity.mjs",
     "db:parity:ci": "node scripts/check-migration-parity.mjs --ci",
-    "board:snapshot": "node scripts/generate-board-snapshot.mjs",
     "archetypes": "node scripts/gen-build-archetypes.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
