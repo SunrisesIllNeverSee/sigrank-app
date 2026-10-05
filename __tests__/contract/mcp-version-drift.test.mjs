@@ -101,8 +101,8 @@ let failed = false;
 
 // ── Version check ──────────────────────────────────────────────────────────
 //
-// Version-only drift is NON-BLOCKING (warn, not fail). The MCP auto-publish
-// workflow bumps the npm version on every push to main, but the app's
+// Version-only drift is NON-BLOCKING (warn, not fail). The MCP now releases
+// explicitly (dispatch/tag — no auto-publish since 2026-10-05), but the app's
 // MCP_VERSION constant is synced by the daily `sync-mcp-version` workflow
 // (07:00 UTC). Between the MCP publish and the next sync, the version will
 // always drift by exactly one patch. Blocking CI on this creates a
