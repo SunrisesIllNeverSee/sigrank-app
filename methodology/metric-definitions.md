@@ -4,6 +4,7 @@ title: Metric Definitions
 description: Formal definitions and formulas for Upsilon, SNR, Velocity, Leverage, 10xDEV, Scale V, and Efficiency with limitations. Active.
 tags: [sigrank, metric-definitions, formulas, upsilon, snr, velocity, spec]
 timestamp: 2026-07-21
+canon: search-authority
 ---
 
 # Metric definitions

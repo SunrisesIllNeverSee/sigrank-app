@@ -4,6 +4,7 @@ title: Metrics
 description: Public cascade metrics including Yield (Υ), SNR, Velocity, Leverage, and 10xDEV as deterministic diagnostics over raw pillars. Active.
 tags: [sigrank, metrics, yield, upsilon, snr, velocity, leverage, 10xdev, reference]
 timestamp: 2026-07-21
+canon: search-authority
 ---
 
 # Metrics
