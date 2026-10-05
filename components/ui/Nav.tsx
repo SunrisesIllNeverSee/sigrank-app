@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AccountMenu } from "./AccountMenu";
 import { MobileNav } from "./MobileNav";
 import { NavLinks } from "./NavLinks";
+import { useFeatureFlag } from "@/lib/infra/posthog/flags";
 
 // Launch nav set. /hall is in launch. (/metrics was in launch per 2026-06-19 but was
 // archived + removed in the 2026-06-22 sweep (ITEM 2) — its content lives in /wiki now.)
@@ -24,6 +25,10 @@ const LINKS: { href: string; label: string }[] = [
   { href: "https://mos2es.org/baseline-assessment", label: "Enterprise" },
 ];
 
+// `exchange_search` flag: site-wide search entry, before the external
+// Enterprise link. Hidden while the flag is off (0% — Algolia not connected).
+const SEARCH_LINK = { href: "/search", label: "Search" };
+
 /**
  * Top navigation chrome. Hides on scroll down, reappears on scroll up.
  * The ThemeToggle island is the only other client piece.
@@ -31,6 +36,10 @@ const LINKS: { href: string; label: string }[] = [
 export function Nav() {
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
+  const showSearch = useFeatureFlag("exchange_search");
+  const links = showSearch
+    ? [...LINKS.slice(0, -1), SEARCH_LINK, LINKS[LINKS.length - 1]]
+    : LINKS;
 
   useEffect(() => {
     const onScroll = () => {
@@ -57,7 +66,7 @@ export function Nav() {
     >
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6">
         {/* Mobile: hamburger (links collapse here below md). */}
-        <MobileNav links={LINKS} />
+        <MobileNav links={links} />
 
         <Link
           href="/"
@@ -69,7 +78,7 @@ export function Nav() {
 
         {/* Desktop: inline links (hidden on mobile — MobileNav covers it).
             NavLinks is a client island that highlights the active route. */}
-        <NavLinks links={LINKS} />
+        <NavLinks links={links} />
 
         <div className="ml-auto">
           <AccountMenu />

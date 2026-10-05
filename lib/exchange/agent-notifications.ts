@@ -21,6 +21,7 @@
  */
 
 import { ensureAgentInbox, sendAgentNotification } from "@/lib/infra/agentmail/client";
+import { agentEmailNotificationsEnabled } from "@/lib/flags";
 import { hashSecret } from "./server";
 
 interface NotificationContext {
@@ -46,11 +47,12 @@ interface NotificationContext {
 export async function notifyAgent(ctx: NotificationContext): Promise<boolean> {
   if (!ctx.agentKey) return false;
 
-  try {
-    // Derive the agent key hash — this is what we use to look up/create
-    // the inbox. We never send the raw key to AgentMail.
-    const agentKeyHash = hashSecret(ctx.agentKey).slice(0, 16);
+  // Rollout gate: `agent_email_notifications` PostHog flag, bucketed per
+  // agent. Fails open — undecidable keeps sending (pre-flag behavior).
+  const agentKeyHash = hashSecret(ctx.agentKey).slice(0, 16);
+  if (!(await agentEmailNotificationsEnabled(agentKeyHash))) return false;
 
+  try {
     // Ensure the agent has an inbox
     const inbox = await ensureAgentInbox(agentKeyHash);
     if (!inbox) return false;

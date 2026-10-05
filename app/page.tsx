@@ -9,6 +9,7 @@ import { getAverageUsersColumn } from "@/lib/marketing/top-operator-column";
 import { Draft2Hero } from "@/components/draft/Draft2Hero";
 import { Draft2LiveActivity } from "@/components/draft/Draft2LiveActivity";
 import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
+import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBadge";
 import type { Metadata } from "next";
 import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -240,6 +241,7 @@ export default async function HomePage() {
 
       <DeletedNotice />
       <Draft2Hero />
+      <VercelMarketplaceBadge />
 
       {/* ── Stats bar (AEO Item 2b) — visible aggregate stats for AI engine citation ── */}
       <section
