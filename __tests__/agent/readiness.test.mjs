@@ -14,7 +14,7 @@ test("homepage H1 is server-rendered, not owned by client wordmark", async () =>
 });
 
 test("homepage markdown negotiation exposes the required media type, Vary, q parsing and 406", async () => {
-  const middleware = await source("middleware.ts");
+  const middleware = await source("proxy.ts");
   const vercel = JSON.parse(await source("vercel.json"));
   assert.match(middleware, /text\/markdown; charset=utf-8/);
   assert.match(middleware, /Accept, Accept-Encoding/);
@@ -36,7 +36,7 @@ test("homepage markdown negotiation exposes the required media type, Vary, q par
 
 test("web 404 includes deterministic agent recovery links and markdown negotiation", async () => {
   const page = await source("app/not-found.tsx");
-  const middleware = await source("middleware.ts");
+  const middleware = await source("proxy.ts");
   assert.match(page, /sitemap\.xml/);
   assert.match(page, /llms\.txt/);
   assert.match(page, /openapi\.json/);
@@ -77,7 +77,7 @@ test("public REST reads advertise rate-limit state and typed errors", async () =
 });
 
 test("API responses advertise deprecation policy via Link header", async () => {
-  const middleware = await source("middleware.ts");
+  const middleware = await source("proxy.ts");
   assert.match(middleware, /deprecation-policy/);
   assert.match(middleware, /\/developers#versioning/);
 });

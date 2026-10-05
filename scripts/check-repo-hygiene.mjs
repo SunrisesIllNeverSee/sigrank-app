@@ -58,7 +58,9 @@ if (broken.length) {
     let target = "";
     try {
       target = readlinkSync(resolve(root, p));
-    } catch {}
+    } catch {
+      // target stays "" — reported as "(unreadable)" below
+    }
     console.error(`  ${p} -> ${target || "(unreadable)"}`);
   }
 } else {

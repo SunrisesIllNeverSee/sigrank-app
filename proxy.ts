@@ -193,7 +193,7 @@ function negotiatedHomepage(request: NextRequest): Response | null {
  * Root middleware — AI bot logging, homepage representation negotiation, and
  * scoped auth session refresh for authenticated surfaces.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // ─── /api/search — proxy to analytics worker (AI Search binding) ──────
   if (request.nextUrl.pathname === "/api/search") {
     const proxyUrl = new URL("https://moses-analytics.sigrank.workers.dev/api/search");

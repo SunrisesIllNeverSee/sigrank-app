@@ -327,8 +327,8 @@ export function revalidateTouchedWindows(
   // 7d-only submission still changes it — bust it unconditionally, not just
   // when the submitted window_type is 'all_time'.
   if (win?.slug !== "all") revalidatePath("/board/all");
-  revalidateTag("operator");
-  revalidateTag("board");
+  revalidateTag("operator", "max");
+  revalidateTag("board", "max");
   // Also bust the in-memory memo cache for getLeaderboard (the 2MB workaround).
   // revalidateTag("board") only invalidates unstable_cache entries; the memo
   // cache is a separate layer and needs explicit invalidation.
