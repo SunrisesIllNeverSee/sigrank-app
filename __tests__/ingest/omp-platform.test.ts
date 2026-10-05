@@ -76,6 +76,7 @@ describe("platformPrimaryEnum — omp", () => {
       "gemini",
       "pi",
       "codex",
+      "devin",
       "multi",
       "other",
       "omp",
@@ -149,7 +150,7 @@ describe("SAVABLE_PLATFORM_DOMAINS — the profile write-path accept-list", () =
   });
 
   it("does not silently admit adapter-only platforms", () => {
-    for (const d of ["droid", "goose", "amp", "devin", "kilo"]) {
+    for (const d of ["droid", "goose", "amp", "kilo"]) {
       expect(SAVABLE_PLATFORM_DOMAINS.has(d)).toBe(false);
     }
   });

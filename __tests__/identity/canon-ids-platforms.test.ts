@@ -23,6 +23,7 @@ describe("PLATFORMS canon ids", () => {
       "P.06": "other",
       "P.07": "codex",
       "P.08": "omp",
+      "P.09": "devin",
     });
   });
 
