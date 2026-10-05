@@ -80,7 +80,9 @@ export function operatorSitemapEntry(
 ): OperatorSitemapEntry | null {
   if (!isIndexableOperatorProfile(operator, hasMetricSnapshot)) return null;
   return {
-    url: `${origin}/user/${operator.codename}`,
+    // encodeURIComponent keeps <loc> byte-identical to the page's
+    // self-canonical (generated from the already-encoded raw codename).
+    url: `${origin}/user/${encodeURIComponent(operator.codename)}`,
     changeFrequency: "daily",
     priority: 0.8,
   };

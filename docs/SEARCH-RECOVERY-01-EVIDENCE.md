@@ -89,6 +89,41 @@ owner review — current behavior matches the approved contract.
 Merge gate: metadata and sitemap agree on every fixture — verified on the
 preview deployment and enforced structurally by the shared predicate.
 
+## Review round 1 — fixes applied
+
+1. **Stale robots/sitemap divergence on flag changes (blocking).**
+   `POST /api/v1/claim` flips `claimed` and `POST /api/v1/profile` can flip
+   `profile_visibility`, but neither invalidated caches — the ISR profile page
+   (`revalidate = 21600`) could serve `noindex` for up to 6h while the sitemap
+   (300s data cache) already advertised the URL: "Submitted URL marked
+   'noindex'" on a sitemap we are rebuilding trust in. Fix: new
+   `revalidateOperatorIndexState(codename)` in `lib/ingest/materialize.ts`
+   busts `operator`/`board` tags, the `board:` memo prefix, the ISR profile
+   path (both casings), `/sitemap.xml`, and `/board/all` + `/board/off`
+   (claim changes claimed-only membership). Both routes call it after the
+   successful write. The profile route now also fixes pre-existing staleness
+   on display-name/handle edits.
+
+2. **PostgREST IN-clause URL limit (warning).**
+   `getIndexableOperatorRows` queried `metric_snapshots` with an unbounded
+   `.in("operator_id", ids)`; the file documents that ~1600+ UUIDs exceed the
+   URL-length limit and the catch would return `[]` — silently dropping every
+   operator URL. The snapshot-existence query is now chunked at 500 ids.
+
+3. **Sitemap URL encoding (suggestion).**
+   `operatorSitemapEntry` now emits `encodeURIComponent(codename)` so `<loc>`
+   is a valid encoded URL. (Profile canonical emits the route param as
+   decoded by Next.js; encoding the canonical is intentionally out of Phase-1
+   scope — no canonical changes.)
+
+4. **Noted, not changed:** no-credentials environments diverge (mock
+   `claimed: true` profile emits `index,follow` while the sitemap omits all
+   operator URLs). Degraded-env only; production is unaffected.
+
+Regression coverage: 5 new tests assert both routes call the invalidation
+helper, the helper busts profile path + sitemap + tags, the IN clause is
+chunked, and sitemap URLs are encoded.
+
 ## Rollback
 
 `git revert` the branch range, or revert to the parent of

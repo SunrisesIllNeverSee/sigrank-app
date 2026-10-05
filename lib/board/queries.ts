@@ -661,13 +661,23 @@ export async function getIndexableOperatorRows(
     if (ops.length === 0) return [];
 
     const ids = ops.map((o) => o.operator_id);
-    const snapRows = await fetchAllPaginated<{ operator_id: string }>(
-      sb,
-      (s) =>
-        s.from("metric_snapshots").select("operator_id").in("operator_id", ids),
-      "metric_snapshots (indexableOperators)",
-    );
-    const hasSnap = new Set(snapRows.map((r) => r.operator_id));
+    // PostgREST serializes .in() into the request URL — the getLeaderboard path
+    // documents that 1600+ UUIDs exceed the length limit and error out. That
+    // failure is caught below → [] → the sitemap would silently drop every
+    // operator URL, so chunk well under the threshold as the population grows.
+    const hasSnap = new Set<string>();
+    for (let i = 0; i < ids.length; i += 500) {
+      const snapRows = await fetchAllPaginated<{ operator_id: string }>(
+        sb,
+        (s) =>
+          s
+            .from("metric_snapshots")
+            .select("operator_id")
+            .in("operator_id", ids.slice(i, i + 500)),
+        "metric_snapshots (indexableOperators)",
+      );
+      for (const r of snapRows) hasSnap.add(r.operator_id);
+    }
 
     return ops.map((o) => ({
       codename: o.codename,
