@@ -12,4 +12,4 @@ An operator is the individual whose AI-work telemetry is measured in SignalAF. I
 
 An authenticated user resolves to an operator through `operator_accounts`. The board display rule prefers an available display name, otherwise a codename; direct identity is not appropriate for research releases. A profile can exist before it is claimed.
 
-Sources: `lib/supabase/auth-server.ts`, `lib/compare/operator-name.ts`.
+Sources: `lib/infra/supabase/auth-server.ts`, `lib/identity/operator-name.ts`.

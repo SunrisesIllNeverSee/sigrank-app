@@ -14,4 +14,4 @@ Leaderboard percentile is computed from a descending score order: for `total > 1
 
 Outlier handling must be explicit. Field records can carry a classification and bot score; an outlier label is a data-quality or distributional decision, not proof of automation or misconduct. Publish inclusion rules, sample date, source, and fence method with every aggregate.
 
-Sources: `lib/field/types.ts`, `lib/data/queries.ts`, `lib/data/outlier-classify.ts`.
+Sources: `lib/analytics/field-types.ts`, `lib/board/queries.ts`, `lib/analytics/outlier-classify.ts`.
