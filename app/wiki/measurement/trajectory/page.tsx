@@ -40,7 +40,7 @@ export default function TrajectoryPage() {
         summary="How an operator's metrics change over time — the temporal dimension of operator measurement."
         category="measurement"
         evidenceLevel="repeated-experiment"
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         definition={
           <>
             How an operator&apos;s metrics change over time. The temporal

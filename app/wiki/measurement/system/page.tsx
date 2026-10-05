@@ -40,7 +40,7 @@ export default function SystemPage() {
         summary="The AI system (model + tool + platform configuration) being operated — distinct from the operator."
         category="measurement"
         evidenceLevel="repeated-experiment"
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         definition={
           <>
             The AI system (model + tool + platform configuration) being

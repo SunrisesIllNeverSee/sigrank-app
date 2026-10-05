@@ -40,7 +40,7 @@ export default function ConvergentValidityPage() {
         summary="Whether metrics that should be related are actually related, and metrics that should not be related are not."
         category="validation"
         evidenceLevel="concept"
-        specVersion="SigRank Standard v1.0 (proposed)"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft (proposed)"
         definition={
           <>
             Whether metrics that should be related are actually related, and

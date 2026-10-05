@@ -40,7 +40,7 @@ export default function LocalAgentPage() {
             {
               question: "How do I install the SigRank MCP server?",
               answer:
-                "Run `npx sigrank` to install and start the SigRank MCP server. It works with Claude, Cursor, Cline, Windsurf, and any MCP-compatible client. The local server exposes 25 tools, including portable SigRank Standard record export.",
+                "Run `npx sigrank` to install and start the SigRank MCP server. It works with Claude, Cursor, Cline, Windsurf, and any MCP-compatible client. The local server exposes 25 tools, including portable TTEOP (Token Telemetry Evaluation Operator Protocol) record export.",
             },
           ]),
         ]}

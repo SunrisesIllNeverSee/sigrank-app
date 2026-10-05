@@ -40,7 +40,7 @@ export default function CohortPage() {
         summary="A group of operators measured together for comparison — the unit of comparative analysis."
         category="measurement"
         evidenceLevel="repeated-experiment"
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         definition={
           <>
             A group of operators measured together for comparison. The unit of

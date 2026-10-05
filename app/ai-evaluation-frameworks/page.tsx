@@ -36,8 +36,8 @@ const RELATED = [
   },
   {
     href: "/standard",
-    title: "The SigRank Standard",
-    desc: "The open operator-evaluation standard: token telemetry, the Yield metric, ed25519-signed snapshots, and cohort-relative ranking. A governed framework, not a proprietary black box.",
+    title: "The TTEOP Standard",
+    desc: "TTEOP (Token Telemetry Evaluation Operator Protocol) — the open operator-evaluation standard: token telemetry, the Yield metric, ed25519-signed snapshots, and cohort-relative ranking. A governed framework, not a proprietary black box.",
   },
   {
     href: "/ai-evaluation",

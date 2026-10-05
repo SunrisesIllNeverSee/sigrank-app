@@ -63,9 +63,9 @@ export const TOOLS = [
   },
   {
     name: "get_sigrank_standard_record",
-    title: "Export SigRank Standard Record",
+    title: "Export TTEOP Record",
     description:
-      "Build a SigRank Standard v0.1-draft portable operator record from available token telemetry. Input and output are required; unavailable cache telemetry remains null. Computes only the five-metric portable core through token-cascade and does not submit or persist data.",
+      "Build a tteop/0.1-draft portable operator record from available token telemetry. Input and output are required; unavailable cache telemetry remains null. Computes only the five-metric portable core through token-cascade and does not submit or persist data.",
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",

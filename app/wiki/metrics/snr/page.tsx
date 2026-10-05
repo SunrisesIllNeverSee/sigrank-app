@@ -77,8 +77,8 @@ export default function SnrPage() {
             information about absolute scale.
           </>
         }
-        specVersion="SigRank Standard v1.0"
-        lineage={<>SigRank Standard. Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</>}
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
+        lineage={<>TTEOP (Token Telemetry Evaluation Operator Protocol). Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</>}
         crossRefs={crossRefs}
         lastUpdated="2026-09-01"
       />
