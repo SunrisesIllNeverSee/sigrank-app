@@ -36,12 +36,12 @@ test("Exchange manifest declares its SignalAF parent and explicit activation bou
   assert.match(manifest, /mode:'explicit_request'/);
   assert.match(manifest, /user_agent_detection_does_not_activate:true/);
   assert.match(manifest, /default_site_representation:'host_content'/);
-  assert.match(profileRoute, /rel=\"up\"/);
+  assert.match(profileRoute, /rel="up"/);
   assert.match(profileRoute, /x-signalaf-activation/);
 });
 
 test("being an AI bot cannot activate or route into Contribution Exchange", async () => {
-  const middleware = await source("middleware.ts");
+  const middleware = await source("proxy.ts");
 
   assert.doesNotMatch(middleware, /exchange/i);
   assert.match(middleware, /detectBot/);
