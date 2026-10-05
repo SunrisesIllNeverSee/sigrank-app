@@ -18,4 +18,4 @@ For positive pillars, its stages are:
 
 Their product telescopes to `(cache_read × output) / input²`, the public Upsilon metric. A zero cache-create value is marked non-compounding; stage ratios and the cascade string are then unavailable rather than inferred.
 
-Source: `lib/cascade/metrics.ts`.
+Source: `lib/analytics/cascade.ts`.

@@ -24,4 +24,4 @@ Multiplying stages cancels intermediate terms:
 
 This decomposition makes Upsilon legible: output relative to input is transmission; cache creation relative to output is commitment; reads relative to created cache are reuse. It is an accounting identity, not a causal proof that one stage produced another.
 
-The app computes stage values and 10xDEV only when every pillar is positive; otherwise it marks the run non-compounding when `cw` is zero. Source: `lib/cascade/metrics.ts`.
+The app computes stage values and 10xDEV only when every pillar is positive; otherwise it marks the run non-compounding when `cw` is zero. Source: `lib/analytics/cascade.ts`.
