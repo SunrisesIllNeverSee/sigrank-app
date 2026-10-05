@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "status": "implemented_v1_with_explicit_scope_limitations",
   "tools": [
     {
@@ -68,7 +68,7 @@
         "type": "object",
         "properties": {
           "contract_version": {
-            "const": "1.0.0"
+            "const": "1.1.0"
           },
           "status": {
             "type": "string",
@@ -741,6 +741,89 @@
                     "type": "null"
                   }
                 ]
+              },
+              "archetype_details": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family_label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "defined_by": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_version": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "origin": {
+                        "const": "computed_from_snapshot"
+                      },
+                      "axes": {
+                        "type": "object",
+                        "properties": {
+                          "leverage": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "velocity": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "construction": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "leverage",
+                          "velocity",
+                          "construction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "name",
+                      "family",
+                      "family_label",
+                      "description",
+                      "defined_by",
+                      "classifier_id",
+                      "classifier_version",
+                      "origin",
+                      "axes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -754,7 +837,8 @@
               "pillars",
               "metrics",
               "provenance",
-              "operating_ratio"
+              "operating_ratio",
+              "archetype_details"
             ],
             "additionalProperties": false
           },
@@ -1233,7 +1317,7 @@
     {
       "name": "get_operator",
       "title": "Get operator profile",
-      "description": "Retrieve a public SignalAF operator by codename for a requested window. Use for an existing public profile, not to measure local usage or identify the caller. Returns metrics, provenance and a source link, or a missing-measurement state. Does not change data.",
+      "description": "Retrieve a public SignalAF operator by codename for a requested window. Use for an existing public profile, not to measure local usage or identify the caller. Returns metrics, provenance and a source link, or a missing-measurement state. Does not change data. Includes the canonical Build Archetype computed from complete snapshot pillars and its classifier version; unavailable axes remain unclassified.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1270,7 +1354,7 @@
         "type": "object",
         "properties": {
           "contract_version": {
-            "const": "1.0.0"
+            "const": "1.1.0"
           },
           "status": {
             "type": "string",
@@ -1899,6 +1983,89 @@
                     "type": "null"
                   }
                 ]
+              },
+              "archetype_details": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family_label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "defined_by": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_version": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "origin": {
+                        "const": "computed_from_snapshot"
+                      },
+                      "axes": {
+                        "type": "object",
+                        "properties": {
+                          "leverage": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "velocity": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "construction": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "leverage",
+                          "velocity",
+                          "construction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "name",
+                      "family",
+                      "family_label",
+                      "description",
+                      "defined_by",
+                      "classifier_id",
+                      "classifier_version",
+                      "origin",
+                      "axes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -1912,7 +2079,8 @@
               "pillars",
               "metrics",
               "provenance",
-              "operating_ratio"
+              "operating_ratio",
+              "archetype_details"
             ],
             "additionalProperties": false
           },
@@ -2399,7 +2567,7 @@
         "type": "object",
         "properties": {
           "contract_version": {
-            "const": "1.0.0"
+            "const": "1.1.0"
           },
           "status": {
             "type": "string",
@@ -3083,6 +3251,89 @@
                     "type": "null"
                   }
                 ]
+              },
+              "archetype_details": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family_label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "defined_by": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_version": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "origin": {
+                        "const": "computed_from_snapshot"
+                      },
+                      "axes": {
+                        "type": "object",
+                        "properties": {
+                          "leverage": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "velocity": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "construction": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "leverage",
+                          "velocity",
+                          "construction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "name",
+                      "family",
+                      "family_label",
+                      "description",
+                      "defined_by",
+                      "classifier_id",
+                      "classifier_version",
+                      "origin",
+                      "axes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -3096,7 +3347,8 @@
               "pillars",
               "metrics",
               "provenance",
-              "operating_ratio"
+              "operating_ratio",
+              "archetype_details"
             ],
             "additionalProperties": false
           },
@@ -3630,7 +3882,7 @@
         "type": "object",
         "properties": {
           "contract_version": {
-            "const": "1.0.0"
+            "const": "1.1.0"
           },
           "status": {
             "type": "string",
@@ -4379,6 +4631,89 @@
                     "type": "null"
                   }
                 ]
+              },
+              "archetype_details": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "family_label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "defined_by": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "classifier_version": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "origin": {
+                        "const": "computed_from_snapshot"
+                      },
+                      "axes": {
+                        "type": "object",
+                        "properties": {
+                          "leverage": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "velocity": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "construction": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "leverage",
+                          "velocity",
+                          "construction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "name",
+                      "family",
+                      "family_label",
+                      "description",
+                      "defined_by",
+                      "classifier_id",
+                      "classifier_version",
+                      "origin",
+                      "axes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -4392,7 +4727,8 @@
               "pillars",
               "metrics",
               "provenance",
-              "operating_ratio"
+              "operating_ratio",
+              "archetype_details"
             ],
             "additionalProperties": false
           },
@@ -5025,7 +5361,7 @@
         "type": "object",
         "properties": {
           "contract_version": {
-            "const": "1.0.0"
+            "const": "1.1.0"
           },
           "status": {
             "type": "string",

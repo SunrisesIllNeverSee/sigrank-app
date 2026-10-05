@@ -198,6 +198,58 @@ function DevTable({ rows }: { rows: ReturnType<typeof buildDevRows> }) {
   );
 }
 
+function ReferenceContext({ columns }: { columns: [GoldColumn, GoldColumn, GoldColumn, GoldColumn] }) {
+  const labels = [
+    ["Fresh input (I)", "fresh_input"], ["Output (O)", "output"],
+    ["Cache creation (W)", "cache_create"], ["Cache read (R)", "cache_read"],
+  ] as const;
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm leading-relaxed text-text-secondary">
+        Four Degrees describes a broader screened all-time reference cohort.
+        The <Link href="/board/all" className="text-gold underline">Active Total board</Link>
+        {" "}covers claimed operators and has its own field statistics.
+      </p>
+      <div className="overflow-x-auto rounded-lg border border-bg-border">
+        <table className="w-full font-mono text-xs">
+          <caption className="px-3 py-2 text-left text-text-secondary">
+            Average raw telemetry · tokens per included operator
+          </caption>
+          <thead><tr>
+            <th className="px-3 py-2 text-left">Pillar</th>
+            {COLS.map((column, index) => <th key={column.label} className="px-3 py-2 text-right">
+              {column.label}<span className="block font-normal text-text-muted">
+                {index === 0 ? "Modeled" : `n = ${columns[index].telemetry?.population ?? "—"}`}
+              </span>
+            </th>)}
+          </tr></thead>
+          <tbody>{labels.map(([label, key]) => <tr key={key} className="border-t border-bg-border-subtle">
+            <th className="px-3 py-2 text-left font-normal">{label}</th>
+            {columns.map((column, index) => {
+              const value = column.telemetry?.means[key];
+              return <td key={index} className="px-3 py-2 text-right tabular-nums" title={index === 0 ? "No observed absolute token counts" : `${column.telemetry?.coverage[key] ?? 0} observed of ${column.telemetry?.population ?? 0} operators`}>
+                {index === 0 ? "Modeled" : value == null ? "—" : value.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+              </td>;
+            })}
+          </tr>)}</tbody>
+        </table>
+      </div>
+      <p className="text-[11px] leading-relaxed text-text-muted">
+        Counts are arithmetic means, rounded to a token; the Top Evals column is one record.
+        The metrics above are independently calculated medians, except the single top evaluation.
+        Ratios of average counts need not equal median ratios or median Yield.
+        The modeled baseline has no measured absolute token counts.
+      </p>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-text-muted">
+        {columns.slice(1).map((column, index) => <span key={index}>
+          {COLS[index + 1].label}: snapshot dates {column.telemetry?.earliest_snapshot ?? "—"}
+          {column.telemetry?.latest_snapshot && column.telemetry.latest_snapshot !== column.telemetry.earliest_snapshot ? ` to ${column.telemetry.latest_snapshot}` : ""}
+        </span>)}
+      </div>
+    </div>
+  );
+}
+
 /** Compact source markers shown ABOVE the chart on the landing (owner: "footnotes
  * to mark sources before the chart"). */
 function SourceMarkers() {
@@ -459,6 +511,7 @@ export async function FourDegreesChart({
               The 1/3 + 2/3 headline/walkthrough split that used to sit above the table
               now lives below it as a full-width explanation block. */}
           <ComparisonTable rows={rows} />
+          <ReferenceContext columns={[aa, avg, power, gold]} />
 
           {/* under-chart footnote (owner 2026-06-22) */}
           <p className="font-mono text-[11px] text-text-muted">
@@ -552,6 +605,7 @@ export async function FourDegreesChart({
 
       <SourceMarkers />
       <ComparisonTable rows={rows} />
+      <ReferenceContext columns={[aa, avg, power, gold]} />
 
       <div className="flex flex-col gap-3">
         <h2 className="font-mono text-lg font-bold text-text-primary">
