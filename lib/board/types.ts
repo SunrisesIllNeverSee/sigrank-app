@@ -18,6 +18,13 @@ import type { Operator, ScoredSnapshot } from "@/lib/analytics/scoring-types";
 export interface LeaderboardRow {
   operator: Operator;
   snapshot: ScoredSnapshot;
+  source_submission_id?: string | null;
+  window_start?: string | null;
+  window_end?: string | null;
+  workflow_mode?: "hitl" | "agentic" | null;
+  workflow_evidence_url?: string | null;
+  workflow_mode_version?: string | null;
+  mode_assessed_at?: string | null;
   global_rank: number;
   /** Percentile [0,100], higher = better. */
   percentile: number;

@@ -41,6 +41,7 @@ import type {
   LeaderboardRow,
   WeeklyPoint,
 } from "@/lib/board/types";
+import { includesBoardMode, resolveWorkflowMode } from "@/lib/board/workflow-mode";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -154,9 +155,7 @@ async function computeClaimedRanks(
       .select("operator_id")
       .eq("claimed", true)
       .limit(10_000);
-    const claimedIds = (claimedData ?? []).map(
-      (r: { operator_id: string }) => r.operator_id,
-    );
+    const claimedIds = (claimedData ?? []).map((r: { operator_id: string }) => r.operator_id);
     if (claimedIds.length === 0) return out;
     const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
       sb,
@@ -168,10 +167,10 @@ async function computeClaimedRanks(
           .order("snapshot_date", { ascending: false }),
       "metric_snapshots (claimedRanks)",
     );
-    const latest = operatorTotalCollapse(
-      asDb<DbMetricSnapshot[]>(allSnaps) ?? [],
-      "all_time",
-    ).byOperator;
+    const eligible = (asDb<DbMetricSnapshot[]>(allSnaps) ?? []).filter(
+      (s) => resolvedModeForSnapshot(s) !== null,
+    );
+    const latest = operatorTotalCollapse(eligible, "all_time").byOperator;
     const ranked = [...latest.values()]
       .map((s) => {
         const snap = mapSnapshot(s);
@@ -234,7 +233,7 @@ export interface LeaderboardRowWithPlatforms extends LeaderboardRow {
 
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
-  "metric_snapshot_id, operator_id, snapshot_date, window_type, platform, compression_ratio, prompt_complexity, cross_thread, " +
+  "metric_snapshot_id, operator_id, snapshot_date, window_type, platform, source_submission_id, window_start, window_end, workflow_mode, workflow_evidence_url, workflow_mode_version, mode_assessed_at, compression_ratio, prompt_complexity, cross_thread, " +
   "session_depth, token_throughput, signa_rate, sdot_score, sdrm_score, signal_force, " +
   "drift_ratio, class_tier, movement_24h, movement_7d, " +
   "ruleset_version, " +
@@ -243,6 +242,17 @@ export const SNAPSHOT_COLUMNS =
   // on every submission); the operators rollup columns are unmaintained, so
   // the row builder backfills them from the chosen snapshot.
   "account_age_days, total_messages";
+
+function resolvedModeForSnapshot(s: DbMetricSnapshot) {
+  if (s.input_tokens == null || s.output_tokens == null ||
+      s.cache_creation_tokens == null || s.cache_read_tokens == null ||
+      s.input_tokens <= 0 || s.output_tokens <= 0) return null;
+  return resolveWorkflowMode({
+    inputTokens: num(s.input_tokens), outputTokens: num(s.output_tokens),
+    cacheWriteTokens: num(s.cache_creation_tokens), cacheReadTokens: num(s.cache_read_tokens),
+    assessment: s.workflow_mode, evidenceUrl: s.workflow_evidence_url,
+  });
+}
 
 /**
  * All operators columns the mapper reads — these are exactly the columns the
@@ -276,6 +286,7 @@ export async function getLeaderboard(
   const sb = getSupabaseServer();
   if (!sb) {
     if (params.strictLive) throw new Error("Live leaderboard is not configured");
+    if (params.mode) return [];
     return filterMockBoard(params);
   }
   try {
@@ -306,7 +317,7 @@ export async function getLeaderboard(
       "metric_snapshots (getLeaderboard)",
     );
     // DB empty/unreachable → mock fallback (graceful-degradation contract).
-    if (allSnaps.length === 0) return params.strictLive ? [] : filterMockBoard(params);
+    if (allSnaps.length === 0) return params.strictLive || params.mode ? [] : filterMockBoard(params);
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
@@ -334,6 +345,15 @@ export async function getLeaderboard(
         s.output_tokens != null &&
         s.output_tokens > 0,
     );
+    if (yieldable.length === 0 && (params.windowFilter || params.strictLive || params.mode)) return [];
+    const modeBySnapshot = new Map<string, "hitl" | "agentic" | null>();
+    const boardCandidates = params.mode
+      ? yieldable.filter((s) => {
+          const mode = resolvedModeForSnapshot(s);
+          if (s.metric_snapshot_id) modeBySnapshot.set(s.metric_snapshot_id, mode);
+          return includesBoardMode(params.mode!, mode);
+        })
+      : yieldable;
     // Collapse ladder (precedence top→bottom):
     //   allSnapshots  — keep EVERY (operator, platform, window) point ("off" board).
     //   operatorTotal — ONE total row per operator: the operator's 'multi' snapshot
@@ -351,34 +371,27 @@ export async function getLeaderboard(
     let platformsByOperator: Map<string, string[]> | null = null;
     let snapRows: DbMetricSnapshot[];
     if (params.allSnapshots) {
-      snapRows = yieldable;
+      snapRows = boardCandidates;
     } else if (params.operatorTotal) {
-      const collapsed = operatorTotalCollapse(yieldable, params.window);
+      const collapsed = operatorTotalCollapse(boardCandidates, params.window);
       platformsByOperator = collapsed.platformsByOperator;
       snapRows = [...collapsed.byOperator.values()];
     } else if (params.perPlatform) {
       snapRows = [
-        ...latestPerOperatorPlatform(yieldable, params.window).values(),
+        ...latestPerOperatorPlatform(boardCandidates, params.window).values(),
       ];
     } else {
-      snapRows = [...latestPerOperator(yieldable, params.window).values()];
+      snapRows = [...latestPerOperator(boardCandidates, params.window).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
     // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
     if (snapRows.length === 0)
-      return params.windowFilter || params.strictLive ? [] : filterMockBoard(params);
+      return params.windowFilter || params.strictLive || params.mode ? [] : filterMockBoard(params);
 
     const opIds = new Set(snapRows.map((s) => s.operator_id));
-    // Fetch all operators_public (paginated) — the IN clause with 1600+ UUIDs
-    // exceeds PostgREST's URL length limit, causing a silent error → mock fallback.
-    // With <2k operators, fetching all is cheaper than batching the IN filter.
     const opData = await fetchAllPaginated<DbOperator>(
       sb,
-      (s) =>
-        s
-          .from("operators_public")
-          .select(OPERATOR_COLUMNS)
-          .order("operator_id"),
+      (s) => s.from("operators_public").select(OPERATOR_COLUMNS).order("operator_id"),
       "operators_public (getLeaderboard)",
     );
     const opById = new Map<string, DbOperator>(
@@ -414,6 +427,16 @@ export async function getLeaderboard(
       rows.push({
         operator: applySnapshotRollups(mapOperator(op), snap),
         snapshot: mapSnapshot(snap),
+        source_submission_id: snap.source_submission_id ?? null,
+        window_start: snap.window_start ?? null,
+        window_end: snap.window_end ?? null,
+        workflow_mode: params.mode
+          ? modeBySnapshot.get(snap.metric_snapshot_id ?? "") ?? null
+          : snap.workflow_mode ?? null,
+        workflow_evidence_url: snap.workflow_evidence_url ?? null,
+        workflow_mode_version: snap.workflow_mode_version ??
+          (params.mode && modeBySnapshot.get(snap.metric_snapshot_id ?? "") === "hitl" ? "hcm-v1" : null),
+        mode_assessed_at: snap.mode_assessed_at ?? null,
         global_rank: 0, // recomputed after sort
         percentile: pctById.get(snap.operator_id) ?? 0,
         telemetry: telemetryFromSnapshot(snap),
@@ -427,7 +450,7 @@ export async function getLeaderboard(
     // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key deploy),
     // a windowFilter board returns [] rather than fabricated mock seeds.
     if (rows.length === 0)
-      return params.windowFilter || params.strictLive ? [] : filterMockBoard(params);
+      return params.windowFilter || params.strictLive || params.mode ? [] : filterMockBoard(params);
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
     // Filter on the row's platform (snapshot.platform, falling back to
@@ -473,6 +496,7 @@ export async function getLeaderboard(
     return rows;
   } catch (error) {
     if (params.strictLive) throw error;
+    if (params.mode) return [];
     return filterMockBoard(params);
   }
 }
@@ -547,10 +571,11 @@ export async function getOperator(
     if (snapError) throw snapError;
     const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? [];
     assertOperatorLimit(allOpSnaps, op.codename);
+    const eligibleSnaps = allOpSnaps.filter((s) => resolvedModeForSnapshot(s));
     const snap =
-      operatorTotalCollapse(allOpSnaps, "all_time").byOperator.get(
+      operatorTotalCollapse(eligibleSnaps, "all_time").byOperator.get(
         op.operator_id,
-      ) ?? null;
+      ) ?? operatorTotalCollapse(allOpSnaps, "all_time").byOperator.get(op.operator_id) ?? null;
     if (!snap) {
       // Operator EXISTS but has no cascade data yet (freshly-claimed account, no
       // verified submission). Render an identity-only PENDING profile — never a 404.
@@ -589,7 +614,7 @@ export async function getOperator(
     if (recomputed) {
       globalRank = recomputed.rank;
       percentile = recomputed.percentile;
-    } else {
+    } else if (!op.claimed) {
       globalRank = num(rank?.global_rank);
       percentile = num(rank?.percentile);
     }
@@ -597,6 +622,14 @@ export async function getOperator(
     return {
       operator: applySnapshotRollups(mapOperator(op), snap),
       snapshot: mapSnapshot(snap),
+      source_submission_id: snap.source_submission_id ?? null,
+      window_start: snap.window_start ?? null,
+      window_end: snap.window_end ?? null,
+      workflow_mode: resolvedModeForSnapshot(snap),
+      workflow_evidence_url: snap.workflow_evidence_url ?? null,
+      workflow_mode_version: snap.workflow_mode_version ??
+        (resolvedModeForSnapshot(snap) === "hitl" ? "hcm-v1" : null),
+      mode_assessed_at: snap.mode_assessed_at ?? null,
       global_rank: globalRank,
       percentile,
       telemetry: telemetryFromSnapshot(snap),

@@ -67,7 +67,7 @@ export function SubmissionsGrid({
   return (
     <div className="flex flex-col gap-3">
       <p className="font-sans text-xs leading-relaxed text-text-secondary">
-        Every verified submission, one cell per{" "}
+        Latest verified snapshot, one cell per{" "}
         <strong className="text-text-primary">platform × window</strong> — each
         showing its <strong className="text-text-primary">Υ Yield</strong> and
         class. Submit more windows or platforms from the local agent to fill the
