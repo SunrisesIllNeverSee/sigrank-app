@@ -1,0 +1,18 @@
+# ER-004b — supports CAND-004 (current SNR semantics; current side of drift)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: npm:tteop-spec@0.1.5-draft:metrics/registry.json
+  content_digest: sha256:d7216182f8ff833824db180e497c1cb8ad9e87032d237791f2c98aafdea9500d
+  media_type: application/json
+quote: Must not be presented as a signal-to-noise ratio. The name 'SNR' is a legacy alias and is misleading. This is an output
+  fraction, not a signal-to-noise measure.
+quote_digest: sha256:64f2fa71965cad6a6f1c9e22b7d1bc499b1f4c0532c6152d1dee99140021bad9
+locator:
+  kind: json_pointer
+  value: /metrics/3/prohibited_interpretation
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: capture current SNR semantics for semantic-drift claim
+  config_digest: sha256:2f5ffac7bcd2973e252c522643eb8933030d7dd04f323be77742bcad7e9b176e
+  selection_reason: 'verbatim current-side prohibited_interpretation: output_fraction is not a signal-to-noise measure'

@@ -1,0 +1,367 @@
+# sources.yaml — Source Registry
+# Every seeded-field source: location, pin, hash, role, verification.
+# roles: raw_authority | supporting_raw | reference_copy | historical_evidence
+#        current_published | implementation | interpretation_surface
+#        upstream_dependency | sensitive_private
+# statuses: current | historical | superseded | unresolved
+#           excluded_from_index_surfaces (indexed for provenance; content withheld)
+version: 1.0.1
+verified_at: "2026-10-05"
+
+sources:
+
+  # ── A. RAW SEEDED CORPUS (L0 authority) ──────────────────────────────
+  - id: SRC-SEED-001
+    name: tokscale-leaderboard.json
+    type: raw_json_scrape
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/tokscale-leaderboard.json
+    audit_pin: 58e4eaa5703e76eeade6f305b7e8a5b0fa69815d
+    verified_head: 1b2f6c4b49a37e696751c331467f827a08d9b32e
+    head_vs_pin: "HEAD is +4 commits; corpus diff empty — content identical to pin"
+    sha256: 9e1a3d727cd132f7d5e1a10991068e9572407b485764ad776ff6eb57a92a4586
+    size_bytes_approx: 9270000
+    documented_n: 1628
+    acquisition: {source_url: "https://tokscale.ai/leaderboard", acquired_at: "2026-07-13T18:51:35Z", method: "Python scraper, 33 pages, 8 workers, 2 passes"}
+    role: raw_authority
+    status: current
+    notes: [full original nested scrape; last record rank 1628]
+
+  - id: SRC-SEED-002
+    name: raw-data.csv
+    type: flattened_raw_export
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/raw-data.csv
+    sha256: 9942a0bb90b0375198fb234bf4e245edb166984d16c6fce05023ede7fbed0a24
+    rows: 1628
+    cols: 24
+    role: raw_authority
+    status: current
+    notes: [flattened export of SRC-SEED-001; field dictionary is SRC-SEED-004]
+
+  - id: SRC-SEED-003
+    name: accounts-index.csv
+    type: identity_index
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/accounts-index.csv
+    sha256: de569d90edc90b743f59b82590ffa004e7ebfe5a97e9f01a778568783f836fa2
+    rows: 1628
+    role: supporting_raw
+    status: current
+
+  - id: SRC-SEED-004
+    name: raw-data-field-definitions.md
+    type: data_dictionary
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/raw-data-field-definitions.md
+    sha256: a424bf0475767347e9e36a59abd94f2a7d61057174b8df23bf9c0a31f3e918b3
+    fields_documented: 24
+    role: raw_authority
+    status: current
+
+  - id: SRC-SEED-005
+    name: dataset-overview.json
+    type: acquisition_metadata
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/dataset-overview.json
+    sha256: ab233a59173de43b4f41532a77c3fe6f2753d608066a295867e0cc70b5a25ffa
+    documented_facts:
+      dataset_version: "1.0"
+      collection_date: "2026-07-13T18:51:35Z"
+      number_of_operators: 1628
+      verified_operators: 1327
+      seed_operators: 1625
+      bot_candidates: 2
+      suspect_operators: 15
+      human_operators: 483
+      excluded_records: 0
+      not_analyzed: 1128
+      pages_fetched: 33
+      scrape_method: "Python scraper, 8 parallel workers, 2 passes"
+      platforms_listed: 15
+    role: raw_authority
+    status: current
+    notes: ["overview lists 15 platforms; published v3.1 copy claims 17 — unindexed discrepancy (GAP-032)"]
+
+  - id: SRC-SEED-006
+    name: dataset-health.json
+    type: quality_analysis
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/dataset-health.json
+    sha256: 14b20e20f61bea5278e674cbfed0c449fbcde40a5901a5c068222f70535a7c6c
+    documented_facts:
+      duplicates: 1
+      reasoning_tokens_missing: 151
+      session_count_missing: 712
+      bot_analysis_scope: "top-500 only (483 human / 15 suspect / 2 bot); bottom 1128 not analyzed"
+    role: supporting_raw
+    status: current
+    notes:
+      - "health file analyzed the nested JSON top-level where cache pillars live under stats.* — it reports cache_read_tokens/cache_write_tokens 'missing' for all 1,628; raw-data.csv actually has them populated (3 and 133 zero/empty). Not a data absence — an artifact of which level was scanned."
+
+
+  - id: SRC-SEED-007
+    name: raw-data-package README.md + CROSS_REFERENCE_ANALYSIS.md
+    type: inventory_lineage_docs
+    layer: L0
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/
+    role: supporting_raw
+    status: current
+    sha256_readme: 93b43c1ea0a8a2e4d1c5e9e4099d75bec4a70c8ff51d01d84610f3896c26b995
+    sha256_crossref: f78b9911d02dad7a1db063882b605dd3f12beff30ed3501726d6984ddf2a47e3
+    notes: ["README: Version 1.0, 1,628 operators, 33 pages"]
+
+  - id: SRC-SEED-008
+    name: sigadmin-web exploration copy
+    type: anonymized_derivative
+    layer: L0-derived (anonymized)
+    repo: SunrisesIllNeverSee/sigadmin-web
+    path: public/tokscale-dataset.json
+    audit_pin: 138aeafb5199dba631ab60bbb390432858cc2ef4   # HEAD == pin, verified in sync
+    sha256: e173c5a69ba376d698c226fdf65be37ebcdc43217b14f60b34bb0fbccbcb96c7
+    role: reference_copy
+    status: current
+    notes:
+      - "343,805 lines; header identical to raw (scraped_at 2026-07-13T18:51:35Z, 33 pages, count 1628) but ALL 1,628 handles are anonymized 'signal-<10-hex>' and display_name/avatar_url/github_url are empty for all — FULLY anonymized derivative, not raw-authority bytes"
+      - "handle format consistent with the signal-<sha256[:10]> codename scheme used by lib/retire.ts; whether produced by that flow is unverified"
+      - "seed_sigrank nonzero = 1,625 — identical to raw corpus (verified by direct count 2026-10-05)"
+      - "loaded by /data explorer (app/data/page.tsx)"
+      - "NOT automatically authoritative for metric definitions/quantile convention/classification policy"
+      - "explorer quantile = linear interpolation over (n-1) index — R type-7 / NumPy default / Excel PERCENTILE.INC; population stdev ÷n; Pearson r — convention recorded, not canonized (GAP-005/006)"
+
+  # ── B. HISTORICAL DERIVED PACKAGE (evidence, not current authority) ──
+  - id: SRC-HIST-001
+    name: sigrank-metric-data.csv + field-definitions.md
+    type: historical_derived_export
+    layer: L2(historical)
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/
+    sha256_csv: 2ce18ff714b1df2227742f8d8943d1c1ef07dec578e645a076427de9c5df2e26
+    sha256_defs: 37328638036d7ea60ceeeb4b572a1da075c8b1030e3b2f12dd42d0928baed68c
+    rows: 1628
+    role: historical_evidence
+    status: historical
+    notes:
+      - "historical formulas incl. snr_pct=(cache_read+output)/total*100 — semantic drift vs current (GAP-003)"
+      - "sorted by sigrank_yield_rank; includes operating_ratio_scraped + seed_sigrank_scraped (source-carried derived)"
+
+  - id: SRC-HIST-002
+    name: historical engines snapshot
+    type: historical_implementation
+    layer: L2(historical)
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/
+    files: [02-metric-engine.ts, 03-scoring-engine.ts, 03b-scoring-types.ts, 04-field-average.ts, 05-field-distribution.mjs]
+    role: historical_evidence
+    status: historical
+
+  - id: SRC-HIST-003
+    name: 05-field-distribution-data.json
+    type: historical_distribution_output
+    layer: L3(historical)
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/05-field-distribution-data.json
+    sha256: b830b3924be777c765564380570220b4923de9df02d64c9ff8dbf5ebff5e703e
+    population: {humans_included: 1611, basis: "1628 - 2 bots - 15 suspects"}
+    medians: {yield: 1.95, snr: 0.0044, total_tokens: 4874366430}
+    role: historical_evidence
+    status: historical
+    notes: ["median values differ from current field-analysis.json — versioned, not reconciled (GAP-009)"]
+
+  - id: SRC-HIST-004
+    name: 07-bot-detection-analysis.json
+    type: historical_classification_output
+    layer: L4(historical)
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/07-bot-detection-analysis.json
+    sha256: ce58780682eb5b2845cc6bfe3b76d8ee7fb80f5c6e2cd4f1ba970e664a7af5b2
+    scope: "top-500 operators only"
+    results: {human: 483, suspect: 15, bot: 2}
+    scraped_at: "2026-07-13T14:23:46Z"
+    role: historical_evidence
+    status: historical
+    notes: ["~4.5h before corpus timestamp; covers 500/1628 only — 1128 not analyzed"]
+
+  - id: SRC-HIST-005
+    name: GHOSTRANK.md
+    type: historical_classification_doc
+    layer: L4(historical)
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/GHOSTRANK.md
+    sha256: 29c9b3e23a92db9b221c0820d06595484328d321dc8e265ba2170093b31cb5a3
+    definition: "Q2 quadrant: total_tokens < median(4.87B) AND yield > median(1.95), over the 1611-operator human population; 50 ghost ops"
+    role: historical_evidence
+    status: historical
+    notes: ["quadrant classification, NOT a metric"]
+
+  - id: SRC-HIST-006
+    name: 06a/06b API response samples
+    type: historical_api_samples
+    layer: L5(historical)
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/raw-data-package/
+    role: historical_evidence
+    status: historical
+
+  # ── C. CURRENT PUBLISHED PACKAGE ──────────────────────────────────────
+  - id: SRC-PUB-001
+    name: Zenodo v3.1 dataset
+    type: published_dataset
+    layer: L1-L4(published)
+    doi_version: "10.5281/zenodo.21900519"
+    doi_concept: "10.5281/zenodo.21875675"
+    api_verified: "2026-10-05 via https://zenodo.org/api/records/21900519"
+    title: "SigRank Two-Axis Operator Taxonomy: Finalized Datasets and Analytics Dashboards"
+    author: "McHenry, Deric J. (ORCID 0009-0002-9904-5390)"
+    published: "2026-08-12"
+    license: CC-BY-4.0
+    documented_n: 1628
+    file_count: 46
+    key_files:
+      - "operators-raw.csv (1,628 rows — SHA-256-anonymized IDs; raw handles never published)"
+      - "operators-derived.csv (1,628 rows — yield, snr, leverage, velocity, dev10x, scale_v, efficiency, archetype …)"
+      - "operators-platform-split.csv (8,992 rows)"
+      - "platform-raw.csv / platform-metrics.csv (17 rows)"
+      - "model-raw.csv / model-metrics.csv (3,304 rows)"
+      - "archetypes.json / class-distribution-reference.json / experience_ladder.json"
+      - "MANIFEST.json (per-file paths, sizes, SHA-256s, row counts — md5 checksums also in Zenodo API)"
+      - "README.md, METHODS.md, PROVENANCE.md, ANONYMIZATION.md, DATASET-SPEC.md, RELEASE-NOTES.md, NUMBERS-REFERENCE.md, methodology-archetypes.md, methodology-class-tiers.md"
+      - "gen-build-archetypes.mjs, gen-experience-distribution.mjs (published generator scripts)"
+      - "4 HTML dashboards + 2 SVG + ~10 animated GIFs"
+    role: current_published
+    status: current
+    notes:
+      - "published corpus is the anonymized derivative — raw handles exist only in the private gtm raw-data-package"
+      - "Zenodo description states HCM cohort '1,586 clustered of 1,627' (canon OCM) — the app /research FAQ labels the same concept OCM=1,498: naming conflict recorded (DRIFT-COM-001)"
+      - "earlier record revisions (2026-08-10) carried different descriptions before the v3.1 CSV drop — version history is meaningful"
+
+  - id: SRC-PUB-002
+    name: app public/data taxonomy JSONs
+    type: current_published_assets
+    layer: L3-L4(published)
+    repo: SunrisesIllNeverSee/sigrank-app
+    path: public/data/
+    files: [archetypes.json, archetype-labels-ocm.json, class-distribution-reference.json, experience_ladder.json, field-analysis.json]
+    role: current_published
+    status: current
+    sha256_field_analysis: edc1eb49a3865d966998e085bf94c28c14d0dafb3ce347be43ad6626d68520e2
+    sha256_archetypes: a438f8b2f55e85ca570bec95720c651a047db0dffeed70a22341720b42590757
+    sha256_experience_ladder: 9e7afb2d1fdad3874f14442c914808d192ffc8ee1761ae33e01f4d7fad624cec
+    sha256_class_distribution: 32bebad00d18a1f33177cb3d029e6626d793a0add62c4962f0f50839744126f0
+    notes:
+      - "field-analysis.json: total_scraped 1627, operators_included 1498, medians differ from historical"
+      - "archetypes.json: deterministic_build_archetypes, n_operators 1627, n_clustered 1586"
+      - "experience_ladder.json: descending_first_match, 24 stages / 8 tiers"
+      - "naming map: canon OCM = 1586-set; app /research FAQ labels OCM = 1498-set; 'hcm' appears in data/ filenames — recorded DRIFT-COM-001"
+
+  - id: SRC-PUB-003
+    name: SigRank-repos data/ numbered JSONs
+    type: published_asset_copies
+    layer: L3-L4(published)
+    path: ~/Developer/active/SigRank-repos/data/
+    files: [01-field-analysis.json, 02-board-all-time.json, 03-archetypes.json, 04-archetype-labels-hcm.json, 05-experience-ladder.json, 06-class-distribution.json]
+    role: reference_copy
+    status: current
+    sha256_05_experience_ladder: 9e7afb2d1fdad3874f14442c914808d192ffc8ee1761ae33e01f4d7fad624cec   # identical to app experience_ladder.json
+    sha256_06_class_distribution: 32bebad00d18a1f33177cb3d029e6626d793a0add62c4962f0f50839744126f0   # identical to app class-distribution-reference.json
+    notes:
+      - "05/06 verified byte-identical to app public/data copies; 01/02/03/04 carry different hashes — sibling versions, not verified byte-copies"
+      - "04 filename uses 'hcm' vs app 'ocm' — naming drift documented (DRIFT-COM-001)"
+
+  # ── D. INTERPRETATION SURFACES (consumers, not authority) ─────────────
+  - id: SRC-SURF-001
+    name: signalaf.com public surfaces
+    type: interpretation_surface
+    layer: L6
+    surfaces: [/research, /field, /wiki, /blog/volume-isnt-yield, /blog/sigrank-dashboards, /blog/how-sigrank-measures-operator-efficiency, /standard/open-vs-proprietary]
+    role: interpretation_surface
+    status: current
+    notes: [consumers/explainers — indexed, never raw authority]
+
+  # ── E. UPSTREAM DEPENDENCIES ──────────────────────────────────────────
+  - id: SRC-UP-001
+    name: TTEOP
+    type: upstream_dependency
+    layer: upstream(read-only)
+    status: current
+    notes: [definition dependency only — see metrics.yaml for pinned versions]
+
+  # ── F. SENSITIVE / PRIVATE ────────────────────────────────────────────
+  - id: SRC-PRIV-001
+    name: PRIVATE_handle-mapping.json
+    type: sensitive_private
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/scientific-dataset/PRIVATE_handle-mapping.json
+    role: sensitive_private
+    status: excluded_from_index_surfaces
+    notes: ["de-anonymizes signal# IDs — MUST NOT appear in any index/publish surface"]
+
+  - id: SRC-PRIV-002
+    name: scientific-dataset/ (superseded v1.0 Zenodo draft)
+    type: superseded_draft
+    repo: SunrisesIllNeverSee/sigrank-gtm
+    path: launch/research/scientific-dataset/
+    role: historical_evidence
+    status: superseded
+    notes: ["never uploaded; replaced by Two-Axis Taxonomy v3.1 (1627 operators)"]
+
+  # ── G. DUPLICATE CORPUS COPIES (reference, not authority) ────────────
+  - id: SRC-DUP-001
+    name: SigRank-repos/raw-data-package/ + data/07-raw-data-package/
+    type: duplicate_copies
+    path: ~/Developer/active/SigRank-repos/
+    role: reference_copy
+    status: current
+    notes: ["same core 20 files + article-charts extras; authoritative copy remains sigrank-gtm"]
+
+# ── H. DRIFT LEDGER (audit pins vs observed reality, 2026-10-05) ─────────
+drift_ledger:
+
+  - object: sigrank-app HEAD
+    expected: "audit pin 130dc0fd / later-observed 8ea811ce (manifest)"
+    actual: "origin/main accb86b (worktree base); remote since advanced to fe0a92b"
+    difference: "main moved ~15 commits past pins; PR #202 merged"
+    action: "re-pinned at accb86b; active lane fix/search-recovery-01-closeout untouched"
+
+  - object: sigrank-gtm HEAD
+    expected: "audit pin 58e4eaa5"
+    actual: "HEAD 1b2f6c4b (+4 commits)"
+    difference: "4 doc commits; corpus diff empty — content identical to pin"
+    action: "corpus verified pin-equivalent; pin retained as corpus anchor"
+
+  - object: sigrank-mcp HEAD
+    expected: "doc pin 4f6eb325"
+    actual: "main 3b1b4b8a (+5 merges past PR #98 spine-mirror removal 406c492)"
+    difference: "post-removal mainline development"
+    action: "no spine dirs remain; authority_role implementation confirmed"
+
+  - object: sigadmin-web HEAD
+    expected: "audit pin 138aeafb"
+    actual: "HEAD 138aeafb — exact pin, in sync with last-fetched origin/main"
+    difference: "none"
+    action: "no action"
+
+  - object: tteop-spec repo
+    expected: "consumer pins tteop-spec@0.1.5-draft"
+    actual: "repo dev at 0.1.7-draft, local main 1 commit ahead of origin (d763aa8)"
+    difference: "spec repo ahead of all consumer pins"
+    action: "pins remain correct for consumers; skew recorded (GAP-024)"
+
+  - object: Zenodo v3.1 file set
+    expected: "not locally present (manifest)"
+    actual: "API live-verified 2026-10-05 — 46 files, v3.1, 2026-08-12, CC-BY-4.0"
+    difference: "enumerated + md5 checksummed remotely; no local mirror needed"
+    action: "SRC-PUB-001 updated; GAP-001/002 closed"
+
+  - object: sigrank-app docs location for index
+    expected: "package proposed docs/seeded-field/"
+    actual: "docs/ is flat-only; datasets/ reserved for versioned dataset releases"
+    difference: "repo structure rules forbid docs subdirs"
+    action: "index placed at datasets/seeded-field/ per package fallback clause"

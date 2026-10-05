@@ -1,0 +1,167 @@
+# fields.yaml — Acquired-Field Classification
+# Every field in the original 24-field raw export, assigned a canonical class.
+# Classes: SOURCE_METADATA | IDENTITY | RAW_TELEMETRY | RAW_ACTIVITY_CONTEXT |
+#          SOURCE_CARRIED_DERIVED | CURRENT_DERIVED | HISTORICAL_DERIVED |
+#          CLASSIFICATION | DISTRIBUTION_OUTPUT | COMPARISON_OUTPUT |
+#          INTERPRETATION_ONLY
+# Rule: presence in the acquired file does NOT make a field raw telemetry.
+version: 1.0.0
+dictionary_source: SRC-SEED-004 (raw-data-field-definitions.md, 24 fields)
+fields:
+
+  # ── SOURCE_METADATA ──────────────────────────────────────────────────
+  - name: source
+    class: SOURCE_METADATA
+    meaning: source URL / acquisition source
+    pillar: false
+    status: current
+
+  - name: scraped_at
+    class: SOURCE_METADATA
+    meaning: acquisition timestamp
+    pillar: false
+    status: current
+
+  - name: scrape_method
+    class: SOURCE_METADATA
+    meaning: acquisition method
+    pillar: false
+    status: current
+
+  # ── IDENTITY ─────────────────────────────────────────────────────────
+  - name: tokscale_rank
+    class: IDENTITY
+    meaning: original TokScale rank, by its own ordering
+    pillar: false
+    status: current
+    notes: [source ordering — not a SigRank rank]
+
+  - name: handle
+    class: IDENTITY
+    meaning: TokScale handle
+    pillar: false
+    status: current
+
+  - name: display_name
+    class: IDENTITY
+    meaning: source display name
+    pillar: false
+    status: current
+
+  - name: avatar_url
+    class: IDENTITY
+    meaning: source avatar URL
+    pillar: false
+    status: current
+
+  - name: github_url
+    class: IDENTITY
+    meaning: source GitHub URL
+    pillar: false
+    status: current
+
+  # ── RAW_TELEMETRY (four pillars + directly-reported quantities) ──────
+  - name: input_tokens
+    class: RAW_TELEMETRY
+    meaning: source-reported input/prompt quantity
+    pillar: true
+    status: current
+
+  - name: output_tokens
+    class: RAW_TELEMETRY
+    meaning: source-reported output/completion quantity
+    pillar: true
+    status: current
+
+  - name: cache_write_tokens
+    class: RAW_TELEMETRY
+    meaning: "source-reported cache writes (normalized name: cache-create)"
+    pillar: true
+    status: current
+
+  - name: cache_read_tokens
+    class: RAW_TELEMETRY
+    meaning: source-reported cache reads
+    pillar: true
+    status: current
+
+  - name: total_tokens
+    class: RAW_TELEMETRY
+    meaning: source-reported total token count
+    pillar: false
+    status: current
+
+  - name: total_cost
+    class: RAW_TELEMETRY
+    meaning: source-reported cost
+    pillar: false
+    status: current
+
+  - name: reasoning_tokens
+    class: RAW_TELEMETRY
+    meaning: source-reported reasoning tokens
+    pillar: false
+    status: current
+    notes: [missing for 151 records per dataset-health.json]
+
+  # ── RAW_ACTIVITY_CONTEXT ─────────────────────────────────────────────
+  - name: submission_count
+    class: RAW_ACTIVITY_CONTEXT
+    meaning: submissions
+    pillar: false
+    status: current
+
+  - name: active_days
+    class: RAW_ACTIVITY_CONTEXT
+    meaning: active-day count
+    pillar: false
+    status: current
+
+  - name: session_count
+    class: RAW_ACTIVITY_CONTEXT
+    meaning: sessions
+    pillar: false
+    status: current
+    notes: [missing for 712 records per dataset-health.json]
+
+  - name: top_platforms
+    class: RAW_ACTIVITY_CONTEXT
+    meaning: source-provided top platforms
+    pillar: false
+    status: current
+
+  - name: platform_breakdown
+    class: RAW_ACTIVITY_CONTEXT
+    meaning: nested platform records
+    pillar: false
+    status: current
+
+  - name: model_usage
+    class: RAW_ACTIVITY_CONTEXT
+    meaning: nested model records
+    pillar: false
+    status: current
+
+  # ── SOURCE_CARRIED_DERIVED ────────────────────────────────────────────
+  - name: operating_ratio
+    class: SOURCE_CARRIED_DERIVED
+    meaning: SigRank-derived value exposed through source
+    pillar: false
+    status: current
+    notes: [NOT raw telemetry despite presence in acquired file]
+
+  - name: seed_sigrank
+    class: SOURCE_CARRIED_DERIVED
+    meaning: SigRank seed/projected value exposed through source
+    pillar: false
+    status: current
+    notes: [NOT raw telemetry; 1625 records carry seed_sigrank > 0]
+
+  # ── ACQUISITION STATUS ───────────────────────────────────────────────
+  - name: profile_error
+    class: SOURCE_METADATA
+    meaning: profile acquisition error/status
+    pillar: false
+    status: current
+
+# Count check: 4 metadata + 5 identity + 7 telemetry + 6 activity + 2 carried = 24

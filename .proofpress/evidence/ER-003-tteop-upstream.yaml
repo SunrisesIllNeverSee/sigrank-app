@@ -1,0 +1,26 @@
+# ER-003 — supports CAND-003 (upstream TTEOP authority boundary)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: github:SunrisesIllNeverSee/sigrank-app@accb86b8ecafa797a2927683256b477594884c98:TTEOP-IMPLEMENTATION-PROFILE.md
+  content_digest: sha256:cd95470c019ce5c9dc114945c0845a59cffc6e97f2295e4729d9f2b51bf7a57d
+  media_type: text/markdown
+quote: 'These extensions are owned by SignalAF and governed by Search Authority''s
+
+  product implementation authority class. They may not redefine TTEOP
+
+  I/O/W/R meaning, formulas, null semantics, privacy, or conformance.
+
+
+  ## D'
+quote_digest: sha256:876e0e7546d4d3a6ae54afc79cb4e8ee547b01f1594a4e9e0723d54b8a98a644
+locator:
+  kind: text_span
+  start: 3872
+  end: 4087
+  text_digest: sha256:876e0e7546d4d3a6ae54afc79cb4e8ee547b01f1594a4e9e0723d54b8a98a644
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: verify TTEOP is an upstream read-only measurement dependency, not a writable child
+  config_digest: sha256:fa63c76762f213e9513e9ba17a8c858cb334812de1be5104a62320f6a0662fc3
+  selection_reason: implementation profile states extensions may not redefine TTEOP semantics

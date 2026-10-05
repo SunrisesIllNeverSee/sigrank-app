@@ -1,0 +1,137 @@
+# populations.yaml — Population / Cohort Registry
+# Every named subset of the seeded corpus is a VERSIONED record.
+# Multiple historical counts coexist — they are different projections,
+# never silently reconciled.
+version: 1.0.0
+populations:
+
+  - id: POP-RAW-1628
+    name: raw_seeded_corpus
+    type: raw_corpus
+    source_corpus: SRC-SEED-001 + SRC-SEED-002
+    source_version: dataset 1.0 @ 2026-07-13T18:51:35Z
+    inclusion_rule: all acquired operator records (33-page scrape, 2 passes)
+    exclusion_rule: none — no bot filtering applied at raw layer
+    resulting_n: 1628
+    generated_at: "2026-07-13T18:51:35Z"
+    evidence: [dataset-overview.json, raw-data.csv (1628 data rows), tokscale-leaderboard.json (count: 1628)]
+    status: current
+    notes: [THE root population — never collapsed, subsetted, or renamed]
+
+  - id: POP-VERIFIED-1327
+    name: verified_operators
+    type: cohort
+    source_corpus: POP-RAW-1628
+    source_version: "dataset 1.0 @ 2026-07-13T18:51:35Z"
+    inclusion_rule: display_name proxy verified per dataset-overview
+    resulting_n: 1327
+    generated_at: "dataset 1.0 acquisition (2026-07-13T18:51:35Z) — count recorded in dataset-overview"
+    evidence: [dataset-overview.json verified_operators]
+    status: historical
+    notes: []
+
+  - id: POP-SEED-1625
+    name: seed_operators
+    type: cohort
+    source_corpus: POP-RAW-1628
+    source_version: "dataset 1.0 @ 2026-07-13T18:51:35Z"
+    inclusion_rule: "seed_sigrank > 0 (source-carried field)"
+    resulting_n: 1625
+    generated_at: "dataset 1.0 acquisition (2026-07-13T18:51:35Z) — count recorded in dataset-overview"
+    evidence: [dataset-overview.json seed_operators]
+    status: historical
+    notes: []
+
+  - id: POP-BOTSCOPE-500
+    name: bot_analysis_scope
+    type: cohort
+    source_corpus: POP-RAW-1628
+    source_version: "dataset 1.0 @ 2026-07-13"
+    inclusion_rule: top-500 operators only
+    resulting_n: 500
+    sub_results: {human: 483, suspect: 15, bot: 2}
+    generated_at: "2026-07-13T14:23:46Z"
+    evidence: [07-bot-detection-analysis.json]
+    status: historical
+    notes: ["bot analysis covered top-500 only — 1,128 operators never analyzed (POP-NOTANALYZED-1128)"]
+
+  - id: POP-NOTANALYZED-1128
+    name: not_bot_analyzed
+    type: cohort
+    source_corpus: POP-RAW-1628
+    source_version: "dataset 1.0 @ 2026-07-13T18:51:35Z"
+    inclusion_rule: operators outside top-500 bot-detection scope
+    resulting_n: 1128
+    generated_at: "dataset 1.0 acquisition (2026-07-13T18:51:35Z) — count recorded in dataset-overview"
+    evidence: [dataset-overview.json not_analyzed]
+    status: historical
+    notes: ["absence of a bot verdict is NOT a clean verdict — gap in classification coverage"]
+
+  - id: POP-HUMAN-1611
+    name: historical_human_population
+    type: classification_population
+    source_corpus: POP-RAW-1628
+    source_version: "dataset 1.0 @ 2026-07-13"
+    inclusion_rule: corpus minus detected bots minus suspects
+    exclusion_rule: 2 bots + 15 suspects
+    resulting_n: 1611
+    generated_at: "2026-07 historical pipeline (05-field-distribution-data.json; exact timestamp not recorded)"
+    evidence: [05-field-distribution-data.json humans_included, GHOSTRANK.md]
+    status: historical
+    notes: ["exclusion derived from top-500 analysis applied to full corpus — method/version nuance"]
+
+  - id: POP-TAXONOMY-1627
+    name: current_taxonomy_cohort
+    type: classification_population
+    source_corpus: POP-RAW-1628
+    source_version: "dataset 1.0 @ 2026-07-13 → v3.1-era derivation (Zenodo 2026-08-12)"
+    generated_at: "v3.1-era; exact time unknown"
+    inclusion_rule: current taxonomy pipeline cohort
+    exclusion_rule: "1628 - 1 (likely duplicate removal — 1 duplicate documented in dataset-health.json; NOT positively verified)"
+    resulting_n: 1627
+    evidence: [archetypes.json n_operators, class-distribution-reference.json, field-analysis.json total_scraped, Zenodo v3.1]
+    status: current
+    notes: ["the -1 cause is documented inference (dedup), not verified — see gaps.yaml"]
+
+  - id: POP-CLUSTERED-1586
+    name: clustered_ocm
+    type: classification_population
+    source_corpus: POP-TAXONOMY-1627
+    source_version: "v3.1-era published assets (Zenodo 2026-08-12); canon snapshot 2026-08-09"
+    generated_at: "v3.1-era; exact time unknown"
+    inclusion_rule: operators assigned to an archetype cluster
+    exclusion_rule: 41 unclustered
+    resulting_n: 1586
+    evidence: [archetypes.json n_clustered, "canon.yaml field_population OCM=1586 (snapshot 2026-08-09)"]
+    status: current
+    canon_name: "OCM — Operator Center of Mass (canon.yaml); staging alias 'HCM / Human Center of Mass'"
+    notes:
+      - "canon describes derivation as FULL(1627) minus outlier-flagged (input/total ≥ 0.5 + flagged); archetypes.json describes it as clustered membership — coincide at 1586 (41 unclustered)"
+      - "GAP-022 resolved: canon name is OCM; 'HCM' is staging/historical alias for same set"
+
+  - id: POP-COM-1498
+    name: center_of_mass
+    type: classification_population
+    source_corpus: POP-HUMAN-1611 (historical derivation)
+    source_version: "dataset 1.0 @ 2026-07-13 → gen-field-analysis.mjs derivation"
+    generated_at: unknown
+    inclusion_rule: human population minus ratio outliers
+    exclusion_rule: 113 ratio outliers
+    resulting_n: 1498
+    alternate_derivation: "1628 - 130 total exclusions (gen-field-analysis.mjs)"
+    evidence: [field-analysis.json operators_included 1498, gen-field-analysis.mjs, research page FAQ]
+    status: current
+    notes:
+      - "≡ historical 1611 - 113; different medians than POP-HUMAN-1611"
+      - "DISTINCT from POP-CLUSTERED-1586: canon OCM = 1586; this field-analysis 'operators_included' = 1498 — do not conflate"
+
+  - id: POP-FIELD-001
+    name: the_field_entity
+    type: synthetic_entity
+    source_corpus: derived-from-populations (NOT a member of POP-RAW-1628)
+    source_version: "n/a — synthetic construction"
+    generated_at: unknown
+    definition: "Synthetic/aggregate 'The Field' representative entity"
+    resulting_n: 1
+    status: current
+    warning: "BLOCKING RULE (GAP-013): must NEVER be counted as an independent empirical observation in the population(s) it was constructed from. Excluded from all N counts, distributions, percentile bases."

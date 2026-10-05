@@ -1,0 +1,74 @@
+# contracts/distributions.yaml — Field-Statistics Contracts
+# Every distributional statistic pins: population/version, metric, N total,
+# N valid, missing policy, methods, date, source. No single "compounding
+# operator" denominator across unrelated metrics. Synthetic entities
+# (POP-FIELD-001) are excluded from empirical populations.
+version: 1.0.0
+
+shared_rules:
+  - "population membership + version MUST be named for every statistic"
+  - "N_valid is per-metric — records missing a field do not shrink other metrics' N"
+  - "quantile/percentile convention MUST be explicit (GAP-005/006 OPEN-DECISION)"
+  - "synthetic 'The Field' entity is NEVER an observation (GAP-013)"
+  - "classifications applied to a population do not mutate the population"
+  - "small-cell suppression n<5 applies upstream (tteop TERMINOLOGY.md)"
+
+contracts:
+
+  - id: DIST-HIST-1611-001
+    population: POP-HUMAN-1611
+    population_version: historical (05-field-distribution-data.json)
+    generated_by: 05-field-distribution.mjs / gen-field-analysis.mjs
+    metrics: [yield, leverage, velocity, snr_pct(historical), dev10x, total_tokens]
+    n_total: 1611
+    n_valid_per_metric: "per-field (dataset-health: reasoning_tokens missing 151, session_count missing 712)"
+    missing_policy: historical (not fully documented — see gaps)
+    quantile_method: historical implementation (unverified convention)
+    percentile_method: historical implementation
+    observed_medians: {yield: 1.95, snr_pct: 0.0044, total_tokens: 4874366430}
+    date_version: "2026-07 historical package"
+    source: SRC-HIST-003
+    status: historical
+
+  - id: DIST-TAX-1627-001
+    population: POP-COM-1498
+    population_version: current (field-analysis.json operators_included)
+    generated_by: current field-analysis pipeline
+    metrics: [yield, snr(display alias), leverage, total_tokens]
+    n_total: "1498 (included for statistics); funnel: POP-TAXONOMY-1627 scraped → 1498 included"
+    n_valid_per_metric: per-field
+    missing_policy: unverified
+    quantile_method: unverified — median + IQR published; P90/P99 availability unverified
+    percentile_method: unverified — GAP-005/006
+    observed_medians: {yield: 1.68, snr: 0.0837, leverage: 18.57, total_tokens: 5278891141}
+    date_version: current published
+    source: SRC-PUB-002 (public/data/field-analysis.json)
+    status: current
+    notes: ["medians differ from DIST-HIST-1611-001 — different population + different metric conventions; coexist as versions (GAP-009)"]
+
+  - id: DIST-EXPLORER-SIGADMIN
+    population: SRC-SEED-008 copy (reference)
+    generated_by: sigadmin-web app/data/page.tsx
+    metrics: [means, medians, percentiles, histograms, correlations, cross-tabs]
+    quantile_method: "linear interpolation over (n-1) index — R quantile(type=7) / NumPy default / Excel PERCENTILE.INC (page.tsx:57-63)"
+    percentile_method: "same linear convention; population stdev (÷n); Pearson r; median = classic midpoint"
+    source: sigadmin-web
+    status: current
+    notes: ["explorer/reference implementation — NOT the canonical quantile authority (GAP-005/006)"]
+
+  - id: DIST-BENCHMARK-CONTRACT
+    population: pending — versioned static reference population (GAP-014)
+    required_fields:
+      population_id: REQUIRED
+      population_version: REQUIRED
+      metric: REQUIRED
+      n_total: REQUIRED
+      n_valid: REQUIRED
+      missing_null_policy: REQUIRED
+      mean_median_method: REQUIRED
+      quantile_method: REQUIRED — GAP-005 owner decision
+      percentile_method: REQUIRED — GAP-006 owner decision (tie-aware convention)
+      date_version: REQUIRED
+      source: REQUIRED
+    status: unresolved
+    notes: ["benchmark BLOCKED until this contract is satisfiable from a pinned reference population (GAP-012/013/014)"]

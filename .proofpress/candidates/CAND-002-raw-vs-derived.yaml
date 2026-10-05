@@ -1,0 +1,14 @@
+# CAND-002 — raw telemetry is distinct from downstream derived/classification layers
+candidate_id: CAND-002
+created_at: "2026-10-05"
+proposed_by: devin-agent (cannot self-approve)
+status: candidate
+statement: >
+  Within the 24-field raw export, telemetry fields are RAW_TELEMETRY while
+  operating_ratio and seed_sigrank are SOURCE_CARRIED_DERIVED (shipped inside the
+  upstream export but not raw observations); all SignalAF/TTEOP metrics,
+  classifications, distributions and comparisons are downstream L2-L6 layers.
+  Presence in the raw file does not make a field raw telemetry.
+evidence_receipts: [ER-002]
+claim_layer: foundation
+review_required: human-owner

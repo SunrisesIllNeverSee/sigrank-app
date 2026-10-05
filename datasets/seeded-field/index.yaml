@@ -1,0 +1,360 @@
+# index.yaml — Canonical Seeded-Field Object Registry
+# Answers for every object: what is it, what does it mean, where is its
+# source of truth, what is derived from it.
+# Status vocabulary: current | historical | superseded | unresolved
+version: 1.0.0
+spec: signalaf_seeded_field_devin_handoff v0.3
+generated_at: "2026-10-05"
+objects:
+
+  - id: IDX-001
+    name: operator
+    type: entity
+    definition: >-
+      Account associated with measured AI-use telemetry. Do not assume one
+      account always equals one unique human.
+    layer: entity
+    authority: spec (seeded-field package), source acquisition
+    path: —
+    version: —
+    inputs: source telemetry
+    outputs: static operator record (IDX-006)
+    upstream_dependencies: []
+    consumed_by: [static seed record, derived statistics, field distributions, classifications, rankings, benchmark]
+    status: current
+    notes: []
+
+  - id: IDX-002
+    name: seeded_operator_profile
+    type: record
+    definition: >-
+      Static SigRank operator record created from the acquired seed dataset
+      rather than a live operator submission.
+    layer: L1
+    authority: raw seed corpus (SRC-SEED-001)
+    path: —
+    version: —
+    inputs: [raw telemetry, identity fields]
+    outputs: [seed_operator record]
+    upstream_dependencies: [SRC-SEED-001]
+    consumed_by: [derived statistics, classifications, benchmark]
+    status: current
+    notes: []
+
+  - id: IDX-003
+    name: raw_seed_corpus
+    type: dataset
+    definition: >-
+      Complete acquired operator set before HCM, bot, suspect, outlier,
+      archetype, tier, or ranking selection.
+    version: raw-data-package pin (SRC-SEED-001 sha256)
+    layer: L0
+    authority: source acquisition — TokScale leaderboard scrape
+    path: sources.yaml#SRC-SEED-001
+    acquired_at: "2026-07-13T18:51:35Z"
+    documented_n: 1628
+    collection_scope: TokScale lifetime aggregate
+    inputs: [tokscale scrape]
+    outputs: [static operator records (IDX-006)]
+    upstream_dependencies: []
+    consumed_by: [all downstream layers]
+    status: current
+    notes: [no bot filtering applied at raw layer per source export notes]
+
+  - id: IDX-004
+    name: raw_telemetry
+    type: field-group
+    definition: >-
+      Source-reported quantities attached to a seeded operator before any
+      SigRank-derived classifications.
+    version: —
+    inputs: [source-reported quantities]
+    outputs: [raw telemetry fields carried on operator records]
+    upstream_dependencies: [SRC-SEED-001]
+    consumed_by: [metric computation (L2), fields.yaml classification]
+    layer: L0
+    authority: source acquisition
+    path: fields.yaml#RAW_TELEMETRY
+    core_quantities: [input_tokens, output_tokens, cache_write_tokens, cache_read_tokens]
+    additional_context: [total_tokens, total_cost, reasoning_tokens, session_count, active_days, submission_count, platform_breakdown, model_usage]
+    status: current
+    notes:
+      - source-carried derived fields (operating_ratio, seed_sigrank) are NOT raw telemetry
+
+  - id: IDX-005
+    name: four_pillars
+    type: metric-input-group
+    definition: >-
+      The four raw quantities consumed by the pinned upstream measurement
+      definition. SignalAF stores/references the values; it does not redefine
+      the fields.
+    path: fields.yaml#RAW_TELEMETRY + metrics.yaml (TTEOP pin)
+    version: tteop-spec@0.1.5-draft
+    inputs: [raw telemetry (IDX-004)]
+    outputs: [canonical metric inputs I/O/W/R]
+    consumed_by: [TTEOP metric computation, derived statistics (IDX-007)]
+    layer: L0→L2 boundary
+    authority: TTEOP upstream (read-only dependency)
+    fields: [input_tokens, output_tokens, cache_write_tokens, cache_read_tokens]
+    upstream_dependencies: [TTEOP]
+    status: current
+    notes: [normalized cache-create name recorded in fields.yaml]
+
+  - id: IDX-006
+    name: static_operator_record
+    type: schema
+    definition: Minimum canonical seeded operator object. Exists before anything is placed in `derived` or `classifications`.
+    version: contracts/operator-record.yaml
+    inputs: [raw + identity fields from IDX-003]
+    outputs: [canonical seeded operator object]
+    upstream_dependencies: [IDX-003]
+    consumed_by: [derived statistics (IDX-007), classifications, populations]
+    layer: L1
+    authority: this index
+    path: contracts/operator-record.yaml (contract)
+    schema:
+      seed_operator:
+        source_operator_id: REQUIRED
+        handle_or_anonymous_id: REQUIRED
+        source: {dataset_id: REQUIRED, acquired_at: REQUIRED}
+        telemetry: {input: REQUIRED, output: REQUIRED, cache_write: REQUIRED, cache_read: REQUIRED}
+        context: {total_tokens: OPTIONAL, reasoning_tokens: OPTIONAL, total_cost: OPTIONAL, active_days: OPTIONAL, session_count: OPTIONAL, submission_count: OPTIONAL, platforms: OPTIONAL, models: OPTIONAL}
+        derived: {}
+        classifications: {}
+    status: current
+    notes: []
+
+  - id: IDX-007
+    name: derived_statistic
+    type: record
+    definition: >-
+      Numerical value calculated from an operator record under a named metric
+      definition and implementation version.
+    path: metrics.yaml (per-metric upstream reference)
+    version: pinned metric implementations (metrics.yaml)
+    inputs: [operator record (IDX-006), metric definition + version]
+    outputs: [computed metric value]
+    upstream_dependencies: [IDX-006, TTEOP]
+    consumed_by: [field distributions (IDX-009), classifications, leaderboard]
+    layer: L2
+    authority: metrics.yaml (per-metric upstream reference)
+    required_record: [metric_id, display_name, upstream_definition, upstream_version, implementation, input_fields, output_field, status]
+    status: current
+    notes: []
+
+  - id: IDX-008
+    name: seed_field
+    type: collection
+    definition: >-
+      Static collection of seeded operator records plus explicitly versioned
+      derived statistics. Never used without specifying which
+      projection/population is intended.
+    authority: source acquisition — TokScale corpus (SRC-SEED-001)
+    path: sources.yaml#SRC-SEED-001 (+ public/data projections)
+    version: raw-data-package pin SRC-SEED-001
+    inputs: [IDX-003 raw_seed_corpus, IDX-006 static operator records]
+    outputs: [versioned population projections — populations.yaml]
+    upstream_dependencies: [SRC-SEED-001]
+    consumed_by: [field distributions, classifications, leaderboard, benchmark, interpretation]
+    layer: L1-L3
+    status: current
+    notes: [population membership must be named — see populations.yaml]
+
+  - id: IDX-009
+    name: field_distribution
+    type: record
+    definition: Statistical summaries across a stated set of seeded operator records.
+    authority: dataset contract — contracts/distributions.yaml
+    path: contracts/distributions.yaml (+ public/data/field-analysis.json)
+    version: observed conventions — DIST-* records
+    inputs: [named population cohort (populations.yaml)]
+    outputs: [statistical summaries over the named cohort]
+    upstream_dependencies: [IDX-008]
+    consumed_by: [IDX-017 leaderboard, IDX-018 benchmark, interpretation surfaces]
+    layer: L3
+    may_contain: [N, mean, median, standard_deviation, min_max, quantiles, quartiles, IQR, histograms, correlations]
+    contract: contracts/distributions.yaml
+    status: current
+    notes: [population membership and calculation procedure must be named]
+
+  - id: IDX-010
+    name: hcm_ocm
+    type: classification
+    definition: >-
+      Secondary selection/classification intended to describe the central
+      human/operator mass after explicit exclusions. Not raw data; does not
+      replace the raw corpus.
+    authority: Search Authority canon (OCM) + field-analysis method
+    path: populations.yaml#POP-CLUSTERED-1586 + populations.yaml#POP-COM-1498
+    version: canon snapshot 2026-08-09 / field-analysis artifact pin
+    inputs: [POP-TAXONOMY-1627, exclusion rules]
+    outputs: [POP-CLUSTERED-1586, POP-COM-1498]
+    upstream_dependencies: [IDX-008, CLS-OUTLIER-RATIO-113, CLS-BOT, CLS-SUSPECT]
+    consumed_by: [field-analysis.json, DIST-TAX-1627-001, research surfaces]
+    layer: L4
+    record: [populations.yaml#POP-CLUSTERED-1586, populations.yaml#POP-COM-1498]   # OCM/HCM populations carry the selection; no standalone CLS record exists
+    required_record: [id, source_corpus, method, inclusion_rule, exclusion_rule, resulting_n, generated_at, evidence]
+    status: current
+    notes: ["versioned: canon OCM = POP-CLUSTERED-1586; field-analysis operators_included = POP-COM-1498 — GAP-007 closed"]
+
+  - id: IDX-011
+    name: bot_suspect_classification
+    type: classification
+    definition: Secondary classification produced by a detection procedure. Raw records remain in the source corpus.
+    authority: historical detection artifact — 07-bot-detection-analysis.json
+    path: classifications.yaml#CLS-BOT + CLS-SUSPECT
+    version: historical analysis run 2026-07-13
+    inputs: [POP-RAW-1628]
+    outputs: [bot/suspect/human labels over POP-BOTSCOPE-500]
+    upstream_dependencies: [IDX-008]
+    consumed_by: [POP-HUMAN-1611, POP-TAXONOMY-1627, POP-BOTSCOPE-500]
+    layer: L4
+    record: classifications.yaml#CLS-BOT
+    historical_analysis: launch/research/raw-data-package/07-bot-detection-analysis.json
+    status: unresolved
+    notes: [current version vs historical — GAP-008]
+
+  - id: IDX-012
+    name: outlier
+    type: classification
+    definition: >-
+      Operator retained in source data but separated from a particular
+      statistical summary under explicit rules. Never delete or overwrite the
+      original raw row.
+    authority: field-analysis exclusion rule (gen-field-analysis.mjs method)
+    path: classifications.yaml#CLS-OUTLIER-RATIO-113
+    version: artifact-observed 113 + 17 = 130 exclusions
+    inputs: [POP-TAXONOMY-1627]
+    outputs: [exclusion set -> POP-COM-1498 basis]
+    upstream_dependencies: [IDX-008]
+    consumed_by: [POP-COM-1498, DIST-TAX-1627-001]
+    layer: L4
+    record: classifications.yaml#CLS-OUTLIER-RATIO-113
+    status: current
+    notes: [exclusion applies only to the named downstream calculation]
+
+  - id: IDX-013
+    name: ghostrank
+    type: classification
+    definition: >-
+      Historical/secondary field classification described in the research
+      package. Indexed at its actual historical definition; not reinterpreted
+      as a current standalone metric unless current authority supports that.
+    authority: historical documentation — GHOSTRANK.md
+    path: classifications.yaml#CLS-GHOSTRANK
+    version: historical (not a current standalone metric)
+    inputs: [historical field records]
+    outputs: [historical ghost-rank labels]
+    upstream_dependencies: [IDX-008]
+    consumed_by: [historical interpretation only]
+    layer: L4
+    historical_documentation: launch/research/raw-data-package/GHOSTRANK.md
+    record: classifications.yaml#CLS-GHOSTRANK
+    status: historical
+    notes: []
+
+  - id: IDX-014
+    name: archetype
+    type: classification
+    definition: Downstream operator classification derived from statistics. Interpretive/classification output, not a primary measured quantity.
+    authority: published asset method — archetypes.json (deterministic_build_archetypes)
+    path: classifications.yaml#CLS-ARCHETYPE
+    version: artifact pin (public/data/archetypes.json sha256 in sources.yaml)
+    inputs: [POP-TAXONOMY-1627 derived statistics]
+    outputs: [archetype labels — 1586 clustered]
+    upstream_dependencies: [IDX-008, IDX-009]
+    consumed_by: [classification surfaces, POP-CLUSTERED-1586]
+    layer: L4
+    current_published_asset: archetypes.json
+    record: classifications.yaml#CLS-ARCHETYPE
+    status: current
+    notes: ["method declared in artifact: deterministic_build_archetypes — GAP-010 closed"]
+
+  - id: IDX-015
+    name: experience_class_tier
+    type: classification
+    definition: Downstream classification according to a stated threshold/rule system. Historical class semantics may differ; preserve version and status.
+    authority: published asset method — experience_ladder.json (descending_first_match)
+    path: classifications.yaml#CLS-EXPERIENCE
+    version: artifact pin (public/data/experience_ladder.json sha256 in sources.yaml)
+    inputs: [POP-TAXONOMY-1627 derived statistics]
+    outputs: [experience class/tier labels]
+    upstream_dependencies: [IDX-008, IDX-009]
+    consumed_by: [classification surfaces, CLS-CLASS-DIST-REFERENCE]
+    layer: L4
+    current_published_asset: experience_ladder.json
+    record: classifications.yaml#CLS-EXPERIENCE
+    status: current
+    notes: ["method declared in artifact: descending_first_match over RS.05 24-stage ladder — GAP-011 closed"]
+
+  - id: IDX-016
+    name: cohort
+    type: population
+    definition: Explicitly specified subset of operators used for comparative statistics.
+    authority: dataset population registry — populations.yaml
+    path: populations.yaml
+    version: per-record generated_at / source_version
+    inputs: [source_corpus, inclusion/exclusion rules]
+    outputs: [named cohorts (POP-*)]
+    upstream_dependencies: [IDX-008]
+    consumed_by: [IDX-009 field_distribution, IDX-018 benchmark]
+    layer: L4/L5
+    required_record: [source_corpus, inclusion_rule, exclusion_rule, n, version_date, intended_comparison]
+    record: populations.yaml
+    status: current
+    notes: []
+
+  - id: IDX-017
+    name: leaderboard
+    type: comparison-product
+    definition: >-
+      Ordering of eligible operator records under an explicit
+      statistic/ranking rule. Derived from statistics; not the primary
+      statistical record.
+    authority: live product surface — see surfaces.yaml
+    path: surfaces.yaml (live board is a sibling system)
+    version: live — not a static seeded artifact
+    inputs: [operator statistics + ordering rule]
+    outputs: [ordered eligible records]
+    upstream_dependencies: [IDX-009]
+    consumed_by: [leaderboard surfaces; NOT a benchmark input — GAP-012]
+    layer: L5
+    status: current
+    notes: [live board is a sibling system — see surfaces.yaml]
+
+  - id: IDX-018
+    name: benchmark
+    type: comparison-product
+    definition: >-
+      Comparison of an operator's statistics with a defined reference
+      population and comparison procedure. Sibling of leaderboard ordering,
+      not a synonym for leaderboard rank.
+    authority: blocked — gated on versioned static reference population
+    path: gaps.yaml (readiness gaps); classifications.yaml#CLS-BENCHMARK
+    version: unresolved
+    inputs: [operator statistics, pinned reference population, comparison procedure]
+    outputs: [benchmark comparison result]
+    upstream_dependencies: [IDX-009, IDX-016]
+    consumed_by: [planned benchmark surface — /ai-operator-benchmark]
+    layer: L5
+    status: unresolved
+    notes: [readiness gated on versioned static reference population — see gaps.yaml]
+
+  - id: IDX-019
+    name: interpretation
+    type: surface-group
+    definition: >-
+      Articles, findings, dashboards, patterns, and narratives based on the
+      indexed corpus and its derived layers. Consume evidence; never become
+      raw-data authority.
+    authority: derived surfaces only — never raw-data authority
+    path: surfaces.yaml
+    version: per-surface pins
+    inputs: [all lower layers L0-L5]
+    outputs: [articles, dashboards, findings, narratives]
+    upstream_dependencies: [IDX-003, IDX-008, IDX-009, IDX-017]
+    consumed_by: [public readers — terminal layer]
+    layer: L6
+    record: surfaces.yaml
+    status: current
+    notes: []

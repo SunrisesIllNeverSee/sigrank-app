@@ -1,0 +1,17 @@
+# ER-005 — supports CAND-005 (classifications do not replace the raw corpus)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: github:SunrisesIllNeverSee/sigrank-gtm@1b2f6c4b49a37e696751c331467f827a08d9b32e:launch/research/raw-data-package/05-field-distribution-data.json
+  content_digest: sha256:b830b3924be777c765564380570220b4923de9df02d64c9ff8dbf5ebff5e703e
+  media_type: application/json
+quote: '1611'
+quote_digest: sha256:68722dedde84631c45b4aade9365a91aa6fd11c5766e66191ffbf07361204a4c
+locator:
+  kind: json_pointer
+  value: /meta/humans_included
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: verify HCM/bot/suspect/outlier selections never replace or shrink the raw corpus
+  config_digest: sha256:4e274475306c212279cd95b64849e37bdf51b83d21303b47fb31112e82f9ed60
+  selection_reason: derived humans_included=1611 vs corpus total_scraped=1628 in same meta block — selection, not mutation

@@ -1,0 +1,138 @@
+# classifications.yaml — Classification Registry
+# Classifications are downstream of raw data. Every record pins: source
+# corpus, source version, method, inclusion/exclusion rules, N, artifact,
+# date, evidence, status. Historical versions coexist — never retrofitted.
+version: 1.0.0
+classifications:
+
+  - id: CLS-HIST-HUMAN-1611
+    name: historical_human_selection
+    type: classification
+    source_corpus: POP-RAW-1628
+    source_version: dataset 1.0 @ 2026-07-13
+    method: "corpus minus bot-detection results (top-500 analysis applied corpus-wide)"
+    inclusion_rule: not bot, not suspect
+    exclusion_rule: 2 bots + 15 suspects
+    resulting_n: 1611
+    output_artifact: 05-field-distribution-data.json
+    generated_at: "2026-07 (historical, exact timestamp not recorded)"
+    evidence: [SRC-HIST-004, SRC-HIST-003, GHOSTRANK.md]
+    status: historical
+    notes: ["analysis covered top-500; application to full corpus is a historical method fact, not an error"]
+
+  - id: CLS-BOT
+    name: bot_classification
+    type: classification
+    source_corpus: POP-BOTSCOPE-500
+    source_version: dataset 1.0
+    method: 07-bot-detection-analysis.json (historical)
+    resulting_n: 2
+    generated_at: "2026-07-13T14:23:46Z"
+    output_artifact: 07-bot-detection-analysis.json
+    evidence: [SRC-HIST-004]
+    status: historical
+    notes: ["top-500 scope only; current version unknown — GAP-008"]
+
+  - id: CLS-SUSPECT
+    name: suspect_classification
+    type: classification
+    source_corpus: POP-BOTSCOPE-500
+    source_version: dataset 1.0
+    method: 07-bot-detection-analysis.json (historical)
+    resulting_n: 15
+    output_artifact: 07-bot-detection-analysis.json
+    generated_at: "2026-07-13T14:23:46Z (artifact scrape timestamp — generation time not separately recorded)"
+    evidence: [SRC-HIST-004]
+    status: historical
+    notes: [same scope caveat as CLS-BOT]
+
+  - id: CLS-OUTLIER-RATIO-113
+    name: ratio_outlier_selection
+    type: classification
+    source_corpus: POP-HUMAN-1611
+    source_version: "dataset 1.0 @ 2026-07-13 (input population version)"
+    method: ratio-based outlier rule in gen-field-analysis.mjs
+    generated_at: unknown
+    exclusion_rule: 113 ratio outliers
+    resulting_n_affected: 113
+    downstream_population: POP-COM-1498
+    evidence: [gen-field-analysis.mjs]
+    status: current
+    notes: ["exclusion applies to the center-of-mass population only — raw rows preserved"]
+
+  - id: CLS-GHOSTRANK
+    name: ghost_rank_quadrant
+    type: classification
+    definition: "Q2 quadrant: total_tokens < population median AND yield > population median — low-volume high-yield operators invisible on volume boards"
+    source_corpus: POP-HUMAN-1611
+    method: "median-split quadrant (05-field-distribution.mjs / gen-field-analysis.mjs)"
+    parameters: {volume_median: 4874366430, yield_median: 1.95, top_n: 50}
+    resulting_n: 50
+    output_artifact: "05-field-distribution-data.json → ghost_ranks[]"
+    historical_documentation: GHOSTRANK.md
+    evidence: [SRC-HIST-005]
+    status: historical
+    notes: ["quadrant classification, NOT a metric; medians are population-versioned — different populations produce different ghost sets"]
+
+  - id: CLS-ARCHETYPE
+    name: archetype_classification
+    type: classification
+    source_corpus: POP-TAXONOMY-1627
+    method: deterministic_build_archetypes
+    inclusion_rule: clustered membership (10 archetypes)
+    resulting_n: 1586 clustered / 41 unclustered
+    output_artifact: archetypes.json (+ archetype-labels-ocm.json labels)
+    generated_at: "v3.1-era (Zenodo published 2026-08-12); artifact-internal generation timestamp absent — exact time unknown"
+    source_version: "dataset 1.0 @ 2026-07-13; taxonomy cohort POP-TAXONOMY-1627"
+    evidence: [SRC-PUB-002]
+    status: current
+    notes:
+      - "archetypes are interpretive downstream classifications — never primary measured quantities"
+      - "method declared in artifact: deterministic_build_archetypes — GAP-010 closed"
+      - "label file naming: archetype-labels-ocm.json vs data/04-archetype-labels-hcm.json drift (DRIFT-COM-001)"
+
+  - id: CLS-EXPERIENCE
+    name: experience_ladder
+    type: classification
+    source_corpus: POP-TAXONOMY-1627
+    source_version: "dataset 1.0 @ 2026-07-13; taxonomy cohort POP-TAXONOMY-1627"
+    method: descending_first_match
+    inclusion_rule: totalMin_inclusive thresholds, 24 stages / 8 tiers
+    resulting_n: 1627
+    output_artifact: experience_ladder.json
+    generated_at: "v3.1-era (Zenodo published 2026-08-12); artifact-internal generation timestamp absent — exact time unknown"
+    details: "ARCH+ I ≥ 7,068,201,104,627 total (n=1 — that sole operator is the ~9e15-token suspected-bot outlier); UNCLASSED for null/zero; TRANSMITTER is peak badge not ladder stage"
+    evidence: [SRC-PUB-002]
+    status: current
+    notes: ["method declared in artifact: descending_first_match — GAP-011 closed; historical class tiers (TRANSMITTER≥10K/IGNITER≥1K/BUILDER≥100/SEEKER≥1/BURNER<1 by yield) preserved in SRC-HIST-001"]
+
+  - id: CLS-CLASS-DIST-REFERENCE
+    name: class_distribution_reference
+    type: classification
+    source_corpus: POP-TAXONOMY-1627
+    source_version: "dataset 1.0 @ 2026-07-13; taxonomy cohort POP-TAXONOMY-1627"
+    method: observed distribution of the 24 ladder stages
+    resulting_n: 1627
+    output_artifact: class-distribution-reference.json
+    generated_at: "v3.1-era; exact time unknown"
+    evidence: [SRC-PUB-002]
+    status: current
+    notes: []
+
+  - id: CLS-LEADERBOARD-LIVE
+    name: live_leaderboard_ordering
+    type: comparison_product
+    source_corpus: live operator ingest (NOT the seeded corpus)
+    method: app leaderboard ranking ruleset
+    status: current
+    notes:
+      - "sibling system — ordering under a rank rule, derived from statistics"
+      - "must NOT silently substitute for static seeded reference population (GAP-012 BLOCKING)"
+
+  - id: CLS-BENCHMARK
+    name: benchmark_comparison
+    type: comparison_product
+    source_corpus: pending — requires versioned static reference population
+    method: pending — explicit percentile convention required (GAP-005, GAP-006)
+    status: unresolved
+    notes: ["sibling of leaderboard; comparison vs defined reference population + procedure — see contracts/distributions.yaml"]

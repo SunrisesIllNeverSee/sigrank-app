@@ -1,0 +1,13 @@
+# CAND-005 — HCM/bot/outlier classifications do not replace the raw corpus
+candidate_id: CAND-005
+created_at: "2026-10-05"
+proposed_by: devin-agent (cannot self-approve)
+status: candidate
+statement: >
+  Classifications (bot 2, suspect 15, outlier 113, clustered 1,586, archetypes,
+  classes, cohorts) are downstream selections/labels over the raw corpus — which
+  remains 1,628 records with excluded_records: 0. humans_included 1,611 and
+  operators_included 1,498 are derived populations, not the corpus.
+evidence_receipts: [ER-005]
+claim_layer: methodology
+review_required: human-owner

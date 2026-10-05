@@ -1,0 +1,20 @@
+# ER-002 — supports CAND-002 (raw telemetry distinct from derived/classification layers)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: github:SunrisesIllNeverSee/sigrank-gtm@1b2f6c4b49a37e696751c331467f827a08d9b32e:launch/research/raw-data-package/raw-data-field-definitions.md
+  content_digest: sha256:a424bf0475767347e9e36a59abd94f2a7d61057174b8df23bf9c0a31f3e918b3
+  media_type: text/markdown
+quote: '| seed_sigrank | float | SigRank (via tokscale.ai) | SigRank seed yield (Υ) — projected yield from the raw token cascade
+  |'
+quote_digest: sha256:e3e340dd0065a8bda26b4ee8b3f9048d5a19b01c095315cfec83a166fe41d5b3
+locator:
+  kind: text_span
+  start: 2834
+  end: 2956
+  text_digest: sha256:e3e340dd0065a8bda26b4ee8b3f9048d5a19b01c095315cfec83a166fe41d5b3
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: verify which acquired fields are raw telemetry vs derived/classification-carried
+  config_digest: sha256:ed2e5be5d68b8914932fb8e2cb1ca357dc1f344e8f1234954ef03a87804a191e
+  selection_reason: dictionary row marks seed_sigrank as a source-carried derived value, not raw telemetry

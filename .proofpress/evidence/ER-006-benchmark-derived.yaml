@@ -1,0 +1,19 @@
+# ER-006 — supports CAND-006 (benchmark is a derived comparison, not primary measurement)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: github:SunrisesIllNeverSee/sigrank-app@accb86b8ecafa797a2927683256b477594884c98:app/api/v1/benchmarks/route.ts
+  content_digest: sha256:7f96af1f3507c9b9dd0dd9db34b6001c8482af4a68313d384e5231e8182b975c
+  media_type: text/plain
+quote: '  const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 })'
+quote_digest: sha256:fc23b98e43cca18606051b33845ffc98f1dd402196c476f1bfb1df1d72389e2d
+locator:
+  kind: text_span
+  start: 892
+  end: 973
+  text_digest: sha256:fc23b98e43cca18606051b33845ffc98f1dd402196c476f1bfb1df1d72389e2d
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: verify benchmark is downstream of statistics, a sibling of leaderboard — not primary measurement
+  config_digest: sha256:e8cdfb0f70a42b22352f01aed5a5e2bf89a34b112e5fe7df1d34d72e8d74504b
+  selection_reason: existing endpoint computes bands over the LIVE board population — comparison consumer, not reference

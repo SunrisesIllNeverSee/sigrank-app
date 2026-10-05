@@ -1,0 +1,14 @@
+# CAND-004 — historical SNR semantics differ from the current mapping
+candidate_id: CAND-004
+created_at: "2026-10-05"
+proposed_by: devin-agent (cannot self-approve)
+status: candidate
+statement: >
+  Historical snr_pct = ((cache_read + output) / total_tokens) × 100 differs from
+  current tteop.output_fraction = output / (input + output) (display alias 'snr',
+  explicitly prohibited from signal-to-noise interpretation). These are different
+  quantities under different conventions and must be versioned separately — never
+  reconciled by overwriting (GAP-003).
+evidence_receipts: [ER-004a, ER-004b]
+claim_layer: methodology
+review_required: human-owner

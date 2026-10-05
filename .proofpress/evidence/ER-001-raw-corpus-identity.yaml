@@ -1,0 +1,17 @@
+# ER-001 — supports CAND-001 (raw corpus identity/date/source/count)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: github:SunrisesIllNeverSee/sigrank-gtm@1b2f6c4b49a37e696751c331467f827a08d9b32e:launch/research/raw-data-package/dataset-overview.json
+  content_digest: sha256:ab233a59173de43b4f41532a77c3fe6f2753d608066a295867e0cc70b5a25ffa
+  media_type: application/json
+quote: '1628'
+quote_digest: sha256:e6c3b6f798b0e8d63406a281cf31ed72a005f9aaba8970ba3d008f2254001146
+locator:
+  kind: json_pointer
+  value: /number_of_operators
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: verify original raw seeded corpus identity, acquisition date, documented count
+  config_digest: sha256:690f7b5a5e76ecddfc47dc1ab4fe55335e2c6af0bad7b0b0028764f4b2f3cc50
+  selection_reason: 'load-bearing scalar: documented operator count of the raw corpus'

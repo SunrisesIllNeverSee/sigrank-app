@@ -1,0 +1,37 @@
+# contracts/operator-record.yaml — Canonical Static Operator Record (IDX-006)
+# The minimum canonical seeded operator object. Exists before anything is
+# placed in `derived` or `classifications`.
+version: 1.0.0
+schema: seed_operator/v1
+record:
+  seed_operator:
+    source_operator_id: REQUIRED     # tokscale_rank or source key
+    handle_or_anonymous_id: REQUIRED # handle, or signal-XXXXXXXXXX in anonymized exports
+
+    source:
+      dataset_id: REQUIRED           # e.g. SRC-SEED-002 / zenodo.21900519
+      acquired_at: REQUIRED          # 2026-07-13T18:51:35Z
+
+    telemetry:                       # four pillars — RAW_TELEMETRY only
+      input: REQUIRED                # input_tokens
+      output: REQUIRED               # output_tokens
+      cache_write: REQUIRED          # cache_write_tokens (cache-create)
+      cache_read: REQUIRED           # cache_read_tokens
+
+    context:                         # RAW_ACTIVITY_CONTEXT — never required
+      total_tokens: OPTIONAL
+      reasoning_tokens: OPTIONAL
+      total_cost: OPTIONAL
+      active_days: OPTIONAL
+      session_count: OPTIONAL
+      submission_count: OPTIONAL
+      platforms: OPTIONAL
+      models: OPTIONAL
+
+    derived: {}                      # L2 records — populated under pinned metric defs
+    classifications: {}              # L4 records — populated under pinned methods
+
+rules:
+  - "derived/classifications START EMPTY — the record precedes them"
+  - "no SOURCE_CARRIED_DERIVED field (operating_ratio, seed_sigrank) may enter telemetry"
+  - "classification annotations never delete/mutate telemetry or identity"

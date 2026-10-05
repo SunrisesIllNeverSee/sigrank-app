@@ -1,0 +1,228 @@
+# gaps.yaml — Gap Register
+# Status: OPEN-EVIDENCE | OPEN-DECISION | HISTORICAL-CONFLICT | BLOCKING |
+#         CLOSED-EVIDENCE | CLOSED-DECISION
+# A gap resolves by evidence, an explicit decision, or documented
+# exclusion — never by inferred prose.
+version: 1.0.0
+gaps:
+
+  - id: GAP-001
+    type: CLOSED-EVIDENCE
+    gap: Exact current repository location of published v3.1 dataset files
+    impact: foundation index incomplete until pinned
+    resolution: "Zenodo API verified 2026-10-05 — record 21900519, v3.1, 2026-08-12, CC-BY-4.0, 46 files enumerated w/ md5 checksums in sources.yaml SRC-PUB-001; MANIFEST.json carries per-file SHA-256s (9,042 B, md5:5c9fb4b1…)"
+    blocks_benchmark: false
+
+  - id: GAP-002
+    type: CLOSED-EVIDENCE
+    gap: Current MANIFEST.json hashes/row counts for published package
+    impact: cannot lock current package
+    resolution: "manifest-pinned 2026-10-05: deposit MANIFEST.json fetched — sha256 d9cfbc8cd145ef0ad820c013355cab3ab527529832c7fede8bfc1d1c4b583398 (md5 5c9fb4b13f2ff1520d2a7604ea82daee, matches API checksum); carries per-file sha256 for 33 of 46 deposit entries; remaining 13 covered by Zenodo API md5s"
+    blocks_benchmark: false
+
+  - id: GAP-003
+    type: HISTORICAL-CONFLICT
+    gap: "historical snr_pct = (cache_read+output)/total×100 differs from current output_fraction = O/(I+O) (displayed SNR semantics)"
+    impact: historical derived values cannot be reused as current
+    resolution: recorded as semantic drift in metrics.yaml — CLOSED-EVIDENCE (documented, not merged)
+    blocks_benchmark: false
+
+  - id: GAP-004
+    type: CLOSED-EVIDENCE
+    gap: Current exact TTEOP/spec/package versions after re-pin
+    impact: current metric records cannot be finalized
+    resolution: "pinned in metrics.yaml — tteop-spec@0.1.5-draft (all consumers), token-cascade@0.2.1, tteop-mcp@0.2.1, registry tteop-metrics/0.1-draft, spec DOI 10.5281/zenodo.22180349; spec repo dev at 0.1.7-draft recorded as skew (GAP-024)"
+    blocks_benchmark: false
+
+  - id: GAP-005
+    type: OPEN-DECISION
+    gap: Canonical quantile estimator for benchmark distributions
+    impact: benchmark percentile thresholds underspecified
+    owner_decision_required: true
+    blocks_benchmark: true
+
+  - id: GAP-006
+    type: OPEN-DECISION
+    gap: Tie-aware benchmark percentile convention
+    impact: reference percentile underspecified
+    owner_decision_required: true
+    blocks_benchmark: true
+
+  - id: GAP-007
+    type: CLOSED-EVIDENCE
+    gap: Exact current HCM/OCM classification method/version
+    impact: public HCM count cannot be treated as timeless population
+    resolution: "POP-COM-1498 = 1611−113 ≡ 1628−130; canon names 1586-set OCM (Operator Center of Mass); two populations versioned separately — CLOSED-EVIDENCE"
+    blocks_benchmark: false
+
+  - id: GAP-008
+    type: OPEN-EVIDENCE
+    gap: Current bot/suspect classification version if newer than historical package
+    impact: classification lineage incomplete
+    current_finding: "only top-500 historical analysis found; 1128 never analyzed"
+    blocks_benchmark: false
+
+  - id: GAP-009
+    type: HISTORICAL-CONFLICT
+    gap: "Multiple population counts: 1628 raw / 1627 taxonomy / 1611 humans / 1586 clustered / 1498 CoM / 500 bot-scope / 1327 verified / 1625 seeded / 1128 unanalyzed"
+    impact: must be versioned projections, not reconciled
+    resolution: versioned in populations.yaml — CLOSED-EVIDENCE
+    blocks_benchmark: false
+
+  - id: GAP-010
+    type: CLOSED-EVIDENCE
+    gap: Current archetype generation method linked to archetypes.json
+    impact: classification lineage incomplete
+    resolution: "method declared in artifact: deterministic_build_archetypes (archetypes.json); no separate method doc exists in-repo — artifact is the record — CLOSED-EVIDENCE"
+    blocks_benchmark: false
+
+  - id: GAP-011
+    type: CLOSED-EVIDENCE
+    gap: Current experience/class generation method linked to experience_ladder.json
+    impact: classification lineage incomplete
+    resolution: "method declared in artifact: descending_first_match over RS.05 24-stage ladder (experience_ladder.json) — CLOSED-EVIDENCE"
+    blocks_benchmark: false
+
+  - id: GAP-012
+    type: BLOCKING
+    gap: Benchmark must not silently use live-board population/API truncation as static reference
+    impact: required before benchmark publication
+    current_finding: "CONFIRMED RISK — app/api/v1/benchmarks/route.ts computes median/top_10/top_1 bands via getLeaderboard over the LIVE population; /ai-operator-benchmark 308-redirects to /ai-operator-scoring. Static seeded benchmark needs a versioned reference population (GAP-014) — do NOT wire the live bands endpoint"
+    blocks_benchmark: true
+
+  - id: GAP-013
+    type: BLOCKING
+    gap: "'The Field' synthetic entity must not be counted as an empirical observation in its own source population"
+    impact: distribution contamination risk
+    resolution: POP-FIELD-001 records it as synthetic_entity with exclusion warning — CLOSED-EVIDENCE pending benchmark contract enforcement
+    blocks_benchmark: true
+
+  - id: GAP-014
+    type: OPEN-EVIDENCE
+    gap: Static reference operator membership manifest
+    impact: needed for reproducible benchmark population
+    blocks_benchmark: true
+
+  - id: GAP-015
+    type: CLOSED-EVIDENCE
+    gap: Which seeded-profile source fields are currently rendered publicly and where
+    impact: surface map completeness
+    resolution: "surfaces.yaml maps all consumers — /field (field-analysis.json), archetype/class JSONs, /board/seeded 308→sigeconomy.com/all-time, sigadmin /data explorer, supabase/seeds SQL, lib/board snapshot+mock"
+    blocks_benchmark: false
+
+  - id: GAP-016
+    type: OPEN-DECISION
+    gap: "Proofpress deployment mode: local Git-backed vs hosted workspace"
+    impact: affects governance workflow; does not block foundation
+    owner_decision_required: true
+    blocks_benchmark: false
+
+  - id: GAP-017
+    type: OPEN-EVIDENCE
+    gap: Exact Proofpress locator strategy for CSV row/field evidence
+    impact: needed before CSV evidence receipts standardized
+    blocks_benchmark: false
+
+  - id: GAP-018
+    type: CLOSED-EVIDENCE
+    gap: Current SignalAF Ello Control identity/authority fields (REPO.yaml, canon contexts, estate registration)
+    impact: needed before final Proofpress policy path rules locked
+    resolution: "no REPO.yaml — app uses .ello/identity.yaml (repo_id: sigrank_app, authority_plane: search-authority); authority classification lives in control-plane catalogs (REPO_AUTHORITY_MAP). Policy paths updated accordingly"
+    blocks_benchmark: false
+
+  - id: GAP-019
+    type: OPEN-DECISION
+    gap: Whether Proofpress runtime registers as _8_dev-tools estate object
+    impact: not required for repo-local pilot
+    owner_decision_required: true
+    blocks_benchmark: false
+
+  - id: GAP-020
+    type: OPEN-DECISION
+    gap: Whether ello bootstrap gains opt-in --proofpress flag
+    impact: deferred until SignalAF pilot succeeds
+    owner_decision_required: true
+    blocks_benchmark: false
+
+  # ── Discovered during reconciliation (new) ──
+  - id: GAP-021
+    type: OPEN-EVIDENCE
+    gap: "Cause of 1628→1627 reduction in current taxonomy cohort (documented inference = 1 dedup'd record, not verified)"
+    impact: population membership manifest incomplete
+    blocks_benchmark: true   # feeds GAP-014
+
+  - id: GAP-022
+    type: CLOSED-EVIDENCE
+    gap: "Archetype label naming: archetype-labels-ocm.json (app) vs 04-archetype-labels-hcm.json (data/) — same numbers, different population naming"
+    impact: OCM vs HCM terminology drift in published assets
+    resolution: "canon.yaml names the 1,586-set 'OCM — Operator Center of Mass' (owner_approved); 'HCM' is staging/historical alias — naming map recorded in populations.yaml/metrics.yaml DRIFT-COM-001; published-asset filename drift preserved, not silently renamed"
+    blocks_benchmark: false
+
+  - id: GAP-023
+    type: OPEN-EVIDENCE
+    gap: "SigRank-repos/raw-data-package + data/07-raw-data-package duplicate copies vs gtm authoritative — byte-identity not yet diffed"
+    impact: which copy consumers actually read
+    current_finding: "dataset-overview.json verified byte-identical across all 3 copies (sha256 ab233a59…); full recursive diff pending — gtm copy designated canonical"
+    blocks_benchmark: false
+
+  # ── Reconciliation round 2 discoveries ──
+  - id: GAP-024
+    type: OPEN-EVIDENCE
+    gap: "tteop-spec repo at 0.1.7-draft (local main d763aa8, 1 unpushed commit ahead of last-fetched origin/main) while ALL consumers pin 0.1.5-draft"
+    impact: spec version skew; consumer pins remain correct for pilot
+    blocks_benchmark: false
+
+  - id: GAP-025
+    type: OPEN-EVIDENCE
+    gap: "token-cascade@0.2.1 is UNLICENSED dist-only npm package — no public source repo located"
+    impact: facade provenance cannot be audited below dist level
+    blocks_benchmark: false
+
+  - id: GAP-026
+    type: OPEN-EVIDENCE
+    gap: "Stale package name '@sigrank/cascade' in tteop-spec docs/CANON_RECONCILIATION.md (8 occurrences incl. README-comment drift note) — actual package is token-cascade@0.2.1; TTEOP-IMPLEMENTATION-PROFILE.md already says token-cascade throughout"
+    impact: documentation drift only; pins correct
+    blocks_benchmark: false
+
+  - id: GAP-027
+    type: OPEN-EVIDENCE
+    gap: "supabase/seeds/tokscale_seed_full.sql seeds the 1,627-cohort (not raw 1,628) — which corpus version DB materialization carries"
+    impact: seeded DB state population identity needs manifest entry
+    blocks_benchmark: true   # feeds GAP-014
+
+  - id: GAP-028
+    type: OPEN-EVIDENCE
+    gap: "Estate hygiene: sigrank-mcp holds 4-entry stash (c5144f9e); tteop-spec local main 1 commit ahead of origin"
+    impact: unpushed/unstashed state may hold work-in-flight
+    blocks_benchmark: false
+
+  - id: GAP-029
+    type: OPEN-EVIDENCE
+    gap: "canon field_population snapshot dated 2026-08-09 predates current published artifacts — canon OCM=1586 verified but snapshot staleness unassessed"
+    impact: canon-vs-current field stats drift window
+    blocks_benchmark: false
+
+  - id: GAP-030
+    type: HISTORICAL-CONFLICT
+    gap: "Published naming conflict: app /research FAQ labels OCM = 1,498; canon.yaml + Zenodo description name OCM/HCM = 1,586 clustered — same label, different populations in PUBLISHED assets"
+    impact: public-facing definitional ambiguity; owner decision needed to align assets
+    blocks_benchmark: true   # benchmark 'vs OCM' claims ambiguous until resolved
+
+  - id: GAP-031
+    type: CLOSED-EVIDENCE
+    gap: "sigadmin copy seed_sigrank content vs raw corpus — suspected generation diff"
+    resolution: "DISPROVEN by direct count 2026-10-05: sigadmin seed_sigrank nonzero = 1,625, identical to raw corpus; field present on all 1,628. Earlier 567-vs-560 figures were erroneous (greps on pretty-printed JSON + comparison to a nonexistent file — data/07 holds tokscale-leaderboard.json, not tokscale-dataset.json). Corrected in SRC-SEED-008."
+    blocks_benchmark: false
+
+  - id: GAP-032
+    type: OPEN-EVIDENCE
+    gap: "Platform count: dataset-overview.json lists 15 platforms; published v3.1 copy claims 17"
+    impact: headline-stat consistency across public assets
+    blocks_benchmark: false
+
+  - id: GAP-033
+    type: OPEN-EVIDENCE
+    gap: in-repo scripts/gen-field-analysis.mjs emits meta {scraped_at, source, total_scraped, operators_included, outliers, medians, iqr_fences} — published field-analysis.json additionally carries bots_removed, suspects_removed, total_classified
+    impact: the in-repo generator is NOT the version that produced the published artifact; arithmetic verified consistent but the producing revision is unlocated
+    resolution: "artifact consistent — do not imply in-repo script produced it; locate the producing generator revision or record it as lost"
+    blocks_benchmark: false

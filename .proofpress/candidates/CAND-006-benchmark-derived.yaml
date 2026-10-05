@@ -1,0 +1,14 @@
+# CAND-006 — benchmark is a derived reference comparison, not primary measurement
+candidate_id: CAND-006
+created_at: "2026-10-05"
+proposed_by: devin-agent (cannot self-approve)
+status: candidate
+statement: >
+  Benchmark comparison consumes a versioned reference-population statistical
+  contract (population + version + valid N + quantile/percentile methods) —
+  statistics → benchmark; benchmark is a sibling consumer of leaderboard,
+  not the primary measurement object, and must not silently inherit the live
+  board population (GAP-012).
+evidence_receipts: [ER-006]
+claim_layer: methodology
+review_required: human-owner

@@ -1,0 +1,142 @@
+# surfaces.yaml — Public Surface Map
+# Every public surface that renders seeded-field objects. Surfaces consume
+# indexed objects — they are explainers, never raw-data authority.
+version: 1.0.0
+surfaces:
+
+  - id: SURF-001
+    surface: signalaf.com/research
+    type: dataset_landing + research_index
+    consumes: [SRC-PUB-001 (Zenodo v3.1 link), POP-TAXONOMY-1627, CLS-ARCHETYPE, CLS-EXPERIENCE, CLS-CLASS-DIST-REFERENCE]
+    defines_or_explains: explains
+    status: current
+    notes:
+      - "FAQ labels 'OCM' = 1,498 — conflicts with canon OCM = 1,586 (GAP-030, flagged for owner)"
+      - "renders DOIs + per-file Zenodo links for all v3.1 assets; headline 1,628 ops / 17 platforms / 3,304 models"
+
+  - id: SURF-002
+    surface: signalaf.com/field
+    type: field_distribution_page
+    consumes: [SRC-PUB-002 field-analysis.json (live), POP-COM-1498, IDX-009 distributions]
+    defines_or_explains: explains + renders live field-analysis.json
+    status: current
+    notes:
+      - "renders public/data/field-analysis.json — medians differ from historical POP-HUMAN-1611 (GAP-009 versioned)"
+      - "page meta: total_scraped 1627, bots_removed 0, suspects_removed 0, operators_included 1498; 9 SVG charts + IQR fences + 80% band"
+
+  - id: SURF-003
+    surface: signalaf.com/wiki
+    type: terminology_evidence_layer
+    consumes: [archetype/tier terminology, metric explainers]
+    defines_or_explains: explains
+    status: current
+
+  - id: SURF-004
+    surface: /blog/volume-isnt-yield
+    type: historical_analysis
+    consumes: [historical field analysis, superseded taxonomy context]
+    defines_or_explains: explains (historical)
+    status: historical
+    notes: ["remains historically accurate — do not retrofit to newest taxonomy"]
+
+  - id: SURF-005
+    surface: /blog/sigrank-dashboards
+    type: analytical_dashboards
+    consumes: [seeded field dashboards]
+    defines_or_explains: explains
+    status: current
+
+  - id: SURF-006
+    surface: /blog/how-sigrank-measures-operator-efficiency
+    type: metric_explainer
+    consumes: [four pillars, metric definitions]
+    defines_or_explains: explains
+    status: current
+
+  - id: SURF-007
+    surface: /standard/open-vs-proprietary
+    type: boundary_statement
+    consumes: [open standard vs proprietary product boundary]
+    defines_or_explains: explains
+    status: current
+
+  - id: SURF-008
+    surface: live leaderboard (/board) + /board/seeded
+    type: live_comparison_product
+    consumes: [live operator ingest — NOT the seeded corpus]
+    defines_or_explains: renders live ranking
+    status: current
+    notes:
+      - "sibling system; must not be silently used as static benchmark reference (GAP-012)"
+      - "/board/seeded 308-redirects to https://sigeconomy.com/all-time — seeded board moved off-app permanently"
+      - "/api/v1/benchmarks computes median/top_10/top_1 bands via getLeaderboard over the LIVE population — GAP-012 trap; static seeded benchmark must NOT consume it"
+
+  - id: SURF-009
+    surface: /ai-operator-benchmark
+    type: benchmark_page
+    consumes: [IDX-018 benchmark — pending]
+    defines_or_explains: 308-redirects to /ai-operator-scoring today; spec'd static benchmark page not yet built
+    status: unresolved
+    notes: ["blocked pending versioned reference population + explicit conventions — see gaps.yaml BLOCKING items"]
+
+  - id: SURF-010
+    surface: seeded operator profiles (public/data/*.json assets)
+    type: data_surface
+    consumes: [archetypes.json, archetype-labels-ocm.json, class-distribution-reference.json, experience_ladder.json, field-analysis.json]
+    defines_or_explains: renders
+    status: current
+    notes: ["served live from sigrank-app/public/data/ — surface map complete (GAP-015 closed)"]
+
+  - id: SURF-011
+    surface: SigAdmin /data explorer (sigadmin-web)
+    type: exploration_tool
+    consumes: [SRC-SEED-008 tokscale-dataset.json copy]
+    defines_or_explains: explores (distributions, percentiles, histograms, correlations, cross-tabs)
+    status: current
+    notes:
+      - "locator/explorer/reference implementation — NOT authoritative for metric defs/quantile convention/classification policy"
+      - "consumes the FULLY anonymized derivative (all 1,628 handles are signal- IDs, not raw-authority bytes)"
+      - "quantile convention: linear (n-1) interpolation = R type-7 / PERCENTILE.INC; population stdev ÷n; Pearson r"
+
+  - id: SURF-012
+    surface: Supabase materialization (supabase/seeds/tokscale_seed_full.sql)
+    type: database_seed
+    consumes: [POP-TAXONOMY-1627 cohort — 1,627 operators real 4-pillar data]
+    defines_or_explains: materializes
+    status: current
+    notes:
+      - "carries the 1,627 taxonomy cohort, NOT the raw 1,628 corpus (GAP-027)"
+      - "live board reads public operator views / metric snapshots / rank history via lib/board/queries.ts"
+      - "live ingest path: POST /api/v1/snapshots (signed) → gate chain → materialization — independent of seeded statics"
+
+  - id: SURF-013
+    surface: lib/board snapshot + mock (sigrank-app)
+    type: static_board_fixture
+    consumes: [lib/board/snapshot.json; mock.ts MO§ES + fictional + 10 tokscale lifetime seeds]
+    defines_or_explains: fallback/dev fixture
+    status: current
+    notes: ["MO§ES invariant entity present in mock — exactly one, canonical display MO§ES™"]
+
+  - id: SURF-014
+    surface: MCP plugin contract (sigrank-app lib/mcp/plugin/contracts.json)
+    type: protocol_surface
+    consumes: [provenance enum data_origin: historical_seed; measurement_class enums]
+    defines_or_explains: declares provenance classes
+    status: current
+    notes: ["provenance is first-class in the app↔MCP contract — seeded data can be labeled historical_seed", "the contract file lives in sigrank-app; sigrank-mcp is the consuming server — no matching tokens found in the mcp repo"]
+
+  - id: SURF-015
+    surface: llms.txt / llms-full.txt (sigrank-app)
+    type: agent_readable_index
+    consumes: [field statistics + corpus counts]
+    defines_or_explains: explains
+    status: current
+    notes: ["canon staging records DISPUTED count conflict — llms.txt says 1,498 humans_included while llms-full.txt carries 1,628 total corpus (unpromoted staging fact)"]
+
+  - id: SURF-016
+    surface: Zenodo record 21900519 (external)
+    type: published_dataset_landing
+    consumes: [entire v3.1 package — SRC-PUB-001]
+    defines_or_explains: publishes
+    status: current
+    notes: ["46 files incl. anonymized operator CSVs, dashboards, methodology docs, generator scripts; MD5s in API, SHA-256s in MANIFEST.json"]

@@ -1,0 +1,119 @@
+schema_version: proofpress/context-policy/v1alpha1
+
+# proofpress implementation pin (spec PP-001 / acceptance criterion)
+proofpress:
+  repo: chenmingtang830/proofpress
+  # validated against the local checkout at ${PROOFPRESS_CHECKOUT} — path is
+  # machine-local and intentionally not committed here
+  pinned_commit: "47614fa"   # Record durable execution attempts for pilot workflows (#208)
+  spec_observed: "0ff7c8d5"  # package-recorded pin — absent from shallow clone (depth 50); ordering unverifiable
+  kernel_schema: proofpress/retrieval-evidence/v1
+  receipt_form: kernel-normalized   # files under evidence/ are the NORMALIZED receipt shape
+  # (source, quote, quote_digest, locator, retrieval, schema_version) — they
+  # renormalize byte-identically (receipt == normalize_retrieval_evidence_v1(envelope)).
+  # Submission requires wrapping into the envelope: {schema_version, source,
+  # evidence: {quote, locator}, retrieval}.
+  validated: "2026-10-05 — all 7 receipts renormalize byte-identically via normalize_retrieval_evidence_v1"
+
+# Layout note: the handoff spec names only context-policy.yaml; candidates/ and
+# evidence/ are the Proofpress-conventional locations for pilot claims and their
+# receipts. No other sanctioned location exists in this repo, so they live here
+# by convention.
+
+
+# Repo-local Proofpress policy for sigrank-app (signalaf.com).
+# Installed per signalaf_seeded_field_devin_handoff v0.3 doc 12 —
+# Phase A repo-local pilot. Identity: .ello/identity.yaml
+# (repo_id: sigrank_app, authority_plane: search-authority).
+# Proofpress admission != Search Authority canonization.
+
+purpose: >
+  Govern durable, evidence-backed knowledge from this repository while preserving
+  Ello Control identity (.ello/identity.yaml), coordination (.coord/,
+  system-devin/), estate registration/authority classification, Search Authority
+  canon, and the repository's existing substantive folder boundaries
+  (methodology/, governance/, research/, docs/, datasets/, public/data/).
+
+propose_when:
+  - durable_decision
+  - evidence_backed_conclusion
+  - reproducible_experiment_result
+  - integration_contract
+  - incident_learning
+
+do_not_propose:
+  - routine_code_edit
+  - transient_debugging
+  - unvalidated_hypothesis
+  - duplicate_of_existing_candidate_or_governed_context
+  - raw_trace_or_full_source_dump
+  - credential_or_secret
+  - project_progress_or_next_action
+  - pull_request_or_deployment_status
+  - release_checklist
+  - synthetic_dogfood_data
+  - snapshot_superseded_by_later_state
+
+evidence:
+  require_bounded_projection: true
+  prefer_stable_artifact_reference: true
+  exclude_private_source_material: true
+
+applicability:
+  required_for_reusable_candidates: true
+  include:
+    - title
+    - description
+    - when_relevant
+    - keywords
+    - validity_conditions
+
+customer_rules:
+  propose:
+    - >
+      Durable methodology conclusions may be proposed when backed by pinned source
+      data, implementation, manifests, or tests (methodology/, datasets/seeded-field/,
+      __tests__/, datasets/, public/data/ versioned assets).
+    - >
+      Durable governance decisions may be proposed with their decision record and
+      supporting evidence (governance/ claim/data policies).
+    - >
+      Evidence-backed research conclusions may be proposed, but exploratory analysis
+      remains candidate-only until validated.
+    - >
+      Integration contracts may be proposed only for authority owned by this
+      repository.
+    - >
+      Public methodology claims may be proposed when exact evidence and versions are
+      recoverable.
+  do_not_propose:
+    - >
+      Material under .coord/, system-devin/, Devins_Plans/, or _archive/ merely
+      because it records assignments, blockers, decisions, activity, handoffs,
+      agent discussion, or historical drafts.
+    - >
+      Material under .agents/, .claude/, .github/, e2e/, or generated
+      build/test artifacts merely because it exists.
+    - >
+      Raw dataset rows or complete source files as claims; source data is evidence.
+    - >
+      Archived material as current truth unless explicitly scoped as historical
+      evidence.
+    - >
+      Publicly rendered content merely because it is public.
+    - >
+      SignalAF interpretations that would redefine or modify upstream TTEOP
+      authority.
+    - >
+      Owner deployment approval inferred from Proofpress claim approval, or
+      Proofpress approval inferred from deployment approval.
+    - >
+      De-anonymizing material (handle-mapping, private seed data) under any
+      circumstances.
+
+non_overridable_safety:
+  agent_may_not_self_approve: true
+  owner_or_recovery_credentials_forbidden: true
+  candidate_is_not_governed_context: true
+  agent_may_not_admit: true
+  staged_context_is_draft_only: true

@@ -1,0 +1,14 @@
+# CAND-003 — TTEOP is an upstream/read-only measurement dependency
+candidate_id: CAND-003
+created_at: "2026-10-05"
+proposed_by: devin-agent (cannot self-approve)
+status: candidate
+statement: >
+  TTEOP is a parent/upstream dependency: SignalAF records metric ID, spec version
+  (tteop-metrics/0.1-draft), implementation pins (tteop-spec@0.1.5-draft,
+  token-cascade@0.2.1), source fields consumed, and resulting fields — and may
+  not redefine TTEOP semantics, fork current semantics, insert SignalAF ranking
+  rules into TTEOP, or promote historical SigRank formulas to TTEOP authority.
+evidence_receipts: [ER-003]
+claim_layer: foundation
+review_required: human-owner

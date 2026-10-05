@@ -1,0 +1,16 @@
+# CAND-001 — identity/date/source/count of the original raw seeded corpus
+candidate_id: CAND-001
+created_at: "2026-10-05"
+proposed_by: devin-agent (cannot self-approve)
+status: candidate   # approval is Human-only per .proofpress/context-policy.yaml
+statement: >
+  The original seeded operator corpus is the TokScale leaderboard export acquired
+  2026-07-13T18:51:35Z by parallel TokScale page fetch (Python scraper, 8 workers,
+  2 passes, 33 pages), documenting 1,628 operator records (24 raw fields each);
+  canonical copy at sigrank-gtm launch/research/raw-data-package (raw-data.csv
+  sha256:9942a0bb…, tokscale-leaderboard.json sha256:9e1a3d72…, dataset-overview.json
+  sha256:ab233a59…, all identical across 3 known copies); SigAdmin reference copy
+  tokscale-dataset.json sha256:e173c5a6….
+evidence_receipts: [ER-001]
+claim_layer: foundation
+review_required: human-owner

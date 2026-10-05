@@ -1,0 +1,241 @@
+# metrics.yaml — Metric Registry
+# Current upstream-pinned metrics + product-layer extensions + historical
+# records. TTEOP is upstream read-only: SignalAF records metric ID, pinned
+# version, implementation, input/output fields — never redefines semantics.
+# Status: current | historical | superseded | unresolved
+version: 1.0.0
+authority_chain: "TTEOP → tteop-spec → token-cascade → sigrank-mcp / sigrank-app"
+
+upstream:
+  spec_package: tteop-spec@0.1.5-draft        # npm pin — ALL consumers
+  spec_repo_dev: "tteop-spec main d763aa8 (0.1.7-draft — repo ahead of consumer pins; skew recorded)"
+  spec_doi: "10.5281/zenodo.22180349 (v0.1.5-draft; concept 10.5281/zenodo.22180348)"
+  registry_version: tteop-metrics/0.1-draft
+  facade_package: token-cascade@0.2.1         # product facade; alias map + extensions
+  normative_rules:
+    - "SRP-METRIC-002 banker's rounding (half-even)"
+    - "SRP-METRIC-003 null (never 0/Inf/NaN) on policy violation"
+    - "SRP-METRIC-004 all five metric keys always present"
+    - "input/output MUST NOT be null (TERMINOLOGY.md)"
+    - "small-cell suppression n<5"
+
+# ── CURRENT CANONICAL METRICS (upstream authority: tteop-spec registry) ──
+metrics:
+
+  - id: tteop.yield
+    display_name: Yield (Υ)
+    symbol: Υ
+    formula: "(cache_read × output) / input²    # ≡ leverage × velocity"
+    inputs: [cache_read, output, input]
+    output_field: yield_
+    rounding: "2dp, half-even"
+    aggregation_behavior: "Compute from aggregated sums, not averaged from per-request values"
+    null_when: "input = 0 OR cache_read null"
+    moses_expected: 18436.98
+    legacy_alias: yield
+    spec_section: "§26.1"
+    prohibited_interpretation: "Yield is not a proof of productivity"
+    status: current
+    canon_layer: "canon canonical_name 'Upsilon Yield'; server impl uses safeI=max(input,1) — documented divergence from TTEOP null rule"
+
+  - id: tteop.leverage
+    display_name: Leverage
+    symbol: L
+    formula: "cache_read / input"
+    inputs: [cache_read, input]
+    output_field: leverage
+    rounding: "1dp"
+    aggregation_behavior: "Compute from aggregated sums, not averaged from per-request values"
+    null_when: "input = 0 OR cache_read null"
+    moses_expected: 2042.2
+    legacy_alias: leverage
+    spec_section: "§26.2"
+    status: current
+    canon_layer: "canon velocity/leverage use safeI=max(input,1)"
+
+  - id: tteop.velocity
+    display_name: Velocity
+    symbol: V
+    formula: "output / input"
+    inputs: [output, input]
+    output_field: velocity
+    rounding: "3dp"
+    aggregation_behavior: "Compute from aggregated sums, not averaged from per-request values"
+    null_when: "input = 0"
+    moses_expected: 9.028
+    legacy_alias: velocity
+    spec_section: "§26.3"
+    status: current
+
+  - id: tteop.output_fraction
+    display_name: "output_fraction (surface alias: SNR)"
+    symbol: F
+    formula: "output / (input + output)"
+    inputs: [output, input]
+    output_field: snr
+    rounding: "4dp"
+    aggregation_behavior: "Compute from aggregated sums, not averaged from per-request values"
+    null_when: "input + output = 0"
+    moses_expected: 0.9003
+    legacy_alias: snr
+    spec_section: "§26.4"
+    prohibited_interpretation: "'SNR' is a misleading legacy alias — it is not a signal-to-noise measure"
+    status: current
+    notes:
+      - "token-cascade maps output_fraction→snr for display"
+      - "MUST NOT be conflated with historical snr_pct — see semantic_drift"
+
+  - id: tteop.log_leverage
+    display_name: "log_leverage (surface alias: 10xDEV / dev10x)"
+    symbol: D
+    formula: "log10(cache_read / input)"
+    inputs: [cache_read, input]
+    output_field: dev10x
+    rounding: "2dp"
+    aggregation_behavior: "Compute from aggregated sums, not averaged from per-request values"
+    null_when: "any of 4 pillars 0/null (impl policy stricter than math requirement)"
+    moses_expected: 3.31
+    legacy_alias: dev10x
+    spec_section: "§26.5"
+    prohibited_interpretation: "must not be presented as a '10x developer' classification"
+    status: current
+
+# ── PRODUCT-LAYER EXTENSIONS (facade/canon — NOT TTEOP canonical) ───────
+product_metrics:
+
+  - id: product.construction
+    display_name: Construction
+    formula: "cache_write / cache_read   (canon: archetype dimension)"
+    inputs: [cache_write, cache_read]
+    output_field: construction
+    implementation: token-cascade@0.2.1 / lib/analytics/cascade.ts
+    status: current
+    notes:
+      - "DROPPED from TTEOP portable record — two conflicting product defs (cw/cr vs cw/o); canon pins cw/cr"
+
+  - id: product.scale_v
+    display_name: ScaleV
+    formula: "log10(input + output + cache_write + cache_read)"
+    output_field: scaleV
+    status: current
+    notes: [canon-layer product metric]
+
+  - id: product.efficiency
+    display_name: Efficiency
+    formula: "(cache_read + cache_write + output) / input / 4"
+    output_field: efficiency
+    status: current
+    notes: [canon-layer; also exists in historical package]
+
+  - id: product.op_ratio
+    display_name: Operating Ratio
+    formula: implementation-defined (lib/analytics/cascade.ts opRatio)
+    output_field: opRatio
+    status: current
+    notes: ["distinct from SOURCE_CARRIED_DERIVED operating_ratio in raw export"]
+
+  - id: product.cascade_str
+    display_name: Cascade String
+    output_field: cascadeStr
+    status: current
+    notes: ["fires only when all four pillars > 0 (TTEOP null gate)"]
+
+  - id: product.cost_per_million
+    display_name: Cost per Million
+    output_field: costPerMillion
+    status: current
+
+  - id: product.class_rs05
+    display_name: Class (RS.05 24-stage ladder)
+    formula: "RS05_CLASS_THRESHOLDS — 24 thresholds across 8 tiers on total tokens (ARCH+ I ≥ 7,068,201,104,627 → IGNITER III ≥ 0); TRANSMITTER = RS.08 badge not a class"
+    inputs: [total_tokens]
+    output_field: class
+    implementation: token-cascade RS05 + sigrank-app ruleset.ts (RS.01-RS.08)
+    status: current
+    notes: ["calibrated on 1,627-operator field — see populations.yaml POP-TAXONOMY-1627"]
+
+  - id: product.ranking
+    display_name: Leaderboard ordering
+    output_field: rank / percentileOf / rankOf
+    implementation: token-cascade fieldStats/percentileOf/rankOf + lib/board/*
+    status: current
+    notes: ["comparison product — not a primary metric"]
+
+# ── HISTORICAL METRICS (SRC-HIST-001 — evidence, not current authority) ─
+historical_metrics:
+
+  - id: hist.yield
+    formula: "(cache_read × output) / input²"
+    status: historical
+    notes: ["matches current tteop.yield formula — lineage preserved"]
+
+  - id: hist.leverage
+    formula: "cache_read / input"
+    status: historical
+
+  - id: hist.velocity
+    formula: "output / input"
+    status: historical
+    notes: ["compression_ratio in historical export is the same quantity — dual column"]
+
+  - id: hist.compression_ratio
+    formula: "output / input"
+    status: historical
+    notes: [alias of velocity in historical export]
+
+  - id: hist.snr_pct
+    formula: "((cache_read + output) / total_tokens) × 100"
+    status: historical
+    semantic_drift: "≠ tteop.output_fraction (o/(i+o)) — different numerator AND denominator — GAP-003"
+
+  - id: hist.dev10x
+    formula: "log10(leverage)"
+    status: historical
+    notes: ["formula shape matches tteop.log_leverage; name/semantics layer differs"]
+
+  - id: hist.efficiency
+    formula: "((cache_read + cache_write + output) / input) / 4.0"
+    status: historical
+    notes: ["same shape as canon product.efficiency"]
+
+  - id: hist.class_tier
+    formula: "TRANSMITTER≥10K, IGNITER≥1K, BUILDER≥100, SEEKER≥1, BURNER<1 (by yield)"
+    status: historical
+    notes: ["superseded by RS.05 24-stage ladder — preserve version"]
+
+# ── SEMANTIC DRIFT REGISTER ─────────────────────────────────────────────
+semantic_drift:
+  - id: DRIFT-SNR-001
+    gap: GAP-003
+    historical: "snr_pct = ((cache_read + output) / total_tokens) × 100"
+    current: "tteop.output_fraction = output / (input + output)"
+    resolution: "documented, versioned — historical columns never reused as current values"
+    evidence: [sigrank-metric-data-field-definitions.md, tteop-spec metrics/registry.json]
+
+  - id: DRIFT-NULL-001
+    gap: null-input semantics
+    historical_impl: "canon/server: safeI = max(input, 1) clamp"
+    current_spec: "TTEOP: null on input=0 (SRP-METRIC-003)"
+    resolution: "documented intentional split — recorded in mcp docs/CLIENT_SCOPE_NOTES.md; index stores both"
+
+  - id: DRIFT-CONSTRUCTION-001
+    definitions: ["cache_write/cache_read (canon, archetype dimension)", "cache_write/output (alternate product def)"]
+    resolution: "canon pins cw/cr; TTEOP dropped from portable record; product-layer only"
+
+  - id: DRIFT-COM-001
+    gap: center-of-mass naming/population
+    canon_name: "OCM — Operator Center of Mass = 1,586 clustered (POP-CLUSTERED-1586, canon.yaml field_population, owner_approved)"
+    staging_alias: "HCM — Human Center of Mass (data/ filenames, staging facts, Zenodo v3.1 description text)"
+    published_faq: "app /research page FAQ labels OCM = 1,498 (POP-COM-1498) — PUBLISHED-ASSET CONFLICT vs canon 1586"
+    field_analysis_name: "operators_included = 1,498 (POP-COM-1498, different basis)"
+    resolution: "two distinct populations versioned separately; naming map recorded; published FAQ-vs-canon mismatch flagged for owner review — not silently corrected"
+
+implementation_map:
+  upstream_spec: "tteop-spec@0.1.5-draft (npm; repo SunrisesIllNeverSee/tteop-spec; DOI 10.5281/zenodo.22180349)"
+  facade: "token-cascade@0.2.1 (npm, UNLICENSED dist-only — no public source repo found)"
+  mcp_path: "_02_sigrank-mcp analytics/cascade.mjs → token-cascade"
+  app_client_path: "lib/analytics/cascade.ts (client-safe computeCascadeMetrics + computeResiduals)"
+  app_ingest_bridge: "lib/ingest/bridge.ts (re-export)"
+  app_server_path: "lib/analytics/scoring-engine.ts + ruleset.ts (RS.01–RS.08, server-only)"
+  app_board: "lib/board/* (queries/cached/fallback/mock + snapshot.json)"
+  conformance_gate: "__tests__/standard/tteop-conformance.test.mjs + __tests__/ingest/canonical.test.mjs (11/11 MOSES Υ 18436.98)"

@@ -1,0 +1,20 @@
+# ER-004a — supports CAND-004 (historical SNR semantics; historical side of drift)
+schema_version: proofpress/retrieval-evidence/v1
+source:
+  uri: github:SunrisesIllNeverSee/sigrank-gtm@1b2f6c4b49a37e696751c331467f827a08d9b32e:launch/research/raw-data-package/sigrank-metric-data-field-definitions.md
+  content_digest: sha256:37328638036d7ea60ceeeb4b572a1da075c8b1030e3b2f12dd42d0928baed68c
+  media_type: text/markdown
+quote: '| snr_pct | float | Derived | ((cache_read + output) / total_tokens) × 100 — Signal-to-Noise Ratio, signal density
+  (%) |'
+quote_digest: sha256:b4202a2b65c492603863402c079a39da33481446fdf724cd49dc663f64792079
+locator:
+  kind: text_span
+  start: 1158
+  end: 1278
+  text_digest: sha256:b4202a2b65c492603863402c079a39da33481446fdf724cd49dc663f64792079
+retrieval:
+  adapter: local-file-read
+  version: '1.0'
+  query: capture historical SNR formula for semantic-drift claim
+  config_digest: sha256:0e71bbc859e99c1791cc27dbacc9697042b76e07c2837b7c8d7b5cf842b8dcca
+  selection_reason: 'verbatim historical definition: snr_pct = ((cache_read + output) / total_tokens) × 100'
