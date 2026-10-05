@@ -1,9 +1,9 @@
 import { appendExchangeEvent, getExchangeAdmin } from './server'
-import { evaluateProposal, mergeExchangePolicy } from '@/exchange-gateway/src/policy'
-import { buildCommitmentDraft } from '@/exchange-gateway/src/draft'
-import { finalizeCommitment } from '@/exchange-gateway/src/commitment'
+import { evaluateProposal, mergeExchangePolicy } from '@/lib/exchange-gateway/src/policy'
+import { buildCommitmentDraft } from '@/lib/exchange-gateway/src/draft'
+import { finalizeCommitment } from '@/lib/exchange-gateway/src/commitment'
 import { deliverSignedNotification } from './signed-notification'
-import type { Consideration, ProposalAuthority, StewardDecision } from '@/exchange-gateway/src/types'
+import type { Consideration, ProposalAuthority, StewardDecision } from '@/lib/exchange-gateway/src/types'
 
 type CompanyRow={id:string;domain:string;categories?:string[]|null;agent_mode?:string|null;exchange_agent_endpoint?:string|null;exchange_policy?:unknown}
 export type TriageInput={category:string;consideration:Consideration[];requiredAuthorization:ProposalAuthority}

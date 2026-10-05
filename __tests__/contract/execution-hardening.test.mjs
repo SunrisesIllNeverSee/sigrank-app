@@ -18,18 +18,18 @@ import {
   getVerifier,
   hasVerifier,
   VerificationError,
-} from '../../exchange-gateway/src/providers/callback-verifier.ts'
+} from '../../lib/exchange-gateway/src/providers/callback-verifier.ts'
 import {
   validateTransition,
   receiptStatusToState,
   isTerminalState,
-} from '../../exchange-gateway/src/execution-state.ts'
+} from '../../lib/exchange-gateway/src/execution-state.ts'
 import {
   startTestProvider,
   stopTestProvider,
   sendSignedCallback,
   createTestProviderAdapter,
-} from '../../exchange-gateway/src/providers/test-provider.ts'
+} from '../../lib/exchange-gateway/src/providers/test-provider.ts'
 
 // ─── Helpers ───
 
@@ -701,6 +701,6 @@ test('RELEASE BLOCKER: receipt route fails closed on unknown receipt status', as
   const { readFileSync } = await import('node:fs')
   const { resolve } = await import('node:path')
   const root = resolve(import.meta.dirname, '..', '..')
-  const executionState = readFileSync(resolve(root, 'exchange-gateway/src/execution-state.ts'), 'utf8')
+  const executionState = readFileSync(resolve(root, 'lib/exchange-gateway/src/execution-state.ts'), 'utf8')
   assert.match(executionState, /default: return null/)
 })

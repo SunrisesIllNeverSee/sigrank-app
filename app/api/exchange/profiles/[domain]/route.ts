@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { platformFeeBps } from '@/exchange-gateway/src/fees'
+import { platformFeeBps } from '@/lib/exchange-gateway/src/fees'
 import { companyPolicy } from '@/lib/exchange/steward'
 import { findCompany, normalizeDomain } from '@/lib/exchange/server'
 

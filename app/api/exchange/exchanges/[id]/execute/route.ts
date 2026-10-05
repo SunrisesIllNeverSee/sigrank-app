@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { CreateExecutionSchema } from '@/exchange-gateway/src/schema'
-import { routeExecution } from '@/exchange-gateway/src/execution-router'
-import { mergeExchangePolicy } from '@/exchange-gateway/src/policy'
+import { CreateExecutionSchema } from '@/lib/exchange-gateway/src/schema'
+import { routeExecution } from '@/lib/exchange-gateway/src/execution-router'
+import { mergeExchangePolicy } from '@/lib/exchange-gateway/src/policy'
 import { appendExchangeEvent, authenticateCompany, authenticateDomainAgent, authenticateProposer, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
-import type { ContributionCommitment } from '@/exchange-gateway/src/types'
+import type { ContributionCommitment } from '@/lib/exchange-gateway/src/types'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const publicId = (await params).id

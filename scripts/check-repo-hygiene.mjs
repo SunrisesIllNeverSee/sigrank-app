@@ -86,7 +86,7 @@ if (violations.length) {
 // ── Check 3: public schema copies byte-match their sources ──────────────
 // [source, publicCopy] — edit the SOURCE, then `cp` it to the public path.
 const SCHEMA_PAIRS = [
-  ["exchange-gateway/exchange.schema.json", "public/exchange.schema.json"],
+  ["lib/exchange-gateway/exchange.schema.json", "public/exchange.schema.json"],
   [
     "standard/schema/sigrank-operator-record-v0.1.schema.json",
     "public/standard/sigrank-operator-record-v0.1.schema.json",

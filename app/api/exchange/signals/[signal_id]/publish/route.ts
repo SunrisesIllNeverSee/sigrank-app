@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateCompany } from "@/lib/exchange/server";
 import { publishSignal } from "@/lib/exchange/signal-server";
-import { ExchangeSignalInputSchema } from "@/exchange-gateway/src/signal-schema";
+import { ExchangeSignalInputSchema } from "@/lib/exchange-gateway/src/signal-schema";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
 
 /**

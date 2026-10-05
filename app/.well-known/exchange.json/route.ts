@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { buildExchangeManifest } from '@/exchange-gateway/src/manifest'
+import { buildExchangeManifest } from '@/lib/exchange-gateway/src/manifest'
 import { logEncounter } from '@/lib/exchange/server'
 
 export async function GET(req: NextRequest) {

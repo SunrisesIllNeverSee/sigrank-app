@@ -28,7 +28,7 @@ test("main SignalAF agent card does not advertise Exchange as a primary skill", 
 });
 
 test("Exchange manifest declares its SignalAF parent and explicit activation boundary", async () => {
-  const manifest = await source("exchange-gateway/src/manifest.ts");
+  const manifest = await source("lib/exchange-gateway/src/manifest.ts");
   const profileRoute = await source("app/.well-known/exchange.json/route.ts");
 
   assert.match(manifest, /capability:'contribution_exchange'/);
