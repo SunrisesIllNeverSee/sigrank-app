@@ -13,9 +13,10 @@ import { useState } from "react";
  * in as a node; this client island only toggles which one is mounted, so the heavy
  * chart islands in inactive tabs never hydrate.
  */
-type TabKey = "stats" | "report" | "lab" | "submissions" | "social";
+type TabKey = "overview" | "stats" | "report" | "lab" | "submissions" | "social";
 
 const TABS: { key: TabKey; label: string }[] = [
+  { key: "overview", label: "Overview" },
   { key: "stats", label: "Stats" },
   { key: "report", label: "Report" },
   { key: "lab", label: "Lab" },
@@ -24,13 +25,15 @@ const TABS: { key: TabKey; label: string }[] = [
 ];
 
 export function ProfileTabs({
+  overview,
   stats,
   report,
   lab,
   submissions,
   social,
-  initial = "stats",
+  initial = "overview",
 }: {
+  overview?: React.ReactNode;
   stats: React.ReactNode;
   report?: React.ReactNode;
   lab?: React.ReactNode;
@@ -40,12 +43,16 @@ export function ProfileTabs({
 }) {
   const [tab, setTab] = useState<TabKey>(initial);
 
-  // Filter tabs: only show Report and Lab if they have content
+  // Filter tabs: only show Report, Lab, and Overview if they have content
   const visibleTabs = TABS.filter((t) => {
+    if (t.key === "overview") return overview != null;
     if (t.key === "report") return report != null;
     if (t.key === "lab") return lab != null;
     return true;
   });
+  const activeTab = visibleTabs.some((t) => t.key === tab)
+    ? tab
+    : visibleTabs[0].key;
 
   return (
     <div className="flex flex-col gap-4">
@@ -55,7 +62,7 @@ export function ProfileTabs({
         className="flex gap-1 border-b border-bg-border"
       >
         {visibleTabs.map((t) => {
-          const active = tab === t.key;
+          const active = activeTab === t.key;
           return (
             <button
               key={t.key}
@@ -76,11 +83,12 @@ export function ProfileTabs({
       </div>
 
       <div role="tabpanel">
-        {tab === "stats" && stats}
-        {tab === "report" && report}
-        {tab === "lab" && lab}
-        {tab === "submissions" && submissions}
-        {tab === "social" && social}
+        {activeTab === "overview" && overview}
+        {activeTab === "stats" && stats}
+        {activeTab === "report" && report}
+        {activeTab === "lab" && lab}
+        {activeTab === "submissions" && submissions}
+        {activeTab === "social" && social}
       </div>
     </div>
   );
