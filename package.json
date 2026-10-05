@@ -84,7 +84,7 @@
     "globals": "^17.13.0",
     "jsdom": "^30.1.1",
     "postcss": "^8.5.23",
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "^3.4.0",
     "tteop-spec": "0.1.5-draft",
     "typescript": "5.8.2",
     "typescript-eslint": "^8.64.0",
@@ -103,9 +103,10 @@
     "@types/react-dom": "^19.3.0",
     "@x402/paywall": {
       "ws": "^8.21.0",
-      "bn.js": "^4.12.3",
       "uuid": "^11.1.1",
       "decode-uri-component": "^0.5.0"
-    }
+    },
+    "bn.js@4": "^4.12.3",
+    "bn.js@5": "^5.2.2"
   }
 }
