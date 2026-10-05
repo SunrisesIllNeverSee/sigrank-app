@@ -108,6 +108,14 @@ test("sitemap entry carries no lastModified (no synthetic freshness)", () => {
   assert.equal("lastModified" in entry, false);
 });
 
+test("sitemap URL is URL-encoded to byte-match the self-canonical", () => {
+  const op = { ...CLAIMED_PUBLIC_ACTIVE, codename: "op name·x" };
+  const entry = operatorSitemapEntry(op, true, ORIGIN);
+  assert.ok(entry);
+  assert.equal(entry.url, `${ORIGIN}/user/op%20name%C2%B7x`);
+  assert.equal(entry.url.includes(" "), false);
+});
+
 // ── The core invariant: profile robots eligibility == sitemap eligibility ──
 
 test("profile metadata indexing eligibility == sitemap eligibility", () => {
@@ -166,4 +174,50 @@ test("profile page applies the shared indexing policy to robots metadata", async
   const page = await source("app/user/[codename]/page.tsx");
   assert.match(page, /seo\/indexing-policy/);
   assert.match(page, /robots/);
+});
+
+// ── Cache invalidation: policy-relevant flag writes must bust every cached
+//    surface so the sitemap and the ISR profile page never disagree ────────
+
+test("claim route invalidates operator index state after flipping claimed", async () => {
+  const route = await source("app/api/v1/claim/route.ts");
+  assert.match(route, /revalidateOperatorIndexState\(codename\)/);
+});
+
+test("profile route invalidates operator index state after profile_visibility writes", async () => {
+  const route = await source("app/api/v1/profile/route.ts");
+  assert.match(route, /revalidateOperatorIndexState\(op\.codename\)/);
+});
+
+test("revalidateOperatorIndexState busts page, sitemap, and tagged caches", async () => {
+  const src = await source("lib/ingest/materialize.ts");
+  const fn = src.match(
+    /export function revalidateOperatorIndexState[\s\S]*?\n}/,
+  );
+  assert.ok(fn, "revalidateOperatorIndexState must exist in materialize.ts");
+  const body = fn[0];
+  for (const needle of [
+    'revalidateTag("operator"',
+    'revalidateTag("board"',
+    "revalidatePath(`/user/${codename}`)",
+    'revalidatePath("/sitemap.xml")',
+    'revalidatePath("/board/all")',
+  ]) {
+    assert.ok(
+      body.includes(needle),
+      `revalidateOperatorIndexState missing ${needle}`,
+    );
+  }
+});
+
+test("indexable-operator snapshot check chunks the IN clause below the PostgREST URL limit", async () => {
+  const src = await source("lib/board/queries.ts");
+  const fn = src.match(
+    /export async function getIndexableOperatorRows[\s\S]*?\n}\n/,
+  );
+  assert.ok(fn, "getIndexableOperatorRows must exist in queries.ts");
+  // An unbounded .in("operator_id", ids) silently errors past ~1600 UUIDs →
+  // [] → the sitemap drops every operator URL. Chunking must be present.
+  assert.match(fn[0], /slice\(i, i \+ \d+\)/);
+  assert.doesNotMatch(fn[0], /\.in\("operator_id",\s*ids\)/);
 });
