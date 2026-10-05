@@ -24,6 +24,9 @@ import {
 } from "@/lib/board";
 import type { HallRecord } from "@/lib/board";
 import { computeFieldAverages } from "@/lib/analytics/field-average";
+import { buildArchetypeOf } from "@/lib/analytics/build-archetypes";
+import { computeTrophyCounts } from "@/lib/analytics/trophy-counts";
+import { computeTierProgress } from "@/lib/analytics/tier-progress";
 import type { Operator } from "@/lib/analytics/scoring-types";
 import { SignalClassBadge } from "@/components/sigrank";
 import { CascadePanel } from "@/components/profile/CascadePanel";
@@ -31,6 +34,7 @@ import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
 import { SnapshotHistory } from "@/components/profile/SnapshotHistory";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { OperatorRecords } from "@/components/profile/OperatorRecords";
+import { OverviewTab } from "@/components/profile/OverviewTab";
 import { ProfileAuthGate } from "@/components/profile/ProfileAuthGate";
 import { ClaimTabGate, ReportTabGate, LabTabGate } from "@/components/profile/ProfileAuthGates";
 import { DeferredSplitFlapCard } from "@/components/profile/DeferredSplitFlapCard";
@@ -199,6 +203,25 @@ export async function ProfileBody({
   const isPrivate = operator.profile_visibility === "private";
   const viewerRedacted = isPrivate && !isOwner;
   const displayName = viewerRedacted ? null : operator.display_name;
+
+  const archetype =
+    c && !c.nonCompounding
+      ? buildArchetypeOf({
+          leverage: c.leverage,
+          velocity: c.velocity,
+          construction: c.construction,
+        })
+      : null;
+
+  const trophyCounts = ranked
+    ? await computeTrophyCounts(codename, displayName ?? undefined, boardRows)
+    : null;
+  const totalTokens = ranked
+    ? telemetry.fresh_input + telemetry.output + telemetry.cache_read + telemetry.cache_create
+    : 0;
+  const tierProgress = ranked
+    ? computeTierProgress(snapshot.class_tier, totalTokens)
+    : null;
 
   // ── Stats tab ─────────────────────────────────────────────────────────────
   const pendingPanel = (
@@ -526,9 +549,31 @@ export async function ProfileBody({
         {!operator.claimed && <ClaimTabGate codename={operator.codename} />}
 
         <ProfileTabs
+          overview={
+            ranked ? (
+              <OverviewTab
+                history={history}
+                classTier={snapshot.class_tier}
+                archetype={archetype}
+                cascade={c ?? null}
+                fieldAvgYield={fieldAvgYield}
+                globalRank={row.global_rank}
+                topPct={topPct}
+                platform={operator.primary_domain}
+                accountAgeDays={operator.account_age_days}
+                lifetimeTurns={operator.total_messages_lifetime}
+                deltaFromAvg={deltaFromAvg}
+                deltaFromTop={deltaFromTop}
+                trophyCounts={trophyCounts}
+                tierProgress={tierProgress}
+                boardRows={boardRows}
+                operatorCodename={codename}
+              />
+            ) : undefined
+          }
           stats={pending ? pendingPanel : rankedStatsPanel}
           report={operatorReport ? (
-            <ReportTabGate report={operatorReport} />
+            <ReportTabGate report={operatorReport} archetype={archetype} />
           ) : undefined}
           lab={
             ranked && c ? (

@@ -5,6 +5,7 @@ import { ClaimTab } from "./ClaimTab";
 import { ReportTab } from "./ReportTab";
 import { LabTab } from "./LabTab";
 import type { OperatorReport } from "@/lib/board";
+import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 
 /**
  * Client-side wrappers that consume the ProfileAuthContext and pass the
@@ -28,9 +29,15 @@ export function ClaimTabGate({ codename }: { codename: string }) {
   );
 }
 
-export function ReportTabGate({ report }: { report: OperatorReport }) {
+export function ReportTabGate({
+  report,
+  archetype,
+}: {
+  report: OperatorReport;
+  archetype: BuildArchetype | null;
+}) {
   const { isOwner } = useProfileAuth();
-  return <ReportTab report={report} isOwner={isOwner} />;
+  return <ReportTab report={report} isOwner={isOwner} archetype={archetype} />;
 }
 
 export function LabTabGate({
