@@ -1,5 +1,6 @@
 import { getLeaderboard, type LeaderboardRow } from "@/lib/board";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
+import { summarizeReferenceTelemetry } from "./four-degrees-telemetry";
 
 /**
  * lib/marketing/top-operator-column.ts — the live columns for the Four Degrees chart
@@ -29,6 +30,7 @@ import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 
 /** The seven column display strings, formatted to match the chart's existing style. */
 export interface GoldColumn {
+  telemetry?: ReturnType<typeof summarizeReferenceTelemetry>;
   yield_: string;
   snr: string;
   velocity: string;
@@ -167,6 +169,7 @@ export async function getTopOperatorColumn(): Promise<GoldColumn | null> {
   const leverage = c.leverage;
   return {
     yield_: c.yield_.toFixed(2),
+    telemetry: summarizeReferenceTelemetry([top!]),
     snr: c.snr.toFixed(2),
     velocity: velocity.toFixed(2),
     leverage: timesStr(leverage),
@@ -196,14 +199,14 @@ export async function getAverageUsersColumn(): Promise<GoldColumn | null> {
   const metrics = real.map(cascadeMetrics).filter(Boolean) as NonNullable<ReturnType<typeof cascadeMetrics>>[];
   if (metrics.length < 2) return null;
 
-  return formatColumn({
+  return { ...formatColumn({
     yield_: medianSorted(metrics.map((m) => m.yield_).sort((a, b) => a - b)),
     snr: medianSorted(metrics.map((m) => m.snr).sort((a, b) => a - b)),
     velocity: medianSorted(metrics.map((m) => m.velocity).sort((a, b) => a - b)),
     leverage: medianSorted(metrics.map((m) => m.leverage).sort((a, b) => a - b)),
     dev10x: medianSorted(metrics.map((m) => m.dev10x).sort((a, b) => a - b)),
     efficiency: medianSorted(metrics.map((m) => m.efficiency).sort((a, b) => a - b)),
-  });
+  }), telemetry: summarizeReferenceTelemetry(real) };
 }
 
 /**
@@ -225,14 +228,14 @@ export async function getPowerUsersColumn(): Promise<GoldColumn | null> {
   const metrics = real.map(cascadeMetrics).filter(Boolean) as NonNullable<ReturnType<typeof cascadeMetrics>>[];
   if (metrics.length < 2) return null;
 
-  return formatColumn({
+  return { ...formatColumn({
     yield_: medianSorted(metrics.map((m) => m.yield_).sort((a, b) => a - b)),
     snr: medianSorted(metrics.map((m) => m.snr).sort((a, b) => a - b)),
     velocity: medianSorted(metrics.map((m) => m.velocity).sort((a, b) => a - b)),
     leverage: medianSorted(metrics.map((m) => m.leverage).sort((a, b) => a - b)),
     dev10x: medianSorted(metrics.map((m) => m.dev10x).sort((a, b) => a - b)),
     efficiency: medianSorted(metrics.map((m) => m.efficiency).sort((a, b) => a - b)),
-  });
+  }), telemetry: summarizeReferenceTelemetry(real) };
 }
 
 export { GOLD_FALLBACK, AVG_FALLBACK, POWER_FALLBACK, AA_BASELINE };
