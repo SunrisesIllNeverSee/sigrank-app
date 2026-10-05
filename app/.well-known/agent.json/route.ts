@@ -9,6 +9,7 @@ import { NextResponse } from "next/server";
 import { SITE_ORIGIN, SITE_NAME } from "@/lib/seo";
 import { TOOLS } from "@/lib/mcp/tools";
 import {
+  PRODUCT_ARCHITECTURE,
   SIGRANK_STANDARD_SCHEMA_URL,
   SIGRANK_STANDARD_URL,
   SIGRANK_STANDARD_VERSION,
@@ -34,7 +35,12 @@ export async function GET() {
     },
     standard: {
       version: SIGRANK_STANDARD_VERSION,
-      status: "proposed_open_standard",
+      spec_status: PRODUCT_ARCHITECTURE.wire_spec_status,
+      protocol: {
+        name: "TTEOP",
+        version: PRODUCT_ARCHITECTURE.protocol,
+        authority: PRODUCT_ARCHITECTURE.protocol_authority,
+      },
       url: SIGRANK_STANDARD_URL,
       schema: SIGRANK_STANDARD_SCHEMA_URL,
       record_tool: "get_sigrank_standard_record",
