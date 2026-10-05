@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { StewardPreflightSchema } from '@/exchange-gateway/src/schema'
-import { evaluateProposal } from '@/exchange-gateway/src/policy'
+import { StewardPreflightSchema } from '@/lib/exchange-gateway/src/schema'
+import { evaluateProposal } from '@/lib/exchange-gateway/src/policy'
 import { companyPolicy } from '@/lib/exchange/steward'
 import { findCompany, logEncounter, normalizeDomain, requestIdentity } from '@/lib/exchange/server'
 import { rateLimitAllow } from '@/lib/exchange/rate-limit'

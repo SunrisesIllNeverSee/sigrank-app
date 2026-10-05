@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ExchangePolicyUpdateSchema } from '@/exchange-gateway/src/schema'
-import { mergeExchangePolicy } from '@/exchange-gateway/src/policy'
+import { ExchangePolicyUpdateSchema } from '@/lib/exchange-gateway/src/schema'
+import { mergeExchangePolicy } from '@/lib/exchange-gateway/src/policy'
 import { authenticateCompany, findCompany, getExchangeAdmin, hashSecret, newSecret, normalizeDomain } from '@/lib/exchange/server'
 import { isProhibitedHost } from '@/lib/exchange/mcp-tools'
 

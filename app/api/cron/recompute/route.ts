@@ -13,7 +13,7 @@
  */
 
 import { start } from "workflow/api";
-import { dailyRecompute } from "@/workflows/daily-recompute";
+import { dailyRecompute } from "@/lib/workflows/daily-recompute";
 
 export const maxDuration = 300;
 

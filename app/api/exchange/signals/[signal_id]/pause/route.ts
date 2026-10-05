@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateCompany } from "@/lib/exchange/server";
 import { transitionSignalStatus } from "@/lib/exchange/signal-server";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
-import type { SignalStatus } from "@/exchange-gateway/src/signal-types";
+import type { SignalStatus } from "@/lib/exchange-gateway/src/signal-types";
 
 /**
  * Shared handler for signal status transitions (pause/close/withdraw).

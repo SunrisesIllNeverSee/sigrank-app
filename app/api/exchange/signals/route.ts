@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { ExchangeSignalInputSchema } = await import("@/exchange-gateway/src/signal-schema");
+  const { ExchangeSignalInputSchema } = await import("@/lib/exchange-gateway/src/signal-schema");
   const parsed = ExchangeSignalInputSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

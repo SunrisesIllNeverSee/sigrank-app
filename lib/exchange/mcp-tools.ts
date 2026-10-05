@@ -31,12 +31,12 @@ import {
   safeEqual,
 } from "./server";
 import { companyPolicy } from "./steward";
-import { evaluateProposal } from "@/exchange-gateway/src/policy";
+import { evaluateProposal } from "@/lib/exchange-gateway/src/policy";
 import {
   ProposalSchema,
   ConsiderationSchema,
   ProposalAuthoritySchema,
-} from "@/exchange-gateway/src/schema";
+} from "@/lib/exchange-gateway/src/schema";
 import {
   listSignals,
   getSignal,

@@ -6,7 +6,7 @@ import { resolve } from 'node:path'
 const root = resolve(import.meta.dirname, '..', '..')
 const receiptRoute = readFileSync(resolve(root, 'app/api/exchange/exchanges/[id]/execution/receipt/route.ts'), 'utf8')
 const executeRoute = readFileSync(resolve(root, 'app/api/exchange/exchanges/[id]/execute/route.ts'), 'utf8')
-const router = readFileSync(resolve(root, 'exchange-gateway/src/execution-router.ts'), 'utf8')
+const router = readFileSync(resolve(root, 'lib/exchange-gateway/src/execution-router.ts'), 'utf8')
 
 test('execution receipts cannot advance authoritative Contribution Exchange state', () => {
   assert.doesNotMatch(receiptRoute, /from\('exchange_records'\)\.update\(\{ state:/)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getProvider } from '@/exchange-gateway/src/execution-router'
+import { getProvider } from '@/lib/exchange-gateway/src/execution-router'
 import { authenticateCompany, authenticateDomainAgent, authenticateProposer, getExchangeAdmin, logEncounter } from '@/lib/exchange/server'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

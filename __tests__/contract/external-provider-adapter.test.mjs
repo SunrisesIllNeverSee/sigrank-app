@@ -14,7 +14,7 @@ import {
   createExternalProviderAdapter,
   mapProviderStateToNormalized,
   mapProviderResultToReceiptStatus,
-} from '../../exchange-gateway/src/providers/external-provider-adapter.ts'
+} from '../../lib/exchange-gateway/src/providers/external-provider-adapter.ts'
 
 // ─── Test config ───
 

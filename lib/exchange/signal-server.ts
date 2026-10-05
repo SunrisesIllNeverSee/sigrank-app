@@ -8,9 +8,9 @@ import "server-only";
  */
 
 import { getExchangeAdmin, normalizeDomain, safeEqual } from "./server";
-import { computeRevisionHash, generateSignalId, generateAttemptId, generateVerificationId, generateQualificationId } from "@/exchange-gateway/src/signal-revision";
-import { type ExchangeSignalInput } from "@/exchange-gateway/src/signal-schema";
-import type { ExchangeSignal, SignalStatus, SignalType } from "@/exchange-gateway/src/signal-types";
+import { computeRevisionHash, generateSignalId, generateAttemptId, generateVerificationId, generateQualificationId } from "@/lib/exchange-gateway/src/signal-revision";
+import { type ExchangeSignalInput } from "@/lib/exchange-gateway/src/signal-schema";
+import type { ExchangeSignal, SignalStatus, SignalType } from "@/lib/exchange-gateway/src/signal-types";
 
 const admin = () => getExchangeAdmin();
 
