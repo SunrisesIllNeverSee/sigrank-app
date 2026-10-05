@@ -27,6 +27,7 @@ import { getLeaderboard } from "@/lib/board";
 import { toEntry } from "@/lib/board/to-entry";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBadge";
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { leaderboardItemList, sigrankDataset, faqPage } from "@/lib/jsonld";
@@ -170,6 +171,8 @@ export default async function BoardWindowPage({
           </>
         }
       />
+
+      <VercelMarketplaceBadge />
 
       <JsonLd
         data={[
