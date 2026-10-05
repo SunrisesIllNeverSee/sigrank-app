@@ -37,6 +37,7 @@ export interface SplitFlapCardProps {
    *  the radar's field polygon, and the op-ratio footer. Absent → legacy
    *  hardcoded references. */
   fieldAvg?: FieldAverages | null;
+  archetypeWord?: string | null;
   showControls?: boolean;
 }
 
@@ -490,6 +491,7 @@ function Board({
   cascadeStr,
   radarAxes,
   fieldAvg,
+  archetypeWord,
   reduced,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>;
@@ -878,7 +880,9 @@ function Board({
                 opacity: 0.85,
               }}
             >
-              {classTier} &middot; {(platform ?? "\u2014").toUpperCase()}{" "}
+              {classTier}
+              {archetypeWord ? ` \u00b7 ${archetypeWord.toUpperCase()}` : ""}{" "}
+              &middot; {(platform ?? "\u2014").toUpperCase()}{" "}
               &middot; {opStr}
             </span>
           </div>
