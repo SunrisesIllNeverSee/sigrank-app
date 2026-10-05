@@ -9,6 +9,8 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { fieldhubPageEnabled } from "@/lib/flags";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
@@ -26,6 +28,10 @@ export const metadata: Metadata = withOG({
 export const revalidate = 3600;
 
 export default async function FieldHubPage() {
+  // `fieldhub-page` PostHog flag (fails open) — the page 404s only on an
+  // explicit off; evaluation runs on each ISR revalidation.
+  if (!(await fieldhubPageEnabled())) notFound();
+
   const data = await getFieldAnalysis();
   const { meta } = data;
 
