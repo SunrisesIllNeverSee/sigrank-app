@@ -28,6 +28,7 @@ import {
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
+import { operatorProfileRobots } from "@/lib/seo/indexing-policy";
 import type { Operator } from "@/lib/analytics/scoring-types";
 import { SignalClassBadge } from "@/components/sigrank";
 import { OperatorAvatar } from "@/components/sigrank/OperatorAvatar";
@@ -103,11 +104,16 @@ export async function generateMetadata({
   const description = row.pending
     ? `${name} — an operator on SigRank (not ranked yet).`
     : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`;
-  return withOG({
+  // robots comes from the shared indexing policy (lib/seo/indexing-policy.ts):
+  // claimed + non-retired + non-private + at least one metric snapshot gets
+  // index,follow; everyone else (seed/unclaimed, private, no-snapshot) keeps a
+  // live 200 page but emits noindex,follow. !row.pending == "has a snapshot".
+  const meta = withOG({
     title,
     description,
     path: `/user/${rawCodename}`,
   });
+  return { ...meta, robots: operatorProfileRobots(row.operator, !row.pending) };
 }
 
 /** One labeled row in the identity / stats rail. */
