@@ -38,6 +38,11 @@ export default [
     ignores: [
       "node_modules/",
       ".next/",
+      ".open-next/",
+      ".vercel/",
+      "out/",
+      "coverage/",
+      "public/",
       "dist/",
       "_sigrank-mcp/",
       "**/*.d.ts",
