@@ -17,6 +17,7 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { operatorSitemapEntry } from "@/lib/seo/indexing-policy";
 import { getIndexableOperatorRows } from "@/lib/board";
 import { BOARD_WINDOWS } from "@/lib/board/windows";
+import { isSitemapPromoted } from "@/config/search-index-policy";
 
 /** Static routes (manually maintained — add new static pages here). */
 const STATIC_ROUTES: {
@@ -26,7 +27,7 @@ const STATIC_ROUTES: {
   lastModified?: Date;
 }[] = [
   { path: "/", priority: 1.0, changeFrequency: "daily" },
-  { path: "/board/all", priority: 0.9, changeFrequency: "hourly" },
+  // /board/all is emitted once via BOARD_WINDOWS below — do not re-add here.
   { path: "/score", priority: 0.9, changeFrequency: "daily" },
   { path: "/hall", priority: 0.8, changeFrequency: "daily" },
   { path: "/fieldhub", priority: 0.8, changeFrequency: "daily" },
@@ -128,12 +129,13 @@ const STATIC_ROUTES: {
   { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
   { path: "/learn", priority: 0.7, changeFrequency: "weekly" },
   { path: "/live", priority: 0.7, changeFrequency: "hourly" },
-  { path: "/marketplace", priority: 0.6, changeFrequency: "weekly" },
+  // /marketplace removed — page serves noindex,nofollow; sitemap must not
+  // advertise non-indexable URLs (SEARCH-RECOVERY closeout).
   { path: "/platforms", priority: 0.6, changeFrequency: "monthly" },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/score/paste", priority: 0.7, changeFrequency: "weekly" },
   { path: "/share/mcp", priority: 0.5, changeFrequency: "weekly" },
-  { path: "/vercel/config", priority: 0.6, changeFrequency: "weekly" },
+  // /vercel/config removed — page serves noindex,nofollow (utility surface).
 
   // ── Contribution Exchange pages ──────────────────────────────────────────
   { path: "/exchange", priority: 0.7, changeFrequency: "weekly" },
@@ -453,9 +455,13 @@ const STATIC_ROUTES: {
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Static routes — lastModified only when the route entry declares a real
-  // modification date; no shared fallback date, no generation time.
-  const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
+  // Static routes — membership is governed by config/search-index-policy.ts
+  // (CORE + SUPPORTED promoted; HOLD stays live but unadvertised; UTILITY +
+  // REDIRECT never promoted). lastModified only when the route entry declares
+  // a real modification date; no shared fallback date, no generation time.
+  const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.filter((r) =>
+    isSitemapPromoted(r.path),
+  ).map((r) => ({
     url: `${SITE_ORIGIN}${r.path}`,
     lastModified: r.lastModified,
     changeFrequency: r.changeFrequency,
@@ -465,7 +471,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Board window routes (/board/7d, /board/30d, /board/90d, /board/all)
   // /board/off is excluded — it 307-redirects to /board/all, which causes
   // "Duplicate without user-selected canonical" in Google Search Console.
-  const boardEntries: MetadataRoute.Sitemap = BOARD_WINDOWS.map((w) => ({
+  // Window membership also flows through the route manifest.
+  const boardEntries: MetadataRoute.Sitemap = BOARD_WINDOWS.filter((w) =>
+    isSitemapPromoted(`/board/${w.slug}`),
+  ).map((w) => ({
     url: `${SITE_ORIGIN}/board/${w.slug}`,
     changeFrequency: "hourly" as const,
     priority: 0.9,

@@ -239,3 +239,125 @@ test("indexable-operator snapshot check chunks the IN clause below the PostgREST
   assert.match(fn[0], /slice\(i, i \+ \d+\)/);
   assert.doesNotMatch(fn[0], /\.in\("operator_id",\s*ids\)/);
 });
+
+// ── Sitemap URL uniqueness (closeout A) ─────────────────────────────────────
+// The emitted URL multiset must have no duplicates. Static and board-window
+// sources overlap historically: /board/all lived in both STATIC_ROUTES and
+// BOARD_WINDOWS.slug === "all", emitting the URL twice.
+
+async function emittedStaticPlusBoardUrls() {
+  const sitemapSrc = await source("app/sitemap.ts");
+  const windowsSrc = await source("lib/board/windows.ts");
+  const staticPaths = [...sitemapSrc.matchAll(/path:\s*"([^"]+)"/g)].map(
+    (m) => m[1],
+  );
+  const boardSlugs = [...windowsSrc.matchAll(/slug:\s*"([^"]+)"/g)].map(
+    (m) => `/board/${m[1]}`,
+  );
+  return { staticPaths, boardSlugs };
+}
+
+test("sitemap URLs are unique (static + board windows, no double emission)", async () => {
+  const { staticPaths, boardSlugs } = await emittedStaticPlusBoardUrls();
+  const urls = [...staticPaths, ...boardSlugs];
+  assert.equal(
+    new Set(urls).size,
+    urls.length,
+    `duplicate sitemap URLs: ${urls.filter((u, i) => urls.indexOf(u) !== i)}`,
+  );
+});
+
+test("every board window URL is emitted exactly once", async () => {
+  const { staticPaths, boardSlugs } = await emittedStaticPlusBoardUrls();
+  for (const w of ["/board/7d", "/board/30d", "/board/90d", "/board/all"]) {
+    const count = [...staticPaths, ...boardSlugs].filter((u) => u === w).length;
+    assert.equal(count, 1, `${w} emitted ${count} times in sitemap`);
+  }
+});
+
+test("/board/all is not re-declared in STATIC_ROUTES (single emitter)", async () => {
+  const { staticPaths } = await emittedStaticPlusBoardUrls();
+  assert.ok(!staticPaths.includes("/board/all"));
+});
+
+// ── IndexNow hardening (closeout J) ─────────────────────────────────────────
+// /api/indexnow is a write action surface: it must be authed, origin-locked,
+// and must not let the caller override the verification key.
+
+test("indexnow endpoint requires bearer auth and has no anonymous path", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.match(src, /INDEXNOW_SUBMIT_SECRET/);
+  assert.match(src, /Bearer \$\{secret\}/);
+  assert.match(src, /status:\s*401/);
+});
+
+test("indexnow endpoint cannot accept a request-supplied key override", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.doesNotMatch(src, /body\.key/);
+  assert.match(src, /key:\s*INDEXNOW_KEY/);
+});
+
+test("indexnow endpoint rejects URLs outside SITE_ORIGIN", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.match(src, /new URL\(SITE_ORIGIN\)\.origin/);
+  assert.match(src, /\.origin !== siteOrigin/);
+});
+
+test("indexnow endpoint dedupes and caps the batch", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.match(src, /new Set\(raw\)/);
+  assert.match(src, /slice\(0, MAX_URLS\)/);
+});
+
+// ── Static route classification manifest (closeout E+F) ─────────────────────
+// config/search-index-policy.ts is the source of truth for sitemap membership:
+// CORE + SUPPORTED are promoted; HOLD stays live but unadvertised; UTILITY and
+// REDIRECT are never promoted.
+
+import {
+  ROUTE_CLASSES,
+  isSitemapPromoted,
+  routesInClass,
+} from "../../config/search-index-policy.ts";
+
+test("every emitted static sitemap route is classified", async () => {
+  const sitemapSrc = await source("app/sitemap.ts");
+  const staticPaths = [...sitemapSrc.matchAll(/path:\s*"([^"]+)"/g)].map(
+    (m) => m[1],
+  );
+  const unclassified = staticPaths.filter((p) => !(p in ROUTE_CLASSES));
+  assert.deepEqual(unclassified, []);
+});
+
+test("every board window is classified and exactly once per URL", async () => {
+  for (const w of ["/board/7d", "/board/30d", "/board/90d", "/board/all"]) {
+    assert.ok(w in ROUTE_CLASSES, `${w} missing from manifest`);
+  }
+});
+
+test("the Phase-1 recovery cohort stays promoted (CORE or SUPPORTED)", () => {
+  const cohort = [
+    "/", "/board/all", "/methodology", "/wiki", "/science", "/research",
+    "/token-telemetry", "/score", "/hall", "/compare", "/ai-operator-scoring",
+    "/metrics/yield-cascade", "/metrics/cache-hit-rate",
+    "/metrics/compression-ratio", "/tools/yield-calculator",
+    "/tools/token-waste-calculator",
+    "/guides/how-to-measure-ai-coding-efficiency", "/blog/volume-isnt-yield",
+    "/vs/ccusage", "/vs/cursor", "/vs/lmsys-arena",
+    "/alternatives/ccusage-alternatives", "/alternatives/token-tracking-tools",
+  ];
+  for (const p of cohort) {
+    assert.ok(isSitemapPromoted(p), `sentinel ${p} must remain sitemap-promoted`);
+  }
+});
+
+test("UTILITY and REDIRECT routes are never sitemap-promoted", () => {
+  for (const p of routesInClass("UTILITY").concat(routesInClass("REDIRECT"))) {
+    assert.equal(isSitemapPromoted(p), false, `${p} must not be promoted`);
+  }
+});
+
+test("sitemap gates static + board entries through the manifest", async () => {
+  const sitemapSrc = await source("app/sitemap.ts");
+  assert.match(sitemapSrc, /isSitemapPromoted/);
+});
