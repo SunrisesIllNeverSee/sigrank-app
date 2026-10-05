@@ -30,6 +30,7 @@ export * from "@/lib/board/fallback";
 // These shadow the raw query exports — consumers get caching transparently.
 export {
   getLeaderboard,
+  getIndexableOperatorRows,
   getOperator,
   getOperatorSubmissions,
   getOperatorHistory,
@@ -48,6 +49,7 @@ export {
 // isOperatorRetired is also not cached (fresh status check for opt-out redirects).
 export { bumpComparisonsRan, isOperatorRetired } from "@/lib/board/queries";
 export type { OperatorSubmission } from "@/lib/board/queries";
+export type { IndexableOperatorRow } from "@/lib/board/queries";
 export type { OperatorReport } from "@/lib/board/queries";
 export type {
   OperatorStaticRecord,

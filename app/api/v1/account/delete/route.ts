@@ -3,6 +3,7 @@ import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { getStripe } from "@/lib/infra/stripe/server";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 
 /**
  * POST /api/v1/account/delete — permanent account deletion (owner 2026-06-27).
@@ -88,6 +89,11 @@ export async function POST(req: NextRequest) {
   });
   if (rpcErr)
     return NextResponse.json({ error: rpcErr.message }, { status: 500 });
+
+  // Retirement flips search-index eligibility (status='retired') and removes
+  // the operator from claimed-only surfaces — bust caches immediately so the
+  // sitemap drops the URL and the ISR profile stops serving the public page.
+  revalidateOperatorIndexState(op.codename);
 
   // 3. Remove the auth user (the email). Cascades operator_accounts. Skip if unlinked.
   if (op.userId) {

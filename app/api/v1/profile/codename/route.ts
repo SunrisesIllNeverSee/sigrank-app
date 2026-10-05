@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 
 /**
  * POST /api/v1/profile/codename — change the signed-in operator's codename.
@@ -101,6 +102,11 @@ export async function POST(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // The codename IS the indexed URL — bust both the old path (now a 404 the
+  // sitemap would otherwise keep advertising until TTL) and the new one.
+  revalidateOperatorIndexState(op.codename);
+  revalidateOperatorIndexState(newCodename);
 
   return NextResponse.json({ ok: true, codename: newCodename });
 }

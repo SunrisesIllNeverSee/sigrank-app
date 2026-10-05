@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 import { SAVABLE_PLATFORM_DOMAINS } from "@/lib/constants";
 
 /**
@@ -143,6 +144,11 @@ export async function POST(req: NextRequest) {
     .eq("operator_id", op.operatorId);
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Profile edits (incl. profile_visibility) flip search-index eligibility and
+  // change what the ISR profile page renders — bust cached surfaces so the
+  // page, sitemap, and claimed boards stay in agreement.
+  revalidateOperatorIndexState(op.codename);
 
   return NextResponse.json({ ok: true, codename: op.codename });
 }

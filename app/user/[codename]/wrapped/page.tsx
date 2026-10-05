@@ -27,6 +27,7 @@ import type { Badge } from "@/components/sigrank/types";
 import { SignaHistoryChart } from "@/components/charts/SignaHistoryChart";
 import { TrackWrappedView } from "@/components/analytics/TrackWrappedView";
 import { withOG } from "@/lib/seo";
+import { operatorProfileRobots } from "@/lib/seo/indexing-policy";
 
 // ISR: revalidate every hour — same rationale as the profile page.
 export const revalidate = 3600;
@@ -147,11 +148,14 @@ export async function generateMetadata({
   const row = await getOperator(codename);
   if (!row) return { title: "Operator not found" };
   const name = row.operator.display_name ?? row.operator.codename;
-  return withOG({
+  const meta = withOG({
     title: `${name} · Wrapped`,
     description: `${name}'s token-telemetry recap — ${compact(totalTokens(row))} tokens scored, SIGNA RATE ${row.snapshot.signa_rate.toFixed(1)}.`,
     path: `/user/${rawCodename}/wrapped`,
   });
+  // Same indexing policy as the profile page — a Wrapped page must never emit
+  // index,follow for an operator whose profile is noindex.
+  return { ...meta, robots: operatorProfileRobots(row.operator, !row.pending) };
 }
 
 export default async function OperatorWrappedPage({
