@@ -70,3 +70,22 @@ export type {
   WeeklyPoint,
   CountryCount,
 } from "@/lib/board/types";
+
+// Phase-2B WS-2: live-board initial-state projection — the typed SSR payload
+// for the frozen workspace surface (contract: ./live-types.ts).
+export {
+  getLiveBoardInitialState,
+  projectLiveBoard,
+  toLiveOperator,
+} from "@/lib/board/live-projection";
+export type {
+  LiveBoardInitialState,
+  LiveOperator,
+  FieldStat,
+  MoverEntry,
+  HallEntry,
+  FeaturedOperator,
+  FieldMaxima,
+  LivePopulation,
+  LiveMeta,
+} from "@/lib/board/live-types";
