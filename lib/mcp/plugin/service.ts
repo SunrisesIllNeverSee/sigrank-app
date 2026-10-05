@@ -4,6 +4,8 @@ import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 import { getLeaderboard, type LeaderboardRow } from "@/lib/board";
 import { getOperator } from "@/lib/board/queries";
+import { isPublishedBoardRow } from "@/lib/board/published-row";
+import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { formatBetaReport, prepareBetaReport } from "./bug-report";
@@ -62,12 +64,14 @@ function operatorDto(row: LeaderboardRow, scope: Scope) {
     input: safeNumber(row.telemetry.fresh_input), output: safeNumber(row.telemetry.output),
     cache_write: safeNumber(row.telemetry.cache_create), cache_read: safeNumber(row.telemetry.cache_read),
   };
+  const archetype = describeBuildArchetype(pillars);
   return {
     codename: row.operator.codename,
     display_name: row.operator.display_name || row.operator.codename,
     profile_url: `https://signalaf.com/user/${encodeURIComponent(row.operator.codename)}`,
     class_tier: row.pending ? null : row.snapshot.class_tier,
-    archetype: null,
+    archetype: archetype?.key ?? null,
+    archetype_details: archetype,
     rank: row.pending || row.global_rank < 1 ? null : row.global_rank,
     percentile: row.pending ? null : safeNumber(row.percentile),
     pillars,
@@ -82,7 +86,7 @@ function operatorDto(row: LeaderboardRow, scope: Scope) {
 }
 
 function envelope(data: unknown, scope: Scope, warnings: Array<{code: string; message: string}> = []) {
-  return { contract_version: "1.0.0", status: "ok", data, provenance: provenance(scope, null, null), warnings, error: null };
+  return { contract_version: "1.1.0", status: "ok", data, provenance: provenance(scope, null, null), warnings, error: null };
 }
 
 function requireCodename(value: unknown): string {
@@ -106,7 +110,7 @@ async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
   } catch {
     throw new ToolError("UPSTREAM_UNAVAILABLE", "Live leaderboard read failed.", true);
   }
-  return rows.filter(r => !r.operator.isPlaceholder && r.operator.status !== "retired" && !r.pending && r.global_rank > 0);
+  return rows.filter(isPublishedBoardRow);
 }
 
 function percentile(values: number[], p: number): number | null {
@@ -148,7 +152,7 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       } catch {
         throw new ToolError("DELIVERY_FAILED", "The report was not confirmed sent. Please use https://signalaf.com/contact.", true);
       }
-      return { contract_version: "1.0.0", status: "ok", data: {
+      return { contract_version: "1.1.0", status: "ok", data: {
         reference, sent_at: sentAt, destination: "hello@signalaf.com", sensitive_text_redacted: report.redacted,
       }, provenance: null, warnings: [], error: null };
     }
@@ -200,13 +204,20 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       return envelope({ scope, population_size: rows.length, included_count: rows.length,
         excluded_count: 0, coverage_complete: true,
         cohort_definition: `${scope.view === "total" ? "Claimed" : "Public including unclaimed"}, non-retired operators with one selected snapshot in the requested board window. Measurement class and verification state are not published per row by this board. Unclaimed does not prove a historical seed.`,
-        distributions, archetype_counts: [],
+        distributions, archetype_counts: Array.from(
+          entries.reduce((counts, entry) => {
+            const key = entry.archetype ?? "Unknown";
+            counts.set(key, (counts.get(key) ?? 0) + 1);
+            return counts;
+          }, new Map<string, number>()),
+          ([archetype, count]) => ({ archetype, count }),
+        ),
         measurement_class_counts: { "Exact-4": 0, "Reconstructed-4": 0, "Partial": 0, "Unverified": 0, "Unknown": rows.length } }, scope);
     }
     throw new ToolError("INVALID_ARGUMENT", "Unknown tool.");
   } catch (error) {
     const known = error instanceof ToolError ? error : new ToolError("INTERNAL_ERROR", "The request could not be completed.");
-    return { contract_version: "1.0.0", status: "error", data: null, provenance: null, warnings: [],
+    return { contract_version: "1.1.0", status: "error", data: null, provenance: null, warnings: [],
       error: { code: known.code, message: known.message, retryable: known.retryable } };
   }
 }

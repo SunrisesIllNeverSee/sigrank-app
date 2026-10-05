@@ -37,6 +37,7 @@ import { ClaimedBadge } from "@/components/claim/ClaimedBadge";
 import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 
 import { ProfileBody } from "./ProfileBody";
+import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
 
 // ISR: revalidate every 6 hours. Profile data doesn't change frequently —
 // operators submit snapshots at most a few times per day, and on-demand
@@ -185,6 +186,12 @@ export default async function OperatorProfilePage({
 
   const isPrivate = operator.profile_visibility === "private";
   const viewerRedacted = isPrivate && !isOwner;
+  const buildArchetype = pending || viewerRedacted ? null : describeBuildArchetype({
+    input: telemetry?.fresh_input,
+    output: telemetry?.output,
+    cache_write: telemetry?.cache_create,
+    cache_read: telemetry?.cache_read,
+  });
   const displayName = viewerRedacted ? null : operator.display_name;
   const handle_ = viewerRedacted ? null : operator.handle;
   const avatarUrl = viewerRedacted ? null : operator.avatar_url;
@@ -233,6 +240,11 @@ export default async function OperatorProfilePage({
                 {row.workflow_mode === "hitl" ? "HITL" : "Agentic"}
               </span>
             )}
+            {buildArchetype && (
+              <Link href="/wiki#archetypes" title={buildArchetype.description} className="rounded-md border border-gold/30 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-gold">
+                {buildArchetype.name}
+              </Link>
+            )}
             {row.workflow_mode === "agentic" && row.workflow_evidence_url?.startsWith("https://") && (
               <a href={row.workflow_evidence_url} target="_blank" rel="noopener noreferrer" className="font-mono text-[11px] text-gold underline">Workflow evidence ↗</a>
             )}
@@ -257,6 +269,15 @@ export default async function OperatorProfilePage({
               </>
             )}
           </div>
+          {buildArchetype && (
+            <p className="max-w-xl text-xs text-text-secondary">
+              {buildArchetype.description}{" "}
+              <Link href="/wiki#archetypes" className="text-gold underline">Build Archetype</Link>
+              {" · "}{row.window_type ?? "selected snapshot"}
+              {" · "}{row.snapshot_date ?? snapshot.snapshot_date ?? "date unavailable"}
+              <span className="sr-only"> · classifier {buildArchetype.classifier_id} {buildArchetype.classifier_version}</span>
+            </p>
+          )}
         </div>
       </header>
 
