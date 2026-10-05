@@ -40,7 +40,7 @@ export default function TransportabilityPage() {
         summary="Whether metrics and findings from one cohort or context transfer to another. Can results from one population generalize?"
         category="validation"
         evidenceLevel="concept"
-        specVersion="SigRank Standard v1.0 (proposed)"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft (proposed)"
         definition={
           <>
             Whether metrics and findings from one cohort or context transfer to

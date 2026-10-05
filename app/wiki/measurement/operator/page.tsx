@@ -40,7 +40,7 @@ export default function OperatorPage() {
         summary="The individual whose AI-work telemetry is measured — the unit of analysis for AI processing efficiency."
         category="measurement"
         evidenceLevel="repeated-experiment"
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         definition={
           <>
             An operator is the account associated with AI-work

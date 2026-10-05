@@ -20,7 +20,7 @@ export interface ExperimentRecordProps {
   experimentId: string;
   /** The AI system and version tested (e.g. "Claude 3.5 Sonnet", "GPT-4o"). */
   system: string;
-  /** The framework name and version (e.g. "MO§ES v0.4", "SigRank Standard v1.0"). */
+  /** The framework name and version (e.g. "MO§ES v0.4", "TTEOP v0.1-draft"). */
   framework: string;
   /** The test name being run (e.g. "Lineage preservation under summarization"). */
   test: string;

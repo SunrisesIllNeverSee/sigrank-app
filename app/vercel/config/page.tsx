@@ -96,7 +96,7 @@ async function VercelConfigContent({
         <ul className="mt-4 space-y-3 font-sans text-sm text-text-secondary">
           <li className="flex gap-3">
             <span className="text-gold">→</span>
-            <span><strong className="text-text-primary">25 MCP tools</strong> — yield calculation, token cascade analysis, operator benchmarking, signed submission, and SigRank Standard record generation.</span>
+            <span><strong className="text-text-primary">25 MCP tools</strong> — yield calculation, token cascade analysis, operator benchmarking, signed submission, and TTEOP (Token Telemetry Evaluation Operator Protocol) record generation.</span>
           </li>
           <li className="flex gap-3">
             <span className="text-gold">→</span>

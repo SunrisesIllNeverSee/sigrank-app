@@ -40,7 +40,7 @@ export default function OperatorSystemDyadPage() {
         summary="The paired relationship between a specific operator and a specific system — the unit of analysis for interaction effects."
         category="measurement"
         evidenceLevel="repeated-experiment"
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         definition={
           <>
             The paired relationship between a specific operator and a specific

@@ -15,11 +15,11 @@ export default function StandardLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <nav
-        aria-label="Upsilon Standard"
+        aria-label="TTEOP Standard"
         className="mx-auto mb-4 flex max-w-4xl flex-wrap items-center gap-x-5 gap-y-2 border-b border-bg-border py-3 font-mono text-xs"
       >
         <Link href="/standard" className="font-bold text-gold hover:underline">
-          Upsilon Standard
+          TTEOP Standard
         </Link>
         <Link
           href="/standard/open-vs-proprietary"

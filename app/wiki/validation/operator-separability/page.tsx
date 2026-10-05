@@ -40,7 +40,7 @@ export default function OperatorSeparabilityPage() {
         summary="Whether different operators produce measurably different metric profiles. If all operators look the same, the measurement has no discriminative power."
         category="validation"
         evidenceLevel="concept"
-        specVersion="SigRank Standard v1.0 (proposed)"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft (proposed)"
         definition={
           <>
             Whether different operators produce measurably different metric
