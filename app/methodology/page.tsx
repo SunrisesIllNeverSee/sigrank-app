@@ -14,6 +14,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getLeaderboard } from "@/lib/board";
+import { isPublishedBoardRow } from "@/lib/board/published-row";
 import { toEntry } from "@/lib/board/to-entry";
 import { PLATFORM_COUNT } from "@/lib/constants";
 import { withOG } from "@/lib/seo";
@@ -48,9 +49,15 @@ export default async function MethodologyPage() {
     window: "all_time",
     windowFilter: false,
     operatorTotal: true,
+    claimedOnly: true,
+    sort: "yield_",
   });
-  const liveRows = rows.filter((r) => r.operator.claimed);
-  const entries = liveRows.map(toEntry);
+  const liveRows = rows.filter(isPublishedBoardRow);
+  const entries = liveRows.map(row => ({
+    ...toEntry(row),
+    yield_: typeof row.snapshot.cascade?.yield_ === "number"
+      && Number.isFinite(row.snapshot.cascade.yield_) ? row.snapshot.cascade.yield_ : null,
+  }));
 
   // ── Compute quotable stats from real data ────────────────────────────
   const ranked = entries.filter(
@@ -146,7 +153,7 @@ export default async function MethodologyPage() {
             by <strong className="text-text-primary">Υ Yield</strong> — the
             architecture of the cascade, not raw spend.{" "}
             <span className="font-mono text-xs text-text-dim">
-              Last updated: August 14, 2026
+              Figures refreshed: {now.toLocaleDateString("en-US", { timeZone: "UTC" })} UTC
             </span>
           </>
         }
@@ -158,6 +165,13 @@ export default async function MethodologyPage() {
           Key Figures
         </h2>
         <div className="flex flex-col gap-3">
+          <p className="text-sm text-text-muted">
+            Active / Total / All-time · claimed, non-retired, ranked operators ·
+            one selected board record per operator across platforms. These figures
+            use the same row selection and Yield values as the analyst field statistics.
+            Refreshed <time dateTime={updatedIso}>{updatedIso}</time>; refresh times
+            can differ from a live tool call. Four Degrees uses a separate screened reference cohort.
+          </p>
           <p className="text-base text-text-secondary">
             As of <strong className="text-text-primary">{monthYear}</strong>,
             the SigRank Index ranks{" "}
@@ -178,7 +192,7 @@ export default async function MethodologyPage() {
             The <strong className="text-text-primary">median</strong> operator
             scores{" "}
             <strong className="text-text-primary">
-              Υ {fmtYield(medianYield)}
+              Υ {medianYield.toLocaleString("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}
             </strong>
             ; the top decile starts at{" "}
             <strong className="text-text-primary">
@@ -195,8 +209,8 @@ export default async function MethodologyPage() {
           </p>
           <p className="text-base text-text-secondary">
             Across all ranked operators,{" "}
-            <strong className="text-text-primary">{cachePct}%</strong> of input
-            tokens are served from cache on average.
+            the mean output share of fresh input plus output is{" "}
+            <strong className="text-text-primary">{cachePct}%</strong> (SNR = O / (I + O)).
           </p>
         </div>
       </section>

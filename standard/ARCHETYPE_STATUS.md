@@ -123,3 +123,13 @@ That extension would need to freeze:
 - classification output schema.
 
 Until then, archetypes remain a SignalAF reference classification built on top of standardized measurements.
+# Classifier implementation pin added October 5, 2026
+
+`signalaf/build-archetypes` version `1.0.0` identifies the existing ten-rule
+classifier and its existing thresholds/precedence. This adds a version identity;
+it does not change classification rules or extend TTEOP base compatibility.
+The website profile and public analyst service call `describeBuildArchetype`
+with the selected snapshot's observed pillars. It returns no classification
+when a pillar is missing, invalid, or a required denominator is zero.
+Zero observed cache writing is valid. Returned labels identify a computation
+from the snapshot, not a manually stored or independently verified property.
