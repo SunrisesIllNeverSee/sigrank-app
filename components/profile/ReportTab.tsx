@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { OperatorReport } from "@/lib/board";
+import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import { BadgeCollection } from "./BadgeCollection";
 import { HealthScore } from "./HealthScore";
 import { DnaCard } from "./DnaCard";
@@ -23,9 +24,11 @@ import { DnaCard } from "./DnaCard";
 export function ReportTab({
   report,
   isOwner,
+  archetype,
 }: {
   report: OperatorReport | null;
   isOwner: boolean;
+  archetype: BuildArchetype | null;
 }) {
   const [visible, setVisible] = useState(report?.report_visible ?? false);
   const [saving, setSaving] = useState(false);
@@ -129,7 +132,7 @@ export function ReportTab({
         <BadgeCollection badges={r.badges} />
         <div className="flex flex-col gap-4">
           <HealthScore score={r.health_score} yield_={r.peak_yield} />
-          <DnaCard modeDistribution={r.mode_distribution} badges={r.badges} />
+          {archetype && <DnaCard archetype={archetype} badges={r.badges} />}
         </div>
       </div>
 
