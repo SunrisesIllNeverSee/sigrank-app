@@ -49,7 +49,7 @@
     "flags": "^4.3.1",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
-    "next": "^15.5.24",
+    "next": "^16.3.8",
     "posthog-js": "^1.399.5",
     "posthog-node": "^5.54.1",
     "react": "^19.2.8",
