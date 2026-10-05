@@ -17,4 +17,4 @@ The cascade model uses four non-negative token counts:
 
 They are observations, not scores. The plausibility gate compares their sum with `tokens_total` within rounding tolerance and flags impossible or extreme relationships. `cache_read` without cache creation is flagged when material, rather than silently treated as a normal cascade.
 
-Source: `lib/cascade/metrics.ts`, `lib/ingest/gates.ts`.
+Source: `lib/analytics/cascade.ts`, `lib/ingest/gates.ts`.

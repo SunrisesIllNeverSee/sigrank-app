@@ -14,4 +14,4 @@ The default aggregate check does not run below `n = 30`. It flags when chi-squar
 
 A Benford flag is evidence for review, not proof of fabrication. It must be considered with data coverage, independence, collection behavior, and other ingest reasons. The production gate may include server-only battery checks whose precise logic is not public.
 
-Sources: `lib/ingest/aggregate-benford.ts`, `lib/ingest/gates.ts`.
+Sources: `lib/analytics/benford.ts`, `lib/ingest/gates.ts`.
