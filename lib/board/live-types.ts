@@ -69,7 +69,9 @@ export interface LiveOperator {
   raw: { i: string; o: string; cr: string; cw: string };
   /** Yield history series (most recent points, oldest → newest). May be empty. */
   trend: number[];
-  /** Record/hall entries for this operator (empty array when none). */
+  /** Record/hall entries for this operator. EMPTY in the initial SSR payload —
+   *  populated by lazy drill-down enrichment (WS-4: /operators/{codename}/records
+   *  fetched on selection, never bulk-loaded into the board state). */
   recs: { metric: string; rank: number; value: string; window: string }[];
   /** Drill-down sub-line (class/archetype/records context). */
   sub: string;
@@ -91,6 +93,17 @@ export interface LiveOperator {
   eff: string;
   /** Primary platform key ("claude" | "codex" | "multi" | …). */
   platform: string;
+  /** Server-projected raw numerics for math paths (sort, radar, field
+   *  normalization). The compact display strings above remain the rendered
+   *  values (reference-v1 renders them verbatim and re-parses via numvOf);
+   *  `num` exists so production math never needs to re-parse a formatted
+   *  string when an exact value is available. */
+  num: {
+    yield: number;
+    lev: number;
+    total: number;
+    cost: number;
+  };
 }
 
 /** Field-strip stat cell (FIELD_STATS equivalent). */
