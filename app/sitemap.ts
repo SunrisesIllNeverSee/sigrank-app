@@ -453,13 +453,11 @@ const STATIC_ROUTES: {
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-  const STATIC_LAST_MODIFIED = new Date("2026-08-14T09:50:00Z");
-
-  // Static routes
+  // Static routes — lastModified only when the route entry declares a real
+  // modification date; no shared fallback date, no generation time.
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: `${SITE_ORIGIN}${r.path}`,
-    lastModified: r.lastModified ?? STATIC_LAST_MODIFIED,
+    lastModified: r.lastModified,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }));
@@ -469,7 +467,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // "Duplicate without user-selected canonical" in Google Search Console.
   const boardEntries: MetadataRoute.Sitemap = BOARD_WINDOWS.map((w) => ({
     url: `${SITE_ORIGIN}/board/${w.slug}`,
-    lastModified: now,
     changeFrequency: "hourly" as const,
     priority: 0.9,
   }));
