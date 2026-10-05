@@ -4,7 +4,7 @@ import { callPluginTool } from "./service";
 
 export function createPluginServer(request: Request): McpServer {
   const server = new McpServer(
-    { name: "sigrank-signalaf", title: "SigRank | SignalAF", version: "1.0.0", websiteUrl: "https://signalaf.com" },
+    { name: "sigrank-signalaf", title: "SigRank | SignalAF Analyst", version: "1.1.0", websiteUrl: "https://signalaf.com" },
     { capabilities: { tools: {} }, instructions: "Tokenpull measures → SigRank evaluates → SignalAF publishes. Metrics describe observable AI operating structure, not intelligence, productivity, or work quality. Archetypes are operating patterns, not personality. Public exploration does not scan local logs." },
   );
   for (const tool of contracts.tools) {

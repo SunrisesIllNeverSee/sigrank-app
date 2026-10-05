@@ -72,6 +72,42 @@ export interface BuildArchetypeInput {
   construction: number;
 }
 
+export const BUILD_ARCHETYPE_CLASSIFIER = {
+  id: "signalaf/build-archetypes",
+  version: "1.0.0",
+} as const;
+
+export function describeBuildArchetype(pillars: {
+  input: number | null | undefined;
+  output: number | null | undefined;
+  cache_write: number | null | undefined;
+  cache_read: number | null | undefined;
+}) {
+  const { input, output, cache_write, cache_read } = pillars;
+  if (![input, output, cache_write, cache_read].every(
+    value => typeof value === "number" && Number.isFinite(value) && value >= 0,
+  ) || !input || !cache_read) return null;
+  const axes = {
+    leverage: cache_read / input,
+    velocity: output! / input,
+    construction: cache_write! / cache_read,
+  };
+  if (!Object.values(axes).every(Number.isFinite)) return null;
+  const archetype = buildArchetypeOf(axes);
+  return {
+    key: archetype.key,
+    name: archetype.name,
+    family: archetype.family,
+    family_label: archetype.familyLabel,
+    description: archetype.blurb,
+    defined_by: archetype.definedBy,
+    classifier_id: BUILD_ARCHETYPE_CLASSIFIER.id,
+    classifier_version: BUILD_ARCHETYPE_CLASSIFIER.version,
+    origin: "computed_from_snapshot" as const,
+    axes,
+  };
+}
+
 // P80 thresholds calibrated from OCM cut (1,586 operators).
 // lev P80 = 74.6, vel P80 = 0.340, constr P80 = 0.0431
 const CONVERGENT_T = { levP80: 74.6, velP80: 0.34, constrP80: 0.0431 };
