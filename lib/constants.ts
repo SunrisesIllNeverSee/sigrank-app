@@ -163,7 +163,7 @@ export const DEMO_BANNER =
  * at 0.9.5 once). Kept current by the daily sync-mcp-version workflow (PR gate
  * via `bot/mcp-version-sync` branch).
  */
-export const MCP_VERSION = "1.0.42" as const;
+export const MCP_VERSION = "1.0.44" as const;
 
 /**
  * PLATFORM_COUNT — how many platforms the MCP's adapter registry reads. Mirrors
