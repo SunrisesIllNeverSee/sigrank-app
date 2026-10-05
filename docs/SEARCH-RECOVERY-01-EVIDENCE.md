@@ -124,6 +124,40 @@ Regression coverage: 5 new tests assert both routes call the invalidation
 helper, the helper busts profile path + sitemap + tags, the IN clause is
 chunked, and sitemap URLs are encoded.
 
+## Review round 2 — fixes applied
+
+1. **Incomplete invalidation wiring (blocking).** Two more write paths that
+   mutate policy inputs now call `revalidateOperatorIndexState`:
+   - `POST /api/v1/account/delete` — `delete_account` RPC retires the
+     operator; the helper drops the URL from the sitemap and busts the ISR
+     profile immediately (previously the public 200 page could serve up to
+     6h after deletion).
+   - `POST /api/v1/profile/codename` — codename IS the indexed URL; the
+     helper runs for both the old codename (stale sitemap entry + stale
+     page) and the new one.
+
+2. **Sibling indexable surface (warning → resolved).**
+   `app/user/[codename]/wrapped/page.tsx` emitted implicit `index,follow`
+   for every profile including unclaimed seeds. `generateMetadata` now
+   applies the same shared policy:
+   `robots: operatorProfileRobots(row.operator, !row.pending)`. The
+   invalidation helper also busts `/user/<c>/wrapped` (both casings) so a
+   claim/retire flips the wrapped page's robots at the same time.
+
+3. **IN-clause chunk bound tightened (suggestion).** 500 → **200 ids**
+   (~7.4KB serialized, under any plausible proxy URL limit — the codebase
+   documents failure at 1600+). Moot at ~52 claimed today; now safe if the
+   claimed population ever grows past the threshold.
+
+4. **Snapshot-scan payload (suggestion → noted).** The existence query
+   fetches `operator_id` rows only, paginated per chunk. A per-id
+   `limit(1)`/count design would bound payload further but adds N queries;
+   the chunked paginated form is bounded and correct at current scale.
+
+Regression coverage: 3 more tests — account/delete and profile/codename
+routes call the helper (both codenames on rename), wrapped page applies the
+shared policy; the helper-body test now also requires the wrapped path bust.
+
 ## Rollback
 
 `git revert` the branch range, or revert to the parent of

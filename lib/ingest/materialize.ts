@@ -354,6 +354,9 @@ export function revalidateOperatorIndexState(codename: string): void {
   memoInvalidatePrefix("board:");
   revalidatePath(`/user/${codename}`);
   revalidatePath(`/user/${codename.toLowerCase()}`);
+  // Wrapped emits the same policy-driven robots (3600s ISR).
+  revalidatePath(`/user/${codename}/wrapped`);
+  revalidatePath(`/user/${codename.toLowerCase()}/wrapped`);
   revalidatePath("/sitemap.xml");
   // Claimed membership changes the claimed-only live board surfaces too.
   revalidatePath("/board/all");

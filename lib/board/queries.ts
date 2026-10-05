@@ -666,14 +666,14 @@ export async function getIndexableOperatorRows(
     // failure is caught below → [] → the sitemap would silently drop every
     // operator URL, so chunk well under the threshold as the population grows.
     const hasSnap = new Set<string>();
-    for (let i = 0; i < ids.length; i += 500) {
+    for (let i = 0; i < ids.length; i += 200) {
       const snapRows = await fetchAllPaginated<{ operator_id: string }>(
         sb,
         (s) =>
           s
             .from("metric_snapshots")
             .select("operator_id")
-            .in("operator_id", ids.slice(i, i + 500)),
+            .in("operator_id", ids.slice(i, i + 200)),
         "metric_snapshots (indexableOperators)",
       );
       for (const r of snapRows) hasSnap.add(r.operator_id);

@@ -189,6 +189,23 @@ test("profile route invalidates operator index state after profile_visibility wr
   assert.match(route, /revalidateOperatorIndexState\(op\.codename\)/);
 });
 
+test("account deletion invalidates operator index state after retiring", async () => {
+  const route = await source("app/api/v1/account/delete/route.ts");
+  assert.match(route, /revalidateOperatorIndexState\(op\.codename\)/);
+});
+
+test("codename change invalidates both old and new indexed URLs", async () => {
+  const route = await source("app/api/v1/profile/codename/route.ts");
+  assert.match(route, /revalidateOperatorIndexState\(op\.codename\)/);
+  assert.match(route, /revalidateOperatorIndexState\(newCodename\)/);
+});
+
+test("wrapped page applies the shared indexing policy to robots metadata", async () => {
+  const page = await source("app/user/[codename]/wrapped/page.tsx");
+  assert.match(page, /seo\/indexing-policy/);
+  assert.match(page, /operatorProfileRobots\(row\.operator, !row\.pending\)/);
+});
+
 test("revalidateOperatorIndexState busts page, sitemap, and tagged caches", async () => {
   const src = await source("lib/ingest/materialize.ts");
   const fn = src.match(
@@ -200,6 +217,7 @@ test("revalidateOperatorIndexState busts page, sitemap, and tagged caches", asyn
     'revalidateTag("operator"',
     'revalidateTag("board"',
     "revalidatePath(`/user/${codename}`)",
+    "revalidatePath(`/user/${codename}/wrapped`)",
     'revalidatePath("/sitemap.xml")',
     'revalidatePath("/board/all")',
   ]) {
