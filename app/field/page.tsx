@@ -95,7 +95,7 @@ export default async function FieldPage() {
             {
               question: "How many AI operators are in the field analysis?",
               answer:
-                "The field analysis covers 1,498 AI operators (the Operator Center of Mass) from a total seed dataset of 1,628 operators. The remaining 130 are classified as outliers or bots. The live leaderboard at signalaf.com/board/all includes additional enrolled operators beyond the seed corpus. The analysis separates genuine operator usage patterns from automated traffic using the Hermes bot control and outlier classification.",
+                "The historical field analysis covers 1,498 operator records in its Center of Mass from a 1,628-record seed dataset. Another 130 records were separated as statistical outliers. That screen describes unusual token-flow shapes, not whether a workflow was human-led or agentic. The live leaderboard at signalaf.com/board/all includes enrolled operators beyond this seed corpus.",
             },
             {
               question: "What is the median Yield of AI operators?",
@@ -573,18 +573,18 @@ export default async function FieldPage() {
       />
         <BotZoneShading />
         <p className="text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s metrics catch gaming automatically. A 6-signal outlier-likelihood score
-          identifies operators with inhuman throughput, zero cache usage, single-model fixation,
-          and zero sessions. {meta.outliers} outliers were separated from the field distribution.
-          An additional input/total ratio analysis separates extreme operators from replay outliers
-          and input dump outliers, keeping the Operator Center of Mass clean.
+          A 6-signal outlier-likelihood score checks throughput, cache usage, model concentration,
+          and session evidence. {meta.outliers} statistical outliers were separated from this
+          historical field distribution. The input/total analysis also distinguishes productive
+          high-reuse signatures from replay and input-dump anomalies. Those screens measure
+          token-flow structure; workflow-mode labels need their own evidence.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The scatter plot shows why outliers are detectable: they cluster in the bottom-right —
-          massive token volume with near-zero SNR. They pump input tokens without producing
-          proportionate output. No operator occupies that region. The 6-signal score makes
-          this structural: inhuman throughput, zero cache reads, single-model fixation, and zero
-          sessions are individually suspicious; together they are conclusive.
+          The scatter plot shows one outlier pattern in the bottom-right: massive token volume
+          with near-zero SNR, where input dominates and little output appears. Other high-reuse
+          outliers have substantial output and cache construction; they are a different operating
+          signature. The 6-signal score flags records for closer analysis rather than proving
+          an operator&apos;s identity or level of human involvement.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           This is why the Four Degrees chart&apos;s columns are honest: the{" "}

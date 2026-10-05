@@ -9,6 +9,7 @@
  */
 
 import type { LeaderboardRow } from "@/lib/board";
+import { snapshotThroughput } from "@/lib/board/throughput";
 
 /** D19: leaderboard responses carry Cache-Control for CDN caching.
  * TTL increased from 300s to 1800s — on-demand revalidation via
@@ -26,6 +27,14 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
   const { operator, snapshot } = row;
   const c = snapshot.cascade;
   const t = row.telemetry;
+  const throughput = snapshotThroughput({
+    inputTokens: t?.fresh_input,
+    outputTokens: t?.output,
+    cacheWriteTokens: t?.cache_create,
+    cacheReadTokens: t?.cache_read,
+    windowStart: row.window_start,
+    windowEnd: row.window_end,
+  });
   return {
     rank: row.global_rank,
     operator_id: operator.operator_id,
@@ -36,6 +45,16 @@ export function serializeLeaderboardEntry(row: LeaderboardRow) {
     platform: (row.platform ?? operator.primary_domain ?? "other").toLowerCase(),
     // The window bucket this row's snapshot belongs to ('7d'/'30d'/'90d'/'all_time').
     window: row.window_type ?? null,
+    workflow_mode: row.workflow_mode ?? null,
+    workflow_evidence_url: row.workflow_evidence_url ?? null,
+    workflow_mode_version: row.workflow_mode_version ?? null,
+    mode_assessed_at: row.mode_assessed_at ?? null,
+    period_start: row.window_start ?? null,
+    period_end: row.window_end ?? null,
+    processed_tokens: throughput?.processedTokens ?? null,
+    processed_tokens_per_day: throughput?.processedTokensPerDay ?? null,
+    output_tokens_per_day: throughput?.outputTokensPerDay ?? null,
+    throughput_calculation_version: throughput ? "exact-calendar-v1" : null,
     // Primary rank metric: Υ yield from the token cascade.
     yield_: c && !c.nonCompounding ? c.yield_ : null,
     leverage: c && !c.nonCompounding ? c.leverage : null,

@@ -70,6 +70,8 @@ export function BoardTableClient({
 
   const platformFilter = normalizePlatform(searchParams.get("platform"));
   const viewPlatforms = searchParams.get("view") === "platforms";
+  const modeParam = searchParams.get("mode");
+  const mode = modeParam === "hitl" || modeParam === "agentic" ? modeParam : "all";
   const platformLabel = platformLabelFor(platformFilter);
 
   // State for API-fetched entries (pages beyond 0, or perPlatform view)
@@ -88,12 +90,13 @@ export function BoardTableClient({
   // full client-side pagination.
   const handlePageChange = useCallback(
     (page: number) => {
-      if (page > 0 && win === "all" && !fullEntries && !loading) {
+      if (page > 0 && win === "all" && mode === "all" && !viewPlatforms && !platformFilter && !fullEntries && !loading) {
         setLoading(true);
         const params = new URLSearchParams({
           metric: "yield",
           window: "all_time",
           limit: "2000",
+          mode,
         });
         fetch(`/api/v1/leaderboard?${params.toString()}`, { cache: "force-cache" })
           .then((r) => (r.ok ? r.json() : { entries: [] }))
@@ -105,7 +108,7 @@ export function BoardTableClient({
           .finally(() => setLoading(false));
       }
     },
-    [win, fullEntries, loading],
+    [win, fullEntries, loading, mode, viewPlatforms, platformFilter],
   );
 
   // Refetch the first page from the API (used by Realtime refresh).
@@ -115,7 +118,10 @@ export function BoardTableClient({
       metric: "yield",
       window: windowEnum,
       limit: "25",
+      mode,
     });
+    if (viewPlatforms) params.set("view", "platforms");
+    if (platformFilter) params.set("platform", platformFilter);
     fetch(`/api/v1/leaderboard?${params.toString()}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { entries: [] }))
       .then((d) => {
@@ -124,7 +130,7 @@ export function BoardTableClient({
         setLiveTick((t) => t + 1);
       })
       .catch(() => {});
-  }, [windowEnum]);
+  }, [windowEnum, mode, viewPlatforms, platformFilter]);
 
   // Realtime: subscribe to metric_snapshots + leaderboards_cached changes.
   // No-op when NEXT_PUBLIC_REALTIME_ENABLED is false or absent.
@@ -132,7 +138,7 @@ export function BoardTableClient({
 
   // Fetch perPlatform entries when ?view=platforms or a platform filter is active
   useEffect(() => {
-    if (isOff || (!viewPlatforms && !platformFilter)) {
+    if (isOff || (!viewPlatforms && !platformFilter && mode === "all")) {
       setFetchedEntries(null);
       return;
     }
@@ -143,8 +149,10 @@ export function BoardTableClient({
       metric: "yield",
       window: windowEnum,
       limit: "2000",
+      mode,
     });
     if (platformFilter) params.set("platform", platformFilter);
+    if (viewPlatforms) params.set("view", "platforms");
 
     fetch(`/api/v1/leaderboard?${params.toString()}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { entries: [] }))
@@ -157,7 +165,7 @@ export function BoardTableClient({
       })
       .catch(() => setFetchedEntries([]))
       .finally(() => setLoading(false));
-  }, [isOff, viewPlatforms, platformFilter, windowEnum]);
+  }, [isOff, viewPlatforms, platformFilter, windowEnum, mode]);
 
   if (isOff) {
     // "off" board: all entries passed from server, no API fetching.
@@ -177,7 +185,7 @@ export function BoardTableClient({
   // server-provided first page (SSR/ISR). For all_time, once the user paginates,
   // swap to the lazy-loaded full dataset.
   let entries: LeaderboardEntryWithPlatforms[];
-  if (viewPlatforms || platformFilter) {
+  if (viewPlatforms || platformFilter || mode !== "all") {
     entries = fetchedEntries ?? [];
   } else if (liveTick > 0 && fetchedEntries) {
     entries = fetchedEntries;
@@ -190,10 +198,11 @@ export function BoardTableClient({
   return (
     <LeaderboardTable
       entries={entries}
-      totalUsers={viewPlatforms || platformFilter ? entries.length : totalCount}
+      totalUsers={viewPlatforms || platformFilter || mode !== "all" ? entries.length : totalCount}
       window={win}
       platform={platformLabel}
       view={viewPlatforms ? "platforms" : "total"}
+      mode={mode}
       onPageChange={handlePageChange}
     />
   );
@@ -203,6 +212,12 @@ export function BoardTableClient({
 function mapApiEntry(api: Record<string, unknown>): LeaderboardEntryWithPlatforms {
   return {
     rank: (api.rank as number) ?? 0,
+    workflowMode: (api.workflow_mode as "hitl" | "agentic" | null) ?? null,
+    workflowEvidenceUrl: (api.workflow_evidence_url as string) ?? null,
+    periodStart: (api.period_start as string) ?? null,
+    periodEnd: (api.period_end as string) ?? null,
+    processedTokensPerDay: (api.processed_tokens_per_day as number) ?? null,
+    outputTokensPerDay: (api.output_tokens_per_day as number) ?? null,
     anonId: (api.display_name as string) ?? (api.codename as string) ?? "?",
     codename: (api.codename as string) ?? "?",
     signalClass: ((api.class_tier as string) ?? "BURNER") as any,

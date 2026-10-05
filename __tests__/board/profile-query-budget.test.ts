@@ -79,7 +79,11 @@ function snap(operatorId: string, cacheRead: number) {
 }
 
 const SNAP_OP1 = snap("op-1", 1_000); // yield = (1000/100)*(100/100) = 10
-const SNAP_OP2 = snap("op-2", 50_000); // yield = 500 → op-2 ranks #1
+const SNAP_OP2 = {
+  ...snap("op-2", 50_000),
+  workflow_mode: "agentic",
+  workflow_evidence_url: "https://example.org/workflow",
+}; // yield = 500 → assessed Agentic op-2 ranks #1
 
 // ── Counting fake ───────────────────────────────────────────────────────
 
@@ -99,7 +103,7 @@ function makeSb() {
       case "operators_public":
         // claimed-id query (claimedRanks) vs identity query (ilike codename)
         return has("eq", "claimed")
-          ? [{ operator_id: "op-1" }, { operator_id: "op-2" }]
+          ? [{ operator_id: "op-1", codename: "test-op" }, { operator_id: "op-2", codename: "agentic-op" }]
           : [OP];
       case "metric_snapshots":
         // claimedRanks fetches via .in(operator_id) → both ops' snaps;

@@ -16,6 +16,7 @@
 
 import type { LeaderboardRow } from "@/lib/board/types";
 import type { LeaderboardEntry } from "@/components/sigrank";
+import { snapshotThroughput } from "@/lib/board/throughput";
 
 /**
  * A LeaderboardEntry carrying the operator's distinct submitted-platform SET, for
@@ -43,8 +44,22 @@ export function toEntry(row: LeaderboardRow): LeaderboardEntryWithPlatforms {
   const c = snapshot.cascade;
   const t = row.telemetry;
   const platforms = (row as RowWithPlatforms).platforms;
+  const throughput = snapshotThroughput({
+    inputTokens: t?.fresh_input,
+    outputTokens: t?.output,
+    cacheWriteTokens: t?.cache_create,
+    cacheReadTokens: t?.cache_read,
+    windowStart: row.window_start,
+    windowEnd: row.window_end,
+  });
   return {
     rank: global_rank,
+    workflowMode: row.workflow_mode ?? null,
+    workflowEvidenceUrl: row.workflow_evidence_url ?? null,
+    periodStart: row.window_start ?? null,
+    periodEnd: row.window_end ?? null,
+    processedTokensPerDay: throughput?.processedTokensPerDay ?? null,
+    outputTokensPerDay: throughput?.outputTokensPerDay ?? null,
     percentile: row.percentile,
     // Seed rows render italic (owner 2026-06-20). The live facade hardcodes
     // isPlaceholder:false for ALL DB rows, so that's mock-only — the signal that works

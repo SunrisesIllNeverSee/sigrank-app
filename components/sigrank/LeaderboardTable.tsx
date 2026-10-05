@@ -30,7 +30,7 @@ import {
 import { OperatorAvatar } from "./OperatorAvatar";
 import { PlatformIcon } from "./PlatformIcon";
 import { track } from "@/lib/infra/posthog/events";
-import { isOutlierEntry } from "@/lib/analytics/outlier-classify";
+import type { BoardMode } from "@/lib/board/workflow-mode";
 import { BoardCapture } from "@/components/board/BoardCapture";
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
@@ -230,6 +230,7 @@ type SortKey =
   | "leverage"
   | "dev10x"
   | "totalTokens"
+  | "processedPerDay"
   | "costPerMillion"
   | "opRatioBest"
   | "opRatioWorst"
@@ -265,6 +266,8 @@ const sortVal = (e: LeaderboardEntry, k: SortKey): number => {
       return e.dev10x ?? -Infinity;
     case "totalTokens":
       return e.totalTokens ?? -Infinity;
+    case "processedPerDay":
+      return e.processedTokensPerDay ?? -Infinity;
     case "costPerMillion":
       return e.costPerMillion ?? -Infinity;
     case "efficiency":
@@ -358,6 +361,7 @@ function Field({
 
 interface Props {
   entries: LeaderboardEntry[];
+  mode?: BoardMode;
   totalUsers?: number;
   window?: string;
   /** Initial Platform filter (BOARD redesign 2026-06-27) — reflects the ?platform=
@@ -374,6 +378,7 @@ interface Props {
 
 export function LeaderboardTable({
   entries,
+  mode: categoryFilter = "all",
   totalUsers,
   window: win = "30d",
   platform: platformProp = "All",
@@ -389,10 +394,6 @@ export function LeaderboardTable({
   // the prop (the URL's value); changing it pushes a new URL rather than filtering in JS.
   const [platform, setPlatform] = useState<PlatformUI>(platformProp);
   const [classFilter, setClassFilter] = useState<string>("all");
-  // Category filter (owner 2026-07-14): default = "human" (Operator Center of Mass only).
-  // "outliers" adds outliers & bots (input/total < 0.1% or > 80%) — one category.
-  // "all" shows everything unfiltered.
-  const [categoryFilter, setCategoryFilter] = useState<string>("human");
   // Search filter (owner 2026-07-14): client-side text search across anonId (display
   // name), codename, and subLabel (@handle). Filters the visible rows in real time.
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -508,11 +509,13 @@ export function LeaderboardTable({
     nextWin: string,
     nextPlatform: PlatformUI,
     nextView: "total" | "platforms",
+    nextMode: BoardMode = categoryFilter,
   ) => {
     const sp = new URLSearchParams();
     const domain = PLATFORM_DOMAIN_MAP[nextPlatform];
     if (domain) sp.set("platform", domain);
     if (nextView === "platforms") sp.set("view", "platforms");
+    if (nextMode !== "all") sp.set("mode", nextMode);
     const qs = sp.toString();
     const base = `/board/${nextWin}`;
     return qs ? `${base}?${qs}` : base;
@@ -543,8 +546,6 @@ export function LeaderboardTable({
   // filter is applied IN JS only on the "off" board (which ships every row); on windowed
   // boards the server already returned the selected platform's rows (URL-driven), so
   // re-filtering in JS would wrongly hide the operator-total 'multi' roll-up rows.
-  // Category filter (owner 2026-07-14): defaults to "human" (Operator Center of Mass) —
-  // excludes outliers (input/total < 0.1%) and bots (input/total > 80%).
   const filtered = useMemo(() => {
     const domain = PLATFORM_DOMAIN_MAP[platform]; // null = All
     const sq = searchQuery.trim().toLowerCase();
@@ -552,10 +553,6 @@ export function LeaderboardTable({
       if (isOff && domain && (e.platform ?? "other") !== domain) return false;
       if (classFilter !== "all" && e.signalClass.toLowerCase() !== classFilter)
         return false;
-      // Category filter: Operator Center of Mass / + Outliers & Bots / All
-      if (categoryFilter === "human") {
-        if (isOutlierEntry(e)) return false;
-      }
       // Search filter: match against display name, codename, or @handle.
       if (sq) {
         const haystack = [
@@ -569,7 +566,7 @@ export function LeaderboardTable({
       }
       return true;
     });
-  }, [entries, platform, classFilter, categoryFilter, isOff, searchQuery]);
+  }, [entries, platform, classFilter, isOff, searchQuery]);
 
   // One sort pipeline for both views (raw default = rawTotal). Nulls fall to the bottom.
   const sorted = useMemo(() => {
@@ -626,6 +623,8 @@ export function LeaderboardTable({
       case "totalTokens":
       case "rawTotal":
         return "V";
+      case "processedPerDay":
+        return "T/D";
       case "input":
         return "IN";
       case "output":
@@ -716,34 +715,32 @@ export function LeaderboardTable({
                 label: c.label,
               }))}
             />
-            {/* Category filter (owner 2026-07-14): Operator Center of Mass by default.
-                Toggle to add outliers & bots (one category). */}
             <div style={st.fieldCol}>
-              <span style={st.flab}>Category</span>
+              <span style={st.flab}>Workflow</span>
               <div style={st.toggleRow}>
                 <button
                   type="button"
-                  onClick={() => setCategoryFilter("human")}
+                  onClick={() => router.push(buildBoardUrl(win, platform, breakdownProp, "hitl"))}
                   style={{
                     ...st.modeBtn,
-                    ...(categoryFilter === "human" ? st.modeOn : null),
+                    ...(categoryFilter === "hitl" ? st.modeOn : null),
                   }}
                 >
-                  Operator
+                  HITL
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCategoryFilter("outliers")}
+                  onClick={() => router.push(buildBoardUrl(win, platform, breakdownProp, "agentic"))}
                   style={{
                     ...st.modeBtn,
-                    ...(categoryFilter === "outliers" ? st.modeOn : null),
+                    ...(categoryFilter === "agentic" ? st.modeOn : null),
                   }}
                 >
-                  + Outliers
+                  Agentic
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCategoryFilter("all")}
+                  onClick={() => router.push(buildBoardUrl(win, platform, breakdownProp, "all"))}
                   style={{
                     ...st.modeBtn,
                     ...(categoryFilter === "all" ? st.modeOn : null),
@@ -834,6 +831,12 @@ export function LeaderboardTable({
             />
           </div>
         </div>
+
+        {sorted.length === 0 && (
+          <p role="status" style={{ color: T.mut, fontSize: 12, padding: "14px 4px" }}>
+            No eligible snapshots in this view yet.
+          </p>
+        )}
 
         {/* Mobile: condensed card list (below md). */}
         <ul className="flex flex-col gap-1.5 md:hidden">
@@ -1019,7 +1022,7 @@ export function LeaderboardTable({
                   <th colSpan={3} style={{ ...st.grp, ...st.gdiv }}>
                     COMPOSITION &amp; COST
                   </th>
-                  <th colSpan={2} style={{ ...st.grp, ...st.gdiv }}>
+                  <th colSpan={3} style={{ ...st.grp, ...st.gdiv }}>
                     ACTIVITY
                   </th>
                 </tr>
@@ -1266,6 +1269,14 @@ export function LeaderboardTable({
                   <th style={{ ...st.col, ...st.colL, ...st.gdiv }}>
                     PLATFORM
                   </th>
+                  <th
+                    onClick={() => onSortColumn("processedPerDay")}
+                    style={{ ...st.col, ...st.colR, ...st.colSort,
+                      ...(isActive("processedPerDay") ? st.colActive : null) }}
+                    title="Processed I+O+W+R tokens per calendar day of the recorded snapshot period"
+                  >
+                    ∑/DAY{caret("processedPerDay")}
+                  </th>
                   <th style={{ ...st.col, ...st.colR }}>LAST</th>
                 </tr>
               </thead>
@@ -1369,6 +1380,12 @@ export function LeaderboardTable({
                           </Link>
                           )}
                         </span>
+                        {e.workflowMode === "agentic" && e.workflowEvidenceUrl ? (
+                          <a href={e.workflowEvidenceUrl} target="_blank" rel="noopener noreferrer"
+                            style={{ color: T.gold, fontSize: 10 }}>Agentic ↗</a>
+                        ) : e.workflowMode === "hitl" ? (
+                          <span style={{ color: T.mut, fontSize: 10 }}>HITL</span>
+                        ) : null}
                       </td>
                       <td
                         style={{
@@ -1482,6 +1499,14 @@ export function LeaderboardTable({
                         }}
                       >
                         <PlatformCell e={e} />
+                      </td>
+                      <td
+                        style={{ ...st.td, ...st.tdR, color: T.ink }}
+                        title={e.periodStart && e.periodEnd
+                          ? `${e.periodStart} to ${e.periodEnd}; output ${fmtBig(e.outputTokensPerDay)}/day`
+                          : "Exact period unavailable"}
+                      >
+                        {fmtBig(e.processedTokensPerDay)}
                       </td>
                       <td
                         style={{ ...st.td, ...st.tdR, color: T.mut }}
