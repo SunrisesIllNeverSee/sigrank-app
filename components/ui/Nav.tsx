@@ -37,9 +37,13 @@ export function Nav() {
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
   const showSearch = useFeatureFlag("exchange_search");
-  const links = showSearch
+  // `fieldhub-page` gates a live surface — default visible, hides only on an
+  // explicit off (mirrors the page's fail-open server gate).
+  const showField = useFeatureFlag("fieldhub-page", true);
+  const links = (showSearch
     ? [...LINKS.slice(0, -1), SEARCH_LINK, LINKS[LINKS.length - 1]]
-    : LINKS;
+    : LINKS
+  ).filter((l) => l.href !== "/fieldhub" || showField);
 
   useEffect(() => {
     const onScroll = () => {
