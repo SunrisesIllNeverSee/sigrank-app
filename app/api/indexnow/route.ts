@@ -60,11 +60,12 @@ function isAuthorized(req: NextRequest): { ok: boolean; status: number; error?: 
       error: "INDEXNOW_SUBMIT_SECRET/CRON_SECRET unset — cannot verify request",
     };
   }
-  const provided = req.headers.get("authorization") ?? "";
-  const expected = `Bearer ${secret}`;
+  // Byte-length pre-check (not string length — a multibyte char at matching
+  // string length produces different byte lengths and would throw).
+  const provided = Buffer.from(req.headers.get("authorization") ?? "");
+  const expected = Buffer.from(`Bearer ${secret}`);
   const same =
-    provided.length === expected.length &&
-    timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+    provided.length === expected.length && timingSafeEqual(provided, expected);
   if (!same) {
     return { ok: false, status: 401, error: "Unauthorized" };
   }
@@ -121,8 +122,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Dedupe + cap
-  const urls = [...new Set(raw)].slice(0, MAX_URLS);
+  // Dedupe + cap. Normalize before dedupe so `…/x` vs `…/x/` and host-case
+  // variants don't count as distinct submissions (origin is already
+  // allowlist-verified, so only path casing can differ legitimately).
+  const normalized = raw.map((u) => {
+    const parsed = new URL(u);
+    const path = parsed.pathname.replace(/\/+$/, "") || "/";
+    return `${parsed.origin}${path}${parsed.search}`;
+  });
+  const unique = [...new Set(normalized)];
+  const urls = unique.slice(0, MAX_URLS);
 
   recentCalls.push(now);
 
@@ -150,10 +159,12 @@ export async function POST(req: NextRequest) {
         status: res.status,
         ok,
         submitted: urls.length,
-        deduped: raw.length - new Set(raw).size,
+        deduped: raw.length - unique.length,
         // Caller-visible so a >MAX_URLS batch can't silently drop URLs.
-        truncated: raw.length > MAX_URLS,
-        dropped: Math.max(0, new Set(raw).size - urls.length),
+        // Both are computed on the post-dedupe unique count — raw-input
+        // size alone would over-report when duplicates push past the cap.
+        dropped: unique.length - urls.length,
+        truncated: unique.length > MAX_URLS,
       },
       { status: 200, headers: { "Cache-Control": "no-store" } },
     );

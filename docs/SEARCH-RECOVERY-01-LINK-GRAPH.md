@@ -11,7 +11,7 @@
 | `/board/[window]` table | `LeaderboardTable` `/user/${codename}` (3 row variants) | `getLeaderboard({claimedOnly:true})` — board pages server-filter | **No** | Yes — board rows are claimed; see edge case ↓ | — |
 | `/board/[window]` JSON-LD | `leaderboardItemList()` in `lib/jsonld.ts` | same `claimedOnly` feed (`jsonLdEntries`) | **No** | Yes | **Yes — ItemList of `/user/` URLs** |
 | `/hall` — all-time scope | `HallClient` / `HallContentClient` href | `getLeaderboard` → server filter `claimed && !retired` | **No** | Yes | No (breadcrumb + FAQ only) |
-| `/hall` — 7d/30d/90d scopes | same emitters | `getLeaderboard({window, windowFilter:true, limit:50})` — **no claimed filter** | **YES ⚠** | Possibly `noindex` targets | No |
+| `/hall` — 7d/30d/90d scopes | same emitters | `getLeaderboard({window, windowFilter:true, limit:50})` + server `claimed && !retired` filter (fixed in closeout) | **No** ✓ | Yes | No |
 | `MetricTopTen` (Hall boards) | `HallSubmissionRow` href | rows from `windowsData` incl. `isPlaceholder` | **No** ✓ — placeholder rows emit no `href` (fixed in closeout) | Real rows only → indexable targets possible | No |
 | Footer (sitewide) | static link `/user/the-field` | hardcoded | Yes — special pseudo-operator | `noindex,follow` ✓ (verified live) | No |
 | `/user/[codename]` self | `operatorProfile` JSON-LD `path` | the profile itself | n/a | Self-canonical | Yes — ProfilePage on its own page |
@@ -27,7 +27,7 @@ Board surfaces filter `claimed`, but the index contract is `claimed ∧ ¬retire
 
 ## Findings — status
 
-1. **Hall non-all-time windows** (`windowsData`/`windowsDataAll` for 7d/30d/90d) carry `liveRows` with no `claimed` filter — the exact gap the addendum flagged. Rows are recency-filtered (`windowFilter: true`), which incidentally excludes static seeds, but nothing enforces `claimed` — a live unclaimed submission appears and its `/user/` href points at a `noindex` target. **Deferred to Phase 2** (nav/link-graph work is frozen under §L; documented here and in NAV-DESIGN.md). Fix: apply the same `claimed && !retired` filter (or the shared indexing policy) before client serialization.
+1. **Hall non-all-time windows — FIXED in this closeout.** `windowsData`/`windowsDataAll` for 7d/30d/90d now apply the same server-side `claimed && !retired` filter the `all_time` branch already used — matching the page's own copy ("claimed operators … only real users are in the record book") and the §D rule that search-authority surfaces preferentially describe the live/indexable population. Unclaimed live submissions no longer render `/user/` links to `noindex` targets.
 2. **`MetricTopTen` placeholder rows — FIXED in this closeout.** `isPlaceholder` rows render the display name without `href`, so no synthetic codename can mint a dead `/user/<codename>` link. Real rows keep the profile link.
 3. **`/user/the-field` sitewide footer link** — retained deliberately: The Field is the canonical aggregate persona used by `/compare`; page is `noindex,follow`. Documented reason; keep.
 4. **JSON-LD hygiene ✓** — `leaderboardItemList` draws from the claimed-only feed; `operatorProfile` emits only the profile's own URL; no dead operator URLs found in machine-readable output. Organization `logo` present (`/og-v2.png`, HTTP 200 verified).

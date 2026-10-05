@@ -166,8 +166,13 @@ test("sitemap does not emit generation-time or shared-fallback lastmod", async (
 });
 
 test("sitemap applies the shared indexing policy", async () => {
+  // Real wiring: sitemap delegates to sitemap-entries, which calls the shared
+  // operatorSitemapEntry() policy — not a prose mention, the call chain.
   const sitemap = await source("app/sitemap.ts");
-  assert.match(sitemap, /seo\/indexing-policy/);
+  assert.match(sitemap, /operatorSitemapEntries/);
+  const entries = await source("lib/seo/sitemap-entries.ts");
+  assert.match(entries, /operatorSitemapEntry\(/);
+  assert.match(entries, /from "\.\/indexing-policy\.ts"/);
 });
 
 test("profile page applies the shared indexing policy to robots metadata", async () => {
@@ -289,7 +294,7 @@ test("emitted sitemap URLs satisfy the structural invariants (CI gate)", () => {
   const siteHost = new URL(ORIGIN).host;
   const utilityPrefixes = [
     "/auth", "/login", "/logout", "/settings", "/account", "/me",
-    "/api/", "/admin", "/onboarding", "/claim",
+    "/api", "/admin", "/onboarding", "/claim",
   ];
   for (const u of emittedStaticPlusBoardUrls()) {
     const parsed = new URL(u);
@@ -302,6 +307,28 @@ test("emitted sitemap URLs satisfy the structural invariants (CI gate)", () => {
         `${u} is a utility/auth/internal route`,
       );
     }
+  }
+});
+
+test("utility-prefix guard actually fires (no dead prefixes)", () => {
+  // Regression: a trailing-slash prefix ("/api/") composes to
+  // startsWith("/api//") — never matches, silently disabling the guard.
+  // Assert the predicate catches representative paths and no prefix is
+  // stored with a trailing slash (scripts/validate-sitemap.mjs shares the list).
+  const utilityPrefixes = [
+    "/auth", "/login", "/logout", "/settings", "/account", "/me",
+    "/api", "/admin", "/onboarding", "/claim",
+  ];
+  for (const p of utilityPrefixes) {
+    assert.ok(!p.endsWith("/"), `prefix ${p} has a trailing slash — dead guard`);
+  }
+  const isUtility = (path) =>
+    utilityPrefixes.some((p) => path === p || path.startsWith(p + "/"));
+  for (const path of ["/api/v1/leaderboard", "/api", "/auth/callback", "/admin"]) {
+    assert.ok(isUtility(path), `${path} must be caught by the utility guard`);
+  }
+  for (const path of ["/metrics", "/apple-touch-icon", "/wiki/apis"]) {
+    assert.ok(!isUtility(path), `${path} must NOT be caught`);
   }
 });
 
@@ -331,7 +358,7 @@ test("indexnow endpoint rejects URLs outside SITE_ORIGIN", async () => {
 
 test("indexnow endpoint dedupes and caps the batch", async () => {
   const src = await source("app/api/indexnow/route.ts");
-  assert.match(src, /new Set\(raw\)/);
+  assert.match(src, /new Set\(normalized\)/); // dedupe on normalized URLs
   assert.match(src, /slice\(0, MAX_URLS\)/);
 });
 

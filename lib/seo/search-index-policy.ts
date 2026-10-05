@@ -64,7 +64,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/faq": "SUPPORTED",
   "/learn": "SUPPORTED",
   "/developers": "SUPPORTED",
-  "/fieldhub": "SUPPORTED", // flag-coupled: a PostHog flag can 404 this route — sitemap:validate --live will catch it if the flag flips
+  "/fieldhub": "HOLD", // flag-gated behind PostHog `fieldhub-page` — can 404; keep unadvertised until the flag ships permanently, then promote + revalidatePath("/sitemap.xml")
   "/platforms": "SUPPORTED",
   "/standard/open-vs-proprietary": "SUPPORTED",
   "/ai-coding-metrics": "SUPPORTED",

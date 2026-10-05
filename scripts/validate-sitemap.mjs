@@ -46,7 +46,7 @@ const CONCURRENCY = 8;
 
 const UTILITY_PREFIXES = [
   "/auth", "/login", "/logout", "/settings", "/account", "/me",
-  "/api/", "/admin", "/onboarding", "/claim",
+  "/api", "/admin", "/onboarding", "/claim",
 ];
 
 function fail(msg, violations) {
@@ -125,8 +125,10 @@ async function main() {
     for (let i = 0; i < urls.length; i += CONCURRENCY) {
       await Promise.all(
         urls.slice(i, i + CONCURRENCY).map(async (u) => {
-          const fetchUrl = baseOrigin + new URL(u).pathname;
           try {
+            // Malformed locs were already reported under the host invariant.
+            if (malformed.has(u)) return;
+            const fetchUrl = baseOrigin + new URL(u).pathname;
             const r = await fetch(fetchUrl, { redirect: "manual" });
             if (r.status >= 300 && r.status < 400) {
               results.redirected.push(`${u} → ${r.headers.get("location")}`);
