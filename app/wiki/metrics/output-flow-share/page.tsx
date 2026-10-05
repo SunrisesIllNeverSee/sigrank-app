@@ -82,7 +82,7 @@ export default function OutputFlowSharePage() {
             cache-heavy workflows.
           </>
         }
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         lineage={<>SigRank composition analysis, cascade ontology. Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</>}
         crossRefs={crossRefs}
         lastUpdated="2026-09-01"

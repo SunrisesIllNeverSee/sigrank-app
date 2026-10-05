@@ -48,7 +48,7 @@ export default function VercelPage() {
         {[
           ["Install", "Point any Streamable-HTTP MCP client at the canonical SignalAF endpoint. No local install is required for the remote toolset."],
           ["Deploy", "Create a Vercel-owned MCP URL backed by the canonical SigRank remote server, without copying metric logic or maintaining a fork."],
-          ["Evaluate", "Score cascades, benchmark operators, compare signatures, diagnose inefficiency, and expose portable SigRank Standard records to agents."],
+          ["Evaluate", "Score cascades, benchmark operators, compare signatures, diagnose inefficiency, and expose portable TTEOP (Token Telemetry Evaluation Operator Protocol) records to agents."],
         ].map(([title, body]) => (
           <div key={title} className="rounded-xl border border-bg-border bg-bg-surface p-5">
             <h2 className="font-mono text-lg font-bold text-text-primary">{title}</h2>

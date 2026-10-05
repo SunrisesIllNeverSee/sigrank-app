@@ -40,7 +40,7 @@ export default function TaskConditioningPage() {
         summary="Whether metrics are conditioned by task type — different tasks may produce systematically different metric profiles regardless of operator skill."
         category="validation"
         evidenceLevel="concept"
-        specVersion="SigRank Standard v1.0 (proposed)"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft (proposed)"
         definition={
           <>
             Whether metrics are conditioned by task type — different tasks may

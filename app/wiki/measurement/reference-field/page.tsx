@@ -40,7 +40,7 @@ export default function ReferenceFieldPage() {
         summary="The full population of operators against which any individual or cohort is compared — the benchmark population."
         category="measurement"
         evidenceLevel="repeated-experiment"
-        specVersion="SigRank Standard v1.0"
+        specVersion="TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft"
         definition={
           <>
             The full population of operators against which any individual or
