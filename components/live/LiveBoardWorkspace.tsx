@@ -78,10 +78,11 @@ import {
   RadarChart,
   SharePreview,
 } from "./OperatorDock";
-import { PixelIcon } from "./PixelIcon";
+import { RailIcon, ICON_SETS } from "./PixelIcon";
+import type { IconSetName } from "./PixelIcon";
 import { PixelBadge, badgeForPct } from "./PixelBadge";
 import { RotatingMovers } from "./MoversRail";
-import { HallSpot, hallRows } from "./HallRail";
+import { HallSpot, Medal, hallRows } from "./HallRail";
 import {
   COMPARE_CTA,
   COMPARE_SLOTS,
@@ -158,14 +159,11 @@ type RailId =
 /* Owner 2026-10-06 (second pass): profile module ↔ top movers swapped —
    movers sit in the left sidebar under the banner; the operator profile
    lives in the inspector rail at movers' old slot. */
-const BASE_RAIL_ORDER: RailId[] = [
-  "share",
-  "profile",
-  "compare",
-  "field",
-  "hall",
-  "soon",
-];
+/* Third pass (2026-10-06): global stats leave both sidebars entirely
+   (owner defers them) — "field"/HOT STATS and the compare module exit
+   the inspector; compare moved to the left sidebar. Inspector = share,
+   profile, hall, recents/soon. */
+const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "hall", "soon"];
 const RAIL_TITLE: Record<RailId, string> = {
   profile: "OPERATOR PROFILE",
   field: "HOT STATS",
@@ -569,6 +567,14 @@ export function LiveBoardWorkspace({
     [],
   );
   const [cmpQ, setCmpQ] = useState("");
+  /* icon-set switcher (owner: "toggle through the icons — all 4 or 5
+     sets") — cycles pixel / glyph / emoji / minimal / hex-badge rail
+     treatments; defaults to the brand pixel set. */
+  const [iconSet, setIconSet] = useState<IconSetName>("pixel");
+  const [notifOpen, setNotifOpen] = useState(false);
+  /* coming-soon votes (owner: "vote button for which gets built first") —
+     local tally; wire to a real vote surface when one exists. */
+  const [soonVotes, setSoonVotes] = useState<Record<string, number>>({});
   /* Adjustable sidebars (owner 2026-10-06): the ear-flap on each panel's
      inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
      vars on .lbw-root; a sub-4px click counts as collapse instead. */
@@ -816,7 +822,6 @@ export function LiveBoardWorkspace({
     ? `live data · synced ${initial.meta.generatedAt}`
     : "fixture data";
 
-  const emStat = (field: string) => field === "top_yield";
 
   const railBody = (id: RailId) => {
     switch (id) {
@@ -830,9 +835,9 @@ export function LiveBoardWorkspace({
                 type="button"
                 className="btn ghost profile-feature"
                 onClick={toggleDock}
-                title="float the operator card over the board"
+                title="pop the operator card out over the board"
               >
-                ⇄ FEATURE
+                ⇄ POP OUT
               </button>
               <OperatorProfileTile d={profile} />
               <div className="lside-radar">
@@ -845,6 +850,23 @@ export function LiveBoardWorkspace({
               {/* trophies → earned block badges (owner: "medal count shows
                   in op profile, so this can become badges") — verified +
                   percentile + milestone badges from the pack's system. */}
+              {/* medal counter (owner): rank-1/2/3 record medals tallied
+                  from the operator's records. */}
+              <div className="medalct mono">
+                {(() => {
+                  const recs = selOp?.recs ?? [];
+                  const g = recs.filter((r) => r.rank === 1).length;
+                  const s = recs.filter((r) => r.rank === 2).length;
+                  const b = recs.filter((r) => r.rank === 3).length;
+                  return (
+                    <>
+                      <span className="mc g">🥇 {g}</span>
+                      <span className="mc s">🥈 {s}</span>
+                      <span className="mc b">🥉 {b}</span>
+                    </>
+                  );
+                })()}
+              </div>
               <div className="trph-h">BADGES</div>
               <div className="pxbadges">
                 {isVerifiedOp(selOp?.verif) && (
@@ -879,9 +901,9 @@ export function LiveBoardWorkspace({
               type="button"
               className="btn ghost lside-redock"
               onClick={toggleDock}
-              title="re-dock the operator card"
+              title="dock the operator card back into the profile module"
             >
-              ⇄ FLOATING — RE-DOCK
+              ⇄ POPPED OUT — DOCK IT
             </button>
           )
         ) : (
@@ -892,11 +914,44 @@ export function LiveBoardWorkspace({
            the banner strip — the rail module now rotates one stat at a
            time from the same source, so nothing repeats visually. */
         return <HotStats stats={initial.fieldStats} />;
-      case "hall":
-        /* Hall spotlight (owner): randomize record-holding operators and
-           show their profile graphic — a rotating spotlight tile rather
-           than the static hex row. */
-        return <HallSpot rows={hall} onSelect={handleSelect} />;
+      case "hall": {
+        /* Hall spotlight + medal tally (owner 2026-10-06: hall of signal
+           = who holds the most gold/silver/bronze trophies). The tally
+           counts record entries per operator in the hall feed — position
+           medal colors (gold/silver/bronze) mark the standing. */
+        const tally = new Map<number, number>();
+        hall.forEach((h) => {
+          if (h.opIndex != null && h.opIndex >= 0)
+            tally.set(h.opIndex, (tally.get(h.opIndex) ?? 0) + 1);
+        });
+        const podium = [...tally.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4);
+        return (
+          <>
+            <HallSpot rows={hall} onSelect={handleSelect} />
+            <div className="soon-h">MEDAL COUNT</div>
+            {podium.length ? (
+              podium.map(([k, n], i) => (
+                <button
+                  key={k}
+                  type="button"
+                  className="hst-r"
+                  onClick={() => handleSelect(k)}
+                >
+                  <Medal i={i} />
+                  <span className="tm">{ops[k]?.name ?? "—"}</span>
+                  <span className="tv mono">
+                    {n} record{n === 1 ? "" : "s"}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p className="drill-note">— NO RECORDS IN SCOPE</p>
+            )}
+          </>
+        );
+      }
       case "compare": {
         /* compare-add-by-search (owner): typing an operator offers the
            match as the second slot — view their profile or carry the
@@ -1028,23 +1083,39 @@ export function LiveBoardWorkspace({
               <p className="drill-note">— SELECT AN OPERATOR</p>
             )}
             <div className="soon-h">COMING SOON</div>
-            {/* owner: 3 icon tiles + the coming-soon explanation (was a flat
-                chip list). */}
-            <div className="soonchips">
+            {/* owner (pass 3): each candidate gets a mockup description +
+                a vote button — which ships first is decided by votes. */}
+            <div className="soonlist">
               {(
                 [
-                  ["👥", "TEAMS"],
-                  ["⚔", "COMPS"],
-                  ["🏁", "HACKS"],
+                  ["👥", "TEAMS", "squad boards + shared stats"],
+                  ["⚔", "COMPS", "timed session competitions"],
+                  ["🏁", "HACKS", "build sprints + vs brackets"],
+                  ["🥊", "VERSUS", "head-to-head operator duels"],
                 ] as const
-              ).map(([g, x]) => (
-                <span key={x} className="soonchip" title={`${x} — coming soon`}>
-                  <i aria-hidden>{g}</i>
-                  {x}
-                </span>
+              ).map(([g, x, d]) => (
+                <div key={x} className="soonrow">
+                  <span className="soon-ic" aria-hidden>
+                    {g}
+                  </span>
+                  <span className="soon-tx">
+                    <b>{x}</b>
+                    <em>{d}</em>
+                  </span>
+                  <button
+                    type="button"
+                    className="vote"
+                    title={`vote for ${x.toLowerCase()} to ship first`}
+                    aria-label={`vote for ${x}`}
+                    onClick={() =>
+                      setSoonVotes((v) => ({ ...v, [x]: (v[x] ?? 0) + 1 }))
+                    }
+                  >
+                    ▲ {soonVotes[x] ?? 0}
+                  </button>
+                </div>
               ))}
             </div>
-            <p className="soon-cap">TEAMS · SESSION COMPS · HACKS · VERSUS — in the lab</p>
           </>
         );
     }
@@ -1092,23 +1163,23 @@ export function LiveBoardWorkspace({
                 stageRef.current?.scrollTo({ top: 0 });
               }}
             >
-              <PixelIcon name="board" />
+              <RailIcon name="board" set={iconSet} />
             </button>
             <Link className="sbtn" href="/compare" data-tip="COMPARE" title="COMPARE">
-              <PixelIcon name="compare" />
+              <RailIcon name="compare" set={iconSet} />
             </Link>
             <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
-              <PixelIcon name="hall" />
+              <RailIcon name="hall" set={iconSet} />
             </Link>
             <Link className="sbtn" href="/field" data-tip="FIELD" title="FIELD">
-              <PixelIcon name="field" />
+              <RailIcon name="field" set={iconSet} />
             </Link>
             <span className="snav-sep" aria-hidden="true"></span>
             <Link className="sbtn" href="/wiki" data-tip="WIKI" title="WIKI">
-              <PixelIcon name="wiki" />
+              <RailIcon name="wiki" set={iconSet} />
             </Link>
             <Link className="sbtn" href="/blog" data-tip="BLOG" title="BLOG">
-              <PixelIcon name="blog" />
+              <RailIcon name="blog" set={iconSet} />
             </Link>
             <button
               type="button"
@@ -1121,7 +1192,7 @@ export function LiveBoardWorkspace({
                 setEpromoOpen((v) => !v);
               }}
             >
-              <PixelIcon name="enterprise" />
+              <RailIcon name="enterprise" set={iconSet} />
             </button>
             {/* owner (2026-10-06): /enterprise doesn't exist — the icon
                 opens a promo card (EKG demo video + blurb → /upsilon). */}
@@ -1160,6 +1231,39 @@ export function LiveBoardWorkspace({
                 </svg>
               </button>
             )}
+            {/* icon-set cycler (owner: "toggle through the icons — all
+                4 or 5 sets"): pixel → glyph → emoji → minimal → hex. */}
+            <button
+              type="button"
+              className="sbtn laybtn"
+              data-tip={`ICON SET · ${iconSet.toUpperCase()}`}
+              title={`rail icons: ${iconSet} — tap to cycle the five sets`}
+              onClick={() =>
+                setIconSet(
+                  ICON_SETS[(ICON_SETS.indexOf(iconSet) + 1) % ICON_SETS.length],
+                )
+              }
+            >
+              <span className="gi">⟳</span>
+            </button>
+            {/* notification bell (owner): placeholder popover until the
+                notifications/settings surface exists. */}
+            <button
+              type="button"
+              className="sbtn laybtn"
+              data-tip="NOTIFICATIONS"
+              title="notifications"
+              aria-expanded={notifOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                setNotifOpen((v) => !v);
+              }}
+            >
+              <span className="gi">🔔</span>
+            </button>
+            <div className="notifpop" hidden={!notifOpen}>
+              <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>
+            </div>
             <div className="themesw">
               {THEMES.map((t) => (
                 <button
@@ -1175,6 +1279,10 @@ export function LiveBoardWorkspace({
               ))}
             </div>
             <div className="sacct" ref={acctRef}>
+              {/* owner: neutral mark when signed out; when signed in the
+                  avatar becomes the user's highest achieved block badge.
+                  TODO(wire): map acct → operator badge tier when the
+                  account payload carries pct/verif. */}
               <button
                 className="avatar"
                 title="account — settings"
@@ -1184,7 +1292,11 @@ export function LiveBoardWorkspace({
                   setAcctPop((v) => !v);
                 }}
               >
-                {acctInitials}
+                {acct.mode === "in" ? (
+                  <PixelBadge name="verified" />
+                ) : (
+                  acctInitials
+                )}
               </button>
               <div className="acctpop" hidden={!acctPop}>
                 {acct.mode === "out" && (
@@ -1255,29 +1367,18 @@ export function LiveBoardWorkspace({
               >
                 ◂
               </button>
-              <div className="railhead">SIGNALAF</div>
+              <div className="railhead">OPERATOR</div>
               <div className="rail">
                 <div className="mod">
                   <h3>
                     <span className="sq"></span>BANNER
                   </h3>
+                  {/* owner: global stats deferred — banner is the kicker
+                      text only; the field-stats strip is out of both
+                      sidebars until the stats review. */}
                   <div className="lside-banner">
-                    {/* owner: drop the duplicated hero title — the title bar
-                        already says it; the banner mod is kicker + stats. */}
                     <section className="hero">
                       <div className="kicker">{COPY.heroKicker}</div>
-                    </section>
-                    <section className="strip">
-                      {initial.fieldStats.map((s) => (
-                        <div className="cell" key={s.field}>
-                          <div className="v">
-                            {emStat(s.field) ? <em>{s.value}</em> : s.value}
-                          </div>
-                          <div className="l">
-                            {s.field.replace(/_/g, " ").toUpperCase()}
-                          </div>
-                        </div>
-                      ))}
                     </section>
                   </div>
                 </div>
@@ -1294,16 +1395,22 @@ export function LiveBoardWorkspace({
                     onSelect={handleSelect}
                   />
                 </div>
+                {/* owner (annotation pass 3): "add compare to this side" —
+                    the compare module joins the left sidebar. */}
+                <div className="mod">
+                  <h3>
+                    <span className="sq"></span>COMPARE OPERATORS
+                  </h3>
+                  {railBody("compare")}
+                </div>
               </div>
             </aside>
 
             <div className="stagecol">
               {/* page title — stage top, centered over the board column
                   (the top chrome bar is gone; the title is the page h1). */}
-              <h1 className="pagetitle stitle">
-                {COPY.heroTitleA}
-                <em>{COPY.heroTitleB}</em>
-              </h1>
+              <div className="stitle"><span className="srk-tag">SIGRANK</span>
+                <h1 className="pagetitle">{COPY.heroTitleA}<em>{COPY.heroTitleB}</em></h1></div>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
                 <div className="seg">

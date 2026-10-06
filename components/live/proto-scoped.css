@@ -825,3 +825,58 @@
   color:var(--ac);overflow:hidden;flex-shrink:0}
 .lbw-root .rav img{width:100%;height:100%;object-fit:cover;display:block}
 .lbw-root .profile-feature{margin:0 0 8px;width:100%}
+
+/* --- annotation pass 3 (2026-10-06) --- */
+/* stitle: SIGRANK tag + centered title strip */
+.lbw-root .stitle{display:flex;align-items:baseline;justify-content:center;gap:8px;
+  padding:10px 0 4px}
+.lbw-root .srk-tag{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.24em;
+  color:var(--mut);border:1px solid var(--line2);border-radius:4px;padding:2px 6px}
+/* medal counter (profile) */
+.lbw-root .medalct{display:flex;gap:10px;font-size:9.5px;margin:2px 0 6px}
+.lbw-root .mc.g{color:#e8b93c}.lbw-root .mc.s{color:#c8cdd8}.lbw-root .mc.b{color:#c98a4b}
+/* hall medal tally rows */
+.lbw-root .hst-r{display:flex;align-items:center;gap:8px;width:100%;
+  padding:4px 2px;text-align:left;color:var(--tx2);font-family:var(--font-mono);
+  font-size:9.5px;letter-spacing:.06em;border-radius:5px}
+.lbw-root .hst-r:hover{background:var(--chip);color:var(--tx)}
+.lbw-root .hst-r .tm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;text-transform:uppercase}
+.lbw-root .hst-r .tv{color:var(--mut);flex-shrink:0}
+.lbw-root .hst-r svg{width:15px;height:17px;flex-shrink:0}
+/* share preview — two-card pair (graphic + stats) */
+.lbw-root .sharepair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.lbw-root .sharecard{border:1px solid var(--line);border-radius:9px;
+  background:var(--panel);padding:10px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;min-height:104px}
+.lbw-root .sharecard .sharemark{margin-bottom:6px}
+.lbw-root .sharecard .rk{font-size:20px;font-weight:700;color:var(--ac)}
+/* coming-soon rows with vote buttons */
+.lbw-root .soonlist{display:flex;flex-direction:column;gap:6px}
+.lbw-root .soonrow{display:flex;align-items:center;gap:8px;border:1px dashed var(--line2);
+  border-radius:7px;padding:7px 8px}
+.lbw-root .soon-ic{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.lbw-root .soon-tx{flex:1;min-width:0}
+.lbw-root .soon-tx b{display:block;font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.14em;color:var(--tx2);font-weight:600}
+.lbw-root .soon-tx em{display:block;font-style:normal;font-family:var(--font-mono);
+  font-size:8px;letter-spacing:.04em;color:var(--mut)}
+.lbw-root .vote{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.1em;
+  color:var(--mut);border:1px solid var(--line2);border-radius:5px;
+  padding:3px 7px;flex-shrink:0}
+.lbw-root .vote:hover{color:var(--ac);border-color:var(--ac)}
+/* notification popover — rail-bottom sheet like the account popover */
+.lbw-root .srail{position:relative}
+.lbw-root .notifpop{position:absolute;left:56px;bottom:96px;z-index:60;
+  background:var(--panel);border:1px solid var(--line2);border-radius:8px;
+  padding:8px 12px;white-space:nowrap;font-family:var(--font-mono);
+  font-size:9.5px;color:var(--mut);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+/* fixed select widths (owner: selects must not reflow on zoom/resize) */
+.lbw-root .fbar select{width:122px;flex-shrink:0}
+.lbw-root .fbar .fsrch{width:170px}
+/* hex badge icon set — glyph inside a hexagon ring */
+.lbw-root .hexic{display:inline-grid;place-items:center;width:26px;height:28px}
+.lbw-root .hexic::before{content:"";position:absolute;inset:0;
+  clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+  background:var(--chip)}
+.lbw-root .hexic span{position:relative;font-size:11px}
