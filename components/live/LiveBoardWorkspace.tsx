@@ -72,6 +72,7 @@ import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
 import { EnterprisePromoPop } from "./EnterprisePromo";
 import {
+  FIELD_MAX_RADAR,
   OperatorDock,
   OperatorProfileTile,
   RadarChart,
@@ -302,16 +303,20 @@ export function LiveBoardWorkspace({
   /* sortFlip = header-click direction toggle (owner: sortable columns);
      re-clicking the active column flips asc/desc off SORT_ASC's default. */
   const [sortFlip, setSortFlip] = useState(false);
-  const onSortColumn = useCallback((key: string) => {
-    setSortSel((prev) => {
-      if (prev === key) {
+  /* Fix (owner report 2026-10-06): never call setSortFlip inside the
+     setSortSel updater — StrictMode double-invokes updaters in dev, so the
+     flip fired twice and cancelled itself (columns never reversed). */
+  const onSortColumn = useCallback(
+    (key: string) => {
+      if (key === sortSel) {
         setSortFlip((f) => !f);
-        return prev;
+      } else {
+        setSortSel(key);
+        setSortFlip(false);
       }
-      setSortFlip(false);
-      return key;
-    });
-  }, []);
+    },
+    [sortSel],
+  );
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   /* The reference's ops/outlier pill pair is now the workflow filter (owner:
@@ -558,6 +563,39 @@ export function LiveBoardWorkspace({
     [],
   );
   const [cmpQ, setCmpQ] = useState("");
+  /* Adjustable sidebars (owner 2026-10-06): the ear-flap on each panel's
+     inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
+     vars on .lbw-root; a sub-4px click counts as collapse instead. */
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const onDrag = useCallback(
+    (side: "l" | "r") => (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      const root = rootRef.current;
+      if (!root) return;
+      const el = e.currentTarget.parentElement as HTMLElement;
+      const startX = e.clientX;
+      const startW = el.getBoundingClientRect().width;
+      const varName = side === "l" ? "--lside-w" : "--rail-w";
+      const move = (ev: PointerEvent) => {
+        const dx = ev.clientX - startX;
+        const w = Math.round(
+          Math.min(480, Math.max(180, side === "l" ? startW + dx : startW - dx)),
+        );
+        root.style.setProperty(varName, `${w}px`);
+      };
+      const up = (ev: PointerEvent) => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        if (Math.abs(ev.clientX - startX) < 4) {
+          if (side === "l") setLeftOn(false);
+          else setRailOn(false);
+        }
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    },
+    [],
+  );
   const stageRef = useRef<HTMLElement | null>(null);
   const acctRef = useRef<HTMLDivElement | null>(null);
   const snavRef = useRef<HTMLElement | null>(null);
@@ -819,7 +857,15 @@ export function LiveBoardWorkspace({
                     title={slotOp ? slotOp.name : "add an operator"}
                   >
                     {slotOp ? (
-                      <span className="cav">{slotOp.name[0]}</span>
+                      <span className="cav">
+                        {slotOp.avatarUrl ? (
+                          /* eslint-disable-next-line @next/next/no-img-element --
+                             operator avatar URL; 26px fixed tile */
+                          <img src={slotOp.avatarUrl} alt="" loading="lazy" />
+                        ) : (
+                          slotOp.name[0]
+                        )}
+                      </span>
                     ) : (
                       "+"
                     )}
@@ -897,13 +943,23 @@ export function LiveBoardWorkspace({
               <p className="drill-note">— SELECT AN OPERATOR</p>
             )}
             <div className="soon-h">COMING SOON</div>
+            {/* owner: 3 icon tiles + the coming-soon explanation (was a flat
+                chip list). */}
             <div className="soonchips">
-              {["TEAMS", "SESSION COMPS", "HACKS", "VERSUS"].map((x) => (
-                <span key={x} className="soonchip" title="coming soon">
+              {(
+                [
+                  ["👥", "TEAMS"],
+                  ["⚔", "COMPS"],
+                  ["🏁", "HACKS"],
+                ] as const
+              ).map(([g, x]) => (
+                <span key={x} className="soonchip" title={`${x} — coming soon`}>
+                  <i aria-hidden>{g}</i>
                   {x}
                 </span>
               ))}
             </div>
+            <p className="soon-cap">TEAMS · SESSION COMPS · HACKS · VERSUS — in the lab</p>
           </>
         );
     }
@@ -911,6 +967,7 @@ export function LiveBoardWorkspace({
 
   return (
     <div
+      ref={rootRef}
       className={`lbw-root ${lbwFontVars}`}
       data-theme={theme}
       suppressHydrationWarning
@@ -936,6 +993,8 @@ export function LiveBoardWorkspace({
             </span>
           </Link>
           <nav className="snav" ref={snavRef}>
+            {/* icon set (owner 2026-10-06): semantic glyphs — ranked bars,
+                scales, trophy, radar rings, ledger, pen, hexagon. */}
             <button
               className="sbtn on"
               data-sec="board"
@@ -945,20 +1004,20 @@ export function LiveBoardWorkspace({
                 stageRef.current?.scrollTo({ top: 0 });
               }}
             >
-              <span className="gi">▦</span>
+              <span className="gi">▤</span>
             </button>
             <Link className="sbtn" href="/compare" data-tip="COMPARE" title="COMPARE">
-              <span className="gi">⇄</span>
+              <span className="gi">⚖</span>
             </Link>
             <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
               <span className="gi">🏆</span>
             </Link>
             <Link className="sbtn" href="/field" data-tip="FIELD" title="FIELD">
-              <span className="gi">◎</span>
+              <span className="gi">◉</span>
             </Link>
             <span className="snav-sep" aria-hidden="true"></span>
             <Link className="sbtn" href="/wiki" data-tip="WIKI" title="WIKI">
-              <span className="gi">▤</span>
+              <span className="gi">▥</span>
             </Link>
             <Link className="sbtn" href="/blog" data-tip="BLOG" title="BLOG">
               <span className="gi">✎</span>
@@ -974,7 +1033,7 @@ export function LiveBoardWorkspace({
                 setEpromoOpen((v) => !v);
               }}
             >
-              <span className="gi">▣</span>
+              <span className="gi">⬢</span>
             </button>
             {/* owner (2026-10-06): /enterprise doesn't exist — the icon
                 opens a promo card (EKG demo video + blurb → /upsilon). */}
@@ -1096,9 +1155,18 @@ export function LiveBoardWorkspace({
             {/* left sidebar (owner 2026-10-06): banner + operator profile —
                 VS Code side-panel anatomy, toggled by the title-bar glyph. */}
             <aside className="lside">
-              <div className="railhead">
-                <span className="sq"></span>SIGNALAF
-              </div>
+              {/* ear-flap (owner): ghost tab mid-edge — click collapses the
+                  sidebar, drag resizes it (VS Code sash pattern). */}
+              <button
+                type="button"
+                className="edge edge-l"
+                title="collapse sidebar · drag to resize"
+                aria-label="collapse left sidebar; drag to resize"
+                onPointerDown={onDrag("l")}
+              >
+                ◂
+              </button>
+              <div className="railhead">SIGNALAF</div>
               <div className="rail">
                 <div className="mod">
                   <h3>
@@ -1143,7 +1211,7 @@ export function LiveBoardWorkspace({
                         <div className="lside-radar">
                           <RadarChart
                             vals={profile.series}
-                            baseline={radarBaseline}
+                            baseline={radarBaseline ?? FIELD_MAX_RADAR}
                             size={150}
                           />
                         </div>
@@ -1456,10 +1524,16 @@ export function LiveBoardWorkspace({
             {/* right rail: heading + swappable modules (share, movers,
                 compare, field, hall — owner 2026-10-06 IA) */}
             <aside className="railcol">
-              <div className="railhead">
-                <span className="sq"></span>
-                {COPY.heroKicker}
-              </div>
+              <button
+                type="button"
+                className="edge edge-r"
+                title="collapse inspector · drag to resize"
+                aria-label="collapse inspector rail; drag to resize"
+                onPointerDown={onDrag("r")}
+              >
+                ▸
+              </button>
+              <div className="railhead">{COPY.heroKicker}</div>
               <div className="rail">
                 {visibleRail.map((id) =>
                   (
