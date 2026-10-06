@@ -35,6 +35,7 @@
  */
 import { memo } from "react";
 import "./board-cols.css";
+import { PixelBadge, badgeForPct } from "./PixelBadge";
 import type { LiveOperator } from "@/lib/board/live-types";
 import {
   avatarStyle,
@@ -307,6 +308,13 @@ export const BoardRow = memo(function BoardRow({
             ) : (
               o.name[0]
             )}
+            {/* verified badge — top-left corner of the avatar (owner:
+                block badges go in the corner + next to names) */}
+            {isVerifiedOp(o.verif) ? (
+              <span className="avbd">
+                <PixelBadge name="verified" />
+              </span>
+            ) : null}
           </span>
           <span>
             <span className="nm">
@@ -317,6 +325,15 @@ export const BoardRow = memo(function BoardRow({
                   <span className="vchk">✓</span>
                 </>
               ) : null}
+              {(() => {
+                const b = badgeForPct(o.pct);
+                return b ? (
+                  <>
+                    {" "}
+                    <PixelBadge name={b} />
+                  </>
+                ) : null;
+              })()}
             </span>
             <br />
             <span className="hd">

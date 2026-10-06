@@ -792,3 +792,13 @@
 /* share preview — brand mark top-left, flagship-card corner treatment */
 .lbw-root .shareprev .sharemark{display:block;width:22px;height:20px;margin:0 0 8px;
   image-rendering:pixelated}
+
+/* PixelBadge — 3x3 block badges from the brand pack (10_badge_system).
+   Inline next to names; .avbd pins the verified badge to the avatar's
+   top-left corner. */
+.lbw-root .pxbd{display:inline-grid;grid-template-columns:repeat(3,3px);
+  grid-auto-rows:3px;gap:1px;vertical-align:middle;flex-shrink:0}
+.lbw-root .pxbd i{display:block}
+.lbw-root .avbd{position:absolute;top:-4px;left:-4px;z-index:2;
+  filter:drop-shadow(0 0 2px var(--bg))}
+.lbw-root .av{position:relative;overflow:visible}

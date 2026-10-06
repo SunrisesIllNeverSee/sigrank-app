@@ -45,6 +45,7 @@ import {
 } from "./utils";
 import type { DetailStatus, LiveOperatorDetail } from "./enrich";
 import { DRILL_CAPS } from "./enrich";
+import { PixelBadge } from "./PixelBadge";
 import { Sparkline } from "./rows";
 /* dock-radar.css — the dual-radar chrome (owner directive 2026-10-06);
    travels with this module the way rail-extras.css rides EnterprisePromo. */
@@ -240,6 +241,11 @@ export function OperatorProfileTile({ d }: { d: ProfileView }) {
           ) : (
             d.name[0]
           )}
+          {isVerifiedOp(d.verif) ? (
+            <span className="avbd">
+              <PixelBadge name="verified" />
+            </span>
+          ) : null}
         </span>
         <div>
           <div className="pn">
