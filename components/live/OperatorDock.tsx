@@ -9,14 +9,21 @@
  * seven selected-operator sections from the contract (DATA_KEYS §11):
  *   OVERVIEW · CASCADE · ACTIVITY · TOOLS · HISTORY · RECORDS · SHARE
  * OVERVIEW reproduces the reference left pane verbatim; the other tabs
- * surface fields already present on LiveOperator (no fabricated data —
- * absent values render "—").
+ * surface fields already present on LiveOperator, overlaid with the WS-4
+ * enrichment payload — no fabricated data; absent values render "—".
  *
- * fetchDetail(codename) is optional: when supplied, the dock fetches the
- * operator detail once per selection (WS-4) and overlays it onto the row
- * fields for the drill tabs. The workspace renders standalone without it.
+ * Enrichment wiring (WS-4/2C): the WORKSPACE owns the fetch lifecycle (one
+ * session-cached fan-out per selected codename via enrich.ts) and hands the
+ * dock `detail` + `detailStatus`; the base LiveOperator it renders is already
+ * merged (mergeDetail) so verif/supporter/trend/recs reach every surface —
+ * the rail profile tile and the row's trend sparkline included. Failure never
+ * blanks the card: a failed channel leaves base field data visible and marks
+ * only its own surface via `detail.errors`.
+ *
+ * Verification mark: gated on real `verification_status` (verified/audited),
+ * never unconditional — the reference's @-handle heuristic is retired here.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import type {
   LiveOperator,
   LivePopulation,
@@ -26,9 +33,12 @@ import {
   RADAR_AXES,
   deltaBody,
   deltaUp,
+  isVerifiedOp,
   mvLabel,
   type ProfileView,
 } from "./utils";
+import type { DetailStatus, LiveOperatorDetail } from "./enrich";
+import { DRILL_CAPS } from "./enrich";
 import { Sparkline } from "./rows";
 
 export type DockTab =
@@ -151,7 +161,7 @@ export function OperatorProfileTile({ d }: { d: ProfileView }) {
         <span className="av">{d.name[0]}</span>
         <div>
           <div className="pn">
-            {d.name} <span className="vchk">✓</span>
+            {d.name} {isVerifiedOp(d.verif) && <span className="vchk">✓</span>}
           </div>
           <div className="ph">
             {d.handle.startsWith("@") ? d.handle : `· ${d.handle}`} · #{d.rank}
@@ -258,39 +268,125 @@ function ToolsTab({ o }: { o: LiveOperator }) {
         ]}
       />
       <p className="drill-note">
-        TOOL / MODEL / MCP USAGE PROJECTION — WIRES AT WS-4
+        TOOL · MODEL · MCP BREAKDOWN — no public projection yet (DATA_KEYS §11:
+        tool usage is measured locally; the workspace shows the account
+        context the API does expose).
       </p>
     </div>
   );
 }
 
-function HistoryTab({ o }: { o: LiveOperator }) {
+function HistoryTab({
+  o,
+  detail,
+  status,
+}: {
+  /** null when the featured card didn't resolve to a field row — detail
+   *  surfaces (trend/trajectory/ledger) still render from the API payload. */
+  o: LiveOperator | null;
+  detail: LiveOperatorDetail | null;
+  status: DetailStatus;
+}) {
+  const hist = detail?.history ?? [];
+  const snaps = detail?.snapshots ?? [];
+  const trend = detail?.trend ?? o?.trend ?? [];
   return (
     <div className="drill">
-      <DrillRows
-        rows={[
-          ["TREND POINTS", o.trend?.length ?? 0],
-          ["ACCOUNT AGE", `${o.age}d`],
-          ["MESSAGES", o.msgs.toLocaleString()],
-          ["∑ OBSERVED", o.total],
-          ["PERCENTILE", `${o.pct}`],
-        ]}
-      />
+      <Sparkline arr={trend} w={220} h={48} />
       <p className="drill-note">
-        HISTORY / TRAJECTORY SERIES — /api/v1/operators/{"{codename}"}/history
+        SCORE HISTORY · SIGNA RATE · {trend.length} PTS
+        {detail?.errors?.history ? " — SYNC FAILED" : ""}
       </p>
+      {o && (
+        <DrillRows
+          rows={[
+            ["ACCOUNT AGE", `${o.age}d`],
+            ["MESSAGES", o.msgs.toLocaleString()],
+            ["∑ OBSERVED", o.total],
+            ["PERCENTILE", `${o.pct}`],
+            ["LAST SNAPSHOT", dash(o.last)],
+          ]}
+        />
+      )}
+      {hist.length > 0 && (
+        <>
+          <p className="drill-note">RANK TRAJECTORY · {hist.length} SNAPSHOTS</p>
+          <DrillRows
+            rows={hist
+              .slice(-DRILL_CAPS.HISTORY_ROWS)
+              .reverse()
+              .map((p) => [
+                p.date,
+                `#${p.rank}`,
+                p.klass || undefined,
+              ])}
+          />
+        </>
+      )}
+      {detail?.snapshotEligible === true && (
+        <>
+          <p className="drill-note">SIGNED SNAPSHOT LEDGER</p>
+          {detail.errors?.snapshots ? (
+            <p className="drill-note">— SNAPSHOT LEDGER SYNC FAILED</p>
+          ) : snaps.length ? (
+            <DrillRows
+              rows={snaps.slice(0, DRILL_CAPS.SNAPSHOT_ROWS).map((s) => [
+                s.submittedAt.slice(0, 10),
+                s.yield_ == null ? "—" : trimYield(s.yield_),
+                s.platform,
+              ])}
+            />
+          ) : (
+            <p className="drill-note">— NO SCORED SUBMISSIONS</p>
+          )}
+        </>
+      )}
+      {detail && detail.snapshotEligible === false && (
+        <p className="drill-note">
+          SNAPSHOT LEDGER — CLAIMED OPERATORS ONLY
+        </p>
+      )}
+      {detail == null && status === "loading" && (
+        <p className="drill-note">⟳ SYNCING HISTORY…</p>
+      )}
+      {detail == null && status === "error" && (
+        <p className="drill-note">— HISTORY UNAVAILABLE · FIELD VALUES SHOWN</p>
+      )}
     </div>
   );
 }
 
-function RecordsTab({ o }: { o: LiveOperator }) {
-  if (!o.recs?.length) {
+/** Trim a snapshot-ledger yield to the compact board form. */
+function trimYield(v: number): string {
+  return v >= 1000 ? `${Math.round(v).toLocaleString("en-US")}` : v.toFixed(2);
+}
+
+function RecordsTab({
+  recs,
+  detail,
+  status,
+}: {
+  /** dynamic metric records — enriched `detail.recs` preferred, else the
+   *  base row's (empty by design until WS-4 lands). */
+  recs: LiveOperator["recs"] | undefined;
+  detail: LiveOperatorDetail | null;
+  status: DetailStatus;
+}) {
+  const dyn = recs ?? [];
+  const stat = detail?.recordsStatic ?? [];
+  if (!dyn.length && !stat.length) {
+    if (detail?.errors?.records)
+      return <p className="drill-note">— RECORDS SYNC FAILED</p>;
+    if (detail == null && status === "loading")
+      return <p className="drill-note">⟳ SYNCING RECORDS…</p>;
+    if (detail == null && status === "error")
+      return <p className="drill-note">— RECORDS UNAVAILABLE</p>;
     return <p className="drill-note">— NO RECORDS IN THIS SCOPE</p>;
   }
   return (
     <div className="srows" style={{ marginTop: 0 }}>
-      {o.recs.map((r, k) => (
-        <div className="srow" key={k}>
+      {dyn.map((r, k) => (
+        <div className="srow" key={`d${k}`}>
           <span className="sl2">{r.metric.toUpperCase()}</span>
           <span className="mono mut" style={{ fontSize: 9 }}>
             {r.window.toUpperCase()}
@@ -298,6 +394,15 @@ function RecordsTab({ o }: { o: LiveOperator }) {
           <span className="sv2">
             #{r.rank} · {r.value}
           </span>
+        </div>
+      ))}
+      {stat.map((r, k) => (
+        <div className="srow" key={`s${k}`}>
+          <span className="sl2">{r.title.toUpperCase()}</span>
+          <span className="mono mut" style={{ fontSize: 9 }}>
+            {`HALL${r.date ? ` · ${r.date.slice(0, 10)}` : ""}`}
+          </span>
+          <span className="sv2">{r.value}</span>
         </div>
       ))}
     </div>
@@ -310,42 +415,25 @@ export function OperatorDock({
   docked,
   onToggleDock,
   population,
-  fetchDetail,
+  detail = null,
+  detailStatus = "idle",
 }: {
   d: ProfileView;
   /** true → this card renders hidden; profile lives in the rail module. */
   docked: boolean;
   onToggleDock: () => void;
   population: LivePopulation;
-  fetchDetail?: (
-    codename: string,
-  ) => Promise<Partial<LiveOperator> | void> | Partial<LiveOperator> | void;
+  /** WS-4 enriched detail for the selected operator (null while loading /
+   *  on total failure). LiveOperator-shaped fields are already merged into
+   *  `d.op`; the detail object additionally carries history points, static
+   *  records, the claimed-only snapshot ledger, and per-channel errors. */
+  detail?: LiveOperatorDetail | null;
+  detailStatus?: DetailStatus;
 }) {
   const [tab, setTab] = useState<DockTab>("overview");
-  const [detail, setDetail] = useState<Partial<LiveOperator> | null>(null);
-  const codename = d.op?.codename ?? null;
-
-  /* WS-4 drill enrichment — optional; cached per selection inside the
-     component that mounts this dock (each selection re-mounts via key). */
-  useEffect(() => {
-    setDetail(null);
-    setTab("overview");
-    if (!fetchDetail || !codename) return;
-    let alive = true;
-    Promise.resolve(fetchDetail(codename))
-      .then((res) => {
-        if (alive && res) setDetail(res);
-      })
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, [fetchDetail, codename]);
-
-  const o = useMemo<LiveOperator | null>(
-    () => (d.op ? { ...d.op, ...(detail ?? {}) } : null),
-    [d.op, detail],
-  );
+  /* `d.op` is already the enriched merge — the workspace overlays detail
+     onto the ops row before profileFor runs, so base fields never blank. */
+  const o = d.op;
 
   const dirUp = deltaUp(d.delta);
   return (
@@ -375,13 +463,24 @@ export function OperatorDock({
             </button>
           ))}
         </div>
+        {detailStatus === "loading" && (
+          <p className="drill-note" role="status">
+            ⟳ OPERATOR DETAIL — SYNCING
+          </p>
+        )}
+        {detailStatus === "error" && (
+          <p className="drill-note" role="status">
+            — DETAIL SYNC UNAVAILABLE · FIELD VALUES SHOWN
+          </p>
+        )}
         {tab === "overview" && (
           <>
             <div className="feat-id">
               <span className="feat-av">{d.name[0]}</span>
               <div>
                 <div className="feat-name">
-                  {d.name} <span className="vchk">✓</span>
+                  {d.name}{" "}
+                  {isVerifiedOp(d.verif) && <span className="vchk">✓</span>}
                 </div>
                 <div className="mut mono" style={{ fontSize: 11 }}>
                   {d.handle.startsWith("@") ? d.handle : `· ${d.handle}`}
@@ -431,14 +530,22 @@ export function OperatorDock({
             <p className="drill-note">— FIELD DATA UNAVAILABLE</p>
           ))}
         {tab === "history" &&
-          (o ? (
-            <HistoryTab o={o} />
+          (o || detail ? (
+            <HistoryTab o={o} detail={detail} status={detailStatus} />
+          ) : detailStatus === "loading" ? (
+            <p className="drill-note">⟳ SYNCING HISTORY…</p>
           ) : (
             <p className="drill-note">— FIELD DATA UNAVAILABLE</p>
           ))}
         {tab === "records" &&
-          (o ? (
-            <RecordsTab o={o} />
+          (o || detail?.recs?.length || detail?.recordsStatic?.length ? (
+            <RecordsTab
+              recs={detail?.recs ?? o?.recs}
+              detail={detail}
+              status={detailStatus}
+            />
+          ) : detail == null && detailStatus === "loading" ? (
+            <p className="drill-note">⟳ SYNCING RECORDS…</p>
           ) : (
             <p className="drill-note">— FIELD DATA UNAVAILABLE</p>
           ))}

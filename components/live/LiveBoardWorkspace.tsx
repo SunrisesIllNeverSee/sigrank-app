@@ -17,8 +17,30 @@
  *     client-side over the supplied array (the prototype shipped the
  *     controls as chrome; the port wires the field-side ones: SORT/CLASS/
  *     PLATFORM/SEARCH; WINDOW is route-owned → onWindowChange)
- *   - fetchMore(page) / fetchDetail(codename) are optional async hooks for
- *     the WS-3/WS-4 wiring — the component is fully standalone on `initial`
+ *   - fetchMore(page) / fetchDetail(codename, hint) are optional async hooks
+ *     for the WS-3/WS-4 wiring — the component is fully standalone on
+ *     `initial`. fetchDetail defaults to createDetailFetcher(meta.window):
+ *     one session-cached fan-out per codename (profile + history + records,
+ *     +snapshot-history for claimed/public ops only — the route 404s
+ *     otherwise). The resolved detail merges onto the row via mergeDetail,
+ *     so verif/supporter/trend/recs reach the rail tile, the row sparkline
+ *     and every dock tab; per-channel failures surface as notes inside the
+ *     dock while base field data keeps rendering (the 1,649-call
+ *     bulk-history prototype pattern is banned — nothing prefetches).
+ *   - theme persistence (2C): ?theme= > lbw-theme localStorage > "green",
+ *     applied pre-paint by the LBW_THEME_INIT inline script; the reference
+ *     had no persistence (query param only). The site's own
+ *     documentElement data-theme stays untouched — scoped via
+ *     .lbw-root[data-theme].
+ *   - account chrome (2C): /api/auth/session via useBoardSession, the same
+ *     client-side pattern as AccountMenu/ProfileAuthGate — signed out →
+ *     SIGN IN → /login; signed-in-unlinked → CLAIM SIGNAL → /me; linked →
+ *     MY SIGNAL / SETTINGS / API KEYS / SIGN OUT (real signOut +
+ *     router.refresh). The `account` prop is a demo/QA override that skips
+ *     the session fetch entirely.
+ *   - COMPARE seeds /compare?a=<codename> from the selected operator (the
+ *     reference's in-board compare.html surface is not ported — the
+ *     canonical compare page carries that role).
  *
  * Nav note: the task spec fixes the X-rail nav to Leaderboard / Compare /
  * Hall / Field (reference-v1's inert PROFILE/WRAPPED buttons and the
@@ -47,17 +69,29 @@ import {
   COMPARE_SLOTS,
   CONTROLS,
   COPY,
+  LBW_THEME_INIT,
   SORT_ASC,
   SORT_KEY,
   THEMES,
   WINDOW_SLUG,
   computeTT,
+  persistLbwTheme,
   profileFor,
   rawRankMap,
+  resolveLbwTheme,
   rmaxOf,
   windowLabel,
   type ThemeName,
 } from "./utils";
+import {
+  createDetailFetcher,
+  detailFailed,
+  mergeDetail,
+  type DetailStatus,
+  type FetchDetail,
+  type LiveOperatorDetail,
+} from "./enrich";
+import { useBoardSession } from "./session";
 
 export interface LiveBoardWorkspaceProps {
   /** SSR payload — see lib/board/live-types.ts. */
@@ -66,13 +100,14 @@ export interface LiveBoardWorkspaceProps {
   fetchMore?: (
     page: number,
   ) => Promise<LiveOperator[] | void> | LiveOperator[] | void;
-  /** WS-4: fetch detail for the selected operator's drill tabs. */
-  fetchDetail?: (
-    codename: string,
-  ) => Promise<Partial<LiveOperator> | void> | Partial<LiveOperator> | void;
+  /** WS-4: fetch detail for the selected operator's drill tabs. Defaults to
+   *  createDetailFetcher(meta.window) — the session-cached same-origin fan
+   *  out in enrich.ts. Pass an explicit no-op/stub to stay fixture-pure. */
+  fetchDetail?: FetchDetail;
   /** WINDOW select override — default navigates to /board/<slug>. */
   onWindowChange?: (windowSlug: string) => void;
-  /** LB-01 account chrome (D-A01/D-A02 placeholder identity). */
+  /** Account chrome override (demo/QA). Omit → the real /api/auth/session
+   *  surface resolves (useBoardSession). */
   account?: { name: string; rank: string };
 }
 
@@ -89,32 +124,59 @@ const RAIL_TITLE: Record<RailId, string> = {
   share: "SHARE YOUR SIGNAL",
 };
 
-const DEFAULT_ACCOUNT = { name: "Alex Operator", rank: "#842" };
-
 export function LiveBoardWorkspace({
   initial,
   fetchMore,
   fetchDetail,
   onWindowChange,
-  account = DEFAULT_ACCOUNT,
+  account,
 }: LiveBoardWorkspaceProps) {
-  /* ---------- theme switch (LB-20) — ?theme= param, state lives on the
-     .lbw-root element's data-theme (prototype used documentElement; the
-     port scopes it so the site theme on <html> is untouched) ---------- */
-  const [theme, setTheme] = useState<ThemeName>(() => {
-    if (typeof window === "undefined") return "green";
-    const q = new URLSearchParams(window.location.search).get("theme");
-    return (THEMES as readonly string[]).includes(q ?? "")
-      ? (q as ThemeName)
-      : "green";
-  });
+  /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
+     "green"; state lives on .lbw-root's data-theme (the site's own
+     documentElement theme is never touched). LBW_THEME_INIT below rewrites
+     the SSR'd attribute pre-paint; clicks persist. ---------- */
+  const [theme, setTheme] = useState<ThemeName>(resolveLbwTheme);
 
   /* ---------- field data (all client-side over the supplied array) --- */
   const [extraOps, setExtraOps] = useState<LiveOperator[]>([]);
-  const ops = useMemo(
-    () => (extraOps.length ? [...initial.operators, ...extraOps] : initial.operators),
+  const baseOps = useMemo(
+    () =>
+      extraOps.length
+        ? [...initial.operators, ...extraOps]
+        : initial.operators,
     [initial.operators, extraOps],
   );
+
+  /* ---------- WS-4 drill-down enrichment (lazy, session-cached) ----------
+     One detail fan-out per `${window}:${codename}` — the same key the
+     enrich.ts session cache uses, so window switches re-resolve. Resolved
+     details overlay onto the base row (mergeDetail) so every surface sees
+     enriched fields uniformly. */
+  const [details, setDetails] = useState<
+    Record<string, { status: DetailStatus; detail?: LiveOperatorDetail }>
+  >({});
+  const defaultFetcher = useMemo(
+    () => createDetailFetcher(initial.meta.window),
+    [initial.meta.window],
+  );
+  const detailFetcher: FetchDetail = fetchDetail ?? defaultFetcher;
+  const detailKey = useCallback(
+    (codename: string) => `${initial.meta.window}:${codename}`,
+    [initial.meta.window],
+  );
+
+  const ops = useMemo(() => {
+    let touched = false;
+    const next = baseOps.map((o) => {
+      const e = details[detailKey(o.codename)];
+      if (e?.status === "ready" && e.detail) {
+        touched = true;
+        return mergeDetail(o, e.detail);
+      }
+      return o;
+    });
+    return touched ? next : baseOps;
+  }, [baseOps, details, detailKey]);
   const rmax = useMemo(() => rmaxOf(initial.fieldMax), [initial.fieldMax]);
   const tt = useMemo(() => computeTT(ops), [ops]);
   const rawRank = useMemo(() => rawRankMap(ops), [ops]);
@@ -141,6 +203,64 @@ export function LiveBoardWorkspace({
     () => profileFor(initial, ops, selected, rmax),
     [initial, ops, selected, rmax],
   );
+
+  /* ---------- selection → enrichment trigger ----------
+     A selection (row, featured card, hall hex, mover row) resolves to a
+     codename — featured without a field match falls back to the featured
+     payload's own codename so the drill still syncs against the API. */
+  const selOp = profile?.op ?? null;
+  const selCodename =
+    selected === -1
+      ? (selOp?.codename ?? initial.featured?.codename ?? null)
+      : (selOp?.codename ?? null);
+  const selEntry = selCodename ? details[detailKey(selCodename)] : undefined;
+  const selDetail = selEntry?.detail ?? null;
+  const selDetailStatus: DetailStatus = selEntry?.status ?? "idle";
+
+  useEffect(() => {
+    if (!selCodename) return;
+    const key = detailKey(selCodename);
+    let alive = true;
+    /* functional-set guard: never regress a ready/loading entry — re-select
+       of a cached codename replays the resolved promise silently. */
+    setDetails((prev) =>
+      prev[key] ? prev : { ...prev, [key]: { status: "loading" } },
+    );
+    Promise.resolve(detailFetcher(selCodename, { claimed: selOp?.claimed }))
+      .then((det) => {
+        if (!alive) return;
+        const d = det || undefined;
+        setDetails((prev) => ({
+          ...prev,
+          [key]:
+            d && !detailFailed(d)
+              ? { status: "ready", detail: d }
+              : d
+                ? { status: "error", detail: d }
+                : { status: "error" },
+        }));
+      })
+      .catch(() => {
+        if (alive) {
+          setDetails((prev) => ({
+            ...prev,
+            [key]: { status: "error" },
+          }));
+        }
+      });
+    return () => {
+      alive = false;
+    };
+    /* `details` is deliberately NOT a dep: reads happen inside functional
+       updates, and enrich.ts's session cache makes a replayed fetch free —
+       re-running on every details write would churn renders; skipping it
+       also keeps StrictMode's double-mount from stranding a `loading`
+       entry whose in-flight promise belongs to the discarded first run. */
+  }, [selCodename, selOp?.claimed, detailKey, detailFetcher]);
+
+  /* ---------- account chrome (2C) — real session surface; the `account`
+     prop is a demo/QA override that skips the fetch entirely. ---------- */
+  const session = useBoardSession(!account);
 
   /* ---------- rail module stack (reorderable + hideable) ---------- */
   const [railOrder, setRailOrder] = useState<RailId[]>([
@@ -282,12 +402,58 @@ export function LiveBoardWorkspace({
     [fetchMore],
   );
 
-  const acctInitials = account.name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  /* account chip — prop override wins (demo); else real session state:
+     loading → neutral, signed out → sign-in affordance, unlinked → claim,
+     linked → name + live rank (current_rank.global via session.ts). */
+  const acct = useMemo(() => {
+    if (account)
+      return {
+        mode: "override" as const,
+        name: account.name,
+        rank: account.rank,
+      };
+    if (!session.loaded)
+      return { mode: "loading" as const, name: "···", rank: "" };
+    if (!session.signedIn)
+      return { mode: "out" as const, name: "Sign in", rank: "→" };
+    if (!session.codename)
+      return { mode: "nolink" as const, name: "Unlinked", rank: "—" };
+    return {
+      mode: "in" as const,
+      name: session.displayName ?? session.codename,
+      rank: session.rank != null ? `#${session.rank}` : "—",
+    };
+  }, [account, session]);
+
+  const acctInitials =
+    acct.mode === "out"
+      ? "◎"
+      : acct.mode === "loading"
+        ? "··"
+        : acct.name
+            .split(/\s+/)
+            .map((w) => w[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase() || "·";
+
+  const onSignOut = useCallback(async () => {
+    setAcctPop(false);
+    try {
+      const { signOut } = await import("@/lib/infra/supabase/auth");
+      await signOut();
+    } catch {
+      /* auth unconfigured — nothing to clear */
+    }
+    router.refresh();
+  }, [router]);
+
+  /* compare seed — the canonical /compare page takes ?a=<codename>; the
+     in-board slot grid stays the reference's chrome (deeper compare is
+     honestly stubbed — the CTA carries the selection). */
+  const cmpHref = selOp
+    ? `/compare?a=${encodeURIComponent(selOp.slug)}`
+    : "/compare";
 
   const pop = initial.population;
   const lastPage = Math.ceil(pop.count / 10);
@@ -330,11 +496,11 @@ export function LiveBoardWorkspace({
             <div className="cmp-slots">
               {Array.from({ length: COMPARE_SLOTS }, (_, k) => (
                 <div className="cmp-slot" key={k}>
-                  +
+                  {k === 0 && selOp ? selOp.codename[0] : "+"}
                 </div>
               ))}
             </div>
-            <a className="btn" href="/compare">
+            <a className="btn" href={cmpHref}>
               {COMPARE_CTA}
             </a>
           </>
@@ -356,6 +522,9 @@ export function LiveBoardWorkspace({
       data-theme={theme}
       suppressHydrationWarning
     >
+      {/* no-flash theme init — applies ?theme=/stored theme to .lbw-root
+          pre-paint (SSR always emits "green"); site <html> untouched. */}
+      <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
       <div className="app">
         {/* left column: brand / nav / account (collapsible to icons) */}
         <aside className={`srail${railMin ? " min" : ""}`}>
@@ -399,7 +568,10 @@ export function LiveBoardWorkspace({
                   key={t}
                   className={`sw sw-${t}${t === theme ? " on" : ""}`}
                   title={t}
-                  onClick={() => setTheme(t)}
+                  onClick={() => {
+                    setTheme(t);
+                    persistLbwTheme(t);
+                  }}
                 />
               ))}
             </div>
@@ -415,22 +587,52 @@ export function LiveBoardWorkspace({
                 {acctInitials}
               </button>
               <div className="aid">
-                <span className="aname">{account.name}</span>
-                <span className="arank mono">{account.rank}</span>
+                <span className="aname">{acct.name}</span>
+                <span className="arank mono">{acct.rank}</span>
               </div>
               <div className="acctpop" hidden={!acctPop}>
-                <a className="ap-item" href="/me">
-                  MY SIGNAL
-                </a>
-                <a className="ap-item" href="/settings">
-                  SETTINGS
-                </a>
-                <button className="ap-item" type="button">
-                  API KEYS
-                </button>
-                <button className="ap-item mut" type="button">
-                  SIGN OUT
-                </button>
+                {acct.mode === "out" && (
+                  <a className="ap-item" href="/login">
+                    SIGN IN →
+                  </a>
+                )}
+                {acct.mode === "loading" && (
+                  <span className="ap-item mut">···</span>
+                )}
+                {(acct.mode === "in" || acct.mode === "override") && (
+                  <>
+                    <a className="ap-item" href="/me">
+                      MY SIGNAL
+                    </a>
+                    <a className="ap-item" href="/settings">
+                      SETTINGS
+                    </a>
+                    <a className="ap-item" href="/settings">
+                      API KEYS
+                    </a>
+                  </>
+                )}
+                {acct.mode === "nolink" && (
+                  <>
+                    <a className="ap-item" href="/me">
+                      CLAIM SIGNAL
+                    </a>
+                    <a className="ap-item" href="/settings">
+                      SETTINGS
+                    </a>
+                  </>
+                )}
+                {(acct.mode === "in" ||
+                  acct.mode === "nolink" ||
+                  acct.mode === "override") && (
+                  <button
+                    className="ap-item mut"
+                    type="button"
+                    onClick={onSignOut}
+                  >
+                    SIGN OUT
+                  </button>
+                )}
               </div>
             </div>
             <button
@@ -584,7 +786,8 @@ export function LiveBoardWorkspace({
                       docked={docked}
                       onToggleDock={toggleDock}
                       population={pop}
-                      fetchDetail={fetchDetail}
+                      detail={selDetail}
+                      detailStatus={selDetailStatus}
                     />
                   )}
 
@@ -714,16 +917,18 @@ export function LiveBoardWorkspace({
             </button>
             <div className="flinks">
               <a href="#">LEADERBOARD</a>
-              <a href="/compare">COMPARE</a>
+              <a href={cmpHref}>COMPARE</a>
               <a href="/hall">HALL</a>
               <a href="/me">PROFILE</a>
               <a href="#">WRAPPED</a>
-              <a href="#">SHARE</a>
+              <a href={selOp ? `/s/${encodeURIComponent(selOp.slug)}` : "#"}>
+                SHARE
+              </a>
               <span className="sep">·</span>
               <a href="/methodology">METHODOLOGY</a>
-              <a href="#">API</a>
+              <a href="/developers">API</a>
               <a href="/privacy">PRIVACY</a>
-              <a href="#">npx sigrank</a>
+              <a href="https://www.npmjs.com/package/sigrank">npx sigrank</a>
             </div>
             <span className="fsig">
               SIGNALAF × SIGRANK — live-board prototype ·{" "}
