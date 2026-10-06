@@ -32,7 +32,7 @@
     "sitemap:validate:live": "node scripts/validate-sitemap.mjs --live"
   },
   "dependencies": {
-    "@modelcontextprotocol/node": "^2.0.0",
+    "@modelcontextprotocol/node": "^2.1.1",
     "@modelcontextprotocol/server": "^2.0.0",
     "@posthog/mcp": "0.21.4",
     "@stripe/stripe-js": "^10.0.0",
