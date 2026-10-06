@@ -122,7 +122,10 @@
 .lbw-root .app{flex:1;display:grid;grid-template-columns:auto minmax(0,1fr);min-height:0}
 .lbw-root .maincol{display:flex;flex-direction:column;min-width:0;min-height:0}
 .lbw-root .mid{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 332px;min-height:0}
-@media(max-width:1100px){.lbw-root .mid{grid-template-columns:minmax(0,1fr)}}
+/* Owner directive (2026-10-06): the inspector rail is PINNED — never
+   reflows below the board at any width. Narrow viewports let .stagecol
+   scroll horizontally instead; collapse is an explicit toggle, not a
+   media query. */
 
 /* left column — brand / nav / account, collapsible to icons */
 .lbw-root .srail{width:200px;border-right:1px solid var(--line);background:var(--bg2);
