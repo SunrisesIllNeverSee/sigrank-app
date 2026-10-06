@@ -783,11 +783,12 @@
 /* PixelIcon — pixel-block nav glyphs (asset-pack badge language).
    Lit cells paint currentColor → per-icon accents from rail-extras.css
    apply unchanged; hover-grow rides the existing .sbtn:hover .gi rule. */
-.lbw-root .sbtn .pxic{display:grid;grid-template-columns:repeat(5,3.4px);
-  grid-auto-rows:3.4px;gap:1.2px;place-content:center;width:22px;height:19px}
+.lbw-root .sbtn .pxic{display:grid;grid-template-columns:repeat(5,4px);
+  grid-auto-rows:4px;gap:1px;place-content:center;width:24px;height:24px}
 .lbw-root .pxic i{display:block;background:transparent}
 .lbw-root .pxic i.lit{background:currentColor}
 .lbw-root .sbtn:hover .pxic i.lit{border-radius:.5px}
 
 /* share preview — brand mark top-left, flagship-card corner treatment */
-.lbw-root .shareprev .sharemark{display:block;width:22px;height:auto;margin:0 0 8px}
+.lbw-root .shareprev .sharemark{display:block;width:22px;height:20px;margin:0 0 8px;
+  image-rendering:pixelated}
