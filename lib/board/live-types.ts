@@ -35,6 +35,11 @@ export interface LiveOperator {
   name: string;
   /** Resolved display handle, e.g. "@name" when a platform handle is set. */
   handle: string;
+  /** Public avatar URL (Supabase Storage upload; privacy-gated like
+   *  location — null when unset or profile_visibility gates it). Rendered
+   *  in place of the gradient-initial tile when present (owner 2026-10-06:
+   *  "why aren't the user icons showing people pictures"). */
+  avatarUrl?: string | null;
   /** Operator-supplied public location (city/country, free string) —
    *  production parity with the legacy board's `◍ <location>` tertiary
    *  line. Flows operators_public.location → LeaderboardRow.operator.
