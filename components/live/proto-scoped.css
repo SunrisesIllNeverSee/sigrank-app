@@ -121,11 +121,28 @@
 /* ---------- workspace grid: X-style left column | header + stage + dock ---------- */
 .lbw-root .app{flex:1;display:grid;grid-template-columns:auto minmax(0,1fr);min-height:0}
 .lbw-root .maincol{display:flex;flex-direction:column;min-width:0;min-height:0}
-.lbw-root .mid{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 332px;min-height:0}
-/* Owner directive (2026-10-06): the inspector rail is PINNED — never
-   reflows below the board at any width. Narrow viewports let .stagecol
-   scroll horizontally instead; collapse is an explicit toggle, not a
-   media query. */
+.lbw-root .mid{flex:1;display:grid;grid-template-columns:248px minmax(0,1fr) 332px;min-height:0}
+/* Owner directive (2026-10-06): both side panels are PINNED — neither
+   reflows below/above the board at any width. Narrow viewports let
+   .stagecol scroll horizontally instead; collapse is an explicit title-bar
+   toggle (VS Code panel pattern), not a media query. */
+
+/* left sidebar — banner + operator profile (owner 2026-10-06 IA: left =
+   banner/op-profile, right = share/movers/compare/field context). Reuses
+   the .railhead/.rail/.mod chrome of .railcol so both sidebars read as
+   the same system. */
+.lbw-root .lside{display:flex;flex-direction:column;min-width:0;min-height:0;
+  border-right:1px solid var(--line);background:var(--bg2)}
+.lbw-root .lside .rail{padding:12px}
+.lbw-root .lside-banner .hero{padding:2px 0 10px}
+.lbw-root .lside-banner .hero h1{font-size:19px;line-height:1.15}
+.lbw-root .lside-banner .strip{grid-template-columns:1fr 1fr;margin-top:10px;
+  border-radius:var(--radius-sm);overflow:hidden}
+.lbw-root .lside-banner .strip .cell{padding:10px 12px}
+.lbw-root .lside-banner .strip .v{font-size:15px}
+.lbw-root .lside-banner .strip .cell:last-child .v{font-size:15px;line-height:inherit}
+.lbw-root .lside-banner .strip .l{font-size:8px}
+.lbw-root .lside-redock{margin-top:2px;font-size:9px;padding:8px 10px}
 
 /* left column — brand / nav / account, collapsible to icons */
 .lbw-root .srail{width:200px;border-right:1px solid var(--line);background:var(--bg2);
@@ -197,10 +214,18 @@
 .lbw-root .fbar .fl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.15em;color:var(--mut)}
 .lbw-root .fbar select,.lbw-root .fbar input{background:var(--panel);border:1px solid var(--line2);color:var(--tx);
   font-family:var(--font-mono);font-size:10.5px;padding:5px 8px;border-radius:var(--radius-sm);height:27px}
+/* symmetric field cluster (owner 2026-10-06): uniform select floor so the
+   label+select pairs read as an even row. */
+.lbw-root .fbar .fb select{min-width:104px}
 .lbw-root .fbar input{width:120px}
 .lbw-root .fbar .seg{height:27px}
 .lbw-root .fbar .seg button{font-size:10px;padding:5px 10px}
 .lbw-root .fbar .ctlbtn{height:27px;padding:5px 11px}
+.lbw-root .fbar .sdir{width:27px;height:27px;flex-shrink:0;display:inline-flex;
+  align-items:center;justify-content:center;background:var(--panel);
+  border:1px solid var(--line2);border-radius:var(--radius-sm);
+  color:var(--mut);font-family:var(--font-mono);font-size:9px;cursor:pointer}
+.lbw-root .fbar .sdir:hover{color:var(--ac);border-color:var(--ac)}
 .lbw-root .fbar .fb-sp{flex:1}
 
 /* ---------- right dock column ---------- */
@@ -219,8 +244,11 @@
   color:var(--mut);background:transparent;cursor:pointer}
 .lbw-root .layout-tg:hover{color:var(--tx);border-color:var(--ac)}
 .lbw-root .layout-tg.on{color:var(--ac);border-color:var(--ac)}
-.lbw-root .app.no-rail .mid{grid-template-columns:minmax(0,1fr)}
+.lbw-root .app.no-rail .mid{grid-template-columns:248px minmax(0,1fr)}
 .lbw-root .app.no-rail .railcol{display:none}
+.lbw-root .app.no-left .mid{grid-template-columns:minmax(0,1fr) 332px}
+.lbw-root .app.no-left .lside{display:none}
+.lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(0,1fr)}
 
 /* ---------- dual rank cell + hover detail ---------- */
 .lbw-root .ranks{position:relative;display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;cursor:default}
