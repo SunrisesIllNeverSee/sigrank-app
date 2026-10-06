@@ -141,7 +141,7 @@
 .lbw-root .lside-banner .strip .cell{padding:10px 12px}
 .lbw-root .lside-banner .strip .v{font-size:15px}
 .lbw-root .lside-banner .strip .cell:last-child .v{font-size:15px;line-height:inherit}
-.lbw-root .lside-banner .strip .l{font-size:8px}
+.lbw-root .lside-banner .strip .l{font-size:9.5px}
 .lbw-root .lside-redock{margin-top:2px;font-size:9px;padding:8px 10px}
 
 /* left column — brand / nav / account, collapsible to icons */
@@ -177,7 +177,7 @@
 .lbw-root .srail [data-tip]:hover::after{content:attr(data-tip);position:absolute;
   left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--panel2);
   border:1px solid var(--line2);border-radius:5px;padding:4px 9px;
-  font-family:var(--font-mono);font-size:8.5px;letter-spacing:.14em;color:var(--tx);
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--tx);
   white-space:nowrap;z-index:40;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.4)}
 .lbw-root .snav-sep{display:block;width:24px;height:1px;background:var(--line2);margin:6px auto}
 .lbw-root .srail.min .sfoot{align-items:center}
@@ -189,7 +189,7 @@
 .lbw-root .sacct .aname{font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
 .lbw-root .sacct .aid{display:flex;flex-direction:column;line-height:1.3}
 .lbw-root .sacct .aid .aname{color:var(--tx2);font-weight:600;font-size:10.5px}
-.lbw-root .sacct .aid .arank{font-size:8.5px;color:var(--ac)}
+.lbw-root .sacct .aid .arank{font-size:9.5px;color:var(--ac)}
 .lbw-root .srail.min .sacct{justify-content:center}
 .lbw-root .srail.min .aname{display:none}
 .lbw-root .srail.min .aid{display:none}
@@ -212,7 +212,7 @@
 .lbw-root .fbar{display:flex;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap;padding:8px 16px;
   border-bottom:1px solid var(--line);background:var(--bg2);flex-shrink:0}
 .lbw-root .fbar .fb{display:flex;align-items:center;gap:6px}
-.lbw-root .fbar .fl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.15em;color:var(--mut)}
+.lbw-root .fbar .fl{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.15em;color:var(--mut)}
 .lbw-root .fbar select,.lbw-root .fbar input{background:var(--panel);border:1px solid var(--line2);color:var(--tx);
   font-family:var(--font-mono);font-size:10.5px;padding:5px 8px;border-radius:var(--radius-sm);height:27px}
 /* symmetric field cluster (owner 2026-10-06): uniform select floor so the
@@ -257,7 +257,7 @@
 .lbw-root .edge{position:absolute;top:50%;transform:translateY(-50%);z-index:30;
   width:14px;height:44px;padding:0;display:grid;place-items:center;
   background:transparent;border:none;border-radius:0 6px 6px 0;
-  color:var(--mut);font-size:8px;cursor:ew-resize;opacity:0;transition:opacity .12s}
+  color:var(--mut);font-size:9.5px;cursor:ew-resize;opacity:0;transition:opacity .12s}
 .lbw-root .edge-l{right:-7px}
 .lbw-root .edge-r{left:-7px;border-radius:6px 0 0 6px}
 .lbw-root .lside:hover .edge,.lbw-root .railcol:hover .edge,.lbw-root .edge:focus-visible{opacity:1}
@@ -323,7 +323,7 @@
    the pre-2B board rendered it as a row badge). Shares .tag chrome at
    smaller size; agentic gets the gold evidence hue like the legacy board. */
 .lbw-root .wftag{display:inline-block;margin-left:7px;font-family:var(--font-mono);
-  font-size:8.5px;letter-spacing:.1em;padding:2px 5px;border-radius:4px;
+  font-size:9.5px;letter-spacing:.1em;padding:2px 5px;border-radius:4px;
   border:1px solid var(--line2);color:var(--mut);vertical-align:1px}
 .lbw-root td:hover .wftag{border-color:var(--ac);color:var(--ac)}
 .lbw-root .feat-yield{margin-top:16px}
@@ -422,7 +422,7 @@
 .lbw-root .pmod .ph{font-family:var(--font-mono);font-size:9.5px;color:var(--mut)}
 .lbw-root .pmod .py{margin-left:auto;text-align:right;flex-shrink:0}
 .lbw-root .pmod .py .n{font-family:var(--font-mono);font-weight:800;font-size:19px;color:var(--ac)}
-.lbw-root .pmod .py .l{font-family:var(--font-mono);font-size:8px;letter-spacing:.14em;color:var(--mut)}
+.lbw-root .pmod .py .l{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--mut)}
 .lbw-root .pmod-tags{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
 
 /* clickable operator rows/cards (swap featured profile) */
@@ -492,7 +492,7 @@
 .lbw-root .sc .brand .px{display:grid;grid-template-columns:repeat(2,6px);grid-auto-rows:6px;gap:1.5px}
 .lbw-root .sc .brand .px i{display:block;background:#a6ff00}.lbw-root .sc .brand .px i:nth-child(2){background:#00e5ff}.lbw-root .sc .brand .px i:nth-child(3){background:#3b82f6}
 .lbw-root .sc-light .brand .px i{background:#4a3fc9}.lbw-root .sc-light .brand .px i:nth-child(2){background:#7a6ff0}.lbw-root .sc-light .brand .px i:nth-child(3){background:#9a93e8}
-.lbw-root .sc .vbadge{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;padding:4px 8px;border-radius:4px;
+.lbw-root .sc .vbadge{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;padding:4px 8px;border-radius:4px;
   border:1px solid #a6ff00;color:#a6ff00;display:flex;align-items:center;gap:4px}
 .lbw-root .sc-light .vbadge{border-color:#4a3fc9;color:#4a3fc9}
 .lbw-root .sc-purple .vbadge{border-color:#b565ff;color:#b565ff}
@@ -506,7 +506,7 @@
 .lbw-root .sc .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
 .lbw-root .sc .stats3 .s{text-align:center;border-top:1px solid rgba(128,128,128,.25);padding-top:9px}
 .lbw-root .sc .stats3 .sv{font-family:var(--font-mono);font-weight:700;font-size:15px}
-.lbw-root .sc .stats3 .sl{font-family:var(--font-mono);font-size:8px;letter-spacing:.14em;opacity:.6;margin-top:2px}
+.lbw-root .sc .stats3 .sl{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;opacity:.6;margin-top:2px}
 .lbw-root .sc .rk-line{font-family:var(--font-mono);font-size:11px;opacity:.75;text-align:center}
 .lbw-root .sc .foot{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;
   opacity:.55;margin-top:14px;border-top:1px solid rgba(128,128,128,.2);padding-top:10px}
@@ -526,7 +526,7 @@
 .lbw-root .badge-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;padding:10px 0 4px}
 .lbw-root .badge{aspect-ratio:1/1.1;width:86px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;
-  font-family:var(--font-mono);font-size:8.5px;letter-spacing:.1em;padding:8px}
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;padding:8px}
 .lbw-root .badge.on{background:linear-gradient(160deg,var(--ac),color-mix(in srgb,var(--ac) 60%,#000));color:var(--ac-tx);font-weight:700}
 .lbw-root .badge.off{background:var(--panel);color:var(--mut);border:1px solid var(--line2)}
 .lbw-root .badge .bi{font-size:15px}
@@ -536,7 +536,7 @@
 .lbw-root .srows{display:flex;flex-direction:column;gap:7px;margin-top:14px}
 .lbw-root .srow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;
   border-top:1px solid rgba(128,128,128,.18);padding-top:7px}
-.lbw-root .srow .sl2{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.14em;opacity:.6}
+.lbw-root .srow .sl2{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;opacity:.6}
 .lbw-root .srow .sv2{font-family:var(--font-mono);font-weight:700;font-size:12.5px}
 /* LinkedIn feed post mockup */
 .lbw-root .lipwrap{display:flex;justify-content:center}
@@ -599,7 +599,7 @@
 .lbw-root .fcell{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 11px}
 .lbw-root .fcell .n{font-family:var(--font-mono);font-weight:700;font-size:17px}
 .lbw-root .fcell .n em{font-style:normal;color:var(--ac);font-size:11px}
-.lbw-root .fcell .l{font-family:var(--font-mono);font-size:8px;letter-spacing:.15em;color:var(--mut);margin-top:2px}
+.lbw-root .fcell .l{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.15em;color:var(--mut);margin-top:2px}
 .lbw-root .fcell:last-child{grid-column:1/-1}
 .lbw-root .fcell:last-child .n{font-size:13px}
 /* view toggles inside controls row */
@@ -611,7 +611,7 @@
 /* ---------- rail restore tray ---------- */
 .lbw-root .rtray{border:1px dashed var(--line2);border-radius:var(--radius);padding:10px;
   display:flex;flex-direction:column;gap:7px}
-.lbw-root .rtray .rl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;color:var(--mut)}
+.lbw-root .rtray .rl{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut)}
 .lbw-root .rtray .rbtn{display:flex;align-items:center;gap:8px;border:1px solid var(--line2);
   border-radius:var(--radius-sm);padding:7px 10px;font-family:var(--font-mono);
   font-size:9.5px;letter-spacing:.12em;color:var(--tx2);background:var(--panel)}
@@ -644,7 +644,7 @@
 .lbw-root .li .brand{display:flex;align-items:center;gap:8px;font-family:var(--font-disp);font-weight:700;font-size:14px}
 .lbw-root .li .brand .px{display:grid;grid-template-columns:repeat(2,6px);grid-auto-rows:6px;gap:1.5px}
 .lbw-root .li .brand .px i{display:block;background:var(--ac)}
-.lbw-root .li .vbadge{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.16em;
+.lbw-root .li .vbadge{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;
   border:1px solid var(--ac);color:var(--ac);border-radius:4px;padding:4px 8px}
 
 /* ==========================================================================
@@ -653,7 +653,7 @@
    matches .mod h3 / .railhead so the tab strip reads as native chrome.
    ========================================================================== */
 .lbw-root .docktabs{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:14px}
-.lbw-root .docktabs button{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.14em;
+.lbw-root .docktabs button{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;
   color:var(--mut);border:1px solid var(--line2);border-radius:4px;padding:3px 8px}
 .lbw-root .docktabs button:hover{color:var(--tx);border-color:var(--tx2)}
 .lbw-root .docktabs button.on{color:var(--ac);border-color:var(--ac);background:var(--ac-soft)}
@@ -687,7 +687,7 @@
    strip; "hot stats, rotating stats from the board as a whole") */
 .lbw-root .hotstat{text-align:center;padding:6px 0 2px}
 .lbw-root .hotstat .hs-v{font-family:var(--font-mono);font-weight:800;font-size:26px;color:var(--ac);line-height:1.15}
-.lbw-root .hotstat .hs-l{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;color:var(--mut);margin-top:4px}
+.lbw-root .hotstat .hs-l{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut);margin-top:4px}
 .lbw-root .hs-dots{display:flex;justify-content:center;gap:5px;margin-top:10px}
 .lbw-root .hs-dots span{width:5px;height:5px;border-radius:50%;background:var(--line2)}
 .lbw-root .hs-dots span.on{background:var(--ac)}
@@ -706,7 +706,7 @@
 .lbw-root .hspot .hsv{font-size:10px;color:var(--ac);margin-top:2px}
 
 /* movers mode label — rotates 7D → 24H → HITL → AGENTIC */
-.lbw-root .mv-mode{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.16em;
+.lbw-root .mv-mode{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;
   color:var(--ac);margin-bottom:7px}
 .lbw-root .mv-mode .mut{color:var(--mut)}
 
@@ -725,7 +725,7 @@
 .lbw-root .cmp-match button:hover{text-decoration:underline}
 
 /* RECENTS & SOON */
-.lbw-root .soon-h{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;
+.lbw-root .soon-h{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;
   color:var(--mut);margin:2px 0 7px}
 .lbw-root .soon-h:not(:first-child){margin-top:13px}
 .lbw-root .rec-chip{display:block;width:100%;text-align:left;background:var(--panel);
@@ -734,13 +734,13 @@
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lbw-root .rec-chip:hover{color:var(--ac);border-color:var(--ac)}
 .lbw-root .soonchips{display:flex;flex-wrap:wrap;gap:5px}
-.lbw-root .soonchip{font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;
+.lbw-root .soonchip{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;
   color:var(--mut);border:1px dashed var(--line2);border-radius:999px;
   padding:3px 9px;cursor:default}
 
 /* lside profile extras — radar + trophy tracker */
 .lbw-root .lside-radar{display:flex;justify-content:center;margin:12px 0 2px}
-.lbw-root .trph-h{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;
+.lbw-root .trph-h{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;
   color:var(--mut);margin:12px 0 7px}
 .lbw-root .trph{display:flex;flex-direction:column;gap:6px}
 .lbw-root .trph-r{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);
@@ -764,19 +764,12 @@
 /* soonchips → 3-icon tile row + shared coming-soon caption */
 .lbw-root .soonchips{display:flex;gap:6px}
 .lbw-root .soonchip{flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:3px;font-family:var(--font-mono);font-size:7.5px;letter-spacing:.12em;
+  gap:3px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;
   color:var(--mut);border:1px dashed var(--line2);border-radius:7px;
   padding:8px 4px;cursor:default}
 .lbw-root .soonchip i{font-style:normal;font-size:15px}
-.lbw-root .soon-cap{font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;
+.lbw-root .soon-cap{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;
   color:var(--mut);margin-top:8px;line-height:1.5}
-
-/* canonical brand mark — the gold § from app/icon.svg (Georgia serif,
-   brand gold #c4923a stays constant across board themes) */
-.lbw-root .sbrand .smark{font-family:Georgia,'Times New Roman',serif;
-  font-weight:700;font-size:22px;line-height:1;color:#c4923a;
-  display:inline-block;text-align:center}
-.lbw-root .srail.min .sbrand .smark{font-size:20px}
 
 /* lighthouse a11y pass (2026-10-06): pagetitle is the h1 — kill the UA
    margin/size so it renders as the same centered title. */

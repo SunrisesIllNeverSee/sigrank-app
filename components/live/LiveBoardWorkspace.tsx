@@ -984,10 +984,16 @@ export function LiveBoardWorkspace({
             the enterprise product surface). Collapse of the labeled
             sidebar is replaced by panel toggles, not a rail-mode. */}
         <aside className="srail min">
-          {/* brand mark = the canonical § glyph (app/icon.svg, gold on dark)
-              — replaces the reference fixture's 4-pixel mark. */}
+          {/* pixel mark (owner 2026-10-06: keep the 4-pixel signalaf mark
+              for the board — the § glyph exists in app/icon.svg but the
+              pixels are the board's brand). */}
           <Link className="sbrand" href="/" data-tip="signalaf — home" title="signalaf — home">
-            <span className="smark" aria-hidden>§</span>
+            <span className="px">
+              <i></i>
+              <i></i>
+              <i></i>
+              <i></i>
+            </span>
           </Link>
           <nav className="snav" ref={snavRef}>
             {/* icon set (owner 2026-10-06): semantic glyphs — ranked bars,
