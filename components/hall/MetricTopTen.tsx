@@ -74,7 +74,10 @@ export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
                 value={display}
                 canonId={canonId}
                 isPlaceholder={!real}
-                href={`/user/${row.operator.codename}`}
+                // Placeholder (seed-corpus) rows have no guaranteed live
+                // profile — emitting href would mint dead /user/* links.
+                // Real rows keep the profile link (SEARCH-RECOVERY D).
+                href={real ? `/user/${row.operator.codename}` : undefined}
                 outlier={isOutlierRow(row)}
               />
             );

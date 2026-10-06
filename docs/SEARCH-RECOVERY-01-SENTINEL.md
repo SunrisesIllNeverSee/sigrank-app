@@ -42,17 +42,40 @@ Every URL: `robotsTxtState ALLOWED`, `INDEXING_ALLOWED`, `pageFetchState SUCCESS
 ## Phase 6 actions executed (once — do not repeat)
 
 1. `submit_sitemap` → `https://signalaf.com/sitemap.xml` — status `submitted`, 2026-10-05T17:44Z.
-2. `indexing_batch_publish` → `URL_UPDATED` ×22 — all acknowledged 2026-10-05T17:45Z. (Indexing API is officially scoped to job/broadcast pages; for general URLs it is a soft signal — used once per plan, not repeated.)
+2. `indexing_batch_publish` → `URL_UPDATED` ×22 — all acknowledged 2026-10-05T17:45Z.
+
+> **⚠ One-time unsupported experiment.** Google's Indexing API is officially
+> limited to `JobPosting` and livestream `BroadcastEvent` pages. The
+> 2026-10-05 submission on ordinary SignalAF pages was a single experiment and
+> **MUST NOT be repeated** or made standard operating procedure.
+>
+> **Correct future Google recovery workflow:**
+> `deploy → verify live HTML → resubmit sitemap when materially changed →
+> Search Console URL Inspection / "Request Indexing" selectively → monitor`
+> Do not automate general SignalAF pages through the Indexing API.
+
+## Monitoring + freeze rules (addendum §L)
+
+- **The September 2026 Google spam update is still in rollout** — do not
+  interpret short-term ranking fluctuation as recovery success/failure until
+  it completes; the clean observation window starts after it ends.
+- **Frozen during the window:** new SEO page batches · mass title/H1 edits ·
+  schema experiments · canonical migrations · new comparison/listicle
+  families · major sitemap expansion.
+- **Allowed:** clear defect/security/production-correctness fixes +
+  explicitly approved SEARCH-RECOVERY items.
+- **Never** re-request indexing for unchanged URLs.
 
 ## Monitoring protocol (Phase 8 freeze applies — no structural SEO changes)
 
 Re-run weekly via `mcp-hub → gsc-seo`:
 
 ```text
-index_coverage_summary(siteUrl, <22 URLs>)   → transitions to "Submitted and indexed" / new coverage states
+index_coverage_summary(siteUrl, <22 URLs>)   → coverage-state transitions + lastCrawlTime freshness
 performance_overview(siteUrl)                → impressions / clicks trend (Gate B)
 brand_nonbrand_split(siteUrl, [signalaf, sigrank, signaf, "sig rank"])  → non-brand discovery (Gate C)
-list_sitemaps(siteUrl)                       → lastDownloaded advances past 2026-10-02; indexed count > 0
+list_sitemaps(siteUrl)                       → lastDownloaded advancing past 2026-10-02 only
+                                             (the API's "indexed" count is unreliable — NOT a criterion)
 ```
 
 ### Gate checks

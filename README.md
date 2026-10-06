@@ -308,7 +308,6 @@ Product contracts, not implementation details:
 - [Contributing](./.github/CONTRIBUTING.md)
 - [Code of Conduct](./.github/CODE_OF_CONDUCT.md)
 - [Security policy](./SECURITY.md)
-- [Changelog](./CHANGELOG.md)
 
 ### Reporting issues
 
