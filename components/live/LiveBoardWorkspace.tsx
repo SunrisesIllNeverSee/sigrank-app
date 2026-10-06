@@ -154,6 +154,35 @@ export function LiveBoardWorkspace({
      the SSR'd attribute pre-paint; clicks persist. ---------- */
   const [theme, setTheme] = useState<ThemeName>(resolveLbwTheme);
 
+  /* Shift+T cycles the WORKSPACE palettes — same gesture as the site-wide
+     ThemeCycleShortcut (which still swaps the hidden site theme behind the
+     board; harmless — .lbw-root owns its own data-theme). Same guards:
+     Shift only, never inside inputs. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "T" && e.key !== "t") return;
+      if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement | null;
+      const tag = el?.tagName;
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el?.isContentEditable
+      )
+        return;
+      setTheme((t) => {
+        const next =
+          THEMES[(THEMES.indexOf(t) + 1) % THEMES.length] ?? "green";
+        persistLbwTheme(next);
+        liveTrack.themeChanged(next);
+        return next;
+      });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   /* ---------- field data (all client-side over the supplied array) --- */
   const [extraOps, setExtraOps] = useState<LiveOperator[]>([]);
   const baseOps = useMemo(
@@ -207,7 +236,11 @@ export function LiveBoardWorkspace({
   );
   const [platformSel, setPlatformSel] = useState<string>(CONTROLS.platforms[0]);
   const [classSel, setClassSel] = useState<string>(CONTROLS.classes[0]);
-  const [wfSel, setWfSel] = useState<"all" | "hitl" | "agentic">("all");
+  /* Workflow filter: both = combined field (default on open); hitl/agentic/
+     hybrid = only rows carrying that resolved mode. */
+  const [wfSel, setWfSel] = useState<"both" | "hitl" | "agentic" | "hybrid">(
+    "both",
+  );
   const [sortSel, setSortSel] = useState<string>(CONTROLS.sorts[0]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -217,7 +250,9 @@ export function LiveBoardWorkspace({
      window swaps, whose router.push carries the param forward. */
   useEffect(() => {
     const m = new URLSearchParams(window.location.search).get("mode");
-    setWfSel(m === "hitl" || m === "agentic" ? m : "all");
+    setWfSel(
+      m === "hitl" || m === "agentic" || m === "hybrid" ? m : "both",
+    );
   }, [initial.meta.window]);
 
   /* WINDOW self-heal (R2): the mount normally remounts the workspace on a
@@ -399,7 +434,7 @@ export function LiveBoardWorkspace({
         ([o]) => o.klass === classSel || o.klass.startsWith(`${classSel} `),
       );
     }
-    if (wfSel !== "all") {
+    if (wfSel !== "both") {
       arr = arr.filter(([o]) => o.wf === wfSel);
     }
     if (platformSel !== "All Platforms") {
@@ -451,7 +486,7 @@ export function LiveBoardWorkspace({
       if (onWindowChange) {
         onWindowChange(slug);
       } else {
-        router.push(`/board/${slug}${wfSel === "all" ? "" : `?mode=${wfSel}`}`);
+        router.push(`/board/${slug}${wfSel === "both" ? "" : `?mode=${wfSel}`}`);
       }
     },
     [onWindowChange, router, wfSel],
@@ -872,9 +907,10 @@ export function LiveBoardWorkspace({
                       liveTrack.modeChanged(v);
                     }}
                   >
-                    <option value="all">All Modes</option>
+                    <option value="both">Both</option>
                     <option value="hitl">HITL</option>
                     <option value="agentic">Agentic</option>
+                    <option value="hybrid">Hybrid</option>
                   </select>
                 </span>
                 <span className="fb">

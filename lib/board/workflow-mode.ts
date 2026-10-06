@@ -1,5 +1,9 @@
 export type BoardMode = "all" | "hitl" | "agentic";
-export type WorkflowMode = Exclude<BoardMode, "all">;
+/** Stored workflow_mode vocabulary — "hybrid" is carried end-to-end for
+ *  surfaces that read the assessed value verbatim (the live board); the
+ *  heuristic resolver below still only produces hitl|agentic|null until
+ *  the pipeline emits hybrid assessments. */
+export type WorkflowMode = Exclude<BoardMode, "all"> | "hybrid";
 
 export function resolveWorkflowMode(input: {
   inputTokens: number;
@@ -12,8 +16,8 @@ export function resolveWorkflowMode(input: {
   if ([input.inputTokens, input.outputTokens, input.cacheWriteTokens, input.cacheReadTokens]
     .some((n) => !Number.isFinite(n) || n < 0) ||
       input.inputTokens === 0 || input.outputTokens === 0) return null;
-  if (input.assessment === "agentic") {
-    return input.evidenceUrl?.startsWith("https://") ? "agentic" : null;
+  if (input.assessment === "agentic" || input.assessment === "hybrid") {
+    return input.evidenceUrl?.startsWith("https://") ? input.assessment : null;
   }
   const total = input.inputTokens + input.outputTokens +
     input.cacheWriteTokens + input.cacheReadTokens;
