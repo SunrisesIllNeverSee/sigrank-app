@@ -87,9 +87,9 @@ export const demoInitial: LiveBoardInitialState = {
     source: "fixture (data.js port)",
   },
   operators,
-  population: { count: 1660, tag: "LIVE FIELD · ALL-TIME" },
+  population: { count: operators.length, tag: "FIXTURE FIELD · ALL-TIME" },
   fieldStats: [
-    { field: "total_operators", value: "1,660" },
+    { field: "total_operators", value: `${operators.length}` },
     { field: "median_yield", value: "34.46" },
     { field: "top_yield", value: "581.87" },
     { field: "window", value: "All-time · fixture" },
@@ -101,6 +101,7 @@ export const demoInitial: LiveBoardInitialState = {
     { value: "George — Υ 79.40", codename: "George" },
   ],
   featured: {
+    codename: "MO§ES™",
     name: "MO§ES™",
     handle: "@SunrisesIllNeverSee",
     rank: 1,
