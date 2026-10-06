@@ -117,6 +117,10 @@ export const CONTROLS = {
     "10xDEV",
     "Efficiency",
     "$/1M",
+    "Input",
+    "Output",
+    "Cache-read",
+    "Cache-write",
   ],
 } as const;
 
@@ -318,6 +322,12 @@ export const SORT_KEY: Record<string, (o: LiveOperator) => number> = {
   "10xDEV": (o) => o.dev,
   Efficiency: (o) => numvOf(o.eff),
   "$/1M": numCost,
+  /* raw pillar sorts (owner 2026-10-06: every column sortable) — compact
+     strings re-parsed via numvOf, same convention as Efficiency. */
+  Input: (o) => numvOf(o.raw.i),
+  Output: (o) => numvOf(o.raw.o),
+  "Cache-read": (o) => numvOf(o.raw.cr),
+  "Cache-write": (o) => numvOf(o.raw.cw),
 };
 /** "$/1M" is a cost — lowest first. Everything else descends. */
 export const SORT_ASC = new Set(["$/1M"]);

@@ -104,12 +104,26 @@ Status tracked here — check items as they land.
 - [x] **Dual overlapping radar** — compare-page CascadeRadar style;
       baseline = field leader's radar vs selected op, FIELD MAX rim on
       featured (`dock-radar.css`, `OperatorDock`, `radarBaseline`)
-- [~] **SORT select cleanup** — sortable headers + direction flip done;
-      the SORT <select> visual tightening itself still open
-- [~] **Collapsible/adjustable sidebars** — right rail toggle shipped;
-      left sidebar still pending owner content decision
-- [ ] **Board tooltip glossary** — from sigrank-app-revamp audit
-      (carried from prior handoff: tooltips for metric columns)
+- [x] **SORT select cleanup** — symmetric field cluster (uniform select
+      min-width, even label+select pairs) + `▲/▼` direction chip beside
+      the SORT select flipping effective asc/desc; select change resets
+      flip; Yield re-click now actually flips order
+- [x] **Collapsible/adjustable sidebars** — left sidebar added
+      (`leftOn`, default on, 248px `.lside`): BANNER module (hero +
+      field-strip moved out of the stage, BANNER ctlbtn removed) +
+      OPERATOR PROFILE module (profile tile when docked, ⇄ FEATURE
+      floats it, re-dock chip when floating). Right rail keeps the
+      pinned `.railcol`, now headed INSPECTOR with modules reordered
+      per owner IA: share → movers → compare → field → hall. Title bar
+      carries both panel glyphs (left fill = sidebar, right fill =
+      inspector). No media-query reflow anywhere.
+- [x] **Board tooltip glossary** — every column header carries its
+      metric definition on hover (canonical formulas from
+      `live-types.ts`: Υ = cache_read × output ÷ input², leverage =
+      cache_read ÷ input, velocity = output ÷ input, SNR = output ÷
+      (input+output), 10×DEV = log₁₀ leverage, pillars I/O/W/R). Raw
+      pillar columns are now sortable too (`Input/Output/Cache-read/
+      Cache-write` in SORT_KEY + CONTROLS.sorts).
 
 ## Process note
 
