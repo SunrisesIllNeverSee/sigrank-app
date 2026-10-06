@@ -752,3 +752,33 @@ html[data-landing-motion="paused"] .cascade-pulse {
   border-top: 1px solid rgb(var(--gold) / 0.2);
   margin: 2.5em 0;
 }
+
+/* ── Live-board workspace shell opt-out (Phase-2B WS-6) ─────────────────────
+ * /board/[window] mounts the frozen reference workspace (.lbw-root — a 100vh
+ * self-chromed app shell whose X-rail IS the nav on that surface). The
+ * inherited site chrome must not wrap it. `:has()` gives real isolation —
+ * display:none removes the nodes from layout AND the accessibility tree —
+ * with zero route moves. (The plan's (site)/(workspace) route-group split
+ * was deferred: it would relocate ~40 routes while an SEO PR touches app/.
+ * Revisit it if a future surface needs more than hide/unconstrain.)
+ *
+ * Selector discipline: direct children of <body> only, so the workspace's
+ * own nested <nav>/<header>/<footer> inside .lbw-root can never match.
+ * `body > div` covers the DemoBanner chrome strip — the only inherited
+ * chrome element without a landmark tag. NavNpxCTA self-suppresses off "/"
+ * and needs no rule; `> iframe` guards third-party injected chrome.
+ * When .lbw-root is absent (the ?v=legacy A/B surface) the rules don't
+ * match and the chrome returns untouched. */
+body:has(.lbw-root) > nav,
+body:has(.lbw-root) > div,
+body:has(.lbw-root) > footer,
+body:has(.lbw-root) > iframe {
+  display: none;
+}
+
+/* Release the global content frame — the workspace owns its own 100vh
+ * layout (.lbw-root sets height/overflow internally). */
+main:has(.lbw-root) {
+  max-width: none;
+  padding: 0;
+}
