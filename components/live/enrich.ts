@@ -57,6 +57,9 @@ interface ApiHistory {
   points?: {
     date?: string;
     signa_rate?: number | null;
+    /** Υ yield series — emitted by the history route since the live-board
+     *  integration; absent on stale cached responses. */
+    yield_?: number | null;
     global_rank?: number;
     class_tier?: string;
   }[];
@@ -98,9 +101,12 @@ interface ApiSnapshots {
 /** One dated score-history point (oldest → newest, as the API emits). */
 export interface LiveHistoryPoint {
   date: string;
-  /** The history endpoint's per-date score (signa_rate) — backs the trend
-   *  sparkline only; never surfaced as Yield (DATA_KEYS §7). */
+  /** The history endpoint's per-date score (signa_rate) — legacy series,
+   *  sparkline fallback only; never surfaced as Yield (DATA_KEYS §7). */
   score: number;
+  /** Per-snapshot Υ yield — the rank metric's dated series (0 when token
+   *  pillars are missing, i.e. non-compounding days). */
+  yieldv: number;
   rank: number;
   klass: string;
 }
@@ -147,6 +153,10 @@ export interface LiveOperatorDetail extends Partial<LiveOperator> {
   /** current_rank.global — used by the account chip; board rows carry rank
    *  positionally, so this is detail-surface only (never written into `o`). */
   rank?: number;
+  /** Which series backs `trend`: "yield" when the API emitted usable Υ
+   *  points, "score" when it fell back to the signa_rate series. The dock
+   *  labels the sparkline from this — never guess from the values. */
+  trendKind?: "yield" | "score";
   /** Channels that failed during this load (partial failure is still ready). */
   errors?: Partial<Record<DetailChannel, true>>;
 }
@@ -263,21 +273,34 @@ async function loadDetail(
     if (typeof g === "number" && Number.isFinite(g)) det.rank = g;
   }
 
-  /* history channel → trend (score series, last-N) + dated trajectory points */
+  /* history channel → trend + dated trajectory points. The sparkline binds
+     the Υ yield series when the API emits usable points; the legacy
+     signa_rate series is the fallback — trendKind tells the dock which
+     label is honest. */
   if (histRes.status === "fulfilled") {
     const pts = (histRes.value.points ?? [])
       .filter((p): p is NonNullable<typeof p> & { date: string } => !!p?.date)
       .map<LiveHistoryPoint>((p) => ({
         date: p.date.slice(0, 10),
         score: typeof p.signa_rate === "number" ? p.signa_rate : 0,
+        yieldv: typeof p.yield_ === "number" ? p.yield_ : 0,
         rank: typeof p.global_rank === "number" ? p.global_rank : 0,
         klass: p.class_tier ?? "",
       }));
     det.history = pts;
-    det.trend = pts
-      .map((p) => p.score)
-      .filter((v) => Number.isFinite(v) && v > 0)
-      .slice(-TREND_POINTS);
+    const yieldSeries = pts
+      .map((p) => p.yieldv)
+      .filter((v) => Number.isFinite(v) && v > 0);
+    if (yieldSeries.length) {
+      det.trend = yieldSeries.slice(-TREND_POINTS);
+      det.trendKind = "yield";
+    } else {
+      det.trend = pts
+        .map((p) => p.score)
+        .filter((v) => Number.isFinite(v) && v > 0)
+        .slice(-TREND_POINTS);
+      det.trendKind = "score";
+    }
   } else {
     errors.history = true;
   }
