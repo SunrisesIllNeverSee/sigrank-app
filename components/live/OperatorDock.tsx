@@ -28,6 +28,7 @@
  * (default FIELD MAX rim; overridable via `radarBaseline`) — not the
  * reference's single polygon.
  */
+import Image from "next/image";
 import { useRef, useState } from "react";
 import type {
   LiveOperator,
@@ -200,12 +201,15 @@ export function SharePreview({
   const slug = encodeURIComponent(d.op?.slug ?? d.codename);
   return (
     <div className="shareprev">
-      {/* eslint-disable-next-line @next/next/no-img-element --
-          brand mark PNG from the SignalAF asset pack (66x60, ~300B) */}
-      <img
+      {/* brand mark PNG from the SignalAF asset pack (66x60, ~300B) —
+          pixelated rendering keeps the block edges hard. */}
+      <Image
         className="sharemark"
         src="/live/signalaf-mark.png"
-        alt="signalaf"
+        alt="SignalAF mark"
+        width={66}
+        height={60}
+        unoptimized
       />
       <div className="big">
         TOP <em>{pct}%</em> OF AI OPERATORS
