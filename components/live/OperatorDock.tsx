@@ -200,6 +200,13 @@ export function SharePreview({
   const slug = encodeURIComponent(d.op?.slug ?? d.codename);
   return (
     <div className="shareprev">
+      {/* eslint-disable-next-line @next/next/no-img-element --
+          brand mark PNG from the SignalAF asset pack (66x60, ~300B) */}
+      <img
+        className="sharemark"
+        src="/live/signalaf-mark.png"
+        alt="signalaf"
+      />
       <div className="big">
         TOP <em>{pct}%</em> OF AI OPERATORS
       </div>

@@ -78,6 +78,7 @@ import {
   RadarChart,
   SharePreview,
 } from "./OperatorDock";
+import { PixelIcon } from "./PixelIcon";
 import { RotatingMovers } from "./MoversRail";
 import { HallSpot, hallRows } from "./HallRail";
 import {
@@ -1007,23 +1008,23 @@ export function LiveBoardWorkspace({
                 stageRef.current?.scrollTo({ top: 0 });
               }}
             >
-              <span className="gi">▤</span>
+              <PixelIcon name="board" />
             </button>
             <Link className="sbtn" href="/compare" data-tip="COMPARE" title="COMPARE">
-              <span className="gi">⚖</span>
+              <PixelIcon name="compare" />
             </Link>
             <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
-              <span className="gi">🏆</span>
+              <PixelIcon name="hall" />
             </Link>
             <Link className="sbtn" href="/field" data-tip="FIELD" title="FIELD">
-              <span className="gi">◉</span>
+              <PixelIcon name="field" />
             </Link>
             <span className="snav-sep" aria-hidden="true"></span>
             <Link className="sbtn" href="/wiki" data-tip="WIKI" title="WIKI">
-              <span className="gi">▥</span>
+              <PixelIcon name="wiki" />
             </Link>
             <Link className="sbtn" href="/blog" data-tip="BLOG" title="BLOG">
-              <span className="gi">✎</span>
+              <PixelIcon name="blog" />
             </Link>
             <button
               type="button"
@@ -1036,7 +1037,7 @@ export function LiveBoardWorkspace({
                 setEpromoOpen((v) => !v);
               }}
             >
-              <span className="gi">⬢</span>
+              <PixelIcon name="enterprise" />
             </button>
             {/* owner (2026-10-06): /enterprise doesn't exist — the icon
                 opens a promo card (EKG demo video + blurb → /upsilon). */}

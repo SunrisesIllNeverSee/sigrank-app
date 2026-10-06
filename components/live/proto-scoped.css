@@ -779,3 +779,15 @@
 /* touch targets: theme swatches bumped 14→18px (still compact, now
    grabbable); keeps the icon-only rail vocabulary. */
 .lbw-root .srail.min .sw{width:18px;height:18px}
+
+/* PixelIcon — pixel-block nav glyphs (asset-pack badge language).
+   Lit cells paint currentColor → per-icon accents from rail-extras.css
+   apply unchanged; hover-grow rides the existing .sbtn:hover .gi rule. */
+.lbw-root .sbtn .pxic{display:grid;grid-template-columns:repeat(5,3.4px);
+  grid-auto-rows:3.4px;gap:1.2px;place-content:center;width:22px;height:19px}
+.lbw-root .pxic i{display:block;background:transparent}
+.lbw-root .pxic i.lit{background:currentColor}
+.lbw-root .sbtn:hover .pxic i.lit{border-radius:.5px}
+
+/* share preview — brand mark top-left, flagship-card corner treatment */
+.lbw-root .shareprev .sharemark{display:block;width:22px;height:auto;margin:0 0 8px}
