@@ -207,9 +207,18 @@ export function LiveBoardWorkspace({
   );
   const [platformSel, setPlatformSel] = useState<string>(CONTROLS.platforms[0]);
   const [classSel, setClassSel] = useState<string>(CONTROLS.classes[0]);
+  const [wfSel, setWfSel] = useState<"all" | "hitl" | "agentic">("all");
   const [sortSel, setSortSel] = useState<string>(CONTROLS.sorts[0]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+
+  /* ?mode=hitl|agentic — the pre-2B board's workflow-view URL contract.
+     Read post-mount (the page stays static/ISR-cacheable) and re-read on
+     window swaps, whose router.push carries the param forward. */
+  useEffect(() => {
+    const m = new URLSearchParams(window.location.search).get("mode");
+    setWfSel(m === "hitl" || m === "agentic" ? m : "all");
+  }, [initial.meta.window]);
 
   /* WINDOW self-heal (R2): the mount normally remounts the workspace on a
      route swap (key={meta.window}), but a prop-driven window change must
@@ -222,7 +231,7 @@ export function LiveBoardWorkspace({
      visible set shrinks, so a deep page pointer would strand the table. */
   useEffect(() => {
     setPage(1);
-  }, [search, classSel, platformSel, viewMode, sortSel, initial.meta.window]);
+  }, [search, classSel, platformSel, wfSel, viewMode, sortSel, initial.meta.window]);
 
   /* ---------- selected operator + dock ---------- */
   const [selected, setSelected] = useState<number>(() =>
@@ -381,6 +390,7 @@ export function LiveBoardWorkspace({
       arr = arr.filter(
         ([o]) =>
           o.codename.toLowerCase().includes(q) ||
+          o.name.toLowerCase().includes(q) ||
           o.handle.toLowerCase().includes(q),
       );
     }
@@ -388,6 +398,9 @@ export function LiveBoardWorkspace({
       arr = arr.filter(
         ([o]) => o.klass === classSel || o.klass.startsWith(`${classSel} `),
       );
+    }
+    if (wfSel !== "all") {
+      arr = arr.filter(([o]) => o.wf === wfSel);
     }
     if (platformSel !== "All Platforms") {
       const key = platformSel.toLowerCase().split(" ")[0];
@@ -404,7 +417,7 @@ export function LiveBoardWorkspace({
       );
     }
     return arr;
-  }, [ops, search, classSel, platformSel, viewMode, sortSel]);
+  }, [ops, search, classSel, platformSel, wfSel, viewMode, sortSel]);
 
   /* ---------- chrome state ---------- */
   const [railMin, setRailMin] = useState(false);
@@ -438,10 +451,10 @@ export function LiveBoardWorkspace({
       if (onWindowChange) {
         onWindowChange(slug);
       } else {
-        router.push(`/board/${slug}`);
+        router.push(`/board/${slug}${wfSel === "all" ? "" : `?mode=${wfSel}`}`);
       }
     },
-    [onWindowChange, router],
+    [onWindowChange, router, wfSel],
   );
 
   /* ---------- pagination (LB-19) — real slices, honest counts ----------
@@ -492,6 +505,7 @@ export function LiveBoardWorkspace({
     };
     const head = [
       "rank",
+      "name",
       "codename",
       "handle",
       "class",
@@ -502,6 +516,7 @@ export function LiveBoardWorkspace({
       "cost_per_m",
       "efficiency",
       "movement_7d",
+      "workflow_mode",
       "platform",
       "last_snapshot",
       "verification",
@@ -509,6 +524,7 @@ export function LiveBoardWorkspace({
     const lines = ordered.map(([o, i], d) =>
       [
         viewMode === "ops" ? i + 1 : d + 1,
+        o.name,
         o.codename,
         o.handle,
         o.klass,
@@ -519,6 +535,7 @@ export function LiveBoardWorkspace({
         o.cost,
         o.eff,
         o.mv7 ?? "",
+        o.wf ?? "",
         o.platform,
         o.last,
         o.verif,
@@ -843,6 +860,21 @@ export function LiveBoardWorkspace({
                     {CONTROLS.classes.map((o) => (
                       <option key={o}>{o}</option>
                     ))}
+                  </select>
+                </span>
+                <span className="fb">
+                  <span className="fl">WORKFLOW</span>
+                  <select
+                    value={wfSel}
+                    onChange={(e) => {
+                      const v = e.target.value as typeof wfSel;
+                      setWfSel(v);
+                      liveTrack.modeChanged(v);
+                    }}
+                  >
+                    <option value="all">All Modes</option>
+                    <option value="hitl">HITL</option>
+                    <option value="agentic">Agentic</option>
                   </select>
                 </span>
                 <span className="fb">

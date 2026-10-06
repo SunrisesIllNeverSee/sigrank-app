@@ -134,7 +134,7 @@ export function SharePreview({
 }) {
   const pop = population.count || 1;
   const pct = Math.max(0.1, +((d.rank / pop) * 100).toFixed(1));
-  const slug = encodeURIComponent(d.op?.slug ?? d.name);
+  const slug = encodeURIComponent(d.op?.slug ?? d.codename);
   return (
     <div className="shareprev">
       <div className="big">
@@ -164,7 +164,7 @@ export function OperatorProfileTile({ d }: { d: ProfileView }) {
             {d.name} {isVerifiedOp(d.verif) && <span className="vchk">✓</span>}
           </div>
           <div className="ph">
-            {d.handle.startsWith("@") ? d.handle : `· ${d.handle}`} · #{d.rank}
+            {d.handle.startsWith("@") ? d.handle : d.codename} · #{d.rank}
           </div>
         </div>
         <div className="py">

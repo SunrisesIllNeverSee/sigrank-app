@@ -326,6 +326,9 @@ export const SORT_ASC = new Set(["$/1M"]);
    idx === -1 → the canonical featured operator; otherwise the ops row. */
 export interface ProfileView {
   name: string;
+  /** Identity key — always the codename (share/permalink target; never a
+   *  display-name fallback). */
+  codename: string;
   handle: string;
   rank: number;
   klass: string;
@@ -368,6 +371,7 @@ export const profileFor = (
       (fx.rank === 1 ? (ops[0] ?? null) : null);
     return {
       name: fx.name,
+      codename: fx.codename,
       handle: fx.handle,
       rank: fx.rank,
       klass: fx.klass,
@@ -388,7 +392,8 @@ export const profileFor = (
       ? `${t[t.length - 1] >= t[0] ? "+" : "−"}${Math.abs(t[t.length - 1] - t[0])} pts vs prior window`
       : "";
   return {
-    name: o.codename,
+    name: o.name,
+    codename: o.codename,
     handle: o.handle,
     rank: idx + 1,
     klass: o.klass,

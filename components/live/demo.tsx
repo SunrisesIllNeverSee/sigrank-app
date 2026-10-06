@@ -61,6 +61,8 @@ const FIXTURE: FixtureOp[] = [
 const operators: LiveOperator[] = FIXTURE.map((o, i) => ({
   ...o,
   slug: o.codename,
+  name: o.codename, // fixture codenames are the display names
+
   claimed: o.handle.startsWith("@"),
   nc: false,
   wf: null,

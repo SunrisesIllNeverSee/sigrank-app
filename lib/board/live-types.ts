@@ -23,11 +23,17 @@
 
 /** Compact metric cell as rendered by the reference workspace. */
 export interface LiveOperator {
-  /** Codename verbatim — also the share slug (slug === codename). */
+  /** Codename verbatim — the identity key + share slug (slug === codename).
+   *  On live data codenames are `signal-…` slugs, NOT human names — never
+   *  render this as the primary identity. */
   codename: string;
   /** Share slug — identical to codename (API codename verbatim). */
   slug: string;
-  /** Resolved display handle (operatorDisplayName), e.g. "@name". */
+  /** Primary display identity — operatorDisplayName() (display_name ??
+   *  codename). This is the name the operator picked; rows/dock/featured
+   *  render it as the headline, codename becomes the secondary identity. */
+  name: string;
+  /** Resolved display handle, e.g. "@name" when a platform handle is set. */
   handle: string;
   /** Display class label, e.g. "POWER II". */
   klass: string;
