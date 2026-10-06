@@ -12,7 +12,9 @@
  *     documentElement data-theme is left alone
  *   - logic verbatim: numvOf compact parsing, RMAX from initial.fieldMax
  *     (server full-scope maxima — never recomputed from rendered rows),
- *     opRadar, derived movers, tt1..tt3 top-3 heat, ops/outliers view
+ *     opRadar, derived movers, tt1..tt3 top-3 heat, workflow pills
+ *     (Both/HITL/Agentic/Hybrid — the reference's ops/outlier pair,
+ *     repurposed per owner; outlier view survives as SORT=10xDEV)
  *   - sort/filter/search are client-side over the supplied array; the table
  *     renders the current page only — PAGE_SIZE = 10 rows, matching the
  *     reference's `ceil(population / 10)` page chrome. The page count derives
@@ -228,7 +230,6 @@ export function LiveBoardWorkspace({
   const rawRank = useMemo(() => rawRankMap(ops), [ops]);
 
   /* ---------- board state ---------- */
-  const [viewMode, setViewMode] = useState<ViewMode>("ops");
   const [colMode, setColMode] = useState<ColMode>("metrics");
   const [bannerOn, setBannerOn] = useState(false);
   const [windowSel, setWindowSel] = useState(() =>
@@ -244,8 +245,13 @@ export function LiveBoardWorkspace({
   const [sortSel, setSortSel] = useState<string>(CONTROLS.sorts[0]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  /* The reference's ops/outlier pill pair is now the workflow filter (owner:
+     HITL replaces Operators, Agentic replaces Outliers, Both = combined).
+     The outlier VIEW survives as SORT=10xDEV — derive the row cosmetics
+     from it so ◆/position ranks/"10×DEV OUTLIER" still fire on a dev sort. */
+  const viewMode: ViewMode = sortSel === "10xDEV" ? "out" : "ops";
 
-  /* ?mode=hitl|agentic — the pre-2B board's workflow-view URL contract.
+  /* ?mode=hitl|agentic|hybrid — the pre-2B board's workflow-view URL contract.
      Read post-mount (the page stays static/ISR-cacheable) and re-read on
      window swaps, whose router.push carries the param forward. */
   useEffect(() => {
@@ -851,17 +857,43 @@ export function LiveBoardWorkspace({
               <div className="fbar">
                 <div className="seg">
                   <button
-                    className={viewMode === "ops" ? "on" : ""}
-                    onClick={() => setViewMode("ops")}
+                    className={wfSel === "both" ? "on" : ""}
+                    onClick={() => {
+                      setWfSel("both");
+                      liveTrack.modeChanged("both");
+                    }}
                   >
-                    Operators
+                    Both
                   </button>
                   <span className="sep"></span>
                   <button
-                    className={viewMode === "out" ? "on" : ""}
-                    onClick={() => setViewMode("out")}
+                    className={wfSel === "hitl" ? "on" : ""}
+                    onClick={() => {
+                      setWfSel("hitl");
+                      liveTrack.modeChanged("hitl");
+                    }}
                   >
-                    Outliers
+                    HITL
+                  </button>
+                  <span className="sep"></span>
+                  <button
+                    className={wfSel === "agentic" ? "on" : ""}
+                    onClick={() => {
+                      setWfSel("agentic");
+                      liveTrack.modeChanged("agentic");
+                    }}
+                  >
+                    Agentic
+                  </button>
+                  <span className="sep"></span>
+                  <button
+                    className={wfSel === "hybrid" ? "on" : ""}
+                    onClick={() => {
+                      setWfSel("hybrid");
+                      liveTrack.modeChanged("hybrid");
+                    }}
+                  >
+                    Hybrid
                   </button>
                 </div>
                 <span className="fb">
@@ -895,22 +927,6 @@ export function LiveBoardWorkspace({
                     {CONTROLS.classes.map((o) => (
                       <option key={o}>{o}</option>
                     ))}
-                  </select>
-                </span>
-                <span className="fb">
-                  <span className="fl">WORKFLOW</span>
-                  <select
-                    value={wfSel}
-                    onChange={(e) => {
-                      const v = e.target.value as typeof wfSel;
-                      setWfSel(v);
-                      liveTrack.modeChanged(v);
-                    }}
-                  >
-                    <option value="both">Both</option>
-                    <option value="hitl">HITL</option>
-                    <option value="agentic">Agentic</option>
-                    <option value="hybrid">Hybrid</option>
                   </select>
                 </span>
                 <span className="fb">
