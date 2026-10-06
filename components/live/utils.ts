@@ -292,7 +292,7 @@ export const profileFor = (
        compute the radar the same way as any selected operator (fixture
        shipped a keyed series; the contract drops it — live.js emits the
        same shape via [1,1,1,1,1] for the field leader). */
-    const match = ops.find((o) => o.codename === fx.name) ?? null;
+    const match = ops.find((o) => o.codename === fx.codename) ?? null;
     return {
       name: fx.name,
       handle: fx.handle,
