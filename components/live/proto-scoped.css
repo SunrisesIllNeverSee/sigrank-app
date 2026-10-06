@@ -93,7 +93,7 @@
 .lbw-root .wrap{max-width:1440px;margin:0 auto;padding:0 22px}
 
 /* ---------- LB-01 nav (edge-to-edge header) ---------- */
-.lbw-root .nav{display:flex;align-items:center;gap:26px;padding:12px 22px;border-bottom:1px solid var(--line);flex-shrink:0}
+.lbw-root .nav{display:flex;align-items:center;gap:26px;padding:12px 22px;border-bottom:1px solid var(--line);flex-shrink:0;position:relative}
 .lbw-root .logo{display:flex;align-items:center;gap:9px;font-family:var(--font-disp);font-weight:700;font-size:17px;letter-spacing:-.02em}
 .lbw-root .logo .px{display:grid;grid-template-columns:repeat(2,7px);grid-auto-rows:7px;gap:2px}
 .lbw-root .logo .px i{display:block;background:var(--ac)}
@@ -202,7 +202,8 @@
 .lbw-root .srail.min .sw{width:14px;height:14px}
 
 /* header — page title left, live-pill + kicker right */
-.lbw-root .pagetitle{font-family:var(--font-disp);font-weight:700;font-size:16px;letter-spacing:-.01em}
+.lbw-root .pagetitle{font-family:var(--font-disp);font-weight:700;font-size:16px;letter-spacing:-.01em;
+  position:absolute;left:50%;transform:translateX(-50%)}
 .lbw-root .pagetitle em{font-style:normal;color:var(--ac)}
 .lbw-root .hkicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--mut)}
 
@@ -231,10 +232,12 @@
 /* ---------- right dock column ---------- */
 .lbw-root .railcol{display:flex;flex-direction:column;border-left:1px solid var(--line);
   background:var(--bg2);min-height:0}
+/* railheads (owner 2026-10-06): raised to proper panel headers — the same
+   display face as the title bar, not the mono module-label treatment. */
 .lbw-root .railhead{display:flex;align-items:center;gap:8px;padding:0 14px;height:41px;flex-shrink:0;
-  border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:10px;
-  letter-spacing:.2em;color:var(--mut)}
-.lbw-root .railhead .sq{width:8px;height:8px;background:var(--ac)}
+  border-bottom:1px solid var(--line);font-family:var(--font-disp);font-weight:700;
+  font-size:13px;letter-spacing:.04em;color:var(--tx);white-space:nowrap;overflow:hidden}
+.lbw-root .railhead .sq{width:8px;height:8px;background:var(--ac);flex-shrink:0}
 
 /* layout toggle (title bar, VS Code quick-pick style) — inspector rail
    visibility is an explicit user control; the rail never reflows below
@@ -363,8 +366,13 @@
 .lbw-root .vchk{color:var(--cyan);font-size:10px}
 .lbw-root .yv{font-weight:700;color:var(--ac)}
 .lbw-root .spark{vertical-align:middle}
-.lbw-root .pgn{display:flex;align-items:center;gap:8px;padding:12px 14px;font-family:var(--font-mono);font-size:11px;color:var(--mut)}
-.lbw-root .pgn .pages{margin-left:auto;display:flex;gap:5px}
+.lbw-root .pgn{display:flex;align-items:center;gap:12px;padding:12px 14px;font-family:var(--font-mono);font-size:11px;color:var(--mut);position:relative}
+.lbw-root .pgn .pgl{flex:1;min-width:0}
+/* owner 2026-10-06: page numbers centered + clickable (absolute-center
+   against the row); the Metrics/Raw (tokens) toggle lives in this row. */
+.lbw-root .pgn .pages{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.lbw-root .pgn .pgn-seg{height:24px;flex-shrink:0}
+.lbw-root .pgn .pgn-seg button{padding:3px 10px;font-size:9.5px}
 .lbw-root .pgn button{border:1px solid var(--line2);border-radius:5px;padding:4px 9px;font-family:var(--font-mono);font-size:10.5px;color:var(--tx2)}
 .lbw-root .pgn button.on{background:var(--ac);color:var(--ac-tx);border-color:var(--ac);font-weight:700}
 .lbw-root .pgn .exp{margin-left:12px;color:var(--ac)}
@@ -655,3 +663,78 @@
 .lbw-root .pgn button.exp:disabled{opacity:.38;cursor:default}
 .lbw-root .pgn .pgstat{font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
 .lbw-root .pgn .pgstat.pgerr{color:var(--dn)}
+
+/* ---------- owner annotation pass (2026-10-06) ----------
+   HotStats / HallSpot / RotatingMovers / compare-search / RECENTS & SOON /
+   lside radar + trophies / icon hover-grow. New selectors only. */
+
+/* HOT STATS — one field stat at a time, rotating (dedupes the banner
+   strip; "hot stats, rotating stats from the board as a whole") */
+.lbw-root .hotstat{text-align:center;padding:6px 0 2px}
+.lbw-root .hotstat .hs-v{font-family:var(--font-mono);font-weight:800;font-size:26px;color:var(--ac);line-height:1.15}
+.lbw-root .hotstat .hs-l{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;color:var(--mut);margin-top:4px}
+.lbw-root .hs-dots{display:flex;justify-content:center;gap:5px;margin-top:10px}
+.lbw-root .hs-dots span{width:5px;height:5px;border-radius:50%;background:var(--line2)}
+.lbw-root .hs-dots span.on{background:var(--ac)}
+
+/* HALL spotlight — random operator spotlight w/ profile graphic */
+.lbw-root .hspot{display:flex;align-items:center;gap:12px;padding:10px 8px;
+  border:1px solid var(--line2);border-radius:var(--radius-sm)}
+.lbw-root .hspot.clickable{cursor:pointer}
+.lbw-root .hspot.clickable:hover{border-color:var(--ac);background:var(--hover)}
+.lbw-root .hspot .hav{width:44px;height:44px;flex-shrink:0;border-radius:10px;
+  background:linear-gradient(135deg,var(--ac),var(--cyan));display:grid;
+  place-items:center;font-family:var(--font-disp);font-weight:800;
+  font-size:19px;color:var(--ac-tx)}
+.lbw-root .hspot .hsp{display:flex;flex-direction:column;min-width:0}
+.lbw-root .hspot .hsn{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbw-root .hspot .hsv{font-size:10px;color:var(--ac);margin-top:2px}
+
+/* movers mode label — rotates 7D → 24H → HITL → AGENTIC */
+.lbw-root .mv-mode{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.16em;
+  color:var(--ac);margin-bottom:7px}
+.lbw-root .mv-mode .mut{color:var(--mut)}
+
+/* compare module — slot graphics + add-by-search */
+.lbw-root .cmp-slot.filled{border-style:solid;border-color:var(--line2);background:var(--chip)}
+.lbw-root .cmp-slot .cav{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--ac),var(--cyan));font-weight:800;
+  font-size:12px;color:var(--ac-tx)}
+.lbw-root .cmp-search{width:100%;background:var(--panel);border:1px solid var(--line2);
+  color:var(--tx);font-family:var(--font-mono);font-size:10px;padding:6px 9px;
+  border-radius:var(--radius-sm);margin-bottom:8px}
+.lbw-root .cmp-search:focus{outline:none;border-color:var(--ac)}
+.lbw-root .cmp-match{font-size:9.5px;margin:-2px 0 8px}
+.lbw-root .cmp-match button{color:var(--ac);background:none;border:none;
+  font:inherit;cursor:pointer;padding:2px 0;letter-spacing:.06em}
+.lbw-root .cmp-match button:hover{text-decoration:underline}
+
+/* RECENTS & SOON */
+.lbw-root .soon-h{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;
+  color:var(--mut);margin:2px 0 7px}
+.lbw-root .soon-h:not(:first-child){margin-top:13px}
+.lbw-root .rec-chip{display:block;width:100%;text-align:left;background:var(--panel);
+  border:1px solid var(--line2);border-radius:5px;padding:5px 9px;margin-bottom:5px;
+  font-family:var(--font-mono);font-size:10px;color:var(--tx2);cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbw-root .rec-chip:hover{color:var(--ac);border-color:var(--ac)}
+.lbw-root .soonchips{display:flex;flex-wrap:wrap;gap:5px}
+.lbw-root .soonchip{font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;
+  color:var(--mut);border:1px dashed var(--line2);border-radius:999px;
+  padding:3px 9px;cursor:default}
+
+/* lside profile extras — radar + trophy tracker */
+.lbw-root .lside-radar{display:flex;justify-content:center;margin:12px 0 2px}
+.lbw-root .trph-h{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;
+  color:var(--mut);margin:12px 0 7px}
+.lbw-root .trph{display:flex;flex-direction:column;gap:6px}
+.lbw-root .trph-r{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);
+  font-size:9.5px}
+.lbw-root .trph-r .ti{font-size:11px}
+.lbw-root .trph-r .tm{color:var(--tx2);flex:1;min-width:0;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:.08em}
+.lbw-root .trph-r .tv{color:var(--ac);flex-shrink:0}
+
+/* icon rail — glyphs grow on hover (owner: "icons get big when scrolled over") */
+.lbw-root .sbtn .gi{transition:transform .14s ease}
+.lbw-root .sbtn:hover .gi{transform:scale(1.3)}
