@@ -165,10 +165,11 @@ transitives) — **owner should regenerate the lockfile**.
 
 ## 11. Known limitations / owner-action items
 
-- **`signa_rate` labeling** — trend sparkline is bound to `signa_rate`
-  history and honestly labeled `SCORE HISTORY · SIGNA RATE` in the dock
-  (unchanged); if a canonical yield-history feed lands later, rebind rather
-  than relabel.
+- **`signa_rate` → resolved** — the history route now emits `yield_` per
+  point (the data layer already computed it; the API was dropping it). The
+  sparkline binds the Υ series and is labeled `YIELD HISTORY · Υ`;
+  `signa_rate` remains only as a labeled fallback when an operator has no
+  compounding snapshots (`trendKind: "score"`).
 - **Tools tab partial** — dock `tools` tab remains reference-parity partial;
   deeper per-tool breakdown is not wired to a dedicated API.
 - **Compare is seeded, not embedded** — `?a=<codename>` seeds `/compare`;
