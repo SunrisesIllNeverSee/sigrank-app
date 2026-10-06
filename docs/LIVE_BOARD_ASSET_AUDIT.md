@@ -34,11 +34,12 @@ Source packs reviewed:
 
 ## Lost / degraded elements vs. the packs (the surgical list)
 
-1. **Pixel medallions (buttons/pins)** — the badge sheet's 3×3 block
-   badges (TOP 10% ACHIEVER, TOP 5% ELITE, TOP 1% LEGEND, 100 DAYS
-   CONSISTENT, 10M TOKENS MILESTONE, VERIFIED OPERATOR). Board surfaces
-   that should use them: the `✓` verified chip → VERIFIED block badge;
-   percentile cells → TOP X% badge; TROPHIES strip → block badges.
+1. ~~**Pixel medallions (buttons/pins)**~~ — **DONE**
+   (`components/live/PixelBadge.tsx`): all six block badges decoded from
+   `10_badge_system.png` (per-cell colors → theme vars). Wired: VERIFIED
+   badge overlays the avatar's top-left corner in rows + profile tile;
+   percentile badges (TOP 10%/5%/1%) render inline next to operator names.
+   `days100`/`tokens10m` are decoded and ready for the milestone surfaces.
 2. **Hexagon milestone medallions** — hex outline + inner glyph + label
    (pack section I). Target: TROPHIES strip + class medallion chips.
 3. **Hexagonal radar** — flagship card uses concentric hex rings + filled
