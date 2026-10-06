@@ -576,3 +576,21 @@
 .lbw-root .drill{display:flex;flex-direction:column;gap:9px;min-height:170px}
 .lbw-root .drill .srow{grid-template-columns:1fr auto auto auto}
 .lbw-root .drill-note{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
+
+/* ==========================================================================
+   R2 production additions — keyboard focus rings on the clickable rows the
+   reference shipped as div-onclick chrome, the now-functional pagination
+   buttons, the honest empty-state row, and the hydration-status text on the
+   .pgn bar. New selectors only; no reference rule is restyled.
+   ========================================================================== */
+.lbw-root tr[data-op]:focus-visible,.lbw-root .mv[data-op]:focus-visible,
+.lbw-root .hex[data-op]:focus-visible{outline:1px solid var(--ac);outline-offset:-1px}
+.lbw-root tr.board-empty td{padding:22px;text-align:center;font-family:var(--font-mono);
+  font-size:10.5px;letter-spacing:.14em;color:var(--mut)}
+.lbw-root .pgn button{cursor:pointer}
+.lbw-root .pgn button:disabled{opacity:.38;cursor:default}
+.lbw-root .pgn button:focus-visible{outline:1px solid var(--ac);outline-offset:1px}
+.lbw-root .pgn button.exp{border:none;padding:0;cursor:pointer}
+.lbw-root .pgn button.exp:disabled{opacity:.38;cursor:default}
+.lbw-root .pgn .pgstat{font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
+.lbw-root .pgn .pgstat.pgerr{color:var(--dn)}

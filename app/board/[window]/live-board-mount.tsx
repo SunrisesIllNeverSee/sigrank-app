@@ -23,6 +23,10 @@
  *     channels can never double-append. Works as the retry path when the
  *     mount fetch soft-failed (429/offline).
  *
+ *   - fieldStatus: the hydration lifecycle ("idle" | "loading" | "ready" |
+ *     "error") surfaced to the workspace so the pagination chrome can show
+ *     SYNCING/FAILURE state — a soft-fail never blanks the SSR'd first page.
+ *
  *   - fetchDetail: not overridden — the workspace's default
  *     createDetailFetcher(meta.window) (components/live/enrich.ts) fans out
  *     profile + history + records + snapshot-history per selection with a
@@ -51,7 +55,10 @@ import type {
   LiveBoardInitialState,
   LiveOperator,
 } from "@/lib/board/live-types";
-import { LiveBoardWorkspace } from "@/components/live/LiveBoardWorkspace";
+import {
+  LiveBoardWorkspace,
+  type LiveFieldStatus,
+} from "@/components/live/LiveBoardWorkspace";
 
 /** /api/live-board row ceiling per request — same 2,000 cap as the public API. */
 const FIELD_FETCH_LIMIT = 2000;
@@ -93,12 +100,23 @@ export function LiveBoardMount({
   /** Rows already delivered server+client side — the pagination cursor. */
   const loadedRef = useRef(initial.operators.length);
   const inFlightRef = useRef(false);
+  /* Hydration lifecycle for the pagination chrome — a 429/network soft-fail
+     lands as "error" (retryable via fetchMore/page clicks); a short or
+     zero-row response with the field still incomplete is also "error" rather
+     than a silent stall. */
+  const [fieldStatus, setFieldStatus] = useState<LiveFieldStatus>(() =>
+    initial.operators.length >= initial.totalOperators ? "ready" : "idle",
+  );
 
   const loadRemaining = useCallback(async () => {
     if (inFlightRef.current) return;
     const offset = loadedRef.current;
-    if (offset >= initial.totalOperators) return; // field already complete
+    if (offset >= initial.totalOperators) {
+      setFieldStatus("ready");
+      return;
+    }
     inFlightRef.current = true;
+    setFieldStatus("loading");
     try {
       const qs = new URLSearchParams({
         window: windowSlug,
@@ -106,13 +124,21 @@ export function LiveBoardMount({
         limit: String(FIELD_FETCH_LIMIT),
       });
       const res = await fetch(`/api/live-board?${qs}`);
-      if (!res.ok) return; // 429/5xx — soft-fail; pagination clicks retry
+      if (!res.ok) {
+        // 429/5xx — soft-fail; pagination clicks retry via fetchMore
+        setFieldStatus("error");
+        return;
+      }
       const data = (await res.json()) as { operators?: LiveOperator[] };
       const rows = Array.isArray(data.operators) ? data.operators : [];
       loadedRef.current = offset + rows.length;
       if (rows.length) setExtraOps((prev) => mergeByCodename(prev, rows));
+      setFieldStatus(
+        loadedRef.current >= initial.totalOperators ? "ready" : "error",
+      );
     } catch {
       /* network/parse failure — the SSR first page still renders */
+      setFieldStatus("error");
     } finally {
       inFlightRef.current = false;
     }
@@ -148,6 +174,7 @@ export function LiveBoardMount({
       key={merged.meta.window}
       initial={merged}
       fetchMore={fetchMore}
+      fieldStatus={fieldStatus}
     />
   );
 }
