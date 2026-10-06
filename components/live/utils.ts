@@ -143,6 +143,15 @@ export const windowLabel = (w: string): string =>
 export const COMPARE_SLOTS = 3;
 export const COMPARE_CTA = "Start Comparing";
 
+/* ---------- pagination (LB-19) ----------
+   The reference's page chrome derives from 10 rows/page —
+   board.js: `Math.ceil(POPN.count / 10)` — so the production contract keeps
+   PAGE_SIZE = 10. The table slices `ordered` to the current page; the page
+   count derives from the LOADED row count (ordered.length), never the
+   population denominator — the mount hydrates the rest of the field lazily
+   and a page click on an incomplete field doubles as the retry path. */
+export const PAGE_SIZE = 10;
+
 /* radar axis labels — data.js FEATURED.radar.axes, verbatim order */
 export const RADAR_AXES = ["Yield", "Leverage", "Velocity", "SNR", "10xDEV"];
 
@@ -263,9 +272,11 @@ export const rawRankMap = (ops: LiveOperator[]): Record<number, number> => {
   return m;
 };
 
-/* ---------- deriveMovers — verbatim from data.js ----------
-   sorts the active field projection by movement_7d; `mv7: null` (no
-   movement data) behaves as 0 spots gained, matching a "stayed" row. */
+/* ---------- deriveMovers — verbatim from data.js, null-preserving ------
+   sorts the active field projection by movement_7d. Rows with mv7: null
+   (no movement data — fresh or unmaintained) are excluded outright: a mover
+   must have moved, and coercing null→0 could rank an unmoved row into the
+   rail. An all-null field yields an empty rail (honest empty state). */
 export interface DerivedMover {
   o: LiveOperator;
   i: number;
@@ -273,7 +284,7 @@ export interface DerivedMover {
 }
 export const deriveMovers = (ops: LiveOperator[]): DerivedMover[] =>
   ops
-    .map((o, i) => ({ o, i, mv: o.mv7 ?? 0 }))
+    .flatMap((o, i) => (o.mv7 == null ? [] : [{ o, i, mv: o.mv7 }]))
     .sort((a, b) => b.mv - a.mv)
     .slice(0, 5);
 
@@ -397,6 +408,7 @@ export const deltaUp = (delta: string): boolean => !delta.startsWith("−");
 /** board.js — strip the leading +/− before rendering with the arrow glyph. */
 export const deltaBody = (delta: string): string => delta.replace(/^\+|^−/, "");
 
-/** signed movement display, e.g. "+8" / "−3" / "0" */
+/** signed movement display, e.g. "+8" / "−3" / "0" — null (no movement data)
+   *  renders "—", never a fabricated zero. */
 export const mvLabel = (mv: number | null | undefined): string =>
-  mv == null ? "0" : mv > 0 ? `+${mv}` : mv < 0 ? `−${Math.abs(mv)}` : "0";
+  mv == null ? "—" : mv > 0 ? `+${mv}` : mv < 0 ? `−${Math.abs(mv)}` : "0";
