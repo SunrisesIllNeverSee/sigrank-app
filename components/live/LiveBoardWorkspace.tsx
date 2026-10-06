@@ -134,7 +134,10 @@ export type LiveFieldStatus = "idle" | "loading" | "ready" | "error";
 /* rail module ids — reference module order: field, hall, compare, movers,
    share; "profile" is inserted first while the operator is docked. */
 type RailId = "profile" | "field" | "hall" | "compare" | "movers" | "share";
-const BASE_RAIL_ORDER: RailId[] = ["field", "hall", "compare", "movers", "share"];
+/* Right-rail module order (owner 2026-10-06): interactive share, movement,
+   compare, then field context — the profile module moved to the left
+   sidebar ("banner + op profile"), which is why "profile" is absent. */
+const BASE_RAIL_ORDER: RailId[] = ["share", "movers", "compare", "field", "hall"];
 const RAIL_TITLE: Record<RailId, string> = {
   profile: "OPERATOR PROFILE",
   field: "FIELD",
@@ -233,7 +236,9 @@ export function LiveBoardWorkspace({
 
   /* ---------- board state ---------- */
   const [colMode, setColMode] = useState<ColMode>("metrics");
-  const [bannerOn, setBannerOn] = useState(false);
+  /* leftOn = left sidebar (banner + operator profile) visibility — explicit
+     title-bar glyph, VS Code panel pattern; never media-query reflow. */
+  const [leftOn, setLeftOn] = useState(true);
   const [windowSel, setWindowSel] = useState(() =>
     windowLabel(initial.meta.window),
   );
@@ -401,24 +406,15 @@ export function LiveBoardWorkspace({
   const session = useBoardSession(!account);
 
   /* ---------- rail module stack (reorderable + hideable) ---------- */
-  const [railOrder, setRailOrder] = useState<RailId[]>([
-    "profile",
-    ...BASE_RAIL_ORDER,
-  ]);
+  const [railOrder, setRailOrder] = useState<RailId[]>(BASE_RAIL_ORDER);
   const [hiddenIds, setHiddenIds] = useState<RailId[]>([]);
   const visibleRail = railOrder.filter((id) => !hiddenIds.includes(id));
 
-  const toggleDock = useCallback(() => {
-    setDocked((prev) => {
-      const next = !prev;
-      setRailOrder((o) =>
-        next
-          ? ["profile", ...o.filter((id) => id !== "profile")]
-          : o.filter((id) => id !== "profile"),
-      );
-      return next;
-    });
-  }, []);
+  /* ⇄ FEATURE flips the drill card between floating (.feat over the board)
+     and docked (compact tile in the LEFT sidebar's OPERATOR PROFILE mod —
+     owner 2026-10-06 IA: left = banner + op profile, right = share/movers/
+     compare/field context). */
+  const toggleDock = useCallback(() => setDocked((v) => !v), []);
 
   const moveModule = useCallback(
     (id: RailId, dir: -1 | 1) => {
@@ -484,7 +480,7 @@ export function LiveBoardWorkspace({
       );
     }
     const fn = SORT_KEY[sortSel];
-    if (fn && sortSel !== "Yield") {
+    if (fn && (sortSel !== "Yield" || sortFlip)) {
       const asc = SORT_ASC.has(sortSel) !== sortFlip;
       arr = [...arr].sort((a, b) =>
         asc ? fn(a[0]) - fn(b[0]) : fn(b[0]) - fn(a[0]),
@@ -772,7 +768,9 @@ export function LiveBoardWorkspace({
       {/* no-flash theme init — applies ?theme=/stored theme to .lbw-root
           pre-paint (SSR always emits "green"); site <html> untouched. */}
       <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
-      <div className={`app${railOn ? "" : " no-rail"}`}>
+      <div
+        className={`app${railOn ? "" : " no-rail"}${leftOn ? "" : " no-left"}`}
+      >
         {/* left column: icon rail (owner 2026-10-06 — icons only, hover
             tooltips; signalaf mark = home; avatar at bottom = account/
             settings. Wiki/Blog/Enterprise added; Enterprise → /upsilon,
@@ -916,8 +914,20 @@ export function LiveBoardWorkspace({
             </span>
             <div className="nav-right">
               <span className="hkicker">{COPY.heroKicker}</span>
-              {/* layout toggle (VS Code quick-pick pattern): inspector
-                  rail on/off — explicit control, never media-query. */}
+              {/* layout toggles (VS Code quick-pick pattern): left sidebar +
+                  inspector rail on/off — explicit control, never media-query. */}
+              <button
+                type="button"
+                className={`layout-tg${leftOn ? " on" : ""}`}
+                title={leftOn ? "hide left sidebar" : "show left sidebar"}
+                aria-pressed={leftOn}
+                onClick={() => setLeftOn((v) => !v)}
+              >
+                <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="12" height="12" fill="none" stroke="currentColor" />
+                  <rect x="1.5" y="2" width="3.5" height="9" fill="currentColor" stroke="none" />
+                </svg>
+              </button>
               <button
                 type="button"
                 className={`layout-tg${railOn ? " on" : ""}`}
@@ -934,6 +944,66 @@ export function LiveBoardWorkspace({
           </header>
 
           <div className="mid">
+            {/* left sidebar (owner 2026-10-06): banner + operator profile —
+                VS Code side-panel anatomy, toggled by the title-bar glyph. */}
+            <aside className="lside">
+              <div className="railhead">
+                <span className="sq"></span>SIGNALAF
+              </div>
+              <div className="rail">
+                <div className="mod">
+                  <h3>
+                    <span className="sq"></span>BANNER
+                  </h3>
+                  <div className="lside-banner">
+                    <section className="hero">
+                      <div className="kicker">{COPY.heroKicker}</div>
+                      <h1>
+                        {COPY.heroTitleA}
+                        <em>{COPY.heroTitleB}</em>
+                      </h1>
+                    </section>
+                    <section className="strip">
+                      {initial.fieldStats.map((s) => (
+                        <div className="cell" key={s.field}>
+                          <div className="v">
+                            {emStat(s.field) ? <em>{s.value}</em> : s.value}
+                          </div>
+                          <div className="l">
+                            {s.field.replace(/_/g, " ").toUpperCase()}
+                          </div>
+                        </div>
+                      ))}
+                    </section>
+                  </div>
+                </div>
+                <div className="mod">
+                  <h3>
+                    <span className="sq"></span>OPERATOR PROFILE
+                    <button className="dock" onClick={toggleDock}>
+                      ⇄ FEATURE
+                    </button>
+                  </h3>
+                  {profile ? (
+                    docked ? (
+                      <OperatorProfileTile d={profile} />
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn ghost lside-redock"
+                        onClick={toggleDock}
+                        title="re-dock the operator card"
+                      >
+                        ⇄ FLOATING — RE-DOCK
+                      </button>
+                    )
+                  ) : (
+                    <p className="drill-note">— SELECT AN OPERATOR</p>
+                  )}
+                </div>
+              </div>
+            </aside>
+
             <div className="stagecol">
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
@@ -1005,12 +1075,26 @@ export function LiveBoardWorkspace({
                   <span className="fl">SORT</span>
                   <select
                     value={sortSel}
-                    onChange={(e) => setSortSel(e.target.value)}
+                    onChange={(e) => {
+                      setSortSel(e.target.value);
+                      setSortFlip(false);
+                    }}
                   >
                     {CONTROLS.sorts.map((o) => (
                       <option key={o}>{o}</option>
                     ))}
                   </select>
+                  {/* direction chip — symmetric with the select; flips the
+                      effective asc/desc off the column's SORT_ASC default. */}
+                  <button
+                    type="button"
+                    className="sdir"
+                    title={`direction — ${SORT_ASC.has(sortSel) !== sortFlip ? "ascending" : "descending"}; click to flip`}
+                    aria-label="toggle sort direction"
+                    onClick={() => setSortFlip((f) => !f)}
+                  >
+                    {SORT_ASC.has(sortSel) !== sortFlip ? "▲" : "▼"}
+                  </button>
                 </span>
                 <span className="fb">
                   <span className="fl">SEARCH</span>
@@ -1036,39 +1120,9 @@ export function LiveBoardWorkspace({
                     Raw · the fuel
                   </button>
                 </div>
-                <button
-                  className={`ctlbtn${bannerOn ? " on" : ""}`}
-                  title="toggle banner block"
-                  onClick={() => setBannerOn((v) => !v)}
-                >
-                  {bannerOn ? "▣ BANNER" : "▢ BANNER"}
-                </button>
               </div>
 
               <main className="stage" ref={stageRef}>
-                {/* optional banner block (user toggle) */}
-                <div className="banner" hidden={!bannerOn}>
-                  <section className="hero">
-                    <div className="kicker">{COPY.heroKicker}</div>
-                    <h1>
-                      {COPY.heroTitleA}
-                      <em>{COPY.heroTitleB}</em>
-                    </h1>
-                  </section>
-                  <section className="strip">
-                    {initial.fieldStats.map((s) => (
-                      <div className="cell" key={s.field}>
-                        <div className="v">
-                          {emStat(s.field) ? <em>{s.value}</em> : s.value}
-                        </div>
-                        <div className="l">
-                          {s.field.replace(/_/g, " ").toUpperCase()}
-                        </div>
-                      </div>
-                    ))}
-                  </section>
-                </div>
-
                 <div className="board">
                   {/* LB-03/04/05 operator dock (starts docked in rail) */}
                   {profile && (
@@ -1216,23 +1270,19 @@ export function LiveBoardWorkspace({
               </main>
             </div>
 
-            {/* right dock: heading + swappable modules */}
+            {/* right rail: heading + swappable modules (share, movers,
+                compare, field, hall — owner 2026-10-06 IA) */}
             <aside className="railcol">
               <div className="railhead">
-                <span className="sq"></span>OPERATOR DOCK
+                <span className="sq"></span>INSPECTOR
               </div>
               <div className="rail">
                 {visibleRail.map((id) =>
-                  id === "profile" && !profile ? null : (
+                  (
                     <div className="mod" key={id}>
                       <h3>
                         <span className="sq"></span>
                         {RAIL_TITLE[id]}
-                        {id === "profile" && (
-                          <button className="dock" onClick={toggleDock}>
-                            ⇄ FEATURE
-                          </button>
-                        )}
                         <span className="mvbtns">
                           <button
                             className="mvbtn"
