@@ -880,3 +880,23 @@
   clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
   background:var(--chip)}
 .lbw-root .hexic span{position:relative;font-size:11px}
+
+/* column header line (owner: "single line header, one for each column,
+   centered") — a slim fixed label at the top of each column. */
+.lbw-root .colhead{font-family:var(--font-disp);font-weight:700;font-size:12px;
+  letter-spacing:.08em;text-align:center;padding:9px 0 7px;
+  border-bottom:1px solid var(--line);color:var(--tx);flex-shrink:0}
+/* sidebar sub-headers sit under the colhead */
+.lbw-root .railhead{padding-top:8px}
+
+/* soon popover (rail icon → mockup desc + vote) */
+.lbw-root .soonpop{position:absolute;left:56px;bottom:150px;z-index:60;
+  background:var(--panel);border:1px solid var(--line2);border-radius:9px;
+  padding:10px 12px;width:180px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.lbw-root .ap-label{font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.16em;color:var(--mut);margin-bottom:4px}
+.lbw-root .ap-desc{font-size:10px;color:var(--tx2);margin:4px 0 8px}
+.lbw-root .soonpop .vote{width:100%}
+/* themes inside the settings popover */
+.lbw-root .acctpop .themesw{display:flex;gap:6px;padding:4px 0 8px}
+.lbw-root .acctpop .sw{width:16px;height:16px}

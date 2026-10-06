@@ -15,6 +15,11 @@ const PATTERNS = {
   wiki: "11111/10001/10101/10001/11111",
   blog: "00001/00010/00100/01100/11110",
   enterprise: "01110/10001/10101/10001/01110",
+  /* coming-soon rail icons (owner 2026-10-06): teams/hacks/versus live in
+     the nav rail — pixel patterns follow the same 5×5 block language. */
+  teams: "10101/11111/00100/11111/10001",
+  hacks: "11100/11100/11100/01000/01000",
+  versus: "10101/01010/00100/01010/10101",
 } as const;
 
 export type PixelIconName = keyof typeof PATTERNS;
@@ -41,12 +46,15 @@ export type IconSetName = (typeof ICON_SETS)[number];
 
 const GLYPH_SET: Record<PixelIconName, string> = {
   board: "▤", compare: "⚖", hall: "🏆", field: "◉", wiki: "▥", blog: "✎", enterprise: "⬢",
+  teams: "⧉", hacks: "⚑", versus: "⚔",
 };
 const EMOJI_SET: Record<PixelIconName, string> = {
   board: "📊", compare: "⚖️", hall: "🏆", field: "🎯", wiki: "📖", blog: "✏️", enterprise: "🏢",
+  teams: "👥", hacks: "🏁", versus: "🥊",
 };
 const MINIMAL_SET: Record<PixelIconName, string> = {
   board: "▦", compare: "◐", hall: "◈", field: "◎", wiki: "▥", blog: "✎", enterprise: "⬢",
+  teams: "⧉", hacks: "⚑", versus: "⚔",
 };
 
 export function RailIcon({
