@@ -32,3 +32,45 @@ export function PixelIcon({ name }: { name: PixelIconName }) {
     </span>
   );
 }
+
+/* ---------- rail icon sets (owner 2026-10-06: "toggle through the icons,
+   I want all 4 or 5 sets") — the five candidates from
+   docs/assets/live-board-icon-options.png, switchable at runtime. */
+export const ICON_SETS = ["pixel", "glyph", "emoji", "minimal", "hex"] as const;
+export type IconSetName = (typeof ICON_SETS)[number];
+
+const GLYPH_SET: Record<PixelIconName, string> = {
+  board: "▤", compare: "⚖", hall: "🏆", field: "◉", wiki: "▥", blog: "✎", enterprise: "⬢",
+};
+const EMOJI_SET: Record<PixelIconName, string> = {
+  board: "📊", compare: "⚖️", hall: "🏆", field: "🎯", wiki: "📖", blog: "✏️", enterprise: "🏢",
+};
+const MINIMAL_SET: Record<PixelIconName, string> = {
+  board: "▦", compare: "◐", hall: "◈", field: "◎", wiki: "▥", blog: "✎", enterprise: "⬢",
+};
+
+export function RailIcon({
+  name,
+  set,
+}: {
+  name: PixelIconName;
+  set: IconSetName;
+}) {
+  if (set === "pixel") return <PixelIcon name={name} />;
+  const g =
+    set === "emoji" ? EMOJI_SET[name]
+    : set === "minimal" ? MINIMAL_SET[name]
+    : GLYPH_SET[name];
+  if (set === "hex") {
+    return (
+      <span className="gi hexic" aria-hidden="true">
+        <span>{g}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="gi" aria-hidden="true">
+      {g}
+    </span>
+  );
+}
