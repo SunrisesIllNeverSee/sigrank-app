@@ -294,7 +294,10 @@ function HistoryTab({
     <div className="drill">
       <Sparkline arr={trend} w={220} h={48} />
       <p className="drill-note">
-        SCORE HISTORY · SIGNA RATE · {trend.length} PTS
+        {detail?.trendKind === "score"
+          ? "SCORE HISTORY · SIGNA RATE"
+          : "YIELD HISTORY · Υ"}{" "}
+        · {trend.length} PTS
         {detail?.errors?.history ? " — SYNC FAILED" : ""}
       </p>
       {o && (
