@@ -78,14 +78,23 @@ export function HallRail({
       <div className="hexrow">
         {rows.map((h, i) => {
           const [hn, hv] = h.value.split(" — ");
+          const clickable = h.opIndex != null && onSelect != null;
           return (
             <div
               key={i}
               className="hex hexmed"
               data-op={h.opIndex ?? undefined}
-              onClick={
-                h.opIndex != null && onSelect
-                  ? () => onSelect(h.opIndex!)
+              role={clickable ? "button" : undefined}
+              tabIndex={clickable ? 0 : undefined}
+              onClick={clickable ? () => onSelect(h.opIndex!) : undefined}
+              onKeyDown={
+                clickable
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onSelect(h.opIndex!);
+                      }
+                    }
                   : undefined
               }
             >
@@ -98,6 +107,9 @@ export function HallRail({
           );
         })}
       </div>
+      {rows.length === 0 && (
+        <p className="drill-note">— NO RECORDS IN THIS SCOPE</p>
+      )}
       <a className="more" href="/hall">
         VIEW ALL RECORDS →
       </a>

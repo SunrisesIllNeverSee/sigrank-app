@@ -158,7 +158,12 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     windowEnd: row.window_end,
   });
   const archetype = archetypeOf(row).key;
-  const mv7 = Math.round(s.movement_7d);
+  /* Null-preserving movement: the contract types mv7/mv24 as number | null
+     because "no movement data" (fresh row, unmaintained rollup) must never
+     surface as a real 0-spot delta. ScoredSnapshot declares the fields
+     non-null, but mapSnapshot's num() coercion and mock/fallback rows mean a
+     null can still arrive here — emit null, not Math.round(null)→0. */
+  const mv7 = s.movement_7d == null ? null : Math.round(s.movement_7d);
 
   // Drill-down sub-line (sync.py): "<archetype> signature · <klass> tier ·
   // <total> observed" + supporter/verified/recs context bits.
@@ -190,7 +195,7 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     dev: comp?.dev10x != null ? trimNum(comp.dev10x, 2) : 0,
     pct: trimNum(row.percentile, 1),
     scalev: c ? trimNum(c.scaleV, 2) : 0,
-    mv24: Math.round(s.movement_24h),
+    mv24: s.movement_24h == null ? null : Math.round(s.movement_24h),
     mv7,
     ptpd: throughput ? `${compact(throughput.processedTokensPerDay)}/d` : null,
     otpd: throughput ? `${compact(throughput.outputTokensPerDay)}/d` : null,
@@ -209,7 +214,9 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     sub: bits.join(" · "),
     verif: operator.verification_status,
     supporter: operator.current_supporter_tier,
-    delta: deltaCopy(mv7),
+    /* No delta copy when movement is unknown — the empty string falls through
+       to the trend-derived delta in profileFor instead of printing "+0 spots". */
+    delta: mv7 == null ? "" : deltaCopy(mv7),
     last: seen(s.snapshot_date ?? row.snapshot_date),
     age: operator.account_age_days,
     msgs: operator.total_messages_lifetime,
