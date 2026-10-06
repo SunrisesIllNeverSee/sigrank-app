@@ -13,8 +13,8 @@
  *   - logic verbatim: numvOf compact parsing, RMAX from initial.fieldMax
  *     (server full-scope maxima — never recomputed from rendered rows),
  *     opRadar, derived movers, tt1..tt3 top-3 heat, workflow pills
- *     (Both/HITL/Agentic/Hybrid — the reference's ops/outlier pair,
- *     repurposed per owner; outlier view survives as SORT=10xDEV)
+ *     (HITL/HYBRID/AGENTIC — the reference's ops/outlier pair, repurposed
+ *     per owner; outlier view survives as SORT=10xDEV)
  *   - sort/filter/search are client-side over the supplied array; the table
  *     renders the current page only — PAGE_SIZE = 10 rows, matching the
  *     reference's `ceil(population / 10)` page chrome. The page count derives
@@ -237,10 +237,12 @@ export function LiveBoardWorkspace({
   );
   const [platformSel, setPlatformSel] = useState<string>(CONTROLS.platforms[0]);
   const [classSel, setClassSel] = useState<string>(CONTROLS.classes[0]);
-  /* Workflow filter: both = combined field (default on open); hitl/agentic/
-     hybrid = only rows carrying that resolved mode. */
-  const [wfSel, setWfSel] = useState<"both" | "hitl" | "agentic" | "hybrid">(
-    "both",
+  /* Workflow pills (owner spec): HITL | HYBRID | AGENTIC — "hybrid" is the
+     middle pill and means the COMBINED view (both workflow types + the
+     unresolved field — replaces the old "All"), and is the default on
+     open. hitl/agentic = only rows carrying that resolved mode. */
+  const [wfSel, setWfSel] = useState<"hybrid" | "hitl" | "agentic">(
+    "hybrid",
   );
   const [sortSel, setSortSel] = useState<string>(CONTROLS.sorts[0]);
   const [search, setSearch] = useState("");
@@ -256,9 +258,7 @@ export function LiveBoardWorkspace({
      window swaps, whose router.push carries the param forward. */
   useEffect(() => {
     const m = new URLSearchParams(window.location.search).get("mode");
-    setWfSel(
-      m === "hitl" || m === "agentic" || m === "hybrid" ? m : "both",
-    );
+    setWfSel(m === "hitl" || m === "agentic" ? m : "hybrid");
   }, [initial.meta.window]);
 
   /* WINDOW self-heal (R2): the mount normally remounts the workspace on a
@@ -440,7 +440,7 @@ export function LiveBoardWorkspace({
         ([o]) => o.klass === classSel || o.klass.startsWith(`${classSel} `),
       );
     }
-    if (wfSel !== "both") {
+    if (wfSel !== "hybrid") {
       arr = arr.filter(([o]) => o.wf === wfSel);
     }
     if (platformSel !== "All Platforms") {
@@ -492,7 +492,7 @@ export function LiveBoardWorkspace({
       if (onWindowChange) {
         onWindowChange(slug);
       } else {
-        router.push(`/board/${slug}${wfSel === "both" ? "" : `?mode=${wfSel}`}`);
+        router.push(`/board/${slug}${wfSel === "hybrid" ? "" : `?mode=${wfSel}`}`);
       }
     },
     [onWindowChange, router, wfSel],
@@ -857,16 +857,6 @@ export function LiveBoardWorkspace({
               <div className="fbar">
                 <div className="seg">
                   <button
-                    className={wfSel === "both" ? "on" : ""}
-                    onClick={() => {
-                      setWfSel("both");
-                      liveTrack.modeChanged("both");
-                    }}
-                  >
-                    Both
-                  </button>
-                  <span className="sep"></span>
-                  <button
                     className={wfSel === "hitl" ? "on" : ""}
                     onClick={() => {
                       setWfSel("hitl");
@@ -877,16 +867,6 @@ export function LiveBoardWorkspace({
                   </button>
                   <span className="sep"></span>
                   <button
-                    className={wfSel === "agentic" ? "on" : ""}
-                    onClick={() => {
-                      setWfSel("agentic");
-                      liveTrack.modeChanged("agentic");
-                    }}
-                  >
-                    Agentic
-                  </button>
-                  <span className="sep"></span>
-                  <button
                     className={wfSel === "hybrid" ? "on" : ""}
                     onClick={() => {
                       setWfSel("hybrid");
@@ -894,6 +874,16 @@ export function LiveBoardWorkspace({
                     }}
                   >
                     Hybrid
+                  </button>
+                  <span className="sep"></span>
+                  <button
+                    className={wfSel === "agentic" ? "on" : ""}
+                    onClick={() => {
+                      setWfSel("agentic");
+                      liveTrack.modeChanged("agentic");
+                    }}
+                  >
+                    Agentic
                   </button>
                 </div>
                 <span className="fb">
