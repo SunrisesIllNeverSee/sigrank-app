@@ -59,8 +59,9 @@
 .lbw-root .board-t th.hc-last{color:var(--mut)}
 .lbw-root .board-t th.hc-trend{color:var(--cyan)}
 
-/* Mono-glyph icon chip inside every column header (prod's st.ic). */
-.lbw-root .board-t th .hi{opacity:.72;margin-right:4px;font-weight:400}
+/* Mono-glyph icon chip inside every column header (prod's st.ic) —
+   full opacity (owner 2026-10-06: column icons must read clearly). */
+.lbw-root .board-t th .hi{opacity:1;margin-right:4px;font-weight:400}
 
 /* ---------- sortable affordance ---------- */
 /* th content becomes a button when onSort is wired; the button inherits

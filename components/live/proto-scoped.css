@@ -121,7 +121,7 @@
 /* ---------- workspace grid: X-style left column | header + stage + dock ---------- */
 .lbw-root .app{flex:1;display:grid;grid-template-columns:auto minmax(0,1fr);min-height:0}
 .lbw-root .maincol{display:flex;flex-direction:column;min-width:0;min-height:0}
-.lbw-root .mid{flex:1;display:grid;grid-template-columns:248px minmax(0,1fr) 332px;min-height:0}
+.lbw-root .mid{flex:1;display:grid;grid-template-columns:var(--lside-w,248px) minmax(0,1fr) var(--rail-w,332px);min-height:0}
 /* Owner directive (2026-10-06): both side panels are PINNED — neither
    reflows below/above the board at any width. Narrow viewports let
    .stagecol scroll horizontally instead; collapse is an explicit title-bar
@@ -165,7 +165,7 @@
 .lbw-root .snav{display:flex;flex-direction:column;gap:2px;padding:10px 8px}
 .lbw-root .sbtn{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;
   color:var(--mut);font-family:var(--font-mono);text-align:left}
-.lbw-root .sbtn .gi{font-size:15px;line-height:1;width:20px;text-align:center}
+.lbw-root .sbtn .gi{font-size:15px;line-height:1;width:20px;text-align:center;display:inline-block}
 .lbw-root .sbtn .gl{font-size:9.5px;letter-spacing:.14em}
 .lbw-root .sbtn:hover{color:var(--tx)}
 .lbw-root .sbtn.on{color:var(--ac);background:var(--chip)}
@@ -242,14 +242,29 @@
 /* layout toggle (title bar, VS Code quick-pick style) — inspector rail
    visibility is an explicit user control; the rail never reflows below
    the board (owner directive 2026-10-06). */
+/* ghost panel toggles (owner 2026-10-06): borderless, hover-tint only —
+   the bordered chip read as a control, not a chrome affordance. */
 .lbw-root .layout-tg{display:inline-flex;align-items:center;justify-content:center;
-  width:26px;height:22px;border:1px solid var(--line2);border-radius:5px;
+  width:26px;height:22px;border:none;border-radius:5px;
   color:var(--mut);background:transparent;cursor:pointer}
-.lbw-root .layout-tg:hover{color:var(--tx);border-color:var(--ac)}
-.lbw-root .layout-tg.on{color:var(--ac);border-color:var(--ac)}
-.lbw-root .app.no-rail .mid{grid-template-columns:248px minmax(0,1fr)}
+.lbw-root .layout-tg:hover{color:var(--tx);background:var(--hover)}
+.lbw-root .layout-tg.on{color:var(--ac)}
+
+/* ear-flap sashes (owner 2026-10-06): a ghost tab pinned mid-edge of each
+   sidebar — click collapses, drag resizes (--lside-w/--rail-w on the
+   .lbw-root drive the .mid grid). */
+.lbw-root .lside,.lbw-root .railcol{position:relative}
+.lbw-root .edge{position:absolute;top:50%;transform:translateY(-50%);z-index:30;
+  width:14px;height:44px;padding:0;display:grid;place-items:center;
+  background:transparent;border:none;border-radius:0 6px 6px 0;
+  color:var(--mut);font-size:8px;cursor:ew-resize;opacity:0;transition:opacity .12s}
+.lbw-root .edge-l{right:-7px}
+.lbw-root .edge-r{left:-7px;border-radius:6px 0 0 6px}
+.lbw-root .lside:hover .edge,.lbw-root .railcol:hover .edge,.lbw-root .edge:focus-visible{opacity:1}
+.lbw-root .edge:hover{background:var(--chip);color:var(--ac)}
+.lbw-root .app.no-rail .mid{grid-template-columns:var(--lside-w,248px) minmax(0,1fr)}
 .lbw-root .app.no-rail .railcol{display:none}
-.lbw-root .app.no-left .mid{grid-template-columns:minmax(0,1fr) 332px}
+.lbw-root .app.no-left .mid{grid-template-columns:minmax(0,1fr) var(--rail-w,332px)}
 .lbw-root .app.no-left .lside{display:none}
 .lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(0,1fr)}
 
@@ -735,6 +750,23 @@
   overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:.08em}
 .lbw-root .trph-r .tv{color:var(--ac);flex-shrink:0}
 
-/* icon rail — glyphs grow on hover (owner: "icons get big when scrolled over") */
+/* icon rail — glyphs grow on hover (owner: "icons get big when scrolled over");
+   .gi is inline-block so the transform actually paints. */
 .lbw-root .sbtn .gi{transition:transform .14s ease}
-.lbw-root .sbtn:hover .gi{transform:scale(1.3)}
+.lbw-root .sbtn:hover .gi{transform:scale(1.45)}
+
+/* operator avatars — real avatar_url images fill the tile; the gradient
+   initial remains the fallback (privacy-gated field) */
+.lbw-root .av img,.lbw-root .mav img,.lbw-root .cav img,.lbw-root .hav img{
+  width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+
+
+/* soonchips → 3-icon tile row + shared coming-soon caption */
+.lbw-root .soonchips{display:flex;gap:6px}
+.lbw-root .soonchip{flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;font-family:var(--font-mono);font-size:7.5px;letter-spacing:.12em;
+  color:var(--mut);border:1px dashed var(--line2);border-radius:7px;
+  padding:8px 4px;cursor:default}
+.lbw-root .soonchip i{font-style:normal;font-size:15px}
+.lbw-root .soon-cap{font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;
+  color:var(--mut);margin-top:8px;line-height:1.5}

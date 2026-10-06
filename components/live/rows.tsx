@@ -300,7 +300,13 @@ export const BoardRow = memo(function BoardRow({
       <td className="l">
         <div className="op">
           <span className="av" style={avatarStyle(i)}>
-            {o.name[0]}
+            {o.avatarUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element --
+                 operator avatar URL; 24px fixed tile, no loader needed */
+              <img src={o.avatarUrl} alt="" loading="lazy" />
+            ) : (
+              o.name[0]
+            )}
           </span>
           <span>
             <span className="nm">

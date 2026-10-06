@@ -221,7 +221,15 @@ export function OperatorProfileTile({ d }: { d: ProfileView }) {
   return (
     <div className="pmod-host">
       <div className="pmod">
-        <span className="av">{d.name[0]}</span>
+        <span className="av">
+          {d.op?.avatarUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element --
+               operator avatar URL; 38px fixed tile */
+            <img src={d.op.avatarUrl} alt="" loading="lazy" />
+          ) : (
+            d.name[0]
+          )}
+        </span>
         <div>
           <div className="pn">
             {d.name} {isVerifiedOp(d.verif) && <span className="vchk">✓</span>}

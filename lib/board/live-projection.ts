@@ -185,6 +185,10 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
        (OPERATOR_COLUMNS selects operators.location; mappers nulls it for
        private profiles). Rendered as the `◍ <location>` tertiary line. */
     location: operator.location ?? null,
+    /* Public avatar image — same privacy gate as location (avatar_url is
+       already in OPERATOR_COLUMNS + mappers.ts). The workspace renders the
+       image over the gradient-initial tile when present. */
+    avatarUrl: operator.avatar_url ?? null,
     klass: s.class_tier,
     archetype,
     claimed: operator.claimed,

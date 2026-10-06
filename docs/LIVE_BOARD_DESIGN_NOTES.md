@@ -1,5 +1,41 @@
 # Live Board — Owner Design Notes (2026-10-06)
 
+## Component map (owner-requested key)
+
+Numbered regions of `/board/[window]` as currently built:
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ 1 TITLE BAR — centered "GLOBAL AI OPERATOR LEADERBOARD"              │
+│   1a pagetitle (centered)  1b panel glyphs (left sidebar, inspector) │
+├──┬────────────┬──────────────────────────────────────┬──────────────┤
+│ 2│ 3          │ 4                                    │ 5            │
+│ICON│LEFT      │ STAGE                                │ INSPECTOR    │
+│RAIL│SIDEBAR   │  4a filter bar: workflow pills ·     │ RAIL         │
+│   │           │    window/platform/class selects ·   │              │
+│2a px│  3a      │    ▲▼ dir chip · search              │  5a SHARE    │
+│mark │BANNER    │  4b table: group headers · colored  │  5b MOVERS   │
+│2b nav│  mod    │    icon columns (sortable) · top-3   │     rotating │
+│  icons│ hero+  │    podium cells · pillar sub-line ·  │     7D/24H/  │
+│  ▤⚖🏆│  stats  │    location · trend spark            │     HITL/AGT │
+│  ◉▥✎│         │  4c pgn: showing · centered pages ·  │  5c COMPARE  │
+│  ⬢  │  3b      │    Metrics/Raw seg · export CSV     │     +search  │
+│2c    │OPERATOR │  4d floating dock (.feat, FEATURE)   │  5d HOT STATS│
+│ theme│PROFILE  │                                      │     rotating │
+│  swat│  mod    │                                      │  5e HALL     │
+│2d    │  tile + │                                      │     spotlight│
+│ acct │  dual   │                                      │  5f RECENTS  │
+│  av  │  radar +│                                      │     & SOON   │
+│      │ TROPHIES│                                     │              │
+├──┴────────────┴──────────────────────────────────────┴──────────────┤
+│ 6 FOOTER — LINKS strip · provenance · ruleset · sync stamp          │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+Edges: `◂`/`▸` ear-flap sashes on each sidebar's inner edge — click =
+collapse, drag = resize (`--lside-w`/`--rail-w` vars, 180–480px clamp).
+Panels are PINNED (no media-query reflow); title-bar glyphs toggle them.
+
 Durable directives from the owner review session. These govern the
 `/board/[window]` redesign on `feat/live-board-2b` and supersede
 reference-v1 parity wherever they conflict. Source artifacts:
