@@ -35,6 +35,12 @@ export interface LiveOperator {
   name: string;
   /** Resolved display handle, e.g. "@name" when a platform handle is set. */
   handle: string;
+  /** Operator-supplied public location (city/country, free string) —
+   *  production parity with the legacy board's `◍ <location>` tertiary
+   *  line. Flows operators_public.location → LeaderboardRow.operator.
+   *  location; null when unset or when profile_visibility gates it off
+   *  (mappers.ts priv check). Reference-v1 had no such field. */
+  location?: string | null;
   /** Display class label, e.g. "POWER II". */
   klass: string;
   /** Canonical build-archetype key (build-archetypes.ts classifier). */
@@ -73,6 +79,13 @@ export interface LiveOperator {
   opratio: string | null;
   /** Raw pillars, compact-formatted. */
   raw: { i: string; o: string; cr: string; cw: string };
+  /** Σ TOTAL pillar sub-line — the I/O/W/R composition rendered under the
+   *  total cell (production parity; reference-v1 dropped it). Same
+   *  telemetry + compact() formatting as `raw` — keys follow the prod
+   *  label order (w = cache-write/cache_create, r = cache-read). Null on
+   *  nc rows per the owner spec; OPTIONAL so hand-built LiveOperator
+   *  fixtures (demo.tsx) and detail patches stay valid. */
+  pillars?: { i: string; o: string; w: string; r: string } | null;
   /** Yield history series (most recent points, oldest → newest). May be empty. */
   trend: number[];
   /** Record/hall entries for this operator. EMPTY in the initial SSR payload —

@@ -22,6 +22,11 @@
  *
  * Verification mark: gated on real `verification_status` (verified/audited),
  * never unconditional — the reference's @-handle heuristic is retired here.
+ *
+ * Radar divergence (owner 2026-10-06): the .feat-r chart is the compare-page
+ * dual-overlapping radar — the operator polygon over a baseline series
+ * (default FIELD MAX rim; overridable via `radarBaseline`) — not the
+ * reference's single polygon.
  */
 import { useRef, useState } from "react";
 import type {
@@ -40,6 +45,9 @@ import {
 import type { DetailStatus, LiveOperatorDetail } from "./enrich";
 import { DRILL_CAPS } from "./enrich";
 import { Sparkline } from "./rows";
+/* dock-radar.css — the dual-radar chrome (owner directive 2026-10-06);
+   travels with this module the way rail-extras.css rides EnterprisePromo. */
+import "./dock-radar.css";
 
 export type DockTab =
   | "overview"
@@ -60,26 +68,63 @@ const DOCK_TABS: { id: DockTab; label: string }[] = [
   { id: "share", label: "SHARE" },
 ];
 
-/* ---------- radar (board.js radar(), verbatim geometry) ---------- */
+/* ---------- dual radar (owner 2026-10-06 — the compare-page dual-overlapping
+   radar replaces the profile single polygon; ring/spoke/label geometry stays
+   the reference radar()'s). The baseline layer is a second polygon drawn
+   UNDER the operator series, compare-page layering (CascadeRadar: reference
+   series behind, solid series on top).
+
+   Baseline sourcing — nothing beyond `d`/`population`/`detail` reaches this
+   component, so the featured-#1 radar and a true field median are both
+   unwirable today. The DEFAULT baseline is therefore the FIELD MAX rim:
+   `d.series` is already normalized 0..1 against initial.fieldMax (opRadar),
+   so radius 1 on every axis IS the per-axis field ceiling — the same
+   [1,1,1,1,1] shape live.js emits for the field leader. A real baseline
+   (featured-#1 opRadar() output, a field median) wires in later via the
+   optional `radarBaseline` prop — pre-normalized, RADAR_AXES order. ---------- */
+export interface DockRadarBaseline {
+  /** Legend chip text — "FIELD MAX" or a baseline operator's name. */
+  label: string;
+  /** Pre-normalized 0..1 per axis, RADAR_AXES order — same scale as
+   *  ProfileView.series (clamped defensively at render). */
+  vals: number[];
+}
+
+/** The rim polygon — per-axis field maximum under opRadar normalization. */
+export const FIELD_MAX_RADAR: DockRadarBaseline = {
+  label: "FIELD MAX",
+  vals: RADAR_AXES.map(() => 1),
+};
+
 export function RadarChart({
   vals,
+  baseline,
   size = 190,
 }: {
   vals: number[];
+  baseline?: DockRadarBaseline;
   size?: number;
 }) {
   const cx = size / 2;
   const cy = size / 2;
   const R = size * 0.36;
   const N = vals.length;
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
   const pt = (i: number, r: number): readonly [number, number] => {
     const a = -Math.PI / 2 + (i * 2 * Math.PI) / N;
     return [cx + Math.cos(a) * r * R, cy + Math.sin(a) * r * R];
   };
   const poly = (rr: number) => vals.map((_, i) => pt(i, rr).join(",")).join(" ");
-  const pts = vals.map((v, i) => pt(i, v).join(",")).join(" ");
+  const ptsFor = (vs: readonly number[]) =>
+    vs.map((v, i) => pt(i, clamp01(v)).join(",")).join(" ");
+  /* positional align: pad/truncate the baseline to the operator axis count */
+  const base = baseline
+    ? vals.map((_, i) => clamp01(baseline.vals[i] ?? 0))
+    : null;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      {/* dotted rings — reference radii kept; dashes mark them as grid so the
+          solid series strokes read as data, not chrome */}
       {[0.33, 0.66, 1].map((r) => (
         <polygon
           key={r}
@@ -87,6 +132,7 @@ export function RadarChart({
           fill="none"
           stroke="var(--line2)"
           strokeWidth={1}
+          strokeDasharray="2 3"
         />
       ))}
       {vals.map((_, i) => {
@@ -109,14 +155,31 @@ export function RadarChart({
           </g>
         );
       })}
+      {/* baseline under the operator — contrast --cyan stroke + lighter fill */}
+      {base && (
+        <>
+          <polygon
+            points={ptsFor(base)}
+            fill="color-mix(in srgb, var(--cyan) 8%, transparent)"
+            stroke="var(--cyan)"
+            strokeWidth={1.4}
+            strokeLinejoin="round"
+          />
+          {base.map((v, i) => {
+            const [x, y] = pt(i, v);
+            return <circle key={i} cx={x} cy={y} r={2} fill="var(--cyan)" />;
+          })}
+        </>
+      )}
       <polygon
-        points={pts}
+        points={ptsFor(vals)}
         fill="color-mix(in srgb, var(--ac) 22%, transparent)"
         stroke="var(--ac)"
         strokeWidth={1.6}
+        strokeLinejoin="round"
       />
       {vals.map((v, i) => {
-        const [x, y] = pt(i, v);
+        const [x, y] = pt(i, clamp01(v));
         return <circle key={i} cx={x} cy={y} r={2.6} fill="var(--ac)" />;
       })}
     </svg>
@@ -420,6 +483,7 @@ export function OperatorDock({
   population,
   detail = null,
   detailStatus = "idle",
+  radarBaseline,
 }: {
   d: ProfileView;
   /** true → this card renders hidden; profile lives in the rail module. */
@@ -432,6 +496,13 @@ export function OperatorDock({
    *  records, the claimed-only snapshot ledger, and per-channel errors. */
   detail?: LiveOperatorDetail | null;
   detailStatus?: DetailStatus;
+  /** Dual-radar baseline overlay (owner 2026-10-06 — the compare-page dual
+   *  radar replaces the profile single). Pre-normalized 0..1 in RADAR_AXES
+   *  order on the same fieldMax scale as `d.series` — wire the featured/#1
+   *  operator's opRadar() output or a field median here. Optional: absent =
+   *  FIELD MAX rim (radius 1 is the per-axis ceiling `d.series` is already
+   *  normalized against — the honest field baseline with no new data flow). */
+  radarBaseline?: DockRadarBaseline;
 }) {
   const [tab, setTab] = useState<DockTab>("overview");
   /* Roving-tabindex tab strip (WAI-ARIA tabs pattern — the reference shipped
@@ -455,6 +526,10 @@ export function OperatorDock({
   /* `d.op` is already the enriched merge — the workspace overlays detail
      onto the ops row before profileFor runs, so base fields never blank. */
   const o = d.op;
+  /* Dual-radar baseline — the prop (featured-#1 / field-median series, when
+     the workspace wires it) wins; else the FIELD MAX rim, the honest ceiling
+     `d.series` is already normalized against (owner 2026-10-06). */
+  const radarBase = radarBaseline ?? FIELD_MAX_RADAR;
 
   const dirUp = deltaUp(d.delta);
   return (
@@ -600,18 +675,30 @@ export function OperatorDock({
         </div>
       </div>
       <div className="feat-r">
-        {/* reference: svg + label are direct flex children of .feat-r */}
-        <RadarChart vals={d.series} />
-        <div
-          className="mut"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "8.5px",
-            letterSpacing: ".14em",
-            marginTop: 6,
-          }}
-        >
-          OPERATOR SIGNATURE
+        {/* dual radar (owner 2026-10-06): chart + legend chips + caption stack
+            in .dockr; the legend names both series compare-page style. */}
+        <div className="dockr">
+          <RadarChart vals={d.series} baseline={radarBase} />
+          <div className="dockr-leg" aria-hidden>
+            <span className="dockr-chip op">
+              <i className="sw" />
+              <span>{d.name}</span>
+            </span>
+            <span className="dockr-chip base">
+              <i className="sw" />
+              <span>{radarBase.label}</span>
+            </span>
+          </div>
+          <div
+            className="mut"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "8.5px",
+              letterSpacing: ".14em",
+            }}
+          >
+            OPERATOR SIGNATURE
+          </div>
         </div>
       </div>
     </section>

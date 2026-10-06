@@ -1,0 +1,35 @@
+/* ==========================================================================
+   dock-radar.css — dual-overlapping radar chrome for the operator dock.
+
+   Loaded via OperatorDock.tsx (`import "./dock-radar.css"`); scoped under
+   .lbw-root like proto-scoped.css. ADDITIVE ONLY — chart stack + legend
+   chips. No existing rule is restyled; ring/spoke/polygon paint stays
+   inline in the SVG (var() attrs) so the chart remains theme-reactive.
+
+   Owner directive (2026-10-06, docs/LIVE_BOARD_DESIGN_NOTES.md): the
+   dual overlapping radar — "i prefer the one from the compare pages vs
+   the profile page".
+   ========================================================================== */
+
+/* .dockr stacks chart + legend chips + caption inside .feat-r — the reference
+   sheet keeps .feat-r a centered row-flex, so one column child centers the
+   stack without touching the rule. */
+.lbw-root .dockr{display:flex;flex-direction:column;align-items:center;gap:6px}
+.lbw-root .dockr>svg{display:block}
+
+/* legend chips — compare-page legend language: the swatch carries the series
+   color, the label is mono microtype. The operator chip reads --ac; the
+   baseline chip keeps its --cyan swatch under muted text so the reference
+   series never outranks the operator (owner 2026-10-06). */
+.lbw-root .dockr-leg{display:flex;align-items:center;justify-content:center;
+  gap:10px;flex-wrap:wrap;max-width:200px}
+.lbw-root .dockr-chip{display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;
+  text-transform:uppercase;min-width:0;max-width:190px}
+.lbw-root .dockr-chip .sw{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.lbw-root .dockr-chip>span{overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;min-width:0}
+.lbw-root .dockr-chip.op{color:var(--ac)}
+.lbw-root .dockr-chip.op .sw{background:var(--ac)}
+.lbw-root .dockr-chip.base{color:var(--mut)}
+.lbw-root .dockr-chip.base .sw{background:var(--cyan)}

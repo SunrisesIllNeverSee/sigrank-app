@@ -69,6 +69,7 @@ import type {
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
+import { EnterprisePromoPop } from "./EnterprisePromo";
 import { OperatorDock, OperatorProfileTile, SharePreview } from "./OperatorDock";
 import { MoversRail, moverRows } from "./MoversRail";
 import { HallRail, hallRows } from "./HallRail";
@@ -84,6 +85,7 @@ import {
   THEMES,
   WINDOW_SLUG,
   computeTT,
+  opRadar,
   persistLbwTheme,
   profileFor,
   rawRankMap,
@@ -245,6 +247,19 @@ export function LiveBoardWorkspace({
     "hybrid",
   );
   const [sortSel, setSortSel] = useState<string>(CONTROLS.sorts[0]);
+  /* sortFlip = header-click direction toggle (owner: sortable columns);
+     re-clicking the active column flips asc/desc off SORT_ASC's default. */
+  const [sortFlip, setSortFlip] = useState(false);
+  const onSortColumn = useCallback((key: string) => {
+    setSortSel((prev) => {
+      if (prev === key) {
+        setSortFlip((f) => !f);
+        return prev;
+      }
+      setSortFlip(false);
+      return key;
+    });
+  }, []);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   /* The reference's ops/outlier pill pair is now the workflow filter (owner:
@@ -283,6 +298,22 @@ export function LiveBoardWorkspace({
     () => profileFor(initial, ops, selected, rmax),
     [initial, ops, selected, rmax],
   );
+
+  /* dual-radar baseline (owner 2026-10-06, compare-page style): when a
+     non-featured operator is selected, overlay the FIELD LEADER's radar
+     behind the operator's polygon; featured/no-match falls back to the
+     dock's FIELD MAX rim. */
+  const featuredRow = useMemo(
+    () => ops.find((o) => o.codename === initial.featured?.codename) ?? null,
+    [ops, initial.featured],
+  );
+  const radarBaseline = useMemo(() => {
+    if (selected === -1 || !featuredRow) return undefined;
+    return {
+      label: `#1 ${initial.featured?.name ?? featuredRow.name}`,
+      vals: opRadar(featuredRow, rmax),
+    };
+  }, [selected, featuredRow, initial.featured, rmax]);
 
   /* ---------- selection → enrichment trigger ----------
      A selection (row, featured card, hall hex, mover row) resolves to a
@@ -448,26 +479,30 @@ export function LiveBoardWorkspace({
       arr = arr.filter(([o]) => o.platform.toLowerCase().includes(key));
     }
     if (viewMode === "out") {
-      return [...arr].sort((a, b) => b[0].dev - a[0].dev);
+      return [...arr].sort((a, b) =>
+        sortFlip ? a[0].dev - b[0].dev : b[0].dev - a[0].dev,
+      );
     }
     const fn = SORT_KEY[sortSel];
     if (fn && sortSel !== "Yield") {
-      const asc = SORT_ASC.has(sortSel);
+      const asc = SORT_ASC.has(sortSel) !== sortFlip;
       arr = [...arr].sort((a, b) =>
         asc ? fn(a[0]) - fn(b[0]) : fn(b[0]) - fn(a[0]),
       );
     }
     return arr;
-  }, [ops, search, classSel, platformSel, wfSel, viewMode, sortSel]);
+  }, [ops, search, classSel, platformSel, wfSel, viewMode, sortSel, sortFlip]);
 
   /* ---------- chrome state ---------- */
   /* railOn = right inspector rail visibility — explicit toggle only (VS
      Code panel pattern); the rail never reflows below the board. */
   const [railOn, setRailOn] = useState(true);
   const [acctPop, setAcctPop] = useState(false);
+  const [epromoOpen, setEpromoOpen] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   const stageRef = useRef<HTMLElement | null>(null);
   const acctRef = useRef<HTMLDivElement | null>(null);
+  const snavRef = useRef<HTMLElement | null>(null);
 
   /* account popover closes on outside click (board.js) */
   useEffect(() => {
@@ -484,6 +519,23 @@ export function LiveBoardWorkspace({
     document.addEventListener("click", onDoc);
     return () => document.removeEventListener("click", onDoc);
   }, [acctPop]);
+
+  /* enterprise promo popover closes on outside click (same contract as
+     the account popover) */
+  useEffect(() => {
+    if (!epromoOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (
+        snavRef.current &&
+        e.target instanceof Node &&
+        !snavRef.current.contains(e.target)
+      ) {
+        setEpromoOpen(false);
+      }
+    };
+    document.addEventListener("click", onDoc);
+    return () => document.removeEventListener("click", onDoc);
+  }, [epromoOpen]);
 
   const router = useRouter();
   const onWindowSel = useCallback(
@@ -735,7 +787,7 @@ export function LiveBoardWorkspace({
               <i></i>
             </span>
           </Link>
-          <nav className="snav">
+          <nav className="snav" ref={snavRef}>
             <button
               className="sbtn on"
               data-sec="board"
@@ -763,9 +815,22 @@ export function LiveBoardWorkspace({
             <Link className="sbtn" href="/blog" data-tip="BLOG" title="BLOG">
               <span className="gi">✎</span>
             </Link>
-            <Link className="sbtn" href="/upsilon" data-tip="ENTERPRISE" title="ENTERPRISE">
+            <button
+              type="button"
+              className="sbtn"
+              data-tip="ENTERPRISE"
+              title="ENTERPRISE"
+              aria-expanded={epromoOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                setEpromoOpen((v) => !v);
+              }}
+            >
               <span className="gi">▣</span>
-            </Link>
+            </button>
+            {/* owner (2026-10-06): /enterprise doesn't exist — the icon
+                opens a promo card (EKG demo video + blurb → /upsilon). */}
+            <EnterprisePromoPop hidden={!epromoOpen} />
           </nav>
           <div className="sfoot">
             <div className="themesw">
@@ -1015,6 +1080,7 @@ export function LiveBoardWorkspace({
                       population={pop}
                       detail={selDetail}
                       detailStatus={selDetailStatus}
+                      radarBaseline={radarBaseline}
                     />
                   )}
 
@@ -1022,7 +1088,16 @@ export function LiveBoardWorkspace({
                   <section className="tablecard">
                     <table className="board-t">
                       <thead>
-                        <BoardHead mode={colMode} />
+                        <BoardHead
+                          mode={colMode}
+                          sortKey={sortSel}
+                          sortDir={
+                            SORT_ASC.has(sortSel) !== sortFlip
+                              ? "asc"
+                              : "desc"
+                          }
+                          onSort={onSortColumn}
+                        />
                       </thead>
                       <tbody>
                         {pageRows.map(([o, i], d) => (

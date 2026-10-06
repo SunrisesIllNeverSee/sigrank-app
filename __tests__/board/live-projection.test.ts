@@ -60,6 +60,7 @@ interface FixtureSpec {
   codename: string;
   displayName?: string;
   handle?: string;
+  location?: string;
   pillars: [number, number, number, number]; // input, output, cacheCreate, cacheRead
   mv24: number;
   mv7: number;
@@ -74,6 +75,7 @@ const SPECS: FixtureSpec[] = [
     codename: "signal-d4e0290661",
     displayName: "Kabir Acharya",
     handle: "kabir",
+    location: "Seoul ROK",
     pillars: [252_600, 132_800_000, 656_300_000, 33_400_000_000],
     mv24: 0,
     mv7: 8,
@@ -166,7 +168,7 @@ function mkRow(spec: FixtureSpec, total: number): LeaderboardRow {
       avatar_url: null,
       bio: null,
       links: null,
-      location: null,
+      location: spec.location ?? null,
       profile_visibility: "public",
       status: "active",
     },
@@ -446,6 +448,19 @@ describe("LiveOperator rows", () => {
       cr: "33.4B",
       cw: "656.3M",
     });
+  });
+
+  it("pillars carry the I·O·W·R sub-line; null on nc rows; location flows", () => {
+    // same telemetry + compact() as `raw`, prod label order (w=create, r=read)
+    expect(alpha.pillars).toEqual({
+      i: "252.6K",
+      o: "132.8M",
+      w: "656.3M",
+      r: "33.4B",
+    });
+    expect(charlie.pillars).toBeNull(); // nc row → null per the contract
+    expect(alpha.location).toBe("Seoul ROK"); // operator.location flows through
+    expect(ops[1].location).toBeNull(); // unset stays null, never fabricated
   });
 
   it("num carries the raw math-path numerics", () => {

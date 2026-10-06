@@ -1,0 +1,103 @@
+/*
+   board-cols.css — production-parity column layer for the live board
+   (owner checklist 2026-10-06, LIVE_BOARD_DESIGN_NOTES.md "Table
+   requirements"). Loaded via rows.tsx (`import "./board-cols.css"`), same
+   pattern as rail-extras.css via EnterprisePromo.tsx.
+
+   ADDITIVE ONLY — every selector is .lbw-root-scoped and proto-scoped.css
+   is not edited. What lives here vs what stays in proto-scoped.css:
+
+   - Column group super-headers (tr.grph): the production board's
+     IDENTITY & SCALE / CASCADE YIELD / COMPOSITION & COST / ACTIVITY band
+     (LeaderboardTable.tsx thead row 1). The reference-v1 thead had a
+     single flat row, so this is a pure addition.
+   - Per-column header color classes (hc-*): theme-palette vars only —
+     --ac --cyan --blue --violet --magenta --orange --yellow --tx --mut —
+     so every data-theme keeps the assignments.
+   - Sort affordance (.hsort / th.sorted): headers render as buttons when
+     the workspace passes onSort; the active column takes the accent color
+     + ▼/▲ caret (prod's colActive = gold underline analog).
+   - Top-3 cell shading (td.tt1/2/3): the tt* TEXT colors already live in
+     proto-scoped.css; this file adds the podium tint + inset ring prod
+     applies to leader cells per metric column (its `podiumBox`).
+   - .pils (Σ TOTAL I·O·W·R sub-line) and .opl (◍ location line): new
+     display lines the reference markup never had.
+*/
+
+/* ---------- column group super-headers ---------- */
+/* Second thead row rendered ABOVE the column labels. Group cells keep the
+   .board-t th chrome but lose the underline (the label row owns it) and
+   take a wider tracked-out group label, centered over its span; the first
+   group stays left-aligned over RANK/OPERATOR/CLASS. */
+.lbw-root .board-t thead tr.grph th{font-size:8.5px;letter-spacing:.16em;
+  color:var(--mut);text-align:center;padding:8px 7px 3px;border-bottom:none;
+  font-weight:600}
+.lbw-root .board-t thead tr.grph th.l{text-align:left}
+/* Group divider — prod's gdiv (borderLeft on every group but the first). */
+.lbw-root .board-t thead tr.grph th.gd{border-left:1px solid var(--line)}
+/* CASCADE YIELD is the rank-metric group — accent-tinted like prod's gold. */
+.lbw-root .board-t thead tr.grph th.grp-y{color:var(--ac)}
+
+/* ---------- per-column header colors ---------- */
+/* Distinct hue per column inside each group band (13 columns, 9 palette
+   vars — repeats are always non-adjacent). */
+.lbw-root .board-t th.hc-rank{color:var(--mut)}
+.lbw-root .board-t th.hc-op{color:var(--tx)}
+.lbw-root .board-t th.hc-class{color:var(--blue)}
+.lbw-root .board-t th.hc-yield{color:var(--ac)}
+.lbw-root .board-t th.hc-lev{color:var(--violet)}
+.lbw-root .board-t th.hc-vel{color:var(--yellow)}
+.lbw-root .board-t th.hc-snr{color:var(--cyan)}
+.lbw-root .board-t th.hc-dev{color:var(--magenta)}
+.lbw-root .board-t th.hc-i{color:var(--blue)}
+.lbw-root .board-t th.hc-o{color:var(--cyan)}
+.lbw-root .board-t th.hc-cr{color:var(--violet)}
+.lbw-root .board-t th.hc-cw{color:var(--magenta)}
+.lbw-root .board-t th.hc-tot{color:var(--orange)}
+.lbw-root .board-t th.hc-cost{color:var(--tx)}
+.lbw-root .board-t th.hc-platform{color:var(--blue)}
+.lbw-root .board-t th.hc-last{color:var(--mut)}
+.lbw-root .board-t th.hc-trend{color:var(--cyan)}
+
+/* Mono-glyph icon chip inside every column header (prod's st.ic). */
+.lbw-root .board-t th .hi{opacity:.72;margin-right:4px;font-weight:400}
+
+/* ---------- sortable affordance ---------- */
+/* th content becomes a button when onSort is wired; the button inherits
+   the header chrome so an unwired head renders byte-identical text. */
+.lbw-root .board-t th .hsort{display:inline-flex;align-items:center;
+  font:inherit;color:inherit;letter-spacing:inherit;cursor:pointer;
+  user-select:none;white-space:nowrap}
+.lbw-root .board-t th .hsort:hover{color:var(--tx)}
+.lbw-root .board-t th .hsort:focus-visible{outline:1px solid var(--ac);
+  outline-offset:2px;border-radius:2px}
+/* Active sort column: accent color + accent underline (the caret is part
+   of the label — "Υ YIELD ▼" — matching prod's `caret()` output). Listed
+   after the hc-* rules so it wins at equal specificity. */
+.lbw-root .board-t th.sorted{color:var(--ac)}
+.lbw-root .board-t th.sorted{box-shadow:inset 0 -2px 0 var(--ac)}
+
+/* ---------- top-3 per-column podium shading ---------- */
+/* Prod shades the top-3 cells per metric column with a rank-tinted
+   background + inset ring (podiumBox). Text colors stay on the existing
+   proto-scoped tt rules; this adds the cell tint at descending strength.
+   These selectors out-specify `.lbw-root tr.top1 td`'s row gradient, so a
+   podium cell on the rank-1 row keeps its column tint. */
+.lbw-root .board-t td.tt1{background:color-mix(in srgb,var(--ac) 14%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 34%,transparent);
+  border-radius:4px}
+.lbw-root .board-t td.tt2{background:color-mix(in srgb,var(--ac) 9%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 22%,transparent);
+  border-radius:4px}
+.lbw-root .board-t td.tt3{background:color-mix(in srgb,var(--ac) 5%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 13%,transparent);
+  border-radius:4px}
+
+/* ---------- Σ TOTAL pillar sub-line + ◍ location line ---------- */
+/* Under the total cell: "I x · O x · W x · R x" — the raw token pillars
+   compact-formatted (prod renders the same I/O/W/R breakdown under TOTAL). */
+.lbw-root .board-t td .pils{display:block;margin-top:2px;font-size:9px;
+  font-weight:500;line-height:1.15;color:var(--mut);letter-spacing:.02em}
+/* Tertiary line in the operator cell: operator-supplied public location
+   (prod's `◍ <location>` under the handle). */
+.lbw-root .op .opl{display:block;font-size:9px;color:var(--mut);line-height:1.3}

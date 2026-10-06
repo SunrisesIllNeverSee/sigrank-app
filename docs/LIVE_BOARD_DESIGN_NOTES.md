@@ -77,6 +77,37 @@ screenshot (purple theme).
 - Narrow-viewport rail behavior — owner wants rails PINNED, not
   reflowed; collapse via explicit toggles only.
 
+## Build checklist (owner: "bring this home with a swarm of agents")
+
+Status tracked here — check items as they land.
+
+- [x] 3-pill workflow toggle `HITL | HYBRID | AGENTIC` (hybrid = combined, default)
+- [x] Inspector rail pinned (no media-query reflow) + title-bar layout toggle
+- [x] Icon rail: icons-only, hover tooltips, avatar bottom → settings
+- [ ] **Rail icons: larger + per-icon color** (owner: "large icons with
+      some color")
+- [ ] **Enterprise promo** — `/enterprise` doesn't exist; owner: make it
+      a promo card — EKG demo video (`mos2es.com/assets/physical-product-brief.mp4`,
+      verified live) + short blurb; CTA → `/upsilon`
+- [ ] **Column headers**: icon + per-column color + sortable (click
+      cycles asc/desc) + group super-headers (`IDENTITY & SCALE /
+      CASCADE YIELD / COMPOSITION & COST / ACTIVITY`)
+- [ ] **Per-column top-3 cell highlights** — prod shades top-3 cells per
+      metric column (gold/blue/violet tint); tt1/tt2/tt3 classes exist,
+      need cell-level shading bound to the existing top-sets
+- [ ] **Σ TOTAL sub-line** — `I·O·W·R` four-pillar breakdown under the
+      total (prod has it)
+- [ ] **Flag/locale** on the identity cell (prod: 🇺🇸 us, Seoul ROK) —
+      only if `location` is already in the leaderboard payload; NO new
+      per-row queries
+- [ ] **Dual overlapping radar** in OP profile — compare-page style
+      (preferred over profile-page version)
+- [ ] **SORT select cleanup** — tighter, organized, symmetrical
+- [ ] **Collapsible/adjustable sidebars** — VS Code pattern (layout
+      toggle exists for right rail; left sidebar pending content)
+- [ ] **Board tooltip glossary** — from sigrank-app-revamp audit
+      (carried from prior handoff: tooltips for metric columns)
+
 ## Process note
 
 - Owner directive: **document all changes and follow-ups in a durable
