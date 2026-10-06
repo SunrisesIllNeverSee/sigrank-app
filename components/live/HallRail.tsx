@@ -14,13 +14,18 @@
  */
 import { useEffect, useState } from "react";
 import type { HallEntry, LiveOperator } from "@/lib/board/live-types";
-import { MEDAL_FILLS } from "./utils";
+import { MEDAL_FILLS, isVerifiedOp } from "./utils";
+import { PixelBadge } from "./PixelBadge";
 
 export interface HallRow {
   /** raw "Name — value" teaser line, verbatim. */
   value: string;
   /** index into operators (-1 = featured card), or null when unresolvable. */
   opIndex: number | null;
+  /** profile graphic + verified flag for the spotlight tile (owner:
+      "randomize users and just show their profile graphic"). */
+  avatarUrl?: string | null;
+  verified?: boolean;
 }
 
 /** Resolve hall entries to field indexes — replaces fixture hallOps [-1,1,2]. */
@@ -44,7 +49,13 @@ export function hallRows(
       if (k >= 0) idx = k;
     }
     if (idx === null && featuredName && label === featuredName) idx = -1;
-    return { value: h.value, opIndex: idx };
+    const op = idx != null && idx >= 0 ? ops[idx] : undefined;
+    return {
+      value: h.value,
+      opIndex: idx,
+      avatarUrl: op?.avatarUrl ?? null,
+      verified: isVerifiedOp(op?.verif),
+    };
   });
 }
 
@@ -174,8 +185,19 @@ export function HallSpot({
             : undefined
         }
       >
-        <span className="hav" aria-hidden>
-          {(hn ?? "·")[0]}
+        <span className="hav">
+          {h.avatarUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element --
+               operator avatar URL; fixed tile */
+            <img src={h.avatarUrl} alt="" loading="lazy" />
+          ) : (
+            (hn ?? "·")[0]
+          )}
+          {h.verified ? (
+            <span className="avbd">
+              <PixelBadge name="verified" />
+            </span>
+          ) : null}
         </span>
         <span className="hsp">
           <span className="hsn">{hn}</span>

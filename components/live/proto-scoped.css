@@ -93,7 +93,7 @@
 .lbw-root .wrap{max-width:1440px;margin:0 auto;padding:0 22px}
 
 /* ---------- LB-01 nav (edge-to-edge header) ---------- */
-.lbw-root .nav{display:flex;align-items:center;gap:26px;padding:12px 22px;border-bottom:1px solid var(--line);flex-shrink:0;position:relative}
+
 .lbw-root .logo{display:flex;align-items:center;gap:9px;font-family:var(--font-disp);font-weight:700;font-size:17px;letter-spacing:-.02em}
 .lbw-root .logo .px{display:grid;grid-template-columns:repeat(2,7px);grid-auto-rows:7px;gap:2px}
 .lbw-root .logo .px i{display:block;background:var(--ac)}
@@ -106,10 +106,10 @@
 .lbw-root[data-theme="bone"] .logo .px i:nth-child(4){background:var(--ac);border:none}
 .lbw-root[data-theme="purple"] .logo .px i{border-radius:2.5px;box-shadow:0 0 7px color-mix(in srgb,var(--ac) 80%,transparent)}
 .lbw-root[data-theme="purple"] .logo .px i:nth-child(4){background:linear-gradient(135deg,var(--ac),var(--magenta))}
-.lbw-root .navlinks{display:flex;gap:20px;font-size:13px;color:var(--tx2)}
-.lbw-root .navlinks a:hover{color:var(--ac)}
-.lbw-root .navlinks a.on{color:var(--ac)}
-.lbw-root .nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+
+
+
+
 .lbw-root .live-pill{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--tx2);
   border:1px solid var(--line2);border-radius:999px;padding:5px 12px;background:var(--panel)}
 .lbw-root .live-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac)}
@@ -202,9 +202,9 @@
 .lbw-root .srail.min .themesw{flex-direction:column;align-items:center}
 .lbw-root .srail.min .sw{width:14px;height:14px}
 
-/* header — page title left, live-pill + kicker right */
-.lbw-root .pagetitle{font-family:var(--font-disp);font-weight:700;font-size:16px;letter-spacing:-.01em;
-  position:absolute;left:50%;transform:translateX(-50%)}
+/* page title — in-flow at the stage top (the chrome bar is gone; owner
+   2026-10-06: "no single bar header"). */
+.lbw-root .pagetitle{font-family:var(--font-disp);font-weight:700;font-size:16px;letter-spacing:-.01em}
 .lbw-root .pagetitle em{font-style:normal;color:var(--ac)}
 .lbw-root .hkicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--mut)}
 
@@ -245,11 +245,9 @@
    the board (owner directive 2026-10-06). */
 /* ghost panel toggles (owner 2026-10-06): borderless, hover-tint only —
    the bordered chip read as a control, not a chrome affordance. */
-.lbw-root .layout-tg{display:inline-flex;align-items:center;justify-content:center;
-  width:26px;height:22px;border:none;border-radius:5px;
-  color:var(--mut);background:transparent;cursor:pointer}
-.lbw-root .layout-tg:hover{color:var(--tx);background:var(--hover)}
-.lbw-root .layout-tg.on{color:var(--ac)}
+
+
+
 
 /* ear-flap sashes (owner 2026-10-06): a ghost tab pinned mid-edge of each
    sidebar — click collapses, drag resizes (--lside-w/--rail-w on the
@@ -802,3 +800,28 @@
 .lbw-root .avbd{position:absolute;top:-4px;left:-4px;z-index:2;
   filter:drop-shadow(0 0 2px var(--bg))}
 .lbw-root .av{position:relative;overflow:visible}
+
+/* no-chrome header (owner 2026-10-06): the title is a slim centered
+   strip at the top of the stage column — not a bar. */
+.lbw-root .stitle{text-align:center;padding:10px 0 4px;font-size:15px}
+
+/* panel reopen glyphs in the icon rail — visible only when the panel
+   is closed (rendered conditionally; ghost styling matches the rail). */
+.lbw-root .laybtn{color:var(--mut)}
+.lbw-root .laybtn:hover{color:var(--ac)}
+
+/* earned block badges row (profile mod — replaces the trophy count) */
+.lbw-root .pxbadges{display:flex;gap:8px;margin:4px 0 8px;align-items:center}
+.lbw-root .pxbadges .pxbd{grid-template-columns:repeat(3,5px);
+  grid-auto-rows:5px;gap:1.5px}
+
+/* badge overlay needs a positioned host on mover/hall tiles too */
+.lbw-root .mav,.lbw-root .hav,.lbw-root .cav{position:relative}
+
+/* recents chip mini-avatar */
+.lbw-root .rec-chip{display:inline-flex;align-items:center;gap:6px}
+.lbw-root .rav{width:14px;height:14px;border-radius:4px;display:inline-grid;
+  place-items:center;background:var(--chip);font-size:8px;font-weight:700;
+  color:var(--ac);overflow:hidden;flex-shrink:0}
+.lbw-root .rav img{width:100%;height:100%;object-fit:cover;display:block}
+.lbw-root .profile-feature{margin:0 0 8px;width:100%}

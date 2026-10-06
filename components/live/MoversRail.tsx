@@ -21,7 +21,8 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import type { LiveOperator, MoverEntry } from "@/lib/board/live-types";
-import { deriveMovers } from "./utils";
+import { deriveMovers, isVerifiedOp } from "./utils";
+import { PixelBadge } from "./PixelBadge";
 
 export interface MoverRow {
   /** display name — resolved handle, codename as honest fallback. */
@@ -33,6 +34,11 @@ export interface MoverRow {
   mv: number;
   /** index into the workspace operators array, or null when unresolvable. */
   opIndex: number | null;
+  /** profile graphic (owner 2026-10-06: "show their profile graphic") —
+   *  avatar_url resolved through the operators array; null → initial tile. */
+  avatarUrl?: string | null;
+  /** verified flag for the avatar-corner block badge. */
+  verified?: boolean;
 }
 
 /** Resolve server-provided movers, else derive client-side from the field. */
@@ -40,6 +46,13 @@ export function moverRows(
   movers: MoverEntry[] | undefined,
   ops: LiveOperator[],
 ): MoverRow[] {
+  const of = (k: number | null, o?: LiveOperator) => {
+    const op = o ?? (k != null && k >= 0 ? ops[k] : undefined);
+    return {
+      avatarUrl: op?.avatarUrl ?? null,
+      verified: isVerifiedOp(op?.verif),
+    };
+  };
   if (movers && movers.length) {
     return movers.map((m) => {
       const k = ops.findIndex((o) => o.codename === m.codename);
@@ -48,6 +61,7 @@ export function moverRows(
         codename: m.codename,
         mv: m.mv7,
         opIndex: k >= 0 ? k : null,
+        ...of(k >= 0 ? k : null),
       };
     });
   }
@@ -56,6 +70,7 @@ export function moverRows(
     codename: m.o.codename,
     mv: m.mv,
     opIndex: m.i,
+    ...of(null, m.o),
   }));
 }
 
@@ -93,7 +108,20 @@ export function MoversRail({
             }
           >
             <span className="mav">
-              {m.name[0] === "@" ? (m.name[1] ?? "·") : (m.name[0] ?? "·")}
+              {m.avatarUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element --
+                   operator avatar URL; fixed tile */
+                <img src={m.avatarUrl} alt="" loading="lazy" />
+              ) : m.name[0] === "@" ? (
+                (m.name[1] ?? "·")
+              ) : (
+                (m.name[0] ?? "·")
+              )}
+              {m.verified ? (
+                <span className="avbd">
+                  <PixelBadge name="verified" />
+                </span>
+              ) : null}
             </span>
             <span>
               {m.name}{" "}
@@ -157,6 +185,8 @@ export function RotatingMovers({
           codename: x.o.codename,
           mv: x.o.mv24 ?? 0,
           opIndex: x.i,
+          avatarUrl: x.o.avatarUrl ?? null,
+          verified: isVerifiedOp(x.o.verif),
         }));
     }
     const base = moverRows(server, ops);

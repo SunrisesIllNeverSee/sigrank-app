@@ -34,7 +34,26 @@ Numbered regions of `/board/[window]` as currently built:
 
 Edges: `◂`/`▸` ear-flap sashes on each sidebar's inner edge — click =
 collapse, drag = resize (`--lside-w`/`--rail-w` vars, 180–480px clamp).
-Panels are PINNED (no media-query reflow); title-bar glyphs toggle them.
+Panels are PINNED (no media-query reflow). Reopen affordances live in
+the icon rail footer — panel glyphs appear ONLY when their panel is
+closed (owner @svg note).
+
+## Layout revision (second pass — 2026-10-06, owner annotations)
+
+- **No single-bar header** — four columns only: icon rail | left sidebar
+  | stage | inspector. The title is a slim centered strip at the top of
+  the stage column (`.stitle`), still the page `<h1>`.
+- **Panel toggles relocated** — the two layout glyphs moved out of the
+  dead header into the icon rail foot (`sfoot`), rendered conditionally
+  (`!leftOn` / `!railOn`) — hidden while their panel is open.
+- **Module swap** — TOP MOVERS ↔ OPERATOR PROFILE: movers now sit in the
+  left sidebar under BANNER; the operator profile (tile + dual radar +
+  BADGES + FEATURE) lives in the inspector rail at movers' old position.
+- **TROPHIES → BADGES** — the medal strip renders earned block badges
+  (verified + percentile + 100-days) above the records rows.
+- **Profile graphics everywhere** — movers `.mav`, hall `.hav`, recents
+  `.rav` now render real avatar_url images with initial fallback +
+  verified corner badge.
 
 Durable directives from the owner review session. These govern the
 `/board/[window]` redesign on `feat/live-board-2b` and supersede

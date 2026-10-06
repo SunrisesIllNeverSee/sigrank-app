@@ -79,6 +79,7 @@ import {
   SharePreview,
 } from "./OperatorDock";
 import { PixelIcon } from "./PixelIcon";
+import { PixelBadge, badgeForPct } from "./PixelBadge";
 import { RotatingMovers } from "./MoversRail";
 import { HallSpot, hallRows } from "./HallRail";
 import {
@@ -93,6 +94,7 @@ import {
   THEMES,
   WINDOW_SLUG,
   computeTT,
+  isVerifiedOp,
   opRadar,
   persistLbwTheme,
   profileFor,
@@ -153,9 +155,12 @@ type RailId =
    compare, then rotating field stats, hall spotlight, recents/coming-soon —
    the profile module moved to the left sidebar ("banner + op profile"),
    which is why "profile" is absent. */
+/* Owner 2026-10-06 (second pass): profile module ↔ top movers swapped —
+   movers sit in the left sidebar under the banner; the operator profile
+   lives in the inspector rail at movers' old slot. */
 const BASE_RAIL_ORDER: RailId[] = [
   "share",
-  "movers",
+  "profile",
   "compare",
   "field",
   "hall",
@@ -816,7 +821,72 @@ export function LiveBoardWorkspace({
   const railBody = (id: RailId) => {
     switch (id) {
       case "profile":
-        return profile ? <OperatorProfileTile d={profile} /> : null;
+        /* operator profile (owner: swapped into the inspector rail) —
+           tile + dual radar + earned block badges + feature/re-dock. */
+        return profile ? (
+          docked ? (
+            <>
+              <button
+                type="button"
+                className="btn ghost profile-feature"
+                onClick={toggleDock}
+                title="float the operator card over the board"
+              >
+                ⇄ FEATURE
+              </button>
+              <OperatorProfileTile d={profile} />
+              <div className="lside-radar">
+                <RadarChart
+                  vals={profile.series}
+                  baseline={radarBaseline ?? FIELD_MAX_RADAR}
+                  size={150}
+                />
+              </div>
+              {/* trophies → earned block badges (owner: "medal count shows
+                  in op profile, so this can become badges") — verified +
+                  percentile + milestone badges from the pack's system. */}
+              <div className="trph-h">BADGES</div>
+              <div className="pxbadges">
+                {isVerifiedOp(selOp?.verif) && (
+                  <PixelBadge name="verified" />
+                )}
+                {(() => {
+                  const b = selOp ? badgeForPct(selOp.pct) : null;
+                  return b ? <PixelBadge name={b} /> : null;
+                })()}
+                {(selOp?.age ?? 0) >= 100 && <PixelBadge name="days100" />}
+              </div>
+              {(selOp?.recs ?? []).length ? (
+                <div className="trph">
+                  {(selOp!.recs ?? []).slice(0, 3).map((r) => (
+                    <div className="trph-r" key={r.metric}>
+                      <span className="ti">🏆</span>
+                      <span className="tm">{r.metric}</span>
+                      <span className="tv">
+                        #{r.rank} · {r.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="drill-note">
+                  {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
+                </p>
+              )}
+            </>
+          ) : (
+            <button
+              type="button"
+              className="btn ghost lside-redock"
+              onClick={toggleDock}
+              title="re-dock the operator card"
+            >
+              ⇄ FLOATING — RE-DOCK
+            </button>
+          )
+        ) : (
+          <p className="drill-note">— SELECT AN OPERATOR</p>
+        );
       case "field":
         /* HOT STATS (owner 2026-10-06): the static field grid duplicated
            the banner strip — the rail module now rotates one stat at a
@@ -927,19 +997,33 @@ export function LiveBoardWorkspace({
           <>
             <div className="soon-h">RECENT</div>
             {recents.length ? (
-              recents.map((r) => (
-                <button
-                  key={r.codename}
-                  type="button"
-                  className="rec-chip"
-                  onClick={() => {
-                    const k = ops.findIndex((o) => o.codename === r.codename);
-                    if (k >= 0) handleSelect(k);
-                  }}
-                >
-                  {r.name}
-                </button>
-              ))
+              recents.map((r) => {
+                const rop = ops.find((o) => o.codename === r.codename);
+                return (
+                  <button
+                    key={r.codename}
+                    type="button"
+                    className="rec-chip"
+                    onClick={() => {
+                      const k = ops.findIndex(
+                        (o) => o.codename === r.codename,
+                      );
+                      if (k >= 0) handleSelect(k);
+                    }}
+                  >
+                    <span className="rav">
+                      {rop?.avatarUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element --
+                           operator avatar URL; 12px chip */
+                        <img src={rop.avatarUrl} alt="" loading="lazy" />
+                      ) : (
+                        r.name[0]
+                      )}
+                    </span>
+                    {r.name}
+                  </button>
+                );
+              })
             ) : (
               <p className="drill-note">— SELECT AN OPERATOR</p>
             )}
@@ -1044,6 +1128,38 @@ export function LiveBoardWorkspace({
             <EnterprisePromoPop hidden={!epromoOpen} />
           </nav>
           <div className="sfoot">
+            {/* panel toggles (owner @svg): live in the nav rail and appear
+                ONLY when their panel is closed — reopen affordances. */}
+            {!leftOn && (
+              <button
+                type="button"
+                className="sbtn laybtn"
+                data-tip="SHOW SIDEBAR"
+                title="show left sidebar"
+                aria-pressed={false}
+                onClick={() => setLeftOn(true)}
+              >
+                <svg width="15" height="15" viewBox="0 0 13 13" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="12" height="12" fill="none" stroke="currentColor" />
+                  <rect x="1.5" y="2" width="3.5" height="9" fill="currentColor" stroke="none" />
+                </svg>
+              </button>
+            )}
+            {!railOn && (
+              <button
+                type="button"
+                className="sbtn laybtn"
+                data-tip="SHOW INSPECTOR"
+                title="show inspector rail"
+                aria-pressed={false}
+                onClick={() => setRailOn(true)}
+              >
+                <svg width="15" height="15" viewBox="0 0 13 13" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="12" height="12" fill="none" stroke="currentColor" />
+                  <rect x="8" y="2" width="3.5" height="9" fill="currentColor" stroke="none" />
+                </svg>
+              </button>
+            )}
             <div className="themesw">
               {THEMES.map((t) => (
                 <button
@@ -1119,41 +1235,10 @@ export function LiveBoardWorkspace({
         </aside>
 
         <div className="maincol">
-          {/* header: page title left, kicker right */}
-          <header className="nav">
-            <h1 className="pagetitle">
-              {COPY.heroTitleA}
-              <em>{COPY.heroTitleB}</em>
-            </h1>
-            <div className="nav-right">
-              {/* layout toggles (VS Code quick-pick pattern): left sidebar +
-                  inspector rail on/off — explicit control, never media-query. */}
-              <button
-                type="button"
-                className={`layout-tg${leftOn ? " on" : ""}`}
-                title={leftOn ? "hide left sidebar" : "show left sidebar"}
-                aria-pressed={leftOn}
-                onClick={() => setLeftOn((v) => !v)}
-              >
-                <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true">
-                  <rect x="0.5" y="0.5" width="12" height="12" fill="none" stroke="currentColor" />
-                  <rect x="1.5" y="2" width="3.5" height="9" fill="currentColor" stroke="none" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className={`layout-tg${railOn ? " on" : ""}`}
-                title={railOn ? "hide inspector rail" : "show inspector rail"}
-                aria-pressed={railOn}
-                onClick={() => setRailOn((v) => !v)}
-              >
-                <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true">
-                  <rect x="0.5" y="0.5" width="12" height="12" fill="none" stroke="currentColor" />
-                  <rect x="8" y="2" width="3.5" height="9" fill="currentColor" stroke="none" />
-                </svg>
-              </button>
-            </div>
-          </header>
+          {/* owner 2026-10-06: no single-bar header — four columns only
+              (rail | sidebar | stage | inspector). The title moved to the
+              stage top; panel toggles live in the icon rail and appear
+              only when their panel is closed. */}
 
           <div className="mid">
             {/* left sidebar (owner 2026-10-06): banner + operator profile —
@@ -1196,70 +1281,29 @@ export function LiveBoardWorkspace({
                     </section>
                   </div>
                 </div>
+                {/* owner 2026-10-06 (annotation): TOP MOVERS swaps places
+                    with OPERATOR PROFILE — movers live in the left sidebar
+                    under the banner; profile moved to the inspector rail. */}
                 <div className="mod">
                   <h3>
-                    <span className="sq"></span>OPERATOR PROFILE
-                    <button className="dock" onClick={toggleDock}>
-                      ⇄ FEATURE
-                    </button>
+                    <span className="sq"></span>TOP MOVERS
                   </h3>
-                  {profile ? (
-                    docked ? (
-                      <>
-                        <OperatorProfileTile d={profile} />
-                        {/* owner 2026-10-06: the profile graphic is the
-                            dual radar (compare-page style), not just the
-                            avatar chip. */}
-                        <div className="lside-radar">
-                          <RadarChart
-                            vals={profile.series}
-                            baseline={radarBaseline ?? FIELD_MAX_RADAR}
-                            size={150}
-                          />
-                        </div>
-                        {/* trophy tracker (owner): the selected operator's
-                            metric records — the badge shelf from the
-                            revamped profiles, bound to the same recs the
-                            dock's RECORDS tab uses. */}
-                        <div className="trph-h">TROPHIES</div>
-                        {(selOp?.recs ?? []).length ? (
-                          <div className="trph">
-                            {(selOp!.recs ?? []).slice(0, 3).map((r) => (
-                              <div className="trph-r" key={r.metric}>
-                                <span className="ti">🏆</span>
-                                <span className="tm">{r.metric}</span>
-                                <span className="tv">
-                                  #{r.rank} · {r.value}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="drill-note">
-                            {selDetailStatus === "ready"
-                              ? "— NO RECORDS YET"
-                              : "— SYNCING…"}
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        className="btn ghost lside-redock"
-                        onClick={toggleDock}
-                        title="re-dock the operator card"
-                      >
-                        ⇄ FLOATING — RE-DOCK
-                      </button>
-                    )
-                  ) : (
-                    <p className="drill-note">— SELECT AN OPERATOR</p>
-                  )}
+                  <RotatingMovers
+                    ops={ops}
+                    server={initial.movers}
+                    onSelect={handleSelect}
+                  />
                 </div>
               </div>
             </aside>
 
             <div className="stagecol">
+              {/* page title — stage top, centered over the board column
+                  (the top chrome bar is gone; the title is the page h1). */}
+              <h1 className="pagetitle stitle">
+                {COPY.heroTitleA}
+                <em>{COPY.heroTitleB}</em>
+              </h1>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
                 <div className="seg">
