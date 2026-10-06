@@ -984,13 +984,10 @@ export function LiveBoardWorkspace({
             the enterprise product surface). Collapse of the labeled
             sidebar is replaced by panel toggles, not a rail-mode. */}
         <aside className="srail min">
+          {/* brand mark = the canonical § glyph (app/icon.svg, gold on dark)
+              — replaces the reference fixture's 4-pixel mark. */}
           <Link className="sbrand" href="/" data-tip="signalaf — home" title="signalaf — home">
-            <span className="px">
-              <i></i>
-              <i></i>
-              <i></i>
-              <i></i>
-            </span>
+            <span className="smark" aria-hidden>§</span>
           </Link>
           <nav className="snav" ref={snavRef}>
             {/* icon set (owner 2026-10-06): semantic glyphs — ranked bars,
@@ -1117,10 +1114,10 @@ export function LiveBoardWorkspace({
         <div className="maincol">
           {/* header: page title left, kicker right */}
           <header className="nav">
-            <span className="pagetitle">
+            <h1 className="pagetitle">
               {COPY.heroTitleA}
               <em>{COPY.heroTitleB}</em>
-            </span>
+            </h1>
             <div className="nav-right">
               {/* layout toggles (VS Code quick-pick pattern): left sidebar +
                   inspector rail on/off — explicit control, never media-query. */}
@@ -1173,12 +1170,10 @@ export function LiveBoardWorkspace({
                     <span className="sq"></span>BANNER
                   </h3>
                   <div className="lside-banner">
+                    {/* owner: drop the duplicated hero title — the title bar
+                        already says it; the banner mod is kicker + stats. */}
                     <section className="hero">
                       <div className="kicker">{COPY.heroKicker}</div>
-                      <h1>
-                        {COPY.heroTitleA}
-                        <em>{COPY.heroTitleB}</em>
-                      </h1>
                     </section>
                     <section className="strip">
                       {initial.fieldStats.map((s) => (
