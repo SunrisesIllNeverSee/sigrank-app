@@ -461,7 +461,9 @@ export function LiveBoardWorkspace({
   }, [ops, search, classSel, platformSel, wfSel, viewMode, sortSel]);
 
   /* ---------- chrome state ---------- */
-  const [railMin, setRailMin] = useState(false);
+  /* railOn = right inspector rail visibility — explicit toggle only (VS
+     Code panel pattern); the rail never reflows below the board. */
+  const [railOn, setRailOn] = useState(true);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   const stageRef = useRef<HTMLElement | null>(null);
@@ -718,41 +720,52 @@ export function LiveBoardWorkspace({
       {/* no-flash theme init — applies ?theme=/stored theme to .lbw-root
           pre-paint (SSR always emits "green"); site <html> untouched. */}
       <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
-      <div className="app">
-        {/* left column: brand / nav / account (collapsible to icons) */}
-        <aside className={`srail${railMin ? " min" : ""}`}>
-          <div className="sbrand">
+      <div className={`app${railOn ? "" : " no-rail"}`}>
+        {/* left column: icon rail (owner 2026-10-06 — icons only, hover
+            tooltips; signalaf mark = home; avatar at bottom = account/
+            settings. Wiki/Blog/Enterprise added; Enterprise → /upsilon,
+            the enterprise product surface). Collapse of the labeled
+            sidebar is replaced by panel toggles, not a rail-mode. */}
+        <aside className="srail min">
+          <Link className="sbrand" href="/" data-tip="signalaf — home" title="signalaf — home">
             <span className="px">
               <i></i>
               <i></i>
               <i></i>
               <i></i>
             </span>
-            <span className="sbname">signalaf</span>
-          </div>
+          </Link>
           <nav className="snav">
             <button
               className="sbtn on"
               data-sec="board"
+              data-tip="LEADERBOARD"
+              title="LEADERBOARD"
               onClick={() => {
                 stageRef.current?.scrollTo({ top: 0 });
               }}
             >
               <span className="gi">▦</span>
-              <span className="gl">LEADERBOARD</span>
             </button>
-            <a className="sbtn" href="/compare">
-              <span className="gi">⧉</span>
-              <span className="gl">COMPARE</span>
-            </a>
-            <a className="sbtn" href="/hall">
+            <Link className="sbtn" href="/compare" data-tip="COMPARE" title="COMPARE">
+              <span className="gi">⇄</span>
+            </Link>
+            <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
               <span className="gi">⬡</span>
-              <span className="gl">HALL</span>
-            </a>
-            <a className="sbtn" href="/field">
+            </Link>
+            <Link className="sbtn" href="/field" data-tip="FIELD" title="FIELD">
+              <span className="gi">◎</span>
+            </Link>
+            <span className="snav-sep" aria-hidden="true"></span>
+            <Link className="sbtn" href="/wiki" data-tip="WIKI" title="WIKI">
               <span className="gi">▤</span>
-              <span className="gl">FIELD</span>
-            </a>
+            </Link>
+            <Link className="sbtn" href="/blog" data-tip="BLOG" title="BLOG">
+              <span className="gi">✎</span>
+            </Link>
+            <Link className="sbtn" href="/upsilon" data-tip="ENTERPRISE" title="ENTERPRISE">
+              <span className="gi">▣</span>
+            </Link>
           </nav>
           <div className="sfoot">
             <div className="themesw">
@@ -772,7 +785,8 @@ export function LiveBoardWorkspace({
             <div className="sacct" ref={acctRef}>
               <button
                 className="avatar"
-                title="account"
+                title="account — settings"
+                data-tip={acct.mode === "out" ? "SIGN IN" : acct.name}
                 onClick={(e) => {
                   e.stopPropagation();
                   setAcctPop((v) => !v);
@@ -780,10 +794,6 @@ export function LiveBoardWorkspace({
               >
                 {acctInitials}
               </button>
-              <div className="aid">
-                <span className="aname">{acct.name}</span>
-                <span className="arank mono">{acct.rank}</span>
-              </div>
               <div className="acctpop" hidden={!acctPop}>
                 {acct.mode === "out" && (
                   <a className="ap-item" href="/login">
@@ -829,13 +839,6 @@ export function LiveBoardWorkspace({
                 )}
               </div>
             </div>
-            <button
-              className="smin"
-              title={railMin ? "expand sidebar" : "collapse to icons"}
-              onClick={() => setRailMin((v) => !v)}
-            >
-              {railMin ? "»" : "«"}
-            </button>
           </div>
         </aside>
 
@@ -848,6 +851,20 @@ export function LiveBoardWorkspace({
             </span>
             <div className="nav-right">
               <span className="hkicker">{COPY.heroKicker}</span>
+              {/* layout toggle (VS Code quick-pick pattern): inspector
+                  rail on/off — explicit control, never media-query. */}
+              <button
+                type="button"
+                className={`layout-tg${railOn ? " on" : ""}`}
+                title={railOn ? "hide inspector rail" : "show inspector rail"}
+                aria-pressed={railOn}
+                onClick={() => setRailOn((v) => !v)}
+              >
+                <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="12" height="12" fill="none" stroke="currentColor" />
+                  <rect x="8" y="2" width="3.5" height="9" fill="currentColor" stroke="none" />
+                </svg>
+              </button>
             </div>
           </header>
 

@@ -154,6 +154,18 @@
 .lbw-root .sbtn.on{color:var(--ac);background:var(--chip)}
 .lbw-root .srail.min .sbtn{justify-content:center;padding:9px 0;margin:0 auto;width:44px}
 .lbw-root .srail.min .sbtn .gl{display:none}
+/* icon-rail hover labels (owner 2026-10-06: rail is icons-only; the
+   description pops on hover) */
+.lbw-root .srail [data-tip]{position:relative}
+.lbw-root .srail [data-tip]:hover::after{content:attr(data-tip);position:absolute;
+  left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--panel2);
+  border:1px solid var(--line2);border-radius:5px;padding:4px 9px;
+  font-family:var(--font-mono);font-size:8.5px;letter-spacing:.14em;color:var(--tx);
+  white-space:nowrap;z-index:40;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.lbw-root .snav-sep{display:block;width:24px;height:1px;background:var(--line2);margin:6px auto}
+.lbw-root .srail.min .sfoot{align-items:center}
+/* account popover opens beside the icon rail, not inside it */
+.lbw-root .srail.min .acctpop{left:calc(100% + 8px)}
 .lbw-root .sfoot{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;
   gap:10px;padding:10px 12px 0;border-top:1px solid var(--line)}
 .lbw-root .sacct{display:flex;align-items:center;gap:10px}
@@ -198,6 +210,17 @@
   border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:10px;
   letter-spacing:.2em;color:var(--mut)}
 .lbw-root .railhead .sq{width:8px;height:8px;background:var(--ac)}
+
+/* layout toggle (title bar, VS Code quick-pick style) — inspector rail
+   visibility is an explicit user control; the rail never reflows below
+   the board (owner directive 2026-10-06). */
+.lbw-root .layout-tg{display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:22px;border:1px solid var(--line2);border-radius:5px;
+  color:var(--mut);background:transparent;cursor:pointer}
+.lbw-root .layout-tg:hover{color:var(--tx);border-color:var(--ac)}
+.lbw-root .layout-tg.on{color:var(--ac);border-color:var(--ac)}
+.lbw-root .app.no-rail .mid{grid-template-columns:minmax(0,1fr)}
+.lbw-root .app.no-rail .railcol{display:none}
 
 /* ---------- dual rank cell + hover detail ---------- */
 .lbw-root .ranks{position:relative;display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;cursor:default}
