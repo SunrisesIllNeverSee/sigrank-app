@@ -8,7 +8,9 @@
  *   - rank marks "▲" (ops view) / "◆" (outliers view) on rows 1–3
  *   - `∑` raw-volume sub-rank inside every rank cell
  *   - avatar color = `avatarCols[i % 7]` (position in the supplied field)
- *   - ✓ vchk iff handle starts with "@" (reference identity heuristic)
+ *   - ✓ vchk iff verif is "verified"/"audited" — real verification_status
+ *     bound by the projection (2C: replaces the reference's @-handle
+ *     heuristic — the mark is never unconditional)
  *   - nc (non-compounding) rows render "—" for canonical cascade metrics;
  *     raw pillars still show real values (contract §11a)
  *
@@ -17,7 +19,13 @@
  */
 import { memo } from "react";
 import type { LiveOperator } from "@/lib/board/live-types";
-import { avatarStyle, sparkGeom, tc, type TopSets } from "./utils";
+import {
+  avatarStyle,
+  isVerifiedOp,
+  sparkGeom,
+  tc,
+  type TopSets,
+} from "./utils";
 
 export type ViewMode = "ops" | "out";
 export type ColMode = "metrics" | "raw";
@@ -142,7 +150,7 @@ export const BoardRow = memo(function BoardRow({
           <span>
             <span className="nm">
               {o.codename}
-              {o.handle.startsWith("@") ? (
+              {isVerifiedOp(o.verif) ? (
                 <>
                   {" "}
                   <span className="vchk">✓</span>

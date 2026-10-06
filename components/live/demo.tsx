@@ -8,6 +8,12 @@
  *
  * `demoInitial.fieldMax` is computed here exactly the way WS-2's projection
  * must compute it — over the FULL scope, not the rendered subset.
+ *
+ * Fixture purity: `fetchDetail` is an explicit no-op (returns an empty
+ * detail — never the live API) and `account` is the reference placeholder,
+ * which skips the /api/auth/session resolve. A sandbox render therefore
+ * performs zero network calls and renders the honest empty states
+ * (records "— NO RECORDS IN THIS SCOPE", history from fixture `trend`).
  */
 import type {
   LiveBoardInitialState,
@@ -123,7 +129,14 @@ export const demoInitial: LiveBoardInitialState = {
   totalOperators: operators.length,
 };
 
-/** Standalone demo consumer — renders the frozen fixture workspace. */
+/** Standalone demo consumer — renders the frozen fixture workspace. The
+ *  no-op fetcher + placeholder account keep the fixture fully offline. */
 export function LiveBoardDemo() {
-  return <LiveBoardWorkspace initial={demoInitial} />;
+  return (
+    <LiveBoardWorkspace
+      initial={demoInitial}
+      fetchDetail={() => ({})}
+      account={{ name: "Alex Operator", rank: "#842" }}
+    />
+  );
 }
