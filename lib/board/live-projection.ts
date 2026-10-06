@@ -181,6 +181,10 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     slug: operator.codename, // share slug === API codename verbatim
     name: operatorDisplayName(row),
     handle: displayHandle(row),
+    /* Operator-supplied public location — already on the leaderboard payload
+       (OPERATOR_COLUMNS selects operators.location; mappers nulls it for
+       private profiles). Rendered as the `◍ <location>` tertiary line. */
+    location: operator.location ?? null,
     klass: s.class_tier,
     archetype,
     claimed: operator.claimed,
@@ -208,6 +212,19 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
       cr: compact(t.cache_read),
       cw: compact(t.cache_create),
     },
+    /* Σ TOTAL pillar sub-line (prod parity — the legacy board renders
+       I·O·W·R under the total cell). Same telemetry as `raw`/`total`,
+       compact(); keys follow the prod label order (w = cache_create,
+       r = cache_read). Null on nc rows per the owner spec — the nc flag
+       is the "—" renderer for compounding surfaces. */
+    pillars: nc
+      ? null
+      : {
+          i: compact(t.fresh_input),
+          o: compact(t.output),
+          w: compact(t.cache_create),
+          r: compact(t.cache_read),
+        },
     // Lazy-enriched (WS-4): history/records are per-operator fetches on
     // selection — never bulk-loaded into the board payload.
     trend: [],

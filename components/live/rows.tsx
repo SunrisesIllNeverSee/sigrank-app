@@ -14,10 +14,27 @@
  *   - nc (non-compounding) rows render "—" for canonical cascade metrics;
  *     raw pillars still show real values (contract §11a)
  *
+ * Production-parity deltas (owner checklist 2026-10-06, all additive):
+ *   - thead carries a column-group super-header row (tr.grph): IDENTITY &
+ *     SCALE / CASCADE YIELD / COMPOSITION & COST / ACTIVITY on the metrics
+ *     head; RAW TOKEN PILLARS replaces CASCADE YIELD on the raw head —
+ *     same boundaries as LeaderboardTable.tsx's two theads.
+ *   - every column header gets a mono-glyph icon (Υ/⚙/⚡/▲/✧/∑/$/…) + an
+ *     hc-* palette color class; labels adopt prod's `<icon> LABEL` order
+ *     (reference "YIELD Υ" → "Υ YIELD").
+ *   - BoardHead accepts OPTIONAL sort wiring (sortKey/sortDir/onSort);
+ *     sortable columns map to the utils.ts SORT_KEY names. Without onSort
+ *     the head renders static — the workspace's <BoardHead mode=…> call
+ *     is unchanged until sorting is wired.
+ *   - ∑ TOTAL cell gains the I·O·W·R pillar sub-line (o.pillars, null on
+ *     nc rows) and the operator cell gains the `◍ location` tertiary
+ *     line — both fields populated by the WS-2 projection.
+ *
  * Pure presentational module — no "use client"; state lives in
  * LiveBoardWorkspace.
  */
 import { memo } from "react";
+import "./board-cols.css";
 import type { LiveOperator } from "@/lib/board/live-types";
 import {
   avatarStyle,
@@ -63,39 +80,156 @@ export function Sparkline({
   );
 }
 
-/* ---------- thead (board.js HEAD_METRICS / HEAD_RAW, verbatim) ---------- */
-export function BoardHead({ mode }: { mode: ColMode }) {
-  return mode === "metrics" ? (
-    <tr>
-      <th className="l">RANK</th>
-      <th className="l">OPERATOR</th>
-      <th>CLASS</th>
-      <th>YIELD Υ</th>
-      <th>LEVERAGE</th>
-      <th>VELOCITY</th>
-      <th>SNR</th>
-      <th>10×DEV</th>
-      <th>∑ TOKENS</th>
-      <th>$/1M</th>
-      <th>PLATFORM</th>
-      <th>LAST</th>
-      <th>TREND</th>
-    </tr>
-  ) : (
-    <tr>
-      <th className="l">RANK</th>
-      <th className="l">OPERATOR</th>
-      <th>CLASS</th>
-      <th>INPUT</th>
-      <th>OUTPUT</th>
-      <th>CACHE-READ</th>
-      <th>CACHE-WRITE</th>
-      <th>∑ TOKENS</th>
-      <th>$/1M</th>
-      <th>PLATFORM</th>
-      <th>LAST</th>
-      <th>TREND</th>
-    </tr>
+/* ---------- thead (board.js HEAD_METRICS / HEAD_RAW + production delta) --
+   The reference's flat label row is preserved as the SECOND thead row; a
+   first row now carries the production column-group super-headers
+   (LeaderboardTable.tsx: IDENTITY & SCALE / CASCADE YIELD / COMPOSITION &
+   COST / ACTIVITY — the raw head swaps the middle band to RAW TOKEN
+   PILLARS, same as prod's raw thead). Every column renders a mono-glyph
+   icon + an hc-* palette class (board-cols.css). Sortable columns map to
+   the SORT_KEY names in utils.ts; the wiring is opt-in via props. */
+interface HeadCol {
+  /** Mono-glyph icon chip (prod convention: Υ YIELD, ⚡ VEL, $ /1M…). */
+  icon: string;
+  /** Header label text (icon excluded — see `<icon> LABEL` ordering). */
+  label: string;
+  /** hc-* palette class from board-cols.css. */
+  cls: string;
+  /** Left-aligned cell (the reference's `className="l"` slots). */
+  l?: boolean;
+  /** SORT_KEY name when the column is sortable; absent = static. */
+  k?: string;
+  /** Hover tooltip. */
+  tip?: string;
+}
+
+interface HeadGroup {
+  label: string;
+  span: number;
+  /** Accent-tint the group label (CASCADE YIELD — the rank-metric band). */
+  ac?: boolean;
+}
+
+const HEAD_GROUPS: Record<ColMode, HeadGroup[]> = {
+  metrics: [
+    { label: "IDENTITY & SCALE", span: 3 },
+    { label: "CASCADE YIELD", span: 5, ac: true },
+    { label: "COMPOSITION & COST", span: 3 },
+    { label: "ACTIVITY", span: 2 },
+  ],
+  /* Raw head columns: RANK, OPERATOR, CLASS, INPUT, OUTPUT, CACHE-READ,
+     CACHE-WRITE, ∑ TOKENS, $/1M, PLATFORM, LAST, TREND. */
+  raw: [
+    { label: "IDENTITY & SCALE", span: 3 },
+    { label: "RAW TOKEN PILLARS", span: 5 },
+    { label: "COMPOSITION & COST", span: 2 },
+    { label: "ACTIVITY", span: 2 },
+  ],
+};
+
+/* Identity columns are never sortable (rank/operator/class are positional);
+   sortable columns key into utils.ts SORT_KEY verbatim. */
+const HEAD_COLS: Record<ColMode, HeadCol[]> = {
+  metrics: [
+    { icon: "#", label: "RANK", cls: "hc-rank", l: true },
+    { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true },
+    { icon: "◈", label: "CLASS", cls: "hc-class" },
+    { icon: "Υ", label: "YIELD", cls: "hc-yield", k: "Yield", tip: "Sort by Υ Yield" },
+    { icon: "⚙", label: "LEVERAGE", cls: "hc-lev", k: "Leverage", tip: "Sort by Leverage" },
+    { icon: "⚡", label: "VELOCITY", cls: "hc-vel", k: "Velocity", tip: "Sort by Velocity" },
+    { icon: "▲", label: "SNR", cls: "hc-snr", k: "SNR", tip: "Sort by SNR" },
+    { icon: "✧", label: "10×DEV", cls: "hc-dev", k: "10xDEV", tip: "Sort by 10xDEV" },
+    { icon: "∑", label: "TOKENS", cls: "hc-tot", k: "Total", tip: "Sort by total tokens" },
+    { icon: "$", label: "/1M", cls: "hc-cost", k: "$/1M", tip: "Sort by $/1M (lower is better)" },
+    { icon: "⬡", label: "PLATFORM", cls: "hc-platform" },
+    { icon: "◷", label: "LAST", cls: "hc-last" },
+    { icon: "↗", label: "TREND", cls: "hc-trend" },
+  ],
+  raw: [
+    { icon: "#", label: "RANK", cls: "hc-rank", l: true },
+    { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true },
+    { icon: "◈", label: "CLASS", cls: "hc-class" },
+    { icon: "→", label: "INPUT", cls: "hc-i" },
+    { icon: "←", label: "OUTPUT", cls: "hc-o" },
+    { icon: "↺", label: "CACHE-READ", cls: "hc-cr" },
+    { icon: "✎", label: "CACHE-WRITE", cls: "hc-cw" },
+    { icon: "∑", label: "TOKENS", cls: "hc-tot", k: "Total", tip: "Sort by total tokens" },
+    { icon: "$", label: "/1M", cls: "hc-cost", k: "$/1M", tip: "Sort by $/1M (lower is better)" },
+    { icon: "⬡", label: "PLATFORM", cls: "hc-platform" },
+    { icon: "◷", label: "LAST", cls: "hc-last" },
+    { icon: "↗", label: "TREND", cls: "hc-trend" },
+  ],
+};
+
+export interface BoardHeadProps {
+  mode: ColMode;
+  /** Optional sort wiring — the workspace passes the active SORT_KEY name
+   *  (e.g. "Yield"), the direction, and a click handler. When `onSort` is
+   *  absent the head renders static (reference-v1 behavior); when present,
+   *  sortable header cells render as buttons and the active column shows
+   *  the ▼/▲ caret. */
+  sortKey?: string | null;
+  sortDir?: "asc" | "desc" | null;
+  onSort?: (key: string) => void;
+}
+
+export function BoardHead({ mode, sortKey, sortDir, onSort }: BoardHeadProps) {
+  const groups = HEAD_GROUPS[mode];
+  const cols = HEAD_COLS[mode];
+  return (
+    <>
+      <tr className="grph">
+        {groups.map((g, gi) => (
+          <th
+            key={g.label}
+            colSpan={g.span}
+            className={`${gi === 0 ? "l" : "gd"}${g.ac ? " grp-y" : ""}`}
+          >
+            {g.label}
+          </th>
+        ))}
+      </tr>
+      <tr>
+        {cols.map((c) => {
+          const active = c.k != null && c.k === sortKey;
+          const inner = (
+            <>
+              <span className="hi" aria-hidden>
+                {c.icon}
+              </span>
+              {c.label}
+              {active ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
+            </>
+          );
+          return (
+            <th
+              key={c.label}
+              className={`${c.cls}${c.l ? " l" : ""}${active ? " sorted" : ""}`}
+              title={c.tip}
+              aria-sort={
+                active
+                  ? sortDir === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : undefined
+              }
+            >
+              {onSort && c.k ? (
+                <button
+                  type="button"
+                  className="hsort"
+                  onClick={() => onSort(c.k!)}
+                >
+                  {inner}
+                </button>
+              ) : (
+                inner
+              )}
+            </th>
+          );
+        })}
+      </tr>
+    </>
   );
 }
 
@@ -180,6 +314,12 @@ export const BoardRow = memo(function BoardRow({
             <span className="hd">
               {o.handle.startsWith("@") ? o.handle : o.codename}
             </span>
+            {/* production parity: `◍ location` tertiary line under the
+                handle — operator-supplied public location, absent unless
+                the projection carries it (null-safe). */}
+            {o.location ? (
+              <span className="opl">◍ {o.location}</span>
+            ) : null}
           </span>
         </div>
       </td>
@@ -198,6 +338,18 @@ export const BoardRow = memo(function BoardRow({
             title={throughputTip(o)}
           >
             {o.total}
+            {/* production parity: the I·O·W·R pillar sub-line under Σ TOTAL
+                (LeaderboardTable.tsx renders the same breakdown; null on nc
+                rows per the contract). */}
+            {o.pillars ? (
+              <span
+                className="pils"
+                title="Raw pillars: I=input · O=output · W=cache-write · R=cache-read"
+              >
+                I {o.pillars.i} · O {o.pillars.o} · W {o.pillars.w} · R{" "}
+                {o.pillars.r}
+              </span>
+            ) : null}
           </td>
           <td className={tc(tt.cost, i) || undefined}>{o.cost}</td>
         </>
@@ -212,6 +364,15 @@ export const BoardRow = memo(function BoardRow({
             title={throughputTip(o)}
           >
             {o.total}
+            {o.pillars ? (
+              <span
+                className="pils"
+                title="Raw pillars: I=input · O=output · W=cache-write · R=cache-read"
+              >
+                I {o.pillars.i} · O {o.pillars.o} · W {o.pillars.w} · R{" "}
+                {o.pillars.r}
+              </span>
+            ) : null}
           </td>
           <td className={tc(tt.cost, i) || undefined}>{o.cost}</td>
         </>
