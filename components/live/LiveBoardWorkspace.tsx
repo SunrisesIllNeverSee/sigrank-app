@@ -72,7 +72,6 @@ import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
 import { EnterprisePromoPop } from "./EnterprisePromo";
 import {
-  FIELD_MAX_RADAR,
   OperatorDock,
   OperatorProfileTile,
   RadarChart,
@@ -102,6 +101,7 @@ import {
   rawRankMap,
   resolveLbwTheme,
   rmaxOf,
+  fieldMedianRadarVals,
   windowLabel,
   type ThemeName,
 } from "./utils";
@@ -163,7 +163,7 @@ type RailId =
    (owner defers them) — "field"/HOT STATS and the compare module exit
    the inspector; compare moved to the left sidebar. Inspector = share,
    profile, hall, recents/soon. */
-const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "hall", "soon"];
+const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "soon"];
 const RAIL_TITLE: Record<RailId, string> = {
   profile: "OPERATOR PROFILE",
   field: "HOT STATS",
@@ -375,6 +375,14 @@ export function LiveBoardWorkspace({
       vals: opRadar(featuredRow, rmax),
     };
   }, [selected, featuredRow, initial.featured, rmax]);
+  /* owner 2026-10-06: featured selection fell back to FIELD MAX — a rim
+     polygon by definition, so the radar read "maxed out". Baseline is the
+     field MEDIAN polygon; leader-vs-field keeps the leader comparison
+     when another operator is selected. */
+  const fieldMedianBaseline = useMemo(
+    () => ({ label: "FIELD MEDIAN", vals: fieldMedianRadarVals(ops, rmax) }),
+    [ops, rmax],
+  );
 
   /* ---------- selection → enrichment trigger ----------
      A selection (row, featured card, hall hex, mover row) resolves to a
@@ -575,6 +583,7 @@ export function LiveBoardWorkspace({
   /* coming-soon votes (owner: "vote button for which gets built first") —
      local tally; wire to a real vote surface when one exists. */
   const [soonVotes, setSoonVotes] = useState<Record<string, number>>({});
+  const [soonPop, setSoonPop] = useState<string | null>(null);
   /* Adjustable sidebars (owner 2026-10-06): the ear-flap on each panel's
      inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
      vars on .lbw-root; a sub-4px click counts as collapse instead. */
@@ -843,7 +852,7 @@ export function LiveBoardWorkspace({
               <div className="lside-radar">
                 <RadarChart
                   vals={profile.series}
-                  baseline={radarBaseline ?? FIELD_MAX_RADAR}
+                  baseline={radarBaseline ?? fieldMedianBaseline}
                   size={150}
                 />
               </div>
@@ -1082,40 +1091,10 @@ export function LiveBoardWorkspace({
             ) : (
               <p className="drill-note">— SELECT AN OPERATOR</p>
             )}
-            <div className="soon-h">COMING SOON</div>
-            {/* owner (pass 3): each candidate gets a mockup description +
-                a vote button — which ships first is decided by votes. */}
-            <div className="soonlist">
-              {(
-                [
-                  ["👥", "TEAMS", "squad boards + shared stats"],
-                  ["⚔", "COMPS", "timed session competitions"],
-                  ["🏁", "HACKS", "build sprints + vs brackets"],
-                  ["🥊", "VERSUS", "head-to-head operator duels"],
-                ] as const
-              ).map(([g, x, d]) => (
-                <div key={x} className="soonrow">
-                  <span className="soon-ic" aria-hidden>
-                    {g}
-                  </span>
-                  <span className="soon-tx">
-                    <b>{x}</b>
-                    <em>{d}</em>
-                  </span>
-                  <button
-                    type="button"
-                    className="vote"
-                    title={`vote for ${x.toLowerCase()} to ship first`}
-                    aria-label={`vote for ${x}`}
-                    onClick={() =>
-                      setSoonVotes((v) => ({ ...v, [x]: (v[x] ?? 0) + 1 }))
-                    }
-                  >
-                    ▲ {soonVotes[x] ?? 0}
-                  </button>
-                </div>
-              ))}
-            </div>
+            {/* coming-soon candidates moved to the icon rail (owner pass 3)
+                — this module keeps recents only. */}
+            <div className="soon-h">COMING SOON — IN THE RAIL</div>
+            <p className="soon-cap">👥 TEAMS · 🏁 HACKS · 🥊 VERSUS — icon rail, bottom</p>
           </>
         );
     }
@@ -1197,6 +1176,61 @@ export function LiveBoardWorkspace({
             {/* owner (2026-10-06): /enterprise doesn't exist — the icon
                 opens a promo card (EKG demo video + blurb → /upsilon). */}
             <EnterprisePromoPop hidden={!epromoOpen} />
+            <span className="snav-sep" aria-hidden="true"></span>
+            {/* coming-soon candidates live in the rail (owner: "teams
+                hacks and versus icons are supposed to be in the nav
+                rail") — each opens its mockup description + vote. */}
+            {(
+              [
+                ["teams", "TEAMS"],
+                ["hacks", "HACKS"],
+                ["versus", "VERSUS"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                className="sbtn"
+                data-tip={`${label} · SOON`}
+                title={`${label} — coming soon`}
+                aria-expanded={soonPop === key}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSoonPop(soonPop === key ? null : key);
+                }}
+              >
+                <RailIcon name={key} set={iconSet} />
+              </button>
+            ))}
+            {soonPop && (
+              <div className="soonpop">
+                {(() => {
+                  const d = {
+                    teams: ["TEAMS", "squad boards + shared stats"],
+                    hacks: ["HACKS", "build sprints + vs brackets"],
+                    versus: ["VERSUS", "head-to-head operator duels"],
+                  }[soonPop as "teams" | "hacks" | "versus"];
+                  return (
+                    <>
+                      <div className="ap-label">{d[0]} — COMING SOON</div>
+                      <p className="ap-desc">{d[1]}</p>
+                      <button
+                        type="button"
+                        className="vote"
+                        onClick={() =>
+                          setSoonVotes((v) => ({
+                            ...v,
+                            [soonPop]: (v[soonPop] ?? 0) + 1,
+                          }))
+                        }
+                      >
+                        ▲ VOTE {soonVotes[soonPop] ?? 0}
+                      </button>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
           </nav>
           <div className="sfoot">
             {/* panel toggles (owner @svg): live in the nav rail and appear
@@ -1264,20 +1298,8 @@ export function LiveBoardWorkspace({
             <div className="notifpop" hidden={!notifOpen}>
               <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>
             </div>
-            <div className="themesw">
-              {THEMES.map((t) => (
-                <button
-                  key={t}
-                  className={`sw sw-${t}${t === theme ? " on" : ""}`}
-                  title={t}
-                  onClick={() => {
-                    setTheme(t);
-                    persistLbwTheme(t);
-                    liveTrack.themeChanged(t);
-                  }}
-                />
-              ))}
-            </div>
+            {/* owner (pass 3): theme swatches moved into the settings
+                menu — the rail foot keeps only utility controls. */}
             <div className="sacct" ref={acctRef}>
               {/* owner: neutral mark when signed out; when signed in the
                   avatar becomes the user's highest achieved block badge.
@@ -1299,6 +1321,21 @@ export function LiveBoardWorkspace({
                 )}
               </button>
               <div className="acctpop" hidden={!acctPop}>
+                <div className="ap-label">THEMES</div>
+                <div className="themesw ap-themes">
+                  {THEMES.map((t) => (
+                    <button
+                      key={t}
+                      className={`sw sw-${t}${t === theme ? " on" : ""}`}
+                      title={t}
+                      onClick={() => {
+                        setTheme(t);
+                        persistLbwTheme(t);
+                        liveTrack.themeChanged(t);
+                      }}
+                    />
+                  ))}
+                </div>
                 {acct.mode === "out" && (
                   <a className="ap-item" href="/login">
                     SIGN IN →
@@ -1367,7 +1404,11 @@ export function LiveBoardWorkspace({
               >
                 ◂
               </button>
-              <div className="railhead">OPERATOR</div>
+              {/* single fixed header line — one centered label per column
+                  (owner 2026-10-06): SIGNALAF over the left column; its own
+                  sidebar sub-header is BURNERS, BUILDERS & 10XERS. */}
+              <div className="colhead">SIGNALAF</div>
+              <div className="railhead">BURNERS, BUILDERS &amp; 10XERS</div>
               <div className="rail">
                 <div className="mod">
                   <h3>
@@ -1403,14 +1444,27 @@ export function LiveBoardWorkspace({
                   </h3>
                   {railBody("compare")}
                 </div>
+                {/* owner (pass 3): "hall of signal is supposed to be in the
+                    left sidebar" — spotlight + medal tally join the burners
+                    column. */}
+                <div className="mod">
+                  <h3>
+                    <span className="sq"></span>HALL OF SIGNAL
+                  </h3>
+                  {railBody("hall")}
+                </div>
               </div>
             </aside>
 
             <div className="stagecol">
               {/* page title — stage top, centered over the board column
                   (the top chrome bar is gone; the title is the page h1). */}
-              <div className="stitle"><span className="srk-tag">SIGRANK</span>
-                <h1 className="pagetitle">{COPY.heroTitleA}<em>{COPY.heroTitleB}</em></h1></div>
+              <div className="stitle">
+                <h1 className="pagetitle">
+                  {COPY.heroTitleA}
+                  <em>{COPY.heroTitleB}</em>
+                </h1>
+              </div>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
                 <div className="seg">
@@ -1686,7 +1740,8 @@ export function LiveBoardWorkspace({
               >
                 ▸
               </button>
-              <div className="railhead">{COPY.heroKicker}</div>
+              <div className="colhead">SIGRANK</div>
+              <div className="railhead">OPERATOR</div>
               <div className="rail">
                 {visibleRail.map((id) =>
                   (

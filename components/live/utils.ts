@@ -219,6 +219,25 @@ export const opRadar = (o: LiveOperator, rmax: FieldMaxima): number[] => {
   ].map((v) => Math.max(v, 0.06));
 };
 
+/* Field-median radar baseline — owner 2026-10-06: "my radar is matched to
+   the edges". Per-axis medians of the whole field's normalized profile —
+   the honest comparison layer (FIELD_MAX is a rim by definition). */
+export const fieldMedianRadarVals = (
+  ops: LiveOperator[],
+  rmax: FieldMaxima,
+): number[] => {
+  const N = 5;
+  const cols: number[][] = Array.from({ length: N }, () => []);
+  for (const o of ops) {
+    opRadar(o, rmax).forEach((v, i) => cols[i].push(v));
+  }
+  return cols.map((c) => {
+    if (!c.length) return 0.5;
+    const s = [...c].sort((a, b) => a - b);
+    return s[Math.floor(s.length / 2)];
+  });
+};
+
 /* ---------- top-3 sets per column (cost: lowest wins) — board.js rank3/TT */
 export type TopMap = Record<number, number>;
 export interface TopSets {
