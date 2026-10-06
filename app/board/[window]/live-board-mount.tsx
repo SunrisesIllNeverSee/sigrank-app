@@ -23,14 +23,12 @@
  *     channels can never double-append. Works as the retry path when the
  *     mount fetch soft-failed (429/offline).
  *
- *   - fetchDetail(codename): WS-4 drill enrichment for the operator dock.
- *     Fetches /api/v1/operators/{codename} (+ /records) and returns the
- *     Partial<LiveOperator> overlay the dock merges over the selected row —
- *     verification/supporter/age/messages are refreshed and `recs` (hall +
- *     metric-board records) is populated. `trend` is deliberately NOT
- *     populated: the history endpoint exposes signa_rate points, which are
- *     legacy vocabulary the workspace contract explicitly does not bind —
- *     a yield-series endpoint is a WS-4 follow-up.
+ *   - fetchDetail: not overridden — the workspace's default
+ *     createDetailFetcher(meta.window) (components/live/enrich.ts) fans out
+ *     profile + history + records + snapshot-history per selection with a
+ *     session-level in-flight cache, binds signa_rate points to the compact
+ *     trend sparkline (honestly labeled SCORE HISTORY · SIGNA RATE in the
+ *     dock), and renders the signed snapshot ledger for claimed operators.
  *
  *   - ?v=legacy A/B flag: post-mount read of location.search swaps the
  *     workspace for the pre-2B board surface (passed in as the `legacy`
@@ -65,31 +63,6 @@ interface LiveBoardMountProps {
   windowSlug: string;
   /** Pre-2B board subtree, rendered only under ?v=legacy (A/B soak). */
   legacy?: ReactNode;
-}
-
-/** /api/v1/operators/{codename} fields the dock overlay consumes. */
-interface OperatorApiShape {
-  verification_status?: string;
-  supporter_tier?: string;
-  account_age_days?: number;
-  total_messages?: number;
-  claimed?: boolean;
-}
-
-/** /api/v1/operators/{codename}/records envelope. */
-interface RecordsApiShape {
-  dynamic_records?: {
-    metric?: string;
-    metric_name?: string;
-    rank?: number;
-    value?: string;
-    window?: string;
-  }[];
-  static_records?: {
-    title?: string;
-    value?: string;
-    achieved_at?: string;
-  }[];
 }
 
 /** Append only rows whose codename isn't already loaded (StrictMode-safe). */
@@ -168,63 +141,6 @@ export function LiveBoardMount({
     await loadRemaining();
   }, [loadRemaining]);
 
-  /* ---------- WS-4 drill enrichment (records + freshest profile bits) --- */
-  const fetchDetail = useCallback(
-    async (codename: string): Promise<Partial<LiveOperator> | void> => {
-      try {
-        const enc = encodeURIComponent(codename);
-        const [opRes, recRes] = await Promise.all([
-          fetch(`/api/v1/operators/${enc}`),
-          fetch(`/api/v1/operators/${enc}/records`),
-        ]);
-        const detail: Partial<LiveOperator> = {};
-        if (opRes.ok) {
-          const d = (await opRes.json()) as OperatorApiShape;
-          // These already ship in the row; the profile read is fresher than
-          // the hourly board ISR so the overlay can't regress them.
-          if (typeof d.verification_status === "string")
-            detail.verif = d.verification_status;
-          if (typeof d.supporter_tier === "string")
-            detail.supporter = d.supporter_tier;
-          if (typeof d.account_age_days === "number")
-            detail.age = d.account_age_days;
-          if (typeof d.total_messages === "number")
-            detail.msgs = d.total_messages;
-          if (typeof d.claimed === "boolean") detail.claimed = d.claimed;
-        }
-        if (recRes.ok) {
-          const r = (await recRes.json()) as RecordsApiShape;
-          const dyn = Array.isArray(r.dynamic_records)
-            ? r.dynamic_records
-            : [];
-          const stat = Array.isArray(r.static_records)
-            ? r.static_records
-            : [];
-          detail.recs = [
-            ...dyn.map((x) => ({
-              metric: String(x.metric_name ?? x.metric ?? "record"),
-              rank: Number(x.rank) || 0,
-              value: String(x.value ?? "—"),
-              window: String(x.window ?? ""),
-            })),
-            // Curated hall records have no rank — they are singular honors;
-            // the dock renders "#{rank} · {value}", so 1 is the honest mark.
-            ...stat.map((x) => ({
-              metric: String(x.title ?? "hall record"),
-              rank: 1,
-              value: String(x.value ?? "—"),
-              window: String(x.achieved_at ?? "").slice(0, 10),
-            })),
-          ];
-        }
-        return detail;
-      } catch {
-        return; // dock renders the row's SSR fields without the overlay
-      }
-    },
-    [],
-  );
-
   if (legacyOn) return <>{legacy}</>;
 
   return (
@@ -232,7 +148,6 @@ export function LiveBoardMount({
       key={merged.meta.window}
       initial={merged}
       fetchMore={fetchMore}
-      fetchDetail={fetchDetail}
     />
   );
 }
