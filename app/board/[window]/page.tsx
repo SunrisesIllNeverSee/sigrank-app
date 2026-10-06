@@ -1,29 +1,55 @@
 /**
- * app/board/[window]/page.tsx — the 730 per-window leaderboard.
+ * app/board/[window]/page.tsx — the per-window live leaderboard.
  *
- * One shareable route per window (/board/7d · /board/30d · /board/90d · /board/all).
- * Each is a board hero heading (LB-1) + the window switcher + the full
- * LeaderboardTable (which carries the Metrics ↔ Raw-pillars view toggle). The
- * window slug maps to a DB window_type enum; getLeaderboard applies the window
- * filter + buffer (lib/data/windows.ts). RSC; ISR-cached 300s (D19).
+ * One shareable route per window (/board/7d · /board/30d · /board/90d ·
+ * /board/all). Phase-2B (WS-3 page integration + WS-6 shell isolation,
+ * PHASE2B_IMPLEMENTATION_PLAN.md): the frozen reference workspace
+ * (components/live/*, tag reference-v1) is now the rendered surface. Routes,
+ * slugs, the everything/off redirects, generateMetadata, JsonLd/AEO output,
+ * generateStaticParams, and ISR (revalidate=3600) are preserved unchanged.
  *
- * LB-2 (owner 2026-06-20): the headline Υ-yield bar chart (BoardYieldBars) was
- * removed — the table already shows Υ with per-row species heat, so the big chart
- * was redundant. LB-1: a real page heading now leads the board (was none).
+ * DATA ARCHITECTURE — first-page SSR + client field fetch:
+ *   The server reads ONE ranking scope (getLeaderboard: operatorTotal,
+ *   claimedOnly, window-filtered except all_time — identical params to the
+ *   pre-2B page) and projects it via getLiveBoardInitialState into the
+ *   typed LiveBoardInitialState: operators[] carries the first
+ *   LIVE_PAGE_SIZE (200) rows; fieldStats / movers / hall / fieldMax /
+ *   population derive from the FULL scope (the live denominator — never a
+ *   constant). On mount the client mount (live-board-mount.tsx) fetches the
+ *   remaining rows from GET /api/live-board?window&offset&limit — same
+ *   projection server-side, capped at 2,000 rows/request matching the
+ *   public API ceiling (paged beyond that). This restores the documented
+ *   "SSR first page + lazy fetch" contract BoardTableClient describes —
+ *   the pre-2B page drifted to serializing slice(0,400) into RSC props on
+ *   all_time.
  *
- * The four windows are statically generated. An unknown slug → 404.
+ * A/B REVIEW FLAG — `?v=legacy`:
+ *   Renders the pre-workspace board (WaveHero + BoardTableClient +
+ *   LeaderboardKey) for visual soak against the new surface. Read
+ *   client-side post-mount (live-board-mount.tsx) so this page never
+ *   touches searchParams — the route stays static + CDN-cacheable per the
+ *   2026-07-02 constraint. SSR always emits the workspace; flagged
+ *   sessions swap after hydration. Remove the `legacy` subtree after soak.
  *
- * CACHING (2026-07-02): the page no longer reads searchParams (which forced
- * dynamic rendering + no-store). Both operatorTotal + perPlatform data variants
- * are pre-fetched on the server; the client wrapper (BoardTableClient) reads
- * useSearchParams and selects/filters the right dataset. This keeps the page
- * static + CDN-cacheable (revalidate=300) while preserving filter functionality.
+ * SHELL OPT-OUT (WS-6):
+ *   The workspace is a 100vh self-chromed app shell — its X-rail IS the
+ *   nav on this surface. app/globals.css carries the surgical opt-out:
+ *   `body:has(.lbw-root)` hides the inherited Nav/DemoBanner/Footer
+ *   (display:none = real isolation — layout AND a11y tree) and releases
+ *   <main>'s max-width/padding. Chosen over the plan's (site)/(workspace)
+ *   route-group split because moving ~40 routes collides with in-flight
+ *   app/ work; isolation is equivalent and zero-move. Under ?v=legacy
+ *   .lbw-root is absent → the site chrome returns untouched.
+ *
+ * The trailing "What is this?" explainer renders at page level for both
+ *   variants — the workspace is a 100vh shell so the copy sits one scroll
+ *   below the app, keeping the SEO/AEO body content live (not hidden).
  */
 
 import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
-import { getLeaderboard } from "@/lib/board";
+import { getLeaderboard, getLiveBoardInitialState } from "@/lib/board";
 import { toEntry } from "@/lib/board/to-entry";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
@@ -33,6 +59,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { leaderboardItemList, sigrankDataset, faqPage } from "@/lib/jsonld";
 import { withOG } from "@/lib/seo";
 import { BoardTableClient } from "@/components/board/BoardTableClient";
+import { LiveBoardMount } from "./live-board-mount";
 
 // D19: cache leaderboard reads for 3600s (1 hour). Board data changes only on
 // snapshot submit, which triggers on-demand revalidation via revalidateTouchedWindows.
@@ -43,6 +70,10 @@ export const revalidate = 3600;
 export function generateStaticParams() {
   return BOARD_WINDOWS.map((w) => ({ window: w.slug }));
 }
+
+/** Legacy surface SSR page depth — the documented BoardTableClient contract
+ *  (first page + lazy fetch via /api/v1/leaderboard). */
+const LEGACY_SSR_ROWS = 25;
 
 /** Per-window OG metadata. */
 export async function generateMetadata({
@@ -91,51 +122,36 @@ export default async function BoardWindowPage({
   if (!win) notFound();
   const isAllTime = win.slug === "all";
 
-  // All windows now query the DB directly. ISR (revalidate=3600) bounds
-  // egress to 1 query/hour. Only claimed/live operators are shown — the
-  // full seeded board (including unclaimed seed operators) lives on
-  // sigeconomy.com/all-time.
-  let totalEntries: ReturnType<typeof toEntry>[];
-  let totalCount: number;
-  let jsonLdEntries: ReturnType<typeof toEntry>[];
+  // All windows query the DB directly; ISR (revalidate=3600) bounds egress to
+  // 1 query/hour. Only claimed/live operators are shown — the full seeded
+  // board (including unclaimed seed operators) lives on sigeconomy.com/all-time.
+  //
+  // ONE ranking scope, two projections. getLiveBoardInitialState issues the
+  // SAME getLeaderboard call (identical param literal → identical memo key),
+  // so this Promise.all shares a single cached read: the workspace gets the
+  // typed LiveBoardInitialState (first page + full-scope aggregates); the
+  // raw rows feed the legacy table's SSR page and the JsonLd item list.
+  const [initial, liveRows] = await Promise.all([
+    getLiveBoardInitialState(win.slug),
+    getLeaderboard({
+      window: win.enum,
+      windowFilter: win.enum !== "all_time",
+      operatorTotal: true,
+      claimedOnly: true,
+      mode: "all",
+    }),
+  ]);
 
-  if (win.enum === "all_time") {
-    // LIVE path: the all_time board fetches ALL snapshots (no window_type
-    // filter) so operators who only submitted 7d/30d/90d snapshots also
-    // appear. operatorTotalCollapse picks the latest 'multi' snapshot per
-    // operator (or latest single-platform). Only claimed operators are
-    // shown (seed operators are on sigeconomy.com) — claimedOnly drops the
-    // unclaimed rows BEFORE ranking so global_rank is the position on this
-    // board, matching the profile rank.
-    // Egress: fetches ~2,400 rows but ISR (revalidate=3600) bounds to
-    // 1 query/hour. We serialize 400 to RSC props; full count for pagination.
-    const liveRows = await getLeaderboard({
-      window: win.enum,
-      windowFilter: false,
-      operatorTotal: true,
-      claimedOnly: true,
-      mode: "all",
-    });
-    totalCount = liveRows.length;
-    totalEntries = liveRows.slice(0, 400).map(toEntry);
-    jsonLdEntries = liveRows.slice(0, 100).map(toEntry);
-  } else {
-    // Live path: DB-side window-filtered query (egress fix — fetches only
-    // rows for this window, e.g. 87 rows for 30d vs 2,413 total).
-    // claimedOnly keeps only claimed operators, pre-rank (see above).
-    const liveRows = await getLeaderboard({
-      window: win.enum,
-      windowFilter: true,
-      operatorTotal: true,
-      claimedOnly: true,
-      mode: "all",
-    });
-    totalCount = liveRows.length;
-    totalEntries = liveRows.map(toEntry);
-    // JsonLd from the default (operatorTotal) entries — search engines see the
-    // default board. Filtered variants are client-side and don't need structured data.
-    jsonLdEntries = totalEntries;
-  }
+  const totalCount = liveRows.length;
+  // Legacy surface (?v=legacy): restored to the documented contract — first
+  // 25 rows SSR'd, deeper pages lazy-fetched client-side (BoardTableClient
+  // handlePageChange → /api/v1/leaderboard, 2,000-row cap).
+  const legacyEntries = liveRows.slice(0, LEGACY_SSR_ROWS).map(toEntry);
+  // JsonLd: all_time keeps the top-100 slice (serialized size bound);
+  // bounded windows serialize the whole (small) scope — unchanged.
+  const jsonLdEntries = isAllTime
+    ? liveRows.slice(0, 100).map(toEntry)
+    : liveRows.map(toEntry);
 
   // Dynamic H1 label: each board window gets a unique page heading (e.g.
   // "30-Day Leaderboard" vs "AI User Leaderboard") so /board/all and /board/30d
@@ -145,35 +161,7 @@ export default async function BoardWindowPage({
     : `${win.days}-Day`;
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead now uses the
-          same animated <WaveHero/> as the Hall, with board-specific copy. */}
-      <WaveHero
-        eyebrow="Burners, Builders & 10×ers"
-        terminalText="SIGNALBOARD"
-        title={
-          <>
-            {boardLabel}{" "}
-            <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
-              Leaderboard
-            </span>
-          </>
-        }
-        subtitle={
-          <>
-            Four integers in, full ledger out. Every operator ranked by{" "}
-            <strong className="text-text-primary">Υ Yield</strong> — the
-            architecture of the cascade, not raw spend. Volume alone is noise; yield
-            is signal.{" "}
-            <span className="text-text-secondary">
-              See how you rank. Compare against top operators. Beat the average.
-            </span>
-          </>
-        }
-      />
-
-      <VercelMarketplaceBadge />
-
+    <>
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
@@ -213,36 +201,80 @@ export default async function BoardWindowPage({
         ]}
       />
 
-      {/* Client wrapper: reads useSearchParams for platform/view filter state,
-          selects + filters from the pre-fetched datasets. Wrapped in <Suspense>
-          so useSearchParams() doesn't force a client-side render bailout during
-          static generation — the fallback renders in the static HTML. */}
-      <Suspense
-        fallback={
-          <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
-            <div className="mb-4 h-8 rounded bg-bg-elevated" />
-            <div className="space-y-2">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-6 rounded bg-bg-elevated" />
-              ))}
-            </div>
+      {/* The workspace surface (default) vs the pre-2B board (?v=legacy).
+          The flag is read client-side in LiveBoardMount so this page stays
+          static — SSR always ships the workspace; flagged sessions swap
+          post-hydration. */}
+      <LiveBoardMount
+        key={win.slug}
+        initial={initial}
+        windowSlug={win.slug}
+        legacy={
+          <div className="flex flex-col gap-6">
+            {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead
+                uses the same animated <WaveHero/> as the Hall, with
+                board-specific copy. */}
+            <WaveHero
+              eyebrow="Burners, Builders & 10×ers"
+              terminalText="SIGNALBOARD"
+              title={
+                <>
+                  {boardLabel}{" "}
+                  <span className="bg-gradient-to-r from-gold to-text-accent bg-clip-text text-transparent">
+                    Leaderboard
+                  </span>
+                </>
+              }
+              subtitle={
+                <>
+                  Four integers in, full ledger out. Every operator ranked by{" "}
+                  <strong className="text-text-primary">Υ Yield</strong> — the
+                  architecture of the cascade, not raw spend. Volume alone is
+                  noise; yield is signal.{" "}
+                  <span className="text-text-secondary">
+                    See how you rank. Compare against top operators. Beat the
+                    average.
+                  </span>
+                </>
+              }
+            />
+
+            <VercelMarketplaceBadge />
+
+            {/* Client wrapper: reads useSearchParams for platform/view filter
+                state, selects + filters from the pre-fetched datasets. Wrapped
+                in <Suspense> so useSearchParams() doesn't force a client-side
+                render bailout during static generation. */}
+            <Suspense
+              fallback={
+                <div className="animate-pulse rounded-lg border border-bg-border bg-bg-surface p-6">
+                  <div className="mb-4 h-8 rounded bg-bg-elevated" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="h-6 rounded bg-bg-elevated" />
+                    ))}
+                  </div>
+                </div>
+              }
+            >
+              <BoardTableClient
+                totalEntries={legacyEntries}
+                totalCount={totalCount}
+                window={win.slug}
+                windowEnum={win.enum}
+              />
+            </Suspense>
+
+            {/* Key popup (owner 2026-06-24): metrics + the eight experience
+                tiers + TRANSMITTER badge — after the table per owner. */}
+            <LeaderboardKey />
           </div>
         }
-      >
-        <BoardTableClient
-          totalEntries={totalEntries}
-          totalCount={totalCount}
-          window={win.slug}
-          windowEnum={win.enum}
-        />
-      </Suspense>
+      />
 
-      {/* Key popup (owner 2026-06-24): metrics + the eight experience tiers + TRANSMITTER badge - moved to the END
-          of the board (after the table) per owner. */}
-      <LeaderboardKey />
-
-      {/* ── What is this? — moved to bottom (owner 2026-07-11) ── */}
-      <section className="mx-auto max-w-2xl px-4 pb-6">
+      {/* ── What is this? — page-level so both variants share it (the
+          workspace is a 100vh app shell; this sits one scroll below). ── */}
+      <section className="mx-auto max-w-2xl px-4 py-8">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The SigRank leaderboard ranks AI operators by token-cascade efficiency
           — Υ Yield = (cache_read × output) / input². Operators are classified
@@ -285,6 +317,6 @@ export default async function BoardWindowPage({
           </p>
         )}
       </section>
-    </div>
+    </>
   );
 }
