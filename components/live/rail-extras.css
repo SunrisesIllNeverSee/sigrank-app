@@ -1,0 +1,58 @@
+/* ==========================================================================
+   rail-extras.css — live-board icon-rail polish + ENTERPRISE promo pop.
+
+   Loaded via EnterprisePromo.tsx (`import "./rail-extras.css"`); scoped
+   under .lbw-root like proto-scoped.css. ADDITIVE ONLY — glyph size,
+   per-icon hues, hover lift, promo popover chrome. No existing rule is
+   restyled destructively; every override is size/color/additive-property.
+
+   Owner directive (2026-10-06, docs/LIVE_BOARD_DESIGN_NOTES.md): "large
+   icons with some color". Hues key off the .sbtn data-tip labels — the
+   rail is icons-only, so the tooltip attr doubles as the semantic hook.
+   ========================================================================== */
+
+/* ---------- rail glyphs: larger + subtle hover lift/tint ---------- */
+.lbw-root .srail .sbtn .gi{font-size:19px;width:22px;transition:transform .12s ease}
+.lbw-root .srail .sbtn:hover{background:var(--hover)}
+.lbw-root .srail .sbtn:hover .gi{transform:translateY(-1px)}
+
+/* ---------- per-icon hue (LEADERBOARD keeps the theme accent) ---------- */
+.lbw-root .srail .sbtn[data-tip="LEADERBOARD"] .gi{color:var(--ac)}
+.lbw-root .srail .sbtn[data-tip="COMPARE"] .gi{color:var(--cyan)}
+.lbw-root .srail .sbtn[data-tip="HALL"] .gi{color:var(--yellow)}
+.lbw-root .srail .sbtn[data-tip="FIELD"] .gi{color:var(--blue)}
+.lbw-root .srail .sbtn[data-tip="WIKI"] .gi{color:var(--violet)}
+.lbw-root .srail .sbtn[data-tip="BLOG"] .gi{color:var(--magenta)}
+.lbw-root .srail .sbtn[data-tip="ENTERPRISE"] .gi{color:var(--orange)}
+/* .on keeps the lit chip + accent text over any per-icon hue */
+.lbw-root .srail .sbtn.on .gi{color:var(--ac)}
+
+/* bone is the light palette — pull the two lightest hues toward --tx
+   so the COMPARE/HALL glyphs stay legible on cream */
+.lbw-root[data-theme="bone"] .srail .sbtn[data-tip="COMPARE"] .gi{color:color-mix(in srgb,var(--cyan) 55%,var(--tx))}
+.lbw-root[data-theme="bone"] .srail .sbtn[data-tip="HALL"] .gi{color:color-mix(in srgb,var(--yellow) 52%,var(--tx))}
+
+/* ---------- promo popover mount ----------
+   caller drops .epromo-pop inside a relative rail box — end of .snav
+   (bottom edge sits just under the ENTERPRISE sbtn) or .sfoot. Both are
+   made positioning contexts here; .sacct already is (acctpop). The pop
+   anchors just right of the rail edge, bottom-aligned to its container. */
+.lbw-root .srail .snav,.lbw-root .srail .sfoot{position:relative}
+.lbw-root .epromo-pop{position:absolute;left:calc(100% + 10px);bottom:0;z-index:40}
+.lbw-root .epromo-pop[hidden]{display:none}
+
+/* ---------- promo card chrome (EnterprisePromo.tsx .epromo) ---------- */
+.lbw-root .epromo{width:270px;background:var(--panel);border:1px solid var(--line2);
+  border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.lbw-root .epromo-vid{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;
+  background:var(--bg2);border-bottom:1px solid var(--line)}
+.lbw-root .epromo-body{padding:13px 14px 14px}
+.lbw-root .epromo-eyebrow{display:flex;align-items:center;gap:7px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--ac)}
+.lbw-root .epromo-eyebrow .sq{width:7px;height:7px;background:var(--ac);flex-shrink:0}
+.lbw-root .epromo-blurb{margin-top:8px;font-size:11.5px;line-height:1.5;color:var(--tx2)}
+.lbw-root .epromo-cta{display:inline-flex;align-items:center;margin-top:11px;
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--tx2);
+  background:var(--panel2);border:1px solid var(--line2);border-radius:var(--radius-sm);
+  padding:6px 11px}
+.lbw-root .epromo-cta:hover{color:var(--ac);border-color:var(--ac)}
