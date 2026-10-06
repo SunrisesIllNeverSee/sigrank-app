@@ -28,6 +28,54 @@ import type {
 export const THEMES = ["green", "gold", "bone", "purple"] as const;
 export type ThemeName = (typeof THEMES)[number];
 
+/* ---------- LB-20 theme persistence (2C) ----------
+   The reference read `?theme=` once at boot and dropped the choice on reload
+   (board.js set documentElement.dataset.theme; index.html hardcoded "green").
+   The port scopes the palette to .lbw-root[data-theme], so persistence is a
+   workspace-local concern under its own key — deliberately NOT `sigrank-theme`
+   (the site's carbon/paper/railway/terminal domain on <html>).
+
+   Resolution order, both at parse time (LBW_THEME_INIT) and at React init
+   (resolveLbwTheme):  ?theme=  >  localStorage  >  "green". The param is an
+   ephemeral override — it never writes storage, so QA/preview links can't
+   poison a visitor's stored preference; clicking a swatch persists. */
+export const LBW_THEME_KEY = "lbw-theme";
+
+export function resolveLbwTheme(): ThemeName {
+  if (typeof window === "undefined") return "green";
+  try {
+    const q = new URLSearchParams(window.location.search).get("theme");
+    if ((THEMES as readonly string[]).includes(q ?? "")) return q as ThemeName;
+    const s = window.localStorage.getItem(LBW_THEME_KEY);
+    if ((THEMES as readonly string[]).includes(s ?? "")) return s as ThemeName;
+  } catch {
+    /* storage disabled (private mode) → fall through to default */
+  }
+  return "green";
+}
+
+export function persistLbwTheme(t: ThemeName): void {
+  try {
+    window.localStorage.setItem(LBW_THEME_KEY, t);
+  } catch {
+    /* storage disabled — theme still applies for the session */
+  }
+}
+
+/**
+ * No-flash init — emitted as the FIRST child of .lbw-root so the HTML parser
+ * runs it while the root element is open but before the subtree paints
+ * (document.currentScript.parentElement === .lbw-root). Mirrors the site's
+ * own THEME_INIT pattern in app/layout.tsx, scoped to the workspace element
+ * instead of documentElement. SSR always renders data-theme="green"; this
+ * script corrects it pre-paint so a stored/param theme never flashes.
+ */
+export const LBW_THEME_INIT = `(function(){try{var ok=${JSON.stringify(
+  THEMES,
+)};var t=new URLSearchParams(location.search).get("theme");if(ok.indexOf(t)<0){t=localStorage.getItem(${JSON.stringify(
+  LBW_THEME_KEY,
+)});}if(ok.indexOf(t)>=0){var el=document.currentScript&&document.currentScript.parentElement;if(el){el.setAttribute("data-theme",t);}}}catch(e){}})();`;
+
 /* ---------- copy locks (data.js COPY — keyed fixture values are the
    canonical strings; the contract does not carry them) ---------- */
 export const COPY = {
@@ -275,9 +323,18 @@ export interface ProfileView {
   delta: string;
   sub: string;
   series: number[];
+  /** Verification status for the ✓ mark — real `verif` only ("verified" |
+   *  "audited" render the mark; anything else, incl. unresolved featured
+   *  profiles, renders no mark — never the reference's @-handle heuristic). */
+  verif: string;
   /** underlying ops row when the profile is a real field operator. */
   op: LiveOperator | null;
 }
+
+/** The verified mark predicate — bound to operators.verification_status
+ *  verbatim, so the ✓ is never unconditional (WS-4 / WS-5 contract). */
+export const isVerifiedOp = (v: string | null | undefined): boolean =>
+  v === "verified" || v === "audited";
 
 export const profileFor = (
   initial: LiveBoardInitialState,
@@ -291,8 +348,13 @@ export const profileFor = (
     /* the featured card is the rank-1 operator; when its row is present we
        compute the radar the same way as any selected operator (fixture
        shipped a keyed series; the contract drops it — live.js emits the
-       same shape via [1,1,1,1,1] for the field leader). */
-    const match = ops.find((o) => o.codename === fx.codename) ?? null;
+       same shape via [1,1,1,1,1] for the field leader). Match by codename
+       (identity, never display name); fall back to ops[0] only because
+       FEATURED is definitionally the rank-1 context block — keeps the card
+       drillable when the payload's codename drifts from the field row. */
+    const match =
+      ops.find((o) => o.codename === fx.codename) ??
+      (fx.rank === 1 ? (ops[0] ?? null) : null);
     return {
       name: fx.name,
       handle: fx.handle,
@@ -303,6 +365,7 @@ export const profileFor = (
       delta: fx.delta,
       sub: fx.blurb,
       series: match ? opRadar(match, rmax) : [1, 1, 1, 1, 1],
+      verif: match?.verif ?? "",
       op: match,
     };
   }
@@ -323,6 +386,7 @@ export const profileFor = (
     delta: o.delta || trendDelta,
     sub: o.sub || `${o.archetype} signature · ${o.klass} tier · ${o.total} observed`,
     series: opRadar(o, rmax),
+    verif: o.verif,
     op: o,
   };
 };
