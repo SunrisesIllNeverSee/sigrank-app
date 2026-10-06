@@ -30,6 +30,14 @@ import {
 export type ViewMode = "ops" | "out";
 export type ColMode = "metrics" | "raw";
 
+/** Exact-rate token throughput tooltip on the ∑ TOTAL cell — the pre-2B
+ *  board's exact-calendar rates (processed/output per day) surfaced without
+ *  changing the reference column set. */
+const throughputTip = (o: LiveOperator): string | undefined =>
+  o.ptpd
+    ? `throughput ${o.ptpd} processed · ${o.otpd ?? "—"} output`
+    : undefined;
+
 /* ---------- spark (board.js) ---------- */
 export function Sparkline({
   arr,
@@ -156,11 +164,11 @@ export const BoardRow = memo(function BoardRow({
       <td className="l">
         <div className="op">
           <span className="av" style={avatarStyle(i)}>
-            {o.codename[0]}
+            {o.name[0]}
           </span>
           <span>
             <span className="nm">
-              {o.codename}
+              {o.name}
               {isVerifiedOp(o.verif) ? (
                 <>
                   {" "}
@@ -169,7 +177,9 @@ export const BoardRow = memo(function BoardRow({
               ) : null}
             </span>
             <br />
-            <span className="hd">{o.handle}</span>
+            <span className="hd">
+              {o.handle.startsWith("@") ? o.handle : o.codename}
+            </span>
           </span>
         </div>
       </td>
@@ -183,7 +193,12 @@ export const BoardRow = memo(function BoardRow({
           <td className={tc(tt.vel, i) || undefined}>{nc ? "—" : o.vel}</td>
           <td className={tc(tt.snr, i) || undefined}>{nc ? "—" : o.snr}</td>
           <td className={tc(tt.dev, i) || undefined}>{nc ? "—" : o.dev}</td>
-          <td className={tc(tt.tot, i) || undefined}>{o.total}</td>
+          <td
+            className={tc(tt.tot, i) || undefined}
+            title={throughputTip(o)}
+          >
+            {o.total}
+          </td>
           <td className={tc(tt.cost, i) || undefined}>{o.cost}</td>
         </>
       ) : (
@@ -192,11 +207,19 @@ export const BoardRow = memo(function BoardRow({
           <td className={tc(tt.o, i) || undefined}>{o.raw.o}</td>
           <td className={tc(tt.cr, i) || undefined}>{o.raw.cr}</td>
           <td className={tc(tt.cw, i) || undefined}>{o.raw.cw}</td>
-          <td className={tc(tt.tot, i) || undefined}>{o.total}</td>
+          <td
+            className={tc(tt.tot, i) || undefined}
+            title={throughputTip(o)}
+          >
+            {o.total}
+          </td>
           <td className={tc(tt.cost, i) || undefined}>{o.cost}</td>
         </>
       )}
-      <td>{o.platform}</td>
+      <td>
+        {o.platform}
+        {o.wf ? <span className="wftag">{o.wf.toUpperCase()}</span> : null}
+      </td>
       <td>{o.last}</td>
       <td>
         <Sparkline arr={o.trend ?? []} />

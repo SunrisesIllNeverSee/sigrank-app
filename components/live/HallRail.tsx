@@ -36,7 +36,10 @@ export function hallRows(
       if (k >= 0) idx = k;
     }
     if (idx === null) {
-      const k = ops.findIndex((o) => o.codename === label);
+      // Label is a display name post-2B; match name or codename.
+      const k = ops.findIndex(
+        (o) => o.name === label || o.codename === label,
+      );
       if (k >= 0) idx = k;
     }
     if (idx === null && featuredName && label === featuredName) idx = -1;
