@@ -23,7 +23,7 @@
  * Verification mark: gated on real `verification_status` (verified/audited),
  * never unconditional — the reference's @-handle heuristic is retired here.
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type {
   LiveOperator,
   LivePopulation,
@@ -431,6 +431,24 @@ export function OperatorDock({
   detailStatus?: DetailStatus;
 }) {
   const [tab, setTab] = useState<DockTab>("overview");
+  /* Roving-tabindex tab strip (WAI-ARIA tabs pattern — the reference shipped
+     the strip as visual chrome; the port adds the keyboard contract):
+     Arrow keys move selection, Home/End jump to the ends. */
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const onTabKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const idx = DOCK_TABS.findIndex((t) => t.id === tab);
+    if (idx < 0) return;
+    let next: number;
+    if (e.key === "ArrowRight") next = (idx + 1) % DOCK_TABS.length;
+    else if (e.key === "ArrowLeft")
+      next = (idx - 1 + DOCK_TABS.length) % DOCK_TABS.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = DOCK_TABS.length - 1;
+    else return;
+    e.preventDefault();
+    setTab(DOCK_TABS[next].id);
+    tabRefs.current[next]?.focus();
+  };
   /* `d.op` is already the enriched merge — the workspace overlays detail
      onto the ops row before profileFor runs, so base fields never blank. */
   const o = d.op;
@@ -441,6 +459,14 @@ export function OperatorDock({
       className="feat"
       style={docked ? { display: "none" } : undefined}
       aria-label="Selected operator"
+      /* reference-v1 has no keyboard model; Escape docks the card into the
+         rail — the same action the ⇄ TO RAIL button performs. */
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.stopPropagation();
+          onToggleDock();
+        }
+      }}
     >
       <button
         className="dockbtn"
@@ -450,12 +476,23 @@ export function OperatorDock({
         ⇄ TO RAIL
       </button>
       <div className="feat-l">
-        <div className="docktabs" role="tablist" aria-label="Operator sections">
-          {DOCK_TABS.map((t) => (
+        <div
+          className="docktabs"
+          role="tablist"
+          aria-label="Operator sections"
+          onKeyDown={onTabKeyDown}
+        >
+          {DOCK_TABS.map((t, i) => (
             <button
               key={t.id}
+              id={`lbw-docktab-${t.id}`}
+              ref={(el) => {
+                tabRefs.current[i] = el;
+              }}
               role="tab"
               aria-selected={tab === t.id}
+              aria-controls="lbw-dockpanel"
+              tabIndex={tab === t.id ? 0 : -1}
               className={tab === t.id ? "on" : ""}
               onClick={() => setTab(t.id)}
             >
@@ -473,6 +510,13 @@ export function OperatorDock({
             — DETAIL SYNC UNAVAILABLE · FIELD VALUES SHOWN
           </p>
         )}
+        {/* one shared panel element — every tab's aria-controls resolves to
+            it; aria-labelledby tracks the active tab. */}
+        <div
+          id="lbw-dockpanel"
+          role="tabpanel"
+          aria-labelledby={`lbw-docktab-${tab}`}
+        >
         {tab === "overview" && (
           <>
             <div className="feat-id">
@@ -550,6 +594,7 @@ export function OperatorDock({
             <p className="drill-note">— FIELD DATA UNAVAILABLE</p>
           ))}
         {tab === "share" && <SharePreview d={d} population={population} />}
+        </div>
       </div>
       <div className="feat-r">
         {/* reference: svg + label are direct flex children of .feat-r */}
