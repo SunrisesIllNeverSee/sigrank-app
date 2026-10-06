@@ -36,9 +36,12 @@ screenshot (purple theme).
 - **Left sidebar** — content TBD; candidate: banner + OP profile module.
 - **Right sidebar** — interactive share, movement, compare modules.
 - **Both sidebars collapsible AND adjustable** — VS Code-style,
-  including a quick window-config button (see the small icon strip
-  reference: panel-toggle glyphs). Never let a sidebar reflow *below*
-  the board — collapse is via toggle, not media query.
+  including a quick window-config button. The icon strip reference
+  (shot 3) is VS Code's "Customize Layout" quick-pick: panel-composition
+  glyphs (split panes / sidebar-left / sidebar-right / bottom panel /
+  single column) + a globe. Implement as a small toggle group that
+  shows/hides each panel — never a media-query reflow. Never let a
+  sidebar reflow *below* the board — collapse is via toggle only.
 - **Bottom bar** — status strip (already approximated by the footer
   strip; keep).
 
