@@ -154,6 +154,7 @@
 .lbw-root .sbrand .px i{display:block;background:var(--ac)}
 .lbw-root .sbrand .px i:nth-child(2){background:var(--cyan)}
 .lbw-root .sbrand .px i:nth-child(3){background:var(--blue)}
+.lbw-root .sbrand .px i:nth-child(4){background:var(--magenta)}
 .lbw-root .srail.min .sbrand{justify-content:center;padding:14px 0 12px}
 .lbw-root .srail.min .sbname{display:none}
 .lbw-root[data-theme="gold"] .sbrand .px{transform:rotate(45deg)}
