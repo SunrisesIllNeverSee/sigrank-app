@@ -77,8 +77,13 @@ export default async function HallPage() {
           limit: 50,
           operatorTotal: true,
         });
-        windowsData[w.slug] = liveRows;
-        windowsDataAll[w.slug] = liveRows;
+        // Same claimed/live contract as the all_time branch — the Hall's own
+        // copy promises claimed operators only, and search-authority surfaces
+        // must not link to noindex seed/unclaimed profiles (SEARCH-RECOVERY D).
+        windowsData[w.slug] = liveRows.filter(
+          (r) => r.operator.claimed && r.operator.status !== "retired",
+        );
+        windowsDataAll[w.slug] = windowsData[w.slug];
       }
     }),
   );

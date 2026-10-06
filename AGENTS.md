@@ -199,14 +199,23 @@ cd ~/Developer/active/SigRank-repos/scripts/gsc
 node gsc.mjs sitemaps:list          # registered sitemaps + error counts
 node gsc.mjs sitemaps:submit        # resubmit sitemap.xml
 node gsc.mjs sitemaps:delete <url>  # remove a stale sitemap
-node gsc.mjs index <url> [url...]   # push URL(s) to Indexing API
 node gsc.mjs inspect <url>          # URL inspection (verdict + coverage)
-node gsc.mjs check:index --push     # inspect all sitemap URLs + auto-push unindexed
+node gsc.mjs check:index            # inspect sitemap URLs (report only)
 node gsc.mjs analytics 28           # clicks/impressions last N days
 ```
 
-After deploying new pages or updating sitemap, run `sitemaps:submit` + `index` for
-new URLs.
+**Indexing API is prohibited for ordinary SignalAF pages.** Google's Indexing
+API is scoped to `JobPosting` and livestream `BroadcastEvent` content — SignalAF
+has neither. `gsc.mjs index` and `check:index --push` were run once on
+2026-10-05 as an unsupported experiment and MUST NOT be repeated (see
+`docs/SEARCH-RECOVERY-01-SENTINEL.md`). Do not wire them into deploys or agents.
+
+Post-deploy search workflow is:
+
+```
+deploy → verify live HTML → sitemaps:submit when sitemap materially changed
+→ Search Console URL Inspection / Request Indexing selectively → monitor
+```
 
 ---
 
