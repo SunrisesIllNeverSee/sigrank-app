@@ -179,6 +179,7 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
   return {
     codename: operator.codename,
     slug: operator.codename, // share slug === API codename verbatim
+    name: operatorDisplayName(row),
     handle: displayHandle(row),
     klass: s.class_tier,
     archetype,
@@ -318,12 +319,17 @@ export function projectLiveBoard(
       delta: deltaCopy(Math.round(r.snapshot.movement_7d)),
     }));
 
-  // HALL teaser — first N records, "Operator — value" display line.
+  // HALL teaser — first N records, "<display name> — value" display line.
+  // Identity stays on `codename`; the label resolves operatorDisplayName so
+  // live rows never surface raw signal-… slugs as the headline.
+  const nameByCodename = new Map(
+    rows.map((r) => [r.operator.codename, operatorDisplayName(r)]),
+  );
   const hallEntries: HallEntry[] = hall
     .filter((h) => !h.isPlaceholder)
     .slice(0, HALL_TEASER)
     .map((h) => ({
-      value: `${h.operator_codename} — ${h.value}`,
+      value: `${nameByCodename.get(h.operator_codename) ?? h.operator_codename} — ${h.value}`,
       codename: h.operator_codename,
       metric: h.title,
     }));

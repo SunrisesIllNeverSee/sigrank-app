@@ -36,4 +36,9 @@ export const liveTrack = {
     if (on())
       posthog.capture("live_board_theme_changed", { theme, ...baseProps() });
   },
+  /** Workflow-mode filter change (HITL/agentic — the pre-2B ?mode= views). */
+  modeChanged: (mode: string) => {
+    if (on())
+      posthog.capture("live_board_mode_changed", { mode, ...baseProps() });
+  },
 };
