@@ -84,27 +84,30 @@ Status tracked here — check items as they land.
 - [x] 3-pill workflow toggle `HITL | HYBRID | AGENTIC` (hybrid = combined, default)
 - [x] Inspector rail pinned (no media-query reflow) + title-bar layout toggle
 - [x] Icon rail: icons-only, hover tooltips, avatar bottom → settings
-- [ ] **Rail icons: larger + per-icon color** (owner: "large icons with
-      some color")
-- [ ] **Enterprise promo** — `/enterprise` doesn't exist; owner: make it
-      a promo card — EKG demo video (`mos2es.com/assets/physical-product-brief.mp4`,
-      verified live) + short blurb; CTA → `/upsilon`
-- [ ] **Column headers**: icon + per-column color + sortable (click
-      cycles asc/desc) + group super-headers (`IDENTITY & SCALE /
-      CASCADE YIELD / COMPOSITION & COST / ACTIVITY`)
-- [ ] **Per-column top-3 cell highlights** — prod shades top-3 cells per
-      metric column (gold/blue/violet tint); tt1/tt2/tt3 classes exist,
-      need cell-level shading bound to the existing top-sets
-- [ ] **Σ TOTAL sub-line** — `I·O·W·R` four-pillar breakdown under the
-      total (prod has it)
-- [ ] **Flag/locale** on the identity cell (prod: 🇺🇸 us, Seoul ROK) —
-      only if `location` is already in the leaderboard payload; NO new
-      per-row queries
-- [ ] **Dual overlapping radar** in OP profile — compare-page style
-      (preferred over profile-page version)
-- [ ] **SORT select cleanup** — tighter, organized, symmetrical
-- [ ] **Collapsible/adjustable sidebars** — VS Code pattern (layout
-      toggle exists for right rail; left sidebar pending content)
+- [x] **Rail icons: larger + per-icon color** (`rail-extras.css`, 19px +
+      accent hues; bone-theme legibility guard on cyan/yellow)
+- [x] **Enterprise promo** — icon opens a popover card: EKG demo video
+      (`mos2es.com/assets/physical-product-brief.mp4`) + Upsilon blurb +
+      CTA → `/upsilon`; outside-click close (`EnterprisePromo.tsx`)
+- [x] **Column headers**: group super-headers (`IDENTITY & SCALE /
+      CASCADE YIELD / COMPOSITION & COST / ACTIVITY`; raw mode = RAW
+      TOKEN PILLARS), icon + per-column color, sortable w/ ▼▲ caret +
+      aria-sort; click = sort, re-click = flip (`board-cols.css`,
+      `rows.tsx`, `sortFlip` in workspace)
+- [x] **Per-column top-3 cell highlights** — podium tints bound to the
+      existing top-sets (board-cols.css `td.tt1/2/3`)
+- [x] **Σ TOTAL sub-line** — `I·O·W·R` pillar breakdown
+      (`LiveOperator.pillars`; null on nc rows)
+- [x] **Flag/locale** — `◍ location` under the handle
+      (`LiveOperator.location`; data already flowed via
+      `OPERATOR_COLUMNS.location`, null when profile_visibility private)
+- [x] **Dual overlapping radar** — compare-page CascadeRadar style;
+      baseline = field leader's radar vs selected op, FIELD MAX rim on
+      featured (`dock-radar.css`, `OperatorDock`, `radarBaseline`)
+- [~] **SORT select cleanup** — sortable headers + direction flip done;
+      the SORT <select> visual tightening itself still open
+- [~] **Collapsible/adjustable sidebars** — right rail toggle shipped;
+      left sidebar still pending owner content decision
 - [ ] **Board tooltip glossary** — from sigrank-app-revamp audit
       (carried from prior handoff: tooltips for metric columns)
 
