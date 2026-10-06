@@ -43,8 +43,8 @@ export interface LiveOperator {
   claimed: boolean;
   /** Non-compounding row — canonical metrics render "—". */
   nc: boolean;
-  /** Workflow mode tag when resolved ("hitl" | "agentic"), else null. */
-  wf: "hitl" | "agentic" | null;
+  /** Workflow mode tag when resolved ("hitl" | "agentic" | "hybrid"), else null. */
+  wf: "hitl" | "agentic" | "hybrid" | null;
   /** Total tokens observed, compact-formatted ("34.2B"). */
   total: string;
   /** Υ Yield, compact-formatted. */

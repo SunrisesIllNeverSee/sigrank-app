@@ -210,6 +210,7 @@ export default async function BoardWindowPage({
         initial={initial}
         windowSlug={win.slug}
         legacy={
+          <>
           <div className="flex flex-col gap-6">
             {/* LB-1 + shared wave hero (owner 2026-06-21): the board masthead
                 uses the same animated <WaveHero/> as the Hall, with
@@ -269,11 +270,9 @@ export default async function BoardWindowPage({
                 tiers + TRANSMITTER badge — after the table per owner. */}
             <LeaderboardKey />
           </div>
-        }
-      />
 
-      {/* ── What is this? — page-level so both variants share it (the
-          workspace is a 100vh app shell; this sits one scroll below). ── */}
+      {/* ── What is this? — legacy surface only. The workspace is
+          board-only: no prose under the board. ── */}
       <section className="mx-auto max-w-2xl px-4 py-8">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The SigRank leaderboard ranks AI operators by token-cascade efficiency
@@ -317,6 +316,9 @@ export default async function BoardWindowPage({
           </p>
         )}
       </section>
+          </>
+        }
+      />
     </>
   );
 }

@@ -75,7 +75,7 @@ export type Platform = "ChatGPT" | "Claude" | "Pi" | "Gemini";
 
 export interface LeaderboardEntry {
   rank: number;
-  workflowMode?: "hitl" | "agentic" | null;
+  workflowMode?: "hitl" | "agentic" | "hybrid" | null;
   workflowEvidenceUrl?: string | null;
   periodStart?: string | null;
   periodEnd?: string | null;

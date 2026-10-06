@@ -125,6 +125,10 @@ narrowing applied — rule left byte-identical.**
   `localStorage("lbw-theme")` → `"green"`; `documentElement` untouched;
   `LBW_THEME_INIT` prevents flash. `liveTrack.themeChanged` added on swatch
   clicks.
+- `Shift+T` now cycles the workspace's own palettes while the board is
+  mounted (same guards as `ThemeCycleShortcut`: Shift-only, never inside
+  inputs). The site-wide handler still swaps `documentElement` behind the
+  workspace — harmless; `.lbw-root` owns its theme.
 - `/api/auth/session` surface intact: loading / signed-out / unlinked /
   linked / demo-override account chrome unchanged.
 
@@ -162,6 +166,29 @@ transitives) — **owner should regenerate the lockfile**.
 | Click-only rows/rails, visual tablist | Keyboard contract (Enter/Space, roving tabs, Escape) | a11y requirement — additive, reference has no keyboard model to preserve |
 | `mv7 ?? 0` mover derivation | Null rows excluded from movers | a mover must have moved; avoids ranking unmoved rows |
 | Rows render all operators | Rows render current page (10) | pagination is now real; the full set remains one page-size away |
+| "What is this?" prose under the board | Moved inside the `?v=legacy` subtree | owner: the workspace is board-only — prose stays on the legacy surface |
+
+## 10a. Owner-feedback pass (post-closeout)
+
+- **Display-name identity end-to-end** — `LiveOperator.name =
+  operatorDisplayName(...)` headlines rows, hall tiles, dock header, search,
+  and CSV; `codename` remains the secondary identity line + URL/lookup key.
+  (The fixture's codenames *were* names, which masked the bug.)
+- **Workflow filter replaces the mode concept** — `Both` (default, the
+  combined field) / `HITL` / `Agentic` / `Hybrid`. `wfSel === "both"` skips
+  filtering entirely so unresolved `wf: null` rows still render; single-mode
+  options filter on the resolved mode. `?mode=hitl|agentic|hybrid` is read
+  post-mount and carried through window navigation. Row badges show
+  HITL/AGENTIC/HYBRID on the platform cell.
+- **`"hybrid"` added to the stored-mode vocabulary** — `WorkflowMode`,
+  `BoardSnapshot.workflow_mode`, `LeaderboardRow.workflow_mode`, and
+  `LeaderboardEntry.workflowMode` widened to `hitl | agentic | hybrid`.
+  `resolveWorkflowMode` passes an assessed `hybrid` through under the same
+  https-evidence gate as `agentic`; the heuristic itself still only derives
+  `hitl`. The legacy board's `includesBoardMode` unchanged in behavior
+  (`all` matches hybrid; `hitl`/`agentic` pills don't).
+- **Throughput tooltip** — `∑ TOTAL` cell title shows exact
+  processed/output tokens-per-day when rates exist.
 
 ## 11. Known limitations / owner-action items
 
