@@ -60,7 +60,7 @@ export function hallRows(
 }
 
 /* board.js medal() — star-in-hexagon, gold/silver/bronze */
-function Medal({ i }: { i: number }) {
+export function Medal({ i }: { i: number }) {
   return (
     <svg width={26} height={29} viewBox="0 0 26 29" aria-hidden>
       <polygon

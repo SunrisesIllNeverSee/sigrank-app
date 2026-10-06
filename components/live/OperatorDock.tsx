@@ -112,13 +112,16 @@ export function RadarChart({
   const R = size * 0.36;
   const N = vals.length;
   const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+  /* owner 2026-10-06: data polygons were drawn to the outer ring edge —
+     scale series to 0.88 of R so they float inside the grid (rings/spokes
+     keep full radius). */
   const pt = (i: number, r: number): readonly [number, number] => {
     const a = -Math.PI / 2 + (i * 2 * Math.PI) / N;
     return [cx + Math.cos(a) * r * R, cy + Math.sin(a) * r * R];
   };
   const poly = (rr: number) => vals.map((_, i) => pt(i, rr).join(",")).join(" ");
   const ptsFor = (vs: readonly number[]) =>
-    vs.map((v, i) => pt(i, clamp01(v)).join(",")).join(" ");
+    vs.map((v, i) => pt(i, clamp01(v) * 0.88).join(",")).join(" ");
   /* positional align: pad/truncate the baseline to the operator axis count */
   const base = baseline
     ? vals.map((_, i) => clamp01(baseline.vals[i] ?? 0))
@@ -168,7 +171,7 @@ export function RadarChart({
             strokeLinejoin="round"
           />
           {base.map((v, i) => {
-            const [x, y] = pt(i, v);
+            const [x, y] = pt(i, v * 0.88);
             return <circle key={i} cx={x} cy={y} r={2} fill="var(--cyan)" />;
           })}
         </>
@@ -181,7 +184,7 @@ export function RadarChart({
         strokeLinejoin="round"
       />
       {vals.map((v, i) => {
-        const [x, y] = pt(i, clamp01(v));
+        const [x, y] = pt(i, clamp01(v) * 0.88);
         return <circle key={i} cx={x} cy={y} r={2.6} fill="var(--ac)" />;
       })}
     </svg>
@@ -202,25 +205,44 @@ export function SharePreview({
   const slug = encodeURIComponent(d.op?.slug ?? d.codename);
   return (
     <div className="shareprev">
-      {/* brand mark PNG from the SignalAF asset pack (66x60, ~300B) —
-          pixelated rendering keeps the block edges hard. */}
-      <Image
-        className="sharemark"
-        src="/live/signalaf-mark.png"
-        alt="SignalAF mark"
-        width={66}
-        height={60}
-        unoptimized
-      />
-      <div className="big">
-        TOP <em>{pct}%</em> OF AI OPERATORS
+      {/* owner 2026-10-06: the snapshot ships as TWO cards — one
+          graphics-only (mark + TOP%), one stats (rank + key numbers). */}
+      <div className="sharepair">
+        <div className="sharecard gfx">
+          <Image
+            className="sharemark"
+            src="/live/signalaf-mark.png"
+            alt="SignalAF mark"
+            width={66}
+            height={60}
+            unoptimized
+          />
+          <div className="big">
+            TOP <em>{pct}%</em>
+          </div>
+          <div className="mono mut" style={{ fontSize: 8.5 }}>
+            OF AI OPERATORS
+          </div>
+        </div>
+        <div className="sharecard stats">
+          <div className="mono mut" style={{ fontSize: 8.5 }}>
+            SIGNAL RANK
+          </div>
+          <div className="rk mono">#{d.rank}</div>
+          <div className="mono mut" style={{ fontSize: 8.5 }}>
+            / {pop.toLocaleString()} · {population.tag}
+          </div>
+          <div className="mono" style={{ fontSize: 9.5, marginTop: 6 }}>
+            {d.name}
+          </div>
+          <div className="mono mut" style={{ fontSize: 8.5 }}>
+            Υ {d.y} · {d.handle}
+          </div>
+        </div>
       </div>
-      <div className="rk mono">
-        SIGNAL RANK #{d.rank} / {pop.toLocaleString()}
-      </div>
-      <div className="mono mut" style={{ fontSize: 9, margin: "2px 0 8px" }}>
-        {d.name} · {population.tag}
-      </div>
+      {/* gallery TODO (owner): GENERATE should open the shares page —
+          one card surface per platform badge (github/x/li/fb/email);
+          /s/<codename> stays the single canonical card for now. */}
       <a className="btn ghost" href={`/s/${slug}`}>
         GENERATE SHARE CARD
       </a>
