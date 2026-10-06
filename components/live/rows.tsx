@@ -127,6 +127,17 @@ export const BoardRow = memo(function BoardRow({
       className={`${cls}${selected ? " sel-op" : ""}`.trim() || undefined}
       data-op={i}
       onClick={() => onSelect(i)}
+      /* keyboard parity with the reference's click-to-swap — the row keeps
+         its <tr> semantics (no role swap) and gains focus + Enter/Space;
+         aria-current marks the row feeding the operator dock. */
+      tabIndex={0}
+      aria-current={selected || undefined}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(i);
+        }
+      }}
     >
       <td>
         <div className="ranks">

@@ -53,7 +53,9 @@ const FIXTURE: FixtureOp[] = [
   { codename: "崔鹏飞 Cui Pengfei", handle: "other", klass: "BASE", archetype: "kinetic", total: "122.7M", yield: "29.15", snr: 0.115, vel: 0.13, lev: "221.5×", dev: 1.33, opratio: "221:1", eff: "5.47", cost: "$0.54", platform: "oth", last: "07/15/26", mv7: 1, trend: [12, 14, 13, 16, 18, 17, 21, 23, 22, 26], raw: { i: "8.8M", o: "41M", cr: "55M", cw: "9.2M" } },
   { codename: "Dai Nguyen Ba", handle: "@it·ba", klass: "SEEKER", archetype: "priming", total: "4.0B", yield: "0.69", snr: 0.052, vel: 0.06, lev: "12.4×", dev: 1.09, opratio: "12:1", eff: "3.29", cost: "$0.71", platform: "+1", last: "07/30/26", mv7: 12, trend: [9, 11, 10, 13, 12, 15, 14, 17, 16, 19], raw: { i: "540K", o: "1.6B", cr: "1.9B", cw: "88M" } },
   { codename: "Gioxa", handle: "other", klass: "REFINER", archetype: "archivist", total: "22.1M", yield: "0.04", snr: 0.033, vel: 0.03, lev: "1.1×", dev: 0.04, opratio: "1.1:1", eff: "0.35", cost: "$2.01", platform: "oth", last: "07/23/26", mv7: 9, trend: [6, 7, 8, 7, 9, 10, 9, 11, 12, 11], raw: { i: "3.3M", o: "7.4M", cr: "8.9M", cw: "1.2M" } },
-  { codename: "signal-f2b5be16b0f", handle: "other", klass: "BEARER", archetype: "input-bound", total: "3.9B", yield: "0.01", snr: 0.007, vel: 0.01, lev: "1.5×", dev: 0.17, opratio: "1.5:1", eff: "0.40", cost: "$1.55", platform: "+1", last: "07/16/26", mv7: 4, trend: [5, 6, 5, 7, 6, 8, 9, 8, 10, 9], raw: { i: "1.1M", o: "1.4B", cr: "1.8B", cw: "260M" } },
+  /* mv7: null exercises the unknown-movement path — an unmaintained/fresh
+     row must render "—"/no-delta copy, never a fabricated "+0 spots". */
+  { codename: "signal-f2b5be16b0f", handle: "other", klass: "BEARER", archetype: "input-bound", total: "3.9B", yield: "0.01", snr: 0.007, vel: 0.01, lev: "1.5×", dev: 0.17, opratio: "1.5:1", eff: "0.40", cost: "$1.55", platform: "+1", last: "07/16/26", mv7: null, trend: [5, 6, 5, 7, 6, 8, 9, 8, 10, 9], raw: { i: "1.1M", o: "1.4B", cr: "1.8B", cw: "260M" } },
 ];
 
 const operators: LiveOperator[] = FIXTURE.map((o, i) => ({
@@ -70,7 +72,8 @@ const operators: LiveOperator[] = FIXTURE.map((o, i) => ({
   },
   pct: Math.max(0.1, +(((FIXTURE.length - i) / FIXTURE.length) * 100).toFixed(1)),
   scalev: 0,
-  mv24: 0,
+  /* every third row carries no 24h movement — same null contract as mv7 */
+  mv24: i % 3 === 1 ? null : 0,
   ptpd: null,
   otpd: null,
   recs: [],
