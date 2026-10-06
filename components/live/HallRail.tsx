@@ -12,6 +12,7 @@
  * "Name — value" label — with the featured card reachable at index -1.
  * Unresolvable entries render the tile without a data-op target.
  */
+import { useEffect, useState } from "react";
 import type { HallEntry, LiveOperator } from "@/lib/board/live-types";
 import { MEDAL_FILLS } from "./utils";
 
@@ -113,6 +114,79 @@ export function HallRail({
       {rows.length === 0 && (
         <p className="drill-note">— NO RECORDS IN THIS SCOPE</p>
       )}
+      <a className="more" href="/hall">
+        VIEW ALL RECORDS →
+      </a>
+    </>
+  );
+}
+
+/* ---------- HallSpot (owner 2026-10-06): the hall module randomizes
+   record-holding operators and shows just their profile graphic — a
+   rotating spotlight tile (gradient avatar + record line) instead of the
+   static hex row. Clicking still selects the operator. ---------- */
+export function HallSpot({
+  rows,
+  onSelect,
+}: {
+  rows: HallRow[];
+  onSelect?: (opIndex: number) => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (rows.length < 2) {
+      setIdx(0);
+      return;
+    }
+    setIdx(Math.floor(Math.random() * rows.length));
+    const t = setInterval(() => {
+      setIdx((i) => {
+        let n = Math.floor(Math.random() * rows.length);
+        if (n === i) n = (n + 1) % rows.length;
+        return n;
+      });
+    }, 5200);
+    return () => clearInterval(t);
+  }, [rows.length]);
+
+  if (!rows.length) {
+    return <p className="drill-note">— NO RECORDS IN THIS SCOPE</p>;
+  }
+  const h = rows[idx % rows.length];
+  const [hn, hv] = h.value.split(" — ");
+  const clickable = h.opIndex != null && onSelect != null;
+
+  return (
+    <>
+      <div
+        className={`hspot${clickable ? " clickable" : ""}`}
+        role={clickable ? "button" : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        onClick={clickable ? () => onSelect(h.opIndex!) : undefined}
+        onKeyDown={
+          clickable
+            ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(h.opIndex!);
+                }
+              }
+            : undefined
+        }
+      >
+        <span className="hav" aria-hidden>
+          {(hn ?? "·")[0]}
+        </span>
+        <span className="hsp">
+          <span className="hsn">{hn}</span>
+          <span className="hsv mono">{hv ?? ""}</span>
+        </span>
+      </div>
+      <div className="hs-dots" aria-hidden>
+        {rows.map((_, k) => (
+          <span key={k} className={k === idx % rows.length ? "on" : ""} />
+        ))}
+      </div>
       <a className="more" href="/hall">
         VIEW ALL RECORDS →
       </a>

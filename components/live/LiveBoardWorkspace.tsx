@@ -63,6 +63,7 @@ import {
   useState,
 } from "react";
 import type {
+  FieldStat,
   LiveBoardInitialState,
   LiveOperator,
 } from "@/lib/board/live-types";
@@ -70,9 +71,14 @@ import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
 import { EnterprisePromoPop } from "./EnterprisePromo";
-import { OperatorDock, OperatorProfileTile, SharePreview } from "./OperatorDock";
-import { MoversRail, moverRows } from "./MoversRail";
-import { HallRail, hallRows } from "./HallRail";
+import {
+  OperatorDock,
+  OperatorProfileTile,
+  RadarChart,
+  SharePreview,
+} from "./OperatorDock";
+import { RotatingMovers } from "./MoversRail";
+import { HallSpot, hallRows } from "./HallRail";
 import {
   COMPARE_CTA,
   COMPARE_SLOTS,
@@ -133,19 +139,60 @@ export type LiveFieldStatus = "idle" | "loading" | "ready" | "error";
 
 /* rail module ids — reference module order: field, hall, compare, movers,
    share; "profile" is inserted first while the operator is docked. */
-type RailId = "profile" | "field" | "hall" | "compare" | "movers" | "share";
+type RailId =
+  | "profile"
+  | "field"
+  | "hall"
+  | "compare"
+  | "movers"
+  | "share"
+  | "soon";
 /* Right-rail module order (owner 2026-10-06): interactive share, movement,
-   compare, then field context — the profile module moved to the left
-   sidebar ("banner + op profile"), which is why "profile" is absent. */
-const BASE_RAIL_ORDER: RailId[] = ["share", "movers", "compare", "field", "hall"];
+   compare, then rotating field stats, hall spotlight, recents/coming-soon —
+   the profile module moved to the left sidebar ("banner + op profile"),
+   which is why "profile" is absent. */
+const BASE_RAIL_ORDER: RailId[] = [
+  "share",
+  "movers",
+  "compare",
+  "field",
+  "hall",
+  "soon",
+];
 const RAIL_TITLE: Record<RailId, string> = {
   profile: "OPERATOR PROFILE",
-  field: "FIELD",
+  field: "HOT STATS",
   hall: "HALL OF SIGNAL",
   compare: "COMPARE OPERATORS",
-  movers: "TOP MOVERS · 7D",
+  movers: "TOP MOVERS",
   share: "SHARE YOUR SIGNAL",
+  soon: "RECENTS & SOON",
 };
+
+/* ---------- HOT STATS (owner 2026-10-06): the rail's field module rotates
+   one board stat at a time instead of duplicating the banner's static
+   strip. Same fieldStats source, one cell rotating on a timer. ---------- */
+function HotStats({ stats }: { stats: FieldStat[] }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (stats.length < 2) return;
+    const t = setInterval(() => setI((x) => (x + 1) % stats.length), 4200);
+    return () => clearInterval(t);
+  }, [stats.length]);
+  if (!stats.length) return <p className="drill-note">— NO FIELD STATS</p>;
+  const s = stats[i % stats.length];
+  return (
+    <div className="hotstat">
+      <div className="hs-v">{s.value}</div>
+      <div className="hs-l">{s.field.replace(/_/g, " ").toUpperCase()}</div>
+      <div className="hs-dots" aria-hidden>
+        {stats.map((_, k) => (
+          <span key={k} className={k === i ? "on" : ""} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function LiveBoardWorkspace({
   initial,
@@ -342,6 +389,16 @@ export function LiveBoardWorkspace({
       const codename =
         i === -1 ? initial.featured?.codename : ops[i]?.codename;
       if (!codename) return;
+      const name =
+        i === -1
+          ? (initial.featured?.name ?? codename)
+          : (ops[i]?.name ?? codename);
+      setRecents((r) =>
+        [{ codename, name }, ...r.filter((x) => x.codename !== codename)].slice(
+          0,
+          4,
+        ),
+      );
       liveTrack.operatorSelected({
         codename,
         rank: i >= 0 ? i + 1 : (initial.featured?.rank ?? null),
@@ -444,7 +501,6 @@ export function LiveBoardWorkspace({
   );
 
   /* ---------- derived rails ---------- */
-  const movers = useMemo(() => moverRows(initial.movers, ops), [initial.movers, ops]);
   const hall = useMemo(
     () => hallRows(initial.hall, ops, initial.featured?.name),
     [initial.hall, ops, initial.featured],
@@ -496,6 +552,12 @@ export function LiveBoardWorkspace({
   const [acctPop, setAcctPop] = useState(false);
   const [epromoOpen, setEpromoOpen] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
+  /* RECENTS (owner 2026-10-06): last-selected operators for the RECENTS &
+     SOON rail module; cmpQ = the compare module's add-by-search input. */
+  const [recents, setRecents] = useState<{ codename: string; name: string }[]>(
+    [],
+  );
+  const [cmpQ, setCmpQ] = useState("");
   const stageRef = useRef<HTMLElement | null>(null);
   const acctRef = useRef<HTMLDivElement | null>(null);
   const snavRef = useRef<HTMLElement | null>(null);
@@ -717,44 +779,132 @@ export function LiveBoardWorkspace({
       case "profile":
         return profile ? <OperatorProfileTile d={profile} /> : null;
       case "field":
-        return (
-          <div className="fgrid">
-            {initial.fieldStats.map((s) => (
-              <div className="fcell" key={s.field}>
-                <div className="n">
-                  {emStat(s.field) ? <em>{s.value}</em> : s.value}
-                </div>
-                <div className="l">
-                  {s.field.replace(/_/g, " ").toUpperCase()}
-                </div>
-              </div>
-            ))}
-          </div>
-        );
+        /* HOT STATS (owner 2026-10-06): the static field grid duplicated
+           the banner strip — the rail module now rotates one stat at a
+           time from the same source, so nothing repeats visually. */
+        return <HotStats stats={initial.fieldStats} />;
       case "hall":
-        return <HallRail rows={hall} onSelect={handleSelect} />;
-      case "compare":
+        /* Hall spotlight (owner): randomize record-holding operators and
+           show their profile graphic — a rotating spotlight tile rather
+           than the static hex row. */
+        return <HallSpot rows={hall} onSelect={handleSelect} />;
+      case "compare": {
+        /* compare-add-by-search (owner): typing an operator offers the
+           match as the second slot — view their profile or carry the
+           pair into /compare?a=<sel>&b=<match>. */
+        const q = cmpQ.trim().toLowerCase();
+        const match = q
+          ? ops.find(
+              (o, k) =>
+                k !== selected &&
+                (o.name.toLowerCase().includes(q) ||
+                  o.codename.toLowerCase().includes(q) ||
+                  o.handle.toLowerCase().includes(q)),
+            )
+          : null;
+        const href = selOp
+          ? `/compare?a=${encodeURIComponent(selOp.slug)}${match ? `&b=${encodeURIComponent(match.slug)}` : ""}`
+          : match
+            ? `/compare?a=${encodeURIComponent(match.slug)}`
+            : "/compare";
         return (
           <>
             <div className="cmp-slots">
-              {Array.from({ length: COMPARE_SLOTS }, (_, k) => (
-                <div className="cmp-slot" key={k}>
-                  {k === 0 && selOp ? selOp.codename[0] : "+"}
-                </div>
-              ))}
+              {Array.from({ length: COMPARE_SLOTS }, (_, k) => {
+                const slotOp = k === 0 ? selOp : k === 1 ? match : null;
+                return (
+                  <div
+                    className={`cmp-slot${slotOp ? " filled" : ""}`}
+                    key={k}
+                    title={slotOp ? slotOp.name : "add an operator"}
+                  >
+                    {slotOp ? (
+                      <span className="cav">{slotOp.name[0]}</span>
+                    ) : (
+                      "+"
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <a className="btn" href={cmpHref}>
+            <input
+              className="cmp-search"
+              placeholder="add operator…"
+              aria-label="add an operator to compare"
+              value={cmpQ}
+              onChange={(e) => setCmpQ(e.target.value)}
+            />
+            {q && (
+              <div className="cmp-match mono">
+                {match ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const k = ops.indexOf(match);
+                      if (k >= 0) handleSelect(k);
+                      setCmpQ("");
+                    }}
+                    title="view their profile"
+                  >
+                    ▸ {match.name}
+                  </button>
+                ) : (
+                  <span className="mut">— no match</span>
+                )}
+              </div>
+            )}
+            <a className="btn" href={href}>
               {COMPARE_CTA}
             </a>
           </>
         );
+      }
       case "movers":
-        return <MoversRail rows={movers} onSelect={handleSelect} />;
+        /* rotating movers (owner): auto-cycles 7D → 24H → HITL → AGENTIC
+           views of the same field. */
+        return (
+          <RotatingMovers
+            ops={ops}
+            server={initial.movers}
+            onSelect={handleSelect}
+          />
+        );
       case "share":
         return profile ? (
           <SharePreview d={profile} population={pop} />
         ) : (
           <p className="drill-note">— SELECT AN OPERATOR</p>
+        );
+      case "soon":
+        return (
+          <>
+            <div className="soon-h">RECENT</div>
+            {recents.length ? (
+              recents.map((r) => (
+                <button
+                  key={r.codename}
+                  type="button"
+                  className="rec-chip"
+                  onClick={() => {
+                    const k = ops.findIndex((o) => o.codename === r.codename);
+                    if (k >= 0) handleSelect(k);
+                  }}
+                >
+                  {r.name}
+                </button>
+              ))
+            ) : (
+              <p className="drill-note">— SELECT AN OPERATOR</p>
+            )}
+            <div className="soon-h">COMING SOON</div>
+            <div className="soonchips">
+              {["TEAMS", "SESSION COMPS", "HACKS", "VERSUS"].map((x) => (
+                <span key={x} className="soonchip" title="coming soon">
+                  {x}
+                </span>
+              ))}
+            </div>
+          </>
         );
     }
   };
@@ -801,7 +951,7 @@ export function LiveBoardWorkspace({
               <span className="gi">⇄</span>
             </Link>
             <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
-              <span className="gi">⬡</span>
+              <span className="gi">🏆</span>
             </Link>
             <Link className="sbtn" href="/field" data-tip="FIELD" title="FIELD">
               <span className="gi">◎</span>
@@ -913,7 +1063,6 @@ export function LiveBoardWorkspace({
               <em>{COPY.heroTitleB}</em>
             </span>
             <div className="nav-right">
-              <span className="hkicker">{COPY.heroKicker}</span>
               {/* layout toggles (VS Code quick-pick pattern): left sidebar +
                   inspector rail on/off — explicit control, never media-query. */}
               <button
@@ -986,7 +1135,43 @@ export function LiveBoardWorkspace({
                   </h3>
                   {profile ? (
                     docked ? (
-                      <OperatorProfileTile d={profile} />
+                      <>
+                        <OperatorProfileTile d={profile} />
+                        {/* owner 2026-10-06: the profile graphic is the
+                            dual radar (compare-page style), not just the
+                            avatar chip. */}
+                        <div className="lside-radar">
+                          <RadarChart
+                            vals={profile.series}
+                            baseline={radarBaseline}
+                            size={150}
+                          />
+                        </div>
+                        {/* trophy tracker (owner): the selected operator's
+                            metric records — the badge shelf from the
+                            revamped profiles, bound to the same recs the
+                            dock's RECORDS tab uses. */}
+                        <div className="trph-h">TROPHIES</div>
+                        {(selOp?.recs ?? []).length ? (
+                          <div className="trph">
+                            {(selOp!.recs ?? []).slice(0, 3).map((r) => (
+                              <div className="trph-r" key={r.metric}>
+                                <span className="ti">🏆</span>
+                                <span className="tm">{r.metric}</span>
+                                <span className="tv">
+                                  #{r.rank} · {r.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="drill-note">
+                            {selDetailStatus === "ready"
+                              ? "— NO RECORDS YET"
+                              : "— SYNCING…"}
+                          </p>
+                        )}
+                      </>
                     ) : (
                       <button
                         type="button"
@@ -1038,9 +1223,14 @@ export function LiveBoardWorkspace({
                     Agentic
                   </button>
                 </div>
+                {/* owner 2026-10-06: dropdown labels removed — the selects
+                    are self-describing; dropping .fl killed the dead space.
+                    SORT select removed too — every column header sorts now;
+                    the ▲▼ chip remains as the compact direction control. */}
                 <span className="fb">
-                  <span className="fl">WINDOW</span>
                   <select
+                    aria-label="Window"
+                    title="Window"
                     value={windowSel}
                     onChange={(e) => onWindowSel(e.target.value)}
                   >
@@ -1050,8 +1240,9 @@ export function LiveBoardWorkspace({
                   </select>
                 </span>
                 <span className="fb">
-                  <span className="fl">PLATFORM</span>
                   <select
+                    aria-label="Platform"
+                    title="Platform"
                     value={platformSel}
                     onChange={(e) => setPlatformSel(e.target.value)}
                   >
@@ -1061,8 +1252,9 @@ export function LiveBoardWorkspace({
                   </select>
                 </span>
                 <span className="fb">
-                  <span className="fl">CLASS</span>
                   <select
+                    aria-label="Class"
+                    title="Class"
                     value={classSel}
                     onChange={(e) => setClassSel(e.target.value)}
                   >
@@ -1072,24 +1264,10 @@ export function LiveBoardWorkspace({
                   </select>
                 </span>
                 <span className="fb">
-                  <span className="fl">SORT</span>
-                  <select
-                    value={sortSel}
-                    onChange={(e) => {
-                      setSortSel(e.target.value);
-                      setSortFlip(false);
-                    }}
-                  >
-                    {CONTROLS.sorts.map((o) => (
-                      <option key={o}>{o}</option>
-                    ))}
-                  </select>
-                  {/* direction chip — symmetric with the select; flips the
-                      effective asc/desc off the column's SORT_ASC default. */}
                   <button
                     type="button"
                     className="sdir"
-                    title={`direction — ${SORT_ASC.has(sortSel) !== sortFlip ? "ascending" : "descending"}; click to flip`}
+                    title={`${sortSel} — ${SORT_ASC.has(sortSel) !== sortFlip ? "ascending" : "descending"}; click to flip`}
                     aria-label="toggle sort direction"
                     onClick={() => setSortFlip((f) => !f)}
                   >
@@ -1097,29 +1275,14 @@ export function LiveBoardWorkspace({
                   </button>
                 </span>
                 <span className="fb">
-                  <span className="fl">SEARCH</span>
                   <input
+                    aria-label="Search operators"
                     placeholder="operator or codename…"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </span>
                 <span className="fb-sp"></span>
-                <div className="seg">
-                  <button
-                    className={colMode === "metrics" ? "on" : ""}
-                    onClick={() => setColMode("metrics")}
-                  >
-                    Metrics · the cascade
-                  </button>
-                  <span className="sep"></span>
-                  <button
-                    className={colMode === "raw" ? "on" : ""}
-                    onClick={() => setColMode("raw")}
-                  >
-                    Raw · the fuel
-                  </button>
-                </div>
               </div>
 
               <main className="stage" ref={stageRef}>
@@ -1182,35 +1345,55 @@ export function LiveBoardWorkspace({
                       </tbody>
                     </table>
                     <div className="pgn">
-                      {ordered.length === 0 ? (
-                        <>
-                          {ops.length === 0
-                            ? "No operators on this board"
-                            : "No rows match the current filter"}
-                        </>
-                      ) : (
-                        <>
-                          Showing {pageStart + 1}–
-                          {pageStart + pageRows.length} of{" "}
-                          {filtered
-                            ? `${ordered.length.toLocaleString()} filtered`
-                            : pop.count.toLocaleString()}{" "}
-                          operators
-                        </>
-                      )}{" "}
-                      · {pop.tag}
-                      {fieldState === "loading" && (
-                        <span className="pgstat" role="status">
-                          {" "}
-                          · ⟳ SYNCING FIELD…
-                        </span>
-                      )}
-                      {fieldState === "error" && (
-                        <span className="pgstat pgerr" role="alert">
-                          {" "}
-                          · FIELD SYNC FAILED — CLICK A PAGE TO RETRY
-                        </span>
-                      )}
+                      <span className="pgl">
+                        {ordered.length === 0 ? (
+                          <>
+                            {ops.length === 0
+                              ? "No operators on this board"
+                              : "No rows match the current filter"}
+                          </>
+                        ) : (
+                          <>
+                            Showing {pageStart + 1}–
+                            {pageStart + pageRows.length} of{" "}
+                            {filtered
+                              ? `${ordered.length.toLocaleString()} filtered`
+                              : pop.count.toLocaleString()}{" "}
+                            operators
+                          </>
+                        )}{" "}
+                        · {pop.tag}
+                        {fieldState === "loading" && (
+                          <span className="pgstat" role="status">
+                            {" "}
+                            · ⟳ SYNCING FIELD…
+                          </span>
+                        )}
+                        {fieldState === "error" && (
+                          <span className="pgstat pgerr" role="alert">
+                            {" "}
+                            · FIELD SYNC FAILED — CLICK A PAGE TO RETRY
+                          </span>
+                        )}
+                      </span>
+                      {/* owner 2026-10-06: pages centered + clickable; the
+                          Metrics/Raw (tokens) toggle lives in the table's
+                          chrome row, not the filter bar. */}
+                      <div className="seg pgn-seg">
+                        <button
+                          className={colMode === "metrics" ? "on" : ""}
+                          onClick={() => setColMode("metrics")}
+                        >
+                          Metrics
+                        </button>
+                        <span className="sep"></span>
+                        <button
+                          className={colMode === "raw" ? "on" : ""}
+                          onClick={() => setColMode("raw")}
+                        >
+                          Raw
+                        </button>
+                      </div>
                       <span className="pages">
                         {[1, 2, 3]
                           .filter((n) => n <= lastPage)
@@ -1274,7 +1457,8 @@ export function LiveBoardWorkspace({
                 compare, field, hall — owner 2026-10-06 IA) */}
             <aside className="railcol">
               <div className="railhead">
-                <span className="sq"></span>INSPECTOR
+                <span className="sq"></span>
+                {COPY.heroKicker}
               </div>
               <div className="rail">
                 {visibleRail.map((id) =>

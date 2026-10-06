@@ -125,6 +125,43 @@ Status tracked here — check items as they land.
       pillar columns are now sortable too (`Input/Output/Cache-read/
       Cache-write` in SORT_KEY + CONTROLS.sorts).
 
+## Owner annotation pass (2026-10-06, VS Code Simple Browser notes)
+
+23 element annotations worked through; element inferred from note content
+(selectors were generic). Interpretation calls flagged for review:
+
+- [x] Radar on profile — `RadarChart` (dual, compare-style baseline)
+      rendered under the profile tile in the left sidebar
+- [x] Profile graphic — gradient avatar tiles in compare slots +
+      spotlight; radar is the profile's graphic centerpiece
+- [x] HALL OF SIGNAL → `HallSpot` rotating random spotlight (avatar +
+      record, 5.2s cycle, click → select)
+- [x] FIELD module duplicate → replaced by `HotStats` rotating ticker
+      (dedupes banner strip + "rotating stats" note)
+- [x] Trophy tracker — `TROPHIES` strip in profile mod binding
+      `selOp.recs` (the same enriched records the dock RECORDS tab uses)
+- [x] TOP MOVERS → `RotatingMovers` auto-cycles 7D·ALL → 24H·ALL →
+      7D·HITL → 7D·AGENTIC (24h derives from `o.mv24`, wf facets filter
+      resolved rows)
+- [x] Pagination centered (`absolute`-center `.pages`)
+- [x] Metrics/Raw seg moved from fbar into `.pgn`
+- [x] COMPARE module: add-by-search input → match offers view-profile or
+      carries `?a=<sel>&b=<match>` into /compare
+- [x] SORT `<select>` removed (headers sort); `.sdir` chip remains
+- [x] `.fl` dropdown labels removed (dead-space cleanup); selects carry
+      aria-label + title
+- [x] Page title centered in `.nav`
+- [x] Railheads restyled to `.pagetitle` display face; right railhead =
+      "BURNERS, BUILDERS & 10XERS" (kicker moved out of `.nav`)
+- [x] RECENTS & SOON module — recents chips (reselect) + coming-soon
+      chips: TEAMS / SESSION COMPS / HACKS / VERSUS
+- [x] Hall icon → 🏆; `.sbtn:hover .gi` grows icons on hover
+
+Interpretation calls (review): "four degree" read as the field-strip
+stats → covered by HotStats; "randomize users + profile graphic" applied
+to the hall module; "boxes inside header text box" read as already
+satisfied (module buttons sit inside `.mod h3`).
+
 ## Process note
 
 - Owner directive: **document all changes and follow-ups in a durable

@@ -19,6 +19,7 @@
  * resolved display identity (@handle or operatorDisplayName) — and falls
  * back to codename only when the handle slot is empty.
  */
+import { useEffect, useMemo, useState } from "react";
 import type { LiveOperator, MoverEntry } from "@/lib/board/live-types";
 import { deriveMovers } from "./utils";
 
@@ -61,9 +62,12 @@ export function moverRows(
 export function MoversRail({
   rows,
   onSelect,
+  tag = "7d",
 }: {
   rows: MoverRow[];
   onSelect?: (opIndex: number) => void;
+  /** movement window label on each row ("7d" | "24h"). */
+  tag?: string;
 }) {
   return (
     <>
@@ -94,7 +98,7 @@ export function MoversRail({
             <span>
               {m.name}{" "}
               <span className="mut mono" style={{ fontSize: 9 }}>
-                7d
+                {tag}
               </span>
             </span>
             <span className={`dlt ${m.mv >= 0 ? "up" : "dn"}`}>
@@ -109,6 +113,72 @@ export function MoversRail({
       )}
       {/* reference renders a decorative "ALL MOVERS →" anchor here; no movers
           destination exists in production, so the dead link is dropped. */}
+    </>
+  );
+}
+
+/* ---------- RotatingMovers (owner 2026-10-06): the movers module cycles
+   between windows and workflow facets on a timer — 7D → 24H → HITL →
+   AGENTIC — instead of pinning a static 7d list. 24H derives client-side
+   from ops' mv24 (server ships mv7 only); workflow facets filter the
+   resolved mover rows through ops' wf. ---------- */
+const MOVER_MODES = ["7D · ALL", "24H · ALL", "7D · HITL", "7D · AGENTIC"] as const;
+
+export function RotatingMovers({
+  ops,
+  server,
+  onSelect,
+}: {
+  ops: LiveOperator[];
+  server?: MoverEntry[];
+  onSelect?: (opIndex: number) => void;
+}) {
+  const [mi, setMi] = useState(0);
+  useEffect(() => {
+    const t = setInterval(
+      () => setMi((i) => (i + 1) % MOVER_MODES.length),
+      5000,
+    );
+    return () => clearInterval(t);
+  }, []);
+  const mode = MOVER_MODES[mi];
+
+  const rows = useMemo<MoverRow[]>(() => {
+    if (mode === "24H · ALL") {
+      return ops
+        .map((o, i) => ({ o, i }))
+        .filter((x) => x.o.mv24 != null && x.o.mv24 !== 0)
+        .sort(
+          (a, b) => Math.abs(b.o.mv24 ?? 0) - Math.abs(a.o.mv24 ?? 0),
+        )
+        .slice(0, 4)
+        .map((x) => ({
+          name: x.o.handle || x.o.name,
+          codename: x.o.codename,
+          mv: x.o.mv24 ?? 0,
+          opIndex: x.i,
+        }));
+    }
+    const base = moverRows(server, ops);
+    const wf =
+      mode === "7D · HITL" ? "hitl" : mode === "7D · AGENTIC" ? "agentic" : null;
+    const out = wf
+      ? base.filter((r) => r.opIndex != null && ops[r.opIndex]?.wf === wf)
+      : base;
+    return out.slice(0, 4);
+  }, [mode, ops, server]);
+
+  return (
+    <>
+      <div className="mv-mode">
+        {mode}
+        <span className="mut"> · AUTO</span>
+      </div>
+      <MoversRail
+        rows={rows}
+        onSelect={onSelect}
+        tag={mode.startsWith("24H") ? "24h" : "7d"}
+      />
     </>
   );
 }
