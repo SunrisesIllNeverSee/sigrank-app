@@ -37,7 +37,7 @@ prefer documenting the layout over renaming it.
 | `.github/` `.agents/` `.claude/` `.ello/` | Tooling | CI, agent skills (locked via `skills-lock.json`), compat dirs — convention paths, do not merge or rename |
 | `Devins_Plans/` `_archive/` | Pointer | Contents live in the umbrella repo (`Devins_Plans/reports/sigrank-app/`, `_archive/sigrank-app-attic/`); keep the READMEs |
 | Root configs | Tooling | `next.config.ts`, `vercel.json`, `wrangler.jsonc`, `open-next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, `tailwind.config.ts`, `playwright.config.ts`, `vitest.*`, `proxy.ts` (middleware replacement — root-pinned by convention), package manifests |
-| Root docs | App-owned | `README.md`, `AGENTS.md`, `SECURITY.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `LICENSE`, `NOTICE`, `TTEOP-IMPLEMENTATION-PROFILE.md` |
+| Root docs | App-owned | `README.md`, `AGENTS.md`, `SECURITY.md`, `CONTRIBUTING.md` (note: `.github/CONTRIBUTING.md` is a divergent duplicate — needs a winner), `LICENSE`, `NOTICE`, `TTEOP-IMPLEMENTATION-PROFILE.md` |
 
 ## Dependency direction
 
