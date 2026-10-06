@@ -166,8 +166,13 @@ test("sitemap does not emit generation-time or shared-fallback lastmod", async (
 });
 
 test("sitemap applies the shared indexing policy", async () => {
+  // Real wiring: sitemap delegates to sitemap-entries, which calls the shared
+  // operatorSitemapEntry() policy — not a prose mention, the call chain.
   const sitemap = await source("app/sitemap.ts");
-  assert.match(sitemap, /seo\/indexing-policy/);
+  assert.match(sitemap, /operatorSitemapEntries/);
+  const entries = await source("lib/seo/sitemap-entries.ts");
+  assert.match(entries, /operatorSitemapEntry\(/);
+  assert.match(entries, /from "\.\/indexing-policy\.ts"/);
 });
 
 test("profile page applies the shared indexing policy to robots metadata", async () => {
@@ -238,4 +243,190 @@ test("indexable-operator snapshot check chunks the IN clause below the PostgREST
   // [] → the sitemap drops every operator URL. Chunking must be present.
   assert.match(fn[0], /slice\(i, i \+ \d+\)/);
   assert.doesNotMatch(fn[0], /\.in\("operator_id",\s*ids\)/);
+});
+
+// ── Sitemap URL uniqueness (closeout A) ─────────────────────────────────────
+// These tests invoke the real emission builders (lib/seo/sitemap-entries.ts)
+// on the real STATIC_ROUTES + BOARD_WINDOWS — the same call app/sitemap.ts
+// makes — so this is the CI gate for the structural sitemap invariants
+// (uniqueness, host, scheme, manifest gating). Historically /board/all lived
+// in both STATIC_ROUTES and BOARD_WINDOWS.slug === "all", emitting twice.
+
+import { BOARD_WINDOWS } from "../../lib/board/windows.ts";
+import {
+  STATIC_ROUTES,
+  staticSitemapEntries,
+  operatorSitemapEntries,
+} from "../../lib/seo/sitemap-entries.ts";
+
+// The exact emitted URL set app/sitemap.ts produces for static + board
+// entries (operator rows need the data layer; tested separately below).
+function emittedStaticPlusBoardUrls() {
+  return staticSitemapEntries(
+    STATIC_ROUTES,
+    BOARD_WINDOWS.map((w) => w.slug),
+    ORIGIN,
+  ).map((e) => e.url);
+}
+
+test("sitemap URLs are unique (static + board windows, no double emission)", () => {
+  const urls = emittedStaticPlusBoardUrls();
+  assert.equal(
+    new Set(urls).size,
+    urls.length,
+    `duplicate sitemap URLs: ${urls.filter((u, i) => urls.indexOf(u) !== i)}`,
+  );
+});
+
+test("every board window URL is emitted exactly once", () => {
+  const urls = emittedStaticPlusBoardUrls();
+  for (const w of ["/board/7d", "/board/30d", "/board/90d", "/board/all"]) {
+    const count = urls.filter((u) => u === `${ORIGIN}${w}`).length;
+    assert.equal(count, 1, `${w} emitted ${count} times in sitemap`);
+  }
+});
+
+test("/board/all is not re-declared in STATIC_ROUTES (single emitter)", () => {
+  assert.ok(!STATIC_ROUTES.some((r) => r.path === "/board/all"));
+});
+
+test("emitted sitemap URLs satisfy the structural invariants (CI gate)", () => {
+  const siteHost = new URL(ORIGIN).host;
+  const utilityPrefixes = [
+    "/auth", "/login", "/logout", "/settings", "/account", "/me",
+    "/api", "/admin", "/onboarding", "/claim",
+  ];
+  for (const u of emittedStaticPlusBoardUrls()) {
+    const parsed = new URL(u);
+    assert.equal(parsed.protocol, "https:", `${u} not HTTPS`);
+    assert.equal(parsed.host, siteHost, `${u} not on ${siteHost}`);
+    assert.equal(parsed.search, "", `${u} carries a query string`);
+    for (const p of utilityPrefixes) {
+      assert.ok(
+        parsed.pathname !== p && !parsed.pathname.startsWith(p + "/"),
+        `${u} is a utility/auth/internal route`,
+      );
+    }
+  }
+});
+
+test("utility-prefix guard actually fires (no dead prefixes)", () => {
+  // Regression: a trailing-slash prefix ("/api/") composes to
+  // startsWith("/api//") — never matches, silently disabling the guard.
+  // Assert the predicate catches representative paths and no prefix is
+  // stored with a trailing slash (scripts/validate-sitemap.mjs shares the list).
+  const utilityPrefixes = [
+    "/auth", "/login", "/logout", "/settings", "/account", "/me",
+    "/api", "/admin", "/onboarding", "/claim",
+  ];
+  for (const p of utilityPrefixes) {
+    assert.ok(!p.endsWith("/"), `prefix ${p} has a trailing slash — dead guard`);
+  }
+  const isUtility = (path) =>
+    utilityPrefixes.some((p) => path === p || path.startsWith(p + "/"));
+  for (const path of ["/api/v1/leaderboard", "/api", "/auth/callback", "/admin"]) {
+    assert.ok(isUtility(path), `${path} must be caught by the utility guard`);
+  }
+  for (const path of ["/metrics", "/apple-touch-icon", "/wiki/apis"]) {
+    assert.ok(!isUtility(path), `${path} must NOT be caught`);
+  }
+});
+
+// ── IndexNow hardening (closeout J) ─────────────────────────────────────────
+// /api/indexnow is a write action surface: it must be authed, origin-locked,
+// and must not let the caller override the verification key.
+
+test("indexnow endpoint requires bearer auth and has no anonymous path", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.match(src, /INDEXNOW_SUBMIT_SECRET/);
+  assert.match(src, /Bearer \$\{secret\}/);
+  assert.match(src, /status:\s*401/);
+  assert.match(src, /timingSafeEqual/); // constant-time bearer comparison
+});
+
+test("indexnow endpoint cannot accept a request-supplied key override", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.doesNotMatch(src, /body\.key/);
+  assert.match(src, /key:\s*INDEXNOW_KEY/);
+});
+
+test("indexnow endpoint rejects URLs outside SITE_ORIGIN", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.match(src, /new URL\(SITE_ORIGIN\)\.origin/);
+  assert.match(src, /\.origin !== siteOrigin/);
+});
+
+test("indexnow endpoint dedupes and caps the batch", async () => {
+  const src = await source("app/api/indexnow/route.ts");
+  assert.match(src, /new Set\(normalized\)/); // dedupe on normalized URLs
+  assert.match(src, /slice\(0, MAX_URLS\)/);
+});
+
+// ── Static route classification manifest (closeout E+F) ─────────────────────
+// lib/seo/search-index-policy.ts is the source of truth for sitemap membership:
+// CORE + SUPPORTED are promoted; HOLD stays live but unadvertised; UTILITY and
+// REDIRECT are never promoted.
+
+import {
+  ROUTE_CLASSES,
+  isSitemapPromoted,
+  routesInClass,
+} from "../../lib/seo/search-index-policy.ts";
+
+test("every emitted static sitemap route is classified", () => {
+  const unclassified = STATIC_ROUTES.map((r) => r.path).filter(
+    (p) => !(p in ROUTE_CLASSES),
+  );
+  assert.deepEqual(unclassified, []);
+});
+
+test("every board window is classified and emitted at most once per URL", () => {
+  for (const w of ["/board/7d", "/board/30d", "/board/90d", "/board/all"]) {
+    assert.ok(w in ROUTE_CLASSES, `${w} missing from manifest`);
+  }
+  const slugs = BOARD_WINDOWS.map((w) => w.slug);
+  assert.equal(new Set(slugs).size, slugs.length, "duplicate board slugs");
+});
+
+test("the Phase-1 recovery cohort stays promoted (CORE or SUPPORTED)", () => {
+  const cohort = [
+    "/", "/board/all", "/methodology", "/wiki", "/science", "/research",
+    "/token-telemetry", "/score", "/hall", "/compare", "/ai-operator-scoring",
+    "/metrics/yield-cascade", "/metrics/cache-hit-rate",
+    "/metrics/compression-ratio", "/tools/yield-calculator",
+    "/tools/token-waste-calculator",
+    "/guides/how-to-measure-ai-coding-efficiency", "/blog/volume-isnt-yield",
+    "/vs/ccusage", "/vs/cursor", "/vs/lmsys-arena",
+    "/alternatives/ccusage-alternatives", "/alternatives/token-tracking-tools",
+  ];
+  for (const p of cohort) {
+    assert.ok(isSitemapPromoted(p), `sentinel ${p} must remain sitemap-promoted`);
+  }
+});
+
+test("UTILITY and REDIRECT routes are never sitemap-promoted", () => {
+  for (const p of routesInClass("UTILITY").concat(routesInClass("REDIRECT"))) {
+    assert.equal(isSitemapPromoted(p), false, `${p} must not be promoted`);
+  }
+});
+
+test("sitemap emits only manifest-promoted static + board paths", () => {
+  for (const u of emittedStaticPlusBoardUrls()) {
+    const path = new URL(u).pathname;
+    assert.ok(
+      isSitemapPromoted(path),
+      `${path} emitted but not promoted by the manifest`,
+    );
+  }
+});
+
+test("operator sitemap entries pass the shared policy (no noindex rows emitted)", () => {
+  const rows = [
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "ok", has_metric_snapshot: true },
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "seed", claimed: false, has_metric_snapshot: true },
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "nosnap", has_metric_snapshot: false },
+    { ...CLAIMED_PUBLIC_ACTIVE, codename: "priv", profile_visibility: "private", has_metric_snapshot: true },
+  ];
+  const emitted = operatorSitemapEntries(rows, ORIGIN).map((e) => e.url);
+  assert.deepEqual(emitted, [`${ORIGIN}/user/ok`]);
 });

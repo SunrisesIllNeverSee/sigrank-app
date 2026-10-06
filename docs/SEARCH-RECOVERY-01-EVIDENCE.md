@@ -175,3 +175,48 @@ invalid; canonicals change; sitemap/policy count unreconcilable; test regression
 - `sigarena.signalaf.com` legacy host cleanup — Phase 3.
 - e2e `SEED_CODENAME = "furic"` profile stays green (200 + noindex). A
   robots-meta assertion can be added to `e2e/profile.spec.ts` in a follow-up.
+
+---
+
+## Closeout round — completeness addendum (2026-10-05)
+
+Post-merge review produced a completeness addendum (§A–L). Executed on branch `fix/search-recovery-01-closeout`:
+
+| § | Item | Result |
+|---|---|---|
+| A | `/board/all` duplicate in sitemap (in `STATIC_ROUTES` **and** `BOARD_WINDOWS`) | **Fixed** — single emitter via BOARD_WINDOWS; live fetch confirmed duplicate pre-fix. Regression tests: URL-set uniqueness + each window exactly once + `/board/all` not re-declared |
+| A | Sitemap noindex/utility leaks found by new validator | **Fixed** — `/marketplace` + `/vercel/config` (both `noindex,nofollow`) removed from STATIC_ROUTES |
+| B | Indexing API misuse correction | **Docs amended** — `SENTINEL.md` marks the 2026-10-05 ×22 submission as a one-time unsupported experiment; correct workflow recorded (deploy → verify → resubmit sitemap → GSC Request Indexing selectively → monitor) |
+| B | `sitemap indexed count > 0` criterion removed | **Done** — marked unreliable; gates now read coverage state + crawl freshness + breadth |
+| C | Manual Actions / Security Issues baseline | **Pending owner** — not exposed via any GSC API; browser attempt hit sign-in wall. `SAFETY-BASELINE.md` records the pending slot + 2-min owner checklist. API evidence already rules out robots/fetch/canonical causes |
+| D | `/user/*` emitter audit | **`LINK-GRAPH.md`** — every emitter mapped incl. self/auth paths. Board/ItemList populations are `claimedOnly`-clean; `MetricTopTen` placeholder `href` fixed in this closeout; Hall 7d/30d/90d claimed-filter deferred (documented Phase-2). `/user/the-field` footer link documented as intentional (`noindex,follow`) |
+| E | Sitemap validator | **`scripts/validate-sitemap.mjs`** — `--file` offline + `--live`/`--base` modes; structural invariants also gated behaviorally in `npm test` via `sitemap-entries.ts`; caught all 3 live violations pre-fix |
+| F | Route classification manifest | **`lib/seo/search-index-policy.ts`** — 216 routes: CORE 19 · SUPPORTED 105 · HOLD 77 · UTILITY 10 · REDIRECT 5. **Manifest now gates sitemap membership** → emitted sitemap 234→~146 URLs. HOLD pages stay live + index,follow (omission ≠ noindex) |
+| G | Structured-data audit | **`SCHEMA-AUDIT.md`** — Organization `logo` present + resolving (flagged defect absent live); no dead operator URLs; no sigarena refs; no dupes |
+| H | Legacy hosts | **`LEGACY-HOSTS.md`** — all 3 hosts DNS-dead (nothing resolves → no live redirects needed today); route-mapping manifest + 410 policy recorded for any future re-point |
+| I | Interior navigation | **`NAV-DESIGN.md`** — full hub topology + operator link-graph rules drafted as design manifest; implementation deferred to evidence gate (§L freeze) |
+| J | `/api/indexnow` hardening | **Rewritten** — bearer auth (`INDEXNOW_SUBMIT_SECRET`/`CRON_SECRET`), SITE_ORIGIN allowlist, key override removed, dedupe+cap(100), per-instance rate limit, submission logging. Contract tests added |
+| K | AI-search crawler access | **`CRAWLER-ACCESS.md`** — verified live: OAI-SearchBot/PerplexityBot/ClaudeBot/Googlebot all HTTP 200, no WAF/JS challenge; robots.txt policies intentional (Bytespider + meta-externalagent blocked; Google-Extended allowed) |
+| L | Spam-rollout monitoring/freeze | **Amended in SENTINEL.md** — Sept 2026 spam update still rolling out → no interpretation of fluctuations until completion; freeze list + allowed-exceptions recorded |
+
+### Tests
+
+38 → **43 contract tests** in `__tests__/seo/indexing-policy.test.mjs` (dedupe, window-once, manifest coverage/promotion/sentinel-preservation, indexnow hardening). Suite + build results in the PR body.
+
+### Behavioral consequence of merging
+
+Sitemap membership drops from 234 → ~146 URLs (HOLD/UTILITY/REDIRECT excluded). This IS the addendum's Phase-2 manifest-as-source-of-truth — merging activates it. Merge timing controls activation timing.
+
+## Review round 2 (2026-10-05)
+
+- **Validator fixed**: `--file` is now a real offline mode (validated `.next/server/app/sitemap.xml.body` → 146 URLs, 0 violations); host invariant asserts `signalaf.com` on the declared `<loc>` rather than the fetch base, so `--live --base <preview>` works on preview deploys; live checks fetch `base+path` while canonical is still compared to the declared URL.
+- **CI gate is real**: sitemap emission extracted to `lib/seo/sitemap-entries.ts` (pure, dependency-free); `__tests__/seo/indexing-policy.test.mjs` now invokes `staticSitemapEntries`/`operatorSitemapEntries` on the real `STATIC_ROUTES` + `BOARD_WINDOWS` — uniqueness, host/scheme/utility/query invariants, manifest gating, and operator policy all assert on the actual emitted set under `npm test`. The script remains the post-deploy complement for live invariants (200/redirect/robots/canonical).
+- **Dead-link fix**: `MetricTopTen` no longer emits `href` on `isPlaceholder` rows — placeholder names render unlinked (LINK-GRAPH finding #2 closed; Hall window claimed-filter remains documented Phase-2 scope).
+- **IndexNow nits**: bearer comparison is now `crypto.timingSafeEqual`; dead post-dedupe empty check removed.
+- **Manifest completeness**: `/marketplace` + `/vercel/config` classified UTILITY (removed from STATIC_ROUTES in §A, recorded in the manifest).
+- **tsconfig**: `allowImportingTsExtensions` enabled so test-importable modules can carry explicit `.ts` specifiers (required by `node --experimental-strip-types`).
+- 40 SEO contract tests (behavioral on the real emitted set); full suite 685/681-pass/0-fail/4-skip; UI 132/132; canonical 11/11; tsc 0; build clean.
+- `config/search-index-policy.ts` moved to **`lib/seo/search-index-policy.ts`** — keeps SEO modules together, avoids a new root dir.
+- **§B closed fully**: AGENTS.md no longer instructs `index`/`check:index --push` as post-deploy SOP — the prohibited-workflow note + correct deploy→verify→sitemap→URL-Inspection sequence now live where future agents read them.
+- Validator brittleness: malformed `<loc>`s report under the host invariant instead of throwing; robots meta matched in either attribute order.
+- IndexNow response now reports `truncated` + `dropped` so a >100-URL batch can't silently lose URLs; route header documents the `INDEXNOW_SUBMIT_SECRET` provisioning requirement (external callers incl. the `indexnow` MCP must present the bearer token).
