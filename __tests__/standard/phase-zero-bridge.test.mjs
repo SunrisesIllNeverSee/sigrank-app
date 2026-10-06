@@ -19,7 +19,7 @@ test("public discovery surfaces advertise the live HTTP MCP endpoint", () => {
 });
 
 test("standard pages are distributed through sitemap and footer", () => {
-  const sitemap = read("app/sitemap.ts");
+  const sitemap = read("lib/seo/sitemap-entries.ts");
   const footer = read("components/ui/Footer.tsx");
   for (const route of ["/upsilon", "/standard", "/standard/open-vs-proprietary"]) {
     assert.ok(sitemap.includes(route), `sitemap is missing ${route}`);
