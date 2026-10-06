@@ -134,6 +134,9 @@ export interface HallEntry {
 
 /** Featured-operator summary (rank-1 context block). */
 export interface FeaturedOperator {
+  /** Codename verbatim — identity key for lookup/share (NEVER match featured
+   *  operators by display name; names collide, codenames don't). */
+  codename: string;
   name: string;
   handle: string;
   rank: number;

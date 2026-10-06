@@ -327,6 +327,7 @@ export function projectLiveBoard(
   if (top) {
     const topOp = toLiveOperator(top);
     featured = {
+      codename: top.operator.codename,
       name: operatorDisplayName(top),
       handle: topOp.handle,
       rank: top.global_rank,
