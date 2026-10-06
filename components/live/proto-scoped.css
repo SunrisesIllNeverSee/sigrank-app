@@ -770,3 +770,18 @@
 .lbw-root .soonchip i{font-style:normal;font-size:15px}
 .lbw-root .soon-cap{font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;
   color:var(--mut);margin-top:8px;line-height:1.5}
+
+/* canonical brand mark — the gold § from app/icon.svg (Georgia serif,
+   brand gold #c4923a stays constant across board themes) */
+.lbw-root .sbrand .smark{font-family:Georgia,'Times New Roman',serif;
+  font-weight:700;font-size:22px;line-height:1;color:#c4923a;
+  display:inline-block;text-align:center}
+.lbw-root .srail.min .sbrand .smark{font-size:20px}
+
+/* lighthouse a11y pass (2026-10-06): pagetitle is the h1 — kill the UA
+   margin/size so it renders as the same centered title. */
+.lbw-root h1.pagetitle{margin:0;font-family:var(--font-disp)}
+
+/* touch targets: theme swatches bumped 14→18px (still compact, now
+   grabbable); keeps the icon-only rail vocabulary. */
+.lbw-root .srail.min .sw{width:18px;height:18px}
