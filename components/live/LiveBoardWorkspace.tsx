@@ -13,8 +13,13 @@
  *   - logic verbatim: numvOf compact parsing, RMAX from initial.fieldMax
  *     (server full-scope maxima — never recomputed from rendered rows),
  *     opRadar, derived movers, tt1..tt3 top-3 heat, ops/outliers view
- *   - workspace renders ALL operators it is given; sort/filter/search are
- *     client-side over the supplied array (the prototype shipped the
+ *   - sort/filter/search are client-side over the supplied array; the table
+ *     renders the current page only — PAGE_SIZE = 10 rows, matching the
+ *     reference's `ceil(population / 10)` page chrome. The page count derives
+ *     from the LOADED rows (never the population denominator — the mount
+ *     hydrates the rest of the field lazily); a page click on an incomplete
+ *     field re-fires fetchMore, so the pagination chrome doubles as the
+ *     retry path when hydration soft-fails (429). (The prototype shipped the
  *     controls as chrome; the port wires the field-side ones: SORT/CLASS/
  *     PLATFORM/SEARCH; WINDOW is route-owned → onWindowChange)
  *   - fetchMore(page) / fetchDetail(codename, hint) are optional async hooks
@@ -46,6 +51,7 @@
  * Hall / Field (reference-v1's inert PROFILE/WRAPPED buttons and the
  * share.html link are dropped — Share lives on the dock's SHARE tab).
  */
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
@@ -70,6 +76,7 @@ import {
   CONTROLS,
   COPY,
   LBW_THEME_INIT,
+  PAGE_SIZE,
   SORT_ASC,
   SORT_KEY,
   THEMES,
@@ -83,6 +90,8 @@ import {
   windowLabel,
   type ThemeName,
 } from "./utils";
+import { track } from "@/lib/infra/posthog/events";
+import { liveTrack } from "./analytics";
 import {
   createDetailFetcher,
   detailFailed,
@@ -109,7 +118,14 @@ export interface LiveBoardWorkspaceProps {
   /** Account chrome override (demo/QA). Omit → the real /api/auth/session
    *  surface resolves (useBoardSession). */
   account?: { name: string; rank: string };
+  /** Mount-side field-hydration state — drives the pagination chrome's
+   *  SYNCING / SYNC-FAILED indicators. Omit in standalone/demo usage (a
+   *  complete field reads as "ready"). */
+  fieldStatus?: LiveFieldStatus;
 }
+
+/** Field-hydration lifecycle reported by the mount (live-board-mount.tsx). */
+export type LiveFieldStatus = "idle" | "loading" | "ready" | "error";
 
 /* rail module ids — reference module order: field, hall, compare, movers,
    share; "profile" is inserted first while the operator is docked. */
@@ -130,6 +146,7 @@ export function LiveBoardWorkspace({
   fetchDetail,
   onWindowChange,
   account,
+  fieldStatus,
 }: LiveBoardWorkspaceProps) {
   /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
      "green"; state lives on .lbw-root's data-theme (the site's own
@@ -194,6 +211,19 @@ export function LiveBoardWorkspace({
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
+  /* WINDOW self-heal (R2): the mount normally remounts the workspace on a
+     route swap (key={meta.window}), but a prop-driven window change must
+     resync the select without relying on that remount. */
+  useEffect(() => {
+    setWindowSel(windowLabel(initial.meta.window));
+  }, [initial.meta.window]);
+
+  /* Any filter/view/sort/search/window change returns to page 1 — the
+     visible set shrinks, so a deep page pointer would strand the table. */
+  useEffect(() => {
+    setPage(1);
+  }, [search, classSel, platformSel, viewMode, sortSel, initial.meta.window]);
+
   /* ---------- selected operator + dock ---------- */
   const [selected, setSelected] = useState<number>(() =>
     initial.featured ? -1 : initial.operators.length ? 0 : -1,
@@ -216,6 +246,33 @@ export function LiveBoardWorkspace({
   const selEntry = selCodename ? details[detailKey(selCodename)] : undefined;
   const selDetail = selEntry?.detail ?? null;
   const selDetailStatus: DetailStatus = selEntry?.status ?? "idle";
+
+  /* Selection funnel (2D analytics) — fires only on user-initiated picks
+     (board row, mover row, hall hex); the featured-operator mount selection
+     does NOT count. */
+  const handleSelect = useCallback(
+    (i: number) => {
+      setSelected(i);
+      const codename =
+        i === -1 ? initial.featured?.codename : ops[i]?.codename;
+      if (!codename) return;
+      liveTrack.operatorSelected({
+        codename,
+        rank: i >= 0 ? i + 1 : (initial.featured?.rank ?? null),
+      });
+    },
+    [ops, initial.featured],
+  );
+
+  /* board_viewed — parity with LeaderboardTable's instrumentation: fires on
+     mount and on window/view swaps (the window prop also remounts via key,
+     so this covers route navigation either way). */
+  useEffect(() => {
+    track.boardViewed(initial.meta.window, {
+      view: viewMode,
+      total: initial.population.count,
+    });
+  }, [initial.meta.window, initial.population.count, viewMode]);
 
   useEffect(() => {
     if (!selCodename) return;
@@ -387,20 +444,105 @@ export function LiveBoardWorkspace({
     [onWindowChange, router],
   );
 
+  /* ---------- pagination (LB-19) — real slices, honest counts ----------
+     lastPage derives from the LOADED rows (ordered.length): the population
+     denominator is the full ranking scope, which the mount hydrates lazily.
+     totalPages is the field horizon — a page target beyond the loaded rows
+     on an incomplete field triggers fetchMore, and any chrome click while
+     the last hydration failed retries it (429 soft-fail path). */
+  const filtered = ordered.length !== ops.length;
+  const fieldComplete = ops.length >= initial.totalOperators;
+  const fieldState: LiveFieldStatus =
+    fieldStatus ?? (fieldComplete ? "ready" : "idle");
+  const lastPage = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(initial.totalOperators / PAGE_SIZE));
+  /* the requested page can sit ahead of the loaded horizon while hydration
+     is in flight — the display clamps to what's actually loaded until the
+     fetch lands. */
+  const pageNow = Math.min(Math.max(1, page), lastPage);
+  const pageStart = (pageNow - 1) * PAGE_SIZE;
+  const pageRows = ordered.slice(pageStart, pageStart + PAGE_SIZE);
+
   const onPage = useCallback(
     (n: number) => {
-      setPage(n);
+      const target = Math.min(Math.max(1, n), totalPages);
+      setPage(target);
       if (!fetchMore) return;
-      Promise.resolve(fetchMore(n))
-        .then((rows) => {
-          if (rows && rows.length) {
-            setExtraOps((x) => [...x, ...rows]);
-          }
-        })
-        .catch(() => {});
+      const needsRows = target * PAGE_SIZE > ops.length;
+      if (fieldState === "error" || (!fieldComplete && needsRows)) {
+        Promise.resolve(fetchMore(target))
+          .then((rows) => {
+            if (rows && rows.length) {
+              setExtraOps((x) => [...x, ...rows]);
+            }
+          })
+          .catch(() => {});
+      }
     },
-    [fetchMore],
+    [fetchMore, fieldComplete, fieldState, ops.length, totalPages],
   );
+
+  /* ---------- client-side CSV export (the reference's .exp chrome, wired) —
+     dumps the currently loaded + sorted + filtered field, not just the page. */
+  const exportCsv = useCallback(() => {
+    if (!ordered.length) return;
+    const cell = (v: string | number | null | undefined): string => {
+      const s = v === null || v === undefined ? "" : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const head = [
+      "rank",
+      "codename",
+      "handle",
+      "class",
+      "archetype",
+      "yield",
+      "leverage",
+      "total_tokens",
+      "cost_per_m",
+      "efficiency",
+      "movement_7d",
+      "platform",
+      "last_snapshot",
+      "verification",
+    ];
+    const lines = ordered.map(([o, i], d) =>
+      [
+        viewMode === "ops" ? i + 1 : d + 1,
+        o.codename,
+        o.handle,
+        o.klass,
+        o.archetype,
+        o.yield,
+        o.lev,
+        o.total,
+        o.cost,
+        o.eff,
+        o.mv7 ?? "",
+        o.platform,
+        o.last,
+        o.verif,
+      ]
+        .map(cell)
+        .join(","),
+    );
+    const blob = new Blob([head.join(",") + "\n" + lines.join("\n") + "\n"], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `signalaf-board-${initial.meta.window}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    track.boardShared("download", {
+      window: initial.meta.window,
+      format: "csv",
+      rows: ordered.length,
+    });
+  }, [ordered, viewMode, initial.meta.window]);
 
   /* account chip — prop override wins (demo); else real session state:
      loading → neutral, signed out → sign-in affordance, unlinked → claim,
@@ -456,16 +598,9 @@ export function LiveBoardWorkspace({
     : "/compare";
 
   const pop = initial.population;
-  const lastPage = Math.ceil(pop.count / 10);
   const fmode = initial.meta.generatedAt
     ? `live data · synced ${initial.meta.generatedAt}`
     : "fixture data";
-  const shown =
-    ordered.length > 10
-      ? ordered.length.toLocaleString()
-      : ordered.length === 0
-        ? "0"
-        : `1–${ordered.length}`;
 
   const emStat = (field: string) => field === "top_yield";
 
@@ -489,7 +624,7 @@ export function LiveBoardWorkspace({
           </div>
         );
       case "hall":
-        return <HallRail rows={hall} onSelect={setSelected} />;
+        return <HallRail rows={hall} onSelect={handleSelect} />;
       case "compare":
         return (
           <>
@@ -506,7 +641,7 @@ export function LiveBoardWorkspace({
           </>
         );
       case "movers":
-        return <MoversRail rows={movers} onSelect={setSelected} />;
+        return <MoversRail rows={movers} onSelect={handleSelect} />;
       case "share":
         return profile ? (
           <SharePreview d={profile} population={pop} />
@@ -571,6 +706,7 @@ export function LiveBoardWorkspace({
                   onClick={() => {
                     setTheme(t);
                     persistLbwTheme(t);
+                    liveTrack.themeChanged(t);
                   }}
                 />
               ))}
@@ -798,49 +934,116 @@ export function LiveBoardWorkspace({
                         <BoardHead mode={colMode} />
                       </thead>
                       <tbody>
-                        {ordered.map(([o, i], d) => (
+                        {pageRows.map(([o, i], d) => (
                           <BoardRow
                             key={`${i}-${o.codename}`}
                             o={o}
                             i={i}
-                            r={viewMode === "ops" ? i + 1 : d + 1}
+                            r={viewMode === "ops" ? i + 1 : pageStart + d + 1}
                             viewMode={viewMode}
                             colMode={colMode}
                             tt={tt}
                             rawRank={rawRank[i] ?? i + 1}
                             selected={selected === i}
-                            onSelect={setSelected}
+                            onSelect={handleSelect}
                           />
                         ))}
+                        {ordered.length === 0 && (
+                          <tr className="board-empty">
+                            <td colSpan={colMode === "metrics" ? 13 : 11}>
+                              {fieldState === "loading"
+                                ? "⟳ SYNCING FIELD…"
+                                : filtered
+                                  ? "— NO ROWS MATCH THE CURRENT FILTER"
+                                  : "— NO OPERATORS IN THIS SCOPE"}
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                     <div className="pgn">
-                      Showing {shown} of {pop.count.toLocaleString()} operators
+                      {ordered.length === 0 ? (
+                        <>
+                          {ops.length === 0
+                            ? "No operators on this board"
+                            : "No rows match the current filter"}
+                        </>
+                      ) : (
+                        <>
+                          Showing {pageStart + 1}–
+                          {pageStart + pageRows.length} of{" "}
+                          {filtered
+                            ? `${ordered.length.toLocaleString()} filtered`
+                            : pop.count.toLocaleString()}{" "}
+                          operators
+                        </>
+                      )}{" "}
                       · {pop.tag}
+                      {fieldState === "loading" && (
+                        <span className="pgstat" role="status">
+                          {" "}
+                          · ⟳ SYNCING FIELD…
+                        </span>
+                      )}
+                      {fieldState === "error" && (
+                        <span className="pgstat pgerr" role="alert">
+                          {" "}
+                          · FIELD SYNC FAILED — CLICK A PAGE TO RETRY
+                        </span>
+                      )}
                       <span className="pages">
-                        {[1, 2, 3].map((n) => (
+                        {[1, 2, 3]
+                          .filter((n) => n <= lastPage)
+                          .map((n) => (
+                            <button
+                              key={n}
+                              className={pageNow === n ? "on" : ""}
+                              aria-current={pageNow === n ? "page" : undefined}
+                              onClick={() => onPage(n)}
+                            >
+                              {n}
+                            </button>
+                          ))}
+                        {pageNow > 3 && pageNow < lastPage && (
                           <button
-                            key={n}
-                            className={page === n ? "on" : ""}
-                            onClick={() => onPage(n)}
+                            className="on"
+                            aria-current="page"
+                            onClick={() => onPage(pageNow)}
                           >
-                            {n}
+                            {pageNow}
                           </button>
-                        ))}
-                        <button
-                          className={page === -1 ? "on" : ""}
-                          onClick={() => setPage(-1)}
-                        >
-                          …
-                        </button>
-                        <button
-                          className={page === lastPage ? "on" : ""}
-                          onClick={() => onPage(lastPage)}
-                        >
-                          {lastPage}
-                        </button>
+                        )}
+                        {lastPage > 3 && (
+                          <button
+                            aria-label="Next page"
+                            title="Next page"
+                            disabled={page >= totalPages}
+                            onClick={() => onPage(page + 1)}
+                          >
+                            …
+                          </button>
+                        )}
+                        {lastPage > 3 && (
+                          <button
+                            className={pageNow === lastPage ? "on" : ""}
+                            aria-current={
+                              pageNow === lastPage ? "page" : undefined
+                            }
+                            onClick={() => onPage(lastPage)}
+                          >
+                            {lastPage}
+                          </button>
+                        )}
                       </span>
-                      <span className="exp">⬇ Export CSV</span>
+                      <button
+                        type="button"
+                        className="exp"
+                        disabled={ordered.length === 0}
+                        title="Download the loaded + sorted field as CSV"
+                        onClick={exportCsv}
+                      >
+                        ⬇ Export CSV
+                      </button>
                     </div>
                   </section>
                 </div>
@@ -916,14 +1119,16 @@ export function LiveBoardWorkspace({
               {ftrMin ? "▸ LINKS" : "▾ LINKS"}
             </button>
             <div className="flinks">
-              <a href="#">LEADERBOARD</a>
+              <Link href="/board/all">LEADERBOARD</Link>
               <a href={cmpHref}>COMPARE</a>
               <a href="/hall">HALL</a>
               <a href="/me">PROFILE</a>
-              <a href="#">WRAPPED</a>
-              <a href={selOp ? `/s/${encodeURIComponent(selOp.slug)}` : "#"}>
-                SHARE
-              </a>
+              {/* WRAPPED dropped — no production surface ships under that
+                  name; SHARE renders only when a real /s/<codename> share
+                  target exists (no dead "#" anchors). */}
+              {selOp && (
+                <a href={`/s/${encodeURIComponent(selOp.slug)}`}>SHARE</a>
+              )}
               <span className="sep">·</span>
               <a href="/methodology">METHODOLOGY</a>
               <a href="/developers">API</a>
@@ -931,8 +1136,9 @@ export function LiveBoardWorkspace({
               <a href="https://www.npmjs.com/package/sigrank">npx sigrank</a>
             </div>
             <span className="fsig">
-              SIGNALAF × SIGRANK — live-board prototype ·{" "}
-              <span>{fmode}</span> · not production · POWERED BY MO§ES™ ·{" "}
+              SIGNALAF × SIGRANK — production live board
+              {initial.meta.ruleset ? ` · RULESET ${initial.meta.ruleset}` : ""}{" "}
+              · <span>{fmode}</span> · POWERED BY MO§ES™ ·{" "}
               <span>{COPY.privacy.toUpperCase()}</span>
             </span>
           </footer>
