@@ -929,3 +929,31 @@
 .lbw-root button.compare-slot{text-align:center;cursor:pointer;
   font-family:inherit;color:inherit}
 .lbw-root button.compare-slot:disabled{cursor:default}
+
+/* --- pass 3c: boxed modules + rotating decks --- */
+/* radar is its own box (owner: end the box after the graphic) */
+.lbw-root .radarbox{border:1px solid var(--line);border-radius:9px;
+  padding:8px;display:flex;justify-content:center;margin-bottom:8px}
+/* awards/badges deck — one box, rotating slides, display-size glyphs */
+.lbw-root .awbox{border:1px solid var(--line);border-radius:9px;
+  padding:10px;min-height:96px}
+.lbw-root .awbox-h{font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.18em;color:var(--mut);margin-bottom:8px}
+.lbw-root .awards.big .award{width:40px;height:44px;font-size:17px;
+  margin-right:12px}
+.lbw-root .pxbadges.big{gap:14px;padding:8px 0}
+.lbw-root .pxbadges.big .pxbd{grid-template-columns:repeat(3,9px);
+  grid-auto-rows:9px;gap:2.5px}
+.lbw-root .medalct.big{font-size:12px;gap:16px;padding:12px 4px}
+.lbw-root .medalct.big .mc{font-size:12px}
+/* movers text box */
+.lbw-root .mbox{border:1px solid var(--line);border-radius:9px;
+  padding:6px 8px}
+.lbw-root .mbox .mv{display:flex;align-items:center;gap:9px}
+.lbw-root .mbox .mv > span:nth-child(2){flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* hall medal deck box + profile tile fill */
+.lbw-root .hbox{border:1px solid var(--line);border-radius:9px;padding:8px}
+.lbw-root .hst-r .mav{width:20px;height:20px;font-size:8px}
+.lbw-root .pmod-r{flex:1;min-width:0}
+.lbw-root .pmod-r .pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

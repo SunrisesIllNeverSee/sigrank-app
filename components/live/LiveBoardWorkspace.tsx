@@ -81,7 +81,7 @@ import { RailIcon, ICON_SETS } from "./PixelIcon";
 import type { IconSetName } from "./PixelIcon";
 import { PixelBadge, badgeForPct } from "./PixelBadge";
 import { RotatingMovers } from "./MoversRail";
-import { HallSpot, Medal, hallRows } from "./HallRail";
+
 import {
   COMPARE_CTA,
   COMPARE_SLOTS,
@@ -177,6 +177,58 @@ const RAIL_TITLE: Record<RailId, string> = {
 /* ---------- HOT STATS (owner 2026-10-06): the rail's field module rotates
    one board stat at a time instead of duplicating the banner's static
    strip. Same fieldStats source, one cell rotating on a timer. ---------- */
+/* Rotating medal deck for HALL OF SIGNAL — one box cycling gold /
+   silver / bronze brackets (owner: "one box 3 slides"). */
+function MedalDeck({
+  medals,
+  ops,
+  onSelect,
+}: {
+  medals: { name: string; list: LiveOperator[] }[];
+  ops: LiveOperator[];
+  onSelect?: (i: number) => void;
+}) {
+  const [s, setS] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setS((i) => (i + 1) % 3), 4000);
+    return () => clearInterval(t);
+  }, []);
+  const slide = medals[s % medals.length];
+  return (
+    <div className="hbox">
+      <div className="awbox-h">
+        {slide.name.toUpperCase()} MEDALS
+        <span className="mut"> · {(s % medals.length) + 1}/3</span>
+      </div>
+      {slide.list.slice(0, 3).map((o) => {
+        const k = ops.indexOf(o);
+        return (
+          <button
+            key={o.codename}
+            type="button"
+            className="hst-r"
+            onClick={() => onSelect?.(k)}
+          >
+            <span className="mav">
+              {o.avatarUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={o.avatarUrl} alt="" loading="lazy" />
+              ) : (
+                o.name[0]
+              )}
+            </span>
+            <span className="tm">{o.name}</span>
+            <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
+          </button>
+        );
+      })}
+      {!slide.list.length && (
+        <p className="drill-note">— NO {slide.name.toUpperCase()} HOLDERS</p>
+      )}
+    </div>
+  );
+}
+
 function HotStats({ stats }: { stats: FieldStat[] }) {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -518,10 +570,6 @@ export function LiveBoardWorkspace({
   );
 
   /* ---------- derived rails ---------- */
-  const hall = useMemo(
-    () => hallRows(initial.hall, ops, initial.featured?.name),
-    [initial.hall, ops, initial.featured],
-  );
 
   /* ---------- filtered/ordered row pairs ([op, fieldIndex]) ---------- */
   const ordered = useMemo(() => {
@@ -584,6 +632,12 @@ export function LiveBoardWorkspace({
      local tally; wire to a real vote surface when one exists. */
   const [soonVotes, setSoonVotes] = useState<Record<string, number>>({});
   const [soonPop, setSoonPop] = useState<string | null>(null);
+  /* awards/badges deck (owner: one box, three slides, bigger graphics) */
+  const [awSlide, setAwSlide] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setAwSlide((i) => i + 1), 4000);
+    return () => clearInterval(t);
+  }, []);
   /* Adjustable sidebars (owner 2026-10-06): the ear-flap on each panel's
      inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
      vars on .lbw-root; a sub-4px click counts as collapse instead. */
@@ -844,66 +898,77 @@ export function LiveBoardWorkspace({
           docked ? (
             <>
               <OperatorProfileTile d={profile} />
-              <div className="lside-radar">
+              {/* owner: the radar is its own box — it ends here, then a
+                  separate AWARDS/BADGES box follows with three rotating
+                  slides (awards → badges → medals) at display size. */}
+              <div className="radarbox">
                 <RadarChart
                   vals={profile.series}
                   baseline={radarBaseline ?? fieldMedianBaseline}
-                  size={150}
+                  size={170}
                 />
               </div>
-              {/* trophies → earned block badges (owner: "medal count shows
-                  in op profile, so this can become badges") — verified +
-                  percentile + milestone badges from the pack's system. */}
-              {/* medal counter (owner): rank-1/2/3 record medals tallied
-                  from the operator's records. */}
-              <div className="medalct mono">
-                {(() => {
-                  const recs = selOp?.recs ?? [];
-                  const g = recs.filter((r) => r.rank === 1).length;
-                  const s = recs.filter((r) => r.rank === 2).length;
-                  const b = recs.filter((r) => r.rank === 3).length;
-                  return (
-                    <>
-                      <span className="mc g">🥇 {g}</span>
-                      <span className="mc s">🥈 {s}</span>
-                      <span className="mc b">🥉 {b}</span>
-                    </>
-                  );
-                })()}
-              </div>
-              {/* AWARDS (owner: "the hexagon ones") — milestone hexagons
-                  from the pack's medallion set; rank/class/age-derived. */}
-              <div className="trph-h">AWARDS</div>
-              <div className="awards">
-                <span className="award hex-gold" title="signal class">
-                  {selOp?.klass?.[0] ?? "—"}
-                </span>
-                {(selOp?.pct ?? 0) >= 99 && (
-                  <span className="award hex-violet" title="top 1% legend">
-                    Υ
-                  </span>
+              <div className="awbox">
+                <div className="awbox-h">
+                  {(["AWARDS", "BADGES", "MEDALS"] as const)[awSlide % 3]}
+                  <span className="mut"> · {(awSlide % 3) + 1}/3</span>
+                </div>
+                {awSlide % 3 === 0 && (
+                  <div className="awards big">
+                    <span className="award hex-gold" title="signal class">
+                      {selOp?.klass?.[0] ?? "—"}
+                    </span>
+                    {(selOp?.pct ?? 0) >= 99 && (
+                      <span className="award hex-violet" title="top 1% legend">
+                        Υ
+                      </span>
+                    )}
+                    {(selOp?.age ?? 0) >= 100 && (
+                      <span className="award hex-cyan" title="100 days consistent">
+                        ◆
+                      </span>
+                    )}
+                    {(selOp?.recs ?? []).length > 0 && (
+                      <span className="award hex-ac" title="record holder">
+                        ★
+                      </span>
+                    )}
+                  </div>
                 )}
-                {(selOp?.age ?? 0) >= 100 && (
-                  <span className="award hex-cyan" title="100 days consistent">
-                    ◆
-                  </span>
+                {awSlide % 3 === 1 && (
+                  <div className="pxbadges big">
+                    {isVerifiedOp(selOp?.verif) && (
+                      <PixelBadge name="verified" />
+                    )}
+                    {(() => {
+                      const b = selOp ? badgeForPct(selOp.pct) : null;
+                      return b ? <PixelBadge name={b} /> : null;
+                    })()}
+                    {(selOp?.age ?? 0) >= 100 && (
+                      <PixelBadge name="days100" />
+                    )}
+                    {(selOp?.recs ?? []).length > 0 && (
+                      <PixelBadge name="tokens10m" />
+                    )}
+                  </div>
                 )}
-                {(selOp?.recs ?? []).length > 0 && (
-                  <span className="award hex-ac" title="record holder">
-                    ★
-                  </span>
+                {awSlide % 3 === 2 && (
+                  <div className="medalct big mono">
+                    {(() => {
+                      const recs = selOp?.recs ?? [];
+                      const g = recs.filter((r) => r.rank === 1).length;
+                      const s = recs.filter((r) => r.rank === 2).length;
+                      const b = recs.filter((r) => r.rank === 3).length;
+                      return (
+                        <>
+                          <span className="mc g">🥇 {g} GOLD</span>
+                          <span className="mc s">🥈 {s} SILVER</span>
+                          <span className="mc b">🥉 {b} BRONZE</span>
+                        </>
+                      );
+                    })()}
+                  </div>
                 )}
-              </div>
-              <div className="trph-h">BADGES</div>
-              <div className="pxbadges">
-                {isVerifiedOp(selOp?.verif) && (
-                  <PixelBadge name="verified" />
-                )}
-                {(() => {
-                  const b = selOp ? badgeForPct(selOp.pct) : null;
-                  return b ? <PixelBadge name={b} /> : null;
-                })()}
-                {(selOp?.age ?? 0) >= 100 && <PixelBadge name="days100" />}
               </div>
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
@@ -962,31 +1027,9 @@ export function LiveBoardWorkspace({
             list: byPct.filter((o) => (o.pct ?? 0) >= 90 && (o.pct ?? 0) < 95),
           },
         ];
-        return (
-          <>
-            <HallSpot rows={hall} onSelect={handleSelect} />
-            <div className="soon-h">MEDAL COUNT</div>
-            {medals.map((m, mi) => (
-              <div key={m.name}>
-                {m.list.slice(0, 3).map((o) => {
-                  const k = ops.indexOf(o);
-                  return (
-                    <button
-                      key={o.codename}
-                      type="button"
-                      className="hst-r"
-                      onClick={() => handleSelect(k)}
-                    >
-                      <Medal i={mi} />
-                      <span className="tm">{o.name}</span>
-                      <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
-          </>
-        );
+        /* owner: hall is ONE box, three slides — top-3 gold, silver,
+           bronze rotate in place (profile graphics on each row). */
+        return <MedalDeck medals={medals} ops={ops} onSelect={handleSelect} />;
       }
       case "compare": {
         /* compare-add-by-search (owner): typing an operator offers the

@@ -88,7 +88,9 @@ export function MoversRail({
   tag?: string;
 }) {
   return (
-    <>
+    /* owner: the movers list is a proper text box — bordered frame,
+       rows flex with name truncating instead of wrapping. */
+    <div className="mbox">
       {rows.map((m, i) => {
         const clickable = m.opIndex != null && onSelect != null;
         return (
@@ -144,7 +146,7 @@ export function MoversRail({
       )}
       {/* reference renders a decorative "ALL MOVERS →" anchor here; no movers
           destination exists in production, so the dead link is dropped. */}
-    </>
+    </div>
   );
 }
 
