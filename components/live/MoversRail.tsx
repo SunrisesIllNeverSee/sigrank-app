@@ -81,16 +81,25 @@ export function MoversRail({
   rows,
   onSelect,
   tag = "7d",
+  boxHead,
 }: {
   rows: MoverRow[];
   onSelect?: (opIndex: number) => void;
   /** movement window label on each row ("7d" | "24h"). */
   tag?: string;
+  /** header line rendered inside the box (rotation mode). */
+  boxHead?: string;
 }) {
   return (
-    /* owner: the movers list is a proper text box — bordered frame,
-       rows flex with name truncating instead of wrapping. */
+    /* owner: the movers list is a proper text box — bordered frame, mode
+       header inside, rows flex with name truncating instead of wrapping. */
     <div className="mbox">
+      {boxHead ? (
+        <div className="mbox-h">
+          {boxHead}
+          <span className="mut"> · AUTO</span>
+        </div>
+      ) : null}
       {rows.map((m, i) => {
         const clickable = m.opIndex != null && onSelect != null;
         return (
@@ -223,11 +232,8 @@ export function RotatingMovers({
 
   return (
     <>
-      <div className="mv-mode">
-        {mode}
-        <span className="mut"> · AUTO</span>
-      </div>
       <MoversRail
+        boxHead={mode}
         rows={rows}
         onSelect={onSelect}
         tag={mode === "Σ TOKENS" ? "Σ" : mode.startsWith("24H") ? "24h" : "7d"}
