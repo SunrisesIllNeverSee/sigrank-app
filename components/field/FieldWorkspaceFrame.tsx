@@ -1,6 +1,44 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { WaveHero } from "@/components/ui/WaveHero";
+
+/**
+ * The Field family's left-rail nav — the space's entries as compact wave
+ * banners (per owner: the hub's hero cards become the rail navigation).
+ * Field Hub home + Articles stay as plain links under the two banners.
+ */
+export function FieldFamilyNav() {
+  return (
+    <>
+      <div className="mini-h"><span className="sq" />RESEARCH</div>
+      <nav className="flex flex-col gap-2" aria-label="Field research">
+        <Link href="/field" className="block">
+          <WaveHero
+            compact
+            headingLevel="h2"
+            eyebrow="Field Analysis"
+            title="Field Analysis"
+            subtitle="The true distribution of token efficiency."
+          />
+        </Link>
+        <Link href="/research" className="block">
+          <WaveHero
+            compact
+            headingLevel="h2"
+            eyebrow="SigRank Index"
+            title="State of the Index"
+            subtitle="The seed dataset · Zenodo DOI."
+          />
+        </Link>
+      </nav>
+      <nav className="ws-nav" style={{ marginTop: 6 }}>
+        <Link href="/fieldhub">← Field Hub</Link>
+        <Link href="/blog">Articles ↗</Link>
+      </nav>
+    </>
+  );
+}
 
 interface Props {
   title: string;
@@ -33,15 +71,7 @@ export function FieldWorkspaceFrame({
       leftTitle="FIELD"
       left={
         <>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />RESEARCH</div>
-            <nav className="ws-nav">
-              <Link href="/fieldhub">Field Hub</Link>
-              <Link href="/field">Field Analysis</Link>
-              <Link href="/research">State of the Index</Link>
-              <Link href="/blog">Articles</Link>
-            </nav>
-          </div>
+          <FieldFamilyNav />
           <div className="mod">
             <div className="mini-h"><span className="sq" />SYSTEM</div>
             <nav className="ws-nav">

@@ -10,6 +10,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
@@ -126,13 +127,7 @@ export default async function FieldPage() {
         left={
           <>
             <div className="mod">
-              <div className="mini-h"><span className="sq"></span>RESEARCH</div>
-              <nav className="ws-nav">
-                <Link href="/fieldhub">Field Hub</Link>
-                <Link href="/field">Field Analysis</Link>
-                <Link href="/research">State of the Index</Link>
-                <Link href="/blog">Articles</Link>
-              </nav>
+              <FieldFamilyNav />
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SECTIONS</div>
