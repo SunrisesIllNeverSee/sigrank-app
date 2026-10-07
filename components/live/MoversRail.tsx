@@ -178,14 +178,28 @@ export function RotatingMovers({
   onSelect?: (opIndex: number) => void;
 }) {
   const [mi, setMi] = useState(0);
+  /* owner: skip scopes with no movers — only cycle modes that produce
+     rows, so the box never flashes an empty slide. */
+  const liveModes = useMemo(() => {
+    const has = (mode: string) => {
+      if (mode === "Σ TOKENS") return ops.some((o) => numvOf(o.total) > 0);
+      if (mode === "24H · ALL") return ops.some((o) => (o.mv24 ?? 0) !== 0);
+      const wf = mode === "7D · HITL" ? "hitl" : mode === "7D · AGENTIC" ? "agentic" : null;
+      const base = moverRows(server, ops);
+      return wf ? base.some((r) => r.opIndex != null && ops[r.opIndex]?.wf === wf)
+                : base.length > 0;
+    };
+    const m = MOVER_MODES.filter(has);
+    return m.length ? m : [MOVER_MODES[0]];
+  }, [ops, server]);
   useEffect(() => {
     const t = setInterval(
-      () => setMi((i) => (i + 1) % MOVER_MODES.length),
+      () => setMi((i) => (i + 1) % liveModes.length),
       5000,
     );
     return () => clearInterval(t);
-  }, []);
-  const mode = MOVER_MODES[mi];
+  }, [liveModes.length]);
+  const mode = liveModes[mi % liveModes.length];
 
   const rows = useMemo<MoverRow[]>(() => {
     if (mode === "Σ TOKENS") {

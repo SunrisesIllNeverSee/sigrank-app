@@ -80,6 +80,7 @@ import {
 import { RailIcon, ICON_SETS } from "./PixelIcon";
 import type { IconSetName } from "./PixelIcon";
 import { PixelBadge, badgeForPct } from "./PixelBadge";
+import CascadeRadar from "@/components/charts/CascadeRadar";
 import { RotatingMovers } from "./MoversRail";
 
 import {
@@ -95,6 +96,8 @@ import {
   WINDOW_SLUG,
   computeTT,
   isVerifiedOp,
+  numLev,
+  numYield,
   opRadar,
   persistLbwTheme,
   profileFor,
@@ -183,6 +186,8 @@ const RAIL_TITLE: Record<RailId, string> = {
    silver / bronze brackets (owner: "one box 3 slides"). */
 /* Podium grid for HALL OF SIGNAL — owner: one box, three columns, top-3
    gold / silver / bronze all visible at once (like compare's slots). */
+/* Paged medal deck for HALL OF SIGNAL — owner: "three pages, 3 per page,
+   one for each medal type" — auto-rotates with page dots. */
 function MedalDeck({
   medals,
   ops,
@@ -192,45 +197,54 @@ function MedalDeck({
   ops: LiveOperator[];
   onSelect?: (i: number) => void;
 }) {
+  const [s, setS] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setS((i) => (i + 1) % 3), 4000);
+    return () => clearInterval(t);
+  }, []);
+  const slide = medals[s % medals.length];
   return (
-    <div className="hbox podium">
-      {medals.map((m, mi) => (
-        <div className="pod-col" key={m.name}>
-          <div className="pod-h">{m.name.toUpperCase()}</div>
-          {m.list.slice(0, 3).map((o, ri) => {
-            const k = ops.indexOf(o);
-            return (
-              <button
-                key={o.codename}
-                type="button"
-                className="pod-r"
-                onClick={() => onSelect?.(k)}
-              >
-                <span className="pod-n">{ri + 1}</span>
-                <span className="mav">
-                  {o.avatarUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={o.avatarUrl} alt="" loading="lazy" />
-                  ) : (
-                    o.name[0]
-                  )}
-                </span>
-                <span className="tm">{o.name}</span>
-              </button>
-            );
-          })}
-          {Array.from({ length: 3 - Math.min(3, m.list.length) }).map(
-            (_, i) => (
-              <div className="pod-r empty" key={i}>
-                <span className="pod-n">
-                  {m.list.length + i + 1}
-                </span>
-                <span className="tm mut">—</span>
-              </div>
-            ),
-          )}
-        </div>
-      ))}
+    <div className="hbox">
+      <div className="awbox-h">
+        {slide.name.toUpperCase()} MEDALS
+        <span className="mut"> · top 3</span>
+      </div>
+      {slide.list.slice(0, 3).map((o) => {
+        const k = ops.indexOf(o);
+        return (
+          <button
+            key={o.codename}
+            type="button"
+            className="hst-r"
+            onClick={() => onSelect?.(k)}
+          >
+            <span className="mav">
+              {o.avatarUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={o.avatarUrl} alt="" loading="lazy" />
+              ) : (
+                o.name[0]
+              )}
+            </span>
+            <span className="tm">{o.name}</span>
+            <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
+          </button>
+        );
+      })}
+      {!slide.list.length && (
+        <p className="drill-note">— NO {slide.name.toUpperCase()} HOLDERS</p>
+      )}
+      <div className="pg-dots">
+        {medals.map((m, i) => (
+          <button
+            key={m.name}
+            type="button"
+            className={`pg-dot${i === s % 3 ? " on" : ""}`}
+            aria-label={`show ${m.name} medals`}
+            onClick={() => setS(i)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -973,10 +987,48 @@ export function LiveBoardWorkspace({
                   separate AWARDS/BADGES box follows with three rotating
                   slides (awards → badges → medals) at display size. */}
               <div className="radarbox">
-                <RadarChart
-                  vals={profile.series}
-                  baseline={radarBaseline ?? fieldMedianBaseline}
+                {/* site radar (CascadeRadar — the /compare + /user
+                    component): shared axis maxima with 25% headroom so the
+                    field leader's polygon keeps a shape; ghost layer =
+                    field median (blue), solid = operator. */}
+                <CascadeRadar
                   size={170}
+                  axes={[
+                    { label: "YIELD ↑", max: rmax.yield * 1.25 },
+                    { label: "LEVERAGE ↑", max: rmax.lev * 1.25 },
+                    { label: "VELOCITY ↑", max: rmax.vel * 1.25 },
+                    { label: "SNR ↑", max: rmax.snr * 1.25 },
+                    { label: "10xDEV ↑", max: rmax.dev * 1.25 },
+                  ]}
+                  series={[
+                    {
+                      name: "FIELD MEDIAN",
+                      values: fieldMedianBaseline.vals.map(
+                        (v, i) =>
+                          v *
+                          [rmax.yield, rmax.lev, rmax.vel, rmax.snr, rmax.dev][
+                            i
+                          ] *
+                          1.25,
+                      ),
+                      color: "var(--blue)",
+                      variant: "ghost",
+                    },
+                    {
+                      name: selOp?.name ?? "OPERATOR",
+                      values: selOp
+                        ? [
+                            numYield(selOp),
+                            numLev(selOp),
+                            selOp.vel,
+                            selOp.snr,
+                            selOp.dev,
+                          ]
+                        : [],
+                      color: "var(--ac)",
+                      variant: "solid",
+                    },
+                  ]}
                 />
               </div>
               {/* YIELD · OVERTIME sparkline (owner: "more over-time
@@ -988,6 +1040,28 @@ export function LiveBoardWorkspace({
                   <TrendSpark series={selOp!.trend} ops={ops} />
                 </div>
               )}
+              {/* owner: the profile's second card is stats-only — the
+                  numbers without the graphic. */}
+              <div className="statcard">
+                <div className="awbox-h">STATS</div>
+                <div className="fgrid">
+                  {(
+                    [
+                      ["YIELD", selOp ? numYield(selOp).toLocaleString() : "—"],
+                      ["LEVERAGE", selOp ? numLev(selOp).toLocaleString() : "—"],
+                      ["VELOCITY", selOp?.vel?.toFixed(2) ?? "—"],
+                      ["SNR", selOp ? `${(selOp.snr * 100).toFixed(1)}%` : "—"],
+                      ["10xDEV", selOp?.dev?.toFixed(1) ?? "—"],
+                      ["TOTAL", selOp?.total ?? "—"],
+                    ] as const
+                  ).map(([l, v]) => (
+                    <div className="fcell" key={l}>
+                      <div className="n">{v}</div>
+                      <div className="l">{l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
                   {(selOp!.recs ?? []).slice(0, 3).map((r) => (
