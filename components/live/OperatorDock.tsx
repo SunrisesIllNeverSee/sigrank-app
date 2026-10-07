@@ -256,6 +256,8 @@ export function SharePreview({
 export function OperatorProfileTile({ d }: { d: ProfileView }) {
   return (
     <div className="pmod-host">
+      {/* owner 2026-10-06: no yield number in the tile — the name spans
+          the full width of the box (.pmod-r fills instead of .py). */}
       <div className="pmod">
         <span className="av">
           {d.op?.avatarUrl ? (
@@ -271,17 +273,13 @@ export function OperatorProfileTile({ d }: { d: ProfileView }) {
             </span>
           ) : null}
         </span>
-        <div>
+        <div className="pmod-r">
           <div className="pn">
             {d.name} {isVerifiedOp(d.verif) && <span className="vchk">✓</span>}
           </div>
           <div className="ph">
             {d.handle.startsWith("@") ? d.handle : d.codename} · #{d.rank}
           </div>
-        </div>
-        <div className="py">
-          <div className="n">{d.y}</div>
-          <div className="l">YIELD Υ</div>
         </div>
       </div>
       <div className="pmod-tags">
