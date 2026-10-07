@@ -957,3 +957,26 @@
 .lbw-root .hst-r .mav{width:20px;height:20px;font-size:8px}
 .lbw-root .pmod-r{flex:1;min-width:0}
 .lbw-root .pmod-r .pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* podium grid — one box, three medal columns × top-3 (owner) */
+.lbw-root .hbox.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lbw-root .pod-col{min-width:0}
+.lbw-root .pod-h{font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.16em;margin-bottom:6px;text-align:center}
+.lbw-root .pod-col:nth-child(1) .pod-h{color:#e8b93c}
+.lbw-root .pod-col:nth-child(2) .pod-h{color:#c8cdd8}
+.lbw-root .pod-col:nth-child(3) .pod-h{color:#c98a4b}
+.lbw-root .pod-r{display:flex;align-items:center;gap:5px;width:100%;
+  padding:4px 2px;border-radius:5px;font-family:var(--font-mono);
+  font-size:9px;color:var(--tx2);min-width:0}
+.lbw-root .pod-r:hover{background:var(--chip);color:var(--tx)}
+.lbw-root .pod-r.empty{opacity:.4}
+.lbw-root .pod-n{width:10px;color:var(--mut);flex-shrink:0;font-size:8px}
+.lbw-root .pod-r .mav{width:16px;height:16px;font-size:7px;flex-shrink:0}
+.lbw-root .pod-r .tm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;text-transform:uppercase;text-align:left}
+/* movers box header lives inside the frame */
+.lbw-root .mbox-h{font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.14em;color:var(--tx2);padding:2px 2px 8px;
+  border-bottom:1px dashed var(--line2);margin-bottom:6px}
+.lbw-root .mbox{padding:8px 10px}
