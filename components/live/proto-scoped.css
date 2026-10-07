@@ -1032,3 +1032,23 @@
   font-weight:700;color:var(--ac)}
 .lbw-root .statcard .fcell .l{font-family:var(--font-mono);font-size:8px;
   letter-spacing:.14em;color:var(--mut);margin-top:2px}
+
+/* CascadeRadar re-theme bridge — the site radar reads rgb() triplets of
+   --gold/--bg-border/--text-primary; map them per board theme so the
+   profile radar follows the four palettes. */
+.lbw-root[data-theme="green"]{--gold:166 255 0;--bg-border:38 54 28;--text-primary:233 243 223}
+.lbw-root[data-theme="gold"]{--gold:232 185 60;--bg-border:58 45 21;--text-primary:243 234 210}
+.lbw-root[data-theme="bone"]{--gold:90 79 207;--bg-border:196 189 162;--text-primary:28 27 21}
+.lbw-root[data-theme="purple"]{--gold:181 101 255;--bg-border:53 37 82;--text-primary:239 231 250}
+
+/* hall medal cards — horizontal compare-slot-style tiles */
+.lbw-root .podrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lbw-root .podcard{display:flex;flex-direction:column;align-items:center;
+  gap:5px;border:1px solid var(--line2);border-radius:8px;padding:10px 6px;
+  color:var(--tx2)}
+.lbw-root .podcard:hover{border-color:var(--ac);background:var(--chip)}
+.lbw-root .podcard .mav{width:30px;height:30px;font-size:11px}
+.lbw-root .podcard .tm{font-size:9px;text-transform:uppercase;letter-spacing:.06em;
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbw-root .podcard .tv{color:var(--ac);font-size:9px}
+.lbw-root .podcard.empty{color:var(--mut);justify-content:center;font-size:12px}
