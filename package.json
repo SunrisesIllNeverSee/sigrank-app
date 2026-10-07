@@ -60,7 +60,7 @@
     "resend": "^6.32.0",
     "server-only": "^0.0.1",
     "simple-statistics": "^7.12.1",
-    "stripe": "^22.3.1",
+    "stripe": "^23.0.0",
     "token-cascade": "0.2.1",
     "workflow": "^4.8.2",
     "zod": "^4.6.5"
