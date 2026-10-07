@@ -60,6 +60,20 @@
       // guard against poisoned/partial state (review #1: a prior bug could
       // persist tiles:null — treat unreadable shapes as absent)
       if (!s || s.page !== E.page || !Array.isArray(s.tiles)) return null;
+      // top-level shape guards — poisoned panels/grid can't crash render
+      if (!s.panels?.left || !s.panels?.right || !s.grid?.columns) return null;
+      for (const k of ["left", "right"])
+        s.panels[k].width = Number.isFinite(s.panels[k].width)
+          ? s.panels[k].width : PANEL_DEF[k];
+      // merge tile defs added after this save (new components appear as
+      // visible stage/sidebar entries, not silently absent)
+      for (const d of E.tiles) {
+        if (!s.tiles.some((t) => t.id === d.id)) {
+          s.tiles.push({ id: d.id, component: d.component, zone: d.zone,
+            x: d.x ?? 0, y: d.y ?? 0, w: d.w ?? 4, h: d.h ?? 3,
+            order: d.order ?? null, visible: true });
+        }
+      }
       // ensure every tile carries component + sane numbers
       for (const t of s.tiles) {
         const d = E.tiles.find((x) => x.id === t.id);
@@ -102,6 +116,7 @@
       <div class="grp">
         <button id="save">SAVE LAYOUT</button>
         <button id="reset">RESET</button>
+        <button id="reset-preset">RESET TO PRESET</button>
         <button id="export">EXPORT JSON</button>
         <button id="download">DOWNLOAD</button>
       </div>
@@ -143,6 +158,8 @@
   const $ = (s) => document.querySelector(s);
   const stage = $("#stage"), pbL = $("#pb-left"), pbR = $("#pb-right"),
         pL = $("#p-left"), pR = $("#p-right"), insp = $("#insp");
+  stage.appendChild(insp); // dock INSIDE stage — covers stage only, never
+                          // the right panel or toolbar (review)
   const colW = () => stage.clientWidth / S.grid.columns;
   const snap = (v, u) => (S.grid.snap ? Math.round(v / u) : v / u);
   const preview = () => document.body.classList.contains("preview");
@@ -153,8 +170,8 @@
       if (t.zone !== "stage") continue;
       t.w = clamp(t.w, 1, S.grid.columns);
       t.x = clamp(t.x, 0, Math.max(0, S.grid.columns - t.w));
-      t.y = Math.max(0, t.y ?? 0);
-      t.h = Math.max(1, t.h ?? 1);
+      t.y = clamp(t.y ?? 0, 0, 60);   // never below scroll reach
+      t.h = clamp(t.h ?? 1, 1, 60);
     }
   }
 
@@ -260,9 +277,10 @@
         m.addEventListener("click", (e) => {
           const a = e.target.closest("button")?.dataset.a;
           sel = t.id;
+          clearSel();
+          m.classList.add("sel");
           insp.classList.add("show");
           renderInsp();
-          m.classList.add("sel");
           if (a === "up") reorder(zone, i, -1);
           if (a === "down") reorder(zone, i, +1);
           if (a === "vis") { t.visible = !t.visible; commit(); }
@@ -311,7 +329,10 @@
       n.innerHTML = `<div class="tile-h">${d.name || t.id}
         <span class="tag">${t.id}</span></div>
         <div class="tile-b">${d.body || ""}</div>
-        <div class="tile-tools"><button data-a="vis" title="hide">✕</button></div>
+        <div class="tile-tools">
+          <button class="zg" draggable="true" title="drag to a panel">⇄</button>
+          <button data-a="vis" title="hide">✕</button>
+        </div>
         <div class="rz"></div>`;
       stage.appendChild(n);
 
@@ -319,14 +340,15 @@
       h.addEventListener("mousedown", (e) => {
         if (preview()) return; /* review §sugg: no layout mutation in preview */
         sel = t.id;
-        insp.classList.add("show");
+        clearSel();
         n.classList.add("sel");
+        insp.classList.add("show");
         renderInsp(); // inspector only — NO re-render, the node stays live
         gesture = { kind: "tile", id: t.id, node: n,
                     ox: e.clientX - n.offsetLeft, oy: e.clientY - n.offsetTop };
       });
-      h.addEventListener("dragstart", (e) => {
-        if (preview()) return e.preventDefault();
+      n.querySelector(".zg").addEventListener("dragstart", (e) => {
+        e.stopPropagation();
         e.dataTransfer.setData("text/mod-id", t.id);
       });
 
@@ -335,6 +357,8 @@
         if (preview()) return;
         e.stopPropagation();
         sel = t.id;
+        clearSel();
+        n.classList.add("sel");
         renderInsp();
         gesture = { kind: "resize", id: t.id, node: n,
                     sw: t.w, sh: t.h, cx: e.clientX, cy: e.clientY };
@@ -342,6 +366,8 @@
 
       n.addEventListener("click", (e) => {
         sel = t.id;
+        clearSel();
+        n.classList.add("sel");
         insp.classList.add("show");
         renderInsp();
         if (e.target.dataset.a === "vis") { t.visible = false; commit(); }
@@ -357,6 +383,11 @@
     if (j < 0 || j >= mods.length) return;
     [mods[i].order, mods[j].order] = [mods[j].order, mods[i].order];
     commit();
+  }
+
+  function clearSel() {
+    document.querySelectorAll(".tile.sel,.mod.sel").forEach((n) =>
+      n.classList.remove("sel"));
   }
 
   /* ---------------- inspector ---------------- */
@@ -493,7 +524,10 @@
 
   /* presets — merge over defaults, confirm over dirty layouts */
   const selp = $("#preset");
-  for (const k of Object.keys(E.presets)) {
+  const ph = document.createElement("option");
+  ph.value = ""; ph.textContent = "— choose —";
+  selp.appendChild(ph);
+  for (const k of Object.keys(E.presets || {})) {
     const o = document.createElement("option");
     o.value = k; o.textContent = k.toUpperCase().replace(/_/g, " ");
     selp.appendChild(o);
@@ -507,6 +541,16 @@
       return;
     }
     S = applyPreset(p, e.target.value);
+    sel = null;
+    save(); render();
+  };
+  // dedicated RESET TO PRESET — re-applies the active preset even when the
+  // select still shows it (same-value picks fire no change event)
+  $("#reset-preset").onclick = () => {
+    const k = selp.value || S.preset;
+    if (!E.presets[k]) { flash("no preset chosen"); return; }
+    if (!confirm(`Reset layout to preset "${k.replace(/_/g, " ")}"?`)) return;
+    S = applyPreset(E.presets[k], k);
     sel = null;
     save(); render();
   };

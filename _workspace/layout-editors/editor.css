@@ -13,10 +13,6 @@ button,input,select{font-family:var(--mono);font-size:inherit}
 
 /* ---- frame ---- */
 .frame{display:flex;flex-direction:column;height:100vh}
-.fhead{display:flex;border-bottom:1px solid var(--line);height:34px;flex-shrink:0}
-.fhead .ch{flex:1;display:flex;align-items:center;justify-content:center;
-  font-size:11px;letter-spacing:.28em;color:var(--tx2)}
-.fhead .ch b{color:var(--ac);font-weight:600}
 .fcols{display:flex;flex:1;min-height:0}
 .ffoot{display:flex;align-items:center;gap:14px;height:26px;flex-shrink:0;
   border-top:1px solid var(--line);padding:0 12px;font-size:9px;
@@ -66,7 +62,7 @@ button,input,select{font-family:var(--mono);font-size:inherit}
 .mod-tools button:hover{color:var(--ac);border-color:var(--ac)}
 
 /* ---- stage ---- */
-.stage{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+.stage{flex:1;position:relative;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
 .stage-grid{position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),
     linear-gradient(to bottom,var(--line) 1px,transparent 1px);
@@ -112,7 +108,7 @@ button,input,select{font-family:var(--mono);font-size:inherit}
 .toolbar .val{color:var(--ac);min-width:40px}
 
 /* ---- inspector (selected tile controls) ---- */
-.insp{position:absolute;right:8px;top:8px;z-index:10;width:230px;
+.insp{position:absolute;right:8px;top:8px;z-index:20;width:230px;
   border:1px solid var(--line2);border-radius:9px;background:var(--panel);
   box-shadow:0 8px 24px #0008;display:none}
 .insp.show{display:block}

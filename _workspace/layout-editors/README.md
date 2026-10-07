@@ -31,7 +31,7 @@ Designed for 1600×1000; usable at 1440×900.
 | Click a tile/module | opens the inspector (zone · x/y · w/h · visible · arrows · nudge buttons · reset tile) |
 | PRESET | `CURRENT FLOW` (production order) / `WORKSPACE COMPACT` |
 | SAVE LAYOUT | persists to `localStorage` (`layout-editor:<page>`) |
-| RESET | back to defaults (confirms first) |
+| RESET | back to defaults · RESET TO PRESET re-applies the active preset |
 | EXPORT JSON | opens + copies the layout contract JSON · DOWNLOAD saves the file |
 | PREVIEW MODE | hides handles/grid/buttons; drag/resize are inert |
 
