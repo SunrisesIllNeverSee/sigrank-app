@@ -13,6 +13,7 @@ import matter from "gray-matter";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
 
@@ -150,18 +151,69 @@ export default async function BlogIndex() {
           },
         ])}
       />
-      <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-          ◈ SigRank Blog
-        </p>
-        <h1 className="font-sans text-3xl font-bold text-text-primary md:text-4xl">
-          Analysis & Research
-        </h1>
-        <p className="text-base leading-relaxed text-text-secondary">
-          Deep dives into AI operator efficiency, the token cascade economy,
-          and outlier detection methodology.
-        </p>
-      </header>
+      {/* Blog index inside the shared SignalAF workspace shell — same
+          transfer contract as Hall/Compare/Wiki/Field: post index in the
+          left rail, the card list is the stage, right rail carries the
+          about module. */}
+      <WorkspaceShell
+        active="blog"
+        title="BLOG"
+        leftTitle="INDEX"
+        left={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>ALL POSTS</div>
+              <nav className="ws-nav">
+                {posts.map((post) => (
+                  <Link key={post.slug} href={`/blog/${post.slug}`}>
+                    {post.title}
+                    {post.date && (
+                      <span className="sub">
+                        {new Date(post.date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </>
+        }
+        rightTitle="ABOUT"
+        right={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>THE BLOG</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">posts</span><span className="v acc">{posts.length}</span></div>
+              </div>
+              <p className="ws-note" style={{ marginTop: 8 }}>
+                Deep dives into AI operator efficiency, the token cascade
+                economy, and outlier detection methodology.
+              </p>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>MORE SIGNAL</div>
+              <nav className="ws-nav">
+                <Link href="/wiki">Wiki</Link>
+                <Link href="/field">Field analysis</Link>
+                <Link href="/learn">Learn</Link>
+              </nav>
+            </div>
+          </>
+        }
+        leftWidth={240}
+        rightWidth={220}
+        status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
+      >
+        <div className="ws-doc">
+          <p className="text-sm leading-relaxed text-text-secondary">
+            Analysis &amp; research — deep dives into AI operator efficiency,
+            the token cascade economy, and outlier detection methodology.
+          </p>
 
       <div className="flex flex-col gap-6">
         {posts.map((post) => (
@@ -196,6 +248,8 @@ export default async function BlogIndex() {
           </Link>
         ))}
       </div>
+        </div>
+      </WorkspaceShell>
     </div>
   );
 }

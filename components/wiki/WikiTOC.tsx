@@ -20,9 +20,12 @@ export interface TocItem {
 
 export interface WikiTOCProps {
   items: TocItem[];
+  /** Workspace-shell mode: renders just the nav list for the left rail —
+   *  no sticky aside wrapper, no mobile dropdown bar. */
+  rail?: boolean;
 }
 
-export function WikiTOC({ items }: WikiTOCProps) {
+export function WikiTOC({ items, rail }: WikiTOCProps) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? "");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -68,6 +71,14 @@ export function WikiTOC({ items }: WikiTOCProps) {
       }, 100);
     }
     setMobileOpen(false);
+  }
+
+  if (rail) {
+    return (
+      <nav aria-label="Wiki contents">
+        <TocList items={items} activeId={activeId} onNavigate={scrollTo} />
+      </nav>
+    );
   }
 
   return (

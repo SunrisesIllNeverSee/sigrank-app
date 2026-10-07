@@ -43,6 +43,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
 import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import Link from "next/link";
 
 export const metadata: Metadata = withOG({
@@ -1943,25 +1944,85 @@ export default function Draft1Page() {
         ])}
       />
 
-      {/* Two-column layout: sticky TOC nav + scrolling doc */}
-      <h1 className="sr-only">SigRank Wiki — Operator Evaluation Reference</h1>
-      <div className="flex flex-col gap-8">
-        {/* Evidence Layer category index — Phase 1 ecosystem split */}
-        <WikiCategoryIndex />
-        {/* Ecosystem connection diagram — Phase 5 cross-property wiring */}
-        <EcosystemDiagram />
-        {/* Evidence Layer category sections — the anchor targets for the
-            category index cards and all 38 wiki page breadcrumbs. Each
-            section has id="evidence-<category>" and lists the pages in
-            that category. */}
-        <WikiCategorySections />
-        <div className="flex flex-col gap-0 lg:flex-row lg:gap-8">
-          <WikiTOC items={tocItems} />
-          <div className="min-w-0 flex-1 pt-6 lg:pt-8">
-            <WikiDoc groups={groups} />
-          </div>
+      {/* Wiki inside the shared SignalAF workspace shell — same transfer
+          contract as Hall/Compare: TOC moves to the left rail (rail mode,
+          same scrollspy), doc content is the stage, right rail carries the
+          canon quick reference. No stub modules. */}
+      <WorkspaceShell
+        active="wiki"
+        title="SIGNALAF WIKI"
+        leftTitle="CONTENTS"
+        left={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>TOPICS</div>
+              <WikiTOC items={tocItems} rail />
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>READING</div>
+              <p className="ws-note">
+                The living reference for operator evaluation — the console,
+                the four pillars, the token cascade, the eight experience
+                tiers, build archetypes, and the MO§ES™ governance framework.
+                Every concept is grounded in token telemetry: no prompts, no
+                code, no self-reported fields.
+              </p>
+            </div>
+          </>
+        }
+        rightTitle="CANON"
+        right={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>THE FOUR PILLARS</div>
+              <div className="ws-kv">
+                {PILLARS.map((p) => (
+                  <div className="row" key={p.id}>
+                    <span className="k">{p.name}</span>
+                    <span className="v">{p.id}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>HEADLINE</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">Υ yield</span><span className="v acc">Y.01</span></div>
+                <div className="row"><span className="k">formula</span><span className="v">R×O/I²</span></div>
+              </div>
+              <p className="ws-note" style={{ marginTop: 8 }}>
+                Yield = cache_read × output / input². Leverage × velocity —
+                what the board ranks on.
+              </p>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>GO DEEPER</div>
+              <nav className="ws-nav">
+                <Link href="/methodology">Methodology</Link>
+                <Link href="/wiki/verification">Verification &amp; integrity</Link>
+                <Link href="/wiki/four-degrees">Four degrees of leverage</Link>
+                <Link href="/field">Field analysis ↗</Link>
+              </nav>
+            </div>
+          </>
+        }
+        leftWidth={240}
+        rightWidth={240}
+        status={<>OPERATOR EVALUATION REFERENCE · SIGNALAF × SIGRANK · MO§ES™</>}
+      >
+        <div className="ws-doc">
+          {/* Evidence Layer category index — Phase 1 ecosystem split */}
+          <WikiCategoryIndex />
+          {/* Ecosystem connection diagram — Phase 5 cross-property wiring */}
+          <EcosystemDiagram />
+          {/* Evidence Layer category sections — the anchor targets for the
+              category index cards and all 38 wiki page breadcrumbs. Each
+              section has id="evidence-<category>" and lists the pages in
+              that category. */}
+          <WikiCategorySections />
+          <WikiDoc groups={groups} />
         </div>
-      </div>
+      </WorkspaceShell>
     </div>
   );
 }

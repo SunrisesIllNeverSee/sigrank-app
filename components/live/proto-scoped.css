@@ -1216,3 +1216,16 @@
 .lbw-root .lgr-tot{display:flex;align-items:baseline;gap:4px;
   border-top:1px solid var(--line);margin-top:4px;padding-top:6px;
   font-family:var(--font-mono);font-size:10px}
+
+/* ---------- Doc surfaces — Wiki/Field/Blog text-page transfer ----------
+   Long-form content in the stage gets a readable measure; rail nav lists
+   are the section-jump pattern for text pages (same slot as Hall's
+   control stack). */
+.lbw-root .ws-doc{display:flex;flex-direction:column;gap:26px;max-width:880px}
+.lbw-root .ws-doc section{scroll-margin-top:12px}
+.lbw-root .ws-nav{display:flex;flex-direction:column}
+.lbw-root .ws-nav a{display:block;padding:5px 8px;border-radius:var(--radius-sm);
+  font-family:var(--font-mono);font-size:10.5px;color:var(--tx2);
+  text-decoration:none;line-height:1.4}
+.lbw-root .ws-nav a:hover{background:var(--hover);color:var(--tx)}
+.lbw-root .ws-nav a .sub{display:block;font-size:9px;color:var(--mut)}
