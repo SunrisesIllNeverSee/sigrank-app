@@ -376,8 +376,14 @@ export default async function ComparePage({
               {opMini(rowA, "a")}
             </div>
             <div className="mod">
-              <div className="mini-h"><span className="sq"></span>COMPARE LEDGER</div>
-              <CompareLedger a={rowA} b={rowB} compact />
+              <div className="mini-h"><span className="sq"></span>METRIC CONTEXT</div>
+              <p className="ws-note">
+                Ledger rows: six raw pillars + eight cascade metrics + the{" "}
+                <b>FLOW</b> row — Token Throughput, the canonical exact-calendar
+                processed-tokens/day rate (not ∑ total tokens). Lower-wins axes
+                (cost, $/1M) are inverted so the better side always reads
+                outward on the radars.
+              </p>
             </div>
           </>
         }
@@ -416,28 +422,29 @@ export default async function ComparePage({
               )}
             </div>
             <div className="mod">
-              <div className="mini-h"><span className="sq"></span>METRIC CONTEXT</div>
-              <p className="ws-note">
-                Ledger rows: six raw pillars + eight cascade metrics + the{" "}
-                <b>FLOW</b> row — Token Throughput, the canonical exact-calendar
-                processed-tokens/day rate (not ∑ total tokens). Lower-wins axes
-                (cost, $/1M) are inverted so the better side always reads
-                outward on the radars.
-              </p>
-            </div>
-            <div className="mod">
               <div className="mini-h"><span className="sq"></span>SHARE</div>
-              <CompareShareCard
-                a={toOperand(rowA)}
-                b={toOperand(rowB)}
-                href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
-              />
-              <div style={{ marginTop: 10 }}>
+              <div className="ws-share">
+                <CompareShareCard
+                  a={toOperand(rowA)}
+                  b={toOperand(rowB)}
+                  href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+                />
+              </div>
+              <div className="ws-share" style={{ marginTop: 10 }}>
                 <DeferredCompareMatchupCard
                   a={rowA}
                   b={rowB}
                   href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
                 />
+              </div>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>RELATED</div>
+              <div className="ws-nav">
+                <Link href="/board/all">ALL-TIME LEADERBOARD</Link>
+                <Link href="/hall">HALL OF SIGNAL</Link>
+                <Link href="/methodology">METHODOLOGY</Link>
+                <Link href="/metrics/yield-cascade">YIELD (Υ) CASCADE</Link>
               </div>
             </div>
           </>
@@ -480,42 +487,13 @@ export default async function ComparePage({
               />
             </div>
           </div>
+          {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
+              the stage (owner annotation: not a rail module). */}
+          <div style={{ gridColumn: "1/13" }}>
+            <CompareLedger a={rowA} b={rowB} />
+          </div>
         </div>
       </WorkspaceShell>
-
-      {/* ── Cross-links ── */}
-      <section className="mt-4 border-t border-bg-border-subtle pt-6">
-        <p className="font-sans text-sm text-text-muted">
-          Related:{" "}
-          <Link
-            href="/board/all"
-            className="text-gold underline underline-offset-2"
-          >
-            All-Time Leaderboard
-          </Link>
-          {" · "}
-          <Link
-            href="/hall"
-            className="text-gold underline underline-offset-2"
-          >
-            Hall of Signal
-          </Link>
-          {" · "}
-          <Link
-            href="/methodology"
-            className="text-gold underline underline-offset-2"
-          >
-            Methodology
-          </Link>
-          {" · "}
-          <Link
-            href="/metrics/yield-cascade"
-            className="text-gold underline underline-offset-2"
-          >
-            Yield (Υ) Cascade
-          </Link>
-        </p>
-      </section>
     </div>
   );
 }
