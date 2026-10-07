@@ -7,6 +7,7 @@
  */
 
 import type { LeaderboardRow } from "@/lib/board/types";
+import { snapshotThroughput } from "@/lib/board/throughput";
 
 export function sortValue(row: LeaderboardRow, key: string): number {
   const s = row.snapshot;
@@ -25,6 +26,19 @@ export function sortValue(row: LeaderboardRow, key: string): number {
     case "totalTokens":
     case "total":
       return t.fresh_input + t.output + t.cache_read + t.cache_create;
+    case "throughput":
+      // Token Throughput — canonical exact-calendar processed tokens/day
+      // (lib/board/throughput), the live-board "thpt" metric. Not ∑ tokens.
+      return (
+        snapshotThroughput({
+          inputTokens: t.fresh_input,
+          outputTokens: t.output,
+          cacheWriteTokens: t.cache_create,
+          cacheReadTokens: t.cache_read,
+          windowStart: row.window_start,
+          windowEnd: row.window_end,
+        })?.processedTokensPerDay ?? -1
+      );
     case "yield_":
     case "yield":
       // Non-compounding operators sort below compounding ones (yield treated as 0)

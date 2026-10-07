@@ -1061,3 +1061,158 @@
   letter-spacing:.12em;color:var(--mut)}
 .lbw-root .srow-v{margin-left:auto;font-size:9.5px;color:var(--tx2)}
 .lbw-root .srow svg{flex-shrink:0}
+
+/* ========================================================================
+   WS pages — shared-workspace surfaces (Hall / Compare / Wiki / Field /
+   Blog). Two layers:
+
+   1. TOKEN BRIDGE — production components use the site's Tailwind
+      rgb(var(--…)) tokens (bg-surface, text-muted, accent…). Inside
+      .lbw-root those vars alias to the ACTIVE WORKSPACE THEME so a
+      transferred surface inherits green/gold/bone/purple like the board.
+      Identity colors (class/platform/rank/bar) stay constant across
+      themes — same contract as globals.css :root.
+
+   2. .ws-* content styles — stage grids + control stacks for the
+      transferred surfaces. New selectors only; the frozen reference rules
+      above are untouched.
+   ======================================================================== */
+
+.lbw-root{
+  /* shared identity colors — constant across workspace themes */
+  --class-transmitter:245 166 35; --class-archplus:96 165 250;
+  --class-arch:59 130 246; --class-power:167 139 250;
+  --class-base:148 163 184; --class-seeker:45 212 160;
+  --class-refiner:244 116 72; --class-bearer:129 140 248;
+  --class-igniter:100 116 139;
+  --platform-chatgpt:16 163 127; --platform-claude:217 119 6;
+  --platform-pi:99 102 241; --platform-gemini:66 133 244;
+  --platform-codex:168 85 247; --platform-omp:236 72 153;
+  --platform-devin:6 182 212;
+  --rank-1:245 166 35; --rank-2:96 165 250; --rank-3:129 140 248;
+  --bar-high:96 165 250; --bar-mid:45 212 160;
+}
+.lbw-root[data-theme="green"]{
+  --bg-base:8 16 13; --bg-surface:13 24 20; --bg-elevated:18 30 25;
+  --bg-hover:18 30 25; --bg-border:43 71 60; --bg-border-subtle:29 51 43;
+  --text-primary:222 242 232; --text-secondary:166 196 182;
+  --text-muted:122 152 138; --text-dim:110 140 126;
+  --gold:224 178 64; --accent:52 209 123;
+  --rank-low:167 139 250; --bar-low:43 71 60;
+}
+.lbw-root[data-theme="gold"]{
+  --bg-base:22 16 4; --bg-surface:29 22 10; --bg-elevated:36 28 14;
+  --bg-hover:36 28 14; --bg-border:82 66 34; --bg-border-subtle:58 47 24;
+  --text-primary:242 232 210; --text-secondary:203 184 148;
+  --text-muted:160 143 104; --text-dim:140 124 88;
+  --gold:224 178 64; --accent:209 164 52;
+  --rank-low:167 139 250; --bar-low:82 66 34;
+}
+.lbw-root[data-theme="bone"]{
+  --bg-base:241 238 228; --bg-surface:251 249 242; --bg-elevated:242 239 230;
+  --bg-hover:242 239 230; --bg-border:182 176 158; --bg-border-subtle:216 211 195;
+  --text-primary:43 40 32; --text-secondary:76 71 56;
+  --text-muted:124 116 96; --text-dim:138 130 112;
+  --gold:154 115 32; --accent:26 103 65;
+  --rank-low:124 58 237; --bar-low:216 211 195;
+}
+.lbw-root[data-theme="purple"]{
+  --bg-base:13 10 18; --bg-surface:18 15 24; --bg-elevated:24 20 33;
+  --bg-hover:24 20 33; --bg-border:54 44 72; --bg-border-subtle:36 30 48;
+  --text-primary:232 228 242; --text-secondary:182 174 200;
+  --text-muted:133 122 156; --text-dim:118 108 140;
+  --gold:224 178 64; --accent:155 138 212;
+  --rank-low:167 139 250; --bar-low:54 44 72;
+}
+
+/* ---------- ws controls — left-panel control stacks (Hall/Compare) ——
+   reuse .ctl/.cl + .seg so transferred filters read as workspace chrome. */
+.lbw-root .ws-ctl{display:flex;flex-direction:column;gap:9px}
+.lbw-root .ws-ctl .ctl select{width:100%;min-width:0}
+.lbw-root .ws-seg{display:flex;flex-wrap:wrap;border:1px solid var(--line2);
+  border-radius:var(--radius-sm);overflow:hidden}
+.lbw-root .ws-seg button{flex:1 1 auto;padding:7px 8px;font-family:var(--font-mono);
+  font-size:10px;letter-spacing:.04em;color:var(--tx2);background:var(--panel);
+  white-space:nowrap}
+.lbw-root .ws-seg button.on{background:var(--ac);color:var(--ac-tx);font-weight:700}
+.lbw-root .ws-seg button:not(.on):hover{background:var(--hover)}
+.lbw-root .ws-note{font-size:10.5px;line-height:1.5;color:var(--tx2)}
+.lbw-root .ws-note b{color:var(--tx)}
+.lbw-root .ws-empty{display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:18px 10px;text-align:center;color:var(--mut);font-size:10.5px;
+  border:1px dashed var(--line2);border-radius:var(--radius-sm)}
+.lbw-root .ws-empty .gi{font-size:16px}
+
+/* key/value stat rows — mini profiles, record inspector, matchup summary */
+.lbw-root .ws-kv{display:flex;flex-direction:column;gap:0}
+.lbw-root .ws-kv .row{display:flex;align-items:baseline;gap:8px;
+  padding:5px 0;border-bottom:1px dashed var(--line);font-size:11px}
+.lbw-root .ws-kv .row:last-child{border-bottom:none}
+.lbw-root .ws-kv .k{color:var(--mut);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;flex-shrink:0}
+.lbw-root .ws-kv .v{margin-left:auto;text-align:right;font-family:var(--font-mono);
+  color:var(--tx);min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.lbw-root .ws-kv .v.acc{color:var(--ac);font-weight:700}
+
+/* ---------- Hall stage — record ticker + metric board grid ---------- */
+.lbw-root .ws-ticker{margin-bottom:var(--gap)}
+.lbw-root .ws-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--gap)}
+@media (max-width:1240px){.lbw-root .ws-grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1080px){.lbw-root .ws-grid3{grid-template-columns:1fr}}
+.lbw-root .ws-grid3 > section{min-width:0}
+/* HallSubmissionRow selection affordance — row click populates the inspector;
+   the name link still navigates to the profile. */
+.lbw-root .ws-rowpick{cursor:pointer}
+.lbw-root .ws-rowpick:hover{background:var(--hover)}
+.lbw-root .ws-rowpick.on{outline:1px solid var(--ac);outline-offset:-1px;
+  background:color-mix(in srgb,var(--ac) 6%,transparent)}
+
+/* ---------- Compare stage — approved 12-col spatial map (CMP-*) ——
+   CMP-01 selectors/againstme x0w6 · CMP-02 matchup x6w6 tall ·
+   CMP-03 raw radar x0w3 · CMP-04 metric radar x3w3 ·
+   CMP-09 challenge bar w12 band (export overlaps matchup — rendered as the
+   full-width divider between the matchup block and history, flagged at
+   checkpoint) · CMP-05 history w12. */
+.lbw-root .ws-cmp{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:var(--gap);align-items:start}
+.lbw-root .ws-cmp-sel{grid-column:1/7}
+.lbw-root .ws-cmp-match{grid-column:7/13;grid-row:1/3}
+/* production renders CompareRadars paired (editor split is spatial-only) */
+.lbw-root .ws-cmp-radars{grid-column:1/7;grid-row:2}
+.lbw-root .ws-cmp-raw{grid-column:1/4;grid-row:2}
+.lbw-root .ws-cmp-met{grid-column:4/7;grid-row:2}
+.lbw-root .ws-cmp-bar{grid-column:1/13;grid-row:3}
+.lbw-root .ws-cmp-hist{grid-column:1/13;grid-row:4}
+@media (max-width:1180px){
+  .lbw-root .ws-cmp-sel{grid-column:1/13}
+  .lbw-root .ws-cmp-match{grid-column:1/13;grid-row:auto}
+  .lbw-root .ws-cmp-radars{grid-column:1/13;grid-row:auto}
+  .lbw-root .ws-cmp-raw{grid-column:1/7;grid-row:auto}
+  .lbw-root .ws-cmp-met{grid-column:7/13;grid-row:auto}
+}
+.lbw-root .ws-cmp svg{max-width:100%;height:auto}
+.lbw-root .ws-cmp .radarcard svg{width:100%}
+
+/* compact ledger — the approved left-panel placement (~180px). Swaps the
+   marketing-page diverging-row grid for a tight stat ledger: one metric per
+   line, A·B values flanking the label, no canon ids, hairline bars. */
+.lbw-root .lgr-h{display:flex;align-items:baseline;gap:6px;
+  padding:6px 0 2px;border-bottom:1px solid var(--line)}
+.lbw-root .lgr-h .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font-size:9px}
+.lbw-root .lgr-row{display:grid;grid-template-columns:1fr auto 1fr;gap:4px;
+  align-items:baseline;padding:4px 0;font-family:var(--font-mono);font-size:10px}
+.lbw-root .lgr-row .a{text-align:right;color:var(--tx2)}
+.lbw-root .lgr-row .a.win{color:var(--ac);font-weight:700}
+.lbw-root .lgr-row .b{color:var(--tx2)}
+.lbw-root .lgr-row .b.win{color:rgb(var(--class-seeker));font-weight:700}
+.lbw-root .lgr-row .k{font-family:var(--font-ui);font-size:9px;color:var(--mut);
+  letter-spacing:.06em;text-transform:uppercase;text-align:center;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbw-root .lgr-band{font-size:8.5px;letter-spacing:.16em;color:var(--mut);
+  text-transform:uppercase;padding:8px 0 2px;font-family:var(--font-mono)}
+.lbw-root .lgr-tot{display:flex;align-items:baseline;gap:4px;
+  border-top:1px solid var(--line);margin-top:4px;padding-top:6px;
+  font-family:var(--font-mono);font-size:10px}

@@ -31,6 +31,7 @@ import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { CanonId } from "@/components/ui/CanonId";
 import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/identity/canon-ids";
+import { snapshotThroughput } from "@/lib/board/throughput";
 
 const A_COLOR = "rgb(var(--class-arch))"; // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
 const B_COLOR = "rgb(var(--class-seeker))";
@@ -244,6 +245,39 @@ function Line({ row }: { row: LedgerRow }) {
   );
 }
 
+/** Canonical Token Throughput per side — the live-board exact-calendar
+ *  processed-tokens/day rate (lib/board/throughput). NOT ∑ total tokens. */
+function throughputOf(row: LeaderboardRow): number | null {
+  const t = row.telemetry;
+  if (!t) return null;
+  return (
+    snapshotThroughput({
+      inputTokens: t.fresh_input,
+      outputTokens: t.output,
+      cacheWriteTokens: t.cache_create,
+      cacheReadTokens: t.cache_read,
+      windowStart: row.window_start,
+      windowEnd: row.window_end,
+    })?.processedTokensPerDay ?? null
+  );
+}
+
+function throughputRow(a: LeaderboardRow, b: LeaderboardRow): LedgerRow {
+  const av = throughputOf(a);
+  const bv = throughputOf(b);
+  const fmt = (v: number | null) => (v === null ? "—" : `${fmtInt(v)}/d`);
+  return {
+    id: "THPT",
+    label: "Throughput",
+    a: av,
+    b: bv,
+    aStr: fmt(av),
+    bStr: fmt(bv),
+    higherWins: true,
+    scale: Math.max(av ?? 0, bv ?? 0, 1),
+  };
+}
+
 /** A banded section header spanning the center column (RAW / METRICS / TOTAL). */
 function Band({ title }: { title: string }) {
   return (
@@ -260,14 +294,21 @@ function Band({ title }: { title: string }) {
 export function CompareLedger({
   a,
   b,
+  compact = false,
 }: {
   a: LeaderboardRow;
   b: LeaderboardRow;
+  /** Workspace left-panel variant (~180px): tight stat ledger, one metric per
+   *  line, no canon ids / diverging bars — same rows, same winner logic. */
+  compact?: boolean;
 }) {
   const aName = nameOf(a);
   const bName = nameOf(b);
   const rawRows = DISPLAY_RAW.map((m) => buildRow(m, a, b));
   const metricRows = DISPLAY_METRICS_COMPARE.map((m) => buildRow(m, a, b));
+  // FLOW row — Token Throughput, comparable datum (canonical exact-calendar
+  // processed tokens/day), appended under its own band in both render modes.
+  const flowRows = [throughputRow(a, b)];
 
   // TOTAL row = the ∑ pillar (sum of 4 raw), shown as its own banded footer.
   const totalRow = buildRow(
@@ -275,6 +316,50 @@ export function CompareLedger({
     a,
     b,
   );
+
+  if (compact) {
+    const win = (r: LedgerRow) => winnerOf(r);
+    return (
+      <div>
+        <div className="lgr-h">
+          <span className="nm" style={{ textAlign: "right", marginLeft: "auto", color: "var(--ac)", fontWeight: 700 }}>{aName}</span>
+        </div>
+        <div className="lgr-h" style={{ borderBottom: "none", paddingBottom: 6 }}>
+          <span className="nm mut" style={{ fontSize: 8, letterSpacing: ".16em" }}>DATA</span>
+          <span className="nm" style={{ marginLeft: "auto", color: "rgb(var(--class-seeker))", fontWeight: 700 }}>{bName}</span>
+        </div>
+        <div className="lgr-band">Raw</div>
+        {rawRows.map((r) => (
+          <div className="lgr-row" key={r.id}>
+            <span className={`a${win(r) === "a" ? " win" : ""}`}>{r.aStr}</span>
+            <span className="k">{r.label}</span>
+            <span className={`b${win(r) === "b" ? " win" : ""}`}>{r.bStr}</span>
+          </div>
+        ))}
+        <div className="lgr-band">Metrics</div>
+        {metricRows.map((r) => (
+          <div className="lgr-row" key={r.id}>
+            <span className={`a${win(r) === "a" ? " win" : ""}`}>{r.aStr}</span>
+            <span className="k">{r.label}</span>
+            <span className={`b${win(r) === "b" ? " win" : ""}`}>{r.bStr}</span>
+          </div>
+        ))}
+        <div className="lgr-band">Flow</div>
+        {flowRows.map((r) => (
+          <div className="lgr-row" key={r.id}>
+            <span className={`a${win(r) === "a" ? " win" : ""}`}>{r.aStr}</span>
+            <span className="k">{r.label}</span>
+            <span className={`b${win(r) === "b" ? " win" : ""}`}>{r.bStr}</span>
+          </div>
+        ))}
+        <div className="lgr-tot">
+          <span className={`a${win(totalRow) === "a" ? " win" : ""}`} style={{ flex: 1, textAlign: "right" }}>{totalRow.aStr}</span>
+          <span className="k">∑ TOTAL</span>
+          <span className={`b${win(totalRow) === "b" ? " win" : ""}`} style={{ flex: 1 }}>{totalRow.bStr}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="overflow-hidden rounded-xl border border-bg-border bg-bg-surface">
@@ -299,6 +384,11 @@ export function CompareLedger({
 
         <Band title="Metrics" />
         {metricRows.map((r) => (
+          <Line key={r.id} row={r} />
+        ))}
+
+        <Band title="Flow" />
+        {flowRows.map((r) => (
           <Line key={r.id} row={r} />
         ))}
       </div>
