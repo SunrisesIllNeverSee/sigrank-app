@@ -215,38 +215,55 @@ export default async function BlogIndex() {
             the token cascade economy, and outlier detection methodology.
           </p>
 
-      <div className="flex flex-col gap-6">
-        {posts.map((post) => (
-          <Link
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            className="group flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5 transition-colors hover:border-gold/40"
-          >
-            <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
-              {post.title}
-            </h2>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              {post.description}
-            </p>
-            <div className="flex items-center gap-3 font-mono text-xs text-text-muted">
-              {post.date && (
+      <div className="blog-index">
+        {posts[0] && (
+          <Link href={`/blog/${posts[0].slug}`} className="blog-feature group">
+            <div className="blog-kicker">LATEST · FIELD NOTE</div>
+            <h2>{posts[0].title}</h2>
+            <p>{posts[0].description}</p>
+            <div className="blog-meta">
+              {posts[0].date && (
                 <time>
-                  {new Date(post.date).toLocaleDateString("en-US", {
+                  {new Date(posts[0].date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
                 </time>
               )}
-              {post.tags.length > 0 && (
-                <>
-                  <span>·</span>
-                  <span>{post.tags.slice(0, 3).join(", ")}</span>
-                </>
+              {posts[0].tags.length > 0 && (
+                <span>{posts[0].tags.slice(0, 3).join(" · ")}</span>
               )}
             </div>
+            <span className="blog-read">READ ARTICLE →</span>
           </Link>
-        ))}
+        )}
+
+        <div className="blog-list">
+          {posts.slice(1).map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-row group">
+              <div className="blog-row-main">
+                <h2>{post.title}</h2>
+                <p>{post.description}</p>
+              </div>
+              <div className="blog-row-meta">
+                {post.date && (
+                  <time>
+                    {new Date(post.date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </time>
+                )}
+                {post.tags.length > 0 && (
+                  <span>{post.tags.slice(0, 2).join(" · ")}</span>
+                )}
+                <span className="arrow">↗</span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
         </div>
       </WorkspaceShell>

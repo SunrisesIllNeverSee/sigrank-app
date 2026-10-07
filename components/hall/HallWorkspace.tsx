@@ -80,7 +80,6 @@ function coerce<T extends string>(
 
 /** Stored workflow vocabulary → owner-facing control labels. */
 const WORKFLOW_OPTS = [
-  { id: "all", label: "ALL" },
   { id: "hitl", label: "OPERATOR-IN-THE-LOOP" },
   { id: "hybrid", label: "HYBRID" },
   { id: "agentic", label: "AUTOMATED" },
@@ -165,7 +164,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
   const windowParam = (mounted ? sp.get("window") : null) ?? "all";
   const scopeParam = (mounted ? sp.get("scope") : null) ?? "active";
   const viewParam = (mounted ? sp.get("view") : null) ?? "metrics";
-  const workflowParam = (mounted ? sp.get("workflow") : null) ?? "all";
+  const workflowParam = (mounted ? sp.get("workflow") : null) ?? "hybrid";
 
   const platform = coerce<PlatformUI>(platformParam, PLATFORM_UI, PLATFORM_DEFAULT);
   const win = boardWindowBySlug(windowParam) ?? boardWindowBySlug("all")!;
@@ -174,7 +173,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
   const workflow: WorkflowSel = coerce(
     workflowParam,
     WORKFLOW_OPTS.map((w) => w.id) as readonly WorkflowSel[],
-    "all",
+    "hybrid",
   );
 
   const setParam = useCallback(
@@ -210,9 +209,11 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
           r.snapshot.class_tier?.toLowerCase() === classParam.toLowerCase(),
       );
     }
-    // Workflow filter — stored workflow_mode verbatim (hitl/hybrid/agentic);
-    // "all" clears. Same assessed values the live board reads.
-    if (workflow !== "all") {
+    // Workflow view semantics mirror the live board exactly:
+    // HYBRID is the combined/default field view (resolved HITL + resolved
+    // agentic + unresolved/legacy rows). The other two modes narrow the field.
+    // Stored workflow_mode evidence remains untouched.
+    if (workflow === "hitl" || workflow === "agentic") {
       rows = rows.filter((r) => r.workflow_mode === workflow);
     }
     return rows;
@@ -319,7 +320,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
               key={w.id}
               type="button"
               className={workflow === w.id ? "on" : ""}
-              onClick={() => setParam("workflow", w.id, "all")}
+              onClick={() => setParam("workflow", w.id, "hybrid")}
             >
               {w.label}
             </button>
@@ -467,7 +468,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
       status={
         <>
           {baseRows.length} OPERATORS · {view === "metrics" ? "METRICS" : "TOKENS"} VIEW ·{" "}
-          {workflow === "all" ? "ALL WORKFLOWS" : workflow.toUpperCase()} ·{" "}
+          {workflow === "hybrid" ? "HYBRID · COMBINED FIELD" : workflow.toUpperCase()} ·{" "}
           {win.label.toUpperCase()} · SIGNALAF × SIGRANK · MO§ES™
         </>
       }

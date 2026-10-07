@@ -17,6 +17,7 @@ import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "Field Hub — SigRank Research",
@@ -58,7 +59,32 @@ export default async function FieldHubPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
+    <FieldWorkspaceFrame
+      title="FIELD HUB"
+      rightTitle="FIELD FAMILY"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />SNAPSHOT</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">analyzed</span><span className="v acc">{meta.operators_included.toLocaleString()}</span></div>
+              <div className="row"><span className="k">collected</span><span className="v">{meta.total_scraped.toLocaleString()}</span></div>
+              <div className="row"><span className="k">median Υ</span><span className="v acc">{meta.medians.yield.toFixed(2)}</span></div>
+            </div>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />PRIMARY SOURCES</div>
+            <nav className="ws-nav">
+              <Link href="/field">Field Analysis</Link>
+              <Link href="/research">State of the Index / Data</Link>
+              <Link href="/blog">Published analysis</Link>
+            </nav>
+          </div>
+        </>
+      }
+      status={<>FIELD HUB · {meta.operators_included.toLocaleString()} ANALYZED OPERATORS · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           collectionPage,
@@ -145,6 +171,7 @@ export default async function FieldHubPage() {
           headingLevel="h2"
         />
       </Link>
-    </div>
+      </div>
+    </FieldWorkspaceFrame>
   );
 }

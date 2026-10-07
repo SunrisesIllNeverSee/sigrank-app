@@ -21,6 +21,7 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, personAuthor, faqPage } from "@/lib/jsonld";
+import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
 
@@ -192,7 +193,8 @@ export default async function BlogPost({
   ]);
 
   return (
-    <article className="px-4 py-8 md:py-12">
+    <BlogWorkspaceFrame>
+      <article className="article-shell px-4 py-8 md:py-12">
       <CitationMeta
         title={title}
         description={description}
@@ -280,6 +282,7 @@ export default async function BlogPost({
           </Link>
         </p>
       </section>
-    </article>
+      </article>
+    </BlogWorkspaceFrame>
   );
 }
