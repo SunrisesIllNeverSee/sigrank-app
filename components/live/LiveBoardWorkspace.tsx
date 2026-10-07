@@ -325,6 +325,70 @@ function TrendSpark({
   );
 }
 
+/* Mini sparkline — three kinds (owner: "different kinds of sparklines"):
+   area fill, bars, plain line. Empty series → a faint flat baseline. */
+function MiniSpark({
+  pts,
+  kind,
+  w = 90,
+  h = 18,
+}: {
+  pts: number[];
+  kind: "area" | "bars" | "line";
+  w?: number;
+  h?: number;
+}) {
+  if (!pts.length)
+    return (
+      <svg width={w} height={h} aria-hidden>
+        <line
+          x1={1}
+          y1={h / 2}
+          x2={w - 1}
+          y2={h / 2}
+          stroke="var(--line2)"
+          strokeDasharray="2 3"
+        />
+      </svg>
+    );
+  const max = Math.max(...pts);
+  const min = Math.min(...pts);
+  const span = Math.max(max - min, 1e-6);
+  const x = (i: number) => 1 + (i / Math.max(pts.length - 1, 1)) * (w - 2);
+  const y = (v: number) => h - 2 - ((v - min) / span) * (h - 4);
+  if (kind === "bars") {
+    const bw = Math.max((w - 4) / pts.length - 1.5, 1.4);
+    return (
+      <svg width={w} height={h} aria-hidden>
+        {pts.map((v, i) => (
+          <rect
+            key={i}
+            x={x(i) - bw / 2}
+            y={y(v)}
+            width={bw}
+            height={h - 1 - y(v)}
+            fill="var(--ac)"
+            opacity={0.35 + (0.65 * (v - min)) / span}
+          />
+        ))}
+      </svg>
+    );
+  }
+  const poly = pts.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return (
+    <svg width={w} height={h} aria-hidden>
+      {kind === "area" && (
+        <polyline
+          points={`${x(0)},${h - 1} ${poly} ${x(pts.length - 1)},${h - 1}`}
+          fill="color-mix(in srgb, var(--ac) 20%, transparent)"
+          stroke="none"
+        />
+      )}
+      <polyline points={poly} fill="none" stroke="var(--ac)" strokeWidth={1.3} />
+    </svg>
+  );
+}
+
 function HotStats({ stats }: { stats: FieldStat[] }) {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -1051,27 +1115,65 @@ export function LiveBoardWorkspace({
                   <TrendSpark series={selOp!.trend} ops={ops} />
                 </div>
               )}
-              {/* owner: the profile's second card is stats-only — the
-                  numbers without the graphic. */}
+              {/* owner: "the stats to be for the sparkline" — each metric
+                  row carries its own mini chart. Real series: yield/score/
+                  rank from the history channel; leverage/velocity from the
+                  snapshot ledger. Each row is a different chart kind. */}
               <div className="statcard">
-                <div className="awbox-h">STATS</div>
-                <div className="fgrid">
-                  {(
-                    [
-                      ["YIELD", selOp ? numYield(selOp).toLocaleString() : "—"],
-                      ["LEVERAGE", selOp ? numLev(selOp).toLocaleString() : "—"],
-                      ["VELOCITY", selOp?.vel?.toFixed(2) ?? "—"],
-                      ["SNR", selOp ? `${(selOp.snr * 100).toFixed(1)}%` : "—"],
-                      ["10xDEV", selOp?.dev?.toFixed(1) ?? "—"],
-                      ["TOTAL", selOp?.total ?? "—"],
-                    ] as const
-                  ).map(([l, v]) => (
-                    <div className="fcell" key={l}>
-                      <div className="n">{v}</div>
-                      <div className="l">{l}</div>
+                <div className="awbox-h">STATS · SPARKLINES</div>
+                {(() => {
+                  const hist = selDetail?.history ?? [];
+                  const snaps = selDetail?.snapshots ?? [];
+                  const rows = [
+                    {
+                      l: "YIELD",
+                      v: selOp ? numYield(selOp).toLocaleString() : "—",
+                      spark: hist.map((h) => h.yieldv).filter((x) => x > 0),
+                      kind: "area" as const,
+                    },
+                    {
+                      l: "SCORE",
+                      v: hist.length
+                        ? (hist[hist.length - 1].score ?? 0).toFixed(1)
+                        : "—",
+                      spark: hist.map((h) => h.score).filter((x) => x > 0),
+                      kind: "bars" as const,
+                    },
+                    {
+                      l: "RANK",
+                      v: profile ? `#${profile.rank}` : "—",
+                      /* lower rank = better — invert so up = improving */
+                      spark: hist
+                        .map((h) => h.rank)
+                        .filter((x) => x > 0)
+                        .map((x) => -x),
+                      kind: "line" as const,
+                    },
+                    {
+                      l: "LEVERAGE",
+                      v: selOp ? numLev(selOp).toLocaleString() : "—",
+                      spark: snaps
+                        .map((sn) => sn.leverage ?? 0)
+                        .filter((x) => x > 0),
+                      kind: "bars" as const,
+                    },
+                    {
+                      l: "VELOCITY",
+                      v: selOp?.vel?.toFixed(2) ?? "—",
+                      spark: snaps
+                        .map((sn) => sn.velocity ?? 0)
+                        .filter((x) => x > 0),
+                      kind: "line" as const,
+                    },
+                  ];
+                  return rows.map((r) => (
+                    <div className="srow" key={r.l}>
+                      <span className="srow-l">{r.l}</span>
+                      <MiniSpark pts={r.spark} kind={r.kind} />
+                      <span className="srow-v mono">{r.v}</span>
                     </div>
-                  ))}
-                </div>
+                  ));
+                })()}
               </div>
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
