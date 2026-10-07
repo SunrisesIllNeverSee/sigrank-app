@@ -1052,3 +1052,12 @@
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lbw-root .podcard .tv{color:var(--ac);font-size:9px}
 .lbw-root .podcard.empty{color:var(--mut);justify-content:center;font-size:12px}
+
+/* stats sparkline rows (owner: stats ARE the sparkline rows) */
+.lbw-root .srow{display:flex;align-items:center;gap:8px;padding:5px 2px;
+  border-bottom:1px dashed var(--line)}
+.lbw-root .srow:last-child{border-bottom:none}
+.lbw-root .srow-l{width:56px;flex-shrink:0;font-size:8.5px;
+  letter-spacing:.12em;color:var(--mut)}
+.lbw-root .srow-v{margin-left:auto;font-size:9.5px;color:var(--tx2)}
+.lbw-root .srow svg{flex-shrink:0}
