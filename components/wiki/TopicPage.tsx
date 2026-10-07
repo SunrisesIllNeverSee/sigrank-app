@@ -12,30 +12,31 @@
 
 import React from "react";
 import Link from "next/link";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
-export function TopicPage({ children, title }: { children: React.ReactNode; title?: string }) {
+export function TopicPage({ children }: { children: React.ReactNode; title?: string }) {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
-      <Link
-        href="/wiki"
-        className="w-fit font-mono text-xs uppercase tracking-wide text-text-muted transition-colors hover:text-text-primary"
-      >
-        ← Wiki
-      </Link>
-      {title && (
-        <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl">
-          {title}
-        </h1>
-      )}
-      {children}
-      <div className="mt-4 border-t border-bg-border-subtle pt-4">
-        <Link
-          href="/wiki"
-          className="font-mono text-xs text-text-accent underline-offset-2 hover:underline"
-        >
-          ← Back to the Wiki
-        </Link>
+    <WorkspaceShell
+      active="wiki"
+      leftTitle="ENTRY"
+      left={
+        <div className="mod">
+          <div className="mini-h"><span className="sq"></span>INDEX</div>
+          <nav className="ws-nav">
+            <Link href="/wiki">← Wiki</Link>
+            <Link href="/wiki/verification">Verification &amp; integrity</Link>
+            <Link href="/wiki/four-degrees">Four degrees of leverage</Link>
+          </nav>
+        </div>
+      }
+      leftWidth={220}
+      status={<>SIGNALAF WIKI · TOPIC PROOF · MO§ES™</>}
+    >
+      <div className="ws-doc">
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
+          {children}
+        </div>
       </div>
-    </div>
+    </WorkspaceShell>
   );
 }

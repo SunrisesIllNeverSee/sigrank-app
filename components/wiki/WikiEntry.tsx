@@ -17,6 +17,7 @@
 import React from "react";
 import Link from "next/link";
 import { EvidenceBadge } from "./EvidenceBadge";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { wikiCategoryById, wikiCategoryHubAnchor, type WikiCategory } from "@/lib/wiki/evidence-ladder";
 
 export interface WikiCrossRef {
@@ -97,43 +98,80 @@ export function WikiEntry({
   );
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 font-mono text-xs text-text-muted">
-        <Link href="/wiki" className="transition-colors hover:text-text-primary">
-          Wiki
-        </Link>
-        {cat && (
-          <>
-            <span className="text-text-dim">/</span>
-            <Link
-              href={`/wiki#${wikiCategoryHubAnchor(category)}`}
-              className="transition-colors hover:text-text-primary"
-            >
-              {cat.label}
-            </Link>
-          </>
-        )}
-      </nav>
-
-      {/* Header: title + evidence badge */}
-      <header className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl">
-            {title}
-          </h1>
-          <EvidenceBadge level={evidenceLevel} />
-        </div>
-        <p className="max-w-2xl font-sans text-base leading-relaxed text-text-secondary">
-          {summary}
-        </p>
-        {(lastUpdated || specVersion) && (
-          <div className="flex flex-wrap gap-3 font-mono text-[11px] text-text-dim">
-            {lastUpdated && <span>Last updated: {lastUpdated}</span>}
-            {specVersion && <span>Spec: {specVersion}</span>}
+    <WorkspaceShell
+      active="wiki"
+      title={title}
+      leftTitle="ENTRY"
+      left={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq"></span>INDEX</div>
+            <nav className="ws-nav">
+              <Link href="/wiki">← Wiki</Link>
+              {cat && (
+                <Link href={`/wiki#${wikiCategoryHubAnchor(category)}`}>
+                  {cat.label}
+                </Link>
+              )}
+            </nav>
           </div>
-        )}
-      </header>
+          <div className="mod">
+            <div className="mini-h"><span className="sq"></span>PATH</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">wiki</span><span className="v">/wiki</span></div>
+              {cat && (
+                <div className="row"><span className="k">section</span><span className="v">{cat.label}</span></div>
+              )}
+              <div className="row"><span className="k">entry</span><span className="v acc">{title}</span></div>
+            </div>
+          </div>
+        </>
+      }
+      rightTitle="SIGNAL"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq"></span>META</div>
+            <div style={{ marginBottom: 8 }}>
+              <EvidenceBadge level={evidenceLevel} />
+            </div>
+            {(lastUpdated || specVersion) && (
+              <div className="ws-kv">
+                {lastUpdated && (
+                  <div className="row"><span className="k">updated</span><span className="v">{lastUpdated}</span></div>
+                )}
+                {specVersion && (
+                  <div className="row"><span className="k">spec</span><span className="v">{specVersion}</span></div>
+                )}
+              </div>
+            )}
+          </div>
+          {crossRefs && crossRefs.length > 0 && (
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>CROSS-REFERENCES</div>
+              <nav className="ws-nav">
+                {crossRefs.map((ref, i) => (
+                  <Link key={i} href={ref.href}>→ {ref.label}</Link>
+                ))}
+              </nav>
+            </div>
+          )}
+        </>
+      }
+      leftWidth={220}
+      rightWidth={240}
+      status={<>SIGNALAF WIKI · EVIDENCE LAYER{cat ? ` · ${cat.label.toUpperCase()}` : ""}</>}
+    >
+      <div className="ws-doc">
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
+          {/* Header: evidence badge + summary (title renders in the shell
+              pagetitle strip as the page h1) */}
+          <header className="flex flex-col gap-3">
+            <EvidenceBadge level={evidenceLevel} />
+            <p className="max-w-2xl font-sans text-base leading-relaxed text-text-secondary">
+              {summary}
+            </p>
+          </header>
 
       {/* 1. Definition */}
       <Section label="Definition">{definition}</Section>
@@ -167,37 +205,8 @@ export function WikiEntry({
 
       {/* 11. Lineage */}
       {lineage && <Section label="Lineage">{lineage}</Section>}
-
-      {/* Cross-references */}
-      {crossRefs && crossRefs.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-text-accent">
-            Cross-references
-          </h2>
-          <ul className="flex flex-col gap-1">
-            {crossRefs.map((ref, i) => (
-              <li key={i}>
-                <Link
-                  href={ref.href}
-                  className="font-mono text-xs text-text-accent underline-offset-2 hover:underline"
-                >
-                  → {ref.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* Footer */}
-      <div className="mt-4 border-t border-bg-border-subtle pt-4">
-        <Link
-          href="/wiki"
-          className="font-mono text-xs text-text-accent underline-offset-2 hover:underline"
-        >
-          ← Back to the Wiki
-        </Link>
+        </div>
       </div>
-    </div>
+    </WorkspaceShell>
   );
 }
