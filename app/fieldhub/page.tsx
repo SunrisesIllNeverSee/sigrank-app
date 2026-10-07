@@ -109,18 +109,6 @@ export default async function FieldHubPage() {
         ]}
       />
 
-      <WaveHero
-        eyebrow="📊 SigRank Research"
-        terminalText="FIELD HUB"
-        title="Field Hub"
-        subtitle={
-          <>
-            The academic research hub for SigRank. This is where we
-            document field analysis and publish dataset findings.
-          </>
-        }
-      />
-
       {/* ── Blurb ───────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <p className="text-lg text-text-primary">
