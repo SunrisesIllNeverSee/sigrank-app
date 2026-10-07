@@ -1229,6 +1229,9 @@
   text-decoration:none;line-height:1.4}
 .lbw-root .ws-nav a:hover{background:var(--hover);color:var(--tx)}
 .lbw-root .ws-nav a .sub{display:block;font-size:9px;color:var(--mut)}
+.lbw-root .ws-nav a:focus-visible,.lbw-root .ws-doc a:focus-visible,
+.lbw-root .ws-kv a:focus-visible{outline:1px solid var(--ac);outline-offset:1px;
+  border-radius:var(--radius-sm)}
 
 /* ---------- Editorial/research workspace variants ---------- */
 .lbw-root .ws-doc.ws-doc-wide{max-width:1100px;width:100%}
