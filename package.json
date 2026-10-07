@@ -37,7 +37,7 @@
     "@posthog/mcp": "0.21.4",
     "@stripe/stripe-js": "^10.0.0",
     "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.110.1",
+    "@supabase/supabase-js": "^2.117.2",
     "@upstash/redis": "^1.39.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
