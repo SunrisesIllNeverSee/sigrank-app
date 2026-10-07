@@ -148,6 +148,7 @@ type RailId =
   | "profile"
   | "field"
   | "hall"
+  | "honors"
   | "compare"
   | "movers"
   | "share"
@@ -163,11 +164,12 @@ type RailId =
    (owner defers them) — "field"/HOT STATS and the compare module exit
    the inspector; compare moved to the left sidebar. Inspector = share,
    profile, hall, recents/soon. */
-const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "soon"];
+const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "honors", "soon"];
 const RAIL_TITLE: Record<RailId, string> = {
   profile: "OPERATOR PROFILE",
   field: "HOT STATS",
   hall: "HALL OF SIGNAL",
+  honors: "AWARDS & BADGES",
   compare: "COMPARE OPERATORS",
   movers: "TOP MOVERS",
   share: "SHARE YOUR SIGNAL",
@@ -179,6 +181,8 @@ const RAIL_TITLE: Record<RailId, string> = {
    strip. Same fieldStats source, one cell rotating on a timer. ---------- */
 /* Rotating medal deck for HALL OF SIGNAL — one box cycling gold /
    silver / bronze brackets (owner: "one box 3 slides"). */
+/* Podium grid for HALL OF SIGNAL — owner: one box, three columns, top-3
+   gold / silver / bronze all visible at once (like compare's slots). */
 function MedalDeck({
   medals,
   ops,
@@ -188,43 +192,45 @@ function MedalDeck({
   ops: LiveOperator[];
   onSelect?: (i: number) => void;
 }) {
-  const [s, setS] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setS((i) => (i + 1) % 3), 4000);
-    return () => clearInterval(t);
-  }, []);
-  const slide = medals[s % medals.length];
   return (
-    <div className="hbox">
-      <div className="awbox-h">
-        {slide.name.toUpperCase()} MEDALS
-        <span className="mut"> · {(s % medals.length) + 1}/3</span>
-      </div>
-      {slide.list.slice(0, 3).map((o) => {
-        const k = ops.indexOf(o);
-        return (
-          <button
-            key={o.codename}
-            type="button"
-            className="hst-r"
-            onClick={() => onSelect?.(k)}
-          >
-            <span className="mav">
-              {o.avatarUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={o.avatarUrl} alt="" loading="lazy" />
-              ) : (
-                o.name[0]
-              )}
-            </span>
-            <span className="tm">{o.name}</span>
-            <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
-          </button>
-        );
-      })}
-      {!slide.list.length && (
-        <p className="drill-note">— NO {slide.name.toUpperCase()} HOLDERS</p>
-      )}
+    <div className="hbox podium">
+      {medals.map((m, mi) => (
+        <div className="pod-col" key={m.name}>
+          <div className="pod-h">{m.name.toUpperCase()}</div>
+          {m.list.slice(0, 3).map((o, ri) => {
+            const k = ops.indexOf(o);
+            return (
+              <button
+                key={o.codename}
+                type="button"
+                className="pod-r"
+                onClick={() => onSelect?.(k)}
+              >
+                <span className="pod-n">{ri + 1}</span>
+                <span className="mav">
+                  {o.avatarUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={o.avatarUrl} alt="" loading="lazy" />
+                  ) : (
+                    o.name[0]
+                  )}
+                </span>
+                <span className="tm">{o.name}</span>
+              </button>
+            );
+          })}
+          {Array.from({ length: 3 - Math.min(3, m.list.length) }).map(
+            (_, i) => (
+              <div className="pod-r empty" key={i}>
+                <span className="pod-n">
+                  {m.list.length + i + 1}
+                </span>
+                <span className="tm mut">—</span>
+              </div>
+            ),
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -908,68 +914,6 @@ export function LiveBoardWorkspace({
                   size={170}
                 />
               </div>
-              <div className="awbox">
-                <div className="awbox-h">
-                  {(["AWARDS", "BADGES", "MEDALS"] as const)[awSlide % 3]}
-                  <span className="mut"> · {(awSlide % 3) + 1}/3</span>
-                </div>
-                {awSlide % 3 === 0 && (
-                  <div className="awards big">
-                    <span className="award hex-gold" title="signal class">
-                      {selOp?.klass?.[0] ?? "—"}
-                    </span>
-                    {(selOp?.pct ?? 0) >= 99 && (
-                      <span className="award hex-violet" title="top 1% legend">
-                        Υ
-                      </span>
-                    )}
-                    {(selOp?.age ?? 0) >= 100 && (
-                      <span className="award hex-cyan" title="100 days consistent">
-                        ◆
-                      </span>
-                    )}
-                    {(selOp?.recs ?? []).length > 0 && (
-                      <span className="award hex-ac" title="record holder">
-                        ★
-                      </span>
-                    )}
-                  </div>
-                )}
-                {awSlide % 3 === 1 && (
-                  <div className="pxbadges big">
-                    {isVerifiedOp(selOp?.verif) && (
-                      <PixelBadge name="verified" />
-                    )}
-                    {(() => {
-                      const b = selOp ? badgeForPct(selOp.pct) : null;
-                      return b ? <PixelBadge name={b} /> : null;
-                    })()}
-                    {(selOp?.age ?? 0) >= 100 && (
-                      <PixelBadge name="days100" />
-                    )}
-                    {(selOp?.recs ?? []).length > 0 && (
-                      <PixelBadge name="tokens10m" />
-                    )}
-                  </div>
-                )}
-                {awSlide % 3 === 2 && (
-                  <div className="medalct big mono">
-                    {(() => {
-                      const recs = selOp?.recs ?? [];
-                      const g = recs.filter((r) => r.rank === 1).length;
-                      const s = recs.filter((r) => r.rank === 2).length;
-                      const b = recs.filter((r) => r.rank === 3).length;
-                      return (
-                        <>
-                          <span className="mc g">🥇 {g} GOLD</span>
-                          <span className="mc s">🥈 {s} SILVER</span>
-                          <span className="mc b">🥉 {b} BRONZE</span>
-                        </>
-                      );
-                    })()}
-                  </div>
-                )}
-              </div>
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
                   {(selOp!.recs ?? []).slice(0, 3).map((r) => (
@@ -1123,6 +1067,78 @@ export function LiveBoardWorkspace({
       case "share":
         return profile ? (
           <SharePreview d={profile} population={pop} />
+        ) : (
+          <p className="drill-note">— SELECT AN OPERATOR</p>
+        );
+      case "honors":
+        /* owner pass 3c: awards/medals/badges are their own module — the
+           rotating deck box moved out of the operator profile. */
+        return profile ? (
+          <>
+              <div className="awbox">
+                <div className="awbox-h">
+                  {(["AWARDS", "BADGES", "MEDALS"] as const)[awSlide % 3]}
+                  <span className="mut"> · {(awSlide % 3) + 1}/3</span>
+                </div>
+                {awSlide % 3 === 0 && (
+                  <div className="awards big">
+                    <span className="award hex-gold" title="signal class">
+                      {selOp?.klass?.[0] ?? "—"}
+                    </span>
+                    {(selOp?.pct ?? 0) >= 99 && (
+                      <span className="award hex-violet" title="top 1% legend">
+                        Υ
+                      </span>
+                    )}
+                    {(selOp?.age ?? 0) >= 100 && (
+                      <span className="award hex-cyan" title="100 days consistent">
+                        ◆
+                      </span>
+                    )}
+                    {(selOp?.recs ?? []).length > 0 && (
+                      <span className="award hex-ac" title="record holder">
+                        ★
+                      </span>
+                    )}
+                  </div>
+                )}
+                {awSlide % 3 === 1 && (
+                  <div className="pxbadges big">
+                    {isVerifiedOp(selOp?.verif) && (
+                      <PixelBadge name="verified" />
+                    )}
+                    {(() => {
+                      const b = selOp ? badgeForPct(selOp.pct) : null;
+                      return b ? <PixelBadge name={b} /> : null;
+                    })()}
+                    {(selOp?.age ?? 0) >= 100 && (
+                      <PixelBadge name="days100" />
+                    )}
+                    {(selOp?.recs ?? []).length > 0 && (
+                      <PixelBadge name="tokens10m" />
+                    )}
+                  </div>
+                )}
+                {awSlide % 3 === 2 && (
+                  <div className="medalct big mono">
+                    {(() => {
+                      const recs = selOp?.recs ?? [];
+                      const g = recs.filter((r) => r.rank === 1).length;
+                      const s = recs.filter((r) => r.rank === 2).length;
+                      const b = recs.filter((r) => r.rank === 3).length;
+                      return (
+                        <>
+                          <span className="mc g">🥇 {g} GOLD</span>
+                          <span className="mc s">🥈 {s} SILVER</span>
+                          <span className="mc b">🥉 {b} BRONZE</span>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+          </>
         ) : (
           <p className="drill-note">— SELECT AN OPERATOR</p>
         );
