@@ -1011,3 +1011,24 @@
 .lbw-root .trendbox{border:1px solid var(--line);border-radius:9px;
   padding:10px;margin-bottom:8px}
 .lbw-root .trendbox svg{display:block;width:100%;height:auto}
+
+/* --- pass 3e --- */
+/* movers box: fixed height so rotation never resizes the panel */
+.lbw-root .mbox{min-height:214px}
+/* medal deck page dots */
+.lbw-root .pg-dots{display:flex;justify-content:center;gap:6px;
+  padding-top:8px}
+.lbw-root .pg-dot{width:8px;height:8px;border-radius:50%;
+  background:var(--line2);border:none;padding:0;cursor:pointer}
+.lbw-root .pg-dot.on{background:var(--ac)}
+/* stats-only card (profile second page) */
+.lbw-root .statcard{border:1px solid var(--line);border-radius:9px;
+  padding:10px;margin-bottom:8px}
+.lbw-root .statcard .fgrid{display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px}
+.lbw-root .statcard .fcell{border:1px solid var(--line);border-radius:7px;
+  padding:8px;text-align:center}
+.lbw-root .statcard .fcell .n{font-family:var(--font-mono);font-size:13px;
+  font-weight:700;color:var(--ac)}
+.lbw-root .statcard .fcell .l{font-family:var(--font-mono);font-size:8px;
+  letter-spacing:.14em;color:var(--mut);margin-top:2px}
