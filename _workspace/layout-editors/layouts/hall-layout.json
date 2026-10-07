@@ -1,0 +1,210 @@
+{
+  "page": "hall",
+  "viewportReference": {
+    "width": 1600,
+    "height": 1000
+  },
+  "panels": {
+    "left": {
+      "visible": true,
+      "width": 220
+    },
+    "right": {
+      "visible": false,
+      "width": 260
+    }
+  },
+  "grid": {
+    "columns": 12,
+    "snap": true
+  },
+  "tiles": [
+    {
+      "id": "HALL-01",
+      "component": "HallHero",
+      "zone": "stage",
+      "x": 0,
+      "y": 0,
+      "w": 12,
+      "h": 2,
+      "order": null,
+      "visible": false
+    },
+    {
+      "id": "HALL-02",
+      "component": "HallHeader[scope]",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "HALL-03",
+      "component": "HallHeader[window]",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 2,
+      "visible": true
+    },
+    {
+      "id": "HALL-04",
+      "component": "HallHeader[class]",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 3,
+      "visible": true
+    },
+    {
+      "id": "HALL-05",
+      "component": "HallHeader[platform]",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 4,
+      "visible": true
+    },
+    {
+      "id": "HALL-06",
+      "component": "RecordTicker",
+      "zone": "stage",
+      "x": 0,
+      "y": 0,
+      "w": 12,
+      "h": 2,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-07",
+      "component": "placeholder:featured-record",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 3,
+      "visible": true
+    },
+    {
+      "id": "HALL-08",
+      "component": "MetricTopTen",
+      "zone": "stage",
+      "x": 0,
+      "y": 2,
+      "w": 4,
+      "h": 9,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-09",
+      "component": "MetricTopTen",
+      "zone": "stage",
+      "x": 4,
+      "y": 2,
+      "w": 4,
+      "h": 9,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-10",
+      "component": "MetricTopTen",
+      "zone": "stage",
+      "x": 8,
+      "y": 2,
+      "w": 4,
+      "h": 9,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-11",
+      "component": "MetricTopTen",
+      "zone": "stage",
+      "x": 0,
+      "y": 11,
+      "w": 4,
+      "h": 9,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-12",
+      "component": "MetricTopTen",
+      "zone": "stage",
+      "x": 4,
+      "y": 11,
+      "w": 4,
+      "h": 9,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-13",
+      "component": "MetricTopTen",
+      "zone": "stage",
+      "x": 8,
+      "y": 11,
+      "w": 4,
+      "h": 9,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "HALL-14",
+      "component": "placeholder:selected-record",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 0,
+      "visible": true
+    },
+    {
+      "id": "HALL-15",
+      "component": "placeholder:holder-mini",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "HALL-16",
+      "component": "placeholder:record-actions",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 2,
+      "visible": true
+    },
+    {
+      "id": "HALL-17",
+      "component": "placeholder:hall-rules",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 0,
+      "visible": true
+    }
+  ]
+}
