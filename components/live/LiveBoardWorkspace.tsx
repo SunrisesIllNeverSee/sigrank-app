@@ -209,28 +209,39 @@ function MedalDeck({
         {slide.name.toUpperCase()} MEDALS
         <span className="mut"> · top 3</span>
       </div>
-      {slide.list.slice(0, 3).map((o) => {
-        const k = ops.indexOf(o);
-        return (
-          <button
-            key={o.codename}
-            type="button"
-            className="hst-r"
-            onClick={() => onSelect?.(k)}
-          >
-            <span className="mav">
-              {o.avatarUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={o.avatarUrl} alt="" loading="lazy" />
-              ) : (
-                o.name[0]
-              )}
-            </span>
-            <span className="tm">{o.name}</span>
-            <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
-          </button>
-        );
-      })}
+      {/* owner: "three profiles horizontal, similar to compare" —
+          compare-slot-style cards in a row per page. */}
+      <div className="podrow">
+        {slide.list.slice(0, 3).map((o) => {
+          const k = ops.indexOf(o);
+          return (
+            <button
+              key={o.codename}
+              type="button"
+              className="podcard"
+              onClick={() => onSelect?.(k)}
+            >
+              <span className="mav">
+                {o.avatarUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={o.avatarUrl} alt="" loading="lazy" />
+                ) : (
+                  o.name[0]
+                )}
+              </span>
+              <span className="tm">{o.name}</span>
+              <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
+            </button>
+          );
+        })}
+        {Array.from({ length: 3 - Math.min(3, slide.list.length) }).map(
+          (_, i) => (
+            <div className="podcard empty" key={i}>
+              —
+            </div>
+          ),
+        )}
+      </div>
       {!slide.list.length && (
         <p className="drill-note">— NO {slide.name.toUpperCase()} HOLDERS</p>
       )}
