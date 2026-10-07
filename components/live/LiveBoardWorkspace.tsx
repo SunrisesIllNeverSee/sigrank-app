@@ -946,36 +946,45 @@ export function LiveBoardWorkspace({
            = who holds the most gold/silver/bronze trophies). The tally
            counts record entries per operator in the hall feed — position
            medal colors (gold/silver/bronze) mark the standing. */
-        const tally = new Map<number, number>();
-        hall.forEach((h) => {
-          if (h.opIndex != null && h.opIndex >= 0)
-            tally.set(h.opIndex, (tally.get(h.opIndex) ?? 0) + 1);
-        });
-        const podium = [...tally.entries()]
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 4);
+        /* owner 2026-10-06: medal count = top-3 gold / silver / bronze
+           holders — not a flat tally. The hall feed carries record
+           winners only (no runner-up data), so the brackets ride field
+           standing: 🥇 ≥99th pct, 🥈 95–99th, 🥉 90–95th. */
+        const byPct = [...ops].sort((a, b) => (b.pct ?? 0) - (a.pct ?? 0));
+        const medals = [
+          { name: "gold", list: byPct.filter((o) => (o.pct ?? 0) >= 99) },
+          {
+            name: "silver",
+            list: byPct.filter((o) => (o.pct ?? 0) >= 95 && (o.pct ?? 0) < 99),
+          },
+          {
+            name: "bronze",
+            list: byPct.filter((o) => (o.pct ?? 0) >= 90 && (o.pct ?? 0) < 95),
+          },
+        ];
         return (
           <>
             <HallSpot rows={hall} onSelect={handleSelect} />
             <div className="soon-h">MEDAL COUNT</div>
-            {podium.length ? (
-              podium.map(([k, n], i) => (
-                <button
-                  key={k}
-                  type="button"
-                  className="hst-r"
-                  onClick={() => handleSelect(k)}
-                >
-                  <Medal i={i} />
-                  <span className="tm">{ops[k]?.name ?? "—"}</span>
-                  <span className="tv mono">
-                    {n} record{n === 1 ? "" : "s"}
-                  </span>
-                </button>
-              ))
-            ) : (
-              <p className="drill-note">— NO RECORDS IN SCOPE</p>
-            )}
+            {medals.map((m, mi) => (
+              <div key={m.name}>
+                {m.list.slice(0, 3).map((o) => {
+                  const k = ops.indexOf(o);
+                  return (
+                    <button
+                      key={o.codename}
+                      type="button"
+                      className="hst-r"
+                      onClick={() => handleSelect(k)}
+                    >
+                      <Medal i={mi} />
+                      <span className="tm">{o.name}</span>
+                      <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </>
         );
       }
