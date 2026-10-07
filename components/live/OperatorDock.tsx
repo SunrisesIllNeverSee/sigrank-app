@@ -112,16 +112,17 @@ export function RadarChart({
   const R = size * 0.36;
   const N = vals.length;
   const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-  /* owner 2026-10-06: data polygons were drawn to the outer ring edge —
-     scale series to 0.88 of R so they float inside the grid (rings/spokes
-     keep full radius). */
+  /* owner 2026-10-07: the reference radar (compare page) uses solid faint
+     grid rings, vertex dots, and opposing blue/green fills — and data
+     scaled to 0.85R so even the field leader's polygon keeps a shape
+     instead of pinning to the rim. */
   const pt = (i: number, r: number): readonly [number, number] => {
     const a = -Math.PI / 2 + (i * 2 * Math.PI) / N;
     return [cx + Math.cos(a) * r * R, cy + Math.sin(a) * r * R];
   };
   const poly = (rr: number) => vals.map((_, i) => pt(i, rr).join(",")).join(" ");
   const ptsFor = (vs: readonly number[]) =>
-    vs.map((v, i) => pt(i, clamp01(v) * 0.88).join(",")).join(" ");
+    vs.map((v, i) => pt(i, clamp01(v) * 0.85).join(",")).join(" ");
   /* positional align: pad/truncate the baseline to the operator axis count */
   const base = baseline
     ? vals.map((_, i) => clamp01(baseline.vals[i] ?? 0))
@@ -137,7 +138,7 @@ export function RadarChart({
           fill="none"
           stroke="var(--line2)"
           strokeWidth={1}
-          strokeDasharray="2 3"
+          strokeOpacity={0.55}
         />
       ))}
       {vals.map((_, i) => {
@@ -171,9 +172,9 @@ export function RadarChart({
             strokeLinejoin="round"
           />
           {base.map((v, i) => {
-            const [x, y] = pt(i, v * 0.88);
+            const [x, y] = pt(i, v * 0.85);
             return (
-              <circle key={i} cx={x} cy={y} r={2} fill="var(--magenta)" />
+              <circle key={i} cx={x} cy={y} r={2} fill="var(--blue)" />
             );
           })}
         </>
@@ -186,7 +187,7 @@ export function RadarChart({
         strokeLinejoin="round"
       />
       {vals.map((v, i) => {
-        const [x, y] = pt(i, clamp01(v) * 0.88);
+        const [x, y] = pt(i, clamp01(v) * 0.85);
         return <circle key={i} cx={x} cy={y} r={2.6} fill="var(--ac)" />;
       })}
     </svg>
@@ -206,48 +207,43 @@ export function SharePreview({
   const pct = Math.max(0.1, +((d.rank / pop) * 100).toFixed(1));
   const slug = encodeURIComponent(d.op?.slug ?? d.codename);
   return (
-    <div className="shareprev">
-      {/* owner 2026-10-06: the snapshot ships as TWO cards — one
-          graphics-only (mark + TOP%), one stats (rank + key numbers). */}
-      <div className="sharepair">
-        <div className="sharecard gfx">
+    /* owner 2026-10-07 (ref screenshot): copy + CTA on the left, ONE
+       bordered mini-card on the right — mark + VERIFIED chip, big TOP%
+       headline, hex-ring motif, RANK #n / pop. */
+    <div className="shareprev split">
+      <div className="sharecopy">
+        <div className="sh-t">SHARE YOUR SIGNAL</div>
+        <p className="sh-d">Create your verified leaderboard card.</p>
+        <a className="btn ghost" href={`/s/${slug}`}>
+          Generate Share Card
+        </a>
+      </div>
+      <div className="minicard">
+        <div className="mc-top">
           <Image
-            className="sharemark"
+            className="sharemark sm"
             src="/live/signalaf-mark.png"
             alt="SignalAF mark"
             width={66}
             height={60}
             unoptimized
           />
-          <div className="big">
-            TOP <em>{pct}%</em>
-          </div>
-          <div className="mono mut" style={{ fontSize: 8.5 }}>
-            OF AI OPERATORS
-          </div>
+          <span className="mc-verif">⌘ VERIFIED</span>
         </div>
-        <div className="sharecard stats">
-          <div className="mono mut" style={{ fontSize: 8.5 }}>
-            SIGNAL RANK
-          </div>
-          <div className="rk mono">#{d.rank}</div>
-          <div className="mono mut" style={{ fontSize: 8.5 }}>
-            / {pop.toLocaleString()} · {population.tag}
-          </div>
-          <div className="mono" style={{ fontSize: 9.5, marginTop: 6 }}>
-            {d.name}
-          </div>
-          <div className="mono mut" style={{ fontSize: 8.5 }}>
-            Υ {d.y} · {d.handle}
-          </div>
+        <div className="big">
+          TOP <em>{pct}%</em>
+        </div>
+        <div className="mono mut" style={{ fontSize: 8.5 }}>
+          OF AI OPERATORS
+        </div>
+        <div className="mc-hex" aria-hidden="true">
+          ⬡
+        </div>
+        <div className="mc-rank mono">
+          <span className="mut">RANK</span> #{d.rank}
+          <span className="mut"> / {pop.toLocaleString()}</span>
         </div>
       </div>
-      {/* gallery TODO (owner): GENERATE should open the shares page —
-          one card surface per platform badge (github/x/li/fb/email);
-          /s/<codename> stays the single canonical card for now. */}
-      <a className="btn ghost" href={`/s/${slug}`}>
-        GENERATE SHARE CARD
-      </a>
     </div>
   );
 }
