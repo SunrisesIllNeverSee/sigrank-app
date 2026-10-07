@@ -13,12 +13,23 @@ import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 import { HallSubmissionRow } from "./HallSubmissionRow";
 
 interface Props {
-  /** Canonical metric id — token-era 'Y.xx' / raw 'T.xx' (live) or legacy 'M/C/E.xx'. */
+  /** Canonical metric id — token-era 'Y.xx' / raw 'T.xx' (live) or legacy 'M/C/E.xx'.
+   *  Non-canon pseudo-keys (e.g. "throughput") are allowed when `name`/`ticker`
+   *  overrides are supplied — the values still resolve via recordValue. */
   canonId: string;
   /** Rows already sorted by this metric (descending), top of the board first. */
   rows: LeaderboardRow[];
   /** Max rows to render (default 10 — the "top ten"). */
   limit?: number;
+  /** Heading override for non-canon boards (e.g. Token Throughput). */
+  name?: string;
+  /** Sub-label override for non-canon boards. */
+  ticker?: string;
+  /** Workspace mode — row click selects the record for the right inspector.
+   *  The profile link inside the row still navigates normally. */
+  onSelect?: (row: LeaderboardRow, canonId: string) => void;
+  /** operator_id of the currently selected row (workspace selection ring). */
+  selectedId?: string | null;
 }
 
 /** Canonical display lookup so RAW (T.xx) headings resolve name/ticker too. */
@@ -35,13 +46,22 @@ const DISPLAY_BY_ID = Object.fromEntries(
  * verified, real row (isPlaceholder === false), in which case the value gets a
  * real canonical-id superscript.
  */
-export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
+export function MetricTopTen({
+  canonId,
+  rows,
+  limit = 10,
+  name: nameProp,
+  ticker: tickerProp,
+  onSelect,
+  selectedId,
+}: Props) {
   // Token-era (Y.xx) resolves from TOKEN_METRICS; legacy ids from METRICS.
   const def = TOKEN_METRICS[canonId] ?? METRICS[canonId];
   // Heading name/ticker prefer the canonical display set (covers RAW T.xx too),
   // falling back to the TOKEN_METRICS/METRICS def, then the raw id.
-  const name = DISPLAY_BY_ID[canonId]?.name ?? def?.name ?? canonId;
-  const ticker = DISPLAY_BY_ID[canonId]?.ticker ?? def?.ticker ?? canonId;
+  const name = nameProp ?? DISPLAY_BY_ID[canonId]?.name ?? def?.name ?? canonId;
+  const ticker =
+    tickerProp ?? DISPLAY_BY_ID[canonId]?.ticker ?? def?.ticker ?? canonId;
   // Retired operators (opt-out): exclude from Hall of Signal top-ten highlights.
   const top = rows.filter((r) => r.operator.status !== "retired").slice(0, limit);
 
@@ -62,9 +82,8 @@ export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
           top.map((row, i) => {
             const display = recordValue(row, canonId);
             const real = row.operator.isPlaceholder === false;
-            return (
+            const submission = (
               <HallSubmissionRow
-                key={row.operator.operator_id}
                 rank={i + 1}
                 codename={row.operator.codename}
                 displayName={row.operator.display_name}
@@ -80,6 +99,29 @@ export function MetricTopTen({ canonId, rows, limit = 10 }: Props) {
                 href={real ? `/user/${row.operator.codename}` : undefined}
                 outlier={isOutlierRow(row)}
               />
+            );
+            if (!onSelect) {
+              return <React.Fragment key={row.operator.operator_id}>{submission}</React.Fragment>;
+            }
+            return (
+              <div
+                key={row.operator.operator_id}
+                role="button"
+                tabIndex={0}
+                className={
+                  "ws-rowpick" +
+                  (selectedId === row.operator.operator_id ? " on" : "")
+                }
+                onClick={() => onSelect(row, canonId)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelect(row, canonId);
+                  }
+                }}
+              >
+                {submission}
+              </div>
             );
           })
         )}
