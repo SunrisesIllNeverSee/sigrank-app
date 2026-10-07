@@ -10,6 +10,15 @@
   const PANEL_DEF = { left: 220, right: 260 };
 
   /* ---------------- state ---------------- */
+  const defTiles = () =>
+    E.tiles.map((t) => ({
+      id: t.id,
+      component: t.component,
+      zone: t.zone,
+      x: t.x ?? 0, y: t.y ?? 0, w: t.w ?? 4, h: t.h ?? 3,
+      order: t.order ?? null, visible: t.visible !== false,
+    }));
+
   const def = () => ({
     page: E.page,
     viewportReference: { width: 1600, height: 1000 },
@@ -18,23 +27,56 @@
       right: { visible: true, width: PANEL_DEF.right },
     },
     grid: { columns: 12, snap: true, show: false },
-    tiles: E.tiles.map((t) => ({
-      id: t.id, component: t.component, zone: t.zone,
-      x: t.x ?? 0, y: t.y ?? 0, w: t.w ?? 4, h: t.h ?? 3,
-      order: t.order ?? null, visible: t.visible !== false,
-    })),
+    tiles: defTiles(),
     preset: "custom",
   });
+
+  /* Merge a preset over defaults. Preset tile entries carry only the
+     fields they override — they merge BY ID onto the default tile so
+     `component` and untouched geometry survive (review #1/#3). */
+  function applyPreset(p, name) {
+    const base = def();
+    if (p.panels) {
+      for (const k of ["left", "right"])
+        if (p.panels[k]) base.panels[k] = { ...base.panels[k], ...p.panels[k] };
+    }
+    if (p.grid) base.grid = { ...base.grid, ...p.grid };
+    if (Array.isArray(p.tiles)) {
+      for (const pt of p.tiles) {
+        const t = base.tiles.find((x) => x.id === pt.id);
+        if (t) Object.assign(t, pt);
+      }
+    }
+    base.preset = name;
+    return base;
+  }
+
   let S = load() || def();
   let sel = null;
 
   function load() {
-    try { const s = JSON.parse(localStorage.getItem(LS_KEY)); return s && s.page === E.page ? s : null; }
-    catch { return null; }
+    try {
+      const s = JSON.parse(localStorage.getItem(LS_KEY));
+      // guard against poisoned/partial state (review #1: a prior bug could
+      // persist tiles:null — treat unreadable shapes as absent)
+      if (!s || s.page !== E.page || !Array.isArray(s.tiles)) return null;
+      // ensure every tile carries component + sane numbers
+      for (const t of s.tiles) {
+        const d = E.tiles.find((x) => x.id === t.id);
+        if (d) t.component = t.component || d.component;
+        for (const k of ["x", "y", "w", "h", "order"]) {
+          if (t[k] != null && !Number.isFinite(t[k])) t[k] = d ? d[k] ?? 0 : 0;
+        }
+        t.visible = t.visible !== false;
+      }
+      return s;
+    } catch { return null; }
   }
   const save = () => localStorage.setItem(LS_KEY, JSON.stringify(S));
   const tile = (id) => S.tiles.find((t) => t.id === id);
   const tileDef = (id) => E.tiles.find((t) => t.id === id) || {};
+  const clamp = (v, a, b) =>
+    Number.isFinite(v) ? Math.max(a, Math.min(b, v)) : a;
 
   /* ---------------- dom scaffold ---------------- */
   document.body.innerHTML = `
@@ -61,9 +103,13 @@
         <button id="save">SAVE LAYOUT</button>
         <button id="reset">RESET</button>
         <button id="export">EXPORT JSON</button>
+        <button id="download">DOWNLOAD</button>
       </div>
       <div class="grp">
         <button id="mode">PREVIEW MODE</button>
+      </div>
+      <div class="grp" id="hidden-grp" style="display:none">
+        <label>HIDDEN</label><span id="hidden-list" style="display:flex;gap:4px"></span>
       </div>
     </div>
     <div class="fcols">
@@ -97,14 +143,66 @@
   const $ = (s) => document.querySelector(s);
   const stage = $("#stage"), pbL = $("#pb-left"), pbR = $("#pb-right"),
         pL = $("#p-left"), pR = $("#p-right"), insp = $("#insp");
-
-  /* ---------------- grid math ---------------- */
   const colW = () => stage.clientWidth / S.grid.columns;
   const snap = (v, u) => (S.grid.snap ? Math.round(v / u) : v / u);
+  const preview = () => document.body.classList.contains("preview");
+
+  /* keep every stage tile inside the visible canvas (review #6) */
+  function normalize() {
+    for (const t of S.tiles) {
+      if (t.zone !== "stage") continue;
+      t.w = clamp(t.w, 1, S.grid.columns);
+      t.x = clamp(t.x, 0, Math.max(0, S.grid.columns - t.w));
+      t.y = Math.max(0, t.y ?? 0);
+      t.h = Math.max(1, t.h ?? 1);
+    }
+  }
+
+  /* ---------------- drag state — ONE pair of window listeners ----------------
+     Review #2: listeners live at top level, registered once. Active
+     gesture tracked in `gesture`; nodes update live without re-render. */
+  let gesture = null; // { kind:"tile"|"resize"|"panel", id, node, ... }
+  window.addEventListener("mousemove", (e) => {
+    if (!gesture) return;
+    if (gesture.kind === "tile") {
+      const t = tile(gesture.id), n = gesture.node;
+      if (!t || !n) return;
+      t.x = clamp(snap((e.clientX - gesture.ox) / colW(), 1), 0, S.grid.columns - t.w);
+      t.y = Math.max(0, snap((e.clientY - gesture.oy) / ROWH, 1));
+      n.style.left = t.x * colW() + "px";
+      n.style.top = t.y * ROWH + "px";
+    } else if (gesture.kind === "resize") {
+      const t = tile(gesture.id), n = gesture.node;
+      if (!t || !n) return;
+      t.w = clamp(snap(gesture.sw + (e.clientX - gesture.cx) / colW(), 1), 1, S.grid.columns - t.x);
+      t.h = Math.max(1, snap(gesture.sh + (e.clientY - gesture.cy) / ROWH, 1));
+      n.style.width = t.w * colW() + "px";
+      n.style.height = t.h * ROWH + "px";
+    } else if (gesture.kind === "panel") {
+      const dx = gesture.p === "left" ? e.clientX - gesture.start : gesture.start - e.clientX;
+      S.panels[gesture.p].width = clamp(gesture.w0 + dx, 120, 480);
+      render(); // panel width readout updates live — cheap (no listeners added)
+    }
+  });
+  window.addEventListener("mouseup", () => {
+    if (!gesture) return;
+    if (gesture.edge) gesture.edge.classList.remove("drag");
+    const wasPanel = gesture.kind === "panel";
+    gesture = null;
+    if (!wasPanel) { markDirty(); save(); render(); }
+    else { save(); }
+  });
+
+  function markDirty() {
+    /* review #4: any user edit marks the layout custom so the preset
+       confirm guard fires and the footer label stays honest */
+    if (S.preset !== "custom") S.preset = "custom";
+  }
+  const commit = () => { markDirty(); save(); render(); };
 
   /* ---------------- render ---------------- */
   function render() {
-    // panels
+    normalize();
     pL.classList.toggle("closed", !S.panels.left.visible);
     pR.classList.toggle("closed", !S.panels.right.visible);
     pL.style.width = S.panels.left.width + "px";
@@ -118,22 +216,38 @@
     $("#grid-snap").classList.toggle("on", S.grid.snap);
     $("#grid-snap").textContent = S.grid.snap ? "snap ✓" : "snap";
     $("#grid-cols").value = String(S.grid.columns);
-    $("#sgrid").style.backgroundSize =
-      `${colW()}px ${ROWH}px, ${colW()}px ${ROWH}px`;
+    $("#sgrid").style.backgroundSize = `${colW()}px ${ROWH}px, ${colW()}px ${ROWH}px`;
     $("#foot-info").textContent =
-      `${S.tiles.filter(t=>t.zone==="stage"&&t.visible).length} stage tiles · ` +
+      `${S.tiles.filter((t) => t.zone === "stage" && t.visible).length} stage tiles · ` +
       `${S.grid.columns} col · ${S.preset}`;
 
-    // sidebar modules
+    /* hidden-tile recovery rail (review #5) */
+    const hidden = S.tiles.filter((t) => !t.visible);
+    const hg = $("#hidden-grp");
+    if (hidden.length) {
+      hg.style.display = "flex";
+      const hl = $("#hidden-list");
+      hl.innerHTML = "";
+      hidden.forEach((t) => {
+        const b = document.createElement("button");
+        b.textContent = t.id;
+        b.title = "show " + t.id;
+        b.onclick = () => { t.visible = true; sel = t.id; commit(); };
+        hl.appendChild(b);
+      });
+    } else hg.style.display = "none";
+
+    /* sidebar modules */
     for (const [zone, el] of [["left", pbL], ["right", pbR]]) {
       el.innerHTML = "";
       const mods = S.tiles.filter((t) => t.zone === zone)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      // normalize order to sequential indices (fixes duplicate orders)
+      mods.forEach((m, i) => (m.order = i));
       mods.forEach((t, i) => {
         const d = tileDef(t.id);
         const m = document.createElement("div");
         m.className = "mod" + (t.visible ? "" : " hidden") + (sel === t.id ? " sel" : "");
-        m.dataset.id = t.id;
         m.innerHTML = `<div class="mod-h" draggable="true">${d.name || t.id}
           <span class="tag">${t.id}</span>
           <span class="mod-tools">
@@ -145,12 +259,16 @@
         el.appendChild(m);
         m.addEventListener("click", (e) => {
           const a = e.target.closest("button")?.dataset.a;
-          select(t.id, zone);
+          sel = t.id;
+          insp.classList.add("show");
+          renderInsp();
+          m.classList.add("sel");
           if (a === "up") reorder(zone, i, -1);
           if (a === "down") reorder(zone, i, +1);
           if (a === "vis") { t.visible = !t.visible; commit(); }
         });
         m.querySelector(".mod-h").addEventListener("dragstart", (e) => {
+          if (preview()) return e.preventDefault();
           e.dataTransfer.setData("text/mod-id", t.id);
         });
       });
@@ -159,11 +277,27 @@
         e.preventDefault();
         const id = e.dataTransfer.getData("text/mod-id");
         const t = tile(id);
-        if (t) { t.zone = zone; t.order = el.children.length; commit(); }
+        if (t) { t.zone = zone; t.order = mods.length; commit(); }
       };
     }
 
-    // stage tiles
+    /* stage accepts drops from either panel or the inspector (review §sugg) */
+    stage.ondragover = (e) => e.preventDefault();
+    stage.ondrop = (e) => {
+      e.preventDefault();
+      if (preview()) return;
+      const id = e.dataTransfer.getData("text/mod-id");
+      const t = tile(id);
+      if (!t) return;
+      const r = stage.getBoundingClientRect();
+      t.zone = "stage";
+      t.x = clamp(snap((e.clientX - r.left) / colW(), 1), 0, S.grid.columns - (t.w || 4));
+      t.y = Math.max(0, snap((e.clientY - r.top) / ROWH, 1));
+      t.order = null;
+      commit();
+    };
+
+    /* stage tiles */
     stage.querySelectorAll(".tile").forEach((n) => n.remove());
     S.tiles.filter((t) => t.zone === "stage" && t.visible).forEach((t) => {
       const d = tileDef(t.id);
@@ -174,57 +308,47 @@
       n.style.top = t.y * ROWH + "px";
       n.style.width = t.w * colW() + "px";
       n.style.height = t.h * ROWH + "px";
-      n.innerHTML = `<div class="tile-h" draggable="true">${d.name || t.id}
+      n.innerHTML = `<div class="tile-h">${d.name || t.id}
         <span class="tag">${t.id}</span></div>
         <div class="tile-b">${d.body || ""}</div>
-        <div class="tile-tools">
-          <button data-a="vis" title="hide">✕</button>
-        </div>
+        <div class="tile-tools"><button data-a="vis" title="hide">✕</button></div>
         <div class="rz"></div>`;
       stage.appendChild(n);
 
       const h = n.querySelector(".tile-h");
-      let drag = null;
       h.addEventListener("mousedown", (e) => {
-        drag = { ox: e.clientX - n.offsetLeft, oy: e.clientY - n.offsetTop };
-        select(t.id, "stage");
+        if (preview()) return; /* review §sugg: no layout mutation in preview */
+        sel = t.id;
+        insp.classList.add("show");
+        n.classList.add("sel");
+        renderInsp(); // inspector only — NO re-render, the node stays live
+        gesture = { kind: "tile", id: t.id, node: n,
+                    ox: e.clientX - n.offsetLeft, oy: e.clientY - n.offsetTop };
       });
-      window.addEventListener("mousemove", (e) => {
-        if (!drag) return;
-        t.x = clamp(snap((e.clientX - drag.ox) / colW(), 1), 0, S.grid.columns - t.w);
-        t.y = Math.max(0, snap((e.clientY - drag.oy) / ROWH, 1));
-        n.style.left = t.x * colW() + "px";
-        n.style.top = t.y * ROWH + "px";
+      h.addEventListener("dragstart", (e) => {
+        if (preview()) return e.preventDefault();
+        e.dataTransfer.setData("text/mod-id", t.id);
       });
-      window.addEventListener("mouseup", () => { if (drag) { drag = null; commit(); } });
 
       const rz = n.querySelector(".rz");
-      let rsz = null;
       rz.addEventListener("mousedown", (e) => {
+        if (preview()) return;
         e.stopPropagation();
-        rsz = { sw: t.w, sh: t.h, cx: e.clientX, cy: e.clientY };
-        select(t.id, "stage");
+        sel = t.id;
+        renderInsp();
+        gesture = { kind: "resize", id: t.id, node: n,
+                    sw: t.w, sh: t.h, cx: e.clientX, cy: e.clientY };
       });
-      window.addEventListener("mousemove", (e) => {
-        if (!rsz) return;
-        t.w = clamp(snap(rsz.sw + (e.clientX - rsz.cx) / colW(), 1), 1, S.grid.columns - t.x);
-        t.h = Math.max(1, snap(rsz.sh + (e.clientY - rsz.cy) / ROWH, 1));
-        n.style.width = t.w * colW() + "px";
-        n.style.height = t.h * ROWH + "px";
-      });
-      window.addEventListener("mouseup", () => { if (rsz) { rsz = null; commit(); } });
 
       n.addEventListener("click", (e) => {
-        select(t.id, "stage");
+        sel = t.id;
+        insp.classList.add("show");
+        renderInsp();
         if (e.target.dataset.a === "vis") { t.visible = false; commit(); }
       });
-      h.addEventListener("dragstart", (e) =>
-        e.dataTransfer.setData("text/mod-id", t.id));
     });
     renderInsp();
   }
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const commit = () => { S.preset = S.preset || "custom"; save(); render(); };
 
   function reorder(zone, i, dir) {
     const mods = S.tiles.filter((t) => t.zone === zone)
@@ -236,7 +360,6 @@
   }
 
   /* ---------------- inspector ---------------- */
-  function select(id, zone) { sel = id; insp.classList.add("show"); render(); }
   function renderInsp() {
     const t = sel && tile(sel);
     if (!t) { insp.classList.remove("show"); return; }
@@ -270,16 +393,16 @@
 
     $("#i-zone").onchange = (e) => {
       t.zone = e.target.value;
-      if (z !== "stage" && t.zone === "stage") { t.x = 1; t.y = 0; }
+      if (z !== "stage" && t.zone === "stage") { t.x = 0; t.y = 0; t.order = null; }
       if (t.zone !== "stage") t.order = 99;
       commit();
     };
     $("#i-vis").onchange = (e) => { t.visible = e.target.value === "1"; commit(); };
     if (z === "stage") {
       $("#i-x").onchange = (e) => { t.x = clamp(+e.target.value, 0, S.grid.columns - t.w); commit(); };
-      $("#i-y").onchange = (e) => { t.y = Math.max(0, +e.target.value); commit(); };
+      $("#i-y").onchange = (e) => { t.y = Math.max(0, +e.target.value || 0); commit(); };
       $("#i-w").onchange = (e) => { t.w = clamp(+e.target.value, 1, S.grid.columns - t.x); commit(); };
-      $("#i-h").onchange = (e) => { t.h = Math.max(1, +e.target.value); commit(); };
+      $("#i-h").onchange = (e) => { t.h = Math.max(1, +e.target.value || 1); commit(); };
       $("#insp-b").onclick = (e) => {
         const mv = e.target.dataset.mv, rz = e.target.dataset.rz;
         if (mv === "l") t.x = Math.max(0, t.x - 1);
@@ -293,7 +416,7 @@
         if (mv || rz) commit();
       };
     } else {
-      $("#i-o").onchange = (e) => { t.order = +e.target.value; commit(); };
+      $("#i-o").onchange = (e) => { t.order = Math.max(0, +e.target.value || 0); commit(); };
       $("#insp-b").onclick = (e) => {
         const mods = S.tiles.filter((m) => m.zone === z)
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -322,21 +445,14 @@
   $("#grid-cols").onchange = (e) => { S.grid.columns = +e.target.value; commit(); };
   $("#mode").onclick = () => {
     document.body.classList.toggle("preview");
-    $("#mode").textContent = document.body.classList.contains("preview")
-      ? "EDIT MODE" : "PREVIEW MODE";
+    sel = null; insp.classList.remove("show");
+    $("#mode").textContent = preview() ? "EDIT MODE" : "PREVIEW MODE";
     $("#mode").classList.toggle("on");
   };
   $("#save").onclick = () => { save(); flash("saved"); };
   $("#reset").onclick = () => {
-    if (confirm("Reset layout to defaults?")) { S = def(); commit(); }
+    if (confirm("Reset layout to defaults?")) { S = def(); sel = null; save(); render(); }
   };
-  $("#export").onclick = () => {
-    const j = JSON.stringify(exportShape(), null, 2);
-    const w = window.open("", "_blank", "width=760,height=560");
-    w.document.write(`<title>${E.page} layout</title><pre style="font:12px monospace;background:#0a0f08;color:#e9f3df;padding:16px">${j.replace(/</g,"&lt;")}</pre>`);
-    navigator.clipboard?.writeText(j).then(() => flash("json copied"));
-  };
-  $("#insp-x").onclick = () => { sel = null; insp.classList.remove("show"); };
 
   function exportShape() {
     return {
@@ -356,7 +472,26 @@
     };
   }
 
-  /* presets */
+  $("#export").onclick = () => {
+    const j = JSON.stringify(exportShape(), null, 2);
+    const w = window.open("", "_blank", "width=760,height=560");
+    if (w) w.document.write(
+      `<title>${E.page} layout</title><pre style="font:12px monospace;background:#0a0f08;color:#e9f3df;padding:16px">${j.replace(/</g, "&lt;")}</pre>`);
+    navigator.clipboard?.writeText(j).then(
+      () => flash("json copied"), () => flash("json shown"));
+  };
+  $("#download").onclick = () => {
+    const j = JSON.stringify(exportShape(), null, 2);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([j], { type: "application/json" }));
+    a.download = `${E.page}-layout.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    flash("downloaded");
+  };
+  $("#insp-x").onclick = () => { sel = null; insp.classList.remove("show"); };
+
+  /* presets — merge over defaults, confirm over dirty layouts */
   const selp = $("#preset");
   for (const k of Object.keys(E.presets)) {
     const o = document.createElement("option");
@@ -366,12 +501,14 @@
   selp.onchange = (e) => {
     const p = E.presets[e.target.value];
     if (!p) return;
-    if (S.preset !== "custom" ||
-        confirm(`Apply preset "${e.target.value}"? Custom layout is kept in storage but replaced here.`)) {
-      S = JSON.parse(JSON.stringify({ ...def(), ...p }));
-      S.preset = e.target.value;
-      commit();
-    } else selp.value = "";
+    if (S.preset === "custom" &&
+        !confirm(`Apply preset "${e.target.value.replace(/_/g, " ")}"? Your current layout will be replaced.`)) {
+      selp.value = "";
+      return;
+    }
+    S = applyPreset(p, e.target.value);
+    sel = null;
+    save(); render();
   };
 
   /* panel edge resize */
@@ -379,27 +516,17 @@
     ed.addEventListener("mousedown", (e) => {
       const p = ed.dataset.p;
       ed.classList.add("drag");
-      const start = e.clientX, w0 = S.panels[p].width;
-      const mm = (e2) => {
-        const dx = p === "left" ? e2.clientX - start : start - e2.clientX;
-        S.panels[p].width = clamp(w0 + dx, 120, 480);
-        render();
-      };
-      const up = () => {
-        ed.classList.remove("drag");
-        window.removeEventListener("mousemove", mm);
-        window.removeEventListener("mouseup", up);
-        commit();
-      };
-      window.addEventListener("mousemove", mm);
-      window.addEventListener("mouseup", up);
+      gesture = { kind: "panel", p, start: e.clientX,
+                  w0: S.panels[p].width, edge: ed };
     });
   });
 
   const flash = (m) => { $("#foot-info").textContent = m; setTimeout(render, 900); };
   window.addEventListener("resize", render);
   stage.addEventListener("mousedown", (e) => {
-    if (e.target === stage || e.target.id === "sgrid") { sel = null; insp.classList.remove("show"); }
+    if (e.target === stage || e.target.id === "sgrid") {
+      sel = null; insp.classList.remove("show");
+    }
   });
 
   render();

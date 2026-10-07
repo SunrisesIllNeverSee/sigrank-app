@@ -33,7 +33,7 @@ button,input,select{font-family:var(--mono);font-size:inherit}
 .rail .ric small{font-size:7px;letter-spacing:.06em}
 
 /* ---- panels ---- */
-.panel{display:flex;flex-direction:column;background:var(--panel);
+.panel{display:flex;flex-direction:column;background:var(--panel);flex:none;
   position:relative;min-width:120px;max-width:480px}
 .panel.left{border-right:1px solid var(--line)}
 .panel.right{border-left:1px solid var(--line)}

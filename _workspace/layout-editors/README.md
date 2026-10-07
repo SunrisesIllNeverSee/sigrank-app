@@ -27,13 +27,13 @@ Designed for 1600×1000; usable at 1440×900.
 | panel edge (hover) | drag to resize; numeric width shown; `reset` restores 220/260 |
 | GRID | `overlay` toggle · 8/12/16 columns · `snap` toggle |
 | Stage tiles | drag header to move · corner handle to resize · `✕` hides |
-| Sidebar modules | ↑/↓ reorder · `◉/◌` hide/show · drag onto other panel or stage |
+| Sidebar modules | ↑/↓ reorder · `◉/◌` hide/show · drag onto other panel or stage (drop target live) |
 | Click a tile/module | opens the inspector (zone · x/y · w/h · visible · arrows · nudge buttons · reset tile) |
 | PRESET | `CURRENT FLOW` (production order) / `WORKSPACE COMPACT` |
 | SAVE LAYOUT | persists to `localStorage` (`layout-editor:<page>`) |
 | RESET | back to defaults (confirms first) |
-| EXPORT JSON | opens + copies the layout contract JSON |
-| PREVIEW MODE | hides handles/grid/buttons for clean screenshots |
+| EXPORT JSON | opens + copies the layout contract JSON · DOWNLOAD saves the file |
+| PREVIEW MODE | hides handles/grid/buttons; drag/resize are inert |
 
 ## Export format
 
@@ -78,6 +78,8 @@ element, not a movable tile), `JsonLd`, `TrackCompareView`, `WaveHero`
 
 - No production files touched — everything lives under `_workspace/`.
 - No APIs, no backend — `localStorage` only.
+- Hidden tiles are recoverable via the `HIDDEN` rail in the toolbar.
+- Grid-column changes clamp out-of-range tiles back into the canvas.
 - Profile editor not built yet; the framework (`editor.js` + page-level
   `window.EDITOR` registry) supports adding `profile.html` with a tile
   list + presets.
