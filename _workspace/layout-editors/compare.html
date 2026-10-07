@@ -1,0 +1,99 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><title>Compare — Layout Editor</title>
+<link rel="stylesheet" href="editor.css">
+</head><body>
+<script>
+/* Compare page tile inventory — production: app/compare/page.tsx.
+   Order on the long page today: ChallengeBar/OnX → WaveHero →
+   CompareAgainstMe → CompareMatchup → CompareRadars → CompareHistoryChart
+   → CompareLedger → CompareShareCard → DeferredCompareMatchupCard → links. */
+const radar = `<svg viewBox="0 0 100 100" style="width:90px;margin:2px auto;display:block">
+  <polygon points="50,8 90,38 74,86 26,86 10,38" fill="none" stroke="var(--line2)"/>
+  <polygon points="50,24 74,42 66,74 34,74 26,42" fill="none" stroke="var(--line2)"/>
+  <polygon points="50,14 82,40 70,80 30,80 16,44" fill="rgba(59,130,246,.18)" stroke="var(--blue)"/>
+  <polygon points="50,22 78,52 62,82 28,74 20,36" fill="rgba(166,255,0,.16)" stroke="var(--ac)"/></svg>`;
+const chart = `<svg viewBox="0 0 200 44" style="width:100%;display:block">
+  <polyline points="0,34 20,30 40,32 60,24 80,26 100,18 120,22 140,14 160,18 180,10 200,12"
+    fill="none" stroke="var(--ac)" stroke-width="1.5"/>
+  <polyline points="0,36 20,36 40,34 60,35 80,33 100,34 120,30 140,32 160,30 180,31 200,29"
+    fill="none" stroke="var(--mut)" stroke-dasharray="3 3"/></svg>`;
+const rows = (n, v) => `<div class="rows">${Array.from({length:n},(_,i)=>
+  `<i><span class="n">operator ${i+1}</span><span class="v">${v||"00.0"}</span></i>`).join("")}</div>`;
+
+window.EDITOR = {
+  page: "compare",
+  tiles: [
+    { id:"CMP-01", component:"CompareAgainstMe+selectors", name:"MATCHUP CONTROLS",
+      body:`<div class="pills"><b class="on">MO§ES™</b><b>vs</b><b class="on">takuma.saito</b></div>
+        <span class="sk w60"></span><span class="sk w40"></span>`,
+      zone:"stage", x:0, y:0, w:12, h:2 },
+    { id:"CMP-02", component:"CompareMatchup", name:"COMPARE MATCHUP",
+      body:`<div class="pills"><b class="on">A 570</b><b>VS</b><b class="on">B 559</b><b>LEADS 6-4</b></div>
+        <span class="sk"></span><span class="sk w80"></span>`,
+      zone:"stage", x:0, y:2, w:12, h:3 },
+    { id:"CMP-03", component:"CompareRadars[raw]", name:"RAW SHAPE RADAR",
+      body:radar+`<div class="ctr mut" style="font-size:8px">raw shape · ghost+solid</div>`,
+      zone:"stage", x:0, y:5, w:6, h:4 },
+    { id:"CMP-04", component:"CompareRadars[metric]", name:"METRIC RADAR",
+      body:radar+`<div class="ctr mut" style="font-size:8px">metric shape · ghost+solid</div>`,
+      zone:"stage", x:6, y:5, w:6, h:4 },
+    { id:"CMP-05", component:"CompareHistoryChart", name:"HISTORY / TRAJECTORY",
+      body:chart+`<div class="mut" style="font-size:8px">Υ yield · overtime · field avg</div>`,
+      zone:"stage", x:0, y:9, w:12, h:3 },
+    { id:"CMP-06", component:"CompareLedger", name:"COMPARE LEDGER",
+      body:rows(6)+`<div class="mut" style="font-size:8px">RAW / METRICS / TOTAL</div>`,
+      zone:"stage", x:0, y:12, w:8, h:5 },
+    { id:"CMP-07", component:"CompareShareCard", name:"SHARE CARD",
+      body:`<div class="ctr"><span class="sk ac w60" style="margin:6px auto"></span>
+        <span class="sk w40" style="margin:4px auto"></span>
+        <div class="mut" style="font-size:8px">signalaf.com/compare?a=…&b=…</div></div>`,
+      zone:"stage", x:8, y:12, w:4, h:3 },
+    { id:"CMP-08", component:"DeferredCompareMatchupCard", name:"MATCHUP SHARE ARTIFACT",
+      body:`<div class="ctr mut">1200×630 matchup card<br>(deferred render)</div>`,
+      zone:"stage", x:8, y:15, w:4, h:2 },
+    { id:"CMP-09", component:"ChallengeBar", name:"CHALLENGE BAR",
+      body:`<div class="pills"><b class="on">⚔ challenge</b><b>rules</b><b>pinned</b></div>`,
+      zone:"stage", x:0, y:17, w:12, h:2 },
+    { id:"CMP-10", component:"ChallengeOnX", name:"CHALLENGE ON X",
+      body:`<span class="mut">post the challenge to X →</span>`,
+      zone:"stage", x:0, y:19, w:12, h:2 },
+    { id:"CMP-11", component:"placeholder:operator-a-mini", name:"OPERATOR A MINI",
+      body:`<span class="sk ac w60"></span>`+rows(3), zone:"left", order:0 },
+    { id:"CMP-12", component:"placeholder:operator-b-mini", name:"OPERATOR B MINI",
+      body:`<span class="sk w60"></span>`+rows(3), zone:"right", order:0 },
+    { id:"CMP-13", component:"placeholder:matchup-summary", name:"MATCHUP SUMMARY / DELTAS",
+      body:rows(4,"+Δ"), zone:"right", order:1 },
+    { id:"CMP-14", component:"placeholder:metric-context", name:"METRIC CONTEXT",
+      body:`<span class="mut">what each cascade metric means →</span>`,
+      zone:"right", order:2 },
+  ],
+  presets: {
+    current_flow: {
+      /* mirrors the long production page: everything stacked in stage */
+      tiles: null /* uses defaults above — stacked stage list */,
+    },
+    workspace_compact: {
+      panels: { left:{visible:true,width:200}, right:{visible:true,width:260} },
+      tiles: [
+        { id:"CMP-01", zone:"left", order:1, visible:true },
+        { id:"CMP-11", zone:"left", order:0, visible:true },
+        { id:"CMP-12", zone:"right", order:0, visible:true },
+        { id:"CMP-13", zone:"right", order:1, visible:true },
+        { id:"CMP-14", zone:"right", order:2, visible:true },
+        { id:"CMP-02", zone:"stage", x:0, y:0, w:8, h:3, visible:true },
+        { id:"CMP-03", zone:"stage", x:8, y:0, w:4, h:5, visible:true },
+        { id:"CMP-04", zone:"stage", x:8, y:5, w:4, h:5, visible:true },
+        { id:"CMP-05", zone:"stage", x:0, y:3, w:8, h:3, visible:true },
+        { id:"CMP-06", zone:"stage", x:0, y:6, w:8, h:4, visible:true },
+        { id:"CMP-07", zone:"right", order:3, visible:true },
+        { id:"CMP-08", zone:"right", order:4, visible:true },
+        { id:"CMP-09", zone:"stage", x:0, y:10, w:12, h:2, visible:true },
+        { id:"CMP-10", zone:"right", order:5, visible:true },
+      ],
+    },
+  },
+};
+</script>
+<script src="editor.js"></script>
+</body></html>

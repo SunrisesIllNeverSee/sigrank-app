@@ -1,0 +1,157 @@
+/* layout-editors — mid-fidelity workspace chrome matching the live board */
+:root{
+  --bg:#0a0f08; --bg2:#0d1309; --panel:#0e150a; --line:#1d2918; --line2:#26361c;
+  --tx:#e9f3df; --tx2:#b9cbb0; --mut:#71826a;
+  --ac:#a6ff00; --ac-soft:#1d2b00; --ac-tx:#0a1000;
+  --blue:#3b82f6; --magenta:#ff4fd8;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size:12px;
+  overflow:hidden;height:100vh}
+button,input,select{font-family:var(--mono);font-size:inherit}
+
+/* ---- frame ---- */
+.frame{display:flex;flex-direction:column;height:100vh}
+.fhead{display:flex;border-bottom:1px solid var(--line);height:34px;flex-shrink:0}
+.fhead .ch{flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:11px;letter-spacing:.28em;color:var(--tx2)}
+.fhead .ch b{color:var(--ac);font-weight:600}
+.fcols{display:flex;flex:1;min-height:0}
+.ffoot{display:flex;align-items:center;gap:14px;height:26px;flex-shrink:0;
+  border-top:1px solid var(--line);padding:0 12px;font-size:9px;
+  letter-spacing:.12em;color:var(--mut)}
+
+/* ---- icon rail ---- */
+.rail{width:46px;flex-shrink:0;border-right:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:6px}
+.rail .ric{width:30px;height:30px;display:grid;place-items:center;border-radius:6px;
+  color:var(--mut);border:1px solid transparent;font-size:13px}
+.rail .ric.on{color:var(--ac);border-color:var(--line2);background:var(--panel)}
+.rail .ric:hover{color:var(--tx)}
+.rail .sp{flex:1}
+.rail .ric small{font-size:7px;letter-spacing:.06em}
+
+/* ---- panels ---- */
+.panel{display:flex;flex-direction:column;background:var(--panel);
+  position:relative;min-width:120px;max-width:480px}
+.panel.left{border-right:1px solid var(--line)}
+.panel.right{border-left:1px solid var(--line)}
+.panel.closed{display:none}
+.panel-head{height:26px;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid var(--line);font-size:8.5px;letter-spacing:.24em;
+  color:var(--tx2);flex-shrink:0}
+.panel-body{flex:1;overflow-y:auto;padding:8px}
+.edge{position:absolute;top:0;bottom:0;width:5px;cursor:col-resize;z-index:5}
+.panel.left .edge{right:-3px}
+.panel.right .edge{left:-3px}
+.edge:hover,.edge.drag{background:color-mix(in srgb,var(--ac) 40%,transparent)}
+
+/* sidebar modules (tiles in panels) */
+.mod{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;
+  background:var(--bg2);overflow:hidden}
+.mod.sel{outline:2px solid var(--ac);outline-offset:-2px}
+.mod-h{display:flex;align-items:center;gap:6px;padding:6px 8px;
+  font-size:8.5px;letter-spacing:.14em;color:var(--tx2);
+  border-bottom:1px dashed var(--line);cursor:grab;user-select:none}
+.mod-h::before{content:"■";color:var(--ac);font-size:7px}
+.mod-h .tag{margin-left:auto;font-size:7.5px;color:var(--mut)}
+.mod-b{padding:8px;font-size:9.5px;color:var(--tx2);line-height:1.7}
+.mod.hidden .mod-b{display:none}
+.mod.hidden .mod-h{opacity:.45}
+.mod-tools{display:flex;gap:4px;margin-left:auto}
+.mod-tools button{width:15px;height:15px;border:1px solid var(--line2);
+  background:transparent;color:var(--mut);border-radius:3px;font-size:9px;
+  cursor:pointer;padding:0;line-height:1}
+.mod-tools button:hover{color:var(--ac);border-color:var(--ac)}
+
+/* ---- stage ---- */
+.stage{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+.stage-grid{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),
+    linear-gradient(to bottom,var(--line) 1px,transparent 1px);
+  opacity:.5;display:none}
+.stage.grid-on .stage-grid{display:block}
+.tile{position:absolute;border:1px solid var(--line2);border-radius:8px;
+  background:var(--panel);overflow:hidden;display:flex;flex-direction:column;
+  min-width:60px;min-height:40px}
+.tile.sel{outline:2px solid var(--ac);outline-offset:-1px;z-index:4}
+.tile.hidden{display:none}
+.tile-h{height:20px;display:flex;align-items:center;gap:6px;padding:0 8px;
+  font-size:8px;letter-spacing:.14em;color:var(--tx2);
+  border-bottom:1px dashed var(--line);cursor:grab;flex-shrink:0;user-select:none}
+.tile-h::before{content:"■";color:var(--ac);font-size:6px}
+.tile-h .tag{margin-left:auto;font-size:7px;color:var(--mut)}
+.tile-b{flex:1;padding:8px;font-size:9.5px;color:var(--tx2);
+  overflow:hidden;line-height:1.6}
+.tile .rz{position:absolute;right:0;bottom:0;width:14px;height:14px;
+  cursor:nwse-resize;z-index:5}
+.tile .rz::after{content:"";position:absolute;right:2px;bottom:2px;
+  width:7px;height:7px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut)}
+.tile.sel .rz::after{border-color:var(--ac)}
+.tile-tools{display:none;position:absolute;top:2px;right:4px;gap:3px;z-index:6}
+.tile.sel .tile-tools{display:flex}
+.tile-tools button{width:14px;height:14px;border:1px solid var(--line2);
+  background:var(--panel);color:var(--mut);border-radius:3px;font-size:8px;
+  cursor:pointer;padding:0;line-height:1}
+.tile-tools button:hover{color:var(--ac);border-color:var(--ac)}
+
+/* ---- toolbar ---- */
+.toolbar{display:flex;align-items:center;gap:8px;padding:5px 12px;
+  border-bottom:1px solid var(--line);background:var(--bg2);flex-shrink:0;
+  font-size:9px;letter-spacing:.1em;flex-wrap:wrap}
+.toolbar .grp{display:flex;align-items:center;gap:4px;
+  padding:0 10px;border-right:1px solid var(--line)}
+.toolbar .grp:last-child{border-right:none}
+.toolbar label{color:var(--mut)}
+.toolbar button,.toolbar select{border:1px solid var(--line2);background:var(--panel);
+  color:var(--tx2);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:9px;
+  letter-spacing:.08em}
+.toolbar button:hover,.toolbar select:hover{color:var(--ac);border-color:var(--ac)}
+.toolbar button.on{color:var(--ac);border-color:var(--ac);background:var(--ac-soft)}
+.toolbar .val{color:var(--ac);min-width:40px}
+
+/* ---- inspector (selected tile controls) ---- */
+.insp{position:absolute;right:8px;top:8px;z-index:10;width:230px;
+  border:1px solid var(--line2);border-radius:9px;background:var(--panel);
+  box-shadow:0 8px 24px #0008;display:none}
+.insp.show{display:block}
+.insp-h{display:flex;align-items:center;padding:7px 10px;
+  border-bottom:1px solid var(--line);font-size:9px;letter-spacing:.16em;
+  color:var(--tx2)}
+.insp-h button{margin-left:auto;background:none;border:none;color:var(--mut);
+  cursor:pointer;font-size:11px}
+.insp-b{padding:8px 10px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.insp-b .row{display:flex;flex-direction:column;gap:3px}
+.insp-b label{font-size:7.5px;letter-spacing:.12em;color:var(--mut)}
+.insp-b input,.insp-b select{border:1px solid var(--line2);background:var(--bg);
+  color:var(--tx);border-radius:4px;padding:3px 6px;font-size:10px;width:100%}
+.insp-b .full{grid-column:1/-1}
+.insp-b .btnrow{display:flex;gap:4px;flex-wrap:wrap;grid-column:1/-1}
+.insp-b .btnrow button{flex:1;border:1px solid var(--line2);background:var(--bg);
+  color:var(--tx2);border-radius:4px;padding:3px 4px;font-size:8.5px;
+  cursor:pointer;letter-spacing:.06em}
+.insp-b .btnrow button:hover{color:var(--ac);border-color:var(--ac)}
+
+/* ---- preview mode: hide edit chrome ---- */
+body.preview .tile-tools,body.preview .tile .rz,body.preview .mod-tools,
+body.preview .stage-grid,body.preview .insp,body.preview .edge{display:none}
+body.preview .tile-h{cursor:default}
+body.preview .tile.sel,body.preview .mod.sel{outline:none}
+
+/* ---- representative tile bodies (mid-fi) ---- */
+.sk{display:block;height:8px;border-radius:3px;background:var(--line2);margin:4px 0}
+.sk.ac{background:color-mix(in srgb,var(--ac) 60%,transparent)}
+.sk.w40{width:40%}.sk.w60{width:60%}.sk.w80{width:80%}
+.rows i{display:flex;justify-content:space-between;padding:3px 0;
+  border-bottom:1px solid var(--line);font-style:normal;font-size:8.5px}
+.rows i:last-child{border-bottom:none}
+.rows .n{color:var(--tx)}
+.rows .v{color:var(--ac)}
+.hbig{font-size:16px;font-weight:700;color:var(--tx);letter-spacing:.02em}
+.mut{color:var(--mut)} .ac{color:var(--ac)}
+.pills{display:flex;gap:4px;flex-wrap:wrap}
+.pills b{border:1px solid var(--line2);border-radius:4px;padding:2px 6px;
+  font-size:8px;color:var(--tx2);font-weight:400}
+.pills b.on{color:var(--ac);border-color:var(--ac)}
+.ctr{text-align:center}
