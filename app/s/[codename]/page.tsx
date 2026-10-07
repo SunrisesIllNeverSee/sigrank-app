@@ -39,6 +39,7 @@ import {
 import { decodeCodename } from "@/lib/route-params";
 import { SITE_ORIGIN, withOG } from "@/lib/seo";
 import { signalCardData } from "@/components/share/OperatorSignalCard";
+import { ProfileShareCard } from "@/components/share/ProfileShareCard";
 
 // ISR: share surfaces re-render at most once/hour per codename (see header).
 export const revalidate = 3600;
@@ -156,6 +157,8 @@ export default async function ShareOperatorPage({
   const xShare = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`${d.name} — ${d.rankLine}`)}`;
   const fbShare = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   const mailShare = `mailto:?subject=${encodeURIComponent(`${d.name} — SigRank signal`)}&body=${encodeURIComponent(shareUrl)}`;
+  const rankMatch = d.rankLine.match(/#([\d,]+)/);
+  const rankNum = rankMatch ? parseInt(rankMatch[1].replace(/,/g, ""), 10) : null;
   const ghEmbed = `[![${d.name} — SigRank signal](${SITE_ORIGIN}${sPath}/card.png)](${shareUrl})`;
 
   return (
@@ -176,52 +179,62 @@ export default async function ShareOperatorPage({
         className="h-auto w-full rounded-[14px] border border-bg-border"
       />
 
-      {/* --- Card set (owner 2026-10-06): three distinct designs -------
-          1 FLAGSHIP — the PNG card above (the og:image bytes)
-          2 STATS — numbers-only card
-          3 GRAPHIC — mark + percentile headline
-          A fourth slot is the platform gate: it unlocks when an account
-          is connected (per-platform badge cards are the planned family —
-          docs/LIVE_BOARD_BADGE_INDEX.md). */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-[14px] border border-bg-border bg-bg-surface p-4">
-          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
-            Card 01 — Stats
-          </p>
-          <p className="mt-2 font-mono text-lg font-semibold text-text-primary">
-            {d.name}
-          </p>
-          <p className="mt-1 font-mono text-[11px] leading-relaxed text-text-secondary">
-            {d.rankLine}
-            <br />
-            {d.classTier}
-            {d.archetype ? ` · ${d.archetype}` : ""}
-          </p>
-        </div>
-        <div className="rounded-[14px] border border-gold/30 bg-bg-surface p-4">
-          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
-            Card 02 — Graphic
-          </p>
-          <img
-            src="/live/signalaf-mark.png"
-            alt=""
-            width={40}
-            height={36}
-            className="mt-2 [image-rendering:pixelated]"
+      {/* --- Card set (owner 2026-10-07: use the REAL designed cards) ---
+          1 FLAGSHIP — the OG card.png above (what socials unfurl)
+          2 OUTREACH — /api/outreach-card PNG (gold/black + hall medals)
+          3 INTERACTIVE — ProfileShareCard: share / preview / download
+          4 CONNECTED — platform badge cards gate on a linked account */}
+      <div className="mt-8">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          Card 02 · Outreach — GitHub issues / DMs
+        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element --
+            API-rendered PNG card; shows exactly the bytes it serves */}
+        <img
+          src={`/api/outreach-card/${encodeURIComponent(row.operator.codename)}`}
+          width={1200}
+          height={630}
+          alt={`${d.name} — SigRank outreach card`}
+          className="mt-2 h-auto w-full rounded-[14px] border border-bg-border"
+        />
+      </div>
+
+      <div className="mt-6 rounded-[14px] border border-bg-border bg-bg-surface p-4">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          Card 03 · Interactive — copy link / preview / download PNG
+        </p>
+        <div className="mt-3">
+          <ProfileShareCard
+            codename={row.operator.codename}
+            name={d.name}
+            handle={d.handleOrPlatform}
+            signalClass={d.classTier}
+            rank={rankNum}
+            topPct={d.topPct}
+            metrics={d.rows.slice(0, 3).map((r) => ({
+              label: r.label,
+              value: r.value,
+              share:
+                r.spark && r.spark.length > 1
+                  ? Math.min(
+                      1,
+                      (r.spark[r.spark.length - 1] ?? 0) /
+                        Math.max(...r.spark, 1),
+                    )
+                  : 0.5,
+            }))}
           />
-          <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-secondary">
-            The mark + percentile headline variant — same card.png backing.
-          </p>
         </div>
-        <div className="rounded-[14px] border border-dashed border-bg-border p-4 opacity-70">
-          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
-            Card 03 — Platform badge · connected
-          </p>
-          <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-secondary">
-            GitHub / X / LinkedIn / Facebook / email badge cards unlock when
-            a platform account is connected.
-          </p>
-        </div>
+      </div>
+
+      <div className="mt-4 rounded-[14px] border border-dashed border-bg-border p-4 opacity-70">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          Card 04 · Platform badges — connect an account to unlock
+        </p>
+        <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-secondary">
+          GitHub / X / LinkedIn / Facebook / email badge cards render here
+          once a platform account is linked.
+        </p>
       </div>
 
       {/* Platform share targets — one row per surface. GitHub gets the

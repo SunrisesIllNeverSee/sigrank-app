@@ -980,3 +980,34 @@
   letter-spacing:.14em;color:var(--tx2);padding:2px 2px 8px;
   border-bottom:1px dashed var(--line2);margin-bottom:6px}
 .lbw-root .mbox{padding:8px 10px}
+
+/* --- pass 3d (owner refs) --- */
+/* share module — copy left, mini verified card right (ref shot) */
+.lbw-root .shareprev.split{display:flex;gap:12px;align-items:stretch}
+.lbw-root .sharecopy{flex:1;min-width:0;display:flex;flex-direction:column;
+  justify-content:center;gap:6px}
+.lbw-root .sh-t{font-family:var(--font-disp);font-size:13px;font-weight:700;
+  color:var(--tx);letter-spacing:.04em}
+.lbw-root .sh-d{font-size:10.5px;color:var(--tx2);margin:0}
+.lbw-root .minicard{width:150px;flex-shrink:0;border:1px solid var(--line2);
+  border-radius:10px;background:var(--bg);padding:10px;text-align:center}
+.lbw-root .mc-top{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:6px}
+.lbw-root .sharemark.sm{height:18px;width:auto}
+.lbw-root .mc-verif{font-family:var(--font-mono);font-size:8px;
+  letter-spacing:.14em;color:var(--ac);border:1px solid var(--ac);
+  border-radius:4px;padding:2px 5px}
+.lbw-root .mc-hex{color:var(--line2);font-size:16px;line-height:1;margin:4px 0}
+.lbw-root .mc-rank{font-size:10px;color:var(--tx2)}
+/* hex medal cards (ref: hall medallion cards) */
+.lbw-root .awards.cards{display:flex;gap:14px;justify-content:center}
+.lbw-root .hxcard{display:flex;flex-direction:column;align-items:center;gap:2px}
+.lbw-root .hxcard .award{width:44px;height:49px;font-size:18px;margin:0}
+.lbw-root .hx-n{font-family:var(--font-mono);font-size:9.5px;color:var(--tx);
+  letter-spacing:.06em;margin-top:4px}
+.lbw-root .hx-v{font-family:var(--font-mono);font-size:8px;color:var(--ac);
+  letter-spacing:.14em}
+/* overtime sparkline box */
+.lbw-root .trendbox{border:1px solid var(--line);border-radius:9px;
+  padding:10px;margin-bottom:8px}
+.lbw-root .trendbox svg{display:block;width:100%;height:auto}

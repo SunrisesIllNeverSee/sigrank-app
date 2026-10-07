@@ -235,6 +235,71 @@ function MedalDeck({
   );
 }
 
+/* Small overtime area chart — operator yield series + dashed field
+   median line (compare-page "YIELD · OVERTIME" language). */
+function TrendSpark({
+  series,
+  ops,
+}: {
+  series: number[];
+  ops: LiveOperator[];
+}) {
+  const W = 220;
+  const H = 56;
+  const P = 4;
+  const max = Math.max(...series, 1);
+  const min = Math.min(...series, 0);
+  const span = Math.max(max - min, 1e-6);
+  const px = (i: number) => P + (i / Math.max(series.length - 1, 1)) * (W - P * 2);
+  const py = (v: number) => H - P - ((v - min) / span) * (H - P * 2);
+  const pts = series.map((v, i) => `${px(i).toFixed(1)},${py(v).toFixed(1)}`);
+  /* field median of each op's latest trend point → the dashed avg line */
+  const latests = ops
+    .map((o) => o.trend?.[o.trend.length - 1])
+    .filter((v): v is number => v != null)
+    .sort((a, b) => a - b);
+  const med = latests.length ? latests[Math.floor(latests.length / 2)] : null;
+  const medY = med != null ? py(med) : null;
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden>
+      <polyline
+        points={`${px(0)},${H} ${pts.join(" ")} ${px(series.length - 1)},${H}`}
+        fill="color-mix(in srgb, var(--ac) 18%, transparent)"
+        stroke="none"
+      />
+      <polyline
+        points={pts.join(" ")}
+        fill="none"
+        stroke="var(--ac)"
+        strokeWidth={1.6}
+      />
+      {medY != null && (
+        <line
+          x1={P}
+          y1={medY}
+          x2={W - P}
+          y2={medY}
+          stroke="var(--mut)"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
+      )}
+      {medY != null && (
+        <text
+          x={W - P}
+          y={medY - 3}
+          textAnchor="end"
+          fill="var(--mut)"
+          fontSize={8}
+          fontFamily="var(--font-mono)"
+        >
+          field avg
+        </text>
+      )}
+    </svg>
+  );
+}
+
 function HotStats({ stats }: { stats: FieldStat[] }) {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -914,6 +979,15 @@ export function LiveBoardWorkspace({
                   size={170}
                 />
               </div>
+              {/* YIELD · OVERTIME sparkline (owner: "more over-time
+                  sparkline charts... a chart that showed multiple
+                  items") — operator trend line + dashed field median. */}
+              {(selOp?.trend?.length ?? 0) > 1 && (
+                <div className="trendbox">
+                  <div className="awbox-h">Υ YIELD · OVERTIME</div>
+                  <TrendSpark series={selOp!.trend} ops={ops} />
+                </div>
+              )}
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
                   {(selOp!.recs ?? []).slice(0, 3).map((r) => (
@@ -1081,24 +1155,36 @@ export function LiveBoardWorkspace({
                   <span className="mut"> · {(awSlide % 3) + 1}/3</span>
                 </div>
                 {awSlide % 3 === 0 && (
-                  <div className="awards big">
-                    <span className="award hex-gold" title="signal class">
-                      {selOp?.klass?.[0] ?? "—"}
-                    </span>
+                  /* owner ref (hall medal cards): hex medallion with ★ +
+                     a caption strip under it — name + value, lime. */
+                  <div className="awards cards">
+                    <div className="hxcard">
+                      <span className="award hex-gold">★</span>
+                      <span className="hx-n">{selOp?.klass ?? "—"}</span>
+                      <span className="hx-v">CLASS</span>
+                    </div>
                     {(selOp?.pct ?? 0) >= 99 && (
-                      <span className="award hex-violet" title="top 1% legend">
-                        Υ
-                      </span>
+                      <div className="hxcard">
+                        <span className="award hex-violet">★</span>
+                        <span className="hx-n">TOP 1%</span>
+                        <span className="hx-v">LEGEND</span>
+                      </div>
                     )}
                     {(selOp?.age ?? 0) >= 100 && (
-                      <span className="award hex-cyan" title="100 days consistent">
-                        ◆
-                      </span>
+                      <div className="hxcard">
+                        <span className="award hex-cyan">★</span>
+                        <span className="hx-n">100 DAYS</span>
+                        <span className="hx-v">STREAK</span>
+                      </div>
                     )}
                     {(selOp?.recs ?? []).length > 0 && (
-                      <span className="award hex-ac" title="record holder">
-                        ★
-                      </span>
+                      <div className="hxcard">
+                        <span className="award hex-ac">★</span>
+                        <span className="hx-n">
+                          ×{(selOp?.recs ?? []).length}
+                        </span>
+                        <span className="hx-v">RECORDS</span>
+                      </div>
                     )}
                   </div>
                 )}
