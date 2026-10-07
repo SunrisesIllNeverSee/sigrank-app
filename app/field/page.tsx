@@ -122,20 +122,17 @@ export default async function FieldPage() {
       <WorkspaceShell
         active="field"
         title="FIELD ANALYSIS"
-        leftTitle="DATASET"
+        leftTitle="FIELD"
         left={
           <>
             <div className="mod">
-              <div className="mini-h"><span className="sq"></span>THE FIELD</div>
-              <div className="ws-kv">
-                <div className="row"><span className="k">analyzed</span><span className="v acc">{meta.operators_included.toLocaleString()}</span></div>
-                <div className="row"><span className="k">collected</span><span className="v">{meta.total_scraped.toLocaleString()}</span></div>
-                <div className="row"><span className="k">outliers</span><span className="v">{meta.outliers}</span></div>
-                <div className="row"><span className="k">ghost ranks</span><span className="v">{ghost_ranks.length}</span></div>
-                <div className="row"><span className="k">median Υ</span><span className="v acc">{meta.medians.yield.toFixed(2)}</span></div>
-                <div className="row"><span className="k">median SNR</span><span className="v">{meta.medians.snr.toFixed(3)}</span></div>
-                <div className="row"><span className="k">median LEV</span><span className="v">{meta.medians.leverage.toFixed(1)}×</span></div>
-              </div>
+              <div className="mini-h"><span className="sq"></span>RESEARCH</div>
+              <nav className="ws-nav">
+                <Link href="/fieldhub">Field Hub</Link>
+                <Link href="/field">Field Analysis</Link>
+                <Link href="/research">State of the Index</Link>
+                <Link href="/blog">Articles</Link>
+              </nav>
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SECTIONS</div>
@@ -159,6 +156,18 @@ export default async function FieldPage() {
         rightTitle="CITATION"
         right={
           <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>THE FIELD</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">analyzed</span><span className="v acc">{meta.operators_included.toLocaleString()}</span></div>
+                <div className="row"><span className="k">collected</span><span className="v">{meta.total_scraped.toLocaleString()}</span></div>
+                <div className="row"><span className="k">outliers</span><span className="v">{meta.outliers}</span></div>
+                <div className="row"><span className="k">ghost ranks</span><span className="v">{ghost_ranks.length}</span></div>
+                <div className="row"><span className="k">median Υ</span><span className="v acc">{meta.medians.yield.toFixed(2)}</span></div>
+                <div className="row"><span className="k">median SNR</span><span className="v">{meta.medians.snr.toFixed(3)}</span></div>
+                <div className="row"><span className="k">median LEV</span><span className="v">{meta.medians.leverage.toFixed(1)}×</span></div>
+              </div>
+            </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>DATASET</div>
               <div className="ws-kv">
