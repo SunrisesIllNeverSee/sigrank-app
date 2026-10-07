@@ -27,6 +27,14 @@ bump its `ver` and record the delta here; patterns live in
 - Versioning: pattern changes bump `ver` in this table + a comment at
   `BADGES` in `PixelBadge.tsx`. Palette swaps ride the theme vars and
   don't need a version bump.
+- **Awarding semantics (owner 2026-10-06)**: badges mark *continuous
+  increase* — sustained growth in stats — not one-time thresholds. The
+  percentile tiers already track current standing; a dedicated
+  "rising-streak" badge family is the next version (v2 candidates:
+  consecutive positive weeks, compounding yield trend).
+- **Awards vs badges**: awards are the hexagon medallions (class, Top 1%,
+  100-day, record-holder) rendered in the profile AWARDS row — milestone
+  hardware, not stat badges. v2 figures out the full award tree.
 
 ## Platform badge family (planned — owner note)
 

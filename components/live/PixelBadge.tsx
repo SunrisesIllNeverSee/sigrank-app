@@ -63,7 +63,10 @@ export function PixelBadge({ name }: { name: PixelBadgeName }) {
 }
 
 /** Rank percentile → badge (pct is "percentile" 0–100, higher = better). */
-export function badgeForPct(pct: number): PixelBadgeName | null {
+export function badgeForPct(
+  pct: number | null | undefined,
+): PixelBadgeName | null {
+  if (pct == null) return null;
   if (pct >= 99) return "top1";
   if (pct >= 95) return "top5";
   if (pct >= 90) return "top10";

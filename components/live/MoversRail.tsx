@@ -21,7 +21,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import type { LiveOperator, MoverEntry } from "@/lib/board/live-types";
-import { deriveMovers, isVerifiedOp } from "./utils";
+import { deriveMovers, isVerifiedOp, numvOf } from "./utils";
 import { PixelBadge } from "./PixelBadge";
 
 export interface MoverRow {
@@ -39,6 +39,9 @@ export interface MoverRow {
   avatarUrl?: string | null;
   /** verified flag for the avatar-corner block badge. */
   verified?: boolean;
+  /** optional right-side note — raw stat modes (e.g. token counts) render
+      this instead of the Δ rank chip. */
+  note?: string;
 }
 
 /** Resolve server-provided movers, else derive client-side from the field. */
@@ -150,7 +153,9 @@ export function MoversRail({
    AGENTIC — instead of pinning a static 7d list. 24H derives client-side
    from ops' mv24 (server ships mv7 only); workflow facets filter the
    resolved mover rows through ops' wf. ---------- */
-const MOVER_MODES = ["7D · ALL", "24H · ALL", "7D · HITL", "7D · AGENTIC"] as const;
+/* owner 2026-10-06: five rows per slide + a raw-tokens mode —
+   "even random stats like highest tokens... add raw token counts". */
+const MOVER_MODES = ["7D · ALL", "24H · ALL", "7D · HITL", "7D · AGENTIC", "Σ TOKENS"] as const;
 
 export function RotatingMovers({
   ops,
@@ -172,6 +177,22 @@ export function RotatingMovers({
   const mode = MOVER_MODES[mi];
 
   const rows = useMemo<MoverRow[]>(() => {
+    if (mode === "Σ TOKENS") {
+      return ops
+        .map((o, i) => ({ o, i }))
+        .filter((x) => numvOf(x.o.total) > 0)
+        .sort((a, b) => numvOf(b.o.total) - numvOf(a.o.total))
+        .slice(0, 5)
+        .map((x) => ({
+          name: x.o.handle || x.o.name,
+          codename: x.o.codename,
+          mv: 0,
+          opIndex: x.i,
+          avatarUrl: x.o.avatarUrl ?? null,
+          verified: isVerifiedOp(x.o.verif),
+          note: x.o.total,
+        }));
+    }
     if (mode === "24H · ALL") {
       return ops
         .map((o, i) => ({ o, i }))
@@ -179,7 +200,7 @@ export function RotatingMovers({
         .sort(
           (a, b) => Math.abs(b.o.mv24 ?? 0) - Math.abs(a.o.mv24 ?? 0),
         )
-        .slice(0, 4)
+        .slice(0, 5)
         .map((x) => ({
           name: x.o.handle || x.o.name,
           codename: x.o.codename,
@@ -195,7 +216,7 @@ export function RotatingMovers({
     const out = wf
       ? base.filter((r) => r.opIndex != null && ops[r.opIndex]?.wf === wf)
       : base;
-    return out.slice(0, 4);
+    return out.slice(0, 5);
   }, [mode, ops, server]);
 
   return (
@@ -207,7 +228,7 @@ export function RotatingMovers({
       <MoversRail
         rows={rows}
         onSelect={onSelect}
-        tag={mode.startsWith("24H") ? "24h" : "7d"}
+        tag={mode === "Σ TOKENS" ? "Σ" : mode.startsWith("24H") ? "24h" : "7d"}
       />
     </>
   );
