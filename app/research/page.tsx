@@ -10,7 +10,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, sigrankDataset, researchArticle, faqPage } from "@/lib/jsonld";
 import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
@@ -174,22 +173,6 @@ export default function StateOfTheIndexPage() {
         date={SNAPSHOT_DATE}
         slug="/research"
         doi={ZENODO_VERSION_DOI}
-      />
-
-      <WaveHero
-        eyebrow="📊 SigRank Index"
-        terminalText="THE DATA-STATE"
-        title="State of the Index"
-        subtitle={
-          <>
-            The primary anonymized seed dataset —{" "}
-            {operatorCount.toLocaleString("en-US")} operators across{" "}
-            {platformCount} platforms and {DATASET.modelCount.toLocaleString("en-US")} models.{" "}
-            {fmt(totalTokens)} total tokens. Available on Zenodo at DOI{" "}
-            <span className="text-gold">10.5281/zenodo.21900519</span>. Data as
-            of {SNAPSHOT_DATE}.
-          </>
-        }
       />
 
       {/* ── Table of contents ───────────────────────────────────────── */}
