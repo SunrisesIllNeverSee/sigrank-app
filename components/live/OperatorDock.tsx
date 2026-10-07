@@ -172,7 +172,9 @@ export function RadarChart({
           />
           {base.map((v, i) => {
             const [x, y] = pt(i, v * 0.88);
-            return <circle key={i} cx={x} cy={y} r={2} fill="var(--cyan)" />;
+            return (
+              <circle key={i} cx={x} cy={y} r={2} fill="var(--magenta)" />
+            );
           })}
         </>
       )}

@@ -900,3 +900,32 @@
 /* themes inside the settings popover */
 .lbw-root .acctpop .themesw{display:flex;gap:6px;padding:4px 0 8px}
 .lbw-root .acctpop .sw{width:16px;height:16px}
+
+/* --- pass 3b (owner annotations) --- */
+/* SIGNAL WIRE — news/welcome lines */
+.lbw-root .wire{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+.lbw-root .wire-line{font-family:var(--font-mono);font-size:9.5px;
+  letter-spacing:.04em;color:var(--tx2);margin:0}
+.lbw-root .wire-line b{color:var(--tx);font-weight:600}
+/* FIELD NOTES — prose stats box ("its own text box") */
+.lbw-root .notes{border:1px dashed var(--line2);border-radius:7px;
+  padding:8px 10px;margin-bottom:4px}
+.lbw-root .notes-t{font-family:var(--font-mono);font-size:9.5px;
+  line-height:1.6;letter-spacing:.03em;color:var(--tx2);margin:0}
+/* AWARDS — hexagon medallions (pack §I milestone set) */
+.lbw-root .awards{display:flex;gap:8px;margin:2px 0 8px}
+.lbw-root .award{width:30px;height:33px;display:grid;place-items:center;
+  font-size:13px;font-weight:700;
+  clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
+.lbw-root .hex-gold{background:color-mix(in srgb,#e8b93c 22%,transparent);
+  color:#e8b93c}
+.lbw-root .hex-violet{background:color-mix(in srgb,var(--violet) 22%,transparent);
+  color:var(--violet)}
+.lbw-root .hex-cyan{background:color-mix(in srgb,var(--cyan) 20%,transparent);
+  color:var(--cyan)}
+.lbw-root .hex-ac{background:color-mix(in srgb,var(--ac) 20%,transparent);
+  color:var(--ac)}
+/* compare slot is now a button — keep the tile layout */
+.lbw-root button.compare-slot{text-align:center;cursor:pointer;
+  font-family:inherit;color:inherit}
+.lbw-root button.compare-slot:disabled{cursor:default}

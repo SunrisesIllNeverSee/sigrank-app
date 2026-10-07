@@ -149,6 +149,14 @@ export default async function ShareOperatorPage({
   const shareUrl = `${SITE_ORIGIN}${sPath}`;
   const profilePath = `/user/${encodeURIComponent(row.operator.codename)}`;
   const linkedInShare = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+  /* Owner 2026-10-06: GENERATE SHARE CARD opens a PAGE OF CARDS — three
+     distinct designs + a share target per platform (LinkedIn, X,
+     Facebook, Gmail/email, GitHub embed). The CONNECTED slot gates on a
+     linked platform account — board-side TODO notes the wiring. */
+  const xShare = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`${d.name} — ${d.rankLine}`)}`;
+  const fbShare = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const mailShare = `mailto:?subject=${encodeURIComponent(`${d.name} — SigRank signal`)}&body=${encodeURIComponent(shareUrl)}`;
+  const ghEmbed = `[![${d.name} — SigRank signal](${SITE_ORIGIN}${sPath}/card.png)](${shareUrl})`;
 
   return (
     <div className="mx-auto flex min-h-[60vh] w-full max-w-[720px] flex-col justify-center py-10">
@@ -167,6 +175,67 @@ export default async function ShareOperatorPage({
         alt={`${d.name} — SigRank operator signal card: ${d.rankLine}`}
         className="h-auto w-full rounded-[14px] border border-bg-border"
       />
+
+      {/* --- Card set (owner 2026-10-06): three distinct designs -------
+          1 FLAGSHIP — the PNG card above (the og:image bytes)
+          2 STATS — numbers-only card
+          3 GRAPHIC — mark + percentile headline
+          A fourth slot is the platform gate: it unlocks when an account
+          is connected (per-platform badge cards are the planned family —
+          docs/LIVE_BOARD_BADGE_INDEX.md). */}
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-[14px] border border-bg-border bg-bg-surface p-4">
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
+            Card 01 — Stats
+          </p>
+          <p className="mt-2 font-mono text-lg font-semibold text-text-primary">
+            {d.name}
+          </p>
+          <p className="mt-1 font-mono text-[11px] leading-relaxed text-text-secondary">
+            {d.rankLine}
+            <br />
+            {d.classTier}
+            {d.archetype ? ` · ${d.archetype}` : ""}
+          </p>
+        </div>
+        <div className="rounded-[14px] border border-gold/30 bg-bg-surface p-4">
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
+            Card 02 — Graphic
+          </p>
+          <img
+            src="/live/signalaf-mark.png"
+            alt=""
+            width={40}
+            height={36}
+            className="mt-2 [image-rendering:pixelated]"
+          />
+          <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-secondary">
+            The mark + percentile headline variant — same card.png backing.
+          </p>
+        </div>
+        <div className="rounded-[14px] border border-dashed border-bg-border p-4 opacity-70">
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
+            Card 03 — Platform badge · connected
+          </p>
+          <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-secondary">
+            GitHub / X / LinkedIn / Facebook / email badge cards unlock when
+            a platform account is connected.
+          </p>
+        </div>
+      </div>
+
+      {/* Platform share targets — one row per surface. GitHub gets the
+          embed snippet (card.png into a README), Gmail goes through
+          mailto, X/Facebook through their share intents. */}
+      <div className="mt-4 flex flex-wrap items-center gap-2 font-mono text-[11px]">
+        <a href={linkedInShare} target="_blank" rel="noopener noreferrer" className="rounded-md border border-bg-border px-3 py-1.5 text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary">LinkedIn ↗</a>
+        <a href={xShare} target="_blank" rel="noopener noreferrer" className="rounded-md border border-bg-border px-3 py-1.5 text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary">X ↗</a>
+        <a href={fbShare} target="_blank" rel="noopener noreferrer" className="rounded-md border border-bg-border px-3 py-1.5 text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary">Facebook ↗</a>
+        <a href={mailShare} className="rounded-md border border-bg-border px-3 py-1.5 text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary">Email ↗</a>
+        <code className="rounded-md border border-bg-border bg-bg-surface px-3 py-1.5 text-[10px] text-text-muted">
+          github: {ghEmbed}
+        </code>
+      </div>
 
       {/* Identity caption + canonical pointer (mirrors share-live/*.html). */}
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">

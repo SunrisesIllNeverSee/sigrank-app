@@ -836,18 +836,13 @@ export function LiveBoardWorkspace({
     switch (id) {
       case "profile":
         /* operator profile (owner: swapped into the inspector rail) —
-           tile + dual radar + earned block badges + feature/re-dock. */
+           tile + dual radar + earned block badges. The pop-out control
+           was removed (owner pass 3: "remove this pop out") — the floating
+           dock still opens from row/stage context and docks back via its
+           own glyph. */
         return profile ? (
           docked ? (
             <>
-              <button
-                type="button"
-                className="btn ghost profile-feature"
-                onClick={toggleDock}
-                title="pop the operator card out over the board"
-              >
-                ⇄ POP OUT
-              </button>
               <OperatorProfileTile d={profile} />
               <div className="lside-radar">
                 <RadarChart
@@ -875,6 +870,29 @@ export function LiveBoardWorkspace({
                     </>
                   );
                 })()}
+              </div>
+              {/* AWARDS (owner: "the hexagon ones") — milestone hexagons
+                  from the pack's medallion set; rank/class/age-derived. */}
+              <div className="trph-h">AWARDS</div>
+              <div className="awards">
+                <span className="award hex-gold" title="signal class">
+                  {selOp?.klass?.[0] ?? "—"}
+                </span>
+                {(selOp?.pct ?? 0) >= 99 && (
+                  <span className="award hex-violet" title="top 1% legend">
+                    Υ
+                  </span>
+                )}
+                {(selOp?.age ?? 0) >= 100 && (
+                  <span className="award hex-cyan" title="100 days consistent">
+                    ◆
+                  </span>
+                )}
+                {(selOp?.recs ?? []).length > 0 && (
+                  <span className="award hex-ac" title="record holder">
+                    ★
+                  </span>
+                )}
               </div>
               <div className="trph-h">BADGES</div>
               <div className="pxbadges">
@@ -1091,10 +1109,51 @@ export function LiveBoardWorkspace({
             ) : (
               <p className="drill-note">— SELECT AN OPERATOR</p>
             )}
+            {/* SIGNAL WIRE (owner: "news and updates — welcome people and
+                notify of submissions") — newest operator + freshest syncs,
+                derived from the live field. */}
+            <div className="soon-h">SIGNAL WIRE</div>
+            <div className="wire">
+              {(() => {
+                const newest = [...ops]
+                  .filter((o) => o.age != null)
+                  .sort((a, b) => (a.age ?? 9e9) - (b.age ?? 9e9))[0];
+                const fresh = [...ops]
+                  .filter((o) => o.last)
+                  .sort((a, b) => (b.last ?? "").localeCompare(a.last ?? ""))
+                  .slice(0, 2);
+                return (
+                  <>
+                    {newest && (
+                      <p className="wire-line">
+                        ◈ welcome <b>{newest.name}</b> — joined the field
+                      </p>
+                    )}
+                    {fresh.map((o) => (
+                      <p className="wire-line" key={o.codename}>
+                        ▸ <b>{o.name}</b> submitted — {o.last}
+                      </p>
+                    ))}
+                  </>
+                );
+              })()}
+            </div>
+            {/* FIELD NOTES (owner: "a text box of the charts or graphs") —
+                the board's numbers written as prose, its own box. */}
+            <div className="soon-h">FIELD NOTES</div>
+            <div className="notes">
+              <p className="notes-t">
+                {initial.fieldStats
+                  .map(
+                    (x) =>
+                      `${x.field.replace(/_/g, " ").toLowerCase()} ${x.value}`,
+                  )
+                  .join(" · ")}
+              </p>
+            </div>
             {/* coming-soon candidates moved to the icon rail (owner pass 3)
                 — this module keeps recents only. */}
-            <div className="soon-h">COMING SOON — IN THE RAIL</div>
-            <p className="soon-cap">👥 TEAMS · 🏁 HACKS · 🥊 VERSUS — icon rail, bottom</p>
+            <p className="soon-cap">COMING SOON — TEAMS · HACKS · VERSUS live in the rail ↙</p>
           </>
         );
     }
@@ -1293,7 +1352,10 @@ export function LiveBoardWorkspace({
                 setNotifOpen((v) => !v);
               }}
             >
-              <span className="gi">🔔</span>
+              <svg className="gi" width="15" height="15" viewBox="0 0 14 14" aria-hidden="true">
+                <path d="M7 1.5C4.5 1.5 3 3.2 3 5.5c0 2.4-1 3-1 3h10s-1-.6-1-3c0-2.3-1.5-4-4-4Z" fill="none" stroke="currentColor" strokeWidth="1.2"/>
+                <path d="M5.6 10.5a1.5 1.5 0 0 0 2.8 0" fill="none" stroke="currentColor" strokeWidth="1.2"/>
+              </svg>
             </button>
             <div className="notifpop" hidden={!notifOpen}>
               <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>
@@ -1314,8 +1376,17 @@ export function LiveBoardWorkspace({
                   setAcctPop((v) => !v);
                 }}
               >
+                {/* owner's highest ranking badge — match the signed-in
+                    name to the field; falls back to the verified block
+                    when the acct doesn't map to a row yet. */}
                 {acct.mode === "in" ? (
-                  <PixelBadge name="verified" />
+                  <PixelBadge
+                    name={
+                      badgeForPct(
+                        ops.find((o) => o.name === acct.name)?.pct,
+                      ) ?? "verified"
+                    }
+                  />
                 ) : (
                   acctInitials
                 )}
@@ -1410,19 +1481,6 @@ export function LiveBoardWorkspace({
               <div className="colhead">SIGNALAF</div>
               <div className="railhead">BURNERS, BUILDERS &amp; 10XERS</div>
               <div className="rail">
-                <div className="mod">
-                  <h3>
-                    <span className="sq"></span>BANNER
-                  </h3>
-                  {/* owner: global stats deferred — banner is the kicker
-                      text only; the field-stats strip is out of both
-                      sidebars until the stats review. */}
-                  <div className="lside-banner">
-                    <section className="hero">
-                      <div className="kicker">{COPY.heroKicker}</div>
-                    </section>
-                  </div>
-                </div>
                 {/* owner 2026-10-06 (annotation): TOP MOVERS swaps places
                     with OPERATOR PROFILE — movers live in the left sidebar
                     under the banner; profile moved to the inspector rail. */}
