@@ -139,7 +139,7 @@ export default async function FieldHubPage() {
       </section>
 
       {/* ── Field Analysis hero card ────────────────────────────────── */}
-      <Link href="/field" className="group block transition-transform hover:scale-[1.01]">
+      <Link href="/field" className="ws-card group block transition-transform hover:scale-[1.01]">
         <WaveHero
           eyebrow="📊 Field Analysis"
           title="Field Analysis"
@@ -156,7 +156,7 @@ export default async function FieldHubPage() {
       </Link>
 
       {/* ── State of the Index hero card ────────────────────────────── */}
-      <Link href="/research" className="group block transition-transform hover:scale-[1.01]"
+      <Link href="/research" className="ws-card group block transition-transform hover:scale-[1.01]"
         style={{ ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" }}>
         <WaveHero
           eyebrow="📊 SigRank Index"
