@@ -26,13 +26,17 @@ export const runtime = "nodejs";
 const size = { width: 1200, height: 630 };
 
 // ── Palette ─────────────────────────────────────────────────────────────────
-const GOLD_BG = "#c4923a";
+/* PRISM treatment (share-card visual system): coral identity panel,
+   aqua phosphor accents; C_GOLD stays gold because it paints medal
+   hardware in the hall section — hardware semantics, not decoration. */
+const GOLD_BG = "#ff7087";
 const INK = "#0a0a0a";
 const C_GOLD = "#f0c862";
-const C_GREEN = "#8ae89a";
-const C_BONE = "#e0e0d0";
-const C_DIM = "#5a8a5a";
-const C_DULL = "#6e8a6e";
+const C_GREEN = "#36e6c2";
+const C_BONE = "#e6ecea";
+const C_DIM = "#5f6e75";
+const C_DULL = "#7e8f96";
+const C_CORAL = "#ff7087";
 const MONO = 'ui-monospace, "SF Mono", Menlo, monospace';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -109,7 +113,7 @@ function MetricTile({
         padding: "10px 14px",
         background: "rgba(255,255,255,0.04)",
         borderRadius: 6,
-        border: `1px solid ${accent ? "rgba(240,200,98,0.3)" : "rgba(255,255,255,0.06)"}`,
+        border: `1px solid ${accent ? "rgba(255,112,135,0.35)" : "rgba(255,255,255,0.06)"}`,
       }}
     >
       <div
@@ -129,7 +133,7 @@ function MetricTile({
           display: "flex",
           fontSize: 28,
           fontWeight: 900,
-          color: accent ? C_GOLD : C_BONE,
+          color: accent ? C_CORAL : C_BONE,
           fontFamily: MONO,
           lineHeight: 1,
         }}
@@ -164,7 +168,7 @@ export async function GET(
           fontFamily: MONO,
         }}
       >
-        <div style={{ display: "flex", fontSize: 80, fontWeight: 900, color: C_GOLD }}>
+        <div style={{ display: "flex", fontSize: 80, fontWeight: 900, color: C_CORAL }}>
           SigRank
         </div>
         <div style={{ display: "flex", fontSize: 28, color: C_DIM, marginTop: 12 }}>

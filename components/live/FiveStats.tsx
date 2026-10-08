@@ -1,12 +1,18 @@
-/* components/live/FiveStats.tsx — LB-G08 approved variant B (original
- * grammar, lime): the operator's five real graph types restored —
- *   YIELD jagged trace · SCORE dense bars · RANK stepped trace ·
- *   LEVERAGE histogram bars · VELOCITY line (dips stay dips).
+/* components/live/FiveStats.tsx — compact signal-history sparklines.
  *
- * Data contract: true timestamped history only. Zero is a valid
- * measurement; null = missing, and gaps stay gaps — a series with <2
- * usable points renders an explicit NO HISTORY state, never a fabricated
- * trend.
+ * Owner correction (2026-10-08, supersedes LB-G08's five-encoding grammar
+ * for THIS module only): the compact strip is PURE LINE TRACES — five
+ * small genuine time-series lines (Yield / Score / Rank / Leverage /
+ * Velocity), distinct colors, consistent line-art style. No bars, no
+ * histograms, no numeric-stat readouts — labels are series identifiers
+ * only. Detailed numbers live in the profile + the large signal module.
+ *
+ * Data contract: true timestamped history only. Invalid/absent
+ * timestamps are dropped (never index-as-date). Zero is a valid
+ * measurement; null = missing, and gaps break the trace — a series with
+ * <2 usable points renders an explicit NO HISTORY state, never a
+ * fabricated trend. RANK plots inverted (a smaller rank number = a
+ * better rank → draws higher).
  */
 export interface TimedMetricPoint {
   timestamp: number;
@@ -18,7 +24,14 @@ export interface FiveStatRow {
   history: TimedMetricPoint[];
 }
 
-const STROKE = "#b8fb58"; // approved lime tone
+/* per-series trace colors — distinct hues, consistent line weight */
+const TRACE_COLORS: Record<FiveStatRow["name"], string> = {
+  YIELD: "#b7ff25",
+  SCORE: "#e6c967",
+  RANK: "#68caeb",
+  LEVERAGE: "#b391ef",
+  VELOCITY: "#f0ac6a",
+};
 const good = (v: number | null | undefined): v is number =>
   typeof v === "number" && Number.isFinite(v) && v >= 0;
 
@@ -34,14 +47,13 @@ export function FiveStats({
   onSelect?: (name: FiveStatRow["name"]) => void;
 }) {
   return (
-    <section className="f5stats lime">
-      <header>STATS · SIGNAL HISTORY</header>
+    <section className="f5stats lines">
+      <header>LINE SIGNALS</header>
       {rows.slice(0, 5).map((row) => {
         const body = (
           <>
             <span>{row.name}</span>
-            <MetricGraph row={row} />
-            <b>{row.display}</b>
+            <LineTrace row={row} />
           </>
         );
         return onSelect ? (
@@ -64,73 +76,54 @@ export function FiveStats({
   );
 }
 
-function MetricGraph({ row }: { row: FiveStatRow }) {
-  const ordered = [...row.history].sort((a, b) => a.timestamp - b.timestamp);
-  const finitePoints = ordered.filter(
-    (pt) => Number.isFinite(pt.timestamp) && good(pt.value),
-  );
-  if (finitePoints.length < 2)
+function LineTrace({ row }: { row: FiveStatRow }) {
+  const pts = [...row.history]
+    .filter((p) => Number.isFinite(p.timestamp))
+    .sort((a, b) => a.timestamp - b.timestamp);
+  const valid = pts.filter((p) => good(p.value));
+  if (valid.length < 2)
     return <small className="f5-no-history">NO HISTORY</small>;
-  const lo = Math.min(...finitePoints.map((pt) => pt.value!));
-  const hi = Math.max(...finitePoints.map((pt) => pt.value!));
+  const lo = Math.min(...valid.map((p) => p.value!));
+  const hi = Math.max(...valid.map((p) => p.value!));
   const span = Math.max(hi - lo, 1e-9);
-  const h = 23;
-  const first = ordered[0].timestamp;
-  const last = ordered.at(-1)!.timestamp;
+  const first = pts[0].timestamp;
+  const last = pts[pts.length - 1].timestamp;
   const timeSpan = Math.max(1, last - first);
   const x = (t: number) => 2 + ((t - first) / timeSpan) * 102;
+  /* rank inverts: a smaller rank number is better → draws higher */
   const y = (v: number) =>
-    row.name === "RANK" ? 2 + ((v - lo) / span) * 19 : h - 2 - ((v - lo) / span) * 19;
-  const bars = row.name === "SCORE" || row.name === "LEVERAGE";
-  if (bars)
-    return (
-      <svg
-        viewBox="0 0 106 23"
-        role="img"
-        aria-label={`${row.name}: ${finitePoints.length} historical observations, bars`}
-      >
-        {finitePoints.map(({ timestamp, value }, i) => {
-          const xx = x(timestamp);
-          const yy = y(value!);
-          const width =
-            row.name === "SCORE" ? 1.7 : Math.min(6, 90 / finitePoints.length);
-          return (
-            <rect
-              key={i}
-              x={xx - width / 2}
-              y={yy}
-              width={width}
-              height={Math.max(0.5, h - 1 - yy)}
-              fill={STROKE}
-              fillOpacity=".95"
-            />
-          );
-        })}
-      </svg>
-    );
+    row.name === "RANK"
+      ? 2 + ((v - lo) / span) * 19
+      : 21 - ((v - lo) / span) * 19;
   const segments: string[] = [];
   let path = "";
-  ordered.forEach((pt) => {
-    if (!good(pt.value) || !Number.isFinite(pt.timestamp)) {
+  for (const p of pts) {
+    if (!good(p.value)) {
       if (path) segments.push(path);
       path = "";
-      return;
+      continue;
     }
-    const xx = x(pt.timestamp).toFixed(1);
-    const yy = y(pt.value!).toFixed(1);
-    if (!path) path = `M${xx} ${yy}`;
-    else if (row.name === "RANK") path += ` H${xx} V${yy}`;
-    else path += ` L${xx} ${yy}`;
-  });
+    const xx = x(p.timestamp).toFixed(2);
+    const yy = y(p.value!).toFixed(2);
+    path += (path ? " L" : "M") + xx + " " + yy;
+  }
   if (path) segments.push(path);
   return (
     <svg
       viewBox="0 0 106 23"
       role="img"
-      aria-label={`${row.name}: measured history trace`}
+      aria-label={`${row.name}: line-only observed history`}
     >
-      {segments.map((segment, i) => (
-        <path key={i} d={segment} stroke={STROKE} strokeWidth="1.6" fill="none" />
+      {segments.map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          stroke={TRACE_COLORS[row.name]}
+          strokeWidth="1.65"
+          fill="none"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
       ))}
     </svg>
   );
