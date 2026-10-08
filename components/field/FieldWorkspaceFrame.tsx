@@ -38,6 +38,7 @@ export function FieldFamilyNav({
       title: "Field Analysis",
       subtitle: "The true distribution of token efficiency.",
       tint: { ["--gold" as string]: "var(--rank-3)" },
+      ec: "var(--rank-3)",
     },
     {
       id: "research" as const,
@@ -46,6 +47,7 @@ export function FieldFamilyNav({
       title: "State of the Index",
       subtitle: "The seed dataset · Zenodo DOI.",
       tint: { ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" },
+      ec: "var(--accent)",
     },
     {
       id: "wiki" as const,
@@ -54,14 +56,16 @@ export function FieldFamilyNav({
       title: "Wiki",
       subtitle: "The evidence layer — every metric defined.",
       tint: { ["--gold" as string]: "var(--rank-2)" },
+      ec: "var(--rank-2)",
     },
     {
       id: "blog" as const,
       href: "/blog",
       eyebrow: "BLOG",
-      title: "Blog",
+      title: "Articles",
       subtitle: "Published analysis & field notes.",
       tint: { ["--gold" as string]: "var(--rank-low)" },
+      ec: "var(--rank-low)",
     },
   ];
   return (
@@ -79,7 +83,7 @@ export function FieldFamilyNav({
             <WaveHero
               compact
               headingLevel="h2"
-              eyebrow={<span style={{ color: "var(--mut)" }}>{it.eyebrow}</span>}
+              eyebrow={<span style={{ color: "ec" in it ? it.ec : "var(--mut)" }}>{it.eyebrow}</span>}
               title={it.title}
               subtitle={it.subtitle}
             />
@@ -129,14 +133,13 @@ export function FieldWorkspaceFrame({
       active="field"
       title={title}
       bareTitle={hero != null}
-      leftTitle="FIELD"
+      leftTitle="RESEARCH"
       left={
         <>
           <FieldFamilyNav current={current} />
           <div className="mod">
             <div className="mini-h"><span className="sq" />SYSTEM</div>
             <nav className="ws-nav">
-              <Link href="/wiki">Wiki</Link>
               <Link href="/methodology">Methodology</Link>
               <Link href="/board/all">Live leaderboard</Link>
             </nav>
