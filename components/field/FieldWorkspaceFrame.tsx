@@ -20,28 +20,29 @@ export function FieldFamilyNav({
     {
       id: "home" as const,
       href: "/",
-      eyebrow: "SigRank",
+      eyebrow: "INDEX",
       title: "Home",
       subtitle: "The signal console — start here.",
     },
     {
       id: "fieldhub" as const,
       href: "/fieldhub",
-      eyebrow: "SigRank Research",
+      eyebrow: "RESEARCH",
       title: "Field Hub",
       subtitle: "The research landing — start here.",
     },
     {
       id: "field" as const,
       href: "/field",
-      eyebrow: "Field Analysis",
+      eyebrow: "RESEARCH",
       title: "Field Analysis",
       subtitle: "The true distribution of token efficiency.",
+      tint: { ["--gold" as string]: "var(--rank-3)" },
     },
     {
       id: "research" as const,
       href: "/research",
-      eyebrow: "SigRank Index",
+      eyebrow: "RESEARCH",
       title: "State of the Index",
       subtitle: "The seed dataset · Zenodo DOI.",
       tint: { ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" },
@@ -49,7 +50,7 @@ export function FieldFamilyNav({
     {
       id: "wiki" as const,
       href: "/wiki",
-      eyebrow: "SigRank",
+      eyebrow: "WIKI",
       title: "Wiki",
       subtitle: "The evidence layer — every metric defined.",
       tint: { ["--gold" as string]: "var(--rank-2)" },
@@ -57,16 +58,16 @@ export function FieldFamilyNav({
     {
       id: "blog" as const,
       href: "/blog",
-      eyebrow: "SigRank",
-      title: "Articles",
+      eyebrow: "BLOG",
+      title: "Blog",
       subtitle: "Published analysis & field notes.",
       tint: { ["--gold" as string]: "var(--rank-low)" },
     },
   ];
   return (
     <>
-      <div className="mini-h"><span className="sq" />SIGRANK</div>
-      <nav className="flex flex-col gap-2" aria-label="SigRank text surfaces">
+      <div className="mini-h"><span className="sq" />INDEX</div>
+      <nav className="ws-bnav flex flex-col gap-2" aria-label="SigRank text surfaces">
         {items.map((it) => (
           <Link
             key={it.id}
@@ -78,7 +79,7 @@ export function FieldFamilyNav({
             <WaveHero
               compact
               headingLevel="h2"
-              eyebrow={it.eyebrow}
+              eyebrow={<span style={{ color: "var(--mut)" }}>{it.eyebrow}</span>}
               title={it.title}
               subtitle={it.subtitle}
             />
