@@ -6,16 +6,24 @@ import { WaveHero } from "@/components/ui/WaveHero";
 /**
  * The Field family's left-rail nav — the space's entries as compact wave
  * banners (per owner: the hub's hero cards become the rail navigation —
- * all family pages, current page marked). The Field + Blog spaces share
- * this rail nav — field pages and the blog carry the same banner stack.
+ * all family pages, current page marked). Owner direction: this is the
+ * SIGRANK section — one banner stack for every text surface, Home as the
+ * opening entry, shared by Field pages, Blog, and Wiki rails.
  */
 export function FieldFamilyNav({
   current,
 }: {
   /** The page currently being viewed — its banner gets the accent mark. */
-  current?: "fieldhub" | "field" | "research" | "blog";
+  current?: "home" | "fieldhub" | "field" | "research" | "wiki" | "blog";
 }) {
   const items = [
+    {
+      id: "home" as const,
+      href: "/",
+      eyebrow: "SigRank",
+      title: "Home",
+      subtitle: "The signal console — start here.",
+    },
     {
       id: "fieldhub" as const,
       href: "/fieldhub",
@@ -39,6 +47,14 @@ export function FieldFamilyNav({
       tint: { ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" },
     },
     {
+      id: "wiki" as const,
+      href: "/wiki",
+      eyebrow: "SigRank",
+      title: "Wiki",
+      subtitle: "The evidence layer — every metric defined.",
+      tint: { ["--gold" as string]: "var(--rank-2)" },
+    },
+    {
       id: "blog" as const,
       href: "/blog",
       eyebrow: "SigRank",
@@ -49,8 +65,8 @@ export function FieldFamilyNav({
   ];
   return (
     <>
-      <div className="mini-h"><span className="sq" />RESEARCH</div>
-      <nav className="flex flex-col gap-2" aria-label="Field research and articles">
+      <div className="mini-h"><span className="sq" />SIGRANK</div>
+      <nav className="flex flex-col gap-2" aria-label="SigRank text surfaces">
         {items.map((it) => (
           <Link
             key={it.id}
@@ -84,6 +100,9 @@ interface Props {
   current?: "fieldhub" | "field" | "research";
   /** Vertically centers short stage content (landings) — kills dead space. */
   center?: boolean;
+  /** Full-stage-width hero rendered above the doc column. When present the
+   *  shell's title strip renders sr-only — the hero IS the visible title. */
+  hero?: ReactNode;
 }
 
 /**
@@ -102,11 +121,13 @@ export function FieldWorkspaceFrame({
   rightDefaultOpen = true,
   current,
   center = false,
+  hero,
 }: Props) {
   return (
     <WorkspaceShell
       active="field"
       title={title}
+      bareTitle={hero != null}
       leftTitle="FIELD"
       left={
         <>
@@ -128,6 +149,7 @@ export function FieldWorkspaceFrame({
       rightWidth={240}
       status={status ?? <>FIELD RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
+      {hero}
       <div className={`ws-doc ws-doc-wide${center ? " ws-center" : ""}`}>{children}</div>
     </WorkspaceShell>
   );

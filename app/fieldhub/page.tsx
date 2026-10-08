@@ -63,6 +63,19 @@ export default async function FieldHubPage() {
       title="FIELD HUB"
       current="fieldhub"
       center
+      hero={
+        <WaveHero
+          eyebrow="📊 SigRank Research"
+          terminalText="FIELD HUB"
+          title="Field Hub"
+          subtitle={
+            <>
+              The academic research hub for SigRank. This is where we
+              document field analysis and publish dataset findings.
+            </>
+          }
+        />
+      }
       rightTitle="FIELD FAMILY"
       right={
         <>
@@ -109,18 +122,6 @@ export default async function FieldHubPage() {
             },
           ]),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="📊 SigRank Research"
-        terminalText="FIELD HUB"
-        title="Field Hub"
-        subtitle={
-          <>
-            The academic research hub for SigRank. This is where we
-            document field analysis and publish dataset findings.
-          </>
-        }
       />
 
       {/* ── Blurb ───────────────────────────────────────────────────── */}

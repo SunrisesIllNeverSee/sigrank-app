@@ -160,6 +160,7 @@ export default async function BlogIndex() {
       <WorkspaceShell
         active="blog"
         title="BLOG"
+        bareTitle
         leftTitle="INDEX"
         left={
           <>
@@ -214,19 +215,19 @@ export default async function BlogIndex() {
         rightWidth={240}
         status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
       >
-        <div className="ws-doc">
-          <WaveHero
-            eyebrow="📊 SigRank"
-            terminalText="BLOG"
-            title="Blog"
-            subtitle={
-              <>
-                Analysis &amp; research — deep dives into AI operator
-                efficiency, the token cascade economy, and outlier detection
-                methodology.
-              </>
-            }
-          />
+        <WaveHero
+        eyebrow="📊 SigRank"
+        terminalText="BLOG"
+        title="Blog"
+        subtitle={
+          <>
+            Analysis &amp; research — deep dives into AI operator
+            efficiency, the token cascade economy, and outlier detection
+            methodology.
+          </>
+        }
+      />
+      <div className="ws-doc" style={{ marginTop: 22 }}>
 
       <div className="blog-index">
         {posts[0] && (
