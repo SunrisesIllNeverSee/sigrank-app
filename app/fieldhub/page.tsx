@@ -62,6 +62,7 @@ export default async function FieldHubPage() {
     <FieldWorkspaceFrame
       title="FIELD HUB"
       current="fieldhub"
+      center
       rightTitle="FIELD FAMILY"
       right={
         <>
@@ -110,6 +111,18 @@ export default async function FieldHubPage() {
         ]}
       />
 
+      <WaveHero
+        eyebrow="📊 SigRank Research"
+        terminalText="FIELD HUB"
+        title="Field Hub"
+        subtitle={
+          <>
+            The academic research hub for SigRank. This is where we
+            document field analysis and publish dataset findings.
+          </>
+        }
+      />
+
       {/* ── Blurb ───────────────────────────────────────────────────── */}
       <section className="flex flex-col gap-4">
         <p className="text-lg text-text-primary">
@@ -129,7 +142,6 @@ export default async function FieldHubPage() {
       <Link href="/field" className="group block transition-transform hover:scale-[1.01]">
         <WaveHero
           eyebrow="📊 Field Analysis"
-          terminalText="THE FIELD"
           title="Field Analysis"
           subtitle={
             <>
@@ -144,10 +156,10 @@ export default async function FieldHubPage() {
       </Link>
 
       {/* ── State of the Index hero card ────────────────────────────── */}
-      <Link href="/research" className="group block transition-transform hover:scale-[1.01]">
+      <Link href="/research" className="group block transition-transform hover:scale-[1.01]"
+        style={{ ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" }}>
         <WaveHero
           eyebrow="📊 SigRank Index"
-          terminalText="THE DATA-STATE"
           title="State of the Index"
           subtitle={
             <>

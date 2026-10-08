@@ -293,7 +293,7 @@
 .lbw-root .ap-item:hover{background:var(--sel);color:var(--tx)}
 .lbw-root .ap-item.mut:hover{color:var(--dn)}
 
-.lbw-root .stage{overflow-y:auto;min-width:0;padding:0 22px 34px}
+.lbw-root .stage{flex:1;min-height:0;overflow-y:auto;min-width:0;padding:0 22px 34px}
 
 /* ---------- LB-02 hero (optional banner block, off by default) ---------- */
 .lbw-root .banner{padding:14px 0 4px}
@@ -1221,7 +1221,7 @@
    Long-form content in the stage gets a readable measure; rail nav lists
    are the section-jump pattern for text pages (same slot as Hall's
    control stack). */
-.lbw-root .ws-doc{display:flex;flex-direction:column;gap:26px;max-width:880px}
+.lbw-root .ws-doc{display:flex;flex-direction:column;gap:26px;max-width:880px;margin-inline:auto;width:100%}
 .lbw-root .ws-doc section{scroll-margin-top:12px}
 .lbw-root .ws-nav{display:flex;flex-direction:column}
 .lbw-root .ws-nav a{display:block;padding:5px 8px;border-radius:var(--radius-sm);
@@ -1281,3 +1281,9 @@
 
 /* rail share cards — button rows must wrap inside the panel, not overflow */
 .lbw-root .ws-share .justify-end{justify-content:flex-start;flex-wrap:wrap;row-gap:6px}
+
+/* centered stage variant — short landings (Field Hub) center vertically
+   in the stage instead of leaving dead space at the bottom */
+.lbw-root .stage:has(>.board>.ws-center){display:flex;flex-direction:column}
+.lbw-root .board:has(>.ws-center){flex:1;display:flex;flex-direction:column;justify-content:center}
+.lbw-root .ws-center{margin-inline:auto}
