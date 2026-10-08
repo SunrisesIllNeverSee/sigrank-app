@@ -74,6 +74,8 @@ interface Props {
   rightDefaultOpen?: boolean;
   /** Which family page this is — marks the active banner in the rail. */
   current?: "fieldhub" | "field" | "research";
+  /** Vertically centers short stage content (landings) — kills dead space. */
+  center?: boolean;
 }
 
 /**
@@ -91,6 +93,7 @@ export function FieldWorkspaceFrame({
   rightTitle = "RESEARCH",
   rightDefaultOpen = true,
   current,
+  center = false,
 }: Props) {
   return (
     <WorkspaceShell
@@ -117,7 +120,7 @@ export function FieldWorkspaceFrame({
       rightWidth={240}
       status={status ?? <>FIELD RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
-      <div className="ws-doc ws-doc-wide">{children}</div>
+      <div className={`ws-doc ws-doc-wide${center ? " ws-center" : ""}`}>{children}</div>
     </WorkspaceShell>
   );
 }
