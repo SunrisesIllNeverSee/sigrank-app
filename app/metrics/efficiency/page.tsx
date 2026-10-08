@@ -13,6 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -27,6 +28,14 @@ export default function EfficiencyPage() {
   return (
     <MetricsWorkspaceFrame
       title="EFFICIENCY"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK METRIC"
+          terminalText="EFFICIENCY"
+          title="Efficiency"
+          subtitle={<>Yield per token.</>}
+        />
+      }
       current="/metrics/efficiency"
     >
     <div className="flex flex-col gap-8 py-2">

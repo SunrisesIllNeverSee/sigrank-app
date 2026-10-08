@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -26,6 +27,14 @@ export default function VelocityPage() {
   return (
     <MetricsWorkspaceFrame
       title="VELOCITY"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK METRIC"
+          terminalText="VELOCITY"
+          title="Velocity"
+          subtitle={<>How fast signal moves through the cascade.</>}
+        />
+      }
       current="/metrics/velocity"
     >
     <div className="flex flex-col gap-8 py-2">

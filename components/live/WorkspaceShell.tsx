@@ -76,6 +76,9 @@ export interface WorkspaceShellProps {
   /** Render the h1 visually-hidden instead of the .stitle strip — for pages
    *  whose hero is the visible title (Field Hub, Blog index). */
   bareTitle?: boolean;
+  /** Edge-to-edge stage hero band (WaveHero), rendered above the board
+   *  content and bleeding to the sidebar borders. Pass with bareTitle. */
+  hero?: ReactNode;
   /** Optional filter-bar strip under the title (the board's .fbar slot). */
   toolbar?: ReactNode;
   /** Left panel railhead label (e.g. "HALL OF SIGNAL"). */
@@ -120,6 +123,7 @@ export function WorkspaceShell({
   active,
   title,
   bareTitle = false,
+  hero,
   toolbar,
   leftTitle,
   left,
@@ -564,7 +568,10 @@ export function WorkspaceShell({
                 ))}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
               <main className="stage">
-                <div className="board">{children}</div>
+                <div className="board">
+                  {hero && <div className="ws-hero">{hero}</div>}
+                  {children}
+                </div>
               </main>
             </div>
 
