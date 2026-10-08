@@ -1287,3 +1287,8 @@
 .lbw-root .stage:has(>.board>.ws-center){display:flex;flex-direction:column}
 .lbw-root .board:has(>.ws-center){flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:6px}
 .lbw-root .ws-center{margin-inline:auto}
+
+/* stage-bleed hero — cancels the stage's side padding so the hero band
+   connects with the sidebar borders (fieldhub landing) */
+.lbw-root .ws-hero{margin:0 -22px}
+.lbw-root .ws-hero > *{display:block}

@@ -149,7 +149,7 @@ export function FieldWorkspaceFrame({
       rightWidth={240}
       status={status ?? <>FIELD RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
-      {hero}
+      {hero && <div className="ws-hero">{hero}</div>}
       <div className={`ws-doc ws-doc-wide${center ? " ws-center" : ""}`}>{children}</div>
     </WorkspaceShell>
   );
