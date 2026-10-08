@@ -6,13 +6,14 @@ import { WaveHero } from "@/components/ui/WaveHero";
 /**
  * The Field family's left-rail nav — the space's entries as compact wave
  * banners (per owner: the hub's hero cards become the rail navigation —
- * all three family pages, current page marked). Articles stays a link.
+ * all family pages, current page marked). The Field + Blog spaces share
+ * this rail nav — field pages and the blog carry the same banner stack.
  */
 export function FieldFamilyNav({
   current,
 }: {
   /** The page currently being viewed — its banner gets the accent mark. */
-  current?: "fieldhub" | "field" | "research";
+  current?: "fieldhub" | "field" | "research" | "blog";
 }) {
   const items = [
     {
@@ -35,18 +36,28 @@ export function FieldFamilyNav({
       eyebrow: "SigRank Index",
       title: "State of the Index",
       subtitle: "The seed dataset · Zenodo DOI.",
+      tint: { ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" },
+    },
+    {
+      id: "blog" as const,
+      href: "/blog",
+      eyebrow: "SigRank",
+      title: "Articles",
+      subtitle: "Published analysis & field notes.",
+      tint: { ["--gold" as string]: "var(--rank-low)" },
     },
   ];
   return (
     <>
       <div className="mini-h"><span className="sq" />RESEARCH</div>
-      <nav className="flex flex-col gap-2" aria-label="Field research">
+      <nav className="flex flex-col gap-2" aria-label="Field research and articles">
         {items.map((it) => (
           <Link
             key={it.id}
             href={it.href}
             className={`block rounded-xl ${current === it.id ? "ws-bnav-on" : ""}`}
             aria-current={current === it.id ? "page" : undefined}
+            style={"tint" in it ? it.tint : undefined}
           >
             <WaveHero
               compact
@@ -57,9 +68,6 @@ export function FieldFamilyNav({
             />
           </Link>
         ))}
-      </nav>
-      <nav className="ws-nav" style={{ marginTop: 6 }}>
-        <Link href="/blog">Articles ↗</Link>
       </nav>
     </>
   );

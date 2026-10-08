@@ -12,6 +12,7 @@ import { join } from "path";
 import matter from "gray-matter";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
@@ -161,6 +162,9 @@ export default async function BlogIndex() {
         leftTitle="INDEX"
         left={
           <>
+            <div className="mod">
+              <FieldFamilyNav current="blog" />
+            </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>ALL POSTS</div>
               <nav className="ws-nav">
