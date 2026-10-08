@@ -15,6 +15,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { WaveHero } from "@/components/ui/WaveHero";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
 
@@ -214,10 +215,18 @@ export default async function BlogIndex() {
         status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
       >
         <div className="ws-doc">
-          <p className="text-sm leading-relaxed text-text-secondary">
-            Analysis &amp; research — deep dives into AI operator efficiency,
-            the token cascade economy, and outlier detection methodology.
-          </p>
+          <WaveHero
+            eyebrow="📊 SigRank"
+            terminalText="BLOG"
+            title="Blog"
+            subtitle={
+              <>
+                Analysis &amp; research — deep dives into AI operator
+                efficiency, the token cascade economy, and outlier detection
+                methodology.
+              </>
+            }
+          />
 
       <div className="blog-index">
         {posts[0] && (
