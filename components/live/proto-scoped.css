@@ -1285,5 +1285,5 @@
 /* centered stage variant — short landings (Field Hub) center vertically
    in the stage instead of leaving dead space at the bottom */
 .lbw-root .stage:has(>.board>.ws-center){display:flex;flex-direction:column}
-.lbw-root .board:has(>.ws-center){flex:1;display:flex;flex-direction:column;justify-content:center}
+.lbw-root .board:has(>.ws-center){flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:6px}
 .lbw-root .ws-center{margin-inline:auto}

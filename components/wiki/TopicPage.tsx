@@ -13,6 +13,7 @@
 import React from "react";
 import Link from "next/link";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 
 export function TopicPage({ children }: { children: React.ReactNode; title?: string }) {
   return (
@@ -20,6 +21,10 @@ export function TopicPage({ children }: { children: React.ReactNode; title?: str
       active="wiki"
       leftTitle="ENTRY"
       left={
+        <>
+        <div className="mod">
+          <FieldFamilyNav current="wiki" />
+        </div>
         <div className="mod">
           <div className="mini-h"><span className="sq"></span>INDEX</div>
           <nav className="ws-nav">
@@ -28,6 +33,7 @@ export function TopicPage({ children }: { children: React.ReactNode; title?: str
             <Link href="/wiki/four-degrees">Four degrees of leverage</Link>
           </nav>
         </div>
+        </>
       }
       leftWidth={280}
       status={<>SIGNALAF WIKI · TOPIC PROOF · MO§ES™</>}

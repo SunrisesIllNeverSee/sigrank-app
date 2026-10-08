@@ -44,6 +44,7 @@ import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
 import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
 
 export const metadata: Metadata = withOG({
@@ -1954,6 +1955,9 @@ export default function Draft1Page() {
         leftTitle="CONTENTS"
         left={
           <>
+            <div className="mod">
+              <FieldFamilyNav current="wiki" />
+            </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>TOPICS</div>
               <WikiTOC items={tocItems} rail />
