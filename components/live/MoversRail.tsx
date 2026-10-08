@@ -143,9 +143,15 @@ export function MoversRail({
                 {tag}
               </span>
             </span>
-            <span className={`dlt ${m.mv >= 0 ? "up" : "dn"}`}>
-              {m.mv >= 0 ? `▲ +${m.mv}` : `▼ −${Math.abs(m.mv)}`}
-            </span>
+            {/* LB-G12: raw-stat modes carry `note` (e.g. the Σ TOKENS
+                volume) — render it instead of a fake Δ rank chip. */}
+            {m.note != null ? (
+              <span className="dlt vol mono">{m.note}</span>
+            ) : (
+              <span className={`dlt ${m.mv >= 0 ? "up" : "dn"}`}>
+                {m.mv >= 0 ? `▲ +${m.mv}` : `▼ −${Math.abs(m.mv)}`}
+              </span>
+            )}
             <span className="rk-pos">&nbsp;#{i + 1}</span>
           </div>
         );
@@ -247,7 +253,9 @@ export function RotatingMovers({
   return (
     <>
       <MoversRail
-        boxHead={mode}
+        /* LB-G12 indexed rotation — header shows the slide's position in
+           the live mode set. */
+        boxHead={`${mode} · ${(mi % liveModes.length) + 1}/${liveModes.length}`}
         rows={rows}
         onSelect={onSelect}
         tag={mode === "Σ TOKENS" ? "Σ" : mode.startsWith("24H") ? "24h" : "7d"}
