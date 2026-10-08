@@ -19,6 +19,7 @@ import { toEntry } from "@/lib/board/to-entry";
 import { PLATFORM_COUNT } from "@/lib/constants";
 import { withOG } from "@/lib/seo";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { sigrankDataset, faqPage, breadcrumb } from "@/lib/jsonld";
 import { BUILD_ARCHETYPES } from "@/lib/analytics/build-archetypes";
@@ -116,6 +117,15 @@ export default async function MethodologyPage() {
     <WorkspaceShell
       active="wiki"
       title="METHODOLOGY"
+      bareTitle
+      hero={
+        <WaveHero
+          eyebrow="THE SIGRANK INDEX"
+          terminalText="METHODOLOGY"
+          title="Methodology"
+          subtitle={<>The canonical source for AI operator token-efficiency data. Ranked by Υ Yield.</>}
+        />
+      }
       leftTitle="SYSTEM"
       left={
         <>

@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -26,6 +27,14 @@ export default function SignalToNoiseRatioPage() {
   return (
     <MetricsWorkspaceFrame
       title="SIGNAL-TO-NOISE RATIO"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK METRIC"
+          terminalText="SNR"
+          title="Signal-to-Noise Ratio"
+          subtitle={<>Signal versus noise in the telemetry.</>}
+        />
+      }
       current="/metrics/signal-to-noise-ratio"
     >
     <div className="flex flex-col gap-8 py-2">

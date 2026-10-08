@@ -45,6 +45,7 @@ import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
 import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
+import { WaveHero } from "@/components/ui/WaveHero";
 import Link from "next/link";
 
 export const metadata: Metadata = withOG({
@@ -1952,6 +1953,15 @@ export default function Draft1Page() {
       <WorkspaceShell
         active="wiki"
         title="SIGNALAF WIKI"
+        bareTitle
+        hero={
+          <WaveHero
+            eyebrow="SIGNALAF"
+            terminalText="WIKI"
+            title="Signalaf Wiki"
+            subtitle={<>The living reference for operator evaluation — grounded in token telemetry.</>}
+          />
+        }
         leftTitle="CONTENTS"
         left={
           <>

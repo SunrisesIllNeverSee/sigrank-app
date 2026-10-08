@@ -21,6 +21,8 @@ interface Props {
   right?: ReactNode;
   rightTitle?: string;
   status?: ReactNode;
+  /** Edge-to-edge stage hero band; suppresses the title strip. */
+  hero?: ReactNode;
 }
 
 /**
@@ -36,11 +38,14 @@ export function MetricsWorkspaceFrame({
   right,
   rightTitle = "REFERENCE",
   status,
+  hero,
 }: Props) {
   return (
     <WorkspaceShell
       active="wiki"
       title={title}
+      bareTitle={hero != null}
+      hero={hero}
       leftTitle="METRICS"
       left={
         <>

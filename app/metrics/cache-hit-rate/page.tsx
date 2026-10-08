@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -26,6 +27,14 @@ export default function CacheHitRatePage() {
   return (
     <MetricsWorkspaceFrame
       title="CACHE HIT RATE"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK METRIC"
+          terminalText="CACHE HIT RATE"
+          title="Cache Hit Rate"
+          subtitle={<>Reuse of prior context.</>}
+        />
+      }
       current="/metrics/cache-hit-rate"
     >
     <div className="flex flex-col gap-8 py-2">
