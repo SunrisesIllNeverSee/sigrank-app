@@ -124,17 +124,15 @@ export default async function FieldHubPage() {
       />
 
       {/* ── Blurb ───────────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <p className="text-lg text-text-primary">
+      <section>
+        <p className="max-w-2xl text-base leading-relaxed text-text-secondary">
           This section is where we document academic field analysis of the
           SigRank Index — the distribution of AI operator efficiency, the
           volume-vs-yield thesis, outlier detection, and the dataset that
-          underpins every finding published on this site.
-        </p>
-        <p className="text-base text-text-secondary">
-          Each entry below is a primary source. The Field Analysis is the
-          full visual article. The State of the Index is the dataset
-          landing page with DOI, citation, and downloadable files.
+          underpins every finding published on this site. Each entry below is
+          a primary source: the Field Analysis is the full visual article, and
+          the State of the Index is the dataset landing page with DOI,
+          citation, and downloadable files.
         </p>
       </section>
 
