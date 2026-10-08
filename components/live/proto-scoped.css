@@ -1290,7 +1290,7 @@
 
 /* stage-bleed hero — cancels the stage's side padding so the hero band
    connects with the sidebar borders (fieldhub landing) */
-.lbw-root .ws-hero{margin:0 -22px}
+.lbw-root .ws-hero{margin:0 -22px 22px}
 .lbw-root .ws-hero > *{display:block}
 
 /* SIGRANK banner nav — square edges, quiet eyebrows, subtitle hidden so
@@ -1298,5 +1298,5 @@
 .lbw-root .ws-bnav{margin-bottom:8px}
 .lbw-root .ws-bnav header{border-radius:0}
 .lbw-root .ws-bnav p{display:none}
-.lbw-root .ws-hero header{border-radius:0}
-.lbw-root .ws-card > header{border-radius:0}
+.lbw-root .ws-hero header{border:none;border-radius:0;background:transparent}
+.lbw-root .ws-card > header{border:none;border-radius:0;background:transparent}
