@@ -30,17 +30,29 @@ import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
 import { boardWindowByEnum } from "@/lib/board/windows";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 
-// ── Palette — the reference green theme (proto.css [data-theme="green"]) ────
-const AC = "#a6ff00";
-const CYAN = "#00e5ff";
-const BLUE = "#3b82f6";
-const TX = "#e9f3df";
-const TX2 = "#b9cbb0";
-const MUT = "#71826a";
-const LINE2 = "#26361c";
-const UP = "#34d399";
-const DN = "#f87171";
+// ── Palette — PRISM treatment (share-card visual system only; the board
+// keeps its own theme). Coral = operator/hero accent, aqua = trust +
+// field-reference accent, lavender third hue, graphite lines, cool dark
+// ground. Distinct from the board's acid-lime on purpose — a share card
+// should read richer and unmistakably "not the app". ────────────────────
+const AC = "#ff7087"; // prism coral — operator accent
+const CYAN = "#36e6c2"; // prism aqua — trust/reference accent
+const BLUE = "#b391ef"; // prism lavender — third px-mark hue
+const TX = "#eef6f4";
+const TX2 = "#bfd4cf"; // prism ink
+const MUT = "#7e8f96";
+const LINE2 = "#3e464c"; // prism graphite
+const UP = "#36e6c2"; // aqua up
+const DN = "#f87171"; // semantic red down — not a theme color
 const MONO = 'ui-monospace, "SF Mono", Menlo, monospace';
+
+/* Per-metric spark colors — the prism-family set; each stat row gets its
+   own hue so the strip reads as three distinct series. */
+const SPARK_COLORS: Record<string, string> = {
+  YIELD: "#ff7087",
+  LEVERAGE: "#36e6c2",
+  SNR: "#b391ef",
+};
 
 export interface SignalCardRow {
   label: string;
@@ -284,27 +296,37 @@ function PxMark({ size = 14 }: { size?: number }) {
   );
 }
 
-/** Nested-hexagon mark (reference hexmark, green accent). */
-function HexMark({ color = AC, size = 150 }: { color?: string; size?: number }) {
+/** Nested-hexagon signature mark — Prism two-tone: coral operator rings
+ *  on the outside, aqua reference ring in the middle, vertex dots like
+ *  the radar's marker language (decorative mark, not measured data). */
+function HexMark({ size = 150 }: { size?: number }) {
+  const verts = [0, 1, 2, 3, 4, 5].map((i) => [
+    43 + 37 * Math.cos(-Math.PI / 2 + (i * Math.PI) / 3),
+    43 + 37 * Math.sin(-Math.PI / 2 + (i * Math.PI) / 3),
+  ]);
   return (
     <svg width={size} height={size} viewBox="0 0 86 86">
       <polygon
         points="43,6 78,24 78,62 43,80 8,62 8,24"
         fill="none"
-        stroke={color}
+        stroke={AC}
         strokeWidth="1.4"
-        opacity="0.45"
+        opacity="0.5"
       />
+      {verts.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="1.6" fill={AC} opacity="0.65" />
+      ))}
       <polygon
         points="43,16 68,29 68,57 43,70 18,57 18,29"
         fill="none"
-        stroke={color}
-        strokeWidth="1.4"
+        stroke={CYAN}
+        strokeWidth="1.2"
+        strokeDasharray="3 3"
         opacity="0.7"
       />
       <polygon
         points="43,27 57,35 57,51 43,59 29,51 29,35"
-        fill={color}
+        fill={AC}
         opacity="0.9"
       />
     </svg>
@@ -403,7 +425,7 @@ export function OperatorSignalCard({ data }: { data: SignalCardData }) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: "linear-gradient(150deg,#0d120b,#080c07)",
+        background: "linear-gradient(150deg,#151b20,#0b0e12)",
         border: `1px solid ${LINE2}`,
         borderRadius: 14,
         color: TX,
@@ -439,8 +461,8 @@ export function OperatorSignalCard({ data }: { data: SignalCardData }) {
               display: "flex",
               fontSize: 14,
               letterSpacing: 1.6,
-              color: AC,
-              border: `1px solid ${AC}`,
+              color: CYAN,
+              border: `1px solid ${CYAN}`,
               borderRadius: 6,
               padding: "8px 14px",
             }}
@@ -567,7 +589,7 @@ export function OperatorSignalCard({ data }: { data: SignalCardData }) {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              borderTop: "1px solid rgba(128,128,128,0.18)",
+              borderTop: "1px solid rgba(126,143,150,0.22)",
               paddingTop: 12,
               gap: 18,
             }}
@@ -583,7 +605,7 @@ export function OperatorSignalCard({ data }: { data: SignalCardData }) {
             >
               {r.label}
             </div>
-            <Spark points={r.spark} />
+            <Spark points={r.spark} stroke={SPARK_COLORS[r.label] ?? AC} />
             <div
               style={{
                 display: "flex",
@@ -636,7 +658,7 @@ export function OperatorSignalCard({ data }: { data: SignalCardData }) {
           fontSize: 13,
           letterSpacing: 1.2,
           color: MUT,
-          borderTop: "1px solid rgba(128,128,128,0.2)",
+          borderTop: "1px solid rgba(126,143,150,0.24)",
           paddingTop: 14,
           marginTop: 16,
         }}

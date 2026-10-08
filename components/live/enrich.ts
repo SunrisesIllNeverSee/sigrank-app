@@ -157,6 +157,11 @@ export interface LiveOperatorDetail extends Partial<LiveOperator> {
    *  points, "score" when it fell back to the signa_rate series. The dock
    *  labels the sparkline from this — never guess from the values. */
   trendKind?: "yield" | "score";
+  /** Count of distinct accepted activity days — evidence for streak-type
+   *  badges. Sourced from an independent all-time history fetch
+   *  (limit 365), NOT the display feed's HISTORY_LIMIT=60 window and
+   *  never account_age_days. Absent when the evidence fetch failed. */
+  activeDays?: number;
   /** Channels that failed during this load (partial failure is still ready). */
   errors?: Partial<Record<DetailChannel, true>>;
 }
@@ -245,7 +250,7 @@ async function loadDetail(
   const enc = encodeURIComponent(codename);
   const errors: NonNullable<LiveOperatorDetail["errors"]> = {};
 
-  const [opRes, histRes, recsRes] = await Promise.allSettled([
+  const [opRes, histRes, recsRes, actRes] = await Promise.allSettled([
     fetchOperatorProfile(codename),
     api<ApiHistory>(
       `/api/v1/operators/${enc}/history?window=${encodeURIComponent(
@@ -253,6 +258,16 @@ async function loadDetail(
       )}&limit=${HISTORY_LIMIT}`,
     ),
     api<ApiRecords>(`/api/v1/operators/${enc}/records`),
+    /* accepted-activity-day evidence — an independent paginated feed
+       (all-time, up to the API's 365-point cap) counted as DISTINCT
+       dates. Deliberately separate from the 60-point display feed so a
+       100-day threshold is provable, and deliberately not
+       account_age_days (age ≠ activity). Conservative: multi-point days
+       collapse to one; a saturated 365-point feed that can't prove 100
+       distinct days denies rather than guesses. */
+    api<ApiHistory>(
+      `/api/v1/operators/${enc}/history?window=all_time&limit=365`,
+    ),
   ]);
 
   const det: LiveOperatorDetail = { errors };
@@ -303,6 +318,17 @@ async function loadDetail(
     }
   } else {
     errors.history = true;
+  }
+
+  /* activity-days evidence channel → distinct accepted dates (independent
+     of the display feed's window/limit). Only real `date` values count —
+     a missing or malformed date is not an active day. */
+  if (actRes.status === "fulfilled") {
+    det.activeDays = new Set(
+      (actRes.value.points ?? [])
+        .map((p) => p?.date?.slice(0, 10))
+        .filter((d): d is string => !!d),
+    ).size;
   }
 
   /* records channel → recs (ranked metric boards) + curated hall titles */

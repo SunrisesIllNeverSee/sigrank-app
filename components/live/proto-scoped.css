@@ -1412,10 +1412,9 @@
 .lbw-root .f5stats header{font:8px var(--font-mono);letter-spacing:.14em;
   color:#a7d36a;border-bottom:1px dashed #375126;padding-bottom:8px}
 .lbw-root .f5-stat-row{flex:1;min-height:0;display:grid;align-items:center;
-  grid-template-columns:66px minmax(0,1fr) 56px;gap:4px;border-bottom:1px solid #2c3824}
+  grid-template-columns:66px minmax(0,1fr);gap:7px;border-bottom:1px solid #2c3824}
 .lbw-root .f5-stat-row:last-child{border:0}
 .lbw-root .f5-stat-row>span{font:8px var(--font-mono);color:#8caa7f}
-.lbw-root .f5-stat-row>b{font:8px var(--font-mono);text-align:right;color:#c7e8a7}
 .lbw-root .f5-stat-row svg{width:100%;height:23px;display:block}
 .lbw-root .f5-no-history{color:#867559;font:7px var(--font-mono);text-align:center}
 
@@ -1447,3 +1446,101 @@
    (ledger: 271×133); contents center within. */
 .lbw-root .rail .awbox{height:133px;box-sizing:border-box;display:flex;flex-direction:column}
 .lbw-root .rail .awbox>.pxshelf,.lbw-root .rail .awbox>.trp-deck,.lbw-root .rail .awbox>.awards.cards{flex:1;align-content:center}
+
+/* ----- Five-section editorial IA, October 2026 -----
+   Only WorkspaceShell pages explicitly marked editorialStage use these rules.
+   Product leaderboard and Hall/Compare geometry remain untouched. */
+.lbw-root .ws-section-navigation{display:flex;flex-direction:column;gap:12px;min-width:0}
+.lbw-root .ws-primary-nav{display:flex;flex-direction:column;gap:4px}
+.lbw-root .ws-primary-nav a{
+  display:flex;align-items:center;justify-content:space-between;gap:9px;
+  min-height:33px;padding:8px 10px;border:1px solid transparent;
+  color:var(--tx2);background:transparent;text-decoration:none;
+  font-family:var(--font-disp);font-weight:600;font-size:12px;letter-spacing:.02em;
+  border-radius:var(--radius-sm);
+}
+.lbw-root .ws-primary-nav a:hover{color:var(--tx);border-color:var(--line2);background:var(--hover)}
+.lbw-root .ws-primary-nav a.ws-primary-active{
+  color:var(--ac);background:var(--sel);border-color:var(--line2);
+}
+.lbw-root .ws-primary-arrow{font-family:var(--font-mono);font-size:9px;opacity:.48}
+.lbw-root .ws-primary-nav a.ws-primary-active .ws-primary-arrow{opacity:1}
+.lbw-root .ws-secondary{padding-top:12px;border-top:1px solid var(--line2)}
+.lbw-root .ws-secondary .mini-h{margin-bottom:8px}
+.lbw-root .ws-secondary .ws-nav{padding-left:9px;border-left:1px solid var(--line2)}
+.lbw-root .ws-secondary .ws-nav a{font-size:10.5px;padding:7px 8px;line-height:1.4}
+.lbw-root .ws-secondary .ws-nav a.ws-secondary-active{color:var(--ac);background:var(--sel)}
+.lbw-root .ws-primary-nav a:focus-visible,.lbw-root .ws-secondary a:focus-visible{
+  outline:2px solid var(--ac);outline-offset:2px
+}
+/* One consistent central composition: truly centered within available Stage,
+   independent of how wide the user drags either sidebar. */
+.lbw-root .stage.ws-editorial-stage{
+  padding:0 clamp(18px,2.5vw,40px) 44px;
+  scroll-padding-top:24px;
+}
+.lbw-root .ws-editorial-stage>.board{
+  width:100%;max-width:1120px;margin:0 auto;padding:22px 0 50px;
+  min-width:0;
+}
+.lbw-root .ws-editorial-stage .ws-doc,
+.lbw-root .ws-editorial-stage .ws-article{
+  width:100%;max-width:880px;margin-left:auto;margin-right:auto;
+  min-width:0;
+}
+.lbw-root .ws-editorial-stage .ws-doc.ws-doc-wide{max-width:1040px}
+.lbw-root .ws-editorial-stage .ws-doc{row-gap:clamp(24px,2.4vw,36px)}
+.lbw-root .ws-editorial-stage .ws-doc>*,.lbw-root .ws-editorial-stage .ws-article>*{min-width:0}
+.lbw-root .ws-editorial-stage .ws-hero{
+  width:100%;max-width:1040px;margin:0 auto 30px;
+}
+.lbw-root .ws-editorial-stage .ws-article>.article-shell{
+  padding-inline:clamp(14px,2vw,30px);
+}
+.lbw-root .ws-editorial-stage .ws-article .prose-sigrank{
+  margin-inline:auto;max-width:740px;overflow-wrap:anywhere;
+}
+.lbw-root .ws-editorial-stage .ws-article .prose-sigrank img,
+.lbw-root .ws-editorial-stage .ws-article .prose-sigrank table{
+  max-width:100%;
+}
+.lbw-root .ws-editorial-stage .ws-doc section[id]{scroll-margin-top:22px}
+@media (max-width:780px){
+ .lbw-root .stage.ws-editorial-stage{padding-inline:18px}
+ .lbw-root .ws-editorial-stage>.board{padding-top:16px}
+}
+
+/* Editorial wave mastheads: keep the approved signal motif as a quiet
+   lower-edge accent instead of drawing through document headings.
+   Applies only to text/research stages, never the Hall/board hero. */
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) {
+  position:relative;
+  padding-bottom:34px;
+}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>svg {
+  inset:auto 0 0;
+  height:34px;
+  opacity:.28;
+}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>div {
+  position:relative;
+  z-index:1;
+}
+/* Article collection title uses the same left-aligned, centered-width
+   editorial measure as Blog and Wiki. */
+.lbw-root .ws-editorial-heading{
+  width:100%;padding:clamp(18px,2.6vw,30px) 0;
+  border-bottom:1px solid var(--line2);
+  display:flex;flex-direction:column;gap:12px;
+}
+.lbw-root .ws-editorial-eyebrow{
+  font:600 9.5px var(--font-mono);letter-spacing:.16em;color:var(--ac);
+}
+.lbw-root .ws-editorial-heading h1{
+  font-family:var(--font-disp);font-size:clamp(30px,3.2vw,44px);
+  font-weight:700;letter-spacing:-.045em;color:var(--tx);line-height:1.05;
+}
+.lbw-root .ws-editorial-heading>p:last-child{
+  max-width:670px;font-size:13px;line-height:1.72;color:var(--tx2);
+}
+.lbw-root .ws-article-list .blog-row-meta{overflow-wrap:anywhere}

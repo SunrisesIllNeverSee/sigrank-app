@@ -129,8 +129,37 @@ export function DualSignatureRadar({
           strokeWidth="2.4"
         />
         {xy(op).map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="3.4" fill={THEME.operator} />
+          <circle key={i} cx={x} cy={y} r="3.4" fill={THEME.operator}>
+            <title>{`${AXES[i].name}: ${operator[AXES[i].key]} / display ceiling ${AXES[i].cap}`}</title>
+          </circle>
         ))}
+        {/* cap saturation is exposed, never implied: a measured value
+            above a fixed display ceiling gets an outward triangle marker
+            — the clipped vertex is not presented as the exact value. */}
+        {AXES.map((a, i) => {
+          const value = operator[a.key];
+          if (value === null || !Number.isFinite(value) || value <= a.cap)
+            return null;
+          const angle = -Math.PI / 2 + (i * Math.PI) / 3;
+          const c = Math.cos(angle);
+          const s = Math.sin(angle);
+          const [cx, cy] = pt(86, i);
+          const tx = -s;
+          const ty = c;
+          return (
+            <polygon
+              key={`overflow-${a.key}`}
+              points={joinPts([
+                [cx + c * 5, cy + s * 5],
+                [cx - c * 3 + tx * 3, cy - s * 3 + ty * 3],
+                [cx - c * 3 - tx * 3, cy - s * 3 - ty * 3],
+              ])}
+              fill={THEME.operator}
+            >
+              <title>{`${a.name} exceeds display ceiling: ${value} (cap ${a.cap})`}</title>
+            </polygon>
+          );
+        })}
         {AXES.map((a, i) => {
           const [x, y] = pt(99, i);
           return (
@@ -166,6 +195,9 @@ export function DualSignatureRadar({
             </text>
           </g>
         )}
+        <text x="256" y="268" fill="#dee9ec" fontSize="6.4" textAnchor="end" opacity=".8">
+          ▲ = ABOVE AXIS CEILING
+        </text>
       </svg>
     </div>
   );
