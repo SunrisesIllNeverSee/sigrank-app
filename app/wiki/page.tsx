@@ -2006,7 +2006,7 @@ export default function Draft1Page() {
             </div>
           </>
         }
-        leftWidth={240}
+        leftWidth={280}
         rightWidth={240}
         status={<>OPERATOR EVALUATION REFERENCE · SIGNALAF × SIGRANK · MO§ES™</>}
       >

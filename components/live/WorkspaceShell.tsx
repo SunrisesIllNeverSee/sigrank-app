@@ -60,7 +60,7 @@ const NAV_LINKS: { key: WorkspaceNav; href: string; tip: string }[] = [
   { key: "board", href: "/board/all", tip: "LEADERBOARD" },
   { key: "compare", href: "/compare", tip: "COMPARE" },
   { key: "hall", href: "/hall", tip: "HALL" },
-  { key: "field", href: "/field", tip: "FIELD" },
+  { key: "field", href: "/fieldhub", tip: "FIELD" },
 ];
 
 const NAV_LINKS_2: { key: WorkspaceNav; href: string; tip: string }[] = [

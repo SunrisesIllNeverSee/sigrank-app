@@ -158,7 +158,7 @@ export function WikiEntry({
           )}
         </>
       }
-      leftWidth={220}
+      leftWidth={280}
       rightWidth={240}
       status={<>SIGNALAF WIKI · EVIDENCE LAYER{cat ? ` · ${cat.label.toUpperCase()}` : ""}</>}
     >

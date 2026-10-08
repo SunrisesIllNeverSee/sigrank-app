@@ -1550,7 +1550,7 @@ export function LiveBoardWorkspace({
             <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
               <RailIcon name="hall" set={iconSet} />
             </Link>
-            <Link className="sbtn" href="/field" data-tip="FIELD" title="FIELD">
+            <Link className="sbtn" href="/fieldhub" data-tip="FIELD" title="FIELD">
               <RailIcon name="field" set={iconSet} />
             </Link>
             <span className="snav-sep" aria-hidden="true"></span>
