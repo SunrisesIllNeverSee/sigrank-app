@@ -104,6 +104,7 @@ export default function StateOfTheIndexPage() {
   return (
     <FieldWorkspaceFrame
       title="STATE OF THE INDEX"
+      current="research"
       rightTitle="DATASET"
       right={
         <>

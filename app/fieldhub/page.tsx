@@ -61,6 +61,7 @@ export default async function FieldHubPage() {
   return (
     <FieldWorkspaceFrame
       title="FIELD HUB"
+      current="fieldhub"
       rightTitle="FIELD FAMILY"
       right={
         <>
