@@ -73,8 +73,8 @@ function fallbackCard(message: string) {
         flexDirection: "column",
         justifyContent: "center",
         padding: "80px",
-        background: "linear-gradient(150deg,#0d120b,#080c07)",
-        color: "#e9f3df",
+        background: "linear-gradient(150deg,#151b20,#0b0e12)",
+        color: "#eef6f4",
         fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
       }}
     >
@@ -92,7 +92,7 @@ function fallbackCard(message: string) {
         style={{
           display: "flex",
           fontSize: 34,
-          color: "#71826a",
+          color: "#7e8f96",
           marginTop: 16,
           letterSpacing: 2,
         }}
@@ -103,7 +103,7 @@ function fallbackCard(message: string) {
         style={{
           display: "flex",
           fontSize: 24,
-          color: "#71826a",
+          color: "#7e8f96",
           marginTop: 40,
           letterSpacing: 1.5,
         }}

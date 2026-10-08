@@ -104,6 +104,7 @@ import {
   computeTT,
   isVerifiedOp,
   numLev,
+  numTotal,
   numYield,
   numvOf,
   opRadar,
@@ -284,40 +285,52 @@ function MedalDeck({
 
 /* LB-G06 — six-axis fact vector for the dual signature radar (SNR,
    Velocity, Leverage, 10xDEV, Scale V, Efficiency — the six derived
-   headline metrics, no raw token pillars). */
+   headline metrics, no raw token pillars). eff arrives as a compact
+   display string — a missing/"—" cell is an absent measurement, never
+   an observed zero (numvOf("—") → 0). */
+const effFactOf = (o: LiveOperator): number | null =>
+  o.eff && o.eff !== "—" ? numvOf(o.eff) : null;
+
 const sixFactsOf = (o: LiveOperator): SixAxisFacts => ({
   snr: o.snr,
   velocity: o.vel,
   leverage: numLev(o),
   dev10x: o.dev,
   scaleV: o.scalev,
-  efficiency: numvOf(o.eff),
+  efficiency: effFactOf(o),
 });
 
-/* Real same-axis field reference: per-axis median across the board's
-   population. Below 3 operators a median isn't meaningful → null.
-   Missing values never feed the median. */
+/* Real same-axis field reference: per-axis statistical median across the
+   eligible cohort. Below 3 operators a median isn't meaningful → null.
+   Exclusions: non-compounding rows (their canonical metrics render "—",
+   not measurements), absent/non-finite values, and display-string "—"
+   (numvOf("—") → 0 must never count as an observed zero). */
 const fieldSixMedian = (ops: LiveOperator[]): SixAxisFacts | null => {
-  if (ops.length < 3) return null;
-  const med = (xs: number[]) => {
-    const s = xs.filter(Number.isFinite).sort((a, b) => a - b);
-    return s.length ? s[Math.floor(s.length / 2)] : null;
+  const eligible = ops.filter((o) => !o.nc);
+  if (eligible.length < 3) return null;
+  const med = (xs: (number | null | undefined)[]) => {
+    const s = xs.filter((v): v is number => Number.isFinite(v)).sort(
+      (a, b) => a - b,
+    );
+    if (!s.length) return null;
+    const mid = Math.floor(s.length / 2);
+    return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
   };
   return {
-    snr: med(ops.map((o) => o.snr)),
-    velocity: med(ops.map((o) => o.vel)),
-    leverage: med(ops.map((o) => numLev(o))),
-    dev10x: med(ops.map((o) => o.dev)),
-    scaleV: med(ops.map((o) => o.scalev)),
-    efficiency: med(ops.map((o) => numvOf(o.eff))),
+    snr: med(eligible.map((o) => o.snr)),
+    velocity: med(eligible.map((o) => o.vel)),
+    leverage: med(eligible.map((o) => numLev(o))),
+    dev10x: med(eligible.map((o) => o.dev)),
+    scaleV: med(eligible.map((o) => o.scalev)),
+    efficiency: med(eligible.map(effFactOf)),
   };
 };
 
-/* LB-G08 — five-stat rows from real dated history/snapshot points. */
-const tsOf = (s: string, i: number) => {
-  const t = Date.parse(s);
-  return Number.isFinite(t) ? t : i;
-};
+/* LB-G08 — five-stat rows from real dated history/snapshot points.
+   tsOf returns the real parsed UTC ms — invalid dates yield NaN and are
+   excluded downstream (ordered()/MetricGraph both drop non-finite
+   timestamps). An index is never a calendar point. */
+const tsOf = (s: string) => Date.parse(s);
 
 const fiveStatRows = (
   selOp: LiveOperator | null | undefined,
@@ -330,40 +343,40 @@ const fiveStatRows = (
     display: selOp ? numYield(selOp).toLocaleString() : "—",
     /* yieldv 0 = a non-compounding day — preserve as a real gap, never
        flatten missingness into fake zeroes. */
-    history: hist.map((h, i) => ({
-      timestamp: tsOf(h.date, i),
+    history: hist.map((h) => ({
+      timestamp: tsOf(h.date),
       value: h.yieldv > 0 ? h.yieldv : null,
     })),
   },
   {
     name: "SCORE",
     display: hist.length ? hist[hist.length - 1].score.toFixed(1) : "—",
-    history: hist.map((h, i) => ({
-      timestamp: tsOf(h.date, i),
+    history: hist.map((h) => ({
+      timestamp: tsOf(h.date),
       value: h.score > 0 ? h.score : null,
     })),
   },
   {
     name: "RANK",
     display: profile ? `#${profile.rank}` : "—",
-    history: hist.map((h, i) => ({
-      timestamp: tsOf(h.date, i),
+    history: hist.map((h) => ({
+      timestamp: tsOf(h.date),
       value: h.rank > 0 ? h.rank : null,
     })),
   },
   {
     name: "LEVERAGE",
     display: selOp ? numLev(selOp).toLocaleString() : "—",
-    history: snaps.map((s, i) => ({
-      timestamp: tsOf(s.submittedAt, i),
+    history: snaps.map((s) => ({
+      timestamp: tsOf(s.submittedAt),
       value: s.leverage,
     })),
   },
   {
     name: "VELOCITY",
     display: selOp ? selOp.vel.toFixed(2) : "—",
-    history: snaps.map((s, i) => ({
-      timestamp: tsOf(s.submittedAt, i),
+    history: snaps.map((s) => ({
+      timestamp: tsOf(s.submittedAt),
       value: s.velocity,
     })),
   },
@@ -1401,12 +1414,12 @@ export function LiveBoardWorkspace({
             {awSlide % 3 === 0 &&
               (() => {
                 const pct = selOp?.pct ?? 0;
-                /* "100 DAYS CONSISTENT" is a streak claim — earn it from
-                   100+ distinct dated history points, never from account
-                   age alone (handoff data rule). */
-                const days = new Set(
-                  (selDetail?.history ?? []).map((h) => h.date),
-                ).size;
+                /* "100 DAYS CONSISTENT" is a streak claim — earned only
+                   from the independent accepted-activity-day evidence
+                   feed (det.activeDays, distinct all-time history
+                   dates). Never account age; the 60-point display feed
+                   can't prove 100 days. Unfetched evidence → unearned. */
+                const days = selDetail?.activeDays ?? 0;
                 const earned = new Set<PixelBadgeName>();
                 if (isVerifiedOp(selOp?.verif)) earned.add("verified");
                 /* cumulative tiers — pct ≥ 99 lights top10+top5+top1 */
@@ -1414,9 +1427,9 @@ export function LiveBoardWorkspace({
                 if (pct >= 95) earned.add("top5");
                 if (pct >= 99) earned.add("top1");
                 if (days >= 100) earned.add("days100");
-                /* the payload carries a real lifetime-token total — use
-                   it, not a records-count proxy */
-                if (selOp && numvOf(selOp.total) >= 1e7)
+                /* exact lifetime-token total via num.num.total — never
+                   the abbreviated display string or a records count */
+                if (selOp && numTotal(selOp) >= 1e7)
                   earned.add("tokens10m");
                 return (
                   <div className="pxshelf">
@@ -1470,9 +1483,7 @@ export function LiveBoardWorkspace({
                  source-backed facts — class standing, top-1% legend,
                  evidence-backed consistency, record count, real 10M. */
               (() => {
-                const days = new Set(
-                  (selDetail?.history ?? []).map((h) => h.date),
-                ).size;
+                const days = selDetail?.activeDays ?? 0;
                 return (
                   <div className="awards cards">
                     <div className="hxcard">
@@ -1503,7 +1514,7 @@ export function LiveBoardWorkspace({
                         <span className="hx-v">RECORDS</span>
                       </div>
                     )}
-                    {selOp && numvOf(selOp.total) >= 1e7 && (
+                    {selOp && numTotal(selOp) >= 1e7 && (
                       <div className="hxcard">
                         <SignalAward type="tokens10m" size={40} />
                         <span className="hx-n">10M+</span>
