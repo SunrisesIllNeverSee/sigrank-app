@@ -1007,10 +1007,53 @@
   letter-spacing:.06em;margin-top:4px}
 .lbw-root .hx-v{font-family:var(--font-mono);font-size:8px;color:var(--ac);
   letter-spacing:.14em}
-/* overtime sparkline box */
-.lbw-root .trendbox{border:1px solid var(--line);border-radius:9px;
-  padding:10px;margin-bottom:8px}
-.lbw-root .trendbox svg{display:block;width:100%;height:auto}
+/* addendum 2026-10-08 — combined-signal module (replaces .trendbox).
+   Fixed 215px chart box so COMBO↔SINGLE never resizes the rail. */
+.lbw-root .csa-large{width:100%;height:215px;border-radius:9px;
+  border:1px solid var(--line);background:var(--panel);padding:9px;
+  box-sizing:border-box;overflow:hidden;margin-bottom:8px;
+  display:flex;flex-direction:column}
+.lbw-root .csa-large>header{height:21px;flex:none;display:flex;
+  justify-content:space-between;align-items:flex-start;
+  border-bottom:1px dashed var(--line);color:var(--tx2);
+  font:8px var(--font-mono);letter-spacing:.08em}
+.lbw-root .csa-mode{display:flex;gap:1px;border:1px solid var(--line);
+  border-radius:3px;padding:2px;margin-top:-3px}
+.lbw-root .csa-mode button{font:7px var(--font-mono);border:0;
+  background:transparent;color:var(--mut);padding:2px 4px;cursor:pointer}
+.lbw-root .csa-mode button[aria-pressed="true"]{background:var(--ac);
+  color:var(--ac-tx);border-radius:2px}
+.lbw-root .csa-legend{height:34px;flex:none;display:flex;flex-wrap:wrap;
+  justify-content:center;align-items:center;gap:3px 6px}
+.lbw-root .csa-legend button{border:1px solid var(--line);
+  background:transparent;color:var(--tx2);font:7px var(--font-mono);
+  display:flex;align-items:center;gap:4px;padding:3px 4px;
+  border-radius:3px;cursor:pointer}
+.lbw-root .csa-legend button[aria-pressed="false"]{opacity:.38;
+  text-decoration:line-through}
+.lbw-root .csa-legend i{width:7px;height:2px;background:var(--csa)}
+.lbw-root .csa-large>svg{display:block;width:100%;flex:1;min-height:0;
+  touch-action:pan-y}
+.lbw-root .csa-large>footer{height:14px;flex:none;
+  border-top:1px dashed var(--line);padding-top:3px;display:flex;
+  justify-content:space-between;gap:8px;font:7px var(--font-mono);
+  color:var(--mut);overflow:hidden;white-space:nowrap}
+.lbw-root .csa-tip{display:inline-flex;gap:8px;align-items:baseline;
+  min-width:0;overflow:hidden}
+.lbw-root .csa-tip small{font-size:7px;color:var(--tx2)}
+.lbw-root .csa-inspect-row{display:inline-flex;gap:3px;align-items:baseline}
+.lbw-root .csa-inspect-row i{font-style:normal}
+.lbw-root .csa-inspect-row b{color:var(--tx);font-weight:500}
+.lbw-root .csa-no-data{margin:auto;color:var(--mut);
+  font:9px var(--font-mono)}
+
+/* f5 stat rows become buttons when they drive the large module */
+.lbw-root button.f5-stat-row{background:transparent;border:0;
+  border-bottom:1px solid #2c3824;cursor:pointer;text-align:left;
+  padding:0;width:100%;font:inherit;color:inherit}
+.lbw-root button.f5-stat-row:last-child{border:0}
+.lbw-root button.f5-stat-row:hover{background:color-mix(in srgb,var(--ac) 6%,transparent)}
+.lbw-root button.f5-stat-row.selected{background:color-mix(in srgb,var(--ac) 12%,transparent)}
 
 /* --- pass 3e --- */
 /* movers box: fixed height so rotation never resizes the panel */
