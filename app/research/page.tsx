@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, sigrankDataset, researchArticle, faqPage } from "@/lib/jsonld";
 import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
+import { WaveHero } from "@/components/ui/WaveHero";
 
 export const revalidate = 3600; // 1h — the seed corpus is stable
 
@@ -104,6 +105,14 @@ export default function StateOfTheIndexPage() {
   return (
     <FieldWorkspaceFrame
       title="STATE OF THE INDEX"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK INDEX"
+          terminalText="STATE OF THE INDEX"
+          title="State of the Index"
+          subtitle={<>The primary anonymized seed dataset. Published on Zenodo, DOI 10.5281/zenodo.21900519.</>}
+        />
+      }
       current="research"
       rightTitle="DATASET"
       right={

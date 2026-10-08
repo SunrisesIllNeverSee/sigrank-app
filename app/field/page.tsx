@@ -11,6 +11,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
@@ -123,6 +124,15 @@ export default async function FieldPage() {
       <WorkspaceShell
         active="field"
         title="FIELD ANALYSIS"
+        bareTitle
+        hero={
+          <WaveHero
+            eyebrow="FIELD RESEARCH"
+            terminalText="FIELD ANALYSIS"
+            title="Field Analysis"
+            subtitle={<>The true distribution of token efficiency across the operator field.</>}
+          />
+        }
         leftTitle="FIELD"
         left={
           <>

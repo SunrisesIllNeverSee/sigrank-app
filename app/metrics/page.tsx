@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
@@ -66,6 +67,14 @@ export default function MetricsIndex() {
   return (
     <MetricsWorkspaceFrame
       title="METRICS"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK"
+          terminalText="METRICS"
+          title="Metrics"
+          subtitle={<>Every comparable operator metric, defined.</>}
+        />
+      }
     >
     <div className="flex flex-col gap-8 py-2">
       <JsonLd
