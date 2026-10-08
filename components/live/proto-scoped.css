@@ -1292,3 +1292,11 @@
    connects with the sidebar borders (fieldhub landing) */
 .lbw-root .ws-hero{margin:0 -22px}
 .lbw-root .ws-hero > *{display:block}
+
+/* SIGRANK banner nav — square edges, quiet eyebrows, subtitle hidden so
+   the rail banners stay small; breathing room before the next section */
+.lbw-root .ws-bnav{margin-bottom:8px}
+.lbw-root .ws-bnav header{border-radius:0}
+.lbw-root .ws-bnav p{display:none}
+.lbw-root .ws-hero header{border-radius:0}
+.lbw-root .ws-card > header{border-radius:0}
