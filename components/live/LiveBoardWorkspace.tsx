@@ -74,13 +74,18 @@ import { EnterprisePromoPop } from "./EnterprisePromo";
 import {
   OperatorDock,
   OperatorProfileTile,
-  RadarChart,
   SharePreview,
 } from "./OperatorDock";
 import { RailIcon, ICON_SETS } from "./PixelIcon";
 import type { IconSetName } from "./PixelIcon";
 import { PixelBadge, badgeForPct } from "./PixelBadge";
-import CascadeRadar from "@/components/charts/CascadeRadar";
+import type { PixelBadgeName } from "./PixelBadge";
+import { BADGE_LABELS } from "./PixelBadge";
+import { SignalMedal, SignalAward } from "./SignalHardware";
+import { DualSignatureRadar } from "./DualSignatureRadar";
+import type { SixAxisFacts } from "./DualSignatureRadar";
+import { FiveStats } from "./FiveStats";
+import type { FiveStatRow } from "./FiveStats";
 import { RotatingMovers } from "./MoversRail";
 
 import {
@@ -98,14 +103,15 @@ import {
   isVerifiedOp,
   numLev,
   numYield,
+  numvOf,
   opRadar,
   persistLbwTheme,
   profileFor,
   rawRankMap,
   resolveLbwTheme,
   rmaxOf,
-  fieldMedianRadarVals,
   windowLabel,
+  type ProfileView,
   type ThemeName,
 } from "./utils";
 import { track } from "@/lib/infra/posthog/events";
@@ -214,6 +220,12 @@ function MedalDeck({
       <div className="podrow">
         {slide.list.slice(0, 3).map((o) => {
           const k = ops.indexOf(o);
+          /* LB-G01 approved direction: SignalMedal hardware up top, the
+             holder's profile icon centered in the card, name + standing
+             below — three horizontal slots per metal slide. */
+          const medalRank = (
+            slide.name === "gold" ? 1 : slide.name === "silver" ? 2 : 3
+          ) as 1 | 2 | 3;
           return (
             <button
               key={o.codename}
@@ -221,6 +233,7 @@ function MedalDeck({
               className="podcard"
               onClick={() => onSelect?.(k)}
             >
+              <SignalMedal rank={medalRank} size={26} />
               <span className="mav">
                 {o.avatarUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
@@ -237,7 +250,14 @@ function MedalDeck({
         {Array.from({ length: 3 - Math.min(3, slide.list.length) }).map(
           (_, i) => (
             <div className="podcard empty" key={i}>
-              —
+              {/* vacant slots keep the same footprint — muted hardware +
+                  explicit VACANT label, never a bare dash */}
+              <SignalMedal
+                rank={(slide.name === "gold" ? 1 : slide.name === "silver" ? 2 : 3) as 1 | 2 | 3}
+                size={24}
+                muted
+              />
+              <span className="vacancy">VACANT</span>
             </div>
           ),
         )}
@@ -325,67 +345,208 @@ function TrendSpark({
   );
 }
 
-/* Mini sparkline — three kinds (owner: "different kinds of sparklines"):
-   area fill, bars, plain line. Empty series → a faint flat baseline. */
-function MiniSpark({
-  pts,
-  kind,
-  w = 90,
-  h = 18,
+/* LB-G06 — six-axis fact vector for the dual signature radar (SNR,
+   Velocity, Leverage, 10xDEV, Scale V, Efficiency — the six derived
+   headline metrics, no raw token pillars). */
+const sixFactsOf = (o: LiveOperator): SixAxisFacts => ({
+  snr: o.snr,
+  velocity: o.vel,
+  leverage: numLev(o),
+  dev10x: o.dev,
+  scaleV: o.scalev,
+  efficiency: numvOf(o.eff),
+});
+
+/* Real same-axis field reference: per-axis median across the board's
+   population. Below 3 operators a median isn't meaningful → null.
+   Missing values never feed the median. */
+const fieldSixMedian = (ops: LiveOperator[]): SixAxisFacts | null => {
+  if (ops.length < 3) return null;
+  const med = (xs: number[]) => {
+    const s = xs.filter(Number.isFinite).sort((a, b) => a - b);
+    return s.length ? s[Math.floor(s.length / 2)] : null;
+  };
+  return {
+    snr: med(ops.map((o) => o.snr)),
+    velocity: med(ops.map((o) => o.vel)),
+    leverage: med(ops.map((o) => numLev(o))),
+    dev10x: med(ops.map((o) => o.dev)),
+    scaleV: med(ops.map((o) => o.scalev)),
+    efficiency: med(ops.map((o) => numvOf(o.eff))),
+  };
+};
+
+/* LB-G08 — five-stat rows from real dated history/snapshot points. */
+const tsOf = (s: string, i: number) => {
+  const t = Date.parse(s);
+  return Number.isFinite(t) ? t : i;
+};
+
+const fiveStatRows = (
+  selOp: LiveOperator | null | undefined,
+  profile: ProfileView | null,
+  hist: { date: string; score: number; rank: number; yieldv: number }[],
+  snaps: { submittedAt: string; leverage: number | null; velocity: number | null }[],
+): FiveStatRow[] => [
+  {
+    name: "YIELD",
+    display: selOp ? numYield(selOp).toLocaleString() : "—",
+    /* yieldv 0 = a non-compounding day — preserve as a real gap, never
+       flatten missingness into fake zeroes. */
+    history: hist.map((h, i) => ({
+      timestamp: tsOf(h.date, i),
+      value: h.yieldv > 0 ? h.yieldv : null,
+    })),
+  },
+  {
+    name: "SCORE",
+    display: hist.length ? hist[hist.length - 1].score.toFixed(1) : "—",
+    history: hist.map((h, i) => ({
+      timestamp: tsOf(h.date, i),
+      value: h.score > 0 ? h.score : null,
+    })),
+  },
+  {
+    name: "RANK",
+    display: profile ? `#${profile.rank}` : "—",
+    history: hist.map((h, i) => ({
+      timestamp: tsOf(h.date, i),
+      value: h.rank > 0 ? h.rank : null,
+    })),
+  },
+  {
+    name: "LEVERAGE",
+    display: selOp ? numLev(selOp).toLocaleString() : "—",
+    history: snaps.map((s, i) => ({
+      timestamp: tsOf(s.submittedAt, i),
+      value: s.leverage,
+    })),
+  },
+  {
+    name: "VELOCITY",
+    display: selOp ? selOp.vel.toFixed(2) : "—",
+    history: snaps.map((s, i) => ({
+      timestamp: tsOf(s.submittedAt, i),
+      value: s.velocity,
+    })),
+  },
+];
+
+/* LB-G15 — the operator profile's two internal slides share one fixed
+   viewport: VISUAL (dual signature radar) / STAT HIGHLIGHTS (the five
+   original graph encodings). Ported from OperatorProfileTwoSlides. */
+function ProfileSlides({
+  visual,
+  stats,
 }: {
-  pts: number[];
-  kind: "area" | "bars" | "line";
-  w?: number;
-  h?: number;
+  visual: React.ReactNode;
+  stats: React.ReactNode;
 }) {
-  if (!pts.length)
-    return (
-      <svg width={w} height={h} aria-hidden>
-        <line
-          x1={1}
-          y1={h / 2}
-          x2={w - 1}
-          y2={h / 2}
-          stroke="var(--line2)"
-          strokeDasharray="2 3"
-        />
-      </svg>
-    );
-  const max = Math.max(...pts);
-  const min = Math.min(...pts);
-  const span = Math.max(max - min, 1e-6);
-  const x = (i: number) => 1 + (i / Math.max(pts.length - 1, 1)) * (w - 2);
-  const y = (v: number) => h - 2 - ((v - min) / span) * (h - 4);
-  if (kind === "bars") {
-    const bw = Math.max((w - 4) / pts.length - 1.5, 1.4);
-    return (
-      <svg width={w} height={h} aria-hidden>
-        {pts.map((v, i) => (
-          <rect
-            key={i}
-            x={x(i) - bw / 2}
-            y={y(v)}
-            width={bw}
-            height={h - 1 - y(v)}
-            fill="var(--ac)"
-            opacity={0.35 + (0.65 * (v - min)) / span}
-          />
-        ))}
-      </svg>
-    );
-  }
-  const poly = pts.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const [slide, setSlide] = useState<"visual" | "stats">("visual");
   return (
-    <svg width={w} height={h} aria-hidden>
-      {kind === "area" && (
-        <polyline
-          points={`${x(0)},${h - 1} ${poly} ${x(pts.length - 1)},${h - 1}`}
-          fill="color-mix(in srgb, var(--ac) 20%, transparent)"
-          stroke="none"
-        />
-      )}
-      <polyline points={poly} fill="none" stroke="var(--ac)" strokeWidth={1.3} />
-    </svg>
+    <div className="profslides">
+      <div className="profslides-vp">{slide === "visual" ? visual : stats}</div>
+      <nav className="profslides-nav" aria-label="Operator profile views">
+        <button
+          type="button"
+          aria-pressed={slide === "visual"}
+          className={slide === "visual" ? "on" : ""}
+          onClick={() => setSlide("visual")}
+        >
+          VISUAL
+        </button>
+        <button
+          type="button"
+          aria-pressed={slide === "stats"}
+          className={slide === "stats" ? "on" : ""}
+          onClick={() => setSlide("stats")}
+        >
+          STAT HIGHLIGHTS
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+/* LB-G14 — user-triggered PNG export of the visible board. Approved
+   scope A: the full workspace frame ([data-board-workspace]); falls back
+   to the central stage. html-to-image at pixelRatio 2; downloads
+   signalaf-board-<scope>-<timestamp>.png. No telemetry, no stitching. */
+type BoardCaptureScope = "stage" | "workspace";
+
+async function captureVisibleBoard(
+  scope: BoardCaptureScope,
+  root: HTMLElement,
+) {
+  const sel =
+    scope === "stage" ? "[data-board-stage]" : "[data-board-workspace]";
+  const target = root.matches(sel)
+    ? root
+    : root.querySelector<HTMLElement>(sel);
+  if (!target) throw new Error("Board capture target not mounted");
+  const box = target.getBoundingClientRect();
+  if (box.width < 50 || box.height < 50)
+    throw new Error("Board screenshot area not visible");
+  const { toPng } = await import("html-to-image");
+  /* Cross-origin avatars may be omitted by html-to-image if blocked by
+     CORS. Preserve factual board numbers and avoid a blank/failed
+     download. */
+  const url = await toPng(target, {
+    cacheBust: true,
+    pixelRatio: 2,
+    backgroundColor: "#080e08",
+    width: Math.round(box.width),
+    height: Math.round(box.height),
+    style: { overflow: "hidden" },
+  });
+  if (!url.startsWith("data:image/png"))
+    throw new Error("PNG export did not produce an image");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const link = document.createElement("a");
+  link.download = `signalaf-board-${scope}-${stamp}.png`;
+  link.href = url;
+  link.click();
+}
+
+function BoardShotButton({
+  scope,
+  rootRef,
+}: {
+  scope: BoardCaptureScope;
+  rootRef: React.RefObject<HTMLElement | null>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const take = useCallback(async () => {
+    const root = rootRef.current;
+    if (!root) return;
+    setBusy(true);
+    setError("");
+    try {
+      await captureVisibleBoard(scope, root);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Screenshot failed");
+    } finally {
+      setBusy(false);
+    }
+  }, [scope, rootRef]);
+  return (
+    <>
+      <button
+        type="button"
+        className="exp"
+        onClick={take}
+        disabled={busy}
+        title="Download a PNG of the visible board workspace"
+      >
+        ▤ {busy ? "Capturing…" : "Screenshot PNG"}
+      </button>
+      {error ? (
+        <span className="shoterr" role="alert">
+          {error}
+        </span>
+      ) : null}
+    </>
   );
 }
 
@@ -580,6 +741,10 @@ export function LiveBoardWorkspace({
     () => ops.find((o) => o.codename === initial.featured?.codename) ?? null,
     [ops, initial.featured],
   );
+  /* owner 2026-10-06: featured selection fell back to FIELD MAX — a rim
+     polygon by definition, so the radar read "maxed out". When another
+     operator is selected the baseline is the #1 leader's polygon so the
+     leader comparison survives. */
   const radarBaseline = useMemo(() => {
     if (selected === -1 || !featuredRow) return undefined;
     return {
@@ -587,15 +752,6 @@ export function LiveBoardWorkspace({
       vals: opRadar(featuredRow, rmax),
     };
   }, [selected, featuredRow, initial.featured, rmax]);
-  /* owner 2026-10-06: featured selection fell back to FIELD MAX — a rim
-     polygon by definition, so the radar read "maxed out". Baseline is the
-     field MEDIAN polygon; leader-vs-field keeps the leader comparison
-     when another operator is selected. */
-  const fieldMedianBaseline = useMemo(
-    () => ({ label: "FIELD MEDIAN", vals: fieldMedianRadarVals(ops, rmax) }),
-    [ops, rmax],
-  );
-
   /* ---------- selection → enrichment trigger ----------
      A selection (row, featured card, hall hex, mover row) resolves to a
      codename — featured without a field match falls back to the featured
@@ -1061,51 +1217,35 @@ export function LiveBoardWorkspace({
               {/* owner: the radar is its own box — it ends here, then a
                   separate AWARDS/BADGES box follows with three rotating
                   slides (awards → badges → medals) at display size. */}
-              <div className="radarbox">
-                {/* site radar (CascadeRadar — the /compare + /user
-                    component): shared axis maxima with 25% headroom so the
-                    field leader's polygon keeps a shape; ghost layer =
-                    field median (blue), solid = operator. */}
-                <CascadeRadar
-                  size={170}
-                  axes={[
-                    { label: "YIELD ↑", max: rmax.yield * 1.25 },
-                    { label: "LEVERAGE ↑", max: rmax.lev * 1.25 },
-                    { label: "VELOCITY ↑", max: rmax.vel * 1.25 },
-                    { label: "SNR ↑", max: rmax.snr * 1.25 },
-                    { label: "10xDEV ↑", max: rmax.dev * 1.25 },
-                  ]}
-                  series={[
-                    {
-                      name: "FIELD MEDIAN",
-                      values: fieldMedianBaseline.vals.map(
-                        (v, i) =>
-                          v *
-                          [rmax.yield, rmax.lev, rmax.vel, rmax.snr, rmax.dev][
-                            i
-                          ] *
-                          1.25,
-                      ),
-                      color: "var(--blue)",
-                      variant: "ghost",
-                    },
-                    {
-                      name: selOp?.name ?? "OPERATOR",
-                      values: selOp
-                        ? [
-                            numYield(selOp),
-                            numLev(selOp),
-                            selOp.vel,
-                            selOp.snr,
-                            selOp.dev,
-                          ]
-                        : [],
-                      color: "var(--ac)",
-                      variant: "solid",
-                    },
-                  ]}
-                />
-              </div>
+              {/* LB-G15 approved two internal slides on one fixed
+                  viewport. VISUAL = LB-G06 candidate-C dual signature
+                  radar (solar operator over an ultraviolet same-axis
+                  field median). STAT HIGHLIGHTS = LB-G08 the five
+                  original graph encodings fed by real dated history and
+                  snapshot points. */}
+              <ProfileSlides
+                visual={
+                  selOp ? (
+                    <DualSignatureRadar
+                      operator={sixFactsOf(selOp)}
+                      fieldMedian={fieldSixMedian(ops)}
+                      label={selOp.name}
+                    />
+                  ) : (
+                    <p className="drill-note">— SELECT AN OPERATOR</p>
+                  )
+                }
+                stats={
+                  <FiveStats
+                    rows={fiveStatRows(
+                      selOp,
+                      profile,
+                      selDetail?.history ?? [],
+                      selDetail?.snapshots ?? [],
+                    )}
+                  />
+                }
+              />
               {/* YIELD · OVERTIME sparkline (owner: "more over-time
                   sparkline charts... a chart that showed multiple
                   items") — operator trend line + dashed field median. */}
@@ -1115,66 +1255,6 @@ export function LiveBoardWorkspace({
                   <TrendSpark series={selOp!.trend} ops={ops} />
                 </div>
               )}
-              {/* owner: "the stats to be for the sparkline" — each metric
-                  row carries its own mini chart. Real series: yield/score/
-                  rank from the history channel; leverage/velocity from the
-                  snapshot ledger. Each row is a different chart kind. */}
-              <div className="statcard">
-                <div className="awbox-h">STATS · SPARKLINES</div>
-                {(() => {
-                  const hist = selDetail?.history ?? [];
-                  const snaps = selDetail?.snapshots ?? [];
-                  const rows = [
-                    {
-                      l: "YIELD",
-                      v: selOp ? numYield(selOp).toLocaleString() : "—",
-                      spark: hist.map((h) => h.yieldv).filter((x) => x > 0),
-                      kind: "area" as const,
-                    },
-                    {
-                      l: "SCORE",
-                      v: hist.length
-                        ? (hist[hist.length - 1].score ?? 0).toFixed(1)
-                        : "—",
-                      spark: hist.map((h) => h.score).filter((x) => x > 0),
-                      kind: "bars" as const,
-                    },
-                    {
-                      l: "RANK",
-                      v: profile ? `#${profile.rank}` : "—",
-                      /* lower rank = better — invert so up = improving */
-                      spark: hist
-                        .map((h) => h.rank)
-                        .filter((x) => x > 0)
-                        .map((x) => -x),
-                      kind: "line" as const,
-                    },
-                    {
-                      l: "LEVERAGE",
-                      v: selOp ? numLev(selOp).toLocaleString() : "—",
-                      spark: snaps
-                        .map((sn) => sn.leverage ?? 0)
-                        .filter((x) => x > 0),
-                      kind: "bars" as const,
-                    },
-                    {
-                      l: "VELOCITY",
-                      v: selOp?.vel?.toFixed(2) ?? "—",
-                      spark: snaps
-                        .map((sn) => sn.velocity ?? 0)
-                        .filter((x) => x > 0),
-                      kind: "line" as const,
-                    },
-                  ];
-                  return rows.map((r) => (
-                    <div className="srow" key={r.l}>
-                      <span className="srow-l">{r.l}</span>
-                      <MiniSpark pts={r.spark} kind={r.kind} />
-                      <span className="srow-v mono">{r.v}</span>
-                    </div>
-                  ));
-                })()}
-              </div>
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
                   {(selOp!.recs ?? []).slice(0, 3).map((r) => (
@@ -1333,85 +1413,137 @@ export function LiveBoardWorkspace({
         );
       case "honors":
         /* owner pass 3c: awards/medals/badges are their own module — the
-           rotating deck box moved out of the operator profile. */
+           rotating deck box moved out of the operator profile.
+           LB-G07 approved slide order: (1) cumulative Pixel Badges shelf,
+           (2) Gold/Silver/Bronze Trophy Tracker, (3) Achievement Awards.
+           Every earned state is source-backed — no G16 patterns, no
+           account-age streaks, no record-count token milestones. */
         return profile ? (
-          <>
-              <div className="awbox">
-                <div className="awbox-h">
-                  {(["AWARDS", "BADGES", "MEDALS"] as const)[awSlide % 3]}
-                  <span className="mut"> · {(awSlide % 3) + 1}/3</span>
-                </div>
-                {awSlide % 3 === 0 && (
-                  /* owner ref (hall medal cards): hex medallion with ★ +
-                     a caption strip under it — name + value, lime. */
+          <div className="awbox">
+            <div className="awbox-h">
+              {
+                (["PIXEL BADGES", "TROPHY TRACKER", "ACHIEVEMENTS"] as const)[
+                  awSlide % 3
+                ]
+              }
+              <span className="mut"> · {(awSlide % 3) + 1}/3</span>
+            </div>
+            {awSlide % 3 === 0 &&
+              (() => {
+                const pct = selOp?.pct ?? 0;
+                /* "100 DAYS CONSISTENT" is a streak claim — earn it from
+                   100+ distinct dated history points, never from account
+                   age alone (handoff data rule). */
+                const days = new Set(
+                  (selDetail?.history ?? []).map((h) => h.date),
+                ).size;
+                const earned = new Set<PixelBadgeName>();
+                if (isVerifiedOp(selOp?.verif)) earned.add("verified");
+                /* cumulative tiers — pct ≥ 99 lights top10+top5+top1 */
+                if (pct >= 90) earned.add("top10");
+                if (pct >= 95) earned.add("top5");
+                if (pct >= 99) earned.add("top1");
+                if (days >= 100) earned.add("days100");
+                /* the payload carries a real lifetime-token total — use
+                   it, not a records-count proxy */
+                if (selOp && numvOf(selOp.total) >= 1e7)
+                  earned.add("tokens10m");
+                return (
+                  <div className="pxshelf">
+                    {(
+                      [
+                        "verified",
+                        "top10",
+                        "top5",
+                        "top1",
+                        "days100",
+                        "tokens10m",
+                      ] as PixelBadgeName[]
+                    ).map((b) => (
+                      <span
+                        className={`pxcell${earned.has(b) ? "" : " locked"}`}
+                        key={b}
+                      >
+                        <PixelBadge name={b} />
+                        <small>{BADGE_LABELS[b]}</small>
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
+            {awSlide % 3 === 1 &&
+              /* real counted hardware — record placements rank 1/2/3 →
+                 gold/silver/bronze. Empty metals render dimmed ×0. */
+              (() => {
+                const recs = selOp?.recs ?? [];
+                const counts = [1, 2, 3].map(
+                  (r) => recs.filter((x) => x.rank === r).length,
+                );
+                return (
+                  <div className="trp-deck">
+                    {(["GOLD", "SILVER", "BRONZE"] as const).map((m, i) => (
+                      <div className="trp-unit" key={m}>
+                        <SignalMedal
+                          rank={(i + 1) as 1 | 2 | 3}
+                          size={30}
+                          muted={counts[i] === 0}
+                        />
+                        <span className="trp-n mono">×{counts[i]}</span>
+                        <span className="trp-m">{m}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            {awSlide % 3 === 2 &&
+              /* achievement hardware (LB-G04 direction) over the same
+                 source-backed facts — class standing, top-1% legend,
+                 evidence-backed consistency, record count, real 10M. */
+              (() => {
+                const days = new Set(
+                  (selDetail?.history ?? []).map((h) => h.date),
+                ).size;
+                return (
                   <div className="awards cards">
                     <div className="hxcard">
-                      <span className="award hex-gold">★</span>
+                      <SignalAward type="class" size={40} />
                       <span className="hx-n">{selOp?.klass ?? "—"}</span>
                       <span className="hx-v">CLASS</span>
                     </div>
                     {(selOp?.pct ?? 0) >= 99 && (
                       <div className="hxcard">
-                        <span className="award hex-violet">★</span>
+                        <SignalAward type="top1" size={40} />
                         <span className="hx-n">TOP 1%</span>
                         <span className="hx-v">LEGEND</span>
                       </div>
                     )}
-                    {(selOp?.age ?? 0) >= 100 && (
+                    {days >= 100 && (
                       <div className="hxcard">
-                        <span className="award hex-cyan">★</span>
+                        <SignalAward type="days100" size={40} />
                         <span className="hx-n">100 DAYS</span>
-                        <span className="hx-v">STREAK</span>
+                        <span className="hx-v">CONSISTENT</span>
                       </div>
                     )}
                     {(selOp?.recs ?? []).length > 0 && (
                       <div className="hxcard">
-                        <span className="award hex-ac">★</span>
+                        <SignalAward type="records" size={40} />
                         <span className="hx-n">
                           ×{(selOp?.recs ?? []).length}
                         </span>
                         <span className="hx-v">RECORDS</span>
                       </div>
                     )}
-                  </div>
-                )}
-                {awSlide % 3 === 1 && (
-                  <div className="pxbadges big">
-                    {isVerifiedOp(selOp?.verif) && (
-                      <PixelBadge name="verified" />
-                    )}
-                    {(() => {
-                      const b = selOp ? badgeForPct(selOp.pct) : null;
-                      return b ? <PixelBadge name={b} /> : null;
-                    })()}
-                    {(selOp?.age ?? 0) >= 100 && (
-                      <PixelBadge name="days100" />
-                    )}
-                    {(selOp?.recs ?? []).length > 0 && (
-                      <PixelBadge name="tokens10m" />
+                    {selOp && numvOf(selOp.total) >= 1e7 && (
+                      <div className="hxcard">
+                        <SignalAward type="tokens10m" size={40} />
+                        <span className="hx-n">10M+</span>
+                        <span className="hx-v">TOKENS</span>
+                      </div>
                     )}
                   </div>
-                )}
-                {awSlide % 3 === 2 && (
-                  <div className="medalct big mono">
-                    {(() => {
-                      const recs = selOp?.recs ?? [];
-                      const g = recs.filter((r) => r.rank === 1).length;
-                      const s = recs.filter((r) => r.rank === 2).length;
-                      const b = recs.filter((r) => r.rank === 3).length;
-                      return (
-                        <>
-                          <span className="mc g">🥇 {g} GOLD</span>
-                          <span className="mc s">🥈 {s} SILVER</span>
-                          <span className="mc b">🥉 {b} BRONZE</span>
-                        </>
-                      );
-                    })()}
-                  </div>
-                )}
-              </div>
-
-          </>
+                );
+              })()}
+          </div>
         ) : (
           <p className="drill-note">— SELECT AN OPERATOR</p>
         );
@@ -1512,6 +1644,7 @@ export function LiveBoardWorkspace({
       <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
       <div
         className={`app${railOn ? "" : " no-rail"}${leftOn ? "" : " no-left"}`}
+        data-board-workspace
       >
         {/* left column: icon rail (owner 2026-10-06 — icons only, hover
             tooltips; signalaf mark = home; avatar at bottom = account/
@@ -1582,11 +1715,15 @@ export function LiveBoardWorkspace({
                 rail") — each opens its mockup description + vote. */}
             {(
               [
-                ["teams", "TEAMS"],
-                ["hacks", "HACKS"],
-                ["versus", "VERSUS"],
+                /* LB-G02: approved color treatment on the bottom three
+                   only — canonical pixel patterns, routing, and vote
+                   semantics untouched. teams=yellow, hacks=orange,
+                   versus=violet. */
+                ["teams", "TEAMS", "var(--yellow)"],
+                ["hacks", "HACKS", "var(--orange)"],
+                ["versus", "VERSUS", "var(--violet)"],
               ] as const
-            ).map(([key, label]) => (
+            ).map(([key, label, tint]) => (
               <button
                 key={key}
                 type="button"
@@ -1599,7 +1736,9 @@ export function LiveBoardWorkspace({
                   setSoonPop(soonPop === key ? null : key);
                 }}
               >
-                <RailIcon name={key} set={iconSet} />
+                <span className="railpix" style={{ color: tint }}>
+                  <RailIcon name={key} set={iconSet} />
+                </span>
               </button>
             ))}
             {soonPop && (
@@ -1706,8 +1845,10 @@ export function LiveBoardWorkspace({
             <div className="sacct" ref={acctRef}>
               {/* owner: neutral mark when signed out; when signed in the
                   avatar becomes the user's highest achieved block badge.
-                  TODO(wire): map acct → operator badge tier when the
-                  account payload carries pct/verif. */}
+                  LB-G09 candidate-A: the mark is the linked operator's
+                  exact name-row badge, bound by session.codename — never
+                  a display-name match, never a generic verified fallback
+                  (that would mint an unearned badge). */}
               <button
                 className="avatar"
                 title="account — settings"
@@ -1717,20 +1858,15 @@ export function LiveBoardWorkspace({
                   setAcctPop((v) => !v);
                 }}
               >
-                {/* owner's highest ranking badge — match the signed-in
-                    name to the field; falls back to the verified block
-                    when the acct doesn't map to a row yet. */}
-                {acct.mode === "in" ? (
-                  <PixelBadge
-                    name={
-                      badgeForPct(
-                        ops.find((o) => o.name === acct.name)?.pct,
-                      ) ?? "verified"
-                    }
-                  />
-                ) : (
-                  acctInitials
-                )}
+                {acct.mode === "in"
+                  ? (() => {
+                      const linked = session.codename
+                        ? ops.find((o) => o.codename === session.codename)
+                        : undefined;
+                      const b = badgeForPct(linked?.pct);
+                      return b ? <PixelBadge name={b} /> : acctInitials;
+                    })()
+                  : acctInitials}
               </button>
               <div className="acctpop" hidden={!acctPop}>
                 <div className="ap-label">THEMES</div>
@@ -1959,7 +2095,7 @@ export function LiveBoardWorkspace({
                 <span className="fb-sp"></span>
               </div>
 
-              <main className="stage" ref={stageRef}>
+              <main className="stage" ref={stageRef} data-board-stage>
                 <div className="board">
                   {/* LB-03/04/05 operator dock (starts docked in rail) */}
                   {profile && (
@@ -2121,6 +2257,9 @@ export function LiveBoardWorkspace({
                       >
                         ⬇ Export CSV
                       </button>
+                      {/* LB-G14 — approved workspace-scope screenshot,
+                          docked in the existing export group. */}
+                      <BoardShotButton scope="workspace" rootRef={rootRef} />
                     </div>
                   </section>
                 </div>

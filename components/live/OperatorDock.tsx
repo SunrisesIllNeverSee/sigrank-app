@@ -28,7 +28,6 @@
  * (default FIELD MAX rim; overridable via `radarBaseline`) — not the
  * reference's single polygon.
  */
-import Image from "next/image";
 import { useRef, useState } from "react";
 import type {
   LiveOperator,
@@ -218,32 +217,72 @@ export function SharePreview({
           Generate Share Card
         </a>
       </div>
-      <div className="minicard">
-        <div className="mc-top">
-          <Image
-            className="sharemark sm"
-            src="/live/signalaf-mark.png"
-            alt="SignalAF mark"
-            width={66}
-            height={60}
-            unoptimized
+      {/* LB-G05 candidate-a (owner-approved): native 150×206 "signature
+          lattice" mini — composed from ProfileView, never a scaled crop of
+          the 1200×630 social card (LB-G03 rejection). VERIFIED chip is
+          conditional on real verification state. */}
+      <a
+        className="sr-mini"
+        href={`/s/${slug}`}
+        aria-label={`Share ${d.name}`}
+      >
+        <div className="sr-mini-head">
+          <span className="sr-mini-mark" aria-hidden="true">
+            ▦
+          </span>
+          <span className={isVerifiedOp(d.verif) ? "" : "unv"}>
+            {isVerifiedOp(d.verif) ? "✓ VERIFIED" : "UNVERIFIED"}
+          </span>
+        </div>
+        <div className="sr-mini-k">SIGNALAF · OPERATOR</div>
+        <div className="sr-mini-num">
+          TOP <b>{pct.toFixed(1)}%</b>
+        </div>
+        <div className="sr-mini-k">OF THE LIVE FIELD</div>
+        {/* The motif is visually decorative, NOT a fabricated operator
+            telemetry trace. */}
+        <svg className="sr-mini-art" viewBox="0 0 125 60" aria-hidden="true">
+          <path
+            d="M7 46 26 43 44 33 63 14 85 28 116 13 116 55 7 55Z"
+            fill="currentColor"
+            fillOpacity=".08"
           />
-          <span className="mc-verif">⌘ VERIFIED</span>
+          <path
+            d="M7 46 26 43 44 33 63 14 85 28 116 13"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          {(
+            [
+              [7, 46],
+              [26, 43],
+              [44, 33],
+              [63, 14],
+              [85, 28],
+              [116, 13],
+            ] as const
+          ).map(([x, y]) => (
+            <rect
+              key={x}
+              x={x - 1.6}
+              y={y - 1.6}
+              width="3.2"
+              height="3.2"
+              fill="currentColor"
+            />
+          ))}
+        </svg>
+        <div className="sr-mini-facts">
+          <span>
+            RANK <b>#{d.rank}</b>
+          </span>
+          <span>
+            FIELD <b>{pop}</b>
+          </span>
         </div>
-        <div className="big">
-          TOP <em>{pct}%</em>
-        </div>
-        <div className="mono mut" style={{ fontSize: 8.5 }}>
-          OF AI OPERATORS
-        </div>
-        <div className="mc-hex" aria-hidden="true">
-          ⬡
-        </div>
-        <div className="mc-rank mono">
-          <span className="mut">RANK</span> #{d.rank}
-          <span className="mut"> / {pop.toLocaleString()}</span>
-        </div>
-      </div>
+        <small>SIGRANK · MEASURED SIGNAL</small>
+      </a>
     </div>
   );
 }
