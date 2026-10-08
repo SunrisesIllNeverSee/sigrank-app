@@ -62,7 +62,6 @@ export default async function FieldHubPage() {
     <FieldWorkspaceFrame
       title="FIELD HUB"
       current="fieldhub"
-      center
       hero={
         <WaveHero
           eyebrow="📊 SigRank Research"
