@@ -86,6 +86,8 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts } from "./DualSignatureRadar";
 import { FiveStats } from "./FiveStats";
 import type { FiveStatRow } from "./FiveStats";
+import { CombinedSignal } from "./CombinedSignal";
+import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
 import { RotatingMovers } from "./MoversRail";
 
 import {
@@ -277,71 +279,6 @@ function MedalDeck({
         ))}
       </div>
     </div>
-  );
-}
-
-/* Small overtime area chart — operator yield series + dashed field
-   median line (compare-page "YIELD · OVERTIME" language). */
-function TrendSpark({
-  series,
-  ops,
-}: {
-  series: number[];
-  ops: LiveOperator[];
-}) {
-  const W = 220;
-  const H = 56;
-  const P = 4;
-  const max = Math.max(...series, 1);
-  const min = Math.min(...series, 0);
-  const span = Math.max(max - min, 1e-6);
-  const px = (i: number) => P + (i / Math.max(series.length - 1, 1)) * (W - P * 2);
-  const py = (v: number) => H - P - ((v - min) / span) * (H - P * 2);
-  const pts = series.map((v, i) => `${px(i).toFixed(1)},${py(v).toFixed(1)}`);
-  /* field median of each op's latest trend point → the dashed avg line */
-  const latests = ops
-    .map((o) => o.trend?.[o.trend.length - 1])
-    .filter((v): v is number => v != null)
-    .sort((a, b) => a - b);
-  const med = latests.length ? latests[Math.floor(latests.length / 2)] : null;
-  const medY = med != null ? py(med) : null;
-  return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden>
-      <polyline
-        points={`${px(0)},${H} ${pts.join(" ")} ${px(series.length - 1)},${H}`}
-        fill="color-mix(in srgb, var(--ac) 18%, transparent)"
-        stroke="none"
-      />
-      <polyline
-        points={pts.join(" ")}
-        fill="none"
-        stroke="var(--ac)"
-        strokeWidth={1.6}
-      />
-      {medY != null && (
-        <line
-          x1={P}
-          y1={medY}
-          x2={W - P}
-          y2={medY}
-          stroke="var(--mut)"
-          strokeWidth={1}
-          strokeDasharray="3 3"
-        />
-      )}
-      {medY != null && (
-        <text
-          x={W - P}
-          y={medY - 3}
-          textAnchor="end"
-          fill="var(--mut)"
-          fontSize={8}
-          fontFamily="var(--font-mono)"
-        >
-          field avg
-        </text>
-      )}
-    </svg>
   );
 }
 
@@ -948,6 +885,13 @@ export function LiveBoardWorkspace({
      local tally; wire to a real vote surface when one exists. */
   const [soonVotes, setSoonVotes] = useState<Record<string, number>>({});
   const [soonPop, setSoonPop] = useState<string | null>(null);
+  /* addendum 2026-10-08: the large history module's COMBO/SINGLE mode +
+     selected metric are controlled here so the FiveStats rows (profile
+     slide 2) can drive the expanded chart. */
+  const [sigMode, setSigMode] = useState<"combined" | "individual">(
+    "combined",
+  );
+  const [sigSel, setSigSel] = useState<SignalMetricKey>("YIELD");
   /* awards/badges deck (owner: one box, three slides, bigger graphics) */
   const [awSlide, setAwSlide] = useState(0);
   useEffect(() => {
@@ -1204,7 +1148,27 @@ export function LiveBoardWorkspace({
 
   const railBody = (id: RailId) => {
     switch (id) {
-      case "profile":
+      case "profile": {
+        /* addendum 2026-10-08: one dated feed drives both the five
+           minis and the large COMBO/SIGNAL module — built once here. */
+        const statRows = fiveStatRows(
+          selOp,
+          profile,
+          selDetail?.history ?? [],
+          selDetail?.snapshots ?? [],
+        );
+        const sigSeries = Object.fromEntries(
+          statRows.map((r) => [r.name, r.history]),
+        ) as unknown as SignalSeries;
+        /* real field reference = median of each op's latest yield trend
+           point (the pre-addendum "field avg" line — Yield single only) */
+        const latestYs = ops
+          .map((o) => o.trend?.[o.trend.length - 1])
+          .filter((v): v is number => v != null)
+          .sort((a, b) => a - b);
+        const fieldMedY = latestYs.length
+          ? latestYs[Math.floor(latestYs.length / 2)]
+          : null;
         /* operator profile (owner: swapped into the inspector rail) —
            tile + dual radar + earned block badges. The pop-out control
            was removed (owner pass 3: "remove this pop out") — the floating
@@ -1237,24 +1201,29 @@ export function LiveBoardWorkspace({
                 }
                 stats={
                   <FiveStats
-                    rows={fiveStatRows(
-                      selOp,
-                      profile,
-                      selDetail?.history ?? [],
-                      selDetail?.snapshots ?? [],
-                    )}
+                    rows={statRows}
+                    selected={sigSel}
+                    onSelect={(k) => {
+                      setSigSel(k);
+                      setSigMode("individual");
+                    }}
                   />
                 }
               />
-              {/* YIELD · OVERTIME sparkline (owner: "more over-time
-                  sparkline charts... a chart that showed multiple
-                  items") — operator trend line + dashed field median. */}
-              {(selOp?.trend?.length ?? 0) > 1 && (
-                <div className="trendbox">
-                  <div className="awbox-h">Υ YIELD · OVERTIME</div>
-                  <TrendSpark series={selOp!.trend} ops={ops} />
-                </div>
-              )}
+              {/* addendum 2026-10-08: the large history module —
+                  COMBO = five normalized colored traces on one dated
+                  axis (toggleable legend, hover inspector); SINGLE =
+                  one metric expanded (Yield keeps its shaded area +
+                  real field-median line). Clicking a mini row above
+                  expands that metric here. Fixed 271×215 footprint. */}
+              <CombinedSignal
+                series={sigSeries}
+                mode={sigMode}
+                selected={sigSel}
+                onMode={setSigMode}
+                onSelect={setSigSel}
+                fieldMedianYield={fieldMedY}
+              />
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
                   {(selOp!.recs ?? []).slice(0, 3).map((r) => (
@@ -1286,6 +1255,7 @@ export function LiveBoardWorkspace({
         ) : (
           <p className="drill-note">— SELECT AN OPERATOR</p>
         );
+      }
       case "field":
         /* HOT STATS (owner 2026-10-06): the static field grid duplicated
            the banner strip — the rail module now rotates one stat at a

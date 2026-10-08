@@ -22,17 +22,44 @@ const STROKE = "#b8fb58"; // approved lime tone
 const good = (v: number | null | undefined): v is number =>
   typeof v === "number" && Number.isFinite(v) && v >= 0;
 
-export function FiveStats({ rows }: { rows: FiveStatRow[] }) {
+export function FiveStats({
+  rows,
+  selected,
+  onSelect,
+}: {
+  rows: FiveStatRow[];
+  /** addendum: clicking a row expands that metric into the large
+      signal-history module (SINGLE mode). */
+  selected?: FiveStatRow["name"];
+  onSelect?: (name: FiveStatRow["name"]) => void;
+}) {
   return (
     <section className="f5stats lime">
       <header>STATS · SIGNAL HISTORY</header>
-      {rows.slice(0, 5).map((row) => (
-        <div className="f5-stat-row" key={row.name}>
-          <span>{row.name}</span>
-          <MetricGraph row={row} />
-          <b>{row.display}</b>
-        </div>
-      ))}
+      {rows.slice(0, 5).map((row) => {
+        const body = (
+          <>
+            <span>{row.name}</span>
+            <MetricGraph row={row} />
+            <b>{row.display}</b>
+          </>
+        );
+        return onSelect ? (
+          <button
+            type="button"
+            className={`f5-stat-row${selected === row.name ? " selected" : ""}`}
+            key={row.name}
+            onClick={() => onSelect(row.name)}
+            title={`Expand ${row.name} in the large history chart`}
+          >
+            {body}
+          </button>
+        ) : (
+          <div className="f5-stat-row" key={row.name}>
+            {body}
+          </div>
+        );
+      })}
     </section>
   );
 }
