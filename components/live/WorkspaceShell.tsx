@@ -49,6 +49,7 @@ import { useBoardSession } from "./session";
 
 /** Rail nav keys — the workspace's canonical site navigation. */
 export type WorkspaceNav =
+  | "home"
   | "board"
   | "compare"
   | "hall"
