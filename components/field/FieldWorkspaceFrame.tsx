@@ -113,7 +113,7 @@ export function FieldWorkspaceFrame({
       rightTitle={rightTitle}
       right={right}
       rightDefaultOpen={rightDefaultOpen}
-      leftWidth={300}
+      leftWidth={280}
       rightWidth={240}
       status={status ?? <>FIELD RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
