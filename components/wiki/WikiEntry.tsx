@@ -18,6 +18,7 @@ import React from "react";
 import Link from "next/link";
 import { EvidenceBadge } from "./EvidenceBadge";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { wikiCategoryById, wikiCategoryHubAnchor, type WikiCategory } from "@/lib/wiki/evidence-ladder";
 
 export interface WikiCrossRef {
@@ -104,6 +105,9 @@ export function WikiEntry({
       leftTitle="ENTRY"
       left={
         <>
+          <div className="mod">
+            <FieldFamilyNav current="wiki" />
+          </div>
           <div className="mod">
             <div className="mini-h"><span className="sq"></span>INDEX</div>
             <nav className="ws-nav">

@@ -73,6 +73,9 @@ export interface WorkspaceShellProps {
   active: WorkspaceNav;
   /** Stage-top page title (h1.pagetitle). Omit to skip the title strip. */
   title?: ReactNode;
+  /** Render the h1 visually-hidden instead of the .stitle strip — for pages
+   *  whose hero is the visible title (Field Hub, Blog index). */
+  bareTitle?: boolean;
   /** Optional filter-bar strip under the title (the board's .fbar slot). */
   toolbar?: ReactNode;
   /** Left panel railhead label (e.g. "HALL OF SIGNAL"). */
@@ -116,6 +119,7 @@ const SOON_ITEMS: Record<string, [string, string]> = {
 export function WorkspaceShell({
   active,
   title,
+  bareTitle = false,
   toolbar,
   leftTitle,
   left,
@@ -550,11 +554,14 @@ export function WorkspaceShell({
             )}
 
             <div className="stagecol">
-              {title != null && (
-                <div className="stitle">
-                  <h1 className="pagetitle">{title}</h1>
-                </div>
-              )}
+              {title != null &&
+                (bareTitle ? (
+                  <h1 className="sr-only">{title}</h1>
+                ) : (
+                  <div className="stitle">
+                    <h1 className="pagetitle">{title}</h1>
+                  </div>
+                ))}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
               <main className="stage">
                 <div className="board">{children}</div>
