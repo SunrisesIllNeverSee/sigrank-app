@@ -205,8 +205,8 @@ export default async function BlogIndex() {
             </div>
           </>
         }
-        leftWidth={240}
-        rightWidth={220}
+        leftWidth={280}
+        rightWidth={240}
         status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
       >
         <div className="ws-doc">

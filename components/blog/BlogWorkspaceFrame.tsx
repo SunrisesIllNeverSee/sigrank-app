@@ -53,8 +53,8 @@ export function BlogWorkspaceFrame({ children, status }: Props) {
           </p>
         </div>
       }
-      leftWidth={210}
-      rightWidth={220}
+      leftWidth={280}
+      rightWidth={240}
       status={status ?? <>ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
       <div className="ws-doc ws-article">{children}</div>

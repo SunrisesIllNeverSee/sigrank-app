@@ -12,8 +12,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -25,7 +25,11 @@ export const metadata: Metadata = withOG({
 
 export default function EfficiencyPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <MetricsWorkspaceFrame
+      title="EFFICIENCY"
+      current="/metrics/efficiency"
+    >
+    <div className="flex flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([
@@ -60,22 +64,6 @@ export default function EfficiencyPage() {
             },
           ]),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="◈ Operational Amplification"
-        terminalText="E"
-        title="Efficiency"
-        subtitle={
-          <>
-            10xDEV is a logarithmic efficiency score that measures whether an
-            operator&rsquo;s leverage exceeds 10x. It&rsquo;s the log&#8321;&#8320;
-            of Leverage — if your cached context amplifies your input by 10x or
-            more, you&rsquo;re a 10xDEV operator. Total operational
-            amplification versus the{" "}
-            <span className="text-gold">AA 7:2:1 baseline</span>.
-          </>
-        }
       />
 
       {/* ── The formula ── */}
@@ -269,5 +257,6 @@ export default function EfficiencyPage() {
         </p>
       </section>
     </div>
+    </MetricsWorkspaceFrame>
   );
 }

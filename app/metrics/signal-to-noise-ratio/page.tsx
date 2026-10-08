@@ -11,8 +11,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -24,7 +24,11 @@ export const metadata: Metadata = withOG({
 
 export default function SignalToNoiseRatioPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <MetricsWorkspaceFrame
+      title="SIGNAL-TO-NOISE RATIO"
+      current="/metrics/signal-to-noise-ratio"
+    >
+    <div className="flex flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([
@@ -63,22 +67,6 @@ export default function SignalToNoiseRatioPage() {
             },
           ]),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="◈ Signal Density"
-        terminalText="SNR"
-        title="Signal-to-Noise Ratio (SNR)"
-        subtitle={
-          <>
-            SNR in AI coding measures the share of your fresh token traffic
-            that is{" "}
-            <span className="text-gold">output</span> versus input. A high
-            signal-to-noise ratio means most of your fresh traffic is
-            productive output; a low SNR means most is input. A bounded view of
-            Velocity.
-          </>
-        }
       />
 
       {/* ── The formula ── */}
@@ -361,5 +349,6 @@ export default function SignalToNoiseRatioPage() {
         </p>
       </section>
     </div>
+    </MetricsWorkspaceFrame>
   );
 }

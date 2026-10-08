@@ -185,7 +185,7 @@ export default async function FieldPage() {
             </div>
           </>
         }
-        leftWidth={300}
+        leftWidth={280}
         rightWidth={240}
         status={
           <>

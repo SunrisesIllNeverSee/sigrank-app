@@ -10,8 +10,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -23,7 +23,11 @@ export const metadata: Metadata = withOG({
 
 export default function YieldCascadePage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <MetricsWorkspaceFrame
+      title="YIELD (Υ) CASCADE"
+      current="/metrics/yield-cascade"
+    >
+    <div className="flex flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([
@@ -63,22 +67,6 @@ export default function YieldCascadePage() {
             },
           ]),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="◈ Headline Metric"
-        terminalText="YIELD"
-        title="Yield (Υ) — Token Cascade Efficiency"
-        subtitle={
-          <>
-            Yield in AI usage measures how efficiently you turn fresh input
-            tokens into useful output, amplified by cached context reuse. The
-            SigRank Yield formula (Υ) captures this in one number — whether
-            your token cascade is{" "}
-            <span className="text-gold">compounding signal</span> or burning
-            tokens.
-          </>
-        }
       />
 
       {/* ── The formula ── */}
@@ -425,5 +413,6 @@ export default function YieldCascadePage() {
         </p>
       </section>
     </div>
+    </MetricsWorkspaceFrame>
   );
 }

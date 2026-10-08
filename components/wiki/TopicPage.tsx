@@ -29,7 +29,7 @@ export function TopicPage({ children }: { children: React.ReactNode; title?: str
           </nav>
         </div>
       }
-      leftWidth={220}
+      leftWidth={280}
       status={<>SIGNALAF WIKI · TOPIC PROOF · MO§ES™</>}
     >
       <div className="ws-doc">
