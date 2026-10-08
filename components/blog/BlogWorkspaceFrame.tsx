@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 
 interface Props {
   children: ReactNode;
@@ -23,18 +24,13 @@ export function BlogWorkspaceFrame({ children, status }: Props) {
       left={
         <>
           <div className="mod">
-            <div className="mini-h"><span className="sq" />READ</div>
-            <nav className="ws-nav">
-              <Link href="/blog">All articles</Link>
-              <Link href="/field">Field analysis</Link>
-              <Link href="/research">State of the Index</Link>
-              <Link href="/wiki">Wiki</Link>
-            </nav>
+            <FieldFamilyNav />
           </div>
           <div className="mod">
             <div className="mini-h"><span className="sq" />REFERENCE</div>
             <nav className="ws-nav">
               <Link href="/methodology">Methodology</Link>
+              <Link href="/wiki">Wiki</Link>
               <Link href="/board/all">Live leaderboard</Link>
               <Link href="/hall">Hall of Signal</Link>
             </nav>
