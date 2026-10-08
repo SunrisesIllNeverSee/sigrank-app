@@ -14,6 +14,8 @@ import type { Metadata } from "next";
 import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { cliTool, faqPage, aggregateStats } from "@/lib/jsonld";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
 
 // ISR: the Four Degrees chart auto-pulls the top operator's live all-time metrics
@@ -57,7 +59,55 @@ export default async function HomePage() {
   const medianYield = averageColumn ? Number(averageColumn.yield_) : null;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-8 py-2">
+    <WorkspaceShell
+      active="home"
+      title="SIGRANK"
+      bareTitle
+      hero={<Draft2Hero />}
+      leftTitle="SIGRANK"
+      left={
+        <>
+          <div className="mod">
+            <FieldFamilyNav current="home" />
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />EXPLORE</div>
+            <nav className="ws-nav">
+              <Link href="/board/all">Live leaderboard</Link>
+              <Link href="/compare">Compare</Link>
+              <Link href="/hall">Hall of Signal</Link>
+            </nav>
+          </div>
+        </>
+      }
+      rightTitle="SIGNAL"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />SNAPSHOT</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">OPERATORS</span><span className="v">{operatorCount.toLocaleString()}</span></div>
+              <div className="row"><span className="k">TOKENS</span><span className="v">{formatTokens(homeStats.total_tokens_scored)}</span></div>
+              <div className="row"><span className="k">PLATFORMS</span><span className="v">17</span></div>
+              <div className="row"><span className="k">MEDIAN Υ</span><span className="v acc">{medianYield != null ? medianYield.toFixed(2) : "—"}</span></div>
+            </div>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />GO DEEPER</div>
+            <nav className="ws-nav">
+              <Link href="/methodology">Methodology</Link>
+              <Link href="/research">State of the Index</Link>
+              <Link href="/pricing">Pricing</Link>
+              <Link href="/developers">Developers</Link>
+            </nav>
+          </div>
+        </>
+      }
+      leftWidth={280}
+      rightWidth={240}
+      status={<>{operatorCount.toLocaleString()} OPERATORS · {formatTokens(homeStats.total_tokens_scored)} TOKENS · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+    <div className="ws-doc ws-doc-wide flex flex-col gap-8">
       {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product).
           Single SoftwareApplication block on homepage — includes canonical @id, isBasedOn,
           about, mentions for entity disambiguation (merged from product()). */}
@@ -240,7 +290,6 @@ export default async function HomePage() {
       />
 
       <DeletedNotice />
-      <Draft2Hero />
       <VercelMarketplaceBadge />
 
       {/* ── Stats bar (AEO Item 2b) — visible aggregate stats for AI engine citation ── */}
@@ -525,5 +574,6 @@ export default async function HomePage() {
 
       <MotionPause />
     </div>
+    </WorkspaceShell>
   );
 }
