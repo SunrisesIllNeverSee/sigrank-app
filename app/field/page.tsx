@@ -127,7 +127,7 @@ export default async function FieldPage() {
         left={
           <>
             <div className="mod">
-              <FieldFamilyNav />
+              <FieldFamilyNav current="field" />
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SECTIONS</div>
@@ -185,7 +185,7 @@ export default async function FieldPage() {
             </div>
           </>
         }
-        leftWidth={220}
+        leftWidth={300}
         rightWidth={240}
         status={
           <>

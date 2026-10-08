@@ -5,35 +5,60 @@ import { WaveHero } from "@/components/ui/WaveHero";
 
 /**
  * The Field family's left-rail nav — the space's entries as compact wave
- * banners (per owner: the hub's hero cards become the rail navigation).
- * Field Hub home + Articles stay as plain links under the two banners.
+ * banners (per owner: the hub's hero cards become the rail navigation —
+ * all three family pages, current page marked). Articles stays a link.
  */
-export function FieldFamilyNav() {
+export function FieldFamilyNav({
+  current,
+}: {
+  /** The page currently being viewed — its banner gets the accent mark. */
+  current?: "fieldhub" | "field" | "research";
+}) {
+  const items = [
+    {
+      id: "fieldhub" as const,
+      href: "/fieldhub",
+      eyebrow: "SigRank Research",
+      title: "Field Hub",
+      subtitle: "The research landing — start here.",
+    },
+    {
+      id: "field" as const,
+      href: "/field",
+      eyebrow: "Field Analysis",
+      title: "Field Analysis",
+      subtitle: "The true distribution of token efficiency.",
+    },
+    {
+      id: "research" as const,
+      href: "/research",
+      eyebrow: "SigRank Index",
+      title: "State of the Index",
+      subtitle: "The seed dataset · Zenodo DOI.",
+    },
+  ];
   return (
     <>
       <div className="mini-h"><span className="sq" />RESEARCH</div>
       <nav className="flex flex-col gap-2" aria-label="Field research">
-        <Link href="/field" className="block">
-          <WaveHero
-            compact
-            headingLevel="h2"
-            eyebrow="Field Analysis"
-            title="Field Analysis"
-            subtitle="The true distribution of token efficiency."
-          />
-        </Link>
-        <Link href="/research" className="block">
-          <WaveHero
-            compact
-            headingLevel="h2"
-            eyebrow="SigRank Index"
-            title="State of the Index"
-            subtitle="The seed dataset · Zenodo DOI."
-          />
-        </Link>
+        {items.map((it) => (
+          <Link
+            key={it.id}
+            href={it.href}
+            className={`block rounded-xl ${current === it.id ? "ws-bnav-on" : ""}`}
+            aria-current={current === it.id ? "page" : undefined}
+          >
+            <WaveHero
+              compact
+              headingLevel="h2"
+              eyebrow={it.eyebrow}
+              title={it.title}
+              subtitle={it.subtitle}
+            />
+          </Link>
+        ))}
       </nav>
       <nav className="ws-nav" style={{ marginTop: 6 }}>
-        <Link href="/fieldhub">← Field Hub</Link>
         <Link href="/blog">Articles ↗</Link>
       </nav>
     </>
@@ -47,6 +72,8 @@ interface Props {
   right?: ReactNode;
   rightTitle?: string;
   rightDefaultOpen?: boolean;
+  /** Which family page this is — marks the active banner in the rail. */
+  current?: "fieldhub" | "field" | "research";
 }
 
 /**
@@ -63,6 +90,7 @@ export function FieldWorkspaceFrame({
   right,
   rightTitle = "RESEARCH",
   rightDefaultOpen = true,
+  current,
 }: Props) {
   return (
     <WorkspaceShell
@@ -71,7 +99,7 @@ export function FieldWorkspaceFrame({
       leftTitle="FIELD"
       left={
         <>
-          <FieldFamilyNav />
+          <FieldFamilyNav current={current} />
           <div className="mod">
             <div className="mini-h"><span className="sq" />SYSTEM</div>
             <nav className="ws-nav">
@@ -85,7 +113,7 @@ export function FieldWorkspaceFrame({
       rightTitle={rightTitle}
       right={right}
       rightDefaultOpen={rightDefaultOpen}
-      leftWidth={210}
+      leftWidth={300}
       rightWidth={240}
       status={status ?? <>FIELD RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
