@@ -1552,19 +1552,31 @@
   overflow:hidden;box-sizing:border-box;padding:10px;
   border:1px solid #384b25;border-radius:9px;background:#0d150c}
 .lbw-root .colranks>header{font:8px var(--font-mono);letter-spacing:.14em;
-  color:#a7d36a;border-bottom:1px dashed #375126;padding-bottom:8px;
-  display:flex;justify-content:space-between}
+  color:#a7d36a;border-bottom:1px dashed #375126;padding-bottom:6px;
+  display:flex;justify-content:space-between;flex:none}
+.lbw-root .colranks>header.sub{margin-top:2px;border-top:1px dashed #375126;
+  padding-top:7px;color:#8caa7f}
 .lbw-root .colrank-row{flex:1;min-height:0;display:grid;align-items:center;
-  grid-template-columns:minmax(0,1fr) auto auto;gap:8px;
+  grid-template-columns:52px minmax(0,1fr) 44px 34px;gap:6px;
   border-bottom:1px solid #2c3824}
 .lbw-root .colrank-row:last-child{border:0}
-.lbw-root .colrank-row .ck{font:8.5px var(--font-mono);letter-spacing:.08em;
-  color:#8caa7f}
-.lbw-root .colrank-row .cv{font:10px var(--font-mono);font-weight:600;
-  color:#d8f0c0;text-align:right}
-.lbw-root .colrank-row .cr{font:9.5px var(--font-mono);font-weight:700;
-  color:#b7ff25;text-align:right;min-width:64px}
-.lbw-root .colrank-row .cr small{font-size:7px;color:#6f8a5e;font-weight:400}
+.lbw-root .colrank-row .ck{font:8px var(--font-mono);letter-spacing:.06em;
+  color:#8caa7f;white-space:nowrap;overflow:hidden}
+.lbw-root .colrank-row .cv{font:9.5px var(--font-mono);font-weight:600;
+  color:#d8f0c0;text-align:right;white-space:nowrap;overflow:hidden}
+.lbw-root .colrank-row .cr{font:9px var(--font-mono);font-weight:700;
+  color:#b7ff25;text-align:right}
+.lbw-root .colrank-row .cr.g{color:#e6c967}
+.lbw-root .colrank-row .cr.s{color:#c9d4d8}
+.lbw-root .colrank-row .cr.b{color:#cd7f32}
+/* field-position bar: track = the eligible field, marker = the operator's
+   standing inside it (right edge = #1). */
+.lbw-root .colrank-row .cbar{position:relative;height:8px;
+  background:linear-gradient(90deg,rgba(140,170,127,.10),rgba(140,170,127,.22));
+  border-radius:3px;overflow:visible}
+.lbw-root .colrank-row .cbar>i{position:absolute;top:-2px;width:2px;height:12px;
+  margin-left:-1px;background:#b7ff25;border-radius:1px;
+  box-shadow:0 0 4px rgba(183,255,37,.7)}
 
 /* owner 2026-10-08 — rotating line slide under the large signal module.
    One category trace at a time; stage is a button so it still drives
