@@ -94,36 +94,54 @@ function computeBoardEntries(
   return entries.sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
 }
 
-// ── Metric tile (right panel) ───────────────────────────────────────────────
-function MetricTile({
+// ── Terminal printout rows (the flip card's static language) ────────────────
+function PrintRow({
+  ticker,
   label,
   value,
   accent,
 }: {
+  ticker: string;
   label: string;
   value: string;
   accent?: boolean;
 }) {
+  /* split-flap row: TICKER glyph · phosphor label · bone value, right-aligned */
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
-        gap: 4,
-        padding: "10px 14px",
-        background: "rgba(255,255,255,0.04)",
-        borderRadius: 6,
-        border: `1px solid ${accent ? "rgba(255,112,135,0.35)" : "rgba(255,255,255,0.06)"}`,
+        flexDirection: "row",
+        alignItems: "baseline",
+        gap: 16,
+        padding: "9px 4px",
+        borderBottom: "1px solid rgba(62,70,76,0.55)",
       }}
     >
       <div
         style={{
           display: "flex",
-          fontSize: 10,
+          width: 52,
+          fontSize: 12,
           fontWeight: 800,
           letterSpacing: 1,
+          color: accent ? C_CORAL : C_GREEN,
+          textShadow: accent
+            ? "0 0 8px rgba(255,112,135,0.5)"
+            : "0 0 8px rgba(54,230,194,0.45)",
+          flexShrink: 0,
+        }}
+      >
+        {ticker}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexGrow: 1,
+          fontSize: 13,
+          fontWeight: 700,
+          letterSpacing: 1.4,
           color: C_DULL,
-          fontFamily: MONO,
         }}
       >
         {label}
@@ -131,10 +149,9 @@ function MetricTile({
       <div
         style={{
           display: "flex",
-          fontSize: 28,
+          fontSize: 22,
           fontWeight: 900,
           color: accent ? C_CORAL : C_BONE,
-          fontFamily: MONO,
           lineHeight: 1,
         }}
       >
@@ -142,6 +159,84 @@ function MetricTile({
       </div>
     </div>
   );
+}
+
+// ── Canonical class mark as SVG ─────────────────────────────────────────────
+/* Satori's bundled font lacks the geometric class glyphs (◈ ▲ ▽ ⬡ ◎ ⟳ ◇);
+   a missing glyph renders as a box. Draw the canonical mark as a shape so the
+   tier identity survives on the PNG. */
+function ClassMark({ glyph, size = 20, color = INK }: { glyph: string; size?: number; color?: string }) {
+  const c = color;
+  const m = size / 2;
+  const body = (() => {
+    switch (glyph) {
+      case "◈": // TRANSMITTER — diamond + center
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <polygon points="10,1 19,10 10,19 1,10" fill={c} />
+            <polygon points="10,6.5 13.5,10 10,13.5 6.5,10" fill={GOLD_BG} />
+          </svg>
+        );
+      case "▲":
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <polygon points="10,2 18,17 2,17" fill={c} />
+          </svg>
+        );
+      case "▽":
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <polygon points="2,3 18,3 10,18" fill={c} />
+          </svg>
+        );
+      case "⬡": // POWER — hexagon
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <polygon points="10,1.5 17.3,5.75 17.3,14.25 10,18.5 2.7,14.25 2.7,5.75" fill={c} />
+          </svg>
+        );
+      case "◎": // SEEKER — ring + center dot
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <circle cx="10" cy="10" r="8" fill="none" stroke={c} strokeWidth="2.4" />
+            <circle cx="10" cy="10" r="3.2" fill={c} />
+          </svg>
+        );
+      case "⟳": // REFINER — circular arrow
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <path d="M 15.5 10 A 5.5 5.5 0 1 1 14.2 4.9" fill="none" stroke={c} strokeWidth="2.2" />
+            <polygon points="16.5,1.5 16.8,7.4 12.6,4.4" fill={c} />
+          </svg>
+        );
+      case "◇": // BEARER — diamond outline
+        return (
+          <svg width={size} height={size} viewBox="0 0 20 20">
+            <polygon points="10,1.5 18.5,10 10,18.5 1.5,10" fill="none" stroke={c} strokeWidth="2.2" />
+          </svg>
+        );
+      default:
+        /* ↓ (BASE) and · (IGNITER) render in-font — keep them as text */
+        return (
+          <div
+            style={{
+              display: "flex",
+              width: size,
+              height: size,
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: size,
+              fontWeight: 900,
+              color: c,
+              lineHeight: 1,
+            }}
+          >
+            {glyph}
+          </div>
+        );
+    }
+  })();
+  return body;
 }
 
 export async function GET(
@@ -311,12 +406,10 @@ export async function GET(
           <div
             style={{
               display: "flex",
-              fontSize: 20,
-              fontWeight: 900,
-              color: INK,
+              alignItems: "center",
             }}
           >
-            {classGlyph}
+            <ClassMark glyph={classGlyph} size={20} color={INK} />
           </div>
           <div
             style={{
@@ -475,7 +568,9 @@ export async function GET(
         </div>
       </div>
 
-      {/* ═══ RIGHT — black metrics + hall panel (720px) ═══ */}
+      {/* ═══ RIGHT — black terminal printout (720px) ═══
+          The static twin of the operator-profile flip card: telemetry rows,
+          column header, scanlines — Prism phosphor instead of green. */}
       <div
         style={{
           width: 720,
@@ -483,177 +578,80 @@ export async function GET(
           background: INK,
           display: "flex",
           flexDirection: "column",
-          padding: "28px 30px",
+          padding: "24px 30px 22px",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* ── Metrics section ── */}
+        {/* CRT scanline overlay — the printout signature */}
         <div
           style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
             display: "flex",
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: 2,
-            color: C_GREEN,
-            marginBottom: 14,
+            background:
+              "repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.16) 2px, rgba(0,0,0,0.16) 3px)",
           }}
-        >
-          CASCADE METRICS
-        </div>
+        />
 
+        {/* Column header — TELEMETRY | WELCOME OPERATOR */}
         <div
           style={{
             display: "flex",
             flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 10,
-            marginBottom: 24,
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingBottom: 10,
+            borderBottom: "1px solid #2b4048",
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+            color: C_DULL,
           }}
         >
-          <MetricTile label="Υ YIELD" value={yieldStr} accent />
-          <MetricTile label="LEVERAGE" value={levStr} />
-          <MetricTile label="VELOCITY" value={velStr} />
-          <MetricTile label="EFFICIENCY" value={effStr} />
-          <MetricTile label="SNR" value={snrStr} />
-          <MetricTile label="10×DEV" value={devStr} />
-        </div>
-
-        {/* ── Hall of Signal section ── */}
-        {topTen > 0 ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* Section header */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: 18,
-                }}
-              >
-                🏆
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  letterSpacing: 2,
-                  color: C_GOLD,
-                }}
-              >
-                HALL OF SIGNAL
-              </div>
-            </div>
-
-            {/* Medal tracker */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 16,
-                padding: "10px 14px",
-                background: "rgba(255,255,255,0.03)",
-                borderRadius: 6,
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <div style={{ display: "flex", fontSize: 20 }}>🥇</div>
-                <div style={{ display: "flex", fontSize: 22, fontWeight: 900, color: C_GOLD }}>
-                  {gold}
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <div style={{ display: "flex", fontSize: 20 }}>🥈</div>
-                <div style={{ display: "flex", fontSize: 22, fontWeight: 900, color: C_BONE }}>
-                  {silver}
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <div style={{ display: "flex", fontSize: 20 }}>🥉</div>
-                <div style={{ display: "flex", fontSize: 22, fontWeight: 900, color: "#cd7f32" }}>
-                  {bronze}
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexGrow: 1,
-                  justifyContent: "flex-end",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: C_DULL,
-                }}
-              >
-                {topTen} top-10 finishes
-              </div>
-            </div>
-
-            {/* Top 3 records */}
-            {top3Entries.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {top3Entries.map((e) => (
-                  <div
-                    key={e.canonId}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 10,
-                      padding: "6px 12px",
-                      background: "rgba(255,255,255,0.02)",
-                      borderRadius: 4,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        fontSize: 14,
-                        fontWeight: 900,
-                        width: 28,
-                      }}
-                    >
-                      {e.rank === 1 ? "🥇" : e.rank === 2 ? "🥈" : e.rank === 3 ? "🥉" : `#${e.rank}`}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: C_BONE,
-                        flexGrow: 1,
-                      }}
-                    >
-                      {e.name}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        fontSize: 14,
-                        fontWeight: 900,
-                        color: e.rank === 1 ? C_GOLD : C_BONE,
-                      }}
-                    >
-                      {e.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          /* No hall entries — show a teaser */
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: 8,
+              color: C_GREEN,
+              textShadow: "0 0 8px rgba(54,230,194,0.5)",
+            }}
+          >
+            TELEMETRY
+          </div>
+          <div style={{ display: "flex" }}>WELCOME OPERATOR</div>
+        </div>
+
+        {/* Cascade printout — six rows, phosphor labels */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: 10,
+          }}
+        >
+          <PrintRow ticker="Υ"   label="YIELD"      value={yieldStr} accent />
+          <PrintRow ticker="LEV" label="LEVERAGE"   value={levStr} />
+          <PrintRow ticker="VEL" label="VELOCITY"   value={velStr} />
+          <PrintRow ticker="EFF" label="EFFICIENCY" value={effStr} />
+          <PrintRow ticker="SNR" label="SNR"        value={snrStr} />
+          <PrintRow ticker="10×" label="10×DEV"     value={devStr} />
+        </div>
+
+        {/* ── Hall of Signal — printout section (gold = medal hardware) ── */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: 16,
+            gap: 6,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "baseline",
             }}
           >
             <div
@@ -662,38 +660,120 @@ export async function GET(
                 fontSize: 11,
                 fontWeight: 800,
                 letterSpacing: 2,
-                color: C_DULL,
+                color: C_GOLD,
+                textShadow: "0 0 8px rgba(240,200,98,0.4)",
               }}
             >
-              HALL OF SIGNAL
+              {"» HALL OF SIGNAL"}
             </div>
             <div
               style={{
                 display: "flex",
-                fontSize: 14,
-                color: C_DIM,
-                fontStyle: "italic",
+                fontSize: 12,
+                fontWeight: 700,
+                color: C_DULL,
               }}
             >
-              No top-10 records yet — submit to climb the boards.
+              {topTen > 0 ? `${topTen} TOP-10 FINISHES` : "NO RECORDS YET"}
             </div>
           </div>
-        )}
 
-        {/* ── CTA footer ── */}
+          {topTen > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {/* medal tally row — printout language, medals as glyphs */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 18,
+                  padding: "7px 4px",
+                  borderBottom: "1px solid rgba(62,70,76,0.55)",
+                  fontSize: 14,
+                  fontWeight: 800,
+                }}
+              >
+                <div style={{ display: "flex", color: C_GOLD }}>#1 ×{gold}</div>
+                <div style={{ display: "flex", color: C_BONE }}>#2 ×{silver}</div>
+                <div style={{ display: "flex", color: "#cd7f32" }}>#3 ×{bronze}</div>
+              </div>
+              {top3Entries.map((e) => (
+                <div
+                  key={e.canonId}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "baseline",
+                    gap: 14,
+                    padding: "6px 4px",
+                    borderBottom: "1px solid rgba(62,70,76,0.35)",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      width: 30,
+                      fontSize: 14,
+                      fontWeight: 900,
+                      flexShrink: 0,
+                      color:
+                        e.rank === 1 ? C_GOLD : e.rank === 2 ? C_BONE : "#cd7f32",
+                    }}
+                  >
+                    {`#${e.rank}`}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexGrow: 1,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                      color: C_DULL,
+                    }}
+                  >
+                    {e.name.toUpperCase()}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: 15,
+                      fontWeight: 900,
+                      color: e.rank === 1 ? C_GOLD : C_BONE,
+                    }}
+                  >
+                    {e.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                fontSize: 12,
+                color: C_DIM,
+                padding: "6px 4px",
+              }}
+            >
+              {"// no top-10 records yet — submit to climb the boards"}
+            </div>
+          )}
+        </div>
+
+        {/* ── CTA footer — printout command line ── */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             marginTop: "auto",
-            gap: 6,
+            gap: 8,
           }}
         >
           <div
             style={{
               display: "flex",
               height: 1,
-              background: "rgba(255,255,255,0.08)",
+              background: "rgba(62,70,76,0.8)",
             }}
           />
           <div
@@ -707,13 +787,18 @@ export async function GET(
             <div
               style={{
                 display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
                 fontSize: 16,
                 fontWeight: 800,
                 color: C_GREEN,
                 letterSpacing: 0.5,
+                textShadow: "0 0 8px rgba(54,230,194,0.4)",
               }}
             >
-              npx sigrank
+              {"$ npx sigrank"}
+              <span style={{ color: C_GREEN, fontWeight: 800 }}>{"_"}</span>
             </div>
             <div
               style={{
