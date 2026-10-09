@@ -27,6 +27,7 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import type { FiveStatRow } from "./FiveStats";
 import type { DetailStatus } from "./enrich";
+import { useBoardSession } from "./session";
 import { OperatorProfileTile } from "./OperatorDock";
 import { ProfileSlides } from "./LiveBoardWorkspace";
 import { sixFactsOf, fieldSixMedian } from "./LiveBoardWorkspace";
@@ -65,10 +66,45 @@ export function PeekPanel({
     "combined",
   );
   const [sigSel, setSigSel] = useState<SignalMetricKey>("YIELD");
+  /* WATCH — two tiers, both honest: signed-in → real row via
+     /api/v1/operators/<cn>/watch (server count included); signed-out →
+     localStorage pin on this device only, never presented as a count. */
+  const session = useBoardSession();
   const [watch, setWatch] = useState<string[]>([]);
-  useEffect(() => setWatch(readWatch()), []);
-  const watched = watch.includes(op.codename);
+  const [watching, setWatching] = useState<boolean | null>(null);
+  const [watchCount, setWatchCount] = useState<number | null>(null);
+  useEffect(() => {
+    setWatch(readWatch());
+    if (!session.signedIn) return;
+    let alive = true;
+    fetch(`/api/v1/operators/${encodeURIComponent(op.codename)}/watch`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!alive || !d) return;
+        setWatching(!!d.watching);
+        setWatchCount(typeof d.count === "number" ? d.count : null);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [op.codename, session.signedIn]);
+  const watched =
+    watching ?? watch.includes(op.codename);
   const toggleWatch = useCallback(() => {
+    if (session.signedIn) {
+      fetch(`/api/v1/operators/${encodeURIComponent(op.codename)}/watch`, {
+        method: "POST",
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          if (!d) return;
+          setWatching(!!d.watching);
+          setWatchCount(typeof d.count === "number" ? d.count : null);
+        })
+        .catch(() => {});
+      return;
+    }
     setWatch((w) => {
       const next = w.includes(op.codename)
         ? w.filter((c) => c !== op.codename)
@@ -80,7 +116,7 @@ export function PeekPanel({
       }
       return next;
     });
-  }, [op.codename]);
+  }, [op.codename, session.signedIn]);
 
   const sigSeries = Object.fromEntries(
     statRows.map((r) => [r.name, r.history]),
@@ -172,10 +208,15 @@ export function PeekPanel({
               type="button"
               className={`pkbtn${watched ? " on" : ""}`}
               aria-pressed={watched}
-              title="pin to your local watchlist (this device)"
+              title={
+                session.signedIn
+                  ? "watch this operator — they can see the count"
+                  : "pin to your local watchlist (this device — sign in to make it real)"
+              }
               onClick={toggleWatch}
             >
               {watched ? "★ WATCHING" : "☆ WATCH"}
+              {watchCount ? ` · ${watchCount}` : ""}
             </button>
           </div>
         </div>
