@@ -333,26 +333,42 @@ const fieldSixMedian = (ops: LiveOperator[]): SixAxisFacts | null => {
    timestamps). An index is never a calendar point. */
 const tsOf = (s: string) => Date.parse(s);
 
+/* The history feed emits many rows per calendar day (each accepted
+   submission), all stamped at day precision. Plotting raw rows stacks
+   every same-day record at one x — vertical strokes, not shapes.
+   dailyClose keeps the LAST record of each distinct day: the day's
+   closing state, standard close-series semantics. Observed values only
+   — no aggregation invents anything; intra-day order comes from the
+   feed's own row order. Snapshots carry second-precision submittedAt so
+   they keep every point. */
+const dailyClose = <T,>(rows: T[], day: (r: T) => string): T[] => {
+  const last = new Map<string, number>();
+  rows.forEach((r, i) => last.set(day(r), i));
+  return [...last.values()].map((i) => rows[i]);
+};
+
 const fiveStatRows = (
   selOp: LiveOperator | null | undefined,
   profile: ProfileView | null,
   hist: { date: string; score: number; rank: number; yieldv: number }[],
   snaps: { submittedAt: string; leverage: number | null; velocity: number | null }[],
-): FiveStatRow[] => [
+): FiveStatRow[] => {
+  const histDay = dailyClose(hist, (h) => h.date);
+  return [
   {
     name: "YIELD",
     display: selOp ? numYield(selOp).toLocaleString() : "—",
     /* yieldv 0 = a non-compounding day — preserve as a real gap, never
        flatten missingness into fake zeroes. */
-    history: hist.map((h) => ({
+    history: histDay.map((h) => ({
       timestamp: tsOf(h.date),
       value: h.yieldv > 0 ? h.yieldv : null,
     })),
   },
   {
     name: "SCORE",
-    display: hist.length ? hist[hist.length - 1].score.toFixed(1) : "—",
-    history: hist.map((h) => ({
+    display: histDay.length ? histDay[histDay.length - 1].score.toFixed(1) : "—",
+    history: histDay.map((h) => ({
       timestamp: tsOf(h.date),
       value: h.score > 0 ? h.score : null,
     })),
@@ -360,7 +376,7 @@ const fiveStatRows = (
   {
     name: "RANK",
     display: profile ? `#${profile.rank}` : "—",
-    history: hist.map((h) => ({
+    history: histDay.map((h) => ({
       timestamp: tsOf(h.date),
       value: h.rank > 0 ? h.rank : null,
     })),
@@ -381,7 +397,8 @@ const fiveStatRows = (
       value: s.velocity,
     })),
   },
-];
+  ];
+};
 
 /* LB-G15 — the operator profile's two internal slides share one fixed
    viewport: VISUAL (dual signature radar) / STAT HIGHLIGHTS (the five
