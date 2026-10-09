@@ -1544,3 +1544,36 @@
   max-width:670px;font-size:13px;line-height:1.72;color:var(--tx2);
 }
 .lbw-root .ws-article-list .blog-row-meta{overflow-wrap:anywhere}
+
+/* owner 2026-10-08 — profile slide 2: numbered stats / column ranks.
+   Same bordered-panel language as .f5stats so the slide pair reads as
+   one module. */
+.lbw-root .colranks{flex:1;min-height:0;display:flex;flex-direction:column;
+  overflow:hidden;box-sizing:border-box;padding:10px;
+  border:1px solid #384b25;border-radius:9px;background:#0d150c}
+.lbw-root .colranks>header{font:8px var(--font-mono);letter-spacing:.14em;
+  color:#a7d36a;border-bottom:1px dashed #375126;padding-bottom:8px;
+  display:flex;justify-content:space-between}
+.lbw-root .colrank-row{flex:1;min-height:0;display:grid;align-items:center;
+  grid-template-columns:minmax(0,1fr) auto auto;gap:8px;
+  border-bottom:1px solid #2c3824}
+.lbw-root .colrank-row:last-child{border:0}
+.lbw-root .colrank-row .ck{font:8.5px var(--font-mono);letter-spacing:.08em;
+  color:#8caa7f}
+.lbw-root .colrank-row .cv{font:10px var(--font-mono);font-weight:600;
+  color:#d8f0c0;text-align:right}
+.lbw-root .colrank-row .cr{font:9.5px var(--font-mono);font-weight:700;
+  color:#b7ff25;text-align:right;min-width:64px}
+.lbw-root .colrank-row .cr small{font-size:7px;color:#6f8a5e;font-weight:400}
+
+/* owner 2026-10-08 — rotating line slide under the large signal module.
+   One category trace at a time; stage is a button so it still drives
+   SINGLE mode on the big chart. */
+.lbw-root .f5-carousel{margin-top:0}
+.lbw-root .f5-carousel>header{display:flex;justify-content:space-between}
+.lbw-root .f5-carousel .f5-idx{color:#6f8a5e;letter-spacing:.08em}
+.lbw-root .f5-carousel-stage{flex:1;min-height:0;display:flex;
+  align-items:center;justify-content:center;width:100%;
+  background:transparent;border:0;padding:4px 0 0;cursor:pointer}
+.lbw-root .f5-carousel-stage svg{width:100%;height:100%;display:block}
+.lbw-root .f5-carousel-stage .f5-no-history{margin:auto}
