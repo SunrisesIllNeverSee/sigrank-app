@@ -1589,3 +1589,32 @@
   background:transparent;border:0;padding:4px 0 0;cursor:pointer}
 .lbw-root .f5-carousel-stage svg{width:100%;height:100%;display:block}
 .lbw-root .f5-carousel-stage .f5-no-history{margin:auto}
+
+/* owner 2026-10-08 — aux quickview rail. Fourth .mid column between the
+   stage and the inspector; mounts only while a peek is open, so the
+   stage narrows like any panel toggle and nothing else reflows. */
+.lbw-root .mid.peek{grid-template-columns:var(--lside-w,248px) minmax(0,1fr) 300px var(--rail-w,332px)}
+.lbw-root .peekcol{display:flex;flex-direction:column;min-width:0;min-height:0;
+  border-left:1px solid var(--line);background:var(--bg);overflow:hidden}
+.lbw-root .peekcol .colhead{display:flex;align-items:center;justify-content:space-between;
+  color:#a7d36a}
+.lbw-root .peekcol .peek-x{background:none;border:0;color:var(--tx2);cursor:pointer;
+  font:inherit;padding:0}
+.lbw-root .peekcol .peek-x:hover{color:var(--ac)}
+.lbw-root .peekcol .rail{flex:1;min-height:0;overflow-y:auto;padding:8px}
+.lbw-root .peekcol .mod{border:1px solid var(--line);border-radius:9px;
+  background:var(--panel);padding:8px;margin-bottom:10px}
+.lbw-root .peek-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.lbw-root .pkbtn{display:flex;align-items:center;justify-content:center;gap:4px;
+  padding:7px 4px;border:1px solid var(--line2);border-radius:6px;
+  font:700 9px var(--font-mono);letter-spacing:.1em;color:var(--tx);
+  background:var(--bg2);cursor:pointer;text-decoration:none;white-space:nowrap}
+.lbw-root .pkbtn:hover{border-color:var(--ac);color:var(--ac)}
+.lbw-root .pkbtn.on{border-color:var(--ac);color:var(--ac)}
+/* row peek glyph — hidden until the operator row is hovered/focused */
+.lbw-root .board-t .peekbtn{display:none;margin-left:6px;padding:0 4px;
+  border:0;background:none;color:var(--mut);cursor:pointer;font:inherit;
+  vertical-align:top}
+.lbw-root .board-t tbody tr:hover .peekbtn,
+.lbw-root .board-t tbody tr:focus-visible .peekbtn{display:inline-block}
+.lbw-root .board-t .peekbtn:hover{color:var(--ac)}
