@@ -84,7 +84,8 @@ import { BADGE_LABELS } from "./PixelBadge";
 import { SignalMedal, SignalAward } from "./SignalHardware";
 import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts } from "./DualSignatureRadar";
-import { FiveStats } from "./FiveStats";
+import { LineCarousel } from "./FiveStats";
+import { ColumnRanks } from "./ColumnRanks";
 import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
 import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
@@ -1197,9 +1198,9 @@ export function LiveBoardWorkspace({
               {/* LB-G15 approved two internal slides on one fixed
                   viewport. VISUAL = LB-G06 candidate-C dual signature
                   radar (solar operator over an ultraviolet same-axis
-                  field median). STAT HIGHLIGHTS = LB-G08 the five
-                  original graph encodings fed by real dated history and
-                  snapshot points. */}
+                  field median). STAT (owner 2026-10-08): numbered stats —
+                  the operator's value + field rank per column, not the
+                  sparkline strip. */}
               <ProfileSlides
                 visual={
                   selOp ? (
@@ -1212,23 +1213,13 @@ export function LiveBoardWorkspace({
                     <p className="drill-note">— SELECT AN OPERATOR</p>
                   )
                 }
-                stats={
-                  <FiveStats
-                    rows={statRows}
-                    selected={sigSel}
-                    onSelect={(k) => {
-                      setSigSel(k);
-                      setSigMode("individual");
-                    }}
-                  />
-                }
+                stats={<ColumnRanks op={selOp} ops={ops} />}
               />
               {/* addendum 2026-10-08: the large history module —
                   COMBO = five normalized colored traces on one dated
                   axis (toggleable legend, hover inspector); SINGLE =
                   one metric expanded (Yield keeps its shaded area +
-                  real field-median line). Clicking a mini row above
-                  expands that metric here. Fixed 271×215 footprint. */}
+                  real field-median line). Fixed 271×215 footprint. */}
               <CombinedSignal
                 series={sigSeries}
                 mode={sigMode}
@@ -1236,6 +1227,16 @@ export function LiveBoardWorkspace({
                 onMode={setSigMode}
                 onSelect={setSigSel}
                 fieldMedianYield={fieldMedY}
+              />
+              {/* owner 2026-10-08: the compact sparklines relocate under
+                  the large module as a rotating slide — one category's
+                  trace at a time, 4s cadence, click → SINGLE expand. */}
+              <LineCarousel
+                rows={statRows}
+                onSelect={(k) => {
+                  setSigSel(k);
+                  setSigMode("individual");
+                }}
               />
               {(selOp?.recs ?? []).length ? (
                 <div className="trph">
