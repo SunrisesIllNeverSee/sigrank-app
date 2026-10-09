@@ -250,6 +250,9 @@ export interface BoardRowProps {
   rawRank: number;
   selected: boolean;
   onSelect: (i: number) => void;
+  /** owner 2026-10-08 — quickview affordance: opens the aux peek rail for
+      this operator without changing the selection (also Alt+click). */
+  onPeek?: (i: number) => void;
 }
 
 export const BoardRow = memo(function BoardRow({
@@ -262,6 +265,7 @@ export const BoardRow = memo(function BoardRow({
   rawRank,
   selected,
   onSelect,
+  onPeek,
 }: BoardRowProps) {
   const cls = r === 1 ? "top1" : r === 2 ? "top2" : r === 3 ? "top3" : "";
   const viewLabel = viewMode === "ops" ? "Υ PERFORMANCE" : "10×DEV OUTLIER";
@@ -271,7 +275,10 @@ export const BoardRow = memo(function BoardRow({
     <tr
       className={`${cls}${selected ? " sel-op" : ""}`.trim() || undefined}
       data-op={i}
-      onClick={() => onSelect(i)}
+      onClick={(e) => {
+        if (e.altKey && onPeek) onPeek(i);
+        else onSelect(i);
+      }}
       /* keyboard parity with the reference's click-to-swap — the row keeps
          its <tr> semantics (no role swap) and gains focus + Enter/Space;
          aria-current marks the row feeding the operator dock. */
@@ -346,6 +353,20 @@ export const BoardRow = memo(function BoardRow({
               <span className="opl">◍ {o.location}</span>
             ) : null}
           </span>
+          {onPeek && (
+            <button
+              type="button"
+              className="peekbtn"
+              title={`quickview ${o.name} (Alt+click)`}
+              aria-label={`quickview ${o.name}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onPeek(i);
+              }}
+            >
+              ◉
+            </button>
+          )}
         </div>
       </td>
       <td>
