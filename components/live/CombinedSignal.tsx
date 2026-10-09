@@ -95,7 +95,9 @@ export function CombinedSignal({
   const [enabled, setEnabled] = useState<SignalMetricKey[]>(
     METRICS.map((m) => m.id),
   );
-  const [focusTime, setFocusTime] = useState<number | null>(null);
+  /* pointer x in viewBox units — each visible trace resolves its own
+     nearest observation against its own span. */
+  const [focusX, setFocusX] = useState<number | null>(null);
   const id = useId().replace(/:/g, "");
 
   const lines = useMemo(() => {
@@ -104,19 +106,31 @@ export function CombinedSignal({
     return result;
   }, [series]);
 
-  /* shared chronological window = union of real observation timestamps */
-  const dated = useMemo(
-    () =>
-      [...new Set(METRICS.flatMap((m) => lines[m.id].map((p) => p.timestamp)))]
-        .sort((a, b) => a - b),
-    [lines],
+  /* owner 2026-10-08 — each trace spans its OWN observed window. A shared
+     chronological axis compressed the two timestamp families against each
+     other (day-precision history vs second-precision snapshots): whichever
+     family covered less wall-time collapsed into an edge sliver and the
+     shapes the carousel shows could not be seen here. Per-series x-extent
+     mirrors the carousel's grammar; x positions stay strictly chronological
+     inside each trace, raw dates stay in the inspector. */
+  const spans = useMemo(() => {
+    const s = {} as Record<SignalMetricKey, { lo: number; hi: number }>;
+    for (const m of METRICS) {
+      const ts = lines[m.id].map((p) => p.timestamp);
+      s[m.id] = { lo: Math.min(...ts), hi: Math.max(...ts) };
+    }
+    return s;
+    /* xOf(m) maps a real timestamp onto the plot width using THAT series'
+       own extent; a single-point series gets a zero-width domain → 0.5 */
+  }, [lines]);
+  const xOf = (mid: SignalMetricKey) => {
+    const { lo, hi } = spans[mid];
+    return (date: number) =>
+      11 + (hi > lo ? (date - lo) / (hi - lo) : 0.5) * 224;
+  };
+  const hasData = METRICS.some(
+    (m) => lines[m.id].filter((p) => good(p.value)).length > 0,
   );
-  const windowStart = dated[0] ?? NaN;
-  const windowEnd = dated[dated.length - 1] ?? NaN;
-  const safeRange = good(windowStart) && good(windowEnd) && windowEnd > windowStart;
-
-  const x = (date: number) =>
-    11 + ((date - windowStart) / Math.max(1, windowEnd - windowStart)) * 224;
   const y = (value: number) => 101 - value * 88;
 
   const visible =
@@ -139,6 +153,7 @@ export function CombinedSignal({
     mid: SignalMetricKey,
   ): string[] => {
     const obs = ordered(points);
+    const sx = xOf(mid);
     const paths: string[] = [];
     let d = "";
     const flush = () => {
@@ -151,7 +166,7 @@ export function CombinedSignal({
         flush();
         continue;
       }
-      const a = x(pt.timestamp).toFixed(2);
+      const a = sx(pt.timestamp).toFixed(2);
       const b = y(value).toFixed(2);
       if (!d) d = `M${a} ${b}`;
       else if (mid === "RANK") d += ` H${a} V${b}`;
@@ -172,7 +187,7 @@ export function CombinedSignal({
         .filter((p) => good(p.value))
         .map((p, i) => {
           const v = normalizeSignal(pts, p.value, m.id === "RANK") ?? 0;
-          const xx = x(p.timestamp);
+          const xx = xOf(m.id)(p.timestamp);
           const yy = y(v);
           return (
             <rect
@@ -212,7 +227,7 @@ export function CombinedSignal({
   /* owner's shaded large Yield treatment returns in SINGLE · YIELD */
   const shaded = mode === "individual" && selected === "YIELD";
 
-  if (!safeRange)
+  if (!hasData)
     return (
       <div className="csa-large">
         <div className="csa-no-data" role="status">
@@ -221,19 +236,49 @@ export function CombinedSignal({
       </div>
     );
 
+  /* per-series nearest point to the hovered x — each trace has its own
+     x-domain, so "nearest" is resolved inside that trace's span and the
+     inspector reports the point's REAL date (they may differ across
+     series; each row carries its own in the title). */
+  const hovered = focusX !== null
+    ? visible.map((m) => {
+        const pts = lines[m.id];
+        let best: SignalPoint | null = null;
+        let bestD = Infinity;
+        const sx = xOf(m.id);
+        for (const p of pts) {
+          const d = Math.abs(sx(p.timestamp) - focusX);
+          if (d < bestD) {
+            bestD = d;
+            best = p;
+          }
+        }
+        return { m, point: best };
+      })
+    : null;
+
   const inspector =
-    focusTime !== null ? (
+    hovered !== null ? (
       <>
-        <small>{new Date(focusTime).toISOString().slice(0, 10)}</small>
-        {visible.map((m) => {
-          const point = lines[m.id].find((p) => p.timestamp === focusTime);
-          return (
-            <span key={m.id} className="csa-inspect-row">
-              <i style={{ color: m.color }}>{m.id.slice(0, 3)}</i>
-              <b>{signalLabel(m.id, point?.value ?? null)}</b>
-            </span>
-          );
-        })}
+        <small>
+          {hovered[0]?.point
+            ? new Date(hovered[0].point.timestamp).toISOString().slice(0, 10)
+            : "—"}
+        </small>
+        {hovered.map(({ m, point }) => (
+          <span
+            key={m.id}
+            className="csa-inspect-row"
+            title={
+              point
+                ? `${new Date(point.timestamp).toISOString()} · ${m.id}`
+                : `${m.id}: no observation`
+            }
+          >
+            <i style={{ color: m.color }}>{m.id.slice(0, 3)}</i>
+            <b>{signalLabel(m.id, point?.value ?? null)}</b>
+          </span>
+        ))}
       </>
     ) : null;
 
@@ -351,10 +396,10 @@ export function CombinedSignal({
             );
           })()}
         {visible.flatMap((m) => chart(m))}
-        {focusTime !== null && (
+        {focusX !== null && (
           <line
-            x1={x(focusTime)}
-            x2={x(focusTime)}
+            x1={focusX}
+            x2={focusX}
             y1="13"
             y2="101"
             stroke="#c5ed9b"
@@ -369,30 +414,20 @@ export function CombinedSignal({
           fill="transparent"
           onPointerMove={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
-            const ts =
-              windowStart +
-              Math.max(
-                0,
-                Math.min(1, (e.clientX - rect.left) / rect.width),
-              ) *
-                (windowEnd - windowStart);
-            const closest = dated.reduce<number | null>(
-              (chosen, v) =>
-                chosen === null || Math.abs(v - ts) < Math.abs(chosen - ts)
-                  ? v
-                  : chosen,
-              null,
+            setFocusX(
+              11 +
+                Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) *
+                  224,
             );
-            setFocusTime(closest);
           }}
-          onPointerLeave={() => setFocusTime(null)}
+          onPointerLeave={() => setFocusX(null)}
         />
       </svg>
       <footer>
         <span className="csa-tip" aria-live="polite">
           {inspector ??
             (mode === "combined"
-              ? "RELATIVE 0–100 PER METRIC"
+              ? "RELATIVE 0–100 · PER-TRACE SPAN"
               : "SOURCE VALUES / DATE")}
         </span>
         <span>DATED OBS.</span>
