@@ -14,6 +14,8 @@
  * fabricated trend. RANK plots inverted (a smaller rank number = a
  * better rank → draws higher).
  */
+import { useEffect, useState } from "react";
+
 export interface TimedMetricPoint {
   timestamp: number;
   value: number | null;
@@ -34,6 +36,47 @@ const TRACE_COLORS: Record<FiveStatRow["name"], string> = {
 };
 const good = (v: number | null | undefined): v is number =>
   typeof v === "number" && Number.isFinite(v) && v >= 0;
+
+/* Rotating variant (owner 2026-10-08): the compact strip moves under the
+ * large Yield-overtime module and becomes a carousel — one metric's line
+ * trace at a time, auto-cycling every 4s on the same cadence as the
+ * honors deck. Clicking still expands that metric in the large chart
+ * (SINGLE mode). Same data contract: gaps break, NO HISTORY when <2
+ * usable points, RANK inverted. */
+export function LineCarousel({
+  rows,
+  onSelect,
+}: {
+  rows: FiveStatRow[];
+  onSelect?: (name: FiveStatRow["name"]) => void;
+}) {
+  const list = rows.slice(0, 5);
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI((x) => (x + 1) % Math.max(list.length, 1)), 4000);
+    return () => clearInterval(t);
+  }, [list.length]);
+  const row = list[i % Math.max(list.length, 1)];
+  if (!row) return null;
+  return (
+    <section className="f5stats f5-carousel" aria-label="Rotating line signals">
+      <header>
+        LINE SIGNALS · {row.name}
+        <span className="f5-idx">
+          {(i % Math.max(list.length, 1)) + 1}/{list.length}
+        </span>
+      </header>
+      <button
+        type="button"
+        className="f5-carousel-stage"
+        onClick={() => onSelect?.(row.name)}
+        title={`Expand ${row.name} in the large history chart`}
+      >
+        <LineTrace row={row} tall />
+      </button>
+    </section>
+  );
+}
 
 export function FiveStats({
   rows,
@@ -76,11 +119,15 @@ export function FiveStats({
   );
 }
 
-function LineTrace({ row }: { row: FiveStatRow }) {
+function LineTrace({ row, tall }: { row: FiveStatRow; tall?: boolean }) {
   const pts = [...row.history]
     .filter((p) => Number.isFinite(p.timestamp))
     .sort((a, b) => a.timestamp - b.timestamp);
   const valid = pts.filter((p) => good(p.value));
+  const VH = tall ? 52 : 23;
+  const TOP = tall ? 6 : 2;
+  const BOT = tall ? 46 : 21;
+  const RNG = BOT - TOP;
   if (valid.length < 2)
     return <small className="f5-no-history">NO HISTORY</small>;
   const lo = Math.min(...valid.map((p) => p.value!));
@@ -93,8 +140,8 @@ function LineTrace({ row }: { row: FiveStatRow }) {
   /* rank inverts: a smaller rank number is better → draws higher */
   const y = (v: number) =>
     row.name === "RANK"
-      ? 2 + ((v - lo) / span) * 19
-      : 21 - ((v - lo) / span) * 19;
+      ? TOP + ((v - lo) / span) * RNG
+      : BOT - ((v - lo) / span) * RNG;
   const segments: string[] = [];
   let path = "";
   for (const p of pts) {
@@ -110,7 +157,7 @@ function LineTrace({ row }: { row: FiveStatRow }) {
   if (path) segments.push(path);
   return (
     <svg
-      viewBox="0 0 106 23"
+      viewBox={`0 0 106 ${VH}`}
       role="img"
       aria-label={`${row.name}: line-only observed history`}
     >
@@ -119,7 +166,7 @@ function LineTrace({ row }: { row: FiveStatRow }) {
           key={i}
           d={d}
           stroke={TRACE_COLORS[row.name]}
-          strokeWidth="1.65"
+          strokeWidth={tall ? "1.4" : "1.65"}
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
