@@ -91,10 +91,9 @@ import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
 import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
 import { RotatingMovers } from "./MoversRail";
+import { ProfileActions } from "./ProfileActions";
 
 import {
-  COMPARE_CTA,
-  COMPARE_SLOTS,
   CONTROLS,
   COPY,
   LBW_THEME_INIT,
@@ -979,11 +978,12 @@ export function LiveBoardWorkspace({
   const [epromoOpen, setEpromoOpen] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   /* RECENTS (owner 2026-10-06): last-selected operators for the RECENTS &
-     SOON rail module; cmpQ = the compare module's add-by-search input. */
+     SOON rail module. */
   const [recents, setRecents] = useState<{ codename: string; name: string }[]>(
     [],
   );
-  const [cmpQ, setCmpQ] = useState("");
+  /* (owner 2026-10-08: the compare module's add-by-search input is gone —
+     the module is a single button that routes to /compare.) */
   /* icon-set switcher (owner: "toggle through the icons — all 4 or 5
      sets") — cycles pixel / glyph / emoji / minimal / hex-badge rail
      treatments; defaults to the brand pixel set. */
@@ -1349,6 +1349,12 @@ export function LiveBoardWorkspace({
                   {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
                 </p>
               )}
+              {/* owner 2026-10-08: the peek rail's action row joins the
+                  selected operator's profile too — SEE PROFILE / COMPARE /
+                  WATCH, always visible, not only inside the aux rail. */}
+              {selOp && (
+                <ProfileActions op={selOp} compareHref={cmpHref} />
+              )}
             </>
           ) : (
             <button
@@ -1394,85 +1400,16 @@ export function LiveBoardWorkspace({
            bronze rotate in place (profile graphics on each row). */
         return <MedalDeck medals={medals} ops={ops} onSelect={handleSelect} />;
       }
-      case "compare": {
-        /* compare-add-by-search (owner): typing an operator offers the
-           match as the second slot — view their profile or carry the
-           pair into /compare?a=<sel>&b=<match>. */
-        const q = cmpQ.trim().toLowerCase();
-        const match = q
-          ? ops.find(
-              (o, k) =>
-                k !== selected &&
-                (o.name.toLowerCase().includes(q) ||
-                  o.codename.toLowerCase().includes(q) ||
-                  o.handle.toLowerCase().includes(q)),
-            )
-          : null;
-        const href = selOp
-          ? `/compare?a=${encodeURIComponent(selOp.slug)}${match ? `&b=${encodeURIComponent(match.slug)}` : ""}`
-          : match
-            ? `/compare?a=${encodeURIComponent(match.slug)}`
-            : "/compare";
+      case "compare":
+        /* owner 2026-10-08: "turn compare operators into a single
+           button… it'll redirect to the compare page" — the slot/search
+           load-out is gone; one button routes to /compare, carrying the
+           selected operator as ?a= when there is one. */
         return (
-          <>
-            <div className="cmp-slots">
-              {Array.from({ length: COMPARE_SLOTS }, (_, k) => {
-                const slotOp = k === 0 ? selOp : k === 1 ? match : null;
-                return (
-                  <div
-                    className={`cmp-slot${slotOp ? " filled" : ""}`}
-                    key={k}
-                    title={slotOp ? slotOp.name : "add an operator"}
-                  >
-                    {slotOp ? (
-                      <span className="cav">
-                        {slotOp.avatarUrl ? (
-                          /* eslint-disable-next-line @next/next/no-img-element --
-                             operator avatar URL; 26px fixed tile */
-                          <img src={slotOp.avatarUrl} alt="" loading="lazy" />
-                        ) : (
-                          slotOp.name[0]
-                        )}
-                      </span>
-                    ) : (
-                      "+"
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            <input
-              className="cmp-search"
-              placeholder="add operator…"
-              aria-label="add an operator to compare"
-              value={cmpQ}
-              onChange={(e) => setCmpQ(e.target.value)}
-            />
-            {q && (
-              <div className="cmp-match mono">
-                {match ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const k = ops.indexOf(match);
-                      if (k >= 0) handleSelect(k);
-                      setCmpQ("");
-                    }}
-                    title="view their profile"
-                  >
-                    ▸ {match.name}
-                  </button>
-                ) : (
-                  <span className="mut">— no match</span>
-                )}
-              </div>
-            )}
-            <a className="btn" href={href}>
-              {COMPARE_CTA}
-            </a>
-          </>
+          <a className="btn" href={cmpHref}>
+            COMPARE OPERATORS →
+          </a>
         );
-      }
       case "movers":
         /* rotating movers (owner): auto-cycles 7D → 24H → HITL → AGENTIC
            views of the same field. */
@@ -1658,48 +1595,9 @@ export function LiveBoardWorkspace({
             ) : (
               <p className="drill-note">— SELECT AN OPERATOR</p>
             )}
-            {/* SIGNAL WIRE (owner: "news and updates — welcome people and
-                notify of submissions") — newest operator + freshest syncs,
-                derived from the live field. */}
-            <div className="soon-h">SIGNAL WIRE</div>
-            <div className="wire">
-              {(() => {
-                const newest = [...ops]
-                  .filter((o) => o.age != null)
-                  .sort((a, b) => (a.age ?? 9e9) - (b.age ?? 9e9))[0];
-                const fresh = [...ops]
-                  .filter((o) => o.last)
-                  .sort((a, b) => (b.last ?? "").localeCompare(a.last ?? ""))
-                  .slice(0, 2);
-                return (
-                  <>
-                    {newest && (
-                      <p className="wire-line">
-                        ◈ welcome <b>{newest.name}</b> — joined the field
-                      </p>
-                    )}
-                    {fresh.map((o) => (
-                      <p className="wire-line" key={o.codename}>
-                        ▸ <b>{o.name}</b> submitted — {o.last}
-                      </p>
-                    ))}
-                  </>
-                );
-              })()}
-            </div>
-            {/* FIELD NOTES (owner: "a text box of the charts or graphs") —
-                the board's numbers written as prose, its own box. */}
-            <div className="soon-h">FIELD NOTES</div>
-            <div className="notes">
-              <p className="notes-t">
-                {initial.fieldStats
-                  .map(
-                    (x) =>
-                      `${x.field.replace(/_/g, " ").toLowerCase()} ${x.value}`,
-                  )
-                  .join(" · ")}
-              </p>
-            </div>
+            {/* owner 2026-10-08: "move the news feeds to the left
+                sidebar" — SIGNAL WIRE + FIELD NOTES now live in .lside;
+                this module keeps recents + the coming-soon caption. */}
             {/* coming-soon candidates moved to the icon rail (owner pass 3)
                 — this module keeps recents only. */}
             <p className="soon-cap">COMING SOON — TEAMS · HACKS · VERSUS live in the rail ↙</p>
@@ -2048,12 +1946,64 @@ export function LiveBoardWorkspace({
                   />
                 </div>
                 {/* owner (annotation pass 3): "add compare to this side" —
-                    the compare module joins the left sidebar. */}
+                    the compare module joins the left sidebar.
+                    2026-10-08: reduced to a single button → /compare. */}
                 <div className="mod">
                   <h3>
                     <span className="sq"></span>COMPARE OPERATORS
                   </h3>
                   {railBody("compare")}
+                </div>
+                {/* owner 2026-10-08: "move the news feeds to the left
+                    sidebar" — SIGNAL WIRE + FIELD NOTES relocate here
+                    from the inspector's RECENTS module, unchanged. */}
+                <div className="mod">
+                  <h3>
+                    <span className="sq"></span>SIGNAL WIRE
+                  </h3>
+                  <div className="wire">
+                    {(() => {
+                      const newest = [...ops]
+                        .filter((o) => o.age != null)
+                        .sort((a, b) => (a.age ?? 9e9) - (b.age ?? 9e9))[0];
+                      const fresh = [...ops]
+                        .filter((o) => o.last)
+                        .sort((a, b) =>
+                          (b.last ?? "").localeCompare(a.last ?? ""),
+                        )
+                        .slice(0, 2);
+                      return (
+                        <>
+                          {newest && (
+                            <p className="wire-line">
+                              ◈ welcome <b>{newest.name}</b> — joined the
+                              field
+                            </p>
+                          )}
+                          {fresh.map((o) => (
+                            <p className="wire-line" key={o.codename}>
+                              ▸ <b>{o.name}</b> submitted — {o.last}
+                            </p>
+                          ))}
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div className="mod">
+                  <h3>
+                    <span className="sq"></span>FIELD NOTES
+                  </h3>
+                  <div className="notes">
+                    <p className="notes-t">
+                      {initial.fieldStats
+                        .map(
+                          (x) =>
+                            `${x.field.replace(/_/g, " ").toLowerCase()} ${x.value}`,
+                        )
+                        .join(" · ")}
+                    </p>
+                  </div>
                 </div>
                 {/* owner (pass 3): "hall of signal is supposed to be in the
                     left sidebar" — spotlight + medal tally join the burners
