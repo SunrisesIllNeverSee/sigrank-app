@@ -13,11 +13,11 @@
  * mode/selection state so the peek never mutates the real selection.
  *
  * Actions: SEE PROFILE → /user/<codename> · COMPARE → /compare?a=sel&b=peek
- * · WATCH — a local pin (localStorage), no backend; an honest personal
- *   mark, not a social count.
+ * · WATCH — shared WatchButton (real row when signed in, local pin
+ *   otherwise). The same ProfileActions row renders under the selected
+ *   operator's profile in the inspector rail.
  */
-import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
 import type { LiveOperator } from "@/lib/board/live-types";
 import type { ProfileView } from "./utils";
 import type { SignalSeries, SignalMetricKey } from "./CombinedSignal";
@@ -27,20 +27,10 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import type { FiveStatRow } from "./FiveStats";
 import type { DetailStatus } from "./enrich";
-import { useBoardSession } from "./session";
 import { OperatorProfileTile } from "./OperatorDock";
+import { ProfileActions } from "./ProfileActions";
 import { ProfileSlides } from "./LiveBoardWorkspace";
 import { sixFactsOf, fieldSixMedian } from "./LiveBoardWorkspace";
-
-const WATCH_KEY = "sigrank:watch";
-const readWatch = (): string[] => {
-  try {
-    const v = JSON.parse(localStorage.getItem(WATCH_KEY) ?? "[]");
-    return Array.isArray(v) ? v.filter((x) => typeof x === "string") : [];
-  } catch {
-    return [];
-  }
-};
 
 export function PeekPanel({
   op,
@@ -66,57 +56,6 @@ export function PeekPanel({
     "combined",
   );
   const [sigSel, setSigSel] = useState<SignalMetricKey>("YIELD");
-  /* WATCH — two tiers, both honest: signed-in → real row via
-     /api/v1/operators/<cn>/watch (server count included); signed-out →
-     localStorage pin on this device only, never presented as a count. */
-  const session = useBoardSession();
-  const [watch, setWatch] = useState<string[]>([]);
-  const [watching, setWatching] = useState<boolean | null>(null);
-  const [watchCount, setWatchCount] = useState<number | null>(null);
-  useEffect(() => {
-    setWatch(readWatch());
-    if (!session.signedIn) return;
-    let alive = true;
-    fetch(`/api/v1/operators/${encodeURIComponent(op.codename)}/watch`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!alive || !d) return;
-        setWatching(!!d.watching);
-        setWatchCount(typeof d.count === "number" ? d.count : null);
-      })
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, [op.codename, session.signedIn]);
-  const watched =
-    watching ?? watch.includes(op.codename);
-  const toggleWatch = useCallback(() => {
-    if (session.signedIn) {
-      fetch(`/api/v1/operators/${encodeURIComponent(op.codename)}/watch`, {
-        method: "POST",
-      })
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => {
-          if (!d) return;
-          setWatching(!!d.watching);
-          setWatchCount(typeof d.count === "number" ? d.count : null);
-        })
-        .catch(() => {});
-      return;
-    }
-    setWatch((w) => {
-      const next = w.includes(op.codename)
-        ? w.filter((c) => c !== op.codename)
-        : [...w, op.codename];
-      try {
-        localStorage.setItem(WATCH_KEY, JSON.stringify(next));
-      } catch {
-        /* private mode — the in-memory toggle still works */
-      }
-      return next;
-    });
-  }, [op.codename, session.signedIn]);
 
   const sigSeries = Object.fromEntries(
     statRows.map((r) => [r.name, r.history]),
@@ -194,31 +133,7 @@ export function PeekPanel({
               {detailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
             </p>
           )}
-          <div className="peek-actions">
-            <Link
-              className="pkbtn"
-              href={`/user/${encodeURIComponent(op.codename)}`}
-            >
-              SEE PROFILE
-            </Link>
-            <Link className="pkbtn" href={compareHref}>
-              COMPARE
-            </Link>
-            <button
-              type="button"
-              className={`pkbtn${watched ? " on" : ""}`}
-              aria-pressed={watched}
-              title={
-                session.signedIn
-                  ? "watch this operator — they can see the count"
-                  : "pin to your local watchlist (this device — sign in to make it real)"
-              }
-              onClick={toggleWatch}
-            >
-              {watched ? "★ WATCHING" : "☆ WATCH"}
-              {watchCount ? ` · ${watchCount}` : ""}
-            </button>
-          </div>
+          <ProfileActions op={op} compareHref={compareHref} />
         </div>
       </div>
     </aside>
