@@ -86,6 +86,7 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import { ColumnRanks } from "./ColumnRanks";
+import { PeekPanel } from "./PeekPanel";
 import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
 import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
@@ -292,7 +293,7 @@ function MedalDeck({
 const effFactOf = (o: LiveOperator): number | null =>
   o.eff && o.eff !== "—" ? numvOf(o.eff) : null;
 
-const sixFactsOf = (o: LiveOperator): SixAxisFacts => ({
+export const sixFactsOf = (o: LiveOperator): SixAxisFacts => ({
   snr: o.snr,
   velocity: o.vel,
   leverage: numLev(o),
@@ -306,7 +307,7 @@ const sixFactsOf = (o: LiveOperator): SixAxisFacts => ({
    Exclusions: non-compounding rows (their canonical metrics render "—",
    not measurements), absent/non-finite values, and display-string "—"
    (numvOf("—") → 0 must never count as an observed zero). */
-const fieldSixMedian = (ops: LiveOperator[]): SixAxisFacts | null => {
+export const fieldSixMedian = (ops: LiveOperator[]): SixAxisFacts | null => {
   const eligible = ops.filter((o) => !o.nc);
   if (eligible.length < 3) return null;
   const med = (xs: (number | null | undefined)[]) => {
@@ -403,7 +404,7 @@ const fiveStatRows = (
 /* LB-G15 — the operator profile's two internal slides share one fixed
    viewport: VISUAL (dual signature radar) / STAT HIGHLIGHTS (the five
    original graph encodings). Ported from OperatorProfileTwoSlides. */
-function ProfileSlides({
+export function ProfileSlides({
   visual,
   stats,
 }: {
@@ -810,6 +811,82 @@ export function LiveBoardWorkspace({
        also keeps StrictMode's double-mount from stranding a `loading`
        entry whose in-flight promise belongs to the discarded first run. */
   }, [selCodename, selOp?.claimed, detailKey, detailFetcher]);
+
+  /* ---------- quickview (owner 2026-10-08): peek another operator into an
+     aux rail without disturbing the selection. Triggered from a row's peek
+     glyph or Alt+click — explicit intent only (nothing prefetches: the
+     fetch runs through the same session-cached detail fan-out). */
+  const [peekCodename, setPeekCodename] = useState<string | null>(null);
+  const peekIdx = peekCodename
+    ? ops.findIndex((o) => o.codename === peekCodename)
+    : -1;
+  const peekOp = peekIdx >= 0 ? ops[peekIdx] : null;
+  const peekEntry = peekCodename
+    ? details[detailKey(peekCodename)]
+    : undefined;
+  const peekDetail = peekEntry?.detail ?? null;
+  const peekDetailStatus: DetailStatus = peekEntry?.status ?? "idle";
+  const peekProfile = useMemo(
+    () => (peekIdx >= 0 ? profileFor(initial, ops, peekIdx, rmax) : null),
+    [initial, ops, peekIdx, rmax],
+  );
+  const peekStatRows = useMemo(
+    () =>
+      fiveStatRows(
+        peekOp,
+        peekProfile,
+        peekDetail?.history ?? [],
+        peekDetail?.snapshots ?? [],
+      ),
+    [peekOp, peekProfile, peekDetail],
+  );
+  const handlePeek = useCallback(
+    (i: number) => setPeekCodename(ops[i]?.codename ?? null),
+    [ops],
+  );
+
+  /* peek detail fan-out — same cache/dedupe contract as the selection
+     loader above. */
+  useEffect(() => {
+    if (!peekCodename) return;
+    const key = detailKey(peekCodename);
+    let alive = true;
+    setDetails((prev) =>
+      prev[key] ? prev : { ...prev, [key]: { status: "loading" } },
+    );
+    Promise.resolve(
+      detailFetcher(peekCodename, { claimed: peekOp?.claimed }),
+    )
+      .then((det) => {
+        if (!alive) return;
+        const d = det || undefined;
+        setDetails((prev) => ({
+          ...prev,
+          [key]:
+            d && !detailFailed(d)
+              ? { status: "ready", detail: d }
+              : d
+                ? { status: "error", detail: d }
+                : { status: "error" },
+        }));
+      })
+      .catch(() => {
+        if (alive)
+          setDetails((prev) => ({ ...prev, [key]: { status: "error" } }));
+      });
+    return () => {
+      alive = false;
+    };
+  }, [peekCodename, peekOp?.claimed, detailKey, detailFetcher]);
+
+  /* Esc dismisses the peek rail. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPeekCodename(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   /* ---------- account chrome (2C) — real session surface; the `account`
      prop is a demo/QA override that skips the fetch entirely. ---------- */
@@ -1936,7 +2013,7 @@ export function LiveBoardWorkspace({
               stage top; panel toggles live in the icon rail and appear
               only when their panel is closed. */}
 
-          <div className="mid">
+          <div className={`mid${peekCodename ? " peek" : ""}`}>
             {/* left sidebar (owner 2026-10-06): banner + operator profile —
                 VS Code side-panel anatomy, toggled by the title-bar glyph. */}
             <aside className="lside">
@@ -2138,6 +2215,7 @@ export function LiveBoardWorkspace({
                             rawRank={rawRank[i] ?? i + 1}
                             selected={selected === i}
                             onSelect={handleSelect}
+                            onPeek={handlePeek}
                           />
                         ))}
                         {ordered.length === 0 && (
@@ -2264,6 +2342,22 @@ export function LiveBoardWorkspace({
                 </div>
               </main>
             </div>
+
+            {/* owner 2026-10-08 — aux quickview rail: pops in between the
+                stage and the inspector when a row's peek glyph (or
+                Alt+click) names another operator. Nothing else unmounts;
+                Esc or ✕ restores the three-column grid. */}
+            {peekCodename && peekOp && peekProfile && (
+              <PeekPanel
+                op={peekOp}
+                profile={peekProfile}
+                ops={ops}
+                statRows={peekStatRows}
+                detailStatus={peekDetailStatus}
+                selSlug={selOp?.slug ?? null}
+                onClose={() => setPeekCodename(null)}
+              />
+            )}
 
             {/* right rail: heading + swappable modules (share, movers,
                 compare, field, hall — owner 2026-10-06 IA) */}
