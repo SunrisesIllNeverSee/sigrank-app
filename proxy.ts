@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { detectBot } from "@/lib/infra/bot-detect";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { anonymousAnalystRoute } from "@/lib/mcp/plugin/anonymous-origin";
 
 const HOME_MARKDOWN = `# SigRank SignalAF — The Evaluation Platform for AI Operators
 
@@ -194,6 +195,14 @@ function negotiatedHomepage(request: NextRequest): Response | null {
  * scoped auth session refresh for authenticated surfaces.
  */
 export async function proxy(request: NextRequest) {
+  const analystRoute = anonymousAnalystRoute(request.nextUrl.hostname, request.nextUrl.pathname);
+  if (analystRoute === "public") return NextResponse.next({ request });
+  if (analystRoute === "blocked") {
+    return new Response("Not Found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
   // ─── /api/search — proxy to analytics worker (AI Search binding) ──────
   if (request.nextUrl.pathname === "/api/search") {
     const proxyUrl = new URL("https://moses-analytics.sigrank.workers.dev/api/search");
@@ -289,6 +298,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    { source: "/:path*", has: [{ type: "host", value: "analyst.signalaf.com" }] },
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf)).*)",
   ],
 };
