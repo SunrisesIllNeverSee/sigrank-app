@@ -11,3 +11,13 @@ export function anonymousAnalystRoute(
     ? "public"
     : "blocked";
 }
+
+export function anonymousAnalystChallenge(method: string): Response {
+  if (method !== "GET" && method !== "HEAD") {
+    return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
+  }
+  return new Response(
+    method === "HEAD" ? null : "BcUWbu8C0IdvuJ0MtTnzQzMcajWl2xL7hHqN8XQy6To\n",
+    { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } },
+  );
+}

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { anonymousAnalystRoute } from "../../lib/mcp/plugin/anonymous-origin.ts";
+import { anonymousAnalystRoute, anonymousAnalystChallenge } from "../../lib/mcp/plugin/anonymous-origin.ts";
 
 test("anonymous hostname exposes the Analyst and ownership challenge", () => {
   for (const path of ["/api/plugins/sigrank/mcp", "/.well-known/openai-apps-challenge"]) {
@@ -46,4 +46,15 @@ test("proxy isolates the hostname before session refresh and matches all its pat
   assert.ok(proxy.indexOf("const analystRoute = anonymousAnalystRoute") < proxy.indexOf("const bot = detectBot"));
   assert.ok(proxy.indexOf('if (analystRoute === "blocked")') < proxy.indexOf("await supabase.auth.getUser()"));
   assert.match(proxy, /source: "\/:path\*", has: \[\{ type: "host", value: "analyst\.signalaf\.com" \}\]/);
+});
+
+test("anonymous ownership challenge matches the review draft and respects HTTP methods", async () => {
+  const response = anonymousAnalystChallenge("GET");
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), "BcUWbu8C0IdvuJ0MtTnzQzMcajWl2xL7hHqN8XQy6To\n");
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(await anonymousAnalystChallenge("HEAD").text(), "");
+  const denied = anonymousAnalystChallenge("POST");
+  assert.equal(denied.status, 405);
+  assert.equal(denied.headers.get("allow"), "GET, HEAD");
 });
