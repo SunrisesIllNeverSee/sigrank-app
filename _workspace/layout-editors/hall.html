@@ -1,0 +1,98 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><title>Hall — Layout Editor</title>
+<link rel="stylesheet" href="editor.css">
+</head><body>
+<script>
+/* Hall page tile inventory — production: app/hall/page.tsx +
+   components/hall/{HallClient,HallHeader,MetricTopTen,RecordTicker,HallHero,Trophy}.
+   Production flow: HallHero → RecordTicker → HallHeader(filters) →
+   MetricTopTen boards (cascade + op-ratio sets) → ComingSoonMarkers. */
+const rows = (n, v) => `<div class="rows">${Array.from({length:n},(_,i)=>
+  `<i><span class="n">#${i+1} operator</span><span class="v">${v||"★"}</span></i>`).join("")}</div>`;
+
+window.EDITOR = {
+  page: "hall",
+  tiles: [
+    { id:"HALL-01", component:"HallHero", name:"HALL IDENTITY / TITLE",
+      body:`<div class="hbig">HALL OF SIGNAL</div><div class="mut" style="font-size:8px">
+        lifetime records · best single-metric peaks</div>`,
+      zone:"stage", x:0, y:0, w:12, h:2 },
+    { id:"HALL-02", component:"HallHeader[scope]", name:"SCOPE CONTROL",
+      body:`<div class="pills"><b class="on">ACTIVE</b><b>ALL</b></div>`,
+      zone:"stage", x:0, y:2, w:4, h:2 },
+    { id:"HALL-03", component:"HallHeader[window]", name:"WINDOW CONTROL",
+      body:`<div class="pills"><b>7D</b><b>30D</b><b>90D</b><b class="on">ALL-TIME</b></div>`,
+      zone:"stage", x:4, y:2, w:4, h:2 },
+    { id:"HALL-04", component:"HallHeader[class]", name:"CLASS CONTROL",
+      body:`<div class="pills"><b class="on">ALL</b><b>POWER</b><b>ARCH</b><b>BASE</b></div>`,
+      zone:"stage", x:8, y:2, w:2, h:2 },
+    { id:"HALL-05", component:"HallHeader[platform]", name:"PLATFORM CONTROL",
+      body:`<div class="pills"><b class="on">ALL</b><b>claude</b><b>codex</b></div>`,
+      zone:"stage", x:10, y:2, w:2, h:2 },
+    { id:"HALL-06", component:"RecordTicker", name:"RECORD TICKER",
+      body:`<div class="mut" style="font-size:9px">★ new record → METRIC ▲ value · holder …</div>`,
+      zone:"stage", x:0, y:4, w:12, h:2 },
+    { id:"HALL-07", component:"placeholder:featured-record", name:"PRIMARY / FEATURED RECORD",
+      body:`<div class="ctr"><div class="ac" style="font-size:20px">★ 387.4×</div>
+        <div class="mut" style="font-size:8px">BEST LEVERAGE · ALL-TIME</div>
+        <span class="sk w40" style="margin:4px auto"></span></div>`,
+      zone:"stage", x:0, y:6, w:12, h:3 },
+    { id:"HALL-08", component:"MetricTopTen", name:"METRIC BOARD — YIELD",
+      body:rows(5), zone:"stage", x:0, y:9, w:4, h:5 },
+    { id:"HALL-09", component:"MetricTopTen", name:"METRIC BOARD — LEVERAGE",
+      body:rows(5), zone:"stage", x:4, y:9, w:4, h:5 },
+    { id:"HALL-10", component:"MetricTopTen", name:"METRIC BOARD — VELOCITY",
+      body:rows(5), zone:"stage", x:8, y:9, w:4, h:5 },
+    { id:"HALL-11", component:"MetricTopTen", name:"METRIC BOARD — SNR",
+      body:rows(5), zone:"stage", x:0, y:14, w:4, h:5 },
+    { id:"HALL-12", component:"MetricTopTen", name:"METRIC BOARD — 10XDEV",
+      body:rows(5), zone:"stage", x:4, y:14, w:4, h:5 },
+    { id:"HALL-13", component:"MetricTopTen", name:"OTHER METRICS GROUP",
+      body:rows(5)+`<div class="mut" style="font-size:8px">op-ratio boards</div>`,
+      zone:"stage", x:8, y:14, w:4, h:5 },
+    { id:"HALL-14", component:"placeholder:selected-record", name:"SELECTED RECORD INSPECTOR",
+      body:`<span class="sk ac w60"></span>`+rows(3), zone:"right", order:0 },
+    { id:"HALL-15", component:"placeholder:holder-mini", name:"HOLDER MINI PROFILE",
+      body:`<span class="sk ac w40"></span><span class="sk w60"></span><span class="sk w80"></span>`,
+      zone:"right", order:1 },
+    { id:"HALL-16", component:"placeholder:record-actions", name:"SHARE / RECORD ACTIONS",
+      body:`<div class="pills"><b>share</b><b>card</b><b>view op</b></div>`,
+      zone:"right", order:2 },
+    { id:"HALL-17", component:"placeholder:hall-rules", name:"HALL EXPLANATION / RULES",
+      body:`<span class="mut" style="font-size:8.5px">how records qualify →
+        single-metric all-time peaks, active vs all scope…</span>`,
+      zone:"left", order:0 },
+  ],
+  presets: {
+    current_flow: {
+      /* production: hero → controls → ticker → featured → board grid */
+      tiles: null,
+    },
+    workspace_compact: {
+      panels: { left:{visible:true,width:210}, right:{visible:true,width:250} },
+      tiles: [
+        { id:"HALL-17", zone:"left", order:6, visible:true },
+        { id:"HALL-02", zone:"left", order:0, visible:true },
+        { id:"HALL-03", zone:"left", order:1, visible:true },
+        { id:"HALL-04", zone:"left", order:2, visible:true },
+        { id:"HALL-05", zone:"left", order:3, visible:true },
+        { id:"HALL-01", zone:"stage", x:0, y:0, w:12, h:2, visible:true },
+        { id:"HALL-07", zone:"stage", x:0, y:2, w:4, h:4, visible:true },
+        { id:"HALL-06", zone:"stage", x:4, y:2, w:8, h:2, visible:true },
+        { id:"HALL-08", zone:"stage", x:4, y:4, w:4, h:4, visible:true },
+        { id:"HALL-09", zone:"stage", x:8, y:4, w:4, h:4, visible:true },
+        { id:"HALL-10", zone:"stage", x:4, y:8, w:4, h:4, visible:true },
+        { id:"HALL-11", zone:"stage", x:8, y:8, w:4, h:4, visible:true },
+        { id:"HALL-12", zone:"left", order:4, visible:true },
+        { id:"HALL-13", zone:"left", order:5, visible:true },
+        { id:"HALL-14", zone:"right", order:0, visible:true },
+        { id:"HALL-15", zone:"right", order:1, visible:true },
+        { id:"HALL-16", zone:"right", order:2, visible:true },
+      ],
+    },
+  },
+};
+</script>
+<script src="editor.js"></script>
+</body></html>

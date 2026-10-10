@@ -10,13 +10,15 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, personAuthor, faqPage } from "@/lib/jsonld";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import FieldStatCards from "@/components/field/FieldStatCards";
 import PlatformAdoption from "@/components/field/PlatformAdoption";
 import CascadeSankey from "@/components/field/CascadeSankey";
@@ -114,18 +116,79 @@ export default async function FieldPage() {
         doi="10.5281/zenodo.21900519"
       />
 
-      <WaveHero
-        eyebrow="📊 Field Analysis"
-        terminalText="THE FIELD"
-        title="Field Analysis"
-        subtitle={
+      {/* Field Analysis inside the shared SignalAF workspace shell — same
+          transfer contract as Hall/Compare/Wiki: dataset + section nav in
+          the left rail, citation in the right inspector, all analysis
+          sections unchanged in the stage. The WaveHero retires per the
+          workspace IA (the shell's title strip carries the page name). */}
+      <WorkspaceShell
+        active="field"
+        editorialStage
+        title="FIELD ANALYSIS"
+        bareTitle
+        hero={
+          <WaveHero
+            eyebrow="FIELD RESEARCH"
+            terminalText="FIELD ANALYSIS"
+            title="Field Analysis"
+            subtitle={<>The true distribution of token efficiency across the operator field.</>}
+          />
+        }
+        leftTitle="FIELD"
+        topic="field"
+        left={<FieldFamilyNav current="field" />}
+        rightTitle="CITATION"
+        right={
           <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>THE FIELD</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">analyzed</span><span className="v acc">{meta.operators_included.toLocaleString()}</span></div>
+                <div className="row"><span className="k">collected</span><span className="v">{meta.total_scraped.toLocaleString()}</span></div>
+                <div className="row"><span className="k">outliers</span><span className="v">{meta.outliers}</span></div>
+                <div className="row"><span className="k">ghost ranks</span><span className="v">{ghost_ranks.length}</span></div>
+                <div className="row"><span className="k">median Υ</span><span className="v acc">{meta.medians.yield.toFixed(2)}</span></div>
+                <div className="row"><span className="k">median SNR</span><span className="v">{meta.medians.snr.toFixed(3)}</span></div>
+                <div className="row"><span className="k">median LEV</span><span className="v">{meta.medians.leverage.toFixed(1)}×</span></div>
+              </div>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>DATASET</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">title</span><span className="v">Field Distribution</span></div>
+                <div className="row"><span className="k">doi</span><span className="v">zenodo.21900519</span></div>
+                <div className="row"><span className="k">license</span><span className="v">CC-BY-4.0</span></div>
+                <div className="row"><span className="k">collected</span><span className="v">{meta.scraped_at}</span></div>
+                <div className="row"><span className="k">source</span><span className="v">tokscale.ai</span></div>
+              </div>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>RELATED</div>
+              <nav className="ws-nav">
+                <Link href="/blog/volume-isnt-yield">Full analysis ↗</Link>
+                <Link href="/methodology">Methodology</Link>
+                <Link href="/wiki/four-degrees">Four degrees of leverage</Link>
+                <Link href="/hall">Hall of Signal</Link>
+                <Link href="/board/all">Live leaderboard</Link>
+              </nav>
+            </div>
+          </>
+        }
+        leftWidth={280}
+        rightWidth={240}
+        status={
+          <>
+            {meta.operators_included.toLocaleString()} OPERATORS · MEDIAN Υ{" "}
+            {meta.medians.yield.toFixed(2)} · VOLUME ≠ YIELD · SIGNALAF × SIGRANK · MO§ES™
+          </>
+        }
+      >
+        <div className="ws-doc">
+          <p className="text-sm leading-relaxed text-text-secondary">
             The true distribution of token efficiency.{" "}
             {meta.operators_included.toLocaleString()} AI operators,
             outliers separated. Volume ranked. Yield revealed.
-          </>
-        }
-      />
+          </p>
 
       {/* ── Stat cards ───────────────────────────────────────────────── */}
       <FieldStatCards
@@ -163,7 +226,7 @@ export default async function FieldPage() {
       <div className="prose-sigrank mt-4">
 
       {/* ── Volume ≠ Yield ───────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="volume-vs-yield" className="flex flex-col gap-4">
         <h2>
           Volume ≠ Yield
         </h2>
@@ -194,7 +257,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── The Cascade (hero Sankey) ────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="token-cascade" className="flex flex-col gap-4">
         <h2>
           The Token Cascade
         </h2>
@@ -217,7 +280,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── The SNR Separation ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="snr-separation" className="flex flex-col gap-4">
         <h2>
           The SNR Separation
         </h2>
@@ -246,7 +309,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Leverage × Velocity ──────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="leverage-velocity" className="flex flex-col gap-4">
         <h2>
           Leverage × Velocity
         </h2>
@@ -276,7 +339,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Platform Dominance ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="platform-dominance" className="flex flex-col gap-4">
         <h2>
           Platform Dominance
         </h2>
@@ -309,7 +372,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Cascade Composition ──────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="cascade-composition" className="flex flex-col gap-4">
         <h2>
           Cascade Composition
         </h2>
@@ -345,7 +408,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Yield Quartile Box Plots ─────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="yield-quartiles" className="flex flex-col gap-4">
         <h2>
           Yield Quartile Box Plots
         </h2>
@@ -375,7 +438,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── 80% Distribution Band ────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="distribution-band" className="flex flex-col gap-4">
         <h2>
           Where 80% of Operators Live
         </h2>
@@ -424,7 +487,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Percentile Ladder (Where am I?) ──────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="percentile-ladder" className="flex flex-col gap-4">
         <h2>
           Where Are You?
         </h2>
@@ -439,7 +502,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Ghost Ranks ──────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="ghost-ranks" className="flex flex-col gap-4">
         <h2>
           Ghost Ranks: The Hidden Operators
         </h2>
@@ -537,7 +600,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Operator Archetypes ──────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="archetypes" className="flex flex-col gap-4">
         <h2>
           Build Archetypes
         </h2>
@@ -558,7 +621,7 @@ export default async function FieldPage() {
       </section>
 
       {/* ── Outlier Detection ───────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
+      <section id="outliers" className="flex flex-col gap-4">
         <h2>
           Outlier Detection
         </h2>
@@ -641,6 +704,8 @@ export default async function FieldPage() {
       </footer>
 
       </div>
+        </div>
+      </WorkspaceShell>
     </div>
   );
 }

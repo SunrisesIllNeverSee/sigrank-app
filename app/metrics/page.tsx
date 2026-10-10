@@ -11,8 +11,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG, SITE_ORIGIN } from "@/lib/seo";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
+import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -64,7 +65,18 @@ const METRICS = [
 
 export default function MetricsIndex() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <MetricsWorkspaceFrame
+      title="METRICS"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK"
+          terminalText="METRICS"
+          title="Metrics"
+          subtitle={<>Every comparable operator metric, defined.</>}
+        />
+      }
+    >
+    <div className="flex flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([{ name: "Metrics", path: "/metrics" }]),
@@ -106,18 +118,6 @@ export default function MetricsIndex() {
         ])}
       />
 
-      <WaveHero
-        eyebrow="◈ Metrics"
-        title="The Six SigRank Metrics"
-        subtitle={
-          <>
-            Every metric is a different lens on the{" "}
-            <span className="text-gold">token cascade</span>. Yield is the
-            headline; the other five explain why.
-          </>
-        }
-      />
-
       <div className="flex flex-col gap-6">
         {METRICS.map((m) => (
           <Link
@@ -135,5 +135,6 @@ export default function MetricsIndex() {
         ))}
       </div>
     </div>
+    </MetricsWorkspaceFrame>
   );
 }
