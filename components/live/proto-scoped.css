@@ -1590,6 +1590,37 @@
 .lbw-root .f5-carousel-stage svg{width:100%;height:100%;display:block}
 .lbw-root .f5-carousel-stage .f5-no-history{margin:auto}
 
+/* Editorial left-rail hierarchy: TOPIC > TOPIC INDEX > PAGE. */
+/* The shared railhead normally clips children; the dropdown must escape it.
+   Raise only editorial dropdown headers so the page/index panels remain intact. */
+.lbw-root .lside .railhead:has(.ws-topic-dropdown){
+  overflow:visible;position:relative;z-index:50;
+}
+.lbw-root .railhead .ws-topic-dropdown{position:relative;flex:1;min-width:0}
+.lbw-root .railhead .ws-topic-dropdown summary{
+ display:flex;align-items:center;justify-content:space-between;gap:6px;
+ height:30px;padding:4px 9px;border:1px solid var(--line2);border-radius:var(--radius-sm);
+ color:var(--tx);background:var(--bg2);font:700 11px var(--font-mono);
+ letter-spacing:.08em;text-transform:uppercase;cursor:pointer;list-style:none;
+}
+.lbw-root .railhead .ws-topic-dropdown summary::-webkit-details-marker{display:none}
+.lbw-root .railhead .ws-topic-dropdown summary:hover{border-color:var(--ac)}
+.lbw-root .railhead .ws-topic-dropdown summary:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.lbw-root .railhead .ws-topic-menu{
+ position:absolute;z-index:100;top:33px;left:0;right:0;display:flex;flex-direction:column;
+ padding:5px;border:1px solid var(--line2);background:var(--bg2);box-shadow:0 10px 24px #0009;
+}
+.lbw-root .railhead .ws-topic-menu a{font:600 11px var(--font-mono);color:var(--tx2);padding:9px 8px;text-decoration:none}
+.lbw-root .railhead .ws-topic-menu a:hover,.lbw-root .railhead .ws-topic-menu a[aria-current="page"]{color:var(--ac);background:var(--sel)}
+.lbw-root .ws-topic-index .ws-nav a[aria-current="page"]{color:var(--ac);background:var(--sel)}
+.lbw-root .ws-page-index .ws-nav{max-height:40vh;overflow-y:auto;overscroll-behavior:contain}
+.lbw-root .ws-page-index .ws-nav a{overflow-wrap:anywhere}
+.lbw-root .ws-topic-index,.lbw-root .ws-page-index{min-width:0}
+/* Annotation review: bold only the requested section/page lists. */
+.lbw-root .ws-topic-index.ws-nav-bold .ws-nav a,
+.lbw-root .ws-page-index.ws-nav-bold .ws-nav a{font-weight:700}
+.lbw-root .stage .board [id^="ws-page-"]{scroll-margin-top:20px}
+
 /* owner 2026-10-08 — aux quickview rail. Fourth .mid column between the
    stage and the inspector; mounts only while a peek is open, so the
    stage narrows like any panel toggle and nothing else reflows. */

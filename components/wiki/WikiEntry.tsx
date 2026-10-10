@@ -19,7 +19,7 @@ import Link from "next/link";
 import { EvidenceBadge } from "./EvidenceBadge";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
-import { wikiCategoryById, wikiCategoryHubAnchor, type WikiCategory } from "@/lib/wiki/evidence-ladder";
+import { wikiCategoryById, type WikiCategory } from "@/lib/wiki/evidence-ladder";
 
 export interface WikiCrossRef {
   /** Label for the cross-reference link. */
@@ -86,9 +86,22 @@ export function WikiEntry({
 }: WikiEntryProps) {
   const cat = wikiCategoryById(category);
 
+  const entryPageSections = [
+    { id: "ws-wiki-definition", label: "Definition", present: true },
+    { id: "ws-wiki-inputs", label: "Inputs", present: Boolean(inputs) },
+    { id: "ws-wiki-derived-variables", label: "Derived variables", present: Boolean(derivedVariables) },
+    { id: "ws-wiki-claim", label: "Claim", present: Boolean(claim) },
+    { id: "ws-wiki-test", label: "Test", present: Boolean(test) },
+    { id: "ws-wiki-observable", label: "Observable", present: Boolean(observable) },
+    { id: "ws-wiki-falsifier", label: "Falsifier", present: Boolean(falsifiers) },
+    { id: "ws-wiki-evidence", label: "Evidence", present: Boolean(evidence) },
+    { id: "ws-wiki-limitations", label: "Limitations", present: Boolean(limitations) },
+    { id: "ws-wiki-lineage", label: "Lineage", present: Boolean(lineage) },
+  ].filter((item) => item.present);
+
   /** Reusable section wrapper — keeps the 11-section template visually consistent. */
-  const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <section className="flex flex-col gap-3">
+  const Section = ({ label, anchor, children }: { label: string; anchor?: string; children: React.ReactNode }) => (
+    <section id={anchor} className="flex flex-col gap-3">
       <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-text-accent">
         {label}
       </h2>
@@ -101,36 +114,15 @@ export function WikiEntry({
   return (
     <WorkspaceShell
       active="wiki"
+      editorialStage
       title={title}
       leftTitle="ENTRY"
-      left={
-        <>
-          <div className="mod">
-            <FieldFamilyNav current="wiki" />
-          </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq"></span>INDEX</div>
-            <nav className="ws-nav">
-              <Link href="/wiki">← Wiki</Link>
-              {cat && (
-                <Link href={`/wiki#${wikiCategoryHubAnchor(category)}`}>
-                  {cat.label}
-                </Link>
-              )}
-            </nav>
-          </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq"></span>PATH</div>
-            <div className="ws-kv">
-              <div className="row"><span className="k">wiki</span><span className="v">/wiki</span></div>
-              {cat && (
-                <div className="row"><span className="k">section</span><span className="v">{cat.label}</span></div>
-              )}
-              <div className="row"><span className="k">entry</span><span className="v acc">{title}</span></div>
-            </div>
-          </div>
-        </>
-      }
+      topic="wiki"
+      left={<FieldFamilyNav current="wiki" pageContents={
+        <nav className="ws-nav" aria-label="Sections on this page">
+          {entryPageSections.map((item) => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}
+        </nav>
+      } />}
       rightTitle="SIGNAL"
       right={
         <>
@@ -178,37 +170,37 @@ export function WikiEntry({
           </header>
 
       {/* 1. Definition */}
-      <Section label="Definition">{definition}</Section>
+      <Section label="Definition" anchor="ws-wiki-definition">{definition}</Section>
 
       {/* 2. Inputs */}
-      {inputs && <Section label="Inputs">{inputs}</Section>}
+      {inputs && <Section label="Inputs" anchor="ws-wiki-inputs">{inputs}</Section>}
 
       {/* 3. Derived variables */}
-      {derivedVariables && <Section label="Derived variables">{derivedVariables}</Section>}
+      {derivedVariables && <Section label="Derived variables" anchor="ws-wiki-derived-variables">{derivedVariables}</Section>}
 
       {/* 4. Claim */}
-      {claim && <Section label="Claim">{claim}</Section>}
+      {claim && <Section label="Claim" anchor="ws-wiki-claim">{claim}</Section>}
 
       {/* 5. Test */}
-      {test && <Section label="Test">{test}</Section>}
+      {test && <Section label="Test" anchor="ws-wiki-test">{test}</Section>}
 
       {/* 6. Observable */}
-      {observable && <Section label="Observable">{observable}</Section>}
+      {observable && <Section label="Observable" anchor="ws-wiki-observable">{observable}</Section>}
 
       {/* 7. Falsifier */}
-      {falsifiers && <Section label="Falsifier">{falsifiers}</Section>}
+      {falsifiers && <Section label="Falsifier" anchor="ws-wiki-falsifier">{falsifiers}</Section>}
 
       {/* 8. Evidence */}
-      {evidence && <Section label="Evidence">{evidence}</Section>}
+      {evidence && <Section label="Evidence" anchor="ws-wiki-evidence">{evidence}</Section>}
 
       {/* 9. Limitations */}
-      {limitations && <Section label="Limitations">{limitations}</Section>}
+      {limitations && <Section label="Limitations" anchor="ws-wiki-limitations">{limitations}</Section>}
 
       {/* 10. Version — rendered inline with lastUpdated/specVersion in header */}
       {/* (specVersion prop serves as the Version section) */}
 
       {/* 11. Lineage */}
-      {lineage && <Section label="Lineage">{lineage}</Section>}
+      {lineage && <Section label="Lineage" anchor="ws-wiki-lineage">{lineage}</Section>}
         </div>
       </div>
     </WorkspaceShell>

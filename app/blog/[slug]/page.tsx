@@ -38,6 +38,7 @@ async function getPost(slug: string) {
         tags?: string[];
         hero?: string;
         doi?: string;
+        type?: string;
       },
       content,
     };
@@ -77,6 +78,34 @@ export async function generateMetadata({
 }
 
 export const revalidate = 86400;
+
+/** Build navigation from the same source-line positions as react-markdown headings.
+ * No fabricated content, and no headings are added/removed from the article.
+ */
+function markdownSectionIndex(content: string): { id: string; label: string }[] {
+  const lines = content.split(/\r?\n/);
+  let fence: string | null = null;
+  const found: { id: string; label: string }[] = [];
+  lines.forEach((line, index) => {
+    const trimmed = line.trimStart();
+    const marker = trimmed.match(/^(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1][0];
+      else if (marker[1][0] === fence) fence = null;
+      return;
+    }
+    if (fence) return;
+    const heading = line.match(/^ {0,3}#{1,2}\s+(.+?)\s*#*\s*$/);
+    if (!heading) return;
+    const label = heading[1]
+      .replace(/!?(?:\[([^\]]+)\])\([^)]*\)/g, "$1")
+      .replace(/[`*_~]/g, "")
+      .replace(/<[^>]+>/g, "")
+      .trim();
+    if (label) found.push({ id: `article-section-${index + 1}`, label });
+  });
+  return found.slice(0, 24);
+}
 
 // ─── Custom ReactMarkdown components ────────────────────────────────────────
 // Route inline markdown images through next/image for optimization (WebP,
@@ -138,8 +167,14 @@ const markdownComponents: Components = {
   // Markdown `#` headings render as <h2> — the page already has an <h1> for the
   // blog title (line ~212). Without this override, every `#` section in the
   // markdown becomes a duplicate <h1>, which is an SEO structural error.
-  h1: ({ children }) => (
-    <h2 className="font-sans text-xl font-bold leading-tight text-text-primary md:text-2xl mt-8 mb-4">
+  h1: ({ node, children }) => (
+    <h2 id={node?.position?.start.line ? `article-section-${node.position.start.line}` : undefined}
+      className="font-sans text-xl font-bold leading-tight text-text-primary md:text-2xl mt-8 mb-4">
+      {children}
+    </h2>
+  ),
+  h2: ({ node, children }) => (
+    <h2 id={node?.position?.start.line ? `article-section-${node.position.start.line}` : undefined}>
       {children}
     </h2>
   ),
@@ -193,7 +228,12 @@ export default async function BlogPost({
   ]);
 
   return (
-    <BlogWorkspaceFrame>
+    <BlogWorkspaceFrame
+      section={frontmatter.type === "article" ? "articles" : "blog"}
+      articleTitle={title}
+      doi={frontmatter.doi}
+      pageSections={markdownSectionIndex(content)}
+    >
       <article className="article-shell px-4 py-8 md:py-12">
       <CitationMeta
         title={title}
@@ -207,7 +247,7 @@ export default async function BlogPost({
           articleLd,
           blogFaq,
           breadcrumb([
-            { name: "Blog", path: "/blog" },
+            { name: frontmatter.type === "article" ? "Articles" : "Blog", path: frontmatter.type === "article" ? "/articles" : "/blog" },
             { name: title, path: `/blog/${slug}` },
           ]),
         ]}

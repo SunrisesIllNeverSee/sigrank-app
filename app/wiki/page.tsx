@@ -1952,6 +1952,7 @@ export default function Draft1Page() {
           canon quick reference. No stub modules. */}
       <WorkspaceShell
         active="wiki"
+        editorialStage
         title="SIGNALAF WIKI"
         bareTitle
         hero={
@@ -1963,27 +1964,8 @@ export default function Draft1Page() {
           />
         }
         leftTitle="CONTENTS"
-        left={
-          <>
-            <div className="mod">
-              <FieldFamilyNav current="wiki" />
-            </div>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>TOPICS</div>
-              <WikiTOC items={tocItems} rail />
-            </div>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>READING</div>
-              <p className="ws-note">
-                The living reference for operator evaluation — the console,
-                the four pillars, the token cascade, the eight experience
-                tiers, build archetypes, and the MO§ES™ governance framework.
-                Every concept is grounded in token telemetry: no prompts, no
-                code, no self-reported fields.
-              </p>
-            </div>
-          </>
-        }
+        topic="wiki"
+        left={<FieldFamilyNav current="wiki" pageContents={<WikiTOC items={tocItems} rail />} />}
         rightTitle="CANON"
         right={
           <>

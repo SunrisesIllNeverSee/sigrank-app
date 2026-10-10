@@ -37,6 +37,7 @@ import { EnterprisePromoPop } from "./EnterprisePromo";
 import { RailIcon, ICON_SETS } from "./PixelIcon";
 import type { IconSetName, PixelIconName } from "./PixelIcon";
 import { PixelBadge } from "./PixelBadge";
+import { EditorialTopicDropdown, type WorkspaceTopic } from "./EditorialSidebar";
 import {
   LBW_THEME_INIT,
   THEMES,
@@ -82,6 +83,8 @@ export interface WorkspaceShellProps {
   hero?: ReactNode;
   /** Optional filter-bar strip under the title (the board's .fbar slot). */
   toolbar?: ReactNode;
+  /** Five-topic editorial selector in the left railhead (only when supplied). */
+  topic?: WorkspaceTopic;
   /** Left panel railhead label (e.g. "HALL OF SIGNAL"). */
   leftTitle?: string;
   /** Left panel content — .mod boxes. Omit → panel collapsed + toggle hidden. */
@@ -110,6 +113,8 @@ export interface WorkspaceShellProps {
   rightOpenSignal?: number;
   /** Footer status text (the .fsig right slot). */
   status?: ReactNode;
+  /** Consistent centered editorial layout for text/research pages only. */
+  editorialStage?: boolean;
   /** Stage content. */
   children: ReactNode;
 }
@@ -127,6 +132,7 @@ export function WorkspaceShell({
   hero,
   toolbar,
   leftTitle,
+  topic,
   left,
   rightTitle,
   right,
@@ -138,6 +144,7 @@ export function WorkspaceShell({
   rightWidth,
   rightOpenSignal,
   status,
+  editorialStage = false,
   children,
 }: WorkspaceShellProps) {
   /* ---------- theme — identical contract to LiveBoardWorkspace ---------- */
@@ -552,7 +559,7 @@ export function WorkspaceShell({
                 <div className="colhead">{colheadLeft}</div>
                 <div className="railhead">
                   <span className="sq"></span>
-                  {leftTitle}
+                  {topic ? <EditorialTopicDropdown topic={topic} /> : leftTitle}
                 </div>
                 <div className="rail">{left}</div>
               </aside>
@@ -568,7 +575,7 @@ export function WorkspaceShell({
                   </div>
                 ))}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
-              <main className="stage">
+              <main className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
                 <div className="board">
                   {hero && <div className="ws-hero">{hero}</div>}
                   {children}
