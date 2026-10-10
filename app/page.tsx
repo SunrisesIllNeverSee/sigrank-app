@@ -65,21 +65,8 @@ export default async function HomePage() {
       bareTitle
       hero={<Draft2Hero />}
       leftTitle="SIGRANK"
-      left={
-        <>
-          <div className="mod">
-            <FieldFamilyNav current="home" />
-          </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />EXPLORE</div>
-            <nav className="ws-nav">
-              <Link href="/board/all">Live leaderboard</Link>
-              <Link href="/compare">Compare</Link>
-              <Link href="/hall">Hall of Signal</Link>
-            </nav>
-          </div>
-        </>
-      }
+      topic="home"
+      left={<FieldFamilyNav current="home" />}
       rightTitle="SIGNAL"
       right={
         <>
@@ -391,17 +378,23 @@ export default async function HomePage() {
           (owner 2026-07-02: moved above the live board so the comparison table leads,
           with the explanation underneath). Sources/footnotes + a link to the full wiki
           description live inside the section. */}
+      <span className="-mb-8 h-0" id="ws-page-four-degrees" />
       <FourDegreesChart variant="embed" averageColumn={averageColumn} />
 
       {/* Live board — the activity tracker now owns the whole section (owner 2026-06-22:
           the 4 MiniBoards were archived; "Real operators. Real cascades." moved into it).
           Now sits under the Four Degrees section. */}
+      <span className="-mb-8 h-0" id="ws-page-activity" />
       <Draft2LiveActivity stats={homeStats} />
 
+      <span className="-mb-8 h-0" id="ws-page-how" />
       <HowItWorks />
+      <span className="-mb-8 h-0" id="ws-page-privacy" />
       <IpBoundary />
+      <span className="-mb-8 h-0" id="ws-page-pricing" />
       <PricingCards />
 
+      <span className="-mb-8 h-0" id="ws-page-questions" />
       {/* ── Ask AI about us (AEO Item 8b) — copy-pasteable prompts for AI search engines ── */}
       <section className="mx-auto w-full max-w-4xl rounded-lg border border-bg-border bg-bg-surface px-6 py-6">
         <h2 className="font-sans text-lg font-bold text-text-primary">

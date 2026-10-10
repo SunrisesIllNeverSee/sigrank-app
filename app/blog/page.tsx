@@ -93,6 +93,42 @@ const STATIC_POSTS: PostSummary[] = [
     date: "2026-08-17",
     tags: [],
   },
+  {
+    slug: "ai-power-user-benchmarking",
+    title: "AI Power User Benchmarking with SigRank",
+    description: "How to benchmark yourself against other AI power users. SigRank's operator classes and yield metrics tell you if you're a power user — and how to become one.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "how-sigrank-measures-operator-efficiency",
+    title: "How SigRank Measures Operator Efficiency",
+    description: "The yield metric (Υ = cache_read × output / input²) measures how well AI operators convert tokens into useful output. Here's how it works and why it matters.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "the-tool-is-the-person",
+    title: "The Tool Is the Person",
+    description: "Every token the AI tool burns is a decision the person made. Measuring the tool IS measuring the person. Your token cascade is your skill signature.",
+    date: "2026-07-12",
+    tags: [],
+  },
+  {
+    slug: "token-cascade-vs-raw-token-consumption",
+    title: "Token Yield vs Token Count",
+    description: "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "why-yield-beats-tokenmaxxing",
+    title: "Why Yield Beats Tokenmaxxing",
+    description: "Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator.",
+    date: "2026-07-07",
+    tags: [],
+  },
+
 ];
 
 async function getAllPosts(): Promise<PostSummary[]> {
@@ -103,6 +139,9 @@ async function getAllPosts(): Promise<PostSummary[]> {
       if (!file.endsWith(".md")) continue;
       const raw = await readFile(join(CONTENT_DIR, file), "utf-8");
       const { data } = matter(raw);
+      // Frontmatter-marked publications now have their own /articles index.
+      // Their original /blog/<slug> detail routes remain canonical.
+      if (data.type === "article") continue;
       posts.push({
         slug: file.replace(/\.md$/, ""),
         title: (data.title as string) ?? file,
@@ -122,7 +161,7 @@ async function getAllPosts(): Promise<PostSummary[]> {
 export const metadata: Metadata = withOG({
   title: "Blog — SigRank",
   description:
-    "Analysis and research on AI operator efficiency, token cascade economics, and outlier detection.",
+    "Practical guides, benchmarking walkthroughs, tool comparisons, and updates for AI operators.",
   path: "/blog",
 });
 
@@ -159,18 +198,14 @@ export default async function BlogIndex() {
           about module. */}
       <WorkspaceShell
         active="blog"
+        editorialStage
         title="BLOG"
         bareTitle
         leftTitle="INDEX"
-        left={
-          <>
-            <div className="mod">
-              <FieldFamilyNav current="blog" />
-            </div>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>ALL POSTS</div>
-              <nav className="ws-nav">
-                {posts.map((post) => (
+        topic="blog"
+        left={<FieldFamilyNav current="blog" topicIndex={<>
+          <Link href="/blog" aria-current="page">All Posts</Link>
+{posts.map((post) => (
                   <Link key={post.slug} href={`/blog/${post.slug}`}>
                     {post.title}
                     {post.date && (
@@ -184,10 +219,7 @@ export default async function BlogIndex() {
                     )}
                   </Link>
                 ))}
-              </nav>
-            </div>
-          </>
-        }
+        </>} />}
         rightTitle="ABOUT"
         right={
           <>
@@ -197,8 +229,8 @@ export default async function BlogIndex() {
                 <div className="row"><span className="k">posts</span><span className="v acc">{posts.length}</span></div>
               </div>
               <p className="ws-note" style={{ marginTop: 8 }}>
-                Deep dives into AI operator efficiency, the token cascade
-                economy, and outlier detection methodology.
+                Practical guides, workflow benchmarks, and tool comparisons
+                for AI operators.
               </p>
             </div>
             <div className="mod">
@@ -221,15 +253,14 @@ export default async function BlogIndex() {
         title="Blog"
         subtitle={
           <>
-            Analysis &amp; research — deep dives into AI operator
-            efficiency, the token cascade economy, and outlier detection
-            methodology.
+            Guides, benchmarking walkthroughs, tool comparisons,
+            and practical updates for AI operators.
           </>
         }
       />
       <div className="ws-doc" style={{ marginTop: 22 }}>
 
-      <div className="blog-index">
+      <div className="blog-index" id="ws-page-posts">
         {posts[0] && (
           <Link href={`/blog/${posts[0].slug}`} className="blog-feature group">
             <div className="blog-kicker">LATEST · FIELD NOTE</div>

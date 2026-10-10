@@ -123,6 +123,7 @@ export default async function FieldPage() {
           workspace IA (the shell's title strip carries the page name). */}
       <WorkspaceShell
         active="field"
+        editorialStage
         title="FIELD ANALYSIS"
         bareTitle
         hero={
@@ -134,30 +135,8 @@ export default async function FieldPage() {
           />
         }
         leftTitle="FIELD"
-        left={
-          <>
-            <div className="mod">
-              <FieldFamilyNav current="field" />
-            </div>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>SECTIONS</div>
-              <nav className="ws-nav">
-                <a href="#volume-vs-yield">Volume ≠ Yield</a>
-                <a href="#token-cascade">The Token Cascade</a>
-                <a href="#snr-separation">The SNR Separation</a>
-                <a href="#leverage-velocity">Leverage × Velocity</a>
-                <a href="#platform-dominance">Platform Dominance</a>
-                <a href="#cascade-composition">Cascade Composition</a>
-                <a href="#yield-quartiles">Yield Quartile Box Plots</a>
-                <a href="#distribution-band">Where 80% Live</a>
-                <a href="#percentile-ladder">Where Are You?</a>
-                <a href="#ghost-ranks">Ghost Ranks</a>
-                <a href="#archetypes">Build Archetypes</a>
-                <a href="#outliers">Outlier Detection</a>
-              </nav>
-            </div>
-          </>
-        }
+        topic="field"
+        left={<FieldFamilyNav current="field" />}
         rightTitle="CITATION"
         right={
           <>

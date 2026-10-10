@@ -11,34 +11,25 @@
  */
 
 import React from "react";
-import Link from "next/link";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 
-export function TopicPage({ children }: { children: React.ReactNode; title?: string }) {
+export function TopicPage({ children, title }: { children: React.ReactNode; title?: string }) {
   return (
     <WorkspaceShell
       active="wiki"
+      editorialStage
       leftTitle="ENTRY"
-      left={
-        <>
-        <div className="mod">
-          <FieldFamilyNav current="wiki" />
-        </div>
-        <div className="mod">
-          <div className="mini-h"><span className="sq"></span>INDEX</div>
-          <nav className="ws-nav">
-            <Link href="/wiki">← Wiki</Link>
-            <Link href="/wiki/verification">Verification &amp; integrity</Link>
-            <Link href="/wiki/four-degrees">Four degrees of leverage</Link>
-          </nav>
-        </div>
-        </>
-      }
+      topic="wiki"
+      left={<FieldFamilyNav current="wiki" pageContents={
+        <nav className="ws-nav" aria-label="Sections on this page">
+          <a href="#ws-wiki-topic-content">{title ?? "Topic content"}</a>
+        </nav>
+      } />}
       leftWidth={280}
       status={<>SIGNALAF WIKI · TOPIC PROOF · MO§ES™</>}
     >
-      <div className="ws-doc">
+      <div className="ws-doc" id="ws-wiki-topic-content">
         <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
           {children}
         </div>
