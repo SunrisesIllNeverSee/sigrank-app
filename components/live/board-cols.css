@@ -87,11 +87,11 @@
 .lbw-root .board-t td.tt1{background:color-mix(in srgb,var(--ac) 14%,transparent);
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 34%,transparent);
   border-radius:4px}
-.lbw-root .board-t td.tt2{background:color-mix(in srgb,var(--ac) 9%,transparent);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 22%,transparent);
+.lbw-root .board-t td.tt2{background:color-mix(in srgb,var(--blue) 9%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blue) 28%,transparent);
   border-radius:4px}
-.lbw-root .board-t td.tt3{background:color-mix(in srgb,var(--ac) 5%,transparent);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 13%,transparent);
+.lbw-root .board-t td.tt3{background:color-mix(in srgb,var(--violet) 7%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 25%,transparent);
   border-radius:4px}
 
 /* ---------- Σ TOTAL pillar sub-line + ◍ location line ---------- */
@@ -102,3 +102,49 @@
 /* Tertiary line in the operator cell: operator-supplied public location
    (prod's `◍ <location>` under the handle). */
 .lbw-root .op .opl{display:block;font-size:9px;color:var(--mut);line-height:1.3}
+
+/* Owner-locked table surgery only: inline identity class + real trend;
+   no parent workspace layout or theme changes. */
+.lbw-root .board-t th.hc-day{color:var(--blue)}
+.lbw-root .board-t th.hc-opratio{color:var(--violet)}
+.lbw-root .board-t th.hc-eff{color:var(--cyan)}
+.lbw-root .board-t .op-trend{display:inline-flex;min-width:56px;align-items:center;flex-shrink:0}
+.lbw-root .board-t .op .tag{display:inline;font-size:9px;margin-left:4px;white-space:nowrap}
+.lbw-root .board-t td .wftag{display:inline-block;margin-left:5px}
+.lbw-root .board-t .unranked-disclosure{display:flex;align-items:center;justify-content:space-between;width:100%;cursor:pointer;color:var(--tx);font-size:11px;gap:12px;flex-wrap:wrap;padding:10px 11px;background:color-mix(in srgb,var(--cyan) 6%,transparent);border:1px solid var(--line);text-align:left}
+.lbw-root .board-t .unranked-disclosure:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.lbw-root .board-t .unranked-detail{padding:13px;color:var(--mut);text-align:left;font-size:11px;line-height:1.6}
+.lbw-root .board-t .unranked-count{color:var(--ac);font-weight:800}
+
+/* Signed-up account positions (not SigRank performance ranks).
+   Each real active linked account occupies exactly one positional row.
+   Names/IDs are withheld until an explicit preboard public-consent gate exists. */
+.lbw-root .board-t tr.unranked-band td{
+  text-align:left;background:color-mix(in srgb,var(--cyan) 9%,var(--panel));
+  color:var(--cyan);padding:12px 10px;font-size:10px;font-weight:800;
+  letter-spacing:.11em;white-space:normal
+}
+.lbw-root .board-t tr.unranked-band .unranked-count{color:var(--ac)}
+.lbw-root .board-t tr.unranked-band .unranked-privacy{
+  float:right;font-size:9px;color:var(--mut);font-weight:500
+}
+.lbw-root .board-t tr.unranked-member td{
+  background:color-mix(in srgb,var(--panel) 92%,var(--mut));
+  color:var(--mut);font-size:10px
+}
+.lbw-root .board-t tr.unranked-member .r-main{color:var(--tx2);font-weight:700}
+.lbw-root .board-t tr.unranked-member .r-sub{color:var(--mut)}
+.lbw-root .board-t tr.unranked-member .op .nm{color:var(--tx2)}
+.lbw-root .board-t tr.unranked-member .unranked-avatar{
+  background:var(--chip);color:var(--mut);border:1px solid var(--line2)
+}
+.lbw-root .board-t tr.unranked-member .unranked-provisional{
+  color:var(--cyan);font-size:9px;letter-spacing:.04em
+}
+.lbw-root .board-t tr.unranked-member td.unranked-na{color:var(--line2)}
+
+/* Pre-board autonomous queue is an owner-requested display grouping.
+   Color indicates pending assessment, NEVER a verification badge. */
+.lbw-root .board-t tr.unranked-member .unranked-provisional{
+  color:var(--mut);font-style:italic
+}

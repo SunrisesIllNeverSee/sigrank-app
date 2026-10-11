@@ -1,4 +1,4 @@
-export type BoardMode = "all" | "hitl" | "agentic";
+export type BoardMode = "all" | "hitl" | "agentic" | "hybrid";
 /** Stored workflow_mode vocabulary — "hybrid" is carried end-to-end for
  *  surfaces that read the assessed value verbatim (the live board); the
  *  heuristic resolver below still only produces hitl|agentic|null until
@@ -33,5 +33,11 @@ export function resolveWorkflowMode(input: {
 }
 
 export function includesBoardMode(mode: BoardMode, resolved: WorkflowMode | null): boolean {
-  return resolved !== null && (mode === "all" || mode === resolved);
+  // Workflow evidence never controls inclusion on the All board.
+  // A null assessment is display-default HITL, explicitly provisional;
+  // it is NOT positive evidence of human operation for Hybrid classification.
+  if (mode === "all") return true;
+  if (mode === "hybrid") return resolved === "hybrid";
+  if (mode === "hitl") return resolved === "hitl" || resolved === "hybrid" || resolved === null;
+  return resolved === "agentic" || resolved === "hybrid";
 }
