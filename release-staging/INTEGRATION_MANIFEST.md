@@ -1,96 +1,101 @@
-# SignalAF integration staging — a315435
+# SignalAF integrated staging manifest
+Updated October 11, 2026. This is the current integration receipt. Historical STATUS files and manifest.json remain unchanged evidence.
 
-Current integration entry point. Created October 11, 2026 (America/New_York).
-This manifest supersedes stale status summaries for integration planning; copied historical handoffs remain immutable evidence, not new instructions or approvals.
+## One workspace and one preview
+- Workspace: /Users/dericmchenry/Developer/active/SigRank-repos/signalaf-integration-a315435
+- Branch: integration/site-a315435 (local, no upstream).
+- Frozen base: a3154353299ab7a60e5abd5383eac95da99c394b.
+- Application checkpoint: 766c6f0 (homepage/navigation integration).
+- Preview: http://127.0.0.1:3230/ — production build and server from this workspace, Node 22.23.3, Next 16.3.8.
+- Home / now renders the existing all-time leaderboard component; /board/all remains available.
+- Preserved editorial landing: /sigrank. Its original content is unchanged; only its canonical path changed.
+- Same-site routes: /articles, /blog, /wiki, /fieldhub, /hall, /compare, /user/xoxo.
+- Original sources and running :3210/:3222 previews remain untouched.
 
-## Workspace and authority
-- Local parent: /Users/dericmchenry/Developer/active/SigRank-repos
-- Canonical integration worktree: /Users/dericmchenry/Developer/active/SigRank-repos/signalaf-integration-a315435
-- Integration branch: integration/site-a315435 (local only; no upstream configured).
-- Frozen baseline: a3154353299ab7a60e5abd5383eac95da99c394b.
-- GitHub origin: https://github.com/SunrisesIllNeverSee/sigrank-app.git
-- Pushed source branch: feat/live-board-2b; live remote ref, local HEAD, and PR #239 head all matched a315435 during audit.
-- Original shared source: /Users/dericmchenry/Developer/active/SigRank-repos/sigrank-app-live-board
-- Git common directory: /Users/dericmchenry/Developer/active/SigRank-repos/_01_sigrank-app/.git
-- Existing worktrees: _01_sigrank-app on main at 02a5007; sigrank-app-graphics-hardening on feat/graphics-hardening at 93b6ec1; sigrank-app-live-board on feat/live-board-2b at a315435.
-- Remote main at audit: 5b1357a6dbe16d1bcea14ccf2a627a7c82835e33. Baseline diverges by 18 main-only and 82 feature-only commits; no main reconciliation attempted.
-- GitHub repository name and local folder name are independent. The existing source already lives under the requested SigRank-repos parent.
-- A worktree isolates files and index, but shares Git refs/history. Do not modify other worktree branches.
+User coordination: the user explicitly directed the leaderboard to become home and the :3210 work to be integrated into it. Scoped candidate imports and navigation glue were completed here. No production/shared page was edited; no merge, deployment, remote push, database mutation, reset, discard, or new Devin session occurred.
 
-Authorized now: audit, isolated worktree, preservation copies, integration planning/checklist.
-Not authorized here: page implementation changes without coordination, merge, deployment, force push, file discard, database writes, or restarting existing previews.
-No application changes have been applied to this integration worktree. Candidate ZIPs are evidence, not active source.
-No new Devin session has been launched or messaged.
+## Repository relationship
+GitHub origin is https://github.com/SunrisesIllNeverSee/sigrank-app.git. The GitHub repository name is independent of its local folder name.
+The shared source already resides at /Users/dericmchenry/Developer/active/SigRank-repos/sigrank-app-live-board.
+Its branch feat/live-board-2b and the live GitHub branch/PR #239 head matched a315435 at audit.
+Registered worktrees share /Users/dericmchenry/Developer/active/SigRank-repos/_01_sigrank-app/.git, but have separate files and indexes.
+This integration branch starts exactly at a315435 and adds preservation and scoped integration commits. It does not reconcile main.
+Other worktrees: _01_sigrank-app/main at 02a5007; sigrank-app-graphics-hardening/feat/graphics-hardening at 93b6ec1; sigrank-app-live-board/feat/live-board-2b at a315435.
+Remote main at audit was 5b1357a; 18 main-only and 82 feature-only commits. PR #239 is open with 170 changed files.
+Inherited CI failure: 40 tracked-but-ignored _workspace files. Physical assets have not been deleted or removed from the index.
 
-## Evidence and preservation
-AUDIT_EVIDENCE.json records exact source state, 39 source-file hashes, capture time, archive hashes, and drift.
-All 23 original release-staging files were copied byte-for-byte. The original release-staging remains untracked and untouched.
-Original manifest.json, STATUS_BOARD.md, and signoff mention 09a45dc; retain them as historical receipts.
-Use Profile r2 for proposed integration. Its 28 members and all 8 editorial archive members match current source; r1 differs in two expected files.
-All three ZIP hashes and every archived member hash were verified. Hall/Compare layout copies match their approved source JSON.
-Fresh editorial-against-a315435.patch and profile-against-a315435.patch record tracked diffs against the actual baseline. They omit untracked modules; pair them with the verified ZIP members.
-Never bulk-extract an archive over app source or apply an old patch without checking current hashes and ownership.
+## Scoped commits
+| Commit | Contents |
+|---|---|
+| 6adfb11 | Preserve candidate archives, hashes, original status/handoffs, and audit |
+| 1d08240 | Profile V2 r2: seven view modules plus two profile route files |
+| 5fdcd76 | Completed editorial navigation: seven source files, including scoped appended CSS |
+| 766c6f0 | Home uses leaderboard; original landing at /sigrank; shared navigation, sitemap classification, root cache refresh |
 
-## Page ownership and commit boundaries
-Owner labels identify existing responsibilities; they do not assign authority to a new session.
+All commits are local on integration/site-a315435. Do not imply they were pushed. Candidate-import receipt gives the source archive and original hash of every imported file.
 
-| Workstream | Current evidence / state | Existing owner | Allowed future implementation scope after coordination | Next gate |
-|---|---|---|---|---|
-| Leaderboard / home | a315435 adds 14 board-specific files; inherited branch includes earlier pages | Leaderboard GPT + product owner | Frozen board files listed in docs/live-board-hardening-checkpoint-2026-10-11.md | Preserve board behavior; settle homepage routing explicitly |
-| Editorial | text-pages/editorial-nav-integrated-2026-10-11.zip; 8 files; matches shared source | Editorial GPT | app/articles/page.tsx, app/blog/page.tsx, components/blog/BlogWorkspaceFrame.tsx, components/live/EditorialSidebar.tsx, lib/editorial/* | Preserve nav first; uniform page structure is separate follow-up |
-| Shared style | 49-line appended editorial navigation block, components/live/proto-scoped.css | Editorial + leaderboard owners jointly | Reviewed hunks only; integrator owns conflict resolution after both confirm | Board and all text-page visual regression |
-| Profile V2 | user-profile/profile-v2-candidate-2026-10-11-r2.zip; 7 components plus route edits | Outgoing Devin profile owner; next owner must be named | components/profile-v2/*; app/user/[codename]/page.tsx and ProfileBody.tsx | Public/private/owner tests; watchCount=0; IdentityHero unwired; preserve SplitFlap placement |
-| Hall | app/hall/page.tsx, components/hall/* already in baseline; hall/hall-layout.json is design evidence | Product owner for final design; implementer unassigned | Hall-only files | Final medals/vacancies/rails/responsive review and data tests |
-| Compare | app/compare/page.tsx, components/compare/* already in baseline; compare/compare-layout.json is design evidence | Product owner for final design; implementer unassigned | Compare-only files | Selectors/query URLs, metric parity, empty states and visual review |
-| Integration / preservation | This manifest, audit evidence, preserved snapshots | Codex audit now; one integration lead next | release-staging/* and reviewed cross-page glue | Never absorb another lane's dirty files without explicit scope |
-| Repository hygiene | 40 tracked-but-ignored files inherited from baseline | Integration lead after custody review | Separate reviewed index/policy change | Preserve physical assets; no deletion performed in this audit |
+## Source custody
+- Profile r2: release-staging/user-profile/profile-v2-candidate-2026-10-11-r2.zip; seven components and two route files now active in this worktree. r1 preserved for history.
+- Editorial: release-staging/text-pages/editorial-nav-integrated-2026-10-11.zip; completed navigation now active.
+- Hall/Compare: bcc5c3a (workspace migration) and 7bb4c2b (ledger-to-stage fix) are ancestors of a315435. app/hall, components/hall, app/compare, components/compare remain byte-identical to that baseline.
+- Approved design evidence: original _workspace/layout-editors/{hall,compare}.html and approved/{hall,compare}-layout.json in the shared source; custody JSON in release-staging/{hall,compare}. Screenshots are historical evidence, not proof of later edits.
+- Profile HTML review mocks remain in the source _workspace/profile-mocks and inside the preserved archives. They are not routable production pages.
+- AUDIT_EVIDENCE.json fingerprints 39 dirty/untracked source files and the archive verification. Current source-preservation check is in INTEGRATION_RECEIPT.json.
+- Each source/archive member was verified before selective copying; no bulk extraction or old patch was applied.
+- Original .env.local was copied privately into an ignored local file for this preview; no secret is committed or printed.
+- Dependencies are an independent APFS clone of existing dependencies, not a shared symlink. No package or lockfile edits and no new app dependency.
+- Original historical manifest.json and outgoing signoff mention 09a45dc; they are immutable historical receipts. This manifest controls current integration status.
 
-Protect scoring/API/privacy contracts, server-only weights, SEO routes, lockfiles, and deployment configuration.
-Changes to app/page.tsx, shared navigation/layout, board queries, or global styles require the relevant page owners' coordination.
-Treat current page layout approval and production release approval as separate gates.
+## Ownership boundaries
+| Lane | Ownership and scope | Remaining gate |
+|---|---|---|
+| Leaderboard | Existing leaderboard owner controls rankings, filters, API, privacy and projection. Integrator changed only the navigation link in LiveBoardWorkspace. | Resolve hydration warning; preserve hardened baseline behavior |
+| Editorial | Existing editorial owner controls content and uniform text-page structure. Imported archive is the completed navigation candidate. | Uniform formatting remains separate work |
+| Profile | Profile owner controls components/profile-v2 and app/user/[codename]. Integrator imported r2 without rewriting it. | Resolve xoxo rank #0, watchCount=0, IdentityHero unwired; owner/private checks |
+| Hall | Product owner controls final layout; implementer owns app/hall and components/hall. Existing committed design retained. | Owner final visual acceptance, responsive/medal/vacancy review |
+| Compare | Product owner controls final layout; implementer owns app/compare and components/compare. Existing committed design retained. | Owner final edits; selector/query/empty-state and metric parity checks |
+| Shared glue | One integration lead owns app/page, app/sigrank, shared rails, route classification and cache glue in this worktree. | Coordinate shared changes with page owners; no concurrent wholesale CSS rewrites |
+| Preservation | Integration lead owns release-staging and receipts. | Keep historical snapshots intact |
+| Release/hygiene | Separate reviewed change after source custody. | Resolve inherited ignored-file CI failure; reconcile main and release approval |
 
-## Preview receipts and limits
-- :3222 PID 5603: /Users/dericmchenry/Developer/active/SigRank-repos/_review_leaderboard_harden_20261011; a disposable copy with no .git, not a registered Git worktree.
-- Browser at http://127.0.0.1:3222/board/all rendered Global AI Operator Leaderboard, HITL/Hybrid/Autonomous controls, 22 ranked operators and 29 signed-up members beginning at #23. Settled DOM had 52 tbody rows including the section row. No console errors captured in the sampled load.
-- :3210 PID 51171: original dirty sigrank-app-live-board; browser homepage rendered the editorial SigRank landing page and topic navigation.
-- Important routing gap: the current / homepage is still editorial; /board/all is the hardened leaderboard. Moving the leaderboard to / is an explicit integration decision, not completed by a315435.
-- HTTP smoke results are in PREVIEW_HTTP.json. These are availability checks, not functional or privacy signoff.
-- No server runs from the new integration worktree yet. Existing servers and their files were left untouched.
-- :3210 has a previously documented hydration/HMR issue; no fresh full interaction audit was done here.
-- Dependencies temporarily link to the shared node_modules for read-only checks. No install, package changes, secrets, .env, or build output were copied. Use an independent dependency install and approved local configuration before the integration preview; do not run installs through this symlink.
-- Current shell Node is 26.10.0, while package.json pins 22.x. Provision/use Node 22 before release build validation. The repository's older Next 15 notes are stale; package.json and running servers indicate Next 16.3.8.
+Scoring formulas, server-only weights, database schema, ranking/API projection, auth/privacy policies, lockfiles and deploy config are outside this integration's edit scope.
+Root cache refresh adds only two revalidatePath("/") calls to existing mutation-triggered refresh functions; no database query or per-render cost was introduced.
+Root rendering reuses the existing all-time board page and its cache/data logic. No second leaderboard implementation was created.
 
-## Remote release status
-PR #239: https://github.com/SunrisesIllNeverSee/sigrank-app/pull/239 — open, 170 changed files, head a315435.
-Latest CI run 38121776522 failed the hygiene step for 40 tracked-but-ignored _workspace files; types/canonical success must not be inferred from that run.
-Vercel preview status succeeded; Supabase Preview skipped. This audit performed no merge/deployment or remote write.
-Starting at a315435 inherits the full branch history and hygiene issue. This is an isolated integration workspace, not a clean-main 14-file PR.
+## Verification
+- TypeScript: passed (including production build).
+- Canonical: 11/11 passed.
+- Full unit suite: 682 passed, 4 skipped, 0 failed (686 total).
+- UI suite: 155/155 passed across 16 files.
+- Scoped ESLint and git diff --check: passed.
+- Production build: passed, 286 routes generated; no offline-font source workaround.
+- HTTP 200 for /, /sigrank, /user/xoxo, /hall, /compare, /articles, /blog, /wiki, /fieldhub.
+- Browser: home renders Global AI Operator Leaderboard; initial settled table includes 22 ranked +29 signed-up members (52 rows including the section row).
+- Browser: HITL, Hybrid, Autonomous controls activate and change rendered rows; Metrics/Raw and ascending sort respond.
+- Browser: SigRank rail link opens /sigrank; visible SigRank button toggles real page-section anchors; topic selector opens Articles/document navigation.
+- Browser: Profile Overview, Stats, Analysis, Lab, Submissions and Social panels respond; public Report tab disabled. This is not authenticated-owner or full privacy signoff.
+- Browser: Hall and Compare render in same origin and shared Compare link navigates successfully.
+- Observed React error #418 on board/editorial loads is an open gate, not a clean-console claim. Existing :3210 had a previously documented hydration issue; attribution of the new warning needs diagnosis.
+- Observed xoxo Overview #0/0.0%ile needs reconciliation with board identity/rank before release.
+- Production preview is local and temporary. It does not change signalaf.com.
 
-## Ordered commit and integration checklist
-- [x] Verify remote checkpoint, upstream, worktree relationships, and preview origins.
-- [x] Create one named worktree at the exact checkpoint without moving the dirty shared tree.
-- [x] Preserve historical staging artifacts and verify archive/member integrity.
-- [x] Required checks passed; preservation-only scope committed locally with SHA recorded in the audit delivery receipt.
-- [ ] User names one integration lead; page owners confirm scope and freeze/export any newer candidates.
-- [ ] Recheck hashes against AUDIT_EVIDENCE.json; stop on drift and reconcile with that owner.
-- [ ] Import Profile r2 source-only members in one scoped commit; keep reference HTML out of app/public. Validate privacy/owner states before considering it release-ready.
-- [ ] Import editorial navigation in its own scoped commit, including lib/editorial modules and reviewed CSS hunks.
-- [ ] Standardize editorial formatting as a separate owner-reviewed commit.
-- [ ] Resolve / versus /board/all routing and link behavior with product owner; preserve intentional discovery pages.
-- [ ] Apply approved Hall edits in a Hall-only commit.
-- [ ] Apply approved Compare edits in a Compare-only commit.
-- [ ] Review preserved asset custody and fix inherited hygiene in an isolated commit without discarding physical files.
-- [ ] Install exact locked dependencies independently under Node 22; configure environment locally without committing secrets.
-- [ ] Start one integration preview on a checked-free port (suggest :3230), record cwd, branch, SHA, command, logs, and dirty state. Keep :3210/:3222 unchanged.
-- [ ] Per commit: explicit path staging, inspect staged diff, TypeScript and 11 canonical tests. Run API/scoring tests if those paths change.
-- [ ] Integrated checks: home→board→profile→compare→hall→editorial navigation, 3 workflow filters, ranks vs member positions, sorting, Raw/Metrics, no private signup identities, profile visibility, empty states, keyboard/mobile, build/lint/CI.
-- [ ] Capture screenshots and test receipts tied to the exact integration SHA; product owner reviews the whole site.
-- [ ] Only after an explicit later instruction: decide remote publication/PR strategy and main reconciliation. No merge or production deployment under this audit.
+## Commit/release checklist
+- [x] Verify remote a315435 and worktree relationships.
+- [x] Isolate integration at a315435; preserve dirty source and snapshots.
+- [x] Verify/import/commit Profile r2 separately.
+- [x] Verify/import/commit completed editorial navigation separately.
+- [x] Verify Hall/Compare commits are inherited; retain them.
+- [x] Make leaderboard the new home and preserve editorial landing.
+- [x] Connect routes in one production preview.
+- [x] Run required tests/build and sample browser interactions.
+- [x] Record current ownership boundaries and concrete remaining gates.
+- [ ] Resolve hydration warning and profile rank mismatch with lane owners.
+- [ ] Complete uniform editorial formatting and owner final Hall/Compare edits.
+- [ ] Verify authenticated owner/private profile behavior and remaining interactions.
+- [ ] Resolve inherited repository hygiene failure in a separate reviewed commit.
+- [ ] Review integrated design, reconcile main, then decide PR/release.
+- [ ] Merge/deploy only when explicitly authorized.
 
-## Recommendation for Devin and specialized tools
-A fresh Devin session is suitable as the sole integration executor after ownership is coordinated. Start it in this worktree and give it this manifest; do not start another parallel editor in the dirty source.
-Keep product/design decisions with the owner and existing page leads. Devin should implement narrowly, commit by workstream, and report exact preview provenance.
-Use GitHub tools/CLI for commits and CI, browser/Playwright for interactive verification, and Filesystem/Remote Desktop Commander for scoped file inspection.
-Use Figma or MagicPath for approved design references and spacing/type comparison; PostHog for existing navigation/drop-off evidence; read-only Supabase for profile/data-contract checks; Wolfram or local reproducible calculations for metric parity when needed.
-These capabilities are available in this Codex environment but must be discovered and authenticated in Devin's actual session; do not claim they ran merely because they are listed.
-Knowledge-graph read_graph, codebase-memory, and Repomix tools were not exposed here; targeted Git and filesystem evidence was used instead. No external design project, analytics account, or database was modified.
+## Next coordinator
+Keep one integration lead and this worktree. A new Devin session is not needed to assemble the pages: that assembly now exists.
+If Devin is used for follow-up hardening, supply this manifest and exact branch; give it a scoped lane and insist on explicit commits, current source hashes, and no edits in the shared dirty worktree.
