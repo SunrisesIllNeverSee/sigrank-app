@@ -57,7 +57,7 @@ export default async function ArticlesPage() {
       title="ARTICLES"
       leftTitle="PUBLICATIONS"
       topic="articles"
-      left={<FieldFamilyNav current="articles" />}
+      left={<FieldFamilyNav current="articles" documents={articles.map(a => ({ label: a.title, href: "/blog/" + a.slug }))} />}
       leftWidth={280}
       rightWidth={240}
       rightTitle="PUBLICATION DATA"
