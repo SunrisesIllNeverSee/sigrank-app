@@ -1649,3 +1649,52 @@
 .lbw-root .board-t tbody tr:hover .peekbtn,
 .lbw-root .board-t tbody tr:focus-visible .peekbtn{display:inline-block}
 .lbw-root .board-t .peekbtn:hover{color:var(--ac)}
+
+/* Approved navigation: SigRank Landing Zero, Wiki contents, document trees. */
+.lbw-root .ws-home-nav{position:relative}
+.lbw-root .ws-home-switch{position:absolute;width:1px;height:1px;opacity:0}
+.lbw-root .ws-home-switch:not(:checked) ~ .ws-home-contents{display:none}
+.lbw-root .ws-home-switch:checked ~ .ws-home-topic-index{display:none}
+.lbw-root .ws-home-topics a,.lbw-root .ws-home-topics label{font-weight:700}
+.lbw-root .ws-editorial-nav-link{display:block;padding:5px 8px;border-radius:var(--radius-sm);
+  color:var(--tx2);cursor:pointer;font-weight:700;line-height:1.4}
+.lbw-root .ws-editorial-nav-link:hover,.lbw-root .ws-editorial-nav-link:focus-visible{color:var(--ac);background:var(--sel)}
+.lbw-root .ws-home-switch:focus-visible ~ .ws-home-topic-index label{outline:2px solid var(--ac)}
+.lbw-root .ws-page-index .ws-page-links a,.lbw-root .ws-tree-sections .ws-page-links a{font-weight:700}
+.lbw-root .railhead .ws-topic-menu label.ws-topic-link-label{
+  display:block;font:600 11px var(--font-mono);color:var(--tx2);
+  padding:9px 8px;text-decoration:none;cursor:pointer}
+.lbw-root .railhead .ws-topic-menu label.ws-topic-link-label:hover,
+.lbw-root .railhead .ws-topic-menu label.ws-topic-link-label:focus-visible{color:var(--ac);background:var(--sel)}
+.lbw-root .ws-document-tree{min-width:0}
+.lbw-root .ws-tree-list{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lbw-root .ws-tree-item{min-width:0}
+.lbw-root .ws-tree-row{display:flex;align-items:stretch;min-width:0;border-radius:5px}
+.lbw-root .ws-tree-row.active{background:var(--sel)}
+.lbw-root .ws-tree-title{flex:1;min-width:0;text-align:left;padding:8px 5px 8px 8px;
+  border-radius:4px;font:700 11px/1.5 var(--font-mono);overflow-wrap:anywhere;
+  text-decoration:none;color:var(--tx2)}
+.lbw-root .ws-tree-row.active .ws-tree-title{color:var(--ac)}
+.lbw-root .ws-tree-title:hover,.lbw-root .ws-tree-toggle:hover{color:var(--ac);background:var(--hover)}
+.lbw-root .ws-tree-toggle{flex:none;align-self:stretch;width:28px;border:0;border-radius:4px;
+  background:transparent;color:var(--tx2);font:700 14px var(--font-mono);cursor:pointer}
+.lbw-root .ws-tree-toggle:focus-visible,.lbw-root .ws-tree-title:focus-visible{outline:2px solid var(--ac)}
+.lbw-root .ws-tree-sections{margin:1px 2px 8px 10px;padding:4px 0 4px 10px;
+  border-left:1px solid var(--line2);min-width:0}
+.lbw-root .ws-tree-sections .ws-nav{gap:2px}
+.lbw-root .ws-tree-sections .ws-nav a{font-size:10.5px;line-height:1.45;
+  padding:7px 5px;overflow-wrap:anywhere}
+.lbw-root .ws-tree-sections .ws-note{font-size:10px}
+.lbw-root .ws-tree-exit{display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  border-top:1px solid var(--line);padding-top:10px;margin:10px 0 1px}
+.lbw-root .ws-tree-exit a{display:block;min-width:0;padding:8px 5px;
+  border:1px solid var(--line2);border-radius:5px;text-align:center;
+  background:var(--bg2);font:700 11px var(--font-mono);color:var(--tx);text-decoration:none}
+.lbw-root .ws-tree-exit a:hover,.lbw-root .ws-tree-exit a:focus-visible{border-color:var(--ac);color:var(--ac)}
+/* Browser-native disclosure and links: works even when dev hydration fails. */
+.lbw-root .ws-tree-doc-link{text-decoration:none}
+.lbw-root .ws-tree-details summary{cursor:pointer;list-style:none}
+.lbw-root .ws-tree-details summary::-webkit-details-marker{display:none}
+.lbw-root .ws-tree-details .ws-tree-toggle::before{content:"▸"}
+.lbw-root .ws-tree-details[open] .ws-tree-toggle::before{content:"▾"}
+.lbw-root .ws-tree-toggle{display:flex;align-items:center;justify-content:center}

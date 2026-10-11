@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Shared SignalAF editorial navigation: TOPIC > TOPIC INDEX > PAGE.
+ * Shared SignalAF editorial navigation: TOPIC > DOCUMENT TREE > PAGE.
  * Topic chooser is mounted in WorkspaceShell's left railhead.
  * No content/telemetry source or route is modified by this navigation layer.
  */
@@ -65,6 +65,8 @@ const topicForPage = (page: TextPage): WorkspaceTopic => {
   return "field";
 };
 
+const NATIVE_HOME_DROPDOWN = "(function(){\n  if(window.__signalafHomeNavInstalled)return;\n  window.__signalafHomeNavInstalled=true;\n  document.addEventListener(\"click\",function(event){\n    var label=event.target.closest?.(\".ws-topic-link-label\");\n    if(label)label.closest(\"details\")?.removeAttribute(\"open\");\n  },true);\n  document.addEventListener(\"keydown\",function(event){\n    if(event.key!==\"Enter\" && event.key!==\" \")return;\n    var label=event.target.closest?.('label[for=\"ws-home-mode\"]');\n    if(!label)return;\n    event.preventDefault();\n    document.getElementById(\"ws-home-mode\")?.click();\n    label.closest(\"details\")?.removeAttribute(\"open\");\n  },true);\n})();";
+
 export function EditorialTopicDropdown({ topic }: { topic: WorkspaceTopic }) {
   const selected = TOPICS.find((item) => item.id === topic);
   // Native disclosure and ordinary links also work when JS is unavailable.
@@ -75,11 +77,19 @@ export function EditorialTopicDropdown({ topic }: { topic: WorkspaceTopic }) {
       </summary>
       <nav aria-label="Topics" className="ws-topic-menu">
         {TOPICS.map((item) => (
-          <Link key={item.id} href={item.href} aria-current={topic === item.id ? "page" : undefined}>
-            {item.label}
-          </Link>
+          topic === "home" && item.id === "home" ? (
+            <label key={item.id} htmlFor="ws-home-mode" className="ws-topic-link-label"
+              role="button" tabIndex={0}>
+              {item.label}
+            </label>
+          ) : (
+            <Link key={item.id} href={item.href} aria-current={topic === item.id ? "page" : undefined}>
+              {item.label}
+            </Link>
+          )
         ))}
       </nav>
+      {topic === "home" && <script dangerouslySetInnerHTML={{ __html: NATIVE_HOME_DROPDOWN }} />}
     </details>
   );
 }
@@ -139,6 +149,8 @@ const PAGE_ANCHORS: Record<string, PageAnchor[]> = {
 const slug = (value: string) =>
   value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 56);
 
+const PAGE_FALLBACK_SCRIPT = "(function(){\n  var host=document.currentScript?.closest(\".ws-page-auto\");\n  if(!host)return;\n  var nav=host.querySelector(\".ws-page-auto-nav\");\n  var note=host.querySelector(\".ws-page-auto-note\");\n  var complete=false;\n  function scan(){\n    if(complete||!host.isConnected)return;\n    var stage=document.querySelector(\".lbw-root .stagecol main.stage .board\");\n    if(!stage)return;\n    var headings=stage.querySelectorAll(\"h2\"),seen=new Set(),found=[];\n    for(var i=0;i<headings.length&&found.length<24;i++){\n      var h=headings[i];\n      if(h.closest(\".blog-row,.blog-list,.ws-nav,.rail,[data-ws-nav-skip]\"))continue;\n      var label=(h.textContent||\"\").replace(/\\s+/g,\" \").trim();\n      if(!label)continue;\n      var enclosing=h.closest(\"section[id]\");\n      var id=h.id||(enclosing&&enclosing.id)||\"\";\n      if(!id){\n        var base=\"ws-page-\"+label.toLowerCase().normalize(\"NFKD\")\n          .replace(/[^a-z0-9]+/g,\"-\").replace(/^-|-$/g,\"\").slice(0,56);\n        id=base||\"ws-page-section\";\n        var stem=id,sequence=2;\n        while(document.getElementById(id))id=stem+\"-\"+(sequence++);\n        h.id=id;\n      }\n      if(seen.has(id))continue;\n      seen.add(id);found.push({id:id,label:label});\n    }\n    if(!found.length)return;\n    for(var k=0;k<found.length;k++){\n      var a=document.createElement(\"a\");\n      a.href=\"#\"+encodeURIComponent(found[k].id);\n      a.textContent=found[k].label;\n      nav.appendChild(a);\n    }\n    if(note)note.hidden=true;\n    complete=true;\n  }\n  if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",scan,{once:true});\n  else scan();\n  window.addEventListener(\"load\",scan,{once:true});\n  setTimeout(scan,250);setTimeout(scan,900);setTimeout(scan,2000);\n})();";
+
 function PageSections({ pageContents }: { pageContents?: ReactNode }) {
   const pathname = usePathname();
   const [sections, setSections] = useState<PageAnchor[]>(() => PAGE_ANCHORS[pathname] ?? []);
@@ -195,51 +207,119 @@ function PageSections({ pageContents }: { pageContents?: ReactNode }) {
         <a key={section.id} href={"#" + encodeURIComponent(section.id)}>{section.label}</a>
       ))}
     </nav>
-  ) : <p className="ws-note">No section headings on this page.</p>;
+  ) : (
+    <div className="ws-page-auto">
+      <nav className="ws-nav ws-page-links ws-page-auto-nav"
+        aria-label="Sections on this page" />
+      <p className="ws-note ws-page-auto-note">Finding page sections…</p>
+      {/* Static JSX articles can be streamed without working dev hydration.
+          This native enhancement derives links only from real page headings. */}
+      <script dangerouslySetInnerHTML={{ __html: PAGE_FALLBACK_SCRIPT }} />
+    </div>
+  );
 }
 
-/** Left rail body: the selected topic's page index + real in-page anchors. */
+export type WorkspaceDocument = { label: string; href: string };
+
+/**
+ * The approved sidebar navigation:
+ * - SigRank: five-topic Landing Zero, switching in-place to page contents.
+ * - Wiki: direct page contents/table.
+ * - Field / Articles / Blog: collection tree; the active document's sections
+ *   appear directly beneath its title, and siblings always remain visible.
+ * - Back and Home follow the ENTIRE tree, below the final sibling.
+ *
+ * Content, canonical routes, and server-provided publication metadata are
+ * never changed by this client-side navigation layer.
+ */
 export function EditorialNav({
-  current = "home",
-  pageContents,
-  topicIndex,
+  current = "home", pageContents, documents,
 }: {
   current?: TextPage;
   pageContents?: ReactNode;
+  documents?: WorkspaceDocument[];
+  /** Retained for external callers; tree navigation uses real documents. */
   topicIndex?: ReactNode;
 }) {
   const pathname = usePathname();
   const topic = topicForPage(current);
-  // The SigRank landing page navigates its own sections only; Field Hub is
-  // the page index itself, so a second in-page menu would duplicate its cards.
-  const hasTopicIndex = pathname !== "/";
-  const hasPageSections = pathname !== "/fieldhub";
-  const emphasizeTopicPages = pathname === "/fieldhub";
-  const emphasizePageSections = ["/", "/field", "/research", "/science"].includes(pathname);
+  const isHome = pathname === "/";
+  const isWiki = topic === "wiki";
+  const isLanding = (topic === "field" && pathname === "/fieldhub")
+    || (topic === "articles" && pathname === "/articles")
+    || (topic === "blog" && pathname === "/blog");
+  const isReader = !isHome && !isWiki && !isLanding;
+  const collectionHref = topic === "field" ? "/fieldhub"
+    : topic === "articles" ? "/articles" : "/blog";
+  const collectionLabel = topic === "field" ? "Field"
+    : topic === "articles" ? "Articles" : "Blog";
+  const entries = documents ?? PAGES[topic];
+
   return (
     <>
-      {hasTopicIndex && (
-        <div className={`mod ws-topic-index${emphasizeTopicPages ? " ws-nav-bold" : ""}`}>
-          <div className="mini-h"><span className="sq" />TOPIC INDEX</div>
-          <nav className="ws-nav" aria-label="Pages in this topic">
-            {topicIndex ?? PAGES[topic].map((page) => (
-              <Link
-                href={page.href}
-                key={page.href}
-                aria-current={pathname === page.href ? "page" : undefined}
-                className={pathname === page.href ? "ws-secondary-active" : ""}
-              >{page.label}</Link>
-            ))}
-          </nav>
+      {isHome && (
+        <div className="ws-home-nav">
+          {/* A native checkbox guarantees the stage is never remounted.
+              Hash navigation preserves this state without client hydration. */}
+          <input id="ws-home-mode" type="checkbox" className="ws-home-switch"
+            aria-label="Show SigRank page contents" />
+          <div className="mod ws-topic-index ws-home-topic-index">
+            <div className="mini-h"><span className="sq" />TOPICS</div>
+            <nav className="ws-nav ws-home-topics" aria-label="SignalAF topics">
+              {TOPICS.map(item => item.id === "home" ? (
+                <label key={item.id} htmlFor="ws-home-mode"
+                  role="button" tabIndex={0} className="ws-editorial-nav-link">{item.label}</label>
+              ) : <Link href={item.href} key={item.id}>{item.label}</Link>)}
+            </nav>
+          </div>
+          <div className="mod ws-page-index ws-home-contents">
+            <div className="mini-h"><span className="sq" />PAGE CONTENTS</div>
+            <PageSections pageContents={pageContents} />
+          </div>
         </div>
       )}
-      {hasPageSections && (
-        <div className={`mod ws-page-index${emphasizePageSections ? " ws-nav-bold" : ""}`}>
-          <div className="mini-h"><span className="sq" />{pathname === "/" ? "SECTIONS" : "PAGE"}</div>
+      {isWiki && (
+        <div className="mod ws-page-index ws-wiki-contents">
+          <div className="mini-h"><span className="sq" />WIKI CONTENTS</div>
           <PageSections pageContents={pageContents} />
+        </div>
+      )}
+      {!isHome && !isWiki && (
+        <div className="mod ws-document-tree">
+          <div className="mini-h"><span className="sq" />DOCUMENTS</div>
+          <nav className="ws-tree-list" aria-label={collectionLabel + " expandable documents"}>
+            {entries.map(entry => {
+              const active = isReader && pathname === entry.href;
+              return (
+                <div className="ws-tree-item" key={entry.href}>
+                  {active ? (
+                    <details open className="ws-tree-details">
+                      <summary className="ws-tree-row active" aria-current="page">
+                        <span className="ws-tree-title">{entry.label}</span>
+                        <span className="ws-tree-toggle" aria-hidden="true" />
+                      </summary>
+                      <div className="ws-tree-sections">
+                        <PageSections pageContents={pageContents} />
+                      </div>
+                    </details>
+                  ) : (
+                    <Link href={entry.href} className="ws-tree-row ws-tree-doc-link">
+                      <span className="ws-tree-title">{entry.label}</span>
+                      <span className="ws-tree-toggle" aria-hidden="true">▸</span>
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+          {isReader && (
+            <nav className="ws-tree-exit" aria-label="Leave document">
+              <Link href={collectionHref}>← Back</Link>
+              <Link href="/">⌂ Home</Link>
+            </nav>
+          )}
         </div>
       )}
     </>
   );
 }
-
