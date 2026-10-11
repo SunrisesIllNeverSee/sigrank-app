@@ -194,8 +194,11 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     claimed: operator.claimed,
     nc,
     wf: row.workflow_mode ?? null,
+    wfProvisional: row.workflow_mode == null,
+    platforms: row.platforms?.filter((p) => p.toLowerCase() !== "multi"),
     total: compact(totalTokens),
     yield: comp ? compact(comp.yield_) : "—",
+    tableYield: comp ? comp.yield_.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—",
     snr: trimNum(c ? c.snr : s.compression_ratio, 3),
     vel: c ? trimNum(c.velocity, 2) : 0,
     lev: comp
@@ -207,9 +210,11 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     mv24: s.movement_24h == null ? null : Math.round(s.movement_24h),
     mv7,
     ptpd: throughput ? `${compact(throughput.processedTokensPerDay)}/d` : null,
+    ptpdExact: throughput?.processedTokensPerDay ?? null,
     otpd: throughput ? `${compact(throughput.outputTokensPerDay)}/d` : null,
     // "lev:1:vel" → "lev:1" (sync.py rsplit(":",1)[0]).
     opratio: c ? c.opRatio.split(":").slice(0, 2).join(":") : null,
+    opratioFull: c?.opRatio ?? null,
     raw: {
       i: compact(t.fresh_input),
       o: compact(t.output),
@@ -244,6 +249,7 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
     msgs: operator.total_messages_lifetime,
     cost: c ? `$${c.costPerMillion.toFixed(2)}` : "—",
     eff: c ? compact(c.efficiency) : "—",
+    tableEff: c ? c.efficiency.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—",
     platform: (row.platform ?? operator.primary_domain ?? "other").toLowerCase(),
     num: {
       // numvOf("—") → 0 parity: nc rows carry 0 in compounding math paths.
@@ -251,6 +257,14 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
       lev: comp ? comp.leverage : 0,
       total: totalTokens,
       cost: c ? c.costPerMillion : 0,
+      eff: c?.efficiency,
+      i: t.fresh_input,
+      o: t.output,
+      cw: t.cache_create,
+      cr: t.cache_read,
+      snr: c?.snr,
+      velocity: c?.velocity,
+      dev: c?.dev10x ?? undefined,
     },
   };
 }
