@@ -59,6 +59,8 @@ import {
 import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { CompareStage } from "@/components/compare/CompareStage";
+import "@/components/compare/compare-workspace.css";
 
 export const metadata: Metadata = withOG({
   title: "Compare AI Operators",
@@ -449,14 +451,17 @@ export default async function ComparePage({
             </div>
           </>
         }
-        leftWidth={180}
-        rightWidth={198}
+        leftWidth={216}
+        rightWidth={240}
         status={
           <>
             {nameOf(rowA).toUpperCase()} × {nameOf(rowB).toUpperCase()} · SIGNALAF × SIGRANK · MO§ES™
           </>
         }
       >
+        {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
+            the stage (owner annotation: not a rail module). */}
+        <CompareStage ledger={<CompareLedger a={rowA} b={rowB} />} matchup={
         <div className="ws-cmp">
           <div className="ws-cmp-sel">
             <CompareSelectors
@@ -484,15 +489,12 @@ export default async function ComparePage({
                 nameA={nameOf(rowA)}
                 nameB={nameOf(rowB)}
                 fieldAvg={fieldAvgYield}
+                height={150}
               />
             </div>
           </div>
-          {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
-              the stage (owner annotation: not a rail module). */}
-          <div style={{ gridColumn: "1/13" }}>
-            <CompareLedger a={rowA} b={rowB} />
-          </div>
         </div>
+        } />
       </WorkspaceShell>
     </div>
   );

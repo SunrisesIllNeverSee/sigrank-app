@@ -6,7 +6,7 @@ Updated October 11, 2026. This is the current integration receipt. Historical ST
 - Branch: integration/site-a315435 (local, no upstream).
 - Frozen base: a3154353299ab7a60e5abd5383eac95da99c394b.
 - Application checkpoint: 766c6f0 (homepage/navigation integration).
-- Preview: http://127.0.0.1:3230/ — production build and server from this workspace, Node 22.23.3, Next 16.3.8.
+- Preview: http://127.0.0.1:3230/ — production build and server from this workspace, Node 22.23.1, Next 16.3.8.
 - Home / now renders the existing all-time leaderboard component; /board/all remains available.
 - Preserved editorial landing: /sigrank. Its original content is unchanged; only its canonical path changed.
 - Same-site routes: /articles, /blog, /wiki, /fieldhub, /hall, /compare, /user/xoxo.
@@ -37,7 +37,7 @@ All commits are local on integration/site-a315435. Do not imply they were pushed
 ## Source custody
 - Profile r2: release-staging/user-profile/profile-v2-candidate-2026-10-11-r2.zip; seven components and two route files now active in this worktree. r1 preserved for history.
 - Editorial: release-staging/text-pages/editorial-nav-integrated-2026-10-11.zip; completed navigation now active.
-- Hall/Compare: bcc5c3a (workspace migration) and 7bb4c2b (ledger-to-stage fix) are ancestors of a315435. app/hall, components/hall, app/compare, components/compare remain byte-identical to that baseline.
+- Hall/Compare: bcc5c3a (workspace migration) and 7bb4c2b (ledger-to-stage fix) are ancestors of a315435. Hall remains byte-identical to that baseline. Compare now has the owner-requested fixed-stage integration described below.
 - Approved design evidence: original _workspace/layout-editors/{hall,compare}.html and approved/{hall,compare}-layout.json in the shared source; custody JSON in release-staging/{hall,compare}. Screenshots are historical evidence, not proof of later edits.
 - Profile HTML review mocks remain in the source _workspace/profile-mocks and inside the preserved archives. They are not routable production pages.
 - AUDIT_EVIDENCE.json fingerprints 39 dirty/untracked source files and the archive verification. Current source-preservation check is in INTEGRATION_RECEIPT.json.
@@ -53,7 +53,7 @@ All commits are local on integration/site-a315435. Do not imply they were pushed
 | Editorial | Existing editorial owner controls content and uniform text-page structure. Imported archive is the completed navigation candidate. | Uniform formatting remains separate work |
 | Profile | Profile owner controls components/profile-v2 and app/user/[codename]. Integrator imported r2 without rewriting it. | Resolve xoxo rank #0, watchCount=0, IdentityHero unwired; owner/private checks |
 | Hall | Product owner controls final layout; implementer owns app/hall and components/hall. Existing committed design retained. | Owner final visual acceptance, responsive/medal/vacancy review |
-| Compare | Product owner controls final layout; implementer owns app/compare and components/compare. Existing committed design retained. | Owner final edits; selector/query/empty-state and metric parity checks |
+| Compare | Product owner controls final layout; integrator owns this scoped fixed-stage pass in app/compare and components/compare. The later implemented stage arrangement is retained with a separate full-ledger view. | Owner final visual acceptance; smaller-screen refinement |
 | Shared glue | One integration lead owns app/page, app/sigrank, shared rails, route classification and cache glue in this worktree. | Coordinate shared changes with page owners; no concurrent wholesale CSS rewrites |
 | Preservation | Integration lead owns release-staging and receipts. | Keep historical snapshots intact |
 | Release/hygiene | Separate reviewed change after source custody. | Resolve inherited ignored-file CI failure; reconcile main and release approval |
@@ -89,10 +89,26 @@ Root rendering reuses the existing all-time board page and its cache/data logic.
 - [x] Connect routes in one production preview.
 - [x] Run required tests/build and sample browser interactions.
 - [x] Record current ownership boundaries and concrete remaining gates.
+- [x] Implement the requested fixed Compare stage in this isolated worktree, with native Matchup/Ledger controls and wider existing sidebars.
 - [ ] Resolve hydration warning and profile rank mismatch with lane owners.
 - [ ] Complete uniform editorial formatting and owner final Hall/Compare edits.
 - [ ] Verify authenticated owner/private profile behavior and remaining interactions.
 - [ ] Resolve inherited repository hygiene failure in a separate reviewed commit.
+
+## Compare fixed-stage checkpoint — October 11, 2026
+
+The user identified the later implemented :3210 Compare as the stage reference and explicitly requested combining it with the preferred sidebars in a fixed, non-scrolling stage. The earlier layout-editor previews are historical design evidence, not this implementation reference.
+
+- Preview: http://127.0.0.1:3230/compare.
+- Matchup: selectors and paired raw/metric radars on the left; head-to-head identities, facts and score on the right; challenge strip and history below.
+- Ledger: full Raw, Metrics, Flow and Total comparison in the same stage, selected through browser-native radio controls labeled Matchup and Ledger. Hidden views are removed from layout and the accessibility tree; keyboard arrow switching is supported.
+- Sidebars: existing operator/context/matchup/share/related modules retained, with initial widths increased to 216 and 240 pixels. Sidebars retain their own internal overflow for secondary content.
+- CSS is in components/compare/compare-workspace.css and scoped to .ws-cmp-stage. The shared shell, global board CSS, scoring and database logic were not edited.
+- Page and center stage have no vertical or horizontal overflow at 1280×720, 1366×768, 1440×900 and 1600×1000 in both views. All infographic panels and ledger totals remain within stage bounds.
+- Verified native view switching, keyboard switching and search/select navigation to MO§ES™ vs The Field.
+- TypeScript, scoped ESLint, canonical 11/11 and production build passed. Browser evidence and four-size measurements are saved in the calling chat's outputs directory.
+- Work is local only, not merged, pushed or deployed. Desktop layout is ready for owner visual review; this is not whole-site deployment approval.
+- Source preservation audit: five original shared-workspace fingerprints changed since the earlier audit (profile route, OverviewView, ProfileTabsV2 and two handoff/manifest files). This task wrote only the integration worktree. Those newer shared changes were neither imported nor overwritten and remain outside this Compare commit.
 - [ ] Review integrated design, reconcile main, then decide PR/release.
 - [ ] Merge/deploy only when explicitly authorized.
 
