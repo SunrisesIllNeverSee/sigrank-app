@@ -53,7 +53,7 @@ All commits are local on integration/site-a315435. Do not imply they were pushed
 | Editorial | Existing editorial owner controls content and uniform text-page structure. Imported archive is the completed navigation candidate. | Uniform formatting remains separate work |
 | Profile | Profile owner controls components/profile-v2 and app/user/[codename]. Integrator imported r2 without rewriting it. | Resolve xoxo rank #0, watchCount=0, IdentityHero unwired; owner/private checks |
 | Hall | Product owner controls final layout; implementer owns app/hall and components/hall. Existing committed design retained. | Owner final visual acceptance, responsive/medal/vacancy review |
-| Compare | Product owner controls final layout; integrator owns this scoped fixed-stage pass in app/compare and components/compare. The later implemented stage arrangement is retained with a separate full-ledger view. | Owner final visual acceptance; smaller-screen refinement |
+| Compare | Product owner controls final layout; integrator owns this scoped fixed-stage pass in app/compare and components/compare. The implemented stage content and original sidebars are composed into one fixed dashboard, with every ledger row visible. | Owner final visual acceptance; smaller-screen refinement |
 | Shared glue | One integration lead owns app/page, app/sigrank, shared rails, route classification and cache glue in this worktree. | Coordinate shared changes with page owners; no concurrent wholesale CSS rewrites |
 | Preservation | Integration lead owns release-staging and receipts. | Keep historical snapshots intact |
 | Release/hygiene | Separate reviewed change after source custody. | Resolve inherited ignored-file CI failure; reconcile main and release approval |
@@ -89,27 +89,31 @@ Root rendering reuses the existing all-time board page and its cache/data logic.
 - [x] Connect routes in one production preview.
 - [x] Run required tests/build and sample browser interactions.
 - [x] Record current ownership boundaries and concrete remaining gates.
-- [x] Implement the requested fixed Compare stage in this isolated worktree, with native Matchup/Ledger controls and wider existing sidebars.
+- [x] Compose all Compare content into one fixed stage in this isolated worktree, using the original sidebar proportions and no view-switch tabs.
 - [ ] Resolve hydration warning and profile rank mismatch with lane owners.
 - [ ] Complete uniform editorial formatting and owner final Hall/Compare edits.
 - [ ] Verify authenticated owner/private profile behavior and remaining interactions.
 - [ ] Resolve inherited repository hygiene failure in a separate reviewed commit.
 
-## Compare fixed-stage checkpoint — October 11, 2026
+## Compare unified fixed-stage checkpoint — October 11, 2026
 
-The user identified the later implemented :3210 Compare as the stage reference and explicitly requested combining it with the preferred sidebars in a fixed, non-scrolling stage. The earlier layout-editor previews are historical design evidence, not this implementation reference.
+The implemented :3210 Compare is the content reference. The original :3222 preview supplied the preferred operator/context sidebars. Layout-editor artifacts are historical evidence, not the current page reference.
 
-- Preview: http://127.0.0.1:3230/compare.
-- Matchup: selectors and paired raw/metric radars on the left; head-to-head identities, facts and score on the right; challenge strip and history below.
-- Ledger: full Raw, Metrics, Flow and Total comparison in the same stage, selected through browser-native radio controls labeled Matchup and Ledger. Hidden views are removed from layout and the accessibility tree; keyboard arrow switching is supported.
-- Sidebars: existing operator/context/matchup/share/related modules retained, with initial widths increased to 216 and 240 pixels. Sidebars retain their own internal overflow for secondary content.
-- CSS is in components/compare/compare-workspace.css and scoped to .ws-cmp-stage. The shared shell, global board CSS, scoring and database logic were not edited.
-- Page and center stage have no vertical or horizontal overflow at 1280×720, 1366×768, 1440×900 and 1600×1000 in both views. All infographic panels and ledger totals remain within stage bounds.
-- Verified native view switching, keyboard switching and search/select navigation to MO§ES™ vs The Field.
-- TypeScript, scoped ESLint, canonical 11/11 and production build passed. Browser evidence and four-size measurements are saved in the calling chat's outputs directory.
-- Work is local only, not merged, pushed or deployed. Desktop layout is ready for owner visual review; this is not whole-site deployment approval.
-- Source preservation audit: five original shared-workspace fingerprints changed since the earlier audit (profile route, OverviewView, ProfileTabsV2 and two handoff/manifest files). This task wrote only the integration worktree. Those newer shared changes were neither imported nor overwritten and remain outside this Compare commit.
-- [ ] Review integrated design, reconcile main, then decide PR/release.
+- Preview: http://127.0.0.1:3230/compare?a=signal-92b4f9f485&b=the-field.
+- Everything is visible together: operator selectors, both shape radars, both matchup identities and all facts, score, six raw rows, eight metrics, throughput, total, full history and challenge strip.
+- The ledger uses two parallel eight-row groups: Raw/Flow/Total beside Metrics. Values, canonical IDs, winner calculations and diverging bars reuse the existing ledger implementation.
+- The previous Matchup/Ledger radio controls are removed. No comparison section is hidden behind a view switch.
+- Original sidebar modules are retained at initial widths 180 and 198 pixels. Compact spacing and share controls keep both share tools and all Related links visible. Throughput wraps instead of truncating.
+- Browser measurements passed at 1280×720, 1366×768, 1440×900 and 1600×1000: document dimensions match the viewport; both sidebars have clientHeight equal to scrollHeight; all stage panels, ledger rows and final matchup facts fit their containers.
+- Operator search/selection to xoxo (Karthikeyan KK) and back to MO§ES™ worked. Share-card Preview opens and closes. Captured browser error logs are empty for these checks.
+- TypeScript, scoped ESLint, canonical 11/11, diff whitespace check and Node 22 production build (286 routes) passed.
+- CSS is Compare-scoped. No shared shell, global board CSS, Hall/profile/editorial source, scoring, database logic, lockfile or deployment configuration was edited in this pass.
+- Narrow screens below the desktop layout width retain horizontal access rather than clipping data. Phone-size redesign and authenticated Compare Against Me verification remain separate checks; they are not claimed complete here.
+- Evidence: calling chat outputs/compare-unified-1600.png and compare-unified-browser-checks.json. The previous fixed-view receipt describes a superseded attempt and is preserved as history.
+- Work is local only, not merged, pushed or deployed. Owner visual acceptance remains open.
+- The newer shared profile/handoff changes noted in the previous preservation audit remain outside this Compare work; they were not imported or overwritten.
+- [ ] Owner visual acceptance of the unified desktop composition.
+- [ ] Reconcile main and remaining site-wide gates before any release.
 - [ ] Merge/deploy only when explicitly authorized.
 
 ## Next coordinator
