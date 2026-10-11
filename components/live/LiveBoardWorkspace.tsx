@@ -1731,6 +1731,9 @@ export function LiveBoardWorkspace({
               <RailIcon name="field" set={iconSet} />
             </Link>
             <span className="snav-sep" aria-hidden="true"></span>
+            <Link className="sbtn" href="/sigrank" data-tip="SIGRANK" title="SIGRANK">
+              <span className="gi" aria-hidden="true">§</span>
+            </Link>
             <Link className="sbtn" href="/wiki" data-tip="WIKI" title="WIKI">
               <RailIcon name="wiki" set={iconSet} />
             </Link>

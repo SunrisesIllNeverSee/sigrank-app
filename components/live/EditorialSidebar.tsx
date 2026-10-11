@@ -15,7 +15,7 @@ export type TextPage =
   | "articles" | "blog" | "wiki";
 
 const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }> = [
-  { id: "home", label: "SigRank", href: "/" },
+  { id: "home", label: "SigRank", href: "/sigrank" },
   { id: "field", label: "Field", href: "/fieldhub" },
   { id: "articles", label: "Articles", href: "/articles" },
   { id: "blog", label: "Blog", href: "/blog" },
@@ -24,7 +24,7 @@ const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }>
 
 const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string }>> = {
   home: [
-    { label: "Overview", href: "/" },
+    { label: "Overview", href: "/sigrank" },
     { label: "Leaderboard", href: "/board/all" },
     { label: "Compare", href: "/compare" },
     { label: "Hall of Signal", href: "/hall" },
@@ -98,7 +98,7 @@ type PageAnchor = { id: string; label: string };
 
 /** Server-rendered real anchors. Optional client heading discovery adds depth. */
 const PAGE_ANCHORS: Record<string, PageAnchor[]> = {
-  "/": [
+  "/sigrank": [
     { id: "ws-page-four-degrees", label: "Four Degrees of Leverage" },
     { id: "ws-page-activity", label: "Live Operator Activity" },
     { id: "ws-page-how", label: "How It Works" },
@@ -243,7 +243,7 @@ export function EditorialNav({
 }) {
   const pathname = usePathname();
   const topic = topicForPage(current);
-  const isHome = pathname === "/";
+  const isHome = pathname === "/sigrank";
   const isWiki = topic === "wiki";
   const isLanding = (topic === "field" && pathname === "/fieldhub")
     || (topic === "articles" && pathname === "/articles")

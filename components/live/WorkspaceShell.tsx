@@ -66,6 +66,7 @@ const NAV_LINKS: { key: WorkspaceNav; href: string; tip: string }[] = [
 ];
 
 const NAV_LINKS_2: { key: WorkspaceNav; href: string; tip: string }[] = [
+  { key: "home", href: "/sigrank", tip: "SIGRANK" },
   { key: "wiki", href: "/wiki", tip: "WIKI" },
   { key: "blog", href: "/blog", tip: "BLOG" },
 ];
@@ -313,7 +314,7 @@ export function WorkspaceShell({
       title={n.tip}
       aria-current={active === n.key ? "page" : undefined}
     >
-      <RailIcon name={n.key as PixelIconName} set={iconSet} />
+      {n.key === "home" ? <span className="gi" aria-hidden="true">§</span> : <RailIcon name={n.key as PixelIconName} set={iconSet} />}
     </Link>
   );
 
