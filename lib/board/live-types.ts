@@ -56,10 +56,20 @@ export interface LiveOperator {
   nc: boolean;
   /** Workflow mode tag when resolved ("hitl" | "agentic" | "hybrid"), else null. */
   wf: "hitl" | "agentic" | "hybrid" | null;
+  /** Provisional UI default only: no evidence-backed workflow mode. */
+  wfProvisional?: boolean;
+  /** Submitted platforms, excluding the multi rollup. */
+  platforms?: string[];
   /** Total tokens observed, compact-formatted ("34.2B"). */
   total: string;
-  /** Υ Yield, compact-formatted. */
+  /** Υ Yield, compact-formatted for existing profile/card surfaces. */
   yield: string;
+  /** Full two-decimal Υ cell, scoped only to the hardened table. */
+  tableYield?: string;
+  /** Full two-decimal efficiency cell, scoped only to the table. */
+  tableEff?: string;
+  /** Complete three-term operating-ratio cell; legacy display stays unchanged. */
+  opratioFull?: string | null;
   /** Signal-to-noise ratio [0,1]. */
   snr: number;
   /** Velocity (output / input). */
@@ -78,6 +88,8 @@ export interface LiveOperator {
   mv7: number | null;
   /** Exact calendar prompt throughput rate, e.g. "9.4M/d" (null when absent). */
   ptpd: string | null;
+  /** Numerically exact processed tokens per calendar day if time bounds exist. */
+  ptpdExact?: number | null;
   /** Exact calendar output throughput rate (null when absent). */
   otpd: string | null;
   /** Operating ratio "132202:1" (null when absent). */
@@ -127,6 +139,14 @@ export interface LiveOperator {
     lev: number;
     total: number;
     cost: number;
+    eff?: number;
+    i?: number;
+    o?: number;
+    cw?: number;
+    cr?: number;
+    snr?: number;
+    velocity?: number;
+    dev?: number;
   };
 }
 

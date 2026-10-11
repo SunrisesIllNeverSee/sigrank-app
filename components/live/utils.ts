@@ -154,7 +154,7 @@ export const COMPARE_CTA = "Start Comparing";
    count derives from the LOADED row count (ordered.length), never the
    population denominator — the mount hydrates the rest of the field lazily
    and a page click on an incomplete field doubles as the retry path. */
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE = 25;
 
 /* radar axis labels — data.js FEATURED.radar.axes, verbatim order */
 export const RADAR_AXES = ["Yield", "Leverage", "Velocity", "SNR", "10xDEV"];
@@ -252,34 +252,43 @@ export interface TopSets {
   o: TopMap;
   cr: TopMap;
   cw: TopMap;
+  eff: TopMap;
+  day: TopMap;
+  ratio: TopMap;
+  totalCost: TopMap;
 }
 
 const rank3 = (
   ops: LiveOperator[],
-  fn: (o: LiveOperator) => number,
+  fn: (o: LiveOperator) => number | null | undefined,
   low = false,
 ): TopMap => {
   const m: TopMap = {};
-  ops
-    .map((o, i) => [i, fn(o)] as const)
-    .sort((a, b) => (low ? a[1] - b[1] : b[1] - a[1]))
+  ops.map((o, i) => [i, fn(o)] as const)
+    .filter((r): r is readonly [number, number] => r[1] != null && Number.isFinite(r[1]))
+    .sort((a, b) => (low ? a[1] - b[1] : b[1] - a[1]) || a[0] - b[0])
     .slice(0, 3)
-    .forEach(([i], r) => (m[i] = r + 1));
+    .forEach(([i], rank) => { m[i] = rank + 1; });
   return m;
 };
 
+/** Each podium uses the visible ranked cohort; no provisional unranked members. */
 export const computeTT = (ops: LiveOperator[]): TopSets => ({
-  yield: rank3(ops, numYield),
-  lev: rank3(ops, numLev),
-  vel: rank3(ops, (o) => o.vel),
-  snr: rank3(ops, (o) => o.snr),
-  dev: rank3(ops, (o) => o.dev),
-  tot: rank3(ops, numTotal),
-  cost: rank3(ops, numCost, true),
-  i: rank3(ops, (o) => numvOf(o.raw.i)),
-  o: rank3(ops, (o) => numvOf(o.raw.o)),
-  cr: rank3(ops, (o) => numvOf(o.raw.cr)),
-  cw: rank3(ops, (o) => numvOf(o.raw.cw)),
+  yield: rank3(ops, (o) => o.nc ? null : o.num.yield),
+  lev: rank3(ops, (o) => o.nc ? null : o.num.lev),
+  vel: rank3(ops, (o) => o.num.velocity ?? o.vel),
+  snr: rank3(ops, (o) => o.num.snr ?? o.snr),
+  dev: rank3(ops, (o) => o.nc ? null : (o.num.dev ?? o.dev)),
+  tot: rank3(ops, (o) => o.num.total),
+  cost: rank3(ops, (o) => o.nc ? null : o.num.cost, true),
+  i: rank3(ops, (o) => o.num.i ?? numvOf(o.raw.i)),
+  o: rank3(ops, (o) => o.num.o ?? numvOf(o.raw.o)),
+  cr: rank3(ops, (o) => o.num.cr ?? numvOf(o.raw.cr)),
+  cw: rank3(ops, (o) => o.num.cw ?? numvOf(o.raw.cw)),
+  eff: rank3(ops, (o) => o.num.eff ?? numvOf(o.eff)),
+  day: rank3(ops, (o) => o.ptpdExact),
+  ratio: rank3(ops, (o) => o.nc ? null : o.num.lev),
+  totalCost: rank3(ops, (o) => o.num.cost * o.num.total / 1_000_000, true),
 });
 
 /** board.js `tc` — " tt1".." tt3" suffix when the row ranks top-3. */
@@ -339,17 +348,20 @@ export const SORT_KEY: Record<string, (o: LiveOperator) => number> = {
   Velocity: (o) => o.vel,
   SNR: (o) => o.snr,
   "10xDEV": (o) => o.dev,
-  Efficiency: (o) => numvOf(o.eff),
+  Efficiency: (o) => o.num.eff ?? numvOf(o.eff),
+  "∑/Day": (o) => o.ptpdExact ?? -1,
+  "Op Ratio": (o) => o.num.lev,
+  "Total Cost": (o) => o.num.cost * o.num.total / 1_000_000,
   "$/1M": numCost,
   /* raw pillar sorts (owner 2026-10-06: every column sortable) — compact
      strings re-parsed via numvOf, same convention as Efficiency. */
-  Input: (o) => numvOf(o.raw.i),
-  Output: (o) => numvOf(o.raw.o),
-  "Cache-read": (o) => numvOf(o.raw.cr),
-  "Cache-write": (o) => numvOf(o.raw.cw),
+  Input: (o) => o.num.i ?? numvOf(o.raw.i),
+  Output: (o) => o.num.o ?? numvOf(o.raw.o),
+  "Cache-read": (o) => o.num.cr ?? numvOf(o.raw.cr),
+  "Cache-write": (o) => o.num.cw ?? numvOf(o.raw.cw),
 };
 /** "$/1M" is a cost — lowest first. Everything else descends. */
-export const SORT_ASC = new Set(["$/1M"]);
+export const SORT_ASC = new Set(["$/1M", "Total Cost"]);
 
 /* ---------- profileData adapter (board.js profileData) ----------
    idx === -1 → the canonical featured operator; otherwise the ops row. */

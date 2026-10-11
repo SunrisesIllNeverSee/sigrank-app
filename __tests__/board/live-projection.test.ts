@@ -430,6 +430,7 @@ describe("LiveOperator rows", () => {
   it("compact formatting matches sync.py/live.js exactly", () => {
     expect(alpha.total).toBe("34.2B");
     expect(alpha.yield).toBe("69.5M");
+    expect(alpha.tableYield).toBe(alpha.num.yield.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     expect(alpha.snr).toBe(0.998);
     expect(alpha.vel).toBe(525.73);
     expect(alpha.lev).toBe("132,224.9×");
@@ -438,7 +439,9 @@ describe("LiveOperator rows", () => {
     expect(alpha.ptpd).toBe("93.7M/d");
     expect(alpha.otpd).toBe("363.8K/d");
     expect(alpha.opratio).toBe("132225:1");
+    expect(alpha.opratioFull).toBe(ROWS[0].snapshot.cascade!.opRatio);
     expect(alpha.eff).toBe("33.8K");
+    expect(alpha.tableEff).toBe(ROWS[0].snapshot.cascade!.efficiency.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     expect(alpha.cost).toBe("$0.42");
     expect(alpha.platform).toBe("multi");
     expect(alpha.last).toBe("10/02/26");

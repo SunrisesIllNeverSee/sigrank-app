@@ -113,54 +113,46 @@ interface HeadGroup {
 
 const HEAD_GROUPS: Record<ColMode, HeadGroup[]> = {
   metrics: [
-    { label: "IDENTITY & SCALE", span: 3 },
+    { label: "IDENTITY & SCALE", span: 4 },
     { label: "CASCADE YIELD", span: 5, ac: true },
     { label: "COMPOSITION & COST", span: 3 },
     { label: "ACTIVITY", span: 2 },
   ],
-  /* Raw head columns: RANK, OPERATOR, CLASS, INPUT, OUTPUT, CACHE-READ,
-     CACHE-WRITE, ∑ TOKENS, $/1M, PLATFORM, LAST, TREND. */
   raw: [
-    { label: "IDENTITY & SCALE", span: 3 },
-    { label: "RAW TOKEN PILLARS", span: 5 },
-    { label: "COMPOSITION & COST", span: 2 },
-    { label: "ACTIVITY", span: 2 },
+    { label: "IDENTITY", span: 2 },
+    { label: "RAW TOKENS & THROUGHPUT", span: 6 },
+    { label: "COMPOSITION", span: 1 },
+    { label: "COST", span: 1 },
   ],
 };
-
-/* Identity columns are never sortable (rank/operator/class are positional);
-   sortable columns key into utils.ts SORT_KEY verbatim. */
-/* Tooltip glossary (owner 2026-10-06): every column carries its metric
-   definition on hover — the canonical formulas live in live-types.ts. */
 const HEAD_COLS: Record<ColMode, HeadCol[]> = {
   metrics: [
-    { icon: "#", label: "RANK", cls: "hc-rank", l: true, tip: "Rank position in this window" },
-    { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true, tip: "Operator — display name, codename & location" },
-    { icon: "◈", label: "CLASS", cls: "hc-class", tip: "Signal class tier" },
-    { icon: "Υ", label: "YIELD", cls: "hc-yield", k: "Yield", tip: "Υ = cache_read × output ÷ input² — cascade efficiency; the rank metric" },
-    { icon: "⚙", label: "LEVERAGE", cls: "hc-lev", k: "Leverage", tip: "cache_read ÷ input — amplification over raw input" },
-    { icon: "⚡", label: "VELOCITY", cls: "hc-vel", k: "Velocity", tip: "output ÷ input — generation per prompt token" },
-    { icon: "▲", label: "SNR", cls: "hc-snr", k: "SNR", tip: "output ÷ (input + output) — signal fraction, 0–1" },
-    { icon: "✧", label: "10×DEV", cls: "hc-dev", k: "10xDEV", tip: "log₁₀(leverage) — dev-mode intensity; the outlier sort" },
-    { icon: "∑", label: "TOKENS", cls: "hc-tot", k: "Total", tip: "Total observed tokens (I+O+W+R)" },
-    { icon: "$", label: "/1M", cls: "hc-cost", k: "$/1M", tip: "Cost per 1M tokens — lower is better" },
-    { icon: "⬡", label: "PLATFORM", cls: "hc-platform", tip: "Primary AI surface" },
-    { icon: "◷", label: "LAST", cls: "hc-last", tip: "Days since the last snapshot" },
-    { icon: "↗", label: "TREND", cls: "hc-trend", tip: "Yield history sparkline" },
+    { icon: "#", label: "RANK", cls: "hc-rank", l: true },
+    { icon: "◉", label: "OPERATOR + TREND", cls: "hc-op", l: true, tip: "Operator identity, class and observed Signa Rate trend" },
+    { icon: "∑", label: "TOTAL", cls: "hc-tot", k: "Total", tip: "I + O + W + R" },
+    { icon: "∑", label: "∑/DAY", cls: "hc-day", k: "∑/Day", tip: "Exact-calendar processed tokens per day" },
+    { icon: "Υ", label: "YIELD", cls: "hc-yield", k: "Yield" },
+    { icon: "▲", label: "SNR", cls: "hc-snr", k: "SNR" },
+    { icon: "⚡", label: "VELOCITY", cls: "hc-vel", k: "Velocity" },
+    { icon: "⚙", label: "LEVERAGE", cls: "hc-lev", k: "Leverage" },
+    { icon: "✧", label: "10×DEV", cls: "hc-dev", k: "10xDEV" },
+    { icon: "⋮", label: "OP RATIO", cls: "hc-opratio", k: "Op Ratio", tip: "Full three-term operating ratio" },
+    { icon: "◌", label: "EFF", cls: "hc-eff", k: "Efficiency" },
+    { icon: "$", label: "$/1M", cls: "hc-cost", k: "$/1M" },
+    { icon: "⬡", label: "PLATFORM", cls: "hc-platform", tip: "Actual submitted platforms, not rollup 'multi'" },
+    { icon: "◷", label: "LAST", cls: "hc-last" },
   ],
   raw: [
-    { icon: "#", label: "RANK", cls: "hc-rank", l: true, tip: "Rank position in this window" },
-    { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true, tip: "Operator — display name, codename & location" },
-    { icon: "◈", label: "CLASS", cls: "hc-class", tip: "Signal class tier" },
-    { icon: "→", label: "INPUT", cls: "hc-i", k: "Input", tip: "Prompt tokens sent (I)" },
-    { icon: "←", label: "OUTPUT", cls: "hc-o", k: "Output", tip: "Tokens generated (O)" },
-    { icon: "↺", label: "CACHE-READ", cls: "hc-cr", k: "Cache-read", tip: "Cache-hit tokens read (R)" },
-    { icon: "✎", label: "CACHE-WRITE", cls: "hc-cw", k: "Cache-write", tip: "Cache-miss tokens written (W)" },
-    { icon: "∑", label: "TOKENS", cls: "hc-tot", k: "Total", tip: "Total observed tokens (I+O+W+R)" },
-    { icon: "$", label: "/1M", cls: "hc-cost", k: "$/1M", tip: "Cost per 1M tokens — lower is better" },
-    { icon: "⬡", label: "PLATFORM", cls: "hc-platform", tip: "Primary AI surface" },
-    { icon: "◷", label: "LAST", cls: "hc-last", tip: "Days since the last snapshot" },
-    { icon: "↗", label: "TREND", cls: "hc-trend", tip: "Yield history sparkline" },
+    { icon: "#", label: "RANK", cls: "hc-rank", l: true },
+    { icon: "◉", label: "OPERATOR + TREND", cls: "hc-op", l: true },
+    { icon: "→", label: "INPUT", cls: "hc-i", k: "Input" },
+    { icon: "←", label: "OUTPUT", cls: "hc-o", k: "Output" },
+    { icon: "✎", label: "CACHE-WRITE", cls: "hc-cw", k: "Cache-write" },
+    { icon: "↺", label: "CACHE-READ", cls: "hc-cr", k: "Cache-read" },
+    { icon: "∑", label: "TOTAL", cls: "hc-tot", k: "Total" },
+    { icon: "∑", label: "∑/DAY", cls: "hc-day", k: "∑/Day" },
+    { icon: "⋮", label: "OP RATIO", cls: "hc-opratio", k: "Op Ratio" },
+    { icon: "$", label: "TOTAL COST", cls: "hc-cost", k: "Total Cost", tip: "Total observed tokens × cost per million / 1,000,000" },
   ],
 };
 
@@ -248,6 +240,10 @@ export interface BoardRowProps {
   tt: TopSets;
   /** ∑ raw-volume rank for this operator index. */
   rawRank: number;
+  /** Secondary performance rank when the Raw mode is active. */
+  metricRank?: number;
+  /** Position in the current filtered top-three metric maps. */
+  metricIndex?: number;
   selected: boolean;
   onSelect: (i: number) => void;
   /** owner 2026-10-08 — quickview affordance: opens the aux peek rail for
@@ -263,6 +259,8 @@ export const BoardRow = memo(function BoardRow({
   colMode,
   tt,
   rawRank,
+  metricRank,
+  metricIndex,
   selected,
   onSelect,
   onPeek,
@@ -271,6 +269,9 @@ export const BoardRow = memo(function BoardRow({
   const viewLabel = viewMode === "ops" ? "Υ PERFORMANCE" : "10×DEV OUTLIER";
   const mark = viewMode === "ops" ? "▲" : "◆";
   const nc = o.nc;
+  const mi = metricIndex ?? i;
+  const day = o.ptpd ? (o.ptpd.endsWith("/d") ? o.ptpd.slice(0, -2) : o.ptpd) : "—";
+  const totalCost = o.cost === "—" ? "—" : (o.num.cost * o.num.total / 1_000_000).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
   return (
     <tr
       className={`${cls}${selected ? " sel-op" : ""}`.trim() || undefined}
@@ -297,11 +298,11 @@ export const BoardRow = memo(function BoardRow({
             {r <= 3 ? mark : ""}
             {r}
           </span>
-          <span className="r-sub">∑{rawRank}</span>
+          <span className="r-sub">{colMode === "metrics" ? "RAW #" + rawRank : "MET #" + (metricRank ?? "—")}</span>
           <div className="rtip">
             <b>{viewLabel} RANK</b> #{r}
             <br />
-            <b>∑ RAW-VOLUME RANK</b> #{rawRank}
+            <b>ALTERNATE RANK</b> {colMode === "metrics" ? "RAW #" + rawRank : "MET #" + (metricRank ?? "—")}
           </div>
         </div>
       </td>
@@ -345,6 +346,7 @@ export const BoardRow = memo(function BoardRow({
             <br />
             <span className="hd">
               {o.handle.startsWith("@") ? o.handle : o.codename}
+              {" · "}<span className="tag">{o.klass}</span>
             </span>
             {/* production parity: `◍ location` tertiary line under the
                 handle — operator-supplied public location, absent unless
@@ -352,6 +354,9 @@ export const BoardRow = memo(function BoardRow({
             {o.location ? (
               <span className="opl">◍ {o.location}</span>
             ) : null}
+          </span>
+          <span className="op-trend" title="Observed Signa Rate history; not Yield">
+            <Sparkline arr={o.trend ?? []} />
           </span>
           {onPeek && (
             <button
@@ -369,68 +374,40 @@ export const BoardRow = memo(function BoardRow({
           )}
         </div>
       </td>
-      <td>
-        <span className="tag">{o.klass}</span>
-      </td>
       {colMode === "metrics" ? (
         <>
-          <td className={`yv${tc(tt.yield, i)}`}>{nc ? "—" : o.yield}</td>
-          <td className={tc(tt.lev, i) || undefined}>{nc ? "—" : o.lev}</td>
-          <td className={tc(tt.vel, i) || undefined}>{nc ? "—" : o.vel}</td>
-          <td className={tc(tt.snr, i) || undefined}>{nc ? "—" : o.snr}</td>
-          <td className={tc(tt.dev, i) || undefined}>{nc ? "—" : o.dev}</td>
-          <td
-            className={tc(tt.tot, i) || undefined}
-            title={throughputTip(o)}
-          >
-            {o.total}
-            {/* production parity: the I·O·W·R pillar sub-line under Σ TOTAL
-                (LeaderboardTable.tsx renders the same breakdown; null on nc
-                rows per the contract). */}
-            {o.pillars ? (
-              <span
-                className="pils"
-                title="Raw pillars: I=input · O=output · W=cache-write · R=cache-read"
-              >
-                I {o.pillars.i} · O {o.pillars.o} · W {o.pillars.w} · R{" "}
-                {o.pillars.r}
-              </span>
-            ) : null}
-          </td>
-          <td className={tc(tt.cost, i) || undefined}>{o.cost}</td>
+          <td className={tc(tt.tot, mi) || undefined}>{o.total}</td>
+          <td className={tc(tt.day, mi) || undefined} title={throughputTip(o)}>{day}</td>
+          <td className={"yv" + tc(tt.yield, mi)}>{nc ? "—" : (o.tableYield ?? o.yield)}</td>
+          <td className={tc(tt.snr, mi) || undefined}>{o.snr.toFixed(3)}</td>
+          <td className={tc(tt.vel, mi) || undefined}>{o.vel.toFixed(2)}</td>
+          <td className={tc(tt.lev, mi) || undefined}>{nc ? "—" : o.lev}</td>
+          <td className={tc(tt.dev, mi) || undefined}>{nc ? "—" : o.dev.toFixed(2)}</td>
+          <td className={tc(tt.ratio, mi) || undefined}>{o.opratioFull ?? o.opratio ?? "—"}</td>
+          <td className={tc(tt.eff, mi) || undefined}>{o.tableEff ?? o.eff}</td>
+          <td className={tc(tt.cost, mi) || undefined}>{o.cost}</td>
         </>
       ) : (
         <>
-          <td className={tc(tt.i, i) || undefined}>{o.raw.i}</td>
-          <td className={tc(tt.o, i) || undefined}>{o.raw.o}</td>
-          <td className={tc(tt.cr, i) || undefined}>{o.raw.cr}</td>
-          <td className={tc(tt.cw, i) || undefined}>{o.raw.cw}</td>
-          <td
-            className={tc(tt.tot, i) || undefined}
-            title={throughputTip(o)}
-          >
-            {o.total}
-            {o.pillars ? (
-              <span
-                className="pils"
-                title="Raw pillars: I=input · O=output · W=cache-write · R=cache-read"
-              >
-                I {o.pillars.i} · O {o.pillars.o} · W {o.pillars.w} · R{" "}
-                {o.pillars.r}
-              </span>
-            ) : null}
-          </td>
-          <td className={tc(tt.cost, i) || undefined}>{o.cost}</td>
+          <td className={tc(tt.i, mi) || undefined}>{o.raw.i}</td>
+          <td className={tc(tt.o, mi) || undefined}>{o.raw.o}</td>
+          <td className={tc(tt.cw, mi) || undefined}>{o.raw.cw}</td>
+          <td className={tc(tt.cr, mi) || undefined}>{o.raw.cr}</td>
+          <td className={tc(tt.tot, mi) || undefined}>{o.total}</td>
+          <td className={tc(tt.day, mi) || undefined}>{day}</td>
+          <td className={tc(tt.ratio, mi) || undefined}>{o.opratioFull ?? o.opratio ?? "—"}</td>
+          <td className={tc(tt.totalCost, mi) || undefined}>{totalCost}</td>
         </>
       )}
-      <td>
-        {o.platform}
-        {o.wf ? <span className="wftag">{o.wf.toUpperCase()}</span> : null}
-      </td>
-      <td>{o.last}</td>
-      <td>
-        <Sparkline arr={o.trend ?? []} />
-      </td>
+      {colMode === "metrics" && (
+        <>
+          <td title={(o.platforms ?? []).join(", ")}>
+            {(o.platforms?.length ? o.platforms.join(" · ") : o.platform)}
+            <span className="wftag">{o.wf ?? "hitl"}{o.wfProvisional ? "*" : ""}</span>
+          </td>
+          <td>{o.last}</td>
+        </>
+      )}
     </tr>
   );
 });

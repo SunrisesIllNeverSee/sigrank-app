@@ -585,6 +585,49 @@ export function LiveBoardWorkspace({
 
   /* ---------- field data (all client-side over the supplied array) --- */
   const [extraOps, setExtraOps] = useState<LiveOperator[]>([]);
+  const [trendsByCode, setTrendsByCode] = useState<Record<string, number[]>>({});
+  const [signupSummary, setSignupSummary] = useState<{
+    registered_total: number; ranked_total: number; unranked_total: number;
+    next_member_position: number; as_of: string;
+    members: Array<{
+      position: number;
+      board_status: "unranked";
+      workflow_mode: null;
+      display_group: "autonomous";
+      workflow_provenance: "unassessed_grouping";
+      identity_status: "not_publicly_listed";
+      display_label: "SIGNED-UP OPERATOR";
+    }>;
+  } | null>(null);
+
+  // Two bounded calls for the whole board; never N+1 fetches per operator.
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    setTrendsByCode({});
+    fetch("/api/v1/board/trends?window=" + encodeURIComponent(initial.meta.window), { signal: controller.signal })
+      .then((r) => { if (!r.ok) throw new Error("history unavailable"); return r.json(); })
+      .then((v) => { if (active && v?.metric === "signa_rate" && v.trends) setTrendsByCode(v.trends); })
+      .catch(() => {});
+    return () => { active = false; controller.abort(); };
+  }, [initial.meta.window]);
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    fetch("/api/v1/board/signup-summary", { signal: controller.signal })
+      .then((r) => { if (!r.ok) throw new Error("registration aggregate unavailable"); return r.json(); })
+      .then((v) => {
+        // Fail closed if a partial or inconsistent account list is returned.
+        if (active && Number.isInteger(v?.ranked_total) &&
+            Number.isInteger(v?.unranked_total) &&
+            Array.isArray(v?.members) &&
+            v.members.length === v.unranked_total &&
+            v.members.every((m: { position?: number }, i: number) =>
+              m.position === v.next_member_position + i)) setSignupSummary(v);
+      }).catch(() => {});
+    return () => { active = false; controller.abort(); };
+  }, []);
+
   const baseOps = useMemo(
     () =>
       extraOps.length
@@ -615,17 +658,21 @@ export function LiveBoardWorkspace({
     let touched = false;
     const next = baseOps.map((o) => {
       const e = details[detailKey(o.codename)];
+      let candidate = o;
       if (e?.status === "ready" && e.detail) {
         touched = true;
-        return mergeDetail(o, e.detail);
+        candidate = mergeDetail(o, e.detail);
       }
-      return o;
+      const history = trendsByCode[o.codename];
+      if (history?.length >= 2 && candidate.trend.length < 2) {
+        touched = true;
+        candidate = { ...candidate, trend: history };
+      }
+      return candidate;
     });
     return touched ? next : baseOps;
-  }, [baseOps, details, detailKey]);
+  }, [baseOps, details, detailKey, trendsByCode]);
   const rmax = useMemo(() => rmaxOf(initial.fieldMax), [initial.fieldMax]);
-  const tt = useMemo(() => computeTT(ops), [ops]);
-  const rawRank = useMemo(() => rawRankMap(ops), [ops]);
 
   /* ---------- board state ---------- */
   const [colMode, setColMode] = useState<ColMode>("metrics");
@@ -641,9 +688,9 @@ export function LiveBoardWorkspace({
      middle pill and means the COMBINED view (both workflow types + the
      unresolved field — replaces the old "All"), and is the default on
      open. hitl/agentic = only rows carrying that resolved mode. */
-  const [wfSel, setWfSel] = useState<"hybrid" | "hitl" | "agentic">(
-    "hybrid",
-  );
+  // Owner: only HITL / Hybrid / Autonomous, default Hybrid = combined view.
+  // A specifically classified HYBRID operator still requires both evidence axes.
+  const [wfSel, setWfSel] = useState<"hybrid" | "hitl" | "agentic">("hybrid");
   const [sortSel, setSortSel] = useState<string>(CONTROLS.sorts[0]);
   /* sortFlip = header-click direction toggle (owner: sortable columns);
      re-clicking the active column flips asc/desc off SORT_ASC's default. */
@@ -949,11 +996,21 @@ export function LiveBoardWorkspace({
       );
     }
     if (wfSel !== "hybrid") {
-      arr = arr.filter(([o]) => o.wf === wfSel);
+      arr = arr.filter(([o]) => {
+        // PRESENTATION COHORTS (not verification): original HCM rows resolve
+        // as HITL. Unresolved rows are legacy outlier candidates for the
+        // Autonomous review tab; null mode does NOT mean proven autonomy.
+        // Owner requested a later independent threshold audit before rollout.
+        if (wfSel === "hitl") return o.wf === "hitl" || o.wf === "hybrid";
+        return o.wf === "agentic" || o.wf === "hybrid" || o.wf === null;
+      });
     }
     if (platformSel !== "All Platforms") {
       const key = platformSel.toLowerCase().split(" ")[0];
-      arr = arr.filter(([o]) => o.platform.toLowerCase().includes(key));
+      arr = arr.filter(([o]) => {
+        const submitted = (o.platforms ?? []).map((p) => p.toLowerCase());
+        return submitted.includes(key) || (!submitted.length && o.platform.toLowerCase() === key);
+      });
     }
     if (viewMode === "out") {
       return [...arr].sort((a, b) =>
@@ -969,6 +1026,19 @@ export function LiveBoardWorkspace({
     }
     return arr;
   }, [ops, search, classSel, platformSel, wfSel, viewMode, sortSel, sortFlip]);
+
+  // Podium boxes and secondary ranks follow the same filtered population.
+  // Never index top-3 sets by the unfiltered operator-array index.
+  const visibleOperators = useMemo(() => ordered.map(([o]) => o), [ordered]);
+  const tt = useMemo(() => computeTT(visibleOperators), [visibleOperators]);
+  const rawRank = useMemo(() => rawRankMap(visibleOperators), [visibleOperators]);
+  const metricRank = useMemo(() => {
+    const result: Record<number, number> = {};
+    visibleOperators.map((o, i) => [i, o.num.yield] as const)
+      .sort((a, b) => b[1] - a[1] || a[0] - b[0])
+      .forEach(([i], rank) => { result[i] = rank + 1; });
+    return result;
+  }, [visibleOperators]);
 
   /* ---------- chrome state ---------- */
   /* railOn = right inspector rail visibility — explicit toggle only (VS
@@ -1155,9 +1225,9 @@ export function LiveBoardWorkspace({
       "last_snapshot",
       "verification",
     ];
-    const lines = ordered.map(([o, i], d) =>
+    const lines = ordered.map(([o], d) =>
       [
-        viewMode === "ops" ? i + 1 : d + 1,
+        d + 1,
         o.name,
         o.codename,
         o.handle,
@@ -1193,7 +1263,7 @@ export function LiveBoardWorkspace({
       format: "csv",
       rows: ordered.length,
     });
-  }, [ordered, viewMode, initial.meta.window]);
+  }, [ordered, initial.meta.window]);
 
   /* account chip — prop override wins (demo); else real session state:
      loading → neutral, signed out → sign-in affordance, unlinked → claim,
@@ -2056,7 +2126,7 @@ export function LiveBoardWorkspace({
                       liveTrack.modeChanged("agentic");
                     }}
                   >
-                    Agentic
+                    Autonomous
                   </button>
                 </div>
                 {/* owner 2026-10-06: dropdown labels removed — the selects
@@ -2158,11 +2228,13 @@ export function LiveBoardWorkspace({
                             key={`${i}-${o.codename}`}
                             o={o}
                             i={i}
-                            r={viewMode === "ops" ? i + 1 : pageStart + d + 1}
+                            r={pageStart + d + 1}
                             viewMode={viewMode}
                             colMode={colMode}
                             tt={tt}
-                            rawRank={rawRank[i] ?? i + 1}
+                            rawRank={rawRank[pageStart + d] ?? pageStart + d + 1}
+                            metricRank={metricRank[pageStart + d] ?? pageStart + d + 1}
+                            metricIndex={pageStart + d}
                             selected={selected === i}
                             onSelect={handleSelect}
                             onPeek={handlePeek}
@@ -2170,7 +2242,7 @@ export function LiveBoardWorkspace({
                         ))}
                         {ordered.length === 0 && (
                           <tr className="board-empty">
-                            <td colSpan={colMode === "metrics" ? 13 : 11}>
+                            <td colSpan={colMode === "metrics" ? 14 : 10}>
                               {fieldState === "loading"
                                 ? "⟳ SYNCING FIELD…"
                                 : filtered
@@ -2178,6 +2250,55 @@ export function LiveBoardWorkspace({
                                   : "— NO OPERATORS IN THIS SCOPE"}
                             </td>
                           </tr>
+                        )}
+                        {(wfSel !== "hitl") && (pageNow === lastPage || ordered.length === 0) && (
+                          <>
+                            <tr className="unranked-band">
+                              <td colSpan={colMode === "metrics" ? 14 : 10}>
+                                SIGNED UP · NOT YET RANKED
+                                <span className="unranked-count">
+                                  {" · "}{signupSummary ? signupSummary.unranked_total + " MEMBERS" : "SYNCING ACCOUNTS"}
+                                </span>
+                                {" · "}STARTING #{signupSummary?.next_member_position ?? "—"}
+                                <span className="unranked-privacy">
+                                  REGISTERED POSITIONS, NOT PERFORMANCE RANKS
+                                </span>
+                              </td>
+                            </tr>
+                            {signupSummary?.members.map((member) => (
+                              <tr key={"registered-position-" + member.position}
+                                className="unranked-member"
+                                data-member-position={member.position}>
+                                <td>
+                                  <div className="ranks">
+                                    <span className="r-main">{member.position}</span>
+                                    <span className="r-sub">UNRANKED</span>
+                                  </div>
+                                </td>
+                                <td className="l">
+                                  <div className="op">
+                                    <span className="av unranked-avatar" aria-hidden>◌</span>
+                                    <span>
+                                      <span className="nm">SIGNED-UP OPERATOR</span>
+                                      <br />
+                                      <span className="hd">MEMBER #{member.position} · PRIVATE IDENTITY</span>
+                                      <br />
+                                      <span className="unranked-provisional">AUTONOMOUS QUEUE · UNASSESSED</span>
+                                    </span>
+                                  </div>
+                                </td>
+                                {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (
+                                  <td key={k} className="unranked-na">—</td>
+                                ))}
+                                {colMode === "metrics" && (
+                                  <>
+                                    <td className="unranked-provisional">HITL*</td>
+                                    <td className="unranked-na">—</td>
+                                  </>
+                                )}
+                              </tr>
+                            ))}
+                          </>
                         )}
                       </tbody>
                     </table>
