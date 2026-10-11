@@ -1,25 +1,29 @@
 /**
  * app/user/[codename]/ProfileBody.tsx — streaming body for the operator profile.
  *
- * This component fetches the 5 heavy data queries (history, submissions,
- * operatorReport, leaderboard, hallOfSignal) and renders the chart panels,
- * records, and tabs. It's wrapped in a <Suspense> boundary by the parent
- * page so the header + basic stats render immediately (FCP) while this
- * body streams in as the data resolves.
+ * V2 (2026-10-10): rebuilt to the approved profile-mock design. Seven tab
+ * panels (Overview / Stats / Analysis / Report / Lab / Submissions / Social)
+ * rendered by dedicated profile-v2 components. The 5 parallel fetches are
+ * unchanged — this component still streams inside the Suspense boundary in
+ * page.tsx so the identity header renders on the critical path.
  *
- * PERF (2026-08-28): extracted from page.tsx to enable React streaming.
- * The parent page renders the header + identity info with just getOperator
- * (critical path), then streams this body via Suspense. This cuts FCP from
- * ~5s (waiting for all 8 queries) to ~0.5s (waiting for 1 query + header render).
+ * Data map:
+ *   overview    → OverviewView    (hero + cascade row + raw row + signal&token + heatmap + records)
+ *   stats       → StatsView       (5 raw data tables — no charts)
+ *   analysis    → AnalysisView    (scatter + archetype + vs-field + deltas + records)
+ *   report      → ReportTabGate   (owner-only)
+ *   lab         → LabTabGate      (owner-only)
+ *   submissions → SubmissionsView (platform grid + history + timeline + windows)
+ *   social      → SocialView      (identity + bio + links + badges + share)
  */
 
 import Link from "next/link";
 
 import {
-  getLeaderboard,
   getOperatorHistory,
   getOperatorSubmissions,
   getOperatorReport,
+  getLeaderboard,
   getHallOfSignal,
 } from "@/lib/board";
 import type { HallRecord } from "@/lib/board";
@@ -28,46 +32,21 @@ import { buildArchetypeOf } from "@/lib/analytics/build-archetypes";
 import { computeTrophyCounts } from "@/lib/analytics/trophy-counts";
 import { computeTierProgress } from "@/lib/analytics/tier-progress";
 import type { Operator } from "@/lib/analytics/scoring-types";
-import { SignalClassBadge } from "@/components/sigrank";
-import { CascadePanel } from "@/components/profile/CascadePanel";
-import { SubmissionsGrid } from "@/components/profile/SubmissionsGrid";
-import { SnapshotHistory } from "@/components/profile/SnapshotHistory";
-import { ProfileTabs } from "@/components/profile/ProfileTabs";
-import { OperatorRecords } from "@/components/profile/OperatorRecords";
-import { OverviewTab } from "@/components/profile/OverviewTab";
+import type { LeaderboardRow } from "@/lib/board";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { operatorProfile } from "@/lib/jsonld";
 import { ProfileAuthGate } from "@/components/profile/ProfileAuthGate";
 import { ClaimTabGate, ReportTabGate, LabTabGate } from "@/components/profile/ProfileAuthGates";
 import { DeferredSplitFlapCard } from "@/components/profile/DeferredSplitFlapCard";
-import { ClaimedBadge } from "@/components/claim/ClaimedBadge";
-import CascadeRadar from "@/components/charts/CascadeRadar";
-import OperatingRatioBar from "@/components/charts/OperatingRatioBar";
-import EvolutionLine from "@/components/charts/EvolutionLine";
-import KpiTile from "@/components/charts/KpiTile";
-import HeatBar from "@/components/charts/HeatBar";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { operatorProfile } from "@/lib/jsonld";
-import type { LeaderboardRow } from "@/lib/board";
+import { ProfileTabsV2 } from "@/components/profile-v2/ProfileTabsV2";
+import { OverviewView } from "@/components/profile-v2/OverviewView";
+import StatsView from "@/components/profile-v2/StatsView";
+import { AnalysisView } from "@/components/profile-v2/AnalysisView";
+import { SubmissionsView } from "@/components/profile-v2/SubmissionsView";
+import { SocialView } from "@/components/profile-v2/SocialView";
 
 function resolveName(operator: Operator): string {
   return operator.display_name ?? operator.codename;
-}
-
-/** One labeled row in the identity / stats rail. */
-function Stat({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-        {label}
-      </span>
-      <span className="font-mono text-sm text-text-primary">{children}</span>
-    </div>
-  );
 }
 
 export async function ProfileBody({
@@ -81,9 +60,9 @@ export async function ProfileBody({
   const pending = row.pending ?? false;
   const codename = operator.codename;
 
-  // PERF: 5 parallel fetches — all independent after getOperator.
-  // getLeaderboard is the heaviest (~2.5MB, memo-cached 300s).
-  // getHallOfSignal is cached 300s. The rest are operator-scoped (90-240s).
+  // 5 parallel fetches — all independent after getOperator.
+  // getLeaderboard is the heaviest (~2.5MB, memo-cached 3600s).
+  // getHallOfSignal is unstable_cache'd at 300s. The rest are operator-scoped.
   const [
     history,
     submissions,
@@ -111,94 +90,9 @@ export async function ProfileBody({
     operatorHallNames.has(r.operator_codename),
   );
 
-  const topOperator = boardRows.find(
-    (r) => r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
-  );
-  const opYield = c && !c.nonCompounding ? c.yield_ : null;
-  const fieldAvgYield = fieldAvg.yield_;
-  const topYield = topOperator?.snapshot.cascade?.yield_ ?? null;
-  const deltaFromAvg =
-    opYield != null && fieldAvgYield != null && fieldAvgYield > 0
-      ? ((opYield - fieldAvgYield) / fieldAvgYield) * 100
-      : null;
-  const deltaFromTop =
-    opYield != null && topYield != null && topYield > 0
-      ? ((topYield - opYield) / topYield) * 100
-      : null;
-
   const ranked = !pending && c && !c.nonCompounding;
 
-  const evolutionPoints = history.map((h) => ({
-    date: h.date.slice(5),
-    value: h.signa_rate,
-  }));
-  const evolutionLabel =
-    evolutionPoints.length > 1
-      ? "Score trajectory"
-      : "Score trajectory (single snapshot — no trend yet)";
-
-  const radarAxes = c
-    ? [
-        { label: "SNR", value: c.snr, max: 1 },
-        { label: "Velocity", value: c.velocity, max: 50 },
-        { label: "Leverage", value: c.leverage, max: 200 },
-        { label: "10xDEV", value: c.dev10x ?? 0, max: 5 },
-        { label: "Scale V", value: c.scaleV, max: 9 },
-        { label: "Efficiency", value: c.efficiency, max: 5 },
-      ]
-    : [];
-
-  const rawMax = Math.max(
-    telemetry.fresh_input,
-    telemetry.output,
-    telemetry.cache_read,
-    telemetry.cache_create,
-    1,
-  );
-  const rawRadarAxes = [
-    { label: "Input", value: telemetry.fresh_input, max: rawMax },
-    { label: "Output", value: telemetry.output, max: rawMax },
-    { label: "Cache R", value: telemetry.cache_read, max: rawMax },
-    { label: "Cache W", value: telemetry.cache_create, max: rawMax },
-  ];
-
-  type HeatRow = {
-    label: string;
-    width: number;
-    heat: number;
-    display: string;
-  };
-  const heatRows: HeatRow[] = c
-    ? [
-        {
-          label: "SNR",
-          width: c.snr,
-          heat: c.snr,
-          display: `${(c.snr * 100).toFixed(0)}%`,
-        },
-        {
-          label: "Velocity",
-          width: Math.min(1, c.velocity / 50),
-          heat: Math.min(1, c.velocity / 50),
-          display: c.velocity.toFixed(1),
-        },
-        {
-          label: "Leverage",
-          width: Math.min(1, c.leverage / 200),
-          heat: Math.min(1, c.leverage / 200),
-          display: c.leverage.toFixed(1),
-        },
-        {
-          label: "Efficiency",
-          width: Math.min(1, c.efficiency / 5),
-          heat: Math.min(1, c.efficiency / 5),
-          display: c.efficiency.toFixed(2),
-        },
-      ]
-    : [];
-
   const name = resolveName(operator);
-  const hasDisplayName = name !== operator.codename;
 
   const isPrivate = operator.profile_visibility === "private";
   const viewerRedacted = isPrivate && !isOwner;
@@ -223,280 +117,20 @@ export async function ProfileBody({
     ? computeTierProgress(snapshot.class_tier, totalTokens)
     : null;
 
-  // ── Stats tab ─────────────────────────────────────────────────────────────
+  // Watch count — read from the watch API shape; placeholder 0 until the
+  // profile-level watch fetch lands. The board's inspector already has this.
+  const watchCount = 0;
+
+  // ── Pending state panels ──────────────────────────────────────────────────
   const pendingPanel = (
     <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
       <span className="font-mono text-2xl text-text-dim">Υ</span>
       <p className="font-mono text-sm text-text-primary">Not ranked yet</p>
       <p className="max-w-sm font-sans text-xs leading-relaxed text-text-secondary">
-        Your profile is live, but you’re not on the board until a verified
+        Your profile is live, but you&rsquo;re not on the board until a verified
         cascade lands. Connect the local agent to submit your token cascade and
         earn a Υ Yield and class.
       </p>
-    </div>
-  );
-
-  const rankedStatsPanel = (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-2 gap-4 rounded-lg border border-bg-border bg-bg-surface p-4 sm:grid-cols-4">
-        <Stat label="Global rank">#{row.global_rank}</Stat>
-        <div className="flex flex-col gap-1">
-          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-            Percentile
-          </span>
-          <span className="font-mono text-sm text-text-primary">
-            Top {topPct.toFixed(2)}%
-          </span>
-          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
-            <div
-              className="h-full rounded-full bg-gold"
-              style={{ width: `${topPct}%` }}
-            />
-          </div>
-        </div>
-        <Stat label="Platform">{operator.primary_domain}</Stat>
-        <Stat label="Account age">{operator.account_age_days} days</Stat>
-        <Stat label="Lifetime turns">
-          {operator.total_messages_lifetime.toLocaleString("en-US")}
-        </Stat>
-      </div>
-
-      {ranked && (deltaFromAvg != null || deltaFromTop != null) && (
-        <div className="flex flex-wrap gap-4 rounded-lg border border-bg-border bg-bg-surface p-4">
-          {deltaFromAvg != null && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                vs. field average
-              </span>
-              <span
-                className={`font-mono text-sm ${deltaFromAvg >= 0 ? "text-gold" : "text-text-secondary"}`}
-              >
-                {deltaFromAvg >= 0 ? "▲" : "▼"} {Math.abs(deltaFromAvg).toFixed(1)}%{" "}
-                {deltaFromAvg >= 0 ? "above" : "below"} average
-              </span>
-            </div>
-          )}
-          {deltaFromTop != null && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                vs. top operator
-              </span>
-              <span className="font-mono text-sm text-text-secondary">
-                {deltaFromTop > 0 ? "▼" : "▲"} {Math.abs(deltaFromTop).toFixed(1)}%{" "}
-                {deltaFromTop > 0 ? "below" : "at"} top
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      <CascadePanel cascade={snapshot.cascade ?? null} />
-
-      {c && !c.nonCompounding && (
-        <section className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-4">
-          <h3 className="font-mono text-[11px] uppercase tracking-[0.06em] text-text-muted">
-            Cascade fingerprint
-          </h3>
-
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <KpiTile
-              label="Υ Yield"
-              glyph="Υ"
-              value={
-                c.yield_ >= 1_000
-                  ? `${(c.yield_ / 1_000).toFixed(1)}K`
-                  : c.yield_.toFixed(1)
-              }
-              accent
-            />
-            <KpiTile label="SNR" value={`${(c.snr * 100).toFixed(1)}%`} />
-            <KpiTile
-              label="Velocity"
-              value={
-                c.velocity >= 10 ? c.velocity.toFixed(1) : c.velocity.toFixed(2)
-              }
-            />
-            <KpiTile
-              label="Leverage"
-              value={
-                c.leverage >= 1_000
-                  ? `${(c.leverage / 1_000).toFixed(1)}K`
-                  : c.leverage.toFixed(1)
-              }
-            />
-            <KpiTile
-              label="10xDEV"
-              glyph="⚡"
-              value={c.dev10x !== null ? c.dev10x.toFixed(2) : "—"}
-              accent={c.dev10x !== null && c.dev10x >= 3.0}
-            />
-            <KpiTile label="Scale V" value={c.scaleV.toFixed(2)} />
-            <KpiTile label="$ / 1M" value={`$${c.costPerMillion.toFixed(2)}`} />
-            <KpiTile label="Efficiency" value={`${c.efficiency.toFixed(2)}×`} />
-            <KpiTile label="Op Ratio" value={c.opRatio} />
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
-            <div className="flex flex-col items-center gap-5">
-              <div className="flex flex-col items-center gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                  Cascade fingerprint
-                </span>
-                <CascadeRadar values={radarAxes} size={260} />
-                <p className="text-center font-sans text-[11px] leading-snug text-text-muted">
-                  The derived Υ-layer shape, each axis scaled to its display
-                  range.
-                </p>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                  Raw fuel
-                </span>
-                <CascadeRadar values={rawRadarAxes} size={260} />
-                <p className="text-center font-sans text-[11px] leading-snug text-text-muted">
-                  The four raw pillars, normalized to the largest — the shape of
-                  the fuel.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                  Operating ratio · {c.opRatio}
-                </span>
-                <OperatingRatioBar
-                  cacheRead={telemetry.cache_read}
-                  cacheCreate={telemetry.cache_create}
-                  input={telemetry.fresh_input}
-                  output={telemetry.output}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                  Υ-layer intensity
-                </span>
-                <HeatBar rows={heatRows} />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <EvolutionLine
-              points={evolutionPoints}
-              label={evolutionLabel}
-              width={720}
-              height={180}
-            />
-          </div>
-        </section>
-      )}
-    </div>
-  );
-
-  // ── Submissions tab ───────────────────────────────────────────────────────
-  const submissionsPanel =
-    submissions.length > 0 ? (
-      <>
-        <SubmissionsGrid submissions={submissions} />
-        {!isPrivate && <SnapshotHistory codename={codename} />}
-      </>
-    ) : (
-      <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-bg-border bg-bg-surface px-6 py-12 text-center">
-        <span className="font-mono text-2xl text-text-dim">◈</span>
-        <p className="font-mono text-sm text-text-primary">
-          No submissions yet
-        </p>
-        <p className="max-w-sm font-sans text-xs leading-relaxed text-text-secondary">
-          Verified cascade submissions feed the leaderboard via the local agent.
-          Once you submit, every platform × window you run will appear here as a
-          grid.
-        </p>
-      </div>
-    );
-
-  // ── Social tab ────────────────────────────────────────────────────────────
-  const handle_ = viewerRedacted ? null : operator.handle;
-  const bio_ = viewerRedacted ? null : operator.bio;
-  const location_ = viewerRedacted ? null : operator.location;
-  const links_ = viewerRedacted ? null : operator.links;
-  const hasLinks = Boolean(
-    links_ && (links_.github || links_.site || links_.x),
-  );
-  const hasSocial = Boolean(
-    location_ || bio_ || hasLinks || handle_,
-  );
-
-  const socialPanel = (
-    <div className="flex flex-col gap-5 rounded-lg border border-bg-border bg-bg-surface p-5">
-      {viewerRedacted ? (
-        <p className="font-sans text-sm text-text-secondary">
-          This operator&apos;s profile is private. Only their codename, rank,
-          and computed metrics are visible.
-        </p>
-      ) : hasSocial ? (
-        <>
-          {handle_ && <Stat label="Handle">@{handle_}</Stat>}
-          {location_ && (
-            <Stat label="Location">{location_}</Stat>
-          )}
-          {bio_ && (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                About
-              </span>
-              <p className="font-sans text-sm leading-relaxed text-text-secondary">
-                {bio_}
-              </p>
-            </div>
-          )}
-          {hasLinks && links_ && (
-            <div className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-                Links
-              </span>
-              <div className="flex flex-wrap gap-3">
-                {links_.github && (
-                  <a
-                    href={`https://github.com/${links_.github}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
-                  >
-                    github
-                  </a>
-                )}
-                {links_.x && (
-                  <a
-                    href={`https://x.com/${links_.x}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
-                  >
-                    x.com
-                  </a>
-                )}
-                {links_.site && (
-                  <a
-                    href={links_.site}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-text-secondary transition-colors hover:text-text-primary"
-                  >
-                    site
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <p className="font-sans text-sm text-text-secondary">
-          {operator.claimed
-            ? "No profile details yet — add a handle, location, bio, and links from your profile editor."
-            : "This operator hasn’t added a bio, location, or links."}
-        </p>
-      )}
     </div>
   );
 
@@ -534,44 +168,68 @@ export async function ProfileBody({
           costPerMillion={c.costPerMillion}
           opRatio={c.opRatio}
           cascadeStr={c.cascadeStr}
-          radarAxes={radarAxes}
+          radarAxes={[]}
           fieldAvg={fieldAvg}
         />
       )}
 
-      <OperatorRecords
-        codename={operator.codename}
-        display_name={displayName ?? undefined}
-        boardRows={boardRows}
-      />
-
       <ProfileAuthGate codename={operator.codename}>
         {!operator.claimed && <ClaimTabGate codename={operator.codename} />}
 
-        <ProfileTabs
+        <ProfileTabsV2
           overview={
-            ranked ? (
-              <OverviewTab
-                history={history}
-                classTier={snapshot.class_tier}
-                archetype={archetype}
-                cascade={c ?? null}
-                fieldAvgYield={fieldAvgYield}
+            <OverviewView
+              operator={operator}
+              snapshot={snapshot}
+              telemetry={telemetry}
+              globalRank={row.global_rank}
+              topPct={topPct}
+              pending={pending}
+              ranked={!!ranked}
+              archetype={archetype}
+              tierProgress={tierProgress}
+              trophyCounts={trophyCounts}
+              records={operatorRecords}
+              watchCount={watchCount}
+              boardRows={boardRows}
+              history={history}
+            />
+          }
+          stats={
+            pending ? (
+              pendingPanel
+            ) : (
+              <StatsView
+                operator={operator}
+                snapshot={snapshot}
+                telemetry={telemetry}
                 globalRank={row.global_rank}
                 topPct={topPct}
-                platform={operator.primary_domain}
-                accountAgeDays={operator.account_age_days}
-                lifetimeTurns={operator.total_messages_lifetime}
-                deltaFromAvg={deltaFromAvg}
-                deltaFromTop={deltaFromTop}
-                trophyCounts={trophyCounts}
-                tierProgress={tierProgress}
+                ranked={!!ranked}
+                history={history}
+                fieldAvg={fieldAvg}
                 boardRows={boardRows}
-                operatorCodename={codename}
+                watchCount={watchCount}
+              />
+            )
+          }
+          analysis={
+            ranked ? (
+              <AnalysisView
+                operator={operator}
+                snapshot={snapshot}
+                telemetry={telemetry}
+                globalRank={row.global_rank}
+                topPct={topPct}
+                ranked={!!ranked}
+                archetype={archetype}
+                fieldAvg={fieldAvg}
+                boardRows={boardRows}
+                history={history}
+                records={operatorRecords}
               />
             ) : undefined
           }
-          stats={pending ? pendingPanel : rankedStatsPanel}
           report={operatorReport ? (
             <ReportTabGate report={operatorReport} archetype={archetype} />
           ) : undefined}
@@ -587,8 +245,22 @@ export async function ProfileBody({
               />
             ) : undefined
           }
-          submissions={submissionsPanel}
-          social={socialPanel}
+          submissions={
+            <SubmissionsView
+              operator={operator}
+              submissions={submissions}
+              history={history}
+            />
+          }
+          social={
+            <SocialView
+              operator={operator}
+              snapshot={snapshot}
+              isOwner={isOwner}
+              records={operatorRecords}
+              trophyCounts={trophyCounts}
+            />
+          }
         />
       </ProfileAuthGate>
 
