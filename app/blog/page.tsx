@@ -59,6 +59,19 @@ export default async function BlogIndex() {
         editorialStage
         title="BLOG"
         bareTitle
+        hero={
+          <WaveHero
+            eyebrow="📊 SigRank"
+            terminalText="BLOG"
+            title="Blog"
+            subtitle={
+              <>
+                Guides, benchmarking walkthroughs, tool comparisons,
+                and practical updates for AI operators.
+              </>
+            }
+          />
+        }
         leftTitle="INDEX"
         topic="blog"
         left={<FieldFamilyNav current="blog" documents={posts.map(post => ({ label: post.title, href: "/blog/" + post.slug }))} />}
@@ -89,18 +102,7 @@ export default async function BlogIndex() {
         rightWidth={240}
         status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
       >
-        <WaveHero
-        eyebrow="📊 SigRank"
-        terminalText="BLOG"
-        title="Blog"
-        subtitle={
-          <>
-            Guides, benchmarking walkthroughs, tool comparisons,
-            and practical updates for AI operators.
-          </>
-        }
-      />
-      <div className="ws-doc" style={{ marginTop: 22 }}>
+      <div className="ws-doc ws-article-list">
 
       <div className="blog-index" id="ws-page-posts">
         {posts[0] && (

@@ -14,6 +14,7 @@
  */
 
 import React from "react";
+import "./StageReflow.css";
 import Link from "next/link";
 import {
   getTopOperatorColumn,
@@ -104,7 +105,8 @@ function buildDevRows(
 function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
   const ROWS = rows;
   return (
-    <div className="overflow-x-auto rounded-xl border border-gold/30 bg-bg-surface">
+    <div className="four-degrees-responsive">
+      <div className="four-degrees-desktop overflow-x-auto rounded-xl border border-gold/30 bg-bg-surface">
       <table className="w-full border-collapse font-mono text-lg sm:text-xl">
         <thead>
           <tr className="border-b border-bg-border">
@@ -153,6 +155,23 @@ function ComparisonTable({ rows }: { rows: ReturnType<typeof buildRows> }) {
           ))}
         </tbody>
       </table>
+      </div>
+      {/* Metric cards retain every compared value when the center Stage is narrow. */}
+      <div className="four-degrees-compact" aria-label="Four Degrees of Leverage comparison">
+        {ROWS.map((r) => (
+          <section key={r.metric} className="four-degrees-metric">
+            <h3>{r.metric}</h3>
+            <dl>
+              {r.vals.map((value, index) => (
+                <div key={COLS[index].label} className={index === r.winner ? "four-degrees-winner" : ""}>
+                  <dt>{COLS[index].label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
@@ -210,7 +229,8 @@ function ReferenceContext({ columns }: { columns: [GoldColumn, GoldColumn, GoldC
         The <Link href="/board/all" className="text-gold underline">Active Total board</Link>
         {" "}covers claimed operators and has its own field statistics.
       </p>
-      <div className="overflow-x-auto rounded-lg border border-bg-border">
+      <div className="four-degrees-telemetry">
+      <div className="four-degrees-telemetry-wide overflow-x-auto rounded-lg border border-bg-border">
         <table className="w-full font-mono text-xs">
           <caption className="px-3 py-2 text-left text-text-secondary">
             Average raw telemetry · tokens per included operator
@@ -233,6 +253,28 @@ function ReferenceContext({ columns }: { columns: [GoldColumn, GoldColumn, GoldC
             })}
           </tr>)}</tbody>
         </table>
+      </div>
+      <div className="four-degrees-telemetry-cards" aria-label="Average raw telemetry by operator cohort">
+        <p className="four-degrees-telemetry-title">Average raw telemetry · tokens per included operator</p>
+        {labels.map(([label, key]) => (
+          <section className="four-degrees-metric" key={key}>
+            <h3>{label}</h3>
+            <dl>
+              {columns.map((column, index) => {
+                const value = column.telemetry?.means[key];
+                return (
+                  <div key={COLS[index].label}>
+                    <dt>{COLS[index].label}</dt>
+                    <dd title={index === 0 ? "No observed absolute token counts" : (column.telemetry?.coverage[key] ?? 0) + " observed of " + (column.telemetry?.population ?? 0) + " operators"}>
+                      {index === 0 ? "Modeled" : value == null ? "—" : value.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </section>
+        ))}
+      </div>
       </div>
       <p className="text-[11px] leading-relaxed text-text-muted">
         Counts are arithmetic means, rounded to a token; the Top Evals column is one record.

@@ -54,6 +54,14 @@ export default async function ArticlesPage() {
       active="articles"
       editorialStage
       bareTitle
+      hero={
+        <WaveHero
+          eyebrow="◈ Publications · Analysis"
+          terminalText="ARTICLES"
+          title="Articles"
+          subtitle={<>Original essays and documented research on AI operators and token-cascade measurement. Source publications are indexed here without changing their canonical URLs.</>}
+        />
+      }
       title="ARTICLES"
       leftTitle="PUBLICATIONS"
       topic="articles"
@@ -89,12 +97,6 @@ export default async function ArticlesPage() {
     >
       <div className="ws-doc ws-article-list">
         <JsonLd data={breadcrumb([{ name: "Articles", path: "/articles" }])} />
-        <WaveHero
-          eyebrow="◈ Publications · Analysis"
-          terminalText="ARTICLES"
-          title="Articles"
-          subtitle={<>Original essays and documented research on AI operators and token-cascade measurement. Source publications are indexed here without changing their canonical URLs.</>}
-        />
         <div className="blog-index" id="all-articles">
           <div className="blog-list">
             {articles.map((article) => (

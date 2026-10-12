@@ -277,8 +277,14 @@ export function WorkspaceShell({
       suppressHydrationWarning
       style={
         {
-          ...(leftWidth ? { "--lside-w": `${leftWidth}px` } : {}),
-          ...(rightWidth ? { "--rail-w": `${rightWidth}px` } : {}),
+          // Compact editorial rails; users can still resize via the sash.
+          ...(editorialStage
+            ? { "--lside-w": Math.min(leftWidth ?? 208, 208) + "px",
+                "--rail-w": Math.min(rightWidth ?? 208, 208) + "px" }
+            : {
+                ...(leftWidth ? { "--lside-w": leftWidth + "px" } : {}),
+                ...(rightWidth ? { "--rail-w": rightWidth + "px" } : {}),
+              }),
         } as React.CSSProperties
       }
     >
@@ -415,6 +421,22 @@ export function WorkspaceShell({
                   {leftTitle}
                 </div>
                 <div className="rail">{left}</div>
+                <nav className="ws-rail-bottom-nav" aria-label="Page navigation">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.history.length > 1) router.back();
+                      else router.push("/");
+                    }}
+                    aria-label="Back to previous page"
+                    title="Back to previous page"
+                  >
+                    <span aria-hidden="true">←</span> BACK
+                  </button>
+                  <Link href="/" aria-label="Home — live leaderboard" title="Home — live leaderboard">
+                    <span aria-hidden="true">⌂</span> HOME
+                  </Link>
+                </nav>
               </aside>
             )}
 
