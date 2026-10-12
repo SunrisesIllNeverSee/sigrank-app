@@ -12,7 +12,10 @@ import { join } from "path";
 import matter from "gray-matter";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { WaveHero } from "@/components/ui/WaveHero";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
 
@@ -90,6 +93,42 @@ const STATIC_POSTS: PostSummary[] = [
     date: "2026-08-17",
     tags: [],
   },
+  {
+    slug: "ai-power-user-benchmarking",
+    title: "AI Power User Benchmarking with SigRank",
+    description: "How to benchmark yourself against other AI power users. SigRank's operator classes and yield metrics tell you if you're a power user — and how to become one.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "how-sigrank-measures-operator-efficiency",
+    title: "How SigRank Measures Operator Efficiency",
+    description: "The yield metric (Υ = cache_read × output / input²) measures how well AI operators convert tokens into useful output. Here's how it works and why it matters.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "the-tool-is-the-person",
+    title: "The Tool Is the Person",
+    description: "Every token the AI tool burns is a decision the person made. Measuring the tool IS measuring the person. Your token cascade is your skill signature.",
+    date: "2026-07-12",
+    tags: [],
+  },
+  {
+    slug: "token-cascade-vs-raw-token-consumption",
+    title: "Token Yield vs Token Count",
+    description: "Why token yield (Υ) — not raw token count — measures AI operator skill. Your token cascade is your skill signature. The tool is the person.",
+    date: "2026-07-07",
+    tags: [],
+  },
+  {
+    slug: "why-yield-beats-tokenmaxxing",
+    title: "Why Yield Beats Tokenmaxxing",
+    description: "Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator.",
+    date: "2026-07-07",
+    tags: [],
+  },
+
 ];
 
 async function getAllPosts(): Promise<PostSummary[]> {
@@ -100,6 +139,9 @@ async function getAllPosts(): Promise<PostSummary[]> {
       if (!file.endsWith(".md")) continue;
       const raw = await readFile(join(CONTENT_DIR, file), "utf-8");
       const { data } = matter(raw);
+      // Frontmatter-marked publications now have their own /articles index.
+      // Their original /blog/<slug> detail routes remain canonical.
+      if (data.type === "article") continue;
       posts.push({
         slug: file.replace(/\.md$/, ""),
         title: (data.title as string) ?? file,
@@ -119,7 +161,7 @@ async function getAllPosts(): Promise<PostSummary[]> {
 export const metadata: Metadata = withOG({
   title: "Blog — SigRank",
   description:
-    "Analysis and research on AI operator efficiency, token cascade economics, and outlier detection.",
+    "Practical guides, benchmarking walkthroughs, tool comparisons, and updates for AI operators.",
   path: "/blog",
 });
 
@@ -150,52 +192,126 @@ export default async function BlogIndex() {
           },
         ])}
       />
-      <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-          ◈ SigRank Blog
-        </p>
-        <h1 className="font-sans text-3xl font-bold text-text-primary md:text-4xl">
-          Analysis & Research
-        </h1>
-        <p className="text-base leading-relaxed text-text-secondary">
-          Deep dives into AI operator efficiency, the token cascade economy,
-          and outlier detection methodology.
-        </p>
-      </header>
+      {/* Blog index inside the shared SignalAF workspace shell — same
+          transfer contract as Hall/Compare/Wiki/Field: post index in the
+          left rail, the card list is the stage, right rail carries the
+          about module. */}
+      <WorkspaceShell
+        active="blog"
+        editorialStage
+        title="BLOG"
+        bareTitle
+        leftTitle="INDEX"
+        topic="blog"
+        left={<FieldFamilyNav current="blog" topicIndex={<>
+          <Link href="/blog" aria-current="page">All Posts</Link>
+{posts.map((post) => (
+                  <Link key={post.slug} href={`/blog/${post.slug}`}>
+                    {post.title}
+                    {post.date && (
+                      <span className="sub">
+                        {new Date(post.date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+        </>} />}
+        rightTitle="ABOUT"
+        right={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>THE BLOG</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">posts</span><span className="v acc">{posts.length}</span></div>
+              </div>
+              <p className="ws-note" style={{ marginTop: 8 }}>
+                Practical guides, workflow benchmarks, and tool comparisons
+                for AI operators.
+              </p>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>MORE SIGNAL</div>
+              <nav className="ws-nav">
+                <Link href="/wiki">Wiki</Link>
+                <Link href="/field">Field analysis</Link>
+                <Link href="/learn">Learn</Link>
+              </nav>
+            </div>
+          </>
+        }
+        leftWidth={280}
+        rightWidth={240}
+        status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
+      >
+        <WaveHero
+        eyebrow="📊 SigRank"
+        terminalText="BLOG"
+        title="Blog"
+        subtitle={
+          <>
+            Guides, benchmarking walkthroughs, tool comparisons,
+            and practical updates for AI operators.
+          </>
+        }
+      />
+      <div className="ws-doc" style={{ marginTop: 22 }}>
 
-      <div className="flex flex-col gap-6">
-        {posts.map((post) => (
-          <Link
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            className="group flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5 transition-colors hover:border-gold/40"
-          >
-            <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
-              {post.title}
-            </h2>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              {post.description}
-            </p>
-            <div className="flex items-center gap-3 font-mono text-xs text-text-muted">
-              {post.date && (
+      <div className="blog-index" id="ws-page-posts">
+        {posts[0] && (
+          <Link href={`/blog/${posts[0].slug}`} className="blog-feature group">
+            <div className="blog-kicker">LATEST · FIELD NOTE</div>
+            <h2>{posts[0].title}</h2>
+            <p>{posts[0].description}</p>
+            <div className="blog-meta">
+              {posts[0].date && (
                 <time>
-                  {new Date(post.date).toLocaleDateString("en-US", {
+                  {new Date(posts[0].date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
                 </time>
               )}
-              {post.tags.length > 0 && (
-                <>
-                  <span>·</span>
-                  <span>{post.tags.slice(0, 3).join(", ")}</span>
-                </>
+              {posts[0].tags.length > 0 && (
+                <span>{posts[0].tags.slice(0, 3).join(" · ")}</span>
               )}
             </div>
+            <span className="blog-read">READ ARTICLE →</span>
           </Link>
-        ))}
+        )}
+
+        <div className="blog-list">
+          {posts.slice(1).map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-row group">
+              <div className="blog-row-main">
+                <h2>{post.title}</h2>
+                <p>{post.description}</p>
+              </div>
+              <div className="blog-row-meta">
+                {post.date && (
+                  <time>
+                    {new Date(post.date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </time>
+                )}
+                {post.tags.length > 0 && (
+                  <span>{post.tags.slice(0, 2).join(" · ")}</span>
+                )}
+                <span className="arrow">↗</span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
+        </div>
+      </WorkspaceShell>
     </div>
   );
 }

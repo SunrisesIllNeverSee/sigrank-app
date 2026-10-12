@@ -29,7 +29,8 @@
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "sitemap:validate": "node scripts/validate-sitemap.mjs",
-    "sitemap:validate:live": "node scripts/validate-sitemap.mjs --live"
+    "sitemap:validate:live": "node scripts/validate-sitemap.mjs --live",
+    "lint:tools": "eslint --config eslint.tools.config.mjs \"_workspace/**/*.{js,mjs,cjs,ts,tsx,jsx}\""
   },
   "dependencies": {
     "@modelcontextprotocol/node": "^2.1.1",
