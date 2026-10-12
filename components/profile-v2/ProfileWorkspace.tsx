@@ -4,6 +4,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { MyWatchlist } from "./MyWatchlist";
 import "./profile-workspace.css";
 
 type ProfileSection = "overview" | "stats" | "analysis" | "report" | "lab" | "submissions" | "social" | "badges";
@@ -54,6 +55,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
           <div className="ws-profile-kv"><span>PLATFORM</span><b>{platform}</b></div>
         </div>
         {panels}
+        <MyWatchlist codename={codename} />
         <div className="mod ws-profile-actions"><h3><span className="sq" />ACTIONS</h3>{actions}</div>
         <div className="mod"><h3><span className="sq" />CONTEXT</h3>
           <p className="ws-note">Public operator telemetry. Report and Lab remain owner-only.</p>

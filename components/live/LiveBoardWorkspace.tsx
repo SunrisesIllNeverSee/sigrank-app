@@ -771,6 +771,7 @@ export function LiveBoardWorkspace({
     initial.featured ? -1 : initial.operators.length ? 0 : -1,
   );
   const [docked, setDocked] = useState(true); // reference: starts docked
+  const [userPicked, setUserPicked] = useState(false);
   const profile = useMemo(
     () => profileFor(initial, ops, selected, rmax),
     [initial, ops, selected, rmax],
@@ -814,6 +815,7 @@ export function LiveBoardWorkspace({
   const handleSelect = useCallback(
     (i: number) => {
       setSelected(i);
+      setUserPicked(true);
       const codename =
         i === -1 ? initial.featured?.codename : ops[i]?.codename;
       if (!codename) return;
@@ -965,6 +967,19 @@ export function LiveBoardWorkspace({
   /* ---------- account chrome (2C) — real session surface; the `account`
      prop is a demo/QA override that skips the fetch entirely. ---------- */
   const session = useBoardSession(!account);
+  const ownIndex = session.codename
+    ? ops.findIndex((o) => o.codename === session.codename)
+    : -1;
+  /* Signed-in, linked operators take precedence over the featured example.
+     Unknown/currently unranked operators get no impersonated fallback. */
+  useEffect(() => {
+    if (account || !session.loaded || !session.signedIn || userPicked) return;
+    setSelected(ownIndex >= 0 ? ownIndex : -2);
+  }, [account, session.loaded, session.signedIn, session.codename, ownIndex, userPicked]);
+  const restoreMyProfile = useCallback(() => {
+    setUserPicked(false);
+    setSelected(ownIndex >= 0 ? ownIndex : -2);
+  }, [ownIndex]);
 
   /* ---------- rail module stack (reorderable + hideable) ---------- */
   const [railOrder, setRailOrder] = useState<RailId[]>(BASE_RAIL_ORDER);
@@ -1228,6 +1243,8 @@ export function LiveBoardWorkspace({
       "yield",
       "leverage",
       "total_tokens",
+      "total_tokens_exact",
+      "scale_v",
       "cost_per_m",
       "efficiency",
       "movement_7d",
@@ -1247,6 +1264,8 @@ export function LiveBoardWorkspace({
         o.yield,
         o.lev,
         o.total,
+        o.num.total,
+        Number.isFinite(o.scalev) && o.scalev >= 0 ? o.scalev.toFixed(2) : "",
         o.cost,
         o.eff,
         o.mv7 ?? "",
@@ -1357,6 +1376,9 @@ export function LiveBoardWorkspace({
         return profile ? (
           docked ? (
             <>
+              {session.signedIn && session.codename && userPicked && (
+                <button type="button" className="ws-return-self" onClick={restoreMyProfile}>↶ MY PROFILE</button>
+              )}
               <OperatorProfileTile d={profile} />
               {/* owner: the radar is its own box — it ends here, then a
                   separate AWARDS/BADGES box follows with three rotating
@@ -1424,9 +1446,7 @@ export function LiveBoardWorkspace({
               {/* owner 2026-10-08: the peek rail's action row joins the
                   selected operator's profile too — SEE PROFILE / COMPARE /
                   WATCH, always visible, not only inside the aux rail. */}
-              {selOp && (
-                <ProfileActions op={selOp} compareHref={cmpHref} />
-              )}
+              {selOp && <ProfileActions op={selOp} />}
             </>
           ) : (
             <button
@@ -1439,7 +1459,13 @@ export function LiveBoardWorkspace({
             </button>
           )
         ) : (
-          <p className="drill-note">— SELECT AN OPERATOR</p>
+          <div className="drill-note">
+            {session.signedIn && selected === -2
+              ? session.codename
+                ? <>— YOUR OPERATOR IS NOT IN THIS RANKED WINDOW. <a href="/me">OPEN MY PROFILE →</a></>
+                : <>— NO OPERATOR LINKED TO THIS ACCOUNT. <a href="/me/edit">FINISH PROFILE SETUP →</a></>
+              : "— SELECT AN OPERATOR"}
+          </div>
         );
       }
       case "field":
@@ -2212,7 +2238,7 @@ export function LiveBoardWorkspace({
                         ))}
                         {ordered.length === 0 && (
                           <tr className="board-empty">
-                            <td colSpan={colMode === "metrics" ? 13 : 11}>
+                            <td colSpan={colMode === "metrics" ? 14 : 11}>
                               {fieldState === "loading"
                                 ? "⟳ SYNCING FIELD…"
                                 : filtered
@@ -2259,7 +2285,7 @@ export function LiveBoardWorkspace({
                                     <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
                                   </div>
                                 </td>
-                                {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (
+                                {Array.from({ length: colMode === "metrics" ? 11 : 8 }, (_, k) => (
                                   <td key={k} className="unranked-na">—</td>
                                 ))}
                                 {colMode === "raw" && <td className="unranked-na">—</td>}
