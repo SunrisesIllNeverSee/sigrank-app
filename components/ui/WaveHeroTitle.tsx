@@ -1,5 +1,6 @@
 "use client";
 
+import "@/components/home/wordmark.css";
 import React, { useEffect, useState } from "react";
 import { TerminalBlockText } from "@/components/home/TerminalBlockText";
 

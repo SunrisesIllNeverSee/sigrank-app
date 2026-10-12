@@ -1774,3 +1774,6 @@
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) h1{font-size:clamp(22px,5cqw,40px);line-height:1.2}
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) p{font-size:clamp(12px,2.1cqw,17px);line-height:1.6;max-width:60ch;text-wrap:balance}
 .lbw-root .app:has(.ws-editorial-sidebar){grid-template-rows:minmax(0,1fr);overflow:hidden}
+
+/* Lead editorial mastheads with each page's own pixel wordmark. */
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>div>:is(h1,h2,div[aria-label]){order:-1}
