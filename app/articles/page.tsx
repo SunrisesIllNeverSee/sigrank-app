@@ -51,7 +51,7 @@ export default async function ArticlesPage() {
   const articles = await getPublications();
   return (
     <WorkspaceShell
-      active="blog"
+      active="articles"
       editorialStage
       bareTitle
       title="ARTICLES"
