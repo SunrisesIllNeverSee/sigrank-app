@@ -1,5 +1,7 @@
 "use client";
 
+import { GroupedRailNav } from "./GroupedRailNav";
+
 /**
  * components/live/LiveBoardWorkspace.tsx — React port of the frozen
  * SignalAF live-board reference workspace (live-board-prototype, tag
@@ -67,16 +69,16 @@ import type {
   LiveBoardInitialState,
   LiveOperator,
 } from "@/lib/board/live-types";
+import type { URMember } from "@/lib/board/unranked-status";
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
-import { EnterprisePromoPop } from "./EnterprisePromo";
 import {
   OperatorDock,
   OperatorProfileTile,
   SharePreview,
 } from "./OperatorDock";
-import { RailIcon, ICON_SETS } from "./PixelIcon";
+import { ICON_SETS } from "./PixelIcon";
 import type { IconSetName } from "./PixelIcon";
 import { PixelBadge, badgeForPct } from "./PixelBadge";
 import type { PixelBadgeName } from "./PixelBadge";
@@ -117,6 +119,7 @@ import {
   windowLabel,
   type ProfileView,
   type ThemeName,
+  avatarStyle,
 } from "./utils";
 import { track } from "@/lib/infra/posthog/events";
 import { liveTrack } from "./analytics";
@@ -589,15 +592,8 @@ export function LiveBoardWorkspace({
   const [signupSummary, setSignupSummary] = useState<{
     registered_total: number; ranked_total: number; unranked_total: number;
     next_member_position: number; as_of: string;
-    members: Array<{
-      position: number;
-      board_status: "unranked";
-      workflow_mode: null;
-      display_group: "autonomous";
-      workflow_provenance: "unassessed_grouping";
-      identity_status: "not_publicly_listed";
-      display_label: "SIGNED-UP OPERATOR";
-    }>;
+    ur_total: number; ranked_metrics_population: number;
+    members: URMember[];
   } | null>(null);
 
   // Two bounded calls for the whole board; never N+1 fetches per operator.
@@ -622,8 +618,13 @@ export function LiveBoardWorkspace({
             Number.isInteger(v?.unranked_total) &&
             Array.isArray(v?.members) &&
             v.members.length === v.unranked_total &&
-            v.members.every((m: { position?: number }, i: number) =>
-              m.position === v.next_member_position + i)) setSignupSummary(v);
+            v.ur_total === v.unranked_total &&
+            v.ranked_metrics_population === v.ranked_total &&
+            v.registered_total === v.ranked_total + v.ur_total &&
+            v.members.every((m: URMember, i: number) =>
+              m.position === v.next_member_position + i &&
+              m.rank_status === "UR" && m.performance_eligible === false &&
+              m.metrics === null)) setSignupSummary(v);
       }).catch(() => {});
     return () => { active = false; controller.abort(); };
   }, []);
@@ -1045,7 +1046,6 @@ export function LiveBoardWorkspace({
      Code panel pattern); the rail never reflows below the board. */
   const [railOn, setRailOn] = useState(true);
   const [acctPop, setAcctPop] = useState(false);
-  const [epromoOpen, setEpromoOpen] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   /* RECENTS (owner 2026-10-06): last-selected operators for the RECENTS &
      SOON rail module. */
@@ -1061,8 +1061,6 @@ export function LiveBoardWorkspace({
   const [notifOpen, setNotifOpen] = useState(false);
   /* coming-soon votes (owner: "vote button for which gets built first") —
      local tally; wire to a real vote surface when one exists. */
-  const [soonVotes, setSoonVotes] = useState<Record<string, number>>({});
-  const [soonPop, setSoonPop] = useState<string | null>(null);
   /* addendum 2026-10-08: the large history module's COMBO/SINGLE mode +
      selected metric are controlled here so the FiveStats rows (profile
      slide 2) can drive the expanded chart. */
@@ -1131,20 +1129,6 @@ export function LiveBoardWorkspace({
 
   /* enterprise promo popover closes on outside click (same contract as
      the account popover) */
-  useEffect(() => {
-    if (!epromoOpen) return;
-    const onDoc = (e: MouseEvent) => {
-      if (
-        snavRef.current &&
-        e.target instanceof Node &&
-        !snavRef.current.contains(e.target)
-      ) {
-        setEpromoOpen(false);
-      }
-    };
-    document.addEventListener("click", onDoc);
-    return () => document.removeEventListener("click", onDoc);
-  }, [epromoOpen]);
 
   const router = useRouter();
   const onWindowSel = useCallback(
@@ -1487,6 +1471,7 @@ export function LiveBoardWorkspace({
           <RotatingMovers
             ops={ops}
             server={initial.movers}
+            boardMode={wfSel}
             onSelect={handleSelect}
           />
         );
@@ -1708,112 +1693,7 @@ export function LiveBoardWorkspace({
             </span>
           </Link>
           <nav className="snav" ref={snavRef}>
-            {/* icon set (owner 2026-10-06): semantic glyphs — ranked bars,
-                scales, trophy, radar rings, ledger, pen, hexagon. */}
-            <button
-              className="sbtn on"
-              data-sec="board"
-              data-tip="LEADERBOARD"
-              title="LEADERBOARD"
-              onClick={() => {
-                stageRef.current?.scrollTo({ top: 0 });
-              }}
-            >
-              <RailIcon name="board" set={iconSet} />
-            </button>
-            <Link className="sbtn" href="/compare" data-tip="COMPARE" title="COMPARE">
-              <RailIcon name="compare" set={iconSet} />
-            </Link>
-            <Link className="sbtn" href="/hall" data-tip="HALL" title="HALL">
-              <RailIcon name="hall" set={iconSet} />
-            </Link>
-            <Link className="sbtn" href="/fieldhub" data-tip="FIELD" title="FIELD">
-              <RailIcon name="field" set={iconSet} />
-            </Link>
-            <span className="snav-sep" aria-hidden="true"></span>
-            <Link className="sbtn" href="/wiki" data-tip="WIKI" title="WIKI">
-              <RailIcon name="wiki" set={iconSet} />
-            </Link>
-            <Link className="sbtn" href="/blog" data-tip="BLOG" title="BLOG">
-              <RailIcon name="blog" set={iconSet} />
-            </Link>
-            <button
-              type="button"
-              className="sbtn"
-              data-tip="ENTERPRISE"
-              title="ENTERPRISE"
-              aria-expanded={epromoOpen}
-              onClick={(e) => {
-                e.stopPropagation();
-                setEpromoOpen((v) => !v);
-              }}
-            >
-              <RailIcon name="enterprise" set={iconSet} />
-            </button>
-            {/* owner (2026-10-06): /enterprise doesn't exist — the icon
-                opens a promo card (EKG demo video + blurb → /upsilon). */}
-            <EnterprisePromoPop hidden={!epromoOpen} />
-            <span className="snav-sep" aria-hidden="true"></span>
-            {/* coming-soon candidates live in the rail (owner: "teams
-                hacks and versus icons are supposed to be in the nav
-                rail") — each opens its mockup description + vote. */}
-            {(
-              [
-                /* LB-G02: approved color treatment on the bottom three
-                   only — canonical pixel patterns, routing, and vote
-                   semantics untouched. teams=yellow, hacks=orange,
-                   versus=violet. */
-                ["teams", "TEAMS", "var(--yellow)"],
-                ["hacks", "HACKS", "var(--orange)"],
-                ["versus", "VERSUS", "var(--violet)"],
-              ] as const
-            ).map(([key, label, tint]) => (
-              <button
-                key={key}
-                type="button"
-                className="sbtn"
-                data-tip={`${label} · SOON`}
-                title={`${label} — coming soon`}
-                aria-expanded={soonPop === key}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSoonPop(soonPop === key ? null : key);
-                }}
-              >
-                <span className="railpix" style={{ color: tint }}>
-                  <RailIcon name={key} set={iconSet} />
-                </span>
-              </button>
-            ))}
-            {soonPop && (
-              <div className="soonpop">
-                {(() => {
-                  const d = {
-                    teams: ["TEAMS", "squad boards + shared stats"],
-                    hacks: ["HACKS", "build sprints + vs brackets"],
-                    versus: ["VERSUS", "head-to-head operator duels"],
-                  }[soonPop as "teams" | "hacks" | "versus"];
-                  return (
-                    <>
-                      <div className="ap-label">{d[0]} — COMING SOON</div>
-                      <p className="ap-desc">{d[1]}</p>
-                      <button
-                        type="button"
-                        className="vote"
-                        onClick={() =>
-                          setSoonVotes((v) => ({
-                            ...v,
-                            [soonPop]: (v[soonPop] ?? 0) + 1,
-                          }))
-                        }
-                      >
-                        ▲ VOTE {soonVotes[soonPop] ?? 0}
-                      </button>
-                    </>
-                  );
-                })()}
-              </div>
-            )}
+            <GroupedRailNav active="board" iconSet={iconSet} onBoard={() => stageRef.current?.scrollTo({ top: 0 })} />
           </nav>
           <div className="sfoot">
             {/* panel toggles (owner @svg): live in the nav rail and appear
@@ -2007,11 +1887,13 @@ export function LiveBoardWorkspace({
                     under the banner; profile moved to the inspector rail. */}
                 <div className="mod">
                   <h3>
-                    <span className="sq"></span>TOP MOVERS
+                    <span className="sq"></span>
+                    TOP MOVERS · {wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()}
                   </h3>
                   <RotatingMovers
                     ops={ops}
                     server={initial.movers}
+                    boardMode={wfSel}
                     onSelect={handleSelect}
                   />
                 </div>
@@ -2255,7 +2137,7 @@ export function LiveBoardWorkspace({
                           <>
                             <tr className="unranked-band">
                               <td colSpan={colMode === "metrics" ? 14 : 10}>
-                                SIGNED UP · NOT YET RANKED
+                                UR · SIGNED UP, NOT YET RANKED
                                 <span className="unranked-count">
                                   {" · "}{signupSummary ? signupSummary.unranked_total + " MEMBERS" : "SYNCING ACCOUNTS"}
                                 </span>
@@ -2272,19 +2154,33 @@ export function LiveBoardWorkspace({
                                 <td>
                                   <div className="ranks">
                                     <span className="r-main">{member.position}</span>
-                                    <span className="r-sub">UNRANKED</span>
+                                    <span className="r-sub">UR</span>
                                   </div>
                                 </td>
                                 <td className="l">
                                   <div className="op">
-                                    <span className="av unranked-avatar" aria-hidden>◌</span>
-                                    <span>
-                                      <span className="nm">SIGNED-UP OPERATOR</span>
-                                      <br />
-                                      <span className="hd">MEMBER #{member.position} · PRIVATE IDENTITY</span>
-                                      <br />
-                                      <span className="unranked-provisional">AUTONOMOUS QUEUE · UNASSESSED</span>
+                                    <span className="av" style={avatarStyle(member.position - 1)}>
+                                      {member.avatar_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={member.avatar_url} alt="" loading="lazy" />
+                                      ) : (member.display_label.charAt(0).toUpperCase() || "◌")}
                                     </span>
+                                    <span>
+                                      <span className="nm">
+                                        {member.profile_slug ? (
+                                          <Link href={"/user/" + encodeURIComponent(member.profile_slug)}>
+                                            {member.display_label}
+                                          </Link>
+                                        ) : member.display_label}
+                                      </span>
+                                      <br />
+                                      <span className="hd">
+                                        {member.handle?.startsWith("@") ? member.handle : (member.profile_slug ?? "PRIVATE")}
+                                        {" · "}<span className="tag">UR</span>
+                                      </span>
+                                      {member.location ? <span className="opl">◍ {member.location}</span> : null}
+                                    </span>
+                                    <span className="op-trend" title="No ranked Signa Rate history">—</span>
                                   </div>
                                 </td>
                                 {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (
@@ -2292,7 +2188,7 @@ export function LiveBoardWorkspace({
                                 ))}
                                 {colMode === "metrics" && (
                                   <>
-                                    <td className="unranked-provisional">HITL*</td>
+                                    <td className="unranked-provisional">UR</td>
                                     <td className="unranked-na">—</td>
                                   </>
                                 )}
@@ -2450,7 +2346,7 @@ export function LiveBoardWorkspace({
                     <div className="mod" key={id}>
                       <h3>
                         <span className="sq"></span>
-                        {RAIL_TITLE[id]}
+                        {id === "movers" ? "TOP MOVERS · " + (wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()) : RAIL_TITLE[id]}
                         <span className="mvbtns">
                           <button
                             className="mvbtn"

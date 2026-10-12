@@ -8,7 +8,9 @@
  * no silent fallback so typos are visible.
  */
 const PATTERNS = {
-  board: "10000/11000/11100/11110/11111",
+  board: "11111/11110/11100/11000/10000",
+  profile: "01110/01110/00000/11111/11111",
+  articles: "11111/10001/11101/10101/11111",
   compare: "10001/01010/00100/01010/10001",
   hall: "01110/01110/11111/00100/01110",
   field: "00100/01110/10101/01110/00100",
@@ -31,7 +33,7 @@ export function PixelIcon({ name }: { name: PixelIconName }) {
     <span className="gi pxic" aria-hidden="true">
       {pattern.split("/").flatMap((row, r) =>
         row.split("").map((cell, c) => (
-          <i key={`${r}-${c}`} className={cell === "1" ? "lit" : ""} />
+          <i key={`${r}-${c}`} className={cell === "1" ? "lit" : ""} style={name === "board" && cell === "1" ? { color: ["#a6ff00", "#00e5ff", "#3b82f6", "#a855f7", "#ff9a3c"][r] } : undefined} />
         )),
       )}
     </span>
@@ -45,15 +47,15 @@ export const ICON_SETS = ["pixel", "glyph", "emoji", "minimal", "hex"] as const;
 export type IconSetName = (typeof ICON_SETS)[number];
 
 const GLYPH_SET: Record<PixelIconName, string> = {
-  board: "▤", compare: "⚖", hall: "🏆", field: "◉", wiki: "▥", blog: "✎", enterprise: "⬢",
+  profile: "♙", articles: "▧", board: "▤", compare: "⚖", hall: "🏆", field: "◉", wiki: "▥", blog: "✎", enterprise: "⬢",
   teams: "⧉", hacks: "⚑", versus: "⚔",
 };
 const EMOJI_SET: Record<PixelIconName, string> = {
-  board: "📊", compare: "⚖️", hall: "🏆", field: "🎯", wiki: "📖", blog: "✏️", enterprise: "🏢",
+  profile: "👤", articles: "📰", board: "📊", compare: "⚖️", hall: "🏆", field: "🎯", wiki: "📖", blog: "✏️", enterprise: "🏢",
   teams: "👥", hacks: "🏁", versus: "🥊",
 };
 const MINIMAL_SET: Record<PixelIconName, string> = {
-  board: "▦", compare: "◐", hall: "◈", field: "◎", wiki: "▥", blog: "✎", enterprise: "⬢",
+  profile: "♙", articles: "▧", board: "▦", compare: "◐", hall: "◈", field: "◎", wiki: "▥", blog: "✎", enterprise: "⬢",
   teams: "⧉", hacks: "⚑", versus: "⚔",
 };
 

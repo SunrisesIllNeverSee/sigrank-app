@@ -193,7 +193,7 @@ function Line({ row }: { row: LedgerRow }) {
   const w = winnerOf(row);
   const sa = shareA(row);
   return (
-    <div className="grid grid-cols-[1fr_minmax(140px,1.4fr)_1fr] items-center gap-x-3 py-2.5">
+    <div className="cmp-ledger-line grid grid-cols-[1fr_minmax(140px,1.4fr)_1fr] items-center gap-x-3 py-2.5" data-metric={row.id}>
       {/* A value (right-aligned, toward center) */}
       <span
         className={
@@ -295,12 +295,15 @@ export function CompareLedger({
   a,
   b,
   compact = false,
+  workspace = false,
 }: {
   a: LeaderboardRow;
   b: LeaderboardRow;
   /** Workspace left-panel variant (~180px): tight stat ledger, one metric per
    *  line, no canon ids / diverging bars — same rows, same winner logic. */
   compact?: boolean;
+  /** Fixed stage: parallel eight-row groups, preserving every value and bar. */
+  workspace?: boolean;
 }) {
   const aName = nameOf(a);
   const bName = nameOf(b);
@@ -316,6 +319,28 @@ export function CompareLedger({
     a,
     b,
   );
+
+  if (workspace) {
+    return (
+      <section className="cmp-ledger-workspace" aria-label="Full comparison ledger">
+        {[
+          { title: "Raw · Flow · Total", rows: [...rawRows, ...flowRows, { ...totalRow, label: "∑ Total" }] },
+          { title: "Metrics", rows: metricRows },
+        ].map((group) => (
+          <div className="cmp-ledger-group" key={group.title}>
+            <header className="cmp-ledger-heading">
+              <span style={{ color: A_COLOR }} title={aName}>{aName}</span>
+              <h2>{group.title}</h2>
+              <span style={{ color: B_COLOR }} title={bName}>{bName}</span>
+            </header>
+            <div className="cmp-ledger-rows">
+              {group.rows.map((row, index) => <Line key={`${row.id}-${index}`} row={row} />)}
+            </div>
+          </div>
+        ))}
+      </section>
+    );
+  }
 
   if (compact) {
     const win = (r: LedgerRow) => winnerOf(r);
