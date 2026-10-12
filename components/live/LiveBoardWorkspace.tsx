@@ -118,6 +118,7 @@ import {
   windowLabel,
   type ProfileView,
   type ThemeName,
+  avatarStyle,
 } from "./utils";
 import { track } from "@/lib/infra/posthog/events";
 import { liveTrack } from "./analytics";
@@ -2279,14 +2280,28 @@ export function LiveBoardWorkspace({
                                 </td>
                                 <td className="l">
                                   <div className="op">
-                                    <span className="av unranked-avatar" aria-hidden>◌</span>
-                                    <span>
-                                      <span className="nm">SIGNED-UP OPERATOR</span>
-                                      <br />
-                                      <span className="hd">MEMBER #{member.position} · PRIVATE IDENTITY</span>
-                                      <br />
-                                      <span className="unranked-provisional">UR · NO RANKED SNAPSHOT</span>
+                                    <span className="av" style={avatarStyle(member.position - 1)}>
+                                      {member.avatar_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={member.avatar_url} alt="" loading="lazy" />
+                                      ) : (member.display_label.charAt(0).toUpperCase() || "◌")}
                                     </span>
+                                    <span>
+                                      <span className="nm">
+                                        {member.profile_slug ? (
+                                          <Link href={"/user/" + encodeURIComponent(member.profile_slug)}>
+                                            {member.display_label}
+                                          </Link>
+                                        ) : member.display_label}
+                                      </span>
+                                      <br />
+                                      <span className="hd">
+                                        {member.handle?.startsWith("@") ? member.handle : (member.profile_slug ?? "PRIVATE")}
+                                        {" · "}<span className="tag">UR</span>
+                                      </span>
+                                      {member.location ? <span className="opl">◍ {member.location}</span> : null}
+                                    </span>
+                                    <span className="op-trend" title="No ranked Signa Rate history">—</span>
                                   </div>
                                 </td>
                                 {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (

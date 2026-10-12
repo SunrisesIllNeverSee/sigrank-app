@@ -32,3 +32,14 @@ Do not alter or checkpoint another session's changing code as a final build.
   app/api/v1/board/signup-summary/route.ts; view at
   components/live/LiveBoardWorkspace.tsx.
 - Local staged worktree only; not merged or deployed.
+
+
+## 2026-10-12 — Public signup identity parity (staged)
+- Read-only roster now projects each member's existing publicly chosen
+  display name, avatar, handle, codename-as-fallback and optional location
+  using the same presentation convention as the first 22 ranked rows.
+- Explicit private profile / data opt-out redaction is enforced server-side;
+  never expose email or auth IDs. Publicly configured signup profiles are
+  visible by owner request; performance metrics remain ineligible for UR.
+- No change to ranking, membership positions, HCM/Outlier math or side rails.
+- Stage only; verify browser/tests before any release.
