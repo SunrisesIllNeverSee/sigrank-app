@@ -333,6 +333,7 @@ export function CompareLedger({
     return (
       <section className="cmp-ledger-workspace" aria-label="Full comparison ledger" style={compareColors}>
         <header className="cmp-ledger-versus" aria-label="Head-to-head record">
+          <div className="cmp-versus-kicker">MATCHUP · BAR STATISTICS</div>
           <div className="cmp-versus-operators">
             <span className="cmp-versus-name" style={{ color: A_COLOR }} title={aName}>{aName}</span>
             <span className="cmp-versus-label">VS</span>

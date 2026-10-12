@@ -37,3 +37,20 @@ RELEASE READY NO. DEPLOYED NO.
   remains full-stage-width beneath the reports and the center bar ledger.
 - Existing live-only eligibility and all comparison formulas remain unchanged.
 - Local staged change; no merge/deploy without owner approval.
+
+## 2026-10-12 — Center width and operator header graphics
+- Desktop stage-center bar ledger expanded from 330px to 400px; operator panels contract
+  from 318px to 283px each at 1440px. Responsive minimum: center 330px,
+  operator panels 232px each at 960px. Token Longevity stays full width.
+- Center's visible MATCHUP · BAR STATISTICS heading is larger (11px), VS 30px,
+  metric group headers and row labels increased for legibility.
+- Operator profile headers now use the shared real class hues, upper live/rank line,
+  public operator avatar or class glyph, display name + handle, class chip,
+  Yield hierarchy and optional verified marker. Decorative glow is clipped without
+  causing horizontal overflow. No invented profile fields or score changes.
+- Production-style Next build, TypeScript, lint, 17/17 Compare tests, and
+  11/11 canonical tests PASS. Browser checks at 1440/1280/960 PASS,
+  each with 22 live selector options, 4 radars, 16 bar-stat lines,
+  fixed VS record, 0 page exceptions, and no header overflow.
+- Isolated local review: http://127.0.0.1:3250/compare. Safari owner review pending.
+- Staging-only; no merge or deployment.
