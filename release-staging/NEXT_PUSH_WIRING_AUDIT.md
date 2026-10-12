@@ -3,7 +3,7 @@
 **Branch:** `integration/site-a315435`
 **Preview:** `http://localhost:3230/` (use `localhost`, not `127.0.0.1` — dev chunks are blocked cross-origin on the IP host, so hydration silently fails there)
 **Date:** 2026-10-12
-**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2 corrections) + `7a95d3f` (round-3 corrections) + `56fed14` (round-3 audit) — pushed to `origin/integration/site-a315435`
+**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2) + `7a95d3f` + `4157d68` (round-3) + `30b8506` (round-4) — pushed to `origin/integration/site-a315435`
 
 ---
 
@@ -83,9 +83,9 @@ Restored the approved mock split (passport card + railway flap board) as the fir
 - `npx tsc --noEmit` — clean.
 - `npm run test:canonical` — 11/11.
 - `npm test` — 682 pass / 0 fail / 4 skipped.
-- `npm run test:ui` (vitest) — 205 pass / 21 files; `snapshot-records.test.ts` 13/13 (guard parity on both snapshot reads, watch-count contract, mapping, null handling, mode resolution, evidence gating).
+- `npm run test:ui` (vitest) — 210 pass / 21 files; `snapshot-records.test.ts` 18/18 (guard parity on all three snapshot reads, mock-leak regression, error-swallow regression, watch-count contract, mapping, null handling, mode resolution, evidence gating).
 - `npm run lint` — 0 errors, 66 warnings (all pre-existing in scripts/older modules; touched files clean).
-- Live re-verification (Chromium): real `WATCHED BY` count, FIELD AVG labels, roving tabindex + arrow/Home/End tab navigation + aria linkage, no private report in the RSC payload, `Locked · 12/500` social milestone, `OUTSIDE OCM · OUTLIER` footer. 0 page errors.
+- Live re-verification (Chromium): real `WATCHED BY` count, FIELD AVG labels, roving tabindex + arrow/Home/End tab navigation + aria linkage, no private report in the RSC payload, `Locked · 12/500` social milestone, `OUTSIDE OCM · OUTLIER` footer, TransVaultOrigin/orcavanguard submissions tabs consistent-empty, pending class badge locked. 0 page errors.
 
 ## Reviewer rejection fixes (round 2)
 
@@ -135,6 +135,22 @@ Deferred / noted (not fixed, with reason):
 
 - `ilike("codename", …)` `_` wildcard — repo-wide pre-existing pattern across every codename lookup; `.limit(1)` masks multi-match. A `.eq` + lowercased-column migration or `ilike`-escaping pass is a cross-repo data-layer change, out of this lane's scope. Flagged for the owner.
 - Board UX nits (search input collapse, `wftag` Raw-only) — compare/board surface belongs to another lane's design; noted on the bus rather than patched here.
+
+## Reviewer rejection fixes (round 4)
+
+All items from the review of `7a95d3f`/`4157d68` addressed:
+
+| # | Issue | Fix | Files |
+|---|-------|-----|-------|
+| 1 | **Critical** — fabricated `MOCK_HISTORY` rendered on a real operator's profile | `getOperatorHistory` served `MOCK_HISTORY[codename]` on three live paths: unknown operator, zero `metric_snapshots`, and any thrown error — and `MOCK_HISTORY` is keyed by `TransVaultOrigin`, a real claimed operator. Verified live it rendered the fixture series (Apr 21 → May 19, canonical MO§ES values) under "5 SUBMISSIONS" while the API correctly returned `{"entries":[]}`. Now: mock fallback survives only on the unconfigured `!sb` path; a live read that finds nothing or fails returns `[]` (errors logged via `console.warn`, never silently converted to fixtures). Verified live: `/user/TransVaultOrigin?tab=submissions` shows the honest `0 SNAPSHOTS` empty state. | `lib/board/queries.ts` |
+| 2 | **Critical** — privacy guard self-contradicting the Submissions tab | `getOperatorSubmissions` was guarded but `getOperatorHistory` read the same `metric_snapshots` table unguarded — `/user/orcavanguard` (unclaimed) showed "No submissions yet" directly above a populated history. `getOperatorHistory` now applies the identical `claimed`/non-`retired`/non-`private` contract before issuing the snapshot read, so every surface on the tab agrees. Verified live: consistent empty state. | `lib/board/queries.ts` |
+| 3 | **Critical** — report-visibility flip never invalidated caches | `POST /api/profile/report-visibility` now calls `revalidateTag("operator", "max")` + `revalidatePath` for the operator's `/user/<codename>` page (original + lowercased, the `materialize.ts` convention) after the update — a flip to private stops serving the serialized report at the next request instead of up to 150s (unstable_cache) / 6h (ISR) later. | `app/api/profile/report-visibility/route.ts` |
+| 4 | Pending operators showed an EARNED class badge | `BadgesView` and `SocialView`'s `BadgesModule` gate the class badge on `pending` — renders locked (`—` · "PENDING FIRST SCORED SNAPSHOT" / "Pending") instead of earned, consistent with the ladder's `CLASS STANDING UNAVAILABLE`. Verified `/user/sex?tab=badges`. | `components/profile-v2/BadgesView.tsx`, `SocialView.tsx`, `ProfileBody.tsx` |
+| 5 | Report route missing codename validation | `GET /api/v1/operators/{codename}/report` now applies the snapshot-history shape gate (`^[a-zA-Z0-9_-]{1,100}$`) before the `ilike` — `%` wildcards return 400 instead of resolving an arbitrary operator. Verified live: `%25` → 400, private → 404. | `app/api/v1/operators/[codename]/report/route.ts` |
+| 6 | `getOperatorHistory` swallowed all errors into mock/empty | Error path now `console.warn`s and returns `[]` — failure is distinguishable from "no data" and never fabricates. (The corpus-level `MOCK_*` fallbacks in `getHallOfSignal`/`getHomepageStats`/`getClassDistribution`/`getOperator` remain the codebase's documented degraded-mode choice — they render unattributed fixture content, not fabricated data under a real operator's identity. Noted for the owner.) | `lib/board/queries.ts` |
+| 7 | Minor | `report-visibility`: meaningless `.order().limit(1)` on PATCH removed + comment corrected. `getOperatorWatchCount`: the count read moved to `getSupabaseService()` — `operator_watches` grants no SELECT to anon, so the "service client" contract is now real instead of a silent-0 fallback. `snapshot-history`: `PAGE_SIZE+1` over-fetch documented. | `report-visibility/route.ts`, `queries.ts`, `snapshot-history/route.ts` |
+
+Tests: `snapshot-records.test.ts` extended to 18 — history guard parity, the TransVaultOrigin mock-leak regression, unknown-operator path, error→`[]`+log path, and happy-path mapping.
 
 ## Remaining blockers
 
