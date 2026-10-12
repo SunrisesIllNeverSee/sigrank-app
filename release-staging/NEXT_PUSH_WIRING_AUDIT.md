@@ -3,7 +3,7 @@
 **Branch:** `integration/site-a315435`
 **Preview:** `http://localhost:3230/` (use `localhost`, not `127.0.0.1` — dev chunks are blocked cross-origin on the IP host, so hydration silently fails there)
 **Date:** 2026-10-12
-**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2) + `7a95d3f` + `4157d68` (round-3) + `30b8506` (round-4) — pushed to `origin/integration/site-a315435`
+**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2) + `7a95d3f` + `4157d68` (round-3) + `30b8506` + `c26b5aa` (round-4) + `a49135c` (round-5) — pushed to `origin/integration/site-a315435`
 
 ---
 
@@ -83,9 +83,13 @@ Restored the approved mock split (passport card + railway flap board) as the fir
 - `npx tsc --noEmit` — clean.
 - `npm run test:canonical` — 11/11.
 - `npm test` — 682 pass / 0 fail / 4 skipped.
-- `npm run test:ui` (vitest) — 210 pass / 21 files; `snapshot-records.test.ts` 18/18 (guard parity on all three snapshot reads, mock-leak regression, error-swallow regression, watch-count contract, mapping, null handling, mode resolution, evidence gating).
-- `npm run lint` — 0 errors, 66 warnings (all pre-existing in scripts/older modules; touched files clean).
-- Live re-verification (Chromium): real `WATCHED BY` count, FIELD AVG labels, roving tabindex + arrow/Home/End tab navigation + aria linkage, no private report in the RSC payload, `Locked · 12/500` social milestone, `OUTSIDE OCM · OUTLIER` footer, TransVaultOrigin/orcavanguard submissions tabs consistent-empty, pending class badge locked. 0 page errors.
+- `npm run test:ui` (vitest) — 223 pass / 22 files; includes `mock-fallback-guard.test.ts` (13/13) and `snapshot-records.test.ts` (18/18).
+- `npm run lint` — 0 errors, 68 warnings (all pre-existing in scripts/older modules; touched files clean).
+- Automated live E2E test suites (100% pass across 95 checks):
+  - `e2e-owner-privacy.mjs` (20/20): signed-out visitor, signed-in non-owner, signed-in owner, report API, serialized payload inspection, visibility toggle next-request cache invalidation, alternate casing, and clean DB teardown.
+  - `e2e-cross-page.mjs` (30/30): leaderboard -> inspector -> profile link, opening split stat agreement, profile -> compare flow, compare selector swap + reload persistence, hall page links, profile tabs (submissions, analysis OCM/Tier, badges), and pending/unranked operator honest rendering (`/user/sex`).
+  - `e2e-toolbar.mjs` (17/17): toolbar layout at 1229x739 & 1440x900, scroll persistence with clearance, Platform in Raw only, search input usable width (130px), filtered CSV export matching view, PNG screenshot capturing clean board without Share menu obscuring.
+  - `e2e-webkit-safari.mjs` (28/28): WebKit verification across 9 routes (`/`, `/sigrank`, `/fieldhub`, `/articles`, `/blog`, `/wiki`, `/hall`, `/compare`, `/user/xoxo`), sidebar uniformity, Back/Home controls, independent editorial navigation details branches, compare stage fit, profile surfaces, and screenshots.
 
 ## Reviewer rejection fixes (round 2)
 
@@ -152,7 +156,27 @@ All items from the review of `7a95d3f`/`4157d68` addressed:
 
 Tests: `snapshot-records.test.ts` extended to 18 — history guard parity, the TransVaultOrigin mock-leak regression, unknown-operator path, error→`[]`+log path, and happy-path mapping.
 
+## Round 5 — Live Mock Fallbacks, E2E Privacy, Cross-Page Wiring, Toolbar & Safari Pass
+
+All items from the round-5 directive implemented and verified:
+
+| # | Task | Implementation & Verification | Files |
+|---|------|--------------------------------|-------|
+| 1 | **Remove live mock fallbacks** | Audited `getHallOfSignal`, `getHomepageStats`, `getClassDistribution`, `getOperator`, `getLeaderboard`, and `getOnline*`. Every fallback to `MOCK_*` and `fallbackRows()` is now strictly guarded by `if (!sb)`. When Supabase is configured: unknown operators return `null` (genuine 404 on profile route), live DB errors produce unavailable/empty states (`[]` or `UNAVAILABLE_HOMEPAGE_STATS` with `isPlaceholder: true`), and empty queries return `[]`/zeroes — never fixture operators, invented records, or sample totals. Verified live: `/user/does-not-exist-xyz123` returns 404; `/api/v1/stats` returns live DB totals with `is_placeholder: false`; `/api/v1/hall-of-signal` emits no fake single-op records; `/hall` displays real operators. Regression tests in `__tests__/board/mock-fallback-guard.test.ts` (13/13 pass). | `lib/board/queries.ts`, `__tests__/board/mock-fallback-guard.test.ts` |
+| 2 | **Owner privacy & cache invalidation E2E** | Live test suite `scripts/e2e-owner-privacy.mjs` (20/20 pass) executed against running server (`http://localhost:3230`) using authenticated test accounts created in Supabase: (a) Signed-out visitor gets 404 on `/api/v1/operators/{codename}/report`, profile HTML/payload does not serialize private report; (b) Signed-in non-owner gets 404 and no private report in HTML; (c) Signed-in owner gets 200 with report JSON, both in canonical and UPPERCASE casing; (d) Toggle to public (`POST /api/profile/report-visibility` with `{ visible: true }`) immediately returns 200 to signed-out visitor on next request (both casings) and serializes report in page payload; (e) Toggle to private immediately returns 404 to visitor on next request and removes report from serialized payload; (f) Browser UI via Playwright confirms visitor sees "This report is private" notice while owner resolves access and renders full Report interface with visibility controls and Health Score. Clean teardown removed all test records and auth users. | `app/api/profile/report-visibility/route.ts`, `app/api/v1/operators/[codename]/report/route.ts`, `scripts/e2e-owner-privacy.mjs` |
+| 3 | **Cross-page data wiring** | Live test suite `scripts/e2e-cross-page.mjs` (30/30 pass) verified all user journeys using real ranked operator `xoxo` (Karthikeyan KK, #3, IGNITER I, 976.9K Υ, 18.2K IN, 1.06M OUT, 305.2M CR, 15.8M CW, 322.1M total): (a) Board row -> inspector -> `SEE PROFILE` -> `/user/xoxo`; (b) Profile opening split metrics match leaderboard row exactly; (c) Profile `COMPARE` button targets `/compare?a=xoxo`; (d) Compare selector swap (`?a=xoxo&b=furic`) updates and reloads with persistence; (e) Compare matchup, dual radars, ledger, and history sync; (f) Hall links -> profile; (g) Profile tabs: Submissions (12 scored snapshots, missing values rendered as `—`), Analysis (Tier Position scatter, OCM Position scatter with `OUTSIDE OCM · OUTLIER`, `FIELD AVG` baseline labels), Badges (IGNITER I, 500th milestone progress `12/500`, class ladder); (h) Pending operator `/user/sex` rendered honestly: pending status, no fake #1 rank, `CLASS STANDING UNAVAILABLE`, locked class badge, `0 SNAPSHOTS`. | `scripts/e2e-cross-page.mjs` |
+| 4 | **Leaderboard toolbar request** | Live test suite `scripts/e2e-toolbar.mjs` (17/17 pass) verified layout and export behavior: (a) Replaced rigid 9-column grid with adaptive flex toolbar (`display: flex; justify-content: space-between; gap: 6px`) in `board-cols.css`; (b) At 1229×739 and 1440×900, all controls sit evenly across one fixed line with no clipping or overlap; (c) Search input has usable width (130px, never collapsed to 25px); (d) Toolbar remains fixed with >60px clearance above first row while rows scroll in `.stage`; (e) Platform select filter is rendered in Raw mode only (`colMode === "raw"`) and hidden in Metrics mode; switching to Metrics resets platform filter to "All Platforms"; (f) Filtered CSV export matches current view (verified with `xoxo` search filter); (g) PNG screenshot capture via `html-to-image` closes Share details menu and filters out `.board-share-menu` popup so the menu never obscures the board; CSP `connect-src` violation prevented by filtering external avatars. | `components/live/LiveBoardWorkspace.tsx`, `components/live/board-cols.css`, `scripts/e2e-toolbar.mjs` |
+| 5 | **Safari / WebKit rendering pass** | Live test suite `scripts/e2e-webkit-safari.mjs` (28/28 pass) evaluated Playwright WebKit at 1440×900 across 9 routes (`/`, `/sigrank`, `/fieldhub`, `/articles`, `/blog`, `/wiki`, `/hall`, `/compare`, `/user/xoxo`): (a) Uniform sidebar widths (56px icon rail, 248px left sidebar), borders and spacing; (b) Centered text-page heroes with pixel headings; (c) Independent editorial navigation branches verified on `/wiki` (both SigRank and Field branches stay open together); (d) Back & Home controls present and accessible below sidebar navigation across all pages; (e) Compare fits desktop stage without clipping; (f) Profile opening split (Passport Card + FlapBoard), history table, OCM scatter, and Badges all render cleanly; (g) Captured screenshots at `/tmp/webkit-leaderboard-toolbar.png`, `/tmp/webkit-profile-opening.png`, `/tmp/webkit-compare.png`, `/tmp/webkit-editorial-wiki.png`. | `scripts/e2e-webkit-safari.mjs` |
+
+## Screenshots
+
+- Leaderboard toolbar (WebKit 1440×900): `/tmp/webkit-leaderboard-toolbar.png`
+- Profile opening (WebKit 1440×900): `/tmp/webkit-profile-opening.png`
+- Compare matchup (WebKit 1440×900): `/tmp/webkit-compare.png`
+- Editorial Wiki (WebKit 1440×900): `/tmp/webkit-editorial-wiki.png`
+- Historical captures: `/tmp/profile-submissions.png` (expanded records), `/tmp/profile-badges2.png` (badges tab), `/tmp/profile-analysis.png` + `/tmp/wk-analysis.png` (Tier+HCM, Chromium/WebKit), `/tmp/wk-overview.png` (opensplit, WebKit), `/tmp/board-top.png` / `/tmp/board-raw.png` / `/tmp/board-820.png` / `/tmp/board-share.png` (toolbar states), `/tmp/j5-hall.png`.
+
 ## Remaining blockers
 
-- Owner-only surfaces (Report/Lab) verified as *locked for public*; the private-report owner-fetch path (`/api/v1/operators/{codename}/report` → gate render) is code-verified but not exercised with a real authenticated session in the local preview.
-- No hybrid/agentic scored submissions exist in current data — the distinct `HYBRID` label and evidence ↗ link are code-verified (unit tests + type-level) but not yet exercised by live rows.
+- No hybrid/agentic scored submissions exist in current production database — the distinct `HYBRID` label and evidence ↗ link are code-verified (unit tests + type-level) but not yet exercised by live rows.
+- Actual Safari 27.0.1 browser engine verification was automated via Playwright WebKit; manual interactive Safari spot-check remains open for owner launch review.

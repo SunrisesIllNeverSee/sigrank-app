@@ -173,14 +173,14 @@
 
 /* Keep the board's controls in one compact line; exports live in Share. */
 .lbw-root:has(.board-filter-actions) .app{grid-template-rows:minmax(0,1fr)}
-.lbw-root .stagecol:has(.board-filter-actions)>.fbar{display:grid;grid-template-columns:auto repeat(3,minmax(64px,1fr)) auto minmax(25px,.5fr) auto auto auto;gap:6px;padding:8px 10px;align-items:center;overflow:visible;position:relative;z-index:35}
-.lbw-root .fbar:has(.board-filter-actions) .fb{min-width:0;flex-shrink:1}
-.lbw-root .fbar:has(.board-filter-actions) .fb select{min-width:0;width:100%;font-size:9px;padding-inline:3px}
+.lbw-root .stagecol:has(.board-filter-actions)>.fbar{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;overflow:visible;position:relative;z-index:35;background:var(--bg)}
+.lbw-root .fbar:has(.board-filter-actions) .seg{flex-shrink:0}
+.lbw-root .fbar:has(.board-filter-actions) .fb{min-width:0;flex:0 1 auto}
+.lbw-root .fbar:has(.board-filter-actions) .fb select{min-width:50px;max-width:80px;width:100%;font-size:9px;padding-inline:3px}
 .lbw-root .fbar:has(.board-filter-actions) .seg button{font-size:9px;padding-inline:5px}
-.lbw-root .fbar:has(.board-filter-actions) .sdir{width:22px}
-.lbw-root .fbar:has(.board-filter-actions) input{width:100%;min-width:25px;padding-inline:4px}
-.lbw-root .fbar:has(.board-filter-actions) input:focus{position:absolute;width:170px;right:8px;top:42px;z-index:2}
-.lbw-root .fbar .board-filter-actions{display:contents}
+.lbw-root .fbar:has(.board-filter-actions) .sdir{width:22px;flex-shrink:0}
+.lbw-root .fbar:has(.board-filter-actions) input{width:100%;min-width:50px;max-width:130px;padding-inline:4px;flex:1 1 60px}
+.lbw-root .fbar .board-filter-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .lbw-root .board-filter-actions .pages button{padding:5px 6px;font-size:9px}
 .lbw-root .board-share{position:relative;font-size:9px}
 .lbw-root .board-share summary{list-style:none;cursor:pointer;padding:6px;border:1px solid var(--line2);border-radius:4px;color:var(--ac);white-space:nowrap}
@@ -188,4 +188,4 @@
 .lbw-root .board-share-menu{position:absolute;right:0;top:calc(100% + 7px);width:175px;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px;background:var(--bg2);border:1px solid var(--line2);border-radius:6px;box-shadow:0 10px 24px #0008;z-index:60}
 .lbw-root .board-share:not([open]) .board-share-menu{display:none}
 .lbw-root .board-share summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-@media(max-width:900px){.lbw-root .stagecol:has(.board-filter-actions)>.fbar{display:flex;flex-wrap:wrap;justify-content:space-between}.lbw-root .fbar:has(.board-filter-actions) .fb select{width:76px}.lbw-root .fbar:has(.board-filter-actions) input{width:30px}.lbw-root .board-share-menu{right:0}}
+@media(max-width:900px){.lbw-root .stagecol:has(.board-filter-actions)>.fbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}.lbw-root .fbar:has(.board-filter-actions) .fb select{width:76px}.lbw-root .fbar:has(.board-filter-actions) input{width:60px}.lbw-root .fbar .board-filter-actions{flex-basis:100%;justify-content:space-between}.lbw-root .board-share-menu{right:0}}
