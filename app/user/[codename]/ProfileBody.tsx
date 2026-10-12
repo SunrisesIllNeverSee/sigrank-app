@@ -88,7 +88,6 @@ export async function ProfileBody({
   // Auth state resolved client-side so this stays ISR-cached.
   const isOwner = false;
 
-  const topPct = Math.max(0, 100 - row.percentile);
   const c = snapshot.cascade;
 
   const fieldAvg = computeFieldAverages(boardRows);
@@ -105,6 +104,17 @@ export async function ProfileBody({
   const isPrivate = operator.profile_visibility === "private";
   const viewerRedacted = isPrivate && !isOwner;
   const displayName = viewerRedacted ? null : operator.display_name;
+
+  // Board-verified rank contexts (owner item 13): row.global_rank comes from
+  // claimedRankMap, which only ranks RESOLVED workflow snapshots — unresolved
+  // review candidates (workflow_mode null) stay ON the combined field per the
+  // owner rules but get global_rank 0 there. The displayed combined-field
+  // rank/percentile must match /board/all, so it derives from the operator's
+  // own row inside boardRows (the same getLeaderboard call the board makes).
+  const boardRow = boardRows.find((r) => r.operator.codename === codename);
+  const fieldRank = boardRow?.global_rank ?? row.global_rank;
+  const fieldPct = boardRow?.percentile ?? row.percentile;
+  const fieldTopPct = Math.max(0, 100 - fieldPct);
 
   const archetype =
     c && !c.nonCompounding
@@ -151,7 +161,7 @@ export async function ProfileBody({
           display_name: displayName,
           path: `/user/${rawCodename}`,
           classTier: snapshot.class_tier,
-          globalRank: row.global_rank,
+          globalRank: fieldRank,
           pending,
           records: operatorRecords,
         })}
@@ -168,14 +178,13 @@ export async function ProfileBody({
               operator={operator}
               snapshot={snapshot}
               telemetry={telemetry}
-              globalRank={row.global_rank}
-              topPct={topPct}
+              globalRank={fieldRank}
+              topPct={fieldTopPct}
               pending={pending}
               ranked={!!ranked}
               archetype={archetype}
               tierProgress={tierProgress}
               trophyCounts={trophyCounts}
-              records={operatorRecords}
               watchCount={watchCount}
               boardRows={boardRows}
               history={history}
@@ -190,8 +199,8 @@ export async function ProfileBody({
                 operator={operator}
                 snapshot={snapshot}
                 telemetry={telemetry}
-                globalRank={row.global_rank}
-                topPct={topPct}
+                globalRank={fieldRank}
+                topPct={fieldTopPct}
                 ranked={!!ranked}
                 history={history}
                 fieldAvg={fieldAvg}
@@ -206,8 +215,8 @@ export async function ProfileBody({
                 operator={operator}
                 snapshot={snapshot}
                 telemetry={telemetry}
-                globalRank={row.global_rank}
-                topPct={topPct}
+                globalRank={fieldRank}
+                topPct={fieldTopPct}
                 ranked={!!ranked}
                 archetype={archetype}
                 fieldAvg={fieldAvg}
