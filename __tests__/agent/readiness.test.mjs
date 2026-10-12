@@ -41,10 +41,9 @@ test("web 404 includes deterministic agent recovery links and markdown negotiati
   assert.match(page, /llms\.txt/);
   assert.match(page, /openapi\.json/);
   assert.match(page, /developers/);
-  // Middleware must serve a markdown 404 body to agents asking for markdown
-  assert.match(middleware, /NOT_FOUND_MARKDOWN/);
-  assert.match(middleware, /negotiatedNotFound/);
-  assert.match(middleware, /status: 404/);
+  // Middleware must NOT blanket-404 markdown requests: it can't tell whether a
+  // path exists, so that broke every real page for markdown-preferring agents.
+  assert.doesNotMatch(middleware, /negotiatedNotFound/);
 });
 
 test("unknown REST routes use RFC 9457 problem responses", async () => {
