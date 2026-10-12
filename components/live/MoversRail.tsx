@@ -97,7 +97,7 @@ export function MoversRail({
       {boxHead ? (
         <div className="mbox-h">
           {boxHead}
-          <span className="mut"> · ROTATING</span>
+          <span className="mut"> · AUTO</span>
         </div>
       ) : null}
       {rows.map((m, i) => {
@@ -165,114 +165,101 @@ export function MoversRail({
   );
 }
 
-/* Board-filter-aware mover rail. Its slides rotate 7D, 24H, and raw
-   volume INSIDE the selected HITL / Hybrid / Autonomous population.
-   Unranked UR members are never in ops and cannot enter mover statistics. */
-export type MoverBoardMode = "hitl" | "hybrid" | "agentic";
-
-export function moverScopeMatches(o: LiveOperator, scope: MoverBoardMode): boolean {
-  if (scope === "hybrid") return true;
-  if (scope === "hitl") return o.wf === "hitl" || o.wf === "hybrid";
-  // Legacy statistical outlier candidates are currently unresolved (null);
-  // this is a display cohort, not verified Autonomous execution.
-  return o.wf === "agentic" || o.wf === "hybrid" || o.wf === null;
-}
-
-const MOVER_MODES = ["7D", "24H", "Σ TOKENS"] as const;
+/* ---------- RotatingMovers (owner 2026-10-06): the movers module cycles
+   between windows and workflow facets on a timer — 7D → 24H → HITL →
+   AGENTIC — instead of pinning a static 7d list. 24H derives client-side
+   from ops' mv24 (server ships mv7 only); workflow facets filter the
+   resolved mover rows through ops' wf. ---------- */
+/* owner 2026-10-06: five rows per slide + a raw-tokens mode —
+   "even random stats like highest tokens... add raw token counts". */
+const MOVER_MODES = ["7D · ALL", "24H · ALL", "7D · HITL", "7D · AGENTIC", "Σ TOKENS"] as const;
 
 export function RotatingMovers({
   ops,
   server,
   onSelect,
-  boardMode = "hybrid",
 }: {
   ops: LiveOperator[];
   server?: MoverEntry[];
   onSelect?: (opIndex: number) => void;
-  boardMode?: MoverBoardMode;
 }) {
   const [mi, setMi] = useState(0);
-  // Preserve positions in the full operator array: mover clicks must still
-  // select the correct operator in the adjacent profile inspector.
-  const scoped = useMemo(
-    () => ops.map((o, i) => ({ o, i }))
-      .filter(({ o }) => moverScopeMatches(o, boardMode)),
-    [ops, boardMode],
-  );
-
-  const sevenDay = useMemo<MoverRow[]>(() => {
-    if (boardMode === "hybrid" && server?.length) {
-      return moverRows(server, ops).filter((m) =>
-        m.opIndex != null && moverScopeMatches(ops[m.opIndex], boardMode)).slice(0, 5);
-    }
-    return scoped
-      .filter(({ o }) => o.mv7 != null)
-      .sort((a, b) => (b.o.mv7 ?? 0) - (a.o.mv7 ?? 0))
-      .slice(0, 5)
-      .map(({ o, i }) => ({
-        name: o.handle || o.name,
-        codename: o.codename,
-        mv: o.mv7 ?? 0,
-        opIndex: i,
-        avatarUrl: o.avatarUrl ?? null,
-        verified: isVerifiedOp(o.verif),
-      }));
-  }, [boardMode, server, ops, scoped]);
-
+  /* owner: skip scopes with no movers — only cycle modes that produce
+     rows, so the box never flashes an empty slide. */
   const liveModes = useMemo(() => {
-    const available = MOVER_MODES.filter((mode) => {
-      if (mode === "7D") return sevenDay.length > 0;
-      if (mode === "24H") return scoped.some(({ o }) => o.mv24 != null && o.mv24 !== 0);
-      return scoped.some(({ o }) => numvOf(o.total) > 0);
-    });
-    return available.length ? available : [MOVER_MODES[0]];
-  }, [scoped, sevenDay]);
-
-  useEffect(() => { setMi(0); }, [boardMode]);
+    const has = (mode: string) => {
+      if (mode === "Σ TOKENS") return ops.some((o) => numvOf(o.total) > 0);
+      if (mode === "24H · ALL") return ops.some((o) => (o.mv24 ?? 0) !== 0);
+      const wf = mode === "7D · HITL" ? "hitl" : mode === "7D · AGENTIC" ? "agentic" : null;
+      const base = moverRows(server, ops);
+      return wf ? base.some((r) => r.opIndex != null && ops[r.opIndex]?.wf === wf)
+                : base.length > 0;
+    };
+    const m = MOVER_MODES.filter(has);
+    return m.length ? m : [MOVER_MODES[0]];
+  }, [ops, server]);
   useEffect(() => {
-    const t = setInterval(() => setMi((i) => (i + 1) % liveModes.length), 5000);
+    const t = setInterval(
+      () => setMi((i) => (i + 1) % liveModes.length),
+      5000,
+    );
     return () => clearInterval(t);
   }, [liveModes.length]);
-
   const mode = liveModes[mi % liveModes.length];
+
   const rows = useMemo<MoverRow[]>(() => {
-    if (mode === "7D") return sevenDay;
-    if (mode === "24H") {
-      return scoped
-        .filter(({ o }) => o.mv24 != null && o.mv24 !== 0)
-        .sort((a, b) => Math.abs(b.o.mv24 ?? 0) - Math.abs(a.o.mv24 ?? 0))
+    if (mode === "Σ TOKENS") {
+      return ops
+        .map((o, i) => ({ o, i }))
+        .filter((x) => numvOf(x.o.total) > 0)
+        .sort((a, b) => numvOf(b.o.total) - numvOf(a.o.total))
         .slice(0, 5)
-        .map(({ o, i }) => ({
-          name: o.handle || o.name,
-          codename: o.codename,
-          mv: o.mv24 ?? 0,
-          opIndex: i,
-          avatarUrl: o.avatarUrl ?? null,
-          verified: isVerifiedOp(o.verif),
+        .map((x) => ({
+          name: x.o.handle || x.o.name,
+          codename: x.o.codename,
+          mv: 0,
+          opIndex: x.i,
+          avatarUrl: x.o.avatarUrl ?? null,
+          verified: isVerifiedOp(x.o.verif),
+          note: x.o.total,
         }));
     }
-    return scoped
-      .filter(({ o }) => numvOf(o.total) > 0)
-      .sort((a, b) => numvOf(b.o.total) - numvOf(a.o.total))
-      .slice(0, 5)
-      .map(({ o, i }) => ({
-        name: o.handle || o.name,
-        codename: o.codename,
-        mv: 0,
-        opIndex: i,
-        avatarUrl: o.avatarUrl ?? null,
-        verified: isVerifiedOp(o.verif),
-        note: o.total,
-      }));
-  }, [mode, scoped, sevenDay]);
-  const scopeLabel = boardMode === "agentic" ? "AUTO" : boardMode.toUpperCase();
+    if (mode === "24H · ALL") {
+      return ops
+        .map((o, i) => ({ o, i }))
+        .filter((x) => x.o.mv24 != null && x.o.mv24 !== 0)
+        .sort(
+          (a, b) => Math.abs(b.o.mv24 ?? 0) - Math.abs(a.o.mv24 ?? 0),
+        )
+        .slice(0, 5)
+        .map((x) => ({
+          name: x.o.handle || x.o.name,
+          codename: x.o.codename,
+          mv: x.o.mv24 ?? 0,
+          opIndex: x.i,
+          avatarUrl: x.o.avatarUrl ?? null,
+          verified: isVerifiedOp(x.o.verif),
+        }));
+    }
+    const base = moverRows(server, ops);
+    const wf =
+      mode === "7D · HITL" ? "hitl" : mode === "7D · AGENTIC" ? "agentic" : null;
+    const out = wf
+      ? base.filter((r) => r.opIndex != null && ops[r.opIndex]?.wf === wf)
+      : base;
+    return out.slice(0, 5);
+  }, [mode, ops, server]);
 
   return (
-    <MoversRail
-      boxHead={mode + " · " + scopeLabel + " · " + ((mi % liveModes.length) + 1) + "/" + liveModes.length}
-      rows={rows}
-      onSelect={onSelect}
-      tag={mode === "Σ TOKENS" ? "Σ" : mode === "24H" ? "24h" : "7d"}
-    />
+    <>
+      <MoversRail
+        /* LB-G12 indexed rotation — header shows the slide's position in
+           the live mode set. */
+        boxHead={`${mode} · ${(mi % liveModes.length) + 1}/${liveModes.length}`}
+        rows={rows}
+        onSelect={onSelect}
+        tag={mode === "Σ TOKENS" ? "Σ" : mode.startsWith("24H") ? "24h" : "7d"}
+      />
+    </>
   );
 }

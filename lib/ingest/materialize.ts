@@ -324,7 +324,6 @@ export function revalidateTouchedWindows(
   const win = boardWindowByEnum(windowType);
   if (win) revalidatePath(`/board/${win.slug}`);
   revalidatePath("/board/off");
-  revalidatePath("/");
   // /board/all aggregates EVERY window (windowFilter:false + collapse), so a
   // 7d-only submission still changes it — bust it unconditionally, not just
   // when the submitted window_type is 'all_time'.
@@ -363,5 +362,4 @@ export function revalidateOperatorIndexState(codename: string): void {
   // Claimed membership changes the claimed-only live board surfaces too.
   revalidatePath("/board/all");
   revalidatePath("/board/off");
-  revalidatePath("/");
 }

@@ -35,7 +35,6 @@ import { ClaimedBadge } from "@/components/claim/ClaimedBadge";
 import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 
 import { ProfileBody } from "./ProfileBody";
-import { ProfileWorkspace } from "@/components/profile-v2/ProfileWorkspace";
 
 // ISR: revalidate every 6 hours. Profile data doesn't change frequently —
 // operators submit snapshots at most a few times per day, and on-demand
@@ -153,12 +152,9 @@ export default async function OperatorProfilePage({
   // LabTab sliders, ClaimTab) appear.
 
   return (
-    <Suspense fallback={<div>Loading profile workspace…</div>}>
-    <ProfileWorkspace name={resolveName(operator)} codename={operator.codename}
-      rank={row.pending ? null : row.global_rank} tier={row.snapshot.class_tier}
-      platform={operator.primary_domain}
-      yieldLabel={row.snapshot.cascade?.nonCompounding ? "—" : (row.snapshot.cascade?.yield_?.toFixed(2) ?? "—")}
-      actions={<div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+      <TrackProfileView codename={operator.codename} />
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/board/all"
           className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
@@ -176,8 +172,7 @@ export default async function OperatorProfilePage({
           {operator.claimed && <ClaimedBadge claimed={operator.claimed} />}
           <ProfileEditModal codename={operator.codename} />
         </div>
-      </div>}>
-      <TrackProfileView codename={operator.codename} />
+      </div>
 
       {/* V2: the identity hero now lives inside OverviewView — the old
           <header> block was removed so the identity renders once. The action
@@ -197,7 +192,6 @@ export default async function OperatorProfilePage({
       >
         <ProfileBody row={row} rawCodename={rawCodename} />
       </Suspense>
-    </ProfileWorkspace>
-    </Suspense>
+    </div>
   );
 }

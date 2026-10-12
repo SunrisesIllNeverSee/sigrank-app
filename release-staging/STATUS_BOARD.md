@@ -2,6 +2,15 @@
 
 Updated October 12, 2026. **Review candidate; not merged, pushed or deployed by this session.**
 
+## Housekeeping reconciliation — October 12, 2026 (DREP1)
+
+- Canonical site confirmed: `SIGNALAF-Website-Redesign/01-Staged-Website` is a symlink to worktree `signalaf-integration-a315435`, branch `integration/site-a315435`. HEAD at check time: `f405daa` (branch is actively receiving commits from the integration lane; verify current HEAD, do not assume).
+- `integration/site-a315435` and `feat/graphics-hardening` are local-only branches — no remote/upstream copies exist.
+- This branch `feat/live-board-2b` is 3 commits ahead of origin (PR #239 head `a315435`): `ba29f02` profile V2 preservation, `637cdc2` status-board update, `9dbb439` hygiene fix below.
+- PR #239 CI hygiene failure RESOLVED locally in `9dbb439`: index-only untrack of 40 `_workspace/` review artifacts, all byte-identical to `SIGNALAF-Website-Redesign/03-Designs-and-Review/` and still on disk + in history. Hygiene script now passes 3/3 here. **Remote PR stays red until push; integration branch still carries the same 40 tracked-but-ignored files — its owner needs the same index-only fix.**
+- Remaining `release-staging/` provenance files committed alongside this note; untracked remainder on this branch = editorial lane files only (`lib/editorial/`, articles/blog/sidebar/css edits) — owned by the editorial agent, untouched.
+- `manifest.json` `head` field corrected 09a45dc → 9dbb439. All earlier manifests, verification receipts and signoffs remain unchanged as dated evidence.
+
 ## Current profile checkpoints
 
 | Location | Saved state | Commit | Preview |
@@ -15,15 +24,6 @@ Verification: shared source TypeScript, scoped ESLint, canonical tests 11/11; in
 Open gates: inspector chart/design parity, full owner/private/pending and empty-data regression acceptance, watch-count placeholder, owner release approval. R4's standalone route is preserved as source history; the staged preview keeps the owner-requested shell.
 
 Continue current integrated redesign work in `SIGNALAF-Website-Redesign/01-Staged-Website`. Original shared editorial changes remain owned by their existing workstream.
-
-## Launch navigation scope — October 12, 2026
-
-- Operators: Leaderboard, Profile, Compare, Hall.
-- Writings: SigRank (§), Field, Articles, Blog, Wiki.
-- Coming soon: Hacks, VS, Teams — gray disabled icons, no destinations or popovers.
-- Homepage and shared workspace use the same grouped rail. Profile resolves through /me to the signed-in operator; existing login flow applies.
-- Profile and Articles have pixel icons; leaderboard uses descending multicolor bars. Existing scoring, datasets and page bodies unchanged.
-- Updated review mock mirrors these groups; current live preview remains :3230.
 
 ## Earlier audit snapshot — October 11 (historical)
 

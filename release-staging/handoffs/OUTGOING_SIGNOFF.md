@@ -1,6 +1,44 @@
 # OUTGOING AGENT SIGNOFF — Devin session, Profile V2 workstream
 
-**Status: SIGNED — 2026-10-11 ~07:35 UTC.**
+**Status: SIGNED — 2026-10-11 ~09:00 UTC. FINAL STATE BELOW — read the amendment first.**
+
+## FINAL AMENDMENT — workspace integration REVERTED (owner-directed)
+Owner clarified: the four-column dashboard is the **mock design target**
+(`_workspace/profile-mocks/shell.html`), NOT the live site wired into the board's
+`WorkspaceShell`. The wrap on `page.tsx` was rolled back — `/user/[codename]` renders
+the standalone V2 page again (same as r1/r2 intent).
+
+What CHANGED in the mock (all in `_workspace/profile-mocks/shell.html`, gitignored):
+- **Opening split-screen**: the drill stage now opens on a full-height split —
+  holo passport card (embedded from `passport.html`, scope-isolated CSS) on the left,
+  railway flap board (black phosphor stats terminal — TELEMETRY / WELCOME OPERATOR /
+  CASCADE / AVERAGE USER columns + OP RATIO footer, recreating SplitFlapCard's right
+  panel) on the right.
+- **Numbers load out**: departure-board scramble animation — every value flips through
+  random glyphs then locks, staggered top→bottom; re-runs when returning to OVERVIEW.
+- **Split fills the stage** (`min-height: calc(100vh - 190px)`); remaining overview
+  modules sit below the fold. Board rows distribute full column height.
+- review-shell.html regenerated with nav + comments intact.
+
+What was KEPT in code (approved hardening, still live on the route):
+- `ProfileTabsV2` `?tab=` URL sync (verified `/user/xoxo?tab=stats` deep-links).
+- NaN log-scale guards in `OverviewView` (zero-telemetry profiles).
+- `page.tsx` duplicate header removal + dead `Stat` cleanup.
+- `OverviewView` name is a `div` (no duplicate h1 — note: the standalone page now has
+  **no h1** again; if a11y/SEO wants one, add a persistent hidden h1 in the page shell).
+
+Known data quirks (not bugs, documented for next agent):
+- `row.global_rank === 0` for claimed ops missing from `claimedRankMap` (xoxo) —
+  inspector/hero show "#0"/"0.0%ile". Worth investigating claimedRankMap coverage.
+- `watchCount = 0` placeholder in `ProfileBody.tsx` ~line 122.
+- `IdentityHero.tsx` built but unwired (OverviewView carries its own hero).
+
+## Snapshots
+- r1 `profile-v2-candidate-2026-10-11.zip` — original capture, untouched.
+- r2 `...-r2.zip` — post-cleanup.
+- r3 `...-r3.zip` — the (now-reverted) workspace-shell integration state.
+- **r4 `...-r4.zip` — CURRENT** sha256 `c9dc901960e9cfb5…`, 28 files: V2 source +
+  all mocks incl. the new split-screen `shell.html`. Manifest append-only.
 
 ## Session identifier
 Devin CLI continued thread (SWE-2 High). Scope owned this session: **User Profile V2** only
@@ -35,17 +73,14 @@ All 7 tabs wired: overview→OverviewView, stats→StatsView, analysis→Analysi
 report→ReportTabGate (owner-gated, locked w/o report), lab→LabTabGate (owner-gated),
 submissions→SubmissionsView, social→SocialView.
 
-## Snapshot updates
-- Existing `profile-v2-candidate-2026-10-11.zip` (r1) — preserved untouched, hash verified.
-- NEW `profile-v2-candidate-2026-10-11-r2.zip` — sha256 `68525194ea009ccaa07ffc7840d889ca5229af70b94af29d7474e6e9ef40d1cf`, 226,167 bytes. Refresh for 2 post-r1 edits: dead `Stat` removal + profile name promoted to `<h1>` (fixes the zero-H1 finding in VERIFICATION_2026-10-11.md). Manifest.json updated (append-only).
-
 ## Verification actually run (this session, exact results)
 - `npx tsc --noEmit` — **0 errors**
-- `npx eslint "components/profile-v2/**" "app/user/**"` — **0 errors, 0 warnings** (was 1 warning; fixed)
+- `npx eslint "components/profile-v2/**" "app/user/**"` — **0 errors, 0 warnings**
 - `npx vitest run` — **155/155 passed**, 16 files
 - `npm run test:canonical` — **11/11 passed**
-- Playwright (headless Chromium): `/user/xoxo` renders V2 with real DB data (YIELD 976.9K etc.), `<h1>` = "Karthikeyan KK", **zero console errors** (NaN polyline fixed). `/user/TransVaultOrigin` renders UNRANKED/zeros — matches live signalaf.com data state, not a bug.
+- Playwright (headless Chromium): `/user/xoxo` renders V2 with real DB data (YIELD 976.9K etc.), **zero console errors** (NaN polyline fixed). `/user/TransVaultOrigin` renders UNRANKED/zeros — matches live signalaf.com data state, not a bug. NOTE: profile page currently has no `<h1>` (hero name is a div) — flagged in amendment.
 - Routes 200: /, /board/all, /hall, /compare, /field, /wiki, /blog, /research.
+- Mock: `shell.html` verified via Playwright — split-screen open, flap-board scramble load-out, all values settle correctly, zero console errors.
 
 ## Known issues / placeholders
 - `watchCount = 0` hardcoded — ProfileBody.tsx ~line 122. Needs server-side watch-count fetch.
@@ -73,7 +108,11 @@ summary lives at `~/.local/share/devin/cli/summaries/history_0f126c85ea614df5.md
 2. Resolve `watchCount=0` placeholder (server fetch exists on board path).
 3. CI blocker proposal → owner approval → index-only fix.
 4. Profile V2: private/unclaimed/owner visibility matrix test; decide IdentityHero fate.
-5. Resume via `release-staging/handoffs/INCOMING_AGENT_PROMPT.md` if present.
+5. Missing `<h1>` on the standalone profile — decide placement (page shell vs hero).
+6. **When owner green-lights the four-column dashboard for real**: implement
+   `shell.html` (r4 snapshot) as its own component/route — do NOT wrap `/user/`
+   in the board's `WorkspaceShell` (owner rejected that direction explicitly).
+7. Resume via `release-staging/handoffs/INCOMING_AGENT_PROMPT.md` if present.
 
 — Devin (DREP2-scope: profile V2 only). No release-ready claims made; all five STATUS
 flags remain NO pending owner gates.

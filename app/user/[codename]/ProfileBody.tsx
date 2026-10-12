@@ -148,7 +148,30 @@ export async function ProfileBody({
         })}
       />
 
-
+      {ranked && c && !c.nonCompounding && (
+        <DeferredSplitFlapCard
+          codename={operator.codename}
+          name={name}
+          yieldValue={c.yield_}
+          classTier={snapshot.class_tier}
+          platform={operator.primary_domain}
+          inputTokens={telemetry.fresh_input}
+          outputTokens={telemetry.output}
+          cacheRead={telemetry.cache_read}
+          cacheCreate={telemetry.cache_create}
+          snr={c.snr}
+          leverage={c.leverage}
+          velocity={c.velocity}
+          dev10x={c.dev10x}
+          scaleV={c.scaleV}
+          efficiency={c.efficiency}
+          costPerMillion={c.costPerMillion}
+          opRatio={c.opRatio}
+          cascadeStr={c.cascadeStr}
+          radarAxes={[]}
+          fieldAvg={fieldAvg}
+        />
+      )}
 
       <ProfileAuthGate codename={operator.codename}>
         {!operator.claimed && <ClaimTabGate codename={operator.codename} />}
@@ -240,32 +263,6 @@ export async function ProfileBody({
           }
         />
       </ProfileAuthGate>
-      {ranked && c && !c.nonCompounding && (
-        <details className="ws-profile-share-card"><summary>Operator signature · share card</summary>
-        <DeferredSplitFlapCard
-          codename={operator.codename}
-          name={name}
-          yieldValue={c.yield_}
-          classTier={snapshot.class_tier}
-          platform={operator.primary_domain}
-          inputTokens={telemetry.fresh_input}
-          outputTokens={telemetry.output}
-          cacheRead={telemetry.cache_read}
-          cacheCreate={telemetry.cache_create}
-          snr={c.snr}
-          leverage={c.leverage}
-          velocity={c.velocity}
-          dev10x={c.dev10x}
-          scaleV={c.scaleV}
-          efficiency={c.efficiency}
-          costPerMillion={c.costPerMillion}
-          opRatio={c.opRatio}
-          cascadeStr={c.cascadeStr}
-          radarAxes={[]}
-          fieldAvg={fieldAvg}
-        />
-        </details>
-      )}
 
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">

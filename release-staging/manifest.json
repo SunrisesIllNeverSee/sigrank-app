@@ -1,9 +1,9 @@
 {
   "schema": "signalaf.release-staging.v1",
-  "timestamp_utc": "2026-10-11T07:30:54+00:00",
+  "timestamp_utc": "2026-10-12T08:45:00+00:00",
   "repo": "SunrisesIllNeverSee/sigrank-app",
   "branch": "feat/live-board-2b",
-  "head": "09a45dc",
+  "head": "9dbb439",
   "release_ready": false,
   "deployed": false,
   "owner_release_approval": false,
@@ -266,6 +266,248 @@
         {
           "path": "_workspace/profile-mocks/shell.html",
           "sha256": "89def5d6619205852ad264e5faaa2a092cbc1d6d281bcbb74d95066235c8b0dd"
+        },
+        {
+          "path": "_workspace/profile-mocks/social.html",
+          "sha256": "cd451c7cc813219c272cd5c31e4f972c95cad9739579bcb0eefb511caf072efb"
+        },
+        {
+          "path": "_workspace/profile-mocks/stats.html",
+          "sha256": "05e9a08f3e5c1b049359f8066c484e6c063e314ecc23bb5592cfb3910827e677"
+        },
+        {
+          "path": "_workspace/profile-mocks/submissions.html",
+          "sha256": "a8a4141f407165489c96eeaaa910d4c59a5f163d16861d9c861e159745a725e4"
+        },
+        {
+          "path": "docs/PROFILE_PAGE_MAP.md",
+          "sha256": "12b7f5c4fa2d9520012e11289e0fa44ccf7e63468ae1eeb006d054a27c3d37cd"
+        },
+        {
+          "path": "docs/PROFILE_REDESIGN_PROMPT.md",
+          "sha256": "5ac79282f0e01028b3c074a17114d5eb58f716e54017aaab42540874ccf880ad"
+        }
+      ]
+    },
+    {
+      "group": "user-profile",
+      "archive": "user-profile/profile-v2-candidate-2026-10-11-r3.zip",
+      "sha256": "a7e8600837be4d1255206cfd2cf701d519b4385588e220b8d668212d3fbb1b74",
+      "size": 226679,
+      "note": "r3 2026-10-11: WORKSPACE INTEGRATION \u2014 page.tsx now wraps the profile in WorkspaceShell (icon rail, left PROFILE sidebar with ?tab= deep links, right OPERATOR inspector + ACTIONS, footer status). ProfileTabsV2 gained ?tab= URL sync. OverviewView name reverted to div (shell provides persistent sr-only h1). RANK shows '\u2014' when global_rank is 0. Self-referencing SEE PROFILE replaced with COMPARE + WATCH. Earlier r1/r2 archives preserved untouched.",
+      "files": [
+        {
+          "path": "components/profile-v2/AnalysisView.tsx",
+          "sha256": "33c496822ee176836d5559bf317f2e4dd867e3b375c8302024edac99688aef01"
+        },
+        {
+          "path": "components/profile-v2/IdentityHero.tsx",
+          "sha256": "d1309a13a86b05220451c1c788ed80f58b636e00ff6d0ce26548a4025df5070e"
+        },
+        {
+          "path": "components/profile-v2/OverviewView.tsx",
+          "sha256": "bc7f67c665eccbb0f46bca1de13bb98ac941550e0e2652830cd3774bc0b16aab"
+        },
+        {
+          "path": "components/profile-v2/ProfileTabsV2.tsx",
+          "sha256": "f957b00f77d5996637eadbf1ee307e6565d0cfdf7e45b2e51faa6c92aa3c00a3"
+        },
+        {
+          "path": "components/profile-v2/SocialView.tsx",
+          "sha256": "3bbd2072fad16d781f08ef50c5213a944a06d566de92d0a247eda52aba664e71"
+        },
+        {
+          "path": "components/profile-v2/StatsView.tsx",
+          "sha256": "96d07fd4a6f0958b6e853e913088e1ce88950e748d716c470dab0b3f9615713d"
+        },
+        {
+          "path": "components/profile-v2/SubmissionsView.tsx",
+          "sha256": "a55497ea3869d8018ad7bf64510d191c0655d3d8f4163a84a1af7a91042e1a2a"
+        },
+        {
+          "path": "app/user/[codename]/ProfileBody.tsx",
+          "sha256": "7cdd8be9f54cb3ba7527d234a64aa207e045d0fbf65bcd164054cba7e4506b59"
+        },
+        {
+          "path": "app/user/[codename]/page.tsx",
+          "sha256": "48bcbec4f1989d2fee8f09033dd1856eba4007a18fe1fcf3d9a55ee6c01a5082"
+        },
+        {
+          "path": "_workspace/profile-mocks/analysis.html",
+          "sha256": "5846388b05649b008f32584b3f84db80428fa2c2be0543ce5eadb74a63d4e101"
+        },
+        {
+          "path": "_workspace/profile-mocks/heatmap.html",
+          "sha256": "1677862533773eb1f848efd21891822c7a46928979ab1edb5c4eba0e13bf5c6a"
+        },
+        {
+          "path": "_workspace/profile-mocks/index.html",
+          "sha256": "7af943ab55901ec73cef91fb34a123aa69e5403ec0001791da7882155c15a210"
+        },
+        {
+          "path": "_workspace/profile-mocks/overview.html",
+          "sha256": "093e3b544b654f72cefe9f035cc8b74c1dd05009d9006ceafe47c8a7db7b094f"
+        },
+        {
+          "path": "_workspace/profile-mocks/passport.html",
+          "sha256": "e7257263f928536de246c056929289d8c20baa063a17cdf2a4394ea7d2080479"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-analysis.html",
+          "sha256": "145f96a5809fdf037fb6218ae8f050ea3484059f713206eb1f0987c7396b5642"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-heatmap.html",
+          "sha256": "598d2c7d7f78af5f7776566ca54ab9ed4ddc444608cf6abbcd4a9edf49c93db4"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-overview.html",
+          "sha256": "e20841befb40e3bcb4f4eb24b8bcd2266e4143a4446102d8ca9f7d716c5e9ac2"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-passport.html",
+          "sha256": "3f408ffb8ade4d4ca48c8e7c029d65a564525257e97b0b9f9448fd67bc3c0c78"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-shell.html",
+          "sha256": "364ffd39b816ccc30668d72ca7c099732995e31fe05e56b8dc85da0408f1e191"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-social.html",
+          "sha256": "78cb560e408b0128bab488ef319c3ac5397535fa88211bf8041664f82b042dfc"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-stats.html",
+          "sha256": "f4da536a7735b7c32c94e0c1a4fe95bf46a65fc3da6486d613078b3bde636957"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-submissions.html",
+          "sha256": "8c9b7b95e4a67ca357db2a0d8a6fd7221397a528e5f8d5ee3670f68c1555b266"
+        },
+        {
+          "path": "_workspace/profile-mocks/shell.html",
+          "sha256": "89def5d6619205852ad264e5faaa2a092cbc1d6d281bcbb74d95066235c8b0dd"
+        },
+        {
+          "path": "_workspace/profile-mocks/social.html",
+          "sha256": "cd451c7cc813219c272cd5c31e4f972c95cad9739579bcb0eefb511caf072efb"
+        },
+        {
+          "path": "_workspace/profile-mocks/stats.html",
+          "sha256": "05e9a08f3e5c1b049359f8066c484e6c063e314ecc23bb5592cfb3910827e677"
+        },
+        {
+          "path": "_workspace/profile-mocks/submissions.html",
+          "sha256": "a8a4141f407165489c96eeaaa910d4c59a5f163d16861d9c861e159745a725e4"
+        },
+        {
+          "path": "docs/PROFILE_PAGE_MAP.md",
+          "sha256": "12b7f5c4fa2d9520012e11289e0fa44ccf7e63468ae1eeb006d054a27c3d37cd"
+        },
+        {
+          "path": "docs/PROFILE_REDESIGN_PROMPT.md",
+          "sha256": "5ac79282f0e01028b3c074a17114d5eb58f716e54017aaab42540874ccf880ad"
+        }
+      ]
+    },
+    {
+      "group": "user-profile",
+      "archive": "user-profile/profile-v2-candidate-2026-10-11-r4.zip",
+      "sha256": "c9dc901960e9cfb571489d60a5ed0569952e696cf97b967b2ed610d5b3a5c5c1",
+      "size": 238850,
+      "note": "r4: shell mock redesign \u2014 opening split (holo passport card + railway flap board with scramble load-out, full-stage height). WorkspaceShell integration REVERTED per owner (standalone page restored). Mocks + source current as of this hash.",
+      "files": [
+        {
+          "path": "components/profile-v2/AnalysisView.tsx",
+          "sha256": "33c496822ee176836d5559bf317f2e4dd867e3b375c8302024edac99688aef01"
+        },
+        {
+          "path": "components/profile-v2/IdentityHero.tsx",
+          "sha256": "d1309a13a86b05220451c1c788ed80f58b636e00ff6d0ce26548a4025df5070e"
+        },
+        {
+          "path": "components/profile-v2/OverviewView.tsx",
+          "sha256": "bc7f67c665eccbb0f46bca1de13bb98ac941550e0e2652830cd3774bc0b16aab"
+        },
+        {
+          "path": "components/profile-v2/ProfileTabsV2.tsx",
+          "sha256": "f957b00f77d5996637eadbf1ee307e6565d0cfdf7e45b2e51faa6c92aa3c00a3"
+        },
+        {
+          "path": "components/profile-v2/SocialView.tsx",
+          "sha256": "3bbd2072fad16d781f08ef50c5213a944a06d566de92d0a247eda52aba664e71"
+        },
+        {
+          "path": "components/profile-v2/StatsView.tsx",
+          "sha256": "96d07fd4a6f0958b6e853e913088e1ce88950e748d716c470dab0b3f9615713d"
+        },
+        {
+          "path": "components/profile-v2/SubmissionsView.tsx",
+          "sha256": "a55497ea3869d8018ad7bf64510d191c0655d3d8f4163a84a1af7a91042e1a2a"
+        },
+        {
+          "path": "app/user/[codename]/ProfileBody.tsx",
+          "sha256": "7cdd8be9f54cb3ba7527d234a64aa207e045d0fbf65bcd164054cba7e4506b59"
+        },
+        {
+          "path": "app/user/[codename]/page.tsx",
+          "sha256": "c1bebb7fe3b1fac087485946173ce0dc2e363657d76fb2316f201cdde4973c5a"
+        },
+        {
+          "path": "_workspace/profile-mocks/analysis.html",
+          "sha256": "5846388b05649b008f32584b3f84db80428fa2c2be0543ce5eadb74a63d4e101"
+        },
+        {
+          "path": "_workspace/profile-mocks/heatmap.html",
+          "sha256": "1677862533773eb1f848efd21891822c7a46928979ab1edb5c4eba0e13bf5c6a"
+        },
+        {
+          "path": "_workspace/profile-mocks/index.html",
+          "sha256": "7af943ab55901ec73cef91fb34a123aa69e5403ec0001791da7882155c15a210"
+        },
+        {
+          "path": "_workspace/profile-mocks/overview.html",
+          "sha256": "093e3b544b654f72cefe9f035cc8b74c1dd05009d9006ceafe47c8a7db7b094f"
+        },
+        {
+          "path": "_workspace/profile-mocks/passport.html",
+          "sha256": "e7257263f928536de246c056929289d8c20baa063a17cdf2a4394ea7d2080479"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-analysis.html",
+          "sha256": "145f96a5809fdf037fb6218ae8f050ea3484059f713206eb1f0987c7396b5642"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-heatmap.html",
+          "sha256": "598d2c7d7f78af5f7776566ca54ab9ed4ddc444608cf6abbcd4a9edf49c93db4"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-overview.html",
+          "sha256": "e20841befb40e3bcb4f4eb24b8bcd2266e4143a4446102d8ca9f7d716c5e9ac2"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-passport.html",
+          "sha256": "3f408ffb8ade4d4ca48c8e7c029d65a564525257e97b0b9f9448fd67bc3c0c78"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-shell.html",
+          "sha256": "e2847be6089256d86058ebc571a35d7be3d24a256a44225612389bf8bc6be1a6"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-social.html",
+          "sha256": "78cb560e408b0128bab488ef319c3ac5397535fa88211bf8041664f82b042dfc"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-stats.html",
+          "sha256": "f4da536a7735b7c32c94e0c1a4fe95bf46a65fc3da6486d613078b3bde636957"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-submissions.html",
+          "sha256": "8c9b7b95e4a67ca357db2a0d8a6fd7221397a528e5f8d5ee3670f68c1555b266"
+        },
+        {
+          "path": "_workspace/profile-mocks/shell.html",
+          "sha256": "53b252424a8c9471a1e78a0d7baa55bb4401aac9c575f56b2e20c851b11fcab7"
         },
         {
           "path": "_workspace/profile-mocks/social.html",
