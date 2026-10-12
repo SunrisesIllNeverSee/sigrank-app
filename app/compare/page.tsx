@@ -32,7 +32,7 @@ import {
   type CompareOption,
 } from "@/components/compare/CompareSelectors";
 import { CompareLedger } from "@/components/compare/CompareLedger";
-import { CompareTokenLongevity } from "@/components/compare/CompareTokenLongevity";
+import { CompareHistoryChart } from "@/components/compare/CompareHistoryChart";
 import { liveCompareCandidates, resolveLiveComparePair } from "@/lib/board/compare-live";
 // CMP redesign (owner 2026-06-22): the matchup box (CompareMatchup) folds the selectors +
 // identity + 5 derived facts per operator; CompareLedger is the RAW/METRICS/TOTAL ledger
@@ -300,12 +300,12 @@ export default async function ComparePage({
           {
             question: "How do I compare two AI operators on SigRank?",
             answer:
-              "Visit signalaf.com/compare and select two operators using the dropdown selectors. The comparison shows Yield (Υ), SNR, Leverage, Velocity, 10xDEV, and blended cost side by side, plus each operator's own raw and metric radars and a shared dated-token longevity chart. You can share the comparison via URL.",
+              "Visit signalaf.com/compare and select two operators using the dropdown selectors. The comparison shows Yield (Υ), SNR, Leverage, Velocity, 10xDEV, and blended cost side by side, plus each operator's own raw and metric radars and a shared Yield-over-time chart. You can share the comparison via URL.",
           },
           {
             question: "What metrics does the SigRank comparison show?",
             answer:
-              "The head-to-head comparison shows six cascade metrics: Yield (Υ = cache_read × output / input²), SNR (signal-to-noise ratio), Leverage (cache reuse efficiency), Velocity (output per token), 10xDEV (log-normalized value above replacement), and blended cost ($/1M tokens). Individual raw and metric radar charts describe each live operator, with shared dated token history beneath.",
+              "The head-to-head comparison shows six cascade metrics: Yield (Υ = cache_read × output / input²), SNR (signal-to-noise ratio), Leverage (cache reuse efficiency), Velocity (output per token), 10xDEV (log-normalized value above replacement), and blended cost ($/1M tokens). Individual raw and metric radar charts describe each live operator, with their recorded Yield history beneath.",
           },
           {
             question: "Can I compare myself against another AI operator?",
@@ -410,8 +410,8 @@ export default async function ComparePage({
             </div>
           </>
         }
-        leftWidth={180}
-        rightWidth={198}
+        leftWidth={228}
+        rightWidth={240}
         status={
           <>
             {nameOf(rowA).toUpperCase()} × {nameOf(rowB).toUpperCase()} · SIGNALAF × SIGRANK · MO§ES™
@@ -429,11 +429,12 @@ export default async function ComparePage({
             <CompareLedger a={rowA} b={rowB} workspace />
           </div>
           <div className="ws-cmp-hist">
-            <CompareTokenLongevity
+            <CompareHistoryChart
               historyA={historyA}
               historyB={historyB}
               nameA={nameOf(rowA)}
               nameB={nameOf(rowB)}
+              height={140}
               colorA={compareClassPalette(rowA.snapshot.class_tier).color}
               colorB={compareClassPalette(rowB.snapshot.class_tier).color}
             />

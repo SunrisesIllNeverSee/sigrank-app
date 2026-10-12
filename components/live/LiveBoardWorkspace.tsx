@@ -2017,7 +2017,7 @@ export function LiveBoardWorkspace({
                     onChange={(e) => setPlatformSel(e.target.value)}
                   >
                     {CONTROLS.platforms.map((o) => (
-                      <option key={o}>{o}</option>
+                      <option key={o} value={o}>{o === "All Platforms" ? "Platform" : o}</option>
                     ))}
                   </select>
                 </span>
@@ -2029,7 +2029,7 @@ export function LiveBoardWorkspace({
                     onChange={(e) => setClassSel(e.target.value)}
                   >
                     {CONTROLS.classes.map((o) => (
-                      <option key={o}>{o}</option>
+                      <option key={o} value={o}>{o === "All Classes" ? "Class" : o}</option>
                     ))}
                   </select>
                 </span>
