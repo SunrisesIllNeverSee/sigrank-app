@@ -44,7 +44,7 @@ export function WatchButton({ codename }: { codename: string }) {
     };
   }, [codename, session.signedIn]);
 
-  const on = watching ?? local.includes(codename);
+  const on = session.signedIn ? watching === true : local.includes(codename);
   const toggle = useCallback(() => {
     if (session.signedIn) {
       fetch(`/api/v1/operators/${encodeURIComponent(codename)}/watch`, {
@@ -55,6 +55,7 @@ export function WatchButton({ codename }: { codename: string }) {
           if (!d) return;
           setWatching(!!d.watching);
           setCount(typeof d.count === "number" ? d.count : null);
+          window.dispatchEvent(new Event("operator-watch-changed"));
         })
         .catch(() => {});
       return;

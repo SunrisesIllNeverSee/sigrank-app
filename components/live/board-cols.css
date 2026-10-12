@@ -24,6 +24,15 @@
      display lines the reference markup never had.
 */
 
+ .lbw-root .ws-return-self{display:block;margin:0 0 8px auto;border:0;background:transparent;color:var(--ac);font:600 10px var(--font-mono);cursor:pointer}
+.lbw-root .ws-return-self:focus-visible{outline:2px solid var(--ac)}
+
+/* Scale V reads as a measured scale, with a separate Wiki link alongside sorting. */
+.lbw-root .board-t th.hc-scale{white-space:nowrap}
+.lbw-root .board-t th .head-help{display:inline-flex;align-items:center;justify-content:center;margin-left:5px;font-size:12px;color:var(--ac);text-decoration:none;vertical-align:middle}
+.lbw-root .board-t th .head-help:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.lbw-root .board-t td.hc-scale{font-variant-numeric:tabular-nums}
+
 /* ---------- column group super-headers ---------- */
 /* Second thead row rendered ABOVE the column labels. Group cells keep the
    .board-t th chrome but lose the underline (the label row owns it) and
