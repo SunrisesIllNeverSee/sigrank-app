@@ -125,3 +125,38 @@
 .lbw-root .board-t tr.unranked-member .op .nm a:hover{
   text-decoration:underline
 }
+
+/* Movers: 5 named/TBD slots x 5 slides, a fixed canvas with explicit
+   slide controls. Stable dimensions at narrow/stage sidebar widths. */
+.lbw-root .mbox{
+  height:252px;min-height:252px;box-sizing:border-box;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.lbw-root .mbox-h{
+  min-height:34px;height:34px;box-sizing:border-box;
+  display:flex;align-items:center;gap:4px;padding-bottom:6px;
+}
+.lbw-root .mbox-title{
+  flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.lbw-root .mbox-nav{display:inline-flex;gap:3px;flex-shrink:0}
+.lbw-root .mbox-nav button{
+  display:grid;place-items:center;width:18px;height:20px;padding:0;
+  border:1px solid var(--line2);background:transparent;border-radius:4px;
+  color:var(--tx2);font:12px var(--font-mono);cursor:pointer
+}
+.lbw-root .mbox-nav button:hover{color:var(--ac);border-color:var(--ac)}
+.lbw-root .mbox-nav button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.lbw-root .mbox .mv{
+  min-height:38px;height:38px;box-sizing:border-box;flex-shrink:0;
+  padding:5px 0;min-width:0;
+}
+.lbw-root .mbox .mv .mav{
+  flex-shrink:0;overflow:hidden
+}
+.lbw-root .mbox .mv .mav img{width:100%;height:100%;object-fit:cover}
+.lbw-root .mbox .mv .dlt{max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.lbw-root .mbox .mv .rk-pos{flex-shrink:0}
+.lbw-root .mbox .mv.mv-tbd{color:var(--mut)}
+.lbw-root .mbox .mv.mv-tbd .mav{opacity:.5;border:1px dashed var(--line2);background:transparent}
+.lbw-root .mbox .mv.mv-tbd .dlt{color:var(--mut)}

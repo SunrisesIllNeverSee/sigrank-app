@@ -1469,6 +1469,7 @@ export function LiveBoardWorkspace({
            views of the same field. */
         return (
           <RotatingMovers
+            key={wfSel}
             ops={ops}
             server={initial.movers}
             boardMode={wfSel}
@@ -1891,6 +1892,7 @@ export function LiveBoardWorkspace({
                     TOP MOVERS · {wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()}
                   </h3>
                   <RotatingMovers
+                    key={wfSel}
                     ops={ops}
                     server={initial.movers}
                     boardMode={wfSel}
