@@ -257,46 +257,38 @@ export function EditorialNav({
 }) {
   const pathname = usePathname();
   const topic = topicForPage(current);
-  const isHome = pathname === "/sigrank";
   const isWiki = topic === "wiki";
-  const isLanding = (topic === "field" && pathname === "/fieldhub")
-    || (topic === "articles" && pathname === "/articles")
-    || (topic === "blog" && pathname === "/blog");
-  const isReader = !isHome && !isWiki && !isLanding;
+  const isLanding = TOPICS.some((item) => pathname === item.href);
+  const isReader = !isLanding && !isWiki;
   const collectionLabel = topic === "field" ? "Field"
     : topic === "articles" ? "Articles" : "Blog";
   const entries = documents ?? PAGES[topic];
 
+  if (isLanding) {
+    return (
+      <div className="mod ws-topic-index">
+        <div className="mini-h"><span className="sq" />TOPICS</div>
+        <nav className="ws-nav ws-home-topics" aria-label="Editorial sections">
+          {TOPICS.map((item) => (
+            <Link key={item.id} href={item.href}
+              aria-current={pathname === item.href ? "page" : undefined}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    );
+  }
+
   return (
     <>
-      {isHome && (
-        <div className="ws-home-nav">
-          {/* A native checkbox guarantees the stage is never remounted.
-              Hash navigation preserves this state without client hydration. */}
-          <input id="ws-home-mode" type="checkbox" className="ws-home-switch"
-            aria-label="Show SigRank page contents" />
-          <div className="mod ws-topic-index ws-home-topic-index">
-            <div className="mini-h"><span className="sq" />TOPICS</div>
-            <nav className="ws-nav ws-home-topics" aria-label="SignalAF topics">
-              {TOPICS.map(item => item.id === "home" ? (
-                <label key={item.id} htmlFor="ws-home-mode"
-                  role="button" tabIndex={0} className="ws-editorial-nav-link">{item.label}</label>
-              ) : <Link href={item.href} key={item.id}>{item.label}</Link>)}
-            </nav>
-          </div>
-          <div className="mod ws-page-index ws-home-contents">
-            <div className="mini-h"><span className="sq" />PAGE CONTENTS</div>
-            <PageSections pageContents={pageContents} />
-          </div>
-        </div>
-      )}
       {isWiki && (
         <div className="mod ws-page-index ws-wiki-contents">
           <div className="mini-h"><span className="sq" />WIKI CONTENTS</div>
           <PageSections pageContents={pageContents} />
         </div>
       )}
-      {!isHome && !isWiki && (
+      {!isWiki && (
         <div className="mod ws-document-tree">
           <div className="mini-h"><span className="sq" />DOCUMENTS</div>
           <nav className="ws-tree-list" aria-label={collectionLabel + " expandable documents"}>
