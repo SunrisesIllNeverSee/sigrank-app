@@ -169,3 +169,8 @@ Profile slot now renders the signed-in operator's existing earned percentile pix
 - Mock remains unauthenticated: links to real staged controls; explicit live-site sign-out note. Immutable R4 archive unchanged.
 - Checks: TypeScript, scoped lint, canonical 11/11, production build, signed-in menu on profile and leaderboard, Escape/focus return, outside closing, device anchor arrival, menu viewport fit. Actual sign-out not exercised against owner's session; signed-out/unlinked branches reviewed in source.
 - No push, merge or deployment. Settings still uses its existing site frame; migrating that frame is outside this account-menu audit.
+
+
+## Whole-site preview synchronization — October 12, 2026
+
+Current :3230 listener is Next dev from this integration checkout. Local HEAD 6d30d9e includes editorial commit 410f4ee and Compare commit 5b7172e. origin/integration/site-a315435 remains f0a39eb at this check. Root, all five text section indexes, Hall, Profile and Compare verified in the browser; editorial-stage class and Back/Home navigation present on all five writing sections. Compare's uncommitted live-operator and token-longevity implementation is also visibly served. No source import is needed to make these changes visible; they are already in this checkout. STATUS_BOARD current receipt supersedes its historical rows. Preview coverage does not constitute final UX/data/auth acceptance. No source files or active workstream ownership changed.
