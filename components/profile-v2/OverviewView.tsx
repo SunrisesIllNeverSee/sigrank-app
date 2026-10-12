@@ -28,6 +28,9 @@ import type {
 import type { TierProgress } from "@/lib/analytics/tier-progress";
 import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
 import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
+import type { FieldAverages } from "@/lib/analytics/field-average";
+import { PassportCard } from "./PassportCard";
+import { FlapBoard } from "./FlapBoard";
 import { lbwFontVars } from "@/components/live/fonts";
 
 export interface OverviewViewProps {
@@ -45,6 +48,7 @@ export interface OverviewViewProps {
   watchCount: number;
   boardRows: LeaderboardRow[];
   history: HistoryPoint[];
+  fieldAvg: FieldAverages;
 }
 
 /* ── Scoped styles (theme tokens + mock structure, .pv2 prefix) ─────────── */
@@ -205,12 +209,15 @@ const seriesDelta = (v: (number | null)[]) => {
   return idx.length >= 2 ? v[idx[idx.length - 1]]! - v[idx[0]]! : null;
 };
 
-function MedalSvg({ color, rank, size = 20 }: { color: string; rank: string; size?: number }) {
+function MedalSvg({ color, rank, size = 30 }: { color: string; rank: string; size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" style={{ flexShrink: 0 }}>
-      <circle cx="10" cy="10" r="9" fill="none" stroke={color} strokeWidth="1.5" />
-      <circle cx="10" cy="10" r="6" fill={color} opacity="0.15" />
-      <text x="10" y="13.5" textAnchor="middle" fill={color} fontFamily="var(--pv2-display)" fontSize="8" fontWeight="700">{rank}</text>
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0 }} aria-hidden="true">
+      {/* ribbon */}
+      <path d="M8.2 2.5 12 7l3.8-4.5 2.3 1-3 5.2-3.1-1.6-3.1 1.6-3-5.2z" fill={color} opacity="0.55" />
+      {/* medal disc */}
+      <circle cx="12" cy="15" r="7.2" fill="none" stroke={color} strokeWidth="1.8" />
+      <circle cx="12" cy="15" r="4.8" fill={color} opacity="0.2" />
+      <text x="12" y="18.4" textAnchor="middle" fill={color} fontFamily="var(--pv2-display)" fontSize="7.5" fontWeight="700">{rank}</text>
     </svg>
   );
 }
@@ -230,6 +237,7 @@ export function OverviewView({
   watchCount,
   boardRows,
   history,
+  fieldAvg,
 }: OverviewViewProps) {
   const c = snapshot.cascade;
   const show = ranked && !pending && c && !c.nonCompounding ? c : null;
@@ -346,6 +354,31 @@ export function OverviewView({
   return (
     <div className={`pv2 ${lbwFontVars}`}>
       <style>{CSS}</style>
+
+      {/* 0 ─ OPENING SPLIT — holo passport card + railway flap board
+          (restored per owner 2026-10-12 wiring pass; the previously designed
+          opening presentation, all values live operator data) */}
+      <section className="pv2-opensplit" aria-label="Operator passport and telemetry board">
+        <div className="pv2-pcard-scope">
+          <PassportCard
+            operator={operator}
+            snapshot={snapshot}
+            globalRank={globalRank}
+            pending={pending}
+            archetype={archetype}
+            trophyCounts={trophyCounts}
+            fieldAvg={fieldAvg}
+          />
+        </div>
+        <FlapBoard
+          operator={operator}
+          snapshot={snapshot}
+          telemetry={telemetry}
+          pending={pending}
+          fieldAvg={fieldAvg}
+          boardRows={boardRows}
+        />
+      </section>
 
       {/* 1 ─ IDENTITY HERO */}
       <section className="pv2-mod" style={{ padding: "24px 28px" }}>
@@ -631,12 +664,12 @@ export function OverviewView({
             WATCHED BY {watchCount}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           {medals.map((m, i) => (
             <span key={i} style={{ display: "contents" }}>
               {i > 0 && <span className="pv2-sep">·</span>}
-              <span style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--pv2-mono)", fontSize: 16, fontWeight: 700, fontVariantNumeric: "tabular-nums", opacity: m.n === 0 ? 0.3 : 1 }}>
-                <MedalSvg color={m.color} rank={m.rank} />
+              <span style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--pv2-mono)", fontSize: 19, fontWeight: 700, fontVariantNumeric: "tabular-nums", opacity: m.n === 0 ? 0.3 : 1 }}>
+                <MedalSvg color={m.color} rank={m.rank} size={30} />
                 <span style={{ color: m.color }}>{m.n}</span>
               </span>
             </span>
@@ -670,7 +703,7 @@ export function OverviewView({
             <div className="pv2-hgrid">
               {records.slice(0, 3).map((r) => (
                 <div key={r.reward_id + r.title} className="pv2-hcard">
-                  <MedalSvg color="var(--pv2-medal)" rank="1" size={18} />
+                  <MedalSvg color="var(--pv2-medal)" rank="1" size={26} />
                   <div className="pv2-hinfo">
                     <div className="pv2-hname">
                       {r.title} <span style={{ color: "var(--pv2-medal)" }}>· CURRENT RECORD</span>
