@@ -116,9 +116,9 @@
 .lbw-root .board-t .unranked-detail{padding:13px;color:var(--mut);text-align:left;font-size:11px;line-height:1.6}
 .lbw-root .board-t .unranked-count{color:var(--ac);font-weight:800}
 
-/* Signed-up account positions (not SigRank performance ranks).
-   Each real active linked account occupies exactly one positional row.
-   Names/IDs are withheld until an explicit preboard public-consent gate exists. */
+/* Signed-up UR positions (not SigRank performance ranks).
+   Public operator identities follow the canonical name/avatar/handle layout
+   while privately configured profiles remain redacted. */
 .lbw-root .board-t tr.unranked-band td{
   text-align:left;background:color-mix(in srgb,var(--cyan) 9%,var(--panel));
   color:var(--cyan);padding:12px 10px;font-size:10px;font-weight:800;
@@ -129,12 +129,14 @@
   float:right;font-size:9px;color:var(--mut);font-weight:500
 }
 .lbw-root .board-t tr.unranked-member td{
-  background:color-mix(in srgb,var(--panel) 92%,var(--mut));
-  color:var(--mut);font-size:10px
+  background:var(--panel);
+  color:var(--tx2);font-size:10px
 }
 .lbw-root .board-t tr.unranked-member .r-main{color:var(--tx2);font-weight:700}
 .lbw-root .board-t tr.unranked-member .r-sub{color:var(--mut)}
-.lbw-root .board-t tr.unranked-member .op .nm{color:var(--tx2)}
+.lbw-root .board-t tr.unranked-member .op .nm{color:var(--tx)}
+.lbw-root .board-t tr.unranked-member .op .nm a{color:inherit;text-decoration:none}
+.lbw-root .board-t tr.unranked-member .op .nm a:hover{text-decoration:underline}
 .lbw-root .board-t tr.unranked-member .unranked-avatar{
   background:var(--chip);color:var(--mut);border:1px solid var(--line2)
 }

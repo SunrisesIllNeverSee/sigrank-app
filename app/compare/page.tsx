@@ -59,6 +59,8 @@ import {
 import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { CompareStage } from "@/components/compare/CompareStage";
+import "@/components/compare/compare-workspace.css";
 
 export const metadata: Metadata = withOG({
   title: "Compare AI Operators",
@@ -359,21 +361,27 @@ export default async function ComparePage({
       ]} />
       <TrackCompareView isDefault={!(a && b)} />
 
-      {/* Compare inside the shared SignalAF workspace shell — approved layout:
-          _workspace/layout-editors/approved/compare-layout.json.
-          LEFT = operator A mini + compact ledger · STAGE = selectors +
-          matchup + paired radars + challenge band + full-width history ·
-          RIGHT = operator B mini + matchup summary + metric context + share.
-          All data/query behavior identical to the long-form page. */}
+      {/* One fixed comparison workspace, using the implemented page's data and
+          original operator/context sidebars. All stage sections stay visible. */}
       <WorkspaceShell
         active="compare"
         title="COMPARE"
+        titleControls={
+          <div className="cmp-title-selectors">
+            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
+          </div>
+        }
         leftTitle="COMPARE"
         left={
           <>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>OPERATOR A</div>
               {opMini(rowA, "a")}
+              <CompareAgainstMe />
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
+              {opMini(rowB, "b")}
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>METRIC CONTEXT</div>
@@ -390,11 +398,7 @@ export default async function ComparePage({
         rightTitle="CONTEXT"
         right={
           <>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
-              {opMini(rowB, "b")}
-            </div>
-            <div className="mod">
+            <div className="mod cmp-sidebar-matchup">
               <div className="mini-h"><span className="sq"></span>MATCHUP</div>
               <div className="ws-kv">
                 <div className="row">
@@ -421,6 +425,7 @@ export default async function ComparePage({
                 </ul>
               )}
             </div>
+            <div className="mod cmp-sidebar-challenges">{ThrowDownLine}</div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SHARE</div>
               <div className="ws-share">
@@ -457,25 +462,19 @@ export default async function ComparePage({
           </>
         }
       >
+        {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
+            the stage (owner annotation: not a rail module). */}
+        <CompareStage>
         <div className="ws-cmp">
-          <div className="ws-cmp-sel">
-            <CompareSelectors
-              options={selectorOptions}
-              aCode={aCode}
-              bCode={bCode}
-            />
-            <div style={{ marginTop: 10 }}>
-              {/* "Compare yourself" — client-side auth gate */}
-              <CompareAgainstMe />
-            </div>
-          </div>
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors />
           </div>
           <div className="ws-cmp-radars">
             <CompareRadars a={rowA} b={rowB} />
           </div>
-          <div className="ws-cmp-bar">{ThrowDownLine}</div>
+          <div className="ws-cmp-ledger">
+            <CompareLedger a={rowA} b={rowB} workspace />
+          </div>
           <div className="ws-cmp-hist">
             <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
               <CompareHistoryChart
@@ -484,15 +483,12 @@ export default async function ComparePage({
                 nameA={nameOf(rowA)}
                 nameB={nameOf(rowB)}
                 fieldAvg={fieldAvgYield}
+                height={150}
               />
             </div>
           </div>
-          {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
-              the stage (owner annotation: not a rail module). */}
-          <div style={{ gridColumn: "1/13" }}>
-            <CompareLedger a={rowA} b={rowB} />
-          </div>
         </div>
+        </CompareStage>
       </WorkspaceShell>
     </div>
   );

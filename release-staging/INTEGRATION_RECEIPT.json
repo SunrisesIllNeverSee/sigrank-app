@@ -1,0 +1,87 @@
+{
+  "captured_utc": "2026-10-11T08:06:25.719729+00:00",
+  "application_commit": "766c6f0fb4c2949ffada988d407a27dfd4f521d5",
+  "base_commit": "a3154353299ab7a60e5abd5383eac95da99c394b",
+  "source_preservation": {
+    "file_count": 39,
+    "drift": [],
+    "git_status_unchanged": true
+  },
+  "preview_origin": "http://127.0.0.1:3230",
+  "http_checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "seconds": 0.015,
+      "bytes": 219402
+    },
+    {
+      "path": "/sigrank",
+      "status": 200,
+      "seconds": 0.002,
+      "bytes": 299598
+    },
+    {
+      "path": "/user/xoxo",
+      "status": 200,
+      "seconds": 0.002,
+      "bytes": 362256
+    },
+    {
+      "path": "/hall",
+      "status": 200,
+      "seconds": 0.006,
+      "bytes": 353959
+    },
+    {
+      "path": "/compare",
+      "status": 200,
+      "seconds": 0.019,
+      "bytes": 274842
+    },
+    {
+      "path": "/articles",
+      "status": 200,
+      "seconds": 0.002,
+      "bytes": 90213
+    },
+    {
+      "path": "/blog",
+      "status": 200,
+      "seconds": 0.001,
+      "bytes": 105363
+    },
+    {
+      "path": "/wiki",
+      "status": 200,
+      "seconds": 0.003,
+      "bytes": 619191
+    },
+    {
+      "path": "/fieldhub",
+      "status": 200,
+      "seconds": 0.001,
+      "bytes": 97370
+    }
+  ],
+  "validation": {
+    "typescript": "pass",
+    "canonical": "11/11",
+    "unit": {
+      "passed": 682,
+      "skipped": 4,
+      "failed": 0
+    },
+    "ui": "155/155",
+    "scoped_eslint": "pass",
+    "production_build": "pass"
+  },
+  "release_gates": [
+    "React hydration warning #418 on board/editorial flow",
+    "xoxo Profile Overview rank #0",
+    "Authenticated owner/privacy checks",
+    "Final Hall/Compare owner design acceptance",
+    "Uniform editorial formatting",
+    "Inherited CI failure for 40 tracked ignored files"
+  ]
+}

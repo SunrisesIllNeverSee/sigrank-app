@@ -82,7 +82,7 @@ export function CompareHistoryChart({
   // Need at least 2 points across both series to draw anything meaningful.
   if (ptsA.length < 2 && ptsB.length < 2) {
     return (
-      <div className="flex h-[240px] items-center justify-center rounded-lg border border-bg-border bg-bg-surface">
+      <div className="cmp-history-empty flex items-center justify-center rounded-lg border border-bg-border bg-bg-surface" style={{ height }}>
         <span className="font-mono text-xs text-text-muted">
           Not enough history yet — both operators need at least two snapshots to
           chart Υ Yield trajectory.
