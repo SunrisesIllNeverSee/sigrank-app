@@ -98,7 +98,7 @@ export default async function FieldHubPage() {
       }
       status={<>FIELD HUB · {meta.operators_included.toLocaleString()} ANALYZED OPERATORS · SIGNALAF × SIGRANK · MO§ES™</>}
     >
-      <div className="ws-doc ws-article-list">
+      <div className="ws-doc ws-article-list ws-field-index">
       <JsonLd
         data={[
           collectionPage,
@@ -140,7 +140,7 @@ export default async function FieldHubPage() {
       <div className="blog-index" id="ws-page-field-index">
         <Link id="ws-page-field-analysis" href="/field" className="blog-feature group">
             <div className="blog-row-main">
-              <span className="blog-kicker">📊 Field Analysis</span>
+              <div className="blog-kicker">FEATURED · FIELD RESEARCH</div>
               <h2>Field Analysis</h2>
               <p>
                 The true distribution of token efficiency.{" "}
@@ -160,6 +160,20 @@ export default async function FieldHubPage() {
                 platforms and 3,304 models. 9.07Q total tokens. Available on
                 Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
               </p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+          <Link href="/science" className="blog-row group">
+            <div className="blog-row-main">
+              <h2>Academic Foundation · Science</h2>
+              <p>The Conservation Law of Commitment, Commitment Theory, MO§ES™ architecture, and published research deposits.</p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+          <Link href="/about" className="blog-row group">
+            <div className="blog-row-main">
+              <h2>About</h2>
+              <p>How SigRank evaluates AI operators using privacy-preserving token telemetry, platform-neutral metrics, and operator-owned profiles.</p>
             </div>
             <div className="blog-row-meta"><span className="arrow">↗</span></div>
           </Link>

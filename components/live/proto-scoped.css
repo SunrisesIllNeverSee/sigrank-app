@@ -1779,3 +1779,12 @@
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>div>:is(h1,h2,div[aria-label]){order:-1}
 
 .lbw-root .ws-home-topics a[aria-current="page"]{color:var(--ac);background:var(--sel)}
+
+/* Field landing: Blog's lead-and-list composition, centered in the stage. */
+.lbw-root .ws-field-index .blog-index{width:100%;max-width:880px;margin-inline:auto;text-align:center}
+.lbw-root .ws-field-index .blog-feature p{margin-inline:auto}
+.lbw-root .ws-field-index .blog-row{grid-template-columns:minmax(0,1fr) 24px;gap:12px}
+.lbw-root .ws-field-index .blog-row-main{padding-left:36px}
+/* Slightly smaller pixel titles throughout the editorial family. */
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(4px,calc(var(--tbt-fit,2cqw) * .85),1.15rem)}
+.lbw-root .sigrank-column-hero pre{font-size:clamp(7px,1.9cqw,18px)}
