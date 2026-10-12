@@ -15,7 +15,7 @@ import type { CSSProperties } from "react";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
-import { compareClassPalette } from "./compare-palette";
+import { compareClassPalette, COMPARE_OPERAND_COLORS } from "./compare-palette";
 import { CompareRadars } from "./CompareRadars";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import {
@@ -86,8 +86,8 @@ export function CompareMatchup({
   const nameB = nameOf(b);
   const clsA = a.snapshot.class_tier as SignalClass;
   const clsB = b.snapshot.class_tier as SignalClass;
-  const colA = compareClassPalette(clsA).color;
-  const colB = compareClassPalette(clsB).color;
+  const colA = COMPARE_OPERAND_COLORS.a;
+  const colB = COMPARE_OPERAND_COLORS.b;
 
   const { aWins, bWins } = compareTally(a, b);
   const winner: "a" | "b" | null =
@@ -149,7 +149,7 @@ export function CompareMatchup({
           </span>
         </div>
         <div className="cmp-profile-bottomline">
-          <span className="cmp-profile-class">
+          <span className="cmp-profile-class" style={{ color: compareClassPalette(cls).color }}>
             <span aria-hidden>{glyphFor(cls)}</span> {cls}
           </span>
           <span className="cmp-profile-yield">

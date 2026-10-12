@@ -19,7 +19,7 @@ import React from "react";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import CascadeRadar, { type CascadeRadarSeries } from "@/components/charts/CascadeRadar";
-import { compareClassPalette } from "./compare-palette";
+import { COMPARE_OPERAND_COLORS } from "./compare-palette";
 
 function nameOf(row: LeaderboardRow): string {
   return operatorDisplayName(row);
@@ -189,7 +189,7 @@ export function CompareRadars({
 }) {
   const person = side === "a" ? a : b;
   const name = nameOf(person);
-  const color = compareClassPalette(person.snapshot.class_tier).color;
+  const color = COMPARE_OPERAND_COLORS[side];
   return (
     <div className="cmp-operator-radars" data-compare-operator={side}>
       <RadarBlock title="Raw · I/O/W/R" axes={rawAxes(a, b)}

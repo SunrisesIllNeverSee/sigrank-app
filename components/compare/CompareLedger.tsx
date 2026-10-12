@@ -27,7 +27,7 @@
  */
 
 import React, { type CSSProperties } from "react";
-import { compareClassPalette } from "./compare-palette";
+import { COMPARE_OPERAND_COLORS } from "./compare-palette";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { CanonId } from "@/components/ui/CanonId";
@@ -313,8 +313,8 @@ export function CompareLedger({
   const bName = nameOf(b);
   const { aWins, bWins } = compareTally(a, b);
   const compareColors = {
-    "--compare-a": compareClassPalette(a.snapshot.class_tier).color,
-    "--compare-b": compareClassPalette(b.snapshot.class_tier).color,
+    "--compare-a": COMPARE_OPERAND_COLORS.a,
+    "--compare-b": COMPARE_OPERAND_COLORS.b,
   } as CSSProperties;
   const rawRows = DISPLAY_RAW.map((m) => buildRow(m, a, b));
   const metricRows = DISPLAY_METRICS_COMPARE.map((m) => buildRow(m, a, b));
