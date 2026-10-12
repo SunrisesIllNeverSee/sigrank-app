@@ -1,13 +1,14 @@
-/* Compare: operator-led reports at left, full metric ledger as a vertical
-   right-stage column. Sized to preserve readable data in desktop Safari.
+/* Compare: two operator reports flanking the centered bar-stat ledger,
+   with full-stage-width Token Longevity beneath. Desktop Safari safe.
    Narrow windows scroll the STAGE, not shrink charts to illegible pixels. */
 .lbw-root:has(.ws-cmp-stage) .stage {display:flex;overflow:auto;padding:10px}
 .lbw-root:has(.ws-cmp-stage) .stage>.board {display:flex;flex:1;min-width:0;min-height:0;padding:0}
 .lbw-root .ws-cmp-stage {flex:1;min-width:0;min-height:0}
 .lbw-root .ws-cmp-stage .ws-cmp {
-  display:grid;grid-template-columns:minmax(540px,1fr) minmax(258px,310px);
+  display:grid;
+  grid-template-columns:minmax(250px,1fr) minmax(275px,330px) minmax(250px,1fr);
   grid-template-rows:minmax(0,1fr) 240px;
-  height:100%;min-height:680px;min-width:845px;
+  height:100%;min-height:680px;min-width:835px;
   gap:10px;align-items:stretch;
 }
 /* Shared stage title still houses the live operand selectors. */
@@ -49,21 +50,20 @@
 .lbw-root .cmp-title-selectors input+div button:hover{background:var(--hover);color:var(--ac)}
 .lbw-root .cmp-title-selectors input+div button:disabled{opacity:.4}
 
-/* Matchup report per PERSON: each contains their two stat-type radars. */
-.lbw-root .ws-cmp-stage .ws-cmp-match {
-  grid-column:1;grid-row:1;min-width:0;min-height:0;overflow:auto
-}
-.lbw-root .ws-cmp-stage .cmp-matchup{
-  min-height:100%;padding:10px;gap:8px
-}
-.lbw-root .ws-cmp-stage .cmp-matchup-panels{
-  display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);
-  align-items:stretch;gap:7px;min-height:0;
-}
+/* Flatten only stage layout wrappers. The semantic markup and operator
+   panels stay unchanged; CSS lays out A | ledger | B as peers. */
+.lbw-root .ws-cmp-stage .ws-cmp-match,
+.lbw-root .ws-cmp-stage .cmp-matchup,
+.lbw-root .ws-cmp-stage .cmp-matchup-panels{display:contents}
 .lbw-root .ws-cmp-stage .cmp-matchup-panel{
-  flex-direction:column;min-width:0;min-height:0;gap:5px;
-  padding:10px;border:1px solid var(--line2);overflow:hidden;
+  grid-row:1;flex-direction:column;min-width:0;min-height:0;gap:5px;
+  padding:12px;border:1px solid var(--line2);
+  overflow-y:auto;overflow-x:hidden;
+  background-color:var(--panel);
 }
+.lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child{grid-column:1}
+.lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{grid-column:3}
+
 .lbw-root .ws-cmp-stage .cmp-operator-report{
   display:flex;flex-direction:column;min-width:0;gap:14px;
 }
@@ -106,10 +106,37 @@
 }
 .lbw-root .ws-cmp-stage .cmp-radar svg text{font-size:11px}
 
-/* Vertical comparison ledger — never another horizontal band under reports. */
+/* Shared diverging-bar statistics now in the CENTER column, with VS
+   and the canonical head-to-head record above the bars. */
 .lbw-root .ws-cmp-stage .ws-cmp-ledger{
   grid-column:2;grid-row:1;min-height:0;min-width:0;
   overflow-y:auto;overflow-x:hidden
+}
+.lbw-root .ws-cmp-stage .cmp-ledger-versus{
+  display:flex;flex-direction:column;align-items:center;
+  gap:5px;padding:13px 6px 15px;border-bottom:1px solid var(--line2);
+  text-align:center
+}
+.lbw-root .ws-cmp-stage .cmp-versus-operators{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:9px;align-items:center;width:100%
+}
+.lbw-root .ws-cmp-stage .cmp-versus-name{
+  display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font:700 10px/1.35 var(--font-mono)
+}
+.lbw-root .ws-cmp-stage .cmp-versus-name:first-child{text-align:right}
+.lbw-root .ws-cmp-stage .cmp-versus-name:last-child{text-align:left}
+.lbw-root .ws-cmp-stage .cmp-versus-label{
+  font:800 22px/1 var(--font-mono);letter-spacing:.1em;color:var(--tx)
+}
+.lbw-root .ws-cmp-stage .cmp-versus-record{
+  display:flex;align-items:center;justify-content:center;gap:13px;
+  font:800 27px/1.1 var(--font-mono);font-variant-numeric:tabular-nums
+}
+.lbw-root .ws-cmp-stage .cmp-versus-dash{color:var(--mut)}
+.lbw-root .ws-cmp-stage .cmp-versus-caption{
+  color:var(--mut);font:700 9px/1.2 var(--font-mono);letter-spacing:.08em
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-workspace{
   display:flex;flex-direction:column;gap:20px;
@@ -145,8 +172,8 @@
 .lbw-root .ws-cmp-stage .cmp-ledger-line .text-center{font-size:10px}
 .lbw-root .ws-cmp-stage .cmp-ledger-line .text-center>*{font-size:8px}
 
-/* Full-stage-width TOKEN LONGEVITY timeline below the top reports and
-   vertical statistics. The ledger stops above it; it never overlays the plot. */
+/* Full-stage-width TOKEN LONGEVITY timeline beneath all three columns.
+   The centered bar-stat ledger stops above it. */
 .lbw-root .ws-cmp-stage .ws-cmp-hist{
   grid-column:1/-1;grid-row:2;min-width:0;min-height:0
 }
