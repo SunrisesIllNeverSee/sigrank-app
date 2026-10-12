@@ -51,13 +51,13 @@ export default async function ArticlesPage() {
   const articles = await getPublications();
   return (
     <WorkspaceShell
-      active="articles"
+      active="blog"
       editorialStage
       bareTitle
       title="ARTICLES"
       leftTitle="PUBLICATIONS"
       topic="articles"
-      left={<FieldFamilyNav current="articles" documents={articles.map(a => ({ label: a.title, href: "/blog/" + a.slug }))} />}
+      left={<FieldFamilyNav current="articles" />}
       leftWidth={280}
       rightWidth={240}
       rightTitle="PUBLICATION DATA"

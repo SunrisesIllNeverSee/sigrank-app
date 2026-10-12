@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
-import { getWorkspaceDocuments } from "@/lib/editorial/workspace-documents";
 
 interface Props {
   children: ReactNode;
@@ -20,8 +19,7 @@ interface Props {
  * the left rail is deliberately small, and collapsing the left panel gives
  * a clean reader surface without creating a second article renderer.
  */
-export async function BlogWorkspaceFrame({ children, status, section = "blog", articleTitle, doi, pageSections }: Props) {
-  const documents = await getWorkspaceDocuments(section);
+export function BlogWorkspaceFrame({ children, status, section = "blog", articleTitle, doi, pageSections }: Props) {
   return (
     <WorkspaceShell
       active="blog"
@@ -30,7 +28,7 @@ export async function BlogWorkspaceFrame({ children, status, section = "blog", a
       title={section === "articles" ? "ARTICLES" : "BLOG"}
       leftTitle="PUBLISHING"
       topic={section}
-      left={<FieldFamilyNav current={section} documents={documents} pageContents={pageSections?.length ? (
+      left={<FieldFamilyNav current={section} pageContents={pageSections?.length ? (
         <nav className="ws-nav" aria-label="Sections on this page">
           {pageSections.map((item) => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}
         </nav>
