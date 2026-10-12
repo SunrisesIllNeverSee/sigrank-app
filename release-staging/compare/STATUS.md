@@ -28,3 +28,12 @@ RELEASE READY NO. DEPLOYED NO.
 - Token Longevity displays measured dated I+O+W+R snapshot totals; same-day repeated window/platform observations use the maximum record rather than adding overlapping records. It is NOT cumulative lifetime volume. Single observations are points; no interpolation or fabricated series.
 - Production-style isolated build: PASS. 1440px stage/chart width 986px; 960px stage/chart width 845px, exact equality in both. 22/22 live selector entries, no Field or seeded entries, forged selection URLs repaired. Two observed time series in sample (four dated points each). Zero React page exceptions after fixing nested SVG tooltip markup.
 - This is a staged, Compare-only candidate. Safari owner visual signoff, overall staging promotion and production deployment remain separate gates.
+
+## 2026-10-12 — Centered diverging bars / VS+record
+- Stage top row: operator A report | metric bar-stat ledger | operator B report.
+- VS and the canonical compareTally metric-win record now lead the middle
+  bar-stat panel; the independent tiny VS strip between reports is removed.
+- Each operator retains both Raw and Cascade Metrics radars. Token Longevity
+  remains full-stage-width beneath the reports and the center bar ledger.
+- Existing live-only eligibility and all comparison formulas remain unchanged.
+- Local staged change; no merge/deploy without owner approval.

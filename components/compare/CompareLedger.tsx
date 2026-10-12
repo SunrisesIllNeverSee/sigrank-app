@@ -33,6 +33,7 @@ import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { CanonId } from "@/components/ui/CanonId";
 import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/identity/canon-ids";
 import { snapshotThroughput } from "@/lib/board/throughput";
+import { compareTally } from "@/lib/analytics/compare-facts";
 
 const A_COLOR = "var(--compare-a, rgb(var(--class-arch)))";
 const B_COLOR = "var(--compare-b, rgb(var(--class-seeker)))";
@@ -310,6 +311,7 @@ export function CompareLedger({
 }) {
   const aName = nameOf(a);
   const bName = nameOf(b);
+  const { aWins, bWins } = compareTally(a, b);
   const compareColors = {
     "--compare-a": compareClassPalette(a.snapshot.class_tier).color,
     "--compare-b": compareClassPalette(b.snapshot.class_tier).color,
@@ -330,6 +332,19 @@ export function CompareLedger({
   if (workspace) {
     return (
       <section className="cmp-ledger-workspace" aria-label="Full comparison ledger" style={compareColors}>
+        <header className="cmp-ledger-versus" aria-label="Head-to-head record">
+          <div className="cmp-versus-operators">
+            <span className="cmp-versus-name" style={{ color: A_COLOR }} title={aName}>{aName}</span>
+            <span className="cmp-versus-label">VS</span>
+            <span className="cmp-versus-name" style={{ color: B_COLOR }} title={bName}>{bName}</span>
+          </div>
+          <div className="cmp-versus-record" data-compare-record>
+            <span style={{ color: A_COLOR }}>{aWins}</span>
+            <span className="cmp-versus-dash">–</span>
+            <span style={{ color: B_COLOR }}>{bWins}</span>
+          </div>
+          <div className="cmp-versus-caption">HEAD-TO-HEAD · METRIC WINS</div>
+        </header>
         {[
           { title: "Raw · Flow · Total", rows: [...rawRows, ...flowRows, { ...totalRow, label: "∑ Total" }] },
           { title: "Metrics", rows: metricRows },
