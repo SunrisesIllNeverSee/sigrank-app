@@ -33,7 +33,8 @@ try {
       const fbar = document.querySelector(".fbar");
       const fRect = fbar.getBoundingClientRect();
       const input = fbar.querySelector("input");
-      const platformSelect = fbar.querySelector(".fb-platform select");
+      const platformSelect = fbar.querySelector("select[aria-label='Platform']");
+      const platformTh = document.querySelector("th.hc-platform");
       const firstRow = document.querySelector("tbody tr");
       const rRect = firstRow?.getBoundingClientRect();
       return {
@@ -41,11 +42,13 @@ try {
         inputWidth: Math.round(input?.getBoundingClientRect().width ?? 0),
         firstRowTop: Math.round(rRect?.top ?? 0),
         fbarBottom: Math.round(fRect.bottom),
-        hasPlatformInMetrics: !!platformSelect,
+        hasPlatformFilter: !!platformSelect,
+        hasPlatformColInMetrics: !!platformTh,
       };
     });
 
-    check(`[${vp.width}x${vp.height}] Platform hidden in Metrics mode`, !mCheck.hasPlatformInMetrics);
+    check(`[${vp.width}x${vp.height}] Platform select filter accessible in Metrics mode`, mCheck.hasPlatformFilter);
+    check(`[${vp.width}x${vp.height}] Platform table column hidden in Metrics mode`, !mCheck.hasPlatformColInMetrics);
     check(`[${vp.width}x${vp.height}] Search input is usable width (>= 50px)`, mCheck.inputWidth >= 50, `width=${mCheck.inputWidth}px`);
     check(`[${vp.width}x${vp.height}] Toolbar does not cover first row`, mCheck.fbarBottom < mCheck.firstRowTop, `fbarBottom=${mCheck.fbarBottom}, rowTop=${mCheck.firstRowTop}`);
 
@@ -56,17 +59,17 @@ try {
     const rCheck = await page.evaluate(() => {
       const fbar = document.querySelector(".fbar");
       const fRect = fbar.getBoundingClientRect();
-      const platformSelect = fbar.querySelector(".fb-platform select");
+      const platformSelect = fbar.querySelector("select[aria-label='Platform']");
       const platformTh = document.querySelector("th.hc-platform");
       return {
         fbarWidth: Math.round(fRect.width),
-        hasPlatformSelectInRaw: !!platformSelect,
-        hasPlatformHeaderInRaw: !!platformTh,
+        hasPlatformFilterInRaw: !!platformSelect,
+        hasPlatformColInRaw: !!platformTh,
       };
     });
 
-    check(`[${vp.width}x${vp.height}] Platform select visible in Raw mode`, rCheck.hasPlatformSelectInRaw);
-    check(`[${vp.width}x${vp.height}] Platform table column visible in Raw mode`, rCheck.hasPlatformHeaderInRaw);
+    check(`[${vp.width}x${vp.height}] Platform select filter accessible in Raw mode`, rCheck.hasPlatformFilterInRaw);
+    check(`[${vp.width}x${vp.height}] Platform table column visible in Raw mode`, rCheck.hasPlatformColInRaw);
 
     // 3. Scroll persistence
     await page.evaluate(() => {
