@@ -1378,7 +1378,7 @@ export interface SnapshotRecord {
   submissionId: string;
   submittedAt: string;
   platform: string;
-  window: string;
+  window: string | null;
   periodStart: string | null;
   periodEnd: string | null;
   rulesetVersion: string | null;
@@ -1393,6 +1393,10 @@ export interface SnapshotRecord {
   tokensPerDay: number | null;
   workflowMode: WorkflowMode | null;
   workflowModeVersion: string | null;
+  /** Agentic-only provenance (mirrors the public API contract): the linked
+   *  workflow evidence and its assessment timestamp. Null otherwise. */
+  workflowEvidenceUrl: string | null;
+  modeAssessedAt: string | null;
 }
 
 /**
@@ -1408,13 +1412,27 @@ export async function getOperatorSnapshotRecords(
   try {
     const { data: opData, error: opError } = await sb
       .from("operators_public")
-      .select("operator_id")
+      .select("operator_id, claimed, status, profile_visibility")
       .ilike("codename", codename)
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
-    const op = asDb<{ operator_id: string } | null>(opData);
-    if (!op) return [];
+    const op = asDb<{
+      operator_id: string;
+      claimed: boolean | null;
+      status: string | null;
+      profile_visibility: string | null;
+    } | null>(opData);
+    // Same public-visibility contract as the snapshot-history API: unclaimed,
+    // retired, or private operators expose no submission records.
+    if (
+      !op ||
+      !op.claimed ||
+      op.status === "retired" ||
+      op.profile_visibility === "private"
+    ) {
+      return [];
+    }
 
     const { data, error } = await sb
       .from("snapshot_submissions")
@@ -1486,7 +1504,7 @@ export async function getOperatorSnapshotRecords(
         submissionId: s.submission_id,
         submittedAt: s.submitted_at ?? "",
         platform: (s.platform ?? "other").toLowerCase(),
-        window: s.window_type ?? "all_time",
+        window: s.window_type,
         periodStart: s.window_start,
         periodEnd: s.window_end,
         rulesetVersion: s.ruleset_version,
@@ -1502,6 +1520,9 @@ export async function getOperatorSnapshotRecords(
         workflowMode: mode,
         workflowModeVersion:
           mode === "hitl" ? "hcm-v1" : s.workflow_mode_version,
+        workflowEvidenceUrl:
+          mode === "agentic" ? s.workflow_evidence_url : null,
+        modeAssessedAt: mode === "agentic" ? s.mode_assessed_at : null,
       };
     });
   } catch {
