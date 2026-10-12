@@ -473,6 +473,24 @@ async function captureVisibleBoard(
     width: Math.round(box.width),
     height: Math.round(box.height),
     style: { overflow: "hidden" },
+    filter: (node) => {
+      // Never capture the open Share menu popup over the board.
+      if (node instanceof HTMLElement && node.classList.contains("board-share-menu")) {
+        return false;
+      }
+      // External images (avatars) violate connect-src CSP when html-to-image
+      // attempts to fetch them; filtering them out lets the capture succeed instantly.
+      if (
+        typeof window !== "undefined" &&
+        node instanceof HTMLImageElement &&
+        node.src &&
+        !node.src.startsWith(window.location.origin) &&
+        !node.src.startsWith("data:")
+      ) {
+        return false;
+      }
+      return true;
+    },
   });
   if (!blob || blob.type !== "image/png")
     throw new Error("PNG export did not produce an image");
@@ -500,6 +518,9 @@ function BoardShotButton({
     setBusy(true);
     setError("");
     try {
+      // Close the Share details menu before capturing so it does not obscure the board.
+      const details = root.querySelector<HTMLDetailsElement>("details.board-share");
+      if (details) details.open = false;
       await captureVisibleBoard(scope, root);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Screenshot failed");
@@ -2009,18 +2030,21 @@ export function LiveBoardWorkspace({
                     ))}
                   </select>
                 </span>
-                <span className="fb">
-                  <select
-                    aria-label="Platform"
-                    title="Platform"
-                    value={platformSel}
-                    onChange={(e) => setPlatformSel(e.target.value)}
-                  >
-                    {CONTROLS.platforms.map((o) => (
-                      <option key={o} value={o}>{o === "All Platforms" ? "Platform" : o}</option>
-                    ))}
-                  </select>
-                </span>
+                {/* Platform select is shown in Raw mode only */}
+                {colMode === "raw" && (
+                  <span className="fb fb-platform">
+                    <select
+                      aria-label="Platform"
+                      title="Platform"
+                      value={platformSel}
+                      onChange={(e) => setPlatformSel(e.target.value)}
+                    >
+                      {CONTROLS.platforms.map((o) => (
+                        <option key={o} value={o}>{o === "All Platforms" ? "Platform" : o}</option>
+                      ))}
+                    </select>
+                  </span>
+                )}
                 <span className="fb">
                   <select
                     aria-label="Class"
@@ -2058,7 +2082,10 @@ export function LiveBoardWorkspace({
                         <button
                           aria-pressed={colMode === "metrics"}
                           className={colMode === "metrics" ? "on" : ""}
-                          onClick={() => setColMode("metrics")}
+                          onClick={() => {
+                            setColMode("metrics");
+                            setPlatformSel("All Platforms");
+                          }}
                         >
                           Metrics
                         </button>

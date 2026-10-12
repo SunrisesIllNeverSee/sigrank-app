@@ -320,8 +320,10 @@ export async function getLeaderboard(
       },
       "metric_snapshots (getLeaderboard)",
     );
-    // DB empty/unreachable → mock fallback (graceful-degradation contract).
-    if (allSnaps.length === 0) return params.strictLive || params.mode ? [] : filterMockBoard(params);
+    // DB empty/unreachable → honest empty. Mock fixtures are ONLY for the
+    // unconfigured (!sb) demo path — a configured database must never show
+    // fixture operators as live data.
+    if (allSnaps.length === 0) return [];
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
@@ -388,9 +390,8 @@ export async function getLeaderboard(
       snapRows = [...latestPerOperator(boardCandidates, params.window).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
-    // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
-    if (snapRows.length === 0)
-      return params.windowFilter || params.strictLive || params.mode ? [] : filterMockBoard(params);
+    // empty board (NOT fabricated mock seeds). Mock is only for the !sb demo path.
+    if (snapRows.length === 0) return [];
 
     const opIds = new Set(snapRows.map((s) => s.operator_id));
     const opData = await fetchAllPaginated<DbOperator>(
@@ -450,11 +451,10 @@ export async function getLeaderboard(
         ...(platforms && platforms.length > 0 ? { platforms } : {}),
       });
     }
-    // Honest empty (mirrors the latest.size===0 guard above): if operators didn't
-    // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key deploy),
-    // a windowFilter board returns [] rather than fabricated mock seeds.
-    if (rows.length === 0)
-      return params.windowFilter || params.strictLive || params.mode ? [] : filterMockBoard(params);
+    // Honest empty (mirrors the snapRows guard above): if operators didn't
+    // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key
+    // deploy), the board is empty rather than fabricated mock seeds.
+    if (rows.length === 0) return [];
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
     // Filter on the row's platform (snapshot.platform, falling back to
@@ -500,8 +500,10 @@ export async function getLeaderboard(
     return rows;
   } catch (error) {
     if (params.strictLive) throw error;
-    if (params.mode) return [];
-    return filterMockBoard(params);
+    // A live read that failed is "unavailable", not "demo" — an empty board
+    // beats fixture rows presented as live.
+    console.warn("getLeaderboard failed:", error);
+    return [];
   }
 }
 
@@ -552,7 +554,11 @@ export async function getOperator(
       .maybeSingle();
     if (opError) throw opError;
     const op = asDb<DbOperator | null>(opData);
-    if (!op) return strictLive ? null : fromMock();
+    // Live path: a real not-found is null — never a fixture row. fromMock()
+    // exists for the unconfigured !sb demo path only; fixture codenames
+    // (e.g. TransVaultOrigin) collide with real operators, so a live miss
+    // must not fabricate an identity.
+    if (!op) return null;
     // Retired operators (opt-out): no profile page. They stay on the leaderboard
     // with their tokens but are not clickable — getOperator returns null so the
     // profile route redirects to /leaderboard instead of rendering a profile.
@@ -640,7 +646,9 @@ export async function getOperator(
     };
   } catch (error) {
     if (strictLive) throw error;
-    return fromMock();
+    // Live read failure → unavailable (null → 404), never fixture identity.
+    console.warn(`getOperator(${codename}) failed:`, error);
+    return null;
   }
 }
 
@@ -1005,7 +1013,8 @@ export async function getHallOfSignal(
       } | null;
     };
     const rows = (data as unknown as HallJoin[] | null) ?? [];
-    if (rows.length === 0) return MOCK_HALL;
+    // Live path: an empty awards table is an empty Hall, not fixture records.
+    if (rows.length === 0) return [];
 
     const records: HallRecord[] = rows.map((r) => {
       // source_note may carry an explicit RW.xx reward id; otherwise fall back to
@@ -1025,12 +1034,27 @@ export async function getHallOfSignal(
       };
     });
     return records;
-  } catch {
-    return MOCK_HALL;
+  } catch (error) {
+    console.warn("getHallOfSignal failed:", error);
+    return [];
   }
 }
 
 /** Homepage aggregate stats. */
+const UNAVAILABLE_HOMEPAGE_STATS: HomepageStats = {
+  total_operators: 0,
+  total_snapshots: 0,
+  total_tokens_scored: 0,
+  transmitter_count: 0,
+  top_operator_codename: "",
+  top_signa_rate: 0,
+  top_yield: 0,
+  median_yield: 0,
+  active_last_hour: 0,
+  comparisons_ran: 0,
+  isPlaceholder: true,
+};
+
 export async function getHomepageStats(): Promise<HomepageStats> {
   const sb = getSupabaseServer();
   if (!sb) return MOCK_HOMEPAGE_STATS;
@@ -1055,7 +1079,11 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       top_yield: number | null;
       operators: { codename: string | null } | null;
     } | null;
-    if (!s) return MOCK_HOMEPAGE_STATS;
+    // No aggregate row → unavailable, not fixture totals. Zeros are the
+    // honest state; isPlaceholder flags the surface for consumers that
+    // distinguish it (the only MOCK_HOMEPAGE_STATS fields invented before
+    // were real-looking totals and a fixture top-operator codename).
+    if (!s) return UNAVAILABLE_HOMEPAGE_STATS;
 
     // Two extra, independently-defensive reads so a missing column/table (e.g. before
     // migration 0021 lands) degrades to 0 rather than collapsing the whole block to
@@ -1119,8 +1147,8 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       total_snapshots: num(s.total_snapshots),
       total_tokens_scored: num(s.total_tokens_scored),
       transmitter_count: num(s.transmitter_count),
-      top_operator_codename:
-        s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
+      // Never fabricate a top operator — empty when the FK doesn't resolve.
+      top_operator_codename: s.operators?.codename ?? "",
       top_signa_rate: num(s.top_signa_rate),
       top_yield: num(s.top_yield),
       median_yield,
@@ -1128,8 +1156,9 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       comparisons_ran,
       isPlaceholder: false,
     };
-  } catch {
-    return MOCK_HOMEPAGE_STATS;
+  } catch (error) {
+    console.warn("getHomepageStats failed:", error);
+    return UNAVAILABLE_HOMEPAGE_STATS;
   }
 }
 
@@ -1147,6 +1176,23 @@ export async function bumpComparisonsRan(): Promise<void> {
     /* RPC/table not present yet, or transient — ignore */
   }
 }
+
+const CANONICAL_CLASS_ORDER: SignalClass[] = [
+  "ARCH+ I", "ARCH+ II", "ARCH+ III",
+  "ARCH I", "ARCH II", "ARCH III",
+  "POWER I", "POWER II", "POWER III",
+  "BASE I", "BASE II", "BASE III",
+  "SEEKER I", "SEEKER II", "SEEKER III",
+  "REFINER I", "REFINER II", "REFINER III",
+  "BEARER I", "BEARER II", "BEARER III",
+  "IGNITER I", "IGNITER II", "IGNITER III",
+];
+
+const EMPTY_CLASS_DISTRIBUTION: ClassDistributionRow[] = CANONICAL_CLASS_ORDER.map((cls) => ({
+  class_tier: cls,
+  class_id: classToTierId(cls),
+  count: 0,
+}));
 
 /** Class distribution across the active population. */
 export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
@@ -1168,7 +1214,8 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
           .order("snapshot_date", { ascending: false }),
       "metric_snapshots (getClassDistribution)",
     );
-    if (rows.length === 0) return MOCK_CLASS_DISTRIBUTION;
+    // Empty table → the honest answer is "0 operators in every class" (the
+    // mapped distribution below emits real zero counts), never fixtures.
 
     const seen = new Set<string>();
     const counts = new Map<SignalClass, number>();
@@ -1179,24 +1226,14 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
       counts.set(cls, (counts.get(cls) ?? 0) + 1);
     }
 
-    // Emit in the same canonical class order the mock board uses.
-    const order: SignalClass[] = [
-      "ARCH+ I", "ARCH+ II", "ARCH+ III",
-      "ARCH I", "ARCH II", "ARCH III",
-      "POWER I", "POWER II", "POWER III",
-      "BASE I", "BASE II", "BASE III",
-      "SEEKER I", "SEEKER II", "SEEKER III",
-      "REFINER I", "REFINER II", "REFINER III",
-      "BEARER I", "BEARER II", "BEARER III",
-      "IGNITER I", "IGNITER II", "IGNITER III",
-    ];
-    return order.map((cls) => ({
+    return CANONICAL_CLASS_ORDER.map((cls) => ({
       class_tier: cls,
       class_id: classToTierId(cls),
       count: counts.get(cls) ?? 0,
     }));
-  } catch {
-    return MOCK_CLASS_DISTRIBUTION;
+  } catch (error) {
+    console.warn("getClassDistribution failed:", error);
+    return EMPTY_CLASS_DISTRIBUTION;
   }
 }
 
@@ -1209,25 +1246,31 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineHourly(): Promise<HourlyPoint[]> {
-  return MOCK_HOURLY;
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_HOURLY;
+  return [];
 }
 
 /**
  * getOnlineWeekly — 7-day online band (daily max + avg) for the activity board.
- * TODO(ONLINE.LIVE): weekly aggregation is not in the schema yet; returns mock.
+ * TODO(ONLINE.LIVE): weekly aggregation is not in the schema yet; returns mock in demo mode.
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineWeekly(): Promise<WeeklyPoint[]> {
-  return MOCK_WEEKLY;
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_WEEKLY;
+  return [];
 }
 
 /**
  * getOnlineByCountry — live operators online by country (BlitzStars "Live").
- * TODO(ONLINE.LIVE): country geo-aggregation is not in the schema yet; returns mock.
+ * TODO(ONLINE.LIVE): country geo-aggregation is not in the schema yet; returns mock in demo mode.
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineByCountry(): Promise<CountryCount[]> {
-  return MOCK_COUNTRIES;
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_COUNTRIES;
+  return [];
 }
 
 /**
