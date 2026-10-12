@@ -6,9 +6,9 @@
 .lbw-root .ws-cmp-stage {flex:1;min-width:0;min-height:0}
 .lbw-root .ws-cmp-stage .ws-cmp {
   display:grid;
-  grid-template-columns:minmax(232px,1fr) minmax(330px,400px) minmax(232px,1fr);
+  grid-template-columns:minmax(205px,1fr) minmax(375px,460px) minmax(205px,1fr);
   grid-template-rows:minmax(0,1fr) 240px;
-  height:100%;min-height:680px;min-width:814px;
+  height:100%;min-height:680px;min-width:805px;
   gap:10px;align-items:stretch;
 }
 /* Shared stage title still houses the live operand selectors. */
@@ -86,8 +86,9 @@
   filter:blur(38px);opacity:.11
 }
 .lbw-root .ws-cmp-stage .cmp-profile-topline{
-  display:flex;gap:8px;align-items:center;justify-content:space-between;
-  white-space:nowrap;font:700 9px/1.15 var(--font-mono)
+  display:flex;flex-wrap:wrap;gap:4px 8px;
+  align-items:center;justify-content:space-between;
+  font:700 10px/1.2 var(--font-mono)
 }
 .lbw-root .ws-cmp-stage .cmp-profile-eyebrow{
   display:inline-flex;align-items:center;gap:6px;color:var(--mut);
@@ -101,7 +102,7 @@
   color:var(--tx2);letter-spacing:.05em
 }
 .lbw-root .ws-cmp-stage .cmp-profile-rank b{
-  color:var(--cmp-class-color);font-size:13px
+  color:var(--cmp-class-color);font-size:15px
 }
 .lbw-root .ws-cmp-stage .cmp-profile-main{
   display:flex;align-items:center;gap:11px;min-width:0
@@ -128,22 +129,22 @@
   display:flex;flex-direction:column;gap:4px;min-width:0
 }
 .lbw-root .ws-cmp-stage .cmp-profile-name{
-  color:var(--tx);font:750 16px/1.2 var(--font-ui);
+  color:var(--tx);font:750 18px/1.2 var(--font-ui);
   letter-spacing:-.025em;overflow-wrap:anywhere
 }
 .lbw-root .ws-cmp-stage .cmp-profile-handle{
-  color:var(--mut);font:500 10px/1.3 var(--font-mono);
+  color:var(--mut);font:500 11px/1.3 var(--font-mono);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 }
 .lbw-root .ws-cmp-stage .cmp-profile-bottomline{
-  display:flex;align-items:flex-end;justify-content:space-between;gap:6px;
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px;
   min-width:0;padding-top:9px;border-top:1px solid var(--line)
 }
 .lbw-root .ws-cmp-stage .cmp-profile-class{
   display:inline-flex;align-items:center;gap:5px;min-width:0;
   color:var(--cmp-class-color);border:1px solid var(--line2);
   border-radius:5px;padding:5px 6px;background:var(--panel);
-  font:750 9px/1.2 var(--font-mono);letter-spacing:.055em;
+  font:750 10px/1.2 var(--font-mono);letter-spacing:.035em;
   white-space:nowrap
 }
 .lbw-root .ws-cmp-stage .cmp-profile-class>span{font-size:13px}
@@ -152,11 +153,11 @@
   min-width:0;white-space:nowrap
 }
 .lbw-root .ws-cmp-stage .cmp-profile-yield strong{
-  color:var(--tx);font:800 23px/1 var(--font-mono);
+  color:var(--tx);font:800 25px/1 var(--font-mono);
   letter-spacing:-.035em
 }
 .lbw-root .ws-cmp-stage .cmp-profile-yield small{
-  color:var(--mut);font:700 9px/1 var(--font-mono);
+  color:var(--mut);font:700 10px/1 var(--font-mono);
   letter-spacing:.09em
 }
 .lbw-root .ws-cmp-stage .cmp-profile-leading{
@@ -164,13 +165,13 @@
   border:1px solid rgba(245,166,35,.42);
   border-radius:4px;color:rgb(245,166,35);
   background:rgba(245,166,35,.06);
-  font:750 9px/1.2 var(--font-mono);letter-spacing:.055em
+  font:750 10px/1.2 var(--font-mono);letter-spacing:.035em
 }
 .lbw-root .ws-cmp-stage .cmp-matchup-facts{
   justify-content:flex-start;gap:5px;flex:initial
 }
 .lbw-root .ws-cmp-stage .cmp-matchup-facts li>span:last-child{
-  font-size:10px;line-height:1.3;overflow-wrap:anywhere
+  font-size:12px;line-height:1.4;overflow-wrap:anywhere
 }
 .lbw-root .ws-cmp-stage .cmp-matchup-vs{padding:0;position:sticky;top:20px;align-self:start}
 .lbw-root .ws-cmp-stage .cmp-matchup-vs>span:first-child{font-size:18px;letter-spacing:0}
@@ -183,13 +184,13 @@
   min-width:0;padding:9px;gap:6px
 }
 .lbw-root .ws-cmp-stage .cmp-radar-heading{
-  margin:0;font:700 10px var(--font-mono);
+  margin:0;font:700 12px var(--font-mono);
   letter-spacing:.08em;text-transform:uppercase;text-align:center
 }
 .lbw-root .ws-cmp-stage .cmp-radar svg{
   display:block;width:100%;height:auto;max-height:240px;aspect-ratio:1/1
 }
-.lbw-root .ws-cmp-stage .cmp-radar svg text{font-size:11px}
+.lbw-root .ws-cmp-stage .cmp-radar svg text{font-size:12px}
 
 /* Shared diverging-bar statistics now in the CENTER column, with VS
    and the canonical head-to-head record above the bars. */
@@ -199,11 +200,11 @@
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-versus{
   display:flex;flex-direction:column;align-items:center;
-  gap:8px;padding:16px 7px 17px;border-bottom:1px solid var(--line2);
+  gap:10px;padding:17px 9px 18px;border-bottom:1px solid var(--line2);
   text-align:center
 }
 .lbw-root .ws-cmp-stage .cmp-versus-kicker{
-  font:750 11px/1.15 var(--font-mono);letter-spacing:.15em;color:var(--tx2);
+  font:750 14px/1.2 var(--font-mono);letter-spacing:.10em;color:var(--tx2);
   text-align:center
 }
 .lbw-root .ws-cmp-stage .cmp-versus-operators{
@@ -212,20 +213,20 @@
 }
 .lbw-root .ws-cmp-stage .cmp-versus-name{
   display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap;font:700 10px/1.35 var(--font-mono)
+  white-space:nowrap;font:700 12px/1.35 var(--font-mono)
 }
 .lbw-root .ws-cmp-stage .cmp-versus-name:first-child{text-align:right}
 .lbw-root .ws-cmp-stage .cmp-versus-name:last-child{text-align:left}
 .lbw-root .ws-cmp-stage .cmp-versus-label{
-  font:850 30px/1 var(--font-mono);letter-spacing:.13em;color:var(--tx)
+  font:850 36px/1 var(--font-mono);letter-spacing:.10em;color:var(--tx)
 }
 .lbw-root .ws-cmp-stage .cmp-versus-record{
   display:flex;align-items:center;justify-content:center;gap:13px;
-  font:850 30px/1.1 var(--font-mono);font-variant-numeric:tabular-nums
+  font:850 34px/1.1 var(--font-mono);font-variant-numeric:tabular-nums
 }
 .lbw-root .ws-cmp-stage .cmp-versus-dash{color:var(--mut)}
 .lbw-root .ws-cmp-stage .cmp-versus-caption{
-  color:var(--mut);font:700 10px/1.2 var(--font-mono);letter-spacing:.08em
+  color:var(--mut);font:700 11px/1.2 var(--font-mono);letter-spacing:.07em
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-workspace{
   display:flex;flex-direction:column;gap:20px;
@@ -236,9 +237,9 @@
   display:block;min-height:auto;min-width:0
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-heading{
-  display:grid;grid-template-columns:minmax(0,1fr) 106px minmax(0,1fr);
+  display:grid;grid-template-columns:minmax(0,1fr) 122px minmax(0,1fr);
   gap:4px;align-items:center;padding-bottom:11px;
-  border-bottom:1px solid var(--line);font:700 11px var(--font-mono)
+  border-bottom:1px solid var(--line);font:700 13px var(--font-mono)
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-heading span{
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap
@@ -250,16 +251,16 @@
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-rows{display:flex;flex-direction:column;padding-top:3px}
 .lbw-root .ws-cmp-stage .cmp-ledger-line{
-  display:grid;grid-template-columns:minmax(0,1fr) 106px minmax(0,1fr);
-  gap:0 5px;padding:9px 0;min-height:50px;
+  display:grid;grid-template-columns:minmax(0,1fr) 122px minmax(0,1fr);
+  gap:0 6px;padding:11px 0;min-height:54px;
   border-bottom:1px solid var(--line)
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-line>span{
-  font-size:11px;line-height:1.35;overflow-wrap:anywhere;min-width:0
+  font-size:12px;line-height:1.4;overflow-wrap:anywhere;min-width:0
 }
-.lbw-root .ws-cmp-stage .cmp-ledger-line>.col-span-3{height:4px;margin-top:5px}
-.lbw-root .ws-cmp-stage .cmp-ledger-line .text-center{font-size:11px}
-.lbw-root .ws-cmp-stage .cmp-ledger-line .text-center>*{font-size:8px}
+.lbw-root .ws-cmp-stage .cmp-ledger-line>.col-span-3{height:6px;margin-top:6px}
+.lbw-root .ws-cmp-stage .cmp-ledger-line .text-center{font-size:12px}
+.lbw-root .ws-cmp-stage .cmp-ledger-line .text-center>*{font-size:10px}
 
 /* Full-stage-width TOKEN LONGEVITY timeline beneath all three columns.
    The centered bar-stat ledger stops above it. */

@@ -54,3 +54,14 @@ RELEASE READY NO. DEPLOYED NO.
   fixed VS record, 0 page exceptions, and no header overflow.
 - Isolated local review: http://127.0.0.1:3250/compare. Safari owner review pending.
 - Staging-only; no merge or deployment.
+
+## 2026-10-12 — Second width and typography pass
+- Center bar-stat column now max 460px (400px prior), minimum 375px; paired
+  operator report columns scale down to 205px minimum with wrapping rank/Yield.
+- Increased center title 11→14px, VS 30→36px, record 30→34px, statistic
+  labels 11→12px, user names 16→18px, and stronger chart/radar legibility.
+- Independent production-style build and browser visual checks PASS at
+  1440/1280/960: no operator-header overflow or runtime exceptions; 16 bars,
+  four radars, 22 live operator choices, and full-width Token Longevity intact.
+- Native Safari foreground preview required for owner visual approval.
+- Local Compare-only staging checkpoint; no merge or deployment.
