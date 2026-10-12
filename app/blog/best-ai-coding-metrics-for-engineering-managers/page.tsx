@@ -18,7 +18,6 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
-import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -86,8 +85,7 @@ const faqs = [
 
 export default function BestAiCodingMetricsForEngineeringManagersPage() {
   return (
-    <BlogWorkspaceFrame>
-      <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <CitationMeta
         title={"Best AI Coding Metrics for Engineering Managers (2026)"}
         description={
@@ -516,7 +514,6 @@ export default function BestAiCodingMetricsForEngineeringManagersPage() {
           </Link>
         </p>
       </section>
-      </div>
-    </BlogWorkspaceFrame>
+    </div>
   );
 }

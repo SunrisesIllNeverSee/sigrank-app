@@ -21,7 +21,7 @@ export interface LeaderboardRow {
   source_submission_id?: string | null;
   window_start?: string | null;
   window_end?: string | null;
-  workflow_mode?: "hitl" | "agentic" | "hybrid" | null;
+  workflow_mode?: "hitl" | "agentic" | null;
   workflow_evidence_url?: string | null;
   workflow_mode_version?: string | null;
   mode_assessed_at?: string | null;
@@ -42,8 +42,6 @@ export interface LeaderboardRow {
    *  same operator's per-platform rows on the "off" board. Live rows read it from
    *  metric_snapshots.platform; mock rows fall back to the operator's primary_domain. */
   platform?: string | null;
-  /** Distinct submitted platforms on an operator-total row. Multi is a rollup, not a platform. */
-  platforms?: string[];
   /** Snapshot DATE ('YYYY-MM-DD') — recency reference for the window buffer. */
   snapshot_date?: string | null;
 }
