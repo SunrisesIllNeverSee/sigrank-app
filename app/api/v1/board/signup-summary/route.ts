@@ -11,6 +11,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { getLeaderboard } from "@/lib/board";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
+import { registeredURMember } from "@/lib/board/unranked-status";
 
 export const dynamic = "force-dynamic";
 
@@ -58,22 +59,15 @@ export async function GET(req: NextRequest) {
       .filter(([id]) => !rankedIDs.has(id))
       .sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
     const nextPosition = ranked.length + 1;
-    const members = unrankedIDs.map(([_id, _joined], index) => ({
-      position: nextPosition + index,
-      board_status: "unranked" as const,
-      // Assigned to the Autonomous REVIEW QUEUE by owner's UI policy.
-      // No scored workflow mode or autonomy assessment is inferred.
-      workflow_mode: null,
-      display_group: "autonomous" as const,
-      workflow_provenance: "unassessed_grouping" as const,
-      identity_status: "not_publicly_listed" as const,
-      display_label: "SIGNED-UP OPERATOR" as const,
-    }));
+    const members = unrankedIDs.map(([_id, _joined], index) =>
+      registeredURMember(nextPosition + index));
     return NextResponse.json({
       scope: "active_linked_registered_operators",
       registered_total: active.size,
       ranked_total: rankedLinked,
       unranked_total: members.length,
+      ur_total: members.length,
+      ranked_metrics_population: rankedLinked,
       next_member_position: nextPosition,
       members,
       roster_status: "registered_positions_only; public identities require consent",
