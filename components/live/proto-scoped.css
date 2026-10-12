@@ -1777,3 +1777,5 @@
 
 /* Lead editorial mastheads with each page's own pixel wordmark. */
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>div>:is(h1,h2,div[aria-label]){order:-1}
+
+.lbw-root .ws-home-topics a[aria-current="page"]{color:var(--ac);background:var(--sel)}
