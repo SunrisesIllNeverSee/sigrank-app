@@ -1,9 +1,5 @@
-export type BoardMode = "all" | "hitl" | "agentic" | "hybrid";
-/** Stored workflow_mode vocabulary — "hybrid" is carried end-to-end for
- *  surfaces that read the assessed value verbatim (the live board); the
- *  heuristic resolver below still only produces hitl|agentic|null until
- *  the pipeline emits hybrid assessments. */
-export type WorkflowMode = Exclude<BoardMode, "all"> | "hybrid";
+export type BoardMode = "all" | "hitl" | "agentic";
+export type WorkflowMode = Exclude<BoardMode, "all">;
 
 export function resolveWorkflowMode(input: {
   inputTokens: number;
@@ -16,8 +12,8 @@ export function resolveWorkflowMode(input: {
   if ([input.inputTokens, input.outputTokens, input.cacheWriteTokens, input.cacheReadTokens]
     .some((n) => !Number.isFinite(n) || n < 0) ||
       input.inputTokens === 0 || input.outputTokens === 0) return null;
-  if (input.assessment === "agentic" || input.assessment === "hybrid") {
-    return input.evidenceUrl?.startsWith("https://") ? input.assessment : null;
+  if (input.assessment === "agentic") {
+    return input.evidenceUrl?.startsWith("https://") ? "agentic" : null;
   }
   const total = input.inputTokens + input.outputTokens +
     input.cacheWriteTokens + input.cacheReadTokens;
@@ -33,11 +29,5 @@ export function resolveWorkflowMode(input: {
 }
 
 export function includesBoardMode(mode: BoardMode, resolved: WorkflowMode | null): boolean {
-  // Workflow evidence never controls inclusion on the All board.
-  // A null assessment is display-default HITL, explicitly provisional;
-  // it is NOT positive evidence of human operation for Hybrid classification.
-  if (mode === "all") return true;
-  if (mode === "hybrid") return resolved === "hybrid";
-  if (mode === "hitl") return resolved === "hitl" || resolved === "hybrid" || resolved === null;
-  return resolved === "agentic" || resolved === "hybrid";
+  return resolved !== null && (mode === "all" || mode === resolved);
 }

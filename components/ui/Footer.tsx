@@ -240,7 +240,7 @@ export function Footer() {
               )}
               <ul className="flex flex-col gap-1.5">
                 {col.links.map((l) => (
-                  <li key={l.label}>
+                  <li key={l.href}>
                     <Link
                       href={l.href}
                       className="text-[11px] text-text-muted transition-colors hover:text-text-primary"

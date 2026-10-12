@@ -11,9 +11,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -25,19 +24,7 @@ export const metadata: Metadata = withOG({
 
 export default function VelocityPage() {
   return (
-    <MetricsWorkspaceFrame
-      title="VELOCITY"
-      hero={
-        <WaveHero
-          eyebrow="SIGRANK METRIC"
-          terminalText="VELOCITY"
-          title="Velocity"
-          subtitle={<>How fast signal moves through the cascade.</>}
-        />
-      }
-      current="/metrics/velocity"
-    >
-    <div className="flex flex-col gap-8 py-2">
+    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([
@@ -72,6 +59,22 @@ export default function VelocityPage() {
             },
           ]),
         ]}
+      />
+
+      <WaveHero
+        eyebrow="◈ Secondary Metric"
+        terminalText="VELOCITY"
+        title="Velocity — Token Production Rate"
+        subtitle={
+          <>
+            Velocity in AI token usage measures how much output you generate
+            relative to fresh input. It&rsquo;s the ratio of output tokens to
+            input tokens — how much the model produces per unit of new context
+            you provide. A{" "}
+            <span className="text-gold">secondary metric</span> — high velocity
+            without yield is just fast waste.
+          </>
+        }
       />
 
       {/* ── The formula ── */}
@@ -386,6 +389,5 @@ export default function VelocityPage() {
         </p>
       </section>
     </div>
-    </MetricsWorkspaceFrame>
   );
 }
