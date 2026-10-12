@@ -14,7 +14,8 @@
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
-import { colors } from "@/components/sigrank/tokens";
+import { compareClassPalette } from "./compare-palette";
+import { CompareRadars } from "./CompareRadars";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import {
   deriveFacts,
@@ -27,19 +28,6 @@ import {
 } from "@/components/compare/CompareSelectors";
 
 const nameOf = operatorDisplayName;
-
-function classColor(cls: SignalClass): string {
-  if (cls === "TRANSMITTER") return colors.class.TRANSMITTER;
-  const tier = cls.split(" ").slice(0, -1).join(" ");
-  return (colors.class as Record<string, string>)[tier] ?? colors.class.BASE;
-}
-
-/** CSS-var token name for a class (e.g. 'ARCH+ I' → 'class-archplus'). */
-function classVar(cls: SignalClass): string {
-  if (cls === "TRANSMITTER") return "class-transmitter";
-  const tier = cls.split(" ").slice(0, -1).join(" ");
-  return "class-" + tier.toLowerCase().replace("+", "plus");
-}
 
 function yieldStr(r: LeaderboardRow): string {
   const c = r.snapshot.cascade;
@@ -97,8 +85,8 @@ export function CompareMatchup({
   const nameB = nameOf(b);
   const clsA = a.snapshot.class_tier as SignalClass;
   const clsB = b.snapshot.class_tier as SignalClass;
-  const colA = classColor(clsA);
-  const colB = classColor(clsB);
+  const colA = compareClassPalette(clsA).color;
+  const colB = compareClassPalette(clsB).color;
 
   const { aWins, bWins } = compareTally(a, b);
   const winner: "a" | "b" | null =
@@ -124,11 +112,10 @@ export function CompareMatchup({
     facts: OperatorFact[];
     won: boolean;
   }) => {
-    const cvar = classVar(cls);
-    const tint = won ? 0.16 : 0.08;
-    // Both panels formatted the SAME (owner 2026-06-22): identity LEFT, 5 points RIGHT.
-    // Class tint still bleeds from each side's outer edge so the matchup stays distinct.
-    const bg = `linear-gradient(${side === "a" ? "105deg" : "255deg"}, rgb(var(--${cvar}) / ${tint}), transparent 72%)`;
+    // Fixed RGB fallback avoids Safari-specific interpolation differences.
+    const tint = compareClassPalette(cls).tint(won ? 0.16 : 0.08);
+    const bg = "linear-gradient(" + (side === "a" ? "105deg" : "255deg") +
+      ", " + tint + ", transparent 72%)";
     const identity = (
       <div className="cmp-matchup-identity flex shrink-0 flex-col items-start gap-1 text-left">
         <span
@@ -177,8 +164,10 @@ export function CompareMatchup({
         }
         style={{ background: bg }}
       >
-        {identity}
-        {factList}
+        <div className="cmp-operator-report">
+          <div className="cmp-operator-report-copy">{identity}{factList}</div>
+          <CompareRadars a={a} b={b} side={side} />
+        </div>
       </div>
     );
   };

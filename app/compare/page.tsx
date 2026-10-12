@@ -32,7 +32,6 @@ import {
   type CompareOption,
 } from "@/components/compare/CompareSelectors";
 import { CompareLedger } from "@/components/compare/CompareLedger";
-import { CompareRadars } from "@/components/compare/CompareRadars";
 import { CompareHistoryChart } from "@/components/compare/CompareHistoryChart";
 // CMP redesign (owner 2026-06-22): the matchup box (CompareMatchup) folds the selectors +
 // identity + 5 derived facts per operator; CompareLedger is the RAW/METRICS/TOTAL ledger
@@ -60,6 +59,7 @@ import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { CompareStage } from "@/components/compare/CompareStage";
+import { compareClassPalette } from "@/components/compare/compare-palette";
 import "@/components/compare/compare-workspace.css";
 
 export const metadata: Metadata = withOG({
@@ -469,9 +469,6 @@ export default async function ComparePage({
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors />
           </div>
-          <div className="ws-cmp-radars">
-            <CompareRadars a={rowA} b={rowB} />
-          </div>
           <div className="ws-cmp-ledger">
             <CompareLedger a={rowA} b={rowB} workspace />
           </div>
@@ -483,6 +480,8 @@ export default async function ComparePage({
                 nameA={nameOf(rowA)}
                 nameB={nameOf(rowB)}
                 fieldAvg={fieldAvgYield}
+                colorA={compareClassPalette(rowA.snapshot.class_tier).color}
+                colorB={compareClassPalette(rowB.snapshot.class_tier).color}
                 height={150}
               />
             </div>
