@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { RailIcon, type IconSetName, type PixelIconName } from "./PixelIcon";
 import "./rail-extras.css";
+import { useBoardSession } from "./session";
+import { PixelBadge } from "./PixelBadge";
 
 export type RailNavId = "home" | "board" | "profile" | "compare" | "hall" | "field" | "articles" | "blog" | "wiki";
 const groups: { label: string; items: { key: RailNavId; label: string; href: string }[] }[] = [
@@ -22,11 +24,12 @@ const groups: { label: string; items: { key: RailNavId; label: string; href: str
 ];
 
 export function GroupedRailNav({ active, iconSet, onBoard }: { active: RailNavId; iconSet: IconSetName; onBoard?: () => void }) {
+  const session = useBoardSession();
   return <>
     {groups.map((group) => <div key={group.label} role="group" aria-label={group.label} className="rail-nav-group">
       {group.items.map((item) => {
         const props = { className: `sbtn${active === item.key ? " on" : ""}`, "data-tip": item.label, title: item.label, "aria-label": item.label };
-        const icon = item.key === "home" ? <span className="gi" aria-hidden="true">§</span> : <RailIcon name={item.key as PixelIconName} set={iconSet} />;
+        const icon = item.key === "profile" && session.signedIn && session.pixelBadge ? <PixelBadge name={session.pixelBadge} /> : item.key === "home" ? <span className="gi" aria-hidden="true">§</span> : <RailIcon name={item.key as PixelIconName} set={iconSet} />;
         return item.key === "board" && onBoard ? <button key={item.key} {...props} type="button" aria-current="page" onClick={onBoard}>{icon}</button>
           : <Link key={item.key} {...props} href={item.href} aria-current={active === item.key ? "page" : undefined}>{icon}</Link>;
       })}
