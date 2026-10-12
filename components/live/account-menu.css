@@ -1,0 +1,9 @@
+.lbw-root .acctpop{width:220px;max-width:calc(100vw - 72px);max-height:calc(100dvh - 90px);overflow-y:auto}
+.lbw-root .account-options{display:flex;flex-direction:column;gap:2px}
+.lbw-root .account-options .account-identity{overflow-wrap:anywhere;color:var(--tx);letter-spacing:0}
+.lbw-root .account-options .ap-label{padding:6px 10px}
+.lbw-root .account-options .themesw{padding:6px 10px}
+.lbw-root .account-options :is(a,button):focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
+.lbw-root .account-options button:disabled{opacity:.6;cursor:wait}
+
+.lbw-root .srail .acctpop .account-options .themesw{flex-direction:row;justify-content:flex-start;align-items:center}
