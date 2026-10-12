@@ -12,9 +12,12 @@ export const useProfileWorkspace = () => useContext(ProfileWorkspaceContext);
 
 const sections = ["overview", "stats", "analysis", "submissions", "social", "badges"] as const;
 
-export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLabel, children, actions }: {
+export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLabel, children, actions, panels }: {
   name: string; codename: string; rank: number | null; tier: string; platform: string;
   yieldLabel: string; children: ReactNode; actions: ReactNode;
+  /** Server-rendered rail panels (rank contexts / activity / records) —
+   *  injected between OPERATOR PROFILE and ACTIONS by the page (Phase 3). */
+  panels?: ReactNode;
 }) {
   const searchParams = useSearchParams();
   const requested = searchParams.get("tab");
@@ -50,6 +53,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
           <div className="ws-profile-kv"><span>Υ YIELD</span><b>{yieldLabel}</b></div>
           <div className="ws-profile-kv"><span>PLATFORM</span><b>{platform}</b></div>
         </div>
+        {panels}
         <div className="mod ws-profile-actions"><h3><span className="sq" />ACTIONS</h3>{actions}</div>
         <div className="mod"><h3><span className="sq" />CONTEXT</h3>
           <p className="ws-note">Public operator telemetry. Report and Lab remain owner-only.</p>

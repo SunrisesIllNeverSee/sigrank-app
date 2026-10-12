@@ -28,6 +28,7 @@ import { Suspense } from "react";
 
 import {
   getOperator,
+  getLeaderboard,
   isOperatorRetired,
 } from "@/lib/board";
 import { decodeCodename } from "@/lib/route-params";
@@ -41,6 +42,7 @@ import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 
 import { ProfileBody } from "./ProfileBody";
 import { ProfileWorkspace } from "@/components/profile-v2/ProfileWorkspace";
+import { ProfileRailPanels } from "@/components/profile-v2/ProfileRailPanels";
 
 // ISR: revalidate every 6 hours. Profile data doesn't change frequently —
 // operators submit snapshots at most a few times per day, and on-demand
@@ -95,9 +97,15 @@ export async function generateMetadata({
   const codename = decodeCodename(rawCodename);
   // Retired operators (opt-out): no metadata (they redirect to the leaderboard).
   if (await isOperatorRetired(codename)) return { title: "SigRank Leaderboard" };
-  const row = await getOperator(codename);
+  const [row, fieldRows] = await Promise.all([
+    getOperator(codename),
+    getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
+  ]);
   if (!row) return { title: "Operator not found" };
   const name = resolveName(row.operator);
+  // Board-verified field rank — row.global_rank is 0 for unresolved-mode
+  // operators who hold a real position on the combined field.
+  const metaRank = fieldRows.find((r) => r.operator.codename === codename)?.global_rank ?? row.global_rank;
   const c = row.snapshot.cascade;
   const yieldLabel =
     c && !c.nonCompounding
@@ -106,7 +114,7 @@ export async function generateMetadata({
   const title = `${name}${yieldLabel}`;
   const description = row.pending
     ? `${name} — an operator on SigRank (not ranked yet).`
-    : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`;
+    : `${name} — ${row.snapshot.class_tier}, rank #${metaRank} on the SigRank leaderboard.`;
   // robots comes from the shared indexing policy (lib/seo/indexing-policy.ts):
   // claimed + non-retired + non-private + at least one metric snapshot gets
   // index,follow; everyone else (seed/unclaimed, private, no-snapshot) keeps a
@@ -132,9 +140,14 @@ export default async function OperatorProfilePage({
   // isOperatorRetired is uncached (fresh status check), getOperator is
   // unstable_cache'd at 90s. Running them in parallel saves ~200ms on
   // cold misses.
-  const [retired, row] = await Promise.all([
+  const [retired, row, fieldRows] = await Promise.all([
     isOperatorRetired(codename),
     getOperator(codename),
+    // Same claimed all-time combined field the board renders — memo-cached,
+    // shared with ProfileBody/RailPanels. Needed up here because the static
+    // OPERATOR rail mods display the rank and row.global_rank (claimedRankMap)
+    // is 0 for unresolved-mode operators who ARE on the field (owner item 13).
+    getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
   ]);
 
   // Retired operators (opt-out): redirect to the leaderboard. No profile page,
@@ -143,6 +156,7 @@ export default async function OperatorProfilePage({
   if (!row) notFound();
 
   const { operator } = row;
+  const fieldRank = fieldRows.find((r) => r.operator.codename === codename)?.global_rank ?? null;
 
   // PERF (2026-08-28): streaming via Suspense.
   // The action row renders immediately with just getOperator data (critical
@@ -160,7 +174,7 @@ export default async function OperatorProfilePage({
   return (
     <Suspense fallback={<div>Loading profile workspace…</div>}>
     <ProfileWorkspace name={resolveName(operator)} codename={operator.codename}
-      rank={row.pending ? null : row.global_rank} tier={row.snapshot.class_tier}
+      rank={row.pending ? null : fieldRank} tier={row.snapshot.class_tier}
       platform={operator.primary_domain}
       yieldLabel={row.snapshot.cascade?.nonCompounding ? "—" : (row.snapshot.cascade?.yield_?.toFixed(2) ?? "—")}
       actions={<div className="flex flex-wrap items-center justify-between gap-4">
@@ -181,7 +195,14 @@ export default async function OperatorProfilePage({
           {operator.claimed && <ClaimedBadge claimed={operator.claimed} />}
           <ProfileEditModal codename={operator.codename} />
         </div>
-      </div>}>
+      </div>}
+      panels={
+        /* Phase 3 rail panels: rank contexts, submission activity, records &
+           honors — streamed via the same cached fetches ProfileBody warms. */
+        <Suspense fallback={<div className="mod"><h3><span className="sq" />OPERATOR DATA</h3><p className="ws-note">Loading…</p></div>}>
+          <ProfileRailPanels row={row} />
+        </Suspense>
+      }>
       <TrackProfileView codename={operator.codename} />
 
       {/* V2: the identity hero now lives inside OverviewView — the old

@@ -250,3 +250,103 @@ All items from the round-5 directive implemented and verified:
 
 - Verified automation HTTPS attestation: no live operator has submitted a third-party evidence link for an assessed `agentic` or `hybrid` workflow mode; evidence ↗ links and `amv-2` tags remain code-verified via unit tests until real attested rows are ingested.
 - Design exploration items noted in the owner checklist (consolidated Compare Share menu, chart layout alternatives, and sidebar card relocations) are reserved for owner review.
+
+---
+
+## Phase 3 — User Profile (owner checklist items 7–14)
+
+### Item 7: Submission Activity → right sidebar
+- **Item:** Move the activity visualization from main content into the right sidebar
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** The 22-week daily-yield heatmap (cells, month labels, legend, ACTIVE/BEST/STREAK/PEAK-Υ stats) previously rendered inside `OverviewView.tsx` main section 5. It now renders as a `.mod` inside the `WorkspaceShell` right rail (`ProfileRailPanels`), fed by the same `getOperatorHistory` + `account_age_days`/`total_messages_lifetime` data — no fabricated cells: operators with no history render zero-lit cells against their account-age window, and pending operators render the same honest empty grid.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/ProfileRailPanels.tsx` (SUBMISSION ACTIVITY module — moved code), `components/profile-v2/OverviewView.tsx` (heatmap removed from main flow), `components/profile-v2/ProfileWorkspace.tsx` (new `panels` slot between OPERATOR PROFILE and ACTIONS), `app/user/[codename]/page.tsx` (panels wiring via Suspense).
+- **Commit:** this push
+- **Where to see it:** `http://localhost:3230/user/xoxo` — right rail, second module under OPERATOR PROFILE.
+- **Verification performed and result:** `scripts/e2e-phase3-profile.mjs` — "activity in rail not main" PASS (154 cells inside `aside.railcol`, none inside `main.stage`); pending profile `/user/sex` renders the grid without fabricated activity.
+- **Evidence path:** `release-staging/evidence/phase3-profile-rail.png`, `release-staging/evidence/phase3-profile-pending.png`.
+- **Remaining work or missing decision:** None.
+
+### Item 8: Records & Honors → right sidebar
+- **Item:** Move records and trophies into the right sidebar, retaining detailed information
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Records moved from main section 6 into the rail with MORE detail than before: medal counts (gold/silver/bronze with per-medal SVGs), VERIFIED/SUPPORTER badges, WATCHED count, and a per-record list where each row carries title, rank value, state styling and a chevron affordance. Earned rows merge curated Hall-of-Signal records and live top-3 metric-board standings; the in-progress 500-snapshot milestone shows a real progress bar; unreachable states render a locked row instead of fabrication.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/ProfileRailPanels.tsx` (RECORDS & HONORS module), `components/profile-v2/RecordDetailList.tsx` (row list + dialog), `components/profile-v2/OverviewView.tsx` (main-content section removed), `app/user/[codename]/ProfileBody.tsx` (`records` prop dropped from Overview).
+- **Commit:** this push
+- **Where to see it:** `http://localhost:3230/user/xoxo` — right rail, third module.
+- **Verification performed and result:** e2e PASS — "records in rail not main" (10 rows in rail, 0 in main); medal row reads `0 gold | 0 silver | 9 bronze` matching xoxo's nine live #3 metric-board standings.
+- **Evidence path:** `release-staging/evidence/phase3-profile-rail.png`.
+- **Remaining work or missing decision:** Final trophy appearance is a provisional design pending owner sign-off (see owner checklist).
+
+### Item 9: Record graphics
+- **Item:** Improve trophy symbols, hierarchy, sizing, earned/pending/unavailable distinction
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Three-state visual system: earned = filled medal disc (ribbon + ring + disc, gold `#FFD700` / silver `#C0C0C0` / bronze `#CD7F32` keyed by standing rank, rank numeral inside the disc); pending = dashed clock glyph + progress bar + `n/500` value; unavailable = lock glyph at reduced opacity. Medal summary chips dim to 0.3 opacity at zero count so absence reads as absence, not a bright fake zero.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/RecordDetailList.tsx` (`MedalDot`, `PendingGlyph`, `LockedGlyph`), `components/profile-v2/ProfileRailPanels.tsx` (medal summary chips), `components/profile-v2/profile-workspace.css` (`.prl-medal`, `.prl-rec--earned/pending/unavailable`).
+- **Commit:** this push
+- **Where to see it:** Right rail RECORDS & HONORS — earned rows show bronze `#3` discs for xoxo; pending milestone row shows dashed glyph + bar.
+- **Verification performed and result:** e2e PASS — `record states earned+pending` (9 earned + 1 pending on xoxo); `medals render` (3 chips); `pending: medals all zero` on `/user/sex`; `pending: only pending milestone record`.
+- **Evidence path:** `release-staging/evidence/phase3-profile-rail.png`, `release-staging/evidence/phase3-profile-pending.png`.
+- **Remaining work or missing decision:** Owner review of final trophy appearance (flagged in checklist).
+
+### Item 10: Clickable records
+- **Item:** Prototype record details — definition, value, cohort, period, date, evidence
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Each record row is a `<button aria-haspopup="dialog">` opening a native `<dialog>` detail card: DEFINITION (metric rule / award criteria), VALUE, COHORT (`COMBINED FIELD · CLAIMED OPERATORS` / `HALL OF SIGNAL` / `OPERATOR MILESTONES`), PERIOD (`ALL-TIME` / `CURATED AWARD` / `CUMULATIVE`), DATE (`LIVE STANDING` / award date / `IN PROGRESS`), PROGRESS for milestones, and EVIDENCE linking to `/board/all`, `/hall`, or the operator's badges tab (internal links stay in-app; external links get `rel="noreferrer" target="_blank"`). Native dialog gives Esc/backdrop close + focus containment; missing fields render `—` rather than invented values.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/RecordDetailList.tsx` (`RecordDetailList` client island + `<dialog>` card), `components/profile-v2/profile-workspace.css` (`.prl-dialog*`).
+- **Commit:** this push
+- **Where to see it:** Click any record row in the right rail on `http://localhost:3230/user/xoxo`.
+- **Verification performed and result:** e2e PASS — dialog opens on Υ Yield record, all five base fields + EVIDENCE present, evidence href `/board/all`, Esc closes; pending milestone dialog shows `12 OF 500 SCORED SNAPSHOTS` progress.
+- **Evidence path:** `scripts/e2e-phase3-profile.mjs` (dialog checks), `release-staging/evidence/phase3-profile-rail.png`.
+- **Remaining work or missing decision:** Popover/dialog visual design is provisional — owner review.
+
+### Item 11: Holographic card shine
+- **Item:** Restore shine effect, Safari rendering, reduced-motion accessibility
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** The mock's `::after` background-position shimmer was fragile under compositing. Restored as a dedicated `.pv2-shine` element inside the card — a transform-based diagonal sweep (`pv2-shine-sweep` keyframes translating a masked gradient), which animates on the compositor in WebKit/Safari rather than repainting a background. `@media (prefers-reduced-motion: reduce)` disables the sweep plus the card's float/avatar-ring animations. Shine is `aria-hidden`.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/PassportCard.tsx` (`<div className="pv2-shine" aria-hidden>`), `components/profile-v2/profile-workspace.css` (`.pv2-shine` + `pv2-shine-sweep` + reduced-motion block covering `.pv2-card-shell/.pv2-card::after/.pv2-hex-bg/.pv2-avatar-ring/.pv2-shine`).
+- **Commit:** this push
+- **Where to see it:** `http://localhost:3230/user/xoxo` overview — passport card diagonal light sweep.
+- **Verification performed and result:** e2e PASS — computed `animationName` = `pv2-shine-sweep` (running); stylesheet reduced-motion media block covers `.pv2-shine` + `.pv2-card::after` + ring/hex animations; native Safari capture renders card cleanly.
+- **Evidence path:** `release-staging/evidence/actual-safari-phase3-profile.png` (Safari 27.0.1), `release-staging/evidence/phase3-profile-rail.png`.
+- **Remaining work or missing decision:** None.
+
+### Item 12: Workflow symbols
+- **Item:** Distinguishable OITL and agentic/operator-agent symbols with readable labels
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** `WorkflowMark` renders an inline SVG glyph + text pair per resolved mode using the board's own vocabulary: `hitl` → person-in-loop glyph + `OITL`/`OPERATOR-IN-THE-LOOP`; `agentic` → bolt glyph + `AUTO`/`AUTOMATED`; `hybrid` → split glyph + `HYBRID`; `null` (unresolved) → hollow glyph + `REVIEW`/`UNRESOLVED · REVIEW`. Unresolved rows are never labeled verified automation — the rail adds the explicit note `REVIEW CANDIDATE — NOT VERIFIED AUTOMATION` whenever the operator's resolved mode is null.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/WorkflowMark.tsx` (new), used by `OverviewView.tsx` (hero tag), `ProfileRailPanels.tsx` (rank-context mark), `lib/analytics/workflow-cohort.ts` (label strings).
+- **Commit:** this push
+- **Where to see it:** Hero tag on `/user/xoxo` (REVIEW), `/user/zachlagden` (OITL); rail RANK CONTEXTS mark.
+- **Verification performed and result:** e2e PASS — xoxo shows `UNRESOLVED · REVIEW`; zachlagden shows `OITL · OPERATOR-IN-THE-LOOP`; review note renders for null mode.
+- **Evidence path:** `release-staging/evidence/phase3-profile-oitl.png`, `release-staging/evidence/phase3-profile-rail.png`.
+- **Remaining work or missing decision:** Final symbol artwork + naming owner sign-off.
+
+### Item 13: Ranking contexts
+- **Item:** Combined-field and workflow-specific ranks separately, verified cohort calculations; hybrid = combined field
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Dual contexts shown in three places: passport card chips (`FIELD #3` + `AUTO #3/9`), hero block (`#3` + `90.5%ile`), rail RANK CONTEXTS (`FIELD #3 · HYBRID · COMBINED · OF 22` / `AUTO #3 · AUTONOMOUS · OF 9`; `OITL #2 · OPERATOR-IN-THE-LOOP · OF 13` on zachlagden). Cohort membership mirrors `LiveBoardWorkspace`'s wfSel predicate exactly (`hitl`→hitl+hybrid, `agentic`→agentic+hybrid+null; hybrid = combined field = no exclusion), and cohort rank sorts members by yield desc — the board's own basis. **Pre-existing bug fixed:** `row.global_rank` comes from `claimedRankMap`, which only ranks RESOLVED-mode snapshots — unresolved operators ON the combined field (xoxo, board #3) displayed `#0`/`0.0%ile` and `UNRANKED` in the OPERATOR rail mods. Displayed field rank/percentile now derives from the operator's own row inside the same `getLeaderboard` rows the board renders (page.tsx, ProfileBody, rail), so every visible rank matches /board/all.
+- **Code changed:** YES
+- **Files and function/component:** `lib/analytics/workflow-cohort.ts` (`workflowCohortRank`, `inCohort`), `components/profile-v2/PassportCard.tsx` (dual rank chips), `components/profile-v2/ProfileRailPanels.tsx` (RANK CONTEXTS), `app/user/[codename]/page.tsx` (board-verified `fieldRank` for rail mods + metadata), `app/user/[codename]/ProfileBody.tsx` (`boardRow` derivation), `components/profile-v2/OverviewView.tsx` (hero gate = field membership).
+- **Commit:** this push
+- **Where to see it:** `http://localhost:3230/user/xoxo` (FIELD #3 + AUTO #3/9), `http://localhost:3230/user/zachlagden` (FIELD #11 + OITL #2/13), `http://localhost:3230/user/sex` (UNRANKED honest state).
+- **Verification performed and result:** e2e PASS — xoxo `#3`/`90.5%ile` matches board rank 3 / percentile 90.48; zachlagden FIELD #11 + OITL #2/13; cohort sizes 22/9/13 reproduce the board's live counts; pending op shows UNRANKED + `AWAITING FIRST SCORED SNAPSHOT` — no fabricated ranks. Manual API cross-check: xoxo `workflow_mode` null → agentic cohort, yield-sorted position #3 of 9.
+- **Evidence path:** `scripts/e2e-phase3-profile.mjs`, `release-staging/evidence/phase3-profile-rail.png`, `release-staging/evidence/phase3-profile-oitl.png`, `release-staging/evidence/actual-safari-phase3-profile.png`.
+- **Remaining work or missing decision:** Prominence of the two contexts is provisional pending owner review. Note: `claimedRankMap`'s resolved-only population still feeds `global_rank` on the raw row for non-display consumers (API `current_rank`) — flagging as a known semantic difference, not changed here.
+
+### Item 14: Ticker stat boxes density
+- **Item:** Reduce excessive spacing, improve density without clipping values
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Chose the small-spacing adjustment over redesign (owner decision point): flap-board rows now render tighter via reduced cell padding/line-height and compressed header/footer spacing; overview stat/raw cards use smaller value sizes and padding while keeping sparklines. Large values verified (13.75B total, 3.3MY field max, `16786:1:58.2` op-ratio) — nothing clips.
+- **Code changed:** YES
+- **Files and function/component:** `components/profile-v2/profile-workspace.css` (flap row padding/typography), `components/profile-v2/OverviewView.tsx` (stat/raw card sizing).
+- **Commit:** this push
+- **Where to see it:** `http://localhost:3230/user/xoxo` — FlapBoard telemetry column + cascade stat cards.
+- **Verification performed and result:** e2e PASS — `flap board no clipped cells` (scrollWidth/scrollHeight within bounds on every cell); 820px viewport: no horizontal overflow, record rows unclipped.
+- **Evidence path:** `release-staging/evidence/phase3-profile-narrow.png`, `release-staging/evidence/actual-safari-phase3-profile.png`.
+- **Remaining work or missing decision:** If owner wants a denser redesign rather than the small adjustment, the flap grid is the next lever.

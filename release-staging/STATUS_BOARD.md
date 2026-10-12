@@ -2,7 +2,9 @@
 
 ## Owner edit backlog — October 12, 2026
 
-See [OWNER_EDIT_CHECKLIST_2026-10-12.md](OWNER_EDIT_CHECKLIST_2026-10-12.md) for the latest recorded leaderboard, Compare action wiring, and profile requests. Items are pending; this entry does not claim implementation. Chart/Share design exploration remains with the owner.
+See [OWNER_EDIT_CHECKLIST_2026-10-12.md](OWNER_EDIT_CHECKLIST_2026-10-12.md) for the latest recorded leaderboard, Compare action wiring, and profile requests. Chart/Share design exploration remains with the owner.
+
+**Phase 3 profile (items 7–14) implemented & verified** — submission activity + records & honors now live in the right rail with clickable record detail dialogs, three-state trophy graphics, restored Safari-safe holo shine with reduced-motion support, OITL/AUTO/HYBRID/REVIEW workflow marks, dual rank contexts (FIELD combined + workflow cohort, board-verified), and compacted ticker boxes. All visible ranks now match `/board/all` — the claimedRankMap `#0` display bug for unresolved-on-field operators is repaired at the display layer. Verification: `scripts/e2e-phase3-profile.mjs` 29/29 WebKit + native Safari capture; evidence under `release-staging/evidence/phase3-*.png` + `actual-safari-phase3-profile.png`. Provisional design decisions (trophy appearance, workflow naming/symbols, rank prominence, ticker density degree) flagged for owner review in the checklist.
 
 ## Current whole-site preview — October 12, 2026
 

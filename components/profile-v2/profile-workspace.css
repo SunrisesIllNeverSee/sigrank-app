@@ -75,18 +75,18 @@
 /* Railway flap board — black phosphor stats terminal (mock .flapboard). */
 .lbw-root .pv2 .pv2-flapboard{background:#060a05;border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
 .lbw-root .pv2 .pv2-flap-cols{display:grid;grid-template-columns:1.1fr .9fr .7fr .9fr;gap:0;border-bottom:1px solid var(--line2);background:var(--bg2)}
-.lbw-root .pv2 .pv2-flap-cols span{font-family:var(--pv2-display,monospace);font-size:8.5px;letter-spacing:.12em;color:var(--tx2);padding:9px 12px;text-transform:uppercase}
+.lbw-root .pv2 .pv2-flap-cols span{font-family:var(--pv2-display,monospace);font-size:8px;letter-spacing:.12em;color:var(--tx2);padding:6px 10px;text-transform:uppercase}
 .lbw-root .pv2 .pv2-flap-cols span:nth-child(3){text-align:center}
-.lbw-root .pv2 .pv2-flap-rows{display:flex;flex-direction:column;padding:2px 0;flex:1}
-.lbw-root .pv2 .pv2-flap-row{display:grid;grid-template-columns:1.1fr .9fr .7fr .9fr;align-items:center;padding:5.5px 12px;border-bottom:1px solid rgba(29,41,24,.5);font-variant-numeric:tabular-nums;flex:1}
+.lbw-root .pv2 .pv2-flap-rows{display:flex;flex-direction:column;padding:1px 0;flex:1}
+.lbw-root .pv2 .pv2-flap-row{display:grid;grid-template-columns:1.1fr .9fr .7fr .9fr;align-items:center;padding:3.5px 10px;border-bottom:1px solid rgba(29,41,24,.5);font-variant-numeric:tabular-nums;flex:1}
 .lbw-root .pv2 .pv2-flap-row:last-child{border-bottom:none}
 .lbw-root .pv2 .pv2-flap-row .fk{font-family:var(--pv2-display,monospace);font-size:9px;letter-spacing:.1em;color:var(--tx2);text-transform:uppercase}
-.lbw-root .pv2 .pv2-flap-row .fv{font-family:var(--pv2-mono,monospace);font-size:14px;font-weight:600;color:#7cff4f;text-align:left}
+.lbw-root .pv2 .pv2-flap-row .fv{font-family:var(--pv2-mono,monospace);font-size:13px;font-weight:600;color:#7cff4f;text-align:left}
 .lbw-root .pv2 .pv2-flap-row .ck{font-family:var(--pv2-display,monospace);font-size:9px;letter-spacing:.08em;color:var(--ac);text-align:center}
-.lbw-root .pv2 .pv2-flap-row .cv{font-family:var(--pv2-mono,monospace);font-size:14px;font-weight:600;color:#b9cbb0;text-align:right}
+.lbw-root .pv2 .pv2-flap-row .cv{font-family:var(--pv2-mono,monospace);font-size:13px;font-weight:600;color:#b9cbb0;text-align:right}
 .lbw-root .pv2 .pv2-flap-row .cv.avg{color:#71826a;font-weight:400}
 .lbw-root .pv2 .pv2-flap-row .fv.gold{color:var(--gold)}
-.lbw-root .pv2 .pv2-flap-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--line2);background:var(--bg2);font:10px var(--pv2-mono,monospace);letter-spacing:.06em}
+.lbw-root .pv2 .pv2-flap-foot{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-top:1px solid var(--line2);background:var(--bg2);font:10px var(--pv2-mono,monospace);letter-spacing:.06em}
 .lbw-root .pv2 .pv2-flap-foot .opr{color:var(--ac);font-weight:700;font-size:12px}
 .lbw-root .pv2 .pv2-flap-foot .cio{color:var(--mut)}
 .lbw-root .pv2 .pv2-flap-foot .cio b{color:#b9cbb0;font-weight:600}
@@ -99,3 +99,108 @@
   .lbw-root .pv2 .pv2-card-shell,.lbw-root .pv2 .pv2-card::after,
   .lbw-root .pv2 .pv2-hex-bg,.lbw-root .pv2 .pv2-avatar-ring{animation:none}
 }
+
+/* ── Phase 3 (2026-10-12): right-rail data panels + holo shine + ticker density ── */
+
+/* Holo shine — iridescent foil band sweeping the passport card. Real element
+   so the sweep runs on transform (GPU) instead of background-position: works
+   identically in Safari/Chromium/Firefox, needs no mix-blend-mode, and is
+   fully disabled under prefers-reduced-motion. */
+.lbw-root .pv2 .pv2-shine{position:absolute;top:-30%;bottom:-30%;left:-15%;width:46%;pointer-events:none;z-index:1;
+  background:linear-gradient(105deg,transparent 0%,rgba(168,85,247,.10) 28%,rgba(0,229,255,.16) 42%,rgba(255,255,255,.22) 50%,rgba(255,0,212,.14) 58%,rgba(255,215,0,.08) 70%,transparent 100%);
+  transform:translateX(-160%) skewX(-16deg);
+  animation:pv2-shine-sweep 7s ease-in-out infinite}
+@keyframes pv2-shine-sweep{0%,55%{transform:translateX(-160%) skewX(-16deg);opacity:0}62%{opacity:1}78%{transform:translateX(320%) skewX(-16deg);opacity:0}100%{transform:translateX(320%) skewX(-16deg);opacity:0}}
+/* ::after shimmer stays as the ambient layer but no longer depends on
+   mix-blend-mode (Safari clip-path + blend composites inconsistently —
+   plain rgba reads identically everywhere). */
+.lbw-root .pv2 .pv2-card::after{mix-blend-mode:normal;opacity:.85}
+@media(prefers-reduced-motion:reduce){
+  .lbw-root .pv2 .pv2-shine{animation:none;opacity:0}
+}
+
+/* Dual rank chip — combined field + workflow cohort (item 13). */
+.lbw-root .pv2 .pv2-rank-chip--wf{margin-top:1px}
+.lbw-root .pv2 .pv2-rank-of{color:var(--pc-muted);font-weight:400;margin-left:1px}
+
+/* Workflow marks (item 12) — distinguishable glyph + readable label. */
+.lbw-root .wfm{display:inline-flex;align-items:center;gap:5px;line-height:1}
+.lbw-root .wfm-glyph{display:inline-flex;flex-shrink:0}
+.lbw-root .wfm--oitl{color:#00e5ff}
+.lbw-root .wfm--auto{color:#ff9a3c}
+.lbw-root .wfm--hybrid{color:#a855f7}
+.lbw-root .wfm--review{color:var(--mut)}
+.lbw-root .wfm--full{gap:7px}
+.lbw-root .wfm--full .wfm-txt{display:flex;flex-direction:column;gap:2px}
+.lbw-root .wfm--full .wfm-txt b{font:700 10px var(--pv2-display,monospace);letter-spacing:.1em}
+.lbw-root .wfm--full .wfm-txt i{font:9px var(--pv2-mono,monospace);font-style:normal;letter-spacing:.06em;opacity:.85}
+
+/* Right-rail modules (items 7, 8, 13). */
+.lbw-root .prl-ctx{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.lbw-root .prl-ctx-row{display:flex;align-items:baseline;gap:8px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.lbw-root .prl-ctx-row:last-of-type{border-bottom:none}
+.lbw-root .prl-ctx-k{font:700 8px var(--pv2-display,monospace);letter-spacing:.1em;color:var(--mut);width:40px;flex-shrink:0}
+.lbw-root .prl-ctx-v{font:700 16px var(--pv2-mono,monospace);color:var(--gold);font-variant-numeric:tabular-nums}
+.lbw-root .prl-ctx-n{font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.05em;margin-left:auto;text-align:right}
+.lbw-root .prl-ctx-mark{display:flex;flex-direction:column;gap:4px;padding-top:4px}
+.lbw-root .prl-ctx-note{font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.06em}
+.lbw-root .prl-note{font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.04em;margin-top:8px}
+
+.lbw-root .prl-heat{margin-top:8px}
+.lbw-root .prl-heat-months{display:flex;justify-content:space-between;margin-bottom:4px;overflow:hidden}
+.lbw-root .prl-heat-months span{font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.04em}
+.lbw-root .prl-heat-grid{display:flex;gap:2px}
+.lbw-root .prl-heat-col{display:flex;flex-direction:column;gap:2px;flex:1}
+.lbw-root .prl-heat-cell{width:100%;aspect-ratio:1;border-radius:2px;background:var(--bg2)}
+.lbw-root .prl-heat-stats{display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);flex-wrap:wrap}
+.lbw-root .prl-heat-stats span{display:flex;align-items:baseline;gap:4px;font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.05em}
+.lbw-root .prl-heat-stats b{font:700 12px var(--pv2-mono,monospace);color:var(--tx);font-variant-numeric:tabular-nums}
+.lbw-root .prl-heat-legend{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.lbw-root .prl-heat-legend span{display:inline-flex;align-items:center;gap:4px;font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.05em}
+.lbw-root .prl-heat-legend i{width:8px;height:8px;border-radius:2px;display:inline-block}
+
+.lbw-root .prl-medals{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+.lbw-root .prl-medal{display:inline-flex;align-items:center;gap:4px}
+.lbw-root .prl-medal b{font:700 13px var(--pv2-mono,monospace);font-variant-numeric:tabular-nums}
+.lbw-root .prl-medal i{font:8px var(--pv2-mono,monospace);font-style:normal;color:var(--mut);letter-spacing:.05em}
+.lbw-root .prl-watched{margin-left:auto;font:8px var(--pv2-mono,monospace);color:var(--mut);letter-spacing:.06em}
+.lbw-root .prl-badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.lbw-root .prl-badge{font:600 8px var(--pv2-mono,monospace);letter-spacing:.08em;padding:3px 7px;border-radius:4px;line-height:1}
+.lbw-root .prl-badge--v{border:1px solid rgb(0 229 255/.55);background:rgb(0 229 255/.08);color:#00e5ff}
+.lbw-root .prl-badge--s{border:1px solid rgb(168 85 247/.55);background:rgb(168 85 247/.08);color:#a855f7}
+
+/* Clickable record rows (items 9+10) — earned / pending / unavailable. */
+.lbw-root .prl-recs{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.lbw-root .prl-rec{display:flex;align-items:center;gap:8px;width:100%;padding:7px 8px;text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:6px;cursor:pointer;transition:border-color .15s}
+.lbw-root .prl-rec:hover{border-color:var(--line2)}
+.lbw-root .prl-rec:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.lbw-root .prl-rec--earned{border-color:rgba(255,215,0,.28)}
+.lbw-root .prl-rec--earned .prl-rec-icon{color:var(--gold)}
+.lbw-root .prl-rec--pending{border-style:dashed;color:var(--tx2)}
+.lbw-root .prl-rec--pending .prl-rec-icon{color:var(--mut)}
+.lbw-root .prl-rec--unavailable{opacity:.55;border-style:dotted;color:var(--mut)}
+.lbw-root .prl-rec--unavailable .prl-rec-icon{color:var(--mut)}
+.lbw-root .prl-rec-icon{display:inline-flex;flex-shrink:0}
+.lbw-root .prl-rec-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lbw-root .prl-rec-name{font:600 8px var(--pv2-mono,monospace);letter-spacing:.06em;color:var(--tx2);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbw-root .prl-rec-bar{height:3px;background:var(--bg3,var(--bg2));border-radius:2px;overflow:hidden}
+.lbw-root .prl-rec-bar span{display:block;height:100%;background:var(--gold);border-radius:2px}
+.lbw-root .prl-rec-val{font:700 11px var(--pv2-mono,monospace);color:var(--gold);font-variant-numeric:tabular-nums;flex-shrink:0}
+.lbw-root .prl-rec--pending .prl-rec-val,.lbw-root .prl-rec--unavailable .prl-rec-val{color:var(--tx2)}
+.lbw-root .prl-rec-chev{color:var(--mut);font-size:12px;flex-shrink:0}
+
+/* Record detail dialog. */
+.lbw-root .prl-dialog{border:1px solid var(--line2);border-radius:10px;background:var(--bg);color:var(--tx);padding:0;max-width:360px;width:calc(100vw - 48px);box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.lbw-root .prl-dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.lbw-root .prl-dialog-card{padding:16px 18px}
+.lbw-root .prl-dialog-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lbw-root .prl-dialog-titles{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbw-root .prl-dialog-titles strong{font:700 12px var(--pv2-display,monospace);letter-spacing:.06em;color:var(--tx)}
+.lbw-root .prl-dialog-titles span{font:8px var(--pv2-mono,monospace);letter-spacing:.08em;color:var(--gold)}
+.lbw-root .prl-dialog-x{background:none;border:none;color:var(--mut);cursor:pointer;font-size:12px;padding:4px}
+.lbw-root .prl-dialog-x:hover{color:var(--tx)}
+.lbw-root .prl-dialog-dl{margin:10px 0 0;display:flex;flex-direction:column;gap:7px}
+.lbw-root .prl-dialog-dl div{display:flex;gap:10px}
+.lbw-root .prl-dialog-dl dt{font:700 8px var(--pv2-display,monospace);letter-spacing:.08em;color:var(--mut);width:76px;flex-shrink:0;padding-top:2px}
+.lbw-root .prl-dialog-dl dd{margin:0;font:10px var(--pv2-mono,monospace);color:var(--tx);line-height:1.5;min-width:0}
+.lbw-root .prl-dialog-dl a{color:var(--gold)}
