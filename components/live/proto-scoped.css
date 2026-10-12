@@ -1762,3 +1762,15 @@
 .lbw-root .snav .rail-unavailable .lit{background:#73806e!important}
 .lbw-root .sbtn[aria-label="PROFILE"] .gi{color:var(--violet)}
 .lbw-root .sbtn[aria-label="ARTICLES"] .gi{color:var(--cyan)}
+
+/* Text navigation stays below the section list while that list scrolls. */
+.lbw-root .ws-editorial-sidebar{overflow:hidden}
+.lbw-root .ws-editorial-sidebar>.rail{flex:0 1 auto;min-height:0;overflow-y:auto}
+.lbw-root .ws-editorial-sidebar>.ws-rail-bottom-nav{margin-top:0;position:relative;z-index:2}
+/* Match SigRank's fitted, centered hero rhythm within the text stage. */
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse){container-type:inline-size;padding:16px 22px 30px;margin-bottom:18px}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>div{padding:0;gap:16px;width:100%;min-width:0}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{--tbt-max:1.5rem!important;max-width:100%;line-height:1.1}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) h1{font-size:clamp(22px,5cqw,40px);line-height:1.2}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) p{font-size:clamp(12px,2.1cqw,17px);line-height:1.6;max-width:60ch;text-wrap:balance}
+.lbw-root .app:has(.ws-editorial-sidebar){grid-template-rows:minmax(0,1fr);overflow:hidden}

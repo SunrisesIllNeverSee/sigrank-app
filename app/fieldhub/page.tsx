@@ -138,8 +138,7 @@ export default async function FieldHubPage() {
 
       {/* Shared editorial index format — same row structure as Articles and Blog. */}
       <div className="blog-index" id="ws-page-field-index">
-        <div className="blog-list">
-          <Link id="ws-page-field-analysis" href="/field" className="blog-row group">
+        <Link id="ws-page-field-analysis" href="/field" className="blog-feature group">
             <div className="blog-row-main">
               <span className="blog-kicker">📊 Field Analysis</span>
               <h2>Field Analysis</h2>
@@ -149,8 +148,9 @@ export default async function FieldHubPage() {
                 outliers separated. Volume ranked. Yield revealed.
               </p>
             </div>
-            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+            <span className="blog-read">READ FIELD ANALYSIS →</span>
           </Link>
+        <div className="blog-list">
           <Link id="ws-page-state-index" href="/research" className="blog-row group">
             <div className="blog-row-main">
               <span className="blog-kicker">📊 SigRank Index</span>

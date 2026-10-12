@@ -170,3 +170,21 @@
 .lbw-root .board-filter-actions button:disabled{opacity:.38;cursor:default}
 .lbw-root .board-filter-actions button:focus-visible{outline:1px solid var(--ac);outline-offset:2px}
 .lbw-root .board-filter-actions .shoterr{color:var(--dn);font-size:10px}
+
+/* Keep the board's controls in one compact line; exports live in Share. */
+.lbw-root .stagecol:has(.board-filter-actions)>.fbar{flex-wrap:nowrap;gap:4px;padding:8px;justify-content:center;overflow:visible;position:relative;z-index:35}
+.lbw-root .fbar:has(.board-filter-actions) .fb{min-width:0;flex-shrink:1}
+.lbw-root .fbar:has(.board-filter-actions) .fb select{min-width:0;width:78px;font-size:9px;padding-inline:4px}
+.lbw-root .fbar:has(.board-filter-actions) .seg button{font-size:9px;padding-inline:5px}
+.lbw-root .fbar:has(.board-filter-actions) .sdir{width:22px}
+.lbw-root .fbar:has(.board-filter-actions) input{width:25px;min-width:25px;padding-inline:4px;transition:width .15s}
+.lbw-root .fbar:has(.board-filter-actions) input:focus{position:absolute;width:170px;right:8px;top:42px;z-index:2}
+.lbw-root .fbar .board-filter-actions{flex-basis:auto;flex-wrap:nowrap;gap:4px;flex-shrink:0}
+.lbw-root .board-filter-actions .pages button{padding:5px 6px;font-size:9px}
+.lbw-root .board-share{position:relative;font-size:9px}
+.lbw-root .board-share summary{list-style:none;cursor:pointer;padding:6px;border:1px solid var(--line2);border-radius:4px;color:var(--ac);white-space:nowrap}
+.lbw-root .board-share summary::-webkit-details-marker{display:none}
+.lbw-root .board-share-menu{position:absolute;right:0;top:calc(100% + 7px);width:175px;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px;background:var(--bg2);border:1px solid var(--line2);border-radius:6px;box-shadow:0 10px 24px #0008;z-index:60}
+.lbw-root .board-share:not([open]) .board-share-menu{display:none}
+.lbw-root .board-share summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media(max-width:700px){.lbw-root .stagecol:has(.board-filter-actions)>.fbar{overflow-x:auto;justify-content:flex-start}.lbw-root .board-share-menu{position:fixed;right:12px;top:110px}}
