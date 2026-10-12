@@ -47,8 +47,8 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
 
   // Terminal theme + a plain string supplied → block-letter hero.
   if (isTerminal && terminalText) {
-    // Wider words need a smaller clamp ceiling so they fit without an x-scroll
-    // gutter; scale the max down as the word grows past ~7 chars (SIGRANK).
+    // Visual cap only — TerminalBlockText now self-fits to its container via
+    // cqw sizing, so these tiers just keep long titles proportionally smaller.
     const baseMax =
       terminalText.length <= 7 ? 1.3 : terminalText.length <= 11 ? 0.95 : 0.7;
     const maxRem = compact ? baseMax * 0.35 : baseMax;
@@ -56,7 +56,7 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
       <TerminalBlockText
         text={terminalText}
         label={terminalText}
-        fontClassName={`text-[clamp(0.3rem,${compact ? 0.7 : 1.9}vw,${maxRem}rem)]`}
+        maxRem={maxRem}
       />
     );
   }
