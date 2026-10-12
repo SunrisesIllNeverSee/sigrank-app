@@ -62,6 +62,7 @@ export default async function HallPage() {
           windowFilter: false,
           limit: 1000,
           operatorTotal: true,
+          mode: "all",
         });
         windowsData[w.slug] = activeRows.filter(
           (r) => r.operator.claimed && r.operator.status !== "retired",
@@ -75,6 +76,7 @@ export default async function HallPage() {
           windowFilter: true,
           limit: 50,
           operatorTotal: true,
+          mode: "all",
         });
         // Same claimed/live contract as the all_time branch — the Hall's own
         // copy promises claimed operators only, and search-authority surfaces

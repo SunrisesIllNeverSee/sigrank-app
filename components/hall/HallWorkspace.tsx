@@ -215,7 +215,9 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
     // agentic + unresolved/legacy rows). The other two modes narrow the field.
     // Stored workflow_mode evidence remains untouched.
     if (workflow === "hitl" || workflow === "agentic") {
-      rows = rows.filter((r) => r.workflow_mode === workflow);
+      rows = rows.filter((r) => workflow === "hitl"
+        ? r.workflow_mode === "hitl" || r.workflow_mode === "hybrid"
+        : r.workflow_mode === "agentic" || r.workflow_mode === "hybrid" || r.workflow_mode == null);
     }
     return rows;
   }, [
@@ -469,7 +471,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
       status={
         <>
           {baseRows.length} OPERATORS · {view === "metrics" ? "METRICS" : "TOKENS"} VIEW ·{" "}
-          {workflow === "hybrid" ? "HYBRID · COMBINED FIELD" : workflow.toUpperCase()} ·{" "}
+          {workflow === "hybrid" ? "HYBRID · COMBINED FIELD" : workflow === "agentic" ? "AUTOMATED · INCLUDES UNCLASSIFIED REVIEW CANDIDATES" : "OPERATOR-IN-THE-LOOP"} ·{" "}
           {win.label.toUpperCase()} · SIGNALAF × SIGRANK · MO§ES™
         </>
       }
