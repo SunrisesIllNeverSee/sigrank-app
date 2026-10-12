@@ -1,5 +1,9 @@
 # Release status board / owner control
 
+## Owner edit backlog — October 12, 2026
+
+See [OWNER_EDIT_CHECKLIST_2026-10-12.md](OWNER_EDIT_CHECKLIST_2026-10-12.md) for the latest recorded leaderboard, Compare action wiring, and profile requests. Items are pending; this entry does not claim implementation. Chart/Share design exploration remains with the owner.
+
 ## Current whole-site preview — October 12, 2026
 
 This current-state receipt supersedes older audit rows below. Preview :3230 is now a Next development server in signalaf-integration-a315435, not the earlier production build. Application source checkpoint: 196bb34. Local and GitHub integration branch were verified identical after publishing the accumulated changes. Follow STAGING_WORKFLOW.md for subsequent handoffs.
