@@ -2030,21 +2030,18 @@ export function LiveBoardWorkspace({
                     ))}
                   </select>
                 </span>
-                {/* Platform select is shown in Raw mode only */}
-                {colMode === "raw" && (
-                  <span className="fb fb-platform">
-                    <select
-                      aria-label="Platform"
-                      title="Platform"
-                      value={platformSel}
-                      onChange={(e) => setPlatformSel(e.target.value)}
-                    >
-                      {CONTROLS.platforms.map((o) => (
-                        <option key={o} value={o}>{o === "All Platforms" ? "Platform" : o}</option>
-                      ))}
-                    </select>
-                  </span>
-                )}
+                <span className="fb">
+                  <select
+                    aria-label="Platform"
+                    title="Platform"
+                    value={platformSel}
+                    onChange={(e) => setPlatformSel(e.target.value)}
+                  >
+                    {CONTROLS.platforms.map((o) => (
+                      <option key={o} value={o}>{o === "All Platforms" ? "Platform" : o}</option>
+                    ))}
+                  </select>
+                </span>
                 <span className="fb">
                   <select
                     aria-label="Class"
@@ -2082,10 +2079,7 @@ export function LiveBoardWorkspace({
                         <button
                           aria-pressed={colMode === "metrics"}
                           className={colMode === "metrics" ? "on" : ""}
-                          onClick={() => {
-                            setColMode("metrics");
-                            setPlatformSel("All Platforms");
-                          }}
+                          onClick={() => setColMode("metrics")}
                         >
                           Metrics
                         </button>
