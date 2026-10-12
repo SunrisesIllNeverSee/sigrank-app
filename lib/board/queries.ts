@@ -41,7 +41,7 @@ import type {
   LeaderboardRow,
   WeeklyPoint,
 } from "@/lib/board/types";
-import { includesBoardMode, resolveWorkflowMode } from "@/lib/board/workflow-mode";
+import { includesBoardMode, resolveWorkflowMode, type WorkflowMode } from "@/lib/board/workflow-mode";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -346,7 +346,7 @@ export async function getLeaderboard(
         s.output_tokens > 0,
     );
     if (yieldable.length === 0 && (params.windowFilter || params.strictLive || params.mode)) return [];
-    const modeBySnapshot = new Map<string, "hitl" | "agentic" | null>();
+    const modeBySnapshot = new Map<string, WorkflowMode | null>();
     const boardCandidates = params.mode
       ? yieldable.filter((s) => {
           const mode = resolvedModeForSnapshot(s);

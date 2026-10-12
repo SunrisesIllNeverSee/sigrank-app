@@ -17,6 +17,7 @@ import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "Field Hub — SigRank Research",
@@ -58,7 +59,46 @@ export default async function FieldHubPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
+    <FieldWorkspaceFrame
+      title="FIELD HUB"
+      current="fieldhub"
+      hero={
+        <WaveHero
+          eyebrow="📊 SigRank Research"
+          terminalText="FIELD HUB"
+          title="Field Hub"
+          subtitle={
+            <>
+              The academic research hub for SigRank. This is where we
+              document field analysis and publish dataset findings.
+            </>
+          }
+        />
+      }
+      rightTitle="FIELD FAMILY"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />SNAPSHOT</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">analyzed</span><span className="v acc">{meta.operators_included.toLocaleString()}</span></div>
+              <div className="row"><span className="k">collected</span><span className="v">{meta.total_scraped.toLocaleString()}</span></div>
+              <div className="row"><span className="k">median Υ</span><span className="v acc">{meta.medians.yield.toFixed(2)}</span></div>
+            </div>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />PRIMARY SOURCES</div>
+            <nav className="ws-nav">
+              <Link href="/field">Field Analysis</Link>
+              <Link href="/research">State of the Index / Data</Link>
+              <Link href="/blog">Published analysis</Link>
+            </nav>
+          </div>
+        </>
+      }
+      status={<>FIELD HUB · {meta.operators_included.toLocaleString()} ANALYZED OPERATORS · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           collectionPage,
@@ -83,38 +123,23 @@ export default async function FieldHubPage() {
         ]}
       />
 
-      <WaveHero
-        eyebrow="📊 SigRank Research"
-        terminalText="FIELD HUB"
-        title="Field Hub"
-        subtitle={
-          <>
-            The academic research hub for SigRank. This is where we
-            document field analysis and publish dataset findings.
-          </>
-        }
-      />
-
       {/* ── Blurb ───────────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <p className="text-lg text-text-primary">
+      <section>
+        <p className="max-w-2xl text-base leading-relaxed text-text-primary">
           This section is where we document academic field analysis of the
-          SigRank Index — the distribution of AI operator efficiency, the
+          SigRank Index: the distribution of AI operator efficiency, the
           volume-vs-yield thesis, outlier detection, and the dataset that
-          underpins every finding published on this site.
-        </p>
-        <p className="text-base text-text-secondary">
-          Each entry below is a primary source. The Field Analysis is the
-          full visual article. The State of the Index is the dataset
-          landing page with DOI, citation, and downloadable files.
+          underpins every finding published on this site. Each entry below is
+          a primary source. The Field Analysis is the full visual article, and
+          the State of the Index is the dataset landing page with DOI,
+          citation, and downloadable files.
         </p>
       </section>
 
       {/* ── Field Analysis hero card ────────────────────────────────── */}
-      <Link href="/field" className="group block transition-transform hover:scale-[1.01]">
+      <Link id="ws-page-field-analysis" href="/field" className="ws-card group block transition-transform hover:scale-[1.01]">
         <WaveHero
           eyebrow="📊 Field Analysis"
-          terminalText="THE FIELD"
           title="Field Analysis"
           subtitle={
             <>
@@ -129,10 +154,10 @@ export default async function FieldHubPage() {
       </Link>
 
       {/* ── State of the Index hero card ────────────────────────────── */}
-      <Link href="/research" className="group block transition-transform hover:scale-[1.01]">
+      <Link id="ws-page-state-index" href="/research" className="ws-card group block transition-transform hover:scale-[1.01]"
+        style={{ ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" }}>
         <WaveHero
           eyebrow="📊 SigRank Index"
-          terminalText="THE DATA-STATE"
           title="State of the Index"
           subtitle={
             <>
@@ -145,6 +170,7 @@ export default async function FieldHubPage() {
           headingLevel="h2"
         />
       </Link>
-    </div>
+      </div>
+    </FieldWorkspaceFrame>
   );
 }

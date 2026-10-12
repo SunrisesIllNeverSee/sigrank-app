@@ -10,9 +10,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, sigrankDataset, researchArticle, faqPage } from "@/lib/jsonld";
+import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
+import { WaveHero } from "@/components/ui/WaveHero";
 
 export const revalidate = 3600; // 1h — the seed corpus is stable
 
@@ -102,7 +103,44 @@ export default function StateOfTheIndexPage() {
 }`;
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
+    <FieldWorkspaceFrame
+      title="STATE OF THE INDEX"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK INDEX"
+          terminalText="STATE OF THE INDEX"
+          title="State of the Index"
+          subtitle={<>The primary anonymized seed dataset. Published on Zenodo, DOI 10.5281/zenodo.21900519.</>}
+        />
+      }
+      current="research"
+      rightTitle="DATASET"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />ZENODO</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">version</span><span className="v">v3.1</span></div>
+              <div className="row"><span className="k">operators</span><span className="v acc">{operatorCount.toLocaleString("en-US")}</span></div>
+              <div className="row"><span className="k">platforms</span><span className="v">{platformCount}</span></div>
+              <div className="row"><span className="k">models</span><span className="v">{DATASET.modelCount.toLocaleString("en-US")}</span></div>
+              <div className="row"><span className="k">license</span><span className="v">CC-BY-4.0</span></div>
+              <div className="row"><span className="k">snapshot</span><span className="v">{SNAPSHOT_DATE}</span></div>
+            </div>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />DOI</div>
+            <nav className="ws-nav">
+              <Link href={"https://doi.org/" + ZENODO_VERSION_DOI} rel="external">Version DOI ↗</Link>
+              <Link href={"https://doi.org/" + ZENODO_CONCEPT_DOI} rel="external">Concept DOI ↗</Link>
+              <Link href="/field">Field Analysis</Link>
+            </nav>
+          </div>
+        </>
+      }
+      status={<>{operatorCount.toLocaleString("en-US")} OPERATORS · {fmt(totalTokens)} TOKENS · DATASET v3.1 · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
@@ -145,22 +183,6 @@ export default function StateOfTheIndexPage() {
         date={SNAPSHOT_DATE}
         slug="/research"
         doi={ZENODO_VERSION_DOI}
-      />
-
-      <WaveHero
-        eyebrow="📊 SigRank Index"
-        terminalText="THE DATA-STATE"
-        title="State of the Index"
-        subtitle={
-          <>
-            The primary anonymized seed dataset —{" "}
-            {operatorCount.toLocaleString("en-US")} operators across{" "}
-            {platformCount} platforms and {DATASET.modelCount.toLocaleString("en-US")} models.{" "}
-            {fmt(totalTokens)} total tokens. Available on Zenodo at DOI{" "}
-            <span className="text-gold">10.5281/zenodo.21900519</span>. Data as
-            of {SNAPSHOT_DATE}.
-          </>
-        }
       />
 
       {/* ── Table of contents ───────────────────────────────────────── */}
@@ -403,7 +425,8 @@ export default function StateOfTheIndexPage() {
       </section>
 
       </div>
-    </div>
+      </div>
+    </FieldWorkspaceFrame>
   );
 }
 

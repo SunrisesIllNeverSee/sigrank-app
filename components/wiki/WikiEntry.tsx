@@ -17,7 +17,9 @@
 import React from "react";
 import Link from "next/link";
 import { EvidenceBadge } from "./EvidenceBadge";
-import { wikiCategoryById, wikiCategoryHubAnchor, type WikiCategory } from "@/lib/wiki/evidence-ladder";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
+import { wikiCategoryById, type WikiCategory } from "@/lib/wiki/evidence-ladder";
 
 export interface WikiCrossRef {
   /** Label for the cross-reference link. */
@@ -84,9 +86,22 @@ export function WikiEntry({
 }: WikiEntryProps) {
   const cat = wikiCategoryById(category);
 
+  const entryPageSections = [
+    { id: "ws-wiki-definition", label: "Definition", present: true },
+    { id: "ws-wiki-inputs", label: "Inputs", present: Boolean(inputs) },
+    { id: "ws-wiki-derived-variables", label: "Derived variables", present: Boolean(derivedVariables) },
+    { id: "ws-wiki-claim", label: "Claim", present: Boolean(claim) },
+    { id: "ws-wiki-test", label: "Test", present: Boolean(test) },
+    { id: "ws-wiki-observable", label: "Observable", present: Boolean(observable) },
+    { id: "ws-wiki-falsifier", label: "Falsifier", present: Boolean(falsifiers) },
+    { id: "ws-wiki-evidence", label: "Evidence", present: Boolean(evidence) },
+    { id: "ws-wiki-limitations", label: "Limitations", present: Boolean(limitations) },
+    { id: "ws-wiki-lineage", label: "Lineage", present: Boolean(lineage) },
+  ].filter((item) => item.present);
+
   /** Reusable section wrapper — keeps the 11-section template visually consistent. */
-  const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <section className="flex flex-col gap-3">
+  const Section = ({ label, anchor, children }: { label: string; anchor?: string; children: React.ReactNode }) => (
+    <section id={anchor} className="flex flex-col gap-3">
       <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-text-accent">
         {label}
       </h2>
@@ -97,107 +112,97 @@ export function WikiEntry({
   );
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 font-mono text-xs text-text-muted">
-        <Link href="/wiki" className="transition-colors hover:text-text-primary">
-          Wiki
-        </Link>
-        {cat && (
-          <>
-            <span className="text-text-dim">/</span>
-            <Link
-              href={`/wiki#${wikiCategoryHubAnchor(category)}`}
-              className="transition-colors hover:text-text-primary"
-            >
-              {cat.label}
-            </Link>
-          </>
-        )}
-      </nav>
-
-      {/* Header: title + evidence badge */}
-      <header className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl">
-            {title}
-          </h1>
-          <EvidenceBadge level={evidenceLevel} />
-        </div>
-        <p className="max-w-2xl font-sans text-base leading-relaxed text-text-secondary">
-          {summary}
-        </p>
-        {(lastUpdated || specVersion) && (
-          <div className="flex flex-wrap gap-3 font-mono text-[11px] text-text-dim">
-            {lastUpdated && <span>Last updated: {lastUpdated}</span>}
-            {specVersion && <span>Spec: {specVersion}</span>}
+    <WorkspaceShell
+      active="wiki"
+      editorialStage
+      title={title}
+      leftTitle="ENTRY"
+      topic="wiki"
+      left={<FieldFamilyNav current="wiki" pageContents={
+        <nav className="ws-nav" aria-label="Sections on this page">
+          {entryPageSections.map((item) => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}
+        </nav>
+      } />}
+      rightTitle="SIGNAL"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq"></span>META</div>
+            <div style={{ marginBottom: 8 }}>
+              <EvidenceBadge level={evidenceLevel} />
+            </div>
+            {(lastUpdated || specVersion) && (
+              <div className="ws-kv">
+                {lastUpdated && (
+                  <div className="row"><span className="k">updated</span><span className="v">{lastUpdated}</span></div>
+                )}
+                {specVersion && (
+                  <div className="row"><span className="k">spec</span><span className="v">{specVersion}</span></div>
+                )}
+              </div>
+            )}
           </div>
-        )}
-      </header>
+          {crossRefs && crossRefs.length > 0 && (
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>CROSS-REFERENCES</div>
+              <nav className="ws-nav">
+                {crossRefs.map((ref, i) => (
+                  <Link key={i} href={ref.href}>→ {ref.label}</Link>
+                ))}
+              </nav>
+            </div>
+          )}
+        </>
+      }
+      leftWidth={280}
+      rightWidth={240}
+      status={<>SIGNALAF WIKI · EVIDENCE LAYER{cat ? ` · ${cat.label.toUpperCase()}` : ""}</>}
+    >
+      <div className="ws-doc">
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 py-2">
+          {/* Header: evidence badge + summary (title renders in the shell
+              pagetitle strip as the page h1) */}
+          <header className="flex flex-col gap-3">
+            <EvidenceBadge level={evidenceLevel} />
+            <p className="max-w-2xl font-sans text-base leading-relaxed text-text-secondary">
+              {summary}
+            </p>
+          </header>
 
       {/* 1. Definition */}
-      <Section label="Definition">{definition}</Section>
+      <Section label="Definition" anchor="ws-wiki-definition">{definition}</Section>
 
       {/* 2. Inputs */}
-      {inputs && <Section label="Inputs">{inputs}</Section>}
+      {inputs && <Section label="Inputs" anchor="ws-wiki-inputs">{inputs}</Section>}
 
       {/* 3. Derived variables */}
-      {derivedVariables && <Section label="Derived variables">{derivedVariables}</Section>}
+      {derivedVariables && <Section label="Derived variables" anchor="ws-wiki-derived-variables">{derivedVariables}</Section>}
 
       {/* 4. Claim */}
-      {claim && <Section label="Claim">{claim}</Section>}
+      {claim && <Section label="Claim" anchor="ws-wiki-claim">{claim}</Section>}
 
       {/* 5. Test */}
-      {test && <Section label="Test">{test}</Section>}
+      {test && <Section label="Test" anchor="ws-wiki-test">{test}</Section>}
 
       {/* 6. Observable */}
-      {observable && <Section label="Observable">{observable}</Section>}
+      {observable && <Section label="Observable" anchor="ws-wiki-observable">{observable}</Section>}
 
       {/* 7. Falsifier */}
-      {falsifiers && <Section label="Falsifier">{falsifiers}</Section>}
+      {falsifiers && <Section label="Falsifier" anchor="ws-wiki-falsifier">{falsifiers}</Section>}
 
       {/* 8. Evidence */}
-      {evidence && <Section label="Evidence">{evidence}</Section>}
+      {evidence && <Section label="Evidence" anchor="ws-wiki-evidence">{evidence}</Section>}
 
       {/* 9. Limitations */}
-      {limitations && <Section label="Limitations">{limitations}</Section>}
+      {limitations && <Section label="Limitations" anchor="ws-wiki-limitations">{limitations}</Section>}
 
       {/* 10. Version — rendered inline with lastUpdated/specVersion in header */}
       {/* (specVersion prop serves as the Version section) */}
 
       {/* 11. Lineage */}
-      {lineage && <Section label="Lineage">{lineage}</Section>}
-
-      {/* Cross-references */}
-      {crossRefs && crossRefs.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-text-accent">
-            Cross-references
-          </h2>
-          <ul className="flex flex-col gap-1">
-            {crossRefs.map((ref, i) => (
-              <li key={i}>
-                <Link
-                  href={ref.href}
-                  className="font-mono text-xs text-text-accent underline-offset-2 hover:underline"
-                >
-                  → {ref.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* Footer */}
-      <div className="mt-4 border-t border-bg-border-subtle pt-4">
-        <Link
-          href="/wiki"
-          className="font-mono text-xs text-text-accent underline-offset-2 hover:underline"
-        >
-          ← Back to the Wiki
-        </Link>
+      {lineage && <Section label="Lineage" anchor="ws-wiki-lineage">{lineage}</Section>}
+        </div>
       </div>
-    </div>
+    </WorkspaceShell>
   );
 }

@@ -26,9 +26,11 @@ import {
   getOperatorHistory,
   type LeaderboardRow,
 } from "@/lib/board";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { CompareMatchup } from "@/components/compare/CompareMatchup";
-import { type CompareOption } from "@/components/compare/CompareSelectors";
+import {
+  CompareSelectors,
+  type CompareOption,
+} from "@/components/compare/CompareSelectors";
 import { CompareLedger } from "@/components/compare/CompareLedger";
 import { CompareRadars } from "@/components/compare/CompareRadars";
 import { CompareHistoryChart } from "@/components/compare/CompareHistoryChart";
@@ -50,6 +52,13 @@ import {
 import { DeferredCompareMatchupCard } from "@/components/share/DeferredCompareMatchupCard";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { isOutlierRow } from "@/lib/analytics/outlier-classify";
+import {
+  compareTally,
+  deriveFacts,
+} from "@/lib/analytics/compare-facts";
+import { snapshotThroughput } from "@/lib/board/throughput";
+import { fmtTokens } from "@/lib/analytics/record-value";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
 export const metadata: Metadata = withOG({
   title: "Compare AI Operators",
@@ -270,8 +279,64 @@ export default async function ComparePage({
     </div>
   );
 
+  // Operator mini-profile module (left rail = A, right rail = B) — real data,
+  // same identity treatment as the matchup panels.
+  const opMini = (row: LeaderboardRow, side: "a" | "b") => {
+    const c = row.snapshot.cascade;
+    const live = c && !c.nonCompounding;
+    return (
+      <div className="ws-kv">
+        <div className="row">
+          <span className="k">{side === "a" ? "OP·A" : "OP·B"}</span>
+          <span className="v" style={{ color: "var(--tx)", fontWeight: 700 }}>
+            {nameOf(row)}
+          </span>
+        </div>
+        <div className="row">
+          <span className="k">class</span>
+          <span className="v">{row.snapshot.class_tier ?? "—"}</span>
+        </div>
+        <div className="row">
+          <span className="k">rank</span>
+          <span className="v">#{row.global_rank}</span>
+        </div>
+        <div className="row">
+          <span className="k">Υ yield</span>
+          <span className="v acc">{live ? (c.yield_ >= 1000 ? `${(c.yield_ / 1000).toFixed(1)}K` : c.yield_.toFixed(2)) : "—"}</span>
+        </div>
+        <div className="row">
+          <span className="k">platform</span>
+          <span className="v">{row.operator.primary_domain ?? "—"}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const { aWins, bWins } = compareTally(rowA, rowB);
+  const factsA = deriveFacts(rowA, rowB).slice(0, 3);
+  const factsB = deriveFacts(rowB, rowA).slice(0, 3);
+
+  // Token Throughput per side — canonical exact-calendar processed tok/day
+  // (same source the live board's thpt column + the ledger FLOW row read).
+  const thrStr = (r: LeaderboardRow) => {
+    const t = r.telemetry;
+    const th = t
+      ? snapshotThroughput({
+          inputTokens: t.fresh_input,
+          outputTokens: t.output,
+          cacheWriteTokens: t.cache_create,
+          cacheReadTokens: t.cache_read,
+          windowStart: r.window_start,
+          windowEnd: r.window_end,
+        })
+      : null;
+    return th ? `${fmtTokens(th.processedTokensPerDay)}/d` : "—";
+  };
+  const aThr = thrStr(rowA);
+  const bThr = thrStr(rowB);
+
   return (
-    <div className="flex flex-col gap-8">
+    <div>
       <JsonLd data={[
         breadcrumb([{ name: "Compare", path: "/compare" }]),
         faqPage([
@@ -293,97 +358,142 @@ export default async function ComparePage({
         ]),
       ]} />
       <TrackCompareView isDefault={!(a && b)} />
-      <WaveHero
-        eyebrow="🤖⚔️🤖 Manus ad Manum"
-        terminalText="COMPARE"
-        title="Compare AI Operators"
-        subtitle={
+
+      {/* Compare inside the shared SignalAF workspace shell — approved layout:
+          _workspace/layout-editors/approved/compare-layout.json.
+          LEFT = operator A mini + compact ledger · STAGE = selectors +
+          matchup + paired radars + challenge band + full-width history ·
+          RIGHT = operator B mini + matchup summary + metric context + share.
+          All data/query behavior identical to the long-form page. */}
+      <WorkspaceShell
+        active="compare"
+        title="COMPARE"
+        leftTitle="COMPARE"
+        left={
           <>
-            Two operators. One cascade layer. Υ Yield, SNR, Leverage, Velocity,
-            10xDEV &amp; blended cost — the data tells you not just who&apos;s
-            ahead, but <em>where</em> and why.
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>OPERATOR A</div>
+              {opMini(rowA, "a")}
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>METRIC CONTEXT</div>
+              <p className="ws-note">
+                Ledger rows: six raw pillars + eight cascade metrics + the{" "}
+                <b>FLOW</b> row — Token Throughput, the canonical exact-calendar
+                processed-tokens/day rate (not ∑ total tokens). Lower-wins axes
+                (cost, $/1M) are inverted so the better side always reads
+                outward on the radars.
+              </p>
+            </div>
           </>
         }
-      />
-
-      {/* "Compare yourself" — client-side auth gate (replaces server-side
-          getSessionOperator). Shows a button when signed in. */}
-      <CompareAgainstMe />
-
-      {/* MAIN MATCHUP BOX — selectors + two operator panels: identity (logo/name/
-          class/Υ) outboard, 5 derived facts inboard (owner 2026-06-22). */}
-      <CompareMatchup a={rowA} b={rowB} options={selectorOptions} />
-
-      {/* DUAL-LAYER RADARS — raw shape + metric shape (ghost raw underlay), consuming
-          TERM's CascadeRadar variant support (owner 2026-06-22). */}
-      <CompareRadars a={rowA} b={rowB} />
-
-      {/* OVERTIME COMPARISON — dual-line Υ Yield trajectory on a shared timeline
-          (owner 2026-07-02). Shows who's climbing, who's flat, who crossed over. */}
-      <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
-        <CompareHistoryChart
-          historyA={historyA}
-          historyB={historyB}
-          nameA={nameOf(rowA)}
-          nameB={nameOf(rowB)}
-          fieldAvg={fieldAvgYield}
-        />
-      </div>
-
-      {/* LEDGER — the RAW / METRICS / TOTAL head-to-head table to the owner's ASCII
-          template, with diverging bars per row (owner 2026-06-22). */}
-      <CompareLedger a={rowA} b={rowB} />
-
-      {/* Share / download the head-to-head as a card for socials (owner 2026-06-27). */}
-      <CompareShareCard
-        a={toOperand(rowA)}
-        b={toOperand(rowB)}
-        href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
-      />
-
-      {/* Matchup + radars card — the full visual snapshot (matchup + dual radars). */}
-      <DeferredCompareMatchupCard
-        a={rowA}
-        b={rowB}
-        href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
-      />
-
-      {/* Throw-Downs "coming soon" line — page tail. */}
-      {ThrowDownLine}
-
-      {/* ── Cross-links ── */}
-      <section className="mt-4 border-t border-bg-border-subtle pt-6">
-        <p className="font-sans text-sm text-text-muted">
-          Related:{" "}
-          <Link
-            href="/board/all"
-            className="text-gold underline underline-offset-2"
-          >
-            All-Time Leaderboard
-          </Link>
-          {" · "}
-          <Link
-            href="/hall"
-            className="text-gold underline underline-offset-2"
-          >
-            Hall of Signal
-          </Link>
-          {" · "}
-          <Link
-            href="/methodology"
-            className="text-gold underline underline-offset-2"
-          >
-            Methodology
-          </Link>
-          {" · "}
-          <Link
-            href="/metrics/yield-cascade"
-            className="text-gold underline underline-offset-2"
-          >
-            Yield (Υ) Cascade
-          </Link>
-        </p>
-      </section>
+        rightTitle="CONTEXT"
+        right={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
+              {opMini(rowB, "b")}
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>MATCHUP</div>
+              <div className="ws-kv">
+                <div className="row">
+                  <span className="k">score</span>
+                  <span className="v acc">{aWins}–{bWins}</span>
+                </div>
+                <div className="row">
+                  <span className="k">throughput</span>
+                  <span className="v">
+                    {nameOf(rowA)} {aThr} · {nameOf(rowB)} {bThr}
+                  </span>
+                </div>
+              </div>
+              {factsA.length + factsB.length > 0 && (
+                <ul className="ws-note" style={{ marginTop: 8, padding: 0, listStyle: "none" }}>
+                  {[...factsA.map((f) => [`A·${f.label}`, f.detail] as const),
+                    ...factsB.map((f) => [`B·${f.label}`, f.detail] as const)]
+                    .slice(0, 4)
+                    .map(([k, d], i) => (
+                      <li key={i} style={{ marginBottom: 4 }}>
+                        <b>{k}</b> — {d}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>SHARE</div>
+              <div className="ws-share">
+                <CompareShareCard
+                  a={toOperand(rowA)}
+                  b={toOperand(rowB)}
+                  href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+                />
+              </div>
+              <div className="ws-share" style={{ marginTop: 10 }}>
+                <DeferredCompareMatchupCard
+                  a={rowA}
+                  b={rowB}
+                  href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+                />
+              </div>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>RELATED</div>
+              <div className="ws-nav">
+                <Link href="/board/all">ALL-TIME LEADERBOARD</Link>
+                <Link href="/hall">HALL OF SIGNAL</Link>
+                <Link href="/methodology">METHODOLOGY</Link>
+                <Link href="/metrics/yield-cascade">YIELD (Υ) CASCADE</Link>
+              </div>
+            </div>
+          </>
+        }
+        leftWidth={180}
+        rightWidth={198}
+        status={
+          <>
+            {nameOf(rowA).toUpperCase()} × {nameOf(rowB).toUpperCase()} · SIGNALAF × SIGRANK · MO§ES™
+          </>
+        }
+      >
+        <div className="ws-cmp">
+          <div className="ws-cmp-sel">
+            <CompareSelectors
+              options={selectorOptions}
+              aCode={aCode}
+              bCode={bCode}
+            />
+            <div style={{ marginTop: 10 }}>
+              {/* "Compare yourself" — client-side auth gate */}
+              <CompareAgainstMe />
+            </div>
+          </div>
+          <div className="ws-cmp-match">
+            <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors />
+          </div>
+          <div className="ws-cmp-radars">
+            <CompareRadars a={rowA} b={rowB} />
+          </div>
+          <div className="ws-cmp-bar">{ThrowDownLine}</div>
+          <div className="ws-cmp-hist">
+            <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
+              <CompareHistoryChart
+                historyA={historyA}
+                historyB={historyB}
+                nameA={nameOf(rowA)}
+                nameB={nameOf(rowB)}
+                fieldAvg={fieldAvgYield}
+              />
+            </div>
+          </div>
+          {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
+              the stage (owner annotation: not a rail module). */}
+          <div style={{ gridColumn: "1/13" }}>
+            <CompareLedger a={rowA} b={rowB} />
+          </div>
+        </div>
+      </WorkspaceShell>
     </div>
   );
 }
