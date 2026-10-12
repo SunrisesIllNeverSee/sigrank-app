@@ -45,7 +45,3 @@ bun.lock
 .repo/.cache/
 skylos-output.json
 .skylos/
-
-# Review/scratch workspace — screenshots, design-review tooling, sidebar mocks.
-# Deletable wholesale; never committed.
-_workspace/

@@ -40,12 +40,7 @@ describe("workflow board eligibility", () => {
     expect(resolveWorkflowMode(hcm)).toBe("hitl");
     const outlier = resolveWorkflowMode({ ...hcm, inputTokens: 100, outputTokens: 9_000_000 });
     expect(outlier).toBeNull();
-    // All-ranked membership is not conditional on workflow evidence.
-    // Outlier/null is provisionally HITL, never evidence for Hybrid.
-    expect(includesBoardMode("all", outlier)).toBe(true);
-    expect(includesBoardMode("hitl", outlier)).toBe(true);
-    expect(includesBoardMode("hybrid", outlier)).toBe(false);
-    expect(includesBoardMode("agentic", outlier)).toBe(false);
+    expect(includesBoardMode("all", outlier)).toBe(false);
   });
 
   it("requires a public evidence link to classify an agentic workflow", () => {
@@ -55,12 +50,6 @@ describe("workflow board eligibility", () => {
     expect(includesBoardMode("agentic", agentic)).toBe(true);
     expect(includesBoardMode("hitl", agentic)).toBe(false);
     expect(includesBoardMode("all", agentic)).toBe(true);
-    expect(includesBoardMode("hybrid", agentic)).toBe(false);
-    const hybrid = resolveWorkflowMode({ ...hcm, assessment: "hybrid", evidenceUrl: "https://example.org/both" });
-    expect(hybrid).toBe("hybrid");
-    expect(includesBoardMode("hitl", hybrid)).toBe(true);
-    expect(includesBoardMode("agentic", hybrid)).toBe(true);
-    expect(includesBoardMode("hybrid", hybrid)).toBe(true);
     expect(resolveWorkflowMode({ ...hcm, inputTokens: 0, assessment: "agentic", evidenceUrl: "https://example.org/workflow" })).toBeNull();
   });
 });

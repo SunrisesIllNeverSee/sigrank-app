@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
   const platformParam = sp.get("platform");
   const classParam = sp.get("class");
   const modeParam = sp.get("mode");
-  if (modeParam && !["all", "hitl", "agentic", "hybrid"].includes(modeParam)) {
+  if (modeParam && !["all", "hitl", "agentic"].includes(modeParam)) {
     return NextResponse.json({ error: "Invalid board mode" }, { status: 400 });
   }
   const mode = modeParam as BoardMode | null;

@@ -20,12 +20,9 @@ export interface TocItem {
 
 export interface WikiTOCProps {
   items: TocItem[];
-  /** Workspace-shell mode: renders just the nav list for the left rail —
-   *  no sticky aside wrapper, no mobile dropdown bar. */
-  rail?: boolean;
 }
 
-export function WikiTOC({ items, rail }: WikiTOCProps) {
+export function WikiTOC({ items }: WikiTOCProps) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? "");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -71,14 +68,6 @@ export function WikiTOC({ items, rail }: WikiTOCProps) {
       }, 100);
     }
     setMobileOpen(false);
-  }
-
-  if (rail) {
-    return (
-      <nav aria-label="Wiki contents">
-        <TocList items={items} activeId={activeId} onNavigate={scrollTo} />
-      </nav>
-    );
   }
 
   return (
@@ -136,8 +125,8 @@ function TocList({
         const subActive = item.subItems?.some((s) => s.id === activeId);
         return (
           <li key={item.id}>
-            <a
-              href={`#${encodeURIComponent(item.id)}`}
+            <button
+              type="button"
               onClick={() => onNavigate(item.id)}
               className={`w-full text-left font-mono text-xs leading-relaxed transition-colors ${
                 isActive
@@ -146,15 +135,15 @@ function TocList({
               }`}
             >
               {item.label}
-            </a>
+            </button>
             {item.subItems && (isActive || subActive) && (
               <ul className="ml-3 mt-0.5 flex flex-col gap-0.5 border-l border-bg-border-subtle pl-2">
                 {item.subItems.map((sub) => {
                   const subIsActive = activeId === sub.id;
                   return (
                     <li key={sub.id}>
-                      <a
-                        href={`#${encodeURIComponent(sub.id)}`}
+                      <button
+                        type="button"
                         onClick={() => onNavigate(sub.id)}
                         className={`w-full text-left font-sans text-[11px] leading-relaxed transition-colors ${
                           subIsActive
@@ -163,7 +152,7 @@ function TocList({
                         }`}
                       >
                         {sub.label}
-                      </a>
+                      </button>
                     </li>
                   );
                 })}

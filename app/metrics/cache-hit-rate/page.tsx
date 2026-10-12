@@ -11,9 +11,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -25,19 +24,7 @@ export const metadata: Metadata = withOG({
 
 export default function CacheHitRatePage() {
   return (
-    <MetricsWorkspaceFrame
-      title="CACHE HIT RATE"
-      hero={
-        <WaveHero
-          eyebrow="SIGRANK METRIC"
-          terminalText="CACHE HIT RATE"
-          title="Cache Hit Rate"
-          subtitle={<>Reuse of prior context.</>}
-        />
-      }
-      current="/metrics/cache-hit-rate"
-    >
-    <div className="flex flex-col gap-8 py-2">
+    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([
@@ -78,6 +65,19 @@ export default function CacheHitRatePage() {
             },
           ]),
         ]}
+      />
+
+      <WaveHero
+        eyebrow="◈ Highest-Leverage Metric"
+        terminalText="CACHE"
+        title="Cache Hit Rate — Context Reuse Efficiency"
+        subtitle={
+          <>
+            How well you reuse cached context. The{" "}
+            <span className="text-gold">single biggest lever</span> for cost,
+            latency, and yield.
+          </>
+        }
       />
 
       {/* ── The formula ── */}
@@ -371,6 +371,5 @@ export default function CacheHitRatePage() {
         </p>
       </section>
     </div>
-    </MetricsWorkspaceFrame>
   );
 }
