@@ -1664,7 +1664,8 @@
 .lbw-root .peekcol .rail{flex:1;min-height:0;overflow-y:auto;padding:8px}
 .lbw-root .peekcol .mod{border:1px solid var(--line);border-radius:9px;
   background:var(--panel);padding:8px;margin-bottom:10px}
-.lbw-root .peek-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.lbw-root .peek-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0 12px}
+.lbw-root .peek-actions.compare-enabled{grid-template-columns:repeat(3,minmax(0,1fr))}
 .lbw-root .pkbtn{display:flex;align-items:center;justify-content:center;gap:4px;
   padding:7px 4px;border:1px solid var(--line2);border-radius:6px;
   font:700 9px var(--font-mono);letter-spacing:.1em;color:var(--tx);

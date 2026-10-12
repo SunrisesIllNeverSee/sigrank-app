@@ -38,6 +38,23 @@ describe("Operator dock actions", () => {
     expect(screen.getByRole("button", { name: "WATCH signal-example" })).toBeInTheDocument();
     expect(screen.queryByText("COMPARE")).not.toBeInTheDocument();
   });
+  it("conditionally offers COMPARE with the signed-in viewer and other operator", () => {
+    const op = { codename: "other-operator" } as LiveOperator;
+    const { container } = render(<ProfileActions
+      op={op}
+      showCompare
+      compareHref="/compare?a=my-operator&b=other-operator"
+    />);
+    expect(screen.getByRole("link", { name: "PROFILE" })).toHaveAttribute("href", "/user/other-operator");
+    expect(screen.getByRole("button", { name: "WATCH other-operator" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "COMPARE" })).toHaveAttribute(
+      "href", "/compare?a=my-operator&b=other-operator",
+    );
+    expect(container.querySelector(".peek-actions.compare-enabled")).toBeInTheDocument();
+    expect([...container.querySelectorAll(".peek-actions > *")].map((el) => el.textContent)).toEqual([
+      "PROFILE", "WATCH other-operator", "COMPARE",
+    ]);
+  });
 });
 
 describe("private profile watchlist", () => {
