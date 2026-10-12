@@ -57,6 +57,7 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
         text={terminalText}
         label={terminalText}
         maxRem={maxRem}
+        vw={compact ? "0.7vw" : "1.9vw"}
       />
     );
   }
