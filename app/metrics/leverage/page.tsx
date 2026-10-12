@@ -11,8 +11,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WaveHero } from "@/components/ui/WaveHero";
+import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -24,7 +25,19 @@ export const metadata: Metadata = withOG({
 
 export default function LeveragePage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <MetricsWorkspaceFrame
+      title="LEVERAGE"
+      hero={
+        <WaveHero
+          eyebrow="SIGRANK METRIC"
+          terminalText="LEVERAGE"
+          title="Leverage"
+          subtitle={<>Output per unit of effort.</>}
+        />
+      }
+      current="/metrics/leverage"
+    >
+    <div className="flex flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([
@@ -59,21 +72,6 @@ export default function LeveragePage() {
             },
           ]),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="◈ Amplification Metric"
-        terminalText="LEVERAGE"
-        title="Leverage — Cached Context Amplification"
-        subtitle={
-          <>
-            Leverage in AI token usage measures how much cached context you
-            reuse relative to fresh input. High leverage means your cached
-            context{" "}
-            <span className="text-gold">amplifies</span> your input many times
-            over — you&rsquo;re building on a foundation, not starting over.
-          </>
-        }
       />
 
       {/* ── The formula ── */}
@@ -344,5 +342,6 @@ export default function LeveragePage() {
         </p>
       </section>
     </div>
+    </MetricsWorkspaceFrame>
   );
 }

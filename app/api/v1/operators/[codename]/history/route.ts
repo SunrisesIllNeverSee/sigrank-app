@@ -49,6 +49,9 @@ export async function GET(
     points: points.map((p) => ({
       date: p.date,
       signa_rate: p.signa_rate,
+      /** Υ Yield = (cache_read × output) / input² per snapshot — the rank
+       *  metric's dated series. 0 when token pillars are missing. */
+      yield_: p.yield_,
       global_rank: p.global_rank,
       class_tier: p.class_tier, // UPPERCASE canonical SignalClass
     })),

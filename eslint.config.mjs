@@ -45,6 +45,10 @@ export default [
       "public/",
       "dist/",
       "_sigrank-mcp/",
+      /* review/annotation tooling lives outside the product lint scope —
+         it is checked separately via `npm run lint:tools` (eslint.tools
+         .config.mjs), not suppressed. */
+      "_workspace/",
       "**/*.d.ts",
       "next-env.d.ts",
     ],

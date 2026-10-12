@@ -1,0 +1,62 @@
+<!doctype html><html><head><meta charset="utf-8"><title>03 · Block Badges</title>
+<style>
+:root{--ac:#A6FF00;--cyan:#00E5FF;--magenta:#FF00D4;--violet:#A855F7;--blue:#3B82F6;--yellow:#FFE600;--bg:#0a0f0a;--panel:#0e140e;--line:#1e2a1e;--line2:#2a3a2a;--tx:#d4e0d4;--tx2:#9fb09f;--mut:#5a6b5a;--mono:'JetBrains Mono','SF Mono',monospace;--disp:'Silkscreen','Courier New',monospace}
+*{margin:0;box-sizing:border-box;font-family:var(--mono);color:var(--tx)}
+body{background:var(--bg);padding:32px;font-size:16px}
+h1{font-family:var(--disp);font-size:24px;color:var(--tx);letter-spacing:.04em;margin-bottom:4px}
+.sub{font-size:16px;color:var(--mut);letter-spacing:.14em;margin-bottom:20px}
+.stage{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:18px;margin-bottom:22px}
+.h3{font-size:16px;letter-spacing:.2em;color:var(--tx2);margin-bottom:10px}
+.sq{display:inline-block;width:8px;height:8px;background:var(--ac);margin-right:8px}
+.scale{display:flex;gap:8px;margin:14px 0 12px}
+.scale button{border:1px solid var(--line2);border-radius:6px;background:transparent;padding:10px 18px;font-size:16px;letter-spacing:.1em;color:var(--tx2);cursor:pointer}
+.scale button:hover{border-color:var(--ac);color:var(--ac)}
+.scale button.sel{background:var(--ac);color:#000;border-color:var(--ac)}
+textarea{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--tx);font-size:16px;padding:10px;resize:vertical}
+.copy{margin-top:12px;border:1px solid var(--ac);background:transparent;color:var(--ac);font-size:16px;letter-spacing:.14em;padding:12px 20px;border-radius:6px;cursor:pointer}
+.copy:hover{background:var(--ac);color:#000}
+.copied{color:var(--ac);font-size:16px;margin-left:10px}
+.a{border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px;background:var(--bg)}
+.cap{font-size:16px;color:var(--mut);letter-spacing:.14em;margin-bottom:8px}
+.mav{width:24px;height:24px;border-radius:5px;display:inline-grid;place-items:center;background:#16200f;font-size:16px;font-weight:700;color:var(--ac);overflow:hidden}
+.mvrow{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:6px;font-size:16px}
+.mvrow:hover{background:var(--line)}
+.mvrow .n{flex:1}.mvrow .d{color:var(--ac)}
+.plabel{color:var(--mut);font-size:16px}
+.pxbd{display:inline-grid;grid-template-columns:repeat(3,6px);grid-auto-rows:6px;gap:1.5px;vertical-align:middle}
+.pxbd i{display:block;border-radius:1px}
+.award{width:34px;height:38px;display:inline-grid;place-items:center;font-size:16px;font-weight:700;clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);margin-right:10px}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg)}
+.card.gold{border-color:var(--yellow)}
+.plink{display:inline-block;border:1px solid var(--line2);border-radius:6px;padding:8px 14px;font-size:16px;color:var(--tx2);margin-right:8px;margin-bottom:6px}
+code.embed{display:block;border:1px solid var(--line2);border-radius:6px;background:var(--bg);padding:8px;font-size:16px;color:var(--mut);word-break:break-all}
+</style></head><body>
+<h1>03 · Block Badges</h1><div class="sub">the six extracted 3×3 badge patterns + placements · SigRank live-board review deck</div>
+<div class="stage">
+<div class="cap">3×3 BLOCK BADGES — extracted from 10_badge_system.png</div><div class="a"><div class="cap">VERIFIED OPERATOR</div><span class="pxbd"><i style="background:#a855f7"></i><i style="background:#ff5f57"></i><i style="background:#3b82f6"></i><i style="background:#ff00d4"></i><i style="background:#ffe600"></i><i style="background:#ff5f57"></i><i style="background:#3b82f6"></i><i style="background:#a855f7"></i><i style="background:#ff00d4"></i></span><span style="font-size:16px;color:var(--mut);margin-left:10px">avatar corner / name line / profile shelf</span></div><div class="a"><div class="cap">TOP 1% LEGEND (pct≥99)</div><span class="pxbd"><i style="background:#a855f7"></i><i style="background:#a855f7"></i><i style="background:#a855f7"></i><i style="background:#ff00d4"></i><i style="background:#ff00d4"></i><i style="background:#ff00d4"></i><i style="background:#a855f7"></i><i style="background:#a855f7"></i><i style="background:#a855f7"></i></span><span style="font-size:16px;color:var(--mut);margin-left:10px">avatar corner / name line / profile shelf</span></div><div class="a"><div class="cap">TOP 5% ELITE (pct≥95)</div><span class="pxbd"><i style="background:#3b82f6"></i><i style="background:#94a3b8"></i><i style="background:#3b82f6"></i><i style="background:#94a3b8"></i><i style="background:#3b82f6"></i><i style="background:#94a3b8"></i><i style="background:#3b82f6"></i><i style="background:#94a3b8"></i><i style="background:#3b82f6"></i></span><span style="font-size:16px;color:var(--mut);margin-left:10px">avatar corner / name line / profile shelf</span></div><div class="a"><div class="cap">TOP 10% ACHIEVER (pct≥90)</div><span class="pxbd"><i style="background:#A6FF00"></i><i style="background:#475569"></i><i style="background:#A6FF00"></i><i style="background:#475569"></i><i style="background:#A6FF00"></i><i style="background:#475569"></i><i style="background:#A6FF00"></i><i style="background:#475569"></i><i style="background:#A6FF00"></i></span><span style="font-size:16px;color:var(--mut);margin-left:10px">avatar corner / name line / profile shelf</span></div><div class="a"><div class="cap">100 DAYS CONSISTENT</div><span class="pxbd"><i style="background:#ffe600"></i><i style="background:#ff9a3c"></i><i style="background:#ffe600"></i><i style="background:#ff9a3c"></i><i style="background:#ffe600"></i><i style="background:#ff9a3c"></i><i style="background:#ffe600"></i><i style="background:#ff9a3c"></i><i style="background:#ffe600"></i></span><span style="font-size:16px;color:var(--mut);margin-left:10px">avatar corner / name line / profile shelf</span></div><div class="a"><div class="cap">10M TOKENS MILESTONE</div><span class="pxbd"><i style="background:#00E5FF"></i><i style="background:#e2e8f0"></i><i style="background:#00E5FF"></i><i style="background:#e2e8f0"></i><i style="background:#00E5FF"></i><i style="background:#e2e8f0"></i><i style="background:#00E5FF"></i><i style="background:#e2e8f0"></i><i style="background:#00E5FF"></i></span><span style="font-size:16px;color:var(--mut);margin-left:10px">avatar corner / name line / profile shelf</span></div>
+<div class="a"><div class="cap">IN CONTEXT — avatar corner + name line</div>
+<div class="mvrow"><span class="mav" style="position:relative">M</span><span class="n">MO§ES™ <span style="display:inline-grid;grid-template-columns:repeat(3,4px);grid-auto-rows:4px;gap:1px"><i style="background:#a855f7"></i><i style="background:#a855f7"></i><i style="background:#a855f7"></i><i style="background:#ff00d4"></i><i style="background:#ff00d4"></i><i style="background:#ff00d4"></i><i style="background:#a855f7"></i><i style="background:#a855f7"></i><i style="background:#a855f7"></i></span></span></div></div>
+</div>
+<div class="h3"><span class="sq"></span>SCORE — how close is this?</div>
+<div class="scale" id="sc">
+<button data-v="1">1 · NEEDS A LOT</button>
+<button data-v="2">2 · HALFWAY THERE</button>
+<button data-v="3">3 · MINOR TWEAKS</button>
+</div>
+<div class="h3"><span class="sq"></span>NOTES / DIRECTION</div>
+<textarea id="note" placeholder="what's right, what's wrong, what to change…"></textarea>
+<button class="copy" id="cp">COPY ANSWER</button><span class="copied" id="copied"></span>
+<div class="h3" style="margin-top:18px"><span class="sq"></span>ALL ITEMS</div>
+<div style="font-size:16px;color:var(--mut);line-height:2">
+<a href="share.html">01 · share page</a> · <a href="charts.html">02 · charts &amp; graphs</a> ·
+<a href="badges.html">03 · block badges</a> · <a href="hexagons.html">04 · hexagon awards</a> ·
+<a href="radar.html">05 · radar × themes</a> · <a href="movers.html">06 · movers slides</a></div>
+<script>
+let v=null;
+document.querySelectorAll('#sc button').forEach(b=>b.onclick=()=>{v=b.dataset.v;document.querySelectorAll('#sc button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+document.getElementById('cp').onclick=()=>{
+const t='badges.html\nscore: '+(v||'—')+'/3\nnotes: '+(document.getElementById('note').value||'—');
+navigator.clipboard.writeText(t).then(()=>{document.getElementById('copied').textContent='COPIED — paste it back to me';});
+};
+</script>
+</body></html>

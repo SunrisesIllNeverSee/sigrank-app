@@ -3,9 +3,8 @@ import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
 import { getLeaderboard } from "@/lib/board";
 import { BOARD_WINDOWS } from "@/lib/board/windows";
-import { HallHero } from "@/components/hall/HallHero";
 import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
-import { HallClient } from "@/components/hall/HallClient";
+import { HallWorkspace } from "@/components/hall/HallWorkspace";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import type { LeaderboardRow } from "@/lib/board";
@@ -110,14 +109,13 @@ export default async function HallPage() {
           },
         ]),
       ]} />
-      {/* HALL-1: animated masthead. */}
-      <HallHero />
+      {/* Hall of Signal inside the shared SignalAF workspace shell —
+          100vh .lbw-root (left controls · stage boards · closed inspector).
+          Filtering stays client-side via URL params (same contract as
+          HallClient); hero treatment retired per the workspace IA. */}
+      <HallWorkspace windowsData={windowsData} windowsDataAll={windowsDataAll} />
 
-      {/* HALL-4/2/3: record ticker + filter dropdowns + 18 metric boards.
-          All filtering is client-side (HallClient reads URL params). */}
-      <HallClient windowsData={windowsData} windowsDataAll={windowsDataAll} />
-
-      {/* ── What is the Hall? — moved to bottom (owner 2026-07-09) ── */}
+      {/* ── What is the Hall? — SEO/AEO copy below the 100vh workspace ── */}
       <section className="mx-auto mt-8 max-w-2xl px-4 pb-6">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The Hall of Signal is the permanent record of peak operator

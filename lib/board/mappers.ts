@@ -66,7 +66,7 @@ export interface DbMetricSnapshot {
   source_submission_id?: string | null;
   window_start?: string | null;
   window_end?: string | null;
-  workflow_mode?: "hitl" | "agentic" | null;
+  workflow_mode?: "hitl" | "agentic" | "hybrid" | null;
   workflow_evidence_url?: string | null;
   workflow_mode_version?: string | null;
   mode_assessed_at?: string | null;

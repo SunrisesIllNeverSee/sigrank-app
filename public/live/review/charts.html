@@ -1,0 +1,75 @@
+<!doctype html><html><head><meta charset="utf-8"><title>02 · Charts &amp; Graphs</title>
+<style>
+:root{--ac:#A6FF00;--cyan:#00E5FF;--magenta:#FF00D4;--violet:#A855F7;--blue:#3B82F6;--yellow:#FFE600;--bg:#0a0f0a;--panel:#0e140e;--line:#1e2a1e;--line2:#2a3a2a;--tx:#d4e0d4;--tx2:#9fb09f;--mut:#5a6b5a;--mono:'JetBrains Mono','SF Mono',monospace;--disp:'Silkscreen','Courier New',monospace}
+*{margin:0;box-sizing:border-box;font-family:var(--mono);color:var(--tx)}
+body{background:var(--bg);padding:32px;font-size:16px}
+h1{font-family:var(--disp);font-size:24px;color:var(--tx);letter-spacing:.04em;margin-bottom:4px}
+.sub{font-size:16px;color:var(--mut);letter-spacing:.14em;margin-bottom:20px}
+.stage{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:18px;margin-bottom:22px}
+.h3{font-size:16px;letter-spacing:.2em;color:var(--tx2);margin-bottom:10px}
+.sq{display:inline-block;width:8px;height:8px;background:var(--ac);margin-right:8px}
+.scale{display:flex;gap:8px;margin:14px 0 12px}
+.scale button{border:1px solid var(--line2);border-radius:6px;background:transparent;padding:10px 18px;font-size:16px;letter-spacing:.1em;color:var(--tx2);cursor:pointer}
+.scale button:hover{border-color:var(--ac);color:var(--ac)}
+.scale button.sel{background:var(--ac);color:#000;border-color:var(--ac)}
+textarea{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--tx);font-size:16px;padding:10px;resize:vertical}
+.copy{margin-top:12px;border:1px solid var(--ac);background:transparent;color:var(--ac);font-size:16px;letter-spacing:.14em;padding:12px 20px;border-radius:6px;cursor:pointer}
+.copy:hover{background:var(--ac);color:#000}
+.copied{color:var(--ac);font-size:16px;margin-left:10px}
+.a{border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px;background:var(--bg)}
+.cap{font-size:16px;color:var(--mut);letter-spacing:.14em;margin-bottom:8px}
+.mav{width:24px;height:24px;border-radius:5px;display:inline-grid;place-items:center;background:#16200f;font-size:16px;font-weight:700;color:var(--ac);overflow:hidden}
+.mvrow{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:6px;font-size:16px}
+.mvrow:hover{background:var(--line)}
+.mvrow .n{flex:1}.mvrow .d{color:var(--ac)}
+.plabel{color:var(--mut);font-size:16px}
+.pxbd{display:inline-grid;grid-template-columns:repeat(3,6px);grid-auto-rows:6px;gap:1.5px;vertical-align:middle}
+.pxbd i{display:block;border-radius:1px}
+.award{width:34px;height:38px;display:inline-grid;place-items:center;font-size:16px;font-weight:700;clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);margin-right:10px}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg)}
+.card.gold{border-color:var(--yellow)}
+.plink{display:inline-block;border:1px solid var(--line2);border-radius:6px;padding:8px 14px;font-size:16px;color:var(--tx2);margin-right:8px;margin-bottom:6px}
+code.embed{display:block;border:1px solid var(--line2);border-radius:6px;background:var(--bg);padding:8px;font-size:16px;color:var(--mut);word-break:break-all}
+</style></head><body>
+<h1>02 · Charts &amp; Graphs</h1><div class="sub">radar, field notes, sparkline cells · SigRank live-board review deck</div>
+<div class="stage">
+<div class="cap">FIELD NOTES — the board's numbers as prose (its own text box)</div>
+<div class="a"><div class="cap">FIELD NOTES module</div>
+<div style="border:1px dashed var(--line2);border-radius:7px;padding:10px">
+<div style="font-size:16px;letter-spacing:.14em;color:var(--tx2);margin-bottom:6px">FIELD NOTES</div>
+<p style="font-size:16px;line-height:1.7;color:var(--tx2)">15 operators · median yield 38.24 · top yield 569.68 · all-time window · field max Υ 387.4×</p></div></div>
+<div class="a"><div class="cap">RADAR — dual layer (operator vs field median)</div>
+<svg width="220" height="220" viewBox="0 0 220 220"><polygon points="110,34 169,91 148,167 72,167 51,91" fill="none" stroke="#2a3a2a" stroke-dasharray="2 3"/>
+<polygon points="110,57 150,96 137,147 83,147 70,96" fill="none" stroke="#2a3a2a" stroke-dasharray="2 3"/>
+<polygon points="110,80 131,102 126,127 94,127 89,102" fill="none" stroke="#2a3a2a" stroke-dasharray="2 3"/>
+<polygon points="110,42 163,93 143,158 78,158 58,94" fill="rgba(255,0,212,.07)" stroke="#FF00D4" stroke-width="1.4"/>
+<polygon points="110,38 161,95 141,160 80,155 60,92" fill="rgba(166,255,0,.22)" stroke="#A6FF00" stroke-width="1.6"/></svg>
+<div style="font-size:16px;color:var(--mut)">lime = operator · magenta = field median</div></div>
+<div class="a"><div class="cap">SPARKLINE metric cell (proposed — pack §C style)</div>
+<div class="card"><div style="font-size:16px;color:var(--mut);letter-spacing:.14em">YIELD</div>
+<div style="font-size:24px;font-weight:700;color:var(--ac)">12.4×</div>
+<svg width="120" height="20"><polyline points="0,16 15,12 30,14 45,8 60,10 75,5 90,7 105,3 120,4" fill="none" stroke="#A6FF00" stroke-width="1.5"/></svg></div></div>
+</div>
+<div class="h3"><span class="sq"></span>SCORE — how close is this?</div>
+<div class="scale" id="sc">
+<button data-v="1">1 · NEEDS A LOT</button>
+<button data-v="2">2 · HALFWAY THERE</button>
+<button data-v="3">3 · MINOR TWEAKS</button>
+</div>
+<div class="h3"><span class="sq"></span>NOTES / DIRECTION</div>
+<textarea id="note" placeholder="what's right, what's wrong, what to change…"></textarea>
+<button class="copy" id="cp">COPY ANSWER</button><span class="copied" id="copied"></span>
+<div class="h3" style="margin-top:18px"><span class="sq"></span>ALL ITEMS</div>
+<div style="font-size:16px;color:var(--mut);line-height:2">
+<a href="share.html">01 · share page</a> · <a href="charts.html">02 · charts &amp; graphs</a> ·
+<a href="badges.html">03 · block badges</a> · <a href="hexagons.html">04 · hexagon awards</a> ·
+<a href="radar.html">05 · radar × themes</a> · <a href="movers.html">06 · movers slides</a></div>
+<script>
+let v=null;
+document.querySelectorAll('#sc button').forEach(b=>b.onclick=()=>{v=b.dataset.v;document.querySelectorAll('#sc button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+document.getElementById('cp').onclick=()=>{
+const t='charts.html\nscore: '+(v||'—')+'/3\nnotes: '+(document.getElementById('note').value||'—');
+navigator.clipboard.writeText(t).then(()=>{document.getElementById('copied').textContent='COPIED — paste it back to me';});
+};
+</script>
+</body></html>

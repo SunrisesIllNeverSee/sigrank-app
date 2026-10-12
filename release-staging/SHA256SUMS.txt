@@ -1,0 +1,2 @@
+4b8ecb5fc5ca4bc681855616bcc3bd9c0d5b6afdb6ad82049afef3ce4a814f24  user-profile/profile-v2-candidate-2026-10-11.zip
+df414213d52381d7458917677b831390969784871f522a0098019c9e98be82f0  text-pages/editorial-nav-integrated-2026-10-11.zip

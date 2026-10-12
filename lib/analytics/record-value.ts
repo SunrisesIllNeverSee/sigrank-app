@@ -14,6 +14,7 @@
  */
 
 import type { LeaderboardRow } from "@/lib/board";
+import { snapshotThroughput } from "@/lib/board/throughput";
 
 /** Compact K-suffix for cascade values (yield/leverage). */
 const k = (n: number) =>
@@ -79,6 +80,19 @@ export function recordValue(row: LeaderboardRow, canonId: string): string {
       return fmtTokens(
         t.fresh_input + t.output + t.cache_read + t.cache_create,
       );
+    // ── Token Throughput — the live-board throughput metric (processed
+    //    tokens/day over the exact snapshot window), NOT ∑ total tokens ──
+    case "throughput": {
+      const th = snapshotThroughput({
+        inputTokens: t.fresh_input,
+        outputTokens: t.output,
+        cacheWriteTokens: t.cache_create,
+        cacheReadTokens: t.cache_read,
+        windowStart: row.window_start,
+        windowEnd: row.window_end,
+      });
+      return th ? `${fmtTokens(th.processedTokensPerDay)}/d` : "—";
+    }
     // ── Legacy word-era (M/C/E) — kept for any non-Hall caller ──
     case "M.01":
       return s.compression_ratio.toFixed(4);

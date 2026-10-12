@@ -11,6 +11,7 @@
  */
 
 import type { Metadata } from "next";
+import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
@@ -34,6 +35,7 @@ export const metadata: Metadata = withOG({
 
 export default function SciencePage() {
   return (
+    <FieldWorkspaceFrame current="science" title="ACADEMIC FOUNDATION" rightTitle="CITATION" right={<div className="mod"><div className="mini-h"><span className="sq" />FOUNDATION</div><p className="ws-note">Commitment Theory, conservation law, MO§ES™ and research deposits.</p><nav className="ws-nav"><a href="https://doi.org/10.5281/zenodo.20029607" rel="external">Publication DOI ↗</a></nav></div>}>
     <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <JsonLd
         data={[
@@ -78,7 +80,7 @@ export default function SciencePage() {
       />
 
       {/* ── The law ── */}
-      <section className="flex flex-col gap-3">
+      <section id="ws-page-science-law" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           The law
         </h2>
@@ -113,7 +115,7 @@ export default function SciencePage() {
       </section>
 
       {/* ── The evidence ── */}
-      <section className="flex flex-col gap-3">
+      <section id="ws-page-science-evidence" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           The evidence
         </h2>
@@ -153,7 +155,7 @@ export default function SciencePage() {
       </section>
 
       {/* ── Commitment Theory ── */}
-      <section className="flex flex-col gap-3">
+      <section id="ws-page-science-theory" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           Commitment Theory
         </h2>
@@ -183,7 +185,7 @@ export default function SciencePage() {
       </section>
 
       {/* ── MO§ES™ ── */}
-      <section className="flex flex-col gap-3">
+      <section id="ws-page-science-moses" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           MO§ES™ enforcement architecture
         </h2>
@@ -209,7 +211,7 @@ export default function SciencePage() {
       </section>
 
       {/* ── Zenodo deposits ── */}
-      <section className="flex flex-col gap-3">
+      <section id="ws-page-science-deposits" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           Zenodo deposits
         </h2>
@@ -301,7 +303,7 @@ export default function SciencePage() {
       </section>
 
       {/* ── Author ── */}
-      <section className="flex flex-col gap-3">
+      <section id="ws-page-science-author" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           Author
         </h2>
@@ -483,5 +485,6 @@ export default function SciencePage() {
         </p>
       </section>
     </div>
+    </FieldWorkspaceFrame>
   );
 }
