@@ -18,8 +18,12 @@
 import React from "react";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
-import CascadeRadar, { type CascadeRadarSeries } from "@/components/charts/CascadeRadar";
-import { compareClassPalette } from "./compare-palette";
+import CascadeRadar, {
+  type CascadeRadarSeries,
+} from "@/components/charts/CascadeRadar";
+
+const A_COLOR = "rgb(var(--class-arch))"; // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
+const B_COLOR = "rgb(var(--class-seeker))";
 
 function nameOf(row: LeaderboardRow): string {
   return operatorDisplayName(row);
@@ -143,59 +147,103 @@ function proj(ax: Axis, v: number): number {
   return ax.higherWins ? c : ax.max - c;
 }
 
-/** Each person's report owns their raw and metric radar, using the same
- * two-person normalization for comparable scale, without mixing A/B outlines. */
 function RadarBlock({
   title,
   axes,
-  side,
-  name,
-  color,
+  aName,
+  bName,
+  ghost,
 }: {
   title: string;
   axes: Axis[];
-  side: "a" | "b";
-  name: string;
-  color: string;
+  aName: string;
+  bName: string;
+  /** optional ghost backdrop — per-axis 0..1 footprints (mapped onto each axis max) */
+  ghost?: { a: number[]; b: number[] };
 }) {
-  const radarAxes = axes.map(ax => ({
-    label: ax.label + (ax.higherWins ? " ↑" : " ↓"),
+  // Direction arrow per axis: ↑ = higher is better, ↓ = lower is better (cost/$1M).
+  // The radar already pre-inverts lower-wins axes so "better" reaches outward; the arrow
+  // just tells the reader which way the underlying value is good (owner 2026-06-24).
+  const radarAxes = axes.map((ax) => ({
+    label: `${ax.label} ${ax.higherWins ? "↑" : "↓"}`,
     max: ax.max,
   }));
-  const series: CascadeRadarSeries[] = [{
-    name,
-    values: axes.map(ax => proj(ax, ax[side])),
-    color,
+  const series: CascadeRadarSeries[] = [];
+  if (ghost) {
+    // Ghost values are 0..1 footprints; multiply by each axis's own max so the
+    // radar's per-axis normalize() maps them back to the right radius. Pushed
+    // first so the variant-sort still draws them behind the solid layers.
+    series.push({
+      name: `${aName} raw`,
+      values: ghost.a.map((v, i) => v * (axes[i]?.max ?? 1)),
+      color: A_COLOR,
+      variant: "ghost",
+    });
+    series.push({
+      name: `${bName} raw`,
+      values: ghost.b.map((v, i) => v * (axes[i]?.max ?? 1)),
+      color: B_COLOR,
+      variant: "ghost",
+    });
+  }
+  series.push({
+    name: aName,
+    values: axes.map((ax) => proj(ax, ax.a)),
+    color: A_COLOR,
     variant: "solid",
-  }];
+  });
+  series.push({
+    name: bName,
+    values: axes.map((ax) => proj(ax, ax.b)),
+    color: B_COLOR,
+    variant: "solid",
+  });
+
   return (
-    <div className="cmp-radar rounded-lg border border-bg-border bg-bg-surface">
-      <h3 className="cmp-radar-heading" style={{ color }}>{title}</h3>
-      <CascadeRadar axes={radarAxes} series={series} size={280} />
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-bg-border bg-bg-surface p-4">
+      <span className="font-sans text-[11px] uppercase tracking-widest text-text-muted">
+        {title}
+      </span>
+      <CascadeRadar axes={radarAxes} series={series} size={300} />
+      <span className="font-sans text-[10px] text-text-muted">
+        ↑ higher is better · ↓ lower is better (cost) — both reach outward when
+        good
+      </span>
     </div>
   );
 }
 
-/** Two stat types under ONE operator's matchup report.
- * side=a or b; no one-stat-type-across-both-users comparison grouping. */
 export function CompareRadars({
   a,
   b,
-  side,
 }: {
   a: LeaderboardRow;
   b: LeaderboardRow;
-  side: "a" | "b";
 }) {
-  const person = side === "a" ? a : b;
-  const name = nameOf(person);
-  const color = compareClassPalette(person.snapshot.class_tier).color;
+  const aName = nameOf(a);
+  const bName = nameOf(b);
+  const rAxes = rawAxes(a, b);
+  const mAxes = metricAxes(a, b);
+
+  // Ghost backdrop on the METRICS radar = each operator's RAW footprint,
+  // normalized 0..1 per raw axis, then mapped onto the metric radar's scale.
+  // It's an intentional footprint (approximate), not a precise overlay.
+  const ghostA = rAxes.map((ax) => proj(ax, ax.a) / ax.max);
+  const ghostB = rAxes.map((ax) => proj(ax, ax.b) / ax.max);
+  // Pad/truncate ghost to the metric axis count (8) so positional align holds.
+  const fit = (arr: number[]) =>
+    Array.from({ length: mAxes.length }, (_, i) => arr[i % arr.length] ?? 0);
+
   return (
-    <div className="cmp-operator-radars" data-compare-operator={side}>
-      <RadarBlock title="Raw · I/O/W/R" axes={rawAxes(a, b)}
-        side={side} name={name} color={color} />
-      <RadarBlock title="Cascade · Metrics" axes={metricAxes(a, b)}
-        side={side} name={name} color={color} />
+    <div className="grid gap-4 md:grid-cols-2">
+      <RadarBlock title="Raw shape" axes={rAxes} aName={aName} bName={bName} />
+      <RadarBlock
+        title="Metric shape"
+        axes={mAxes}
+        aName={aName}
+        bName={bName}
+        ghost={{ a: fit(ghostA), b: fit(ghostB) }}
+      />
     </div>
   );
 }

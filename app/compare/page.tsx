@@ -22,6 +22,7 @@ import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 import {
   getLeaderboard,
+  getOperator,
   getOperatorHistory,
   type LeaderboardRow,
 } from "@/lib/board";
@@ -31,8 +32,8 @@ import {
   type CompareOption,
 } from "@/components/compare/CompareSelectors";
 import { CompareLedger } from "@/components/compare/CompareLedger";
-import { CompareTokenLongevity } from "@/components/compare/CompareTokenLongevity";
-import { liveCompareCandidates, resolveLiveComparePair } from "@/lib/board/compare-live";
+import { CompareRadars } from "@/components/compare/CompareRadars";
+import { CompareHistoryChart } from "@/components/compare/CompareHistoryChart";
 // CMP redesign (owner 2026-06-22): the matchup box (CompareMatchup) folds the selectors +
 // identity + 5 derived facts per operator; CompareLedger is the RAW/METRICS/TOTAL ledger
 // (owner's ASCII template); CompareRadars is the dual-layer raw+metrics radar pair.
@@ -50,6 +51,7 @@ import {
 } from "@/components/share/CompareShareCard";
 import { DeferredCompareMatchupCard } from "@/components/share/DeferredCompareMatchupCard";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
+import { isOutlierRow } from "@/lib/analytics/outlier-classify";
 import {
   compareTally,
   deriveFacts,
@@ -57,9 +59,6 @@ import {
 import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
-import { CompareStage } from "@/components/compare/CompareStage";
-import { compareClassPalette } from "@/components/compare/compare-palette";
-import "@/components/compare/compare-workspace.css";
 
 export const metadata: Metadata = withOG({
   title: "Compare AI Operators",
@@ -140,20 +139,50 @@ export default async function ComparePage({
 }) {
   const { a, b } = await searchParams;
 
-  // Exactly the live board's eligible operator field; exclude seed, synthetic
-  // field, UR and inactive unclaimed profiles even on explicit ?a/?b= URLs.
-  const board = liveCompareCandidates(await getLeaderboard({
-    strictLive: true,
-    window: "all_time",
-    windowFilter: false,
-    operatorTotal: true,
-    claimedOnly: true,
-    mode: "all",
-  }).catch(() => []));
-  const daySeed = Math.floor(Date.now() / 86_400_000);
-  const pair = resolveLiveComparePair(board, a, b, daySeed);
-  const rowA = pair?.[0] ?? null;
-  const rowB = pair?.[1] ?? null;
+  // PERF: parallelize independent fetches.
+  const [board, operatorA, fieldRow] = await Promise.all([
+    getLeaderboard(),
+    a ? getOperator(a) : Promise.resolve(null),
+    getOperator("the-field"),
+  ]);
+  const humanBoard = board.filter((r) => !isOutlierRow(r));
+
+  // Default opponent B is "The Field" — the median-Υ baseline operator (owner
+  // 2026-06-27, migration 0024) — so the page opens as "you vs. the field median".
+  // Note: this is the LIVE field median (computed from real operators' Υ),
+  // distinct from the AA-modeled 3.5:1:0.5 baseline in SplitFlapCard/FourDegreesChart.
+  //
+  // Default side A (owner 2026-06-27): a rotating board pick rather than always
+  // #1 (so the matchup isn't the lopsided top-vs-average). The pick is day-seeded,
+  // not Math.random() (which would break ISR caching) — stable within a cache
+  // window, varies day to day. The Field itself is excluded from the A pool.
+  //
+  // "Compare yourself" (signed-in operator as side A) is now handled client-side
+  // by CompareAgainstMe, which navigates to /compare?a=<codename> — preserving
+  // the ISR cache for the default view.
+  let defaultA: LeaderboardRow | null = null;
+  if (!defaultA) {
+    const pool = humanBoard.filter((r) => r.operator.codename !== "the-field");
+    if (pool.length > 0) {
+      const daySeed = Math.floor(
+        Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`) /
+          86_400_000,
+      );
+      defaultA = pool[daySeed % pool.length] ?? pool[0];
+    }
+  }
+
+  const rowA: LeaderboardRow | null =
+    operatorA ?? defaultA ?? board[0] ?? null;
+  let rowB: LeaderboardRow | null =
+    (b ? await getOperator(b) : null) ??
+    fieldRow ??
+    board[1] ??
+    null;
+  if (rowA && rowB && rowA.operator.codename === rowB.operator.codename) {
+    rowB =
+      board.find((r) => r.operator.codename !== rowA.operator.codename) ?? rowB;
+  }
 
   const activeChallenge =
     GATE_CHALLENGES && rowA && rowB
@@ -173,6 +202,20 @@ export default async function ComparePage({
         ])
       : [[], []];
 
+  // Field average Υ Yield — mean of all ranked, compounding OCM operators
+  // (outliers/bots excluded, owner 2026-07-14). Drawn as a horizontal reference
+  // line on the overtime chart.
+  const fieldYields = humanBoard
+    .filter(
+      (r) =>
+        !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
+    )
+    .map((r) => r.snapshot.cascade!.yield_)
+    .filter((v) => Number.isFinite(v) && v > 0);
+  const fieldAvgYield = fieldYields.length
+    ? fieldYields.reduce((a, b) => a + b, 0) / fieldYields.length
+    : null;
+
   if (!rowA || !rowB) {
     return (
       <div className="flex flex-col gap-3">
@@ -180,7 +223,7 @@ export default async function ComparePage({
           Compare AI Operators
         </h1>
         <p className="font-sans text-sm text-text-secondary">
-          At least two eligible live ranked operators are needed to compare.
+          Not enough operators to compare yet.
         </p>
       </div>
     );
@@ -189,7 +232,8 @@ export default async function ComparePage({
   const aCode = rowA.operator.codename;
   const bCode = rowB.operator.codename;
 
-  // Only active qualified live operators are eligible for both selectors.
+  // All seed operators for the opponent pickers (owner 2026-06-22). De-dup codenames,
+  // sort by display label so the dropdowns read cleanly.
   const seen = new Set<string>();
   const selectorOptions: CompareOption[] = board
     .filter((r) => {
@@ -299,12 +343,12 @@ export default async function ComparePage({
           {
             question: "How do I compare two AI operators on SigRank?",
             answer:
-              "Visit signalaf.com/compare and select two operators using the dropdown selectors. The comparison shows Yield (Υ), SNR, Leverage, Velocity, 10xDEV, and blended cost side by side, plus each operator's own raw and metric radars and a shared dated-token longevity chart. You can share the comparison via URL.",
+              "Visit signalaf.com/compare and select two operators using the dropdown selectors. The comparison shows Yield (Υ), SNR, Leverage, Velocity, 10xDEV, and blended cost side by side, plus a shape radar visualizing each operator's cascade profile. You can share the comparison via URL.",
           },
           {
             question: "What metrics does the SigRank comparison show?",
             answer:
-              "The head-to-head comparison shows six cascade metrics: Yield (Υ = cache_read × output / input²), SNR (signal-to-noise ratio), Leverage (cache reuse efficiency), Velocity (output per token), 10xDEV (log-normalized value above replacement), and blended cost ($/1M tokens). Individual raw and metric radar charts describe each live operator, with shared dated token history beneath.",
+              "The head-to-head comparison shows six cascade metrics: Yield (Υ = cache_read × output / input²), SNR (signal-to-noise ratio), Leverage (cache reuse efficiency), Velocity (output per token), 10xDEV (log-normalized value above replacement), and blended cost ($/1M tokens). A dual-layer radar chart visualizes the raw token counts and derived metrics.",
           },
           {
             question: "Can I compare myself against another AI operator?",
@@ -315,28 +359,21 @@ export default async function ComparePage({
       ]} />
       <TrackCompareView isDefault={!(a && b)} />
 
-      {/* One fixed comparison workspace, using the implemented page's data and
-          original operator/context sidebars. All stage sections stay visible. */}
+      {/* Compare inside the shared SignalAF workspace shell — approved layout:
+          _workspace/layout-editors/approved/compare-layout.json.
+          LEFT = operator A mini + compact ledger · STAGE = selectors +
+          matchup + paired radars + challenge band + full-width history ·
+          RIGHT = operator B mini + matchup summary + metric context + share.
+          All data/query behavior identical to the long-form page. */}
       <WorkspaceShell
         active="compare"
         title="COMPARE"
-        titleControls={
-          <div className="cmp-title-selectors">
-            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
-          </div>
-        }
         leftTitle="COMPARE"
         left={
           <>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>OPERATOR A</div>
               {opMini(rowA, "a")}
-              <CompareAgainstMe eligibleCodes={selectorOptions.map(o => o.codename)}
-                bCode={bCode} />
-            </div>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
-              {opMini(rowB, "b")}
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>METRIC CONTEXT</div>
@@ -353,7 +390,11 @@ export default async function ComparePage({
         rightTitle="CONTEXT"
         right={
           <>
-            <div className="mod cmp-sidebar-matchup">
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
+              {opMini(rowB, "b")}
+            </div>
+            <div className="mod">
               <div className="mini-h"><span className="sq"></span>MATCHUP</div>
               <div className="ws-kv">
                 <div className="row">
@@ -380,7 +421,6 @@ export default async function ComparePage({
                 </ul>
               )}
             </div>
-            <div className="mod cmp-sidebar-challenges">{ThrowDownLine}</div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SHARE</div>
               <div className="ws-share">
@@ -417,28 +457,42 @@ export default async function ComparePage({
           </>
         }
       >
-        {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
-            the stage (owner annotation: not a rail module). */}
-        <CompareStage>
         <div className="ws-cmp">
+          <div className="ws-cmp-sel">
+            <CompareSelectors
+              options={selectorOptions}
+              aCode={aCode}
+              bCode={bCode}
+            />
+            <div style={{ marginTop: 10 }}>
+              {/* "Compare yourself" — client-side auth gate */}
+              <CompareAgainstMe />
+            </div>
+          </div>
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors />
           </div>
-          <div className="ws-cmp-ledger">
-            <CompareLedger a={rowA} b={rowB} workspace />
+          <div className="ws-cmp-radars">
+            <CompareRadars a={rowA} b={rowB} />
           </div>
+          <div className="ws-cmp-bar">{ThrowDownLine}</div>
           <div className="ws-cmp-hist">
-            <CompareTokenLongevity
-              historyA={historyA}
-              historyB={historyB}
-              nameA={nameOf(rowA)}
-              nameB={nameOf(rowB)}
-              colorA={compareClassPalette(rowA.snapshot.class_tier).color}
-              colorB={compareClassPalette(rowB.snapshot.class_tier).color}
-            />
+            <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
+              <CompareHistoryChart
+                historyA={historyA}
+                historyB={historyB}
+                nameA={nameOf(rowA)}
+                nameB={nameOf(rowB)}
+                fieldAvg={fieldAvgYield}
+              />
+            </div>
+          </div>
+          {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
+              the stage (owner annotation: not a rail module). */}
+          <div style={{ gridColumn: "1/13" }}>
+            <CompareLedger a={rowA} b={rowB} />
           </div>
         </div>
-        </CompareStage>
       </WorkspaceShell>
     </div>
   );

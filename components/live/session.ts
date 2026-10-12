@@ -24,7 +24,6 @@
 
 import { useEffect, useState } from "react";
 import { fetchOperatorProfile } from "./enrich";
-import { badgeForPct, type PixelBadgeName } from "./PixelBadge";
 
 export interface BoardSession {
   loaded: boolean;
@@ -34,7 +33,6 @@ export interface BoardSession {
   displayName: string | null;
   /** current_rank.global for the linked operator — null until/unless resolved. */
   rank: number | null;
-  pixelBadge: PixelBadgeName | null;
 }
 
 const INITIAL: BoardSession = {
@@ -43,7 +41,6 @@ const INITIAL: BoardSession = {
   codename: null,
   displayName: null,
   rank: null,
-  pixelBadge: null,
 };
 
 let cached: Promise<BoardSession> | null = null;
@@ -67,7 +64,6 @@ export function fetchBoardSession(): Promise<BoardSession> {
         codename,
         displayName,
         rank: null,
-        pixelBadge: null,
       };
       /* Linked operator → resolve live rank through the shared profile cache
          (same endpoint the drill enrichment hits; deduped per session). */
@@ -75,7 +71,6 @@ export function fetchBoardSession(): Promise<BoardSession> {
         const p = await fetchOperatorProfile(codename);
         const g = p?.current_rank?.global;
         if (typeof g === "number" && Number.isFinite(g)) sess.rank = g;
-        if (sess.signedIn) sess.pixelBadge = badgeForPct(p?.current_rank?.percentile);
       }
       return sess;
     })
