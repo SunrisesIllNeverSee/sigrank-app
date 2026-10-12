@@ -130,7 +130,7 @@ export function CompareMatchup({
     // Class tint still bleeds from each side's outer edge so the matchup stays distinct.
     const bg = `linear-gradient(${side === "a" ? "105deg" : "255deg"}, rgb(var(--${cvar}) / ${tint}), transparent 72%)`;
     const identity = (
-      <div className="flex shrink-0 flex-col items-start gap-1 text-left">
+      <div className="cmp-matchup-identity flex shrink-0 flex-col items-start gap-1 text-left">
         <span
           className="font-mono text-3xl leading-none"
           style={{ color: col }}
@@ -159,7 +159,7 @@ export function CompareMatchup({
       </div>
     );
     const factList = (
-      <ul className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
+      <ul className="cmp-matchup-facts flex min-w-0 flex-1 flex-col justify-center gap-1.5">
         {facts.length > 0 ? (
           facts.map((fact, i) => <FactLine key={i} fact={fact} />)
         ) : (
@@ -172,7 +172,7 @@ export function CompareMatchup({
     return (
       <div
         className={
-          "relative flex min-w-0 flex-1 flex-row items-stretch gap-3 rounded-lg p-4 " +
+          "cmp-matchup-panel relative flex min-w-0 flex-1 flex-row items-stretch gap-3 rounded-lg p-4 " +
           (won ? " winner-glow" : "")
         }
         style={{ background: bg }}
@@ -184,7 +184,7 @@ export function CompareMatchup({
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-bg-border bg-bg-surface p-4">
+    <div className="cmp-matchup flex flex-col gap-4 rounded-xl border border-bg-border bg-bg-surface p-4">
       {!hideSelectors && (
         <CompareSelectors
           options={options}
@@ -192,7 +192,7 @@ export function CompareMatchup({
           bCode={b.operator.codename}
         />
       )}
-      <div className="flex items-stretch gap-2 sm:gap-4">
+      <div className="cmp-matchup-panels flex items-stretch gap-2 sm:gap-4">
         <Panel
           r={a}
           side="a"
@@ -202,7 +202,7 @@ export function CompareMatchup({
           facts={factsA}
           won={winner === "a"}
         />
-        <div className="flex flex-col items-center justify-center gap-1 px-1 sm:px-2">
+        <div className="cmp-matchup-vs flex flex-col items-center justify-center gap-1 px-1 sm:px-2">
           <span
             className="font-mono text-3xl font-bold tracking-widest text-text-secondary sm:text-4xl"
             style={{ textShadow: `0 0 26px rgb(var(--gold) / 0.6)` }}

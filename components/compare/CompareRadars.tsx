@@ -200,7 +200,7 @@ function RadarBlock({
   });
 
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-bg-border bg-bg-surface p-4">
+    <div className="cmp-radar flex flex-col items-center gap-2 rounded-xl border border-bg-border bg-bg-surface p-4">
       <span className="font-sans text-[11px] uppercase tracking-widest text-text-muted">
         {title}
       </span>
