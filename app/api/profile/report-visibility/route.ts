@@ -9,6 +9,7 @@
  * explicitly choose to share their cascade report (mode patterns, badges, DNA).
  */
 
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
@@ -35,13 +36,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update the operator's latest report's visibility
+    // Update the operator's report visibility. PostgREST ignores
+    // order/limit on PATCH, so this sets the flag on all of the operator's
+    // report rows — the read path always takes the latest, which is the
+    // intended behavior anyway.
     const { error } = await svc
       .from("operator_reports")
       .update({ report_visible: visible })
-      .eq("operator_id", sessionOp.operatorId)
-      .order("created_at", { ascending: false })
-      .limit(1);
+      .eq("operator_id", sessionOp.operatorId);
 
     if (error) {
       return NextResponse.json(
@@ -49,6 +51,13 @@ export async function POST(request: Request) {
         { status: 500 },
       );
     }
+
+    // The serialized report rides in the "operator" unstable_cache and the
+    // ISR'd /user/[codename] payload — invalidate both so a flip to private
+    // stops serving the report at the next request, not after 150s / 6h.
+    revalidateTag("operator", "max");
+    revalidatePath(`/user/${sessionOp.codename}`);
+    revalidatePath(`/user/${sessionOp.codename.toLowerCase()}`);
 
     return NextResponse.json({
       status: "ok",
