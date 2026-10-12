@@ -1792,5 +1792,5 @@
 .lbw-root .ws-topic-branch > summary .ws-tree-title{font-weight:700}
 .lbw-root .ws-topic-documents{margin:2px 0 8px 9px;padding-left:6px;border-left:1px solid var(--line)}
 .lbw-root .ws-topic-documents .ws-tree-title{font-size:11px;line-height:1.45;text-decoration:none}
-.lbw-root .ws-tree-details > summary .ws-tree-toggle::before{content:"▸"}
+.lbw-root .ws-tree-details:not([open]) > summary .ws-tree-toggle::before{content:"▸"}
 .lbw-root .ws-tree-details[open] > summary .ws-tree-toggle::before{content:"▾"}
