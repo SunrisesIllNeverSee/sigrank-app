@@ -56,6 +56,7 @@ export function TerminalWordmark() {
         text="SIGRANK"
         label="SIGRANK"
         maxRem={1.7}
+        vw="3.2vw"
       />
 
       {/* ◈ rule (SPLASH_RULE) */}

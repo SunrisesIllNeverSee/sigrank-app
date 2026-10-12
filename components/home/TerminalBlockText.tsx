@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import "./terminal-block.css";
 
 /**
  * TerminalBlockText — the ONE block-letter engine for the terminal theme.
@@ -99,6 +100,8 @@ export interface TerminalBlockTextProps {
   text: string;
   /** Visual ceiling in rem. The fit term can only shrink below this — never grow. */
   maxRem?: number;
+  /** vw fallback for browsers without container-query units (Safari < 16). */
+  vw?: string;
   /** Accessible label; defaults to the text itself. */
   label?: string;
 }
@@ -115,6 +118,7 @@ export interface TerminalBlockTextProps {
 export function TerminalBlockText({
   text,
   maxRem = 1.3,
+  vw = "1.9vw",
   label,
 }: TerminalBlockTextProps) {
   const rows = toBlockRows(text);
@@ -129,8 +133,15 @@ export function TerminalBlockText({
     >
       <pre
         aria-hidden
-        className="select-none overflow-x-clip font-mono leading-[1.1] tracking-tight"
-        style={{ margin: 0, fontSize: `clamp(0.25rem, ${fitCqw}cqw, ${maxRem}rem)` }}
+        className="tbt-fit select-none overflow-x-clip font-mono leading-[1.1] tracking-tight"
+        style={
+          {
+            margin: 0,
+            "--tbt-fit": `${fitCqw}cqw`,
+            "--tbt-fallback": vw,
+            "--tbt-max": `${maxRem}rem`,
+          } as React.CSSProperties
+        }
       >
         {rows.map((line, i) => (
           <div
