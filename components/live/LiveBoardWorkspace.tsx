@@ -2135,18 +2135,6 @@ export function LiveBoardWorkspace({
                         )}
                         {(wfSel !== "hitl") && (pageNow === lastPage || ordered.length === 0) && (
                           <>
-                            <tr className="unranked-band">
-                              <td colSpan={colMode === "metrics" ? 14 : 10}>
-                                UR · SIGNED UP, NOT YET RANKED
-                                <span className="unranked-count">
-                                  {" · "}{signupSummary ? signupSummary.unranked_total + " MEMBERS" : "SYNCING ACCOUNTS"}
-                                </span>
-                                {" · "}STARTING #{signupSummary?.next_member_position ?? "—"}
-                                <span className="unranked-privacy">
-                                  REGISTERED POSITIONS, NOT PERFORMANCE RANKS
-                                </span>
-                              </td>
-                            </tr>
                             {signupSummary?.members.map((member) => (
                               <tr key={"registered-position-" + member.position}
                                 className="unranked-member"
@@ -2180,7 +2168,7 @@ export function LiveBoardWorkspace({
                                       </span>
                                       {member.location ? <span className="opl">◍ {member.location}</span> : null}
                                     </span>
-                                    <span className="op-trend" title="No ranked Signa Rate history">—</span>
+                                    <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
                                   </div>
                                 </td>
                                 {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (
