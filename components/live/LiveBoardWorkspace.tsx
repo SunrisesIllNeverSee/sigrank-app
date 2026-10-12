@@ -460,25 +460,29 @@ async function captureVisibleBoard(
   const box = target.getBoundingClientRect();
   if (box.width < 50 || box.height < 50)
     throw new Error("Board screenshot area not visible");
-  const { toPng } = await import("html-to-image");
+  const { toBlob } = await import("html-to-image");
   /* Cross-origin avatars may be omitted by html-to-image if blocked by
      CORS. Preserve factual board numbers and avoid a blank/failed
      download. */
-  const url = await toPng(target, {
+  const blob = await toBlob(target, {
     cacheBust: true,
+    // A blocked avatar must not prevent exporting the board's real numbers.
+    imagePlaceholder: "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' fill='%23151e15'/%3E%3C/svg%3E",
     pixelRatio: 2,
     backgroundColor: "#080e08",
     width: Math.round(box.width),
     height: Math.round(box.height),
     style: { overflow: "hidden" },
   });
-  if (!url.startsWith("data:image/png"))
+  if (!blob || blob.type !== "image/png")
     throw new Error("PNG export did not produce an image");
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const link = document.createElement("a");
   link.download = `signalaf-board-${scope}-${stamp}.png`;
-  link.href = url;
+  const downloadUrl = URL.createObjectURL(blob);
+  link.href = downloadUrl;
   link.click();
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 }
 
 function BoardShotButton({
@@ -2048,159 +2052,10 @@ export function LiveBoardWorkspace({
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </span>
-                <span className="fb-sp"></span>
-              </div>
-
-              <main className="stage" ref={stageRef} data-board-stage>
-                <div className="board">
-                  {/* LB-03/04/05 operator dock (starts docked in rail) */}
-                  {profile && (
-                    <OperatorDock
-                      key={selected}
-                      d={profile}
-                      docked={docked}
-                      onToggleDock={toggleDock}
-                      population={pop}
-                      detail={selDetail}
-                      detailStatus={selDetailStatus}
-                      radarBaseline={radarBaseline}
-                    />
-                  )}
-
-                  {/* LB-10/11/12 leaderboard table — center stage */}
-                  <section className="tablecard">
-                    <table className="board-t">
-                      <thead>
-                        <BoardHead
-                          mode={colMode}
-                          sortKey={sortSel}
-                          sortDir={
-                            SORT_ASC.has(sortSel) !== sortFlip
-                              ? "asc"
-                              : "desc"
-                          }
-                          onSort={onSortColumn}
-                        />
-                      </thead>
-                      <tbody>
-                        {pageRows.map(([o, i], d) => (
-                          <BoardRow
-                            key={`${i}-${o.codename}`}
-                            o={o}
-                            i={i}
-                            r={pageStart + d + 1}
-                            viewMode={viewMode}
-                            colMode={colMode}
-                            tt={tt}
-                            rawRank={rawRank[pageStart + d] ?? pageStart + d + 1}
-                            metricRank={metricRank[pageStart + d] ?? pageStart + d + 1}
-                            metricIndex={pageStart + d}
-                            selected={selected === i}
-                            onSelect={handleSelect}
-                            onPeek={handlePeek}
-                          />
-                        ))}
-                        {ordered.length === 0 && (
-                          <tr className="board-empty">
-                            <td colSpan={colMode === "metrics" ? 14 : 10}>
-                              {fieldState === "loading"
-                                ? "⟳ SYNCING FIELD…"
-                                : filtered
-                                  ? "— NO ROWS MATCH THE CURRENT FILTER"
-                                  : "— NO OPERATORS IN THIS SCOPE"}
-                            </td>
-                          </tr>
-                        )}
-                        {(wfSel !== "hitl") && (pageNow === lastPage || ordered.length === 0) && (
-                          <>
-                            {signupSummary?.members.map((member) => (
-                              <tr key={"registered-position-" + member.position}
-                                className="unranked-member"
-                                data-member-position={member.position}>
-                                <td>
-                                  <div className="ranks">
-                                    <span className="r-main">{member.position}</span>
-                                    <span className="r-sub">UR</span>
-                                  </div>
-                                </td>
-                                <td className="l">
-                                  <div className="op">
-                                    <span className="av" style={avatarStyle(member.position - 1)}>
-                                      {member.avatar_url ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={member.avatar_url} alt="" loading="lazy" />
-                                      ) : (member.display_label.charAt(0).toUpperCase() || "◌")}
-                                    </span>
-                                    <span>
-                                      <span className="nm">
-                                        {member.profile_slug ? (
-                                          <Link href={"/user/" + encodeURIComponent(member.profile_slug)}>
-                                            {member.display_label}
-                                          </Link>
-                                        ) : member.display_label}
-                                      </span>
-                                      <br />
-                                      <span className="hd">
-                                        {member.handle?.startsWith("@") ? member.handle : (member.profile_slug ?? "PRIVATE")}
-                                        {" · "}<span className="tag">UR</span>
-                                      </span>
-                                      {member.location ? <span className="opl">◍ {member.location}</span> : null}
-                                    </span>
-                                    <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
-                                  </div>
-                                </td>
-                                {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (
-                                  <td key={k} className="unranked-na">—</td>
-                                ))}
-                                {colMode === "metrics" && (
-                                  <>
-                                    <td className="unranked-provisional">UR</td>
-                                    <td className="unranked-na">—</td>
-                                  </>
-                                )}
-                              </tr>
-                            ))}
-                          </>
-                        )}
-                      </tbody>
-                    </table>
-                    <div className="pgn">
-                      <span className="pgl">
-                        {ordered.length === 0 ? (
-                          <>
-                            {ops.length === 0
-                              ? "No operators on this board"
-                              : "No rows match the current filter"}
-                          </>
-                        ) : (
-                          <>
-                            Showing {pageStart + 1}–
-                            {pageStart + pageRows.length} of{" "}
-                            {filtered
-                              ? `${ordered.length.toLocaleString()} filtered`
-                              : pop.count.toLocaleString()}{" "}
-                            operators
-                          </>
-                        )}{" "}
-                        · {pop.tag}
-                        {fieldState === "loading" && (
-                          <span className="pgstat" role="status">
-                            {" "}
-                            · ⟳ SYNCING FIELD…
-                          </span>
-                        )}
-                        {fieldState === "error" && (
-                          <span className="pgstat pgerr" role="alert">
-                            {" "}
-                            · FIELD SYNC FAILED — CLICK A PAGE TO RETRY
-                          </span>
-                        )}
-                      </span>
-                      {/* owner 2026-10-06: pages centered + clickable; the
-                          Metrics/Raw (tokens) toggle lives in the table's
-                          chrome row, not the filter bar. */}
+                <div className="board-filter-actions" role="group" aria-label="Leaderboard view and exports">
                       <div className="seg pgn-seg">
                         <button
+                          aria-pressed={colMode === "metrics"}
                           className={colMode === "metrics" ? "on" : ""}
                           onClick={() => setColMode("metrics")}
                         >
@@ -2208,6 +2063,7 @@ export function LiveBoardWorkspace({
                         </button>
                         <span className="sep"></span>
                         <button
+                          aria-pressed={colMode === "raw"}
                           className={colMode === "raw" ? "on" : ""}
                           onClick={() => setColMode("raw")}
                         >
@@ -2270,6 +2126,155 @@ export function LiveBoardWorkspace({
                       {/* LB-G14 — approved workspace-scope screenshot,
                           docked in the existing export group. */}
                       <BoardShotButton scope="workspace" rootRef={rootRef} />
+                </div>
+              </div>
+
+              <main className="stage" ref={stageRef} data-board-stage>
+                <div className="board">
+                  {/* LB-03/04/05 operator dock (starts docked in rail) */}
+                  {profile && (
+                    <OperatorDock
+                      key={selected}
+                      d={profile}
+                      docked={docked}
+                      onToggleDock={toggleDock}
+                      population={pop}
+                      detail={selDetail}
+                      detailStatus={selDetailStatus}
+                      radarBaseline={radarBaseline}
+                    />
+                  )}
+
+                  {/* LB-10/11/12 leaderboard table — center stage */}
+                  <section className="tablecard">
+                    <table className="board-t">
+                      <thead>
+                        <BoardHead
+                          mode={colMode}
+                          sortKey={sortSel}
+                          sortDir={
+                            SORT_ASC.has(sortSel) !== sortFlip
+                              ? "asc"
+                              : "desc"
+                          }
+                          onSort={onSortColumn}
+                        />
+                      </thead>
+                      <tbody>
+                        {pageRows.map(([o, i], d) => (
+                          <BoardRow
+                            key={`${i}-${o.codename}`}
+                            o={o}
+                            i={i}
+                            r={pageStart + d + 1}
+                            viewMode={viewMode}
+                            colMode={colMode}
+                            tt={tt}
+                            rawRank={rawRank[pageStart + d] ?? pageStart + d + 1}
+                            metricRank={metricRank[pageStart + d] ?? pageStart + d + 1}
+                            metricIndex={pageStart + d}
+                            selected={selected === i}
+                            onSelect={handleSelect}
+                            onPeek={handlePeek}
+                          />
+                        ))}
+                        {ordered.length === 0 && (
+                          <tr className="board-empty">
+                            <td colSpan={colMode === "metrics" ? 13 : 11}>
+                              {fieldState === "loading"
+                                ? "⟳ SYNCING FIELD…"
+                                : filtered
+                                  ? "— NO ROWS MATCH THE CURRENT FILTER"
+                                  : "— NO OPERATORS IN THIS SCOPE"}
+                            </td>
+                          </tr>
+                        )}
+                        {(wfSel !== "hitl") && (pageNow === lastPage || ordered.length === 0) && (
+                          <>
+                            {signupSummary?.members.map((member) => (
+                              <tr key={"registered-position-" + member.position}
+                                className="unranked-member"
+                                data-member-position={member.position}>
+                                <td>
+                                  <div className="ranks">
+                                    <span className="r-main">{member.position}</span>
+                                    <span className="r-sub">UR</span>
+                                  </div>
+                                </td>
+                                <td className="l">
+                                  <div className="op">
+                                    <span className="av" style={avatarStyle(member.position - 1)}>
+                                      {member.avatar_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={member.avatar_url} alt="" loading="lazy" />
+                                      ) : (member.display_label.charAt(0).toUpperCase() || "◌")}
+                                    </span>
+                                    <span>
+                                      <span className="nm">
+                                        {member.profile_slug ? (
+                                          <Link href={"/user/" + encodeURIComponent(member.profile_slug)}>
+                                            {member.display_label}
+                                          </Link>
+                                        ) : member.display_label}
+                                      </span>
+                                      <br />
+                                      <span className="hd">
+                                        {member.handle?.startsWith("@") ? member.handle : (member.profile_slug ?? "PRIVATE")}
+                                        {" · "}<span className="tag">UR</span>
+                                      </span>
+                                      {member.location ? <span className="opl">◍ {member.location}</span> : null}
+                                    </span>
+                                    <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
+                                  </div>
+                                </td>
+                                {Array.from({ length: colMode === "metrics" ? 10 : 8 }, (_, k) => (
+                                  <td key={k} className="unranked-na">—</td>
+                                ))}
+                                {colMode === "raw" && <td className="unranked-na">—</td>}
+                                {colMode === "metrics" && (
+                                  <>
+                                    <td className="unranked-na">—</td>
+                                  </>
+                                )}
+                              </tr>
+                            ))}
+                          </>
+                        )}
+                      </tbody>
+                    </table>
+                    <div className="pgn">
+                      <span className="pgl">
+                        {ordered.length === 0 ? (
+                          <>
+                            {ops.length === 0
+                              ? "No operators on this board"
+                              : "No rows match the current filter"}
+                          </>
+                        ) : (
+                          <>
+                            Showing {pageStart + 1}–
+                            {pageStart + pageRows.length} of{" "}
+                            {filtered
+                              ? `${ordered.length.toLocaleString()} filtered`
+                              : pop.count.toLocaleString()}{" "}
+                            operators
+                          </>
+                        )}{" "}
+                        · {pop.tag}
+                        {fieldState === "loading" && (
+                          <span className="pgstat" role="status">
+                            {" "}
+                            · ⟳ SYNCING FIELD…
+                          </span>
+                        )}
+                        {fieldState === "error" && (
+                          <span className="pgstat pgerr" role="alert">
+                            {" "}
+                            · FIELD SYNC FAILED — CLICK A PAGE TO RETRY
+                          </span>
+                        )}
+                      </span>
+
                     </div>
                   </section>
                 </div>

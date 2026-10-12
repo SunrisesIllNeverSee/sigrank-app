@@ -116,13 +116,14 @@ const HEAD_GROUPS: Record<ColMode, HeadGroup[]> = {
     { label: "IDENTITY & SCALE", span: 4 },
     { label: "CASCADE YIELD", span: 5, ac: true },
     { label: "COMPOSITION & COST", span: 3 },
-    { label: "ACTIVITY", span: 2 },
+    { label: "ACTIVITY", span: 1 },
   ],
   raw: [
     { label: "IDENTITY", span: 2 },
     { label: "RAW TOKENS & THROUGHPUT", span: 6 },
     { label: "COMPOSITION", span: 1 },
     { label: "COST", span: 1 },
+    { label: "PLATFORM", span: 1 },
   ],
 };
 const HEAD_COLS: Record<ColMode, HeadCol[]> = {
@@ -139,7 +140,6 @@ const HEAD_COLS: Record<ColMode, HeadCol[]> = {
     { icon: "⋮", label: "OP RATIO", cls: "hc-opratio", k: "Op Ratio", tip: "Full three-term operating ratio" },
     { icon: "◌", label: "EFF", cls: "hc-eff", k: "Efficiency" },
     { icon: "$", label: "$/1M", cls: "hc-cost", k: "$/1M" },
-    { icon: "⬡", label: "PLATFORM", cls: "hc-platform", tip: "Actual submitted platforms, not rollup 'multi'" },
     { icon: "◷", label: "LAST", cls: "hc-last" },
   ],
   raw: [
@@ -153,6 +153,7 @@ const HEAD_COLS: Record<ColMode, HeadCol[]> = {
     { icon: "∑", label: "∑/DAY", cls: "hc-day", k: "∑/Day" },
     { icon: "⋮", label: "OP RATIO", cls: "hc-opratio", k: "Op Ratio" },
     { icon: "$", label: "TOTAL COST", cls: "hc-cost", k: "Total Cost", tip: "Total observed tokens × cost per million / 1,000,000" },
+    { icon: "⬡", label: "PLATFORM", cls: "hc-platform", tip: "Actual submitted platforms, not rollup 'multi'" },
   ],
 };
 
@@ -399,15 +400,13 @@ export const BoardRow = memo(function BoardRow({
           <td className={tc(tt.totalCost, mi) || undefined}>{totalCost}</td>
         </>
       )}
-      {colMode === "metrics" && (
-        <>
+      {colMode === "raw" && (
           <td title={(o.platforms ?? []).join(", ")}>
             {(o.platforms?.length ? o.platforms.join(" · ") : o.platform)}
             <span className="wftag">{o.wf ?? "hitl"}{o.wfProvisional ? "*" : ""}</span>
           </td>
-          <td>{o.last}</td>
-        </>
       )}
+      {colMode === "metrics" && <td>{o.last}</td>}
     </tr>
   );
 });
