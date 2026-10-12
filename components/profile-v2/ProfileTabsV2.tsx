@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useProfileWorkspace } from "./ProfileWorkspace";
 
 /**
@@ -80,7 +81,9 @@ export function ProfileTabsV2({
   social,
   initial = "overview",
 }: ProfileTabsV2Props) {
-  const [localTab, setTab] = useState<TabKey>(initial);
+  const searchParams = useSearchParams();
+  const urlTab = searchParams.get("tab") as TabKey | null;
+  const [localTab, setTab] = useState<TabKey>(urlTab && TABS.some((t) => t.key === urlTab) ? urlTab : initial);
   const workspace = useProfileWorkspace();
   const tab = workspace?.section ?? localTab;
   const panelRef = useRef<HTMLDivElement>(null);
@@ -106,6 +109,11 @@ export function ProfileTabsV2({
   const select = (key: TabKey) => {
     setTab(key);
     workspace?.select(key);
+    if (!workspace) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", key);
+      window.history.replaceState(null, "", url.toString());
+    }
     panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import "./profile-workspace.css";
 
@@ -15,7 +16,16 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
   name: string; codename: string; rank: number | null; tier: string; platform: string;
   yieldLabel: string; children: ReactNode; actions: ReactNode;
 }) {
-  const [section, select] = useState<ProfileSection>("overview");
+  const searchParams = useSearchParams();
+  const requested = searchParams.get("tab");
+  const validSections: ProfileSection[] = ["overview", "stats", "analysis", "report", "lab", "submissions", "social"];
+  const [section, setSection] = useState<ProfileSection>(validSections.includes(requested as ProfileSection) ? requested as ProfileSection : "overview");
+  const select = (next: ProfileSection) => {
+    setSection(next);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", next);
+    window.history.replaceState(null, "", url.toString());
+  };
   return <ProfileWorkspaceContext.Provider value={{ section, select }}>
     <WorkspaceShell active="board" title={`PROFILE / ${name}`} leftTitle="PROFILE · DRILL"
       leftWidth={220} rightWidth={280}
