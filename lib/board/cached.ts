@@ -42,6 +42,7 @@ import {
   getOperator as _getOperator,
   getOperatorSubmissions as _getOperatorSubmissions,
   getOperatorHistory as _getOperatorHistory,
+  getOperatorSnapshotRecords as _getOperatorSnapshotRecords,
   getMetricLeaders as _getMetricLeaders,
   getHallOfSignal as _getHallOfSignal,
   getHomepageStats as _getHomepageStats,
@@ -159,6 +160,12 @@ export const getOperatorSubmissions = unstable_cache(
 export const getOperatorHistory = unstable_cache(
   _getOperatorHistory,
   ["operator-history"],
+  { revalidate: 150, tags: ["operator"] },
+);
+
+export const getOperatorSnapshotRecords = unstable_cache(
+  _getOperatorSnapshotRecords,
+  ["operator-snapshot-records"],
   { revalidate: 150, tags: ["operator"] },
 );
 

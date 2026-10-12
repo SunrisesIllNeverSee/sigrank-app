@@ -62,6 +62,7 @@ import {
 } from "@/lib/board/mappers";
 import { fallbackRows, filterMockBoard, sortValue } from "@/lib/board/fallback";
 import { memoize } from "@/lib/board/memo";
+import { snapshotThroughput } from "@/lib/board/throughput";
 import { recordValue } from "@/lib/analytics/record-value";
 import { computeCascadeMetrics } from "@/lib/analytics/cascade";
 
@@ -1368,4 +1369,142 @@ export async function getOperatorRecords(
     static_records: staticRecords,
     dynamic_records: dynamicRecords,
   };
+}
+
+/** A single scored snapshot submission — the full per-snapshot record behind
+ *  the profile Snapshot History table (dates, reporting window, platform,
+ *  token pillars, derived metrics, verification/provenance). */
+export interface SnapshotRecord {
+  submissionId: string;
+  submittedAt: string;
+  platform: string;
+  window: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  rulesetVersion: string | null;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  cacheCreateTokens: number | null;
+  cacheReadTokens: number | null;
+  yield_: number | null;
+  snr: number | null;
+  velocity: number | null;
+  leverage: number | null;
+  tokensPerDay: number | null;
+  workflowMode: WorkflowMode | null;
+  workflowModeVersion: string | null;
+}
+
+/**
+ * Per-submission snapshot records for one operator, newest first — the same
+ * scored snapshot_submissions rows the public snapshot-history API serves.
+ * Null pillars/metrics stay null so the UI can distinguish "no data" from 0.
+ */
+export async function getOperatorSnapshotRecords(
+  codename: string,
+): Promise<SnapshotRecord[]> {
+  const sb = getSupabaseServer();
+  if (!sb) return [];
+  try {
+    const { data: opData, error: opError } = await sb
+      .from("operators_public")
+      .select("operator_id")
+      .ilike("codename", codename)
+      .limit(1)
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<{ operator_id: string } | null>(opData);
+    if (!op) return [];
+
+    const { data, error } = await sb
+      .from("snapshot_submissions")
+      .select(
+        "submission_id, submitted_at, window_type, window_start, window_end, platform, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, workflow_mode, workflow_evidence_url, workflow_mode_version, mode_assessed_at",
+      )
+      .eq("operator_id", op.operator_id)
+      .eq("status", "scored")
+      .order("submitted_at", { ascending: false })
+      .limit(PER_OPERATOR_LIMIT);
+    if (error) throw error;
+    const rows =
+      asDb<Array<{
+        submission_id: string;
+        submitted_at: string | null;
+        window_type: string | null;
+        window_start: string | null;
+        window_end: string | null;
+        platform: string | null;
+        ruleset_version: string | null;
+        input_tokens: number | null;
+        output_tokens: number | null;
+        cache_creation_tokens: number | null;
+        cache_read_tokens: number | null;
+        workflow_mode: WorkflowMode | null;
+        workflow_evidence_url: string | null;
+        workflow_mode_version: string | null;
+        mode_assessed_at: string | null;
+      }> | null>(data) ?? [];
+    assertOperatorLimit(rows, codename);
+
+    return rows.map((s) => {
+      const pillars = [
+        s.input_tokens,
+        s.output_tokens,
+        s.cache_creation_tokens,
+        s.cache_read_tokens,
+      ];
+      const complete = pillars.every(
+        (n) => n != null && Number.isFinite(n) && n >= 0,
+      );
+      const cascade = complete
+        ? computeCascadeMetrics({
+            input: s.input_tokens!,
+            output: s.output_tokens!,
+            cacheCreate: s.cache_creation_tokens!,
+            cacheRead: s.cache_read_tokens!,
+          })
+        : null;
+      const throughput = snapshotThroughput({
+        inputTokens: s.input_tokens,
+        outputTokens: s.output_tokens,
+        cacheWriteTokens: s.cache_creation_tokens,
+        cacheReadTokens: s.cache_read_tokens,
+        windowStart: s.window_start,
+        windowEnd: s.window_end,
+      });
+      const mode = complete
+        ? resolveWorkflowMode({
+            inputTokens: s.input_tokens!,
+            outputTokens: s.output_tokens!,
+            cacheWriteTokens: s.cache_creation_tokens!,
+            cacheReadTokens: s.cache_read_tokens!,
+            assessment: s.workflow_mode,
+            evidenceUrl: s.workflow_evidence_url,
+          })
+        : null;
+      return {
+        submissionId: s.submission_id,
+        submittedAt: s.submitted_at ?? "",
+        platform: (s.platform ?? "other").toLowerCase(),
+        window: s.window_type ?? "all_time",
+        periodStart: s.window_start,
+        periodEnd: s.window_end,
+        rulesetVersion: s.ruleset_version,
+        inputTokens: s.input_tokens,
+        outputTokens: s.output_tokens,
+        cacheCreateTokens: s.cache_creation_tokens,
+        cacheReadTokens: s.cache_read_tokens,
+        yield_: cascade && !cascade.nonCompounding ? cascade.yield_ : null,
+        snr: cascade?.snr ?? null,
+        velocity: cascade?.velocity ?? null,
+        leverage: cascade && !cascade.nonCompounding ? cascade.leverage : null,
+        tokensPerDay: throughput?.processedTokensPerDay ?? null,
+        workflowMode: mode,
+        workflowModeVersion:
+          mode === "hitl" ? "hcm-v1" : s.workflow_mode_version,
+      };
+    });
+  } catch {
+    return [];
+  }
 }
