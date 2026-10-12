@@ -19,6 +19,7 @@ import type { Operator, ScoredSnapshot } from "@/lib/analytics/scoring-types";
 import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
 import type { FieldAverages } from "@/lib/analytics/field-average";
+import type { WorkflowCohortRank } from "@/lib/analytics/workflow-cohort";
 
 interface PassportCardProps {
   operator: Operator;
@@ -28,6 +29,9 @@ interface PassportCardProps {
   archetype: BuildArchetype | null;
   trophyCounts: TrophyCounts | null;
   fieldAvg: FieldAverages | null;
+  /** Workflow-cohort rank context (item 13) — shown under the combined-field
+   *  rank on the card face. Null for pending/unranked operators. */
+  cohort?: WorkflowCohortRank | null;
 }
 
 function compact(n: number): string {
@@ -71,6 +75,7 @@ export function PassportCard({
   archetype,
   trophyCounts,
   fieldAvg,
+  cohort,
 }: PassportCardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
@@ -118,6 +123,10 @@ export function PassportCard({
   return (
     <div className="pv2-card-shell">
       <div className="pv2-card">
+        {/* Holo shine — iridescent foil band sweeping the card face. A real
+            element (not ::after) so the sweep is transform-based: GPU-only,
+            Safari-safe, and disabled under prefers-reduced-motion. */}
+        <div className="pv2-shine" aria-hidden="true" />
         <div className="pv2-card-inner">
           <div className="pv2-top-strip">
             <div className="pv2-rating-block">
@@ -130,9 +139,16 @@ export function PassportCard({
             <div className="pv2-class-block">
               <div className="pv2-class-badge">{pending ? "UNRANKED" : snapshot.class_tier}</div>
               <div className="pv2-rank-chip">
-                Rank{" "}
+                FIELD{" "}
                 <strong>{pending || !globalRank ? "—" : `#${globalRank}`}</strong>
               </div>
+              {cohort && cohort.rank != null && (
+                <div className="pv2-rank-chip pv2-rank-chip--wf">
+                  {cohort.cohortShort}{" "}
+                  <strong>#{cohort.rank}</strong>
+                  <span className="pv2-rank-of">/{cohort.size}</span>
+                </div>
+              )}
             </div>
           </div>
 

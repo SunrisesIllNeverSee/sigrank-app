@@ -5,8 +5,10 @@
  * seeded-PRNG activity heatmap that renders identically on every render.
  *
  * Layout follows the approved mock (_workspace/profile-mocks/overview.html):
- * identity hero → cascade stat row → raw pillar row → signal+token module →
- * activity heatmap → records & honors → action bar.
+ * opening split → identity hero → cascade stat row → raw pillar row →
+ * signal+token module → field context strip → action bar. (Phase 3:
+ * Submission Activity and Records & Honors moved into the right rail —
+ * components/profile-v2/ProfileRailPanels.tsx.)
  *
  * Surfaces/text/borders resolve through the app theme tokens so the view
  * swaps with data-theme; the categorical metric palette (cyan/violet/orange/
@@ -22,7 +24,6 @@ import type { Operator, ScoredSnapshot } from "@/lib/analytics/scoring-types";
 import type {
   LeaderboardRow,
   TelemetryRaw,
-  HallRecord,
   HistoryPoint,
 } from "@/lib/board";
 import type { TierProgress } from "@/lib/analytics/tier-progress";
@@ -31,6 +32,8 @@ import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { FieldAverages } from "@/lib/analytics/field-average";
 import { PassportCard } from "./PassportCard";
 import { FlapBoard } from "./FlapBoard";
+import { WorkflowMark } from "./WorkflowMark";
+import { workflowCohortRank } from "@/lib/analytics/workflow-cohort";
 import { lbwFontVars } from "@/components/live/fonts";
 
 export interface OverviewViewProps {
@@ -44,7 +47,6 @@ export interface OverviewViewProps {
   archetype: BuildArchetype | null;
   tierProgress: TierProgress | null;
   trophyCounts: TrophyCounts | null;
-  records: HallRecord[];
   watchCount: number;
   boardRows: LeaderboardRow[];
   history: HistoryPoint[];
@@ -70,18 +72,18 @@ const CSS = `
 .pv2-ring{position:absolute;top:-6px;left:-6px;width:100px;height:100px}
 .pv2-name{font-size:28px;font-weight:700;color:rgb(var(--text-primary));line-height:1.1;letter-spacing:-.01em}
 .pv2-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
-.pv2-sc{background:rgb(var(--bg-elevated));border:1px solid rgb(var(--bg-border));border-radius:6px;padding:12px 14px 10px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden}
+.pv2-sc{background:rgb(var(--bg-elevated));border:1px solid rgb(var(--bg-border));border-radius:6px;padding:9px 11px 8px;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
 .pv2-sc:first-child{border-color:rgb(var(--gold)/.25)}
 .pv2-sl{font-family:var(--pv2-display);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgb(var(--text-muted));line-height:1}
-.pv2-sv{font-family:var(--pv2-mono);font-size:22px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.pv2-sv{font-family:var(--pv2-mono);font-size:18px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 .pv2-su{font-family:var(--pv2-mono);font-size:10px;color:rgb(var(--text-muted));letter-spacing:.05em;font-weight:400}
 .pv2-sd{font-family:var(--pv2-mono);font-size:9px;font-weight:600;display:inline-flex;align-items:center;gap:2px}
 .pv2-spark{position:absolute;bottom:0;right:0;width:60%;height:24px;opacity:.2}
 .pv2-raw{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.pv2-rc{background:rgb(var(--bg-elevated));border:1px solid rgb(var(--bg-border));border-radius:6px;padding:9px 11px 8px;display:flex;flex-direction:column;gap:3px}
+.pv2-rc{background:rgb(var(--bg-elevated));border:1px solid rgb(var(--bg-border));border-radius:6px;padding:7px 9px 6px;display:flex;flex-direction:column;gap:2px}
 .pv2-rc:first-child{border-color:rgb(var(--gold)/.25)}
 .pv2-rl{font-family:var(--pv2-display);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgb(var(--text-muted));line-height:1}
-.pv2-rv{font-family:var(--pv2-mono);font-size:16px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.pv2-rv{font-family:var(--pv2-mono);font-size:14px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
 .pv2-trow{display:flex;align-items:center;gap:10px}
 .pv2-tl{width:64px;flex-shrink:0;font-family:var(--pv2-mono);font-size:9px;letter-spacing:.06em;color:rgb(var(--text-muted));text-transform:uppercase;text-align:right}
 .pv2-tt{flex:1;height:10px;background:rgb(var(--bg-elevated));border-radius:5px;position:relative;z-index:2}
@@ -132,25 +134,6 @@ const CSS = `
 @media(max-width:720px){.pv2-hero{grid-template-columns:auto 1fr;gap:16px}.pv2-hrank{grid-column:1/-1;flex-direction:row!important;align-items:center!important;gap:12px}.pv2-stats{grid-template-columns:repeat(3,1fr)}.pv2-raw{grid-template-columns:repeat(4,1fr)}.pv2-tl{width:56px}}
 `;
 
-/* ── Deterministic PRNG (identical output server + client renders) ───────── */
-function hashSeed(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-function mulberry32(a: number): () => number {
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 /* ── Formatting helpers ──────────────────────────────────────────────────── */
 function compact(n: number): string {
   const a = Math.abs(n);
@@ -166,8 +149,8 @@ const fmtDate = (iso: string) => {
   const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
   return `${MONTHS[(m ?? 1) - 1] ?? "?"} ${d ?? "?"} ${y ?? "?"}`;
 };
-const dayMs = 86400000;
-const toDay = (iso: string) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / dayMs);
+
+
 
 /* ── Per-snapshot cascade values derived from history token pillars ──────── */
 interface Series {
@@ -209,19 +192,6 @@ const seriesDelta = (v: (number | null)[]) => {
   return idx.length >= 2 ? v[idx[idx.length - 1]]! - v[idx[0]]! : null;
 };
 
-function MedalSvg({ color, rank, size = 30 }: { color: string; rank: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0 }} aria-hidden="true">
-      {/* ribbon */}
-      <path d="M8.2 2.5 12 7l3.8-4.5 2.3 1-3 5.2-3.1-1.6-3.1 1.6-3-5.2z" fill={color} opacity="0.55" />
-      {/* medal disc */}
-      <circle cx="12" cy="15" r="7.2" fill="none" stroke={color} strokeWidth="1.8" />
-      <circle cx="12" cy="15" r="4.8" fill={color} opacity="0.2" />
-      <text x="12" y="18.4" textAnchor="middle" fill={color} fontFamily="var(--pv2-display)" fontSize="7.5" fontWeight="700">{rank}</text>
-    </svg>
-  );
-}
-
 export function OverviewView({
   operator,
   snapshot,
@@ -233,7 +203,6 @@ export function OverviewView({
   archetype,
   tierProgress,
   trophyCounts,
-  records,
   watchCount,
   boardRows,
   history,
@@ -250,6 +219,7 @@ export function OverviewView({
     telemetry.fresh_input + telemetry.output + telemetry.cache_read + telemetry.cache_create;
   const ownRow = boardRows.find((r) => r.operator.codename === operator.codename);
   const wf = ownRow?.workflow_mode ?? null;
+  const wfCohort = ranked && !pending ? workflowCohortRank(boardRows, operator.codename) : null;
   const fieldYields = boardRows
     .map((r) => r.snapshot.cascade?.yield_)
     .filter((v): v is number => v != null && v > 0)
@@ -287,70 +257,6 @@ export function OverviewView({
     return { ...s, pts };
   });
 
-  // Heatmap — 22 weeks × 7, anchored at snapshot date (deterministic)
-  const anchorIso = history.length ? history[history.length - 1].date : (snapshot.snapshot_date ?? "2026-01-01");
-  const anchor = toDay(anchorIso);
-  const startDay = anchor - 153;
-  const acctStart = anchor - operator.account_age_days;
-  const histMap = new Map<number, number>();
-  for (const h of history) {
-    const d = toDay(h.date);
-    if (h.yield_ > 0) histMap.set(d, h.yield_);
-    else if (!histMap.has(d)) histMap.set(d, -1); // active, no yield
-  }
-  const yields = [...histMap.values()].filter((v) => v > 0).sort((a, b) => a - b);
-  const baseline = yields.length ? yields[Math.floor(yields.length / 2)] : null;
-  const peak = yields.length ? yields[yields.length - 1] : null;
-  const rng = mulberry32(hashSeed(operator.codename));
-  // Sparse seeded fill only applies once real history exists — a pending
-  // operator with zero submissions gets an honest empty grid, not noise.
-  const simulate = history.length > 0;
-  const cells: { day: number; bg: string | null }[] = [];
-  for (let k = 0; k < 154; k++) {
-    const day = startDay + k;
-    if (day > anchor || day < acctStart) { cells.push({ day, bg: null }); continue; }
-    const recency = (day - Math.max(acctStart, startDay)) / Math.max(1, anchor - Math.max(acctStart, startDay));
-    const y = histMap.get(day);
-    let bg: string | null = null;
-    if (y != null && y >= 0 && baseline) {
-      if (peak && y >= peak) bg = "var(--pv2-orange)";
-      else if (y < baseline * 0.9) bg = "rgb(255 0 212 / 0.55)";
-      else if (y <= baseline * 1.1) bg = "rgb(255 230 0 / 0.55)";
-      else bg = "rgb(var(--gold) / 0.75)";
-    } else if (y === -1) {
-      bg = "rgb(var(--gold) / 0.35)";
-    } else if (simulate) {
-      const v = rng() * 0.6 + recency * 0.4;
-      if (v >= 0.15) {
-        const t = rng(), lvl = rng();
-        const al = lvl < 0.2 ? "0.15" : lvl < 0.4 ? "0.35" : lvl < 0.6 ? "0.55" : lvl < 0.8 ? "0.75" : null;
-        if (t < 0.15) bg = `rgb(255 0 212 / ${lvl < 0.25 ? "0.15" : lvl < 0.5 ? "0.35" : lvl < 0.75 ? "0.55" : "0.75"})`;
-        else if (t < 0.65) bg = al ? `rgb(255 230 0 / ${al})` : "var(--pv2-yellow)";
-        else if (t < 0.9) bg = al ? `rgb(var(--gold) / ${al})` : "var(--pv2-signal)";
-        else bg = lvl < 0.8 ? "rgb(255 154 60 / 0.55)" : "var(--pv2-orange)";
-      }
-    }
-    cells.push({ day, bg });
-  }
-  const active = cells.filter((x) => x.bg);
-  let longest = 0, run = 0;
-  for (const x of cells) { run = x.bg ? run + 1 : 0; longest = Math.max(longest, run); }
-  let streak = 0;
-  for (let k = cells.length - 1; k >= 0; k--) { if (cells[k].day > anchor) continue; if (!cells[k].bg) break; streak++; }
-  const monthSet: string[] = [];
-  for (let w = 0; w < 22; w++) {
-    const d = new Date((startDay + w * 7) * dayMs);
-    const ab = d.toUTCString().slice(8, 11).toUpperCase();
-    if (monthSet[monthSet.length - 1] !== ab) monthSet.push(ab);
-  }
-  const avgY = yields.length ? yields.reduce((a, b) => a + b, 0) / yields.length : null;
-
-  const medals = [
-    { n: trophyCounts?.gold ?? 0, color: "var(--pv2-medal)", rank: "1" },
-    { n: trophyCounts?.silver ?? 0, color: "var(--pv2-silver)", rank: "2" },
-    { n: trophyCounts?.bronze ?? 0, color: "var(--pv2-bronze)", rank: "3" },
-  ];
-
   return (
     <div className={`pv2 ${lbwFontVars}`}>
       <style>{CSS}</style>
@@ -368,6 +274,7 @@ export function OverviewView({
             archetype={archetype}
             trophyCounts={trophyCounts}
             fieldAvg={fieldAvg}
+            cohort={wfCohort}
           />
         </div>
         <FlapBoard
@@ -415,7 +322,9 @@ export function OverviewView({
                 </span>
               )}
               {archetype && <span className="pv2-tag pv2-tag--arch">{archetype.name}</span>}
-              {wf && <span className="pv2-tag pv2-tag--wf">{wf === "hitl" ? "HITL" : wf}</span>}
+              {ranked && !pending && (
+                <span className="pv2-tag pv2-tag--wf"><WorkflowMark mode={wf} /></span>
+              )}
               <span className="pv2-tag">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
                 {operator.primary_domain}
@@ -441,7 +350,11 @@ export function OverviewView({
           </div>
 
           <div className="pv2-hrank">
-            {pending || !ranked ? (
+            {/* onField = the operator's own row inside the combined-field
+                boardRows — the verified rank context (item 13). An operator
+                with a cascade but no board row (unclaimed/not yieldable)
+                shows UNRANKED rather than a claimedRankMap "#0". */}
+            {pending || !ownRow ? (
               <span style={{ fontFamily: "var(--pv2-display)", fontSize: 18, fontWeight: 700, color: "rgb(var(--text-muted))", letterSpacing: "0.04em" }}>UNRANKED</span>
             ) : (
               <>
@@ -597,128 +510,15 @@ export function OverviewView({
         </div>
       </section>
 
-      {/* 5 ─ ACTIVITY HEATMAP */}
-      <section className="pv2-mod" style={{ paddingBottom: 16 }}>
-        <div className="pv2-mhead">
-          <div>
-            <div className="pv2-mtitle">SUBMISSION ACTIVITY</div>
-            <div className="pv2-msub">COLOR = YIELD VS OPERATOR BASELINE</div>
-          </div>
-          <div className="pv2-mhmeta">
-            {operator.account_age_days} DAYS · {num(operator.total_messages_lifetime)} MESSAGES
-          </div>
-        </div>
-        <div className="pv2-hm">
-          {monthSet.map((m, i) => <span key={i}>{m}</span>)}
-        </div>
-        <div className="pv2-hg">
-          {Array.from({ length: 22 }, (_, w) => (
-            <div key={w} className="pv2-hc">
-              {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
-                <div key={d} className="pv2-hcell" style={cell.bg ? { background: cell.bg } : undefined} />
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="pv2-hstat">
-          {([
-            ["ACTIVE DAYS", active.length],
-            ["LONGEST STREAK", longest],
-            ["CURRENT STREAK", streak],
-            ["AVG Υ", avgY != null ? avgY.toFixed(1) : "—"],
-            ["PEAK Υ", peak != null ? compact(peak) : "—"],
-          ] as const).map(([lbl, v]) => (
-            <div key={lbl} className="pv2-rstat">
-              <span className="pv2-rstat-v">{v}</span>
-              <span className="pv2-rstat-l">{lbl}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, paddingTop: 8, borderTop: "1px solid rgb(var(--bg-border))", flexWrap: "wrap", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {([
-              ["rgb(255 0 212 / 0.55)", "BELOW"],
-              ["rgb(255 230 0 / 0.55)", "BASELINE"],
-              ["rgb(var(--gold) / 0.55)", "ABOVE"],
-              ["rgb(255 154 60 / 0.55)", "RECORD"],
-            ] as const).map(([bg, lbl]) => (
-              <span key={lbl} className="pv2-htype">
-                <span className="pv2-hsw" style={{ background: bg }} />
-                {lbl}
-              </span>
-            ))}
-          </div>
-          <span className="pv2-msub">DAILY YIELD VS BASELINE</span>
-        </div>
-      </section>
-
-      {/* 6 ─ RECORDS & HONORS */}
-      <section className="pv2-mod">
-        <div className="pv2-mhead">
-          <div>
-            <div className="pv2-mtitle">RECORDS &amp; HONORS</div>
-            <div className="pv2-msub">MEDALS · BADGES · HALL RECORDS</div>
-          </div>
-          <div className="pv2-mhmeta" style={{ fontSize: 11, color: "rgb(var(--text-muted))" }}>
-            WATCHED BY {watchCount}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          {medals.map((m, i) => (
-            <span key={i} style={{ display: "contents" }}>
-              {i > 0 && <span className="pv2-sep">·</span>}
-              <span style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--pv2-mono)", fontSize: 19, fontWeight: 700, fontVariantNumeric: "tabular-nums", opacity: m.n === 0 ? 0.3 : 1 }}>
-                <MedalSvg color={m.color} rank={m.rank} size={30} />
-                <span style={{ color: m.color }}>{m.n}</span>
-              </span>
-            </span>
-          ))}
-          {operator.verification_status !== "unverified" && (
-            <>
-              <span className="pv2-sep">·</span>
-              <span className="pv2-badge pv2-badge--v">
-                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1.5 5.5L3.8 7.8L8.5 2.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                VERIFIED
-              </span>
-            </>
-          )}
-          {operator.current_supporter_tier !== "free" && (
-            <span className="pv2-badge pv2-badge--s">
-              <svg width="9" height="9" viewBox="0 0 9 9"><polygon points="4.5,0.5 8.5,4.5 4.5,8.5 0.5,4.5" fill="currentColor" /></svg>
-              SUPPORTER
-            </span>
-          )}
-        </div>
-        {records.length > 0 && (
-          <>
-            <div className="pv2-hlabel">
-              <span>HALL RECORDS</span>
-              {records.length > 3 && (
-                <Link href="/hall" style={{ fontFamily: "var(--pv2-mono)", fontSize: 9, color: "rgb(var(--gold))", letterSpacing: "0.06em" }}>
-                  VIEW ALL {records.length} →
-                </Link>
-              )}
-            </div>
-            <div className="pv2-hgrid">
-              {records.slice(0, 3).map((r) => (
-                <div key={r.reward_id + r.title} className="pv2-hcard">
-                  <MedalSvg color="var(--pv2-medal)" rank="1" size={26} />
-                  <div className="pv2-hinfo">
-                    <div className="pv2-hname">
-                      {r.title} <span style={{ color: "var(--pv2-medal)" }}>· CURRENT RECORD</span>
-                    </div>
-                    <div className="pv2-hval">{r.value}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <div className="pv2-rstats">
+      {/* 5 ─ FIELD CONTEXT STRIP (activity + records live in the right rail
+          since 2026-10-12 — owner Phase 3) */}
+      <section className="pv2-mod" style={{ padding: "12px 20px" }}>
+        <div className="pv2-rstats" style={{ marginTop: 0, paddingTop: 0, borderTop: "none" }}>
           {([
             ["OP RATIO", c && !pending ? c.opRatio : "—"],
             ["SCALE V", c && !pending ? c.scaleV.toFixed(2) : "—"],
             ["COST", c && !pending ? `$${c.costPerMillion.toFixed(2)}/M` : "—"],
+            ["WATCHED BY", String(watchCount)],
           ] as const).map(([lbl, v]) => (
             <div key={lbl} className="pv2-rstat">
               <span className="pv2-rstat-v">{v}</span>
