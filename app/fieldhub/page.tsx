@@ -69,8 +69,11 @@ export default async function FieldHubPage() {
           title="Field Hub"
           subtitle={
             <>
-              The academic research hub for SigRank. This is where we
-              document field analysis and publish dataset findings.
+              The academic research hub for SigRank: field analysis and dataset
+              findings on AI operator efficiency, volume versus yield, and
+              outlier detection. Each entry is a primary source. Field Analysis
+              presents the full visual study; State of the Index provides the
+              underlying dataset, DOI, citation, and downloadable files.
             </>
           }
         />
@@ -123,19 +126,6 @@ export default async function FieldHubPage() {
         ]}
       />
 
-      {/* ── Blurb ───────────────────────────────────────────────────── */}
-      <section>
-        <p className="mx-auto max-w-2xl text-center text-base leading-relaxed text-text-primary">
-          This section is where we document academic field analysis of the
-          SigRank Index: the distribution of AI operator efficiency, the
-          volume-vs-yield thesis, outlier detection, and the dataset that
-          underpins every finding published on this site. Each entry below is
-          a primary source. The Field Analysis is the full visual article, and
-          the State of the Index is the dataset landing page with DOI,
-          citation, and downloadable files.
-        </p>
-      </section>
-
       {/* Shared editorial index format — same row structure as Articles and Blog. */}
       <div className="blog-index" id="ws-page-field-index">
         <Link id="ws-page-field-analysis" href="/field" className="blog-feature group">
@@ -153,7 +143,7 @@ export default async function FieldHubPage() {
         <div className="blog-list">
           <Link id="ws-page-state-index" href="/research" className="blog-row group">
             <div className="blog-row-main">
-              <span className="blog-kicker">📊 SigRank Index</span>
+              <span className="blog-kicker">SigRank Index</span>
               <h2>State of the Index</h2>
               <p>
                 The primary anonymized seed dataset. 1,628 operators across 17
