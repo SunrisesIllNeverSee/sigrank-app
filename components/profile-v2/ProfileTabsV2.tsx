@@ -122,6 +122,28 @@ export function ProfileTabsV2({
     panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // APG tablist: roving tabindex + arrow/Home/End navigation with automatic
+  // activation. Locked (disabled) affordances are skipped entirely.
+  const tabRefs = useRef<Map<TabKey, HTMLButtonElement>>(new Map());
+  const onTabKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    const n = selectableTabs.length;
+    const next =
+      e.key === "ArrowRight"
+        ? (idx + 1) % n
+        : e.key === "ArrowLeft"
+          ? (idx - 1 + n) % n
+          : e.key === "Home"
+            ? 0
+            : e.key === "End"
+              ? n - 1
+              : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    const key = selectableTabs[next].key;
+    select(key);
+    tabRefs.current.get(key)?.focus();
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div
@@ -149,13 +171,22 @@ export function ProfileTabsV2({
               </button>
             );
           }
+          const order = selectableTabs.indexOf(t);
           return (
             <button
               key={t.key}
+              ref={(el) => {
+                if (el) tabRefs.current.set(t.key, el);
+                else tabRefs.current.delete(t.key);
+              }}
+              id={`pv2-tab-${t.key}`}
               role="tab"
               aria-selected={active}
+              aria-controls="pv2-tabpanel"
+              tabIndex={active ? 0 : -1}
               type="button"
               onClick={() => select(t.key)}
+              onKeyDown={(e) => onTabKeyDown(e, order)}
               className={`relative -mb-px px-4 py-2 font-mono text-xs uppercase tracking-[0.06em] transition-colors ${
                 active
                   ? "border-b-2 border-gold text-text-primary"
@@ -168,7 +199,13 @@ export function ProfileTabsV2({
         })}
       </div>
 
-      <div ref={panelRef} role="tabpanel" className="scroll-mt-4">
+      <div
+        ref={panelRef}
+        id="pv2-tabpanel"
+        role="tabpanel"
+        aria-labelledby={`pv2-tab-${activeTab}`}
+        className="scroll-mt-4"
+      >
         {activeTab === "overview" && overview}
         {activeTab === "stats" && stats}
         {activeTab === "analysis" && analysis}

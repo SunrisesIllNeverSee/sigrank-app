@@ -1,9 +1,10 @@
 /**
  * app/user/[codename]/ProfileBody.tsx — streaming body for the operator profile.
  *
- * V2 (2026-10-10): rebuilt to the approved profile-mock design. Seven tab
- * panels (Overview / Stats / Analysis / Report / Lab / Submissions / Social)
- * rendered by dedicated profile-v2 components. The 5 parallel fetches are
+ * V2 (2026-10-10): rebuilt to the approved profile-mock design. Eight tab
+ * panels (Overview / Stats / Analysis / Report / Lab / Submissions / Social
+ * / Badges) rendered by dedicated profile-v2 components. The 7 parallel
+ * fetches are
  * unchanged — this component still streams inside the Suspense boundary in
  * page.tsx so the identity header renders on the critical path.
  *
@@ -23,6 +24,7 @@ import {
   getOperatorHistory,
   getOperatorSubmissions,
   getOperatorSnapshotRecords,
+  getOperatorWatchCount,
   getOperatorReport,
   getLeaderboard,
   getHallOfSignal,
@@ -62,7 +64,7 @@ export async function ProfileBody({
   const pending = row.pending ?? false;
   const codename = operator.codename;
 
-  // 5 parallel fetches — all independent after getOperator.
+  // 7 parallel fetches — all independent after getOperator.
   // getLeaderboard is the heaviest (~2.5MB, memo-cached 3600s).
   // getHallOfSignal is unstable_cache'd at 300s. The rest are operator-scoped.
   const [
@@ -72,6 +74,7 @@ export async function ProfileBody({
     operatorReport,
     boardRows,
     hallRecords,
+    watchCount,
   ] = await Promise.all([
     getOperatorHistory(codename),
     getOperatorSubmissions(codename),
@@ -79,6 +82,7 @@ export async function ProfileBody({
     getOperatorReport(operator.operator_id),
     getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
     getHallOfSignal(),
+    getOperatorWatchCount(codename),
   ]);
 
   // Auth state resolved client-side so this stays ISR-cached.
@@ -112,7 +116,12 @@ export async function ProfileBody({
       : null;
 
   const trophyCounts = ranked
-    ? await computeTrophyCounts(codename, displayName ?? undefined, boardRows)
+    ? await computeTrophyCounts(
+        codename,
+        displayName ?? undefined,
+        boardRows,
+        hallRecords,
+      )
     : null;
   const totalTokens = ranked
     ? telemetry.fresh_input + telemetry.output + telemetry.cache_read + telemetry.cache_create
@@ -120,10 +129,6 @@ export async function ProfileBody({
   const tierProgress = ranked
     ? computeTierProgress(snapshot.class_tier, totalTokens)
     : null;
-
-  // Watch count — read from the watch API shape; placeholder 0 until the
-  // profile-level watch fetch lands. The board's inspector already has this.
-  const watchCount = 0;
 
   // ── Pending state panels ──────────────────────────────────────────────────
   const pendingPanel = (
@@ -213,7 +218,14 @@ export async function ProfileBody({
             ) : undefined
           }
           report={operatorReport ? (
-            <ReportTabGate report={operatorReport} archetype={archetype} />
+            // Only a public report is serialized into the flight payload —
+            // a private report never leaves the server; the owner fetches it
+            // through the authenticated route after the auth gate resolves.
+            <ReportTabGate
+              report={operatorReport.report_visible ? operatorReport : null}
+              codename={operator.codename}
+              archetype={archetype}
+            />
           ) : undefined}
           lab={
             ranked && c ? (
@@ -242,6 +254,7 @@ export async function ProfileBody({
               isOwner={isOwner}
               records={operatorRecords}
               trophyCounts={trophyCounts}
+              scoredSnapshots={snapshotRecords.length}
             />
           }
           badges={

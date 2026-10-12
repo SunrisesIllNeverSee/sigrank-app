@@ -35,6 +35,7 @@ export {
   getOperatorSubmissions,
   getOperatorHistory,
   getOperatorSnapshotRecords,
+  getOperatorWatchCount,
   getMetricLeaders,
   getHallOfSignal,
   getHomepageStats,

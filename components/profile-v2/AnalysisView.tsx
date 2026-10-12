@@ -8,10 +8,10 @@
  *                              operator highlighted with ring + label.
  *   2. ARCHETYPE FINGERPRINT — 3-axis triangle radar (leverage / velocity /
  *                              construction), operator polygon vs archetype template.
- *   3. VS FIELD              — grouped bars per cascade metric vs field median.
- *                              MEDIAN/TOP switch is a pure-CSS checkbox hack so the
+ *   3. VS FIELD              — grouped bars per cascade metric vs field average.
+ *                              AVG/TOP switch is a pure-CSS checkbox hack so the
  *                              component stays a server component.
- *   4. DELTA BREAKDOWN       — diverging log-normalized bars, % above/below median.
+ *   4. DELTA BREAKDOWN       — diverging log-normalized bars, % above/below average.
  *   5. HALL RECORDS          — all-time record trophy cards from the records prop.
  */
 
@@ -593,19 +593,21 @@ function OcmSignature({
 
   const c = snapshot.cascade;
   const opTotal = total(telemetry);
-  const opFromRows = pts.find((p) => p.isOp) ?? null;
+  // The operator's position and its membership label both derive from the
+  // profile telemetry/cascade — never the board row's differently-aged
+  // snapshot — so the dot and the IN/OUT label can never disagree.
+  const opResolvedMode = pts.find((p) => p.isOp)?.mode ?? null;
   const op: OcmPoint | null =
-    opFromRows ??
-    (ranked && c && !c.nonCompounding && opTotal > 0
+    ranked && c && !c.nonCompounding && opTotal > 0
       ? {
           codename: operator.codename,
           label: operator.display_name ?? operator.codename,
           share: telemetry.fresh_input / opTotal,
           yield_: c.yield_,
-          mode: null,
+          mode: opResolvedMode,
           isOp: true,
         }
-      : null);
+      : null;
 
   const L = 56;
   const R = 812;
@@ -1191,7 +1193,7 @@ function VsField({
 
   const rows = VS_METRICS.map((m) => {
     const op = opVal(m.key);
-    const med = fieldAvg[m.key];
+    const avg = fieldAvg[m.key];
     if (op == null) return null;
     // Sort-equivalent value for the operator's own metric — non-compounding
     // yield/leverage sorts below the compounding field, matching sortValue().
@@ -1217,7 +1219,7 @@ function VsField({
       ? (bestRow.operator.display_name ?? bestRow.operator.codename)
       : null;
     const topIsSelf = bestRow?.operator.codename === operator.codename;
-    return { m, op, med, rank, pct, best, topName, topIsSelf };
+    return { m, op, avg, rank, pct, best, topName, topIsSelf };
   }).filter((r): r is NonNullable<typeof r> => r != null);
 
   if (!rows.length) {
@@ -1241,13 +1243,13 @@ function VsField({
             id="vs-field-mode"
             type="checkbox"
             className="vs-cb sr-only"
-            aria-label="Toggle comparison reference between field median and top operator"
+            aria-label="Toggle comparison reference between field average and top operator"
           />
           <label
             htmlFor="vs-field-mode"
             className="vs-lab-med cursor-pointer select-none rounded border border-gold/50 bg-gold/10 px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.1em] text-gold transition-colors"
           >
-            vs median
+            vs field avg
           </label>
           <label
             htmlFor="vs-field-mode"
@@ -1259,8 +1261,8 @@ function VsField({
       }
     >
       <div className="flex flex-col">
-        {rows.map(({ m, op, med, rank, pct, best, topName, topIsSelf }) => {
-          const medDenom = Math.max(op, med ?? 0, 1e-9);
+        {rows.map(({ m, op, avg, rank, pct, best, topName, topIsSelf }) => {
+          const avgDenom = Math.max(op, avg ?? 0, 1e-9);
           const topDenom = Math.max(op, best > 0 ? best : op, 1e-9);
           const pctLabel = pct >= 99.95 ? "100" : pct.toFixed(1);
           const pctColor =
@@ -1286,7 +1288,7 @@ function VsField({
                     <i
                       className="block h-full rounded-sm"
                       style={{
-                        width: `${Math.max((op / medDenom) * 100, 1.5)}%`,
+                        width: `${Math.max((op / avgDenom) * 100, 1.5)}%`,
                         background: m.color,
                       }}
                     />
@@ -1295,20 +1297,20 @@ function VsField({
                     {m.fmt(op)}
                   </span>
                 </span>
-                {/* median ref bar (visible in MEDIAN mode) */}
+                {/* field-average ref bar (visible in FIELD AVG mode) */}
                 <span className="vs-med flex items-center gap-2">
                   <span className="relative h-[5px] flex-1">
                     <i
                       className="block h-full rounded-sm"
                       style={{
-                        width: `${med != null ? Math.max((med / medDenom) * 100, 1.5) : 0}%`,
+                        width: `${avg != null ? Math.max((avg / avgDenom) * 100, 1.5) : 0}%`,
                         background: MUTED,
                         opacity: 0.55,
                       }}
                     />
                   </span>
                   <span className="w-[88px] shrink-0 font-mono text-[8px] tabular-nums text-text-muted sm:w-[108px]">
-                    {med != null ? `${m.fmt(med)} MED` : "— MED"}
+                    {avg != null ? `${m.fmt(avg)} AVG` : "— AVG"}
                   </span>
                 </span>
                 {/* top ref bar (visible in TOP mode) */}
@@ -1344,7 +1346,7 @@ function VsField({
       </div>
 
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-bg-border pt-2.5 font-mono text-[8px] uppercase tracking-[0.06em] text-text-muted">
-        <span className="vs-med">REF = FIELD MEDIAN · N={n}</span>
+        <span className="vs-med">REF = FIELD AVG · N={n}</span>
         <span className="vs-top hidden">REF = #1 OPERATOR PER METRIC · SELF WHERE HELD</span>
         <span className="opacity-70">
           RANK COLOR:{" "}
@@ -1369,7 +1371,7 @@ function DeltaBreakdown({
   const c = snapshot.cascade;
   if (!c) {
     return (
-      <Module title="Delta Breakdown" subtitle="Above / below field median" tag={<Tag>LOG10 SCALE</Tag>}>
+      <Module title="Delta Breakdown" subtitle="Above / below field average" tag={<Tag>LOG10 SCALE</Tag>}>
         <PendingNote>
           Delta breakdown unlocks after the first verified cascade submission.
         </PendingNote>
@@ -1378,9 +1380,9 @@ function DeltaBreakdown({
   }
 
   const rows: { label: string; delta: number }[] = [];
-  const push = (label: string, op: number | null, med: number | null) => {
-    if (op == null || med == null || med <= 0) return;
-    rows.push({ label, delta: ((op - med) / med) * 100 });
+  const push = (label: string, op: number | null, avg: number | null) => {
+    if (op == null || avg == null || avg <= 0) return;
+    rows.push({ label, delta: ((op - avg) / avg) * 100 });
   };
 
   push("Yield", c.yield_, fieldAvg.yield_);
@@ -1393,16 +1395,16 @@ function DeltaBreakdown({
 
   // Op Ratio = leverage × velocity product vs the field's mean ratio product.
   const opProduct = c.leverage * c.velocity;
-  const medProduct =
+  const avgProduct =
     fieldAvg.crRatio != null && fieldAvg.outRatio != null
       ? fieldAvg.crRatio * fieldAvg.outRatio
       : null;
-  push("Op Ratio", opProduct, medProduct);
+  push("Op Ratio", opProduct, avgProduct);
 
   if (!rows.length) {
     return (
-      <Module title="Delta Breakdown" subtitle="Above / below field median" tag={<Tag>LOG10 SCALE</Tag>}>
-        <PendingNote>No field medians available for comparison.</PendingNote>
+      <Module title="Delta Breakdown" subtitle="Above / below field average" tag={<Tag>LOG10 SCALE</Tag>}>
+        <PendingNote>No field averages available for comparison.</PendingNote>
       </Module>
     );
   }
@@ -1422,7 +1424,7 @@ function DeltaBreakdown({
   return (
     <Module
       title="Delta Breakdown"
-      subtitle="Above / below field median"
+      subtitle="Above / below field average"
       tag={<Tag>LOG10 SCALE</Tag>}
     >
       <div className="flex flex-col">
@@ -1467,12 +1469,12 @@ function DeltaBreakdown({
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-bg-border pt-2.5 font-mono text-[8px] uppercase tracking-[0.06em] text-text-muted">
         <span>
           <i className="mb-px mr-1.5 inline-block h-2 w-2.5 rounded-[1px] align-middle" style={{ background: UP }} />
-          ABOVE MEDIAN{"  "}·{"  "}
+          ABOVE AVG{"  "}·{"  "}
           <i className="mb-px mr-1.5 inline-block h-2 w-2.5 rounded-[1px] align-middle" style={{ background: DOWN }} />
           BELOW
         </span>
         <span className="opacity-70">
-          {above}/{rows.length} METRICS ABOVE FIELD MEDIAN
+          {above}/{rows.length} METRICS ABOVE FIELD AVG
         </span>
       </div>
     </Module>
