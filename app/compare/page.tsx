@@ -366,12 +366,22 @@ export default async function ComparePage({
       <WorkspaceShell
         active="compare"
         title="COMPARE"
+        titleControls={
+          <div className="cmp-title-selectors">
+            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
+          </div>
+        }
         leftTitle="COMPARE"
         left={
           <>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>OPERATOR A</div>
               {opMini(rowA, "a")}
+              <CompareAgainstMe />
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
+              {opMini(rowB, "b")}
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>METRIC CONTEXT</div>
@@ -388,10 +398,6 @@ export default async function ComparePage({
         rightTitle="CONTEXT"
         right={
           <>
-            <div className="mod">
-              <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
-              {opMini(rowB, "b")}
-            </div>
             <div className="mod cmp-sidebar-matchup">
               <div className="mini-h"><span className="sq"></span>MATCHUP</div>
               <div className="ws-kv">
@@ -419,6 +425,7 @@ export default async function ComparePage({
                 </ul>
               )}
             </div>
+            <div className="mod cmp-sidebar-challenges">{ThrowDownLine}</div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SHARE</div>
               <div className="ws-share">
@@ -459,17 +466,6 @@ export default async function ComparePage({
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
         <div className="ws-cmp">
-          <div className="ws-cmp-sel">
-            <CompareSelectors
-              options={selectorOptions}
-              aCode={aCode}
-              bCode={bCode}
-            />
-            <div style={{ marginTop: 10 }}>
-              {/* "Compare yourself" — client-side auth gate */}
-              <CompareAgainstMe />
-            </div>
-          </div>
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors />
           </div>
@@ -479,7 +475,6 @@ export default async function ComparePage({
           <div className="ws-cmp-ledger">
             <CompareLedger a={rowA} b={rowB} workspace />
           </div>
-          <div className="ws-cmp-bar">{ThrowDownLine}</div>
           <div className="ws-cmp-hist">
             <div className="rounded-xl border border-bg-border bg-bg-surface p-4">
               <CompareHistoryChart

@@ -1,5 +1,5 @@
 # SignalAF integrated staging manifest
-Updated October 11, 2026. This is the current integration receipt. Historical STATUS files and manifest.json remain unchanged evidence.
+Updated October 12, 2026. This is the current integration receipt. Historical STATUS files and manifest.json remain unchanged evidence.
 
 ## One workspace and one preview
 - Workspace: /Users/dericmchenry/Developer/active/SigRank-repos/signalaf-integration-a315435
@@ -95,26 +95,24 @@ Root rendering reuses the existing all-time board page and its cache/data logic.
 - [ ] Verify authenticated owner/private profile behavior and remaining interactions.
 - [ ] Resolve inherited repository hygiene failure in a separate reviewed commit.
 
-## Compare unified fixed-stage checkpoint — October 11, 2026
+## Compare marked arrangement — October 12, 2026
 
-The implemented :3210 Compare is the content reference. The original :3222 preview supplied the preferred operator/context sidebars. Layout-editor artifacts are historical evidence, not the current page reference.
+The owner's eight browser annotations specify the current arrangement. All comparison content remains visible together.
 
+- Operator A selector is at the left end of the title bar; Operator B is at the right end. The centered Compare h1 is retained. Search/select behavior is unchanged.
+- Left sidebar: Operator A, Operator B immediately beneath it, then metric context. Compare Against Me remains alongside the Operator A summary when applicable.
+- Right sidebar: matchup context, Throw-Downs/challenge controls, both share tools, then Related links.
+- Stage: quick comparison report on the left, paired Raw/Metric radars on the right, full parallel ledger beneath, history at the bottom. There is no separate stage selector or challenge row.
+- No metric values, winner calculations, canonical IDs, comparison facts or history were removed.
+- Shared WorkspaceShell gains an optional titleControls slot. Only Compare supplies it. Existing pages retain their current title rendering; global shell CSS was not edited.
+- Browser fit passed at the owner's 1229×739 viewport and at 1280×720, including xoxo selected through title search. Document dimensions match the viewport, both sidebar scroll/client heights match, all 16 ledger rows are present, and final matchup facts fit their panels.
+- Node 22 TypeScript, scoped ESLint, canonical 11/11, whitespace check and production build (286 routes) passed. Captured Compare error logs are empty for these interactions.
 - Preview: http://127.0.0.1:3230/compare?a=signal-92b4f9f485&b=the-field.
-- Everything is visible together: operator selectors, both shape radars, both matchup identities and all facts, score, six raw rows, eight metrics, throughput, total, full history and challenge strip.
-- The ledger uses two parallel eight-row groups: Raw/Flow/Total beside Metrics. Values, canonical IDs, winner calculations and diverging bars reuse the existing ledger implementation.
-- The previous Matchup/Ledger radio controls are removed. No comparison section is hidden behind a view switch.
-- Original sidebar modules are retained at initial widths 180 and 198 pixels. Compact spacing and share controls keep both share tools and all Related links visible. Throughput wraps instead of truncating.
-- Browser measurements passed at 1280×720, 1366×768, 1440×900 and 1600×1000: document dimensions match the viewport; both sidebars have clientHeight equal to scrollHeight; all stage panels, ledger rows and final matchup facts fit their containers.
-- Operator search/selection to xoxo (Karthikeyan KK) and back to MO§ES™ worked. Share-card Preview opens and closes. Captured browser error logs are empty for these checks.
-- TypeScript, scoped ESLint, canonical 11/11, diff whitespace check and Node 22 production build (286 routes) passed.
-- CSS is Compare-scoped. No shared shell, global board CSS, Hall/profile/editorial source, scoring, database logic, lockfile or deployment configuration was edited in this pass.
-- Narrow screens below the desktop layout width retain horizontal access rather than clipping data. Phone-size redesign and authenticated Compare Against Me verification remain separate checks; they are not claimed complete here.
-- Evidence: calling chat outputs/compare-unified-1600.png and compare-unified-browser-checks.json. The previous fixed-view receipt describes a superseded attempt and is preserved as history.
-- Work is local only, not merged, pushed or deployed. Owner visual acceptance remains open.
-- The newer shared profile/handoff changes noted in the previous preservation audit remain outside this Compare work; they were not imported or overwritten.
-- [ ] Owner visual acceptance of the unified desktop composition.
-- [ ] Reconcile main and remaining site-wide gates before any release.
-- [ ] Merge/deploy only when explicitly authorized.
+- Evidence: calling chat outputs/compare-marked-layout-1229.png and compare-marked-layout-checks.json. Earlier layout receipts are retained as history.
+- Scope: integration worktree only. Shared dirty source, Hall/profile/editorial implementations, ranking/database logic, lockfiles and deployment configuration remain untouched by this pass.
+- Limits: owner visual acceptance and authenticated Compare Against Me verification remain open. Narrow screens retain horizontal access; phone-size composition is separate.
+- [ ] Owner visual acceptance of this marked arrangement.
+- [ ] Reconcile remaining site-wide release gates before any merge/deployment.
 
 ## Next coordinator
 Keep one integration lead and this worktree. A new Devin session is not needed to assemble the pages: that assembly now exists.
