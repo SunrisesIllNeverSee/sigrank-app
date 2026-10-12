@@ -1905,6 +1905,22 @@ export function LiveBoardWorkspace({
                   {railBody("hall")}
                 </div>
               </div>
+              <nav className="ws-rail-bottom-nav" aria-label="Page navigation">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.history.length > 1) router.back();
+                    else router.push("/");
+                  }}
+                  aria-label="Back to previous page"
+                  title="Back to previous page"
+                >
+                  <span aria-hidden="true">←</span> BACK
+                </button>
+                <Link href="/" aria-label="Home — live leaderboard" title="Home — live leaderboard">
+                  <span aria-hidden="true">⌂</span> HOME
+                </Link>
+              </nav>
             </aside>
 
             <div className="stagecol">

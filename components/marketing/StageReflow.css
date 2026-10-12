@@ -1,0 +1,60 @@
+/* Four Degrees is shared by SigRank and Wiki. Switch by actual component width,
+   not viewport width; both render inside resizable workspace sidebars. */
+.four-degrees-responsive,
+.four-degrees-telemetry { width:100%; min-width:0; container-type:inline-size; }
+.four-degrees-desktop,
+.four-degrees-telemetry-wide { max-width:100%; min-width:0; }
+.four-degrees-responsive table { font-size:clamp(12px,1.1vw,16px); }
+.four-degrees-responsive table :is(th,td) { padding:10px 7px; }
+.four-degrees-responsive table th { font-size:clamp(10px,1vw,13px); }
+.four-degrees-responsive table td { font-size:clamp(12px,1.2vw,17px); }
+.four-degrees-compact,
+.four-degrees-telemetry-cards { display:none; }
+@container (max-width:720px) {
+  .four-degrees-desktop, .four-degrees-telemetry-wide { display:none; }
+  .four-degrees-compact, .four-degrees-telemetry-cards {
+    display:grid; grid-template-columns:minmax(0,1fr); gap:12px; width:100%;
+  }
+}
+.four-degrees-metric {
+  min-width:0; padding:12px; border:1px solid var(--bg-border, #263529);
+  border-radius:8px; background:var(--bg-surface, #101710);
+}
+.four-degrees-metric h3 {
+  margin:0 0 9px; font:700 13px/1.4 var(--font-mono,monospace);
+  color:var(--tx, #e3e9e2); overflow-wrap:anywhere;
+}
+.four-degrees-metric dl {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0;
+}
+.four-degrees-metric dl > div { min-width:0; padding-top:6px; border-top:1px solid rgba(130,160,130,.15); }
+.four-degrees-metric dt {
+  font:500 10px/1.4 var(--font-mono,monospace); color:#a5b6a9;
+  overflow-wrap:anywhere; margin-bottom:4px;
+}
+.four-degrees-metric dd {
+  margin:0; font:700 clamp(12px,1.6vw,16px)/1.4 var(--font-mono,monospace);
+  color:#deeae0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums;
+}
+.four-degrees-metric .four-degrees-winner dd { color:#eec75d; }
+.four-degrees-telemetry-title {
+  margin:0; font:500 11px/1.5 var(--font-mono,monospace); color:#a5b6a9;
+}
+@media (max-width:520px) {
+  .four-degrees-metric dl { grid-template-columns:minmax(0,1fr); }
+}
+/* One, two, or three full-size instruction cards based on Stage width.
+   Never select columns merely because the whole browser is wide. */
+.sig-step-grid {
+  display:grid; width:100%; min-width:0;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,275px),1fr));
+  gap:18px;
+}
+.sig-step-grid > * { min-width:0; }
+.sig-step-grid .sig-step-card { min-width:0; }
+.lbw-root .sigrank-stage-reflow { min-width:0; }
+.lbw-root .sigrank-stage-reflow > section { min-width:0; }
+.lbw-root .sigrank-stage-reflow :is(.box-glow, .sig-step-grid) { min-width:0; }
+.lbw-root .sigrank-stage-reflow .box-glow { padding:clamp(12px,2vw,24px); }
+.lbw-root .sigrank-stage-reflow p { overflow-wrap:anywhere; }
+.lbw-root .sigrank-stage-reflow .my-16 { margin-block:clamp(24px,3vw,44px); }

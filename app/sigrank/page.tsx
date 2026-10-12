@@ -61,6 +61,7 @@ export default async function HomePage() {
   return (
     <WorkspaceShell
       active="home"
+      editorialStage
       title="SIGRANK"
       bareTitle
       hero={<div className="sigrank-column-hero"><Draft2Hero /></div>}
@@ -94,7 +95,7 @@ export default async function HomePage() {
       rightWidth={240}
       status={<>{operatorCount.toLocaleString()} OPERATORS · {formatTokens(homeStats.total_tokens_scored)} TOKENS · SIGNALAF × SIGRANK · MO§ES™</>}
     >
-    <div className="ws-doc ws-doc-wide flex flex-col gap-8">
+    <div className="ws-doc ws-doc-wide sigrank-stage-reflow flex flex-col gap-8">
       {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product).
           Single SoftwareApplication block on homepage — includes canonical @id, isBasedOn,
           about, mentions for entity disambiguation (merged from product()). */}

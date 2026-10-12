@@ -46,6 +46,7 @@ export function FieldWorkspaceFrame({
       editorialStage
       title={title}
       bareTitle
+      hero={hero}
       leftTitle="RESEARCH"
       topic="field"
       left={<FieldFamilyNav current={current} />}
@@ -56,7 +57,6 @@ export function FieldWorkspaceFrame({
       rightWidth={240}
       status={status ?? <>FIELD RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
     >
-      {hero && <div className="ws-hero">{hero}</div>}
       <div className={`ws-doc ws-doc-wide${center ? " ws-center" : ""}`}>{children}</div>
     </WorkspaceShell>
   );

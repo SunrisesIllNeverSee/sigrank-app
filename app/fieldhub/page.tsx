@@ -98,7 +98,7 @@ export default async function FieldHubPage() {
       }
       status={<>FIELD HUB · {meta.operators_included.toLocaleString()} ANALYZED OPERATORS · SIGNALAF × SIGRANK · MO§ES™</>}
     >
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 py-2">
+      <div className="ws-doc ws-article-list">
       <JsonLd
         data={[
           collectionPage,
@@ -136,40 +136,35 @@ export default async function FieldHubPage() {
         </p>
       </section>
 
-      {/* ── Field Analysis hero card ────────────────────────────────── */}
-      <Link id="ws-page-field-analysis" href="/field" className="ws-card group block transition-transform hover:scale-[1.01]">
-        <WaveHero
-          eyebrow="📊 Field Analysis"
-          title="Field Analysis"
-          subtitle={
-            <>
-              The true distribution of token efficiency.{" "}
-              {meta.operators_included.toLocaleString()} AI operators,
-              outliers separated. Volume ranked. Yield revealed.
-            </>
-          }
-          compact
-          headingLevel="h2"
-        />
-      </Link>
-
-      {/* ── State of the Index hero card ────────────────────────────── */}
-      <Link id="ws-page-state-index" href="/research" className="ws-card group block transition-transform hover:scale-[1.01]"
-        style={{ ["--gold" as string]: "var(--accent)", ["--accent" as string]: "var(--class-seeker)" }}>
-        <WaveHero
-          eyebrow="📊 SigRank Index"
-          title="State of the Index"
-          subtitle={
-            <>
-              The primary anonymized seed dataset. 1,628 operators across 17
-              platforms and 3,304 models. 9.07Q total tokens. Available on
-              Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
-            </>
-          }
-          compact
-          headingLevel="h2"
-        />
-      </Link>
+      {/* Shared editorial index format — same row structure as Articles and Blog. */}
+      <div className="blog-index" id="ws-page-field-index">
+        <div className="blog-list">
+          <Link id="ws-page-field-analysis" href="/field" className="blog-row group">
+            <div className="blog-row-main">
+              <span className="blog-kicker">📊 Field Analysis</span>
+              <h2>Field Analysis</h2>
+              <p>
+                The true distribution of token efficiency.{" "}
+                {meta.operators_included.toLocaleString()} AI operators,
+                outliers separated. Volume ranked. Yield revealed.
+              </p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+          <Link id="ws-page-state-index" href="/research" className="blog-row group">
+            <div className="blog-row-main">
+              <span className="blog-kicker">📊 SigRank Index</span>
+              <h2>State of the Index</h2>
+              <p>
+                The primary anonymized seed dataset. 1,628 operators across 17
+                platforms and 3,304 models. 9.07Q total tokens. Available on
+                Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
+              </p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+        </div>
+      </div>
       </div>
     </FieldWorkspaceFrame>
   );
