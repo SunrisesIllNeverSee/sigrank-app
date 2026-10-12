@@ -144,6 +144,15 @@
 .lbw-root .lside-banner .strip .l{font-size:9.5px}
 .lbw-root .lside-redock{margin-top:2px;font-size:9px;padding:8px 10px}
 
+/* Compact Back/Home icons under the icon-rail menu (every page). Sits at the
+   top of .sfoot so the pair lands at the bottom of the ever-present .srail —
+   pages without an .lside still get the affordance. */
+.lbw-root .ws-srail-nav{
+  display:flex;flex-direction:column;gap:6px;align-items:center;
+  margin-bottom:8px;
+}
+.lbw-root .ws-srail-nav > :is(a,button){text-decoration:none}
+
 /* Persistent Back/Home controls at the bottom of the left sidebar. */
 .lbw-root .lside > .ws-rail-bottom-nav{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;

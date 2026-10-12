@@ -311,6 +311,30 @@ export function WorkspaceShell({
             <GroupedRailNav active={active} iconSet={iconSet} />
           </nav>
           <div className="sfoot">
+            <nav className="ws-srail-nav" aria-label="Page navigation">
+              <button
+                type="button"
+                className="sbtn"
+                data-tip="BACK"
+                title="Back to previous page"
+                aria-label="Back to previous page"
+                onClick={() => {
+                  if (window.history.length > 1) router.back();
+                  else router.push("/");
+                }}
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+              <Link
+                className="sbtn"
+                href="/"
+                data-tip="HOME"
+                title="Home — live leaderboard"
+                aria-label="Home — live leaderboard"
+              >
+                <span aria-hidden="true">⌂</span>
+              </Link>
+            </nav>
             {left != null && !leftOn && (
               <button
                 type="button"
