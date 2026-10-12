@@ -1471,6 +1471,7 @@ export function LiveBoardWorkspace({
           <RotatingMovers
             ops={ops}
             server={initial.movers}
+            boardMode={wfSel}
             onSelect={handleSelect}
           />
         );
@@ -1886,11 +1887,13 @@ export function LiveBoardWorkspace({
                     under the banner; profile moved to the inspector rail. */}
                 <div className="mod">
                   <h3>
-                    <span className="sq"></span>TOP MOVERS
+                    <span className="sq"></span>
+                    TOP MOVERS · {wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()}
                   </h3>
                   <RotatingMovers
                     ops={ops}
                     server={initial.movers}
+                    boardMode={wfSel}
                     onSelect={handleSelect}
                   />
                 </div>
@@ -2343,7 +2346,7 @@ export function LiveBoardWorkspace({
                     <div className="mod" key={id}>
                       <h3>
                         <span className="sq"></span>
-                        {RAIL_TITLE[id]}
+                        {id === "movers" ? "TOP MOVERS · " + (wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()) : RAIL_TITLE[id]}
                         <span className="mvbtns">
                           <button
                             className="mvbtn"
