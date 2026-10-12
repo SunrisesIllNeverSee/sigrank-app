@@ -145,3 +145,11 @@ If Devin is used for follow-up hardening, supply this manifest and exact branch;
 - Important conflict: R3 route used WorkspaceShell, R4 removed it. Keep the owner-requested four-column integration instead of copying R4 route verbatim.
 - Merged newer Overview name heading correction and URL tab selection, preserving synchronized sidebar navigation and existing gates.
 - Receipt: user-profile/R4_IMPORT_RECEIPT.json. Design references preserved does not imply full pixel parity or final acceptance.
+
+## Launch icon navigation — October 12, 2026
+
+Owner scope: Operators (Leaderboard/Profile/Compare/Hall), Writings (SigRank §/Field/Articles/Blog/Wiki), then gray non-navigating Hacks/VS/Teams.
+
+Shared GroupedRailNav now drives both LiveBoardWorkspace and WorkspaceShell. Profile destination /me uses existing authentication and redirects to the current operator. Added profile/articles icon patterns and descending multicolor leaderboard bars. Existing Enterprise rail promotion omitted from the requested three-group rail; product routes remain unchanged.
+
+Verification: TypeScript, scoped ESLint, canonical 11/11 and production build passed. Browser checked ordered groups, disabled controls with no href, five leaderboard colors, rail fit at 1229×739, Profile redirect to MO§ES™ and Articles active icon. Mock previews updated too. No scoring/data changes, merge, push or deployment.

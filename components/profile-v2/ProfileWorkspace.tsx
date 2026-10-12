@@ -27,7 +27,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
     window.history.replaceState(null, "", url.toString());
   };
   return <ProfileWorkspaceContext.Provider value={{ section, select }}>
-    <WorkspaceShell active="board" title={`PROFILE / ${name}`} leftTitle="PROFILE · DRILL"
+    <WorkspaceShell active="profile" title={`PROFILE / ${name}`} leftTitle="PROFILE · DRILL"
       leftWidth={220} rightWidth={280}
       left={<>
         <nav className="ws-profile-nav" aria-label="Profile views">

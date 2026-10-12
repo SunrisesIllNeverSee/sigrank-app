@@ -1,5 +1,7 @@
 "use client";
 
+import { GroupedRailNav } from "./GroupedRailNav";
+
 /**
  * components/live/WorkspaceShell.tsx — the shared SignalAF workspace frame
  * for non-board pages (Hall, Compare, Wiki, Field, Blog…).
@@ -33,9 +35,8 @@ import {
 } from "react";
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
-import { EnterprisePromoPop } from "./EnterprisePromo";
-import { RailIcon, ICON_SETS } from "./PixelIcon";
-import type { IconSetName, PixelIconName } from "./PixelIcon";
+import { ICON_SETS } from "./PixelIcon";
+import type { IconSetName } from "./PixelIcon";
 import { PixelBadge } from "./PixelBadge";
 import { EditorialHeaderNav, type WorkspaceTopic } from "./EditorialSidebar";
 import {
@@ -52,24 +53,14 @@ import { useBoardSession } from "./session";
 export type WorkspaceNav =
   | "home"
   | "board"
+  | "profile"
+  | "articles"
   | "compare"
   | "hall"
   | "field"
   | "wiki"
   | "blog";
 
-const NAV_LINKS: { key: WorkspaceNav; href: string; tip: string }[] = [
-  { key: "board", href: "/board/all", tip: "LEADERBOARD" },
-  { key: "compare", href: "/compare", tip: "COMPARE" },
-  { key: "hall", href: "/hall", tip: "HALL" },
-  { key: "field", href: "/fieldhub", tip: "FIELD" },
-];
-
-const NAV_LINKS_2: { key: WorkspaceNav; href: string; tip: string }[] = [
-  { key: "home", href: "/sigrank", tip: "SIGRANK" },
-  { key: "wiki", href: "/wiki", tip: "WIKI" },
-  { key: "blog", href: "/blog", tip: "BLOG" },
-];
 
 export interface WorkspaceShellProps {
   /** Which rail icon renders `.on`. */
@@ -122,11 +113,6 @@ export interface WorkspaceShellProps {
   children: ReactNode;
 }
 
-const SOON_ITEMS: Record<string, [string, string]> = {
-  teams: ["TEAMS", "squad boards + shared stats"],
-  hacks: ["HACKS", "build sprints + vs brackets"],
-  versus: ["VERSUS", "head-to-head operator duels"],
-};
 
 export function WorkspaceShell({
   active,
@@ -182,12 +168,9 @@ export function WorkspaceShell({
   const [leftOn, setLeftOn] = useState(leftDefaultOpen && left != null);
   const [railOn, setRailOn] = useState(rightDefaultOpen && right != null);
   const [acctPop, setAcctPop] = useState(false);
-  const [epromoOpen, setEpromoOpen] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   const [iconSet, setIconSet] = useState<IconSetName>("pixel");
   const [notifOpen, setNotifOpen] = useState(false);
-  const [soonVotes, setSoonVotes] = useState<Record<string, number>>({});
-  const [soonPop, setSoonPop] = useState<string | null>(null);
 
   const router = useRouter();
   const session = useBoardSession(true);
@@ -257,20 +240,6 @@ export function WorkspaceShell({
     document.addEventListener("click", onDoc);
     return () => document.removeEventListener("click", onDoc);
   }, [acctPop]);
-  useEffect(() => {
-    if (!epromoOpen) return;
-    const onDoc = (e: MouseEvent) => {
-      if (
-        snavRef.current &&
-        e.target instanceof Node &&
-        !snavRef.current.contains(e.target)
-      ) {
-        setEpromoOpen(false);
-      }
-    };
-    document.addEventListener("click", onDoc);
-    return () => document.removeEventListener("click", onDoc);
-  }, [epromoOpen]);
 
   /* account chip — real session surface (no ops array here, so the signed-in
      avatar falls back to the verified badge — the board's documented
@@ -308,18 +277,6 @@ export function WorkspaceShell({
     router.refresh();
   }, [router]);
 
-  const navBtn = (n: { key: WorkspaceNav; href: string; tip: string }) => (
-    <Link
-      key={n.key}
-      className={`sbtn${active === n.key ? " on" : ""}`}
-      href={n.href}
-      data-tip={n.tip}
-      title={n.tip}
-      aria-current={active === n.key ? "page" : undefined}
-    >
-      {n.key === "home" ? <span className="gi" aria-hidden="true">§</span> : <RailIcon name={n.key as PixelIconName} set={iconSet} />}
-    </Link>
-  );
 
   return (
     <div
@@ -354,58 +311,7 @@ export function WorkspaceShell({
             </span>
           </Link>
           <nav className="snav" ref={snavRef}>
-            {NAV_LINKS.map(navBtn)}
-            <span className="snav-sep" aria-hidden="true"></span>
-            {NAV_LINKS_2.map(navBtn)}
-            <button
-              type="button"
-              className="sbtn"
-              data-tip="ENTERPRISE"
-              title="ENTERPRISE"
-              aria-expanded={epromoOpen}
-              onClick={(e) => {
-                e.stopPropagation();
-                setEpromoOpen((v) => !v);
-              }}
-            >
-              <RailIcon name="enterprise" set={iconSet} />
-            </button>
-            <EnterprisePromoPop hidden={!epromoOpen} />
-            <span className="snav-sep" aria-hidden="true"></span>
-            {(["teams", "hacks", "versus"] as const).map((key) => (
-              <button
-                key={key}
-                type="button"
-                className="sbtn"
-                data-tip={`${SOON_ITEMS[key][0]} · SOON`}
-                title={`${SOON_ITEMS[key][0]} — coming soon`}
-                aria-expanded={soonPop === key}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSoonPop(soonPop === key ? null : key);
-                }}
-              >
-                <RailIcon name={key} set={iconSet} />
-              </button>
-            ))}
-            {soonPop && (
-              <div className="soonpop">
-                <div className="ap-label">{SOON_ITEMS[soonPop][0]} — COMING SOON</div>
-                <p className="ap-desc">{SOON_ITEMS[soonPop][1]}</p>
-                <button
-                  type="button"
-                  className="vote"
-                  onClick={() =>
-                    setSoonVotes((v) => ({
-                      ...v,
-                      [soonPop]: (v[soonPop] ?? 0) + 1,
-                    }))
-                  }
-                >
-                  ▲ VOTE {soonVotes[soonPop] ?? 0}
-                </button>
-              </div>
-            )}
+            <GroupedRailNav active={active} iconSet={iconSet} />
           </nav>
           <div className="sfoot">
             {left != null && !leftOn && (

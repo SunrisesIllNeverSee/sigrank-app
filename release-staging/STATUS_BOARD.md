@@ -16,6 +16,15 @@ Open gates: inspector chart/design parity, full owner/private/pending and empty-
 
 Continue current integrated redesign work in `SIGNALAF-Website-Redesign/01-Staged-Website`. Original shared editorial changes remain owned by their existing workstream.
 
+## Launch navigation scope — October 12, 2026
+
+- Operators: Leaderboard, Profile, Compare, Hall.
+- Writings: SigRank (§), Field, Articles, Blog, Wiki.
+- Coming soon: Hacks, VS, Teams — gray disabled icons, no destinations or popovers.
+- Homepage and shared workspace use the same grouped rail. Profile resolves through /me to the signed-in operator; existing login flow applies.
+- Profile and Articles have pixel icons; leaderboard uses descending multicolor bars. Existing scoring, datasets and page bodies unchanged.
+- Updated review mock mirrors these groups; current live preview remains :3230.
+
 ## Earlier audit snapshot — October 11 (historical)
 
 Checkpoint 2026-10-11T07:13:52+00:00 UTC; HEAD 09a45dc; branch feat/live-board-2b; PR #239 OPEN.
