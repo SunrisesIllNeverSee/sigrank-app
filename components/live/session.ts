@@ -48,6 +48,11 @@ const INITIAL: BoardSession = {
 
 let cached: Promise<BoardSession> | null = null;
 
+export function invalidateBoardSession() {
+  cached = null;
+  window.dispatchEvent(new Event("workspace-session-changed"));
+}
+
 /** The single session fetch — deduped module-wide, never refetches. */
 export function fetchBoardSession(): Promise<BoardSession> {
   if (cached) return cached;
@@ -93,11 +98,18 @@ export function useBoardSession(enabled = true): BoardSession {
   useEffect(() => {
     if (!enabled) return;
     let alive = true;
-    fetchBoardSession().then((s) => {
-      if (alive) setSess(s);
-    });
+    let revision = 0;
+    const refresh = () => {
+      const current = ++revision;
+      fetchBoardSession().then((s) => {
+        if (alive && current === revision) setSess(s);
+      });
+    };
+    refresh();
+    window.addEventListener("workspace-session-changed", refresh);
     return () => {
       alive = false;
+      window.removeEventListener("workspace-session-changed", refresh);
     };
   }, [enabled]);
   return sess;
