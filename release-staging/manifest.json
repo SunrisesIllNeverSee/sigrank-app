@@ -1,9 +1,9 @@
 {
   "schema": "signalaf.release-staging.v1",
-  "timestamp_utc": "2026-10-12T07:37:56+00:00",
+  "timestamp_utc": "2026-10-12T08:45:00+00:00",
   "repo": "SunrisesIllNeverSee/sigrank-app",
   "branch": "feat/live-board-2b",
-  "head": "09a45dc",
+  "head": "9dbb439",
   "release_ready": false,
   "deployed": false,
   "owner_release_approval": false,

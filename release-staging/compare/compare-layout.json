@@ -1,0 +1,177 @@
+{
+  "page": "compare",
+  "viewportReference": {
+    "width": 1600,
+    "height": 1000
+  },
+  "panels": {
+    "left": {
+      "visible": true,
+      "width": 120
+    },
+    "right": {
+      "visible": true,
+      "width": 198
+    }
+  },
+  "grid": {
+    "columns": 12,
+    "snap": true
+  },
+  "tiles": [
+    {
+      "id": "CMP-01",
+      "component": "CompareAgainstMe+selectors",
+      "zone": "stage",
+      "x": 0,
+      "y": 0,
+      "w": 6,
+      "h": 4,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "CMP-02",
+      "component": "CompareMatchup",
+      "zone": "stage",
+      "x": 6,
+      "y": 0,
+      "w": 6,
+      "h": 12,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "CMP-03",
+      "component": "CompareRadars[raw]",
+      "zone": "stage",
+      "x": 0,
+      "y": 4,
+      "w": 3,
+      "h": 8,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "CMP-04",
+      "component": "CompareRadars[metric]",
+      "zone": "stage",
+      "x": 3,
+      "y": 4,
+      "w": 3,
+      "h": 8,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "CMP-05",
+      "component": "CompareHistoryChart",
+      "zone": "stage",
+      "x": 0,
+      "y": 12,
+      "w": 12,
+      "h": 4,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "CMP-06",
+      "component": "CompareLedger",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "CMP-07",
+      "component": "CompareShareCard",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 3,
+      "visible": true
+    },
+    {
+      "id": "CMP-08",
+      "component": "DeferredCompareMatchupCard",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 4,
+      "visible": true
+    },
+    {
+      "id": "CMP-09",
+      "component": "ChallengeBar",
+      "zone": "stage",
+      "x": 0,
+      "y": 8,
+      "w": 12,
+      "h": 2,
+      "order": null,
+      "visible": true
+    },
+    {
+      "id": "CMP-10",
+      "component": "ChallengeOnX",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 5,
+      "visible": true
+    },
+    {
+      "id": "CMP-11",
+      "component": "placeholder:operator-a-mini",
+      "zone": "left",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 0,
+      "visible": true
+    },
+    {
+      "id": "CMP-12",
+      "component": "placeholder:operator-b-mini",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 0,
+      "visible": true
+    },
+    {
+      "id": "CMP-13",
+      "component": "placeholder:matchup-summary",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "CMP-14",
+      "component": "placeholder:metric-context",
+      "zone": "right",
+      "x": null,
+      "y": null,
+      "w": null,
+      "h": null,
+      "order": 2,
+      "visible": true
+    }
+  ]
+}

@@ -2,6 +2,15 @@
 
 Updated October 12, 2026. **Review candidate; not merged, pushed or deployed by this session.**
 
+## Housekeeping reconciliation — October 12, 2026 (DREP1)
+
+- Canonical site confirmed: `SIGNALAF-Website-Redesign/01-Staged-Website` is a symlink to worktree `signalaf-integration-a315435`, branch `integration/site-a315435`. HEAD at check time: `f405daa` (branch is actively receiving commits from the integration lane; verify current HEAD, do not assume).
+- `integration/site-a315435` and `feat/graphics-hardening` are local-only branches — no remote/upstream copies exist.
+- This branch `feat/live-board-2b` is 3 commits ahead of origin (PR #239 head `a315435`): `ba29f02` profile V2 preservation, `637cdc2` status-board update, `9dbb439` hygiene fix below.
+- PR #239 CI hygiene failure RESOLVED locally in `9dbb439`: index-only untrack of 40 `_workspace/` review artifacts, all byte-identical to `SIGNALAF-Website-Redesign/03-Designs-and-Review/` and still on disk + in history. Hygiene script now passes 3/3 here. **Remote PR stays red until push; integration branch still carries the same 40 tracked-but-ignored files — its owner needs the same index-only fix.**
+- Remaining `release-staging/` provenance files committed alongside this note; untracked remainder on this branch = editorial lane files only (`lib/editorial/`, articles/blog/sidebar/css edits) — owned by the editorial agent, untouched.
+- `manifest.json` `head` field corrected 09a45dc → 9dbb439. All earlier manifests, verification receipts and signoffs remain unchanged as dated evidence.
+
 ## Current profile checkpoints
 
 | Location | Saved state | Commit | Preview |
