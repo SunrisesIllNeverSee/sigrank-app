@@ -30,7 +30,8 @@ type TabKey =
   | "report"
   | "lab"
   | "submissions"
-  | "social";
+  | "social"
+  | "badges";
 
 const TABS: { key: TabKey; label: string; gated?: boolean }[] = [
   { key: "overview", label: "Overview" },
@@ -40,6 +41,7 @@ const TABS: { key: TabKey; label: string; gated?: boolean }[] = [
   { key: "lab", label: "Lab", gated: true }, // owner-gated
   { key: "submissions", label: "Submissions" },
   { key: "social", label: "Social" },
+  { key: "badges", label: "Badges" },
 ];
 
 interface ProfileTabsV2Props {
@@ -50,6 +52,7 @@ interface ProfileTabsV2Props {
   lab?: React.ReactNode;
   submissions: React.ReactNode;
   social: React.ReactNode;
+  badges?: React.ReactNode;
   initial?: TabKey;
 }
 
@@ -79,6 +82,7 @@ export function ProfileTabsV2({
   lab,
   submissions,
   social,
+  badges,
   initial = "overview",
 }: ProfileTabsV2Props) {
   const searchParams = useSearchParams();
@@ -96,6 +100,7 @@ export function ProfileTabsV2({
     lab,
     submissions,
     social,
+    badges,
   };
 
   // Owner-gated tabs stay in the bar even without content (they render as
@@ -171,6 +176,7 @@ export function ProfileTabsV2({
         {activeTab === "lab" && lab}
         {activeTab === "submissions" && submissions}
         {activeTab === "social" && social}
+        {activeTab === "badges" && badges}
       </div>
     </div>
   );

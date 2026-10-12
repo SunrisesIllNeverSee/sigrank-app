@@ -22,12 +22,17 @@ import type { Operator } from "@/lib/analytics/scoring-types";
 import type {
   HistoryPoint,
   OperatorSubmission,
+  SnapshotRecord,
 } from "@/lib/board";
 
 export interface SubmissionsViewProps {
   operator: Operator;
   submissions: OperatorSubmission[];
   history: HistoryPoint[];
+  /** Scored per-submission records (snapshot_submissions) — the expanded
+   *  history with windows, platforms, pillars and provenance. Empty on
+   *  degraded/mock paths → the legacy yield table renders instead. */
+  snapshotRecords?: SnapshotRecord[];
 }
 
 const GOLD = "rgb(var(--gold))";
@@ -280,6 +285,98 @@ function CoverageGrid({
 
 /* ═══════════════ 2. SNAPSHOT HISTORY ═══════════════ */
 const HISTORY_LIMIT = 12;
+
+function compactTok(n: number | null | undefined): string {
+  if (n == null || !Number.isFinite(n)) return "—";
+  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+  return n.toFixed(0);
+}
+
+/** Expanded per-submission record table — the scored snapshot_submissions
+ *  archive with reporting windows, platforms, token pillars, derived metrics
+ *  and provenance. Null fields render "—" (unavailable), never 0. */
+function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
+  const rows = records.slice(0, HISTORY_LIMIT);
+  const latest = rows[0];
+  const cell = "px-3 py-2 text-right text-text-secondary";
+  const dim = "px-3 py-2 text-right text-text-dim";
+
+  return (
+    <Module
+      title="Snapshot History"
+      subtitle={`${records.length} SCORED SUBMISSIONS${latest ? ` · LATEST ${fmtTableDate(latest.submittedAt.slice(0, 10)).toUpperCase()}` : ""}`}
+    >
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[980px] border-collapse font-mono text-[11px] tabular-nums">
+          <thead>
+            <tr>
+              {["Date", "Window", "Platform", "In", "Out", "Cache-R", "Cache-W", "Υ", "SNR", "Vel", "Mode", "Ruleset"].map((h, i) => (
+                <th
+                  key={h}
+                  className={`border-b border-bg-border px-3 py-2 text-[8px] font-semibold uppercase tracking-[0.1em] text-text-muted ${
+                    i === 0 || i === 2 ? "text-left" : i === 1 ? "text-center" : "text-right"
+                  }`}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                key={r.submissionId}
+                className="border-b border-bg-border-subtle last:border-0 odd:bg-bg-elevated/40"
+              >
+                <td className="px-3 py-2 text-left text-text-secondary">
+                  {fmtTableDate(r.submittedAt.slice(0, 10))}
+                </td>
+                <td className="px-3 py-2 text-center text-text-secondary"
+                  title={r.periodStart && r.periodEnd ? `${r.periodStart} → ${r.periodEnd}` : undefined}>
+                  {r.window.replace(/_/g, " ")}
+                </td>
+                <td className="px-3 py-2 text-left uppercase text-text-secondary">{r.platform}</td>
+                <td className={r.inputTokens == null ? dim : cell}>{compactTok(r.inputTokens)}</td>
+                <td className={r.outputTokens == null ? dim : cell}>{compactTok(r.outputTokens)}</td>
+                <td className={r.cacheReadTokens == null ? dim : cell}>{compactTok(r.cacheReadTokens)}</td>
+                <td className={r.cacheCreateTokens == null ? dim : cell}>{compactTok(r.cacheCreateTokens)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-gold">
+                  {r.yield_ != null ? `${fmtYield(r.yield_)}Υ` : "—"}
+                </td>
+                <td className={r.snr == null ? dim : cell}>{r.snr != null ? r.snr.toFixed(3) : "—"}</td>
+                <td className={r.velocity == null ? dim : cell}>{r.velocity != null ? r.velocity.toFixed(2) : "—"}</td>
+                <td className="px-3 py-2 text-right">
+                  {r.workflowMode ? (
+                    <span
+                      className="rounded border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-semibold uppercase text-gold"
+                      title={r.workflowModeVersion ? `mode ${r.workflowModeVersion}` : undefined}
+                    >
+                      {r.workflowMode === "hitl" ? "HITL" : "AGENTIC"}
+                      {r.workflowModeVersion ? ` · ${r.workflowModeVersion}` : ""}
+                    </span>
+                  ) : (
+                    <span className="text-text-dim">—</span>
+                  )}
+                </td>
+                <td className={r.rulesetVersion == null ? dim : cell}>
+                  {r.rulesetVersion ?? "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex items-center justify-between pt-2.5 font-mono text-[8px] uppercase tracking-[0.08em] text-text-muted">
+        <span>
+          {rows.length} ROWS{records.length > rows.length ? ` OF ${records.length}` : ""} · SCORED SNAPSHOTS · — = NOT REPORTED
+        </span>
+        <span className="text-text-secondary">PAGE 1/1</span>
+      </div>
+    </Module>
+  );
+}
 
 function HistoryTable({ history }: { history: HistoryPoint[] }) {
   const rows = [...history]
@@ -593,9 +690,11 @@ export function SubmissionsView({
   operator,
   submissions,
   history,
+  snapshotRecords = [],
 }: SubmissionsViewProps) {
   const hasSubs = submissions.length > 0;
-  const hasHistory = history.length > 0;
+  const hasRecords = snapshotRecords.length > 0;
+  const hasHistory = history.length > 0 || hasRecords;
 
   return (
     <div className="flex flex-col gap-4">
@@ -609,8 +708,10 @@ export function SubmissionsView({
       )}
 
       {hasSubs && <CoverageGrid operator={operator} submissions={submissions} />}
-      {hasHistory && <HistoryTable history={history} />}
-      {hasHistory && <Timeline operator={operator} history={history} />}
+      {hasRecords
+        ? <SnapshotRecordsTable records={snapshotRecords} />
+        : history.length > 0 && <HistoryTable history={history} />}
+      {history.length > 0 && <Timeline operator={operator} history={history} />}
       <MultiWindow
         operator={operator}
         submissions={submissions}

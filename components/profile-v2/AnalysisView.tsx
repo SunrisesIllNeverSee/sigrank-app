@@ -529,6 +529,347 @@ function TierPosition({
   );
 }
 
+/* ═══════════════ 1b. HCM SIGNATURE ═══════════════ */
+interface HcmPoint {
+  codename: string;
+  label: string;
+  share: number; // fresh_input / total tokens — the HCM composition axis
+  yield_: number;
+  mode: "hitl" | "agentic" | "hybrid" | null;
+  isOp: boolean;
+}
+
+const MODE_COLOR: Record<string, string> = {
+  hitl: "rgb(var(--gold))",
+  agentic: "rgb(var(--accent))",
+  hybrid: "rgb(var(--violet, 168 85 247))",
+};
+const HCM_BOUNDARY = 0.8;
+
+/**
+ * HCM POSITION — the field plotted in the Human Center of Mass composition
+ * space (fresh-input share of total tokens vs yield). The dashed boundary at
+ * share = 0.8 is the documented HCM rule (resolveWorkflowMode): rows at or
+ * below it resolve HITL unless the deep-reuse fallback applies. Points are
+ * colored by their RESOLVED workflow cohort on the same all-time board
+ * population as TierPosition — no window or cohort mixing.
+ */
+function HcmSignature({
+  operator,
+  snapshot,
+  telemetry,
+  boardRows,
+  ranked,
+}: {
+  operator: Operator;
+  snapshot: ScoredSnapshot;
+  telemetry: TelemetryRaw;
+  boardRows: LeaderboardRow[];
+  ranked: boolean;
+}) {
+  const total = (t: TelemetryRaw) =>
+    t.fresh_input + t.output + t.cache_read + t.cache_create;
+
+  const pts: HcmPoint[] = boardRows
+    .filter(
+      (r) =>
+        !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
+    )
+    .map((r) => {
+      const t = total(r.telemetry);
+      return {
+        codename: r.operator.codename,
+        label: r.operator.display_name ?? r.operator.codename,
+        share: t > 0 ? r.telemetry.fresh_input / t : 0,
+        yield_: r.snapshot.cascade!.yield_,
+        mode: r.workflow_mode ?? null,
+        isOp: r.operator.codename === operator.codename,
+      };
+    })
+    .filter((p) => p.share > 0 && p.yield_ > 0);
+
+  const c = snapshot.cascade;
+  const opTotal = total(telemetry);
+  const opFromRows = pts.find((p) => p.isOp) ?? null;
+  const op: HcmPoint | null =
+    opFromRows ??
+    (ranked && c && !c.nonCompounding && opTotal > 0
+      ? {
+          codename: operator.codename,
+          label: operator.display_name ?? operator.codename,
+          share: telemetry.fresh_input / opTotal,
+          yield_: c.yield_,
+          mode: null,
+          isOp: true,
+        }
+      : null);
+
+  const L = 56;
+  const R = 812;
+  const T = 10;
+  const B = 182;
+
+  if (pts.length < 3) {
+    return (
+      <Module
+        title="HCM Position"
+        subtitle="Workflow signature · Human Center of Mass rule"
+        tag={<Tag>FIELD N={pts.length}</Tag>}
+      >
+        <PendingNote>
+          Not enough field data to plot the workflow signature yet.
+        </PendingNote>
+      </Module>
+    );
+  }
+
+  const yields = pts.map((p) => p.yield_);
+  const yMax = Math.max(10, Math.ceil(Math.max(...yields, op?.yield_ ?? 0) * 1.08));
+  const xAt = (share: number): number => L + share * (R - L);
+  const yAt = (v: number): number => B - (v / yMax) * (B - T);
+  const xTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * yMax);
+
+  const opX = op ? xAt(op.share) : 0;
+  const opY = op ? yAt(op.yield_) : 0;
+  const opVelocity =
+    opTotal > 0 && telemetry.fresh_input > 0
+      ? telemetry.output / telemetry.fresh_input
+      : null;
+  const opMode = op?.mode ?? null;
+  const inHcm = op != null && op.share <= HCM_BOUNDARY;
+
+  return (
+    <Module
+      title="HCM Position"
+      subtitle="Workflow signature · Human Center of Mass composition rule"
+      tag={<Tag>FIELD N={pts.length}</Tag>}
+    >
+      <svg
+        viewBox="0 0 840 212"
+        className="block h-auto w-full"
+        role="img"
+        aria-label="Scatter plot of fresh-input share versus yield for all operators, color coded by resolved workflow cohort, with the HCM composition boundary at 0.8 input share"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {/* HCM cohort region (share ≤ 0.8) */}
+        <rect
+          x={L}
+          y={T}
+          width={xAt(HCM_BOUNDARY) - L}
+          height={B - T}
+          fill={GOLD}
+          opacity={0.035}
+        />
+        {/* horizontal grid */}
+        {yTicks.map((v, i) => (
+          <line
+            key={`gy-${i}`}
+            x1={L}
+            y1={yAt(v)}
+            x2={R}
+            y2={yAt(v)}
+            stroke={BORDER}
+            strokeWidth={0.5}
+            strokeDasharray={i === 0 || i === yTicks.length - 1 ? undefined : "3 6"}
+          />
+        ))}
+        {/* vertical grid */}
+        {xTicks.map((t) => (
+          <line
+            key={`gx-${t}`}
+            x1={xAt(t)}
+            y1={T}
+            x2={xAt(t)}
+            y2={B}
+            stroke={BORDER}
+            strokeWidth={0.5}
+            strokeDasharray={t === 0 || t === 1 ? undefined : "3 6"}
+          />
+        ))}
+
+        {/* HCM composition boundary */}
+        <line
+          x1={xAt(HCM_BOUNDARY)}
+          y1={T}
+          x2={xAt(HCM_BOUNDARY)}
+          y2={B}
+          stroke={GOLD}
+          strokeWidth={1}
+          strokeDasharray="4 5"
+          opacity={0.8}
+        />
+        <text
+          x={xAt(HCM_BOUNDARY) - 6}
+          y={T + 7}
+          textAnchor="end"
+          fill={GOLD}
+          fontFamily={MONO}
+          fontSize={8}
+          opacity={0.9}
+        >
+          HCM ≤ 0.80
+        </text>
+
+        {/* axis labels */}
+        {yTicks.map((v, i) => (
+          <text
+            key={`ly-${i}`}
+            x={L - 8}
+            y={yAt(v) + 3}
+            textAnchor="end"
+            fill={MUTED}
+            fontFamily={MONO}
+            fontSize={9}
+            opacity={0.75}
+          >
+            {fmtYield(v)}
+          </text>
+        ))}
+        {xTicks.map((t) => (
+          <text
+            key={`lx-${t}`}
+            x={xAt(t)}
+            y={B + 16}
+            textAnchor="middle"
+            fill={MUTED}
+            fontFamily={MONO}
+            fontSize={9}
+            opacity={0.75}
+          >
+            {t.toFixed(1)}
+          </text>
+        ))}
+        <text
+          x={(L + R) / 2}
+          y={210}
+          textAnchor="middle"
+          fill={MUTED}
+          fontFamily={MONO}
+          fontSize={8}
+          letterSpacing={0.8}
+        >
+          FRESH-INPUT SHARE OF TOTAL TOKENS
+        </text>
+        <text
+          transform={`rotate(-90 12 ${(T + B) / 2})`}
+          x={12}
+          y={(T + B) / 2}
+          textAnchor="middle"
+          fill={MUTED}
+          fontFamily={MONO}
+          fontSize={8}
+          letterSpacing={0.8}
+        >
+          YIELD Υ
+        </text>
+
+        {/* field dots by resolved cohort */}
+        {pts.map((p) =>
+          p.isOp ? null : (
+            <circle
+              key={p.codename}
+              cx={xAt(p.share).toFixed(1)}
+              cy={yAt(p.yield_).toFixed(1)}
+              r={3}
+              fill={p.mode ? (MODE_COLOR[p.mode] ?? MUTED) : MUTED}
+              opacity={p.mode ? 0.85 : 0.4}
+            />
+          ),
+        )}
+
+        {/* operator highlight */}
+        {op && (
+          <g>
+            <circle
+              cx={opX.toFixed(1)}
+              cy={opY.toFixed(1)}
+              r={15}
+              fill="none"
+              stroke={GOLD}
+              strokeWidth={0.75}
+              strokeDasharray="2 3"
+              opacity={0.35}
+            />
+            <circle
+              cx={opX.toFixed(1)}
+              cy={opY.toFixed(1)}
+              r={10}
+              fill="none"
+              stroke={GOLD}
+              strokeWidth={1.5}
+            />
+            <circle
+              cx={opX.toFixed(1)}
+              cy={opY.toFixed(1)}
+              r={6}
+              fill={VIOLET}
+              stroke={GOLD}
+              strokeWidth={1.5}
+            />
+            <text
+              x={(opX > 560 ? opX - 17 : opX + 17).toFixed(1)}
+              y={(opY - 8).toFixed(1)}
+              textAnchor={opX > 560 ? "end" : "start"}
+              fill="rgb(var(--text-primary))"
+              fontFamily={MONO}
+              fontSize={10}
+              fontWeight={600}
+            >
+              {op.label}
+            </text>
+            <text
+              x={(opX > 560 ? opX - 17 : opX + 17).toFixed(1)}
+              y={(opY + 3).toFixed(1)}
+              textAnchor={opX > 560 ? "end" : "start"}
+              fill={MUTED}
+              fontFamily={MONO}
+              fontSize={8}
+            >
+              {(op.share * 100).toFixed(1)}% IN · {fmtYield(op.yield_)}Υ
+            </text>
+          </g>
+        )}
+      </svg>
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 border-t border-bg-border pt-2.5 font-mono text-[9px] uppercase tracking-[0.06em] text-text-muted">
+        {(["hitl", "agentic", "hybrid"] as const)
+          .filter((m) => pts.some((p) => p.mode === m && !p.isOp))
+          .map((m) => (
+            <span key={m} className="inline-flex items-center gap-1.5">
+              <i
+                className="inline-block h-2 w-2 shrink-0 rounded-full"
+                style={{ background: MODE_COLOR[m] }}
+              />
+              {m === "hitl" ? "HITL" : m === "agentic" ? "AGENTIC" : "HYBRID"}
+            </span>
+          ))}
+        <span className="inline-flex items-center gap-1.5">
+          <i className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ background: MUTED, opacity: 0.4 }} />
+          UNRESOLVED
+        </span>
+        {op && (
+          <span className="inline-flex items-center gap-1.5">
+            <i
+              className="inline-block h-2.5 w-2.5 shrink-0 rounded-full border-[1.5px]"
+              style={{ background: VIOLET, borderColor: GOLD }}
+            />
+            THIS OPERATOR
+          </span>
+        )}
+        <span className="flex-1" />
+        {op && (
+          <span className="text-text-secondary">
+            SHARE {(op.share * 100).toFixed(1)}%{opVelocity != null ? ` · VEL ${opVelocity.toFixed(1)}` : ""} · {inHcm ? "INSIDE HCM" : "OUTSIDE HCM"}
+            {opMode ? ` · ${opMode.toUpperCase()}` : " · UNRESOLVED"}
+          </span>
+        )}
+        <span className="opacity-70">DASHED GOLD = HCM BOUNDARY</span>
+      </div>
+    </Module>
+  );
+}
+
 /* ═══════════════ 2. ARCHETYPE FINGERPRINT ═══════════════ */
 interface FpAxes {
   leverage: number;
@@ -1210,6 +1551,13 @@ export function AnalysisView({
         ranked={ranked}
         globalRank={globalRank}
         topPct={topPct}
+      />
+      <HcmSignature
+        operator={operator}
+        snapshot={snapshot}
+        telemetry={telemetry}
+        boardRows={boardRows}
+        ranked={ranked}
       />
       <ArchetypeFingerprint archetype={archetype} telemetry={telemetry} />
       <VsField

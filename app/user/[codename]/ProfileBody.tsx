@@ -22,6 +22,7 @@ import Link from "next/link";
 import {
   getOperatorHistory,
   getOperatorSubmissions,
+  getOperatorSnapshotRecords,
   getOperatorReport,
   getLeaderboard,
   getHallOfSignal,
@@ -44,6 +45,7 @@ import StatsView from "@/components/profile-v2/StatsView";
 import { AnalysisView } from "@/components/profile-v2/AnalysisView";
 import { SubmissionsView } from "@/components/profile-v2/SubmissionsView";
 import { SocialView } from "@/components/profile-v2/SocialView";
+import { BadgesView } from "@/components/profile-v2/BadgesView";
 
 function resolveName(operator: Operator): string {
   return operator.display_name ?? operator.codename;
@@ -66,12 +68,14 @@ export async function ProfileBody({
   const [
     history,
     submissions,
+    snapshotRecords,
     operatorReport,
     boardRows,
     hallRecords,
   ] = await Promise.all([
     getOperatorHistory(codename),
     getOperatorSubmissions(codename),
+    getOperatorSnapshotRecords(codename),
     getOperatorReport(operator.operator_id),
     getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
     getHallOfSignal(),
@@ -170,6 +174,7 @@ export async function ProfileBody({
               watchCount={watchCount}
               boardRows={boardRows}
               history={history}
+              fieldAvg={fieldAvg}
             />
           }
           stats={
@@ -227,6 +232,7 @@ export async function ProfileBody({
               operator={operator}
               submissions={submissions}
               history={history}
+              snapshotRecords={snapshotRecords}
             />
           }
           social={
@@ -236,6 +242,16 @@ export async function ProfileBody({
               isOwner={isOwner}
               records={operatorRecords}
               trophyCounts={trophyCounts}
+            />
+          }
+          badges={
+            <BadgesView
+              operator={operator}
+              snapshot={snapshot}
+              records={operatorRecords}
+              trophyCounts={trophyCounts}
+              tierProgress={tierProgress}
+              scoredSnapshots={snapshotRecords.length}
             />
           }
         />
