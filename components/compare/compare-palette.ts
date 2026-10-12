@@ -22,3 +22,9 @@ export function compareClassPalette(tier: string | null | undefined) {
     tint: (alpha: number) => `rgba(${triplet},${alpha})`,
   };
 }
+
+/** Stable operand colors distinguish operators even when their classes match. */
+export const COMPARE_OPERAND_COLORS = {
+  a: "#60a5fa",
+  b: "#2dd4bf",
+} as const;

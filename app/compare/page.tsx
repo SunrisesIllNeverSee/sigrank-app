@@ -59,7 +59,7 @@ import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { CompareStage } from "@/components/compare/CompareStage";
-import { compareClassPalette } from "@/components/compare/compare-palette";
+import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
 import "@/components/compare/compare-workspace.css";
 
 export const metadata: Metadata = withOG({
@@ -435,8 +435,8 @@ export default async function ComparePage({
               nameA={nameOf(rowA)}
               nameB={nameOf(rowB)}
               height={140}
-              colorA={compareClassPalette(rowA.snapshot.class_tier).color}
-              colorB={compareClassPalette(rowB.snapshot.class_tier).color}
+              colorA={COMPARE_OPERAND_COLORS.a}
+              colorB={COMPARE_OPERAND_COLORS.b}
             />
           </div>
         </div>
