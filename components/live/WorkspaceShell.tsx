@@ -279,8 +279,8 @@ export function WorkspaceShell({
         {
           // Compact editorial rails; users can still resize via the sash.
           ...(editorialStage
-            ? { "--lside-w": Math.min(leftWidth ?? 208, 208) + "px",
-                "--rail-w": Math.min(rightWidth ?? 208, 208) + "px" }
+            ? { "--lside-w": Math.min(leftWidth ?? 240, 240) + "px",
+                "--rail-w": Math.min(rightWidth ?? 240, 240) + "px" }
             : {
                 ...(leftWidth ? { "--lside-w": leftWidth + "px" } : {}),
                 ...(rightWidth ? { "--rail-w": rightWidth + "px" } : {}),
