@@ -125,7 +125,7 @@ export default async function FieldHubPage() {
 
       {/* ── Blurb ───────────────────────────────────────────────────── */}
       <section>
-        <p className="max-w-2xl text-base leading-relaxed text-text-primary">
+        <p className="mx-auto max-w-2xl text-center text-base leading-relaxed text-text-primary">
           This section is where we document academic field analysis of the
           SigRank Index: the distribution of AI operator efficiency, the
           volume-vs-yield thesis, outlier detection, and the dataset that
