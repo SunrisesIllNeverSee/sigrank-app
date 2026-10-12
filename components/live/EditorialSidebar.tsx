@@ -25,15 +25,12 @@ const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }>
 const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string }>> = {
   home: [
     { label: "Overview", href: "/sigrank" },
-    { label: "Leaderboard", href: "/board/all" },
-    { label: "Compare", href: "/compare" },
-    { label: "Hall of Signal", href: "/hall" },
-    { label: "Methodology", href: "/methodology" },
   ],
   field: [
     { label: "Field Hub", href: "/fieldhub" },
     { label: "Field Analysis", href: "/field" },
     { label: "State of the Index", href: "/research" },
+    { label: "Methodology", href: "/methodology" },
     { label: "Academic Foundation · Science", href: "/science" },
     { label: "About", href: "/about" },
   ],
