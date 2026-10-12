@@ -2,16 +2,21 @@
  * app/user/[codename]/page.tsx — the operator profile page (was /operators/[codename], owner 2026-06-22).
  *
  * "The single most important page after the homepage" (site_architecture.md
- * §Operator profile). AUTH_LAUNCH_DIRECTIVES D6: a GitHub-style multi-tab workspace —
- * a persistent identity header (avatar / name / class / rank) over three tabs:
+ * §Operator profile). A GitHub-style multi-tab workspace — a persistent
+ * identity header (avatar / name / class / rank) over eight tab panels:
  *
- *   • Stats        — view-only cascade dashboard (KPIs, radars, op-ratio, heat, trend)
- *   • Submissions  — manual project/build showcase (D9 — not yet built; empty state)
- *   • Social       — self-promo identity: handle, location, bio, links
+ *   • Overview     — opensplit (passport card + flap board), cascade, records
+ *   • Stats        — view-only cascade tables (KPIs, raw data)
+ *   • Analysis     — field scatters, archetype, vs-field, delta breakdown
+ *   • Report       — cascade report (owner-gated; public only when opted in)
+ *   • Lab          — cascade lab (owner-gated)
+ *   • Submissions  — platform grid + scored snapshot records + history
+ *   • Social       — self-promo identity: handle, location, bio, links, badges
+ *   • Badges       — earned/locked badges, class ladder, milestones
  *
  * RSC: reads the operator + history through the @/lib/data facade (mock fallback when
- * Supabase is unset). The three panels are server-rendered here and handed to the
- * ProfileTabs client island, which only mounts the active one. ScoreBreakdown-style
+ * Supabase is unset). The panels are server-rendered in ProfileBody and handed to the
+ * ProfileTabsV2 client island, which only mounts the active one. ScoreBreakdown-style
  * client islands receive plain serializable props resolved here, so RS.xx weights never
  * reach the client.
  */
@@ -43,7 +48,7 @@ import { ProfileWorkspace } from "@/components/profile-v2/ProfileWorkspace";
 // the page updates immediately after a submission regardless of the ISR
 // window. The 21600s ISR is a safety net that cuts cold-miss DB queries
 // 6x vs the previous 3600s, which matters because the /user/[codename]
-// route does 8 DB queries on a cold miss and Supabase compute is a cost
+// route does 9 DB queries on a cold miss and Supabase compute is a cost
 // constraint. The data-layer cache (unstable_cache on getOperator etc.)
 // provides a second tier at 90-300s for data freshness.
 //
