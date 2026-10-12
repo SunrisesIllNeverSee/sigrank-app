@@ -6,11 +6,11 @@ import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import "./profile-workspace.css";
 
-type ProfileSection = "overview" | "stats" | "analysis" | "report" | "lab" | "submissions" | "social";
+type ProfileSection = "overview" | "stats" | "analysis" | "report" | "lab" | "submissions" | "social" | "badges";
 const ProfileWorkspaceContext = createContext<{ section: ProfileSection; select: (section: ProfileSection) => void } | null>(null);
 export const useProfileWorkspace = () => useContext(ProfileWorkspaceContext);
 
-const sections = ["overview", "stats", "analysis", "submissions", "social"] as const;
+const sections = ["overview", "stats", "analysis", "submissions", "social", "badges"] as const;
 
 export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLabel, children, actions }: {
   name: string; codename: string; rank: number | null; tier: string; platform: string;
@@ -18,7 +18,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
 }) {
   const searchParams = useSearchParams();
   const requested = searchParams.get("tab");
-  const validSections: ProfileSection[] = ["overview", "stats", "analysis", "report", "lab", "submissions", "social"];
+  const validSections: ProfileSection[] = ["overview", "stats", "analysis", "report", "lab", "submissions", "social", "badges"];
   const [section, setSection] = useState<ProfileSection>(validSections.includes(requested as ProfileSection) ? requested as ProfileSection : "overview");
   const select = (next: ProfileSection) => {
     setSection(next);
