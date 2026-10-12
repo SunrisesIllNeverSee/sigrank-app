@@ -21,8 +21,10 @@
  *
  * Also covers the two sibling reads the same profile surface performs:
  *
- *   5. getOperatorSubmissions — identical visibility parity on
- *      metric_snapshots (unclaimed/retired/private expose nothing).
+ *   5. getOperatorSubmissions / getOperatorHistory — identical visibility
+ *      parity on metric_snapshots (unclaimed/retired/private expose
+ *      nothing), and the live path NEVER serves MOCK_HISTORY fixtures —
+ *      MOCK_HISTORY keys collide with real codenames (TransVaultOrigin).
  *   6. getOperatorWatchCount — service-side HEAD count on
  *      operator_watches; returns a number, never watcher identity.
  */
@@ -127,6 +129,7 @@ let opFixture: typeof OP | null = OP;
 let submissionRows: unknown[] = [];
 let metricRows: unknown[] = [];
 let watchCountFixture = 0;
+let failTables = new Set<string>();
 
 function makeSb() {
   const requests: ReqRec[] = [];
@@ -171,14 +174,18 @@ function makeSb() {
       maybeSingle: async () => {
         rec.terminal = "maybeSingle";
         requests.push(rec);
+        if (failTables.has(rec.table)) {
+          return { data: null, error: { message: "db down" } };
+        }
         return { data: pickRows(rec)[0] ?? null, error: null };
       },
       then: (res: (v: unknown) => unknown) => {
         rec.terminal = "await";
         requests.push(rec);
         // HEAD-count reads (operator_watches) resolve {count}, not {data}.
-        const result =
-          rec.table === "operator_watches"
+        const result = failTables.has(rec.table)
+          ? { data: null, error: { message: "db down" } }
+          : rec.table === "operator_watches"
             ? { data: null, count: watchCountFixture, error: null }
             : { data: pickRows(rec), error: null };
         return Promise.resolve(result).then(res);
@@ -200,23 +207,29 @@ const sb = makeSb();
 
 vi.mock("@/lib/infra/supabase/server", () => ({
   getSupabaseServer: () => sb,
+  // operator_watches is read under the service-role client — same fake.
+  getSupabaseService: () => sb,
 }));
 
 const {
   getOperatorSnapshotRecords,
   getOperatorSubmissions,
+  getOperatorHistory,
   getOperatorWatchCount,
 } = await import("@/lib/board/queries");
 const requests = sb.__requests;
 
+const reset = () => {
+  opFixture = OP;
+  submissionRows = [];
+  metricRows = [];
+  watchCountFixture = 0;
+  failTables = new Set();
+  requests.length = 0;
+};
+
 describe("getOperatorSnapshotRecords", () => {
-  beforeEach(() => {
-    opFixture = OP;
-    submissionRows = [];
-    metricRows = [];
-    watchCountFixture = 0;
-    requests.length = 0;
-  });
+  beforeEach(reset);
 
   it("issues no submission query for unclaimed operators", async () => {
     opFixture = { ...OP, claimed: false };
@@ -325,13 +338,7 @@ describe("getOperatorSnapshotRecords", () => {
 });
 
 describe("getOperatorSubmissions", () => {
-  beforeEach(() => {
-    opFixture = OP;
-    submissionRows = [];
-    metricRows = [];
-    watchCountFixture = 0;
-    requests.length = 0;
-  });
+  beforeEach(reset);
 
   it("issues no metric_snapshots query for unclaimed, retired, or private operators", async () => {
     for (const over of [
@@ -372,14 +379,71 @@ describe("getOperatorSubmissions", () => {
   });
 });
 
-describe("getOperatorWatchCount", () => {
-  beforeEach(() => {
-    opFixture = OP;
-    submissionRows = [];
+describe("getOperatorHistory", () => {
+  beforeEach(reset);
+
+  it("NEVER serves MOCK_HISTORY on the live path — a claimed operator with zero snapshots gets []", async () => {
+    // TransVaultOrigin is both a MOCK_HISTORY fixture key AND a real claimed
+    // operator — the exact collision that rendered fabricated history on a
+    // live profile. metric_snapshots returning zero rows must mean "no
+    // history", not "show the fixtures".
     metricRows = [];
-    watchCountFixture = 0;
-    requests.length = 0;
+    const out = await getOperatorHistory("TransVaultOrigin");
+    expect(out).toEqual([]);
+    expect(
+      requests.filter((r) => r.table === "metric_snapshots"),
+    ).toHaveLength(1);
   });
+
+  it("issues no metric_snapshots query for unclaimed, retired, or private operators", async () => {
+    for (const over of [
+      { claimed: false },
+      { status: "retired" },
+      { profile_visibility: "private" },
+    ]) {
+      opFixture = { ...OP, ...over };
+      metricRows = [snap()];
+      requests.length = 0;
+      const out = await getOperatorHistory("test-op");
+      expect(out).toEqual([]);
+      expect(
+        requests.filter((r) => r.table === "metric_snapshots"),
+      ).toHaveLength(0);
+    }
+  });
+
+  it("returns [] for an unknown operator — never fixture data", async () => {
+    opFixture = null;
+    expect(await getOperatorHistory("ghost")).toEqual([]);
+    expect(
+      requests.filter((r) => r.table === "metric_snapshots"),
+    ).toHaveLength(0);
+  });
+
+  it("returns [] and logs when the live read fails — failure is not mock data", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    failTables = new Set(["metric_snapshots"]);
+    const out = await getOperatorHistory("test-op");
+    expect(out).toEqual([]);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("maps real snapshot rows into history points", async () => {
+    metricRows = [
+      snap({ metric_snapshot_id: "s1", snapshot_date: "2026-09-01" }),
+      snap({ metric_snapshot_id: "s2", snapshot_date: "2026-10-01" }),
+    ];
+    const out = await getOperatorHistory("test-op");
+    expect(out).toHaveLength(2);
+    expect(out[0].date).toBe("2026-09-01");
+    // Υ = (cache_read × output) / input² = (2000×200)/100² = 40
+    expect(out[0].yield_).toBeCloseTo(40);
+  });
+});
+
+describe("getOperatorWatchCount", () => {
+  beforeEach(reset);
 
   it("returns the HEAD count scoped to the operator", async () => {
     watchCountFixture = 7;

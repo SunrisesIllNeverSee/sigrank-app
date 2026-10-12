@@ -16,7 +16,10 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import {
+  getSupabaseServer,
+  getSupabaseService,
+} from "@/lib/infra/supabase/server";
 import { SORT_DEFAULT } from "@/lib/constants";
 import { filterToWindow } from "@/lib/board/windows";
 import { classToTierId, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids";
@@ -865,13 +868,31 @@ export async function getOperatorHistory(
     // Resolve the operator id from the codename first.
     const { data: opData, error: opError } = await sb
       .from("operators_public")
-      .select("operator_id")
+      .select("operator_id, claimed, status, profile_visibility")
       .ilike("codename", codename)
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
-    const op = asDb<{ operator_id: string } | null>(opData);
-    if (!op) return fromMock();
+    const op = asDb<{
+      operator_id: string;
+      claimed: boolean | null;
+      status: string | null;
+      profile_visibility: string | null;
+    } | null>(opData);
+    // Same public-visibility contract as getOperatorSubmissions /
+    // getOperatorSnapshotRecords and the snapshot-history API: unclaimed,
+    // retired, or private operators expose no submission data. And on the
+    // live path an empty read returns empty — never MOCK_HISTORY fixtures
+    // rendered against a real codename (MOCK_HISTORY keys collide with
+    // live operators, e.g. TransVaultOrigin).
+    if (
+      !op ||
+      !op.claimed ||
+      op.status === "retired" ||
+      op.profile_visibility === "private"
+    ) {
+      return [];
+    }
 
     // Per-snapshot scores + token pillars (for Υ Yield), oldest → newest.
     const { data: snapData, error: snapError } = await sb
@@ -893,7 +914,7 @@ export async function getOperatorHistory(
         cache_read_tokens: number | null;
         cache_creation_tokens: number | null;
       }> | null>(snapData) ?? [];
-    if (snaps.length === 0) return fromMock();
+    if (snaps.length === 0) return [];
     assertOperatorLimit(snaps, codename);
 
     // Per-date global_rank from rank_history (keyed by date).
@@ -938,8 +959,11 @@ export async function getOperatorHistory(
     return params.limit && params.limit > 0
       ? points.slice(-params.limit)
       : points;
-  } catch {
-    return fromMock();
+  } catch (error) {
+    // A live read that fails is "unavailable", not "mock" — fixture data
+    // must never render on a real operator's profile.
+    console.warn(`getOperatorHistory(${codename}) failed:`, error);
+    return [];
   }
 }
 
@@ -1547,8 +1571,10 @@ export async function getOperatorSnapshotRecords(
 /**
  * Public watcher count for one operator — the same aggregate the
  * /api/v1/operators/{codename}/watch GET exposes. operator_watches grants
- * no SELECT to anon, so the count runs under the service client by design;
- * watcher identity is never returned, only the number.
+ * no SELECT to anon, so the count runs under the SERVICE-ROLE client
+ * (getSupabaseService — never the anon fallback); watcher identity is never
+ * returned, only the number. Returns 0 when no service client exists —
+ * the profile degrades to "no watchers" rather than a fabricated count.
  */
 export async function getOperatorWatchCount(
   codename: string,
@@ -1565,7 +1591,9 @@ export async function getOperatorWatchCount(
     if (opError) throw opError;
     const op = asDb<{ operator_id: string } | null>(opData);
     if (!op) return 0;
-    const { count, error } = await sb
+    const svc = getSupabaseService();
+    if (!svc) return 0;
+    const { count, error } = await svc
       .from("operator_watches")
       .select("operator_id", { count: "exact", head: true })
       .eq("operator_id", op.operator_id);

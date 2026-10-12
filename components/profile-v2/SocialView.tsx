@@ -33,6 +33,8 @@ export interface SocialViewProps {
   /** Scored snapshots on record — drives the snapshot-milestone badge state
    *  so this module agrees with the Badges tab. */
   scoredSnapshots: number;
+  /** Pending/unranked operators hold no earned class badge yet. */
+  pending?: boolean;
 }
 
 const GOLD = "rgb(var(--gold))";
@@ -334,12 +336,14 @@ function BadgesModule({
   records,
   trophyCounts,
   scoredSnapshots,
+  pending = false,
 }: {
   operator: Operator;
   snapshot: ScoredSnapshot;
   records: HallRecord[];
   trophyCounts: TrophyCounts | null;
   scoredSnapshots: number;
+  pending?: boolean;
 }) {
   const badges: BadgeDef[] = [];
 
@@ -359,11 +363,14 @@ function BadgesModule({
     });
   }
 
-  // Class badge.
+  // Class badge — pending operators hold no verified class (same gate the
+  // Badges tab applies, so the two views can't contradict).
   badges.push({
-    rank: snapshot.class_tier,
+    rank: pending ? "—" : snapshot.class_tier,
     name: "Class",
-    color: "rgb(var(--class-power))",
+    sub: pending ? "Pending" : undefined,
+    color: pending ? MUTED : "rgb(var(--class-power))",
+    locked: pending,
   });
 
   // Verified identity badge.
@@ -522,6 +529,7 @@ export function SocialView({
   records,
   trophyCounts,
   scoredSnapshots,
+  pending = false,
 }: SocialViewProps) {
   const links = operator.links ?? {};
   const hasLinks = !!(
@@ -553,6 +561,7 @@ export function SocialView({
           records={records}
           trophyCounts={trophyCounts}
           scoredSnapshots={scoredSnapshots}
+          pending={pending}
         />
       </div>
     );
@@ -584,6 +593,7 @@ export function SocialView({
         records={records}
         trophyCounts={trophyCounts}
         scoredSnapshots={scoredSnapshots}
+        pending={pending}
       />
       <ShareModule operator={operator} />
     </div>
