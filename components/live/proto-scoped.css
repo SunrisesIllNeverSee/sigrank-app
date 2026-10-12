@@ -1788,3 +1788,9 @@
 /* Slightly smaller pixel titles throughout the editorial family. */
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(4px,calc(var(--tbt-fit,2cqw) * .85),1.15rem)}
 .lbw-root .sigrank-column-hero pre{font-size:clamp(7px,1.9cqw,18px)}
+
+.lbw-root .ws-topic-branch > summary .ws-tree-title{font-weight:700}
+.lbw-root .ws-topic-documents{margin:2px 0 8px 9px;padding-left:6px;border-left:1px solid var(--line)}
+.lbw-root .ws-topic-documents .ws-tree-title{font-size:11px;line-height:1.45;text-decoration:none}
+.lbw-root .ws-tree-details > summary .ws-tree-toggle::before{content:"▸"}
+.lbw-root .ws-tree-details[open] > summary .ws-tree-toggle::before{content:"▾"}
