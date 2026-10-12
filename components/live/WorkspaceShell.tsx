@@ -37,7 +37,7 @@ import { EnterprisePromoPop } from "./EnterprisePromo";
 import { RailIcon, ICON_SETS } from "./PixelIcon";
 import type { IconSetName, PixelIconName } from "./PixelIcon";
 import { PixelBadge } from "./PixelBadge";
-import { EditorialTopicDropdown, type WorkspaceTopic } from "./EditorialSidebar";
+import { EditorialHeaderNav, type WorkspaceTopic } from "./EditorialSidebar";
 import {
   LBW_THEME_INIT,
   THEMES,
@@ -560,10 +560,10 @@ export function WorkspaceShell({
                 >
                   ◂
                 </button>
-                <div className="colhead">{colheadLeft}</div>
+                <div className="colhead">{topic ? <EditorialHeaderNav label={colheadLeft} /> : colheadLeft}</div>
                 <div className="railhead">
                   <span className="sq"></span>
-                  {topic ? <EditorialTopicDropdown topic={topic} /> : leftTitle}
+                  {leftTitle}
                 </div>
                 <div className="rail">{left}</div>
               </aside>
