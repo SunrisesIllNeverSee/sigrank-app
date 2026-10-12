@@ -68,7 +68,7 @@ Remaining decision or dependency: Do not initiate rich-dock redesign without new
 ### LB-06 — PROFILE and WATCH only
 Item: PROFILE and WATCH only
 Status: IMPLEMENTED, NOT VERIFIED
-Solution or answer: Dock and peek primary action rows contain only PROFILE and WATCH; PROFILE routes to selected /user/<codename>; WATCH uses existing session-authorized toggle and shows WATCHING when active. Compare remains available separately in global navigation.
+Solution or answer: Dock and peek primary action rows render PROFILE and WATCH, with COMPARE added in the dock only for an authenticated operator viewing someone other than their own linked account. PROFILE routes to selected /user/<codename>; WATCH uses the existing session-authorized toggle and shows WATCHING when active. COMPARE is seeded with both valid operator codenames when available.
 Code changed: YES
 Files and function/component: components/live/ProfileActions.tsx (ProfileActions), components/live/WatchButton.tsx (WatchButton watch-changed event, correct signed-in state)
 Commit: 06cccafe0f0f6ba4782122397748fea8574f6af9
@@ -247,3 +247,27 @@ Remaining decision or dependency: Optional further density change only after own
 - **Data-integrity review finding:** `ProfileRailPanels` fills missing activity days with seeded simulated colors when any history exists. The e2e checks verify layout, not that each colored day represents an observed submission. This must be resolved before labeling those cells verified observation evidence.
 - **Independent concurrent work:** Local integration checkout currently has uncommitted badge/profile work beyond `260b849`. It is deliberately excluded from this merge and must be preserved. The live :3230 server can display those unfinished edits; for an exact merge revision use a dedicated worktree preview.
 - Final staging merge commit/remote HEAD: see Git history of `integration/site-a315435` after successful merge. Production `main` unchanged.
+
+## Leaderboard follow-up — owner visual adjustments, October 12
+
+### LB-07 — Move contextual operator actions above radar
+Item: Position PROFILE / WATCH / conditional COMPARE above the radar.
+Status: IMPLEMENTED & VERIFIED
+Solution or answer: PROFILE and WATCH always appear directly after the selected operator identity tile and immediately before the radar slide. COMPARE appears there only when a signed-in, linked operator has deliberately selected a different operator. Prefills /compare?a=<signed-in codename>&b=<selected codename> when both are present in the board. On own account and signed-out views the action group contains exactly two buttons. No change to WATCH permission checks.
+Code changed: YES
+Files and function/component: components/live/LiveBoardWorkspace.tsx (railBody(profile)), components/live/ProfileActions.tsx (ProfileActions), components/live/proto-scoped.css (peek-actions); __tests__/ui/owner-board-watchlist.test.tsx
+Commit: see latest integration/site-a315435 HEAD after the staging-only merge.
+Where to see it: http://localhost:3230/board/all — select a user from a signed-in session; operator dock right rail, action group immediately before radar.
+Verification and evidence: WebKit controlled auth showed PROFILE + WATCH for signed-in own operator; after selecting another, PROFILE + WATCH + COMPARE in that order, with /compare?a=...&b=...; geometry tile.bottom=540, actions.top=549, actions.bottom=577, radar.top=589; no page JS errors. UI tests cover both states.
+Remaining decision or dependency: Real owner sign-in acceptance remains separate; simulated session uses no private credentials.
+
+### LB-08 — Center and responsively wrap leaderboard filters
+Item: Fix toolbar centering and formatting without requiring Safari Cmd+0.
+Status: IMPLEMENTED & VERIFIED
+Solution or answer: Split the toolbar into a centered filtering row (workflow, window, platform, class, sort direction, search) and a centered views/pagination/export row. Remove the old one-line justify-space-between and auto-margin interaction. Controls wrap based on available stage width even when both sidebars remain pinned; readable 10px form text, consistent sizing.
+Code changed: YES
+Files and function/component: components/live/LiveBoardWorkspace.tsx (board-filter-controls), components/live/board-cols.css (responsive filtering rows), components/live/proto-scoped.css (action spacing).
+Commit: see latest integration/site-a315435 HEAD after the staging-only merge.
+Where to see it: http://localhost:3230/board/all — normal Safari view, check at standard and enlarged page zoom.
+Verification and evidence: WebKit layout checks at 1440, 1280, 1152 (~125%-zoom equivalent), 1100 and 900 logical viewport pixels: both rows had exact centered bounding boxes (0px error), 0 filter/group/secondary-action overflow, and controls remained legible at 10px. Browser selection tested independently.
+Remaining decision or dependency: Actual Safari page zoom state is a browser preference; the CSS no longer relies on manually resetting it. At extremely narrow viewports the fixed three-panel shell remains a separate owner constraint.

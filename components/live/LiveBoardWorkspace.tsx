@@ -1380,6 +1380,19 @@ export function LiveBoardWorkspace({
                 <button type="button" className="ws-return-self" onClick={restoreMyProfile}>↶ MY PROFILE</button>
               )}
               <OperatorProfileTile d={profile} />
+              {/* Primary actions belong immediately above the radar. Compare
+                  only appears when an authenticated operator views someone
+                  other than their own linked profile. If the owner is not in
+                  this comparison field, use the selected operator alone. */}
+              {selOp && (
+                <ProfileActions
+                  op={selOp}
+                  showCompare={!!(session.signedIn && session.codename && session.codename !== selOp.codename)}
+                  compareHref={session.codename && ownIndex >= 0
+                    ? `/compare?a=${encodeURIComponent(session.codename)}&b=${encodeURIComponent(selOp.codename)}`
+                    : cmpHref}
+                />
+              )}
               {/* owner: the radar is its own box — it ends here, then a
                   separate AWARDS/BADGES box follows with three rotating
                   slides (awards → badges → medals) at display size. */}
@@ -1443,10 +1456,6 @@ export function LiveBoardWorkspace({
                   {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
                 </p>
               )}
-              {/* owner 2026-10-08: the peek rail's action row joins the
-                  selected operator's profile too — SEE PROFILE / COMPARE /
-                  WATCH, always visible, not only inside the aux rail. */}
-              {selOp && <ProfileActions op={selOp} />}
             </>
           ) : (
             <button
@@ -2009,6 +2018,7 @@ export function LiveBoardWorkspace({
               </div>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
+                <div className="board-filter-controls" role="group" aria-label="Leaderboard filters">
                 <div className="seg">
                   <button
                     className={wfSel === "hitl" ? "on" : ""}
@@ -2100,6 +2110,7 @@ export function LiveBoardWorkspace({
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </span>
+                </div>
                 <div className="board-filter-actions" role="group" aria-label="Leaderboard view and exports">
                       <div className="seg pgn-seg">
                         <button
