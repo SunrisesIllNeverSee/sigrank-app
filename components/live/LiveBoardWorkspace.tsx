@@ -2047,7 +2047,8 @@ export function LiveBoardWorkspace({
                 <span className="fb">
                   <input
                     aria-label="Search operators"
-                    placeholder="operator or codename…"
+                    placeholder="⌕"
+                    title="Search operators by name or codename"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
@@ -2114,6 +2115,14 @@ export function LiveBoardWorkspace({
                           </button>
                         )}
                       </span>
+                      <details className="board-share" onKeyDown={(event) => {
+                        if (event.key === "Escape") {
+                          event.currentTarget.open = false;
+                          event.currentTarget.querySelector("summary")?.focus();
+                        }
+                      }}>
+                        <summary>Share ↗</summary>
+                        <div className="board-share-menu">
                       <button
                         type="button"
                         className="exp"
@@ -2126,6 +2135,8 @@ export function LiveBoardWorkspace({
                       {/* LB-G14 — approved workspace-scope screenshot,
                           docked in the existing export group. */}
                       <BoardShotButton scope="workspace" rootRef={rootRef} />
+                        </div>
+                      </details>
                 </div>
               </div>
 
