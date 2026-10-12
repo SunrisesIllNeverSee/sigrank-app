@@ -257,68 +257,49 @@ export function EditorialNav({
 }) {
   const pathname = usePathname();
   const topic = topicForPage(current);
-  const isWiki = topic === "wiki";
-  const isLanding = TOPICS.some((item) => pathname === item.href);
-  const isReader = !isLanding && !isWiki;
-  const collectionLabel = topic === "field" ? "Field"
-    : topic === "articles" ? "Articles" : "Blog";
-  const entries = documents ?? PAGES[topic];
-
-  if (isLanding) {
-    return (
-      <div className="mod ws-topic-index">
-        <div className="mini-h"><span className="sq" />TOPICS</div>
-        <nav className="ws-nav ws-home-topics" aria-label="Editorial sections">
-          {TOPICS.map((item) => (
-            <Link key={item.id} href={item.href}
-              aria-current={pathname === item.href ? "page" : undefined}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    );
-  }
-
   return (
-    <>
-      {isWiki && (
-        <div className="mod ws-page-index ws-wiki-contents">
-          <div className="mini-h"><span className="sq" />WIKI CONTENTS</div>
-          <PageSections pageContents={pageContents} />
-        </div>
-      )}
-      {!isWiki && (
-        <div className="mod ws-document-tree">
-          <div className="mini-h"><span className="sq" />DOCUMENTS</div>
-          <nav className="ws-tree-list" aria-label={collectionLabel + " expandable documents"}>
-            {entries.map(entry => {
-              const active = isReader && pathname === entry.href;
-              return (
-                <div className="ws-tree-item" key={entry.href}>
-                  {active ? (
-                    <details open className="ws-tree-details">
-                      <summary className="ws-tree-row active" aria-current="page">
-                        <span className="ws-tree-title">{entry.label}</span>
+    <div className="mod ws-document-tree ws-topic-index">
+      <div className="mini-h"><span className="sq" />TOPICS</div>
+      <nav className="ws-tree-list" aria-label="Editorial sections">
+        {TOPICS.map(item => {
+          const selected = item.id === topic;
+          const entries = selected && documents ? documents : PAGES[item.id];
+          const listed = entries.some(entry => entry.href === pathname);
+          const activeLabel = pathname.split("/").filter(Boolean).at(-1)?.replace(/-/g, " ") ?? "Current page";
+          const pages = selected && !listed
+            ? [...entries, { label: activeLabel, href: pathname }]
+            : entries;
+          return (
+            <details key={item.id + pathname} open={selected} className="ws-tree-details ws-topic-branch">
+              <summary className={"ws-tree-row" + (selected ? " active" : "")}>
+                <Link href={item.href} className="ws-tree-title"
+                  aria-current={pathname === item.href ? "page" : undefined}>{item.label}</Link>
+                <span className="ws-tree-toggle" aria-hidden="true" />
+              </summary>
+              <div className="ws-topic-documents">
+                {pages.map(entry => {
+                  const active = selected && pathname === entry.href;
+                  return active && (pathname !== item.href || item.id === "home" || item.id === "wiki") ? (
+                    <details key={entry.href} open className="ws-tree-details ws-document-branch">
+                      <summary className="ws-tree-row active">
+                        <Link href={entry.href} className="ws-tree-title" aria-current="page">{entry.label}</Link>
                         <span className="ws-tree-toggle" aria-hidden="true" />
                       </summary>
                       <div className="ws-tree-sections">
-                        <PageSections pageContents={pageContents} />
+                        <PageSections key={pathname} pageContents={pageContents} />
                       </div>
                     </details>
                   ) : (
-                    <Link href={entry.href} className="ws-tree-row ws-tree-doc-link">
+                    <Link key={entry.href} href={entry.href} className="ws-tree-row ws-tree-doc-link">
                       <span className="ws-tree-title">{entry.label}</span>
-                      <span className="ws-tree-toggle" aria-hidden="true">▸</span>
                     </Link>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-
-        </div>
-      )}
-    </>
+                  );
+                })}
+              </div>
+            </details>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
