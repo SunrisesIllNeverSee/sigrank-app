@@ -11,10 +11,12 @@
  * server component over two rows + the shared narrate/facts helpers — no fetch.
  */
 
+import type { CSSProperties } from "react";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
-import { colors } from "@/components/sigrank/tokens";
+import { compareClassPalette } from "./compare-palette";
+import { CompareRadars } from "./CompareRadars";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import {
   deriveFacts,
@@ -27,19 +29,6 @@ import {
 } from "@/components/compare/CompareSelectors";
 
 const nameOf = operatorDisplayName;
-
-function classColor(cls: SignalClass): string {
-  if (cls === "TRANSMITTER") return colors.class.TRANSMITTER;
-  const tier = cls.split(" ").slice(0, -1).join(" ");
-  return (colors.class as Record<string, string>)[tier] ?? colors.class.BASE;
-}
-
-/** CSS-var token name for a class (e.g. 'ARCH+ I' → 'class-archplus'). */
-function classVar(cls: SignalClass): string {
-  if (cls === "TRANSMITTER") return "class-transmitter";
-  const tier = cls.split(" ").slice(0, -1).join(" ");
-  return "class-" + tier.toLowerCase().replace("+", "plus");
-}
 
 function yieldStr(r: LeaderboardRow): string {
   const c = r.snapshot.cascade;
@@ -97,8 +86,8 @@ export function CompareMatchup({
   const nameB = nameOf(b);
   const clsA = a.snapshot.class_tier as SignalClass;
   const clsB = b.snapshot.class_tier as SignalClass;
-  const colA = classColor(clsA);
-  const colB = classColor(clsB);
+  const colA = compareClassPalette(clsA).color;
+  const colB = compareClassPalette(clsB).color;
 
   const { aWins, bWins } = compareTally(a, b);
   const winner: "a" | "b" | null =
@@ -124,39 +113,56 @@ export function CompareMatchup({
     facts: OperatorFact[];
     won: boolean;
   }) => {
-    const cvar = classVar(cls);
-    const tint = won ? 0.16 : 0.08;
-    // Both panels formatted the SAME (owner 2026-06-22): identity LEFT, 5 points RIGHT.
-    // Class tint still bleeds from each side's outer edge so the matchup stays distinct.
-    const bg = `linear-gradient(${side === "a" ? "105deg" : "255deg"}, rgb(var(--${cvar}) / ${tint}), transparent 72%)`;
+    // Fixed RGB fallback avoids Safari-specific interpolation differences.
+    const tint = compareClassPalette(cls).tint(won ? 0.16 : 0.08);
+    const bg = "linear-gradient(" + (side === "a" ? "105deg" : "255deg") +
+      ", " + tint + ", transparent 72%)";
+    const verified = r.operator.verification_status === "verified" ||
+      r.operator.verification_status === "audited";
     const identity = (
-      <div className="cmp-matchup-identity flex shrink-0 flex-col items-start gap-1 text-left">
-        <span
-          className="font-mono text-3xl leading-none"
-          style={{ color: col }}
-          aria-hidden
-        >
-          {glyphFor(cls)}
-        </span>
-        <span className="break-words font-mono text-sm font-bold text-text-primary">
-          {name}
-        </span>
-        <span
-          className="font-mono text-[11px] uppercase tracking-wide"
-          style={{ color: col }}
-        >
-          {cls} · #{r.global_rank}
-        </span>
-        <span className="figure-rise mt-1 font-mono text-4xl font-bold leading-none text-gold">
-          {yieldStr(r)}
-        </span>
-        <span className="font-mono text-[10px] text-text-muted">Υ Yield</span>
-        {won && (
-          <span className="mt-1 rounded-full border border-gold/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-gold">
-            ◆ Leads {Math.max(aWins, bWins)}–{Math.min(aWins, bWins)}
+      <header
+        className="cmp-matchup-identity cmp-profile-header"
+        style={{ "--cmp-class-color": col } as CSSProperties}
+        data-operator-side={side}
+      >
+        <div className="cmp-profile-topline">
+          <span className="cmp-profile-eyebrow">OPERATOR {side.toUpperCase()} <i aria-hidden /> LIVE</span>
+          <span className="cmp-profile-rank">GLOBAL <b>#{r.global_rank}</b></span>
+        </div>
+        <div className="cmp-profile-main">
+          <span className="cmp-profile-avatar"
+            style={{ background: compareClassPalette(cls).tint(0.18) }}
+            aria-hidden="true">
+            {r.operator.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- public operator profile avatar
+              <img src={r.operator.avatar_url} alt="" loading="lazy" />
+            ) : (
+              <span className="cmp-profile-glyph">{glyphFor(cls)}</span>
+            )}
+            {verified ? <span className="cmp-profile-verified">✓</span> : null}
           </span>
-        )}
-      </div>
+          <span className="cmp-profile-names">
+            <strong className="cmp-profile-name" title={name}>{name}</strong>
+            <span className="cmp-profile-handle">
+              {r.operator.handle?.trim() || r.operator.codename}
+            </span>
+          </span>
+        </div>
+        <div className="cmp-profile-bottomline">
+          <span className="cmp-profile-class">
+            <span aria-hidden>{glyphFor(cls)}</span> {cls}
+          </span>
+          <span className="cmp-profile-yield">
+            <strong>{yieldStr(r)}</strong>
+            <small>Υ YIELD</small>
+          </span>
+        </div>
+        {won ? (
+          <span className="cmp-profile-leading">
+            ◆ LEADING · {Math.max(aWins, bWins)}–{Math.min(aWins, bWins)}
+          </span>
+        ) : null}
+      </header>
     );
     const factList = (
       <ul className="cmp-matchup-facts flex min-w-0 flex-1 flex-col justify-center gap-1.5">
@@ -177,8 +183,10 @@ export function CompareMatchup({
         }
         style={{ background: bg }}
       >
-        {identity}
-        {factList}
+        <div className="cmp-operator-report">
+          <div className="cmp-operator-report-copy">{identity}{factList}</div>
+          <CompareRadars a={a} b={b} side={side} />
+        </div>
       </div>
     );
   };
@@ -202,6 +210,7 @@ export function CompareMatchup({
           facts={factsA}
           won={winner === "a"}
         />
+        {!hideSelectors && (
         <div className="cmp-matchup-vs flex flex-col items-center justify-center gap-1 px-1 sm:px-2">
           <span
             className="font-mono text-3xl font-bold tracking-widest text-text-secondary sm:text-4xl"
@@ -213,6 +222,7 @@ export function CompareMatchup({
             {aWins}–{bWins}
           </span>
         </div>
+        )}
         <Panel
           r={b}
           side="b"

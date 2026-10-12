@@ -32,6 +32,8 @@ interface Props {
   fieldAvg?: number | null;
   /** SVG height. Default 240. */
   height?: number;
+  colorA?: string;
+  colorB?: string;
 }
 
 // Theme-reactive CSS vars — re-resolve when data-theme flips.
@@ -75,6 +77,8 @@ export function CompareHistoryChart({
   nameB,
   fieldAvg,
   height = 240,
+  colorA,
+  colorB,
 }: Props) {
   const ptsA = toPts(historyA);
   const ptsB = toPts(historyB);
@@ -161,12 +165,12 @@ export function CompareHistoryChart({
     >
       <defs>
         <linearGradient id="cmp-grad-a" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={BLUE} stopOpacity={0.28} />
-          <stop offset="100%" stopColor={BLUE} stopOpacity={0} />
+          <stop offset="0%" stopColor={(colorB ?? BLUE)} stopOpacity={0.28} />
+          <stop offset="100%" stopColor={(colorB ?? BLUE)} stopOpacity={0} />
         </linearGradient>
         <linearGradient id="cmp-grad-b" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={GOLD} stopOpacity={0.28} />
-          <stop offset="100%" stopColor={GOLD} stopOpacity={0} />
+          <stop offset="0%" stopColor={(colorA ?? GOLD)} stopOpacity={0.28} />
+          <stop offset="100%" stopColor={(colorA ?? GOLD)} stopOpacity={0} />
         </linearGradient>
       </defs>
 
@@ -190,7 +194,7 @@ export function CompareHistoryChart({
           width={10}
           height={10}
           rx={2}
-          fill={BLUE}
+          fill={(colorB ?? BLUE)}
         />
         <text
           x={W - padR - 256}
@@ -207,7 +211,7 @@ export function CompareHistoryChart({
           width={10}
           height={10}
           rx={2}
-          fill={GOLD}
+          fill={(colorA ?? GOLD)}
         />
         <text
           x={W - padR - 156}
@@ -304,7 +308,7 @@ export function CompareHistoryChart({
           <path
             d={linePathA}
             fill="none"
-            stroke={BLUE}
+            stroke={(colorB ?? BLUE)}
             strokeWidth={2.4}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -319,7 +323,7 @@ export function CompareHistoryChart({
           <path
             d={linePathB}
             fill="none"
-            stroke={GOLD}
+            stroke={(colorA ?? GOLD)}
             strokeWidth={2.4}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -338,8 +342,8 @@ export function CompareHistoryChart({
             cx={x.toFixed(2)}
             cy={y.toFixed(2)}
             r={isLast ? 4 : 2.5}
-            fill={isLast ? BLUE : SURF}
-            stroke={BLUE}
+            fill={isLast ? (colorB ?? BLUE) : SURF}
+            stroke={(colorB ?? BLUE)}
             strokeWidth={1.5}
           />
         );
@@ -356,8 +360,8 @@ export function CompareHistoryChart({
             cx={x.toFixed(2)}
             cy={y.toFixed(2)}
             r={isLast ? 4 : 2.5}
-            fill={isLast ? GOLD : SURF}
-            stroke={GOLD}
+            fill={isLast ? (colorA ?? GOLD) : SURF}
+            stroke={(colorA ?? GOLD)}
             strokeWidth={1.5}
           />
         );
@@ -369,7 +373,7 @@ export function CompareHistoryChart({
           x={W - padR + 8}
           y={yAt(lastA.v).toFixed(2)}
           dominantBaseline="middle"
-          fill={BLUE}
+          fill={(colorB ?? BLUE)}
           fontSize={11}
           fontWeight={700}
           fontFamily={MONO}
@@ -382,7 +386,7 @@ export function CompareHistoryChart({
           x={W - padR + 8}
           y={yAt(lastB.v).toFixed(2)}
           dominantBaseline="middle"
-          fill={GOLD}
+          fill={(colorA ?? GOLD)}
           fontSize={11}
           fontWeight={700}
           fontFamily={MONO}
