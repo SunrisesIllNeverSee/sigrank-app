@@ -2,17 +2,17 @@
 
 ## Current whole-site preview — October 12, 2026
 
-This current-state receipt supersedes older audit rows below. Preview :3230 is now a Next development server in signalaf-integration-a315435, not the earlier production build. The local branch is at 6d30d9e; origin/integration/site-a315435 is at f0a39eb (nine local commits ahead at this check).
+This current-state receipt supersedes older audit rows below. Preview :3230 is now a Next development server in signalaf-integration-a315435, not the earlier production build. Application source checkpoint: 196bb34. Local and GitHub integration branch were verified identical after publishing the accumulated changes. Follow STAGING_WORKFLOW.md for subsequent handoffs.
 
 | Area | Current source / visible preview | Custody |
 |---|---|---|
 | Homepage / leaderboard | Latest committed board work and shared account/navigation at / | Committed locally |
-| Compare | 5b7172e operator radars and vertical ledger; newer live-operator/token-longevity additions visible at /compare | Newer additions remain uncommitted and owned by active Compare workstream |
+| Compare | 5b7172e operator radars and vertical ledger; 196bb34 live-operator/token-longevity additions visible at /compare | Committed in 196bb34 and pushed to the integration branch |
 | SigRank / Field / Articles / Blog / Wiki | 410f4ee shared editorial layout and Back/Home navigation; 6d30d9e terminal hero sizing; all five routes verified in browser | Committed locally |
 | Hall | Shared workspace at /hall, Back/Home navigation present | Existing staged implementation; no new design acceptance implied |
 | Profile | Four-column shared shell at /user/signal-92b4f9f485 | Existing staged implementation; mock parity/owner acceptance gates remain |
 
-All eight page families were loaded without an application-error page. This is a preview synchronization check, not whole-site release signoff or approval of uncommitted Compare changes. Other agents' files were not changed, committed, or discarded. No push, merge, or deployment performed by this audit.
+All eight page families were loaded without an application-error page. This is a preview synchronization check, not whole-site release signoff or approval of uncommitted Compare changes. Other agents' files were not changed, committed, or discarded. Integration branch pushed following owner clarification: keep production unchanged during redesign, allow staging synchronization. Vercel preview status must be verified separately; no main merge or production promotion.
 
 
 Updated October 12, 2026. **Review candidate; not merged, pushed or deployed by this session.**
