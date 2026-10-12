@@ -237,9 +237,13 @@ export function BadgesView({
       <Module
         title="Class Ladder"
         subtitle={
-          tierProgress?.nextClass
-            ? `${tierProgress.progressPct.toFixed(0)}% TO ${tierProgress.nextClass}`
-            : "TOP CLASS REACHED"
+          tierProgress == null
+            ? "CLASS STANDING UNAVAILABLE"
+            : tierProgress.nextClass
+              ? `${tierProgress.progressPct.toFixed(0)}% TO ${tierProgress.nextClass}`
+              : currentIdx === 0
+                ? "TOP CLASS REACHED"
+                : "CLASS STANDING UNAVAILABLE"
         }
       >
         <div className="flex flex-col">
@@ -271,8 +275,10 @@ export function BadgesView({
                   {compact(rung.totalMin)}+ TOKENS
                 </span>
                 <span className="flex-1 font-mono text-[9px] uppercase tracking-[0.08em] text-text-muted">
-                  {isCurrent && tierProgress?.nextClass
-                    ? `${compact(tierProgress.currentTotal)} BANKED · ${compact(tierProgress.tokensToNext ?? 0)} TO ${tierProgress.nextClass}`
+                  {isCurrent
+                    ? tierProgress?.nextClass
+                      ? `${compact(tierProgress.currentTotal)} BANKED · ${compact(tierProgress.tokensToNext ?? 0)} TO ${tierProgress.nextClass}`
+                      : "CURRENT CLASS"
                     : isLocked
                       ? isNext
                         ? "NEXT CLASS — LOCKED"

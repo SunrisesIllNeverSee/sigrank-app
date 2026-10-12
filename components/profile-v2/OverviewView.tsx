@@ -376,7 +376,6 @@ export function OverviewView({
           telemetry={telemetry}
           pending={pending}
           fieldAvg={fieldAvg}
-          boardRows={boardRows}
         />
       </section>
 

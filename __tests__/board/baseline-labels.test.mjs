@@ -21,12 +21,19 @@ test("FIX 8: SplitFlapCard documents its baseline as AA-modeled (not live field)
   );
 });
 
-test("FIX 8: /compare documents its baseline as live field median", () => {
+test("FIX 8: /compare carries no unlabeled field baseline", () => {
   const src = read("app/compare/page.tsx");
-  assert.ok(
-    /median.*[Uu]psilon|field median|live field/i.test(src),
-    '/compare must label The Field as the live field median, not just "average"',
-  );
+  // The live-operators-only rework removed the "The Field" pseudo-operator
+  // baseline row entirely — liveCompareCandidates now excludes "the-field".
+  // If a field baseline ever returns to the page, the FIX 8 labeling rule
+  // still applies: it must be labeled as the live field median.
+  const hasBaseline = /the[- ]field|baseline|average user|avg\b/i.test(src);
+  if (hasBaseline) {
+    assert.ok(
+      /median.*[Uu]psilon|field median|live field/i.test(src),
+      '/compare must label The Field as the live field median, not just "average"',
+    );
+  }
 });
 
 test("FIX 8: FourDegreesChart already labels its baselines (parity check)", () => {
