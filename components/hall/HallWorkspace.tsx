@@ -44,6 +44,7 @@ import { recordValue } from "@/lib/analytics/record-value";
 import { MetricTopTen } from "./MetricTopTen";
 import { RecordTicker } from "./RecordTicker";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import "./hall-workspace.css";
 
 /** Op-ratio variant board ids (Y.10–Y.12). */
 const OP_RATIO_IDS = new Set(["Y.10", "Y.11", "Y.12"]);
@@ -476,7 +477,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
       <div className="ws-ticker">
         <RecordTicker items={tickerItems} />
       </div>
-      <div className="ws-grid3">
+      <div className="ws-grid3 ws-hall-grid">
         {boardSet.map((b, i) => (
           <MetricTopTen
             key={b.canonId}

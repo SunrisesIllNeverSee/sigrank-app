@@ -138,7 +138,7 @@ export function HallSubmissionRow({
   return (
     // 2 rows per entry (owner 2026-06-21): row 1 = rank · name · class glyph · claimed;
     // row 2 = the metric value, right-aligned and emphasized.
-    <div className="flex flex-col gap-0.5 border-b border-bg-border-subtle px-2 py-2 text-sm last:border-b-0">
+    <div className="hall-record-row flex flex-col gap-0.5 border-b border-bg-border-subtle px-2 py-2 text-sm last:border-b-0">
       <div className="flex min-w-0 items-center gap-2">
         <span className="inline-flex w-7 shrink-0 items-center justify-center font-mono font-bold leading-none">
           {rankNode}
@@ -155,7 +155,7 @@ export function HallSubmissionRow({
           </span>
         ) : null}
       </div>
-      <div className="flex items-baseline justify-end gap-2 pl-9">
+      <div className="hall-record-value flex items-baseline justify-end gap-2 pl-9">
         {platform ? (
           <span className="mr-auto font-mono text-[10px] uppercase text-text-muted">
             {platform}

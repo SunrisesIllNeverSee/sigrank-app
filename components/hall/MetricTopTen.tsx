@@ -66,8 +66,8 @@ export function MetricTopTen({
   const top = rows.filter((r) => r.operator.status !== "retired").slice(0, limit);
 
   return (
-    <section className="rounded-md border border-bg-border bg-bg-surface p-4">
-      <div className="mb-3 flex flex-col items-center gap-0.5 text-center">
+    <section className="hall-metric-card rounded-md border border-bg-border bg-bg-surface p-4">
+      <div className="hall-metric-heading mb-3 flex flex-col items-center gap-0.5 text-center">
         <h3 className="font-mono text-sm font-bold tracking-wide text-text-primary">
           {name}
         </h3>
