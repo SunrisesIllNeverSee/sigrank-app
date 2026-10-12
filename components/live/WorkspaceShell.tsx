@@ -429,7 +429,7 @@ export function WorkspaceShell({
         <div className="maincol">
           <div className="mid">
             {leftOn && left != null && (
-              <aside className="lside">
+              <aside className={`lside${topic ? " ws-editorial-sidebar" : ""}`}>
                 <button
                   type="button"
                   className="edge edge-l"

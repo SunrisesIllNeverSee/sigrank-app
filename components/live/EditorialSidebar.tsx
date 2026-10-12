@@ -263,8 +263,6 @@ export function EditorialNav({
     || (topic === "articles" && pathname === "/articles")
     || (topic === "blog" && pathname === "/blog");
   const isReader = !isHome && !isWiki && !isLanding;
-  const collectionHref = topic === "field" ? "/fieldhub"
-    : topic === "articles" ? "/articles" : "/blog";
   const collectionLabel = topic === "field" ? "Field"
     : topic === "articles" ? "Articles" : "Blog";
   const entries = documents ?? PAGES[topic];
@@ -326,12 +324,7 @@ export function EditorialNav({
               );
             })}
           </nav>
-          {isReader && (
-            <nav className="ws-tree-exit" aria-label="Leave document">
-              <Link href={collectionHref}>← Back</Link>
-              <Link href="/">⌂ Home</Link>
-            </nav>
-          )}
+
         </div>
       )}
     </>
