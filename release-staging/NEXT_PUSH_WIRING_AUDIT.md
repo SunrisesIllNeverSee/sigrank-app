@@ -3,7 +3,7 @@
 **Branch:** `integration/site-a315435`
 **Preview:** `http://localhost:3230/` (use `localhost`, not `127.0.0.1` — dev chunks are blocked cross-origin on the IP host, so hydration silently fails there)
 **Date:** 2026-10-12
-**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `68feff6` (reviewer corrections) — pushed to `origin/integration/site-a315435`
+**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2 corrections) + `7a95d3f` (round-3 corrections) + `56fed14` (round-3 audit) — pushed to `origin/integration/site-a315435`
 
 ---
 
@@ -82,9 +82,10 @@ Restored the approved mock split (passport card + railway flap board) as the fir
 
 - `npx tsc --noEmit` — clean.
 - `npm run test:canonical` — 11/11.
-- `npm test` — 682 pass / 0 fail / 4 skipped (was 681/1 — the two stale compare-baseline tests retargeted to the live-operators-only contract, see fix log below).
-- `bunx vitest run __tests__/board/snapshot-records.test.ts` — 8/8.
-- `bun run lint` — 0 errors, 66 warnings (was 67 — `hasHistory` warning removed; remaining warnings are pre-existing in scripts/older modules).
+- `npm test` — 682 pass / 0 fail / 4 skipped.
+- `npm run test:ui` (vitest) — 205 pass / 21 files; `snapshot-records.test.ts` 13/13 (guard parity on both snapshot reads, watch-count contract, mapping, null handling, mode resolution, evidence gating).
+- `npm run lint` — 0 errors, 66 warnings (all pre-existing in scripts/older modules; touched files clean).
+- Live re-verification (Chromium): real `WATCHED BY` count, FIELD AVG labels, roving tabindex + arrow/Home/End tab navigation + aria linkage, no private report in the RSC payload, `Locked · 12/500` social milestone, `OUTSIDE OCM · OUTLIER` footer. 0 page errors.
 
 ## Reviewer rejection fixes (round 2)
 
@@ -108,8 +109,34 @@ Compare-lane reconciliation: `baseline-labels.test.mjs` FIX 8 and `the-field-boa
 
 `/tmp/profile-submissions.png` (expanded records), `/tmp/profile-badges2.png` (badges tab), `/tmp/profile-analysis.png` + `/tmp/wk-analysis.png` (Tier+HCM, Chromium/WebKit), `/tmp/wk-overview.png` (opensplit, WebKit), `/tmp/board-top.png` / `/tmp/board-raw.png` / `/tmp/board-820.png` / `/tmp/board-share.png` (toolbar states), `/tmp/j5-hall.png`.
 
+## Reviewer rejection fixes (round 3)
+
+All items from the review of `53f3d38` addressed:
+
+| # | Issue | Fix | Files |
+|---|-------|-----|-------|
+| 1 | **Critical** — hard-coded `watchCount = 0` rendered as `WATCHED BY 0` | New `getOperatorWatchCount(codename)` in `queries.ts` — service-side HEAD count on `operator_watches` (anon has no SELECT on the table; only the count is exposed, never watcher identity — same contract as `/api/v1/operators/{codename}/watch`). Wrapped in `unstable_cache` (150s, `operator` tag), re-exported via the barrel, fetched in the `ProfileBody` `Promise.all`, and wired into both `OverviewView` (`WATCHED BY n`) and `StatsView` (Watchers row). Placeholder removed. | `lib/board/queries.ts`, `cached.ts`, `index.ts`, `ProfileBody.tsx` |
+| 2 | **Critical** — means labeled "median" in VsField + DeltaBreakdown | Relabeled to FIELD AVG end-to-end: `vs field avg` toggle label, `{fmt} AVG` bar values, `REF = FIELD AVG · N=` legend, `avg != null` guard (was stale `med`), `Above / below field average` subtitle, `ABOVE AVG`/`METRICS ABOVE FIELD AVG` footer. One baseline source — `computeFieldAverages` — across Overview, VsField, and DeltaBreakdown. The OCM scatter's `DASHED = FIELD MEDIAN` crosshair stays: it is a genuine `median()` of the plotted dots. | `components/profile-v2/AnalysisView.tsx` |
+| 3 | **Critical** — cross-tab badge contradiction (Social always locked the 500TH badge) | `SocialView`/`BadgesModule` accept `scoredSnapshots` (the real `snapshotRecords.length`); the milestone renders `Locked · n/500` under the threshold and earned at ≥500 — the same derivation `BadgesView` uses. Verified live: `/user/xoxo?tab=social` shows `500TH Snapshot Locked · 12/500`. | `components/profile-v2/SocialView.tsx`, `ProfileBody.tsx` |
+| 4 | Private report serialized into the RSC flight payload | `ProfileBody` now passes `report={null}` to the gate unless `report_visible` — a private report never leaves the server. New route `GET /api/v1/operators/{codename}/report` serves the report when `report_visible` is on, else requires the linked-owner session (`getSessionOperator` — the same check `/api/profile/report-visibility` uses); 404 otherwise, `force-dynamic`, rate-limited. `ReportTabGate` fetches it client-side only after auth resolves as owner; non-owners get a "private — visible to the operator only" notice; owners who genuinely lack a report get the existing empty state. | `app/api/v1/operators/[codename]/report/route.ts`, `components/profile/ProfileAuthGates.tsx`, `ProfileBody.tsx` |
+| 5 | Asymmetric visibility guards on the same page | `getOperatorSubmissions` now enforces the identical contract as `getOperatorSnapshotRecords` and the public API: `claimed`, non-`retired`, non-`private` — checked before the `metric_snapshots` read is issued. | `lib/board/queries.ts` |
+| 6 | Tabs failing the APG keyboard contract | Roving `tabIndex` (active tab `0`, others `-1`), `ArrowLeft`/`ArrowRight`/`Home`/`End` with automatic activation + focus move, `aria-controls="pv2-tabpanel"` on every tab, `id="pv2-tab-{key}"` + `aria-labelledby` linkage on the panel. Locked affordances stay `disabled` and are skipped by arrow order. Verified live: focus+selection follow End/Home/arrows; `?tab=` persists. | `components/profile-v2/ProfileTabsV2.tsx` |
+| 7 | OCM dot vs. label could disagree (differently-aged sources) | The operator point is always built from the profile `telemetry`/`cascade` props — the same source the `isOutlier` membership test reads — never the board row's 3600s-memo telemetry. Only the resolved `mode` chip comes from the board row. Dot and IN/OUT label can no longer diverge. | `components/profile-v2/AnalysisView.tsx` |
+| 8 | Ordering parity gap vs the API | `getOperatorSnapshotRecords` now orders `submitted_at DESC, submission_id DESC` — identical to the snapshot-history route; tied timestamps resolve deterministically. | `lib/board/queries.ts` |
+
+Suggestions applied:
+
+- Stale comments corrected — `ProfileBody` header ("Eight tab panels", "7 parallel fetches"), `page.tsx` header (rewritten for the 8-tab workspace), "9 DB queries on a cold miss".
+- `components/profile-v2/IdentityHero.tsx` (281 lines, zero imports) deleted.
+- `computeTrophyCounts` accepts a `hallRecords` param; `ProfileBody` passes its already-fetched list — no second `getHallOfSignal` read.
+- Tests: `snapshot-records.test.ts` extended to 13 — `getOperatorSubmissions` guard parity + operator constraint + mapping, `getOperatorWatchCount` HEAD-count contract + unknown-operator path.
+
+Deferred / noted (not fixed, with reason):
+
+- `ilike("codename", …)` `_` wildcard — repo-wide pre-existing pattern across every codename lookup; `.limit(1)` masks multi-match. A `.eq` + lowercased-column migration or `ilike`-escaping pass is a cross-repo data-layer change, out of this lane's scope. Flagged for the owner.
+- Board UX nits (search input collapse, `wftag` Raw-only) — compare/board surface belongs to another lane's design; noted on the bus rather than patched here.
+
 ## Remaining blockers
 
-- Owner-only surfaces (Report/Lab) verified as *locked for public*; authenticated-owner rendering not exercised (no auth session in the local preview).
-- `watchCount` in `ProfileBody` remains a documented placeholder (0) until the profile-level watch fetch lands.
+- Owner-only surfaces (Report/Lab) verified as *locked for public*; the private-report owner-fetch path (`/api/v1/operators/{codename}/report` → gate render) is code-verified but not exercised with a real authenticated session in the local preview.
 - No hybrid/agentic scored submissions exist in current data — the distinct `HYBRID` label and evidence ↗ link are code-verified (unit tests + type-level) but not yet exercised by live rows.
