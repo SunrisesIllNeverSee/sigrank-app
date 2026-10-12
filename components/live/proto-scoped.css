@@ -1726,3 +1726,10 @@
 .lbw-root .sigrank-column-hero .mt-5{margin-top:4px}
 .lbw-root .sigrank-column-hero button[aria-label="Copy npx sigrank command to clipboard"]{padding:8px 14px;font-size:13px}
 .lbw-root .sigrank-column-hero button .select-none{font-size:14px}
+
+/* Launch rail: operators, writings, then three unavailable features. */
+.lbw-root .rail-nav-group{display:flex;flex-direction:column}
+.lbw-root .snav .rail-unavailable,.lbw-root .snav .rail-unavailable .gi{color:#73806e!important;cursor:default;opacity:.65;background:transparent!important}
+.lbw-root .snav .rail-unavailable .lit{background:#73806e!important}
+.lbw-root .sbtn[aria-label="PROFILE"] .gi{color:var(--violet)}
+.lbw-root .sbtn[aria-label="ARTICLES"] .gi{color:var(--cyan)}
