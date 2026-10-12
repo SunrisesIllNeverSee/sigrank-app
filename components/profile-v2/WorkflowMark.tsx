@@ -3,14 +3,16 @@
  * with readable labels (owner checklist item 12).
  *
  * Three resolved modes + the unresolved review state, matching the board's
- * presentation vocabulary:
+ * presentation vocabulary. Custom inline-SVG marks keyed to the hexagon
+ * medallion language (no emoji/icon font):
  *
- *   hitl    → ◉ OITL  OPERATOR-IN-THE-LOOP — person glyph inside a loop ring
- *   agentic → ⌬ AUTO  AUTOMATED — hexagonal agent body with a bolt (verified
- *             automation only; requires HTTPS evidence)
- *   hybrid  → ◈ HYBRID assessed hybrid — two interlocked half-marks
- *   null    → ◌ REVIEW UNRESOLVED — dashed ring; a review candidate, never
- *             presented as verified automation
+ *   hitl    → OITL  OPERATOR-IN-THE-LOOP — operator bust closing the loop
+ *             ring (arrowhead marks the human completing the circuit)
+ *   agentic → AUTO  AUTOMATED — hexagonal chassis + bolt core + circuit
+ *             nodes (verified automation only; requires HTTPS evidence)
+ *   hybrid  → HYBRID — hexagon split down the seam: person half / bolt half
+ *   null    → REVIEW UNRESOLVED — dashed hexagon + scan tick; a review
+ *             candidate, never presented as verified automation
  *
  * Pure render — safe for server components. The glyph is drawn inline so it
  * matches the pixel-type aesthetic without an icon font.
@@ -27,44 +29,55 @@ interface WorkflowMarkProps {
 }
 
 function OitlGlyph() {
-  // Person-in-loop: head + shoulders centered inside a broken ring.
+  // Person-in-loop: operator bust with the loop closing around them —
+  // arrowhead marks the human completing the circuit.
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M20 12a8 8 0 1 1-2.34-5.66" />
-      <circle cx="12" cy="10" r="3" fill="currentColor" stroke="none" />
-      <path d="M7.5 17a5 5 0 0 1 9 0" fill="currentColor" stroke="none" />
+    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3.4a8.6 8.6 0 1 0 8.6 8.6" />
+      <path d="M17.4 3.2 20.6 3.6l-.4 3.2" />
+      <circle cx="12" cy="10.4" r="2.7" fill="currentColor" stroke="none" />
+      <path d="M7.6 17.4a4.9 4.9 0 0 1 8.8 0" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 function AutoGlyph() {
-  // Agent: hex body + bolt — machine-automated, visually opposite the person.
+  // Agent: hexagonal chassis + bolt core + circuit nodes — machine-built.
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
-      <path d="M12 2.5 20 7v10l-8 4.5L4 17V7z" />
-      <path d="M12.8 6.5 9.5 12.5h2.4L11 17.5l4.3-7h-2.5z" fill="currentColor" stroke="none" />
+    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round">
+      <path d="M12 2.6 20.2 7.4v9.2L12 21.4 3.8 16.6V7.4z" />
+      <path d="M12.9 6.8 9.7 12.4h2.3l-.9 4.8 4.2-6.6h-2.4l1.4-3.8z" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="2.6" r="1" fill="currentColor" stroke="none" />
+      <circle cx="20.2" cy="7.4" r="1" fill="currentColor" stroke="none" />
+      <circle cx="20.2" cy="16.6" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="21.4" r="1" fill="currentColor" stroke="none" />
+      <circle cx="3.8" cy="16.6" r="1" fill="currentColor" stroke="none" />
+      <circle cx="3.8" cy="7.4" r="1" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 function HybridGlyph() {
-  // Interlocked half-marks: half person / half agent share one diamond.
+  // Split hexagon — left half person (operator arc), right half bolt (agent).
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
-      <path d="M12 2 22 12 12 22 2 12z" />
-      <circle cx="9.5" cy="10.5" r="2" fill="currentColor" stroke="none" />
-      <path d="M13.2 8.5 11 12.5h1.7L11.6 15.5 15 11.5h-1.8z" fill="currentColor" stroke="none" />
+    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round">
+      <path d="M12 2.6 20.2 7.4v9.2L12 21.4 3.8 16.6V7.4z" />
+      <path d="M12 2.6v18.8" strokeDasharray="2.2 2.4" opacity="0.7" />
+      <circle cx="8.4" cy="10" r="1.9" fill="currentColor" stroke="none" />
+      <path d="M5.2 15.6a3.5 3.5 0 0 1 6.4 0" fill="currentColor" stroke="none" />
+      <path d="M16.6 7.2 14.1 12h1.7l-.7 3.6 3.2-5h-1.8l1.2-3.4z" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 function ReviewGlyph() {
-  // Unresolved: dashed ring + question mark — honest "under review" state.
+  // Unresolved: dashed hexagon + scan beam — a candidate under review,
+  // never presented as verified automation.
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="12" cy="12" r="8.5" strokeDasharray="3 3" />
-      <path d="M10 9.5a2 2 0 1 1 3 1.7c-.7.4-1 .9-1 1.8" />
-      <circle cx="12" cy="16.5" r="0.5" fill="currentColor" />
+    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.6 20.2 7.4v9.2L12 21.4 3.8 16.6V7.4z" strokeDasharray="3.4 3" />
+      <path d="M8 13.6l2.6 2.6L16.4 10" opacity="0.9" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
     </svg>
   );
 }

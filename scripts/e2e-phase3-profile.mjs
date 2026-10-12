@@ -56,7 +56,8 @@ try {
     // main content must NOT contain heatmap/records any more
     const mainHasHeat = main ? !!main.querySelector(".prl-heat") : null;
     const mainHasRecs = main ? !!main.querySelector(".prl-recs") : null;
-    return { railBox, mainBox, ctx, note, wf, recStates, medals, heatCells, actInRail, recInRail, ctxInRail, shineAnim, heroRank, mainHasHeat, mainHasRecs, recCount: recButtons.length };
+    const hexPaths = document.querySelectorAll('.prl-rec svg path[d^="M24 2.5"], .prl-medal svg path[d^="M24 2.5"]').length;
+    return { railBox, mainBox, ctx, note, wf, recStates, medals, heatCells, actInRail, recInRail, ctxInRail, shineAnim, heroRank, mainHasHeat, mainHasRecs, recCount: recButtons.length, hexPaths };
   });
 
   check("rail is right of main", rail.railBox && rail.mainBox && rail.railBox.x > rail.mainBox.x + rail.mainBox.width - 40, `rail.x=${rail.railBox?.x.toFixed(0)} main.right=${rail.mainBox?.right.toFixed(0)}`);
@@ -72,6 +73,32 @@ try {
   check("holo shine animates", rail.shineAnim && rail.shineAnim !== "none", rail.shineAnim);
   check("hero shows field rank #3", /#\s*3/.test(rail.heroRank), rail.heroRank.replace(/\s+/g, " ").slice(0, 40));
   check("hero percentile 90.5", /90\.5\s*%ile/.test(rail.heroRank), rail.heroRank.replace(/\s+/g, " ").slice(0, 60));
+  check("hexagon medallion artwork", rail.hexPaths > 0, `${rail.hexPaths} medallions`);
+
+  /* ── in-window popups (owner: heat map + honors pop up on click) ── */
+  const popBtns = await page.locator(".prl-open").count();
+  check("popup triggers (activity + honors)", popBtns === 2, `${popBtns}`);
+  const sparkN = await page.locator(".prl-spark i").count();
+  check("activity spark strip 22 weeks", sparkN === 22, `${sparkN}`);
+  // activity trigger → wide dialog with the full 154-cell grid
+  await page.locator(".mod", { hasText: "SUBMISSION ACTIVITY" }).locator(".prl-open").click();
+  await page.waitForSelector(".prl-dialog--wide[open]", { timeout: 5000 });
+  const actPop = await page.evaluate(() => {
+    const d = document.querySelector(".prl-dialog--wide[open]");
+    return d ? { cells: d.querySelectorAll(".prl-heat-cell").length, legend: d.querySelectorAll(".prl-heat-legend span").length, title: d.querySelector(".prl-dialog-titles strong")?.textContent } : null;
+  });
+  check("activity popup = full heatmap", !!actPop && actPop.cells === 154 && actPop.legend === 4, `${actPop?.cells} cells, ${actPop?.legend} legend`);
+  await page.keyboard.press("Escape");
+  // honors trigger → medal/badge breakdown dialog
+  await page.locator(".mod", { hasText: "RECORDS" }).locator(".prl-open").click();
+  await page.waitForSelector(".prl-dialog[open]", { timeout: 5000 });
+  const honPop = await page.evaluate(() => {
+    const d = document.querySelector(".prl-dialog[open]");
+    return d ? { dts: [...d.querySelectorAll("dt")].map((t) => t.textContent.trim()), title: d.querySelector(".prl-dialog-titles strong")?.textContent } : null;
+  });
+  check("honors popup lists medals+badges", !!honPop && ["GOLD", "SILVER", "BRONZE", "WATCHED"].every((k) => honPop.dts.some((d) => d.includes(k))), honPop?.dts.join("|").slice(0, 80));
+  await page.keyboard.press("Escape");
+  check("popups close on Esc", (await page.locator(".prl-dialog[open]").count()) === 0);
 
   /* ── record dialog (item 10) ── */
   await page.locator(".prl-rec").first().click();

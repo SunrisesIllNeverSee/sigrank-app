@@ -81,15 +81,16 @@
 
 /* Railway flap board — black phosphor stats terminal (mock .flapboard). */
 .lbw-root .pv2 .pv2-flapboard{background:#060a05;border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
-.lbw-root .pv2 .pv2-flap-cols{display:grid;grid-template-columns:1.1fr .9fr .7fr .9fr;gap:0;border-bottom:1px solid var(--line2);background:var(--bg2)}
-.lbw-root .pv2 .pv2-flap-cols span{font-family:var(--pv2-display,monospace);font-size:8px;letter-spacing:.12em;color:var(--tx2);padding:6px 10px;text-transform:uppercase}
-.lbw-root .pv2 .pv2-flap-cols span:nth-child(3){text-align:center}
+.lbw-root .pv2 .pv2-flap-cols{display:grid;grid-template-columns:minmax(8.5ch,auto) auto minmax(2ch,1fr) auto;column-gap:12px;border-bottom:1px solid var(--line2);background:var(--bg2)}
+.lbw-root .pv2 .pv2-flap-cols span{font-family:var(--pv2-display,monospace);font-size:8px;letter-spacing:.12em;color:var(--tx2);padding:6px 0;text-transform:uppercase;white-space:nowrap}
+.lbw-root .pv2 .pv2-flap-cols span:nth-child(3){text-align:right;padding-right:10px}
+.lbw-root .pv2 .pv2-flap-cols span:nth-child(4){text-align:right}
 .lbw-root .pv2 .pv2-flap-rows{display:flex;flex-direction:column;padding:1px 0;flex:1}
-.lbw-root .pv2 .pv2-flap-row{display:grid;grid-template-columns:1.1fr .9fr .7fr .9fr;align-items:center;padding:3.5px 10px;border-bottom:1px solid rgba(29,41,24,.5);font-variant-numeric:tabular-nums;flex:1}
+.lbw-root .pv2 .pv2-flap-row{display:grid;grid-template-columns:minmax(8.5ch,auto) auto minmax(2ch,1fr) auto;column-gap:12px;align-items:center;padding:3.5px 10px;border-bottom:1px solid rgba(29,41,24,.5);font-variant-numeric:tabular-nums;flex:1}
 .lbw-root .pv2 .pv2-flap-row:last-child{border-bottom:none}
 .lbw-root .pv2 .pv2-flap-row .fk{font-family:var(--pv2-display,monospace);font-size:9px;letter-spacing:.1em;color:var(--tx2);text-transform:uppercase}
 .lbw-root .pv2 .pv2-flap-row .fv{font-family:var(--pv2-mono,monospace);font-size:13px;font-weight:600;color:#7cff4f;text-align:left}
-.lbw-root .pv2 .pv2-flap-row .ck{font-family:var(--pv2-display,monospace);font-size:9px;letter-spacing:.08em;color:var(--ac);text-align:center}
+.lbw-root .pv2 .pv2-flap-row .ck{font-family:var(--pv2-display,monospace);font-size:9px;letter-spacing:.08em;color:var(--ac);text-align:right;padding-right:10px;justify-self:end}
 .lbw-root .pv2 .pv2-flap-row .cv{font-family:var(--pv2-mono,monospace);font-size:13px;font-weight:600;color:#b9cbb0;text-align:right}
 .lbw-root .pv2 .pv2-flap-row .cv.avg{color:#71826a;font-weight:400}
 .lbw-root .pv2 .pv2-flap-row .fv.gold{color:var(--gold)}
@@ -211,3 +212,23 @@
 .lbw-root .prl-dialog-dl dt{font:700 8px var(--pv2-display,monospace);letter-spacing:.08em;color:var(--mut);width:76px;flex-shrink:0;padding-top:2px}
 .lbw-root .prl-dialog-dl dd{margin:0;font:10px var(--pv2-mono,monospace);color:var(--tx);line-height:1.5;min-width:0}
 .lbw-root .prl-dialog-dl a{color:var(--gold)}
+
+/* ── Phase-3 round 2 — in-window popups + medallion marks ─────────────── */
+/* Rail module trigger: compact preview that opens the in-window dialog. */
+.lbw-root .prl-open{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:8px;padding:8px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;cursor:pointer;text-align:left;color:inherit;font:inherit;transition:border-color .15s}
+.lbw-root .prl-open:hover{border-color:var(--line2)}
+.lbw-root .prl-open:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.lbw-root .prl-open-hint{align-self:flex-end;font:600 8px var(--pv2-mono,monospace);letter-spacing:.1em;color:var(--mut)}
+.lbw-root .prl-open:hover .prl-open-hint{color:var(--ac)}
+/* Weekly spark strip — 22 cells, one per week (last lit day wins). */
+.lbw-root .prl-spark{display:grid;grid-template-columns:repeat(22,1fr);gap:2px;width:100%}
+.lbw-root .prl-spark i{aspect-ratio:1/1.6;border-radius:1.5px;background:var(--bg);border:1px solid rgba(255,255,255,.03)}
+/* Trigger strips keep their compact spacing inside the button. */
+.lbw-root .prl-open .prl-heat-stats{margin-top:0;padding-top:0;border-top:0}
+.lbw-root .prl-open .prl-medals{margin-top:0}
+.lbw-root .prl-medal{font-style:normal}
+/* Wide dialog for the full heatmap. */
+.lbw-root .prl-dialog--wide{max-width:min(520px,calc(100vw - 48px))}
+.lbw-root .prl-dialog--wide .prl-heat-cell{border-radius:2.5px}
+/* Honors breakdown rows inside the dialog. */
+.lbw-root .prl-honor-dt{display:inline-flex;align-items:center;gap:6px}

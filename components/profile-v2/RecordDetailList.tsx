@@ -4,11 +4,14 @@
  * components/profile-v2/RecordDetailList.tsx — clickable record rows for the
  * profile right rail (owner checklist items 9+10).
  *
- * Each row carries a three-state visual treatment:
- *   earned      — medal disc (gold/silver/bronze for #1/#2/#3 standings,
- *                 gold for curated Hall records)
- *   pending     — dashed outline + progress note (in-progress milestones)
- *   unavailable — locked grey (records not reachable yet, e.g. pending ops)
+ * Each row carries a three-state visual treatment built on the owner's
+ * hexagon medallion artwork (RecordMarks — same geometry as BadgeArtwork's
+ * AchievementArtwork):
+ *   earned      — hexagon medallion: metal ring by standing rank
+ *                 (gold/silver/bronze; hall gold for curated awards) with the
+ *                 metric/hall sigil inside
+ *   pending     — dashed hexagon + clock hands + progress note
+ *   unavailable — dim hexagon + lock
  *
  * Clicking a row opens a <dialog> with the record's detail card:
  * definition, value, cohort, period, date, and evidence link when available.
@@ -16,12 +19,17 @@
  */
 
 import { useRef, useState } from "react";
+import { MedalHex, PendingHex, LockedHex } from "./RecordMarks";
 
 export interface RailRecord {
   id: string;
   state: "earned" | "pending" | "unavailable";
-  /** Medal rank for earned records (1/2/3 → gold/silver/bronze disc). */
+  /** Medal rank for earned records (1/2/3 → gold/silver/bronze ring). */
   rank?: number;
+  /** Catalog sigil for earned medallions (metric mark or hall award glyph). */
+  sigil?: string;
+  /** Sigil ink color (metric family accent); defaults to the ring color. */
+  ink?: string;
   /** Short row title (metric name or badge title). */
   title: string;
   /** Row value (e.g. "976.9KΥ", "12/500"). */
@@ -39,39 +47,10 @@ export interface RailRecord {
   progressLabel?: string;
 }
 
-const MEDAL: Record<number, string> = { 1: "#FFD700", 2: "#C0C0C0", 3: "#CD7F32" };
-
-function MedalDot({ rank, color }: { rank?: number; color: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-      <path d="M8.2 2.5 12 7l3.8-4.5 2.3 1-3 5.2-3.1-1.6-3.1 1.6-3-5.2z" fill={color} opacity="0.55" />
-      <circle cx="12" cy="15" r="7.2" fill="none" stroke={color} strokeWidth="1.8" />
-      <circle cx="12" cy="15" r="4.8" fill={color} opacity="0.2" />
-      {rank != null && (
-        <text x="12" y="18.4" textAnchor="middle" fill={color} fontSize="8" fontWeight="700" fontFamily="monospace">
-          {rank}
-        </text>
-      )}
-    </svg>
-  );
-}
-
-function PendingGlyph() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-      <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeDasharray="3 3" opacity="0.8" />
-      <path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function LockedGlyph() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-      <rect x="5" y="11" width="14" height="9" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" strokeWidth="1.8" />
-    </svg>
-  );
+function RecordIcon({ r, size = 16 }: { r: RailRecord; size?: number }) {
+  if (r.state === "earned") return <MedalHex rank={r.rank} sigil={r.sigil ?? "◆"} ink={r.ink} size={size} />;
+  if (r.state === "pending") return <PendingHex size={size} />;
+  return <LockedHex size={size} />;
 }
 
 export function RecordDetailList({ records }: { records: RailRecord[] }) {
@@ -96,13 +75,7 @@ export function RecordDetailList({ records }: { records: RailRecord[] }) {
               aria-haspopup="dialog"
             >
               <span className="prl-rec-icon">
-                {r.state === "earned" ? (
-                  <MedalDot rank={r.rank} color={r.rank != null ? MEDAL[r.rank] ?? "#FFD700" : "#FFD700"} />
-                ) : r.state === "pending" ? (
-                  <PendingGlyph />
-                ) : (
-                  <LockedGlyph />
-                )}
+                <RecordIcon r={r} />
               </span>
               <span className="prl-rec-body">
                 <span className="prl-rec-name" title={r.title}>{r.title}</span>
@@ -125,13 +98,7 @@ export function RecordDetailList({ records }: { records: RailRecord[] }) {
           <div className="prl-dialog-card">
             <div className="prl-dialog-head">
               <span className="prl-rec-icon">
-                {active.state === "earned" ? (
-                  <MedalDot rank={active.rank} color={active.rank != null ? MEDAL[active.rank] ?? "#FFD700" : "#FFD700"} />
-                ) : active.state === "pending" ? (
-                  <PendingGlyph />
-                ) : (
-                  <LockedGlyph />
-                )}
+                <RecordIcon r={active} size={24} />
               </span>
               <div className="prl-dialog-titles">
                 <strong>{active.title}</strong>

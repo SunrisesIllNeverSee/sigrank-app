@@ -350,3 +350,56 @@ All items from the round-5 directive implemented and verified:
 - **Verification performed and result:** e2e PASS — `flap board no clipped cells` (scrollWidth/scrollHeight within bounds on every cell); 820px viewport: no horizontal overflow, record rows unclipped.
 - **Evidence path:** `release-staging/evidence/phase3-profile-narrow.png`, `release-staging/evidence/actual-safari-phase3-profile.png`.
 - **Remaining work or missing decision:** If owner wants a denser redesign rather than the small adjustment, the flap grid is the next lever.
+
+---
+
+## Phase 3 round 2 — owner-directed refinements (2026-10-12)
+
+### R2-1: In-window popups (heatmap + honors)
+- **Item:** Owner direction — "heat map is supposed to pop up inside the window, not a full stage body, when you click it — same for badges"
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Rail modules now render compact triggers that open native `<dialog>` popups inside the window. SUBMISSION ACTIVITY shows a stats row + 22-cell weekly spark strip + EXPAND ▸; clicking opens a wide dialog with the full 154-cell grid, month labels, stats, and legend. RECORDS & HONORS shows the medallion strip + badge chips; clicking opens an honors breakdown (per-metal counts with definitions, badge criteria, watched count). Per-record detail dialogs remain on each row.
+- **Code changed:** YES — `components/profile-v2/RailDialog.tsx` (new client wrapper: button trigger + `<dialog>`, Esc/backdrop close), `components/profile-v2/ProfileRailPanels.tsx` (both modules restructured), `profile-workspace.css` (`.prl-open`, `.prl-spark`, `.prl-dialog--wide`, `.prl-honor-dt`).
+- **Where to see it:** `http://localhost:3230/user/xoxo` — click the SUBMISSION ACTIVITY strip or the medals row.
+- **Verification performed and result:** `scripts/e2e-phase3-profile.mjs` — popup triggers = 2, spark strip = 22 cells, activity popup = full 154-cell grid + 4 legend entries, honors popup lists GOLD/SILVER/BRONZE/WATCHED, Esc closes. 35/35 PASS.
+- **Evidence path:** `release-staging/evidence/phase3-r2-rail.png`, `phase3-r2-activity-popup.png`, `phase3-r2-honors-popup.png`, `actual-safari-phase3-r2-profile.png`.
+- **Remaining work or missing decision:** None.
+
+### R2-2: Owner hexagon medallion artwork for records
+- **Item:** Owner direction — "I already designed the trophies; they are in atlas docs" (badge index + achievement catalog)
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Record icons now use the owner's double-hexagon medallion (same geometry as `AchievementArtwork`) instead of ribbon discs. Two-tone rule: ring = standing metal (gold/silver/bronze for #1/#2/#3, hall gold `#e8bf61` for curated awards); sigil inside = metric/hall mark from `achievement-index.v1.json` — Υ yield, ◈ SNR, × leverage, ↗ velocity, ⌁ dev, ⬡ scale, ▸ efficiency, ◉ ratios, ▦▰▱▤⬡ raw pillars, ★/◇/♛ hall awards. Pending = dashed hexagon + clock hands; unavailable = dim hexagon + lock.
+- **Code changed:** YES — `components/profile-v2/RecordMarks.tsx` (new: `HexMark`/`MedalHex`/`PendingHex`/`LockedHex`), `RecordDetailList.tsx` (icons via `RecordIcon`, `sigil`/`ink` fields on `RailRecord`), `ProfileRailPanels.tsx` (`BOARD_SIGIL` map + `hallSigil`).
+- **Where to see it:** Records rail rows + medal chips on `/user/xoxo`.
+- **Verification performed and result:** e2e — 13 hexagon medallion paths present (`path[d^="M24 2.5"]`), medals row reads `★0 gold | ✧0 silver | ◆9 bronze`. 35/35 PASS.
+- **Evidence path:** `release-staging/evidence/phase3-r2-rail.png`.
+- **Remaining work or missing decision:** Owner sign-off on sigil-to-metric mapping (catalog-aligned, `$` for cost since no catalog mark exists).
+
+### R2-3: Custom workflow glyphs refined
+- **Item:** Owner direction — "custom glyphs, not just standard emojis"
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Marks are custom inline SVGs in the hexagon language: OITL = operator bust + loop ring with closing arrowhead; AUTO = hexagonal chassis + bolt core + six circuit nodes; HYBRID = hexagon split at a dashed seam (person arc left / bolt right); REVIEW = dashed hexagon + check-dot (candidate under review, never labeled verified automation).
+- **Code changed:** YES — `components/profile-v2/WorkflowMark.tsx`.
+- **Where to see it:** RANK CONTEXTS module + hero tag on `/user/xoxo` (REVIEW), `/user/zachlagden` (OITL).
+- **Verification performed and result:** e2e — `workflow mark label` + `OITL mark label` PASS; renders in native Safari capture.
+- **Evidence path:** `release-staging/evidence/phase3-r2-rail.png`.
+- **Remaining work or missing decision:** Owner sign-off on final mark designs.
+
+### R2-4: Ticker dead-space gaps removed
+- **Item:** Owner clarification — "just looking to remove the dead space gaps"
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** The flap-board rows used `grid-template-columns: 1.1fr .9fr .7fr .9fr`, stretching all four cells edge-to-edge and leaving dead gaps between label/value/key/avg. Columns now size to content (`minmax(8.5ch,auto) auto minmax(2ch,1fr) auto`): `[metric name + your value]` packs left, `[key + field average]` packs right, and the only slack sits in a single gutter between the two groups — matching the railway-board reading. Header row matches the same template.
+- **Code changed:** YES — `profile-workspace.css` (`.pv2-flap-cols`, `.pv2-flap-row` grid templates, `.ck` right-aligned in the gutter).
+- **Where to see it:** `/user/xoxo` — FlapBoard telemetry column; e.g. `INPUT 18.2K ......... IN 115.4M`.
+- **Verification performed and result:** e2e — `flap board no clipped cells` PASS; Safari capture confirms layout.
+- **Evidence path:** `release-staging/evidence/phase3-r2-rail.png`, `actual-safari-phase3-r2-profile.png`.
+- **Remaining work or missing decision:** None.
+
+### R2-5: Pixel-badge percentile source fix (owner in-flight work)
+- **Item:** Owner's earned-only `BadgesView` thresholds (`EARNED_PIXEL_MARKS` ≥90/95/99) fed by `row.percentile`
+- **Status:** IMPLEMENTED & VERIFIED (uncommitted — travels with owner's badge lane)
+- **Finding and answer:** `row.percentile` comes from `claimedRankMap` (resolved-mode snapshots only) — xoxo read 0, so no pixel marks would earn. Changed to `fieldPct` (board-verified combined-field percentile, 90.48 for xoxo → TOP 10% ACHIEVER earns correctly). Line lives in the owner's uncommitted `ProfileBody.tsx` block — not in this commit.
+- **Code changed:** YES — `app/user/[codename]/ProfileBody.tsx` (one line: `percentile={fieldPct}`).
+- **Commit:** pending with the badge lane (depends on their `BadgesView` signature).
+- **Verification performed and result:** `npx tsc --noEmit` clean with combined tree.
+- **Remaining work or missing decision:** Owner lane commits it with the badges feature.
