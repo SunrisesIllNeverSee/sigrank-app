@@ -26,15 +26,16 @@
  * row.telemetry and metrics off row.snapshot.cascade. No fetch, no facade edits.
  */
 
-import React from "react";
+import React, { type CSSProperties } from "react";
+import { compareClassPalette } from "./compare-palette";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { CanonId } from "@/components/ui/CanonId";
 import { DISPLAY_RAW, DISPLAY_METRICS } from "@/lib/identity/canon-ids";
 import { snapshotThroughput } from "@/lib/board/throughput";
 
-const A_COLOR = "rgb(var(--class-arch))"; // blue (was --accent=green; one green B + one blue A, owner 2026-06-27)
-const B_COLOR = "rgb(var(--class-seeker))";
+const A_COLOR = "var(--compare-a, rgb(var(--class-arch)))";
+const B_COLOR = "var(--compare-b, rgb(var(--class-seeker)))";
 
 /** The owner's compare METRICS view: the 8 rows from the ASCII, in order.
  * (Scale V intentionally omitted — profile-only per owner 2026-06-21.) */
@@ -198,8 +199,9 @@ function Line({ row }: { row: LedgerRow }) {
       <span
         className={
           "text-right font-mono text-base tabular-nums " +
-          (w === "a" ? "font-bold text-text-accent" : "text-text-muted")
+          (w === "a" ? "font-bold" : "text-text-muted")
         }
+        style={w === "a" ? { color: A_COLOR } : undefined}
       >
         {row.aStr}
       </span>
@@ -212,8 +214,9 @@ function Line({ row }: { row: LedgerRow }) {
       <span
         className={
           "text-left font-mono text-base tabular-nums " +
-          (w === "b" ? "font-bold text-class-seeker" : "text-text-muted")
+          (w === "b" ? "font-bold" : "text-text-muted")
         }
+        style={w === "b" ? { color: B_COLOR } : undefined}
       >
         {row.bStr}
       </span>
@@ -307,6 +310,10 @@ export function CompareLedger({
 }) {
   const aName = nameOf(a);
   const bName = nameOf(b);
+  const compareColors = {
+    "--compare-a": compareClassPalette(a.snapshot.class_tier).color,
+    "--compare-b": compareClassPalette(b.snapshot.class_tier).color,
+  } as CSSProperties;
   const rawRows = DISPLAY_RAW.map((m) => buildRow(m, a, b));
   const metricRows = DISPLAY_METRICS_COMPARE.map((m) => buildRow(m, a, b));
   // FLOW row — Token Throughput, comparable datum (canonical exact-calendar
@@ -322,7 +329,7 @@ export function CompareLedger({
 
   if (workspace) {
     return (
-      <section className="cmp-ledger-workspace" aria-label="Full comparison ledger">
+      <section className="cmp-ledger-workspace" aria-label="Full comparison ledger" style={compareColors}>
         {[
           { title: "Raw · Flow · Total", rows: [...rawRows, ...flowRows, { ...totalRow, label: "∑ Total" }] },
           { title: "Metrics", rows: metricRows },
@@ -345,7 +352,7 @@ export function CompareLedger({
   if (compact) {
     const win = (r: LedgerRow) => winnerOf(r);
     return (
-      <div>
+      <div style={compareColors}>
         <div className="lgr-h">
           <span className="nm" style={{ textAlign: "right", marginLeft: "auto", color: "var(--ac)", fontWeight: 700 }}>{aName}</span>
         </div>
