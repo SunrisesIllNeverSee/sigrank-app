@@ -88,6 +88,14 @@ function resolveName(operator: Operator): string {
   return operator.display_name ?? operator.codename;
 }
 
+// Compact yield for the rail OPERATOR PROFILE mod — matches the card's
+// Υ shorthand (976.9K, not the raw 976944.23).
+const compactYield = (n: number): string =>
+  n >= 1e9 ? `${(n / 1e9).toFixed(2)}B`
+    : n >= 1e6 ? `${(n / 1e6).toFixed(2)}M`
+    : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K`
+    : n.toFixed(0);
+
 export async function generateMetadata({
   params,
 }: {
@@ -176,7 +184,7 @@ export default async function OperatorProfilePage({
     <ProfileWorkspace name={resolveName(operator)} codename={operator.codename}
       rank={row.pending ? null : fieldRank} tier={row.snapshot.class_tier}
       platform={operator.primary_domain}
-      yieldLabel={row.snapshot.cascade?.nonCompounding ? "—" : (row.snapshot.cascade?.yield_?.toFixed(2) ?? "—")}
+      yieldLabel={row.snapshot.cascade?.nonCompounding ? "—" : (row.snapshot.cascade?.yield_ != null ? compactYield(row.snapshot.cascade.yield_) : "—")}
       actions={<div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/board/all"

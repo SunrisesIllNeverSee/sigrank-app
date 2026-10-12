@@ -78,8 +78,8 @@ try {
   /* ── in-window popups (owner: heat map + honors pop up on click) ── */
   const popBtns = await page.locator(".prl-open").count();
   check("popup triggers (activity + honors)", popBtns === 2, `${popBtns}`);
-  const sparkN = await page.locator(".prl-spark i").count();
-  check("activity spark strip 22 weeks", sparkN === 22, `${sparkN}`);
+  const railCells = await page.locator(".prl-open .prl-heat-cell").count();
+  check("rail shows full scaled heatmap", railCells === 154, `${railCells} cells in rail trigger`);
   // activity trigger → wide dialog with the full 154-cell grid
   await page.locator(".mod", { hasText: "SUBMISSION ACTIVITY" }).locator(".prl-open").click();
   await page.waitForSelector(".prl-dialog--wide[open]", { timeout: 5000 });
@@ -88,6 +88,13 @@ try {
     return d ? { cells: d.querySelectorAll(".prl-heat-cell").length, legend: d.querySelectorAll(".prl-heat-legend span").length, title: d.querySelector(".prl-dialog-titles strong")?.textContent } : null;
   });
   check("activity popup = full heatmap", !!actPop && actPop.cells === 154 && actPop.legend === 4, `${actPop?.cells} cells, ${actPop?.legend} legend`);
+  const centered = await page.evaluate(() => {
+    const d = document.querySelector(".prl-dialog--wide[open]")?.getBoundingClientRect();
+    if (!d) return null;
+    const cx = d.left + d.width / 2, cy = d.top + d.height / 2;
+    return { dx: Math.abs(cx - innerWidth / 2), dy: Math.abs(cy - innerHeight / 2) };
+  });
+  check("dialog centered in window", !!centered && centered.dx < 30 && centered.dy < 60, centered ? `dx=${centered.dx.toFixed(0)} dy=${centered.dy.toFixed(0)}` : "none");
   await page.keyboard.press("Escape");
   // honors trigger → medal/badge breakdown dialog
   await page.locator(".mod", { hasText: "RECORDS" }).locator(".prl-open").click();
