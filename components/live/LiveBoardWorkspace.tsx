@@ -1690,6 +1690,30 @@ export function LiveBoardWorkspace({
             <GroupedRailNav active="board" iconSet={iconSet} onBoard={() => stageRef.current?.scrollTo({ top: 0 })} />
           </nav>
           <div className="sfoot">
+            <nav className="ws-srail-nav" aria-label="Page navigation">
+              <button
+                type="button"
+                className="sbtn"
+                data-tip="BACK"
+                title="Back to previous page"
+                aria-label="Back to previous page"
+                onClick={() => {
+                  if (window.history.length > 1) router.back();
+                  else router.push("/");
+                }}
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+              <Link
+                className="sbtn"
+                href="/"
+                data-tip="HOME"
+                title="Home — live leaderboard"
+                aria-label="Home — live leaderboard"
+              >
+                <span aria-hidden="true">⌂</span>
+              </Link>
+            </nav>
             {/* panel toggles (owner @svg): live in the nav rail and appear
                 ONLY when their panel is closed — reopen affordances. */}
             {!leftOn && (
