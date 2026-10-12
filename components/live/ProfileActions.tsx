@@ -1,7 +1,7 @@
 "use client";
 /**
- * components/live/ProfileActions.tsx — the three-button action row for
- * an operator: full profile, compare, watch. Shared by the peek rail
+ * components/live/ProfileActions.tsx — the two-button action row for
+ * an operator: profile and watch. Shared by the peek rail
  * and the inspector's operator-profile module.
  */
 import Link from "next/link";
@@ -10,10 +10,9 @@ import { WatchButton } from "./WatchButton";
 
 export function ProfileActions({
   op,
-  compareHref,
 }: {
   op: LiveOperator;
-  compareHref: string;
+  compareHref?: string;
 }) {
   return (
     <div className="peek-actions">
@@ -22,14 +21,7 @@ export function ProfileActions({
         href={`/user/${encodeURIComponent(op.codename)}`}
         onClick={(e) => e.stopPropagation()}
       >
-        SEE PROFILE
-      </Link>
-      <Link
-        className="pkbtn"
-        href={compareHref}
-        onClick={(e) => e.stopPropagation()}
-      >
-        COMPARE
+        PROFILE
       </Link>
       <WatchButton codename={op.codename} />
     </div>
