@@ -720,7 +720,14 @@ body{
 
 .nav-category-sep{height:1px;background:var(--border);margin:8px 12px}.gray-feature{color:#73806e!important;opacity:.65;cursor:default}.snav a.sbtn{text-decoration:none}.snav .sbtn{height:34px;min-height:34px}
 </style>
-<style>.mock-content{padding:0}.shell-body{display:block}</style></head>
+<style>.mock-content{padding:0}.shell-body{display:block}</style><style>
+.preview-account{position:relative}.preview-account [hidden]{display:none!important}
+#preview-account-options{position:absolute;left:44px;bottom:0;width:230px;max-height:calc(100dvh - 80px);overflow-y:auto;z-index:100;background:var(--panel,#10160c);border:1px solid var(--border,#29321c);border-radius:8px;padding:8px;box-shadow:0 8px 24px #0008;display:flex;flex-direction:column;gap:2px}
+#preview-account-options a{font:10px var(--font-mono);color:var(--text);text-decoration:none;padding:8px;border-radius:4px}
+#preview-account-options a:hover,#preview-account-options a:focus-visible{background:var(--chip);outline:1px solid var(--signal)}
+.preview-account-label{font:10px var(--font-mono);color:var(--signal);padding:6px 8px}.preview-account-note{font:10px/1.5 var(--font-mono);color:var(--muted);padding:8px}
+</style>
+</head>
 <body>
 <nav class="nav">
   <h1>MOCK REVIEW &mdash; 1/8</h1>
@@ -1883,7 +1890,20 @@ html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
       <button class="sbtn" data-tip="THEME" title="theme">
         <svg width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="7" r="4.5"/><path d="M7 2.5a4.5 4.5 0 0 1 0 9z" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="avatar" data-tip="GUEST" title="account">G</button>
+      <div class="preview-account">
+      <button class="avatar" id="preview-account-button" data-tip="ACCOUNT" title="account" aria-label="Account" aria-expanded="false" aria-controls="preview-account-options" aria-haspopup="dialog">◎</button>
+      <div id="preview-account-options" role="dialog" aria-label="Account options" hidden>
+        <div class="preview-account-label">LIVE ACCOUNT</div>
+        <a href="http://127.0.0.1:3230/me">MY PROFILE</a>
+        <a href="http://127.0.0.1:3230/me/edit">EDIT PROFILE / SETUP</a>
+        <a href="http://127.0.0.1:3230/settings">ACCOUNT SETTINGS</a>
+        <a href="http://127.0.0.1:3230/settings#connect-device">DEVICES &amp; KEYS</a>
+        <a href="http://127.0.0.1:3230/settings#privacy-data">PRIVACY &amp; DATA</a>
+        <a href="http://127.0.0.1:3230/settings">APPEARANCE</a>
+        <a href="http://127.0.0.1:3230/login">SIGN IN</a>
+        <a href="http://127.0.0.1:3230/me">OPEN LIVE ACCOUNT →</a>
+        <div class="preview-account-note">Sign-out is available in the live site's account menu. This design preview does not hold a login session.</div>
+      </div></div>
     </div>
   </aside>
 
@@ -3216,6 +3236,16 @@ render();
     }
     grid.appendChild(col);
   }
+})();
+</script>
+<script>
+(() => {
+ const button=document.getElementById('preview-account-button'), panel=document.getElementById('preview-account-options');
+ const close=()=>{panel.hidden=true;button.setAttribute('aria-expanded','false')};
+ button.addEventListener('click',()=>{const opening=panel.hidden;panel.hidden=!opening;button.setAttribute('aria-expanded',String(opening));if(opening)panel.querySelector('a').focus()});
+ document.addEventListener('click',event=>{if(!button.parentElement.contains(event.target))close()});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus()}});
+ panel.addEventListener('focusout',event=>{if(event.relatedTarget&&!panel.contains(event.relatedTarget))close()});
 })();
 </script>
 </body>

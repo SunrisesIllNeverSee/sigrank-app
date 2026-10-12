@@ -1,5 +1,7 @@
 "use client";
 
+import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
+
 import { GroupedRailNav } from "./GroupedRailNav";
 
 /**
@@ -266,17 +268,6 @@ export function WorkspaceShell({
             .slice(0, 2)
             .toUpperCase() || "·";
 
-  const onSignOut = useCallback(async () => {
-    setAcctPop(false);
-    try {
-      const { signOut } = await import("@/lib/infra/supabase/auth");
-      await signOut();
-    } catch {
-      /* auth unconfigured — nothing to clear */
-    }
-    router.refresh();
-  }, [router]);
-
 
   return (
     <div
@@ -380,74 +371,26 @@ export function WorkspaceShell({
               <button
                 className="avatar"
                 title="account — settings"
+                aria-label="Account"
+                aria-haspopup="dialog"
+                aria-expanded={acctPop}
+                aria-controls="workspace-account-options"
                 data-tip={acct.mode === "out" ? "SIGN IN" : acct.name}
                 onClick={(e) => {
                   e.stopPropagation();
+                  setNotifOpen(false);
                   setAcctPop((v) => !v);
                 }}
               >
-                {acct.mode === "in" ? (
-                  <PixelBadge name="verified" />
+                {acct.mode === "in" && session.pixelBadge ? (
+                  <PixelBadge name={session.pixelBadge} />
                 ) : (
                   acctInitials
                 )}
               </button>
-              <div className="acctpop" hidden={!acctPop}>
-                <div className="ap-label">THEMES</div>
-                <div className="themesw ap-themes">
-                  {THEMES.map((t) => (
-                    <button
-                      key={t}
-                      className={`sw sw-${t}${t === theme ? " on" : ""}`}
-                      title={t}
-                      onClick={() => {
-                        setTheme(t);
-                        persistLbwTheme(t);
-                        liveTrack.themeChanged(t);
-                      }}
-                    />
-                  ))}
-                </div>
-                {acct.mode === "out" && (
-                  <a className="ap-item" href="/login">
-                    SIGN IN →
-                  </a>
-                )}
-                {acct.mode === "loading" && (
-                  <span className="ap-item mut">···</span>
-                )}
-                {acct.mode === "in" && (
-                  <>
-                    <a className="ap-item" href="/me">
-                      MY SIGNAL
-                    </a>
-                    <a className="ap-item" href="/settings">
-                      SETTINGS
-                    </a>
-                    <a className="ap-item" href="/settings">
-                      API KEYS
-                    </a>
-                  </>
-                )}
-                {acct.mode === "nolink" && (
-                  <>
-                    <a className="ap-item" href="/me">
-                      CLAIM SIGNAL
-                    </a>
-                    <a className="ap-item" href="/settings">
-                      SETTINGS
-                    </a>
-                  </>
-                )}
-                {(acct.mode === "in" || acct.mode === "nolink") && (
-                  <button
-                    className="ap-item mut"
-                    type="button"
-                    onClick={onSignOut}
-                  >
-                    SIGN OUT
-                  </button>
-                )}
+              <div id="workspace-account-options" className="acctpop" hidden={!acctPop}>
+                {acctPop && <WorkspaceAccountOptions mode={acct.mode} name={acct.name}
+                  theme={theme} setTheme={setTheme} close={() => setAcctPop(false)} />}
               </div>
             </div>
           </div>

@@ -19,6 +19,7 @@
   "owner_customizations": [
     "Preview HTML identity changed from TheSignalVault / TransVaultOrigin to MO\u00a7ES\u2122 / signal-92b4f9f485; originals remain in the unchanged R4 ZIP. Sample metrics remain design fixtures.",
     "Replaced signal/token placeholder with static SVG and raw token bars captured from staged MO\u00a7ES\u2122 profile on October 12, 2026; 267 observations. Live interactivity remains at :3230.",
-    "Launch icon rail grouped into Operators and Writings, then gray disabled Hacks/VS/Teams; profile/articles icons added and descending leaderboard bars colored."
+    "Launch icon rail grouped into Operators and Writings, then gray disabled Hacks/VS/Teams; profile/articles icons added and descending leaderboard bars colored.",
+    "Bottom-left account button opens a keyboard-accessible menu linking to live profile, edit/setup, account settings, device/key, privacy and appearance controls. Mock does not impersonate a login session; sign-out stays on the live site."
   ]
 }

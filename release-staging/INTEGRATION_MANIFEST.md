@@ -157,3 +157,15 @@ Verification: TypeScript, scoped ESLint, canonical 11/11 and production build pa
 ## Profile rail badge — October 12, 2026
 
 Profile slot now renders the signed-in operator's existing earned percentile pixel badge through the shared session/profile cache. Signed-out, unlinked, or badge-less operators keep the neutral profile icon. No extra profile request or badge entitlement is created. A separately saved user-selected badge setting was not found; this uses the current existing badge mapping. The MOSES mock mirrors the top-one-percent badge. Owned files: GroupedRailNav.tsx, session.ts and the two customized HTML previews. Concurrent MoversRail/LiveBoardWorkspace changes remain outside this commit.
+
+
+## Bottom-left account audit — October 12, 2026
+
+- Owner requested complete account options across the shared rail and visible profile design preview.
+- Gaps found: mock button inert; Edit Profile absent; API Keys duplicated generic Settings; missing keyboard labels/Escape; stale session cache after sign-out; vertical swatches and notification overlap; section anchors unavailable until account loads.
+- Shared WorkspaceAccountOptions now presents linked account identity, My Profile, Edit Profile, Account Settings, Devices & Keys, Privacy & Data, appearance swatches, Privacy Policy, Sign Out. Signed-out = Sign In; unlinked = Finish Profile Setup; QA override is labelled preview and does not offer real Sign Out.
+- Device/key and privacy shortcuts target existing authenticated Settings controls, with scrolling after client account loading. No keys minted, devices revoked, privacy settings changed, or account signed out during verification.
+- Ownership: WorkspaceAccountOptions.tsx, account-menu.css, account sections in WorkspaceShell/LiveBoardWorkspace only, session.ts, SettingsAccount.tsx anchors, two customized R4 HTML previews and receipt. Existing concurrent editorial sizing/content work excluded from the account commit.
+- Mock remains unauthenticated: links to real staged controls; explicit live-site sign-out note. Immutable R4 archive unchanged.
+- Checks: TypeScript, scoped lint, canonical 11/11, production build, signed-in menu on profile and leaderboard, Escape/focus return, outside closing, device anchor arrival, menu viewport fit. Actual sign-out not exercised against owner's session; signed-out/unlinked branches reviewed in source.
+- No push, merge or deployment. Settings still uses its existing site frame; migrating that frame is outside this account-menu audit.

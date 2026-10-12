@@ -42,3 +42,8 @@ Local smoke routes responding 200: /, /board/all, /fieldhub, /field, /articles, 
 The other GPT owns leaderboard/new-homepage changes. The editorial GPT owns text-page formatting next. The agent may sign out only after it preserves its exact unfinished scope and the context export. No other developer's changed files should be bundled into an opportunistic commit.
 
 Update each page status only with a dated, reproducible test result, commit SHA, owner approval, deployment target and rollback note.
+
+
+### Account button audit — October 12, 2026
+
+Shared staged rail now includes profile/edit/setup, settings, devices & keys, privacy/data, appearance and sign-out options appropriate to account state. Keyboard/outside closing, error handling and session refresh corrected. Customized mock button opens links to live account controls rather than impersonating a session. Production checks passed; owner session was not signed out or otherwise altered. This completes the menu audit, not whole-site launch acceptance. See INTEGRATION_MANIFEST.md for scope and remaining frame migration.
