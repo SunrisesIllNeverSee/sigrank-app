@@ -63,7 +63,7 @@ export default async function HomePage() {
       active="home"
       title="SIGRANK"
       bareTitle
-      hero={<Draft2Hero />}
+      hero={<div className="sigrank-column-hero"><Draft2Hero /></div>}
       leftTitle="SIGRANK"
       topic="home"
       left={<FieldFamilyNav current="home" />}

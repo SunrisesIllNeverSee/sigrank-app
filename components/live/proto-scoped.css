@@ -1698,3 +1698,31 @@
 .lbw-root .ws-tree-details .ws-tree-toggle::before{content:"▸"}
 .lbw-root .ws-tree-details[open] .ws-tree-toggle::before{content:"▾"}
 .lbw-root .ws-tree-toggle{display:flex;align-items:center;justify-content:center}
+
+/* Owner annotation: navigation lives in the column heading. */
+.lbw-root .lside .colhead:has(.ws-header-nav){padding:0;position:relative;z-index:60;overflow:visible}
+.lbw-root .ws-header-nav{position:relative}
+.lbw-root .ws-header-nav > button{width:100%;padding:9px 12px 7px;background:transparent;color:var(--tx);font:inherit;letter-spacing:inherit;cursor:pointer}
+.lbw-root .ws-header-nav nav{position:absolute;top:100%;left:8px;right:8px;display:flex;flex-direction:column;padding:6px;background:var(--bg2);border:1px solid var(--line2);box-shadow:0 10px 24px #0009;text-align:left}
+.lbw-root .ws-header-nav nav a{padding:10px;color:var(--tx2);font:600 12px var(--font-mono);text-decoration:none}
+.lbw-root .ws-header-nav nav a:hover,.lbw-root .ws-header-nav nav a:focus-visible{background:var(--sel);color:var(--ac)}
+/* Hero uses its actual stage width, independently of sidebar sizes. */
+.lbw-root .sigrank-column-hero{container-type:inline-size}
+.lbw-root .sigrank-column-hero header{min-height:0;padding:16px 22px 18px}
+.lbw-root .sigrank-column-hero header > .relative.z-10{width:100%;min-width:0;gap:16px}
+.lbw-root .sigrank-column-hero h1{white-space:normal;font-size:clamp(18px,3.4cqw,26px);line-height:1.25}
+.lbw-root .sigrank-column-hero pre{font-size:clamp(7px,2.25cqw,22px);line-height:1.1}
+.lbw-root .sigrank-column-hero [aria-label="SIGRANK"]{max-width:100%}
+.lbw-root .sigrank-column-hero div.select-none{font-size:clamp(24px,9cqw,80px)}
+.lbw-root .sigrank-column-hero header > .relative.z-10 > p{font-size:clamp(11px,1.9cqw,16px);line-height:1.5}
+.lbw-root .sigrank-column-hero .max-w-2xl{max-width:60ch}
+.lbw-root .sigrank-column-hero .max-w-2xl p{font-size:clamp(13px,2.3cqw,17px);line-height:1.6}
+.lbw-root .sigrank-column-hero header > .relative.z-10 > span{font-size:12px}
+.lbw-root .sigrank-column-hero .rounded-full .uppercase{font-size:10px;letter-spacing:.08em}
+
+.lbw-root .sigrank-column-hero header > .relative.z-10{gap:9px}
+.lbw-root .sigrank-column-hero .max-w-2xl{max-width:100%;width:100%}
+.lbw-root .sigrank-column-hero .max-w-2xl p{font-size:clamp(13px,2.15cqw,16px)}
+.lbw-root .sigrank-column-hero .mt-5{margin-top:4px}
+.lbw-root .sigrank-column-hero button[aria-label="Copy npx sigrank command to clipboard"]{padding:8px 14px;font-size:13px}
+.lbw-root .sigrank-column-hero button .select-none{font-size:14px}

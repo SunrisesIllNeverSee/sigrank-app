@@ -67,6 +67,20 @@ const topicForPage = (page: TextPage): WorkspaceTopic => {
 
 const NATIVE_HOME_DROPDOWN = "(function(){\n  if(window.__signalafHomeNavInstalled)return;\n  window.__signalafHomeNavInstalled=true;\n  document.addEventListener(\"click\",function(event){\n    var label=event.target.closest?.(\".ws-topic-link-label\");\n    if(label)label.closest(\"details\")?.removeAttribute(\"open\");\n  },true);\n  document.addEventListener(\"keydown\",function(event){\n    if(event.key!==\"Enter\" && event.key!==\" \")return;\n    var label=event.target.closest?.('label[for=\"ws-home-mode\"]');\n    if(!label)return;\n    event.preventDefault();\n    document.getElementById(\"ws-home-mode\")?.click();\n    label.closest(\"details\")?.removeAttribute(\"open\");\n  },true);\n})();";
 
+export function EditorialHeaderNav({ label }: { label: string }) {
+  const [open, setOpen] = useState(false);
+  return <div className="ws-header-nav" onMouseEnter={() => setOpen(true)}
+    onMouseLeave={() => setOpen(false)} onFocus={() => setOpen(true)}
+    onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}
+    onKeyDown={(event) => { if (event.key === "Escape") { setOpen(false); event.stopPropagation(); } }}>
+    <button type="button" aria-expanded={open} aria-label="SignalAF navigation"
+      onClick={() => setOpen(!open)}>{label} <span aria-hidden="true">▾</span></button>
+    {open && <nav aria-label="SignalAF topics">
+      {TOPICS.map((item) => <Link key={item.id} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>)}
+    </nav>}
+  </div>;
+}
+
 export function EditorialTopicDropdown({ topic }: { topic: WorkspaceTopic }) {
   const selected = TOPICS.find((item) => item.id === topic);
   // Native disclosure and ordinary links also work when JS is unavailable.
