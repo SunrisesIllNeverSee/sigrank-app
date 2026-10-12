@@ -28,18 +28,24 @@ interface RailDialogProps {
 export function RailDialog({ title, subtitle, trigger, children, wide }: RailDialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const close = () => ref.current?.close();
+  const open = () => ref.current?.showModal();
 
   return (
     <>
-      <button
-        type="button"
+      {/* role=button (not <button>) — the trigger hosts block content
+          (the scaled heatmap grid), which is invalid inside a button. */}
+      <div
+        role="button"
+        tabIndex={0}
         className="prl-open"
-        onClick={() => ref.current?.showModal()}
+        onClick={open}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
         aria-haspopup="dialog"
+        aria-label={`${title} — expand`}
       >
         {trigger}
         <span className="prl-open-hint" aria-hidden="true">EXPAND ▸</span>
-      </button>
+      </div>
       <dialog
         ref={ref}
         className={`prl-dialog${wide ? " prl-dialog--wide" : ""}`}

@@ -185,13 +185,8 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
     const ab = new Date((startDay + w * 7) * dayMs).toUTCString().slice(8, 11).toUpperCase();
     if (monthSet[monthSet.length - 1] !== ab) monthSet.push(ab);
   }
-  // Weekly spark strip for the compact rail trigger: one cell per week —
-  // the last lit day's color, else unlit.
-  const weekColors = Array.from({ length: 22 }, (_, w) => {
-    const wk = cells.slice(w * 7, w * 7 + 7);
-    for (let d = wk.length - 1; d >= 0; d--) if (wk[d].bg) return wk[d].bg;
-    return null;
-  });
+  /* The full 154-cell grid renders scaled inside the rail trigger and again
+     (same cells) inside the centered popup — no separate preview data. */
 
   /* ── Records (items 8–10): static Hall + dynamic top-3 standings ─────── */
   const names = new Set<string>([codename]);
@@ -319,8 +314,9 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
         </div>
       </div>
 
-      {/* SUBMISSION ACTIVITY — compact strip; full grid pops up in-window
-          on click (owner direction — never a stage-body element). */}
+      {/* SUBMISSION ACTIVITY — the whole 22-week grid scaled into the
+          sidebar; click pops the same map centered in-window with the
+          legend (owner direction — never a stage-body element). */}
       <div className="mod">
         <h3><span className="sq" />SUBMISSION ACTIVITY</h3>
         <RailDialog
@@ -328,19 +324,23 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
           title="SUBMISSION ACTIVITY"
           subtitle={`DAILY YIELD VS OPERATOR BASELINE · ${operator.account_age_days}D · ${num(operator.total_messages_lifetime)} MSG`}
           trigger={
-            <>
-              <span className="prl-heat-stats">
+            <div className="prl-heat prl-heat--rail">
+              <div className="prl-heat-grid">
+                {Array.from({ length: 22 }, (_, w) => (
+                  <div key={w} className="prl-heat-col">
+                    {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
+                      <div key={d} className="prl-heat-cell" style={cell.bg ? { background: cell.bg } : undefined} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="prl-heat-stats">
                 <span><b>{active.length}</b>ACTIVE</span>
                 <span><b>{longest}</b>BEST</span>
                 <span><b>{streak}</b>STREAK</span>
                 <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
-              </span>
-              <span className="prl-spark" aria-hidden="true">
-                {weekColors.map((c, w) => (
-                  <i key={w} style={c ? { background: c } : undefined} />
-                ))}
-              </span>
-            </>
+              </div>
+            </div>
           }
         >
           <div className="prl-heat">
