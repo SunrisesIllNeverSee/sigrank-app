@@ -191,6 +191,7 @@ export function CompareMatchup({
           facts={factsA}
           won={winner === "a"}
         />
+        {!hideSelectors && (
         <div className="cmp-matchup-vs flex flex-col items-center justify-center gap-1 px-1 sm:px-2">
           <span
             className="font-mono text-3xl font-bold tracking-widest text-text-secondary sm:text-4xl"
@@ -202,6 +203,7 @@ export function CompareMatchup({
             {aWins}–{bWins}
           </span>
         </div>
+        )}
         <Panel
           r={b}
           side="b"
