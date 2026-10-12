@@ -3,7 +3,7 @@
 **Branch:** `integration/site-a315435`
 **Preview:** `http://localhost:3230/` (use `localhost`, not `127.0.0.1` — dev chunks are blocked cross-origin on the IP host, so hydration silently fails there)
 **Date:** 2026-10-12
-**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2) + `7a95d3f` + `4157d68` (round-3) + `30b8506` + `c26b5aa` (round-4) + `a49135c` (round-5) — pushed to `origin/integration/site-a315435`
+**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `b4793c7` (audit) + `68feff6` + `53f3d38` (round-2) + `7a95d3f` + `4157d68` (round-3) + `30b8506` + `c26b5aa` (round-4) + `05c95b5` (round-5) + `a87391a` (round-6) — pushed to `origin/integration/site-a315435`
 
 ---
 
@@ -170,13 +170,83 @@ All items from the round-5 directive implemented and verified:
 
 ## Screenshots
 
-- Leaderboard toolbar (WebKit 1440×900): `/tmp/webkit-leaderboard-toolbar.png`
-- Profile opening (WebKit 1440×900): `/tmp/webkit-profile-opening.png`
-- Compare matchup (WebKit 1440×900): `/tmp/webkit-compare.png`
-- Editorial Wiki (WebKit 1440×900): `/tmp/webkit-editorial-wiki.png`
-- Historical captures: `/tmp/profile-submissions.png` (expanded records), `/tmp/profile-badges2.png` (badges tab), `/tmp/profile-analysis.png` + `/tmp/wk-analysis.png` (Tier+HCM, Chromium/WebKit), `/tmp/wk-overview.png` (opensplit, WebKit), `/tmp/board-top.png` / `/tmp/board-raw.png` / `/tmp/board-820.png` / `/tmp/board-share.png` (toolbar states), `/tmp/j5-hall.png`.
+- Native macOS Safari 27.0.1 (1440×900):
+  - Leaderboard toolbar: `release-staging/evidence/actual-safari-leaderboard-toolbar.png`
+  - Profile opening: `release-staging/evidence/actual-safari-profile-opening.png`
+  - Compare matchup: `release-staging/evidence/actual-safari-compare.png`
+  - Editorial Wiki: `release-staging/evidence/actual-safari-editorial-wiki.png`
+- Automated Playwright WebKit (1440×900):
+  - Leaderboard toolbar: `release-staging/evidence/webkit-leaderboard-toolbar.png`
+  - Profile opening: `release-staging/evidence/webkit-profile-opening.png`
+  - Compare matchup: `release-staging/evidence/webkit-compare.png`
+  - Editorial Wiki: `release-staging/evidence/webkit-editorial-wiki.png`
+- Historical captures in `/tmp`: `/tmp/profile-submissions.png` (expanded records), `/tmp/profile-badges2.png` (badges tab), `/tmp/profile-analysis.png` + `/tmp/wk-analysis.png` (Tier+HCM, Chromium/WebKit), `/tmp/wk-overview.png` (opensplit, WebKit), `/tmp/board-top.png` / `/tmp/board-raw.png` / `/tmp/board-820.png` / `/tmp/board-share.png` (toolbar states), `/tmp/j5-hall.png`.
+
+## Round 6 — Workflow Reconciliation, Compare Action Wiring, Platform Filter & Native Safari Evidence
+
+### Item 1: Workflow Classification and Launch Gate Reconciliation
+- **Item:** Workflow classification and remaining launch gate reconciliation
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** The old Operator / Outlier / All categories evolved into HITL (Operator-in-the-loop / OCM), Autonomous (Outlier / Review candidates), and Hybrid (Combined Field). The remaining launch gate previously recorded ("no stored hybrid/agentic submissions exist") was narrower than stated: Hybrid is the entire combined field (22 live claimed operators), not an empty cohort waiting for a tag, and Autonomous includes unclassified review candidates (9 live operators outside OCM).
+- **Mapping table:**
+  | Old Category | Current Label (Board / Hall) | Actual Inclusion Rule | Live Row Count (All-Time) | Evidence Status |
+  |---|---|---|---|---|
+  | **Operator** | `HITL` / `OPERATOR-IN-THE-LOOP` | **In OCM:** `inputShare ≤ 0.80` AND (`inputShare ≥ 0.01` OR deep-reuse fallback: `velocity ≤ 2`, `yield ≤ 1000`, `output ≥ 1M`, `cacheWrite ≥ 1M`) OR whitelisted (`OPERATOR_WHITELIST`). Resolved via `resolveWorkflowMode(...) === "hitl"`. | **13 rows** | Heuristically stamped `hcm-v1` (Operator Center of Mass rule); verified human-in-the-loop composition. |
+  | **Outlier** | `Autonomous` / `AUTOMATED` | **Outside OCM / Unresolved review candidates:** `inputShare > 0.80` (input-dominant) OR `inputShare < 0.01` failing deep-reuse fallback (`resolveWorkflowMode === null`), PLUS any assessed `agentic` rows with verified public HTTPS evidence. Filter: `wf === "agentic" \|\| wf === "hybrid" \|\| wf === null`. | **9 rows** | Legacy outlier candidates pending automation verification / review; `null` mode indicates unclassified review candidate, not proven autonomous operation. Verified `agentic` requires HTTPS attestation. |
+  | **All** | `Hybrid` / `HYBRID · COMBINED FIELD` | **Combined Field:** Complete live field combining both OCM (HITL) and Outlier (Autonomous / review candidates) rows. No workflow exclusion filter applied (`wfSel === "hybrid"` includes all qualifying claimed operators). | **22 rows** | Combined field view encompassing all live telemetry records regardless of workflow classification. |
+- **Code changed:** YES
+- **Files and function/component:** `lib/board/queries.ts` (`getLeaderboard`, ensuring `workflow_mode` and `workflow_mode_version` are resolved and populated for all rows).
+- **Commit:** `a87391a`
+- **Where to see it:** `http://localhost:3230/board/all` (toggle HITL: 13 rows, Autonomous: 9 rows, Hybrid: 22 rows); `http://localhost:3230/hall` (WORKFLOW: OPERATOR-IN-THE-LOOP, HYBRID, AUTOMATED); `http://localhost:3230/user/xoxo?tab=analysis` (OCM Position scatter: `OUTSIDE OCM · OUTLIER · UNRESOLVED`).
+- **Verification performed and result:** Live Playwright query against staging preview confirms exact row counts: Hybrid = 22, HITL = 13, Autonomous = 9 (13 + 9 = 22). Full unit test suite (223 tests) and canonical test suite (11/11) pass.
+- **Evidence path:** `scripts/e2e-cross-page.mjs`, `release-staging/evidence/actual-safari-leaderboard-toolbar.png`, `release-staging/evidence/webkit-leaderboard-toolbar.png`.
+- **Remaining work or missing decision:** Third-party cryptographic / HTTPS evidence links remain code-verified until live operators submit external attestation URLs via MCP.
+
+### Item 2: Compare Sharing and Action Wiring Audit & Repair
+- **Item:** Compare sharing, preview, download, and challenge action wiring
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Inventory revealed two distinct artifacts in the Compare Share module: (1) `CompareShareCard` (1200×630 landscape card with gold identity and terminal readouts, downloading `sigrank-compare-<slugA>-vs-<slugB>.png`) and (2) `CompareMatchupCard` (1200×900 vertical matchup + dual radars social card, downloading `sigrank-matchup-<slugA>-vs-<slugB>.png`). Both provide Share matchup, Preview, and Download actions for their respective artifacts. Repaired: (a) Download filenames dynamically reflect selected operators' codenames/slugs; (b) Operand colors aligned with canonical `COMPARE_OPERAND_COLORS` (`#60a5fa` blue for A, `#2dd4bf` teal for B); (c) Dynamic `window.location.origin` in `shareLink` with fallback to prompt if clipboard write is blocked; (d) `ChallengeOnX` strips leading `@` to prevent `@@handle` and reads `links?.x || handle`. `Throw-Downs` remains explicitly "Coming soon".
+- **Code changed:** YES
+- **Files and function/component:** `components/share/CompareShareCard.tsx` (`CompareShareCard`), `components/share/CompareMatchupCard.tsx` (`CompareMatchupCard`), `components/compare/ChallengeOnX.tsx` (`ChallengeOnX`), `app/compare/page.tsx` (`ThrowDownLine`).
+- **Commit:** `a87391a`
+- **Where to see it:** `http://localhost:3230/compare?a=xoxo&b=furic` (right rail: Throw-Downs / Coming soon / Challenge on X, Share matchup / Preview / Download card, and Preview / Download matchup card).
+- **Verification performed and result:** Click Preview opens matching modal scaled to viewport; download generates valid PNG with matching names and operand colors; Challenge on X generates correct twitter intent with proper handle and public comparison URL.
+- **Evidence path:** `release-staging/evidence/webkit-compare.png`, `release-staging/evidence/actual-safari-compare.png`, `scripts/e2e-cross-page.mjs`.
+- **Remaining work or missing decision:** Consolidating the two share cards into one unified Share menu is deferred for the owner's future layout redesign.
+
+### Item 3: Platform Column vs Platform Filter Reconciliation
+- **Item:** Platform table column vs toolbar Platform filter dropdown
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Reconciled owner intent: the owner requested the Platform COLUMN in the table for Raw metrics (`colMode === "raw"`). Hiding the Platform dropdown filter in Metrics mode was a misunderstanding that prevented filtering the board by platform in Metrics view. Corrected: Platform select filter (`All Platforms`, `Claude`, `Codex`, `Multi`, `Pi`) is now accessible in BOTH Metrics and Raw modes on the toolbar. The Platform COLUMN in the table remains displayed in Raw mode only (`{colMode === "raw" && <td>...</td>}`).
+- **Code changed:** YES
+- **Files and function/component:** `components/live/LiveBoardWorkspace.tsx` (restored Platform select unconditionally in `.fbar`), `components/live/board-cols.css` (compact flex alignment keeping all controls accessible).
+- **Commit:** `a87391a`
+- **Where to see it:** `http://localhost:3230/board/all` (Platform dropdown visible in Metrics mode; click "Raw" to reveal the ⬡PLATFORM table column).
+- **Verification performed and result:** Automated checks in `scripts/e2e-toolbar.mjs` verify Platform dropdown is present and functional in both Metrics and Raw modes, while table `<th>`/`<td>` Platform column appears in Raw mode only.
+- **Evidence path:** `scripts/e2e-toolbar.mjs`, `release-staging/evidence/webkit-leaderboard-toolbar.png`, `release-staging/evidence/actual-safari-leaderboard-toolbar.png`.
+- **Remaining work or missing decision:** None.
+
+### Item 4: Safari and WebKit Evidence Gap Closure
+- **Item:** Native Safari and automated WebKit browser verification and artifact capture
+- **Status:** IMPLEMENTED & VERIFIED
+- **Finding and answer:** Closed evidence gap by running both automated Playwright WebKit checks and native macOS Safari (Safari 27.0.1) interactive capture at 1440×900 across all 9 routes. Uniform sidebars (56px icon rail, 248px left rail), Back/Home controls, independent navigation details expansion on `/wiki`, stage fit on `/compare`, and complete profile surface rendering confirmed in both engines. High-resolution screenshots saved directly into `release-staging/evidence/`.
+- **Code changed:** NO (verification & artifact capture).
+- **Files and function/component:** `scripts/e2e-webkit-safari.mjs`, `scripts/capture-actual-safari.mjs`.
+- **Commit:** `a87391a`
+- **Where to see it:** `release-staging/evidence/`
+- **Verification performed and result:** 28/28 checks passed in WebKit; native Safari verified via AppleScript window sizing and screencapture.
+- **Evidence path:**
+  - `release-staging/evidence/actual-safari-leaderboard-toolbar.png` (Safari 27.0.1, 1440×900)
+  - `release-staging/evidence/actual-safari-profile-opening.png` (Safari 27.0.1, 1440×900)
+  - `release-staging/evidence/actual-safari-compare.png` (Safari 27.0.1, 1440×900)
+  - `release-staging/evidence/actual-safari-editorial-wiki.png` (Safari 27.0.1, 1440×900)
+  - `release-staging/evidence/webkit-leaderboard-toolbar.png` (WebKit, 1440×900)
+  - `release-staging/evidence/webkit-profile-opening.png` (WebKit, 1440×900)
+  - `release-staging/evidence/webkit-compare.png` (WebKit, 1440×900)
+  - `release-staging/evidence/webkit-editorial-wiki.png` (WebKit, 1440×900)
+- **Remaining work or missing decision:** Owner visual sign-off during final launch review.
 
 ## Remaining blockers
 
-- No hybrid/agentic scored submissions exist in current production database — the distinct `HYBRID` label and evidence ↗ link are code-verified (unit tests + type-level) but not yet exercised by live rows.
-- Actual Safari 27.0.1 browser engine verification was automated via Playwright WebKit; manual interactive Safari spot-check remains open for owner launch review.
+- Verified automation HTTPS attestation: no live operator has submitted a third-party evidence link for an assessed `agentic` or `hybrid` workflow mode; evidence ↗ links and `amv-2` tags remain code-verified via unit tests until real attested rows are ingested.
+- Design exploration items noted in the owner checklist (consolidated Compare Share menu, chart layout alternatives, and sidebar card relocations) are reserved for owner review.

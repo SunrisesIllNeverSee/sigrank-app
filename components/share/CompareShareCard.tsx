@@ -17,6 +17,7 @@
 import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { track } from "@/lib/infra/posthog/events";
+import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
 
 export interface CompareOperand {
   name: string;
@@ -38,8 +39,8 @@ const INK = "#0a0a0a";
 const C_GREEN = "#8ae89a";
 const C_GOLD = "#f0c862";
 const C_DULL = "#6e8a6e";
-const A_COLOR = "#e8a0d0"; // pink — matches the site's compare A
-const B_COLOR = "#f0c862"; // gold — matches the site's compare B
+const A_COLOR = COMPARE_OPERAND_COLORS.a;
+const B_COLOR = COMPARE_OPERAND_COLORS.b;
 
 /** Build an SVG radar chart with two overlapping polygons (A vs B). */
 function RadarGraphic({ a, b }: { a: CompareOperand; b: CompareOperand }) {
@@ -592,13 +593,37 @@ export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
   const [preview, setPreview] = useState(false);
 
   const shareLink = async () => {
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "https://signalaf.com";
+    const full = `${origin}${href}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: `${a.name} vs ${b.name} · SigRank`, url: full });
+        track.compareShared("copy", { href, method: "native_share" });
+        return;
+      } catch {
+        /* user cancelled or share failed, fall back to clipboard */
+      }
+    }
     try {
-      await navigator.clipboard.writeText(`https://signalaf.com${href}`);
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(full);
+      } else {
+        const input = document.createElement("input");
+        input.value = full;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
       track.compareShared("copy", { href });
     } catch {
-      /* clipboard blocked */
+      /* clipboard blocked, prompt user */
+      if (typeof window !== "undefined") {
+        window.prompt("Copy link to share this matchup:", full);
+      }
     }
   };
 
@@ -612,9 +637,12 @@ export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
         pixelRatio: 2,
         cacheBust: true,
       });
+      const params = new URL(href, "https://signalaf.com").searchParams;
+      const slugA = (params.get("a") || a.name || "op-a").toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
+      const slugB = (params.get("b") || b.name || "op-b").toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `sigrank-compare.png`;
+      link.download = `sigrank-compare-${slugA}-vs-${slugB}.png`;
       link.click();
       track.compareShared("download");
     } finally {

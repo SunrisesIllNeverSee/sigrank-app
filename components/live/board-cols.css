@@ -180,7 +180,7 @@
 .lbw-root .fbar:has(.board-filter-actions) .seg button{font-size:9px;padding-inline:5px}
 .lbw-root .fbar:has(.board-filter-actions) .sdir{width:22px;flex-shrink:0}
 .lbw-root .fbar:has(.board-filter-actions) input{width:100%;min-width:50px;max-width:130px;padding-inline:4px;flex:1 1 60px}
-.lbw-root .fbar .board-filter-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.lbw-root .fbar:has(.board-filter-actions) .board-filter-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-basis:auto}
 .lbw-root .board-filter-actions .pages button{padding:5px 6px;font-size:9px}
 .lbw-root .board-share{position:relative;font-size:9px}
 .lbw-root .board-share summary{list-style:none;cursor:pointer;padding:6px;border:1px solid var(--line2);border-radius:4px;color:var(--ac);white-space:nowrap}

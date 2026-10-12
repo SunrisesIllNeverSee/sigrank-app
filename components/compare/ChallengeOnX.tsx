@@ -35,9 +35,11 @@ export function ChallengeOnX({
   xB,
   compareUrl,
 }: ChallengeOnXProps) {
-  // Build the tag text: @handle if available, otherwise just the name
-  const tagA = xA ? `@${xA}` : nameA;
-  const tagB = xB ? `@${xB}` : nameB;
+  // Build the tag text: @handle if available (strip any existing @ first), otherwise display name
+  const cleanA = xA?.replace(/^@+/, "").trim();
+  const cleanB = xB?.replace(/^@+/, "").trim();
+  const tagA = cleanA ? `@${cleanA}` : (nameA || "Operator A");
+  const tagB = cleanB ? `@${cleanB}` : (nameB || "Operator B");
 
   const text = `⚔️ Throw-down challenge:\n\n${tagA} vs ${tagB}\n\nToken cascade head-to-head. Who compounds signal better?\n\n${compareUrl}`;
 

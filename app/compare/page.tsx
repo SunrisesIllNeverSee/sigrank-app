@@ -215,8 +215,8 @@ export default async function ComparePage({
       <ChallengeOnX
         nameA={nameOf(rowA)}
         nameB={nameOf(rowB)}
-        xA={rowA.operator.links?.x}
-        xB={rowB.operator.links?.x}
+        xA={rowA.operator.links?.x || rowA.operator.handle}
+        xB={rowB.operator.links?.x || rowB.operator.handle}
         compareUrl={compareUrl}
       />
     </div>
@@ -229,8 +229,8 @@ export default async function ComparePage({
       <ChallengeOnX
         nameA={nameOf(rowA)}
         nameB={nameOf(rowB)}
-        xA={rowA.operator.links?.x}
-        xB={rowB.operator.links?.x}
+        xA={rowA.operator.links?.x || rowA.operator.handle}
+        xB={rowB.operator.links?.x || rowB.operator.handle}
         compareUrl={compareUrl}
       />
     </div>
