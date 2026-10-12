@@ -117,3 +117,12 @@ The owner's eight browser annotations specify the current arrangement. All compa
 ## Next coordinator
 Keep one integration lead and this worktree. A new Devin session is not needed to assemble the pages: that assembly now exists.
 If Devin is used for follow-up hardening, supply this manifest and exact branch; give it a scoped lane and insist on explicit commits, current source hashes, and no edits in the shared dirty worktree.
+
+## SigRank annotated formatting — October 12, 2026
+
+- Owner-requested scope: SIGNALAF header becomes hover topic navigation; SigRank hero fits the center column.
+- Files: EditorialSidebar.tsx, WorkspaceShell.tsx, proto-scoped.css, app/sigrank/page.tsx.
+- Editorial topic pages share the header navigation. Compare and Hall retain their existing column headings.
+- Hero typography uses its column width; canonical copy, destinations, telemetry and scoring remain unchanged.
+- Commit checklist: TypeScript, scoped ESLint, canonical 11 tests, production build, browser hover/focus and wordmark bounds.
+- Shared source checkout untouched; no merge, push or deployment authorized or performed.
