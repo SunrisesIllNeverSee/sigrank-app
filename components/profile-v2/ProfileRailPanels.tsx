@@ -35,6 +35,38 @@ import { DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids"
 import { workflowCohortRank } from "@/lib/analytics/workflow-cohort";
 import { WorkflowMark } from "./WorkflowMark";
 import { RecordDetailList, type RailRecord } from "./RecordDetailList";
+import { HexMark } from "./RecordMarks";
+import { RailDialog } from "./RailDialog";
+
+/* Owner-catalog sigils (achievement-index.v1.json) keyed by metric-board id —
+   medallion glyph inside the standing-metal ring. */
+const BOARD_SIGIL: Record<string, { s: string; ink: string }> = {
+  "Y.01": { s: "Υ", ink: "#bd83ff" },  // cascade-yield-one
+  "Y.02": { s: "◈", ink: "#41d9d3" },  // signal-snr-half
+  "Y.03": { s: "×", ink: "#bd83ff" },  // cascade-leverage-ten
+  "Y.04": { s: "↗", ink: "#bd83ff" },  // cascade-velocity
+  "Y.05": { s: "⌁", ink: "#41d9d3" },  // signal-dev-two
+  "Y.06": { s: "⬡", ink: "#ffad4b" },  // scale-billion
+  "Y.07": { s: "$", ink: "#ffad4b" },  // cost — no catalog mark; honest label
+  "Y.08": { s: "▸", ink: "#41d9d3" },  // signal-output-first
+  "Y.09": { s: "◉", ink: "#41d9d3" },  // signal-balanced
+  "Y.10": { s: "◉", ink: "#41d9d3" },
+  "Y.11": { s: "◉", ink: "#41d9d3" },
+  "Y.12": { s: "◉", ink: "#41d9d3" },
+  "T.01": { s: "▰", ink: "#ffad4b" },  // scale-output-ten
+  "T.02": { s: "▦", ink: "#ffad4b" },  // scale-100m
+  "T.03": { s: "▱", ink: "#ffad4b" },  // scale-output-hundred
+  "T.04": { s: "▤", ink: "#ffad4b" },  // cache-write
+  "T.05": { s: "⬡", ink: "#ffad4b" },  // total — scale family
+};
+const HALL_INK = "#e8bf61";
+/** Curated Hall record → catalog sigil (hall-first ◇ / triple ♛ / gold ★). */
+function hallSigil(title: string): string {
+  const t = title.toUpperCase();
+  if (t.includes("FIRST")) return "◇";
+  if (t.includes("TRIPLE") || t.includes("THREE")) return "♛";
+  return "★";
+}
 
 /* ── Deterministic PRNG (same generator OverviewView used) ─────────────── */
 function hashSeed(s: string): number {
@@ -153,6 +185,13 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
     const ab = new Date((startDay + w * 7) * dayMs).toUTCString().slice(8, 11).toUpperCase();
     if (monthSet[monthSet.length - 1] !== ab) monthSet.push(ab);
   }
+  // Weekly spark strip for the compact rail trigger: one cell per week —
+  // the last lit day's color, else unlit.
+  const weekColors = Array.from({ length: 22 }, (_, w) => {
+    const wk = cells.slice(w * 7, w * 7 + 7);
+    for (let d = wk.length - 1; d >= 0; d--) if (wk[d].bg) return wk[d].bg;
+    return null;
+  });
 
   /* ── Records (items 8–10): static Hall + dynamic top-3 standings ─────── */
   const names = new Set<string>([codename]);
@@ -180,6 +219,8 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
       id: `hall-${r.reward_id}-${i}`,
       state: "earned" as const,
       rank: undefined,
+      sigil: hallSigil(r.title),
+      ink: HALL_INK,
       title: r.title,
       value: r.value || "—",
       definition: REWARDS[r.reward_id]?.reward ?? r.title,
@@ -193,6 +234,8 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
       id: `dyn-${r.id}`,
       state: "earned" as const,
       rank: r.rank,
+      sigil: BOARD_SIGIL[r.id]?.s ?? "◆",
+      ink: BOARD_SIGIL[r.id]?.ink,
       title: r.name,
       value: r.value,
       definition: `Top-${r.rank} standing on the ${r.name} metric board`,
@@ -235,9 +278,9 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
   }
 
   const medals = [
-    { n: staticRecs.length + dynamicRecs.filter((r) => r.rank === 1).length, color: "var(--pv2-medal)", label: "gold" },
-    { n: dynamicRecs.filter((r) => r.rank === 2).length, color: "var(--pv2-silver)", label: "silver" },
-    { n: dynamicRecs.filter((r) => r.rank === 3).length, color: "var(--pv2-bronze)", label: "bronze" },
+    { n: staticRecs.length + dynamicRecs.filter((r) => r.rank === 1).length, color: "var(--pv2-medal)", label: "gold", sigil: "★", def: "#1 standing on a metric board or curated Hall award" },
+    { n: dynamicRecs.filter((r) => r.rank === 2).length, color: "var(--pv2-silver)", label: "silver", sigil: "✧", def: "#2 standing on a metric board" },
+    { n: dynamicRecs.filter((r) => r.rank === 3).length, color: "var(--pv2-bronze)", label: "bronze", sigil: "◆", def: "#3 standing on a metric board" },
   ];
 
   return (
@@ -276,63 +319,106 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
         </div>
       </div>
 
-      {/* SUBMISSION ACTIVITY — moved from Overview (item 7) */}
+      {/* SUBMISSION ACTIVITY — compact strip; full grid pops up in-window
+          on click (owner direction — never a stage-body element). */}
       <div className="mod">
         <h3><span className="sq" />SUBMISSION ACTIVITY</h3>
-        <div className="prl-heat">
-          <div className="prl-heat-months">
-            {monthSet.map((m, i) => <span key={i}>{m}</span>)}
-          </div>
-          <div className="prl-heat-grid">
-            {Array.from({ length: 22 }, (_, w) => (
-              <div key={w} className="prl-heat-col">
-                {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
-                  <div key={d} className="prl-heat-cell" style={cell.bg ? { background: cell.bg } : undefined} />
+        <RailDialog
+          wide
+          title="SUBMISSION ACTIVITY"
+          subtitle={`DAILY YIELD VS OPERATOR BASELINE · ${operator.account_age_days}D · ${num(operator.total_messages_lifetime)} MSG`}
+          trigger={
+            <>
+              <span className="prl-heat-stats">
+                <span><b>{active.length}</b>ACTIVE</span>
+                <span><b>{longest}</b>BEST</span>
+                <span><b>{streak}</b>STREAK</span>
+                <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
+              </span>
+              <span className="prl-spark" aria-hidden="true">
+                {weekColors.map((c, w) => (
+                  <i key={w} style={c ? { background: c } : undefined} />
                 ))}
-              </div>
-            ))}
+              </span>
+            </>
+          }
+        >
+          <div className="prl-heat">
+            <div className="prl-heat-months">
+              {monthSet.map((m, i) => <span key={i}>{m}</span>)}
+            </div>
+            <div className="prl-heat-grid">
+              {Array.from({ length: 22 }, (_, w) => (
+                <div key={w} className="prl-heat-col">
+                  {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
+                    <div key={d} className="prl-heat-cell" style={cell.bg ? { background: cell.bg } : undefined} />
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="prl-heat-stats">
+              <span><b>{active.length}</b>ACTIVE</span>
+              <span><b>{longest}</b>BEST</span>
+              <span><b>{streak}</b>STREAK</span>
+              <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
+            </div>
+            <div className="prl-heat-legend">
+              <span><i style={{ background: "rgb(255 0 212 / 0.55)" }} />BELOW</span>
+              <span><i style={{ background: "rgb(255 230 0 / 0.55)" }} />BASE</span>
+              <span><i style={{ background: "rgb(var(--gold) / 0.55)" }} />ABOVE</span>
+              <span><i style={{ background: "rgb(255 154 60 / 0.55)" }} />RECORD</span>
+            </div>
           </div>
-          <div className="prl-heat-stats">
-            <span><b>{active.length}</b>ACTIVE</span>
-            <span><b>{longest}</b>BEST</span>
-            <span><b>{streak}</b>STREAK</span>
-            <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
-          </div>
-          <div className="prl-heat-legend">
-            <span><i style={{ background: "rgb(255 0 212 / 0.55)" }} />BELOW</span>
-            <span><i style={{ background: "rgb(255 230 0 / 0.55)" }} />BASE</span>
-            <span><i style={{ background: "rgb(var(--gold) / 0.55)" }} />ABOVE</span>
-            <span><i style={{ background: "rgb(255 154 60 / 0.55)" }} />RECORD</span>
-          </div>
-          <p className="prl-note">DAILY YIELD VS OPERATOR BASELINE · {operator.account_age_days}D · {num(operator.total_messages_lifetime)} MSG</p>
-        </div>
+        </RailDialog>
       </div>
 
-      {/* RECORDS & HONORS — moved from Overview (items 8–10) */}
+      {/* RECORDS & HONORS — honors strip pops its detail in-window;
+          each record row still opens its own detail card (item 10). */}
       <div className="mod">
         <h3><span className="sq" />RECORDS &amp; HONORS</h3>
-        <div className="prl-medals">
-          {medals.map((m) => (
-            <span key={m.label} className="prl-medal" style={{ opacity: m.n === 0 ? 0.3 : 1 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8.2 2.5 12 7l3.8-4.5 2.3 1-3 5.2-3.1-1.6-3.1 1.6-3-5.2z" fill={m.color} opacity="0.55" />
-                <circle cx="12" cy="15" r="7.2" fill="none" stroke={m.color} strokeWidth="1.8" />
-                <circle cx="12" cy="15" r="4.8" fill={m.color} opacity="0.25" />
-              </svg>
-              <b style={{ color: m.color }}>{m.n}</b>
-              <i>{m.label}</i>
-            </span>
-          ))}
-          <span className="prl-watched">WATCHED {watchCount}</span>
-        </div>
-        <div className="prl-badges">
-          {operator.verification_status !== "unverified" && (
-            <span className="prl-badge prl-badge--v">✓ VERIFIED</span>
-          )}
-          {operator.current_supporter_tier !== "free" && (
-            <span className="prl-badge prl-badge--s">◆ SUPPORTER</span>
-          )}
-        </div>
+        <RailDialog
+          title="RECORDS & HONORS"
+          subtitle={`${railRecords.filter((r) => r.state === "earned").length} EARNED · ${railRecords.filter((r) => r.state === "pending").length} IN PROGRESS`}
+          trigger={
+            <>
+              <span className="prl-medals">
+                {medals.map((m) => (
+                  <i key={m.label} className="prl-medal" style={{ opacity: m.n === 0 ? 0.3 : 1 }}>
+                    <HexMark sigil={m.sigil} ring={m.color} size={14} />
+                    <b style={{ color: m.color }}>{m.n}</b>
+                    <i>{m.label}</i>
+                  </i>
+                ))}
+                <i className="prl-watched">WATCHED {watchCount}</i>
+              </span>
+              <span className="prl-badges">
+                {operator.verification_status !== "unverified" && (
+                  <i className="prl-badge prl-badge--v">✓ VERIFIED</i>
+                )}
+                {operator.current_supporter_tier !== "free" && (
+                  <i className="prl-badge prl-badge--s">◆ SUPPORTER</i>
+                )}
+              </span>
+            </>
+          }
+        >
+          <dl className="prl-dialog-dl">
+            {medals.map((m) => (
+              <div key={m.label}>
+                <dt className="prl-honor-dt"><HexMark sigil={m.sigil} ring={m.color} size={18} />{m.label.toUpperCase()}</dt>
+                <dd>{m.n} — {m.def}</dd>
+              </div>
+            ))}
+            {operator.verification_status !== "unverified" && (
+              <div><dt className="prl-honor-dt">✓ VERIFIED</dt><dd>Identity verified/audited operator status.</dd></div>
+            )}
+            {operator.current_supporter_tier !== "free" && (
+              <div><dt className="prl-honor-dt">◆ SUPPORTER</dt><dd>Active supporter tier: {operator.current_supporter_tier}.</dd></div>
+            )}
+            <div><dt className="prl-honor-dt">WATCHED</dt><dd>{watchCount} operator{watchCount === 1 ? "" : "s"} watching this profile.</dd></div>
+          </dl>
+          <p className="prl-note">RECORDS LISTED BELOW — EACH ROW OPENS ITS OWN DETAIL.</p>
+        </RailDialog>
         <RecordDetailList records={railRecords} />
       </div>
     </>
