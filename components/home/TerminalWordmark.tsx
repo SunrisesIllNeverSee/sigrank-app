@@ -55,7 +55,7 @@ export function TerminalWordmark() {
       <TerminalBlockText
         text="SIGRANK"
         label="SIGRANK"
-        fontClassName="text-[clamp(0.6rem,3.2vw,1.7rem)]"
+        maxRem={1.7}
       />
 
       {/* ◈ rule (SPLASH_RULE) */}
