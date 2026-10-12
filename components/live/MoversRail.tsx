@@ -21,7 +21,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import type { LiveOperator, MoverEntry } from "@/lib/board/live-types";
-import { deriveMovers, isVerifiedOp, numvOf } from "./utils";
+import { deriveMovers, isVerifiedOp } from "./utils";
 import { PixelBadge } from "./PixelBadge";
 
 export interface MoverRow {
@@ -42,6 +42,8 @@ export interface MoverRow {
   /** optional right-side note — raw stat modes (e.g. token counts) render
       this instead of the Δ rank chip. */
   note?: string;
+  /** False for a genuine measured mover; TBD slots carry no fake metrics. */
+  placeholder?: boolean;
 }
 
 /** Resolve server-provided movers, else derive client-side from the field. */
@@ -82,85 +84,77 @@ export function MoversRail({
   onSelect,
   tag = "7d",
   boxHead,
+  onPrev,
+  onNext,
+  slideKey,
 }: {
   rows: MoverRow[];
   onSelect?: (opIndex: number) => void;
-  /** movement window label on each row ("7d" | "24h"). */
   tag?: string;
-  /** header line rendered inside the box (rotation mode). */
   boxHead?: string;
+  onPrev?: () => void;
+  onNext?: () => void;
+  slideKey?: string;
 }) {
   return (
-    /* owner: the movers list is a proper text box — bordered frame, mode
-       header inside, rows flex with name truncating instead of wrapping. */
-    <div className="mbox">
-      {boxHead ? (
-        <div className="mbox-h">
-          {boxHead}
-          <span className="mut"> · ROTATING</span>
-        </div>
-      ) : null}
+    <div className="mbox" data-mover-slide={slideKey}>
+      <div className="mbox-h">
+        <span className="mbox-title">{boxHead}</span>
+        {onPrev && onNext ? (
+          <span className="mbox-nav">
+            <button type="button" onClick={onPrev} title="Previous mover slide"
+              aria-label="Previous mover slide">◂</button>
+            <button type="button" onClick={onNext} title="Next mover slide"
+              aria-label="Next mover slide">▸</button>
+          </span>
+        ) : null}
+      </div>
       {rows.map((m, i) => {
-        const clickable = m.opIndex != null && onSelect != null;
+        const clickable = !m.placeholder && m.opIndex != null && onSelect != null;
         return (
           <div
-            key={`${m.codename}-${i}`}
-            className="mv"
-            data-op={m.opIndex ?? undefined}
+            key={m.placeholder ? "tbd-" + i : m.codename + "-" + i}
+            className={"mv" + (m.placeholder ? " mv-tbd" : "")}
+            data-op={clickable ? m.opIndex! : undefined}
             role={clickable ? "button" : undefined}
             tabIndex={clickable ? 0 : undefined}
             onClick={clickable ? () => onSelect(m.opIndex!) : undefined}
-            onKeyDown={
-              clickable
-                ? (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      onSelect(m.opIndex!);
-                    }
-                  }
-                : undefined
-            }
+            onKeyDown={clickable ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect(m.opIndex!);
+              }
+            } : undefined}
           >
             <span className="mav">
               {m.avatarUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element --
-                   operator avatar URL; fixed tile */
+                /* eslint-disable-next-line @next/next/no-img-element -- profile image */
                 <img src={m.avatarUrl} alt="" loading="lazy" />
-              ) : m.name[0] === "@" ? (
-                (m.name[1] ?? "·")
-              ) : (
-                (m.name[0] ?? "·")
-              )}
-              {m.verified ? (
-                <span className="avbd">
-                  <PixelBadge name="verified" />
-                </span>
+              ) : m.placeholder ? "·" : m.name[0] === "@" ?
+                (m.name[1] ?? "·") : (m.name[0] ?? "·")}
+              {m.verified && !m.placeholder ? (
+                <span className="avbd"><PixelBadge name="verified" /></span>
               ) : null}
             </span>
-            <span>
-              {m.name}{" "}
-              <span className="mut mono" style={{ fontSize: 9 }}>
-                {tag}
-              </span>
+            <span title={m.placeholder ? "No qualifying operator for this position" : m.name}>
+              {m.name}
+              {!m.placeholder ? (
+                <> <span className="mut mono" style={{ fontSize: 9 }}>{tag}</span></>
+              ) : null}
             </span>
-            {/* LB-G12: raw-stat modes carry `note` (e.g. the Σ TOKENS
-                volume) — render it instead of a fake Δ rank chip. */}
-            {m.note != null ? (
-              <span className="dlt vol mono">{m.note}</span>
+            {m.placeholder ? (
+              <span className="dlt vol mono" aria-label="No data">—</span>
+            ) : m.note != null ? (
+              <span className="dlt vol mono" title={m.note}>{m.note}</span>
             ) : (
-              <span className={`dlt ${m.mv >= 0 ? "up" : "dn"}`}>
-                {m.mv >= 0 ? `▲ +${m.mv}` : `▼ −${Math.abs(m.mv)}`}
+              <span className={"dlt " + (m.mv >= 0 ? "up" : "dn")}>
+                {m.mv >= 0 ? "▲ +" + m.mv : "▼ −" + Math.abs(m.mv)}
               </span>
             )}
-            <span className="rk-pos">&nbsp;#{i + 1}</span>
+            <span className="rk-pos">#{i + 1}</span>
           </div>
         );
       })}
-      {rows.length === 0 && (
-        <p className="drill-note">— NO MOVEMENT IN THIS SCOPE</p>
-      )}
-      {/* reference renders a decorative "ALL MOVERS →" anchor here; no movers
-          destination exists in production, so the dead link is dropped. */}
     </div>
   );
 }
@@ -178,7 +172,90 @@ export function moverScopeMatches(o: LiveOperator, scope: MoverBoardMode): boole
   return o.wf === "agentic" || o.wf === "hybrid" || o.wf === null;
 }
 
-const MOVER_MODES = ["7D", "24H", "Σ TOKENS"] as const;
+/** Exactly five independently inspectable boards — never skip a slide. */
+export const MOVER_MODES = ["7D", "24H", "Σ TOKENS", "OP RATIO", "10×DEV"] as const;
+export type MoverSlideMode = typeof MOVER_MODES[number];
+export const MOVER_SLOTS = 5;
+
+export function fillMoverSlots(rows: MoverRow[]): MoverRow[] {
+  return Array.from({ length: MOVER_SLOTS }, (_, i) => rows[i] ?? {
+    name: "TBD",
+    codename: "tbd-" + i,
+    mv: 0,
+    opIndex: null,
+    note: "—",
+    placeholder: true,
+  });
+}
+
+/** Real scored operators only. No UR account records, invalid ratios or
+ * invented scores. Indexes always refer to the complete ranked op array. */
+export function moverSlideRows(
+  ops: LiveOperator[],
+  server: MoverEntry[] | undefined,
+  boardMode: MoverBoardMode,
+  mode: MoverSlideMode,
+): MoverRow[] {
+  const scoped = ops.map((o, i) => ({ o, i }))
+    .filter(({ o }) => moverScopeMatches(o, boardMode));
+
+  const row = (o: LiveOperator, i: number, mv: number, note?: string): MoverRow => ({
+    name: o.handle?.trim() || o.name?.trim() || o.codename?.trim() || "TBD",
+    codename: o.codename,
+    opIndex: i,
+    mv,
+    avatarUrl: o.avatarUrl ?? null,
+    verified: isVerifiedOp(o.verif),
+    ...(note != null ? { note } : {}),
+  });
+
+  if (mode === "7D") {
+    if (boardMode === "hybrid" && server?.length) {
+      const authoritative = moverRows(server, ops)
+        .filter((m) => m.opIndex != null && m.mv !== 0 &&
+          Number.isFinite(m.mv) && moverScopeMatches(ops[m.opIndex], boardMode))
+        .map((m) => {
+          const o = ops[m.opIndex!];
+          return row(o, m.opIndex!, m.mv);
+        });
+      return fillMoverSlots(authoritative);
+    }
+    return fillMoverSlots(scoped
+      .filter(({ o }) => o.mv7 != null && o.mv7 !== 0 && Number.isFinite(o.mv7))
+      .sort((a, b) => (b.o.mv7 ?? 0) - (a.o.mv7 ?? 0))
+      .slice(0, MOVER_SLOTS)
+      .map(({ o, i }) => row(o, i, o.mv7!)));
+  }
+  if (mode === "24H") return fillMoverSlots(scoped
+    .filter(({ o }) => o.mv24 != null && o.mv24 !== 0 && Number.isFinite(o.mv24))
+    .sort((a, b) => Math.abs(b.o.mv24!) - Math.abs(a.o.mv24!))
+    .slice(0, MOVER_SLOTS)
+    .map(({ o, i }) => row(o, i, o.mv24!)));
+
+  if (mode === "Σ TOKENS") return fillMoverSlots(scoped
+    .filter(({ o }) => Number.isFinite(o.num.total) && o.num.total > 0)
+    .sort((a, b) => b.o.num.total - a.o.num.total)
+    .slice(0, MOVER_SLOTS)
+    .map(({ o, i }) => row(o, i, 0, o.total)));
+
+  // Operating ratio uses the existing full 3-component R:I:O display;
+  // sort by its first canonical dimension (leverage R/I), consistent with
+  // the board's "Op Ratio" sort. Do not synthesize a composite statistic.
+  if (mode === "OP RATIO") return fillMoverSlots(scoped
+    .filter(({ o }) => !o.nc && !!o.opratioFull &&
+      Number.isFinite(o.num.lev) && o.num.lev >= 0)
+    .sort((a, b) => b.o.num.lev - a.o.num.lev)
+    .slice(0, MOVER_SLOTS)
+    .map(({ o, i }) => row(o, i, 0, o.opratioFull!)));
+
+  // 10×DEV is log10(leverage), not a made-up 10× multiplier.
+  return fillMoverSlots(scoped
+    .filter(({ o }) => !o.nc && Number.isFinite(o.num.dev ?? o.dev))
+    .sort((a, b) => (b.o.num.dev ?? b.o.dev) - (a.o.num.dev ?? a.o.dev))
+    .slice(0, MOVER_SLOTS)
+    .map(({ o, i }) => row(o, i, 0,
+      (o.num.dev ?? o.dev).toFixed(2))));
+}
 
 export function RotatingMovers({
   ops,
@@ -192,87 +269,29 @@ export function RotatingMovers({
   boardMode?: MoverBoardMode;
 }) {
   const [mi, setMi] = useState(0);
-  // Preserve positions in the full operator array: mover clicks must still
-  // select the correct operator in the adjacent profile inspector.
-  const scoped = useMemo(
-    () => ops.map((o, i) => ({ o, i }))
-      .filter(({ o }) => moverScopeMatches(o, boardMode)),
-    [ops, boardMode],
-  );
-
-  const sevenDay = useMemo<MoverRow[]>(() => {
-    if (boardMode === "hybrid" && server?.length) {
-      return moverRows(server, ops).filter((m) =>
-        m.opIndex != null && moverScopeMatches(ops[m.opIndex], boardMode)).slice(0, 5);
-    }
-    return scoped
-      .filter(({ o }) => o.mv7 != null)
-      .sort((a, b) => (b.o.mv7 ?? 0) - (a.o.mv7 ?? 0))
-      .slice(0, 5)
-      .map(({ o, i }) => ({
-        name: o.handle || o.name,
-        codename: o.codename,
-        mv: o.mv7 ?? 0,
-        opIndex: i,
-        avatarUrl: o.avatarUrl ?? null,
-        verified: isVerifiedOp(o.verif),
-      }));
-  }, [boardMode, server, ops, scoped]);
-
-  const liveModes = useMemo(() => {
-    const available = MOVER_MODES.filter((mode) => {
-      if (mode === "7D") return sevenDay.length > 0;
-      if (mode === "24H") return scoped.some(({ o }) => o.mv24 != null && o.mv24 !== 0);
-      return scoped.some(({ o }) => numvOf(o.total) > 0);
-    });
-    return available.length ? available : [MOVER_MODES[0]];
-  }, [scoped, sevenDay]);
 
   useEffect(() => { setMi(0); }, [boardMode]);
+
   useEffect(() => {
-    const t = setInterval(() => setMi((i) => (i + 1) % liveModes.length), 5000);
+    const t = setInterval(() => setMi((i) => (i + 1) % MOVER_MODES.length), 5000);
     return () => clearInterval(t);
-  }, [liveModes.length]);
+  }, []);
 
-  const mode = liveModes[mi % liveModes.length];
-  const rows = useMemo<MoverRow[]>(() => {
-    if (mode === "7D") return sevenDay;
-    if (mode === "24H") {
-      return scoped
-        .filter(({ o }) => o.mv24 != null && o.mv24 !== 0)
-        .sort((a, b) => Math.abs(b.o.mv24 ?? 0) - Math.abs(a.o.mv24 ?? 0))
-        .slice(0, 5)
-        .map(({ o, i }) => ({
-          name: o.handle || o.name,
-          codename: o.codename,
-          mv: o.mv24 ?? 0,
-          opIndex: i,
-          avatarUrl: o.avatarUrl ?? null,
-          verified: isVerifiedOp(o.verif),
-        }));
-    }
-    return scoped
-      .filter(({ o }) => numvOf(o.total) > 0)
-      .sort((a, b) => numvOf(b.o.total) - numvOf(a.o.total))
-      .slice(0, 5)
-      .map(({ o, i }) => ({
-        name: o.handle || o.name,
-        codename: o.codename,
-        mv: 0,
-        opIndex: i,
-        avatarUrl: o.avatarUrl ?? null,
-        verified: isVerifiedOp(o.verif),
-        note: o.total,
-      }));
-  }, [mode, scoped, sevenDay]);
-  const scopeLabel = boardMode === "agentic" ? "AUTO" : boardMode.toUpperCase();
-
+  const slide = MOVER_MODES[mi];
+  const rows = useMemo(
+    () => moverSlideRows(ops, server, boardMode, slide),
+    [ops, server, boardMode, slide],
+  );
   return (
     <MoversRail
-      boxHead={mode + " · " + scopeLabel + " · " + ((mi % liveModes.length) + 1) + "/" + liveModes.length}
+      boxHead={slide + " · " + (mi + 1) + "/" + MOVER_MODES.length}
       rows={rows}
       onSelect={onSelect}
-      tag={mode === "Σ TOKENS" ? "Σ" : mode === "24H" ? "24h" : "7d"}
+      slideKey={slide}
+      onPrev={() => setMi((i) => (i + MOVER_MODES.length - 1) % MOVER_MODES.length)}
+      onNext={() => setMi((i) => (i + 1) % MOVER_MODES.length)}
+      tag={slide === "Σ TOKENS" ? "Σ" : slide === "24H" ? "24h" :
+        slide === "OP RATIO" ? "R:I:O" : slide === "10×DEV" ? "10×" : "7d"}
     />
   );
 }
