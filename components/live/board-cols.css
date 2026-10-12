@@ -160,3 +160,13 @@
 .lbw-root .mbox .mv.mv-tbd{color:var(--mut)}
 .lbw-root .mbox .mv.mv-tbd .mav{opacity:.5;border:1px dashed var(--line2);background:transparent}
 .lbw-root .mbox .mv.mv-tbd .dlt{color:var(--mut)}
+
+/* Board actions share the filter surface and wrap within the stage width. */
+.lbw-root .fbar .board-filter-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 12px;flex-basis:100%;font-family:var(--font-mono)}
+.lbw-root .board-filter-actions .pages{display:flex;gap:5px}
+.lbw-root .board-filter-actions .pages button,.lbw-root .board-filter-actions .exp{border:1px solid var(--line2);border-radius:5px;padding:5px 9px;font:inherit;font-size:10px;color:var(--tx2);cursor:pointer}
+.lbw-root .board-filter-actions .pages button.on{background:var(--ac);color:var(--ac-tx);border-color:var(--ac);font-weight:700}
+.lbw-root .board-filter-actions .exp{color:var(--ac)}
+.lbw-root .board-filter-actions button:disabled{opacity:.38;cursor:default}
+.lbw-root .board-filter-actions button:focus-visible{outline:1px solid var(--ac);outline-offset:2px}
+.lbw-root .board-filter-actions .shoterr{color:var(--dn);font-size:10px}
