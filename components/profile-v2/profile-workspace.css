@@ -22,6 +22,13 @@
 .lbw-root .ws-profile-share-card{margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
 .lbw-root .ws-profile-share-card summary{cursor:pointer;color:var(--tx2);font:11px var(--font-mono);padding:10px 0}
 
+/* Private authenticated watchlist belongs only to the owner's sidebar. */
+.lbw-root .ws-watch-entries{list-style:none;padding:0;margin:8px 0 0}
+.lbw-root .ws-watch-entry{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line)}
+.lbw-root .ws-watch-entry>a{font:600 11px var(--font-mono);color:var(--tx);overflow-wrap:anywhere;flex:1 1 90px}
+.lbw-root .ws-watch-entry .pkbtn{padding:6px 7px;font:9px var(--font-mono);cursor:pointer}
+.lbw-root .ws-my-watchlist .ws-note{line-height:1.5}
+
 /* ── 0 · opening split — holo passport card + railway flap board ──────────
    Ported from _workspace/profile-mocks/shell.html §0 (.opensplit). Scoped
    under .pv2 (the profile-v2 views) so the card's bespoke palette stays

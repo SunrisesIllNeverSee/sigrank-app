@@ -111,6 +111,7 @@ export const CONTROLS = {
   sorts: [
     "Yield",
     "Total",
+    "Scale V",
     "Leverage",
     "Velocity",
     "SNR",
@@ -344,6 +345,7 @@ export const sparkGeom = (
 export const SORT_KEY: Record<string, (o: LiveOperator) => number> = {
   Yield: numYield,
   Total: numTotal,
+  "Scale V": (o) => Number.isFinite(o.scalev) ? o.scalev : -1,
   Leverage: numLev,
   Velocity: (o) => o.vel,
   SNR: (o) => o.snr,

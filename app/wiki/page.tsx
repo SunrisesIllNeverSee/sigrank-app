@@ -454,6 +454,7 @@ function CascadeList() {
             </div>
             <p className="pl-[72px] font-sans text-xs leading-relaxed text-text-muted">
               {CASCADE_NOTES[m.id]}
+              {m.id === "Y.06" && <a className="ml-2 text-text-accent underline" href="/wiki/metrics/scale-v">Detailed Scale V definition →</a>}
             </p>
           </div>
         ))}
