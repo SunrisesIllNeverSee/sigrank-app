@@ -18,6 +18,13 @@
  *      (hitl heuristic, assessed agentic/hybrid with https evidence);
  *      evidence URL + assessment timestamp ride along for agentic rows
  *      only — the same gating the public API applies.
+ *
+ * Also covers the two sibling reads the same profile surface performs:
+ *
+ *   5. getOperatorSubmissions — identical visibility parity on
+ *      metric_snapshots (unclaimed/retired/private expose nothing).
+ *   6. getOperatorWatchCount — service-side HEAD count on
+ *      operator_watches; returns a number, never watcher identity.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -97,8 +104,29 @@ interface ReqRec {
   terminal: string;
 }
 
+// Minimal metric_snapshots row — mapSnapshot is null-tolerant, so only the
+// fields toSubmission actually surfaces are populated.
+function snap(over: Record<string, unknown> = {}) {
+  return {
+    metric_snapshot_id: "snap-1",
+    operator_id: "op-1",
+    snapshot_date: "2026-10-01",
+    window_type: "all_time",
+    platform: "claude-code",
+    class_tier: "IGNITER I",
+    signa_rate: 12.5,
+    input_tokens: 100,
+    output_tokens: 200,
+    cache_creation_tokens: 50,
+    cache_read_tokens: 2_000,
+    ...over,
+  };
+}
+
 let opFixture: typeof OP | null = OP;
 let submissionRows: unknown[] = [];
+let metricRows: unknown[] = [];
+let watchCountFixture = 0;
 
 function makeSb() {
   const requests: ReqRec[] = [];
@@ -109,6 +137,8 @@ function makeSb() {
         return opFixture ? [opFixture] : [];
       case "snapshot_submissions":
         return submissionRows;
+      case "metric_snapshots":
+        return metricRows;
       default:
         return [];
     }
@@ -146,7 +176,12 @@ function makeSb() {
       then: (res: (v: unknown) => unknown) => {
         rec.terminal = "await";
         requests.push(rec);
-        return Promise.resolve({ data: pickRows(rec), error: null }).then(res);
+        // HEAD-count reads (operator_watches) resolve {count}, not {data}.
+        const result =
+          rec.table === "operator_watches"
+            ? { data: null, count: watchCountFixture, error: null }
+            : { data: pickRows(rec), error: null };
+        return Promise.resolve(result).then(res);
       },
     };
     return b;
@@ -167,13 +202,19 @@ vi.mock("@/lib/infra/supabase/server", () => ({
   getSupabaseServer: () => sb,
 }));
 
-const { getOperatorSnapshotRecords } = await import("@/lib/board/queries");
+const {
+  getOperatorSnapshotRecords,
+  getOperatorSubmissions,
+  getOperatorWatchCount,
+} = await import("@/lib/board/queries");
 const requests = sb.__requests;
 
 describe("getOperatorSnapshotRecords", () => {
   beforeEach(() => {
     opFixture = OP;
     submissionRows = [];
+    metricRows = [];
+    watchCountFixture = 0;
     requests.length = 0;
   });
 
@@ -280,5 +321,85 @@ describe("getOperatorSnapshotRecords", () => {
     const [r] = await getOperatorSnapshotRecords("test-op");
     expect(r.workflowMode).toBeNull();
     expect(r.workflowEvidenceUrl).toBeNull();
+  });
+});
+
+describe("getOperatorSubmissions", () => {
+  beforeEach(() => {
+    opFixture = OP;
+    submissionRows = [];
+    metricRows = [];
+    watchCountFixture = 0;
+    requests.length = 0;
+  });
+
+  it("issues no metric_snapshots query for unclaimed, retired, or private operators", async () => {
+    for (const over of [
+      { claimed: false },
+      { status: "retired" },
+      { profile_visibility: "private" },
+    ]) {
+      opFixture = { ...OP, ...over };
+      metricRows = [snap()];
+      requests.length = 0;
+      const out = await getOperatorSubmissions("test-op");
+      expect(out).toEqual([]);
+      expect(
+        requests.filter((r) => r.table === "metric_snapshots"),
+      ).toHaveLength(0);
+    }
+  });
+
+  it("constrains the snapshot read to the operator", async () => {
+    metricRows = [snap()];
+    await getOperatorSubmissions("test-op");
+    const req = requests.find((r) => r.table === "metric_snapshots");
+    expect(req).toBeDefined();
+    expect(
+      req!.filters.some(
+        (f) => f.op === "eq" && f.col === "operator_id" && f.val === "op-1",
+      ),
+    ).toBe(true);
+  });
+
+  it("maps platform, window, and tier for a visible operator", async () => {
+    metricRows = [snap()];
+    const [r] = await getOperatorSubmissions("test-op");
+    expect(r.platform).toBe("claude-code");
+    expect(r.window).toBe("all_time");
+    expect(r.classTier).toBe("IGNITER I");
+    expect(r.totalTokens).toBe(2350);
+  });
+});
+
+describe("getOperatorWatchCount", () => {
+  beforeEach(() => {
+    opFixture = OP;
+    submissionRows = [];
+    metricRows = [];
+    watchCountFixture = 0;
+    requests.length = 0;
+  });
+
+  it("returns the HEAD count scoped to the operator", async () => {
+    watchCountFixture = 7;
+    const n = await getOperatorWatchCount("test-op");
+    expect(n).toBe(7);
+    const req = requests.find((r) => r.table === "operator_watches");
+    expect(req).toBeDefined();
+    expect(
+      req!.filters.some(
+        (f) => f.op === "eq" && f.col === "operator_id" && f.val === "op-1",
+      ),
+    ).toBe(true);
+  });
+
+  it("returns 0 for an unknown operator without touching operator_watches", async () => {
+    opFixture = null;
+    const n = await getOperatorWatchCount("test-op");
+    expect(n).toBe(0);
+    expect(
+      requests.filter((r) => r.table === "operator_watches"),
+    ).toHaveLength(0);
   });
 });

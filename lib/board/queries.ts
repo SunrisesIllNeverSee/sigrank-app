@@ -810,7 +810,7 @@ export async function getOperatorSubmissions(
   try {
     const { data: opData, error: opError } = await sb
       .from("operators_public")
-      .select("operator_id, primary_domain")
+      .select("operator_id, primary_domain, claimed, status, profile_visibility")
       .ilike("codename", codename)
       .limit(1)
       .maybeSingle();
@@ -818,8 +818,21 @@ export async function getOperatorSubmissions(
     const op = asDb<{
       operator_id: string;
       primary_domain: string | null;
+      claimed: boolean | null;
+      status: string | null;
+      profile_visibility: string | null;
     } | null>(opData);
-    if (!op) return [];
+    // Same public-visibility contract as getOperatorSnapshotRecords and the
+    // snapshot-history API: unclaimed, retired, or private operators expose
+    // no submission data on the profile.
+    if (
+      !op ||
+      !op.claimed ||
+      op.status === "retired" ||
+      op.profile_visibility === "private"
+    ) {
+      return [];
+    }
     const { data: snapData, error: snapError } = await sb
       .from("metric_snapshots")
       .select(SNAPSHOT_COLUMNS)
@@ -1442,6 +1455,7 @@ export async function getOperatorSnapshotRecords(
       .eq("operator_id", op.operator_id)
       .eq("status", "scored")
       .order("submitted_at", { ascending: false })
+      .order("submission_id", { ascending: false })
       .limit(PER_OPERATOR_LIMIT);
     if (error) throw error;
     const rows =
@@ -1527,5 +1541,37 @@ export async function getOperatorSnapshotRecords(
     });
   } catch {
     return [];
+  }
+}
+
+/**
+ * Public watcher count for one operator — the same aggregate the
+ * /api/v1/operators/{codename}/watch GET exposes. operator_watches grants
+ * no SELECT to anon, so the count runs under the service client by design;
+ * watcher identity is never returned, only the number.
+ */
+export async function getOperatorWatchCount(
+  codename: string,
+): Promise<number> {
+  const sb = getSupabaseServer();
+  if (!sb) return 0;
+  try {
+    const { data: opData, error: opError } = await sb
+      .from("operators_public")
+      .select("operator_id")
+      .ilike("codename", codename)
+      .limit(1)
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<{ operator_id: string } | null>(opData);
+    if (!op) return 0;
+    const { count, error } = await sb
+      .from("operator_watches")
+      .select("operator_id", { count: "exact", head: true })
+      .eq("operator_id", op.operator_id);
+    if (error) throw error;
+    return count ?? 0;
+  } catch {
+    return 0;
   }
 }

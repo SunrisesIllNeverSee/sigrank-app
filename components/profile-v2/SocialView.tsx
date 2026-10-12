@@ -30,6 +30,9 @@ export interface SocialViewProps {
   isOwner: boolean; // for edit buttons
   records: HallRecord[];
   trophyCounts: TrophyCounts | null;
+  /** Scored snapshots on record — drives the snapshot-milestone badge state
+   *  so this module agrees with the Badges tab. */
+  scoredSnapshots: number;
 }
 
 const GOLD = "rgb(var(--gold))";
@@ -330,11 +333,13 @@ function BadgesModule({
   snapshot,
   records,
   trophyCounts,
+  scoredSnapshots,
 }: {
   operator: Operator;
   snapshot: ScoredSnapshot;
   records: HallRecord[];
   trophyCounts: TrophyCounts | null;
+  scoredSnapshots: number;
 }) {
   const badges: BadgeDef[] = [];
 
@@ -389,7 +394,17 @@ function BadgesModule({
   for (const n of lockCandidates) {
     badges.push({ rank: "#1", name: n, sub: "Locked", color: MUTED, locked: true });
   }
-  badges.push({ rank: "500TH", name: "Snapshot", sub: "Locked", color: MUTED, locked: true });
+  // Same milestone state as the Badges tab — earned at 500 scored snapshots.
+  const snapshotEarned = scoredSnapshots >= 500;
+  badges.push({
+    rank: "500TH",
+    name: "Snapshot",
+    sub: snapshotEarned
+      ? `${scoredSnapshots} scored`
+      : `Locked · ${scoredSnapshots}/500`,
+    color: snapshotEarned ? "rgb(var(--rank-1))" : MUTED,
+    locked: !snapshotEarned,
+  });
 
   const earned = badges.filter((b) => !b.locked).length;
   const locked = badges.length - earned;
@@ -506,6 +521,7 @@ export function SocialView({
   isOwner,
   records,
   trophyCounts,
+  scoredSnapshots,
 }: SocialViewProps) {
   const links = operator.links ?? {};
   const hasLinks = !!(
@@ -536,6 +552,7 @@ export function SocialView({
           snapshot={snapshot}
           records={records}
           trophyCounts={trophyCounts}
+          scoredSnapshots={scoredSnapshots}
         />
       </div>
     );
@@ -566,6 +583,7 @@ export function SocialView({
         snapshot={snapshot}
         records={records}
         trophyCounts={trophyCounts}
+        scoredSnapshots={scoredSnapshots}
       />
       <ShareModule operator={operator} />
     </div>
