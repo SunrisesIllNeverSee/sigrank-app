@@ -370,7 +370,7 @@ export function OverviewView({
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <h1 className="pv2-name" style={{ margin: 0 }}>{name}</h1>
+            <div className="pv2-name">{name}</div>
             {operator.display_name && <div className="pv2-sub">{operator.codename}</div>}
             {operator.handle && (
               <div className="pv2-sub" style={{ color: "rgb(var(--text-secondary))" }}>@{operator.handle}</div>

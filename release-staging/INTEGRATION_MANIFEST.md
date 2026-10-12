@@ -137,3 +137,11 @@ If Devin is used for follow-up hardening, supply this manifest and exact branch;
 - Checked: TypeScript, scoped ESLint, canonical 11 tests, production build; public tabs and both navigation controls in browser.
 - Remaining: full owner/private/pending regression acceptance and detailed inspector chart parity with design mocks. This is shell integration, not final profile release approval.
 - Shared source remains untouched. No push, merge or deployment.
+
+## Profile candidate freshness audit — October 12, 2026
+
+- Latest found: R4 archive, October 12 03:37, SHA256 c9dc901960e9cfb571489d60a5ed0569952e696cf97b967b2ed610d5b3a5c5c1; matches recorded upstream manifest and every current shared candidate file.
+- R4 and R3 preserved alongside R2. Latest shell/review-shell references preserved under user-profile/r4-designs/.
+- Important conflict: R3 route used WorkspaceShell, R4 removed it. Keep the owner-requested four-column integration instead of copying R4 route verbatim.
+- Merged newer Overview name heading correction and URL tab selection, preserving synchronized sidebar navigation and existing gates.
+- Receipt: user-profile/R4_IMPORT_RECEIPT.json. Design references preserved does not imply full pixel parity or final acceptance.

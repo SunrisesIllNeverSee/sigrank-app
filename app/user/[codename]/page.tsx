@@ -153,6 +153,7 @@ export default async function OperatorProfilePage({
   // LabTab sliders, ClaimTab) appear.
 
   return (
+    <Suspense fallback={<div>Loading profile workspace…</div>}>
     <ProfileWorkspace name={resolveName(operator)} codename={operator.codename}
       rank={row.pending ? null : row.global_rank} tier={row.snapshot.class_tier}
       platform={operator.primary_domain}
@@ -197,5 +198,6 @@ export default async function OperatorProfilePage({
         <ProfileBody row={row} rawCodename={rawCodename} />
       </Suspense>
     </ProfileWorkspace>
+    </Suspense>
   );
 }
