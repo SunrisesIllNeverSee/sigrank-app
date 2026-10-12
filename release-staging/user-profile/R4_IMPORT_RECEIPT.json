@@ -15,5 +15,8 @@
   "limitations": [
     "R4 design HTML is reference material, not a complete production shell implementation",
     "Detailed inspector chart parity and owner/private regression acceptance remain open"
+  ],
+  "owner_customizations": [
+    "Preview HTML identity changed from TheSignalVault / TransVaultOrigin to MO\u00a7ES\u2122 / signal-92b4f9f485; originals remain in the unchanged R4 ZIP. Sample metrics remain design fixtures."
   ]
 }
