@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useProfileWorkspace } from "./ProfileWorkspace";
 
 /**
  * components/profile-v2/ProfileTabsV2.tsx — tab bar for the redesigned
@@ -79,7 +80,9 @@ export function ProfileTabsV2({
   social,
   initial = "overview",
 }: ProfileTabsV2Props) {
-  const [tab, setTab] = useState<TabKey>(initial);
+  const [localTab, setTab] = useState<TabKey>(initial);
+  const workspace = useProfileWorkspace();
+  const tab = workspace?.section ?? localTab;
   const panelRef = useRef<HTMLDivElement>(null);
 
   const content: Record<TabKey, React.ReactNode> = {
@@ -102,6 +105,7 @@ export function ProfileTabsV2({
 
   const select = (key: TabKey) => {
     setTab(key);
+    workspace?.select(key);
     panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 

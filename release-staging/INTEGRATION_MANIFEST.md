@@ -126,3 +126,14 @@ If Devin is used for follow-up hardening, supply this manifest and exact branch;
 - Hero typography uses its column width; canonical copy, destinations, telemetry and scoring remain unchanged.
 - Commit checklist: TypeScript, scoped ESLint, canonical 11 tests, production build, browser hover/focus and wordmark bounds.
 - Shared source checkout untouched; no merge, push or deployment authorized or performed.
+
+## Profile workspace correction — October 12, 2026
+
+- Owner reported V2 content still outside the required four-column shell; corrected in the integration checkout.
+- Layout source: original `_workspace/profile-mocks/shell.html`; production uses shared WorkspaceShell with icon rail, profile navigation, center stage and operator inspector.
+- Sidebar and stage tabs share selection state. Existing ProfileAuthGate, Report/Lab gates, edit/claim controls and server data queries remain in place.
+- The legacy animated signature card is preserved in an expandable section below the profile rather than preceding the identity.
+- Ownership: app/user/[codename]/page.tsx and ProfileBody.tsx; components/profile-v2/ProfileWorkspace.tsx, ProfileTabsV2.tsx and profile-workspace.css.
+- Checked: TypeScript, scoped ESLint, canonical 11 tests, production build; public tabs and both navigation controls in browser.
+- Remaining: full owner/private/pending regression acceptance and detailed inspector chart parity with design mocks. This is shell integration, not final profile release approval.
+- Shared source remains untouched. No push, merge or deployment.
