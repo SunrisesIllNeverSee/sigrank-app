@@ -67,6 +67,7 @@ import type {
   LiveBoardInitialState,
   LiveOperator,
 } from "@/lib/board/live-types";
+import type { URMember } from "@/lib/board/unranked-status";
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
@@ -589,15 +590,8 @@ export function LiveBoardWorkspace({
   const [signupSummary, setSignupSummary] = useState<{
     registered_total: number; ranked_total: number; unranked_total: number;
     next_member_position: number; as_of: string;
-    members: Array<{
-      position: number;
-      board_status: "unranked";
-      workflow_mode: null;
-      display_group: "autonomous";
-      workflow_provenance: "unassessed_grouping";
-      identity_status: "not_publicly_listed";
-      display_label: "SIGNED-UP OPERATOR";
-    }>;
+    ur_total: number; ranked_metrics_population: number;
+    members: URMember[];
   } | null>(null);
 
   // Two bounded calls for the whole board; never N+1 fetches per operator.
@@ -622,8 +616,13 @@ export function LiveBoardWorkspace({
             Number.isInteger(v?.unranked_total) &&
             Array.isArray(v?.members) &&
             v.members.length === v.unranked_total &&
-            v.members.every((m: { position?: number }, i: number) =>
-              m.position === v.next_member_position + i)) setSignupSummary(v);
+            v.ur_total === v.unranked_total &&
+            v.ranked_metrics_population === v.ranked_total &&
+            v.registered_total === v.ranked_total + v.ur_total &&
+            v.members.every((m: URMember, i: number) =>
+              m.position === v.next_member_position + i &&
+              m.rank_status === "UR" && m.performance_eligible === false &&
+              m.metrics === null)) setSignupSummary(v);
       }).catch(() => {});
     return () => { active = false; controller.abort(); };
   }, []);
@@ -2258,7 +2257,7 @@ export function LiveBoardWorkspace({
                           <>
                             <tr className="unranked-band">
                               <td colSpan={colMode === "metrics" ? 14 : 10}>
-                                SIGNED UP · NOT YET RANKED
+                                UR · SIGNED UP, NOT YET RANKED
                                 <span className="unranked-count">
                                   {" · "}{signupSummary ? signupSummary.unranked_total + " MEMBERS" : "SYNCING ACCOUNTS"}
                                 </span>
@@ -2275,7 +2274,7 @@ export function LiveBoardWorkspace({
                                 <td>
                                   <div className="ranks">
                                     <span className="r-main">{member.position}</span>
-                                    <span className="r-sub">UNRANKED</span>
+                                    <span className="r-sub">UR</span>
                                   </div>
                                 </td>
                                 <td className="l">
@@ -2286,7 +2285,7 @@ export function LiveBoardWorkspace({
                                       <br />
                                       <span className="hd">MEMBER #{member.position} · PRIVATE IDENTITY</span>
                                       <br />
-                                      <span className="unranked-provisional">AUTONOMOUS QUEUE · UNASSESSED</span>
+                                      <span className="unranked-provisional">UR · NO RANKED SNAPSHOT</span>
                                     </span>
                                   </div>
                                 </td>
@@ -2295,7 +2294,7 @@ export function LiveBoardWorkspace({
                                 ))}
                                 {colMode === "metrics" && (
                                   <>
-                                    <td className="unranked-provisional">HITL*</td>
+                                    <td className="unranked-provisional">UR</td>
                                     <td className="unranked-na">—</td>
                                   </>
                                 )}
