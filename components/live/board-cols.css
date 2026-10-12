@@ -180,53 +180,62 @@
 .lbw-root .board-filter-actions button:focus-visible{outline:1px solid var(--ac);outline-offset:2px}
 .lbw-root .board-filter-actions .shoterr{color:var(--dn);font-size:10px}
 
-/* Two balanced filter rows: center within the actual board stage width,
-   not the full browser width (fixed left/right rails consume viewport).
-   Previous one-line/space-between rules misaligned controls at Safari zoom. */
+/* Owner requirement: ALL nine leaderboard controls stay on ONE horizontal line.
+   The board is bounded by pinned sidebars, so on narrow/zoomed viewports
+   the toolbar itself scrolls sideways; controls never wrap or shrink to
+   unreadable labels. Use safe centering to keep the first filter reachable. */
 .lbw-root:has(.board-filter-actions) .app{grid-template-rows:minmax(0,1fr)}
 .lbw-root .stagecol:has(.board-filter-actions)>.fbar{
-  display:grid;grid-template-columns:minmax(0,1fr);justify-items:stretch;
-  gap:8px;padding:9px clamp(8px,1.5vw,16px);overflow:visible;
-  position:relative;z-index:35;background:var(--bg)
+  display:flex;flex-direction:row;align-items:center;justify-content:space-evenly;
+  flex-wrap:nowrap;gap:7px;padding:8px 9px;
+  position:relative;z-index:35;background:var(--bg);
+  min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:thin;overscroll-behavior-x:contain
 }
-.lbw-root .fbar .board-filter-controls{
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
-  gap:7px 9px;min-width:0;width:100%
+/* Keep the existing group semantics, but distribute ALL nine controls as
+   direct flex items with equal free-space distribution across the full row.
+   No container-bound breakpoint or zoom threshold can move an item down. */
+.lbw-root .fbar .board-filter-controls,
+.lbw-root .fbar .board-filter-actions{display:contents}
+.lbw-root .fbar .board-filter-controls>.seg,
+.lbw-root .fbar .board-filter-controls>.fb,
+.lbw-root .fbar .board-filter-actions>.seg,
+.lbw-root .fbar .board-filter-actions>.pages,
+.lbw-root .fbar .board-filter-actions>.board-share{
+  flex:0 0 auto;align-self:center;min-width:0;margin:0
 }
 .lbw-root .fbar .board-filter-controls>.seg,
-.lbw-root .fbar .board-filter-actions .seg{margin-left:0;flex:0 0 auto;max-width:100%}
+.lbw-root .fbar .board-filter-actions .seg{
+  margin-left:0;flex:0 0 auto;max-width:none
+}
 .lbw-root .fbar .board-filter-controls>.fb{flex:0 0 auto;min-width:0}
 .lbw-root .fbar .board-filter-controls>.fb select{
-  box-sizing:border-box;min-width:90px;width:90px;max-width:90px;
-  height:29px;font-size:10px;padding:4px 7px
+  box-sizing:border-box;width:72px;min-width:72px;max-width:72px;
+  height:28px;font-size:10px;padding:4px 3px
 }
-.lbw-root .fbar .board-filter-controls .seg{height:29px}
+.lbw-root .fbar .board-filter-controls .seg{height:28px}
 .lbw-root .fbar .board-filter-controls .seg button{
-  font-size:10px;padding:5px 7px;white-space:nowrap
+  font-size:10px;padding:5px 5px;white-space:nowrap
 }
-.lbw-root .fbar .board-filter-controls .sdir{width:29px;height:29px}
+.lbw-root .fbar .board-filter-controls .sdir{width:26px;height:28px}
 .lbw-root .fbar .board-filter-controls input{
-  box-sizing:border-box;width:112px;min-width:88px;max-width:112px;
-  height:29px;font-size:10px;padding-inline:7px
-}
-.lbw-root .fbar .board-filter-actions{
-  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
-  gap:7px 10px;width:100%;min-width:0;flex-basis:auto;
-  margin:0 auto
+  box-sizing:border-box;width:76px;min-width:76px;max-width:76px;
+  height:28px;font-size:10px;padding-inline:6px
 }
 .lbw-root .board-filter-actions .pgn-seg{height:28px}
-.lbw-root .board-filter-actions .pages button{padding:5px 8px;font-size:10px}
-.lbw-root .board-filter-actions .board-share summary{font-size:10px;padding:6px 9px}
+.lbw-root .board-filter-actions .pages{flex-wrap:nowrap;gap:3px}
+.lbw-root .board-filter-actions .pages button{padding:5px 6px;font-size:10px}
+.lbw-root .board-filter-actions .board-share summary{
+  font-size:10px;padding:6px;white-space:nowrap
+}
 .lbw-root .board-share{position:relative;font-size:9px}
 .lbw-root .board-share summary{list-style:none;cursor:pointer;padding:6px;border:1px solid var(--line2);border-radius:4px;color:var(--ac);white-space:nowrap}
 .lbw-root .board-share summary::-webkit-details-marker{display:none}
 .lbw-root .board-share-menu{position:absolute;right:0;top:calc(100% + 7px);width:175px;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px;background:var(--bg2);border:1px solid var(--line2);border-radius:6px;box-shadow:0 10px 24px #0008;z-index:60}
 .lbw-root .board-share:not([open]) .board-share-menu{display:none}
 .lbw-root .board-share summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-/* The fixed shell stays pinned: at very narrow stage widths filters wrap
-   centrally rather than squeezing to 9px type or pushing the Share menu out. */
-@media(max-width:900px){
-  .lbw-root .fbar .board-filter-controls{gap:6px}
-  .lbw-root .fbar .board-filter-actions{gap:6px}
-  .lbw-root .board-share-menu{right:0}
+/* The single-row rule also applies at narrow viewport sizes.
+   Opening Share temporarily lets its anchored menu render above the stage. */
+.lbw-root .stagecol:has(.board-filter-actions)>.fbar:has(.board-share[open]){
+  overflow:visible
 }

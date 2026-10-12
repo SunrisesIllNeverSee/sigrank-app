@@ -264,10 +264,10 @@ Remaining decision or dependency: Real owner sign-in acceptance remains separate
 ### LB-08 — Center and responsively wrap leaderboard filters
 Item: Fix toolbar centering and formatting without requiring Safari Cmd+0.
 Status: IMPLEMENTED & VERIFIED
-Solution or answer: Split the toolbar into a centered filtering row (workflow, window, platform, class, sort direction, search) and a centered views/pagination/export row. Remove the old one-line justify-space-between and auto-margin interaction. Controls wrap based on available stage width even when both sidebars remain pinned; readable 10px form text, consistent sizing.
+Solution or answer: Owner clarification supersedes the temporary two-row layout. All nine controls now remain on ONE fixed horizontal line: workflow, window, platform, class, sort direction, search, Metrics/Raw, pagination, Share. Controls distribute with equal horizontal spacing when there is room; at greater zoom or narrow board width, the unchanged row scrolls horizontally rather than wrapping or rearranging.
 Code changed: YES
 Files and function/component: components/live/LiveBoardWorkspace.tsx (board-filter-controls), components/live/board-cols.css (responsive filtering rows), components/live/proto-scoped.css (action spacing).
 Commit: see latest integration/site-a315435 HEAD after the staging-only merge.
 Where to see it: http://localhost:3230/board/all — normal Safari view, check at standard and enlarged page zoom.
-Verification and evidence: WebKit layout checks at 1440, 1280, 1152 (~125%-zoom equivalent), 1100 and 900 logical viewport pixels: both rows had exact centered bounding boxes (0px error), 0 filter/group/secondary-action overflow, and controls remained legible at 10px. Browser selection tested independently.
-Remaining decision or dependency: Actual Safari page zoom state is a browser preference; the CSS no longer relies on manually resetting it. At extremely narrow viewports the fixed three-panel shell remains a separate owner constraint.
+Verification and evidence: Follow-up supersedes two-row test: WebKit at 1680/1440/1280/1152/1100/900/750px measured 9 control centers at identical Y (0px delta), equal gaps across all 8 intervals (39px at 1680, 15px at 1440, 7px at narrower widths); at 1280 and below toolbar scrolls and page does not horizontally overflow. At simulated 100/125/150/175/200% zoom, every control remains on the same Y. No viewport-width breakpoint switches toolbar layout.
+Remaining decision or dependency: All controls stay in fixed order. At widths where they cannot fit, use the toolbar's horizontal scroll; the sidebars remain pinned and no second line is created.
