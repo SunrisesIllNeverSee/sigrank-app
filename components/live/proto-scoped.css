@@ -1794,3 +1794,5 @@
 .lbw-root .ws-topic-documents .ws-tree-title{font-size:11px;line-height:1.45;text-decoration:none}
 .lbw-root .ws-tree-details:not([open]) > summary .ws-tree-toggle::before{content:"▸"}
 .lbw-root .ws-tree-details[open] > summary .ws-tree-toggle::before{content:"▾"}
+
+.lbw-root .sbtn[aria-label="PROFILE"] .pxbd{width:24px;height:24px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-rows:auto;gap:1px}
