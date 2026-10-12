@@ -3,7 +3,7 @@
 **Branch:** `integration/site-a315435`
 **Preview:** `http://localhost:3230/` (use `localhost`, not `127.0.0.1` — dev chunks are blocked cross-origin on the IP host, so hydration silently fails there)
 **Date:** 2026-10-12
-**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) — pushed to `origin/integration/site-a315435`
+**Commits:** `33b66c9` (board data) + `a5c60f9` (profile UI) + `68feff6` (reviewer corrections) — pushed to `origin/integration/site-a315435`
 
 ---
 
@@ -82,7 +82,27 @@ Restored the approved mock split (passport card + railway flap board) as the fir
 
 - `npx tsc --noEmit` — clean.
 - `npm run test:canonical` — 11/11.
-- `npm test` — 681 pass / **1 pre-existing fail**: `baseline-labels.test.mjs` FIX 8 asserts `app/compare/page.tsx` documents a "live field median" baseline — the lane's compare rework (`196bb34`) removed "The Field" pseudo-operator entirely, so the test targets a superseded design. Flagged on the bus for the compare lane owner; not patched here to avoid fighting their in-flight design.
+- `npm test` — 682 pass / 0 fail / 4 skipped (was 681/1 — the two stale compare-baseline tests retargeted to the live-operators-only contract, see fix log below).
+- `bunx vitest run __tests__/board/snapshot-records.test.ts` — 8/8.
+- `bun run lint` — 0 errors, 66 warnings (was 67 — `hasHistory` warning removed; remaining warnings are pre-existing in scripts/older modules).
+
+## Reviewer rejection fixes (round 2)
+
+All items from the review of `33b66c9`/`a5c60f9`/`b4793c7` addressed:
+
+| # | Issue | Fix | Files |
+|---|-------|-----|-------|
+| 1 | **Critical** — `INSIDE HCM` for outlier operators (`share ≤ 0.8` only) | Membership now computed by `isOutlier` — the shared classifier implementing the full documented rule (share ≤ 0.80 AND (share ≥ 0.01 OR deep-reuse fallback) + verified-operator whitelist). Verified live: `/user/xoxo` now reads `SHARE 0.0% · VEL 58.2 · OUTSIDE OCM · OUTLIER · UNRESOLVED` — consistent with the resolver. Module renamed to canonical **OCM** (Operator Center of Mass, per `a3d1f61`): title, subtitle, band labels, footer. The 0.01 floor is drawn as a second dashed bound; footer notes the deep-reuse carve-out. `OUTSIDE OCM` distinguishes `OUTLIER` (below floor) vs `INPUT-DOMINANT` (above ceiling). | `components/profile-v2/AnalysisView.tsx` |
+| 2 | `hybrid` mislabeled "AGENTIC" | `ModeChip` renders the three-valued mode distinctly (`HITL`/`AGENTIC`/`HYBRID`), `—` for null, version suffix, and — for agentic rows — an evidence ↗ link (http/https-only) plus assessed timestamp in the title. | `components/profile-v2/SubmissionsView.tsx` |
+| 3 | `TOP CLASS REACHED` on pending profiles | Subtitle is now `CLASS STANDING UNAVAILABLE` when `tierProgress == null` (pending/unranked) and for unmapped classes; `TOP CLASS REACHED` only when the operator genuinely sits at ladder index 0. Current rung text degrades to `CURRENT CLASS` when no progress data exists. Verified `/user/sex`. | `components/profile-v2/BadgesView.tsx` |
+| 4 | Mixed median/mean "AVERAGE USER" column | `FieldAverages` gained `inputTokens`/`outputTokens`/`cacheReadTokens`/`cacheCreateTokens`/`totalTokens` means over the same ranked cohort (zeros count); `FlapBoard` now reads every average cell from `computeFieldAverages` — one statistic, one source of truth. Local `medianOf` (which silently dropped zeros) and the `boardRows` prop removed. | `lib/analytics/field-average.ts`, `components/profile-v2/FlapBoard.tsx`, `OverviewView.tsx` |
+| 5 | Unused `hasHistory` lint warning | Removed the declaration. | `SubmissionsView.tsx` |
+| 6 | Provenance fields fetched but dropped | `SnapshotRecord` now carries `workflowEvidenceUrl` + `modeAssessedAt` (agentic-only, mirroring the API's gating); surfaced via `ModeChip` link + title. | `lib/board/queries.ts`, `SubmissionsView.tsx` |
+| 7 | No tests for the new data-layer read | New `__tests__/board/snapshot-records.test.ts` (8 tests): visibility-guard parity (unclaimed/retired/private → no query issued), operator+status constraint, complete-row mapping/derivation, null-pillars → null derived metrics, null window stays null, agentic evidence carried, hybrid resolved distinctly, non-https evidence rejected. | `__tests__/board/snapshot-records.test.ts` |
+
+Suggestions applied: `window` null-preserving (was `?? "all_time"`) — renders `—`; footers read `SHOWING n OF m` instead of the false `PAGE 1/1`; OCM terminology applied; public-API visibility guards (`claimed`/`status`/`profile_visibility`) now gate the records read identically to the snapshot-history route.
+
+Compare-lane reconciliation: `baseline-labels.test.mjs` FIX 8 and `the-field-board-exclusion.test.mjs` asserted the pre-rework contract ("The Field" pseudo-operator as compare baseline). The live-operators-only rework (`liveCompareCandidates` excludes `the-field`) made both stale — the exclusion test was previously passing only on stale comment text. Both retargeted to pin the actual contract: compare carries no unlabeled baseline, and `liveCompareCandidates` excludes `the-field`. Stale "the-field" comments in `app/compare/page.tsx` corrected. The Field remains on the board per the documented CLAIM 9 owner decision.
 
 ## Screenshots
 
@@ -92,4 +112,4 @@ Restored the approved mock split (passport card + railway flap board) as the fir
 
 - Owner-only surfaces (Report/Lab) verified as *locked for public*; authenticated-owner rendering not exercised (no auth session in the local preview).
 - `watchCount` in `ProfileBody` remains a documented placeholder (0) until the profile-level watch fetch lands.
-- The stale `baseline-labels` test needs the compare lane owner to either reintroduce the median label or update the test.
+- No hybrid/agentic scored submissions exist in current data — the distinct `HYBRID` label and evidence ↗ link are code-verified (unit tests + type-level) but not yet exercised by live rows.
