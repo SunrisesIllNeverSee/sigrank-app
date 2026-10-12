@@ -153,3 +153,7 @@ Owner scope: Operators (Leaderboard/Profile/Compare/Hall), Writings (SigRank §/
 Shared GroupedRailNav now drives both LiveBoardWorkspace and WorkspaceShell. Profile destination /me uses existing authentication and redirects to the current operator. Added profile/articles icon patterns and descending multicolor leaderboard bars. Existing Enterprise rail promotion omitted from the requested three-group rail; product routes remain unchanged.
 
 Verification: TypeScript, scoped ESLint, canonical 11/11 and production build passed. Browser checked ordered groups, disabled controls with no href, five leaderboard colors, rail fit at 1229×739, Profile redirect to MO§ES™ and Articles active icon. Mock previews updated too. No scoring/data changes, merge, push or deployment.
+
+## Profile rail badge — October 12, 2026
+
+Profile slot now renders the signed-in operator's existing earned percentile pixel badge through the shared session/profile cache. Signed-out, unlinked, or badge-less operators keep the neutral profile icon. No extra profile request or badge entitlement is created. A separately saved user-selected badge setting was not found; this uses the current existing badge mapping. The MOSES mock mirrors the top-one-percent badge. Owned files: GroupedRailNav.tsx, session.ts and the two customized HTML previews. Concurrent MoversRail/LiveBoardWorkspace changes remain outside this commit.
