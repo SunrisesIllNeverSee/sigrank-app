@@ -1,0 +1,11 @@
+.lbw-root .ws-hall-grid{gap:16px;padding-bottom:16px}
+.lbw-root .ws-hall-grid .hall-metric-card{min-width:0;padding:12px;border:1px solid var(--line2);border-radius:8px;background:var(--panel)}
+.lbw-root .ws-hall-grid .hall-metric-heading{margin:0 0 4px;padding:2px 8px 12px;border-bottom:1px solid var(--line2);gap:4px}
+.lbw-root .ws-hall-grid .hall-metric-heading h3{font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+.lbw-root .ws-hall-grid .hall-record-row{padding:5px 8px;gap:3px;border-bottom:1px solid var(--line);font-size:12px;line-height:1.35}
+.lbw-root .ws-hall-grid .ws-rowpick:last-child .hall-record-row{border-bottom:0}
+.lbw-root .ws-hall-grid .hall-record-value{gap:8px;padding-left:28px;min-width:0}
+.lbw-root .ws-hall-grid .hall-record-value>span:last-child{font-size:14px;line-height:1.4;letter-spacing:0;font-variant-numeric:tabular-nums}
+.lbw-root .ws-hall-grid .ws-rowpick{border-radius:4px}
+.lbw-root .ws-hall-grid .ws-rowpick:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
+.lbw-root .ws-hall-grid .ws-rowpick.on{outline:1px solid var(--ac);outline-offset:-1px}
