@@ -255,6 +255,7 @@ export async function ProfileBody({
               records={operatorRecords}
               trophyCounts={trophyCounts}
               scoredSnapshots={snapshotRecords.length}
+              pending={pending}
             />
           }
           badges={
@@ -265,6 +266,7 @@ export async function ProfileBody({
               trophyCounts={trophyCounts}
               tierProgress={tierProgress}
               scoredSnapshots={snapshotRecords.length}
+              pending={pending}
             />
           }
         />

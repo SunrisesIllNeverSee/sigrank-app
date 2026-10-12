@@ -87,6 +87,8 @@ export interface BadgesViewProps {
   tierProgress: TierProgress | null;
   /** Scored snapshots on record (snapshot_submissions rows). */
   scoredSnapshots: number;
+  /** Pending/unranked operators hold no earned badges yet. */
+  pending?: boolean;
 }
 
 export function BadgesView({
@@ -96,6 +98,7 @@ export function BadgesView({
   trophyCounts,
   tierProgress,
   scoredSnapshots,
+  pending = false,
 }: BadgesViewProps) {
   /* ── Badge derivation — same rules as SocialView ─────────────── */
   const badges: BadgeDef[] = [];
@@ -116,11 +119,16 @@ export function BadgesView({
     });
   }
 
+  // A pending operator has no verified class — the badge stays locked until
+  // their first scored snapshot lands (mirrors tierProgress == null →
+  // "CLASS STANDING UNAVAILABLE" below).
   badges.push({
-    rank: snapshot.class_tier,
+    rank: pending ? "—" : snapshot.class_tier,
     name: "Class",
     criteria: "Signal class — lifetime verified token volume",
-    color: "rgb(var(--class-power))",
+    detail: pending ? "PENDING FIRST SCORED SNAPSHOT" : undefined,
+    color: pending ? MUTED : "rgb(var(--class-power))",
+    locked: pending,
   });
 
   if (operator.verification_status !== "unverified") {

@@ -62,6 +62,8 @@ export async function GET(
     .eq("status", "scored")
     .order("submitted_at", { ascending: false })
     .order("submission_id", { ascending: false })
+    // Fetch PAGE_SIZE + 1 rows — the extra row only detects whether another
+    // page exists (drives next_page below) and is never returned.
     .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
   if (error) return NextResponse.json({ error: "Unavailable" }, { status: 503 });
 

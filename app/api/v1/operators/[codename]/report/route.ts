@@ -25,6 +25,14 @@ export async function GET(
   if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
 
   const { codename } = await params;
+  // Same shape gate as the snapshot-history route — rejects % / _ wildcards
+  // before they reach the ilike pattern below.
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(codename)) {
+    return json(
+      { status: "invalid", detail: "Codename must be 1-100 chars of [a-zA-Z0-9_-]." },
+      400,
+    );
+  }
   const sb = getSupabaseServer();
   if (!sb) return json({ status: "unavailable" }, 503);
 
