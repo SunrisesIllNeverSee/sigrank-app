@@ -20,6 +20,12 @@ export interface FieldAverages {
   scaleV: number | null;
   efficiency: number | null;
   costPerMillion: number | null;
+  /** Mean raw token pillars over the same ranked cohort — zeros count. */
+  inputTokens: number | null;
+  outputTokens: number | null;
+  cacheReadTokens: number | null;
+  cacheCreateTokens: number | null;
+  totalTokens: number | null;
   /** Mean token ratios normalized to input = 1 (the op-ratio components). */
   crRatio: number | null;
   outRatio: number | null;
@@ -56,6 +62,20 @@ export function computeFieldAverages(rows: LeaderboardRow[]): FieldAverages {
 
   return {
     yield_: mean(nums((r) => r.snapshot.cascade!.yield_)),
+    inputTokens: mean(nums((r) => r.telemetry?.fresh_input)),
+    outputTokens: mean(nums((r) => r.telemetry?.output)),
+    cacheReadTokens: mean(nums((r) => r.telemetry?.cache_read)),
+    cacheCreateTokens: mean(nums((r) => r.telemetry?.cache_create)),
+    totalTokens: mean(
+      nums((r) =>
+        r.telemetry
+          ? r.telemetry.fresh_input +
+            r.telemetry.output +
+            r.telemetry.cache_read +
+            r.telemetry.cache_create
+          : null,
+      ),
+    ),
     snr: mean(nums((r) => r.snapshot.cascade!.snr)),
     leverage: mean(nums((r) => r.snapshot.cascade!.leverage)),
     velocity: mean(nums((r) => r.snapshot.cascade!.velocity)),

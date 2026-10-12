@@ -294,6 +294,52 @@ function compactTok(n: number | null | undefined): string {
   return n.toFixed(0);
 }
 
+/** Resolved workflow mode chip — HITL / AGENTIC / HYBRID with mode version;
+ *  agentic rows additionally carry the evidence link + assessment timestamp
+ *  the snapshot-history API exposes. */
+function ModeChip({ r }: { r: SnapshotRecord }) {
+  if (!r.workflowMode) return <span className="text-text-dim">—</span>;
+  const label =
+    r.workflowMode === "hitl"
+      ? "HITL"
+      : r.workflowMode === "agentic"
+        ? "AGENTIC"
+        : "HYBRID";
+  const evidence =
+    r.workflowEvidenceUrl && /^https?:\/\//i.test(r.workflowEvidenceUrl)
+      ? r.workflowEvidenceUrl
+      : null;
+  const title = [
+    r.workflowModeVersion ? `mode ${r.workflowModeVersion}` : null,
+    r.modeAssessedAt ? `assessed ${r.modeAssessedAt.slice(0, 10)}` : null,
+    evidence,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  return (
+    <span
+      className="rounded border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-semibold uppercase text-gold"
+      title={title || undefined}
+    >
+      {label}
+      {r.workflowModeVersion ? ` · ${r.workflowModeVersion}` : ""}
+      {evidence && (
+        <>
+          {" "}
+          <a
+            href={evidence}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-dotted"
+          >
+            ↗
+          </a>
+        </>
+      )}
+    </span>
+  );
+}
+
 /** Expanded per-submission record table — the scored snapshot_submissions
  *  archive with reporting windows, platforms, token pillars, derived metrics
  *  and provenance. Null fields render "—" (unavailable), never 0. */
@@ -333,9 +379,9 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
                 <td className="px-3 py-2 text-left text-text-secondary">
                   {fmtTableDate(r.submittedAt.slice(0, 10))}
                 </td>
-                <td className="px-3 py-2 text-center text-text-secondary"
+                <td className={`px-3 py-2 text-center ${r.window ? "text-text-secondary" : "text-text-dim"}`}
                   title={r.periodStart && r.periodEnd ? `${r.periodStart} → ${r.periodEnd}` : undefined}>
-                  {r.window.replace(/_/g, " ")}
+                  {r.window ? r.window.replace(/_/g, " ") : "—"}
                 </td>
                 <td className="px-3 py-2 text-left uppercase text-text-secondary">{r.platform}</td>
                 <td className={r.inputTokens == null ? dim : cell}>{compactTok(r.inputTokens)}</td>
@@ -348,17 +394,7 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
                 <td className={r.snr == null ? dim : cell}>{r.snr != null ? r.snr.toFixed(3) : "—"}</td>
                 <td className={r.velocity == null ? dim : cell}>{r.velocity != null ? r.velocity.toFixed(2) : "—"}</td>
                 <td className="px-3 py-2 text-right">
-                  {r.workflowMode ? (
-                    <span
-                      className="rounded border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-semibold uppercase text-gold"
-                      title={r.workflowModeVersion ? `mode ${r.workflowModeVersion}` : undefined}
-                    >
-                      {r.workflowMode === "hitl" ? "HITL" : "AGENTIC"}
-                      {r.workflowModeVersion ? ` · ${r.workflowModeVersion}` : ""}
-                    </span>
-                  ) : (
-                    <span className="text-text-dim">—</span>
-                  )}
+                  <ModeChip r={r} />
                 </td>
                 <td className={r.rulesetVersion == null ? dim : cell}>
                   {r.rulesetVersion ?? "—"}
@@ -370,9 +406,11 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
       </div>
       <div className="flex items-center justify-between pt-2.5 font-mono text-[8px] uppercase tracking-[0.08em] text-text-muted">
         <span>
-          {rows.length} ROWS{records.length > rows.length ? ` OF ${records.length}` : ""} · SCORED SNAPSHOTS · — = NOT REPORTED
+          SCORED SNAPSHOTS · — = NOT REPORTED
         </span>
-        <span className="text-text-secondary">PAGE 1/1</span>
+        <span className="text-text-secondary">
+          SHOWING {rows.length} OF {records.length}
+        </span>
       </div>
     </Module>
   );
@@ -446,9 +484,11 @@ function HistoryTable({ history }: { history: HistoryPoint[] }) {
       </div>
       <div className="flex items-center justify-between pt-2.5 font-mono text-[8px] uppercase tracking-[0.08em] text-text-muted">
         <span>
-          {rows.length} ROWS{history.length > rows.length ? ` OF ${history.length}` : ""} · Δ = YIELD VS PREV SNAPSHOT
+          Δ = YIELD VS PREV SNAPSHOT
         </span>
-        <span className="text-text-secondary">PAGE 1/1</span>
+        <span className="text-text-secondary">
+          SHOWING {rows.length} OF {history.length}
+        </span>
       </div>
     </Module>
   );
@@ -694,7 +734,6 @@ export function SubmissionsView({
 }: SubmissionsViewProps) {
   const hasSubs = submissions.length > 0;
   const hasRecords = snapshotRecords.length > 0;
-  const hasHistory = history.length > 0 || hasRecords;
 
   return (
     <div className="flex flex-col gap-4">

@@ -2,7 +2,8 @@
  * app/compare/page.tsx — head-to-head operator comparison. The Nav links here.
  *
  * RSC: resolves operators A and B from ?a=&b= codenames (defaulting to a
- * day-seeded rotating pick vs "the-field"), reads through the @/lib/data facade
+ * day-seeded rotating pair of qualified live operators), reads through the
+ * @/lib/data facade
  * (mock fallback when no creds), and renders the presentational CompareTable
  * (metric table + shape radar + Pro gate). A row of quick-swap links re-targets
  * slot B while keeping A.
@@ -69,7 +70,7 @@ export const metadata: Metadata = withOG({
 });
 
 // PERF (2026-08-12): page is ISR. The default view (no ?a= or ?b= params)
-// is prerendered with a day-seeded pick vs the-field. When ?a= and ?b= are
+// is prerendered with a day-seeded pair of live operators. When ?a= and ?b= are
 // present, Next.js generates the page on-demand and caches the result for
 // `revalidate` seconds (per unique param combo). Auth-dependent "compare
 // against me" moved client-side (CompareAgainstMe) so the page no longer

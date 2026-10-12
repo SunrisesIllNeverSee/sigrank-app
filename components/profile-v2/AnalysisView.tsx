@@ -29,6 +29,7 @@ import type {
   BuildArchetypeKey,
 } from "@/lib/analytics/build-archetypes";
 import { tierOf, type TierName } from "@/components/sigrank/types";
+import { isOutlier } from "@/lib/analytics/outlier-classify";
 import { sortValue } from "@/lib/analytics/sort-value";
 
 export interface AnalysisViewProps {
@@ -529,11 +530,11 @@ function TierPosition({
   );
 }
 
-/* ═══════════════ 1b. HCM SIGNATURE ═══════════════ */
-interface HcmPoint {
+/* ═══════════════ 1b. OCM SIGNATURE ═══════════════ */
+interface OcmPoint {
   codename: string;
   label: string;
-  share: number; // fresh_input / total tokens — the HCM composition axis
+  share: number; // fresh_input / total tokens — the OCM composition axis
   yield_: number;
   mode: "hitl" | "agentic" | "hybrid" | null;
   isOp: boolean;
@@ -544,17 +545,19 @@ const MODE_COLOR: Record<string, string> = {
   agentic: "rgb(var(--accent))",
   hybrid: "rgb(var(--violet, 168 85 247))",
 };
-const HCM_BOUNDARY = 0.8;
+const OCM_MAX_SHARE = 0.8;
+const OCM_MIN_SHARE = 0.01;
 
 /**
- * HCM POSITION — the field plotted in the Human Center of Mass composition
- * space (fresh-input share of total tokens vs yield). The dashed boundary at
- * share = 0.8 is the documented HCM rule (resolveWorkflowMode): rows at or
- * below it resolve HITL unless the deep-reuse fallback applies. Points are
- * colored by their RESOLVED workflow cohort on the same all-time board
- * population as TierPosition — no window or cohort mixing.
+ * OCM POSITION — the field plotted in the Operator Center of Mass composition
+ * space (fresh-input share of total tokens vs yield). The OCM band is the
+ * documented rule (resolveWorkflowMode / isOutlier): share ≤ 0.80 AND
+ * (share ≥ 0.01 OR the deep-reuse fallback — velocity ≤ 2, yield ≤ 1000,
+ * output ≥ 1M, cache write ≥ 1M). Points are colored by their RESOLVED
+ * workflow cohort on the same all-time board population as TierPosition —
+ * no window or cohort mixing.
  */
-function HcmSignature({
+function OcmSignature({
   operator,
   snapshot,
   telemetry,
@@ -570,7 +573,7 @@ function HcmSignature({
   const total = (t: TelemetryRaw) =>
     t.fresh_input + t.output + t.cache_read + t.cache_create;
 
-  const pts: HcmPoint[] = boardRows
+  const pts: OcmPoint[] = boardRows
     .filter(
       (r) =>
         !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
@@ -591,7 +594,7 @@ function HcmSignature({
   const c = snapshot.cascade;
   const opTotal = total(telemetry);
   const opFromRows = pts.find((p) => p.isOp) ?? null;
-  const op: HcmPoint | null =
+  const op: OcmPoint | null =
     opFromRows ??
     (ranked && c && !c.nonCompounding && opTotal > 0
       ? {
@@ -612,8 +615,8 @@ function HcmSignature({
   if (pts.length < 3) {
     return (
       <Module
-        title="HCM Position"
-        subtitle="Workflow signature · Human Center of Mass rule"
+        title="OCM Position"
+        subtitle="Workflow signature · Operator Center of Mass rule"
         tag={<Tag>FIELD N={pts.length}</Tag>}
       >
         <PendingNote>
@@ -637,26 +640,41 @@ function HcmSignature({
       ? telemetry.output / telemetry.fresh_input
       : null;
   const opMode = op?.mode ?? null;
-  const inHcm = op != null && op.share <= HCM_BOUNDARY;
+  // Full documented OCM rule — the shared classifier (input-share band plus
+  // the deep-reuse fallback and the verified-operator whitelist), so the
+  // membership label can never contradict the resolved cohort.
+  const inOcm =
+    op != null &&
+    !isOutlier({
+      codename: operator.codename,
+      input: telemetry.fresh_input,
+      output: telemetry.output,
+      cacheRead: telemetry.cache_read,
+      cacheWrite: telemetry.cache_create,
+      velocity: c?.velocity ?? 0,
+      yield_: c?.yield_ ?? 0,
+    });
+  const outlierZone = op != null && !inOcm && op.share <= OCM_MAX_SHARE;
 
   return (
     <Module
-      title="HCM Position"
-      subtitle="Workflow signature · Human Center of Mass composition rule"
+      title="OCM Position"
+      subtitle="Workflow signature · Operator Center of Mass composition rule"
       tag={<Tag>FIELD N={pts.length}</Tag>}
     >
       <svg
         viewBox="0 0 840 212"
         className="block h-auto w-full"
         role="img"
-        aria-label="Scatter plot of fresh-input share versus yield for all operators, color coded by resolved workflow cohort, with the HCM composition boundary at 0.8 input share"
+        aria-label="Scatter plot of fresh-input share versus yield for all operators, color coded by resolved workflow cohort, with the OCM composition band between 0.01 and 0.8 input share"
         style={{ fontVariantNumeric: "tabular-nums" }}
       >
-        {/* HCM cohort region (share ≤ 0.8) */}
+        {/* OCM band (share 0.01–0.80; the deep-reuse fallback can extend
+            membership below the floor — see footer note) */}
         <rect
-          x={L}
+          x={xAt(OCM_MIN_SHARE)}
           y={T}
-          width={xAt(HCM_BOUNDARY) - L}
+          width={xAt(OCM_MAX_SHARE) - xAt(OCM_MIN_SHARE)}
           height={B - T}
           fill={GOLD}
           opacity={0.035}
@@ -688,19 +706,29 @@ function HcmSignature({
           />
         ))}
 
-        {/* HCM composition boundary */}
+        {/* OCM composition boundaries */}
         <line
-          x1={xAt(HCM_BOUNDARY)}
+          x1={xAt(OCM_MAX_SHARE)}
           y1={T}
-          x2={xAt(HCM_BOUNDARY)}
+          x2={xAt(OCM_MAX_SHARE)}
           y2={B}
           stroke={GOLD}
           strokeWidth={1}
           strokeDasharray="4 5"
           opacity={0.8}
         />
+        <line
+          x1={xAt(OCM_MIN_SHARE)}
+          y1={T}
+          x2={xAt(OCM_MIN_SHARE)}
+          y2={B}
+          stroke={GOLD}
+          strokeWidth={0.75}
+          strokeDasharray="2 4"
+          opacity={0.55}
+        />
         <text
-          x={xAt(HCM_BOUNDARY) - 6}
+          x={xAt(OCM_MAX_SHARE) - 6}
           y={T + 7}
           textAnchor="end"
           fill={GOLD}
@@ -708,7 +736,18 @@ function HcmSignature({
           fontSize={8}
           opacity={0.9}
         >
-          HCM ≤ 0.80
+          OCM ≤ 0.80
+        </text>
+        <text
+          x={xAt(OCM_MIN_SHARE) + 4}
+          y={B - 4}
+          textAnchor="start"
+          fill={GOLD}
+          fontFamily={MONO}
+          fontSize={8}
+          opacity={0.7}
+        >
+          0.01
         </text>
 
         {/* axis labels */}
@@ -860,11 +899,11 @@ function HcmSignature({
         <span className="flex-1" />
         {op && (
           <span className="text-text-secondary">
-            SHARE {(op.share * 100).toFixed(1)}%{opVelocity != null ? ` · VEL ${opVelocity.toFixed(1)}` : ""} · {inHcm ? "INSIDE HCM" : "OUTSIDE HCM"}
+            SHARE {(op.share * 100).toFixed(1)}%{opVelocity != null ? ` · VEL ${opVelocity.toFixed(1)}` : ""} · {inOcm ? "INSIDE OCM" : outlierZone ? "OUTSIDE OCM · OUTLIER" : "OUTSIDE OCM · INPUT-DOMINANT"}
             {opMode ? ` · ${opMode.toUpperCase()}` : " · UNRESOLVED"}
           </span>
         )}
-        <span className="opacity-70">DASHED GOLD = HCM BOUNDARY</span>
+        <span className="opacity-70">DASHED GOLD = OCM BOUNDS · &lt;0.01 HOLDS ONLY VIA DEEP-REUSE FALLBACK</span>
       </div>
     </Module>
   );
@@ -1552,7 +1591,7 @@ export function AnalysisView({
         globalRank={globalRank}
         topPct={topPct}
       />
-      <HcmSignature
+      <OcmSignature
         operator={operator}
         snapshot={snapshot}
         telemetry={telemetry}

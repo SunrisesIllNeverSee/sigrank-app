@@ -10,14 +10,15 @@
  *   footer   OP RATIO · C:I:O
  *
  * Server component. WELCOME OPERATOR = the displayed operator's real values;
- * AVERAGE USER = the per-metric median of the current ranked field
- * (compounding rows only) — the same reference population the tier scatter
- * and card radar use. Missing values render "—", never zero.
+ * AVERAGE USER = the per-metric mean of the current ranked field
+ * (compounding rows only) — every cell reads from computeFieldAverages, the
+ * single source of truth for average-operator references, so raw pillars and
+ * derived metrics share one statistic. Missing values render "—", never zero.
  */
 
 import type { Operator, ScoredSnapshot } from "@/lib/analytics/scoring-types";
 import type { FieldAverages } from "@/lib/analytics/field-average";
-import type { LeaderboardRow, TelemetryRaw } from "@/lib/board";
+import type { TelemetryRaw } from "@/lib/board";
 
 interface FlapBoardProps {
   operator: Operator;
@@ -25,7 +26,6 @@ interface FlapBoardProps {
   telemetry: TelemetryRaw;
   pending: boolean;
   fieldAvg: FieldAverages | null;
-  boardRows: LeaderboardRow[];
 }
 
 function compact(n: number): string {
@@ -33,12 +33,6 @@ function compact(n: number): string {
   if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
   if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
   return n.toFixed(0);
-}
-
-function medianOf(values: number[]): number | null {
-  const xs = values.filter((v) => Number.isFinite(v) && v > 0).sort((a, b) => a - b);
-  if (!xs.length) return null;
-  return xs[Math.floor(xs.length / 2)];
 }
 
 function row(name: string, you: string, abbr: string, avg: string, gold = false) {
@@ -58,29 +52,11 @@ export function FlapBoard({
   telemetry,
   pending,
   fieldAvg,
-  boardRows,
 }: FlapBoardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
 
   const total = telemetry.fresh_input + telemetry.output + telemetry.cache_read + telemetry.cache_create;
-
-  const field = boardRows.filter(
-    (r) => !r.pending && r.snapshot.cascade && !r.snapshot.cascade.nonCompounding,
-  );
-  const avgIn = medianOf(field.map((r) => r.telemetry.fresh_input));
-  const avgOut = medianOf(field.map((r) => r.telemetry.output));
-  const avgCr = medianOf(field.map((r) => r.telemetry.cache_read));
-  const avgCw = medianOf(field.map((r) => r.telemetry.cache_create));
-  const avgTotal = medianOf(
-    field.map(
-      (r) =>
-        r.telemetry.fresh_input +
-        r.telemetry.output +
-        r.telemetry.cache_read +
-        r.telemetry.cache_create,
-    ),
-  );
 
   const hasTokens = total > 0;
   const t = (v: number | null | undefined) => (v == null ? "—" : compact(v));
@@ -95,11 +71,11 @@ export function FlapBoard({
         <span>Average user</span>
       </div>
       <div className="pv2-flap-rows">
-        {row("INPUT", you(compact(telemetry.fresh_input)), "IN", t(avgIn))}
-        {row("OUTPUT", you(compact(telemetry.output)), "OUT", t(avgOut))}
-        {row("CACHE R", you(compact(telemetry.cache_read)), "CR", t(avgCr))}
-        {row("CACHE W", you(compact(telemetry.cache_create)), "CW", t(avgCw))}
-        {row("TOTAL", you(compact(total)), "Σ", t(avgTotal))}
+        {row("INPUT", you(compact(telemetry.fresh_input)), "IN", t(fieldAvg?.inputTokens))}
+        {row("OUTPUT", you(compact(telemetry.output)), "OUT", t(fieldAvg?.outputTokens))}
+        {row("CACHE R", you(compact(telemetry.cache_read)), "CR", t(fieldAvg?.cacheReadTokens))}
+        {row("CACHE W", you(compact(telemetry.cache_create)), "CW", t(fieldAvg?.cacheCreateTokens))}
+        {row("TOTAL", you(compact(total)), "Σ", t(fieldAvg?.totalTokens))}
         {row(
           "YIELD",
           show ? `${compact(show.yield_)}Υ` : "—",
