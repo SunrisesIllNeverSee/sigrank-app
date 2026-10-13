@@ -65,7 +65,10 @@ describe("seed claim shutdown", () => {
       method: "POST", body: JSON.stringify({ codename: "victim", input_tokens }),
     }));
     expect(response.status).toBe(503);
-    expect(await response.json()).toMatchObject({ code: "claim_verification_unavailable" });
+    expect(await response.json()).toMatchObject({
+      code: "claim_verification_unavailable",
+      contact: "hello@signalaf.com",
+    });
     expect(state.database.from).not.toHaveBeenCalled();
   });
 });
@@ -97,5 +100,14 @@ describe("Vercel installation ownership", () => {
     expect(response.headers.get("location")).toContain("/vercel/config?configurationId=icfg_own");
     expect(fetch).not.toHaveBeenCalled();
     expect(state.writes).not.toHaveBeenCalled();
+  });
+});
+
+describe("seed claim contact", () => {
+  it("routes original-board claims to the owner inbox with the codename", async () => {
+    const { claimMailto } = await import("@/lib/identity/claim-contact");
+    const href = claimMailto("victim");
+    expect(href.startsWith("mailto:hello@signalaf.com?")).toBe(true);
+    expect(decodeURIComponent(href)).toContain("Profile claim: victim");
   });
 });
