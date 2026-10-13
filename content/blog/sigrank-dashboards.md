@@ -4,7 +4,7 @@ title: "SigRank Interactive Dashboards"
 description: "Interactive analytics dashboards for the SigRank two-axis operator taxonomy — 10 build archetypes, 24-stage experience ladder, cross-metric scatterplots, operator scatterplots, platform board, and model board. 1,628 operators, 17 platforms, 3,304 models."
 tags: [article, sigrank, dashboards, analytics, archetypes, tier-ladder, scatter, platform-board, model-board, interactive]
 timestamp: 2026-08-11T14:00:00Z
-author: Deric (@SunrisesIllNeverSee)
+author: Deric J. McHenry
 ---
 
 > [1] The full analytical surface of the SigRank two-axis operator taxonomy, rendered as interactive Chart.js dashboards. All data is embedded — no server calls, no API dependencies. Each dashboard is self-contained and can be viewed independently.

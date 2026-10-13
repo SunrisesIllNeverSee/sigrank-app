@@ -14,7 +14,6 @@
  */
 
 import React from "react";
-import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import "./StageReflow.css";
 import Link from "next/link";
 import {
@@ -558,8 +557,6 @@ export async function FourDegreesChart({
             <ComparisonTable rows={rows} />
             <p className="mt-4 text-center font-mono text-xs text-text-muted">AA: modeled baseline · Field & power users: medians · Top eval: one operator<br />signalaf.com/wiki/four-degrees</p>
           </div>
-          <ArtworkShareControls target={`four-degrees-artwork-${variant}`} title="Four Degrees"
-            filename="signalaf-four-degrees" href="/wiki/four-degrees" />
           <ReferenceContext columns={[aa, avg, power, gold]} />
 
           {/* under-chart footnote (owner 2026-06-22) */}
@@ -658,8 +655,6 @@ export async function FourDegreesChart({
             <ComparisonTable rows={rows} />
             <p className="mt-4 text-center font-mono text-xs text-text-muted">AA: modeled baseline · Field & power users: medians · Top eval: one operator<br />signalaf.com/wiki/four-degrees</p>
           </div>
-          <ArtworkShareControls target={`four-degrees-artwork-${variant}`} title="Four Degrees"
-            filename="signalaf-four-degrees" href="/wiki/four-degrees" />
       <ReferenceContext columns={[aa, avg, power, gold]} />
 
       <div className="flex flex-col gap-3">

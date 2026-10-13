@@ -479,6 +479,10 @@ export function WorkspaceShell({
                 <div className="board">
                   {hero && <div className="ws-hero">{hero}</div>}
                   {children}
+                  {editorialStage && <footer className="ws-editorial-credit" aria-label="Writing credits">
+                    <span>Written by <Link href="/about">Deric J. McHenry</Link></span>
+                    <span>Published by SignalAF · SigRank</span>
+                  </footer>}
                 </div>
               </main>
             </div>

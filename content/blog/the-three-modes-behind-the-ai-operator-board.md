@@ -4,7 +4,7 @@ title: "The Three Modes Behind the AI Operator Board"
 description: "Equal token totals can hide radically different workflows. Read human-led, hybrid/HITL, and agentic operation through four token pillars, operating ratio, throughput, and submission history."
 tags: [article, sigrank, ai-operators, operating-ratio, token-telemetry, hitl, agentic, cascade, methodology]
 timestamp: 2026-10-05T10:00:00Z
-author: SignalAF
+author: Deric J. McHenry
 ---
 
 Ten million tokens. Three workflows. Three very different ways of working with AI.
