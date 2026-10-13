@@ -148,7 +148,7 @@ export function ProfileTabsV2({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex min-w-0 items-center gap-2 border-b border-bg-border">
+      <div className="profile-title-nav flex min-w-0 items-center gap-2 border-b border-bg-border">
       <div
         role="tablist"
         aria-label="Profile sections"
@@ -205,7 +205,7 @@ export function ProfileTabsV2({
       {isOwner && (
         <Link
           href="/me/edit#profile-display"
-          className="shrink-0 border-b-2 border-transparent px-3 py-2 font-mono text-xs uppercase tracking-[0.06em] text-text-muted transition-colors hover:border-gold hover:text-text-primary"
+          className="profile-share-gallery"
           aria-label="Profile settings: badges and marks"
         >
           Settings
