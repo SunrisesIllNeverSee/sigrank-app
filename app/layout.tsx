@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Roboto, Geist_Mono, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
@@ -18,26 +18,23 @@ import { WebMcpRegistrar } from "@/components/webmcp/register-tools";
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
 // foundation). Wired to the existing --font-geist-sans var name so all
 // globals.css + tailwind fontFamily references resolve to it app-wide.
-const geistSans = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const geistSans = localFont({
+  src: [{path: "../public/fonts/roboto-400-normal.woff2", weight: "400", style: "normal"}, {path: "../public/fonts/roboto-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--font-geist-sans",
   display: "swap",
   preload: false,
 });
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["700"],
+const geistMono = localFont({
+  src: [{path: "../public/fonts/geist_mono-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--font-geist-mono",
   display: "swap",
 });
 
 // Inter — clean professional sans for long-form blog articles only.
 // Scoped to --font-article so it only applies inside .prose-sigrank.
-const articleSerif = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const articleSerif = localFont({
+  src: [{path: "../public/fonts/inter-400-normal.woff2", weight: "400", style: "normal"}, {path: "../public/fonts/inter-500-normal.woff2", weight: "500", style: "normal"}, {path: "../public/fonts/inter-600-normal.woff2", weight: "600", style: "normal"}, {path: "../public/fonts/inter-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--font-article",
   display: "swap",
   preload: false,

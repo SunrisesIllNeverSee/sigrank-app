@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { detectBot } from "@/lib/infra/bot-detect";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { anonymousAnalystRoute, anonymousAnalystChallenge } from "@/lib/mcp/plugin/anonymous-origin";
 
 const HOME_MARKDOWN = `# SigRank SignalAF — The Evaluation Platform for AI Operators
 
@@ -106,54 +107,6 @@ function preferredRepresentation(header: string | null): Representation | null {
   return best;
 }
 
-const NOT_FOUND_MARKDOWN = `# 404 — SignalAF resource not found
-
-The requested path does not exist on signalaf.com.
-
-## Recovery map
-
-- Sitemap: https://signalaf.com/sitemap.xml
-- Agent index: https://signalaf.com/llms.txt
-- Developer portal: https://signalaf.com/developers
-- OpenAPI: https://signalaf.com/openapi.json
-- Documentation: https://signalaf.com/wiki
-- MCP manifest: https://signalaf.com/.well-known/mcp.json
-- Methodology: https://signalaf.com/methodology
-
-If this URL was linked from an external source, the page may exist as HTML.
-Retry with \`Accept: text/html\` or visit the URL in a browser.
-`;
-
-function isApiOrStaticPath(path: string): boolean {
-  if (path.startsWith("/api/")) return true;
-  if (path.startsWith("/_next/")) return true;
-  if (path.startsWith("/.well-known/")) return true;
-  if (/\.(svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf|md)$/.test(path)) return true;
-  return false;
-}
-
-function negotiatedNotFound(request: NextRequest): Response | null {
-  if (request.method !== "GET" && request.method !== "HEAD") return null;
-  const path = request.nextUrl.pathname;
-  if (path === "/" || isApiOrStaticPath(path)) return null;
-
-  const accept = request.headers.get("accept");
-  const preferred = preferredRepresentation(accept);
-
-  if (preferred === "text/markdown") {
-    return new Response(request.method === "HEAD" ? null : NOT_FOUND_MARKDOWN, {
-      status: 404,
-      headers: {
-        "Content-Type": "text/markdown; charset=utf-8",
-        "Cache-Control": "private, no-store",
-        Vary: "Accept, Accept-Encoding",
-      },
-    });
-  }
-
-  return null;
-}
-
 function negotiatedHomepage(request: NextRequest): Response | null {
   if (request.method !== "GET" && request.method !== "HEAD") return null;
   if (request.nextUrl.pathname !== "/") return null;
@@ -194,6 +147,19 @@ function negotiatedHomepage(request: NextRequest): Response | null {
  * scoped auth session refresh for authenticated surfaces.
  */
 export async function proxy(request: NextRequest) {
+  const analystRoute = anonymousAnalystRoute(request.nextUrl.hostname, request.nextUrl.pathname);
+  if (analystRoute === "public") {
+    if (request.nextUrl.pathname === "/.well-known/openai-apps-challenge") {
+      return anonymousAnalystChallenge(request.method);
+    }
+    return NextResponse.next({ request });
+  }
+  if (analystRoute === "blocked") {
+    return new Response("Not Found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
   // ─── /api/search — proxy to analytics worker (AI Search binding) ──────
   if (request.nextUrl.pathname === "/api/search") {
     const proxyUrl = new URL("https://moses-analytics.sigrank.workers.dev/api/search");
@@ -230,8 +196,9 @@ export async function proxy(request: NextRequest) {
   const negotiated = negotiatedHomepage(request);
   if (negotiated) return negotiated;
 
-  const notFoundMd = negotiatedNotFound(request);
-  if (notFoundMd) return notFoundMd;
+  // No markdown 404 here: middleware can't tell whether a path exists, and a
+  // blanket markdown 404 broke every real page for agents preferring
+  // text/markdown (e.g. Claude's WebFetch). Non-home pages fall through as HTML.
 
   const path = request.nextUrl.pathname;
   const isHomepage = path === "/";
@@ -289,6 +256,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    { source: "/:path*", has: [{ type: "host", value: "analyst.signalaf.com" }] },
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf)).*)",
   ],
 };

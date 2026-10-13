@@ -18,59 +18,45 @@
  * request resolves to 700 — Google doesn't ship an 800 face; the CSS
  * font-weight:800 declarations render as synthesized/700 either way).
  */
-import {
-  Space_Grotesk,
-  JetBrains_Mono,
-  Silkscreen,
-  Unbounded,
-  Instrument_Serif,
-  Orbitron,
-} from "next/font/google";
+import localFont from "next/font/local";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const spaceGrotesk = localFont({
+  src: [{path: "../../public/fonts/space_grotesk-400-normal.woff2", weight: "400", style: "normal"}, {path: "../../public/fonts/space_grotesk-500-normal.woff2", weight: "500", style: "normal"}, {path: "../../public/fonts/space_grotesk-600-normal.woff2", weight: "600", style: "normal"}, {path: "../../public/fonts/space_grotesk-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--font-lbw-sg",
   display: "swap",
   preload: false,
 });
 
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
+const jetBrainsMono = localFont({
+  src: [{path: "../../public/fonts/jetbrains_mono-400-normal.woff2", weight: "400", style: "normal"}, {path: "../../public/fonts/jetbrains_mono-600-normal.woff2", weight: "600", style: "normal"}, {path: "../../public/fonts/jetbrains_mono-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--font-lbw-jb",
   display: "swap",
   preload: false,
 });
 
-const silkscreen = Silkscreen({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const silkscreen = localFont({
+  src: [{path: "../../public/fonts/silkscreen-400-normal.woff2", weight: "400", style: "normal"}, {path: "../../public/fonts/silkscreen-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--font-lbw-silk",
   display: "swap",
   preload: false,
 });
 
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  weight: ["500", "700", "900"],
+const unbounded = localFont({
+  src: [{path: "../../public/fonts/unbounded-500-normal.woff2", weight: "500", style: "normal"}, {path: "../../public/fonts/unbounded-700-normal.woff2", weight: "700", style: "normal"}, {path: "../../public/fonts/unbounded-900-normal.woff2", weight: "900", style: "normal"}],
   variable: "--font-lbw-unb",
   display: "swap",
   preload: false,
 });
 
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
+const instrumentSerif = localFont({
+  src: [{path: "../../public/fonts/instrument_serif-400-italic.woff2", weight: "400", style: "italic"}, {path: "../../public/fonts/instrument_serif-400-normal.woff2", weight: "400", style: "normal"}],
   variable: "--font-lbw-serif",
   display: "swap",
   preload: false,
 });
 
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  weight: ["600", "800"],
+const orbitron = localFont({
+  src: [{path: "../../public/fonts/orbitron-600-normal.woff2", weight: "600", style: "normal"}, {path: "../../public/fonts/orbitron-800-normal.woff2", weight: "800", style: "normal"}],
   variable: "--font-lbw-orb",
   display: "swap",
   preload: false,
