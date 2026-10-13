@@ -1,328 +1,168 @@
-# SignalAF — Upsilon Measurement Engine + SigRank Proof Surface
+# SignalAF — Upsilon + SigRank
 
-> **Upsilon** is the privacy-preserving measurement engine. **SigRank** is the
-> public leaderboard and proof surface at [signalaf.com](https://signalaf.com).
-> Run `npx sigrank` to calculate Yield from four token counts. _Never prompts or code._
-
-<div align="center">
-
-<p><img src="./.github/assets/og-card-v2.png" alt="SigRank SignalAF — AI operator evaluation and token cascade efficiency leaderboard" width="800"></p>
-
-**Upsilon measures. SigRank proves. MO§ES™ governs. SignalAF is the brand.**
-
-SigRank evaluates the human using the AI, not the AI model itself. Most platforms reward volume. SigRank SignalAF rewards structure.
+Rank how well you use AI, from four token counts. Run `npx sigrank` to calculate your Yield, or sign up at [signalaf.com](https://signalaf.com) to join the public board. Prompts and code never leave your machine.
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
-[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?style=flat-square&logo=dependabot)](https://github.com/SunrisesIllNeverSee/sigrank-app/network/dependencies)
-[![live](https://img.shields.io/badge/live-signalaf.com-gold.svg?style=flat-square)](https://signalaf.com)
-[![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&color=gold&label=sigrank)](https://www.npmjs.com/package/sigrank)
-[![npm downloads](https://img.shields.io/npm/dm/sigrank.svg?style=flat-square&color=blue&label=npm%20downloads)](https://www.npmjs.com/package/sigrank)
-[![GitHub stars](https://img.shields.io/github/stars/SunrisesIllNeverSee/sigrank-app.svg?style=flat-square&color=yellow&label=%E2%98%85%20stars)](https://github.com/SunrisesIllNeverSee/sigrank-app/stargazers)
-[![deploy](https://img.shields.io/badge/deploy-Vercel-black.svg?style=flat-square)](https://vercel.com)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg?style=flat-square)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg?style=flat-square)](https://www.typescriptlang.org)
-[![Supabase](https://img.shields.io/badge/db-Supabase-green.svg?style=flat-square)](https://supabase.com)
-[![Stripe](https://img.shields.io/badge/billing-Stripe-purple.svg?style=flat-square)](https://stripe.com)
+[![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&label=sigrank)](https://www.npmjs.com/package/sigrank)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
 
-</div>
+| The leaderboard | An operator profile |
+| :---: | :---: |
+| [![Leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all) | [![Operator profile](./.github/assets/profile.png)](https://signalaf.com) |
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/sigrank"><img src="https://img.shields.io/badge/$%20npx%20sigrank-gold?style=for-the-badge&logo=npm&logoColor=white&labelColor=1a1a1a&color=daa520" alt="npx sigrank" /></a>
-  &nbsp;
-  <a href="https://github.com/SunrisesIllNeverSee/sigrank-app/stargazers"><img src="https://img.shields.io/badge/★%20Star%20this%20repo-yellow?style=for-the-badge&logo=github&labelColor=1a1a1a" alt="Star this repo" /></a>
-</p>
+This repo is the Next.js app behind [signalaf.com](https://signalaf.com): the board, profiles, wiki, accounts, billing, ingest API, MCP endpoints, and the contribution exchange.
 
-## Table of Contents
+## How it works
 
-- [What is SignalAF?](#what-is-signalaf)
-- [The SigRank SignalAF ecosystem](#the-sigrank-signalaf-ecosystem)
-- [Get ranked (you don't need this repo)](#get-ranked-you-dont-need-this-repo)
-- [How it works](#how-it-works)
-- [For developers](#for-developers)
-- [Stack](#stack)
-- [Quick Start](#quick-start)
-- [Scripts](#scripts)
-- [Project Map](#project-map)
-- [Data Model](#data-model)
-- [Environment](#environment)
-- [Supabase](#supabase)
-- [Scoring Invariants](#scoring-invariants)
-- [Development Notes](#development-notes)
-- [Related](#related)
-- [Community](#community)
-- [License](#license)
-
-|                                    The leaderboard                                    |                               Your operator profile                               |
-| :-----------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
-| [![SigRank SignalAF leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all)  | [![SigRank SignalAF operator profile](./.github/assets/profile.png)](https://signalaf.com) |
-| Every operator ranked by **Υ Yield** — the architecture of the cascade, not raw spend |        Cascade layer, class, and fingerprint — all from four token counts         |
-
----
-
-## What is SignalAF?
-
-SignalAF is the umbrella brand for Upsilon and SigRank. Upsilon is the AI operator measurement engine; SigRank is the public leaderboard. Upsilon measures token cascade efficiency, not AI models. It describes **token-processing patterns**: how much reusable signal
-they create from each unit of input, not how many tokens they burn. The rank metric:
+The server computes every score from four token counts: `input`, `output`, `cache_creation`, `cache_read`. It never receives message content.
 
 ```txt
 Υ = (cache_read × output) / input²
 ```
 
-The board is anonymous by default, claimable by operators, and built around one
-question: **is this session compounding signal, or just burning tokens?** Volume is
-noise; yield is signal.
+- Upsilon (Υ) Yield is the rank metric. SIGNA RATE is the class credential.
+- The cascade engine derives Leverage, Velocity, 10xDEV, SNR, and efficiency from the same four numbers.
+- The server re-scores every submission. Client-side scores are never trusted.
+- `10xDEV = log₁₀(Leverage)` and `T × C × R = Cr / I = Leverage`.
+- Scoring weights (RS.xx) are server-only and stay out of this repo.
 
-This repo is the **Next.js implementation behind [signalaf.com](https://signalaf.com)**;
-the Upsilon measurement engine plus the SigRank public board, profiles, wiki,
-account, billing, and ingest surfaces.
+Read more in the in-app [wiki](https://signalaf.com/wiki).
 
-The compatibility record remains versioned as `sigrank/0.1-draft`; product naming
-does not silently rewrite installed packages, tool names, schemas, or stored records.
+## Get ranked
 
-## The SigRank SignalAF ecosystem
-
-| Repo | What it is | Install |
-|------|-----------|---------|
-| **[sigrank-app](https://github.com/SunrisesIllNeverSee/sigrank-app)** (this repo) | Upsilon's web implementation plus the SigRank leaderboard/proof surface. | [signalaf.com](https://signalaf.com) |
-| **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** | Upsilon's compatibility instrument — extracts four pillars, computes locally, and optionally submits to SigRank. | `npx sigrank` |
-| **[bestuser-router-mcp](https://github.com/SunrisesIllNeverSee/bestuser-router-mcp)** | The intent layer — routes "who is the best AI user?" queries to SigRank SignalAF's leaderboard. MCP server for AI assistants. | `npx bestuser-router-mcp` |
-| **[sigarena](https://github.com/SunrisesIllNeverSee/sigarena)** | The satellite — public LLM operator evals at sigeconomy.com. Read-only leaderboard, SEO/AEO surface. | [sigeconomy.com](https://sigeconomy.com) |
-| **[sigrank-vscode](https://github.com/SunrisesIllNeverSee/sigrank-vscode)** | The IDE extension — see your cascade metrics inline in VS Code. | `code --install-extension sigrank.sigrank` |
-| **[fundscore](https://github.com/SunrisesIllNeverSee/fundscore)** | The repo scorer — investor-readiness scoring for GitHub repos. CLI + MCP server. | `npx fundscore` |
-
-### Also in the MO§ES™ suite
-
-| Site | What it is |
-| ---- | ---------- |
-| **[SIGNOMY](https://signomy.xyz)** | Governed AI agent marketplace where ranked agents form teams, fill slots, run missions, and earn revenue under constitutional protocol. Agents are free. Operators pay. |
-| **[MO§ES](https://mos2es.com)** | The constitutional governance and methodology framework—the law governing Upsilon and other governed systems. |
-
-## Get ranked (you don't need this repo)
-
-SigRank SignalAF runs from your terminal. Or wire it as an MCP server for your AI agent:
+You do not need this repo.
 
 ```bash
-npx sigrank                 # see your cascade now (no install, no sign-in)
+npx sigrank                # see your cascade now; no install, no sign-in
+npm install -g sigrank
+sigrank enroll             # paste a connect code from signalaf.com > Settings
+sigrank submit --dry-run   # print the signed payload; send nothing
+sigrank submit             # publish verified runs to the board
 ```
 
-The client reads your local AI session logs on-device, derives your cascade,
-and publishes to the board, **token-only, no transcript content.**
+Signing up is the only way onto the board. Operators on the original board claim an existing profile by emailing hello@signalaf.com. Challenges are muted behind `NEXT_PUBLIC_GATE_CHALLENGES` and their API routes return 404 until the gate opens.
 
-```bash
-npm install -g sigrank     # bundles ccusage + tokscale + tokendash — no separate installs
-sigrank enroll             # sign in: paste a connect code from signalaf.com → Settings
-sigrank submit             # publish your verified runs to the board
-```
-
-Or explore first, no sign-in:
-
-```bash
-sigrank                    # full tabbed TUI: dashboard · compare · board · watch
-npx sigrank board --once   # print the live leaderboard once
-bunx sigrank board --once  # same, via Bun (faster startup if you have it)
-```
-
-Cautious? `sigrank submit --dry-run` prints the exact signed payload (four token
-counts and a signature) and sends nothing.
-
-```bash
-$ sigrank submit --dry-run
-📦 Payload (not sent):
-  input:          1,251,211
-  output:        11,296,121
-  cache_create:     128,196
-  cache_read:    2,555,179,769
-  Υ Yield:          18,436.98
-  class:            TRANSMITTER
-  signature:        ed25519:9f3a...
-```
-
-Full CLI + MCP docs: **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** ·
-package: **[sigrank on npm](https://www.npmjs.com/package/sigrank)**.
-
-## How it works
-
-- **Four raw token pillars** — `input`, `output`, `cache_creation`, `cache_read` — are the
-  only inputs. No message content, ever.
-- The **cascade engine** derives Υ Yield, Leverage, Velocity, 10xDEV, SNR, and efficiency
-  from those four numbers. The server re-scores every submission authoritatively.
-- Operators are placed in **signal classes** (Transmitter, Architect, …) by their cascade
-  shape, and ranked globally by Υ.
-- **SIGNA RATE** is the class credential; **Υ Yield** is the rank metric.
-
-Deep dive: the in-app **[wiki](https://signalaf.com/wiki)**.
-
----
-
-# For developers
-
-The rest of this README is for working on the app itself.
+CLI and MCP docs: [sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp).
 
 ## Stack
 
-- **Framework:** Next.js 15 App Router, React 19, TypeScript strict
-- **UI:** Tailwind CSS, themeable SigRank SignalAF design tokens (carbon default)
-- **Data:** Supabase with cold-store snapshot and mock fallback
-- **Billing:** Stripe Checkout, Billing Portal, webhook handlers
-- **Validation:** zod, Node test runner, TypeScript
+- Next.js 16 App Router, React 19, TypeScript (strict)
+- Tailwind CSS 3
+- Supabase (Postgres, Auth, Realtime)
+- Stripe Checkout, Billing Portal, webhooks
+- Upstash Redis for rate limiting (Supabase Postgres fallback)
+- zod, Node test runner, Vitest, Playwright
 
-## Quick Start
+## Local setup
+
+Requires Node 22.x (`engines` in `package.json`, `.nvmrc`).
 
 ```bash
 npm install
-cp .env.example .env.local      # all values optional — see Environment below
-npm run dev                     # http://localhost:3000
+cp .env.example .env.local   # optional; see Environment
+npm run dev                  # http://localhost:3000
 ```
 
-The app is designed to run **without** Supabase or Stripe credentials. When env vars are
-missing, reads fall back to the cold-store snapshot and then deterministic mock data,
-while billing routes return configuration errors instead of crashing, so it stays
-buildable, previewable, and testable out of the box.
-
-> Requires **Node 22.x** (see `engines` in `package.json`). On a newer Node, `next dev`
-> may fail to start; use the version manager of your choice to pin 22.
->
-> If vendor chunks act strange, run the dev server directly: `node_modules/.bin/next dev --port 3000`
+The app runs without Supabase or Stripe credentials. Without Supabase, board reads fall back to a cold-store snapshot (`lib/board/snapshot.json`), then to mock data. Billing routes return a configuration error instead of crashing.
 
 ## Scripts
 
-| Command                  | Purpose                                 |
-| ------------------------ | --------------------------------------- |
-| `npm run dev`            | Start the local Next.js dev server      |
-| `npm run build`          | Create a production build               |
-| `npm run start`          | Serve the production build              |
-| `npm run lint`           | Run the configured Next.js lint command |
-| `npm test`               | Run all Node test files                 |
-| `npm run test:canonical` | Run the canonical ingest parity test    |
-| `npm run snapshot`       | Refresh the database snapshot           |
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Build for production (`next build --webpack`) |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run the Node test suites in `__tests__/` |
+| `npm run test:ui` | Run Vitest component tests |
+| `npm run test:canonical` | Check canonical ingest parity (MO§ES Υ 18436.98) |
+| `npm run test:coverage` | Run `npm test` with c8 coverage |
+| `npm run e2e` | Run Playwright tests (`e2e:local` targets localhost:3000) |
+| `npm run verify` | Run `tsc --noEmit`, the canonical test, and `npm test` |
+| `npm run db:parity` | Check local migrations against the remote ledger (`db:parity:ci` for CI) |
+| `npm run snapshot` | Refresh the cold-store board snapshot |
+| `npm run sitemap:validate` | Validate the sitemap (`:live` checks production) |
 
-Before committing, run the gates CI enforces:
-
-```bash
-npx tsc --noEmit            # 0 errors (typescript is a devDependency)
-npm run build               # production build green
-npm run test:canonical      # canonical ingest parity — MO§ES Υ 18436.98
-```
-
-## Project Map
-
-| Path                  | Responsibility                                               |
-| --------------------- | ------------------------------------------------------------ |
-| `app/`                | App Router pages and API routes                              |
-| `app/api/v1/`         | Public API, ingest, claim, devices, billing, metrics         |
-| `components/`         | UI components by product area                                |
-| `components/sigrank/` | Board, profile, and shared SigRank SignalAF UI (incl. `PlatformIcon`) |
-| `lib/data/`           | Single read facade: Supabase → snapshot → mock fallback      |
-| `lib/ingest/`         | Canonical payload parsing and cascade metric materialization |
-| `lib/scoring/`        | Core scoring engine and server-only ruleset boundary         |
-| `lib/supabase/`       | Browser, server, service-role, and auth helpers              |
-| `lib/stripe/`         | Stripe server helpers, handlers, tiers, and rewards          |
-| `supabase/`           | SQL schema, migrations, seed data, policies, and tests       |
-| `__tests__/`          | Node test suites and canonical fixtures                      |
-
-## Data Model
-
-All app code reads operator data through `@/lib/data`. The facade chooses the safest
-available source, in order:
-
-1. **Supabase live reads** when credentials are configured.
-2. **Cold-store snapshot** (`lib/data/snapshot.json`) if live reads are unavailable or fail.
-3. **Mock fixtures** (`lib/data/mock.ts`) as the last resort.
+Before opening a PR, run `npm run verify` and `npm run build`.
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and fill values as needed. All are optional locally
-(the app degrades gracefully); production values live in **Vercel environment variables**.
+Copy `.env.example` to `.env.local`. It lists every variable with notes. Never commit values. Production values live in Vercel environment variables.
 
-| Variable group                                                                           | Notes                                                   |
-| ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Live Supabase reads + service-role writes               |
-| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`       | Billing and webhook flows                               |
-| `STRIPE_PRICE_*`                                                                         | Per paid tier / claim checkout path                     |
-| `NEXT_PUBLIC_SITE_URL`                                                                   | Stripe redirects and public URLs                        |
-| `SIGRANK_RULESET`                                                                        | **Server-only** proprietary RS.xx scoring overrides     |
-| `SIGRANK_API_KEY`                                                                        | Optional trusted bulk-read key for public API consumers |
-| `SIGRANK_INGEST_WRITE`                                                                   | Ingest-write flip: `1` = persist verified snapshots to the board (see note below)        |
-| `NEXT_PUBLIC_GATE_*`                                                                     | Optional feature gates for unfinished surfaces          |
+| Variable | Used for |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Live Supabase reads and service-role writes. The server client needs all three. |
+| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*` | Billing and webhooks |
+| `NEXT_PUBLIC_SITE_URL` | Stripe redirects and public URLs |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (or Vercel's `KV_REST_API_URL`, `KV_REST_API_TOKEN`) | Shared rate limiter. Without Upstash, the limiter uses Supabase Postgres (`api_rate_limit_hit`, migration 0055), then a per-instance in-memory counter. Sensitive write routes fail closed. |
+| `SIGRANK_RULESET` | Server-only RS.xx scoring overrides |
+| `SIGRANK_API_KEY` | Trusted bulk-read key for the public API (`x-api-key`) |
+| `SIGRANK_INGEST_WRITE` | `1` persists verified snapshots to the board. Do not mark it sensitive in Vercel; `vercel env pull` then returns an empty value. |
+| `CRON_SECRET` | Bearer token for `/api/cron/recompute` |
+| `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `POSTHOG_KEY` | Product analytics |
+| `RESEND_API_KEY`, `*AGENTMAIL_API_KEY` | Contact form and exchange email |
+| `ALGOLIA_*`, `EXA_API_KEY`, `MOTHERDUCK_*`, `AI_GATEWAY_*`, `VERCEL_CLIENT_*`, `SIGNALAF_LIVE_TOKEN` | Search, enrichment, analytics, AI gateway, Vercel integration, live demo |
+| `NEXT_PUBLIC_REALTIME_ENABLED` | Set to `false` to disable live board updates |
 
-**Never commit real secrets or proprietary ruleset values.**
+### Feature flags
 
-### SIGRANK_INGEST_WRITE — the ingest-write flip
+`lib/features.ts` defines the flags. All gated flags default to off and accept `1` or `true`.
 
-**Status: LIVE in Production (`1`).** The board persists verified signed snapshots
-from enrolled MCP devices. Set in Vercel for both Production and Preview.
+| Flag | Gates |
+| --- | --- |
+| `NEXT_PUBLIC_GATE_CHALLENGES` | Throw-down challenges. Also needs `NEXT_PUBLIC_GATE_ARENA`. Off: `/api/v1/challenges` returns 404. |
+| `NEXT_PUBLIC_GATE_ARENA` | Challenge submission interface (required with the challenges gate) |
+| `NEXT_PUBLIC_GATE_SIGNAL_DROP` | Weekly signal drop |
+| `NEXT_PUBLIC_GATE_BRACKETS` | Blind bracket / Circle Wars |
+| `NEXT_PUBLIC_GATE_TRADING_CARD_SPECIES` | Species badge on trading cards |
 
-> **Do NOT mark this variable as sensitive in Vercel.** It is a boolean on/off
-> flag (`1` or `""`), not a secret. When marked sensitive, `vercel env pull`
-> returns `""` even though the runtime has `1`, which misleads agents and
-> operators into thinking the flip is OFF. If `vercel env pull` shows `""` but
-> the board is receiving verified submissions, the var is likely marked
-> sensitive again. Fix it in the Vercel dashboard (remove the sensitive flag).
+## Database and migrations
 
-**Authoritative verification is RUNTIME behavior, not the CLI pull:**
-1. PostHog: `snapshot_submitted` events with `source: "agent"` and `persisted: true`
-2. Supabase: rows in `snapshot_submissions` with `verification_tier = 'verified'` and `status = 'scored'`
-3. A real signed submit via `npx sigrank submit` returning `ranked: true`
+Migrations live in [`supabase/migrations/`](./supabase/migrations/): 57 files, latest `0055_api_rate_limits`. Apply new migrations to production before you deploy code that depends on them. Migrations 0053 to 0055 (operator security boundaries, security hardening pass 2, API rate limits) back the current security code. Run `npm run db:parity` to compare local files with the remote ledger.
 
-If any of those show verified rows landing, the flip is ON regardless of what
-`vercel env pull` says.
+Row Level Security policies, seed data, and security tests live in [`supabase/`](./supabase/). See [`supabase/README.md`](./supabase/README.md) to run your own instance.
 
-## Supabase
+## Project map
 
-Schema, migrations, RLS policies, and seed data live in [`supabase/`](./supabase/). See
-[`supabase/README.md`](./supabase/README.md) to run your own instance. RS.xx scoring
-weights are server-only and are not included here.
+| Path | Contents |
+| --- | --- |
+| `app/` | App Router pages and API routes |
+| `app/api/v1/` | Public API: ingest, claim, devices, billing, metrics, leaderboard |
+| `app/api/mcp/`, `app/api/exchange/mcp/` | MCP endpoints (analyst plugin and exchange) |
+| `app/exchange/`, `app/api/exchange/` | Contribution exchange UI and API |
+| `components/` | UI components |
+| `lib/board/` | Board reads: Supabase, snapshot, mock fallback |
+| `lib/ingest/` | Payload parsing, signature checks, cascade materialization |
+| `lib/analytics/` | Scoring engine and server-only ruleset boundary |
+| `lib/exchange/`, `lib/exchange-gateway/` | Exchange server logic and portable gateway reference |
+| `lib/infra/` | Supabase clients, Stripe, rate limiting, API gates |
+| `supabase/` | Migrations, policies, seeds, SQL tests, edge functions |
+| `__tests__/`, `e2e/` | Node, Vitest, and Playwright tests |
 
-## Scoring Invariants
+Development conventions:
 
-Product contracts, not implementation details:
-
-- `Υ = (cache_read × output) / input²`
-- `T × C × R = Cr / I = Leverage`
-- `10xDEV = log₁₀(Leverage)`
-- **SIGNA RATE** is the class credential; **Υ Yield** is the rank metric.
-- RS.xx weights are server-only and must not be exposed to client components.
-
-## Development Notes
-
-- Keep changes small and aligned with existing file ownership.
-- Pages are React Server Components by default; add `'use client'` only when a component
-  needs hooks, event handlers, or browser APIs.
-- Keep `components/sigrank/tokens.ts` and Tailwind theme values in sync.
-- Use `<Placeholder />` for placeholder metrics and `<CanonId />` for canonical real values.
-- Do not import server-only scoring configuration into client code.
+- Pages are server components by default. Add `'use client'` only for hooks, handlers, or browser APIs.
+- Keep RS.xx scoring configuration out of client code.
 - Avoid random values and wall-clock reads at module scope.
+
+## Deployment
+
+Pushes to `main` deploy to Vercel (`vercel.json`). A daily cron calls `/api/cron/recompute`. Set environment variables in Vercel. An OpenNext Cloudflare path exists (`npm run preview`, `npm run deploy`, `wrangler.jsonc`).
+
+## Security
+
+Report vulnerabilities privately. Email the maintainer or open a private GitHub security advisory. Do not file public issues for vulnerabilities. See [`SECURITY.md`](./SECURITY.md).
 
 ## Related
 
-- **[signalaf.com](https://signalaf.com)** — the live board
-- **[signalaf.com/score](https://signalaf.com/score)** — paste four token counts, get projected yield + ghost rank
-- **[sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp)** — the CLI / TUI / MCP server (`npx sigrank`)
-- **[Smithery](https://smithery.ai/servers/burnmydays/sigrank)** — one-click MCP install for Claude Desktop, Cursor, and more
-- **[Glama](https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp)** — MCP server directory listing
+- [sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp): the `npx sigrank` CLI, TUI, and MCP server
+- [signalaf.com/score](https://signalaf.com/score): paste four token counts, get a projected yield
+- [MO§ES](https://mos2es.com): the governance framework behind Upsilon
 
-## Community
+## Contributing
 
-- [Contributing](./.github/CONTRIBUTING.md)
-- [Code of Conduct](./.github/CODE_OF_CONDUCT.md)
-- [Security policy](./SECURITY.md)
-
-### Reporting issues
-
-Found a bug or have a feature request? Please
-[open an issue](https://github.com/SunrisesIllNeverSee/sigrank-app/issues) on GitHub.
-Search existing issues first to avoid duplicates, and include repro steps, expected
-vs. actual behavior, and your environment (OS, Node version).
-
-### Pull request process
-
-1. **Fork** the repo and create a branch from `main`.
-2. Make your change, keeping it small and aligned with existing file ownership.
-3. Ensure `npx tsc --noEmit` passes with **0 errors** before pushing.
-4. Open a pull request against `main` with a clear description of what and why.
+Open an [issue](https://github.com/SunrisesIllNeverSee/sigrank-app/issues) with repro steps and your Node version. For code changes, branch from `main`, keep the change small, run `npm run verify`, and open a PR. See [Contributing](./.github/CONTRIBUTING.md) and the [Code of Conduct](./.github/CODE_OF_CONDUCT.md).
 
 ## License
 
-MIT; see [`LICENSE`](./LICENSE).
+MIT. See [`LICENSE`](./LICENSE).
