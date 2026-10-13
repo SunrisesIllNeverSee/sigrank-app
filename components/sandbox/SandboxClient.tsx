@@ -6,7 +6,7 @@
  * Sliders for the 4 token pillars + session/turn counts. Cascade metrics
  * (Υ, SNR, Leverage, Velocity, 10xDEV, $/1M) compute client-side from the
  * pillars. SignaRate + class compute server-side via /api/sandbox/score
- * (those use the secret RS.xx weights).
+ * (those use published example rules, not the private production ruleset).
  */
 
 import { useState, useCallback, useRef, useEffect } from "react";
@@ -477,12 +477,12 @@ export function SandboxClient({
               accent="rgb(var(--gold))"
             />
             <MetricCard
-              label="SignaRate"
+              label="Example SignaRate"
               value={score ? fmt(score.signa_rate, { decimals: 1 }) : "—"}
-              sub={loading ? "computing..." : "server-scored"}
+              sub={loading ? "computing..." : "public example rules"}
             />
             <MetricCard
-              label="Class"
+              label="Example class"
               value={score?.class_tier ?? "—"}
               sub={
                 score ? `SF ${fmt(score.signal_force, { decimals: 1 })}` : ""
