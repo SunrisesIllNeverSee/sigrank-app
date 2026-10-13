@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { LoginButtons } from "@/components/auth/LoginButtons";
 import Link from "next/link";
+import { safeNext as validateNext } from "@/lib/infra/safe-next";
 
 /**
  * LoginContent — client component that reads searchParams via useSearchParams().
@@ -16,10 +17,7 @@ export function LoginContent() {
   const next = searchParams.get("next");
   const error = searchParams.get("error");
 
-  const safeNext =
-    typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
-      ? next
-      : undefined;
+  const safeNext = validateNext(next) ?? undefined;
   const errorMsg =
     error === "auth"
       ? "Sign-in didn’t complete — please try again, or use a different provider below."

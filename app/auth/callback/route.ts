@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { safeNext } from "@/lib/infra/safe-next";
 
 /**
  * GET /auth/callback — OAuth (GitHub) + magic-link return point.
@@ -16,10 +17,6 @@ import { captureServer } from "@/lib/infra/posthog/server";
  * Degrades safely: with no creds or no code, it honors the seam and routes onward
  * without faking a session.
  */
-
-function safeNext(raw: string | null): string | null {
-  return raw && raw.startsWith("/") && !raw.startsWith("//") ? raw : null;
-}
 
 /** Mint a stable, unique public codename. The user personalizes display via
  *  display_name/handle later — codename stays the immutable URL key. */
@@ -55,7 +52,7 @@ function providerProfile(meta: unknown): {
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;
   const code = req.nextUrl.searchParams.get("code");
-  const next = safeNext(req.nextUrl.searchParams.get("next"));
+  const next = safeNext(req.nextUrl.searchParams.get("next"), origin);
 
   const sb = await createServerClient();
   // Unconfigured / no code → route onward, never fake a session.
