@@ -49,6 +49,7 @@ export default function FourDegreesPage() {
           ]),
         ]}
       />
+
       <FourDegreesChart variant="full" />
     </TopicPage>
   );

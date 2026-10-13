@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { captureServer } from "@/lib/infra/posthog/server";
 import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
+import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 /**
  * POST /api/v1/claim — claim an existing unclaimed seeded operator profile.
@@ -32,6 +33,9 @@ import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl);
+
   // 1. Must be signed in.
   const user = await getSessionUser();
   if (!user) {

@@ -14,8 +14,7 @@ export function NavNpxCTA() {
 
   return (
     <div className="fixed bottom-5 right-5 z-50">
-      <button
-        onClick={undefined}
+      <div
         className="group relative inline-flex items-center gap-2 rounded-xl border border-gold/40 bg-gold/10 px-4 py-2.5 font-mono text-sm font-bold text-text-primary backdrop-blur-sm shadow-lg shadow-gold/20 transition-all duration-300 hover:border-gold hover:bg-gold/20 hover:shadow-gold/40 sm:text-base"
         style={{
           animation: "npx-glow 2s ease-in-out infinite",
@@ -37,7 +36,7 @@ export function NavNpxCTA() {
             50% { opacity: 0.7; }
           }
         `}</style>
-      </button>
+      </div>
     </div>
   );
 }

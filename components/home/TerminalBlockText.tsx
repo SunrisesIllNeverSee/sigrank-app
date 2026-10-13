@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import "./terminal-block.css";
 
 /**
  * TerminalBlockText — the ONE block-letter engine for the terminal theme.
@@ -97,8 +98,10 @@ export function toBlockRows(text: string): string[] {
 
 export interface TerminalBlockTextProps {
   text: string;
-  /** Tailwind class for the responsive font-size (caller tunes per width). */
-  fontClassName?: string;
+  /** Visual ceiling in rem. The fit term can only shrink below this — never grow. */
+  maxRem?: number;
+  /** vw fallback for browsers without container-query units (Safari < 16). */
+  vw?: string;
   /** Accessible label; defaults to the text itself. */
   label?: string;
 }
@@ -106,19 +109,39 @@ export interface TerminalBlockTextProps {
 /**
  * The block-letter <pre>. Each row is a `.terminal-wordmark-line` with a
  * staggered `--tw-delay` so the gold cycle flows down the word.
+ *
+ * Sizing is self-fitting: the wrapper is an inline-size container, and the
+ * font is `cqw`-sized so `cols × ~0.62em ≤ container` at ANY width and ANY
+ * text length (the old per-length clamp tiers clipped "STATE OF THE INDEX").
+ * `maxRem` stays as the visual cap so short words still render large.
  */
 export function TerminalBlockText({
   text,
-  fontClassName = "text-[clamp(0.45rem,2.4vw,1.3rem)]",
+  maxRem = 1.3,
+  vw = "1.9vw",
   label,
 }: TerminalBlockTextProps) {
   const rows = toBlockRows(text);
+  const cols = Math.max(...rows.map((r) => r.length));
+  // Monospace advance ≈ 0.6em; 0.65 divisor leaves ~8% breathing room.
+  const fitCqw = (100 / (0.65 * cols)).toFixed(3);
   return (
-    <div className="flex flex-col items-center" aria-label={label ?? text}>
+    <div
+      className="flex w-full flex-col items-center"
+      style={{ containerType: "inline-size" }}
+      aria-label={label ?? text}
+    >
       <pre
         aria-hidden
-        className={`select-none overflow-x-clip font-mono leading-[1.1] tracking-tight ${fontClassName}`}
-        style={{ margin: 0 }}
+        className="tbt-fit select-none overflow-x-clip font-mono leading-[1.1] tracking-tight"
+        style={
+          {
+            margin: 0,
+            "--tbt-fit": `${fitCqw}cqw`,
+            "--tbt-fallback": vw,
+            "--tbt-max": `${maxRem}rem`,
+          } as React.CSSProperties
+        }
       >
         {rows.map((line, i) => (
           <div

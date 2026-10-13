@@ -1,30 +1,27 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Space_Grotesk, Bitter, Archivo_Black } from "next/font/google";
+import localFont from "next/font/local";
 import "./wordmark.css";
 
 // Wordmark font pool — used ONLY here (the rotating SIGRANK logo on the
 // homepage). Moved from app/layout.tsx so these 3 font families don't
 // load on every page on the site. Each letter of "SIGRANK" cycles through
 // these via the .wordmark-letter CSS animation in globals.css.
-const wmGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["700"],
+const wmGrotesk = localFont({
+  src: [{path: "../../public/fonts/space_grotesk-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--wm-grotesk",
   display: "swap",
   preload: false,
 });
-const wmSerif = Bitter({
-  subsets: ["latin"],
-  weight: ["700"],
+const wmSerif = localFont({
+  src: [{path: "../../public/fonts/bitter-700-normal.woff2", weight: "700", style: "normal"}],
   variable: "--wm-serif",
   display: "swap",
   preload: false,
 });
-const wmBlack = Archivo_Black({
-  subsets: ["latin"],
-  weight: ["400"],
+const wmBlack = localFont({
+  src: [{path: "../../public/fonts/archivo_black-400-normal.woff2", weight: "400", style: "normal"}],
   variable: "--wm-black",
   display: "swap",
   preload: false,

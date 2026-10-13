@@ -57,7 +57,7 @@ export default function VercelPage() {
         ))}
       </section>
 
-      <section className="mt-14">
+      <section id="diagnostic" className="mt-14">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-gold">Free utility</p>

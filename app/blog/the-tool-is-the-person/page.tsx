@@ -17,6 +17,7 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
+import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -79,7 +80,8 @@ const faqs = [
 
 export default function TheToolIsThePersonPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <BlogWorkspaceFrame>
+      <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <CitationMeta title={"The Tool Is the Person: Why Token Telemetry Measures AI Skill"} description={"Every token the AI tool burns is a decision the person made. Measuring the tool IS measuring the person. Your token cascade is your skill signature."} date={"2026-07-12"} slug={"/blog/the-tool-is-the-person"} />
       <JsonLd
         data={[
@@ -106,7 +108,7 @@ export default function TheToolIsThePersonPage() {
 
       {/* ── Article meta ── */}
       <div className="flex items-center gap-3 border-b border-bg-border-subtle pb-4 font-mono text-xs text-text-muted">
-        <span>By SigRank</span>
+        <span>By Deric J. McHenry</span>
         <span aria-hidden="true">·</span>
         <time dateTime="2026-07-12">Published July 12, 2026</time>
         <span aria-hidden="true">·</span>
@@ -357,6 +359,7 @@ export default function TheToolIsThePersonPage() {
           </Link>
         </p>
       </section>
-    </div>
+      </div>
+    </BlogWorkspaceFrame>
   );
 }

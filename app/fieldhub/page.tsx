@@ -17,6 +17,7 @@ import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "Field Hub — SigRank Research",
@@ -58,7 +59,49 @@ export default async function FieldHubPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 py-2">
+    <FieldWorkspaceFrame
+      title="FIELD HUB"
+      current="fieldhub"
+      hero={
+        <WaveHero
+          eyebrow="📊 SigRank Research"
+          terminalText="FIELD HUB"
+          title="Field Hub"
+          subtitle={
+            <>
+              The academic research hub for SigRank: field analysis and dataset
+              findings on AI operator efficiency, volume versus yield, and
+              outlier detection. Each entry is a primary source. Field Analysis
+              presents the full visual study; State of the Index provides the
+              underlying dataset, DOI, citation, and downloadable files.
+            </>
+          }
+        />
+      }
+      rightTitle="FIELD FAMILY"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />SNAPSHOT</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">analyzed</span><span className="v acc">{meta.operators_included.toLocaleString()}</span></div>
+              <div className="row"><span className="k">collected</span><span className="v">{meta.total_scraped.toLocaleString()}</span></div>
+              <div className="row"><span className="k">median Υ</span><span className="v acc">{meta.medians.yield.toFixed(2)}</span></div>
+            </div>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />PRIMARY SOURCES</div>
+            <nav className="ws-nav">
+              <Link href="/field">Field Analysis</Link>
+              <Link href="/research">State of the Index / Data</Link>
+              <Link href="/blog">Published analysis</Link>
+            </nav>
+          </div>
+        </>
+      }
+      status={<>FIELD HUB · {meta.operators_included.toLocaleString()} ANALYZED OPERATORS · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+      <div className="ws-doc ws-article-list ws-field-index">
       <JsonLd
         data={[
           collectionPage,
@@ -83,68 +126,50 @@ export default async function FieldHubPage() {
         ]}
       />
 
-      <WaveHero
-        eyebrow="📊 SigRank Research"
-        terminalText="FIELD HUB"
-        title="Field Hub"
-        subtitle={
-          <>
-            The academic research hub for SigRank. This is where we
-            document field analysis and publish dataset findings.
-          </>
-        }
-      />
-
-      {/* ── Blurb ───────────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <p className="text-lg text-text-primary">
-          This section is where we document academic field analysis of the
-          SigRank Index — the distribution of AI operator efficiency, the
-          volume-vs-yield thesis, outlier detection, and the dataset that
-          underpins every finding published on this site.
-        </p>
-        <p className="text-base text-text-secondary">
-          Each entry below is a primary source. The Field Analysis is the
-          full visual article. The State of the Index is the dataset
-          landing page with DOI, citation, and downloadable files.
-        </p>
-      </section>
-
-      {/* ── Field Analysis hero card ────────────────────────────────── */}
-      <Link href="/field" className="group block transition-transform hover:scale-[1.01]">
-        <WaveHero
-          eyebrow="📊 Field Analysis"
-          terminalText="THE FIELD"
-          title="Field Analysis"
-          subtitle={
-            <>
-              The true distribution of token efficiency.{" "}
-              {meta.operators_included.toLocaleString()} AI operators,
-              outliers separated. Volume ranked. Yield revealed.
-            </>
-          }
-          compact
-          headingLevel="h2"
-        />
-      </Link>
-
-      {/* ── State of the Index hero card ────────────────────────────── */}
-      <Link href="/research" className="group block transition-transform hover:scale-[1.01]">
-        <WaveHero
-          eyebrow="📊 SigRank Index"
-          terminalText="THE DATA-STATE"
-          title="State of the Index"
-          subtitle={
-            <>
-              The primary anonymized seed dataset. 1,628 operators across 17
-              platforms and 3,304 models. 9.07Q total tokens. Available on
-              Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
-            </>
-          }
-          compact
-          headingLevel="h2"
-        />
-      </Link>
-    </div>
+      {/* Shared editorial index format — same row structure as Articles and Blog. */}
+      <div className="blog-index" id="ws-page-field-index">
+        <Link id="ws-page-field-analysis" href="/field" className="blog-feature group">
+            <div className="blog-row-main">
+              <div className="blog-kicker">FEATURED · FIELD RESEARCH</div>
+              <h2>Field Analysis</h2>
+              <p>
+                The true distribution of token efficiency.{" "}
+                {meta.operators_included.toLocaleString()} AI operators,
+                outliers separated. Volume ranked. Yield revealed.
+              </p>
+            </div>
+            <span className="blog-read">READ FIELD ANALYSIS →</span>
+          </Link>
+        <div className="blog-list">
+          <Link id="ws-page-state-index" href="/research" className="blog-row group">
+            <div className="blog-row-main">
+              <span className="blog-kicker">SigRank Index</span>
+              <h2>State of the Index</h2>
+              <p>
+                The primary anonymized seed dataset. 1,628 operators across 17
+                platforms and 3,304 models. 9.07Q total tokens. Available on
+                Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
+              </p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+          <Link href="/science" className="blog-row group">
+            <div className="blog-row-main">
+              <h2>Academic Foundation · Science</h2>
+              <p>The Conservation Law of Commitment, Commitment Theory, MO§ES™ architecture, and published research deposits.</p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+          <Link href="/about" className="blog-row group">
+            <div className="blog-row-main">
+              <h2>About</h2>
+              <p>How SigRank evaluates AI operators using privacy-preserving token telemetry, platform-neutral metrics, and operator-owned profiles.</p>
+            </div>
+            <div className="blog-row-meta"><span className="arrow">↗</span></div>
+          </Link>
+        </div>
+      </div>
+      </div>
+    </FieldWorkspaceFrame>
   );
 }

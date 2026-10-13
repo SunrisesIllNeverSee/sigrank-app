@@ -47,10 +47,20 @@ test("The Field exists in snapshot.json (confirming it ships in the cold store)"
   );
 });
 
-test("/compare uses The Field as the default opponent B (baseline)", () => {
-  const src = read("app/compare/page.tsx");
+test("/compare excludes The Field — live operators only", () => {
+  // The live-operators-only compare rework removed the synthetic field
+  // baseline row: the candidate pool is filtered through
+  // liveCompareCandidates, which drops "the-field" (alongside seeds, UR and
+  // unclaimed profiles). The exclusion is the contract — pin the code path,
+  // not incidental wording on the page.
+  const src = read("lib/board/compare-live.ts");
   assert.ok(
-    src.includes("the-field"),
-    "/compare page uses the-field as the default compare baseline",
+    src.includes('"the-field"'),
+    "liveCompareCandidates must exclude the-field from compare candidates",
+  );
+  const page = read("app/compare/page.tsx");
+  assert.ok(
+    page.includes("liveCompareCandidates"),
+    "/compare must route its candidate pool through liveCompareCandidates",
   );
 });

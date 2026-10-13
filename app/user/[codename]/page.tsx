@@ -2,16 +2,21 @@
  * app/user/[codename]/page.tsx — the operator profile page (was /operators/[codename], owner 2026-06-22).
  *
  * "The single most important page after the homepage" (site_architecture.md
- * §Operator profile). AUTH_LAUNCH_DIRECTIVES D6: a GitHub-style multi-tab workspace —
- * a persistent identity header (avatar / name / class / rank) over three tabs:
+ * §Operator profile). A GitHub-style multi-tab workspace — a persistent
+ * identity header (avatar / name / class / rank) over eight tab panels:
  *
- *   • Stats        — view-only cascade dashboard (KPIs, radars, op-ratio, heat, trend)
- *   • Submissions  — manual project/build showcase (D9 — not yet built; empty state)
- *   • Social       — self-promo identity: handle, location, bio, links
+ *   • Overview     — opensplit (passport card + flap board), cascade, records
+ *   • Stats        — view-only cascade tables (KPIs, raw data)
+ *   • Analysis     — field scatters, archetype, vs-field, delta breakdown
+ *   • Report       — cascade report (owner-gated; public only when opted in)
+ *   • Lab          — cascade lab (owner-gated)
+ *   • Submissions  — platform grid + scored snapshot records + history
+ *   • Social       — self-promo identity: handle, location, bio, links, badges
+ *   • Badges       — earned/locked badges, class ladder, milestones
  *
  * RSC: reads the operator + history through the @/lib/data facade (mock fallback when
- * Supabase is unset). The three panels are server-rendered here and handed to the
- * ProfileTabs client island, which only mounts the active one. ScoreBreakdown-style
+ * Supabase is unset). The panels are server-rendered in ProfileBody and handed to the
+ * ProfileTabsV2 client island, which only mounts the active one. ScoreBreakdown-style
  * client islands receive plain serializable props resolved here, so RS.xx weights never
  * reach the client.
  */
@@ -23,21 +28,21 @@ import { Suspense } from "react";
 
 import {
   getOperator,
+  getLeaderboard,
   isOperatorRetired,
 } from "@/lib/board";
 import { decodeCodename } from "@/lib/route-params";
 import { withOG } from "@/lib/seo";
 import { operatorProfileRobots } from "@/lib/seo/indexing-policy";
 import type { Operator } from "@/lib/analytics/scoring-types";
-import { SignalClassBadge } from "@/components/sigrank";
-import { OperatorAvatar } from "@/components/sigrank/OperatorAvatar";
 import { CompareAgainstMe } from "@/components/profile/CompareAgainstMe";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 import { ClaimedBadge } from "@/components/claim/ClaimedBadge";
 import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 
 import { ProfileBody } from "./ProfileBody";
-import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
+import { ProfileWorkspace } from "@/components/profile-v2/ProfileWorkspace";
+import { ProfileRailPanels } from "@/components/profile-v2/ProfileRailPanels";
 
 // ISR: revalidate every 6 hours. Profile data doesn't change frequently —
 // operators submit snapshots at most a few times per day, and on-demand
@@ -45,7 +50,7 @@ import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
 // the page updates immediately after a submission regardless of the ISR
 // window. The 21600s ISR is a safety net that cuts cold-miss DB queries
 // 6x vs the previous 3600s, which matters because the /user/[codename]
-// route does 8 DB queries on a cold miss and Supabase compute is a cost
+// route does 9 DB queries on a cold miss and Supabase compute is a cost
 // constraint. The data-layer cache (unstable_cache on getOperator etc.)
 // provides a second tier at 90-300s for data freshness.
 //
@@ -83,6 +88,14 @@ function resolveName(operator: Operator): string {
   return operator.display_name ?? operator.codename;
 }
 
+// Compact yield for the rail OPERATOR PROFILE mod — matches the card's
+// Υ shorthand (976.9K, not the raw 976944.23).
+const compactYield = (n: number): string =>
+  n >= 1e9 ? `${(n / 1e9).toFixed(2)}B`
+    : n >= 1e6 ? `${(n / 1e6).toFixed(2)}M`
+    : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K`
+    : n.toFixed(0);
+
 export async function generateMetadata({
   params,
 }: {
@@ -92,9 +105,15 @@ export async function generateMetadata({
   const codename = decodeCodename(rawCodename);
   // Retired operators (opt-out): no metadata (they redirect to the leaderboard).
   if (await isOperatorRetired(codename)) return { title: "SigRank Leaderboard" };
-  const row = await getOperator(codename);
+  const [row, fieldRows] = await Promise.all([
+    getOperator(codename),
+    getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
+  ]);
   if (!row) return { title: "Operator not found" };
   const name = resolveName(row.operator);
+  // Board-verified field rank — row.global_rank is 0 for unresolved-mode
+  // operators who hold a real position on the combined field.
+  const metaRank = fieldRows.find((r) => r.operator.codename === codename)?.global_rank ?? row.global_rank;
   const c = row.snapshot.cascade;
   const yieldLabel =
     c && !c.nonCompounding
@@ -103,7 +122,7 @@ export async function generateMetadata({
   const title = `${name}${yieldLabel}`;
   const description = row.pending
     ? `${name} — an operator on SigRank (not ranked yet).`
-    : `${name} — ${row.snapshot.class_tier}, rank #${row.global_rank} on the SigRank leaderboard.`;
+    : `${name} — ${row.snapshot.class_tier}, rank #${metaRank} on the SigRank leaderboard.`;
   // robots comes from the shared indexing policy (lib/seo/indexing-policy.ts):
   // claimed + non-retired + non-private + at least one metric snapshot gets
   // index,follow; everyone else (seed/unclaimed, private, no-snapshot) keeps a
@@ -114,24 +133,6 @@ export async function generateMetadata({
     path: `/user/${rawCodename}`,
   });
   return { ...meta, robots: operatorProfileRobots(row.operator, !row.pending) };
-}
-
-/** One labeled row in the identity / stats rail. */
-function Stat({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-dim">
-        {label}
-      </span>
-      <span className="font-mono text-sm text-text-primary">{children}</span>
-    </div>
-  );
 }
 
 export default async function OperatorProfilePage({
@@ -147,9 +148,14 @@ export default async function OperatorProfilePage({
   // isOperatorRetired is uncached (fresh status check), getOperator is
   // unstable_cache'd at 90s. Running them in parallel saves ~200ms on
   // cold misses.
-  const [retired, row] = await Promise.all([
+  const [retired, row, fieldRows] = await Promise.all([
     isOperatorRetired(codename),
     getOperator(codename),
+    // Same claimed all-time combined field the board renders — memo-cached,
+    // shared with ProfileBody/RailPanels. Needed up here because the static
+    // OPERATOR rail mods display the rank and row.global_rank (claimedRankMap)
+    // is 0 for unresolved-mode operators who ARE on the field (owner item 13).
+    getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
   ]);
 
   // Retired operators (opt-out): redirect to the leaderboard. No profile page,
@@ -157,15 +163,14 @@ export default async function OperatorProfilePage({
   if (retired) redirect("/leaderboard");
   if (!row) notFound();
 
-  const { operator, snapshot, telemetry } = row;
-  const pending = row.pending ?? false;
+  const { operator } = row;
+  const fieldRank = fieldRows.find((r) => r.operator.codename === codename)?.global_rank ?? null;
 
   // PERF (2026-08-28): streaming via Suspense.
-  // The header + identity info render immediately with just getOperator data
-  // (critical path). The heavy body (5 parallel DB queries: history,
-  // submissions, report, leaderboard, hall) streams in via <Suspense>.
-  // This cuts FCP from ~5s (waiting for all 8 queries) to ~0.5s (1 query +
-  // header render). The body shows a skeleton fallback while streaming.
+  // The action row renders immediately with just getOperator data (critical
+  // path). The heavy body (5 parallel DB queries: history, submissions,
+  // report, leaderboard, hall) streams in via <Suspense> — including the
+  // V2 identity hero, which lives inside OverviewView.
 
   // Auth state (isOwner, isSignedIn, hasOperator) is resolved CLIENT-SIDE via
   // ProfileAuthGate so this page stays ISR-cached (edge s-maxage=21600).
@@ -173,34 +178,14 @@ export default async function OperatorProfilePage({
   // (currently zero) private profiles. Owners see a brief default state before
   // the client gate resolves, then interactive features (ReportTab toggle,
   // LabTab sliders, ClaimTab) appear.
-  const isOwner = false;
-
-  const topPct = Math.max(0, 100 - row.percentile);
-  const c = snapshot.cascade;
-
-  // Header-only computations — these use only getOperator data (already
-  // fetched above) so the header renders immediately without waiting for
-  // the 5 heavy parallel queries in ProfileBody.
-  const name = resolveName(operator);
-  const hasDisplayName = name !== operator.codename;
-
-  const isPrivate = operator.profile_visibility === "private";
-  const viewerRedacted = isPrivate && !isOwner;
-  const buildArchetype = pending || viewerRedacted ? null : describeBuildArchetype({
-    input: telemetry?.fresh_input,
-    output: telemetry?.output,
-    cache_write: telemetry?.cache_create,
-    cache_read: telemetry?.cache_read,
-  });
-  const displayName = viewerRedacted ? null : operator.display_name;
-  const handle_ = viewerRedacted ? null : operator.handle;
-  const avatarUrl = viewerRedacted ? null : operator.avatar_url;
-  const nameShown = viewerRedacted ? operator.codename : name;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <TrackProfileView codename={operator.codename} />
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <Suspense fallback={<div>Loading profile workspace…</div>}>
+    <ProfileWorkspace name={resolveName(operator)} codename={operator.codename}
+      rank={row.pending ? null : fieldRank} tier={row.snapshot.class_tier}
+      platform={operator.primary_domain}
+      yieldLabel={row.snapshot.cascade?.nonCompounding ? "—" : (row.snapshot.cascade?.yield_ != null ? compactYield(row.snapshot.cascade.yield_) : "—")}
+      actions={<div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/board/all"
           className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
@@ -218,68 +203,19 @@ export default async function OperatorProfilePage({
           {operator.claimed && <ClaimedBadge claimed={operator.claimed} />}
           <ProfileEditModal codename={operator.codename} />
         </div>
-      </div>
+      </div>}
+      panels={
+        /* Phase 3 rail panels: rank contexts, submission activity, records &
+           honors — streamed via the same cached fetches ProfileBody warms. */
+        <Suspense fallback={<div className="mod"><h3><span className="sq" />OPERATOR DATA</h3><p className="ws-note">Loading…</p></div>}>
+          <ProfileRailPanels row={row} />
+        </Suspense>
+      }>
+      <TrackProfileView codename={operator.codename} />
 
-      {/* Persistent identity header — renders immediately with getOperator data. */}
-      <header className="flex flex-col gap-4 rounded-lg border border-bg-border bg-bg-surface p-5 sm:flex-row sm:items-center sm:gap-5 sm:w-fit">
-        <OperatorAvatar src={avatarUrl} alt={nameShown} size={64} />
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
-              {nameShown}
-            </h1>
-            {pending || row.global_rank === 0 ? (
-              <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
-                Unranked
-              </span>
-            ) : (
-              <SignalClassBadge signalClass={snapshot.class_tier} />
-            )}
-            {row.workflow_mode && (
-              <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-secondary">
-                {row.workflow_mode === "hitl" ? "HITL" : "Agentic"}
-              </span>
-            )}
-            {buildArchetype && (
-              <Link href="/wiki#archetypes" title={buildArchetype.description} className="rounded-md border border-gold/30 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-gold">
-                {buildArchetype.name}
-              </Link>
-            )}
-            {row.workflow_mode === "agentic" && row.workflow_evidence_url?.startsWith("https://") && (
-              <a href={row.workflow_evidence_url} target="_blank" rel="noopener noreferrer" className="font-mono text-[11px] text-gold underline">Workflow evidence ↗</a>
-            )}
-            {viewerRedacted && (
-              <span className="rounded-md border border-bg-border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-text-muted">
-                🔒 Private
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-xs text-text-muted">
-            {hasDisplayName && !viewerRedacted && <span>{operator.codename}</span>}
-            {handle_ && (
-              <span className="text-text-secondary">@{handle_}</span>
-            )}
-            {pending || row.global_rank === 0 ? (
-              <span>{pending ? "No cascade data yet" : "Awaiting board placement"}</span>
-            ) : (
-              <>
-                <span>Rank #{row.global_rank}</span>
-                <span>Top {topPct.toFixed(2)}% of the field</span>
-                <span>{snapshot.class_tier}</span>
-              </>
-            )}
-          </div>
-          {buildArchetype && (
-            <p className="max-w-xl text-xs text-text-secondary">
-              {buildArchetype.description}{" "}
-              <Link href="/wiki#archetypes" className="text-gold underline">Build Archetype</Link>
-              {" · "}{row.window_type ?? "selected snapshot"}
-              {" · "}{row.snapshot_date ?? snapshot.snapshot_date ?? "date unavailable"}
-              <span className="sr-only"> · classifier {buildArchetype.classifier_id} {buildArchetype.classifier_version}</span>
-            </p>
-          )}
-        </div>
-      </header>
+      {/* V2: the identity hero now lives inside OverviewView — the old
+          <header> block was removed so the identity renders once. The action
+          row above (back / compare / edit) stays on the critical path. */}
 
       {/* Streaming body — fetches 5 heavy queries (history, submissions,
           report, leaderboard, hall) and renders the split-flap card, records,
@@ -295,6 +231,7 @@ export default async function OperatorProfilePage({
       >
         <ProfileBody row={row} rawCodename={rawCodename} />
       </Suspense>
-    </div>
+    </ProfileWorkspace>
+    </Suspense>
   );
 }
