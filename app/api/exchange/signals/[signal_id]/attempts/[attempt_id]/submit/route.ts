@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { submitAttempt, getSignal } from "@/lib/exchange/signal-server";
 import { logEncounter, requestIdentity } from "@/lib/exchange/server";
 import { createHash } from "node:crypto";
+import { resolveValidatedActor } from "@/lib/exchange/mcp-tools";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
 import { notifyAgent } from "@/lib/exchange/agent-notifications";
 
@@ -42,8 +43,9 @@ export async function POST(
   }
 
   const bodyHash = `sha256:${createHash("sha256").update(body).digest("hex")}`;
-  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
-  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
+  const actor = await resolveValidatedActor(req, ip);
+  if (!actor.ok) return NextResponse.json({ error: actor.error }, { status: actor.status, headers: distributedRateLimitHeaders(rl, "signal-submit") });
+  const { actorKey, actorId } = actor;
 
   // Validate required_fields (§10.2). The signal declares which fields must
   // be present in the submission body. For JSON submissions, we parse the

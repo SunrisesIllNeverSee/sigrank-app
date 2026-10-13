@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSignal, getAttempt, getVerification, getQualification, consumeQualification, recordProposalOrigin } from "@/lib/exchange/signal-server";
-import { getExchangeAdmin, hashSecret, newPublicId, newSecret, requestIdentity, logEncounter } from "@/lib/exchange/server";
+import { findCompany, getExchangeAdmin, hashSecret, newPublicId, newSecret, requestIdentity, logEncounter } from "@/lib/exchange/server";
+import { resolveValidatedActor } from "@/lib/exchange/mcp-tools";
+import { z } from "zod";
+import { ConsiderationSchema } from "@/lib/exchange-gateway/src/schema";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
-import { createHash } from "node:crypto";
+
+// Same limits as the canonical ProposalSchema (title 5-300, contribution
+// 10-20000 chars, <=20 consideration entries). Unlike unsolicited proposals
+// this is the solicited `proposal_allowed` path, so no accepts_unsolicited gate.
+const AttemptProposalBodySchema = z.object({
+  title: z.string().trim().min(5).max(300).optional(),
+  proposed_contribution: z.string().trim().min(10).max(20_000).optional(),
+  consideration: z.array(ConsiderationSchema).max(20).optional(),
+  qualification_id: z.string().trim().min(1).max(200).optional(),
+});
 
 /**
  * POST /api/exchange/signals/{signal_id}/attempts/{attempt_id}/proposal (§10.4).
@@ -33,8 +45,9 @@ export async function POST(
     return NextResponse.json({ error: "Signal does not allow proposal follow-on" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
   }
 
-  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
-  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
+  const actor = await resolveValidatedActor(req, ip);
+  if (!actor.ok) return NextResponse.json({ error: actor.error }, { status: actor.status, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
+  const { actorId } = actor;
   const attempt = await getAttempt(signal_id, attempt_id, actorId);
   if (!attempt) return NextResponse.json({ error: "Attempt not found" }, { status: 404, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
 
@@ -42,15 +55,39 @@ export async function POST(
     return NextResponse.json({ error: "Attempt must be verified before creating a proposal" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
   }
 
-  // Read the request body ONCE. The body may contain qualification_id,
-  // title, proposed_contribution, and consideration. Reading req.json()
-  // twice consumes the stream and silently drops user input.
-  const body = await req.json().catch(() => ({} as Record<string, unknown>));
+  // Read the request body ONCE, then validate with the same limits as normal proposals.
+  const rawBody = await req.json().catch(() => ({}));
+  const parsedBody = AttemptProposalBodySchema.safeParse(rawBody ?? {});
+  if (!parsedBody.success) {
+    return NextResponse.json({ error: "Invalid proposal body", details: parsedBody.error.flatten() }, { status: 400, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
+  }
+  const body = parsedBody.data;
+
+  // The publisher must be a verified company (parity with unsolicited proposals).
+  const publisher = await findCompany(signal.publisher.domain);
+  if (!publisher || publisher.verification_status !== "verified") {
+    return NextResponse.json({ error: "Publisher domain is not verified" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
+  }
+
+  // One proposal per attempt.
+  const preAdmin = getExchangeAdmin();
+  const { data: priorOrigin, error: priorError } = await preAdmin
+    .from("contribution_proposal_origins")
+    .select("id")
+    .eq("attempt_id", attempt_id)
+    .eq("signal_id", signal_id)
+    .limit(1);
+  if (priorError) {
+    return NextResponse.json({ error: "Failed to check existing proposals" }, { status: 500, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
+  }
+  if (priorOrigin && priorOrigin.length > 0) {
+    return NextResponse.json({ error: "A proposal has already been created from this attempt" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
+  }
 
   // Check qualification if required
   let qualificationId: string | undefined;
   if (signal.follow_on.qualification_required) {
-    const qualId = req.headers.get("x-qualification-id") ?? (body as Record<string, unknown>)?.qualification_id;
+    const qualId = req.headers.get("x-qualification-id") ?? body.qualification_id;
     if (!qualId || typeof qualId !== "string") {
       return NextResponse.json({ error: "Qualification ID required for this signal's follow-on policy" }, { status: 400, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
     }
@@ -66,14 +103,13 @@ export async function POST(
   if (!verification) return NextResponse.json({ error: "No verification found for attempt" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
 
   // Create an ordinary ContributionProposal (existing exchange_records flow)
-  const admin = getExchangeAdmin();
+  const admin = preAdmin;
   const proposerKey = newSecret("proposal");
   const publicId = newPublicId();
 
-  const proposalBody = body as Record<string, unknown>;
-  const customTitle = typeof proposalBody.title === "string" ? proposalBody.title : undefined;
-  const customContribution = typeof proposalBody.proposed_contribution === "string" ? proposalBody.proposed_contribution : undefined;
-  const customConsideration = Array.isArray(proposalBody.consideration) ? proposalBody.consideration : undefined;
+  const customTitle = body.title;
+  const customContribution = body.proposed_contribution;
+  const customConsideration = body.consideration;
 
   const { data: proposal, error } = await admin.from("exchange_records").insert({
     public_id: publicId,
@@ -118,6 +154,20 @@ export async function POST(
     verificationId: verification.id as string,
     qualificationId,
   });
+
+  // Race guard (no unique index): if a concurrent request linked a proposal to
+  // this attempt first, discard ours.
+  const { data: origins } = await admin
+    .from("contribution_proposal_origins")
+    .select("proposal_id")
+    .eq("attempt_id", attempt_id)
+    .eq("signal_id", signal_id)
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+  if (origins && origins.length > 1 && origins[0].proposal_id !== proposal.id) {
+    await admin.from("exchange_records").delete().eq("id", proposal.id);
+    return NextResponse.json({ error: "A proposal has already been created from this attempt" }, { status: 409, headers: distributedRateLimitHeaders(rl, "signal-proposal") });
+  }
 
   // Consume qualification if present. If consumption fails (race
   // condition, expiry, or revocation between the check above and now),

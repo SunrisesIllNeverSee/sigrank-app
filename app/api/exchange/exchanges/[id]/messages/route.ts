@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { appendExchangeEvent, authenticateCompany, authenticateDomainAgent, authenticateProposer, findCompany, getExchangeAdmin, requestIdentity } from '@/lib/exchange/server'
 import { notifyDomainAgent } from '@/lib/exchange/steward'
-import { rateLimitAllow } from '@/lib/exchange/rate-limit'
+import { rateLimitAllowAsync } from '@/lib/exchange/rate-limit'
 const MessageSchema=z.object({text:z.string().trim().min(1).max(10000)})
 const controlBase=process.env.NEXT_PUBLIC_SITE_URL??'https://signalaf.com'
 
@@ -17,7 +17,7 @@ function hostedStewardReply(record:Record<string,unknown>):string{
 }
 
 export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>}){
-  if(!rateLimitAllow(requestIdentity(req),'exchange_message')) return NextResponse.json({error:'Rate limited'},{status:429})
+  if(!(await rateLimitAllowAsync(requestIdentity(req),'exchange_message'))) return NextResponse.json({error:'Rate limited'},{status:429})
   const publicId=(await params).id
   const parsed=MessageSchema.safeParse(await req.json().catch(()=>null))
   if(!parsed.success)return NextResponse.json({error:'Invalid message'},{status:400})
