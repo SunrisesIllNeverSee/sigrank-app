@@ -191,7 +191,7 @@ export function CombinedSignal({
           const yy = y(v);
           return (
             <rect
-              key={i}
+              key={`${m.id}-${i}`}
               x={xx - barWidth / 2}
               y={yy}
               height={Math.max(0.2, 101 - yy)}
@@ -204,7 +204,7 @@ export function CombinedSignal({
     }
     return pathFor(pts, m.id).map((d, i) => (
       <path
-        key={i}
+        key={`${m.id}-${i}`}
         d={d}
         stroke={m.color}
         fill="none"
