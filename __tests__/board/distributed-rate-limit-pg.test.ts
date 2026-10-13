@@ -19,6 +19,8 @@ const cfg = { windowMs: 60_000, max: 2 };
 beforeEach(() => {
   delete process.env.UPSTASH_REDIS_REST_URL;
   delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
   state.serviceConfigured = true;
   state.rpc.mockReset();
 });

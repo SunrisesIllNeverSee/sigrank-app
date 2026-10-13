@@ -11,6 +11,7 @@ import "server-only";
  * Env vars:
  *   UPSTASH_REDIS_REST_URL  — Upstash Redis REST endpoint
  *   UPSTASH_REDIS_REST_TOKEN — Upstash Redis REST token
+ *   (or KV_REST_API_URL / KV_REST_API_TOKEN from the Vercel integration)
  *
  * When Upstash is missing, unreachable or over quota, the shared counter
  * falls back to Supabase Postgres (public.api_rate_limit_hit, migration 0055;
@@ -45,8 +46,9 @@ let redisClient: Redis | null | undefined;
 
 function getRedis(): Redis | null {
   if (redisClient !== undefined) return redisClient;
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  // Vercel's Upstash integration provisions KV_REST_API_* names.
+  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
   if (!url || !token) {
     redisClient = null;
     return null;
