@@ -81,8 +81,7 @@ import {
   OperatorProfileTile,
   SharePreview,
 } from "./OperatorDock";
-import { ICON_SETS } from "./PixelIcon";
-import type { IconSetName } from "./PixelIcon";
+import { useRailIconSet } from "./useRailIconSet";
 import { PixelBadge } from "./PixelBadge";
 import type { PixelBadgeName } from "./PixelBadge";
 import { BADGE_LABELS } from "./PixelBadge";
@@ -1109,7 +1108,7 @@ export function LiveBoardWorkspace({
   /* icon-set switcher (owner: "toggle through the icons — all 4 or 5
      sets") — cycles pixel / glyph / emoji / minimal / hex-badge rail
      treatments; defaults to the brand pixel set. */
-  const [iconSet, setIconSet] = useState<IconSetName>("pixel");
+  const [iconSet, setIconSet] = useRailIconSet();
   const [notifOpen, setNotifOpen] = useState(false);
   /* coming-soon votes (owner: "vote button for which gets built first") —
      local tally; wire to a real vote surface when one exists. */
@@ -1749,42 +1748,10 @@ export function LiveBoardWorkspace({
           {/* pixel mark (owner 2026-10-06: keep the 4-pixel signalaf mark
               for the board — the § glyph exists in app/icon.svg but the
               pixels are the board's brand). */}
-          <Link className="sbrand" href="/" data-tip="signalaf — home" title="signalaf — home">
-            <span className="px">
-              <i></i>
-              <i></i>
-              <i></i>
-              <i></i>
-            </span>
-          </Link>
           <nav className="snav" ref={snavRef}>
             <GroupedRailNav active="board" iconSet={iconSet} onBoard={() => stageRef.current?.scrollTo({ top: 0 })} />
           </nav>
           <div className="sfoot">
-            <nav className="ws-srail-nav" aria-label="Page navigation">
-              <button
-                type="button"
-                className="sbtn"
-                data-tip="BACK"
-                title="Back to previous page"
-                aria-label="Back to previous page"
-                onClick={() => {
-                  if (window.history.length > 1) router.back();
-                  else router.push("/");
-                }}
-              >
-                <span aria-hidden="true">←</span>
-              </button>
-              <Link
-                className="sbtn"
-                href="/"
-                data-tip="HOME"
-                title="Home — live leaderboard"
-                aria-label="Home — live leaderboard"
-              >
-                <span aria-hidden="true">⌂</span>
-              </Link>
-            </nav>
             {/* panel toggles (owner @svg): live in the nav rail and appear
                 ONLY when their panel is closed — reopen affordances. */}
             {!leftOn && (
@@ -1819,19 +1786,6 @@ export function LiveBoardWorkspace({
             )}
             {/* icon-set cycler (owner: "toggle through the icons — all
                 4 or 5 sets"): pixel → glyph → emoji → minimal → hex. */}
-            <button
-              type="button"
-              className="sbtn laybtn"
-              data-tip={`ICON SET · ${iconSet.toUpperCase()}`}
-              title={`rail icons: ${iconSet} — tap to cycle the five sets`}
-              onClick={() =>
-                setIconSet(
-                  ICON_SETS[(ICON_SETS.indexOf(iconSet) + 1) % ICON_SETS.length],
-                )
-              }
-            >
-              <span className="gi">⟳</span>
-            </button>
             {/* notification bell (owner): placeholder popover until the
                 notifications/settings surface exists. */}
             <button
@@ -1881,7 +1835,7 @@ export function LiveBoardWorkspace({
               </button>
               <div id="workspace-account-options" className="acctpop" hidden={!acctPop}>
                 {acctPop && <WorkspaceAccountOptions mode={acct.mode} name={acct.name}
-                  theme={theme} setTheme={setTheme} close={() => setAcctPop(false)} />}
+                  theme={theme} setTheme={setTheme} iconSet={iconSet} setIconSet={setIconSet} close={() => setAcctPop(false)} />}
               </div>
             </div>
           </div>
@@ -2000,22 +1954,6 @@ export function LiveBoardWorkspace({
                   {railBody("hall")}
                 </div>
               </div>
-              <nav className="ws-rail-bottom-nav" aria-label="Page navigation">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.history.length > 1) router.back();
-                    else router.push("/");
-                  }}
-                  aria-label="Back to previous page"
-                  title="Back to previous page"
-                >
-                  <span aria-hidden="true">←</span> BACK
-                </button>
-                <Link href="/" aria-label="Home — live leaderboard" title="Home — live leaderboard">
-                  <span aria-hidden="true">⌂</span> HOME
-                </Link>
-              </nav>
             </aside>
 
             <div className="stagecol">

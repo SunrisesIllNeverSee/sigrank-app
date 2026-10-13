@@ -27,7 +27,6 @@ import { GroupedRailNav } from "./GroupedRailNav";
  */
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -37,8 +36,7 @@ import {
 } from "react";
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
-import { ICON_SETS } from "./PixelIcon";
-import type { IconSetName } from "./PixelIcon";
+import { useRailIconSet } from "./useRailIconSet";
 import { PixelBadge } from "./PixelBadge";
 import { EditorialHeaderNav, type WorkspaceTopic } from "./EditorialSidebar";
 import {
@@ -171,10 +169,9 @@ export function WorkspaceShell({
   const [railOn, setRailOn] = useState(rightDefaultOpen && right != null);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
-  const [iconSet, setIconSet] = useState<IconSetName>("pixel");
+  const [iconSet, setIconSet] = useRailIconSet();
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const router = useRouter();
   const session = useBoardSession(true);
 
   /* rightOpenSignal bumps → open the inspector (Hall: record selection
@@ -294,47 +291,10 @@ export function WorkspaceShell({
       >
         {/* icon rail — identical contract to the board's .srail.min */}
         <aside className="srail min">
-          <Link
-            className="sbrand"
-            href="/"
-            data-tip="signalaf — home"
-            title="signalaf — home"
-          >
-            <span className="px">
-              <i></i>
-              <i></i>
-              <i></i>
-              <i></i>
-            </span>
-          </Link>
           <nav className="snav" ref={snavRef}>
             <GroupedRailNav active={active} iconSet={iconSet} />
           </nav>
           <div className="sfoot">
-            <nav className="ws-srail-nav" aria-label="Page navigation">
-              <button
-                type="button"
-                className="sbtn"
-                data-tip="BACK"
-                title="Back to previous page"
-                aria-label="Back to previous page"
-                onClick={() => {
-                  if (window.history.length > 1) router.back();
-                  else router.push("/");
-                }}
-              >
-                <span aria-hidden="true">←</span>
-              </button>
-              <Link
-                className="sbtn"
-                href="/"
-                data-tip="HOME"
-                title="Home — live leaderboard"
-                aria-label="Home — live leaderboard"
-              >
-                <span aria-hidden="true">⌂</span>
-              </Link>
-            </nav>
             {left != null && !leftOn && (
               <button
                 type="button"
@@ -365,19 +325,6 @@ export function WorkspaceShell({
                 </svg>
               </button>
             )}
-            <button
-              type="button"
-              className="sbtn laybtn"
-              data-tip={`ICON SET · ${iconSet.toUpperCase()}`}
-              title={`rail icons: ${iconSet} — tap to cycle the five sets`}
-              onClick={() =>
-                setIconSet(
-                  ICON_SETS[(ICON_SETS.indexOf(iconSet) + 1) % ICON_SETS.length],
-                )
-              }
-            >
-              <span className="gi">⟳</span>
-            </button>
             <button
               type="button"
               className="sbtn laybtn"
@@ -420,7 +367,7 @@ export function WorkspaceShell({
               </button>
               <div id="workspace-account-options" className="acctpop" hidden={!acctPop}>
                 {acctPop && <WorkspaceAccountOptions mode={acct.mode} name={acct.name}
-                  theme={theme} setTheme={setTheme} close={() => setAcctPop(false)} />}
+                  theme={theme} setTheme={setTheme} iconSet={iconSet} setIconSet={setIconSet} close={() => setAcctPop(false)} />}
               </div>
             </div>
           </div>
@@ -445,22 +392,6 @@ export function WorkspaceShell({
                   {leftTitle}
                 </div>
                 <div className="rail">{left}</div>
-                <nav className="ws-rail-bottom-nav" aria-label="Page navigation">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.history.length > 1) router.back();
-                      else router.push("/");
-                    }}
-                    aria-label="Back to previous page"
-                    title="Back to previous page"
-                  >
-                    <span aria-hidden="true">←</span> BACK
-                  </button>
-                  <Link href="/" aria-label="Home — live leaderboard" title="Home — live leaderboard">
-                    <span aria-hidden="true">⌂</span> HOME
-                  </Link>
-                </nav>
               </aside>
             )}
 
