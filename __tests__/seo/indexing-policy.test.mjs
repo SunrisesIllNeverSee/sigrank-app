@@ -184,9 +184,10 @@ test("profile page applies the shared indexing policy to robots metadata", async
 // ── Cache invalidation: policy-relevant flag writes must bust every cached
 //    surface so the sitemap and the ISR profile page never disagree ────────
 
-test("claim route invalidates operator index state after flipping claimed", async () => {
+test("disabled seeded claims cannot change operator index state", async () => {
   const route = await source("app/api/v1/claim/route.ts");
-  assert.match(route, /revalidateOperatorIndexState\(codename\)/);
+  assert.match(route, /claim_verification_unavailable/);
+  assert.doesNotMatch(route, /getSupabaseServer|\.insert\(|\.update\(/);
 });
 
 test("profile route invalidates operator index state after profile_visibility writes", async () => {
