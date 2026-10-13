@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 import { bumpComparisonsRan } from "@/lib/board/queries";
 
 /**
@@ -13,7 +14,9 @@ import { bumpComparisonsRan } from "@/lib/board/queries";
  */
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const limited = await enforceRouteLimit(req, "compare-bump", { windowMs: 60 * 1000, max: 20 });
+  if (limited) return limited;
   await bumpComparisonsRan();
   return NextResponse.json({ ok: true });
 }
