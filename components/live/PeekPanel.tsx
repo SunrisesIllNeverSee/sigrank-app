@@ -30,7 +30,7 @@ import type { DetailStatus } from "./enrich";
 import { OperatorProfileTile } from "./OperatorDock";
 import { ProfileActions } from "./ProfileActions";
 import { ProfileSlides } from "./LiveBoardWorkspace";
-import { sixFactsOf, fieldSixMedian } from "./LiveBoardWorkspace";
+import { sixFactsOf, rawFactsOf } from "./LiveBoardWorkspace";
 
 export function PeekPanel({
   op,
@@ -95,7 +95,8 @@ export function PeekPanel({
             visual={
               <DualSignatureRadar
                 operator={sixFactsOf(op)}
-                fieldMedian={fieldSixMedian(ops)}
+                raw={rawFactsOf(op)}
+                cohort={ops.filter(o => o.num.total > 0).map(o => ({ raw: rawFactsOf(o), metrics: o.nc ? null : sixFactsOf(o) }))}
                 label={op.name}
               />
             }

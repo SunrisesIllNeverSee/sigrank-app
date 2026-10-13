@@ -1,8 +1,13 @@
 "use client";
 
+import { MedalHex } from "@/components/profile-v2/RecordMarks";
+import { invalidateBoardSession } from "@/components/live/session";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlatformPicker } from "@/components/auth/PlatformPicker";
+import { PixelArtwork } from "@/components/profile-v2/BadgeArtwork";
+import type { ProfileMarkOption } from "@/lib/profile/profile-marks";
 
 /**
  * components/auth/ProfileEditForm.tsx — the editable profile surface
@@ -28,6 +33,11 @@ export interface ProfileInitial {
   operator_domains: string[];
   avatar_url: string;
   profile_visibility?: "public" | "private";
+  profile_pixel_badge?: string | null;
+  profile_secondary_logo?: string | null;
+  pixel_badges?: ProfileMarkOption[];
+  secondary_logos?: ProfileMarkOption[];
+  mark_settings_ready?: boolean;
 }
 
 function Field({
@@ -81,6 +91,8 @@ export function ProfileEditForm({
   const [visibility, setVisibility] = useState<"public" | "private">(
     initial.profile_visibility ?? "public",
   );
+  const [pixelBadge, setPixelBadge] = useState(initial.profile_pixel_badge ?? "");
+  const [secondaryLogo, setSecondaryLogo] = useState(initial.profile_secondary_logo ?? "");
   const [codename, setCodename] = useState(initial.codename ?? "");
   const [codenameStatus, setCodenameStatus] = useState<
     "idle" | "checking" | "saving" | "saved" | "error"
@@ -142,6 +154,13 @@ export function ProfileEditForm({
           bio,
           links,
           operator_domains: platforms,
+          profile_visibility: visibility,
+          ...(initial.mark_settings_ready
+            ? {
+                profile_pixel_badge: pixelBadge || null,
+                profile_secondary_logo: secondaryLogo || null,
+              }
+            : {}),
         }),
       });
       if (!res.ok) {
@@ -151,6 +170,7 @@ export function ProfileEditForm({
         return;
       }
       setStatus("saved");
+      invalidateBoardSession();
       router.refresh();
       onSaved?.();
     } catch {
@@ -322,6 +342,46 @@ export function ProfileEditForm({
       </fieldset>
 
       <PlatformPicker selected={platforms} onChange={setPlatforms} />
+
+      {initial.mark_settings_ready ? <section id="profile-display" className="scroll-mt-6 border-y border-bg-border py-4">
+        <div className="mb-4">
+          <h2 className="font-mono text-xs font-semibold uppercase tracking-wide text-text-secondary">Profile display</h2>
+          <p className="mt-1 font-sans text-[11px] leading-relaxed text-text-dim">Choose from marks you have earned. Eligibility follows your current leaderboard and Hall records.</p>
+        </div>
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 font-mono text-[10px] uppercase tracking-wider text-text-muted">Pixel badge</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${pixelBadge === "" ? "border-gold/60 bg-bg-elevated" : "border-bg-border"}`}>
+              <input type="radio" name="profile-pixel-badge" checked={pixelBadge === ""} onChange={() => setPixelBadge("")} className="accent-gold" />
+              <span className="font-sans text-xs text-text-secondary">No Pixel badge</span>
+            </label>
+            {(initial.pixel_badges ?? []).map((option) => (
+              <label key={option.id} className={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${pixelBadge === option.id ? "border-gold/60 bg-bg-elevated" : "border-bg-border"}`}>
+                <input type="radio" name="profile-pixel-badge" checked={pixelBadge === option.id} onChange={() => setPixelBadge(option.id)} className="accent-gold" />
+                <PixelArtwork pattern={option.pattern ?? ".../.../..."} size={36} />
+                <span className="min-w-0"><span className="block font-mono text-[10px] uppercase text-text-primary">{option.label}</span><span className="mt-1 block font-sans text-[10px] text-text-muted">{option.detail}</span></span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="mt-5 flex flex-col gap-2">
+          <legend className="mb-2 font-mono text-[10px] uppercase tracking-wider text-text-muted">Secondary earned badge</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${secondaryLogo === "" ? "border-gold/60 bg-bg-elevated" : "border-bg-border"}`}>
+              <input type="radio" name="profile-secondary-logo" checked={secondaryLogo === ""} onChange={() => setSecondaryLogo("")} className="accent-gold" />
+              <span className="font-sans text-xs text-text-secondary">No secondary badge</span>
+            </label>
+            {(initial.secondary_logos ?? []).map((option) => (
+              <label key={option.id} className={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${secondaryLogo === option.id ? "border-gold/60 bg-bg-elevated" : "border-bg-border"}`}>
+                <input type="radio" name="profile-secondary-logo" checked={secondaryLogo === option.id} onChange={() => setSecondaryLogo(option.id)} className="accent-gold" />
+                <MedalHex rank={option.rank} sigil={option.sigil ?? "★"} ink={option.accent} size={56} />
+                <span className="min-w-0"><span className="block font-mono text-[10px] uppercase text-text-primary">{option.label}</span><span className="mt-1 block font-sans text-[10px] text-text-muted">{option.detail}</span></span>
+              </label>
+            ))}
+          </div>
+          {(initial.pixel_badges ?? []).length === 0 && (initial.secondary_logos ?? []).length === 0 && <p className="mt-2 font-sans text-[11px] text-text-muted">No eligible marks yet. Earn a leaderboard Pixel standing or a Hall/metric record to choose one.</p>}
+        </fieldset>
+      </section> : <p id="profile-display" className="border-y border-bg-border py-4 font-sans text-[11px] leading-relaxed text-text-muted">Badge display settings will appear here once this preview database has profile mark storage enabled.</p>}
 
       <Field
         label="Avatar"

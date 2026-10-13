@@ -114,17 +114,17 @@
    so the sweep runs on transform (GPU) instead of background-position: works
    identically in Safari/Chromium/Firefox, needs no mix-blend-mode, and is
    fully disabled under prefers-reduced-motion. */
-.lbw-root .pv2 .pv2-shine{position:absolute;top:-30%;bottom:-30%;left:-15%;width:46%;pointer-events:none;z-index:1;
+.lbw-root .pv2 .pv2-shine{position:absolute;top:-30%;bottom:-30%;left:-15%;width:46%;pointer-events:none;z-index:3;
   background:linear-gradient(105deg,transparent 0%,rgba(168,85,247,.10) 28%,rgba(0,229,255,.16) 42%,rgba(255,255,255,.22) 50%,rgba(255,0,212,.14) 58%,rgba(255,215,0,.08) 70%,transparent 100%);
   transform:translateX(-160%) skewX(-16deg);
-  animation:pv2-shine-sweep 7s ease-in-out infinite}
-@keyframes pv2-shine-sweep{0%,55%{transform:translateX(-160%) skewX(-16deg);opacity:0}62%{opacity:1}78%{transform:translateX(320%) skewX(-16deg);opacity:0}100%{transform:translateX(320%) skewX(-16deg);opacity:0}}
+  animation:pv2-shine-sweep 4s ease-in-out infinite}
+@keyframes pv2-shine-sweep{0%{transform:translateX(-140%) skewX(-16deg);opacity:.2}30%,60%{opacity:.9}100%{transform:translateX(340%) skewX(-16deg);opacity:.2}}
 /* ::after shimmer stays as the ambient layer but no longer depends on
    mix-blend-mode (Safari clip-path + blend composites inconsistently —
    plain rgba reads identically everywhere). */
 .lbw-root .pv2 .pv2-card::after{mix-blend-mode:normal;opacity:.85}
 @media(prefers-reduced-motion:reduce){
-  .lbw-root .pv2 .pv2-shine{animation:none;opacity:0}
+  .lbw-root .pv2 .pv2-shine{animation:none;transform:translateX(110%) skewX(-16deg);opacity:.5}
 }
 
 /* Dual rank chip — combined field + workflow cohort (item 13). */

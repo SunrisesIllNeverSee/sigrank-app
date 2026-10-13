@@ -1787,7 +1787,7 @@
 .lbw-root .ws-field-index .blog-row{grid-template-columns:minmax(0,1fr) 24px;gap:12px}
 .lbw-root .ws-field-index .blog-row-main{padding-left:36px}
 /* Slightly smaller pixel titles throughout the editorial family. */
-.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(4px,calc(var(--tbt-fit,2cqw) * .85),1.15rem)}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(4px,calc(var(--tbt-fit,2cqw) * .68),1.05rem)}
 .lbw-root .sigrank-column-hero pre{font-size:clamp(7px,1.9cqw,18px)}
 
 .lbw-root .ws-topic-branch > summary .ws-tree-title{font-weight:700}
@@ -1797,3 +1797,15 @@
 .lbw-root .ws-tree-details[open] > summary .ws-tree-toggle::before{content:"▾"}
 
 .lbw-root .sbtn[aria-label="PROFILE"] .pxbd{width:24px;height:24px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-rows:auto;gap:1px}
+
+.lbw-root .share-gallery{max-width:900px;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.lbw-root .share-gallery>div,.lbw-root .share-gallery>section{padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.lbw-root .share-gallery h2{margin-bottom:16px;font:16px var(--font-d);text-align:center}
+.lbw-root .share-gallery .share-capture-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.lbw-root .share-capture-grid>a{display:block;padding:16px;border:1px solid var(--line2);border-radius:8px;background:var(--panel2)}
+.lbw-root .share-capture-grid p{margin-top:8px;font:11px/1.6 var(--font-mono);color:var(--mut)}
+.lbw-root .account-access-content,.lbw-root .account-settings-content{width:100%;max-width:560px;margin:0 auto;padding:36px 24px;display:flex;flex-direction:column;gap:24px}
+.lbw-root .account-access-content header{display:flex;flex-direction:column;gap:14px;text-align:center}
+.lbw-root .account-access-content button,.lbw-root .account-settings-content button{padding:10px 14px;border-radius:6px}
+.lbw-root .account-access-content input,.lbw-root .account-settings-content input,.lbw-root .account-settings-content textarea{padding:10px 12px;border-radius:6px}
+@media(max-width:700px){.lbw-root .share-gallery{padding:16px}.lbw-root .share-gallery .share-capture-grid{grid-template-columns:1fr}}

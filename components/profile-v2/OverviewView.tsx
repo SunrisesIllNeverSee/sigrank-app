@@ -30,11 +30,13 @@ import type { TierProgress } from "@/lib/analytics/tier-progress";
 import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
 import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { FieldAverages } from "@/lib/analytics/field-average";
+import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { PassportCard } from "./PassportCard";
 import { FlapBoard } from "./FlapBoard";
 import { WorkflowMark } from "./WorkflowMark";
 import { workflowCohortRank } from "@/lib/analytics/workflow-cohort";
 import { lbwFontVars } from "@/components/live/fonts";
+import type { ProfileMarkOption } from "@/lib/profile/profile-marks";
 
 export interface OverviewViewProps {
   operator: Operator;
@@ -47,6 +49,8 @@ export interface OverviewViewProps {
   archetype: BuildArchetype | null;
   tierProgress: TierProgress | null;
   trophyCounts: TrophyCounts | null;
+  selectedPixelBadge?: ProfileMarkOption | null;
+  selectedSecondaryBadge?: ProfileMarkOption | null;
   watchCount: number;
   boardRows: LeaderboardRow[];
   history: HistoryPoint[];
@@ -203,6 +207,8 @@ export function OverviewView({
   archetype,
   tierProgress,
   trophyCounts,
+  selectedPixelBadge,
+  selectedSecondaryBadge,
   watchCount,
   boardRows,
   history,
@@ -273,9 +279,13 @@ export function OverviewView({
             pending={pending}
             archetype={archetype}
             trophyCounts={trophyCounts}
+            selectedPixelBadge={selectedPixelBadge}
+            selectedSecondaryBadge={selectedSecondaryBadge}
             fieldAvg={fieldAvg}
             cohort={wfCohort}
           />
+          <ArtworkShareControls target={`holocard-${operator.codename}`} title="holocard" animated
+            filename={`signalaf-holocard-${operator.codename}`} href={`/user/${encodeURIComponent(operator.codename)}`} />
         </div>
         <FlapBoard
           operator={operator}

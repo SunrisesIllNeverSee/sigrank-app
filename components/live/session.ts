@@ -24,7 +24,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchOperatorProfile } from "./enrich";
-import { badgeForPct, type PixelBadgeName } from "./PixelBadge";
+import { BADGE_LABELS, badgeForPct, type PixelBadgeName } from "./PixelBadge";
 
 export interface BoardSession {
   loaded: boolean;
@@ -77,10 +77,27 @@ export function fetchBoardSession(): Promise<BoardSession> {
       /* Linked operator → resolve live rank through the shared profile cache
          (same endpoint the drill enrichment hits; deduped per session). */
       if (codename) {
-        const p = await fetchOperatorProfile(codename);
+        const [p, preferences] = await Promise.all([
+          fetchOperatorProfile(codename),
+          sess.signedIn
+            ? fetch("/api/v1/profile", { cache: "no-store" })
+                .then((r) => r.ok ? r.json() : null)
+                .catch(() => null)
+            : Promise.resolve(null),
+        ]);
         const g = p?.current_rank?.global;
         if (typeof g === "number" && Number.isFinite(g)) sess.rank = g;
-        if (sess.signedIn) sess.pixelBadge = badgeForPct(p?.current_rank?.percentile);
+        if (sess.signedIn) {
+          const owner = preferences?.operator;
+          const hasPreference = owner?.codename?.toLowerCase() === codename.toLowerCase()
+            && Object.hasOwn(owner, "profile_pixel_badge");
+          const selected = hasPreference ? owner.profile_pixel_badge : null;
+          sess.pixelBadge = hasPreference
+            ? typeof selected === "string" && Object.hasOwn(BADGE_LABELS, selected)
+              ? selected as PixelBadgeName
+              : null
+            : badgeForPct(p?.current_rank?.percentile);
+        }
       }
       return sess;
     })

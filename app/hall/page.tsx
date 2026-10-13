@@ -8,6 +8,7 @@ import { HallWorkspace } from "@/components/hall/HallWorkspace";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import type { LeaderboardRow } from "@/lib/board";
+import Link from "next/link";
 
 export const metadata: Metadata = withOG({
   title: "AI Operator Hall of Fame",
@@ -135,6 +136,9 @@ export default async function HallPage() {
           the Hall rewards efficiency architecture over brute-force token
           production.
         </p>
+        <Link href="/hall/badges" className="mt-5 inline-flex border-b border-gold/40 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-gold hover:border-gold">
+          Open the Badge Index →
+        </Link>
       </section>
 
       {/* HALL Task 6: coming-soon markers (Eras teaser · Season Leaders · Sessions) —

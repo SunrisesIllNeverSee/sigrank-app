@@ -2,7 +2,9 @@
 
 import { useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useProfileWorkspace } from "./ProfileWorkspace";
+import { useProfileAuth } from "@/components/profile/ProfileAuthGate";
 
 /**
  * components/profile-v2/ProfileTabsV2.tsx — tab bar for the redesigned
@@ -14,8 +16,7 @@ import { useProfileWorkspace } from "./ProfileWorkspace";
  * hydrate.
  *
  * v2 differences:
- *   - 7 tabs (adds "analysis"); "settings" stays out — it's owner-only and the
- *     parent page renders it as its own surface.
+ *   - Seven profile tabs with a separate owner-only Settings link.
  *   - The two owner-gated tabs (report / lab) are ALWAYS in the bar: when the
  *     viewer isn't the owner they render dimmed + non-interactive with a lock
  *     icon, so the gating reads as intentional rather than a missing tab.
@@ -89,6 +90,7 @@ export function ProfileTabsV2({
   const urlTab = searchParams.get("tab") as TabKey | null;
   const [localTab, setTab] = useState<TabKey>(urlTab && TABS.some((t) => t.key === urlTab) ? urlTab : initial);
   const workspace = useProfileWorkspace();
+  const { isOwner } = useProfileAuth();
   const tab = workspace?.section ?? localTab;
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -146,10 +148,11 @@ export function ProfileTabsV2({
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex min-w-0 items-center gap-2 border-b border-bg-border">
       <div
         role="tablist"
         aria-label="Profile sections"
-        className="flex gap-1 overflow-x-auto border-b border-bg-border"
+        className="flex min-w-0 flex-1 gap-1 overflow-x-auto"
       >
         {visibleTabs.map((t) => {
           const locked = content[t.key] == null;
@@ -197,6 +200,16 @@ export function ProfileTabsV2({
             </button>
           );
         })}
+      </div>
+      {isOwner && (
+        <Link
+          href="/me/edit#profile-display"
+          className="shrink-0 border-b-2 border-transparent px-3 py-2 font-mono text-xs uppercase tracking-[0.06em] text-text-muted transition-colors hover:border-gold hover:text-text-primary"
+          aria-label="Profile settings: badges and marks"
+        >
+          Settings
+        </Link>
+      )}
       </div>
 
       <div
