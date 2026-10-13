@@ -55,7 +55,7 @@ export default function PercentileBands({
           </>
         )}
         <a href="/login" className="text-gold underline hover:text-text-primary">
-          Claim your profile to see exactly where you land
+          Sign up to see exactly where you land
         </a>
       </p>
     </div>

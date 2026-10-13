@@ -35,7 +35,7 @@ const PILLARS: { h: string; b: string }[] = [
   },
   {
     h: "Operator-owned",
-    b: "Anonymous by codename. Claim your profile when you want it; the score is yours, computed from your own telemetry.",
+    b: "Anonymous by codename. Sign up when you want in; the score is yours, computed from your own telemetry.",
   },
 ];
 

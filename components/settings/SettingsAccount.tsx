@@ -151,7 +151,7 @@ export function SettingsAccount() {
                 Sign in to manage your account
               </span>
               <span className="font-sans text-[11px] text-text-dim">
-                Claim your profile, set your handle, and edit your details.
+                Create your profile, set your handle, and edit your details.
               </span>
             </div>
             <Link
