@@ -1,47 +1,45 @@
-import { TerminalBlockText } from "@/components/home/TerminalBlockText";
-import { getAverageUsersColumn, getPowerUsersColumn, getTopOperatorColumn, AA_BASELINE, type GoldColumn } from "@/lib/marketing/top-operator-column";
+import Link from "next/link";
+import { getLeaderboard } from "@/lib/board";
+import { getAverageUsersColumn, getPowerUsersColumn, AA_BASELINE, type GoldColumn } from "@/lib/marketing/top-operator-column";
+import { fourDegreesHighs } from "@/lib/share/four-degrees-highs";
 import { ArtworkShareControls } from "./ArtworkShareControls";
 import "./four-degrees-card.css";
 
-const METRICS: { key: keyof GoldColumn; label: string }[] = [
-  { key: "yield_", label: "Υ YIELD" },
-  { key: "snr", label: "SNR" },
-  { key: "velocity", label: "VELOCITY · O/I" },
-  { key: "leverage", label: "LEVERAGE · CR/I" },
-  { key: "dev10x", label: "10xDEV · log₁₀" },
-  { key: "efficiency", label: "EFFICIENCY · vs AA" },
-  { key: "opRatio", label: "CACHE : INPUT : OUTPUT" },
+const METRICS: { key: keyof GoldColumn; label: string; detail: string }[] = [
+  { key: "yield_", label: "Yield", detail: "Υ · cascade output" },
+  { key: "snr", label: "Signal-to-noise", detail: "SNR" },
+  { key: "velocity", label: "Velocity", detail: "Output / Input" },
+  { key: "leverage", label: "Leverage", detail: "Cache-read / Input" },
+  { key: "dev10x", label: "10xDEV", detail: "log₁₀ Leverage" },
+  { key: "efficiency", label: "Efficiency", detail: "Relative to AA" },
+  { key: "opRatio", label: "Operating ratio", detail: "Cache : Input : Output" },
 ];
 
 export async function FourDegreesShareCard() {
-  const [field, power, top] = await Promise.all([getAverageUsersColumn(), getPowerUsersColumn(), getTopOperatorColumn()]);
-  const columns = [
-    { label: "AA BASELINE", note: "Modeled · 7:2:1 reference", value: AA_BASELINE, color: "#9ba7a0" },
-    { label: "THE FIELD", note: "Operator center of mass · median", value: field, color: "#5dded0" },
-    { label: "POWER USERS", note: "Top 100 by Yield · median", value: power, color: "#b598ff" },
-    { label: "TOP EVAL", note: "Single qualifying top operator", value: top, color: "#efc44c" },
-  ];
+  const [field, power, board] = await Promise.all([
+    getAverageUsersColumn(), getPowerUsersColumn(),
+    getLeaderboard({ window: "all_time", windowFilter: true, operatorTotal: true, claimedOnly: true, mode: "all" }),
+  ]);
+  const oitl = fourDegreesHighs(board, "hitl");
+  const auto = fourDegreesHighs(board, "agentic");
+  const values = [AA_BASELINE, field, null, power, oitl, auto];
   return <div className="four-share-wrap">
-    <article id="four-degrees-share-card" className="four-share-card" aria-label="Four Degrees of Leverage share card">
-      <div className="four-share-mast"><span><i /> SIGNALAF × SIGRANK</span><span>OPERATOR EVALUATION / 04 DEGREES</span></div>
-      <header className="four-share-heading">
-        <TerminalBlockText text="FOUR DEGREES" />
-        <h1>OF LEVERAGE</h1>
-        <p>The baseline builds. The field caches. A few compound.</p>
+    <article id="four-degrees-share-card" className="four-share-card" aria-label="AI operator comparison share card">
+      <header className="four-share-heading"><div className="four-share-brand"><span className="four-share-symbol">S</span> SignalAF <span>AI operator evaluation</span></div>
+        <h1>Same AI. Different outcomes.</h1><p>How does the way you use AI compare?</p>
       </header>
-      <div className="four-share-degrees">
-        {columns.map((column, index) => <section key={column.label} style={{ "--degree-ink": column.color } as React.CSSProperties}>
-          <div className="four-share-degree-top"><span>0{index + 1}</span><svg viewBox="0 0 36 28" aria-hidden="true">{Array.from({ length: 4 }, (_, step) => <rect key={step} x={step * 9} y={24 - step * 6} width="6" height={4 + step * 6} fill="currentColor" opacity={step <= index ? 1 : 0.12} />)}</svg></div>
-          <h2>{column.label}</h2><p>{column.note}</p>
-          <strong>{column.value?.leverage ?? "—"}</strong><span className="four-share-unit">CACHE LEVERAGE</span>
-        </section>)}
-      </div>
-      <table className="four-share-metrics"><caption>THE CASCADE · FOUR REFERENCE POINTS</caption>
-        <thead><tr><th scope="col">METRIC</th>{columns.map(column => <th key={column.label} scope="col">{column.label}</th>)}</tr></thead>
-        <tbody>{METRICS.map(metric => <tr key={metric.key}><th scope="row">{metric.label}</th>{columns.map(column => <td key={column.label} style={{ color: column.color }}>{String(column.value?.[metric.key] ?? "—")}</td>)}</tr>)}</tbody>
+      <table className="four-share-metrics"><caption>Four degrees of leverage · find where you fit</caption>
+        <colgroup><col className="four-share-label-col" /><col /><col /><col className="four-share-you-col" /><col /><col /><col /></colgroup>
+        <thead><tr className="four-share-groups"><th colSpan={5} /><th colSpan={2} scope="colgroup">SignalAF · metric highs</th></tr>
+          <tr><th scope="col">The cascade</th><th scope="col">Average world user<span>Modeled baseline*</span></th><th scope="col">Our field<span>Typical operator · median</span></th>
+            <th scope="col" className="four-share-cta-head">Ever wondered how you use AI vs. someone else?<Link href="/board/all">Find your rank ↗</Link></th>
+            <th scope="col">Power users<span>Top 100 · median</span></th><th scope="col">OITL<span>Operator in the loop</span></th><th scope="col">Auto†<span>Autonomous / review</span></th></tr>
+        </thead>
+        <tbody>{METRICS.map(metric => <tr key={metric.key}><th scope="row">{metric.label}<span>{metric.detail}</span></th>{values.map((column, index) => <td key={index} className={index === 2 ? "four-share-question" : index >= 4 ? "four-share-high" : ""}>{index === 2 ? <span aria-label="Your score is waiting">?</span> : String(column?.[metric.key] ?? "—")}</td>)}</tr>)}</tbody>
       </table>
-      <footer className="four-share-footer"><div><strong>TOKEN COUNTS ONLY. NEVER YOUR PROMPTS.</strong><p>All-time board · qualifying compounding operators · outliers excluded.<br />AA is modeled; field and power values are medians; top eval is one operator.<br />Unavailable measured columns display —. Values reflect this render.</p></div><div><strong>MO§ES™</strong><span>signalaf.com/wiki/four-degrees</span></div></footer>
+      <div className="four-share-bottom"><strong>Your tool is only half the story.<br /><span>Measure the operator.</span></strong><Link href="/board/all">Find your rank <span>signalaf.com</span><b aria-hidden="true">↗</b></Link></div>
+      <footer className="four-share-footer"><p>*World-user reference is the AA 7:2:1 modeled baseline, not a measured worldwide average. Field & power users: medians of qualifying compounding operators, excluding outliers. OITL/Auto: per-metric highs on the claimed all-time board; highs can belong to different operators. Operating ratio uses each cohort’s Yield leader.</p><p>†Auto follows the board’s filter and includes unresolved review candidates; this does not verify autonomy. Hybrid rows can appear in both groups. — = unavailable. Values captured at render.</p><span>Source & methodology: signalaf.com/wiki/four-degrees · Token counts only. Never your prompts.</span></footer>
     </article>
-    <ArtworkShareControls target="four-degrees-share-card" title="Four Degrees card" filename="signalaf-four-degrees-card" href="/wiki/four-degrees" />
+    <ArtworkShareControls target="four-degrees-share-card" title="AI comparison card" filename="signalaf-ai-comparison-linkedin" href="/wiki/four-degrees" backgroundColor="#ffffff" />
   </div>;
 }
