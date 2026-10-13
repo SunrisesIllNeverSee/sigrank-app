@@ -3,8 +3,8 @@
 import { useState } from "react";
 import "./artwork-share.css";
 
-export function ArtworkShareControls({ target, title, filename, href, animated = false, backgroundColor = "#0b100b" }: {
-  target: string; title: string; filename: string; href: string; animated?: boolean; backgroundColor?: string;
+export function ArtworkShareControls({ target, title, filename, href, animated = false, backgroundColor = "#0b100b", pixelRatio = 3 }: {
+  target: string; title: string; filename: string; href: string; animated?: boolean; backgroundColor?: string; pixelRatio?: number;
 }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -41,7 +41,7 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
         await original.decode();
       }
       const { toBlob } = await import("html-to-image");
-      const options = { pixelRatio: 3, backgroundColor, cacheBust: false };
+      const options = { pixelRatio, backgroundColor, cacheBust: false };
       if (navigator.vendor.includes("Apple")) await toBlob(node, options);
       const blob = await toBlob(node, options);
       if (!blob) throw new Error("Image could not be rendered");
