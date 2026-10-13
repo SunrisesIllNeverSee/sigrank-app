@@ -262,7 +262,7 @@ export default async function ShareOperatorPage({
           {[
             { name: "AI comparison · LinkedIn & X", href: "/share/four-degrees", note: "Three bold themes · square / landscape · editable Canva files" },
             { name: "Leaderboard", href: "/board/all", note: "Share → Screenshot PNG; keeps your current filters" },
-            { name: "Compare / VS", href: `/compare?a=${encodeURIComponent(row.operator.codename)}&b=the-field`, note: "Share VS matchup → Download PNG" },
+            { name: "Compare / VS", href: `/compare?a=${encodeURIComponent(row.operator.codename)}`, note: "Share VS matchup → Download PNG" },
             { name: "User profile", href: profilePath, note: "Screen capture → Download PNG; captures your current view" },
           ].map(item => <Link key={item.name} href={item.href} className="rounded-lg border border-bg-border p-4 hover:bg-bg-hover">
             <strong className="text-text-primary">{item.name} →</strong><p className="mt-2 text-xs text-text-muted">{item.note}</p>

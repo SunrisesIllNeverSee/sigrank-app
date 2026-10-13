@@ -220,7 +220,7 @@ export default function AboutPage() {
             </p>
           </details>
 
-          <details className="group rounded-lg border border-bg-border bg-bg-surface p-4">
+          <details id="install" className="group rounded-lg border border-bg-border bg-bg-surface p-4">
             <summary className="cursor-pointer font-sans text-sm font-semibold text-text-primary">
               How can I tell if I&apos;m good at using AI?
             </summary>
