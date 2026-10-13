@@ -13,8 +13,9 @@
  *   NEXT_PUBLIC_GATE_ARENA=true in .env.local / Vercel env
  */
 
-function envBool(key: string, defaultVal = false): boolean {
-  const v = process.env[key];
+// Takes the value, not the key: Next.js only inlines NEXT_PUBLIC_* into client
+// bundles for literal `process.env.NEXT_PUBLIC_X` references.
+function envBool(v: string | undefined, defaultVal = false): boolean {
   if (v === undefined || v === "") return defaultVal;
   return v === "1" || v.toLowerCase() === "true";
 }
@@ -33,20 +34,19 @@ export const FEAT_COMPARE_TABLE = true; // /compare metric table + radar
 // ---------------------------------------------------------------------------
 
 /** /arena — signal-Areana challenge submission interface (Phase 4) */
-export const GATE_ARENA = envBool("NEXT_PUBLIC_GATE_ARENA", false);
+export const GATE_ARENA = envBool(process.env.NEXT_PUBLIC_GATE_ARENA, false);
 
 /** Throw-down initiation from /transmitters + /compare (depends on GATE_ARENA) */
-export const GATE_CHALLENGES = envBool("NEXT_PUBLIC_GATE_CHALLENGES", false);
+export const GATE_CHALLENGES = envBool(process.env.NEXT_PUBLIC_GATE_CHALLENGES, false);
 
 /** Weekly signal drop (cron + signal_prompts seeder) */
-export const GATE_SIGNAL_DROP = envBool("NEXT_PUBLIC_GATE_SIGNAL_DROP", false);
+export const GATE_SIGNAL_DROP = envBool(process.env.NEXT_PUBLIC_GATE_SIGNAL_DROP, false);
 
 /** Blind bracket / Circle Wars */
-export const GATE_BRACKETS = envBool("NEXT_PUBLIC_GATE_BRACKETS", false);
+export const GATE_BRACKETS = envBool(process.env.NEXT_PUBLIC_GATE_BRACKETS, false);
 
 /** Species badge on trading card / wrapped view */
-export const GATE_TRADING_CARD_SPECIES = envBool(
-  "NEXT_PUBLIC_GATE_TRADING_CARD_SPECIES",
+export const GATE_TRADING_CARD_SPECIES = envBool(process.env.NEXT_PUBLIC_GATE_TRADING_CARD_SPECIES,
   false,
 );
 
