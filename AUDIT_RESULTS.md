@@ -1,28 +1,86 @@
-# SignalAF site audit — AUDIT_RESULTS.md
+# SignalAF Rebuild — Staging Audit Results
 
-Audit of the staged rebuild `integration/site-a315435` (preview http://localhost:3230).
-Findings recorded per owner format: URL | Issue | Severity | Reproduction | Implemented fix or recommendation | File/line | Commit | Verification | Remaining work.
+**Audit target:** `integration/site-a315435` @ `1a505a0`, previewed at `http://localhost:3230`.
+**Fix branch:** `audit/site-a315435` (this worktree `_audit_fixes_20261013`), PR target `integration/site-a315435`.
+**Status label:** ALL findings are STAGING findings — production (`signalaf.com`) still serves the Oct-10 baseline `54484c7`; the rebuild is NOT deployed. Production was probed only for release regressions/urgent security issues, not comprehensively audited.
+**Method:** deterministic 235-route sweep + 3 parallel lanes (wiring trace, Playwright Chromium+WebKit interaction audit, static link-graph audit) + targeted verification. Lane artifacts: `/tmp/pw-audit/*.mjs`, `/tmp/audit-*.png`.
 
-## Deployment status (checked 2026-10-13)
+## Deployment-gap note
 
-- **signalaf.com serves `54484c7`** — Oct-10 baseline + PR #243 markdown-404 fix. **REBUILD NOT DEPLOYED.** Missing staging work: 69 commits / 364 files / +44,356 (−3,565), incl. 7 new routes (`/articles`, `/sigrank`, `/hall/badges`, `/s/[codename]`, `/share/four-degrees`, `/editor/review`, `/wiki/metrics/scale-v`), board/profile/compare redesign, badge + share systems, migration 0052.
-- All findings below are **staging findings** against commit `1a505a0` unless noted.
+| | commit | delta vs deployed |
+|---|---|---|
+| Live `signalaf.com` | `54484c7` (PR #243 = Oct-10 baseline + markdown-404 fix) | — |
+| Staged `integration/site-a315435` | `1a505a0` | **+69 commits / 364 files / +44,356−3,565** |
 
-## Site map (staging, 235 routes swept)
+Missing from prod: 7 new routes (`/articles`, `/sigrank`, `/hall/badges`, `/s/[codename]`, `/share/four-degrees`, `/editor/review`, `/wiki/metrics/scale-v`) + all redesigned surfaces (live board, profile-v2 rail, compare, badges, share, watchlist, review editor). All 225 prod routes still resolve in staging.
 
-`TOTAL 235 · OK 234 · non-200: /search (intentional — flag-gated rollout shell)`
+## Route sweep (:3230, 235-route manifest)
 
-Groups: `/` (leaderboard), `/board/{7d,30d,90d,all}`, `/user/[codename]`, `/compare`, `/hall`, `/hall/badges`, `/s/[codename]`, `/sigrank`, `/field`, `/fieldhub`, `/wiki/*`, `/articles`, `/blog/*`, `/guides/*`, `/tools/*`, `/vs/*`, `/alternatives/*`, `/standard`, `/science`, `/research`, `/about`, `/faq`, `/contact`, `/pricing`, `/upgrade`, `/login`, `/me/edit`, `/editor/review` (dev-only), `/search` (flagged), plus 150+ SEO/AEO editorial routes (intentional per AGENTS.md — excluded from dead-link review).
+**234/235 → 200.** Sole non-200: `/search` → 404, confirmed INTENTIONAL — `app/search/page.tsx` returns `notFound()` while `NEXT_PUBLIC_FEATURE_EXCHANGE_SEARCH` is off; Nav hides the entry under the same flag (`components/ui/Nav.tsx`). Rollout shell, not a defect.
 
-## Findings
+## Owner review-editor checklist (`~/Downloads/signalaf-review.md`, 1 open item)
 
-| # | URL | Issue | Severity | Reproduction | Implemented fix / recommendation | File/line | Commit | Verification | Remaining |
-|---|-----|-------|----------|--------------|----------------------------------|-----------|--------|--------------|-----------|
-| F-1 | /login (+ every page) | `.lbw-root button` + `.lbw-root a` resets (specificity 0,1,1) override all Tailwind `bg-*`/`text-*`/`underline` utilities on buttons/links sitewide. "Email me a magic link" loses `bg-gold`+`text-bg-base` → renders as plain text, not a CTA. "Continue with GitHub" loses `bg-elevated` fill (outline survives via `button.border` restore). | HIGH | localhost:3230/login — computed bg `rgba(0,0,0,0)` + `color:inherit` on both OAuth buttons and gold submit. | `:where()`-wrap the three resets → specificity (0,0,x); utilities win, unclassed proto elements keep resets. | components/live/proto-scoped.css:80-82 | pending | Computed styles verified in-browser: gold fill `rgb(224,178,64)` + dark text `rgb(8,16,13)` restored; GitHub `1px solid` outline retained; /board/all proto buttons unchanged (sbtn/laybtn/avatar class rules unaffected). | none |
-| V-1 | /search | Returns 404. | — | curl 404 | Verified INTENTIONAL: `exchange_search` PostHog flag gates `notFound()`; nav link also hidden when flag off. Rollout shell, not a defect. | app/search/page.tsx:22-24 | — | code inspection | none |
-| V-2 | /login | Owner checklist: "confirm this control retains the thin solid outline" (Continue with GitHub, 750×662). | — | playwright @750×662 | Verified: `1px solid rgb(38,54,28)` — thin solid outline present and visible. RESOLVED — owner item closed. | components/auth/LoginButtons.tsx:77-78 | — | screenshot /tmp/audit-login-github-btn.png | none |
+| Item | Result |
+|---|---|
+| `/login` "Continue with GitHub" — thin solid outline @ 750×662 | **VERIFIED OK** — computed `1px solid rgb(38,54,28)`; visible on card. Note: a separate site-wide regression (F-1) stripped its background fill — the outline itself always survived. |
 
-*More findings land here as the three audit lanes (wiring trace, interaction flows, link inventory) report back.*
-| V-3 | /me, /me/edit | — | — | curl | Verified: 307 → /login?next=/. API /api/v1/profile returns {"operator":null} anon. /settings public shell with sign-in gates on Account/Privacy; Appearance local-only. Privacy boundaries hold. | app/(auth) middleware | — | curl | none |
-| F-2 | / (every page via layout) | Hydration mismatch: `<CopyButton>` (<button>) nested inside outer `<button>` in NavNpxCTA — browser splits invalid nesting → DOM≠SSR tree → "tree will be regenerated on the client" on every page load. Outer button also had `onClick={undefined}` (dead). | MED | load / or any route — console shows hydration error | outer `<button>` → `<div>` (keeps pill styling; CopyButton remains the copy control) | components/ui/NavNpxCTA.tsx:17,40 | pending | playwright: 0 hydration errors on / post-fix; pill renders; note: clipboard write unverifiable headless | consider making whole pill the copy trigger (owner UX call) |
-| F-3 | /, /board/* | React duplicate-key warnings ×4/page: `{visible.flatMap((m) => chart(m))}` — flatMap makes each metric's `key={i}` paths/bars siblings → every index restarts at 0 → 5× key "0". | MED | console on /board/all — "Encountered two children with the same key, 0" ×4; fiber probe: 5 sibling <path> keyed 0 under CombinedSignal | metric-qualify keys: `key={\`${m.id}-${i}\`}` on <rect> + <path> returns | components/live/CombinedSignal.tsx:194,207 (render at :398) | pending | playwright: 0 dup-key errors post-fix; chart paths still render | none |
+## Findings — FIXED on `audit/site-a315435`
+
+| ID | URL | Issue | Severity | Reproduction | Implemented fix | File/line | Commit | Verification | Remaining |
+|---|---|---|---|---|---|---|---|---|---|
+| F-1 | `/login` + every page | `proto-scoped.css` `.lbw-root button/a` element resets (spec. 0,1,1) beat Tailwind `bg-*`/`text-*` utilities — gold magic-link CTA rendered as plain text, OAuth button lost fill | MED | playwright: `bg-gold` button → `background:rgba(0,0,0,0)` | Lowered resets to `:where()` (zero-specificity) — matches existing pattern `globals.css:163` | `components/live/proto-scoped.css:80-81` | `26f7d6f` | playwright: CTA restored `rgb(224,178,64)`+dark text; GitHub outline kept; board proto buttons unaffected | none |
+| F-2 | `/` + nav pages | `NavNpxCTA` nested `<CopyButton>` (a `<button>`) inside `<button>` → invalid HTML → hydration mismatch, client re-render | MED | console: `<button> cannot be a descendant` + hydration error on `/` | Outer element → `<div>` (pill styling kept; Copy button stays the copy target) | `components/ui/NavNpxCTA.tsx:17-40` | `0707aba` | playwright: hydration error gone on `/` | none |
+| F-3 | `/`, `/board/all` | React duplicate-key `0` ×4-8/page — `visible.flatMap(m => chart(m))` made each metric's `key={i}` children siblings | MED | console `same key '0'`; fiber walk → 5 `<path>` + `<rect>` siblings keyed `0` under `CombinedSignal` | Metric-qualified keys: `` `${m.id}-${i}` `` on paths + bars | `components/live/CombinedSignal.tsx:398` | `0707aba` | playwright: 0 dup-key errors, chart renders | none |
+| F-4 | `/pricing` | Same class of bug — `freeFeatures` keyed by `href`, `/developers` appears twice → dup-key warning | LOW | console `same key '/developers'` on `/pricing` | `key={title}` (titles unique) | `app/pricing/page.tsx:56` | this commit | playwright: 0 dup-key errors on `/pricing` | none |
+| F-5 | `/s/[codename]` | "Compare / VS" capture card hardcoded `b=the-field`; `the-field` is excluded from live compare (`compare-live.ts:10`) → URL claims a matchup the resolver silently substitutes | LOW-MED | link href `?a=xoxo&b=the-field` renders a different opponent | Dropped `&b=the-field` — resolver picks deterministic B; URL no longer lies | `app/s/[codename]/page.tsx:265` | this commit | playwright: href now `/compare?a=xoxo` | optional: substitution notice in compare (R-5) |
+| F-6 | `/about`, `/vercel` | Dead anchors: `/support` links `/about#install` and `/vercel#diagnostic` — neither `id` existed (200 + no scroll) | LOW | static trace; `id` absent in served HTML | Added `id="install"` (FAQ `<details>` w/ `npx sigrank`) and `id="diagnostic"` (diagnostic `<section>`) | `app/about/page.tsx:223`, `app/vercel/page.tsx:60` | this commit | playwright: inner `.stage` scroller → el top:24 (hash) vs top:3708 (no-hash) | none |
+| F-7 | `/compare` | `ChallengeBar` "Enter arena →" links `/arena?challenge=` — **no `/arena` route exists** (Phase-4 external app). Gate `GATE_CHALLENGES` alone → latent 404 whenever challenges enabled | MED (latent) | static: `app/arena` absent; flag default `false` both envs | Gated the CTA on `GATE_ARENA` (documented dependency; `challengesEnabled()` exists but was dead code) | `components/compare/ChallengeBar.tsx:19,86` | this commit | tsc; flag-off render unchanged | owner-input: `/arena` route/app URL when GATE_ARENA ships (R-9) |
+| F-8 | `/` dock + `/api/v1/operators/*` | Claimed op absent from `claimedRankMap` (unresolved-mode snapshots) → `global_rank:0` surfaces as literal `#0` in dock chip; session.rank=0 | MED | code trace `queries.ts:625-633` → `session.ts:88` → `LiveBoardWorkspace.tsx:1326` | Display layer: `sess.rank` only set when `g>0`; dock chip `rank>0` guard → renders `—` (matches hero UNRANKED convention) | `components/live/session.ts:89`, `LiveBoardWorkspace.tsx:1326` | this commit | tsc; unranked → `—` | API `current_rank:0` contract — owner-input (R-1) |
+| F-9 | `/api/v1/claim` | Comment claims "Rate-limited via the standard gate" — **no `rateLimit` call exists**; exact-token claim check brute-forceable per IP | MED | code trace: no `rateLimit(req)` in POST | Added `rateLimit(req)` + `rateLimitedResponse` (sibling-route pattern) | `app/api/v1/claim/route.ts:6,36-37` | this commit | tsc; pattern identical to `operators/route.ts:30` | optional: per-user attempt lockout (R-6) |
+| F-10 | `/api/v1/operators/{c}/history` | Missing per-IP `rateLimit` its siblings apply (`records`, `operators/{c}`) | LOW | code trace | Added same two-line gate | `app/api/v1/operators/[codename]/history/route.ts:13-16,24-25` | this commit | tsc | none |
+| F-11 | `/api/v1/account/removal-request` | Raw user `handle` interpolated into email `subject:` — header-injection primitive | LOW | code trace `route.ts:95` | Strip control chars before trim/slice | `app/api/v1/account/removal-request/route.ts:71-74` | this commit | tsc | none |
+| F-12 | `/user/X` (case-variant) | Owner gates compare codename case-sensitively — `/user/XOXO` loads profile (ilike resolves) but hides owner edit/kernel/watchlist | LOW | `ProfileAuthGate.tsx:66`, `SubmissionsView.tsx:385`, `MyWatchlist.tsx:13` all `===` | `.toLowerCase()` both sides at all three gates | same files | this commit | tsc | none |
+| F-13 | `/user/%25`, `/api/v1/operators/%` | `.ilike("codename", codename)` unescaped — `%`/`_` URL segments wildcard-match the first operator (identity confusion + enumeration primitive); public data only | LOW | static: 6 `.ilike` sites in `queries.ts` | `escapeLike()` helper (`[%_\\]` → `\…`) applied at all 6 sites; case-fold preserved | `lib/board/queries.ts:261-263` + 6 call sites | this commit | tsc 0 err | none |
+| F-14 | `/hall`, homepage stats strip | `getHallOfSignal` + `getHomepageStats` FK-embed base `operators` — bypass `operators_public` visibility contract → private-profile op holding a badge/top spot leaks codename/display_name | LOW | code trace `queries.ts` both joins | Hall: batched `operators_public` visibility lookup, private → `unknown` (fail-closed). Stats: `top_operator_id` resolved via `publicOperatorCodename()` (public-only, `""` fallback) | `lib/board/queries.ts:992-1011,1026-1052,1120-1137` | this commit | tsc 0 err; full suite 682/0 fail | none |
+
+## Findings — RECOMMENDATION / OWNER-INPUT (no code change)
+
+| ID | Item | Severity | Detail | Recommended action / owner decision needed |
+|---|---|---|---|---|
+| R-1 | `/api/v1/operators/{c}` `current_rank` emits `0` for claimed-unranked | MED | Display leak fixed (F-8) but API still returns `global_rank:0, percentile:0` — `#0` is not a representable rank | Owner decision: emit `null`/unranked sentinel (contract change) vs rank_history fallback (reintroduces the basis mismatch the 2026-09-27 fix removed). Recommend `null` + doc note |
+| R-2 | `/api/v1/premium/insights` + `/cascade-report` serve canned data behind `withX402` payment gate | **HIGH (integrity)** | Hardcoded `archetype_distribution` incl. the Υ-18436.98 seed; identical "analysis" for any `?codename=` (`insights/route.ts:17-46`, `cascade-report/route.ts:25-60`) | Owner decision: wire real computation, ship explicit `mock:true`/demo flag, or 501 until implemented. Not silently patched — product/pricing call |
+| R-3 | `?mode=hitl` cohort semantics diverge API↔UI | MED | `includesBoardMode("hitl",null)===true` (`workflow-mode.ts:35`) but workspace filter excludes null-mode rows from HITL — API `?mode=hitl` returns rows the site rail hides | Owner decision on canonical semantics; then align `includesBoardMode` or document the divergence in `api_spec` |
+| R-4 | Default `/api/v1/leaderboard` mixes unclaimed rows; rank basis ≠ `/board/all` | LOW | `claimedOnly: mode!==null` (`route.ts:79`) renumbers over the mixed corpus | Document the full-corpus contract, emit both ranks, or default `claimedOnly:true` |
+| R-5 | `/compare` silent operand substitution, no notice | LOW | `?a=bogus&b=zzz` → 200 with day-seeded pair, URL still claims invalid codenames (`resolveLiveComparePair` `?? fallbackA`) | Optional UX notice "requested operator unavailable — showing X vs Y". Partially mitigated by F-5 |
+| R-6 | Back-nav resets scroll + board filter state | LOW | mode/platform/class/sort are client-state only (window is the sole deep-link unit) | Product call: lift filter state into query params (shareable filtered views) vs accept reset |
+| R-7 | `?v=legacy` window selector still offers `"off"` | LOW | `/board/off` → 308 `/board/all` — option leads somewhere other than labeled | Remove `"off"` from `WINDOW_OPTS` (`LeaderboardTable.tsx:323`) — legacy surface, cosmetic |
+| R-8 | Footer `/marketplace` label mismatch | LOW | Route is a `noindex` internal asset index (PNG/SVG grid), not a product marketplace | Relabel or relink — copy/SEO decision |
+| R-9 | `/arena` route/app missing | MED (latent) | F-7 gates the link on `GATE_ARENA`, but enabling that flag still 404s — no same-origin route exists | Owner-input: arena app URL/route before shipping `NEXT_PUBLIC_GATE_ARENA=true` |
+| R-10 | Session-cache staleness on SPA login transition | LOW | `session.ts:49` module cache invalidated only on sign-out/save — login then client-nav leaves dock/watchlist signed-out until reload | Dispatch `workspace-session-changed` post-login, or subscribe `onAuthStateChange` |
+| R-11 | Watchlist owner-gate lacks its regression test on this branch | LOW | `__tests__/ui/owner-board-watchlist.test.tsx` exists in sibling staging snapshots, never merged here | Port the test file |
+| R-12 | OAuth cancel lands silently | INFO | `/auth/callback?error=access_denied` → `/login?next=…` with no message; only `code`-exchange failures surface `?error=auth` | Optional: surface "sign-in cancelled" notice |
+| R-13 | `?window=`/`?mode=` params silently ignored | INFO | `/board/all?window=7d` keeps the param, no effect (window is path-based) | Cosmetic — leave or strip |
+| R-14 | `/compare` ~3px document overflow @375px & WebKit desktop | LOW | `scrollWidth` 378/375, 1443/1440 — edge leak on an intentionally-scrollable stage | Optional: audit `.stagecol`/`.board` edge padding at narrow widths |
+| R-15 | Console noise | INFO | meta `;` parse warning (client-injected), JsonLd dev warning, `/api/auth/session` fetched twice | Optional cleanup; none user-visible |
+| R-16 | Unencoded codename interpolation (hall/wrapped) | INFO | `HallWorkspace`, `HallClient`, `MetricTopTen`, `wrapped` build `/user/${codename}` raw vs `encodeURIComponent` elsewhere | Currently safe — `CODENAME_RE` `[a-z0-9-]`; tighten only if charset loosens |
+| R-17 | Authenticated surface untested | — | No credentials in audit env — `/me` owner view, edit form, real watchlist, magic-link send verified from signed-out side only | Owner-input: run authenticated pass post-deploy |
+| R-18 | `/s/[codename]` vs `/user/[codename]` | — | Both exist by design (`/s/` = share surface). Confirmed distinct content | none |
+
+## Verified OK (key invariants — no defect)
+
+- **Auth flows:** GitHub+X OAuth carry correct `redirect_to=http://localhost:3230/auth/callback`; `?next=` threading incl. double-encoding works; `?next=https://evil.example.com` + `//evil.example.com` both stripped; `?error=auth` displays; callback failure paths land sanely. No Google button exists (provider set = GitHub/X/email by design, `LoginButtons.tsx:97-143`).
+- **Signed-out gates:** `/me`→`/login?next=/me`, `/me/edit`→`/login?next=/me/edit`, `/settings` renders designed signed-out state (appearance local-only, private sections gated), `/api/v1/profile` anon→`{operator:null}` clean.
+- **Privacy:** kernel endpoint owner-only double-gated (401 anon); private report never serialized to RSC, 404s for non-owner; `mapOperator` redacts private fields; `/api/v1/me/watches` caller-scoped+RLS; badge prefs validated against earned marks; removal-request intentionally public+rate-limited; localStorage holds only theme/pin/posthog/review-notes — no operator identity.
+- **Board/filters:** window deep-links distinct; mode/platform/class filters + column sort work; empty states designed; peek→profile 2-step is intentional; rank recompute over visible set verified in code.
+- **Compare:** `?a=&b=` deep-link resolves; candidate set claimed/qualified/deduped/positive-telemetry; `the-field` excluded by contract; deterministic fallback.
+- **Dialogs:** heatmap EXPAND + honors EXPAND → centered `<dialog>` (154-cell grid, Esc close) — verified Chromium + WebKit.
+- **Navigation:** 80+ unique internal hrefs → 200; zero `javascript:void`/empty `#`; rail/coming-soon entries correctly `disabled` buttons not links; all redirects resolve (board/everything, board/off, /leaderboard→/board/all, /user→/user/the-field).
+- **Scoring:** canonical 11/11; Υ formula + MOSES seeds untouched; RS.xx server-only.
+- **Gates after fixes:** `npx tsc --noEmit` 0 errors · `npm run test:canonical` 11/11 · `npm test` 682 pass / 0 fail / 4 skip · playwright verification per row above.
+
+## Post-publish follow-up (when rebuild deploys)
+
+1. Verify `signalaf.com` serves the intended release commit (check for `pv2-`/`prl-`/workflow-mark markers in prerendered HTML + Vercel deployment ID).
+2. Firecrawl-equivalent public inventory on the live domain (title/headings/outgoing-links/failures per page).
+3. Re-run the auth + OAuth + `?next=` matrix against production env vars.
+4. Authenticated pass (R-17).

@@ -1323,7 +1323,7 @@ export function LiveBoardWorkspace({
     return {
       mode: "in" as const,
       name: session.displayName ?? session.codename,
-      rank: session.rank != null ? `#${session.rank}` : "—",
+      rank: session.rank != null && session.rank > 0 ? `#${session.rank}` : "—",
     };
   }, [account, session]);
 

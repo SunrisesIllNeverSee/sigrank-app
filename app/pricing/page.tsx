@@ -53,7 +53,7 @@ export default function PricingPage() {
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {freeFeatures.map(([title, href, desc]) => (
             <Link
-              key={href}
+              key={title}
               href={href}
               className="rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-gold/50"
             >

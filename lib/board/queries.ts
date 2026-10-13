@@ -258,6 +258,10 @@ function resolvedModeForSnapshot(s: DbMetricSnapshot) {
   });
 }
 
+/** Escape LIKE metacharacters so URL-supplied codenames can't wildcard-match
+ *  (e.g. `/user/%25` or a `_` segment resolving the first matching operator). */
+const escapeLike = (s: string) => s.replace(/([%_\\])/g, "\\$1");
+
 /**
  * All operators columns the mapper reads — these are exactly the columns the
  * `operators_public` view exposes (P5 fix, 0008). claim_contact / claim_payment_id
@@ -520,7 +524,7 @@ export async function isOperatorRetired(codename: string): Promise<boolean> {
     const { data, error } = await sb
       .from("operators_public")
       .select("status")
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (error) return false;
@@ -549,7 +553,7 @@ export async function getOperator(
     const { data: opData, error: opError } = await sb
       .from("operators_public")
       .select(OPERATOR_COLUMNS)
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
@@ -824,7 +828,7 @@ export async function getOperatorSubmissions(
     const { data: opData, error: opError } = await sb
       .from("operators_public")
       .select("operator_id, primary_domain, claimed, status, profile_visibility")
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
@@ -879,7 +883,7 @@ export async function getOperatorHistory(
     const { data: opData, error: opError } = await sb
       .from("operators_public")
       .select("operator_id, claimed, status, profile_visibility")
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
@@ -985,6 +989,27 @@ export async function getMetricLeaders(
   return getLeaderboard({ ...params, sort: metric });
 }
 
+/** Resolve a codename only when the operator's profile is public — the
+ *  operators_public redaction contract applied to FK targets that joins
+ *  through the base `operators` table would otherwise expose. */
+async function publicOperatorCodename(
+  sb: SupabaseClient,
+  operatorId: string | null,
+): Promise<string> {
+  if (!operatorId) return "";
+  try {
+    const { data } = await sb
+      .from("operators_public")
+      .select("codename")
+      .eq("operator_id", operatorId)
+      .eq("profile_visibility", "public")
+      .maybeSingle();
+    return (data as { codename: string | null } | null)?.codename ?? "";
+  } catch {
+    return "";
+  }
+}
+
 /** Hall of Signal records. */
 export async function getHallOfSignal(
   params: BoardParams = {},
@@ -1000,7 +1025,7 @@ export async function getHallOfSignal(
       .select(
         "awarded_at, source_note, " +
           "badges:badge_id ( badge_name ), " +
-          "operators:operator_id ( codename, display_name )",
+          "operators:operator_id ( operator_id, codename, display_name )",
       )
       .order("awarded_at", { ascending: false });
     if (error) throw error;
@@ -1010,6 +1035,7 @@ export async function getHallOfSignal(
       source_note: string | null;
       badges: { badge_name: string | null } | null;
       operators: {
+        operator_id: string | null;
         codename: string | null;
         display_name: string | null;
       } | null;
@@ -1017,6 +1043,34 @@ export async function getHallOfSignal(
     const rows = (data as unknown as HallJoin[] | null) ?? [];
     // Live path: an empty awards table is an empty Hall, not fixture records.
     if (rows.length === 0) return [];
+
+    // The FK embed reads the base `operators` table, bypassing the
+    // operators_public redaction contract. Look up visibility for the joined
+    // ids and redact private operators' identity — fail closed on lookup error.
+    const joinedIds = [
+      ...new Set(
+        rows
+          .map((r) => r.operators?.operator_id)
+          .filter((id): id is string => !!id),
+      ),
+    ];
+    let publicIds: Set<string>;
+    try {
+      const { data: pub } = await sb
+        .from("operators_public")
+        .select("operator_id")
+        .eq("profile_visibility", "public")
+        .in("operator_id", joinedIds);
+      publicIds = new Set(
+        ((pub ?? []) as { operator_id: string }[]).map((r) => r.operator_id),
+      );
+    } catch {
+      publicIds = new Set();
+    }
+    const operatorName = (r: HallJoin) =>
+      r.operators?.operator_id && publicIds.has(r.operators.operator_id)
+        ? r.operators.display_name || r.operators.codename || "unknown"
+        : "unknown";
 
     const records: HallRecord[] = rows.map((r) => {
       // source_note may carry an explicit RW.xx reward id; otherwise fall back to
@@ -1028,8 +1082,7 @@ export async function getHallOfSignal(
         reward_id: rewardId,
         title:
           r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? "Hall of Signal",
-        operator_codename:
-          r.operators?.display_name || r.operators?.codename || "unknown",
+        operator_codename: operatorName(r),
         value: note || (r.badges?.badge_name ?? ""),
         date: (r.awarded_at ?? "").slice(0, 10),
         isPlaceholder: false,
@@ -1061,13 +1114,13 @@ export async function getHomepageStats(): Promise<HomepageStats> {
   const sb = getSupabaseServer();
   if (!sb) return MOCK_HOMEPAGE_STATS;
   try {
-    // Singleton aggregate block (system_stats.id is pinned TRUE), with the top
-    // operator's codename embedded via the top_operator_id FK.
+    // Singleton aggregate block (system_stats.id is pinned TRUE); the top
+    // operator's codename resolves via operators_public (visibility-gated).
     const { data, error } = await sb
       .from("system_stats")
       .select(
         "total_operators, total_snapshots, total_tokens_scored, transmitter_count, " +
-          "top_signa_rate, top_yield, operators:top_operator_id ( codename )",
+          "top_signa_rate, top_yield, top_operator_id",
       )
       .limit(1)
       .maybeSingle();
@@ -1079,7 +1132,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       transmitter_count: number | null;
       top_signa_rate: number | null;
       top_yield: number | null;
-      operators: { codename: string | null } | null;
+      top_operator_id: string | null;
     } | null;
     // No aggregate row → unavailable, not fixture totals. Zeros are the
     // honest state; isPlaceholder flags the surface for consumers that
@@ -1150,7 +1203,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       total_tokens_scored: num(s.total_tokens_scored),
       transmitter_count: num(s.transmitter_count),
       // Never fabricate a top operator — empty when the FK doesn't resolve.
-      top_operator_codename: s.operators?.codename ?? "",
+      top_operator_codename: await publicOperatorCodename(sb, s.top_operator_id),
       top_signa_rate: num(s.top_signa_rate),
       top_yield: num(s.top_yield),
       median_yield,
@@ -1496,7 +1549,7 @@ export async function getOperatorSnapshotRecords(
     const { data: opData, error: opError } = await sb
       .from("operators_public")
       .select("operator_id, claimed, status, profile_visibility")
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
@@ -1633,7 +1686,7 @@ export async function getOperatorWatchCount(
     const { data: opData, error: opError } = await sb
       .from("operators_public")
       .select("operator_id")
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;

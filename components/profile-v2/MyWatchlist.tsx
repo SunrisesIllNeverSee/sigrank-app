@@ -10,7 +10,7 @@ type WatchState = "loading" | "ready" | "unavailable";
 
 export function MyWatchlist({ codename }: { codename: string }) {
   const session = useBoardSession();
-  const isOwnProfile = session.loaded && session.signedIn && session.codename === codename;
+  const isOwnProfile = session.loaded && session.signedIn && session.codename?.toLowerCase() === codename.toLowerCase();
   const [state, setState] = useState<WatchState>("loading");
   const [watches, setWatches] = useState<WatchEntry[]>([]);
 
