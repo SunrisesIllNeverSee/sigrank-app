@@ -170,13 +170,38 @@ describe("Live mock fallback guards (when DB is configured)", () => {
           awarded_at: "2026-10-01T12:00:00Z",
           source_note: "Top Yield RW.15",
           badges: { badge_name: "Highest Yield" },
-          operators: { codename: "real-op", display_name: "Real Op" },
+          operators: {
+            operator_id: "op-real-1",
+            codename: "real-op",
+            display_name: "Real Op",
+          },
         },
       ];
+      // Names resolve only for operators visible via operators_public.
+      tableData["operators_public"] = [{ operator_id: "op-real-1" }];
       const hall = await getHallOfSignal();
       expect(hall).toHaveLength(1);
       expect(hall[0].operator_codename).toBe("Real Op");
       expect(hall[0].title).toBe("Highest Yield");
+    });
+
+    it("redacts the operator name to 'unknown' when the operator is not public", async () => {
+      tableData["operator_badges"] = [
+        {
+          awarded_at: "2026-10-01T12:00:00Z",
+          source_note: "Top Yield RW.15",
+          badges: { badge_name: "Highest Yield" },
+          operators: {
+            operator_id: "op-private-1",
+            codename: "private-op",
+            display_name: "Private Op",
+          },
+        },
+      ];
+      tableData["operators_public"] = [];
+      const hall = await getHallOfSignal();
+      expect(hall).toHaveLength(1);
+      expect(hall[0].operator_codename).toBe("unknown");
     });
   });
 
@@ -206,9 +231,11 @@ describe("Live mock fallback guards (when DB is configured)", () => {
           transmitter_count: 5,
           top_signa_rate: 98.5,
           top_yield: 1250,
-          operators: { codename: "champion-op" },
+          top_operator_id: "op-champ-1",
         },
       ];
+      // Top operator's codename resolves via operators_public (visibility-gated).
+      tableData["operators_public"] = [{ codename: "champion-op" }];
       const stats = await getHomepageStats();
       expect(stats.isPlaceholder).toBe(false);
       expect(stats.total_operators).toBe(42);
