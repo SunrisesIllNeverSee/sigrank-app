@@ -21,6 +21,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { resolveAuth } from "@/lib/infra/api-auth";
 import { rateLimit, rateLimitHeaders, rateLimitedResponse } from "@/lib/infra/api-gate";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
+import {
+  MAX_PROMPT_BRIEF_CHARS,
+  challengesMutedResponse,
+  isValidWindowHours,
+} from "@/lib/identity/challenge-limits";
+import {
+  publicCodenameSet,
+  redactEmbed,
+  resolvePublicOperatorId,
+} from "@/lib/identity/challenge-visibility";
 
 const DEFAULT_WINDOW_HOURS = 24;
 const DEFAULT_BRIEF =
@@ -39,6 +50,17 @@ function deterministicId(prefix: string, ...parts: string[]): string {
 // POST — create challenge
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
+  const muted = challengesMutedResponse();
+  if (muted) return muted;
+
+  const limited = await enforceRouteLimit(
+    req,
+    "challenge-create",
+    { windowMs: 60 * 60 * 1000, max: 20 },
+    { failClosed: true },
+  );
+  if (limited) return limited;
+
   let body: unknown;
   try {
     body = await req.json();
@@ -71,8 +93,26 @@ export async function POST(req: NextRequest) {
   const format = typeof b.format === "string" ? b.format : "throwdown";
   const challengerEngine =
     typeof b.challenger_engine === "string" ? b.challenger_engine : "claude";
+  if (b.window_hours !== undefined && !isValidWindowHours(b.window_hours)) {
+    return NextResponse.json(
+      { error: "invalid_window", detail: "window_hours must be an integer 1-168" },
+      { status: 400 },
+    );
+  }
   const windowHours =
     typeof b.window_hours === "number" ? b.window_hours : DEFAULT_WINDOW_HOURS;
+  if (promptBrief.length > MAX_PROMPT_BRIEF_CHARS) {
+    return NextResponse.json(
+      { error: "too_long", detail: `prompt_brief max ${MAX_PROMPT_BRIEF_CHARS} chars` },
+      { status: 400 },
+    );
+  }
+  if (
+    challengedCodename &&
+    challengedCodename.toLowerCase() === challengerCodename.toLowerCase()
+  ) {
+    return NextResponse.json({ error: "invalid_target", detail: "You cannot challenge yourself" }, { status: 400 });
+  }
 
   if (format === "throwdown" && !challengedCodename) {
     return NextResponse.json(
@@ -129,21 +169,17 @@ export async function POST(req: NextRequest) {
   // Challenger identity is already resolved from auth — no codename lookup needed.
   let challengedId: string | null = null;
   if (challengedCodename) {
-    const { data: challenged } = await sb
-      .from("operators")
-      .select("operator_id")
-      .eq("codename", challengedCodename)
-      .single();
-    if (!challenged) {
+    // Public operators only; private and nonexistent return the same 404.
+    challengedId = await resolvePublicOperatorId(sb, challengedCodename);
+    if (!challengedId) {
       return NextResponse.json(
-        {
-          error: "operator_not_found",
-          detail: `Challenged '${challengedCodename}' not found`,
-        },
+        { error: "operator_not_found", detail: "Challenged operator not found" },
         { status: 404 },
       );
     }
-    challengedId = challenged.operator_id;
+    if (challengedId === challengerId) {
+      return NextResponse.json({ error: "invalid_target", detail: "You cannot challenge yourself" }, { status: 400 });
+    }
   }
 
   // Resolve active prompt if no brief provided
@@ -183,8 +219,9 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
+    console.error("[challenges] insert error", error);
     return NextResponse.json(
-      { error: "db_error", detail: error.message },
+      { error: "db_error", detail: "Could not create challenge" },
       { status: 500 },
     );
   }
@@ -208,6 +245,9 @@ export async function POST(req: NextRequest) {
 // GET — list recent challenges
 // ---------------------------------------------------------------------------
 export async function GET(req: NextRequest) {
+  const muted = challengesMutedResponse();
+  if (muted) return muted;
+
   const rl = rateLimit(req);
   if (!rl.ok) return rateLimitedResponse(rl);
 
@@ -244,28 +284,42 @@ export async function GET(req: NextRequest) {
 
   if (codename) {
     // Filter to challenges involving this operator
-    const { data: op } = await sb
-      .from("operators")
-      .select("operator_id")
-      .eq("codename", codename)
-      .single();
-    if (op) {
-      q = q.or(
-        `challenger_id.eq.${op.operator_id},challenged_id.eq.${op.operator_id}`,
-      );
+    const opId = await resolvePublicOperatorId(sb, codename);
+    if (!opId) {
+      return NextResponse.json({ challenges: [] }, { headers: rateLimitHeaders(rl) });
     }
+    q = q.or(`challenger_id.eq.${opId},challenged_id.eq.${opId}`);
   }
 
   const { data, error } = await q;
   if (error) {
+    console.error("[challenges] list error", error);
     return NextResponse.json(
-      { error: "db_error", detail: error.message },
+      { error: "db_error", detail: "Could not list challenges" },
       { status: 500 },
     );
   }
 
+  // Only expose codenames of public operators; never operator_id.
+  type Row = Record<string, unknown>;
+  const rows = (data ?? []) as unknown as Row[];
+  const names = rows.flatMap((r) =>
+    ["challenger", "challenged", "winner"].map((k) =>
+      Array.isArray(r[k])
+        ? ((r[k] as Array<{ codename?: string }>)[0]?.codename ?? null)
+        : ((r[k] as { codename?: string } | null)?.codename ?? null),
+    ),
+  );
+  const pub = await publicCodenameSet(sb, names);
+  const challenges = rows.map((r) => ({
+    ...r,
+    challenger: redactEmbed(r.challenger as never, pub),
+    challenged: redactEmbed(r.challenged as never, pub),
+    winner: redactEmbed(r.winner as never, pub),
+  }));
+
   return NextResponse.json(
-    { challenges: data ?? [] },
+    { challenges },
     { headers: rateLimitHeaders(rl) },
   );
 }

@@ -3,6 +3,7 @@ import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { isValidAgentPublicKey } from "@/lib/ingest/signature";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 
 /**
  * POST /api/v1/devices/rotate — re-enroll a new device key after revocation (D7 §4.6 follow-up).
@@ -25,6 +26,9 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function POST(req: NextRequest) {
+  const limited = await enforceRouteLimit(req, "device-rotate", { windowMs: 60 * 60 * 1000, max: 10 }, { failClosed: true });
+  if (limited) return limited;
+
   const op = await getSessionOperator();
   if (!op)
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
@@ -69,8 +73,10 @@ export async function POST(req: NextRequest) {
     .eq("operator_id", op.operatorId) // you can only rotate your own device
     .maybeSingle();
 
-  if (oldError)
-    return NextResponse.json({ error: oldError.message }, { status: 500 });
+  if (oldError) {
+    console.error("[devices/rotate] lookup error", oldError);
+    return NextResponse.json({ error: "Could not rotate device." }, { status: 500 });
+  }
   if (!oldDevice) {
     return NextResponse.json(
       { error: "Device not found or not yours." },
@@ -85,8 +91,10 @@ export async function POST(req: NextRequest) {
     .eq("device_id", oldDeviceId)
     .eq("operator_id", op.operatorId);
 
-  if (revokeError)
-    return NextResponse.json({ error: revokeError.message }, { status: 500 });
+  if (revokeError) {
+    console.error("[devices/rotate] revoke error", revokeError);
+    return NextResponse.json({ error: "Could not rotate device." }, { status: 500 });
+  }
 
   // 2. Generate a new device_id (crypto-uuid via crypto.randomUUID).
   const newDeviceId = crypto.randomUUID();
@@ -110,7 +118,8 @@ export async function POST(req: NextRequest) {
       .from("devices")
       .update({ trust_status: oldDevice.trust_status })
       .eq("device_id", oldDeviceId);
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
+    console.error("[devices/rotate] insert error", insertError);
+    return NextResponse.json({ error: "Could not rotate device." }, { status: 500 });
   }
 
   await captureServer(op.codename ?? op.operatorId, "device_rotated", {
