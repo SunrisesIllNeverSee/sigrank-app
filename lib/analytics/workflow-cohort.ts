@@ -70,8 +70,8 @@ export function workflowCohortRank(
   return {
     mode,
     cohort,
-    cohortLabel: cohort === "hitl" ? "OPERATOR-IN-THE-LOOP" : "AUTONOMOUS",
-    cohortShort: cohort === "hitl" ? "OITL" : "AUTO",
+    cohortLabel: cohort === "hitl" ? "OPERATOR-IN-THE-LOOP" : "AUTONOMOUS / REVIEW",
+    cohortShort: cohort === "hitl" ? "OITL" : "AUTO / REVIEW",
     rank: idx >= 0 ? idx + 1 : null,
     size: members.length,
   };

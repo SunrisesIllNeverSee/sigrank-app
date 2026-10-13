@@ -39,25 +39,7 @@ import { HexMark } from "./RecordMarks";
 import { RailDialog } from "./RailDialog";
 
 import { BOARD_SIGIL, HALL_INK, hallSigil } from "@/lib/profile/record-artwork";
-
-/* ── Deterministic PRNG (same generator OverviewView used) ─────────────── */
-function hashSeed(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-function mulberry32(a: number): () => number {
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+import { proratedDailyTokens } from "@/lib/profile/prorated-activity";
 
 const compact = (n: number) => {
   const a = Math.abs(n);
@@ -116,45 +98,37 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
     else if (!histMap.has(d)) histMap.set(d, -1);
   }
   const yields = [...histMap.values()].filter((v) => v > 0).sort((a, b) => a - b);
-  const baseline = yields.length ? yields[Math.floor(yields.length / 2)] : null;
   const peak = yields.length ? yields[yields.length - 1] : null;
-  const rng = mulberry32(hashSeed(codename));
-  const simulate = history.length > 0;
+  // Proration is anchored in REAL scored token windows, not seeded random
+  // colors. It does NOT establish observed per-day submissions or streaks.
+  const dailyRates = Array.from({ length: 154 }, (_, k) => proratedDailyTokens(snapshotRecords, startDay + k));
+  const measuredRates = dailyRates.filter((v): v is number => v != null && v > 0).sort((a,b) => a-b);
+  const midRate = measuredRates.length ? measuredRates[Math.floor(measuredRates.length / 2)] : null;
   const cells: { day: number; bg: string | null; estimated: boolean }[] = [];
   for (let k = 0; k < 154; k++) {
     const day = startDay + k;
     if (day > anchor || day < acctStart) { cells.push({ day, bg: null, estimated: false }); continue; }
-    const recency = (day - Math.max(acctStart, startDay)) / Math.max(1, anchor - Math.max(acctStart, startDay));
     const y = histMap.get(day);
+    const rate = dailyRates[k];
     let bg: string | null = null;
-    let estimated = false;
-    if (y != null && y >= 0 && baseline) {
-      if (peak && y >= peak) bg = "var(--pv2-orange)";
-      else if (y < baseline * 0.9) bg = "rgb(255 0 212 / 0.55)";
-      else if (y <= baseline * 1.1) bg = "rgb(255 230 0 / 0.55)";
-      else bg = "rgb(var(--gold) / 0.75)";
-    } else if (y === -1) {
-      bg = "rgb(var(--gold) / 0.35)";
-    } else if (simulate) {
-      // Visual interpolation only. No actual daily submission or streak
-      // observation is implied for an unobserved date.
-      estimated = true;
-      const v = rng() * 0.6 + recency * 0.4;
-      if (v >= 0.15) {
-        const t = rng(), lvl = rng();
-        const al = lvl < 0.2 ? "0.15" : lvl < 0.4 ? "0.35" : lvl < 0.6 ? "0.55" : lvl < 0.8 ? "0.75" : null;
-        if (t < 0.15) bg = `rgb(255 0 212 / ${lvl < 0.25 ? "0.15" : lvl < 0.5 ? "0.35" : lvl < 0.75 ? "0.55" : "0.75"})`;
-        else if (t < 0.65) bg = al ? `rgb(255 230 0 / ${al})` : "var(--pv2-yellow)";
-        else if (t < 0.9) bg = al ? `rgb(var(--gold) / ${al})` : "var(--pv2-signal)";
-        else bg = lvl < 0.8 ? "rgb(255 154 60 / 0.55)" : "var(--pv2-orange)";
-      }
+    const estimated = rate != null && rate > 0 && midRate != null;
+    if (estimated) {
+      const relative = rate! / midRate!;
+      if (relative < 0.8) bg = "rgb(255 0 212 / 0.55)";
+      else if (relative <= 1.1) bg = "rgb(255 230 0 / 0.55)";
+      else if (relative < 1.8) bg = "rgb(var(--gold) / 0.75)";
+      else bg = "var(--pv2-orange)";
+    } else if (y != null) {
+      // An observed snapshot date is visible; its date is evidence, but
+      // never misrepresented as measured continuous daily activity.
+      bg = y > 0 && peak && y >= peak ? "var(--pv2-orange)" : "rgb(var(--gold) / 0.35)";
     }
     cells.push({ day, bg, estimated });
   }
   const modeledDays = cells.filter((c) => c.estimated).length;
   const isEstimated = modeledDays > 0;
   const activityNotice = isEstimated
-    ? `ESTIMATED — ${modeledDays} days modeled between available snapshots. Colors are illustrative, not observed daily submissions; ACTIVE, BEST and STREAK are approximations.`
+    ? `PRORATED ESTIMATE — ${modeledDays} days covered. Recorded token totals divided evenly across their reporting-window days; the narrowest available window is used. Colors are NOT observed daily submissions. Active, best and streak-like spans are hypothetical coverage, not verified session streaks.`
     : "NO DAILY OBSERVATIONS — insufficient history for modeled activity; no daily activity or streak is assumed.";
   const displayEstimate = (n: number) => isEstimated ? `~${n}` : String(n);
   const active = cells.filter((x) => x.bg);
@@ -218,9 +192,14 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
       definition: `Top-${r.rank} standing on the ${r.name} metric board`,
       cohort: "COMBINED FIELD · CLAIMED OPERATORS",
       period: "ALL-TIME",
-      date: "LIVE STANDING",
-      evidenceHref: "/board/all",
-      evidenceLabel: "Live leaderboard",
+      date: boardRow?.snapshot.snapshot_date ? fmtDate(boardRow.snapshot.snapshot_date) : "DATE NOT REPORTED",
+      evidenceHref: boardRow?.source_submission_id &&
+        snapshotRecords.some((record) => record.submissionId === boardRow.source_submission_id)
+        ? `/user/${encodeURIComponent(codename)}?tab=submissions#submission-${encodeURIComponent(boardRow.source_submission_id)}`
+        : "/board/all",
+      evidenceLabel: boardRow?.source_submission_id &&
+        snapshotRecords.some((record) => record.submissionId === boardRow.source_submission_id)
+        ? "Scored source snapshot" : "Current leaderboard",
     })),
   ];
   if (snapshotRecords.length < SNAPSHOT_MILESTONE) {
@@ -300,26 +279,26 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
           sidebar; click pops the same map centered in-window with the
           legend (owner direction — never a stage-body element). */}
       <div className="mod">
-        <h3><span className="sq" />SUBMISSION ACTIVITY <span title={activityNotice} style={{ color: "var(--pv2-orange)", fontSize: "9px", letterSpacing: ".06em", marginLeft: "5px" }}>{isEstimated ? "ESTIMATED" : "NO DAILY DATA"}</span></h3>
+        <h3><span className="sq" />SUBMISSION ACTIVITY <span title={activityNotice} style={{ color: "var(--pv2-orange)", fontSize: "9px", letterSpacing: ".06em", marginLeft: "5px" }}>{isEstimated ? "PRORATED · ESTIMATED" : "NO DAILY DATA"}</span></h3>
         <RailDialog
           wide
           title="SUBMISSION ACTIVITY"
-          subtitle={`${isEstimated ? "ESTIMATED ACTIVITY PATTERN" : "AVAILABLE SNAPSHOT DATES"} · ${operator.account_age_days}D · ${num(operator.total_messages_lifetime)} MSG`}
+          subtitle={`${isEstimated ? "PRORATED TOKEN ACTIVITY" : "AVAILABLE SNAPSHOT DATES"} · ${operator.account_age_days}D · ${num(operator.total_messages_lifetime)} MSG`}
           trigger={
             <div className="prl-heat prl-heat--rail">
               <div className="prl-heat-grid">
                 {Array.from({ length: 22 }, (_, w) => (
                   <div key={w} className="prl-heat-col">
                     {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
-                      <div key={d} className="prl-heat-cell" title={cell.estimated ? "ESTIMATED · not an observed daily submission" : cell.bg ? "AVAILABLE SNAPSHOT DATE" : "NO DAILY OBSERVATION"} style={cell.bg ? { background: cell.bg } : undefined} />
+                      <div key={d} className="prl-heat-cell" title={cell.estimated ? "PRORATED TOKEN RATE · estimated evenly across reporting window; no observed daily submission" : cell.bg ? "AVAILABLE SNAPSHOT DATE" : "NO DAILY OBSERVATION"} style={cell.bg ? { background: cell.bg } : undefined} />
                     ))}
                   </div>
                 ))}
               </div>
               <div className="prl-heat-stats">
-                <span><b>{displayEstimate(active.length)}</b>{isEstimated ? "EST. ACTIVE" : "ACTIVE"}</span>
-                <span><b>{displayEstimate(longest)}</b>{isEstimated ? "EST. BEST" : "BEST"}</span>
-                <span><b>{displayEstimate(streak)}</b>{isEstimated ? "EST. STREAK" : "STREAK"}</span>
+                <span><b>{displayEstimate(active.length)}</b>{isEstimated ? "EST. COVERED" : "ACTIVE"}</span>
+                <span><b>{displayEstimate(longest)}</b>{isEstimated ? "EST. LONGEST" : "BEST"}</span>
+                <span><b>{displayEstimate(streak)}</b>{isEstimated ? "EST. CURRENT" : "STREAK"}</span>
                 <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
               </div>
               <p className="ws-note" style={{ marginTop: "6px", lineHeight: 1.4 }}>{activityNotice}</p>
@@ -334,15 +313,15 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
               {Array.from({ length: 22 }, (_, w) => (
                 <div key={w} className="prl-heat-col">
                   {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
-                    <div key={d} className="prl-heat-cell" title={cell.estimated ? "ESTIMATED · not an observed daily submission" : cell.bg ? "AVAILABLE SNAPSHOT DATE" : "NO DAILY OBSERVATION"} style={cell.bg ? { background: cell.bg } : undefined} />
+                    <div key={d} className="prl-heat-cell" title={cell.estimated ? "PRORATED TOKEN RATE · estimated evenly across reporting window; no observed daily submission" : cell.bg ? "AVAILABLE SNAPSHOT DATE" : "NO DAILY OBSERVATION"} style={cell.bg ? { background: cell.bg } : undefined} />
                   ))}
                 </div>
               ))}
             </div>
             <div className="prl-heat-stats">
-              <span><b>{displayEstimate(active.length)}</b>{isEstimated ? "EST. ACTIVE" : "ACTIVE"}</span>
-              <span><b>{displayEstimate(longest)}</b>{isEstimated ? "EST. BEST" : "BEST"}</span>
-              <span><b>{displayEstimate(streak)}</b>{isEstimated ? "EST. STREAK" : "STREAK"}</span>
+              <span><b>{displayEstimate(active.length)}</b>{isEstimated ? "EST. COVERED" : "ACTIVE"}</span>
+              <span><b>{displayEstimate(longest)}</b>{isEstimated ? "EST. LONGEST" : "BEST"}</span>
+              <span><b>{displayEstimate(streak)}</b>{isEstimated ? "EST. CURRENT" : "STREAK"}</span>
               <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
             </div>
             <p className="ws-note" style={{ marginTop: "8px", lineHeight: 1.5 }}>{activityNotice}</p>
@@ -359,16 +338,16 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
       {/* RECORDS & HONORS — honors strip pops its detail in-window;
           each record row still opens its own detail card (item 10). */}
       <div className="mod">
-        <h3><span className="sq" />RECORDS &amp; HONORS</h3>
+        <h3><span className="sq" />TROPHIES &amp; RECORDS</h3>
         <RailDialog
-          title="RECORDS & HONORS"
+          title="TROPHIES & RECORDS"
           subtitle={`${railRecords.filter((r) => r.state === "earned").length} EARNED · ${railRecords.filter((r) => r.state === "pending").length} IN PROGRESS`}
           trigger={
             <>
               <span className="prl-medals">
                 {medals.map((m) => (
                   <i key={m.label} className="prl-medal" style={{ opacity: m.n === 0 ? 0.3 : 1 }}>
-                    <HexMark sigil={m.sigil} ring={m.color} size={14} />
+                    <HexMark sigil={m.sigil} ring={m.color} size={22} />
                     <b style={{ color: m.color }}>{m.n}</b>
                     <i>{m.label}</i>
                   </i>
@@ -389,7 +368,7 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
           <dl className="prl-dialog-dl">
             {medals.map((m) => (
               <div key={m.label}>
-                <dt className="prl-honor-dt"><HexMark sigil={m.sigil} ring={m.color} size={18} />{m.label.toUpperCase()}</dt>
+                <dt className="prl-honor-dt"><HexMark sigil={m.sigil} ring={m.color} size={24} />{m.label.toUpperCase()}</dt>
                 <dd>{m.n} — {m.def}</dd>
               </div>
             ))}
