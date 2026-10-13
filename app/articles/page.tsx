@@ -1,6 +1,7 @@
 /** Articles are existing type:article publications, not a new content fork.
  * Their individual canonical /blog/<slug> URLs remain unchanged. */
 import type { Metadata } from "next";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 import Link from "next/link";
 import { readdir, readFile } from "fs/promises";
 import { join } from "path";
@@ -98,6 +99,7 @@ export default async function ArticlesPage() {
       <div className="ws-doc ws-article-list">
         <JsonLd data={breadcrumb([{ name: "Articles", path: "/articles" }])} />
         <div className="blog-index" id="all-articles">
+        <div className="mb-3 flex justify-end"><UnifiedShare title="SignalAF · Research & Articles" markdown editorial compact /></div>
           <div className="blog-list">
             {articles.map((article) => (
               <Link

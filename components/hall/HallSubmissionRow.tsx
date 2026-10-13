@@ -5,6 +5,7 @@ import { colors } from "@/components/sigrank/tokens";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Trophy } from "@/components/hall/Trophy";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 
 interface Props {
   /** Display rank within the board. */
@@ -45,6 +46,7 @@ export function HallSubmissionRow({
   classTier,
   platform,
   value,
+  canonId,
   isPlaceholder = true,
   href,
   outlier = false,
@@ -138,13 +140,17 @@ export function HallSubmissionRow({
   return (
     // 2 rows per entry (owner 2026-06-21): row 1 = rank · name · class glyph · claimed;
     // row 2 = the metric value, right-aligned and emphasized.
-    <div className="hall-record-row flex flex-col gap-0.5 border-b border-bg-border-subtle px-2 py-2 text-sm last:border-b-0">
+    <div id={`hall-${canonId ?? "rank"}-rank-${rank}`} className="hall-record-row flex flex-col gap-0.5 border-b border-bg-border-subtle px-2 py-2 text-sm last:border-b-0">
       <div className="flex min-w-0 items-center gap-2">
         <span className="inline-flex w-7 shrink-0 items-center justify-center font-mono font-bold leading-none">
           {rankNode}
         </span>
         {classGlyph}
         <span className="min-w-0 flex-1 truncate">{nameNode}</span>
+        {rank <= 10 && claimed && href && (
+          <UnifiedShare compact label="↗" title={`SignalAF Hall #${rank} · ${displayLabel}`}
+            href={`#hall-${canonId ?? "rank"}-rank-${rank}`} imageHref={`/s/${encodeURIComponent(codename)}/card.png`} />
+        )}
         {claimed ? (
           <span
             title="Claimed operator"

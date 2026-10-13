@@ -114,14 +114,14 @@ export function PassportCard({
     show ? show.scaleV.toFixed(2) : "—",
   ];
 
-  const medals: { color: string; label: string }[] = [];
-  const pushMedals = (n: number, color: string, label: string) => {
-    for (let i = 0; i < Math.min(n, 3) && medals.length < 5; i++) medals.push({ color, label });
+  const medals: { rank: 1 | 2 | 3; label: string }[] = [];
+  const pushMedals = (n: number, rank: 1 | 2 | 3, label: string) => {
+    for (let i = 0; i < Math.min(n, 3) && medals.length < 5; i++) medals.push({ rank, label });
   };
   if (trophyCounts) {
-    pushMedals(trophyCounts.gold, "#e8b93c", "gold");
-    pushMedals(trophyCounts.silver, "#94a3b8", "silver");
-    pushMedals(trophyCounts.bronze, "#cd7c32", "bronze");
+    pushMedals(trophyCounts.gold, 1, "gold");
+    pushMedals(trophyCounts.silver, 2, "silver");
+    pushMedals(trophyCounts.bronze, 3, "bronze");
   }
   const medalLabel = trophyCounts
     ? `${trophyCounts.gold} gold, ${trophyCounts.silver} silver, ${trophyCounts.bronze} bronze medals`
@@ -242,9 +242,9 @@ export function PassportCard({
             </div>
             <div className="pv2-medals" aria-label={medalLabel}>
               {medals.map((m, i) => (
-                <svg key={i} width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                  <circle cx="5" cy="5" r="4.5" fill={m.color} />
-                </svg>
+                <span key={i} title={`${m.label} standing medal`} style={{ display: "inline-flex", alignItems: "center" }}>
+                  <MedalHex rank={m.rank} sigil="★" size={15} />
+                </span>
               ))}
             </div>
           </div>

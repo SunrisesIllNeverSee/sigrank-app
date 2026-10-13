@@ -31,6 +31,7 @@ import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
 import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { FieldAverages } from "@/lib/analytics/field-average";
 import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { PassportCard } from "./PassportCard";
 import { FlapBoard } from "./FlapBoard";
 import { WorkflowMark } from "./WorkflowMark";
@@ -284,6 +285,7 @@ export function OverviewView({
             fieldAvg={fieldAvg}
             cohort={wfCohort}
           />
+          <UnifiedShare title="SignalAF Operator Profile" href={"/s/" + encodeURIComponent(operator.codename)} imageHref={"/s/" + encodeURIComponent(operator.codename) + "/card.png"} screenshotTarget={"#holocard-" + operator.codename} />
           <ArtworkShareControls target={`holocard-${operator.codename}`} title="holocard" animated
             filename={`signalaf-holocard-${operator.codename}`} href={`/user/${encodeURIComponent(operator.codename)}`} />
         </div>

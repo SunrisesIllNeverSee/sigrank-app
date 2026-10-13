@@ -84,7 +84,7 @@ function coerce<T extends string>(
 const WORKFLOW_OPTS = [
   { id: "hitl", label: "OPERATOR-IN-THE-LOOP" },
   { id: "hybrid", label: "HYBRID" },
-  { id: "agentic", label: "AUTOMATED" },
+  { id: "agentic", label: "AUTONOMOUS / REVIEW" },
 ] as const;
 type WorkflowSel = (typeof WORKFLOW_OPTS)[number]["id"];
 
@@ -477,7 +477,7 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
       status={
         <>
           {baseRows.length} OPERATORS · {view === "metrics" ? "METRICS" : "TOKENS"} VIEW ·{" "}
-          {workflow === "hybrid" ? "HYBRID · COMBINED FIELD" : workflow === "agentic" ? "AUTOMATED · INCLUDES UNCLASSIFIED REVIEW CANDIDATES" : "OPERATOR-IN-THE-LOOP"} ·{" "}
+          {workflow === "hybrid" ? "HYBRID · COMBINED FIELD" : workflow === "agentic" ? "AUTONOMOUS / REVIEW · INCLUDES UNRESOLVED CANDIDATES" : "OPERATOR-IN-THE-LOOP"} ·{" "}
           {win.label.toUpperCase()} · SIGNALAF × SIGRANK · MO§ES™
         </>
       }

@@ -1,5 +1,6 @@
 "use client";
 
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
@@ -2057,7 +2058,7 @@ export function LiveBoardWorkspace({
                       liveTrack.modeChanged("agentic");
                     }}
                   >
-                    Autonomous
+                    <span title="AUTONOMOUS / REVIEW — includes unresolved workflow candidates; not a verified automation claim">AUTO / REVIEW</span>
                   </button>
                 </div>
                 {/* owner 2026-10-06: dropdown labels removed — the selects
@@ -2183,28 +2184,20 @@ export function LiveBoardWorkspace({
                           </button>
                         )}
                       </span>
-                      <details className="board-share" onKeyDown={(event) => {
-                        if (event.key === "Escape") {
-                          event.currentTarget.open = false;
-                          event.currentTarget.querySelector("summary")?.focus();
-                        }
-                      }}>
-                        <summary>Share ↗</summary>
-                        <div className="board-share-menu">
-                      <button
-                        type="button"
-                        className="exp"
-                        disabled={ordered.length === 0}
-                        title="Download the loaded + sorted field as CSV"
-                        onClick={exportCsv}
-                      >
-                        ⬇ Export CSV
-                      </button>
-                      {/* LB-G14 — approved workspace-scope screenshot,
-                          docked in the existing export group. */}
-                      <BoardShotButton scope="workspace" rootRef={rootRef} />
-                        </div>
-                      </details>
+                      <div className="board-share">
+                        <UnifiedShare
+                          title="SignalAF · Live AI Operator Leaderboard"
+                          href="/board/all"
+                          compact
+                          extras={<>
+                            <button type="button" className="exp" disabled={ordered.length === 0}
+                              title="Export the loaded and sorted field as CSV" onClick={exportCsv}>
+                              ⬇ EXPORT CSV
+                            </button>
+                            <BoardShotButton scope="workspace" rootRef={rootRef} />
+                          </>}
+                        />
+                      </div>
                 </div>
               </div>
 
