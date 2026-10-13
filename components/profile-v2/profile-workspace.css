@@ -44,8 +44,8 @@
   --pc-font-d:var(--pv2-display,"Silkscreen"),monospace;
   --pc-font-m:var(--pv2-mono,"JetBrains Mono"),monospace;
 }
-.lbw-root .pv2 .pv2-card-shell{position:relative;width:324px;height:484px;clip-path:polygon(8% 0,92% 0,100% 5%,100% 100%,0 100%,0 5%);background:linear-gradient(135deg,rgba(168,85,247,.9) 0%,rgba(255,255,255,.35) 45%,rgba(168,85,247,.9) 100%);box-shadow:0 24px 70px rgba(0,0,0,.7),0 0 0 1px rgba(168,85,247,.25),0 0 60px rgba(168,85,247,.18);animation:pv2pc-float 6s ease-in-out infinite;transform-style:preserve-3d}
-.lbw-root .pv2 .pv2-card{position:relative;width:320px;height:480px;margin:2px;clip-path:polygon(8% 0,92% 0,100% 5%,100% 100%,0 100%,0 5%);background:linear-gradient(135deg,var(--pc-bg1) 0%,var(--pc-bg2) 30%,var(--pc-bg3) 60%,var(--pc-bg4) 100%);overflow:hidden;display:flex;flex-direction:column;padding:22px 20px 16px}
+.lbw-root .pv2 .pv2-card-shell{position:relative;width:324px;height:484px;clip-path:polygon(8% 0,92% 0,100% 5%,100% 95%,92% 100%,8% 100%,0 95%,0 5%);background:linear-gradient(135deg,rgba(168,85,247,.9) 0%,rgba(255,255,255,.35) 45%,rgba(168,85,247,.9) 100%);box-shadow:0 24px 70px rgba(0,0,0,.7),0 0 0 1px rgba(168,85,247,.25),0 0 60px rgba(168,85,247,.18);animation:pv2pc-float 6s ease-in-out infinite;transform-style:preserve-3d}
+.lbw-root .pv2 .pv2-card{position:relative;width:320px;height:480px;margin:2px;clip-path:polygon(8% 0,92% 0,100% 5%,100% 95%,92% 100%,8% 100%,0 95%,0 5%);background:linear-gradient(135deg,var(--pc-bg1) 0%,var(--pc-bg2) 30%,var(--pc-bg3) 60%,var(--pc-bg4) 100%);overflow:hidden;display:flex;flex-direction:column;padding:22px 20px 52px}
 .lbw-root .pv2 .pv2-card::before{content:"";position:absolute;inset:0;background-image:repeating-radial-gradient(circle at 1px 1px,rgba(255,255,255,.04) 0,rgba(255,255,255,.04) 1px,transparent 1px,transparent 12px);background-size:8px 8px;opacity:.45;pointer-events:none;mix-blend-mode:overlay}
 .lbw-root .pv2 .pv2-card::after{content:"";position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 45%,rgba(255,255,255,.05) 55%,transparent 70%);background-size:200% 100%;transform:rotate(12deg);animation:pv2pc-shimmer 5s linear infinite;pointer-events:none;mix-blend-mode:screen}
 .lbw-root .pv2 .pv2-card-inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;color:var(--pc-text)}
@@ -60,14 +60,14 @@
 .lbw-root .pv2 .pv2-rank-chip strong{color:var(--pc-gold);font-weight:700}
 .lbw-root .pv2 .pv2-center-block{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;margin-top:2px;margin-bottom:2px}
 .lbw-root .pv2 .pv2-hex-bg{position:absolute;width:230px;height:230px;opacity:.35;animation:pv2pc-spin 24s linear infinite;filter:drop-shadow(0 0 14px rgba(168,85,247,.2))}
-.lbw-root .pv2 .pv2-avatar-wrap{position:relative;width:128px;height:128px;display:flex;align-items:center;justify-content:center}
+.lbw-root .pv2 .pv2-avatar-wrap{position:relative;width:112px;height:112px;display:flex;align-items:center;justify-content:center}
 .lbw-root .pv2 .pv2-avatar-ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,var(--pc-class),#d8b4fe,var(--pc-class));filter:blur(1px);opacity:.55;animation:pv2pc-ring 4s ease-in-out infinite}
-.lbw-root .pv2 .pv2-avatar{position:relative;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#4c1d95 0%,var(--pc-bg1) 70%);border:2px solid rgba(168,85,247,.6);box-shadow:inset 0 0 28px rgba(168,85,247,.25),0 0 22px rgba(168,85,247,.35);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lbw-root .pv2 .pv2-avatar{position:relative;width:104px;height:104px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#4c1d95 0%,var(--pc-bg1) 70%);border:2px solid rgba(168,85,247,.6);box-shadow:inset 0 0 28px rgba(168,85,247,.25),0 0 22px rgba(168,85,247,.35);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .lbw-root .pv2 .pv2-avatar-initials{font-family:var(--pc-font-d);font-size:38px;color:var(--pc-text);letter-spacing:.04em;text-shadow:0 0 18px rgba(168,85,247,.55)}
-.lbw-root .pv2 .pv2-operator-name{font-size:18px;font-weight:700;color:var(--pc-text);margin-top:16px;letter-spacing:.02em;text-align:center}
+.lbw-root .pv2 .pv2-operator-name{font-size:18px;font-weight:700;color:var(--pc-text);margin-top:8px;letter-spacing:.02em;text-align:center}
 .lbw-root .pv2 .pv2-operator-code{font-family:var(--pc-font-m);font-size:12px;color:var(--pc-muted);margin-top:4px;letter-spacing:.05em}
 .lbw-root .pv2 .pv2-radar-wrap{position:absolute;right:-6px;bottom:-4px;width:118px;height:118px;opacity:.65;pointer-events:none}
-.lbw-root .pv2 .pv2-stats-block{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 8px;margin-bottom:14px;padding:12px 8px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid rgba(168,85,247,.12);position:relative}
+.lbw-root .pv2 .pv2-stats-block{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 8px;margin-bottom:6px;padding:12px 8px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid rgba(168,85,247,.12);position:relative}
 .lbw-root .pv2 .pv2-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
 .lbw-root .pv2 .pv2-stat-value{font-family:var(--pc-font-m);font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;line-height:1;letter-spacing:-.02em}
 .lbw-root .pv2 .pv2-stat-label{font-family:var(--pc-font-m);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--pc-muted);text-transform:uppercase}
@@ -241,3 +241,7 @@
 
 .lbw-root .profile-share-gallery{flex-shrink:0;padding:10px 8px;margin-bottom:16px;color:var(--tx2);font:10px var(--font-mono);text-transform:uppercase;border-bottom:2px solid transparent}
 .lbw-root .profile-share-gallery:hover,.lbw-root .profile-share-gallery:focus-visible{color:var(--ac);border-color:var(--ac)}
+
+.lbw-root .ws-profile-content .profile-title-nav [role="tablist"],.lbw-root .profile-title-nav .profile-share-gallery{margin-bottom:0}
+.lbw-root .profile-title-nav .profile-share-gallery{display:inline-flex;align-items:center;justify-content:center;align-self:center;white-space:nowrap;padding:10px 9px;line-height:1.45;text-align:center}
+.lbw-root .pv2 .pv2-command-footer{position:absolute;z-index:4;bottom:0;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:center;background:#000;color:#e9f3df;border-top:1px solid rgba(168,85,247,.5);font:600 11px var(--pc-font-m);letter-spacing:.08em}
