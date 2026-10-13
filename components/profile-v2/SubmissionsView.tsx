@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 /**
  * components/profile-v2/SubmissionsView.tsx — the SUBMISSIONS tab for the v2
  * profile redesign.
@@ -14,7 +18,7 @@
  *   4. MULTI-WINDOW COMPARISON  — ALL-TIME / 30D / 7D cards recomputed per
  *      window from submissions + history.
  *
- * Server component — all data arrives pre-resolved from the profile page.
+ * Client rendering controls — all historical data arrives pre-resolved from the profile page.
  * When `submissions` is empty a graceful empty state replaces the coverage grid.
  */
 
@@ -284,7 +288,36 @@ function CoverageGrid({
 }
 
 /* ═══════════════ 2. SNAPSHOT HISTORY ═══════════════ */
-const HISTORY_LIMIT = 12;
+// The previous 12-row UI truncation hid historical submissions already
+// returned by the backend. Show a useful recent window with an explicit
+// path to every fetched scored snapshot (currently < 1,000 per operator).
+const HISTORY_INITIAL = 50;
+const HISTORY_INCREMENT = 50;
+
+function HistoryReveal({ shown, total, onMore, onAll, onLess }: {
+  shown: number; total: number; onMore: () => void; onAll: () => void; onLess: () => void;
+}) {
+  if (total <= HISTORY_INITIAL) return null;
+  const button = "rounded border border-bg-border px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-gold hover:border-gold focus-visible:outline-2 focus-visible:outline-gold";
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2 pt-3" aria-label="Historical submission controls">
+      {shown < total ? (
+        <>
+          <button type="button" className={button} onClick={onMore}>
+            SHOW NEXT {Math.min(HISTORY_INCREMENT, total - shown)}
+          </button>
+          <button type="button" className={button} onClick={onAll}>
+            SHOW ALL {total}
+          </button>
+        </>
+      ) : (
+        <button type="button" className={button} onClick={onLess}>
+          BACK TO LATEST {HISTORY_INITIAL}
+        </button>
+      )}
+    </div>
+  );
+}
 
 function compactTok(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return "—";
@@ -344,7 +377,8 @@ function ModeChip({ r }: { r: SnapshotRecord }) {
  *  archive with reporting windows, platforms, token pillars, derived metrics
  *  and provenance. Null fields render "—" (unavailable), never 0. */
 function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
-  const rows = records.slice(0, HISTORY_LIMIT);
+  const [visible, setVisible] = useState(HISTORY_INITIAL);
+  const rows = records.slice(0, visible);
   const latest = rows[0];
   const cell = "px-3 py-2 text-right text-text-secondary";
   const dim = "px-3 py-2 text-right text-text-dim";
@@ -409,17 +443,25 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
           SCORED SNAPSHOTS · — = NOT REPORTED
         </span>
         <span className="text-text-secondary">
-          SHOWING {rows.length} OF {records.length}
+          SHOWING {rows.length} OF {records.length} AVAILABLE SCORED SUBMISSIONS
         </span>
       </div>
+      <HistoryReveal
+        shown={rows.length}
+        total={records.length}
+        onMore={() => setVisible((n) => Math.min(n + HISTORY_INCREMENT, records.length))}
+        onAll={() => setVisible(records.length)}
+        onLess={() => setVisible(HISTORY_INITIAL)}
+      />
     </Module>
   );
 }
 
 function HistoryTable({ history }: { history: HistoryPoint[] }) {
+  const [visible, setVisible] = useState(HISTORY_INITIAL);
   const rows = [...history]
     .sort((a, z) => z.date.localeCompare(a.date))
-    .slice(0, HISTORY_LIMIT);
+    .slice(0, visible);
   const latest = rows[0];
 
   return (
@@ -487,9 +529,16 @@ function HistoryTable({ history }: { history: HistoryPoint[] }) {
           Δ = YIELD VS PREV SNAPSHOT
         </span>
         <span className="text-text-secondary">
-          SHOWING {rows.length} OF {history.length}
+          SHOWING {rows.length} OF {history.length} AVAILABLE HISTORY POINTS
         </span>
       </div>
+      <HistoryReveal
+        shown={rows.length}
+        total={history.length}
+        onMore={() => setVisible((n) => Math.min(n + HISTORY_INCREMENT, history.length))}
+        onAll={() => setVisible(history.length)}
+        onLess={() => setVisible(HISTORY_INITIAL)}
+      />
     </Module>
   );
 }
