@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="font-mono text-[11px] text-text-dim">
-          Last updated 2026-10-01
+          Last updated 2026-10-10
         </p>
       </header>
 
@@ -66,10 +66,41 @@ export default function PrivacyPage() {
               <span className="text-text-primary">Support and beta reports</span>
               {" "}— when you contact us or explicitly send a plugin bug report,
               we receive the summary, reproduction steps, expected and actual
-              behavior, surface and optional reply email you provide. The plugin
+              behavior, surface, board window and optional plugin version, tool
+              name and reply email you provide. The plugin
               does not attach your full chat, local logs, or token telemetry.
             </li>
           </ul>
+        </section>
+
+        <section className="flex flex-col gap-1.5">
+          <h2 className="font-semibold text-text-primary">
+            SigRank | SignalAF Analyst in ChatGPT and Codex
+          </h2>
+          <p>
+            The Analyst plugin retrieves public leaderboard statistics and
+            public operator profiles. These lookups do not require a SignalAF
+            account. We receive the tool arguments needed for your request,
+            such as an operator codename, board window or comparison scope.
+            The plugin does not receive your full conversation or access your
+            private local logs. Local measurement and telemetry submission use
+            separate services covered by this policy.
+          </p>
+          <p>
+            Beta reports are optional. You can review, edit or decline a report
+            before sending it. Approved reports are delivered through Resend
+            to hello@signalaf.com so our support team can investigate the issue
+            and reply if you provide an email address. Report contents are not
+            published on the leaderboard.
+          </p>
+          <p>
+            To limit spam, the reporting service uses the incoming request IP
+            address in a short-lived rate-limit counter, held in memory or
+            Upstash Redis. Redis counters expire approximately one hour after
+            their last update. The IP address is not attached to the bug report.
+            Our hosting and email providers also process the request and
+            delivery information needed to operate their services.
+          </p>
         </section>
 
         <section className="flex flex-col gap-1.5">
@@ -151,6 +182,14 @@ export default function PrivacyPage() {
             Your token telemetry snapshots are retained as long as your
             account is active — they are the historical record that powers
             your rank trajectory and cascade analysis.
+          </p>
+          <p>
+            Support and beta reports are kept while the issue is open and for
+            up to 90 days after it closes. We then delete the retained report
+            and personal contact details from our support records, including
+            our support mailbox. We may keep an anonymized technical summary
+            to improve the service. You can request earlier deletion by
+            emailing hello@signalaf.com; a SignalAF account is not required.
           </p>
           <p>
             From{" "}
