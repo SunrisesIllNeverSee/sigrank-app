@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
   }
   return NextResponse.json(
     {
-      error: "Seeded profile claiming is unavailable until secure ownership verification is supported.",
+      error:
+        "Profiles from the original board are claimed by email. Contact hello@signalaf.com and we'll verify ownership.",
+      contact: "hello@signalaf.com",
       code: "claim_verification_unavailable",
     },
     { status: 503, headers: { "Cache-Control": "private, no-store" } },

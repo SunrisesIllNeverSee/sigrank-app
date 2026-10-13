@@ -23,7 +23,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = withOG({
   title: "Sign in",
-  description: "Sign in to claim your operator profile and back the build.",
+  description: "Sign up or sign in to get on the board and back the build.",
   path: "/login",
 });
 
@@ -44,7 +44,7 @@ export default function LoginPage() {
               Sign in
             </h1>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              Claim your operator profile, set your handle, and back the build.
+              Sign up to create your operator profile, set your handle, and back the build.
               The leaderboard is free to browse without an account.
             </p>
           </header>

@@ -35,7 +35,7 @@ export function LoginContent() {
           Sign in
         </h1>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Claim your operator profile, set your handle, and back the build. The
+          Sign up to create your operator profile, set your handle, and back the build. The
           leaderboard is free to browse without an account.
         </p>
       </header>

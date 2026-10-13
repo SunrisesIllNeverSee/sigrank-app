@@ -4,8 +4,8 @@
  * components/settings/RemovalRequest.tsx — public removal request form.
  *
  * For seeded operators who don't have an account. Two paths:
- *   1. GitHub verify — sign in with GitHub; if your handle matches an operator
- *      on the board, claim your profile then delete from Settings.
+ *   1. Email — original-board operators email hello@signalaf.com to claim
+ *      (handled by hand), then delete from Settings.
  *   2. Form submission — enter your handle + email; we send a removal request
  *      to the team and return a reference number.
  *
@@ -13,7 +13,7 @@
  */
 
 import { useState } from "react";
-import Link from "next/link";
+import { claimMailto } from "@/lib/identity/claim-contact";
 
 const btnGhost =
   "shrink-0 rounded-md border border-bg-border px-3 py-1.5 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary";
@@ -60,20 +60,20 @@ export function RemovalRequest() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* GitHub verify path */}
+      {/* Email claim path */}
       <div className="flex items-start justify-between gap-4 rounded-md border border-bg-border bg-bg-base/40 p-3">
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="font-mono text-xs text-text-primary">
-            Verify with GitHub
+            Claim by email
           </span>
           <span className="font-sans text-[11px] text-text-dim">
-            If your GitHub handle matches your board handle, sign in to claim
-            your profile — then delete from Settings.
+            On the original board? Email us to claim your profile — then delete
+            from Settings.
           </span>
         </div>
-        <Link href="/login?next=/settings" className={btnGhost}>
-          Sign in →
-        </Link>
+        <a href={claimMailto()} className={btnGhost}>
+          Email us →
+        </a>
       </div>
 
       {/* Form submission path */}
@@ -112,7 +112,7 @@ export function RemovalRequest() {
               Submit a removal request
             </span>
             <span className="font-sans text-[11px] text-text-dim">
-              No GitHub? Enter your board handle and email — we&apos;ll process
+              Just want it removed? Enter your board handle and email — we&apos;ll process
               your request and send confirmation.
             </span>
           </div>
