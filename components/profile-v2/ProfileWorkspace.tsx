@@ -9,7 +9,7 @@ import { MyWatchlist } from "./MyWatchlist";
 import "./profile-workspace.css";
 
 type ProfileSection = "overview" | "stats" | "analysis" | "report" | "lab" | "submissions" | "social" | "badges";
-const ProfileWorkspaceContext = createContext<{ section: ProfileSection; select: (section: ProfileSection) => void } | null>(null);
+const ProfileWorkspaceContext = createContext<{ section: ProfileSection; codename: string; select: (section: ProfileSection) => void } | null>(null);
 export const useProfileWorkspace = () => useContext(ProfileWorkspaceContext);
 
 const sections = ["overview", "stats", "analysis", "submissions", "social", "badges"] as const;
@@ -31,16 +31,16 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
     url.searchParams.set("tab", next);
     window.history.replaceState(null, "", url.toString());
   };
-  return <ProfileWorkspaceContext.Provider value={{ section, select }}>
+  return <ProfileWorkspaceContext.Provider value={{ section, codename, select }}>
     <WorkspaceShell active="profile" title={`PROFILE / ${name}`} leftTitle="PROFILE · DRILL"
       leftWidth={220} rightWidth={280}
       left={<>
-        <nav className="ws-profile-nav" aria-label="Profile views">
+        {section === "badges" ? <div id="profile-badge-left" /> : <nav className="ws-profile-nav" aria-label="Profile views">
           {sections.map((key) => <button key={key} type="button" aria-current={section === key ? "page" : undefined}
             onClick={() => select(key)}>{section === key ? "◆" : "◇"} {key}</button>)}
-        </nav>
+        </nav>}
+        {section !== "badges" && <>
         <Link className="ws-profile-back" href="/hall/badges">BADGE GALLERY →</Link>
-        <Link className="ws-profile-back" href={`/s/${encodeURIComponent(codename)}`}>SHAREABLES GALLERY →</Link>
         <div className="mod"><h3><span className="sq" />SCREEN CAPTURE</h3>
           <ArtworkShareControls target="main.stage" title="profile view" filename={`signalaf-profile-${codename}-${section}`} href={`/user/${encodeURIComponent(codename)}?tab=${section}`} />
         </div>
@@ -50,6 +50,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
           <div className="ws-profile-kv"><span>CLASS</span><b>{tier}</b></div>
           <div className="ws-profile-kv"><span>RANK</span><b>{rank ? `#${rank}` : "UNRANKED"}</b></div>
         </div>
+        </>}
       </>}
       rightTitle="OPERATOR"
       right={<>
@@ -60,6 +61,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
           <div className="ws-profile-kv"><span>Υ YIELD</span><b>{yieldLabel}</b></div>
           <div className="ws-profile-kv"><span>PLATFORM</span><b>{platform}</b></div>
         </div>
+        {section === "badges" ? <div id="profile-badge-right" /> : <>
         {panels}
         <MyWatchlist codename={codename} />
         <div className="mod ws-profile-actions"><h3><span className="sq" />ACTIONS</h3>{actions}</div>
@@ -67,6 +69,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
           <p className="ws-note">Public operator telemetry. Report and Lab remain owner-only.</p>
           <Link href="/methodology">Methodology →</Link>
         </div>
+        </>}
       </>}
       status={<>{name} · PROFILE · SIGNALAF × SIGRANK</>}
     ><div className="ws-profile-content">{children}</div></WorkspaceShell>

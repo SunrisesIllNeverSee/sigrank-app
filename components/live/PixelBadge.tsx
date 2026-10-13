@@ -1,3 +1,5 @@
+import { PLATFORM_PIXEL_BADGES, type PlatformPixelId } from "@/lib/profile/platform-pixels";
+
 /* components/live/PixelBadge.tsx — 3×3 block badges from the brand pack's
  * badge system (docs: 10_badge_system.png). Cells carry per-cell palette
  * colors extracted from the pack artwork; "." renders transparent.
@@ -30,7 +32,7 @@ const BADGES = {
   verified: ".PR/BPK/.YM",
 } as const;
 
-export type PixelBadgeName = keyof typeof BADGES;
+export type PixelBadgeName = keyof typeof BADGES | PlatformPixelId;
 
 export const BADGE_LABELS: Record<PixelBadgeName, string> = {
   top10: "TOP 10% ACHIEVER",
@@ -39,13 +41,14 @@ export const BADGE_LABELS: Record<PixelBadgeName, string> = {
   days100: "100 DAYS CONSISTENT",
   tokens10m: "10M TOKENS MILESTONE",
   verified: "VERIFIED OPERATOR",
-};
+  ...Object.fromEntries(PLATFORM_PIXEL_BADGES.map(b => [b.id, b.label.toUpperCase()])),
+} as Record<PixelBadgeName, string>;
 
 export function PixelBadge({ name }: { name: PixelBadgeName }) {
-  const pattern = BADGES[name];
+  const pattern = PLATFORM_PIXEL_BADGES.find(b => b.id === name)?.pattern ?? BADGES[name as keyof typeof BADGES];
   if (!pattern) return null;
   return (
-    <span className="pxbd" title={BADGE_LABELS[name]} role="img" aria-label={BADGE_LABELS[name]}>
+    <span className="pxbd" style={pattern.split("/")[0].length > 3 ? { width:25, height:25, gap:1, gridTemplateColumns:"repeat(7,1fr)", gridTemplateRows:"repeat(7,1fr)", gridAutoRows:"auto" } : undefined} title={BADGE_LABELS[name]} role="img" aria-label={BADGE_LABELS[name]}>
       {pattern.split("/").flatMap((row, r) =>
         row.split("").map((cell, c) => (
           <i

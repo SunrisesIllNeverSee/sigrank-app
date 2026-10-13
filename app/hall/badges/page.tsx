@@ -16,11 +16,12 @@ export default function HallBadgeIndexPage() {
       active="hall"
       title="BADGE INDEX"
       leftTitle="HALL OF SIGNAL"
-      left={<div className="flex flex-col gap-3">
+      left={<div className="flex flex-col gap-3"><div id="badge-directory-left" />
         <Link href="/hall" className="font-mono text-[10px] uppercase tracking-wider text-text-secondary hover:text-text-primary">← Hall record book</Link>
         <p className="font-mono text-[9px] leading-relaxed text-text-muted">Reference directory for Pixel patterns and Achievement designs.</p>
         <Link href="/me/edit#profile-display" className="font-mono text-[9px] uppercase tracking-wider text-gold hover:text-text-primary">Profile display settings →</Link>
       </div>}
+      rightTitle="COLLECTION" right={<div id="badge-directory-right" />}
     >
       <BadgeDirectory />
     </WorkspaceShell>

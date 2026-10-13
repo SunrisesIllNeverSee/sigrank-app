@@ -141,7 +141,7 @@ export async function ProfileBody({
         hallRecords,
       )
     : null;
-  const profileMarkOptions = await getProfileMarkOptions(codename, boardRows, hallRecords);
+  const profileMarkOptions = await getProfileMarkOptions(codename, boardRows, hallRecords, submissions);
   const selectedPixelBadge = !isPrivate
     ? profileMarkOptions.pixelBadges.find((mark) => mark.id === markPreferences?.profile_pixel_badge) ?? null
     : null;
@@ -286,11 +286,16 @@ export async function ProfileBody({
           }
           badges={
             <BadgesView
+              platformSubmissions={submissions}
+              snapshotRecords={snapshotRecords}
               operator={operator}
               snapshot={snapshot}
               records={operatorRecords}
               trophyCounts={trophyCounts}
               scoredSnapshots={snapshotRecords.length}
+              evidenceDate={snapshotRecords.find(r => r.submissionId === boardRow?.source_submission_id)?.submittedAt || snapshot.snapshot_date || undefined}
+              snapshotHash={snapshotRecords.find(r => r.submissionId === boardRow?.source_submission_id)?.snapshotHash ?? null}
+              submissionId={boardRow?.source_submission_id ?? undefined}
               processedTokens={boardRow ? boardRow.telemetry.fresh_input + boardRow.telemetry.output + boardRow.telemetry.cache_read + boardRow.telemetry.cache_create : 0}
               percentile={fieldPct}
               pending={pending}

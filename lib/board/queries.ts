@@ -739,6 +739,7 @@ export async function getIndexableOperatorRows(
 
 /** One operator submission cell: a (platform, window) point with its score. */
 export interface OperatorSubmission {
+  platformAttributed?: boolean;
   /** Lowercase platform ('claude'/'codex'/'multi'/…). */
   platform: string;
   /** Window bucket ('7d'/'30d'/'90d'/'all_time'/'today'). */
@@ -762,6 +763,7 @@ function toSubmission(
   const c = s.cascade;
   return {
     platform: (snap.platform ?? primaryDomain ?? "other").toLowerCase(),
+    platformAttributed: Boolean(snap.platform && snap.platform !== "multi" && snap.platform !== "other"),
     window: snap.window_type ?? "all_time",
     snapshotDate: snap.snapshot_date ?? null,
     classTier: s.class_tier,
@@ -1456,6 +1458,7 @@ export async function getOperatorRecords(
  *  token pillars, derived metrics, verification/provenance). */
 export interface SnapshotRecord {
   submissionId: string;
+  snapshotHash?: string | null;
   submittedAt: string;
   platform: string;
   window: string | null;
@@ -1517,7 +1520,7 @@ export async function getOperatorSnapshotRecords(
     const { data, error } = await sb
       .from("snapshot_submissions")
       .select(
-        "submission_id, submitted_at, window_type, window_start, window_end, platform, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, workflow_mode, workflow_evidence_url, workflow_mode_version, mode_assessed_at",
+        "snapshot_hash, submission_id, submitted_at, window_type, window_start, window_end, platform, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, workflow_mode, workflow_evidence_url, workflow_mode_version, mode_assessed_at",
       )
       .eq("operator_id", op.operator_id)
       .eq("status", "scored")
@@ -1528,6 +1531,7 @@ export async function getOperatorSnapshotRecords(
     const rows =
       asDb<Array<{
         submission_id: string;
+        snapshot_hash: string | null;
         submitted_at: string | null;
         window_type: string | null;
         window_start: string | null;
@@ -1583,6 +1587,7 @@ export async function getOperatorSnapshotRecords(
         : null;
       return {
         submissionId: s.submission_id,
+        snapshotHash: typeof s.snapshot_hash === "string" ? s.snapshot_hash : null,
         submittedAt: s.submitted_at ?? "",
         platform: (s.platform ?? "other").toLowerCase(),
         window: s.window_type,

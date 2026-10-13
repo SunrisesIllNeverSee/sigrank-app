@@ -11,11 +11,13 @@ export function PixelArtwork({
   pattern: string;
   size?: number;
 }) {
-  const cells = pattern.replaceAll("/", "").split("");
+  const rows = pattern.split("/");
+  const columns = Math.max(...rows.map(row => row.length));
+  const cells = rows.flatMap(row => row.padEnd(columns, ".").split(""));
   return (
     <span
-      className="grid shrink-0 grid-cols-3 grid-rows-3 gap-[3px]"
-      style={{ width: size, height: size }}
+      className="grid shrink-0"
+      style={{ width: size, height: size, display: "grid", gridTemplateColumns: `repeat(${columns},1fr)`, gridTemplateRows: `repeat(${rows.length},1fr)`, gap: Math.max(1, Math.round(size / (columns * 8))) }}
       aria-hidden="true"
     >
       {cells.map((cell, i) => (

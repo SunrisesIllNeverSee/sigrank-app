@@ -256,6 +256,13 @@ describe("getOperatorSnapshotRecords", () => {
     }
   });
 
+  it("maps stored proof hashes without fabricating missing hashes", async () => {
+    submissionRows = [{ ...HITL_ROW, snapshot_hash: "a".repeat(64) }];
+    expect((await getOperatorSnapshotRecords("test-op"))[0].snapshotHash).toBe("a".repeat(64));
+    submissionRows = [HITL_ROW];
+    expect((await getOperatorSnapshotRecords("test-op"))[0].snapshotHash).toBeNull();
+  });
+
   it("constrains the read to the operator and scored status", async () => {
     submissionRows = [HITL_ROW];
     await getOperatorSnapshotRecords("test-op");

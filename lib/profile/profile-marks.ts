@@ -1,4 +1,4 @@
-import { getHallOfSignal, getLeaderboard } from "@/lib/board";
+import { getHallOfSignal, getLeaderboard, getOperatorSubmissions } from "@/lib/board";
 import { BOARD_SIGIL, HALL_INK, hallSigil } from "./record-artwork";
 import { earnedPixelMarks } from "./pixel-eligibility";
 import { sortValue } from "@/lib/analytics/sort-value";
@@ -19,6 +19,7 @@ export async function getProfileMarkOptions(
   codename: string,
   knownBoardRows?: Awaited<ReturnType<typeof getLeaderboard>>,
   knownHallRecords?: Awaited<ReturnType<typeof getHallOfSignal>>,
+  knownPlatformSubmissions?: Awaited<ReturnType<typeof getOperatorSubmissions>>,
 ) {
   const [boardRows, hallRecords] = knownBoardRows && knownHallRecords
     ? [knownBoardRows, knownHallRecords]
@@ -27,11 +28,13 @@ export async function getProfileMarkOptions(
         getHallOfSignal(),
       ]);
   const row = boardRows.find((entry) => entry.operator.codename.toLowerCase() === codename.toLowerCase());
+  const platformSubmissions = knownPlatformSubmissions ?? (row && !row.pending ? await getOperatorSubmissions(codename) : []);
   const pixelBadges: ProfileMarkOption[] = row ? earnedPixelMarks({
     percentile: row.percentile,
     processedTokens: row.telemetry ? sortValue(row, "totalTokens") : 0,
     verificationStatus: row.operator.verification_status,
     pending: row.pending,
+    platformSubmissions,
   }) : [];
 
   const trophies = row

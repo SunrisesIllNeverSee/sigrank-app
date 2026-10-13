@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { getProfileMarkOptions } from "@/lib/profile/profile-marks";
 import type { HallRecord, LeaderboardRow } from "@/lib/board";
 
-vi.mock("@/lib/board", () => ({ getLeaderboard: vi.fn(), getHallOfSignal: vi.fn() }));
+vi.mock("@/lib/board", () => ({ getLeaderboard: vi.fn(), getHallOfSignal: vi.fn(), getOperatorSubmissions: vi.fn().mockResolvedValue([]) }));
 vi.mock("@/lib/analytics/trophy-counts", () => ({
   computeTrophyCounts: vi.fn().mockResolvedValue({
     dynamicRecords: [{ canonId: "Y.01", name: "Yield", rank: 2, value: "100 Υ" }],
