@@ -15,6 +15,20 @@ import {
 } from "@/lib/analytics/secret-config";
 import type { Core5Raw, Core5Scores } from "@/lib/analytics/scoring-types";
 
+export interface ScoringRules {
+  weights: Record<keyof Core5Scores, number>;
+  depthBuckets: ReadonlyArray<readonly [number, number]>;
+  depthFallback: number;
+  classes: ReadonlyArray<{ class: string; totalMin: number }>;
+}
+
+const activeRules: ScoringRules = {
+  weights: RS01_SIGNA_WEIGHTS,
+  depthBuckets: RS02_DEPTH_BUCKETS,
+  depthFallback: RS02_DEPTH_FALLBACK,
+  classes: RS05_CLASS_THRESHOLDS,
+};
+
 /** Log normalization shared by TT / MV / Signal Force: min(100, 20·log10(x+1)). */
 export const logNorm = (x: number): number =>
   Math.min(100, 20 * Math.log10(x + 1));
@@ -31,10 +45,10 @@ const clamp = (x: number, min: number, max: number): number =>
  * - ct   = already [0,100] (clamped)
  * - tt   = log normalization of total tokens
  */
-export function normalizeCore5(raw: Core5Raw): Core5Scores {
+export function normalizeCore5(raw: Core5Raw, rules: ScoringRules = activeRules): Core5Scores {
   return {
     comp: clamp(raw.compression_ratio * 100, 0, 100),
-    sd: bucketizeDepth(raw.session_depth),
+    sd: bucketizeDepth(raw.session_depth, rules),
     pc: clamp(raw.prompt_complexity, 0, 100),
     ct: clamp(raw.cross_thread, 0, 100),
     tt: logNorm(raw.token_throughput),
@@ -42,20 +56,20 @@ export function normalizeCore5(raw: Core5Raw): Core5Scores {
 }
 
 /** RS.02 session-depth bucketization. First threshold met (>=) wins. */
-export function bucketizeDepth(rawDepth: number): number {
-  for (const [threshold, score] of RS02_DEPTH_BUCKETS) {
+export function bucketizeDepth(rawDepth: number, rules: ScoringRules = activeRules): number {
+  for (const [threshold, score] of rules.depthBuckets) {
     if (rawDepth >= threshold) return score;
   }
-  return RS02_DEPTH_FALLBACK;
+  return rules.depthFallback;
 }
 
 /**
  * computeSignaRate — RS.01-weighted Core 5 composite (CANON §VI.7).
  * = w·comp + w·sd + w·pc + w·ct + w·tt, result in [0,100].
  */
-export function computeSignaRate(scores: Core5Scores): number {
+export function computeSignaRate(scores: Core5Scores, rules: ScoringRules = activeRules): number {
   const { comp, sd, pc, ct, tt } = scores;
-  const w = RS01_SIGNA_WEIGHTS;
+  const w = rules.weights;
   const signa = w.comp * comp + w.sd * sd + w.pc * pc + w.ct * ct + w.tt * tt;
   return clamp(signa, 0, 100);
 }
@@ -75,11 +89,11 @@ export function computeSignaRate(scores: Core5Scores): number {
  * for each threshold in order, totalTokens >= totalMin wins. First match wins;
  * fallthrough returns the last class (IGNITER, floor 0).
  */
-export function assignClass(totalTokens: number): SignalClass {
-  for (const t of RS05_CLASS_THRESHOLDS) {
+export function assignClass(totalTokens: number, rules: ScoringRules = activeRules): SignalClass {
+  for (const t of rules.classes) {
     if (totalTokens >= t.totalMin) return t.class as SignalClass;
   }
-  return RS05_CLASS_THRESHOLDS[RS05_CLASS_THRESHOLDS.length - 1]
+  return rules.classes[rules.classes.length - 1]
     .class as SignalClass;
 }
 
@@ -125,10 +139,10 @@ export interface ScoreSnapshotResult {
  * Movement deltas, SDOT/SDRM, and Drift Ratio are computed elsewhere (history /
  * AuditProvider), not here.
  */
-export function scoreSnapshot(input: ScoreSnapshotInput): ScoreSnapshotResult {
-  const scores = normalizeCore5(input.raw);
-  const signa_rate = computeSignaRate(scores);
-  const class_tier = assignClass(input.raw.token_throughput);
+export function scoreSnapshot(input: ScoreSnapshotInput, rules: ScoringRules = activeRules): ScoreSnapshotResult {
+  const scores = normalizeCore5(input.raw, rules);
+  const signa_rate = computeSignaRate(scores, rules);
+  const class_tier = assignClass(input.raw.token_throughput, rules);
   const sf = computeSignalForce(
     input.totalMessagesLifetime,
     input.raw.session_depth,
