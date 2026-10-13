@@ -10,7 +10,6 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { withOG } from "@/lib/seo";
@@ -141,9 +140,6 @@ export default async function FieldPage() {
         rightTitle="CITATION"
         right={
           <>
-            <div className="mod"><div className="mini-h"><span className="sq" />SHARE RESEARCH</div>
-              <UnifiedShare title="SignalAF · Field Analysis" href="/field" markdown editorial compact />
-            </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>THE FIELD</div>
               <div className="ws-kv">

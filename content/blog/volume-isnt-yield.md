@@ -4,7 +4,7 @@ title: "Volume Isn't Yield: The Shape of AI Operators"
 description: A historical analysis of 1,628 AI coding operator records by volume, Yield, and token-flow composition. Statistical groups describe operating signatures, not the level of human intervention.
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
-author: Deric (@SunrisesIllNeverSee)
+author: Deric J. McHenry
 hero: /article-charts/webp/03-volume-vs-yield.webp
 ---
 
