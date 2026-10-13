@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ExchangePolicyUpdateSchema } from '@/lib/exchange-gateway/src/schema'
 import { mergeExchangePolicy } from '@/lib/exchange-gateway/src/policy'
-import { authenticateCompany, findCompany, getExchangeAdmin, hashSecret, newSecret, normalizeDomain } from '@/lib/exchange/server'
+import { authenticateCompany, authenticateCompanyAllowUnverified, findCompany, getExchangeAdmin, hashSecret, newSecret, normalizeDomain } from '@/lib/exchange/server'
 import { isProhibitedHost } from '@/lib/exchange/mcp-tools'
 
 export async function GET(req:NextRequest){
   const domain=normalizeDomain(req.nextUrl.searchParams.get('domain')||'')
-  if(!domain||!(await authenticateCompany(domain,req.headers.get('x-exchange-company-key')))) return NextResponse.json({error:'Unauthorized'},{status:401})
+  if(!domain||!(await authenticateCompanyAllowUnverified(domain,req.headers.get('x-exchange-company-key')))) return NextResponse.json({error:'Unauthorized'},{status:401})
   const company=await findCompany(domain)
   if(!company) return NextResponse.json({error:'Company not found'},{status:404})
   const admin=getExchangeAdmin()
