@@ -260,7 +260,7 @@ export default async function ShareOperatorPage({
         <p className="mt-2 text-sm text-text-secondary">Open a view, choose what to show, then download its current image.</p>
         <div className="share-capture-grid mt-4 grid gap-3 sm:grid-cols-2">
           {[
-            { name: "Four Degrees · custom card", href: "/share/four-degrees", note: "Pixel-designed post card → Download PNG" },
+            { name: "AI comparison · LinkedIn card", href: "/share/four-degrees", note: "Find your rank · OITL / Auto highs → Download PNG" },
             { name: "Leaderboard", href: "/board/all", note: "Share → Screenshot PNG; keeps your current filters" },
             { name: "Compare / VS", href: `/compare?a=${encodeURIComponent(row.operator.codename)}&b=the-field`, note: "Share VS matchup → Download PNG" },
             { name: "User profile", href: profilePath, note: "Screen capture → Download PNG; captures your current view" },

@@ -1,13 +1,13 @@
-# Four Degrees custom share card
+# AI comparison card — LinkedIn revision
 
 Preview: http://localhost:3230/share/four-degrees
 
-Created a dedicated post layout in the current pixel/terminal visual style: gold block-letter heading, four colored reference panels, all seven chart metrics, and source/provenance notes. Added a direct entry to the existing operator share gallery. Existing chart layouts are preserved.
+Owner requested a modern LinkedIn graphic independent of site themes and focused on the chart. Replaced the terminal design with white, navy, blue and teal sans-serif artwork. Comparison sequence: modeled average world user; our field median; question-mark CTA (Find your rank); power-user median; SignalAF OITL highs; SignalAF Auto/review highs. All seven existing metrics retained.
 
-Uses existing getAverageUsersColumn/getPowerUsersColumn/getTopOperatorColumn helpers and AA_BASELINE; no new scoring or database path. Missing measured columns show an em dash rather than static reference numbers presented as live data. Existing helper cohort definitions remain unchanged.
+World-user values are explicitly identified as the AA modeled reference, not a measured global average. Field/power columns reuse existing Four Degrees helpers. OITL/Auto highs use cached getLeaderboard all-time claimed operator totals with mode all so workflow values are resolved. Membership uses inCohort, including hybrid overlap and unresolved Auto review candidates; this is disclosed on the artwork. Noncompounding, pending and placeholder rows are excluded. Each metric is maximized independently; operating ratio uses the Yield leader of its cohort. This card does not change classification, scoring, or existing board filters.
 
-Share, Download PNG, and Copy link use the existing ArtworkShareControls component. Export fixes the artwork width at 1080 CSS pixels with a 3× capture: tested PNG was 3240×3162. Public source link points to /wiki/four-degrees. The rendered page is still staging-only.
+Shared export controls now accept an optional backgroundColor. This card passes white; existing cards retain their dark default. Export uses 1200 CSS pixel width at 3×. Verified download was 3600×3633 PNG, visually inspected with both cohort columns populated. Stored at /Users/dericmchenry/Downloads/signalaf-ai-comparison-linkedin.png. Share gallery entry updated.
 
-Validation: TypeScript clean; scoped ESLint clean; canonical 11/11; diff whitespace clean. WebKit rendered the card and successfully downloaded the real PNG. Export visually inspected for clipped labels, source notes, and legibility. Local downloaded artwork: /Users/dericmchenry/Downloads/signalaf-four-degrees-card.png.
+Validation: TypeScript clean, scoped ESLint clean, canonical 11/11, two targeted metric-high tests passed, git diff whitespace clean. Actual WebKit PNG download succeeded. No database migration or dependency added; production unchanged.
 
-Owned files: components/share/FourDegreesShareCard.tsx, components/share/four-degrees-card.css, app/share/four-degrees/page.tsx, and the Four Degrees entry in app/s/[codename]/page.tsx. No dependency or migration required.
+Owned files: components/share/FourDegreesShareCard.tsx; four-degrees-card.css; ArtworkShareControls.tsx optional export background; app/share/four-degrees/page.tsx; gallery entry in app/s/[codename]/page.tsx; lib/share/four-degrees-highs.ts; __tests__/board/four-degrees-highs.test.ts.
