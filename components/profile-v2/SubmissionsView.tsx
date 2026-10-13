@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { OriginalKernelButton } from "./OriginalKernelButton";
+import { useBoardSession } from "@/components/live/session";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 
 /**
  * components/profile-v2/SubmissionsView.tsx — the SUBMISSIONS tab for the v2
@@ -376,8 +379,10 @@ function ModeChip({ r }: { r: SnapshotRecord }) {
 /** Expanded per-submission record table — the scored snapshot_submissions
  *  archive with reporting windows, platforms, token pillars, derived metrics
  *  and provenance. Null fields render "—" (unavailable), never 0. */
-function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
+function SnapshotRecordsTable({ records, codename }: { records: SnapshotRecord[]; codename: string }) {
   const [visible, setVisible] = useState(HISTORY_INITIAL);
+  const session = useBoardSession();
+  const isOwner = session.loaded && session.signedIn && session.codename === codename;
   const rows = records.slice(0, visible);
   const latest = rows[0];
   const cell = "px-3 py-2 text-right text-text-secondary";
@@ -392,7 +397,7 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
         <table className="w-full min-w-[980px] border-collapse font-mono text-[11px] tabular-nums">
           <thead>
             <tr>
-              {["Date", "Window", "Platform", "In", "Out", "Cache-R", "Cache-W", "Υ", "SNR", "Vel", "Mode", "Ruleset"].map((h, i) => (
+              {["Date", "Window", "Platform", "In", "Out", "Cache-R", "Cache-W", "Υ", "SNR", "Vel", "Mode", "Ruleset", "Original"].map((h, i) => (
                 <th
                   key={h}
                   className={`border-b border-bg-border px-3 py-2 text-[8px] font-semibold uppercase tracking-[0.1em] text-text-muted ${
@@ -408,6 +413,7 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
             {rows.map((r) => (
               <tr
                 key={r.submissionId}
+                id={"submission-" + encodeURIComponent(r.submissionId)}
                 className="border-b border-bg-border-subtle last:border-0 odd:bg-bg-elevated/40"
               >
                 <td className="px-3 py-2 text-left text-text-secondary">
@@ -432,6 +438,13 @@ function SnapshotRecordsTable({ records }: { records: SnapshotRecord[] }) {
                 </td>
                 <td className={r.rulesetVersion == null ? dim : cell}>
                   {r.rulesetVersion ?? "—"}
+                </td>
+                <td className="px-3 py-2 text-right">
+                  <div className="flex flex-col items-end gap-1">
+                    <UnifiedShare compact label="↗" title={"SignalAF · Scored submission · " + r.submittedAt.slice(0, 10)}
+                      href={"/user/" + encodeURIComponent(codename) + "?tab=submissions#submission-" + encodeURIComponent(r.submissionId)} />
+                    {isOwner && <OriginalKernelButton codename={codename} submissionId={r.submissionId} />}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -797,7 +810,7 @@ export function SubmissionsView({
 
       {hasSubs && <CoverageGrid operator={operator} submissions={submissions} />}
       {hasRecords
-        ? <SnapshotRecordsTable records={snapshotRecords} />
+        ? <SnapshotRecordsTable records={snapshotRecords} codename={operator.codename} />
         : history.length > 0 && <HistoryTable history={history} />}
       {history.length > 0 && <Timeline operator={operator} history={history} />}
       <MultiWindow
