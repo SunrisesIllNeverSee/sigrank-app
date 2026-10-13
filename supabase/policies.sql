@@ -43,13 +43,10 @@ ALTER TABLE webhook_events          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_log               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ruleset_versions        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_stats            ENABLE ROW LEVEL SECURITY;
-ALTER TABLE circles                 ENABLE ROW LEVEL SECURITY;
-ALTER TABLE circle_members          ENABLE ROW LEVEL SECURITY;
-ALTER TABLE circle_metric_snapshots ENABLE ROW LEVEL SECURITY;
 
 -- ----------------------------------------------------------------------------
 -- Public read tables — anon + authenticated may SELECT.
--- These back every public-facing page (leaderboard, profiles, hall, circles).
+-- These back every public-facing page (leaderboard, profiles, hall).
 -- ----------------------------------------------------------------------------
 DROP POLICY IF EXISTS p_operators_public_select ON operators;
 CREATE POLICY p_operators_public_select ON operators
@@ -87,21 +84,8 @@ DROP POLICY IF EXISTS p_system_stats_public_select ON system_stats;
 CREATE POLICY p_system_stats_public_select ON system_stats
   FOR SELECT TO anon, authenticated USING (true);
 
+-- audit_records is intentionally NOT public (0035 dropped its public policy).
 DROP POLICY IF EXISTS p_audit_records_public_select ON audit_records;
-CREATE POLICY p_audit_records_public_select ON audit_records
-  FOR SELECT TO anon, authenticated USING (true);
-
-DROP POLICY IF EXISTS p_circles_public_select ON circles;
-CREATE POLICY p_circles_public_select ON circles
-  FOR SELECT TO anon, authenticated USING (true);
-
-DROP POLICY IF EXISTS p_circle_members_public_select ON circle_members;
-CREATE POLICY p_circle_members_public_select ON circle_members
-  FOR SELECT TO anon, authenticated USING (true);
-
-DROP POLICY IF EXISTS p_circle_metric_snapshots_public_select ON circle_metric_snapshots;
-CREATE POLICY p_circle_metric_snapshots_public_select ON circle_metric_snapshots
-  FOR SELECT TO anon, authenticated USING (true);
 
 -- ----------------------------------------------------------------------------
 -- NON-public tables — NO public policy. With RLS enabled and no SELECT policy
