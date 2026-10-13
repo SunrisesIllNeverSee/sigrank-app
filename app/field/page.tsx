@@ -496,8 +496,8 @@ export default async function FieldPage() {
           The percentile ladder shows the yield thresholds for each tier. The
           median is where most operators land. The top 1% is where cache
           architecture becomes an art form. If you use AI coding agents, you
-          are probably near the median. Claim your profile to see exactly
-          where you fit.
+          are probably near the median. Sign up to see exactly where you
+          fit.
         </p>
       </section>
 
@@ -595,7 +595,7 @@ export default async function FieldPage() {
           href="/login"
           className="self-start rounded-md border border-gold bg-bg-surface px-5 py-2.5 font-sans text-sm font-bold text-gold transition-colors hover:bg-gold hover:text-bg-primary"
         >
-          Claim your profile →
+          Sign up to get on the board →
         </Link>
       </section>
 
