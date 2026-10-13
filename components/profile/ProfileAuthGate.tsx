@@ -63,7 +63,7 @@ export function ProfileAuthGate({
       .then((d) => {
         if (!alive) return;
         const operator = d?.operator;
-        const isOwner = !!operator && operator.codename === codename;
+        const isOwner = !!operator && operator.codename.toLowerCase() === codename.toLowerCase();
         setAuth({
           isOwner,
           isSignedIn: !!d?.signedIn,

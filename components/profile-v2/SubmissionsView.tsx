@@ -382,7 +382,7 @@ function ModeChip({ r }: { r: SnapshotRecord }) {
 function SnapshotRecordsTable({ records, codename }: { records: SnapshotRecord[]; codename: string }) {
   const [visible, setVisible] = useState(HISTORY_INITIAL);
   const session = useBoardSession();
-  const isOwner = session.loaded && session.signedIn && session.codename === codename;
+  const isOwner = session.loaded && session.signedIn && session.codename?.toLowerCase() === codename.toLowerCase();
   const rows = records.slice(0, visible);
   const latest = rows[0];
   const cell = "px-3 py-2 text-right text-text-secondary";

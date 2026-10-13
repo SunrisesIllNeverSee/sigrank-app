@@ -68,7 +68,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const handle = (body.handle ?? "").trim().slice(0, 100);
+  const handle = (body.handle ?? "")
+    .replace(/[\r\n\t\x00-\x1f\x7f]/g, " ")
+    .trim()
+    .slice(0, 100);
   const email = (body.email ?? "").trim();
 
   if (!handle) {

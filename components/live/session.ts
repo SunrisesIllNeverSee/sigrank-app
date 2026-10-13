@@ -86,7 +86,7 @@ export function fetchBoardSession(): Promise<BoardSession> {
             : Promise.resolve(null),
         ]);
         const g = p?.current_rank?.global;
-        if (typeof g === "number" && Number.isFinite(g)) sess.rank = g;
+        if (typeof g === "number" && Number.isFinite(g) && g > 0) sess.rank = g;
         if (sess.signedIn) {
           const owner = preferences?.operator;
           const hasPreference = owner?.codename?.toLowerCase() === codename.toLowerCase()
