@@ -18,6 +18,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
@@ -385,6 +386,7 @@ export default async function ComparePage({
             <div className="mod cmp-sidebar-challenges">{ThrowDownLine}</div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>SHARE</div>
+              <UnifiedShare title="SignalAF · Operator Matchup" href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`} screenshotTarget="#compare-vs-artwork" />
               <ArtworkShareControls target="compare-vs-artwork" title="VS matchup"
                 filename={`signalaf-vs-${aCode}-${bCode}`}
                 href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`} />

@@ -34,6 +34,7 @@
  * LiveBoardWorkspace.
  */
 import { memo } from "react";
+import { WorkflowMark } from "@/components/profile-v2/WorkflowMark";
 import "./board-cols.css";
 import { PixelBadge, badgeForPct } from "./PixelBadge";
 import type { LiveOperator } from "@/lib/board/live-types";
@@ -324,6 +325,7 @@ export const BoardRow = memo(function BoardRow({
           <span>
             <span className="nm">
               {o.name}
+              <WorkflowMark mode={o.wf === "hitl" || o.wf === "agentic" || o.wf === "hybrid" ? o.wf : null} size="icon" />
               {isVerifiedOp(o.verif) ? (
                 <>
                   {" "}
