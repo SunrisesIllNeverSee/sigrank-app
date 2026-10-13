@@ -28,7 +28,7 @@ export function LoginContent() {
         : null;
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 py-12">
+    <div className="account-access-content mx-auto flex max-w-md flex-col gap-6 py-12">
       <header className="flex flex-col items-center gap-2 text-center">
         <span className="font-mono text-3xl font-bold tracking-[0.1em] text-gold">
           SIGRANK

@@ -1,3 +1,4 @@
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -8,6 +9,7 @@ import {
   type ProfileInitial,
 } from "@/components/auth/ProfileEditForm";
 import { withOG } from "@/lib/seo";
+import { getProfileMarkOptions } from "@/lib/profile/profile-marks";
 
 /**
  * app/me/edit/page.tsx — the editable profile surface (AUTH_LAUNCH_DIRECTIVES D6:
@@ -34,6 +36,11 @@ const EMPTY: ProfileInitial = {
   operator_domains: [],
   avatar_url: "",
   profile_visibility: "public",
+  profile_pixel_badge: null,
+  profile_secondary_logo: null,
+  pixel_badges: [],
+  secondary_logos: [],
+  mark_settings_ready: false,
 };
 
 export default async function EditProfilePage() {
@@ -43,6 +50,12 @@ export default async function EditProfilePage() {
   // Prefill from the operator row (service-role read, scoped to the owner).
   let initial = EMPTY;
   const svc = getSupabaseServer();
+  const [markOptions, savedMarks] = await Promise.all([
+    getProfileMarkOptions(op.codename).catch(() => ({ pixelBadges: [], secondaryLogos: [] })),
+    svc
+      ? svc.from("operators").select("profile_pixel_badge, profile_secondary_logo").eq("operator_id", op.operatorId).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
   if (svc) {
     const { data } = await svc
       .from("operators")
@@ -75,12 +88,34 @@ export default async function EditProfilePage() {
         avatar_url: d.avatar_url ?? "",
         profile_visibility:
           d.profile_visibility === "private" ? "private" : "public",
+        profile_pixel_badge: (savedMarks.data as { profile_pixel_badge?: string | null } | null)?.profile_pixel_badge ?? null,
+        profile_secondary_logo: (savedMarks.data as { profile_secondary_logo?: string | null } | null)?.profile_secondary_logo ?? null,
+        pixel_badges: markOptions.pixelBadges,
+        secondary_logos: markOptions.secondaryLogos,
+        mark_settings_ready: Boolean(svc && !savedMarks.error),
       };
     }
   }
 
+  // Keep the selectors usable when the profile row is temporarily unavailable.
+  initial = {
+    ...initial,
+    pixel_badges: markOptions.pixelBadges,
+    secondary_logos: markOptions.secondaryLogos,
+    profile_pixel_badge: markOptions.pixelBadges.some((mark) => mark.id === initial.profile_pixel_badge)
+      ? initial.profile_pixel_badge
+      : null,
+    profile_secondary_logo: markOptions.secondaryLogos.some((mark) => mark.id === initial.profile_secondary_logo)
+      ? initial.profile_secondary_logo
+      : null,
+  };
+
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-6 py-8">
+    <WorkspaceShell active="profile" title="PROFILE SETTINGS" leftTitle="YOUR PROFILE"
+      left={<div className="mod"><h3><span className="sq" />SETTINGS</h3><Link href={`/user/${encodeURIComponent(op.codename)}`}>← RETURN TO PROFILE</Link></div>}
+      rightTitle="YOUR IDENTITY" right={<div className="mod"><p className="ws-note">Choose your public identity, Pixel badge and an earned secondary mark.</p></div>}
+      leftWidth={228} rightWidth={252}>
+    <div className="account-settings-content mx-auto flex max-w-lg flex-col gap-6 px-4 py-8">
       <header className="flex flex-col gap-1.5">
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           ◈ Your profile
@@ -105,5 +140,6 @@ export default async function EditProfilePage() {
         .
       </p>
     </div>
+    </WorkspaceShell>
   );
 }

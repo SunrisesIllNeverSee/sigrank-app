@@ -65,6 +65,7 @@ export function WorkspaceAccountOptions({ mode, name, theme, setTheme, close }: 
           <a className="ap-item" href={mode === "nolink" ? "/me/edit" : "/me"}>
             {mode === "nolink" ? "FINISH PROFILE SETUP" : "MY PROFILE"}
           </a>
+          {mode !== "nolink" && <a className="ap-item" href="/me/edit#profile-display">PROFILE DISPLAY · BADGES & MARKS</a>}
           {mode !== "nolink" && <a className="ap-item" href="/me/edit">EDIT PROFILE</a>}
           <a className="ap-item" href="/settings">ACCOUNT SETTINGS</a>
           <a className="ap-item" href="/settings#connect-device">DEVICES & KEYS</a>

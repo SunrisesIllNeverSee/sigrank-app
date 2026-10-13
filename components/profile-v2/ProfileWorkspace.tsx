@@ -4,6 +4,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { MyWatchlist } from "./MyWatchlist";
 import "./profile-workspace.css";
 
@@ -38,6 +39,11 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
           {sections.map((key) => <button key={key} type="button" aria-current={section === key ? "page" : undefined}
             onClick={() => select(key)}>{section === key ? "◆" : "◇"} {key}</button>)}
         </nav>
+        <Link className="ws-profile-back" href="/hall/badges">BADGE GALLERY →</Link>
+        <Link className="ws-profile-back" href={`/s/${encodeURIComponent(codename)}`}>SHAREABLES GALLERY →</Link>
+        <div className="mod"><h3><span className="sq" />SCREEN CAPTURE</h3>
+          <ArtworkShareControls target="main.stage" title="profile view" filename={`signalaf-profile-${codename}-${section}`} href={`/user/${encodeURIComponent(codename)}?tab=${section}`} />
+        </div>
         <Link className="ws-profile-back" href="/board/all">← BACK TO BOARD</Link>
         <div className="mod"><h3><span className="sq" />OPERATOR</h3>
           <strong>{name}</strong><p className="ws-note">{codename}</p>

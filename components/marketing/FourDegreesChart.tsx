@@ -14,6 +14,7 @@
  */
 
 import React from "react";
+import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import "./StageReflow.css";
 import Link from "next/link";
 import {
@@ -552,7 +553,13 @@ export async function FourDegreesChart({
           {/* Comparison table LEADS (owner 2026-07-02: table-first, explanation below).
               The 1/3 + 2/3 headline/walkthrough split that used to sit above the table
               now lives below it as a full-width explanation block. */}
-          <ComparisonTable rows={rows} />
+          <div id={`four-degrees-artwork-${variant}`} className="rounded-xl bg-bg-surface p-4">
+            <h3 className="mb-4 text-center font-mono text-xl font-bold text-gold">FOUR DEGREES OF LEVERAGE</h3>
+            <ComparisonTable rows={rows} />
+            <p className="mt-4 text-center font-mono text-xs text-text-muted">AA: modeled baseline · Field & power users: medians · Top eval: one operator<br />signalaf.com/wiki/four-degrees</p>
+          </div>
+          <ArtworkShareControls target={`four-degrees-artwork-${variant}`} title="Four Degrees"
+            filename="signalaf-four-degrees" href="/wiki/four-degrees" />
           <ReferenceContext columns={[aa, avg, power, gold]} />
 
           {/* under-chart footnote (owner 2026-06-22) */}
@@ -646,7 +653,13 @@ export async function FourDegreesChart({
       </div>
 
       <SourceMarkers />
-      <ComparisonTable rows={rows} />
+      <div id={`four-degrees-artwork-${variant}`} className="rounded-xl bg-bg-surface p-4">
+            <h3 className="mb-4 text-center font-mono text-xl font-bold text-gold">FOUR DEGREES OF LEVERAGE</h3>
+            <ComparisonTable rows={rows} />
+            <p className="mt-4 text-center font-mono text-xs text-text-muted">AA: modeled baseline · Field & power users: medians · Top eval: one operator<br />signalaf.com/wiki/four-degrees</p>
+          </div>
+          <ArtworkShareControls target={`four-degrees-artwork-${variant}`} title="Four Degrees"
+            filename="signalaf-four-degrees" href="/wiki/four-degrees" />
       <ReferenceContext columns={[aa, avg, power, gold]} />
 
       <div className="flex flex-col gap-3">

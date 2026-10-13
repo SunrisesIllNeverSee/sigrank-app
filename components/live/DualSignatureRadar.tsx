@@ -1,26 +1,16 @@
-/* components/live/DualSignatureRadar.tsx — LB-G06 approved variant C
- * (SOLAR / ULTRAVIOLET): six-axis operator signature + real field-median
- * overlay, 271×271 fixed.
- *
- * Axis contract = the original /user/[codename] profile radar:
- *   SNR /1 · Velocity /50 · Leverage /200 · 10xDEV /5 · Scale V /9 ·
- *   Efficiency /5 — fixed display ceilings, NOT field-max normalization
- *   (field-max made the field leader a regular pentagon; owner wants the
- *   real signal shape back).
- *
- * Colors: operator = solar gold (solid polygon, circle markers); field
- * median = ultraviolet (dashed polygon, diamond markers) — readable
- * without color per the review candidate. The median is computed from the
- * actual loaded field; when no real reference exists it is simply omitted,
- * never synthesized.
+/* components/live/DualSignatureRadar.tsx — raw usage and derived metric
+ * signatures overlap on one grid with paired axis labels and distinct colors.
+ * Per-axis percentile positions use the loaded time-window cohort,
+ * with shared positions for ties and lower-is-better cost direction.
+ * Missing measurements are excluded without altering canonical scores.
  */
 const AXES = [
-  { key: "snr", name: "SNR", cap: 1 },
-  { key: "velocity", name: "VELOCITY", cap: 50 },
-  { key: "leverage", name: "LEVERAGE", cap: 200 },
-  { key: "dev10x", name: "10xDEV", cap: 5 },
-  { key: "scaleV", name: "SCALE V", cap: 9 },
-  { key: "efficiency", name: "EFFICIENCY", cap: 5 },
+  { key: "snr", name: "SNR" },
+  { key: "velocity", name: "VELOCITY" },
+  { key: "leverage", name: "LEVERAGE" },
+  { key: "dev10x", name: "10xDEV" },
+  { key: "scaleV", name: "SCALE V" },
+  { key: "efficiency", name: "EFFICIENCY" },
 ] as const;
 
 export interface SixAxisFacts {
@@ -32,7 +22,17 @@ export interface SixAxisFacts {
   efficiency: number | null;
 }
 
-const THEME = { operator: "#ffcd52", reference: "#a78bfa", grid: "#4d3a57" };
+export const radarPercentile = (value: number | null, field: (number | null)[], lowerIsBetter = false): number | null => {
+  if (!good(value)) return null;
+  const valid = field.filter(good);
+  if (valid.length < 3) return null;
+  const below = valid.filter(v => v < value).length;
+  const tied = valid.filter(v => v === value).length;
+  const position = Math.max(0, Math.min(1, (below + Math.max(0, tied - 1) / 2) / (valid.length - 1)));
+  return lowerIsBetter ? 1 - position : position;
+};
+
+const THEME = { operator: "#ffcd52", grid: "#4d3a57" };
 
 const pt = (r: number, i: number, c = 135): [number, number] => [
   c + Math.cos(-Math.PI / 2 + (i * Math.PI) / 3) * r,
@@ -43,162 +43,70 @@ const joinPts = (pts: [number, number][]) =>
 const good = (v: number | null | undefined): v is number =>
   typeof v === "number" && Number.isFinite(v) && v >= 0;
 
-export function DualSignatureRadar({
-  operator,
-  fieldMedian,
-  label,
-}: {
+export interface RawAxisFacts {
+  input: number | null;
+  output: number | null;
+  cacheRead: number | null;
+  cacheWrite: number | null;
+  total: number | null;
+  cost: number | null;
+}
+const RAW_AXES = [
+  { key: "input", name: "INPUT" },
+  { key: "output", name: "OUTPUT" },
+  { key: "cacheRead", name: "CACHE READ" },
+  { key: "cacheWrite", name: "CACHE WRITE" },
+  { key: "total", name: "TOTAL" },
+  { key: "cost", name: "COST / 1M ↓" },
+] as const;
+
+export function DualSignatureRadar({ operator, raw, cohort, label }: {
   operator: SixAxisFacts;
-  fieldMedian: SixAxisFacts | null;
+  raw: RawAxisFacts;
+  cohort: { raw: RawAxisFacts; metrics: SixAxisFacts | null }[];
   label: string;
 }) {
-  const norm = (facts: SixAxisFacts) =>
-    AXES.map((a) => {
-      const n = facts[a.key];
-      return good(n) ? Math.min(1, n / a.cap) : null;
-    });
-  const op = norm(operator);
-  const ref = fieldMedian ? norm(fieldMedian) : null;
-  const opReady = op.every((x) => x !== null);
-  const refReady = ref?.every((x) => x !== null) ?? false;
-  if (!opReady)
-    return <div className="dusradar f4-no-data">SIX-AXIS SIGNAL UNAVAILABLE</div>;
-  const xy = (points: (number | null)[]) =>
-    points.map((x, i) => pt(75 * (x ?? 0), i));
-  return (
-    <div className="dusradar">
-      <svg
-        viewBox="0 0 271 271"
-        role="img"
-        aria-label={`${label}: six-axis operator radar${refReady ? ", compared with real field median" : ""}`}
-      >
-        <text x="12" y="16" fill={THEME.operator} fontSize="8">
-          ▣ {label.slice(0, 18)} · DUAL SIGNATURE
-        </text>
-        {[0.25, 0.5, 0.75, 1].map((r) => (
-          <polygon
-            key={r}
-            points={joinPts(AXES.map((_, i) => pt(75 * r, i)))}
-            fill="none"
-            stroke={THEME.grid}
-            strokeWidth=".8"
-          />
-        ))}
-        {AXES.map((_, i) => {
-          const [x, y] = pt(75, i);
-          return (
-            <line
-              key={i}
-              x1="135"
-              y1="135"
-              x2={x}
-              y2={y}
-              stroke={THEME.grid}
-              strokeWidth=".8"
-            />
-          );
+  const rawValues = RAW_AXES.map(a => raw[a.key]);
+  const metricValues = AXES.map(a => operator[a.key]);
+  const shapes = [
+    { title: "RAW", color: "#22d3ee", axes: RAW_AXES, values: rawValues,
+      points: rawValues.map((v, i) => radarPercentile(v, cohort.map(p => p.raw[RAW_AXES[i].key]), i === 5)) },
+    { title: "METRICS", color: THEME.operator, axes: AXES, values: metricValues,
+      points: metricValues.map((v, i) => radarPercentile(v, cohort.map(p => p.metrics?.[AXES[i].key] ?? null))) },
+  ];
+  return <div className="dusradar">
+    <svg viewBox="-22 0 315 291" role="img" aria-label={`${label}: overlapping raw usage and derived metrics percentile radar; loaded field of ${cohort.length} operators`}>
+      <text x="12" y="16" fill="#dee9ec" fontSize="8">DUAL SIGNATURE · RAW + METRICS</text>
+      {[0.25, 0.5, 0.75, 1].map(r => <polygon key={r}
+        points={joinPts(AXES.map((_, i) => pt(75 * r, i)))} fill="none" stroke={THEME.grid} strokeWidth=".8" />)}
+      {AXES.map((_, i) => {
+        const [x, y] = pt(75, i);
+        return <line key={i} x1="135" y1="135" x2={x} y2={y} stroke={THEME.grid} strokeWidth=".8" />;
+      })}
+      {shapes.map(shape => shape.points.every(v => v !== null) ? <g key={shape.title} data-series={shape.title}>
+        <polygon points={joinPts(shape.points.map((v, i) => pt(75 * (v ?? 0), i)))}
+          fill={shape.color} fillOpacity=".10" stroke={shape.color} strokeWidth="2.2"
+          strokeDasharray={shape.title === "RAW" ? "4 2" : undefined} />
+        {shape.points.map((v, i) => {
+          const [x, y] = pt(75 * (v ?? 0), i);
+          return <circle key={i} cx={x} cy={y} r="3" fill={shape.color}>
+            <title>{`${shape.title} · ${shape.axes[i].name}: ${shape.values[i]} · ${((v ?? 0) * 100).toFixed(1)} percentile · ${cohort.filter(p => good(shape.title === "RAW" ? p.raw[RAW_AXES[i].key] : p.metrics?.[AXES[i].key])).length} measured operators`}</title>
+          </circle>;
         })}
-        {refReady && ref && (
-          <g>
-            <polygon
-              points={joinPts(xy(ref))}
-              fill={THEME.reference}
-              fillOpacity=".10"
-              stroke={THEME.reference}
-              strokeDasharray="4 3"
-              strokeWidth="2.4"
-            />
-            {xy(ref).map(([x, y], i) => (
-              <rect
-                key={i}
-                x={x - 2.7}
-                y={y - 2.7}
-                width="5.4"
-                height="5.4"
-                fill={THEME.reference}
-                transform={`rotate(45 ${x} ${y})`}
-              />
-            ))}
-          </g>
-        )}
-        <polygon
-          points={joinPts(xy(op))}
-          fill={THEME.operator}
-          fillOpacity=".14"
-          stroke={THEME.operator}
-          strokeWidth="2.4"
-        />
-        {xy(op).map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="3.4" fill={THEME.operator}>
-            <title>{`${AXES[i].name}: ${operator[AXES[i].key]} / display ceiling ${AXES[i].cap}`}</title>
-          </circle>
-        ))}
-        {/* cap saturation is exposed, never implied: a measured value
-            above a fixed display ceiling gets an outward triangle marker
-            — the clipped vertex is not presented as the exact value. */}
-        {AXES.map((a, i) => {
-          const value = operator[a.key];
-          if (value === null || !Number.isFinite(value) || value <= a.cap)
-            return null;
-          const angle = -Math.PI / 2 + (i * Math.PI) / 3;
-          const c = Math.cos(angle);
-          const s = Math.sin(angle);
-          const [cx, cy] = pt(86, i);
-          const tx = -s;
-          const ty = c;
-          return (
-            <polygon
-              key={`overflow-${a.key}`}
-              points={joinPts([
-                [cx + c * 5, cy + s * 5],
-                [cx - c * 3 + tx * 3, cy - s * 3 + ty * 3],
-                [cx - c * 3 - tx * 3, cy - s * 3 - ty * 3],
-              ])}
-              fill={THEME.operator}
-            >
-              <title>{`${a.name} exceeds display ceiling: ${value} (cap ${a.cap})`}</title>
-            </polygon>
-          );
-        })}
-        {AXES.map((a, i) => {
-          const [x, y] = pt(99, i);
-          return (
-            <text
-              key={a.key}
-              x={x}
-              y={y}
-              fill="#dee9ec"
-              fontSize="9"
-              textAnchor={i === 0 || i === 3 ? "middle" : i === 1 || i === 2 ? "start" : "end"}
-              dominantBaseline="middle"
-            >
-              {a.name}
-            </text>
-          );
-        })}
-        <circle cx="28" cy="253" r="3" fill={THEME.operator} />
-        <text x="36" y="256" fill="#dee9ec" fontSize="7.5">
-          OPERATOR
-        </text>
-        {refReady && (
-          <g>
-            <rect
-              x="123"
-              y="250"
-              width="6"
-              height="6"
-              fill={THEME.reference}
-              transform="rotate(45 126 253)"
-            />
-            <text x="136" y="256" fill="#dee9ec" fontSize="7.5">
-              FIELD MEDIAN
-            </text>
-          </g>
-        )}
-        <text x="256" y="268" fill="#dee9ec" fontSize="6.4" textAnchor="end" opacity=".8">
-          ▲ = ABOVE AXIS CEILING
-        </text>
-      </svg>
-    </div>
-  );
+      </g> : <text key={shape.title} x="12" y={shape.title === "RAW" ? 240 : 252} fill={shape.color} fontSize="8">{shape.title} UNAVAILABLE</text>)}
+      {AXES.map((a, i) => {
+        const [x, y] = pt(101, i);
+        const anchor = i === 0 || i === 3 ? "middle" : i === 1 || i === 2 ? "start" : "end";
+        return <g key={a.key}>
+          <text x={x} y={y - 5} fill="#22d3ee" fontSize="8" textAnchor={anchor}>{RAW_AXES[i].name}</text>
+          <text x={x} y={y + 7} fill={THEME.operator} fontSize="8" textAnchor={anchor}>{a.name}</text>
+        </g>;
+      })}
+      <line x1="26" y1="267" x2="42" y2="267" stroke="#22d3ee" strokeWidth="2" strokeDasharray="4 2" />
+      <text x="48" y="270" fill="#22d3ee" fontSize="8">RAW</text>
+      <line x1="134" y1="267" x2="150" y2="267" stroke={THEME.operator} strokeWidth="2" />
+      <text x="156" y="270" fill={THEME.operator} fontSize="8">METRICS</text>
+      <text x="135" y="286" fill="#dee9ec" fontSize="6.5" textAnchor="middle">PERCENTILE · FIELD {cohort.length} · EDGE 100 · COST ↓</text>
+    </svg>
+  </div>;
 }

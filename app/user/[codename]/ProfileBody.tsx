@@ -29,6 +29,8 @@ import {
   getLeaderboard,
   getHallOfSignal,
 } from "@/lib/board";
+import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getProfileMarkOptions } from "@/lib/profile/profile-marks";
 import type { HallRecord } from "@/lib/board";
 import { computeFieldAverages } from "@/lib/analytics/field-average";
 import { buildArchetypeOf } from "@/lib/analytics/build-archetypes";
@@ -63,6 +65,10 @@ export async function ProfileBody({
   const { operator, snapshot, telemetry } = row;
   const pending = row.pending ?? false;
   const codename = operator.codename;
+  const svc = getSupabaseServer();
+  const markPreferencesPromise = svc
+    ? svc.from("operators").select("profile_pixel_badge, profile_secondary_logo").eq("operator_id", operator.operator_id).maybeSingle().then(({ data, error }) => error ? null : data as { profile_pixel_badge?: string | null; profile_secondary_logo?: string | null } | null)
+    : Promise.resolve(null);
 
   // 7 parallel fetches — all independent after getOperator.
   // getLeaderboard is the heaviest (~2.5MB, memo-cached 3600s).
@@ -75,6 +81,7 @@ export async function ProfileBody({
     boardRows,
     hallRecords,
     watchCount,
+    markPreferences,
   ] = await Promise.all([
     getOperatorHistory(codename),
     getOperatorSubmissions(codename),
@@ -83,6 +90,7 @@ export async function ProfileBody({
     getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }),
     getHallOfSignal(),
     getOperatorWatchCount(codename),
+    markPreferencesPromise,
   ]);
 
   // Auth state resolved client-side so this stays ISR-cached.
@@ -132,6 +140,13 @@ export async function ProfileBody({
         boardRows,
         hallRecords,
       )
+    : null;
+  const profileMarkOptions = await getProfileMarkOptions(codename, boardRows, hallRecords);
+  const selectedPixelBadge = !isPrivate
+    ? profileMarkOptions.pixelBadges.find((mark) => mark.id === markPreferences?.profile_pixel_badge) ?? null
+    : null;
+  const selectedSecondaryBadge = !isPrivate
+    ? profileMarkOptions.secondaryLogos.find((mark) => mark.id === markPreferences?.profile_secondary_logo) ?? null
     : null;
   const totalTokens = ranked
     ? telemetry.fresh_input + telemetry.output + telemetry.cache_read + telemetry.cache_create
@@ -185,6 +200,8 @@ export async function ProfileBody({
               archetype={archetype}
               tierProgress={tierProgress}
               trophyCounts={trophyCounts}
+              selectedPixelBadge={selectedPixelBadge}
+              selectedSecondaryBadge={selectedSecondaryBadge}
               watchCount={watchCount}
               boardRows={boardRows}
               history={history}
@@ -273,8 +290,9 @@ export async function ProfileBody({
               snapshot={snapshot}
               records={operatorRecords}
               trophyCounts={trophyCounts}
-              tierProgress={tierProgress}
               scoredSnapshots={snapshotRecords.length}
+              processedTokens={boardRow ? boardRow.telemetry.fresh_input + boardRow.telemetry.output + boardRow.telemetry.cache_read + boardRow.telemetry.cache_create : 0}
+              percentile={fieldPct}
               pending={pending}
             />
           }

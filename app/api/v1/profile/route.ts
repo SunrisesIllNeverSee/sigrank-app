@@ -3,6 +3,7 @@ import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 import { SAVABLE_PLATFORM_DOMAINS } from "@/lib/constants";
+import { getProfileMarkOptions } from "@/lib/profile/profile-marks";
 
 /**
  * POST /api/v1/profile — update the signed-in operator's own profile fields.
@@ -54,6 +55,16 @@ export async function GET() {
     avatar_url: string | null;
     profile_visibility: string | null;
   } | null;
+  const [markResult, markOptions] = await Promise.all([
+    svc
+      .from("operators")
+      .select("profile_pixel_badge, profile_secondary_logo")
+      .eq("operator_id", op.operatorId)
+      .maybeSingle(),
+    getProfileMarkOptions(op.codename).catch(() => ({ pixelBadges: [], secondaryLogos: [] })),
+  ]);
+  const marks = markResult.data;
+  const savedMarks = marks as { profile_pixel_badge?: string | null; profile_secondary_logo?: string | null } | null;
 
   return NextResponse.json({
     operator: {
@@ -66,6 +77,15 @@ export async function GET() {
       operator_domains: d?.operator_domains ?? [],
       avatar_url: d?.avatar_url ?? "",
       profile_visibility: d?.profile_visibility ?? "public",
+      profile_pixel_badge: markOptions.pixelBadges.some((mark) => mark.id === savedMarks?.profile_pixel_badge)
+        ? savedMarks?.profile_pixel_badge ?? null
+        : null,
+      profile_secondary_logo: markOptions.secondaryLogos.some((mark) => mark.id === savedMarks?.profile_secondary_logo)
+        ? savedMarks?.profile_secondary_logo ?? null
+        : null,
+      pixel_badges: markOptions.pixelBadges,
+      secondary_logos: markOptions.secondaryLogos,
+      mark_settings_ready: !markResult.error,
     },
   });
 }
@@ -125,6 +145,34 @@ export async function POST(req: NextRequest) {
   // when the caller explicitly sends it (so partial saves don't clobber it).
   if (body.profile_visibility === "public" || body.profile_visibility === "private") {
     update.profile_visibility = body.profile_visibility;
+  }
+  const hasPixelPreference = Object.hasOwn(body, "profile_pixel_badge");
+  const hasSecondaryPreference = Object.hasOwn(body, "profile_secondary_logo");
+  if (hasPixelPreference || hasSecondaryPreference) {
+    const [options, { error: readMarkError }] = await Promise.all([
+      getProfileMarkOptions(op.codename),
+      svc.from("operators").select("profile_pixel_badge, profile_secondary_logo").eq("operator_id", op.operatorId).maybeSingle(),
+    ]);
+    if (readMarkError) {
+      return NextResponse.json(
+        { error: "Profile badge settings are unavailable until the latest database migration is applied." },
+        { status: 503 },
+      );
+    }
+    if (hasPixelPreference) {
+      const value = str(body.profile_pixel_badge, 40);
+      if (value && !options.pixelBadges.some((mark) => mark.id === value)) {
+        return NextResponse.json({ error: "Choose a Pixel badge you have earned." }, { status: 400 });
+      }
+      update.profile_pixel_badge = value;
+    }
+    if (hasSecondaryPreference) {
+      const value = str(body.profile_secondary_logo, 160);
+      if (value && !options.secondaryLogos.some((mark) => mark.id === value)) {
+        return NextResponse.json({ error: "Choose a secondary badge you have earned." }, { status: 400 });
+      }
+      update.profile_secondary_logo = value;
+    }
   }
   // Derive the display platform only when at least one is set (don't clobber an
   // existing primary_domain on an empty platform selection).

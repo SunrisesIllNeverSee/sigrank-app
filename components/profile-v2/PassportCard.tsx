@@ -20,6 +20,9 @@ import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
 import type { FieldAverages } from "@/lib/analytics/field-average";
 import type { WorkflowCohortRank } from "@/lib/analytics/workflow-cohort";
+import type { ProfileMarkOption } from "@/lib/profile/profile-marks";
+import { MedalHex } from "./RecordMarks";
+import { PixelArtwork } from "@/components/profile-v2/BadgeArtwork";
 
 interface PassportCardProps {
   operator: Operator;
@@ -32,6 +35,8 @@ interface PassportCardProps {
   /** Workflow-cohort rank context (item 13) — shown under the combined-field
    *  rank on the card face. Null for pending/unranked operators. */
   cohort?: WorkflowCohortRank | null;
+  selectedPixelBadge?: ProfileMarkOption | null;
+  selectedSecondaryBadge?: ProfileMarkOption | null;
 }
 
 function compact(n: number): string {
@@ -76,6 +81,8 @@ export function PassportCard({
   trophyCounts,
   fieldAvg,
   cohort,
+  selectedPixelBadge,
+  selectedSecondaryBadge,
 }: PassportCardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
@@ -121,7 +128,7 @@ export function PassportCard({
     : "no medals";
 
   return (
-    <div className="pv2-card-shell">
+    <div id={`holocard-${operator.codename}`} className="pv2-card-shell">
       <div className="pv2-card">
         {/* Holo shine — iridescent foil band sweeping the card face. A real
             element (not ::after) so the sweep is transform-based: GPU-only,
@@ -174,6 +181,16 @@ export function PassportCard({
                   <span className="pv2-avatar-initials">{initials}</span>
                 )}
               </div>
+              {selectedPixelBadge?.pattern && (
+                <span title={`Selected Pixel badge: ${selectedPixelBadge.label}`} aria-label={`Selected Pixel badge: ${selectedPixelBadge.label}`} className="absolute -right-2 -top-1 z-10 flex h-8 w-8 items-center justify-center">
+                  <PixelArtwork pattern={selectedPixelBadge.pattern} size={28} />
+                </span>
+              )}
+              {selectedSecondaryBadge && (
+                <span title={`Selected earned badge: ${selectedSecondaryBadge.label}`} aria-label={`Selected earned badge: ${selectedSecondaryBadge.label}`} className="absolute -bottom-1 -right-2 z-10 flex h-8 w-8 items-center justify-center rounded bg-bg-base shadow-lg">
+                  <MedalHex rank={selectedSecondaryBadge.rank} sigil={selectedSecondaryBadge.sigil ?? "★"} ink={selectedSecondaryBadge.accent} size={30} />
+                </span>
+              )}
             </div>
             <div className="pv2-operator-name">{name}</div>
             <div className="pv2-operator-code">{operator.codename}</div>

@@ -87,7 +87,7 @@ import type { PixelBadgeName } from "./PixelBadge";
 import { BADGE_LABELS } from "./PixelBadge";
 import { SignalMedal, SignalAward } from "./SignalHardware";
 import { DualSignatureRadar } from "./DualSignatureRadar";
-import type { SixAxisFacts } from "./DualSignatureRadar";
+import type { SixAxisFacts, RawAxisFacts } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import { ColumnRanks } from "./ColumnRanks";
 import { PeekPanel } from "./PeekPanel";
@@ -295,7 +295,16 @@ function MedalDeck({
    display string — a missing/"—" cell is an absent measurement, never
    an observed zero (numvOf("—") → 0). */
 const effFactOf = (o: LiveOperator): number | null =>
-  o.eff && o.eff !== "—" ? numvOf(o.eff) : null;
+  o.num?.eff ?? (o.eff && o.eff !== "—" ? numvOf(o.eff) : null);
+
+export const rawFactsOf = (o: LiveOperator): RawAxisFacts => ({
+  input: o.num?.i ?? (o.raw.i !== "—" ? numvOf(o.raw.i) : null),
+  output: o.num?.o ?? (o.raw.o !== "—" ? numvOf(o.raw.o) : null),
+  cacheRead: o.num?.cr ?? (o.raw.cr !== "—" ? numvOf(o.raw.cr) : null),
+  cacheWrite: o.num?.cw ?? (o.raw.cw !== "—" ? numvOf(o.raw.cw) : null),
+  total: numTotal(o),
+  cost: o.num?.cost ?? (o.cost !== "—" ? numvOf(o.cost) : null),
+});
 
 export const sixFactsOf = (o: LiveOperator): SixAxisFacts => ({
   snr: o.snr,
@@ -1407,7 +1416,8 @@ export function LiveBoardWorkspace({
                   selOp ? (
                     <DualSignatureRadar
                       operator={sixFactsOf(selOp)}
-                      fieldMedian={fieldSixMedian(ops)}
+                      raw={rawFactsOf(selOp)}
+                      cohort={ops.filter(o => numTotal(o) > 0).map(o => ({ raw: rawFactsOf(o), metrics: o.nc ? null : sixFactsOf(o) }))}
                       label={selOp.name}
                     />
                   ) : (

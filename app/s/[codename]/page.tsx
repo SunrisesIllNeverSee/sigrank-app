@@ -28,6 +28,9 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { HolocardGallery } from "@/components/share/HolocardGallery";
 import { notFound, redirect } from "next/navigation";
 
 import {
@@ -162,7 +165,18 @@ export default async function ShareOperatorPage({
   const ghEmbed = `[![${d.name} — SigRank signal](${SITE_ORIGIN}${sPath}/card.png)](${shareUrl})`;
 
   return (
-    <div className="mx-auto flex min-h-[60vh] w-full max-w-[720px] flex-col justify-center py-10">
+    <WorkspaceShell active="profile" title="SHAREABLES GALLERY" leftTitle="COLLECTION"
+      left={<><div className="mod"><h3><span className="sq" />OPERATOR CARDS</h3><div className="ws-nav">
+        <a href="#share-flagship">SIGNAL CARD</a><a href="#share-holocard">HOLOCARD · PNG / GIF</a>
+        <a href="#share-captures">GENERAL · SCREEN CAPTURES</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
+      </div></div></>}
+      rightTitle="POST & SHARE" right={<><div className="mod"><h3><span className="sq" />POST YOUR IMAGE</h3>
+        <p className="ws-note">Download PNG or GIF and attach it to your post. GIF preserves the moving foil sheen.</p>
+        <div className="ws-nav"><a href={linkedInShare} target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a>
+          <a href={xShare} target="_blank" rel="noopener noreferrer">X ↗</a><a href={fbShare} target="_blank" rel="noopener noreferrer">FACEBOOK ↗</a><a href={mailShare}>EMAIL ↗</a></div>
+      </div><div className="mod"><h3><span className="sq" />GITHUB EMBED</h3><code style={{overflowWrap:"anywhere",fontSize:10}}>{ghEmbed}</code></div></>}
+      leftWidth={228} rightWidth={252} status={<>{d.name} · SHAREABLES</>}>
+    <div className="share-gallery mx-auto flex w-full max-w-[900px] flex-col px-6 py-6">
       {/* Provenance caption — mirrors the card footer (same builder). */}
       <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
         {d.provenance}
@@ -172,7 +186,7 @@ export default async function ShareOperatorPage({
       {/* The share card — the actual card.png bytes, so what you see is what
           LinkedIn/X/Slack render. */}
       <img
-        src={`${sPath}/card.png`}
+        id="share-flagship" src={`${sPath}/card.png`}
         width={1200}
         height={630}
         alt={`${d.name} — SigRank operator signal card: ${d.rankLine}`}
@@ -236,6 +250,25 @@ export default async function ShareOperatorPage({
           once a platform account is linked.
         </p>
       </div>
+
+      <section id="share-holocard" className="mt-8 rounded-xl border border-bg-border bg-bg-surface p-5">
+        <h2 className="mb-4 text-center font-mono text-lg text-text-primary">HOLOGRAPHIC OPERATOR CARD</h2>
+        <Suspense fallback={<p>Loading holocard…</p>}><HolocardGallery row={row} /></Suspense>
+      </section>
+      <section id="share-captures" className="mt-8 rounded-xl border border-bg-border bg-bg-surface p-5">
+        <h2 className="font-mono text-lg text-text-primary">GENERAL · SCREEN CAPTURES</h2>
+        <p className="mt-2 text-sm text-text-secondary">Open a view, choose what to show, then download its current image.</p>
+        <div className="share-capture-grid mt-4 grid gap-3 sm:grid-cols-2">
+          {[
+            { name: "Four Degrees", href: "/sigrank#ws-page-four-degrees", note: "Share Four Degrees → Download PNG" },
+            { name: "Leaderboard", href: "/board/all", note: "Share → Screenshot PNG; keeps your current filters" },
+            { name: "Compare / VS", href: `/compare?a=${encodeURIComponent(row.operator.codename)}&b=the-field`, note: "Share VS matchup → Download PNG" },
+            { name: "User profile", href: profilePath, note: "Screen capture → Download PNG; captures your current view" },
+          ].map(item => <Link key={item.name} href={item.href} className="rounded-lg border border-bg-border p-4 hover:bg-bg-hover">
+            <strong className="text-text-primary">{item.name} →</strong><p className="mt-2 text-xs text-text-muted">{item.note}</p>
+          </Link>)}
+        </div>
+      </section>
 
       {/* Platform share targets — one row per surface. GitHub gets the
           embed snippet (card.png into a README), Gmail goes through
@@ -301,5 +334,6 @@ export default async function ShareOperatorPage({
         </Link>
       </div>
     </div>
+    </WorkspaceShell>
   );
 }
