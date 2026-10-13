@@ -128,7 +128,7 @@ Row Level Security policies, seed data, and security tests live in [`supabase/`]
 | --- | --- |
 | `app/` | App Router pages and API routes |
 | `app/api/v1/` | Public API: ingest, claim, devices, billing, metrics, leaderboard |
-| `app/api/mcp/`, `app/api/exchange/mcp/` | MCP endpoints (analyst plugin and exchange) |
+| `app/api/mcp/`, `app/api/plugins/sigrank/mcp/`, `app/api/exchange/mcp/` | MCP endpoints (main server, analyst plugin, exchange) |
 | `app/exchange/`, `app/api/exchange/` | Contribution exchange UI and API |
 | `components/` | UI components |
 | `lib/board/` | Board reads: Supabase, snapshot, mock fallback |
