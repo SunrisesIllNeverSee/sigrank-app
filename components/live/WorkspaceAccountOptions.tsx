@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import { THEMES, persistLbwTheme, type ThemeName } from "./utils";
 import { liveTrack } from "./analytics";
 import { invalidateBoardSession } from "./session";
+import { ICON_SETS, type IconSetName } from "./PixelIcon";
 import "./account-menu.css";
 
-export function WorkspaceAccountOptions({ mode, name, theme, setTheme, close }: {
+export function WorkspaceAccountOptions({ mode, name, theme, setTheme, iconSet, setIconSet, close }: {
   mode: "loading" | "out" | "in" | "nolink" | "override";
   name: string;
   theme: ThemeName;
   setTheme: (theme: ThemeName) => void;
+  iconSet: IconSetName;
+  setIconSet: (iconSet: IconSetName) => void;
   close: () => void;
 }) {
   const root = useRef<HTMLDivElement>(null);
@@ -72,11 +75,17 @@ export function WorkspaceAccountOptions({ mode, name, theme, setTheme, close }: 
           <a className="ap-item" href="/settings#privacy-data">PRIVACY & DATA</a>
         </>}
       <div className="ap-label">APPEARANCE</div>
-      <div className="themesw ap-themes">
-        {THEMES.map((item) => <button key={item} type="button"
-          className={`sw sw-${item}${item === theme ? " on" : ""}`}
-          title={item} aria-label={`${item} theme`} aria-pressed={item === theme}
-          onClick={() => { setTheme(item); persistLbwTheme(item); liveTrack.themeChanged(item); }} />)}
+      <div className="ap-appearance">
+        <label>Icons<select aria-label="Icon style" value={iconSet}
+          onChange={(event) => setIconSet(event.target.value as IconSetName)}>
+          {ICON_SETS.map(item => <option key={item} value={item}>{item}</option>)}
+        </select></label>
+        <label>Theme<select aria-label="Theme" value={theme} onChange={(event) => {
+          const next = event.target.value as ThemeName;
+          setTheme(next); persistLbwTheme(next); liveTrack.themeChanged(next);
+        }}>
+          {THEMES.map(item => <option key={item} value={item}>{item}</option>)}
+        </select></label>
       </div>
       <a className="ap-item" href="/privacy">PRIVACY POLICY</a>
       {(mode === "in" || mode === "nolink") && <button className="ap-item mut" type="button"
