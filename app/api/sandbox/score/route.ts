@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import type { RawPillars } from "@/lib/ingest/types";
+import { publicScoringRules } from "@/lib/analytics/public-scoring";
 
 export const runtime = "nodejs";
 
@@ -61,9 +62,10 @@ export async function POST(req: NextRequest) {
     pcConfidence: bridge.pcConfidence,
     totalMessagesLifetime: Math.max(totalMessagesLifetime, 0),
     accountAgeDays: Math.max(accountAgeDays, 1),
-  });
+  }, publicScoringRules);
 
   return NextResponse.json({
+    ruleset: "public-example",
     signa_rate: result.signa_rate,
     class_tier: result.class_tier,
     scores: result.scores,

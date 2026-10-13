@@ -29,6 +29,7 @@ import { requireSession } from "@/lib/infra/api-auth";
 import { ingestMeta } from "@/lib/ingest";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
+import { publicScoringRules } from "@/lib/analytics/public-scoring";
 import { captureServer } from "@/lib/infra/posthog/server";
 
 const SCORING_ETA_SECONDS = 10;
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
     pcConfidence: "low",
     totalMessagesLifetime: 0,
     accountAgeDays: 0,
-  });
+  }, publicScoringRules);
 
   // 4. Persist (non-blocking; mock-accept if Supabase not configured)
   const submissionId = deterministicId(
@@ -163,6 +164,7 @@ export async function POST(req: NextRequest) {
           pillars,
           meta,
           scored: {
+            ruleset: "public-example",
             signa_rate: scored.signa_rate,
             class_tier: scored.class_tier,
           },
@@ -189,6 +191,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       status: "received",
+      ruleset: "public-example",
       submission_id: submissionId,
       operator_id: operatorId,
       signa_rate: Math.round(scored.signa_rate * 10) / 10,

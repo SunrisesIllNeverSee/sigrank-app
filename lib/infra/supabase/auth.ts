@@ -14,6 +14,7 @@
 
 import { createBrowserClient as createSsrBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { safeNext } from "@/lib/infra/safe-next";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -34,8 +35,9 @@ export function createBrowserClient(): SupabaseClient | null {
 /** Build the same-origin callback URL, carrying an optional same-origin `next` hop. */
 function callbackUrl(next?: string): string {
   const base = `${location.origin}/auth/callback`;
-  if (next && next.startsWith("/") && !next.startsWith("//")) {
-    return `${base}?next=${encodeURIComponent(next)}`;
+  const destination = safeNext(next, location.origin);
+  if (destination) {
+    return `${base}?next=${encodeURIComponent(destination)}`;
   }
   return base;
 }
