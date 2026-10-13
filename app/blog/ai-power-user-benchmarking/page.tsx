@@ -106,7 +106,7 @@ export default function AiPowerUserBenchmarkingPage() {
 
       {/* ── Article meta ── */}
       <div className="flex items-center gap-3 border-b border-bg-border-subtle pb-4 font-mono text-xs text-text-muted">
-        <span>By SigRank</span>
+        <span>By Deric J. McHenry</span>
         <span aria-hidden="true">·</span>
         <time dateTime="2026-07-07">Published July 7, 2026</time>
         <span aria-hidden="true">·</span>

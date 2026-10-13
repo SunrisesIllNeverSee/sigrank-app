@@ -1809,3 +1809,4 @@
 .lbw-root .account-access-content button,.lbw-root .account-settings-content button{padding:10px 14px;border-radius:6px}
 .lbw-root .account-access-content input,.lbw-root .account-settings-content input,.lbw-root .account-settings-content textarea{padding:10px 12px;border-radius:6px}
 @media(max-width:700px){.lbw-root .share-gallery{padding:16px}.lbw-root .share-gallery .share-capture-grid{grid-template-columns:1fr}}
+.lbw-root .ws-editorial-credit{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin:28px auto 12px;padding:16px 12px;border-top:1px solid var(--line);color:var(--tx2);font:12px/1.6 var(--font-mono);text-align:center}.lbw-root .ws-editorial-credit a{color:var(--tx);text-decoration:none}.lbw-root .ws-editorial-credit a:hover{text-decoration:underline}

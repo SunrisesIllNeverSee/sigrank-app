@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { TopicPage } from "@/components/wiki/TopicPage";
 import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
-import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
@@ -50,7 +49,7 @@ export default function FourDegreesPage() {
           ]),
         ]}
       />
-      <div className="mb-3 flex justify-end"><UnifiedShare title="SignalAF · Four Degrees of Leverage" href="/wiki/four-degrees" screenshotTarget=".four-degrees-responsive" /></div>
+
       <FourDegreesChart variant="full" />
     </TopicPage>
   );
