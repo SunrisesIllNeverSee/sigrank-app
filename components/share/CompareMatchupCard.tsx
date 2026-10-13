@@ -23,6 +23,7 @@ import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { deriveFacts, type OperatorFact } from "@/lib/analytics/compare-facts";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
+import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
 
 // ── Palette (static hex — html-to-image can't resolve CSS vars) ──────────────
 const INK = "#0a0a0a";
@@ -31,8 +32,8 @@ const C_GOLD = "#f0c862";
 const C_DULL = "#6e8a6e";
 const C_BONE = "#e9e3d5"; // matches --text-primary
 const C_LINE = "#332d20"; // matches --bg-border
-const A_COLOR = "#7ab8e8"; // matches rgb(var(--class-arch)) — blue
-const B_COLOR = "#f0c862"; // matches rgb(var(--class-seeker)) — gold
+const A_COLOR = COMPARE_OPERAND_COLORS.a;
+const B_COLOR = COMPARE_OPERAND_COLORS.b;
 
 // Class → hex (static for the card; can't use CSS vars in html-to-image reliably)
 const CLASS_HEX: Record<string, string> = {
@@ -904,13 +905,40 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
   const [preview, setPreview] = useState(false);
 
   const shareLink = async () => {
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "https://signalaf.com";
+    const full = `${origin}${href}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${operatorDisplayName(a)} vs ${operatorDisplayName(b)} · SigRank`,
+          url: full,
+        });
+        track.compareShared("copy", { href, method: "native_share" });
+        return;
+      } catch {
+        /* user cancelled or share failed, fall back to clipboard */
+      }
+    }
     try {
-      await navigator.clipboard.writeText(`https://signalaf.com${href}`);
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(full);
+      } else {
+        const input = document.createElement("input");
+        input.value = full;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
       track.compareShared("copy", { href });
     } catch {
-      /* clipboard blocked */
+      /* clipboard blocked, prompt user */
+      if (typeof window !== "undefined") {
+        window.prompt("Copy link to share this matchup:", full);
+      }
     }
   };
 
@@ -924,9 +952,11 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
         pixelRatio: 2,
         cacheBust: true,
       });
+      const slugA = (a.operator.codename || "op-a").toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
+      const slugB = (b.operator.codename || "op-b").toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `sigrank-compare-matchup.png`;
+      link.download = `sigrank-matchup-${slugA}-vs-${slugB}.png`;
       link.click();
       track.compareShared("download");
     } finally {

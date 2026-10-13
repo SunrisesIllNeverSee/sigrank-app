@@ -1,0 +1,162 @@
+{
+  "schema": "signalaf.pixel-design-proposals/1",
+  "revision": "2026-10-13",
+  "authority": "design proposals; not issued",
+  "description": "Fourteen 7\u00d77 Pixel motifs for sharing, watches, platform use and combinations. Proposed rules are not entitlement decisions.",
+  "entries": [
+    {
+      "id": "pixel-share-relay",
+      "label": "Signal Relay",
+      "family": "sharing",
+      "pattern": "......C/.....CC/....C.C/...C..C/..C...C/.C....C/CCCCCCC",
+      "threshold": "First qualified share",
+      "evidence": "Needs an authenticated, deduplicated share ledger",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "A cyan broadcast arrow rising from a transmission base."
+    },
+    {
+      "id": "pixel-share-broadcaster",
+      "label": "Broadcaster",
+      "family": "sharing",
+      "pattern": "C.C.C.C/CCCCCCC/.W.W.W./WWWWWWW/..P.P../.PPPPP./...P...",
+      "threshold": "10 distinct qualified shares",
+      "evidence": "Needs qualified share receipts; an opened share sheet is not proof of publication",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Cyan transmission banks, white pulses and a violet antenna."
+    },
+    {
+      "id": "pixel-holo-signal",
+      "label": "Prismatic Signal",
+      "family": "sharing",
+      "pattern": ".PPPPP./PWWWWWP/PC.C.CP/P.BWB.P/PM.M.MP/PWWWWWP/.PPPPP.",
+      "threshold": "Share a holographic operator card",
+      "evidence": "Needs a qualified holocard share event",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "A tiny iridescent card, white frame, blue core and pink foil."
+    },
+    {
+      "id": "pixel-watch-scout",
+      "label": "Signal Scout",
+      "family": "watches",
+      "pattern": "......./..GGG../.G...G./G.CBC.G/.G...G./..GGG../.......",
+      "threshold": "Watch one distinct operator",
+      "evidence": "Own authenticated active watchlist; rule proposal",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Green eye outline with a cyan iris and blue pupil."
+    },
+    {
+      "id": "pixel-watch-orbit",
+      "label": "Orbit Watch",
+      "family": "watches",
+      "pattern": "...C.../.PP.PP./.P...P./C..Y..C/.P...P./.PP.PP./...C...",
+      "threshold": "Watch five distinct operators",
+      "evidence": "Own authenticated active watchlist; rule proposal",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Purple orbit, cyan compass points and a golden central signal."
+    },
+    {
+      "id": "pixel-watch-network",
+      "label": "Watch Matrix",
+      "family": "watches",
+      "pattern": "C..C..C/.C.C.C./..CCC../CCCWCCC/..CCC../.C.C.C./C..C..C",
+      "threshold": "Watch ten distinct operators",
+      "evidence": "Own authenticated active watchlist; rule proposal",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Nine connected cyan nodes converge on a white hub."
+    },
+    {
+      "id": "pixel-claude-ember",
+      "label": "Claude Ember",
+      "family": "platform use",
+      "pattern": ".O.O.O./..OOO../O.OOO.O/.OOYOO./O.OOO.O/..OOO../.O.O.O.",
+      "threshold": "10M accepted all-time processed tokens on Claude",
+      "evidence": "Accepted non-overlapping Claude telemetry; proposed threshold",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "An amber radial ember with a gold core."
+    },
+    {
+      "id": "pixel-codex-core",
+      "label": "Codex Core",
+      "family": "platform use",
+      "pattern": "B.....B/.B...B./..B.B../...W.../..B.B../.B...B./B..WW.B",
+      "threshold": "10M accepted all-time processed tokens on Codex",
+      "evidence": "Accepted non-overlapping Codex telemetry; proposed threshold",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Blue terminal brackets, a white core and a cursor underline."
+    },
+    {
+      "id": "pixel-claude-ascent",
+      "label": "Claude Ascent",
+      "family": "platform use",
+      "pattern": ".....OO/....OO./...OO../..OO.../.OO..Y./OO..YY./...YYY.",
+      "threshold": "100M accepted all-time processed tokens on Claude",
+      "evidence": "Accepted non-overlapping Claude totals; proposed threshold",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "An amber staircase with a golden cumulative-volume base."
+    },
+    {
+      "id": "pixel-codex-stack",
+      "label": "Codex Stack",
+      "family": "platform use",
+      "pattern": ".BBBBB./.BWWWB./.BBBBB./......./.BBBBB./.BCCCB./.BBBBB.",
+      "threshold": "1B accepted all-time processed tokens on Codex",
+      "evidence": "Accepted non-overlapping Codex totals; proposed threshold",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Two blue terminal stacks containing white output and cyan context."
+    },
+    {
+      "id": "pixel-dual-engine",
+      "label": "Dual Engine",
+      "family": "combinations",
+      "pattern": ".OO.BB./O..B..B/O..B..B/.O.W.B./O..B..B/O..B..B/.OO.BB.",
+      "threshold": "Meet the 10M platform milestone on Claude and Codex",
+      "evidence": "Both independent accepted platform milestones",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Amber and blue loops connected by one white bridge."
+    },
+    {
+      "id": "pixel-trinity-engine",
+      "label": "Trinity Engine",
+      "family": "combinations",
+      "pattern": "...P.../..PPP../...P.../..WWW../.W...W./CC...OO/CCC.OOO",
+      "threshold": "Meet the 10M milestone on three platforms",
+      "evidence": "Three independent accepted platform milestones",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Purple, cyan and amber engines linked by a white triangular relay."
+    },
+    {
+      "id": "pixel-platform-mosaic",
+      "label": "Platform Mosaic",
+      "family": "combinations",
+      "pattern": "OOO.BBB/O.O.B.B/OOO.BBB/......./CCC.PPP/C.C.P.P/CCC.PPP",
+      "threshold": "Accepted telemetry from four distinct platforms",
+      "evidence": "Distinct accepted platform lineage; no double-counted windows",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Four colored platform tiles, each with its own central aperture."
+    },
+    {
+      "id": "pixel-signal-connector",
+      "label": "Signal Connector",
+      "family": "combinations",
+      "pattern": ".C...C./C.C.C.C/.CCCCC./..WWW../.CCCCC./C.C.C.C/.C...C.",
+      "threshold": "Qualify for both a sharing and a watch milestone",
+      "evidence": "Independent authenticated share and watch milestones",
+      "status": "proposed \u00b7 not issued",
+      "is_existing": false,
+      "visual_story": "Two cyan communities joined through a white bridge."
+    }
+  ]
+}

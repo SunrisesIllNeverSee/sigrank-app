@@ -34,6 +34,8 @@ export {
   getOperator,
   getOperatorSubmissions,
   getOperatorHistory,
+  getOperatorSnapshotRecords,
+  getOperatorWatchCount,
   getMetricLeaders,
   getHallOfSignal,
   getHomepageStats,
@@ -49,6 +51,7 @@ export {
 // isOperatorRetired is also not cached (fresh status check for opt-out redirects).
 export { bumpComparisonsRan, isOperatorRetired } from "@/lib/board/queries";
 export type { OperatorSubmission } from "@/lib/board/queries";
+export type { SnapshotRecord } from "@/lib/board/queries";
 export type { IndexableOperatorRow } from "@/lib/board/queries";
 export type { OperatorReport } from "@/lib/board/queries";
 export type {
@@ -70,3 +73,22 @@ export type {
   WeeklyPoint,
   CountryCount,
 } from "@/lib/board/types";
+
+// Phase-2B WS-2: live-board initial-state projection — the typed SSR payload
+// for the frozen workspace surface (contract: ./live-types.ts).
+export {
+  getLiveBoardInitialState,
+  projectLiveBoard,
+  toLiveOperator,
+} from "@/lib/board/live-projection";
+export type {
+  LiveBoardInitialState,
+  LiveOperator,
+  FieldStat,
+  MoverEntry,
+  HallEntry,
+  FeaturedOperator,
+  FieldMaxima,
+  LivePopulation,
+  LiveMeta,
+} from "@/lib/board/live-types";

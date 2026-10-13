@@ -32,6 +32,8 @@ interface Props {
   fieldAvg?: number | null;
   /** SVG height. Default 240. */
   height?: number;
+  colorA?: string;
+  colorB?: string;
 }
 
 // Theme-reactive CSS vars — re-resolve when data-theme flips.
@@ -75,6 +77,8 @@ export function CompareHistoryChart({
   nameB,
   fieldAvg,
   height = 240,
+  colorA,
+  colorB,
 }: Props) {
   const ptsA = toPts(historyA);
   const ptsB = toPts(historyB);
@@ -82,7 +86,7 @@ export function CompareHistoryChart({
   // Need at least 2 points across both series to draw anything meaningful.
   if (ptsA.length < 2 && ptsB.length < 2) {
     return (
-      <div className="flex h-[240px] items-center justify-center rounded-lg border border-bg-border bg-bg-surface">
+      <div className="cmp-history-empty flex items-center justify-center rounded-lg border border-bg-border bg-bg-surface" style={{ height }}>
         <span className="font-mono text-xs text-text-muted">
           Not enough history yet — both operators need at least two snapshots to
           chart Υ Yield trajectory.
@@ -105,7 +109,7 @@ export function CompareHistoryChart({
   const rawMin = Math.min(...allVals);
   const rawMax = Math.max(...allVals);
   const tickStep = Math.max(1, Math.ceil((rawMax - rawMin) / 4));
-  const min = Math.floor(rawMin / tickStep) * tickStep - tickStep;
+  const min = Math.max(0, Math.floor(rawMin / tickStep) * tickStep - tickStep);
   const max = Math.ceil(rawMax / tickStep) * tickStep + tickStep;
   const range = max - min || 1;
 
@@ -150,6 +154,9 @@ export function CompareHistoryChart({
   const lastB = ptsB[ptsB.length - 1];
 
   const truncName = (n: string) => (n.length > 14 ? n.slice(0, 14) + "…" : n);
+  const fmtYield = (n: number) => n >= 1e9 ? (n / 1e9).toFixed(1) + "B"
+    : n >= 1e6 ? (n / 1e6).toFixed(1) + "M"
+    : n >= 1e3 ? (n / 1e3).toFixed(1) + "K" : n.toFixed(1);
 
   return (
     <svg
@@ -161,12 +168,12 @@ export function CompareHistoryChart({
     >
       <defs>
         <linearGradient id="cmp-grad-a" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={BLUE} stopOpacity={0.28} />
-          <stop offset="100%" stopColor={BLUE} stopOpacity={0} />
+          <stop offset="0%" stopColor={(colorA ?? BLUE)} stopOpacity={0.28} />
+          <stop offset="100%" stopColor={(colorA ?? BLUE)} stopOpacity={0} />
         </linearGradient>
         <linearGradient id="cmp-grad-b" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={GOLD} stopOpacity={0.28} />
-          <stop offset="100%" stopColor={GOLD} stopOpacity={0} />
+          <stop offset="0%" stopColor={(colorB ?? GOLD)} stopOpacity={0.28} />
+          <stop offset="100%" stopColor={(colorB ?? GOLD)} stopOpacity={0} />
         </linearGradient>
       </defs>
 
@@ -190,7 +197,7 @@ export function CompareHistoryChart({
           width={10}
           height={10}
           rx={2}
-          fill={BLUE}
+          fill={(colorA ?? BLUE)}
         />
         <text
           x={W - padR - 256}
@@ -207,7 +214,7 @@ export function CompareHistoryChart({
           width={10}
           height={10}
           rx={2}
-          fill={GOLD}
+          fill={(colorB ?? GOLD)}
         />
         <text
           x={W - padR - 156}
@@ -265,7 +272,7 @@ export function CompareHistoryChart({
               fill={MUTED}
               fontFamily={MONO}
             >
-              {t.toFixed(0)}
+              {fmtYield(t)}
             </text>
           </g>
         );
@@ -304,7 +311,7 @@ export function CompareHistoryChart({
           <path
             d={linePathA}
             fill="none"
-            stroke={BLUE}
+            stroke={(colorA ?? BLUE)}
             strokeWidth={2.4}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -319,7 +326,7 @@ export function CompareHistoryChart({
           <path
             d={linePathB}
             fill="none"
-            stroke={GOLD}
+            stroke={(colorB ?? GOLD)}
             strokeWidth={2.4}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -338,8 +345,8 @@ export function CompareHistoryChart({
             cx={x.toFixed(2)}
             cy={y.toFixed(2)}
             r={isLast ? 4 : 2.5}
-            fill={isLast ? BLUE : SURF}
-            stroke={BLUE}
+            fill={isLast ? (colorA ?? BLUE) : SURF}
+            stroke={(colorA ?? BLUE)}
             strokeWidth={1.5}
           />
         );
@@ -356,8 +363,8 @@ export function CompareHistoryChart({
             cx={x.toFixed(2)}
             cy={y.toFixed(2)}
             r={isLast ? 4 : 2.5}
-            fill={isLast ? GOLD : SURF}
-            stroke={GOLD}
+            fill={isLast ? (colorB ?? GOLD) : SURF}
+            stroke={(colorB ?? GOLD)}
             strokeWidth={1.5}
           />
         );
@@ -369,12 +376,12 @@ export function CompareHistoryChart({
           x={W - padR + 8}
           y={yAt(lastA.v).toFixed(2)}
           dominantBaseline="middle"
-          fill={BLUE}
+          fill={(colorA ?? BLUE)}
           fontSize={11}
           fontWeight={700}
           fontFamily={MONO}
         >
-          {lastA.v.toFixed(1)}
+          {fmtYield(lastA.v)}
         </text>
       )}
       {ptsB.length >= 2 && (
@@ -382,12 +389,12 @@ export function CompareHistoryChart({
           x={W - padR + 8}
           y={yAt(lastB.v).toFixed(2)}
           dominantBaseline="middle"
-          fill={GOLD}
+          fill={(colorB ?? GOLD)}
           fontSize={11}
           fontWeight={700}
           fontFamily={MONO}
         >
-          {lastB.v.toFixed(1)}
+          {fmtYield(lastB.v)}
         </text>
       )}
 

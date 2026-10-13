@@ -17,6 +17,7 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
+import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -115,7 +116,8 @@ const faqs = [
 
 export default function HowToBenchmarkAiCodingWorkflowPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <BlogWorkspaceFrame>
+      <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <CitationMeta title={"Benchmarking AI Coding Workflows — Analysis"} description={"A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples."} date={"2026-07-07"} slug={"/blog/how-to-benchmark-ai-coding-workflow"} />
       <JsonLd
         data={[
@@ -145,7 +147,7 @@ export default function HowToBenchmarkAiCodingWorkflowPage() {
 
       {/* ── Article meta ── */}
       <div className="flex items-center gap-3 border-b border-bg-border-subtle pb-4 font-mono text-xs text-text-muted">
-        <span>By SigRank</span>
+        <span>By Deric J. McHenry</span>
         <span aria-hidden="true">·</span>
         <time dateTime="2026-07-07">Published July 7, 2026</time>
         <span aria-hidden="true">·</span>
@@ -591,6 +593,7 @@ sigrank board --window 30d`}</code>
           </Link>
         </p>
       </section>
-    </div>
+      </div>
+    </BlogWorkspaceFrame>
   );
 }

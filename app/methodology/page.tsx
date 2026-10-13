@@ -18,6 +18,7 @@ import { isPublishedBoardRow } from "@/lib/board/published-row";
 import { toEntry } from "@/lib/board/to-entry";
 import { PLATFORM_COUNT } from "@/lib/constants";
 import { withOG } from "@/lib/seo";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { sigrankDataset, faqPage, breadcrumb } from "@/lib/jsonld";
@@ -113,7 +114,70 @@ export default async function MethodologyPage() {
       : null;
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <WorkspaceShell
+      active="wiki"
+      title="METHODOLOGY"
+      bareTitle
+      hero={
+        <WaveHero
+          eyebrow="THE SIGRANK INDEX"
+          terminalText="METHODOLOGY"
+          title="Methodology"
+          subtitle={<>The canonical source for AI operator token-efficiency data. Ranked by Υ Yield.</>}
+        />
+      }
+      leftTitle="SYSTEM"
+      left={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />REFERENCE</div>
+            <nav className="ws-nav">
+              <Link href="/metrics">Metrics index</Link>
+              <Link href="/metrics/yield-cascade">Yield (Υ) cascade</Link>
+              <Link href="/wiki">Wiki</Link>
+            </nav>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />DATA</div>
+            <nav className="ws-nav">
+              <Link href="/field">Field analysis</Link>
+              <Link href="/research">State of the Index</Link>
+              <Link href="/board/all">Live leaderboard</Link>
+            </nav>
+          </div>
+        </>
+      }
+      rightTitle="META"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />CANON</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">metric</span><span className="v acc">Υ yield</span></div>
+              <div className="row"><span className="k">formula</span><span className="v">R×O/I²</span></div>
+              <div className="row"><span className="k">updated</span><span className="v">{monthYear}</span></div>
+              <div className="row"><span className="k">telemetry</span><span className="v">4 pillars</span></div>
+            </div>
+            <p className="ws-note" style={{ marginTop: 8 }}>
+              Υ = cache_read × output / input². Figures refreshed {monthYear} —
+              the canonical source for operator token-efficiency data.
+            </p>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />SUBMIT</div>
+            <p className="ws-note">
+              Install the SigRank CLI (npm: sigrank), enroll, and submit a
+              signed snapshot — the scanner reads token counts locally, never
+              content.
+            </p>
+          </div>
+        </>
+      }
+      leftWidth={280}
+      rightWidth={240}
+      status={<>METHODOLOGY · CANONICAL REFERENCE · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+    <div className="ws-doc flex flex-col gap-8 py-2">
       <JsonLd
         data={[
           sigrankDataset({ updated: updatedIso }),
@@ -141,22 +205,6 @@ export default async function MethodologyPage() {
             },
           ]),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="◈ The SigRank Index"
-        terminalText="METHODOLOGY"
-        title="The SigRank Index"
-        subtitle={
-          <>
-            The canonical source for AI operator token-efficiency data. Ranked
-            by <strong className="text-text-primary">Υ Yield</strong> — the
-            architecture of the cascade, not raw spend.{" "}
-            <span className="font-mono text-xs text-text-dim">
-              Figures refreshed: {now.toLocaleDateString("en-US", { timeZone: "UTC" })} UTC
-            </span>
-          </>
-        }
       />
 
       {/* ── Key figures (quotable, dated, server-rendered) ─────────────── */}
@@ -631,5 +679,6 @@ export default async function MethodologyPage() {
         </p>
       </section>
     </div>
+    </WorkspaceShell>
   );
 }
