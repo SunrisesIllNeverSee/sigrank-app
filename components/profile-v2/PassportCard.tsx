@@ -248,8 +248,8 @@ export function PassportCard({
               ))}
             </div>
           </div>
-          <div className="pv2-watermark">signalaf.com</div>
         </div>
+        <div className="pv2-command-footer">npx sigrank</div>
       </div>
     </div>
   );
