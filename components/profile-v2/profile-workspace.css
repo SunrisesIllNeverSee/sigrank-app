@@ -234,3 +234,10 @@
 .lbw-root .prl-dialog--wide .prl-heat-cell{border-radius:2.5px}
 /* Honors breakdown rows inside the dialog. */
 .lbw-root .prl-honor-dt{display:inline-flex;align-items:center;gap:6px}
+
+.lbw-root .pv2 .pv2-pcard-scope{flex-direction:column;gap:18px}
+.lbw-root .pv2 .pv2-pcard-scope .artwork-share-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:324px;margin:0}
+.lbw-root .pv2 .pv2-pcard-scope .artwork-share-controls [role=status]{grid-column:1/-1}
+
+.lbw-root .profile-share-gallery{flex-shrink:0;padding:10px 8px;margin-bottom:16px;color:var(--tx2);font:10px var(--font-mono);text-transform:uppercase;border-bottom:2px solid transparent}
+.lbw-root .profile-share-gallery:hover,.lbw-root .profile-share-gallery:focus-visible{color:var(--ac);border-color:var(--ac)}

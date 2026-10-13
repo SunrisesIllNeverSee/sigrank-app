@@ -152,7 +152,7 @@ export function ProfileTabsV2({
       <div
         role="tablist"
         aria-label="Profile sections"
-        className="flex min-w-0 flex-1 gap-1 overflow-x-auto"
+        className="flex min-w-0 gap-1 overflow-x-auto"
       >
         {visibleTabs.map((t) => {
           const locked = content[t.key] == null;
@@ -201,6 +201,7 @@ export function ProfileTabsV2({
           );
         })}
       </div>
+      {workspace?.codename && <Link className="profile-share-gallery" href={`/s/${encodeURIComponent(workspace.codename)}`}>Share Gallery</Link>}
       {isOwner && (
         <Link
           href="/me/edit#profile-display"
