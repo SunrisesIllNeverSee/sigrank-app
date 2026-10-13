@@ -187,7 +187,7 @@
 
 /* ── Terminal layer 4: box-drawing borders (theme-scoped, purely additive) ───
  * Under terminal only, restyle the existing card/surface border patterns to a
- * dashed box-drawing feel + add ◈ corner accents (the TUI SPLASH_RULE motif).
+ * solid outlines + add ◈ corner accents (the TUI SPLASH_RULE motif).
  * Targets the Tailwind border classes already used sitewide — no component
  * changes needed. Cannot leak into carbon/paper/railway (scoped under the
  * theme selector). Reversible: remove this block to revert.
@@ -197,9 +197,9 @@
  * sit at the top-left + bottom-right corners, colored with --gold, and are
  * small enough not to crowd the content.
  */
-[data-theme="terminal"] .border-bg-border,
-[data-theme="terminal"] .border-bg-border-subtle {
-  border-style: dashed;
+[data-theme="terminal"] .border-bg-border:not(.border-dashed),
+[data-theme="terminal"] .border-bg-border-subtle:not(.border-dashed) {
+  border-style: solid;
 }
 
 /* ◈ corner accents on bordered cards (the TUI motif). Only on elements that
