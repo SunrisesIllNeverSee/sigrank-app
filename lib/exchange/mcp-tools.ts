@@ -51,6 +51,7 @@ import {
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { rateLimitAllowAsync } from "./rate-limit";
 import { createHash } from "node:crypto";
+import { isProhibitedHostSync, isProhibitedHostResolved } from "./ssrf";
 
 // ─── Authorization scopes ────────────────────────────────────────────────────
 
@@ -106,7 +107,7 @@ export async function resolveScopes(req: NextRequest): Promise<Set<ExchangeScope
  *
  * Returns true if the key matches any record, false otherwise.
  */
-async function validateAgentKey(key: string): Promise<boolean> {
+export async function validateAgentKey(key: string): Promise<boolean> {
   const keyHash = hashSecret(key);
 
   // 1. Reference admin key
@@ -133,6 +134,30 @@ async function validateAgentKey(key: string): Promise<boolean> {
   if (proposal) return true;
 
   return false;
+}
+
+/**
+ * Resolve the REST actor identity for signal-attempt routes (E1).
+ *
+ * The actor ID is derived from a key that has been validated via
+ * {@link validateAgentKey}. A supplied-but-invalid key is rejected (401);
+ * a missing key yields an anonymous IP-scoped identity (callers decide
+ * whether the signal permits anonymous attempts).
+ */
+export async function resolveValidatedActor(
+  req: NextRequest,
+  ip: string,
+): Promise<{ ok: true; actorKey: string | null; actorId: string } | { ok: false; status: 401; error: string }> {
+  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
+  if (!actorKey) return { ok: true, actorKey: null, actorId: `anonymous:${ip}` };
+  let valid = false;
+  try {
+    valid = await validateAgentKey(actorKey);
+  } catch {
+    valid = false;
+  }
+  if (!valid) return { ok: false, status: 401, error: "Invalid exchange credential" };
+  return { ok: true, actorKey, actorId: `actor:${hashSecret(actorKey).slice(0, 16)}` };
 }
 
 /**
@@ -274,42 +299,13 @@ async function checkSignalProposalRateLimit(ip: string): Promise<RateLimitedResu
 /**
  * Prohibited destination hosts for domain discovery fetches.
  * Prevents SSRF attacks against loopback, link-local, private networks,
- * and cloud metadata services.
+ * and cloud metadata services. Implemented in ./ssrf: blocks localhost,
+ * 127.0.0.0/8, 10.x, 172.16/12, 192.168.x, 169.254.x (cloud metadata), CGNAT
+ * 100.64/10, 0.0.0.0, ::, ::1, fc00::/7, fe80::/10 and IPv4-mapped forms.
+ * Use isProhibitedHostResolved (DNS lookup) before any outbound fetch.
  */
 export function isProhibitedHost(hostname: string): boolean {
-  const h = hostname.toLowerCase();
-  // Loopback
-  if (h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "[::1]") return true;
-  if (h.endsWith(".localhost")) return true;
-  // Link-local
-  if (h.startsWith("169.254.")) return true;
-  if (h === "metadata.google.internal") return true;
-  // Cloud metadata
-  if (h === "169.254.169.254") return true;
-  if (h === "fd00:ec2::254" || h === "[fd00:ec2::254]") return true;
-  // Private network ranges (RFC 1918)
-  if (h.startsWith("10.")) return true;
-  if (h.startsWith("172.")) {
-    const parts = h.split(".");
-    const second = parseInt(parts[1], 10);
-    if (second >= 16 && second <= 31) return true;
-  }
-  if (h.startsWith("192.168.")) return true;
-  // Carrier-grade NAT
-  if (h.startsWith("100.64.") || h.startsWith("100.65.") || h.startsWith("100.66.") || h.startsWith("100.67.") ||
-      h.startsWith("100.68.") || h.startsWith("100.69.") || h.startsWith("100.7") || h.startsWith("100.8") ||
-      h.startsWith("100.9") || h.startsWith("100.1") || h.startsWith("100.2")) {
-    // 100.64.0.0/10 — check more precisely
-    const parts = h.split(".");
-    const first = parseInt(parts[0], 10);
-    const second = parseInt(parts[1], 10);
-    if (first === 100 && second >= 64 && second <= 127) return true;
-  }
-  // IPv6 unique local
-  if (h.startsWith("fc") || h.startsWith("fd")) return true;
-  // IPv6 link-local
-  if (h.startsWith("fe80:")) return true;
-  return false;
+  return isProhibitedHostSync(hostname);
 }
 
 /**
@@ -356,6 +352,9 @@ export async function handleDiscoverDomain(args: {
   }
 
   const manifestUrl = `https://${domain}/.well-known/exchange.json`;
+  if (await isProhibitedHostResolved(domain)) {
+    return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "prohibited host (resolves to private/loopback/metadata address)" };
+  }
   try {
     // Use redirect: "manual" to inspect each redirect target against the
     // SSRF blocklist before following. A malicious domain could publish a
@@ -388,7 +387,7 @@ export async function handleDiscoverDomain(args: {
       } catch {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "invalid redirect URL" };
       }
-      if (isProhibitedHost(redirectHost)) {
+      if (isProhibitedHost(redirectHost) || (await isProhibitedHostResolved(redirectHost))) {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "redirect to prohibited host blocked (SSRF protection)" };
       }
       // Reject cross-origin redirects — the manifest must be served from the

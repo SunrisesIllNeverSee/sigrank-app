@@ -11,36 +11,27 @@
  * the tool name, result, duration, and transport. No secrets, no user
  * identifiers beyond a hashed IP (privacy-safe).
  *
- * Rate limiting: beacons are throttled per-IP to prevent abuse. The
- * existing mutation rate limiter is not applicable here (this is a
- * telemetry write, not a business mutation), so we use a simple
- * in-memory check. Distributed enforcement is not critical for
- * telemetry — duplicate beacons are deduplicated by request_id.
+ * Rate limiting: beacons are throttled per client via the distributed limiter.
+ * Requests with no resolvable client IP share a single "noip" bucket instead
+ * of bypassing the limit. Inputs (tool_name, target_domain, x-request-id) are
+ * length- and charset-capped.
  */
 
 import { NextResponse, type NextRequest } from "next/server";
+import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { recordMcpCall, hashIp, type McpResult } from "@/lib/exchange/mcp-observability";
 
 export const dynamic = "force-dynamic";
 
-// Simple in-memory rate limit for beacons (per IP, per minute).
-// Telemetry-only — not a security boundary. The observability table
-// enforces its own constraints.
-const beaconWindow = new Map<string, { count: number; resetAt: number }>();
-const BEACON_MAX = 60; // 60 beacons/min per IP — generous for agent use
+const BEACON_MAX = 60; // 60 beacons/min per client — generous for agent use
 const BEACON_WINDOW_MS = 60_000;
 
-function beaconRateLimited(ipHash: string | undefined): boolean {
-  if (!ipHash) return false;
-  const now = Date.now();
-  const entry = beaconWindow.get(ipHash);
-  if (!entry || now > entry.resetAt) {
-    beaconWindow.set(ipHash, { count: 1, resetAt: now + BEACON_WINDOW_MS });
-    return false;
-  }
-  entry.count++;
-  return entry.count > BEACON_MAX;
-}
+const MAX_TOOL_NAME = 128;
+const MAX_TARGET_DOMAIN = 253;
+const MAX_REQUEST_ID = 128;
+const TOOL_NAME_RE = /^[A-Za-z0-9_.:-]+$/;
+const DOMAIN_RE = /^[A-Za-z0-9.-]+$/;
+const REQUEST_ID_RE = /^[A-Za-z0-9_.:-]+$/;
 
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
@@ -50,7 +41,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  const toolName = typeof body.tool_name === "string" ? body.tool_name : undefined;
+  const rawTool = typeof body.tool_name === "string" ? body.tool_name : undefined;
+  if (rawTool !== undefined && (rawTool.length > MAX_TOOL_NAME || (rawTool.length > 0 && !TOOL_NAME_RE.test(rawTool)))) {
+    return NextResponse.json({ ok: false, error: "invalid_tool_name" }, { status: 400 });
+  }
+  const toolName = rawTool;
+  const rawDomain = typeof body.target_domain === "string" ? body.target_domain : undefined;
+  if (rawDomain !== undefined && (rawDomain.length > MAX_TARGET_DOMAIN || !DOMAIN_RE.test(rawDomain))) {
+    return NextResponse.json({ ok: false, error: "invalid_target_domain" }, { status: 400 });
+  }
   const result = typeof body.result === "string" ? body.result : "success";
   const durationMs = typeof body.duration_ms === "number" ? body.duration_ms : undefined;
   const transport = typeof body.transport === "string" ? body.transport : "webmcp";
@@ -65,17 +64,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "missing_tool_name" }, { status: 400 });
   }
 
-  const ipHash = hashIp(req.headers.get("x-forwarded-for")?.split(",")[0]?.trim());
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip")?.trim() || undefined;
+  const ipHash = hashIp(clientIp);
 
-  // Rate limit beacons (telemetry-only throttle)
-  if (beaconRateLimited(ipHash)) {
-    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
+  // Distributed rate limit. No client IP → shared "noip" bucket (never skipped).
+  const rl = await checkDistributedRateLimit(
+    ["exchange-beacon", ipHash ?? "noip"],
+    { windowMs: BEACON_WINDOW_MS, max: BEACON_MAX },
+    false, // telemetry: fall back to per-instance memory rather than dropping on store outage
+  );
+  if (!rl.ok) {
+    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429, headers: { "Retry-After": String(rl.retryAfter) } });
   }
 
   // Record to durable observability table
   // server_id is inferred from the tool name prefix
   const serverId = toolName.startsWith("exchange_") ? "contribution-exchange" : "sigrank";
-  const requestId = req.headers.get("x-request-id") ?? crypto.randomUUID();
+  const headerRequestId = req.headers.get("x-request-id");
+  const requestId = headerRequestId && headerRequestId.length <= MAX_REQUEST_ID && REQUEST_ID_RE.test(headerRequestId)
+    ? headerRequestId
+    : crypto.randomUUID();
 
   await recordMcpCall({
     request_id: requestId,
@@ -83,7 +91,7 @@ export async function POST(req: NextRequest) {
     transport: "webmcp",
     operation: "tools_call",
     tool_name: toolName,
-    target_domain: typeof body.target_domain === "string" ? body.target_domain : undefined,
+    target_domain: rawDomain,
     result: (["success", "error", "denied", "rate_limited", "invalid_request"].includes(result)
       ? result
       : "success") as McpResult,

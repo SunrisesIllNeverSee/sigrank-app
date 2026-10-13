@@ -83,13 +83,33 @@ export async function findCompany(domain: string) {
   return data
 }
 
-export async function authenticateCompany(domain: string, key: string | null): Promise<boolean> {
+export function referenceDomain(): string {
+  return normalizeDomain(process.env.EXCHANGE_REFERENCE_DOMAIN ?? 'signalaf.com')
+}
+
+async function authenticateCompanyInternal(domain: string, key: string | null, allowUnverified: boolean): Promise<boolean> {
   if (!key) return false
   const normalized = normalizeDomain(domain)
   const referenceKey = process.env.EXCHANGE_REFERENCE_ADMIN_KEY
-  if (normalized === normalizeDomain(process.env.EXCHANGE_REFERENCE_DOMAIN ?? 'signalaf.com') && referenceKey && safeEqual(key, referenceKey)) return true
+  if (normalized === referenceDomain() && referenceKey && safeEqual(key, referenceKey)) return true
   const company = await findCompany(normalized)
-  return !!company?.admin_key_hash && safeEqual(hashSecret(key), company.admin_key_hash)
+  if (!company?.admin_key_hash || !safeEqual(hashSecret(key), company.admin_key_hash)) return false
+  // An admin key only grants authority once DNS ownership has been verified.
+  return allowUnverified || company.verification_status === 'verified'
+}
+
+/** Company admin auth. DB-row companies must be verified (reference-key branch unchanged). */
+export async function authenticateCompany(domain: string, key: string | null): Promise<boolean> {
+  return authenticateCompanyInternal(domain, key, false)
+}
+
+/**
+ * Company admin auth that also accepts a not-yet-verified company. Use ONLY
+ * for companies/verify and companies/control GET, which an unverified company
+ * needs in order to complete verification.
+ */
+export async function authenticateCompanyAllowUnverified(domain: string, key: string | null): Promise<boolean> {
+  return authenticateCompanyInternal(domain, key, true)
 }
 
 export async function authenticateDomainAgent(domain: string, key: string | null): Promise<boolean> {

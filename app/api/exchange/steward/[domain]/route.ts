@@ -3,7 +3,7 @@ import { StewardPreflightSchema } from '@/lib/exchange-gateway/src/schema'
 import { evaluateProposal } from '@/lib/exchange-gateway/src/policy'
 import { companyPolicy } from '@/lib/exchange/steward'
 import { findCompany, logEncounter, normalizeDomain, requestIdentity } from '@/lib/exchange/server'
-import { rateLimitAllow } from '@/lib/exchange/rate-limit'
+import { rateLimitAllowAsync } from '@/lib/exchange/rate-limit'
 
 function card(req:NextRequest,company:Record<string,unknown>,domain:string){
   const policy=companyPolicy(company as never)
@@ -35,7 +35,7 @@ export async function GET(req:NextRequest,{params}:{params:Promise<{domain:strin
 
 export async function POST(req:NextRequest,{params}:{params:Promise<{domain:string}>}){
   const domain=normalizeDomain(decodeURIComponent((await params).domain))
-  if(!rateLimitAllow(requestIdentity(req),'exchange_steward_preflight')) {
+  if(!(await rateLimitAllowAsync(requestIdentity(req),'exchange_steward_preflight'))) {
     await logEncounter({targetDomain:domain,endpoint:`/api/exchange/steward/${domain}`,req,method:'POST',result:'rate_limited'})
     return NextResponse.json({error:'Rate limited'},{status:429})
   }

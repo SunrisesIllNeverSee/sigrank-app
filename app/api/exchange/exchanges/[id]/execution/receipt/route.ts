@@ -6,6 +6,8 @@ import { validateTransition, receiptStatusToState } from '@/lib/exchange-gateway
 import { appendExchangeEvent, authenticateCompany, authenticateProposer, getExchangeAdmin, logEncounter, safeEqual } from '@/lib/exchange/server'
 import { createHash } from 'node:crypto'
 
+const UNAUTHORIZED_MESSAGE = 'Unauthorized'
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Ensure any env-configured verifiers are registered before we look them up.
   bootstrapVerifiers()
@@ -24,10 +26,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     result: 'ok',
   })
 
-  if (record.state !== 'delivering' && record.state !== 'delivered' && record.state !== 'verified') {
-    return NextResponse.json({ error: 'Exchange must be in delivering, delivered, or verified state to accept execution receipts' }, { status: 409 })
-  }
-
   // ─── Authentication principals ───
   // Internal/self-executed receipts authenticate via company key or proposer key.
   // External provider callbacks authenticate via cryptographic signature ONLY —
@@ -37,6 +35,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const isCompany = await authenticateCompany(record.target_domain, companyKey)
   const isProposer = authenticateProposer(record, proposerKey)
   const providerSignature = req.headers.get('x-provider-signature')
+
+  // Uniform 401 for callers presenting no valid principal, independent of
+  // exchange state (no 409-vs-401 oracle). Provider callbacks (signature
+  // header present) are fully verified further below.
+  if (!isCompany && !isProposer && !providerSignature) {
+    return NextResponse.json({ error: UNAUTHORIZED_MESSAGE }, { status: 401 })
+  }
 
   // Read the raw body ONCE — needed for signature verification over the exact
   // bytes the provider sent (not reserialized JSON).
@@ -158,7 +163,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   } else {
     // ─── Internal provider — authenticated internal path ───
     if (!isCompany && !isProposer) {
-      return NextResponse.json({ error: 'Company administrator or proposer authorization required to submit internal execution receipt' }, { status: 401 })
+      return NextResponse.json({ error: UNAUTHORIZED_MESSAGE }, { status: 401 })
     }
     // Internal receipts use a deterministic event ID derived from stable
     // signed fields (provider + execution_id + payload hash), NOT from
@@ -168,6 +173,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       ?? `internal_${execution.provider}_${receipt.execution_reference.execution_id}_${payloadHash.slice(0, 16)}`
     verifiedTimestamp = parsed.data.provider_event_timestamp ?? new Date().toISOString()
     verifiedNonce = parsed.data.nonce ?? null
+  }
+
+  // State gate runs only after the caller is authenticated.
+  if (record.state !== 'delivering' && record.state !== 'delivered' && record.state !== 'verified') {
+    return NextResponse.json({ error: 'Exchange must be in delivering, delivered, or verified state to accept execution receipts' }, { status: 409 })
   }
 
   // ─── Idempotency check (read-then-insert; the unique index is the atomic
@@ -368,7 +378,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         execution_id: receipt.execution_reference.execution_id,
       }, { status: 409 })
     }
-    return NextResponse.json({ error: 'Execution receipt persistence failed', detail: receiptError.message }, { status: 500 })
+    console.error('execution receipt persistence failed', receiptError.code, receiptError.message)
+    return NextResponse.json({ error: 'Execution receipt persistence failed' }, { status: 500 })
   }
 
   // ─── Update execution state with optimistic concurrency ───

@@ -37,6 +37,14 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   }
   const stripe=getStripe()
   if(!stripe) return NextResponse.json({error:'Stripe is not configured'},{status:500})
+  // Reuse an open checkout session for this settlement instead of minting a new one on every call.
+  const {data:prior}=await admin.from('exchange_settlements').select('status,checkout_session_id').eq('exchange_id',record.id).maybeSingle()
+  if(prior?.status==='awaiting_payment'&&prior.checkout_session_id){
+    try{
+      const existingSession=await stripe.checkout.sessions.retrieve(prior.checkout_session_id)
+      if(existingSession.status==='open'&&existingSession.url) return NextResponse.json({status:'awaiting_payment',checkout_url:existingSession.url,fees,reused:true})
+    }catch{ /* unretrievable session: fall through and create a new one */ }
+  }
   const base=`${req.nextUrl.protocol}//${req.nextUrl.host}`
   const session=await stripe.checkout.sessions.create({mode:'payment',line_items:[{quantity:1,price_data:{currency,unit_amount:grossCents,product_data:{name:`Contribution exchange ${publicId}`,description:record.title}}}],payment_intent_data:{application_fee_amount:fees.platformFeeCents,transfer_data:{destination:payoutAccountId}},success_url:`${base}/exchange?settlement=success&id=${encodeURIComponent(publicId)}`,cancel_url:`${base}/exchange?settlement=cancelled&id=${encodeURIComponent(publicId)}`,metadata:{exchange_public_id:publicId,exchange_id:record.id}})
   await admin.from('exchange_settlements').upsert({exchange_id:record.id,provider:'stripe_connect',currency:currency.toUpperCase(),gross_cents:grossCents,platform_fee_bps:fees.platformFeeBps,platform_fee_cents:fees.platformFeeCents,referral_commission_bps:fees.referralCommissionBps,referral_commission_cents:fees.referralCommissionCents,checkout_session_id:session.id,status:'awaiting_payment',metadata:{payout_account_id:payoutAccountId}},{onConflict:'exchange_id'})
