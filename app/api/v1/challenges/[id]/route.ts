@@ -41,7 +41,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { resolveAuth } from "@/lib/infra/api-auth";
-import { extractVerifiedCert } from "@/lib/identity/challenge-cert";
+import { extractVerifiedCert, certBindsTo } from "@/lib/identity/challenge-cert";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
+import {
+  MAX_CERT_JSON_BYTES,
+  MAX_SIGNAL_TEXT_CHARS,
+  challengesMutedResponse,
+  jsonWithinBytes,
+} from "@/lib/identity/challenge-limits";
+import { publicCodenameSet, redactEmbed } from "@/lib/identity/challenge-visibility";
 
 function compositeScore(
   d: number,
@@ -63,6 +71,9 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const muted = challengesMutedResponse();
+  if (muted) return muted;
+
   const { id } = await params;
   const sb = getSupabaseServer();
   if (!sb) {
@@ -99,7 +110,7 @@ export async function GET(
       .from("challenge_submissions")
       .select(
         `
-        submission_id, operator_id, engine, composite_score,
+        submission_id, engine, composite_score,
         score_density, score_clarity, score_fidelity, score_brevity, score_impact,
         certificate_json, submitted_at,
         operator:operator_id(codename)
@@ -109,7 +120,41 @@ export async function GET(
     submissions = subs ?? [];
   }
 
-  return NextResponse.json({ challenge, submissions });
+  // Redact: only public codenames, never operator_id (also strip it from
+  // the embedded signed certificate copy).
+  type Row = Record<string, unknown>;
+  const ch = challenge as unknown as Row;
+  const subRows = (submissions ?? []) as unknown as Row[];
+  const nameOf = (e: unknown): string | null => {
+    const o = Array.isArray(e) ? e[0] : e;
+    return (o as { codename?: string } | null)?.codename ?? null;
+  };
+  const pub = await publicCodenameSet(sb, [
+    nameOf(ch.challenger),
+    nameOf(ch.challenged),
+    nameOf(ch.winner),
+    ...subRows.map((s) => nameOf(s.operator)),
+  ]);
+  const redactedChallenge = {
+    ...ch,
+    challenger: redactEmbed(ch.challenger as never, pub) ? ch.challenger : null,
+    challenged: redactEmbed(ch.challenged as never, pub) ? ch.challenged : null,
+    winner: redactEmbed(ch.winner as never, pub),
+  };
+  const redactedSubs = submissions
+    ? subRows.map((s) => {
+        const cert = s.certificate_json;
+        let certOut = cert;
+        if (cert && typeof cert === "object" && !Array.isArray(cert)) {
+          const { operator_id: _omit, ...rest } = cert as Row;
+          void _omit;
+          certOut = rest;
+        }
+        return { ...s, operator: redactEmbed(s.operator as never, pub), certificate_json: certOut };
+      })
+    : null;
+
+  return NextResponse.json({ challenge: redactedChallenge, submissions: redactedSubs });
 }
 
 // ---------------------------------------------------------------------------
@@ -119,7 +164,18 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const muted = challengesMutedResponse();
+  if (muted) return muted;
+
   const { id } = await params;
+
+  const limited = await enforceRouteLimit(
+    req,
+    "challenge-submit",
+    { windowMs: 60 * 60 * 1000, max: 60 },
+    { failClosed: true },
+  );
+  if (limited) return limited;
 
   let body: unknown;
   try {
@@ -155,6 +211,19 @@ export async function PATCH(
   const brevity = Number(rawScores?.brevity ?? 0);
   const impact = Number(rawScores?.impact ?? 0);
 
+  if (signalText.length > MAX_SIGNAL_TEXT_CHARS) {
+    return NextResponse.json(
+      { error: "too_long", detail: `signal_text max ${MAX_SIGNAL_TEXT_CHARS} chars` },
+      { status: 400 },
+    );
+  }
+  if (certJson !== null && !jsonWithinBytes(certJson, MAX_CERT_JSON_BYTES)) {
+    return NextResponse.json(
+      { error: "too_large", detail: "certificate_json too large" },
+      { status: 400 },
+    );
+  }
+
   if (!signalText.trim()) {
     return NextResponse.json(
       { error: "missing_field", detail: "signal_text required" },
@@ -174,9 +243,15 @@ export async function PATCH(
   // F1 FIX: Check for a verified signed certificate. If present, use its
   // scores as authoritative. If not, the submission is "pending" — the
   // client-reported composite is NOT used for ranking.
-  const verifiedCert = extractVerifiedCert(certJson);
-  const scoringMode = verifiedCert ? "api_verified" : "pending";
-  const authoritativeComposite = verifiedCert
+  // The cert must be bound to THIS challenge + THIS operator (and, once the
+  // challenge row is loaded, its window); otherwise it is treated as pending.
+  const sigCert = extractVerifiedCert(certJson);
+  let verifiedCert =
+    sigCert && certBindsTo(sigCert, { challengeId: id, operatorId })
+      ? sigCert
+      : null;
+  let scoringMode = verifiedCert ? "api_verified" : "pending";
+  let authoritativeComposite = verifiedCert
     ? verifiedCert.composite
     : 0; // pending submissions have composite=0 (not ranked)
 
@@ -198,7 +273,7 @@ export async function PATCH(
   const { data: challenge } = await sb
     .from("challenges")
     .select(
-      "challenge_id, status, challenger_id, challenged_id, window_close, format",
+      "challenge_id, status, challenger_id, challenged_id, window_open, window_close, format",
     )
     .eq("challenge_id", id)
     .single();
@@ -237,6 +312,20 @@ export async function PATCH(
     }
   }
 
+  // Re-check the cert timestamp against this challenge's window.
+  if (
+    verifiedCert &&
+    !certBindsTo(verifiedCert, {
+      challengeId: id,
+      operatorId,
+      window: { open: challenge.window_open, close: challenge.window_close },
+    })
+  ) {
+    verifiedCert = null;
+    scoringMode = "pending";
+    authoritativeComposite = 0;
+  }
+
   // Upsert submission (UNIQUE constraint on challenge_id + operator_id)
   // F1 FIX: composite_score uses the AUTHORITATIVE composite (from verified
   // cert), not the client-reported one. scoring_mode reflects whether the
@@ -256,7 +345,7 @@ export async function PATCH(
         score_impact: impact,
         composite_score: authoritativeComposite,
         engine,
-        certificate_json: certJson,
+        certificate_json: verifiedCert ? certJson : null,
         scoring_mode: scoringMode,
       },
       { onConflict: "challenge_id,operator_id" },
@@ -265,8 +354,9 @@ export async function PATCH(
     .single();
 
   if (subErr) {
+    console.error("[challenges/id] submission upsert error", subErr);
     return NextResponse.json(
-      { error: "db_error", detail: subErr.message },
+      { error: "db_error", detail: "Could not record submission" },
       { status: 500 },
     );
   }
@@ -329,10 +419,11 @@ export async function PATCH(
 
         // Fetch winner codename for response
         const { data: w } = await sb
-          .from("operators")
+          .from("operators_public")
           .select("codename")
           .eq("operator_id", winnerId)
-          .single();
+          .eq("profile_visibility", "public")
+          .maybeSingle();
         winner_codename = w?.codename ?? null;
         resolved = true;
       }

@@ -38,6 +38,8 @@ import {
   type MaterializeResult,
 } from "@/lib/ingest/materialize";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
+import { sanitizeNotifyCodename, safeText } from "@/lib/ingest/notify-sanitize";
 
 const SCORING_ETA_SECONDS = 30;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
@@ -53,6 +55,13 @@ const ALERT_FROM = "SigRank Alerts <hello@signalaf.com>";
  */
 const EMAIL_RATE_LIMIT_MS = 60 * 60 * 1000; // 1 hour
 const lastEmailSent = new Map<string, number>();
+/** Global cap across ALL codenames, so rotating attacker-chosen names cannot flood the inbox. */
+const EMAIL_GLOBAL_WINDOW_MS = 10 * 60 * 1000;
+const EMAIL_GLOBAL_MAX = 5;
+/** Bound on the per-codename throttle map. */
+const EMAIL_MAP_MAX = 500;
+let globalEmailTimes: number[] = [];
+
 
 /**
  * Notify the owner about a submission issue (rejected or flagged).
@@ -66,16 +75,24 @@ const lastEmailSent = new Map<string, number>();
  * no gate internals, no PII beyond what's already public on the board.
  */
 async function notifySubmissionIssue(
-  codename: string,
+  rawCodename: string,
   outcome: "rejected" | "flagged",
-  reason: string,
-  detail: string,
-  meta: {
+  rawReason: string,
+  rawDetail: string,
+  rawMeta: {
     platform?: string;
     windowType?: string;
     flagCodes?: string[];
   },
 ): Promise<void> {
+  const codename = sanitizeNotifyCodename(rawCodename);
+  const reason = safeText(rawReason, 80);
+  const detail = safeText(rawDetail, 300);
+  const meta = {
+    platform: rawMeta.platform ? safeText(rawMeta.platform, 40) : undefined,
+    windowType: rawMeta.windowType ? safeText(rawMeta.windowType, 40) : undefined,
+    flagCodes: rawMeta.flagCodes?.slice(0, 20).map((c) => safeText(c, 40)),
+  };
   // 1. PostHog — always (best-effort, never throws)
   await captureServer(codename, "submission_issue", {
     outcome,
@@ -90,6 +107,18 @@ async function notifySubmissionIssue(
   const now = Date.now();
   const lastSent = lastEmailSent.get(codename) ?? 0;
   if (now - lastSent < EMAIL_RATE_LIMIT_MS) return; // already emailed about this operator recently
+  globalEmailTimes = globalEmailTimes.filter((t) => now - t < EMAIL_GLOBAL_WINDOW_MS);
+  if (globalEmailTimes.length >= EMAIL_GLOBAL_MAX) return;
+  globalEmailTimes.push(now);
+  if (lastEmailSent.size >= EMAIL_MAP_MAX) {
+    for (const [k, t] of lastEmailSent) {
+      if (now - t >= EMAIL_RATE_LIMIT_MS) lastEmailSent.delete(k);
+    }
+    if (lastEmailSent.size >= EMAIL_MAP_MAX) {
+      const oldest = lastEmailSent.keys().next().value;
+      if (oldest !== undefined) lastEmailSent.delete(oldest);
+    }
+  }
   lastEmailSent.set(codename, now);
   try {
     const resend = new Resend(RESEND_API_KEY);
@@ -170,6 +199,14 @@ function deterministicId(prefix: string, ...parts: string[]): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Per-IP rate limit BEFORE any body parsing / notifications. Best-effort
+  // (in-memory fallback if Redis is down) so ingest is not hard-down on infra loss.
+  const limited = await enforceRouteLimit(req, "snapshots", {
+    windowMs: 60 * 1000,
+    max: 60,
+  });
+  if (limited) return limited;
+
   // Body must be JSON.
   let raw: unknown;
   try {
@@ -191,7 +228,7 @@ export async function POST(req: NextRequest) {
   if (!result.ok) {
     const attemptedCodename =
       typeof raw === "object" && raw !== null && "codename" in raw
-        ? String((raw as { codename: unknown }).codename ?? "unknown")
+        ? sanitizeNotifyCodename((raw as { codename: unknown }).codename)
         : "unknown";
     const attemptedPlatform =
       typeof raw === "object" && raw !== null && "platform" in raw

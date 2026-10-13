@@ -12,6 +12,7 @@
  * the endpoint returns 500 so the misconfiguration is loud, not silent.
  */
 
+import { timingSafeEqual } from "node:crypto";
 import { start } from "workflow/api";
 import { dailyRecompute } from "@/lib/workflows/daily-recompute";
 
@@ -26,8 +27,10 @@ export async function GET(request: Request) {
     );
   }
 
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  const authHeader = request.headers.get("authorization") ?? "";
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const given = Buffer.from(authHeader);
+  if (given.length !== expected.length || !timingSafeEqual(given, expected)) {
     return new Response("Unauthorized", { status: 401 });
   }
 
