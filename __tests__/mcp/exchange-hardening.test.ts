@@ -193,8 +193,8 @@ describe("E2 company authentication", () => {
 });
 
 describe("E3 stripe webhook", () => {
-  const event = (paymentStatus: string) => ({
-    type: "checkout.session.completed",
+  const event = (paymentStatus: string, type = "checkout.session.completed") => ({
+    type,
     data: { object: { id: "cs_1", payment_status: paymentStatus, payment_intent: "pi_1", metadata: { exchange_public_id: "CX-1" } } },
   });
   const hook = async () => {
@@ -225,6 +225,17 @@ describe("E3 stripe webhook", () => {
     expect(s!.filters.status).toBe("awaiting_payment");
     const r = h.state.calls.find((c) => c.table === "exchange_records" && c.op === "update");
     expect(r!.filters.state).toBe("verified");
+  });
+
+  it("async_payment_succeeded settles a delayed payment", async () => {
+    h.stripe.value = { webhooks: { constructEvent: () => event("paid", "checkout.session.async_payment_succeeded") } };
+    h.state.handler = (c) => {
+      if (c.table === "exchange_records" && c.op === "select") return { data: { id: "r1", state: "verified" } };
+      if (c.op === "update") return { data: [{ id: "r1", exchange_id: "r1" }] };
+      return { data: null };
+    };
+    expect((await hook()).status).toBe(200);
+    expect(h.state.calls.some((c) => c.table === "exchange_records" && c.op === "update")).toBe(true);
   });
 
   it("DB error -> 500 so Stripe retries", async () => {

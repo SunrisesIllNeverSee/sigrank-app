@@ -12,9 +12,9 @@ export async function POST(req:NextRequest){
   if(!stripe) return NextResponse.json({error:'Stripe not configured'},{status:500})
   let event:Stripe.Event
   try{event=stripe.webhooks.constructEvent(await req.text(),sig,secret)}catch{return NextResponse.json({error:'Invalid signature'},{status:400})}
-  if(event.type!=='checkout.session.completed') return NextResponse.json({received:true})
+  // Delayed methods (e.g. bank debits) complete unpaid, then send async_payment_succeeded once funds land.
+  if(event.type!=='checkout.session.completed'&&event.type!=='checkout.session.async_payment_succeeded') return NextResponse.json({received:true})
   const session=event.data.object as Stripe.Checkout.Session
-  // checkout.session.completed can fire for async payment methods before funds are captured.
   if(session.payment_status!=='paid') return NextResponse.json({received:true,settled:false})
   const publicId=session.metadata?.exchange_public_id
   if(!publicId) return NextResponse.json({received:true})
