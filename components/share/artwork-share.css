@@ -1,0 +1,12 @@
+.artwork-share-controls{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;font:11px var(--font-mono,monospace)}
+.artwork-share-controls button{border:1px solid rgb(var(--bg-border));background:rgb(var(--bg-surface));color:rgb(var(--text-primary));border-radius:5px;padding:6px 9px;cursor:pointer}
+.artwork-share-controls button:disabled{opacity:.6;cursor:wait}
+.artwork-share-controls button:focus-visible{outline:2px solid #a855f7;outline-offset:2px}
+.artwork-share-controls [role=status]{width:100%;font-size:10px}
+[data-artwork-export] *,[data-artwork-export]{animation:none!important;transition:none!important}
+[data-artwork-export].pv2-card-shell{transform:none!important}
+[data-artwork-export] .pv2-shine{transform:translateX(110%) skewX(-16deg)!important;opacity:.8!important}
+
+[data-artwork-export="gif"] .pv2-shine{opacity:0!important}
+[data-artwork-export="gif"] .pv2-card::after{opacity:0!important}
+.share-holocard{--pv2-display:var(--font-lbw-silk),monospace;--pv2-mono:var(--font-lbw-jb),monospace;--pv2-ui:var(--font-lbw-sg),sans-serif}

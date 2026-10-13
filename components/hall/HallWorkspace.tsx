@@ -23,6 +23,7 @@
  * scope/window/class/platform params keep their exact semantics.
  */
 
+import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   usePathname,
@@ -290,6 +291,11 @@ export function HallWorkspace({ windowsData, windowsDataAll }: Props) {
   /* ---------- left panel — control surface ---------- */
   const left = (
     <>
+      <div className="mod">
+        <div className="mini-h"><span className="sq" />BADGES & ACHIEVEMENTS</div>
+        <Link href="/hall/badges" className="ws-profile-back">BADGE GALLERY →</Link>
+        <p className="ws-note">All badge artwork and earning requirements.</p>
+      </div>
       <div className="mod">
         <div className="mini-h"><span className="sq"></span>VIEW</div>
         <div className="ws-seg" role="group" aria-label="Hall view">
