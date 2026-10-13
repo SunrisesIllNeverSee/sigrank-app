@@ -36,7 +36,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
+    <section id={title === "Connect a device" ? "connect-device" : title === "Privacy & Data" ? "privacy-data" : undefined} className="scroll-mt-6 flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5">
       <div className="flex flex-col gap-0.5">
         <h2 className="font-mono text-sm font-semibold uppercase tracking-wide text-text-primary">
           {title}
@@ -51,6 +51,14 @@ function Section({
 export function SettingsAccount() {
   const [op, setOp] = useState<SessionOperator | null | undefined>(undefined);
   const [claimed, setClaimed] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!op) return;
+    const target = window.location.hash.slice(1);
+    if (target === "connect-device" || target === "privacy-data") {
+      document.getElementById(target)?.scrollIntoView({ block: "start" });
+    }
+  }, [op]);
 
   useEffect(() => {
     // Read ?claimed=1 from the URL (was previously a server-side searchParam)

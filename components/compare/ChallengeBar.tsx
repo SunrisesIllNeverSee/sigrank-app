@@ -16,6 +16,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import type { ActiveChallenge } from "@/lib/identity/challenges-types";
+import { GATE_ARENA } from "@/lib/features";
 
 interface ChallengeBarProps {
   codeA: string;
@@ -82,12 +83,14 @@ function ActiveState({
         {" · "}
         <span className="italic text-text-muted">{challenge.prompt_brief}</span>
       </p>
-      <Link
-        href={`/arena?challenge=${challenge.challenge_id}`}
-        className="inline-flex w-fit items-center gap-2 rounded-md bg-gold px-4 py-2 font-mono text-xs font-bold text-bg-base transition-colors hover:bg-gold/90"
-      >
-        Enter arena →
-      </Link>
+      {GATE_ARENA ? (
+        <Link
+          href={`/arena?challenge=${challenge.challenge_id}`}
+          className="inline-flex w-fit items-center gap-2 rounded-md bg-gold px-4 py-2 font-mono text-xs font-bold text-bg-base transition-colors hover:bg-gold/90"
+        >
+          Enter arena →
+        </Link>
+      ) : null}
     </div>
   );
 }

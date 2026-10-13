@@ -16,7 +16,10 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import {
+  getSupabaseServer,
+  getSupabaseService,
+} from "@/lib/infra/supabase/server";
 import { SORT_DEFAULT } from "@/lib/constants";
 import { filterToWindow } from "@/lib/board/windows";
 import { classToTierId, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids";
@@ -41,7 +44,7 @@ import type {
   LeaderboardRow,
   WeeklyPoint,
 } from "@/lib/board/types";
-import { includesBoardMode, resolveWorkflowMode } from "@/lib/board/workflow-mode";
+import { includesBoardMode, resolveWorkflowMode, type WorkflowMode } from "@/lib/board/workflow-mode";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -62,6 +65,7 @@ import {
 } from "@/lib/board/mappers";
 import { fallbackRows, filterMockBoard, sortValue } from "@/lib/board/fallback";
 import { memoize } from "@/lib/board/memo";
+import { snapshotThroughput } from "@/lib/board/throughput";
 import { recordValue } from "@/lib/analytics/record-value";
 import { computeCascadeMetrics } from "@/lib/analytics/cascade";
 
@@ -254,6 +258,10 @@ function resolvedModeForSnapshot(s: DbMetricSnapshot) {
   });
 }
 
+/** Escape LIKE metacharacters so URL-supplied codenames can't wildcard-match
+ *  (e.g. `/user/%25` or a `_` segment resolving the first matching operator). */
+const escapeLike = (s: string) => s.replace(/([%_\\])/g, "\\$1");
+
 /**
  * All operators columns the mapper reads — these are exactly the columns the
  * `operators_public` view exposes (P5 fix, 0008). claim_contact / claim_payment_id
@@ -316,8 +324,10 @@ export async function getLeaderboard(
       },
       "metric_snapshots (getLeaderboard)",
     );
-    // DB empty/unreachable → mock fallback (graceful-degradation contract).
-    if (allSnaps.length === 0) return params.strictLive || params.mode ? [] : filterMockBoard(params);
+    // DB empty/unreachable → honest empty. Mock fixtures are ONLY for the
+    // unconfigured (!sb) demo path — a configured database must never show
+    // fixture operators as live data.
+    if (allSnaps.length === 0) return [];
     // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
     // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
     // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
@@ -346,7 +356,7 @@ export async function getLeaderboard(
         s.output_tokens > 0,
     );
     if (yieldable.length === 0 && (params.windowFilter || params.strictLive || params.mode)) return [];
-    const modeBySnapshot = new Map<string, "hitl" | "agentic" | null>();
+    const modeBySnapshot = new Map<string, WorkflowMode | null>();
     const boardCandidates = params.mode
       ? yieldable.filter((s) => {
           const mode = resolvedModeForSnapshot(s);
@@ -384,9 +394,8 @@ export async function getLeaderboard(
       snapRows = [...latestPerOperator(boardCandidates, params.window).values()];
     }
     // Honest empty: a connected DB whose requested window has zero rows returns an
-    // empty board (NOT fabricated mock seeds). Mock is only for an empty/broken DB.
-    if (snapRows.length === 0)
-      return params.windowFilter || params.strictLive || params.mode ? [] : filterMockBoard(params);
+    // empty board (NOT fabricated mock seeds). Mock is only for the !sb demo path.
+    if (snapRows.length === 0) return [];
 
     const opIds = new Set(snapRows.map((s) => s.operator_id));
     const opData = await fetchAllPaginated<DbOperator>(
@@ -446,11 +455,10 @@ export async function getLeaderboard(
         ...(platforms && platforms.length > 0 ? { platforms } : {}),
       });
     }
-    // Honest empty (mirrors the latest.size===0 guard above): if operators didn't
-    // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key deploy),
-    // a windowFilter board returns [] rather than fabricated mock seeds.
-    if (rows.length === 0)
-      return params.windowFilter || params.strictLive || params.mode ? [] : filterMockBoard(params);
+    // Honest empty (mirrors the snapRows guard above): if operators didn't
+    // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key
+    // deploy), the board is empty rather than fabricated mock seeds.
+    if (rows.length === 0) return [];
 
     // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
     // Filter on the row's platform (snapshot.platform, falling back to
@@ -496,8 +504,10 @@ export async function getLeaderboard(
     return rows;
   } catch (error) {
     if (params.strictLive) throw error;
-    if (params.mode) return [];
-    return filterMockBoard(params);
+    // A live read that failed is "unavailable", not "demo" — an empty board
+    // beats fixture rows presented as live.
+    console.warn("getLeaderboard failed:", error);
+    return [];
   }
 }
 
@@ -514,7 +524,7 @@ export async function isOperatorRetired(codename: string): Promise<boolean> {
     const { data, error } = await sb
       .from("operators_public")
       .select("status")
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (error) return false;
@@ -543,12 +553,16 @@ export async function getOperator(
     const { data: opData, error: opError } = await sb
       .from("operators_public")
       .select(OPERATOR_COLUMNS)
-      .ilike("codename", codename)
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
     const op = asDb<DbOperator | null>(opData);
-    if (!op) return strictLive ? null : fromMock();
+    // Live path: a real not-found is null — never a fixture row. fromMock()
+    // exists for the unconfigured !sb demo path only; fixture codenames
+    // (e.g. TransVaultOrigin) collide with real operators, so a live miss
+    // must not fabricate an identity.
+    if (!op) return null;
     // Retired operators (opt-out): no profile page. They stay on the leaderboard
     // with their tokens but are not clickable — getOperator returns null so the
     // profile route redirects to /leaderboard instead of rendering a profile.
@@ -636,7 +650,9 @@ export async function getOperator(
     };
   } catch (error) {
     if (strictLive) throw error;
-    return fromMock();
+    // Live read failure → unavailable (null → 404), never fixture identity.
+    console.warn(`getOperator(${codename}) failed:`, error);
+    return null;
   }
 }
 
@@ -727,6 +743,7 @@ export async function getIndexableOperatorRows(
 
 /** One operator submission cell: a (platform, window) point with its score. */
 export interface OperatorSubmission {
+  platformAttributed?: boolean;
   /** Lowercase platform ('claude'/'codex'/'multi'/…). */
   platform: string;
   /** Window bucket ('7d'/'30d'/'90d'/'all_time'/'today'). */
@@ -750,6 +767,7 @@ function toSubmission(
   const c = s.cascade;
   return {
     platform: (snap.platform ?? primaryDomain ?? "other").toLowerCase(),
+    platformAttributed: Boolean(snap.platform && snap.platform !== "multi" && snap.platform !== "other"),
     window: snap.window_type ?? "all_time",
     snapshotDate: snap.snapshot_date ?? null,
     classTier: s.class_tier,
@@ -809,16 +827,29 @@ export async function getOperatorSubmissions(
   try {
     const { data: opData, error: opError } = await sb
       .from("operators_public")
-      .select("operator_id, primary_domain")
-      .ilike("codename", codename)
+      .select("operator_id, primary_domain, claimed, status, profile_visibility")
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
     const op = asDb<{
       operator_id: string;
       primary_domain: string | null;
+      claimed: boolean | null;
+      status: string | null;
+      profile_visibility: string | null;
     } | null>(opData);
-    if (!op) return [];
+    // Same public-visibility contract as getOperatorSnapshotRecords and the
+    // snapshot-history API: unclaimed, retired, or private operators expose
+    // no submission data on the profile.
+    if (
+      !op ||
+      !op.claimed ||
+      op.status === "retired" ||
+      op.profile_visibility === "private"
+    ) {
+      return [];
+    }
     const { data: snapData, error: snapError } = await sb
       .from("metric_snapshots")
       .select(SNAPSHOT_COLUMNS)
@@ -851,13 +882,31 @@ export async function getOperatorHistory(
     // Resolve the operator id from the codename first.
     const { data: opData, error: opError } = await sb
       .from("operators_public")
-      .select("operator_id")
-      .ilike("codename", codename)
+      .select("operator_id, claimed, status, profile_visibility")
+      .ilike("codename", escapeLike(codename))
       .limit(1)
       .maybeSingle();
     if (opError) throw opError;
-    const op = asDb<{ operator_id: string } | null>(opData);
-    if (!op) return fromMock();
+    const op = asDb<{
+      operator_id: string;
+      claimed: boolean | null;
+      status: string | null;
+      profile_visibility: string | null;
+    } | null>(opData);
+    // Same public-visibility contract as getOperatorSubmissions /
+    // getOperatorSnapshotRecords and the snapshot-history API: unclaimed,
+    // retired, or private operators expose no submission data. And on the
+    // live path an empty read returns empty — never MOCK_HISTORY fixtures
+    // rendered against a real codename (MOCK_HISTORY keys collide with
+    // live operators, e.g. TransVaultOrigin).
+    if (
+      !op ||
+      !op.claimed ||
+      op.status === "retired" ||
+      op.profile_visibility === "private"
+    ) {
+      return [];
+    }
 
     // Per-snapshot scores + token pillars (for Υ Yield), oldest → newest.
     const { data: snapData, error: snapError } = await sb
@@ -879,7 +928,7 @@ export async function getOperatorHistory(
         cache_read_tokens: number | null;
         cache_creation_tokens: number | null;
       }> | null>(snapData) ?? [];
-    if (snaps.length === 0) return fromMock();
+    if (snaps.length === 0) return [];
     assertOperatorLimit(snaps, codename);
 
     // Per-date global_rank from rank_history (keyed by date).
@@ -924,8 +973,11 @@ export async function getOperatorHistory(
     return params.limit && params.limit > 0
       ? points.slice(-params.limit)
       : points;
-  } catch {
-    return fromMock();
+  } catch (error) {
+    // A live read that fails is "unavailable", not "mock" — fixture data
+    // must never render on a real operator's profile.
+    console.warn(`getOperatorHistory(${codename}) failed:`, error);
+    return [];
   }
 }
 
@@ -935,6 +987,27 @@ export async function getMetricLeaders(
   params: BoardParams = {},
 ): Promise<LeaderboardRow[]> {
   return getLeaderboard({ ...params, sort: metric });
+}
+
+/** Resolve a codename only when the operator's profile is public — the
+ *  operators_public redaction contract applied to FK targets that joins
+ *  through the base `operators` table would otherwise expose. */
+async function publicOperatorCodename(
+  sb: SupabaseClient,
+  operatorId: string | null,
+): Promise<string> {
+  if (!operatorId) return "";
+  try {
+    const { data } = await sb
+      .from("operators_public")
+      .select("codename")
+      .eq("operator_id", operatorId)
+      .eq("profile_visibility", "public")
+      .maybeSingle();
+    return (data as { codename: string | null } | null)?.codename ?? "";
+  } catch {
+    return "";
+  }
 }
 
 /** Hall of Signal records. */
@@ -952,7 +1025,7 @@ export async function getHallOfSignal(
       .select(
         "awarded_at, source_note, " +
           "badges:badge_id ( badge_name ), " +
-          "operators:operator_id ( codename, display_name )",
+          "operators:operator_id ( operator_id, codename, display_name )",
       )
       .order("awarded_at", { ascending: false });
     if (error) throw error;
@@ -962,12 +1035,42 @@ export async function getHallOfSignal(
       source_note: string | null;
       badges: { badge_name: string | null } | null;
       operators: {
+        operator_id: string | null;
         codename: string | null;
         display_name: string | null;
       } | null;
     };
     const rows = (data as unknown as HallJoin[] | null) ?? [];
-    if (rows.length === 0) return MOCK_HALL;
+    // Live path: an empty awards table is an empty Hall, not fixture records.
+    if (rows.length === 0) return [];
+
+    // The FK embed reads the base `operators` table, bypassing the
+    // operators_public redaction contract. Look up visibility for the joined
+    // ids and redact private operators' identity — fail closed on lookup error.
+    const joinedIds = [
+      ...new Set(
+        rows
+          .map((r) => r.operators?.operator_id)
+          .filter((id): id is string => !!id),
+      ),
+    ];
+    let publicIds: Set<string>;
+    try {
+      const { data: pub } = await sb
+        .from("operators_public")
+        .select("operator_id")
+        .eq("profile_visibility", "public")
+        .in("operator_id", joinedIds);
+      publicIds = new Set(
+        ((pub ?? []) as { operator_id: string }[]).map((r) => r.operator_id),
+      );
+    } catch {
+      publicIds = new Set();
+    }
+    const operatorName = (r: HallJoin) =>
+      r.operators?.operator_id && publicIds.has(r.operators.operator_id)
+        ? r.operators.display_name || r.operators.codename || "unknown"
+        : "unknown";
 
     const records: HallRecord[] = rows.map((r) => {
       // source_note may carry an explicit RW.xx reward id; otherwise fall back to
@@ -979,31 +1082,45 @@ export async function getHallOfSignal(
         reward_id: rewardId,
         title:
           r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? "Hall of Signal",
-        operator_codename:
-          r.operators?.display_name || r.operators?.codename || "unknown",
+        operator_codename: operatorName(r),
         value: note || (r.badges?.badge_name ?? ""),
         date: (r.awarded_at ?? "").slice(0, 10),
         isPlaceholder: false,
       };
     });
     return records;
-  } catch {
-    return MOCK_HALL;
+  } catch (error) {
+    console.warn("getHallOfSignal failed:", error);
+    return [];
   }
 }
 
 /** Homepage aggregate stats. */
+const UNAVAILABLE_HOMEPAGE_STATS: HomepageStats = {
+  total_operators: 0,
+  total_snapshots: 0,
+  total_tokens_scored: 0,
+  transmitter_count: 0,
+  top_operator_codename: "",
+  top_signa_rate: 0,
+  top_yield: 0,
+  median_yield: 0,
+  active_last_hour: 0,
+  comparisons_ran: 0,
+  isPlaceholder: true,
+};
+
 export async function getHomepageStats(): Promise<HomepageStats> {
   const sb = getSupabaseServer();
   if (!sb) return MOCK_HOMEPAGE_STATS;
   try {
-    // Singleton aggregate block (system_stats.id is pinned TRUE), with the top
-    // operator's codename embedded via the top_operator_id FK.
+    // Singleton aggregate block (system_stats.id is pinned TRUE); the top
+    // operator's codename resolves via operators_public (visibility-gated).
     const { data, error } = await sb
       .from("system_stats")
       .select(
         "total_operators, total_snapshots, total_tokens_scored, transmitter_count, " +
-          "top_signa_rate, top_yield, operators:top_operator_id ( codename )",
+          "top_signa_rate, top_yield, top_operator_id",
       )
       .limit(1)
       .maybeSingle();
@@ -1015,9 +1132,13 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       transmitter_count: number | null;
       top_signa_rate: number | null;
       top_yield: number | null;
-      operators: { codename: string | null } | null;
+      top_operator_id: string | null;
     } | null;
-    if (!s) return MOCK_HOMEPAGE_STATS;
+    // No aggregate row → unavailable, not fixture totals. Zeros are the
+    // honest state; isPlaceholder flags the surface for consumers that
+    // distinguish it (the only MOCK_HOMEPAGE_STATS fields invented before
+    // were real-looking totals and a fixture top-operator codename).
+    if (!s) return UNAVAILABLE_HOMEPAGE_STATS;
 
     // Two extra, independently-defensive reads so a missing column/table (e.g. before
     // migration 0021 lands) degrades to 0 rather than collapsing the whole block to
@@ -1081,8 +1202,8 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       total_snapshots: num(s.total_snapshots),
       total_tokens_scored: num(s.total_tokens_scored),
       transmitter_count: num(s.transmitter_count),
-      top_operator_codename:
-        s.operators?.codename ?? MOCK_HOMEPAGE_STATS.top_operator_codename,
+      // Never fabricate a top operator — empty when the FK doesn't resolve.
+      top_operator_codename: await publicOperatorCodename(sb, s.top_operator_id),
       top_signa_rate: num(s.top_signa_rate),
       top_yield: num(s.top_yield),
       median_yield,
@@ -1090,8 +1211,9 @@ export async function getHomepageStats(): Promise<HomepageStats> {
       comparisons_ran,
       isPlaceholder: false,
     };
-  } catch {
-    return MOCK_HOMEPAGE_STATS;
+  } catch (error) {
+    console.warn("getHomepageStats failed:", error);
+    return UNAVAILABLE_HOMEPAGE_STATS;
   }
 }
 
@@ -1109,6 +1231,23 @@ export async function bumpComparisonsRan(): Promise<void> {
     /* RPC/table not present yet, or transient — ignore */
   }
 }
+
+const CANONICAL_CLASS_ORDER: SignalClass[] = [
+  "ARCH+ I", "ARCH+ II", "ARCH+ III",
+  "ARCH I", "ARCH II", "ARCH III",
+  "POWER I", "POWER II", "POWER III",
+  "BASE I", "BASE II", "BASE III",
+  "SEEKER I", "SEEKER II", "SEEKER III",
+  "REFINER I", "REFINER II", "REFINER III",
+  "BEARER I", "BEARER II", "BEARER III",
+  "IGNITER I", "IGNITER II", "IGNITER III",
+];
+
+const EMPTY_CLASS_DISTRIBUTION: ClassDistributionRow[] = CANONICAL_CLASS_ORDER.map((cls) => ({
+  class_tier: cls,
+  class_id: classToTierId(cls),
+  count: 0,
+}));
 
 /** Class distribution across the active population. */
 export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
@@ -1130,7 +1269,8 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
           .order("snapshot_date", { ascending: false }),
       "metric_snapshots (getClassDistribution)",
     );
-    if (rows.length === 0) return MOCK_CLASS_DISTRIBUTION;
+    // Empty table → the honest answer is "0 operators in every class" (the
+    // mapped distribution below emits real zero counts), never fixtures.
 
     const seen = new Set<string>();
     const counts = new Map<SignalClass, number>();
@@ -1141,24 +1281,14 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
       counts.set(cls, (counts.get(cls) ?? 0) + 1);
     }
 
-    // Emit in the same canonical class order the mock board uses.
-    const order: SignalClass[] = [
-      "ARCH+ I", "ARCH+ II", "ARCH+ III",
-      "ARCH I", "ARCH II", "ARCH III",
-      "POWER I", "POWER II", "POWER III",
-      "BASE I", "BASE II", "BASE III",
-      "SEEKER I", "SEEKER II", "SEEKER III",
-      "REFINER I", "REFINER II", "REFINER III",
-      "BEARER I", "BEARER II", "BEARER III",
-      "IGNITER I", "IGNITER II", "IGNITER III",
-    ];
-    return order.map((cls) => ({
+    return CANONICAL_CLASS_ORDER.map((cls) => ({
       class_tier: cls,
       class_id: classToTierId(cls),
       count: counts.get(cls) ?? 0,
     }));
-  } catch {
-    return MOCK_CLASS_DISTRIBUTION;
+  } catch (error) {
+    console.warn("getClassDistribution failed:", error);
+    return EMPTY_CLASS_DISTRIBUTION;
   }
 }
 
@@ -1171,25 +1301,31 @@ export async function getClassDistribution(): Promise<ClassDistributionRow[]> {
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineHourly(): Promise<HourlyPoint[]> {
-  return MOCK_HOURLY;
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_HOURLY;
+  return [];
 }
 
 /**
  * getOnlineWeekly — 7-day online band (daily max + avg) for the activity board.
- * TODO(ONLINE.LIVE): weekly aggregation is not in the schema yet; returns mock.
+ * TODO(ONLINE.LIVE): weekly aggregation is not in the schema yet; returns mock in demo mode.
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineWeekly(): Promise<WeeklyPoint[]> {
-  return MOCK_WEEKLY;
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_WEEKLY;
+  return [];
 }
 
 /**
  * getOnlineByCountry — live operators online by country (BlitzStars "Live").
- * TODO(ONLINE.LIVE): country geo-aggregation is not in the schema yet; returns mock.
+ * TODO(ONLINE.LIVE): country geo-aggregation is not in the schema yet; returns mock in demo mode.
  * (Real item — the "operators online" widgets; backlog, post-auth.)
  */
 export async function getOnlineByCountry(): Promise<CountryCount[]> {
-  return MOCK_COUNTRIES;
+  const sb = getSupabaseServer();
+  if (!sb) return MOCK_COUNTRIES;
+  return [];
 }
 
 /**
@@ -1368,4 +1504,203 @@ export async function getOperatorRecords(
     static_records: staticRecords,
     dynamic_records: dynamicRecords,
   };
+}
+
+/** A single scored snapshot submission — the full per-snapshot record behind
+ *  the profile Snapshot History table (dates, reporting window, platform,
+ *  token pillars, derived metrics, verification/provenance). */
+export interface SnapshotRecord {
+  submissionId: string;
+  snapshotHash?: string | null;
+  submittedAt: string;
+  platform: string;
+  window: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  rulesetVersion: string | null;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  cacheCreateTokens: number | null;
+  cacheReadTokens: number | null;
+  yield_: number | null;
+  snr: number | null;
+  velocity: number | null;
+  leverage: number | null;
+  tokensPerDay: number | null;
+  workflowMode: WorkflowMode | null;
+  workflowModeVersion: string | null;
+  /** Agentic-only provenance (mirrors the public API contract): the linked
+   *  workflow evidence and its assessment timestamp. Null otherwise. */
+  workflowEvidenceUrl: string | null;
+  modeAssessedAt: string | null;
+}
+
+/**
+ * Per-submission snapshot records for one operator, newest first — the same
+ * scored snapshot_submissions rows the public snapshot-history API serves.
+ * Null pillars/metrics stay null so the UI can distinguish "no data" from 0.
+ */
+export async function getOperatorSnapshotRecords(
+  codename: string,
+): Promise<SnapshotRecord[]> {
+  const sb = getSupabaseServer();
+  if (!sb) return [];
+  try {
+    const { data: opData, error: opError } = await sb
+      .from("operators_public")
+      .select("operator_id, claimed, status, profile_visibility")
+      .ilike("codename", escapeLike(codename))
+      .limit(1)
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<{
+      operator_id: string;
+      claimed: boolean | null;
+      status: string | null;
+      profile_visibility: string | null;
+    } | null>(opData);
+    // Same public-visibility contract as the snapshot-history API: unclaimed,
+    // retired, or private operators expose no submission records.
+    if (
+      !op ||
+      !op.claimed ||
+      op.status === "retired" ||
+      op.profile_visibility === "private"
+    ) {
+      return [];
+    }
+
+    const { data, error } = await sb
+      .from("snapshot_submissions")
+      .select(
+        "snapshot_hash, submission_id, submitted_at, window_type, window_start, window_end, platform, ruleset_version, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens, workflow_mode, workflow_evidence_url, workflow_mode_version, mode_assessed_at",
+      )
+      .eq("operator_id", op.operator_id)
+      .eq("status", "scored")
+      .order("submitted_at", { ascending: false })
+      .order("submission_id", { ascending: false })
+      .limit(PER_OPERATOR_LIMIT);
+    if (error) throw error;
+    const rows =
+      asDb<Array<{
+        submission_id: string;
+        snapshot_hash: string | null;
+        submitted_at: string | null;
+        window_type: string | null;
+        window_start: string | null;
+        window_end: string | null;
+        platform: string | null;
+        ruleset_version: string | null;
+        input_tokens: number | null;
+        output_tokens: number | null;
+        cache_creation_tokens: number | null;
+        cache_read_tokens: number | null;
+        workflow_mode: WorkflowMode | null;
+        workflow_evidence_url: string | null;
+        workflow_mode_version: string | null;
+        mode_assessed_at: string | null;
+      }> | null>(data) ?? [];
+    assertOperatorLimit(rows, codename);
+
+    return rows.map((s) => {
+      const pillars = [
+        s.input_tokens,
+        s.output_tokens,
+        s.cache_creation_tokens,
+        s.cache_read_tokens,
+      ];
+      const complete = pillars.every(
+        (n) => n != null && Number.isFinite(n) && n >= 0,
+      );
+      const cascade = complete
+        ? computeCascadeMetrics({
+            input: s.input_tokens!,
+            output: s.output_tokens!,
+            cacheCreate: s.cache_creation_tokens!,
+            cacheRead: s.cache_read_tokens!,
+          })
+        : null;
+      const throughput = snapshotThroughput({
+        inputTokens: s.input_tokens,
+        outputTokens: s.output_tokens,
+        cacheWriteTokens: s.cache_creation_tokens,
+        cacheReadTokens: s.cache_read_tokens,
+        windowStart: s.window_start,
+        windowEnd: s.window_end,
+      });
+      const mode = complete
+        ? resolveWorkflowMode({
+            inputTokens: s.input_tokens!,
+            outputTokens: s.output_tokens!,
+            cacheWriteTokens: s.cache_creation_tokens!,
+            cacheReadTokens: s.cache_read_tokens!,
+            assessment: s.workflow_mode,
+            evidenceUrl: s.workflow_evidence_url,
+          })
+        : null;
+      return {
+        submissionId: s.submission_id,
+        snapshotHash: typeof s.snapshot_hash === "string" ? s.snapshot_hash : null,
+        submittedAt: s.submitted_at ?? "",
+        platform: (s.platform ?? "other").toLowerCase(),
+        window: s.window_type,
+        periodStart: s.window_start,
+        periodEnd: s.window_end,
+        rulesetVersion: s.ruleset_version,
+        inputTokens: s.input_tokens,
+        outputTokens: s.output_tokens,
+        cacheCreateTokens: s.cache_creation_tokens,
+        cacheReadTokens: s.cache_read_tokens,
+        yield_: cascade && !cascade.nonCompounding ? cascade.yield_ : null,
+        snr: cascade?.snr ?? null,
+        velocity: cascade?.velocity ?? null,
+        leverage: cascade && !cascade.nonCompounding ? cascade.leverage : null,
+        tokensPerDay: throughput?.processedTokensPerDay ?? null,
+        workflowMode: mode,
+        workflowModeVersion:
+          mode === "hitl" ? "hcm-v1" : s.workflow_mode_version,
+        workflowEvidenceUrl:
+          mode === "agentic" ? s.workflow_evidence_url : null,
+        modeAssessedAt: mode === "agentic" ? s.mode_assessed_at : null,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Public watcher count for one operator — the same aggregate the
+ * /api/v1/operators/{codename}/watch GET exposes. operator_watches grants
+ * no SELECT to anon, so the count runs under the SERVICE-ROLE client
+ * (getSupabaseService — never the anon fallback); watcher identity is never
+ * returned, only the number. Returns 0 when no service client exists —
+ * the profile degrades to "no watchers" rather than a fabricated count.
+ */
+export async function getOperatorWatchCount(
+  codename: string,
+): Promise<number> {
+  const sb = getSupabaseServer();
+  if (!sb) return 0;
+  try {
+    const { data: opData, error: opError } = await sb
+      .from("operators_public")
+      .select("operator_id")
+      .ilike("codename", escapeLike(codename))
+      .limit(1)
+      .maybeSingle();
+    if (opError) throw opError;
+    const op = asDb<{ operator_id: string } | null>(opData);
+    if (!op) return 0;
+    const svc = getSupabaseService();
+    if (!svc) return 0;
+    const { count, error } = await svc
+      .from("operator_watches")
+      .select("operator_id", { count: "exact", head: true })
+      .eq("operator_id", op.operator_id);
+    if (error) throw error;
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
 }

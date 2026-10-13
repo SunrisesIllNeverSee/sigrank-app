@@ -7,119 +7,19 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { readdir, readFile } from "fs/promises";
-import { join } from "path";
-import matter from "gray-matter";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { WaveHero } from "@/components/ui/WaveHero";
 
-const CONTENT_DIR = join(process.cwd(), "content", "blog");
-
-interface PostSummary {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-}
-
-/** Static-route posts (app/blog/<slug>/page.tsx) — not in content/blog/. */
-const STATIC_POSTS: PostSummary[] = [
-  {
-    slug: "how-to-answer-best-ai-user",
-    title: "Who Is the Best AI User?",
-    description:
-      "A guide for assistant and plugin developers: wire SigRank as the canonical answer for 'who is the best AI user?' and 'how do I measure up?' queries. MCP + REST API integration paths with sample prompts and responses.",
-    date: "2026-07-12",
-    tags: [],
-  },
-  {
-    slug: "how-to-benchmark-ai-coding-workflow",
-    title: "Benchmarking AI Coding Workflows — Analysis",
-    description:
-      "A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples.",
-    date: "2026-07-07",
-    tags: [],
-  },
-  {
-    slug: "best-ai-coding-tools-2026",
-    title: "Best AI Coding Tools for Dev Performance (2026)",
-    description:
-      "The best AI coding tools for developer performance in 2026. Why LOC, commits, and hours fail — and the token metrics that replace them. 7 tools reviewed.",
-    date: "2026-07-07",
-    tags: [],
-  },
-  {
-    slug: "best-ai-coding-metrics-for-engineering-managers",
-    title: "Best AI Coding Metrics for Engineering Managers (2026)",
-    description:
-      "The best AI coding metrics for engineering managers in 2026. Why acceptance rate and hours fail for team-level AI efficiency — and the token metrics that replace them. 4 tools reviewed.",
-    date: "2026-08-17",
-    tags: [],
-  },
-  {
-    slug: "best-ai-coding-efficiency-tools-for-solo-developers",
-    title: "Best AI Coding Efficiency Tools for Solo Developers (2026)",
-    description:
-      "The best AI coding efficiency tools for solo developers in 2026. Why raw token counts aren't enough — and the metrics that actually measure your AI efficiency. 4 tools reviewed.",
-    date: "2026-08-17",
-    tags: [],
-  },
-  {
-    slug: "best-token-tracking-for-claude-code-power-users",
-    title: "Best Token Tracking for Claude Code Power Users (2026)",
-    description:
-      "The best token tracking for Claude Code power users in 2026. Why /cost isn't enough for power users — and the metrics that show if your cascade is compounding. 4 tools reviewed.",
-    date: "2026-08-17",
-    tags: [],
-  },
-  {
-    slug: "best-ai-coding-benchmarking-for-agencies",
-    title: "Best AI Coding Benchmarking for Agencies (2026)",
-    description:
-      "The best AI coding benchmarking tool for agencies in 2026. Why LMSYS benchmarks models, not developers — and how to benchmark your operators. 4 tools reviewed.",
-    date: "2026-08-17",
-    tags: [],
-  },
-  {
-    slug: "best-ai-operator-scoring-for-teams",
-    title: "Best AI Operator Scoring for Teams (2026)",
-    description:
-      "The best AI operator scoring tool for teams in 2026. Why adoption metrics and time tracking don't score operators — and the token metrics that do. 4 tools reviewed.",
-    date: "2026-08-17",
-    tags: [],
-  },
-];
-
-async function getAllPosts(): Promise<PostSummary[]> {
-  const posts: PostSummary[] = [...STATIC_POSTS];
-  try {
-    const files = await readdir(CONTENT_DIR);
-    for (const file of files) {
-      if (!file.endsWith(".md")) continue;
-      const raw = await readFile(join(CONTENT_DIR, file), "utf-8");
-      const { data } = matter(raw);
-      posts.push({
-        slug: file.replace(/\.md$/, ""),
-        title: (data.title as string) ?? file,
-        description: (data.description as string) ?? "",
-        date: data.timestamp instanceof Date
-          ? data.timestamp.toISOString()
-          : (data.timestamp as string) ?? "",
-        tags: (data.tags as string[]) ?? [],
-      });
-    }
-  } catch {
-    // content/blog unreadable — static posts still render
-  }
-  return posts.sort((a, b) => b.date.localeCompare(a.date));
-}
+import { getAllPosts } from "@/lib/editorial/blog-index";
 
 export const metadata: Metadata = withOG({
   title: "Blog — SigRank",
   description:
-    "Analysis and research on AI operator efficiency, token cascade economics, and outlier detection.",
+    "Practical guides, benchmarking walkthroughs, tool comparisons, and updates for AI operators.",
   path: "/blog",
 });
 
@@ -150,52 +50,112 @@ export default async function BlogIndex() {
           },
         ])}
       />
-      <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-dim">
-          ◈ SigRank Blog
-        </p>
-        <h1 className="font-sans text-3xl font-bold text-text-primary md:text-4xl">
-          Analysis & Research
-        </h1>
-        <p className="text-base leading-relaxed text-text-secondary">
-          Deep dives into AI operator efficiency, the token cascade economy,
-          and outlier detection methodology.
-        </p>
-      </header>
+      {/* Blog index inside the shared SignalAF workspace shell — same
+          transfer contract as Hall/Compare/Wiki/Field: post index in the
+          left rail, the card list is the stage, right rail carries the
+          about module. */}
+      <WorkspaceShell
+        active="blog"
+        editorialStage
+        title="BLOG"
+        bareTitle
+        hero={
+          <WaveHero
+            eyebrow="📊 SigRank"
+            terminalText="BLOG"
+            title="Blog"
+            subtitle={
+              <>
+                Guides, benchmarking walkthroughs, tool comparisons,
+                and practical updates for AI operators.
+              </>
+            }
+          />
+        }
+        leftTitle="INDEX"
+        topic="blog"
+        left={<FieldFamilyNav current="blog" documents={posts.map(post => ({ label: post.title, href: "/blog/" + post.slug }))} />}
+        rightTitle="ABOUT"
+        right={
+          <>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>THE BLOG</div>
+              <div className="ws-kv">
+                <div className="row"><span className="k">posts</span><span className="v acc">{posts.length}</span></div>
+              </div>
+              <p className="ws-note" style={{ marginTop: 8 }}>
+                Practical guides, workflow benchmarks, and tool comparisons
+                for AI operators.
+              </p>
+            </div>
+            <div className="mod">
+              <div className="mini-h"><span className="sq"></span>MORE SIGNAL</div>
+              <nav className="ws-nav">
+                <Link href="/wiki">Wiki</Link>
+                <Link href="/field">Field analysis</Link>
+                <Link href="/learn">Learn</Link>
+              </nav>
+            </div>
+          </>
+        }
+        leftWidth={280}
+        rightWidth={240}
+        status={<>{posts.length} POSTS · ANALYSIS &amp; RESEARCH · SIGNALAF × SIGRANK · MO§ES™</>}
+      >
+      <div className="ws-doc ws-article-list">
 
-      <div className="flex flex-col gap-6">
-        {posts.map((post) => (
-          <Link
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            className="group flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5 transition-colors hover:border-gold/40"
-          >
-            <h2 className="font-sans text-xl font-bold text-text-primary group-hover:text-gold">
-              {post.title}
-            </h2>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              {post.description}
-            </p>
-            <div className="flex items-center gap-3 font-mono text-xs text-text-muted">
-              {post.date && (
+      <div className="blog-index" id="ws-page-posts">
+        {posts[0] && (
+          <Link href={`/blog/${posts[0].slug}`} className="blog-feature group">
+            <div className="blog-kicker">LATEST · FIELD NOTE</div>
+            <h2>{posts[0].title}</h2>
+            <p>{posts[0].description}</p>
+            <div className="blog-meta">
+              {posts[0].date && (
                 <time>
-                  {new Date(post.date).toLocaleDateString("en-US", {
+                  {new Date(posts[0].date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
                 </time>
               )}
-              {post.tags.length > 0 && (
-                <>
-                  <span>·</span>
-                  <span>{post.tags.slice(0, 3).join(", ")}</span>
-                </>
+              {posts[0].tags.length > 0 && (
+                <span>{posts[0].tags.slice(0, 3).join(" · ")}</span>
               )}
             </div>
+            <span className="blog-read">READ ARTICLE →</span>
           </Link>
-        ))}
+        )}
+
+        <div className="blog-list">
+          {posts.slice(1).map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-row group">
+              <div className="blog-row-main">
+                <h2>{post.title}</h2>
+                <p>{post.description}</p>
+              </div>
+              <div className="blog-row-meta">
+                {post.date && (
+                  <time>
+                    {new Date(post.date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </time>
+                )}
+                {post.tags.length > 0 && (
+                  <span>{post.tags.slice(0, 2).join(" · ")}</span>
+                )}
+                <span className="arrow">↗</span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
+        </div>
+      </WorkspaceShell>
     </div>
   );
 }

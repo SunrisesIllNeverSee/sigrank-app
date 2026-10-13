@@ -1,0 +1,16 @@
+/*
+ * terminal-block.css — TerminalBlockText self-fit sizing.
+ *
+ * The block-letter <pre> sizes itself to its container via cqw units so any
+ * text fits any width. Browsers without container-query units (Safari < 16)
+ * fall back to the caller-supplied vw clamp — same behaviour as before the
+ * self-fit change, never an unstyled 16px blowout.
+ */
+.tbt-fit {
+  font-size: clamp(0.25rem, var(--tbt-fallback, 1.9vw), var(--tbt-max, 1.3rem));
+}
+@supports (font-size: 1cqw) {
+  .tbt-fit {
+    font-size: clamp(0.25rem, var(--tbt-fit, 2cqw), var(--tbt-max, 1.3rem));
+  }
+}

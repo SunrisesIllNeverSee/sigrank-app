@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LoginContent } from "@/components/auth/LoginContent";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { withOG } from "@/lib/seo";
 
 /**
@@ -28,9 +29,13 @@ export const metadata: Metadata = withOG({
 
 export default function LoginPage() {
   return (
+    <WorkspaceShell active="profile" title="ACCOUNT ACCESS" leftTitle="SIGN IN"
+      left={<div className="mod"><h3><span className="sq" />YOUR ACCOUNT</h3><p className="ws-note">Sign in to access your operator profile, saved badges and watchlist.</p></div>}
+      rightTitle="PRIVACY" right={<div className="mod"><h3><span className="sq" />TOKEN COUNTS ONLY</h3><p className="ws-note">Never prompts or conversation content. Your public profile and owner settings remain separate.</p></div>}
+      leftWidth={228} rightWidth={252}>
     <Suspense
       fallback={
-        <div className="mx-auto flex max-w-md flex-col gap-6 py-12">
+        <div className="account-access-content mx-auto flex max-w-md flex-col gap-6 py-12">
           <header className="flex flex-col items-center gap-2 text-center">
             <span className="font-mono text-3xl font-bold tracking-[0.1em] text-gold">
               SIGRANK
@@ -48,5 +53,6 @@ export default function LoginPage() {
     >
       <LoginContent />
     </Suspense>
+    </WorkspaceShell>
   );
 }

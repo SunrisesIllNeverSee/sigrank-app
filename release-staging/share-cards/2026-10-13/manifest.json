@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-13",
+  "themes": [
+    "Cobalt",
+    "Midnight",
+    "Editorial"
+  ],
+  "formats": {
+    "linkedin": [
+      1200,
+      1200
+    ],
+    "x": [
+      1600,
+      900
+    ]
+  },
+  "canva": {
+    "folder": "https://www.canva.com/folder/FAHX4uwa9CI",
+    "linkedin": "https://www.canva.com/d/HDdsEbXADRKAAfA",
+    "x": "https://www.canva.com/d/iKe9GRSsLIu7e5q"
+  },
+  "files": [
+    {
+      "name": "signalaf-comparison-linkedin-cobalt.png",
+      "sha256": "2b32d84b501d0275d177e13b7df3f770295274baa6e5e58302a23bb26f1a6f10"
+    },
+    {
+      "name": "signalaf-comparison-linkedin-editorial.png",
+      "sha256": "b54086fa2ab43895de25ba7315270047cbc306d863b6b3d429ced10ca1ec4cff"
+    },
+    {
+      "name": "signalaf-comparison-linkedin-midnight.png",
+      "sha256": "d65a41fac9681182ad7a97c74f0d9075fa3d1aa4e66c1c5604c3a0769747fbd4"
+    },
+    {
+      "name": "signalaf-comparison-x-cobalt.png",
+      "sha256": "a274519290554b746aedbfb4a7205d5169ede459598569290c9d161f65f00d1d"
+    },
+    {
+      "name": "signalaf-comparison-x-editorial.png",
+      "sha256": "1f15d47631bc6b17fee0475678e48e6bf9a304d7c6053dc5ad319e8204fd0a04"
+    },
+    {
+      "name": "signalaf-comparison-x-midnight.png",
+      "sha256": "13a7c3fb338a33c6075e98f48cb1c82ea5ed90fe17ac0ec1986c267fa9f38474"
+    },
+    {
+      "name": "signalaf-linkedin-themes.pdf",
+      "sha256": "c552c5758f544f9df0c083983bc3c72b3e6da55980c6c05cd9dfae6b387d7414"
+    },
+    {
+      "name": "signalaf-x-themes.pdf",
+      "sha256": "08259b9acb1916bcefd00ce56ef8b3137a55ebb3d6430745184a6918765c7442"
+    },
+    {
+      "name": "source-card.html",
+      "sha256": "e86364b7fa4a70e499c0eca550db79d1390df4b33acd21371a7c5b861aa2da2a"
+    }
+  ]
+}

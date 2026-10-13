@@ -34,12 +34,14 @@ export interface ProfileShareCardProps {
   metrics: { label: string; value: string; share: number }[];
 }
 
-// ── Palette — mirrors the canonical SplitFlapCard design ────────────────────
-const GOLD_BG = "#c4923a";
+// ── Palette — PRISM treatment (share-card visual system): coral identity
+//   panel, aqua phosphor on the terminal side, coral metric values.
+//   Layout/semantics unchanged — recolor only. ────────────────────────────
+const GOLD_BG = "#ff7087"; // prism coral — identity panel
 const INK = "#0a0a0a";
-const C_GREEN = "#8ae89a";
-const C_GOLD = "#f0c862";
-const C_DULL = "#6e8a6e";
+const C_GREEN = "#36e6c2"; // prism aqua — phosphor labels
+const C_GOLD = "#ff9eaa"; // prism light-coral — metric values
+const C_DULL = "#7e8f96"; // graphite-muted
 
 // Canonical measured average-AI-user operating ratio (cache-read:input:output).
 // A population constant, NOT a computed field mean — do not replace it.
@@ -385,7 +387,7 @@ function Card({
             justifyContent: "space-between",
             alignItems: "center",
             padding: "14px 28px 12px",
-            borderBottom: "1px solid #2a5a2a",
+            borderBottom: "1px solid #2b4048",
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: 0.5,
@@ -395,7 +397,7 @@ function Card({
           <span
             style={{
               color: C_GREEN,
-              textShadow: "0 0 8px rgba(138,232,154,0.5)",
+              textShadow: "0 0 8px rgba(54,230,194,0.5)",
             }}
           >
             TELEMETRY
@@ -429,7 +431,7 @@ function Card({
                   fontWeight: 700,
                   color: C_GREEN,
                   letterSpacing: 1,
-                  textShadow: "0 0 7px rgba(138,232,154,0.45)",
+                  textShadow: "0 0 7px rgba(54,230,194,0.45)",
                 }}
               >
                 {m.label.toUpperCase()}
@@ -439,7 +441,7 @@ function Card({
                   fontSize: 40,
                   fontWeight: 800,
                   color: C_GOLD,
-                  textShadow: "0 0 8px rgba(240,200,98,0.4)",
+                  textShadow: "0 0 8px rgba(255,158,170,0.4)",
                 }}
               >
                 {m.value}
@@ -467,8 +469,8 @@ function Card({
               style={{
                 fontSize: 24,
                 fontWeight: 700,
-                color: "#a8ffa8",
-                textShadow: "0 0 8px rgba(168,255,168,0.4)",
+                color: "#36e6c2",
+                textShadow: "0 0 8px rgba(54,230,194,0.4)",
               }}
             >
               signalaf.com
@@ -483,14 +485,14 @@ function Card({
             justifyContent: "space-between",
             alignItems: "center",
             padding: "10px 18px",
-            borderTop: "1px solid #1a3a1a",
+            borderTop: "1px solid #22333a",
             fontSize: 15,
             fontWeight: 700,
             letterSpacing: 0.5,
           }}
         >
-          <span style={{ color: "#5a8a5a" }}>AVERAGE USER</span>
-          <span style={{ color: "#4a6a4a", fontSize: 11 }}>C:I:O</span>
+          <span style={{ color: "#5f6e75" }}>AVERAGE USER</span>
+          <span style={{ color: "#42545a", fontSize: 11 }}>C:I:O</span>
           <span style={{ color: C_DULL }}>{AVG_RATIO}</span>
         </div>
       </div>

@@ -59,6 +59,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/alternatives": "SUPPORTED",
   "/blog": "SUPPORTED",
   "/about": "SUPPORTED",
+  "/sigrank": "SUPPORTED",
   "/contact": "SUPPORTED",
   "/support": "SUPPORTED",
   "/faq": "SUPPORTED",

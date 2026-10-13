@@ -1,5 +1,5 @@
 import { getHallOfSignal } from "@/lib/board";
-import type { LeaderboardRow } from "@/lib/board";
+import type { HallRecord, LeaderboardRow } from "@/lib/board";
 import { sortValue } from "@/lib/analytics/sort-value";
 import {
   DISPLAY_RAW,
@@ -78,9 +78,10 @@ export async function computeTrophyCounts(
   codename: string,
   displayName: string | undefined,
   boardRows: LeaderboardRow[] | undefined,
+  hallRecords?: HallRecord[],
 ): Promise<TrophyCounts> {
-  const hallRecords = await getHallOfSignal();
-  const staticRecords = filterStaticRecords(hallRecords, codename, displayName);
+  const records = hallRecords ?? (await getHallOfSignal());
+  const staticRecords = filterStaticRecords(records, codename, displayName);
   const dynamicRecords = boardRows
     ? computeDynamicRecords(codename, boardRows)
     : [];

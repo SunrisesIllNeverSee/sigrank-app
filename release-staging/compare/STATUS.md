@@ -1,0 +1,67 @@
+# Compare — roughed
+
+Route /compare. Main implementation app/compare/page.tsx, components/compare/.
+A reviewed layout evidence copy: compare-layout.json.
+- [x] Route HTTP 200 locally.
+- [x] Existing approved-layout JSON located in scratch editor.
+- [ ] Owner final spacing/graphics: operator matchup, radar pair, metric ledger and share card.
+- [ ] Validate selectors/query URLs, metrics and raw comparisons, empty data, auth-gated controls.
+- [ ] Responsive/keyboard accessibility, canonical tests and owner release signoff.
+RELEASE READY NO. DEPLOYED NO.
+
+## 2026-10-12 · Operator-led stage / Safari palette review candidate
+- Compare section only: stage is two columns, each operator matchup report
+  owns its RAW + cascade metric radar underneath; the full metric ledger is
+  vertical in the stage-right column. Overtime remains under the reports.
+- Class hues come from actual SigRank operator class (and explicit rgba
+  fallback); previous hardcoded A=blue / B=teal is retired in Compare.
+- Preserved existing normalization against both operators, canonical data
+  values, selectors, history and share cards; no score write.
+- Chromium browser regression verified at 1440 and 960; desktop Safari visual
+  acceptance pending because automated WebKit executable is not installed.
+- Build-only font workaround used solely in isolated test copy, not in stage.
+- No deploy or production write; independent Compare-only commit.
+
+## 2026-10-12 — Live-only Compare + full-width Token Longevity
+- Both Compare operands must be live, active, claimed, scored all-time operator-total rows, drawn from the canonical 22-member live board. Seeded/unclaimed/UR profiles and synthetic `the-field` are not eligible, even via direct URL. Signed-in comparison shortcut is offered only to an eligible ranked operator.
+- The bottom Token Longevity module now spans the entire stage width below both the operator reports and the stage-right vertical statistics ledger. The ledger no longer reaches behind or alongside the chart.
+- Token Longevity displays measured dated I+O+W+R snapshot totals; same-day repeated window/platform observations use the maximum record rather than adding overlapping records. It is NOT cumulative lifetime volume. Single observations are points; no interpolation or fabricated series.
+- Production-style isolated build: PASS. 1440px stage/chart width 986px; 960px stage/chart width 845px, exact equality in both. 22/22 live selector entries, no Field or seeded entries, forged selection URLs repaired. Two observed time series in sample (four dated points each). Zero React page exceptions after fixing nested SVG tooltip markup.
+- This is a staged, Compare-only candidate. Safari owner visual signoff, overall staging promotion and production deployment remain separate gates.
+
+## 2026-10-12 — Centered diverging bars / VS+record
+- Stage top row: operator A report | metric bar-stat ledger | operator B report.
+- VS and the canonical compareTally metric-win record now lead the middle
+  bar-stat panel; the independent tiny VS strip between reports is removed.
+- Each operator retains both Raw and Cascade Metrics radars. Token Longevity
+  remains full-stage-width beneath the reports and the center bar ledger.
+- Existing live-only eligibility and all comparison formulas remain unchanged.
+- Local staged change; no merge/deploy without owner approval.
+
+## 2026-10-12 — Center width and operator header graphics
+- Desktop stage-center bar ledger expanded from 330px to 400px; operator panels contract
+  from 318px to 283px each at 1440px. Responsive minimum: center 330px,
+  operator panels 232px each at 960px. Token Longevity stays full width.
+- Center's visible MATCHUP · BAR STATISTICS heading is larger (11px), VS 30px,
+  metric group headers and row labels increased for legibility.
+- Operator profile headers now use the shared real class hues, upper live/rank line,
+  public operator avatar or class glyph, display name + handle, class chip,
+  Yield hierarchy and optional verified marker. Decorative glow is clipped without
+  causing horizontal overflow. No invented profile fields or score changes.
+- Production-style Next build, TypeScript, lint, 17/17 Compare tests, and
+  11/11 canonical tests PASS. Browser checks at 1440/1280/960 PASS,
+  each with 22 live selector options, 4 radars, 16 bar-stat lines,
+  fixed VS record, 0 page exceptions, and no header overflow.
+- Isolated local review: http://127.0.0.1:3250/compare. Safari owner review pending.
+- Staging-only; no merge or deployment.
+
+## 2026-10-12 — Second width and typography pass
+- Center bar-stat column now max 460px (400px prior), minimum 375px; paired
+  operator report columns scale down to 205px minimum with wrapping rank/Yield.
+- Increased center title 11→14px, VS 30→36px, record 30→34px, statistic
+  labels 11→12px, user names 16→18px, and stronger chart/radar legibility.
+- Independent production-style build and browser visual checks PASS at
+  1440/1280/960: no operator-header overflow or runtime exceptions; 16 bars,
+  four radars, 22 live operator choices, and full-width Token Longevity intact.
+- Native Safari foreground preview required for owner visual approval.
+- Local Compare-only staging checkpoint; no merge or deployment.

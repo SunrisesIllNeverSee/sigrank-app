@@ -1,0 +1,294 @@
+{
+  "schema": "signalaf.release-staging.v1",
+  "timestamp_utc": "2026-10-11T07:30:54+00:00",
+  "repo": "SunrisesIllNeverSee/sigrank-app",
+  "branch": "feat/live-board-2b",
+  "head": "09a45dc",
+  "release_ready": false,
+  "deployed": false,
+  "owner_release_approval": false,
+  "snapshots": [
+    {
+      "group": "user-profile",
+      "archive": "user-profile/profile-v2-candidate-2026-10-11.zip",
+      "sha256": "4b8ecb5fc5ca4bc681855616bcc3bd9c0d5b6afdb6ad82049afef3ce4a814f24",
+      "size": 225337,
+      "files": [
+        {
+          "path": "components/profile-v2/AnalysisView.tsx",
+          "sha256": "33c496822ee176836d5559bf317f2e4dd867e3b375c8302024edac99688aef01"
+        },
+        {
+          "path": "components/profile-v2/IdentityHero.tsx",
+          "sha256": "d1309a13a86b05220451c1c788ed80f58b636e00ff6d0ce26548a4025df5070e"
+        },
+        {
+          "path": "components/profile-v2/OverviewView.tsx",
+          "sha256": "bc7f67c665eccbb0f46bca1de13bb98ac941550e0e2652830cd3774bc0b16aab"
+        },
+        {
+          "path": "components/profile-v2/ProfileTabsV2.tsx",
+          "sha256": "2750dd82dd3e741ac1c70a3fde8416b4fd21bc0e52ec25e250168814e77628a4"
+        },
+        {
+          "path": "components/profile-v2/SocialView.tsx",
+          "sha256": "3bbd2072fad16d781f08ef50c5213a944a06d566de92d0a247eda52aba664e71"
+        },
+        {
+          "path": "components/profile-v2/StatsView.tsx",
+          "sha256": "96d07fd4a6f0958b6e853e913088e1ce88950e748d716c470dab0b3f9615713d"
+        },
+        {
+          "path": "components/profile-v2/SubmissionsView.tsx",
+          "sha256": "a55497ea3869d8018ad7bf64510d191c0655d3d8f4163a84a1af7a91042e1a2a"
+        },
+        {
+          "path": "app/user/[codename]/ProfileBody.tsx",
+          "sha256": "7cdd8be9f54cb3ba7527d234a64aa207e045d0fbf65bcd164054cba7e4506b59"
+        },
+        {
+          "path": "app/user/[codename]/page.tsx",
+          "sha256": "95d55cf86cf03ecf4081090b5434ae6ef6a6f29b77235fa6190f51f537e93a13"
+        },
+        {
+          "path": "_workspace/profile-mocks/analysis.html",
+          "sha256": "5846388b05649b008f32584b3f84db80428fa2c2be0543ce5eadb74a63d4e101"
+        },
+        {
+          "path": "_workspace/profile-mocks/heatmap.html",
+          "sha256": "1677862533773eb1f848efd21891822c7a46928979ab1edb5c4eba0e13bf5c6a"
+        },
+        {
+          "path": "_workspace/profile-mocks/index.html",
+          "sha256": "7af943ab55901ec73cef91fb34a123aa69e5403ec0001791da7882155c15a210"
+        },
+        {
+          "path": "_workspace/profile-mocks/overview.html",
+          "sha256": "093e3b544b654f72cefe9f035cc8b74c1dd05009d9006ceafe47c8a7db7b094f"
+        },
+        {
+          "path": "_workspace/profile-mocks/passport.html",
+          "sha256": "e7257263f928536de246c056929289d8c20baa063a17cdf2a4394ea7d2080479"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-analysis.html",
+          "sha256": "145f96a5809fdf037fb6218ae8f050ea3484059f713206eb1f0987c7396b5642"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-heatmap.html",
+          "sha256": "598d2c7d7f78af5f7776566ca54ab9ed4ddc444608cf6abbcd4a9edf49c93db4"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-overview.html",
+          "sha256": "e20841befb40e3bcb4f4eb24b8bcd2266e4143a4446102d8ca9f7d716c5e9ac2"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-passport.html",
+          "sha256": "3f408ffb8ade4d4ca48c8e7c029d65a564525257e97b0b9f9448fd67bc3c0c78"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-shell.html",
+          "sha256": "364ffd39b816ccc30668d72ca7c099732995e31fe05e56b8dc85da0408f1e191"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-social.html",
+          "sha256": "78cb560e408b0128bab488ef319c3ac5397535fa88211bf8041664f82b042dfc"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-stats.html",
+          "sha256": "f4da536a7735b7c32c94e0c1a4fe95bf46a65fc3da6486d613078b3bde636957"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-submissions.html",
+          "sha256": "8c9b7b95e4a67ca357db2a0d8a6fd7221397a528e5f8d5ee3670f68c1555b266"
+        },
+        {
+          "path": "_workspace/profile-mocks/shell.html",
+          "sha256": "89def5d6619205852ad264e5faaa2a092cbc1d6d281bcbb74d95066235c8b0dd"
+        },
+        {
+          "path": "_workspace/profile-mocks/social.html",
+          "sha256": "cd451c7cc813219c272cd5c31e4f972c95cad9739579bcb0eefb511caf072efb"
+        },
+        {
+          "path": "_workspace/profile-mocks/stats.html",
+          "sha256": "05e9a08f3e5c1b049359f8066c484e6c063e314ecc23bb5592cfb3910827e677"
+        },
+        {
+          "path": "_workspace/profile-mocks/submissions.html",
+          "sha256": "a8a4141f407165489c96eeaaa910d4c59a5f163d16861d9c861e159745a725e4"
+        },
+        {
+          "path": "docs/PROFILE_PAGE_MAP.md",
+          "sha256": "12b7f5c4fa2d9520012e11289e0fa44ccf7e63468ae1eeb006d054a27c3d37cd"
+        },
+        {
+          "path": "docs/PROFILE_REDESIGN_PROMPT.md",
+          "sha256": "5ac79282f0e01028b3c074a17114d5eb58f716e54017aaab42540874ccf880ad"
+        }
+      ]
+    },
+    {
+      "group": "text-pages",
+      "archive": "text-pages/editorial-nav-integrated-2026-10-11.zip",
+      "sha256": "df414213d52381d7458917677b831390969784871f522a0098019c9e98be82f0",
+      "size": 38660,
+      "files": [
+        {
+          "path": "components/live/EditorialSidebar.tsx",
+          "sha256": "cd4e6a1c62091fc17c330df5d66c5ccffb0400d314aa04cbc9d24e3db9e779e8"
+        },
+        {
+          "path": "components/live/proto-scoped.css",
+          "sha256": "ea653c5542fd1c66796e6fb7d386e3a001d8edab7fec098b5ed63f4f3f9e082d"
+        },
+        {
+          "path": "components/blog/BlogWorkspaceFrame.tsx",
+          "sha256": "23fe095141d4e6e3e48c6cd2904426154595bece7b73423fa9f3ca7d19ed33d4"
+        },
+        {
+          "path": "app/blog/page.tsx",
+          "sha256": "517bf49e39507ab6488365a0c3a0e0dcfccf2e160c3d0449eef390dc67207c1d"
+        },
+        {
+          "path": "app/articles/page.tsx",
+          "sha256": "e41d280f7f63dbff0d3bdd5335b92e7b5d7e4b1dc0acb8fb5f97e87b0820de1e"
+        },
+        {
+          "path": "lib/editorial/blog-index.ts",
+          "sha256": "4c78a59a91643080cc8b5f34f88cafe30886465003f739df902bd670de9d9bf4"
+        },
+        {
+          "path": "lib/editorial/workspace-documents.ts",
+          "sha256": "37522963f5ac15eef21c9e95061d41f78f958b4b8204261a953ca0f1dfb34bcb"
+        },
+        {
+          "path": "_workspace/sidebar-review/EXPANDABLE_TREE_INTEGRATED_2026-10-10.md",
+          "sha256": "c00d440dc92d06517327d0763ced55f2195c058fdf0a62af050a743f17da8256"
+        }
+      ]
+    },
+    {
+      "group": "user-profile",
+      "archive": "user-profile/profile-v2-candidate-2026-10-11-r2.zip",
+      "sha256": "68525194ea009ccaa07ffc7840d889ca5229af70b94af29d7474e6e9ef40d1cf",
+      "size": 226167,
+      "note": "r2 refresh 2026-10-11: two edits vs r1 \u2014 page.tsx dead Stat helper removed (eslint now 0 warnings); OverviewView.tsx profile name promoted to <h1> (fixes VERIFICATION_2026-10-11 zero-H1 finding). Earlier NaN log-scale fix + SplitFlap revert already in r1 hashes. Original r1 archive preserved untouched.",
+      "files": [
+        {
+          "path": "components/profile-v2/AnalysisView.tsx",
+          "sha256": "33c496822ee176836d5559bf317f2e4dd867e3b375c8302024edac99688aef01"
+        },
+        {
+          "path": "components/profile-v2/IdentityHero.tsx",
+          "sha256": "d1309a13a86b05220451c1c788ed80f58b636e00ff6d0ce26548a4025df5070e"
+        },
+        {
+          "path": "components/profile-v2/OverviewView.tsx",
+          "sha256": "bdf86bf2657ef154f6a56498ce404dea73a455f490a1e8926af6c6d1de4f4c2e"
+        },
+        {
+          "path": "components/profile-v2/ProfileTabsV2.tsx",
+          "sha256": "2750dd82dd3e741ac1c70a3fde8416b4fd21bc0e52ec25e250168814e77628a4"
+        },
+        {
+          "path": "components/profile-v2/SocialView.tsx",
+          "sha256": "3bbd2072fad16d781f08ef50c5213a944a06d566de92d0a247eda52aba664e71"
+        },
+        {
+          "path": "components/profile-v2/StatsView.tsx",
+          "sha256": "96d07fd4a6f0958b6e853e913088e1ce88950e748d716c470dab0b3f9615713d"
+        },
+        {
+          "path": "components/profile-v2/SubmissionsView.tsx",
+          "sha256": "a55497ea3869d8018ad7bf64510d191c0655d3d8f4163a84a1af7a91042e1a2a"
+        },
+        {
+          "path": "app/user/[codename]/ProfileBody.tsx",
+          "sha256": "7cdd8be9f54cb3ba7527d234a64aa207e045d0fbf65bcd164054cba7e4506b59"
+        },
+        {
+          "path": "app/user/[codename]/page.tsx",
+          "sha256": "c1bebb7fe3b1fac087485946173ce0dc2e363657d76fb2316f201cdde4973c5a"
+        },
+        {
+          "path": "_workspace/profile-mocks/analysis.html",
+          "sha256": "5846388b05649b008f32584b3f84db80428fa2c2be0543ce5eadb74a63d4e101"
+        },
+        {
+          "path": "_workspace/profile-mocks/heatmap.html",
+          "sha256": "1677862533773eb1f848efd21891822c7a46928979ab1edb5c4eba0e13bf5c6a"
+        },
+        {
+          "path": "_workspace/profile-mocks/index.html",
+          "sha256": "7af943ab55901ec73cef91fb34a123aa69e5403ec0001791da7882155c15a210"
+        },
+        {
+          "path": "_workspace/profile-mocks/overview.html",
+          "sha256": "093e3b544b654f72cefe9f035cc8b74c1dd05009d9006ceafe47c8a7db7b094f"
+        },
+        {
+          "path": "_workspace/profile-mocks/passport.html",
+          "sha256": "e7257263f928536de246c056929289d8c20baa063a17cdf2a4394ea7d2080479"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-analysis.html",
+          "sha256": "145f96a5809fdf037fb6218ae8f050ea3484059f713206eb1f0987c7396b5642"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-heatmap.html",
+          "sha256": "598d2c7d7f78af5f7776566ca54ab9ed4ddc444608cf6abbcd4a9edf49c93db4"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-overview.html",
+          "sha256": "e20841befb40e3bcb4f4eb24b8bcd2266e4143a4446102d8ca9f7d716c5e9ac2"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-passport.html",
+          "sha256": "3f408ffb8ade4d4ca48c8e7c029d65a564525257e97b0b9f9448fd67bc3c0c78"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-shell.html",
+          "sha256": "364ffd39b816ccc30668d72ca7c099732995e31fe05e56b8dc85da0408f1e191"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-social.html",
+          "sha256": "78cb560e408b0128bab488ef319c3ac5397535fa88211bf8041664f82b042dfc"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-stats.html",
+          "sha256": "f4da536a7735b7c32c94e0c1a4fe95bf46a65fc3da6486d613078b3bde636957"
+        },
+        {
+          "path": "_workspace/profile-mocks/review-submissions.html",
+          "sha256": "8c9b7b95e4a67ca357db2a0d8a6fd7221397a528e5f8d5ee3670f68c1555b266"
+        },
+        {
+          "path": "_workspace/profile-mocks/shell.html",
+          "sha256": "89def5d6619205852ad264e5faaa2a092cbc1d6d281bcbb74d95066235c8b0dd"
+        },
+        {
+          "path": "_workspace/profile-mocks/social.html",
+          "sha256": "cd451c7cc813219c272cd5c31e4f972c95cad9739579bcb0eefb511caf072efb"
+        },
+        {
+          "path": "_workspace/profile-mocks/stats.html",
+          "sha256": "05e9a08f3e5c1b049359f8066c484e6c063e314ecc23bb5592cfb3910827e677"
+        },
+        {
+          "path": "_workspace/profile-mocks/submissions.html",
+          "sha256": "a8a4141f407165489c96eeaaa910d4c59a5f163d16861d9c861e159745a725e4"
+        },
+        {
+          "path": "docs/PROFILE_PAGE_MAP.md",
+          "sha256": "12b7f5c4fa2d9520012e11289e0fa44ccf7e63468ae1eeb006d054a27c3d37cd"
+        },
+        {
+          "path": "docs/PROFILE_REDESIGN_PROMPT.md",
+          "sha256": "5ac79282f0e01028b3c074a17114d5eb58f716e54017aaab42540874ccf880ad"
+        }
+      ]
+    }
+  ],
+  "warning": "Snapshots are point-in-time evidence. Preserve source of truth in normal Next app paths. Reconcile newer code before applying."
+}

@@ -10,6 +10,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getOperator, getOperatorHistory } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
+import {
+  rateLimit,
+  rateLimitedResponse,
+} from "@/lib/infra/api-gate";
 
 const MAX_LIMIT = 365;
 
@@ -17,6 +21,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ codename: string }> },
 ) {
+  const rl = rateLimit(req);
+  if (!rl.ok) return rateLimitedResponse(rl);
+
   const { codename } = await params;
 
   const operator = await getOperator(codename);
@@ -49,6 +56,9 @@ export async function GET(
     points: points.map((p) => ({
       date: p.date,
       signa_rate: p.signa_rate,
+      /** Υ Yield = (cache_read × output) / input² per snapshot — the rank
+       *  metric's dated series. 0 when token pillars are missing. */
+      yield_: p.yield_,
       global_rank: p.global_rank,
       class_tier: p.class_tier, // UPPERCASE canonical SignalClass
     })),

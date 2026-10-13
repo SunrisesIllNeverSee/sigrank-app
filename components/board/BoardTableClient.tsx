@@ -212,7 +212,7 @@ export function BoardTableClient({
 function mapApiEntry(api: Record<string, unknown>): LeaderboardEntryWithPlatforms {
   return {
     rank: (api.rank as number) ?? 0,
-    workflowMode: (api.workflow_mode as "hitl" | "agentic" | null) ?? null,
+    workflowMode: (api.workflow_mode as "hitl" | "agentic" | "hybrid" | null) ?? null,
     workflowEvidenceUrl: (api.workflow_evidence_url as string) ?? null,
     periodStart: (api.period_start as string) ?? null,
     periodEnd: (api.period_end as string) ?? null,

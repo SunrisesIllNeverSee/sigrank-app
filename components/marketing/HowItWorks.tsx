@@ -74,7 +74,7 @@ export function HowItWorks() {
       </div>
 
       {/* ── Three-card quickstart ── */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="sig-step-grid">
         <CommandCard
           kicker="Step 1"
           title="Install"

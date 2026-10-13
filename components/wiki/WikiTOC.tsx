@@ -20,9 +20,12 @@ export interface TocItem {
 
 export interface WikiTOCProps {
   items: TocItem[];
+  /** Workspace-shell mode: renders just the nav list for the left rail —
+   *  no sticky aside wrapper, no mobile dropdown bar. */
+  rail?: boolean;
 }
 
-export function WikiTOC({ items }: WikiTOCProps) {
+export function WikiTOC({ items, rail }: WikiTOCProps) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? "");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -68,6 +71,14 @@ export function WikiTOC({ items }: WikiTOCProps) {
       }, 100);
     }
     setMobileOpen(false);
+  }
+
+  if (rail) {
+    return (
+      <nav aria-label="Wiki contents">
+        <TocList items={items} activeId={activeId} onNavigate={scrollTo} />
+      </nav>
+    );
   }
 
   return (
@@ -118,15 +129,24 @@ function TocList({
   activeId: string;
   onNavigate: (id: string) => void;
 }) {
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(items[0]?.subItems?.length ? [items[0].id] : []));
+  function toggle(id: string) {
+    setExpanded(previous => {
+      const next = new Set(previous);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
   return (
     <ul className="flex flex-col gap-0.5">
       {items.map((item) => {
         const isActive = activeId === item.id;
-        const subActive = item.subItems?.some((s) => s.id === activeId);
         return (
           <li key={item.id}>
-            <button
-              type="button"
+            <div className="flex items-center gap-1">
+            <a
+              href={`#${encodeURIComponent(item.id)}`}
               onClick={() => onNavigate(item.id)}
               className={`w-full text-left font-mono text-xs leading-relaxed transition-colors ${
                 isActive
@@ -135,15 +155,21 @@ function TocList({
               }`}
             >
               {item.label}
-            </button>
-            {item.subItems && (isActive || subActive) && (
+            </a>
+            {item.subItems?.length ? (
+              <button type="button" className="shrink-0 px-2 py-1 text-xs"
+                aria-label={`Toggle ${item.label} contents`} aria-expanded={expanded.has(item.id)}
+                onClick={() => toggle(item.id)}>{expanded.has(item.id) ? "▾" : "▸"}</button>
+            ) : null}
+            </div>
+            {item.subItems && expanded.has(item.id) && (
               <ul className="ml-3 mt-0.5 flex flex-col gap-0.5 border-l border-bg-border-subtle pl-2">
                 {item.subItems.map((sub) => {
                   const subIsActive = activeId === sub.id;
                   return (
                     <li key={sub.id}>
-                      <button
-                        type="button"
+                      <a
+                        href={`#${encodeURIComponent(sub.id)}`}
                         onClick={() => onNavigate(sub.id)}
                         className={`w-full text-left font-sans text-[11px] leading-relaxed transition-colors ${
                           subIsActive
@@ -152,7 +178,7 @@ function TocList({
                         }`}
                       >
                         {sub.label}
-                      </button>
+                      </a>
                     </li>
                   );
                 })}

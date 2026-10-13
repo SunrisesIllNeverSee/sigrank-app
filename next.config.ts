@@ -78,6 +78,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-scripts.com https://www.googletagmanager.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
+              "media-src 'self' https://mos2es.com",
               "font-src 'self' data:",
               "connect-src 'self' https://*.posthog.com https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com",
               "frame-ancestors 'self'",
