@@ -12,12 +12,17 @@ import "server-only";
  *   UPSTASH_REDIS_REST_URL  — Upstash Redis REST endpoint
  *   UPSTASH_REDIS_REST_TOKEN — Upstash Redis REST token
  *
- * Degraded mode: if Upstash is not configured (no env vars) or is
- * unreachable, the limiter falls back to a per-instance in-memory counter.
- * Sensitive write routes (failClosed=true) reject the request instead.
+ * When Upstash is missing, unreachable or over quota, the shared counter
+ * falls back to Supabase Postgres (public.api_rate_limit_hit, migration 0055;
+ * service role only).
+ *
+ * Degraded mode: if neither backend is configured or reachable, the limiter
+ * falls back to a per-instance in-memory counter. Sensitive write routes
+ * (failClosed=true) reject the request instead.
  */
 
 import { Redis } from "@upstash/redis";
+import { getSupabaseServer, SUPABASE_SERVICE_CONFIGURED } from "@/lib/infra/supabase/server";
 
 export interface DistributedRateLimitConfig {
   /** Time window in milliseconds. */
@@ -48,6 +53,32 @@ function getRedis(): Redis | null {
   }
   redisClient = new Redis({ url, token });
   return redisClient;
+}
+
+// ─── Postgres backend (Supabase, service role) ───────────────────────────────
+
+type PgHit = { hits: number; reset_seconds: number };
+
+/** Returns null when Postgres isn't usable, so callers can degrade. */
+async function pgLimit(key: string, config: DistributedRateLimitConfig): Promise<DistributedRateLimitResult | null> {
+  if (!SUPABASE_SERVICE_CONFIGURED) return null;
+  const sb = getSupabaseServer();
+  if (!sb) return null;
+  const windowSeconds = Math.max(1, Math.ceil(config.windowMs / 1000));
+  const { data, error } = await sb.rpc("api_rate_limit_hit", {
+    p_bucket: key,
+    p_window_seconds: windowSeconds,
+  });
+  const row = (Array.isArray(data) ? data[0] : data) as PgHit | null | undefined;
+  if (error || !row || typeof row.hits !== "number") {
+    if (error) console.error("[rate-limit] postgres backend failed", error.message);
+    return null;
+  }
+  const reset = Math.max(1, row.reset_seconds);
+  if (row.hits > config.max) {
+    return { ok: false, retryAfter: reset, limit: config.max, remaining: 0, reset };
+  }
+  return { ok: true, retryAfter: 0, limit: config.max, remaining: Math.max(0, config.max - row.hits), reset };
 }
 
 // ─── In-memory fallback (per-instance) ───────────────────────────────────────
@@ -102,8 +133,10 @@ export async function checkDistributedRateLimit(
   const key = `rl:${dimensions.join(":")}`;
   const redis = getRedis();
 
-  // No Redis configured → in-memory fallback (or fail-closed)
+  // No Redis configured → Postgres, then in-memory fallback (or fail-closed)
   if (!redis) {
+    const pg = await pgLimit(key, config).catch(() => null);
+    if (pg) return pg;
     if (failClosed) {
       return { ok: false, retryAfter: Math.ceil(config.windowMs / 1000), limit: config.max, remaining: 0, reset: Math.ceil(config.windowMs / 1000) };
     }
@@ -133,7 +166,9 @@ export async function checkDistributedRateLimit(
     }
     return { ok: true, retryAfter: 0, limit: config.max, remaining, reset };
   } catch {
-    // Redis unreachable
+    // Redis unreachable or over quota → Postgres, then in-memory (or fail-closed)
+    const pg = await pgLimit(key, config).catch(() => null);
+    if (pg) return pg;
     if (failClosed) {
       return { ok: false, retryAfter: Math.ceil(config.windowMs / 1000), limit: config.max, remaining: 0, reset: Math.ceil(config.windowMs / 1000) };
     }
