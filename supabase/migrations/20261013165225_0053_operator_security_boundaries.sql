@@ -78,4 +78,3 @@ REVOKE CREATE ON SCHEMA public FROM signalaf_public_projection;
 NOTIFY pgrst, 'reload schema';
 
 COMMIT;
-
