@@ -1,6 +1,7 @@
 import { McpServer, fromJsonSchema, type StandardSchemaWithJSON, type CallToolResult } from "@modelcontextprotocol/server";
 import contracts from "./contracts.json";
 import { callPluginTool } from "./service";
+import { UNTRUSTED_TEXT_NOTICE } from "../untrusted";
 
 export function createPluginServer(request: Request): McpServer {
   const server = new McpServer(
@@ -11,7 +12,7 @@ export function createPluginServer(request: Request): McpServer {
     const inputSchema = fromJsonSchema(tool.inputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
     const outputSchema = fromJsonSchema(tool.outputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
     server.registerTool(tool.name, {
-      title: tool.title, description: tool.description, inputSchema, outputSchema,
+      title: tool.title, description: `${tool.description} ${UNTRUSTED_TEXT_NOTICE}`, inputSchema, outputSchema,
       annotations: tool.annotations,
       _meta: { securitySchemes: tool.securitySchemes },
     }, async (args: Record<string, unknown>): Promise<CallToolResult> => {
