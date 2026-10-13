@@ -120,13 +120,14 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
   const peak = yields.length ? yields[yields.length - 1] : null;
   const rng = mulberry32(hashSeed(codename));
   const simulate = history.length > 0;
-  const cells: { day: number; bg: string | null }[] = [];
+  const cells: { day: number; bg: string | null; estimated: boolean }[] = [];
   for (let k = 0; k < 154; k++) {
     const day = startDay + k;
-    if (day > anchor || day < acctStart) { cells.push({ day, bg: null }); continue; }
+    if (day > anchor || day < acctStart) { cells.push({ day, bg: null, estimated: false }); continue; }
     const recency = (day - Math.max(acctStart, startDay)) / Math.max(1, anchor - Math.max(acctStart, startDay));
     const y = histMap.get(day);
     let bg: string | null = null;
+    let estimated = false;
     if (y != null && y >= 0 && baseline) {
       if (peak && y >= peak) bg = "var(--pv2-orange)";
       else if (y < baseline * 0.9) bg = "rgb(255 0 212 / 0.55)";
@@ -135,6 +136,9 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
     } else if (y === -1) {
       bg = "rgb(var(--gold) / 0.35)";
     } else if (simulate) {
+      // Visual interpolation only. No actual daily submission or streak
+      // observation is implied for an unobserved date.
+      estimated = true;
       const v = rng() * 0.6 + recency * 0.4;
       if (v >= 0.15) {
         const t = rng(), lvl = rng();
@@ -145,8 +149,14 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
         else bg = lvl < 0.8 ? "rgb(255 154 60 / 0.55)" : "var(--pv2-orange)";
       }
     }
-    cells.push({ day, bg });
+    cells.push({ day, bg, estimated });
   }
+  const modeledDays = cells.filter((c) => c.estimated).length;
+  const isEstimated = modeledDays > 0;
+  const activityNotice = isEstimated
+    ? `ESTIMATED — ${modeledDays} days modeled between available snapshots. Colors are illustrative, not observed daily submissions; ACTIVE, BEST and STREAK are approximations.`
+    : "NO DAILY OBSERVATIONS — insufficient history for modeled activity; no daily activity or streak is assumed.";
+  const displayEstimate = (n: number) => isEstimated ? `~${n}` : String(n);
   const active = cells.filter((x) => x.bg);
   let longest = 0, run = 0;
   for (const x of cells) { run = x.bg ? run + 1 : 0; longest = Math.max(longest, run); }
@@ -290,28 +300,29 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
           sidebar; click pops the same map centered in-window with the
           legend (owner direction — never a stage-body element). */}
       <div className="mod">
-        <h3><span className="sq" />SUBMISSION ACTIVITY</h3>
+        <h3><span className="sq" />SUBMISSION ACTIVITY <span title={activityNotice} style={{ color: "var(--pv2-orange)", fontSize: "9px", letterSpacing: ".06em", marginLeft: "5px" }}>{isEstimated ? "ESTIMATED" : "NO DAILY DATA"}</span></h3>
         <RailDialog
           wide
           title="SUBMISSION ACTIVITY"
-          subtitle={`DAILY YIELD VS OPERATOR BASELINE · ${operator.account_age_days}D · ${num(operator.total_messages_lifetime)} MSG`}
+          subtitle={`${isEstimated ? "ESTIMATED ACTIVITY PATTERN" : "AVAILABLE SNAPSHOT DATES"} · ${operator.account_age_days}D · ${num(operator.total_messages_lifetime)} MSG`}
           trigger={
             <div className="prl-heat prl-heat--rail">
               <div className="prl-heat-grid">
                 {Array.from({ length: 22 }, (_, w) => (
                   <div key={w} className="prl-heat-col">
                     {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
-                      <div key={d} className="prl-heat-cell" style={cell.bg ? { background: cell.bg } : undefined} />
+                      <div key={d} className="prl-heat-cell" title={cell.estimated ? "ESTIMATED · not an observed daily submission" : cell.bg ? "AVAILABLE SNAPSHOT DATE" : "NO DAILY OBSERVATION"} style={cell.bg ? { background: cell.bg } : undefined} />
                     ))}
                   </div>
                 ))}
               </div>
               <div className="prl-heat-stats">
-                <span><b>{active.length}</b>ACTIVE</span>
-                <span><b>{longest}</b>BEST</span>
-                <span><b>{streak}</b>STREAK</span>
+                <span><b>{displayEstimate(active.length)}</b>{isEstimated ? "EST. ACTIVE" : "ACTIVE"}</span>
+                <span><b>{displayEstimate(longest)}</b>{isEstimated ? "EST. BEST" : "BEST"}</span>
+                <span><b>{displayEstimate(streak)}</b>{isEstimated ? "EST. STREAK" : "STREAK"}</span>
                 <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
               </div>
+              <p className="ws-note" style={{ marginTop: "6px", lineHeight: 1.4 }}>{activityNotice}</p>
             </div>
           }
         >
@@ -323,17 +334,18 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
               {Array.from({ length: 22 }, (_, w) => (
                 <div key={w} className="prl-heat-col">
                   {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
-                    <div key={d} className="prl-heat-cell" style={cell.bg ? { background: cell.bg } : undefined} />
+                    <div key={d} className="prl-heat-cell" title={cell.estimated ? "ESTIMATED · not an observed daily submission" : cell.bg ? "AVAILABLE SNAPSHOT DATE" : "NO DAILY OBSERVATION"} style={cell.bg ? { background: cell.bg } : undefined} />
                   ))}
                 </div>
               ))}
             </div>
             <div className="prl-heat-stats">
-              <span><b>{active.length}</b>ACTIVE</span>
-              <span><b>{longest}</b>BEST</span>
-              <span><b>{streak}</b>STREAK</span>
+              <span><b>{displayEstimate(active.length)}</b>{isEstimated ? "EST. ACTIVE" : "ACTIVE"}</span>
+              <span><b>{displayEstimate(longest)}</b>{isEstimated ? "EST. BEST" : "BEST"}</span>
+              <span><b>{displayEstimate(streak)}</b>{isEstimated ? "EST. STREAK" : "STREAK"}</span>
               <span><b>{yields.length ? compact(yields[yields.length - 1]) : "—"}</b>PEAK Υ</span>
             </div>
+            <p className="ws-note" style={{ marginTop: "8px", lineHeight: 1.5 }}>{activityNotice}</p>
             <div className="prl-heat-legend">
               <span><i style={{ background: "rgb(255 0 212 / 0.55)" }} />BELOW</span>
               <span><i style={{ background: "rgb(255 230 0 / 0.55)" }} />BASE</span>
