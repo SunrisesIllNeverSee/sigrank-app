@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAttempt, isAcceptingAttempts, countActorAttempts, countConcurrentAttempts, getSignal } from "@/lib/exchange/signal-server";
 import { logEncounter, requestIdentity } from "@/lib/exchange/server";
 import { createHash } from "node:crypto";
+import { resolveValidatedActor } from "@/lib/exchange/mcp-tools";
 import { checkDistributedRateLimit, distributedRateLimitHeaders } from "@/lib/infra/distributed-rate-limit";
 
 /**
@@ -54,10 +55,11 @@ export async function POST(
   }
 
   // Authentication: require authenticated actor unless anonymous_attempts is true.
-  // The actor ID is derived from the validated credential, NOT from a caller-
-  // supplied header — this prevents actor-ID spoofing.
-  const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
-  const actorId = actorKey ? `actor:${createHash("sha256").update(actorKey).digest("hex").slice(0, 16)}` : `anonymous:${ip}`;
+  // The actor ID is derived from a credential validated via validateAgentKey
+  // (invalid key → 401), preventing actor-ID spoofing.
+  const actor = await resolveValidatedActor(req, ip);
+  if (!actor.ok) return NextResponse.json({ error: actor.error }, { status: actor.status, headers: distributedRateLimitHeaders(rl, "signal-attempt") });
+  const { actorKey, actorId } = actor;
 
   if (!signal.participation.anonymous_attempts && !actorKey) {
     return NextResponse.json(

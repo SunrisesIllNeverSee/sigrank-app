@@ -20,12 +20,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     result: 'ok',
   })
 
-  if (record.state !== 'authorized' && record.state !== 'delivering') {
-    return NextResponse.json({ error: 'Exchange must be authorized before execution can be routed' }, { status: 409 })
-  }
-
+  // Authenticate BEFORE revealing anything about exchange state (uniform 401, no 409-vs-401 oracle).
   if (!(await authenticateCompany(record.target_domain, req.headers.get('x-exchange-company-key')))) {
     return NextResponse.json({ error: 'Company administrator authorization required to route execution' }, { status: 401 })
+  }
+
+  if (record.state !== 'authorized' && record.state !== 'delivering') {
+    return NextResponse.json({ error: 'Exchange must be authorized before execution can be routed' }, { status: 409 })
   }
 
   let body: unknown

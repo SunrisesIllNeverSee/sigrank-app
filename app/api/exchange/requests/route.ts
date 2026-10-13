@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { RequestSchema } from '@/lib/exchange-gateway/src/schema'
 import { appendExchangeEvent, findCompany, getExchangeAdmin, hashSecret, logEncounter, newPublicId, newSecret, requestIdentity, safeEqual } from '@/lib/exchange/server'
 import { dispatchToDomainAgent } from '@/lib/exchange/steward'
-import { rateLimitAllow } from '@/lib/exchange/rate-limit'
+import { rateLimitAllowAsync } from '@/lib/exchange/rate-limit'
 import { captureServer } from '@/lib/infra/posthog/server'
 
 export async function POST(req:NextRequest){
   const ip=requestIdentity(req)
-  if(!rateLimitAllow(ip,'exchange_request')) {
+  if(!(await rateLimitAllowAsync(ip,'exchange_request'))) {
     await logEncounter({targetDomain:'',endpoint:'/api/exchange/requests',req,result:'rate_limited'})
     return NextResponse.json({error:'Rate limited'},{status:429})
   }
