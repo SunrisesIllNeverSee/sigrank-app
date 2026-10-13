@@ -95,6 +95,7 @@ export async function GET(req: NextRequest) {
     const scope: string | undefined = tokenData.scope;
     const teamId: string | undefined = tokenData.team_id;
     const userId: string | undefined = tokenData.user_id;
+    const installationId: unknown = tokenData.installation_id;
 
     if (!accessToken) {
       console.error("[vercel/oauth] No access_token in response");
@@ -103,9 +104,14 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    if (typeof installationId !== "string" || !/^[a-zA-Z0-9_-]{1,200}$/.test(installationId) ||
+        (configurationId !== null && configurationId !== installationId)) {
+      return NextResponse.redirect(new URL("/vercel?error=installation_mismatch", SITE_ORIGIN));
+    }
+
     // Persist the installation. Try Supabase first; fall back to a cookie.
     const supabase = getSupabaseServer();
-    const configId = configurationId ?? `cfg_${Date.now()}`;
+    const configId = installationId;
 
     if (supabase) {
       const { error } = await supabase.from("vercel_integrations").upsert({

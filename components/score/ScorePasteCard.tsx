@@ -193,9 +193,9 @@ export function ScorePasteCard() {
             <span className="text-gold font-bold">
               {preview.yield.toFixed(1)}
             </span>
-            <span className="text-text-muted">Class tier</span>
+            <span className="text-text-muted">Example class</span>
             <span className="text-gold font-bold">{preview.classTier}</span>
-            <span className="text-text-muted">SIGNA rate</span>
+            <span className="text-text-muted">Example SIGNA</span>
             <span className="text-text-primary">
               {preview.signaRate.toFixed(1)}
             </span>
