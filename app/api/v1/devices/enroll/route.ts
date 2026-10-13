@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
-import { enrollRateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 import { normalizeConnectCode } from "@/lib/identity/connect-code";
 import { isValidAgentPublicKey } from "@/lib/ingest/signature";
 import { captureServer } from "@/lib/infra/posthog/server";
@@ -19,8 +19,8 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function POST(req: NextRequest) {
-  const rl = enrollRateLimit(req);
-  if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
+  const limited = await enforceRouteLimit(req, "device-enroll", { windowMs: 10 * 60 * 1000, max: 10 }, { failClosed: true });
+  if (limited) return limited;
 
   let body: Record<string, unknown>;
   try {
@@ -103,8 +103,9 @@ export async function POST(req: NextRequest) {
     }
   }
   if (error) {
+    console.error("[devices/enroll] rpc error", error);
     return NextResponse.json(
-      { reason: "enroll_failed", detail: error.message },
+      { reason: "enroll_failed", detail: "Enrollment failed." },
       { status: 500 },
     );
   }

@@ -1,11 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
-import {
-  enrollRateLimit,
-  rateLimitedResponse,
-  getClientIp,
-} from "@/lib/infra/api-gate";
+import { getClientIp } from "@/lib/infra/api-gate";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 import { generateConnectCode } from "@/lib/identity/connect-code";
 
 /**
@@ -22,8 +19,8 @@ export const dynamic = "force-dynamic";
 const CODE_TTL_MS = 10 * 60_000; // 10 minutes
 
 export async function POST(req: NextRequest) {
-  const rl = enrollRateLimit(req);
-  if (!rl.ok) return rateLimitedResponse(rl.retryAfter);
+  const limited = await enforceRouteLimit(req, "device-mint-code", { windowMs: 10 * 60 * 1000, max: 10 }, { failClosed: true });
+  if (limited) return limited;
 
   const op = await getSessionOperator();
   if (!op)
@@ -79,7 +76,8 @@ export async function POST(req: NextRequest) {
     });
     if (!error) code = candidate;
     else if (error.code !== "23505") {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("[devices/mint-code] insert error", error);
+      return NextResponse.json({ error: "Could not issue code." }, { status: 500 });
     }
   }
   if (!code) {

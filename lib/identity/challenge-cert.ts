@@ -117,3 +117,32 @@ export function extractVerifiedCert(
     signature: cert.signature as string,
   };
 }
+
+/**
+ * Bind a verified cert to the specific challenge + submitting operator + window.
+ * A valid signature alone is not enough: a public certificate from another
+ * challenge/operator must not be replayable here.
+ *
+ * `window` is optional (mock path has no DB row); when present the cert
+ * timestamp must parse and fall inside [open - skew, close + skew].
+ */
+export function certBindsTo(
+  cert: ChallengeScoreCert,
+  expected: {
+    challengeId: string;
+    operatorId: string;
+    window?: { open: string; close: string };
+  },
+): boolean {
+  if (cert.challenge_id !== expected.challengeId) return false;
+  if (cert.operator_id !== expected.operatorId) return false;
+  if (expected.window) {
+    const ts = Date.parse(cert.timestamp);
+    const open = Date.parse(expected.window.open);
+    const close = Date.parse(expected.window.close);
+    if (Number.isNaN(ts) || Number.isNaN(open) || Number.isNaN(close)) return false;
+    const skewMs = 60_000;
+    if (ts < open - skewMs || ts > close + skewMs) return false;
+  }
+  return true;
+}

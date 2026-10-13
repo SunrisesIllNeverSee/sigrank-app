@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
+import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 
 /**
  * POST /api/v1/devices/revoke — kill-switch for a leaked device key (D7 §4.6).
@@ -14,6 +15,9 @@ import { getSupabaseService } from "@/lib/infra/supabase/server";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const limited = await enforceRouteLimit(req, "device-revoke", { windowMs: 60 * 60 * 1000, max: 30 }, { failClosed: true });
+  if (limited) return limited;
+
   const op = await getSessionOperator();
   if (!op)
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
@@ -41,8 +45,10 @@ export async function POST(req: NextRequest) {
     .eq("device_id", deviceId)
     .eq("operator_id", op.operatorId) // you can only revoke your own device
     .select("device_id");
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[devices/revoke] db error", error);
+    return NextResponse.json({ error: "Could not revoke device." }, { status: 500 });
+  }
   if (!data || data.length === 0) {
     return NextResponse.json({ error: "Device not found." }, { status: 404 });
   }
