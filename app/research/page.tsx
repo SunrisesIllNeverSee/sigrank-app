@@ -7,6 +7,7 @@
  */
 
 import type { Metadata } from "next";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -141,6 +142,7 @@ export default function StateOfTheIndexPage() {
       status={<>{operatorCount.toLocaleString("en-US")} OPERATORS · {fmt(totalTokens)} TOKENS · DATASET v3.1 · SIGNALAF × SIGRANK · MO§ES™</>}
     >
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 py-2">
+        <div className="mb-3 flex justify-end"><UnifiedShare title="SignalAF · Research & Articles" markdown editorial compact /></div>
       <JsonLd
         data={[
           sigrankDataset({ updated: new Date().toISOString() }),
