@@ -20,6 +20,7 @@
 
 import { useRef, useState } from "react";
 import { MedalHex, PendingHex, LockedHex } from "./RecordMarks";
+import { UnifiedShare } from "@/components/share/UnifiedShare";
 
 export interface RailRecord {
   id: string;
@@ -47,7 +48,7 @@ export interface RailRecord {
   progressLabel?: string;
 }
 
-function RecordIcon({ r, size = 16 }: { r: RailRecord; size?: number }) {
+function RecordIcon({ r, size = 23 }: { r: RailRecord; size?: number }) {
   if (r.state === "earned") return <MedalHex rank={r.rank} sigil={r.sigil ?? "◆"} ink={r.ink} size={size} />;
   if (r.state === "pending") return <PendingHex size={size} />;
   return <LockedHex size={size} />;
@@ -67,7 +68,7 @@ export function RecordDetailList({ records }: { records: RailRecord[] }) {
     <>
       <ul className="prl-recs" aria-label="Operator records">
         {records.map((r) => (
-          <li key={r.id}>
+          <li key={r.id} id={"record-" + encodeURIComponent(r.id)}>
             <button
               type="button"
               className={`prl-rec prl-rec--${r.state}`}
@@ -104,6 +105,8 @@ export function RecordDetailList({ records }: { records: RailRecord[] }) {
                 <strong>{active.title}</strong>
                 <span>{active.state === "earned" ? "CURRENT RECORD" : active.state === "pending" ? "IN PROGRESS" : "UNAVAILABLE"}</span>
               </div>
+              {active.state === "earned" && <UnifiedShare title={"SignalAF · " + active.title + " record"} href={"#record-" + encodeURIComponent(active.id)}
+                screenshotTarget=".prl-dialog[open] .prl-dialog-card" compact />}
               <button type="button" className="prl-dialog-x" onClick={close} aria-label="Close record details">✕</button>
             </div>
             <dl className="prl-dialog-dl">
