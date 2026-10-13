@@ -2,7 +2,7 @@
 
 **Audit target:** `integration/site-a315435` @ `1a505a0`, previewed at `http://localhost:3230`.
 **Fix branch:** `audit/site-a315435` (this worktree `_audit_fixes_20261013`), PR target `integration/site-a315435`.
-**Status label:** ALL findings are STAGING findings — production (`signalaf.com`) still serves the Oct-10 baseline `54484c7`; the rebuild is NOT deployed. Production was probed only for release regressions/urgent security issues, not comprehensively audited.
+**Status label:** Production flipped mid-audit — `signalaf.com` now serves the rebuild (verified: `/sigrank`, `/articles`, `/s/xoxo`, `/hall/badges`, `/share/four-degrees` all 200 + `pv2-`/`prl-` markers in `/user/xoxo` HTML; `/editor/review` correctly 404s as dev-only). Visual-pass findings below were taken against **live** signalaf.com where noted.
 **Method:** deterministic 235-route sweep + 3 parallel lanes (wiring trace, Playwright Chromium+WebKit interaction audit, static link-graph audit) + targeted verification. Lane artifacts: `/tmp/pw-audit/*.mjs`, `/tmp/audit-*.png`.
 
 ## Deployment-gap note
@@ -84,3 +84,34 @@ Missing from prod: 7 new routes (`/articles`, `/sigrank`, `/hall/badges`, `/s/[c
 2. Firecrawl-equivalent public inventory on the live domain (title/headings/outgoing-links/failures per page).
 3. Re-run the auth + OAuth + `?next=` matrix against production env vars.
 4. Authenticated pass (R-17).
+
+---
+
+## Visual/usability pass — live signalaf.com + staging :3230 (Chromium + WebKit + real Safari.app)
+
+Owner checklist items incorporated: leaderboard filter spacing, Raw/Metrics radar overlap, Compare fixed stage/sidebars, Hall records, profile Settings alignment, holographic card/footer, badges, sharing controls.
+
+| ID | Page | Owner instruction or finding | Proposed solution | Fixed in code? | File/line | Commit | Before/after evidence | Verified in Safari? | Outstanding decision |
+|---|---|---|---|---|---|---|---|---|---|
+| V-1 | every WorkspaceShell page @ ≤1050px | **Stage collapsed to 0–99px at 375px — content unreachable** (`/login` card, board, profiles, `/s/`, editorial). Owner directive (proto:128-131) intends pinned panels + horizontal access; only `/compare` implemented it (`compare-workspace.css:347`) | Generalized compare's `@media(max-width:1050px)` rule to all `.mid` variants incl. `.peek`/`no-rail`/`no-left` combos: `minmax(600px,1fr)` stage + `overflow-x:auto` | **YES** | `proto-scoped.css:302-313` | this commit | before: stage 36–99px, `.mid` no scroll; after: stage=600px, `.mid` scrollW 1068–1180 pannable | **YES** — WebKit: stageW=600, pan renders full board incl. sparklines/selects | none — collapse toggles stay opt-in per directive |
+| V-2 | `/board/all` `.fbar` selects | Leaderboard filter spacing — Safari's native arrow chrome clipped labels to `All-ti⌄`/`Platfo⌄` at 72px | `appearance:none` + drawn SVG chevron reclaims ~14px; `title` now carries current value | **YES** | `board-cols.css:212-218`; `LiveBoardWorkspace.tsx:2009,2021,2033` | this commit | shot `vis-fix-fbar.png`: "All-time▾ Platform▾ Class▾" fully legible @72px (was clipped) | **YES** — `appearance:none` computed in WebKit | long selected values ("Claude Code") still clip ~2ch — tooltip shows full value |
+| V-3 | `/s/xoxo` Card 02 (`/api/outreach-card`) | Public PNG rendered `GLOBAL RANK #0 / TOP 100.0%` for claimed-unranked operator — `#0` is not a rank | `hasRank` guard → `—`/`—` (same DASH convention as the card's other unranked fields) | **YES** | `outreach-card/[codename]/route.tsx:297-298,509,534` | this commit | Safari prod PNG showed `#0`/`TOP 100.0%`; fixed PNG shows `—`/`—` | **YES** (evidence captured from real Safari render) | API `current_rank:0` contract unchanged — R-1 owner decision |
+| V-4 | every `.ftr` footer (all workspace pages) | `.flinks{overflow:hidden}` hid ~104px of nav links — API/PRIVACY/`npx sigrank` unreachable **even at 1440px** | `overflow-x:auto` + `scrollbar-width:none` + webkit scrollbar hidden — scrollable, visually unchanged | **YES** | `proto-scoped.css:634-635` | this commit | before sw528>cw424 dead links; after `ox:auto` measured | **YES** | none |
+| V-5 | all `.railhead` panel headers | Bare text node clipped mid-glyph (sw310/cw247 — "…10XER_") — no ellipsis possible on anonymous flex item | Wrapped titles in `.rh-t` span with `overflow:hidden;text-overflow:ellipsis;min-width:0` (4 sites) | **YES** | `proto-scoped.css:274`; `WorkspaceShell.tsx:392,435`; `LiveBoardWorkspace.tsx:1869,2323` | this commit | `.rh-t` computes ellipsis, sw216/cw216 | **YES** | none |
+| V-6 | `/compare` | ~3px document-level overflow (378/375, 1443/1440) | Edge leak on intentionally-scrollable stage | deferred | — | — | measured; no element flags outside scroll containers | n/a | optional `.stagecol` edge-padding audit |
+| V-7 | all workspace pages (touch) | `.edge` collapse sashes `opacity:0` until hover — invisible on touch; `.rail-x` 30px / `.mvbtn` 16px sub-44px | V-1 makes content reachable via pan regardless; sashes still tappable | partially (V-1) | `proto-scoped.css:288-295` | — | — | n/a | owner decision: visible collapse affordance on touch vs current minimal-chrome intent |
+| V-8 | all `.lbw-root` pages | `height:100vh` — iOS dynamic chrome can cover `.ftr` strip | `100dvh`/`100svh` progressive enhancement | deferred | `proto-scoped.css:79` | — | emulation can't reproduce; needs real-device check | n/a | recommended CSS tweak |
+| V-9 | `/` | `NavNpxCTA` renders but `body:has(.lbw-root)>div{display:none}` suppresses it — dead UI on its only eligible page | Remove the render or scope it to non-workspace pages | documented | `globals.css:772-777` vs `NavNpxCTA.tsx:13` | — | computed `display:none` on `/` | n/a | owner decision: intentional suppression vs dead code |
+| V-10 | `/user/*` | `.pv2-card-inner`/`.pv2-center-block` ~22px internal overflow | Card-art bleed by design — `.pv2-card` clips intentionally; Safari render is clean | n/a (intentional) | `profile-workspace.css` | — | Safari shot: holo card clean | **YES** | none |
+| V-11 | `/compare` radars (owner item) | "overlapping Raw/Metrics radar shapes and legends" | Audited live: the Raw/Metrics pair is **numeric rows** on profiles; the dual radar pair exists only in compare — solid vs ghost variants distinguishable, legends legible | n/a (verified OK) | `CompareRadars.tsx`, `CascadeRadar.tsx` | — | Safari shot `safari-compare.png`: both radars clean, matchup bars aligned | **YES** | none |
+| V-12 | `/s/xoxo` holo card + footer (owner item) | "holographic card/footer" | `.pv2-shine` runs `pv2-shine-sweep` animation (verified computed `animationName` in WebKit + Chromium); card/footer render clean | n/a (verified OK) | `profile-workspace.css` | — | real Safari.app capture `/tmp/safari-user-xoxo.png` + WebKit probe | **YES** | none |
+| V-13 | `/hall` records (owner item) | Hall records legibility | `.ws-grid3` metric cards + `RecordTicker` render clean at desktop; mobile covered by V-1 pan | n/a (verified OK) | `hall-workspace.css` | — | 24-page sweep + shots | **YES** | none |
+| V-14 | `/settings` (owner item) | "profile Settings alignment" | Normal document page — sections aligned both viewports; designed signed-out state gates private sections | n/a (verified OK) | `app/settings/page.tsx` | — | sweep: no overflow, no clip | **YES** | none |
+| V-15 | `/hall/badges`, `/user/*?tab=badges`, share controls (owner item) | badges + sharing controls | `BadgeExplorer` medallions + criteria `clamp(2)` intentional; `UnifiedShare` portal clamps to viewport at 375; `ArtworkShareControls` wraps | n/a (verified OK) | `badge-explorer.css`, `UnifiedShare.tsx:229-243` | — | shots + portal-clamp math verified | **YES** | preview-modal scale ≈0.29 at 375 — legible but small; optional improvement |
+
+### Visual-pass verification record
+
+- **Engines:** Playwright Chromium + WebKit at 1440×900 and 375×812 against live `signalaf.com`; real Safari 27.0.1 window captures (`screencapture -l`) for `/user/xoxo`, `/s/xoxo`, `/board/all`, `/compare`.
+- **Mobile reachability:** all workspace stages now 600px + pannable at 375px (was 36–99px dead slivers). `/login` sign-in reachable.
+- **Shots:** `/tmp/vis-fix-fbar.png` (fixed toolbar), `/tmp/vis-wk-mob-stage.png` (WebKit panned board), `/tmp/safari-*.png` (real Safari), `/tmp/vis-*-*.png` (lane sweeps), `/tmp/outreach-fixed.png` (rank `—`).
+- **Gates:** `tsc --noEmit` 0 · canonical 11/11 · `npm test` 682/0/4-skip · zero pageerrors during sweeps.

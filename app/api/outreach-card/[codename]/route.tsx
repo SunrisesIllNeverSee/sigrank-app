@@ -295,6 +295,7 @@ export async function GET(
   const cascadeStr = (ranked && c.cascadeStr) || DASH;
 
   const globalRank = row.global_rank;
+  const hasRank = globalRank > 0;
   const topPct = Math.max(0, 100 - row.percentile);
 
   // ── Hall of Signal ────────────────────────────────────────────────────────
@@ -505,7 +506,7 @@ export async function GET(
                 lineHeight: 1,
               }}
             >
-              #{globalRank}
+              {hasRank ? `#${globalRank}` : DASH}
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -530,7 +531,7 @@ export async function GET(
                 lineHeight: 1,
               }}
             >
-              TOP {topPct.toFixed(1)}%
+              {hasRank ? `TOP ${topPct.toFixed(1)}%` : DASH}
             </div>
           </div>
         </div>

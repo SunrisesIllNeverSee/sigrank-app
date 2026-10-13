@@ -389,7 +389,7 @@ export function WorkspaceShell({
                 <div className="colhead">{topic ? <EditorialHeaderNav label={colheadLeft} /> : colheadLeft}</div>
                 <div className="railhead">
                   <span className="sq"></span>
-                  {leftTitle}
+                  <span className="rh-t">{leftTitle}</span>
                 </div>
                 <div className="rail">{left}</div>
               </aside>
@@ -432,7 +432,7 @@ export function WorkspaceShell({
                 <div className="colhead">{colheadRight}</div>
                 <div className="railhead">
                   <span className="sq"></span>
-                  {rightTitle}
+                  <span className="rh-t">{rightTitle}</span>
                 </div>
                 <div className="rail">{right}</div>
               </aside>
