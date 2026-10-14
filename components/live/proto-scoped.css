@@ -271,6 +271,7 @@
   border-bottom:1px solid var(--line);font-family:var(--font-disp);font-weight:700;
   font-size:13px;letter-spacing:.04em;color:var(--tx);white-space:nowrap;overflow:hidden}
 .lbw-root .railhead .sq{width:8px;height:8px;background:var(--ac);flex-shrink:0}
+.lbw-root .railhead .rh-t{overflow:hidden;text-overflow:ellipsis;min-width:0}
 
 /* layout toggle (title bar, VS Code quick-pick style) — inspector rail
    visibility is an explicit user control; the rail never reflows below
@@ -298,6 +299,19 @@
 .lbw-root .app.no-left .mid{grid-template-columns:minmax(0,1fr) var(--rail-w,332px)}
 .lbw-root .app.no-left .lside{display:none}
 .lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(0,1fr)}
+
+/* narrow viewports: panels stay pinned (owner 2026-10-06) — the stage keeps
+   a 600px floor and .mid pans horizontally, the same pattern .ws-cmp uses. */
+@media (max-width:1050px){
+  .lbw-root .mid{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr) var(--rail-w,332px);overflow-x:auto}
+  .lbw-root .app.no-rail .mid{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr)}
+  .lbw-root .app.no-left .mid{grid-template-columns:minmax(600px,1fr) var(--rail-w,332px)}
+  .lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(600px,1fr)}
+  .lbw-root .mid.peek{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr) 300px var(--rail-w,332px)}
+  .lbw-root .app.no-rail .mid.peek{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr) 300px}
+  .lbw-root .app.no-left .mid.peek{grid-template-columns:minmax(600px,1fr) 300px var(--rail-w,332px)}
+  .lbw-root .app.no-rail.no-left .mid.peek{grid-template-columns:minmax(600px,1fr) 300px}
+}
 
 /* ---------- dual rank cell + hover detail ---------- */
 .lbw-root .ranks{position:relative;display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;cursor:default}
@@ -618,7 +632,8 @@
 .lbw-root .ftr .fmin{color:var(--mut);font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;
   display:flex;align-items:center;gap:6px;padding:4px 0}
 .lbw-root .ftr .fmin:hover{color:var(--ac)}
-.lbw-root .ftr .flinks{display:flex;gap:14px;align-items:center;white-space:nowrap;overflow:hidden;min-width:0}
+.lbw-root .ftr .flinks{display:flex;gap:14px;align-items:center;white-space:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0}
+.lbw-root .ftr .flinks::-webkit-scrollbar{display:none}
 .lbw-root .ftr .flinks a{color:var(--tx2)}
 .lbw-root .ftr .flinks a:hover{color:var(--ac)}
 .lbw-root .ftr .flinks .sep{color:var(--line2)}
