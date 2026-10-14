@@ -115,5 +115,8 @@
     },
     "bn.js@4": "^4.12.3",
     "bn.js@5": "^5.2.2"
-  }
+  },
+  "workspaces": [
+    "vendor/braces"
+  ]
 }
