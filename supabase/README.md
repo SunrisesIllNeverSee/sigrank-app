@@ -9,7 +9,7 @@ page renders on deterministic mock data when no Supabase credentials are present
 
 | File                          | Purpose                                                                                                                                       |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `migrations/`                 | 51 migration files (0001–0031 numbered + 20 timestamp-prefixed). **Source of truth for the schema.** Ledger-reconciled 2026-07-31 — see "Migration ledger" below. |
+| `migrations/`                 | Migration files 0001–0055 (early ones numbered, later ones timestamp-prefixed). **Source of truth for the schema.** Ledger-reconciled 2026-07-31 — see "Migration ledger" below. |
 | `seeds/`                      | Seed data files (`tokscale_seed_full.sql`, `tokscale_seed_preview.sql`). NOT migrations — relocated out of `migrations/` during reconcile.   |
 | `seed.sql`                    | Ruleset v1.0, 16 badges (BG.01–BG.16), MO§ES operator + snapshot + rank + cached board, `system_stats` singleton. Mirrors `lib/data/mock.ts`. |
 | `policies.sql`                | Enables RLS on every table; public read-only on public tables; writes are service-role only (Phase-2 owner writes deferred).                  |
