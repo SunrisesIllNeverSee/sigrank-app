@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import { allowedOrigin } from "@/lib/mcp/protocol";
 import { createPluginServer } from "@/lib/mcp/plugin/server";
+import { mcpRateLimitResponse } from "@/lib/mcp/route-limit";
 import contracts from "@/lib/mcp/plugin/contracts.json";
 
 export const runtime = "nodejs";
@@ -10,6 +11,8 @@ const handler = createMcpHandler(({ requestInfo }) => createPluginServer(request
 
 export async function POST(req: NextRequest) {
   if (!allowedOrigin(req)) return new Response("Forbidden", { status: 403 });
+  const limited = await mcpRateLimitResponse(req, "plugin");
+  if (limited) return limited;
   // The pinned SDK accepts securitySchemes in _meta but does not expose the
   // standard top-level field in tools/list. Decorate this endpoint's list only;
   // tool execution and all other protocol messages remain SDK-owned.

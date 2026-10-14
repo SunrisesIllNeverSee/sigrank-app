@@ -24,7 +24,8 @@ import {
 } from "@modelcontextprotocol/server";
 import { PostHog } from "posthog-node";
 import { instrument } from "@posthog/mcp";
-import { TOOLS, callTool } from "@/lib/mcp/tools";
+import { TOOLS, NAME_BEARING_TOOLS, callTool } from "@/lib/mcp/tools";
+import { UNTRUSTED_TEXT_NOTICE } from "@/lib/mcp/untrusted";
 import { RESOURCES, readResource } from "@/lib/mcp/resources";
 import { PROMPTS, getPrompt } from "@/lib/mcp/prompts";
 import {
@@ -116,7 +117,7 @@ export function createSigrankServer(req?: NextRequest): McpServer {
 
     const toolConfig = {
       title: tool.title,
-      description: tool.description,
+      description: NAME_BEARING_TOOLS.has(toolName) ? `${tool.description} ${UNTRUSTED_TEXT_NOTICE}` : tool.description,
       annotations: tool.annotations,
       inputSchema,
       ...(outputSchema ? { outputSchema } : {}),
