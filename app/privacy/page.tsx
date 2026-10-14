@@ -75,7 +75,7 @@ export default function PrivacyPage() {
 
         <section className="flex flex-col gap-1.5">
           <h2 className="font-semibold text-text-primary">
-            SigRank | SignalAF Analyst in ChatGPT and Codex
+            SigRank | SignalAF Analyst in ChatGPT, Codex and Claude
           </h2>
           <p>
             The Analyst plugin retrieves public leaderboard statistics and
