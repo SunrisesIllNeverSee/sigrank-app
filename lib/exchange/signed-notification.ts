@@ -20,7 +20,7 @@ import "server-only";
 import { createHmac, createHash, randomUUID } from "node:crypto";
 import { safeEqual } from "./server";
 import { isProhibitedHost } from "./mcp-tools";
-import { isProhibitedHostResolved } from "./ssrf";
+import { isProhibitedHostResolved, pinnedExchangeFetch } from "./ssrf";
 
 export interface SignedNotificationHeaders {
   "x-exchange-signature": string;
@@ -149,11 +149,10 @@ export async function deliverSignedNotification(params: {
         signature,
       };
     }
-    const response = await fetch(endpoint, {
+    const response = await pinnedExchangeFetch(endpoint, {
       method: "POST",
       headers,
       body,
-      redirect: "manual",
       signal: AbortSignal.timeout(5000),
     });
     return {
