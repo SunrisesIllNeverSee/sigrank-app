@@ -1866,7 +1866,7 @@ export function LiveBoardWorkspace({
                   (owner 2026-10-06): SIGNALAF over the left column; its own
                   sidebar sub-header is BURNERS, BUILDERS & 10XERS. */}
               <div className="colhead">SIGNALAF</div>
-              <div className="railhead">BURNERS, BUILDERS &amp; 10XERS</div>
+              <div className="railhead"><span className="rh-t">BURNERS, BUILDERS &amp; 10XERS</span></div>
               <div className="rail">
                 {/* owner 2026-10-06 (annotation): TOP MOVERS swaps places
                     with OPERATOR PROFILE — movers live in the left sidebar
@@ -2006,7 +2006,7 @@ export function LiveBoardWorkspace({
                 <span className="fb">
                   <select
                     aria-label="Window"
-                    title="Window"
+                    title={`Window: ${windowSel}`}
                     value={windowSel}
                     onChange={(e) => onWindowSel(e.target.value)}
                   >
@@ -2018,7 +2018,7 @@ export function LiveBoardWorkspace({
                 <span className="fb">
                   <select
                     aria-label="Platform"
-                    title="Platform"
+                    title={`Platform: ${platformSel}`}
                     value={platformSel}
                     onChange={(e) => setPlatformSel(e.target.value)}
                   >
@@ -2030,7 +2030,7 @@ export function LiveBoardWorkspace({
                 <span className="fb">
                   <select
                     aria-label="Class"
-                    title="Class"
+                    title={`Class: ${classSel}`}
                     value={classSel}
                     onChange={(e) => setClassSel(e.target.value)}
                   >
@@ -2320,7 +2320,7 @@ export function LiveBoardWorkspace({
                 ▸
               </button>
               <div className="colhead">SIGRANK</div>
-              <div className="railhead">OPERATOR</div>
+              <div className="railhead"><span className="rh-t">OPERATOR</span></div>
               <div className="rail">
                 {visibleRail.map((id) =>
                   (
