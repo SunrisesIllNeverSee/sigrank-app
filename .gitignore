@@ -49,3 +49,8 @@ skylos-output.json
 # Review/scratch workspace — screenshots, design-review tooling, sidebar mocks.
 # Deletable wholesale; never committed.
 _workspace/
+
+# agent tooling (local only — never in the product repo)
+.agents/
+.claude/
+.ello/
