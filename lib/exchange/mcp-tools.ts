@@ -51,7 +51,7 @@ import {
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { rateLimitAllowAsync } from "./rate-limit";
 import { createHash } from "node:crypto";
-import { isProhibitedHostSync, isProhibitedHostResolved } from "./ssrf";
+import { isProhibitedHostSync, isProhibitedHostResolved, pinnedExchangeFetch } from "./ssrf";
 
 // ─── Authorization scopes ────────────────────────────────────────────────────
 
@@ -364,9 +364,8 @@ export async function handleDiscoverDomain(args: {
     // target. We manually follow up to 3 redirects, checking each Location
     // header's hostname against isProhibitedHost.
     let currentUrl = manifestUrl;
-    let response = await fetch(currentUrl, {
+    let response = await pinnedExchangeFetch(currentUrl, {
       method: "GET",
-      redirect: "manual",
       signal: AbortSignal.timeout(8000),
       headers: { "accept": "application/json", "user-agent": "Contribution-Exchange-MCP/1.0" },
     });
@@ -406,9 +405,8 @@ export async function handleDiscoverDomain(args: {
         return { outcome: "invalid", domain, manifest_url: manifestUrl, error: "redirect to non-HTTPS URL blocked" };
       }
       currentUrl = resolvedUrl;
-      response = await fetch(currentUrl, {
+      response = await pinnedExchangeFetch(currentUrl, {
         method: "GET",
-        redirect: "manual",
         signal: AbortSignal.timeout(8000),
         headers: { "accept": "application/json", "user-agent": "Contribution-Exchange-MCP/1.0" },
       });
