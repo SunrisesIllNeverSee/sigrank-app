@@ -1,12 +1,15 @@
 /**
  * SSRF guard helpers for outbound Exchange fetches (agent endpoints, domain
- * discovery). Pure functions plus a DNS-resolving check.
- *
- * Known limit: the check resolves DNS before fetch(); a hostile resolver could
- * still rebind between the check and the connection. Callers never follow
- * redirects automatically.
+ * discovery): name/IP checks, DNS validation, and pinnedExchangeFetch — a
+ * request whose socket is pinned to the exact addresses that passed
+ * validation, so a hostile resolver cannot rebind between check and connect.
+ * Redirects are never followed automatically.
  */
 import { lookup } from "node:dns/promises";
+import type { LookupAddress } from "node:dns";
+import { request as httpRequest } from "node:http";
+import type { RequestOptions } from "node:http";
+import { request as httpsRequest } from "node:https";
 import { isIP } from "node:net";
 
 function ipv4ToParts(ip: string): number[] | null {
@@ -98,6 +101,30 @@ export function isProhibitedHostSync(hostname: string): boolean {
 }
 
 export type HostResolver = (hostname: string) => Promise<Array<{ address: string; family: number }>>;
+export type ResolvedAddress = { address: string; family: number };
+
+const defaultResolver: HostResolver = (h) => lookup(h, { all: true });
+
+/**
+ * Resolve a hostname and return its addresses only when every one is public —
+ * null when the name is prohibited, unresolvable, or ANY address is private.
+ * The returned list is the authoritative dial set for pinnedExchangeFetch.
+ */
+export async function resolveVerifiedAddresses(
+  hostname: string,
+  resolver: HostResolver = defaultResolver,
+): Promise<ResolvedAddress[] | null> {
+  if (isProhibitedHostSync(hostname)) return null;
+  const h = stripHost(hostname);
+  if (isIP(h)) return [{ address: h, family: isIP(h) }];
+  try {
+    const addrs = await resolver(h);
+    if (!addrs || addrs.length === 0) return null;
+    return addrs.some((a) => isPrivateIp(a.address)) ? null : addrs;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Resolve a hostname and reject if it is prohibited by name or if ANY resolved
@@ -105,16 +132,96 @@ export type HostResolver = (hostname: string) => Promise<Array<{ address: string
  */
 export async function isProhibitedHostResolved(
   hostname: string,
-  resolver: HostResolver = (h) => lookup(h, { all: true }),
+  resolver: HostResolver = defaultResolver,
 ): Promise<boolean> {
-  if (isProhibitedHostSync(hostname)) return true;
-  const h = stripHost(hostname);
-  if (isIP(h)) return false; // public literal, already checked
-  try {
-    const addrs = await resolver(h);
-    if (!addrs || addrs.length === 0) return true;
-    return addrs.some((a) => isPrivateIp(a.address));
-  } catch {
-    return true;
+  return (await resolveVerifiedAddresses(hostname, resolver)) === null;
+}
+
+type PinnedLookup = (
+  hostname: string,
+  options: unknown,
+  callback: (err: NodeJS.ErrnoException | null, address: string | LookupAddress[], family?: number) => void,
+) => void;
+
+/**
+ * A node:dns lookup-compatible function that answers only from a fixed,
+ * pre-validated address list. It never consults DNS — that is the point:
+ * the socket can only ever reach an address that already passed validation.
+ */
+export function pinnedLookup(addrs: ResolvedAddress[]): PinnedLookup {
+  let idx = 0;
+  return (_hostname, options, callback) => {
+    if ((options as { all?: boolean } | null)?.all) {
+      callback(null, addrs.map((a) => ({ address: a.address, family: a.family })));
+      return;
+    }
+    const a = addrs[idx++ % addrs.length];
+    callback(null, a.address, a.family);
+  };
+}
+
+export interface PinnedFetchInit {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string | Uint8Array;
+  signal?: AbortSignal;
+  resolver?: HostResolver;
+}
+
+const MAX_RESPONSE_BODY = 1_048_576;
+
+/**
+ * fetch() for Exchange outbound calls: resolves + validates the destination
+ * once, then dials with a pinned lookup so the socket can only reach an
+ * address that passed validation (closes the check-to-connect DNS rebinding
+ * window). TLS SNI and the Host header still use the real hostname. Redirects
+ * are never followed — callers inspect and re-pin each hop themselves.
+ */
+export async function pinnedExchangeFetch(url: string, init: PinnedFetchInit = {}): Promise<Response> {
+  const target = new URL(url);
+  if (target.protocol !== "https:" && target.protocol !== "http:") {
+    throw new Error(`SSRF guard: scheme ${target.protocol} is not allowed`);
   }
+  const addrs = await resolveVerifiedAddresses(target.hostname, init.resolver ?? defaultResolver);
+  if (!addrs) throw new Error(`SSRF guard: ${target.hostname} is prohibited or unresolvable`);
+  const transport = target.protocol === "https:" ? httpsRequest : httpRequest;
+  return new Promise<Response>((resolve, reject) => {
+    const req = transport(
+      target,
+      { method: init.method ?? "GET", headers: init.headers, lookup: pinnedLookup(addrs) as unknown as RequestOptions["lookup"] },
+      (res) => {
+        const chunks: Buffer[] = [];
+        let size = 0;
+        res.on("data", (chunk: Buffer) => {
+          size += chunk.length;
+          if (size > MAX_RESPONSE_BODY) {
+            req.destroy(new Error("SSRF guard: response exceeds 1MB limit"));
+            return;
+          }
+          chunks.push(chunk);
+        });
+        res.on("end", () => {
+          try {
+            const headers = new Headers();
+            for (let i = 0; i < res.rawHeaders.length; i += 2) headers.append(res.rawHeaders[i], res.rawHeaders[i + 1]);
+            const status = res.statusCode ?? 0;
+            const nullBody = status === 204 || status === 304 || (status >= 300 && status < 400);
+            resolve(new Response(nullBody ? null : Buffer.concat(chunks), { status, statusText: res.statusMessage ?? "", headers }));
+          } catch (e) {
+            reject(e);
+          }
+        });
+        res.on("error", reject);
+      },
+    );
+    req.on("error", reject);
+    const signal = init.signal;
+    if (signal) {
+      const abort = () => req.destroy(signal.reason instanceof Error ? signal.reason : new Error("request aborted"));
+      if (signal.aborted) abort();
+      else signal.addEventListener("abort", abort, { once: true });
+    }
+    if (init.body != null) req.write(init.body);
+    req.end();
+  });
 }
