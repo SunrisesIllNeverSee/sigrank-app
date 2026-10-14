@@ -4,7 +4,7 @@ import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
   title: "SigRank | SignalAF Plugin",
-  description: "Performative stats and benchmarks for AI users, not models. Explore and interpret the SignalAF AI Operator Leaderboard in ChatGPT and Codex.",
+  description: "Performative stats and benchmarks for AI users, not models. Explore and interpret the SignalAF AI Operator Leaderboard in ChatGPT, Codex and Claude.",
   path: "/plugin",
 });
 
@@ -26,6 +26,7 @@ export default function PluginPage() {
           compare operating structures, and understand field statistics. The plugin helps explain
           relationships among fresh input, generated output, context construction and reuse.
           In Codex, an existing local SigRank identity can locate its public profile by codename.
+          In Claude, look up any operator by its public codename.
         </p>
         <p>
           Tokenpull measures → SigRank evaluates → SignalAF publishes. The plugin interprets those
@@ -33,6 +34,26 @@ export default function PluginPage() {
           describe observable AI operating structure, not intelligence, productivity or work quality.
           Archetypes describe operating patterns, not personality.
         </p>
+      </section>
+
+      <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
+        <h2 className="font-mono text-xl font-bold text-text-primary">Use it in Claude</h2>
+        <p>
+          In Claude Code, add the plugin from its GitHub marketplace:
+        </p>
+        <pre className="overflow-x-auto rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
+          /plugin install signalaf-analyst --marketplace SunrisesIllNeverSee/signalaf-analyst-claude
+        </pre>
+        <p>
+          It works the same in Claude chat and Cowork. The plugin connects to the same public,
+          sign-in-free Analyst server as ChatGPT and Codex, so results match across hosts.
+        </p>
+        <a
+          className="text-gold underline underline-offset-4"
+          href="https://github.com/SunrisesIllNeverSee/signalaf-analyst-claude"
+        >
+          View the Claude plugin on GitHub
+        </a>
       </section>
 
       <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">

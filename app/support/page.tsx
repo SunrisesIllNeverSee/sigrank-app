@@ -33,7 +33,7 @@ export default function SupportPage() {
           <SupportCard
             href="/plugin"
             title="SigRank | SignalAF Plugin"
-            description="Explore the AI Operator Leaderboard in ChatGPT and Codex, with beta help and data boundaries."
+            description="Explore the AI Operator Leaderboard in ChatGPT, Codex and Claude, with beta help and data boundaries."
           />
           <SupportCard
             href="/contact"
