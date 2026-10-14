@@ -35,6 +35,7 @@ import {
   allowedOrigin,
   type RpcRequest,
 } from "@/lib/mcp/protocol";
+import { mcpRateLimitResponse } from "@/lib/mcp/route-limit";
 import { createSigrankServer } from "@/lib/mcp/server";
 // Compatibility bridge: legacy Exchange tool calls through /api/mcp are
 // dispatched to the shared Exchange dispatcher. Exchange tools are NOT
@@ -70,6 +71,8 @@ export async function POST(req: NextRequest) {
   if (!allowedOrigin(req)) {
     return new Response("Forbidden", { status: 403 });
   }
+  const limited = await mcpRateLimitResponse(req, "main");
+  if (limited) return limited;
 
   const startTime = Date.now();
   const requestId = req.headers.get("x-request-id") ?? crypto.randomUUID();
