@@ -8,6 +8,7 @@ import { isPublishedBoardRow } from "@/lib/board/published-row";
 import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { safeName, trustedClientIp, ttlMemo } from "@/lib/mcp/untrusted";
 import { formatBetaReport, prepareBetaReport } from "./bug-report";
 
 type Scope = { window: "7d" | "30d" | "90d" | "all"; platform: string; cohort: "public" | "exact4" | "reconstructed4"; view: "total" | "platforms"; category: "all"; population: "claimed_operators" | "public_operators" };
@@ -67,7 +68,7 @@ function operatorDto(row: LeaderboardRow, scope: Scope) {
   const archetype = describeBuildArchetype(pillars);
   return {
     codename: row.operator.codename,
-    display_name: row.operator.display_name || row.operator.codename,
+    display_name: safeName(row.operator.display_name, row.operator.codename),
     profile_url: `https://signalaf.com/user/${encodeURIComponent(row.operator.codename)}`,
     class_tier: row.pending ? null : row.snapshot.class_tier,
     archetype: archetype?.key ?? null,
@@ -95,7 +96,7 @@ function requireCodename(value: unknown): string {
   return value;
 }
 
-async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
+async function loadLiveBoard(scope: Scope): Promise<LeaderboardRow[]> {
   const db = getSupabaseServer();
   if (!db) throw new ToolError("UPSTREAM_UNAVAILABLE", "Live SignalAF data is not configured.", true);
   // The general board facade falls back to fixtures on database errors. Probe the
@@ -112,6 +113,9 @@ async function liveBoard(scope: Scope): Promise<LeaderboardRow[]> {
   }
   return rows.filter(isPublishedBoardRow);
 }
+
+/** Live board read, memoized for 45s per scope (results identical within the TTL). */
+export const liveBoard = ttlMemo(45_000, (scope: Scope) => JSON.stringify(scope), loadLiveBoard);
 
 function percentile(values: number[], p: number): number | null {
   if (!values.length) return null;
@@ -131,11 +135,10 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       let report;
       try { report = prepareBetaReport(args); }
       catch (error) { throw new ToolError("INVALID_ARGUMENT", error instanceof Error ? error.message : "Invalid bug report."); }
-      const ip = request.headers.get("cf-connecting-ip")
-        ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-        ?? "unknown";
-      const limit = await checkDistributedRateLimit(["sigrank-beta-report", ip], { windowMs: 3_600_000, max: 5 }, false);
-      if (!limit.ok) throw new ToolError("RATE_LIMITED", "Too many beta reports. Please try again later.", true);
+      const ip = trustedClientIp(request.headers);
+      const perIp = await checkDistributedRateLimit(["sigrank-beta-report", ip], { windowMs: 3_600_000, max: 5 }, true);
+      const global = perIp.ok ? await checkDistributedRateLimit(["sigrank-beta-report", "global"], { windowMs: 3_600_000, max: 50 }, true) : perIp;
+      if (!perIp.ok || !global.ok) throw new ToolError("RATE_LIMITED", "Too many beta reports. Please try again later.", true);
       const key = process.env.RESEND_API_KEY;
       if (!key) throw new ToolError("UPSTREAM_UNAVAILABLE", "Beta reporting is unavailable. Use https://signalaf.com/contact.", true);
       const reference = `SRB-${randomUUID().slice(0, 8).toUpperCase()}`;

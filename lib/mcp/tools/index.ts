@@ -15,6 +15,7 @@ import {
   evaluateOperator,
 } from "token-cascade";
 import { textResult } from "@/lib/mcp/protocol";
+import { safeName, ttlMemo, UNTRUSTED_TEXT_NOTICE } from "@/lib/mcp/untrusted";
 import {
   buildSigRankStandardRecord,
   SIGRANK_STANDARD_VERSION,
@@ -476,6 +477,16 @@ export const TOOLS = [
   },
 ] as const;
 
+/** Tools that return user-supplied profile text; their advertised description carries an untrusted-data notice. */
+export const NAME_BEARING_TOOLS: ReadonlySet<string> = new Set(["get_leaderboard", "get_operator", "benchmark_me", "compare_to_field", "operator_gap", "field_anomaly", "who_operates_like_me", "operator_signature"]);
+
+/** 1000-row board read shared by field-wide tools; memoized for 60s per window. */
+const getFullBoard = ttlMemo(
+  60_000,
+  (window: string) => window,
+  (window: string) => getLeaderboard({ window, windowFilter: true, limit: 1000 }),
+);
+
 export function validNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
@@ -569,7 +580,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
       entries: rows.map((row) => ({
         rank: row.global_rank,
         codename: row.operator.codename,
-        display_name: row.operator.display_name,
+        display_name: safeName(row.operator.display_name),
         class_tier: row.snapshot.class_tier,
         yield_: row.snapshot.cascade && !row.snapshot.cascade.nonCompounding
           ? row.snapshot.cascade.yield_
@@ -593,7 +604,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const cascade = row.snapshot.cascade;
     return textResult({
       codename: row.operator.codename,
-      display_name: row.operator.display_name,
+      display_name: safeName(row.operator.display_name),
       class_tier: row.snapshot.class_tier,
       rank: row.global_rank,
       percentile: row.percentile,
@@ -1121,7 +1132,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
         return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
       }
       const t = row.operator;
-      operatorName = t.display_name || t.codename;
+      operatorName = safeName(t.display_name, t.codename);
       const tel = row.telemetry;
       if (!tel) {
         return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry data.` }, true);
@@ -1141,7 +1152,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     }
 
     const myCascade = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
-    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const board = await getFullBoard(window);
 
     if (board.length === 0) {
       return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable. Try again later." }, true);
@@ -1284,7 +1295,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const myYield = myCascade.yield ?? 0;
 
     // Fetch the live board to find the target yield threshold
-    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const board = await getFullBoard(window);
     if (board.length === 0) {
       return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable. Try again later." }, true);
     }
@@ -1503,7 +1514,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     if (typeof args.a_codename === "string") {
       const row = await getOperator(args.a_codename.trim());
       if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${args.a_codename}".` }, true);
-      aName = row.operator.display_name || row.operator.codename;
+      aName = safeName(row.operator.display_name, row.operator.codename);
       const tel = row.telemetry;
       if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${args.a_codename}" has no telemetry.` }, true);
       aPillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
@@ -1522,7 +1533,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     if (typeof args.b_codename === "string") {
       const row = await getOperator(args.b_codename.trim());
       if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${args.b_codename}".` }, true);
-      bName = row.operator.display_name || row.operator.codename;
+      bName = safeName(row.operator.display_name, row.operator.codename);
       const tel = row.telemetry;
       if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${args.b_codename}" has no telemetry.` }, true);
       bPillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
@@ -1585,7 +1596,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
 
   if (name === "field_anomaly") {
     const window = typeof args.window === "string" ? args.window : "30d";
-    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const board = await getFullBoard(window);
     if (board.length === 0) {
       return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
     }
@@ -1597,7 +1608,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
       if (!c || c.nonCompounding) continue;
       ops.push({
         codename: row.operator.codename,
-        display_name: row.operator.display_name || row.operator.codename,
+        display_name: safeName(row.operator.display_name, row.operator.codename),
         yield: c.yield_ ?? 0,
         leverage: c.leverage ?? 0,
         velocity: c.velocity ?? 0,
@@ -1627,7 +1638,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
         display_name: top.display_name,
         velocity: top.velocity,
         leverage: top.leverage,
-        finding: `${top.display_name} has velocity ${top.velocity.toFixed(2)}× with only ${top.leverage.toFixed(1)}× leverage — generating fast without much context reuse.`,
+        finding: `operator "${top.display_name}" has velocity ${top.velocity.toFixed(2)}× with only ${top.leverage.toFixed(1)}× leverage — generating fast without much context reuse.`,
       });
     }
 
@@ -1643,7 +1654,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
           display_name: op.display_name,
           rank: op.rank,
           cache_write: op.cache_write,
-          finding: `${op.display_name} is rank #${op.rank} with near-zero cache creation — non-compounding or barely committing context.`,
+          finding: `operator "${op.display_name}" is rank #${op.rank} with near-zero cache creation — non-compounding or barely committing context.`,
         });
       }
     }
@@ -1658,7 +1669,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
         operator: top.codename,
         display_name: top.display_name,
         movement_7d: top.movement_7d,
-        finding: `${top.display_name} climbed ${top.movement_7d} positions in the last 7 days — the largest field movement.`,
+        finding: `operator "${top.display_name}" climbed ${top.movement_7d} positions in the last 7 days — the largest field movement.`,
       });
     }
 
@@ -1675,7 +1686,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
           top: { operator: topYield.codename, yield: topYield.yield },
           bottom: { operator: bottomYield.codename, yield: bottomYield.yield },
           ratio: ratio === Infinity ? "infinite" : Number(ratio.toFixed(1)),
-          finding: `Top operator ${topYield.display_name} (Υ ${topYield.yield.toFixed(1)}) outperforms bottom ${bottomYield.display_name} (Υ ${bottomYield.yield.toFixed(1)}) by ${ratio === Infinity ? "∞" : ratio.toFixed(0) + "×"}.`,
+          finding: `Top operator "${topYield.display_name}" (Υ ${topYield.yield.toFixed(1)}) outperforms bottom "${bottomYield.display_name}" (Υ ${bottomYield.yield.toFixed(1)}) by ${ratio === Infinity ? "∞" : ratio.toFixed(0) + "×"}.`,
         });
       }
     }
@@ -1703,7 +1714,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     if (codename) {
       const row = await getOperator(codename);
       if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
-      myName = row.operator.display_name || row.operator.codename;
+      myName = safeName(row.operator.display_name, row.operator.codename);
       const tel = row.telemetry;
       if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry.` }, true);
       myPillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
@@ -1719,7 +1730,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const myVel = myC.velocity ?? 0;
     const mySnr = myC.snr ?? 0;
 
-    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const board = await getFullBoard(window);
     if (board.length === 0) {
       return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
     }
@@ -1745,7 +1756,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
 
       neighbors.push({
         codename: row.operator.codename,
-        display_name: row.operator.display_name || row.operator.codename,
+        display_name: safeName(row.operator.display_name, row.operator.codename),
         rank: row.global_rank,
         yield: c.yield_,
         leverage: theirLev,
@@ -1795,7 +1806,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     if (codename) {
       const row = await getOperator(codename);
       if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
-      myName = row.operator.display_name || row.operator.codename;
+      myName = safeName(row.operator.display_name, row.operator.codename);
       const tel = row.telemetry;
       if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry.` }, true);
       pillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
@@ -1806,7 +1817,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     }
 
     const myC = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
-    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const board = await getFullBoard(window);
     if (board.length === 0) {
       return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
     }
@@ -1874,7 +1885,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     if (codename) {
       const row = await getOperator(codename);
       if (!row) return textResult({ code: "operator_not_found", message: `No operator with codename "${codename}".` }, true);
-      myName = row.operator.display_name || row.operator.codename;
+      myName = safeName(row.operator.display_name, row.operator.codename);
       const tel = row.telemetry;
       if (!tel) return textResult({ code: "no_telemetry", message: `Operator "${codename}" has no telemetry.` }, true);
       pillars = { input: tel.fresh_input, output: tel.output, cacheCreate: tel.cache_create, cacheRead: tel.cache_read };
@@ -1888,7 +1899,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const sig = operatorSignature(myC);
 
     // Find closest comparable operators from the board
-    const board = await getLeaderboard({ window, windowFilter: true, limit: 1000 });
+    const board = await getFullBoard(window);
     const comparables: Array<Record<string, unknown>> = [];
     if (board.length > 0) {
       const myLev = myC.leverage ?? 0;
@@ -1905,7 +1916,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
         const dist = Math.sqrt(dLev * dLev + dVel * dVel + dSnr * dSnr);
         candidates.push({
           codename: row.operator.codename,
-          display_name: row.operator.display_name || row.operator.codename,
+          display_name: safeName(row.operator.display_name, row.operator.codename),
           rank: row.global_rank,
           yield: c.yield_,
           signature_distance: Number(dist.toFixed(3)),
