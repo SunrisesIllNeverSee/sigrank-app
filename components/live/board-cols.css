@@ -211,7 +211,10 @@
 .lbw-root .fbar .board-filter-controls>.fb{flex:0 0 auto;min-width:0}
 .lbw-root .fbar .board-filter-controls>.fb select{
   box-sizing:border-box;width:72px;min-width:72px;max-width:72px;
-  height:28px;font-size:10px;padding:4px 3px
+  height:28px;font-size:10px;padding:4px 14px 4px 3px;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'%3E%3Cpath d='M0 0l3.5 4L7 0z' fill='%237f8b72'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 4px center;background-size:7px 4px
 }
 .lbw-root .fbar .board-filter-controls .seg{height:28px}
 .lbw-root .fbar .board-filter-controls .seg button{
