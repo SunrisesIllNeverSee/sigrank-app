@@ -28,7 +28,7 @@ export const radarPercentile = (value: number | null, field: (number | null)[], 
   if (valid.length < 2) return null;
   const below = valid.filter(v => v < value).length;
   const tied = valid.filter(v => v === value).length;
-  const position = Math.max(0, Math.min(1, (below + Math.max(0, tied - 1) / 2) / (valid.length - 1)));
+  const position = Math.max(0, Math.min(1, (below + tied / 2) / valid.length));
   return lowerIsBetter ? 1 - position : position;
 };
 
@@ -106,7 +106,7 @@ export function DualSignatureRadar({ operator, raw, cohort, label }: {
       <text x="48" y="270" fill="#22d3ee" fontSize="8">RAW</text>
       <line x1="134" y1="267" x2="150" y2="267" stroke={THEME.operator} strokeWidth="2" />
       <text x="156" y="270" fill={THEME.operator} fontSize="8">METRICS</text>
-      <text x="135" y="286" fill="#dee9ec" fontSize="6.5" textAnchor="middle">PERCENTILE · {cohort.length < 3 ? "SMALL FIELD" : "FIELD"} {cohort.length} · EDGE 100 · COST ↓</text>
+      <text x="135" y="286" fill="#dee9ec" fontSize="6.5" textAnchor="middle">MIDPOINT %ILE · {cohort.length < 3 ? "SMALL FIELD" : "FIELD"} {cohort.length} · EDGE 100 · COST ↓</text>
     </svg>
   </div>;
 }
