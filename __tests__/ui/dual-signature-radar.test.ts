@@ -16,8 +16,17 @@ describe("radar cohort percentile", () => {
     expect(radarPercentile(2, [2, 2, 2])).toBe(0.5);
     expect(radarPercentile(2, [1, 2, 3, null, NaN])).toBe(0.5);
     expect(radarPercentile(null, [1, 2, 3])).toBeNull();
-    expect(radarPercentile(1, [1, null, 2])).toBeNull();
+    expect(radarPercentile(1, [1, null])).toBeNull();
   });
+  it("supports two measured peers without introducing another time window", () => {
+    expect(radarPercentile(1, [1, 2])).toBe(0);
+    expect(radarPercentile(2, [1, 2])).toBe(1);
+    expect(radarPercentile(1, [1, 2], true)).toBe(1);
+    expect(radarPercentile(2, [1, 2], true)).toBe(0);
+    expect(radarPercentile(2, [2, 2])).toBe(0.5);
+    expect(radarPercentile(2, [null, 2, NaN])).toBeNull();
+  });
+
 });
 
 it("overlaps raw and metrics as distinct shapes on one grid", () => {
@@ -38,4 +47,19 @@ it("overlaps raw and metrics as distinct shapes on one grid", () => {
   const shapes = [...html.matchAll(/points="([^"]+)" fill="(?:#22d3ee|#ffcd52)"/g)];
   expect(shapes).toHaveLength(2);
   expect(shapes[0][1]).not.toBe(shapes[1][1]);
+});
+
+
+it("renders both signatures for a two-operator window and labels the small field", () => {
+  const peers = [1, 2].map(n => ({
+    raw: { input: n * 100, output: n * 200, cacheRead: n * 300, cacheWrite: n * 50, total: n * 650, cost: n },
+    metrics: { snr: n * 0.3, velocity: n, leverage: n * 10, dev10x: n, scaleV: n * 2, efficiency: n * 20 },
+  }));
+  const html = renderToStaticMarkup(createElement(DualSignatureRadar, {
+    label: "Window operator", raw: peers[0].raw, operator: peers[0].metrics, cohort: peers,
+  }));
+  expect(html).toContain('data-series="RAW"');
+  expect(html).toContain('data-series="METRICS"');
+  expect(html).toContain('SMALL FIELD');
+  expect(html).not.toContain('UNAVAILABLE');
 });
