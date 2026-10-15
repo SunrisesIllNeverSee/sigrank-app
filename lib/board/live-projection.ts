@@ -189,6 +189,7 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
        already in OPERATOR_COLUMNS + mappers.ts). The workspace renders the
        image over the gradient-initial tile when present. */
     avatarUrl: operator.avatar_url ?? null,
+    pixelBadge: operator.profile_pixel_badge ?? null,
     klass: s.class_tier,
     archetype,
     claimed: operator.claimed,
