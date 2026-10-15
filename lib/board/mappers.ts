@@ -48,6 +48,7 @@ export interface DbOperator {
   // Phase-0 identity fields (migration 0007, apply post-move)
   handle: string | null;
   avatar_url: string | null;
+  profile_pixel_badge?: string | null;
   bio: string | null;
   links: { github?: string; site?: string; x?: string } | null;
   location: string | null;
@@ -341,6 +342,7 @@ export function mapOperator(o: DbOperator): Operator {
     // Phase-0 identity fields (migration 0007, apply post-move)
     handle: priv ? null : (o.handle ?? null),
     avatar_url: priv ? null : (o.avatar_url ?? null),
+    profile_pixel_badge: priv || !o.claimed || o.status === "retired" ? null : (o.profile_pixel_badge ?? null),
     bio: priv ? null : (o.bio ?? null),
     links: priv ? null : (o.links ?? null),
     location: priv ? null : (o.location ?? null),
