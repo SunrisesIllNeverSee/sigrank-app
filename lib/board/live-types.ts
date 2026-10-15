@@ -40,6 +40,7 @@ export interface LiveOperator {
    *  in place of the gradient-initial tile when present (owner 2026-10-06:
    *  "why aren't the user icons showing people pictures"). */
   avatarUrl?: string | null;
+  pixelBadge?: string | null;
   /** Operator-supplied public location (city/country, free string) —
    *  production parity with the legacy board's `◍ <location>` tertiary
    *  line. Flows operators_public.location → LeaderboardRow.operator.
