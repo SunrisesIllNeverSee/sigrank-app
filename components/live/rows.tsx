@@ -36,7 +36,7 @@
 import { memo } from "react";
 import { WorkflowMark } from "@/components/profile-v2/WorkflowMark";
 import "./board-cols.css";
-import { PixelBadge, badgeForPct } from "./PixelBadge";
+import { PixelBadge, badgeForPct, BADGE_LABELS, type PixelBadgeName } from "./PixelBadge";
 import type { LiveOperator } from "@/lib/board/live-types";
 import {
   avatarStyle,
@@ -333,7 +333,9 @@ export const BoardRow = memo(function BoardRow({
                 </>
               ) : null}
               {(() => {
-                const b = badgeForPct(o.pct);
+                const b = o.pixelBadge && Object.hasOwn(BADGE_LABELS, o.pixelBadge)
+                  ? o.pixelBadge as PixelBadgeName
+                  : badgeForPct(o.pct);
                 return b ? (
                   <>
                     {" "}

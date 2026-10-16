@@ -1,48 +1,54 @@
-# SignalAF — Upsilon + SigRank
+# SignalAF · SigRank web app
 
-Rank how well you use AI, from four token counts. Run `npx sigrank` to calculate your Yield, or sign up at [signalaf.com](https://signalaf.com) to join the public board. Prompts and code never leave your machine.
+Browse AI operator token telemetry, explore personal profiles, and compare token-cascade metrics on [signalaf.com](https://signalaf.com).
 
 [![CI](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SunrisesIllNeverSee/sigrank-app/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/sigrank.svg?style=flat-square&label=sigrank)](https://www.npmjs.com/package/sigrank)
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
 
-| The leaderboard | An operator profile |
-| :---: | :---: |
-| [![Leaderboard](./.github/assets/board.png)](https://signalaf.com/board/all) | [![Operator profile](./.github/assets/profile.png)](https://signalaf.com) |
+**[Live site](https://signalaf.com) · [Leaderboard](https://signalaf.com/board/all) · [Methodology](https://signalaf.com/methodology) · [CLI & MCP](https://github.com/SunrisesIllNeverSee/sigrank-mcp) · [Local setup](#local-setup)**
 
-This repo is the Next.js app behind [signalaf.com](https://signalaf.com): the board, profiles, wiki, accounts, billing, ingest API, MCP endpoints, and the contribution exchange.
+This repository contains the Next.js application: the leaderboard homepage, operator profiles, Compare, Hall of Signal, editorial pages, accounts, billing, and server APIs.
 
-## How it works
+## Explore the site
 
-The server computes every score from four token counts: `input`, `output`, `cache_creation`, `cache_read`. It never receives message content.
+| Surface | What you can do |
+| --- | --- |
+| [Leaderboard / homepage](https://signalaf.com/) | Filter the field by window and platform; inspect RAW and derived metrics |
+| [Operator profiles](https://signalaf.com/me) | View personal stats, submission history, badges, and account settings |
+| [Compare](https://signalaf.com/compare) | Examine two operators' telemetry and metric differences |
+| [Hall of Signal](https://signalaf.com/hall) | Browse records and the badge directory |
+| [SigRank overview](https://signalaf.com/sigrank) | Understand the measurement and enrollment flow |
+| [Field](https://signalaf.com/fieldhub), [Articles](https://signalaf.com/articles), [Blog](https://signalaf.com/blog), [Wiki](https://signalaf.com/wiki) | Read research, explanations, and metric definitions |
 
-```txt
+Some features are gated; see [Feature flags](#feature-flags). This README describes the source tree, not a promise that every optional integration is configured on every deployment.
+
+## Get your own results
+
+You do not need to clone this application to use it. Run the [CLI/MCP package](https://github.com/SunrisesIllNeverSee/sigrank-mcp):
+
+```bash
+npx sigrank                       # inspect local usage in the terminal
+npx sigrank enroll                # bind your device using a Settings connect code
+npx sigrank submit --dry-run      # inspect the payload without sending it
+npx sigrank submit                # publish a signed snapshot
+```
+
+Sign in at [signalaf.com](https://signalaf.com) to create a connect code. Claims for profiles from the original board require ownership verification through hello@signalaf.com.
+
+## What is measured
+
+Four token pillars feed the cascade: input, output, cache-write, and cache-read. Yield is calculated as:
+
+```text
 Υ = (cache_read × output) / input²
 ```
 
-- Upsilon (Υ) Yield is the rank metric. SIGNA RATE is the class credential.
-- The cascade engine derives Leverage, Velocity, 10xDEV, SNR, and efficiency from the same four numbers.
-- The server re-scores every submission. Client-side scores are never trusted.
-- `10xDEV = log₁₀(Leverage)` and `T × C × R = Cr / I = Leverage`.
-- Scoring weights (RS.xx) are server-only and stay out of this repo.
+The server verifies and re-scores submissions. Leverage, Velocity, SNR, and 10xDEV describe token-processing patterns; they are not measures of model quality, work quality, productivity, or business outcomes.
 
-Read more in the in-app [wiki](https://signalaf.com/wiki).
+**Upsilon** is the measurement engine; **SigRank** is the public leaderboard and proof surface on **SignalAF**. Protocol semantics belong to [TTEOP](https://github.com/SunrisesIllNeverSee/otep-spec). See the [methodology](https://signalaf.com/methodology) and [wiki](https://signalaf.com/wiki) for definitions and limitations.
 
-## Get ranked
-
-You do not need this repo.
-
-```bash
-npx sigrank                # see your cascade now; no install, no sign-in
-npm install -g sigrank
-sigrank enroll             # paste a connect code from signalaf.com > Settings
-sigrank submit --dry-run   # print the signed payload; send nothing
-sigrank submit             # publish verified runs to the board
-```
-
-Signing up is the only way onto the board. Operators on the original board claim an existing profile by emailing hello@signalaf.com. Challenges are muted behind `NEXT_PUBLIC_GATE_CHALLENGES` and their API routes return 404 until the gate opens.
-
-CLI and MCP docs: [sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp).
+Ranked telemetry does not require prompt text, responses, or source code. Submissions also carry identity, device/signature, platform, and report metadata; see the [CLI privacy details](https://github.com/SunrisesIllNeverSee/sigrank-mcp#privacy).
 
 ## Stack
 
@@ -63,7 +69,7 @@ cp .env.example .env.local   # optional; see Environment
 npm run dev                  # http://localhost:3000
 ```
 
-The app runs without Supabase or Stripe credentials. Without Supabase, board reads fall back to a cold-store snapshot (`lib/board/snapshot.json`), then to mock data. Billing routes return a configuration error instead of crashing.
+Unconfigured local development can use snapshot or demo data on supported read paths. This is not live telemetry. Live board data, authentication, signed writes, and billing need their corresponding services configured. A configured database with no matching records returns an empty result rather than a fabricated operator history.
 
 ## Scripts
 
@@ -97,7 +103,7 @@ Copy `.env.example` to `.env.local`. It lists every variable with notes. Never c
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (or Vercel's `KV_REST_API_URL`, `KV_REST_API_TOKEN`) | Shared rate limiter. Without Upstash, the limiter uses Supabase Postgres (`api_rate_limit_hit`, migration 0055), then a per-instance in-memory counter. Sensitive write routes fail closed. |
 | `SIGRANK_RULESET` | Server-only RS.xx scoring overrides |
 | `SIGRANK_API_KEY` | Trusted bulk-read key for the public API (`x-api-key`) |
-| `SIGRANK_INGEST_WRITE` | `1` persists verified snapshots to the board. Do not mark it sensitive in Vercel; `vercel env pull` then returns an empty value. |
+| `SIGRANK_INGEST_WRITE` | `1` enables persistence of verified snapshots to the board. |
 | `CRON_SECRET` | Bearer token for `/api/cron/recompute` |
 | `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `POSTHOG_KEY` | Product analytics |
 | `RESEND_API_KEY`, `*AGENTMAIL_API_KEY` | Contact form and exchange email |
@@ -118,7 +124,7 @@ Copy `.env.example` to `.env.local`. It lists every variable with notes. Never c
 
 ## Database and migrations
 
-Migrations live in [`supabase/migrations/`](./supabase/migrations/): 57 files, latest `0055_api_rate_limits`. Apply new migrations to production before you deploy code that depends on them. Migrations 0053 to 0055 (operator security boundaries, security hardening pass 2, API rate limits) back the current security code. Run `npm run db:parity` to compare local files with the remote ledger.
+Migrations live in [`supabase/migrations/`](./supabase/migrations/). Use that directory and `npm run db:parity` for the current schema and remote-ledger status rather than relying on a hard-coded migration count. Apply required migrations before deploying code that depends on them; review the pending SQL and target project first.
 
 Row Level Security policies, seed data, and security tests live in [`supabase/`](./supabase/). See [`supabase/README.md`](./supabase/README.md) to run your own instance.
 
@@ -157,7 +163,7 @@ Report vulnerabilities privately. Email the maintainer or open a private GitHub 
 
 - [sigrank-mcp](https://github.com/SunrisesIllNeverSee/sigrank-mcp): the `npx sigrank` CLI, TUI, and MCP server
 - [signalaf.com/score](https://signalaf.com/score): paste four token counts, get a projected yield
-- [MO§ES](https://mos2es.com): the governance framework behind Upsilon
+- [MO§ES™](https://mos2es.com): the governance framework behind Upsilon
 
 ## Contributing
 

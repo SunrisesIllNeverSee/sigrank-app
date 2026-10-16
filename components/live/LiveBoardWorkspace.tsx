@@ -1417,7 +1417,6 @@ export function LiveBoardWorkspace({
                     <DualSignatureRadar
                       operator={sixFactsOf(selOp)}
                       raw={rawFactsOf(selOp)}
-                      cohort={ops.filter(o => numTotal(o) > 0).map(o => ({ raw: rawFactsOf(o), metrics: o.nc ? null : sixFactsOf(o) }))}
                       label={selOp.name}
                     />
                   ) : (

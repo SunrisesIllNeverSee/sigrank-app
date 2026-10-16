@@ -167,6 +167,7 @@ export interface Operator {
   handle?: string | null;
   /** Public avatar URL (Supabase Storage, Phase 3 upload; display-only pre-move). */
   avatar_url?: string | null;
+  profile_pixel_badge?: string | null;
   /** Short public bio. */
   bio?: string | null;
   /** Profile links — fixed slots: github, site, x. */

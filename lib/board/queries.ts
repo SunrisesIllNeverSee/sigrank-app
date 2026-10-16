@@ -277,7 +277,7 @@ export const OPERATOR_COLUMNS =
   // Profile visibility (migration 0021) — gates which fields non-owners can see.
   "profile_visibility, " +
   // status — needed to detect retired operators (opt-out: show on board, no profile page)
-  "status";
+  "status, profile_pixel_badge";
 
 // (Circles feature dropped 2026-06-25 — fresh-slate rebuild later. The circles /
 // circle_members / circle_metric_snapshots tables were removed from the DB; the
