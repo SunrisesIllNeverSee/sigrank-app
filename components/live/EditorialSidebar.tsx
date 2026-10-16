@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 
 export type WorkspaceTopic = "home" | "field" | "articles" | "blog" | "wiki";
 export type TextPage =
-  | "home" | "fieldhub" | "field" | "research" | "science" | "about"
+  | "home" | "fieldhub" | "field" | "research" | "science" | "about" | "methodology"
   | "articles" | "blog" | "wiki";
 
 const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }> = [
