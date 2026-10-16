@@ -46,7 +46,11 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
     return () => observer.disconnect();
   }, []);
 
-  // Terminal theme + a plain string supplied → block-letter hero.
+  const Tag = headingLevel === "h2" ? "h2" : "h1";
+
+  // Terminal theme + a plain string supplied → block-letter hero. The block
+  // art is decorative, so a visually-hidden heading keeps the page's one h1
+  // (WorkspaceShell omits its own h1 when the hero carries the title).
   if (isTerminal && terminalText) {
     // Visual cap only — TerminalBlockText now self-fits to its container via
     // cqw sizing, so these tiers just keep long titles proportionally smaller.
@@ -54,16 +58,18 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
       terminalText.length <= 7 ? 1.3 : terminalText.length <= 11 ? 0.95 : 0.7;
     const maxRem = compact ? baseMax * 0.35 : baseMax;
     return (
-      <TerminalBlockText
-        text={terminalText}
-        label={terminalText}
-        maxRem={maxRem}
-        vw={compact ? "0.7vw" : "1.9vw"}
-      />
+      <>
+        <Tag className="sr-only">{title}</Tag>
+        <TerminalBlockText
+          text={terminalText}
+          label={terminalText}
+          maxRem={maxRem}
+          vw={compact ? "0.7vw" : "1.9vw"}
+        />
+      </>
     );
   }
 
-  const Tag = headingLevel === "h2" ? "h2" : "h1";
   return (
     <Tag
       className={

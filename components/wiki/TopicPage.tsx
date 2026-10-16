@@ -19,6 +19,11 @@ export function TopicPage({ children, title }: { children: React.ReactNode; titl
     <WorkspaceShell
       active="wiki"
       editorialStage
+      /* the visible heading is the content component's h2; this gives the
+         page its one h1 without changing the layout */
+      title={title}
+      bareTitle
+      srOnlyTitle
       leftTitle="ENTRY"
       topic="wiki"
       left={<FieldFamilyNav current="wiki" pageContents={

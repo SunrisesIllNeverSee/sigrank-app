@@ -10,11 +10,11 @@ import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { breadcrumb } from "@/lib/jsonld";
+import { breadcrumb, collectionPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Articles — SignalAF Research and Analysis",
-  description: "Original published analyses and essays on AI operator evaluation and token-cascade measurement.",
+  description: "Original published analyses and essays on AI operator evaluation and token-cascade measurement from SignalAF, with publication DOIs where recorded.",
   path: "/articles",
 });
 export const revalidate = 86400;
@@ -59,7 +59,7 @@ export default async function ArticlesPage() {
           eyebrow="◈ Publications · Analysis"
           terminalText="ARTICLES"
           title="Articles"
-          subtitle={<>Original essays and documented research on AI operators and token-cascade measurement. Source publications are indexed here without changing their canonical URLs.</>}
+          subtitle={<>Original essays and documented research on AI operators and token-cascade measurement.</>}
         />
       }
       title="ARTICLES"
@@ -97,6 +97,14 @@ export default async function ArticlesPage() {
     >
       <div className="ws-doc ws-article-list">
         <JsonLd data={breadcrumb([{ name: "Articles", path: "/articles" }])} />
+        <JsonLd
+          data={collectionPage({
+            path: "/articles",
+            name: "SignalAF Articles",
+            description: "Original published analyses and essays on AI operator evaluation and token-cascade measurement.",
+            items: articles.map((a) => ({ name: a.title, path: `/blog/${a.slug}` })),
+          })}
+        />
         <div className="blog-index" id="all-articles">
 
           <div className="blog-list">

@@ -78,7 +78,7 @@ export function Draft2Hero() {
             telemetry into a repeatable performance evaluation: your{" "}
             <strong className="text-text-primary">Yield</strong>, workflow
             signature, benchmark, and progress over time. The leaderboard is
-            proof, not the product. The product is the{" "}
+            the proof rather than the product, which is the{" "}
             <strong className="text-text-primary">operator-evaluation standard</strong>.
           </p>
           <p className="text-balance font-sans text-lg font-medium leading-relaxed text-text-primary sm:text-xl">

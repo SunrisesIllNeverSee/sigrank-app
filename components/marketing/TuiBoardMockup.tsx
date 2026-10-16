@@ -139,10 +139,10 @@ export function TuiBoardMockup({
           Yield
         </div>
         {/* column headers */}
-        <div className="mt-3 flex gap-2 border-b border-bg-border-subtle pb-2 font-mono text-[10px] uppercase tracking-wide text-text-muted whitespace-nowrap">
+        <div className="mt-3 flex gap-2 [&>span]:shrink-0 border-b border-bg-border-subtle pb-2 font-mono text-[10px] uppercase tracking-wide text-text-muted whitespace-nowrap">
           <span className="w-8 text-right">#</span>
-          <span className="w-36">Operator</span>
-          <span className="w-24">Class</span>
+          <span className="w-36 !shrink min-w-12">Operator</span>
+          <span className="w-24 !shrink min-w-10 truncate">Class</span>
           <span className="w-24 text-right">Υ Yield</span>
           <span className="w-14 text-right">SNR</span>
           <span className="w-14 text-right">Lev</span>
@@ -157,7 +157,7 @@ export function TuiBoardMockup({
           return (
             <div
               key={r.rank}
-              className={`flex gap-2 py-1.5 font-mono text-[11px] whitespace-nowrap ${
+              className={`flex gap-2 [&>span]:shrink-0 py-1.5 font-mono tabular-nums text-[11px] whitespace-nowrap ${
                 showYou ? "rounded bg-gold/10" : ""
               }`}
             >
@@ -167,12 +167,12 @@ export function TuiBoardMockup({
                 #{r.rank}
               </span>
               <span
-                className={`w-36 truncate ${showYou ? "font-bold text-gold" : "text-text-primary"}`}
+                className={`w-36 !shrink min-w-12 truncate ${showYou ? "font-bold text-gold" : "text-text-primary"}`}
               >
                 {r.name}
                 {showYou && <span className="ml-1 text-gold/70">YOU</span>}
               </span>
-              <span className="w-24 text-text-secondary">{r.cls}</span>
+              <span className="w-24 !shrink min-w-10 truncate text-text-secondary">{r.cls}</span>
               <span className="w-24 text-right font-semibold text-text-primary">
                 {r.yld}
               </span>

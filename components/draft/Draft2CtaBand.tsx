@@ -15,9 +15,9 @@ export function Draft2CtaBand() {
         Four integers in, full evaluation out.
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
-        Architecture is the only variable that matters. Run the local agent or
-        just paste your numbers — see your Υ Yield, your class, and where your
-        operating efficiency actually stands in under a minute.
+        Architecture is the only variable that matters, so run the local agent
+        or just paste your numbers to see your Υ Yield, your class, and where
+        your operating efficiency actually stands, all in under a minute.
       </p>
 
       <Draft2ActionTiles className="mt-8" shine />

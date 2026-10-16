@@ -16,14 +16,22 @@ import matter from "gray-matter";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { withOG } from "@/lib/seo";
-import { SITE_ORIGIN } from "@/lib/seo";
+import { withOG, fitTitle, AUTHOR_NAME } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
-import { breadcrumb, personAuthor, faqPage } from "@/lib/jsonld";
+import { breadcrumb, articleJsonLd } from "@/lib/jsonld";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 
 const CONTENT_DIR = join(process.cwd(), "content", "blog");
+
+/** YAML dates parse to Date; keep a date-only value date-only (no fake time). */
+function isoDate(v: string | Date | undefined): string {
+  if (v instanceof Date) {
+    const iso = v.toISOString();
+    return iso.endsWith("T00:00:00.000Z") ? iso.slice(0, 10) : iso;
+  }
+  return v ?? "";
+}
 
 async function getPost(slug: string) {
   try {
@@ -34,6 +42,13 @@ async function getPost(slug: string) {
         title?: string;
         description?: string;
         timestamp?: string | Date;
+        /** Last substantive revision (YAML date). Absent → dateModified = timestamp. */
+        modified?: string | Date;
+        /** Meta/OG description (~120–158 chars). Absent → `description`.
+         *  `description` stays the visible lede on the post + /articles. */
+        seo_description?: string;
+        /** Raster share image (PNG/JPG) when `hero` is SVG — social cards reject SVG. */
+        og_image?: string;
         author?: string;
         tags?: string[];
         hero?: string;
@@ -66,14 +81,28 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return {};
-  const title = post.frontmatter.title ?? slug;
-  const description = post.frontmatter.description ?? "";
-  const hero = post.frontmatter.hero;
+  const fm = post.frontmatter;
+  const title = fm.title ?? slug;
+  const description = fm.seo_description ?? fm.description ?? "";
+  const shareImage = fm.og_image ?? fm.hero;
+  const published = isoDate(fm.timestamp);
   return withOG({
     title,
+    titleAbsolute: fitTitle(title),
     description,
     path: `/blog/${slug}`,
-    ...(hero ? { ogImage: { url: hero, alt: title } } : {}),
+    ...(shareImage ? { ogImage: { url: shareImage, alt: title } } : {}),
+    ...(published
+      ? {
+          article: {
+            publishedTime: published,
+            modifiedTime: isoDate(fm.modified) || published,
+            authors: [AUTHOR_NAME],
+            section: fm.type === "article" ? "Articles" : "Blog",
+            tags: (fm.tags ?? []).filter((t) => t !== "article"),
+          },
+        }
+      : {}),
   });
 }
 
@@ -192,39 +221,21 @@ export default async function BlogPost({
   const { frontmatter, content } = post;
   const title = frontmatter.title ?? slug;
   const description = frontmatter.description ?? "";
-  const date = frontmatter.timestamp instanceof Date
-    ? frontmatter.timestamp.toISOString()
-    : (frontmatter.timestamp as string) ?? "";
+  const date = isoDate(frontmatter.timestamp);
+  const modified = isoDate(frontmatter.modified);
   const hero = frontmatter.hero;
 
-  const articleLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: title,
-    description,
-    author: personAuthor(),
-    publisher: { "@id": `${SITE_ORIGIN}/#org` },
+  const articleLd = articleJsonLd({
+    path: `/blog/${slug}`,
+    title,
+    description: frontmatter.seo_description ?? description,
     datePublished: date,
-    dateModified: date,
-    url: `${SITE_ORIGIN}/blog/${slug}`,
-    ...(hero ? { image: `${SITE_ORIGIN}${hero}` } : { image: `${SITE_ORIGIN}/og-v2.png` }),
-    keywords: frontmatter.tags?.join(", "),
-  };
-
-  const blogFaq = faqPage([
-    {
-      question: title,
-      answer: description || `SigRank blog post: ${title}. Read the full article at signalaf.com/blog/${slug}.`,
-    },
-    {
-      question: `What is SigRank?`,
-      answer: `SigRank is a privacy-preserving leaderboard that ranks AI operators by token cascade efficiency (Yield). It measures the accounts using AI, not the AI models. Run \`npx sigrank\` to see your score.`,
-    },
-    {
-      question: `How does this relate to AI operator efficiency?`,
-      answer: `This article is part of SigRank's research on AI operator performance. SigRank measures operators by Yield (Υ = cache_read × output / input²) — token-cascade efficiency, not raw spend. See signalaf.com/board/all for the live leaderboard.`,
-    },
-  ]);
+    dateModified: modified || date,
+    image: frontmatter.og_image ?? hero ?? "/og-v2.png",
+    type: frontmatter.type === "article" ? "Article" : "BlogPosting",
+    section: frontmatter.type === "article" ? "Articles" : "Blog",
+    keywords: frontmatter.tags,
+  });
 
   return (
     <BlogWorkspaceFrame
@@ -244,7 +255,6 @@ export default async function BlogPost({
       <JsonLd
         data={[
           articleLd,
-          blogFaq,
           breadcrumb([
             { name: frontmatter.type === "article" ? "Articles" : "Blog", path: frontmatter.type === "article" ? "/articles" : "/blog" },
             { name: title, path: `/blog/${slug}` },

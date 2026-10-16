@@ -58,6 +58,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/tools": "SUPPORTED",
   "/alternatives": "SUPPORTED",
   "/blog": "SUPPORTED",
+  "/articles": "SUPPORTED", // publications index (frontmatter type: article) — sibling of /blog
   "/about": "SUPPORTED",
   "/sigrank": "SUPPORTED",
   "/contact": "SUPPORTED",
@@ -165,6 +166,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/blog/how-to-benchmark-ai-coding-workflow": "SUPPORTED",
   "/blog/the-human-in-the-loop-is-unmeasured": "SUPPORTED",
   "/blog/sigrank-dashboards": "SUPPORTED",
+  "/blog/the-three-modes-behind-the-ai-operator-board": "SUPPORTED",
   "/blog/how-sigrank-measures-operator-efficiency": "SUPPORTED",
   "/blog/token-cascade-vs-raw-token-consumption": "SUPPORTED",
   "/blog/why-yield-beats-tokenmaxxing": "SUPPORTED",
