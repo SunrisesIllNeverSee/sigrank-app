@@ -1159,6 +1159,9 @@ export function LiveBoardWorkspace({
     [],
   );
   const stageRef = useRef<HTMLElement | null>(null);
+  /* The tablecard is the board's single scroller (both axes) while the
+     operator card is docked — see .stage-board in board-cols.css. */
+  const tableCardRef = useRef<HTMLElement | null>(null);
   const acctRef = useRef<HTMLDivElement | null>(null);
   const snavRef = useRef<HTMLElement | null>(null);
 
@@ -1213,6 +1216,10 @@ export function LiveBoardWorkspace({
      fetch lands. */
   const pageNow = Math.min(Math.max(1, page), lastPage);
   const pageStart = (pageNow - 1) * PAGE_SIZE;
+  // New page → start at its first row (the pager sits at the table's end).
+  useEffect(() => {
+    tableCardRef.current?.scrollTo({ top: 0 });
+  }, [pageNow]);
   const pageRows = ordered.slice(pageStart, pageStart + PAGE_SIZE);
 
   const onPage = useCallback(
@@ -1748,7 +1755,10 @@ export function LiveBoardWorkspace({
               for the board — the § glyph exists in app/icon.svg but the
               pixels are the board's brand). */}
           <nav className="snav" ref={snavRef}>
-            <GroupedRailNav active="board" iconSet={iconSet} onBoard={() => stageRef.current?.scrollTo({ top: 0 })} />
+            <GroupedRailNav active="board" iconSet={iconSet} onBoard={() => {
+              stageRef.current?.scrollTo({ top: 0 });
+              tableCardRef.current?.scrollTo({ top: 0 });
+            }} />
           </nav>
           <div className="sfoot">
             {/* panel toggles (owner @svg): live in the nav rail and appear
@@ -2138,7 +2148,11 @@ export function LiveBoardWorkspace({
                 </div>
               </div>
 
-              <main className="stage" ref={stageRef} data-board-stage>
+              <main
+                className={profile && !docked ? "stage" : "stage stage-board"}
+                ref={stageRef}
+                data-board-stage
+              >
                 <div className="board">
                   {/* LB-03/04/05 operator dock (starts docked in rail) */}
                   {profile && (
@@ -2155,7 +2169,7 @@ export function LiveBoardWorkspace({
                   )}
 
                   {/* LB-10/11/12 leaderboard table — center stage */}
-                  <section className="tablecard">
+                  <section className="tablecard" ref={tableCardRef}>
                     <table className="board-t">
                       <thead>
                         <BoardHead
@@ -2189,7 +2203,7 @@ export function LiveBoardWorkspace({
                         ))}
                         {ordered.length === 0 && (
                           <tr className="board-empty">
-                            <td colSpan={colMode === "metrics" ? 14 : 11}>
+                            <td colSpan={colMode === "metrics" ? 15 : 12}>
                               {fieldState === "loading"
                                 ? "⟳ SYNCING FIELD…"
                                 : filtered
@@ -2204,13 +2218,13 @@ export function LiveBoardWorkspace({
                               <tr key={"registered-position-" + member.position}
                                 className="unranked-member"
                                 data-member-position={member.position}>
-                                <td>
+                                <td className="pin pin-rank">
                                   <div className="ranks">
                                     <span className="r-main">{member.position}</span>
                                     <span className="r-sub">UR</span>
                                   </div>
                                 </td>
-                                <td className="l">
+                                <td className="l pin pin-op">
                                   <div className="op">
                                     <span className="av" style={avatarStyle(member.position - 1)}>
                                       {member.avatar_url ? (
@@ -2219,22 +2233,23 @@ export function LiveBoardWorkspace({
                                       ) : (member.display_label.charAt(0).toUpperCase() || "◌")}
                                     </span>
                                     <span>
-                                      <span className="nm">
+                                      <span className="nm" title={member.location ? `${member.display_label} · ◍ ${member.location}` : member.display_label}>
                                         {member.profile_slug ? (
-                                          <Link href={"/user/" + encodeURIComponent(member.profile_slug)}>
+                                          <Link className="nmtxt" href={"/user/" + encodeURIComponent(member.profile_slug)}>
                                             {member.display_label}
                                           </Link>
-                                        ) : member.display_label}
+                                        ) : <span className="nmtxt">{member.display_label}</span>}
                                       </span>
                                       <br />
                                       <span className="hd">
                                         {member.handle?.startsWith("@") ? member.handle : (member.profile_slug ?? "PRIVATE")}
                                         {" · "}<span className="tag">UR</span>
                                       </span>
-                                      {member.location ? <span className="opl">◍ {member.location}</span> : null}
                                     </span>
-                                    <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
                                   </div>
+                                </td>
+                                <td className="l pin pin-trend">
+                                  <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
                                 </td>
                                 {Array.from({ length: colMode === "metrics" ? 11 : 8 }, (_, k) => (
                                   <td key={k} className="unranked-na">—</td>
