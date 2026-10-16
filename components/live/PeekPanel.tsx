@@ -96,7 +96,6 @@ export function PeekPanel({
               <DualSignatureRadar
                 operator={sixFactsOf(op)}
                 raw={rawFactsOf(op)}
-                cohort={ops.filter(o => o.num.total > 0).map(o => ({ raw: rawFactsOf(o), metrics: o.nc ? null : sixFactsOf(o) }))}
                 label={op.name}
               />
             }
