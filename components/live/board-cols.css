@@ -103,14 +103,11 @@
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 25%,transparent);
   border-radius:4px}
 
-/* ---------- Σ TOTAL pillar sub-line + ◍ location line ---------- */
+/* ---------- Σ TOTAL pillar sub-line ---------- */
 /* Under the total cell: "I x · O x · W x · R x" — the raw token pillars
    compact-formatted (prod renders the same I/O/W/R breakdown under TOTAL). */
 .lbw-root .board-t td .pils{display:block;margin-top:2px;font-size:9px;
   font-weight:500;line-height:1.15;color:var(--mut);letter-spacing:.02em}
-/* Tertiary line in the operator cell: operator-supplied public location
-   (prod's `◍ <location>` under the handle). */
-.lbw-root .op .opl{display:block;font-size:9px;color:var(--mut);line-height:1.3}
 
 /* Owner-locked table surgery only: inline identity class + real trend;
    no parent workspace layout or theme changes. */
@@ -242,3 +239,52 @@
 .lbw-root .stagecol:has(.board-filter-actions)>.fbar:has(.board-share[open]){
   overflow:visible
 }
+
+/* ---------- frozen identity + single scroller (2026-10-16) ----------
+   RANK + OPERATOR + TREND stay put on horizontal scroll and every metric
+   column slides underneath; both header rows stay put on vertical scroll.
+   Sticky only works against the nearest scroll container, so while the
+   operator card is docked (.stage-board) the tablecard becomes the board's
+   ONE scroller for both axes and the stage stops scrolling — nested
+   scrollers made three regions move at once. With the card undocked the
+   stage scrolls as before and only the horizontal freeze applies. */
+.lbw-root{--pin-rank-w:58px;--pin-op-w:240px;--pin-trend-w:76px}
+.lbw-root .stage.stage-board{overflow:hidden;display:flex;flex-direction:column;padding-bottom:12px}
+.lbw-root .stage.stage-board>.board{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-bottom:0}
+.lbw-root .stage.stage-board .tablecard{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
+
+.lbw-root .stage.stage-board .board-t thead th{position:sticky;top:0;z-index:4;background:var(--panel)}
+.lbw-root .stage.stage-board .board-t thead tr.grph th{height:26px;box-sizing:border-box}
+.lbw-root .stage.stage-board .board-t thead tr:not(.grph) th{top:26px}
+.lbw-root .board-t .pin{position:sticky;z-index:3;background:var(--panel);box-sizing:border-box}
+/* corner cells sit above both the sticky header row and the frozen body */
+.lbw-root .board-t thead th.pin,.lbw-root .stage.stage-board .board-t thead th.pin{z-index:6}
+/* lift the hovered frozen cell so its rank tooltip isn't painted under the
+   neighbouring frozen cell */
+.lbw-root .board-t tbody td.pin:hover{z-index:5}
+.lbw-root .board-t .pin-rank{left:0;width:var(--pin-rank-w);min-width:var(--pin-rank-w)}
+.lbw-root .board-t .pin-op{left:var(--pin-rank-w);width:var(--pin-op-w);min-width:var(--pin-op-w);max-width:var(--pin-op-w)}
+.lbw-root .board-t .pin-trend{left:calc(var(--pin-rank-w) + var(--pin-op-w));width:var(--pin-trend-w);min-width:var(--pin-trend-w);
+  box-shadow:inset -1px 0 0 var(--line),8px 0 10px -8px rgba(0,0,0,.55)}
+/* Row states paint over the solid pin background so frozen cells keep the
+   top-1 / selected / hover tint the scrolling cells show. */
+.lbw-root tr.top1 td.pin{background:linear-gradient(90deg,color-mix(in srgb,var(--ac) 7%,transparent),transparent),var(--panel)}
+.lbw-root tr.sel-op td.pin{background:linear-gradient(color-mix(in srgb,var(--ac) 6%,transparent),color-mix(in srgb,var(--ac) 6%,transparent)),var(--panel)}
+.lbw-root .board-t tbody tr:hover td.pin{background:linear-gradient(var(--hover),var(--hover)),var(--panel)}
+
+/* Two-line identity cell: name + marks / handle · class; long names
+   ellipsize (full name + location in the .nm tooltip). */
+.lbw-root .board-t td.pin-op .op{min-width:0}
+.lbw-root .board-t td.pin-op .op>span:nth-child(2){min-width:0;overflow:hidden}
+.lbw-root .board-t td.pin-op .op>span:nth-child(2)>br{display:none}
+.lbw-root .board-t td.pin-op .nm{white-space:nowrap;overflow:hidden}
+.lbw-root .board-t td.pin-op .nmtxt{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lbw-root .board-t td.pin-op .hd{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Readable sizes (9px headers/labels were below comfortable reading). */
+.lbw-root .board-t th{font-size:11px}
+.lbw-root .board-t thead tr.grph th{font-size:9.5px}
+.lbw-root .board-t td{padding:6px 8px;font-size:12px}
+.lbw-root .board-t .op .nm{font-size:13px}
+.lbw-root .board-t .op .hd{font-size:10.5px}
+.lbw-root .board-t .op .tag{font-size:10px}
