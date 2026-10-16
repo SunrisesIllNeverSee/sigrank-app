@@ -105,6 +105,9 @@ interface HeadCol {
   tip?: string;
   /** Optional dedicated Wiki entry for a measured metric. */
   href?: string;
+  /** Frozen identity column (board-cols.css .pin-*) — stays put while the
+   *  metric columns scroll underneath on horizontal scroll. */
+  pin?: "rank" | "op" | "trend";
 }
 
 interface HeadGroup {
@@ -116,13 +119,13 @@ interface HeadGroup {
 
 const HEAD_GROUPS: Record<ColMode, HeadGroup[]> = {
   metrics: [
-    { label: "IDENTITY & SCALE", span: 5 },
+    { label: "IDENTITY & SCALE", span: 6 },
     { label: "CASCADE YIELD", span: 5, ac: true },
     { label: "COMPOSITION & COST", span: 3 },
     { label: "ACTIVITY", span: 1 },
   ],
   raw: [
-    { label: "IDENTITY", span: 2 },
+    { label: "IDENTITY", span: 3 },
     { label: "RAW TOKENS & THROUGHPUT", span: 6 },
     { label: "COMPOSITION", span: 1 },
     { label: "COST", span: 1 },
@@ -131,8 +134,9 @@ const HEAD_GROUPS: Record<ColMode, HeadGroup[]> = {
 };
 const HEAD_COLS: Record<ColMode, HeadCol[]> = {
   metrics: [
-    { icon: "#", label: "RANK", cls: "hc-rank", l: true },
-    { icon: "◉", label: "OPERATOR + TREND", cls: "hc-op", l: true, tip: "Operator identity, class and observed Signa Rate trend" },
+    { icon: "#", label: "RANK", cls: "hc-rank", l: true, pin: "rank" },
+    { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true, pin: "op", tip: "Operator identity and class" },
+    { icon: "↗", label: "TREND", cls: "hc-trend", l: true, pin: "trend", tip: "Observed Signa Rate history; not Yield" },
     { icon: "∑", label: "TOTAL", cls: "hc-tot", k: "Total", tip: "I + O + W + R" },
     { icon: "∑", label: "∑/DAY", cls: "hc-day", k: "∑/Day", tip: "Exact-calendar processed tokens per day" },
     { icon: "Ⅴ", label: "SCALE V", cls: "hc-scale", k: "Scale V", tip: "log10(Input + Output + Cache-write + Cache-read). Each +1 = 10× recorded token activity. Activity volume, not efficiency or unique content. See Wiki.", href: "/wiki/metrics/scale-v" },
@@ -147,8 +151,9 @@ const HEAD_COLS: Record<ColMode, HeadCol[]> = {
     { icon: "◷", label: "LAST", cls: "hc-last" },
   ],
   raw: [
-    { icon: "#", label: "RANK", cls: "hc-rank", l: true },
-    { icon: "◉", label: "OPERATOR + TREND", cls: "hc-op", l: true },
+    { icon: "#", label: "RANK", cls: "hc-rank", l: true, pin: "rank" },
+    { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true, pin: "op" },
+    { icon: "↗", label: "TREND", cls: "hc-trend", l: true, pin: "trend", tip: "Observed Signa Rate history; not Yield" },
     { icon: "→", label: "INPUT", cls: "hc-i", k: "Input" },
     { icon: "←", label: "OUTPUT", cls: "hc-o", k: "Output" },
     { icon: "✎", label: "CACHE-WRITE", cls: "hc-cw", k: "Cache-write" },
@@ -204,7 +209,7 @@ export function BoardHead({ mode, sortKey, sortDir, onSort }: BoardHeadProps) {
           return (
             <th
               key={c.label}
-              className={`${c.cls}${c.l ? " l" : ""}${active ? " sorted" : ""}`}
+              className={`${c.cls}${c.l ? " l" : ""}${c.pin ? " pin pin-" + c.pin : ""}${active ? " sorted" : ""}`}
               title={c.tip}
               aria-sort={
                 active
@@ -290,7 +295,7 @@ export const BoardRow = memo(function BoardRow({
         }
       }}
     >
-      <td>
+      <td className="pin pin-rank">
         <div className="ranks">
           <span className="r-main">
             {r <= 3 ? mark : ""}
@@ -304,7 +309,7 @@ export const BoardRow = memo(function BoardRow({
           </div>
         </div>
       </td>
-      <td className="l">
+      <td className="l pin pin-op">
         <div className="op">
           <span className="av" style={avatarStyle(i)}>
             {o.avatarUrl ? (
@@ -323,8 +328,8 @@ export const BoardRow = memo(function BoardRow({
             ) : null}
           </span>
           <span>
-            <span className="nm">
-              {o.name}
+            <span className="nm" title={o.location ? `${o.name} · ◍ ${o.location}` : o.name}>
+              <span className="nmtxt">{o.name}</span>
               <WorkflowMark mode={o.wf === "hitl" || o.wf === "agentic" || o.wf === "hybrid" ? o.wf : null} size="icon" />
               {isVerifiedOp(o.verif) ? (
                 <>
@@ -349,15 +354,9 @@ export const BoardRow = memo(function BoardRow({
               {o.handle.startsWith("@") ? o.handle : o.codename}
               {" · "}<span className="tag">{o.klass}</span>
             </span>
-            {/* production parity: `◍ location` tertiary line under the
-                handle — operator-supplied public location, absent unless
-                the projection carries it (null-safe). */}
-            {o.location ? (
-              <span className="opl">◍ {o.location}</span>
-            ) : null}
-          </span>
-          <span className="op-trend" title="Observed Signa Rate history; not Yield">
-            <Sparkline arr={o.trend ?? []} />
+            {/* `◍ location` lives in the name tooltip (2026-10-16): the
+                third line made rows ~79px tall; two lines keep ~14 rows
+                in view. */}
           </span>
           {onPeek && (
             <button
@@ -374,6 +373,11 @@ export const BoardRow = memo(function BoardRow({
             </button>
           )}
         </div>
+      </td>
+      <td className="l pin pin-trend">
+        <span className="op-trend" title="Observed Signa Rate history; not Yield">
+          <Sparkline arr={o.trend ?? []} />
+        </span>
       </td>
       {colMode === "metrics" ? (
         <>
