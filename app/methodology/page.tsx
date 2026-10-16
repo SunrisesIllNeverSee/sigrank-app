@@ -19,6 +19,7 @@ import { toEntry } from "@/lib/board/to-entry";
 import { PLATFORM_COUNT } from "@/lib/constants";
 import { withOG } from "@/lib/seo";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { EditorialNav } from "@/components/live/EditorialSidebar";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { sigrankDataset, faqPage, breadcrumb } from "@/lib/jsonld";
@@ -115,7 +116,9 @@ export default async function MethodologyPage() {
 
   return (
     <WorkspaceShell
-      active="wiki"
+      active="field"
+      topic="field"
+      editorialStage
       title="METHODOLOGY"
       bareTitle
       hero={
@@ -126,9 +129,10 @@ export default async function MethodologyPage() {
           subtitle={<>The canonical source for AI operator token-efficiency data. Ranked by Υ Yield.</>}
         />
       }
-      leftTitle="SYSTEM"
+      leftTitle="RESEARCH"
       left={
         <>
+          <EditorialNav current="methodology" />
           <div className="mod">
             <div className="mini-h"><span className="sq" />REFERENCE</div>
             <nav className="ws-nav">
