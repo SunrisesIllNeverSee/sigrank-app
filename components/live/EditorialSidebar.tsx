@@ -160,7 +160,6 @@ const PAGE_ANCHORS: Record<string, PageAnchor[]> = {
 const slug = (value: string) =>
   value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 56);
 
-const PAGE_FALLBACK_SCRIPT = "(function(){\n  var host=document.currentScript?.closest(\".ws-page-auto\");\n  if(!host)return;\n  var nav=host.querySelector(\".ws-page-auto-nav\");\n  var note=host.querySelector(\".ws-page-auto-note\");\n  var complete=false;\n  function scan(){\n    if(complete||!host.isConnected)return;\n    var stage=document.querySelector(\".lbw-root .stagecol main.stage .board\");\n    if(!stage)return;\n    var headings=stage.querySelectorAll(\"h2\"),seen=new Set(),found=[];\n    for(var i=0;i<headings.length&&found.length<24;i++){\n      var h=headings[i];\n      if(h.closest(\".blog-row,.blog-list,.ws-nav,.rail,[data-ws-nav-skip]\"))continue;\n      var label=(h.textContent||\"\").replace(/\\s+/g,\" \").trim();\n      if(!label)continue;\n      var enclosing=h.closest(\"section[id]\");\n      var id=h.id||(enclosing&&enclosing.id)||\"\";\n      if(!id){\n        var base=\"ws-page-\"+label.toLowerCase().normalize(\"NFKD\")\n          .replace(/[^a-z0-9]+/g,\"-\").replace(/^-|-$/g,\"\").slice(0,56);\n        id=base||\"ws-page-section\";\n        var stem=id,sequence=2;\n        while(document.getElementById(id))id=stem+\"-\"+(sequence++);\n        h.id=id;\n      }\n      if(seen.has(id))continue;\n      seen.add(id);found.push({id:id,label:label});\n    }\n    if(!found.length)return;\n    for(var k=0;k<found.length;k++){\n      var a=document.createElement(\"a\");\n      a.href=\"#\"+encodeURIComponent(found[k].id);\n      a.textContent=found[k].label;\n      nav.appendChild(a);\n    }\n    if(note)note.hidden=true;\n    complete=true;\n  }\n  if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",scan,{once:true});\n  else scan();\n  window.addEventListener(\"load\",scan,{once:true});\n  setTimeout(scan,250);setTimeout(scan,900);setTimeout(scan,2000);\n})();";
 
 function PageSections({ pageContents }: { pageContents?: ReactNode }) {
   const pathname = usePathname();
@@ -223,9 +222,9 @@ function PageSections({ pageContents }: { pageContents?: ReactNode }) {
       <nav className="ws-nav ws-page-links ws-page-auto-nav"
         aria-label="Sections on this page" />
       <p className="ws-note ws-page-auto-note">Finding page sections…</p>
-      {/* Static JSX articles can be streamed without working dev hydration.
-          This native enhancement derives links only from real page headings. */}
-      <script dangerouslySetInnerHTML={{ __html: PAGE_FALLBACK_SCRIPT }} />
+      {/* No inline pre-hydration script here: mutating this React-owned nav
+          (and heading ids) before hydration caused React #418. The effect
+          above discovers headings after hydration instead. */}
     </div>
   );
 }

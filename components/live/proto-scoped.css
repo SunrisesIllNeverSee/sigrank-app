@@ -1861,3 +1861,45 @@
 .lbw-root .account-access-content input,.lbw-root .account-settings-content input,.lbw-root .account-settings-content textarea{padding:10px 12px;border-radius:6px}
 @media(max-width:700px){.lbw-root .share-gallery{padding:16px}.lbw-root .share-gallery .share-capture-grid{grid-template-columns:1fr}}
 .lbw-root .ws-editorial-credit{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin:28px auto 12px;padding:16px 12px;border-top:1px solid var(--line);color:var(--tx2);font:12px/1.6 var(--font-mono);text-align:center}.lbw-root .ws-editorial-credit a{color:var(--tx);text-decoration:none}.lbw-root .ws-editorial-credit a:hover{text-decoration:underline}
+
+/* ---------- text pages on phones (2026-10-16) ----------
+   Below 760px the editorial stage drops the 600px floor and fills the
+   screen once both panels are collapsed (WorkspaceShell collapses them on
+   mount); during the first paint ([data-phone-init]) the panels are hidden
+   so the page never flashes the panning layout. */
+@media (max-width:760px){
+  .lbw-root .app[data-phone-init] .mid:has(.ws-editorial-stage)>:is(.lside,.railcol){display:none}
+  .lbw-root .app[data-phone-init] .mid:has(.ws-editorial-stage),
+  .lbw-root .app.no-rail.no-left .mid:has(.ws-editorial-stage){grid-template-columns:minmax(0,1fr);overflow-x:hidden}
+  .lbw-root .mid:has(.ws-editorial-stage) .stagecol{min-width:0}
+  /* .ws-doc is a flex column; its mx-auto children shrink-to-fit their
+     widest line (400-800px), so they overflowed the phone. Fill instead. */
+  .lbw-root .ws-editorial-stage .ws-doc>*:not(.fixed,.absolute,.sticky),
+  .lbw-root .ws-editorial-stage .ws-doc .prose-sigrank{width:100%;max-width:100%;min-width:0}
+  .lbw-root .ws-editorial-stage .board :is(p,li,h1,h2,h3,strong,a,span){overflow-wrap:anywhere}
+}
+
+/* ── Visible FAQ on workspace surfaces (components/seo/FaqSection
+   variant="workspace") — /board/*, /compare. Questions are <details>
+   closed by default; answers stay in the DOM for crawlers. ── */
+.lbw-root .ws-faq{flex:none;margin-top:12px;border-top:1px solid var(--line);padding-top:10px;min-width:0}
+.lbw-root .ws-faq-h{font-family:var(--font-mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}
+.lbw-root .ws-faq-n{letter-spacing:.06em;font-weight:400}
+.lbw-root .ws-faq-list{display:flex;flex-direction:column;gap:6px}
+.lbw-root .ws-faq-item{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel)}
+.lbw-root .ws-faq-item>summary,.lbw-root .ws-faq-outer>summary{cursor:pointer;list-style:none;
+  display:flex;align-items:baseline;gap:8px;border-radius:var(--radius-sm)}
+.lbw-root .ws-faq-item>summary::-webkit-details-marker,
+.lbw-root .ws-faq-outer>summary::-webkit-details-marker{display:none}
+.lbw-root .ws-faq-item>summary{padding:8px 10px;font-size:12.5px;font-weight:600;color:var(--tx)}
+.lbw-root .ws-faq-item>summary::before,.lbw-root .ws-faq-outer>summary::before{content:"▸";
+  color:var(--ac);font-size:10px;flex:none;transition:transform .15s}
+.lbw-root .ws-faq-item[open]>summary::before,.lbw-root .ws-faq-outer[open]>summary::before{transform:rotate(90deg)}
+.lbw-root .ws-faq-item>summary:hover{color:var(--ac)}
+.lbw-root .ws-faq-item>summary:focus-visible,
+.lbw-root .ws-faq-outer>summary:focus-visible{outline:1px solid var(--ac);outline-offset:1px}
+.lbw-root .ws-faq-item>p{padding:0 10px 10px 28px;font-size:12px;line-height:1.55;color:var(--tx2);max-width:78ch}
+.lbw-root .ws-faq-code{font-family:var(--font-mono);font-size:11px;color:var(--ac)}
+.lbw-root .ws-faq-outer>summary .ws-faq-h{margin:0}
+.lbw-root .ws-faq-outer[open]>.ws-faq-list{margin-top:8px;max-height:42vh;overflow:auto;overscroll-behavior:contain}

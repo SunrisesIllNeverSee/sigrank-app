@@ -70,6 +70,8 @@ interface LiveBoardMountProps {
   windowSlug: string;
   /** Pre-2B board subtree, rendered only under ?v=legacy (A/B soak). */
   legacy?: ReactNode;
+  /** Server-rendered stage footer (visible FAQ) passed to the workspace. */
+  stageFooter?: ReactNode;
 }
 
 /** Append only rows whose codename isn't already loaded (StrictMode-safe). */
@@ -86,6 +88,7 @@ export function LiveBoardMount({
   initial,
   windowSlug,
   legacy,
+  stageFooter,
 }: LiveBoardMountProps) {
   /* ---------- ?v=legacy review flag (post-mount; keeps the page static) -- */
   const [legacyOn, setLegacyOn] = useState(false);
@@ -175,6 +178,7 @@ export function LiveBoardMount({
       initial={merged}
       fetchMore={fetchMore}
       fieldStatus={fieldStatus}
+      stageFooter={stageFooter}
     />
   );
 }

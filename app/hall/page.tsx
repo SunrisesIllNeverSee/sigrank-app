@@ -7,6 +7,7 @@ import { ComingSoonMarkers } from "@/components/hall/ComingSoonMarkers";
 import { HallWorkspace } from "@/components/hall/HallWorkspace";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
 import type { LeaderboardRow } from "@/lib/board";
 import Link from "next/link";
 
@@ -31,6 +32,25 @@ export const metadata: Metadata = withOG({
 // platform/class filtering). Total SSR rows: ~22 + 50 + 3×50 = 172 (was 1400).
 export const dynamic = "force-static";
 export const revalidate = 300;
+
+/** Single source for the FAQPage JSON-LD and the visible FAQ section. */
+const HALL_FAQS = [
+  {
+    question: "What is the AI Operator Hall of Fame?",
+    answer:
+      "The AI Operator Hall of Fame is the permanent record of peak signal across the SigRank leaderboard. It showcases the top AI operators by all-time Yield (Υ) across 18 metric boards — the record book for the best AI users measured by token cascade efficiency.",
+  },
+  {
+    question: "Who qualifies for the AI Operator Hall of Fame?",
+    answer:
+      "The AI Operator Hall of Fame shows claimed operators with real verified submissions. Operators who have enrolled, submitted signed token telemetry snapshots, and have active status appear in the Hall. Seed and scraped data are excluded from the Active scope — only real users are in the record book.",
+  },
+  {
+    question: "How many metric boards are in the AI Operator Hall of Fame?",
+    answer:
+      "The AI Operator Hall of Fame has 18 metric boards covering Yield, Leverage, Velocity, SNR, 10xDEV, Efficiency, Scale V, Cost per 1M tokens, Op Ratio, and more. Each board shows the top operators across 7-day, 30-day, 90-day, and all-time windows.",
+  },
+];
 
 /**
  * /hall — Hall of Signal (D15 canonical route; /hall-of-signal redirects here).
@@ -94,23 +114,7 @@ export default async function HallPage() {
     <div>
       <JsonLd data={[
         breadcrumb([{ name: "AI Operator Hall of Fame", path: "/hall" }]),
-        faqPage([
-          {
-            question: "What is the AI Operator Hall of Fame?",
-            answer:
-              "The AI Operator Hall of Fame is the permanent record of peak signal across the SigRank leaderboard. It showcases the top AI operators by all-time Yield (Υ) across 18 metric boards — the record book for the best AI users measured by token cascade efficiency.",
-          },
-          {
-            question: "Who qualifies for the AI Operator Hall of Fame?",
-            answer:
-              "The AI Operator Hall of Fame shows claimed operators with real verified submissions. Operators who have enrolled, submitted signed token telemetry snapshots, and have active status appear in the Hall. Seed and scraped data are excluded from the Active scope — only real users are in the record book.",
-          },
-          {
-            question: "How many metric boards are in the AI Operator Hall of Fame?",
-            answer:
-              "The AI Operator Hall of Fame has 18 metric boards covering Yield, Leverage, Velocity, SNR, 10xDEV, Efficiency, Scale V, Cost per 1M tokens, Op Ratio, and more. Each board shows the top operators across 7-day, 30-day, 90-day, and all-time windows.",
-          },
-        ]),
+        faqPage(HALL_FAQS),
       ]} />
       {/* Hall of Signal inside the shared SignalAF workspace shell —
           100vh .lbw-root (left controls · stage boards · closed inspector).
@@ -140,6 +144,12 @@ export default async function HallPage() {
           Open the Badge Index →
         </Link>
       </section>
+
+      {/* Visible FAQ — same array as the FAQPage JSON-LD above. Lives with
+          the Hall's SEO copy below the 100vh workspace. */}
+      <div className="mx-auto max-w-2xl px-4 pb-6">
+        <FaqSection faqs={HALL_FAQS} id="hall-faq" />
+      </div>
 
       {/* HALL Task 6: coming-soon markers (Eras teaser · Season Leaders · Sessions) —
           the footer "On the horizon" area per HALL_DESIGN §2/§6/§7. Last child of the page. */}

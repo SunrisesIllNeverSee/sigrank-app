@@ -66,6 +66,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 import type {
   FieldStat,
@@ -155,6 +156,9 @@ export interface LiveBoardWorkspaceProps {
    *  SYNCING / SYNC-FAILED indicators. Omit in standalone/demo usage (a
    *  complete field reads as "ready"). */
   fieldStatus?: LiveFieldStatus;
+  /** Server-rendered content appended to the foot of the board stage, below
+   *  the table (the page's collapsed FAQ). Omit → board-only stage. */
+  stageFooter?: ReactNode;
 }
 
 /** Field-hydration lifecycle reported by the mount (live-board-mount.tsx). */
@@ -586,6 +590,7 @@ export function LiveBoardWorkspace({
   onWindowChange,
   account,
   fieldStatus,
+  stageFooter,
 }: LiveBoardWorkspaceProps) {
   /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
      "green"; state lives on .lbw-root's data-theme (the site's own
@@ -2301,6 +2306,7 @@ export function LiveBoardWorkspace({
 
                     </div>
                   </section>
+                  {stageFooter}
                 </div>
               </main>
             </div>

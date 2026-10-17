@@ -204,6 +204,11 @@ export default async function MethodologyPage() {
               answer:
                 "Yes. The on-device scanner reads token counts and content lengths only — never the words of your prompts. Only the resulting numeric scores, signed with ed25519, leave your device. Snapshots are verified server-side with replay and plausibility guards.",
             },
+            {
+              question: "How do I get listed on the SigRank Index?",
+              answer:
+                "Install the SigRank CLI (npm: sigrank), enroll your operator identity, and submit a snapshot. The scanner reads your token telemetry locally and publishes a signed snapshot to the leaderboard. Enrollment and submission are done via the SigRank CLI.",
+            },
           ]),
         ]}
       />
@@ -646,14 +651,14 @@ export default async function MethodologyPage() {
           </div>
           <div className="flex flex-col gap-1">
             <dt className="font-semibold text-text-primary">
-              How do I get listed?
+              How do I get listed on the SigRank Index?
             </dt>
             <dd className="text-base text-text-secondary">
-              Install the SigRank MCP server (
-              <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
-                npm i -g sigrank
-              </code>
-              ), enroll, and submit a snapshot. Visit{" "}
+              Install the SigRank CLI (npm: sigrank), enroll your operator
+              identity, and submit a snapshot. The scanner reads your token
+              telemetry locally and publishes a signed snapshot to the
+              leaderboard. Enrollment and submission are done via the SigRank
+              CLI. Visit{" "}
               <Link
                 href="/score"
                 className="text-gold underline underline-offset-2"
