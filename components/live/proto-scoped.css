@@ -1877,6 +1877,9 @@
   .lbw-root .ws-editorial-stage .ws-doc>*:not(.fixed,.absolute,.sticky),
   .lbw-root .ws-editorial-stage .ws-doc .prose-sigrank{width:100%;max-width:100%;min-width:0}
   .lbw-root .ws-editorial-stage .board :is(p,li,h1,h2,h3,strong,a,span){overflow-wrap:anywhere}
+  /* grid/flex items default to min-width:auto (their min-content width),
+     which let a card grid size itself past the phone column */
+  .lbw-root .ws-editorial-stage .board :is(.grid,.flex)>*:not(.fixed,.absolute){min-width:0}
 }
 
 /* ── Visible FAQ on workspace surfaces (components/seo/FaqSection
