@@ -75,7 +75,7 @@ export function WaveHero({
     // box the table sits in) — hero and table share one width + centering, no
     // scrollbar-gutter drift between them.
     <header
-      className={`relative w-full overflow-hidden rounded-xl border border-bg-border bg-bg-surface ${compact ? "mb-0" : "mb-8"}`}
+      className={`wave-hero relative w-full overflow-hidden rounded-xl border border-bg-border bg-bg-surface ${compact ? "mb-0" : "mb-8"}`}
     >
       {/* Animated signal-wave backdrop */}
       <svg
