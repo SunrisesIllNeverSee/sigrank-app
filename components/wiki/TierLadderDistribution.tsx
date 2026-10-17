@@ -54,6 +54,7 @@ export function TierLadderDistribution() {
     tierGroups[t] = (tierGroups[t] ?? 0) + s.operators;
   }
   const tierOrder = ["ARCH+", "ARCH", "POWER", "BASE", "SEEKER", "REFINER", "BEARER", "IGNITER"];
+  const maxTierOps = Math.max(0, ...tierOrder.map((t) => tierGroups[t] ?? 0));
 
   return (
     <section className="flex flex-col gap-3">
@@ -73,7 +74,9 @@ export function TierLadderDistribution() {
         {tierOrder.map((tier) => {
           const count = tierGroups[tier] ?? 0;
           const pct = ((count / totalOps) * 100).toFixed(1);
-          const width = (count / maxOps) * 100;
+          // tier bars sum three sub-stages, so scale against the largest
+          // TIER total (scaling by the largest sub-stage drew bars >100%)
+          const width = maxTierOps > 0 ? (count / maxTierOps) * 100 : 0;
           const color = TIER_COLORS[tier] ?? "#888";
           return (
             <div key={tier} className="flex items-center gap-2">
