@@ -1394,11 +1394,10 @@
 .lbw-root .ws-bnav{margin-bottom:8px}
 .lbw-root .ws-bnav header{border-radius:0}
 .lbw-root .ws-bnav p{display:none}
-/* 2026-10-16: this used to say border:none, but .border-bg-border:not(.border-dashed)
-   re-applied border-style:solid at higher specificity, so the header fell back to
-   a 3px "medium" border in currentColor (the bright-white box on index pages).
-   Match the article hero instead: thin line, rounded. */
-.lbw-root .ws-hero header{border:1px solid var(--line2)!important;border-radius:12px;background:transparent}
+/* Hero frame: none (owner 2026-10-17). `border:none` alone lost to
+   .border-bg-border:not(.border-dashed){border-style:solid} and fell back to a
+   3px currentColor box, so zero the width outright. */
+.lbw-root .ws-hero header{border:0!important;border-radius:0;background:transparent}
 .lbw-root .ws-card > header{border:none;border-radius:0;background:transparent}
 
 /* ---------- leaderboard design handoff (approved items only) ---------- */
@@ -1550,9 +1549,6 @@
 .lbw-root .ws-editorial-stage .ws-doc>*,.lbw-root .ws-editorial-stage .ws-article>*{min-width:0}
 .lbw-root .ws-editorial-stage .ws-hero{
   width:100%;max-width:1040px;margin:0 auto 30px;
-}
-.lbw-root .ws-editorial-stage .ws-hero header{
-  border:3px solid var(--tx)!important;border-radius:0;
 }
 .lbw-root .ws-editorial-stage .ws-article>.article-shell{
   padding-inline:clamp(14px,2vw,30px);
@@ -1838,7 +1834,8 @@
 .lbw-root .ws-field-index .blog-row{grid-template-columns:minmax(0,1fr) 24px;gap:12px}
 .lbw-root .ws-field-index .blog-row-main{padding-left:36px}
 /* Slightly smaller pixel titles throughout the editorial family. */
-.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(4px,calc(var(--tbt-fit,2cqw) * .68),1.05rem)}
+/* min 2px (was 4px): long titles like STATE OF THE INDEX clipped on phones */
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(2px,calc(var(--tbt-fit,2cqw) * .68),1.05rem)}
 .lbw-root .sigrank-column-hero pre{font-size:clamp(7px,1.9cqw,18px)}
 
 .lbw-root .ws-topic-branch > summary .ws-tree-title{font-weight:700}
@@ -1906,3 +1903,72 @@
 .lbw-root .ws-faq-code{font-family:var(--font-mono);font-size:11px;color:var(--ac)}
 .lbw-root .ws-faq-outer>summary .ws-faq-h{margin:0}
 .lbw-root .ws-faq-outer[open]>.ws-faq-list{margin-top:8px;max-height:42vh;overflow:auto;overscroll-behavior:contain}
+
+/* ---------- text-page masthead (owner 2026-10-17) ----------
+   The hero is a fixed masthead: pinned to the top of the stage body, full
+   stage width, no frame, solid page background so the content scrolls
+   underneath. Covers the hero slot (.ws-hero) and banners rendered at the top
+   of article content (header.wave-hero). Motion (wave paths, SigRank cascade
+   lines + animated wordmark) is untouched. Full bleed: 100cqw is the stage's
+   content box, --stage-pad its inline padding. */
+.lbw-root .stage.ws-editorial-stage{--stage-pad:clamp(18px,2.5vw,40px);padding-inline:var(--stage-pad);container-type:inline-size}
+.lbw-root .ws-editorial-stage>.board:has(>.ws-hero){padding-top:0}
+.lbw-root .ws-editorial-stage>.board>.ws-hero,
+.lbw-root .ws-editorial-stage .board header.wave-hero:not(.ws-hero *){
+  position:sticky;top:0;z-index:30;
+  width:calc(100cqw + 2*var(--stage-pad));max-width:none;
+  margin-inline:calc((100% - 100cqw)/2 - var(--stage-pad));
+  margin-top:0;margin-bottom:28px;
+  background:var(--bg);border:0!important;border-radius:0!important}
+/* soft edge where content passes under the masthead */
+.lbw-root .ws-editorial-stage>.board>.ws-hero::after,
+.lbw-root .ws-editorial-stage .board header.wave-hero:not(.ws-hero *)::after{
+  content:"";position:absolute;left:0;right:0;bottom:-18px;height:18px;pointer-events:none;
+  background:linear-gradient(var(--bg),transparent)}
+.lbw-root .ws-editorial-stage>.board>.ws-hero header,
+.lbw-root .ws-editorial-stage .board header.wave-hero{background:transparent;margin-bottom:0}
+/* compact masthead: the banner's tall py-12/16 becomes a slim band */
+.lbw-root .ws-editorial-stage header.wave-hero>div.relative{padding:18px 0 16px}
+.lbw-root .ws-editorial-stage .sigrank-column-hero header{padding:14px 22px 16px}
+/* SigRank intro (scrolling half of the hero) keeps the hero's centred stack */
+.lbw-root .ws-editorial-stage .draft2-intro p{max-width:none}
+@media (max-width:760px){
+  .lbw-root .stage.ws-editorial-stage{--stage-pad:18px}
+}
+/* very short viewports: let the masthead scroll away instead of pinning */
+@media (max-height:560px){
+  .lbw-root .ws-editorial-stage>.board>.ws-hero,
+  .lbw-root .ws-editorial-stage .board header.wave-hero{position:relative}
+}
+.lbw-root .ws-editorial-stage .ws-hero-lede{margin:0 auto 6px;text-align:center;color:var(--tx2)}
+/* compact (scrolled) masthead: title / animated wordmark only */
+.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative{padding:8px 0}
+.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative>:not(:nth-child(2)){display:none}
+.lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header{padding:6px 22px 8px}
+.lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>div.relative>:is(p){display:none}
+.lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>div.relative>h1{
+  position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>div.relative{gap:6px}
+.lbw-root .ws-editorial-stage[data-compact] header.wave-hero :is(h1,h2){font-size:clamp(15px,2.2vw,22px);line-height:1.2}
+/* masthead breathing room (owner 2026-10-17: "a little cramped") */
+.lbw-root .ws-editorial-stage .sigrank-column-hero header{padding:32px 32px 30px}
+.lbw-root .ws-editorial-stage .sigrank-column-hero header>.relative.z-10{gap:22px}
+.lbw-root .ws-editorial-stage .sigrank-column-hero header>.relative.z-10>p{text-wrap:balance;max-width:60ch;line-height:1.5}
+.lbw-root .ws-editorial-stage .sigrank-column-hero header>.relative.z-10>div.h-px{margin-top:6px}
+/* pixel titles size to the HEADER's content box (cqw), so side padding lives
+   on the header, never on the inner box */
+.lbw-root .ws-editorial-stage header.wave-hero{padding-inline:32px}
+.lbw-root .ws-editorial-stage header.wave-hero>div.relative{padding:30px 0 26px;gap:12px}
+.lbw-root .ws-editorial-stage>.board>.ws-hero,
+.lbw-root .ws-editorial-stage .board header.wave-hero:not(.ws-hero *){margin-bottom:40px}
+.lbw-root .ws-editorial-stage .draft2-intro{gap:24px}
+/* compact band keeps tighter, but not jammed */
+.lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header{padding:12px 24px 16px}
+.lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>.relative.z-10{gap:12px}
+.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative{padding:12px 0}
+@media (max-width:760px){
+  .lbw-root .ws-editorial-stage .sigrank-column-hero header{padding:24px 16px 22px}
+  .lbw-root .ws-editorial-stage .sigrank-column-hero header>.relative.z-10{gap:16px}
+  .lbw-root .ws-editorial-stage header.wave-hero{padding-inline:16px}
+  .lbw-root .ws-editorial-stage header.wave-hero>div.relative{padding:22px 0 18px}
+}
