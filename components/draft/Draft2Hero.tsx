@@ -31,12 +31,18 @@ const TerminalWordmark = dynamic(
  * original") — never forked. Server component: both are client islands rendered
  * as children, never imported into a client file. No props, no data reads.
  */
-export function Draft2Hero() {
+/**
+ * Masthead / intro split (owner 2026-10-17): on text pages the hero is a fixed
+ * masthead pinned to the top of the stage with no border. The pinned part keeps
+ * the motion (CascadeHeader lines + animated SIGRANK wordmark); everything after
+ * "powered by MO§ES™" scrolls with the page as Draft2Intro.
+ */
+export function Draft2Masthead() {
   return (
-    <header className="relative flex min-h-[540px] flex-col items-center justify-center gap-5 overflow-hidden rounded-2xl border border-bg-border-subtle bg-bg-surface px-6 py-16 text-center">
+    <header className="relative flex flex-col items-center justify-center gap-4 overflow-hidden px-6 py-8 text-center">
       <CascadeHeader slowFactor={1.8} />
 
-      <div className="relative z-10 flex flex-col items-center gap-5">
+      <div className="relative z-10 flex flex-col items-center gap-4">
         {/* intro line — canonical server-rendered H1 */}
         <h1 className="font-mono text-base font-bold leading-tight tracking-tight text-text-primary sm:whitespace-nowrap md:text-xl lg:text-2xl">
           The evaluation platform for{" "}
@@ -59,7 +65,8 @@ export function Draft2Hero() {
 
         {/* privacy badge — the differentiator every launch post leans on, surfaced
             at the brand level so a stranger landing from X/HN sees it first (GTM
-            Phase C front-door fix, 2026-07-02). */}
+            Phase C front-door fix, 2026-07-02). Part of the pinned masthead
+            (owner 2026-10-17). */}
         <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/5 px-4 py-1.5">
           <span className="text-gold">⊙</span>
           <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-text-primary sm:text-sm">
@@ -68,40 +75,56 @@ export function Draft2Hero() {
         </div>
 
         <div className="h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
-
-        {/* body — "We measure…" starts on a new line (owner). text-balance evens the
-            line lengths so there's no one-word orphan line (owner 2026-06-24). */}
-        <div className="flex max-w-2xl flex-col gap-2 text-center">
-          <p className="text-balance font-sans text-lg leading-relaxed text-text-secondary sm:text-xl">
-            SigRank is an AI operator benchmark measuring token cascade
-            efficiency, not AI models. It turns privacy-preserving token
-            telemetry into a repeatable performance evaluation: your{" "}
-            <strong className="text-text-primary">Yield</strong>, workflow
-            signature, benchmark, and progress over time. The leaderboard is
-            the proof rather than the product, which is the{" "}
-            <strong className="text-text-primary">operator-evaluation standard</strong>.
-          </p>
-          <p className="text-balance font-sans text-lg font-medium leading-relaxed text-text-primary sm:text-xl">
-            Fair warning: the blade cuts both ways.
-          </p>
-        </div>
-
-        {/* action tiles — Measure (→ /score) · Board · Compare · Info·Wiki (shared
-            component). Shine-sweep glint on too (owner 2026-06-22). */}
-        <Draft2ActionTiles className="mt-3" shine />
-
-        {/* Direct enroll CTA — the exact command to run, copy-to-clipboard.
-            Surfaces the path to the leaderboard without requiring navigation. */}
-        <EnrollCta className="mt-5" />
-
-        {/* taglines — bigger (owner 2026-06-22: increase size of these last two) */}
-        <p className="font-mono text-lg font-semibold text-text-secondary sm:text-xl">
-          Identifying Burners, Builders, and 10×ers.
-        </p>
-        <p className="font-mono text-xl font-bold uppercase tracking-[0.18em] text-text-primary sm:text-2xl">
-          signal <span className="text-gold">AF</span>
-        </p>
       </div>
     </header>
+  );
+}
+
+export function Draft2Intro() {
+  return (
+    <section className="draft2-intro flex flex-col items-center gap-5 text-center" aria-label="About SigRank">
+      {/* body — "We measure…" starts on a new line (owner). text-balance evens the
+          line lengths so there's no one-word orphan line (owner 2026-06-24). */}
+      <div className="flex max-w-2xl flex-col gap-2 text-center">
+        <p className="text-balance font-sans text-lg leading-relaxed text-text-secondary sm:text-xl">
+          SigRank is an AI operator benchmark measuring token cascade
+          efficiency, not AI models. It turns privacy-preserving token
+          telemetry into a repeatable performance evaluation: your{" "}
+          <strong className="text-text-primary">Yield</strong>, workflow
+          signature, benchmark, and progress over time. The leaderboard is
+          the proof rather than the product, which is the{" "}
+          <strong className="text-text-primary">operator-evaluation standard</strong>.
+        </p>
+        <p className="text-balance font-sans text-lg font-medium leading-relaxed text-text-primary sm:text-xl">
+          Fair warning: the blade cuts both ways.
+        </p>
+      </div>
+
+      {/* action tiles — Measure (→ /score) · Board · Compare · Info·Wiki (shared
+          component). Shine-sweep glint on too (owner 2026-06-22). */}
+      <Draft2ActionTiles className="mt-3" shine />
+
+      {/* Direct enroll CTA — the exact command to run, copy-to-clipboard.
+          Surfaces the path to the leaderboard without requiring navigation. */}
+      <EnrollCta className="mt-5" />
+
+      {/* taglines — bigger (owner 2026-06-22: increase size of these last two) */}
+      <p className="font-mono text-lg font-semibold text-text-secondary sm:text-xl">
+        Identifying Burners, Builders, and 10×ers.
+      </p>
+      <p className="font-mono text-xl font-bold uppercase tracking-[0.18em] text-text-primary sm:text-2xl">
+        signal <span className="text-gold">AF</span>
+      </p>
+    </section>
+  );
+}
+
+/** Full stacked hero (masthead + intro) for any caller outside the text stage. */
+export function Draft2Hero() {
+  return (
+    <>
+      <Draft2Masthead />
+      <Draft2Intro />
+    </>
   );
 }

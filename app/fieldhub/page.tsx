@@ -69,15 +69,6 @@ export default async function FieldHubPage() {
           eyebrow="📊 SigRank Research"
           terminalText="FIELD HUB"
           title="Field Hub"
-          subtitle={
-            <>
-              The academic research hub for SigRank: field analysis and dataset
-              findings on AI operator efficiency, volume versus yield, and
-              outlier detection. Each entry is a primary source. Field Analysis
-              presents the full visual study; State of the Index provides the
-              underlying dataset, DOI, citation, and downloadable files.
-            </>
-          }
         />
       }
       rightTitle="FIELD FAMILY"
@@ -104,6 +95,14 @@ export default async function FieldHubPage() {
       status={<>FIELD HUB · {meta.operators_included.toLocaleString()} ANALYZED OPERATORS · SIGNALAF × SIGRANK · MO§ES™</>}
     >
       <div className="ws-doc ws-article-list ws-field-index">
+        {/* lede moved out of the pinned masthead (owner 2026-10-17) */}
+        <p className="ws-hero-lede">
+          The academic research hub for SigRank: field analysis and dataset
+          findings on AI operator efficiency, volume versus yield, and
+          outlier detection. Each entry is a primary source. Field Analysis
+          presents the full visual study; State of the Index provides the
+          underlying dataset, DOI, citation, and downloadable files.
+        </p>
       <JsonLd
         data={[
           collectionPage,

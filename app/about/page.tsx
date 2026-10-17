@@ -110,17 +110,16 @@ export default function AboutPage() {
       <WaveHero
         eyebrow="◈ About SigRank"
         title="The Operator, Not the Model"
-        subtitle={
-          <>
-            SignalAF (not Signal Messenger) is the web platform for SigRank, an
-            AI operator evaluation leaderboard. SigRank ranks the{" "}
-            <span className="text-text-primary">operator</span>, not the model,
-            by who gets the most signal per token (cascade yield, leverage,
-            10×DEV) across every platform on one leaderboard.{" "}
-            <span className="text-gold">Volume alone is noise. Yield is signal.</span>
-          </>
-        }
       />
+      {/* lede moved out of the pinned masthead (owner 2026-10-17) */}
+      <p className="ws-hero-lede">
+        SignalAF (not Signal Messenger) is the web platform for SigRank, an
+        AI operator evaluation leaderboard. SigRank ranks the{" "}
+        <span className="text-text-primary">operator</span>, not the model,
+        by who gets the most signal per token (cascade yield, leverage,
+        10×DEV) across every platform on one leaderboard.{" "}
+        <span className="text-gold">Volume alone is noise. Yield is signal.</span>
+      </p>
 
       <section className="grid gap-4 sm:grid-cols-3">
         {PILLARS.map((c) => (

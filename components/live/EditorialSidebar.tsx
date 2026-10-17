@@ -266,7 +266,11 @@ export function EditorialNav({
             ? [...entries, { label: activeLabel, href: pathname }]
             : entries;
           return (
-            <details key={item.id + pathname} open={selected} className="ws-tree-details ws-topic-branch">
+            /* owner 2026-10-17: landing on a section's index page (/articles,
+               /blog, …) leaves every dropdown closed — the index page is where
+               a reading is picked; the ▸ toggle still opens the list. A reading
+               page opens its own section so the current piece is visible. */
+            <details key={item.id + pathname} open={selected && pathname !== item.href} className="ws-tree-details ws-topic-branch">
               <summary className={"ws-tree-row" + (selected ? " active" : "")}>
                 <Link href={item.href} className="ws-tree-title"
                   aria-current={pathname === item.href ? "page" : undefined}>{item.label}</Link>

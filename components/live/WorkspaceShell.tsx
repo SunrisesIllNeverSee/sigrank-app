@@ -214,6 +214,48 @@ export function WorkspaceShell({
      --lside-w/--rail-w on .lbw-root (clamped 180–480); a sub-4px click
      counts as collapse. */
   const rootRef = useRef<HTMLDivElement | null>(null);
+  /* Text-page masthead compacts once the reader scrolls (owner 2026-10-17):
+     full hero at the top, a slim pinned band (title / animated wordmark only)
+     after ~300px; back to full near the top. The band is sticky and in flow,
+     so the scroll position is corrected by the height it gives up — content
+     doesn't jump — and the wide hysteresis gap keeps it from flapping. */
+  const stageElRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const st = stageElRef.current;
+    if (!editorialStage || !st) return;
+    let compact = false;
+    let raf = 0;
+    const hero = () => st.querySelector<HTMLElement>(".board>.ws-hero, .board header.wave-hero");
+    const apply = (next: boolean) => {
+      const h = hero();
+      if (!h) return;
+      // Keep the content that follows the masthead visually still. Chrome's
+      // scroll anchoring may already compensate; Safari doesn't — so measure
+      // where the following content actually lands and correct only the rest.
+      const anchor = (h.nextElementSibling ?? h.parentElement?.nextElementSibling) as HTMLElement | null;
+      const before = anchor?.getBoundingClientRect().top ?? 0;
+      st.toggleAttribute("data-compact", next);
+      compact = next;
+      if (!next || !anchor) return;
+      requestAnimationFrame(() => {
+        const drift = anchor.getBoundingClientRect().top - before;
+        if (Math.abs(drift) > 1) st.scrollTop += drift;
+      });
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = st.scrollTop;
+        if (!compact && y > 300) apply(true);
+        else if (compact && y < 8) apply(false);
+      });
+    };
+    st.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      st.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [editorialStage]);
   const onDrag = useCallback(
     (side: "l" | "r") => (e: React.PointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -443,7 +485,7 @@ export function WorkspaceShell({
                   </div>
                 ))}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
-              <main className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
+              <main ref={stageElRef} className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
                 <div className="board">
                   {hero && <div className="ws-hero">{hero}</div>}
                   {children}

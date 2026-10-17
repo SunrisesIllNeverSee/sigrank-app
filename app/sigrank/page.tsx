@@ -6,7 +6,7 @@ import { IpBoundary } from "@/components/marketing/IpBoundary";
 import { PricingCards } from "@/components/marketing/PricingCards";
 import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
 import { getAverageUsersColumn } from "@/lib/marketing/top-operator-column";
-import { Draft2Hero } from "@/components/draft/Draft2Hero";
+import { Draft2Masthead, Draft2Intro } from "@/components/draft/Draft2Hero";
 import { Draft2LiveActivity } from "@/components/draft/Draft2LiveActivity";
 import { Draft2CtaBand } from "@/components/draft/Draft2CtaBand";
 import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBadge";
@@ -68,7 +68,7 @@ export default async function HomePage() {
       editorialStage
       title="SIGRANK"
       bareTitle
-      hero={<div className="sigrank-column-hero"><Draft2Hero /></div>}
+      hero={<div className="sigrank-column-hero"><Draft2Masthead /></div>}
       leftTitle="SIGRANK"
       topic="home"
       left={<FieldFamilyNav current="home" />}
@@ -100,6 +100,8 @@ export default async function HomePage() {
       status={<>{operatorCount.toLocaleString()} OPERATORS · {formatTokens(homeStats.total_tokens_scored)} TOKENS · SIGNALAF × SIGRANK · MO§ES™</>}
     >
     <div className="ws-doc ws-doc-wide sigrank-stage-reflow flex flex-col gap-8">
+      {/* the scrolling half of the SigRank hero (masthead is pinned above) */}
+      <Draft2Intro />
       {/* JSON-LD: SoftwareApplication — the sigrank CLI tool (GEO: machine-readable software product).
           Single SoftwareApplication block on homepage — includes canonical @id, isBasedOn,
           about, mentions for entity disambiguation (merged from product()). */}
