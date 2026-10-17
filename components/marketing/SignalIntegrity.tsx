@@ -46,16 +46,16 @@ function ContaminationConstraint() {
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
         Any live observer that <strong>prompts</strong> generates the tokens it
         measures. We learned this directly: a memory observer that auto-prompts
-        (low-input / high-output) inflated a real operator&apos;s output by ~25%
-        — visible openly on the live board as the inflated-vs-clean pair (rows 2
+        (low-input / high-output) inflated a real operator&apos;s output by ~25%,
+        visible openly on the live board as the inflated-vs-clean pair (rows 2
         and 3). So every SigRank instrument that touches a live session is{" "}
         <strong className="text-text-primary">
           read-only against telemetry and emits no prompt
-        </strong>{" "}
-        — no auto-memory, no keep-alive, no self-query. Verified-passive, or it
-        re-contaminates every operator running it. This is a hard requirement,
-        not a caution — and it is the moat: the instrument that doesn&apos;t
-        disturb what it measures.
+        </strong>
+        , with no auto-memory, no keep-alive, and no self-query. It has to be
+        verified-passive, or it re-contaminates every operator running it. This
+        is a hard requirement rather than a caution, and it is the moat: the
+        instrument that doesn&apos;t disturb what it measures.
       </p>
     </section>
   );
@@ -293,7 +293,7 @@ const PROFILE_PIPELINE = [
   {
     step: "01",
     title: "Agent reads your local logs",
-    body: `tokenpull reads local session logs from ${PLATFORM_COUNT}+ platforms — Claude Code, Codex, Amp, Kimi, Gemini CLI, GitHub Copilot CLI, Goose, Kilo, Hermes, and more — and counts the four token pillars across each window. Never prompt content; only the four integers.`,
+    body: `tokenpull reads local session logs from ${PLATFORM_COUNT}+ platforms (Claude Code, Codex, Amp, Kimi, Gemini CLI, GitHub Copilot CLI, Goose, Kilo, Hermes, and more) and counts the four token pillars across each window. Prompt content is never read; only the four integers are counted.`,
   },
   {
     step: "02",
@@ -308,7 +308,7 @@ const PROFILE_PIPELINE = [
   {
     step: "04",
     title: "Your operator profile updates live",
-    body: "The board entry links to your operator profile at signalaf.com/user/[codename]. All cascade metrics — Υ Yield, SNR, Leverage, 10xDEV, class tier, per-window history — render on your profile card. The profile is the public face of your cascade.",
+    body: "The board entry links to your operator profile at signalaf.com/user/[codename]. All cascade metrics (Υ Yield, SNR, Leverage, 10xDEV, class tier, per-window history) render on your profile card. The profile is the public face of your cascade.",
   },
 ];
 
@@ -321,12 +321,12 @@ export function LocalAgentMcp() {
         </h2>
         <P>
           The SigRank local agent is an MCP that reads your token counts
-          straight from local session logs — {PLATFORM_COUNT}+ platforms
+          straight from local session logs ({PLATFORM_COUNT}+ platforms
           supported, including Claude Code, Codex, Amp, Gemini CLI, GitHub
-          Copilot CLI, Goose, Kilo, and more — and keeps your live cascade in
+          Copilot CLI, Goose, Kilo, and more) and keeps your live cascade in
           sync with the board and your operator profile. You never touch a
-          number; the agent is the verifier. It counts tokens; it never reads
-          the content of your prompts or replies.
+          number, because the agent is the verifier: it counts tokens and never
+          reads the content of your prompts or replies.
         </P>
       </div>
 
@@ -337,7 +337,7 @@ export function LocalAgentMcp() {
           {[
             {
               t: "Zero-paste, on-device read",
-              b: `tokenpull reads local session logs from ${PLATFORM_COUNT}+ platforms and counts the four token pillars across 7d / 30d / 90d / all-time — no copy-paste, nothing to assemble by hand.`,
+              b: `tokenpull reads local session logs from ${PLATFORM_COUNT}+ platforms and counts the four token pillars across 7d / 30d / 90d / all-time, with no copy-paste and nothing to assemble by hand.`,
             },
             {
               t: "Publishes in one call",
@@ -345,7 +345,7 @@ export function LocalAgentMcp() {
             },
             {
               t: "Stays strictly passive",
-              b: "Read-only against telemetry, emits no prompt of its own. It measures without disturbing what it measures — only the four counts ever leave your machine.",
+              b: "Read-only against telemetry, it emits no prompt of its own and measures without disturbing what it measures, and only the four counts ever leave your machine.",
             },
           ].map((c) => (
             <div
@@ -368,8 +368,8 @@ export function LocalAgentMcp() {
         <H2>Supported platforms</H2>
         <P>
           tokenpull reads local session logs from {PLATFORM_COUNT}+ AI coding
-          platforms. Each adapter reads that platform&apos;s own log format —
-          you don&apos;t reconfigure anything.
+          platforms. Each adapter reads that platform&apos;s own log format,
+          so you don&apos;t reconfigure anything.
         </P>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {[
@@ -479,9 +479,9 @@ npx sigrank
 }`}
         </pre>
         <p className="font-sans text-[11px] text-text-muted">
-          In a terminal it opens the TUI. Wired into your AI client it starts
-          the MCP stdio server automatically — no extra config. Verified on Node
-          ≥18, macOS + Linux.
+          In a terminal it opens the TUI, and wired into your AI client it
+          starts the MCP stdio server automatically with no extra config.
+          Verified on Node ≥18, macOS + Linux.
         </p>
       </section>
 
@@ -515,7 +515,7 @@ npx sigrank
         <H2>MCP tools — callable by your AI client</H2>
         <P>
           When wired into Claude Code or Cursor, your AI agent can call these
-          tools directly — no paste, no copy-out.
+          tools directly, with no paste and no copy-out.
         </P>
         <div className="grid gap-2 sm:grid-cols-2">
           {MCP_TOOL_LIST.map((t) => (
@@ -531,9 +531,9 @@ npx sigrank
           ))}
         </div>
         <p className="font-sans text-[11px] text-text-dim">
-          Open by design — the cascade math is public; proprietary threshold
-          cuts stay server-side. Canonical anchor: rank_paste reproduces MO§ES Υ
-          18,436.98 exactly.
+          Open by design: the cascade math is public, and proprietary threshold
+          cuts stay server-side. As the canonical anchor, rank_paste reproduces
+          MO§ES Υ 18,436.98 exactly.
         </p>
       </section>
 
@@ -570,11 +570,11 @@ npx sigrank
             <strong className="text-text-primary">
               The profile is not separate from the MCP.
             </strong>{" "}
-            The MCP is the write path. Every cascade metric your profile
-            displays — Υ Yield, SNR, Leverage, 10xDEV, class tier, per-window
-            history — originates from a <Mono>tokenpull_submit</Mono> call (or a
-            manual paste through the calculator). The profile is the read
-            surface; the agent is the write path.
+            Every cascade metric your profile displays (Υ Yield, SNR,
+            Leverage, 10xDEV, class tier, per-window history) originates from
+            a <Mono>tokenpull_submit</Mono> call (or a manual paste through the
+            calculator), so the profile is the read surface and the MCP is the
+            write path.
           </p>
         </div>
       </section>
@@ -590,9 +590,9 @@ npx sigrank
           signature drift
         </Link>
         : the agent is the live reader the drift instrument runs on, and because
-        it never prompts, the drift it reports is the operator&apos;s own — not
-        the observer&apos;s. A live observer that prompted would inflate the
-        very numbers it reports; this one cannot.
+        it never prompts, the drift it reports is the operator&apos;s own, not
+        the observer&apos;s: a live observer that prompted would inflate the
+        very numbers it reports, and this one cannot.
       </P>
 
       <section className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface/40 p-4">
@@ -600,7 +600,7 @@ npx sigrank
           Status
         </span>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          The agent is how board entries become exact and live — vs. the manual
+          The agent is how board entries become exact and live, unlike the manual
           paste calculator, which runs your numbers but does not save to the
           board or update your profile. Account + review still gate the board so
           it stays honest.
@@ -764,8 +764,8 @@ npx sigrank
                 </span>
               </span>
               <span className="font-sans text-xs leading-relaxed text-text-muted">
-                <Mono>npm i -g sigrank</Mono> — the CLI, TUI, and MCP server in
-                one package.
+                <Mono>npm i -g sigrank</Mono> installs the CLI, TUI, and MCP
+                server in one package.
               </span>
             </a>
           </div>
@@ -773,7 +773,7 @@ npx sigrank
       </section>
 
       <p className="font-sans text-[11px] italic text-text-dim">
-        Token counts only — never prompt content. Verified-passive by design.
+        Token counts only, never prompt content, and verified-passive by design.
       </p>
     </div>
   );

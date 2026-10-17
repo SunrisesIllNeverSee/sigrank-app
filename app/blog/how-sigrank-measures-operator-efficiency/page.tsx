@@ -41,7 +41,7 @@ function articleJsonLd() {
     datePublished: "2026-07-07",
     dateModified: "2026-07-07",
     author: personAuthor(),
-    publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    publisher: { "@id": `${SITE_ORIGIN}/#org` }, // shared Organization node (app/layout.tsx)
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "AI operator efficiency measurement and the yield cascade metric",
     keywords: [

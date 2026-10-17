@@ -14,10 +14,16 @@
 import { SITE_ORIGIN, formatTokensLong } from "@/lib/seo";
 import { elloCelloLLC, sigrank as sigrankCanon, dericMcHenry, CANON_PROVENANCE_CONTEXT, CANON_ENTITY_IDS } from "@/lib/canon-entities";
 import { activeProfile } from "@/lib/site-profile";
+import { MCP_VERSION } from "@/lib/constants";
 import type { HallRecord } from "@/lib/board";
 
 const ORG_ID = `${SITE_ORIGIN}/#org`;
 const SITE_ID = `${SITE_ORIGIN}/#website`;
+/** Publisher brand name (owner decision 2026-10); legal entity = canon Ello Cello LLC. */
+const ORG_NAME = "SignalAF";
+/** SigRank Dataset v3.1 publication date (Zenodo) — the real data-revision
+ *  date for pages built on the seed corpus. Never substitute request time. */
+export const SIGRANK_DATASET_PUBLISHED = "2026-08-12";
 
 /** Person — the site author (Deric J. McHenry) for E-E-A-T author attribution.
  *  Used as the `author` on blog posts, comparison articles, and research.
@@ -83,6 +89,98 @@ export function comparisonArticle(opts: {
   };
 }
 
+/** Shared publisher reference — points at the site-wide Organization node
+ *  emitted in app/layout.tsx. Use instead of inline Organization objects. */
+export const PUBLISHER_REF = { "@id": ORG_ID } as const;
+
+/** BlogPosting / Article — editorial posts. Author is the canon Person,
+ *  publisher is a reference to the shared #org node. Dates must come from
+ *  git history / frontmatter — never synthesized at request time. */
+export function articleJsonLd(opts: {
+  path: string;
+  title: string;
+  description: string;
+  datePublished: string;
+  dateModified?: string;
+  image?: string;
+  type?: "BlogPosting" | "Article" | "TechArticle";
+  section?: string;
+  keywords?: string[];
+}) {
+  const url = `${SITE_ORIGIN}${opts.path}`;
+  const image = opts.image
+    ? opts.image.startsWith("http") ? opts.image : `${SITE_ORIGIN}${opts.image}`
+    : `${SITE_ORIGIN}/og-v2.png`;
+  return {
+    "@context": "https://schema.org",
+    "@type": opts.type ?? "BlogPosting",
+    "@id": `${url}#article`,
+    headline: opts.title,
+    description: opts.description,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    image,
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified ?? opts.datePublished,
+    author: personAuthor(),
+    publisher: PUBLISHER_REF,
+    isPartOf: { "@id": SITE_ID },
+    inLanguage: "en",
+    ...(opts.section ? { articleSection: opts.section } : {}),
+    ...(opts.keywords && opts.keywords.length ? { keywords: opts.keywords.join(", ") } : {}),
+  };
+}
+
+/** CollectionPage — index pages (/blog, /articles, /wiki). */
+export function collectionPage(opts: {
+  path: string;
+  name: string;
+  description: string;
+  items?: { name: string; path: string }[];
+}) {
+  const url = `${SITE_ORIGIN}${opts.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": url,
+    name: opts.name,
+    description: opts.description,
+    url,
+    isPartOf: { "@id": SITE_ID },
+    publisher: PUBLISHER_REF,
+    ...(opts.items && opts.items.length
+      ? {
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: opts.items.length,
+            itemListElement: opts.items.map((it, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: it.name,
+              url: `${SITE_ORIGIN}${it.path}`,
+            })),
+          },
+        }
+      : {}),
+  };
+}
+
+/** AboutPage — /about. */
+export function aboutPage(opts: { path: string; name: string; description: string }) {
+  const url = `${SITE_ORIGIN}${opts.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "@id": url,
+    name: opts.name,
+    description: opts.description,
+    url,
+    isPartOf: { "@id": SITE_ID },
+    about: { "@id": ORG_ID },
+    publisher: PUBLISHER_REF,
+  };
+}
+
 /** Organization — site-wide, rendered in app/layout.tsx.
  *
  *  Canon-backed values (name, description, provenance, associatedWith) come
@@ -94,11 +192,19 @@ export function organization() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": ORG_ID,
-    name: elloCelloLLC.name,
-    alternateName: activeProfile.alternateNames,
+    // Owner decision (2026-10): publisher brand is SignalAF; the legal entity
+    // (canon: Ello Cello LLC) is carried as legalName.
+    name: ORG_NAME,
+    legalName: elloCelloLLC.name,
+    alternateName: activeProfile.alternateNames.filter((n) => n !== ORG_NAME),
     url: SITE_ORIGIN,
     description: elloCelloLLC.description,
-    logo: `${SITE_ORIGIN}/og-v2.png`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_ORIGIN}/logo.png`,
+      width: 200,
+      height: 200,
+    },
     sameAs: [
       "https://orcid.org/0009-0002-9904-5390",
       "https://github.com/SunrisesIllneverSee",
@@ -382,6 +488,17 @@ export function definedTerm(term: string, definition: string, path: string) {
     name: term,
     description: definition,
     url: `${SITE_ORIGIN}${path}`,
+    // Dedicated term pages (no #fragment): tie the term to its WebPage and
+    // the site so engines resolve page → term → site.
+    ...(path.includes("#")
+      ? {}
+      : {
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `${SITE_ORIGIN}${path}`,
+            isPartOf: { "@id": SITE_ID },
+          },
+        }),
     inDefinedTermSet: {
       "@type": "DefinedTermSet",
       name: "SigRank SignalAF Wiki",
@@ -439,14 +556,15 @@ export function sigrankDataset(opts?: {
       "https://github.com/SunrisesIllNeverSee/sigrank-mcp",
     ],
     version: "3.1",
-    datePublished: "2026-08-12",
+    datePublished: SIGRANK_DATASET_PUBLISHED,
     isAccessibleForFree: true,
     license: "https://creativecommons.org/licenses/by/4.0/",
     creator: personAuthor(),
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: elloCelloLLC.name,
+      name: ORG_NAME,
+      legalName: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     citation: [
@@ -624,6 +742,7 @@ export function researchArticle(opts: {
   title: string;
   description: string;
   datePublished: string;
+  dateModified?: string;
   headlineFindings: string[];
   doi?: string;
 }) {
@@ -638,6 +757,7 @@ export function researchArticle(opts: {
     description: opts.description,
     url,
     datePublished: opts.datePublished,
+    ...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
     author: personAuthor(),
     publisher: { "@id": ORG_ID },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -725,7 +845,8 @@ export function mosesPatent() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: elloCelloLLC.name,
+      name: ORG_NAME,
+      legalName: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     about: "AI governance enforcement architecture",
@@ -763,7 +884,8 @@ export function experimentalRecordDataset() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: elloCelloLLC.name,
+      name: ORG_NAME,
+      legalName: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -843,7 +965,8 @@ export function transformationHarnessDataset() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: elloCelloLLC.name,
+      name: ORG_NAME,
+      legalName: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -902,7 +1025,8 @@ export function propositionsDataset() {
     publisher: {
       "@type": "Organization",
       "@id": ORG_ID,
-      name: elloCelloLLC.name,
+      name: ORG_NAME,
+      legalName: elloCelloLLC.name,
       url: SITE_ORIGIN,
     },
     license: "https://creativecommons.org/licenses/by/4.0/",
@@ -923,7 +1047,8 @@ export function propositionsDataset() {
       publisher: {
         "@type": "Organization",
         "@id": ORG_ID,
-        name: elloCelloLLC.name,
+        name: ORG_NAME,
+        legalName: elloCelloLLC.name,
         url: SITE_ORIGIN,
       },
     },
@@ -993,7 +1118,7 @@ export function cliTool() {
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Cross-platform",
     runtimePlatform: "Node.js >= 18",
-    softwareVersion: "0.16.0",
+    softwareVersion: MCP_VERSION,
     offers: {
       "@type": "Offer",
       price: "0",

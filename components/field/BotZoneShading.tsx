@@ -54,8 +54,8 @@ export default function BotZoneShading() {
         </div>
       </div>
       <p className="text-xs text-text-muted">
-        Outliers are not deleted. They get their own category and
-        rank against each other. They just do not set the numbers for the
+        Outliers are not deleted; they get their own category and
+        rank against each other, but they do not set the numbers for the
         Operator Center of Mass.
       </p>
     </div>

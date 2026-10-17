@@ -69,7 +69,13 @@
   --font-disp:var(--font-lbw-orb,"Orbitron"),var(--font-lbw-sg,"Space Grotesk"),sans-serif;
 }
 
-.lbw-root,.lbw-root *{box-sizing:border-box;margin:0;padding:0}
+.lbw-root,.lbw-root *{box-sizing:border-box}
+/* margin/padding reset — NOT inside text-page content. This rule loads after
+   Tailwind at higher specificity, so inside .ws-editorial-stage it cancelled
+   every Tailwind p-, px- and m- utility the marketing/wiki/blog components are built with
+   (bordered boxes rendered with text jammed against the border). Tailwind's own
+   preflight already resets margins there. (2026-10-16) */
+.lbw-root,.lbw-root *:not(:where(.ws-editorial-stage .board *)){margin:0;padding:0}
 /* prototype: html{background:var(--bg)} + body{...} + body.ws{...} — all
    three collapse onto the scoped root element. */
 .lbw-root{
@@ -1358,7 +1364,7 @@
 .lbw-root .blog-row:hover{background:linear-gradient(90deg,color-mix(in srgb,var(--ac) 4%,transparent),transparent)}
 .lbw-root .blog-row-main h2{font-family:var(--font-disp);font-size:17px;line-height:1.2;
   color:var(--tx);margin:0 0 5px}
-.lbw-root .blog-row-main p{font-size:11.5px;line-height:1.55;color:var(--mut);margin:0}
+.lbw-root .blog-row-main p{font-size:13px;line-height:1.55;color:var(--mut);margin:0;max-width:72ch}
 .lbw-root .blog-row-meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;
   font-family:var(--font-mono);font-size:9px;color:var(--mut);text-align:right}
 .lbw-root .blog-row-meta .arrow{font-size:13px;color:var(--line2);transition:color .15s ease,transform .15s ease}
@@ -1388,7 +1394,11 @@
 .lbw-root .ws-bnav{margin-bottom:8px}
 .lbw-root .ws-bnav header{border-radius:0}
 .lbw-root .ws-bnav p{display:none}
-.lbw-root .ws-hero header{border:none;border-radius:0;background:transparent}
+/* 2026-10-16: this used to say border:none, but .border-bg-border:not(.border-dashed)
+   re-applied border-style:solid at higher specificity, so the header fell back to
+   a 3px "medium" border in currentColor (the bright-white box on index pages).
+   Match the article hero instead: thin line, rounded. */
+.lbw-root .ws-hero header{border:1px solid var(--line2)!important;border-radius:12px;background:transparent}
 .lbw-root .ws-card > header{border:none;border-radius:0;background:transparent}
 
 /* ---------- leaderboard design handoff (approved items only) ---------- */
@@ -1552,6 +1562,26 @@
   max-width:100%;
 }
 .lbw-root .ws-editorial-stage .ws-doc section[id]{scroll-margin-top:22px}
+/* Reading measure (2026-10-16): text-page paragraphs ran a median 80-91
+   characters per line, up to 113 on the wiki. Cap running prose at ~72ch
+   (ch = one Geist Mono glyph, so ~72 characters). Centered intros, banners
+   and table cells keep their own widths. */
+.lbw-root .ws-editorial-stage .board :is(p,li):not(.text-center, .text-center *, header *, .ws-hero *, td *, th *){max-width:72ch}
+/* Reading text (owner 2026-10-16): running paragraphs, lists and quotes on
+   text pages use the workspace sans (Space Grotesk, already loaded as
+   --font-ui) at 17px; mono stays for headings, numbers, tables, code,
+   commands and banners. Selector beats the terminal theme's
+   :where(p, li, ...) mono rule. */
+.lbw-root .ws-editorial-stage .board :is(p,li,blockquote):not(header *, .ws-hero *, td *, th *, pre *){
+  font-family:var(--font-ui);line-height:1.7;letter-spacing:0}
+/* only body-size text grows to 17px; captions, sources and footnotes sized
+   with text-xs / text-sm / text-[Npx], and the list-row blurbs, keep theirs */
+.lbw-root .ws-editorial-stage .board :is(p,li,blockquote):not(header *, .ws-hero *, td *, th *, pre *, .blog-row *, [class*="text-xs"], [class*="text-xs"] *, [class*="text-sm"], [class*="text-sm"] *, [class*="text-["], [class*="text-["] *){
+  font-size:17px}
+/* components that set body copy with text-sm (14px) step up to 16px */
+.lbw-root .ws-editorial-stage .board :is(p,li):is([class*="text-sm"], [class*="text-sm"] *):not(header *, .ws-hero *, td *, th *, pre *, [class*="text-xs"], [class*="text-xs"] *, [class*="text-["] *){
+  font-size:16px}
+.lbw-root .ws-editorial-stage .board :is(p,li) :is(code,kbd,samp){font-family:var(--font-mono);font-size:.86em}
 @media (max-width:780px){
  .lbw-root .stage.ws-editorial-stage{padding-inline:18px}
  .lbw-root .ws-editorial-stage>.board{padding-top:16px}

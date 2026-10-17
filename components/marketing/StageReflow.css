@@ -10,7 +10,9 @@
 .four-degrees-responsive table td { font-size:clamp(12px,1.2vw,17px); }
 .four-degrees-compact,
 .four-degrees-telemetry-cards { display:none; }
-@container (max-width:720px) {
+/* 660 (was 720): text-page padding now applies, so the chart box inside the
+   SigRank card measures ~693px at 1440 — still roomy for the table. */
+@container (max-width:660px) {
   .four-degrees-desktop, .four-degrees-telemetry-wide { display:none; }
   .four-degrees-compact, .four-degrees-telemetry-cards {
     display:grid; grid-template-columns:minmax(0,1fr); gap:12px; width:100%;

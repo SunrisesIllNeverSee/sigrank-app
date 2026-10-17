@@ -13,7 +13,7 @@
 import type { Metadata } from "next";
 import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, fitTitle } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -23,11 +23,11 @@ import {
   experimentalRecordDataset,
   transformationHarnessDataset,
   propositionsDataset,
-  faqPage,
 } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Science — The Conservation Law of Commitment",
+  titleAbsolute: fitTitle("Science — The Conservation Law of Commitment"),
   description:
     "The academic foundation of SigRank: the Conservation Law of Commitment, the Commitment Theory program, the MO\u00A7ES\u2122 architecture, and Zenodo deposits.",
   path: "/science",
@@ -45,23 +45,6 @@ export default function SciencePage() {
           transformationHarnessDataset(),
           propositionsDataset(),
           breadcrumb([{ name: "Science", path: "/science" }]),
-          faqPage([
-            {
-              question: "What is the Conservation Law of Commitment?",
-              answer:
-                "The Conservation Law of Commitment is a published conservation law for language that grounds SigRank's theoretical foundation. It establishes that token commitment (input, output, cache creation, cache read) is conserved across transformations, providing the mathematical basis for cascade efficiency metrics like Yield.",
-            },
-            {
-              question: "What is the MOSES enforcement architecture?",
-              answer:
-                "MOSES is the enforcement architecture that ensures SigRank's measurements remain integrity-verified. It combines signed, server-verifiable snapshots with telescoping identity locks to prevent metric inflation and gaming. The architecture is documented with Zenodo deposits as an empirical record.",
-            },
-            {
-              question: "Is SigRank backed by academic research?",
-              answer:
-                "Yes. SigRank is built on the Conservation Law of Commitment, the Commitment Theory research program, and the MOSES enforcement architecture. The theoretical foundation and empirical records are deposited on Zenodo with DOIs, making SigRank a data source grounded in published science rather than proprietary heuristics.",
-            },
-          ]),
         ]}
       />
 

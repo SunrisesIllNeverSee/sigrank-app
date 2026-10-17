@@ -12,19 +12,25 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
-import { SITE_ORIGIN } from "@/lib/seo";
+import { withOG, fitTitle, AUTHOR_NAME, SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { articleJsonLd, breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Benchmarking AI Coding Workflows — Analysis",
+  titleAbsolute: fitTitle("Benchmarking AI Coding Workflows — Analysis"),
   description:
     "A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples.",
   path: "/blog/how-to-benchmark-ai-coding-workflow",
+  article: {
+    publishedTime: "2026-07-07",
+    modifiedTime: "2026-07-07",
+    authors: [AUTHOR_NAME],
+    section: "Blog",
+  },
 });
 
 /** Inline HowTo JSON-LD (follows the scoreHowTo() pattern). */
@@ -121,6 +127,15 @@ export default function HowToBenchmarkAiCodingWorkflowPage() {
       <CitationMeta title={"Benchmarking AI Coding Workflows — Analysis"} description={"A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples."} date={"2026-07-07"} slug={"/blog/how-to-benchmark-ai-coding-workflow"} />
       <JsonLd
         data={[
+          articleJsonLd({
+            path: "/blog/how-to-benchmark-ai-coding-workflow",
+            title: "Benchmarking AI Coding Workflows — Analysis",
+            description:
+              "A guide to benchmarking your AI coding workflow. Set a baseline, fix weak pillars, re-measure, and compare on the leaderboard. With real examples.",
+            datePublished: "2026-07-07",
+            dateModified: "2026-07-07",
+            section: "Blog",
+          }),
           howToJsonLd(),
           breadcrumb([
             { name: "Blog", path: "/blog" },
@@ -158,7 +173,7 @@ export default function HowToBenchmarkAiCodingWorkflowPage() {
       <section className="flex flex-col gap-4">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           You&apos;ve been coding with AI for months. Your sessions feel
-          productive — the agent generates code, you review it, you ship. But
+          productive: the agent generates code, you review it, and you ship. But
           &ldquo;feels productive&rdquo; is not a metric. The question every
           AI-assisted developer eventually faces is simple and uncomfortable:{" "}
           <strong className="text-text-primary">
@@ -168,7 +183,7 @@ export default function HowToBenchmarkAiCodingWorkflowPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           This guide walks through a complete, repeatable workflow for
-          benchmarking your AI coding performance. Seven steps. One week per
+          benchmarking your AI coding performance in seven steps, with one week per
           cycle. By the end you&apos;ll have a number — your{" "}
           <Link href="/wiki" className="text-gold underline underline-offset-2">
             yield (Υ)
@@ -254,8 +269,8 @@ sigrank enroll`}</code>
           <strong className="text-text-primary">
             Code normally for one full week.
           </strong>{" "}
-          Do not optimize. Do not change your habits. Do not try to impress the
-          tool. The goal is an honest picture of where you are right now.
+          Do not optimize, change your habits, or try to impress the tool; the
+          goal is an honest picture of where you are right now.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           At the end of the week, record your cascade:
@@ -344,9 +359,9 @@ sigrank enroll`}</code>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">Real example:</strong>{" "}
           Seeker-7&apos;s weakest pillar was cache hit rate (53%). Their input
-          was high, but the root cause was the same — they were starting new
-          sessions for every sub-task and re-pasting the same context each time.
-          One problem, one fix.
+          was high, but the root cause was the same: they were starting new
+          sessions for every sub-task and re-pasting the same context each time,
+          so there was one problem and one fix.
         </p>
       </section>
 
@@ -370,14 +385,14 @@ sigrank enroll`}</code>
             stop starting fresh sessions for each sub-task; work within one long
             session per feature so the cache builds.
           </em>{" "}
-          That&apos;s it. No prompt-tightening, no output-boosting, no other
-          changes. One variable.
+          That was the only change, with no prompt-tightening, no output-boosting,
+          and nothing else: one variable.
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Anti-pattern:</strong>{" "}
             &ldquo;I&apos;ll try being more efficient this week.&rdquo; That is
-            not a fix — it is a vibe. A fix is a specific, observable change to
+            not a fix but a vibe. A fix is a specific, observable change to
             one behavior: &ldquo;I will work in one session per feature instead
             of three.&rdquo; If you can&apos;t describe the change in one
             sentence, it&apos;s not a fix yet.
@@ -401,32 +416,32 @@ sigrank enroll`}</code>
           <pre className="overflow-x-auto font-mono text-sm text-gold">
             <code>{`# Seeker-7, Week 2 (after session-structuring fix)
 # ┌──────────────────────────────────────┐
-# │  Input:          980,000 tokens  ↓21% │
-# │  Output:         340,000 tokens   ↑9% │
-# │  Cache-read:   1,120,000 tokens  ↑26% │
-# │  Cache-write:    240,000 tokens  ↑14% │
+# │  Input:         980,000 tokens  ↓21% │
+# │  Output:        340,000 tokens   ↑9% │
+# │  Cache-read:  1,120,000 tokens  ↑26% │
+# │  Cache-write:   240,000 tokens  ↑14% │
 # │                                      │
-# │  Yield (Υ):          39,801   ↑180%   │
-# │  Cache hit rate:        82.4%  ↑29pp  │
-# │  Leverage:              1.14   ↑58%   │
+# │  Yield (Υ):          39,801   ↑180%  │
+# │  Cache hit rate:        82.4%  ↑29pp │
+# │  Leverage:              1.14   ↑58%  │
 # │  Class tier:          ARCH+          │
 # └──────────────────────────────────────┘`}</code>
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          One fix. One week. Yield up 180%, cache hit rate from 53% to 82%,
-          class tier jumped from BASE to ARCH+. The numbers confirm the
+          One fix in one week took yield up 180%, cache hit rate from 53% to 82%,
+          and class tier from BASE to ARCH+. The numbers confirm the
           hypothesis: the problem was session fragmentation, and consolidating
           sessions fixed it. If the yield had stayed flat or dropped, the fix
-          was wrong — revert and try the next-weakest pillar.
+          was wrong, so revert and try the next-weakest pillar.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">
             Don&apos;t re-measure after a single session.
           </strong>{" "}
           One good day doesn&apos;t prove a fix worked; one bad day doesn&apos;t
-          prove it failed. The weekly cadence averages out session-level noise.
-          Patience is part of the method.
+          prove it failed. The weekly cadence averages out session-level noise,
+          and patience is part of the method.
         </p>
       </section>
 
@@ -458,8 +473,7 @@ sigrank board --window 30d`}</code>
           The leaderboard shows your{" "}
           <strong className="text-text-primary">class tier</strong> (IGNITER →
           BEARER → REFINER → SEEKER → BASE → POWER → ARCH → ARCH+), your global
-          rank, and —
-          critically — the{" "}
+          rank, and, critically, the{" "}
           <strong className="text-text-primary">
             pillar ratios of the top decile
           </strong>
@@ -470,7 +484,7 @@ sigrank board --window 30d`}</code>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">Real example:</strong> Seeker-7
           hit ARCH+ after one cycle but ranked #847 globally. The top
-          decile&apos;s leverage was 1.8 — theirs was 1.14. Next cycle&apos;s
+          decile&apos;s leverage was 1.8 and theirs was 1.14. Next cycle&apos;s
           fix: increase cache depth by referencing larger shared context blocks
           early in each session, so the cache-read base grows faster than input.
         </p>
@@ -487,7 +501,7 @@ sigrank board --window 30d`}</code>
           cycle: identify the weakest pillar, apply one fix, re-measure,
           compare. Over weeks, your yield climbs and your class tier rises. The
           developers at the top of the leaderboard didn&apos;t get there in one
-          sprint — they got there by running this loop dozens of times, each
+          sprint; they got there by running this loop dozens of times, each
           cycle tightening their cascade by a few percent.
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
@@ -520,9 +534,9 @@ sigrank board --window 30d`}</code>
           </ol>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The developers who treat AI coding as a measurable skill — not a vibe
-          — are the ones who climb. The loop is simple. The discipline is hard.
-          Run it for a month and you&apos;ll know your cascade better than
+          The developers who treat AI coding as a measurable skill, not a vibe,
+          are the ones who climb. The loop is simple but the discipline is hard,
+          and if you run it for a month you&apos;ll know your cascade better than
           anyone who&apos;s been &ldquo;just coding&rdquo; for a year.
         </p>
       </section>

@@ -2,18 +2,20 @@
 type: article
 title: "SigRank Interactive Dashboards"
 description: "Interactive analytics dashboards for the SigRank two-axis operator taxonomy — 10 build archetypes, 24-stage experience ladder, cross-metric scatterplots, operator scatterplots, platform board, and model board. 1,628 operators, 17 platforms, 3,304 models."
+seo_description: "Interactive SigRank dashboards: 10 build archetypes, a 24-stage experience ladder, metric and operator scatterplots, and platform and model boards."
 tags: [article, sigrank, dashboards, analytics, archetypes, tier-ladder, scatter, platform-board, model-board, interactive]
 timestamp: 2026-08-11T14:00:00Z
+modified: 2026-08-11
 author: Deric J. McHenry
 ---
 
-> [1] The full analytical surface of the SigRank two-axis operator taxonomy, rendered as interactive Chart.js dashboards. All data is embedded — no server calls, no API dependencies. Each dashboard is self-contained and can be viewed independently.
+> [1] The full analytical surface of the SigRank two-axis operator taxonomy, rendered as interactive Chart.js dashboards. All data is embedded, with no server calls and no API dependencies, so each dashboard is self-contained and can be viewed independently.
 
 ---
 
 ## Build Archetype Analytics
 
-[2] 9-chart breakdown of the 10 build archetypes: distribution pie, yield bars, leverage bars, velocity bars, 4-pillar token composition, total tokens, tokens/day, SNR, and top platform per archetype. HCM cohort (1,586 operators).
+[2] This dashboard offers a 9-chart breakdown of the 10 build archetypes for the HCM cohort (1,586 operators): distribution pie, yield bars, leverage bars, velocity bars, 4-pillar token composition, total tokens, tokens/day, SNR, and top platform per archetype.
 
 **[Open Archetype Analytics →](/dashboards/archetype-analytics.html)**
 
@@ -21,7 +23,7 @@ author: Deric J. McHenry
 
 ## Experience Ladder Analytics
 
-[3] 6-chart experience-ladder distribution: tier pie, stage bars, token floor bars, token ceiling bars, stacked column by tier, tier population bars. 24 stages across 8 tiers, 1,627 operators.
+[3] This dashboard shows a 6-chart experience-ladder distribution across 24 stages in 8 tiers and 1,627 operators: tier pie, stage bars, token floor bars, token ceiling bars, stacked column by tier, and tier population bars.
 
 **[Open Tier-Ladder Analytics →](/dashboards/tier-ladder-analytics.html)**
 
@@ -29,7 +31,7 @@ author: Deric J. McHenry
 
 ## Cross-Metric Analytics
 
-[4] 10-chart cross-metric analysis: leverage vs yield scatter, archetype radar, yield bars + velocity line, construction vs leverage scatter, stacked composition + SNR overlay, metric heatmap (z-scores), tokens/day vs yield, family radar (4 workflow families), population vs yield sorted.
+[4] This dashboard runs a 10-chart cross-metric analysis: leverage vs yield scatter, archetype radar, yield bars + velocity line, construction vs leverage scatter, stacked composition + SNR overlay, metric heatmap (z-scores), tokens/day vs yield, family radar (4 workflow families), population vs yield sorted.
 
 **[Open Cross-Metric Analytics →](/dashboards/cross-metric-analytics.html)**
 
@@ -37,7 +39,7 @@ author: Deric J. McHenry
 
 ## Operator Scatterplots
 
-[5] 9 scatterplots covering 1,598 operators across metric pairs: yield vs leverage, yield vs total tokens, velocity vs leverage, SNR vs leverage, input share vs yield, cache read % vs cache write %, tokens/day vs yield, active days vs yield, velocity vs SNR.
+[5] This dashboard has 9 scatterplots covering 1,598 operators across metric pairs: yield vs leverage, yield vs total tokens, velocity vs leverage, SNR vs leverage, input share vs yield, cache read % vs cache write %, tokens/day vs yield, active days vs yield, velocity vs SNR.
 
 **[Open Operator Scatterplots →](/dashboards/operator-scatter.html)**
 
@@ -45,7 +47,7 @@ author: Deric J. McHenry
 
 ## Platform Board
 
-[6] 17 platforms ranked by token volume. Three tables: raw token/cost stats, operator aggregate medians, and derived metrics (yield, SNR, leverage, velocity, compression, tokens/day).
+[6] This board ranks 17 platforms by token volume in three tables: raw token/cost stats, operator aggregate medians, and derived metrics (yield, SNR, leverage, velocity, compression, tokens/day).
 
 **[Open Platform Board →](/dashboards/platform-board.html)**
 
@@ -53,7 +55,7 @@ author: Deric J. McHenry
 
 ## Model Board
 
-[7] 3,304 models ranked by adoption and token volume (top 100 shown). Two tables: by total token volume and by operator adoption count.
+[7] This board ranks 3,304 models by adoption and token volume (top 100 shown) in two tables: by total token volume and by operator adoption count.
 
 **[Open Model Board →](/dashboards/model-board.html)**
 

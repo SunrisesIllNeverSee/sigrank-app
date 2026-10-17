@@ -73,8 +73,8 @@ export function PricingCards() {
         Free for ranking. Back the build for what&apos;s next.
       </h2>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
-        The leaderboard is free and stays free — your cascade metrics, your
-        class, your rank, no paywall. If you find SigRank useful, consider a
+        The leaderboard is free and stays free, with your cascade metrics,
+        class, and rank behind no paywall. If you find SigRank useful, consider a
         one-time contribution to support the build.
       </p>
 

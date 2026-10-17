@@ -63,13 +63,14 @@ export function HowItWorks() {
           ⊙ How it works
         </div>
         <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-          Three commands. That&apos;s it.
+          Three commands is all it takes.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
           The SigRank agent reads your local AI session logs on-device, derives
-          your token cascade, and publishes to the board. No paste, no prompts
-          read — only the four token counts leave your machine. ccusage,
-          tokscale, and tokendash are bundled — no separate installs.
+          your token cascade, and publishes to the board. You paste nothing and
+          no prompts are read: only the four token counts leave your machine.
+          ccusage, tokscale, and tokendash come bundled, so there are no
+          separate installs.
         </p>
       </div>
 
@@ -89,7 +90,7 @@ export function HowItWorks() {
           title="Sign in"
           command="sigrank enroll"
           note={
-            'Paste a connect code from signalaf.com → Settings → "New key". Binds your device to your operator identity.'
+            'Paste a connect code from signalaf.com → Settings → "New key" to bind your device to your operator identity.'
           }
         >
           <TuiBoardMockup />
@@ -99,7 +100,7 @@ export function HowItWorks() {
           kicker="Step 3"
           title="Submit to the board"
           command="sigrank submit"
-          note="Signs + publishes your cascade. Your rank updates live on signalaf.com."
+          note="Signs and publishes your cascade, and your rank updates live on signalaf.com."
         >
           <TuiBoardMockup highlightYou />
         </CommandCard>
@@ -111,7 +112,7 @@ export function HowItWorks() {
           Or let your AI agent do it
         </div>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-          Don&apos;t want to leave your agent? Just tell it to run{" "}
+          If you don&apos;t want to leave your agent, just tell it to run{" "}
           <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">
             npx sigrank
           </code>{" "}
@@ -123,9 +124,9 @@ export function HowItWorks() {
           <code className="rounded bg-bg-base px-1.5 py-0.5 font-mono text-[12px] text-text-accent">
             npx sigrank enroll
           </code>
-          ). It reads your logs, derives the cascade, and submits — you
-          don&apos;t paste anything. For direct tool calls, wire it as an MCP
-          server — see the{" "}
+          ). It reads your logs, derives the cascade, and submits without you
+          pasting anything. For direct tool calls, wire it as an MCP server, as
+          described on the{" "}
           <Link
             href="/wiki/local-agent"
             className="text-text-accent underline-offset-2 hover:underline"

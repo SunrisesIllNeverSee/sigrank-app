@@ -12,11 +12,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { withOG } from "@/lib/seo";
+import { withOG, AUTHOR_NAME } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis, getArchetypes } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
+import { FaqSection } from "@/components/seo/FaqSection";
 import { breadcrumb, personAuthor, faqPage } from "@/lib/jsonld";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import FieldStatCards from "@/components/field/FieldStatCards";
@@ -33,11 +34,38 @@ export const metadata: Metadata = withOG({
   title:
     "AI Operator Field Analysis",
   description:
-    "Real data from 1,498 AI operators proves volume ≠ yield. Median yield 1.68, SNR .084, leverage 18.6×. Outliers separated, ghost ranks exposed, platform dominance analyzed.",
+    "Field analysis of 1,498 AI operators showing volume is not Yield: median Yield 1.68, SNR .084, leverage 18.6×, with outliers and ghost ranks separated.",
   path: "/field",
+  // Dates from git history: page first published 2026-07-14; field dataset
+  // (public/data/field-analysis.json) last revised 2026-09-04.
+  article: {
+    publishedTime: "2026-07-14",
+    modifiedTime: "2026-09-04",
+    authors: [AUTHOR_NAME],
+    section: "Research",
+  },
 });
 
 export const revalidate = 3600;
+
+/** Single source for the FAQPage JSON-LD and the visible FAQ section. */
+const FIELD_FAQS = [
+  {
+    question: "Does volume correlate with yield in AI usage?",
+    answer:
+      "No. Real data from 1,498 AI operators proves volume does not equal yield. The median yield is 1.68, meaning most operators compound signal poorly despite high token usage. The top operators achieve leverage of 18.6× through cache reuse, not by spending more tokens. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached volume.",
+  },
+  {
+    question: "How many AI operators are in the field analysis?",
+    answer:
+      "The historical field analysis covers 1,498 operator records in its Center of Mass from a 1,628-record seed dataset. Another 130 records were separated as statistical outliers. That screen describes unusual token-flow shapes, not whether a workflow was human-led or agentic. The live leaderboard at signalaf.com/board/all includes enrolled operators beyond this seed corpus.",
+  },
+  {
+    question: "What is the median Yield of AI operators?",
+    answer:
+      "The median Yield (Υ) across 1,498 AI operators is 1.68. This means half of all operators score below 1.68 — most AI users compound signal poorly. The top operator achieves a Yield of 18,436.98, demonstrating that the difference between median and elite is not incremental but structural — cache reuse, not volume.",
+  },
+];
 
 export default async function FieldPage() {
   // PERF (2026-07-31): parallelize the two data loads.
@@ -88,23 +116,7 @@ export default async function FieldPage() {
         data={[
           fieldDataset,
           breadcrumb([{ name: "Field Analysis", path: "/field" }]),
-          faqPage([
-            {
-              question: "Does volume correlate with yield in AI usage?",
-              answer:
-                "No. Real data from 1,498 AI operators proves volume does not equal yield. The median yield is 1.68, meaning most operators compound signal poorly despite high token usage. The top operators achieve leverage of 18.6× through cache reuse, not by spending more tokens. SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached volume.",
-            },
-            {
-              question: "How many AI operators are in the field analysis?",
-              answer:
-                "The historical field analysis covers 1,498 operator records in its Center of Mass from a 1,628-record seed dataset. Another 130 records were separated as statistical outliers. That screen describes unusual token-flow shapes, not whether a workflow was human-led or agentic. The live leaderboard at signalaf.com/board/all includes enrolled operators beyond this seed corpus.",
-            },
-            {
-              question: "What is the median Yield of AI operators?",
-              answer:
-                "The median Yield (Υ) across 1,498 AI operators is 1.68. This means half of all operators score below 1.68 — most AI users compound signal poorly. The top operator achieves a Yield of 18,436.98, demonstrating that the difference between median and elite is not incremental but structural — cache reuse, not volume.",
-            },
-          ]),
+          faqPage(FIELD_FAQS),
         ]}
       />
 
@@ -185,9 +197,10 @@ export default async function FieldPage() {
       >
         <div className="ws-doc">
           <p className="text-sm leading-relaxed text-text-secondary">
-            The true distribution of token efficiency.{" "}
-            {meta.operators_included.toLocaleString()} AI operators,
-            outliers separated. Volume ranked. Yield revealed.
+            The true distribution of token efficiency across{" "}
+            {meta.operators_included.toLocaleString()} AI operators, with
+            outliers separated, comparing how the field ranks by volume with
+            what its Yield reveals.
           </p>
 
       {/* ── Stat cards ───────────────────────────────────────────────── */}
@@ -244,15 +257,15 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           Public token-volume leaderboards rank by total token volume. SigRank ranks by yield — how
           efficiently an operator converts input tokens into output tokens using cache compounding.
-          These two rankings have almost zero correlation. The operator with the most tokens (9
-          quadrillion) has a yield of 0. The operator with the highest yield (2.46M) ranks #697
-          by volume. Volume alone is noise. Yield is signal.
+          These two rankings have almost zero correlation: the operator with the most tokens (9
+          quadrillion) has a yield of 0, while the operator with the highest yield (2.46M) ranks
+          #697 by volume. Volume alone is noise. Yield is signal.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The scatter plot above makes this visible. The median lines divide the field into four
-          quadrants — and the top-right (high volume, high yield) is nearly empty. The highest-yield
-          operators cluster in the bottom-right: modest token spend, extraordinary efficiency. This
-          is the ghost-rank phenomenon, explored below.
+          quadrants, and the top-right (high volume, high yield) is nearly empty. The highest-yield
+          operators cluster in the bottom-right, pairing modest token spend with extraordinary
+          efficiency, which is the ghost-rank phenomenon explored below.
         </p>
       </section>
 
@@ -263,12 +276,12 @@ export default async function FieldPage() {
         </h2>
         <CascadeSankey />
         <p className="text-sm leading-relaxed text-text-secondary">
-          The median operator puts in 238M tokens of fresh input. They produce
-          24M tokens of output. They write 72M tokens to cache. And they read
-          4.77B tokens from cache. That last number is the harvest: 20.5x the
-          seed. This is leverage. The cascade is not a chain of
-          amplifications. It is a seed (input), a tiny sprout (output), a
-          small store (cache write), and a massive harvest (cache read).
+          The median operator puts in 238M tokens of fresh input, produces
+          24M tokens of output, writes 72M tokens to cache, and reads 4.77B
+          tokens from cache. That last number is the harvest, 20.5x the seed,
+          and it is what leverage means. The cascade is not a chain of
+          amplifications but a seed (input), a tiny sprout (output), a small
+          store (cache write), and a massive harvest (cache read).
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The operating ratio compresses this into one fingerprint:{" "}
@@ -297,14 +310,15 @@ export default async function FieldPage() {
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
           Signal-to-Noise Ratio (SNR) = output / (input + output). It measures what fraction of your
-          interaction produced actual output versus prompt overhead. Outliers have SNR near zero.
-          Humans have SNR above .05. One number separates signal producers from token burners.
+          interaction produced actual output versus prompt overhead. Outliers have SNR near zero
+          while humans have SNR above .05, so this one number separates signal producers from
+          token burners.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
           The histogram shows the field clustering tightly around the median SNR of{" "}
           {meta.medians.snr.toFixed(3)}. The IQR fences (dashed lines) bracket the middle
-          50% of operators. The long tail to the right — operators with SNR above .10 — are the
-          ghost-rank operators: they produce disproportionate output from minimal input.
+          50% of operators. The long tail to the right, made up of operators with SNR above .10,
+          holds the ghost-rank operators, who produce disproportionate output from minimal input.
         </p>
       </section>
 
@@ -327,14 +341,14 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           Leverage (cache_read / input) measures how much cached context amplifies each fresh input
           token. Velocity (output / input) measures how much the model generates per token of fresh
-          context. Together, they define the yield rectangle — the area of leverage × velocity
+          context. Together they define the yield rectangle, whose area (leverage × velocity)
           approximates how efficiently an operator turns cached knowledge into produced signal.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The median crosshair divides the field. Operators in the top-right quadrant — high
-          leverage and high velocity — are the architectural elite. They read deeply from cache and
+          The median crosshair divides the field. Operators in the top-right quadrant, with high
+          leverage and high velocity, are the architectural elite: they read deeply from cache and
           produce rapidly. The bottom-left cluster (low leverage, low velocity) represents the
-          volume-burning majority: fresh input, minimal caching, slow output.
+          volume-burning majority, running on fresh input with minimal caching and slow output.
         </p>
       </section>
 
@@ -358,14 +372,14 @@ export default async function FieldPage() {
         />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
-          Anthropic-primary operators dominate the top yield quartile — 98.5% of the highest-yield
-          operators use Claude as their primary platform. This isn&apos;t coincidence: Anthropic&apos;s
-          mature prompt caching infrastructure produces higher cacheRead values, which directly
-          drives yield.
+          Anthropic-primary operators dominate the top yield quartile, where 98.5% of the
+          highest-yield operators use Claude as their primary platform. That isn&apos;t coincidence,
+          because Anthropic&apos;s mature prompt caching infrastructure produces higher cacheRead
+          values, which directly drives yield.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The adoption chart shows raw volume — OpenAI and Anthropic lead in total operator count.
-          But the quartile breakdown reveals the efficiency story: OpenAI dominates the bottom
+          The adoption chart shows raw volume, where OpenAI and Anthropic lead in total operator
+          count, but the quartile breakdown reveals the efficiency story: OpenAI dominates the bottom
           quartiles (high volume, low yield), while Anthropic owns the top. The platform you choose
           shapes the ceiling of your yield architecture.
         </p>
@@ -388,14 +402,14 @@ export default async function FieldPage() {
         />
         </div>
         <p className="text-sm leading-relaxed text-text-secondary">
-          Four notable operators, four radically different cascade architectures. The stacked bars
+          The four notable operators here have radically different cascade architectures. The stacked bars
           show how each operator composes their token spend across the four pillars: input (fresh
           tokens), output (produced signal), cache write (context stored), and cache read (context
-          reused). The outlier at left burns input with zero cache. The high-yield operators at right
-          are dominated by cache read — they reuse context, not burn it.
+          reused). The outlier at left burns input with zero cache, while the high-yield operators at
+          right are dominated by cache read because they reuse context rather than burn it.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          These operators illustrate the yield spectrum. See their full profiles on the{" "}
+          These operators illustrate the yield spectrum; you can see their full profiles on the{" "}
           <Link href="/hall" className="text-gold underline hover:text-text-primary">
             Hall of Signal
           </Link>{" "}
@@ -426,14 +440,14 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The box plots break down four metrics — yield, leverage, velocity, and SNR — across the
           four yield quartiles. The progression is stark: leverage jumps from a median of ~5× in Q1
-          to ~200× in Q4. Velocity climbs from 0.03 to nearly 1.0. But SNR stays flat across all
-          quartiles — the signal density of output doesn't change. What changes is how much cached
-          context amplifies that output.
+          to ~200× in Q4, and velocity climbs from 0.03 to nearly 1.0. SNR, however, stays flat
+          across all quartiles, so the signal density of output doesn&apos;t change; what changes is
+          how much cached context amplifies that output.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          This is the architectural insight: high-yield operators don&apos;t produce denser signal —
-          they produce more signal from the same density by leveraging cache. The yield gap is a
-          leverage gap, not a talent gap.
+          The architectural insight is that high-yield operators don&apos;t produce denser signal.
+          They produce more signal from the same density by leveraging cache, which makes the yield
+          gap a leverage gap, not a talent gap.
         </p>
       </section>
 
@@ -448,12 +462,12 @@ export default async function FieldPage() {
           median={meta.medians.yield}
         />
         <p className="text-sm leading-relaxed text-text-secondary">
-          The yield distribution is heavily right-skewed. 80% of
-          operators fall within the shaded band. The long tail to the right
-          is where the AMPLIFIERS and CONVERGENT operators live. The bulk of
-          the field clusters near the median. This is why the median is used
-          instead of the mean: the mean is pulled by outliers, the median
-          reflects where operators actually are.
+          The yield distribution is heavily right-skewed: 80% of operators
+          fall within the shaded band and the bulk of the field clusters near
+          the median, while the long tail to the right is where the AMPLIFIERS
+          and CONVERGENT operators live. That is why the median is used
+          instead of the mean, since the mean is pulled by outliers and the
+          median reflects where operators actually are.
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-4">
           <p className="text-sm leading-relaxed text-text-secondary">
@@ -468,13 +482,13 @@ export default async function FieldPage() {
               Artificial Analysis
             </a>{" "}
             modeled &ldquo;average AI user&rdquo; baseline of 1.75 (the 7:2:1
-            cache-read : cache-write : input ratio). But the composition is very
-            different: the real field has <strong className="text-text-primary">{meta.medians.leverage.toFixed(1)}× leverage</strong>{" "}
-            vs the model&apos;s 3.5× — real operators read far more cache — but
-            only <strong className="text-text-primary">{meta.medians.velocity.toFixed(2)} velocity</strong>{" "}
-            vs the model&apos;s 0.50 — they produce less output per input token.
-            Cache-heavy, output-light. Net yield is close to the modeled average;
-            the path there is not. See the{" "}
+            cache-read : cache-write : input ratio), but the composition is very
+            different. The real field has <strong className="text-text-primary">{meta.medians.leverage.toFixed(1)}× leverage</strong>{" "}
+            vs the model&apos;s 3.5×, because real operators read far more cache,
+            but only <strong className="text-text-primary">{meta.medians.velocity.toFixed(2)} velocity</strong>{" "}
+            vs the model&apos;s 0.50, because they produce less output per input
+            token. The field runs cache-heavy and output-light, so net yield is
+            close to the modeled average even though the path there is not. See the{" "}
             <Link
               href="/wiki/four-degrees"
               className="text-gold underline underline-offset-2"
@@ -493,11 +507,11 @@ export default async function FieldPage() {
         </h2>
         <PercentileBands medianYield={meta.medians.yield} />
         <p className="text-sm leading-relaxed text-text-secondary">
-          The percentile ladder shows the yield thresholds for each tier. The
-          median is where most operators land. The top 1% is where cache
-          architecture becomes an art form. If you use AI coding agents, you
-          are probably near the median. Sign up to see exactly where you
-          fit.
+          The percentile ladder shows the yield thresholds for each tier. Most
+          operators land at the median, and the top 1% is where cache
+          architecture becomes an art form. If you use AI coding agents you
+          are probably near the median, and signing up shows you exactly
+          where you fit.
         </p>
       </section>
 
@@ -508,12 +522,12 @@ export default async function FieldPage() {
         </h2>
         <p className="text-sm leading-relaxed text-text-secondary">
           Ghost-rank operators are invisible on volume-based leaderboards but dominate yield-based
-          rankings. They use fewer tokens but achieve higher output efficiency. These are the
-          operators worth recruiting — they have skill, not just spend.
+          rankings, because they use fewer tokens but achieve higher output efficiency. These are the
+          operators worth recruiting, since they have skill and not just spend.
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          The data reveals {ghost_ranks.length} ghost-rank operators — above median yield but with volume
-          ranks in the hundreds or thousands. Their median volume rank is{" "}
+          The data reveals {ghost_ranks.length} ghost-rank operators who sit above median yield but
+          have volume ranks in the hundreds or thousands. Their median volume rank is{" "}
           {(() => {
             const ranks = ghost_ranks.map((g) => g.tokscale_rank).sort((a, b) => a - b);
             const mid = Math.floor(ranks.length / 2);
@@ -521,8 +535,8 @@ export default async function FieldPage() {
               ? Math.round((ranks[mid - 1] + ranks[mid]) / 2)
               : ranks[mid];
           })()},
-          meaning they are buried deep on any volume leaderboard. But their yield values reach into
-          the hundreds of thousands. Volume metrics hide them. Yield metrics find them.
+          meaning they are buried deep on any volume leaderboard, yet their yield values reach into
+          the hundreds of thousands. Volume metrics hide them, and yield metrics find them.
         </p>
         <div className="overflow-x-auto">
           <img
@@ -538,9 +552,9 @@ export default async function FieldPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The quadrant chart above plots every operator on a log-log grid of total tokens
           versus yield. The dashed gold lines mark the median on each axis, splitting the field into
-          four quadrants. Q2 — the top-left, low volume and high yield — is the ghost-rank region,
-          highlighted in cyan. These operators would be invisible on any volume-ranked leaderboard,
-          yet they dominate on yield. They are the operators worth recruiting.
+          four quadrants. Q2, the top-left region of low volume and high yield, is the ghost-rank
+          region and is highlighted in cyan. These operators would be invisible on any volume-ranked
+          leaderboard, yet they dominate on yield and are the operators worth recruiting.
         </p>
         <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
           <table className="w-full border-collapse font-sans text-sm">
@@ -609,9 +623,9 @@ export default async function FieldPage() {
           Convergence, Generation, Reuse Depth, and Active Construction.
           CONVERGENT is checked first and pulls out operators who are elite
           on all three derived dimensions (leverage, velocity, construction).
-          KINETIC captures high-velocity generation. The Construction branch
-          captures active context builders. The Reuse Depth branch captures
-          passive context reusers. Each type is defined by a different
+          KINETIC captures high-velocity generation, the Construction branch
+          captures active context builders, and the Reuse Depth branch
+          captures passive context reusers. Each type is defined by a different
           primary dimension of the token cascade.
         </p>
         <OperatorArchetypes
@@ -653,7 +667,7 @@ export default async function FieldPage() {
           This is why the Four Degrees chart&apos;s columns are honest: the{" "}
           {meta.outliers} outliers are separated before the median is computed. Without
           separation, the top outlier alone skews the field average by
-          248,000%. The median is immune. Read the{" "}
+          248,000%, while the median is immune. Read the{" "}
           <Link
             href="/blog/volume-isnt-yield"
             className="text-gold underline underline-offset-2"
@@ -702,6 +716,8 @@ export default async function FieldPage() {
           </Link>
         </div>
       </footer>
+
+      <FaqSection faqs={FIELD_FAQS} />
 
       </div>
         </div>

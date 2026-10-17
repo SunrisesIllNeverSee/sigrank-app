@@ -144,3 +144,28 @@ export async function getAllPosts(): Promise<PostSummary[]> {
   return posts.sort((a, b) => b.date.localeCompare(a.date));
 }
 
+
+/** Frontmatter `type: article` publications (the /articles index). */
+export async function getArticlePosts(): Promise<PostSummary[]> {
+  const posts: PostSummary[] = [];
+  try {
+    const files = await readdir(CONTENT_DIR);
+    for (const file of files) {
+      if (!file.endsWith(".md")) continue;
+      const { data } = matter(await readFile(join(CONTENT_DIR, file), "utf-8"));
+      if (data.type !== "article") continue;
+      posts.push({
+        slug: file.replace(/\.md$/, ""),
+        title: (data.title as string) ?? file,
+        description: (data.seo_description as string) ?? (data.description as string) ?? "",
+        date: data.timestamp instanceof Date
+          ? data.timestamp.toISOString()
+          : (data.timestamp as string) ?? "",
+        tags: (data.tags as string[]) ?? [],
+      });
+    }
+  } catch {
+    // content/blog unreadable
+  }
+  return posts.sort((a, b) => b.date.localeCompare(a.date));
+}
