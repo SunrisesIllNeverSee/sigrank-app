@@ -10,7 +10,9 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
-import { breadcrumb, collectionPage } from "@/lib/jsonld";
+import { breadcrumb, collectionPage, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { BLOG_INDEX_FAQS } from "@/lib/seo/page-faqs";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { WaveHero } from "@/components/ui/WaveHero";
 
@@ -39,6 +41,7 @@ export default async function BlogIndex() {
           items: posts.map((p) => ({ name: p.title, path: `/blog/${p.slug}` })),
         })}
       />
+      <JsonLd data={faqPage(BLOG_INDEX_FAQS)} />
       {/* Blog index inside the shared SignalAF workspace shell — same
           transfer contract as Hall/Compare/Wiki/Field: post index in the
           left rail, the card list is the stage, right rail carries the
@@ -143,6 +146,7 @@ export default async function BlogIndex() {
           ))}
         </div>
       </div>
+      <FaqSection faqs={BLOG_INDEX_FAQS} />
         </div>
       </WorkspaceShell>
     </div>

@@ -16,6 +16,8 @@ import { ClassLadder } from "@/components/marketing/ClassLadder";
 import { IpBoundary } from "@/components/marketing/IpBoundary";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { aboutPage, breadcrumb, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { ABOUT_MORE_FAQS } from "@/lib/seo/page-faqs";
 
 export const metadata: Metadata = withOG({
   title: "About",
@@ -101,6 +103,8 @@ export default function AboutPage() {
             answer:
               "Yield varies by class tier. Generally, a yield above 1000 puts you in the upper tiers. Run npx sigrank and compare against the leaderboard.",
           },
+          // Rendered visibly by the "More questions" FaqSection below.
+          ...ABOUT_MORE_FAQS,
         ])}
       />
       <WaveHero
@@ -266,6 +270,8 @@ export default function AboutPage() {
           </details>
         </div>
       </section>
+
+      <FaqSection faqs={ABOUT_MORE_FAQS} id="about-faq-more" heading="More questions" />
 
       {/* Legal policies are maintained at their canonical standalone URLs.
           These legacy fragment anchors retain a useful no-JS fallback. */}

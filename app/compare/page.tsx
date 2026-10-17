@@ -22,6 +22,7 @@ import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { withOG, SITE_ORIGIN } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
 
 import {
   getLeaderboard,
@@ -135,6 +136,25 @@ function toOperand(row: LeaderboardRow): CompareOperand {
     ],
   };
 }
+
+/** Single source for the FAQPage JSON-LD and the visible FAQ section. */
+const COMPARE_FAQS = [
+  {
+    question: "How do I compare two AI operators on SigRank?",
+    answer:
+      "Visit signalaf.com/compare and select two operators using the dropdown selectors. The comparison shows Yield (Υ), SNR, Leverage, Velocity, 10xDEV, and blended cost side by side, plus each operator's own raw and metric radars and a shared Yield-over-time chart. You can share the comparison via URL.",
+  },
+  {
+    question: "What metrics does the SigRank comparison show?",
+    answer:
+      "The head-to-head comparison shows six cascade metrics: Yield (Υ = cache_read × output / input²), SNR (signal-to-noise ratio), Leverage (cache reuse efficiency), Velocity (output per token), 10xDEV (log-normalized value above replacement), and blended cost ($/1M tokens). Individual raw and metric radar charts describe each live operator, with their recorded Yield history beneath.",
+  },
+  {
+    question: "Can I compare myself against another AI operator?",
+    answer:
+      "Yes. If you are enrolled on SigRank, the Compare Against Me feature lets you select yourself as one of the comparison operands. You can compare your cascade metrics against any other operator on the leaderboard to see exactly where and why you differ.",
+  },
+];
 
 export default async function ComparePage({
   searchParams,
@@ -298,23 +318,7 @@ export default async function ComparePage({
     <div>
       <JsonLd data={[
         breadcrumb([{ name: "Compare", path: "/compare" }]),
-        faqPage([
-          {
-            question: "How do I compare two AI operators on SigRank?",
-            answer:
-              "Visit signalaf.com/compare and select two operators using the dropdown selectors. The comparison shows Yield (Υ), SNR, Leverage, Velocity, 10xDEV, and blended cost side by side, plus each operator's own raw and metric radars and a shared Yield-over-time chart. You can share the comparison via URL.",
-          },
-          {
-            question: "What metrics does the SigRank comparison show?",
-            answer:
-              "The head-to-head comparison shows six cascade metrics: Yield (Υ = cache_read × output / input²), SNR (signal-to-noise ratio), Leverage (cache reuse efficiency), Velocity (output per token), 10xDEV (log-normalized value above replacement), and blended cost ($/1M tokens). Individual raw and metric radar charts describe each live operator, with their recorded Yield history beneath.",
-          },
-          {
-            question: "Can I compare myself against another AI operator?",
-            answer:
-              "Yes. If you are enrolled on SigRank, the Compare Against Me feature lets you select yourself as one of the comparison operands. You can compare your cascade metrics against any other operator on the leaderboard to see exactly where and why you differ.",
-          },
-        ]),
+        faqPage(COMPARE_FAQS),
       ]} />
       <TrackCompareView isDefault={!(a && b)} />
 
@@ -447,6 +451,9 @@ export default async function ComparePage({
           </div>
         </div>
         </CompareStage>
+        {/* Visible FAQ (same array as the FAQPage JSON-LD), collapsed to one
+            line at the foot of the stage so the fitted layout is untouched. */}
+        <FaqSection faqs={COMPARE_FAQS} id="compare-faq" variant="workspace" collapsed />
       </WorkspaceShell>
     </div>
   );
