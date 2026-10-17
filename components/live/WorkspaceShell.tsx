@@ -27,6 +27,7 @@ import { GroupedRailNav } from "./GroupedRailNav";
  */
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -178,6 +179,7 @@ export function WorkspaceShell({
   const [iconSet, setIconSet] = useRailIconSet();
   const [notifOpen, setNotifOpen] = useState(false);
 
+  const router = useRouter();
   const session = useBoardSession(true);
 
   /* rightOpenSignal bumps → open the inspector (Hall: record selection
@@ -398,6 +400,20 @@ export function WorkspaceShell({
                   <span className="rh-t">{leftTitle}</span>
                 </div>
                 <div className="rail">{left}</div>
+                {topic && (
+                  <nav className="ws-rail-bottom-nav" aria-label="Page navigation">
+                    <button type="button" aria-label="Back to previous page"
+                      onClick={() => {
+                        if (window.history.length > 1) router.back();
+                        else router.push("/");
+                      }}>
+                      <span aria-hidden="true">←</span> BACK
+                    </button>
+                    <Link href="/" aria-label="Home — live leaderboard">
+                      <span aria-hidden="true">⌂</span> HOME
+                    </Link>
+                  </nav>
+                )}
               </aside>
             )}
 
