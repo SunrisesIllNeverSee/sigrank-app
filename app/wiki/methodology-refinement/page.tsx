@@ -25,7 +25,9 @@
 import type { Metadata } from "next";
 import { TopicPage } from "@/components/wiki/TopicPage";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { METHODOLOGY_REFINEMENT_FAQS } from "@/lib/seo/page-faqs";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
@@ -160,6 +162,7 @@ export default function MethodologyRefinementPage() {
             "The dual-reader and memory-pair entries used to bracket and verify the SigRank Index scoring before live operators populated the board.",
             "/wiki/methodology-refinement",
           ),
+          faqPage(METHODOLOGY_REFINEMENT_FAQS),
         ]}
       />
 
@@ -258,6 +261,7 @@ export default function MethodologyRefinementPage() {
           ruleset and stays server-side.
         </p>
       </section>
+      <FaqSection faqs={METHODOLOGY_REFINEMENT_FAQS} />
     </TopicPage>
   );
 }

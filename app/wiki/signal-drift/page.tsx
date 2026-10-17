@@ -3,7 +3,9 @@ import { TopicPage } from "@/components/wiki/TopicPage";
 import { SignatureDrift } from "@/components/marketing/SignalIntegrity";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { SIGNAL_DRIFT_FAQS } from "@/lib/seo/page-faqs";
 
 export const metadata: Metadata = withOG({
   title: "Signature Drift — the tune meter",
@@ -26,9 +28,11 @@ export default function SignalDriftPage() {
             "Shape-not-magnitude drift from an operator’s calibrated cascade signature, measured in log space.",
             "/wiki/signal-drift",
           ),
+          faqPage(SIGNAL_DRIFT_FAQS),
         ]}
       />
       <SignatureDrift />
+      <FaqSection faqs={SIGNAL_DRIFT_FAQS} />
     </TopicPage>
   );
 }

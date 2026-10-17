@@ -13,7 +13,9 @@ import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBad
 import type { Metadata } from "next";
 import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { cliTool, aggregateStats } from "@/lib/jsonld";
+import { cliTool, aggregateStats, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { SIGRANK_FAQS } from "@/lib/seo/page-faqs";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
@@ -119,10 +121,9 @@ export default async function HomePage() {
         })}
       />
 
-      {/* FAQPage JSON-LD removed (2026-10): none of its Q&As render on this
-          page — only "Who is the best AI user?" appears, as an "Ask AI" prompt
-          link with no answer. Structured data must match visible content; the
-          FAQ answers live on /about (visible FAQ) and /faq. */}
+      {/* JSON-LD: FAQPage — same array as the visible FAQ section at the end
+          of the page (SIGRANK_FAQS), so structured data matches the page. */}
+      <JsonLd data={faqPage(SIGRANK_FAQS)} />
 
       <DeletedNotice />
       <VercelMarketplaceBadge />
@@ -408,6 +409,8 @@ export default async function HomePage() {
           Explore the baseline assessment →
         </a>
       </section>
+
+      <FaqSection faqs={SIGRANK_FAQS} />
 
       <MotionPause />
     </div>

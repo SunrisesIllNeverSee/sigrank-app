@@ -40,7 +40,9 @@ import {
   Credits,
 } from "@/components/marketing/SignalIntegrity";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, collectionPage, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, collectionPage, definedTerm, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { WIKI_FAQS } from "@/lib/seo/page-faqs";
 import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
 import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
@@ -1941,6 +1943,7 @@ export default function Draft1Page() {
           "/wiki#conservation-law-of-commitment",
         )}
       />
+      <JsonLd data={faqPage(WIKI_FAQS)} />
 
       {/* Wiki inside the shared SignalAF workspace shell — same transfer
           contract as Hall/Compare: TOC moves to the left rail (rail mode,
@@ -2013,6 +2016,7 @@ export default function Draft1Page() {
               that category. */}
           <WikiCategorySections />
           <WikiDoc groups={groups} />
+          <FaqSection faqs={WIKI_FAQS} />
         </div>
       </WorkspaceShell>
     </div>

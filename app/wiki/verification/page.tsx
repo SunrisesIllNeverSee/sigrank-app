@@ -3,7 +3,9 @@ import { TopicPage } from "@/components/wiki/TopicPage";
 import { VerificationTests } from "@/components/marketing/VerificationTests";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { VERIFICATION_FAQS } from "@/lib/seo/page-faqs";
 
 export const metadata: Metadata = withOG({
   title: "Verification & Integrity Tests",
@@ -29,9 +31,11 @@ export default function VerificationPage() {
             "How we know the numbers are real: Benford’s Law, the Hermes bot control, the telescoping identity lock, and the gaming threat model.",
             "/wiki/verification",
           ),
+          faqPage(VERIFICATION_FAQS),
         ]}
       />
       <VerificationTests />
+      <FaqSection faqs={VERIFICATION_FAQS} />
     </TopicPage>
   );
 }

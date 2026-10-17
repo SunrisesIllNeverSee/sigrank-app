@@ -173,6 +173,20 @@ export function WorkspaceShell({
   /* ---------- panel + popover chrome ---------- */
   const [leftOn, setLeftOn] = useState(leftDefaultOpen && left != null);
   const [railOn, setRailOn] = useState(rightDefaultOpen && right != null);
+  /* Phones (2026-10-16): text pages open with both panels collapsed so the
+     reading column gets the full width instead of panning a 600px stage.
+     `phoneInit` is true in SSR and the first client render (no hydration
+     mismatch); CSS hides the panels while it is set, so there is no flash
+     before this effect collapses them. Reopen buttons in the rail still work. */
+  const [phoneInit, setPhoneInit] = useState(editorialStage);
+  useEffect(() => {
+    if (!editorialStage) return;
+    if (window.matchMedia("(max-width: 760px)").matches) {
+      setLeftOn(false);
+      setRailOn(false);
+    }
+    setPhoneInit(false);
+  }, [editorialStage]);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   const [iconSet, setIconSet] = useRailIconSet();
@@ -294,6 +308,7 @@ export function WorkspaceShell({
       <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
       <div
         className={`app${railOn ? "" : " no-rail"}${leftOn ? "" : " no-left"}`}
+        data-phone-init={phoneInit ? "" : undefined}
       >
         {/* icon rail — identical contract to the board's .srail.min */}
         <aside className="srail min">

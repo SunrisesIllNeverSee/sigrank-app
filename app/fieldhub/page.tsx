@@ -16,7 +16,9 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { breadcrumb } from "@/lib/jsonld";
+import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { FIELDHUB_FAQS } from "@/lib/seo/page-faqs";
 import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
@@ -106,6 +108,7 @@ export default async function FieldHubPage() {
         data={[
           collectionPage,
           breadcrumb([{ name: "Field Hub", path: "/fieldhub" }]),
+          faqPage(FIELDHUB_FAQS),
         ]}
       />
 
@@ -154,6 +157,7 @@ export default async function FieldHubPage() {
           </Link>
         </div>
       </div>
+      <FaqSection faqs={FIELDHUB_FAQS} />
       </div>
     </FieldWorkspaceFrame>
   );
