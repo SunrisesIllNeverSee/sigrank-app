@@ -1911,7 +1911,7 @@
    of article content (header.wave-hero). Motion (wave paths, SigRank cascade
    lines + animated wordmark) is untouched. Full bleed: 100cqw is the stage's
    content box, --stage-pad its inline padding. */
-.lbw-root .stage.ws-editorial-stage{--stage-pad:clamp(18px,2.5vw,40px);padding-inline:var(--stage-pad);container-type:inline-size}
+.lbw-root .stage.ws-editorial-stage{--stage-pad:clamp(18px,2.5vw,40px);padding-inline:var(--stage-pad);container-type:inline-size;overflow-x:clip}
 .lbw-root .ws-editorial-stage>.board:has(>.ws-hero){padding-top:0}
 .lbw-root .ws-editorial-stage>.board>.ws-hero,
 .lbw-root .ws-editorial-stage .board header.wave-hero:not(.ws-hero *){
@@ -1943,7 +1943,9 @@
 .lbw-root .ws-editorial-stage .ws-hero-lede{margin:0 auto 6px;text-align:center;color:var(--tx2)}
 /* compact (scrolled) masthead: title / animated wordmark only */
 .lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative{padding:8px 0}
-.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative>:not(:nth-child(2)){display:none}
+/* compact: hide the eyebrow label and the lede only — the title may be an
+   sr-only h1 followed by the pixel-block art, so never select by position */
+.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative>:is(span:first-child,p){display:none}
 .lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header{padding:6px 22px 8px}
 .lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>div.relative>:is(p){display:none}
 .lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>div.relative>h1{
@@ -1965,7 +1967,7 @@
 /* compact band keeps tighter, but not jammed */
 .lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header{padding:12px 24px 16px}
 .lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>.relative.z-10{gap:12px}
-.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative{padding:12px 0}
+.lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative{padding:18px 0 14px}
 @media (max-width:760px){
   .lbw-root .ws-editorial-stage .sigrank-column-hero header{padding:24px 16px 22px}
   .lbw-root .ws-editorial-stage .sigrank-column-hero header>.relative.z-10{gap:16px}
