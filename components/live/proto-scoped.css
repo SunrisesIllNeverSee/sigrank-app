@@ -1551,6 +1551,9 @@
 .lbw-root .ws-editorial-stage .ws-hero{
   width:100%;max-width:1040px;margin:0 auto 30px;
 }
+.lbw-root .ws-editorial-stage .ws-hero header{
+  border:3px solid var(--tx)!important;border-radius:0;
+}
 .lbw-root .ws-editorial-stage .ws-article>.article-shell{
   padding-inline:clamp(14px,2vw,30px);
 }
