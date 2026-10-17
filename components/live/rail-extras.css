@@ -26,6 +26,11 @@
 .lbw-root .srail .sbtn[data-tip="ENTERPRISE"] .gi{color:var(--orange)}
 /* .on keeps the lit chip + accent text over any per-icon hue */
 .lbw-root .srail .sbtn.on .gi{color:var(--ac)}
+/* SIGRANK § is a text glyph, not a pixel icon — give it the wordmark's
+   orange (unused by the other rail hues) so it carries color like its
+   neighbours; it keeps the hue when active (the lit chip marks .on). */
+.lbw-root .srail .sbtn[data-tip="SIGRANK"] .gi,
+.lbw-root .srail .sbtn.on[data-tip="SIGRANK"] .gi{color:var(--orange);font-weight:700}
 
 /* bone is the light palette — pull the two lightest hues toward --tx
    so the COMPARE/HALL glyphs stay legible on cream */

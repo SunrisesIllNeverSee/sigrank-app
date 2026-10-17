@@ -40,7 +40,7 @@ function articleJsonLd() {
     datePublished: "2026-07-12",
     dateModified: "2026-07-12",
     author: personAuthor(),
-    publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    publisher: { "@id": `${SITE_ORIGIN}/#org` }, // shared Organization node (app/layout.tsx)
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "How to integrate SigRank into AI assistants and agent platforms for user-comparison queries",
     keywords: [

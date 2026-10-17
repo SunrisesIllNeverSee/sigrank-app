@@ -33,8 +33,8 @@ export default function EightyPercentBand({
       <p className="text-xs text-text-muted">
         80% of operators have a yield between{" "}
         <span className="font-mono text-gold">{p10.toFixed(2)}</span> and{" "}
-        <span className="font-mono text-gold">{p90.toFixed(2)}</span>. The
-        median is <span className="font-mono text-gold">{median.toFixed(2)}</span>.
+        <span className="font-mono text-gold">{p90.toFixed(2)}</span>, with a
+        median of <span className="font-mono text-gold">{median.toFixed(2)}</span>.
         The distribution is heavily right-skewed (power-law), which is why the
         median is used instead of the mean.
       </p>

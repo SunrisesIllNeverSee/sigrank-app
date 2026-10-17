@@ -8,10 +8,11 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
+import { withOG, fitTitle, AUTHOR_NAME } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
-import { breadcrumb, sigrankDataset, researchArticle, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { breadcrumb, sigrankDataset, researchArticle, faqPage, SIGRANK_DATASET_PUBLISHED } from "@/lib/jsonld";
 import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 import { WaveHero } from "@/components/ui/WaveHero";
 
@@ -19,9 +20,16 @@ export const revalidate = 3600; // 1h — the seed corpus is stable
 
 export const metadata: Metadata = withOG({
   title: "State of the Index — AI Operator Token Efficiency",
+  titleAbsolute: fitTitle("State of the Index — AI Operator Token Efficiency"),
   description:
-    "The primary anonymized seed dataset: 1,628 AI operators across 17 platforms and 3,304 models. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
+    "Anonymized seed dataset of 1,628 AI operators across 17 platforms and 3,304 models: token telemetry and cascade metrics, CC-BY-4.0 on Zenodo.",
   path: "/research",
+  article: {
+    publishedTime: "2026-07-13", // SNAPSHOT_DATE
+    modifiedTime: SIGRANK_DATASET_PUBLISHED, // Dataset v3.1
+    authors: [AUTHOR_NAME],
+    section: "Research",
+  },
 });
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -31,6 +39,28 @@ const ZENODO_CONCEPT_DOI = "10.5281/zenodo.21875675";
 const ZENODO_URL = "https://zenodo.org/records/21900519";
 const ZENODO_FILE = (name: string) => `${ZENODO_URL}/files/${name}`;
 const SNAPSHOT_DATE = "2026-07-13";
+/** Dataset v3.1 publication date on Zenodo — the last real data revision.
+ *  Never use request time. */
+const DATA_MODIFIED = SIGRANK_DATASET_PUBLISHED;
+
+/** Single source for the FAQPage JSON-LD and the visible FAQ section. */
+const RESEARCH_FAQS = [
+  {
+    question: "What is the SigRank dataset?",
+    answer:
+      "The SigRank seed dataset is an anonymized collection of AI operator token telemetry — 1,628 operators across 17 platforms and 3,304 models. It contains raw token counts (input, output, cache creation, cache read) and derived cascade metrics (Yield, Leverage, Velocity, SNR). Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
+  },
+  {
+    question: "How many AI operators are in the SigRank dataset?",
+    answer:
+      "The SigRank seed dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. This is the seed corpus — the live leaderboard at signalaf.com/board/all includes additional enrolled operators. The Operator Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
+  },
+  {
+    question: "Is the SigRank dataset free to download?",
+    answer:
+      "Yes. The SigRank dataset is available on Zenodo under a CC-BY-4.0 license. You can download the CSVs and JSON to run your own analysis. The dataset includes per-operator token pillars, derived cascade metrics, and platform breakdowns. Cite as: McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy (v3.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21900519.",
+  },
+];
 
 // Dataset stats (from Zenodo v3.1 package)
 const DATASET = {
@@ -110,7 +140,7 @@ export default function StateOfTheIndexPage() {
           eyebrow="SIGRANK INDEX"
           terminalText="STATE OF THE INDEX"
           title="State of the Index"
-          subtitle={<>The primary anonymized seed dataset. Published on Zenodo, DOI 10.5281/zenodo.21900519.</>}
+          subtitle={<>The primary anonymized seed dataset, published on Zenodo under DOI 10.5281/zenodo.21900519.</>}
         />
       }
       current="research"
@@ -144,13 +174,14 @@ export default function StateOfTheIndexPage() {
 
       <JsonLd
         data={[
-          sigrankDataset({ updated: new Date().toISOString() }),
+          sigrankDataset({ updated: DATA_MODIFIED }),
           researchArticle({
             slug: "",
             title: "State of the Index — AI Operator Token Efficiency",
             description:
               "The primary anonymized seed dataset: 1,628 AI operators across 17 platforms. Raw token telemetry, derived cascade metrics, per-platform breakdowns. Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
             datePublished: SNAPSHOT_DATE,
+            dateModified: DATA_MODIFIED,
             headlineFindings,
             // No doi: the Dataset entity owns the Zenodo DOI @id.
             // The article is about the dataset, not the dataset itself.
@@ -158,23 +189,7 @@ export default function StateOfTheIndexPage() {
             // with sigrankDataset() on the same page.
           }),
           breadcrumb([{ name: "Research", path: "/research" }]),
-          faqPage([
-            {
-              question: "What is the SigRank dataset?",
-              answer:
-                "The SigRank seed dataset is an anonymized collection of AI operator token telemetry — 1,628 operators across 17 platforms and 3,304 models. It contains raw token counts (input, output, cache creation, cache read) and derived cascade metrics (Yield, Leverage, Velocity, SNR). Available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.",
-            },
-            {
-              question: "How many AI operators are in the SigRank dataset?",
-              answer:
-                "The SigRank seed dataset contains 1,628 AI operators measured across 17 platforms (Claude, ChatGPT, Gemini, Cursor, Copilot, and more) and 3,304 models. This is the seed corpus — the live leaderboard at signalaf.com/board/all includes additional enrolled operators. The Operator Center of Mass — operators with realistic usage patterns — is 1,498, with the remainder classified as outliers or bots.",
-            },
-            {
-              question: "Is the SigRank dataset free to download?",
-              answer:
-                "Yes. The SigRank dataset is available on Zenodo under a CC-BY-4.0 license. You can download the CSVs and JSON to run your own analysis. The dataset includes per-operator token pillars, derived cascade metrics, and platform breakdowns. Cite as: McHenry, D. J. (2026). SigRank Two-Axis Operator Taxonomy (v3.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.21900519.",
-            },
-          ]),
+          faqPage(RESEARCH_FAQS),
         ]}
       />
 
@@ -210,23 +225,23 @@ export default function StateOfTheIndexPage() {
           platforms, the first thing that jumps out is that{" "}
           <strong>volume is not yield</strong>.
           The operators who burn the most tokens are not the most efficient.
-          The most efficient operators reuse context — cache reads dominate
-          their cascade, and their Yield (Υ) is orders of magnitude higher
+          The most efficient operators reuse context, so cache reads dominate
+          their cascade and their Yield (Υ) is orders of magnitude higher
           than the heavy-input majority.
         </p>
         <p className="text-base text-text-secondary">
           The aggregate numbers tell the story: {fmt(totalInput)} of the{" "}
           {fmt(totalTokens)} total tokens observed are fresh input. Only{" "}
-          {fmt(totalCacheRead)} are cache reads — just {cachePct}% of all
-          traffic. The cascade economy exists, but barely. Most operators are
-          paying full price for every token. The ones who aren&apos;t are the
-          ones at the top of the leaderboard.
+          {fmt(totalCacheRead)} are cache reads, just {cachePct}% of all
+          traffic, so the cascade economy exists but only barely. Most
+          operators are paying full price for every token, and the ones who
+          aren&apos;t are the ones at the top of the leaderboard.
         </p>
         <p className="text-base text-text-secondary">
-          This is the founding insight. The dataset is the evidence. Every
-          quarter we will re-snapshot the index, publish a new version, and
-          track how the distribution shifts as prompt caching becomes standard
-          practice. This is v3.1 — the baseline.
+          This is the founding insight, and the dataset is the evidence for
+          it. Every quarter we will re-snapshot the index, publish a new
+          version, and track how the distribution shifts as prompt caching
+          becomes standard practice; this release, v3.1, is the baseline.
         </p>
       </section>
 
@@ -236,18 +251,18 @@ export default function StateOfTheIndexPage() {
           The Source
         </h2>
         <p className="text-lg text-text-primary">
-          This is the source material. Every article, dashboard, and finding
-          published by SigRank derives from this dataset. It is available on
-          Zenodo under CC-BY-4.0 — download the CSVs and JSON to run your own
-          analysis.
+          This dataset is the source material from which every article,
+          dashboard, and finding published by SigRank derives. It is available
+          on Zenodo under CC-BY-4.0, so you can download the CSVs and JSON to
+          run your own analysis.
         </p>
         <p className="text-base text-text-secondary">
           The dataset measures AI operators — the accounts driving AI tools —
           by four token pillars: <strong>input</strong> (fresh tokens sent),
           <strong> output</strong> (tokens generated), <strong>cache creation</strong>
           {" "}(context written to cache), and <strong>cache read</strong> (context
-          reused from cache). From these four integers, every cascade metric is
-          derived — including the headline efficiency metric{" "}
+          reused from cache). Every cascade metric is derived from these four
+          integers, including the headline efficiency metric{" "}
           <strong>Υ (Yield) = (cache_read × output) / input²</strong>.
         </p>
       </section>
@@ -355,9 +370,9 @@ export default function StateOfTheIndexPage() {
           <Link href="/field" className="text-gold underline underline-offset-2">
             /field
           </Link>
-          {" "}— interactive charts, archetype distributions, platform adoption
-          curves, Benford validation, percentile bands, and the cascade Sankey.
-          It is the visual companion to this dataset.
+          {" "}with interactive charts, archetype distributions, platform
+          adoption curves, Benford validation, percentile bands, and the cascade
+          Sankey, and it serves as the visual companion to this dataset.
         </p>
         <Link
           href="/field"
@@ -377,7 +392,7 @@ export default function StateOfTheIndexPage() {
           leaderboard ranking AI operators by token-cascade efficiency (Υ ={" "}
           cache_read × output / input²). Data is built from on-device,
           ed25519-signed token-telemetry snapshots. No message content is ever
-          read or stored. Full methodology at{" "}
+          read or stored. The full methodology is at{" "}
           <Link href="/methodology" className="text-gold underline underline-offset-2">
             /methodology
           </Link>
@@ -421,9 +436,11 @@ export default function StateOfTheIndexPage() {
           >
             CC-BY-4.0
           </Link>
-          . Attribution required — cite as shown above.
+          . Attribution is required, so cite the dataset as shown above.
         </p>
       </section>
+
+      <FaqSection faqs={RESEARCH_FAQS} />
 
       </div>
       </div>

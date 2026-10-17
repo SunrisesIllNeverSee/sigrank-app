@@ -51,7 +51,7 @@ export default function PercentileBands({
             <span className="font-mono font-bold text-gold">
               {medianYield.toFixed(2)}
             </span>
-            . You are probably here.{" "}
+            , and you are probably here.{" "}
           </>
         )}
         <a href="/login" className="text-gold underline hover:text-text-primary">

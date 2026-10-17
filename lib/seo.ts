@@ -18,6 +18,8 @@ import type { Metadata } from "next";
  *  sigeconomy.com. Defaults to signalaf.com for backward compatibility. */
 export const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://signalaf.com").replace(/\/$/, "");
 export const SITE_NAME = "SigRank SignalAF";
+/** Byline used for article:author on posts and reports. */
+export const AUTHOR_NAME = "Deric J. McHenry";
 export const SITE_TAGLINE =
   "The evaluation platform for AI operators. Models are benchmarked constantly. The people operating them are not. SigRank turns privacy-preserving token telemetry into a repeatable performance evaluation: your Yield, workflow signature, benchmark, and progress over time.";
 
@@ -55,22 +57,44 @@ export function withOG(opts: {
   path?: string;
   /** Override the OG image (e.g. a per-page image). Defaults to /og-v2.png. */
   ogImage?: { url: string; width?: number; height?: number; alt?: string };
+  /** Emit og:type=article with article:* fields (posts, research reports).
+   *  Dates must be real (git history / frontmatter), never request-time. */
+  article?: {
+    publishedTime: string;
+    modifiedTime?: string;
+    authors?: string[];
+    section?: string;
+    tags?: string[];
+  };
+  /** Exact <title> override (skips the " · SigRank SignalAF" template) —
+   *  see fitTitle(). OG/Twitter titles keep `title`. */
+  titleAbsolute?: string;
 }): Metadata {
-  const { title, description, path, ogImage } = opts;
+  const { title, description, path, ogImage, article, titleAbsolute } = opts;
   const image = ogImage ?? OG_IMAGE;
   const url = path ? `${SITE_ORIGIN}${path}` : SITE_ORIGIN;
-  return {
+  const base = {
     title,
     description,
+    siteName: SITE_NAME,
+    url,
+    images: [image],
+  };
+  return {
+    title: titleAbsolute ? { absolute: titleAbsolute } : title,
+    description,
     alternates: path ? { canonical: path } : undefined,
-    openGraph: {
-      title,
-      description,
-      siteName: SITE_NAME,
-      type: "website",
-      url,
-      images: [image],
-    },
+    openGraph: article
+      ? {
+          ...base,
+          type: "article",
+          publishedTime: article.publishedTime,
+          modifiedTime: article.modifiedTime ?? article.publishedTime,
+          authors: article.authors ?? [AUTHOR_NAME],
+          ...(article.section ? { section: article.section } : {}),
+          ...(article.tags && article.tags.length ? { tags: article.tags } : {}),
+        }
+      : { ...base, type: "website" },
     twitter: {
       card: TWITTER_CARD,
       title,
@@ -78,6 +102,19 @@ export function withOG(opts: {
       images: [image.url],
     },
   };
+}
+
+/** SERP-friendly title budget (chars) for the full <title>. */
+export const TITLE_BUDGET = 60;
+
+/** If `${title} · SigRank SignalAF` exceeds the budget, return an absolute
+ *  title with the short brand (" · SignalAF"), or the bare title if even that
+ *  is too long. Returns undefined when the default template already fits.
+ *  Pass the result as withOG({ titleAbsolute }). */
+export function fitTitle(title: string): string | undefined {
+  if (`${title} · ${SITE_NAME}`.length <= TITLE_BUDGET) return undefined;
+  const short = `${title} · SignalAF`;
+  return short.length <= TITLE_BUDGET ? short : title;
 }
 
 /**

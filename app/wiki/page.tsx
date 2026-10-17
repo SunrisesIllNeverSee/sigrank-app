@@ -40,7 +40,7 @@ import {
   Credits,
 } from "@/components/marketing/SignalIntegrity";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { breadcrumb, collectionPage, definedTerm } from "@/lib/jsonld";
 import { ArchetypeDataTable } from "@/components/wiki/ArchetypeDataTable";
 import { TierLadderDistribution } from "@/components/wiki/TierLadderDistribution";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
@@ -86,7 +86,7 @@ function SigRankDefinition() {
       </p>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
         Volume alone is noise. Yield is signal. The same four token counts
-        reveal whether you compound signal or burn it - and whether
+        reveal whether you compound signal or burn it, and whether
         you&apos;re a Burner, a Builder, or a 10xer.
       </p>
 
@@ -97,8 +97,8 @@ function SigRankDefinition() {
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The leaderboard ranks every operator by{" "}
-          <strong className="text-text-primary">Υ Yield</strong> — the headline
-          cascade metric — across four scoring windows: 7-day, 30-day, 90-day,
+          <strong className="text-text-primary">Υ Yield</strong> (the headline
+          cascade metric) across four scoring windows: 7-day, 30-day, 90-day,
           and all-time. Each row shows the operator&apos;s class tier
           (ARCH+ down to IGNITER), their four raw token pillars, the full
           cascade (Υ Yield, SNR, Leverage, Velocity, 10xDEV), cost per million
@@ -107,10 +107,10 @@ function SigRankDefinition() {
         </p>
         <p className="font-sans text-xs leading-relaxed text-text-muted">
           Every number is derived from four raw integers: input, output,
-          cache-read, cache-write. No word counts, no message content, no
-          self-reported fields. The server recomputes everything from the raw
-          payload. Derived metrics cannot be altered independently of the four
-          pillars. The telescoping identity detects inconsistent calculations.
+          cache-read, cache-write, with no word counts, no message content, and
+          no self-reported fields. The server recomputes everything from the raw
+          payload, so derived metrics cannot be altered independently of the four
+          pillars, and the telescoping identity detects inconsistent calculations.
           Fabricated pillars are handled separately through signed telemetry,
           provenance, plausibility checks, and review.
         </p>
@@ -140,9 +140,9 @@ function SigRankDefinition() {
               Burner
             </span>
             <span className="font-sans text-xs leading-relaxed text-text-muted">
-              High input, low reuse. Fresh tokens in, tokens out, nothing held.
-              The cascade doesn&apos;t compound — it burns. Most operators start
-              here.
+              High input, low reuse: fresh tokens in, tokens out, nothing held,
+              so the cascade doesn&apos;t compound; it burns. Most operators
+              start here.
             </span>
           </div>
           <div className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-3">
@@ -150,8 +150,8 @@ function SigRankDefinition() {
               Builder
             </span>
             <span className="font-sans text-xs leading-relaxed text-text-muted">
-              Cache-write is happening — context is being built forward.
-              Leverage is rising but hasn&apos;t compounded yet. The
+              Cache-write is happening and context is being built forward.
+              Leverage is rising but hasn&apos;t compounded yet, and the
               architecture is forming.
             </span>
           </div>
@@ -159,13 +159,13 @@ function SigRankDefinition() {
             <span className="font-mono text-sm font-bold text-gold">10×er</span>
             <span className="font-sans text-xs leading-relaxed text-text-muted">
               Cache-read dominates. The operator holds context, reuses it, and
-              produces far more output than they spend input on. The cascade
-              compounds — 10× and above.
+              produces far more output than they spend input on, so the cascade
+              compounds, 10× and above.
             </span>
           </div>
         </div>
         <p className="font-sans text-xs text-text-dim">
-          These are not fixed labels - they are cascade shapes. An operator can
+          These are not fixed labels; they are cascade shapes. An operator can
           be a Burner on Monday and a 10xer by Friday if their architecture
           shifts. Archetype describes shape. Class describes qualification. Rank
           describes position. All three are recomputed every scoring window.
@@ -282,8 +282,8 @@ function FourPillars() {
       <p className="max-w-2xl font-sans text-sm text-text-secondary">
         Every score starts from{" "}
         <strong className="text-text-primary">four raw token counts</strong>.
-        Not your prompts, not your code, not your word counts — four integers.
-        The whole cascade is derived from these.
+        That means four integers, not your prompts, your code, or your word
+        counts, and the whole cascade is derived from these.
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {PILLARS.map((p) => (
@@ -313,7 +313,7 @@ function FourPillars() {
           Why these four
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The four pillars are not arbitrary — they are the complete token
+          The four pillars are not arbitrary; they are the complete token
           economy of an AI coding session.{" "}
           <strong className="text-text-primary">Input</strong> is what you pay
           to ask.
@@ -358,7 +358,7 @@ function FourPillars() {
         </div>
         <p className="font-sans text-xs leading-relaxed text-text-muted">
           The cascade is a loop, not a line. Cache-read feeds back into the next
-          turn&apos;s input — the more you reuse, the less fresh input you need.
+          turn&apos;s input, so the more you reuse, the less fresh input you need.
           That feedback is why leverage compounds: an operator who holds context
           produces more output per input over time, not less. The four pillars
           capture the entire loop; the cascade metrics measure its shape.
@@ -374,10 +374,10 @@ function FourPillars() {
           The Artificial Analysis pricing baseline sets a 7:2:1 ratio for
           cache-read : cache-write : fresh input. SigRank&apos;s Efficiency
           metric (Y.08) measures how an operator&apos;s cascade compares to that
-          baseline - are they above or below the field average for their token
-          mix? It&apos;s not a pass/fail; it&apos;s a reference point. The
-          baseline comes from published model pricing data, not from
-          SigRank&apos;s own sample.
+          baseline, meaning whether they are above or below the field average
+          for their token mix. It&apos;s a reference point rather than a
+          pass/fail, and the baseline comes from published model pricing data,
+          not from SigRank&apos;s own sample.
         </p>
         <p className="font-sans text-xs leading-relaxed text-text-muted">
           <strong className="text-text-secondary">The derivation.</strong> The
@@ -393,8 +393,8 @@ function FourPillars() {
   Efficiency = 4.0 / 4.0 = 1.00  (by construction)`}
         </pre>
         <p className="font-sans text-xs leading-relaxed text-text-muted">
-          The two 4.0s are the same number by design - that is the calibration.
-          Every other operator is measured against this reference point.
+          The two 4.0s are the same number by design, which is the calibration,
+          and every other operator is measured against this reference point.
         </p>
       </section>
     </section>
@@ -427,10 +427,10 @@ function CascadeList() {
     <section className="flex flex-col gap-4">
       <p className="max-w-2xl font-sans text-sm text-text-secondary">
         From the four pillars we derive the{" "}
-        <strong className="text-text-primary">token cascade</strong> — the
+        <strong className="text-text-primary">token cascade</strong>, the
         metrics the board actually ranks on. Each one captures a different facet
-        of how the cascade compounds (or doesn&apos;t). Token-only; no word-era
-        proxies.
+        of how the cascade compounds (or doesn&apos;t), and all of it is
+        token-only, with no word-era proxies.
       </p>
 
       {/* The metric list with explanations */}
@@ -466,7 +466,7 @@ function CascadeList() {
           The telescoping identity
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The cascade has three stages — transmission (O/I), commitment
+          The cascade has three stages: transmission (O/I), commitment
           (Create/O), and reuse (Read/Create). Their product{" "}
           <strong>must</strong> equal cache_read / input exactly, because the
           intermediate terms cancel:
@@ -475,7 +475,7 @@ function CascadeList() {
           {`(O/I) × (Create/O) × (Read/Create) = Read/Input`}
         </pre>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          So 10^(10xDEV) = Leverage, by identity — not by fit. An operator
+          So 10^(10xDEV) = Leverage, by identity, not by fit. An operator
           cannot inflate their amplification exponent independently of their
           leverage; the two are bound by algebra. This is Test 3 in the
           verification suite — it catches any fabricated row where the numbers
@@ -489,11 +489,12 @@ function CascadeList() {
           Three operating dimensions, seven analytical views
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank is not seven independent measurements. It is a{" "}
+          SigRank is a{" "}
           <strong className="text-text-primary">coordinate system</strong> for
-          AI operating behavior. Three structural ratios describe the actual
-          operating state. Four analytical transformations interpret that state.
-          One narrative representation communicates it in natural language.
+          AI operating behavior rather than seven independent measurements.
+          Three structural ratios describe the actual operating state, four
+          analytical transformations interpret that state, and one narrative
+          representation communicates it in natural language.
         </p>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -541,13 +542,14 @@ function CascadeList() {
           answering different questions. SNR (S = V/(1+V)) places the unbounded
           velocity ratio onto a 0-1 scale for comparison. 10xDEV (D = log10(L))
           makes differences between 10x, 100x, and 1000x leverage legible. Yield
-          (Y = L x V) measures the interaction between reuse and output - both
-          must survive for Yield to be high. The dependence is the architecture.
+          (Y = L x V) measures the interaction between reuse and output, since
+          both must survive for Yield to be high, and the dependence is the
+          architecture.
         </p>
 
         <div className="rounded border border-gold/20 bg-gold/5 p-3">
           <p className="font-mono text-xs text-gold">
-            One operating state. Seven analytical views.
+            One operating state, seen through seven analytical views.
           </p>
         </div>
       </section>
@@ -558,8 +560,8 @@ function CascadeList() {
           Same Yield, different machine
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Yield gives coupled strength. Operating Ratio reveals how that
-          strength was constructed. Two operators can produce the same Yield
+          Yield gives coupled strength, and Operating Ratio reveals how that
+          strength was constructed, so two operators can produce the same Yield
           through completely different operating structures:
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -568,7 +570,7 @@ function CascadeList() {
               100 : 1 : 2
             </p>
             <p className="font-sans text-xs text-text-secondary mt-1">
-              Cache-dominant. 100x leverage, 2x velocity. Yield = 200. This
+              Cache-dominant: 100x leverage, 2x velocity, Yield = 200. This
               operator reuses enormous amounts of cached context and produces
               modest output per input token.
             </p>
@@ -578,24 +580,24 @@ function CascadeList() {
               20 : 1 : 10
             </p>
             <p className="font-sans text-xs text-text-secondary mt-1">
-              Output-dominant. 20x leverage, 10x velocity. Yield = 200. This
+              Output-dominant: 20x leverage, 10x velocity, Yield = 200. This
               operator produces substantial output per input token with moderate
               cache reuse.
             </p>
           </div>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Both produce Yield 200. But one is a cache compounding machine and the
+          Both produce Yield 200, but one is a cache compounding machine and the
           other is an output generation machine. Yield alone hides that
-          distinction. Operating Ratio reveals it immediately. This is why the
-          system shows several dependent metrics together - each answers a
-          different question about the same operating state.
+          distinction, while Operating Ratio reveals it immediately, which is
+          why the system shows several dependent metrics together: each answers
+          a different question about the same operating state.
         </p>
         <div className="rounded border border-gold/20 bg-gold/5 p-3">
           <p className="font-mono text-xs text-gold">
             Yield is an AND-gate: if reuse is zero OR output is zero, Yield is
-            zero. High reuse cannot compensate for producing nothing. High
-            output cannot compensate for preserving nothing.
+            zero, because high reuse cannot compensate for producing nothing and
+            high output cannot compensate for preserving nothing.
           </p>
         </div>
       </section>
@@ -613,7 +615,7 @@ function WorkedOperatorRead() {
       </h2>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-secondary">
         One operator, four pillars, the full cascade. This is how the numbers
-        compose - from raw integers to every derived metric.
+        compose, from raw integers to every derived metric.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -649,34 +651,34 @@ function WorkedOperatorRead() {
       <div className="flex flex-col gap-2">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">How to read it.</strong> The
-          operator sends 1.25M fresh tokens and reuses 2.56B from cache - a{" "}
+          operator sends 1.25M fresh tokens and reuses 2.56B from cache, a{" "}
           <strong className="text-text-primary">2,042x</strong> leverage ratio.
-          They produce 11.3M output tokens on that 1.25M input - a{" "}
+          They produce 11.3M output tokens on that 1.25M input, a{" "}
           <strong className="text-text-primary">9.03</strong> velocity. Yield
           is the product: <strong className="text-text-primary">18,436.98</strong>.
           The cascade compounds: cache-read dwarfs input by three orders of
-          magnitude, and output is 9x the fresh input. This is the 10xer shape.
+          magnitude, and output is 9x the fresh input, which is the 10xer shape.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           <strong className="text-text-secondary">The telescoping check.</strong>{" "}
           Transmission (O/I) = 9.03. Commitment (W/O) = 11.35. Reuse (R/W) =
           19.93. Product = 9.03 x 11.35 x 19.93 = 2,042 = Leverage. The identity
-          holds - the derived metrics compose exactly.
+          holds, so the derived metrics compose exactly.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           <strong className="text-text-secondary">Archetype and class.</strong>{" "}
           Construction = W/R = 0.050 (active context building). Leverage = 2042
           (far above the P80 gate of 74.6). Velocity = 9.03 (far above the P80
-          gate of 0.34). All three axes elevated - this is the{" "}
+          gate of 0.34). All three axes are elevated, so this is the{" "}
           <strong className="text-gold">CONVERGENT</strong> archetype. Class:
           2.7B total tokens places this operator in the{" "}
           <strong className="text-text-primary">ARCH+</strong> experience tier.
         </p>
         <p className="font-sans text-xs leading-relaxed text-text-dim">
-          The signature describes the structure of this workflow - extreme
-          cache reuse, high output velocity, active context construction. It
-          does not describe whether the work was correct, original, or
-          valuable. It says: this is how the operator works the tools.
+          The signature describes the structure of this workflow (extreme
+          cache reuse, high output velocity, active context construction), not
+          whether the work was correct, original, or valuable; it says this is
+          how the operator works the tools.
         </p>
       </div>
     </section>
@@ -698,11 +700,11 @@ function TransmitterClasses() {
       </div>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
         Eight experience tiers from ARCH+ down to IGNITER, each split into three
-        sub-stages (I/II/III) - 24 stages total. Plus the TRANSMITTER peak
+        sub-stages (I/II/III), 24 stages total, plus the TRANSMITTER peak
         badge, a temporary state any tier can earn during a high-frequency,
         high-resonance window. Class is assigned from{" "}
-        <strong className="text-text-primary">total tokens accumulated</strong>{" "}
-        - not compression, not yield, not SIGNA. It tracks how much real work
+        <strong className="text-text-primary">total tokens accumulated</strong>
+        , not compression, not yield, not SIGNA. It tracks how much real work
         the operator has put in, not how efficient that work is.
       </p>
 
@@ -715,18 +717,18 @@ function TransmitterClasses() {
           Class tier is a single-axis read:{" "}
           <strong className="text-text-primary">total tokens accumulated</strong>
           . The more real token flow an operator has logged, the higher their
-          tier. It is a qualification ladder, not a quality ranking - a
+          tier. It is a qualification ladder, not a quality ranking: a
           high-tier operator is not necessarily more efficient than a low-tier
           one. A small operator can out-yield a large one; class tracks volume,
           yield tracks efficiency.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          The TRANSMITTER badge is separate. It is a temporary peak state that
+          The TRANSMITTER badge is separate: it is a temporary peak state that
           any tier can earn during a window where the operator hits both high
           frequency (token throughput) and high resonance (SIGNA RATE, a
           composite signal-quality score currently under recalibration). The
-          badge lapses when frequency or resonance drops. It is not a permanent
-          class - it is a windowed peak.
+          badge lapses when frequency or resonance drops, so it is a windowed
+          peak rather than a permanent class.
         </p>
       </section>
 
@@ -738,7 +740,7 @@ function TransmitterClasses() {
           How you move between classes
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Class is not a lifetime label. It is recomputed every scoring window
+          Class is not a lifetime label; it is recomputed every scoring window
           (7d / 30d / 90d / all-time). The more tokens you log in a window, the
           higher your tier for that window. An operator who stops working will
           see their class drift down as the window rolls forward.
@@ -775,13 +777,13 @@ const ARCHETYPE_FAMILIES = [
     name: "Reuse Depth",
     color: "#3498db",
     members: ["INPUT-BOUND", "PRIMING", "CONTEXTUAL", "DEEP READER", "ARCHIVIST"],
-    desc: "The passive reuse axis. How deeply an operator draws on accumulated context, from almost none (INPUT-BOUND) to extreme (ARCHIVIST).",
+    desc: "The passive reuse axis, covering how deeply an operator draws on accumulated context, from almost none (INPUT-BOUND) to extreme (ARCHIVIST).",
   },
   {
     name: "Active Construction",
     color: "#2ecc71",
     members: ["BUILDER", "RECURSIVE", "AMPLIFIER"],
-    desc: "The active construction axis. How much new context an operator writes for future reuse, scaled by how much leverage they already have.",
+    desc: "The active construction axis, covering how much new context an operator writes for future reuse, scaled by how much leverage they already have.",
   },
 ] as const;
 
@@ -876,7 +878,7 @@ function BuildArchetypesSection() {
         </span>
       </div>
       <p className="max-w-2xl font-sans text-sm leading-relaxed text-text-muted">
-        Every operator lands in exactly one build archetype - a composition
+        Every operator lands in exactly one build archetype, a composition
         classifier that describes <strong>how</strong> they operate, not how
         much. This is a <strong className="text-text-primary">separate axis</strong>{" "}
         from the experience ladder. An ARCH+ can be INPUT-BOUND (deep
@@ -1061,8 +1063,8 @@ function BuildArchetypesSection() {
         <p className="font-sans text-xs leading-relaxed text-text-muted">
           Both are recomputed every scoring window (7d / 30d / 90d / all-time).
           An operator can shift from INPUT-BOUND to AMPLIFIER within a week if
-          their architecture changes - the archetype tracks the live shape,
-          not a lifetime label.
+          their architecture changes, because the archetype tracks the live
+          shape, not a lifetime label.
         </p>
       </section>
     </section>
@@ -1396,7 +1398,7 @@ function SubmitMcpLead() {
           The SigRank agent reads your local session logs across{" "}
           {PLATFORM_COUNT}+ AI coding platforms (Claude Code, Codex, Gemini CLI,
           Copilot CLI, Amp, Goose, Kilo, and more) and counts the four token
-          pillars per window —{" "}
+          pillars per window, with{" "}
           <strong className="text-text-primary">
             zero paste, token counts only, never your prompt content.
           </strong>{" "}
@@ -1416,12 +1418,13 @@ npx sigrank`}
         <code className="rounded bg-bg-surface px-1 py-0.5 font-mono text-xs text-gold">
           npx sigrank
         </code>{" "}
-        opens your dashboard — the cascade across every detected platform and
-        window, the 5-source token comparison, and your board position.{" "}
+        opens your dashboard, showing the cascade across every detected
+        platform and window, the 5-source token comparison, and your board
+        position.{" "}
         <strong className="text-text-primary">
           Submitting to the board is managed from your profile
         </strong>{" "}
-        (sign in, then publish) — so your numbers land verified and stay yours.
+        (sign in, then publish), so your numbers land verified and stay yours.
         Full command + tool reference is in{" "}
         <a
           href="/wiki/local-agent"
@@ -1439,8 +1442,8 @@ npx sigrank`}
           The agent reads token counts. It does not read your prompts, your
           replies, your code, or your file contents. The four integers are all
           that leaves your machine. The server derives the cascade from those
-          four - no content is transmitted, stored, or seen by anyone. This is
-          not a privacy compromise we tolerate; it is the architecture the
+          four, and no content is transmitted, stored, or seen by anyone. This
+          is not a privacy compromise we tolerate; it is the architecture the
           Conservation Law predicts. Full detail in the Proof section below.
         </p>
       </div>
@@ -1452,17 +1455,17 @@ const FLOW: { step: string; title: string; body: string }[] = [
   {
     step: "01",
     title: "The local agent reads your tokens",
-    body: `The SigRank agent (MCP) reads local session logs from ${PLATFORM_COUNT}+ platforms — Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more — and counts the four token pillars. You never touch a number; the agent is the verifier. It never reads the content of your prompts or replies.`,
+    body: `The SigRank agent (MCP) reads local session logs from ${PLATFORM_COUNT}+ platforms (Claude Code, Codex, Amp, Gemini CLI, Copilot CLI, Goose, Kilo, and more) and counts the four token pillars. You never touch a number, because the agent is the verifier, and it never reads the content of your prompts or replies.`,
   },
   {
     step: "02",
     title: "We compute the cascade layer",
-    body: "From your four pillars we derive Υ Yield, Leverage, SNR, 10xDEV, and your cascade species. Architecture is the only variable — the same four integers reveal whether you're a Burner, a Builder, or a 10×er.",
+    body: "From your four pillars we derive Υ Yield, Leverage, SNR, 10xDEV, and your cascade species. Architecture is the only variable: the same four integers reveal whether you're a Burner, a Builder, or a 10×er.",
   },
   {
     step: "03",
     title: "Account + review lands you on the board",
-    body: "Board entries go through an account and a quick review, so the leaderboard stays honest (observer-inflated tooling gets stripped). Want to just see your numbers? Paste below — it runs instantly and does NOT save to the board.",
+    body: "Board entries go through an account and a quick review, so the leaderboard stays honest (observer-inflated tooling gets stripped). To just see your numbers, paste below; it runs instantly and does NOT save to the board.",
   },
 ];
 
@@ -1493,21 +1496,22 @@ function SubmitFlow() {
         </h3>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The board is public and ranked. Without a gate, it would fill with
-          observer-inflated entries — tooling that reports numbers the operator
+          observer-inflated entries: tooling that reports numbers the operator
           didn&apos;t actually produce, or synthetic data designed to game a
           single metric. The account ties a submission to a real identity; the
           review checks that the token counts are physically plausible and that
           the source logs haven&apos;t been edited.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          The review is lightweight — it runs the plausibility gate (range
+          The review is lightweight: it runs the plausibility gate (range
           checks, cross-field ratios, cadence bounds) and the source-attestation
           cross-check (log file hashes that detect tampering across
           submissions). Benford&apos;s Law runs as a backstop but is cosmetic at
           per-session scale (n=4); its real power is aggregate, across the whole
-          board. If the numbers compose, the entry lands. If they don&apos;t, it
-          gets flagged. The gate is mechanical, not editorial — we don&apos;t
-          judge whether your work is good, just whether your numbers are real.
+          board. If the numbers compose, the entry lands, and if they
+          don&apos;t, it gets flagged. The gate is mechanical rather than
+          editorial, since we don&apos;t judge whether your work is good, just
+          whether your numbers are real.
         </p>
       </section>
 
@@ -1520,11 +1524,11 @@ function SubmitFlow() {
           The agent reads token counts. It does not read your prompts, your
           replies, your code, or your file contents. The four integers (input,
           output, cache-read, cache-write) are all that leaves your machine. The
-          server derives the cascade from those four — no content is
+          server derives the cascade from those four, and no content is
           transmitted, stored, or seen by anyone.
         </p>
         <p className="font-sans text-xs text-text-muted">
-          This is not a privacy compromise we tolerate — it is the architecture
+          This is not a privacy compromise we tolerate; it is the architecture
           the Conservation Law predicts. EXP-007 established that conserved
           structure is detectable without reading content. Token counts are a
           legitimate statistical witness; we never need to see what you typed.
@@ -1547,7 +1551,7 @@ function PasteRunNumbers() {
           <code className="rounded bg-bg-surface px-1 py-0.5 font-mono text-text-primary">
             ccusage --json
           </code>{" "}
-          in your terminal — it prints your four token pillars per session.
+          in your terminal, which prints your four token pillars per session.
           Paste the output below and the calculator derives your full cascade: Υ
           Yield, SNR, Leverage, Velocity, 10xDEV, and your projected class tier.
         </p>
@@ -1576,7 +1580,7 @@ function ManualEntryPanel() {
       <p className="mt-2 max-w-2xl font-sans text-sm text-text-muted">
         No token counts handy? This fallback estimates a rough cascade from
         coarse activity proxies (sessions, turns, account age) at reduced
-        confidence. It is an approximation only — the board ranks on the four
+        confidence. It is an approximation only, and the board ranks on the four
         token pillars, so run the local agent (or paste{" "}
         <code className="rounded bg-bg-surface px-1 py-0.5 font-mono text-xs text-text-primary">
           ccusage --json
@@ -1603,7 +1607,7 @@ function ContactCard() {
       </span>
       <p className="max-w-md font-sans text-sm text-text-secondary">
         Paste not parsing, reader we don&apos;t support yet, or just want to
-        talk? Reach us — we read everything.
+        talk? Reach us; we read everything.
       </p>
       <div className="mt-1 flex flex-wrap justify-center gap-2">
         <a
@@ -1916,35 +1920,26 @@ export default function Draft1Page() {
     <div className="flex flex-col gap-0">
       <JsonLd data={breadcrumb([{ name: "Wiki", path: "/wiki" }])} />
       <JsonLd
+        data={collectionPage({
+          path: "/wiki",
+          name: "SignalAF Wiki",
+          description: "The living reference for operator evaluation — grounded in token telemetry.",
+          items: [
+            { name: "The Four Degrees of Leverage", path: "/wiki/four-degrees" },
+            { name: "Verification & Integrity Tests", path: "/wiki/verification" },
+            { name: "How We Got Here — Refining the Index", path: "/wiki/methodology-refinement" },
+            { name: "The Local Agent (MCP)", path: "/wiki/local-agent" },
+            { name: "Signature Drift — the tune meter", path: "/wiki/signal-drift" },
+            { name: "Measured Alongside", path: "/wiki/measured-alongside" },
+          ],
+        })}
+      />
+      <JsonLd
         data={definedTerm(
           "Conservation Law of Commitment",
           "C(T(S)) ≈ C(S) with enforcement; C(T(S)) < C(S) without it. Commitment content (obligations, prohibitions, modal constraints) persists under recursive transformative compression when an enforcement gate is present. Published under CC-BY-4.0 (DOI: 10.5281/zenodo.20029607). Enforced by MO§ES™ (Modus Operandi §ignal Scaling Expansion System) — constitutional governance framework co-authored by nine rival AI architectures. Patent portfolio: Provisional 63/877,177 + 63/883,018 + 63/991,282 + Utility 19/426,028 + trademark TM 99408355 (IC 042).",
           "/wiki#conservation-law-of-commitment",
         )}
-      />
-      <JsonLd
-        data={faqPage([
-          {
-            question: "What is the SigRank wiki?",
-            answer:
-              "The SigRank wiki is the living reference for AI operator evaluation. It covers the four token pillars (input, output, cache-read, cache-write), the cascade metrics derived from them, the eight experience tiers, build archetypes, and the MO§ES governance framework. Every concept is grounded in token telemetry — no prompts, no code, no self-reported fields.",
-          },
-          {
-            question: "What are the four token pillars?",
-            answer:
-              "The four token pillars are Input (fresh prompt tokens you send), Output (tokens the model generates back), Cache-read (tokens served from cache — cheap reuse of held context), and Cache-write (tokens written to cache — context you build forward). Every SigRank metric is derived from these four integers. No prompt content or code is ever read.",
-          },
-          {
-            question: "What is the token cascade?",
-            answer:
-              "The token cascade is the relationship between the four token pillars. An operator who writes cache and reads it back is compounding — their cache-read dwarfs their input. An operator who sends fresh input every turn is burning — their input dwarfs everything else. The cascade is a loop: cache-read feeds back into the next turn's input, reducing what you need to send.",
-          },
-          {
-            question: "How does SigRank classify operators?",
-            answer:
-              "SigRank classifies operators by archetype (cascade shape), class (qualification tier), and rank (leaderboard position). Archetypes include Burner, Builder, and 10xer. Classes range from IGNITER to ARCH+. All three are recomputed every scoring window (7-day, 30-day, 90-day, all-time) — none are permanent.",
-          },
-        ])}
       />
 
       {/* Wiki inside the shared SignalAF workspace shell — same transfer
@@ -1954,13 +1949,13 @@ export default function Draft1Page() {
       <WorkspaceShell
         active="wiki"
         editorialStage
-        title="SIGNALAF WIKI"
+        title="SignalAF Wiki"
         bareTitle
         hero={
           <WaveHero
             eyebrow="SIGNALAF"
             terminalText="WIKI"
-            title="Signalaf Wiki"
+            title="SignalAF Wiki"
             subtitle={<>The living reference for operator evaluation — grounded in token telemetry.</>}
           />
         }

@@ -69,9 +69,14 @@ export interface WorkspaceShellProps {
   title?: ReactNode;
   /** Optional controls alongside the visible stage title. */
   titleControls?: ReactNode;
-  /** Render the h1 visually-hidden instead of the .stitle strip — for pages
-   *  whose hero is the visible title (Field Hub, Blog index). */
+  /** Skip the .stitle strip — for pages whose hero (WaveHero/WaveHeroTitle)
+   *  or content renders the page's visible h1 (Field Hub, Blog index, posts).
+   *  The shell emits NO h1 in this mode so the page keeps exactly one h1;
+   *  pass `srOnlyTitle` too when the content has no h1 of its own. */
   bareTitle?: boolean;
+  /** With `bareTitle`: render `title` as a visually-hidden h1 — for pages
+   *  whose visible heading is not an h1 (wiki topic pages use an h2). */
+  srOnlyTitle?: boolean;
   /** Edge-to-edge stage hero band (WaveHero), rendered above the board
    *  content and bleeding to the sidebar borders. Pass with bareTitle. */
   hero?: ReactNode;
@@ -119,6 +124,7 @@ export function WorkspaceShell({
   title,
   titleControls,
   bareTitle = false,
+  srOnlyTitle = false,
   hero,
   toolbar,
   leftTitle,
@@ -398,7 +404,7 @@ export function WorkspaceShell({
             <div className="stagecol">
               {title != null &&
                 (bareTitle ? (
-                  <h1 className="sr-only">{title}</h1>
+                  srOnlyTitle ? <h1 className="sr-only">{title}</h1> : null
                 ) : (
                   <div className="stitle">
                     <h1 className="pagetitle">{title}</h1>

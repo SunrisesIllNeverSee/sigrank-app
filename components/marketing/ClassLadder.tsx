@@ -70,12 +70,13 @@ export function ClassLadder() {
         ⊙ The hierarchy
       </div>
       <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-        Eight tiers. One ladder.
+        Eight tiers on one ladder.
       </h2>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
-        Your class is identity. Your rank is position. Class is assigned from
-        total tokens — eight tiers, each split into three sub-stages.
-        TRANSMITTER is a temporary peak badge, not a permanent class.
+        Your class is your identity and your rank is your position. Class is
+        assigned from total tokens across eight tiers, each split into three
+        sub-stages, and TRANSMITTER is a temporary peak badge, not a permanent
+        class.
       </p>
 
       <div className="mt-10 overflow-hidden rounded-2xl border border-bg-border-subtle bg-bg-surface">

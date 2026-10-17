@@ -2,18 +2,19 @@
 type: article
 title: "The Three Modes Behind the AI Operator Board"
 description: "Equal token totals can hide radically different workflows. Read human-led, hybrid/HITL, and agentic operation through four token pillars, operating ratio, throughput, and submission history."
+seo_description: "Equal token totals can hide different workflows. Read human-led, hybrid/HITL, and agentic operation from token pillars, operating ratio, and throughput."
 tags: [article, sigrank, ai-operators, operating-ratio, token-telemetry, hitl, agentic, cascade, methodology]
 timestamp: 2026-10-05T10:00:00Z
 author: Deric J. McHenry
 ---
 
-Ten million tokens. Three workflows. Three very different ways of working with AI.
+Ten million tokens can represent three workflows, which are three very different ways of working with AI.
 
 One person is steering a conversation turn by turn. Another sets a task, lets the system work through a batch, then reviews and redirects it. A third sets up a workflow that executes a queue of tasks with little ongoing intervention. A token-total leaderboard can put all three beside the same number. SigRank gives you the next question: **what happened to those tokens?**
 
 That is where the board becomes interesting. Fresh input, generated output, context construction, and context reuse form an operating signature. Add a measured period and you can see the rate at which that signature runs. Add workflow evidence and you can connect the numbers to a way of working.
 
-The field is about AI operators: people, builders, and systems organizing AI work. It gives their approaches a common statistical language. Like the stats of a sport or game, each measure makes a different part of the action visible—and gives you something specific to explore, compare, and learn from.
+The field is about AI operators: people, builders, and systems organizing AI work. It gives their approaches a common statistical language. Like the stats of a sport or game, each measure makes a different part of the action visible and gives you something specific to explore, compare, and learn from.
 
 ## Same total, different game
 
@@ -31,11 +32,11 @@ The following **illustrative examples** each contain exactly ten million process
 | Processed tokens per day | 1,000,000 | 1,000,000 | 1,000,000 |
 | Output tokens per day | 20,000 | 100,000 | 200,000 |
 
-The totals tie. The operating ratios tell three distinct stories.
+The totals tie, but the operating ratios tell three distinct stories.
 
 In the first example, fresh input is a substantial part of the activity: the person keeps supplying direction and context. In the second, a smaller amount of fresh input supports considerably more reuse and output. In the third, a very small fresh-input denominator accompanies large amounts of output and returning context. The described execution process explains why we call that example agentic.
 
-That final ratio is striking. It also rewards a closer look: how much fresh input was recorded, what the harness counted, how long the run lasted, and how it was directed. A higher Yield is a stronger measured reuse/output relationship to fresh input. Assessing the resulting work—its correctness, usefulness, or originality—adds a different kind of evidence.
+That final ratio is striking, and it also rewards a closer look: how much fresh input was recorded, what the harness counted, how long the run lasted, and how it was directed. A higher Yield is a stronger measured reuse/output relationship to fresh input. Assessing the resulting work (its correctness, usefulness, or originality) adds a different kind of evidence.
 
 ## Four pillars make the signature readable
 
@@ -95,7 +96,7 @@ Throughput asks how much recorded activity passes through the workflow over its 
 
 The three examples process the same million tokens per day, but generate different output rates. Their composition and activity rate belong together.
 
-Now multiply every pillar in one example by 100 while keeping the same ten-day period. Its operating ratio, Yield, SNR, and Construction stay the same. Its processed and output rates rise 100-fold. You have the same shape operating at a very different scale. That is a distinction a ratio alone cannot show.
+Now multiply every pillar in one example by 100 while keeping the same ten-day period. Its operating ratio, Yield, SNR, and Construction stay the same, while its processed and output rates rise 100-fold. That is the same shape operating at a very different scale, a distinction a ratio alone cannot show.
 
 Use the snapshot's actual start and end timestamps for the denominator. A label such as “30-day” is a selection window, not a substitute for retained coverage bounds. An all-time daily rate also needs an actual recorded period. If an active-day intensity measure is available, label it separately from the calendar-day rate.
 
@@ -117,7 +118,7 @@ The [historical field analysis](/blog/volume-isnt-yield) supplies another view: 
 
 Build Archetypes make recurring measured shapes easier to recognize. Workflow mode explains execution. Class records scale or qualification under its rules, and rank locates a profile within the selected field. Together, they provide several ways to discover an interesting operator beyond the first row.
 
-Try comparing similar totals with different operating ratios. Then try similar ratios at different throughput. Look for unusually strong context construction. Follow one operator across submissions. The board has more than one kind of standout, and these views give you the language to explain why.
+Try comparing similar totals with different operating ratios, then similar ratios at different throughput. Look for unusually strong context construction, and follow one operator across submissions. The board has more than one kind of standout, and these views give you the language to explain why.
 
 That is the educational value of an operator leaderboard: common reference points, visible differences, and concrete approaches worth investigating. **Tokenpull measures → SigRank evaluates → SignalAF publishes.** Start with the counts, read the relationships, and follow the workflow behind them.
 
