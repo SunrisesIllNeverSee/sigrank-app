@@ -57,6 +57,7 @@ import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBad
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { leaderboardItemList, sigrankDataset, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
 import { withOG } from "@/lib/seo";
 import { BoardTableClient } from "@/components/board/BoardTableClient";
 import { LiveBoardMount } from "./live-board-mount";
@@ -160,6 +161,31 @@ export default async function BoardWindowPage({
     ? "AI User"
     : `${win.days}-Day`;
 
+  // Single source for the FAQPage JSON-LD and the visible (collapsed) FAQ
+  // at the foot of the board stage.
+  const boardFaqs = [
+    {
+      question: `Who is the best AI user (${boardLabel.toLowerCase()})?`,
+      answer: `The best AI user on the ${boardLabel.toLowerCase()} SigRank leaderboard is the operator ranked #1 by Yield (Υ = cache_read × output / input²). This page shows the live ranking — operators are scored by objective token-cascade efficiency, not subjective voting. The #1 operator has the highest yield, meaning they reuse cached context most efficiently and produce the most output relative to their input.`,
+    },
+    {
+      question: "Who is the most efficient AI coder right now?",
+      answer: `The most efficient AI coder right now is the #1 operator on this SigRank ${boardLabel.toLowerCase()} leaderboard. Efficiency is measured by Yield (Υ = cache_read × output / input²) — a composite metric computed from signed token telemetry. The operator at the top maximizes context reuse and output while minimizing wasted input tokens.`,
+    },
+    {
+      question: "How are AI operators ranked on this leaderboard?",
+      answer: `AI operators on the SigRank ${boardLabel.toLowerCase()} leaderboard are ranked by Yield (Υ = cache_read × output / input²). Operators run the sigrank CLI locally, which reads four token pillars (cache_read, cache_write, input, output) and submits a signed, server-verifiable snapshot. No prompt content leaves the machine — only the four counts. The leaderboard updates as new snapshots are submitted.`,
+    },
+    {
+      question: "What is a user-based AI leaderboard?",
+      answer: `A user-based AI leaderboard ranks the accounts that use AI tools, not the AI models themselves. SigRank (signalaf.com) is the first user-based AI leaderboard — it ranks AI operators by objective token-cascade efficiency (Yield, Υ). This is different from model leaderboards like LMSYS Chatbot Arena, which rank AI models by human voting. SigRank answers "who is the best AI user?" not "which model is best?"`,
+    },
+    {
+      question: "Is SigRank a model leaderboard or a user leaderboard?",
+      answer: `SigRank is a user leaderboard. It ranks AI operators (the accounts using AI tools) by token-cascade efficiency, not AI models by benchmark performance. LMSYS Chatbot Arena, LiveBench, and Hugging Face Open LLM Leaderboard rank models. SigRank ranks users. If you want to know which model is best, use LMSYS. If you want to know who is the best AI user, use SigRank.`,
+    },
+  ];
+
   return (
     <>
       <JsonLd
@@ -175,29 +201,9 @@ export default async function BoardWindowPage({
             `/board/${slug}`,
           ),
           // AEO: FAQPage schema targeting "who is the best AI user?" queries
-          // on the leaderboard page itself — where the answer lives.
-          faqPage([
-            {
-              question: `Who is the best AI user (${boardLabel.toLowerCase()})?`,
-              answer: `The best AI user on the ${boardLabel.toLowerCase()} SigRank leaderboard is the operator ranked #1 by Yield (Υ = cache_read × output / input²). This page shows the live ranking — operators are scored by objective token-cascade efficiency, not subjective voting. The #1 operator has the highest yield, meaning they reuse cached context most efficiently and produce the most output relative to their input.`,
-            },
-            {
-              question: "Who is the most efficient AI coder right now?",
-              answer: `The most efficient AI coder right now is the #1 operator on this SigRank ${boardLabel.toLowerCase()} leaderboard. Efficiency is measured by Yield (Υ = cache_read × output / input²) — a composite metric computed from signed token telemetry. The operator at the top maximizes context reuse and output while minimizing wasted input tokens.`,
-            },
-            {
-              question: "How are AI operators ranked on this leaderboard?",
-              answer: `AI operators on the SigRank ${boardLabel.toLowerCase()} leaderboard are ranked by Yield (Υ = cache_read × output / input²). Operators run the sigrank CLI locally, which reads four token pillars (cache_read, cache_write, input, output) and submits a signed, server-verifiable snapshot. No prompt content leaves the machine — only the four counts. The leaderboard updates as new snapshots are submitted.`,
-            },
-            {
-              question: "What is a user-based AI leaderboard?",
-              answer: `A user-based AI leaderboard ranks the accounts that use AI tools, not the AI models themselves. SigRank (signalaf.com) is the first user-based AI leaderboard — it ranks AI operators by objective token-cascade efficiency (Yield, Υ). This is different from model leaderboards like LMSYS Chatbot Arena, which rank AI models by human voting. SigRank answers "who is the best AI user?" not "which model is best?"`,
-            },
-            {
-              question: "Is SigRank a model leaderboard or a user leaderboard?",
-              answer: `SigRank is a user leaderboard. It ranks AI operators (the accounts using AI tools) by token-cascade efficiency, not AI models by benchmark performance. LMSYS Chatbot Arena, LiveBench, and Hugging Face Open LLM Leaderboard rank models. SigRank ranks users. If you want to know which model is best, use LMSYS. If you want to know who is the best AI user, use SigRank.`,
-            },
-          ]),
+          // on the leaderboard page itself — where the answer lives. Also
+          // rendered visibly (collapsed) at the foot of the board stage.
+          faqPage(boardFaqs),
         ]}
       />
 
@@ -209,6 +215,9 @@ export default async function BoardWindowPage({
         key={win.slug}
         initial={initial}
         windowSlug={win.slug}
+        stageFooter={
+          <FaqSection faqs={boardFaqs} id="board-faq" variant="workspace" collapsed />
+        }
         legacy={
           <>
           <div className="flex flex-col gap-6">

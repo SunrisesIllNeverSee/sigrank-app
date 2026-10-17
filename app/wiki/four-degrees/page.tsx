@@ -3,7 +3,9 @@ import { TopicPage } from "@/components/wiki/TopicPage";
 import { FourDegreesChart } from "@/components/marketing/FourDegreesChart";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm } from "@/lib/jsonld";
+import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { FOUR_DEGREES_FAQS } from "@/lib/seo/page-faqs";
 
 export const metadata: Metadata = withOG({
   title: "The Four Degrees of Leverage",
@@ -30,10 +32,12 @@ export default function FourDegreesPage() {
             "The 10xDEV log anchor: AA baseline → median operator → top-100 median → top operator. The first column is a static modeled reference; the last three are measured live from the all-time board.",
             "/wiki/four-degrees",
           ),
+          faqPage(FOUR_DEGREES_FAQS),
         ]}
       />
 
       <FourDegreesChart variant="full" />
+      <FaqSection faqs={FOUR_DEGREES_FAQS} />
     </TopicPage>
   );
 }

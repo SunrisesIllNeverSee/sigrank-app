@@ -350,3 +350,8 @@
   .lbw-root:has(.ws-cmp-stage) .stage{overflow:auto}
   .lbw-root .ws-cmp-stage .ws-cmp{min-height:560px}
 }
+
+/* Visible FAQ (FaqSection variant="workspace" collapsed) sits under the fitted
+   compare grid: stack the stage vertically so it takes one line at the foot. */
+.lbw-root:has(.ws-cmp-stage) .stage>.board:has(>.ws-faq){flex-direction:column}
+.lbw-root:has(.ws-cmp-stage) .stage>.board>.ws-faq{margin-top:8px;padding-top:6px}

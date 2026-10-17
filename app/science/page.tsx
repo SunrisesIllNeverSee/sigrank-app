@@ -23,7 +23,10 @@ import {
   experimentalRecordDataset,
   transformationHarnessDataset,
   propositionsDataset,
+  faqPage,
 } from "@/lib/jsonld";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { SCIENCE_FAQS } from "@/lib/seo/page-faqs";
 
 export const metadata: Metadata = withOG({
   title: "Science — The Conservation Law of Commitment",
@@ -45,6 +48,7 @@ export default function SciencePage() {
           transformationHarnessDataset(),
           propositionsDataset(),
           breadcrumb([{ name: "Science", path: "/science" }]),
+          faqPage(SCIENCE_FAQS),
         ]}
       />
 
@@ -440,6 +444,8 @@ export default function SciencePage() {
           .
         </p>
       </section>
+
+      <FaqSection faqs={SCIENCE_FAQS} />
 
       {/* ── Topic hubs ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
