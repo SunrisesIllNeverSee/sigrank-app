@@ -5,11 +5,15 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
+import { editorialPagesMarkdown } from "@/lib/seo/llms-pages";
 
 export const revalidate = 86400;
 
 export async function GET() {
-  const homeStats = await getHomepageStats();
+  const [homeStats, editorialPages] = await Promise.all([
+    getHomepageStats(),
+    editorialPagesMarkdown(SITE_ORIGIN),
+  ]);
   const operatorCount = homeStats.total_operators;
   const medianYield = homeStats.median_yield;
 
@@ -106,6 +110,10 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Wiki](${SITE_ORIGIN}/wiki): four token pillars, cascade metrics, operator archetypes, MO§ES governance
 - [Compare](${SITE_ORIGIN}/compare): head-to-head operator comparison
 - [SigRank for Vercel](${SITE_ORIGIN}/vercel): Vercel-native MCP distribution and public deployment diagnostic
+- [SigRank overview](${SITE_ORIGIN}/sigrank): the evaluation platform for AI operators — what it measures and how
+- [About](${SITE_ORIGIN}/about): what SigRank is, privacy model, and FAQ
+
+${editorialPages}
 
 ## Common Questions (Q&A)
 

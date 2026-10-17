@@ -324,8 +324,8 @@ function SourceMarkers() {
       >
         field analysis
       </Link>
-      ). All derived from canonical four-pillar token telemetry. Token counts
-      only. Read the{" "}
+      ). All derived from canonical four-pillar token telemetry (token counts
+      only). Read the{" "}
       <Link
         href="/blog/volume-isnt-yield"
         className="text-text-accent underline-offset-2 hover:underline"
@@ -352,7 +352,7 @@ function Provenance() {
         <p>
           The Artificial Analysis pricing baseline sets a 7:2:1 ratio for
           cache-read : cache-write : fresh input. This is a modeled reference
-          point, not live data — it represents the &ldquo;average AI user&rdquo;
+          point, not live data, and it represents the &ldquo;average AI user&rdquo;
           operating ratio of 3.5:1:0.5 (cache-read : input : output). Efficiency
           is 1.00 by definition: all other operators are measured against this.
           Source:{" "}
@@ -395,7 +395,7 @@ function Provenance() {
           The median of the top 100 real operators on the all-time board, ranked
           by Υ Yield. Median, not mean: the top 100 is right-skewed (the top 5
           have yields 10-100× higher than the rest), so the median is the honest
-          &ldquo;typical elite performer&rdquo; — the operator ranked ~50th out
+          &ldquo;typical elite performer&rdquo;, the operator ranked ~50th out
           of the top 100. Source:{" "}
           <Link
             href="/board/all"
@@ -416,10 +416,10 @@ function Provenance() {
           statistical outliers separated for this reference calculation. Median, not mean: the
           board is heavily right-skewed (a single IGNITER-class operator with 9
           quadrillion input tokens pulls the mean yield to 427 vs the median of
-          2.5 — a 170× spread). The median is the exact 50th percentile, immune
-          to any outlier no matter how extreme. The trimmed mean (drop 5% each
-          end) still lands at 17.6 vs 2.5 — still pulled by the upper-middle.
-          Median is the cleanest cut. The gap between this column and the AA
+          2.5, a 170× spread). The median is the exact 50th percentile, immune
+          to any outlier no matter how extreme, whereas the trimmed mean (drop 5%
+          each end) still lands at 17.6 vs 2.5, still pulled by the upper-middle,
+          so the median is the cleanest cut. The gap between this column and the AA
           baseline is the selection effect: real operators who install a token
           scanner are cache-heavy (leverage ~20× vs AA&apos;s 3.5×) but
           output-light (velocity ~0.09 vs AA&apos;s 0.50) — net yield is close
@@ -444,9 +444,9 @@ function Provenance() {
           long tail burns tokens. The mean is dragged toward the extremes; the
           median sits at the honest middle. For the &ldquo;typical
           operator&rdquo; column, the median answers &ldquo;what does the
-          operator at the 50th percentile look like?&rdquo; — which is the
+          operator at the 50th percentile look like?&rdquo;, which is the
           question the chart asks. A mean would answer &ldquo;what would you get
-          if you pooled everyone&apos;s tokens and divided evenly?&rdquo; — which
+          if you pooled everyone&apos;s tokens and divided evenly?&rdquo;, which
           is a different question, and not a useful one when the distribution is
           this skewed.
         </p>
@@ -470,7 +470,7 @@ function Provenance() {
         <p>
           <span className="text-text-muted">§</span>{" "}
           <strong>AA baseline</strong>: the Artificial Analysis 7:2:1 modeled
-          reference (3.5:1:0.5 operating ratio). Static — not live data.
+          reference (3.5:1:0.5 operating ratio). Static, not live data.
           Efficiency = 1.00 by definition.
         </p>
         <p>
@@ -583,25 +583,24 @@ export async function FourDegreesChart({
                 </strong>
                 . The AA baseline at{" "}
                 <strong className="text-text-muted">{aa.opRatio}</strong> is the
-                modeled reference — the average AI user. The median operator on
+                modeled reference, the average AI user. The median operator on
                 the board sits at{" "}
                 <strong className="text-text-primary">{avg.opRatio}</strong>{" "}
-                (the second column) — the typical operator, the 50th percentile
+                (the second column), the typical operator and the 50th percentile
                 of everyone measured.
               </p>
               <p>
                 The median of the{" "}
-                <strong className="text-text-primary">top 100</strong> operators
-                lands at{" "}
-                <strong className="text-text-primary">{power.opRatio}</strong>.
-                What they give up in output they bank in cache — the typical
-                elite performer.
+                <strong className="text-text-primary">top 100</strong> operators,
+                the typical elite performer, lands at{" "}
+                <strong className="text-text-primary">{power.opRatio}</strong>:
+                what they give up in output they bank in cache.
               </p>
               <p>
                 The top operator on the live board sits at{" "}
                 <strong className="text-gold">{gold.opRatio}</strong>: every
                 input token returns multiple outputs while carrying a deep
-                cache. That&apos;s the eval to beat.
+                cache, which makes it the eval to beat.
               </p>
             </div>
           </div>
@@ -628,16 +627,16 @@ export async function FourDegreesChart({
           Read it as a token cascade:{" "}
           <strong className="text-text-primary">Cache : Input : Output</strong>.
           The AA baseline sits at{" "}
-          <strong className="text-text-muted">{aa.opRatio}</strong> — the modeled
+          <strong className="text-text-muted">{aa.opRatio}</strong>, the modeled
           average AI user. The median operator on the all-time board sits at{" "}
-          <strong className="text-text-primary">{avg.opRatio}</strong> — the
-          typical operator, the 50th percentile of everyone measured. The median
+          <strong className="text-text-primary">{avg.opRatio}</strong>, the
+          typical operator and the 50th percentile of everyone measured. The median
           of the top 100 lands at{" "}
-          <strong className="text-text-primary">{power.opRatio}</strong>, output
+          <strong className="text-text-primary">{power.opRatio}</strong>, with output
           traded for cache. The top operator on the live board is{" "}
           <strong className="text-gold">{gold.opRatio}</strong>: every input
-          returns multiple outputs on a deep cache. Four degrees of leverage,
-          each a real skill, and the distance between them learnable. The last
+          returns multiple outputs on a deep cache. These four degrees of leverage
+          are each a real skill, and the distance between them is learnable. The last
           three columns are measured live from the{" "}
           <Link
             href="/board/all"

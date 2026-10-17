@@ -2,8 +2,10 @@
 type: article
 title: "Volume Isn't Yield: The Shape of AI Operators"
 description: A historical analysis of 1,628 AI coding operator records by volume, Yield, and token-flow composition. Statistical groups describe operating signatures, not the level of human intervention.
+seo_description: "A historical analysis of 1,628 AI coding operator records by volume, Yield, and token-flow composition. Groups show operating signatures, not intervention."
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
+modified: 2026-10-05
 author: Deric J. McHenry
 hero: /article-charts/webp/03-volume-vs-yield.webp
 ---
@@ -12,13 +14,13 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 
 > **Terminology correction (2026-10-03):** Earlier versions called productive low-input records “extreme humans” and used a statistical outlier screen as though it identified who steered a workflow. The screen measured token-flow shape. Below, **productive high-reuse signatures** names records with substantial output and cache writing despite little fresh input; replay and input-dump anomalies remain separate. The planned HITL and Agentic board modes will use cohort membership and workflow evidence, respectively. The historical counts and clustering remain dated findings, not board-mode labels.
 
-> [1] We ranked 1,628 AI coding operator records by token volume, then measured how their four token flows relate. This historical analysis separated seven composition clusters and a statistical outlier group. The median record had 19 cache-read tokens per fresh-input token. The shape is not what you'd expect.
+> [1] We ranked 1,628 AI coding operator records by token volume, then measured how their four token flows relate. This historical analysis separated seven composition clusters and a statistical outlier group. The median record had 19 cache-read tokens per fresh-input token, and the shape is not what you'd expect.
 
 ---
 
 ## Why SigRank Exists
 
-[2] Operator leaderboards rank by volume. Total tokens. Who burned the most. It's the only metric anyone publishes, and it's the wrong one.
+[2] Operator leaderboards rank by volume, meaning total tokens, or who burned the most. It's the only metric anyone publishes, and it's the wrong one.
 
 [3] Volume tells you how much token traffic was recorded. It does not reveal its operating structure. A record with 9 quadrillion tokens of almost entirely input traffic (99.999943% input, near-zero output, zero cache reuse) ranks #1 by volume despite showing no comparable reuse or generation. That's an input-dump anomaly, not the benchmark for a productive cascade.
 
@@ -32,7 +34,7 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 Y = (cache_read × output) / input^2
 ```
 
-[7] Yield combines cache reuse and generated output relative to fresh input. Cache writing is a separate pillar that helps explain context construction. Volume ranks total traffic; Yield ranks a relationship among token flows. That's the central distinction.
+[7] Yield combines cache reuse and generated output relative to fresh input. Cache writing is a separate pillar that helps explain context construction. Volume ranks total traffic while Yield ranks a relationship among token flows, and that is the central distinction.
 
 > **Why input is squared.** Input appears in the denominator as input², not input. With cache read and output held fixed, less fresh input increases Yield quadratically; the formula does not itself penalize a near-zero denominator. The outlier checks in [15a] separately examine whether a low-input record also has substantial output and cache writing, or resembles replay-only traffic. Neither the formula nor that screen determines how much human steering occurred.
 
@@ -40,7 +42,7 @@ Y = (cache_read × output) / input^2
 
 [8] Once you measure the cascade instead of the total, you can see the **shape** of the field. SigRank analyzed 1,628 operators from public AI coding agent leaderboards and ran the cascade math on every one of them.
 
-[9] The first thing the margins show: **92.4% of the median operator's tokens are cache reads.** Not input. Not output. Cache reads. The typical operator is not typing new prompts; they're reusing cached context. That's the economy. Input is 5.0%. Output is 0.5%. Cache write is 1.6%. The rest (the overwhelming majority) is cache read.
+[9] The first thing the margins show is that **92.4% of the median operator's tokens are cache reads**, not input or output. The typical operator is not typing new prompts; they're reusing cached context, which is the economy. Input is 5.0%, output is 0.5%, and cache write is 1.6%, with the rest (the overwhelming majority) being cache read.
 
 | Pillar | Median % | What it means |
 |--------|----------|---------------|
@@ -51,7 +53,7 @@ Y = (cache_read × output) / input^2
 
 > **Rounding note.** Percentages are median-of-ratios — each operator's pillar share is computed individually, then the median across all 1,498 Human Center of Mass operators is reported. Pillar medians may not sum to exactly 100% because medians don't commute with sums. All ratios in this article (operating ratio, leverage, velocity) are median-of-ratios, not ratio-of-medians; the two diverge when distributions are skewed.
 
-[10] This is why volume is misleading. An operator with 5 billion total tokens might have only 200 million tokens of actual input; the rest is cache replay. They're not "using" 5 billion tokens. They're using 200 million and compounding it.
+[10] This is why volume is misleading. An operator with 5 billion total tokens might have only 200 million tokens of actual input; the rest is cache replay. They're not "using" 5 billion tokens so much as using 200 million and compounding it.
 
 ## Can the Data Be Trusted?
 
@@ -120,13 +122,13 @@ Y = (cache_read × output) / input^2
 
 [21] The middle 50% of operators (the IQR) live between 1.8B and 16B total tokens. The median yield is 1.68, meaning the typical operator gets about 1.7x more signal out of their cascade than they put in as input. The top 1% pulls 10,000x or more.
 
-[22] The median leverage is 18.6x. For every token of fresh input, the median operator reads 19 tokens of cached context. That's the cascade economy in one number.
+[22] The median leverage is 18.6x. For every token of fresh input, the median operator reads 19 tokens of cached context, which is the cascade economy in one number.
 
 [22b] **How does this compare to the "average AI user"?** The [Artificial Analysis](https://artificialanalysis.ai) pricing baseline models a 7:2:1 cache-read : cache-write : input ratio — the "average AI user" has a yield of 1.75, leverage of 3.5×, and velocity of 0.50. The real SigRank field median (yield 1.68, leverage 18.6×, velocity 0.09) tells a very different story: actual operators who install a token scanner read **5× more cache** than the model assumes (18.6× vs 3.5× leverage) but produce **5× less output per input** (0.09 vs 0.50 velocity). Net yield is about the same (1.68 vs 1.75) — but the composition is cache-heavy, output-light. The [Four Degrees of Leverage chart](/wiki/four-degrees) shows this side by side: the AA baseline column (static, the modeled average) next to the Human Center of Mass column (live, the real field median). The gap between them is the selection effect: people who care enough to measure their token cascade are cache-efficient, not output-prolific.
 
 [22a] Three more metrics in the table above need defining. **Velocity** is output divided by input: how much the model generates per token of fresh context. The median is 0.09, meaning 9 tokens of output for every 100 tokens of input. **SNR** (signal-to-noise ratio) is output as a fraction of input plus output: what fraction of the operator's interaction was actual generated signal versus prompt overhead. The median is .084, which makes sense when 92.4% of tokens are cache replay — the cascade is dominated by context reuse, not fresh interaction. **Cache Read %** is the share of total tokens that are cache reads: how much of the operator's world is reused context versus fresh interaction or output. The median is 0.924, meaning 92.4% of everything an operator touches is cached context they built earlier. (Cache write is separate — 1.6% — so total cached context including writes is ~94.4%.)
 
-[23] This is where you land when you open SigRank. Not the outliers. The Human Center of Mass. Where you probably are.
+[23] This is where you land when you open SigRank: not the outliers, but the Human Center of Mass, where you probably are.
 
 ## Where the Tokens Go
 
@@ -145,7 +147,7 @@ Cache Write:      72M tokens   (1.6%)
 Cache Read:      4.77B tokens  (92.4%)
 ```
 
-[25] 92.4% cache read. That's the economy. The typical operator isn't typing new prompts; they're reusing cached context.
+[25] At 92.4% cache read, the typical operator isn't typing new prompts; they're reusing cached context, which is the same economy described above.
 
 [26] The **operating ratio** compresses this into one number. For the median operator:
 
@@ -153,44 +155,44 @@ Cache Read:      4.77B tokens  (92.4%)
 C : I : O = 19 : 1 : 0.09
 ```
 
-[27] 19 tokens of cache read for every 1 token of input. 0.09 tokens of output for every 1 token of input. That's the median operator's fingerprint: extreme cache reuse, modest output, tiny fresh input. The cascade rewards building cache that compounds, not burning tokens.
+[27] That is 19 tokens of cache read and 0.09 tokens of output for every 1 token of input, which is the median operator's fingerprint: extreme cache reuse, modest output, tiny fresh input. The cascade rewards building cache that compounds, not burning tokens.
 
-[28] This is why volume != yield. An operator with 10 trillion tokens and 0.01x yield is less efficient than an operator with 1 billion tokens and 1,000x yield. The first is pumping. The second is compounding.
+[28] This is why volume != yield. An operator with 10 trillion tokens and 0.01x yield is less efficient than an operator with 1 billion tokens and 1,000x yield. The first is pumping and the second is compounding.
 
 ![Volume vs Yield: The Central Finding](/article-charts/webp/03-volume-vs-yield.webp)
 
-[29] Volume-based leaderboards rank by total tokens. SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's ~500,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant." Yield says "elite."
+[29] Volume-based leaderboards rank by total tokens, whereas SigRank ranks by yield. The 50 ghost-rank operators (below the volume median but above the yield median) are invisible on every volume-based leaderboard. SigRank is the only place that surfaces them. Take `grishin43` (Grishin Vlad): ranked 1,142nd by volume with 2.07B total tokens, but yield of 839,628. That's ~500,000x the median yield, hidden at position 1,142 on a volume board. On SigRank, that operator is near the top. Volume says "irrelevant" while Yield says "elite."
 
 ## The 8 Archetypes
 
-[30] K-Means clustering was run on the 1,611 non-flagged operators. Not to invent categories; to discover what's already there. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
+[30] K-Means clustering was run on the 1,611 non-flagged operators. The aim was to discover what's already there rather than invent categories. The method: cluster on log(yield, leverage, velocity, SNR) to find yield tiers, then cluster on token composition proportions (input%, output%, cache_read%, cache_write%) to find shapes within each tier. The two-stage hierarchy is collapsed to a flat list here for readability; the full tier structure is on the [methodology page](/methodology).
 
 [31] **Eight statistical groups emerged** from the historical clustering and outlier analysis. Seven composition clusters came from K-Means on the 1,611 non-flagged records. The eighth — Outliers — combined 113 records from the input/total ratio analysis (including productive high-reuse signatures) and 17 flagged by the 6-signal score, for 130 outliers. Some records such as `furic` also appear in Cache Architects; the outlier group identifies values too extreme to set the cohort median. A silhouette score of 0.625 indicates separation in the measured feature space, not a human-versus-agentic classification.
 
 ![Seven historical composition clusters](/article-charts/webp/04-archetype-composition.webp)
 
 ### The Field (n=963, 59.8%)
-[32] The human center of mass. Yield 1.24, leverage 15.7x. Composition: 5.9% input, 0.4% output, 92.7% cache read, 0.8% cache write. These are the majority; consistent cache reuse, moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
+[32] The human center of mass, with yield 1.24 and leverage 15.7x. Composition is 5.9% input, 0.4% output, 92.7% cache read, and 0.8% cache write. These are the majority, with consistent cache reuse and moderate yield, finding their rhythm. If you use AI coding agents, this is probably you. Examples: `Xavierhorwood` (4.91B tokens, 0.73% input, 95.9% cache read), `LeeByeongMuk`, `journeyWorker`, `tellang` (18.7B tokens, 4.1% input, 92.9% cache read, yield 2.4), `ShivamB25` (29.2B tokens, 5.3% input, 92.0% cache read, yield 1.2).
 
 ### Context Builders (n=313, 19.4%)
 [33] Moderate yield (6.71), but with a difference: they're actively building cache. 4.8% of their tokens go to cache writes, 6x more than The Field. They're investing in context construction, and it's paying off with 5x higher yield. Examples: `gwbiubiu` (1.66B tokens, 0.94% input, 4% cache writes), `shivang2000`, `YoannLetacq`, `amondnet` (40.7B tokens, 0.22% input, 7.7% cache writes, yield 165), `trin4ik` (12.7B tokens, 1.6% input, 2.8% cache writes, yield 10.6).
 
 ### Cache Architects (n=137, 8.5%)
-[34] Extreme cache reuse. 96.6% of their tokens are cache reads. Near-zero fresh input (0.3%). Yield 444, 360x The Field. These operators have built such efficient cached context that they barely need fresh input. They're not pumping tokens; they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 98.0% cache read, yield 84).
+[34] Extreme cache reuse: 96.6% of their tokens are cache reads, with near-zero fresh input (0.3%). Yield is 444, 360x The Field. These operators have built such efficient cached context that they barely need fresh input; they're not pumping tokens, they're compounding them. Examples: `furic` (6.72B tokens, 0.003% input, 96.8% cache read), `younhomaeng-svg`, `grishin43`, `tomashrdlicka` (3.55B tokens, 0.28% input, 95.7% cache read, yield 135), `kevinelliott` (24.7B tokens, 0.56% input, 98.0% cache read, yield 84).
 
 ![8 Archetypes: Distribution Across the Field](/article-charts/webp/26-eight-categories-donut.webp)
 
 ### Input-Heavy Operators (n=102, 6.3%)
-[35] 43% of their tokens are input. Only 54% cache read. Yield 0.02, effectively zero. These operators are dumping tokens in without building cache. They're the opposite of Cache Architects. Whether they're beginners, using tools that don't support caching, or just inefficient, their cascade isn't compounding. Examples: `wuwangzhang1216` (487B tokens, 33.7% input, 60.9% cache read), `jake8655`, `gaorf30153`, `Gioxaa` (18.5B tokens, 27% input, 72% cache read, yield 0.003), `bnmbanhmi` (2.56B tokens, 56% input, 44% cache read, yield 0).
+[35] 43% of their tokens are input and only 54% are cache read, giving a yield of 0.02, effectively zero. These operators are dumping tokens in without building cache, the opposite of Cache Architects. Whether they're beginners, using tools that don't support caching, or just inefficient, their cascade isn't compounding. Examples: `wuwangzhang1216` (487B tokens, 33.7% input, 60.9% cache read), `jake8655`, `gaorf30153`, `Gioxaa` (18.5B tokens, 27% input, 72% cache read, yield 0.003), `bnmbanhmi` (2.56B tokens, 56% input, 44% cache read, yield 0).
 
 ### Cache Builders (n=46, 2.9%)
-[36] The elite. Yield 1,825. Leverage 915x. 7% cache writes, they're not just reading cache, they're actively constructing it. And it's working: 915x leverage means every token of input generates 915 tokens of cached context. These are the cascade masters. Examples: `gabsh` (253M tokens, 0.01% input, 5.2% cache writes), `marquis08`, `typark96`, `hiiamtrong` (1.78B tokens, 0.12% input, 5.3% cache writes, yield 757), `j3566` (5.44B tokens, 0.34% input, 3.6% cache writes, yield 507).
+[36] The elite, with yield 1,825 and leverage 915x. With 7% cache writes, they're not just reading cache but actively constructing it, and it's working: 915x leverage means every token of input generates 915 tokens of cached context. These are the cascade masters. Examples: `gabsh` (253M tokens, 0.01% input, 5.2% cache writes), `marquis08`, `typark96`, `hiiamtrong` (1.78B tokens, 0.12% input, 5.3% cache writes, yield 757), `j3566` (5.44B tokens, 0.34% input, 3.6% cache writes, yield 507).
 
 ### Cascade Operators (n=46, 2.9%)
-[37] High yield (135) through balance, not extreme on any one dimension. 140x leverage, 0.99 velocity, 94% cache read, 4% cache write. They're efficient across the board, not relying on a single trick. Examples: `honggilgim` (7.2M tokens, 0.01% input, 96.4% cache read), `henmmi`, `shpark-daim`, `632781460` (10.5B tokens, 0.18% input, 97.3% cache read, yield 941, velocity 1.70), `headcha` (1.8B tokens, 0.28% input, 91.6% cache read, yield 291, velocity 0.90).
+[37] High yield (135) through balance, with 140x leverage, 0.99 velocity, 94% cache read, and 4% cache write rather than an extreme on any one dimension. They're efficient across the board, not relying on a single trick. Examples: `honggilgim` (7.2M tokens, 0.01% input, 96.4% cache read), `henmmi`, `shpark-daim`, `632781460` (10.5B tokens, 0.18% input, 97.3% cache read, yield 941, velocity 1.70), `headcha` (1.8B tokens, 0.28% input, 91.6% cache read, yield 291, velocity 0.90).
 
 ### Steady Cascaders (n=4, 0.2%)
-[38] A rare shape. 24% output, most operators are under 1%. These operators produce proportionally more output than the rest of the field. Yield 13.5, moderate. They're not the highest yield, but their composition is unique. Note: n=4 is small — this cluster is the most likely to dissolve or merge with reclassification. Examples: `rar-file` (9.08B tokens, 6.3% input, 13.3% output, yield 26), `cexll` (214B tokens, 33% input, 30% output, yield 1.0). (The originally listed `sadw1q` was moved to the historical statistical outlier group based on its 0.14% input share and Yield of 110,251; that move does not identify its workflow mode.)
+[38] A rare shape: 24% output, where most operators are under 1%, so these operators produce proportionally more output than the rest of the field. Yield is 13.5, moderate; they're not the highest yield, but their composition is unique. Note: n=4 is small — this cluster is the most likely to dissolve or merge with reclassification. Examples: `rar-file` (9.08B tokens, 6.3% input, 13.3% output, yield 26), `cexll` (214B tokens, 33% input, 30% output, yield 1.0). (The originally listed `sadw1q` was moved to the historical statistical outlier group based on its 0.14% input share and Yield of 110,251; that move does not identify its workflow mode.)
 
 ### Outliers (the 8th archetype)
 
@@ -202,7 +204,7 @@ C : I : O = 19 : 1 : 0.09
 
 [41] **Flagged statistical outliers (17 records):** Two extreme cases — `grenadeoftacoss` (9 quadrillion tokens, 99.999943% input, near-zero output) and `stelle-w` (450B tokens, 75% input, 25% output, zero cache). Fifteen more were flagged by a multi-signal outlier score (3–4 signals): unusual ratios and activity fields within this dataset, without a workflow-mode label. Examples: `iamtheavoc1` (7T tokens, 14% input, 18% output, 64% cache read — flagged, score 4), `logcjj` (115B tokens, 52% input, near-zero Yield — flagged, score 3).
 
-[42] Not deleted, categorized in this historical analysis. Separating statistical extremes makes the reference median more representative; it does not itself define today's HITL or Agentic board membership.
+[42] The outliers were not deleted but categorized in this historical analysis. Separating statistical extremes makes the reference median more representative; it does not itself define today's HITL or Agentic board membership.
 
 ### What Each Type Looks Like
 
@@ -233,17 +235,17 @@ C : I : O = 19 : 1 : 0.09
 
 4. **The historical analysis found eight statistical groups.** Seven composition clusters came from K-Means; the eighth came from outlier screens. These groups describe measured features, while HITL and Agentic are workflow modes that require their own evidence.
 
-5. **This is something that doesn't exist yet.** GitHub measures commits. Stack Overflow measured reputation. Kaggle measures competitions. SigRank measures operator behavior, not models, not benchmarks, humans operating models. That's genuinely a different domain.
+5. **This is something that doesn't exist yet.** GitHub measures commits. Stack Overflow measured reputation. Kaggle measures competitions. SigRank measures operator behavior (humans operating models), not models or benchmarks, which is genuinely a different domain.
 
 ## What's Next
 
-[44] **The [field page](/field) is live.** It shows the distribution, the 8 archetypes, the percentile bands, the cascade flow, the outlier zone, and the Benford trust badge. One story: Volume != Yield. You land on the Human Center of Mass and see where you fit.
+[44] **The [field page](/field) is live.** It shows the distribution, the 8 archetypes, the percentile bands, the cascade flow, the outlier zone, and the Benford trust badge. It tells one story, Volume != Yield: you land on the Human Center of Mass and see where you fit.
 
 [45] **The [methodology page](/methodology) is live.** Full chi-square tables, the outlier detection algorithm, the clustering methodology, the provenance chain. This is the citation target, the place where "can I trust this?" gets answered.
 
 [46] **Phase 3: The Dataset.** Upload to Zenodo, get a DOI, register DataCite metadata. The dataset becomes formally citable in academic papers.
 
-[47] **Phase 4: The Paper.** "Benford's Law and Token Ratio Analysis for Outlier Detection in AI Coding Agent Leaderboards." The data is done. The analysis is done. It's writing time.
+[47] **Phase 4: The Paper.** "Benford's Law and Token Ratio Analysis for Outlier Detection in AI Coding Agent Leaderboards." The data and the analysis are done, so it's writing time.
 
 ## Why This Matters
 
@@ -251,11 +253,11 @@ C : I : O = 19 : 1 : 0.09
 
 [49] GitHub measures commits. Stack Overflow measured reputation. Kaggle measures competitions. SigRank measures the cascade: how humans operate AI models, not how models perform on benchmarks. That's a different domain, and it doesn't have a standard yet.
 
-[50] The dataset is real. The outliers are categorized, not hidden. The archetypes emerged. The methodology is sound.
+[50] The dataset is real, the outliers are categorized rather than hidden, the archetypes emerged, and the methodology is sound.
 
 [51] Volume isn't Yield. The cascade shows different ways AI work can run: a screened center, productive high-reuse signatures far beyond it, and input-heavy or replay anomalies. Ratios make those differences visible; workflow evidence can show which signatures came from HITL or agentic execution.
 
-[52] This is the first cut. 1,628 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the outlier detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young. The measurement layer is just being built.
+[52] This is the first cut: 1,628 operators, one snapshot, one leaderboard. The methodology scales — the cascade math works on any token telemetry source, and the outlier detection framework generalizes to any operator leaderboard that exposes the four pillars. Next: longitudinal analysis (how operators move between archetypes over time), cross-platform comparison (does a Cache Architect on Anthropic look the same as one on OpenAI?), and the formal paper with full chi-square tables, clustering methodology, and the provenance chain. The dataset will be on Zenodo with a DOI. The field is young and the measurement layer is just being built.
 
 ---
 

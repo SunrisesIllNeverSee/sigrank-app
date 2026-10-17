@@ -10,7 +10,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb, collectionPage } from "@/lib/jsonld";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { WaveHero } from "@/components/ui/WaveHero";
 
@@ -19,7 +19,7 @@ import { getAllPosts } from "@/lib/editorial/blog-index";
 export const metadata: Metadata = withOG({
   title: "Blog — SigRank",
   description:
-    "Practical guides, benchmarking walkthroughs, tool comparisons, and updates for AI operators.",
+    "Practical guides, benchmarking walkthroughs, tool comparisons, and updates for AI operators measuring token-cascade efficiency and Yield with SigRank.",
   path: "/blog",
 });
 
@@ -32,23 +32,12 @@ export default async function BlogIndex() {
     <div className="flex flex-col gap-8 py-2">
       <JsonLd data={breadcrumb([{ name: "Blog", path: "/blog" }])} />
       <JsonLd
-        data={faqPage([
-          {
-            question: "What is the SigRank blog about?",
-            answer:
-              "The SigRank blog covers AI operator efficiency, token cascade economics, and outlier detection methodology. Posts analyze why raw token volume is noise, how Yield measures real skill, and what the token cascade reveals about how effectively someone uses AI coding tools.",
-          },
-          {
-            question: "Why isn't token volume a good measure of AI coding skill?",
-            answer:
-              "Raw token count measures spending, not skill. An operator who burns 10M input tokens with no cache reuse has high volume but low signal. Yield (Υ = cache_read × output / input²) penalizes un-cached volume and rewards compounding — the quadratic input penalty means waste is non-linear. Two operators with the same token count can have 100× different Yield.",
-          },
-          {
-            question: "What is the token cascade economy?",
-            answer:
-              "The token cascade economy describes how the four token pillars (input, output, cache-read, cache-write) interact. An operator who reuses cached context produces more output per fresh input — their cascade compounds. An operator who sends fresh input every turn burns tokens without compounding. SigRank measures this cascade shape, not just volume.",
-          },
-        ])}
+        data={collectionPage({
+          path: "/blog",
+          name: "SigRank Blog",
+          description: "Practical guides, benchmarking walkthroughs, tool comparisons, and updates for AI operators.",
+          items: posts.map((p) => ({ name: p.title, path: `/blog/${p.slug}` })),
+        })}
       />
       {/* Blog index inside the shared SignalAF workspace shell — same
           transfer contract as Hall/Compare/Wiki/Field: post index in the

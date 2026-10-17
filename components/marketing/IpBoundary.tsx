@@ -92,9 +92,9 @@ export function IpBoundary() {
         What we open. What we keep.
       </h2>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
-        Trust requires transparency. A leaderboard requires a moat. We open
-        everything that proves the system is honest — and keep everything that
-        prevents it from being gamed or cloned.
+        Trust requires transparency, but a leaderboard also requires a moat.
+        So we open everything that proves the system is honest and keep
+        everything that prevents it from being gamed or cloned.
       </p>
 
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -102,7 +102,7 @@ export function IpBoundary() {
           icon="⊕"
           label="Open source"
           heading="What we publish"
-          tagline="Everything that makes the privacy claim verifiable. Read the code. Inspect the schema. Trust by audit, not promise."
+          tagline="We publish everything that makes the privacy claim verifiable, so you can read the code, inspect the schema, and trust the system by audit rather than by promise."
           items={OPEN}
           variant="open"
         />
@@ -110,7 +110,7 @@ export function IpBoundary() {
           icon="⊘"
           label="Proprietary"
           heading="What we keep"
-          tagline="The moat. The math that prevents gaming and cloning. Without these, anyone could rebuild a clone with our data and undercut the leaderboard."
+          tagline="This is the moat: the math that prevents gaming and cloning. Without these pieces, anyone could rebuild a clone with our data and undercut the leaderboard."
           items={PROPRIETARY}
           variant="lock"
         />

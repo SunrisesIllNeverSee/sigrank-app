@@ -12,36 +12,39 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { withOG } from "@/lib/seo";
-import { SITE_ORIGIN } from "@/lib/seo";
+import { withOG, fitTitle, AUTHOR_NAME } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
-import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
+import { articleJsonLd, breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Best AI Operator Scoring for Teams (2026)",
+  titleAbsolute: fitTitle("Best AI Operator Scoring for Teams (2026)"),
   description:
-    "The best AI operator scoring tool for teams in 2026. Why adoption metrics and time tracking don't score operators — and the token metrics that do. 4 tools reviewed.",
+    "The best AI operator scoring for teams in 2026: why adoption and time metrics don't score operators, and the token metrics that do. 4 tools reviewed.",
   path: "/blog/best-ai-operator-scoring-for-teams",
+  article: {
+    publishedTime: "2026-08-17",
+    modifiedTime: "2026-08-31",
+    authors: [AUTHOR_NAME],
+    section: "Blog",
+  },
 });
 
-/** Inline ScholarlyArticle JSON-LD (follows the researchArticle() pattern). */
-function articleJsonLd() {
-  const url = `${SITE_ORIGIN}/blog/best-ai-operator-scoring-for-teams`;
+/** BlogPosting JSON-LD via the shared articleJsonLd() builder. */
+function postJsonLd() {
   return {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "@id": url,
-    headline: "Best AI Operator Scoring for Teams (2026)",
-    description:
-      "AI operator scoring for teams. Why adoption and time metrics don't score operators, the token metrics that do, and 4 tools reviewed.",
-    url,
-    datePublished: "2026-08-17",
-    dateModified: "2026-08-17",
-    author: personAuthor(),
-    publisher: { "@type": "Organization", name: "SigRank", url: SITE_ORIGIN },
+    ...articleJsonLd({
+      path: "/blog/best-ai-operator-scoring-for-teams",
+      title: "Best AI Operator Scoring for Teams (2026)",
+      description:
+        "AI operator scoring for teams. Why adoption and time metrics don't score operators, the token metrics that do, and 4 tools reviewed.",
+      datePublished: "2026-08-17",
+      dateModified: "2026-08-31",
+      section: "Blog",
+    }),
     license: "https://creativecommons.org/licenses/by/4.0/",
     about: "AI operator scoring and ranking for engineering teams",
     keywords: [
@@ -80,7 +83,7 @@ const faqs = [
     question:
       "What is the best tool for scoring team AI operators?",
     answer:
-      "SigRank is the best tool for scoring team AI operators. It is the only tool reviewed that scores operators and assigns class tiers. GitHub Copilot metrics show adoption (acceptance rate, active users) — not operator efficiency. WakaTime shows time-in-editor — not cascade efficiency. Langfuse traces LLM calls — not operators. Only SigRank answers &ldquo;which developer uses their AI most efficiently?&rdquo;",
+      "SigRank is the best tool for scoring team AI operators. It is the only tool reviewed that scores operators and assigns class tiers. GitHub Copilot metrics show adoption (acceptance rate, active users) — not operator efficiency. WakaTime shows time-in-editor — not cascade efficiency. Langfuse traces LLM calls — not operators. Only SigRank answers “which developer uses their AI most efficiently?”",
   },
 ];
 
@@ -98,7 +101,7 @@ export default function BestAiOperatorScoringForTeamsPage() {
       />
       <JsonLd
         data={[
-          articleJsonLd(),
+          postJsonLd(),
           breadcrumb([
             { name: "Blog", path: "/blog" },
             {
@@ -135,17 +138,17 @@ export default function BestAiOperatorScoringForTeamsPage() {
       <section className="flex flex-col gap-4">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The best AI operator scoring tool for teams is{" "}
-          <strong className="text-text-primary">SigRank</strong> — the only tool
+          <strong className="text-text-primary">SigRank</strong>, the only tool
           that scores operators and assigns class tiers. It computes yield (Υ),
           cache hit rate, and leverage per developer from local token logs and
           ranks them on a team leaderboard (IGNITER to ARCH+). GitHub Copilot
-          metrics show adoption only. WakaTime shows time only. Langfuse traces
-          LLM calls, not operators. Only SigRank scores the people driving the
-          AI.
+          metrics show adoption only, WakaTime shows time only, and Langfuse
+          traces LLM calls, not operators, so only SigRank scores the people
+          driving the AI.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Team leads don&apos;t need another adoption dashboard. They need to
-          score and rank their team&apos;s AI operators — to know who&apos;s
+          Team leads don&apos;t need another adoption dashboard; they need to
+          score and rank their team&apos;s AI operators, to know who&apos;s
           compounding signal and who&apos;s burning tokens. Here are the four
           tools that matter, and why usage metrics aren&apos;t operator scoring.
         </p>
@@ -232,14 +235,14 @@ export default function BestAiOperatorScoringForTeamsPage() {
           </p>
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Strengths:</strong> The only
-            tool that scores operators and assigns class tiers. Computes yield
-            (Υ), cache hit rate, and leverage per developer from four token
-            integers read locally. Publishes a team leaderboard with class tiers
-            (IGNITER to ARCH+). Head-to-head compare lets you benchmark two
-            operators directly. Platform-neutral — works across Claude,
-            ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms.
-            Privacy-preserving: reads token counts only, never prompt content;
-            snapshots are ed25519-signed on-device.
+            tool that scores operators and assigns class tiers. It computes
+            yield (Υ), cache hit rate, and leverage per developer from four
+            token integers read locally, and it publishes a team leaderboard
+            with class tiers (IGNITER to ARCH+). Head-to-head compare lets you
+            benchmark two operators directly. It is platform-neutral, working
+            across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms,
+            and privacy-preserving: it reads token counts only, never prompt
+            content, and snapshots are ed25519-signed on-device.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Newer
@@ -272,17 +275,18 @@ export default function BestAiOperatorScoringForTeamsPage() {
           </p>
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Strengths:</strong> The most
-            widely deployed AI coding tool. Org-level dashboards show acceptance
-            rate, suggestions shown vs. accepted, and active users — useful for
-            tracking AI adoption across a team. Deep integration with the GitHub
-            workflow.
+            widely deployed AI coding tool, with org-level dashboards that show
+            acceptance rate, suggestions shown vs. accepted, and active users,
+            which is useful for tracking AI adoption across a team. It also
+            integrates deeply with the GitHub workflow.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Adoption
-            only — no operator scoring. Acceptance rate measures whether a
-            suggestion was taken, not whether the cascade was efficient. No
-            cache-read or cache-write visibility. No yield, no leverage, no class
-            tier, no leaderboard. Locked to the GitHub/Copilot platform.
+            only, with no operator scoring. Acceptance rate measures whether a
+            suggestion was taken, not whether the cascade was efficient. It has
+            no cache-read or cache-write visibility, no yield, no leverage, no
+            class tier, and no leaderboard, and it is locked to the
+            GitHub/Copilot platform.
           </p>
         </div>
 
@@ -295,18 +299,18 @@ export default function BestAiOperatorScoringForTeamsPage() {
             Team time tracking · IDE plugins · time only
           </p>
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">Strengths:</strong> Mature,
-            widely-adopted time tracker with team dashboards. Good for measuring
-            active coding time, language breakdown, and project allocation.
-            Plugins for every major editor.
+            <strong className="text-text-primary">Strengths:</strong> A mature,
+            widely-adopted time tracker with team dashboards, good for measuring
+            active coding time, language breakdown, and project allocation, with
+            plugins for every major editor.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Measures
-            hours, not operator efficiency. Can&apos;t distinguish an AI-assisted
-            session from a hand-typed one. No token metrics, no yield, no cache
-            hit rate, no leverage, no class tier. Time-in-editor is increasingly
-            decoupled from output in the AI era. A complement, not a scoring
-            tool.
+            hours, not operator efficiency, and can&apos;t distinguish an
+            AI-assisted session from a hand-typed one. It has no token metrics,
+            yield, cache hit rate, leverage, or class tier, and time-in-editor
+            is increasingly decoupled from output in the AI era. It is a
+            complement, not a scoring tool.
           </p>
         </div>
 
@@ -319,19 +323,19 @@ export default function BestAiOperatorScoringForTeamsPage() {
             LLM tracing · observability · not operator scoring
           </p>
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">Strengths:</strong> Open-source
-            LLM observability platform. Traces every LLM call — input, output,
-            latency, cost, tokens. Good for debugging agent pipelines and
-            understanding what your models are doing. Self-hostable for teams
-            with data-residency requirements.
+            <strong className="text-text-primary">Strengths:</strong> An
+            open-source LLM observability platform that traces every LLM call
+            (input, output, latency, cost, tokens). It is good for debugging
+            agent pipelines and understanding what your models are doing, and it
+            is self-hostable for teams with data-residency requirements.
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Weaknesses:</strong> Traces
             LLM <em>calls</em>, not <em>operators</em>. There&apos;s no concept
             of an operator score, a class tier, or a team leaderboard. You get
-            per-call telemetry, not per-developer efficiency. Requires
-            instrumentation in your application code — not a drop-in CLI. An
-            observability tool, not a scoring tool.
+            per-call telemetry, not per-developer efficiency, and it requires
+            instrumentation in your application code, so it is not a drop-in
+            CLI. It is an observability tool, not a scoring tool.
           </p>
         </div>
       </section>
@@ -402,9 +406,9 @@ export default function BestAiOperatorScoringForTeamsPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Of the four tools reviewed, only SigRank scores operators and assigns
-          class tiers. Copilot metrics show adoption. WakaTime shows time.
-          Langfuse traces calls. Useful, but none of them answer the question
-          every team lead is actually asking:{" "}
+          class tiers. Copilot metrics show adoption, WakaTime shows time, and
+          Langfuse traces calls; they are useful, but none of them answer the
+          question every team lead is actually asking:{" "}
           <strong className="text-text-primary">
             which developer uses their AI most efficiently?
           </strong>

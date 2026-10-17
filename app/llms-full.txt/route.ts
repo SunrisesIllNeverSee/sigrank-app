@@ -12,6 +12,7 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
+import { editorialPagesMarkdown } from "@/lib/seo/llms-pages";
 
 export const revalidate = 86400; // 24h
 
@@ -165,6 +166,10 @@ ${operators || "| 1 | MO§ES™ | BASE | 566.34 | 385.7× | 1.47 | claude |"}
 - [Methodology](${SITE_ORIGIN}/methodology?utm_source=ai&utm_medium=answer_engine): quotable key figures, methodology, and FAQ. The canonical citation source.
 - [Hall of Signal](${SITE_ORIGIN}/hall?utm_source=ai&utm_medium=answer_engine): top operators
 - [Compare](${SITE_ORIGIN}/compare?utm_source=ai&utm_medium=answer_engine): head-to-head operator comparison
+- [SigRank overview](${SITE_ORIGIN}/sigrank?utm_source=ai&utm_medium=answer_engine): the evaluation platform for AI operators
+- [About](${SITE_ORIGIN}/about?utm_source=ai&utm_medium=answer_engine): what SigRank is, privacy model, and FAQ
+
+${await editorialPagesMarkdown(SITE_ORIGIN, "?utm_source=ai&utm_medium=answer_engine")}
 
 ## Common Questions (Q&A)
 

@@ -171,10 +171,10 @@ export default function OperatorArchetypes({
       </div>
       <p className="text-xs text-text-muted">
         Build archetypes are deterministic classifications based on token
-        cascade dimensions — leverage (cache_read/input), velocity
+        cascade dimensions: leverage (cache_read/input), velocity
         (output/input), and construction (cache_write/cache_read). Each type
-        is defined by a different primary dimension. CONVERGENT is checked
-        first and pulls out operators who are elite on all three axes.
+        is defined by a different primary dimension, and CONVERGENT is checked
+        first to pull out operators who are elite on all three axes.
       </p>
     </div>
   );

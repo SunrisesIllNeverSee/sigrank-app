@@ -22,7 +22,7 @@ import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { EditorialNav } from "@/components/live/EditorialSidebar";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { sigrankDataset, faqPage, breadcrumb } from "@/lib/jsonld";
+import { sigrankDataset, faqPage, breadcrumb, SIGRANK_DATASET_PUBLISHED } from "@/lib/jsonld";
 import { BUILD_ARCHETYPES } from "@/lib/analytics/build-archetypes";
 
 export const metadata: Metadata = withOG({
@@ -126,7 +126,7 @@ export default async function MethodologyPage() {
           eyebrow="THE SIGRANK INDEX"
           terminalText="METHODOLOGY"
           title="Methodology"
-          subtitle={<>The canonical source for AI operator token-efficiency data. Ranked by Υ Yield.</>}
+          subtitle={<>The canonical source for AI operator token-efficiency data, ranked by Υ Yield.</>}
         />
       }
       leftTitle="RESEARCH"
@@ -163,8 +163,9 @@ export default async function MethodologyPage() {
               <div className="row"><span className="k">telemetry</span><span className="v">4 pillars</span></div>
             </div>
             <p className="ws-note" style={{ marginTop: 8 }}>
-              Υ = cache_read × output / input². Figures refreshed {monthYear} —
-              the canonical source for operator token-efficiency data.
+              Υ = cache_read × output / input². This page, refreshed{" "}
+              {monthYear}, is the canonical source for operator
+              token-efficiency data.
             </p>
           </div>
           <div className="mod">
@@ -184,7 +185,8 @@ export default async function MethodologyPage() {
     <div className="ws-doc flex flex-col gap-8 py-2">
       <JsonLd
         data={[
-          sigrankDataset({ updated: updatedIso }),
+          // Dataset dateModified = the real v3.1 data revision, not render time.
+          sigrankDataset({ updated: SIGRANK_DATASET_PUBLISHED }),
           breadcrumb([{ name: "Methodology", path: "/methodology" }]),
           faqPage([
             {
@@ -201,11 +203,6 @@ export default async function MethodologyPage() {
               question: "Is the data private?",
               answer:
                 "Yes. The on-device scanner reads token counts and content lengths only — never the words of your prompts. Only the resulting numeric scores, signed with ed25519, leave your device. Snapshots are verified server-side with replay and plausibility guards.",
-            },
-            {
-              question: "How do I get listed on the SigRank Index?",
-              answer:
-                "Install the SigRank CLI (npm: sigrank), enroll your operator identity, and submit a snapshot. The scanner reads your token telemetry locally and publishes a signed snapshot to the leaderboard. Enrollment and submission are done via the SigRank CLI.",
             },
           ]),
         ]}
@@ -488,8 +485,8 @@ export default async function MethodologyPage() {
           </li>
         </ul>
         <p className="text-sm text-text-muted">
-          The leaderboard is discovery, not judgment. No single metric can
-          fully prevent gaming — the goal is to make gaming harder and more
+          The leaderboard is for discovery, not judgment. No single metric can
+          fully prevent gaming, so the goal is to make gaming harder and more
           detectable than honest participation.
         </p>
       </section>
@@ -509,8 +506,8 @@ export default async function MethodologyPage() {
             TTEOP specification
           </a>{" "}
           (Token Telemetry Evaluation Operator Protocol, v0.1.5-draft). SigRank is the
-          public reference implementation; Upsilon is the enterprise
-          measurement engine. Both implement TTEOP. The governance framework
+          public reference implementation and Upsilon is the enterprise
+          measurement engine, and both implement TTEOP. The governance framework
           (MO§ES™, patent pending) enforces submission integrity.
         </p>
         <p className="text-base text-text-secondary">
@@ -551,7 +548,7 @@ export default async function MethodologyPage() {
           server-side rescoring, plausibility gates, and replay controls. Each
           device generates a keypair during enrollment; every snapshot is signed
           and the server verifies the signature before accepting. The server
-          recomputes all derived metrics from the four raw token pillars —
+          recomputes all derived metrics from the four raw token pillars, so
           operators cannot submit inflated yield or leverage values directly.
           Replay attacks are blocked by nonce tracking, and implausible token
           ratios are flagged for review.
@@ -572,7 +569,7 @@ export default async function MethodologyPage() {
           >
             Creative Commons Attribution 4.0 (CC-BY-4.0)
           </a>
-          . Attribution is the citation mechanism — reuse requires credit, which
+          . Attribution is the citation mechanism: reuse requires credit, which
           turns reuse into citations. The source code is separately licensed
           under MIT.
         </p>

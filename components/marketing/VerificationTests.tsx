@@ -99,7 +99,7 @@ export function VerificationTests() {
             how do you know the numbers aren&apos;t fabricated, gamed, or
             bot-generated?
           </em>{" "}
-          Every result here comes from a real run on real data — and where a
+          Every result here comes from a real run on real data, and where a
           test <em>failed</em> its first form, we show that too, because a test
           that can&apos;t fail isn&apos;t a test.
         </P>
@@ -114,7 +114,7 @@ export function VerificationTests() {
           fabricated or mechanical data don&apos;t reproduce. To fake a high
           rank, a forger would have to simultaneously fake the right first-digit
           distribution, the right internal arithmetic, the right concentration,
-          and the right human activity schedule — in one self-consistent file.
+          and the right human activity schedule, all in one self-consistent file.
           Each test closes one of those escape routes.
         </P>
       </section>
@@ -143,13 +143,13 @@ export function VerificationTests() {
           ]}
         />
         <P>
-          Raw session totals did <strong>not</strong> conform. We report this
-          plainly — the first prediction was falsified. But the failure was{" "}
-          <em>diagnostic</em>: digit 1 was under-represented, 5 and 9
-          over-represented — the textbook signature of{" "}
-          <strong>lower-bound truncation</strong>. The cause is mechanical:
+          Raw session totals did <strong>not</strong> conform, and we report
+          this plainly: the first prediction was falsified. The failure was{" "}
+          <em>diagnostic</em>, though. Digit 1 was under-represented and 5 and 9
+          over-represented, the textbook signature of{" "}
+          <strong>lower-bound truncation</strong>, and the cause is mechanical:
           every coding session begins with ~20–23k tokens of cached system
-          prompt — an additive constant on top of the multiplicative process —
+          prompt, an additive constant on top of the multiplicative process,
           which starves the leading-1 bucket and breaks Benford.
         </P>
         <p className="font-sans text-sm font-semibold text-text-secondary">
@@ -174,15 +174,15 @@ export function VerificationTests() {
           does <em>not</em> fix it; subtraction does. Synthetic simulation
           reproduced the whole story (pure multiplicative conforms at 0.00974;
           +22k floor breaks it to 0.03253, matching the data; floor-subtracted
-          recovers to 0.00787). The mechanism reproduces in synthesis —
-          it&apos;s not a story told after the fact.
+          recovers to 0.00787). The mechanism reproduces in synthesis, so it
+          is not a story told after the fact.
         </P>
         <P>
           <strong className="text-text-secondary">The defensible claim:</strong>{" "}
           the multiplicative cascade is Benford-conforming once the measured
           additive system-prompt floor is removed. The raw version is falsified
           and we say so; the floor-corrected version holds and is
-          mechanistically motivated — a stronger result than naive conformity.
+          mechanistically motivated, a stronger result than naive conformity.
           The test had teeth, fired, and revealed a real artifact (the floor)
           that is now itself a tracked quantity.
         </P>
@@ -194,9 +194,9 @@ export function VerificationTests() {
           A natural-conformity claim is only meaningful if something{" "}
           <em>fails</em> it. Among the sessions was a set of 5 automated probe
           runs (&ldquo;hermes&rdquo;): totals 4208, 4152, 4115, 4222, 4258.{" "}
-          <strong>Every first digit was 4.</strong> Zero digit diversity — a
-          fixed-size mechanical probe, exactly the non-Benford signature a bot
-          produces. This is the control that gives Test 1 meaning: the method
+          <strong>Every first digit was 4</strong>, which means zero digit
+          diversity: a fixed-size mechanical probe, exactly the non-Benford
+          signature a bot produces. This is the control that gives Test 1 meaning: the method
           distinguishes a multiplicative human process from a constant-size
           machine process.
         </P>
@@ -214,7 +214,7 @@ export function VerificationTests() {
           (O/I) × (Create/O) × (Read/Create) = Read/Input
         </pre>
         <P>
-          So 10^(10xDEV) = Leverage, by identity — not by fit. An operator
+          So 10^(10xDEV) = Leverage, by identity, not by fit. An operator
           cannot inflate their amplification exponent independently of their
           leverage; the two are bound by algebra. A fabricated row with a high
           10xDEV but the wrong Read/Input ratio fails the identity and is
@@ -229,13 +229,13 @@ export function VerificationTests() {
           A separate experiment (EXP-007) established that conserved structure
           is detectable <strong>without</strong> reading content: across
           negation-paraphrase pairs, surface overlap was zero (Jaccard 0.00)
-          while semantic equivalence was complete (NLI 1.00) — &ldquo;You must
+          while semantic equivalence was complete (NLI 1.00): &ldquo;You must
           not smoke&rdquo; and &ldquo;No smoking&rdquo; converge to one kernel.
           The consequence: a statistical witness (token counts) is a legitimate
           instrument for a conservation-driven process. The no-content-access
-          design is not a privacy compromise we tolerate — it is the
-          architecture this result predicts. We rank the four integers; we never
-          see what you typed.
+          design is not a privacy compromise we tolerate; it is the
+          architecture this result predicts, and we rank the four integers
+          without ever seeing what you typed.
         </P>
       </section>
 
@@ -274,8 +274,8 @@ export function VerificationTests() {
             human activity is bursty with heavy tails (Barabási, <em>Nature</em>{" "}
             435, 207, 2005) and carries 1/f timing noise (Gilden,{" "}
             <em>Science</em>, 1995); machines are periodic or Poisson. Session
-            timestamps already carry the data for a timing-domain humanity test.
-            Not yet deployed.
+            timestamps already carry the data for a timing-domain humanity test,
+            which is not yet deployed.
           </li>
           <li>
             <strong className="text-text-secondary">
@@ -320,7 +320,8 @@ export function VerificationTests() {
           </li>
         </ul>
         <p className="font-sans text-[11px] italic text-text-dim">
-          Token counts only — never prompt content. Tests are run, not asserted.
+          Token counts only, never prompt content, and every test here was run
+          rather than asserted.
         </p>
       </section>
     </div>

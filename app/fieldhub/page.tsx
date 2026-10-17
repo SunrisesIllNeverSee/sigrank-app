@@ -16,13 +16,13 @@ import { SITE_ORIGIN } from "@/lib/seo";
 import { getFieldAnalysis } from "@/lib/analytics/field-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
-import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { breadcrumb } from "@/lib/jsonld";
 import { FieldWorkspaceFrame } from "@/components/field/FieldWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "Field Hub — SigRank Research",
   description:
-    "The academic field analysis and dataset publication hub for SigRank. Field Analysis and State of the Index.",
+    "The academic field analysis and dataset publication hub for SigRank: Field Analysis of AI operator token efficiency and the State of the Index dataset.",
   path: "/fieldhub",
 });
 
@@ -106,23 +106,6 @@ export default async function FieldHubPage() {
         data={[
           collectionPage,
           breadcrumb([{ name: "Field Hub", path: "/fieldhub" }]),
-          faqPage([
-            {
-              question: "What is the SigRank Field Hub?",
-              answer:
-                "The Field Hub is the academic research hub for SigRank. It provides two entry points: the Field Analysis (signalaf.com/field), which presents the full distribution analysis of AI operator token efficiency, and the State of the Index (signalaf.com/research), which is the Zenodo dataset landing page with downloadable CSVs and JSON.",
-            },
-            {
-              question: "Where can I download the SigRank dataset?",
-              answer:
-                "The SigRank seed dataset is available on Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0. Visit the State of the Index page at signalaf.com/research for the full details. The seed dataset includes 1,628 AI operators across 17 platforms with raw token telemetry and derived cascade metrics. The live leaderboard at signalaf.com/board/all includes additional enrolled operators.",
-            },
-            {
-              question: "What research does SigRank publish?",
-              answer:
-                "SigRank publishes field analysis showing the true distribution of AI operator token efficiency (1,498 operators, median yield 1.68), the Zenodo dataset with full anonymized telemetry, and the academic foundation page covering the Conservation Law of Commitment and MOSES enforcement architecture.",
-            },
-          ]),
         ]}
       />
 
@@ -133,9 +116,10 @@ export default async function FieldHubPage() {
               <div className="blog-kicker">FEATURED · FIELD RESEARCH</div>
               <h2>Field Analysis</h2>
               <p>
-                The true distribution of token efficiency.{" "}
-                {meta.operators_included.toLocaleString()} AI operators,
-                outliers separated. Volume ranked. Yield revealed.
+                The true distribution of token efficiency across{" "}
+                {meta.operators_included.toLocaleString()} AI operators, with
+                outliers separated, comparing how the field ranks by volume
+                with what its Yield reveals.
               </p>
             </div>
             <span className="blog-read">READ FIELD ANALYSIS →</span>
@@ -146,9 +130,10 @@ export default async function FieldHubPage() {
               <span className="blog-kicker">SigRank Index</span>
               <h2>State of the Index</h2>
               <p>
-                The primary anonymized seed dataset. 1,628 operators across 17
-                platforms and 3,304 models. 9.07Q total tokens. Available on
-                Zenodo at DOI 10.5281/zenodo.21900519 under CC-BY-4.0.
+                The primary anonymized seed dataset covers 1,628 operators
+                across 17 platforms and 3,304 models, with 9.07Q total tokens,
+                and is available on Zenodo at DOI 10.5281/zenodo.21900519 under
+                CC-BY-4.0.
               </p>
             </div>
             <div className="blog-row-meta"><span className="arrow">↗</span></div>

@@ -25,7 +25,7 @@
 import type { Metadata } from "next";
 import { TopicPage } from "@/components/wiki/TopicPage";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { breadcrumb, definedTerm } from "@/lib/jsonld";
 import { withOG } from "@/lib/seo";
 
 export const metadata: Metadata = withOG({
@@ -160,23 +160,6 @@ export default function MethodologyRefinementPage() {
             "The dual-reader and memory-pair entries used to bracket and verify the SigRank Index scoring before live operators populated the board.",
             "/wiki/methodology-refinement",
           ),
-          faqPage([
-            {
-              question: "How was the SigRank Index calibrated?",
-              answer:
-                "The SigRank Index was calibrated using dual-reader and memory-pair entries: one operator measured by two different token readers, and the same operator measured with and without conversation memory. These bracketing entries established the scoring bounds before live operators populated the board.",
-            },
-            {
-              question: "What is the inflation gap in AI token metrics?",
-              answer:
-                "The inflation gap is the difference between an operator's metrics measured with conversation memory (cached context) versus without (fresh input every turn). SigRank's Yield metric (Υ = cache_read × output / input²) penalizes un-cached prompting, so the gap between with-memory and clean reads reveals how much an operator benefits from context reuse.",
-            },
-            {
-              question: "Why does SigRank trust the ordinal rank over the raw magnitude?",
-              answer:
-                "The raw Yield magnitude can diverge when input tokens approach zero (the I² denominator inflates the score). The ordinal rank — who is above whom — is more robust because it preserves relative ordering even when absolute magnitudes are uncertain. SigRank leads with what survives: the rank, not the raw number.",
-            },
-          ]),
         ]}
       />
 
@@ -187,10 +170,10 @@ export default function MethodologyRefinementPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           Before live operators populated the board, the Index had to be{" "}
           <em>bracketed and stress-tested</em> against entries we understood
-          completely — all of them our own usage (MO§ES), measured deliberately
+          completely, all of them our own usage (MO§ES) and measured deliberately
           at the extremes. These are those entries, kept here as the record of
           how the methodology was tuned and where it&apos;s honest about its own
-          limits. They are no longer on the live ranking; this page is where
+          limits. They are no longer on the live ranking, and this page is where
           they belong.
         </p>
       </header>
@@ -205,7 +188,7 @@ export default function MethodologyRefinementPage() {
           Both rows are the <em>same operator&apos;s same activity</em>, counted
           by two different token tools. ccusage reads a small fresh-input
           footprint (Υ 18,437); tokscale reads a larger, partial input (Υ 16).
-          That is a &gt;1,000× swing from the <em>reader alone</em> — and it is
+          That is a &gt;1,000× swing from the <em>reader alone</em>, which is
           exactly why we do <strong>not</strong> lead with the raw multiplier. Υ
           = cache_read × output ÷ input², so input² in the denominator makes Υ
           hypersensitive to a tiny input. The honest figures are the ones that
@@ -213,18 +196,18 @@ export default function MethodologyRefinementPage() {
         </p>
         <ul className="ml-4 flex list-disc flex-col gap-1 text-sm leading-relaxed text-text-secondary">
           <li>
-            <strong>The rank.</strong> On every reader and every axis, the
-            operator is #1. The ordinal does not wobble.
+            <strong>The rank.</strong> On every reader and every axis the
+            operator is #1, so the ordinal does not wobble.
           </li>
           <li>
             <strong>The reader-matched 6.3×.</strong> Put everyone on the{" "}
             <em>same</em> reader (the volume-style one) and even this
             operator&apos;s <em>worst</em> input reading beats the strongest
-            high-volume operator by 6.3×. That is the courtroom number.
+            high-volume operator by 6.3×, which is the courtroom number.
           </li>
           <li>
             <strong>10×DEV.</strong> The log view tames the input² blow-up: 1.76
-            vs the field&apos;s best 1.50 — clearly ahead, on a sane scale. The
+            vs the field&apos;s best 1.50, clearly ahead on a sane scale. The
             telescoping identity locks the exponent to earned leverage, so it
             can&apos;t be inflated independently.
           </li>
@@ -232,7 +215,7 @@ export default function MethodologyRefinementPage() {
         <p className="text-sm leading-relaxed text-text-secondary">
           The lesson the bracket taught:{" "}
           <strong>put every operator on one reader.</strong> The moment the
-          field is measured the same way, the comparison stops being arguable —
+          field is measured the same way, the comparison stops being arguable,
           and the bracket{" "}
           <span className="font-mono text-text-accent">[16.24 … 18,437]</span>{" "}
           itself becomes the robustness story (&quot;best even at its own
@@ -250,8 +233,8 @@ export default function MethodologyRefinementPage() {
           The two static seeds are the same workload run <em>with</em>{" "}
           memory/context reuse and <em>clean</em> (observer stripped). The
           memory-on run yields ~36% higher. We staged the pair on purpose: it
-          lets the board <em>show the inflation gap publicly</em> — honesty as a
-          feature — and it confirms the cascade credits the thing that actually
+          lets the board <em>show the inflation gap publicly</em> (honesty as a
+          feature) and it confirms the cascade credits the thing that actually
           makes an operator efficient: reusing prior context (cache_read)
           instead of re-paying for it every turn.
         </p>
@@ -262,7 +245,7 @@ export default function MethodologyRefinementPage() {
           Why they&apos;re here, not on the board
         </h2>
         <p>
-          These entries did their job — they bracketed the scale, exposed its
+          These entries did their job: they bracketed the scale, exposed its
           sensitivity to the reader, and confirmed the cascade credits context
           reuse. Leaving a seed-era self-anchor at the top of a public ranking
           would misrepresent the live field, so they retire into the record. The
