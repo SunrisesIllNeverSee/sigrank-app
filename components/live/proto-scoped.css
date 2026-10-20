@@ -965,6 +965,37 @@
   padding:8px 10px;margin-bottom:4px}
 .lbw-root .notes-t{font-family:var(--font-mono);font-size:9.5px;
   line-height:1.6;letter-spacing:.03em;color:var(--tx2);margin:0}
+.lbw-root .briefing-preview{display:flex;flex-direction:column;gap:9px;width:100%;
+  padding:10px;text-align:left;border:1px solid var(--line2);border-radius:var(--radius-sm);
+  background:var(--panel);color:var(--tx2);cursor:pointer}
+.lbw-root .briefing-label{display:flex;justify-content:space-between;gap:8px;width:100%;
+  color:var(--ac);font:700 10px/1.4 var(--font-mono);text-transform:uppercase}
+.lbw-root .briefing-label>span,.lbw-root .briefing-hint{color:var(--mut);font:9px/1.4 var(--font-mono)}
+.lbw-root .briefing-excerpt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;min-height:4.8em;font:11px/1.6 var(--font-mono);overflow-wrap:anywhere}
+.lbw-root .briefing-switch{display:flex;gap:6px;margin:8px 0}
+.lbw-root .briefing-switch button{flex:1;padding:7px 5px;border:1px solid var(--line2);
+  border-radius:var(--radius-sm);background:var(--panel);color:var(--tx2);
+  font:10px/1.4 var(--font-mono);cursor:pointer}
+.lbw-root .briefing-switch button[aria-pressed="true"]{color:var(--ac);border-color:var(--ac)}
+.lbw-root .board-briefings :is(button,a):focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+.lbw-root .briefing-dialog{position:fixed;inset:0;margin:auto;width:min(520px,calc(100vw - 32px));
+  max-height:calc(100dvh - 40px);padding:0;border:1px solid var(--line2);
+  border-radius:var(--radius);background:var(--bg2);color:var(--tx);overflow-y:auto;
+  box-shadow:0 20px 80px #0008}
+.lbw-root .briefing-dialog::backdrop{background:#0009}
+.lbw-root .briefing-dialog-card{padding:20px}
+.lbw-root .briefing-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lbw-root .briefing-dialog-head h2{font:700 16px/1.4 var(--font-mono)}
+.lbw-root .briefing-dialog-head button{padding:8px 12px;background:var(--panel);color:var(--tx);
+  border:1px solid var(--line2);border-radius:var(--radius-sm);cursor:pointer}
+.lbw-root .briefing-detail{margin-top:16px;font:12px/1.7 var(--font-mono);overflow-wrap:anywhere}
+.lbw-root .briefing-detail p+p{margin-top:12px}
+.lbw-root .briefing-detail a{color:var(--ac);text-decoration:underline}
+.lbw-root .briefing-detail dl>div{display:flex;justify-content:space-between;gap:16px;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.lbw-root .briefing-detail dt{color:var(--mut);text-transform:capitalize}
+.lbw-root .briefing-detail dd{margin:0;text-align:right;font-weight:700}
 /* AWARDS — hexagon medallions (pack §I milestone set) */
 .lbw-root .awards{display:flex;gap:8px;margin:2px 0 8px}
 .lbw-root .award{width:30px;height:33px;display:grid;place-items:center;
