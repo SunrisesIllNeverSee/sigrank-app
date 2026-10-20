@@ -49,6 +49,7 @@ export default [
          it is checked separately via `npm run lint:tools` (eslint.tools
          .config.mjs), not suppressed. */
       "_workspace/",
+      "labs/",
       "**/*.d.ts",
       "next-env.d.ts",
     ],
