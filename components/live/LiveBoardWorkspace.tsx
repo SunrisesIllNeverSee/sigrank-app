@@ -4,6 +4,7 @@ import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
+import { BoardBriefings } from "./BoardBriefings";
 
 /**
  * components/live/LiveBoardWorkspace.tsx — React port of the frozen
@@ -1898,66 +1899,7 @@ export function LiveBoardWorkspace({
                     onSelect={handleSelect}
                   />
                 </div>
-                {/* owner (annotation pass 3): "add compare to this side" —
-                    the compare module joins the left sidebar.
-                    2026-10-08: reduced to a single button → /compare. */}
-                <div className="mod">
-                  <h3>
-                    <span className="sq"></span>COMPARE OPERATORS
-                  </h3>
-                  {railBody("compare")}
-                </div>
-                {/* owner 2026-10-08: "move the news feeds to the left
-                    sidebar" — SIGNAL WIRE + FIELD NOTES relocate here
-                    from the inspector's RECENTS module, unchanged. */}
-                <div className="mod">
-                  <h3>
-                    <span className="sq"></span>SIGNAL WIRE
-                  </h3>
-                  <div className="wire">
-                    {(() => {
-                      const newest = [...ops]
-                        .filter((o) => o.age != null)
-                        .sort((a, b) => (a.age ?? 9e9) - (b.age ?? 9e9))[0];
-                      const fresh = [...ops]
-                        .filter((o) => o.last)
-                        .sort((a, b) =>
-                          (b.last ?? "").localeCompare(a.last ?? ""),
-                        )
-                        .slice(0, 2);
-                      return (
-                        <>
-                          {newest && (
-                            <p className="wire-line">
-                              ◈ welcome <b>{newest.name}</b> — joined the
-                              field
-                            </p>
-                          )}
-                          {fresh.map((o) => (
-                            <p className="wire-line" key={o.codename}>
-                              ▸ <b>{o.name}</b> submitted — {o.last}
-                            </p>
-                          ))}
-                        </>
-                      );
-                    })()}
-                  </div>
-                </div>
-                <div className="mod">
-                  <h3>
-                    <span className="sq"></span>FIELD NOTES
-                  </h3>
-                  <div className="notes">
-                    <p className="notes-t">
-                      {initial.fieldStats
-                        .map(
-                          (x) =>
-                            `${x.field.replace(/_/g, " ").toLowerCase()} ${x.value}`,
-                        )
-                        .join(" · ")}
-                    </p>
-                  </div>
-                </div>
+                <BoardBriefings ops={ops} stats={initial.fieldStats} />
                 {/* owner (pass 3): "hall of signal is supposed to be in the
                     left sidebar" — spotlight + medal tally join the burners
                     column. */}
