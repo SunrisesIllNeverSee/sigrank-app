@@ -96,6 +96,21 @@ export function toBlockRows(text: string): string[] {
   return rows;
 }
 
+/** SVG mask (data URI) with one crisp rect per run of █ in the row. */
+function rowMask(line: string, cols: number): string {
+  let rects = "";
+  let i = 0;
+  while (i < line.length) {
+    if (line[i] !== "█") { i++; continue; }
+    let j = i;
+    while (j < line.length && line[j] === "█") j++;
+    rects += `<rect x='${i}' y='0' width='${j - i}' height='1'/>`;
+    i = j;
+  }
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${cols} 1' preserveAspectRatio='none' shape-rendering='crispEdges'>${rects}</svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
 export interface TerminalBlockTextProps {
   text: string;
   /** Visual ceiling in rem. The fit term can only shrink below this — never grow. */
@@ -146,11 +161,18 @@ export function TerminalBlockText({
         {rows.map((line, i) => (
           <div
             key={i}
-            className="terminal-wordmark-line"
-            style={{ ["--tw-delay" as string]: `${i * 0.4}s` }}
-          >
-            {line}
-          </div>
+            className="terminal-wordmark-line tbt-row"
+            style={{
+              ["--tw-delay" as string]: `${i * 0.4}s`,
+              // Each row is painted through an exact rectangle mask built from
+              // the block pattern, not the █ glyph: glyph fallback fonts gave █
+              // a different advance than the space, so rows drifted and the
+              // letters broke/smeared. One cell = 0.6em × 1em, as before.
+              width: `${cols * 0.6}em`,
+              WebkitMaskImage: rowMask(line, cols),
+              maskImage: rowMask(line, cols),
+            }}
+          />
         ))}
       </pre>
     </div>

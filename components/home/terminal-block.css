@@ -14,3 +14,18 @@
     font-size: clamp(0.25rem, var(--tbt-fit, 2cqw), var(--tbt-max, 1.3rem));
   }
 }
+
+/* Rows render as masked blocks (see TerminalBlockText rowMask): the moving
+   gradient paints the box, the mask cuts the exact pixel pattern. */
+.tbt-row {
+  display: block;
+  height: 1em;
+  margin: 0 auto 0.1em;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.tbt-row:last-child { margin-bottom: 0; }
