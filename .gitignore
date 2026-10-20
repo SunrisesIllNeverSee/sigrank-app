@@ -50,6 +50,11 @@ skylos-output.json
 # Deletable wholesale; never committed.
 _workspace/
 
+# Labs — local-only marketing/experiment material (promo kit, renders, video).
+# Only the README is committed; everything else stays on the owner's machine.
+labs/*
+!labs/README.md
+
 # agent tooling (local only — never in the product repo)
 .agents/
 .claude/
