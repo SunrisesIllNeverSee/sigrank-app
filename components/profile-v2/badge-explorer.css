@@ -36,3 +36,20 @@
 .lbw-root .badge-tile.locked.design-preview{width:108px;min-height:108px;filter:none;opacity:1}
 .lbw-root .badge-color-preview{align-self:flex-start;padding:8px 12px;border:1px solid var(--line2);border-radius:5px;background:var(--panel);color:var(--tx2);font:10px var(--font-mono);cursor:pointer}
 .lbw-root .badge-color-preview[aria-pressed=true]{color:var(--ac);border-color:var(--ac)}
+
+/* ══ Phone badges (owner 2026-10-21) — 2 columns, detail as bottom sheet ══ */
+@media(max-width:760px){
+  .lbw-root .badge-explorer{padding:12px 0}
+  .lbw-root .badge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}
+  .lbw-root .badge-tile,.lbw-root .badge-tile.locked,.lbw-root .badge-tile.locked.design-preview{width:100%;min-width:0;min-height:112px}
+  .lbw-root .badge-tile>span:last-child{font-size:12px}
+  .lbw-root .badge-tile.mini,.lbw-root .badge-tile.mini.locked{width:100%;min-height:44px}
+  .lbw-root .badge-mini-grid{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
+  .lbw-root .badge-search{flex-direction:column}
+  .lbw-root .badge-search input,.lbw-root .badge-search select{font-size:16px;min-height:44px}
+  .lbw-root .badge-navigation nav button,.lbw-root .badge-group summary,.lbw-root .badge-color-preview{min-height:44px;font-size:12px}
+  .lbw-root .badge-explorer header span,.lbw-root .badge-note,.lbw-root .badge-ledger p,.lbw-root .badge-navigation p{font-size:12px}
+  /* detail popover -> bottom sheet (positioned by CSS, ignores the hover x/y) */
+  .badge-detail{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-height:70dvh;border-radius:14px 14px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));font-size:13px;box-shadow:0 0 0 100vmax rgba(0,0,0,.55)}
+  .badge-detail>button{min-width:44px;min-height:44px;font-size:16px}
+}
