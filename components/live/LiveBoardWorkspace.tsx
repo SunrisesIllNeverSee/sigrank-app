@@ -80,6 +80,10 @@ import type { URMember } from "@/lib/board/unranked-status";
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
+import { MobileChrome } from "../mobile/MobileChrome";
+import { BoardCards } from "../board-mobile/BoardCards";
+import { BoardFilterSheet, BoardMobileBar } from "../board-mobile/BoardMobileBar";
+import { usePhone } from "../board-mobile/usePhone";
 import {
   OperatorDock,
   OperatorProfileTile,
@@ -1106,6 +1110,32 @@ export function LiveBoardWorkspace({
   const [railOn, setRailOn] = useState(true);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
+  /* Narrow screens (owner 2026-10-21, same rule as WorkspaceShell): at <=1050px
+     the board opens with both sidebars collapsed — stage full width, no pan.
+     Tablets open them as overlay drawers (reopen tab / rail toggle); phones use
+     MobileChrome's menu drawer instead. `phoneInit` is true in SSR and the
+     first client render and CSS hides the panels while it is set (no flash). */
+  const [phoneInit, setPhoneInit] = useState(true);
+  useEffect(() => {
+    if (typeof window.matchMedia === "function" && window.matchMedia("(max-width: 1050px)").matches) {
+      setLeftOn(false);
+      setRailOn(false);
+    }
+    setPhoneInit(false);
+  }, []);
+  useEffect(() => {
+    if (!leftOn && !railOn) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || typeof window.matchMedia !== "function" || !window.matchMedia("(min-width: 761px) and (max-width: 1050px)").matches) return;
+      setLeftOn(false);
+      setRailOn(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [leftOn, railOn]);
+  const isPhone = usePhone();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const onMobileSort = useCallback((v: string) => { setSortSel(v); setSortFlip(false); }, []);
   /* (owner 2026-10-08: the compare module's add-by-search input is gone —
      the module is a single button that routes to /compare.) */
   /* icon-set switcher (owner: "toggle through the icons — all 4 or 5
@@ -1226,6 +1256,12 @@ export function LiveBoardWorkspace({
     tableCardRef.current?.scrollTo({ top: 0 });
   }, [pageNow]);
   const pageRows = ordered.slice(pageStart, pageStart + PAGE_SIZE);
+  /* phone (owner 2026-10-21): "Load more" instead of pagination — the card list
+     shows the first `page` pages of the same `ordered` rows and the same
+     onPage/fetchMore path hydrates the field (no extra fetches vs desktop). */
+  const mobilePages = Math.max(1, page);
+  const mobileRows = ordered.slice(0, mobilePages * PAGE_SIZE);
+  const mobileHasMore = mobileRows.length < ordered.length || !fieldComplete;
 
   const onPage = useCallback(
     (n: number) => {
@@ -1587,6 +1623,41 @@ export function LiveBoardWorkspace({
     }
   };
 
+  /* left-sidebar modules — rendered in the desktop/tablet .lside and, on
+     phones, inside MobileChrome's menu drawer (same nodes, one at a time). */
+  const leftModules = (
+    <>
+      {/* owner 2026-10-06 (annotation): TOP MOVERS swaps places
+          with OPERATOR PROFILE — movers live in the left sidebar
+          under the banner; profile moved to the inspector rail. */}
+      <div className="mod">
+        <h3>
+          <span className="sq"></span>
+          TOP MOVERS · {wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()}
+        </h3>
+        <RotatingMovers
+          key={wfSel}
+          ops={ops}
+          server={initial.movers}
+          boardMode={wfSel}
+          onSelect={handleSelect}
+        />
+      </div>
+      <BoardBriefings ops={ops} stats={initial.fieldStats} movers={initial.movers}
+        hall={initial.hall} newestBadge={initial.newestBadge} newestPost={newestPost}
+        leader={initial.featured ? { codename: initial.featured.codename, name: initial.featured.name } : null} />
+      {/* owner (pass 3): "hall of signal is supposed to be in the
+          left sidebar" — spotlight + medal tally join the burners
+          column. */}
+      <div className="mod">
+        <h3>
+          <span className="sq"></span>HALL OF SIGNAL
+        </h3>
+        {railBody("hall")}
+      </div>
+    </>
+  );
+
   return (
     <div
       ref={rootRef}
@@ -1597,9 +1668,19 @@ export function LiveBoardWorkspace({
       {/* no-flash theme init — applies ?theme=/stored theme to .lbw-root
           pre-paint (SSR always emits "green"); site <html> untouched. */}
       <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
+      <MobileChrome
+        active="board"
+        theme={theme}
+        setTheme={setTheme}
+        iconSet={iconSet}
+        setIconSet={setIconSet}
+        left={leftModules}
+        leftTitle="BOARD"
+      >
       <div
         className={`app${railOn ? "" : " no-rail"}${leftOn ? "" : " no-left"}`}
         data-board-workspace
+        data-phone-init={phoneInit ? "" : undefined}
       >
         {/* left column: icon rail (owner 2026-10-06 — icons only, hover
             tooltips; signalaf mark = home; avatar at bottom = account/
@@ -1713,6 +1794,11 @@ export function LiveBoardWorkspace({
               only when their panel is closed. */}
 
           <div className={`mid${peekCodename ? " peek" : ""}`}>
+            {/* tablet: an open sidebar is an overlay drawer — tap the scrim to close */}
+            {(leftOn || railOn) && (
+              <button type="button" className="m-tscrim" aria-label="Close panel" tabIndex={-1}
+                onClick={() => { setLeftOn(false); setRailOn(false); }} />
+            )}
             {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
                 the stage edge (the rail-foot toggles alone were easy to miss). */}
             {!leftOn && (
@@ -1745,34 +1831,7 @@ export function LiveBoardWorkspace({
               <div className="colhead">SIGNALAF</div>
               <div className="railhead"><span className="rh-t">BURNERS, BUILDERS &amp; 10XERS</span></div>
               <div className="rail">
-                {/* owner 2026-10-06 (annotation): TOP MOVERS swaps places
-                    with OPERATOR PROFILE — movers live in the left sidebar
-                    under the banner; profile moved to the inspector rail. */}
-                <div className="mod">
-                  <h3>
-                    <span className="sq"></span>
-                    TOP MOVERS · {wfSel === "agentic" ? "AUTO" : wfSel.toUpperCase()}
-                  </h3>
-                  <RotatingMovers
-                    key={wfSel}
-                    ops={ops}
-                    server={initial.movers}
-                    boardMode={wfSel}
-                    onSelect={handleSelect}
-                  />
-                </div>
-                <BoardBriefings ops={ops} stats={initial.fieldStats} movers={initial.movers}
-                  hall={initial.hall} newestBadge={initial.newestBadge} newestPost={newestPost}
-                  leader={initial.featured ? { codename: initial.featured.codename, name: initial.featured.name } : null} />
-                {/* owner (pass 3): "hall of signal is supposed to be in the
-                    left sidebar" — spotlight + medal tally join the burners
-                    column. */}
-                <div className="mod">
-                  <h3>
-                    <span className="sq"></span>HALL OF SIGNAL
-                  </h3>
-                  {railBody("hall")}
-                </div>
+                {leftModules}
               </div>
             </aside>
 
@@ -1954,14 +2013,37 @@ export function LiveBoardWorkspace({
                 </div>
               </div>
 
+              {/* phone (owner 2026-10-21): sticky bar over the card list; the
+                  desktop filter bar above is hidden by CSS at <=760px */}
+              {isPhone && (
+                <BoardMobileBar
+                  wfSel={wfSel}
+                  onWf={(w) => { setWfSel(w); liveTrack.modeChanged(w); }}
+                  filtersOpen={filtersOpen}
+                  onOpenFilters={() => setFiltersOpen(true)}
+                  windowSel={windowSel}
+                  onWindow={onWindowSel}
+                  platformSel={platformSel}
+                  onPlatform={setPlatformSel}
+                  classSel={classSel}
+                  onClass={setClassSel}
+                  sortSel={sortSel}
+                  onSort={onMobileSort}
+                  colMode={colMode}
+                  onColMode={setColMode}
+                  search={search}
+                  onSearch={setSearch}
+                  matchCount={ordered.length}
+                />
+              )}
               <main
-                className={profile && !docked ? "stage" : "stage stage-board"}
+                className={(profile && !docked) || isPhone ? "stage" : "stage stage-board"}
                 ref={stageRef}
                 data-board-stage
               >
                 <div className="board">
                   {/* LB-03/04/05 operator dock (starts docked in rail) */}
-                  {profile && (
+                  {profile && !isPhone && (
                     <OperatorDock
                       key={selected}
                       d={profile}
@@ -1975,6 +2057,42 @@ export function LiveBoardWorkspace({
                   )}
 
                   {/* LB-10/11/12 leaderboard table — center stage */}
+                  {isPhone && (
+                    <section className="bm-cards" aria-label="Leaderboard">
+                      <BoardCards
+                        rows={mobileRows}
+                        colMode={colMode}
+                        viewMode={viewMode}
+                        ownCodename={session.codename}
+                      />
+                      <div className="bm-more">
+                        {ordered.length === 0 ? (
+                          <p className="bm-status" role="status">
+                            {fieldState === "loading"
+                              ? "⟳ Syncing field…"
+                              : filtered
+                                ? "No rows match the current filter"
+                                : "No operators in this scope"}
+                          </p>
+                        ) : (
+                          <p className="bm-status" role="status">
+                            Showing {mobileRows.length.toLocaleString()} of{" "}
+                            {filtered ? `${ordered.length.toLocaleString()} filtered` : pop.count.toLocaleString()} operators
+                            {fieldState === "loading" ? " · ⟳ syncing" : ""}
+                          </p>
+                        )}
+                        {fieldState === "error" && (
+                          <p className="bm-status err" role="alert">Field sync failed. Tap Load more to retry.</p>
+                        )}
+                        {mobileHasMore && (
+                          <button type="button" onClick={() => onPage(mobilePages + 1)}>
+                            Load more
+                          </button>
+                        )}
+                      </div>
+                    </section>
+                  )}
+                  {!isPhone && (
                   <section className="tablecard" ref={tableCardRef}>
                     <table className="board-t">
                       <thead>
@@ -2107,6 +2225,7 @@ export function LiveBoardWorkspace({
 
                     </div>
                   </section>
+                  )}
                   {stageFooter}
                 </div>
               </main>
@@ -2230,6 +2349,26 @@ export function LiveBoardWorkspace({
           </footer>
         </div>
       </div>
+      {isPhone && (
+        <BoardFilterSheet
+          open={filtersOpen}
+          onClose={() => setFiltersOpen(false)}
+          windowSel={windowSel}
+          onWindow={onWindowSel}
+          platformSel={platformSel}
+          onPlatform={setPlatformSel}
+          classSel={classSel}
+          onClass={setClassSel}
+          sortSel={sortSel}
+          onSort={onMobileSort}
+          colMode={colMode}
+          onColMode={setColMode}
+          search={search}
+          onSearch={setSearch}
+          matchCount={ordered.length}
+        />
+      )}
+      </MobileChrome>
     </div>
   );
 }
