@@ -21,7 +21,7 @@ import { toPng } from "html-to-image";
 import { track } from "@/lib/infra/posthog/events";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
-import { deriveFacts, type OperatorFact } from "@/lib/analytics/compare-facts";
+import { compareTally, deriveFacts, type OperatorFact } from "@/lib/analytics/compare-facts";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
 import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
@@ -73,42 +73,8 @@ function yieldStr(r: LeaderboardRow): string {
   return y.toFixed(2);
 }
 
-function tally(
-  a: LeaderboardRow,
-  b: LeaderboardRow,
-): { aWins: number; bWins: number } {
-  const ca = a.snapshot.cascade;
-  const cb = b.snapshot.cascade;
-  const ta = a.telemetry;
-  const tb = b.telemetry;
-  const comp = (c: typeof ca, pick: (x: NonNullable<typeof ca>) => number) =>
-    c && !c.nonCompounding ? pick(c) : 0;
-  const raw = (c: typeof ca, pick: (x: NonNullable<typeof ca>) => number) =>
-    c ? pick(c) : 0;
-  const tel = (t: typeof ta, pick: (x: NonNullable<typeof ta>) => number) =>
-    t ? pick(t) : 0;
-  const axes: Array<[number, number, boolean]> = [
-    [comp(ca, (x) => x.yield_), comp(cb, (x) => x.yield_), true],
-    [raw(ca, (x) => x.snr), raw(cb, (x) => x.snr), true],
-    [comp(ca, (x) => x.leverage), comp(cb, (x) => x.leverage), true],
-    [raw(ca, (x) => x.velocity), raw(cb, (x) => x.velocity), true],
-    [comp(ca, (x) => x.dev10x ?? 0), comp(cb, (x) => x.dev10x ?? 0), true],
-    [raw(ca, (x) => x.costPerMillion), raw(cb, (x) => x.costPerMillion), false],
-    [tel(ta, (x) => x.fresh_input), tel(tb, (x) => x.fresh_input), true],
-    [tel(ta, (x) => x.output), tel(tb, (x) => x.output), true],
-    [tel(ta, (x) => x.cache_read), tel(tb, (x) => x.cache_read), true],
-    [tel(ta, (x) => x.cache_create), tel(tb, (x) => x.cache_create), true],
-  ];
-  let aWins = 0,
-    bWins = 0;
-  for (const [av, bv, higherWins] of axes) {
-    if (av === bv) continue;
-    const aBetter = higherWins ? av > bv : av < bv;
-    if (aBetter) aWins++;
-    else bWins++;
-  }
-  return { aWins, bWins };
-}
+// Score comes from the shared compareTally (owner 2026-10-21): one source so the card,
+// ledger and page agree (fresh input is lower-wins there).
 
 // ── Card radars (owner 2026-10-21) ───────────────────────────────────────────
 // Same math as the /compare page radars (lib/compare/radar-math.ts): a per-operator
@@ -423,7 +389,7 @@ function Card({
   const clsB = b.snapshot.class_tier as SignalClass;
   const colA = classColor(clsA);
   const colB = classColor(clsB);
-  const { aWins, bWins } = tally(a, b);
+  const { aWins, bWins } = compareTally(a, b);
   const winner: "a" | "b" | null =
     aWins === bWins ? null : aWins > bWins ? "a" : "b";
   const factsA = deriveFacts(a, b).slice(0, 3);
