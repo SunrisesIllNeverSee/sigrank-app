@@ -66,10 +66,11 @@
   .lbw-root .bc-av img{width:100%;height:100%;object-fit:cover;display:block}
   .lbw-root .bc-who{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:3px}
   .lbw-root .bc-nm{display:flex;align-items:baseline;min-width:0;font-family:var(--font-ui);font-weight:700;font-size:15px;line-height:1.2}
-  .lbw-root .bc-nmt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lbw-root .bc-nmt{min-width:0;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
   .lbw-root .bc-vchk{flex:none;color:var(--ac);font-size:12px}
+  /* owner 2026-10-21: "class · build" wraps to two lines instead of ellipsizing */
   .lbw-root .bc-meta{font-family:var(--font-mono);font-weight:600;font-size:11.5px;line-height:1.2;color:var(--tx2);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
   .lbw-root .bc-trend{flex:none;display:block;width:34px;height:18px;overflow:hidden}
   .lbw-root .bc-trend .spark{display:block;width:34px;height:18px}
   .lbw-root .bc-yv{flex:none;min-width:48px;text-align:right;display:flex;flex-direction:column;gap:2px}
@@ -78,6 +79,11 @@
   .lbw-root .bc-cmp{flex:none;display:grid;place-items:center;width:48px;color:var(--tx2);text-decoration:none;
     font-size:18px;border-left:1px solid var(--line);margin:8px 0}
   .lbw-root .bc-cmp:active{color:var(--ac)}
+
+  /* narrow phones: the sparkline gives its width back to the name column */
+  @media (max-width:400px){
+    .lbw-root .bc-trend{display:none}
+  }
 
   /* load more + status */
   .lbw-root .bm-more{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:14px 14px 18px}

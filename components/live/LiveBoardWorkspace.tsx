@@ -1831,7 +1831,8 @@ export function LiveBoardWorkspace({
               <div className="colhead">SIGNALAF</div>
               <div className="railhead"><span className="rh-t">BURNERS, BUILDERS &amp; 10XERS</span></div>
               <div className="rail">
-                {leftModules}
+                {/* owner 2026-10-21: on phones MobileChrome's drawer owns the modules; never mount a second copy */}
+                {isPhone ? null : leftModules}
               </div>
             </aside>
 
@@ -2094,7 +2095,7 @@ export function LiveBoardWorkspace({
                   )}
                   {!isPhone && (
                   <section className="tablecard" ref={tableCardRef}>
-                    <table className="board-t">
+                    <table className="board-t" data-mode={colMode}>
                       <thead>
                         <BoardHead
                           mode={colMode}

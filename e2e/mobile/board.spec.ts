@@ -10,7 +10,7 @@ test.describe("mobile board", () => {
     const errors = trackConsole(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await gotoPhone(page, BOARD);
-    const list = page.getByRole("list", { name: "Leaderboard" });
+    const list = page.getByRole("list", { name: "Ranked operators" });
     await expect(list).toBeVisible();
     await expect(page.locator("table.board-t")).toHaveCount(0);
     await expect(page.getByRole("table")).toHaveCount(0);
@@ -27,6 +27,17 @@ test.describe("mobile board", () => {
     expect(above).toBeGreaterThanOrEqual(8);
     expect(errors.filter((e) => /hydrat/i.test(e) && !/aria-label="Theme/.test(e))).toEqual([]);
     await expectNoHorizontalClip(page);
+  });
+
+  test("card link names include class, build and Yield; second line is readable", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await gotoPhone(page, BOARD);
+    const first = page.locator("li.bc .bc-main").first();
+    await expect(first).toHaveAttribute("aria-label", /rank 1, .+, (YIELD|TOTAL|10×DEV) /);
+    // no ellipsis: the class/build line wraps instead of truncating
+    const clipped = await page.locator(".bc-meta").evaluateAll((els) =>
+      els.filter((e) => e.scrollHeight > e.clientHeight + 1).length);
+    expect(clipped).toBe(0);
   });
 
   test("tapping a card opens the profile; ⇄ opens compare", async ({ page }) => {

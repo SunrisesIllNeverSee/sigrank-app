@@ -2,15 +2,16 @@
    (and, on the landing, on the avatar/text). Lift it above the tab bar and move
    it to the right edge so it never covers the Board tab or the left gutter. */
 @media (max-width: 760px) {
+  /* owner 2026-10-21: a fixed button always sat on top of scrolling body text at
+     360px, so on phones it is anchored near the top of the page (it scrolls away
+     with the hero) instead of floating over the copy. */
   .motion-pause {
+    position: absolute !important;
     left: auto;
     right: 12px;
-    bottom: 16px;
+    top: 54px;
+    bottom: auto;
     width: 44px;
     height: 44px;
-  }
-  /* pages with the phone chrome: tab bar is 56px + safe area */
-  body:has(.m-tabs) .motion-pause {
-    bottom: calc(56px + 16px + env(safe-area-inset-bottom));
   }
 }
