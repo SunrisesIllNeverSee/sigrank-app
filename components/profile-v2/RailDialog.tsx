@@ -39,9 +39,11 @@ interface RailDialogProps {
   hint?: string;
   /** Extra modifier class on the dialog (e.g. "prl-dialog--movers"). */
   dialogClass?: string;
+  /** Accessible name for the trigger; defaults to "<title> — open". */
+  triggerLabel?: string;
 }
 
-export function RailDialog({ title, subtitle, trigger, children, wide, lazy, onOpenChange, hint = "EXPAND ▸", dialogClass }: RailDialogProps) {
+export function RailDialog({ title, subtitle, trigger, children, wide, lazy, onOpenChange, hint = "EXPAND ▸", dialogClass, triggerLabel }: RailDialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const close = () => ref.current?.close();
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +64,7 @@ export function RailDialog({ title, subtitle, trigger, children, wide, lazy, onO
         onClick={open}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
         aria-haspopup="dialog"
-        aria-label={`${title} — ${hint.replace(/\s*[▸↗]\s*$/, "").toLowerCase()}`}
+        aria-label={triggerLabel ?? `${title} — ${hint.replace(/\s*[▸↗]\s*$/, "").toLowerCase()}`}
       >
         {trigger}
         <span className="prl-open-hint" aria-hidden="true">{hint}</span>

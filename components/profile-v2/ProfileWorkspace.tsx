@@ -65,11 +65,17 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
       rightTitle="OPERATOR"
       right={<>
         <div className="mod"><h3><span className="sq" />OPERATOR PROFILE</h3>
-          <strong>{name}</strong><p className="ws-note">{codename}</p>
-          <div className="ws-profile-kv"><span>CLASS</span><b>{tier}</b></div>
-          <div className="ws-profile-kv"><span>RANK</span><b>{rank ? `#${rank}` : "UNRANKED"}</b></div>
-          <div className="ws-profile-kv"><span>Υ YIELD</span><b>{yieldLabel}</b></div>
-          <div className="ws-profile-kv"><span>PLATFORM</span><b>{platform}</b></div>
+          <RailDialog title="OPERATOR PROFILE" subtitle={codename} hint="OPEN ▸"
+            trigger={<span className="prl-sum">
+              <strong>{name}</strong>
+              <span className="ws-note">{rank ? `#${rank}` : "UNRANKED"} · {tier}</span>
+            </span>}>
+            <strong>{name}</strong><p className="ws-note">{codename}</p>
+            <div className="ws-profile-kv"><span>CLASS</span><b>{tier}</b></div>
+            <div className="ws-profile-kv"><span>RANK</span><b>{rank ? `#${rank}` : "UNRANKED"}</b></div>
+            <div className="ws-profile-kv"><span>Υ YIELD</span><b>{yieldLabel}</b></div>
+            <div className="ws-profile-kv"><span>PLATFORM</span><b>{platform}</b></div>
+          </RailDialog>
         </div>
         {section === "badges" ? <div id="profile-badge-right" /> : <>
         {panels}

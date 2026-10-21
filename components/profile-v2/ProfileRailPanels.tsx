@@ -246,9 +246,10 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
           cohort rank, mark and notes open in a popup. */}
       <div className="mod">
         <h3><span className="sq" />RANK CONTEXTS</h3>
+        {onField && cohort ? (
         <RailDialog
           title="RANK CONTEXTS"
-          subtitle={onField ? "COMBINED FIELD + WORKFLOW COHORT" : undefined}
+          subtitle="COMBINED FIELD + WORKFLOW COHORT"
           hint="OPEN ▸"
           trigger={
             <div className="prl-ctx">
@@ -290,6 +291,22 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
             )}
           </div>
         </RailDialog>
+        ) : (
+          <div className="prl-ctx">
+            <div className="prl-ctx-row">
+              <span className="prl-ctx-k">FIELD</span>
+              <b className="prl-ctx-v">{onField ? `#${boardRow.global_rank}` : "UNRANKED"}</b>
+              <span className="prl-ctx-n">HYBRID · COMBINED{boardRows.length ? ` · OF ${boardRows.length}` : ""}</span>
+            </div>
+            {!onField && (
+              <div className="prl-ctx-note">
+                {snapshotRecords.length === 0
+                  ? "AWAITING FIRST SCORED SNAPSHOT"
+                  : "NOT PLACED ON COMBINED FIELD"}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* SUBMISSION ACTIVITY — the whole 22-week grid scaled into the

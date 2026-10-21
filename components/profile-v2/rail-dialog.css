@@ -34,5 +34,4 @@
 .lbw-root .prl-dialog .mbox{min-height:0;border:0;padding:12px 0 0}
 .lbw-root .prl-dialog--insp{max-width:min(380px,calc(100vw - 48px))}
 .lbw-root .prl-dialog--insp>.prl-dialog-card>*+*{margin-top:12px}
-.lbw-root .prl-open--static .prl-open-hint{align-self:flex-end}
 .lbw-root .prl-open .prl-sum{display:flex;flex-direction:column;gap:5px;font-size:10px}

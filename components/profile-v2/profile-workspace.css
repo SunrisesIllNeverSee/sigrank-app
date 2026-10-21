@@ -197,8 +197,6 @@
 .lbw-root .prl-rec--pending .prl-rec-val,.lbw-root .prl-rec--unavailable .prl-rec-val{color:var(--tx2)}
 .lbw-root .prl-rec-chev{color:var(--mut);font-size:12px;flex-shrink:0}
 
-/* Record detail dialog. */
-
 /* ── Phase-3 round 2 — in-window popups + medallion marks ─────────────── */
 /* Rail module trigger: compact preview that opens the in-window dialog. */
 /* Rail-scaled heatmap — same grid compressed to sidebar width. */
@@ -208,8 +206,6 @@
 .lbw-root .prl-heat--rail .prl-heat-stats{margin-top:6px;padding-top:6px}
 /* Trigger strips keep their compact spacing inside the button. */
 .lbw-root .prl-medal{font-style:normal}
-/* Wide dialog for the full heatmap. */
-/* Honors breakdown rows inside the dialog. */
 
 .lbw-root .pv2 .pv2-pcard-scope{flex-direction:column;gap:18px}
 .lbw-root .pv2 .pv2-pcard-scope .artwork-share-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:324px;margin:0}
