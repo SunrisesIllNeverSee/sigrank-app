@@ -79,6 +79,7 @@ function radarPoint(i: number, frac: number): [number, number] {
 }
 
 export function PassportCard({
+  id,
   operator,
   snapshot,
   globalRank,
@@ -91,7 +92,6 @@ export function PassportCard({
   selectedSecondaryBadge,
   showSignature = true,
   rankLabel = "FIELD",
-  id,
 }: PassportCardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
