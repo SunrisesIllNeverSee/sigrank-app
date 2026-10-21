@@ -288,3 +288,15 @@
 .lbw-root .board-t .op .nm{font-size:13px}
 .lbw-root .board-t .op .hd{font-size:10.5px}
 .lbw-root .board-t .op .tag{font-size:10px}
+
+/* ---------- tablet 761-1050: fit the table without inner horizontal scroll ----------
+   owner 2026-10-21: the board table scrolled sideways inside its card at 768.
+   Low-priority columns drop out here (desktop >1050 and phones are unchanged;
+   phones render cards). Metrics keeps RANK, OPERATOR, TOTAL, YIELD, SNR,
+   LEVERAGE; Raw keeps INPUT, OUTPUT and TOTAL (the cache terms are in TOTAL and on the profile). The group super-header
+   row is hidden because its colspans no longer match. */
+@media (min-width:761px) and (max-width:1050px){
+  .lbw-root .board-t thead tr.grph{display:none}
+  .lbw-root .board-t[data-mode="metrics"] :is(th,td):is(:nth-child(3),:nth-child(5),:nth-child(6),:nth-child(9),:nth-child(n+11)){display:none}
+  .lbw-root .board-t[data-mode="raw"] :is(th,td):is(:nth-child(3),:nth-child(n+6):nth-child(-n+7),:nth-child(n+9)){display:none}
+}

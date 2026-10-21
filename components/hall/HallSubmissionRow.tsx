@@ -148,8 +148,8 @@ export function HallSubmissionRow({
         {classGlyph}
         <span className="min-w-0 flex-1 truncate">{nameNode}</span>
         {rank <= 10 && claimed && href && (
-          <UnifiedShare compact label="↗" title={`SignalAF Hall #${rank} · ${displayLabel}`}
-            href={`#hall-${canonId ?? "rank"}-rank-${rank}`} imageHref={`/s/${encodeURIComponent(codename)}/card.png`} />
+          <span className="hall-record-share"><UnifiedShare compact label="↗" title={`SignalAF Hall #${rank} · ${displayLabel}`}
+            href={`#hall-${canonId ?? "rank"}-rank-${rank}`} imageHref={`/s/${encodeURIComponent(codename)}/card.png`} /></span>
         )}
         {claimed ? (
           <span

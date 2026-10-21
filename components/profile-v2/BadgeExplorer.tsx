@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { usePhone } from "../board-mobile/usePhone";
 import Link from "next/link";
 import pixelCatalog from "./cumulative-pixel-catalog.v2.json";
 import communityPixels from "./community-pixel-proposals.v1.json";
@@ -86,11 +87,49 @@ export function BadgeExplorer({ earned, progress, platformProgress = [], leftTar
     locate();
     return () => observer.disconnect();
   }, [leftTarget, rightTarget]);
+  /* owner 2026-10-21 (phone): the pinned detail is a modal bottom sheet — scrim tap and Esc close it,
+     focus moves in and returns to the tile that opened it, and the page behind is inert meanwhile. */
+  const isPhone = usePhone();
+  const sheetRef = useRef<HTMLElement | null>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
+  const noReveal = useRef(false);
+  const returnRef = useRef<HTMLElement | null>(null);
+  const pinnedOpen = !!detail?.pinned;
+  const closeDetail = () => {
+    setDetail(null);
+    // focus goes back to the tile once the page is no longer inert (see the modal effect cleanup)
+    if (isPhone) returnRef.current = openerRef.current;
+    openerRef.current = null;
+  };
+  const closeRef = useRef(closeDetail);
+  closeRef.current = closeDetail;
   useEffect(() => {
-    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setDetail(null); };
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") closeRef.current(); };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, []);
+  const modal = isPhone && pinnedOpen;
+  useEffect(() => {
+    if (!modal) return;
+    const sheet = sheetRef.current;
+    sheet?.focus({ preventScroll: true });
+    const inerted: Element[] = [];
+    for (const el of Array.from(document.body.children)) {
+      if (el.hasAttribute("data-badge-modal") || el.hasAttribute("inert")) continue;
+      el.setAttribute("inert", "");
+      inerted.push(el);
+    }
+    return () => {
+      inerted.forEach((el) => el.removeAttribute("inert"));
+      const back = returnRef.current;
+      returnRef.current = null;
+      if (back && document.contains(back)) {
+        noReveal.current = true; // refocusing the tile must not re-open it as a tooltip
+        back.focus({ preventScroll: true });
+        window.setTimeout(() => { noReveal.current = false; }, 0);
+      }
+    };
+  }, [modal]);
   const held = new Map((earned ?? []).map(e => [e.id, e]));
   const allPixels = pixels.map(e => held.has(e.id) ? { ...held.get(e.id)!, category: e.category } : e);
   const allAchievements = [...achievements, ...newConcepts, ...medals].map(e => held.has(e.id) ? { ...held.get(e.id)!, category: e.category } : e);
@@ -101,7 +140,9 @@ export function BadgeExplorer({ earned, progress, platformProgress = [], leftTar
     `${e.label} ${e.category} ${e.description} ${e.rule} ${e.evidence}`.toLowerCase().includes(query.trim().toLowerCase()));
   const choose = (next: Mode) => { setMode(next); setCategory("all"); setQuery(""); setPreviewColors(false); setDetail(null); };
   const reveal = (item: BadgeDisplayEntry, element: HTMLElement, pinned = false) => {
+    if (noReveal.current && !pinned) return;
     if (detail?.pinned && !pinned) return;
+    if (pinned) openerRef.current = element;
     const rect = element.getBoundingClientRect();
     setDetail({ item, x: Math.max(12, Math.min(window.innerWidth - 332, rect.right + 8)), y: Math.max(12, Math.min(window.innerHeight - 360, rect.top)), pinned });
   };
@@ -153,9 +194,13 @@ export function BadgeExplorer({ earned, progress, platformProgress = [], leftTar
     </details>)}
     </div>
     {visible.length === 0 && (earned || mode !== "earned") && <p>No matching awards.</p>}
-    {detail && typeof document !== "undefined" && createPortal(<aside id="badge-inspect-detail" className="badge-detail" role={detail.pinned ? "dialog" : "tooltip"}
+    {detail && typeof document !== "undefined" && createPortal(<>
+    {modal && <div className="badge-scrim" data-badge-modal="" onClick={closeDetail} role="presentation" />}
+    <aside id="badge-inspect-detail" className="badge-detail" role={detail.pinned ? "dialog" : "tooltip"} ref={sheetRef} data-badge-modal=""
+      aria-modal={modal || undefined} tabIndex={modal ? -1 : undefined}
+      onKeyDown={modal ? (e) => { if (e.key === "Tab") { e.preventDefault(); sheetRef.current?.querySelector<HTMLElement>("button")?.focus(); } } : undefined}
       aria-label={detail.item.label} style={{ left: detail.x, top: detail.y }}>
-      {detail.pinned && <button type="button" aria-label="Close badge details" onClick={() => setDetail(null)}>✕</button>}
+      {detail.pinned && <button type="button" aria-label="Close badge details" onClick={closeDetail}>✕</button>}
       <div className="badge-detail-art"><Artwork item={detail.item} size={detail.item.pattern ? 96 : 64} /></div>
       <strong>{detail.item.label}</strong><p>{detail.item.description}</p><p>{detail.item.rule}</p>
       <p>{detail.item.earned ? "Earned / current standing" : `Not earned · ${detail.item.status}`}</p>
@@ -163,6 +208,6 @@ export function BadgeExplorer({ earned, progress, platformProgress = [], leftTar
       {detail.item.date && <p>{detail.item.dateLabel ?? "Evidence date"}: {detail.item.date}</p>}
       {detail.item.submissionId && <p>Submission ID: {detail.item.submissionId}</p>}
       {detail.item.snapshotHash ? <p>Snapshot proof hash: <code>{detail.item.snapshotHash}</code></p> : detail.item.earned && <p>No linked snapshot proof hash available for this item.</p>}
-    </aside>, document.body)}
+    </aside></>, document.body)}
   </div>;
 }

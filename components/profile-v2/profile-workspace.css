@@ -241,7 +241,16 @@
   .lbw-root .ws-profile-nav{display:none}
 
   /* sticky, horizontally scrolling tab strip */
-  .lbw-root .ws-profile-content .profile-title-nav{position:sticky;top:0;z-index:5;background:var(--bg);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;flex-wrap:nowrap;margin:0 -2px;padding:0 2px;-webkit-overflow-scrolling:touch}
+  .lbw-root .ws-profile-content .profile-title-nav{position:sticky;top:0;z-index:5;background:var(--bg);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;flex-wrap:nowrap;margin:0 -2px;padding:3px 2px;-webkit-overflow-scrolling:touch;
+    /* owner 2026-10-21: edge fades cue that more tabs scroll off-screen (local layers cover the
+       scroll layers once you reach that end, so a fade shows only on the side with more). */
+    background:
+      linear-gradient(var(--bg),var(--bg)) left center/26px 100% no-repeat local,
+      linear-gradient(var(--bg),var(--bg)) right center/26px 100% no-repeat local,
+      linear-gradient(to right,color-mix(in srgb,var(--ac) 38%,transparent),transparent) left center/22px 100% no-repeat scroll,
+      linear-gradient(to left,color-mix(in srgb,var(--ac) 38%,transparent),transparent) right center/22px 100% no-repeat scroll,
+      var(--bg)}
+  .lbw-root .ws-profile-content [role="tab"]:focus-visible,.lbw-root .profile-title-nav .profile-share-gallery:focus-visible{outline:2px solid var(--ac);outline-offset:-3px}
   .lbw-root .ws-profile-content .profile-title-nav::-webkit-scrollbar{display:none}
   .lbw-root .ws-profile-content .profile-title-nav [role="tablist"]{flex-wrap:nowrap;overflow:visible;flex:none;margin-bottom:0}
   .lbw-root .ws-profile-content [role="tab"]{flex:none;min-height:44px;padding:10px 12px;font-size:12px;white-space:nowrap}

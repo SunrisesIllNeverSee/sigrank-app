@@ -41,6 +41,7 @@ import "./proto-scoped.css";
 import { useRailIconSet } from "./useRailIconSet";
 import { PanelReopenTab, usePanelFocus } from "./PanelReopenTab";
 import { PixelBadge } from "./PixelBadge";
+import { usePhone } from "../board-mobile/usePhone";
 import { EditorialHeaderNav, type WorkspaceTopic } from "./EditorialSidebar";
 import {
   LBW_THEME_INIT,
@@ -175,6 +176,7 @@ export function WorkspaceShell({
   }, []);
 
   /* ---------- panel + popover chrome ---------- */
+  const phone = usePhone();
   const [leftOn, setLeftOn] = useState(leftDefaultOpen && left != null);
   const [railOn, setRailOn] = useState(rightDefaultOpen && right != null);
   /* Narrow screens (owner 2026-10-21, generalizing the 2026-10-16 text-page
@@ -508,7 +510,7 @@ export function WorkspaceShell({
                   <span className="sq"></span>
                   <span className="rh-t">{leftTitle}</span>
                 </div>
-                <div className="rail">{left}</div>
+                <div className="rail">{phone ? null : left /* owner 2026-10-21: the phone drawer owns the modules */}</div>
                 {topic && (
                   <nav className="ws-rail-bottom-nav" aria-label="Page navigation">
                     <button type="button" aria-label="Back to previous page"
