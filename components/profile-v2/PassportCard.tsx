@@ -79,6 +79,7 @@ function radarPoint(i: number, frac: number): [number, number] {
 }
 
 export function PassportCard({
+  id,
   operator,
   snapshot,
   globalRank,

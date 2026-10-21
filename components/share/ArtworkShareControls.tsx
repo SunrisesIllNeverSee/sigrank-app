@@ -3,8 +3,8 @@
 import { useState } from "react";
 import "./artwork-share.css";
 
-export function ArtworkShareControls({ target, title, filename, href, animated = false, backgroundColor = "#0b100b", pixelRatio = 3 }: {
-  target: string; title: string; filename: string; href: string; animated?: boolean; backgroundColor?: string; pixelRatio?: number;
+export function ArtworkShareControls({ target, title, filename, href, animated = false, backgroundColor = "#0b100b", pixelRatio = 3, exportWidth, exportHeight, gifPanelStart }: {
+  target: string; title: string; filename: string; href: string; animated?: boolean; backgroundColor?: string; pixelRatio?: number; exportWidth?: number; exportHeight?: number; gifPanelStart?: number;
 }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -41,11 +41,11 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
         await original.decode();
       }
       const { toBlob } = await import("html-to-image");
-      const options = { pixelRatio, backgroundColor, cacheBust: false };
+      const options = { pixelRatio, backgroundColor, cacheBust: false, ...(exportWidth ? { width: exportWidth, height: exportHeight, style: { transform: "none" } } : {}) };
       if (navigator.vendor.includes("Apple")) await toBlob(node, options);
       const blob = await toBlob(node, options);
       if (!blob) throw new Error("Image could not be rendered");
-      const output = gif ? await (await import("./holocard-gif")).holocardGif(blob) : blob;
+      const output = gif ? await (await import("./holocard-gif")).holocardGif(blob, { width: exportWidth, panelStart: gifPanelStart }) : blob;
       const file = new File([output], `${filename}.${gif ? "gif" : "png"}`, { type: output.type });
       if (share && navigator.canShare?.({ files: [file] })) {
         try {
