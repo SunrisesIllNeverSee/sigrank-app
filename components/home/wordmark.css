@@ -109,6 +109,9 @@
     font-family: var(--font-geist-mono), monospace;
   }
 }
+.wave-hero-wordmark {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
 .wordmark-letter {
   display: inline-block;
   animation: wordmark-rotate 8s steps(1, end) var(--wm-delay, 0s) infinite;
