@@ -974,6 +974,8 @@
 .lbw-root .briefing-detail dl>div{display:flex;justify-content:space-between;gap:16px;
   padding:10px 0;border-bottom:1px solid var(--line)}
 .lbw-root .briefing-detail dt{color:var(--mut);text-transform:capitalize}
+.lbw-root .briefing-kind{color:var(--mut);font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+.lbw-root .briefing-detail p[data-current]{border-left:2px solid var(--ac);padding-left:8px}
 .lbw-root .briefing-detail dd{margin:0;text-align:right;font-weight:700}
 /* AWARDS — hexagon medallions (pack §I milestone set) */
 .lbw-root .awards{display:flex;gap:8px;margin:2px 0 8px}

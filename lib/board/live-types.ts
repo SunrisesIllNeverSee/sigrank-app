@@ -120,6 +120,10 @@ export interface LiveOperator {
   delta: string;
   /** Last snapshot date, short display form. */
   last: string;
+  /** Last snapshot date as real ISO YYYY-MM-DD (sort key — `last` is an
+   *  MM/DD/YY string that mis-sorts across a year boundary). Optional so
+   *  hand-built fixtures stay valid. */
+  lastIso?: string | null;
   /** Account age in days. */
   age: number;
   /** Lifetime turns/messages count. */
@@ -175,6 +179,8 @@ export interface HallEntry {
   value: string;
   codename?: string;
   metric?: string;
+  /** Award date (YYYY-MM-DD) from operator_badges.awarded_at, when present. */
+  date?: string;
 }
 
 /** Featured-operator summary (rank-1 context block). */
@@ -229,6 +235,9 @@ export interface LiveBoardInitialState {
   fieldStats: FieldStat[];
   movers: MoverEntry[];
   hall: HallEntry[];
+  /** Most recently awarded public badge in the field (operator_badges
+   *  awarded_at ordering; private operators excluded). Null when none. */
+  newestBadge?: { codename: string; name: string; badge: string; date: string } | null;
   featured: FeaturedOperator | null;
   /** Full-scope maxima — radar/rail normalization must use these, not the
    *  maxima of `operators` (which may be a paginated subset). */
