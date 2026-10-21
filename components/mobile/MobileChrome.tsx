@@ -156,7 +156,7 @@ export function MobileChrome({
             <IconPanel />
           </button>
         )}
-        <button type="button" className="m-ibtn" aria-label={`Theme: ${theme}. Switch theme`} onClick={cycleTheme}>
+        <button type="button" className="m-ibtn" aria-label="Switch theme" onClick={cycleTheme}>
           <IconTheme />
         </button>
         <button
