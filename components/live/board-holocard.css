@@ -1,7 +1,6 @@
-.lbw-root .shareprev.pv2.board-holocard{display:flex;flex-direction:column;gap:12px;padding:12px;min-width:0;text-align:center}
-.lbw-root .board-holocard .pv2-pcard-scope{position:relative;display:block;width:100%;max-width:324px;aspect-ratio:324/484;margin:0 auto;padding:0;border:0;background:none;text-decoration:none}
+.lbw-root .shareprev.pv2.board-holocard{display:flex;flex-direction:row;align-items:center;gap:12px;padding:14px;min-width:0;text-align:left}
+.lbw-root .board-holocard .pv2-pcard-scope{position:relative;display:block;flex:0 0 auto;width:138px;max-width:58%;aspect-ratio:324/484;margin:0;padding:0;border:0;background:none;text-decoration:none}
 .lbw-root .board-holocard .pv2-pcard-scope:focus-visible{outline:2px solid var(--ac);outline-offset:5px}
 .lbw-root .board-holocard .board-holocard-canvas{position:absolute;top:0;left:0;width:324px;height:484px;transform-origin:top left;text-align:left}
 .lbw-root .board-holocard .pv2-card-shell{animation:none}
-.lbw-root .board-holocard .board-holocard-actions{display:flex;flex-direction:column;gap:7px;align-items:stretch}
-.lbw-root .board-holocard .board-holocard-context{font:9px var(--font-mono);color:var(--mut);line-height:1.4}
+.lbw-root .board-holocard .board-holocard-context{font:8px var(--font-mono);color:var(--mut);line-height:1.4}

@@ -224,7 +224,13 @@ export function SharePreview({
   if (!op) return <p className="drill-note">— SELECT AN OPERATOR</p>;
   const valid = !op.nc && [op.num.yield, op.snr, op.vel, op.num.lev, op.dev, op.scalev].every(Number.isFinite);
   return (
-    <div className="shareprev pv2 board-holocard">
+    <div className="shareprev split pv2 board-holocard">
+      <div className="sharecopy">
+        <div className="sh-t">SHARE YOUR SIGNAL</div>
+        <p className="sh-d">Create your share card.</p>
+        <a className="btn ghost" href={href}>Share card →</a>
+        <span className="board-holocard-context">{population.tag}</span>
+      </div>
       <a ref={previewRef} className="pv2-pcard-scope" href={href} aria-label={`Share ${d.name} holographic card`}>
         <div className="board-holocard-canvas" style={{ transform: `scale(${cardScale})` }}>
         <PassportCard
@@ -245,10 +251,6 @@ export function SharePreview({
         />
         </div>
       </a>
-      <div className="board-holocard-actions">
-        <span className="board-holocard-context">{population.tag}</span>
-        <a className="btn ghost" href={href}>Share holocard →</a>
-      </div>
     </div>
   );
 }
