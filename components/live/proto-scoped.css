@@ -2068,10 +2068,23 @@
 .lbw-root .ws-editorial-stage[data-compact] .sigrank-column-hero header>.relative.z-10{gap:12px}
 .lbw-root .ws-editorial-stage[data-compact] header.wave-hero>div.relative{padding:18px 0 14px}
 @media (max-width:760px){
+  /* owner 2026-10-21 (mobile): index leads/rows were 9px mono with a 36px
+     left inset (field hub) that squeezed titles; raise to readable sizes. */
+  .lbw-root .blog-feature{padding:18px 16px 16px}
+  .lbw-root .blog-kicker,.lbw-root .blog-meta,.lbw-root .blog-read{font-size:11px}
+  .lbw-root .blog-feature h2{font-size:22px}
+  .lbw-root .blog-feature p{font-size:14px}
+  .lbw-root .ws-field-index .blog-row-main{padding-left:0}
   .lbw-root .ws-editorial-stage .sigrank-column-hero header{padding:24px 16px 22px}
   .lbw-root .ws-editorial-stage .sigrank-column-hero header>.relative.z-10{gap:16px}
   .lbw-root .ws-editorial-stage header.wave-hero{padding-inline:16px}
   .lbw-root .ws-editorial-stage header.wave-hero>div.relative{padding:22px 0 18px}
+  /* owner 2026-10-21 (mobile): the pinned masthead ate ~25% of a phone screen
+     while reading; on phones it scrolls away with the page instead. */
+  .lbw-root .ws-editorial-stage>.board>.ws-hero,
+  .lbw-root .ws-editorial-stage .board header.wave-hero:not(.ws-hero *){position:relative;margin-bottom:24px}
+  .lbw-root .ws-editorial-stage>.board>.ws-hero::after,
+  .lbw-root .ws-editorial-stage .board header.wave-hero:not(.ws-hero *)::after{display:none}
 }
 
 /* AWARDS & BADGES summary + popup (owner 2026-10-21) */
