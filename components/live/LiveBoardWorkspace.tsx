@@ -1940,7 +1940,8 @@ export function LiveBoardWorkspace({
                 {/* owner 2026-10-06: dropdown labels removed — the selects
                     are self-describing; dropping .fl killed the dead space.
                     SORT select removed too — every column header sorts now;
-                    the ▲▼ chip remains as the compact direction control. */}
+                    the ▲▼ chip was dropped too (owner 2026-10-21); clicking the
+                    active column header flips direction. */}
                 <span className="fb">
                   <select
                     aria-label="Window"
@@ -1976,17 +1977,6 @@ export function LiveBoardWorkspace({
                       <option key={o} value={o}>{o === "All Classes" ? "Class" : o}</option>
                     ))}
                   </select>
-                </span>
-                <span className="fb">
-                  <button
-                    type="button"
-                    className="sdir"
-                    title={`${sortSel} — ${SORT_ASC.has(sortSel) !== sortFlip ? "ascending" : "descending"}; click to flip`}
-                    aria-label="toggle sort direction"
-                    onClick={() => setSortFlip((f) => !f)}
-                  >
-                    {SORT_ASC.has(sortSel) !== sortFlip ? "▲" : "▼"}
-                  </button>
                 </span>
                 <span className="fb">
                   <input
@@ -2177,7 +2167,7 @@ export function LiveBoardWorkspace({
                                     </span>
                                   </div>
                                 </td>
-                                <td className="l pin pin-trend">
+                                <td className="l">
                                   <span className="op-trend" title="No ranked Signa Rate history" aria-hidden="true" />
                                 </td>
                                 {Array.from({ length: colMode === "metrics" ? 11 : 8 }, (_, k) => (
