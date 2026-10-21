@@ -4,6 +4,7 @@ import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
+import { GlobalSearch } from "./GlobalSearch";
 import { BoardBriefings } from "./BoardBriefings";
 import { medalLeaders, type MedalStanding } from "./medal-leaders";
 
@@ -30,7 +31,7 @@ import { medalLeaders, type MedalStanding } from "./medal-leaders";
  *     field re-fires fetchMore, so the pagination chrome doubles as the
  *     retry path when hydration soft-fails (429). (The prototype shipped the
  *     controls as chrome; the port wires the field-side ones: SORT/CLASS/
- *     PLATFORM/SEARCH; WINDOW is route-owned → onWindowChange)
+ *     PLATFORM/SEARCH (table filter; site-wide search is the title-bar GlobalSearch, owner 2026-10-21); WINDOW is route-owned → onWindowChange)
  *   - fetchMore(page) / fetchDetail(codename, hint) are optional async hooks
  *     for the WS-3/WS-4 wiring — the component is fully standalone on
  *     `initial`. fetchDetail defaults to createDetailFetcher(meta.window):
@@ -1733,10 +1734,15 @@ export function LiveBoardWorkspace({
               {/* page title — stage top, centered over the board column
                   (the top chrome bar is gone; the title is the page h1). */}
               <div className="stitle">
-                <h1 className="pagetitle">
-                  {COPY.heroTitleA}
-                  <em>{COPY.heroTitleB}</em>
-                </h1>
+                <div className="stitle-main">
+                  <h1 className="pagetitle">
+                    {COPY.heroTitleA}
+                    <em>{COPY.heroTitleB}</em>
+                  </h1>
+                </div>
+                {/* owner 2026-10-21: site-wide search at the right end of the title
+                    row (navigates); the board table filter stays in the filter bar */}
+                <GlobalSearch label="Search operators and pages" />
               </div>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">

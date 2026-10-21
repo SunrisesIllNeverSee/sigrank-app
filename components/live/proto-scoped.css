@@ -918,6 +918,39 @@
 .lbw-root .colhead{font-family:var(--font-disp);font-weight:700;font-size:12px;
   letter-spacing:.08em;text-align:center;padding:9px 0 7px;
   border-bottom:1px solid var(--line);color:var(--tx);flex-shrink:0}
+/* global search (owner 2026-10-21) — lives at the right end of the stage title
+   row (.stitle), independent of either sidebar's collapsed state; results drop
+   down below it, grouped Operators / Pages. Title cell shrinks/ellipsizes. */
+.lbw-root .stagecol{container-type:inline-size;container-name:stagecol}
+.lbw-root .stitle{--gs-w:clamp(170px,24cqw,280px);display:grid;grid-template-columns:minmax(0,1fr) var(--gs-w);
+  align-items:center;column-gap:12px;padding-inline:14px;position:relative;z-index:70}
+.lbw-root .stitle-main{grid-column:1;grid-row:1;display:flex;align-items:baseline;justify-content:center;gap:8px;min-width:0}
+.lbw-root .stitle-main .pagetitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbw-root .stitle .gs-root{grid-column:2;grid-row:1;justify-self:end}
+/* narrow stage (sidebars open): search drops to its own row under the title */
+@container stagecol (max-width:620px){
+  .lbw-root .stitle{grid-template-columns:minmax(0,1fr);row-gap:6px}
+  .lbw-root .stitle .gs-root{grid-column:1;grid-row:2;justify-self:stretch;max-width:none}
+}
+.lbw-root .gs-root{position:relative;width:100%;max-width:var(--gs-w,280px);min-width:0}
+.lbw-root .gs-in{width:100%;box-sizing:border-box;height:28px;padding:0 10px;border:1px solid var(--line2);
+  border-radius:var(--radius-sm);background:var(--panel);color:var(--tx);
+  font:600 11px var(--font-mono);letter-spacing:.06em;outline:none;-webkit-appearance:none;appearance:none}
+.lbw-root .gs-in::placeholder{color:var(--mut);letter-spacing:.08em}
+.lbw-root .gs-in:focus{border-color:var(--ac)}
+.lbw-root .gs-panel{position:absolute;top:calc(100% + 4px);right:0;width:max(100%,min(340px,calc(100vw - 24px)));z-index:80;margin:0;padding:4px 0;list-style:none;
+  max-height:min(60vh,440px);overflow:auto;background:var(--panel);border:1px solid var(--line2);
+  border-radius:var(--radius-sm);box-shadow:0 10px 28px rgba(0,0,0,.35);text-align:left}
+.lbw-root .gs-panel ul{margin:0;padding:0;list-style:none}
+.lbw-root .gs-gh{padding:6px 12px 3px;font:700 9.5px var(--font-mono);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mut)}
+.lbw-root .gs-opt{display:flex;flex-direction:column;gap:1px;padding:6px 12px;cursor:pointer;
+  font-family:var(--font-ui);letter-spacing:0;font-weight:400}
+.lbw-root .gs-opt.on{background:var(--sel)}
+.lbw-root .gs-l{font-size:12.5px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbw-root .gs-s{font:500 10px var(--font-mono);color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbw-root .gs-opt.on .gs-l{color:var(--ac)}
+.lbw-root .gs-empty{padding:10px 12px;font:500 11px var(--font-mono);color:var(--mut)}
 /* sidebar sub-headers sit under the colhead */
 .lbw-root .railhead{padding-top:8px}
 
