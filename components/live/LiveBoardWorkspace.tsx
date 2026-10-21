@@ -93,11 +93,13 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts, RawAxisFacts } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import { ColumnRanks } from "./ColumnRanks";
+import { PanelReopenTab, usePanelFocus } from "./PanelReopenTab";
 import { PeekPanel } from "./PeekPanel";
 import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
 import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
 import { RotatingMovers } from "./MoversRail";
+import { RailDialog } from "../profile-v2/RailDialog";
 import { ProfileActions } from "./ProfileActions";
 
 import {
@@ -1124,6 +1126,15 @@ export function LiveBoardWorkspace({
      inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
      vars on .lbw-root; a sub-4px click counts as collapse instead. */
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const focusAfter = usePanelFocus(leftOn, railOn);
+  const collapse = useCallback(
+    (side: "l" | "r") => {
+      focusAfter(side === "l" ? ".reopen-l" : ".reopen-r");
+      if (side === "l") setLeftOn(false);
+      else setRailOn(false);
+    },
+    [focusAfter],
+  );
   const onDrag = useCallback(
     (side: "l" | "r") => (e: React.PointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -1144,14 +1155,13 @@ export function LiveBoardWorkspace({
         window.removeEventListener("pointermove", move);
         window.removeEventListener("pointerup", up);
         if (Math.abs(ev.clientX - startX) < 4) {
-          if (side === "l") setLeftOn(false);
-          else setRailOn(false);
+          collapse(side);
         }
       };
       window.addEventListener("pointermove", move);
       window.addEventListener("pointerup", up);
     },
-    [],
+    [collapse],
   );
   const stageRef = useRef<HTMLElement | null>(null);
   /* The tablecard is the board's single scroller (both axes) while the
@@ -1404,6 +1414,28 @@ export function LiveBoardWorkspace({
                     : cmpHref}
                 />
               )}
+              {/* owner 2026-10-21: the inspector is a compact box — tile plus
+                  the PROFILE / WATCH actions above stay visible; the radar,
+                  column ranks, signal history and records open in a popup
+                  (same RailDialog pattern as Wire / Notes). */}
+              <RailDialog
+                title={`OPERATOR DETAIL · ${selOp?.name ?? "—"}`}
+                subtitle="RADAR · RANKS · SIGNAL HISTORY · RECORDS"
+                hint="OPEN ▸"
+                lazy
+                dialogClass="prl-dialog--insp"
+                trigger={
+                  <span className="prl-sum mono">
+                    <b>RADAR · SIGNAL HISTORY</b>
+                    <span className="mut">
+                      {(selOp?.recs ?? []).length
+                        ? `${selOp!.recs!.length} RECORD${selOp!.recs!.length === 1 ? "" : "S"}`
+                        : "RECORDS · COLUMN RANKS"}
+                    </span>
+                  </span>
+                }
+              >
+                <>
               {/* owner: the radar is its own box — it ends here, then a
                   separate AWARDS/BADGES box follows with three rotating
                   slides (awards → badges → medals) at display size. */}
@@ -1467,6 +1499,8 @@ export function LiveBoardWorkspace({
                   {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
                 </p>
               )}
+                </>
+              </RailDialog>
             </>
           ) : (
             <button
@@ -1679,9 +1713,17 @@ export function LiveBoardWorkspace({
               only when their panel is closed. */}
 
           <div className={`mid${peekCodename ? " peek" : ""}`}>
+            {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
+                the stage edge (the rail-foot toggles alone were easy to miss). */}
+            {!leftOn && (
+              <PanelReopenTab side="l" label="SIDEBAR" controls="lbw-left-panel" onOpen={() => { focusAfter(".edge-l"); setLeftOn(true); }} />
+            )}
+            {!railOn && (
+              <PanelReopenTab side="r" label="OPERATOR" controls="lbw-right-panel" onOpen={() => { focusAfter(".edge-r"); setRailOn(true); }} />
+            )}
             {/* left sidebar (owner 2026-10-06): banner + operator profile —
                 VS Code side-panel anatomy, toggled by the title-bar glyph. */}
-            <aside className="lside">
+            <aside id="lbw-left-panel" className="lside">
               {/* ear-flap (owner): ghost tab mid-edge — click collapses the
                   sidebar, drag resizes it (VS Code sash pattern). */}
               <button
@@ -1689,7 +1731,11 @@ export function LiveBoardWorkspace({
                 className="edge edge-l"
                 title="collapse sidebar · drag to resize"
                 aria-label="collapse left sidebar; drag to resize"
+                aria-expanded="true"
+                aria-controls="lbw-left-panel"
+                data-label="HIDE"
                 onPointerDown={onDrag("l")}
+                onClick={(e) => { if (e.detail === 0) collapse("l"); }}
               >
                 ◂
               </button>
@@ -2084,13 +2130,17 @@ export function LiveBoardWorkspace({
 
             {/* right rail: heading + swappable modules (share, movers,
                 compare, field, hall — owner 2026-10-06 IA) */}
-            <aside className="railcol">
+            <aside id="lbw-right-panel" className="railcol">
               <button
                 type="button"
                 className="edge edge-r"
                 title="collapse inspector · drag to resize"
                 aria-label="collapse inspector rail; drag to resize"
+                aria-expanded="true"
+                aria-controls="lbw-right-panel"
+                data-label="HIDE"
                 onPointerDown={onDrag("r")}
+                onClick={(e) => { if (e.detail === 0) collapse("r"); }}
               >
                 ▸
               </button>

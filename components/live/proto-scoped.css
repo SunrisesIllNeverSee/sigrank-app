@@ -288,13 +288,32 @@
    .lbw-root drive the .mid grid). */
 .lbw-root .lside,.lbw-root .railcol{position:relative}
 .lbw-root .edge{position:absolute;top:50%;transform:translateY(-50%);z-index:30;
-  width:14px;height:44px;padding:0;display:grid;place-items:center;
-  background:transparent;border:none;border-radius:0 6px 6px 0;
-  color:var(--mut);font-size:9.5px;cursor:ew-resize;opacity:0;transition:opacity .12s}
-.lbw-root .edge-l{right:-7px}
-.lbw-root .edge-r{left:-7px;border-radius:6px 0 0 6px}
+  width:18px;height:76px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  background:var(--chip);border:1px solid var(--line2);border-left:none;border-radius:0 6px 6px 0;
+  color:var(--ac);font-size:10px;cursor:ew-resize;opacity:.78;transition:opacity .12s,background .12s,color .12s}
+/* owner 2026-10-21: the collapse tab is always visible and labelled HIDE. */
+.lbw-root .edge::after{content:attr(data-label);writing-mode:vertical-rl;font-family:var(--font-mono);
+  font-size:8.5px;letter-spacing:.16em;line-height:1}
+.lbw-root .edge-l{right:-9px}
+.lbw-root .edge-r{left:-9px;border-radius:6px 0 0 6px;border:1px solid var(--line2);border-right:none}
 .lbw-root .lside:hover .edge,.lbw-root .railcol:hover .edge,.lbw-root .edge:focus-visible{opacity:1}
-.lbw-root .edge:hover{background:var(--chip);color:var(--ac)}
+.lbw-root .edge:hover,.lbw-root .edge:focus-visible{background:var(--ac);color:var(--ac-tx)}
+.lbw-root .edge:focus-visible,.lbw-root .reopen-tab:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+/* reopen tab (owner 2026-10-21): accent handle on the stage edge of a collapsed panel. */
+.lbw-root .mid{position:relative}
+.lbw-root .reopen-tab{position:absolute;top:50%;z-index:30;width:24px;height:112px;padding:0;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--ac);color:var(--ac-tx);
+  border:none;cursor:pointer;font-size:11px;font-weight:700;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 2px 10px rgba(0,0,0,.35);
+  animation:reopen-in .22s ease-out both;transition:width .12s,filter .12s}
+.lbw-root .reopen-l{left:0;border-radius:0 7px 7px 0;transform:translateY(-50%)}
+.lbw-root .reopen-r{right:0;border-radius:7px 0 0 7px;transform:translateY(-50%)}
+.lbw-root .reopen-tab:hover{width:30px;filter:brightness(1.1)}
+.lbw-root .reopen-lbl{writing-mode:vertical-rl;font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;
+  white-space:nowrap;max-height:78px;overflow:hidden}
+@keyframes reopen-in{from{opacity:0;margin-inline:-14px}to{opacity:1;margin-inline:0}}
+@media (prefers-reduced-motion:reduce){
+  .lbw-root .edge,.lbw-root .reopen-tab{transition:none;animation:none}
+}
 .lbw-root .app.no-rail .mid{grid-template-columns:var(--lside-w,248px) minmax(0,1fr)}
 .lbw-root .app.no-rail .railcol{display:none}
 .lbw-root .app.no-left .mid{grid-template-columns:minmax(0,1fr) var(--rail-w,332px)}
