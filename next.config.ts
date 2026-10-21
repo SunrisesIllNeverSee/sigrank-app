@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
         destination: `${POSTHOG_ASSETS}/static/:path*`,
       },
       { source: "/ingest/:path*", destination: `${POSTHOG_HOST}/:path*` },
+      // Live sigrank-otel dashboard, proxied from the owner's machine through a Cloudflare tunnel.
+      { source: "/otel", destination: `${process.env.OTEL_LIVE_ORIGIN}/` },
+      { source: "/otel/:path*", destination: `${process.env.OTEL_LIVE_ORIGIN}/:path*` },
     ];
   },
   async headers() {
