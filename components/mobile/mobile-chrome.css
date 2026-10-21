@@ -1,0 +1,111 @@
+/* components/mobile/mobile-chrome.css — phone chrome (owner 2026-10-21).
+   Top bar + bottom tab bar are display:none above 760px so desktop and tablet
+   render exactly as before; the overlay layers (drawer / sheet / search) are
+   only mounted while open. Every colour is a workspace theme token, so all four
+   themes (green, gold, bone, purple) work. Text in chrome is >= 12px; tap
+   targets are >= 44px. */
+
+.lbw-root .m-top,
+.lbw-root .m-tabs{display:none}
+
+@media (max-width:760px){
+  .lbw-root .m-top{display:flex;align-items:center;gap:0;flex:none;position:relative;z-index:60;
+    min-height:calc(48px + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(4px,env(safe-area-inset-right)) 0 max(4px,env(safe-area-inset-left));
+    background:var(--bg2);border-bottom:1px solid var(--line)}
+  .lbw-root .m-ibtn{width:44px;height:44px;flex:none;display:grid;place-items:center;color:var(--tx2);
+    border-radius:var(--radius-sm,6px);-webkit-tap-highlight-color:transparent}
+  .lbw-root .m-ibtn:active{background:var(--sel)}
+  .lbw-root .m-ibtn[aria-expanded="true"]{color:var(--ac)}
+  .lbw-root .m-wordmark{font-family:var(--font-disp);font-weight:900;font-size:15px;letter-spacing:.22em;
+    color:var(--tx);padding:0 6px;min-height:44px;display:flex;align-items:center;white-space:nowrap}
+  .lbw-root .m-spacer{flex:1;min-width:0}
+  .lbw-root .m-avatar .avatar{width:30px;height:30px}
+
+  .lbw-root .m-tabs{display:flex;flex:none;position:relative;z-index:60;
+    padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background:var(--bg2);border-top:1px solid var(--line)}
+  .lbw-root .m-tab{flex:1 1 0;min-width:0;min-height:56px;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:3px;color:var(--tx2);font-family:var(--font-mono);font-weight:700;font-size:12px;
+    letter-spacing:.02em;-webkit-tap-highlight-color:transparent}
+  .lbw-root .m-tab.on{color:var(--ac)}
+  .lbw-root .m-tab.on svg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ac) 55%,transparent))}
+  .lbw-root .m-tab:active{background:var(--sel)}
+  .lbw-root .m-tab:focus-visible,.lbw-root .m-ibtn:focus-visible,.lbw-root .m-mlink:focus-visible,
+  .lbw-root .m-x:focus-visible,.lbw-root .m-cancel:focus-visible,.lbw-root .m-wordmark:focus-visible{
+    outline:2px solid var(--ac);outline-offset:-2px}
+}
+
+/* ---------- overlay layers (drawer / sheet) ---------- */
+.lbw-root .m-layer{position:fixed;inset:0;z-index:300}
+.lbw-root .m-dim{position:absolute;inset:0;width:100%;height:100%;background:rgba(0,0,0,.6);border:0;padding:0;
+  cursor:default;animation:m-fade .18s ease-out both}
+.lbw-root .m-drawer{position:absolute;top:0;bottom:0;left:0;width:min(86vw,340px);display:flex;flex-direction:column;
+  background:var(--panel);border-right:1px solid var(--line2);padding-top:env(safe-area-inset-top);
+  box-shadow:8px 0 32px rgba(0,0,0,.4);animation:m-in-l .22s cubic-bezier(.2,.8,.2,1) both;outline:none}
+.lbw-root .m-drawer-right{left:auto;right:0;border-right:0;border-left:1px solid var(--line2);animation-name:m-in-r}
+.lbw-root .m-dhead{display:flex;align-items:center;justify-content:space-between;flex:none;min-height:52px;
+  padding:0 6px 0 16px;border-bottom:1px solid var(--line)}
+.lbw-root .m-dtitle{font-family:var(--font-mono);font-weight:700;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx2)}
+.lbw-root .m-x{width:44px;height:44px;display:grid;place-items:center;font-size:16px;color:var(--tx2)}
+.lbw-root .m-dbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:6px 0 calc(20px + env(safe-area-inset-bottom))}
+.lbw-root .m-sheet{position:absolute;left:0;right:0;bottom:0;max-height:86dvh;display:flex;flex-direction:column;
+  background:var(--panel);border-top:1px solid var(--line2);border-radius:20px 20px 0 0;
+  padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -10px 36px rgba(0,0,0,.45);
+  animation:m-in-b .24s cubic-bezier(.2,.8,.2,1) both;outline:none}
+.lbw-root .m-sheet-full{height:calc(100dvh - env(safe-area-inset-top) - 12px);max-height:none}
+.lbw-root .m-grab{width:42px;height:5px;border-radius:3px;background:var(--line2);margin:8px auto 0;flex:none}
+.lbw-root .m-sbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 12px 20px}
+@keyframes m-fade{from{opacity:0}to{opacity:1}}
+@keyframes m-in-l{from{transform:translateX(-100%)}to{transform:none}}
+@keyframes m-in-r{from{transform:translateX(100%)}to{transform:none}}
+@keyframes m-in-b{from{transform:translateY(100%)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .lbw-root .m-dim,.lbw-root .m-drawer,.lbw-root .m-sheet{animation:none}
+}
+/* the chrome is phone-only: if the viewport grows while a layer is open, hide it */
+@media (min-width:761px){.lbw-root .m-layer,.lbw-root .m-search{display:none}}
+
+/* sidebar modules reused inside the overlays: strip the pinned-column chrome */
+.lbw-root .m-drawer .m-inline,.lbw-root .m-sheet .m-inline{display:block;border:0;background:none;min-height:0;width:auto}
+.lbw-root .m-drawer .m-inline>.rail,.lbw-root .m-sheet .m-inline>.rail{overflow:visible;padding:0 12px}
+.lbw-root .m-sheet .m-inline>.rail{padding:0}
+.lbw-root .m-panelblock{margin-top:8px;padding-top:6px;border-top:1px solid var(--line)}
+.lbw-root .m-acct{padding:0}
+.lbw-root .m-acct .ap-item,.lbw-root .m-acct a.ap-item{display:flex;align-items:center;min-height:44px;font-size:12px}
+.lbw-root .m-acct .ap-appearance select{font-size:16px;min-height:44px}
+
+/* ---------- menu nav ---------- */
+.lbw-root .m-menunav{display:flex;flex-direction:column}
+.lbw-root .m-mgroup{display:flex;flex-direction:column;padding-bottom:6px}
+.lbw-root .m-mlabel{padding:12px 16px 4px;font-family:var(--font-mono);font-weight:700;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx2)}
+.lbw-root .m-mlink{display:flex;align-items:center;min-height:48px;padding:0 16px;font-family:var(--font-ui);
+  font-weight:600;font-size:16px;color:var(--tx);border-left:3px solid transparent}
+.lbw-root .m-mlink:active{background:var(--sel)}
+.lbw-root .m-mlink.on{color:var(--ac);border-left-color:var(--ac);background:var(--sel)}
+
+/* ---------- full-screen search ---------- */
+.lbw-root .m-search{position:fixed;inset:0;z-index:310;display:flex;flex-direction:column;background:var(--bg);
+  padding-top:env(safe-area-inset-top);outline:none}
+.lbw-root .m-sin{display:flex;align-items:center;gap:8px;flex:none;padding:10px 6px 10px 12px;border-bottom:1px solid var(--line)}
+.lbw-root .m-sinput{flex:1;min-width:0;height:48px;box-sizing:border-box;padding:0 14px;border:2px solid var(--ac);
+  border-radius:12px;background:var(--panel);color:var(--tx);font:600 16px var(--font-mono);outline:none;
+  -webkit-appearance:none;appearance:none}
+.lbw-root .m-sinput::placeholder{color:var(--tx2)}
+.lbw-root .m-cancel{min-width:44px;height:44px;padding:0 10px;font-family:var(--font-mono);font-weight:700;font-size:13px;color:var(--tx2)}
+.lbw-root .m-sres{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;list-style:none;
+  padding:0 0 env(safe-area-inset-bottom)}
+.lbw-root .m-sres ul{list-style:none}
+.lbw-root .m-sgh{padding:14px 16px 6px;font-family:var(--font-mono);font-weight:700;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx2)}
+.lbw-root .m-sopt{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:56px;padding:8px 16px;
+  border-bottom:1px solid var(--line);cursor:pointer}
+.lbw-root .m-sopt b{font-family:var(--font-ui);font-weight:700;font-size:16px;color:var(--tx);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.lbw-root .m-sopt small{font-family:var(--font-mono);font-weight:600;font-size:12px;color:var(--tx2);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.lbw-root .m-sopt.on{background:var(--sel)}
+.lbw-root .m-sopt.on b{color:var(--ac)}
+.lbw-root .m-sempty{padding:20px 16px;font-family:var(--font-mono);font-size:13px;color:var(--tx2)}
