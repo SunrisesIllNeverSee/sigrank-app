@@ -29,8 +29,13 @@ const nextConfig: NextConfig = {
       },
       { source: "/ingest/:path*", destination: `${POSTHOG_HOST}/:path*` },
       // Live sigrank-otel dashboard, proxied from the owner's machine through a Cloudflare tunnel.
-      { source: "/otel", destination: `${process.env.OTEL_LIVE_ORIGIN}/` },
-      { source: "/otel/:path*", destination: `${process.env.OTEL_LIVE_ORIGIN}/:path*` },
+      // Only when OTEL_LIVE_ORIGIN is set — an unset origin builds "undefined/" and Next refuses to start.
+      ...(process.env.OTEL_LIVE_ORIGIN
+        ? [
+            { source: "/otel", destination: `${process.env.OTEL_LIVE_ORIGIN}/` },
+            { source: "/otel/:path*", destination: `${process.env.OTEL_LIVE_ORIGIN}/:path*` },
+          ]
+        : []),
     ];
   },
   async headers() {
