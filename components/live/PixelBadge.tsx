@@ -55,8 +55,14 @@ export function pixelBadgeMark(name: string | null | undefined) {
 export function PixelBadge({ name }: { name: PixelBadgeName }) {
   const pattern = PLATFORM_PIXEL_BADGES.find(b => b.id === name)?.pattern ?? BADGES[name as keyof typeof BADGES];
   if (!pattern) return null;
+  return <PixelPatternBadge pattern={pattern} label={BADGE_LABELS[name]} />;
+}
+
+/** Render a raw pattern string ("LL./LGK/GGL", 3x3 or 7x7) — used for earned
+ *  marks that arrive with their pattern (AWARDS & BADGES popup). */
+export function PixelPatternBadge({ pattern, label }: { pattern: string; label: string }) {
   return (
-    <span className="pxbd" style={pattern.split("/")[0].length > 3 ? { width:25, height:25, gap:1, gridTemplateColumns:"repeat(7,1fr)", gridTemplateRows:"repeat(7,1fr)", gridAutoRows:"auto" } : undefined} title={BADGE_LABELS[name]} role="img" aria-label={BADGE_LABELS[name]}>
+    <span className="pxbd" style={pattern.split("/")[0].length > 3 ? { width:25, height:25, gap:1, gridTemplateColumns:"repeat(7,1fr)", gridTemplateRows:"repeat(7,1fr)", gridAutoRows:"auto" } : undefined} title={label} role="img" aria-label={label}>
       {pattern.split("/").flatMap((row, r) =>
         row.split("").map((cell, c) => (
           <i

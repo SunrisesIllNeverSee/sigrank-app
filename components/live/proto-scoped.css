@@ -777,14 +777,6 @@
 .lbw-root .cmp-match button:hover{text-decoration:underline}
 
 /* RECENTS & SOON */
-.lbw-root .soon-h{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;
-  color:var(--mut);margin:2px 0 7px}
-.lbw-root .soon-h:not(:first-child){margin-top:13px}
-.lbw-root .rec-chip{display:block;width:100%;text-align:left;background:var(--panel);
-  border:1px solid var(--line2);border-radius:5px;padding:5px 9px;margin-bottom:5px;
-  font-family:var(--font-mono);font-size:10px;color:var(--tx2);cursor:pointer;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lbw-root .rec-chip:hover{color:var(--ac);border-color:var(--ac)}
 .lbw-root .soonchips{display:flex;flex-wrap:wrap;gap:5px}
 .lbw-root .soonchip{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;
   color:var(--mut);border:1px dashed var(--line2);border-radius:999px;
@@ -820,8 +812,6 @@
   color:var(--mut);border:1px dashed var(--line2);border-radius:7px;
   padding:8px 4px;cursor:default}
 .lbw-root .soonchip i{font-style:normal;font-size:15px}
-.lbw-root .soon-cap{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;
-  color:var(--mut);margin-top:8px;line-height:1.5}
 
 /* lighthouse a11y pass (2026-10-06): pagetitle is the h1 — kill the UA
    margin/size so it renders as the same centered title. */
@@ -871,12 +861,6 @@
 /* badge overlay needs a positioned host on mover/hall tiles too */
 .lbw-root .mav,.lbw-root .hav,.lbw-root .cav{position:relative}
 
-/* recents chip mini-avatar */
-.lbw-root .rec-chip{display:inline-flex;align-items:center;gap:6px}
-.lbw-root .rav{width:14px;height:14px;border-radius:4px;display:inline-grid;
-  place-items:center;background:var(--chip);font-size:8px;font-weight:700;
-  color:var(--ac);overflow:hidden;flex-shrink:0}
-.lbw-root .rav img{width:100%;height:100%;object-fit:cover;display:block}
 .lbw-root .profile-feature{margin:0 0 8px;width:100%}
 
 /* --- annotation pass 3 (2026-10-06) --- */
@@ -2018,3 +2002,36 @@
   .lbw-root .ws-editorial-stage header.wave-hero{padding-inline:16px}
   .lbw-root .ws-editorial-stage header.wave-hero>div.relative{padding:22px 0 18px}
 }
+
+/* AWARDS & BADGES summary + popup (owner 2026-10-21) */
+.lbw-root .earned-marks{display:flex;flex-direction:column;gap:8px}
+.lbw-root .em-counts{display:flex;flex-wrap:wrap;gap:4px 12px;font:9px/1.4 var(--font-mono);
+  letter-spacing:.1em;color:var(--tx2)}
+.lbw-root .em-counts b{color:var(--ac);font-size:12px;margin-right:3px}
+.lbw-root .em-top{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start}
+.lbw-root .em-cell{display:flex;flex-direction:column;align-items:center;gap:4px;width:52px}
+.lbw-root .em-cell small{font:6px/1.25 var(--font-mono);letter-spacing:.04em;color:var(--tx2);
+  text-align:center;overflow-wrap:anywhere}
+.lbw-root .em-sigil{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--line2);
+  border-radius:6px;color:var(--ac);font-size:14px}
+.lbw-root .em-open{align-self:flex-start;padding:6px 10px;border:1px solid var(--line2);
+  border-radius:var(--radius-sm);background:var(--panel);color:var(--ac);
+  font:10px/1.4 var(--font-mono);letter-spacing:.1em;cursor:pointer}
+.lbw-root .em-open:hover{border-color:var(--ac)}
+.lbw-root .em-open:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+.lbw-root .em-dialog{width:min(560px,calc(100vw - 32px))}
+.lbw-root .em-group{margin-top:16px}
+.lbw-root .em-group h3{font:700 10px/1.4 var(--font-mono);letter-spacing:.14em;color:var(--tx2);
+  margin-bottom:8px}
+.lbw-root .em-group ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lbw-root .em-group li{display:flex;align-items:center;gap:12px;padding:8px 10px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel)}
+.lbw-root .em-group li>:first-child{flex:none;min-width:28px}
+.lbw-root .em-group li>:first-child:not(.pxbd){display:grid;place-items:center}
+.lbw-root .em-t{display:flex;flex-direction:column;gap:2px;min-width:0;font-family:var(--font-mono)}
+.lbw-root .em-t b{font-size:11px;color:var(--tx);overflow-wrap:anywhere}
+.lbw-root .em-t small{font-size:10px;color:var(--tx2);overflow-wrap:anywhere}
+.lbw-root .earned-marks .pxbd,.lbw-root .em-group .pxbd{width:28px!important;height:28px!important;gap:1px;
+  grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-rows:auto}
+.lbw-root .earned-marks .pxbd[style*="repeat(7"],.lbw-root .em-group .pxbd[style*="repeat(7"]{
+  grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(7,minmax(0,1fr))}
