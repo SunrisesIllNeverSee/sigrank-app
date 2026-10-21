@@ -15,7 +15,7 @@
  * Missing/undefined data renders "—", never a fabricated zero.
  */
 
-import type { Operator, ScoredSnapshot } from "@/lib/analytics/scoring-types";
+import type { Operator, CascadeMetrics } from "@/lib/analytics/scoring-types";
 import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { TrophyCounts } from "@/lib/analytics/trophy-counts";
 import type { FieldAverages } from "@/lib/analytics/field-average";
@@ -25,11 +25,14 @@ import { MedalHex } from "./RecordMarks";
 import { PixelArtwork } from "@/components/profile-v2/BadgeArtwork";
 
 interface PassportCardProps {
-  operator: Operator;
-  snapshot: ScoredSnapshot;
+  operator: Pick<Operator, "codename" | "display_name" | "avatar_url" | "primary_domain">;
+  snapshot: {
+    class_tier: string;
+    cascade: Pick<CascadeMetrics, "yield_" | "snr" | "velocity" | "leverage" | "dev10x" | "scaleV" | "nonCompounding"> | null;
+  };
   globalRank: number;
   pending: boolean;
-  archetype: BuildArchetype | null;
+  archetype: Pick<BuildArchetype, "name"> | null;
   trophyCounts: TrophyCounts | null;
   fieldAvg: FieldAverages | null;
   /** Workflow-cohort rank context (item 13) — shown under the combined-field
@@ -37,6 +40,9 @@ interface PassportCardProps {
   cohort?: WorkflowCohortRank | null;
   selectedPixelBadge?: ProfileMarkOption | null;
   selectedSecondaryBadge?: ProfileMarkOption | null;
+  showSignature?: boolean;
+  rankLabel?: string;
+  id?: string;
 }
 
 function compact(n: number): string {
@@ -83,6 +89,9 @@ export function PassportCard({
   cohort,
   selectedPixelBadge,
   selectedSecondaryBadge,
+  showSignature = true,
+  rankLabel = "FIELD",
+  id,
 }: PassportCardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
@@ -128,7 +137,7 @@ export function PassportCard({
     : "no medals";
 
   return (
-    <div id={`holocard-${operator.codename}`} className="pv2-card-shell">
+    <div id={id ?? `holocard-${operator.codename}`} className="pv2-card-shell">
       <div className="pv2-card">
         {/* Holo shine — iridescent foil band sweeping the card face. A real
             element (not ::after) so the sweep is transform-based: GPU-only,
@@ -146,7 +155,7 @@ export function PassportCard({
             <div className="pv2-class-block">
               <div className="pv2-class-badge">{pending ? "UNRANKED" : snapshot.class_tier}</div>
               <div className="pv2-rank-chip">
-                FIELD{" "}
+                {rankLabel}{" "}
                 <strong>{pending || !globalRank ? "—" : `#${globalRank}`}</strong>
               </div>
               {cohort && cohort.rank != null && (
@@ -194,7 +203,7 @@ export function PassportCard({
             </div>
             <div className="pv2-operator-name">{name}</div>
             <div className="pv2-operator-code">{operator.codename}</div>
-            {show && (
+            {show && showSignature && (
               <svg className="pv2-radar-wrap" viewBox="0 0 120 120" aria-hidden="true">
                 <g opacity="0.9">
                   {[12.5, 25, 37.5, 50].map((r) => (
