@@ -51,6 +51,8 @@ export const metadata: Metadata = siteMetadata;
 export const viewport: Viewport = {
   themeColor: "#050605",
   colorScheme: "dark light",
+  // owner 2026-10-21 mobile foundation: lets the phone chrome use env(safe-area-inset-*)
+  viewportFit: "cover",
 };
 
 // No-flash theme init: applies the saved theme before the body content paints.

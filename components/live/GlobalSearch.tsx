@@ -18,14 +18,14 @@ import {
   type SearchPage,
 } from "@/lib/search/match";
 
-interface SearchIndex {
+export interface SearchIndex {
   operators: SearchOperator[];
   pages: SearchPage[];
 }
 
 // Module-level cache: one fetch per tab, shared across shell remounts.
 let indexPromise: Promise<SearchIndex> | null = null;
-function loadIndex(): Promise<SearchIndex> {
+export function loadIndex(): Promise<SearchIndex> {
   if (!indexPromise) {
     indexPromise = fetch("/api/search-index")
       .then((r) => (r.ok ? (r.json() as Promise<SearchIndex>) : Promise.reject(new Error(String(r.status)))))
@@ -37,7 +37,8 @@ function loadIndex(): Promise<SearchIndex> {
   return indexPromise;
 }
 
-type Item =
+// owner 2026-10-21: exported so the phone SearchOverlay reuses the same index + shape.
+export type Item =
   | { kind: "op"; key: string; label: string; sub: string; href: string }
   | { kind: "page"; key: string; label: string; sub: string; href: string };
 
