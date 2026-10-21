@@ -413,6 +413,7 @@ export default async function ComparePage({
                 <DeferredCompareMatchupCard
                   a={rowA}
                   b={rowB}
+                  field={board.map(sampleFromRow)}
                   href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
                 />
               </div>

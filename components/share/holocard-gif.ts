@@ -1,4 +1,4 @@
-export async function holocardGif(png: Blob): Promise<Blob> {
+export async function holocardGif(png: Blob, options: { width?: number; panelStart?: number } = {}): Promise<Blob> {
   const url = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
@@ -9,7 +9,7 @@ export async function holocardGif(png: Blob): Promise<Blob> {
     const image = new Image();
     image.src = url;
     await image.decode();
-    const width = 324, height = Math.round(width * image.height / image.width);
+    const width = options.width ?? 324, height = Math.round(width * image.height / image.width);
     const canvas = document.createElement("canvas");
     canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext("2d");
@@ -20,6 +20,7 @@ export async function holocardGif(png: Blob): Promise<Blob> {
       ctx.drawImage(image, 0, 0, width, height);
       ctx.save();
       ctx.beginPath();
+      if (options.panelStart != null) { ctx.rect(width * options.panelStart, 0, width * (1 - options.panelStart), height); ctx.clip(); ctx.beginPath(); }
       ctx.moveTo(width * .08, 0); ctx.lineTo(width * .92, 0);
       ctx.lineTo(width, height * .05); ctx.lineTo(width, height);
       ctx.lineTo(0, height); ctx.lineTo(0, height * .05); ctx.closePath(); ctx.clip();
@@ -79,9 +80,10 @@ export async function holocardGif(png: Blob): Promise<Blob> {
     text("GIF89a"); word(width); word(height); bytes.push(247, 0, 0);
     palette.forEach(p => bytes.push(...p));
     bytes.push(33, 255, 11); text("NETSCAPE2.0"); bytes.push(3, 1, 0, 0, 0);
-    for (const pixels of frames) {
+    for (const [frameIndex, pixels] of frames.entries()) {
+      const frameX = frameIndex > 0 && options.panelStart != null ? Math.floor(width * options.panelStart) : 0;
       bytes.push(33, 249, 4, 4); word(17); bytes.push(0, 0, 44);
-      word(0); word(0); word(width); word(height); bytes.push(0, 8);
+      word(frameX); word(0); word(width - frameX); word(height); bytes.push(0, 8);
       const packed: number[] = [];
       let bits = 0, bitCount = 0, run = 0;
       const code = (n: number) => {
@@ -89,7 +91,8 @@ export async function holocardGif(png: Blob): Promise<Blob> {
         while (bitCount >= 8) { packed.push(bits & 255); bits >>>= 8; bitCount -= 8; }
       };
       code(256);
-      for (let i = 0; i < pixels.length; i += 4) {
+      for (let y = 0; y < height; y++) for (let x = frameX; x < width; x++) {
+        const i = (y * width + x) * 4;
         if (run === 200) { code(256); run = 0; }
         code(lookup[(pixels[i] >> 4) * 256 + (pixels[i + 1] >> 4) * 16 + (pixels[i + 2] >> 4)]); run++;
       }
