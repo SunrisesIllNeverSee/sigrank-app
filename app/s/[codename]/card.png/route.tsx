@@ -16,8 +16,8 @@
  * `no-store` fetches inside the Supabase data layer on a cache miss), and
  * instead emits explicit `s-maxage`/`stale-while-revalidate` headers — the
  * Vercel-CDN cache convention for route handlers. 3600s matches the
- * live-board cadence; `/s/` is intentionally NOT in revalidateTouched-
- * Windows()' bust set, so this TTL is the freshness bound. The data layer
+ * live-board cadence as a fallback only: since owner 2026-10-21 a submit
+ * busts this path via revalidateTouchedWindows(). The data layer
  * (getOperator 90s / getOperatorHistory 150s / getIndexableOperatorRows 300s
  * unstable_cache) bounds DB cost independently of the image TTL.
  *
