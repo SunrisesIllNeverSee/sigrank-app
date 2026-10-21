@@ -489,9 +489,6 @@ export async function POST(req: NextRequest) {
       );
     }
     persisted = true;
-    // All-time guard held the board row (lib/ingest/all-time-guard.ts): surface it
-    // as a flag so the CLI response, PostHog and the owner alert all show it.
-    if (res.allTimeGuard) gate.reasons.push(res.allTimeGuard);
 
     // Update last_seen on the device + operator so engagement tracking works.
     // Without this, last_seen stays at created_at forever and it looks like no
