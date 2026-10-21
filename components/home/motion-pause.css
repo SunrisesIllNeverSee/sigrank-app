@@ -1,0 +1,16 @@
+/* owner 2026-10-21: on phones the fixed pause button sat on the bottom tab bar
+   (and, on the landing, on the avatar/text). Lift it above the tab bar and move
+   it to the right edge so it never covers the Board tab or the left gutter. */
+@media (max-width: 760px) {
+  .motion-pause {
+    left: auto;
+    right: 12px;
+    bottom: 16px;
+    width: 44px;
+    height: 44px;
+  }
+  /* pages with the phone chrome: tab bar is 56px + safe area */
+  body:has(.m-tabs) .motion-pause {
+    bottom: calc(56px + 16px + env(safe-area-inset-bottom));
+  }
+}
