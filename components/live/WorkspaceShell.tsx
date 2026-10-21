@@ -3,6 +3,7 @@
 import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
+import { GlobalSearch } from "./GlobalSearch";
 
 /**
  * components/live/WorkspaceShell.tsx — the shared SignalAF workspace frame
@@ -508,7 +509,10 @@ export function WorkspaceShell({
                 >
                   ▸
                 </button>
-                <div className="colhead">{colheadRight}</div>
+                {/* owner 2026-10-21: the right column head is now the site-wide search
+                    slot (was a static SIGRANK label); colheadRight stays the
+                    slot's accessible name when a page overrides it. */}
+                <GlobalSearch label={colheadRight === "SIGRANK" ? "Search operators and pages" : `Search (${colheadRight})`} />
                 <div className="railhead">
                   <span className="sq"></span>
                   <span className="rh-t">{rightTitle}</span>

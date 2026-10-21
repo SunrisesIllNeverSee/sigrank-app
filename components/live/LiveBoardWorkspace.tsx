@@ -4,6 +4,7 @@ import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
+import { GlobalSearch } from "./GlobalSearch";
 import { BoardBriefings } from "./BoardBriefings";
 import { medalLeaders, type MedalStanding } from "./medal-leaders";
 
@@ -30,7 +31,7 @@ import { medalLeaders, type MedalStanding } from "./medal-leaders";
  *     field re-fires fetchMore, so the pagination chrome doubles as the
  *     retry path when hydration soft-fails (429). (The prototype shipped the
  *     controls as chrome; the port wires the field-side ones: SORT/CLASS/
- *     PLATFORM/SEARCH; WINDOW is route-owned → onWindowChange)
+ *     PLATFORM; the old board-only SEARCH input moved to the title-bar GlobalSearch (owner 2026-10-21); WINDOW is route-owned → onWindowChange)
  *   - fetchMore(page) / fetchDetail(codename, hint) are optional async hooks
  *     for the WS-3/WS-4 wiring — the component is fully standalone on
  *     `initial`. fetchDetail defaults to createDetailFetcher(meta.window):
@@ -756,7 +757,6 @@ export function LiveBoardWorkspace({
     },
     [sortSel],
   );
-  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   /* The reference's ops/outlier pill pair is now the workflow filter (owner:
      HITL replaces Operators, Agentic replaces Outliers, Both = combined).
@@ -783,7 +783,7 @@ export function LiveBoardWorkspace({
      visible set shrinks, so a deep page pointer would strand the table. */
   useEffect(() => {
     setPage(1);
-  }, [search, classSel, platformSel, wfSel, viewMode, sortSel, initial.meta.window]);
+  }, [classSel, platformSel, wfSel, viewMode, sortSel, initial.meta.window]);
 
   /* ---------- selected operator + dock ---------- */
   const [selected, setSelected] = useState<number>(() =>
@@ -1043,15 +1043,6 @@ export function LiveBoardWorkspace({
   /* ---------- filtered/ordered row pairs ([op, fieldIndex]) ---------- */
   const ordered = useMemo(() => {
     let arr = ops.map((o, i) => [o, i] as [LiveOperator, number]);
-    const q = search.trim().toLowerCase();
-    if (q) {
-      arr = arr.filter(
-        ([o]) =>
-          o.codename.toLowerCase().includes(q) ||
-          o.name.toLowerCase().includes(q) ||
-          o.handle.toLowerCase().includes(q),
-      );
-    }
     if (classSel !== "All Classes") {
       arr = arr.filter(
         ([o]) => o.klass === classSel || o.klass.startsWith(`${classSel} `),
@@ -1087,7 +1078,7 @@ export function LiveBoardWorkspace({
       );
     }
     return arr;
-  }, [ops, search, classSel, platformSel, wfSel, viewMode, sortSel, sortFlip]);
+  }, [ops, classSel, platformSel, wfSel, viewMode, sortSel, sortFlip]);
 
   // Podium boxes and secondary ranks follow the same filtered population.
   // Never index top-3 sets by the unfiltered operator-array index.
@@ -1988,15 +1979,6 @@ export function LiveBoardWorkspace({
                     {SORT_ASC.has(sortSel) !== sortFlip ? "▲" : "▼"}
                   </button>
                 </span>
-                <span className="fb">
-                  <input
-                    aria-label="Search operators"
-                    placeholder="⌕"
-                    title="Search operators by name or codename"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </span>
                 </div>
                 <div className="board-filter-actions" role="group" aria-label="Leaderboard view and exports">
                       <div className="seg pgn-seg">
@@ -2263,7 +2245,9 @@ export function LiveBoardWorkspace({
               >
                 ▸
               </button>
-              <div className="colhead">SIGRANK</div>
+              {/* owner 2026-10-21: site-wide search lives in the title bar's right
+                  column head (was the SIGRANK label + a board-only filter input) */}
+              <GlobalSearch label="Search operators and pages" />
               <div className="railhead"><span className="rh-t">OPERATOR</span></div>
               <div className="rail">
                 {visibleRail.map((id) =>
