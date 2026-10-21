@@ -1,21 +1,14 @@
 "use client";
 
 import "@/components/home/wordmark.css";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TerminalBlockText } from "@/components/home/TerminalBlockText";
+import { usePixelWordmark } from "@/components/home/usePixelWordmark";
 
 /**
- * WaveHeroTitle — the WaveHero H1, theme-aware.
- *
- * Under the terminal theme (and only then), if the caller supplied a plain
- * `terminalText`, the title renders as block-letter art via the shared
- * TerminalBlockText engine — matching the landing SIGRANK wordmark. Every other
- * theme (and any page that omits terminalText) renders the existing styled <h1>
- * untouched, so carbon/paper/railway heroes are byte-identical to before.
- *
- * Client-only because it reads data-theme off <html> (set by ThemeToggle), the
- * same detection pattern TerminalWordmark uses. Kept as a small leaf so the rest
- * of WaveHero stays a server component.
+ * Uses the enclosing workspace's theme, or the document theme outside a shell.
+ * Terminal/Green and Black & Gold use block art; other workspace themes use
+ * their display typeface. A hidden semantic heading accompanies decorative art.
  */
 
 export interface WaveHeroTitleProps {
@@ -29,29 +22,14 @@ export interface WaveHeroTitleProps {
 }
 
 export function WaveHeroTitle({ title, terminalText, compact = false, headingLevel = "h1" }: WaveHeroTitleProps) {
-  const [isTerminal, setIsTerminal] = useState(false);
-
-  useEffect(() => {
-    const check = () => {
-      setIsTerminal(
-        document.documentElement.getAttribute("data-theme") === "terminal",
-      );
-    };
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
+  const { isPixel, themeRef } = usePixelWordmark<HTMLHeadingElement>();
 
   const Tag = headingLevel === "h2" ? "h2" : "h1";
 
-  // Terminal theme + a plain string supplied → block-letter hero. The block
+  // Pixel theme + a plain string supplied → block-letter hero. The block
   // art is decorative, so a visually-hidden heading keeps the page's one h1
   // (WorkspaceShell omits its own h1 when the hero carries the title).
-  if (isTerminal && terminalText) {
+  if (isPixel && terminalText) {
     // Visual cap only — TerminalBlockText now self-fits to its container via
     // cqw sizing, so these tiers just keep long titles proportionally smaller.
     const baseMax =
@@ -59,7 +37,7 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
     const maxRem = compact ? baseMax * 0.35 : baseMax;
     return (
       <>
-        <Tag className="sr-only">{title}</Tag>
+        <Tag ref={themeRef} className="sr-only">{title}</Tag>
         <TerminalBlockText
           text={terminalText}
           label={terminalText}
@@ -72,10 +50,11 @@ export function WaveHeroTitle({ title, terminalText, compact = false, headingLev
 
   return (
     <Tag
+      ref={themeRef}
       className={
         compact
-          ? "font-mono text-base font-bold tracking-wide text-text-primary sm:text-lg"
-          : "font-mono text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl"
+          ? "wave-hero-wordmark text-base font-bold tracking-wide text-text-primary sm:text-lg"
+          : "wave-hero-wordmark text-3xl font-bold tracking-wide text-text-primary sm:text-4xl md:text-5xl"
       }
     >
       {title}

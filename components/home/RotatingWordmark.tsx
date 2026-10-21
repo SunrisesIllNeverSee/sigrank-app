@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import localFont from "next/font/local";
 import "./wordmark.css";
+import { usePixelWordmark } from "./usePixelWordmark";
 
 // Wordmark font pool — used ONLY here (the rotating SIGRANK logo on the
 // homepage). Moved from app/layout.tsx so these 3 font families don't
@@ -39,35 +40,18 @@ const wmBlack = localFont({
  * Hero-scale: clamped huge (up to ~9rem), heavy weight, tight tracking. The §
  * coin sits after the word. Reduced-motion locks every letter to the mono face.
  *
- * Self-gates: renders null when data-theme === 'terminal' (the TerminalWordmark
- * takes over the hero under that theme). Watches data-theme via MutationObserver.
+ * Hidden for pixel themes, where TerminalWordmark takes over. Inside workspace
+ * themes the letters use the theme display font rather than rotating typefaces.
  * The semantic page H1 is server-rendered by Draft2Hero; this animated treatment
  * is exposed as an image-like accessible brand label to avoid a duplicate H1.
  */
 const WORD = "SIGRANK".split("");
 
 export function RotatingWordmark() {
-  const [hidden, setHidden] = useState(false);
-
-  useEffect(() => {
-    const check = () => {
-      setHidden(
-        document.documentElement.getAttribute("data-theme") === "terminal",
-      );
-    };
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  if (hidden) return null;
+  const { isPixel, themeRef } = usePixelWordmark<HTMLDivElement>();
 
   return (
-    <div className={`${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} flex flex-wrap items-center justify-center gap-x-3 gap-y-2`}>
+    <div ref={themeRef} style={{ display: isPixel ? "none" : "flex" }} className={`theme-brand-wordmark ${wmGrotesk.variable} ${wmSerif.variable} ${wmBlack.variable} flex flex-wrap items-center justify-center gap-x-3 gap-y-2`}>
       <div
         aria-label="SIGRANK"
         role="img"

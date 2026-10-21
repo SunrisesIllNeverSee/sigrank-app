@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TerminalBlockText } from "@/components/home/TerminalBlockText";
 import "./wordmark.css";
+import { usePixelWordmark } from "./usePixelWordmark";
 
 /**
  * TerminalWordmark — the terminal-theme hero wordmark (Layer 3, FIX O-adjacent).
@@ -14,9 +15,9 @@ import "./wordmark.css";
  * gradient that animates background-position). Per-line stagger via --tw-delay
  * so the sweep reads as flowing down the wordmark.
  *
- * Rendered ONLY when data-theme === 'terminal' (reads the attribute client-side,
- * same pattern as ThemeToggle). Other themes keep the existing RotatingWordmark.
- * The caller (Draft2Hero) switches between the two.
+ * Shown for Terminal/Green and Black & Gold, following the enclosing workspace
+ * theme (or the document theme outside a shell). Other themes show the styled
+ * brand mark. The mounted wrapper lets the theme observer remain connected.
  *
  * Responsive: the art is 52 chars wide — clamp the font-size so it fits mobile
  * width without horizontal scroll. Reduced-motion: the CSS slows the cycle to a
@@ -28,27 +29,11 @@ import "./wordmark.css";
 const SPLASH_RULE = "◈  ───────────────────────────────────────────  ◈";
 
 export function TerminalWordmark() {
-  const [isTerminal, setIsTerminal] = useState(false);
-
-  useEffect(() => {
-    const check = () => {
-      const t = document.documentElement.getAttribute("data-theme");
-      setIsTerminal(t === "terminal");
-    };
-    check();
-    // Watch for theme changes (the ThemeToggle sets data-theme on <html>).
-    const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  if (!isTerminal) return null;
+  const { isPixel, themeRef } = usePixelWordmark<HTMLDivElement>();
 
   return (
-    <div className="flex flex-col items-center gap-3" aria-label="SIGRANK">
+    <div ref={themeRef} className="flex flex-col items-center gap-3" aria-label="SIGRANK"
+      style={{ display: isPixel ? "flex" : "none" }}>
       {/* Block-letter art via the shared engine. SIGRANK's glyphs reproduce the
           original SPLASH_ART byte-for-byte. Responsive font-size so the 52-char
           width fits mobile without a horizontal-scroll gutter (overflow-x-clip). */}
