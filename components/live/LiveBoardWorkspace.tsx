@@ -86,9 +86,8 @@ import {
 } from "./OperatorDock";
 import { useRailIconSet } from "./useRailIconSet";
 import { PixelBadge } from "./PixelBadge";
-import type { PixelBadgeName } from "./PixelBadge";
-import { BADGE_LABELS } from "./PixelBadge";
-import { SignalMedal, SignalAward } from "./SignalHardware";
+import { SignalMedal } from "./SignalHardware";
+import { EarnedMarksModule } from "./EarnedMarksModule";
 import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts, RawAxisFacts } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
@@ -110,7 +109,6 @@ import {
   THEMES,
   WINDOW_SLUG,
   computeTT,
-  isVerifiedOp,
   numLev,
   numTotal,
   numYield,
@@ -175,10 +173,9 @@ type RailId =
   | "honors"
   | "compare"
   | "movers"
-  | "share"
-  | "soon";
+  | "share";
 /* Right-rail module order (owner 2026-10-06): interactive share, movement,
-   compare, then rotating field stats, hall spotlight, recents/coming-soon —
+   compare, then rotating field stats, hall spotlight —
    the profile module moved to the left sidebar ("banner + op profile"),
    which is why "profile" is absent. */
 /* Owner 2026-10-06 (second pass): profile module ↔ top movers swapped —
@@ -187,8 +184,10 @@ type RailId =
 /* Third pass (2026-10-06): global stats leave both sidebars entirely
    (owner defers them) — "field"/HOT STATS and the compare module exit
    the inspector; compare moved to the left sidebar. Inspector = share,
-   profile, hall, recents/soon. */
-const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "honors", "soon"];
+   profile, hall. */
+/* Owner 2026-10-21: RECENTS & SOON removed (its coming-soon caption already
+   lives in the left rail) — inspector = share, profile, awards & badges. */
+const BASE_RAIL_ORDER: RailId[] = ["share", "profile", "honors"];
 const RAIL_TITLE: Record<RailId, string> = {
   profile: "OPERATOR PROFILE",
   field: "HOT STATS",
@@ -197,7 +196,6 @@ const RAIL_TITLE: Record<RailId, string> = {
   compare: "COMPARE OPERATORS",
   movers: "TOP MOVERS",
   share: "SHARE YOUR SIGNAL",
-  soon: "RECENTS & SOON",
 };
 
 /* ---------- HOT STATS (owner 2026-10-06): the rail's field module rotates
@@ -838,16 +836,6 @@ export function LiveBoardWorkspace({
       const codename =
         i === -1 ? initial.featured?.codename : ops[i]?.codename;
       if (!codename) return;
-      const name =
-        i === -1
-          ? (initial.featured?.name ?? codename)
-          : (ops[i]?.name ?? codename);
-      setRecents((r) =>
-        [{ codename, name }, ...r.filter((x) => x.codename !== codename)].slice(
-          0,
-          4,
-        ),
-      );
       liveTrack.operatorSelected({
         codename,
         rank: i >= 0 ? i + 1 : (initial.featured?.rank ?? null),
@@ -1003,7 +991,11 @@ export function LiveBoardWorkspace({
   /* ---------- rail module stack (reorderable + hideable) ---------- */
   const [railOrder, setRailOrder] = useState<RailId[]>(BASE_RAIL_ORDER);
   const [hiddenIds, setHiddenIds] = useState<RailId[]>([]);
-  const visibleRail = railOrder.filter((id) => !hiddenIds.includes(id));
+  /* ids no longer in RAIL_TITLE (e.g. the retired "soon" module in a stale
+     saved order) are dropped rather than rendered. */
+  const visibleRail = railOrder.filter(
+    (id) => id in RAIL_TITLE && !hiddenIds.includes(id),
+  );
 
   /* ⇄ FEATURE flips the drill card between floating (.feat over the board)
      and docked (compact tile in the LEFT sidebar's OPERATOR PROFILE mod —
@@ -1108,11 +1100,6 @@ export function LiveBoardWorkspace({
   const [railOn, setRailOn] = useState(true);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
-  /* RECENTS (owner 2026-10-06): last-selected operators for the RECENTS &
-     SOON rail module. */
-  const [recents, setRecents] = useState<{ codename: string; name: string }[]>(
-    [],
-  );
   /* (owner 2026-10-08: the compare module's add-by-search input is gone —
      the module is a single button that routes to /compare.) */
   /* icon-set switcher (owner: "toggle through the icons — all 4 or 5
@@ -1129,12 +1116,6 @@ export function LiveBoardWorkspace({
     "combined",
   );
   const [sigSel, setSigSel] = useState<SignalMetricKey>("YIELD");
-  /* awards/badges deck (owner: one box, three slides, bigger graphics) */
-  const [awSlide, setAwSlide] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setAwSlide((i) => i + 1), 4000);
-    return () => clearInterval(t);
-  }, []);
   /* Adjustable sidebars (owner 2026-10-06): the ear-flap on each panel's
      inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
      vars on .lbw-root; a sub-4px click counts as collapse instead. */
@@ -1540,181 +1521,30 @@ export function LiveBoardWorkspace({
           <p className="drill-note">— SELECT AN OPERATOR</p>
         );
       case "honors":
-        /* owner pass 3c: awards/medals/badges are their own module — the
-           rotating deck box moved out of the operator profile.
-           LB-G07 approved slide order: (1) cumulative Pixel Badges shelf,
-           (2) Gold/Silver/Bronze Trophy Tracker, (3) Achievement Awards.
-           Every earned state is source-backed — no G16 patterns, no
-           account-age streaks, no record-count token milestones. */
-        return profile ? (
-          <div className="awbox">
-            <div className="awbox-h">
-              {
-                (["PIXEL BADGES", "TROPHY TRACKER", "ACHIEVEMENTS"] as const)[
-                  awSlide % 3
-                ]
-              }
-              <span className="mut"> · {(awSlide % 3) + 1}/3</span>
-            </div>
-            {awSlide % 3 === 0 &&
-              (() => {
-                const pct = selOp?.pct ?? 0;
-                /* "100 DAYS CONSISTENT" is a streak claim — earned only
-                   from the independent accepted-activity-day evidence
-                   feed (det.activeDays, distinct all-time history
-                   dates). Never account age; the 60-point display feed
-                   can't prove 100 days. Unfetched evidence → unearned. */
-                const days = selDetail?.activeDays ?? 0;
-                const earned = new Set<PixelBadgeName>();
-                if (isVerifiedOp(selOp?.verif)) earned.add("verified");
-                /* cumulative tiers — pct ≥ 99 lights top10+top5+top1 */
-                if (pct >= 90) earned.add("top10");
-                if (pct >= 95) earned.add("top5");
-                if (pct >= 99) earned.add("top1");
-                if (days >= 100) earned.add("days100");
-                /* exact lifetime-token total via num.num.total — never
-                   the abbreviated display string or a records count */
-                if (selOp && numTotal(selOp) >= 1e7)
-                  earned.add("tokens10m");
-                return (
-                  <div className="pxshelf">
-                    {(
-                      [
-                        "verified",
-                        "top10",
-                        "top5",
-                        "top1",
-                        "days100",
-                        "tokens10m",
-                      ] as PixelBadgeName[]
-                    ).map((b) => (
-                      <span
-                        className={`pxcell${earned.has(b) ? "" : " locked"}`}
-                        key={b}
-                      >
-                        <PixelBadge name={b} />
-                        <small>{BADGE_LABELS[b]}</small>
-                      </span>
-                    ))}
-                  </div>
-                );
-              })()}
-            {awSlide % 3 === 1 &&
-              /* real counted hardware — record placements rank 1/2/3 →
-                 gold/silver/bronze. Empty metals render dimmed ×0. */
-              (() => {
-                const recs = selOp?.recs ?? [];
-                const counts = [1, 2, 3].map(
-                  (r) => recs.filter((x) => x.rank === r).length,
-                );
-                return (
-                  <div className="trp-deck">
-                    {(["GOLD", "SILVER", "BRONZE"] as const).map((m, i) => (
-                      <div className="trp-unit" key={m}>
-                        <SignalMedal
-                          rank={(i + 1) as 1 | 2 | 3}
-                          size={30}
-                          muted={counts[i] === 0}
-                        />
-                        <span className="trp-n mono">×{counts[i]}</span>
-                        <span className="trp-m">{m}</span>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-            {awSlide % 3 === 2 &&
-              /* achievement hardware (LB-G04 direction) over the same
-                 source-backed facts — class standing, top-1% legend,
-                 evidence-backed consistency, record count, real 10M. */
-              (() => {
-                const days = selDetail?.activeDays ?? 0;
-                return (
-                  <div className="awards cards">
-                    <div className="hxcard">
-                      <SignalAward type="class" size={40} />
-                      <span className="hx-n">{selOp?.klass ?? "—"}</span>
-                      <span className="hx-v">CLASS</span>
-                    </div>
-                    {(selOp?.pct ?? 0) >= 99 && (
-                      <div className="hxcard">
-                        <SignalAward type="top1" size={40} />
-                        <span className="hx-n">TOP 1%</span>
-                        <span className="hx-v">LEGEND</span>
-                      </div>
-                    )}
-                    {days >= 100 && (
-                      <div className="hxcard">
-                        <SignalAward type="days100" size={40} />
-                        <span className="hx-n">100 DAYS</span>
-                        <span className="hx-v">CONSISTENT</span>
-                      </div>
-                    )}
-                    {(selOp?.recs ?? []).length > 0 && (
-                      <div className="hxcard">
-                        <SignalAward type="records" size={40} />
-                        <span className="hx-n">
-                          ×{(selOp?.recs ?? []).length}
-                        </span>
-                        <span className="hx-v">RECORDS</span>
-                      </div>
-                    )}
-                    {selOp && numTotal(selOp) >= 1e7 && (
-                      <div className="hxcard">
-                        <SignalAward type="tokens10m" size={40} />
-                        <span className="hx-n">10M+</span>
-                        <span className="hx-v">TOKENS</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-          </div>
+        /* owner 2026-10-21: summary + OPEN popup of EVERYTHING earned (same
+           derivation as the profile Badges tab — see lib/live/earned-marks).
+           Replaces the auto-rotating three-slide deck that only showed six
+           pixel badges, medal counts and five achievement cards. */
+        return profile && selOp ? (
+          <EarnedMarksModule
+            key={selOp.codename}
+            input={{
+              /* standing + tokens prefer the profile's own board row
+                 (selDetail.earned); the board row is the pre-load fallback */
+              pct: selDetail?.earned?.percentile ?? selOp.pct ?? 0,
+              totalTokens:
+                selDetail?.earned?.processedTokens ?? numTotal(selOp),
+              pending: selDetail?.earned?.pending,
+              verif: selOp.verif,
+              klass: selOp.klass,
+              medals: selDetail?.earned?.medals,
+              hall: selDetail?.earned?.hall,
+              platformMarks: selDetail?.platformMarks,
+              scoredSnapshots: selDetail?.scoredSnapshots,
+            }}
+          />
         ) : (
           <p className="drill-note">— SELECT AN OPERATOR</p>
-        );
-      case "soon":
-        return (
-          <>
-            <div className="soon-h">RECENT</div>
-            {recents.length ? (
-              recents.map((r) => {
-                const rop = ops.find((o) => o.codename === r.codename);
-                return (
-                  <button
-                    key={r.codename}
-                    type="button"
-                    className="rec-chip"
-                    onClick={() => {
-                      const k = ops.findIndex(
-                        (o) => o.codename === r.codename,
-                      );
-                      if (k >= 0) handleSelect(k);
-                    }}
-                  >
-                    <span className="rav">
-                      {rop?.avatarUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element --
-                           operator avatar URL; 12px chip */
-                        <img src={rop.avatarUrl} alt="" loading="lazy" />
-                      ) : (
-                        r.name[0]
-                      )}
-                    </span>
-                    {r.name}
-                  </button>
-                );
-              })
-            ) : (
-              <p className="drill-note">— SELECT AN OPERATOR</p>
-            )}
-            {/* owner 2026-10-08: "move the news feeds to the left
-                sidebar" — SIGNAL WIRE + FIELD NOTES now live in .lside;
-                this module keeps recents + the coming-soon caption. */}
-            {/* coming-soon candidates moved to the icon rail (owner pass 3)
-                — this module keeps recents only. */}
-            <p className="soon-cap">COMING SOON — TEAMS · HACKS · VERSUS live in the rail ↙</p>
-          </>
         );
     }
   };
@@ -2293,7 +2123,7 @@ export function LiveBoardWorkspace({
                 <div className={`rtray${hiddenIds.length ? "" : " rhide"}`}>
                   <span className="rl">HIDDEN MODULES</span>
                   {railOrder
-                    .filter((id) => hiddenIds.includes(id))
+                    .filter((id) => id in RAIL_TITLE && hiddenIds.includes(id))
                     .map((id) => (
                       <button
                         key={id}
