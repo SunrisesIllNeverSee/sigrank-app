@@ -217,3 +217,76 @@
 .lbw-root .ws-profile-content .profile-title-nav [role="tablist"],.lbw-root .profile-title-nav .profile-share-gallery{margin-bottom:0}
 .lbw-root .profile-title-nav .profile-share-gallery{display:inline-flex;align-items:center;justify-content:center;align-self:center;white-space:nowrap;padding:10px 9px;line-height:1.45;text-align:center}
 .lbw-root .pv2 .pv2-command-footer{position:absolute;z-index:4;bottom:0;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:center;background:#000;color:#e9f3df;border-top:1px solid rgba(168,85,247,.5);font:600 11px var(--pc-font-m);letter-spacing:.08em}
+
+/* ══ Phone profile (owner 2026-10-21) — <= 760px only; desktop/tablet unchanged ══ */
+.lbw-root .ws-pm-head{display:none}
+@media(max-width:760px){
+  .lbw-root .ws-profile-content{padding:12px 0 24px}
+  /* header */
+  .lbw-root .ws-pm-head{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+  .lbw-root .ws-pm-id{display:flex;align-items:center;gap:12px;min-width:0}
+  .lbw-root .ws-pm-av{flex:none;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 18px var(--pv2-display,var(--font-d),monospace);color:var(--tx);background:radial-gradient(circle at 30% 30%,#4c1d95,#1a1128 75%);border:2px solid rgba(168,85,247,.6)}
+  .lbw-root .ws-pm-names{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .lbw-root .ws-pm-names h1{margin:0;font:700 20px/1.2 var(--font-sg,system-ui,sans-serif);color:var(--tx);overflow-wrap:anywhere}
+  .lbw-root .ws-pm-handle{font:12px var(--font-mono);color:var(--mut);overflow-wrap:anywhere}
+  .lbw-root .ws-pm-pills{display:flex;flex-wrap:wrap;gap:6px}
+  .lbw-root .ws-pm-pills span{font:600 12px var(--font-mono);letter-spacing:.04em;padding:5px 10px;border:1px solid var(--line2);border-radius:999px;color:var(--tx2);background:var(--bg2);text-transform:uppercase}
+  .lbw-root .ws-pm-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .lbw-root .ws-pm-actions>button,.lbw-root .ws-pm-actions>a,.lbw-root .ws-pm-watch>*{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;padding:0 8px;border:1px solid var(--line2);border-radius:8px;background:var(--bg2);color:var(--tx);font:600 12px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
+  .lbw-root .ws-pm-watch{display:block;min-width:0}
+  .lbw-root .ws-pm-note{margin:0;min-height:0;font:12px var(--font-mono);color:var(--ac)}
+  .lbw-root .ws-pm-note:empty{display:none}
+
+  /* drill nav is duplicated by the tab strip */
+  .lbw-root .ws-profile-nav{display:none}
+
+  /* sticky, horizontally scrolling tab strip */
+  .lbw-root .ws-profile-content .profile-title-nav{position:sticky;top:0;z-index:5;background:var(--bg);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;flex-wrap:nowrap;margin:0 -2px;padding:0 2px;-webkit-overflow-scrolling:touch}
+  .lbw-root .ws-profile-content .profile-title-nav::-webkit-scrollbar{display:none}
+  .lbw-root .ws-profile-content .profile-title-nav [role="tablist"]{flex-wrap:nowrap;overflow:visible;flex:none;margin-bottom:0}
+  .lbw-root .ws-profile-content [role="tab"]{flex:none;min-height:44px;padding:10px 12px;font-size:12px;white-space:nowrap}
+  .lbw-root .profile-title-nav .profile-share-gallery{flex:none;min-height:44px;font-size:12px;padding:10px 12px}
+
+  /* identity card + flap board stack */
+  .lbw-root .pv2 .pv2-opensplit{grid-template-columns:minmax(0,1fr);min-height:0}
+  .lbw-root .pv2 .pv2-pcard-scope{padding:18px 10px;overflow:hidden}
+  .lbw-root .pv2 .pv2-pcard-scope .artwork-share-controls{max-width:324px}
+
+  /* telemetry as key-value rows: key | operator value | field average */
+  .lbw-root .pv2 .pv2-flap-cols{grid-template-columns:minmax(0,1fr) auto auto;column-gap:12px;padding:0 12px}
+  .lbw-root .pv2 .pv2-flap-cols span{font-size:12px;padding:8px 0}
+  .lbw-root .pv2 .pv2-flap-cols span:nth-child(3){display:none}
+  .lbw-root .pv2 .pv2-flap-cols span:nth-child(2){display:none}
+  .lbw-root .pv2 .pv2-flap-cols span:nth-child(4){text-align:right}
+  .lbw-root .pv2 .pv2-flap-cols::before{content:"Operator";grid-column:2;font:inherit;font-family:var(--pv2-display,monospace);font-size:12px;letter-spacing:.12em;color:var(--tx2);padding:8px 0;text-align:right;text-transform:uppercase}
+  .lbw-root .pv2 .pv2-flap-cols span:first-child{grid-column:1;grid-row:1}
+  .lbw-root .pv2 .pv2-flap-cols::before{grid-row:1}
+  .lbw-root .pv2 .pv2-flap-cols span:nth-child(4){grid-column:3;grid-row:1}
+  .lbw-root .pv2 .pv2-flap-row{grid-template-columns:minmax(0,1fr) auto auto;column-gap:12px;padding:0 12px;min-height:44px}
+  .lbw-root .pv2 .pv2-flap-row .ck{display:none}
+  .lbw-root .pv2 .pv2-flap-row .fk{font-size:12px}
+  .lbw-root .pv2 .pv2-flap-row .fv,.lbw-root .pv2 .pv2-flap-row .cv{font-size:14px;text-align:right}
+  .lbw-root .pv2 .pv2-flap-foot{font-size:12px;padding:10px 12px;gap:8px;flex-wrap:wrap}
+
+  /* rank contexts, records, heatmap text readable */
+  .lbw-root .prl-ctx-row{min-height:44px;align-items:center}
+  .lbw-root .prl-ctx-k{font-size:12px;width:64px}
+  .lbw-root .prl-ctx-n,.lbw-root .prl-ctx-note,.lbw-root .prl-note,.lbw-root .prl-watched{font-size:12px}
+  .lbw-root .prl-heat-months span,.lbw-root .prl-heat-stats span,.lbw-root .prl-heat-legend span,.lbw-root .prl-medal i{font-size:12px}
+  .lbw-root .prl-badge{font-size:12px;padding:5px 9px}
+  .lbw-root .prl-rec{min-height:44px;padding:8px 10px}
+  .lbw-root .prl-rec-name{font-size:12px}
+  .lbw-root .prl-rec-val{font-size:13px}
+  .lbw-root .prl-open{min-height:44px}
+  .lbw-root .prl-open-hint{font-size:12px}
+  .lbw-root .ws-profile-kv{font-size:12px;padding:10px 0;min-height:44px;align-items:center}
+  .lbw-root .ws-profile-actions a,.lbw-root .ws-profile-actions button{min-height:44px;font-size:12px;display:inline-flex;align-items:center}
+  .lbw-root .ws-watch-entry>a{font-size:12px}
+  .lbw-root .ws-watch-entry .pkbtn{font-size:12px;min-height:44px;padding:6px 12px}
+  /* utility-class text in the views (Tailwind arbitrary sizes) — 12px floor; card art excluded */
+  .lbw-root .ws-profile-content :is([class*="text-[8px]"],[class*="text-[9px]"],[class*="text-[10px]"],[class*="text-[11px]"],.text-xs):not(.pv2-card *){font-size:12px}
+  .lbw-root .ws-profile-content summary,.lbw-root .ws-profile-content .text-gold.hover\:underline{font-size:12px}
+  /* wide tables scroll inside their own card (overflow-x-auto wrapper) */
+  .lbw-root .ws-profile-content .overflow-x-auto{-webkit-overflow-scrolling:touch}
+  .lbw-root .ws-profile-content .text-xs{font-size:12px}
+}

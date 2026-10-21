@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { MyWatchlist } from "./MyWatchlist";
+import { WatchButton } from "@/components/live/WatchButton";
 import { RailDialog } from "./RailDialog";
 import "./profile-workspace.css";
 
@@ -14,6 +15,41 @@ const ProfileWorkspaceContext = createContext<{ section: ProfileSection; codenam
 export const useProfileWorkspace = () => useContext(ProfileWorkspaceContext);
 
 const sections = ["overview", "stats", "analysis", "submissions", "social", "badges"] as const;
+
+/** owner 2026-10-21: phone-only profile header (hidden above 760px by CSS). */
+function PhoneHeader({ name, codename, rank, tier, platform }: { name: string; codename: string; rank: number | null; tier: string; platform: string }) {
+  const [note, setNote] = useState("");
+  const initials = name.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase() || "?";
+  const share = async () => {
+    const url = `${window.location.origin}/s/${encodeURIComponent(codename)}`;
+    try {
+      if (typeof navigator.share === "function") { await navigator.share({ title: `${name} on SignalAF`, url }); return; }
+      await navigator.clipboard.writeText(url);
+      setNote("Link copied");
+    } catch (e) {
+      if ((e as Error)?.name !== "AbortError") setNote("Could not share");
+    }
+    window.setTimeout(() => setNote(""), 2500);
+  };
+  return <header className="ws-pm-head" aria-label="Operator">
+    <div className="ws-pm-id">
+      <span className="ws-pm-av" aria-hidden="true">{initials}</span>
+      <div className="ws-pm-names">
+        <h1>{name}</h1>
+        <span className="ws-pm-handle">@{codename}</span>
+      </div>
+    </div>
+    <div className="ws-pm-pills">
+      <span>{rank ? `#${rank}` : "UNRANKED"}</span><span>{tier}</span><span>{platform}</span>
+    </div>
+    <div className="ws-pm-actions">
+      <button type="button" onClick={share}>Share</button>
+      <Link href={`/compare?a=${encodeURIComponent(codename)}`}>Compare</Link>
+      <span className="ws-pm-watch"><WatchButton codename={codename} /></span>
+    </div>
+    <p className="ws-pm-note" role="status" aria-live="polite">{note}</p>
+  </header>;
+}
 
 export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLabel, children, actions, panels }: {
   name: string; codename: string; rank: number | null; tier: string; platform: string;
@@ -88,6 +124,6 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
         </>}
       </>}
       status={<>{name} · PROFILE · SIGNALAF × SIGRANK</>}
-    ><div className="ws-profile-content">{children}</div></WorkspaceShell>
+    ><div className="ws-profile-content"><PhoneHeader name={name} codename={codename} rank={rank} tier={tier} platform={platform} />{children}</div></WorkspaceShell>
   </ProfileWorkspaceContext.Provider>;
 }
