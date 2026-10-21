@@ -476,15 +476,23 @@ export function WorkspaceShell({
             )}
 
             <div className="stagecol">
-              {title != null &&
-                (bareTitle ? (
-                  srOnlyTitle ? <h1 className="sr-only">{title}</h1> : null
-                ) : (
-                  <div className="stitle">
+              {/* owner 2026-10-21: site-wide search sits at the right end of the title
+                  row so it is never hidden by a collapsed sidebar; bare/untitled
+                  pages get a search-only row. */}
+              {title != null && !bareTitle ? (
+                <div className="stitle">
+                  <div className="stitle-main">
                     <h1 className="pagetitle">{title}</h1>
                     {titleControls}
                   </div>
-                ))}
+                  <GlobalSearch label="Search operators and pages" />
+                </div>
+              ) : (
+                <div className="stitle">
+                  {title != null && srOnlyTitle && <h1 className="sr-only">{title}</h1>}
+                  <GlobalSearch label="Search operators and pages" />
+                </div>
+              )}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
               <main ref={stageElRef} className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
                 <div className="board">
@@ -509,10 +517,7 @@ export function WorkspaceShell({
                 >
                   ▸
                 </button>
-                {/* owner 2026-10-21: the right column head is now the site-wide search
-                    slot (was a static SIGRANK label); colheadRight stays the
-                    slot's accessible name when a page overrides it. */}
-                <GlobalSearch label={colheadRight === "SIGRANK" ? "Search operators and pages" : `Search (${colheadRight})`} />
+                <div className="colhead">{colheadRight}</div>
                 <div className="railhead">
                   <span className="sq"></span>
                   <span className="rh-t">{rightTitle}</span>

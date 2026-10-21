@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * GlobalSearch — site-wide search in the title bar's right column head
- * (owner 2026-10-21: "move search out of the filter bar and into the top
- * title bar, where the SIGRANK header label sits"). Searches every
+ * GlobalSearch — site-wide search at the right end of the page-title row
+ * (owner 2026-10-21: "the site search is supposed to sit in the title bar
+ * where it's not affected by collapsing the sidebar"). Searches every
  * operator (public fields only) and the whole site's page index; results
  * drop down grouped Operators / Pages. Up/Down move, Enter opens, Esc closes.
  * The index is fetched once, lazily, on first focus (GET /api/search-index).
@@ -155,7 +155,7 @@ export function GlobalSearch({ label = "Search" }: { label?: string }) {
     );
 
   return (
-    <div className="colhead colhead-search" ref={rootRef} role="search">
+    <div className="gs-root" ref={rootRef} role="search">
       <input
         ref={inputRef}
         className="gs-in"
