@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { BoardBriefings } from "@/components/live/BoardBriefings";
+import { BoardBriefings, buildUpdates } from "@/components/live/BoardBriefings";
 
 let reducedMotion = false;
 beforeEach(() => {
@@ -25,43 +25,58 @@ afterEach(() => {
   Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
 });
 
-const mount = () => render(<BoardBriefings ops={[]} stats={[{ field: "median_yield", value: "12.5" }]} />);
-const tick = async () => { await act(async () => { await vi.advanceTimersByTimeAsync(12000); }); };
+const op = (codename: string, name: string, last: string, age: number) =>
+  ({ codename, name, last, age } as unknown as import("@/lib/board/live-types").LiveOperator);
+const ops = [op("a", "Alpha", "10/20/26", 30), op("b", "Beta", "10/19/26", 2)];
+const stats = [{ field: "median_yield", value: "12.5" }, { field: "top_yield", value: "99.1" }];
+const mount = (o = ops, s = stats) => render(<BoardBriefings ops={o} stats={s} />);
+const pager = () => screen.getByRole("button", { name: /^Open Wire/ }).textContent ?? "";
+const advance = async (ms: number) => { await act(async () => { await vi.advanceTimersByTimeAsync(ms); }); };
 
 describe("leaderboard briefings", () => {
-  it("rotates between both views and pauses while the reader hovers", async () => {
-    mount();
-    expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
-    expect(vi.getTimerCount()).toBe(1);
-    await act(async () => { await vi.advanceTimersByTimeAsync(6000); });
-    expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
-    await act(async () => { await vi.advanceTimersByTimeAsync(6000); });
-    const preview = screen.getByRole("button", { name: "Open Field Notes" });
-    fireEvent.mouseEnter(preview.closest(".board-briefings")!);
-    await tick();
-    expect(screen.getByRole("button", { name: "Open Field Notes" })).toBeInTheDocument();
-    fireEvent.mouseLeave(preview.closest(".board-briefings")!);
-    await tick();
-    expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
+  it("builds only real updates and hides empty categories", () => {
+    const keys = buildUpdates(ops, stats).map((u) => u.kind);
+    expect(keys).toEqual(["Submission", "Submission", "New operator", "Field stat", "Field stat"]);
+    expect(buildUpdates([], [])).toEqual([]);
   });
 
-  it("freezes the chosen view in the popup and resumes after closing", async () => {
+  it("rotates every 6 seconds with a pager and pauses while hovered", async () => {
     mount();
-    fireEvent.click(screen.getByRole("button", { name: "Field Notes" }));
-    expect(screen.getByRole("dialog", { name: "Wire / Notes" })).toBeInTheDocument();
-    await tick();
-    expect(screen.getByRole("region", { name: "Field Notes" })).toHaveTextContent("12.5");
+    expect(pager()).toContain("1 / 5");
+    await advance(6000);
+    expect(pager()).toContain("2 / 5");
+    const root = screen.getByRole("button", { name: /^Open Wire/ }).closest(".board-briefings")!;
+    fireEvent.mouseEnter(root);
+    await advance(30000);
+    expect(pager()).toContain("2 / 5");
+    fireEvent.mouseLeave(root);
+    await advance(6000);
+    expect(pager()).toContain("3 / 5");
+  });
+
+  it("lists every update in the popup and resumes after closing", async () => {
+    mount();
+    fireEvent.click(screen.getByRole("button", { name: /^Open Wire/ }));
+    const region = screen.getByRole("region", { name: "All updates" });
+    expect(region).toHaveTextContent("Alpha");
+    expect(region).toHaveTextContent("Median Yield 12.5");
+    expect(region).toHaveTextContent("Top Yield 99.1");
+    await advance(12000);
+    expect(pager()).toContain("1 / 5");
     fireEvent.click(screen.getByRole("button", { name: "Close Wire / Notes" }));
-    await tick();
-    expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
+    await advance(6000);
+    expect(pager()).toContain("2 / 5");
   });
 
-  it("respects reduced motion while keeping both views accessible", async () => {
+  it("does not rotate under reduced motion", async () => {
     reducedMotion = true;
     mount();
-    await tick();
-    expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Field Notes" }));
-    expect(screen.getByRole("region", { name: "Field Notes" })).toHaveTextContent("12.5");
+    await advance(30000);
+    expect(pager()).toContain("1 / 5");
+  });
+
+  it("shows an empty state when there is no data", () => {
+    mount([], []);
+    expect(screen.getAllByText("No recent updates in this board view.").length).toBeGreaterThan(0);
   });
 });

@@ -1881,7 +1881,9 @@ export function LiveBoardWorkspace({
                     onSelect={handleSelect}
                   />
                 </div>
-                <BoardBriefings ops={ops} stats={initial.fieldStats} />
+                <BoardBriefings ops={ops} stats={initial.fieldStats} movers={initial.movers}
+                  hall={initial.hall}
+                  leader={initial.featured ? { codename: initial.featured.codename, name: initial.featured.name } : null} />
                 {/* owner (pass 3): "hall of signal is supposed to be in the
                     left sidebar" — spotlight + medal tally join the burners
                     column. */}
