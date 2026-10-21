@@ -217,7 +217,6 @@
 .lbw-root .fbar .board-filter-controls .seg button{
   font-size:10px;padding:5px 5px;white-space:nowrap
 }
-.lbw-root .fbar .board-filter-controls .sdir{width:26px;height:28px}
 .lbw-root .fbar .board-filter-controls input{
   box-sizing:border-box;width:76px;min-width:76px;max-width:76px;
   height:28px;font-size:10px;padding-inline:6px
@@ -248,7 +247,7 @@
    ONE scroller for both axes and the stage stops scrolling — nested
    scrollers made three regions move at once. With the card undocked the
    stage scrolls as before and only the horizontal freeze applies. */
-.lbw-root{--pin-rank-w:58px;--pin-op-w:240px;--pin-trend-w:76px}
+.lbw-root{--pin-rank-w:58px;--pin-op-w:240px}
 .lbw-root .stage.stage-board{overflow:hidden;display:flex;flex-direction:column;padding-bottom:12px}
 .lbw-root .stage.stage-board>.board{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-bottom:0}
 .lbw-root .stage.stage-board .tablecard{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
@@ -263,8 +262,9 @@
    neighbouring frozen cell */
 .lbw-root .board-t tbody td.pin:hover{z-index:5}
 .lbw-root .board-t .pin-rank{left:0;width:var(--pin-rank-w);min-width:var(--pin-rank-w)}
-.lbw-root .board-t .pin-op{left:var(--pin-rank-w);width:var(--pin-op-w);min-width:var(--pin-op-w);max-width:var(--pin-op-w)}
-.lbw-root .board-t .pin-trend{left:calc(var(--pin-rank-w) + var(--pin-op-w));width:var(--pin-trend-w);min-width:var(--pin-trend-w);
+/* owner 2026-10-21: Trend scrolls with the metrics; the frozen edge (divider +
+   shadow) now closes on the Operator column. */
+.lbw-root .board-t .pin-op{left:var(--pin-rank-w);width:var(--pin-op-w);min-width:var(--pin-op-w);max-width:var(--pin-op-w);
   box-shadow:inset -1px 0 0 var(--line),8px 0 10px -8px rgba(0,0,0,.55)}
 /* Row states paint over the solid pin background so frozen cells keep the
    top-1 / selected / hover tint the scrolling cells show. */
