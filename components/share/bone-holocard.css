@@ -5,8 +5,13 @@
 .bone-holo-options{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:16px 0}
 .bone-holo-options label{display:flex;align-items:center;gap:8px;font:12px BoneMono,monospace}
 .bone-holo-options select{background:#141b1b;color:#edf4ee;padding:8px;border:1px solid #64746d;border-radius:5px}
-.bone-holo-viewport{position:relative;width:100%;overflow:hidden;border-radius:20px}
-.bone-holo-card{width:1200px;height:627px;position:absolute;left:0;top:0;transform-origin:top left;isolation:isolate;overflow:hidden;border-radius:20px;background:#f4eee3;color:#262124;--bone-foil:#56d8c2;font-family:BoneMono,monospace}
+.bone-holo-viewport{position:relative;width:100%;overflow:hidden}
+.bone-holo-shape{position:absolute;inset:0;overflow:hidden;background:#f4eee3;
+  clip-path:polygon(var(--bone-cut-x) 0,calc(100% - var(--bone-cut-x)) 0,100% var(--bone-cut-y),100% calc(100% - var(--bone-cut-y)),calc(100% - var(--bone-cut-x)) 100%,var(--bone-cut-x) 100%,0 calc(100% - var(--bone-cut-y)),0 var(--bone-cut-y))}
+.bone-holo-card{width:1200px;height:627px;position:absolute;left:0;top:0;transform-origin:top left;isolation:isolate;
+  /* owner 2026-10-21: outer corners use the holocard's own cut (8% x 5% of the 324x484 shell,
+     x1.2954545 = 33.6px x 31.4px) on all four corners instead of a 20px round */
+  --bone-cut-x:33.6px;--bone-cut-y:31.4px;color:#262124;--bone-foil:#56d8c2;font-family:BoneMono,monospace}
 .bone-holo-card *{box-sizing:border-box}
 .bone-holo-paper{position:absolute;inset:0;padding:46px 55px 27px}
 .bone-holo-header{display:flex;align-items:center;justify-content:space-between;width:698px;height:51px}
@@ -33,6 +38,9 @@
 .bone-holo-paper footer{position:absolute;left:55px;bottom:28px;max-width:700px;font:700 13px BoneMono,monospace;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#756d73}
 .lbw-root .pv2 .bone-holo-live.pv2-pcard-scope{position:absolute;left:780px;top:0;width:420px;height:627px;padding:0;border:0;border-radius:0;display:block;background:#102e2c;perspective:none;--pc-bg1:#0f2625;--pc-bg2:#163d38;--pc-bg3:#25594d;--pc-bg4:#0e2829;--pc-muted:#a3c8bd;--pc-class:#62dcc7}
 .lbw-root .pv2 .bone-holo-live .pv2-card-shell{position:absolute;left:0;top:0;transform:scale(1.2954545);transform-origin:top left;animation:none;background:linear-gradient(135deg,var(--bone-foil),#ffffff60,var(--bone-foil));box-shadow:none}
+/* owner 2026-10-21: where the holo meets the bone paper its left corners are square, so the two
+   halves join on a straight seam; only the outer (right) corners keep the cut */
+.lbw-root .pv2 .bone-holo-live .pv2-card-shell,.lbw-root .pv2 .bone-holo-live .pv2-card{clip-path:polygon(0 0,92% 0,100% 5%,100% 95%,92% 100%,0 100%)}
 .lbw-root .pv2 .bone-holo-card[data-palette=coral]{--bone-foil:#ff9caa}.lbw-root .pv2 .bone-holo-card[data-palette=gold]{--bone-foil:#f3d372}.lbw-root .pv2 .bone-holo-card[data-palette=violet]{--bone-foil:#bd9aff}
 .lbw-root .pv2 [data-palette=coral] .bone-holo-live{--pc-bg1:#2d1420;--pc-bg2:#4a2430;--pc-bg3:#68373d;--pc-bg4:#291620;--pc-class:#ff9caa}
 .lbw-root .pv2 [data-palette=gold] .bone-holo-live{--pc-bg1:#29220e;--pc-bg2:#443718;--pc-bg3:#65552b;--pc-bg4:#29200e;--pc-class:#f3d372}
