@@ -388,8 +388,10 @@
   .lbw-root:has(.ws-cmp-stage) .rail .ws-note li { margin-bottom:2px!important }
   .lbw-root:has(.ws-cmp-stage) .rail .ws-nav a { padding:2px 0; font-size:10px; line-height:1.3 }
 }
-@media (max-width:1050px) {
-  .lbw-root:has(.ws-cmp-stage) .mid { grid-template-columns:var(--lside-w) minmax(600px,1fr) var(--rail-w); overflow-x:auto }
+@media (min-width:761px) and (max-width:1050px) {
+  /* owner 2026-10-21: tablet has no horizontal pan (supersedes 2026-10-06); the
+     sidebars are drawers, so the stage takes the full width. */
+  .lbw-root:has(.ws-cmp-stage) .mid { grid-template-columns:var(--lside-w) minmax(0,1fr) var(--rail-w); overflow-x:hidden }
 }
 @media (max-height:650px), (max-width:1050px) {
   .lbw-root:has(.ws-cmp-stage) .stage{overflow:auto}
@@ -411,4 +413,154 @@
   .lbw-root .ws-cmp-stage .ws-cmp-hist{grid-row:4}
   .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{grid-column:2}
   .lbw-root .ws-cmp-stage .cmp-h2h-grid{grid-template-columns:minmax(0,1fr)}
+}
+
+/* ---- Phone / tablet additions (owner 2026-10-21, mobile spec T4) ---- */
+/* The visually hidden radar tables (.cmp-sr) are absolutely positioned and wide;
+   clip them at the stage so they never create a horizontal pan at <=1050px. */
+@media (max-width:1050px){
+  .lbw-root .ws-cmp-stage{position:relative;overflow-x:clip}
+}
+.lbw-root .cmp-m-score,.lbw-root .cmp-m-swap,.lbw-root .cmp-hist-phone{display:none}
+
+/* Tablet: stage is full width, ledger/hist fit without pan. */
+@media (min-width:761px) and (max-width:1050px){
+  .lbw-root .ws-cmp-stage .ws-cmp{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (max-width:760px){
+  /* Stage scrolls vertically only; drop the fit-to-viewport behaviour. */
+  .lbw-root:has(.ws-cmp-stage) .stage{display:block;overflow-x:hidden;overflow-y:auto;padding:8px 10px 16px}
+  .lbw-root:has(.ws-cmp-stage) .stage>.board{display:block;min-height:0;min-width:0}
+  .lbw-root .ws-cmp-stage{min-width:0;width:100%}
+  .lbw-root .ws-cmp-stage .ws-cmp{
+    display:flex;flex-direction:column;gap:12px;grid-template-columns:none;grid-template-rows:none;
+    min-height:0;width:100%
+  }
+
+  /* Stacked A / B selectors with a swap button. */
+  .lbw-root:has(.cmp-title-selectors) .stitle{
+    height:auto;flex-wrap:wrap;gap:6px;padding:8px 12px 6px;overflow:visible
+  }
+  /* Title stays for assistive tech; the Compare tab already names the page. */
+  .lbw-root:has(.cmp-title-selectors) .stitle h1{
+    position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap
+  }
+  .lbw-root .cmp-title-selectors{flex:1 1 100%}
+  .lbw-root .cmp-title-selectors>div{
+    display:flex;flex-direction:column;gap:8px;position:relative;align-items:stretch
+  }
+  .lbw-root .cmp-title-selectors>div>span{display:none}
+  .lbw-root .cmp-title-selectors>div>div,
+  .lbw-root .cmp-title-selectors>div>div:last-child{
+    display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;width:100%
+  }
+  .lbw-root .cmp-title-selectors>div>div>span{
+    flex:none;width:18px;font-size:0;overflow:hidden
+  }
+  .lbw-root .cmp-title-selectors>div>div>span::before{
+    font:800 13px/1 var(--font-mono);color:var(--compare-a,rgb(var(--class-arch)))
+  }
+  .lbw-root .cmp-title-selectors>div>div:first-of-type>span::before{content:"A"}
+  .lbw-root .cmp-title-selectors>div>div:last-of-type>span::before{content:"B";color:var(--compare-b,rgb(var(--class-seeker)))}
+  .lbw-root .cmp-title-selectors>div>div>div{flex:1;width:auto;min-width:0}
+  .lbw-root .cmp-title-selectors button:not(.cmp-m-swap),.lbw-root .cmp-title-selectors input{
+    min-height:44px;font-size:16px;padding:8px 12px;border-radius:10px
+  }
+  .lbw-root .cmp-title-selectors input+div button{min-height:44px;font-size:14px}
+  .lbw-root .cmp-title-selectors .cmp-m-swap{
+    display:grid;place-items:center;position:absolute;right:12px;top:50%;
+    transform:translateY(-50%);width:44px;height:44px;padding:0;z-index:3;
+    border:1px solid var(--line2);border-radius:50%;background:var(--panel2);
+    color:var(--ac);font:700 20px/1 var(--font-mono);width:44px
+  }
+  .lbw-root .cmp-title-selectors>div>div>div button{padding-right:62px}
+
+  /* Score card */
+  .lbw-root .cmp-m-score{
+    display:block;order:0;padding:12px;border:1px solid var(--line2);
+    border-radius:12px;background:var(--panel)
+  }
+  .lbw-root .cmp-m-wins,.lbw-root .cmp-m-kv{
+    display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center
+  }
+  .lbw-root .cmp-m-wins b{font:800 28px/1 var(--font-mono)}
+  .lbw-root .cmp-m-wins span,.lbw-root .cmp-m-kv span{
+    font:700 11px/1.2 var(--font-mono);letter-spacing:.06em;color:var(--tx2);text-align:center
+  }
+  .lbw-root .cmp-m-kv{margin-top:8px}
+  .lbw-root .cmp-m-kv b{font:800 13px/1.2 var(--font-mono);overflow-wrap:anywhere}
+  /* Text stays --tx (AA in every theme); the operand colour is a rule under it. */
+  .lbw-root .cmp-m-score b{color:var(--tx)}
+  .lbw-root .cmp-m-score .a{text-align:left;border-bottom:3px solid var(--compare-a,rgb(var(--class-arch)));padding-bottom:3px}
+  .lbw-root .cmp-m-score .b{text-align:right;border-bottom:3px solid var(--compare-b,rgb(var(--class-seeker)));padding-bottom:3px}
+  .lbw-root .cmp-m-share{
+    display:block;width:100%;min-height:44px;margin-top:12px;border:1px solid var(--line2);
+    border-radius:10px;background:var(--panel2);color:var(--tx);font:700 13px var(--font-mono);
+    letter-spacing:.06em;cursor:pointer
+  }
+  .lbw-root .cmp-m-share:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+  .lbw-root .cmp-m-note:empty{display:none}
+  .lbw-root .cmp-m-note{margin:6px 0 0;text-align:center;font:600 11px var(--font-mono);color:var(--mut);overflow-wrap:anywhere}
+
+  /* Order: score, A composite, B composite, head-to-head, ledger, history. */
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child{order:1}
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{order:2}
+  .lbw-root .ws-cmp-stage .ws-cmp-h2h{order:3}
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{order:4}
+  .lbw-root .ws-cmp-stage .ws-cmp-hist{order:5}
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel{padding:10px;width:100%}
+  .lbw-root .ws-cmp-stage .cmp-matchup-facts{display:none}
+  .lbw-root .ws-cmp-stage .cmp-profile-topline{font-size:11px}
+  .lbw-root .ws-cmp-stage .cmp-profile-avatar{width:40px;height:40px}
+  .lbw-root .ws-cmp-stage .cmp-profile-name{font-size:16px}
+  .lbw-root .ws-cmp-stage .cmp-profile-handle{font-size:12px}
+  .lbw-root .ws-cmp-stage .cmp-profile-class{font-size:11px;padding:4px 6px}
+  .lbw-root .ws-cmp-stage .cmp-profile-yield strong{font-size:18px}
+  .lbw-root .ws-cmp-stage .cmp-profile-yield small{font-size:11px}
+  .lbw-root .ws-cmp-stage .cmp-profile-leading{font-size:11px}
+
+  /* Radars: container-scaled, labels 11px+ rendered. Composite viewBox is 270
+     wide (scale about 1.3 at phone width); head-to-head is 420 wide (about .85). */
+  .lbw-root .ws-cmp-stage .cmp-radar{padding:8px 4px}
+  .lbw-root .ws-cmp-stage .cmp-rd-svg{width:100%;height:auto;max-width:none}
+  .lbw-root .ws-cmp-stage .cmp-rd-label{font-size:10px}
+  .lbw-root .ws-cmp-stage .cmp-rd-tick{font-size:9px}
+  /* Head-to-head viewBox is 420 wide: go edge to edge (scale about .93) so a
+     12 unit label renders at 11px+ without the stacked value lines colliding. */
+  .lbw-root .ws-cmp-stage .ws-cmp-h2h{margin:0 -10px}
+  .lbw-root .ws-cmp-stage .cmp-h2h{border-left:0;border-right:0;border-radius:0;padding:10px 0}
+  .lbw-root .ws-cmp-stage .cmp-h2h-grid{gap:14px}
+  .lbw-root .ws-cmp-stage .cmp-h2h-radar .cmp-rd-label{font-size:12px}
+  .lbw-root .ws-cmp-stage .cmp-h2h-radar .cmp-rd-tick{font-size:11.5px}
+  .lbw-root .ws-cmp-stage .cmp-radar-heading{font-size:12px}
+  .lbw-root .ws-cmp-stage .cmp-radar-heading small,
+  .lbw-root .ws-cmp-stage .cmp-rd-caption,
+  .lbw-root .ws-cmp-stage .cmp-rd-pillars,
+  .lbw-root .ws-cmp-stage .cmp-rd-legend{font-size:11px}
+  .lbw-root .ws-cmp-stage .cmp-h2h-title{font-size:12px;letter-spacing:.14em}
+  .lbw-root .ws-cmp-stage .cmp-h2h{padding:10px 6px}
+
+  /* Ledger: compact rows. */
+  .lbw-root .ws-cmp-stage .cmp-ledger-workspace{height:auto;padding:8px}
+  .lbw-root .ws-cmp-stage .cmp-ledger-group{flex:none}
+  .lbw-root .ws-cmp-stage .cmp-ledger-rows{flex:none}
+  .lbw-root .ws-cmp-stage .cmp-ledger-heading,
+  .lbw-root .ws-cmp-stage .cmp-ledger-line{grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr)}
+  .lbw-root .ws-cmp-stage .cmp-ledger-heading{font-size:11px}
+  .lbw-root .ws-cmp-stage .cmp-ledger-line{flex:none;padding:5px 0;min-height:30px}
+  .lbw-root .ws-cmp-stage .cmp-ledger-line>span,
+  .lbw-root .ws-cmp-stage .cmp-ledger-line .text-center,
+  .lbw-root .ws-cmp-stage .cmp-ledger-line .text-center>*{font-size:12px}
+  .lbw-root .ws-cmp-stage .cmp-versus-name{font-size:13px}
+  .lbw-root .ws-cmp-stage .cmp-versus-kicker,.lbw-root .ws-cmp-stage .cmp-versus-caption{font-size:11px}
+
+  /* Yield over time: the compact (360-wide viewBox) chart, full width. */
+  .lbw-root .ws-cmp-stage .cmp-hist-desk{display:none}
+  .lbw-root .ws-cmp-stage .cmp-hist-phone{display:block;padding:8px;height:auto}
+  .lbw-root .ws-cmp-stage .cmp-hist-phone>svg{height:auto}
+
+  /* FAQ accordion */
+  .lbw-root:has(.ws-cmp-stage) .stage>.board>.ws-faq{margin-top:12px}
+  .lbw-root:has(.ws-cmp-stage) .ws-faq summary{min-height:44px;display:flex;align-items:center}
 }
