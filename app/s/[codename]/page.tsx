@@ -21,9 +21,10 @@
  * image, and the PNG stays responsive for free. An HTML summary below the
  * card carries the same facts as selectable text.
  *
- * revalidate = 3600 matches the live-board cadence: the card is a board-state
- * snapshot, and /s/ is not in revalidateTouchedWindows()' bust set, so the
- * TTL is the freshness bound (data-layer caches still refresh at 90–300s).
+ * revalidate = 3600 is only the fallback bound (owner 2026-10-21): a snapshot
+ * submit busts /s/<codename> and its card.png via revalidateTouchedWindows()
+ * (lib/ingest/materialize.ts, revalidateShareSurfaces), so share cards refresh
+ * right away like the profile does.
  */
 
 import type { Metadata } from "next";

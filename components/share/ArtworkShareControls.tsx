@@ -41,7 +41,9 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
         await original.decode();
       }
       const { toBlob } = await import("html-to-image");
-      const options = { pixelRatio, backgroundColor, cacheBust: false, ...(exportWidth ? { width: exportWidth, height: exportHeight, style: { transform: "none" } } : {}) };
+      // owner 2026-10-21: GIFs carry real transparency (holocard-gif.ts), so the
+      // chamfered corners must not be pre-filled with the page colour.
+      const options = { pixelRatio, backgroundColor: gif ? "transparent" : backgroundColor, cacheBust: false, ...(exportWidth ? { width: exportWidth, height: exportHeight, style: { transform: "none" } } : {}) };
       if (navigator.vendor.includes("Apple")) await toBlob(node, options);
       const blob = await toBlob(node, options);
       if (!blob) throw new Error("Image could not be rendered");

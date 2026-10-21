@@ -234,6 +234,19 @@ test("revalidateOperatorIndexState busts page, sitemap, and tagged caches", asyn
   }
 });
 
+test("submit and claim revalidation also bust /s/<codename> share page and card.png", async () => {
+  const src = await source("lib/ingest/materialize.ts");
+  const helper = src.match(/function revalidateShareSurfaces[\s\S]*?\n}/);
+  assert.ok(helper, "revalidateShareSurfaces must exist in materialize.ts");
+  assert.ok(helper[0].includes("revalidatePath(`/s/${c}`)"));
+  assert.ok(helper[0].includes("revalidatePath(`/s/${c}/card.png`)"));
+  for (const name of ["revalidateTouchedWindows", "revalidateOperatorIndexState"]) {
+    const fn = src.match(new RegExp(`export function ${name}[\\s\\S]*?\\n}`));
+    assert.ok(fn, `${name} must exist`);
+    assert.ok(fn[0].includes("revalidateShareSurfaces(codename)"), `${name} must bust share surfaces`);
+  }
+});
+
 test("indexable-operator snapshot check chunks the IN clause below the PostgREST URL limit", async () => {
   const src = await source("lib/board/queries.ts");
   const fn = src.match(
