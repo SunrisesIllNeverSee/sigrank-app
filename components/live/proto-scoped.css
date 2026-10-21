@@ -971,8 +971,8 @@
 .lbw-root .briefing-label{display:flex;justify-content:space-between;gap:8px;width:100%;
   color:var(--ac);font:700 10px/1.4 var(--font-mono);text-transform:uppercase}
 .lbw-root .briefing-label>span,.lbw-root .briefing-hint{color:var(--mut);font:9px/1.4 var(--font-mono)}
-.lbw-root .briefing-excerpt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
-  overflow:hidden;min-height:4.8em;font:11px/1.6 var(--font-mono);overflow-wrap:anywhere}
+.lbw-root .briefing-excerpt{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;
+  overflow:hidden;min-height:9.6em;font:11px/1.6 var(--font-mono);overflow-wrap:anywhere;white-space:pre-line}
 .lbw-root .briefing-switch{display:flex;gap:6px;margin:8px 0}
 .lbw-root .briefing-switch button{flex:1;padding:7px 5px;border:1px solid var(--line2);
   border-radius:var(--radius-sm);background:var(--panel);color:var(--tx2);

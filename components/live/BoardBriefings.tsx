@@ -24,7 +24,7 @@ export function BoardBriefings({ ops, stats }: { ops: LiveOperator[]; stats: Fie
 
   useEffect(() => {
     if (hovered || focused || opened || reducedMotion) return;
-    const timer = setInterval(() => setSlide((i) => 1 - i), 6000);
+    const timer = setInterval(() => setSlide((i) => 1 - i), 12000);
     return () => clearInterval(timer);
   }, [hovered, focused, opened, reducedMotion]);
 
@@ -45,7 +45,7 @@ export function BoardBriefings({ ops, stats }: { ops: LiveOperator[]; stats: Fie
         aria-label={`Open ${TITLES[slide]}`} onClick={open}>
         <span className="briefing-label">{TITLES[slide]} <span>{slide + 1} / 2</span></span>
         <span className="briefing-excerpt">
-          {slide === 0 ? (fresh[0] ? `${fresh[0].name} submitted — ${fresh[0].last}`
+          {slide === 0 ? (fresh.length ? fresh.map((o) => `${o.name} submitted — ${o.last}`).join("\n\n")
             : newest ? `Welcome ${newest.name} — joined the field` : "No recent operator activity in this board view.")
             : notes || "No field notes available for this board view."}
         </span>

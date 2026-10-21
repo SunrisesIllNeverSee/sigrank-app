@@ -26,14 +26,16 @@ afterEach(() => {
 });
 
 const mount = () => render(<BoardBriefings ops={[]} stats={[{ field: "median_yield", value: "12.5" }]} />);
-const tick = async () => { await act(async () => { await vi.advanceTimersByTimeAsync(6000); }); };
+const tick = async () => { await act(async () => { await vi.advanceTimersByTimeAsync(12000); }); };
 
 describe("leaderboard briefings", () => {
   it("rotates between both views and pauses while the reader hovers", async () => {
     mount();
     expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
     expect(vi.getTimerCount()).toBe(1);
-    await tick();
+    await act(async () => { await vi.advanceTimersByTimeAsync(6000); });
+    expect(screen.getByRole("button", { name: "Open Signal Wire" })).toBeInTheDocument();
+    await act(async () => { await vi.advanceTimersByTimeAsync(6000); });
     const preview = screen.getByRole("button", { name: "Open Field Notes" });
     fireEvent.mouseEnter(preview.closest(".board-briefings")!);
     await tick();
