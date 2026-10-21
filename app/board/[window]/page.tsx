@@ -61,6 +61,7 @@ import { FaqSection } from "@/components/seo/FaqSection";
 import { withOG } from "@/lib/seo";
 import { BoardTableClient } from "@/components/board/BoardTableClient";
 import { LiveBoardMount } from "./live-board-mount";
+import { getAllPosts, getArticlePosts } from "@/lib/editorial/blog-index";
 
 // D19: cache leaderboard reads for 3600s (1 hour). Board data changes only on
 // snapshot submit, which triggers on-demand revalidation via revalidateTouchedWindows.
@@ -143,6 +144,21 @@ export default async function BoardWindowPage({
     }),
   ]);
 
+  /* owner 2026-10-21: Wire / Notes "newest article". Real titles/slugs/dates
+     from the blog index, read at ISR time (no client request); future-dated
+     or undated posts are ignored. Articles link via their canonical /blog route. */
+  const newestPost = await (async () => {
+    try {
+      const now = Date.now();
+      const posts = [...(await getAllPosts()), ...(await getArticlePosts())]
+        .filter((p) => p.title && Number.isFinite(Date.parse(p.date)) && Date.parse(p.date) <= now)
+        .sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+      return posts[0] ? { slug: posts[0].slug, title: posts[0].title } : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const totalCount = liveRows.length;
   // Legacy surface (?v=legacy): restored to the documented contract — first
   // 25 rows SSR'd, deeper pages lazy-fetched client-side (BoardTableClient
@@ -215,6 +231,7 @@ export default async function BoardWindowPage({
         key={win.slug}
         initial={initial}
         windowSlug={win.slug}
+        newestPost={newestPost}
         stageFooter={
           <FaqSection faqs={boardFaqs} id="board-faq" variant="workspace" collapsed />
         }

@@ -246,6 +246,7 @@ export function toLiveOperator(row: LeaderboardRow): LiveOperator {
        to the trend-derived delta in profileFor instead of printing "+0 spots". */
     delta: mv7 == null ? "" : deltaCopy(mv7),
     last: seen(s.snapshot_date ?? row.snapshot_date),
+    lastIso: (s.snapshot_date ?? row.snapshot_date)?.slice(0, 10) ?? null,
     age: operator.account_age_days,
     msgs: operator.total_messages_lifetime,
     cost: c ? `$${c.costPerMillion.toFixed(2)}` : "—",
@@ -368,7 +369,27 @@ export function projectLiveBoard(
       value: `${nameByCodename.get(h.operator_codename) ?? h.operator_codename} — ${h.value}`,
       codename: h.operator_codename,
       metric: h.title,
+      date: h.date || undefined,
     }));
+
+  /* owner 2026-10-21: Wire / Notes "newest badge earned". Hall records are
+     operator_badges rows with a real awarded_at; pick the max date over the
+     whole list (not the teaser slice). Private operators come through as
+     "unknown" (queries.ts redaction) and are skipped — never named. */
+  const newestHall = hall
+    .filter((h) => !h.isPlaceholder && h.date && h.operator_codename !== "unknown")
+    .reduce<HallRecord | null>((best, h) => (!best || h.date > best.date ? h : best), null);
+  // operator_codename is a display label (display_name || codename), so the
+  // profile link uses the real codename when the query supplies it.
+  const newestCode = newestHall?.codename ?? newestHall?.operator_codename;
+  const newestBadge = newestHall && newestCode
+    ? {
+        codename: newestCode,
+        name: nameByCodename.get(newestCode) ?? newestHall.operator_codename,
+        badge: newestHall.title,
+        date: newestHall.date,
+      }
+    : null;
 
   // FEATURED — the rank-1 context block (sync.py FEATURED shape).
   const top = rows[0];
@@ -400,6 +421,7 @@ export function projectLiveBoard(
     fieldStats,
     movers,
     hall: hallEntries,
+    newestBadge,
     featured,
     fieldMax,
     totalOperators: rows.length,

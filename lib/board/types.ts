@@ -100,7 +100,10 @@ export interface HallRecord {
   /** Reward canonical id, e.g. "RW.28". */
   reward_id: string;
   title: string;
+  /** Display label: the public display name, falling back to the codename. */
   operator_codename: string;
+  /** Real codename for profile links (public operators only). */
+  codename?: string;
   value: string;
   date: string;
   isPlaceholder: boolean;
