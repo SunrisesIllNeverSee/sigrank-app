@@ -55,6 +55,9 @@ _workspace/
 labs/*
 !labs/README.md
 
+# Release evidence/checklists — local only (scripts/capture-*.mjs write here)
+release-staging/
+
 # agent tooling (local only — never in the product repo)
 .agents/
 .claude/
