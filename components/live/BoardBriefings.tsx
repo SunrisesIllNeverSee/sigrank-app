@@ -7,8 +7,9 @@ import type { FieldStat, HallEntry, LiveOperator, MoverEntry } from "@/lib/board
 /* owner 2026-10-21: "Wire / Notes rotates real updates". Every slide is
    derived from data the board already holds (ops, fieldStats, movers, hall,
    featured); a category with no data produces no slide — nothing is invented.
-   Not wired (no cheap existing source on the board payload): newest badge
-   earned, newest article. */
+   Follow-up owner 2026-10-21: newest badge (operator_badges awarded_at, via
+   initial.newestBadge) and newest article (blog-index, passed from the board
+   page's server component) are wired in; each hides when absent. */
 export interface BriefingUpdate {
   key: string;
   kind: string;
@@ -17,6 +18,20 @@ export interface BriefingUpdate {
   codename?: string;
   /** Operator display name inside `text`, so the popup can link just that part. */
   name?: string;
+  /** Non-profile link (e.g. /blog/<slug>) for the whole slide, when it has one. */
+  href?: string;
+}
+
+export interface NewestBadge { codename: string; name: string; badge: string; date: string }
+export interface NewestPost { slug: string; title: string }
+
+/** Real sort key for a submission: ISO date when projected, else the legacy
+ *  "MM/DD/YY" display string rebuilt as YYYY-MM-DD (never compared raw —
+ *  "12/30/25" would outrank "01/02/26"). */
+function lastKey(o: LiveOperator): string {
+  if (o.lastIso) return o.lastIso;
+  const m = /^(\d{2})\/(\d{2})\/(\d{2})$/.exec(o.last ?? "");
+  return m ? `20${m[3]}-${m[1]}-${m[2]}` : "";
 }
 
 const STAT_LABEL: Record<string, string> = {
@@ -32,12 +47,14 @@ export function buildUpdates(
   movers: MoverEntry[] = [],
   hall: HallEntry[] = [],
   leader: { codename: string; name: string } | null = null,
+  badge: NewestBadge | null = null,
+  post: NewestPost | null = null,
 ): BriefingUpdate[] {
   const out: BriefingUpdate[] = [];
   const nameOf = (codename: string, fallback?: string) =>
     ops.find((o) => o.codename === codename)?.name ?? fallback ?? codename;
   [...ops].filter((o) => o.last)
-    .sort((a, b) => (b.last ?? "").localeCompare(a.last ?? "")).slice(0, 3)
+    .sort((a, b) => lastKey(b).localeCompare(lastKey(a))).slice(0, 3)
     .forEach((o) => out.push({ key: `sub-${o.codename}`, kind: "Submission",
       text: `${o.name} submitted — ${o.last}`, codename: o.codename, name: o.name }));
   const newest = [...ops].filter((o) => o.age != null)
@@ -52,6 +69,10 @@ export function buildUpdates(
     out.push({ key: `mv-${mover.codename}`, kind: "Rank move",
       text: `${name} ${mover.delta}`, codename: mover.codename, name });
   }
+  if (badge) out.push({ key: `badge-${badge.codename}-${badge.badge}`, kind: "New badge",
+    text: `${badge.name} earned ${badge.badge}`, codename: badge.codename, name: badge.name });
+  if (post) out.push({ key: `post-${post.slug}`, kind: "New article",
+    text: `New article: ${post.title}`, href: `/blog/${post.slug}` });
   hall.slice(0, 2).forEach((h, i) => out.push({ key: `hall-${i}`, kind: "Record",
     text: `${h.metric ? `${h.metric}: ` : ""}${h.value}`, codename: h.codename }));
   stats.filter((s) => STAT_LABEL[s.field] && s.value)
@@ -60,12 +81,14 @@ export function buildUpdates(
   return out;
 }
 
-export function BoardBriefings({ ops, stats, movers, hall, leader }: {
+export function BoardBriefings({ ops, stats, movers, hall, leader, newestBadge, newestPost }: {
   ops: LiveOperator[];
   stats: FieldStat[];
   movers?: MoverEntry[];
   hall?: HallEntry[];
   leader?: { codename: string; name: string } | null;
+  newestBadge?: NewestBadge | null;
+  newestPost?: NewestPost | null;
 }) {
   const [slide, setSlide] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -73,8 +96,8 @@ export function BoardBriefings({ ops, stats, movers, hall, leader }: {
   const [opened, setOpened] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
-  const updates = useMemo(() => buildUpdates(ops, stats, movers, hall, leader),
-    [ops, stats, movers, hall, leader]);
+  const updates = useMemo(() => buildUpdates(ops, stats, movers, hall, leader, newestBadge, newestPost),
+    [ops, stats, movers, hall, leader, newestBadge, newestPost]);
   const count = updates.length;
   const current = updates[count ? slide % count : 0];
 
@@ -124,7 +147,9 @@ export function BoardBriefings({ ops, stats, movers, hall, leader }: {
           <section aria-label="All updates" className="briefing-detail">
             {count ? updates.map((u, i) => <p key={u.key} data-current={i === slide % count || undefined}>
               <span className="briefing-kind">{u.kind}</span>{" "}
-              {u.codename && u.name && u.text.startsWith(u.name)
+              {u.href
+                ? <Link href={u.href}>{u.text}</Link>
+                : u.codename && u.name && u.text.startsWith(u.name)
                 ? <><Link href={`/user/${encodeURIComponent(u.codename)}`}>{u.name}</Link>{u.text.slice(u.name.length)}</>
                 : u.text.startsWith("Welcome ") && u.codename && u.name
                   ? <>Welcome <Link href={`/user/${encodeURIComponent(u.codename)}`}>{u.name}</Link>{u.text.slice(8 + u.name.length)}</>

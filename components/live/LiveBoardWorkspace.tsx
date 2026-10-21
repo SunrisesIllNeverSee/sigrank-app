@@ -161,6 +161,8 @@ export interface LiveBoardWorkspaceProps {
   /** Server-rendered content appended to the foot of the board stage, below
    *  the table (the page's collapsed FAQ). Omit → board-only stage. */
   stageFooter?: ReactNode;
+  /** Newest blog/article post for Wire / Notes (server-resolved, no extra request). */
+  newestPost?: { slug: string; title: string } | null;
 }
 
 /** Field-hydration lifecycle reported by the mount (live-board-mount.tsx). */
@@ -595,6 +597,7 @@ export function LiveBoardWorkspace({
   account,
   fieldStatus,
   stageFooter,
+  newestPost,
 }: LiveBoardWorkspaceProps) {
   /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
      "green"; state lives on .lbw-root's data-theme (the site's own
@@ -1882,7 +1885,7 @@ export function LiveBoardWorkspace({
                   />
                 </div>
                 <BoardBriefings ops={ops} stats={initial.fieldStats} movers={initial.movers}
-                  hall={initial.hall}
+                  hall={initial.hall} newestBadge={initial.newestBadge} newestPost={newestPost}
                   leader={initial.featured ? { codename: initial.featured.codename, name: initial.featured.name } : null} />
                 {/* owner (pass 3): "hall of signal is supposed to be in the
                     left sidebar" — spotlight + medal tally join the burners

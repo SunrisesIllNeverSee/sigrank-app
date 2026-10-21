@@ -40,6 +40,25 @@ describe("leaderboard briefings", () => {
     expect(buildUpdates([], [])).toEqual([]);
   });
 
+  it("adds newest badge and newest article, hiding them when absent", () => {
+    const kinds = buildUpdates(ops, stats, [], [], null,
+      { codename: "a", name: "Alpha", badge: "Top 1% Legend", date: "2026-10-20" },
+      { slug: "hello", title: "Hello World" });
+    expect(kinds.map((u) => u.kind)).toEqual(
+      ["Submission", "Submission", "New operator", "New badge", "New article", "Field stat", "Field stat"]);
+    expect(kinds.find((u) => u.kind === "New badge")?.text).toBe("Alpha earned Top 1% Legend");
+    const post = kinds.find((u) => u.kind === "New article");
+    expect(post?.text).toBe("New article: Hello World");
+    expect(post?.href).toBe("/blog/hello");
+  });
+
+  it("sorts submissions by real date across a year boundary", () => {
+    const o = [op("old", "Old", "12/30/25", 5), op("new", "New", "01/02/26", 9)];
+    expect(buildUpdates(o, [])[0].codename).toBe("new");
+    const iso = [{ ...op("x", "X", "12/30/25", 1), lastIso: "2026-01-05" }, op("y", "Y", "01/02/26", 2)] as never[];
+    expect(buildUpdates(iso, [])[0].codename).toBe("x");
+  });
+
   it("rotates every 6 seconds with a pager and pauses while hovered", async () => {
     mount();
     expect(pager()).toContain("1 / 5");
