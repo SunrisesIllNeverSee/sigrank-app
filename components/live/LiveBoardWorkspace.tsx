@@ -93,6 +93,7 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts, RawAxisFacts } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import { ColumnRanks } from "./ColumnRanks";
+import { PanelReopenTab } from "./PanelReopenTab";
 import { PeekPanel } from "./PeekPanel";
 import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
@@ -1704,9 +1705,17 @@ export function LiveBoardWorkspace({
               only when their panel is closed. */}
 
           <div className={`mid${peekCodename ? " peek" : ""}`}>
+            {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
+                the stage edge (the rail-foot toggles alone were easy to miss). */}
+            {!leftOn && (
+              <PanelReopenTab side="l" label="SIDEBAR" controls="lbw-left-panel" onOpen={() => setLeftOn(true)} />
+            )}
+            {!railOn && (
+              <PanelReopenTab side="r" label="OPERATOR" controls="lbw-right-panel" onOpen={() => setRailOn(true)} />
+            )}
             {/* left sidebar (owner 2026-10-06): banner + operator profile —
                 VS Code side-panel anatomy, toggled by the title-bar glyph. */}
-            <aside className="lside">
+            <aside id="lbw-left-panel" className="lside">
               {/* ear-flap (owner): ghost tab mid-edge — click collapses the
                   sidebar, drag resizes it (VS Code sash pattern). */}
               <button
@@ -1714,6 +1723,9 @@ export function LiveBoardWorkspace({
                 className="edge edge-l"
                 title="collapse sidebar · drag to resize"
                 aria-label="collapse left sidebar; drag to resize"
+                aria-expanded="true"
+                aria-controls="lbw-left-panel"
+                data-label="HIDE"
                 onPointerDown={onDrag("l")}
               >
                 ◂
@@ -2109,12 +2121,15 @@ export function LiveBoardWorkspace({
 
             {/* right rail: heading + swappable modules (share, movers,
                 compare, field, hall — owner 2026-10-06 IA) */}
-            <aside className="railcol">
+            <aside id="lbw-right-panel" className="railcol">
               <button
                 type="button"
                 className="edge edge-r"
                 title="collapse inspector · drag to resize"
                 aria-label="collapse inspector rail; drag to resize"
+                aria-expanded="true"
+                aria-controls="lbw-right-panel"
+                data-label="HIDE"
                 onPointerDown={onDrag("r")}
               >
                 ▸

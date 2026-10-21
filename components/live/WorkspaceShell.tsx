@@ -39,6 +39,7 @@ import {
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { useRailIconSet } from "./useRailIconSet";
+import { PanelReopenTab } from "./PanelReopenTab";
 import { PixelBadge } from "./PixelBadge";
 import { EditorialHeaderNav, type WorkspaceTopic } from "./EditorialSidebar";
 import {
@@ -441,13 +442,24 @@ export function WorkspaceShell({
 
         <div className="maincol">
           <div className="mid">
+            {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
+                the stage edge (the rail-foot toggles alone were easy to miss). */}
+            {!leftOn && left != null && (
+              <PanelReopenTab side="l" label={leftTitle ?? "SIDEBAR"} controls="lbw-left-panel" onOpen={() => setLeftOn(true)} />
+            )}
+            {!railOn && right != null && (
+              <PanelReopenTab side="r" label={rightTitle ?? "OPERATOR"} controls="lbw-right-panel" onOpen={() => setRailOn(true)} />
+            )}
             {leftOn && left != null && (
-              <aside className={`lside${topic ? " ws-editorial-sidebar" : ""}`}>
+              <aside id="lbw-left-panel" className={`lside${topic ? " ws-editorial-sidebar" : ""}`}>
                 <button
                   type="button"
                   className="edge edge-l"
                   title="collapse sidebar · drag to resize"
                   aria-label="collapse left sidebar; drag to resize"
+                  aria-expanded="true"
+                  aria-controls="lbw-left-panel"
+                  data-label="HIDE"
                   onPointerDown={onDrag("l")}
                 >
                   ◂
@@ -507,12 +519,15 @@ export function WorkspaceShell({
             </div>
 
             {railOn && right != null && (
-              <aside className="railcol">
+              <aside id="lbw-right-panel" className="railcol">
                 <button
                   type="button"
                   className="edge edge-r"
                   title="collapse inspector · drag to resize"
                   aria-label="collapse inspector rail; drag to resize"
+                  aria-expanded="true"
+                  aria-controls="lbw-right-panel"
+                  data-label="HIDE"
                   onPointerDown={onDrag("r")}
                 >
                   ▸
