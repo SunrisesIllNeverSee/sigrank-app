@@ -43,6 +43,8 @@ function humanize(segment: string): string {
 
 function fallbackTitle(path: string): string {
   if (path === "/") return "Home";
+  // the /vs index itself (matches its page metadata title), not "SigRank vs Vs"
+  if (path === "/vs") return "SigRank vs Other Tools";
   const parts = path.split("/").filter(Boolean);
   const last = humanize(parts[parts.length - 1]);
   return parts[0] === "vs" ? `SigRank vs ${last}` : last;
