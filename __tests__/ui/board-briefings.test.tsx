@@ -48,7 +48,7 @@ describe("leaderboard briefings", () => {
       ["Submission", "Submission", "New operator", "New badge", "New article", "Field stat", "Field stat"]);
     expect(kinds.find((u) => u.kind === "New badge")?.text).toBe("Alpha earned Top 1% Legend");
     const post = kinds.find((u) => u.kind === "New article");
-    expect(post?.text).toBe("New article: Hello World");
+    expect(post?.text).toBe("Hello World");
     expect(post?.href).toBe("/blog/hello");
   });
 

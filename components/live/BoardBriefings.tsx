@@ -72,7 +72,7 @@ export function buildUpdates(
   if (badge) out.push({ key: `badge-${badge.codename}-${badge.badge}`, kind: "New badge",
     text: `${badge.name} earned ${badge.badge}`, codename: badge.codename, name: badge.name });
   if (post) out.push({ key: `post-${post.slug}`, kind: "New article",
-    text: `New article: ${post.title}`, href: `/blog/${post.slug}` });
+    text: post.title, href: `/blog/${post.slug}` });
   hall.slice(0, 2).forEach((h, i) => out.push({ key: `hall-${i}`, kind: "Record",
     text: `${h.metric ? `${h.metric}: ` : ""}${h.value}`, codename: h.codename }));
   stats.filter((s) => STAT_LABEL[s.field] && s.value)

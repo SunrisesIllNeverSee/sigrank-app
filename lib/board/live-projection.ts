@@ -379,10 +379,13 @@ export function projectLiveBoard(
   const newestHall = hall
     .filter((h) => !h.isPlaceholder && h.date && h.operator_codename !== "unknown")
     .reduce<HallRecord | null>((best, h) => (!best || h.date > best.date ? h : best), null);
-  const newestBadge = newestHall
+  // operator_codename is a display label (display_name || codename), so the
+  // profile link uses the real codename when the query supplies it.
+  const newestCode = newestHall?.codename ?? newestHall?.operator_codename;
+  const newestBadge = newestHall && newestCode
     ? {
-        codename: newestHall.operator_codename,
-        name: nameByCodename.get(newestHall.operator_codename) ?? newestHall.operator_codename,
+        codename: newestCode,
+        name: nameByCodename.get(newestCode) ?? newestHall.operator_codename,
         badge: newestHall.title,
         date: newestHall.date,
       }
