@@ -32,6 +32,8 @@ interface Props {
   fieldAvg?: number | null;
   /** SVG height. Default 240. */
   height?: number;
+  /** Phone layout (owner 2026-10-21): narrow viewBox so type stays 11px, legend on its own row, 3-4 ticks. */
+  compact?: boolean;
   colorA?: string;
   colorB?: string;
 }
@@ -79,6 +81,7 @@ export function CompareHistoryChart({
   height = 240,
   colorA,
   colorB,
+  compact = false,
 }: Props) {
   const ptsA = toPts(historyA);
   const ptsB = toPts(historyB);
@@ -95,12 +98,15 @@ export function CompareHistoryChart({
     );
   }
 
-  const W = 1040;
+  const W = compact ? 360 : 1040;
   const H = height;
-  const padL = 42;
-  const padR = 120; // room for end-of-line labels
-  const padT = 32;
-  const padB = 28;
+  const padL = compact ? 44 : 42;
+  const padR = compact ? 56 : 120; // room for end-of-line labels
+  const padT = compact ? 50 : 32;
+  const padB = compact ? 30 : 28;
+  const fs = compact ? 11 : undefined; // owner 2026-10-21: 11px minimum on phones
+  const gid = compact ? "m" : "";
+  const xEvery = compact ? Math.max(1, Math.ceil(7 / 4)) : 1;
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
 
@@ -141,7 +147,7 @@ export function CompareHistoryChart({
       : "";
 
   // Y-axis ticks (5 steps).
-  const yTicks = Array.from({ length: 5 }, (_, i) => min + (range * i) / 4);
+  const yTicks = Array.from({ length: compact ? 3 : 5 }, (_, i) => min + (range * i) / (compact ? 2 : 4));
 
   // Field baseline — the current board mean Υ Yield, drawn as a horizontal
   // reference line. Not time-varying (we don't have aggregate history), but
@@ -153,7 +159,8 @@ export function CompareHistoryChart({
   const lastA = ptsA[ptsA.length - 1];
   const lastB = ptsB[ptsB.length - 1];
 
-  const truncName = (n: string) => (n.length > 14 ? n.slice(0, 14) + "…" : n);
+  const maxName = compact ? 11 : 14;
+  const truncName = (n: string) => (n.length > maxName ? n.slice(0, maxName) + "…" : n);
   const fmtYield = (n: number) => n >= 1e9 ? (n / 1e9).toFixed(1) + "B"
     : n >= 1e6 ? (n / 1e6).toFixed(1) + "M"
     : n >= 1e3 ? (n / 1e3).toFixed(1) + "K" : n.toFixed(1);
@@ -167,11 +174,11 @@ export function CompareHistoryChart({
       style={{ fontVariantNumeric: "tabular-nums" }}
     >
       <defs>
-        <linearGradient id="cmp-grad-a" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`cmp-grad-a${gid}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={(colorA ?? BLUE)} stopOpacity={0.28} />
           <stop offset="100%" stopColor={(colorA ?? BLUE)} stopOpacity={0} />
         </linearGradient>
-        <linearGradient id="cmp-grad-b" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`cmp-grad-b${gid}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={(colorB ?? GOLD)} stopOpacity={0.28} />
           <stop offset="100%" stopColor={(colorB ?? GOLD)} stopOpacity={0} />
         </linearGradient>
@@ -181,7 +188,7 @@ export function CompareHistoryChart({
       <text
         x={padL}
         y={16}
-        fontSize={11}
+        fontSize={fs ?? 11}
         fill={MUTED}
         style={{ letterSpacing: "0.04em" }}
         fontFamily={MONO}
@@ -192,40 +199,40 @@ export function CompareHistoryChart({
       {/* legend (top-right, inline) */}
       <g>
         <rect
-          x={W - padR - 270}
-          y={8}
+          x={compact ? padL : W - padR - 270}
+          y={compact ? 24 : 8}
           width={10}
           height={10}
           rx={2}
           fill={(colorA ?? BLUE)}
         />
         <text
-          x={W - padR - 256}
-          y={17}
+          x={compact ? padL + 14 : W - padR - 256}
+          y={compact ? 33 : 17}
           fill={BONE}
-          fontSize={10}
+          fontSize={fs ?? 10}
           fontFamily={MONO}
         >
           {truncName(nameA)}
         </text>
         <rect
-          x={W - padR - 170}
-          y={8}
+          x={compact ? padL + 140 : W - padR - 170}
+          y={compact ? 24 : 8}
           width={10}
           height={10}
           rx={2}
           fill={(colorB ?? GOLD)}
         />
         <text
-          x={W - padR - 156}
-          y={17}
+          x={compact ? padL + 154 : W - padR - 156}
+          y={compact ? 33 : 17}
           fill={BONE}
-          fontSize={10}
+          fontSize={fs ?? 10}
           fontFamily={MONO}
         >
           {truncName(nameB)}
         </text>
-        {hasField && (
+        {hasField && !compact && (
           <>
             <line
               x1={W - padR - 70}
@@ -240,7 +247,7 @@ export function CompareHistoryChart({
               x={W - padR - 56}
               y={17}
               fill={MUTED}
-              fontSize={10}
+              fontSize={fs ?? 10}
               fontFamily={MONO}
             >
               Field avg
@@ -268,7 +275,7 @@ export function CompareHistoryChart({
               y={y.toFixed(2)}
               textAnchor="end"
               dominantBaseline="middle"
-              fontSize={9}
+              fontSize={fs ?? 9}
               fill={MUTED}
               fontFamily={MONO}
             >
@@ -295,7 +302,7 @@ export function CompareHistoryChart({
             x={padL + 4}
             y={(fieldY - 5).toFixed(2)}
             textAnchor="start"
-            fontSize={9}
+            fontSize={fs ?? 9}
             fill={MUTED}
             fontFamily={MONO}
           >
@@ -307,7 +314,7 @@ export function CompareHistoryChart({
       {/* A area wash + smooth line */}
       {ptsA.length >= 2 && (
         <>
-          <path d={areaPathA} fill="url(#cmp-grad-a)" stroke="none" />
+          <path d={areaPathA} fill={`url(#cmp-grad-a${gid})`} stroke="none" />
           <path
             d={linePathA}
             fill="none"
@@ -322,7 +329,7 @@ export function CompareHistoryChart({
       {/* B area wash + smooth line */}
       {ptsB.length >= 2 && (
         <>
-          <path d={areaPathB} fill="url(#cmp-grad-b)" stroke="none" />
+          <path d={areaPathB} fill={`url(#cmp-grad-b${gid})`} stroke="none" />
           <path
             d={linePathB}
             fill="none"
@@ -377,7 +384,7 @@ export function CompareHistoryChart({
           y={yAt(lastA.v).toFixed(2)}
           dominantBaseline="middle"
           fill={(colorA ?? BLUE)}
-          fontSize={11}
+          fontSize={fs ?? 11}
           fontWeight={700}
           fontFamily={MONO}
         >
@@ -390,7 +397,7 @@ export function CompareHistoryChart({
           y={yAt(lastB.v).toFixed(2)}
           dominantBaseline="middle"
           fill={(colorB ?? GOLD)}
-          fontSize={11}
+          fontSize={fs ?? 11}
           fontWeight={700}
           fontFamily={MONO}
         >
@@ -399,13 +406,13 @@ export function CompareHistoryChart({
       )}
 
       {/* x-axis labels — every date from the shared timeline */}
-      {allDates.map((d, i) => (
+      {allDates.map((d, i) => (i % xEvery === 0 || i === allDates.length - 1) && (
         <text
           key={`x-${i}`}
           x={xAt(i).toFixed(2)}
           y={H - 7}
           textAnchor="middle"
-          fontSize={9}
+          fontSize={fs ?? 9}
           fill={MUTED}
           fontFamily={MONO}
         >

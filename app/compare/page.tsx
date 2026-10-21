@@ -61,6 +61,7 @@ import {
 import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { CompareMobileScore } from "@/components/compare/CompareMobileScore";
 import { CompareStage } from "@/components/compare/CompareStage";
 import { CompareHeadToHead } from "@/components/compare/CompareRadars";
 import { sampleFromRow } from "@/lib/compare/radar-math";
@@ -313,6 +314,11 @@ export default async function ComparePage({
       : null;
     return th ? `${fmtTokens(th.processedTokensPerDay)}/d` : "—";
   };
+  const yStr = (r: LeaderboardRow) => {
+    const c = r.snapshot.cascade;
+    if (!c || c.nonCompounding) return "—";
+    return c.yield_ >= 1000 ? `${(c.yield_ / 1000).toFixed(1)}K` : c.yield_.toFixed(2);
+  };
   const aThr = thrStr(rowA);
   const bThr = thrStr(rowB);
 
@@ -434,6 +440,14 @@ export default async function ComparePage({
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
         <div id="compare-vs-artwork" className="ws-cmp">
+          {/* Phone-only score card (hidden above 760px by CSS), owner 2026-10-21. */}
+          <CompareMobileScore
+            a={{ name: nameOf(rowA), rank: rowA.global_rank, yieldStr: yStr(rowA), thr: aThr }}
+            b={{ name: nameOf(rowB), rank: rowB.global_rank, yieldStr: yStr(rowB), thr: bThr }}
+            aWins={aWins}
+            bWins={bWins}
+            href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+          />
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors field={board.map(sampleFromRow)} />
           </div>
@@ -443,13 +457,25 @@ export default async function ComparePage({
           <div className="ws-cmp-h2h">
             <CompareHeadToHead a={rowA} b={rowB} />
           </div>
-          <div className="ws-cmp-hist">
+          <div className="ws-cmp-hist cmp-hist-desk">
             <CompareHistoryChart
               historyA={historyA}
               historyB={historyB}
               nameA={nameOf(rowA)}
               nameB={nameOf(rowB)}
               height={140}
+              colorA={COMPARE_OPERAND_COLORS.a}
+              colorB={COMPARE_OPERAND_COLORS.b}
+            />
+          </div>
+          <div className="ws-cmp-hist cmp-hist-phone">
+            <CompareHistoryChart
+              historyA={historyA}
+              historyB={historyB}
+              nameA={nameOf(rowA)}
+              nameB={nameOf(rowB)}
+              height={210}
+              compact
               colorA={COMPARE_OPERAND_COLORS.a}
               colorB={COMPARE_OPERAND_COLORS.b}
             />

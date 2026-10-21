@@ -48,6 +48,15 @@ export function CompareSelectors({
       <span className="pb-2 text-center font-mono text-xs text-text-muted">
         vs
       </span>
+      {/* Phone-only swap (owner 2026-10-21); hidden above 760px by CSS. */}
+      <button
+        type="button"
+        className="cmp-m-swap"
+        aria-label="Swap operators A and B"
+        onClick={() => go(bCode, aCode)}
+      >
+        ⇅
+      </button>
 
       <OperatorSearchSelect
         options={options}
