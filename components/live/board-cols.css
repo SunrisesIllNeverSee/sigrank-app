@@ -233,6 +233,10 @@
 .lbw-root .board-share-menu{position:absolute;right:0;top:calc(100% + 7px);width:175px;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px;background:var(--bg2);border:1px solid var(--line2);border-radius:6px;box-shadow:0 10px 24px #0008;z-index:60}
 .lbw-root .board-share:not([open]) .board-share-menu{display:none}
 .lbw-root .board-share summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.lbw-root .stitle.board-title-search-rail{grid-template-columns:minmax(0,1fr)}
+.lbw-root .colhead-search{position:relative;z-index:75;padding:3px 12px 2px;min-width:0}
+.lbw-root .colhead-search .gs-root{max-width:none}
+.lbw-root .colhead-search .gs-in{text-align:center}
 /* The single-row rule also applies at narrow viewport sizes.
    Opening Share temporarily lets its anchored menu render above the stage. */
 .lbw-root .stagecol:has(.board-filter-actions)>.fbar:has(.board-share[open]){
@@ -248,6 +252,9 @@
    scrollers made three regions move at once. With the card undocked the
    stage scrolls as before and only the horizontal freeze applies. */
 .lbw-root{--pin-rank-w:58px;--pin-op-w:240px}
+@media (min-width:1051px) and (max-width:1500px){
+  .lbw-root:has(.board-filter-actions){--lside-w:clamp(200px,17vw,248px);--rail-w:clamp(240px,20vw,332px)}
+}
 .lbw-root .stage.stage-board{overflow:hidden;display:flex;flex-direction:column;padding-bottom:12px}
 .lbw-root .stage.stage-board>.board{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-bottom:0}
 .lbw-root .stage.stage-board .tablecard{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}

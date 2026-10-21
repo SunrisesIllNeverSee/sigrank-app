@@ -44,7 +44,7 @@ export type Item =
 
 const DEBOUNCE_MS = 120;
 
-export function GlobalSearch({ label = "Search" }: { label?: string }) {
+export function GlobalSearch({ label = "Search", placeholder = "SEARCH OPERATORS · PAGES" }: { label?: string; placeholder?: string }) {
   const router = useRouter();
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -167,7 +167,7 @@ export function GlobalSearch({ label = "Search" }: { label?: string }) {
         aria-controls={listId}
         aria-autocomplete="list"
         aria-activedescendant={showPanel && items[active] ? `${listId}-${active}` : undefined}
-        placeholder="SEARCH OPERATORS · PAGES"
+        placeholder={placeholder}
         autoComplete="off"
         spellCheck={false}
         value={value}
