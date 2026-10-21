@@ -3,6 +3,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import type { ExchangeState } from '@/lib/exchange-gateway/src/types'
 import { captureServer } from '@/lib/infra/posthog/server'
+import { anonymousActorId, hashIp } from '@/lib/infra/ip-hash'
 
 /**
  * Length-safe constant-time string comparison.
@@ -68,12 +69,12 @@ export function requestIdentity(req: NextRequest): string {
  */
 export function resolveActorId(req: NextRequest, validatedKey: string | null): string {
   const ip = requestIdentity(req)
-  if (!validatedKey) return `anonymous:${ip}`
+  if (!validatedKey) return anonymousActorId(ip)
   return `actor:${hashSecret(validatedKey).slice(0, 16)}`
 }
 
-export function ipHash(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 16)
+export function ipHash(ip: string): string | null {
+  return hashIp(ip) ?? null
 }
 
 export async function findCompany(domain: string) {
