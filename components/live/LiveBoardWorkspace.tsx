@@ -1839,7 +1839,7 @@ export function LiveBoardWorkspace({
             <div className="stagecol">
               {/* page title — stage top, centered over the board column
                   (the top chrome bar is gone; the title is the page h1). */}
-              <div className="stitle">
+              <div className={`stitle${railOn ? " board-title-search-rail" : ""}`}>
                 <div className="stitle-main">
                   <h1 className="pagetitle">
                     {COPY.heroTitleA}
@@ -1848,7 +1848,7 @@ export function LiveBoardWorkspace({
                 </div>
                 {/* owner 2026-10-21: site-wide search at the right end of the title
                     row (navigates); the board table filter stays in the filter bar */}
-                <GlobalSearch label="Search operators and pages" />
+                {!railOn && <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />}
               </div>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
@@ -1881,7 +1881,7 @@ export function LiveBoardWorkspace({
                       liveTrack.modeChanged("agentic");
                     }}
                   >
-                    <span title="AUTONOMOUS / REVIEW — includes unresolved workflow candidates; not a verified automation claim">AUTO / REVIEW</span>
+                    <span title="Agency — includes unresolved workflow candidates; not a verified automation claim">Agency</span>
                   </button>
                 </div>
                 {/* owner 2026-10-06: dropdown labels removed — the selects
@@ -1924,15 +1924,6 @@ export function LiveBoardWorkspace({
                       <option key={o} value={o}>{o === "All Classes" ? "Class" : o}</option>
                     ))}
                   </select>
-                </span>
-                <span className="fb">
-                  <input
-                    aria-label="Search operators"
-                    placeholder="⌕"
-                    title="Search operators by name or codename"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
                 </span>
                 </div>
                 <div className="board-filter-actions" role="group" aria-label="Leaderboard view and exports">
@@ -2264,7 +2255,7 @@ export function LiveBoardWorkspace({
               >
                 ▸
               </button>
-              <div className="colhead">SIGRANK</div>
+              <div className="colhead colhead-search"><GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" /></div>
               <div className="railhead"><span className="rh-t">OPERATOR</span></div>
               <div className="rail">
                 {visibleRail.map((id) =>
