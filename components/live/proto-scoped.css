@@ -83,6 +83,8 @@
   font-size:14px; line-height:1.45;
   height:100vh;overflow:hidden;display:flex;flex-direction:column;
 }
+/* owner 2026-10-21 mobile foundation: phones' URL bar makes 100vh taller than the visible area */
+@supports (height:100dvh){.lbw-root{height:100dvh}}
 :where(.lbw-root) a{color:inherit;text-decoration:none}
 :where(.lbw-root) button{font:inherit;color:inherit;background:none;border-width:0;cursor:pointer}
 :where(.lbw-root) button.border{border-width:1px}
@@ -320,17 +322,40 @@
 .lbw-root .app.no-left .lside{display:none}
 .lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(0,1fr)}
 
-/* narrow viewports: panels stay pinned (owner 2026-10-06) — the stage keeps
-   a 600px floor and .mid pans horizontally, the same pattern .ws-cmp uses. */
+/* narrow viewports (owner 2026-10-21, supersedes the 2026-10-06 pan rule):
+   at <=1050px the stage takes the full width with no horizontal pan; the
+   sidebars start collapsed (WorkspaceShell) and open as overlay drawers over
+   the stage (tablet). At <=760px (phones) they never render in the grid at
+   all — the menu drawer / Details sheet of components/mobile/MobileChrome
+   carry their content. Desktop (>1050px) is untouched. */
+.lbw-root .m-tscrim{display:none}
 @media (max-width:1050px){
-  .lbw-root .mid{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr) var(--rail-w,332px);overflow-x:auto}
-  .lbw-root .app.no-rail .mid{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr)}
-  .lbw-root .app.no-left .mid{grid-template-columns:minmax(600px,1fr) var(--rail-w,332px)}
-  .lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(600px,1fr)}
-  .lbw-root .mid.peek{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr) 300px var(--rail-w,332px)}
-  .lbw-root .app.no-rail .mid.peek{grid-template-columns:var(--lside-w,248px) minmax(600px,1fr) 300px}
-  .lbw-root .app.no-left .mid.peek{grid-template-columns:minmax(600px,1fr) 300px var(--rail-w,332px)}
-  .lbw-root .app.no-rail.no-left .mid.peek{grid-template-columns:minmax(600px,1fr) 300px}
+  .lbw-root .mid,
+  .lbw-root .app.no-rail .mid,
+  .lbw-root .app.no-left .mid,
+  .lbw-root .app.no-rail.no-left .mid{grid-template-columns:minmax(0,1fr);overflow-x:auto}
+  .lbw-root .mid.peek,
+  .lbw-root .app.no-rail .mid.peek,
+  .lbw-root .app.no-left .mid.peek,
+  .lbw-root .app.no-rail.no-left .mid.peek{grid-template-columns:minmax(0,1fr) 300px}
+  /* first paint (SSR, before the collapse effect runs): no flash of open panels */
+  .lbw-root .app[data-phone-init] .mid>:is(.lside,.railcol){display:none}
+}
+@media (min-width:761px) and (max-width:1050px){
+  .lbw-root .mid>.lside,.lbw-root .mid>.railcol{position:absolute;top:0;bottom:0;z-index:45;
+    box-shadow:0 0 28px rgba(0,0,0,.45)}
+  .lbw-root .mid>.lside{left:0;width:var(--lside-w,248px)}
+  .lbw-root .mid>.railcol{right:0;width:var(--rail-w,332px);max-width:calc(100% - 56px)}
+  .lbw-root .m-tscrim{display:block;position:absolute;inset:0;z-index:40;width:100%;border:0;padding:0;
+    background:rgba(0,0,0,.45);cursor:default}
+}
+@media (max-width:760px){
+  .lbw-root .app{grid-template-columns:minmax(0,1fr)}
+  .lbw-root .app>.srail,.lbw-root .app .maincol>.ftr{display:none}
+  .lbw-root .mid>:is(.lside,.railcol,.reopen-tab,.m-tscrim){display:none}
+  /* title strip: the Search tab replaces the inline site search */
+  .lbw-root .stitle{grid-template-columns:minmax(0,1fr)}
+  .lbw-root .stitle .gs-root{display:none}
 }
 
 /* ---------- dual rank cell + hover detail ---------- */
@@ -1939,12 +1964,9 @@
 /* ---------- text pages on phones (2026-10-16) ----------
    Below 760px the editorial stage drops the 600px floor and fills the
    screen once both panels are collapsed (WorkspaceShell collapses them on
-   mount); during the first paint ([data-phone-init]) the panels are hidden
-   so the page never flashes the panning layout. */
+   mount); the shell grid rules above (owner 2026-10-21) now cover every page,
+   and [data-phone-init] hides the panels during the first paint. */
 @media (max-width:760px){
-  .lbw-root .app[data-phone-init] .mid:has(.ws-editorial-stage)>:is(.lside,.railcol){display:none}
-  .lbw-root .app[data-phone-init] .mid:has(.ws-editorial-stage),
-  .lbw-root .app.no-rail.no-left .mid:has(.ws-editorial-stage){grid-template-columns:minmax(0,1fr);overflow-x:hidden}
   .lbw-root .mid:has(.ws-editorial-stage) .stagecol{min-width:0}
   /* .ws-doc is a flex column; its mx-auto children shrink-to-fit their
      widest line (400-800px), so they overflowed the phone. Fill instead. */

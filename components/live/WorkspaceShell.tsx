@@ -51,6 +51,7 @@ import {
 } from "./utils";
 import { liveTrack } from "./analytics";
 import { useBoardSession } from "./session";
+import { MobileChrome } from "../mobile/MobileChrome";
 
 /** Rail nav keys — the workspace's canonical site navigation. */
 export type WorkspaceNav =
@@ -176,20 +177,33 @@ export function WorkspaceShell({
   /* ---------- panel + popover chrome ---------- */
   const [leftOn, setLeftOn] = useState(leftDefaultOpen && left != null);
   const [railOn, setRailOn] = useState(rightDefaultOpen && right != null);
-  /* Phones (2026-10-16): text pages open with both panels collapsed so the
-     reading column gets the full width instead of panning a 600px stage.
+  /* Narrow screens (owner 2026-10-21, generalizing the 2026-10-16 text-page
+     rule): at <=1050px every page opens with both panels collapsed — the
+     stage gets the full width and there is no horizontal pan. On tablets the
+     panels then open as overlay drawers (reopen tab / rail toggle); on phones
+     they are replaced by MobileChrome's menu drawer + Details sheet.
      `phoneInit` is true in SSR and the first client render (no hydration
      mismatch); CSS hides the panels while it is set, so there is no flash
-     before this effect collapses them. Reopen buttons in the rail still work. */
-  const [phoneInit, setPhoneInit] = useState(editorialStage);
+     before this effect collapses them. Desktop (>1050px) is unchanged. */
+  const [phoneInit, setPhoneInit] = useState(true);
   useEffect(() => {
-    if (!editorialStage) return;
-    if (window.matchMedia("(max-width: 760px)").matches) {
+    if (typeof window.matchMedia === "function" && window.matchMedia("(max-width: 1050px)").matches) {
       setLeftOn(false);
       setRailOn(false);
     }
     setPhoneInit(false);
-  }, [editorialStage]);
+  }, []);
+  /* tablet drawers close on Esc */
+  useEffect(() => {
+    if (!leftOn && !railOn) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || typeof window.matchMedia !== "function" || !window.matchMedia("(min-width: 761px) and (max-width: 1050px)").matches) return;
+      setLeftOn(false);
+      setRailOn(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [leftOn, railOn]);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
   const [iconSet, setIconSet] = useRailIconSet();
@@ -360,6 +374,18 @@ export function WorkspaceShell({
       }
     >
       <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
+      <MobileChrome
+        active={active}
+        theme={theme}
+        setTheme={setTheme}
+        iconSet={iconSet}
+        setIconSet={setIconSet}
+        left={left}
+        leftTitle={leftTitle}
+        right={right}
+        rightTitle={rightTitle}
+        rightOpenSignal={rightOpenSignal}
+      >
       <div
         className={`app${railOn ? "" : " no-rail"}${leftOn ? "" : " no-left"}`}
         data-phone-init={phoneInit ? "" : undefined}
@@ -452,6 +478,10 @@ export function WorkspaceShell({
           <div className="mid">
             {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
                 the stage edge (the rail-foot toggles alone were easy to miss). */}
+            {((leftOn && left != null) || (railOn && right != null)) && (
+              <button type="button" className="m-tscrim" aria-label="Close panel" tabIndex={-1}
+                onClick={() => { setLeftOn(false); setRailOn(false); }} />
+            )}
             {!leftOn && left != null && (
               <PanelReopenTab side="l" label={leftTitle ?? "SIDEBAR"} onOpen={() => { focusAfter(".edge-l"); setLeftOn(true); }} />
             )}
@@ -577,6 +607,7 @@ export function WorkspaceShell({
           </footer>
         </div>
       </div>
+      </MobileChrome>
     </div>
   );
 }
