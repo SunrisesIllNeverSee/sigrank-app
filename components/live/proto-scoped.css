@@ -261,11 +261,6 @@
 .lbw-root .fbar .seg{height:27px}
 .lbw-root .fbar .seg button{font-size:10px;padding:5px 10px}
 .lbw-root .fbar .ctlbtn{height:27px;padding:5px 11px}
-.lbw-root .fbar .sdir{width:27px;height:27px;flex-shrink:0;display:inline-flex;
-  align-items:center;justify-content:center;background:var(--panel);
-  border:1px solid var(--line2);border-radius:var(--radius-sm);
-  color:var(--mut);font-family:var(--font-mono);font-size:9px;cursor:pointer}
-.lbw-root .fbar .sdir:hover{color:var(--ac);border-color:var(--ac)}
 .lbw-root .fbar .fb-sp{flex:1}
 
 /* ---------- right dock column ---------- */
