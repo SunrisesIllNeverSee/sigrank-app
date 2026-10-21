@@ -17,6 +17,7 @@ import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
 import { compareClassPalette, COMPARE_OPERAND_COLORS } from "./compare-palette";
 import { CompareRadars } from "./CompareRadars";
+import { sampleFromRow, type FieldSample } from "@/lib/compare/radar-math";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import {
   deriveFacts,
@@ -74,6 +75,7 @@ export function CompareMatchup({
   b,
   options,
   hideSelectors = false,
+  field,
 }: {
   a: LeaderboardRow;
   b: LeaderboardRow;
@@ -81,7 +83,11 @@ export function CompareMatchup({
   /** Workspace layout renders <CompareSelectors/> in its own stage cell
    *  (CMP-01 vs CMP-02); pass true to keep the matchup panels only. */
   hideSelectors?: boolean;
+  /** Flattened public numbers of the whole field the page ranks (percentile basis).
+   *  Defaults to just these two operators. */
+  field?: FieldSample[];
 }) {
+  const fieldSamples = field && field.length >= 2 ? field : [sampleFromRow(a), sampleFromRow(b)];
   const nameA = nameOf(a);
   const nameB = nameOf(b);
   const clsA = a.snapshot.class_tier as SignalClass;
@@ -185,7 +191,7 @@ export function CompareMatchup({
       >
         <div className="cmp-operator-report">
           <div className="cmp-operator-report-copy">{identity}{factList}</div>
-          <CompareRadars a={a} b={b} side={side} />
+          <CompareRadars row={r} side={side} field={fieldSamples} />
         </div>
       </div>
     );
