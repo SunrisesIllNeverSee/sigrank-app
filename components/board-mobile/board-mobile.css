@@ -1,0 +1,90 @@
+/* components/board-mobile — phone leaderboard (owner 2026-10-21). Phone is
+   max-width 760px; everything here is inert above it. Colors/fonts are the
+   workspace tokens, so every theme works. */
+.lbw-root .bm-bar,.lbw-root .bm-more,.lbw-root .bc-list{display:none}
+
+@media (max-width:760px){
+  /* desktop filter bar + table are replaced by the bar + cards (the workspace
+     also stops rendering the table on phones; this covers the SSR first paint) */
+  .lbw-root [data-board-workspace] .stagecol>.fbar,
+  .lbw-root [data-board-workspace] .tablecard{display:none}
+
+  /* compact title strip so 8+ cards fit above the fold */
+  .lbw-root [data-board-workspace] .stitle{padding:6px 14px 2px}
+  .lbw-root [data-board-workspace] .pagetitle{font-size:15px;line-height:1.2;margin:0}
+
+  .lbw-root .bm-bar{display:flex;flex-direction:column;gap:8px;flex:none;padding:6px 14px 10px;
+    background:var(--bg);border-bottom:1px solid var(--line);position:relative;z-index:5}
+  .lbw-root .bm-seg{display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--panel)}
+  .lbw-root .bm-seg button{flex:1 1 0;min-width:0;min-height:44px;padding:0 4px;background:none;border:0;
+    font-family:var(--font-mono);font-weight:700;font-size:12px;letter-spacing:.02em;color:var(--tx2);white-space:nowrap}
+  .lbw-root .bm-seg button+button{border-left:1px solid var(--line2)}
+  .lbw-root .bm-seg button.on{background:var(--ac);color:var(--ac-tx)}
+  .lbw-root .bm-seg button:focus-visible{outline:2px solid var(--ac);outline-offset:-3px}
+  .lbw-root .bm-row{display:flex;gap:8px;align-items:center}
+  .lbw-root .bm-chip{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;
+    padding:0 16px;border:1px solid var(--line2);border-radius:999px;background:var(--panel);color:var(--tx);
+    font-family:var(--font-mono);font-weight:700;font-size:12px;white-space:nowrap}
+  .lbw-root .bm-win{padding:0}
+  .lbw-root .bm-win select{appearance:none;-webkit-appearance:none;min-height:44px;padding:0 30px 0 16px;border:0;background:transparent;
+    color:var(--tx);font:inherit;font-size:16px;border-radius:999px}
+  .lbw-root .bm-win::after{content:"▾";position:absolute;right:13px;top:50%;transform:translateY(-52%);font-size:11px;color:var(--mut);pointer-events:none}
+  .lbw-root .bm-filters{margin-left:auto;border-color:var(--ac);color:var(--ac)}
+  .lbw-root .bm-n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;
+    background:var(--ac);color:var(--ac-tx);font-size:11px}
+  .lbw-root .bm-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .lbw-root .bm-chip:focus-within,.lbw-root .bm-filters:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+  /* filter sheet */
+  .lbw-root .bm-sheet{display:flex;flex-direction:column;gap:12px}
+  .lbw-root .bm-field{display:flex;flex-direction:column;gap:6px}
+  .lbw-root .bm-lbl{font-family:var(--font-mono);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+  .lbw-root .bm-field select,.lbw-root .bm-field input{width:100%;box-sizing:border-box;min-height:48px;padding:0 14px;
+    background:var(--panel2);border:1px solid var(--line2);border-radius:10px;color:var(--tx);font-family:var(--font-mono);font-size:16px}
+  .lbw-root .bm-field select{appearance:none;-webkit-appearance:none;padding-right:34px;
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237f8b72'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center}
+  .lbw-root .bm-field select:focus-visible,.lbw-root .bm-field input:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+  .lbw-root .bm-actions{display:flex;gap:10px;margin-top:6px}
+  .lbw-root .bm-btn{flex:1;min-height:48px;border-radius:12px;border:1px solid var(--ac);background:var(--ac);color:var(--ac-tx);
+    font-family:var(--font-mono);font-weight:800;font-size:14px}
+  .lbw-root .bm-btn.ghost{flex:0 0 38%;background:transparent;color:var(--tx);border-color:var(--line2)}
+
+  /* card list */
+  .lbw-root .bc-list{display:block;list-style:none;margin:0;padding:0}
+  .lbw-root .bc{position:relative;display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+  .lbw-root .bc-me{background:linear-gradient(90deg,color-mix(in srgb,var(--ac) 13%,transparent),transparent 85%);
+    box-shadow:inset 3px 0 0 var(--ac)}
+  .lbw-root .bc-main{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;min-height:62px;padding:9px 0 9px 8px;
+    color:var(--tx);text-decoration:none;-webkit-tap-highlight-color:transparent}
+  .lbw-root .bc-main:active{background:var(--hover)}
+  .lbw-root .bc-main:focus-visible,.lbw-root .bc-cmp:focus-visible{outline:2px solid var(--ac);outline-offset:-3px}
+  .lbw-root .bc-rk{flex:none;width:22px;text-align:center;font-family:var(--font-mono);font-weight:800;font-size:15px;color:var(--ac)}
+  .lbw-root .bc-top1 .bc-rk,.lbw-root .bc-top2 .bc-rk,.lbw-root .bc-top3 .bc-rk{font-size:17px}
+  .lbw-root .bc-av{flex:none;position:relative;display:grid;place-items:center;width:34px;height:34px;border-radius:8px;overflow:hidden;
+    font-family:var(--font-ui);font-weight:800;font-size:15px;color:#061006}
+  .lbw-root .bc-av img{width:100%;height:100%;object-fit:cover;display:block}
+  .lbw-root .bc-who{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .lbw-root .bc-nm{display:flex;align-items:baseline;min-width:0;font-family:var(--font-ui);font-weight:700;font-size:15px;line-height:1.2}
+  .lbw-root .bc-nmt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lbw-root .bc-vchk{flex:none;color:var(--ac);font-size:12px}
+  .lbw-root .bc-meta{font-family:var(--font-mono);font-weight:600;font-size:11.5px;line-height:1.2;color:var(--tx2);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lbw-root .bc-trend{flex:none;display:block;width:34px;height:18px;overflow:hidden}
+  .lbw-root .bc-trend .spark{display:block;width:34px;height:18px}
+  .lbw-root .bc-yv{flex:none;min-width:48px;text-align:right;display:flex;flex-direction:column;gap:2px}
+  .lbw-root .bc-yv b{font-family:var(--font-mono);font-weight:800;font-size:15px;line-height:1.1;color:var(--tx)}
+  .lbw-root .bc-yv small{font-family:var(--font-mono);font-weight:700;font-size:10px;letter-spacing:.04em;color:var(--tx2)}
+  .lbw-root .bc-cmp{flex:none;display:grid;place-items:center;width:48px;color:var(--tx2);text-decoration:none;
+    font-size:18px;border-left:1px solid var(--line);margin:8px 0}
+  .lbw-root .bc-cmp:active{color:var(--ac)}
+
+  /* load more + status */
+  .lbw-root .bm-more{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:14px 14px 18px}
+  .lbw-root .bm-more button{min-height:48px;border:1px solid var(--line2);border-radius:10px;background:var(--panel);color:var(--tx);
+    font-family:var(--font-mono);font-weight:700;font-size:13px}
+  .lbw-root .bm-more button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+  .lbw-root .bm-more button[disabled]{opacity:.6}
+  .lbw-root .bm-status{text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--mut)}
+  .lbw-root .bm-status.err{color:var(--dn)}
+}
