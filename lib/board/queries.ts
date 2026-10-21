@@ -171,9 +171,7 @@ async function computeClaimedRanks(
           .order("snapshot_date", { ascending: false }),
       "metric_snapshots (claimedRanks)",
     );
-    const eligible = (asDb<DbMetricSnapshot[]>(allSnaps) ?? []).filter(
-      (s) => resolvedModeForSnapshot(s) !== null,
-    );
+    const eligible = (asDb<DbMetricSnapshot[]>(allSnaps) ?? []).filter(isBoardEligible);
     const latest = operatorTotalCollapse(eligible, "all_time").byOperator;
     const ranked = [...latest.values()]
       .map((s) => {
@@ -246,6 +244,17 @@ export const SNAPSHOT_COLUMNS =
   // on every submission); the operators rollup columns are unmaintained, so
   // the row builder backfills them from the chosen snapshot.
   "account_age_days, total_messages";
+
+/** The All board's row rule (mirrors compute_board_ranks, migration 0028): input
+ *  and output present and positive. Profile / share-card / rank picks use this same
+ *  rule so they land on the row the board shows. Workflow mode is a VIEW filter
+ *  (includesBoardMode), never an eligibility filter: owner 2026-10-21, the profile
+ *  skipped a newer all_time row that resolved to no workflow and fell back to an
+ *  older one (holocard Υ 661 vs board Υ 15.5K). */
+function isBoardEligible(s: DbMetricSnapshot): boolean {
+  return s.input_tokens != null && s.input_tokens > 0 &&
+    s.output_tokens != null && s.output_tokens > 0;
+}
 
 function resolvedModeForSnapshot(s: DbMetricSnapshot) {
   if (s.input_tokens == null || s.output_tokens == null ||
@@ -348,13 +357,7 @@ export async function getLeaderboard(
     // Codex-gap operators (cache_creation = 0) are NOT filtered here — the
     // existing cascade layer nulls their yield intentionally, and they still
     // show on the board. Only null/zero input/output rows are dropped.
-    const yieldable = windowed.filter(
-      (s) =>
-        s.input_tokens != null &&
-        s.input_tokens > 0 &&
-        s.output_tokens != null &&
-        s.output_tokens > 0,
-    );
+    const yieldable = windowed.filter(isBoardEligible);
     if (yieldable.length === 0 && (params.windowFilter || params.strictLive || params.mode)) return [];
     const modeBySnapshot = new Map<string, WorkflowMode | null>();
     const boardCandidates = params.mode
@@ -585,7 +588,7 @@ export async function getOperator(
     if (snapError) throw snapError;
     const allOpSnaps = asDb<DbMetricSnapshot[] | null>(snapData) ?? [];
     assertOperatorLimit(allOpSnaps, op.codename);
-    const eligibleSnaps = allOpSnaps.filter((s) => resolvedModeForSnapshot(s));
+    const eligibleSnaps = allOpSnaps.filter(isBoardEligible);
     const snap =
       operatorTotalCollapse(eligibleSnaps, "all_time").byOperator.get(
         op.operator_id,
