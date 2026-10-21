@@ -94,7 +94,9 @@ export interface MetricDef {
   higherIsBetter: boolean;
 }
 
-/** The 8 cascade metrics, in radar order (long labels away from the clipping edge). */
+/** The 7 cascade metrics, in radar order (long labels away from the clipping edge).
+ *  Op Ratio stays in the ledger only: it ranks on its lead term (leverage), so as
+ *  a radar axis it would just repeat Leverage. */
 export const COMPOSITE_METRICS: MetricDef[] = [
   { key: "yield_", label: "Yield", short: "Υ Yield", higherIsBetter: true },
   { key: "leverage", label: "Leverage", short: "Leverage", higherIsBetter: true },
@@ -103,7 +105,6 @@ export const COMPOSITE_METRICS: MetricDef[] = [
   { key: "dev10x", label: "10xDEV", short: "10xDEV", higherIsBetter: true },
   { key: "efficiency", label: "Efficiency", short: "Efficiency", higherIsBetter: true },
   { key: "cost", label: "Cost per 1M", short: "$/1M", higherIsBetter: false },
-  { key: "opRatio", label: "Op Ratio (lead term)", short: "Op Ratio", higherIsBetter: true },
 ];
 
 export const COMPOSITE_PILLARS: MetricDef[] = [
@@ -240,7 +241,8 @@ export function compactNumber(n: number | null | undefined): string {
   if (a >= 1e12) return `${(n / 1e12).toFixed(1)}T`;
   if (a >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
   if (a >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
-  if (a >= 1e4) return `${(n / 1e3).toFixed(0)}K`;
+  if (a >= 1e5) return `${(n / 1e3).toFixed(0)}K`;
+  if (a >= 1e4) return `${(n / 1e3).toFixed(1)}K`;  // 15.5K, matching the ledger
   if (a >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
   if (a >= 100) return n.toFixed(0);
   if (a >= 10) return n.toFixed(1);

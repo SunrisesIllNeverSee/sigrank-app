@@ -4,7 +4,7 @@
  *  A. CompareRadars (primary, one per operator, under that operator's column):
  *     the operator's OWN composite, independent of the opponent. Each axis is the
  *     operator's percentile in the field the page is showing (0-100, outward =
- *     higher; cost per 1M inverted). 8 cascade metrics solid, the 5 raw pillars
+ *     higher; cost per 1M inverted). 7 cascade metrics solid, the 5 raw pillars
  *     as a faint ghost layer underneath (the "dual signature" idea).
  *  B. CompareHeadToHead (secondary, full-width band): two radars with A and B
  *     overlaid — "Cascade stages" on a shared log scale and "Token mix" as a share
@@ -95,7 +95,7 @@ export function CompareRadars({
         axes={axes}
         rings={[{ r: 0.25 }, { r: 0.5 }, { r: 0.75 }, { r: 1 }]}
         layers={layers}
-        ariaLabel={`${title}: percentile in the field for eight cascade metrics (solid) and five raw token pillars (faint)`}
+        ariaLabel={`${title}: percentile in the field for seven cascade metrics (solid) and five raw token pillars (faint)`}
       />
       <p className="cmp-rd-pillars" aria-hidden="true">
         <span className="cmp-rd-ghostkey" style={{ borderColor: color }} />
@@ -223,7 +223,7 @@ function MixRadar({ a, b, nameA, nameB }: { a: FieldSample; b: FieldSample; name
   const colA = COMPARE_OPERAND_COLORS.a;
   const colB = COMPARE_OPERAND_COLORS.b;
   const pct = (v: number | undefined) =>
-    v === undefined ? "—" : v >= 10 ? `${v.toFixed(0)}%` : v >= 1 ? `${v.toFixed(1)}%` : `${v.toFixed(2)}%`;
+    v === undefined ? "—" : v > 0 && v < 0.01 ? "<0.01%" : v >= 10 ? `${v.toFixed(0)}%` : v >= 1 ? `${v.toFixed(1)}%` : `${v.toFixed(2)}%`;
   const axes: RadarAxis[] = defs.map((d) => ({
     title: `${d.label}: share of the operator's own total tokens`,
     lines: [

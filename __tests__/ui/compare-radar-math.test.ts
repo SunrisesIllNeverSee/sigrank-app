@@ -105,7 +105,8 @@ describe("scales and formatting", () => {
   });
   it("compactNumber / decadeLabel", () => {
     expect(compactNumber(64_332_300)).toBe("64.3M");
-    expect(compactNumber(15_500)).toBe("16K");
+    expect(compactNumber(15_500)).toBe("15.5K");
+    expect(compactNumber(130_000)).toBe("130K");
     expect(compactNumber(7.74)).toBe("7.74");
     expect(compactNumber(null)).toBe("—");
     expect(decadeLabel(3)).toBe("1K");

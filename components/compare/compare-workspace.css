@@ -193,7 +193,8 @@
 .lbw-root .ws-cmp-stage .cmp-rd-ring{fill:none;stroke:var(--line2);stroke-width:1;opacity:.55}
 .lbw-root .ws-cmp-stage .cmp-rd-ring.cmp-rd-rim{opacity:.95}
 .lbw-root .ws-cmp-stage .cmp-rd-spoke{stroke:var(--line2);stroke-width:1;opacity:.5}
-.lbw-root .ws-cmp-stage .cmp-rd-tick{font:9px var(--font-mono);fill:var(--mut)}
+.lbw-root .ws-cmp-stage .cmp-rd-tick{font:9px var(--font-mono);fill:var(--mut);
+  paint-order:stroke;stroke:var(--panel);stroke-width:3px;stroke-linejoin:round}  /* halo: ring labels stay legible over the shapes */
 .lbw-root .ws-cmp-stage .cmp-rd-label{font:10px var(--font-mono);fill:var(--tx);font-variant-numeric:tabular-nums}
 .lbw-root .ws-cmp-stage .cmp-rd-label.cmp-rd-name{fill:var(--tx2)}
 .lbw-root .ws-cmp-stage .cmp-rd-label.cmp-rd-muted{fill:var(--mut)}
