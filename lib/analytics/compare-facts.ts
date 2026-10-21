@@ -58,6 +58,12 @@ const fmtLev = (v: number) =>
  * head-to-head count reflects raw volume too). Cost = lower wins; everything else
  * higher wins. Max is now 10.
  *
+ * Fresh input is the exception among the raw pillars (owner 2026-10-21): it is the
+ * denominator of Yield (Υ = cache_read × output / input²), so using LESS fresh input
+ * for the same output is what the product rewards. Input is LOWER-wins; output,
+ * cache read and cache write stay higher-wins (volume). CompareLedger and the share
+ * card read this same function so the page never shows two different scores.
+ *
  * Exported for the workspace compare page's matchup-summary module — same
  * calculation the CompareMatchup panels use. (Moved verbatim from
  * components/compare/CompareMatchup.tsx.)
@@ -84,8 +90,9 @@ export function compareTally(
     [raw(ca, (x) => x.velocity), raw(cb, (x) => x.velocity), true],
     [comp(ca, (x) => x.dev10x ?? 0), comp(cb, (x) => x.dev10x ?? 0), true],
     [raw(ca, (x) => x.costPerMillion), raw(cb, (x) => x.costPerMillion), false], // lower wins
-    // 4 raw pillars (higher volume wins)
-    [tel(ta, (x) => x.fresh_input), tel(tb, (x) => x.fresh_input), true],
+    // 4 raw pillars: fresh input LOWER wins (Yield denominator, owner 2026-10-21);
+    // output / cache read / cache write higher volume wins
+    [tel(ta, (x) => x.fresh_input), tel(tb, (x) => x.fresh_input), false],
     [tel(ta, (x) => x.output), tel(tb, (x) => x.output), true],
     [tel(ta, (x) => x.cache_read), tel(tb, (x) => x.cache_read), true],
     [tel(ta, (x) => x.cache_create), tel(tb, (x) => x.cache_create), true],

@@ -168,7 +168,9 @@ function buildRow(
     b: bv,
     aStr: displayFor(m.key, a),
     bStr: displayFor(m.key, b),
-    higherWins: !m.lowerIsBetter,
+    // Fresh input is lower-wins like cost (owner 2026-10-21): it is the Yield
+    // denominator, and compareTally scores it that way. Keep the row in step.
+    higherWins: !(m.lowerIsBetter || m.key === "input"),
     scale,
   };
 }
@@ -376,7 +378,7 @@ export function CompareLedger({
           <span className="nm mut" style={{ fontSize: 8, letterSpacing: ".16em" }}>DATA</span>
           <span className="nm" style={{ marginLeft: "auto", color: "rgb(var(--class-seeker))", fontWeight: 700 }}>{bName}</span>
         </div>
-        <div className="lgr-band">Raw</div>
+        <div className="lgr-band">Raw · Flow · Total</div>
         {rawRows.map((r) => (
           <div className="lgr-row" key={r.id}>
             <span className={`a${win(r) === "a" ? " win" : ""}`}>{r.aStr}</span>
@@ -425,7 +427,7 @@ export function CompareLedger({
       </div>
 
       <div className="px-4 pb-2 pt-1">
-        <Band title="Raw" />
+        <Band title="Raw · Flow · Total" />
         {rawRows.map((r) => (
           <Line key={r.id} row={r} />
         ))}
