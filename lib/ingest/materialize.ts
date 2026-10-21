@@ -32,8 +32,13 @@ import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
 import { boardWindowByEnum } from "@/lib/board/windows";
 import { memoInvalidatePrefix } from "@/lib/board/memo";
+import {
+  decideAllTime,
+  sumPillars,
+  type Pillars,
+} from "@/lib/ingest/all-time-guard";
 import type { SnapshotPayloadV1 } from "@/lib/ingest/payload-schema";
-import type { GateResult } from "@/lib/ingest/gates";
+import type { GateReason, GateResult } from "@/lib/ingest/gates";
 
 /** The enrolled-device facts the persist path needs (resolved FROM the device, §5.4). */
 export interface ResolvedDevice {
@@ -43,7 +48,13 @@ export interface ResolvedDevice {
 
 /** Persist outcome the route maps to an HTTP status. */
 export type MaterializeResult =
-  | { ok: true; metricSnapshotId: string | null }
+  | {
+      ok: true;
+      metricSnapshotId: string | null;
+      /** Set when the all-time guard kept the board row from shrinking; the
+       *  route adds it to the gate reasons so it is flagged, not silent. */
+      allTimeGuard?: GateReason;
+    }
   | {
       ok: false;
       reason:
@@ -188,6 +199,11 @@ export async function materializeVerifiedSnapshot(
 
   const r = recomputeFromPillars(payload);
 
+  if (payload.window.type === "all_time") {
+    const guarded = await guardAllTimeUpload(svc, payload, signature, device, gate, r);
+    if (guarded) return guarded;
+  }
+
   const { data, error } = await svc.rpc("materialize_verified_snapshot", {
     p_operator_id: device.operator_id, // resolved FROM DEVICE (§5.4), never from payload
     p_device_id: device.device_id,
@@ -265,32 +281,59 @@ export async function insertSubmissionOnly(
     };
   }
 
-  const r = recomputeFromPillars(payload);
-
-  const { error } = await svc.from("snapshot_submissions").insert({
-    operator_id: device.operator_id, // FROM DEVICE (§5.4)
-    device_id: device.device_id,
-    // submitted_at OMITTED → column DEFAULT now() (server clock). Throttle integrity:
-    // never let a client timestamp set the throttle-keyed column (review P2). The client's
-    // claimed submitted_at remains in payload_json.
-    window_type: payload.window.type,
-    platform: payload.platform.primary,
-    window_start: payload.window.start,
-    window_end: payload.window.end,
-    schema_version: payload.schema_version,
-    ruleset_version: payload.agent.ruleset_version,
-    snapshot_hash: payload.agent.snapshot_hash,
+  const res = await insertAuditSubmission(
+    svc,
+    payload,
     signature,
-    payload_json: payload,
-    codename: payload.codename,
-    tier: payload.tier,
-    verification_tier: gate.tier,
-    status: "validated",
-    input_tokens: r.pillars.input,
-    output_tokens: r.pillars.output,
-    cache_creation_tokens: r.pillars.cacheCreate,
-    cache_read_tokens: r.pillars.cacheRead,
-  });
+    device,
+    gate,
+    recomputeFromPillars(payload),
+  );
+  return res.ok ? { ok: true, metricSnapshotId: null } : res;
+}
+
+type ServiceClient = NonNullable<ReturnType<typeof getSupabaseService>>;
+type AuditResult =
+  | { ok: true; submissionId: string }
+  | Extract<MaterializeResult, { ok: false }>;
+
+/** The status-'validated' audit row (never ranked). Returns its submission_id. */
+async function insertAuditSubmission(
+  svc: ServiceClient,
+  payload: SnapshotPayloadV1,
+  signature: string,
+  device: ResolvedDevice,
+  gate: GateResult,
+  r: RecomputedSnapshot,
+): Promise<AuditResult> {
+  const { data, error } = await svc
+    .from("snapshot_submissions")
+    .insert({
+      operator_id: device.operator_id, // FROM DEVICE (§5.4)
+      device_id: device.device_id,
+      // submitted_at OMITTED → column DEFAULT now() (server clock). Throttle integrity:
+      // never let a client timestamp set the throttle-keyed column (review P2). The client's
+      // claimed submitted_at remains in payload_json.
+      window_type: payload.window.type,
+      platform: payload.platform.primary,
+      window_start: payload.window.start,
+      window_end: payload.window.end,
+      schema_version: payload.schema_version,
+      ruleset_version: payload.agent.ruleset_version,
+      snapshot_hash: payload.agent.snapshot_hash,
+      signature,
+      payload_json: payload,
+      codename: payload.codename,
+      tier: payload.tier,
+      verification_tier: gate.tier,
+      status: "validated",
+      input_tokens: r.pillars.input,
+      output_tokens: r.pillars.output,
+      cache_creation_tokens: r.pillars.cacheCreate,
+      cache_read_tokens: r.pillars.cacheRead,
+    })
+    .select("submission_id")
+    .single();
 
   if (error) {
     if (error.code === "23505") {
@@ -303,7 +346,173 @@ export async function insertSubmissionOnly(
     return { ok: false, reason: "persist_failed", detail: error.message };
   }
 
-  return { ok: true, metricSnapshotId: null };
+  return { ok: true, submissionId: (data as { submission_id: string }).submission_id };
+}
+
+type MetricRow = Record<string, unknown> & {
+  snapshot_date: string;
+  input_tokens: number | string | null;
+  output_tokens: number | string | null;
+  cache_read_tokens: number | string | null;
+  cache_creation_tokens: number | string | null;
+  window_end: string | null;
+};
+
+const rowPillars = (row: MetricRow): Pillars => ({
+  input: Number(row.input_tokens ?? 0),
+  output: Number(row.output_tokens ?? 0),
+  cacheRead: Number(row.cache_read_tokens ?? 0),
+  cacheCreate: Number(row.cache_creation_tokens ?? 0),
+});
+
+/** A carried-forward row keeps its source's window_end, so its date trails snapshot_date. */
+const isCarried = (row: MetricRow): boolean =>
+  row.window_end != null && snapshotDateUTC(row.window_end) !== row.snapshot_date;
+
+/**
+ * guardAllTimeUpload — all-time never shrinks (lib/ingest/all-time-guard.ts).
+ * Returns null when the upload may replace the board row as usual (the caller
+ * runs the 0013 RPC). Otherwise it writes the status-'validated' audit row (the
+ * scanned numbers stay on record) and upserts this date's all_time row with the
+ * guarded totals: the previous row carried forward, or for 'multi' the sum of
+ * the scan's guarded platform rows. Reads fail closed: no read, no write.
+ */
+async function guardAllTimeUpload(
+  svc: ServiceClient,
+  payload: SnapshotPayloadV1,
+  signature: string,
+  device: ResolvedDevice,
+  gate: GateResult,
+  r: RecomputedSnapshot,
+): Promise<MaterializeResult | null> {
+  const platform = payload.platform.primary;
+  const snapshotDate = snapshotDateUTC(payload.window.end);
+  const allTime = () =>
+    svc
+      .from("metric_snapshots")
+      .select("*")
+      .eq("operator_id", device.operator_id)
+      .eq("window_type", "all_time");
+
+  const prevRes = await allTime()
+    .eq("platform", platform)
+    .order("snapshot_date", { ascending: false })
+    .limit(1);
+  if (prevRes.error) {
+    return { ok: false, reason: "persist_failed", detail: prevRes.error.message };
+  }
+  const prev = ((prevRes.data ?? []) as MetricRow[])[0] ?? null;
+
+  let scanPlatformSum: Pillars | null = null;
+  if (platform === "multi") {
+    const scanRes = await allTime()
+      .eq("snapshot_date", snapshotDate)
+      .neq("platform", "multi");
+    if (scanRes.error) {
+      return { ok: false, reason: "persist_failed", detail: scanRes.error.message };
+    }
+    const scanRows = (scanRes.data ?? []) as MetricRow[];
+    if (scanRows.some(isCarried)) scanPlatformSum = sumPillars(scanRows.map(rowPillars));
+  }
+
+  const decision = decideAllTime({
+    platform,
+    next: r.pillars,
+    previous: prev ? rowPillars(prev) : null,
+    scanPlatformSum,
+  });
+  if (decision.action === "replace") return null;
+
+  const now = new Date().toISOString();
+  let row: Record<string, unknown>;
+  let detail: string;
+  if (decision.action === "hold" && prev) {
+    const prevDate = prev.snapshot_date;
+    // Same columns as the previous row (its source submission, window, pillars and
+    // derived scores); only the identity and timestamps are new.
+    row = { ...prev };
+    delete row.metric_snapshot_id;
+    row = {
+      ...row,
+      snapshot_date: snapshotDate,
+      last_seen: now,
+      generated_at: now,
+      movement_24h: 0,
+      movement_7d: 0,
+    };
+    detail = `all_time ${platform} scan has less ${decision.shrunk.join(", ")} than the board row from ${prevDate}; kept those totals`;
+  } else if (decision.action === "platform_sum") {
+    const s = recomputeFromPillars({
+      ...payload,
+      raw_telemetry: {
+        ...payload.raw_telemetry,
+        tokens_input_fresh: decision.pillars.input,
+        tokens_output: decision.pillars.output,
+        tokens_cache_read: decision.pillars.cacheRead,
+        tokens_cache_creation: decision.pillars.cacheCreate,
+      },
+    });
+    row = {
+      operator_id: device.operator_id,
+      snapshot_date: snapshotDate,
+      window_type: "all_time",
+      platform,
+      source_submission_id: null, // set to this upload's audit row below
+      window_start: payload.window.start,
+      window_end: payload.window.end,
+      input_tokens: s.pillars.input,
+      output_tokens: s.pillars.output,
+      cache_creation_tokens: s.pillars.cacheCreate,
+      cache_read_tokens: s.pillars.cacheRead,
+      signa_rate: s.signaRate,
+      class_tier: s.classTier,
+      ruleset_version: payload.agent.ruleset_version,
+      compression_ratio: s.compressionRatio,
+      prompt_complexity: s.promptComplexity,
+      cross_thread: s.crossThread,
+      session_depth: s.sessionDepth,
+      token_throughput: s.tokenThroughput,
+      signal_force: s.signalForce,
+      live_signa_rate: s.signaRate,
+      message_volume: s.messageVolume,
+      account_age_days: s.accountAgeDays,
+      total_messages: s.totalMessages,
+      workflow_mode: null,
+      workflow_evidence_url: null,
+      workflow_mode_version: null,
+      mode_assessed_at: null,
+      last_seen: now,
+      generated_at: now,
+      movement_24h: 0,
+      movement_7d: 0,
+    };
+    detail = `all_time multi scan has less ${decision.shrunk.join(", ")} than its platform rows (one was held); multi set to their sum`;
+  } else {
+    throw new Error("all-time guard: hold without a previous row");
+  }
+
+  const audit = await insertAuditSubmission(svc, payload, signature, device, gate, r);
+  if (!audit.ok) return audit;
+  if (decision.action === "platform_sum") row.source_submission_id = audit.submissionId;
+
+  const { data, error } = await svc
+    .from("metric_snapshots")
+    .upsert(row, { onConflict: "operator_id,snapshot_date,window_type,platform" })
+    .select("metric_snapshot_id")
+    .single();
+  if (error) return { ok: false, reason: "persist_failed", detail: error.message };
+
+  return {
+    ok: true,
+    metricSnapshotId: (data as { metric_snapshot_id: string }).metric_snapshot_id,
+    allTimeGuard: {
+      code:
+        decision.action === "hold" ? "all_time_shrink_held" : "all_time_platform_sum",
+      gate: "all_time_guard",
+      severity: "flag",
+      detail,
+    },
+  };
 }
 
 /**
