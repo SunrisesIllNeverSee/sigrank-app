@@ -48,6 +48,8 @@ export function BoneHolocard({ codename, name, throughput, ratio, children }: {
     <div ref={viewport} className="bone-holo-viewport" style={{ height: 627 * scale }}>
       <div id={target} className="bone-holo-card" data-palette={palette} data-brand={brand}
         role="img" aria-label={`Bone holographic share card for ${name}`} style={{ transform: `scale(${scale})` }}>
+        {/* the cut-corner shape lives one level in: html-to-image drops clip-path on the captured root */}
+        <div className="bone-holo-shape">
         <div className="bone-holo-paper">
           <header className="bone-holo-header">
             <div className="bone-holo-logo">
@@ -71,9 +73,10 @@ export function BoneHolocard({ codename, name, throughput, ratio, children }: {
           <footer>signalaf.com/user/{codename}</footer>
         </div>
         <div className="bone-holo-live pv2-pcard-scope">{children}</div>
+        </div>
       </div>
     </div>
     <ArtworkShareControls target={target} title="Bone holocard" filename={`signalaf-bone-holocard-${codename}-${palette}-${brand}`}
-      href={href} animated backgroundColor="#f4eee3" pixelRatio={1} exportWidth={1200} exportHeight={627} gifPanelStart={.65}/>
+      href={href} animated backgroundColor="transparent" pixelRatio={1} exportWidth={1200} exportHeight={627} gifPanelStart={.65}/>
   </section>;
 }
