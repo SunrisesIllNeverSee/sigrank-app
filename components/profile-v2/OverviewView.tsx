@@ -32,6 +32,7 @@ import type { BuildArchetype } from "@/lib/analytics/build-archetypes";
 import type { FieldAverages } from "@/lib/analytics/field-average";
 import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { UnifiedShare } from "@/components/share/UnifiedShare";
+import { PcardFit } from "./PcardFit";
 import { PassportCard } from "./PassportCard";
 import { FlapBoard } from "./FlapBoard";
 import { WorkflowMark } from "./WorkflowMark";
@@ -273,7 +274,7 @@ export function OverviewView({
           opening presentation, all values live operator data) */}
       <section className="pv2-opensplit" aria-label="Operator passport and telemetry board">
         <div className="pv2-pcard-scope">
-          <PassportCard
+          <PcardFit><PassportCard
             operator={operator}
             snapshot={snapshot}
             globalRank={globalRank}
@@ -284,7 +285,7 @@ export function OverviewView({
             selectedSecondaryBadge={selectedSecondaryBadge}
             fieldAvg={fieldAvg}
             cohort={wfCohort}
-          />
+          /></PcardFit>
           <UnifiedShare title="SignalAF Operator Profile" href={"/s/" + encodeURIComponent(operator.codename)} imageHref={"/s/" + encodeURIComponent(operator.codename) + "/card.png"} screenshotTarget={"#holocard-" + operator.codename} />
           <ArtworkShareControls target={`holocard-${operator.codename}`} title="holocard" animated
             filename={`signalaf-holocard-${operator.codename}`} href={`/user/${encodeURIComponent(operator.codename)}`} />

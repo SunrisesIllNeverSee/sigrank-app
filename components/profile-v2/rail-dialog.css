@@ -35,3 +35,15 @@
 .lbw-root .prl-dialog--insp{max-width:min(380px,calc(100vw - 48px))}
 .lbw-root .prl-dialog--insp>.prl-dialog-card>*+*{margin-top:12px}
 .lbw-root .prl-open .prl-sum{display:flex;flex-direction:column;gap:5px;font-size:10px}
+
+/* owner 2026-10-21: phone — record/watchlist/operator dialogs are bottom sheets. */
+@media(max-width:760px){
+  .lbw-root .prl-dialog,.lbw-root .prl-dialog--wide,.lbw-root .prl-dialog--movers,.lbw-root .prl-dialog--insp{inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:86dvh;border-radius:14px 14px 0 0;border-width:1px 0 0}
+  .lbw-root .prl-dialog-card{padding:8px 16px calc(20px + env(safe-area-inset-bottom))}
+  .lbw-root .prl-dialog-card::before{content:"";display:block;width:40px;height:4px;margin:0 auto 10px;border-radius:2px;background:var(--line2)}
+  .lbw-root .prl-dialog-titles strong{font-size:14px}
+  .lbw-root .prl-dialog-titles span{font-size:12px}
+  .lbw-root .prl-dialog-x{min-width:44px;min-height:44px;font-size:16px}
+  .lbw-root .prl-dialog-dl dt{font-size:12px;width:96px}
+  .lbw-root .prl-dialog-dl dd{font-size:13px}
+}

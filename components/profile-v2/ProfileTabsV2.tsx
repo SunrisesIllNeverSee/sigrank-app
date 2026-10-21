@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useProfileWorkspace } from "./ProfileWorkspace";
@@ -93,6 +93,7 @@ export function ProfileTabsV2({
   const { isOwner } = useProfileAuth();
   const tab = workspace?.section ?? localTab;
   const panelRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
 
   const content: Record<TabKey, React.ReactNode> = {
     overview,
@@ -112,6 +113,16 @@ export function ProfileTabsV2({
   const activeTab = selectableTabs.some((t) => t.key === tab)
     ? tab
     : selectableTabs[0].key;
+
+  // owner 2026-10-21: phone tab strip scrolls horizontally — keep the active
+  // tab in view (scrolls the strip only, never the page).
+  useEffect(() => {
+    const strip = stripRef.current;
+    const el = strip?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+    if (!strip || !el) return;
+    const left = el.offsetLeft - (strip.clientWidth - el.offsetWidth) / 2;
+    strip.scrollTo({ left: Math.max(0, left), behavior: "auto" });
+  }, [activeTab]);
 
   const select = (key: TabKey) => {
     setTab(key);
@@ -148,7 +159,7 @@ export function ProfileTabsV2({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="profile-title-nav flex min-w-0 items-center gap-2 border-b border-bg-border">
+      <div ref={stripRef} className="profile-title-nav flex min-w-0 items-center gap-2 border-b border-bg-border">
       <div
         role="tablist"
         aria-label="Profile sections"
