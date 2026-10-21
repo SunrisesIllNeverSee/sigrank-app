@@ -49,6 +49,7 @@ import {
   submitAttempt,
 } from "./signal-server";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
+import { anonymousActorId } from "@/lib/infra/ip-hash";
 import { rateLimitAllowAsync } from "./rate-limit";
 import { createHash } from "node:crypto";
 import { isProhibitedHostSync, isProhibitedHostResolved, pinnedExchangeFetch } from "./ssrf";
@@ -149,7 +150,7 @@ export async function resolveValidatedActor(
   ip: string,
 ): Promise<{ ok: true; actorKey: string | null; actorId: string } | { ok: false; status: 401; error: string }> {
   const actorKey = req.headers.get("x-exchange-agent-key") ?? req.headers.get("x-exchange-proposer-key");
-  if (!actorKey) return { ok: true, actorKey: null, actorId: `anonymous:${ip}` };
+  if (!actorKey) return { ok: true, actorKey: null, actorId: anonymousActorId(ip) };
   let valid = false;
   try {
     valid = await validateAgentKey(actorKey);

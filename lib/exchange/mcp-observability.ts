@@ -64,14 +64,8 @@ function getAdminClient() {
   return supabaseAdmin;
 }
 
-/**
- * Hash an IP address for privacy-safe storage.
- * Returns SHA-256 first 16 hex chars, or undefined if no IP.
- */
-export function hashIp(ip: string | null | undefined): string | undefined {
-  if (!ip) return undefined;
-  return createHash("sha256").update(ip).digest("hex").slice(0, 16);
-}
+/** Keyed IP hash for privacy-safe storage (see lib/infra/ip-hash). */
+export { hashIp } from "@/lib/infra/ip-hash";
 
 /**
  * Derive a privacy-safe agent identity from request headers.
