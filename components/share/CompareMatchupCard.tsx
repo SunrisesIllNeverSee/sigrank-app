@@ -200,13 +200,6 @@ function CardRadarSvg({
         const [x, y] = pt(i, n, 1);
         return <line key={`sp-${i}`} x1={cx} y1={cy} x2={x} y2={y} stroke={C_LINE} strokeWidth={1} opacity={0.5} />;
       })}
-      {rings.map((ring, k) =>
-        ring.label ? (
-          <text key={`rl-${k}`} x={cx + 3} y={cy - radius * ring.r + 10} fontSize={9} fill={C_DULL} fontFamily={MONO}>
-            {ring.label}
-          </text>
-        ) : null,
-      )}
       {ordered.map((layer, li) => {
         const c = layer.points.length;
         const pts = layer.points
@@ -240,6 +233,14 @@ function CardRadarSvg({
           </g>
         );
       })}
+      {/* owner 2026-10-21: ring labels drawn after the layers, with a dark halo, so polygons never overdraw them */}
+      {rings.map((ring, k) =>
+        ring.label ? (
+          <text key={`rl-${k}`} x={cx + 6} y={cy - radius * ring.r + 10} fontSize={9} fill={C_DULL} fontFamily={MONO} stroke="#050605" strokeWidth={3} paintOrder="stroke" strokeLinejoin="round">
+            {ring.label}
+          </text>
+        ) : null,
+      )}
       {axes.map((lines, i) => {
         const a = ang(i, n);
         const cos = Math.cos(a);
@@ -795,7 +796,7 @@ function Card({
         >
           <span style={{ color: A_COLOR }}>{aWins} WINS</span>
           <span style={{ color: "#4a6a4a", fontSize: 9 }}>
-            COMPOSITE = PERCENTILE IN FIELD OF ${field.length} · $/1M INVERTED · DASHED = RAW PILLARS · ● = HIGHER STAGE · TOKEN-FLOW SHAPE, NOT A QUALITY SCORE
+            COMPOSITE = PERCENTILE IN FIELD OF {field.length} · $/1M INVERTED · DASHED = RAW PILLARS · ● = HIGHER STAGE · TOKEN-FLOW SHAPE, NOT A QUALITY SCORE
           </span>
           <span style={{ color: C_GOLD }}>{bWins} WINS</span>
         </div>
