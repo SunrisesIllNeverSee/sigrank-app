@@ -28,7 +28,7 @@
  * (default FIELD MAX rim; overridable via `radarBaseline`) — not the
  * reference's single polygon.
  */
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type {
   LiveOperator,
   LivePopulation,
@@ -44,7 +44,10 @@ import {
 } from "./utils";
 import type { DetailStatus, LiveOperatorDetail } from "./enrich";
 import { DRILL_CAPS } from "./enrich";
-import { PixelBadge } from "./PixelBadge";
+import { PixelBadge, pixelBadgeMark } from "./PixelBadge";
+import { PassportCard } from "@/components/profile-v2/PassportCard";
+import "@/components/profile-v2/profile-workspace.css";
+import "./board-holocard.css";
 import { Sparkline } from "./rows";
 /* dock-radar.css — the dual-radar chrome (owner directive 2026-10-06);
    travels with this module the way rail-extras.css rides EnterprisePromo. */
@@ -202,87 +205,36 @@ export function SharePreview({
   d: ProfileView;
   population: LivePopulation;
 }) {
-  const pop = population.count || 1;
-  const pct = Math.max(0.1, +((d.rank / pop) * 100).toFixed(1));
+  const cardId = useId();
   const slug = encodeURIComponent(d.op?.slug ?? d.codename);
+  const href = `/s/${slug}#share-holocard`;
+  const op = d.op;
+  if (!op) return <p className="drill-note">— SELECT AN OPERATOR</p>;
+  const valid = !op.nc && [op.num.yield, op.snr, op.vel, op.num.lev, op.dev, op.scalev].every(Number.isFinite);
   return (
-    /* owner 2026-10-07 (ref screenshot): copy + CTA on the left, ONE
-       bordered mini-card on the right — mark + VERIFIED chip, big TOP%
-       headline, hex-ring motif, RANK #n / pop. */
-    <div className="shareprev split">
-      <div className="sharecopy">
-        <div className="sh-t">SHARE YOUR SIGNAL</div>
-        <p className="sh-d">Create your verified leaderboard card.</p>
-        <a className="btn ghost" href={`/s/${slug}`}>
-          Generate Share Card
-        </a>
-      </div>
-      {/* LB-G05 candidate-a (owner-approved): native 150×206 "signature
-          lattice" mini — composed from ProfileView, never a scaled crop of
-          the 1200×630 social card (LB-G03 rejection). VERIFIED chip is
-          conditional on real verification state. */}
-      <a
-        className="sr-mini"
-        href={`/s/${slug}`}
-        aria-label={`Share ${d.name}`}
-      >
-        <div className="sr-mini-head">
-          <span className="sr-mini-mark" aria-hidden="true">
-            ▦
-          </span>
-          <span className={isVerifiedOp(d.verif) ? "" : "unv"}>
-            {isVerifiedOp(d.verif) ? "✓ VERIFIED" : "UNVERIFIED"}
-          </span>
-        </div>
-        <div className="sr-mini-k">SIGNALAF · OPERATOR</div>
-        <div className="sr-mini-num">
-          TOP <b>{pct.toFixed(1)}%</b>
-        </div>
-        <div className="sr-mini-k">OF THE LIVE FIELD</div>
-        {/* The motif is visually decorative, NOT a fabricated operator
-            telemetry trace. */}
-        <svg className="sr-mini-art" viewBox="0 0 125 60" aria-hidden="true">
-          <path
-            d="M7 46 26 43 44 33 63 14 85 28 116 13 116 55 7 55Z"
-            fill="currentColor"
-            fillOpacity=".08"
-          />
-          <path
-            d="M7 46 26 43 44 33 63 14 85 28 116 13"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          {(
-            [
-              [7, 46],
-              [26, 43],
-              [44, 33],
-              [63, 14],
-              [85, 28],
-              [116, 13],
-            ] as const
-          ).map(([x, y]) => (
-            <rect
-              key={x}
-              x={x - 1.6}
-              y={y - 1.6}
-              width="3.2"
-              height="3.2"
-              fill="currentColor"
-            />
-          ))}
-        </svg>
-        <div className="sr-mini-facts">
-          <span>
-            RANK <b>#{d.rank}</b>
-          </span>
-          <span>
-            FIELD <b>{pop}</b>
-          </span>
-        </div>
-        <small>SIGRANK · MEASURED SIGNAL</small>
+    <div className="shareprev pv2 board-holocard">
+      <a className="pv2-pcard-scope" href={href} aria-label={`Share ${d.name} holographic card`}>
+        <PassportCard
+          id={`board-holocard-${cardId}`}
+          operator={{ codename: d.codename, display_name: d.name, avatar_url: op.avatarUrl, primary_domain: op.platform }}
+          snapshot={{ class_tier: d.klass, cascade: valid ? {
+            yield_: op.num.yield, snr: op.snr, velocity: op.vel, leverage: op.num.lev,
+            dev10x: op.dev, scaleV: op.scalev, nonCompounding: false,
+          } : null }}
+          globalRank={d.rank}
+          pending={d.rank < 1}
+          archetype={d.arch ? { name: d.arch.replace(/-/g, " ") } : null}
+          trophyCounts={null}
+          fieldAvg={null}
+          selectedPixelBadge={pixelBadgeMark(op.pixelBadge)}
+          showSignature={false}
+          rankLabel="BOARD"
+        />
       </a>
+      <div className="board-holocard-actions">
+        <span className="board-holocard-context">{population.tag}</span>
+        <a className="btn ghost" href={href}>Share holocard →</a>
+      </div>
     </div>
   );
 }

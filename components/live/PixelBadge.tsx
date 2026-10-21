@@ -44,6 +44,14 @@ export const BADGE_LABELS: Record<PixelBadgeName, string> = {
   ...Object.fromEntries(PLATFORM_PIXEL_BADGES.map(b => [b.id, b.label.toUpperCase()])),
 } as Record<PixelBadgeName, string>;
 
+export function pixelBadgeMark(name: string | null | undefined) {
+  if (!name) return null;
+  const platform = PLATFORM_PIXEL_BADGES.find(b => b.id === name);
+  const pattern = platform?.pattern ?? (Object.prototype.hasOwnProperty.call(BADGES, name) ? BADGES[name as keyof typeof BADGES] : null);
+  const label = BADGE_LABELS[name as PixelBadgeName];
+  return pattern && label ? { id: name, label, pattern, detail: "Selected profile badge" } : null;
+}
+
 export function PixelBadge({ name }: { name: PixelBadgeName }) {
   const pattern = PLATFORM_PIXEL_BADGES.find(b => b.id === name)?.pattern ?? BADGES[name as keyof typeof BADGES];
   if (!pattern) return null;

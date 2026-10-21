@@ -1,0 +1,21 @@
+.lbw-root .shareprev.pv2.board-holocard{display:flex;flex-direction:column;gap:12px;padding:12px;min-width:0;text-align:center}
+.lbw-root .board-holocard .pv2-pcard-scope{display:block;width:100%;max-width:324px;margin:0 auto;padding:0;border:0;background:none;text-decoration:none}
+.lbw-root .board-holocard .pv2-pcard-scope:focus-visible{outline:2px solid var(--ac);outline-offset:5px}
+.lbw-root .board-holocard .pv2-card-shell{width:100%;height:auto;aspect-ratio:324/484;animation:none}
+.lbw-root .board-holocard .pv2-card{position:absolute;inset:2px;width:auto;height:auto;margin:0;padding:16px 14px 40px}
+.lbw-root .board-holocard .pv2-rating-number{font-size:40px}
+.lbw-root .board-holocard .pv2-position-tag{max-width:125px;font-size:8px;letter-spacing:.08em}
+.lbw-root .board-holocard .pv2-class-badge{font-size:9px;padding:4px 7px}
+.lbw-root .board-holocard .pv2-avatar-wrap{width:84px;height:84px;flex-shrink:0}
+.lbw-root .board-holocard .pv2-avatar{width:76px;height:76px;flex-shrink:0}
+.lbw-root .board-holocard .pv2-center-block{min-height:0}
+.lbw-root .board-holocard .pv2-hex-bg{width:170px;height:170px}
+.lbw-root .board-holocard .pv2-operator-name{max-width:100%;font-size:16px;overflow-wrap:anywhere}
+.lbw-root .board-holocard .pv2-operator-code{max-width:100%;font-size:8px;overflow-wrap:anywhere}
+.lbw-root .board-holocard .pv2-stats-block{padding:8px 5px;gap:6px 4px;margin-bottom:4px}
+.lbw-root .board-holocard .pv2-stat-value{font-size:16px}
+.lbw-root .board-holocard .pv2-stat-label{font-size:8px}
+.lbw-root .board-holocard .pv2-platform-chip{font-size:8px;padding:3px 6px}
+.lbw-root .board-holocard .pv2-card-footer{flex-shrink:0;padding-top:3px}
+.lbw-root .board-holocard .board-holocard-actions{display:flex;flex-direction:column;gap:7px;align-items:stretch}
+.lbw-root .board-holocard .board-holocard-context{font:9px var(--font-mono);color:var(--mut);line-height:1.4}
