@@ -307,6 +307,19 @@ export async function insertSubmissionOnly(
 }
 
 /**
+ * revalidateShareSurfaces — bust the /s/<codename> share landing page and its
+ * card.png OG/share image (owner 2026-10-21). Both render operator numbers and
+ * the verification mark, and previously lagged up to an hour (revalidate =
+ * 3600 / s-maxage=3600). Both codename casings, like /user/.
+ */
+function revalidateShareSurfaces(codename: string): void {
+  for (const c of new Set([codename, codename.toLowerCase()])) {
+    revalidatePath(`/s/${c}`);
+    revalidatePath(`/s/${c}/card.png`);
+  }
+}
+
+/**
  * revalidateTouchedWindows — refresh the static board pages AND the operator
  * profile cache a new verified row affects (§6.4): the specific window slug +
  * the deduped default "/board/off" (which replaced the removed "everything"
@@ -315,7 +328,8 @@ export async function insertSubmissionOnly(
  * getOperatorReport — all tagged "operator" in cached.ts) refreshes
  * immediately instead of waiting up to 120s for the unstable_cache TTL.
  * Finally revalidate the operator's profile page path itself so the ISR
- * static cache (export const revalidate = 120) is also busted.
+ * static cache (export const revalidate = 120) is also busted, plus the
+ * /s/<codename> share page and card.png (revalidateShareSurfaces).
  */
 export function revalidateTouchedWindows(
   windowType: string,
@@ -338,6 +352,7 @@ export function revalidateTouchedWindows(
   if (codename) {
     revalidatePath(`/user/${codename}`);
     revalidatePath(`/user/${codename.toLowerCase()}`);
+    revalidateShareSurfaces(codename);
   }
 }
 
@@ -359,6 +374,7 @@ export function revalidateOperatorIndexState(codename: string): void {
   // Wrapped emits the same policy-driven robots (3600s ISR).
   revalidatePath(`/user/${codename}/wrapped`);
   revalidatePath(`/user/${codename.toLowerCase()}/wrapped`);
+  revalidateShareSurfaces(codename);
   revalidatePath("/sitemap.xml");
   // Claimed membership changes the claimed-only live board surfaces too.
   revalidatePath("/board/all");
