@@ -6,7 +6,7 @@
  * Share button (navigator.share, copy-link fallback). Hidden above 760px by CSS
  * (.cmp-m-score), so desktop and tablet are unchanged.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type MobileScoreSide = { name: string; rank: number; yieldStr: string; thr: string };
 
@@ -24,6 +24,9 @@ export function CompareMobileScore({
   href: string;
 }) {
   const [note, setNote] = useState("");
+  const noteTimer = useRef<number | undefined>(undefined);
+  // owner 2026-10-21: clear the pending note timer on unmount.
+  useEffect(() => () => window.clearTimeout(noteTimer.current), []);
 
   const share = async () => {
     const url = new URL(href, window.location.origin).toString();
@@ -36,13 +39,16 @@ export function CompareMobileScore({
     } catch (e) {
       if ((e as Error)?.name === "AbortError") return; // user dismissed the sheet
     }
+    window.clearTimeout(noteTimer.current);
+    let copied = true;
     try {
       await navigator.clipboard.writeText(url);
       setNote("Link copied");
     } catch {
-      setNote(url);
+      copied = false;
+      setNote(url); // fallback: leave the URL up so it can be selected and copied
     }
-    window.setTimeout(() => setNote(""), 2500);
+    if (copied) noteTimer.current = window.setTimeout(() => setNote(""), 2500);
   };
 
   return (

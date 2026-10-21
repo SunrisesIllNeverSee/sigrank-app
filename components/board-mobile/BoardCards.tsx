@@ -54,7 +54,7 @@ const Card = memo(function Card({
   const top = r <= 3 ? ` bc-top${r}` : "";
   return (
     <li className={`bc${own ? " bc-me" : ""}${top}`} data-op={i} data-own={own || undefined}>
-      <Link href={href} className="bc-main" aria-label={`${o.name}, rank ${r}`} aria-current={own ? "true" : undefined}>
+      <Link href={href} className="bc-main" aria-label={`${o.name}, rank ${r}, ${o.klass}${build ? `, ${build}` : ""}, ${label.replace(/^[^\w]+\s*/, "")} ${headline}`} aria-current={own ? "true" : undefined}>
         <span className="bc-rk">{r}</span>
         <span className="bc-av" style={avatarStyle(i)} aria-hidden="true">
           {o.avatarUrl ? (
@@ -91,7 +91,7 @@ const Card = memo(function Card({
 
 export function BoardCards({ rows, colMode, viewMode, ownCodename }: BoardCardsProps) {
   return (
-    <ol className="bc-list" aria-label="Leaderboard">
+    <ol className="bc-list" aria-label="Ranked operators">
       {rows.map(([o, i], d) => (
         <Card
           key={`${i}-${o.codename}`}

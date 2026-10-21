@@ -77,4 +77,20 @@ test.describe("profile sheets", () => {
     expect(b!.x).toBe(0);
     expect(Math.round(b!.y + b!.height)).toBeGreaterThanOrEqual(843);
   });
+
+  test("badge sheet: scrim tap and Esc close it, focus returns, page behind is inert", async ({ page }) => {
+    await gotoPhone(page, `/user/${CODENAME}?tab=badges`);
+    const tile = page.locator(".badge-tile").first();
+    await tile.tap();
+    await expect(page.locator(".badge-detail")).toBeVisible();
+    expect(await page.evaluate(() => document.querySelectorAll("body > [inert]").length)).toBeGreaterThan(0);
+    await page.touchscreen.tap(195, 80); // scrim, above the sheet
+    await expect(page.locator(".badge-detail")).toHaveCount(0);
+    await expect(tile).toBeFocused();
+    await tile.tap();
+    await expect(page.locator(".badge-detail")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".badge-detail")).toHaveCount(0);
+    expect(await page.evaluate(() => document.querySelectorAll("body > [inert]").length)).toBe(0);
+  });
 });
