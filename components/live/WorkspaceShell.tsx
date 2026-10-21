@@ -39,7 +39,7 @@ import {
 import { lbwFontVars } from "./fonts";
 import "./proto-scoped.css";
 import { useRailIconSet } from "./useRailIconSet";
-import { PanelReopenTab } from "./PanelReopenTab";
+import { PanelReopenTab, usePanelFocus } from "./PanelReopenTab";
 import { PixelBadge } from "./PixelBadge";
 import { EditorialHeaderNav, type WorkspaceTopic } from "./EditorialSidebar";
 import {
@@ -258,6 +258,15 @@ export function WorkspaceShell({
       cancelAnimationFrame(raf);
     };
   }, [editorialStage]);
+  const focusAfter = usePanelFocus(leftOn, railOn);
+  const collapse = useCallback(
+    (side: "l" | "r") => {
+      focusAfter(side === "l" ? ".reopen-l" : ".reopen-r");
+      if (side === "l") setLeftOn(false);
+      else setRailOn(false);
+    },
+    [focusAfter],
+  );
   const onDrag = useCallback(
     (side: "l" | "r") => (e: React.PointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -278,14 +287,13 @@ export function WorkspaceShell({
         window.removeEventListener("pointermove", move);
         window.removeEventListener("pointerup", up);
         if (Math.abs(ev.clientX - startX) < 4) {
-          if (side === "l") setLeftOn(false);
-          else setRailOn(false);
+          collapse(side);
         }
       };
       window.addEventListener("pointermove", move);
       window.addEventListener("pointerup", up);
     },
-    [],
+    [collapse],
   );
   const acctRef = useRef<HTMLDivElement | null>(null);
   const snavRef = useRef<HTMLElement | null>(null);
@@ -445,10 +453,10 @@ export function WorkspaceShell({
             {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
                 the stage edge (the rail-foot toggles alone were easy to miss). */}
             {!leftOn && left != null && (
-              <PanelReopenTab side="l" label={leftTitle ?? "SIDEBAR"} controls="lbw-left-panel" onOpen={() => setLeftOn(true)} />
+              <PanelReopenTab side="l" label={leftTitle ?? "SIDEBAR"} onOpen={() => { focusAfter(".edge-l"); setLeftOn(true); }} />
             )}
             {!railOn && right != null && (
-              <PanelReopenTab side="r" label={rightTitle ?? "OPERATOR"} controls="lbw-right-panel" onOpen={() => setRailOn(true)} />
+              <PanelReopenTab side="r" label={rightTitle ?? "OPERATOR"} onOpen={() => { focusAfter(".edge-r"); setRailOn(true); }} />
             )}
             {leftOn && left != null && (
               <aside id="lbw-left-panel" className={`lside${topic ? " ws-editorial-sidebar" : ""}`}>
@@ -461,6 +469,7 @@ export function WorkspaceShell({
                   aria-controls="lbw-left-panel"
                   data-label="HIDE"
                   onPointerDown={onDrag("l")}
+                  onClick={(e) => { if (e.detail === 0) collapse("l"); }}
                 >
                   ◂
                 </button>
@@ -529,6 +538,7 @@ export function WorkspaceShell({
                   aria-controls="lbw-right-panel"
                   data-label="HIDE"
                   onPointerDown={onDrag("r")}
+                  onClick={(e) => { if (e.detail === 0) collapse("r"); }}
                 >
                   ▸
                 </button>

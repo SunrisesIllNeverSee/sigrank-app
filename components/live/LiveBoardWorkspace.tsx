@@ -93,7 +93,7 @@ import { DualSignatureRadar } from "./DualSignatureRadar";
 import type { SixAxisFacts, RawAxisFacts } from "./DualSignatureRadar";
 import { LineCarousel } from "./FiveStats";
 import { ColumnRanks } from "./ColumnRanks";
-import { PanelReopenTab } from "./PanelReopenTab";
+import { PanelReopenTab, usePanelFocus } from "./PanelReopenTab";
 import { PeekPanel } from "./PeekPanel";
 import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
@@ -1126,6 +1126,15 @@ export function LiveBoardWorkspace({
      inner edge is a VS Code sash — drag resizes via --lside-w/--rail-w CSS
      vars on .lbw-root; a sub-4px click counts as collapse instead. */
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const focusAfter = usePanelFocus(leftOn, railOn);
+  const collapse = useCallback(
+    (side: "l" | "r") => {
+      focusAfter(side === "l" ? ".reopen-l" : ".reopen-r");
+      if (side === "l") setLeftOn(false);
+      else setRailOn(false);
+    },
+    [focusAfter],
+  );
   const onDrag = useCallback(
     (side: "l" | "r") => (e: React.PointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -1146,14 +1155,13 @@ export function LiveBoardWorkspace({
         window.removeEventListener("pointermove", move);
         window.removeEventListener("pointerup", up);
         if (Math.abs(ev.clientX - startX) < 4) {
-          if (side === "l") setLeftOn(false);
-          else setRailOn(false);
+          collapse(side);
         }
       };
       window.addEventListener("pointermove", move);
       window.addEventListener("pointerup", up);
     },
-    [],
+    [collapse],
   );
   const stageRef = useRef<HTMLElement | null>(null);
   /* The tablecard is the board's single scroller (both axes) while the
@@ -1708,10 +1716,10 @@ export function LiveBoardWorkspace({
             {/* owner 2026-10-21: collapsed panels leave a labelled accent tab on
                 the stage edge (the rail-foot toggles alone were easy to miss). */}
             {!leftOn && (
-              <PanelReopenTab side="l" label="SIDEBAR" controls="lbw-left-panel" onOpen={() => setLeftOn(true)} />
+              <PanelReopenTab side="l" label="SIDEBAR" controls="lbw-left-panel" onOpen={() => { focusAfter(".edge-l"); setLeftOn(true); }} />
             )}
             {!railOn && (
-              <PanelReopenTab side="r" label="OPERATOR" controls="lbw-right-panel" onOpen={() => setRailOn(true)} />
+              <PanelReopenTab side="r" label="OPERATOR" controls="lbw-right-panel" onOpen={() => { focusAfter(".edge-r"); setRailOn(true); }} />
             )}
             {/* left sidebar (owner 2026-10-06): banner + operator profile —
                 VS Code side-panel anatomy, toggled by the title-bar glyph. */}
@@ -1727,6 +1735,7 @@ export function LiveBoardWorkspace({
                 aria-controls="lbw-left-panel"
                 data-label="HIDE"
                 onPointerDown={onDrag("l")}
+                onClick={(e) => { if (e.detail === 0) collapse("l"); }}
               >
                 ◂
               </button>
@@ -2131,6 +2140,7 @@ export function LiveBoardWorkspace({
                 aria-controls="lbw-right-panel"
                 data-label="HIDE"
                 onPointerDown={onDrag("r")}
+                onClick={(e) => { if (e.detail === 0) collapse("r"); }}
               >
                 ▸
               </button>
