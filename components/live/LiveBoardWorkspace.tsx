@@ -5,6 +5,7 @@ import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
 import { BoardBriefings } from "./BoardBriefings";
+import { medalLeaders, type MedalStanding } from "./medal-leaders";
 
 /**
  * components/live/LiveBoardWorkspace.tsx — React port of the frozen
@@ -213,7 +214,7 @@ function MedalDeck({
   ops,
   onSelect,
 }: {
-  medals: { name: string; list: LiveOperator[] }[];
+  medals: { name: string; list: MedalStanding[] }[];
   ops: LiveOperator[];
   onSelect?: (i: number) => void;
 }) {
@@ -232,7 +233,7 @@ function MedalDeck({
       {/* owner: "three profiles horizontal, similar to compare" —
           compare-slot-style cards in a row per page. */}
       <div className="podrow">
-        {slide.list.slice(0, 3).map((o) => {
+        {slide.list.slice(0, 3).map(({ operator: o, count }) => {
           const k = ops.indexOf(o);
           /* LB-G01 approved direction: SignalMedal hardware up top, the
              holder's profile icon centered in the card, name + standing
@@ -245,6 +246,7 @@ function MedalDeck({
               key={o.codename}
               type="button"
               className="podcard"
+              title={o.name}
               onClick={() => onSelect?.(k)}
             >
               <SignalMedal rank={medalRank} size={26} />
@@ -257,7 +259,7 @@ function MedalDeck({
                 )}
               </span>
               <span className="tm">{o.name}</span>
-              <span className="tv mono">{(o.pct ?? 0).toFixed(0)}%</span>
+              <span className="tv mono">{count} {count === 1 ? "medal" : "medals"}</span>
             </button>
           );
         })}
@@ -290,6 +292,7 @@ function MedalDeck({
           />
         ))}
       </div>
+      <p className="drill-note">Current window · metric standings</p>
     </div>
   );
 }
@@ -716,6 +719,7 @@ export function LiveBoardWorkspace({
     return touched ? next : baseOps;
   }, [baseOps, details, detailKey, trendsByCode]);
   const rmax = useMemo(() => rmaxOf(initial.fieldMax), [initial.fieldMax]);
+  const medals = useMemo(() => medalLeaders(ops), [ops]);
 
   /* ---------- board state ---------- */
   const [colMode, setColMode] = useState<ColMode>("metrics");
@@ -1505,28 +1509,6 @@ export function LiveBoardWorkspace({
            time from the same source, so nothing repeats visually. */
         return <HotStats stats={initial.fieldStats} />;
       case "hall": {
-        /* Hall spotlight + medal tally (owner 2026-10-06: hall of signal
-           = who holds the most gold/silver/bronze trophies). The tally
-           counts record entries per operator in the hall feed — position
-           medal colors (gold/silver/bronze) mark the standing. */
-        /* owner 2026-10-06: medal count = top-3 gold / silver / bronze
-           holders — not a flat tally. The hall feed carries record
-           winners only (no runner-up data), so the brackets ride field
-           standing: 🥇 ≥99th pct, 🥈 95–99th, 🥉 90–95th. */
-        const byPct = [...ops].sort((a, b) => (b.pct ?? 0) - (a.pct ?? 0));
-        const medals = [
-          { name: "gold", list: byPct.filter((o) => (o.pct ?? 0) >= 99) },
-          {
-            name: "silver",
-            list: byPct.filter((o) => (o.pct ?? 0) >= 95 && (o.pct ?? 0) < 99),
-          },
-          {
-            name: "bronze",
-            list: byPct.filter((o) => (o.pct ?? 0) >= 90 && (o.pct ?? 0) < 95),
-          },
-        ];
-        /* owner: hall is ONE box, three slides — top-3 gold, silver,
-           bronze rotate in place (profile graphics on each row). */
         return <MedalDeck medals={medals} ops={ops} onSelect={handleSelect} />;
       }
       case "compare":
