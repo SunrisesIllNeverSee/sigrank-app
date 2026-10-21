@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { LiveOperator, MoverEntry } from "@/lib/board/live-types";
 import { deriveMovers, isVerifiedOp } from "./utils";
 import { PixelBadge } from "./PixelBadge";
+import { RailDialog } from "../profile-v2/RailDialog";
 
 export interface MoverRow {
   /** display name — resolved handle, codename as honest fallback. */
@@ -176,6 +177,8 @@ export function moverScopeMatches(o: LiveOperator, scope: MoverBoardMode): boole
 export const MOVER_MODES = ["7D", "24H", "Σ TOKENS", "OP RATIO", "10×DEV"] as const;
 export type MoverSlideMode = typeof MOVER_MODES[number];
 export const MOVER_SLOTS = 5;
+/** Leading movers shown in the compact sidebar box (owner 2026-10-21: 1–3). */
+const COMPACT_MOVERS = 3;
 
 export function fillMoverSlots(rows: MoverRow[]): MoverRow[] {
   return Array.from({ length: MOVER_SLOTS }, (_, i) => rows[i] ?? {
@@ -272,26 +275,67 @@ export function RotatingMovers({
 
   useEffect(() => { setMi(0); }, [boardMode]);
 
+  /* owner 2026-10-21: the sidebar box is compact (leading movers) and the
+     full list + pager live in a popup. Auto-rotation pauses while the popup
+     is open so the list does not change under the reader. */
+  const [popupOpen, setPopupOpen] = useState(false);
   useEffect(() => {
+    if (popupOpen) return;
     const t = setInterval(() => setMi((i) => (i + 1) % MOVER_MODES.length), 5000);
     return () => clearInterval(t);
-  }, []);
+  }, [popupOpen]);
 
   const slide = MOVER_MODES[mi];
   const rows = useMemo(
     () => moverSlideRows(ops, server, boardMode, slide),
     [ops, server, boardMode, slide],
   );
+  const boxHead = slide + " · " + (mi + 1) + "/" + MOVER_MODES.length;
+  const tag = slide === "Σ TOKENS" ? "Σ" : slide === "24H" ? "24h" :
+    slide === "OP RATIO" ? "R:I:O" : slide === "10×DEV" ? "10×" : "7d";
+  const lead = rows.filter((m) => !m.placeholder).slice(0, COMPACT_MOVERS);
   return (
-    <MoversRail
-      boxHead={slide + " · " + (mi + 1) + "/" + MOVER_MODES.length}
-      rows={rows}
-      onSelect={onSelect}
-      slideKey={slide}
-      onPrev={() => setMi((i) => (i + MOVER_MODES.length - 1) % MOVER_MODES.length)}
-      onNext={() => setMi((i) => (i + 1) % MOVER_MODES.length)}
-      tag={slide === "Σ TOKENS" ? "Σ" : slide === "24H" ? "24h" :
-        slide === "OP RATIO" ? "R:I:O" : slide === "10×DEV" ? "10×" : "7d"}
-    />
+    <RailDialog
+      title="TOP MOVERS"
+      subtitle={boxHead}
+      hint="OPEN ▸"
+      lazy
+      dialogClass="prl-dialog--movers"
+      onOpenChange={setPopupOpen}
+      trigger={
+        <div className="mbox mbox--compact" data-mover-slide={slide}>
+          <div className="mbox-compact-h"><span>{boxHead}</span></div>
+          {lead.length ? lead.map((m, i) => (
+            <div key={m.codename + "-" + i} className="mv">
+              <span className="mav">
+                {m.avatarUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element -- profile image */
+                  <img src={m.avatarUrl} alt="" loading="lazy" />
+                ) : m.name[0] === "@" ? (m.name[1] ?? "·") : (m.name[0] ?? "·")}
+              </span>
+              <span title={m.name}>{m.name}</span>
+              {m.note != null ? (
+                <span className="dlt vol mono">{m.note}</span>
+              ) : (
+                <span className={"dlt " + (m.mv >= 0 ? "up" : "dn")}>
+                  {m.mv >= 0 ? "▲ +" + m.mv : "▼ −" + Math.abs(m.mv)}
+                </span>
+              )}
+              <span className="rk-pos">#{i + 1}</span>
+            </div>
+          )) : <div className="mv"><span className="mut mono">— NO MOVERS YET</span></div>}
+        </div>
+      }
+    >
+      {(close) => <MoversRail
+        boxHead={boxHead}
+        rows={rows}
+        onSelect={onSelect ? (i) => { onSelect(i); close(); } : undefined}
+        slideKey={slide}
+        onPrev={() => setMi((i) => (i + MOVER_MODES.length - 1) % MOVER_MODES.length)}
+        onNext={() => setMi((i) => (i + 1) % MOVER_MODES.length)}
+        tag={tag}
+      />}
+    </RailDialog>
   );
 }

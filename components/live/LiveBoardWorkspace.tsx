@@ -98,6 +98,7 @@ import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
 import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
 import { RotatingMovers } from "./MoversRail";
+import { RailDialog } from "../profile-v2/RailDialog";
 import { ProfileActions } from "./ProfileActions";
 
 import {
@@ -1404,6 +1405,28 @@ export function LiveBoardWorkspace({
                     : cmpHref}
                 />
               )}
+              {/* owner 2026-10-21: the inspector is a compact box — tile plus
+                  the PROFILE / WATCH actions above stay visible; the radar,
+                  column ranks, signal history and records open in a popup
+                  (same RailDialog pattern as Wire / Notes). */}
+              <RailDialog
+                title={`OPERATOR DETAIL · ${selOp?.name ?? "—"}`}
+                subtitle="RADAR · RANKS · SIGNAL HISTORY · RECORDS"
+                hint="OPEN ▸"
+                lazy
+                dialogClass="prl-dialog--insp"
+                trigger={
+                  <span className="prl-sum mono">
+                    <b>RADAR · SIGNAL HISTORY</b>
+                    <span className="mut">
+                      {(selOp?.recs ?? []).length
+                        ? `${selOp!.recs!.length} RECORD${selOp!.recs!.length === 1 ? "" : "S"}`
+                        : "RECORDS · COLUMN RANKS"}
+                    </span>
+                  </span>
+                }
+              >
+                <>
               {/* owner: the radar is its own box — it ends here, then a
                   separate AWARDS/BADGES box follows with three rotating
                   slides (awards → badges → medals) at display size. */}
@@ -1467,6 +1490,8 @@ export function LiveBoardWorkspace({
                   {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
                 </p>
               )}
+                </>
+              </RailDialog>
             </>
           ) : (
             <button

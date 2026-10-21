@@ -1,0 +1,38 @@
+/* RailDialog chrome — shared by the profile rails and the board sidebar
+   popups (owner 2026-10-21: compact sidebar boxes that open popups).
+   Moved out of profile-workspace.css so the board can load it too. */
+.lbw-root .prl-dialog{position:fixed;inset:0;margin:auto;height:fit-content;max-height:85vh;overflow:auto;border:1px solid var(--line2);border-radius:10px;background:var(--bg);color:var(--tx);padding:0;max-width:360px;width:calc(100vw - 48px);box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.lbw-root .prl-dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.lbw-root .prl-dialog-card{padding:16px 18px}
+.lbw-root .prl-dialog-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lbw-root .prl-dialog-titles{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbw-root .prl-dialog-titles strong{font:700 12px var(--pv2-display,monospace);letter-spacing:.06em;color:var(--tx)}
+.lbw-root .prl-dialog-titles span{font:8px var(--pv2-mono,monospace);letter-spacing:.08em;color:var(--gold)}
+.lbw-root .prl-dialog-x{background:none;border:none;color:var(--mut);cursor:pointer;font-size:12px;padding:4px}
+.lbw-root .prl-dialog-x:hover{color:var(--tx)}
+.lbw-root .prl-dialog-dl{margin:10px 0 0;display:flex;flex-direction:column;gap:7px}
+.lbw-root .prl-dialog-dl div{display:flex;gap:10px}
+.lbw-root .prl-dialog-dl dt{font:700 8px var(--pv2-display,monospace);letter-spacing:.08em;color:var(--mut);width:76px;flex-shrink:0;padding-top:2px}
+.lbw-root .prl-dialog-dl dd{margin:0;font:10px var(--pv2-mono,monospace);color:var(--tx);line-height:1.5;min-width:0}
+.lbw-root .prl-dialog-dl a{color:var(--gold)}
+.lbw-root .prl-open{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:8px;padding:8px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;cursor:pointer;text-align:left;color:inherit;font:inherit;transition:border-color .15s}
+.lbw-root .prl-open:hover{border-color:var(--line2)}
+.lbw-root .prl-open:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.lbw-root .prl-open-hint{align-self:flex-end;font:600 8px var(--pv2-mono,monospace);letter-spacing:.1em;color:var(--mut)}
+.lbw-root .prl-open:hover .prl-open-hint{color:var(--ac)}
+.lbw-root .prl-open .prl-heat-stats{margin-top:0;padding-top:0;border-top:0}
+.lbw-root .prl-open .prl-medals{margin-top:0}
+.lbw-root .prl-dialog--wide{max-width:min(520px,calc(100vw - 48px))}
+.lbw-root .prl-dialog--wide .prl-heat-cell{border-radius:2.5px}
+.lbw-root .prl-honor-dt{display:inline-flex;align-items:center;gap:6px}
+/* owner 2026-10-21: board sidebar popups — compact preview rows. */
+.lbw-root .prl-open .mbox.mbox--compact{display:block;height:auto;min-height:0;border:0;padding:0;background:none}
+.lbw-root .prl-open .mbox-compact-h{display:flex;justify-content:space-between;gap:8px;margin-bottom:2px;
+  font:600 8.5px var(--font-mono);letter-spacing:.14em;color:var(--mut)}
+.lbw-root .prl-open .mbox--compact .mv{padding:5px 0;flex:none;height:auto;min-height:0}
+.lbw-root .prl-dialog--movers{max-width:min(380px,calc(100vw - 48px))}
+.lbw-root .prl-dialog .mbox{min-height:0;border:0;padding:12px 0 0}
+.lbw-root .prl-dialog--insp{max-width:min(380px,calc(100vw - 48px))}
+.lbw-root .prl-dialog--insp>.prl-dialog-card>*+*{margin-top:12px}
+.lbw-root .prl-open--static .prl-open-hint{align-self:flex-end}
+.lbw-root .prl-open .prl-sum{display:flex;flex-direction:column;gap:5px;font-size:10px}

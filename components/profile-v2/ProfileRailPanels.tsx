@@ -241,38 +241,55 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
 
   return (
     <>
-      {/* RANK CONTEXTS — combined field + workflow cohort (items 12+13) */}
+      {/* RANK CONTEXTS — combined field + workflow cohort (items 12+13).
+          owner 2026-10-21: compact box shows the FIELD rank; the workflow
+          cohort rank, mark and notes open in a popup. */}
       <div className="mod">
         <h3><span className="sq" />RANK CONTEXTS</h3>
-        <div className="prl-ctx">
-          <div className="prl-ctx-row">
-            <span className="prl-ctx-k">FIELD</span>
-            <b className="prl-ctx-v">{onField ? `#${boardRow.global_rank}` : "UNRANKED"}</b>
-            <span className="prl-ctx-n">HYBRID · COMBINED{boardRows.length ? ` · OF ${boardRows.length}` : ""}</span>
-          </div>
-          {onField && cohort && (
+        <RailDialog
+          title="RANK CONTEXTS"
+          subtitle={onField ? "COMBINED FIELD + WORKFLOW COHORT" : undefined}
+          hint="OPEN ▸"
+          trigger={
+            <div className="prl-ctx">
+              <div className="prl-ctx-row">
+                <span className="prl-ctx-k">FIELD</span>
+                <b className="prl-ctx-v">{onField ? `#${boardRow.global_rank}` : "UNRANKED"}</b>
+                <span className="prl-ctx-n">HYBRID · COMBINED{boardRows.length ? ` · OF ${boardRows.length}` : ""}</span>
+              </div>
+            </div>
+          }
+        >
+          <div className="prl-ctx">
             <div className="prl-ctx-row">
-              <span className="prl-ctx-k">{cohort.cohortShort}</span>
-              <b className="prl-ctx-v">{cohort.rank != null ? `#${cohort.rank}` : "—"}</b>
-              <span className="prl-ctx-n">{cohort.cohortLabel} · OF {cohort.size}</span>
+              <span className="prl-ctx-k">FIELD</span>
+              <b className="prl-ctx-v">{onField ? `#${boardRow.global_rank}` : "UNRANKED"}</b>
+              <span className="prl-ctx-n">HYBRID · COMBINED{boardRows.length ? ` · OF ${boardRows.length}` : ""}</span>
             </div>
-          )}
-          {onField && cohort && (
-            <div className="prl-ctx-mark">
-              <WorkflowMark mode={cohort.mode} size="full" />
-              {cohort.mode === null && (
-                <span className="prl-ctx-note">REVIEW CANDIDATE — NOT VERIFIED AUTOMATION</span>
-              )}
-            </div>
-          )}
-          {!onField && (
-            <div className="prl-ctx-note">
-              {snapshotRecords.length === 0
-                ? "AWAITING FIRST SCORED SNAPSHOT"
-                : "NOT PLACED ON COMBINED FIELD"}
-            </div>
-          )}
-        </div>
+            {onField && cohort && (
+              <div className="prl-ctx-row">
+                <span className="prl-ctx-k">{cohort.cohortShort}</span>
+                <b className="prl-ctx-v">{cohort.rank != null ? `#${cohort.rank}` : "—"}</b>
+                <span className="prl-ctx-n">{cohort.cohortLabel} · OF {cohort.size}</span>
+              </div>
+            )}
+            {onField && cohort && (
+              <div className="prl-ctx-mark">
+                <WorkflowMark mode={cohort.mode} size="full" />
+                {cohort.mode === null && (
+                  <span className="prl-ctx-note">REVIEW CANDIDATE — NOT VERIFIED AUTOMATION</span>
+                )}
+              </div>
+            )}
+            {!onField && (
+              <div className="prl-ctx-note">
+                {snapshotRecords.length === 0
+                  ? "AWAITING FIRST SCORED SNAPSHOT"
+                  : "NOT PLACED ON COMBINED FIELD"}
+              </div>
+            )}
+          </div>
+        </RailDialog>
       </div>
 
       {/* SUBMISSION ACTIVITY — the whole 22-week grid scaled into the
@@ -335,8 +352,9 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
         </RailDialog>
       </div>
 
-      {/* RECORDS & HONORS — honors strip pops its detail in-window;
-          each record row still opens its own detail card (item 10). */}
+      {/* RECORDS & HONORS — honors strip pops its detail in-window; the
+          record list (owner 2026-10-21: compact sidebar) lives in that
+          popup and each row still opens its own detail card (item 10). */}
       <div className="mod">
         <h3><span className="sq" />TROPHIES &amp; RECORDS</h3>
         <RailDialog
@@ -380,9 +398,9 @@ export async function ProfileRailPanels({ row }: { row: LeaderboardRow }) {
             )}
             <div><dt className="prl-honor-dt">WATCHED</dt><dd>{watchCount} operator{watchCount === 1 ? "" : "s"} watching this profile.</dd></div>
           </dl>
-          <p className="prl-note">RECORDS LISTED BELOW — EACH ROW OPENS ITS OWN DETAIL.</p>
+          <p className="prl-note">EACH RECORD ROW OPENS ITS OWN DETAIL.</p>
+          <RecordDetailList records={railRecords} />
         </RailDialog>
-        <RecordDetailList records={railRecords} />
       </div>
     </>
   );
