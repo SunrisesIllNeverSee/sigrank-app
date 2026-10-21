@@ -2,14 +2,14 @@
    with full-stage-width Token Longevity beneath. Desktop Safari safe.
    Narrow windows scroll the STAGE, not shrink charts to illegible pixels. */
 .lbw-root:has(.ws-cmp-stage) .app{grid-template-rows:minmax(0,1fr)}
-.lbw-root:has(.ws-cmp-stage) .stage {display:flex;overflow:hidden;padding:8px}
-.lbw-root:has(.ws-cmp-stage) .stage>.board {display:flex;flex:1;min-width:0;min-height:0;padding:0}
-.lbw-root .ws-cmp-stage {flex:1;min-width:0;min-height:0}
+.lbw-root:has(.ws-cmp-stage) .stage {display:flex;overflow-x:hidden;overflow-y:auto;padding:8px}
+.lbw-root:has(.ws-cmp-stage) .stage>.board {display:flex;flex:1 1 0;min-width:0;min-height:min-content;padding:0}
+.lbw-root .ws-cmp-stage {flex:1 0 auto;min-width:0;min-height:0}
 .lbw-root .ws-cmp-stage .ws-cmp {
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(260px,1.3fr) minmax(0,1fr);
-  grid-template-rows:minmax(0,1fr) 120px;
-  height:100%;min-height:0;min-width:0;
+  grid-template-columns:minmax(0,1.05fr) minmax(250px,1.35fr) minmax(0,1.05fr);
+  grid-template-rows:auto auto 150px;
+  min-height:0;min-width:0;
   gap:8px;align-items:stretch;
 }
 /* Shared stage title still houses the live operand selectors. */
@@ -177,21 +177,66 @@
 .lbw-root .ws-cmp-stage .cmp-matchup-vs{padding:0;position:sticky;top:20px;align-self:start}
 .lbw-root .ws-cmp-stage .cmp-matchup-vs>span:first-child{font-size:18px;letter-spacing:0}
 .lbw-root .ws-cmp-stage .cmp-matchup-vs>span:last-child{font-size:11px}
-.lbw-root .ws-cmp-stage .cmp-operator-radars{
-  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:6px;min-width:0;min-height:0
-}
 .lbw-root .ws-cmp-stage .cmp-radar{
-  display:flex;flex-direction:column;align-items:stretch;
-  min-width:0;min-height:0;padding:4px;gap:3px
+  display:flex;flex-direction:column;align-items:stretch;margin:0;
+  min-width:0;padding:6px 4px 4px;gap:3px;
+  border:1px solid var(--line2);border-radius:8px;background:var(--panel)
 }
 .lbw-root .ws-cmp-stage .cmp-radar-heading{
   margin:0;font:700 10px var(--font-mono);
   letter-spacing:.08em;text-transform:uppercase;text-align:center
 }
-.lbw-root .ws-cmp-stage .cmp-radar svg{
-  display:block;width:100%;height:100%;min-height:0;flex:1
+.lbw-root .ws-cmp-stage .cmp-radar-heading small{
+  font:500 9px var(--font-mono);letter-spacing:.04em;color:var(--mut);text-transform:none
 }
-.lbw-root .ws-cmp-stage .cmp-radar svg text{font-size:12px}
+.lbw-root .ws-cmp-stage .cmp-rd-svg{display:block;width:100%;height:auto;overflow:visible}
+.lbw-root .ws-cmp-stage .cmp-rd-ring{fill:none;stroke:var(--line2);stroke-width:1;opacity:.55}
+.lbw-root .ws-cmp-stage .cmp-rd-ring.cmp-rd-rim{opacity:.95}
+.lbw-root .ws-cmp-stage .cmp-rd-spoke{stroke:var(--line2);stroke-width:1;opacity:.5}
+.lbw-root .ws-cmp-stage .cmp-rd-tick{font:9px var(--font-mono);fill:var(--mut);
+  paint-order:stroke;stroke:var(--panel);stroke-width:3px;stroke-linejoin:round}  /* halo: ring labels stay legible over the shapes */
+.lbw-root .ws-cmp-stage .cmp-rd-label{font:10px var(--font-mono);fill:var(--tx);font-variant-numeric:tabular-nums}
+.lbw-root .ws-cmp-stage .cmp-rd-label.cmp-rd-name{fill:var(--tx2)}
+.lbw-root .ws-cmp-stage .cmp-rd-label.cmp-rd-muted{fill:var(--mut)}
+.lbw-root .ws-cmp-stage .cmp-rd-label.cmp-rd-bold{font-weight:800}
+.lbw-root .ws-cmp-stage .cmp-rd-upsilon{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-style:italic}
+.lbw-root .ws-cmp-stage .cmp-rd-pillars{
+  margin:0;text-align:center;font:9.5px/1.4 var(--font-mono);color:var(--tx2)
+}
+.lbw-root .ws-cmp-stage .cmp-rd-pillars b{font-weight:800}
+.lbw-root .ws-cmp-stage .cmp-rd-ghostkey{
+  display:inline-block;width:12px;height:0;border-top:1.5px dashed;vertical-align:middle;margin-right:5px
+}
+.lbw-root .ws-cmp-stage .cmp-rd-caption{
+  margin:0;padding:0 6px;text-align:center;font:9px/1.35 var(--font-mono);color:var(--mut)
+}
+.lbw-root .ws-cmp-stage .cmp-rd-legend{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:4px 14px;margin:0;
+  font:600 10px var(--font-mono);color:var(--tx2)
+}
+.lbw-root .ws-cmp-stage .cmp-rd-legend i{
+  display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px
+}
+/* visually hidden data table equivalent of each radar */
+.lbw-root .cmp-sr{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0
+}
+/* Head to head band: full stage width beneath the columns */
+.lbw-root .ws-cmp-stage .ws-cmp-h2h{grid-column:1/-1;grid-row:2;min-width:0}
+.lbw-root .ws-cmp-stage .cmp-h2h{
+  padding:8px;border:1px solid var(--line2);border-radius:8px;background:var(--panel2)
+}
+.lbw-root .ws-cmp-stage .cmp-h2h-title{
+  margin:0 0 6px;font:700 11px var(--font-mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tx);text-align:center
+}
+.lbw-root .ws-cmp-stage .cmp-h2h-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px
+}
+.lbw-root .ws-cmp-stage .cmp-h2h-radar{min-width:0}
+.lbw-root .ws-cmp-stage .cmp-h2h-radar .cmp-rd-svg{max-width:520px;margin:0 auto}
+
 
 /* Shared diverging-bar statistics now in the CENTER column, with VS
    and the canonical head-to-head record above the bars. */
@@ -266,7 +311,7 @@
 /* Full-stage-width TOKEN LONGEVITY timeline beneath all three columns.
    The centered bar-stat ledger stops above it. */
 .lbw-root .ws-cmp-stage .ws-cmp-hist{
-  grid-column:1/-1;grid-row:2;min-width:0;min-height:0;
+  grid-column:1/-1;grid-row:3;min-width:0;min-height:0;
   border:1px solid var(--line2);border-radius:8px;background:var(--panel);padding:5px
 }
 .lbw-root .ws-cmp-stage .ws-cmp-hist>svg{display:block;width:100%;height:100%}
@@ -348,10 +393,22 @@
 }
 @media (max-height:650px), (max-width:1050px) {
   .lbw-root:has(.ws-cmp-stage) .stage{overflow:auto}
-  .lbw-root .ws-cmp-stage .ws-cmp{min-height:560px}
 }
 
 /* Visible FAQ (FaqSection variant="workspace" collapsed) sits under the fitted
    compare grid: stack the stage vertically so it takes one line at the foot. */
 .lbw-root:has(.ws-cmp-stage) .stage>.board:has(>.ws-faq){flex-direction:column}
 .lbw-root:has(.ws-cmp-stage) .stage>.board>.ws-faq{margin-top:8px;padding-top:6px}
+
+/* Narrow stage (side rails open on a small window): operators side by side,
+   ledger full width beneath them, head-to-head radars stacked. */
+@media (max-width:1180px){
+  .lbw-root .ws-cmp-stage .ws-cmp{
+    grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto auto 150px
+  }
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{grid-column:1/-1;grid-row:2}
+  .lbw-root .ws-cmp-stage .ws-cmp-h2h{grid-row:3}
+  .lbw-root .ws-cmp-stage .ws-cmp-hist{grid-row:4}
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{grid-column:2}
+  .lbw-root .ws-cmp-stage .cmp-h2h-grid{grid-template-columns:minmax(0,1fr)}
+}
