@@ -1,12 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { MyWatchlist } from "./MyWatchlist";
 import { WatchButton } from "@/components/live/WatchButton";
+import { usePhone } from "@/components/board-mobile/usePhone";
 import { RailDialog } from "./RailDialog";
 import "./profile-workspace.css";
 
@@ -19,6 +20,10 @@ const sections = ["overview", "stats", "analysis", "submissions", "social", "bad
 /** owner 2026-10-21: phone-only profile header (hidden above 760px by CSS). */
 function PhoneHeader({ name, codename, rank, tier, platform }: { name: string; codename: string; rank: number | null; tier: string; platform: string }) {
   const [note, setNote] = useState("");
+  const isPhone = usePhone();
+  const noteTimer = useRef<number | undefined>(undefined);
+  // owner 2026-10-21: clear the pending note timer on unmount.
+  useEffect(() => () => window.clearTimeout(noteTimer.current), []);
   const initials = name.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase() || "?";
   const share = async () => {
     const url = `${window.location.origin}/s/${encodeURIComponent(codename)}`;
@@ -29,7 +34,8 @@ function PhoneHeader({ name, codename, rank, tier, platform }: { name: string; c
     } catch (e) {
       if ((e as Error)?.name !== "AbortError") setNote("Could not share");
     }
-    window.setTimeout(() => setNote(""), 2500);
+    window.clearTimeout(noteTimer.current);
+    noteTimer.current = window.setTimeout(() => setNote(""), 2500);
   };
   return <header className="ws-pm-head" aria-label="Operator">
     <div className="ws-pm-id">
@@ -45,7 +51,8 @@ function PhoneHeader({ name, codename, rank, tier, platform }: { name: string; c
     <div className="ws-pm-actions">
       <button type="button" onClick={share}>Share</button>
       <Link href={`/compare?a=${encodeURIComponent(codename)}`}>Compare</Link>
-      <span className="ws-pm-watch"><WatchButton codename={codename} /></span>
+      {/* owner 2026-10-21: mount (and fetch) only on phones; the header is CSS-hidden above 760px. */}
+      <span className="ws-pm-watch">{isPhone ? <WatchButton codename={codename} /> : null}</span>
     </div>
     <p className="ws-pm-note" role="status" aria-live="polite">{note}</p>
   </header>;

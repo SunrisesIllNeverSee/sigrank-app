@@ -51,5 +51,7 @@
   .lbw-root .badge-explorer header span,.lbw-root .badge-note,.lbw-root .badge-ledger p,.lbw-root .badge-navigation p{font-size:12px}
   /* detail popover -> bottom sheet (positioned by CSS, ignores the hover x/y) */
   .badge-detail{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-height:70dvh;border-radius:14px 14px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));font-size:13px;box-shadow:0 0 0 100vmax rgba(0,0,0,.55)}
+  .badge-scrim{display:block!important;position:fixed;inset:0;z-index:9999;background:transparent}
+  .badge-detail:focus{outline:none}
   .badge-detail>button{min-width:44px;min-height:44px;font-size:16px}
 }
