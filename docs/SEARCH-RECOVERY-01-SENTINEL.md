@@ -90,4 +90,3 @@ list_sitemaps(siteUrl)                       → lastDownloaded advancing past 2
 - `lastCrawlTime` spread (Jul 8 – Sep 30) with uniform "Crawled — currently not indexed" confirms site-level reclassification, not per-page defects — the premise of this recovery.
 - Referrers show `/field` feeding most sentinels; `/field` itself is not in the cohort (consider for Phase 2 CORE classification review).
 - External referrers already present (`drjack.world`, `pitchhut.com`) — link equity exists; indexing is the bottleneck.
-- Competitor "vs sigrank" queries (`tokenmaxxer vs sigrank` pos 44, `tokscale vs sigrank` pos 69) generate impressions on *their* terms — once indexed, `/vs/*` can contest these.

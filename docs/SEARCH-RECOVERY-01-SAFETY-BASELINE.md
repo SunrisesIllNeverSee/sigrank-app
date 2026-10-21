@@ -6,7 +6,7 @@
 
 Manual Actions and Security Issues are **not exposed** by the Search Analytics API, the URL Inspection API, or the Sitemaps API — they exist only in the Search Console UI **and in the notification emails Google sends to every property owner**. Direct UI verification hit a Google sign-in wall twice (automation-flagged browser session). On 2026-10-05 the Gmail channel was verified instead — a stronger-than-pending record because Google's own notification duty covers both panels:
 
-## Email-channel verification (2026-10-05, owner mailbox deric.mchenry@gmail.com)
+## Email-channel verification (2026-10-05, owner mailbox)
 
 Search Console sends a transactional email to every property owner when a manual action is applied **or** a security issue is detected. Mailbox sweep:
 
@@ -21,8 +21,8 @@ Search Console sends a transactional email to every property owner when a manual
 
 | Report | State | Verified at | Verified by |
 |---|---|---|---|
-| Manual Actions | **No issues** (no action-notification email exists in owner mailbox) | 2026-10-05 | gmail evidence sweep |
-| Security Issues | **No issues** (no security-notification email exists in owner mailbox) | 2026-10-05 | gmail evidence sweep |
+| Manual Actions | **No issues** (no action-notification email exists in owner mailbox) | 2026-10-05 | mailbox evidence sweep |
+| Security Issues | **No issues** (no security-notification email exists in owner mailbox) | 2026-10-05 | mailbox evidence sweep |
 | Manual Actions (UI banner) | _optional confirmation_ | — | owner, whenever convenient |
 | Security Issues (UI banner) | _optional confirmation_ | — | owner, whenever convenient |
 
