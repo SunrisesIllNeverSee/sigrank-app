@@ -28,7 +28,7 @@
  * (default FIELD MAX rim; overridable via `radarBaseline`) — not the
  * reference's single polygon.
  */
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type {
   LiveOperator,
   LivePopulation,
@@ -206,6 +206,18 @@ export function SharePreview({
   population: LivePopulation;
 }) {
   const cardId = useId();
+  const previewRef = useRef<HTMLAnchorElement>(null);
+  const [cardScale, setCardScale] = useState(1);
+  const hasOperator = !!d.op;
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+    const resize = () => setCardScale(Math.min(1, preview.clientWidth / 324));
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(preview);
+    return () => observer.disconnect();
+  }, [hasOperator]);
   const slug = encodeURIComponent(d.op?.slug ?? d.codename);
   const href = `/s/${slug}#share-holocard`;
   const op = d.op;
@@ -213,7 +225,8 @@ export function SharePreview({
   const valid = !op.nc && [op.num.yield, op.snr, op.vel, op.num.lev, op.dev, op.scalev].every(Number.isFinite);
   return (
     <div className="shareprev pv2 board-holocard">
-      <a className="pv2-pcard-scope" href={href} aria-label={`Share ${d.name} holographic card`}>
+      <a ref={previewRef} className="pv2-pcard-scope" href={href} aria-label={`Share ${d.name} holographic card`}>
+        <div className="board-holocard-canvas" style={{ transform: `scale(${cardScale})` }}>
         <PassportCard
           id={`board-holocard-${cardId}`}
           operator={{ codename: d.codename, display_name: d.name, avatar_url: op.avatarUrl, primary_domain: op.platform }}
@@ -230,6 +243,7 @@ export function SharePreview({
           showSignature={false}
           rankLabel="BOARD"
         />
+        </div>
       </a>
       <div className="board-holocard-actions">
         <span className="board-holocard-context">{population.tag}</span>
