@@ -4,18 +4,19 @@
  * components/share/CompareMatchupCard.tsx — the downloadable matchup + radars card.
  *
  * Sibling of CompareShareCard. Combines the CompareMatchup (identity + 3 facts
- * per operator) and CompareRadars (raw shape + metric shape with ghost underlay)
+ * per operator) and the compare radars (per-operator composite + cascade stages)
  * into a single 1200×900 social card. Dark top section for the matchup, terminal-black
  * bottom section with CRT scanlines for the dual radars.
  *
- * Radars mirror the site's CascadeRadar: ghost layers on the metric radar, legend,
- * full axis labels with direction arrows (↑/↓), matching colors/opacity/vertex sizes.
+ * Radars use the /compare page math (lib/compare/radar-math.ts) with static hex SVG
+ * (owner 2026-10-21): each operator's percentile composite with a raw-pillar ghost,
+ * plus the head-to-head cascade stages on a log scale.
  *
  * Same html-to-image approach as CompareShareCard — off-screen element
  * captured to PNG, no server route / Satori.
  */
 
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { track } from "@/lib/infra/posthog/events";
 import type { LeaderboardRow } from "@/lib/board";
@@ -24,6 +25,17 @@ import { deriveFacts, type OperatorFact } from "@/lib/analytics/compare-facts";
 import { glyphFor } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
 import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
+import {
+  COMPOSITE_METRICS,
+  COMPOSITE_PILLARS,
+  cascadeStages,
+  compactNumber,
+  decadeLabel,
+  logScale,
+  percentilesFor,
+  sampleFromRow,
+  type FieldSample,
+} from "@/lib/compare/radar-math";
 
 // ── Palette (static hex — html-to-image can't resolve CSS vars) ──────────────
 const INK = "#0a0a0a";
@@ -98,292 +110,260 @@ function tally(
   return { aWins, bWins };
 }
 
-// ── Radar axis data (mirrors CompareRadars.tsx exactly) ──────────────────────
+// ── Card radars (owner 2026-10-21) ───────────────────────────────────────────
+// Same math as the /compare page radars (lib/compare/radar-math.ts): a per-operator
+// COMPOSITE (percentile in the field, 7 cascade metrics solid, 5 raw pillars as a
+// faint ghost) and a head-to-head CASCADE STAGES overlay on a shared log scale.
+// The page SVG (CompareRadarSvg) styles itself through theme CSS classes, which
+// html-to-image cannot carry into the export, so the card draws its own SVG with
+// static hex and inline attributes.
 
-interface RadarAxis {
-  label: string;
-  a: number;
-  b: number;
-  max: number;
-  higherWins: boolean;
+const MONO = 'ui-monospace, "SF Mono", Menlo, monospace';
+const SERIF = 'Georgia, "Times New Roman", serif';
+
+interface CardAxisLine {
+  text: string;
+  color?: string;
+  bold?: boolean;
 }
 
-function rawAxes(a: LeaderboardRow, b: LeaderboardRow): RadarAxis[] {
-  const ta = a.telemetry;
-  const tb = b.telemetry;
-  const totA = ta
-    ? ta.fresh_input + ta.output + ta.cache_read + ta.cache_create
-    : 0;
-  const totB = tb
-    ? tb.fresh_input + tb.output + tb.cache_read + tb.cache_create
-    : 0;
-  const ca = a.snapshot.cascade;
-  const cb = b.snapshot.cascade;
-  const mk = (
-    label: string,
-    av: number,
-    bv: number,
-    higherWins = true,
-  ): RadarAxis => ({
-    label,
-    a: av,
-    b: bv,
-    max: Math.max(av, bv, 1),
-    higherWins,
-  });
-  return [
-    mk("Input", ta?.fresh_input ?? 0, tb?.fresh_input ?? 0),
-    mk("Output", ta?.output ?? 0, tb?.output ?? 0),
-    mk("CR", ta?.cache_read ?? 0, tb?.cache_read ?? 0),
-    mk("CW", ta?.cache_create ?? 0, tb?.cache_create ?? 0),
-    mk("Total", totA, totB),
-    mk("Cost", ca?.costPerMillion ?? 0, cb?.costPerMillion ?? 0, false),
-  ];
-}
-
-function metricAxes(a: LeaderboardRow, b: LeaderboardRow): RadarAxis[] {
-  const ca = a.snapshot.cascade;
-  const cb = b.snapshot.cascade;
-  const comp = (c: typeof ca, pick: (x: NonNullable<typeof ca>) => number) =>
-    c && !c.nonCompounding ? pick(c) : 0;
-  const raw = (c: typeof ca, pick: (x: NonNullable<typeof ca>) => number) =>
-    c ? pick(c) : 0;
-  const mk = (
-    label: string,
-    av: number,
-    bv: number,
-    higherWins = true,
-  ): RadarAxis => ({
-    label,
-    a: av,
-    b: bv,
-    max: Math.max(av, bv, 1),
-    higherWins,
-  });
-  return [
-    mk(
-      "Υ Yield",
-      comp(ca, (x) => x.yield_),
-      comp(cb, (x) => x.yield_),
-    ),
-    mk(
-      "Leverage",
-      comp(ca, (x) => x.leverage),
-      comp(cb, (x) => x.leverage),
-    ),
-    mk(
-      "SNR",
-      raw(ca, (x) => x.snr),
-      raw(cb, (x) => x.snr),
-    ),
-    mk(
-      "Velocity",
-      raw(ca, (x) => x.velocity),
-      raw(cb, (x) => x.velocity),
-    ),
-    mk(
-      "10xDEV",
-      comp(ca, (x) => x.dev10x ?? 0),
-      comp(cb, (x) => x.dev10x ?? 0),
-    ),
-    mk(
-      "Efficacy",
-      raw(ca, (x) => x.efficiency),
-      raw(cb, (x) => x.efficiency),
-    ),
-    mk(
-      "$/1M",
-      raw(ca, (x) => x.costPerMillion),
-      raw(cb, (x) => x.costPerMillion),
-      false,
-    ),
-    mk(
-      "Op Ratio",
-      comp(ca, (x) => x.leverage),
-      comp(cb, (x) => x.leverage),
-    ),
-  ];
-}
-
-function proj(ax: RadarAxis, v: number): number {
-  const c = Math.max(0, Math.min(ax.max, v));
-  return ax.higherWins ? c : ax.max - c;
-}
-
-// ── Card radar — mirrors CascadeRadar.tsx output (ghost + solid + legend) ────
-
-interface CardRadarSeries {
-  name: string;
-  values: number[];
+interface CardLayer {
   color: string;
-  variant: "solid" | "ghost";
+  ghost?: boolean;
+  /** 0..1 radial position per axis of THIS layer; null = missing (no vertex). */
+  points: (number | null)[];
 }
 
-function CardRadar({
+/** Render Υ in a serif italic so it reads as Greek upsilon, not Latin Y. */
+function Glyphs({ text }: { text: string }) {
+  if (!text.includes("Υ")) return <>{text}</>;
+  const parts = text.split("Υ");
+  return (
+    <>
+      {parts.map((part, i) => (
+        <Fragment key={i}>
+          {part}
+          {i < parts.length - 1 ? (
+            <tspan fontFamily={SERIF} fontStyle="italic" fontWeight={700}>
+              Υ
+            </tspan>
+          ) : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+function CardRadarSvg({
+  width,
+  height,
+  radius,
   axes,
-  series,
-  size,
+  rings,
+  layers,
+  labelGap = 12,
+  lineHeight = 14,
 }: {
-  axes: { label: string; max: number }[];
-  series: CardRadarSeries[];
-  size: number;
+  width: number;
+  height: number;
+  radius: number;
+  axes: CardAxisLine[][];
+  rings: { r: number; label?: string }[];
+  layers: CardLayer[];
+  labelGap?: number;
+  lineHeight?: number;
 }) {
   const n = axes.length;
-  const cx = size / 2;
-  const cy = size / 2;
-  const radius = size / 2 - 56; // matches CascadeRadar — room for labels
-  const rings = [0.25, 0.5, 0.75, 1];
-  const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
-  const point = (i: number, r: number): [number, number] => {
-    const a = angleAt(i);
-    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
-  };
-  const norm = (value: number, max: number) => {
-    if (!max || !isFinite(max) || max <= 0) return 0;
-    return Math.max(0, Math.min(1, value / max));
-  };
-  const pathFor = (vals: number[]) =>
-    axes
-      .map((_, i) => {
-        const r = norm(vals[i] ?? 0, axes[i].max) * radius;
-        const [x, y] = point(i, r);
-        return `${i === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`;
-      })
-      .join(" ") + " Z";
-
-  // Sort: ghost layers first (behind), solid layers on top — matches CascadeRadar
-  const sorted = [...series]
-    .map((s, si) => ({ s, si }))
-    .sort(
-      (p, q) =>
-        (p.s.variant === "ghost" ? 0 : 1) - (q.s.variant === "ghost" ? 0 : 1),
-    );
+  const cx = width / 2;
+  const cy = height / 2;
+  const ang = (i: number, count: number) => -Math.PI / 2 + (i * 2 * Math.PI) / count;
+  const pt = (i: number, count: number, f: number): [number, number] => [
+    cx + Math.cos(ang(i, count)) * radius * f,
+    cy + Math.sin(ang(i, count)) * radius * f,
+  ];
+  const fmt = (p: [number, number]) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`;
+  const ordered = [...layers].sort((p, q) => Number(!!q.ghost) - Number(!!p.ghost));
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      style={{ display: "block" }}
-    >
-      {/* concentric grid rings */}
-      {rings.map((ring) => (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: "block" }}>
+      {rings.map((ring, k) => (
         <polygon
-          key={ring}
-          points={axes
-            .map((_, i) =>
-              point(i, ring * radius)
-                .map((v) => v.toFixed(2))
-                .join(","),
-            )
-            .join(" ")}
+          key={`ring-${k}`}
+          points={axes.map((_, i) => fmt(pt(i, n, ring.r))).join(" ")}
           fill="none"
           stroke={C_LINE}
           strokeWidth={1}
-          opacity={ring === 1 ? 0.9 : 0.5}
+          opacity={ring.r >= 1 ? 0.9 : 0.6}
         />
       ))}
-      {/* radial spokes */}
       {axes.map((_, i) => {
-        const [x, y] = point(i, radius);
-        return (
-          <line
-            key={`s-${i}`}
-            x1={cx}
-            y1={cy}
-            x2={x.toFixed(2)}
-            y2={y.toFixed(2)}
-            stroke={C_LINE}
-            strokeWidth={1}
-            opacity={0.4}
-          />
-        );
+        const [x, y] = pt(i, n, 1);
+        return <line key={`sp-${i}`} x1={cx} y1={cy} x2={x} y2={y} stroke={C_LINE} strokeWidth={1} opacity={0.5} />;
       })}
-      {/* data polygons — ghost first (fill-only), then solid (stroked) */}
-      {sorted.map(({ s, si }) => {
-        const ghost = s.variant === "ghost";
-        return (
-          <path
-            key={`poly-${si}`}
-            d={pathFor(s.values)}
-            fill={s.color}
-            fillOpacity={ghost ? 0.1 : 0.16}
-            stroke={ghost ? "none" : s.color}
-            strokeWidth={ghost ? 0 : 2}
-            strokeLinejoin="round"
-          />
-        );
-      })}
-      {/* data vertices — solid layers only */}
-      {series.map((s, si) =>
-        s.variant === "ghost"
-          ? null
-          : axes.map((_, i) => {
-              const [x, y] = point(
-                i,
-                norm(s.values[i] ?? 0, axes[i].max) * radius,
-              );
-              return (
-                <circle
-                  key={`pt-${si}-${i}`}
-                  cx={x.toFixed(2)}
-                  cy={y.toFixed(2)}
-                  r={3}
-                  fill={s.color}
-                />
-              );
-            }),
-      )}
-      {/* axis labels — bone, with direction arrows */}
-      {axes.map((ax, i) => {
-        const [lx, ly] = point(i, radius + 22);
-        const cos = Math.cos(angleAt(i));
-        const anchor =
-          Math.abs(cos) < 0.3 ? "middle" : cos > 0 ? "start" : "end";
-        return (
-          <text
-            key={`l-${i}`}
-            x={lx.toFixed(2)}
-            y={ly.toFixed(2)}
-            textAnchor={anchor}
-            dominantBaseline="middle"
-            fontSize={11}
-            fill={C_BONE}
-            fontWeight={600}
-            fontFamily="ui-monospace, monospace"
-            style={{ fontVariantNumeric: "tabular-nums" }}
-          >
-            {ax.label}
+      {rings.map((ring, k) =>
+        ring.label ? (
+          <text key={`rl-${k}`} x={cx + 3} y={cy - radius * ring.r + 10} fontSize={9} fill={C_DULL} fontFamily={MONO}>
+            {ring.label}
           </text>
+        ) : null,
+      )}
+      {ordered.map((layer, li) => {
+        const c = layer.points.length;
+        const pts = layer.points
+          .map((v, i) => (v === null ? null : pt(i, c, v)))
+          .filter((p): p is [number, number] => p !== null);
+        return (
+          <g key={li}>
+            {pts.length >= 3 ? (
+              <polygon
+                points={pts.map(fmt).join(" ")}
+                fill={layer.color}
+                fillOpacity={layer.ghost ? 0.12 : 0.17}
+                stroke={layer.color}
+                strokeOpacity={layer.ghost ? 0.5 : 1}
+                strokeWidth={layer.ghost ? 1.2 : 2.5}
+                strokeDasharray={layer.ghost ? "3 3" : undefined}
+                strokeLinejoin="round"
+              />
+            ) : pts.length === 2 ? (
+              <polyline points={pts.map(fmt).join(" ")} fill="none" stroke={layer.color} strokeWidth={2.5} />
+            ) : null}
+            {layer.points.map((v, i) => {
+              if (v === null) return null;
+              const [x, y] = pt(i, c, v);
+              return layer.ghost ? (
+                <circle key={i} cx={x} cy={y} r={2.4} fill="none" stroke={layer.color} strokeOpacity={0.7} strokeWidth={1} />
+              ) : (
+                <circle key={i} cx={x} cy={y} r={3.6} fill={layer.color} />
+              );
+            })}
+          </g>
         );
       })}
-      {/* legend — solid layers only, top-left */}
-      {series
-        .filter((s) => s.variant !== "ghost")
-        .map((s, si) => (
-          <g key={`leg-${si}`}>
-            <rect
-              x={8}
-              y={8 + si * 16}
-              width={10}
-              height={10}
-              rx={2}
-              fill={s.color}
-            />
-            <text
-              x={22}
-              y={17 + si * 16}
-              fill={C_BONE}
-              fontSize={10}
-              fontFamily="ui-monospace, monospace"
-            >
-              {s.name}
-            </text>
+      {axes.map((lines, i) => {
+        const a = ang(i, n);
+        const cos = Math.cos(a);
+        const sin = Math.sin(a);
+        const [px, py] = pt(i, n, 1);
+        const lx = px + cos * labelGap;
+        const ly = py + sin * labelGap;
+        const anchor = Math.abs(cos) < 0.25 ? "middle" : cos > 0 ? "start" : "end";
+        const count = lines.length;
+        let y0: number;
+        if (sin < -0.5) y0 = ly - (count - 1) * lineHeight - 2;
+        else if (sin > 0.5) y0 = ly + lineHeight * 0.85;
+        else y0 = ly - ((count - 1) * lineHeight) / 2 + 4;
+        return (
+          <g key={`ax-${i}`}>
+            {lines.map((line, j) => (
+              <text
+                key={j}
+                x={lx}
+                y={y0 + j * lineHeight}
+                textAnchor={anchor}
+                fontSize={12}
+                fontFamily={MONO}
+                fontWeight={line.bold || j === 0 ? 700 : 500}
+                fill={line.color ?? (j === 0 ? C_BONE : C_DULL)}
+              >
+                <Glyphs text={line.text} />
+              </text>
+            ))}
           </g>
-        ))}
+        );
+      })}
     </svg>
   );
 }
+
+const pctText = (pct: number | null) => (pct === null ? "n/a" : String(Math.round(pct)));
+
+function CompositeRadar({ sample, field, color }: { sample: FieldSample; field: FieldSample[]; color: string }) {
+  const metrics = percentilesFor(sample, field, COMPOSITE_METRICS);
+  const pillars = percentilesFor(sample, field, COMPOSITE_PILLARS);
+  const axes: CardAxisLine[][] = metrics.map((m) => [
+    { text: m.short },
+    { text: pctText(m.pct), color: m.pct === null ? undefined : color, bold: true },
+  ]);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <CardRadarSvg
+        width={380}
+        height={420}
+        radius={110}
+        labelGap={10}
+        axes={axes}
+        rings={[{ r: 0.25 }, { r: 0.5 }, { r: 0.75 }, { r: 1 }]}
+        layers={[
+          { color, ghost: true, points: pillars.map((p) => (p.pct === null ? null : p.pct / 100)) },
+          { color, points: metrics.map((m) => (m.pct === null ? null : m.pct / 100)) },
+        ]}
+      />
+      <div style={{ fontSize: 10.5, color: C_DULL, textAlign: "center", lineHeight: 1.5 }}>
+        <span
+          style={{
+            display: "inline-block",
+            width: 14,
+            height: 0,
+            borderTop: `1.5px dashed ${color}`,
+            marginRight: 6,
+            verticalAlign: "middle",
+          }}
+        />
+        RAW{" "}
+        {pillars.map((p, i) => (
+          <span key={p.key}>
+            {i ? " · " : ""}
+            {p.key === "total" ? "Σ" : p.short} <b style={{ color: p.pct === null ? C_DULL : color }}>{pctText(p.pct)}</b>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const STAGE_DEFS = [
+  { key: "transmission", label: "Transmission" },
+  { key: "commitment", label: "Commitment" },
+  { key: "reuse", label: "Reuse" },
+  { key: "leverage", label: "Leverage" },
+  { key: "yield_", label: "Υ Yield" },
+] as const;
+
+function StagesRadar({ a, b }: { a: FieldSample; b: FieldSample }) {
+  const sa = cascadeStages(a);
+  const sb = cascadeStages(b);
+  const scale = logScale(STAGE_DEFS.flatMap((d) => [sa[d.key], sb[d.key]]));
+  const axes: CardAxisLine[][] = STAGE_DEFS.map((d) => {
+    const va = sa[d.key];
+    const vb = sb[d.key];
+    const winner = va !== null && vb !== null && va !== vb ? (va > vb ? "a" : "b") : null;
+    return [
+      { text: d.label },
+      { text: `${winner === "a" ? "● " : ""}${compactNumber(va)}`, color: va === null ? undefined : A_COLOR, bold: winner === "a" },
+      { text: `${winner === "b" ? "● " : ""}${compactNumber(vb)}`, color: vb === null ? undefined : B_COLOR, bold: winner === "b" },
+    ];
+  });
+  const layer = (s: typeof sa, color: string): CardLayer => ({
+    color,
+    points: STAGE_DEFS.map((d) => scale.project(s[d.key])),
+  });
+  return (
+    <CardRadarSvg
+      width={440}
+      height={460}
+      radius={132}
+      labelGap={12}
+      axes={axes}
+      rings={scale.ticks.map((e) => ({
+        r: (e - scale.loExp) / (scale.hiExp - scale.loExp),
+        label: decadeLabel(e),
+      }))}
+      layers={[layer(sa, A_COLOR), layer(sb, B_COLOR)]}
+    />
+  );
+}
+
 
 // ── Fact line for the card ───────────────────────────────────────────────────
 
@@ -429,10 +409,12 @@ function Card({
   cardRef,
   a,
   b,
+  field,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>;
   a: LeaderboardRow;
   b: LeaderboardRow;
+  field: FieldSample[];
 }) {
   const nameA = operatorDisplayName(a).toUpperCase();
   const nameB = operatorDisplayName(b).toUpperCase();
@@ -446,65 +428,8 @@ function Card({
   const factsA = deriveFacts(a, b).slice(0, 3);
   const factsB = deriveFacts(b, a).slice(0, 3);
 
-  // Build radar data — mirrors CompareRadars.tsx
-  const rAxes = rawAxes(a, b);
-  const mAxes = metricAxes(a, b);
-  // Ghost backdrop for metric radar = raw footprint normalized 0..1, padded to 8 axes
-  const ghostA = rAxes.map((ax) => proj(ax, ax.a) / ax.max);
-  const ghostB = rAxes.map((ax) => proj(ax, ax.b) / ax.max);
-  const fit = (arr: number[]) =>
-    Array.from({ length: mAxes.length }, (_, i) => arr[i % arr.length] ?? 0);
-
-  // Radar axes with direction arrows (matches CompareRadars RadarBlock)
-  const rawRadarAxes = rAxes.map((ax) => ({
-    label: `${ax.label} ${ax.higherWins ? "↑" : "↓"}`,
-    max: ax.max,
-  }));
-  const metricRadarAxes = mAxes.map((ax) => ({
-    label: `${ax.label} ${ax.higherWins ? "↑" : "↓"}`,
-    max: ax.max,
-  }));
-
-  const rawSeries: CardRadarSeries[] = [
-    {
-      name: operatorDisplayName(a),
-      values: rAxes.map((ax) => proj(ax, ax.a)),
-      color: A_COLOR,
-      variant: "solid",
-    },
-    {
-      name: operatorDisplayName(b),
-      values: rAxes.map((ax) => proj(ax, ax.b)),
-      color: B_COLOR,
-      variant: "solid",
-    },
-  ];
-  const metricSeries: CardRadarSeries[] = [
-    {
-      name: `${operatorDisplayName(a)} raw`,
-      values: fit(ghostA).map((v, i) => v * (mAxes[i]?.max ?? 1)),
-      color: A_COLOR,
-      variant: "ghost",
-    },
-    {
-      name: `${operatorDisplayName(b)} raw`,
-      values: fit(ghostB).map((v, i) => v * (mAxes[i]?.max ?? 1)),
-      color: B_COLOR,
-      variant: "ghost",
-    },
-    {
-      name: operatorDisplayName(a),
-      values: mAxes.map((ax) => proj(ax, ax.a)),
-      color: A_COLOR,
-      variant: "solid",
-    },
-    {
-      name: operatorDisplayName(b),
-      values: mAxes.map((ax) => proj(ax, ax.b)),
-      color: B_COLOR,
-      variant: "solid",
-    },
-  ];
+  const sampleA = sampleFromRow(a);
+  const sampleB = sampleFromRow(b);
 
   return (
     <div
@@ -821,8 +746,7 @@ function Card({
         <div
           style={{
             display: "flex",
-            justifyContent: "space-around",
-            padding: "10px 0",
+            padding: "10px 15px 0",
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: 1,
@@ -831,8 +755,9 @@ function Card({
             zIndex: 2,
           }}
         >
-          <span>RAW SHAPE</span>
-          <span>METRIC SHAPE</span>
+          <span style={{ width: 380, textAlign: "center", color: A_COLOR }}>{nameA} · COMPOSITE</span>
+          <span style={{ width: 410, textAlign: "center" }}>CASCADE STAGES · LOG SCALE</span>
+          <span style={{ width: 380, textAlign: "center", color: B_COLOR }}>{nameB} · COMPOSITE</span>
         </div>
 
         {/* radars */}
@@ -841,14 +766,17 @@ function Card({
             flex: 1,
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-around",
+            justifyContent: "center",
             position: "relative",
             zIndex: 2,
-            padding: "0 20px",
+            padding: "0 15px",
           }}
         >
-          <CardRadar axes={rawRadarAxes} series={rawSeries} size={460} />
-          <CardRadar axes={metricRadarAxes} series={metricSeries} size={460} />
+          <CompositeRadar sample={sampleA} field={field} color={A_COLOR} />
+          <div style={{ width: 410, display: "flex", justifyContent: "center", marginLeft: 0 }}>
+            <StagesRadar a={sampleA} b={sampleB} />
+          </div>
+          <CompositeRadar sample={sampleB} field={field} color={B_COLOR} />
         </div>
 
         {/* footer */}
@@ -867,7 +795,7 @@ function Card({
         >
           <span style={{ color: A_COLOR }}>{aWins} WINS</span>
           <span style={{ color: "#4a6a4a", fontSize: 9 }}>
-            ↑ HIGHER BETTER · ↓ LOWER BETTER · GHOST = RAW FOOTPRINT
+            COMPOSITE = PERCENTILE IN FIELD OF ${field.length} · $/1M INVERTED · DASHED = RAW PILLARS · ● = HIGHER STAGE · TOKEN-FLOW SHAPE, NOT A QUALITY SCORE
           </span>
           <span style={{ color: C_GOLD }}>{bWins} WINS</span>
         </div>
@@ -896,9 +824,11 @@ export interface CompareMatchupCardProps {
   a: LeaderboardRow;
   b: LeaderboardRow;
   href: string;
+  /** Field samples for the composites, same as the page: board.map(sampleFromRow). */
+  field: FieldSample[];
 }
 
-export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
+export function CompareMatchupCard({ a, b, href, field }: CompareMatchupCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -988,7 +918,7 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
         }}
         aria-hidden
       >
-        <Card cardRef={cardRef} a={a} b={b} />
+        <Card cardRef={cardRef} a={a} b={b} field={field} />
       </div>
 
       {preview && (
@@ -1014,7 +944,7 @@ export function CompareMatchupCard({ a, b, href }: CompareMatchupCardProps) {
                 transformOrigin: "top left",
               }}
             >
-              <Card cardRef={cardRef} a={a} b={b} />
+              <Card cardRef={cardRef} a={a} b={b} field={field} />
             </div>
           </div>
         </div>
