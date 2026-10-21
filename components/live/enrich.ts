@@ -71,6 +71,7 @@ interface ApiRecords {
     title?: string;
     value?: string;
     achieved_at?: string;
+    is_placeholder?: boolean;
   }[];
   dynamic_records?: {
     metric?: string;
@@ -79,6 +80,16 @@ interface ApiRecords {
     value?: string;
     window?: string;
   }[];
+}
+
+interface ApiEarnedMarks {
+  platform_marks?: { id: string; label: string; detail: string; pattern: string }[];
+  scored_snapshots?: number;
+  medals?: { canon_id: string; name: string; rank: number; value: string }[];
+  hall?: { title: string; value: string; date: string }[];
+  pending?: boolean;
+  percentile?: number | null;
+  processed_tokens?: number | null;
 }
 
 interface ApiSnapshots {
@@ -117,6 +128,8 @@ export interface LiveStaticRecord {
   value: string;
   /** achieved_at, ISO — display form handled by the consumer. */
   date: string;
+  /** Hall placeholder row — not an earned record. */
+  placeholder?: boolean;
 }
 
 /** One scored submission from the claimed-only snapshot ledger. */
@@ -162,6 +175,21 @@ export interface LiveOperatorDetail extends Partial<LiveOperator> {
    *  (limit 365), NOT the display feed's HISTORY_LIMIT=60 window and
    *  never account_age_days. Absent when the evidence fetch failed. */
   activeDays?: number;
+  /** Platform token-ladder pixel badges the operator holds (owner
+   *  2026-10-21: AWARDS & BADGES must match the profile Badges tab). */
+  platformMarks?: { id: string; label: string; detail: string; pattern: string }[];
+  /** Scored snapshots on record — snapshot-milestone evidence. */
+  scoredSnapshots?: number;
+  /** Ranked metric medals + Hall records + standing inputs from the same
+   *  claimed all-time board the profile Badges tab reads (the /records
+   *  channel ranks a different field and can come back empty). */
+  earned?: {
+    medals: { canonId: string; name: string; rank: number; value: string }[];
+    hall: { title: string; value: string; date: string }[];
+    pending: boolean;
+    percentile: number | null;
+    processedTokens: number | null;
+  };
   /** Channels that failed during this load (partial failure is still ready). */
   errors?: Partial<Record<DetailChannel, true>>;
 }
@@ -250,7 +278,7 @@ async function loadDetail(
   const enc = encodeURIComponent(codename);
   const errors: NonNullable<LiveOperatorDetail["errors"]> = {};
 
-  const [opRes, histRes, recsRes, actRes] = await Promise.allSettled([
+  const [opRes, histRes, recsRes, actRes, marksRes] = await Promise.allSettled([
     fetchOperatorProfile(codename),
     api<ApiHistory>(
       `/api/v1/operators/${enc}/history?window=${encodeURIComponent(
@@ -268,6 +296,9 @@ async function loadDetail(
     api<ApiHistory>(
       `/api/v1/operators/${enc}/history?window=all_time&limit=365`,
     ),
+    /* owner 2026-10-21: earned marks computed like the profile Badges tab
+       (platform pixels, medals, Hall records, snapshot count). */
+    api<ApiEarnedMarks>(`/api/v1/operators/${enc}/earned-marks`),
   ]);
 
   const det: LiveOperatorDetail = { errors };
@@ -344,9 +375,28 @@ async function loadDetail(
       title: s.title ?? "Record",
       value: s.value ?? "—",
       date: s.achieved_at ?? "",
+      placeholder: s.is_placeholder === true,
     }));
   } else {
     errors.records = true;
+  }
+
+  if (marksRes.status === "fulfilled") {
+    const m = marksRes.value;
+    det.platformMarks = m.platform_marks ?? [];
+    det.scoredSnapshots = m.scored_snapshots ?? 0;
+    det.earned = {
+      medals: (m.medals ?? []).map((x) => ({
+        canonId: x.canon_id,
+        name: x.name,
+        rank: x.rank,
+        value: x.value,
+      })),
+      hall: m.hall ?? [],
+      pending: m.pending === true,
+      percentile: m.percentile ?? null,
+      processedTokens: m.processed_tokens ?? null,
+    };
   }
 
   /* snapshot ledger — claimed-only upstream (404 on unclaimed). Eligibility:
