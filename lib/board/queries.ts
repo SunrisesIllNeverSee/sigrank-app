@@ -1083,6 +1083,10 @@ export async function getHallOfSignal(
         title:
           r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? "Hall of Signal",
         operator_codename: operatorName(r),
+        codename:
+          r.operators?.operator_id && publicIds.has(r.operators.operator_id)
+            ? r.operators.codename || undefined
+            : undefined,
         value: note || (r.badges?.badge_name ?? ""),
         date: (r.awarded_at ?? "").slice(0, 10),
         isPlaceholder: false,
