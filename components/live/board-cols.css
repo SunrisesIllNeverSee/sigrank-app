@@ -248,6 +248,9 @@
    scrollers made three regions move at once. With the card undocked the
    stage scrolls as before and only the horizontal freeze applies. */
 .lbw-root{--pin-rank-w:58px;--pin-op-w:240px}
+@media (min-width:1051px) and (max-width:1500px){
+  .lbw-root:has(.board-filter-actions){--lside-w:clamp(200px,17vw,248px);--rail-w:clamp(240px,20vw,332px)}
+}
 .lbw-root .stage.stage-board{overflow:hidden;display:flex;flex-direction:column;padding-bottom:12px}
 .lbw-root .stage.stage-board>.board{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-bottom:0}
 .lbw-root .stage.stage-board .tablecard{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
