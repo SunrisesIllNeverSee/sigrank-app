@@ -92,7 +92,6 @@ export function PassportCard({
   selectedSecondaryBadge,
   showSignature = true,
   rankLabel = "FIELD",
-  id,
 }: PassportCardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
