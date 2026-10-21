@@ -1,8 +1,9 @@
 /**
  * lib/search/page-index.ts — page index for the title-bar global search
  * (owner 2026-10-21). Built from existing sources, never a parallel list:
- *   - lib/seo/search-index-policy ROUTE_CLASSES (every live static route;
- *     UTILITY/REDIRECT excluded so forms and redirects never show up)
+ *   - lib/seo/search-index-policy ROUTE_CLASSES, CORE + SUPPORTED only:
+ *     HOLD routes are deliberately unadvertised (some are flag-gated and can
+ *     404), and UTILITY/REDIRECT are forms and redirects
  *   - content/blog + static posts via lib/editorial/blog-index (real titles)
  *   - WIKI_PAGES from lib/seo/llms-pages (real wiki titles)
  * Routes with no editorial title fall back to a humanized path segment.
@@ -52,7 +53,7 @@ export async function buildPageIndex(): Promise<SearchPage[]> {
   const byPath = new Map<string, SearchPage>();
 
   for (const [path, cls] of Object.entries(ROUTE_CLASSES)) {
-    if (cls === "UTILITY" || cls === "REDIRECT") continue;
+    if (cls !== "CORE" && cls !== "SUPPORTED") continue;
     const first = path.split("/").filter(Boolean)[0] ?? "";
     byPath.set(path, {
       path,
