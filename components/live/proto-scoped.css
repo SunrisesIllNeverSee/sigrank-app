@@ -1169,14 +1169,14 @@
 .lbw-root[data-theme="purple"]{--gold:181 101 255;--bg-border:53 37 82;--text-primary:239 231 250}
 
 /* hall medal cards — horizontal compare-slot-style tiles */
-.lbw-root .podrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lbw-root .podrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-width:0}
 .lbw-root .podcard{display:flex;flex-direction:column;align-items:center;
   gap:5px;border:1px solid var(--line2);border-radius:8px;padding:10px 6px;
-  color:var(--tx2)}
+  color:var(--tx2);min-width:0;max-width:100%}
 .lbw-root .podcard:hover{border-color:var(--ac);background:var(--chip)}
 .lbw-root .podcard .mav{width:30px;height:30px;font-size:11px}
 .lbw-root .podcard .tm{font-size:9px;text-transform:uppercase;letter-spacing:.06em;
-  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  width:100%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lbw-root .podcard .tv{color:var(--ac);font-size:9px}
 .lbw-root .podcard.empty{color:var(--mut);justify-content:center;font-size:12px}
 

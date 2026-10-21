@@ -246,6 +246,7 @@ function MedalDeck({
               key={o.codename}
               type="button"
               className="podcard"
+              title={o.name}
               onClick={() => onSelect?.(k)}
             >
               <SignalMedal rank={medalRank} size={26} />
