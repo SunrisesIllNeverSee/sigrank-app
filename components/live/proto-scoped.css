@@ -1849,7 +1849,10 @@
 /* Match SigRank's fitted, centered hero rhythm within the text stage. */
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse){container-type:inline-size;padding:16px 22px 30px;margin-bottom:18px}
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse)>div{padding:0;gap:16px;width:100%;min-width:0}
-.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{--tbt-max:1.5rem!important;max-width:100%;line-height:1.1}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{
+  max-width:100%;line-height:1;
+  font-size:clamp(2px,calc(var(--tbt-fit,2cqw) * .78),min(var(--tbt-max,1.3rem),.875rem))}
+.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-row{margin-bottom:0}
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) h1{font-size:clamp(22px,5cqw,40px);line-height:1.2}
 .lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) p{font-size:clamp(12px,2.1cqw,17px);line-height:1.6;max-width:60ch;text-wrap:balance}
 .lbw-root .app:has(.ws-editorial-sidebar){grid-template-rows:minmax(0,1fr);overflow:hidden}
@@ -1866,7 +1869,6 @@
 .lbw-root .ws-field-index .blog-row-main{padding-left:36px}
 /* Slightly smaller pixel titles throughout the editorial family. */
 /* min 2px (was 4px): long titles like STATE OF THE INDEX clipped on phones */
-.lbw-root .ws-editorial-stage header:has(> svg .cascade-pulse) .tbt-fit{font-size:clamp(2px,calc(var(--tbt-fit,2cqw) * .68),1.05rem)}
 .lbw-root .sigrank-column-hero pre{font-size:clamp(7px,1.9cqw,18px)}
 
 .lbw-root .ws-topic-branch > summary .ws-tree-title{font-weight:700}
