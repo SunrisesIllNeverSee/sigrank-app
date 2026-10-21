@@ -62,6 +62,8 @@ import { snapshotThroughput } from "@/lib/board/throughput";
 import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { CompareStage } from "@/components/compare/CompareStage";
+import { CompareHeadToHead } from "@/components/compare/CompareRadars";
+import { sampleFromRow } from "@/lib/compare/radar-math";
 import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
 import "@/components/compare/compare-workspace.css";
 
@@ -433,10 +435,13 @@ export default async function ComparePage({
         <CompareStage>
         <div id="compare-vs-artwork" className="ws-cmp">
           <div className="ws-cmp-match">
-            <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors />
+            <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors field={board.map(sampleFromRow)} />
           </div>
           <div className="ws-cmp-ledger">
             <CompareLedger a={rowA} b={rowB} workspace />
+          </div>
+          <div className="ws-cmp-h2h">
+            <CompareHeadToHead a={rowA} b={rowB} />
           </div>
           <div className="ws-cmp-hist">
             <CompareHistoryChart
