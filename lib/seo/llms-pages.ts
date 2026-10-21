@@ -10,7 +10,7 @@ import { isSitemapPromoted } from "@/lib/seo/search-index-policy";
 
 /** Wiki subpages with stable titles (route → label). Unclassified/HOLD
  *  entries are filtered out by the manifest below. */
-const WIKI_PAGES: { path: string; title: string }[] = [
+export const WIKI_PAGES: { path: string; title: string }[] = [
   { path: "/wiki/four-degrees", title: "The Four Degrees of Leverage" },
   { path: "/wiki/verification", title: "Verification & Integrity Tests" },
   { path: "/wiki/methodology-refinement", title: "How We Got Here — Refining the Index" },

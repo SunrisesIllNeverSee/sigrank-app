@@ -3,6 +3,7 @@
 import { WorkspaceAccountOptions } from "./WorkspaceAccountOptions";
 
 import { GroupedRailNav } from "./GroupedRailNav";
+import { GlobalSearch } from "./GlobalSearch";
 
 /**
  * components/live/WorkspaceShell.tsx — the shared SignalAF workspace frame
@@ -475,15 +476,23 @@ export function WorkspaceShell({
             )}
 
             <div className="stagecol">
-              {title != null &&
-                (bareTitle ? (
-                  srOnlyTitle ? <h1 className="sr-only">{title}</h1> : null
-                ) : (
-                  <div className="stitle">
+              {/* owner 2026-10-21: site-wide search sits at the right end of the title
+                  row so it is never hidden by a collapsed sidebar; bare/untitled
+                  pages get a search-only row. */}
+              {title != null && !bareTitle ? (
+                <div className="stitle">
+                  <div className="stitle-main">
                     <h1 className="pagetitle">{title}</h1>
                     {titleControls}
                   </div>
-                ))}
+                  <GlobalSearch label="Search operators and pages" />
+                </div>
+              ) : (
+                <div className="stitle">
+                  {title != null && srOnlyTitle && <h1 className="sr-only">{title}</h1>}
+                  <GlobalSearch label="Search operators and pages" />
+                </div>
+              )}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
               <main ref={stageElRef} className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
                 <div className="board">
