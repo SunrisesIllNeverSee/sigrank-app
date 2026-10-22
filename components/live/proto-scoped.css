@@ -966,14 +966,15 @@
    row (.stitle), independent of either sidebar's collapsed state; results drop
    down below it, grouped Operators / Pages. Title cell shrinks/ellipsizes. */
 .lbw-root .stagecol{container-type:inline-size;container-name:stagecol}
-.lbw-root .stitle{--gs-w:clamp(170px,24cqw,280px);display:grid;grid-template-columns:minmax(0,1fr) var(--gs-w);
+.lbw-root .stitle{--gs-w:clamp(170px,24cqw,280px);display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
   align-items:center;column-gap:12px;padding-inline:14px;position:relative;z-index:70}
-.lbw-root .stitle-main{grid-column:1;grid-row:1;display:flex;align-items:baseline;justify-content:center;gap:8px;min-width:0}
+.lbw-root .stitle-main{grid-column:2;grid-row:1;display:flex;align-items:baseline;justify-content:center;gap:8px;min-width:0}
 .lbw-root .stitle-main .pagetitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lbw-root .stitle .gs-root{grid-column:2;grid-row:1;justify-self:end}
+.lbw-root .stitle .gs-root{grid-column:3;grid-row:1;justify-self:end}
 /* narrow stage (sidebars open): search drops to its own row under the title */
 @container stagecol (max-width:620px){
   .lbw-root .stitle{grid-template-columns:minmax(0,1fr);row-gap:6px}
+  .lbw-root .stitle-main{grid-column:1;grid-row:1}
   .lbw-root .stitle .gs-root{grid-column:1;grid-row:2;justify-self:stretch;max-width:none}
 }
 .lbw-root .gs-root{position:relative;width:100%;max-width:var(--gs-w,280px);min-width:0}
