@@ -9,6 +9,7 @@
  * compare-workspace.css, so every workspace theme restyles the grid and text.
  */
 import type { ReactNode } from "react";
+import { RADAR_REF_STYLE, type RadarRef } from "@/lib/radar/points";
 
 export interface RadarLine {
   text: string;
@@ -40,6 +41,13 @@ export interface RadarLayer {
   titles?: string[];
 }
 
+/** White reference line (field first / middle / last operator), drawn under the layers. */
+export interface RadarRefLine {
+  role: RadarRef["role"];
+  points: (number | null)[];
+  title?: string;
+}
+
 const UPSILON = "Υ";
 
 /** Render text with Υ in a serif face so it reads as Greek upsilon, not Latin Y. */
@@ -67,6 +75,7 @@ export function RadarSvg({
   axes,
   rings,
   layers,
+  refs = [],
   ariaLabel,
   labelGap = 10,
   lineHeight = 11.5,
@@ -79,6 +88,7 @@ export function RadarSvg({
   axes: RadarAxis[];
   rings: RadarRing[];
   layers: RadarLayer[];
+  refs?: RadarRefLine[];
   ariaLabel: string;
   labelGap?: number;
   lineHeight?: number;
@@ -134,6 +144,30 @@ export function RadarSvg({
           </text>
         ) : null,
       )}
+
+      {refs.map((ref) => {
+        const pts = ref.points
+          .map((v, i) => (v === null ? null : pt(i, ref.points.length, v)))
+          .filter((p): p is [number, number] => p !== null);
+        if (pts.length < 3) return null;
+        const st = RADAR_REF_STYLE[ref.role];
+        return (
+          <polygon
+            key={`ref-${ref.role}`}
+            className="cmp-rd-ref"
+            data-ref={ref.role}
+            points={pts.map(fmt).join(" ")}
+            fill="none"
+            style={{ stroke: "var(--tx, #ffffff)" }}
+            strokeOpacity={st.opacity}
+            strokeWidth={st.width}
+            strokeDasharray={st.dash}
+            strokeLinejoin="round"
+          >
+            {ref.title ? <title>{ref.title}</title> : null}
+          </polygon>
+        );
+      })}
 
       {ordered.map((layer) => {
         const shape = shapePath(layer);

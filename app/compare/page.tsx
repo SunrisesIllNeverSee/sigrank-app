@@ -64,7 +64,7 @@ import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { CompareMobileScore } from "@/components/compare/CompareMobileScore";
 import { CompareStage } from "@/components/compare/CompareStage";
 import { CompareHeadToHead } from "@/components/compare/CompareRadars";
-import { sampleFromRow } from "@/lib/compare/radar-math";
+import { scoreRadarField } from "@/lib/radar/points";
 import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
 import "@/components/compare/compare-workspace.css";
 
@@ -176,6 +176,13 @@ export default async function ComparePage({
     claimedOnly: true,
     mode: "all",
   }).catch(() => []));
+  // Roto points for every /compare radar, scored once over the live field.
+  const radars = {
+    composite: scoreRadarField(board, "composite"),
+    stages: scoreRadarField(board, "stages"),
+    mix: scoreRadarField(board, "mix"),
+    share: scoreRadarField(board, "share"),
+  };
   const daySeed = Math.floor(Date.now() / 86_400_000);
   const pair = resolveLiveComparePair(board, a, b, daySeed);
   const rowA = pair?.[0] ?? null;
@@ -407,13 +414,20 @@ export default async function ComparePage({
                   a={toOperand(rowA)}
                   b={toOperand(rowB)}
                   href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
+                  radar={{
+                    max: radars.share.max,
+                    a: radars.share.points[aCode] ?? [],
+                    b: radars.share.points[bCode] ?? [],
+                    refs: radars.share.refs.map(({ role, pts }) => ({ role, pts })),
+                  }}
                 />
               </div>
               <div className="ws-share" style={{ marginTop: 10 }}>
                 <DeferredCompareMatchupCard
                   a={rowA}
                   b={rowB}
-                  field={board.map(sampleFromRow)}
+                  composite={radars.composite}
+                  stages={radars.stages}
                   href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
                 />
               </div>
@@ -450,13 +464,13 @@ export default async function ComparePage({
             href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
           />
           <div className="ws-cmp-match">
-            <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors field={board.map(sampleFromRow)} />
+            <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors field={radars.composite} />
           </div>
           <div className="ws-cmp-ledger">
             <CompareLedger a={rowA} b={rowB} workspace />
           </div>
           <div className="ws-cmp-h2h">
-            <CompareHeadToHead a={rowA} b={rowB} />
+            <CompareHeadToHead a={rowA} b={rowB} stages={radars.stages} mix={radars.mix} />
           </div>
           <div className="ws-cmp-hist cmp-hist-desk">
             <CompareHistoryChart

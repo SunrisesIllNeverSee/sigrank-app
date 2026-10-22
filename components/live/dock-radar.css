@@ -33,3 +33,7 @@
 .lbw-root .dockr-chip.op .sw{background:var(--ac)}
 .lbw-root .dockr-chip.base{color:var(--mut)}
 .lbw-root .dockr-chip.base .sw{background:var(--cyan)}
+
+/* roto field references (owner 2026-10-22): white first / middle / last lines */
+.lbw-root .dockr-chip.refs{color:var(--mut)}
+.lbw-root .dockr-chip.refs .sw{width:12px;height:0;border-radius:0;border-top:1.3px solid var(--tx)}

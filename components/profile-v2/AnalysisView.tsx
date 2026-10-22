@@ -31,6 +31,7 @@ import type {
 import { tierOf, type TierName } from "@/components/sigrank/types";
 import { isOutlier } from "@/lib/analytics/outlier-classify";
 import { sortValue } from "@/lib/analytics/sort-value";
+import { RADAR_REF_STYLE, radarFractions, scoreRadarField, type RadarField } from "@/lib/radar/points";
 
 export interface AnalysisViewProps {
   operator: Operator;
@@ -948,9 +949,15 @@ const normAxes = (a: FpAxes) => ({
 function ArchetypeFingerprint({
   archetype,
   telemetry,
+  field,
+  codename,
 }: {
   archetype: BuildArchetype | null;
   telemetry: TelemetryRaw;
+  /** All-time roto points (owner 2026-10-22): the triangle draws field points
+   *  plus the first / middle / last operator in white instead of the template. */
+  field?: RadarField | null;
+  codename: string;
 }) {
   // describeBuildArchetype() result also satisfies this shape — read axes off it
   // when present so the fingerprint matches the classifier exactly.
@@ -1001,6 +1008,12 @@ function ArchetypeFingerprint({
     `${(CX + (v.x - CX) * f).toFixed(1)},${(CY + (v.y - CY) * f).toFixed(1)}`;
   const poly = (f: { lev: number; vel: number; constr: number }): string =>
     `${pt(V.lev, f.lev)} ${pt(V.vel, f.vel)} ${pt(V.constr, f.constr)}`;
+  const tri = (fr: (number | null)[]) => ({ lev: fr[0] ?? 0, vel: fr[1] ?? 0, constr: fr[2] ?? 0 });
+  const rotoPts = field?.points[codename];
+  const shape = field && rotoPts ? tri(radarFractions(rotoPts, field.max)) : op;
+  const refShapes = field && rotoPts
+    ? field.refs.map((r) => ({ ref: r, f: tri(radarFractions(r.pts, field.max)) }))
+    : [];
 
   const axisRows = [
     { name: "Leverage", op: op.lev, tpl: tpl.lev, val: axes.leverage >= 100 ? axes.leverage.toLocaleString("en-US", { maximumFractionDigits: 0 }) : axes.leverage.toFixed(1) },
@@ -1020,7 +1033,9 @@ function ArchetypeFingerprint({
             viewBox="0 0 200 175"
             className="block h-[180px] w-[220px]"
             role="img"
-            aria-label={`Triangular radar comparing operator fingerprint to the ${archetype.name} archetype template`}
+            aria-label={refShapes.length
+              ? `Triangular radar of leverage, velocity and construction as points among ${field?.size} live operators, with the field's first, middle and last operator as reference lines`
+              : `Triangular radar comparing operator fingerprint to the ${archetype.name} archetype template`}
           >
             {[1, 0.75, 0.5, 0.25].map((f) => (
               <polygon
@@ -1036,22 +1051,37 @@ function ArchetypeFingerprint({
               stroke={BORDER}
               strokeWidth={0.75}
             />
+            {refShapes.length ? refShapes.map(({ ref, f }) => (
+              <polygon
+                key={ref.role}
+                points={poly(f)}
+                fill="none"
+                stroke="rgb(var(--text-primary))"
+                strokeOpacity={RADAR_REF_STYLE[ref.role].opacity}
+                strokeWidth={RADAR_REF_STYLE[ref.role].width}
+                strokeDasharray={RADAR_REF_STYLE[ref.role].dash}
+                strokeLinejoin="round"
+              >
+                <title>{`${RADAR_REF_STYLE[ref.role].label}: #${ref.rank} ${ref.name}`}</title>
+              </polygon>
+            )) : (
+              <polygon
+                points={poly(tpl)}
+                fill="rgba(167,139,250,0.10)"
+                stroke={VIOLET}
+                strokeWidth={1.25}
+                strokeDasharray="5 3"
+              />
+            )}
             <polygon
-              points={poly(tpl)}
-              fill="rgba(167,139,250,0.10)"
-              stroke={VIOLET}
-              strokeWidth={1.25}
-              strokeDasharray="5 3"
-            />
-            <polygon
-              points={poly(op)}
+              points={poly(shape)}
               fill="rgb(var(--gold) / 0.14)"
               stroke={GOLD}
               strokeWidth={1.75}
               strokeLinejoin="round"
             />
             {[V.lev, V.vel, V.constr].map((v, i) => {
-              const f = [op.lev, op.vel, op.constr][i];
+              const f = [shape.lev, shape.vel, shape.constr][i];
               return (
                 <circle
                   key={i}
@@ -1600,7 +1630,8 @@ export function AnalysisView({
         boardRows={boardRows}
         ranked={ranked}
       />
-      <ArchetypeFingerprint archetype={archetype} telemetry={telemetry} />
+      <ArchetypeFingerprint archetype={archetype} telemetry={telemetry} codename={operator.codename}
+        field={boardRows.length ? scoreRadarField(boardRows, "archetype") : null} />
       <VsField
         operator={operator}
         snapshot={snapshot}

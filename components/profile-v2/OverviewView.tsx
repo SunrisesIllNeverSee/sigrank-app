@@ -34,6 +34,7 @@ import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { UnifiedShare } from "@/components/share/UnifiedShare";
 import { PcardFit } from "./PcardFit";
 import { PassportCard } from "./PassportCard";
+import { scoreRadarField } from "@/lib/radar/points";
 import { FlapBoard } from "./FlapBoard";
 import { WorkflowMark } from "./WorkflowMark";
 import { workflowCohortRank } from "@/lib/analytics/workflow-cohort";
@@ -285,6 +286,7 @@ export function OverviewView({
             selectedSecondaryBadge={selectedSecondaryBadge}
             fieldAvg={fieldAvg}
             cohort={wfCohort}
+            radar={boardRows.length ? scoreRadarField(boardRows, "metric") : null}
           /></PcardFit>
           <UnifiedShare title="SignalAF Operator Profile" href={"/s/" + encodeURIComponent(operator.codename)} imageHref={"/s/" + encodeURIComponent(operator.codename) + "/card.png"} screenshotTarget={"#holocard-" + operator.codename} />
           <ArtworkShareControls target={`holocard-${operator.codename}`} title="holocard" animated

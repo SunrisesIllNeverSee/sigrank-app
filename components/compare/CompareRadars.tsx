@@ -2,13 +2,13 @@
  * components/compare/CompareRadars.tsx — /compare radars (owner ask 2026-10-21).
  *
  *  A. CompareRadars (primary, one per operator, under that operator's column):
- *     the operator's OWN composite, independent of the opponent. Each axis is the
- *     operator's percentile in the field the page is showing (0-100, outward =
- *     higher; cost per 1M inverted). 7 cascade metrics solid, the 5 raw pillars
- *     as a faint ghost layer underneath (the "dual signature" idea).
+ *     the operator's OWN composite, independent of the opponent: 7 cascade metrics.
  *  B. CompareHeadToHead (secondary, full-width band): two radars with A and B
- *     overlaid — "Cascade stages" on a shared log scale and "Token mix" as a share
- *     of each operator's own total.
+ *     overlaid — "Cascade stages" and "Token mix".
+ *
+ * Every axis is roto points among the live field (lib/radar/points, owner
+ * 2026-10-22): 1 to N, outward = more (cost and input share: less). White lines
+ * are the board's first, middle and last operator.
  *
  * These describe token-flow relationships, not quality, skill or effort. Missing
  * telemetry is drawn as missing, never as zero. Pure server components over rows
@@ -17,22 +17,43 @@
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { COMPARE_OPERAND_COLORS } from "./compare-palette";
-import { RadarSvg, RadarTable, type RadarAxis, type RadarLayer } from "./CompareRadarSvg";
+import { RadarSvg, RadarTable, type RadarAxis, type RadarLayer, type RadarRefLine } from "./CompareRadarSvg";
 import {
   COMPOSITE_METRICS,
-  COMPOSITE_PILLARS,
   cascadeStages,
   compactNumber,
-  decadeLabel,
-  logScale,
-  percentilesFor,
   sampleFromRow,
-  sqrtShare,
   tokenMix,
   type FieldSample,
 } from "@/lib/compare/radar-math";
+import { RADAR_REF_STYLE, radarFractions, type RadarField } from "@/lib/radar/points";
 
-const pLabel = (pct: number | null) => (pct === null ? "n/a" : String(Math.round(pct)));
+const pLabel = (p: number | null) => (p === null ? "n/a" : Number.isInteger(p) ? String(p) : p.toFixed(1));
+const RINGS = [{ r: 0.25 }, { r: 0.5 }, { r: 0.75 }, { r: 1 }];
+
+/** The field's first / middle / last operator as white reference lines. */
+export function refLines(field: RadarField): RadarRefLine[] {
+  return field.refs.map((r) => ({
+    role: r.role,
+    points: radarFractions(r.pts, field.max),
+    title: `${RADAR_REF_STYLE[r.role].label}: #${r.rank} ${r.name}`,
+  }));
+}
+
+const ptsOf = (field: RadarField, row: LeaderboardRow) =>
+  field.points[row.operator.codename] ?? field.labels.map(() => null);
+
+export function RefKey({ field }: { field: RadarField }) {
+  return (
+    <p className="cmp-rd-refkey">
+      {field.refs.map((r) => (
+        <span key={r.role} data-ref={r.role}>
+          <i />#{r.rank} {r.name}
+        </span>
+      ))}
+    </p>
+  );
+}
 const full = (n: number | null) => (n === null ? "missing" : n.toLocaleString("en-US", { maximumFractionDigits: 4 }));
 
 /* ------------------------------------------------------------------ */
@@ -46,35 +67,28 @@ export function CompareRadars({
 }: {
   row: LeaderboardRow;
   side: "a" | "b";
-  field: FieldSample[];
+  field: RadarField;
 }) {
   const name = operatorDisplayName(row);
   const color = COMPARE_OPERAND_COLORS[side];
   const sample = sampleFromRow(row);
-  const metrics = percentilesFor(sample, field, COMPOSITE_METRICS);
-  const pillars = percentilesFor(sample, field, COMPOSITE_PILLARS);
+  const pts = ptsOf(field, row);
+  const metrics = COMPOSITE_METRICS.map((m, i) => ({ ...m, raw: sample[m.key], pts: pts[i] ?? null }));
 
   const axes: RadarAxis[] = metrics.map((m) => ({
-    title: `${m.label}: ${m.pct === null ? "missing" : `percentile ${pLabel(m.pct)}`}, value ${full(m.raw)}`,
+    title: `${m.label}: ${m.pts === null ? "missing" : `${pLabel(m.pts)} of ${field.max} points`}, value ${full(m.raw)}`,
     lines: [
       { text: m.short },
-      { text: m.pct === null ? "n/a" : pLabel(m.pct), color: m.pct === null ? undefined : color, bold: true, muted: m.pct === null,
+      { text: pLabel(m.pts), color: m.pts === null ? undefined : color, bold: true, muted: m.pts === null,
         title: `${m.label}: value ${full(m.raw)}` },
     ],
   }));
   const layers: RadarLayer[] = [
     {
-      name: `${name} raw pillars`,
-      color,
-      ghost: true,
-      points: pillars.map((p) => (p.pct === null ? null : p.pct / 100)),
-      titles: pillars.map((p) => `${p.label}: ${p.pct === null ? "missing" : `percentile ${pLabel(p.pct)}`} · ${full(p.raw)}`),
-    },
-    {
       name: `${name} cascade metrics`,
       color,
-      points: metrics.map((m) => (m.pct === null ? null : m.pct / 100)),
-      titles: metrics.map((m) => `${m.label}: ${m.pct === null ? "missing" : `percentile ${pLabel(m.pct)}`} · ${full(m.raw)}`),
+      points: radarFractions(pts, field.max),
+      titles: metrics.map((m) => `${m.label}: ${m.pts === null ? "missing" : `${pLabel(m.pts)} of ${field.max}`} · ${full(m.raw)}`),
     },
   ];
 
@@ -93,31 +107,20 @@ export function CompareRadars({
         labelGap={6}
         lineHeight={11}
         axes={axes}
-        rings={[{ r: 0.25 }, { r: 0.5 }, { r: 0.75 }, { r: 1 }]}
+        rings={RINGS}
+        refs={refLines(field)}
         layers={layers}
-        ariaLabel={`${title}: percentile in the field for seven cascade metrics (solid) and five raw token pillars (faint)`}
+        ariaLabel={`${title}: points among ${field.size} live operators for seven cascade metrics, with the field's first, middle and last operator as reference lines`}
       />
-      <p className="cmp-rd-pillars" aria-hidden="true">
-        <span className="cmp-rd-ghostkey" style={{ borderColor: color }} />
-        Raw:{" "}
-        {pillars.map((p, i) => (
-          <span key={p.key}>
-            {i ? " · " : ""}
-            {p.key === "total" ? "Σ" : p.short} <b style={{ color: p.pct === null ? undefined : color }}>{pLabel(p.pct)}</b>
-          </span>
-        ))}
-      </p>
+      <RefKey field={field} />
       <p className="cmp-rd-caption">
-        Outward = higher in the field ({field.length} operators). Cost per 1M is inverted.
+        Points among {field.size} live operators (1 to {field.max}); outward = more. Cost per 1M: cheaper is outward.
         Token-flow shape, not a quality score.
       </p>
       <RadarTable
-        caption={`${title}: percentile in the field of ${field.length} operators (0 to 100, higher is further out; cost per 1M inverted so cheaper is higher)`}
-        columns={["Measure", "Value", "Percentile"]}
-        rows={[
-          ...metrics.map((m) => [m.label, full(m.raw), m.pct === null ? "missing" : pLabel(m.pct)]),
-          ...pillars.map((p) => [`${p.label} (raw pillar)`, full(p.raw), p.pct === null ? "missing" : pLabel(p.pct)]),
-        ]}
+        caption={`${title}: points among ${field.size} live operators (1 to ${field.max}, higher is further out; cost per 1M inverted so cheaper is higher)`}
+        columns={["Measure", "Value", "Points"]}
+        rows={metrics.map((m) => [m.label, full(m.raw), m.pts === null ? "missing" : pLabel(m.pts)])}
       />
     </figure>
   );
@@ -136,47 +139,48 @@ function Legend({ nameA, nameB }: { nameA: string; nameB: string }) {
   );
 }
 
-function StagesRadar({ a, b, nameA, nameB }: { a: FieldSample; b: FieldSample; nameA: string; nameB: string }) {
-  const sa = cascadeStages(a);
-  const sb = cascadeStages(b);
-  const defs = [
-    { key: "transmission", label: "Transmission", formula: "output ÷ input" },
-    { key: "commitment", label: "Commitment", formula: "cache write ÷ output" },
-    { key: "reuse", label: "Reuse", formula: "cache read ÷ cache write" },
-    { key: "leverage", label: "Leverage", formula: "T × C × R = cache read ÷ input" },
-    { key: "yield_", label: "Υ Yield", formula: "Leverage × Transmission = cache read × output ÷ input²" },
-  ] as const;
-  const all = defs.flatMap((d) => [sa[d.key], sb[d.key]]);
-  const scale = logScale(all);
+interface H2HDef { label: string; formula: string; value: (s: FieldSample) => string }
+
+/** Head-to-head radar on roto points: both operators overlaid on the field references. */
+function H2HRadar({
+  a, b, field, defs, title, small, caption,
+}: {
+  a: LeaderboardRow; b: LeaderboardRow; field: RadarField; defs: H2HDef[]; title: string; small: string; caption: string;
+}) {
+  const nameA = operatorDisplayName(a);
+  const nameB = operatorDisplayName(b);
+  const sa = sampleFromRow(a);
+  const sb = sampleFromRow(b);
+  const pa = ptsOf(field, a);
+  const pb = ptsOf(field, b);
   const colA = COMPARE_OPERAND_COLORS.a;
   const colB = COMPARE_OPERAND_COLORS.b;
 
-  const axes: RadarAxis[] = defs.map((d) => {
-    const va = sa[d.key];
-    const vb = sb[d.key];
+  const axes: RadarAxis[] = defs.map((d, i) => {
+    const va = pa[i] ?? null;
+    const vb = pb[i] ?? null;
     const winner = va !== null && vb !== null && va !== vb ? (va > vb ? "a" : "b") : null;
-    const mk = (v: number | null, who: "a" | "b", nm: string) => ({
-      text: `${winner === who ? "● " : ""}${compactNumber(v)}`,
+    const mk = (v: number | null, who: "a" | "b", nm: string, s: FieldSample) => ({
+      text: `${winner === who ? "● " : ""}${pLabel(v)}`,
       color: v === null ? undefined : who === "a" ? colA : colB,
       bold: winner === who,
       muted: v === null,
-      title: `${nm}: ${d.label} = ${full(v)}${winner === who ? " (higher)" : ""}`,
+      title: `${nm}: ${d.label} = ${d.value(s)} · ${pLabel(v)} of ${field.max} points${winner === who ? " (more)" : ""}`,
     });
     return {
       title: `${d.label} = ${d.formula}`,
-      lines: [{ text: d.label }, mk(va, "a", nameA), mk(vb, "b", nameB)],
+      lines: [{ text: d.label }, mk(va, "a", nameA, sa), mk(vb, "b", nameB, sb)],
     };
   });
-  const layer = (s: typeof sa, color: string, nm: string): RadarLayer => ({
+  const layer = (p: (number | null)[], color: string, nm: string, s: FieldSample): RadarLayer => ({
     name: nm,
     color,
-    points: defs.map((d) => scale.project(s[d.key])),
-    titles: defs.map((d) => `${nm}: ${d.label} = ${full(s[d.key])}`),
+    points: radarFractions(p, field.max),
+    titles: defs.map((d, i) => `${nm}: ${d.label} = ${d.value(s)} · ${pLabel(p[i] ?? null)} of ${field.max}`),
   });
-  const title = "Cascade stages";
   return (
     <figure className="cmp-radar cmp-h2h-radar" aria-label={`${title}, ${nameA} versus ${nameB}`}>
-      <figcaption className="cmp-radar-heading">{title} <small>log scale</small></figcaption>
+      <figcaption className="cmp-radar-heading">{title} <small>{small}</small></figcaption>
       <Legend nameA={nameA} nameB={nameB} />
       <RadarSvg
         width={420}
@@ -186,24 +190,20 @@ function StagesRadar({ a, b, nameA, nameB }: { a: FieldSample; b: FieldSample; n
         radius={96}
         labelGap={10}
         axes={axes}
-        rings={scale.ticks.map((e) => ({
-          r: (e - scale.loExp) / (scale.hiExp - scale.loExp),
-          label: decadeLabel(e),
-        }))}
-        layers={[layer(sa, colA, nameA), layer(sb, colB, nameB)]}
-        ariaLabel={`${title}: ${nameA} versus ${nameB} on a shared logarithmic scale from ${decadeLabel(scale.loExp)} to ${decadeLabel(scale.hiExp)}`}
+        rings={RINGS}
+        refs={refLines(field)}
+        layers={[layer(pa, colA, nameA, sa), layer(pb, colB, nameB, sb)]}
+        ariaLabel={`${title}: ${nameA} versus ${nameB}, points among ${field.size} live operators, with the field's first, middle and last operator as reference lines`}
       />
-      <p className="cmp-rd-caption">
-        Where a Yield gap comes from. Transmission × Commitment × Reuse = Leverage (cache read ÷ input);
-        Υ = Leverage × Transmission. Dot = higher on that axis. Rings are powers of ten, shared by every axis.
-      </p>
+      <RefKey field={field} />
+      <p className="cmp-rd-caption">{caption}</p>
       <RadarTable
-        caption={`${title}, shared logarithmic scale`}
-        columns={["Stage", "Formula", nameA, nameB, "Higher"]}
-        rows={defs.map((d) => {
-          const va = sa[d.key];
-          const vb = sb[d.key];
-          return [d.label, d.formula, full(va), full(vb),
+        caption={`${title}: points among ${field.size} live operators (1 to ${field.max})`}
+        columns={["Axis", "Formula", nameA, nameB, "More"]}
+        rows={defs.map((d, i) => {
+          const va = pa[i] ?? null;
+          const vb = pb[i] ?? null;
+          return [d.label, d.formula, `${d.value(sa)} (${pLabel(va)})`, `${d.value(sb)} (${pLabel(vb)})`,
             va === null || vb === null || va === vb ? "none" : va > vb ? nameA : nameB];
         })}
       />
@@ -211,79 +211,45 @@ function StagesRadar({ a, b, nameA, nameB }: { a: FieldSample; b: FieldSample; n
   );
 }
 
-function MixRadar({ a, b, nameA, nameB }: { a: FieldSample; b: FieldSample; nameA: string; nameB: string }) {
-  const ma = tokenMix(a);
-  const mb = tokenMix(b);
-  const defs = [
-    { key: "input", label: "Input" },
-    { key: "output", label: "Output" },
-    { key: "cacheWrite", label: "Cache write" },
-    { key: "cacheRead", label: "Cache read" },
-  ] as const;
-  const colA = COMPARE_OPERAND_COLORS.a;
-  const colB = COMPARE_OPERAND_COLORS.b;
-  const pct = (v: number | undefined) =>
-    v === undefined ? "—" : v > 0 && v < 0.01 ? "<0.01%" : v >= 10 ? `${v.toFixed(0)}%` : v >= 1 ? `${v.toFixed(1)}%` : `${v.toFixed(2)}%`;
-  const axes: RadarAxis[] = defs.map((d) => ({
-    title: `${d.label}: share of the operator's own total tokens`,
-    lines: [
-      { text: d.label },
-      { text: pct(ma?.[d.key]), color: ma ? colA : undefined, muted: !ma, title: `${nameA}: ${d.label} ${ma ? ma[d.key].toFixed(3) + "% of total" : "missing"}` },
-      { text: pct(mb?.[d.key]), color: mb ? colB : undefined, muted: !mb, title: `${nameB}: ${d.label} ${mb ? mb[d.key].toFixed(3) + "% of total" : "missing"}` },
-    ],
-  }));
-  const layer = (m: typeof ma, color: string, nm: string): RadarLayer => ({
-    name: nm,
-    color,
-    points: defs.map((d) => (m ? sqrtShare(m[d.key]) : null)),
-    titles: defs.map((d) => `${nm}: ${d.label} ${m ? m[d.key].toFixed(3) + "% of own total" : "missing"}`),
-  });
-  const title = "Token mix";
-  return (
-    <figure className="cmp-radar cmp-h2h-radar" aria-label={`${title}, ${nameA} versus ${nameB}`}>
-      <figcaption className="cmp-radar-heading">{title} <small>share of own total</small></figcaption>
-      <Legend nameA={nameA} nameB={nameB} />
-      <RadarSvg
-        width={420}
-        height={310}
-        cx={210}
-        cy={160}
-        radius={96}
-        labelGap={10}
-        axes={axes}
-        rings={[
-          { r: Math.sqrt(0.01), label: "1%" },
-          { r: Math.sqrt(0.1), label: "10%" },
-          { r: Math.sqrt(0.5), label: "50%" },
-          { r: 1, label: "100%" },
-        ]}
-        layers={[layer(ma, colA, nameA), layer(mb, colB, nameB)]}
-        ariaLabel={`${title}: share of input, output, cache write and cache read in each operator's own total, ${nameA} versus ${nameB}`}
-      />
-      <p className="cmp-rd-caption">
-        How each operates, not how much. Each shape sums to 100% of that operator&apos;s own tokens
-        (square-root rings so small shares stay visible). A composition, not a contest, so no winner.
-      </p>
-      <RadarTable
-        caption={`${title}: percent of each operator's own total tokens`}
-        columns={["Pillar", nameA, nameB]}
-        rows={defs.map((d) => [d.label, ma ? `${ma[d.key].toFixed(2)}%` : "missing", mb ? `${mb[d.key].toFixed(2)}%` : "missing"])}
-      />
-    </figure>
-  );
-}
+const stage = (k: keyof ReturnType<typeof cascadeStages>) => (s: FieldSample) => compactNumber(cascadeStages(s)[k]);
+const STAGE_DEFS: H2HDef[] = [
+  { label: "Transmission", formula: "output ÷ input", value: stage("transmission") },
+  { label: "Commitment", formula: "cache write ÷ output", value: stage("commitment") },
+  { label: "Reuse", formula: "cache read ÷ cache write", value: stage("reuse") },
+  { label: "Leverage", formula: "T × C × R = cache read ÷ input", value: stage("leverage") },
+  { label: "Υ Yield", formula: "Leverage × Transmission = cache read × output ÷ input²", value: stage("yield_") },
+];
 
-export function CompareHeadToHead({ a, b }: { a: LeaderboardRow; b: LeaderboardRow }) {
-  const sa = sampleFromRow(a);
-  const sb = sampleFromRow(b);
-  const nameA = operatorDisplayName(a);
-  const nameB = operatorDisplayName(b);
+const mixPct = (k: "input" | "output" | "cacheWrite" | "cacheRead") => (s: FieldSample) => {
+  const v = tokenMix(s)?.[k];
+  return v === undefined ? "—" : v > 0 && v < 0.01 ? "<0.01%" : v >= 10 ? `${v.toFixed(0)}%` : v >= 1 ? `${v.toFixed(1)}%` : `${v.toFixed(2)}%`;
+};
+const MIX_DEFS: H2HDef[] = [
+  { label: "Input ↓", formula: "input share of own total (less is outward)", value: mixPct("input") },
+  { label: "Output", formula: "output share of own total", value: mixPct("output") },
+  { label: "Cache write", formula: "cache write share of own total", value: mixPct("cacheWrite") },
+  { label: "Cache read", formula: "cache read share of own total", value: mixPct("cacheRead") },
+];
+
+export function CompareHeadToHead({
+  a,
+  b,
+  stages,
+  mix,
+}: {
+  a: LeaderboardRow;
+  b: LeaderboardRow;
+  stages: RadarField;
+  mix: RadarField;
+}) {
   return (
     <section className="cmp-h2h" aria-label="Head to head radars">
       <h2 className="cmp-h2h-title">Head to head</h2>
       <div className="cmp-h2h-grid">
-        <StagesRadar a={sa} b={sb} nameA={nameA} nameB={nameB} />
-        <MixRadar a={sa} b={sb} nameA={nameA} nameB={nameB} />
+        <H2HRadar a={a} b={b} field={stages} defs={STAGE_DEFS} title="Cascade stages" small="points in the field"
+          caption="Where a Yield gap comes from. Transmission × Commitment × Reuse = Leverage (cache read ÷ input); Υ = Leverage × Transmission. Dot = more points on that axis." />
+        <H2HRadar a={a} b={b} field={mix} defs={MIX_DEFS} title="Token mix" small="share of own total"
+          caption="How each operates, not how much: each pillar's share of the operator's own tokens, ranked against the field. Input share is flipped, so less input is outward." />
       </div>
     </section>
   );

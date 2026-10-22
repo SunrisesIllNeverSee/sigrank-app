@@ -11,6 +11,7 @@ import { BoneHolocard } from "./BoneHolocard";
 import { snapshotThroughput } from "@/lib/board/throughput";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { ArtworkShareControls } from "./ArtworkShareControls";
+import { scoreRadarField } from "@/lib/radar/points";
 import "@/components/profile-v2/profile-workspace.css";
 
 export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
@@ -41,11 +42,13 @@ export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
   const ratio = !row.pending && c && !c.nonCompounding
     ? `${Math.round(c.leverage).toLocaleString("en-US")}:1:${c.velocity.toFixed(2)}`
     : "—";
+  const metricRadar = board.length ? scoreRadarField(board, "metric") : null;
   const passport = (id: string) => <PassportCard id={id}
     operator={row.operator} snapshot={row.snapshot} globalRank={own.global_rank}
     pending={!!row.pending} trophyCounts={trophies} fieldAvg={computeFieldAverages(board)}
     archetype={c && !c.nonCompounding ? buildArchetypeOf({ leverage: c.leverage, velocity: c.velocity, construction: c.construction }) : null}
     cohort={workflowCohortRank(board, row.operator.codename)}
+    radar={metricRadar}
     selectedPixelBadge={marks.pixelBadges.find(m => m.id === preferences?.profile_pixel_badge) ?? null}
     selectedSecondaryBadge={marks.secondaryLogos.find(m => m.id === preferences?.profile_secondary_logo) ?? null} />;
   return <div className="pv2 share-holocard flex flex-col items-center gap-4">

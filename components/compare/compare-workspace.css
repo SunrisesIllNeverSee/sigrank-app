@@ -217,6 +217,15 @@
 .lbw-root .ws-cmp-stage .cmp-rd-legend i{
   display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px
 }
+.lbw-root .ws-cmp-stage .cmp-rd-refkey{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:2px 12px;margin:0;
+  font:9.5px/1.4 var(--font-mono);color:var(--tx2)
+}
+.lbw-root .ws-cmp-stage .cmp-rd-refkey i{
+  display:inline-block;width:14px;height:0;border-top:1.3px solid var(--tx);vertical-align:middle;margin-right:5px;opacity:.9
+}
+.lbw-root .ws-cmp-stage .cmp-rd-refkey [data-ref="middle"] i{border-top-style:dashed;opacity:.7}
+.lbw-root .ws-cmp-stage .cmp-rd-refkey [data-ref="last"] i{border-top-style:dotted;border-top-width:2px;opacity:.6}
 /* visually hidden data table equivalent of each radar */
 .lbw-root .cmp-sr{
   position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
