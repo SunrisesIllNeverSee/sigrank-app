@@ -647,6 +647,11 @@
   filter:drop-shadow(0 0 3px color-mix(in srgb,var(--ac) 23%,transparent));
 }
 @media (min-width:1181px){
+  /* The continuous top stroke is inside the scrollport. Leave clearance so
+     MATCHUP / BAR STATISTICS does not collide with the new top edge. */
+  .lbw-root .ws-cmp-stage .cmp-ledger-workspace{
+    padding-top:16px;
+  }
   /* Original gold bar and stem each had a full border, leaving internal
      horizontal seams. Hide those two borders: only the outline SVG draws
      the exterior silhouette. Match their top edges with a VISUAL shift,
