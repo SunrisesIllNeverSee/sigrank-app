@@ -71,6 +71,7 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   { path: "/blog/the-human-in-the-loop-is-unmeasured", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/sigrank-dashboards", priority: 0.8, changeFrequency: "weekly" },
   { path: "/blog/the-three-modes-behind-the-ai-operator-board", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/blog/a-tour-of-the-new-signalaf", priority: 0.8, changeFrequency: "weekly" },
   { path: "/articles", priority: 0.8, changeFrequency: "weekly" },
   { path: "/methodology", priority: 0.8, changeFrequency: "daily" },
   { path: "/upsilon", priority: 0.9, changeFrequency: "weekly" },
@@ -117,6 +118,7 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   { path: "/wiki/metrics/output-flow-share", priority: 0.5, changeFrequency: "monthly" },
   { path: "/wiki/metrics/context-activity-ratio", priority: 0.5, changeFrequency: "monthly" },
   { path: "/wiki/metrics/active-output-share", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/wiki/metrics/scale-v", priority: 0.5, changeFrequency: "monthly" },
   // System Tests category
   { path: "/wiki/tests/lineage", priority: 0.5, changeFrequency: "monthly" },
   { path: "/wiki/tests/compression", priority: 0.5, changeFrequency: "monthly" },
@@ -397,11 +399,12 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   // Topic hub pages — category intent
   { path: "/token-telemetry", priority: 0.6, changeFrequency: "monthly" },
   { path: "/ai-coding-metrics", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/operator-performance", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-04T00:00:00Z") },
+  // lastModified = last material content change (3540d050, 2026-09-07 content refresh)
+  { path: "/operator-performance", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-07T23:35:51Z") },
   { path: "/ai-benchmarking", priority: 0.6, changeFrequency: "monthly" },
   { path: "/cascade-analysis", priority: 0.6, changeFrequency: "monthly" },
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-04T00:00:00Z") },
+  { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-07T23:35:51Z") },
   // /ai-operator-benchmark removed from sitemap — 308-redirects to /ai-operator-scoring (P8)
   // /token-efficiency removed from sitemap — 308-redirects to /metrics/yield-cascade (P8)
   { path: "/privacy-preserving-ai-telemetry", priority: 0.8, changeFrequency: "monthly" },
