@@ -51,35 +51,62 @@
 .lbw-root .cmp-title-selectors input+div button:hover{background:var(--hover);color:var(--ac)}
 .lbw-root .cmp-title-selectors input+div button:disabled{opacity:.4}
 
-/* Compare operand identity: on non-gold themes keep existing blue/teal,
-   while gold uses black, gold and bone from that same theme's token family.
-   Stage owns vars so every radar, stats line and history legend inherits them. */
+/* Compare is one product across FOUR workspace themes.
+   All operand colors come from the active theme's existing palette,
+   including charts/radar strokes, stats bars, selectors, and the profiles.
+   This replaces the old fixed blue/teal styling in green/bone/purple. */
 .lbw-root .ws-cmp-stage{
-  --compare-a:#60a5fa;
-  --compare-b:#2dd4bf;
-}
-.lbw-root[data-theme="gold"] .ws-cmp-stage{
   --compare-a:var(--ac);
   --compare-b:var(--tx2);
 }
-.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-header[data-operator-side="a"]{
+.lbw-root[data-theme="green"] .ws-cmp-stage{
+  /* Electric lime / pale sage on the green/black board. */
+  --compare-a:var(--ac);
+  --compare-b:var(--tx2);
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage{
+  /* Brass / ivory, matching the existing black-and-gold benchmark. */
+  --compare-a:var(--ac);
+  --compare-b:var(--tx2);
+}
+.lbw-root[data-theme="bone"] .ws-cmp-stage{
+  /* Indigo ink / charcoal ink on the paper surface, never pastel on ivory. */
+  --compare-a:var(--ac);
+  --compare-b:var(--tx2);
+}
+.lbw-root[data-theme="purple"] .ws-cmp-stage{
+  /* Amethyst / silver-lavender instead of the unrelated blue/teal pair. */
+  --compare-a:var(--ac);
+  --compare-b:var(--tx2);
+}
+/* Operator identity colors must follow the comparison series even when the
+   operator's class-colored fallback is specified with inline styles. */
+.lbw-root .ws-cmp-stage .cmp-profile-header[data-operator-side="a"]{
   --cmp-class-color:var(--compare-a)!important;
 }
-.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-header[data-operator-side="b"]{
+.lbw-root .ws-cmp-stage .cmp-profile-header[data-operator-side="b"]{
   --cmp-class-color:var(--compare-b)!important;
 }
-.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-class{
+.lbw-root .ws-cmp-stage .cmp-profile-class{
   color:var(--cmp-class-color)!important;
+  border-color:color-mix(in srgb,var(--cmp-class-color) 36%,var(--line2));
 }
-.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-avatar{
-  background:color-mix(in srgb,var(--cmp-class-color) 15%,var(--panel2))!important;
+.lbw-root .ws-cmp-stage .cmp-profile-avatar{
+  background:color-mix(in srgb,var(--cmp-class-color) 13%,var(--panel2))!important;
 }
-.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-matchup-panel:first-child{
-  background:linear-gradient(110deg,color-mix(in srgb,var(--ac) 6%,var(--panel)),var(--panel) 64%)!important;
+/* Class-tinted inline gradient belongs to the old compare presentation;
+   match the card fill to the current theme and the same series as the radar. */
+.lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child{
+  background:linear-gradient(110deg,
+    color-mix(in srgb,var(--compare-a) 6%,var(--panel)),
+    var(--panel) 64%)!important;
 }
-.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-matchup-panel:last-child{
-  background:linear-gradient(250deg,color-mix(in srgb,var(--tx2) 6%,var(--panel)),var(--panel) 64%)!important;
+.lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{
+  background:linear-gradient(250deg,
+    color-mix(in srgb,var(--compare-b) 6%,var(--panel)),
+    var(--panel) 64%)!important;
 }
+
 .lbw-root .ws-cmp-stage .cmp-profile-leading{
   color:var(--ac);border-color:color-mix(in srgb,var(--ac) 42%,transparent);
   background:color-mix(in srgb,var(--ac) 6%,transparent);
@@ -785,3 +812,48 @@
   .lbw-root .ws-cmp-stage .cmp-operator-trigger,
   .lbw-root .ws-cmp-stage .cmp-operator-input{transition:none}
 }
+
+/* Compare theme-finish pass.  Shared layout/typography stay unchanged; these
+   rules adapt decorative depth to the four actual workspace color systems. */
+
+/* Green: preserve the dark field, dial back luminous outlines so the numbers
+   and charts remain the high-saturation elements. */
+.lbw-root[data-theme="green"] .ws-cmp-stage .cmp-matchup-panel{
+  border-color:color-mix(in srgb,var(--portrait-glow) 35%,var(--line2));
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--portrait-glow) 14%,transparent),
+    0 0 0 1px color-mix(in srgb,var(--portrait-glow) 9%,transparent),
+    0 0 17px color-mix(in srgb,var(--portrait-glow) 13%,transparent),
+    0 8px 18px rgba(0,0,0,.27);
+}
+/* Bone: ink-like outlines and warm paper shadow. Avoid dark-theme neon
+   halos and the heavy black shadow that looked dirty on an ivory sheet. */
+.lbw-root[data-theme="bone"] .ws-cmp-stage .cmp-matchup-panel{
+  border-color:color-mix(in srgb,var(--portrait-glow) 46%,var(--line2));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),
+    0 0 0 1px color-mix(in srgb,var(--portrait-glow) 9%,transparent),
+    0 5px 19px color-mix(in srgb,var(--portrait-glow) 14%,transparent),
+    0 7px 16px rgba(57,47,32,.13);
+}
+.lbw-root[data-theme="bone"] .ws-cmp-stage .ws-cmp-ledger{
+  background:var(--panel);
+  box-shadow:0 6px 20px rgba(57,47,32,.11);
+}
+.lbw-root[data-theme="bone"] .ws-cmp-stage .cmp-operator-trigger,
+.lbw-root[data-theme="bone"] .ws-cmp-stage .cmp-operator-input{
+  background:linear-gradient(120deg,
+    color-mix(in srgb,var(--picker-accent) 6%,var(--panel)),
+    var(--panel) 78%);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--picker-accent) 9%,transparent),
+    0 3px 11px rgba(57,47,32,.09);
+}
+/* Purple: soft amethyst ambient glow, lavender B instead of turquoise.
+   Stronger separation than a line but not a neon rectangle. */
+.lbw-root[data-theme="purple"] .ws-cmp-stage .cmp-matchup-panel{
+  border-color:color-mix(in srgb,var(--portrait-glow) 39%,var(--line2));
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--portrait-glow) 12%,transparent),
+    0 0 0 1px color-mix(in srgb,var(--portrait-glow) 10%,transparent),
+    0 0 23px color-mix(in srgb,var(--portrait-glow) 17%,transparent),
+    0 9px 21px rgba(0,0,0,.32);
+}
+/* Gold is the approved reference: keep its polished metallic contrast,
+   portrait glow and picker dimensions without introducing another frame. */
