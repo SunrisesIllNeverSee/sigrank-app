@@ -48,6 +48,9 @@ jobs:
       - name: Canonical contract tests
         run: npm run test:canonical
 
+      - name: Owner outbound mail security tests
+        run: npx vitest run __tests__/mcp/owner-mail-route.test.ts
+
       - name: TTEOP protocol + legacy compatibility gates
         run: >-
           node --test
