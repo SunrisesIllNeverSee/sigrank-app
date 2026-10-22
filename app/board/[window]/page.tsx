@@ -50,6 +50,7 @@ import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { getLeaderboard, getLiveBoardInitialState } from "@/lib/board";
+import { scoreRadarField } from "@/lib/radar/points";
 import { toEntry } from "@/lib/board/to-entry";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
 import { WaveHero } from "@/components/ui/WaveHero";
@@ -133,7 +134,7 @@ export default async function BoardWindowPage({
   // so this Promise.all shares a single cached read: the workspace gets the
   // typed LiveBoardInitialState (first page + full-scope aggregates); the
   // raw rows feed the legacy table's SSR page and the JsonLd item list.
-  const [initial, liveRows] = await Promise.all([
+  const [initialState, liveRows, allTimeRows] = await Promise.all([
     getLiveBoardInitialState(win.slug),
     getLeaderboard({
       window: win.enum,
@@ -142,7 +143,30 @@ export default async function BoardWindowPage({
       claimedOnly: true,
       mode: "all",
     }),
+    // Radars score the all-time field on every window (owner 2026-10-22: no
+    // window-filtered radars yet). Same param literal as /board/all, so it
+    // shares that page's memoized read; skipped when this IS all-time.
+    isAllTime
+      ? null
+      : getLeaderboard({
+          window: "all_time",
+          windowFilter: false,
+          operatorTotal: true,
+          claimedOnly: true,
+          mode: "all",
+        }).catch(() => null),
   ]);
+  const radarRows = isAllTime ? liveRows : allTimeRows;
+  const initial = radarRows?.length
+    ? {
+        ...initialState,
+        radars: {
+          dock: scoreRadarField(radarRows, "dock"),
+          metric: scoreRadarField(radarRows, "metric"),
+          raw: scoreRadarField(radarRows, "raw"),
+        },
+      }
+    : initialState;
 
   /* owner 2026-10-21: Wire / Notes "newest article". Real titles/slugs/dates
      from the blog index, read at ISR time (no client request); future-dated

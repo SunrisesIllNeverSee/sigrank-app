@@ -21,6 +21,8 @@
  *     serializer fields are NOT bound here.
  */
 
+import type { RadarField } from "@/lib/radar/points";
+
 /** Compact metric cell as rendered by the reference workspace. */
 export interface LiveOperator {
   /** Codename verbatim — the identity key + share slug (slug === codename).
@@ -245,4 +247,14 @@ export interface LiveBoardInitialState {
   /** Total ranked rows available for the client to page through (may exceed
    *  operators.length when pagination applies). */
   totalOperators: number;
+  /** All-time roto radars (lib/radar/points), set by the board page only.
+   *  Radars do not follow the window yet (owner 2026-10-22). */
+  radars?: BoardRadars;
+}
+
+/** Board radars scored over the all-time live field. */
+export interface BoardRadars {
+  dock: RadarField;
+  metric: RadarField;
+  raw: RadarField;
 }

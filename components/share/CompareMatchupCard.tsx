@@ -27,15 +27,11 @@ import type { SignalClass } from "@/components/sigrank/types";
 import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
 import {
   COMPOSITE_METRICS,
-  COMPOSITE_PILLARS,
   cascadeStages,
   compactNumber,
-  decadeLabel,
-  logScale,
-  percentilesFor,
   sampleFromRow,
-  type FieldSample,
 } from "@/lib/compare/radar-math";
+import { RADAR_REF_STYLE, radarFractions, type RadarField } from "@/lib/radar/points";
 
 // ── Palette (static hex — html-to-image can't resolve CSS vars) ──────────────
 const INK = "#0a0a0a";
@@ -78,8 +74,8 @@ function yieldStr(r: LeaderboardRow): string {
 
 // ── Card radars (owner 2026-10-21) ───────────────────────────────────────────
 // Same math as the /compare page radars (lib/compare/radar-math.ts): a per-operator
-// COMPOSITE (percentile in the field, 7 cascade metrics solid, 5 raw pillars as a
-// faint ghost) and a head-to-head CASCADE STAGES overlay on a shared log scale.
+// COMPOSITE (roto points in the live field, 7 cascade metrics) and a head-to-head
+// CASCADE STAGES overlay, both over the field's first / middle / last operator in white.
 // The page SVG (CompareRadarSvg) styles itself through theme CSS classes, which
 // html-to-image cannot carry into the export, so the card draws its own SVG with
 // static hex and inline attributes.
@@ -91,6 +87,11 @@ interface CardAxisLine {
   text: string;
   color?: string;
   bold?: boolean;
+}
+
+interface CardRef {
+  role: keyof typeof RADAR_REF_STYLE;
+  points: (number | null)[];
 }
 
 interface CardLayer {
@@ -127,6 +128,7 @@ function CardRadarSvg({
   axes,
   rings,
   layers,
+  refs = [],
   labelGap = 12,
   lineHeight = 14,
 }: {
@@ -136,6 +138,7 @@ function CardRadarSvg({
   axes: CardAxisLine[][];
   rings: { r: number; label?: string }[];
   layers: CardLayer[];
+  refs?: CardRef[];
   labelGap?: number;
   lineHeight?: number;
 }) {
@@ -165,6 +168,16 @@ function CardRadarSvg({
       {axes.map((_, i) => {
         const [x, y] = pt(i, n, 1);
         return <line key={`sp-${i}`} x1={cx} y1={cy} x2={x} y2={y} stroke={C_LINE} strokeWidth={1} opacity={0.5} />;
+      })}
+      {refs.map((ref) => {
+        const pts = ref.points
+          .map((v, i) => (v === null ? null : pt(i, ref.points.length, v)))
+          .filter((p): p is [number, number] => p !== null);
+        const st = RADAR_REF_STYLE[ref.role];
+        return pts.length >= 3 ? (
+          <polygon key={`ref-${ref.role}`} points={pts.map(fmt).join(" ")} fill="none" stroke="#ffffff"
+            strokeOpacity={st.opacity} strokeWidth={st.width * 1.3} strokeDasharray={st.dash} strokeLinejoin="round" />
+        ) : null;
       })}
       {ordered.map((layer, li) => {
         const c = layer.points.length;
@@ -243,14 +256,18 @@ function CardRadarSvg({
   );
 }
 
-const pctText = (pct: number | null) => (pct === null ? "n/a" : String(Math.round(pct)));
+const ptsText = (p: number | null) => (p === null ? "n/a" : Number.isInteger(p) ? String(p) : p.toFixed(1));
+const RINGS = [{ r: 0.25 }, { r: 0.5 }, { r: 0.75 }, { r: 1 }];
+const refsOf = (field: RadarField): CardRef[] =>
+  field.refs.map((r) => ({ role: r.role, points: radarFractions(r.pts, field.max) }));
+const ptsOf = (field: RadarField, row: LeaderboardRow) =>
+  field.points[row.operator.codename] ?? field.labels.map(() => null);
 
-function CompositeRadar({ sample, field, color }: { sample: FieldSample; field: FieldSample[]; color: string }) {
-  const metrics = percentilesFor(sample, field, COMPOSITE_METRICS);
-  const pillars = percentilesFor(sample, field, COMPOSITE_PILLARS);
-  const axes: CardAxisLine[][] = metrics.map((m) => [
+function CompositeRadar({ row, field, color }: { row: LeaderboardRow; field: RadarField; color: string }) {
+  const pts = ptsOf(field, row);
+  const axes: CardAxisLine[][] = COMPOSITE_METRICS.map((m, i) => [
     { text: m.short },
-    { text: pctText(m.pct), color: m.pct === null ? undefined : color, bold: true },
+    { text: ptsText(pts[i] ?? null), color: pts[i] == null ? undefined : color, bold: true },
   ]);
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -260,31 +277,10 @@ function CompositeRadar({ sample, field, color }: { sample: FieldSample; field: 
         radius={110}
         labelGap={10}
         axes={axes}
-        rings={[{ r: 0.25 }, { r: 0.5 }, { r: 0.75 }, { r: 1 }]}
-        layers={[
-          { color, ghost: true, points: pillars.map((p) => (p.pct === null ? null : p.pct / 100)) },
-          { color, points: metrics.map((m) => (m.pct === null ? null : m.pct / 100)) },
-        ]}
+        rings={RINGS}
+        refs={refsOf(field)}
+        layers={[{ color, points: radarFractions(pts, field.max) }]}
       />
-      <div style={{ fontSize: 10.5, color: C_DULL, textAlign: "center", lineHeight: 1.5 }}>
-        <span
-          style={{
-            display: "inline-block",
-            width: 14,
-            height: 0,
-            borderTop: `1.5px dashed ${color}`,
-            marginRight: 6,
-            verticalAlign: "middle",
-          }}
-        />
-        RAW{" "}
-        {pillars.map((p, i) => (
-          <span key={p.key}>
-            {i ? " · " : ""}
-            {p.key === "total" ? "Σ" : p.short} <b style={{ color: p.pct === null ? C_DULL : color }}>{pctText(p.pct)}</b>
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
@@ -297,23 +293,20 @@ const STAGE_DEFS = [
   { key: "yield_", label: "Υ Yield" },
 ] as const;
 
-function StagesRadar({ a, b }: { a: FieldSample; b: FieldSample }) {
-  const sa = cascadeStages(a);
-  const sb = cascadeStages(b);
-  const scale = logScale(STAGE_DEFS.flatMap((d) => [sa[d.key], sb[d.key]]));
-  const axes: CardAxisLine[][] = STAGE_DEFS.map((d) => {
-    const va = sa[d.key];
-    const vb = sb[d.key];
+function StagesRadar({ a, b, field }: { a: LeaderboardRow; b: LeaderboardRow; field: RadarField }) {
+  const sa = cascadeStages(sampleFromRow(a));
+  const sb = cascadeStages(sampleFromRow(b));
+  const pa = ptsOf(field, a);
+  const pb = ptsOf(field, b);
+  const axes: CardAxisLine[][] = STAGE_DEFS.map((d, i) => {
+    const va = pa[i] ?? null;
+    const vb = pb[i] ?? null;
     const winner = va !== null && vb !== null && va !== vb ? (va > vb ? "a" : "b") : null;
     return [
       { text: d.label },
-      { text: `${winner === "a" ? "● " : ""}${compactNumber(va)}`, color: va === null ? undefined : A_COLOR, bold: winner === "a" },
-      { text: `${winner === "b" ? "● " : ""}${compactNumber(vb)}`, color: vb === null ? undefined : B_COLOR, bold: winner === "b" },
+      { text: `${winner === "a" ? "● " : ""}${compactNumber(sa[d.key])}`, color: va === null ? undefined : A_COLOR, bold: winner === "a" },
+      { text: `${winner === "b" ? "● " : ""}${compactNumber(sb[d.key])}`, color: vb === null ? undefined : B_COLOR, bold: winner === "b" },
     ];
-  });
-  const layer = (s: typeof sa, color: string): CardLayer => ({
-    color,
-    points: STAGE_DEFS.map((d) => scale.project(s[d.key])),
   });
   return (
     <CardRadarSvg
@@ -322,11 +315,12 @@ function StagesRadar({ a, b }: { a: FieldSample; b: FieldSample }) {
       radius={132}
       labelGap={12}
       axes={axes}
-      rings={scale.ticks.map((e) => ({
-        r: (e - scale.loExp) / (scale.hiExp - scale.loExp),
-        label: decadeLabel(e),
-      }))}
-      layers={[layer(sa, A_COLOR), layer(sb, B_COLOR)]}
+      rings={RINGS}
+      refs={refsOf(field)}
+      layers={[
+        { color: A_COLOR, points: radarFractions(pa, field.max) },
+        { color: B_COLOR, points: radarFractions(pb, field.max) },
+      ]}
     />
   );
 }
@@ -376,12 +370,14 @@ function Card({
   cardRef,
   a,
   b,
-  field,
+  composite,
+  stages,
 }: {
   cardRef: React.RefObject<HTMLDivElement | null>;
   a: LeaderboardRow;
   b: LeaderboardRow;
-  field: FieldSample[];
+  composite: RadarField;
+  stages: RadarField;
 }) {
   const nameA = operatorDisplayName(a).toUpperCase();
   const nameB = operatorDisplayName(b).toUpperCase();
@@ -395,8 +391,6 @@ function Card({
   const factsA = deriveFacts(a, b).slice(0, 3);
   const factsB = deriveFacts(b, a).slice(0, 3);
 
-  const sampleA = sampleFromRow(a);
-  const sampleB = sampleFromRow(b);
 
   return (
     <div
@@ -739,11 +733,11 @@ function Card({
             padding: "0 15px",
           }}
         >
-          <CompositeRadar sample={sampleA} field={field} color={A_COLOR} />
+          <CompositeRadar row={a} field={composite} color={A_COLOR} />
           <div style={{ width: 410, display: "flex", justifyContent: "center", marginLeft: 0 }}>
-            <StagesRadar a={sampleA} b={sampleB} />
+            <StagesRadar a={a} b={b} field={stages} />
           </div>
-          <CompositeRadar sample={sampleB} field={field} color={B_COLOR} />
+          <CompositeRadar row={b} field={composite} color={B_COLOR} />
         </div>
 
         {/* footer */}
@@ -762,7 +756,7 @@ function Card({
         >
           <span style={{ color: A_COLOR }}>{aWins} WINS</span>
           <span style={{ color: "#4a6a4a", fontSize: 9 }}>
-            COMPOSITE = PERCENTILE IN FIELD OF {field.length} · $/1M INVERTED · DASHED = RAW PILLARS · ● = HIGHER STAGE · TOKEN-FLOW SHAPE, NOT A QUALITY SCORE
+            POINTS AMONG {composite.size} LIVE OPERATORS · WHITE = #{composite.refs.map((r) => r.rank).join(" / #")} · $/1M INVERTED · ● = MORE STAGE POINTS · TOKEN-FLOW SHAPE, NOT A QUALITY SCORE
           </span>
           <span style={{ color: C_GOLD }}>{bWins} WINS</span>
         </div>
@@ -791,11 +785,12 @@ export interface CompareMatchupCardProps {
   a: LeaderboardRow;
   b: LeaderboardRow;
   href: string;
-  /** Field samples for the composites, same as the page: board.map(sampleFromRow). */
-  field: FieldSample[];
+  /** Roto-scored fields from the page (lib/radar/points). */
+  composite: RadarField;
+  stages: RadarField;
 }
 
-export function CompareMatchupCard({ a, b, href, field }: CompareMatchupCardProps) {
+export function CompareMatchupCard({ a, b, href, composite, stages }: CompareMatchupCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -885,7 +880,7 @@ export function CompareMatchupCard({ a, b, href, field }: CompareMatchupCardProp
         }}
         aria-hidden
       >
-        <Card cardRef={cardRef} a={a} b={b} field={field} />
+        <Card cardRef={cardRef} a={a} b={b} composite={composite} stages={stages} />
       </div>
 
       {preview && (
@@ -911,7 +906,7 @@ export function CompareMatchupCard({ a, b, href, field }: CompareMatchupCardProp
                 transformOrigin: "top left",
               }}
             >
-              <Card cardRef={cardRef} a={a} b={b} field={field} />
+              <Card cardRef={cardRef} a={a} b={b} composite={composite} stages={stages} />
             </div>
           </div>
         </div>

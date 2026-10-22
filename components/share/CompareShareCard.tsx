@@ -18,6 +18,7 @@ import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { track } from "@/lib/infra/posthog/events";
 import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
+import { RADAR_REF_STYLE, type RadarRef } from "@/lib/radar/points";
 
 export interface CompareOperand {
   name: string;
@@ -31,6 +32,15 @@ export interface CompareShareCardProps {
   b: CompareOperand;
   /** URL slug for the shared link (?a=&b=). */
   href: string;
+  /** Roto points for the radar (lib/radar/points), metric order. Absent = pair max. */
+  radar?: CompareShareRadar;
+}
+
+export interface CompareShareRadar {
+  max: number;
+  a: (number | null)[];
+  b: (number | null)[];
+  refs: Pick<RadarRef, "role" | "pts">[];
 }
 
 // ── Palette — mirrors ProfileShareCard exactly ──────────────────────────────
@@ -43,7 +53,7 @@ const A_COLOR = COMPARE_OPERAND_COLORS.a;
 const B_COLOR = COMPARE_OPERAND_COLORS.b;
 
 /** Build an SVG radar chart with two overlapping polygons (A vs B). */
-function RadarGraphic({ a, b }: { a: CompareOperand; b: CompareOperand }) {
+function RadarGraphic({ a, b, radar }: { a: CompareOperand; b: CompareOperand; radar?: CompareShareRadar }) {
   const n = a.metrics.length;
   const cx = 300;
   const cy = 315;
@@ -62,8 +72,17 @@ function RadarGraphic({ a, b }: { a: CompareOperand; b: CompareOperand }) {
     y: cy + radius * Math.sin(angle),
   });
 
+  const ptsPolygon = (pts: (number | null)[]) =>
+    pts
+      .map((p, i) => {
+        const v = Math.max(0.05, Math.min(1, (p ?? 0) / (radar?.max || 1)));
+        const q = pt(angles[i], r * v);
+        return `${q.x.toFixed(1)},${q.y.toFixed(1)}`;
+      })
+      .join(" ");
+
   const polygon = (op: CompareOperand) =>
-    op.metrics
+    radar ? ptsPolygon(op === a ? radar.a : radar.b) : op.metrics
       .map((m, i) => {
         const max = Math.max(a.metrics[i].raw, b.metrics[i].raw, 1);
         const v = norm(m.raw, max, m.higherWins);
@@ -112,6 +131,19 @@ function RadarGraphic({ a, b }: { a: CompareOperand; b: CompareOperand }) {
           />
         );
       })}
+      {/* Field references: first / middle / last operator, white */}
+      {radar?.refs.map((ref) => (
+        <polygon
+          key={ref.role}
+          points={ptsPolygon(ref.pts)}
+          fill="none"
+          stroke="#ffffff"
+          strokeOpacity={RADAR_REF_STYLE[ref.role].opacity}
+          strokeWidth={RADAR_REF_STYLE[ref.role].width * 1.6}
+          strokeDasharray={RADAR_REF_STYLE[ref.role].dash}
+          strokeLinejoin="round"
+        />
+      ))}
       {/* A polygon (pink) */}
       <polygon
         points={polygon(a)}
@@ -155,6 +187,7 @@ function Card({
   cardRef,
   a,
   b,
+  radar,
 }: { cardRef: React.RefObject<HTMLDivElement | null> } & Omit<
   CompareShareCardProps,
   "href"
@@ -559,7 +592,7 @@ function Card({
             zIndex: 2,
           }}
         >
-          <RadarGraphic a={a} b={b} />
+          <RadarGraphic a={a} b={b} radar={radar} />
         </div>
 
         {/* Footer — A (pink, wins) | B (gold, wins), same position as Profile's AVERAGE USER footer */}
@@ -586,7 +619,7 @@ function Card({
   );
 }
 
-export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
+export function CompareShareCard({ a, b, href, radar }: CompareShareCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -674,7 +707,7 @@ export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
         }}
         aria-hidden
       >
-        <Card cardRef={cardRef} a={a} b={b} />
+        <Card cardRef={cardRef} a={a} b={b} radar={radar} />
       </div>
 
       {/* Preview modal — shows the card scaled to fit the viewport */}
@@ -701,7 +734,7 @@ export function CompareShareCard({ a, b, href }: CompareShareCardProps) {
                 transformOrigin: "top left",
               }}
             >
-              <Card cardRef={cardRef} a={a} b={b} />
+              <Card cardRef={cardRef} a={a} b={b} radar={radar} />
             </div>
           </div>
         </div>
