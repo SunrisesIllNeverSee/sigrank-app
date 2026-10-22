@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Exchange Signals — SignalAF",
   description: "Discover published work signals from domains participating in the Contribution Exchange. Problems, requests, challenges, bounties, verification tasks, and more.",
   robots: { index: true, follow: true },
+  alternates: { canonical: "/exchange/signals" },
 };
 
 export const revalidate = 60;

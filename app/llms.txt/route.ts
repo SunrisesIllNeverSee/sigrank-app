@@ -6,8 +6,27 @@
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
 import { editorialPagesMarkdown } from "@/lib/seo/llms-pages";
+import { isSitemapPromoted } from "@/lib/seo/search-index-policy";
 
 export const revalidate = 86400;
+
+// Topic pages listed only while sitemap-promoted — HOLD pages are not
+// advertised to agents (same gate as lib/seo/llms-pages.ts).
+const TOPIC_PAGES: { path: string; title: string; description: string }[] = [
+  { path: "/ai-evaluation", title: "AI Evaluation", description: "what AI evaluation means — the four layers (model, output, safety, operator) and where SigRank fits" },
+  { path: "/ai-evaluation-tools", title: "AI Evaluation Tools", description: "the complete tools landscape across all four layers" },
+  { path: "/best-ai-evaluation-tools-for-production", title: "Best AI Evaluation Tools for Production", description: "the production evaluation stack" },
+  { path: "/ai-evaluation-frameworks", title: "AI Evaluation Frameworks", description: "NIST AI RMF, OpenAI Evals, DeepEval, Braintrust, and SigRank" },
+  { path: "/ai-agent-evaluation", title: "AI Agent Evaluation", description: "evaluating AI agents and the operators who direct them" },
+  { path: "/ai-evaluator", title: "AI Evaluator", description: "what an AI evaluator is and what SigRank does differently" },
+  { path: "/ai-evaluation-platform", title: "AI Evaluation Platform", description: "SigRank as an evaluation platform for operators" },
+  { path: "/evaluating-ai", title: "Evaluating AI", description: "the operator layer is the missing piece" },
+  { path: "/ai-evaluation-news", title: "AI Evaluation News", description: "trends and developments in AI evaluation for 2026" },
+  { path: "/ai-compliance-standards", title: "AI Compliance Standards", description: "NIST AI RMF, EU AI Act, and governed operator evaluation" },
+  { path: "/ai-model-evaluation", title: "AI Model Evaluation", description: "model evaluation vs operator evaluation" },
+  { path: "/confirmation-hacking-ai-evaluation", title: "Confirmation Hacking", description: "when evaluation confirms what you already believe — and how content-free telemetry avoids it" },
+  { path: "/ai-model-safety-evaluation-benchmark-continuous-testing", title: "AI Model Safety Evaluation", description: "safety benchmarks and continuous testing, extended to operators" },
+];
 
 export async function GET() {
   const [homeStats, editorialPages] = await Promise.all([
@@ -21,6 +40,9 @@ export async function GET() {
   // refresh_system_stats() which selects by yield_).
   const topYield = homeStats.top_yield ?? 0;
   const topOperatorName = homeStats.top_operator_codename ?? "unknown";
+  const topicPages = TOPIC_PAGES.filter((p) => isSitemapPromoted(p.path))
+    .map((p) => `\n- [${p.title}](${SITE_ORIGIN}${p.path}): ${p.description}`)
+    .join("");
   const body = `# ${SITE_NAME}
 
 SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the accounts associated with AI-work telemetry by objective efficiency metrics computed from privacy-preserving token telemetry. Run \`npx sigrank\` to see your efficiency score.
@@ -101,6 +123,7 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Leaderboard](${SITE_ORIGIN}/board/all): live operator rankings (all-time, 7d, 30d, 90d windows)
 - [Score calculator](${SITE_ORIGIN}/score): paste your stats, get your Yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall): top operators
+- [Field Hub](${SITE_ORIGIN}/fieldhub): research hub linking the field analysis and the State of the Index dataset
 - [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across 1,498 operators
 - [TTEOP Standard](${SITE_ORIGIN}/standard): open telemetry protocol for AI operator measurement
 - [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, how operator scoring works, and the operator/agent/model comparison
@@ -146,20 +169,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - [All Guides](${SITE_ORIGIN}/guides): how-to guides for measuring efficiency and reducing waste
 - [All Tools](${SITE_ORIGIN}/tools): interactive calculators and comparators
 - [Wiki concepts](${SITE_ORIGIN}/wiki): verification, signal drift, four degrees, local agent, methodology
-- [Topic hubs](${SITE_ORIGIN}/ai-benchmarking): AI benchmarking, coding metrics, operator scoring, cascade analysis, token telemetry
-- [AI Evaluation](${SITE_ORIGIN}/ai-evaluation): what AI evaluation means — the four layers (model, output, safety, operator) and where SigRank fits
-- [AI Evaluation Tools](${SITE_ORIGIN}/ai-evaluation-tools): the complete tools landscape across all four layers
-- [Best AI Evaluation Tools for Production](${SITE_ORIGIN}/best-ai-evaluation-tools-for-production): the production evaluation stack
-- [AI Evaluation Frameworks](${SITE_ORIGIN}/ai-evaluation-frameworks): NIST AI RMF, OpenAI Evals, DeepEval, Braintrust, and SigRank
-- [AI Agent Evaluation](${SITE_ORIGIN}/ai-agent-evaluation): evaluating AI agents and the operators who direct them
-- [AI Evaluator](${SITE_ORIGIN}/ai-evaluator): what an AI evaluator is and what SigRank does differently
-- [AI Evaluation Platform](${SITE_ORIGIN}/ai-evaluation-platform): SigRank as an evaluation platform for operators
-- [Evaluating AI](${SITE_ORIGIN}/evaluating-ai): the operator layer is the missing piece
-- [AI Evaluation News](${SITE_ORIGIN}/ai-evaluation-news): trends and developments in AI evaluation for 2026
-- [AI Compliance Standards](${SITE_ORIGIN}/ai-compliance-standards): NIST AI RMF, EU AI Act, and governed operator evaluation
-- [AI Model Evaluation](${SITE_ORIGIN}/ai-model-evaluation): model evaluation vs operator evaluation
-- [Confirmation Hacking](${SITE_ORIGIN}/confirmation-hacking-ai-evaluation): when evaluation confirms what you already believe — and how content-free telemetry avoids it
-- [AI Model Safety Evaluation](${SITE_ORIGIN}/ai-model-safety-evaluation-benchmark-continuous-testing): safety benchmarks and continuous testing, extended to operators
+- [Topic hubs](${SITE_ORIGIN}/ai-benchmarking): AI benchmarking, coding metrics, operator scoring, cascade analysis, token telemetry${topicPages}
 
 ## Comparisons & Blog
 - [All Comparisons](${SITE_ORIGIN}/vs): comparisons with model, coding, observability, and AI developer tools
