@@ -449,8 +449,11 @@ export default async function ComparePage({
         {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
-        <div className="cmp-title-selectors">
-          <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
+        <div className="cmp-stage-head">
+          <div className="cmp-title-selectors">
+            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
+          </div>
+          <div className="mini-h"><span className="sq"></span>MATCHUP · BAR STATISTICS</div>
         </div>
         <div id="compare-vs-artwork" className="ws-cmp">
           {/* Phone-only score card (hidden above 760px by CSS), owner 2026-10-21. */}
