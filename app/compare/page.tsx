@@ -47,7 +47,7 @@ import { ChallengeOnX } from "@/components/compare/ChallengeOnX";
 import { getChallengeBetween } from "@/lib/identity/challenges-server";
 import { GATE_CHALLENGES } from "@/lib/features";
 import { TrackCompareView } from "@/components/analytics/TrackCompareView";
-import { CompareAgainstMe } from "@/components/compare/CompareAgainstMe";
+import type {} from "@/components/compare/CompareAgainstMe";
 import {
   CompareShareCard,
   type CompareOperand,
@@ -348,8 +348,6 @@ export default async function ComparePage({
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>OPERATOR A</div>
               {opMini(rowA, "a")}
-              <CompareAgainstMe eligibleCodes={selectorOptions.map(o => o.codename)}
-                bCode={bCode} />
             </div>
             <div className="mod">
               <div className="mini-h"><span className="sq"></span>OPERATOR B</div>
@@ -450,10 +448,10 @@ export default async function ComparePage({
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
         <div className="cmp-stage-head">
+          <div className="mini-h"><span className="sq"></span>MATCHUP</div>
           <div className="cmp-title-selectors">
             <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
           </div>
-          <div className="mini-h"><span className="sq"></span>MATCHUP · BAR STATISTICS</div>
         </div>
         <div id="compare-vs-artwork" className="ws-cmp">
           {/* Phone-only score card (hidden above 760px by CSS), owner 2026-10-21. */}
