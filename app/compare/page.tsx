@@ -63,6 +63,7 @@ import { fmtTokens } from "@/lib/analytics/record-value";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { CompareMobileScore } from "@/components/compare/CompareMobileScore";
 import { CompareStage } from "@/components/compare/CompareStage";
+import { CompareTOutline } from "@/components/compare/CompareTOutline";
 import { CompareHeadToHead } from "@/components/compare/CompareRadars";
 import { scoreRadarField } from "@/lib/radar/points";
 import { COMPARE_THEME_OPERAND_COLORS } from "@/components/compare/compare-palette";
@@ -448,6 +449,7 @@ export default async function ComparePage({
         {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
+        <CompareTOutline />
         <div className="cmp-stage-head">
           <div className="cmp-title-selectors">
             <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
