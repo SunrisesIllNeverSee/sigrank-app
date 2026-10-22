@@ -1,6 +1,6 @@
 /**
  * Single bounded, server-side history read for the live board.
- * Actual dated Signa Rate records only. No per-operator N+1 requests.
+ * Actual dated Yield records only. No per-operator N+1 requests.
  */
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
@@ -8,7 +8,7 @@ import { getLeaderboard } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 export const dynamic = "force-dynamic";
-type HistoryRow = { operator_id: string; snapshot_date: string | null; signa_rate: number | string | null; platform: string | null };
+type HistoryRow = { operator_id: string; snapshot_date: string | null; yield_: number | string | null; platform: string | null };
 export async function GET(req: NextRequest) {
   const gate = rateLimit(req);
   if (!gate.ok) return rateLimitedResponse(gate);
@@ -24,14 +24,14 @@ export async function GET(req: NextRequest) {
       operatorTotal: true, claimedOnly: true, mode: "all",
     });
     const ids = [...new Set(ops.map((r) => r.operator.operator_id))];
-    if (ids.length === 0) return NextResponse.json({ metric: "signa_rate", trends: {} });
+    if (ids.length === 0) return NextResponse.json({ metric: "yield", trends: {} });
     if (ids.length > 2000) return NextResponse.json({ error: "Field exceeds safe request limit" }, { status: 413 });
     const names = new Map(ops.map((r) => [r.operator.operator_id, r.operator.codename]));
     const all: HistoryRow[] = [];
     for (let page=0; page<8; page++) {
       const from=page*1000;
       const result = await sb.from("metric_snapshots")
-        .select("operator_id,snapshot_date,signa_rate,platform")
+        .select("operator_id,snapshot_date,yield_,platform")
         .eq("window_type",windowType)
         .in("operator_id",ids)
         .order("snapshot_date",{ascending:true})
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     }
     const daily = new Map<string,Map<string,{rate:number;multi:boolean}>>();
     for (const row of all) {
-      const rate=Number(row.signa_rate);
+      const rate=Number(row.yield_);
       if (!row.snapshot_date || !Number.isFinite(rate) || rate<=0) continue;
       const byDay=daily.get(row.operator_id) ?? new Map();
       const multi=row.platform==="multi";
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
       const code=names.get(id);
       if (code) trends[code]=[...dates.entries()].sort((a,b)=>a[0].localeCompare(b[0])).slice(-40).map(([,v])=>v.rate);
     }
-    return NextResponse.json({metric:"signa_rate",window:windowType,trends},{
+    return NextResponse.json({metric:"yield",window:windowType,trends},{
       headers:{"Cache-Control":"public, s-maxage=600, stale-while-revalidate=3600"},
     });
   } catch {

@@ -136,7 +136,7 @@ const HEAD_COLS: Record<ColMode, HeadCol[]> = {
   metrics: [
     { icon: "#", label: "RANK", cls: "hc-rank", l: true, pin: "rank" },
     { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true, pin: "op", tip: "Operator identity and class" },
-    { icon: "↗", label: "TREND", cls: "hc-trend", l: true, tip: "Observed Signa Rate history; not Yield" },
+    { icon: "↗", label: "TREND", cls: "hc-trend", l: true, tip: "Observed Yield history" },
     { icon: "∑", label: "TOTAL", cls: "hc-tot", k: "Total", tip: "I + O + W + R" },
     { icon: "∑", label: "∑/DAY", cls: "hc-day", k: "∑/Day", tip: "Exact-calendar processed tokens per day" },
     { icon: "Ⅴ", label: "SCALE V", cls: "hc-scale", k: "Scale V", tip: "log10(Input + Output + Cache-write + Cache-read). Each +1 = 10× recorded token activity. Activity volume, not efficiency or unique content. See Wiki.", href: "/wiki/metrics/scale-v" },
@@ -153,7 +153,7 @@ const HEAD_COLS: Record<ColMode, HeadCol[]> = {
   raw: [
     { icon: "#", label: "RANK", cls: "hc-rank", l: true, pin: "rank" },
     { icon: "◉", label: "OPERATOR", cls: "hc-op", l: true, pin: "op" },
-    { icon: "↗", label: "TREND", cls: "hc-trend", l: true, tip: "Observed Signa Rate history; not Yield" },
+    { icon: "↗", label: "TREND", cls: "hc-trend", l: true, tip: "Observed Yield history" },
     { icon: "→", label: "INPUT", cls: "hc-i", k: "Input" },
     { icon: "←", label: "OUTPUT", cls: "hc-o", k: "Output" },
     { icon: "✎", label: "CACHE-WRITE", cls: "hc-cw", k: "Cache-write" },
@@ -375,7 +375,7 @@ export const BoardRow = memo(function BoardRow({
         </div>
       </td>
       <td className="l">
-        <span className="op-trend" title="Observed Signa Rate history; not Yield">
+        <span className="op-trend" title="Observed Yield history">
           <Sparkline arr={o.trend ?? []} />
         </span>
       </td>
