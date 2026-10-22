@@ -656,7 +656,7 @@ export function LiveBoardWorkspace({
     setTrendsByCode({});
     fetch("/api/v1/board/trends?window=" + encodeURIComponent(initial.meta.window), { signal: controller.signal })
       .then((r) => { if (!r.ok) throw new Error("history unavailable"); return r.json(); })
-      .then((v) => { if (active && v?.metric === "signa_rate" && v.trends) setTrendsByCode(v.trends); })
+      .then((v) => { if (active && v?.metric === "yield" && v.trends) setTrendsByCode(v.trends); })
       .catch(() => {});
     return () => { active = false; controller.abort(); };
   }, [initial.meta.window]);
