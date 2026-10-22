@@ -50,13 +50,11 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
       let output = blob;
       if (gif) {
         const { holocardGif } = await import("./holocard-gif");
-        // The original 1200px / 24-frame GIF can exceed social upload limits
-        // (one owner export was 20.5 MB). Keep full-res PNG unchanged, but
-        // render GIF at 960px; the current encoder uses 9-bit pixel codes and
-        // this yields a ~13 MB upper bound at 1200:627 aspect ratio.
-        // Enforce a conservative 14.5 MB budget with automatic fallback.
+        // X/Twitter caps GIF uploads at 15 MB. The encoder (gif-encode.ts) uses
+        // LZW + per-frame deltas, so the full-width export fits (owner
+        // 2026-10-22: no downscaling). Shrink only as a last-resort fallback.
         const maxGifBytes = 14_500_000;
-        let gifWidth = Math.min(exportWidth ?? 324, 960);
+        let gifWidth = exportWidth ?? 324;
         output = await holocardGif(blob, { width: gifWidth, panelStart: gifPanelStart });
         while (output.size > maxGifBytes && gifWidth > 320) {
           gifWidth = Math.max(320, Math.floor(gifWidth * 0.8));
