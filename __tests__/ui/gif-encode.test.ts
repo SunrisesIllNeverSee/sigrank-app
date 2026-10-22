@@ -36,7 +36,7 @@ function decode(gif: Uint8Array) {
       for (let i = 0; i < size; i++, bit++) code |= ((data[bit >> 3] >> (bit & 7)) & 1) << i;
       if (code === clear) { reset(); continue; }
       if (code === eoi) break;
-      const entry = code < dict.length ? dict[code] : [...prev!, prev![0]];
+      const entry: number[] = code < dict.length ? dict[code] : [...prev!, prev![0]];
       out.push(...entry);
       if (prev) dict.push([...prev, entry[0]]);
       prev = entry;
