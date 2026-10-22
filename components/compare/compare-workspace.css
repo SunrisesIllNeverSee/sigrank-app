@@ -631,3 +631,57 @@
   .lbw-root:has(.ws-cmp-stage) .stage>.board>.ws-faq{margin-top:12px}
   .lbw-root:has(.ws-cmp-stage) .ws-faq summary{min-height:44px;display:flex;align-items:center}
 }
+
+/* TRUE T CONTOUR — one continuous gold line, not overlapping rectangles.
+   Measured SVG perimeter adapts to stage/sidebar widths without guessing the
+   1.05 / 1.35 / 1.05 column boundaries. Portrait cards are NOT in that frame. */
+.lbw-root .ws-cmp-stage{position:relative}
+.lbw-root .ws-cmp-stage .cmp-t-perimeter{
+  position:absolute;inset:0;display:block;width:100%;height:100%;
+  overflow:visible;pointer-events:none;z-index:10;
+}
+.lbw-root .ws-cmp-stage .cmp-t-perimeter-path{
+  fill:none;stroke:var(--ac);stroke-width:1.8px;
+  vector-effect:non-scaling-stroke;stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--ac) 23%,transparent));
+}
+@media (min-width:1181px){
+  /* Original gold bar and stem each had a full border, leaving internal
+     horizontal seams. Hide those two borders: only the outline SVG draws
+     the exterior silhouette. Match their top edges with a VISUAL shift,
+     without changing the owner-approved -66px ledger lift or stage rows. */
+  .lbw-root .ws-cmp-stage .cmp-stage-head{
+    top:-7px;border-color:transparent;
+    box-shadow:none;
+  }
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{
+    border-color:transparent;
+    box-shadow:none;
+  }
+  .lbw-root .ws-cmp-stage .ws-cmp{
+    column-gap:14px;
+  }
+  /* The selector columns keep their one-to-one alignment with the panels. */
+  .lbw-root .ws-cmp-stage .cmp-title-selectors>div{column-gap:14px}
+  /* A/B portraits occupy separate inset cards. Subtle ivory separators in the
+     gutters distinguish their frames from the main bright gold T stem. */
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel{
+    position:relative;
+    border-color:color-mix(in srgb,var(--tx2) 17%,var(--line2));
+    box-shadow:inset 0 1px 0 color-mix(in srgb,var(--tx2) 8%,transparent),
+               0 4px 14px rgba(0,0,0,.18);
+  }
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child::after,
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child::before{
+    content:"";position:absolute;top:12px;bottom:12px;width:1px;
+    background:color-mix(in srgb,var(--tx2) 30%,transparent);
+    pointer-events:none;
+  }
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child::after{right:-8px}
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child::before{left:-8px}
+}
+@media (max-width:1180px){
+  /* Stacked layout has no T. Retain legible individual panel borders. */
+  .lbw-root .ws-cmp-stage .cmp-t-perimeter{display:none}
+}
