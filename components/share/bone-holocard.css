@@ -71,36 +71,32 @@
 .bone-holo-card .bone-holo-ledger-rank{display:flex;align-items:center;justify-content:space-between;font:700 8px/1.05 BoneMono,monospace;color:#795b60}
 .bone-holo-card .bone-holo-ledger-rank b{font-weight:700}
 .bone-holo-card .bone-holo-paper footer{font:700 12px/1.1 BoneMono,monospace;bottom:25px;letter-spacing:1px}
-.bone-holo-card .bone-holo-plaque{position:absolute;z-index:9;left:829px;top:308px;width:344px;height:67px;display:flex;align-items:center;justify-content:center;padding:7px 18px;border:2px solid rgba(192,228,226,.87);border-radius:9px;background:linear-gradient(145deg,#071a1d 0%,#164247 30%,#0d2e35 55%,#153b42 100%);box-shadow:0 0 0 3px rgba(17,35,38,.72),inset 0 0 0 2px rgba(227,247,241,.16),inset 0 2px 13px rgba(0,0,0,.6),0 5px 16px rgba(0,0,0,.5)}
-.bone-holo-card .bone-holo-plaque::before{content:"";pointer-events:none;position:absolute;inset:8px;border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.1)}
-.bone-holo-card .bone-holo-plaque::after{content:"·";pointer-events:none;position:absolute;left:11px;top:2px;font-size:15px;color:#b9e2dd;text-shadow:326px 0 #b9e2dd}
-.bone-holo-card .bone-holo-plaque span{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font:700 24px/1.1 BoneMono,monospace;letter-spacing:.5px;color:#eaf9f5;text-shadow:0 1px 0 #080d10,0 -1px 0 #aec5c5,0 0 5px rgba(210,245,249,.35)}
-/* The plaque is the single operator name on this *share card* only.
-   Profile/passport everywhere else retains its own visible name. */
-.lbw-root .pv2 .bone-holo-live .pv2-operator-name{visibility:hidden}
-
-/* The primary field rank is a major result, never 9–12px metadata.
-   Applies only to the two shareable holographic cards; profile remains unchanged. */
-.lbw-root .pv2.share-holocard .pv2-rank-chip--field{
-  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
-  margin-top:9px;font:700 11px/1.1 BoneMono,monospace;
-  letter-spacing:.11em;color:#d2e7db;text-align:right;
+/* Share-only corrections: rank belongs to each ledger cell, NOT to the
+   passport's overall-field rank. Keep original Yield and FIELD hierarchy. */
+.bone-holo-card .bone-holo-ledger-cell{padding:4px 6px 2px}
+.bone-holo-card .bone-holo-ledger-label{font-size:9px;line-height:1.08}
+.bone-holo-card .bone-holo-ledger-value{font-size:11px;line-height:1.05;min-height:12px}
+.bone-holo-card .bone-holo-ledger-rank{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:2px;
+  margin-top:auto;white-space:nowrap;font:700 8px/1 BoneMono,monospace;color:#795b60;
 }
-.lbw-root .pv2.share-holocard .pv2-rank-chip--field strong{
-  font-family:var(--pc-font-d),BoneGrotesk,monospace;
-  font-size:58px;line-height:.93;letter-spacing:-.055em;
-  color:var(--pc-accent);font-variant-numeric:tabular-nums;
-  text-shadow:0 0 14px rgba(166,255,0,.22);
+.bone-holo-card .bone-holo-ledger-rank b{
+  flex-shrink:0;font:800 23px/.95 BoneMono,monospace;letter-spacing:-1px;
+  color:#382a30;font-variant-numeric:tabular-nums;
 }
-/* Preserve an intact #1234 on the fixed-width 324px passport. */
-.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="3"] strong{font-size:47px}
-.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="4"] strong{font-size:39px}
-.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="5"] strong{font-size:33px}
-.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="0"] strong{font-size:38px;color:var(--pc-muted)}
-.lbw-root .pv2.share-holocard .pv2-rank-chip--wf{
-  margin-top:5px;font-size:10px;letter-spacing:.04em;
+/* Single in-flow operator name in the exact native name slot, rather than
+   a second absolutely-positioned plaque obscuring the hologram.
+   Apply only on sharable card faces, not normal profile passports. */
+.lbw-root .pv2.share-holocard .pv2-operator-name{
+  display:block;visibility:visible;
+  width:100%;max-width:278px;height:37px;flex:0 0 auto;
+  margin:9px auto 1px;padding:7px 14px;
+  border:1px solid #c7dedd;border-radius:5px;
+  background:linear-gradient(160deg,#07181f 0%,#21525a 30%,#0b2c34 64%,#102a33 100%);
+  box-shadow:0 0 0 2px rgba(10,22,27,.5),inset 0 1px 0 rgba(249,255,255,.23),
+    inset 0 -2px 7px rgba(0,0,0,.45),0 3px 11px rgba(0,0,0,.33);
+  font:700 17px/1.15 BoneMono,monospace;letter-spacing:.25px;
+  text-align:center;color:#edf8f5;text-shadow:0 1px 0 #07131c,0 -1px 0 #99bfc0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.lbw-root .pv2.share-holocard .pv2-rating-number{font-size:42px}
-/* Metric-by-metric rank must also be readable in the 18-cell ledger. */
-.bone-holo-card .bone-holo-ledger-rank{font-size:9px;line-height:1.05}
-.bone-holo-card .bone-holo-ledger-rank b{font-size:12px;line-height:1;font-weight:800;color:#442f37}
+.lbw-root .pv2.share-holocard .pv2-operator-code{display:none}
