@@ -76,8 +76,13 @@ export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
     selectedSecondaryBadge={marks.secondaryLogos.find(m => m.id === preferences?.profile_secondary_logo) ?? null} />;
   return <div className="pv2 share-holocard flex flex-col items-center gap-4">
     <BoneHolocard codename={row.operator.codename} name={operatorDisplayName(row)} metrics={benchmarkCells(row, board)}>{passport(`bone-passport-${row.operator.codename}`)}</BoneHolocard>
-    <div className="pv2-pcard-scope">{passport(`holocard-${row.operator.codename}`)}</div>
-    <ArtworkShareControls target={`holocard-${row.operator.codename}`} title="holocard" animated
-      filename={`signalaf-holocard-${row.operator.codename}`} href={`/user/${encodeURIComponent(row.operator.codename)}`} />
+    <details className="mt-5 w-full rounded-lg border border-bg-border p-3">
+      <summary className="cursor-pointer font-mono text-xs text-text-secondary">Previous standalone holographic passport · archive</summary>
+      <div className="mt-4 flex flex-col items-center gap-3">
+        <div className="pv2-pcard-scope">{passport(`holocard-${row.operator.codename}`)}</div>
+        <ArtworkShareControls target={`holocard-${row.operator.codename}`} title="holocard" animated
+          filename={`signalaf-holocard-${row.operator.codename}`} href={`/user/${encodeURIComponent(row.operator.codename)}`} />
+      </div>
+    </details>
   </div>;
 }
