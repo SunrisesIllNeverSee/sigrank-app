@@ -10,3 +10,7 @@
 [data-artwork-export="gif"] .pv2-shine{opacity:0!important}
 [data-artwork-export="gif"] .pv2-card::after{opacity:0!important}
 .share-holocard{--pv2-display:var(--font-lbw-silk),monospace;--pv2-mono:var(--font-lbw-jb),monospace;--pv2-ui:var(--font-lbw-sg),sans-serif}
+
+/* The current Shareables package prioritizes the two formats of one card. */
+.artwork-share-controls .artwork-featured-format{font-weight:700;font-size:12px;min-height:38px;border-color:rgba(168,85,247,.7);background:rgba(168,85,247,.12)}
+.artwork-share-controls .artwork-featured-format:hover:not(:disabled){background:rgba(168,85,247,.23)}
