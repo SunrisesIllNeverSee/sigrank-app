@@ -1,22 +1,8 @@
-import type { Metadata } from "next";
-import { withOG } from "@/lib/seo";
-import BoardWindowPage from "./board/[window]/page";
+import { permanentRedirect } from "next/navigation";
 
-export const revalidate = 3600;
-
-export const metadata: Metadata = withOG({
-  title: "AI User Leaderboard · SigRank SignalAF",
-  description:
-    "The SigRank AI user leaderboard — AI users ranked by Υ Yield (token cascade efficiency). See how top AI operators compare all-time.",
-  path: "/",
-  ogImage: {
-    url: "/board/all/og",
-    width: 1200,
-    height: 630,
-    alt: "SigRank AI User Leaderboard",
-  },
-});
-
+// Owner decision (2026-10-22): /board/all is the home URL. The all-time board
+// is the landing page; / forwards (308) so the canonical address is
+// /board/all. The board workspace emits its own metadata + JSON-LD.
 export default function HomePage() {
-  return <BoardWindowPage params={Promise.resolve({ window: "all" })} />;
+  permanentRedirect("/board/all");
 }
