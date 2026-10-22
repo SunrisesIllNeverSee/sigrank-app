@@ -68,7 +68,7 @@ export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
   const own = board.find(r => r.operator.operator_id === row.operator.operator_id) ?? row;
   const trophies = await computeTrophyCounts(row.operator.codename, row.operator.display_name ?? undefined, board, hall);
   const passport = (id: string) => <PassportCard id={id}
-    operator={row.operator} snapshot={row.snapshot} globalRank={own.global_rank}
+    operator={row.operator} snapshot={row.snapshot} globalRank={own.global_rank} rankLabel="FIELD RANK"
     pending={!!row.pending} trophyCounts={trophies} fieldAvg={computeFieldAverages(board)}
     archetype={c && !c.nonCompounding ? buildArchetypeOf({ leverage: c.leverage, velocity: c.velocity, construction: c.construction }) : null}
     cohort={workflowCohortRank(board, row.operator.codename)}
