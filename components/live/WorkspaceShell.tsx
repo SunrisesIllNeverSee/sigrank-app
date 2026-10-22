@@ -516,11 +516,11 @@ export function WorkspaceShell({
                     <button type="button" aria-label="Back to previous page"
                       onClick={() => {
                         if (window.history.length > 1) router.back();
-                        else router.push("/");
+                        else router.push("/board/all");
                       }}>
                       <span aria-hidden="true">←</span> BACK
                     </button>
-                    <Link href="/" aria-label="Home — live leaderboard">
+                    <Link href="/board/all" aria-label="Home — live leaderboard">
                       <span aria-hidden="true">⌂</span> HOME
                     </Link>
                   </nav>
