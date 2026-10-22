@@ -15,7 +15,7 @@ import type { CSSProperties } from "react";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import type { SignalClass } from "@/components/sigrank/types";
-import { compareClassPalette, COMPARE_OPERAND_COLORS } from "./compare-palette";
+import { compareClassPalette, COMPARE_THEME_OPERAND_COLORS } from "./compare-palette";
 import { CompareRadars } from "./CompareRadars";
 import { scoreRadarField, type RadarField } from "@/lib/radar/points";
 import { glyphFor } from "@/lib/identity/canon-ids";
@@ -92,8 +92,8 @@ export function CompareMatchup({
   const nameB = nameOf(b);
   const clsA = a.snapshot.class_tier as SignalClass;
   const clsB = b.snapshot.class_tier as SignalClass;
-  const colA = COMPARE_OPERAND_COLORS.a;
-  const colB = COMPARE_OPERAND_COLORS.b;
+  const colA = COMPARE_THEME_OPERAND_COLORS.a;
+  const colB = COMPARE_THEME_OPERAND_COLORS.b;
 
   const { aWins, bWins } = compareTally(a, b);
   const winner: "a" | "b" | null =
