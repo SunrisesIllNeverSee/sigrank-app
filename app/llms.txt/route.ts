@@ -124,7 +124,7 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Score calculator](${SITE_ORIGIN}/score): paste your stats, get your Yield + class, no account
 - [Hall of Signal](${SITE_ORIGIN}/hall): top operators
 - [Field Hub](${SITE_ORIGIN}/fieldhub): research hub linking the field analysis and the State of the Index dataset
-- [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across 1,498 operators
+- [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across the tracked telemetry corpus
 - [TTEOP Standard](${SITE_ORIGIN}/standard): open telemetry protocol for AI operator measurement
 - [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, how operator scoring works, and the operator/agent/model comparison
 - [Operator Performance](${SITE_ORIGIN}/operator-performance): why the operator is the variable — class tiers, scoring, and the operator-performance hub
@@ -177,7 +177,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - [Blog](${SITE_ORIGIN}/blog): analysis on operator efficiency, token cascade economics, and outlier detection
 
 ## The numbers
-- ${operatorCount.toLocaleString()} operators ranked
+- ${operatorCount.toLocaleString()} operators tracked
 - ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked
 - 3,304 models measured

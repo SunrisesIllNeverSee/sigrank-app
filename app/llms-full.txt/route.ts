@@ -250,7 +250,7 @@ experimental record). Methodology page: ${SITE_ORIGIN}/methodology.
 
 ## Live aggregate stats
 
-- ${operatorCount.toLocaleString()} operators ranked
+- ${operatorCount.toLocaleString()} operators tracked
 - ${formatTokensLong(homeStats.total_tokens_scored)} tokens analyzed
 - 17 platforms tracked (Claude, ChatGPT, Gemini, Cursor, Copilot, ...)
 - 3,304 models measured
