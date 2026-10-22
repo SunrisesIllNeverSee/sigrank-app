@@ -103,7 +103,7 @@ import type { FiveStatRow } from "./FiveStats";
 import { CombinedSignal } from "./CombinedSignal";
 import type { SignalMetricKey, SignalSeries } from "./CombinedSignal";
 import { RotatingMovers } from "./MoversRail";
-import type {} from "../profile-v2/RailDialog";
+import { RailDialog } from "../profile-v2/RailDialog";
 import { ProfileActions } from "./ProfileActions";
 
 import {
@@ -1501,23 +1501,46 @@ export function LiveBoardWorkspace({
                   setSigMode("individual");
                 }}
               />
-              {(selOp?.recs ?? []).length ? (
-                <div className="trph">
-                  {(selOp!.recs ?? []).slice(0, 3).map((r) => (
-                    <div className="trph-r" key={r.metric}>
-                      <span className="ti">🏆</span>
-                      <span className="tm">{r.metric}</span>
-                      <span className="tv">
-                        #{r.rank} · {r.value}
-                      </span>
+              {/* owner 2026-10-22: graphics stay inline; the records +
+                  ranks detail opens as a popup on demand. */}
+              <RailDialog
+                title={`OPERATOR DETAIL · ${selOp?.name ?? "—"}`}
+                subtitle="COLUMN RANKS · RECORDS"
+                hint="OPEN ▸"
+                lazy
+                dialogClass="prl-dialog--insp"
+                trigger={
+                  <span className="prl-sum mono">
+                    <b>DETAIL · RECORDS</b>
+                    <span className="mut">
+                      {(selOp?.recs ?? []).length
+                        ? `${selOp!.recs!.length} RECORD${selOp!.recs!.length === 1 ? "" : "S"}`
+                        : "RECORDS · COLUMN RANKS"}
+                    </span>
+                  </span>
+                }
+              >
+                <>
+                  <ColumnRanks op={selOp} ops={ops} />
+                  {(selOp?.recs ?? []).length ? (
+                    <div className="trph">
+                      {(selOp!.recs ?? []).slice(0, 3).map((r) => (
+                        <div className="trph-r" key={r.metric}>
+                          <span className="ti">🏆</span>
+                          <span className="tm">{r.metric}</span>
+                          <span className="tv">
+                            #{r.rank} · {r.value}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="drill-note">
-                  {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
-                </p>
-              )}
+                  ) : (
+                    <p className="drill-note">
+                      {selDetailStatus === "ready" ? "— NO RECORDS YET" : "— SYNCING…"}
+                    </p>
+                  )}
+                </>
+              </RailDialog>
                 </>
             </>
           ) : (
