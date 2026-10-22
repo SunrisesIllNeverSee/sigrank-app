@@ -59,6 +59,7 @@ export function operatorSitemapEntries(
 
 /** Static routes (manually maintained — add new static pages here). */
 export const STATIC_ROUTES: StaticRouteEntry[] = [
+  { path: "/", priority: 1.0, changeFrequency: "daily" },
   { path: "/sigrank", priority: 0.8, changeFrequency: "daily" },
   // /board/all is emitted once via BOARD_WINDOWS below — do not re-add here.
   { path: "/score", priority: 0.9, changeFrequency: "daily" },

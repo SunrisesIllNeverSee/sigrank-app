@@ -140,7 +140,7 @@ export function MobileChrome({
         >
           <IconMenu />
         </button>
-        <Link href="/board/all" className="m-wordmark" aria-label="SignalAF home">
+        <Link href="/" className="m-wordmark" aria-label="SignalAF home">
           SIGNALAF
         </Link>
         <span className="m-spacer" />

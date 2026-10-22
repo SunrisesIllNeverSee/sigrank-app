@@ -27,7 +27,7 @@ export default function ExchangePage() {
     <div className="min-h-screen bg-bg-base text-text-primary">
       <header className="border-b border-bg-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
-          <Link href="/board/all" className="font-mono font-semibold">
+          <Link href="/" className="font-mono font-semibold">
             SigRank / Contribution Exchange
           </Link>
           <nav className="flex gap-4 font-sans text-sm text-text-muted">

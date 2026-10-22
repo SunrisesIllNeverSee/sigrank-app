@@ -404,7 +404,7 @@ test("every board window is classified and emitted at most once per URL", () => 
 
 test("the Phase-1 recovery cohort stays promoted (CORE or SUPPORTED)", () => {
   const cohort = [
-    "/board/all", "/methodology", "/wiki", "/science", "/research",
+    "/", "/board/all", "/methodology", "/wiki", "/science", "/research",
     "/token-telemetry", "/score", "/hall", "/compare", "/ai-operator-scoring",
     "/metrics/yield-cascade", "/metrics/cache-hit-rate",
     "/metrics/compression-ratio", "/tools/yield-calculator",

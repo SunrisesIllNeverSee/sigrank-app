@@ -17,7 +17,7 @@ export function SignOutButton() {
     setBusy(true);
     await signOut();
     router.refresh();
-    router.push("/board/all");
+    router.push("/");
   }
 
   return (
