@@ -77,6 +77,7 @@ export function OperatorSearchSelect({
   }, []);
 
   const handleSelect = (code: string) => {
+    if (code === disabledCode) return;
     onSelect(code);
     setOpen(false);
     setQuery("");
@@ -100,9 +101,10 @@ export function OperatorSearchSelect({
       setHighlightIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (filtered[highlightIndex]) {
-        handleSelect(filtered[highlightIndex].codename);
-      }
+      // Clamp — query changes reset highlight in an effect AFTER render, so a
+      // fast Enter can otherwise read a stale index past the filtered end.
+      const target = filtered[Math.min(highlightIndex, filtered.length - 1)];
+      if (target) handleSelect(target.codename);
     } else if (e.key === "Escape") {
       e.preventDefault();
       setOpen(false);
@@ -173,6 +175,7 @@ export function OperatorSearchSelect({
                     onClick={() => handleSelect(o.codename)}
                     onMouseEnter={() => setHighlightIndex(i)}
                     disabled={o.codename === disabledCode}
+                    data-highlighted={i === highlightIndex}
                     className={`block w-full px-3 py-1.5 text-left font-mono text-sm transition-colors ${
                       i === highlightIndex
                         ? "bg-bg-hover text-text-primary"
