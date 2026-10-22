@@ -18,7 +18,8 @@
  */
 
 import { ImageResponse } from "next/og";
-import { getOperator } from "@/lib/board";
+import { getLeaderboard, getOperator } from "@/lib/board";
+import { RADAR_REF_STYLE, radarFractions, scoreRadarField, type RadarRef } from "@/lib/radar/points";
 import { decodeCodename } from "@/lib/route-params";
 
 export const size = { width: 1200, height: 630 };
@@ -56,7 +57,13 @@ interface RadarRow {
   you: string;
 }
 
-function radarSvg(rows: RadarRow[], svgSize: number) {
+/** Field reference line (first / middle / last operator), 0..1 per axis. */
+interface RadarRefRow {
+  role: RadarRef["role"];
+  fracs: (number | null)[];
+}
+
+function radarSvg(rows: RadarRow[], svgSize: number, refs: RadarRefRow[] = []) {
   const n = rows.length;
   const cx = svgSize / 2,
     cy = svgSize / 2,
@@ -127,15 +134,29 @@ function radarSvg(rows: RadarRow[], svgSize: number) {
             />
           );
         })}
+        {/* roto field references (owner 2026-10-22): white first / middle / last */}
+        {refs.map((ref) => (
+          <polygon
+            key={`ref-${ref.role}`}
+            points={poly(ref.fracs)}
+            fill="none"
+            stroke="#ffffff"
+            strokeOpacity={Math.min(1, RADAR_REF_STYLE[ref.role].opacity + 0.1)}
+            strokeWidth={RADAR_REF_STYLE[ref.role].width * 2}
+            strokeDasharray={RADAR_REF_STYLE[ref.role].dash?.split(" ").map((n) => Number(n) * 2).join(" ")}
+          />
+        ))}
         {/* field average — dashed faint reference */}
-        <polygon
-          points={poly(rows.map((r) => r.avgFrac))}
-          fill="rgba(10,10,10,0.07)"
-          stroke={INK}
-          strokeWidth={1.5}
-          strokeDasharray="5 4"
-          opacity={0.5}
-        />
+        {refs.length === 0 && (
+          <polygon
+            points={poly(rows.map((r) => r.avgFrac))}
+            fill="rgba(10,10,10,0.07)"
+            stroke={INK}
+            strokeWidth={1.5}
+            strokeDasharray="5 4"
+            opacity={0.5}
+          />
+        )}
         {/* you — solid ink */}
         <polygon
           points={poly(rows.map((r) => r.frac))}
@@ -279,7 +300,11 @@ export default async function OperatorOG({
 }) {
   const { codename: rawCodename } = await params;
   const codename = decodeCodename(rawCodename);
-  const row = await getOperator(codename);
+  // Board read shares the profile page's memo key (same param literal).
+  const [row, board] = await Promise.all([
+    getOperator(codename),
+    getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }).catch(() => []),
+  ]);
 
   // Fallback to a generic card if the operator doesn't exist (shouldn't
   // happen in practice — the page 404s — but the OG route must not throw).
@@ -363,8 +388,15 @@ export default async function OperatorOG({
   const avgScl =
     avgTotal != null && avgTotal > 0 ? Math.log10(avgTotal).toFixed(2) : DOT;
 
-  // ── Radar rows — same per-axis log calibration as SplitFlapCard, with the
-  // component's legacy average-operator references (fieldAvg fallbacks).
+  // ── Radar rows — roto points in the all-time live field (lib/radar/points,
+  // the shared metric ring) when the operator is on the board; otherwise the
+  // legacy per-axis log calibration against average-operator references.
+  const metric = board.length ? scoreRadarField(board, "metric") : null;
+  const rotoPts = metric?.points[operator.codename];
+  const rotoFracs = metric && rotoPts ? radarFractions(rotoPts, metric.max) : null;
+  const radarRefs: RadarRefRow[] = metric && rotoFracs
+    ? metric.refs.map((r) => ({ role: r.role, fracs: radarFractions(r.pts, metric.max) }))
+    : [];
   const radarRows: RadarRow[] = ranked
     ? [
         { glyph: "SNR", youV: c.snr, avgV: 0.33, you: snrStr },
@@ -373,7 +405,10 @@ export default async function OperatorOG({
         { glyph: "10X", youV: c.dev10x ?? 0, avgV: 0.5, you: devStr },
         { glyph: "SCL", youV: c.scaleV, avgV: null, you: scaleStr },
         { glyph: "EFF", youV: c.efficiency, avgV: 1.0, you: effStr },
-      ].map(({ glyph, youV, avgV, you }) => {
+      ].map(({ glyph, youV, avgV, you }, i) => {
+        if (rotoFracs) {
+          return { glyph, you, frac: Math.max(0.02, rotoFracs[i] ?? 0), avgFrac: null };
+        }
         const axisMax = Math.max(youV ?? 0, avgV ?? 0, 1e-9) * 1.25;
         const logN = (v: number) =>
           Math.log1p(Math.max(0, v)) / Math.log1p(axisMax);
@@ -651,7 +686,7 @@ export default async function OperatorOG({
           }}
         >
           {radarRows.length >= 3 ? (
-            radarSvg(radarRows, 430)
+            radarSvg(radarRows, 430, radarRefs)
           ) : (
             <div
               style={{
@@ -691,12 +726,14 @@ export default async function OperatorOG({
                 display: "flex",
                 width: 16,
                 height: 0,
-                borderTop: `2px dashed ${INK}`,
+                borderTop: radarRefs.length ? "2px solid #ffffff" : `2px dashed ${INK}`,
                 marginRight: 5,
                 opacity: 0.55,
               }}
             />
-            <div style={{ display: "flex", opacity: 0.55 }}>FIELD AVG</div>
+            <div style={{ display: "flex", opacity: 0.55 }}>
+              {metric && radarRefs.length ? `#${metric.refs.map((r) => r.rank).join(" · #")} (WHITE)` : "FIELD AVG"}
+            </div>
           </div>
         </div>
 

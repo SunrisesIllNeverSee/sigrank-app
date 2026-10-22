@@ -1488,6 +1488,7 @@ export function LiveBoardWorkspace({
                       operator={sixFactsOf(selOp)}
                       raw={rawFactsOf(selOp)}
                       label={selOp.name}
+                      roto={initial.radars ? { codename: selOp.codename, metric: initial.radars.metric, raw: initial.radars.raw } : undefined}
                     />
                   ) : (
                     <p className="drill-note">— SELECT AN OPERATOR</p>
@@ -2045,6 +2046,7 @@ export function LiveBoardWorkspace({
                       detail={selDetail}
                       detailStatus={selDetailStatus}
                       radarBaseline={radarBaseline}
+                      radarField={initial.radars?.dock}
                     />
                   )}
 
@@ -2236,6 +2238,7 @@ export function LiveBoardWorkspace({
                 detailStatus={peekDetailStatus}
                 selSlug={selOp?.slug ?? null}
                 onClose={() => setPeekCodename(null)}
+                radars={initial.radars}
               />
             )}
 

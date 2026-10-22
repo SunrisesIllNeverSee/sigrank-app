@@ -18,7 +18,7 @@
  *   operator's profile in the inspector rail.
  */
 import { useState } from "react";
-import type { LiveOperator } from "@/lib/board/live-types";
+import type { BoardRadars, LiveOperator } from "@/lib/board/live-types";
 import type { ProfileView } from "./utils";
 import type { SignalSeries, SignalMetricKey } from "./CombinedSignal";
 import { CombinedSignal } from "./CombinedSignal";
@@ -40,6 +40,7 @@ export function PeekPanel({
   detailStatus,
   selSlug,
   onClose,
+  radars,
 }: {
   /** peeked operator, merged with its fetched detail */
   op: LiveOperator;
@@ -51,6 +52,8 @@ export function PeekPanel({
   /** currently-selected operator's slug → COMPARE pairs a=sel&b=peek */
   selSlug: string | null;
   onClose: () => void;
+  /** all-time roto radars from the board page (lib/radar/points) */
+  radars?: BoardRadars;
 }) {
   const [sigMode, setSigMode] = useState<"combined" | "individual">(
     "combined",
@@ -97,6 +100,7 @@ export function PeekPanel({
                 operator={sixFactsOf(op)}
                 raw={rawFactsOf(op)}
                 label={op.name}
+                roto={radars ? { codename: op.codename, metric: radars.metric, raw: radars.raw } : undefined}
               />
             }
             stats={<ColumnRanks op={op} ops={ops} />}
