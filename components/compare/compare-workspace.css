@@ -766,6 +766,16 @@
 }
 @media(max-width:760px){
   .lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker{width:100%}
+  /* Reset legacy phone selectors: their A/B pseudo-letters and 18px-wide
+     label column were intended for an older horizontal picker layout. */
+  .lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker>span.cmp-operator-picker-label{
+    width:auto;min-width:0;flex:none;overflow:visible;white-space:nowrap;
+    font:800 10px/1.15 var(--font-mono);letter-spacing:.12em;
+  }
+  .lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker>span.cmp-operator-picker-label::before{
+    content:"";display:inline-block;width:5px;height:5px;flex:0 0 5px;
+    font-size:0;
+  }
   .lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger,
   .lbw-root .ws-cmp-stage .cmp-title-selectors input.cmp-operator-input{
     min-height:44px;font-size:15px;
