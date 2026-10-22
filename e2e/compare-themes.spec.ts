@@ -10,11 +10,18 @@ for (const theme of ["gold", "green", "bone", "purple"]) {
       await expect(stage).toBeVisible();
       const ledger = stage.locator(".cmp-ledger-workspace");
       const baseline = await ledger.innerText();
-      const geometry = await stage.evaluate(el => ({
-        fits: el.scrollWidth <= el.clientWidth,
-        documentFits: document.documentElement.scrollWidth <= innerWidth,
-        headerBorder: getComputedStyle(el.querySelector(".cmp-stage-head")!).borderTopWidth,
-      }));
+      const geometry = await stage.evaluate(el => {
+        const bounds = el.getBoundingClientRect();
+        return {
+          fits: [...el.querySelectorAll(".cmp-matchup-panel,.ws-cmp-ledger,.cmp-h2h,.cmp-operator-picker")].every(child => {
+            const rect = child.getBoundingClientRect();
+            if (child.matches(".cmp-h2h")) return rect.left >= 0 && rect.right <= innerWidth;
+            return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1;
+          }),
+          documentFits: document.documentElement.scrollWidth <= innerWidth,
+          headerBorder: getComputedStyle(el.querySelector(".cmp-stage-head")!).borderTopWidth,
+        };
+      });
       expect(geometry).toEqual({ fits: true, documentFits: true, headerBorder: "0px" });
       const leading = stage.locator(".cmp-profile-leading");
       if (await leading.count()) {
@@ -42,6 +49,14 @@ for (const theme of ["gold", "green", "bone", "purple"]) {
         await expect(active).toHaveCSS("box-shadow", /inset/);
         const ink = await picker.locator(".cmp-operator-picker-label").evaluate(el => getComputedStyle(el).color);
         await expect(active).toHaveCSS("color", ink);
+        const previous = options.nth(enabledIndex);
+        await previous.hover();
+        const nextIndex = await options.evaluateAll((es, start) => es.findIndex((e, i) => i > start && !(e as HTMLButtonElement).disabled), enabledIndex);
+        expect(nextIndex).toBeGreaterThan(enabledIndex);
+        for (let i = enabledIndex; i < nextIndex; i++) await input.press("ArrowDown");
+        await expect(previous).toHaveAttribute("data-highlighted", "false");
+        await expect(previous).toHaveCSS("box-shadow", "none");
+        await expect(active).toHaveCSS("box-shadow", /inset/);
         if (width === 390) {
           expect((await active.boundingBox())!.height).toBeGreaterThanOrEqual(44);
           await expect(input).toHaveCSS("font-size", "16px");

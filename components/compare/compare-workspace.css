@@ -806,8 +806,9 @@
 }
 .lbw-root .ws-cmp-stage .cmp-title-selectors .cmp-operator-menu button{
   width:100%;min-height:32px;padding:7px 10px;border:0;border-radius:0;
+  color:var(--tx);background:var(--panel);
 }
-.lbw-root .ws-cmp-stage .cmp-title-selectors .cmp-operator-menu button:is([data-highlighted="true"],:hover,:focus-visible):not(:disabled){
+.lbw-root .ws-cmp-stage .cmp-title-selectors .cmp-operator-menu button:is([data-highlighted="true"],:focus-visible):not(:disabled){
   color:var(--picker-accent);
   background:color-mix(in srgb,var(--picker-accent) 12%,var(--panel));
   box-shadow:inset 3px 0 var(--picker-accent);
