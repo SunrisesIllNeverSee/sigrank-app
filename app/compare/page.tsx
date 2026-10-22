@@ -449,6 +449,9 @@ export default async function ComparePage({
         {/* LEDGER — full RAW / METRICS / FLOW / TOTAL head-to-head lives in
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
+        <div className="cmp-title-selectors">
+          <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
+        </div>
         <div id="compare-vs-artwork" className="ws-cmp">
           {/* Phone-only score card (hidden above 760px by CSS), owner 2026-10-21. */}
           <CompareMobileScore
@@ -458,9 +461,6 @@ export default async function ComparePage({
             bWins={bWins}
             href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
           />
-          <div className="cmp-title-selectors">
-            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
-          </div>
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors field={radars.composite} />
           </div>
