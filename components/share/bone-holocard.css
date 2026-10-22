@@ -71,11 +71,6 @@
 .bone-holo-card .bone-holo-ledger-rank{display:flex;align-items:center;justify-content:space-between;font:700 8px/1.05 BoneMono,monospace;color:#795b60}
 .bone-holo-card .bone-holo-ledger-rank b{font-weight:700}
 .bone-holo-card .bone-holo-paper footer{font:700 12px/1.1 BoneMono,monospace;bottom:25px;letter-spacing:1px}
-.bone-holo-card .bone-holo-plaque{position:absolute;z-index:9;left:829px;top:308px;width:344px;height:67px;display:flex;align-items:center;justify-content:center;padding:7px 18px;border:2px solid rgba(192,228,226,.87);border-radius:9px;background:linear-gradient(145deg,#071a1d 0%,#164247 30%,#0d2e35 55%,#153b42 100%);box-shadow:0 0 0 3px rgba(17,35,38,.72),inset 0 0 0 2px rgba(227,247,241,.16),inset 0 2px 13px rgba(0,0,0,.6),0 5px 16px rgba(0,0,0,.5)}
-.bone-holo-card .bone-holo-plaque::before{content:"";pointer-events:none;position:absolute;inset:8px;border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.1)}
-.bone-holo-card .bone-holo-plaque::after{content:"·";pointer-events:none;position:absolute;left:11px;top:2px;font-size:15px;color:#b9e2dd;text-shadow:326px 0 #b9e2dd}
-.bone-holo-card .bone-holo-plaque span{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font:700 24px/1.1 BoneMono,monospace;letter-spacing:.5px;color:#eaf9f5;text-shadow:0 1px 0 #080d10,0 -1px 0 #aec5c5,0 0 5px rgba(210,245,249,.35)}
-
 /* Share-only corrections: rank belongs to each ledger cell, NOT to the
    passport's overall-field rank. Keep original Yield and FIELD hierarchy. */
 .bone-holo-card .bone-holo-ledger-cell{padding:4px 6px 2px}
