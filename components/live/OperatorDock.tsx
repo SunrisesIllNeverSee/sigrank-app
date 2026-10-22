@@ -52,6 +52,7 @@ import { Sparkline } from "./rows";
 /* dock-radar.css — the dual-radar chrome (owner directive 2026-10-06);
    travels with this module the way rail-extras.css rides EnterprisePromo. */
 import "./dock-radar.css";
+import { RADAR_REF_STYLE, radarFractions, type RadarField, type RadarRef } from "@/lib/radar/points";
 
 export type DockTab =
   | "overview"
@@ -100,13 +101,22 @@ export const FIELD_MAX_RADAR: DockRadarBaseline = {
   vals: RADAR_AXES.map(() => 1),
 };
 
+/** Field reference lines (lib/radar/points): first / middle / last operator, 0..1 per axis. */
+export interface DockRadarRef {
+  role: RadarRef["role"];
+  vals: (number | null)[];
+  title: string;
+}
+
 export function RadarChart({
   vals,
   baseline,
+  refs,
   size = 190,
 }: {
   vals: number[];
   baseline?: DockRadarBaseline;
+  refs?: DockRadarRef[];
   size?: number;
 }) {
   const cx = size / 2;
@@ -163,8 +173,26 @@ export function RadarChart({
           </g>
         );
       })}
+      {/* roto field references (owner 2026-10-22): white first / middle / last */}
+      {refs?.map((ref) => {
+        const st = RADAR_REF_STYLE[ref.role];
+        return (
+          <polygon
+            key={ref.role}
+            points={ptsFor(ref.vals.map((v) => v ?? 0.06))}
+            fill="none"
+            stroke="var(--tx)"
+            strokeOpacity={st.opacity}
+            strokeWidth={st.width}
+            strokeDasharray={st.dash}
+            strokeLinejoin="round"
+          >
+            <title>{ref.title}</title>
+          </polygon>
+        );
+      })}
       {/* baseline under the operator — contrast --cyan stroke + lighter fill */}
-      {base && (
+      {!refs && base && (
         <>
           <polygon
             points={ptsFor(base)}
@@ -534,6 +562,7 @@ export function OperatorDock({
   detail = null,
   detailStatus = "idle",
   radarBaseline,
+  radarField,
 }: {
   d: ProfileView;
   /** true → this card renders hidden; profile lives in the rail module. */
@@ -553,6 +582,10 @@ export function OperatorDock({
    *  FIELD MAX rim (radius 1 is the per-axis ceiling `d.series` is already
    *  normalized against — the honest field baseline with no new data flow). */
   radarBaseline?: DockRadarBaseline;
+  /** All-time roto points for the dock radar (lib/radar/points). When the
+   *  operator is in it, the radar draws points plus the white field references
+   *  instead of the fieldMax series and baseline. */
+  radarField?: RadarField;
 }) {
   const [tab, setTab] = useState<DockTab>("overview");
   /* Roving-tabindex tab strip (WAI-ARIA tabs pattern — the reference shipped
@@ -580,6 +613,17 @@ export function OperatorDock({
      the workspace wires it) wins; else the FIELD MAX rim, the honest ceiling
      `d.series` is already normalized against (owner 2026-10-06). */
   const radarBase = radarBaseline ?? FIELD_MAX_RADAR;
+  const rotoPts = o ? radarField?.points[o.codename] : undefined;
+  const roto = radarField && rotoPts
+    ? {
+        vals: radarFractions(rotoPts, radarField.max).map((v) => v ?? 0.06),
+        refs: radarField.refs.map((r) => ({
+          role: r.role,
+          vals: radarFractions(r.pts, radarField.max),
+          title: `${RADAR_REF_STYLE[r.role].label}: #${r.rank} ${r.name}`,
+        })),
+      }
+    : null;
 
   const dirUp = deltaUp(d.delta);
   return (
@@ -728,16 +772,23 @@ export function OperatorDock({
         {/* dual radar (owner 2026-10-06): chart + legend chips + caption stack
             in .dockr; the legend names both series compare-page style. */}
         <div className="dockr">
-          <RadarChart vals={d.series} baseline={radarBase} />
+          <RadarChart vals={roto?.vals ?? d.series} baseline={radarBase} refs={roto?.refs} />
           <div className="dockr-leg" aria-hidden>
             <span className="dockr-chip op">
               <i className="sw" />
               <span>{d.name}</span>
             </span>
-            <span className="dockr-chip base">
-              <i className="sw" />
-              <span>{radarBase.label}</span>
-            </span>
+            {roto && radarField ? (
+              <span className="dockr-chip refs" title={radarField.refs.map((r) => `#${r.rank} ${r.name}`).join(" · ")}>
+                <i className="sw" />
+                <span>{radarField.refs.map((r) => `#${r.rank}`).join(" · ")}</span>
+              </span>
+            ) : (
+              <span className="dockr-chip base">
+                <i className="sw" />
+                <span>{radarBase.label}</span>
+              </span>
+            )}
           </div>
           <div
             className="mut"

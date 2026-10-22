@@ -12,6 +12,7 @@ import { sortValue } from "@/lib/analytics/sort-value";
 import { recordValue } from "@/lib/analytics/record-value";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { ArtworkShareControls } from "./ArtworkShareControls";
+import { scoreRadarField } from "@/lib/radar/points";
 import "@/components/profile-v2/profile-workspace.css";
 
 /** V6 ledger: 12 cascade boards, four raw pillars, total and processed/day.
@@ -67,11 +68,13 @@ export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
   const c = row.snapshot.cascade;
   const own = board.find(r => r.operator.operator_id === row.operator.operator_id) ?? row;
   const trophies = await computeTrophyCounts(row.operator.codename, row.operator.display_name ?? undefined, board, hall);
+  const metricRadar = board.length ? scoreRadarField(board, "metric") : null;
   const passport = (id: string) => <PassportCard id={id}
     operator={row.operator} snapshot={row.snapshot} globalRank={own.global_rank} rankLabel="FIELD RANK"
     pending={!!row.pending} trophyCounts={trophies} fieldAvg={computeFieldAverages(board)}
     archetype={c && !c.nonCompounding ? buildArchetypeOf({ leverage: c.leverage, velocity: c.velocity, construction: c.construction }) : null}
     cohort={workflowCohortRank(board, row.operator.codename)}
+    radar={metricRadar}
     selectedPixelBadge={marks.pixelBadges.find(m => m.id === preferences?.profile_pixel_badge) ?? null}
     selectedSecondaryBadge={marks.secondaryLogos.find(m => m.id === preferences?.profile_secondary_logo) ?? null} />;
   return <div className="pv2 share-holocard flex flex-col items-center gap-4">

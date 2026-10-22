@@ -13,6 +13,10 @@
  * normalize so the field average sits at 50% (the same convention
  * SplitFlapCard documents for radarAxes): norm = clamp(v / (avg * 2), 0..1).
  * Missing/undefined data renders "—", never a fabricated zero.
+ *
+ * With `radar` (owner 2026-10-22) the mini radar draws roto points instead
+ * (lib/radar/points, the shared metric ring: SNR VEL LEV 10X SCV EFF) over the
+ * field's first / middle / last operator in white.
  */
 
 import type { Operator, CascadeMetrics } from "@/lib/analytics/scoring-types";
@@ -23,6 +27,7 @@ import type { WorkflowCohortRank } from "@/lib/analytics/workflow-cohort";
 import type { ProfileMarkOption } from "@/lib/profile/profile-marks";
 import { MedalHex } from "./RecordMarks";
 import { PixelArtwork } from "@/components/profile-v2/BadgeArtwork";
+import { RADAR_REF_STYLE, radarFractions, type RadarField } from "@/lib/radar/points";
 
 interface PassportCardProps {
   operator: Pick<Operator, "codename" | "display_name" | "avatar_url" | "primary_domain">;
@@ -43,6 +48,8 @@ interface PassportCardProps {
   showSignature?: boolean;
   rankLabel?: string;
   id?: string;
+  /** All-time roto metric ring for the mini radar; absent = field-average scale. */
+  radar?: RadarField | null;
 }
 
 function compact(n: number): string {
@@ -92,6 +99,7 @@ export function PassportCard({
   selectedSecondaryBadge,
   showSignature = true,
   rankLabel = "FIELD",
+  radar,
 }: PassportCardProps) {
   const c = snapshot.cascade;
   const show = !pending && c && !c.nonCompounding ? c : null;
@@ -106,11 +114,23 @@ export function PassportCard({
     { label: "DEV", value: show ? show.dev10x : null, avg: fieldAvg?.dev10x ?? null },
     { label: "SCV", value: show ? show.scaleV : null, avg: fieldAvg?.scaleV ?? null },
   ];
-  const polygon = axes
-    .map((a, i) => radarPoint(i, normAxis(a.value, a.avg)).map((n) => n.toFixed(2)).join(","))
+  const rotoPts = radar?.points[operator.codename];
+  const fracs: number[] = radar && rotoPts
+    ? radarFractions(rotoPts, radar.max).map((v) => v ?? 0)
+    : axes.map((a) => normAxis(a.value, a.avg));
+  const refPolys = radar && rotoPts
+    ? radar.refs.map((r) => ({
+        role: r.role,
+        points: radarFractions(r.pts, radar.max)
+          .map((v, i) => radarPoint(i, v ?? 0).map((n) => n.toFixed(2)).join(","))
+          .join(" "),
+      }))
+    : [];
+  const polygon = fracs
+    .map((f, i) => radarPoint(i, f).map((n) => n.toFixed(2)).join(","))
     .join(" ");
   const dotAt = (i: number) => {
-    const [x, y] = radarPoint(i, normAxis(axes[i].value, axes[i].avg));
+    const [x, y] = radarPoint(i, fracs[i]);
     return { x: x.toFixed(2), y: y.toFixed(2) };
   };
 
@@ -215,6 +235,18 @@ export function PassportCard({
                       <line key={i} x1="60" y1="60" x2={x} y2={y} stroke="#A855F7" strokeWidth="0.5" strokeOpacity="0.18" />
                     );
                   })}
+                  {refPolys.map((r) => (
+                    <polygon
+                      key={r.role}
+                      points={r.points}
+                      fill="none"
+                      stroke="#ffffff"
+                      strokeOpacity={RADAR_REF_STYLE[r.role].opacity}
+                      strokeWidth={RADAR_REF_STYLE[r.role].width * 0.6}
+                      strokeDasharray={RADAR_REF_STYLE[r.role].dash ? RADAR_REF_STYLE[r.role].dash?.split(" ").map((n) => Number(n) * 0.5).join(" ") : undefined}
+                      strokeLinejoin="round"
+                    />
+                  ))}
                   <polygon
                     points={polygon}
                     fill="rgba(168,85,247,0.18)"
