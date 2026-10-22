@@ -27,7 +27,7 @@ export default function UpgradeSuccessPage() {
         everyone because of supporters like you.
       </p>
       <Link
-        href="/"
+        href="/board/all"
         className="rounded-md border px-4 py-2 text-sm hover:opacity-80"
       >
         Back to the board
