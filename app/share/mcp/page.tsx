@@ -202,7 +202,7 @@ function ErrorCard({ message }: { message: string }) {
           MCP server →
         </Link>
         <Link
-          href="/"
+          href="/board/all"
           className="font-mono text-sm text-text-secondary underline hover:text-text-primary"
         >
           Home →
