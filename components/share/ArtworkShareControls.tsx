@@ -47,7 +47,25 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
       if (navigator.vendor.includes("Apple")) await toBlob(node, options);
       const blob = await toBlob(node, options);
       if (!blob) throw new Error("Image could not be rendered");
-      const output = gif ? await (await import("./holocard-gif")).holocardGif(blob, { width: exportWidth, panelStart: gifPanelStart }) : blob;
+      let output = blob;
+      if (gif) {
+        const { holocardGif } = await import("./holocard-gif");
+        // The original 1200px / 24-frame GIF can exceed social upload limits
+        // (one owner export was 20.5 MB). Keep full-res PNG unchanged, but
+        // render GIF at 960px; the current encoder uses 9-bit pixel codes and
+        // this yields a ~13 MB upper bound at 1200:627 aspect ratio.
+        // Enforce a conservative 14.5 MB budget with automatic fallback.
+        const maxGifBytes = 14_500_000;
+        let gifWidth = Math.min(exportWidth ?? 324, 960);
+        output = await holocardGif(blob, { width: gifWidth, panelStart: gifPanelStart });
+        while (output.size > maxGifBytes && gifWidth > 320) {
+          gifWidth = Math.max(320, Math.floor(gifWidth * 0.8));
+          output = await holocardGif(blob, { width: gifWidth, panelStart: gifPanelStart });
+        }
+        if (output.size > maxGifBytes) {
+          throw new Error("Animated GIF exceeds the 15 MB upload budget");
+        }
+      }
       const file = new File([output], `${filename}.${gif ? "gif" : "png"}`, { type: output.type });
       if (share && navigator.canShare?.({ files: [file] })) {
         try {
@@ -63,7 +81,8 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
       link.download = file.name;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
-      setMessage(share ? "Image downloaded—ready to share." : `${gif ? "GIF" : "PNG"} downloaded.`);
+      const exportInfo = gif ? `GIF ${(output.size / 1_000_000).toFixed(2)} MB · under 15 MB upload limit.` : "PNG downloaded.";
+      setMessage(share ? `${exportInfo} Ready to share.` : exportInfo);
     } catch (error) {
       console.warn("Artwork export failed", error);
       if (!(error instanceof Error && error.name === "AbortError")) setMessage("Could not render the image. Please try again.");
