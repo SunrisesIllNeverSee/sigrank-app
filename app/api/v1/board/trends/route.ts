@@ -7,8 +7,8 @@ import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { getLeaderboard } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
+import { buildYieldTrends, TREND_COLUMNS, type TrendSnapshotRow } from "@/lib/board/yield-trends";
 export const dynamic = "force-dynamic";
-type HistoryRow = { operator_id: string; snapshot_date: string | null; cascade: { yield_?: number | string | null } | null; platform: string | null };
 export async function GET(req: NextRequest) {
   const gate = rateLimit(req);
   if (!gate.ok) return rateLimitedResponse(gate);
@@ -27,36 +27,22 @@ export async function GET(req: NextRequest) {
     if (ids.length === 0) return NextResponse.json({ metric: "yield", trends: {} });
     if (ids.length > 2000) return NextResponse.json({ error: "Field exceeds safe request limit" }, { status: 413 });
     const names = new Map(ops.map((r) => [r.operator.operator_id, r.operator.codename]));
-    const all: HistoryRow[] = [];
+    const all: TrendSnapshotRow[] = [];
     for (let page=0; page<8; page++) {
       const from=page*1000;
       const result = await sb.from("metric_snapshots")
-        .select("operator_id,snapshot_date,cascade,platform")
+        .select(TREND_COLUMNS)
         .eq("window_type",windowType)
         .in("operator_id",ids)
         .order("snapshot_date",{ascending:true})
         .range(from,from+999);
       if (result.error) throw result.error;
-      const slice=(result.data??[]) as HistoryRow[];
+      const slice=(result.data??[]) as TrendSnapshotRow[];
       all.push(...slice);
       if (slice.length < 1000) break;
       if (page===7) throw new Error("History truncated: bounded scan limit reached");
     }
-    const daily = new Map<string,Map<string,{rate:number;multi:boolean}>>();
-    for (const row of all) {
-      const rate=Number(row.cascade?.yield_);
-      if (!row.snapshot_date || !Number.isFinite(rate) || rate<=0) continue;
-      const byDay=daily.get(row.operator_id) ?? new Map();
-      const multi=row.platform==="multi";
-      const current=byDay.get(row.snapshot_date);
-      if (!current || (multi&&!current.multi)) byDay.set(row.snapshot_date,{rate,multi});
-      daily.set(row.operator_id,byDay);
-    }
-    const trends: Record<string,number[]> = {};
-    for (const [id,dates] of daily) {
-      const code=names.get(id);
-      if (code) trends[code]=[...dates.entries()].sort((a,b)=>a[0].localeCompare(b[0])).slice(-40).map(([,v])=>v.rate);
-    }
+    const trends = buildYieldTrends(all, names);
     return NextResponse.json({metric:"yield",window:windowType,trends},{
       headers:{"Cache-Control":"public, s-maxage=600, stale-while-revalidate=3600"},
     });
