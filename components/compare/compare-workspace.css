@@ -698,11 +698,14 @@
 }
 /* Operator dropdowns: illuminated interactive fields with distinct operand
    identity, visible chevrons, and keyboard-focus treatment. */
-.lbw-root .ws-cmp-stage .cmp-title-selectors>div>div>div.cmp-operator-picker{
-  width:min(215px,100%);min-width:0;display:flex;flex-direction:column;gap:4px;
+.lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker{
+  width:min(215px,100%);min-width:0;display:flex;flex-direction:column;
+  align-items:stretch;justify-content:flex-start;gap:4px;
   position:relative;
   --picker-accent:var(--compare-a,var(--ac));
 }
+.lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker--a{justify-self:start}
+.lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker--b{justify-self:end}
 .lbw-root .ws-cmp-stage .cmp-operator-picker--b{
   --picker-accent:var(--compare-b,var(--tx2))!important;
 }
@@ -716,7 +719,7 @@
   border-radius:50%;background:var(--picker-accent);
   box-shadow:0 0 8px color-mix(in srgb,var(--picker-accent) 65%,transparent);
 }
-.lbw-root .ws-cmp-stage .cmp-operator-picker-control{position:relative;min-width:0}
+.lbw-root .ws-cmp-stage .cmp-operator-picker-control{position:relative;min-width:0;width:100%}
 .lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger,
 .lbw-root .ws-cmp-stage .cmp-title-selectors input.cmp-operator-input{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
@@ -762,7 +765,7 @@
   width:100%;min-height:32px;padding:7px 10px;border:0;border-radius:0;
 }
 @media(max-width:760px){
-  .lbw-root .ws-cmp-stage .cmp-title-selectors>div>div>div.cmp-operator-picker{width:100%}
+  .lbw-root .ws-cmp-stage .cmp-title-selectors>div>div.cmp-operator-picker{width:100%}
   .lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger,
   .lbw-root .ws-cmp-stage .cmp-title-selectors input.cmp-operator-input{
     min-height:44px;font-size:15px;
