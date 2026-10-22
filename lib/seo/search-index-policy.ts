@@ -25,6 +25,7 @@ export type RouteClass = "CORE" | "SUPPORTED" | "HOLD" | "UTILITY" | "REDIRECT";
 
 export const ROUTE_CLASSES: Record<string, RouteClass> = {
   // ── CORE — product/research/search authority ────────────────────────────
+  "/": "CORE",
   "/methodology": "CORE",
   "/science": "CORE",
   "/research": "CORE",
@@ -271,7 +272,6 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/vercel/config": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
 
   // ── REDIRECT — known redirecting routes (never sitemap members) ─────────
-  "/": "REDIRECT", // 308 → /board/all (the home URL, owner decision 2026-10-22)
   "/leaderboard": "REDIRECT", // → /board/all
   "/ai-operator-benchmark": "REDIRECT", // 308 → /ai-operator-scoring
   "/token-efficiency": "REDIRECT", // 308 → /metrics/yield-cascade

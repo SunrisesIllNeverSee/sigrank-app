@@ -26,7 +26,7 @@ export default function NotFound() {
       </div>
 
       <nav className="mt-8 flex flex-wrap gap-3" aria-label="404 recovery">
-        <Link href="/board/all" className="font-mono text-sm text-gold hover:text-text-primary">
+        <Link href="/" className="font-mono text-sm text-gold hover:text-text-primary">
           Home
         </Link>
         <Link href="/wiki" className="font-mono text-sm text-gold hover:text-text-primary">
