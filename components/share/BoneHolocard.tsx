@@ -88,6 +88,6 @@ export function BoneHolocard({ codename, name, metrics, children }: {
       </div>
     </div>
     <ArtworkShareControls target={target} title="Bone holocard" filename={`signalaf-bone-holocard-${codename}-${palette}-${brand}`}
-      href={href} animated backgroundColor="transparent" pixelRatio={1} exportWidth={1200} exportHeight={627} gifPanelStart={.65}/>
+      href={href} animated backgroundColor="transparent" pixelRatio={1} exportWidth={1200} exportHeight={627} gifPanelStart={0}/>
   </section>;
 }

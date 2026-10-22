@@ -100,3 +100,97 @@
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .lbw-root .pv2.share-holocard .pv2-operator-code{display:none}
+
+/* Whole-card foil and depth pass — October 22, 2026.
+   Presentation only: does not alter the 18 metric cells, rank values,
+   operator name count, plaque geometry, or the solo passport source. */
+
+/* A clipped inset bezel gives the full white-and-holo composite dimension
+   without introducing opaque rectangles around the cut corners. */
+.bone-holo-card .bone-holo-shape::after{
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.58),
+             inset 0 10px 18px -12px rgba(34,18,36,.34),
+             inset 0 -16px 24px -15px rgba(20,14,35,.4);
+}
+
+/* Iridescent highlight travels over the bone paper, BEHIND the headline,
+   masthead and data. Background is transparent to preserve contrast. */
+.bone-holo-card .bone-holo-paper::before{
+  content:"";position:absolute;inset:0 auto 0 0;width:780px;
+  z-index:0;pointer-events:none;
+  background:linear-gradient(108deg,
+    transparent 16%,
+    rgba(39,191,210,.04) 29%,
+    rgba(63,195,220,.16) 38%,
+    rgba(178,114,229,.2) 45%,
+    rgba(249,148,173,.13) 52%,
+    rgba(242,215,135,.12) 58%,
+    transparent 75%);
+  background-size:260% 100%;
+  background-position:100% 50%;
+  animation:bone-whole-foil 8s ease-in-out infinite alternate;
+}
+.bone-holo-card .bone-holo-header,
+.bone-holo-card .bone-holo-copy,
+.bone-holo-card .bone-holo-ledger,
+.bone-holo-card .bone-holo-paper footer{z-index:1}
+.bone-holo-card .bone-holo-header{position:relative}
+.bone-holo-card .bone-holo-headline{
+  text-shadow:0 2px 0 rgba(255,255,255,.86),
+              0 5px 8px rgba(61,31,54,.18),
+              -1px -1px 0 rgba(185,122,194,.12);
+}
+.bone-holo-card .bone-holo-subtitle{
+  text-shadow:0 1px 0 rgba(255,255,255,.75),0 2px 4px rgba(69,39,59,.13);
+}
+/* Raised etched-metal ledger; large rank digits remain the most legible
+   element in every cell. Holographic ink is low-opacity, never a text overlay. */
+.bone-holo-card .bone-holo-ledger{
+  border-color:#a9a3ad;
+  background:linear-gradient(135deg,rgba(245,224,239,.5),rgba(236,246,242,.4) 46%,rgba(226,223,250,.5)),#eee6dc;
+  box-shadow:0 6px 14px rgba(52,28,57,.22),
+             inset 0 2px 0 rgba(255,255,255,.86),
+             inset 0 -2px 4px rgba(57,34,62,.1);
+}
+.bone-holo-card .bone-holo-ledger-cell{
+  background-image:linear-gradient(130deg,rgba(255,255,255,.3),transparent 45%,rgba(150,89,190,.04) 100%);
+  text-shadow:0 1px 0 rgba(255,255,255,.7);
+}
+.bone-holo-card .bone-holo-ledger-cell:nth-child(even){
+  background-image:linear-gradient(130deg,rgba(151,218,229,.12),rgba(255,255,255,.2) 49%,rgba(255,189,207,.1));
+}
+.bone-holo-card .bone-holo-ledger-rank b{
+  text-shadow:0 1px 0 rgba(255,255,255,.9),0 2px 2px rgba(81,54,85,.15);
+}
+
+/* One native operator-name plaque on each sharable passport. Animate a
+   restrained foil glint INSIDE that nameplate; no duplicated text layer. */
+.lbw-root .pv2.share-holocard .pv2-operator-name{
+  border-color:#e3eeeb;
+  background:linear-gradient(115deg,
+    #06191f 3%,#19414a 22%,#35616c 36%,
+    #264c58 44%,#522d5d 53%,#184552 62%,#102a33 81%);
+  background-size:240% 100%;
+  animation:bone-nameplate-foil 7.2s ease-in-out infinite alternate;
+  box-shadow:0 0 0 2px rgba(7,18,25,.65),
+    inset 0 1px 0 rgba(255,255,255,.48),
+    inset 0 -3px 9px rgba(0,0,0,.55),
+    0 5px 13px rgba(0,0,0,.54),
+    0 0 15px rgba(115,230,239,.16);
+  text-shadow:0 -1px 0 rgba(207,249,253,.7),
+              0 1px 1px #050e1a,
+              0 2px 5px rgba(0,0,0,.8);
+}
+@keyframes bone-whole-foil{
+  0%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes bone-nameplate-foil{
+  0%{background-position:0% 50%}
+  100%{background-position:100% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+  .bone-holo-card .bone-holo-paper::before,
+  .lbw-root .pv2.share-holocard .pv2-operator-name{animation:none}
+}
