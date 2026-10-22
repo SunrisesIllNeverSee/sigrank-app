@@ -1,0 +1,49 @@
+name: Sharables · Offline Export
+
+# Creates downloadable workflow artifacts, NEVER publishes to the site.
+on:
+  workflow_dispatch:
+    inputs:
+      codename:
+        description: Public operator codename for share card
+        required: true
+        type: string
+        default: signal-17cd049318
+  push:
+    branches:
+      - feat/sharables-package-white-holo-first
+    paths:
+      - scripts/export-sharables-package.mjs
+      - .github/workflows/export-sharables-package.yml
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Export PNG and four GIFs
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SHARE_CODENAME: ${{ github.event.inputs.codename || 'signal-17cd049318' }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Export local media only
+        run: node scripts/export-sharables-package.mjs --codename "$SHARE_CODENAME"
+      - name: Upload offline artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: signalaf-white-holo-${{ env.SHARE_CODENAME }}
+          path: release-staging/sharables-package/${{ env.SHARE_CODENAME }}/
+          if-no-files-found: error
+          retention-days: 14
