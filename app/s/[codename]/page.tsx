@@ -166,24 +166,51 @@ export default async function ShareOperatorPage({
   const ghEmbed = `[![${d.name} — SigRank signal](${SITE_ORIGIN}${sPath}/card.png)](${shareUrl})`;
 
   return (
-    <WorkspaceShell active="profile" title="SHAREABLES GALLERY" leftTitle="COLLECTION"
-      left={<><div className="mod"><h3><span className="sq" />OPERATOR CARDS</h3><div className="ws-nav">
-        <a href="#share-flagship">SIGNAL CARD</a><a href="#share-holocard">HOLOCARD · PNG / GIF</a>
-        <a href="#share-captures">GENERAL · SCREEN CAPTURES</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
+    <WorkspaceShell active="profile" title="SHARABLES PACKAGE" leftTitle="SHARABLES"
+      left={<><div className="mod"><h3><span className="sq" />CURRENT PACKAGE</h3><div className="ws-nav">
+        <a href="#share-white-holo">01 · WHITE-HOLO PNG</a>
+        <a href="#share-holo-gif">02 · HOLOGRAPHIC GIF</a>
+        <a href="#sharables-archive">SHARABLES ARCHIVE ↓</a>
+        <Link href={profilePath}>OPERATOR PROFILE →</Link>
       </div></div></>}
-      rightTitle="POST & SHARE" right={<><div className="mod"><h3><span className="sq" />POST YOUR IMAGE</h3>
-        <p className="ws-note">Download PNG or GIF and attach it to your post. GIF preserves the moving foil sheen.</p>
-        <div className="ws-nav"><a href={linkedInShare} target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a>
-          <a href={xShare} target="_blank" rel="noopener noreferrer">X ↗</a><a href={fbShare} target="_blank" rel="noopener noreferrer">FACEBOOK ↗</a><a href={mailShare}>EMAIL ↗</a></div>
-      </div><div className="mod"><h3><span className="sq" />GITHUB EMBED</h3><code style={{overflowWrap:"anywhere",fontSize:10}}>{ghEmbed}</code></div></>}
-      leftWidth={228} rightWidth={252} status={<>{d.name} · SHAREABLES</>}>
+      rightTitle="SHARE & DOWNLOAD" right={<>
+        <div className="mod"><h3><span className="sq" />CURRENT EXPORTS</h3>
+          <p className="ws-note">Two formats of the same white-holographic operator card. Download the static PNG or animated foil GIF below the preview.</p>
+          <div className="ws-nav"><a href="#share-white-holo">WHITE-HOLO PNG ↓</a>
+          <a href="#share-holo-gif">ANIMATED HOLO GIF ↓</a></div>
+        </div>
+        <div className="mod"><h3><span className="sq" />PREVIOUS DESIGNS</h3>
+          <p className="ws-note">Original signal cards, outreach graphics, captures and social links remain in the Sharables Archive.</p>
+          <div className="ws-nav"><a href="#sharables-archive">OPEN ARCHIVE ↓</a></div>
+        </div>
+      </>}
+      leftWidth={228} rightWidth={252} status={<>{d.name} · SHARABLES</>}>
     <div className="share-gallery mx-auto flex w-full max-w-[900px] flex-col px-6 py-6">
-      {/* Provenance caption — mirrors the card footer (same builder). */}
-      <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
-        {d.provenance}
-        {d.pending ? "" : " · LIVE FIELD"}
-      </p>
-
+      <header className="mb-5">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
+          {d.provenance}{d.pending ? "" : " · LIVE FIELD"}
+        </p>
+        <h1 className="mt-3 font-mono text-xl font-bold tracking-[0.06em] text-text-primary">SHARABLES PACKAGE</h1>
+        <p className="mt-2 text-sm text-text-secondary">
+          The white × holographic card in two formats. Older designs and capture tools are kept in the archive, not deleted.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <a href="#share-white-holo" className="rounded-lg border border-bg-border bg-bg-surface p-3 font-mono text-xs text-text-primary hover:bg-bg-hover">
+            <strong>01 · WHITE-HOLO PNG</strong><span className="mt-1 block text-text-muted">Static 1200 × 627 card</span>
+          </a>
+          <a href="#share-holo-gif" className="rounded-lg border border-bg-border bg-bg-surface p-3 font-mono text-xs text-text-primary hover:bg-bg-hover">
+            <strong>02 · HOLOGRAPHIC GIF</strong><span className="mt-1 block text-text-muted">Same card with animated foil</span>
+          </a>
+        </div>
+      </header>
+      <section id="share-white-holo" className="rounded-xl border border-bg-border bg-bg-surface p-5">
+        <h2 className="mb-2 text-center font-mono text-lg font-semibold text-text-primary">WHITE × HOLOGRAPHIC</h2>
+        <p className="mb-3 text-center font-mono text-[11px] text-text-muted">PNG + ANIMATED GIF · SAME OPERATOR CARD</p>
+        <Suspense fallback={<p>Loading white-holo card…</p>}>
+          <HolocardGallery row={row} archive={<>
+            <p className="mb-3 font-mono text-xs text-text-muted">
+              Previous card designs, original social preview, outreach layouts, screen captures and publishing links.
+            </p>
       {/* The share card — the actual card.png bytes, so what you see is what
           LinkedIn/X/Slack render. */}
       <img
@@ -252,10 +279,6 @@ export default async function ShareOperatorPage({
         </p>
       </div>
 
-      <section id="share-holocard" className="mt-8 rounded-xl border border-bg-border bg-bg-surface p-5">
-        <h2 className="mb-4 text-center font-mono text-lg text-text-primary">HOLOGRAPHIC OPERATOR CARD</h2>
-        <Suspense fallback={<p>Loading holocard…</p>}><HolocardGallery row={row} /></Suspense>
-      </section>
       <section id="share-captures" className="mt-8 rounded-xl border border-bg-border bg-bg-surface p-5">
         <h2 className="font-mono text-lg text-text-primary">GENERAL · SCREEN CAPTURES</h2>
         <p className="mt-2 text-sm text-text-secondary">Open a view, choose what to show, then download its current image.</p>
@@ -333,6 +356,13 @@ export default async function ShareOperatorPage({
         >
           ← Leaderboard
         </Link>
+      </div>
+          </>} />
+        </Suspense>
+      </section>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+        <Link href={profilePath} className="text-text-secondary hover:text-text-primary">VIEW OPERATOR PROFILE →</Link>
+        <Link href="/board/all" className="text-text-muted hover:text-text-primary">← LEADERBOARD</Link>
       </div>
     </div>
     </WorkspaceShell>
