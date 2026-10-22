@@ -84,7 +84,6 @@ export function BoneHolocard({ codename, name, metrics, children }: {
           <footer>signalaf.com/user/{codename}</footer>
         </div>
         <div className="bone-holo-live pv2-pcard-scope">{children}</div>
-        <div className="bone-holo-plaque" aria-label={`Operator ${name}`}><span>{name}</span></div>
         </div>
       </div>
     </div>
