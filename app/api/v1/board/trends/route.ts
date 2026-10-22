@@ -8,7 +8,7 @@ import { getLeaderboard } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 export const dynamic = "force-dynamic";
-type HistoryRow = { operator_id: string; snapshot_date: string | null; yield_: number | string | null; platform: string | null };
+type HistoryRow = { operator_id: string; snapshot_date: string | null; cascade: { yield_?: number | string | null } | null; platform: string | null };
 export async function GET(req: NextRequest) {
   const gate = rateLimit(req);
   if (!gate.ok) return rateLimitedResponse(gate);
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     for (let page=0; page<8; page++) {
       const from=page*1000;
       const result = await sb.from("metric_snapshots")
-        .select("operator_id,snapshot_date,yield_,platform")
+        .select("operator_id,snapshot_date,cascade,platform")
         .eq("window_type",windowType)
         .in("operator_id",ids)
         .order("snapshot_date",{ascending:true})
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     }
     const daily = new Map<string,Map<string,{rate:number;multi:boolean}>>();
     for (const row of all) {
-      const rate=Number(row.yield_);
+      const rate=Number(row.cascade?.yield_);
       if (!row.snapshot_date || !Number.isFinite(rate) || rate<=0) continue;
       const byDay=daily.get(row.operator_id) ?? new Map();
       const multi=row.platform==="multi";
