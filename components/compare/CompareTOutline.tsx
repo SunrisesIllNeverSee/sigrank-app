@@ -35,7 +35,7 @@ export function CompareTOutline() {
       const x1 = l.left - parent.left;
       const x2 = l.right - parent.left;
       const x3 = b.right - parent.left;
-      const y0 = Math.min(b.top, l.top) - parent.top;
+      // The lifted crossbar and stem can sit above the scroll container\'s\n      // paint boundary. Keep the TOP of the one-piece perimeter inside it.\n      const y0 = Math.max(2, Math.min(b.top, l.top) - parent.top);
       const y1 = b.bottom - parent.top;
       const y2 = l.bottom - parent.top;
       // Clamp radii inside the narrow selector arms and the full ledger.
