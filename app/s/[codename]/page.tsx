@@ -168,7 +168,7 @@ export default async function ShareOperatorPage({
   return (
     <WorkspaceShell active="profile" title="SHAREABLES GALLERY" leftTitle="COLLECTION"
       left={<><div className="mod"><h3><span className="sq" />OPERATOR CARDS</h3><div className="ws-nav">
-        <a href="#share-holocard">WHITE-HOLO · PNG / GIF</a><a href="#sharables-archive">SHARABLES ARCHIVE</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
+        <a href="#share-holocard">WHITE-HOLO · PNG / GIF</a><a href="#share-solo-holocard">SOLO HOLO · PNG / GIF</a><a href="#sharables-archive">SHARABLES ARCHIVE</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
       </div></div></>}
       rightTitle="POST & SHARE" right={<><div className="mod"><h3><span className="sq" />POST YOUR IMAGE</h3>
         <p className="ws-note">Download PNG or GIF and attach it to your post. GIF preserves the moving foil sheen.</p>
