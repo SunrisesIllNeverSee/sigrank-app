@@ -13,8 +13,15 @@ const brands = [
 ] as const;
 type Palette = typeof palettes[number];
 
-export function BoneHolocard({ codename, name, throughput, ratio, children }: {
-  codename: string; name: string; throughput: string; ratio: string; children: ReactNode;
+export interface BenchmarkMetricCell {
+  id: string;
+  label: string;
+  value: string;
+  rank: string;
+}
+
+export function BoneHolocard({ codename, name, metrics, children }: {
+  codename: string; name: string; metrics: readonly BenchmarkMetricCell[]; children: ReactNode;
 }) {
   const [palette, setPalette] = useState<Palette>("aqua");
   const [brand, setBrand] = useState<string>("af-stack");
@@ -57,22 +64,27 @@ export function BoneHolocard({ codename, name, throughput, ratio, children }: {
               <strong className={brand === "af-stack" ? "bone-holo-stack" : ""}>
                 {brand === "af-stack" ? <>SIGNAL<br/><em>AF</em></> : isRank ? "SIGRANK" : brand === "dual" ? "SIGNALAF × SIGRANK" : "SIGNALAF"}
               </strong>
-              <small>{brand === "af-stack" ? "OPERATOR INTELLIGENCE" : "BY SIGRANK"}</small>
+              <small>{brand === "af-stack" ? "AI OPERATOR INTELLIGENCE AND BENCHMARKING" : "AI OPERATOR INTELLIGENCE AND BENCHMARKING"}</small>
             </div>
             <span>RANK / BONE</span>
           </header>
           <div className="bone-holo-copy">
-            <p className="bone-holo-eyebrow">◈ AI OPERATOR EVALUATION</p>
             <div className="bone-holo-headline">A DIFFERENT KIND<br/>OF BENCHMARK.</div>
             <p className="bone-holo-subtitle">Highlighting Users, Not Models.</p>
           </div>
-          <div className="bone-holo-data">
-            <div><span>TOKENS / DAY</span><strong>{throughput}</strong></div>
-            <div><span>OP RATIO</span><strong>{ratio}</strong></div>
+          <div className="bone-holo-ledger" aria-label="18 canonical operator statistics with values and field ranks">
+            {metrics.map(metric => (
+              <div className="bone-holo-ledger-cell" key={metric.id} title={metric.label}>
+                <span className="bone-holo-ledger-label">{metric.label}</span>
+                <strong className="bone-holo-ledger-value">{metric.value}</strong>
+                <span className="bone-holo-ledger-rank">RANK <b>{metric.rank}</b></span>
+              </div>
+            ))}
           </div>
           <footer>signalaf.com/user/{codename}</footer>
         </div>
         <div className="bone-holo-live pv2-pcard-scope">{children}</div>
+        <div className="bone-holo-plaque" aria-label={`Operator ${name}`}><span>{name}</span></div>
         </div>
       </div>
     </div>
