@@ -13,8 +13,10 @@
   gap:8px;align-items:stretch;
 }
 /* MATCHUP header sits high/centered; the A/B selectors form the T's
-   arms across the three breakdown columns beneath it. */
-.lbw-root .cmp-stage-head{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:10px}
+   arms across the three breakdown columns beneath it. The framed
+   strip + raised ledger read as one enclosure around the selectors. */
+.lbw-root .cmp-stage-head{display:flex;flex-direction:column;align-items:center;margin-bottom:10px;
+  border:1px solid var(--ac);border-radius:var(--radius-sm);background:var(--panel);padding:8px 10px}
 .lbw-root .cmp-stage-head .cmp-title-selectors{width:100%}
 .lbw-root .cmp-title-selectors{width:100%;position:relative}
 .lbw-root .cmp-title-selectors>div {
@@ -248,8 +250,9 @@
   grid-column:2;grid-row:1;min-height:0;min-width:0;
   overflow:visible;
   /* raised into the selector strip's hidden center channel so its top
-     edge sits level with the operand dropdowns (T stem) */
-  margin-top:-56px
+     edge sits level with the operand dropdowns (T stem); accent border
+     joins the enclosing strip frame */
+  margin-top:-66px;border-color:var(--ac)
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-versus{
   display:flex;flex-direction:column;align-items:center;
