@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 
-export const metadata: Metadata = withOG({
-  title: "Checkout canceled",
-  description:
-    "Your SigRank checkout was canceled. No charge was made — come back any time.",
-  path: "/upgrade/canceled",
-});
+export const metadata: Metadata = {
+  ...withOG({
+    title: "Checkout canceled",
+    description:
+      "Your SigRank checkout was canceled. No charge was made — come back any time.",
+    path: "/upgrade/canceled",
+  }),
+  // Stripe redirect target — not a search landing page.
+  robots: { index: false, follow: true },
+};
 
 /** Stripe Checkout cancel_url target (subscription + claim flows). */
 export default function UpgradeCanceledPage() {
