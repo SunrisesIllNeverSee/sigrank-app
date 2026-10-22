@@ -17,7 +17,10 @@
   position:relative;height:48px;flex:none;padding:0 12px;
   align-items:center;overflow:visible;z-index:20
 }
-.lbw-root:has(.cmp-title-selectors) .stitle>h1 {
+.lbw-root:has(.cmp-title-selectors) .stitle-main{
+  grid-column:1/-1;position:relative;display:flex;align-items:center;min-width:0;width:100%
+}
+.lbw-root:has(.cmp-title-selectors) .stitle-main .pagetitle {
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   pointer-events:none
 }
