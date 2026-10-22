@@ -3,12 +3,16 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { PaymentSuccessTracker } from "@/components/billing/PaymentSuccessTracker";
 
-export const metadata: Metadata = withOG({
-  title: "Payment complete",
-  description:
-    "Thank you for supporting SigRank.",
-  path: "/upgrade/success",
-});
+export const metadata: Metadata = {
+  ...withOG({
+    title: "Payment complete",
+    description:
+      "Thank you for supporting SigRank.",
+    path: "/upgrade/success",
+  }),
+  // Stripe redirect target — not a search landing page.
+  robots: { index: false, follow: true },
+};
 
 /**
  * Stripe Checkout success_url target.
