@@ -154,7 +154,7 @@ export function PassportCard({
             </div>
             <div className="pv2-class-block">
               <div className="pv2-class-badge">{pending ? "UNRANKED" : snapshot.class_tier}</div>
-              <div className="pv2-rank-chip pv2-rank-chip--field" data-rank-digits={pending || !globalRank ? "0" : String(globalRank).length}>
+              <div className="pv2-rank-chip">
                 {rankLabel}{" "}
                 <strong>{pending || !globalRank ? "—" : `#${globalRank}`}</strong>
               </div>
