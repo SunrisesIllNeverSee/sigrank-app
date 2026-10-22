@@ -342,11 +342,6 @@ export default async function ComparePage({
       <WorkspaceShell
         active="compare"
         title="COMPARE"
-        titleControls={
-          <div className="cmp-title-selectors">
-            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
-          </div>
-        }
         leftTitle="COMPARE"
         left={
           <>
@@ -463,6 +458,9 @@ export default async function ComparePage({
             bWins={bWins}
             href={`/compare?a=${encodeURIComponent(aCode)}&b=${encodeURIComponent(bCode)}`}
           />
+          <div className="cmp-title-selectors">
+            <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
+          </div>
           <div className="ws-cmp-match">
             <CompareMatchup a={rowA} b={rowB} options={selectorOptions} hideSelectors field={radars.composite} />
           </div>

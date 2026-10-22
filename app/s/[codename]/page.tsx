@@ -168,8 +168,7 @@ export default async function ShareOperatorPage({
   return (
     <WorkspaceShell active="profile" title="SHAREABLES GALLERY" leftTitle="COLLECTION"
       left={<><div className="mod"><h3><span className="sq" />OPERATOR CARDS</h3><div className="ws-nav">
-        <a href="#share-flagship">SIGNAL CARD</a><a href="#share-holocard">HOLOCARD · PNG / GIF</a>
-        <a href="#share-captures">GENERAL · SCREEN CAPTURES</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
+        <a href="#share-holocard">WHITE-HOLO · PNG / GIF</a><a href="#share-solo-holocard">SOLO HOLO · PNG / GIF</a><a href="#sharables-archive">SHARABLES ARCHIVE</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
       </div></div></>}
       rightTitle="POST & SHARE" right={<><div className="mod"><h3><span className="sq" />POST YOUR IMAGE</h3>
         <p className="ws-note">Download PNG or GIF and attach it to your post. GIF preserves the moving foil sheen.</p>
@@ -184,6 +183,21 @@ export default async function ShareOperatorPage({
         {d.pending ? "" : " · LIVE FIELD"}
       </p>
 
+      {/* Current public sharables: approved V6 white-holographic PNG and
+          animated GIF in four palettes. Other cards remain below in archive. */}
+      <section id="share-holocard" className="mt-4 rounded-xl border border-bg-border bg-bg-surface p-5">
+        <h2 className="mb-2 text-center font-mono text-lg text-text-primary">WHITE × HOLOGRAPHIC · BENCHMARK V6</h2>
+        <p className="mb-4 text-center font-mono text-[11px] text-text-muted">
+          One card · Download PNG or animated GIF · Aqua / Coral / Gold / Violet
+        </p>
+        <Suspense fallback={<p>Loading white-holographic card…</p>}><HolocardGallery row={row} /></Suspense>
+      </section>
+
+      <details id="sharables-archive" className="mt-6 rounded-xl border border-bg-border bg-bg-surface p-4">
+        <summary className="cursor-pointer font-mono text-xs font-semibold text-text-primary">
+          SHARABLES ARCHIVE · Older signal cards, outreach graphics, captures and social links
+        </summary>
+        <div className="mt-5">
       {/* The share card — the actual card.png bytes, so what you see is what
           LinkedIn/X/Slack render. */}
       <img
@@ -252,10 +266,6 @@ export default async function ShareOperatorPage({
         </p>
       </div>
 
-      <section id="share-holocard" className="mt-8 rounded-xl border border-bg-border bg-bg-surface p-5">
-        <h2 className="mb-4 text-center font-mono text-lg text-text-primary">HOLOGRAPHIC OPERATOR CARD</h2>
-        <Suspense fallback={<p>Loading holocard…</p>}><HolocardGallery row={row} /></Suspense>
-      </section>
       <section id="share-captures" className="mt-8 rounded-xl border border-bg-border bg-bg-surface p-5">
         <h2 className="font-mono text-lg text-text-primary">GENERAL · SCREEN CAPTURES</h2>
         <p className="mt-2 text-sm text-text-secondary">Open a view, choose what to show, then download its current image.</p>
@@ -309,6 +319,9 @@ export default async function ShareOperatorPage({
         {" · Υ "}
         {d.rows[0].value}
       </p>
+
+        </div>
+      </details>
 
       {/* Actions — the canonical profile is the real identity surface; the
           share URL is for posting. */}

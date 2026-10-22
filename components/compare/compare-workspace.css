@@ -12,16 +12,8 @@
   min-height:0;min-width:0;
   gap:8px;align-items:stretch;
 }
-/* Shared stage title still houses the live operand selectors. */
-.lbw-root:has(.cmp-title-selectors) .stitle {
-  position:relative;height:48px;flex:none;padding:0 12px;
-  align-items:center;overflow:visible;z-index:20
-}
-.lbw-root:has(.cmp-title-selectors) .stitle>h1 {
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  pointer-events:none
-}
-.lbw-root .cmp-title-selectors{width:100%;position:relative}
+/* Operand selectors live in the stage, above the matchup breakdown. */
+.lbw-root .cmp-title-selectors{width:100%;position:relative;margin-bottom:10px}
 .lbw-root .cmp-title-selectors>div {
   display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);
   gap:8px;align-items:center
@@ -448,13 +440,6 @@
   }
 
   /* Stacked A / B selectors with a swap button. */
-  .lbw-root:has(.cmp-title-selectors) .stitle{
-    height:auto;flex-wrap:wrap;gap:6px;padding:8px 12px 6px;overflow:visible
-  }
-  /* Title stays for assistive tech; the Compare tab already names the page. */
-  .lbw-root:has(.cmp-title-selectors) .stitle h1{
-    position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap
-  }
   .lbw-root .cmp-title-selectors{flex:1 1 100%}
   /* owner 2026-10-21: swap gets its own column beside the stacked A / B rows
      (it used to float over the right edge of both name boxes). */
