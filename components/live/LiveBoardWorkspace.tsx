@@ -1840,7 +1840,7 @@ export function LiveBoardWorkspace({
             <div className="stagecol">
               {/* page title — stage top, centered over the board column
                   (the top chrome bar is gone; the title is the page h1). */}
-              <div className={`stitle${railOn ? " board-title-search-rail" : ""}`}>
+              <div className="stitle">
                 <div className="stitle-main">
                   <h1 className="pagetitle">
                     {COPY.heroTitleA}
@@ -1849,7 +1849,7 @@ export function LiveBoardWorkspace({
                 </div>
                 {/* owner 2026-10-21: site-wide search at the right end of the title
                     row (navigates); the board table filter stays in the filter bar */}
-                {!railOn && <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />}
+                <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />
               </div>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
@@ -2258,7 +2258,7 @@ export function LiveBoardWorkspace({
               >
                 ▸
               </button>
-              <div className="colhead colhead-search"><GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" /></div>
+              <div className="colhead">SIGRANK</div>
               <div className="railhead"><span className="rh-t">OPERATOR</span></div>
               <div className="rail">
                 {visibleRail.map((id) =>
