@@ -12,11 +12,10 @@
   min-height:0;min-width:0;
   gap:8px;align-items:stretch;
 }
-/* Operand selectors + section label form one strip above the matchup
-   breakdown — the crossbar of the T under the COMPARE title. */
-.lbw-root .cmp-stage-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.lbw-root .cmp-stage-head>.mini-h{flex:none;white-space:nowrap}
-.lbw-root .cmp-stage-head .cmp-title-selectors{flex:1 1 auto;min-width:0;margin-bottom:0}
+/* MATCHUP header sits high/centered; the A/B selectors form the T's
+   arms across the three breakdown columns beneath it. */
+.lbw-root .cmp-stage-head{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:10px}
+.lbw-root .cmp-stage-head .cmp-title-selectors{width:100%}
 .lbw-root .cmp-title-selectors{width:100%;position:relative}
 .lbw-root .cmp-title-selectors>div {
   display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);
