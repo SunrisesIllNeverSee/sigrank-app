@@ -233,7 +233,7 @@ export default function OperatorClassCheckerPage() {
           </Link>
           {" · "}
           <Link
-            href="/leaderboard"
+            href="/board/all"
             className="text-gold underline underline-offset-2"
           >
             Leaderboard

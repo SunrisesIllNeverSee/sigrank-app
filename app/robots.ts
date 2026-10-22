@@ -13,39 +13,44 @@
 import type { MetadataRoute } from "next";
 import { SITE_ORIGIN } from "@/lib/seo";
 
+// Named AI crawler groups mirror the `*` group below — robots groups are
+// exclusive, so a bot with its own group ignores `*`. Keep these in sync.
+const ALLOW = ["/", "/api/exchange/signals"];
+const DISALLOW = ["/api/", "/auth/", "/internal/"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       // Explicitly allow AI answer-engine crawlers (AEO)
       {
         userAgent: "GPTBot",
-        allow: "/",
-        disallow: ["/api/", "/auth/"],
+        allow: ALLOW,
+        disallow: DISALLOW,
       },
       {
         userAgent: "ClaudeBot",
-        allow: "/",
-        disallow: ["/api/", "/auth/"],
+        allow: ALLOW,
+        disallow: DISALLOW,
       },
       {
         userAgent: "CCBot",
-        allow: "/",
-        disallow: ["/api/", "/auth/"],
+        allow: ALLOW,
+        disallow: DISALLOW,
       },
       {
         userAgent: "Google-Extended",
-        allow: "/",
-        disallow: ["/api/", "/auth/"],
+        allow: ALLOW,
+        disallow: DISALLOW,
       },
       {
         userAgent: "PerplexityBot",
-        allow: "/",
-        disallow: ["/api/", "/auth/"],
+        allow: ALLOW,
+        disallow: DISALLOW,
       },
       {
         userAgent: "Applebot-Extended",
-        allow: "/",
-        disallow: ["/api/", "/auth/"],
+        allow: ALLOW,
+        disallow: DISALLOW,
       },
       // Block training-focused scrapers (not answer engines)
       {

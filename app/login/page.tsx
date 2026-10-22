@@ -21,11 +21,15 @@ import { withOG } from "@/lib/seo";
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = withOG({
-  title: "Sign in",
-  description: "Sign up or sign in to get on the board and back the build.",
-  path: "/login",
-});
+export const metadata: Metadata = {
+  ...withOG({
+    title: "Sign in",
+    description: "Sign up or sign in to get on the board and back the build.",
+    path: "/login",
+  }),
+  // Auth surface — not a search landing page.
+  robots: { index: false, follow: true },
+};
 
 export default function LoginPage() {
   return (
