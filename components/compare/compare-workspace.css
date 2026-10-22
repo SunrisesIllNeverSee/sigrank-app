@@ -13,7 +13,7 @@
   gap:8px;align-items:stretch;
 }
 /* Operand selectors live in the stage, above the matchup breakdown. */
-.lbw-root .cmp-title-selectors{width:100%;position:relative;margin-bottom:10px}
+.lbw-root .cmp-title-selectors{width:100%;position:relative;margin-bottom:10px;grid-column:1/-1}
 .lbw-root .cmp-title-selectors>div {
   display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);
   gap:8px;align-items:center
