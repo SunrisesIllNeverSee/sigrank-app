@@ -230,7 +230,7 @@ export default async function MethodologyPage() {
             As of <strong className="text-text-primary">{monthYear}</strong>,
             the SigRank Index ranks{" "}
             <strong className="text-text-primary">{operatorCount}</strong>{" "}
-            operators across{" "}
+            claimed operators across{" "}
             <strong className="text-text-primary">{platformCount}</strong>{" "}
             platforms.
           </p>
@@ -257,9 +257,9 @@ export default async function MethodologyPage() {
           <p className="text-base text-text-secondary">
             Operators in the{" "}
             <strong className="text-text-primary">TRANSMITTER</strong> class
-            tier represent the top{" "}
+            tier account for{" "}
             <strong className="text-text-primary">{transmitterPct}%</strong> of
-            the board.
+            the ranked board.
           </p>
           <p className="text-base text-text-secondary">
             Across all ranked operators,{" "}
