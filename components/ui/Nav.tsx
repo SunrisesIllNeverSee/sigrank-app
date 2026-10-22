@@ -73,7 +73,7 @@ export function Nav() {
         <MobileNav links={links} />
 
         <Link
-          href="/board/all"
+          href="/"
           className="font-mono text-sm font-bold tracking-tight"
           style={{ color: "rgb(var(--nav-text))" }}
         >
