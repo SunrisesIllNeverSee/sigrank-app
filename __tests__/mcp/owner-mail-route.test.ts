@@ -26,7 +26,7 @@ vi.mock("resend", () => ({
 
 import { POST } from "@/app/api/v1/owner/send-email/route";
 
-const OWNER_ID = "63e70157-2e63-49d2-b2bf-6a634fb547b9"; // test-only ID, never a credential
+const OWNER_ID = "00000000-0000-4000-8000-000000000001"; // test fixture, never a real account ID
 const valid = {
   to: "recipient@example.com",
   subject: "SignalAF card",
