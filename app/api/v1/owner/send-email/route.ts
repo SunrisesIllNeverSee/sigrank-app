@@ -5,7 +5,6 @@ import { Resend } from "resend";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
 import { getSessionUser } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 
 /**
@@ -13,7 +12,7 @@ import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
  *
  * POST /api/v1/owner/send-email
  * Authorization: a verified Supabase access JWT (Bearer) owned by a
- * profiles.role='owner' account, or a same-origin owner browser session.
+ * explicitly authorized owner account, or a same-origin owner browser session.
  *
  * No provider key or sender choice is accepted from the caller.
  * The existing RESEND_API_KEY is used only on the server.
@@ -115,12 +114,12 @@ async function verifiedOwner(req: NextRequest): Promise<User | ErrorStatus> {
     if (!user) return { status: 401, error: "Sign in to SignalAF." };
   }
 
-  // Fail closed. Never trust app_metadata, caller role, or an unaudited email match.
-  const svc = getSupabaseService();
-  if (!svc) return { status: 503, error: "Owner authorization unavailable." };
-  const { data: profile, error } = await svc.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (error) return { status: 503, error: "Owner authorization unavailable." };
-  if (profile?.role !== "owner") return { status: 403, error: "Owner permission required." };
+  // The SignalAF schema has no public profiles/role table. Bind the endpoint
+  // to one verified Supabase user ID stored in a server-only Vercel env var.
+  // Never trust user-editable metadata, a public codename, or a supplied email.
+  const ownerId = process.env.SIGNALAF_MAIL_OWNER_USER_ID?.trim();
+  if (!ownerId) return { status: 503, error: "Owner authorization unavailable." };
+  if (user.id !== ownerId) return { status: 403, error: "Owner permission required." };
   return user;
 }
 
