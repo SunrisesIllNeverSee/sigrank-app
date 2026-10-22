@@ -89,11 +89,11 @@ export async function generateMetadata({
   if (!win) return { title: "Board not found" };
   const label = win.label;
   const isAllTime = win.slug === "all";
-  const titleLabel = isAllTime ? "AI User Leaderboard" : `${label} Leaderboard`;
+  const titleLabel = isAllTime ? "All-Time AI Operator Leaderboard" : `${label} Leaderboard`;
   return withOG({
     title: titleLabel,
     description: isAllTime
-      ? `The SigRank AI user leaderboard — AI users ranked by Υ Yield (token cascade efficiency). See how top AI operators compare all-time.`
+      ? `Every claimed AI operator ranked all-time by Υ Yield (token cascade efficiency) on the SigRank Index.`
       : `The SigRank ${label.toLowerCase()} leaderboard — AI operators ranked by Υ Yield (token cascade efficiency).`,
     path: `/board/${slug}`,
     ogImage: {
