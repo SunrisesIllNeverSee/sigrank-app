@@ -18,7 +18,7 @@
 .lbw-root .cmp-stage-head .cmp-title-selectors{width:100%}
 .lbw-root .cmp-title-selectors{width:100%;position:relative}
 .lbw-root .cmp-title-selectors>div {
-  display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(250px,1.35fr) minmax(0,1.05fr);
   gap:8px;align-items:center
 }
 .lbw-root .cmp-title-selectors>div>span{visibility:hidden}
@@ -246,7 +246,10 @@
    and the canonical head-to-head record above the bars. */
 .lbw-root .ws-cmp-stage .ws-cmp-ledger{
   grid-column:2;grid-row:1;min-height:0;min-width:0;
-  overflow:visible
+  overflow:visible;
+  /* raised into the selector strip's hidden center channel so its top
+     edge sits level with the operand dropdowns (T stem) */
+  margin-top:-56px
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-versus{
   display:flex;flex-direction:column;align-items:center;
@@ -412,7 +415,7 @@
   .lbw-root .ws-cmp-stage .ws-cmp{
     grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto auto 150px
   }
-  .lbw-root .ws-cmp-stage .ws-cmp-ledger{grid-column:1/-1;grid-row:2}
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{grid-column:1/-1;grid-row:2;margin-top:0}
   .lbw-root .ws-cmp-stage .ws-cmp-h2h{grid-row:3}
   .lbw-root .ws-cmp-stage .ws-cmp-hist{grid-row:4}
   .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{grid-column:2}
