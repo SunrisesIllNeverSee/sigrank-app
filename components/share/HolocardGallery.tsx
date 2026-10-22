@@ -76,13 +76,18 @@ export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
     selectedSecondaryBadge={marks.secondaryLogos.find(m => m.id === preferences?.profile_secondary_logo) ?? null} />;
   return <div className="pv2 share-holocard flex flex-col items-center gap-4">
     <BoneHolocard codename={row.operator.codename} name={operatorDisplayName(row)} metrics={benchmarkCells(row, board)}>{passport(`bone-passport-${row.operator.codename}`)}</BoneHolocard>
-    <details className="mt-5 w-full rounded-lg border border-bg-border p-3">
-      <summary className="cursor-pointer font-mono text-xs text-text-secondary">Previous standalone holographic passport · archive</summary>
-      <div className="mt-4 flex flex-col items-center gap-3">
+    <section id="share-solo-holocard" aria-label="Standalone holographic operator passport" className="mt-8 w-full rounded-xl border border-bg-border bg-bg-surface px-4 py-6">
+      <h3 className="mb-2 text-center font-mono text-lg font-semibold text-text-primary">
+        SOLO HOLOGRAPHIC · OPERATOR PASSPORT
+      </h3>
+      <p className="mb-5 text-center font-mono text-[11px] text-text-muted">
+        Standalone card · Animated foil · Download PNG or GIF
+      </p>
+      <div className="flex flex-col items-center gap-3">
         <div className="pv2-pcard-scope">{passport(`holocard-${row.operator.codename}`)}</div>
-        <ArtworkShareControls target={`holocard-${row.operator.codename}`} title="holocard" animated
-          filename={`signalaf-holocard-${row.operator.codename}`} href={`/user/${encodeURIComponent(row.operator.codename)}`} />
+        <ArtworkShareControls target={`holocard-${row.operator.codename}`} title="solo holographic card" animated
+          filename={`signalaf-holocard-${row.operator.codename}`} href={`/s/${encodeURIComponent(row.operator.codename)}#share-solo-holocard`} />
       </div>
-    </details>
+    </section>
   </div>;
 }
