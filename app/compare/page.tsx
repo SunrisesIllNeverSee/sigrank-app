@@ -448,7 +448,6 @@ export default async function ComparePage({
             the stage (owner annotation: not a rail module). */}
         <CompareStage>
         <div className="cmp-stage-head">
-          <div className="mini-h"><span className="sq"></span>MATCHUP</div>
           <div className="cmp-title-selectors">
             <CompareSelectors options={selectorOptions} aCode={aCode} bCode={bCode} />
           </div>
