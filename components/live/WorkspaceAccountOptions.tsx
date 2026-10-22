@@ -68,6 +68,7 @@ export function WorkspaceAccountOptions({ mode, name, theme, setTheme, iconSet, 
           <a className="ap-item" href={mode === "nolink" ? "/me/edit" : "/me"}>
             {mode === "nolink" ? "FINISH PROFILE SETUP" : "MY PROFILE"}
           </a>
+          {mode !== "nolink" && <a className="ap-item" href="/me/sharables">MY SHARABLES</a>}
           {mode !== "nolink" && <a className="ap-item" href="/me/edit#profile-display">PROFILE DISPLAY · BADGES & MARKS</a>}
           {mode !== "nolink" && <a className="ap-item" href="/me/edit">EDIT PROFILE</a>}
           <a className="ap-item" href="/settings">ACCOUNT SETTINGS</a>

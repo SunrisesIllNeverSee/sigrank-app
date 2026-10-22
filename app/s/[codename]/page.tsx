@@ -32,6 +32,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { HolocardGallery } from "@/components/share/HolocardGallery";
+import { MySharablesNotice } from "@/components/share/MySharablesNotice";
 import { notFound, redirect } from "next/navigation";
 
 import {
@@ -168,7 +169,7 @@ export default async function ShareOperatorPage({
   return (
     <WorkspaceShell active="profile" title="SHAREABLES GALLERY" leftTitle="COLLECTION"
       left={<><div className="mod"><h3><span className="sq" />OPERATOR CARDS</h3><div className="ws-nav">
-        <a href="#share-holocard">WHITE-HOLO · PNG / GIF</a><a href="#share-solo-holocard">SOLO HOLO · PNG / GIF</a><a href="#sharables-archive">SHARABLES ARCHIVE</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
+        <Link href="/me/sharables">MY SHARABLES →</Link><a href="#share-holocard">WHITE-HOLO · PNG / GIF</a><a href="#share-solo-holocard">SOLO HOLO · PNG / GIF</a><a href="#sharables-archive">SHARABLES ARCHIVE</a><Link href={profilePath}>OPERATOR PROFILE →</Link>
       </div></div></>}
       rightTitle="POST & SHARE" right={<><div className="mod"><h3><span className="sq" />POST YOUR IMAGE</h3>
         <p className="ws-note">Download PNG or GIF and attach it to your post. GIF preserves the moving foil sheen.</p>
@@ -182,6 +183,8 @@ export default async function ShareOperatorPage({
         {d.provenance}
         {d.pending ? "" : " · LIVE FIELD"}
       </p>
+
+      <MySharablesNotice viewingCodename={row.operator.codename} viewingName={d.name} />
 
       {/* Current public sharables: approved V6 white-holographic PNG and
           animated GIF in four palettes. Other cards remain below in archive. */}
