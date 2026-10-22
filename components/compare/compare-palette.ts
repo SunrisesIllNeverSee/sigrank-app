@@ -28,3 +28,12 @@ export const COMPARE_OPERAND_COLORS = {
   a: "#60a5fa",
   b: "#2dd4bf",
 } as const;
+
+/** Browser-rendered Compare workspace colors. The gold Compare theme supplies
+ * --compare-a (gold) and --compare-b (bone/ivory); all other workspace themes
+ * retain the previous blue/teal comparison colors. Keep the literal constants
+ * above for portable server-image/Satori renders. */
+export const COMPARE_THEME_OPERAND_COLORS = {
+  a: "var(--compare-a, #60a5fa)",
+  b: "var(--compare-b, #2dd4bf)",
+} as const;

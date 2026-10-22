@@ -16,7 +16,7 @@
  */
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
-import { COMPARE_OPERAND_COLORS } from "./compare-palette";
+import { COMPARE_THEME_OPERAND_COLORS } from "./compare-palette";
 import { RadarSvg, RadarTable, type RadarAxis, type RadarLayer, type RadarRefLine } from "./CompareRadarSvg";
 import {
   COMPOSITE_METRICS,
@@ -70,7 +70,7 @@ export function CompareRadars({
   field: RadarField;
 }) {
   const name = operatorDisplayName(row);
-  const color = COMPARE_OPERAND_COLORS[side];
+  const color = COMPARE_THEME_OPERAND_COLORS[side];
   const sample = sampleFromRow(row);
   const pts = ptsOf(field, row);
   const metrics = COMPOSITE_METRICS.map((m, i) => ({ ...m, raw: sample[m.key], pts: pts[i] ?? null }));
@@ -133,8 +133,8 @@ export function CompareRadars({
 function Legend({ nameA, nameB }: { nameA: string; nameB: string }) {
   return (
     <p className="cmp-rd-legend">
-      <span><i style={{ background: COMPARE_OPERAND_COLORS.a }} />{nameA}</span>
-      <span><i style={{ background: COMPARE_OPERAND_COLORS.b }} />{nameB}</span>
+      <span><i style={{ background: COMPARE_THEME_OPERAND_COLORS.a }} />{nameA}</span>
+      <span><i style={{ background: COMPARE_THEME_OPERAND_COLORS.b }} />{nameB}</span>
     </p>
   );
 }
@@ -153,8 +153,8 @@ function H2HRadar({
   const sb = sampleFromRow(b);
   const pa = ptsOf(field, a);
   const pb = ptsOf(field, b);
-  const colA = COMPARE_OPERAND_COLORS.a;
-  const colB = COMPARE_OPERAND_COLORS.b;
+  const colA = COMPARE_THEME_OPERAND_COLORS.a;
+  const colB = COMPARE_THEME_OPERAND_COLORS.b;
 
   const axes: RadarAxis[] = defs.map((d, i) => {
     const va = pa[i] ?? null;
