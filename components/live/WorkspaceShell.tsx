@@ -119,6 +119,9 @@ export interface WorkspaceShellProps {
   status?: ReactNode;
   /** Consistent centered editorial layout for text/research pages only. */
   editorialStage?: boolean;
+  /** Page-specific entry palette. An explicit ?theme= still overrides it;
+   * user theme controls still work after entering this page. */
+  defaultTheme?: ThemeName;
   /** Stage content. */
   children: ReactNode;
 }
@@ -146,10 +149,23 @@ export function WorkspaceShell({
   rightOpenSignal,
   status,
   editorialStage = false,
+  defaultTheme,
   children,
 }: WorkspaceShellProps) {
   /* ---------- theme — identical contract to LiveBoardWorkspace ---------- */
-  const [theme, setTheme] = useState<ThemeName>(resolveLbwTheme);
+  const [theme, setTheme] = useState<ThemeName>(() => {
+    if (!defaultTheme) return resolveLbwTheme();
+    if (typeof window !== "undefined") {
+      try {
+        const explicit = new URLSearchParams(window.location.search).get("theme");
+        if (THEMES.includes(explicit as ThemeName)) return explicit as ThemeName;
+      } catch { /* no query access: use page-specific default */ }
+    }
+    return defaultTheme;
+  });
+  const themeBoot = defaultTheme
+    ? `(function(){try{var ok=${JSON.stringify(THEMES)},q=new URLSearchParams(location.search).get("theme"),t=ok.indexOf(q)>=0?q:${JSON.stringify(defaultTheme)};var el=document.currentScript&&document.currentScript.parentElement;if(el)el.setAttribute("data-theme",t);}catch(e){}})();`
+    : LBW_THEME_INIT;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "T" && e.key !== "t") return;
@@ -375,7 +391,7 @@ export function WorkspaceShell({
         } as React.CSSProperties
       }
     >
-      <script dangerouslySetInnerHTML={{ __html: LBW_THEME_INIT }} />
+      <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
       <MobileChrome
         active={active}
         theme={theme}

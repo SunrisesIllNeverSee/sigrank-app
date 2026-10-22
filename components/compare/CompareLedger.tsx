@@ -26,8 +26,7 @@
  * row.telemetry and metrics off row.snapshot.cascade. No fetch, no facade edits.
  */
 
-import React, { type CSSProperties } from "react";
-import { COMPARE_OPERAND_COLORS } from "./compare-palette";
+import React from "react";
 import type { LeaderboardRow } from "@/lib/board";
 import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { CanonId } from "@/components/ui/CanonId";
@@ -314,10 +313,7 @@ export function CompareLedger({
   const aName = nameOf(a);
   const bName = nameOf(b);
   const { aWins, bWins } = compareTally(a, b);
-  const compareColors = {
-    "--compare-a": COMPARE_OPERAND_COLORS.a,
-    "--compare-b": COMPARE_OPERAND_COLORS.b,
-  } as CSSProperties;
+  // Operand accents inherit from the active workspace theme.
   const rawRows = DISPLAY_RAW.map((m) => buildRow(m, a, b));
   const metricRows = DISPLAY_METRICS_COMPARE.map((m) => buildRow(m, a, b));
   // FLOW row — Token Throughput, comparable datum (canonical exact-calendar
@@ -333,7 +329,7 @@ export function CompareLedger({
 
   if (workspace) {
     return (
-      <section className="cmp-ledger-workspace" aria-label="Full comparison ledger" style={compareColors}>
+      <section className="cmp-ledger-workspace" aria-label="Full comparison ledger">
         <header className="cmp-ledger-versus" aria-label="Head-to-head record">
           <div className="cmp-versus-kicker">MATCHUP · BAR STATISTICS</div>
           <div className="cmp-versus-operators">
@@ -370,7 +366,7 @@ export function CompareLedger({
   if (compact) {
     const win = (r: LedgerRow) => winnerOf(r);
     return (
-      <div style={compareColors}>
+      <div>
         <div className="lgr-h">
           <span className="nm" style={{ textAlign: "right", marginLeft: "auto", color: "var(--ac)", fontWeight: 700 }}>{aName}</span>
         </div>

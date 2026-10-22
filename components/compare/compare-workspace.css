@@ -16,7 +16,10 @@
    arms across the three breakdown columns beneath it. The framed
    strip + raised ledger read as one enclosure around the selectors. */
 .lbw-root .cmp-stage-head{display:flex;flex-direction:column;align-items:center;margin-bottom:10px;
-  border:1px solid var(--ac);border-radius:var(--radius-sm);background:var(--panel);padding:8px 10px}
+  position:relative;z-index:1;
+  border:1px solid var(--ac);border-radius:var(--radius-sm);background:var(--panel);padding:8px 10px;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--ac) 18%,transparent)
+}
 .lbw-root .cmp-stage-head .cmp-title-selectors{width:100%}
 .lbw-root .cmp-title-selectors{width:100%;position:relative}
 .lbw-root .cmp-title-selectors>div {
@@ -47,6 +50,58 @@
 }
 .lbw-root .cmp-title-selectors input+div button:hover{background:var(--hover);color:var(--ac)}
 .lbw-root .cmp-title-selectors input+div button:disabled{opacity:.4}
+
+/* Compare operand identity: on non-gold themes keep existing blue/teal,
+   while gold uses black, gold and bone from that same theme's token family.
+   Stage owns vars so every radar, stats line and history legend inherits them. */
+.lbw-root .ws-cmp-stage{
+  --compare-a:#60a5fa;
+  --compare-b:#2dd4bf;
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage{
+  --compare-a:var(--ac);
+  --compare-b:var(--tx2);
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-header[data-operator-side="a"]{
+  --cmp-class-color:var(--compare-a)!important;
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-header[data-operator-side="b"]{
+  --cmp-class-color:var(--compare-b)!important;
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-class{
+  color:var(--cmp-class-color)!important;
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-profile-avatar{
+  background:color-mix(in srgb,var(--cmp-class-color) 15%,var(--panel2))!important;
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-matchup-panel:first-child{
+  background:linear-gradient(110deg,color-mix(in srgb,var(--ac) 6%,var(--panel)),var(--panel) 64%)!important;
+}
+.lbw-root[data-theme="gold"] .ws-cmp-stage .cmp-matchup-panel:last-child{
+  background:linear-gradient(250deg,color-mix(in srgb,var(--tx2) 6%,var(--panel)),var(--panel) 64%)!important;
+}
+.lbw-root .ws-cmp-stage .cmp-profile-leading{
+  color:var(--ac);border-color:color-mix(in srgb,var(--ac) 42%,transparent);
+  background:color-mix(in srgb,var(--ac) 6%,transparent);
+}
+/* Keep the top bar and raised ledger a unified framed assembly on desktop.
+   Small screens retain separate stacked panels with no negative lift. */
+@media (min-width:1181px) {
+  .lbw-root .ws-cmp-stage .cmp-stage-head{
+    border-bottom-color:var(--ac);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,var(--ac) 18%,transparent),
+               0 1px 8px color-mix(in srgb,var(--ac) 9%,transparent);
+  }
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{
+    border-color:var(--ac);
+  }
+}
+@media (max-width:1180px) {
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{
+    border-color:var(--line2);
+    box-shadow:none;
+  }
+}
 
 /* Flatten only stage layout wrappers. The semantic markup and operator
    panels stay unchanged; CSS lays out A | ledger | B as peers. */
@@ -248,11 +303,15 @@
    and the canonical head-to-head record above the bars. */
 .lbw-root .ws-cmp-stage .ws-cmp-ledger{
   grid-column:2;grid-row:1;min-height:0;min-width:0;
-  overflow:visible;
-  /* raised into the selector strip's hidden center channel so its top
-     edge sits level with the operand dropdowns (T stem); accent border
-     joins the enclosing strip frame */
-  margin-top:-66px;border-color:var(--ac)
+  position:relative;z-index:2;overflow:visible;
+  /* Keep the owner-approved raised height. The missing border declaration
+     was why this never joined the top selector arms into a real T. */
+  margin-top:-66px;
+  border:1px solid var(--ac);
+  border-radius:8px 8px 9px 9px;
+  background:var(--panel);
+  box-shadow:0 3px 16px color-mix(in srgb,var(--ac) 8%,transparent),
+             0 0 0 1px color-mix(in srgb,var(--ac) 12%,transparent);
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-versus{
   display:flex;flex-direction:column;align-items:center;
@@ -287,7 +346,8 @@
 .lbw-root .ws-cmp-stage .cmp-ledger-workspace{
   display:flex;flex-direction:column;gap:6px;
   height:100%;min-height:0;padding:6px;
-  border:1px solid var(--line2);border-radius:10px;background:var(--panel)
+  /* The enclosing T stem is the only perimeter; no double inner frame. */
+  border:0;border-radius:7px;background:var(--panel)
 }
 .lbw-root .ws-cmp-stage .cmp-ledger-group{
   display:flex;flex-direction:column;flex:1;min-height:0;min-width:0

@@ -65,7 +65,7 @@ import { CompareMobileScore } from "@/components/compare/CompareMobileScore";
 import { CompareStage } from "@/components/compare/CompareStage";
 import { CompareHeadToHead } from "@/components/compare/CompareRadars";
 import { scoreRadarField } from "@/lib/radar/points";
-import { COMPARE_OPERAND_COLORS } from "@/components/compare/compare-palette";
+import { COMPARE_THEME_OPERAND_COLORS } from "@/components/compare/compare-palette";
 import "@/components/compare/compare-workspace.css";
 
 export const metadata: Metadata = withOG({
@@ -340,6 +340,7 @@ export default async function ComparePage({
       {/* One fixed comparison workspace, using the implemented page's data and
           original operator/context sidebars. All stage sections stay visible. */}
       <WorkspaceShell
+        defaultTheme="gold"
         active="compare"
         title="COMPARE"
         leftTitle="COMPARE"
@@ -477,8 +478,8 @@ export default async function ComparePage({
               nameA={nameOf(rowA)}
               nameB={nameOf(rowB)}
               height={140}
-              colorA={COMPARE_OPERAND_COLORS.a}
-              colorB={COMPARE_OPERAND_COLORS.b}
+              colorA={COMPARE_THEME_OPERAND_COLORS.a}
+              colorB={COMPARE_THEME_OPERAND_COLORS.b}
             />
           </div>
           <div className="ws-cmp-hist cmp-hist-phone">
@@ -489,8 +490,8 @@ export default async function ComparePage({
               nameB={nameOf(rowB)}
               height={210}
               compact
-              colorA={COMPARE_OPERAND_COLORS.a}
-              colorB={COMPARE_OPERAND_COLORS.b}
+              colorA={COMPARE_THEME_OPERAND_COLORS.a}
+              colorB={COMPARE_THEME_OPERAND_COLORS.b}
             />
           </div>
         </div>
