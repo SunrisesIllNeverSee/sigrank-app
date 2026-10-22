@@ -57,7 +57,7 @@ import { WaveHero } from "@/components/ui/WaveHero";
 import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBadge";
 import { LeaderboardKey } from "@/components/leaderboard/LeaderboardKey";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { leaderboardItemList, sigrankDataset, faqPage } from "@/lib/jsonld";
+import { leaderboardItemList, sigrankDataset, faqPage, SIGRANK_DATASET_PUBLISHED } from "@/lib/jsonld";
 import { FaqSection } from "@/components/seo/FaqSection";
 import { withOG } from "@/lib/seo";
 import { BoardTableClient } from "@/components/board/BoardTableClient";
@@ -230,7 +230,8 @@ export default async function BoardWindowPage({
     <>
       <JsonLd
         data={[
-          sigrankDataset({ updated: new Date().toISOString() }),
+          // Static DOI dataset (v3.1) — its real modification date, never render time.
+          sigrankDataset({ updated: SIGRANK_DATASET_PUBLISHED }),
           leaderboardItemList(
             jsonLdEntries.map((e) => ({
               codename: e.codename,

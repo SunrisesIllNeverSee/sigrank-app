@@ -24,6 +24,7 @@ export const WIKI_PAGES: { path: string; title: string }[] = [
   { path: "/wiki/metrics/output-flow-share", title: "Output Flow Share" },
   { path: "/wiki/metrics/context-activity-ratio", title: "Context Activity Ratio" },
   { path: "/wiki/metrics/active-output-share", title: "Active Output Share" },
+  { path: "/wiki/metrics/scale-v", title: "Scale V — Recorded Token Activity" },
 ];
 
 function line(origin: string, path: string, title: string, description?: string, query = "") {
