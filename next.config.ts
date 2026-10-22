@@ -11,6 +11,10 @@ const POSTHOG_ASSETS = POSTHOG_HOST.includes("eu.")
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // CI already runs tsc + lint (hygiene job) — skip the in-build pass to
+  // cut Vercel build CPU minutes on every main push.
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
   // Don't 308-redirect /ingest → /ingest/ ; PostHog ingestion paths are exact.
   skipTrailingSlashRedirect: true,
   // Include content/blog/ in serverless function file tracing so ISR
