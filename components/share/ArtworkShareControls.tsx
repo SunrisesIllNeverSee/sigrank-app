@@ -3,8 +3,8 @@
 import { useState } from "react";
 import "./artwork-share.css";
 
-export function ArtworkShareControls({ target, title, filename, href, animated = false, backgroundColor = "#0b100b", pixelRatio = 3, exportWidth, exportHeight, gifPanelStart, featuredFormats = false }: {
-  target: string; title: string; filename: string; href: string; animated?: boolean; backgroundColor?: string; pixelRatio?: number; exportWidth?: number; exportHeight?: number; gifPanelStart?: number; featuredFormats?: boolean;
+export function ArtworkShareControls({ target, title, filename, href, animated = false, backgroundColor = "#0b100b", pixelRatio = 3, exportWidth, exportHeight, gifPanelStart }: {
+  target: string; title: string; filename: string; href: string; animated?: boolean; backgroundColor?: string; pixelRatio?: number; exportWidth?: number; exportHeight?: number; gifPanelStart?: number;
 }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -80,19 +80,9 @@ export function ArtworkShareControls({ target, title, filename, href, animated =
     } catch { setMessage("Clipboard unavailable. Copy this page’s address."); }
   };
   return <div className="artwork-share-controls">
-    {featuredFormats && animated ? <>
-      <button type="button" className="artwork-featured-format" disabled={busy} onClick={() => download(false)}>
-        {busy ? "Rendering…" : "01 · Download white-holo PNG"}
-      </button>
-      <button type="button" id="share-holo-gif" className="artwork-featured-format" disabled={busy} onClick={() => download(false, true)}>
-        {busy ? "Rendering…" : "02 · Download holographic GIF"}
-      </button>
-      <button type="button" disabled={busy} onClick={() => download(true)}>{busy ? "Rendering…" : `Share ${title}`}</button>
-    </> : <>
-      <button type="button" disabled={busy} onClick={() => download(true)}>{busy ? "Rendering…" : `Share ${title}`}</button>
-      <button type="button" disabled={busy} onClick={() => download(false)}>Download PNG</button>
-      {animated && <button type="button" disabled={busy} onClick={() => download(false, true)}>Download GIF</button>}
-    </>}
+    <button type="button" disabled={busy} onClick={() => download(true)}>{busy ? "Rendering…" : `Share ${title}`}</button>
+    <button type="button" disabled={busy} onClick={() => download(false)}>Download PNG</button>
+    {animated && <button type="button" disabled={busy} onClick={() => download(false, true)}>Download GIF</button>}
     <button type="button" onClick={copy}>Copy link</button>
     <span role="status">{message}</span>
   </div>;
