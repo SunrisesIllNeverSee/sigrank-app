@@ -78,3 +78,29 @@
 /* The plaque is the single operator name on this *share card* only.
    Profile/passport everywhere else retains its own visible name. */
 .lbw-root .pv2 .bone-holo-live .pv2-operator-name{visibility:hidden}
+
+/* The primary field rank is a major result, never 9–12px metadata.
+   Applies only to the two shareable holographic cards; profile remains unchanged. */
+.lbw-root .pv2.share-holocard .pv2-rank-chip--field{
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+  margin-top:9px;font:700 11px/1.1 BoneMono,monospace;
+  letter-spacing:.11em;color:#d2e7db;text-align:right;
+}
+.lbw-root .pv2.share-holocard .pv2-rank-chip--field strong{
+  font-family:var(--pc-font-d),BoneGrotesk,monospace;
+  font-size:58px;line-height:.93;letter-spacing:-.055em;
+  color:var(--pc-accent);font-variant-numeric:tabular-nums;
+  text-shadow:0 0 14px rgba(166,255,0,.22);
+}
+/* Preserve an intact #1234 on the fixed-width 324px passport. */
+.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="3"] strong{font-size:47px}
+.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="4"] strong{font-size:39px}
+.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="5"] strong{font-size:33px}
+.lbw-root .pv2.share-holocard .pv2-rank-chip--field[data-rank-digits="0"] strong{font-size:38px;color:var(--pc-muted)}
+.lbw-root .pv2.share-holocard .pv2-rank-chip--wf{
+  margin-top:5px;font-size:10px;letter-spacing:.04em;
+}
+.lbw-root .pv2.share-holocard .pv2-rating-number{font-size:42px}
+/* Metric-by-metric rank must also be readable in the 18-cell ledger. */
+.bone-holo-card .bone-holo-ledger-rank{font-size:9px;line-height:1.05}
+.bone-holo-card .bone-holo-ledger-rank b{font-size:12px;line-height:1;font-weight:800;color:#442f37}
