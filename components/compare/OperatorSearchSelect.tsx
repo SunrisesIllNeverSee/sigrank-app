@@ -120,11 +120,11 @@ export function OperatorSearchSelect({
   }, [highlightIndex, open]);
 
   return (
-    <div className="flex flex-col gap-1" ref={containerRef}>
-      <span className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
+    <div className={`cmp-operator-picker ${sideLabel === "Operator A" ? "cmp-operator-picker--a" : "cmp-operator-picker--b"}`} ref={containerRef}>
+      <span className="cmp-operator-picker-label">
         {sideLabel}
       </span>
-      <div className="relative">
+      <div className="cmp-operator-picker-control">
         {/* Closed state: shows selected operator as a button */}
         {!open && (
           <button
@@ -133,9 +133,12 @@ export function OperatorSearchSelect({
               setOpen(true);
               setTimeout(() => inputRef.current?.focus(), 0);
             }}
-            className="w-full rounded-md border border-bg-border bg-bg-surface px-3 py-2 text-left font-mono text-sm text-text-primary outline-none transition-colors hover:bg-bg-hover focus:border-text-accent"
+            className="cmp-operator-trigger"
+            aria-label={`Change ${sideLabel}: ${selectedLabel}`}
+            aria-expanded={false}
           >
-            {selectedLabel}
+            <span className="cmp-operator-selected">{selectedLabel}</span>
+            <span className="cmp-operator-chevron" aria-hidden="true">⌄</span>
           </button>
         )}
 
@@ -149,12 +152,14 @@ export function OperatorSearchSelect({
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search operators…"
-              className="w-full rounded-md border border-text-accent bg-bg-surface px-3 py-2 font-mono text-sm text-text-primary outline-none placeholder:text-text-dim"
+              className="cmp-operator-input"
+              aria-label={`Search ${sideLabel}`}
+              aria-expanded={true}
               autoFocus
             />
             <div
               ref={listRef}
-              className="absolute z-50 mt-1 max-h-72 w-full overflow-y-auto rounded-md border border-bg-border bg-bg-surface shadow-lg"
+              className="cmp-operator-menu"
             >
               {filtered.length === 0 ? (
                 <div className="px-3 py-2 font-mono text-xs text-text-muted">

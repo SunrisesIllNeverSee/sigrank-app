@@ -632,61 +632,143 @@
   .lbw-root:has(.ws-cmp-stage) .ws-faq summary{min-height:44px;display:flex;align-items:center}
 }
 
-/* TRUE T CONTOUR — one continuous gold line, not overlapping rectangles.
-   Measured SVG perimeter adapts to stage/sidebar widths without guessing the
-   1.05 / 1.35 / 1.05 column boundaries. Portrait cards are NOT in that frame. */
-.lbw-root .ws-cmp-stage{position:relative}
-.lbw-root .ws-cmp-stage .cmp-t-perimeter{
-  position:absolute;inset:0;display:block;width:100%;height:100%;
-  overflow:visible;pointer-events:none;z-index:10;
+
+/* Compare visual refinement: the T-shaped arrangement remains, but the
+   perimeter itself is deliberately UNFRAMED. Attention goes to the two
+   operator cards and the selection controls rather than an enclosing outline.
+   This is scoped to Compare; other workspace themes/pages are unchanged. */
+.lbw-root .ws-cmp-stage .cmp-t-perimeter{display:none}
+.lbw-root .ws-cmp-stage .cmp-stage-head{
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
 }
-.lbw-root .ws-cmp-stage .cmp-t-perimeter-path{
-  fill:none;stroke:var(--ac);stroke-width:1.8px;
-  vector-effect:non-scaling-stroke;stroke-linecap:round;
-  stroke-linejoin:round;
-  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--ac) 23%,transparent));
+.lbw-root .ws-cmp-stage .ws-cmp-ledger{
+  border:0;
+  border-radius:8px;
+  box-shadow:none;
+  background:var(--panel);
 }
 @media (min-width:1181px){
-  /* The continuous top stroke is inside the scrollport. Leave clearance so
-     MATCHUP / BAR STATISTICS does not collide with the new top edge. */
+  .lbw-root .ws-cmp-stage .cmp-stage-head{top:0;z-index:4}
+  .lbw-root .ws-cmp-stage .ws-cmp-ledger{
+    /* Retain existing -66px lift/position: visual T, no drawn perimeter. */
+    margin-top:-66px;
+    box-shadow:0 8px 28px rgba(0,0,0,.26);
+  }
   .lbw-root .ws-cmp-stage .cmp-ledger-workspace{
     padding-top:16px;
   }
-  /* Original gold bar and stem each had a full border, leaving internal
-     horizontal seams. Hide those two borders: only the outline SVG draws
-     the exterior silhouette. Match their top edges with a VISUAL shift,
-     without changing the owner-approved -66px ledger lift or stage rows. */
-  .lbw-root .ws-cmp-stage .cmp-stage-head{
-    top:-7px;border-color:transparent;
-    box-shadow:none;
-  }
-  .lbw-root .ws-cmp-stage .ws-cmp-ledger{
-    border-color:transparent;
-    box-shadow:none;
-  }
-  .lbw-root .ws-cmp-stage .ws-cmp{
-    column-gap:14px;
-  }
-  /* The selector columns keep their one-to-one alignment with the panels. */
-  .lbw-root .ws-cmp-stage .cmp-title-selectors>div{column-gap:14px}
-  /* A/B portraits occupy separate inset cards. Subtle ivory separators in the
-     gutters distinguish their frames from the main bright gold T stem. */
-  .lbw-root .ws-cmp-stage .cmp-matchup-panel{
-    position:relative;
-    border-color:color-mix(in srgb,var(--tx2) 17%,var(--line2));
-    box-shadow:inset 0 1px 0 color-mix(in srgb,var(--tx2) 8%,transparent),
-               0 4px 14px rgba(0,0,0,.18);
-  }
+  .lbw-root .ws-cmp-stage .ws-cmp{column-gap:16px}
+  .lbw-root .ws-cmp-stage .cmp-title-selectors>div{column-gap:16px}
+}
+/* Operator profile cards carry the separation, with theme-relative A (gold)
+   and B (bone) luminous edges. No LED-style animation or hardcoded blue. */
+.lbw-root .ws-cmp-stage .cmp-matchup-panel{
+  position:relative;
+  border:1px solid color-mix(in srgb,var(--portrait-glow) 42%,var(--line2));
+  border-radius:10px;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--portrait-glow) 17%,transparent),
+             0 0 0 1px color-mix(in srgb,var(--portrait-glow) 12%,transparent),
+             0 0 15px color-mix(in srgb,var(--portrait-glow) 15%,transparent),
+             0 0 32px color-mix(in srgb,var(--portrait-glow) 8%,transparent),
+             0 10px 18px rgba(0,0,0,.36);
+}
+.lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child{
+  --portrait-glow:var(--compare-a,var(--ac));
+}
+.lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child{
+  --portrait-glow:var(--compare-b,var(--tx2));
+}
+.lbw-root .ws-cmp-stage .cmp-matchup-panel::after,
+.lbw-root .ws-cmp-stage .cmp-matchup-panel::before{
+  pointer-events:none;
+}
+@media (min-width:1181px){
+  /* Quiet separators set the profiles apart from the center statistics. */
   .lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child::after,
   .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child::before{
-    content:"";position:absolute;top:12px;bottom:12px;width:1px;
-    background:color-mix(in srgb,var(--tx2) 30%,transparent);
-    pointer-events:none;
+    content:"";position:absolute;top:18px;bottom:18px;width:1px;
+    background:color-mix(in srgb,var(--portrait-glow) 34%,transparent);
+    box-shadow:0 0 6px color-mix(in srgb,var(--portrait-glow) 14%,transparent);
   }
-  .lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child::after{right:-8px}
-  .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child::before{left:-8px}
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:first-child::after{right:-9px}
+  .lbw-root .ws-cmp-stage .cmp-matchup-panel:last-child::before{left:-9px}
 }
-@media (max-width:1180px){
-  /* Stacked layout has no T. Retain legible individual panel borders. */
-  .lbw-root .ws-cmp-stage .cmp-t-perimeter{display:none}
+/* Operator dropdowns: illuminated interactive fields with distinct operand
+   identity, visible chevrons, and keyboard-focus treatment. */
+.lbw-root .ws-cmp-stage .cmp-title-selectors>div>div>div.cmp-operator-picker{
+  width:min(215px,100%);min-width:0;display:flex;flex-direction:column;gap:4px;
+  position:relative;
+  --picker-accent:var(--compare-a,var(--ac));
+}
+.lbw-root .ws-cmp-stage .cmp-operator-picker--b{
+  --picker-accent:var(--compare-b,var(--tx2))!important;
+}
+.lbw-root .ws-cmp-stage .cmp-operator-picker-label{
+  display:flex;align-items:center;gap:5px;
+  color:var(--picker-accent);font:800 10px/1 var(--font-mono);
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.lbw-root .ws-cmp-stage .cmp-operator-picker-label::before{
+  content:"";width:5px;height:5px;flex:0 0 5px;
+  border-radius:50%;background:var(--picker-accent);
+  box-shadow:0 0 8px color-mix(in srgb,var(--picker-accent) 65%,transparent);
+}
+.lbw-root .ws-cmp-stage .cmp-operator-picker-control{position:relative;min-width:0}
+.lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger,
+.lbw-root .ws-cmp-stage .cmp-title-selectors input.cmp-operator-input{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  width:100%;min-height:34px;padding:7px 11px;border:1px solid
+  color-mix(in srgb,var(--picker-accent) 66%,var(--line2));
+  border-radius:7px;
+  color:var(--tx);
+  font:700 12px/1.3 var(--font-mono);
+  background:linear-gradient(120deg,
+     color-mix(in srgb,var(--picker-accent) 11%,var(--panel2)),
+     var(--panel) 70%);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--picker-accent) 19%,transparent),
+             0 0 0 1px color-mix(in srgb,var(--picker-accent) 11%,transparent),
+             0 0 12px color-mix(in srgb,var(--picker-accent) 11%,transparent);
+  transition:border-color .15s,box-shadow .15s,background-color .15s;
+}
+.lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger{
+  cursor:pointer;text-align:left;
+}
+.lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger:hover,
+.lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger:focus-visible,
+.lbw-root .ws-cmp-stage .cmp-title-selectors input.cmp-operator-input:focus{
+  border-color:var(--picker-accent);outline:2px solid var(--picker-accent);
+  outline-offset:1px;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--picker-accent) 15%,transparent),
+             0 0 19px color-mix(in srgb,var(--picker-accent) 24%,transparent);
+}
+.lbw-root .ws-cmp-stage .cmp-operator-selected{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.lbw-root .ws-cmp-stage .cmp-operator-chevron{
+  flex:none;display:grid;place-items:center;width:19px;height:19px;
+  border:1px solid color-mix(in srgb,var(--picker-accent) 50%,transparent);
+  border-radius:4px;background:color-mix(in srgb,var(--picker-accent) 12%,var(--panel));
+  font:800 17px/1 var(--font-mono);color:var(--picker-accent);
+}
+.lbw-root .ws-cmp-stage .cmp-title-selectors .cmp-operator-menu{
+  position:absolute;z-index:60;top:100%;left:0;width:100%;max-height:290px;
+  margin-top:5px;overflow-y:auto;border:1px solid var(--picker-accent);
+  border-radius:7px;background:var(--panel);box-shadow:0 14px 28px rgba(0,0,0,.5);
+}
+.lbw-root .ws-cmp-stage .cmp-title-selectors .cmp-operator-menu button{
+  width:100%;min-height:32px;padding:7px 10px;border:0;border-radius:0;
+}
+@media(max-width:760px){
+  .lbw-root .ws-cmp-stage .cmp-title-selectors>div>div>div.cmp-operator-picker{width:100%}
+  .lbw-root .ws-cmp-stage .cmp-title-selectors button.cmp-operator-trigger,
+  .lbw-root .ws-cmp-stage .cmp-title-selectors input.cmp-operator-input{
+    min-height:44px;font-size:15px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .lbw-root .ws-cmp-stage .cmp-operator-trigger,
+  .lbw-root .ws-cmp-stage .cmp-operator-input{transition:none}
 }
