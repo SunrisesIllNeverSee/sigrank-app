@@ -5,7 +5,7 @@
 
 import { SITE_ORIGIN, SITE_NAME, SITE_TAGLINE, formatTokensLong } from "@/lib/seo";
 import { getHomepageStats } from "@/lib/board";
-import { editorialPagesMarkdown } from "@/lib/seo/llms-pages";
+import { editorialPagesMarkdown, siteMapMarkdown, NAMING_MARKDOWN } from "@/lib/seo/llms-pages";
 import { isSitemapPromoted } from "@/lib/seo/search-index-policy";
 
 export const revalidate = 86400;
@@ -49,7 +49,11 @@ SigRank is an AI operator benchmark measuring token cascade efficiency, not AI m
 
 > ${SITE_TAGLINE}
 
+${NAMING_MARKDOWN}
+
 Unlike model leaderboards, SigRank ranks the accounts associated with AI-work telemetry, not the models themselves. Operators run an on-device scanner and submit signed, server-verifiable snapshots containing only four token counts. Full reference: ${SITE_ORIGIN}/llms-full.txt
+
+${siteMapMarkdown(SITE_ORIGIN)}
 
 ## When to use SignalAF
 - Benchmark an AI operator against a public reference field.
@@ -119,22 +123,15 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [MCP discovery — SigRank](${SITE_ORIGIN}/.well-known/mcp.json): SigRank MCP server card
 - [MCP discovery — Exchange](${SITE_ORIGIN}/.well-known/exchange-mcp.json): Contribution Exchange MCP server card with tool list and authorization scopes
 
-## Core pages
-- [Leaderboard](${SITE_ORIGIN}/board/all): live operator rankings (all-time, 7d, 30d, 90d windows)
-- [Score calculator](${SITE_ORIGIN}/score): paste your stats, get your Yield + class, no account
-- [Hall of Signal](${SITE_ORIGIN}/hall): top operators
-- [Field Hub](${SITE_ORIGIN}/fieldhub): research hub linking the field analysis and the State of the Index dataset
-- [Field Analysis](${SITE_ORIGIN}/field): AI operator field distribution across the tracked telemetry corpus
+## Reference pages
+- [Methodology](${SITE_ORIGIN}/methodology): definitions, formulas and quotable key figures — the canonical citation source
 - [TTEOP Standard](${SITE_ORIGIN}/standard): open telemetry protocol for AI operator measurement
-- [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, how operator scoring works, and the operator/agent/model comparison
-- [Operator Performance](${SITE_ORIGIN}/operator-performance): why the operator is the variable — class tiers, scoring, and the operator-performance hub
-- [Methodology](${SITE_ORIGIN}/methodology): quotable key figures, the canonical citation source
+- [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, and operator vs agent vs model evaluation
+- [Operator Performance](${SITE_ORIGIN}/operator-performance): why the operator is the variable — class tiers and scoring
+- [Score calculator](${SITE_ORIGIN}/score): paste token counts, get Yield + class, no account
 - [FAQ](${SITE_ORIGIN}/faq): common questions about AI operators and token-cascade efficiency
-- [Wiki](${SITE_ORIGIN}/wiki): four token pillars, cascade metrics, operator archetypes, MO§ES governance
-- [Compare](${SITE_ORIGIN}/compare): head-to-head operator comparison
+- [About](${SITE_ORIGIN}/about): what SignalAF and SigRank are, and the privacy model
 - [SigRank for Vercel](${SITE_ORIGIN}/vercel): Vercel-native MCP distribution and public deployment diagnostic
-- [SigRank overview](${SITE_ORIGIN}/sigrank): the evaluation platform for AI operators — what it measures and how
-- [About](${SITE_ORIGIN}/about): what SigRank is, privacy model, and FAQ
 
 ${editorialPages}
 
@@ -142,6 +139,9 @@ ${editorialPages}
 
 **Q: What is SigRank?**
 A: SigRank is the public AI operator benchmark — the leaderboard that ranks how efficiently operators (accounts) use AI by Yield (Υ = cache_read × output / input²), not raw token volume. Measurements are produced by Upsilon, the measurement engine. SigRank is the proof surface; Upsilon is the engine.
+
+**Q: What is SignalAF?**
+A: SignalAF (signalaf.com) is the website that publishes SigRank, the public AI operator leaderboard. Upsilon is the measurement engine behind the numbers. Not affiliated with Signal Messenger or SignalFx.
 
 **Q: What is TTEOP?**
 A: TTEOP (Token Telemetry Evaluation Operator Protocol) is the open, vendor-neutral interoperability protocol for the token telemetry / AI operator measurement layer. Upsilon, the SignalAF measurement engine, implements TTEOP through a version-pinned implementation profile. The protocol defines I/O/W/R plus Yield, Leverage, Velocity, output_fraction (displayed as SNR), and log_leverage (displayed as 10xDEV). See ${SITE_ORIGIN}/standard.
@@ -157,6 +157,12 @@ A: Yield is the headline efficiency metric: Υ = (cache_read × output) / input�
 
 **Q: Does Upsilon read my prompts?**
 A: No. Upsilon only reads token counts. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
+
+**Q: How do I compare two AI operators?**
+A: Open ${SITE_ORIGIN}/compare and pick operator A and operator B (or link \`/compare?a=<codename>&b=<codename>\`). Each side gets raw-pillar and cascade-metric radars; the center ledger counts metric wins, and Yield over time shares one axis.
+
+**Q: What does SigRank not measure?**
+A: Correctness, code quality, effort, productivity, intelligence or model quality. Yield describes a token-flow relationship from four counts; a comparison is a comparison of operating shape, not of people.
 
 **Q: How is SigRank different from model leaderboards?**
 A: Model leaderboards benchmark AI models. SigRank benchmarks AI operators, the accounts operating the models.
@@ -189,12 +195,17 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - Install: \`npx sigrank\`
 
 ## Ask AI about us
-- "What is SigRank?" → ${SITE_ORIGIN}/faq
+- "What is SigRank?" → ${SITE_ORIGIN}/sigrank
+- "What is SignalAF?" → ${SITE_ORIGIN}/about
 - "What is an AI operator?" → ${SITE_ORIGIN}/ai-operator-scoring
 - "What is AI operator scoring?" → ${SITE_ORIGIN}/ai-operator-scoring
 - "What is the standard for AI operator performance?" → ${SITE_ORIGIN}/standard
-- "Who is the best AI user?" → ${SITE_ORIGIN}/hall
-- "What is token cascade efficiency?" → ${SITE_ORIGIN}/wiki/four-degrees
+- "Who is the best AI user?" → ${SITE_ORIGIN}/board/all
+- "Who holds the records?" → ${SITE_ORIGIN}/hall
+- "How do I compare two AI operators?" → ${SITE_ORIGIN}/compare
+- "What badges can an operator earn?" → ${SITE_ORIGIN}/hall/badges
+- "What is token cascade efficiency?" → ${SITE_ORIGIN}/methodology
+- "What is Yield (Υ)?" → ${SITE_ORIGIN}/wiki/metrics/yield
 - "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
 - "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 - "How do I use SigRank with Vercel?" → ${SITE_ORIGIN}/vercel

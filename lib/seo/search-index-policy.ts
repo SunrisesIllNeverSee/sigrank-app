@@ -33,6 +33,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/token-telemetry": "CORE",
   "/score": "CORE",
   "/hall": "CORE",
+  "/hall/badges": "SUPPORTED", // badge + achievement index (redesign, linked from /hall + profiles)
   "/compare": "CORE",
   "/field": "CORE",
   "/live": "CORE",
@@ -174,6 +175,9 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/blog/the-tool-is-the-person": "SUPPORTED",
   "/blog/a-tour-of-the-new-signalaf": "SUPPORTED", // redesign tour (content/blog, 2026-10-21)
 
+  // ── HOLD — interactive surfaces with tool intent already covered by /tools/*
+  "/sandbox": "HOLD", // Cascade Lab — live and indexable, not advertised
+
   // ── HOLD — newer AI-evaluation cluster (2026-09-15 batch, unproven) ─────
   "/ai-evaluation": "HOLD",
   "/ai-evaluation-tools": "HOLD",
@@ -270,9 +274,26 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/agents.md": "UTILITY", // agent-facing doc route
   "/marketplace": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
   "/vercel/config": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
+  "/terms": "UTILITY",
+  "/login": "UTILITY", // serves noindex,follow
+  "/upgrade/success": "UTILITY", // Stripe success_url — noindex,follow
+  "/upgrade/canceled": "UTILITY", // Stripe cancel_url — noindex,follow
+  "/search": "UTILITY", // flag-gated site search (404 while off)
+  "/me": "UTILITY",
+  "/me/edit": "UTILITY",
+  "/me/sharables": "UTILITY",
+  "/settings": "UTILITY",
+  "/editor/review": "UTILITY",
+  "/share/four-degrees": "UTILITY", // share-card surface
+  "/exchange/activity": "UTILITY",
+  "/exchange/agent": "UTILITY",
+  "/exchange/company": "UTILITY",
+  "/exchange/control": "UTILITY",
+  "/exchange/inbox": "UTILITY",
 
   // ── REDIRECT — known redirecting routes (never sitemap members) ─────────
   "/leaderboard": "REDIRECT", // → /board/all
+  "/user": "REDIRECT", // 307 → /user/the-field
   "/ai-operator-benchmark": "REDIRECT", // 308 → /ai-operator-scoring
   "/token-efficiency": "REDIRECT", // 308 → /metrics/yield-cascade
   "/ai-coding-analytics": "REDIRECT", // 308 → /ai-coding-metrics

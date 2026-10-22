@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { ArtworkShareControls } from "@/components/share/ArtworkShareControls";
 import { MyWatchlist } from "./MyWatchlist";
@@ -16,6 +15,7 @@ const ProfileWorkspaceContext = createContext<{ section: ProfileSection; codenam
 export const useProfileWorkspace = () => useContext(ProfileWorkspaceContext);
 
 const sections = ["overview", "stats", "analysis", "submissions", "social", "badges"] as const;
+const VALID_SECTIONS = ["overview", "stats", "analysis", "report", "lab", "submissions", "social", "badges"] as const;
 
 /** owner 2026-10-21: phone-only profile header (hidden above 760px by CSS). */
 function PhoneHeader({ name, codename, rank, tier, platform }: { name: string; codename: string; rank: number | null; tier: string; platform: string }) {
@@ -65,10 +65,14 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
    *  injected between OPERATOR PROFILE and ACTIONS by the page (Phase 3). */
   panels?: ReactNode;
 }) {
-  const searchParams = useSearchParams();
-  const requested = searchParams.get("tab");
-  const validSections: ProfileSection[] = ["overview", "stats", "analysis", "report", "lab", "submissions", "social", "badges"];
-  const [section, setSection] = useState<ProfileSection>(validSections.includes(requested as ProfileSection) ? requested as ProfileSection : "overview");
+  // ?tab= is read after mount, not via useSearchParams: that hook bails the
+  // whole profile out of server rendering on this ISR page, leaving crawlers
+  // (and non-JS AI agents) only the Suspense fallback.
+  const [section, setSection] = useState<ProfileSection>("overview");
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    if (requested && (VALID_SECTIONS as readonly string[]).includes(requested)) setSection(requested as ProfileSection);
+  }, []);
   const select = (next: ProfileSection) => {
     setSection(next);
     const url = new URL(window.location.href);
