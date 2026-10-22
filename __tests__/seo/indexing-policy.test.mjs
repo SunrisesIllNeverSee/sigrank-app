@@ -444,3 +444,32 @@ test("operator sitemap entries pass the shared policy (no noindex rows emitted)"
   const emitted = operatorSitemapEntries(rows, ORIGIN).map((e) => e.url);
   assert.deepEqual(emitted, [`${ORIGIN}/user/ok`]);
 });
+
+// ── Post-redesign search closeout (2026-10-22) ──────────────────────────────
+
+test("redesign-era permanent pages are promoted and emitted", () => {
+  const emitted = new Set(emittedStaticPlusBoardUrls().map((u) => new URL(u).pathname));
+  for (const p of ["/fieldhub", "/blog/a-tour-of-the-new-signalaf", "/wiki/metrics/scale-v"]) {
+    assert.ok(isSitemapPromoted(p), `${p} must be promoted`);
+    assert.ok(emitted.has(p), `${p} must be emitted in the sitemap`);
+  }
+});
+
+test("HOLD AI-evaluation cluster stays unpromoted", () => {
+  for (const p of ["/ai-evaluation", "/ai-evaluation-tools", "/evaluating-ai", "/ai-model-evaluation"]) {
+    assert.equal(ROUTE_CLASSES[p], "HOLD");
+    assert.equal(isSitemapPromoted(p), false);
+  }
+});
+
+test("llms.txt advertises topic pages only through the sitemap manifest", async () => {
+  const route = await source("app/llms.txt/route.ts");
+  assert.match(route, /TOPIC_PAGES\.filter\(\(p\) => isSitemapPromoted\(p\.path\)\)/);
+  assert.doesNotMatch(route, /\]\(\$\{SITE_ORIGIN\}\/ai-evaluation\)/);
+});
+
+test("board Dataset JSON-LD never stamps render time as dateModified", async () => {
+  const board = await source("app/board/[window]/page.tsx");
+  assert.doesNotMatch(board, /sigrankDataset\(\{\s*updated:\s*new Date\(/);
+  assert.match(board, /sigrankDataset\(\{\s*updated:\s*SIGRANK_DATASET_PUBLISHED\s*\}\)/);
+});

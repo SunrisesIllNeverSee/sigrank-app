@@ -66,7 +66,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/faq": "SUPPORTED",
   "/learn": "SUPPORTED",
   "/developers": "SUPPORTED",
-  "/fieldhub": "HOLD", // flag-gated behind PostHog `fieldhub-page` — can 404; keep unadvertised until the flag ships permanently, then promote + revalidatePath("/sitemap.xml")
+  "/fieldhub": "CORE", // primary-nav "Field" since the redesign; `fieldhub-page` flag fails open on page + nav (404 only on an explicit off) — promoted 2026-10-22 search closeout
   "/platforms": "SUPPORTED",
   "/standard/open-vs-proprietary": "SUPPORTED",
   "/ai-coding-metrics": "SUPPORTED",
@@ -160,6 +160,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/wiki/metrics/output-flow-share": "SUPPORTED",
   "/wiki/metrics/context-activity-ratio": "SUPPORTED",
   "/wiki/metrics/active-output-share": "SUPPORTED",
+  "/wiki/metrics/scale-v": "SUPPORTED", // canon metric (Scale V), added 2026-10-12
 
   // ── Blog — established essays (1 sentinel-backed) ───────────────────────
   "/blog/volume-isnt-yield": "SUPPORTED",
@@ -171,6 +172,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/blog/token-cascade-vs-raw-token-consumption": "SUPPORTED",
   "/blog/why-yield-beats-tokenmaxxing": "SUPPORTED",
   "/blog/the-tool-is-the-person": "SUPPORTED",
+  "/blog/a-tour-of-the-new-signalaf": "SUPPORTED", // redesign tour (content/blog, 2026-10-21)
 
   // ── HOLD — newer AI-evaluation cluster (2026-09-15 batch, unproven) ─────
   "/ai-evaluation": "HOLD",
