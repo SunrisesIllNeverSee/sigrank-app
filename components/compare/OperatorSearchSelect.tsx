@@ -77,6 +77,7 @@ export function OperatorSearchSelect({
   }, []);
 
   const handleSelect = (code: string) => {
+    if (code === disabledCode) return;
     onSelect(code);
     setOpen(false);
     setQuery("");
@@ -173,6 +174,7 @@ export function OperatorSearchSelect({
                     onClick={() => handleSelect(o.codename)}
                     onMouseEnter={() => setHighlightIndex(i)}
                     disabled={o.codename === disabledCode}
+                    data-highlighted={i === highlightIndex}
                     className={`block w-full px-3 py-1.5 text-left font-mono text-sm transition-colors ${
                       i === highlightIndex
                         ? "bg-bg-hover text-text-primary"
