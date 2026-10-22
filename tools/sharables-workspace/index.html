@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SignalAF · Sharables Workspace (Local Only)</title>
+<style>
+:root{color-scheme:dark;--ink:#f4eee3;--muted:#a3ada6;--line:#39473f;--lime:#a6ff00;--ox:#411d28;--panel:#162019}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif;color:var(--ink);background:#0e1410}
+header{background:var(--ox);padding:26px clamp(18px,5vw,64px);border-bottom:1px solid #92606e}
+main{max-width:1350px;margin:auto;padding:24px clamp(14px,3vw,38px)}
+h1{margin:0;font-size:clamp(23px,3vw,38px);letter-spacing:-.04em}h2{margin:0 0 12px;font-size:20px}h3{margin:0 0 8px;font-size:14px}
+p{color:var(--muted);margin:7px 0 12px}a{color:var(--lime);text-decoration:none}a:hover{text-decoration:underline}
+small,.mono,code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:11px;letter-spacing:.08em}
+.tag.primary{border-color:var(--lime);color:var(--lime)}.eyebrow{text-transform:uppercase;letter-spacing:.2em;color:#d5aab6;font:11px ui-monospace,monospace}
+section{margin:0 0 32px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px}
+.sample{height:115px;position:relative;overflow:hidden;border-radius:9px;background:#f4eee3;color:#2a2125;padding:14px}
+.sample b{font-size:19px;letter-spacing:-.06em;line-height:1.05}.sample span{position:absolute;top:0;right:0;width:35%;height:100%;background:linear-gradient(135deg,var(--foil,#80e5cc),#192f37,#ca9fff,var(--foil,#80e5cc))}
+.sample small{position:absolute;bottom:12px;left:14px;color:#5b4b55}
+.asset{background:#17201b;border:1px solid var(--line);border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.asset strong{font-size:14px}.asset p{margin:2px 0 0;font-size:12px}.paths{overflow-wrap:anywhere;color:#b8c3bb;font:11px/1.4 ui-monospace,monospace}
+.actions{display:flex;flex-wrap:wrap;gap:9px}button,select,input,textarea{font:inherit;color:var(--ink);background:#1c2820;border:1px solid #516259;border-radius:6px;padding:9px 11px}
+button{cursor:pointer}button:hover{border-color:var(--lime)}button.primary{color:#0d160d;background:var(--lime);font-weight:bold;border:0}
+input[type=search]{width:min(400px,100%)}textarea{width:100%;resize:vertical;min-height:76px}
+label{font-size:11px;color:var(--muted)}label select{display:block;margin-top:5px;width:100%}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+pre{white-space:pre-wrap;word-break:break-word;font-size:12px;background:#070e0a;padding:15px;border-radius:7px;color:#dcf9d9}
+.footer{font:11px/1.5 ui-monospace,monospace;opacity:.8}
+#inventory{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+ <div class="eyebrow">SignalAF · offline production workspace</div>
+ <h1>Sharables Package + Editing Inventory</h1>
+ <p style="color:#eadadd">Current delivery set is one bone-white holographic PNG and four colored holographic GIF variants. Older designs remain editable, not published from this workspace.</p>
+ <span class="tag primary">LOCAL-ONLY · NOT A WEBSITE ROUTE</span> <span class="tag">5 export files</span> <span class="tag">Searchable source index</span>
+</header>
+<main>
+<section id="active">
+ <h2>01 / Current sharables package</h2>
+ <p>These are variations of the same operator card, not separate card concepts. Previews below are layout cues, not actual exported artwork.</p>
+ <div class="grid" id="current"></div>
+ <div class="panel" style="margin-top:16px">
+ <h3>Generate private files (no site publication)</h3>
+ <p>This uses the current share renderer as an input, saves finished assets locally under the gitignored release-staging folder, and writes a SHA-256 manifest. It does not add files to public/ or deploy anything.</p>
+ <pre id="command">npm install &amp;&amp; npx playwright install chromium &amp;&amp; node scripts/export-sharables-package.mjs --codename signal-17cd049318</pre>
+ <div class="actions"><button class="primary" id="copy">Copy export command</button><a href="https://github.com/SunrisesIllNeverSee/sigrank-app/blob/main/scripts/export-sharables-package.mjs" target="_blank" rel="noopener noreferrer">Open export script ↗</a></div>
+ </div>
+</section>
+<section id="editor">
+ <h2>02 / All other sharables — editing index</h2>
+ <p>Locate source components, prototypes, and local-only promo material. Change review status or add editing notes; your notes stay in this browser until you export the plan.</p>
+ <div class="toolbar">
+ <input type="search" id="search" placeholder="Search designs, formats, platforms…">
+ <select id="category" aria-label="Filter sharables category"><option value="all">All categories</option></select>
+ <button id="export">Export edits / notes JSON</button>
+ <button id="import">Import notes JSON</button>
+ <input type="file" id="importfile" accept=".json,application/json" hidden>
+ <span id="count" class="tag"></span>
+ </div>
+ <div class="grid" id="inventory"></div>
+</section>
+<section class="panel">
+ <h2>03 / Editing boundaries</h2>
+ <p><strong>Current package:</strong> only the white-holo static PNG and aqua/coral/gold/violet holographic GIFs.</p>
+ <p><strong>Other shareables:</strong> retained in their original paths for editing; this inventory is not a site page and does not relocate production source files. The larger ~1.1 GB promotional kit is under the ignored local <span class="mono">labs/promo-kit/</span> directory on the owner's computer and cannot be browsed from a GitHub clone alone.</p>
+ <p><strong>Important:</strong> the public <span class="mono">/s/[codename]</span> route already exists. The offline export script uses it as a renderer, but the new package and editing workspace are not themselves hosted on SignalAF.</p>
+</section>
+<p class="footer">NO RESEND SENDS · NO SITE DEPLOYMENT · NO PROMOTIONAL OUTREACH · EXPORT NOTES TO RETAIN A COPY</p>
+</main>
+<script>
+"use strict";
+const base = "https://github.com/SunrisesIllNeverSee/sigrank-app/blob/main/";
+const colors = [
+ {id:"png", name:"White × holographic", format:"PNG · 1200 × 627",palette:"aqua",foil:"#71dfcb",file:"white-holo.png"},
+ {id:"gif-aqua", name:"Holographic · Aqua",format:"GIF · foil motion",palette:"aqua",foil:"#71dfcb",file:"holo-aqua.gif"},
+ {id:"gif-coral", name:"Holographic · Coral",format:"GIF · foil motion",palette:"coral",foil:"#ff9caa",file:"holo-coral.gif"},
+ {id:"gif-gold", name:"Holographic · Gold",format:"GIF · foil motion",palette:"gold",foil:"#f3d372",file:"holo-gold.gif"},
+ {id:"gif-violet", name:"Holographic · Violet",format:"GIF · foil motion",palette:"violet",foil:"#bd9aff",file:"holo-violet.gif"}
+];
+const records = [
+ ["A1","Original social/OG operator signal card","Operator cards","app/s/[codename]/card.png/route.tsx","Live social preview retained as a legacy design"],
+ ["A2","Signal card graphic template","Operator cards","components/share/OperatorSignalCard.tsx","Single design system used by OG renderer"],
+ ["A3","Gold/black outreach card","Operator cards","app/api/outreach-card/[codename]/route.tsx","Personalized outreach graphic and honors"],
+ ["A4","Interactive profile share card","Operator cards","components/share/ProfileShareCard.tsx","Download/preview/copy-link variant"],
+ ["A5","Standalone holographic passport","Operator cards","components/profile-v2/PassportCard.tsx","Alternate standalone passport, not the white-holo split card"],
+ ["A6","Operator DNA fingerprint","Operator cards","components/profile/DnaCard.tsx","Archetype-focused share concept"],
+ ["B1","Four Degrees comparison · LinkedIn/X","LinkedIn & social","app/share/four-degrees/page.tsx","Existing publishing studio route; candidate for editing workspace"],
+ ["B2","Four Degrees chart renderer","LinkedIn & social","components/share/FourDegreesShareCard.tsx","Metric comparison table and graphic"],
+ ["B3","Four Degrees themes/formats editor","LinkedIn & social","components/share/FourDegreesStudio.tsx","PRISM, cobalt, midnight and editorial, LinkedIn vs X"],
+ ["B4","Four Degrees design stylesheet","LinkedIn & social","components/share/four-degrees-card.css","Source visual tokens and layouts"],
+ ["B5","Unified social share controls","LinkedIn & social","components/share/UnifiedShare.tsx","LinkedIn, X, Facebook, email and other destinations"],
+ ["B6","GitHub social preview image","LinkedIn & social","public/github-social-preview.png","Existing repository social thumbnail"],
+ ["C1","Compare share card","Compare & captures","components/share/CompareShareCard.tsx","Head-to-head comparison graphics"],
+ ["C2","Compare matchup card","Compare & captures","components/share/CompareMatchupCard.tsx","Pairwise matchup graphics"],
+ ["C3","Deferred compare matchup loading","Compare & captures","components/share/DeferredCompareMatchupCard.tsx","Client integration for matchup exports"],
+ ["C4","Leaderboard and user capture actions","Compare & captures","components/share/ArtworkShareControls.tsx","PNG/GIF/download plumbing used on multiple surfaces"],
+ ["D1","MCP share page","Technical & preview","app/share/mcp/page.tsx","MCP marketing/publishing example"],
+ ["D2","MCP Open Graph graphic","Technical & preview","app/share/mcp/opengraph-image.tsx","Card-specific social preview"],
+ ["D3","MCP share graphic data","Technical & preview","lib/share/mcp-card.ts","MCP social card generation logic"],
+ ["D4","Original card review sheet","Technical & preview","public/live/review/share.html","Archived concept/reference layout"],
+ ["D5","Original social preview asset","Technical & preview",".github/assets/og-card-v2.png","Reference image kept in git"],
+ ["E1","Promo kit · local social cards & motion","Local experiments","labs/README.md","Ignored labs/promo-kit has carousels, gifs, video, renderer scripts, and local edit assets; read START-HERE.txt on owner's computer"],
+ ["E2","Sharables page assembly","Operator cards","app/s/[codename]/page.tsx","Canonical live share gallery with legacy cards"]
+].map(([id,name,category,file,detail])=>({id,name,category,file,detail}));
+const key = "signalaf-sharables-offline-editor-v1";
+const allowedStatuses = ["To review","Editing","Approved","Archived"];
+let notes = {};
+try { notes = JSON.parse(localStorage.getItem(key)||"{}") || {}; } catch { notes={}; }
+function persist() { try { localStorage.setItem(key,JSON.stringify(notes)); } catch {} }
+function el(tag,cls,text) { const x=document.createElement(tag); if(cls)x.className=cls; if(text!=null)x.textContent=text; return x; }
+const current=document.getElementById("current");
+for(const item of colors){
+ const card=el("article","asset");
+ const art=el("div","sample");
+ art.style.setProperty("--foil",item.foil);
+ art.append(el("b","", "A DIFFERENT KIND"),el("br"),el("b","","OF BENCHMARK."));
+ art.append(el("small","",item.id==="png"?"BONE × HOLOGRAPHIC":"FOIL ANIMATION · "+item.palette.toUpperCase()));
+ art.append(el("span"));
+ card.append(art,el("strong","",item.name),el("p","",item.format),el("div","paths","Offline export · "+item.file));
+ current.append(card);
+}
+const categories=[...new Set(records.map(x=>x.category))];
+for(const c of categories){const o=el("option","",c);o.value=c;document.getElementById("category").append(o)}
+const container=document.getElementById("inventory");
+function render(){
+ container.replaceChildren();
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const c=document.getElementById("category").value;
+ const visible=records.filter(r=>(c==="all"||r.category===c)&&(!q||[r.id,r.name,r.category,r.file,r.detail].join(" ").toLowerCase().includes(q)));
+ for(const r of visible){
+ const card=el("article","asset"),title=el("strong","",r.id+" · "+r.name),desc=el("p","",r.detail),loc=el("div","paths",r.file);
+ card.append(title,el("span","tag",r.category),desc,loc);
+ const actions=el("div","actions");
+ const src=el("a","","View / edit source ↗");src.href=base+r.file;src.target="_blank";src.rel="noopener noreferrer";actions.append(src);
+ if(r.id==="E1"){src.href=base+"labs/README.md";actions.append(el("span","tag","LOCAL FILES NOT IN GIT"))}
+ card.append(actions);
+ const select=el("select");select.setAttribute("aria-label",r.name+" status");
+ for(const status of allowedStatuses){const opt=el("option","",status);opt.value=status;select.append(opt)}
+ select.value=allowedStatuses.includes(notes[r.id]?.status)?notes[r.id].status:"To review";
+ select.addEventListener("change",()=>{notes[r.id]={...notes[r.id],status:select.value};persist()});
+ const statusLabel=el("label","","Editing status");statusLabel.append(select);card.append(statusLabel);
+ const field=el("textarea");field.placeholder="Edits, placement, reference, approval notes…";field.value=notes[r.id]?.notes||"";
+ field.setAttribute("aria-label",r.name+" notes");
+ field.addEventListener("input",()=>{notes[r.id]={...notes[r.id],notes:field.value};persist()});
+ const noteLabel=el("label","","Review notes");noteLabel.append(field);card.append(noteLabel);
+ container.append(card);
+ }
+ document.getElementById("count").textContent=visible.length+" / "+records.length+" indexed";
+}
+document.getElementById("category").addEventListener("change",render);
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("copy").addEventListener("click",async()=>{
+ const cmd=document.getElementById("command").textContent;
+ try {await navigator.clipboard.writeText(cmd)} catch {
+ const t=document.createElement("textarea");t.value=cmd;document.body.append(t);t.select();document.execCommand("copy");t.remove();
+ }
+ document.getElementById("copy").textContent="Copied command";
+});
+document.getElementById("export").addEventListener("click",()=>{
+ const payload={schema:"signalaf-sharables-notes-v1",exportedAt:new Date().toISOString(),notes};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="signalaf-sharables-edit-notes.json";a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),2000);
+});
+document.getElementById("import").addEventListener("click",()=>document.getElementById("importfile").click());
+document.getElementById("importfile").addEventListener("change",async(e)=>{
+ const f=e.target.files?.[0];if(!f)return;
+ try{
+ const obj=JSON.parse(await f.text());
+ if(obj.schema!=="signalaf-sharables-notes-v1"||typeof obj.notes!=="object"||!obj.notes||Array.isArray(obj.notes))throw Error("Not a Sharables notes file");
+ notes=Object.fromEntries(Object.entries(obj.notes).filter(([id,v])=>records.some(r=>r.id===id)&&v&&typeof v==="object").map(([id,v])=>[id,{status:allowedStatuses.includes(v.status)?v.status:"To review",notes:String(v.notes||"").slice(0,12000)}]));
+ persist();render();
+ }catch(err){alert("Could not import edits: "+err.message)}
+ e.target.value="";
+});
+render();
+</script>
+</body>
+</html>
