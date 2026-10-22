@@ -1,4 +1,5 @@
 import type { LeaderboardRow } from "@/lib/board";
+import type { ReactNode } from "react";
 import { getLeaderboard, getHallOfSignal } from "@/lib/board";
 import { getSupabaseServer } from "@/lib/infra/supabase/server";
 import { computeFieldAverages } from "@/lib/analytics/field-average";
@@ -13,7 +14,7 @@ import { operatorDisplayName } from "@/lib/identity/operator-name";
 import { ArtworkShareControls } from "./ArtworkShareControls";
 import "@/components/profile-v2/profile-workspace.css";
 
-export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
+export async function HolocardGallery({ row, archive }: { row: LeaderboardRow; archive?: ReactNode }) {
   if (row.operator.profile_visibility === "private") return <p>Holocard unavailable for a private profile.</p>;
   const service = getSupabaseServer();
   const [board, hall, preferenceResult] = await Promise.all([
@@ -50,8 +51,21 @@ export async function HolocardGallery({ row }: { row: LeaderboardRow }) {
     selectedSecondaryBadge={marks.secondaryLogos.find(m => m.id === preferences?.profile_secondary_logo) ?? null} />;
   return <div className="pv2 share-holocard flex flex-col items-center gap-4">
     <BoneHolocard codename={row.operator.codename} name={operatorDisplayName(row)} throughput={throughput} ratio={ratio}>{passport(`bone-passport-${row.operator.codename}`)}</BoneHolocard>
-    <div className="pv2-pcard-scope">{passport(`holocard-${row.operator.codename}`)}</div>
-    <ArtworkShareControls target={`holocard-${row.operator.codename}`} title="holocard" animated
-      filename={`signalaf-holocard-${row.operator.codename}`} href={`/user/${encodeURIComponent(row.operator.codename)}`} />
+    <details id="sharables-archive" className="mt-8 w-full rounded-xl border border-bg-border bg-bg-surface">
+      <summary className="cursor-pointer px-4 py-4 font-mono text-sm font-semibold text-text-primary">
+        SHARABLES ARCHIVE · Previous cards, captures &amp; publishing links
+      </summary>
+      <div className="border-t border-bg-border px-4 pb-5 pt-4">
+        {archive}
+        <div id="share-legacy-passport" className="mt-8 rounded-xl border border-bg-border p-4">
+          <h3 className="mb-3 font-mono text-sm font-semibold text-text-primary">Previous standalone holographic passport</h3>
+          <div className="flex flex-col items-center gap-3">
+            <div className="pv2-pcard-scope">{passport(`holocard-${row.operator.codename}`)}</div>
+            <ArtworkShareControls target={`holocard-${row.operator.codename}`} title="holocard" animated
+              filename={`signalaf-holocard-${row.operator.codename}`} href={`/user/${encodeURIComponent(row.operator.codename)}`} />
+          </div>
+        </div>
+      </div>
+    </details>
   </div>;
 }
