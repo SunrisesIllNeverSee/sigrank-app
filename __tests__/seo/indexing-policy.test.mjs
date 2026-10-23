@@ -473,3 +473,52 @@ test("board Dataset JSON-LD never stamps render time as dateModified", async () 
   assert.doesNotMatch(board, /sigrankDataset\(\{\s*updated:\s*new Date\(/);
   assert.match(board, /sigrankDataset\(\{\s*updated:\s*SIGRANK_DATASET_PUBLISHED\s*\}\)/);
 });
+
+// ── Redesign discovery refresh (2026-10-22) ─────────────────────────────────
+
+import { readdir } from "node:fs/promises";
+
+async function pageRoutes(dir = new URL("../../app/", import.meta.url), prefix = "") {
+  const out = [];
+  for (const e of await readdir(dir, { withFileTypes: true })) {
+    if (e.isDirectory()) {
+      const seg = e.name.startsWith("(") ? "" : `/${e.name}`; // route groups add no segment
+      out.push(...(await pageRoutes(new URL(`${e.name}/`, dir), prefix + seg)));
+    } else if (/^page\.(tsx|mdx)$/.test(e.name)) {
+      out.push(prefix || "/");
+    }
+  }
+  return out;
+}
+
+test("every static page route is deliberately classified", async () => {
+  const unclassified = (await pageRoutes())
+    .filter((p) => !p.includes("["))
+    .filter((p) => !(p in ROUTE_CLASSES));
+  assert.deepEqual(unclassified, [], "classify new routes in lib/seo/search-index-policy.ts");
+});
+
+test("badge + achievement index is promoted", () => {
+  assert.ok(isSitemapPromoted("/hall/badges"));
+});
+
+test("llms-full.txt gates its Ask-AI list through the sitemap manifest", async () => {
+  const route = await source("app/llms-full.txt/route.ts");
+  assert.match(route, /ASK_AI\.filter\(\(\[, path\]\) => isSitemapPromoted\(path\)\)/);
+  assert.doesNotMatch(route, /\| 1 \| MO§ES™ \| BASE \|/, "no fabricated fallback board row");
+});
+
+test("named AI crawler groups share the default allow/disallow lists", async () => {
+  const robots = await source("app/robots.ts");
+  assert.doesNotMatch(robots, /disallow: \["\/api\/", "\/auth\/"\]/);
+  assert.equal((robots.match(/disallow: DISALLOW/g) ?? []).length, 6);
+  // ALLOW/DISALLOW must stay identical to the literal `*` group.
+  assert.match(robots, /const ALLOW = \["\/", "\/api\/exchange\/signals"\];/);
+  assert.match(robots, /const DISALLOW = \["\/api\/", "\/auth\/", "\/internal\/"\];/);
+  assert.match(robots, /allow: \["\/", "\/api\/exchange\/signals"\],[\s\S]*disallow: \["\/api\/", "\/auth\/", "\/internal\/"\],/);
+});
+
+test("operator profile workspace does not bail out of server rendering", async () => {
+  const ws = await source("components/profile-v2/ProfileWorkspace.tsx");
+  assert.doesNotMatch(ws, /useSearchParams\(/);
+});
