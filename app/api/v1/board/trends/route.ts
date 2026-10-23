@@ -8,7 +8,7 @@ import { getLeaderboard } from "@/lib/board";
 import { windowParamToEnum } from "@/lib/board/windows";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 export const dynamic = "force-dynamic";
-type HistoryRow = { operator_id: string; snapshot_date: string | null; cascade: { yield_?: number | string | null } | null; platform: string | null };
+type HistoryRow = { operator_id: string; snapshot_date: string | null; input_tokens: number | string | null; output_tokens: number | string | null; cache_read_tokens: number | string | null; platform: string | null };
 export async function GET(req: NextRequest) {
   const gate = rateLimit(req);
   if (!gate.ok) return rateLimitedResponse(gate);
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     for (let page=0; page<8; page++) {
       const from=page*1000;
       const result = await sb.from("metric_snapshots")
-        .select("operator_id,snapshot_date,cascade,platform")
+        .select("operator_id,snapshot_date,input_tokens,output_tokens,cache_read_tokens,platform")
         .eq("window_type",windowType)
         .in("operator_id",ids)
         .order("snapshot_date",{ascending:true})
@@ -44,7 +44,10 @@ export async function GET(req: NextRequest) {
     }
     const daily = new Map<string,Map<string,{rate:number;multi:boolean}>>();
     for (const row of all) {
-      const rate=Number(row.cascade?.yield_);
+      // metric_snapshots has no stored Yield: Υ = (cache_read × output) / input²,
+      // the same derivation as getOperatorHistory.
+      const input=Number(row.input_tokens), output=Number(row.output_tokens), cacheRead=Number(row.cache_read_tokens);
+      const rate=input>0 ? (cacheRead*output)/(input*input) : NaN;
       if (!row.snapshot_date || !Number.isFinite(rate) || rate<=0) continue;
       const byDay=daily.get(row.operator_id) ?? new Map();
       const multi=row.platform==="multi";
