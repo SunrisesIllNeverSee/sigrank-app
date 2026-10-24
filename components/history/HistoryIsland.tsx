@@ -11,6 +11,7 @@ import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { HistoricalLeaderboardTable } from "./legacy/LeaderboardTable";
 import { HistoryHeader, HistoryTitleControls } from "./HistoryHeader";
 import { MiniProfile } from "./MiniProfile";
+import { ComparePanel } from "./ComparePanel";
 import type { HistoricalBoard, HistoricalEntry } from "@/lib/history/types";
 import "./history-island.css";
 
@@ -25,7 +26,8 @@ export function HistoryIsland({ board }: { board: HistoricalBoard }) {
     setCompare(([a, b]) => (a == null ? [e, b] : a.codename === e.codename ? [a, b] : [a, e]));
   const clearCompare = (slot: 0 | 1) =>
     setCompare((c) => (slot === 0 ? [null, c[1]] : [c[0], null]));
-  void clearCompare;
+  const pickCompare = (slot: 0 | 1, e: HistoricalEntry) =>
+    setCompare((c) => (slot === 0 ? [e, c[1]] : [c[0], e]));
 
   return (
     <WorkspaceShell
@@ -34,6 +36,8 @@ export function HistoryIsland({ board }: { board: HistoricalBoard }) {
       titleControls={<HistoryTitleControls meta={board.meta} />}
       leftTitle="OPERATOR · JULY 31"
       left={<MiniProfile entry={selected} onAddToCompare={addToCompare} />}
+      rightTitle="COMPARE"
+      right={<ComparePanel slots={compare} entries={board.entries} onPick={pickCompare} onClear={clearCompare} />}
       status={<>JULY 31, 2026 SNAPSHOT · {board.meta.totalOperators.toLocaleString("en-US")} OPERATORS · ARCHIVE</>}
     >
       <div className="hist-island">
