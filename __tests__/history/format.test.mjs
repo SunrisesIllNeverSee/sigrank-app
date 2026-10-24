@@ -26,3 +26,10 @@ test("mid values keep two decimals, large values none", () => {
 test("cost per million gets a dollar sign", () => {
   assert.equal(fmtArchived(0.4445, "costPerMillion"), "$0.445");
 });
+
+test("yield and leverage read the same as the table cells", () => {
+  assert.equal(fmtArchived(1234.567, "yield_"), "1,234.57");
+  assert.equal(fmtArchived(5.1234, "yield_"), "5.12");
+  assert.equal(fmtArchived(12.34, "leverage"), "12.3×");
+  assert.equal(fmtArchived(2345, "leverage"), "2.3K×");
+});

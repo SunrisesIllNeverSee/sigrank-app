@@ -16,7 +16,10 @@ const CLASS_NAME_TO_GLYPH: Record<string, string> = {
   IGNITER: "·",
 };
 
-/** Canonical glyph for a SignalClass name (falls back to '·' / IGNITER). */
-export function glyphFor(name: SignalClass): string {
+/** Canonical glyph for a SignalClass name. July 31 fell back to '·' (IGNITER's
+ *  glyph) for a missing class, which mislabels the one null-class row; the
+ *  archive shows no glyph instead. Unknown names keep the July 31 fallback. */
+export function glyphFor(name: SignalClass | null | undefined): string {
+  if (name == null) return "";
   return CLASS_NAME_TO_GLYPH[name] ?? "·";
 }

@@ -127,6 +127,24 @@ describe("HistoricalLeaderboardTable", () => {
     expect(document.querySelectorAll('a[href^="/user/"]').length).toBe(0);
   });
 
+  it("a retired row (no name button) opens from the keyboard", () => {
+    const retired = { ...entries[0], status: "retired" } as HistoricalEntry;
+    const onSelect = vi.fn();
+    render(<HistoricalLeaderboardTable entries={[retired, ...entries.slice(1)]} totalUsers={1642} onSelect={onSelect} />);
+    const tr = pageRows()[0];
+    expect(within(tr).queryByRole("button")).toBeNull();
+    expect(tr.tabIndex).toBe(0);
+    fireEvent.keyDown(tr, { key: "Enter" });
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ codename: "furic" }));
+  });
+
+  it("marks the selected card with aria-current, never aria-selected on <li>", () => {
+    render(<HistoricalLeaderboardTable entries={entries} totalUsers={1642} onSelect={vi.fn()} selectedCodename="furic" />);
+    const li = document.querySelector<HTMLLIElement>('li[data-codename="furic"]')!;
+    expect(li.hasAttribute("aria-selected")).toBe(false);
+    expect(li.getAttribute("aria-current")).toBe("true");
+  });
+
   it("has no window, breakdown or capture controls", () => {
     renderTable();
     expect(screen.queryByLabelText("Window filter")).toBeNull();

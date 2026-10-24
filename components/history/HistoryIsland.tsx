@@ -61,7 +61,7 @@ export function HistoryIsland({ board }: { board: HistoricalBoard }) {
       titleControls={<HistoryTitleControls meta={board.meta} />}
       leftTitle="OPERATOR · JULY 31"
       left={<MiniProfile entry={selected} onAddToCompare={addToCompare} />}
-      rightTitle="COMPARE"
+      rightTitle={compact ? "OPERATOR · COMPARE" : "COMPARE"}
       right={
         <>
           {compact ? <MiniProfile entry={selected} onAddToCompare={addToCompare} /> : null}

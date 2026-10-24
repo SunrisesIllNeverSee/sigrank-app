@@ -35,7 +35,7 @@ import {
   CLASS_FILTER,
   type PlatformUI,
 } from "./constants";
-import { OperatorAvatar } from "@/components/sigrank/OperatorAvatar";
+import { OperatorAvatar } from "./OperatorAvatar";
 import { PlatformIcon } from "./PlatformIcon";
 import { isOutlierEntry } from "./outlier-classify";
 import type { HistoricalEntry } from "@/lib/history/types";
@@ -171,7 +171,7 @@ const fmtY = (n: number | null | undefined): string =>
   n == null
     ? "—"
     : n >= 1000
-      ? n.toLocaleString(undefined, { maximumFractionDigits: 2 })
+      ? n.toLocaleString("en-US", { maximumFractionDigits: 2 })
       : n.toFixed(2);
 const fmtLev = (n: number | null | undefined): string =>
   n == null
@@ -206,7 +206,7 @@ function fmtLast(iso: string | null | undefined): {
   if (!m) return { short: "—", full: "" };
   const [, yyyy, mm, dd] = m;
   const short = `${mm}/${dd}/${yyyy.slice(2)}`;
-  const full = new Date(`${iso}T12:00:00Z`).toLocaleDateString(undefined, {
+  const full = new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -221,7 +221,10 @@ const RANK_COLOR: Record<number, string> = {
   2: "#60a5fa",
   3: "#818cf8",
 };
-const rankColor = (rank: number): string => RANK_COLOR[rank] ?? T.mut;
+// Text color goes through --hist-rank-N so the light bone theme can darken it
+// (history-island.css); podium tints keep the hex above.
+const rankColor = (rank: number): string =>
+  RANK_COLOR[rank] ? `var(--hist-rank-${rank}, ${RANK_COLOR[rank]})` : T.mut;
 const rankWeight = (rank: number): number => (rank <= 3 ? 700 : 400);
 
 type ViewMode = "metrics" | "raw";
@@ -395,8 +398,20 @@ export function HistoricalLeaderboardTable({
     "data-archived-rank": e.rank,
     "data-seed": e.isSeed ? "1" : "0",
     "data-codename": e.codename,
-    "aria-selected": selectedCodename === e.codename,
+    "aria-current": selectedCodename === e.codename ? ("true" as const) : undefined,
     onClick: () => select(e),
+    // Retired rows render no name button, so the row itself takes focus.
+    ...(e.status === "retired"
+      ? {
+          tabIndex: 0,
+          onKeyDown: (ev: React.KeyboardEvent) => {
+            if (ev.key === "Enter" || ev.key === " ") {
+              ev.preventDefault();
+              select(e);
+            }
+          },
+        }
+      : null),
     style: {
       cursor: "pointer",
       ...(selectedCodename === e.codename ? { outline: `1px solid ${T.gold}`, outlineOffset: -1 } : null),
@@ -762,7 +777,6 @@ export function HistoricalLeaderboardTable({
             const sp = speciesOf(e.signalClass);
             const displayRank = e.rank;
             const position = safePage * PER_PAGE + i + 1;
-            const otherRank = position;
             const yld =
               e.yield_ == null
                 ? "—"
@@ -830,7 +844,7 @@ export function HistoricalLeaderboardTable({
                     }}
                   >
                     {displayRank}
-                    {otherRank != null && (
+                    {(
                       <span
                         style={{
                           fontSize: 9,
@@ -838,7 +852,7 @@ export function HistoricalLeaderboardTable({
                           color: T.mut,
                         }}
                       >
-                        /{otherRank}
+                        /{position}
                       </span>
                     )}
                   </span>
@@ -1195,8 +1209,7 @@ export function HistoricalLeaderboardTable({
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
                   const displayRank = e.rank;
-            const position = safePage * PER_PAGE + i + 1;
-                  const volRank = position;
+                  const position = safePage * PER_PAGE + i + 1;
                   return (
                     <tr key={`${e.anonId}-${i}`} {...rowProps(e)}>
                       <td
@@ -1209,7 +1222,7 @@ export function HistoricalLeaderboardTable({
                         }}
                       >
                         {displayRank}
-                        {volRank != null && (
+                        {(
                           <span
                             style={{
                               display: "block",
@@ -1219,7 +1232,7 @@ export function HistoricalLeaderboardTable({
                               lineHeight: 1.1,
                             }}
                           >
-                            /{volRank}
+                            /{position}
                           </span>
                         )}
                         {e.percentile != null && e.percentile > 0 && (
@@ -1514,8 +1527,7 @@ export function HistoricalLeaderboardTable({
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
                   const displayRank = e.rank;
-            const position = safePage * PER_PAGE + i + 1;
-                  const yRank = position;
+                  const position = safePage * PER_PAGE + i + 1;
                   return (
                     <tr key={`raw-${e.anonId}-${i}`} {...rowProps(e)}>
                       <td
@@ -1528,7 +1540,7 @@ export function HistoricalLeaderboardTable({
                         }}
                       >
                         {displayRank}
-                        {yRank != null && (
+                        {(
                           <span
                             style={{
                               display: "block",
@@ -1538,7 +1550,7 @@ export function HistoricalLeaderboardTable({
                               lineHeight: 1.1,
                             }}
                           >
-                            /{yRank}
+                            /{position}
                           </span>
                         )}
                         {e.percentile != null && e.percentile > 0 && (

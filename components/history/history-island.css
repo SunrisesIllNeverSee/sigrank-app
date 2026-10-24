@@ -36,6 +36,10 @@
   --text-primary:28 27 21;
   --text-muted:125 120 98;
   --gold:90 79 207;
+  /* July 31 rank 1–3 hues darkened to ≥4.5:1 on the light surface */
+  --hist-rank-1:#8a5300;
+  --hist-rank-2:#1d4ed8;
+  --hist-rank-3:#4338ca;
 }
 
 .lbw-root[data-theme="purple"] .hist-island{
