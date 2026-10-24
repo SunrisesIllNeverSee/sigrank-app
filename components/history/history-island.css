@@ -1,0 +1,59 @@
+/* ==========================================================================
+   /board/history island. The July 31 table (components/history/legacy/) reads
+   the old site tokens as rgb(var(--x)) triplets; this bridge maps them from
+   each workspace theme in components/live/proto-scoped.css so the archive
+   follows the shell theme. Values are those theme blocks as RGB triplets.
+   ========================================================================== */
+
+.lbw-root[data-theme="green"] .hist-island{
+  --bg-surface:14 20 12;
+  --bg-elevated:18 26 14;
+  --bg-base:8 12 7;
+  --bg-border:38 54 28;
+  --bg-border-subtle:29 41 24;
+  --text-primary:233 243 223;
+  --text-muted:113 130 106;
+  --gold:166 255 0;
+}
+
+.lbw-root[data-theme="gold"] .hist-island{
+  --bg-surface:20 16 10;
+  --bg-elevated:26 21 12;
+  --bg-base:12 10 5;
+  --bg-border:58 45 21;
+  --bg-border-subtle:43 33 16;
+  --text-primary:243 234 210;
+  --text-muted:138 124 94;
+  --gold:232 185 60;
+}
+
+.lbw-root[data-theme="bone"] .hist-island{
+  --bg-surface:250 247 238;
+  --bg-elevated:242 238 224;
+  --bg-base:242 238 227;
+  --bg-border:196 189 162;
+  --bg-border-subtle:214 208 187;
+  --text-primary:28 27 21;
+  --text-muted:125 120 98;
+  --gold:90 79 207;
+}
+
+.lbw-root[data-theme="purple"] .hist-island{
+  --bg-surface:20 13 30;
+  --bg-elevated:26 17 40;
+  --bg-base:12 8 18;
+  --bg-border:53 37 82;
+  --bg-border-subtle:39 27 60;
+  --text-primary:239 231 250;
+  --text-muted:133 119 166;
+  --gold:181 101 255;
+}
+
+
+.lbw-root .hist-island{color:rgb(var(--text-primary));font-family:var(--font-ui)}
+.lbw-root .hist-title-meta{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:var(--mut)}
+.lbw-root .hist-badge{padding:2px 7px;border:1px solid var(--ac);border-radius:var(--radius-sm);color:var(--ac);font-weight:700;letter-spacing:.08em}
+.lbw-root .hist-header{padding:10px 2px 12px;max-width:820px}
+.lbw-root .hist-explainer{margin:0 0 6px;font-size:13px;line-height:1.5;color:var(--tx2)}
+.lbw-root .hist-explainer a,.lbw-root .hist-fingerprint a{color:var(--ac);text-decoration:underline;text-underline-offset:2px}
+.lbw-root .hist-fingerprint{margin:0;font-family:var(--font-mono);font-size:11px;color:var(--mut)}
