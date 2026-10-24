@@ -10,6 +10,10 @@
  * 2D Recharts implementation — the 3D three.js version (Grok artifact 056)
  * was skipped: 600KB+ bundle weight for a flow diagram is not justified when
  * the 2D radar communicates the same information clearly.
+ *
+ * With `roto` (owner 2026-10-24) the radar uses roto points against the live
+ * board (lib/radar/genome) and draws the field's first / middle / last operator
+ * as white reference shapes instead of the fixed benchmarks.
  */
 
 import {
@@ -22,6 +26,8 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { RADAR_REF_STYLE } from "@/lib/radar/points";
+import type { GenomeRoto } from "@/lib/radar/genome";
 
 export interface GenomeScores {
   comp: number;
@@ -42,6 +48,8 @@ interface CascadeGenomeProps {
   operatorLabel?: string;
   /** Optional: compact mode (smaller chart, no panel). */
   compact?: boolean;
+  /** Roto points + field references; replaces the fixed benchmarks. */
+  roto?: GenomeRoto;
 }
 
 const DIMENSIONS: Array<{
@@ -62,12 +70,15 @@ export function CascadeGenome({
   top1Percent,
   operatorLabel = "You",
   compact = false,
+  roto,
 }: CascadeGenomeProps) {
-  const data = DIMENSIONS.map((dim) => ({
+  const refName = (r: GenomeRoto["refs"][number]) => `#${r.rank} ${r.name}`;
+  const data = DIMENSIONS.map((dim, k) => ({
     dimension: dim.label,
-    [operatorLabel]: scores[dim.key] ?? 0,
+    [operatorLabel]: roto ? Math.round(roto.fracs[k] * 100) : scores[dim.key] ?? 0,
     "Class Avg": classAverage?.[dim.key] ?? 50,
     "Top 1%": top1Percent?.[dim.key] ?? 85,
+    ...Object.fromEntries((roto?.refs ?? []).map((r) => [refName(r), Math.round(r.fracs[k] * 100)])),
   }));
 
   // Strengths: dimensions where the operator beats class average
@@ -76,9 +87,10 @@ export function CascadeGenome({
   const opportunities: Array<{ dim: string; value: number; delta: number }> =
     [];
 
-  for (const dim of DIMENSIONS) {
-    const val = scores[dim.key] ?? 0;
-    const avg = classAverage?.[dim.key] ?? 50;
+  const middle = roto?.refs.find((r) => r.role === "middle");
+  for (const [k, dim] of DIMENSIONS.entries()) {
+    const val = roto ? Math.round(roto.fracs[k] * 100) : scores[dim.key] ?? 0;
+    const avg = middle ? Math.round(middle.fracs[k] * 100) : classAverage?.[dim.key] ?? 50;
     const delta = Number((val - avg).toFixed(1));
     if (delta >= 5) {
       strengths.push({ dim: dim.full, value: val, delta });
@@ -113,6 +125,20 @@ export function CascadeGenome({
             />
             <Tooltip contentStyle={tooltipStyle} />
             {!compact && <Legend wrapperStyle={{ fontSize: "11px" }} />}
+            {roto?.refs.map((r) => (
+              <Radar
+                key={r.role}
+                name={refName(r)}
+                dataKey={refName(r)}
+                stroke="rgb(var(--text-primary))"
+                strokeOpacity={RADAR_REF_STYLE[r.role].opacity}
+                fill="none"
+                fillOpacity={0}
+                strokeWidth={RADAR_REF_STYLE[r.role].width}
+                strokeDasharray={RADAR_REF_STYLE[r.role].dash}
+                isAnimationActive={false}
+              />
+            ))}
             <Radar
               name={operatorLabel}
               dataKey={operatorLabel}

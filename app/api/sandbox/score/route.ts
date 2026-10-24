@@ -5,6 +5,9 @@
  * pipeline (normalize → SignaRate → class → signal force), returns the
  * server-computed slice. Cascade metrics (Υ, SNR, etc.) are computed
  * client-side from the same pillars (no secret weights needed).
+ *
+ * `genome` ranks the Core 5 scores against the live board (lib/radar/genome)
+ * for the Cascade Genome radar; omitted if the board read fails.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -12,6 +15,8 @@ import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
 import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import type { RawPillars } from "@/lib/ingest/types";
 import { publicScoringRules } from "@/lib/analytics/public-scoring";
+import { getLeaderboard } from "@/lib/board";
+import { genomeRoto } from "@/lib/radar/genome";
 
 export const runtime = "nodejs";
 
@@ -64,6 +69,10 @@ export async function POST(req: NextRequest) {
     accountAgeDays: Math.max(accountAgeDays, 1),
   }, publicScoringRules);
 
+  // Same param literal as the profile page, so this shares its memoized read.
+  const board = await getLeaderboard({ window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" }).catch(() => []);
+  const genome = board.length ? genomeRoto(result.scores, board) : null;
+
   return NextResponse.json({
     ruleset: "public-example",
     signa_rate: result.signa_rate,
@@ -74,5 +83,6 @@ export async function POST(req: NextRequest) {
     core5: bridge.core5,
     compressionRatio: bridge.compressionRatio,
     tokensTotal: bridge.tokensTotal,
+    genome,
   });
 }
