@@ -465,93 +465,121 @@ export function ProfileSlides({
   );
 }
 
-/* LB-G14 — user-triggered PNG export of the visible board. Approved
-   scope A: the full workspace frame ([data-board-workspace]); falls back
-   to the central stage. html-to-image at pixelRatio 2; downloads
-   signalaf-board-<scope>-<timestamp>.png. No telemetry, no stitching. */
-type BoardCaptureScope = "stage" | "workspace";
+interface BoardShotFilters {
+  window: string;
+  platform: string;
+  classFilter: string;
+  sort: string;
+  colMode: string;
+  page: number;
+  lastPage: number;
+}
 
-async function captureVisibleBoard(
-  scope: BoardCaptureScope,
-  root: HTMLElement,
+function escapeShot(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* captureBoardTable — pre-redesign output: branded overlay strip
+   (SigRank — Leaderboard Snapshot + filter chips + timestamp) composed
+   above the table card only. No rails, no sidebars, no page chrome. */
+async function captureBoardTable(
+  target: HTMLElement,
+  f: BoardShotFilters,
 ) {
-  const sel =
-    scope === "stage" ? "[data-board-stage]" : "[data-board-workspace]";
-  const target = root.matches(sel)
-    ? root
-    : root.querySelector<HTMLElement>(sel);
-  if (!target) throw new Error("Board capture target not mounted");
-  const box = target.getBoundingClientRect();
-  if (box.width < 50 || box.height < 50)
-    throw new Error("Board screenshot area not visible");
-  const { toBlob } = await import("html-to-image");
-  /* Cross-origin avatars may be omitted by html-to-image if blocked by
-     CORS. Preserve factual board numbers and avoid a blank/failed
-     download. */
-  const blob = await toBlob(target, {
-    cacheBust: true,
-    // A blocked avatar must not prevent exporting the board's real numbers.
-    imagePlaceholder: "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' fill='%23151e15'/%3E%3C/svg%3E",
-    pixelRatio: 2,
-    backgroundColor: "#080e08",
-    width: Math.round(box.width),
-    height: Math.round(box.height),
-    style: { overflow: "hidden" },
-    filter: (node) => {
-      // Never capture the open Share menu popup over the board.
-      if (node instanceof HTMLElement && node.classList.contains("board-share-menu")) {
-        return false;
-      }
-      // External images (avatars) violate connect-src CSP when html-to-image
-      // attempts to fetch them; filtering them out lets the capture succeed instantly.
-      if (
-        typeof window !== "undefined" &&
-        node instanceof HTMLImageElement &&
-        node.src &&
-        !node.src.startsWith(window.location.origin) &&
-        !node.src.startsWith("data:")
-      ) {
-        return false;
-      }
-      return true;
-    },
+  const ts = new Date().toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
   });
-  if (!blob || blob.type !== "image/png")
-    throw new Error("PNG export did not produce an image");
-  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const link = document.createElement("a");
-  link.download = `signalaf-board-${scope}-${stamp}.png`;
-  const downloadUrl = URL.createObjectURL(blob);
-  link.href = downloadUrl;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  const parts: string[] = [`Window: ${f.window}`];
+  if (f.platform && f.platform !== CONTROLS.platforms[0]) parts.push(`Platform: ${f.platform}`);
+  if (f.classFilter && f.classFilter !== CONTROLS.classes[0]) parts.push(`Class: ${f.classFilter}`);
+  if (f.colMode !== "metrics") parts.push(`View: ${f.colMode}`);
+  if (f.sort && f.sort !== CONTROLS.sorts[0]) parts.push(`Sort: ${f.sort}`);
+  if (f.lastPage > 1) parts.push(`Page ${f.page}/${f.lastPage}`);
+
+  const overlay = document.createElement("div");
+  overlay.style.cssText =
+    "display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;background:rgb(var(--bg-surface));border-bottom:1px solid rgb(var(--bg-border));font-family:Roboto,-apple-system,system-ui,sans-serif;font-size:13px;color:rgb(var(--text-primary));white-space:nowrap;";
+  overlay.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;font-weight:700;">
+      <span style="color:rgb(var(--gold));font-size:16px;">SigRank</span>
+      <span style="color:rgb(var(--text-muted));font-weight:400;">— Leaderboard Snapshot</span>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;color:rgb(var(--text-muted));font-size:11px;">
+      ${parts.map((p) => `<span style="padding:2px 8px;border:1px solid rgb(var(--bg-border));border-radius:4px;">${escapeShot(p)}</span>`).join("")}
+    </div>
+    <div style="color:rgb(var(--text-muted));font-size:11px;font-variant-numeric:tabular-nums;">${escapeShot(ts)}</div>
+  `;
+
+  const parent = target.parentElement;
+  if (!parent) throw new Error("Board capture target not mounted");
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText = "display:flex;flex-direction:column;background:rgb(var(--bg-base));";
+  parent.insertBefore(wrapper, target);
+  wrapper.appendChild(overlay);
+  wrapper.appendChild(target);
+  try {
+    const { toBlob } = await import("html-to-image");
+    const blob = await toBlob(wrapper, {
+      cacheBust: true,
+      imagePlaceholder:
+        "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' fill='%23151e15'/%3E%3C/svg%3E",
+      pixelRatio: 2,
+      backgroundColor: "#080e08",
+      filter: (node) =>
+        !(
+          typeof window !== "undefined" &&
+          node instanceof HTMLImageElement &&
+          node.src &&
+          !node.src.startsWith(window.location.origin) &&
+          !node.src.startsWith("data:")
+        ),
+    });
+    if (!blob || blob.type !== "image/png")
+      throw new Error("PNG export did not produce an image");
+    const slug = f.window.replace(/[^a-z0-9]/gi, "-").toLowerCase();
+    const link = document.createElement("a");
+    link.download = `sigrank-board-${slug}-p${f.page}.png`;
+    const downloadUrl = URL.createObjectURL(blob);
+    link.href = downloadUrl;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  } finally {
+    wrapper.removeChild(overlay);
+    wrapper.removeChild(target);
+    parent.insertBefore(target, wrapper);
+    wrapper.remove();
+    overlay.remove();
+  }
 }
 
 function BoardShotButton({
-  scope,
-  rootRef,
+  tableRef,
+  filters,
 }: {
-  scope: BoardCaptureScope;
-  rootRef: React.RefObject<HTMLElement | null>;
+  tableRef: React.RefObject<HTMLElement | null>;
+  filters: BoardShotFilters;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const take = useCallback(async () => {
-    const root = rootRef.current;
-    if (!root) return;
+    const target = tableRef.current;
+    if (!target) return;
     setBusy(true);
     setError("");
     try {
-      // Close the Share details menu before capturing so it does not obscure the board.
-      const details = root.querySelector<HTMLDetailsElement>("details.board-share");
-      if (details) details.open = false;
-      await captureVisibleBoard(scope, root);
+      await captureBoardTable(target, filters);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Screenshot failed");
     } finally {
       setBusy(false);
     }
-  }, [scope, rootRef]);
+  }, [tableRef, filters]);
   return (
     <>
       <button
@@ -559,7 +587,7 @@ function BoardShotButton({
         className="exp"
         onClick={take}
         disabled={busy}
-        title="Download a PNG of the visible board workspace"
+        title="Download a PNG of the leaderboard table with a filter summary"
       >
         ▤ {busy ? "Capturing…" : "Screenshot PNG"}
       </button>
@@ -2004,7 +2032,15 @@ export function LiveBoardWorkspace({
                               title="Export the loaded and sorted field as CSV" onClick={exportCsv}>
                               ⬇ EXPORT CSV
                             </button>
-                            <BoardShotButton scope="workspace" rootRef={rootRef} />
+                            <BoardShotButton tableRef={tableCardRef} filters={{
+                              window: windowSel,
+                              platform: platformSel,
+                              classFilter: classSel,
+                              sort: sortSel,
+                              colMode,
+                              page: pageNow,
+                              lastPage,
+                            }} />
                           </>}
                         />
                       </div>
