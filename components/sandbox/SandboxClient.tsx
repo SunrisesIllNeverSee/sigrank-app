@@ -28,12 +28,15 @@ import {
   type RawPillars,
 } from "@/lib/analytics/cascade";
 import { CascadeGenome } from "@/components/sandbox/CascadeGenome";
+import type { GenomeRoto } from "@/lib/radar/genome";
 import type { SignalClass } from "@/components/sigrank/types";
 
 interface ScoreResponse {
   signa_rate: number;
   class_tier: SignalClass;
   scores: { comp: number; sd: number; pc: number; ct: number; tt: number };
+  /** Roto points against the live board (null when the board is unavailable). */
+  genome?: GenomeRoto | null;
   signal_force: number;
   signal_force_raw: number;
   core5: {
@@ -526,8 +529,9 @@ export function SandboxClient({
                 </h4>
                 <CascadeGenome
                   scores={score.scores}
-                  classAverage={{ comp: 60, sd: 58, pc: 50, ct: 45, tt: 70 }}
-                  top1Percent={{ comp: 90, sd: 92, pc: 80, ct: 75, tt: 90 }}
+                  roto={score.genome ?? undefined}
+                  classAverage={score.genome ? undefined : { comp: 60, sd: 58, pc: 50, ct: 45, tt: 70 }}
+                  top1Percent={score.genome ? undefined : { comp: 90, sd: 92, pc: 80, ct: 75, tt: 90 }}
                   compact
                 />
               </div>
