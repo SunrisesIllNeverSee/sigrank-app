@@ -1,0 +1,105 @@
+/* ==========================================================================
+   /board/history island. The July 31 table (components/history/legacy/) reads
+   the old site tokens as rgb(var(--x)) triplets; this bridge maps them from
+   each workspace theme in components/live/proto-scoped.css so the archive
+   follows the shell theme. Values are those theme blocks as RGB triplets.
+   ========================================================================== */
+
+.lbw-root[data-theme="green"] .hist-island{
+  --bg-surface:14 20 12;
+  --bg-elevated:18 26 14;
+  --bg-base:8 12 7;
+  --bg-border:38 54 28;
+  --bg-border-subtle:29 41 24;
+  --text-primary:233 243 223;
+  --text-muted:113 130 106;
+  --gold:166 255 0;
+}
+
+.lbw-root[data-theme="gold"] .hist-island{
+  --bg-surface:20 16 10;
+  --bg-elevated:26 21 12;
+  --bg-base:12 10 5;
+  --bg-border:58 45 21;
+  --bg-border-subtle:43 33 16;
+  --text-primary:243 234 210;
+  --text-muted:138 124 94;
+  --gold:232 185 60;
+}
+
+.lbw-root[data-theme="bone"] .hist-island{
+  --bg-surface:250 247 238;
+  --bg-elevated:242 238 224;
+  --bg-base:242 238 227;
+  --bg-border:196 189 162;
+  --bg-border-subtle:214 208 187;
+  --text-primary:28 27 21;
+  --text-muted:125 120 98;
+  --gold:90 79 207;
+  /* July 31 rank 1–3 hues darkened to ≥4.5:1 on the light surface */
+  --hist-rank-1:#8a5300;
+  --hist-rank-2:#1d4ed8;
+  --hist-rank-3:#4338ca;
+}
+
+.lbw-root[data-theme="purple"] .hist-island{
+  --bg-surface:20 13 30;
+  --bg-elevated:26 17 40;
+  --bg-base:12 8 18;
+  --bg-border:53 37 82;
+  --bg-border-subtle:39 27 60;
+  --text-primary:239 231 250;
+  --text-muted:133 119 166;
+  --gold:181 101 255;
+}
+
+
+.lbw-root .hist-island{color:rgb(var(--text-primary));font-family:var(--font-ui)}
+.lbw-root .hist-title-meta{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:var(--mut)}
+.lbw-root .hist-badge{padding:2px 7px;border:1px solid var(--ac);border-radius:var(--radius-sm);color:var(--ac);font-weight:700;letter-spacing:.08em}
+.lbw-root .hist-header{padding:10px 2px 12px;max-width:820px}
+.lbw-root .hist-explainer{margin:0 0 6px;font-size:13px;line-height:1.5;color:var(--tx2)}
+.lbw-root .hist-explainer a,.lbw-root .hist-fingerprint a{color:var(--ac);text-decoration:underline;text-underline-offset:2px}
+.lbw-root .hist-fingerprint{margin:0;font-family:var(--font-mono);font-size:11px;color:var(--mut)}
+
+/* Left sidebar: mini profile */
+.lbw-root .hist-mini-banner{margin:0 0 12px;padding:6px 8px;border:1px dashed var(--line2);border-radius:var(--radius-sm);font-size:11px;line-height:1.4;color:var(--tx2)}
+.lbw-root .hist-mini-id{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.lbw-root .hist-mini-rank{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--ac)}
+.lbw-root .hist-mini-names{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:12px;color:var(--tx2)}
+.lbw-root .hist-mini-names strong{font-size:14px;color:var(--tx);overflow-wrap:anywhere}
+.lbw-root .hist-mini-names code{font-family:var(--font-mono);font-size:11px;color:var(--mut)}
+.lbw-root .hist-mini-facts{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0 0 12px;font-size:11px}
+.lbw-root .hist-mini-facts dt{color:var(--mut);font-family:var(--font-mono);letter-spacing:.04em}
+.lbw-root .hist-mini-facts dd{margin:0;color:var(--tx);overflow-wrap:anywhere}
+.lbw-root .hist-mini-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 12px}
+.lbw-root .hist-mini-metrics>div{min-width:0;padding:6px 8px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius-sm)}
+.lbw-root .hist-mini-metrics dt{font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;color:var(--mut)}
+.lbw-root .hist-mini-metrics dt span{margin-right:4px}
+.lbw-root .hist-mini-metrics dd{margin:2px 0 0;font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere;color:var(--tx);font-variant-numeric:tabular-nums}
+.lbw-root .hist-mini-actions{display:flex;flex-wrap:wrap;gap:6px}
+.lbw-root .hist-btn{display:inline-flex;align-items:center;padding:6px 10px;border:1px solid var(--ac);border-radius:var(--radius-sm);background:var(--ac);color:var(--ac-tx);font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none}
+.lbw-root .hist-btn.ghost{background:transparent;color:var(--ac)}
+
+/* Right sidebar: compare */
+.lbw-root .hist-cmp-slots{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.lbw-root .hist-cmp-slot{position:relative;display:flex;flex-direction:column;gap:2px;padding:8px 26px 8px 30px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:12px;min-width:0}
+.lbw-root .hist-cmp-tag{position:absolute;left:8px;top:8px;font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ac)}
+.lbw-root .hist-cmp-rank{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--ac)}
+.lbw-root .hist-cmp-slot strong{color:var(--tx);overflow-wrap:anywhere}
+.lbw-root .hist-cmp-class{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--mut)}
+.lbw-root .hist-cmp-clear{position:absolute;right:6px;top:4px;background:none;border:0;color:var(--mut);font-size:16px;cursor:pointer}
+.lbw-root .hist-cmp-clear:hover{color:var(--ac)}
+.lbw-root .hist-cmp-picker .ws-note{margin:0 0 4px}
+.lbw-root .hist-cmp-picker input{width:100%;padding:5px 7px;background:var(--bg);border:1px solid var(--line2);border-radius:var(--radius-sm);color:var(--tx);font-family:var(--font-mono);font-size:11px}
+.lbw-root .hist-cmp-picker ul{list-style:none;margin:4px 0 0;padding:0;max-height:200px;overflow:auto}
+.lbw-root .hist-cmp-picker li button{display:block;width:100%;padding:4px 2px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--tx);text-align:left;font-size:11px;cursor:pointer}
+.lbw-root .hist-cmp-picker li button:hover{color:var(--ac)}
+.lbw-root .hist-cmp-picker li button span{color:var(--mut);font-family:var(--font-mono);margin-left:4px}
+.lbw-root .hist-cmp-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px;font-variant-numeric:tabular-nums}
+.lbw-root .hist-cmp-table th,.lbw-root .hist-cmp-table td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:right}
+.lbw-root .hist-cmp-table th[scope="row"],.lbw-root .hist-cmp-table thead th:first-child{text-align:left;color:var(--mut);font-weight:400;letter-spacing:.06em}
+.lbw-root .hist-cmp-table th[scope="row"] span{margin-right:4px}
+.lbw-root .hist-cmp-table thead th{color:var(--ac);font-weight:700}
+.lbw-root .hist-cmp-table td{color:var(--tx);overflow-wrap:anywhere}
+.lbw-root .hist-cmp-table td.hi{color:var(--ac);font-weight:700}

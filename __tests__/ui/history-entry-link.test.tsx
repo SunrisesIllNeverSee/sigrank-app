@@ -1,0 +1,70 @@
+import type React from "react";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
+  usePathname: () => "/hall",
+}));
+
+vi.mock("@/components/live/fonts", () => ({ lbwFontVars: "" }));
+
+// Surface next/link's prefetch prop so the test can see it.
+vi.mock("next/link", () => ({
+  default: ({ href, prefetch, children, ...rest }: { href: string; prefetch?: boolean; children: React.ReactNode }) => (
+    <a href={href} data-prefetch={String(prefetch)} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { MenuNav } from "@/components/mobile/MenuNav";
+
+afterEach(cleanup);
+
+describe("ORIGINAL BOARD entry point", () => {
+  it("sits last in the rail's Writings group, without prefetch", () => {
+    render(
+      <WorkspaceShell active="hall" title="T">
+        <p>stage</p>
+      </WorkspaceShell>,
+    );
+    const writings = screen.getAllByRole("group", { name: "Writings" })[0];
+    const links = within(writings).getAllByRole("link");
+    const link = links[links.length - 1];
+    expect(link.getAttribute("aria-label")).toBe("ORIGINAL BOARD");
+    expect(link.getAttribute("href")).toBe("/board/history");
+    // The archive page is ~1.2 MB of RSC; the always-visible rail must not prefetch it.
+    expect(link.getAttribute("data-prefetch")).toBe("false");
+    expect(link.getAttribute("aria-current")).toBeNull();
+  });
+
+  it("lights up on the archive page", () => {
+    render(
+      <WorkspaceShell active="history" title="T">
+        <p>stage</p>
+      </WorkspaceShell>,
+    );
+    const writings = screen.getAllByRole("group", { name: "Writings" })[0];
+    expect(within(writings).getByRole("link", { name: "ORIGINAL BOARD" }).getAttribute("aria-current")).toBe("page");
+  });
+
+  it("left the footer (one entry point)", () => {
+    render(
+      <WorkspaceShell active="hall" title="T">
+        <p>stage</p>
+      </WorkspaceShell>,
+    );
+    expect(document.querySelector('.flinks a[href="/board/history"]')).toBeNull();
+  });
+
+  it("is in the phone menu's Writings group too, without prefetch", () => {
+    render(<MenuNav active="history" onNavigate={() => {}} />);
+    const writings = screen.getByRole("group", { name: "Writings" });
+    const link = within(writings).getByRole("link", { name: "Original Board" });
+    expect(link.getAttribute("href")).toBe("/board/history");
+    expect(link.getAttribute("data-prefetch")).toBe("false");
+    expect(link.getAttribute("aria-current")).toBe("page");
+  });
+});
