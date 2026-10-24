@@ -64,7 +64,8 @@ export type WorkspaceNav =
   | "hall"
   | "field"
   | "wiki"
-  | "blog";
+  | "blog"
+  | "history";
 
 
 export interface WorkspaceShellProps {
@@ -606,7 +607,6 @@ export function WorkspaceShell({
             </button>
             <div className="flinks">
               <Link href="/board/all">LEADERBOARD</Link>
-              <Link href="/board/history" prefetch={false}>ORIGINAL BOARD</Link>
               <a href="/compare">COMPARE</a>
               <a href="/hall">HALL</a>
               <a href="/me">PROFILE</a>

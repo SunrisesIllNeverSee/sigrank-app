@@ -56,7 +56,7 @@ export function HistoryIsland({ board }: { board: HistoricalBoard }) {
 
   return (
     <WorkspaceShell
-      active="board"
+      active="history"
       title="Historical Leaderboard"
       titleControls={<HistoryTitleControls meta={board.meta} />}
       leftTitle="OPERATOR · JULY 31"
