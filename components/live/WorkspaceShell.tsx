@@ -64,7 +64,8 @@ export type WorkspaceNav =
   | "hall"
   | "field"
   | "wiki"
-  | "blog";
+  | "blog"
+  | "history";
 
 
 export interface WorkspaceShellProps {

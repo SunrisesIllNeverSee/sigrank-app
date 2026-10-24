@@ -62,3 +62,6 @@ release-staging/
 .agents/
 .claude/
 .ello/
+
+# local screenshot captures (e2e/history/capture.spec.ts)
+_shots/
