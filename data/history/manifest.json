@@ -1,0 +1,14 @@
+{
+  "source_commit": "4c610df9a78a6c396e0404d6e776919ac11c40c5",
+  "source_path": "public/data/board-all_time.json",
+  "git_blob": "1a24939623ea0a8efeaaa68ba0e5818c684f7203",
+  "bytes": 1237309,
+  "sha256": "004a91aa30713d384310dbafb64745d375114d727dd7370aa2a3b2396a437ce0",
+  "generated_at": "2026-07-31T12:09:09.303Z",
+  "window": "all_time",
+  "total_operators": 1642,
+  "entries": 1642,
+  "seeded": 1626,
+  "real": 16,
+  "copied_at": "2026-10-24T10:01:14Z"
+}
