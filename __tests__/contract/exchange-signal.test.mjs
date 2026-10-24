@@ -635,3 +635,126 @@ test("Minor 4: recordVerification checks attempt state before recording", async 
   assert.match(recordSection, /expired/);
   assert.match(recordSection, /Cannot record verification for attempt in status/);
 });
+
+// ─── Published JSON Schema tests (/schemas/exchange-signal/1.0) ─────────────
+
+const PUBLISHED_SCHEMA = "lib/exchange-gateway/exchange-signal-1.0.schema.json";
+const SCHEMA_ROUTE = "app/schemas/exchange-signal/1.0/route.ts";
+
+test("Published JSON Schema is a valid draft 2020-12 document", async () => {
+  const { default: Ajv2020 } = await import("ajv/dist/2020.js");
+  const doc = JSON.parse(await source(PUBLISHED_SCHEMA));
+  const ajv = new Ajv2020({ strict: false });
+  const validate = ajv.compile(doc);
+  assert.equal(typeof validate, "function");
+});
+
+test("Published JSON Schema $id matches the manifest-advertised URL", async () => {
+  const doc = JSON.parse(await source(PUBLISHED_SCHEMA));
+  assert.equal(doc.$id, "https://signalaf.com/schemas/exchange-signal/1.0");
+  assert.equal(doc.$schema, "https://json-schema.org/draft/2020-12/schema");
+  assert.equal(doc.properties.schema_version.const, "exchange-signal/1.0");
+
+  const manifest = await source("lib/exchange-gateway/src/manifest.ts");
+  assert.match(manifest, /schema:`\$\{base\}\/schemas\/exchange-signal\/1\.0`/);
+});
+
+test("Schema route serves the published document at /schemas/exchange-signal/1.0", async () => {
+  const route = await source(SCHEMA_ROUTE);
+  assert.match(route, /export async function GET/);
+  assert.match(route, /application\/schema\+json/);
+  assert.match(route, /exchange-signal-1\.0\.schema\.json/);
+});
+
+test("Published JSON Schema mirrors ExchangeSignalInputSchema top-level fields", async () => {
+  const doc = JSON.parse(await source(PUBLISHED_SCHEMA));
+  const required = [
+    "schema_version", "type", "title", "summary", "description",
+    "desired_outcome", "scope", "constraints", "participation",
+    "submission", "verification", "consideration", "follow_on", "timestamps",
+  ];
+  const optional = ["signal_id", "challenge_kind", "evidence", "labels", "lineage"];
+  for (const field of required) {
+    assert.ok(doc.required.includes(field), `required must include ${field}`);
+  }
+  for (const field of optional) {
+    assert.ok(field in doc.properties, `${field} must exist as a property`);
+    assert.ok(!doc.required.includes(field), `${field} must stay optional`);
+  }
+  // No invented fields: properties = required + optional, exactly.
+  assert.deepEqual(
+    Object.keys(doc.properties).sort(),
+    [...required, ...optional].sort(),
+  );
+});
+
+test("Published JSON Schema preserves non-obligation invariants and enums", async () => {
+  const doc = JSON.parse(await source(PUBLISHED_SCHEMA));
+  assert.equal(doc.properties.consideration.properties.creates_obligation.const, false);
+  assert.ok(doc.properties.consideration.required.includes("creates_obligation"));
+  assert.equal(doc.properties.follow_on.properties.commitment_automatic.const, false);
+  assert.equal(doc.properties.follow_on.properties.authorization_automatic.const, false);
+  assert.deepEqual(doc.properties.type.enum,
+    ["problem", "request", "challenge", "bounty", "verification", "discovery", "experiment"]);
+  assert.deepEqual(doc.properties.challenge_kind.enum,
+    ["puzzle", "constraint_preservation", "governance_reasoning", "minimal_intervention", "provenance", "capability"]);
+  assert.deepEqual(doc.properties.verification.properties.mode.enum,
+    ["deterministic", "hybrid", "manual"]);
+  assert.deepEqual(doc.properties.follow_on.properties.mode.enum,
+    ["none", "domain_review", "proposal_allowed", "invite_to_propose", "draft_proposal"]);
+  assert.deepEqual(doc.properties.desired_outcome.properties.kind.enum,
+    ["artifact", "answer", "finding", "proof", "score", "result"]);
+});
+
+const validSignalFixture = {
+  schema_version: "exchange-signal/1.0",
+  type: "problem",
+  title: "Improve cold-start docs",
+  summary: "Onboarding docs lack a quickstart for agents.",
+  description: "The agent onboarding docs jump straight into advanced usage without a minimal worked example.",
+  desired_outcome: { kind: "artifact", description: "A quickstart guide" },
+  scope: { included: ["docs"] },
+  constraints: {},
+  participation: {},
+  submission: { accepted_media_types: ["text/markdown"], required_fields: ["title"] },
+  verification: {
+    mode: "manual",
+    verifier: { verifier_id: "steward", version: "1", digest: "sha256:abc", runtime: "manual" },
+    inputs: { signal_revision_hash: "abc123" },
+    checks: [{ check_id: "c1", description: "Docs updated" }],
+    result_contract: { outcomes: ["passed", "failed"], score_range: { minimum: 0, maximum: 100 }, passing_score: 50 },
+  },
+  consideration: { mode: "fixed", advertised: true, creates_obligation: false },
+  follow_on: { mode: "none", commitment_automatic: false, authorization_automatic: false },
+  timestamps: { created_at: "2026-10-12T00:00:00Z" },
+};
+
+test("Published JSON Schema and Zod schema agree on a valid fixture", async () => {
+  const { default: Ajv2020 } = await import("ajv/dist/2020.js");
+  const { ExchangeSignalInputSchema } = await import("../../lib/exchange-gateway/src/signal-schema.ts");
+  const doc = JSON.parse(await source(PUBLISHED_SCHEMA));
+  const ajvValidate = new Ajv2020({ strict: false }).compile(doc);
+
+  const zodResult = ExchangeSignalInputSchema.safeParse(validSignalFixture);
+  assert.ok(zodResult.success, `Zod rejected the fixture: ${JSON.stringify(zodResult.error?.issues)}`);
+  assert.ok(ajvValidate(validSignalFixture), `JSON Schema rejected the fixture: ${JSON.stringify(ajvValidate.errors)}`);
+});
+
+test("Published JSON Schema and Zod schema agree on rejections", async () => {
+  const { default: Ajv2020 } = await import("ajv/dist/2020.js");
+  const { ExchangeSignalInputSchema } = await import("../../lib/exchange-gateway/src/signal-schema.ts");
+  const doc = JSON.parse(await source(PUBLISHED_SCHEMA));
+  const ajvValidate = new Ajv2020({ strict: false }).compile(doc);
+
+  const cases = {
+    missing_title: Object.fromEntries(Object.entries(validSignalFixture).filter(([k]) => k !== "title")),
+    bad_type: { ...validSignalFixture, type: "unknown_type" },
+    obligation: { ...validSignalFixture, consideration: { ...validSignalFixture.consideration, creates_obligation: true } },
+    auto_commit: { ...validSignalFixture, follow_on: { ...validSignalFixture.follow_on, commitment_automatic: true } },
+    bad_version: { ...validSignalFixture, schema_version: "exchange-signal/9.9" },
+  };
+  for (const [name, fixture] of Object.entries(cases)) {
+    assert.ok(!ExchangeSignalInputSchema.safeParse(fixture).success, `Zod should reject ${name}`);
+    assert.ok(!ajvValidate(fixture), `JSON Schema should reject ${name}`);
+  }
+});
