@@ -51,6 +51,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/board/30d": "SUPPORTED",
   "/board/90d": "SUPPORTED",
   "/board/off": "REDIRECT", // 307 → /board/all; never in sitemap
+  "/board/history": "HOLD", // frozen July 31, 2026 archive; sitemap promotion is an owner call
 
   // ── Topic hubs + company/product surfaces ───────────────────────────────
   "/metrics": "SUPPORTED",

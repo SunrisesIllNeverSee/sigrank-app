@@ -22,6 +22,8 @@ const PATTERNS = {
   teams: "10101/11111/00100/11111/10001",
   hacks: "11100/11100/11100/01000/01000",
   versus: "10101/01010/00100/01010/10101",
+  /* ORIGINAL BOARD (/board/history): an hourglass for the July 31 archive. */
+  history: "11111/01010/00100/01010/11111",
 } as const;
 
 export type PixelIconName = keyof typeof PATTERNS;
@@ -48,15 +50,15 @@ export type IconSetName = (typeof ICON_SETS)[number];
 
 const GLYPH_SET: Record<PixelIconName, string> = {
   profile: "♙", articles: "▧", board: "▤", compare: "⚖", hall: "🏆", field: "◉", wiki: "▥", blog: "✎", enterprise: "⬢",
-  teams: "⧉", hacks: "⚑", versus: "⚔",
+  teams: "⧉", hacks: "⚑", versus: "⚔", history: "⧗",
 };
 const EMOJI_SET: Record<PixelIconName, string> = {
   profile: "👤", articles: "📰", board: "📊", compare: "⚖️", hall: "🏆", field: "🎯", wiki: "📖", blog: "✏️", enterprise: "🏢",
-  teams: "👥", hacks: "🏁", versus: "🥊",
+  teams: "👥", hacks: "🏁", versus: "🥊", history: "⏳",
 };
 const MINIMAL_SET: Record<PixelIconName, string> = {
   profile: "♙", articles: "▧", board: "▦", compare: "◐", hall: "◈", field: "◎", wiki: "▥", blog: "✎", enterprise: "⬢",
-  teams: "⧉", hacks: "⚑", versus: "⚔",
+  teams: "⧉", hacks: "⚑", versus: "⚔", history: "⧗",
 };
 
 export function RailIcon({

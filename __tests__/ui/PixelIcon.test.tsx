@@ -12,6 +12,7 @@ const ALL: PixelIconName[] = [
   "wiki",
   "blog",
   "enterprise",
+  "history",
 ];
 
 describe("PixelIcon", () => {
