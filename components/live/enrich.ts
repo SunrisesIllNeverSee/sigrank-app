@@ -441,7 +441,9 @@ const PATCH_KEYS = [
   "msgs",
   "mv24",
   "mv7",
-  "trend",
+  // `trend` deliberately excluded: the history endpoint returns several rows
+  // per date (one per platform/source), so det.trend is not a time series.
+  // The row sparkline comes only from /api/v1/board/trends (one point per day).
   "recs",
 ] as const;
 

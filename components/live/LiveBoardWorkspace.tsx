@@ -717,8 +717,9 @@ export function LiveBoardWorkspace({
         touched = true;
         candidate = mergeDetail(o, e.detail);
       }
+      // Single source for the row sparkline: the per-window, per-day Yield series.
       const history = trendsByCode[o.codename];
-      if (history?.length >= 2 && candidate.trend.length < 2) {
+      if (history?.length >= 2) {
         touched = true;
         candidate = { ...candidate, trend: history };
       }
