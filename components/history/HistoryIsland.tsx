@@ -6,9 +6,8 @@
  * right = historical-only compare. State is local (the route stays static).
  */
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
-import { usePhone } from "@/components/board-mobile/usePhone";
 import { HistoricalLeaderboardTable } from "./legacy/LeaderboardTable";
 import { HistoryHeader, HistoryTitleControls } from "./HistoryHeader";
 import { MiniProfile } from "./MiniProfile";
@@ -16,19 +15,35 @@ import { ComparePanel } from "./ComparePanel";
 import type { HistoricalBoard, HistoricalEntry } from "@/lib/history/types";
 import "./history-island.css";
 
+/* At ≤1050px the shell collapses both side panels (phones move the left one
+   into the menu drawer), so a row tap must open the right panel / Details
+   sheet, which then carries the mini profile above compare. */
+const COMPACT_MQ = "(max-width: 1050px)";
+function subscribeCompact(cb: () => void) {
+  if (typeof window.matchMedia !== "function") return () => {};
+  const mq = window.matchMedia(COMPACT_MQ);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+function useCompact(): boolean {
+  return useSyncExternalStore(
+    subscribeCompact,
+    () => (typeof window.matchMedia === "function" ? window.matchMedia(COMPACT_MQ).matches : false),
+    () => false,
+  );
+}
+
 export type CompareSlots = [HistoricalEntry | null, HistoricalEntry | null];
 
 export function HistoryIsland({ board }: { board: HistoricalBoard }) {
   const [selected, setSelected] = useState<HistoricalEntry | null>(null);
   const [compare, setCompare] = useState<CompareSlots>([null, null]);
-  const phone = usePhone();
+  const compact = useCompact();
   const [sheetSignal, setSheetSignal] = useState(0);
 
-  /* Phones keep the left panel inside the menu drawer, so a tap there would
-     show nothing; the Details sheet carries the mini profile above compare. */
   const select = (e: HistoricalEntry) => {
     setSelected(e);
-    if (phone) setSheetSignal((n) => n + 1);
+    if (compact) setSheetSignal((n) => n + 1);
   };
 
   /** Fills A, then B; a third add replaces B. */
@@ -49,7 +64,7 @@ export function HistoryIsland({ board }: { board: HistoricalBoard }) {
       rightTitle="COMPARE"
       right={
         <>
-          {phone ? <MiniProfile entry={selected} onAddToCompare={addToCompare} /> : null}
+          {compact ? <MiniProfile entry={selected} onAddToCompare={addToCompare} /> : null}
           <ComparePanel slots={compare} entries={board.entries} onPick={pickCompare} onClear={clearCompare} />
         </>
       }

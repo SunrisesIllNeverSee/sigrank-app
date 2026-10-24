@@ -62,3 +62,16 @@ test.describe("phone", () => {
     await expect(menu).toBeHidden();
   });
 });
+
+for (const width of [820, 1024]) {
+  test.describe(`tablet ${width}`, () => {
+    test.use({ viewport: { width, height: 1000 } });
+
+    test("a row tap shows the mini profile", async ({ page }) => {
+      await page.goto("/board/history");
+      await page.locator("tr[data-archived-rank]:visible, li[data-archived-rank]:visible").first().click();
+      await expect(page.getByText("Snapshot from July 31, 2026. Not linked to a live profile.").first()).toBeVisible();
+      await expect(page.getByRole("button", { name: "Add to compare" }).first()).toBeVisible();
+    });
+  });
+}

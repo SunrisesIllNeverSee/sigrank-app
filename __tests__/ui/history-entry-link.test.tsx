@@ -1,3 +1,4 @@
+import type React from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -7,6 +8,15 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/components/live/fonts", () => ({ lbwFontVars: "" }));
+
+// Surface next/link's prefetch prop so the test can see it.
+vi.mock("next/link", () => ({
+  default: ({ href, prefetch, children, ...rest }: { href: string; prefetch?: boolean; children: React.ReactNode }) => (
+    <a href={href} data-prefetch={String(prefetch)} {...rest}>
+      {children}
+    </a>
+  ),
+}));
 
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
@@ -19,6 +29,9 @@ describe("ORIGINAL BOARD entry point", () => {
         <p>stage</p>
       </WorkspaceShell>,
     );
-    expect(screen.getByRole("link", { name: "ORIGINAL BOARD" }).getAttribute("href")).toBe("/board/history");
+    const link = screen.getByRole("link", { name: "ORIGINAL BOARD" });
+    expect(link.getAttribute("href")).toBe("/board/history");
+    // The archive page is ~1.2 MB of RSC; the always-visible footer must not prefetch it.
+    expect(link.getAttribute("data-prefetch")).toBe("false");
   });
 });

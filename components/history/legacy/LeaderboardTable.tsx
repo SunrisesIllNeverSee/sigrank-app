@@ -517,7 +517,7 @@ export function HistoricalLeaderboardTable({
     const domain = PLATFORM_DOMAIN_MAP[platform]; // null = All
     const sq = searchQuery.trim().toLowerCase();
     return entries.filter((e) => {
-      if (domain && (e.platform ?? "other") !== domain) return false;
+      if (domain && (e.platform ?? "other") !== domain && !platformsOf(e).includes(domain)) return false;
       if (seededOnly && !e.isSeed) return false;
       if (classFilter !== "all" && (e.signalClass ?? "").toLowerCase() !== classFilter)
         return false;

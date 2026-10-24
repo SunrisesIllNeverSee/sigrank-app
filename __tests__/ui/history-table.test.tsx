@@ -98,6 +98,18 @@ describe("HistoricalLeaderboardTable", () => {
     expectRanksIntact(rows);
   });
 
+  it("platform filter matches any declared platform, not only the primary one", () => {
+    renderTable();
+    fireEvent.change(screen.getByLabelText("Platform filter"), { target: { value: "Claude" } });
+    const rows = allRows();
+    const expected = entries.filter(
+      (e) => e.platform === "claude" || (e.platforms ?? []).some((p) => p.toLowerCase() === "claude"),
+    );
+    expect(rows).toHaveLength(expected.length);
+    expect(rows.some((tr) => entries.find((e) => e.codename === codenameOf(tr))!.platform === "multi")).toBe(true);
+    expectRanksIntact(rows);
+  });
+
   it("searches by codename and by display name", () => {
     renderTable();
     const search = screen.getByLabelText("Search operators");
