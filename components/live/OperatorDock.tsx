@@ -430,15 +430,14 @@ function HistoryTab({
 }) {
   const hist = detail?.history ?? [];
   const snaps = detail?.snapshots ?? [];
-  const trend = detail?.trend ?? o?.trend ?? [];
+  // Same per-day Yield series as the row sparkline (detail history carries
+  // several rows per date, so it is not plotted as a trend).
+  const trend = o?.trend ?? [];
   return (
     <div className="drill">
       <Sparkline arr={trend} w={220} h={48} />
       <p className="drill-note">
-        {detail?.trendKind === "score"
-          ? "SCORE HISTORY · SIGNA RATE"
-          : "YIELD HISTORY · Υ"}{" "}
-        · {trend.length} PTS
+        YIELD HISTORY · Υ · {trend.length} DAYS
         {detail?.errors?.history ? " — SYNC FAILED" : ""}
       </p>
       {o && (
