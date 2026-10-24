@@ -1,6 +1,12 @@
 /*
  * ARCHIVAL COPY of components/sigrank/LeaderboardTable.tsx@4c610df9 (2026-07-31) for /board/history.
  * Frozen: do not sync with live code. Not canon.
+ *
+ * Island adaptations (2026-10-24, docs/superpowers/specs/2026-10-24-historical-board-design.md §4):
+ * no routing (all-time only, platform filter client-side), operator name opens
+ * the mini profile via onSelect instead of /user/, no analytics or capture, a
+ * Seeded-only filter, the # column leads with the archived rank, nulls sort
+ * last both ways, null signalClass is filter-safe, Category defaults to All.
  */
 "use client";
 
@@ -21,8 +27,6 @@
  */
 
 import React, { useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { LeaderboardEntry } from "./types";
 import { glyphFor } from "./canon-glyph";
 import {
@@ -33,9 +37,8 @@ import {
 } from "./constants";
 import { OperatorAvatar } from "@/components/sigrank/OperatorAvatar";
 import { PlatformIcon } from "./PlatformIcon";
-import { track } from "@/lib/infra/posthog/events";
 import { isOutlierEntry } from "./outlier-classify";
-import { BoardCapture } from "@/components/board/BoardCapture";
+import type { HistoricalEntry } from "@/lib/history/types";
 
 // ── Palette — THEME-REACTIVE (owner 2026-06-20). Chrome keys are theme tokens; the
 // SPECIES colors stay literal (semantic identity for the class glyph, theme-invariant).
@@ -317,13 +320,6 @@ function topThreeByColumn(
 
 // Window dropdown — "off" (filter off: one row/operator, no window) then All time · 90 · 30 · 7,
 // driving the /board/[window] route. Owner 2026-06-25: the "everything" firehose was removed.
-const WINDOW_OPTS = [
-  { value: "off", label: "off" },
-  { value: "all", label: "All time" },
-  { value: "90d", label: "90 day" },
-  { value: "30d", label: "30 day" },
-  { value: "7d", label: "7 day" },
-];
 
 /** One uniform labeled dropdown (Window/Class/Platform) — same size, top-left of the board. */
 function Field({
@@ -357,38 +353,72 @@ function Field({
 }
 
 interface Props {
-  entries: LeaderboardEntry[];
+  entries: HistoricalEntry[];
   totalUsers?: number;
-  window?: string;
-  /** Initial Platform filter (BOARD redesign 2026-06-27) — reflects the ?platform=
-   *  URL param; the dropdown drives the URL (server re-queries). Default 'All'. */
-  platform?: PlatformUI;
-  /** Board breakdown mode (BOARD redesign 2026-06-27): 'total' = one operator-total
-   *  row (default), 'platforms' = the per-platform breakdown (?view=platforms). The
-   *  "by platform" toggle drives the URL. Off boards ignore it. */
-  view?: "total" | "platforms";
+  onSelect: (e: HistoricalEntry) => void;
+  selectedCodename?: string;
 }
 
-export function LeaderboardTable({
-  entries,
+/** Metric-view columns of the July 31 table (labels verbatim), shared with the
+ *  mini profile and compare panels. */
+export const HISTORY_METRIC_COLUMNS = [
+  { key: "totalTokens", icon: "∑", label: "TOTAL" },
+  { key: "yield_", icon: "Υ", label: "YIELD" },
+  { key: "snr", icon: "▲", label: "SNR" },
+  { key: "velocity", icon: "⚡", label: "VEL" },
+  { key: "leverage", icon: "⚙", label: "LEV" },
+  { key: "dev10x", icon: "✧", label: "10xDEV" },
+  { key: "efficiency", icon: "◌", label: "EFF" },
+  { key: "costPerMillion", icon: "$", label: "/1M", lowerIsBetter: true },
+] as const;
+
+const BTN_RESET: React.CSSProperties = {
+  background: "none",
+  border: 0,
+  padding: 0,
+  font: "inherit",
+  color: "inherit",
+  cursor: "pointer",
+  textAlign: "left",
+};
+
+export function HistoricalLeaderboardTable({
+  entries: historicalEntries,
   totalUsers,
-  window: win = "30d",
-  platform: platformProp = "All",
-  view: breakdownProp = "total",
+  onSelect,
+  selectedCodename,
 }: Props) {
-  const router = useRouter();
+  // The July 31 page passed static rows straight into the table (cast); same here.
+  const entries = historicalEntries as unknown as LeaderboardEntry[];
+  const select = (e: LeaderboardEntry) => onSelect(e as unknown as HistoricalEntry);
+  const rowProps = (e: LeaderboardEntry) => ({
+    "data-archived-rank": e.rank,
+    "data-seed": e.isSeed ? "1" : "0",
+    "data-codename": e.codename,
+    "aria-selected": selectedCodename === e.codename,
+    onClick: () => select(e),
+    style: {
+      cursor: "pointer",
+      ...(selectedCodename === e.codename ? { outline: `1px solid ${T.gold}`, outlineOffset: -1 } : null),
+    },
+  });
+  const pick = (e: LeaderboardEntry) => (ev: React.MouseEvent) => {
+    ev.stopPropagation();
+    select(e);
+  };
   const [view, setView] = useState<ViewMode>("metrics");
   const [sort, setSort] = useState<SortKey>("yield");
   const [dir, setDir] = useState<SortDir>("desc");
   // Platform filter is URL-DRIVEN on windowed boards (server re-queries with ?platform=)
   // so the operator-total board can filter to a single platform's snapshots. Seeded from
   // the prop (the URL's value); changing it pushes a new URL rather than filtering in JS.
-  const [platform, setPlatform] = useState<PlatformUI>(platformProp);
+  const [platform, setPlatform] = useState<PlatformUI>("All");
   const [classFilter, setClassFilter] = useState<string>("all");
   // Category filter (owner 2026-07-14): default = "human" (Human Center of Mass only).
   // "outliers" adds outliers & bots (input/total < 0.1% or > 80%) — one category.
   // "all" shows everything unfiltered.
-  const [categoryFilter, setCategoryFilter] = useState<string>("human");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [seededOnly, setSeededOnly] = useState(false);
   // Search filter (owner 2026-07-14): client-side text search across anonId (display
   // name), codename, and subLabel (@handle). Filters the visible rows in real time.
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -399,19 +429,10 @@ export function LeaderboardTable({
   // Screenshot capture: ref to the table container for html-to-image
   const tableRef = useRef<HTMLDivElement | null>(null);
 
-  // board_viewed funnel event (no-ops without the PostHog key). Fires on mount and
-  // when the window/platform/breakdown changes; URL-driven boards remount so it stays fresh.
-  React.useEffect(() => {
-    track.boardViewed(win, {
-      platform,
-      view: breakdownProp,
-      total: totalUsers,
-    });
-  }, [win, platform, breakdownProp, totalUsers]);
 
   // FIX F: the "off" board mixes windows (per-(operator, platform, window) rows), so it
   // labels each row with its window. Single-window boards don't (the window is the board).
-  const showWindow = win === "off";
+  const showWindow = false; // island: all-time only, never the mixed "off" board
   const winChip = (e: LeaderboardEntry) =>
     showWindow && windowLabel(e) ? (
       <span
@@ -481,47 +502,9 @@ export function LeaderboardTable({
     setDir("desc");
   };
 
-  // URL-driven board controls (BOARD redesign 2026-06-27). The Window slug, the
-  // ?platform= filter, and the ?view=platforms breakdown all live in the URL so the
-  // SERVER re-queries the right rows (the operator-total board's platform filter can't
-  // be done client-side — its rows are 'multi' roll-ups, not per-platform). buildBoardUrl
-  // composes the next URL from the current board slug + the next platform/view, dropping
-  // params at their defaults so clean states stay clean. The "off" board keeps its
-  // pre-existing client-side platform filter (it ships every row, no server re-query).
-  const isOff = win === "off";
-  const buildBoardUrl = (
-    nextWin: string,
-    nextPlatform: PlatformUI,
-    nextView: "total" | "platforms",
-  ) => {
-    const sp = new URLSearchParams();
-    const domain = PLATFORM_DOMAIN_MAP[nextPlatform];
-    if (domain) sp.set("platform", domain);
-    if (nextView === "platforms") sp.set("view", "platforms");
-    const qs = sp.toString();
-    const base = `/board/${nextWin}`;
-    return qs ? `${base}?${qs}` : base;
-  };
-
-  const onWindow = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const nextWin = e.target.value;
-    // Off board has no platform/view breakdown — go clean. Else preserve them.
-    if (nextWin === "off") router.push("/board/off");
-    else router.push(buildBoardUrl(nextWin, platform, breakdownProp));
-  };
-
-  // Platform dropdown: off board → client-side filter (setState); windowed boards →
-  // drive the URL so the server returns that platform's rows (operator-total path).
+  // Island: all-time only, no URL navigation — the platform filter is client-side.
   const onPlatform = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const next = e.target.value as PlatformUI;
-    setPlatform(next);
-    if (!isOff) router.push(buildBoardUrl(win, next, breakdownProp));
-  };
-
-  // "By platform" breakdown toggle (windowed boards only): flips ?view=platforms.
-  const onBreakdownToggle = (next: "total" | "platforms") => {
-    if (isOff || next === breakdownProp) return;
-    router.push(buildBoardUrl(win, platform, next));
+    setPlatform(e.target.value as PlatformUI);
   };
 
   // Shared filter — class tier (always client-side) + platform + category. The platform
@@ -534,8 +517,9 @@ export function LeaderboardTable({
     const domain = PLATFORM_DOMAIN_MAP[platform]; // null = All
     const sq = searchQuery.trim().toLowerCase();
     return entries.filter((e) => {
-      if (isOff && domain && (e.platform ?? "other") !== domain) return false;
-      if (classFilter !== "all" && e.signalClass.toLowerCase() !== classFilter)
+      if (domain && (e.platform ?? "other") !== domain) return false;
+      if (seededOnly && !e.isSeed) return false;
+      if (classFilter !== "all" && (e.signalClass ?? "").toLowerCase() !== classFilter)
         return false;
       // Category filter: Human Center of Mass / + Outliers & Bots / All
       if (categoryFilter === "human") {
@@ -554,41 +538,21 @@ export function LeaderboardTable({
       }
       return true;
     });
-  }, [entries, platform, classFilter, categoryFilter, isOff, searchQuery]);
+  }, [entries, platform, classFilter, categoryFilter, seededOnly, searchQuery]);
 
   // One sort pipeline for both views (raw default = rawTotal). Nulls fall to the bottom.
   const sorted = useMemo(() => {
     const cmp = (a: LeaderboardEntry, b: LeaderboardEntry) => {
       const av = sortVal(a, sort),
         bv = sortVal(b, sort);
-      return dir === "desc" ? bv - av : av - bv;
+      // Nulls (−Infinity) sink in both directions; ties keep the archived order.
+      const an = !Number.isFinite(av),
+        bn = !Number.isFinite(bv);
+      if (an || bn) return an === bn ? a.rank - b.rank : an ? 1 : -1;
+      return (dir === "desc" ? bv - av : av - bv) || a.rank - b.rank;
     };
     return [...filtered].sort(cmp);
   }, [filtered, sort, dir]);
-
-  // Dual-rank # column (owner 2026-07-14): show the current sort rank AND the
-  // "other" board's default rank so a reader sees both positions at once.
-  // Metrics board: primary = current sort rank, secondary = volume rank (by
-  // totalTokens). Raw board: primary = current sort rank, secondary = yield
-  // rank (by Υ). Both computed over the filtered set so they track the active
-  // class/platform/category filters.
-  const yieldRankMap = useMemo(() => {
-    const order = [...filtered].sort(
-      (a, b) => (b.yield_ ?? -Infinity) - (a.yield_ ?? -Infinity),
-    );
-    const m = new Map<LeaderboardEntry, number>();
-    order.forEach((e, i) => m.set(e, i + 1));
-    return m;
-  }, [filtered]);
-
-  const volumeRankMap = useMemo(() => {
-    const order = [...filtered].sort(
-      (a, b) => (b.totalTokens ?? -Infinity) - (a.totalTokens ?? -Infinity),
-    );
-    const m = new Map<LeaderboardEntry, number>();
-    order.forEach((e, i) => m.set(e, i + 1));
-    return m;
-  }, [filtered]);
 
   // Short label for the current sort key, used in the # header so the reader
   // knows which metric the primary rank reflects. Y/V on metrics, V/Y on raw.
@@ -633,7 +597,7 @@ export function LeaderboardTable({
   const pageCount = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
   React.useEffect(() => {
     setPage(0);
-  }, [sort, dir, platform, classFilter, categoryFilter, view, searchQuery]);
+  }, [sort, dir, platform, classFilter, categoryFilter, seededOnly, view, searchQuery]);
   const safePage = Math.min(page, pageCount - 1);
   const rows = useMemo(
     () => sorted.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE),
@@ -687,12 +651,6 @@ export function LeaderboardTable({
         <div style={st.headRow}>
           <div style={st.filters}>
             <Field
-              label="Window"
-              value={win}
-              onChange={onWindow}
-              options={WINDOW_OPTS}
-            />
-            <Field
               label="Class"
               value={classFilter}
               onChange={(e) => setClassFilter(e.target.value)}
@@ -738,6 +696,26 @@ export function LeaderboardTable({
                 </button>
               </div>
             </div>
+            {/* Seed filter (island): every row, or only the seeded tokscale rows. */}
+            <div style={st.fieldCol}>
+              <span style={st.flab}>Seed</span>
+              <div style={st.toggleRow}>
+                <button
+                  type="button"
+                  onClick={() => setSeededOnly(false)}
+                  style={{ ...st.modeBtn, ...(!seededOnly ? st.modeOn : null) }}
+                >
+                  All rows
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSeededOnly(true)}
+                  style={{ ...st.modeBtn, ...(seededOnly ? st.modeOn : null) }}
+                >
+                  Seeded only
+                </button>
+              </div>
+            </div>
             {/* Platform: URL-driven on windowed boards (server returns that platform's rows),
                 client-side on the "off" board. (BOARD redesign 2026-06-27.) */}
             <Field
@@ -758,35 +736,6 @@ export function LeaderboardTable({
                 style={st.searchInput}
               />
             </label>
-            {/* "By platform" breakdown toggle — windowed boards only. Default = one
-                operator-total row; "By platform" = one row per (operator, platform). */}
-            {!isOff ? (
-              <div style={st.fieldCol}>
-                <span style={st.flab}>Breakdown</span>
-                <div style={st.toggleRow}>
-                  <button
-                    type="button"
-                    onClick={() => onBreakdownToggle("total")}
-                    style={{
-                      ...st.modeBtn,
-                      ...(breakdownProp === "total" ? st.modeOn : null),
-                    }}
-                  >
-                    Total
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onBreakdownToggle("platforms")}
-                    style={{
-                      ...st.modeBtn,
-                      ...(breakdownProp === "platforms" ? st.modeOn : null),
-                    }}
-                  >
-                    By platform
-                  </button>
-                </div>
-              </div>
-            ) : null}
           </div>
           <div style={{ ...st.toggleRow, alignItems: "center" }}>
             <button
@@ -804,19 +753,6 @@ export function LeaderboardTable({
             >
               Raw · the fuel
             </button>
-            <BoardCapture
-              targetRef={tableRef}
-              filters={{
-                window: win,
-                platform: platform,
-                view: view,
-                classFilter: classFilter,
-                category: categoryFilter,
-                sort: sort,
-                page: safePage,
-                totalPages: pageCount,
-              }}
-            />
           </div>
         </div>
 
@@ -824,11 +760,9 @@ export function LeaderboardTable({
         <ul className="flex flex-col gap-1.5 md:hidden">
           {rows.map((e, i) => {
             const sp = speciesOf(e.signalClass);
-            const displayRank = searchQuery
-              ? e.rank
-              : safePage * PER_PAGE + i + 1;
-            const otherRank =
-              view === "raw" ? yieldRankMap.get(e) : volumeRankMap.get(e);
+            const displayRank = e.rank;
+            const position = safePage * PER_PAGE + i + 1;
+            const otherRank = position;
             const yld =
               e.yield_ == null
                 ? "—"
@@ -836,7 +770,7 @@ export function LeaderboardTable({
                   ? `${(e.yield_ / 1000).toFixed(1)}K`
                   : e.yield_.toFixed(0);
             return (
-              <li key={`m-${e.anonId}-${i}`}>
+              <li key={`m-${e.anonId}-${i}`} {...rowProps(e)}>
                 {e.status === "retired" ? (
                   <div
                     style={{
@@ -866,9 +800,12 @@ export function LeaderboardTable({
                     </span>
                   </div>
                 ) : (
-                <Link
-                  href={`/user/${encodeURIComponent(e.codename)}`}
+                <button
+                  type="button"
+                  onClick={pick(e)}
                   style={{
+                    ...BTN_RESET,
+                    width: "100%",
                     display: "flex",
                     alignItems: "center",
                     gap: 10,
@@ -979,7 +916,7 @@ export function LeaderboardTable({
                       <PlatformCell e={e} />
                     </span>
                   </span>
-                </Link>
+                </button>
                 )}
               </li>
             );
@@ -1017,7 +954,7 @@ export function LeaderboardTable({
                       width: 30,
                     }}
                   >
-                    {sortLabel(sort)}/V
+                    #/{sortLabel(sort)}
                   </th>
                   <th style={{ ...st.col, ...st.colL, ...st.stickyOpHead }}>
                     OPERATOR
@@ -1257,12 +1194,11 @@ export function LeaderboardTable({
               <tbody>
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
-                  const displayRank = searchQuery
-                    ? e.rank
-                    : safePage * PER_PAGE + i + 1;
-                  const volRank = volumeRankMap.get(e);
+                  const displayRank = e.rank;
+            const position = safePage * PER_PAGE + i + 1;
+                  const volRank = position;
                   return (
-                    <tr key={`${e.anonId}-${i}`}>
+                    <tr key={`${e.anonId}-${i}`} {...rowProps(e)}>
                       <td
                         style={{
                           ...st.td,
@@ -1317,9 +1253,10 @@ export function LeaderboardTable({
                               ) : null}
                             </span>
                           ) : (
-                          <Link
-                            href={`/user/${encodeURIComponent(e.codename)}`}
-                            style={st.opLink}
+                          <button
+                            type="button"
+                            onClick={pick(e)}
+                            style={{ ...BTN_RESET, ...st.opLink }}
                           >
                             <span
                               style={{
@@ -1351,7 +1288,7 @@ export function LeaderboardTable({
                                 ) : null}
                               </span>
                             ) : null}
-                          </Link>
+                          </button>
                           )}
                         </span>
                       </td>
@@ -1491,7 +1428,7 @@ export function LeaderboardTable({
                       width: 30,
                     }}
                   >
-                    {sortLabel(sort)}/Y
+                    #/{sortLabel(sort)}
                   </th>
                   <th style={{ ...st.col, ...st.colL, ...st.stickyOpHead }}>
                     OPERATOR
@@ -1576,12 +1513,11 @@ export function LeaderboardTable({
               <tbody>
                 {rows.map((e, i) => {
                   const sp = speciesOf(e.signalClass);
-                  const displayRank = searchQuery
-                    ? e.rank
-                    : safePage * PER_PAGE + i + 1;
-                  const yRank = yieldRankMap.get(e);
+                  const displayRank = e.rank;
+            const position = safePage * PER_PAGE + i + 1;
+                  const yRank = position;
                   return (
-                    <tr key={`raw-${e.anonId}-${i}`}>
+                    <tr key={`raw-${e.anonId}-${i}`} {...rowProps(e)}>
                       <td
                         style={{
                           ...st.td,
@@ -1636,9 +1572,10 @@ export function LeaderboardTable({
                               ) : null}
                             </span>
                           ) : (
-                          <Link
-                            href={`/user/${encodeURIComponent(e.codename)}`}
-                            style={st.opLink}
+                          <button
+                            type="button"
+                            onClick={pick(e)}
+                            style={{ ...BTN_RESET, ...st.opLink }}
                           >
                             <span
                               style={{
@@ -1670,7 +1607,7 @@ export function LeaderboardTable({
                                 ) : null}
                               </span>
                             ) : null}
-                          </Link>
+                          </button>
                           )}
                         </span>
                       </td>
@@ -1841,8 +1778,8 @@ export function LeaderboardTable({
         ) : null}
         <div style={st.note}>
           {view === "metrics"
-            ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column shows the current sort rank over the volume rank (Y/V) — switching metrics renumbers rows to match."
-            : "Raw pillars — the four integers the engine derives every metric from. Click a header to sort; the last column is total cost ($). Top-3 per column boxed. The # column shows the current sort rank over the yield rank (V/Y)."}
+            ? "Click any metric header to sort (click again to flip ▲/▼). Top-3 in each column sit in a gold/blue/indigo shadow box so the leaders stay visible after any sort or filter. The # column shows the archived July 31 rank over the row's position in the current sort."
+            : "Raw pillars — the four integers the engine derives every metric from. Click a header to sort; the last column is total cost ($). Top-3 per column boxed. The # column shows the archived July 31 rank over the row's position in the current sort."}
           {totalUsers != null
             ? ` · 25 per page · ${sorted.length} of ${totalUsers} operators.`
             : null}
