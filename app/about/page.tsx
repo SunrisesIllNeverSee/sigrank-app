@@ -101,7 +101,7 @@ export default function AboutPage() {
           {
             question: "What is a good yield score?",
             answer:
-              "Yield varies by class tier. Generally, a yield above 1000 puts you in the upper tiers. Run npx sigrank and compare against the leaderboard.",
+              "Yield is unbounded and relative — benchmark against the live leaderboard. Rough bands: below 0.5 is low, 0.5–2 is moderate, 2–10 is high, and 10+ is very high. Class tier is separate — it is based on total tokens, not yield (see the class checker). Run npx sigrank and compare your score on the leaderboard.",
           },
           // Rendered visibly by the "More questions" FaqSection below.
           ...ABOUT_MORE_FAQS,
@@ -255,8 +255,14 @@ export default function AboutPage() {
               What is a good yield score?
             </summary>
             <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
-              Yield varies by class tier. Generally, a yield above 1000 puts you
-              in the upper tiers. Run{" "}
+              Yield is unbounded and relative — benchmark against the live
+              leaderboard. Rough bands: below 0.5 is low, 0.5–2 is moderate,
+              2–10 is high, and 10+ is very high. Class tier is separate — it is
+              based on total tokens, not yield (see the{" "}
+              <Link href="/tools/operator-class-checker" className="text-gold underline underline-offset-2">
+                class checker
+              </Link>
+              ). Run{" "}
               <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
                 npx sigrank
               </code>{" "}

@@ -2,7 +2,8 @@
  * app/metrics/yield-cascade/page.tsx — "Yield (Υ) — Token Cascade Efficiency"
  *
  * The headline SigRank metric. This page defines yield, explains the formula,
- * walks through example calculations, and maps yield ranges to class tiers.
+ * walks through example calculations, and gives rough yield bands (class
+ * tiers are based on total tokens, not yield).
  *
  * JSON-LD: breadcrumb + definedTerm + faqPage.
  */
@@ -61,7 +62,7 @@ export default function YieldCascadePage() {
             {
               question: "What is a good yield score?",
               answer:
-                "Yield ranges map to class tiers: IGNITER (low yield, just starting) through ARCH+ (deepest field experience). TRANSMITTER is a separate peak badge, not a tier. The exact thresholds are calibrated from the live leaderboard. The median operator sits well below the top decile - the gap between median and the top is where most improvement lives.",
+                "Yield is unbounded and relative — benchmark against the live leaderboard. Rough bands: below 0.5 is low, 0.5–2 is moderate, 2–10 is high, and 10+ is very high. Class tier is separate — it is based on total tokens, not yield. TRANSMITTER is a separate peak badge, not a tier. The median operator sits well below the top decile - the gap between median and the top is where most improvement lives.",
             },
             {
               question: "How do I improve my yield?",
@@ -353,11 +354,12 @@ export default function YieldCascadePage() {
               What is a good yield score?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Yield ranges map to class tiers: IGNITER (low) through ARCH+
-              (deepest field experience). TRANSMITTER is a separate peak badge,
-              not a tier. Thresholds are calibrated from the live leaderboard.
-              The gap between median and the top is where most improvement
-              lives.
+              Yield is unbounded and relative — benchmark against the live
+              leaderboard. Rough bands: below 0.5 is low, 0.5–2 is moderate,
+              2–10 is high, and 10+ is very high. Class tier is separate — it
+              is based on total tokens, not yield. TRANSMITTER is a separate
+              peak badge, not a tier. The gap between median and the top is
+              where most improvement lives.
             </dd>
           </div>
           <div className="flex flex-col gap-1">
