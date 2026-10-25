@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import {
   signInWithGitHub,
   signInWithTwitter,
+  signInWithLinkedIn,
   signInWithEmail,
 } from "@/lib/infra/supabase/auth";
 
 /**
- * components/auth/LoginButtons.tsx — the three locked sign-in providers
- * (AUTH_LAUNCH_DIRECTIVES D1/D3): GitHub OAuth, X/Twitter OAuth, and email magic-link.
+ * components/auth/LoginButtons.tsx — the sign-in providers
+ * (AUTH_LAUNCH_DIRECTIVES D1/D3 + LinkedIn OIDC): GitHub OAuth, X/Twitter OAuth,
+ * LinkedIn OIDC, and email magic-link.
  *
  * The OAuth buttons hand off to the provider — the page unloads, so only an error
  * surfaces here. The magic-link form calls signInWithOtp and shows a "check your email"
@@ -18,17 +20,21 @@ import {
  */
 export function LoginButtons({ next }: { next?: string }) {
   const [note, setNote] = useState<string | null>(null);
-  const [busy, setBusy] = useState<null | "github" | "twitter" | "email">(null);
+  const [busy, setBusy] = useState<
+    null | "github" | "twitter" | "linkedin" | "email"
+  >(null);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
-  async function oauth(provider: "github" | "twitter") {
+  async function oauth(provider: "github" | "twitter" | "linkedin") {
     setBusy(provider);
     setNote(null);
     const { error } =
       provider === "github"
         ? await signInWithGitHub(next)
-        : await signInWithTwitter(next);
+        : provider === "twitter"
+          ? await signInWithTwitter(next)
+          : await signInWithLinkedIn(next);
     if (error) {
       setNote(error);
       setBusy(null);
@@ -113,6 +119,24 @@ export function LoginButtons({ next }: { next?: string }) {
           <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.6.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z" />
         </svg>
         {busy === "twitter" ? "Connecting…" : "Continue with X"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => oauth("linkedin")}
+        disabled={busy !== null}
+        className={oauthBtn}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          aria-hidden
+        >
+          <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.359 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.432.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" />
+        </svg>
+        {busy === "linkedin" ? "Connecting…" : "Continue with LinkedIn"}
       </button>
 
       <div className="flex items-center gap-3 py-0.5">

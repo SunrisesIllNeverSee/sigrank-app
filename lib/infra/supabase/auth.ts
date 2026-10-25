@@ -70,6 +70,21 @@ export async function signInWithTwitter(
   return error ? { error: error.message } : {};
 }
 
+/** Start the LinkedIn OIDC flow. Works once the LinkedIn (OIDC) provider is
+ *  enabled in Supabase Auth; until then Supabase returns an honest error that
+ *  surfaces in the UI (the button never fakes a session). */
+export async function signInWithLinkedIn(
+  next?: string,
+): Promise<{ error?: string }> {
+  const sb = createBrowserClient();
+  if (!sb) return { error: "Sign-in is not configured yet." };
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: "linkedin_oidc",
+    options: { redirectTo: callbackUrl(next) },
+  });
+  return error ? { error: error.message } : {};
+}
+
 /** Send an email magic-link (second provider). Returns an error message on failure. */
 export async function signInWithEmail(
   email: string,
