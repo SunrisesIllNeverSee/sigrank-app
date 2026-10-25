@@ -4,9 +4,13 @@
  * Allow all crawlers access to everything. The sitemap is referenced so
  * Google Search Console can discover it automatically.
  *
- * AEO (2026-08-14): explicit AI answer-engine crawler allowlist so ChatGPT
- * Search, Perplexity, Claude, Google AI Overviews, and Apple Intelligence
- * can read and cite our content. Training-focused scrapers (Bytespider,
+ * AEO (2026-10-25): AI crawlers are grouped by function. Answer-engine and
+ * on-demand fetchers (OAI-SearchBot, Claude-SearchBot, ChatGPT-User,
+ * Claude-User, PerplexityBot, Perplexity-User) get explicit groups so ChatGPT
+ * Search, Claude, Perplexity, and similar surfaces can read and cite our
+ * content. Training/extended-use crawlers (GPTBot, ClaudeBot, CCBot,
+ * Google-Extended, Applebot-Extended) are kept at parity with `*` — flip to
+ * disallow to opt out of training. Aggressive scrapers (Bytespider,
  * meta-externalagent) are blocked.
  */
 
@@ -21,7 +25,39 @@ const DISALLOW = ["/api/", "/auth/", "/internal/"];
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // Explicitly allow AI answer-engine crawlers (AEO)
+      // AI search & answer-engine crawlers — these drive chat citations.
+      {
+        userAgent: "OAI-SearchBot",
+        allow: ALLOW,
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "Claude-SearchBot",
+        allow: ALLOW,
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "PerplexityBot",
+        allow: ALLOW,
+        disallow: DISALLOW,
+      },
+      // On-demand fetchers — fire when a user asks the AI to open a page.
+      {
+        userAgent: "ChatGPT-User",
+        allow: ALLOW,
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "Claude-User",
+        allow: ALLOW,
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "Perplexity-User",
+        allow: ALLOW,
+        disallow: DISALLOW,
+      },
+      // AI training / extended-use controls (not search crawlers).
       {
         userAgent: "GPTBot",
         allow: ALLOW,
@@ -39,11 +75,6 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: "Google-Extended",
-        allow: ALLOW,
-        disallow: DISALLOW,
-      },
-      {
-        userAgent: "PerplexityBot",
         allow: ALLOW,
         disallow: DISALLOW,
       },

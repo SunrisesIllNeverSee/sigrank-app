@@ -32,7 +32,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "How do I measure up to other AI users?",
     answer:
-      "Install sigrank (npm i -g sigrank), run `sigrank me` or paste your ccusage JSON at /score, then compare your Υ Yield, class tier, and rank against other operators on the leaderboard.",
+      "Run `npx sigrank` (or npm i -g sigrank) to read your telemetry locally, then `sigrank enroll` and `sigrank submit` to publish to the board — or paste your four token counts at /score for an instant preview. Compare your Υ Yield, class tier, and rank against other operators on the leaderboard.",
   },
   {
     question: "Is there an AI user leaderboard?",
@@ -111,7 +111,7 @@ export default function FaqPage() {
             <span className="text-gold">AI operator performance</span> — who is
             the best, how to measure up, and what makes a top AI user.{" "}
             <span className="font-mono text-xs text-text-dim">
-              Last updated: August 14, 2026
+              Last updated: October 25, 2026
             </span>
           </>
         }
