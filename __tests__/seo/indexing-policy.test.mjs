@@ -511,7 +511,7 @@ test("llms-full.txt gates its Ask-AI list through the sitemap manifest", async (
 test("named AI crawler groups share the default allow/disallow lists", async () => {
   const robots = await source("app/robots.ts");
   assert.doesNotMatch(robots, /disallow: \["\/api\/", "\/auth\/"\]/);
-  assert.equal((robots.match(/disallow: DISALLOW/g) ?? []).length, 6);
+  assert.equal((robots.match(/disallow: DISALLOW/g) ?? []).length, 11);
   // ALLOW/DISALLOW must stay identical to the literal `*` group.
   assert.match(robots, /const ALLOW = \["\/", "\/api\/exchange\/signals"\];/);
   assert.match(robots, /const DISALLOW = \["\/api\/", "\/auth\/", "\/internal\/"\];/);

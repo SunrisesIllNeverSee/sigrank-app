@@ -338,8 +338,9 @@ export default async function BoardWindowPage({
           The board refreshes every hour during active periods. Operators are
           ranked by yield, not output volume — a high-yield operator produces
           more signal per token than a low-yield one, regardless of how many
-          hours they code. Class tiers are yield thresholds, so climbing the
-          board means improving your cascade architecture, not just spending
+          hours they code. Class tiers are accumulated-token thresholds, so
+          climbing the board means improving your cascade architecture and
+          building volume, not just spending
           more time in the editor.
         </p>
         <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">

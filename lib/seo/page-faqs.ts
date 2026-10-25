@@ -104,7 +104,7 @@ export const SIGRANK_FAQS: Faq[] = [
   {
     question: "How does SigRank work?",
     answer:
-      "SigRank works in three steps: (1) Install the sigrank CLI (npm i -g sigrank). (2) The CLI reads your token telemetry locally — four counts: cache_read, cache_write, input, output. (3) It submits a signed, server-verifiable snapshot to the leaderboard. Your Yield (Υ) score is computed and you're ranked against all other operators. No prompt content ever leaves your machine.",
+      "SigRank works in three steps: (1) Install or run the sigrank CLI (`npx sigrank` or npm i -g sigrank). (2) The CLI reads your token telemetry locally — four counts: cache_read, cache_write, input, output; `sigrank enroll` then binds a signed operator identity. (3) `sigrank submit` publishes a signed, server-verifiable snapshot to the leaderboard. Your Yield (Υ) score is computed and you're ranked against all other operators. No prompt content ever leaves your machine.",
   },
   {
     question: "Is SigRank privacy-preserving?",
@@ -139,7 +139,7 @@ export const SIGRANK_FAQS: Faq[] = [
   {
     question: "What is a good yield score?",
     answer:
-      "Yield (Υ) scores vary by operator class tier. The operator class checker at signalaf.com/tools/operator-class-checker maps yield ranges to tiers (IGNITER through ARCH+). TRANSMITTER is a separate peak badge, not a tier. Generally, a yield above 1000 puts you in the upper tiers. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard at signalaf.com/board/all.",
+      "Yield is unbounded and relative — benchmark against the live leaderboard. Rough bands: below 0.5 is low, 0.5–2 is moderate, 2–10 is high, and 10+ is very high. Class tier is separate — it is based on total tokens, not yield; the operator class checker at signalaf.com/tools/operator-class-checker maps token counts to tiers (IGNITER through ARCH+). TRANSMITTER is a separate peak badge, not a tier. The best way to know where you stand is to run `npx sigrank` and compare your score against the leaderboard at signalaf.com/board/all.",
   },
   {
     question: "Why not just count tokens?",
@@ -223,7 +223,7 @@ export const ABOUT_MORE_FAQS: Faq[] = [
   {
     question: "How does SigRank work?",
     answer:
-      "SigRank works in three steps: (1) Install the sigrank CLI (npm i -g sigrank). (2) The CLI reads your token telemetry locally — four counts: cache_read, cache_write, input, output. (3) It submits a signed, server-verifiable snapshot to the leaderboard. Your Yield (Υ) score is computed and you're ranked against all other operators. No prompt content ever leaves your machine.",
+      "SigRank works in three steps: (1) Install or run the sigrank CLI (`npx sigrank` or npm i -g sigrank). (2) The CLI reads your token telemetry locally — four counts: cache_read, cache_write, input, output; `sigrank enroll` then binds a signed operator identity. (3) `sigrank submit` publishes a signed, server-verifiable snapshot to the leaderboard. Your Yield (Υ) score is computed and you're ranked against all other operators. No prompt content ever leaves your machine.",
   },
   {
     question: "Is SigRank privacy-preserving?",
@@ -385,7 +385,7 @@ export const LOCAL_AGENT_FAQS: Faq[] = [
   {
     question: "How do I install the SigRank MCP server?",
     answer:
-      "Run `npx sigrank` to install and start the SigRank MCP server. It works with Claude, Cursor, Cline, Windsurf, and any MCP-compatible client. The local server exposes 25 tools, including portable TTEOP (Token Telemetry Evaluation Operator Protocol) record export.",
+      "Run `npx sigrank` to install and start the SigRank MCP server. It works with Claude, Cursor, Cline, Windsurf, and any MCP-compatible client. The local server exposes 30+ tools, including portable TTEOP (Token Telemetry Evaluation Operator Protocol) record export.",
   },
 ];
 

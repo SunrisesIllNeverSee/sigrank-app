@@ -4,9 +4,10 @@ import React from "react";
  * TuiBoardMockup — a CSS replica of the sigrank-mcp TUI Board tab.
  *
  * Used on the landing HowItWorks section as the "screenshot" alongside the
- * install/submit commands. Static data mirrors the live 30d board (refreshed
- * 2026-07-06). When `highlightYou` is true, the #1 row gets a gold bg-tint +
- * YOU marker (the "after you submit" view).
+ * install/submit commands. Rows are synthetic example data — intentionally not
+ * a snapshot of the live board, so they never go stale or contradict it. When
+ * `highlightYou` is true, the #1 row gets a gold bg-tint + YOU marker (the
+ * "after you submit" view).
  */
 
 interface Row {
@@ -26,74 +27,74 @@ interface Row {
 const ROWS: Row[] = [
   {
     rank: 1,
-    name: "MO§ES™",
+    name: "your.codename",
     cls: "BASE",
-    yld: "566.34",
-    snr: "0.59",
-    lev: "385.7×",
-    vel: "1.47",
-    d10: "2.59",
+    yld: "412.08",
+    snr: "0.61",
+    lev: "372.4×",
+    vel: "1.52",
+    d10: "2.61",
     pct: "100%",
     mv: "—",
     you: true,
   },
   {
     rank: 2,
-    name: "Ólafur Nils Sigurðsson",
+    name: "night.cache",
     cls: "TRANSMITTER",
-    yld: "2.59",
-    snr: "0.08",
-    lev: "27.9×",
-    vel: "0.09",
-    d10: "1.45",
+    yld: "2.48",
+    snr: "0.09",
+    lev: "28.6×",
+    vel: "0.10",
+    d10: "1.46",
     pct: "99%",
     mv: "—",
   },
   {
     rank: 3,
-    name: "Ivan Golovach",
+    name: "echo.operator",
     cls: "TRANSMITTER",
-    yld: "2.30",
+    yld: "2.21",
     snr: "0.07",
-    lev: "30.1×",
+    lev: "29.8×",
     vel: "0.08",
-    d10: "1.48",
+    d10: "1.44",
     pct: "98%",
     mv: "—",
   },
   {
     rank: 4,
-    name: "Maple Gao",
+    name: "relay.mind",
     cls: "POWER",
-    yld: "1.82",
+    yld: "1.86",
     snr: "0.08",
-    lev: "22.3×",
+    lev: "23.1×",
     vel: "0.08",
-    d10: "1.35",
+    d10: "1.38",
     pct: "91%",
     mv: "—",
   },
   {
     rank: 5,
-    name: "Vincent Koc",
+    name: "quiet.field",
     cls: "BASE",
-    yld: "1.77",
+    yld: "1.74",
     snr: "0.05",
-    lev: "31.5×",
+    lev: "30.9×",
     vel: "0.06",
-    d10: "1.50",
+    d10: "1.49",
     pct: "85%",
     mv: "—",
   },
   {
     rank: 6,
-    name: "Max Ghenis",
+    name: "gray.falcon",
     cls: "ARCH+",
-    yld: "1.51",
+    yld: "1.53",
     snr: "0.06",
-    lev: "22.3×",
+    lev: "22.8×",
     vel: "0.07",
-    d10: "1.35",
+    d10: "1.36",
     pct: "75%",
     mv: "—",
   },
@@ -199,8 +200,8 @@ export function TuiBoardMockup({
         })}
       </div>
       <div className="border-t border-bg-border-subtle px-4 py-2 font-mono text-[10px] leading-snug text-text-dim">
-        Illustrative — mirrors the live 30d board. See signalaf.com/board/30d
-        for real-time data.
+        Example output — not live standings. See signalaf.com/board/30d for
+        real-time data.
       </div>
     </div>
   );
