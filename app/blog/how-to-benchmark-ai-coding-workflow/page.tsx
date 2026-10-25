@@ -100,7 +100,7 @@ const faqs = [
   {
     question: "What is a good yield (Υ) score for an AI coding workflow?",
     answer:
-      "Yield varies by class tier. IGNITER is the entry tier; ARCH+ is the top. The median yield on the SigRank leaderboard sits in the BASE band. Rather than chasing an absolute number, benchmark against your own baseline week-over-week and against the leaderboard's top decile for your platform. The goal is consistent upward movement, not a single target.",
+      "Yield is unbounded and relative — treat it as a trend metric, not a fixed grade. Rough bands: below 0.5 is low, 0.5–2 is moderate, 2–10 is high, and 10+ is very high. (Class tier is separate — it is based on total tokens, not yield.) Rather than chasing an absolute number, benchmark against your own baseline week-over-week and against the leaderboard's top decile for your platform. The goal is consistent upward movement, not a single target.",
   },
   {
     question: "How long should I wait before re-measuring my workflow?",
