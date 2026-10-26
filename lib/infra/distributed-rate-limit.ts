@@ -23,7 +23,7 @@ import "server-only";
  */
 
 import { Redis } from "@upstash/redis";
-import { getSupabaseServer, SUPABASE_SERVICE_CONFIGURED } from "@/lib/infra/supabase/server";
+import { getSupabaseService, SUPABASE_SERVICE_CONFIGURED } from "@/lib/infra/supabase/server";
 
 export interface DistributedRateLimitConfig {
   /** Time window in milliseconds. */
@@ -64,7 +64,7 @@ type PgHit = { hits: number; reset_seconds: number };
 /** Returns null when Postgres isn't usable, so callers can degrade. */
 async function pgLimit(key: string, config: DistributedRateLimitConfig): Promise<DistributedRateLimitResult | null> {
   if (!SUPABASE_SERVICE_CONFIGURED) return null;
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) return null;
   const windowSeconds = Math.max(1, Math.ceil(config.windowMs / 1000));
   const { data, error } = await sb.rpc("api_rate_limit_hit", {

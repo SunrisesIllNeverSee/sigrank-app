@@ -10,7 +10,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseServer, getSupabaseService } from "@/lib/infra/supabase/server";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +49,12 @@ export async function GET(
     );
   }
 
-  const { data: report } = await sb
+  // Private reports are invisible to anon; the service client sees them so the
+  // owner check below can still serve them to the linked operator.
+  const svc = getSupabaseService();
+  if (!svc) return json({ status: "unavailable" }, 503);
+
+  const { data: report } = await svc
     .from("operator_reports")
     .select("report, report_visible, created_at")
     .eq("operator_id", op.operator_id)
