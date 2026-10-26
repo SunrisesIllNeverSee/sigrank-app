@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
 /**
  * app/privacy/page.tsx — standalone Privacy Policy page (owner 2026-07-16:
@@ -19,7 +20,50 @@ export const metadata: Metadata = withOG({
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 py-8">
+    <WorkspaceShell
+      active="home"
+      editorialStage
+      title="PRIVACY POLICY"
+      leftTitle="LEGAL"
+      left={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />DOCUMENTS</div>
+            <nav className="ws-nav">
+              <Link href="/terms">Terms of service</Link>
+              <Link href="/eula">EULA</Link>
+              <Link href="/about">About SigRank</Link>
+            </nav>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />YOUR DATA</div>
+            <nav className="ws-nav">
+              <Link href="/settings">Privacy &amp; data settings</Link>
+            </nav>
+          </div>
+        </>
+      }
+      rightTitle="META"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />PRIVACY</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">updated</span><span className="v">2026-10-10</span></div>
+              <div className="row"><span className="k">collected</span><span className="v acc">token counts</span></div>
+              <div className="row"><span className="k">never</span><span className="v">prompts · code</span></div>
+            </div>
+            <p className="ws-note" style={{ marginTop: 8 }}>
+              Token counts only — your sessions stay on your machine.
+            </p>
+          </div>
+        </>
+      }
+      leftWidth={228}
+      rightWidth={252}
+      status={<>PRIVACY POLICY · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+    <div className="ws-doc mx-auto flex max-w-2xl flex-col gap-6 py-8">
       <header className="flex flex-col gap-1">
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           Privacy Policy
@@ -340,5 +384,6 @@ export default function PrivacyPage() {
         </Link>
       </div>
     </div>
+    </WorkspaceShell>
   );
 }

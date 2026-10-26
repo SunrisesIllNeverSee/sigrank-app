@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
 /**
  * app/terms/page.tsx — standalone Terms of Service page (owner 2026-07-16:
@@ -19,7 +20,43 @@ export const metadata: Metadata = withOG({
 
 export default function TermsPage() {
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 py-8">
+    <WorkspaceShell
+      active="home"
+      editorialStage
+      title="TERMS OF SERVICE"
+      leftTitle="LEGAL"
+      left={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />DOCUMENTS</div>
+            <nav className="ws-nav">
+              <Link href="/privacy">Privacy policy</Link>
+              <Link href="/eula">EULA</Link>
+              <Link href="/about">About SigRank</Link>
+            </nav>
+          </div>
+        </>
+      }
+      rightTitle="META"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />TERMS</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">updated</span><span className="v">2026-07-16</span></div>
+              <div className="row"><span className="k">operator</span><span className="v">Ello Cello LLC</span></div>
+            </div>
+            <p className="ws-note" style={{ marginTop: 8 }}>
+              Questions: hello@signalaf.com
+            </p>
+          </div>
+        </>
+      }
+      leftWidth={228}
+      rightWidth={252}
+      status={<>TERMS OF SERVICE · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+    <div className="ws-doc mx-auto flex max-w-2xl flex-col gap-6 py-8">
       <header className="flex flex-col gap-1">
         <h1 className="font-mono text-2xl font-bold tracking-wide text-text-primary">
           Terms of Service
@@ -175,5 +212,6 @@ export default function TermsPage() {
         </Link>
       </div>
     </div>
+    </WorkspaceShell>
   );
 }
