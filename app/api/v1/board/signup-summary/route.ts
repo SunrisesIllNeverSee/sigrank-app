@@ -91,7 +91,8 @@ export async function GET(req: NextRequest) {
       source: "live_server_account_anti_join",
       as_of: new Date().toISOString(),
     }, { headers: { "Cache-Control": "private, no-store" } });
-  } catch {
+  } catch (e) {
+    console.error("[board/signup-summary] unavailable:", e instanceof Error ? e.message : e);
     return NextResponse.json({ status: "unavailable" }, { status: 503 });
   }
 }
