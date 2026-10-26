@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 
 export const metadata: Metadata = withOG({
   title: "Support",
@@ -11,6 +12,60 @@ export const metadata: Metadata = withOG({
 
 export default function SupportPage() {
   return (
+    <WorkspaceShell
+      active="home"
+      editorialStage
+      title="SUPPORT"
+      bareTitle
+      leftTitle="HELP"
+      left={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />SELF-SERVE</div>
+            <nav className="ws-nav">
+              <Link href="/faq">FAQ</Link>
+              <Link href="/wiki">Wiki</Link>
+              <Link href="/mcp">MCP documentation</Link>
+              <Link href="/contact">Contact form</Link>
+            </nav>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />DOCS</div>
+            <nav className="ws-nav">
+              <Link href="/methodology">Methodology</Link>
+              <Link href="/about">About SigRank</Link>
+              <Link href="/vercel">Vercel integration</Link>
+            </nav>
+          </div>
+        </>
+      }
+      rightTitle="CHANNELS"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />DIRECT</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">email</span><span className="v">hello@signalaf.com</span></div>
+              <div className="row"><span className="k">x</span><span className="v">@burnmydays</span></div>
+            </div>
+            <p className="ws-note" style={{ marginTop: 8 }}>
+              Can&apos;t find what you need? Reach out directly — we read
+              everything.
+            </p>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />LEGAL</div>
+            <nav className="ws-nav">
+              <Link href="/privacy">Privacy policy</Link>
+              <Link href="/terms">Terms of service</Link>
+            </nav>
+          </div>
+        </>
+      }
+      leftWidth={228}
+      rightWidth={252}
+      status={<>SUPPORT · SIGNALAF × SIGRANK</>}
+    >
     <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold">Support</p>
       <h1 className="mt-3 font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
@@ -170,6 +225,7 @@ export default function SupportPage() {
         </Link>
       </section>
     </main>
+    </WorkspaceShell>
   );
 }
 

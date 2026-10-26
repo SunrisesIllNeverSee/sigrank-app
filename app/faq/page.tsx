@@ -14,6 +14,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -93,28 +94,76 @@ const FAQS: { question: string; answer: string }[] = [
 
 export default function FaqPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <WorkspaceShell
+      active="home"
+      editorialStage
+      title="FAQ"
+      bareTitle
+      hero={
+        <WaveHero
+          eyebrow="◈ FAQ"
+          terminalText="FAQ"
+          title="Frequently Asked Questions"
+          subtitle={
+            <>
+              Answers to the most common questions about{" "}
+              <span className="text-gold">AI operator performance</span> — who
+              is the best, how to measure up, and what makes a top AI user.{" "}
+              <span className="font-mono text-xs text-text-dim">
+                Last updated: October 25, 2026
+              </span>
+            </>
+          }
+        />
+      }
+      leftTitle="ANSWERS"
+      left={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />GUIDES</div>
+            <nav className="ws-nav">
+              <Link href="/methodology">Methodology</Link>
+              <Link href="/wiki">Wiki</Link>
+              <Link href="/support">Support</Link>
+              <Link href="/contact">Contact</Link>
+            </nav>
+          </div>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />BOARD</div>
+            <nav className="ws-nav">
+              <Link href="/">Leaderboard</Link>
+              <Link href="/hall">Hall of Signal</Link>
+              <Link href="/metrics/yield-cascade">Yield (Υ) cascade</Link>
+            </nav>
+          </div>
+        </>
+      }
+      rightTitle="META"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />FAQ</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">questions</span><span className="v">{FAQS.length}</span></div>
+              <div className="row"><span className="k">updated</span><span className="v">Oct 25, 2026</span></div>
+            </div>
+            <p className="ws-note" style={{ marginTop: 8 }}>
+              Common questions about AI operator performance — who is the best,
+              how to measure up, what makes a top AI user.
+            </p>
+          </div>
+        </>
+      }
+      leftWidth={228}
+      rightWidth={252}
+      status={<>FAQ · SIGNALAF × SIGRANK</>}
+    >
+    <div className="ws-doc mx-auto flex max-w-3xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([{ name: "FAQ", path: "/faq" }]),
           faqPage(FAQS),
         ]}
-      />
-
-      <WaveHero
-        eyebrow="◈ FAQ"
-        terminalText="FAQ"
-        title="Frequently Asked Questions"
-        subtitle={
-          <>
-            Answers to the most common questions about{" "}
-            <span className="text-gold">AI operator performance</span> — who is
-            the best, how to measure up, and what makes a top AI user.{" "}
-            <span className="font-mono text-xs text-text-dim">
-              Last updated: October 25, 2026
-            </span>
-          </>
-        }
       />
 
       {/* ── FAQ section ── */}
@@ -202,5 +251,6 @@ export default function FaqPage() {
         </ul>
       </section>
     </div>
+    </WorkspaceShell>
   );
 }
