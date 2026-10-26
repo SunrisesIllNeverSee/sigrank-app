@@ -51,7 +51,7 @@
     "html-to-image": "^1.11.13",
     "next": "^16.4.2",
     "posthog-js": "^1.438.12",
-    "posthog-node": "^5.55.0",
+    "posthog-node": "^5.57.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-is": "^19.3.1",
