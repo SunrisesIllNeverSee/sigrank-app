@@ -225,6 +225,7 @@ export function WorkspaceShell({
   }, [leftOn, railOn]);
   const [acctPop, setAcctPop] = useState(false);
   const [ftrMin, setFtrMin] = useState(false);
+  const [pagesPop, setPagesPop] = useState(false);
   const [iconSet, setIconSet] = useRailIconSet();
   const [notifOpen, setNotifOpen] = useState(false);
 
@@ -329,6 +330,23 @@ export function WorkspaceShell({
     [collapse],
   );
   const acctRef = useRef<HTMLDivElement | null>(null);
+  const pagesRef = useRef<HTMLDivElement | null>(null);
+
+  /* footer PAGES popover — same outside-click contract as the account pop. */
+  useEffect(() => {
+    if (!pagesPop) return;
+    const onDoc = (e: MouseEvent) => {
+      if (
+        pagesRef.current &&
+        e.target instanceof Node &&
+        !pagesRef.current.contains(e.target)
+      ) {
+        setPagesPop(false);
+      }
+    };
+    document.addEventListener("click", onDoc);
+    return () => document.removeEventListener("click", onDoc);
+  }, [pagesPop]);
   const snavRef = useRef<HTMLElement | null>(null);
 
   /* account + enterprise popovers close on outside click (same contract). */
@@ -605,6 +623,43 @@ export function WorkspaceShell({
             <button className="fmin" onClick={() => setFtrMin((v) => !v)}>
               {ftrMin ? "▸ LINKS" : "▾ LINKS"}
             </button>
+            <div className="fpages" ref={pagesRef}>
+              <button className="fmin" onClick={() => setPagesPop((v) => !v)}>
+                {pagesPop ? "▾ PAGES" : "▸ PAGES"}
+              </button>
+              <div className="ftrpop" hidden={!pagesPop}>
+                <div className="fgroup">
+                  <span className="fhead">PRODUCT</span>
+                  <Link href="/board/all">Leaderboard</Link>
+                  <Link href="/compare">Compare</Link>
+                  <Link href="/hall">Hall of Signal</Link>
+                  <Link href="/score">Get scored</Link>
+                  <Link href="/live">Live board</Link>
+                </div>
+                <div className="fgroup">
+                  <span className="fhead">DOCS</span>
+                  <Link href="/about">About</Link>
+                  <Link href="/methodology">Methodology</Link>
+                  <Link href="/wiki">Wiki</Link>
+                  <Link href="/faq">FAQ</Link>
+                  <Link href="/mcp">MCP</Link>
+                </div>
+                <div className="fgroup">
+                  <span className="fhead">SUPPORT</span>
+                  <Link href="/support">Support</Link>
+                  <Link href="/contact">Contact</Link>
+                  <Link href="/developers">Developers</Link>
+                  <Link href="/pricing">Pricing</Link>
+                  <Link href="/settings">Settings</Link>
+                </div>
+                <div className="fgroup">
+                  <span className="fhead">LEGAL</span>
+                  <Link href="/privacy">Privacy</Link>
+                  <Link href="/terms">Terms</Link>
+                  <Link href="/eula">EULA</Link>
+                </div>
+              </div>
+            </div>
             <div className="flinks">
               <Link href="/board/all">LEADERBOARD</Link>
               <a href="/compare">COMPARE</a>
