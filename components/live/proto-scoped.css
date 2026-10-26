@@ -384,6 +384,19 @@
 .lbw-root .ap-item:hover{background:var(--sel);color:var(--tx)}
 .lbw-root .ap-item.mut:hover{color:var(--dn)}
 
+/* footer PAGES popover — grouped site map, opens upward like the account pop */
+.lbw-root .fpages{position:relative;display:flex}
+.lbw-root .ftrpop{position:absolute;bottom:calc(100% + 8px);left:0;z-index:30;
+  background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;gap:18px}
+.lbw-root .ftrpop[hidden]{display:none}
+.lbw-root .ftrpop .fgroup{display:flex;flex-direction:column;gap:2px;min-width:90px}
+.lbw-root .ftrpop .fhead{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;
+  color:var(--mut);padding:4px 10px 6px}
+.lbw-root .ftrpop .fgroup a{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.13em;
+  color:var(--tx2);padding:5px 10px;border-radius:5px;white-space:nowrap}
+.lbw-root .ftrpop .fgroup a:hover{background:var(--sel);color:var(--tx)}
+
 .lbw-root .stage{flex:1;min-height:0;overflow-y:auto;min-width:0;padding:0 22px 34px}
 
 /* ---------- LB-02 hero (optional banner block, off by default) ---------- */
