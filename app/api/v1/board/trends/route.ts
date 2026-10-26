@@ -46,7 +46,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({metric:"yield",window:windowType,trends},{
       headers:{"Cache-Control":"public, s-maxage=600, stale-while-revalidate=3600"},
     });
-  } catch {
+  } catch (e) {
+    console.error("[board/trends] unavailable:", e instanceof Error ? e.message : e);
     return NextResponse.json({status:"unavailable"}, {status:503});
   }
 }
