@@ -63,7 +63,7 @@
     "simple-statistics": "^7.12.1",
     "stripe": "^23.0.0",
     "token-cascade": "0.2.1",
-    "workflow": "^4.8.2",
+    "workflow": "^5.2.3",
     "zod": "^4.6.7"
   },
   "devDependencies": {
