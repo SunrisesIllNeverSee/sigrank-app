@@ -2377,9 +2377,7 @@ export function LiveBoardWorkspace({
               <a href="https://www.npmjs.com/package/sigrank">npx sigrank</a>
             </div>
             <span className="fsig">
-              SIGNALAF × SIGRANK — production live board
-              {initial.meta.ruleset ? ` · RULESET ${initial.meta.ruleset}` : ""}{" "}
-              · <span>{fmode}</span> · POWERED BY MO§ES™ ·{" "}
+              SIGNALAF × SIGRANK · <span>{fmode}</span> · POWERED BY MO§ES™ ·{" "}
               <span>{COPY.privacy.toUpperCase()}</span>
             </span>
           </footer>
