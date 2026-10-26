@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { ConnectDevicePanel } from "@/components/settings/ConnectDevicePanel";
+import { LinkedAccounts } from "@/components/settings/LinkedAccounts";
 import { DangerZone } from "@/components/settings/DangerZone";
 import { DataPrivacy } from "@/components/settings/DataPrivacy";
 
@@ -163,6 +164,15 @@ export function SettingsAccount() {
           </div>
         )}
       </Section>
+
+      {op && (
+        <Section
+          title="Connected accounts"
+          desc="Additional sign-in methods attached to this account."
+        >
+          <LinkedAccounts />
+        </Section>
+      )}
 
       {op && (
         <Section

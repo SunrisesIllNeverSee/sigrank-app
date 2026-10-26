@@ -99,6 +99,42 @@ export async function signInWithEmail(
   return error ? { error: error.message } : {};
 }
 
+/** The OAuth providers a signed-in user can link to their account. */
+export type LinkableProvider = "github" | "twitter" | "linkedin_oidc";
+
+export const LINKABLE_PROVIDERS: LinkableProvider[] = [
+  "github",
+  "twitter",
+  "linkedin_oidc",
+];
+
+/** Provider ids the current user's auth identities cover ("github", "email", …). */
+export async function getLinkedProviderIds(): Promise<string[]> {
+  const sb = createBrowserClient();
+  if (!sb) return [];
+  const { data, error } = await sb.auth.getUserIdentities();
+  if (error || !data) return [];
+  return (data.identities ?? []).map((i) => i.provider);
+}
+
+/** Attach an OAuth provider to the CURRENT signed-in account. Same redirect
+ *  contract as sign-in: Supabase bounces through the provider and returns to
+ *  /auth/callback, which exchanges the code and completes the link. Requires a
+ *  live session and the provider enabled in Supabase Auth; failures return an
+ *  honest error message. */
+export async function linkOAuthIdentity(
+  provider: LinkableProvider,
+  next?: string,
+): Promise<{ error?: string }> {
+  const sb = createBrowserClient();
+  if (!sb) return { error: "Sign-in is not configured yet." };
+  const { error } = await sb.auth.linkIdentity({
+    provider,
+    options: { redirectTo: callbackUrl(next) },
+  });
+  return error ? { error: error.message } : {};
+}
+
 /** Sign the current user out (clears the session cookie). */
 export async function signOut(): Promise<void> {
   const sb = createBrowserClient();
