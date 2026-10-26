@@ -21,7 +21,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 
 const VERCEL_TOKEN_URL = "https://api.vercel.com/v2/oauth/access_token";
 const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://signalaf.com").replace(/\/$/, "");
@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Persist the installation. Try Supabase first; fall back to a cookie.
-    const supabase = getSupabaseServer();
+    const supabase = getSupabaseService();
     const configId = installationId;
 
     if (supabase) {
