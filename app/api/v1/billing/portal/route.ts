@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/infra/stripe/server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
 
 /**
@@ -26,7 +26,7 @@ export const runtime = "nodejs";
  * column (schema.sql §1); the subscriptions table has no such column.
  */
 async function customerForOperator(operatorId: string): Promise<string | null> {
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) return null;
   try {
     const { data } = await sb

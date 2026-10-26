@@ -18,7 +18,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { resolveAuth } from "@/lib/infra/api-auth";
 import { rateLimit, rateLimitHeaders, rateLimitedResponse } from "@/lib/infra/api-gate";
 import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     now.toISOString().slice(0, 16),
   );
 
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
 
   // Mock path — no Supabase configured
   if (!sb) {
@@ -256,7 +256,7 @@ export async function GET(req: NextRequest) {
   const format = searchParams.get("format") ?? "";
   const limit = Math.min(parseInt(searchParams.get("limit") ?? "20", 10), 100);
 
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) {
     return NextResponse.json(
       { challenges: [], mock: true },

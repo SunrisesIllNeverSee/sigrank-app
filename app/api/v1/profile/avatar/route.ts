@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 
 /**
  * POST /api/v1/profile/avatar — upload the signed-in operator's avatar.
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   if (!op)
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
 
-  const svc = getSupabaseServer();
+  const svc = getSupabaseService();
   if (!svc)
     return NextResponse.json(
       { error: "Storage is not configured." },

@@ -16,7 +16,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, getSessionUser } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseServer, getSupabaseService } from "@/lib/infra/supabase/server";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 /* per-user state — never cache */
@@ -37,7 +37,7 @@ async function resolveOperatorId(codename: string): Promise<string | null> {
 }
 
 async function watchCount(operatorId: string): Promise<number> {
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) return 0;
   const { count } = await sb
     .from("operator_watches")

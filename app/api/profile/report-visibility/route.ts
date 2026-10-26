@@ -12,7 +12,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const svc = getSupabaseServer();
+    const svc = getSupabaseService();
     if (!svc) {
       return NextResponse.json(
         { status: "error", reason: "server_not_configured" },

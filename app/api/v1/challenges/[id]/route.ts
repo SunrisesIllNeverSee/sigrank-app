@@ -39,7 +39,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { resolveAuth } from "@/lib/infra/api-auth";
 import { extractVerifiedCert, certBindsTo } from "@/lib/identity/challenge-cert";
 import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
@@ -75,7 +75,7 @@ export async function GET(
   if (muted) return muted;
 
   const { id } = await params;
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) {
     return NextResponse.json(
       { error: "db_not_configured", mock: true },
@@ -255,7 +255,7 @@ export async function PATCH(
     ? verifiedCert.composite
     : 0; // pending submissions have composite=0 (not ranked)
 
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) {
     // Mock path
     return NextResponse.json({

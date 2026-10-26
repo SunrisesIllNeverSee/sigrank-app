@@ -7,7 +7,7 @@ import { getOperator } from "@/lib/board/queries";
 import { isPublishedBoardRow } from "@/lib/board/published-row";
 import { describeBuildArchetype } from "@/lib/analytics/build-archetypes";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { safeName, trustedClientIp, ttlMemo } from "@/lib/mcp/untrusted";
 import { formatBetaReport, prepareBetaReport } from "./bug-report";
 
@@ -97,7 +97,7 @@ function requireCodename(value: unknown): string {
 }
 
 async function loadLiveBoard(scope: Scope): Promise<LeaderboardRow[]> {
-  const db = getSupabaseServer();
+  const db = getSupabaseService();
   if (!db) throw new ToolError("UPSTREAM_UNAVAILABLE", "Live SignalAF data is not configured.", true);
   // The general board facade falls back to fixtures on database errors. Probe the
   // source first and reject empty/error states so a fixture is never sold as live.

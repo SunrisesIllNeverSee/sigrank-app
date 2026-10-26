@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { captureServer } from "@/lib/infra/posthog/server";
 import { safeNext } from "@/lib/infra/safe-next";
 
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
 
   // FREE CLAIM: create/link the operator via the service role (privileged, idempotent
   // on the operator_accounts user_id PK).
-  const svc = getSupabaseServer();
+  const svc = getSupabaseService();
   if (svc) {
     const { data: existing } = await svc
       .from("operator_accounts")

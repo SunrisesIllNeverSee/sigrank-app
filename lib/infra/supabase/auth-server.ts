@@ -15,7 +15,7 @@ import "server-only";
 import { createServerClient as createSsrServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -75,7 +75,7 @@ export interface SessionOperator {
 export async function getSessionOperator(): Promise<SessionOperator | null> {
   const user = await getSessionUser();
   if (!user) return null;
-  const svc = getSupabaseServer();
+  const svc = getSupabaseService();
   if (!svc) return null;
   const { data } = await svc
     .from("operator_accounts")
