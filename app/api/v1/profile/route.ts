@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionOperator } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { revalidateOperatorIndexState } from "@/lib/ingest/materialize";
 import { SAVABLE_PLATFORM_DOMAINS } from "@/lib/constants";
 import { getProfileMarkOptions } from "@/lib/profile/profile-marks";
@@ -35,7 +35,7 @@ export async function GET() {
   const op = await getSessionOperator();
   if (!op) return NextResponse.json({ operator: null });
 
-  const svc = getSupabaseServer();
+  const svc = getSupabaseService();
   if (!svc) return NextResponse.json({ operator: null });
 
   const { data } = await svc
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
   if (!op)
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
 
-  const svc = getSupabaseServer();
+  const svc = getSupabaseService();
   if (!svc)
     return NextResponse.json(
       { error: "Profiles are not configured." },

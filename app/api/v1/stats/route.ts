@@ -16,7 +16,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { getHomepageStats } from "@/lib/board";
 import { rateLimit, rateLimitHeaders, rateLimitedResponse } from "@/lib/infra/api-gate";
 import { computeCascadeMetrics } from "@/lib/analytics/cascade";
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   const rl = rateLimit(req);
   if (!rl.ok) return rateLimitedResponse(rl);
 
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   const homeStats = await getHomepageStats();
 
   // Default response from homepage stats (system_stats singleton)

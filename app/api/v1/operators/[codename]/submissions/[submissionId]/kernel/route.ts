@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionUser } from "@/lib/infra/supabase/auth-server";
-import { getSupabaseServer } from "@/lib/infra/supabase/server";
+import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { rateLimit, rateLimitedResponse } from "@/lib/infra/api-gate";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest, { params }: {
   if (!/^[a-zA-Z0-9_-]{1,100}$/.test(codename) || !/^[a-zA-Z0-9_-]{1,130}$/.test(submissionId)) {
     return NextResponse.json({ error: "Invalid identifier" }, { status: 400, headers });
   }
-  const sb = getSupabaseServer();
+  const sb = getSupabaseService();
   if (!sb) return NextResponse.json({ error: "Unavailable" }, { status: 503, headers });
   const { data: linked, error: linkError } = await sb
     .from("operator_accounts").select("operator_id").eq("user_id", user.id).maybeSingle();
