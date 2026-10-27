@@ -120,6 +120,9 @@ export interface WorkspaceShellProps {
   status?: ReactNode;
   /** Consistent centered editorial layout for text/research pages only. */
   editorialStage?: boolean;
+  /** With editorialStage: show the writing-credit footer (off for app pages
+   *  such as /settings and /contact that use the stage only for layout). */
+  editorialCredit?: boolean;
   /** Page-specific entry palette. An explicit ?theme= still overrides it;
    * user theme controls still work after entering this page. */
   defaultTheme?: ThemeName;
@@ -150,6 +153,7 @@ export function WorkspaceShell({
   rightOpenSignal,
   status,
   editorialStage = false,
+  editorialCredit = true,
   defaultTheme,
   children,
 }: WorkspaceShellProps) {
@@ -586,7 +590,7 @@ export function WorkspaceShell({
                 <div className="board">
                   {hero && <div className="ws-hero">{hero}</div>}
                   {children}
-                  {editorialStage && <footer className="ws-editorial-credit" aria-label="Writing credits">
+                  {editorialStage && editorialCredit && <footer className="ws-editorial-credit" aria-label="Writing credits">
                     <span>Written by <Link href="/about">Deric J. McHenry</Link></span>
                     <span>Published by SignalAF · SigRank</span>
                   </footer>}
