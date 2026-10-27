@@ -16,7 +16,7 @@ export default function ContactPage() {
   return (
     <EditorialWorkspaceFrame
       topic="support"
-      editorialStage={false}
+      credit={false}
       title="CONTACT"
       hero={
         <WaveHero
@@ -46,8 +46,13 @@ export default function ContactPage() {
         </>
       }
       status={<>CONTACT · SIGNALAF × SIGRANK</>}
+      pageContents={
+        <nav className="ws-nav" aria-label="Sections on this page">
+          <a href="#contact-form">Send a message</a>
+        </nav>
+      }
     >
-      <div className="mx-auto max-w-lg px-4 py-12">
+      <div id="contact-form" className="mx-auto max-w-lg px-4 py-12">
         <ContactForm />
       </div>
     </EditorialWorkspaceFrame>

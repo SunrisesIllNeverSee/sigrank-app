@@ -42,8 +42,10 @@ interface Props {
   rightTitle?: string;
   rightDefaultOpen?: boolean;
   status?: ReactNode;
-  /** Writing-credit footer + editorial stage spacing. Off for app pages. */
+  /** Centered editorial stage layout (text spacing, measure). */
   editorialStage?: boolean;
+  /** Writing-credit footer under the page. Off for app pages. */
+  credit?: boolean;
   /** Collection entries for the active topic (defaults to the static PAGES list). */
   documents?: WorkspaceDocument[];
   /** Replaces the auto-discovered h2 section list under the active page. */
@@ -70,6 +72,7 @@ export function EditorialWorkspaceFrame({
   rightDefaultOpen,
   status,
   editorialStage = true,
+  credit = true,
   documents,
   pageContents,
 }: Props) {
@@ -77,6 +80,7 @@ export function EditorialWorkspaceFrame({
     <WorkspaceShell
       active={rail ?? RAIL[topic]}
       editorialStage={editorialStage}
+      editorialCredit={credit}
       title={title}
       bareTitle={!titleStrip}
       srOnlyTitle={!titleStrip && srOnlyTitle}

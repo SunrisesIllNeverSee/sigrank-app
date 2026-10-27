@@ -50,7 +50,7 @@ export default function SettingsPage() {
       topic="support"
       rail="profile"
       titleStrip
-      editorialStage={false}
+      credit={false}
       title="SETTINGS"
       rightTitle="DATA"
       right={
