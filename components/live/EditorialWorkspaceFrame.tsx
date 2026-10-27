@@ -9,6 +9,11 @@ const RAIL: Record<WorkspaceTopic, WorkspaceNav> = {
   articles: "blog",
   blog: "blog",
   wiki: "wiki",
+  guides: "wiki",
+  tools: "wiki",
+  compare: "compare",
+  alternatives: "compare",
+  evaluation: "compare",
   support: "home",
   legal: "home",
 };
@@ -19,6 +24,11 @@ const SECTION: Record<WorkspaceTopic, string> = {
   articles: "PUBLISHING",
   blog: "PUBLISHING",
   wiki: "ENTRY",
+  guides: "GUIDES",
+  tools: "TOOLS",
+  compare: "COMPARE",
+  alternatives: "ALTERNATIVES",
+  evaluation: "EVALUATION",
   support: "HELP",
   legal: "LEGAL",
 };
