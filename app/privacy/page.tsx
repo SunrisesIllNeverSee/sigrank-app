@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 
 /**
  * app/privacy/page.tsx — standalone Privacy Policy page (owner 2026-07-16:
@@ -20,29 +20,9 @@ export const metadata: Metadata = withOG({
 
 export default function PrivacyPage() {
   return (
-    <WorkspaceShell
-      active="home"
-      editorialStage
+    <EditorialWorkspaceFrame
+      topic="legal"
       title="PRIVACY POLICY"
-      leftTitle="LEGAL"
-      left={
-        <>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />DOCUMENTS</div>
-            <nav className="ws-nav">
-              <Link href="/terms">Terms of service</Link>
-              <Link href="/eula">EULA</Link>
-              <Link href="/about">About SigRank</Link>
-            </nav>
-          </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />YOUR DATA</div>
-            <nav className="ws-nav">
-              <Link href="/settings">Privacy &amp; data settings</Link>
-            </nav>
-          </div>
-        </>
-      }
       rightTitle="META"
       right={
         <>
@@ -59,8 +39,6 @@ export default function PrivacyPage() {
           </div>
         </>
       }
-      leftWidth={228}
-      rightWidth={252}
       status={<>PRIVACY POLICY · SIGNALAF × SIGRANK · MO§ES™</>}
     >
     <div className="ws-doc mx-auto flex max-w-2xl flex-col gap-6 py-8">
@@ -384,6 +362,6 @@ export default function PrivacyPage() {
         </Link>
       </div>
     </div>
-    </WorkspaceShell>
+    </EditorialWorkspaceFrame>
   );
 }
