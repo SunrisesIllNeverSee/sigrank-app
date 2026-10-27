@@ -3,7 +3,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "Contact",
@@ -14,29 +14,16 @@ export const metadata: Metadata = withOG({
 
 export default function ContactPage() {
   return (
-    <WorkspaceShell
-      active="home"
+    <EditorialWorkspaceFrame
+      topic="support"
+      credit={false}
       title="CONTACT"
-      bareTitle
       hero={
         <WaveHero
           eyebrow="Contact"
           title="Get in touch"
           subtitle="Feedback, questions, partnerships, or bug reports — we read everything."
         />
-      }
-      leftTitle="MORE"
-      left={
-        <>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />HELP</div>
-            <nav className="ws-nav">
-              <Link href="/faq">FAQ</Link>
-              <Link href="/support">Support</Link>
-              <Link href="/methodology">Methodology</Link>
-            </nav>
-          </div>
-        </>
       }
       rightTitle="CHANNELS"
       right={
@@ -58,13 +45,16 @@ export default function ContactPage() {
           </div>
         </>
       }
-      leftWidth={228}
-      rightWidth={252}
       status={<>CONTACT · SIGNALAF × SIGRANK</>}
+      pageContents={
+        <nav className="ws-nav" aria-label="Sections on this page">
+          <a href="#contact-form">Send a message</a>
+        </nav>
+      }
     >
-      <div className="mx-auto max-w-lg px-4 py-12">
+      <div id="contact-form" className="mx-auto max-w-lg px-4 py-12">
         <ContactForm />
       </div>
-    </WorkspaceShell>
+    </EditorialWorkspaceFrame>
   );
 }

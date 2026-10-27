@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { RemovalRequest } from "@/components/settings/RemovalRequest";
 import { SettingsAccount } from "@/components/settings/SettingsAccount";
-import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 import { withOG } from "@/lib/seo";
 
 /**
@@ -46,11 +46,14 @@ function Section({
 
 export default function SettingsPage() {
   return (
-    <WorkspaceShell
-      active="profile"
+    <EditorialWorkspaceFrame
+      topic="support"
+      rail="profile"
+      titleStrip
+      credit={false}
       title="SETTINGS"
-      leftTitle="ACCOUNT"
-      left={
+      rightTitle="DATA"
+      right={
         <>
           <div className="mod">
             <div className="mini-h"><span className="sq" />YOUR PROFILE</div>
@@ -60,19 +63,6 @@ export default function SettingsPage() {
               <Link href="/me/sharables">Sharables</Link>
             </nav>
           </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />BOARD</div>
-            <nav className="ws-nav">
-              <Link href="/">Leaderboard</Link>
-              <Link href="/hall">Hall of Signal</Link>
-              <Link href="/faq">FAQ</Link>
-            </nav>
-          </div>
-        </>
-      }
-      rightTitle="DATA"
-      right={
-        <>
           <div className="mod">
             <div className="mini-h"><span className="sq" />PRIVACY</div>
             <p className="ws-note">
@@ -90,8 +80,6 @@ export default function SettingsPage() {
           </div>
         </>
       }
-      leftWidth={228}
-      rightWidth={252}
       status={<>SETTINGS · ACCOUNT · SIGNALAF × SIGRANK</>}
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-6 py-6">
@@ -127,6 +115,6 @@ export default function SettingsPage() {
           </p>
         </Section>
       </div>
-    </WorkspaceShell>
+    </EditorialWorkspaceFrame>
   );
 }
