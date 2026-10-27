@@ -14,7 +14,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
@@ -94,11 +94,9 @@ const FAQS: { question: string; answer: string }[] = [
 
 export default function FaqPage() {
   return (
-    <WorkspaceShell
-      active="home"
-      editorialStage
+    <EditorialWorkspaceFrame
+      topic="support"
       title="FAQ"
-      bareTitle
       hero={
         <WaveHero
           eyebrow="◈ FAQ"
@@ -116,28 +114,6 @@ export default function FaqPage() {
           }
         />
       }
-      leftTitle="ANSWERS"
-      left={
-        <>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />GUIDES</div>
-            <nav className="ws-nav">
-              <Link href="/methodology">Methodology</Link>
-              <Link href="/wiki">Wiki</Link>
-              <Link href="/support">Support</Link>
-              <Link href="/contact">Contact</Link>
-            </nav>
-          </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />BOARD</div>
-            <nav className="ws-nav">
-              <Link href="/">Leaderboard</Link>
-              <Link href="/hall">Hall of Signal</Link>
-              <Link href="/metrics/yield-cascade">Yield (Υ) cascade</Link>
-            </nav>
-          </div>
-        </>
-      }
       rightTitle="META"
       right={
         <>
@@ -154,8 +130,6 @@ export default function FaqPage() {
           </div>
         </>
       }
-      leftWidth={228}
-      rightWidth={252}
       status={<>FAQ · SIGNALAF × SIGRANK</>}
     >
     <div className="ws-doc mx-auto flex max-w-3xl flex-col gap-8 py-2">
@@ -251,6 +225,6 @@ export default function FaqPage() {
         </ul>
       </section>
     </div>
-    </WorkspaceShell>
+    </EditorialWorkspaceFrame>
   );
 }

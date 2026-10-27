@@ -9,10 +9,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type WorkspaceTopic = "home" | "field" | "articles" | "blog" | "wiki";
+export type WorkspaceTopic = "home" | "field" | "articles" | "blog" | "wiki" | "support" | "legal";
 export type TextPage =
   | "home" | "fieldhub" | "field" | "research" | "science" | "about" | "methodology"
-  | "articles" | "blog" | "wiki";
+  | "articles" | "blog" | "wiki" | "support" | "legal";
 
 const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }> = [
   { id: "home", label: "SigRank", href: "/sigrank" },
@@ -20,6 +20,8 @@ const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }>
   { id: "articles", label: "Articles", href: "/articles" },
   { id: "blog", label: "Blog", href: "/blog" },
   { id: "wiki", label: "Wiki", href: "/wiki" },
+  { id: "support", label: "Support", href: "/support" },
+  { id: "legal", label: "Legal", href: "/terms" },
 ];
 
 const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string }>> = {
@@ -54,11 +56,26 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
     { label: "Methodology Refinement", href: "/wiki/methodology-refinement" },
     { label: "Local Agent", href: "/wiki/local-agent" },
   ],
+  support: [
+    { label: "Support", href: "/support" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Contact", href: "/contact" },
+    { label: "Settings", href: "/settings" },
+  ],
+  legal: [
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "EULA", href: "/eula" },
+  ],
 };
+
+/** Topics whose href is a real index page (the reader picks a document there).
+ *  The others (Support, Legal) land on an ordinary document, so their branch opens. */
+const INDEX_TOPICS: ReadonlySet<WorkspaceTopic> = new Set(["home", "field", "articles", "blog", "wiki"]);
 
 const topicForPage = (page: TextPage): WorkspaceTopic => {
   if (page === "home") return "home";
-  if (page === "articles" || page === "blog" || page === "wiki") return page;
+  if (page === "articles" || page === "blog" || page === "wiki" || page === "support" || page === "legal") return page;
   return "field";
 };
 
@@ -270,7 +287,7 @@ export function EditorialNav({
                /blog, …) leaves every dropdown closed — the index page is where
                a reading is picked; the ▸ toggle still opens the list. A reading
                page opens its own section so the current piece is visible. */
-            <details key={item.id + pathname} open={selected && pathname !== item.href} className="ws-tree-details ws-topic-branch">
+            <details key={item.id + pathname} open={selected && (pathname !== item.href || !INDEX_TOPICS.has(item.id))} className="ws-tree-details ws-topic-branch">
               <summary className={"ws-tree-row" + (selected ? " active" : "")}>
                 <Link href={item.href} className="ws-tree-title"
                   aria-current={pathname === item.href ? "page" : undefined}>{item.label}</Link>
@@ -279,7 +296,7 @@ export function EditorialNav({
               <div className="ws-topic-documents">
                 {pages.map(entry => {
                   const active = selected && pathname === entry.href;
-                  return active && (pathname !== item.href || item.id === "home" || item.id === "wiki") ? (
+                  return active && (pathname !== item.href || !INDEX_TOPICS.has(item.id) || item.id === "home" || item.id === "wiki") ? (
                     <details key={entry.href} open className="ws-tree-details ws-document-branch">
                       <summary className="ws-tree-row active">
                         <Link href={entry.href} className="ws-tree-title" aria-current="page">{entry.label}</Link>

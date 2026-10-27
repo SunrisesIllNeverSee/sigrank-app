@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
-import { WorkspaceShell } from "@/components/live/WorkspaceShell";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "Support",
@@ -12,33 +12,9 @@ export const metadata: Metadata = withOG({
 
 export default function SupportPage() {
   return (
-    <WorkspaceShell
-      active="home"
-      editorialStage
+    <EditorialWorkspaceFrame
+      topic="support"
       title="SUPPORT"
-      bareTitle
-      leftTitle="HELP"
-      left={
-        <>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />SELF-SERVE</div>
-            <nav className="ws-nav">
-              <Link href="/faq">FAQ</Link>
-              <Link href="/wiki">Wiki</Link>
-              <Link href="/mcp">MCP documentation</Link>
-              <Link href="/contact">Contact form</Link>
-            </nav>
-          </div>
-          <div className="mod">
-            <div className="mini-h"><span className="sq" />DOCS</div>
-            <nav className="ws-nav">
-              <Link href="/methodology">Methodology</Link>
-              <Link href="/about">About SigRank</Link>
-              <Link href="/vercel">Vercel integration</Link>
-            </nav>
-          </div>
-        </>
-      }
       rightTitle="CHANNELS"
       right={
         <>
@@ -54,16 +30,17 @@ export default function SupportPage() {
             </p>
           </div>
           <div className="mod">
-            <div className="mini-h"><span className="sq" />LEGAL</div>
+            <div className="mini-h"><span className="sq" />DOCS</div>
             <nav className="ws-nav">
-              <Link href="/privacy">Privacy policy</Link>
-              <Link href="/terms">Terms of service</Link>
+              <Link href="/wiki">Wiki</Link>
+              <Link href="/mcp">MCP documentation</Link>
+              <Link href="/methodology">Methodology</Link>
+              <Link href="/about">About SigRank</Link>
+              <Link href="/vercel">Vercel integration</Link>
             </nav>
           </div>
         </>
       }
-      leftWidth={228}
-      rightWidth={252}
       status={<>SUPPORT · SIGNALAF × SIGRANK</>}
     >
     <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
@@ -225,7 +202,7 @@ export default function SupportPage() {
         </Link>
       </section>
     </main>
-    </WorkspaceShell>
+    </EditorialWorkspaceFrame>
   );
 }
 
