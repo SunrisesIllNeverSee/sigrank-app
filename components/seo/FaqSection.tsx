@@ -15,10 +15,16 @@
  * `collapsed` wraps the whole list in one outer disclosure whose summary is
  * the heading, so the section costs a single line until opened (used at the
  * foot of the 100vh board stage).
+ *
+ * `groups` (editorial only) sorts the questions into labelled panels in a
+ * two-column grid, each panel a compact list of disclosures, with `title` /
+ * `intro` as a section header. Questions not named in any group go in a last
+ * "More questions" panel, so nothing in `faqs` (and its JSON-LD) is dropped.
  */
 import type { ReactNode } from "react";
 
 type Faq = { question: string; answer: string };
+export type FaqGroup = { label: string; questions: readonly string[] };
 
 /** Render `inline code` spans (authored with backticks) as <code>. */
 function renderAnswer(text: string, codeClass: string): ReactNode {
@@ -40,12 +46,18 @@ export function FaqSection({
   heading = "FAQ",
   variant = "editorial",
   collapsed = false,
+  groups,
+  title,
+  intro,
 }: {
   faqs: readonly Faq[];
   id?: string;
   heading?: string;
   variant?: "editorial" | "workspace";
   collapsed?: boolean;
+  groups?: readonly FaqGroup[];
+  title?: string;
+  intro?: string;
 }) {
   const headingId = `${id}-heading`;
 
@@ -85,6 +97,71 @@ export function FaqSection({
 
   const summaryFocus =
     "rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold";
+  const codeClass = "rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold";
+
+  if (groups) {
+    const byQuestion = new Map(faqs.map((f) => [f.question, f]));
+    const named = new Set(groups.flatMap((g) => g.questions));
+    const rest = faqs.filter((f) => !named.has(f.question));
+    const panels = [
+      ...groups.map((g) => ({
+        label: g.label,
+        items: g.questions.flatMap((q) => byQuestion.get(q) ?? []),
+      })),
+      ...(rest.length ? [{ label: "More questions", items: rest }] : []),
+    ].filter((panel) => panel.items.length > 0);
+    return (
+      <section
+        id={id}
+        aria-labelledby={headingId}
+        className="my-16 flex flex-col gap-8 scroll-mt-20"
+      >
+        <div>
+          <div className="font-mono text-xs uppercase tracking-widest text-gold">
+            ⊙ {heading} · {faqs.length} questions
+          </div>
+          <h2
+            id={headingId}
+            className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl"
+          >
+            {title ?? heading}
+          </h2>
+          {intro && (
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">{intro}</p>
+          )}
+        </div>
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          {panels.map((panel) => (
+            <div
+              key={panel.label}
+              className="flex flex-col rounded-2xl border border-bg-border-subtle bg-bg-surface px-5 py-4"
+            >
+              <h3 className="pb-2 font-mono text-xs uppercase tracking-widest text-gold">
+                {panel.label}
+                <span className="text-text-dim"> · {panel.items.length}</span>
+              </h3>
+              <div className="flex flex-col divide-y divide-bg-border-subtle">
+                {panel.items.map((f) => (
+                  <details key={f.question} className="group py-3">
+                    <summary
+                      className={`flex cursor-pointer list-none items-start gap-2 font-sans text-base font-semibold text-text-primary [&::-webkit-details-marker]:hidden ${summaryFocus}`}
+                    >
+                      <span aria-hidden="true" className="mt-0.5 font-mono text-sm text-gold transition-transform group-open:rotate-90">▸</span>
+                      <span>{f.question}</span>
+                    </summary>
+                    <p className="mt-2 pl-5 font-sans text-base leading-relaxed text-text-secondary">
+                      {renderAnswer(f.answer, codeClass)}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       id={id}

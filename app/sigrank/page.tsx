@@ -15,7 +15,7 @@ import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { cliTool, aggregateStats, faqPage } from "@/lib/jsonld";
 import { FaqSection } from "@/components/seo/FaqSection";
-import { SIGRANK_FAQS } from "@/lib/seo/page-faqs";
+import { SIGRANK_FAQS, SIGRANK_FAQ_GROUPS } from "@/lib/seo/page-faqs";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
@@ -412,7 +412,12 @@ export default async function HomePage() {
         </a>
       </section>
 
-      <FaqSection faqs={SIGRANK_FAQS} />
+      <FaqSection
+        faqs={SIGRANK_FAQS}
+        groups={SIGRANK_FAQ_GROUPS}
+        title="Questions, answered."
+        intro="What people ask about ranking AI operators, how the score works, and what never leaves your machine."
+      />
 
       <MotionPause />
     </div>
