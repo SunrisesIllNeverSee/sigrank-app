@@ -2133,3 +2133,20 @@
   grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-rows:auto}
 .lbw-root .earned-marks .pxbd[style*="repeat(7"],.lbw-root .em-group .pxbd[style*="repeat(7"]{
   grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(7,minmax(0,1fr))}
+
+/* /sigrank readability (owner 2026-10-28): body copy one step up from the
+   text-page default (17→18, text-sm 16→17), footnote-style small text and
+   list blurbs floored at 13px, and the long description block and the
+   Learn-more links centred. Eyebrow labels, tables, buttons and the hero keep
+   their sizes. Scoped to the /sigrank stage wrapper. */
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow :is(p,li,blockquote):not(header *, .ws-hero *, td *, th *, pre *, [class*="text-xs"], [class*="text-xs"] *, [class*="text-sm"], [class*="text-sm"] *, [class*="text-["], [class*="text-["] *){
+  font-size:18px}
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow :is(p,li):is([class*="text-sm"], [class*="text-sm"] *):not(header *, .ws-hero *, td *, th *, pre *, [class*="text-xs"], [class*="text-xs"] *, [class*="text-["] *){
+  font-size:17px}
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow :is([class*="text-xs"],[class*="text-[10px]"],[class*="text-[11px]"]):is([class*="leading-relaxed"],[class*="leading-snug"]),
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow :is([class*="text-xs"],[class*="text-[10px]"],[class*="text-[11px]"]):is([class*="leading-relaxed"],[class*="leading-snug"]) :is(p,span,li),
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow li small[class*="text-xs"]{
+  font-size:13px;line-height:1.6}
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow .sigrank-prose p{margin-inline:auto}
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow .sigrank-learn{align-items:center;text-align:center}
+.lbw-root .ws-editorial-stage .sigrank-stage-reflow .sigrank-learn p{margin-inline:auto;text-wrap:balance}
