@@ -8,11 +8,17 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SECTION_PAGES } from "@/lib/editorial/section-pages";
 
-export type WorkspaceTopic = "home" | "field" | "articles" | "blog" | "wiki" | "support" | "legal";
+export type WorkspaceTopic =
+  | "home" | "field" | "articles" | "blog" | "wiki"
+  | "guides" | "tools" | "compare" | "alternatives" | "evaluation"
+  | "support" | "legal";
 export type TextPage =
   | "home" | "fieldhub" | "field" | "research" | "science" | "about" | "methodology"
-  | "articles" | "blog" | "wiki" | "support" | "legal";
+  | "articles" | "blog" | "wiki"
+  | "guides" | "tools" | "compare" | "alternatives" | "evaluation"
+  | "support" | "legal";
 
 const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }> = [
   { id: "home", label: "SigRank", href: "/sigrank" },
@@ -20,6 +26,11 @@ const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }>
   { id: "articles", label: "Articles", href: "/articles" },
   { id: "blog", label: "Blog", href: "/blog" },
   { id: "wiki", label: "Wiki", href: "/wiki" },
+  { id: "guides", label: "Guides", href: "/guides" },
+  { id: "tools", label: "Tools", href: "/tools" },
+  { id: "compare", label: "Compare", href: "/vs" },
+  { id: "alternatives", label: "Alternatives", href: "/alternatives" },
+  { id: "evaluation", label: "AI Evaluation", href: "/ai-evaluation" },
   { id: "support", label: "Support", href: "/support" },
   { id: "legal", label: "Legal", href: "/terms" },
 ];
@@ -56,6 +67,7 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
     { label: "Methodology Refinement", href: "/wiki/methodology-refinement" },
     { label: "Local Agent", href: "/wiki/local-agent" },
   ],
+  ...SECTION_PAGES,
   support: [
     { label: "Support", href: "/support" },
     { label: "FAQ", href: "/faq" },
@@ -70,12 +82,15 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
 };
 
 /** Topics whose href is a real index page (the reader picks a document there).
- *  The others (Support, Legal) land on an ordinary document, so their branch opens. */
-const INDEX_TOPICS: ReadonlySet<WorkspaceTopic> = new Set(["home", "field", "articles", "blog", "wiki"]);
+ *  The others (AI Evaluation, Support, Legal) land on an ordinary document, so their branch opens. */
+const INDEX_TOPICS: ReadonlySet<WorkspaceTopic> = new Set([
+  "home", "field", "articles", "blog", "wiki", "guides", "tools", "compare", "alternatives",
+]);
 
 const topicForPage = (page: TextPage): WorkspaceTopic => {
   if (page === "home") return "home";
-  if (page === "articles" || page === "blog" || page === "wiki" || page === "support" || page === "legal") return page;
+  if (page !== "fieldhub" && page !== "field" && page !== "research" && page !== "science"
+    && page !== "about" && page !== "methodology") return page;
   return "field";
 };
 
