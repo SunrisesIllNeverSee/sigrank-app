@@ -139,33 +139,33 @@ export default async function HomePage() {
           <span className="font-mono text-2xl font-bold text-gold">
             {operatorCount.toLocaleString()}
           </span>
-          <span className="font-sans text-xs text-text-dim">operators ranked</span>
+          <span className="font-sans text-sm text-text-dim">operators ranked</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
             {formatTokens(homeStats.total_tokens_scored)}
           </span>
-          <span className="font-sans text-xs text-text-dim">tokens analyzed</span>
+          <span className="font-sans text-sm text-text-dim">tokens analyzed</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">17</span>
-          <span className="font-sans text-xs text-text-dim">platforms tracked</span>
+          <span className="font-sans text-sm text-text-dim">platforms tracked</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">3,304</span>
-          <span className="font-sans text-xs text-text-dim">models measured</span>
+          <span className="font-sans text-sm text-text-dim">models measured</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
             {medianYield === null ? "—" : medianYield.toFixed(2)}
           </span>
-          <span className="font-sans text-xs text-text-dim">all-time real-operator median Yield (Υ)</span>
+          <span className="font-sans text-sm text-text-dim">all-time real-operator median Yield (Υ)</span>
         </div>
       </section>
 
       {/* ── Plain-text product description (AEO + content efficiency) — gives AI
           crawlers a dense, indexable summary of what SigRank is and does. ── */}
-      <section className="mx-auto w-full max-w-3xl">
+      <section className="sigrank-prose mx-auto w-full max-w-3xl">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is the evaluation platform for AI operators — the accounts using
           AI tools, not the AI models themselves. It ranks operators by Yield
@@ -282,26 +282,26 @@ export default async function HomePage() {
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pb-4 text-center">
         <Link
           href="/methodology"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          className="font-mono text-sm text-text-muted transition-colors hover:text-text-secondary"
         >
           Methodology & data →
         </Link>
         <Link
           href="/research"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          className="font-mono text-sm text-text-muted transition-colors hover:text-text-secondary"
         >
           Q1 2026 report →
         </Link>
         <Link
           href="/science"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          className="font-mono text-sm text-text-muted transition-colors hover:text-text-secondary"
         >
           Academic foundation →
         </Link>
       </div>
 
       {/* ── Topic hubs ── */}
-      <section className="flex flex-col gap-3 border-t border-bg-border-subtle pt-6">
+      <section className="sigrank-learn flex flex-col gap-3 border-t border-bg-border-subtle pt-6">
         <h2 className="font-mono text-sm font-bold text-text-primary">
           Learn more
         </h2>
