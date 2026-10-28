@@ -13,9 +13,9 @@ import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBad
 import type { Metadata } from "next";
 import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { cliTool, aggregateStats, faqPage } from "@/lib/jsonld";
-import { FaqSection } from "@/components/seo/FaqSection";
-import { SIGRANK_FAQS } from "@/lib/seo/page-faqs";
+import { cliTool, aggregateStats } from "@/lib/jsonld";
+import { faqGroupId } from "@/components/seo/FaqSection";
+import { SIGRANK_FAQ_GROUPS } from "@/lib/seo/page-faqs";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
@@ -123,9 +123,8 @@ export default async function HomePage() {
         })}
       />
 
-      {/* JSON-LD: FAQPage — same array as the visible FAQ section at the end
-          of the page (SIGRANK_FAQS), so structured data matches the page. */}
-      <JsonLd data={faqPage(SIGRANK_FAQS)} />
+      {/* FAQPage JSON-LD moved to /faq with the questions (owner 2026-10-28):
+          the page now links to them, so structured data matches each page. */}
 
       <DeletedNotice />
       <VercelMarketplaceBadge />
@@ -139,33 +138,33 @@ export default async function HomePage() {
           <span className="font-mono text-2xl font-bold text-gold">
             {operatorCount.toLocaleString()}
           </span>
-          <span className="font-sans text-xs text-text-dim">operators ranked</span>
+          <span className="font-sans text-sm text-text-dim">operators ranked</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
             {formatTokens(homeStats.total_tokens_scored)}
           </span>
-          <span className="font-sans text-xs text-text-dim">tokens analyzed</span>
+          <span className="font-sans text-sm text-text-dim">tokens analyzed</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">17</span>
-          <span className="font-sans text-xs text-text-dim">platforms tracked</span>
+          <span className="font-sans text-sm text-text-dim">platforms tracked</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">3,304</span>
-          <span className="font-sans text-xs text-text-dim">models measured</span>
+          <span className="font-sans text-sm text-text-dim">models measured</span>
         </div>
         <div className="flex flex-col gap-0.5 text-center">
           <span className="font-mono text-2xl font-bold text-gold">
             {medianYield === null ? "—" : medianYield.toFixed(2)}
           </span>
-          <span className="font-sans text-xs text-text-dim">all-time real-operator median Yield (Υ)</span>
+          <span className="font-sans text-sm text-text-dim">all-time real-operator median Yield (Υ)</span>
         </div>
       </section>
 
       {/* ── Plain-text product description (AEO + content efficiency) — gives AI
           crawlers a dense, indexable summary of what SigRank is and does. ── */}
-      <section className="mx-auto w-full max-w-3xl">
+      <section className="sigrank-prose mx-auto w-full max-w-3xl">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank is the evaluation platform for AI operators — the accounts using
           AI tools, not the AI models themselves. It ranks operators by Yield
@@ -282,26 +281,26 @@ export default async function HomePage() {
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pb-4 text-center">
         <Link
           href="/methodology"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          className="font-mono text-sm text-text-muted transition-colors hover:text-text-secondary"
         >
           Methodology & data →
         </Link>
         <Link
           href="/research"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          className="font-mono text-sm text-text-muted transition-colors hover:text-text-secondary"
         >
           Q1 2026 report →
         </Link>
         <Link
           href="/science"
-          className="font-mono text-xs text-text-muted transition-colors hover:text-text-secondary"
+          className="font-mono text-sm text-text-muted transition-colors hover:text-text-secondary"
         >
           Academic foundation →
         </Link>
       </div>
 
       {/* ── Topic hubs ── */}
-      <section className="flex flex-col gap-3 border-t border-bg-border-subtle pt-6">
+      <section className="sigrank-learn flex flex-col gap-3 border-t border-bg-border-subtle pt-6">
         <h2 className="font-mono text-sm font-bold text-text-primary">
           Learn more
         </h2>
@@ -412,7 +411,40 @@ export default async function HomePage() {
         </a>
       </section>
 
-      <FaqSection faqs={SIGRANK_FAQS} />
+      {/* ── FAQ — the questions live on /faq (owner 2026-10-28); this card
+          links to each category. Keeps the #faq anchor for old links. ── */}
+      <section id="faq" aria-labelledby="faq-heading" className="my-16 flex scroll-mt-20 flex-col items-center gap-6 text-center">
+        <div className="flex flex-col items-center">
+          <div className="font-mono text-xs uppercase tracking-widest text-gold">
+            ⊙ FAQ
+          </div>
+          <h2 id="faq-heading" className="mt-3 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
+            Questions, answered.
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
+            Who&apos;s at the top, how the leaderboard ranks operators, how the
+            score works, and what never leaves your machine.
+          </p>
+        </div>
+        <div className="grid w-full max-w-3xl gap-3 sm:grid-cols-2">
+          {SIGRANK_FAQ_GROUPS.map((g) => (
+            <Link
+              key={g.label}
+              href={"/faq#" + faqGroupId("faq", g.label)}
+              className="flex items-center justify-between gap-3 rounded-lg border border-bg-border bg-bg-surface px-4 py-3 text-left font-mono text-sm text-text-primary transition-colors hover:border-gold/40 hover:text-gold"
+            >
+              <span>{g.label}</span>
+              <span aria-hidden="true" className="text-text-dim">→</span>
+            </Link>
+          ))}
+        </div>
+        <Link
+          href="/faq"
+          className="inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Read every question →
+        </Link>
+      </section>
 
       <MotionPause />
     </div>
