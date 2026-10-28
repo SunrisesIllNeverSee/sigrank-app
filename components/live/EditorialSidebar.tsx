@@ -148,6 +148,7 @@ const PAGE_ANCHORS: Record<string, PageAnchor[]> = {
     { id: "ws-page-privacy", label: "Privacy & IP" },
     { id: "ws-page-pricing", label: "Free & Support" },
     { id: "ws-page-questions", label: "Ask AI About Us" },
+    { id: "faq", label: "FAQ" },
   ],
   "/science": [
     { id: "ws-page-science-law", label: "The Law" },

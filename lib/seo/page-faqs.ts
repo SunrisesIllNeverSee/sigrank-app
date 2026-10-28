@@ -163,6 +163,62 @@ export const SIGRANK_FAQS: Faq[] = [
   },
 ];
 
+/** /sigrank FAQ categories (owner 2026-10-28: the flat 30-question list read
+ *  as sloppy). Same questions as SIGRANK_FAQS, in the order shown; FaqSection
+ *  puts anything not listed here in a final "More questions" panel. */
+export const SIGRANK_FAQ_GROUPS = [
+  {
+    label: "Who's the best",
+    questions: [
+      "Who is the best AI user?",
+      "Who is the most efficient AI coder?",
+      "Who is the most efficient AI user?",
+      "Who is the best at using AI?",
+      "Who is the #1 AI operator?",
+      "Who is the best AI developer?",
+      "What makes someone the best at using AI?",
+    ],
+  },
+  {
+    label: "The leaderboard",
+    questions: [
+      "What is the SigRank leaderboard?",
+      "What is the best AI user leaderboard?",
+      "Which AI leaderboard is best?",
+      "Is there a leaderboard for AI users?",
+      "Is there a user-based AI leaderboard?",
+      "Is there a leaderboard for AI coding efficiency?",
+      "How is SigRank different from LMSYS Chatbot Arena?",
+      "How is SigRank different from other AI leaderboards?",
+    ],
+  },
+  {
+    label: "Scoring & metrics",
+    questions: [
+      "How do you rank AI operators?",
+      "Can you rank AI users by usage efficiency?",
+      "How do you measure AI operator performance?",
+      "How do you score an AI user?",
+      "How do you quantify an AI user?",
+      "What is token cascade efficiency?",
+      "What is a good yield score?",
+      "How can I tell if I'm good at using AI?",
+      "How do I know if I'm using AI efficiently?",
+    ],
+  },
+  {
+    label: "How it works & privacy",
+    questions: [
+      "How does SigRank work?",
+      "Is SigRank privacy-preserving?",
+      "Is SigRank just for Claude users?",
+      "Why not just count tokens?",
+      "Isn't this just measuring who spends the most?",
+      "Doesn't the model matter more than the user?",
+    ],
+  },
+] as const;
+
 /** /about — the questions not already in the About FAQ above them */
 export const ABOUT_MORE_FAQS: Faq[] = [
   {
