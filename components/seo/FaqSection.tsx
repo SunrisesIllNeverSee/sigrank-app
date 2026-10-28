@@ -26,6 +26,13 @@ import type { ReactNode } from "react";
 type Faq = { question: string; answer: string };
 export type FaqGroup = { label: string; questions: readonly string[] };
 
+/** Anchor id of a grouped-FAQ panel, e.g. faqGroupId("faq", "Who's the best")
+ *  → "faq-whos-the-best". Pages linking to a panel use the same helper. */
+export function faqGroupId(sectionId: string, label: string): string {
+  const slug = label.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return `${sectionId}-${slug}`;
+}
+
 /** Render `inline code` spans (authored with backticks) as <code>. */
 function renderAnswer(text: string, codeClass: string): ReactNode {
   if (!text.includes("`")) return text;
@@ -134,7 +141,8 @@ export function FaqSection({
           {panels.map((panel) => (
             <div
               key={panel.label}
-              className="flex flex-col rounded-2xl border border-bg-border-subtle bg-bg-surface px-5 py-4"
+              id={faqGroupId(id, panel.label)}
+              className="flex scroll-mt-20 flex-col rounded-2xl border border-bg-border-subtle bg-bg-surface px-5 py-4"
             >
               <h3 className="pb-2 font-mono text-xs uppercase tracking-widest text-gold">
                 {panel.label}

@@ -13,9 +13,9 @@ import { VercelMarketplaceBadge } from "@/components/vercel/VercelMarketplaceBad
 import type { Metadata } from "next";
 import { withOG, formatTokens } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { cliTool, aggregateStats, faqPage } from "@/lib/jsonld";
-import { FaqSection } from "@/components/seo/FaqSection";
-import { SIGRANK_FAQS, SIGRANK_FAQ_GROUPS } from "@/lib/seo/page-faqs";
+import { cliTool, aggregateStats } from "@/lib/jsonld";
+import { faqGroupId } from "@/components/seo/FaqSection";
+import { SIGRANK_FAQ_GROUPS } from "@/lib/seo/page-faqs";
 import { WorkspaceShell } from "@/components/live/WorkspaceShell";
 import { FieldFamilyNav } from "@/components/field/FieldWorkspaceFrame";
 import Link from "next/link";
@@ -123,9 +123,8 @@ export default async function HomePage() {
         })}
       />
 
-      {/* JSON-LD: FAQPage — same array as the visible FAQ section at the end
-          of the page (SIGRANK_FAQS), so structured data matches the page. */}
-      <JsonLd data={faqPage(SIGRANK_FAQS)} />
+      {/* FAQPage JSON-LD moved to /faq with the questions (owner 2026-10-28):
+          the page now links to them, so structured data matches each page. */}
 
       <DeletedNotice />
       <VercelMarketplaceBadge />
@@ -412,12 +411,40 @@ export default async function HomePage() {
         </a>
       </section>
 
-      <FaqSection
-        faqs={SIGRANK_FAQS}
-        groups={SIGRANK_FAQ_GROUPS}
-        title="Questions, answered."
-        intro="What people ask about ranking AI operators, how the score works, and what never leaves your machine."
-      />
+      {/* ── FAQ — the questions live on /faq (owner 2026-10-28); this card
+          links to each category. Keeps the #faq anchor for old links. ── */}
+      <section id="faq" aria-labelledby="faq-heading" className="my-16 flex scroll-mt-20 flex-col items-center gap-6 text-center">
+        <div className="flex flex-col items-center">
+          <div className="font-mono text-xs uppercase tracking-widest text-gold">
+            ⊙ FAQ
+          </div>
+          <h2 id="faq-heading" className="mt-3 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
+            Questions, answered.
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-text-secondary">
+            Who&apos;s at the top, how the leaderboard ranks operators, how the
+            score works, and what never leaves your machine.
+          </p>
+        </div>
+        <div className="grid w-full max-w-3xl gap-3 sm:grid-cols-2">
+          {SIGRANK_FAQ_GROUPS.map((g) => (
+            <Link
+              key={g.label}
+              href={"/faq#" + faqGroupId("faq", g.label)}
+              className="flex items-center justify-between gap-3 rounded-lg border border-bg-border bg-bg-surface px-4 py-3 text-left font-mono text-sm text-text-primary transition-colors hover:border-gold/40 hover:text-gold"
+            >
+              <span>{g.label}</span>
+              <span aria-hidden="true" className="text-text-dim">→</span>
+            </Link>
+          ))}
+        </div>
+        <Link
+          href="/faq"
+          className="inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
+        >
+          Read every question →
+        </Link>
+      </section>
 
       <MotionPause />
     </div>

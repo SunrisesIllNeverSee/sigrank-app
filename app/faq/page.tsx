@@ -16,6 +16,8 @@ import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
+import { FaqSection, faqGroupId } from "@/components/seo/FaqSection";
+import { SIGRANK_FAQS, SIGRANK_FAQ_GROUPS } from "@/lib/seo/page-faqs";
 
 export const metadata: Metadata = withOG({
   title: "FAQ — SigRank",
@@ -92,6 +94,19 @@ const FAQS: { question: string; answer: string }[] = [
   },
 ];
 
+/** The one FAQ page (owner 2026-10-28): the basics above, then the /sigrank
+ *  questions in their categories. A /sigrank question already asked in the
+ *  basics shows once, so the visible list and the FAQPage JSON-LD match. */
+const BASICS = new Set(FAQS.map((f) => f.question));
+const ALL_FAQS = [...FAQS, ...SIGRANK_FAQS.filter((f) => !BASICS.has(f.question))];
+const FAQ_GROUPS = [
+  { label: "The basics", questions: FAQS.map((f) => f.question) },
+  ...SIGRANK_FAQ_GROUPS.map((g) => ({
+    label: g.label,
+    questions: g.questions.filter((q) => !BASICS.has(q)),
+  })),
+];
+
 export default function FaqPage() {
   return (
     <EditorialWorkspaceFrame
@@ -108,7 +123,7 @@ export default function FaqPage() {
               <span className="text-gold">AI operator performance</span> — who
               is the best, how to measure up, and what makes a top AI user.{" "}
               <span className="font-mono text-xs text-text-dim">
-                Last updated: October 25, 2026
+                Last updated: October 28, 2026
               </span>
             </>
           }
@@ -120,8 +135,8 @@ export default function FaqPage() {
           <div className="mod">
             <div className="mini-h"><span className="sq" />FAQ</div>
             <div className="ws-kv">
-              <div className="row"><span className="k">questions</span><span className="v">{FAQS.length}</span></div>
-              <div className="row"><span className="k">updated</span><span className="v">Oct 25, 2026</span></div>
+              <div className="row"><span className="k">questions</span><span className="v">{ALL_FAQS.length}</span></div>
+              <div className="row"><span className="k">updated</span><span className="v">Oct 28, 2026</span></div>
             </div>
             <p className="ws-note" style={{ marginTop: 8 }}>
               Common questions about AI operator performance — who is the best,
@@ -131,39 +146,33 @@ export default function FaqPage() {
         </>
       }
       status={<>FAQ · SIGNALAF × SIGRANK</>}
+      pageContents={
+        <nav className="ws-nav" aria-label="Sections on this page">
+          {FAQ_GROUPS.map((g) => (
+            <a key={g.label} href={"#" + faqGroupId("faq", g.label)}>{g.label}</a>
+          ))}
+          <a href="#explore-further">Explore further</a>
+        </nav>
+      }
     >
-    <div className="ws-doc mx-auto flex max-w-3xl flex-col gap-8 py-2">
+    <div className="ws-doc mx-auto flex max-w-5xl flex-col gap-8 py-2">
       <JsonLd
         data={[
           breadcrumb([{ name: "FAQ", path: "/faq" }]),
-          faqPage(FAQS),
+          faqPage(ALL_FAQS),
         ]}
       />
 
-      {/* ── FAQ section ── */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-mono text-base font-bold text-text-primary">
-          Questions &amp; answers
-        </h2>
-        <dl className="flex flex-col gap-4">
-          {FAQS.map((f) => (
-            <div
-              key={f.question}
-              className="flex flex-col gap-1 rounded-lg border border-bg-border bg-bg-surface p-4"
-            >
-              <dt className="font-semibold text-text-primary">
-                {f.question}
-              </dt>
-              <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-                {f.answer}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {/* ── FAQ: the basics + the /sigrank categories ── */}
+      <FaqSection
+        faqs={ALL_FAQS}
+        groups={FAQ_GROUPS}
+        title="Questions, answered."
+        intro="Who's at the top, how the leaderboard ranks operators, how the score works, and what never leaves your machine."
+      />
 
       {/* ── Related pages ── */}
-      <section className="flex flex-col gap-3">
+      <section id="explore-further" className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
           Explore further
         </h2>
