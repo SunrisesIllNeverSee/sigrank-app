@@ -1,6 +1,7 @@
 "use client";
 
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js/pure";
+import type { Stripe } from "@stripe/stripe-js";
 
 /**
  * components/billing/CheckoutRedirect.tsx — client-only Stripe.js loader + the
@@ -14,6 +15,11 @@ import { loadStripe, type Stripe } from "@stripe/stripe-js";
  * routes (server-created sessions), so a missing publishable key does not block
  * the redirect — `getStripeClient()` is exported for any future client-side
  * Stripe.js needs (e.g. Elements) without re-loading the SDK.
+ *
+ * Imported from `@stripe/stripe-js/pure`: the default entry injects
+ * js.stripe.com on import, which the site CSP blocks ("Failed to load
+ * Stripe.js") and nothing here needs. /pure loads it only when
+ * getStripeClient() runs — add js.stripe.com to the CSP before using it.
  */
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
