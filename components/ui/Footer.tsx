@@ -115,7 +115,6 @@ const FOOTER_COLUMNS: {
       { href: "/score", label: "Benchmark Your AI Usage" },
       { href: "/score/paste", label: "Paste Your Stats" },
       { href: "/live", label: "Live Board" },
-      { href: "/marketplace", label: "Marketplace" },
       { href: "/exchange/signals", label: "Exchange Signals" },
       { href: "/share/mcp", label: "Share via MCP" },
       { href: "/research", label: "AI Power User Statistics" },
