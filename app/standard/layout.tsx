@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 
 export const metadata: Metadata = {
   alternates: {
@@ -11,36 +12,24 @@ export const metadata: Metadata = {
   },
 };
 
+/** /standard and /standard/* render inside the editorial frame (docs topic);
+ *  the machine-readable files sit in the right rail. */
 export default function StandardLayout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <nav
-        aria-label="TTEOP Standard"
-        className="mx-auto mb-4 flex max-w-4xl flex-wrap items-center gap-x-5 gap-y-2 border-b border-bg-border py-3 font-mono text-xs"
-      >
-        <Link href="/standard" className="font-bold text-gold hover:underline">
-          TTEOP Standard
-        </Link>
-        <Link
-          href="/standard/open-vs-proprietary"
-          className="text-text-secondary hover:text-gold hover:underline"
-        >
-          Open vs proprietary
-        </Link>
-        <Link
-          href="/standard/sigrank-operator-record-v0.1.schema.json"
-          className="text-text-secondary hover:text-gold hover:underline"
-        >
-          JSON Schema
-        </Link>
-        <Link
-          href="/standard/llms.txt"
-          className="text-text-secondary hover:text-gold hover:underline"
-        >
-          Agent reference
-        </Link>
-      </nav>
+    <EditorialWorkspaceFrame
+      topic="docs"
+      rightTitle="FILES"
+      right={
+        <div className="mod">
+          <div className="mini-h"><span className="sq" />TTEOP STANDARD</div>
+          <nav className="ws-nav" aria-label="TTEOP Standard files">
+            <Link href="/standard/sigrank-operator-record-v0.1.schema.json">JSON Schema</Link>
+            <Link href="/standard/llms.txt">Agent reference</Link>
+          </nav>
+        </div>
+      }
+    >
       {children}
-    </>
+    </EditorialWorkspaceFrame>
   );
 }
