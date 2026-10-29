@@ -176,9 +176,6 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/blog/the-tool-is-the-person": "SUPPORTED",
   "/blog/a-tour-of-the-new-signalaf": "SUPPORTED", // redesign tour (content/blog, 2026-10-21)
 
-  // ── HOLD — interactive surfaces with tool intent already covered by /tools/*
-  "/sandbox": "HOLD", // Cascade Lab — live and indexable, not advertised
-
   // ── HOLD — newer AI-evaluation cluster (2026-09-15 batch, unproven) ─────
   "/ai-evaluation": "HOLD",
   "/ai-evaluation-tools": "HOLD",
@@ -273,7 +270,6 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/upgrade": "UTILITY",
   "/exchange/propose": "UTILITY", // submission form
   "/agents.md": "UTILITY", // agent-facing doc route
-  "/marketplace": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
   "/vercel/config": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
   "/terms": "UTILITY",
   "/login": "UTILITY", // serves noindex,follow
