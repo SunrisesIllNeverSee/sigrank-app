@@ -6,9 +6,11 @@ import { EditorialNav, type WorkspaceDocument, type WorkspaceTopic } from "./Edi
 const RAIL: Record<WorkspaceTopic, WorkspaceNav> = {
   home: "home",
   field: "field",
+  concepts: "field",
   articles: "blog",
   blog: "blog",
   wiki: "wiki",
+  docs: "wiki",
   guides: "wiki",
   tools: "wiki",
   compare: "compare",
@@ -21,9 +23,11 @@ const RAIL: Record<WorkspaceTopic, WorkspaceNav> = {
 const SECTION: Record<WorkspaceTopic, string> = {
   home: "SIGRANK",
   field: "RESEARCH",
+  concepts: "CONCEPTS",
   articles: "PUBLISHING",
   blog: "PUBLISHING",
   wiki: "ENTRY",
+  docs: "DOCS",
   guides: "GUIDES",
   tools: "TOOLS",
   compare: "COMPARE",
