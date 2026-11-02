@@ -32,12 +32,8 @@ jobs:
           node-version: 22 # repo .nvmrc pin
           cache: npm
 
-      # `npm ci` currently fails — package.json↔package-lock.json desync is a
-      # known baseline ledger item pending its own dependency PR (P-06).
-      # Until then `npm install` resolves from package.json; switch back to
-      # `npm ci` once the lockfile is resynced.
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Repo hygiene (broken symlinks + tracked-ignored files)
         run: node scripts/check-repo-hygiene.mjs
@@ -49,7 +45,7 @@ jobs:
         run: npm run test:canonical
 
       - name: Owner outbound mail security tests
-        run: npx vitest run __tests__/mcp/owner-mail-route.test.ts
+        run: npx vitest run __tests__/mcp/owner-mail-route.test.ts __tests__/mcp/standard-record-conformance.test.ts
 
       - name: TTEOP protocol + legacy compatibility gates
         run: >-
