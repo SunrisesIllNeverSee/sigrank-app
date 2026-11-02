@@ -2,6 +2,7 @@
   "name": "sigrank-app",
   "version": "0.12.0",
   "private": true,
+  "packageManager": "npm@11.9.0",
   "license": "MIT",
   "engines": {
     "node": "22.x"
