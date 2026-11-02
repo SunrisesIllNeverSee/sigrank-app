@@ -70,29 +70,19 @@ function assertCascadeMatchesTteop(telemetry, label) {
   const c = cascade(
     telemetry.input,
     telemetry.output,
-    telemetry.cache_write ?? 0,
-    telemetry.cache_read ?? 0,
+    telemetry.cache_write,
+    telemetry.cache_read,
   );
 
-  // When cache_read is unavailable, cascade received 0 but the product must
-  // null out the dependent metrics. The tteop-spec authority already returns
-  // null in that case. Compare against the product's null-adjusted view.
-  const crNull = telemetry.cache_read == null;
-  const cwNull = telemetry.cache_write == null;
-
-  const productYield = crNull ? null : c.yield;
-  const productLeverage = crNull ? null : c.leverage;
-  const productLogLev = crNull || cwNull ? null : c.dev10x;
-
   assert.equal(
-    productYield,
+    c.yield,
     tteop.metrics.yield,
-    `${label}: Yield mismatch (cascade=${productYield}, tteop=${tteop.metrics.yield})`,
+    `${label}: Yield mismatch (cascade=${c.yield}, tteop=${tteop.metrics.yield})`,
   );
   assert.equal(
-    productLeverage,
+    c.leverage,
     tteop.metrics.leverage,
-    `${label}: Leverage mismatch (cascade=${productLeverage}, tteop=${tteop.metrics.leverage})`,
+    `${label}: Leverage mismatch (cascade=${c.leverage}, tteop=${tteop.metrics.leverage})`,
   );
   assert.equal(
     c.velocity,
@@ -107,9 +97,9 @@ function assertCascadeMatchesTteop(telemetry, label) {
   );
   // log_leverage (tteop) == dev10x (cascade display alias)
   assert.equal(
-    productLogLev,
+    c.dev10x,
     tteop.metrics.log_leverage,
-    `${label}: log_leverage/dev10x mismatch (cascade=${productLogLev}, tteop=${tteop.metrics.log_leverage})`,
+    `${label}: log_leverage/dev10x mismatch (cascade=${c.dev10x}, tteop=${tteop.metrics.log_leverage})`,
   );
 }
 
