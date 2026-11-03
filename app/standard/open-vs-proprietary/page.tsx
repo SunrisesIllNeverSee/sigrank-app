@@ -37,7 +37,7 @@ const REFERENCE = [
 
 export default function OpenVsProprietaryPage() {
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-10 py-8">
+    <div className="mx-auto flex max-w-4xl flex-col gap-10 py-8">
       <JsonLd
         data={[
           breadcrumb([
@@ -143,6 +143,6 @@ export default function OpenVsProprietaryPage() {
           Methodology →
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

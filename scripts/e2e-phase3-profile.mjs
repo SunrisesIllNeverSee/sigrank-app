@@ -34,7 +34,7 @@ try {
 
   const rail = await page.evaluate(() => {
     const railEl = document.querySelector("aside.railcol");
-    const main = document.querySelector("main.stage");
+    const main = document.querySelector(".stagecol .stage");
     const railBox = railEl?.getBoundingClientRect();
     const mainBox = main?.getBoundingClientRect();
     const ctx = [...document.querySelectorAll(".prl-ctx-row")].map((r) => r.textContent.trim());
