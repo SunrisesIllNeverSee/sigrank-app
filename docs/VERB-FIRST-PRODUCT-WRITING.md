@@ -1,4 +1,11 @@
-> **Canonical source:** technical-index `docs/VERB-FIRST-PRODUCT-WRITING.md` — edit there; copies are distribution snapshots.
+---
+type: Reference
+title: Verb-First Product Writing
+description: Describe what a product does before naming what it is (action, consequence, product name, theory), plus the verb-first test to run before publishing any product description.
+tags: [doctrine, writing, product, publishing]
+timestamp: 2026-10-07
+---
+> **Canonical source:** technical-index `docs/VERB-FIRST-PRODUCT-WRITING.md` @a51533e — edit there; copies are distribution snapshots.
 
 # Verb-First Product Writing
 
