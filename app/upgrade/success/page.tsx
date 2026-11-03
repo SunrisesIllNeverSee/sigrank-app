@@ -20,7 +20,7 @@ export const metadata: Metadata = {
  */
 export default function UpgradeSuccessPage() {
   return (
-    <main className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-4 px-6 text-center">
+    <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-4 px-6 text-center">
       <PaymentSuccessTracker />
       <div className="text-3xl" aria-hidden>
         ✓
@@ -36,6 +36,6 @@ export default function UpgradeSuccessPage() {
       >
         Back to the board
       </Link>
-    </main>
+    </div>
   );
 }

@@ -40,7 +40,7 @@ export function UnifiedShare({ href, title = "SignalAF", imageHref, screenshotTa
   };
   const go = (u: string) => { window.open(u, "_blank", "noopener,noreferrer"); setStatus("Opened share composer."); };
   const capture = async (asFile: boolean) => {
-    const node = document.querySelector<HTMLElement>(screenshotTarget || "main.stage");
+    const node = document.querySelector<HTMLElement>(screenshotTarget || ".stagecol .stage");
     if (!node) { setStatus("No screenshot surface available."); return; }
     try {
       setStatus("Rendering screenshot…");

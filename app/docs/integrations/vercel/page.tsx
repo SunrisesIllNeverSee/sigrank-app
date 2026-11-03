@@ -11,7 +11,7 @@ export const metadata: Metadata = withOG({
 
 export default function VercelIntegrationDocs() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold">Documentation</p>
       <h1 className="mt-3 font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
         SigRank Vercel Integration
@@ -457,6 +457,6 @@ get_wiki_entry(topic="yield")
         <Link href="/privacy" className="font-mono text-xs text-text-muted hover:text-text-primary">Privacy Policy</Link>
         <Link href="/support" className="font-mono text-xs text-text-muted hover:text-text-primary">Support</Link>
       </div>
-    </main>
+    </div>
   );
 }

@@ -11,21 +11,23 @@ import { usePathname } from "next/navigation";
 import { SECTION_PAGES } from "@/lib/editorial/section-pages";
 
 export type WorkspaceTopic =
-  | "home" | "field" | "articles" | "blog" | "wiki"
+  | "home" | "field" | "concepts" | "articles" | "blog" | "wiki" | "docs"
   | "guides" | "tools" | "compare" | "alternatives" | "evaluation"
   | "support" | "legal";
 export type TextPage =
   | "home" | "fieldhub" | "field" | "research" | "science" | "about" | "methodology"
-  | "articles" | "blog" | "wiki"
+  | "concepts" | "articles" | "blog" | "wiki" | "docs"
   | "guides" | "tools" | "compare" | "alternatives" | "evaluation"
   | "support" | "legal";
 
 const TOPICS: ReadonlyArray<{ id: WorkspaceTopic; label: string; href: string }> = [
   { id: "home", label: "SigRank", href: "/sigrank" },
   { id: "field", label: "Field", href: "/fieldhub" },
+  { id: "concepts", label: "Concepts", href: "/token-telemetry" },
   { id: "articles", label: "Articles", href: "/articles" },
   { id: "blog", label: "Blog", href: "/blog" },
   { id: "wiki", label: "Wiki", href: "/wiki" },
+  { id: "docs", label: "Docs", href: "/developers" },
   { id: "guides", label: "Guides", href: "/guides" },
   { id: "tools", label: "Tools", href: "/tools" },
   { id: "compare", label: "Compare", href: "/vs" },
@@ -73,6 +75,7 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
     { label: "FAQ", href: "/faq" },
     { label: "Contact", href: "/contact" },
     { label: "Settings", href: "/settings" },
+    { label: "Back the Build", href: "/upgrade" },
   ],
   legal: [
     { label: "Terms of Service", href: "/terms" },
@@ -82,7 +85,7 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
 };
 
 /** Topics whose href is a real index page (the reader picks a document there).
- *  The others (AI Evaluation, Support, Legal) land on an ordinary document, so their branch opens. */
+ *  The others (Concepts, Docs, AI Evaluation, Support, Legal) land on an ordinary document, so their branch opens. */
 const INDEX_TOPICS: ReadonlySet<WorkspaceTopic> = new Set([
   "home", "field", "articles", "blog", "wiki", "guides", "tools", "compare", "alternatives",
 ]);
@@ -202,7 +205,7 @@ function PageSections({ pageContents }: { pageContents?: ReactNode }) {
     if (pageContents || PAGE_ANCHORS[pathname]?.length) return;
     let cancelled = false;
     const discover = () => {
-      const stage = document.querySelector<HTMLElement>(".lbw-root .stagecol main.stage .board");
+      const stage = document.querySelector<HTMLElement>(".lbw-root .stagecol .stage .board");
       if (!stage || cancelled) return;
       const found: PageAnchor[] = [];
       const seen = new Set<string>();
@@ -236,7 +239,7 @@ function PageSections({ pageContents }: { pageContents?: ReactNode }) {
     };
     // Streaming server components can insert headings after this client effect.
     // Observe content additions, not attributes (our new heading IDs are benign).
-    const stage = document.querySelector<HTMLElement>(".lbw-root .stagecol main.stage .board");
+    const stage = document.querySelector<HTMLElement>(".lbw-root .stagecol .stage .board");
     const observer = new MutationObserver(() => requestAnimationFrame(discover));
     if (stage) observer.observe(stage, { childList: true, subtree: true });
     const raf = requestAnimationFrame(discover);
