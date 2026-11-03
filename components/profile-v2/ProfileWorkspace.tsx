@@ -90,7 +90,7 @@ export function ProfileWorkspace({ name, codename, rank, tier, platform, yieldLa
         {section !== "badges" && <>
         <Link className="ws-profile-back" href="/hall/badges">BADGE GALLERY →</Link>
         <div className="mod"><h3><span className="sq" />SCREEN CAPTURE</h3>
-          <ArtworkShareControls target="main.stage" title="profile view" filename={`signalaf-profile-${codename}-${section}`} href={`/user/${encodeURIComponent(codename)}?tab=${section}`} />
+          <ArtworkShareControls target=".stagecol .stage" title="profile view" filename={`signalaf-profile-${codename}-${section}`} href={`/user/${encodeURIComponent(codename)}?tab=${section}`} />
         </div>
         <Link className="ws-profile-back" href="/board/all">← BACK TO BOARD</Link>
         {/* owner 2026-10-21: compact box — name and rank here, the rest in a popup. */}

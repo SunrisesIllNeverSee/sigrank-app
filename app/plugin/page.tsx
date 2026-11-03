@@ -10,7 +10,7 @@ export const metadata: Metadata = withOG({
 
 export default function PluginPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold">AI Operator Leaderboard</p>
       <h1 className="mt-3 font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
         SigRank | SignalAF
@@ -82,6 +82,6 @@ export default function PluginPage() {
           <Link className="text-gold underline underline-offset-4" href="/terms">Terms</Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
