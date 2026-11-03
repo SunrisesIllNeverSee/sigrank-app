@@ -37,7 +37,10 @@ vi.mock("@/lib/infra/supabase/server", () => {
     return chain;
   };
   chain.maybeSingle = async () => ({ data: state.publicRow });
-  return { getSupabaseServer: () => ({ from: () => chain }) };
+  return {
+    getSupabaseServer: () => ({ from: () => chain }),
+    getSupabaseService: () => ({ from: () => chain }),
+  };
 });
 vi.mock("@/lib/infra/posthog/server", () => ({ captureServer: vi.fn() }));
 vi.mock("workflow/api", () => ({ start: vi.fn(async () => undefined) }));
