@@ -78,6 +78,7 @@ import type {
 } from "@/lib/board/live-types";
 import type { URMember } from "@/lib/board/unranked-status";
 import { lbwFontVars } from "./fonts";
+import { mountRankedBoardCaptureSurface } from "@/lib/board/board-capture-surface";
 import "./proto-scoped.css";
 import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
 import { MobileChrome } from "../mobile/MobileChrome";
@@ -516,16 +517,16 @@ async function captureBoardTable(
     <div style="color:rgb(var(--text-muted));font-size:11px;font-variant-numeric:tabular-nums;">${escapeShot(ts)}</div>
   `;
 
-  const parent = target.parentElement;
-  if (!parent) throw new Error("Board capture target not mounted");
-  const wrapper = document.createElement("div");
-  wrapper.style.cssText = "display:flex;flex-direction:column;background:rgb(var(--bg-base));";
-  parent.insertBefore(wrapper, target);
-  wrapper.appendChild(overlay);
-  wrapper.appendChild(target);
+  // Clone the ranked table into a full-size, offscreen export surface.
+  // The live scroll container (and React-owned table) remain untouched.
+  await document.fonts.ready;
+  const { surface, width, height, dispose } =
+    mountRankedBoardCaptureSurface(target, overlay);
   try {
     const { toBlob } = await import("html-to-image");
-    const blob = await toBlob(wrapper, {
+    const blob = await toBlob(surface, {
+      width,
+      height,
       cacheBust: true,
       imagePlaceholder:
         "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' fill='%23151e15'/%3E%3C/svg%3E",
@@ -550,11 +551,7 @@ async function captureBoardTable(
     link.click();
     setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
   } finally {
-    wrapper.removeChild(overlay);
-    wrapper.removeChild(target);
-    parent.insertBefore(target, wrapper);
-    wrapper.remove();
-    overlay.remove();
+    dispose();
   }
 }
 
