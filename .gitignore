@@ -65,3 +65,7 @@ release-staging/
 
 # local screenshot captures (e2e/history/capture.spec.ts)
 _shots/
+
+# Agent guide is kept private (sigrank-coordination: agent-guides/sigrank-app.AGENTS.md).
+# A local copy may sit at the root for agents; never commit it.
+AGENTS.md
