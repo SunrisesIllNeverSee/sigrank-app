@@ -50,6 +50,9 @@ jobs:
       - name: Owner outbound mail security tests
         run: npx vitest run __tests__/mcp/owner-mail-route.test.ts __tests__/mcp/standard-record-conformance.test.ts
 
+      - name: Full Vitest suite
+        run: npx vitest run
+
       - name: TTEOP protocol + legacy compatibility gates
         run: >-
           node --test
