@@ -17,7 +17,6 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - "npm"
     # Group patch updates so they land in one PR instead of ten.
     groups:
       patch-updates:

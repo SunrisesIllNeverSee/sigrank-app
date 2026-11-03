@@ -11,6 +11,7 @@ vi.mock("@/lib/infra/supabase/server", () => ({
     return state.serviceConfigured;
   },
   getSupabaseServer: () => ({ rpc: state.rpc }),
+  getSupabaseService: () => ({ rpc: state.rpc }),
 }));
 
 const { checkDistributedRateLimit } = await import("@/lib/infra/distributed-rate-limit");

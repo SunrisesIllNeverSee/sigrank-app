@@ -13,6 +13,7 @@ vi.mock("@/lib/board/queries", () => ({ getOperator: vi.fn() }));
 vi.mock("@/lib/board/published-row", () => ({ isPublishedBoardRow: () => true }));
 vi.mock("@/lib/infra/supabase/server", () => ({
   getSupabaseServer: () => ({ from: () => ({ select: async () => ({ error: null, count: 3 }) }) }),
+  getSupabaseService: () => ({ from: () => ({ select: async () => ({ error: null, count: 3 }) }) }),
   SUPABASE_SERVICE_CONFIGURED: true,
 }));
 
