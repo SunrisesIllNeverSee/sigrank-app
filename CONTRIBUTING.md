@@ -232,7 +232,7 @@ Recommended additions for `main`:
 ## Questions?
 
 - Open an issue on this repository.
-- Read [AGENTS.md](./AGENTS.md) for the full agent orientation guide.
+- Maintainers: the agent orientation guide is kept in the private coordination repo.
 - Read [AUDIT.md](./AUDIT.md) for known bugs and improvement areas.
 
 ## License
