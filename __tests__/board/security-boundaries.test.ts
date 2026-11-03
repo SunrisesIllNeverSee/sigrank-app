@@ -13,6 +13,7 @@ vi.mock("@/lib/infra/supabase/auth-server", () => ({
 }));
 vi.mock("@/lib/infra/supabase/server", () => ({
   getSupabaseServer: () => state.database,
+  getSupabaseService: () => state.database,
 }));
 vi.mock("@/lib/infra/posthog/server", () => ({ captureServer: vi.fn() }));
 vi.mock("@/lib/infra/api-gate", () => ({
