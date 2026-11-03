@@ -1,4 +1,11 @@
-> **Canonical source:** technical-index `docs/FOUR-PASS-ARCHITECTURE-RECOVERY-PROTOCOL.md` — edit there; copies are distribution snapshots.
+---
+type: Runbook
+title: Four-Pass Architecture Recovery Protocol
+description: Surface, System, Edge and Latent-Intent passes that recover what a product or system actually is before any redesign, consolidation or control-surface work, so meaningful architecture is not flattened or erased.
+tags: [doctrine, architecture, review, redesign, owner-decisions]
+timestamp: 2026-10-07
+---
+> **Canonical source:** technical-index `docs/FOUR-PASS-ARCHITECTURE-RECOVERY-PROTOCOL.md` @a51533e — edit there; copies are distribution snapshots.
 
 # Four-Pass Architecture Recovery Protocol
 
