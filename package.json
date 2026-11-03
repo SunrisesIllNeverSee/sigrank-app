@@ -34,7 +34,7 @@
     "lint:tools": "eslint --config eslint.tools.config.mjs \"_workspace/**/*.{js,mjs,cjs,ts,tsx,jsx}\""
   },
   "dependencies": {
-    "@modelcontextprotocol/node": "^2.1.1",
+    "@modelcontextprotocol/node": "^2.1.2",
     "@modelcontextprotocol/server": "^2.3.1",
     "@posthog/mcp": "0.21.4",
     "@stripe/stripe-js": "^10.1.0",
@@ -50,7 +50,7 @@
     "clackboard": "^1.1.2",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
-    "next": "^16.4.2",
+    "next": "^16.4.3",
     "posthog-js": "^1.438.12",
     "posthog-node": "^5.55.0",
     "react": "^19.3.1",
@@ -70,8 +70,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
-    "@next/eslint-plugin-next": "^16.4.2",
-    "@opennextjs/cloudflare": "^1.20.13",
+    "@next/eslint-plugin-next": "^16.4.3",
+    "@opennextjs/cloudflare": "^1.20.14",
     "@playwright/test": "^1.64.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
@@ -81,7 +81,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "ajv": "^8.20.0",
-    "autoprefixer": "^10.6.1",
+    "autoprefixer": "^10.6.2",
     "c8": "^12.0.0",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
@@ -90,8 +90,8 @@
     "tailwindcss": "^3.4.0",
     "tteop-spec": "0.1.5-draft",
     "typescript": "5.8.2",
-    "typescript-eslint": "^8.71.2",
-    "vite": "^8.3.4",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5",
     "wrangler": "^4.151.1"
   },
