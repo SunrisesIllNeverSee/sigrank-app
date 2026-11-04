@@ -66,6 +66,24 @@ release-staging/
 # local screenshot captures (e2e/history/capture.spec.ts)
 _shots/
 
-# Agent guide is kept private (sigrank-coordination: agent-guides/sigrank-app.AGENTS.md).
+# Local development instructions stay untracked.
 # A local copy may sit at the root for agents; never commit it.
 AGENTS.md
+
+# Local operating state is excluded from public source.
+/.coord/
+/.repo/
+/.ello/
+/.devin/
+/.agents/
+/.claude/
+/system-devin/
+/Devins_Plans/
+/AGENTS.md
+/CLAUDE.md
+/REPO.yaml
+/skills-lock.json
+/release-staging/
+/_workspace/
+/docs/superpowers/
+/standard/strategy/

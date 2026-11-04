@@ -70,7 +70,7 @@ file but had unique ledger versions. The prior README (last updated 2026-06-25)
 incorrectly claimed several migrations had no ledger entry and stopped its
 mapping table at 0023.
 
-**Reconcile actions taken (2026-07-31, Drep2):**
+**Reconcile actions taken (2026-07-31, maintainer):**
 1. Queried the live ledger directly (`supabase db query --linked`) — 42 entries
    found, all 30 numbered + 12 timestamp. Ground truth recorded in
    `MIGRATION_LEDGER_GROUND_TRUTH.md`.
