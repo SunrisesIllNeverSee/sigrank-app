@@ -101,9 +101,6 @@ export default function robots(): MetadataRoute.Robots {
         // agents (spec §11.4). The more specific Allow rule wins over the
         // broader Disallow: /api/ rule per RFC 9309.
         disallow: ["/api/", "/auth/", "/internal/"],
-        // Throttle aggressive crawlers — 10s between requests prevents edge-request
-        // spikes (2026-07-24: Googlebot crawl caused 16K requests/hour).
-        crawlDelay: 10,
       },
     ],
     sitemap: `${SITE_ORIGIN}/sitemap.xml`,
