@@ -1,0 +1,74 @@
+name: E2E journeys (warning)
+
+# Owner decision 2026-11-04: browser journeys run in CI as a NON-BLOCKING
+# warning. Read-only GETs against production (https://signalaf.com); no
+# secrets, no sign-in, no writes, no Stripe.
+#
+# Why production and not the PR's Vercel preview: previews are behind Vercel
+# SSO (302 to vercel.com/sso-api), which needs a protection-bypass secret.
+# No new secrets were approved, so the job targets production. That means a
+# PR run checks the live site, not the PR's code; it is a site-health warning.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: e2e journeys (warning, non-blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    env:
+      E2E_BASE_URL: https://signalaf.com
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22 # repo .nvmrc pin
+          cache: npm
+
+      - name: Use pinned npm version
+        run: npm install --global npm@11.9.0
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Target reachability (detect bot protection)
+        run: |
+          code=$(curl -s -o /tmp/probe.html -D /tmp/probe.headers -w '%{http_code}' \
+            -A 'Mozilla/5.0 (compatible; sigrank-ci-e2e)' "$E2E_BASE_URL/board/all" || echo 000)
+          echo "GET $E2E_BASE_URL/board/all -> HTTP $code"
+          if [ "$code" = "403" ] || [ "$code" = "429" ] || grep -qi '^x-vercel-mitigated' /tmp/probe.headers; then
+            echo "::error title=E2E target blocked::$E2E_BASE_URL answered HTTP $code or a Vercel challenge (bot protection / firewall) to the CI runner. This is a blocked client, not a site failure. Browser journeys did not run."
+            exit 1
+          fi
+          if [ "$code" != "200" ]; then
+            echo "::error title=E2E target unhealthy::$E2E_BASE_URL/board/all answered HTTP $code."
+            exit 1
+          fi
+
+      - name: Install Chromium only
+        run: npx playwright install --with-deps chromium
+
+      - name: Run journeys (desktop + mobile Chromium)
+        run: npx playwright test --project=chromium --project=mobile-chromium --workers=2
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
