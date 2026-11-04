@@ -55,6 +55,7 @@ test.describe("mobile board", () => {
 
   test("filter sheet drives the same filters as desktop", async ({ page }) => {
     await gotoPhone(page, BOARD);
+    await expect(page.locator("li.bc").first()).toBeVisible();
     const before = await page.locator("li.bc").count();
     await page.getByRole("button", { name: /^Filters/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filters" });
