@@ -66,40 +66,45 @@ test("board screenshot download is a real PNG with every table row drawn", async
   expect(overlay).toBeGreaterThan(20);
   expect(overlay).toBeLessThan(120);
   const viewer = await page.context().newPage();
-  const ink = await viewer.evaluate(
-    async ({ src, bands, overlay, ratio }) => {
-      const img = new Image();
-      img.src = src;
-      await img.decode();
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
-      return bands.map(({ top, height }) => {
-        const y = Math.round((overlay + top) * ratio) + 2;
-        const h = Math.round(height * ratio) - 4;
-        if (h <= 0 || y + h > canvas.height) return -1;
-        const d = ctx.getImageData(0, y, canvas.width, h).data;
-        const counts = new Map<number, number>();
-        for (let i = 0; i < d.length; i += 4) {
-          const k = ((d[i] >> 4) << 8) | ((d[i + 1] >> 4) << 4) | (d[i + 2] >> 4);
-          counts.set(k, (counts.get(k) ?? 0) + 1);
-        }
-        const bg = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-        const br = ((bg >> 8) & 15) * 16 + 8;
-        const bgG = ((bg >> 4) & 15) * 16 + 8;
-        const bb = (bg & 15) * 16 + 8;
-        let n = 0;
-        for (let i = 0; i < d.length; i += 4) {
-          if (Math.abs(d[i] - br) + Math.abs(d[i + 1] - bgG) + Math.abs(d[i + 2] - bb) > 120) n++;
-        }
-        return n / (d.length / 4);
-      });
-    },
-    { src: `data:image/png;base64,${buf.toString("base64")}`, bands, overlay, ratio: PIXEL_RATIO },
-  );
-  await viewer.close();
+  let ink: number[];
+  try {
+    ink = await viewer.evaluate(
+      async ({ src, bands, overlay, ratio }) => {
+        const img = new Image();
+        img.src = src;
+        await img.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
+        return bands.map(({ top, height }) => {
+          const y = Math.round((overlay + top) * ratio) + 2;
+          const h = Math.round(height * ratio) - 4;
+          if (h <= 0 || y + h > canvas.height) return -1;
+          const d = ctx.getImageData(0, y, canvas.width, h).data;
+          const counts = new Map<number, number>();
+          for (let i = 0; i < d.length; i += 4) {
+            const k = ((d[i] >> 4) << 8) | ((d[i + 1] >> 4) << 4) | (d[i + 2] >> 4);
+            counts.set(k, (counts.get(k) ?? 0) + 1);
+          }
+          const bg = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+          const br = ((bg >> 8) & 15) * 16 + 8;
+          const bgG = ((bg >> 4) & 15) * 16 + 8;
+          const bb = (bg & 15) * 16 + 8;
+          let n = 0;
+          for (let i = 0; i < d.length; i += 4) {
+            if (Math.abs(d[i] - br) + Math.abs(d[i + 1] - bgG) + Math.abs(d[i + 2] - bb) > 120) n++;
+          }
+          return n / (d.length / 4);
+        });
+      },
+      { src: `data:image/png;base64,${buf.toString("base64")}`, bands, overlay, ratio: PIXEL_RATIO },
+    );
+  } finally {
+    await viewer.close();
+  }
+  ink.forEach((v, i) => expect(v, `row ${i + 1} of ${ink.length} falls outside the PNG`).not.toBe(-1));
   ink.forEach((v, i) => expect(v, `row ${i + 1} of ${ink.length} has no visible text in the PNG`).toBeGreaterThan(0.01));
 
   await expect(card.locator("thead th")).toHaveCount(headers.length);
