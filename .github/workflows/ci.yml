@@ -2,10 +2,12 @@ name: CI
 
 # Restored in PR-3 (repo-cleanup): slim truthful gate mirroring AGENTS.md's
 # verification protocol + REPO_CLEANUP_PLAN §16 hygiene controls.
-# The wider suite (CodeQL, dependency-audit, Playwright E2E, Lighthouse,
-# gitleaks secret-scan) stays archived at _archive/workflows/ pending
-# separate owner decisions — do NOT re-enable by copying wholesale; each of
-# those carried its own secrets/trigger surface.
+# The wider suite (CodeQL, dependency-audit, Lighthouse, gitleaks secret-scan)
+# stays archived at _archive/workflows/ pending separate owner decisions — do
+# NOT re-enable by copying wholesale; each of those carried its own
+# secrets/trigger surface. Playwright E2E was re-enabled as a non-blocking
+# warning on 2026-11-04 by owner decision: see e2e-journeys.yml (new, minimal,
+# read-only, no secrets), not the archived workflow.
 
 on:
   push:
