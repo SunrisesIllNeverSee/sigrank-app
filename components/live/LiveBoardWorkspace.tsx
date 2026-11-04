@@ -1879,11 +1879,6 @@ export function LiveBoardWorkspace({
                     {COPY.heroTitleA}
                     <em>{COPY.heroTitleB}</em>
                   </h1>
-                  <p className="sr-only">
-                    SigRank SignalAF ranks AI operators (the people using AI tools, not the models) by Υ Yield, a
-                    measure of token cascade efficiency computed from privacy-preserving token telemetry. See how you
-                    rank and compare against top operators.
-                  </p>
                 </div>
                 {/* owner 2026-10-21: site-wide search at the right end of the title
                     row (navigates); the board table filter stays in the filter bar */}

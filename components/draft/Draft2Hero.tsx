@@ -48,10 +48,6 @@ export function Draft2Masthead() {
           The evaluation platform for{" "}
           <span className="text-gold">AI operators</span>
         </h1>
-        <p className="sr-only">
-          SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It turns
-          privacy-preserving token telemetry into your Yield, workflow signature, and rank.
-        </p>
         <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary sm:text-base">
           Models are benchmarked constantly. The people operating them are not.
         </p>
