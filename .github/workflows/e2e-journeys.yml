@@ -2,7 +2,11 @@ name: E2E journeys (warning)
 
 # Owner decision 2026-11-04: browser journeys run in CI as a NON-BLOCKING
 # warning. Read-only GETs against production (https://signalaf.com); no
-# secrets, no sign-in, no writes, no Stripe.
+# writes, no Stripe. One read-only signed-in check (e2e/signed-in.spec.ts,
+# desktop chromium only) uses a dedicated hidden test account (owner approved
+# 2026-11-04); it skips when its secrets are absent (e.g. fork PRs, where
+# GitHub does not pass secrets). Trace, screenshot and video are off for that
+# spec so the failure artifact holds no session cookies. Nothing writes app data.
 #
 # Why production and not the PR's Vercel preview: previews are behind Vercel
 # SSO (302 to vercel.com/sso-api), which needs a protection-bypass secret.
@@ -30,6 +34,10 @@ jobs:
     continue-on-error: true
     env:
       E2E_BASE_URL: https://signalaf.com
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      E2E_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.E2E_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
