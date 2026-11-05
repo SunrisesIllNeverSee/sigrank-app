@@ -255,8 +255,12 @@ export async function proxy(request: NextRequest, event?: NextFetchEvent) {
 export const config = {
   matcher: [
     { source: "/:path*", has: [{ type: "host", value: "analyst.signalaf.com" }] },
-    // robots.txt, llms.txt and sitemap.xml are deliberately NOT excluded:
-    // which AI crawlers read them is the point of the crawler tracking.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|eot|otf)).*)",
+    // The crawler files, so we can see which AI crawlers read them. Other
+    // .txt and .xml files stay excluded and are served without the proxy.
+    "/robots.txt",
+    "/llms.txt",
+    "/llms-full.txt",
+    "/sitemap.xml",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf)).*)",
   ],
 };

@@ -53,7 +53,6 @@ test("a crawler hit becomes one ai_crawler_hit event with a per-bot id and no pe
     bot_name: "ChatGPT-User",
     bot_operator: "OpenAI",
     bot_family: "ai_user_fetch",
-    bot_allowed: true,
     host: "signalaf.com",
     path: "/alternatives/ai-benchmarking-tools",
     method: "GET",
@@ -88,6 +87,25 @@ test("proxy sends the crawler event after the response and lets crawlers reach r
   assert.match(proxy, /event\.waitUntil\(sent\)/);
   assert.doesNotMatch(proxy, /ai_bot_detected/);
   const matcher = proxy.slice(proxy.indexOf("export const config"));
-  assert.doesNotMatch(matcher, /\|txt\||\|xml\|/);
+  for (const file of ["/robots.txt", "/llms.txt", "/llms-full.txt", "/sitemap.xml"]) {
+    assert.ok(matcher.includes(`"${file}"`), file);
+  }
+  // Every other .txt and .xml file is still served without the proxy.
+  assert.match(matcher, /\|ico\|txt\|xml\|css\|/);
   assert.match(matcher, /_next\/static\|_next\/image/);
+});
+
+test("previews, local runs, signed-in paths and non-GET requests send nothing", () => {
+  const bot = detectBot(UA.GPTBot);
+  for (const host of ["sigrank-app.vercel.app", "sigrank-app-git-x.vercel.app", "localhost", "analyst.signalaf.com"]) {
+    assert.equal(crawlerHit(bot, new URL(`https://${host}/`), "GET"), null, host);
+  }
+  for (const path of ["/me", "/me/profile", "/settings", "/settings/keys", "/auth/callback"]) {
+    assert.equal(crawlerHit(bot, new URL(`https://signalaf.com${path}`), "GET"), null, path);
+  }
+  for (const method of ["POST", "PUT", "DELETE", "OPTIONS"]) {
+    assert.equal(crawlerHit(bot, new URL("https://signalaf.com/"), method), null, method);
+  }
+  assert.ok(crawlerHit(bot, new URL("https://www.signalaf.com/methodology"), "HEAD"));
+  assert.ok(crawlerHit(bot, new URL("https://signalaf.com/membership"), "GET"), "only /me itself and below are private");
 });

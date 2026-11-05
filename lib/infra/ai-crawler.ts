@@ -31,8 +31,6 @@ const FAMILY: Record<string, CrawlerFamily> = {
   "ClaudeBot": "ai_training",
   "anthropic-ai": "ai_training",
   "CCBot": "ai_training",
-  "Google-Extended": "ai_training",
-  "Applebot-Extended": "ai_training",
   "cohere-ai": "ai_training",
   "Bytespider": "ai_training",
   "meta-externalagent": "ai_training",
@@ -55,7 +53,6 @@ const FAMILY: Record<string, CrawlerFamily> = {
   "meta-externalfetcher": "ai_user_fetch",
   // Search engines
   "Googlebot": "search",
-  "Googlebot-Image": "search",
   "Bingbot": "search",
   "Applebot": "search",
   "DuckDuckBot": "search",
@@ -64,6 +61,13 @@ const FAMILY: Record<string, CrawlerFamily> = {
   "Sogou": "search",
   "Exabot": "search",
 };
+
+// Only production traffic is recorded, so previews and local runs don't mix
+// into the dashboard.
+const PRODUCTION_HOSTS = new Set(["signalaf.com", "www.signalaf.com"]);
+
+// Signed-in areas: never record their paths, even for a crawler user-agent.
+const PRIVATE_PATH = /^\/(?:me|settings|auth)(?:\/|$)/;
 
 export function crawlerFamily(botName: string): CrawlerFamily | null {
   return FAMILY[botName] ?? null;
@@ -76,16 +80,21 @@ export interface CrawlerHit {
 }
 
 /**
- * Build the PostHog event for a crawler request, or null when the request is
- * not from a known AI or search crawler (people, social link previews and
- * unidentified bots send nothing). The query string is never recorded.
+ * Build the PostHog event for a crawler request, or null when nothing should
+ * be sent: people, social link previews, unidentified bots, methods other
+ * than GET/HEAD, non-production hosts and signed-in paths. Bots are known by
+ * User-Agent only, so a client can claim to be one. The query string is
+ * never recorded.
  */
 export function crawlerHit(bot: BotInfo, url: URL, method: string): CrawlerHit | null {
   if (!bot.isBot) return null;
+  if (method !== "GET" && method !== "HEAD") return null;
   const family = crawlerFamily(bot.botName);
   if (!family) return null;
   const host = url.hostname.toLowerCase();
+  if (!PRODUCTION_HOSTS.has(host)) return null;
   const path = url.pathname;
+  if (PRIVATE_PATH.test(path)) return null;
   return {
     // One PostHog id per bot, with no person profile: bots aren't people.
     distinctId: `crawler:${bot.botName}`,
@@ -94,7 +103,6 @@ export function crawlerHit(bot: BotInfo, url: URL, method: string): CrawlerHit |
       bot_name: bot.botName,
       bot_operator: bot.botOperator,
       bot_family: family,
-      bot_allowed: bot.allowed,
       host,
       path,
       method,
