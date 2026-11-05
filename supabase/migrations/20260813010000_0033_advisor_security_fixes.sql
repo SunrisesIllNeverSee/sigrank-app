@@ -34,7 +34,7 @@ REVOKE SELECT ON public.subscriptions FROM anon, authenticated;
 REVOKE SELECT ON public.webhook_events FROM anon, authenticated;
 
 -- 2. Function search_path: pin to prevent schema injection.
-ALTER FUNCTION public.update_operator_reports_updatedated_at()
+ALTER FUNCTION public.update_operator_reports_updated_at()
   SET search_path = public, extensions;
 ALTER FUNCTION public.compute_board_ranks(p_operator_id uuid, p_aa_yield numeric, p_hcm_yield numeric, p_codex_yield numeric)
   SET search_path = public, extensions;

@@ -14,7 +14,7 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
       // owner 2026-10-21: phone specs run only in the mobile projects below
-      testIgnore: /e2e\/mobile\//,
+      testIgnore: /e2e\/(mobile|localdb)\//,
     },
     // Mobile projects (owner 2026-10-21 mobile foundation): real phone emulation,
     // 390x844 iPhone on WebKit and a 412x915 Pixel on Chromium.
@@ -27,6 +27,11 @@ export default defineConfig({
       name: "mobile-chromium",
       use: { ...devices["Pixel 7"] },
       testMatch: /e2e\/mobile\/.*\.spec\.ts/,
+    },
+    {
+      name: "localdb",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: /e2e\/localdb\/.*\.spec\.ts/,
     },
   ],
 });

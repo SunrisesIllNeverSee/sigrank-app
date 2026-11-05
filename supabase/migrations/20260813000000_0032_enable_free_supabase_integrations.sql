@@ -18,6 +18,6 @@ CREATE EXTENSION IF NOT EXISTS pg_net;
 --   metric_snapshots    → new snapshot submitted → board refresh
 --   leaderboards_cached → rank recomputed → board refresh
 --   operators           → profile/class change → profile refresh
-ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS public.metric_snapshots;
-ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS public.leaderboards_cached;
-ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS public.operators;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'metric_snapshots') THEN ALTER PUBLICATION supabase_realtime ADD TABLE public.metric_snapshots; END IF; END $$;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'leaderboards_cached') THEN ALTER PUBLICATION supabase_realtime ADD TABLE public.leaderboards_cached; END IF; END $$;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'operators') THEN ALTER PUBLICATION supabase_realtime ADD TABLE public.operators; END IF; END $$;
