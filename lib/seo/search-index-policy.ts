@@ -165,6 +165,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/wiki/metrics/scale-v": "SUPPORTED", // canon metric (Scale V), added 2026-10-12
 
   // ── Blog — established essays (1 sentinel-backed) ───────────────────────
+  "/blog/the-operator-explains-95-percent-of-the-difference": "SUPPORTED",
   "/blog/volume-isnt-yield": "SUPPORTED",
   "/blog/how-to-benchmark-ai-coding-workflow": "SUPPORTED",
   "/blog/the-human-in-the-loop-is-unmeasured": "SUPPORTED",

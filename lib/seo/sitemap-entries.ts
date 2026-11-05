@@ -68,6 +68,7 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   { path: "/fieldhub", priority: 0.8, changeFrequency: "daily" },
   { path: "/field", priority: 0.8, changeFrequency: "daily" },
   { path: "/blog", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/blog/the-operator-explains-95-percent-of-the-difference", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/volume-isnt-yield", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/the-human-in-the-loop-is-unmeasured", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/sigrank-dashboards", priority: 0.8, changeFrequency: "weekly" },
