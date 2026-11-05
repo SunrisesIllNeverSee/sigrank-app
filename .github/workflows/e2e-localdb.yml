@@ -40,7 +40,7 @@ jobs:
 
       - uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
         with:
-          version: latest
+          version: 2.98.2
 
       - name: Assemble scratch Supabase workdir
         run: |
