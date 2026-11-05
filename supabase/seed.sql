@@ -143,7 +143,7 @@ ON CONFLICT (badge_name) DO NOTHING;
 --   pill render; claim_contact left NULL (no PII required).
 -- ----------------------------------------------------------------------------
 INSERT INTO operators (
-  operator_id, codename, display_name, status, privacy_level, verification_status,
+  operator_id, codename, display_name, status, verification_status,
   primary_domain, account_age_days, total_messages_lifetime,
   current_supporter_tier, claimed, claimed_at, claim_payment_id, claim_contact
 ) VALUES (
@@ -151,7 +151,6 @@ INSERT INTO operators (
   'TransVaultOrigin',
   'TheSignalVault',
   'active',
-  'public',
   'audited',
   'claude',
   119,
@@ -187,7 +186,7 @@ SELECT
   0, 0, '1.0'
 FROM operators o
 WHERE o.codename = 'TransVaultOrigin'
-ON CONFLICT (operator_id, snapshot_date, window_type) DO NOTHING;
+ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO NOTHING;
 
 -- ----------------------------------------------------------------------------
 -- MO§ES rank_history — global #1, percentile 99.97.
@@ -267,7 +266,7 @@ FROM (VALUES
 ,  ('AshIgnition', 4036000000000, 1258000000000, 99000000000, 1661000000000, 11.8, 0.118, 12, 3, 2.8, 1200, 1.4, 'ARCH+ II')
 ) AS v(codename, input, output, cc, cr, signa, comp, pc, ct, sd, tt, sf, cls)
 JOIN operators o ON o.codename = v.codename
-ON CONFLICT (operator_id, snapshot_date, window_type) DO NOTHING;
+ON CONFLICT (operator_id, snapshot_date, window_type, platform) DO NOTHING;
 
 -- ----------------------------------------------------------------------------
 -- system_stats — singleton homepage aggregate block.
