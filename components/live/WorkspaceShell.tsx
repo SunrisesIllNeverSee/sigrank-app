@@ -484,7 +484,7 @@ export function WorkspaceShell({
               </svg>
             </button>
             <div className="notifpop" hidden={!notifOpen}>
-              <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>
+              {notifOpen && <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>}
             </div>
             <div className="sacct" ref={acctRef}>
               <button
