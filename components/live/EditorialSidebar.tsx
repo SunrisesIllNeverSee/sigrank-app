@@ -51,6 +51,7 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
   ],
   articles: [
     { label: "All Articles", href: "/articles" },
+    { label: "The Operator Explains 95%", href: "/blog/the-operator-explains-95-percent-of-the-difference" },
     { label: "The Human in the Loop Is Unmeasured", href: "/blog/the-human-in-the-loop-is-unmeasured" },
     { label: "Volume Isn't Yield", href: "/blog/volume-isnt-yield" },
     { label: "The Three Modes", href: "/blog/the-three-modes-behind-the-ai-operator-board" },
@@ -58,6 +59,7 @@ const PAGES: Record<WorkspaceTopic, ReadonlyArray<{ label: string; href: string 
   ],
   blog: [
     { label: "All Posts", href: "/blog" },
+    { label: "The Operator Explains 95%", href: "/blog/the-operator-explains-95-percent-of-the-difference" },
     { label: "Benchmarking Workflows", href: "/blog/how-to-benchmark-ai-coding-workflow" },
     { label: "AI Coding Tools", href: "/blog/best-ai-coding-tools-2026" },
     { label: "Operator Scoring", href: "/blog/best-ai-operator-scoring-for-teams" },
