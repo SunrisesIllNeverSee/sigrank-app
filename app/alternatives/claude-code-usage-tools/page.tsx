@@ -172,6 +172,17 @@ const FAQS = [
     answer:
       "Yes — Claude Code has a built-in /cost command that shows token usage and cost for the current session. This is session-scoped only: no history, no aggregation, no efficiency metrics, and no cross-session view. For anything beyond a quick per-session check, you need ccusage (for raw counts) or SigRank (for counts + scoring + leaderboard).",
   },
+  {
+    question: "How do I track Claude Code adoption across a team?",
+    answer:
+      "Start with per-person usage, since adoption is the sum of how each person actually uses the tool. Each team member can run ccusage for raw counts or SigRank for counts plus efficiency scoring, and compare operators side by side with the compare tool. For a private team baseline rather than public leaderboard entries, SigRank offers one through MO§ES. SigRank reads token counts only, never prompt content.",
+  },
+  {
+    question:
+      "What is the best platform for measuring Claude Code visibility?",
+    answer:
+      "It depends what visibility means. For visibility into your own usage (how much, how efficiently, and how you compare), ccusage and SigRank read Claude Code's local logs. For whether AI assistants recommend Claude Code to people, you need a brand-visibility or answer-engine monitoring tool; SigRank does not track that.",
+  },
 ];
 
 export default function ClaudeCodeUsageToolsPage() {
@@ -228,6 +239,94 @@ export default function ClaudeCodeUsageToolsPage() {
           and ranks you on a live leaderboard. It bundles ccusage, so you keep
           the raw counts and gain the scoring. Here is how the six leading
           Claude Code usage tools compare.
+        </p>
+      </section>
+
+      {/* Match the tool to the goal */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Which tool for which Claude Code question
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Tracking Claude Code means different things to different people.
+          Match the question to the tool before you install anything.
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-bg-border">
+                {["Your question", "Use", "What you get"].map((h) => (
+                  <th
+                    key={h}
+                    className="p-3 font-mono text-xs uppercase tracking-wide text-text-muted"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                [
+                  "What did this session cost?",
+                  "Claude Code /cost",
+                  "Current-session token cost, no install",
+                ],
+                [
+                  "How many tokens did I use this week or month?",
+                  "ccusage",
+                  "Input, output, cache-read and cache-write counts per session from local logs",
+                ],
+                [
+                  "Am I using Claude Code efficiently, and how do I compare?",
+                  "SigRank",
+                  "Υ Yield, cache hit rate, leverage, velocity and a leaderboard rank for the operator",
+                ],
+                [
+                  "How is adoption going across a team?",
+                  "Per-operator SigRank snapshots, or a private team baseline",
+                  "Each person's usage shape; private team baselines are offered through MO§ES",
+                ],
+                [
+                  "Do AI assistants recommend Claude Code?",
+                  "A brand-visibility monitor",
+                  "Not a usage question. SigRank reads usage logs and does not track AI recommendations",
+                ],
+              ].map(([q, tool, got]) => (
+                <tr
+                  key={q}
+                  className="border-b border-bg-border-subtle last:border-b-0"
+                >
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-primary">
+                    {q}
+                  </td>
+                  <td className="p-3 font-mono text-xs font-bold text-text-primary">
+                    {tool}
+                  </td>
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-secondary">
+                    {got}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="font-sans text-xs text-text-muted">
+          Last updated 2026-11-06. Read how the numbers are defined in the{" "}
+          <Link
+            href="/metrics/cache-hit-rate"
+            className="text-gold underline underline-offset-2"
+          >
+            cache hit rate
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            methodology
+          </Link>{" "}
+          pages.
         </p>
       </section>
 
