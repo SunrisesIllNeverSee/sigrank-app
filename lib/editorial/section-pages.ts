@@ -12,6 +12,9 @@ export const SECTION_PAGES = {
     { label: "How to Read Your Token Cascade", href: "/guides/how-to-read-your-cascade" },
     { label: "How to Reduce Token Waste in AI Coding", href: "/guides/how-to-reduce-token-waste" },
     { label: "How to Track Your Token Cascade", href: "/guides/how-to-track-token-cascade" },
+    { label: "LLM Token Usage Spike Alerts", href: "/guides/llm-token-usage-spike-alerts" },
+    { label: "Best AI Tools 2026", href: "/guides/best-ai-tools-2026" },
+    { label: "AI Rating", href: "/guides/ai-rating" },
     { label: "Learn", href: "/learn" },
   ],
   tools: [

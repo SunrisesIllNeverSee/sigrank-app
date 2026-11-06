@@ -35,7 +35,7 @@ const FAQS = [
   {
     question: "What is a good threshold for an LLM token usage spike alert?",
     answer:
-      "Start from your own baseline rather than a fixed number. A common starting point is to warn when a session or day reaches 2 to 3 times its trailing median and to page when it reaches 5 times, then tune after two weeks of alerts. These multipliers are working heuristics, not measured standards; the right values depend on how variable your normal usage is.",
+      "Start from your own baseline rather than a fixed number. A common starting point is to warn when a day exceeds 1.5 times the 90th percentile (p90) of the trailing 14 days and to page at 3 times p90, and to stop a session at 2 times the p90 session. Tune after two weeks of alerts. These multipliers are working heuristics, not measured standards; the right values depend on how variable your normal usage is.",
   },
   {
     question: "Should I alert per session or per day?",
@@ -45,7 +45,7 @@ const FAQS = [
   {
     question: "Why does a drop in cache hit rate cause a token spike?",
     answer:
-      "When the cached prefix stops matching, the same context is billed as fresh input or as a new cache write instead of a cheap cache read. Anthropic's documentation prices cache reads at a fraction of base input (0.1x for most models as of 2026-11-06) and 5-minute cache writes at 1.25x, so a broken cache raises cost sharply even when your prompts have not grown. Anything that changes the cached prefix, such as tool definitions, system prompt edits or a timestamp placed early in the prompt, can cause it.",
+      "When the cached prefix stops matching, the same context is billed as fresh input or as a new cache write instead of a cheap cache read. Anthropic's documentation prices cache reads at a fraction of base input (0.1x for most models, lower for some newer ones, as of 2026-11-06) and 5-minute cache writes above base input, so a broken cache raises cost sharply even when your prompts have not grown. Check the current multipliers in the linked docs. Anything that changes the cached prefix, such as tool definitions, system prompt edits or a timestamp placed early in the prompt, can cause it. Note that the cache hit rate ratio alone can miss this: if caching stops entirely the ratio is undefined, so also watch cache_read and fresh input per turn.",
   },
   {
     question: "How do I detect a runaway agent loop?",
@@ -63,25 +63,28 @@ const ALERT_TABLE = [
   {
     alert: "Per-session token cap",
     signal: "Total tokens in one session",
-    start: "Hard stop at 3 to 5 times your median session",
+    start: "Hard stop at 2 times your p90 session",
     catches: "Runaway agent loops, accidental huge-file reads",
   },
   {
     alert: "Per-day spend or token trend",
     signal: "Daily total vs trailing 14-day median",
-    start: "Warn at 2 to 3 times, page at 5 times",
+    start: "Warn above 1.5 times the p90 day, page above 3 times p90",
     catches: "Slow drift, new expensive workflow, broken cache",
   },
   {
-    alert: "Cache hit rate drop",
-    signal: "cache_read / (cache_read + cache_write), day over day",
-    start: "Warn when it falls well below your own 14-day range",
-    catches: "Prefix changes that invalidate prompt caching",
+    alert: "Cache reuse drop",
+    signal:
+      "cache_read per turn, plus fresh input per turn; cache hit rate as a companion",
+    start:
+      "Warn when cache_read per turn falls below half its 14-day median, or cache hit rate drops 15 points below its 14-day median",
+    catches:
+      "Prefix changes that invalidate prompt caching, including total cache loss where the ratio is undefined",
   },
   {
     alert: "Fresh input per turn",
     signal: "Uncached input tokens per request",
-    start: "Warn when the median per-turn value doubles",
+    start: "Warn when the median per-turn value reaches 2 times its 14-day median",
     catches: "Re-pasted context, tool output dumped into the prompt",
   },
   {
@@ -257,9 +260,21 @@ export default function SpikeAlertsGuide() {
           as cache_read / (cache_read + cache_write). When it falls, the same
           context is being rebuilt instead of reused. Anthropic&apos;s
           documentation prices cache reads at 0.1x base input for most models
-          (lower for some newer ones) and 5-minute cache writes at 1.25x, so a
-          cache that stops matching raises cost without any change in what you
-          asked the model to do (checked 2026-11-06).
+          (lower for some newer ones) and 5-minute cache writes above base
+          input, so a cache that stops matching raises cost without any change
+          in what you asked the model to do (as of 2026-11-06; check the{" "}
+          <a
+            href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+            className={LINK}
+            rel="noopener"
+          >
+            current multipliers
+          </a>
+          ). The ratio has a blind spot: if caching stops entirely, both
+          cache_read and cache_write are zero and the ratio is undefined, and
+          if the broken prefix is billed as fresh input the ratio can look
+          unchanged. So also alert on cache_read per turn and fresh input per
+          turn.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The usual causes are in the provider docs: a change to tool

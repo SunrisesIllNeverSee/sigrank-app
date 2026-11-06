@@ -278,12 +278,17 @@ export default function AICodingEfficiencyToolsPage() {
                 [
                   "Is the team adopting the tool?",
                   "Suggestion and acceptance stats",
-                  "GitHub Copilot metrics, Cursor insights",
+                  "Your editor or assistant vendor's admin analytics",
                 ],
                 [
-                  "How much does each unit of output cost?",
-                  "Output and cost per fresh input token",
-                  "ccusage counts; SigRank Velocity and cost per 1M",
+                  "What does a million tokens cost me?",
+                  "Cost per 1M tokens",
+                  "ccusage counts; SigRank reports cost per 1M",
+                ],
+                [
+                  "How much output do I get per unit of fresh input?",
+                  "Velocity (output / input)",
+                  "SigRank; a token ratio, not a cost",
                 ],
                 [
                   "Is context being reused or rebuilt?",

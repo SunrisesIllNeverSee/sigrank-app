@@ -1,8 +1,8 @@
 /**
  * app/guides/page.tsx — Guides index.
  *
- * Hub page listing all eleven guides. Each child page carries HowTo +
- * FAQPage + BreadcrumbList schema. This index adds an ItemList so AI engines
+ * Hub page listing every guide. Each child page carries FAQPage +
+ * BreadcrumbList schema (some also HowTo or Article). This index adds an ItemList so AI engines
  * see the full guide set as a structured collection.
  *
  * JSON-LD: breadcrumb() + ItemList.
@@ -18,7 +18,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Guides — AI Coding Efficiency How-Tos",
   description:
-    "Eleven guides: measure AI coding efficiency, improve your yield, reduce token waste, read your token cascade, track it, benchmark your workflow, compare operators, troubleshoot cache write convergence, set token usage spike alerts, choose AI tools, and understand AI ratings.",
+    "Guides on how to measure AI coding efficiency, improve your yield, reduce token waste, read your token cascade, track it, benchmark your workflow, compare operators, troubleshoot cache write convergence, set token usage spike alerts, choose AI tools, and understand AI ratings.",
   path: "/guides",
 });
 
