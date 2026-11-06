@@ -1026,7 +1026,9 @@ export async function getHallOfSignal(
     // by the public role, and the view applies the visibility redaction.
     const { data, error } = await sb
       .from("operator_badges")
-      .select("awarded_at, source_note, operator_id, badges:badge_id ( badge_name )")
+      .select(
+        "awarded_at, source_note, operator_id, badges:badge_id ( badge_name )",
+      )
       .order("awarded_at", { ascending: false });
     if (error) throw error;
 
@@ -1042,22 +1044,28 @@ export async function getHallOfSignal(
 
     // Only public profiles are named; fail closed on lookup error.
     const joinedIds = [
-      ...new Set(rows.map((r) => r.operator_id).filter((id): id is string => !!id)),
+      ...new Set(
+        rows.map((r) => r.operator_id).filter((id): id is string => !!id),
+      ),
     ];
-    const publicOps = new Map<string, { codename: string | null; display_name: string | null }>();
-    try {
-      const { data: pub } = await sb
-        .from("operators_public")
-        .select("operator_id, codename, display_name")
-        .eq("profile_visibility", "public")
-        .in("operator_id", joinedIds);
-      for (const op of (pub ?? []) as { operator_id: string; codename: string | null; display_name: string | null }[]) {
-        publicOps.set(op.operator_id, op);
-      }
-    } catch {
-      publicOps.clear();
+    type PublicOp = {
+      operator_id: string;
+      codename: string | null;
+      display_name: string | null;
+    };
+    const publicOps = new Map<string, PublicOp>();
+    const { data: pub, error: pubError } = await sb
+      .from("operators_public")
+      .select("operator_id, codename, display_name")
+      .eq("profile_visibility", "public")
+      .in("operator_id", joinedIds);
+    if (pubError) {
+      console.warn("getHallOfSignal public lookup failed:", pubError);
+    } else {
+      for (const op of (pub ?? []) as PublicOp[]) publicOps.set(op.operator_id, op);
     }
-    const publicOp = (r: HallJoin) => (r.operator_id ? publicOps.get(r.operator_id) : undefined);
+    const publicOp = (r: HallJoin) =>
+      r.operator_id ? publicOps.get(r.operator_id) : undefined;
     const operatorName = (r: HallJoin) => {
       const op = publicOp(r);
       return op ? op.display_name || op.codename || "unknown" : "unknown";
