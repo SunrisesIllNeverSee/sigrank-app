@@ -7,9 +7,10 @@
  * page is never delayed or broken by analytics.
  *
  * The event keeps the name the proxy has always used, `ai_bot_detected`, so
- * PostHog charts keep their history (data since 2026-08-17). It has a fixed
- * property set, so a dashboard can break visits down by bot, family, site
- * and page.
+ * counts by event and bot_name continue from 2026-08-17. Older events carry
+ * bot_category, bot_allowed, url and one shared distinct id ("ai-bot"); these
+ * carry bot_family, host, path and one id per bot. No saved insight used the
+ * old fields (checked 2026-11-06).
  */
 
 import type { BotInfo } from "./bot-detect";
@@ -68,8 +69,9 @@ const FAMILY: Record<string, CrawlerFamily> = {
 // into the dashboard.
 const PRODUCTION_HOSTS = new Set(["signalaf.com", "www.signalaf.com"]);
 
-// Signed-in areas: never record their paths, even for a crawler user-agent.
-const PRIVATE_PATH = /^\/(?:me|settings|auth)(?:\/|$)/;
+// Signed-in areas, sign-in callbacks and the analytics relay: never record
+// their paths, even for a crawler user-agent.
+const PRIVATE_PATH = /^\/(?:me|settings|auth|api\/auth|ingest)(?:\/|$)/;
 
 export function crawlerFamily(botName: string): CrawlerFamily | null {
   return FAMILY[botName] ?? null;

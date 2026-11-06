@@ -101,7 +101,7 @@ test("previews, local runs, signed-in paths and non-GET requests send nothing", 
   for (const host of ["sigrank-app.vercel.app", "sigrank-app-git-x.vercel.app", "localhost", "analyst.signalaf.com"]) {
     assert.equal(crawlerHit(bot, new URL(`https://${host}/`), "GET"), null, host);
   }
-  for (const path of ["/me", "/me/profile", "/settings", "/settings/keys", "/auth/callback"]) {
+  for (const path of ["/me", "/me/profile", "/settings", "/settings/keys", "/auth/callback", "/api/auth/callback", "/ingest/e"]) {
     assert.equal(crawlerHit(bot, new URL(`https://signalaf.com${path}`), "GET"), null, path);
   }
   for (const method of ["POST", "PUT", "DELETE", "OPTIONS"]) {
