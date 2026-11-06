@@ -1021,59 +1021,47 @@ export async function getHallOfSignal(
   if (!sb) return MOCK_HALL;
   try {
     void params;
-    // Hall records derive from badge awards. We embed the badge catalog (for the
-    // record title) and the operator (for the codename), newest awards first.
+    // Hall records derive from badge awards, newest first. Operator identity
+    // comes from operators_public: the base operators table is not readable
+    // by the public role, and the view applies the visibility redaction.
     const { data, error } = await sb
       .from("operator_badges")
-      .select(
-        "awarded_at, source_note, " +
-          "badges:badge_id ( badge_name ), " +
-          "operators:operator_id ( operator_id, codename, display_name )",
-      )
+      .select("awarded_at, source_note, operator_id, badges:badge_id ( badge_name )")
       .order("awarded_at", { ascending: false });
     if (error) throw error;
 
     type HallJoin = {
       awarded_at: string | null;
       source_note: string | null;
+      operator_id: string | null;
       badges: { badge_name: string | null } | null;
-      operators: {
-        operator_id: string | null;
-        codename: string | null;
-        display_name: string | null;
-      } | null;
     };
     const rows = (data as unknown as HallJoin[] | null) ?? [];
     // Live path: an empty awards table is an empty Hall, not fixture records.
     if (rows.length === 0) return [];
 
-    // The FK embed reads the base `operators` table, bypassing the
-    // operators_public redaction contract. Look up visibility for the joined
-    // ids and redact private operators' identity — fail closed on lookup error.
+    // Only public profiles are named; fail closed on lookup error.
     const joinedIds = [
-      ...new Set(
-        rows
-          .map((r) => r.operators?.operator_id)
-          .filter((id): id is string => !!id),
-      ),
+      ...new Set(rows.map((r) => r.operator_id).filter((id): id is string => !!id)),
     ];
-    let publicIds: Set<string>;
+    const publicOps = new Map<string, { codename: string | null; display_name: string | null }>();
     try {
       const { data: pub } = await sb
         .from("operators_public")
-        .select("operator_id")
+        .select("operator_id, codename, display_name")
         .eq("profile_visibility", "public")
         .in("operator_id", joinedIds);
-      publicIds = new Set(
-        ((pub ?? []) as { operator_id: string }[]).map((r) => r.operator_id),
-      );
+      for (const op of (pub ?? []) as { operator_id: string; codename: string | null; display_name: string | null }[]) {
+        publicOps.set(op.operator_id, op);
+      }
     } catch {
-      publicIds = new Set();
+      publicOps.clear();
     }
-    const operatorName = (r: HallJoin) =>
-      r.operators?.operator_id && publicIds.has(r.operators.operator_id)
-        ? r.operators.display_name || r.operators.codename || "unknown"
-        : "unknown";
+    const publicOp = (r: HallJoin) => (r.operator_id ? publicOps.get(r.operator_id) : undefined);
+    const operatorName = (r: HallJoin) => {
+      const op = publicOp(r);
+      return op ? op.display_name || op.codename || "unknown" : "unknown";
+    };
 
     const records: HallRecord[] = rows.map((r) => {
       // source_note may carry an explicit RW.xx reward id; otherwise fall back to
@@ -1086,10 +1074,7 @@ export async function getHallOfSignal(
         title:
           r.badges?.badge_name ?? REWARDS[rewardId]?.reward ?? "Hall of Signal",
         operator_codename: operatorName(r),
-        codename:
-          r.operators?.operator_id && publicIds.has(r.operators.operator_id)
-            ? r.operators.codename || undefined
-            : undefined,
+        codename: publicOp(r)?.codename || undefined,
         value: note || (r.badges?.badge_name ?? ""),
         date: (r.awarded_at ?? "").slice(0, 10),
         isPlaceholder: false,
