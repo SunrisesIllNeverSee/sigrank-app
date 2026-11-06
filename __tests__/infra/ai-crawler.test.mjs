@@ -44,10 +44,10 @@ test("each real crawler user-agent is identified by name and family", () => {
   }
 });
 
-test("a crawler hit becomes one ai_crawler_hit event with a per-bot id and no person profile", () => {
+test("a crawler hit becomes one ai_bot_detected event with a per-bot id and no person profile", () => {
   const hit = crawlerHit(detectBot(UA["ChatGPT-User"]), url, "GET");
   assert.equal(hit.event, AI_CRAWLER_EVENT);
-  assert.equal(hit.event, "ai_crawler_hit");
+  assert.equal(hit.event, "ai_bot_detected");
   assert.equal(hit.distinctId, "crawler:ChatGPT-User");
   assert.deepEqual(hit.properties, {
     bot_name: "ChatGPT-User",
@@ -85,7 +85,8 @@ test("proxy sends the crawler event after the response and lets crawlers reach r
   const proxy = readFileSync(new URL("../../proxy.ts", import.meta.url), "utf8");
   assert.match(proxy, /export async function proxy\(request: NextRequest, event\?: NextFetchEvent\)/);
   assert.match(proxy, /event\.waitUntil\(sent\)/);
-  assert.doesNotMatch(proxy, /ai_bot_detected/);
+  // The event name lives in lib/infra/ai-crawler.ts only.
+  assert.doesNotMatch(proxy, /"ai_bot_detected"/);
   const matcher = proxy.slice(proxy.indexOf("export const config"));
   for (const file of ["/robots.txt", "/llms.txt", "/llms-full.txt", "/sitemap.xml"]) {
     assert.ok(matcher.includes(`"${file}"`), file);

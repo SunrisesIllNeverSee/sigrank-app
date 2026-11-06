@@ -6,13 +6,15 @@
  * event, sends it server-side after the response (event.waitUntil), so the
  * page is never delayed or broken by analytics.
  *
- * One event name, `ai_crawler_hit`, with a fixed property set, so a PostHog
- * dashboard can break visits down by bot, family, site and page.
+ * The event keeps the name the proxy has always used, `ai_bot_detected`, so
+ * PostHog charts keep their history (data since 2026-08-17). It has a fixed
+ * property set, so a dashboard can break visits down by bot, family, site
+ * and page.
  */
 
 import type { BotInfo } from "./bot-detect";
 
-export const AI_CRAWLER_EVENT = "ai_crawler_hit";
+export const AI_CRAWLER_EVENT = "ai_bot_detected";
 
 /**
  * What the crawler is for:
