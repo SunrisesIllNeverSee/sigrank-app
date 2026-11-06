@@ -246,6 +246,93 @@ export default function AICodingEfficiencyToolsPage() {
         </p>
       </section>
 
+      {/* Team health and generation efficiency: what each tool can answer */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Team coding health versus generation efficiency
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Two questions get mixed up. <em>Team coding health</em> asks whether a
+          team is adopting AI tools and getting value from them.{" "}
+          <em>Generation efficiency</em> asks how much input and cost it takes
+          to produce a given amount of output. Acceptance-rate dashboards
+          speak to the first; token metrics speak to the second. Neither
+          measures code quality.
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-bg-border">
+                {["Question", "Signal", "Where to get it"].map((h) => (
+                  <th
+                    key={h}
+                    className="p-3 font-mono text-xs uppercase tracking-wide text-text-muted"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                [
+                  "Is the team adopting the tool?",
+                  "Suggestion and acceptance stats",
+                  "GitHub Copilot metrics, Cursor insights",
+                ],
+                [
+                  "How much does each unit of output cost?",
+                  "Output and cost per fresh input token",
+                  "ccusage counts; SigRank Velocity and cost per 1M",
+                ],
+                [
+                  "Is context being reused or rebuilt?",
+                  "Cache hit rate, Leverage",
+                  "SigRank (see cache hit rate)",
+                ],
+                [
+                  "Who on the team operates most efficiently?",
+                  "Υ Yield by operator",
+                  "SigRank compare, or a private team baseline via MO§ES",
+                ],
+              ].map(([q, s, w]) => (
+                <tr
+                  key={q}
+                  className="border-b border-bg-border-subtle last:border-b-0"
+                >
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-primary">
+                    {q}
+                  </td>
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-secondary">
+                    {s}
+                  </td>
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-secondary">
+                    {w}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="font-sans text-xs text-text-muted">
+          Last updated 2026-11-06. Definitions are on the{" "}
+          <Link
+            href="/metrics/cache-hit-rate"
+            className="text-gold underline underline-offset-2"
+          >
+            cache hit rate
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/metrics/yield-cascade"
+            className="text-gold underline underline-offset-2"
+          >
+            yield cascade
+          </Link>{" "}
+          pages.
+        </p>
+      </section>
+
       {/* Comparison table */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
