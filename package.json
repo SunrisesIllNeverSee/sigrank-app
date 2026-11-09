@@ -36,7 +36,7 @@
   "dependencies": {
     "@modelcontextprotocol/node": "^2.1.2",
     "@modelcontextprotocol/server": "^2.4.0",
-    "@posthog/mcp": "0.25.0",
+    "@posthog/mcp": "0.25.2",
     "@stripe/stripe-js": "^10.1.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
@@ -50,7 +50,7 @@
     "clackboard": "^1.1.2",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
-    "next": "^16.4.3",
+    "next": "^16.4.5",
     "posthog-js": "^1.438.12",
     "posthog-node": "^5.61.1",
     "react": "^19.3.1",
@@ -70,8 +70,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
-    "@next/eslint-plugin-next": "^16.4.3",
-    "@opennextjs/cloudflare": "^1.20.14",
+    "@next/eslint-plugin-next": "^16.4.5",
+    "@opennextjs/cloudflare": "^1.20.16",
     "@playwright/test": "^1.64.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
@@ -91,7 +91,7 @@
     "tteop-spec": "0.1.5-draft",
     "typescript": "5.8.2",
     "typescript-eslint": "^8.72.1",
-    "vite": "^8.3.5",
+    "vite": "^8.3.6",
     "vitest": "^5.0.5",
     "wrangler": "^4.156.0"
   },
