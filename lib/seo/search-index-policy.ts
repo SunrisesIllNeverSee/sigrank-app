@@ -104,6 +104,9 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/guides/how-to-compare-ai-operators": "SUPPORTED",
   "/guides/how-to-read-your-cascade": "SUPPORTED",
   "/guides/cache-write-convergence": "SUPPORTED",
+  "/guides/llm-token-usage-spike-alerts": "SUPPORTED",
+  "/guides/best-ai-tools-2026": "SUPPORTED",
+  "/guides/ai-rating": "SUPPORTED",
 
   // ── Established comparisons (major-tool intent; 3 sentinel-backed) ──────
   "/vs/ccusage": "SUPPORTED",
@@ -165,6 +168,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/wiki/metrics/scale-v": "SUPPORTED", // canon metric (Scale V), added 2026-10-12
 
   // ── Blog — established essays (1 sentinel-backed) ───────────────────────
+  "/blog/the-operator-explains-95-percent-of-the-difference": "SUPPORTED",
   "/blog/volume-isnt-yield": "SUPPORTED",
   "/blog/how-to-benchmark-ai-coding-workflow": "SUPPORTED",
   "/blog/the-human-in-the-loop-is-unmeasured": "SUPPORTED",

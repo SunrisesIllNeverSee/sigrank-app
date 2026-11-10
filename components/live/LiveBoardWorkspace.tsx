@@ -1785,7 +1785,7 @@ export function LiveBoardWorkspace({
               </svg>
             </button>
             <div className="notifpop" hidden={!notifOpen}>
-              <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>
+              {notifOpen && <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>}
             </div>
             {/* owner (pass 3): theme swatches moved into the settings
                 menu — the rail foot keeps only utility controls. */}

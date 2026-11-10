@@ -146,6 +146,11 @@ const FAQS = [
     answer:
       "Yes. SigRank, ccusage, Tokscale, Token Dashboard, and Tiktoken are all free and open-source. SigRank additionally offers a live operator leaderboard, MCP server integration, and class tiers at no cost.",
   },
+  {
+    question: "What is the best API token usage tracking platform?",
+    answer:
+      "For application-level API usage, with traces, cost and latency across a team, an LLM observability platform fits; Langfuse is one covered on our token cost tracking comparison. For tokens from coding agents such as Claude Code, ccusage counts them from local logs and SigRank adds efficiency scoring. Pick by what you need to watch: applications, or the operators using coding agents.",
+  },
 ];
 
 export default function TokenTrackingToolsPage() {
@@ -195,6 +200,92 @@ export default function TokenTrackingToolsPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           Here are the five best token tracking tools in 2026, compared.
+        </p>
+      </section>
+
+      {/* Software list by use case */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Token tracking software list, by use case
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          If you are building a list of token monitoring or API token usage
+          tracking software, sort the candidates by what they watch. The tools
+          covered on this page track tokens from coding agents and prompts; for
+          application-level API monitoring with team dashboards, see the
+          observability tools on{" "}
+          <Link
+            href="/alternatives/token-cost-tracking-tools"
+            className="text-gold underline underline-offset-2"
+          >
+            token cost tracking tools
+          </Link>
+          .
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-bg-border">
+                {["You want to track", "Candidates", "Note"].map((h) => (
+                  <th
+                    key={h}
+                    className="p-3 font-mono text-xs uppercase tracking-wide text-text-muted"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                [
+                  "Tokens in a single prompt, before sending",
+                  "Tiktoken",
+                  "A tokenizer library; counts a string, not sessions",
+                ],
+                [
+                  "Tokens across coding-agent sessions",
+                  "ccusage, Tokscale, Token Dashboard",
+                  "Count from local logs; Token Dashboard adds charts",
+                ],
+                [
+                  "Whether those tokens were used efficiently",
+                  "SigRank",
+                  "Scores Υ Yield and cache hit rate on top of the counts",
+                ],
+                [
+                  "Sudden jumps in usage",
+                  "Any counter, plus alert rules",
+                  "See the guide to token usage spike alerts",
+                ],
+              ].map(([w, c, n]) => (
+                <tr
+                  key={w}
+                  className="border-b border-bg-border-subtle last:border-b-0"
+                >
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-primary">
+                    {w}
+                  </td>
+                  <td className="p-3 font-mono text-xs font-bold text-text-primary">
+                    {c}
+                  </td>
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-secondary">
+                    {n}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="font-sans text-xs text-text-muted">
+          Last updated 2026-11-06. To turn counts into alerts, read{" "}
+          <Link
+            href="/guides/llm-token-usage-spike-alerts"
+            className="text-gold underline underline-offset-2"
+          >
+            LLM token usage spike alerts
+          </Link>
+          .
         </p>
       </section>
 
@@ -469,6 +560,13 @@ export default function TokenTrackingToolsPage() {
             className="text-gold underline underline-offset-2"
           >
             The Local Agent (MCP)
+          </Link>
+          {" · "}
+          <Link
+            href="/guides/llm-token-usage-spike-alerts"
+            className="text-gold underline underline-offset-2"
+          >
+            Token Usage Spike Alerts
           </Link>
         </p>
       </section>

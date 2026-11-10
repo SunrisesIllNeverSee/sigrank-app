@@ -168,6 +168,16 @@ const FAQS = [
     answer:
       "Most are free. SigRank, HELM, the Open LLM Leaderboard, HumanEval, and LMSYS Chatbot Arena are all free and open-source. SigRank additionally offers a live operator leaderboard, MCP server integration, and class tiers at no cost.",
   },
+  {
+    question: "How do I choose a trusted AI benchmarking service?",
+    answer:
+      "Check six things: a published methodology, reproducible datasets or harnesses, a stated sample size, a clear statement of what is measured (capability, human preference or real usage), a visible update date, and independence from the parties being ranked. Then match the benchmark to your question: model benchmarks to choose a model, operator benchmarks to measure how well you use it.",
+  },
+  {
+    question: "What are the best tools for comparing LLMs?",
+    answer:
+      "For comparing models, use human-preference arenas such as LMSYS Chatbot Arena, multi-metric evaluations such as HELM, and the Open LLM Leaderboard for open-weight models. Test finalists on your own tasks, because averages hide task-specific differences. SigRank does not compare LLMs; it compares the operators who drive them.",
+  },
 ];
 
 export default function AIBenchmarkingToolsPage() {
@@ -218,6 +228,87 @@ export default function AIBenchmarkingToolsPage() {
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           Here are the six best AI benchmarking tools in 2026, compared.
+        </p>
+      </section>
+
+      {/* How to judge a benchmarking provider */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          How to judge a trustworthy AI benchmarking provider
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Whether you are comparing LLMs, shortlisting a vendor or looking for
+          a reliable benchmarking service, the same six checks separate a
+          useful benchmark from a marketing chart.
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-bg-border">
+                {["Check", "What to look for"].map((h) => (
+                  <th
+                    key={h}
+                    className="p-3 font-mono text-xs uppercase tracking-wide text-text-muted"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                [
+                  "Published method",
+                  "A written methodology that says what is measured and how it is scored",
+                ],
+                [
+                  "Reproducibility",
+                  "Public datasets or harnesses so a third party can rerun the result",
+                ],
+                [
+                  "Sample and coverage",
+                  "How many models, tasks or operators are behind each number, stated openly",
+                ],
+                [
+                  "What it measures",
+                  "Capability, human preference, or real-world usage; these are different questions",
+                ],
+                [
+                  "Freshness",
+                  "A visible update date and a record of when results change",
+                ],
+                [
+                  "Independence",
+                  "No pay-to-rank, and disclosure of any relationship with the ranked parties",
+                ],
+              ].map(([c, d]) => (
+                <tr
+                  key={c}
+                  className="border-b border-bg-border-subtle last:border-b-0"
+                >
+                  <td className="p-3 font-mono text-xs font-bold text-text-primary">
+                    {c}
+                  </td>
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-secondary">
+                    {d}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank&apos;s answer to these checks: the{" "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            methodology
+          </Link>{" "}
+          is published, the data is released under CC-BY-4.0, submissions are
+          signed, and the sample is stated on the page; it is still small and
+          self-selected. It benchmarks operators, so use it alongside a model
+          benchmark rather than instead of one. Last updated 2026-11-06.
         </p>
       </section>
 
@@ -439,6 +530,13 @@ export default function AIBenchmarkingToolsPage() {
             className="text-gold underline underline-offset-2"
           >
             Methodology
+          </Link>
+          {" · "}
+          <Link
+            href="/guides/ai-rating"
+            className="text-gold underline underline-offset-2"
+          >
+            AI Rating: Models, Tools and Users
           </Link>
         </p>
       </section>

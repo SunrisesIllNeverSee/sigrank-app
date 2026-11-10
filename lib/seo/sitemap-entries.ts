@@ -68,6 +68,7 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   { path: "/fieldhub", priority: 0.8, changeFrequency: "daily" },
   { path: "/field", priority: 0.8, changeFrequency: "daily" },
   { path: "/blog", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/blog/the-operator-explains-95-percent-of-the-difference", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/volume-isnt-yield", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/the-human-in-the-loop-is-unmeasured", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog/sigrank-dashboards", priority: 0.8, changeFrequency: "weekly" },
@@ -346,6 +347,21 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   },
   {
     path: "/guides/cache-write-convergence",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/guides/llm-token-usage-spike-alerts",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/guides/best-ai-tools-2026",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/guides/ai-rating",
     priority: 0.6,
     changeFrequency: "monthly",
   },

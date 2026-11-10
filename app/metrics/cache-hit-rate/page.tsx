@@ -363,6 +363,13 @@ export default function CacheHitRatePage() {
           </Link>
           {" · "}
           <Link
+            href="/guides/llm-token-usage-spike-alerts"
+            className="text-gold underline underline-offset-2"
+          >
+            Token usage spike alerts
+          </Link>
+          {" · "}
+          <Link
             href="/methodology"
             className="text-gold underline underline-offset-2"
           >

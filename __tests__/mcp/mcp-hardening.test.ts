@@ -122,3 +122,50 @@ describe("board memoization", () => {
     expect(h.getLeaderboard).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("plugin route timeouts", () => {
+  const rpcHeaders = { "content-type": "application/json", accept: "application/json, text/event-stream", "x-real-ip": "203.0.113.9" };
+
+  it("still answers tools/list with securitySchemes on every tool", async () => {
+    const res = await pluginPost(new NextRequest("https://analyst.signalaf.com/api/plugins/sigrank/mcp", {
+      method: "POST", headers: rpcHeaders,
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+    }));
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    const line = text.split("\n").find(l => l.startsWith("data: "));
+    const payload = JSON.parse(line ? line.slice(6) : text);
+    expect(payload.result.tools.length).toBeGreaterThan(0);
+    for (const tool of payload.result.tools) expect(tool.securitySchemes).toBeDefined();
+  });
+
+  it("passes batches through without decorating them", async () => {
+    const res = await pluginPost(new NextRequest("https://analyst.signalaf.com/api/plugins/sigrank/mcp", {
+      method: "POST", headers: rpcHeaders,
+      body: JSON.stringify([{ jsonrpc: "2.0", id: 1, method: "ping" }, { jsonrpc: "2.0", id: 2, method: "ping" }]),
+    }));
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).toContain('"id":1');
+    expect(text).toContain('"id":2');
+  });
+
+  it("returns 408 when the request body never arrives", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const body = new ReadableStream<Uint8Array>({ start() {} });
+      const pending = pluginPost(new NextRequest("https://analyst.signalaf.com/api/plugins/sigrank/mcp", {
+        method: "POST", headers: rpcHeaders, body, duplex: "half",
+      } as ConstructorParameters<typeof NextRequest>[1]));
+      await vi.advanceTimersByTimeAsync(10_000);
+      const res = await pending;
+      expect(res.status).toBe(408);
+      expect((await res.json()).jsonrpc).toBe("2.0");
+      expect(warn).toHaveBeenCalledWith("plugin mcp: request body not received", expect.anything());
+    } finally {
+      warn.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+});

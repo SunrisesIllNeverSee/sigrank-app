@@ -1,6 +1,6 @@
 # SigRank Supabase Migration Ledger — Ground Truth
 
-> **Discovered 2026-07-31 by Drep2** via direct query of live
+> **Discovered 2026-07-31 by maintainer** via direct query of live
 > `supabase_migrations.schema_migrations` on the linked Sigrank project
 > (`copqtaqzsdvpdbhpwjmt`, East US Ohio) using `supabase db query --linked`.
 > This file is the authoritative record of the remote ledger state BEFORE
@@ -163,7 +163,7 @@ re-running any existing SQL against prod.
 6. **NEVER `db push` or `migration up`** during reconcile. Only file
    renames + ledger stamping.
 
-**Decision point (for Drep1/owner):** The cleanest path is to adopt the
+**Decision point (for maintainer/owner):** The cleanest path is to adopt the
 Supabase-native `<timestamp>_name.sql` format for ALL migrations going
 forward, since that's what the ledger tracks. The numbered files become
 the canonical names only for 0001–0005 (which were CLI-applied with
