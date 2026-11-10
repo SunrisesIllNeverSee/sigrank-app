@@ -4,7 +4,7 @@
   "tools": [
     {
       "name": "get_leaderboard",
-      "title": "Get AI Operator Leaderboard",
+      "title": "Get SignalAF Leaderboard",
       "description": "Read the current SignalAF board for 7d, 30d, 90d or all time. The default is the website Total / All view of claimed operators. Set view=platforms for the broader By platform / All view, including unclaimed public rows; a platform filter also uses that view. Results are ranked by published Yield and include the board link, scope, operating ratios, provenance and access cap. Ranking eligibility means inclusion on this displayed board; it does not mean the underlying measurement is verified. Unclaimed does not prove seeded origin.",
       "inputSchema": {
         "type": "object",
@@ -1296,6 +1296,7 @@
         ]
       },
       "annotations": {
+        "title": "Get SignalAF Leaderboard",
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
@@ -1316,7 +1317,7 @@
     },
     {
       "name": "get_operator",
-      "title": "Get operator profile",
+      "title": "Get Operator Profile",
       "description": "Retrieve a public SignalAF operator by codename for a requested window. Use for an existing public profile, not to measure local usage or identify the caller. Returns metrics, provenance and a source link, or a missing-measurement state. Does not change data. Includes the canonical Build Archetype computed from complete snapshot pillars and its classifier version; unavailable axes remain unclassified.",
       "inputSchema": {
         "type": "object",
@@ -2494,6 +2495,7 @@
         ]
       },
       "annotations": {
+        "title": "Get Operator Profile",
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
@@ -2514,7 +2516,7 @@
     },
     {
       "name": "compare_operators",
-      "title": "Compare operator structure",
+      "title": "Compare Two Operators",
       "description": "Compare two public operators’ observable AI operating structure for a common window and cohort. Returns canonical metrics and differences only when evidence is compatible, otherwise incompatibility reasons. Does not infer intelligence, productivity, work quality or personality and does not change data.",
       "inputSchema": {
         "type": "object",
@@ -3817,6 +3819,7 @@
         ]
       },
       "annotations": {
+        "title": "Compare Two Operators",
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
@@ -3837,7 +3840,7 @@
     },
     {
       "name": "get_field_stats",
-      "title": "Get field statistics",
+      "title": "Get Field Statistics",
       "description": "Get distributions and field size for the public SignalAF board. Defaults to the broader By platform / All population, including unclaimed rows; set view=total for the claimed-operator Total / All field. Returns available metric distributions and provenance. No unsupported evidence-class cohort or seed label is inferred.",
       "inputSchema": {
         "type": "object",
@@ -5262,6 +5265,7 @@
         ]
       },
       "annotations": {
+        "title": "Get Field Statistics",
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
@@ -5282,7 +5286,7 @@
     },
     {
       "name": "report_beta_bug",
-      "title": "Send beta bug report",
+      "title": "Report a Beta Bug",
       "description": "Send a concise SigRank | SignalAF beta bug report to hello@signalaf.com only after the user explicitly asks to submit it. Collect steps, expected and actual behavior; omit prompt content, credentials, raw logs and private telemetry. Returns a delivery reference or an error; does not alter operator data.",
       "inputSchema": {
         "type": "object",
@@ -5344,7 +5348,8 @@
             "maxLength": 254
           },
           "consent_confirmed": {
-            "const": true
+            "type": "boolean",
+            "description": "True only after the user has explicitly asked to submit this bug report."
           }
         },
         "required": [
@@ -5522,6 +5527,7 @@
         ]
       },
       "annotations": {
+        "title": "Report a Beta Bug",
         "readOnlyHint": false,
         "destructiveHint": false,
         "idempotentHint": false,
