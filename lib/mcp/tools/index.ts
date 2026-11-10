@@ -33,7 +33,7 @@ export const TOOLS = [
     name: "rank_paste",
     title: "Rank Paste — Local Token Cascade Calculator",
     description:
-      "Calculate SigRank cascade metrics from four non-negative token counts without submitting data. Returns Yield, Leverage, Velocity, SNR, and 10xDEV. No data is persisted.",
+      "Calculate SigRank cascade metrics from four non-negative token counts without submitting data. Returns Yield, Leverage, Velocity, SNR, and 10xDEV. No data is persisted. The arguments object must be a JSON object with all four required numeric properties at the top level (not nested, not strings): input, output, cache_read, cache_write. Example arguments: {\"input\": 1000000, \"output\": 50000, \"cache_read\": 20000000, \"cache_write\": 500000}.",
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",
@@ -345,7 +345,7 @@ export const TOOLS = [
     name: "benchmark_me",
     title: "Benchmark Me — Field Position Analyzer",
     description:
-      "Answers 'How good am I?' — benchmarks your token cascade against the live field. Takes 4 token pillars (or a codename), computes your cascade, then compares against the live leaderboard: percentile, rank, distance from median, distance from top 10%, strongest metric, weakest metric, and a one-line interpretation. This is the human-question tool — use it when someone asks 'am I a power user?' or 'how do I compare?'.",
+      "Answers 'How good am I?' — benchmarks your token cascade against the live field. Takes 4 token pillars (or a codename), computes your cascade, then compares against the live leaderboard: percentile, rank, distance from median, distance from top 10%, strongest metric, weakest metric, and a one-line interpretation. This is the human-question tool — use it when someone asks 'am I a power user?' or 'how do I compare?'. Arguments must be a JSON object with either a codename (e.g. {\"codename\": \"signal-ae3b5c3c55\"}) or all four numeric pillars at the top level (e.g. {\"input\": 1000000, \"output\": 50000, \"cache_read\": 20000000, \"cache_write\": 500000}); partial pillars are rejected.",
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",
@@ -491,10 +491,28 @@ export function validNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
+const PILLAR_EXAMPLE = '{"input": 1000000, "output": 50000, "cache_read": 20000000, "cache_write": 500000}';
+
+/**
+ * Self-correcting message for a bad pillar payload: names the fields that are
+ * missing or invalid and shows the expected arguments object. Validation is
+ * unchanged; only the wording is richer.
+ */
+export function pillarErrorMessage(args: Record<string, unknown>): string {
+  const fields = ["input", "output", "cache_read", "cache_write"] as const;
+  const missing = fields.filter((f) => args[f] === undefined || args[f] === null);
+  const invalid = fields.filter((f) => !missing.includes(f) && !validNumber(args[f]));
+  const parts = ["input, output, cache_read, and cache_write must be non-negative finite numbers."];
+  if (missing.length) parts.push(`Missing: ${missing.join(", ")}.`);
+  if (invalid.length) parts.push(`Not a non-negative finite number: ${invalid.join(", ")} (send JSON numbers, not strings).`);
+  parts.push(`Pass them as top-level properties of the arguments object, e.g. ${PILLAR_EXAMPLE}.`);
+  return parts.join(" ");
+}
+
 export function parsePillars(args: Record<string, unknown>): { input: number; output: number; cacheCreate: number; cacheRead: number } | { error: string } {
   const { input, output, cache_read, cache_write } = args;
   if (![input, output, cache_read, cache_write].every(validNumber)) {
-    return { error: "input, output, cache_read, and cache_write must be non-negative finite numbers" };
+    return { error: pillarErrorMessage(args) };
   }
   return {
     input: input as number,
@@ -543,7 +561,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const cacheWrite = args.cache_write;
     if (![input, output, cacheRead, cacheWrite].every(validNumber)) {
       return textResult(
-        { code: "invalid_arguments", message: "input, output, cache_read, and cache_write must be non-negative finite numbers" },
+        { code: "invalid_arguments", message: pillarErrorMessage(args) },
         true,
       );
     }
@@ -580,7 +598,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
       entries: rows.map((row) => ({
         rank: row.global_rank,
         codename: row.operator.codename,
-        display_name: safeName(row.operator.display_name),
+        display_name: safeName(row.operator.display_name, row.operator.codename),
         class_tier: row.snapshot.class_tier,
         yield_: row.snapshot.cascade && !row.snapshot.cascade.nonCompounding
           ? row.snapshot.cascade.yield_
@@ -604,7 +622,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const cascade = row.snapshot.cascade;
     return textResult({
       codename: row.operator.codename,
-      display_name: safeName(row.operator.display_name),
+      display_name: safeName(row.operator.display_name, row.operator.codename),
       class_tier: row.snapshot.class_tier,
       rank: row.global_rank,
       percentile: row.percentile,
