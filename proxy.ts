@@ -1,6 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { type NextFetchEvent, type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { detectBot } from "@/lib/infra/bot-detect";
+import { crawlerHit } from "@/lib/infra/ai-crawler";
 import { captureServer } from "@/lib/infra/posthog/server";
 import { anonymousAnalystRoute, anonymousAnalystChallenge } from "@/lib/mcp/plugin/anonymous-origin";
 
@@ -146,7 +147,7 @@ function negotiatedHomepage(request: NextRequest): Response | null {
  * Root middleware — AI bot logging, homepage representation negotiation, and
  * scoped auth session refresh for authenticated surfaces.
  */
-export async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest, event?: NextFetchEvent) {
   const analystRoute = anonymousAnalystRoute(request.nextUrl.hostname, request.nextUrl.pathname);
   if (analystRoute === "public") {
     if (request.nextUrl.pathname === "/.well-known/openai-apps-challenge") {
@@ -181,16 +182,13 @@ export async function proxy(request: NextRequest) {
   }
 
   const bot = detectBot(request.headers.get("user-agent"));
-  if (bot.isBot) {
-    void captureServer("ai-bot", "ai_bot_detected", {
-      bot_name: bot.botName,
-      bot_operator: bot.botOperator,
-      bot_category: bot.category,
-      bot_allowed: bot.allowed,
-      path: request.nextUrl.pathname,
-      url: request.nextUrl.href,
-      method: request.method,
-    });
+  const hit = crawlerHit(bot, request.nextUrl, request.method);
+  if (hit) {
+    // Send after the response so analytics never delays or breaks the page.
+    // captureServer never throws.
+    const sent = captureServer(hit.distinctId, hit.event, hit.properties);
+    if (event) event.waitUntil(sent);
+    else void sent;
   }
 
   const negotiated = negotiatedHomepage(request);
@@ -257,6 +255,12 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     { source: "/:path*", has: [{ type: "host", value: "analyst.signalaf.com" }] },
+    // The crawler files, so we can see which AI crawlers read them. Other
+    // .txt and .xml files stay excluded and are served without the proxy.
+    "/robots.txt",
+    "/llms.txt",
+    "/llms-full.txt",
+    "/sitemap.xml",
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|css|js|map|woff|woff2|ttf|eot|otf)).*)",
   ],
 };

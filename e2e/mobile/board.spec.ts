@@ -33,7 +33,7 @@ test.describe("mobile board", () => {
     await page.setViewportSize({ width: 360, height: 800 });
     await gotoPhone(page, BOARD);
     const first = page.locator("li.bc .bc-main").first();
-    await expect(first).toHaveAttribute("aria-label", /rank 1, .+, (YIELD|TOTAL|10×DEV) /);
+    await expect(first).toHaveAccessibleName(/^1\s.+(YIELD|TOTAL|10×DEV)$/);
     // no ellipsis: the class/build line wraps instead of truncating
     const clipped = await page.locator(".bc-meta").evaluateAll((els) =>
       els.filter((e) => e.scrollHeight > e.clientHeight + 1).length);
@@ -55,6 +55,7 @@ test.describe("mobile board", () => {
 
   test("filter sheet drives the same filters as desktop", async ({ page }) => {
     await gotoPhone(page, BOARD);
+    await expect(page.locator("li.bc").first()).toBeVisible();
     const before = await page.locator("li.bc").count();
     await page.getByRole("button", { name: /^Filters/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filters" });

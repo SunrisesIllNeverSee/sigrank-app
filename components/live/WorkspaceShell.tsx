@@ -259,7 +259,7 @@ export function WorkspaceShell({
      after ~300px; back to full near the top. The band is sticky and in flow,
      so the scroll position is corrected by the height it gives up — content
      doesn't jump — and the wide hysteresis gap keeps it from flapping. */
-  const stageElRef = useRef<HTMLElement | null>(null);
+  const stageElRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const st = stageElRef.current;
     if (!editorialStage || !st) return;
@@ -484,7 +484,7 @@ export function WorkspaceShell({
               </svg>
             </button>
             <div className="notifpop" hidden={!notifOpen}>
-              <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>
+              {notifOpen && <span className="ap-item mut">— NOTHING YET · SIGNAL SOON</span>}
             </div>
             <div className="sacct" ref={acctRef}>
               <button
@@ -586,7 +586,7 @@ export function WorkspaceShell({
                 </div>
               )}
               {toolbar != null && <div className="fbar">{toolbar}</div>}
-              <main ref={stageElRef} className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
+              <div ref={stageElRef} className={`stage${editorialStage ? " ws-editorial-stage" : ""}`}>
                 <div className="board">
                   {hero && <div className="ws-hero">{hero}</div>}
                   {children}
@@ -595,7 +595,7 @@ export function WorkspaceShell({
                     <span>Published by SignalAF · SigRank</span>
                   </footer>}
                 </div>
-              </main>
+              </div>
             </div>
 
             {railOn && right != null && (

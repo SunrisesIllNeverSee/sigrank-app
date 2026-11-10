@@ -1,8 +1,8 @@
 /**
  * app/guides/page.tsx — Guides index.
  *
- * Hub page listing all eight how-to guides. Each child page carries HowTo +
- * FAQPage + BreadcrumbList schema. This index adds an ItemList so AI engines
+ * Hub page listing every guide. Each child page carries FAQPage +
+ * BreadcrumbList schema (some also HowTo or Article). This index adds an ItemList so AI engines
  * see the full guide set as a structured collection.
  *
  * JSON-LD: breadcrumb() + ItemList.
@@ -18,7 +18,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Guides — AI Coding Efficiency How-Tos",
   description:
-    "Eight how-to guides: measure AI coding efficiency, improve your yield, reduce token waste, read your token cascade, track it, benchmark your workflow, compare operators, and troubleshoot cache write convergence.",
+    "Guides on how to measure AI coding efficiency, improve your yield, reduce token waste, read your token cascade, track it, benchmark your workflow, compare operators, troubleshoot cache write convergence, set token usage spike alerts, choose AI tools, and understand AI ratings.",
   path: "/guides",
 });
 
@@ -64,6 +64,21 @@ const GUIDES = [
     href: "/guides/cache-write-convergence",
     title: "Cache Write Convergence — Troubleshooting",
     desc: "When ChatGPT/Codex reports cache_write as zero, use reference operating ratios to split the combined input. Validate against real operator data.",
+  },
+  {
+    href: "/guides/llm-token-usage-spike-alerts",
+    title: "LLM Token Usage Spike Alerts: Best Practices",
+    desc: "Baselines, per-session and per-day thresholds, cache hit rate drops, and how to stop runaway agent loops.",
+  },
+  {
+    href: "/guides/best-ai-tools-2026",
+    title: "Best AI Tools 2026: How to Choose",
+    desc: "Pick AI tools by job, compare cost per finished task, and see what public usage telemetry can and cannot tell you.",
+  },
+  {
+    href: "/guides/ai-rating",
+    title: "AI Rating: Models, Tools and Users",
+    desc: "Rating models, rating tools and rating operators are different jobs. How each works and how SigRank rates operators.",
   },
 ];
 

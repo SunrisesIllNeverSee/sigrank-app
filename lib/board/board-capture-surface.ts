@@ -84,7 +84,9 @@ export function mountRankedBoardCaptureSurface(
     surface.style.width = `${fullWidth}px`;
     table.style.width = `${fullWidth}px`;
   }
-  const height = Math.ceil(surface.scrollHeight);
+  const height = Math.ceil(
+    Math.max(surface.scrollHeight, surface.getBoundingClientRect().height),
+  );
   return {
     surface,
     width: fullWidth,

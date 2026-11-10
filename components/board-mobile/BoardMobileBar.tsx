@@ -45,9 +45,9 @@ const activeFilters = (p: BoardFilterState) =>
   (p.search.trim() ? 1 : 0);
 
 const WF: { id: Wf; label: string; full: string }[] = [
-  { id: "hitl", label: "HITL", full: "Human in the loop" },
+  { id: "hitl", label: "HITL", full: "HITL, human in the loop" },
   { id: "hybrid", label: "Hybrid", full: "Hybrid, combined view" },
-  { id: "agentic", label: "Auto/Review", full: "Autonomous and review" },
+  { id: "agentic", label: "Auto/Review", full: "Auto/Review, autonomous and review" },
 ];
 
 export function BoardMobileBar(p: BoardMobileBarProps) {

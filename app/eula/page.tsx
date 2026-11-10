@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { EditorialWorkspaceFrame } from "@/components/live/EditorialWorkspaceFrame";
 
 export const metadata: Metadata = withOG({
   title: "End User License Agreement",
@@ -11,7 +12,27 @@ export const metadata: Metadata = withOG({
 
 export default function EulaPage() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
+    <EditorialWorkspaceFrame
+      topic="legal"
+      title="EULA"
+      rightTitle="META"
+      right={
+        <>
+          <div className="mod">
+            <div className="mini-h"><span className="sq" />EULA</div>
+            <div className="ws-kv">
+              <div className="row"><span className="k">updated</span><span className="v">2026-09-01</span></div>
+              <div className="row"><span className="k">licensor</span><span className="v">Ello Cello LLC</span></div>
+            </div>
+            <p className="ws-note" style={{ marginTop: 8 }}>
+              Questions: hello@signalaf.com
+            </p>
+          </div>
+        </>
+      }
+      status={<>EULA · SIGNALAF × SIGRANK · MO§ES™</>}
+    >
+    <div className="ws-doc mx-auto max-w-2xl px-4 py-12 sm:py-16">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold">Legal</p>
       <h1 className="mt-3 font-mono text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
         End User License Agreement
@@ -262,6 +283,7 @@ export default function EulaPage() {
         <Link href="/docs/integrations/vercel" className="font-mono text-xs text-text-muted hover:text-text-primary">Integration Docs</Link>
         <Link href="/support" className="font-mono text-xs text-text-muted hover:text-text-primary">Support</Link>
       </div>
-    </main>
+    </div>
+    </EditorialWorkspaceFrame>
   );
 }

@@ -229,6 +229,86 @@ export default function TokenCostTrackingToolsPage() {
         </p>
       </section>
 
+      {/* Match the tool to the cost question */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Which tool for which cost question
+        </h2>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-bg-border">
+                {["Cost question", "Use", "Scope"].map((h) => (
+                  <th
+                    key={h}
+                    className="p-3 font-mono text-xs uppercase tracking-wide text-text-muted"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                [
+                  "What has this session cost so far?",
+                  "Claude Code /cost or aider /usage",
+                  "One session, one tool",
+                ],
+                [
+                  "What did Claude Code cost over a month?",
+                  "ccusage",
+                  "Local logs across sessions",
+                ],
+                [
+                  "What do our LLM application calls cost, per team?",
+                  "Langfuse or similar observability",
+                  "Applications and API traffic",
+                ],
+                [
+                  "Is my spend efficient, and why did it jump?",
+                  "SigRank, with spike alerts",
+                  "Operator cascade; see the spike alert guide",
+                ],
+              ].map(([q, u, s]) => (
+                <tr
+                  key={q}
+                  className="border-b border-bg-border-subtle last:border-b-0"
+                >
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-primary">
+                    {q}
+                  </td>
+                  <td className="p-3 font-mono text-xs font-bold text-text-primary">
+                    {u}
+                  </td>
+                  <td className="p-3 font-sans text-xs leading-relaxed text-text-secondary">
+                    {s}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="font-sans text-xs text-text-muted">
+          Last updated 2026-11-06. When cost jumps without a workload change,
+          check{" "}
+          <Link
+            href="/metrics/cache-hit-rate"
+            className="text-gold underline underline-offset-2"
+          >
+            cache hit rate
+          </Link>{" "}
+          first; the{" "}
+          <Link
+            href="/guides/llm-token-usage-spike-alerts"
+            className="text-gold underline underline-offset-2"
+          >
+            spike alert guide
+          </Link>{" "}
+          explains why.
+        </p>
+      </section>
+
       {/* Comparison table */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
@@ -459,6 +539,13 @@ export default function TokenCostTrackingToolsPage() {
             className="text-gold underline underline-offset-2"
           >
             How to Reduce Token Waste
+          </Link>
+          {" · "}
+          <Link
+            href="/guides/llm-token-usage-spike-alerts"
+            className="text-gold underline underline-offset-2"
+          >
+            Token Usage Spike Alerts
           </Link>
         </p>
       </section>
