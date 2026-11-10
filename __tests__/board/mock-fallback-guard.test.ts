@@ -170,18 +170,17 @@ describe("Live mock fallback guards (when DB is configured)", () => {
           awarded_at: "2026-10-01T12:00:00Z",
           source_note: "Top Yield RW.15",
           badges: { badge_name: "Highest Yield" },
-          operators: {
-            operator_id: "op-real-1",
-            codename: "real-op",
-            display_name: "Real Op",
-          },
+          operator_id: "op-real-1",
         },
       ];
       // Names resolve only for operators visible via operators_public.
-      tableData["operators_public"] = [{ operator_id: "op-real-1" }];
+      tableData["operators_public"] = [
+        { operator_id: "op-real-1", codename: "real-op", display_name: "Real Op" },
+      ];
       const hall = await getHallOfSignal();
       expect(hall).toHaveLength(1);
       expect(hall[0].operator_codename).toBe("Real Op");
+      expect(hall[0].codename).toBe("real-op");
       expect(hall[0].title).toBe("Highest Yield");
     });
 
@@ -191,11 +190,7 @@ describe("Live mock fallback guards (when DB is configured)", () => {
           awarded_at: "2026-10-01T12:00:00Z",
           source_note: "Top Yield RW.15",
           badges: { badge_name: "Highest Yield" },
-          operators: {
-            operator_id: "op-private-1",
-            codename: "private-op",
-            display_name: "Private Op",
-          },
+          operator_id: "op-private-1",
         },
       ];
       tableData["operators_public"] = [];
