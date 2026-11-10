@@ -126,17 +126,42 @@ describe("board memoization", () => {
 describe("plugin route timeouts", () => {
   const rpcHeaders = { "content-type": "application/json", accept: "application/json, text/event-stream", "x-real-ip": "203.0.113.9" };
 
-  it("still answers tools/list with securitySchemes on every tool", async () => {
+  it("publishes connector titles, tool hints, and the boolean report consent schema", async () => {
     const res = await pluginPost(new NextRequest("https://analyst.signalaf.com/api/plugins/sigrank/mcp", {
       method: "POST", headers: rpcHeaders,
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
     }));
     expect(res.status).toBe(200);
-    const text = await res.text();
-    const line = text.split("\n").find(l => l.startsWith("data: "));
-    const payload = JSON.parse(line ? line.slice(6) : text);
-    expect(payload.result.tools.length).toBeGreaterThan(0);
-    for (const tool of payload.result.tools) expect(tool.securitySchemes).toBeDefined();
+    const { tools } = (await rpcPayload(res)).result;
+    const titles = [
+      ["get_leaderboard", "Get SignalAF Leaderboard"],
+      ["get_operator", "Get Operator Profile"],
+      ["compare_operators", "Compare Two Operators"],
+      ["get_field_stats", "Get Field Statistics"],
+      ["report_beta_bug", "Report a Beta Bug"],
+    ];
+    expect(tools).toHaveLength(titles.length);
+    for (const [name, title] of titles) {
+      const readOnly = name !== "report_beta_bug";
+      expect(tools).toContainEqual(expect.objectContaining({
+        name,
+        title,
+        annotations: {
+          title,
+          readOnlyHint: readOnly,
+          destructiveHint: false,
+          idempotentHint: readOnly,
+          openWorldHint: true,
+        },
+        securitySchemes: [{ type: "noauth" }],
+      }));
+    }
+    const reportTool = tools.find((tool: { name: string }) => tool.name === "report_beta_bug");
+    expect(reportTool.inputSchema.required).toContain("consent_confirmed");
+    expect(reportTool.inputSchema.properties.consent_confirmed).toEqual({
+      type: "boolean",
+      description: "True only after the user has explicitly asked to submit this bug report.",
+    });
   });
 
   it("passes batches through without decorating them", async () => {
