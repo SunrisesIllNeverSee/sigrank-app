@@ -80,9 +80,9 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     SERVER_INFO,
     {
       capabilities: {
-        tools: {},
-        resources: { subscribe: false },
-        prompts: {},
+        tools: { listChanged: false },
+        resources: { subscribe: false, listChanged: false },
+        prompts: { listChanged: false },
       },
       instructions: SERVER_INSTRUCTIONS,
     },

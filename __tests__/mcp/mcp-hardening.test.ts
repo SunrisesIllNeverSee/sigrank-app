@@ -169,3 +169,34 @@ describe("plugin route timeouts", () => {
     }
   });
 });
+
+describe("plugin capabilities", () => {
+  it("does not advertise tool-list changes, so clients do not hold a listen stream open", async () => {
+    const res = await pluginPost(new NextRequest("https://analyst.signalaf.com/api/plugins/sigrank/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "x-real-ip": "203.0.113.9" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "test", version: "1" } } }),
+    }));
+    const payload = await rpcPayload(res);
+    expect(payload.result.capabilities.tools.listChanged).toBe(false);
+  });
+
+  it("main server advertises no list changes for tools, resources or prompts", async () => {
+    const res = await mainPost(new NextRequest("https://signalaf.com/api/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "x-real-ip": "203.0.113.9" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "test", version: "1" } } }),
+    }));
+    const { capabilities } = (await rpcPayload(res)).result;
+    expect(capabilities.tools.listChanged).toBe(false);
+    expect(capabilities.resources.listChanged).toBe(false);
+    expect(capabilities.prompts.listChanged).toBe(false);
+  });
+});
+
+async function rpcPayload(res: Response) {
+  const text = await res.text();
+  const data = text.split("\n").filter(l => l.startsWith("data:")).map(l => l.slice(5).trim());
+  expect(data.length + (text.trim().startsWith("{") ? 1 : 0)).toBeGreaterThan(0);
+  return JSON.parse(data.length ? data[data.length - 1] : text);
+}
