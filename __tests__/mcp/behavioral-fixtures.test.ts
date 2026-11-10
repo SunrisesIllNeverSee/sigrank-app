@@ -514,6 +514,40 @@ describe("pillar argument errors are self-correcting", () => {
     expect(msg).toContain("codename");
   });
 
+  it("negative numbers get a number message, not a string message", async () => {
+    const result = await callTool("rank_paste", { input: -5, output: 1, cache_read: 1, cache_write: 1 }, {} as never);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("input must be a non-negative number");
+    expect(msg).not.toContain("not a string");
+  });
+
+  it("string values get the string message", async () => {
+    const result = await callTool("rank_paste", { input: "5", output: 1, cache_read: 1, cache_write: 1 }, {} as never);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("input is a string: send a JSON number, not a string.");
+  });
+
+  it("benchmark_me builds the codename alternative into the message (no dangling suffix)", async () => {
+    const result = await callTool("benchmark_me", { input: 1 }, {} as never);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("either a codename or the four fields");
+    expect(msg.trim().endsWith("}.")).toBe(true);
+    expect(msg).not.toContain("Or provide a codename instead");
+  });
+
+  it("generic callers get no location advice", async () => {
+    const { pillarErrorMessage } = await import("@/lib/mcp/tools");
+    expect(pillarErrorMessage({ input: 1 })).not.toContain("top level");
+  });
+
+  it("display_name that sanitizes to empty falls back to codename", async () => {
+    const { getLeaderboard } = await import("@/lib/board");
+    const zw = { ...mockRow, operator: { ...mockOperator, codename: "signal-zw", display_name: "\u200b\u0007 " } };
+    vi.mocked(getLeaderboard).mockResolvedValueOnce([zw] as never);
+    const result = await callTool("get_leaderboard", {}, {} as never);
+    expect(JSON.parse(result.content[0].text as string).entries[0].display_name).toBe("signal-zw");
+  });
+
   it("descriptions state the required shape with an example", async () => {
     const { TOOLS } = await import("@/lib/mcp/tools");
     for (const name of ["rank_paste", "benchmark_me"]) {

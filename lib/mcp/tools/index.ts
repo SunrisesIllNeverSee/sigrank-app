@@ -28,12 +28,14 @@ export const READ_ONLY_ANNOTATIONS = {
   openWorldHint: false,
 };
 
+const PILLAR_EXAMPLE = '{"input": 1000000, "output": 50000, "cache_read": 20000000, "cache_write": 500000}';
+
 export const TOOLS = [
   {
     name: "rank_paste",
     title: "Rank Paste — Local Token Cascade Calculator",
     description:
-      "Calculate SigRank cascade metrics from four non-negative token counts without submitting data. Returns Yield, Leverage, Velocity, SNR, and 10xDEV. No data is persisted. The arguments object must be a JSON object with all four required numeric properties at the top level (not nested, not strings): input, output, cache_read, cache_write. Example arguments: {\"input\": 1000000, \"output\": 50000, \"cache_read\": 20000000, \"cache_write\": 500000}.",
+      "Calculate SigRank cascade metrics from four non-negative token counts without submitting data. Returns Yield, Leverage, Velocity, SNR, and 10xDEV. No data is persisted. Required top-level numeric arguments, e.g. " + PILLAR_EXAMPLE + ".",
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",
@@ -345,7 +347,7 @@ export const TOOLS = [
     name: "benchmark_me",
     title: "Benchmark Me — Field Position Analyzer",
     description:
-      "Answers 'How good am I?' — benchmarks your token cascade against the live field. Takes 4 token pillars (or a codename), computes your cascade, then compares against the live leaderboard: percentile, rank, distance from median, distance from top 10%, strongest metric, weakest metric, and a one-line interpretation. This is the human-question tool — use it when someone asks 'am I a power user?' or 'how do I compare?'. Arguments must be a JSON object with either a codename (e.g. {\"codename\": \"signal-ae3b5c3c55\"}) or all four numeric pillars at the top level (e.g. {\"input\": 1000000, \"output\": 50000, \"cache_read\": 20000000, \"cache_write\": 500000}); partial pillars are rejected.",
+      "Answers 'How good am I?' — benchmarks your token cascade against the live field. Takes 4 token pillars (or a codename), computes your cascade, then compares against the live leaderboard: percentile, rank, distance from median, distance from top 10%, strongest metric, weakest metric, and a one-line interpretation. This is the human-question tool — use it when someone asks 'am I a power user?' or 'how do I compare?'. Send a codename, or all four numeric pillars at the top level, e.g. " + PILLAR_EXAMPLE + ".",
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: "object",
@@ -491,28 +493,38 @@ export function validNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
-const PILLAR_EXAMPLE = '{"input": 1000000, "output": 50000, "cache_read": 20000000, "cache_write": 500000}';
+type PillarErrorOpts = {
+  /** When set, the message says where the fields go and shows PILLAR_EXAMPLE. Only pass for tools where that is true. */
+  where?: "top level";
+  /** Name the codename alternative (tools that accept a codename instead of pillars). */
+  allowCodename?: boolean;
+};
 
 /**
  * Self-correcting message for a bad pillar payload: names the fields that are
- * missing or invalid and shows the expected arguments object. Validation is
- * unchanged; only the wording is richer.
+ * missing or invalid. Validation is unchanged; only the wording is richer.
+ * Location/example/codename advice is opt-in so every caller gets only advice
+ * that is true for it.
  */
-export function pillarErrorMessage(args: Record<string, unknown>): string {
+export function pillarErrorMessage(args: Record<string, unknown>, opts: PillarErrorOpts = {}): string {
   const fields = ["input", "output", "cache_read", "cache_write"] as const;
   const missing = fields.filter((f) => args[f] === undefined || args[f] === null);
   const invalid = fields.filter((f) => !missing.includes(f) && !validNumber(args[f]));
   const parts = ["input, output, cache_read, and cache_write must be non-negative finite numbers."];
   if (missing.length) parts.push(`Missing: ${missing.join(", ")}.`);
-  if (invalid.length) parts.push(`Not a non-negative finite number: ${invalid.join(", ")} (send JSON numbers, not strings).`);
-  parts.push(`Pass them as top-level properties of the arguments object, e.g. ${PILLAR_EXAMPLE}.`);
+  for (const f of invalid) {
+    parts.push(typeof args[f] === "string" ? `${f} is a string: send a JSON number, not a string.` : `${f} must be a non-negative number.`);
+  }
+  if (opts.where) {
+    parts.push(`Pass ${opts.allowCodename ? "either a codename or " : ""}the four fields as ${opts.where} properties of the arguments object, e.g. ${PILLAR_EXAMPLE}.`);
+  }
   return parts.join(" ");
 }
 
-export function parsePillars(args: Record<string, unknown>): { input: number; output: number; cacheCreate: number; cacheRead: number } | { error: string } {
+export function parsePillars(args: Record<string, unknown>, opts?: PillarErrorOpts): { input: number; output: number; cacheCreate: number; cacheRead: number } | { error: string } {
   const { input, output, cache_read, cache_write } = args;
   if (![input, output, cache_read, cache_write].every(validNumber)) {
-    return { error: pillarErrorMessage(args) };
+    return { error: pillarErrorMessage(args, opts) };
   }
   return {
     input: input as number,
@@ -555,20 +567,18 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
   }
 
   if (name === "rank_paste") {
-    const input = args.input;
-    const output = args.output;
-    const cacheRead = args.cache_read;
-    const cacheWrite = args.cache_write;
-    if (![input, output, cacheRead, cacheWrite].every(validNumber)) {
-      return textResult(
-        { code: "invalid_arguments", message: pillarErrorMessage(args) },
-        true,
-      );
+    const parsed = parsePillars(args, { where: "top level" });
+    if ("error" in parsed) {
+      return textResult({ code: "invalid_arguments", message: parsed.error }, true);
     }
-    const c = cascade(input as number, output as number, cacheWrite as number, cacheRead as number);
-    const nonCompounding = (cacheWrite as number) === 0;
+    const input = parsed.input;
+    const output = parsed.output;
+    const cacheRead = parsed.cacheRead;
+    const cacheWrite = parsed.cacheCreate;
+    const c = cascade(input, output, cacheWrite, cacheRead);
+    const nonCompounding = cacheWrite === 0;
     const evaluation = evaluateOperator(
-      { input: input as number, output: output as number, cache_read: cacheRead as number, cache_write: cacheWrite as number },
+      { input, output, cache_read: cacheRead, cache_write: cacheWrite },
     );
     return textResult({
       input,
@@ -1162,9 +1172,9 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
         cacheRead: tel.cache_read,
       };
     } else {
-      const parsed = parsePillars(args);
+      const parsed = parsePillars(args, { where: "top level", allowCodename: true });
       if ("error" in parsed) {
-        return textResult({ code: "invalid_arguments", message: parsed.error + " Or provide a codename instead." }, true);
+        return textResult({ code: "invalid_arguments", message: parsed.error }, true);
       }
       pillars = parsed;
     }
