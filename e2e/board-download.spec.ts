@@ -4,6 +4,14 @@ import { readFile } from "node:fs/promises";
 const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 const PIXEL_RATIO = 2;
 
+interface ExportLayout {
+  width: number;
+  height: number;
+  headers: number;
+  unranked: number;
+  bands: { top: number; height: number }[];
+}
+
 test("board screenshot download is a real PNG with every table row drawn", async ({ page }) => {
   test.setTimeout(90_000);
   const summary = page
@@ -31,11 +39,12 @@ test("board screenshot download is a real PNG with every table row drawn", async
   const rowCount = await rows.count();
   expect(rowCount).toBeGreaterThan(0);
   const box = (await card.boundingBox())!;
-  const { bands, fullHeight } = await card.evaluate((el) => {
+  const { bands, fullHeight, fullWidth } = await card.evaluate((el) => {
     const top = el.getBoundingClientRect().top - el.scrollTop;
     const cs = getComputedStyle(el);
     return {
       fullHeight: el.scrollHeight + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth),
+      fullWidth: el.scrollWidth,
       bands: [...el.querySelectorAll("tbody tr")].map((r) => {
         const b = r.getBoundingClientRect();
         return { top: b.top - top, height: b.height };
@@ -43,6 +52,27 @@ test("board screenshot download is a real PNG with every table row drawn", async
     };
   });
   expect(bands.length).toBe(rowCount);
+  const rankedCount = await card.locator("tbody tr:not(.unranked-member):not(.board-empty)").count();
+  await page.evaluate(() => {
+    const state = window as Window & { boardExportLayout?: ExportLayout };
+    const observer = new MutationObserver(() => {
+      const surface = document.querySelector<HTMLElement>("[data-ranked-board-export]");
+      if (!surface) return;
+      const rect = surface.getBoundingClientRect();
+      state.boardExportLayout = {
+        width: rect.width,
+        height: Math.ceil(Math.max(surface.scrollHeight, rect.height)),
+        headers: surface.querySelectorAll("thead th").length,
+        unranked: surface.querySelectorAll("tr.unranked-member").length,
+        bands: [...surface.querySelectorAll("tbody tr")].map((row) => {
+          const bounds = row.getBoundingClientRect();
+          return { top: bounds.top - rect.top, height: bounds.height };
+        }),
+      };
+      observer.disconnect();
+    });
+    observer.observe(document.body, { subtree: true, childList: true });
+  });
 
   await page.locator(".board-share").getByRole("button", { name: /^SHARE/ }).click();
   const shot = page.getByRole("button", { name: /Screenshot PNG/ });
@@ -59,12 +89,28 @@ test("board screenshot download is a real PNG with every table row drawn", async
   const width = buf.readUInt32BE(16);
   const height = buf.readUInt32BE(20);
 
-  expect(Math.abs(width - box.width * PIXEL_RATIO)).toBeLessThanOrEqual(PIXEL_RATIO * 2);
-  expect(height).toBeGreaterThan(box.height * PIXEL_RATIO);
-
-  const overlay = height / PIXEL_RATIO - fullHeight;
-  expect(overlay).toBeGreaterThan(20);
-  expect(overlay).toBeLessThan(120);
+  const layout = await page.evaluate(
+    () => (window as Window & { boardExportLayout?: ExportLayout }).boardExportLayout ?? null,
+  );
+  if (process.env.E2E_REQUIRE_RANKED_EXPORT === "1") expect(layout).not.toBeNull();
+  let overlay = 0;
+  let exportBands = bands;
+  if (layout) {
+    expect(layout.headers).toBe(headers.length);
+    expect(layout.unranked).toBe(0);
+    expect(layout.bands).toHaveLength(Math.min(rankedCount, 25));
+    expect(width).toBeGreaterThanOrEqual(fullWidth * PIXEL_RATIO);
+    expect(Math.abs(width - layout.width * PIXEL_RATIO)).toBeLessThanOrEqual(PIXEL_RATIO * 2);
+    expect(Math.abs(height - layout.height * PIXEL_RATIO)).toBeLessThanOrEqual(PIXEL_RATIO * 2);
+    expect(await page.locator("[data-board-capture-host]").count()).toBe(0);
+    exportBands = layout.bands;
+  } else {
+    expect(Math.abs(width - box.width * PIXEL_RATIO)).toBeLessThanOrEqual(PIXEL_RATIO * 2);
+    expect(height).toBeGreaterThan(box.height * PIXEL_RATIO);
+    overlay = height / PIXEL_RATIO - fullHeight;
+    expect(overlay).toBeGreaterThan(20);
+    expect(overlay).toBeLessThan(120);
+  }
   const viewer = await page.context().newPage();
   let ink: number[];
   try {
@@ -99,12 +145,12 @@ test("board screenshot download is a real PNG with every table row drawn", async
           return n / (d.length / 4);
         });
       },
-      { src: `data:image/png;base64,${buf.toString("base64")}`, bands, overlay, ratio: PIXEL_RATIO },
+      { src: `data:image/png;base64,${buf.toString("base64")}`, bands: exportBands, overlay, ratio: PIXEL_RATIO },
     );
   } finally {
     await viewer.close();
   }
-  ink.forEach((v, i) => expect(v, `row ${i + 1} of ${ink.length} falls outside the PNG`).not.toBe(-1));
+  ink.forEach((v, i) => expect(v, `row ${i + 1} of ${ink.length} falls outside the ${height}px PNG`).not.toBe(-1));
   ink.forEach((v, i) => expect(v, `row ${i + 1} of ${ink.length} has no visible text in the PNG`).toBeGreaterThan(0.01));
 
   await expect(card.locator("thead th")).toHaveCount(headers.length);
