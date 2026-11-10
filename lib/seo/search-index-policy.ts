@@ -104,6 +104,9 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/guides/how-to-compare-ai-operators": "SUPPORTED",
   "/guides/how-to-read-your-cascade": "SUPPORTED",
   "/guides/cache-write-convergence": "SUPPORTED",
+  "/guides/llm-token-usage-spike-alerts": "SUPPORTED",
+  "/guides/best-ai-tools-2026": "SUPPORTED",
+  "/guides/ai-rating": "SUPPORTED",
 
   // ── Established comparisons (major-tool intent; 3 sentinel-backed) ──────
   "/vs/ccusage": "SUPPORTED",

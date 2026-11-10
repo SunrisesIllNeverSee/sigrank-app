@@ -350,6 +350,21 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
     priority: 0.6,
     changeFrequency: "monthly",
   },
+  {
+    path: "/guides/llm-token-usage-spike-alerts",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/guides/best-ai-tools-2026",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
+  {
+    path: "/guides/ai-rating",
+    priority: 0.6,
+    changeFrequency: "monthly",
+  },
 
   // Metric definition pages — definitional intent
   { path: "/metrics/yield-cascade", priority: 0.6, changeFrequency: "monthly" },
