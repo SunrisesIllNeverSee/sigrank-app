@@ -25,9 +25,11 @@ function withTimeout<T>(work: Promise<T>, ms: number): Promise<T | typeof TIMED_
 
 interface RequestSummary { method: string; tool: string; client: string; agent: string }
 
-function summarize(raw: string, req: NextRequest): RequestSummary {
-  let parsed: unknown;
-  try { parsed = JSON.parse(raw); } catch { parsed = undefined; }
+function parseBody(raw: string): unknown {
+  try { return JSON.parse(raw); } catch { return undefined; }
+}
+
+function summarize(parsed: unknown, req: NextRequest): RequestSummary {
   const messages = (Array.isArray(parsed) ? parsed : [parsed]) as { method?: unknown; params?: { name?: unknown; clientInfo?: { name?: unknown } } }[];
   const pick = (get: (m: (typeof messages)[number]) => unknown) =>
     messages.map(m => sanitizeUntrusted(m && typeof m === "object" ? get(m) : undefined)).filter(Boolean).join(",");
@@ -56,13 +58,21 @@ export async function POST(req: NextRequest) {
     console.warn("plugin mcp: request body not received", { agent: sanitizeUntrusted(req.headers.get("user-agent") ?? "") });
     return rpcError(408, "Request body not received in time");
   }
-  const summary = summarize(raw, req);
+  const parsed = parseBody(raw);
+  const summary = summarize(parsed, req);
   const stallLog = setTimeout(() => console.warn("plugin mcp: request still open", summary), STALL_LOG_MS);
   const done = () => clearTimeout(stallLog);
 
   const headers = new Headers(req.headers);
   headers.delete("content-length");
-  const response = await withTimeout(handler.fetch(new Request(req.url, { method: "POST", headers, body: raw })), HANDLER_TIMEOUT_MS);
+  headers.delete("transfer-encoding");
+  let response: Response | typeof TIMED_OUT;
+  try {
+    response = await withTimeout(handler.fetch(new Request(req.url, { method: "POST", headers, body: raw })), HANDLER_TIMEOUT_MS);
+  } catch (error) {
+    done();
+    throw error;
+  }
   if (response === TIMED_OUT) {
     done();
     console.warn("plugin mcp: handler timed out", summary);
@@ -72,7 +82,8 @@ export async function POST(req: NextRequest) {
   // The pinned SDK accepts securitySchemes in _meta but does not expose the
   // standard top-level field in tools/list. Decorate this endpoint's list only;
   // tool execution and all other protocol messages remain SDK-owned.
-  if (summary.method !== "tools/list" || !response.ok) {
+  const listRequest = (parsed as { method?: unknown } | undefined)?.method === "tools/list";
+  if (!listRequest || !response.ok) {
     if (!response.body) { done(); return response; }
     const body = response.body.pipeThrough(new TransformStream({ flush: done }));
     return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
@@ -88,8 +99,7 @@ export async function POST(req: NextRequest) {
     } catch { return message; }
   };
   const type = response.headers.get("content-type") ?? "";
-  const body = await response.text();
-  done();
+  const body = await response.text().finally(done);
   const updated = type.includes("text/event-stream")
     ? body.split("\n").map(line => line.startsWith("data: ") ? `data: ${decorate(line.slice(6))}` : line).join("\n")
     : decorate(body);

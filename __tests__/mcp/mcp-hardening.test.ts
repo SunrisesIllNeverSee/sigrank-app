@@ -139,6 +139,17 @@ describe("plugin route timeouts", () => {
     for (const tool of payload.result.tools) expect(tool.securitySchemes).toBeDefined();
   });
 
+  it("passes batches through without decorating them", async () => {
+    const res = await pluginPost(new NextRequest("https://analyst.signalaf.com/api/plugins/sigrank/mcp", {
+      method: "POST", headers: rpcHeaders,
+      body: JSON.stringify([{ jsonrpc: "2.0", id: 1, method: "ping" }, { jsonrpc: "2.0", id: 2, method: "ping" }]),
+    }));
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).toContain('"id":1');
+    expect(text).toContain('"id":2');
+  });
+
   it("returns 408 when the request body never arrives", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
