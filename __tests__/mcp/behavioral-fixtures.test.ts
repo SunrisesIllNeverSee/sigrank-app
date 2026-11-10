@@ -503,7 +503,7 @@ describe("pillar argument errors are self-correcting", () => {
       {} as never,
     );
     const msg = JSON.parse(result.content[0].text as string).message as string;
-    expect(msg).toContain("Not a non-negative finite number: input");
+    expect(msg).toContain("input is a string");
   });
 
   it("benchmark_me gives the same guidance and mentions codename", async () => {
