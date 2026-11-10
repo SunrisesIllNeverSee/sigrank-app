@@ -17,16 +17,24 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-    # Group patch updates so they land in one PR instead of ten.
+    # Group patch updates, and dev-dependency minors, so they land in one PR
+    # each instead of ten. Runtime minors stay separate.
     groups:
       patch-updates:
         update-types:
           - "patch"
+      dev-minor-updates:
+        dependency-type: "development"
+        update-types:
+          - "minor"
     # tailwindcss v4 moves the PostCSS plugin to @tailwindcss/postcss and
     # drops @tailwind directives — this repo's postcss.config.mjs + CSS are
     # v3. A v4 migration is a project, not a bump; hold majors.
     ignore:
       - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+      # Types must match the runtime: engines.node is 22.x.
+      - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
 
   # GitHub Actions versions used in workflows (keeps actions/checkout etc. current)
