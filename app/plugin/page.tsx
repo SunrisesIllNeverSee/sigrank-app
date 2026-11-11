@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { ChatGptListingLink } from "@/components/plugin/ChatGptListingLink";
 
 export const metadata: Metadata = withOG({
   title: "SigRank | SignalAF Plugin",
@@ -9,7 +10,6 @@ export const metadata: Metadata = withOG({
 });
 
 const ANALYST_MCP_URL = "https://analyst.signalaf.com/api/plugins/sigrank/mcp";
-const CHATGPT_PLUGIN_URL = "https://chatgpt.com/plugins/plugin_asdk_app_6ac9daab15288191aaeb6847cb6264ee";
 
 const ADMIN_TOOLS = [
   { name: "get_leaderboard", summary: "Reads the public board for 7d, 30d, 90d or all time.", access: "Read-only" },
@@ -62,14 +62,7 @@ export default function PluginPage() {
               Find SigRank | SignalAF Analyst in the ChatGPT Plugin Directory to explore the
               public leaderboard, operator profiles and field comparisons.
             </p>
-            <a
-              className="mt-4 inline-flex min-h-11 items-center justify-center rounded border border-gold px-4 py-2 text-center font-mono text-xs font-semibold text-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-              href={CHATGPT_PLUGIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open in ChatGPT
-            </a>
+            <ChatGptListingLink />
             <p className="mt-3 text-xs">
               This Analyst plugin also supports Codex. It reads public results; it does not
               submit your telemetry.

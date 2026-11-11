@@ -34,6 +34,8 @@ npx sigrank submit --dry-run      # inspect the payload without sending it
 npx sigrank submit                # publish a signed snapshot
 ```
 
+Prefer to explore the public board from an AI chat? Use SigRank in ChatGPT: [SigRank | SignalAF Analyst](https://chatgpt.com/plugins/plugin_asdk_app_6ac9daab15288191aaeb6847cb6264ee) (details at [signalaf.com/plugin](https://signalaf.com/plugin)).
+
 Sign in at [signalaf.com](https://signalaf.com) to create a connect code. Claims for profiles from the original board require ownership verification through hello@signalaf.com.
 
 ## What is measured
