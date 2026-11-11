@@ -1,118 +1,140 @@
 /**
- * app/vs/clawdboard/page.tsx — "SigRank vs clawdboard" SEO comparison page.
+ * app/vs/clawdboard/page.tsx — "SigRank vs clawdboard".
  *
- * Angle: clawdboard has clean UI, streak gamification, "cooking" project
- * labels. Ranks by cost + tokens + streaks + active days. SigRank ranks by
- * cascade efficiency.
+ * Rebuilt 2026-11-11 from clawdboard's own pages (leaderboard, /stats, GitHub
+ * repo) plus a dated read of the public SigRank board. Every clawdboard claim
+ * below is linked to the page it came from; each figure carries its own read
+ * date (constants below). Canon names only (lib/identity/canon-ids.ts, token-era board).
  *
- * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
- * WaveHero, and a styled comparison table matching the repo's table conventions.
+ * RSC only — no client JS.
  */
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
+import { breadcrumb, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
+const READ_ON = "11 November 2026";
+const SIGRANK_READ_ON = "11 November 2026";
+const SIGRANK_OPERATORS_30D = 7;
+
+const SRC = {
+  board: "https://clawdboard.ai/",
+  stats: "https://clawdboard.ai/stats",
+  repo: "https://github.com/morgen-so/clawdboard-oss",
+};
+
 export const metadata: Metadata = withOG({
-  title: "SigRank vs clawdboard \u2014 Cascade vs Streaks",
+  title: "SigRank vs clawdboard — Spend and Streaks vs Yield",
   description:
-    "clawdboard ranks by cost, tokens, streaks, and active days. SigRank ranks by cascade efficiency. Streaks measure consistency; Yield measures skill.",
+    "clawdboard ranks by estimated API cost, with streaks and active days. SigRank ranks by Yield. How they differ, with figures dated 11 Nov 2026.",
   path: "/vs/clawdboard",
 });
 
-// Comparison rows — feature-by-feature, clawdboard vs SigRank.
-const COMPARE_ROWS: { feature: string; clawdboard: string; sigrank: string }[] = [
+const FACTS: { label: string; value: string; href: string; readOn: string }[] = [
   {
-    feature: "Reads Claude Code token logs",
-    clawdboard: "Yes",
-    sigrank: "Yes (bundles ccusage)",
+    label: "Default ranking column",
+    value: "Estimated cost (API-equivalent), with tokens, active days, streak and a project column beside it",
+    href: SRC.board,
+    readOn: READ_ON,
   },
   {
-    feature:
-      "Token pillar breakdown (input / output / cache-read / cache-write)",
-    clawdboard: "Yes",
-    sigrank: "Yes",
+    label: "Time views",
+    value: "today, 7d, 30d, month, ytd and a custom range",
+    href: SRC.board,
+    readOn: READ_ON,
   },
   {
-    feature: "Cascade efficiency score (Υ = cache_read × output / input²)",
-    clawdboard: "No (ranks by cost + tokens + streaks)",
-    sigrank: "Yes",
+    label: "Registered developers",
+    value: "96",
+    href: SRC.stats,
+    readOn: READ_ON,
   },
   {
-    feature: "SNR + Leverage + Velocity",
-    clawdboard: "Partial (raw counts)",
-    sigrank: "Yes (derived metrics)",
+    label: "Tools it reads",
+    value: "The agent CLIs listed on its stats page, read from local logs",
+    href: SRC.stats,
+    readOn: READ_ON,
   },
   {
-    feature: "Class tier (IGNITER to ARCH+)",
-    clawdboard: "No",
-    sigrank: "Yes",
+    label: "What leaves your machine",
+    value: "Aggregate token counts and a model name per session, per its methodology section",
+    href: SRC.stats,
+    readOn: READ_ON,
   },
   {
-    feature: "Build archetype (10 types)",
-    clawdboard: "No (\"cooking\" project labels)",
-    sigrank: "Yes",
+    label: "Licence",
+    value: "MIT (open-source repository morgen-so/clawdboard-oss)",
+    href: SRC.repo,
+    readOn: READ_ON,
+  },
+];
+
+const WHEN_ROWS: { need: string; pick: string; why: string }[] = [
+  {
+    need: "See how much AI coding you do, at API prices, against other developers",
+    pick: "clawdboard",
+    why: "Cost is its main column and the page is built around it.",
   },
   {
-    feature: "Global operator leaderboard",
-    clawdboard: "Yes (activity-ranked)",
-    sigrank: "Yes (Yield-ranked)",
+    need: "Keep a daily habit going",
+    pick: "clawdboard",
+    why: "Streaks and active days sit next to cost on its board.",
   },
   {
-    feature: "Operator profiles + head-to-head compare",
-    clawdboard: "Partial (profile pages)",
-    sigrank: "Yes",
+    need: "Track a team on one page",
+    pick: "clawdboard",
+    why: "It has a Teams tab next to the individual board.",
   },
   {
-    feature: "MCP server for AI-agent integration",
-    clawdboard: "No",
-    sigrank: "Yes",
+    need: "Find out whether your reused context is turning into output",
+    pick: "SigRank",
+    why: "Leverage and Velocity are built from exactly that ratio.",
   },
   {
-    feature: "ed25519-signed snapshot submission",
-    clawdboard: "No",
-    sigrank: "Yes",
+    need: "Compare two operators who spend about the same",
+    pick: "SigRank",
+    why: "Spend ties; Yield separates them.",
   },
   {
-    feature: "Streak / gamification tracking",
-    clawdboard: "Yes",
-    sigrank: "No (ranks skill, not attendance)",
-  },
-  {
-    feature: "Privacy-preserving (token counts only)",
-    clawdboard: "Yes",
-    sigrank: "Yes",
+    need: "Hand a verifiable score to someone else",
+    pick: "SigRank",
+    why: "Submissions are signed with your device key and re-scored server-side.",
   },
 ];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: "Is SigRank a clawdboard alternative?",
+    question: "Is a cost ranking the same as an efficiency ranking?",
     answer:
-      "They overlap on data but diverge on the ranking axis. clawdboard aggregates token usage, adds streak gamification and \"cooking\" project labels, and ranks by a blend of cost, tokens, streaks, and active days. SigRank takes the same token telemetry and ranks by cascade efficiency: Υ = cache_read × output / input². If you want a habit tracker for AI coding, clawdboard is fun. If you want to know who is actually skilled, SigRank is the answer. You can run both, they read the same logs.",
+      "No. A cost figure is tokens multiplied by a price per model, so it grows with how much you run. It does not say how much output that traffic produced. Yield is computed from token ratios instead, so a light user can outrank a heavy one.",
   },
   {
-    question: "What does clawdboard not measure that SigRank does?",
+    question: "Why can a cost-ranked board and a token-ranked board disagree?",
     answer:
-      "clawdboard reports cost, token totals, streaks, and active days, then blends them into a composite rank. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). clawdboard rewards showing up; SigRank rewards driving well. Streaks measure consistency; Yield measures skill.",
+      "Because price per token depends on the model. Heavy cache reuse on a cheaper model counts for a lot of tokens and not many dollars, so a cost ranking and a token ranking can order the same people differently. Neither says how much output that traffic produced; that is the gap Yield is built to close.",
   },
   {
-    question: "Can I use both clawdboard and SigRank?",
+    question: "Is a streak a skill signal?",
     answer:
-      "Yes, and they serve different purposes. clawdboard gives you the habit layer: streaks, active days, project labels, a clean UI that keeps you coming back. SigRank gives you the efficiency layer that streak counts cannot. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clawdboard for the motivation loop. The same local logs feed both.",
+      "A streak counts days of use, so it rewards regularity. A short test session and an eight-hour session both keep it alive. Treat it as a habit tracker, not a measure of how well you drive; Yield is the measure of output per fresh input.",
   },
   {
-    question: "Which is better for measuring AI coding skill?",
+    question: "Does SigRank replace clawdboard?",
     answer:
-      "SigRank. Streaks and active days measure attendance, not ability. An operator who shows up every day and re-sends the same context will have a perfect streak and a low Yield. An operator who shows up twice a week but compounds cached context into high-yield output will have a modest streak and a high Yield. If you want to find the best drivers, look at lap times, not how many days they showed up to the track.",
+      "No. They answer different questions and read the same kind of local logs. clawdboard tells you how much you ran and how consistently. SigRank tells you how much output you got per unit of fresh input you sent. Many people will want both.",
   },
   {
-    question: "clawdboard has \"cooking\" project labels. Does SigRank track projects?",
+    question: "Will my cost rank on clawdboard match my SigRank rank?",
     answer:
-      "SigRank tracks build archetypes, not project nicknames. The 10 build archetypes (e.g. Greenfield, Refactor, Debug Cascade, Migration) classify the kind of work the operator is doing, derived from the cascade signature rather than a self-applied label. This makes archetypes comparable across operators: a Debug Cascade run on one machine means the same thing as a Debug Cascade run on another. \"Cooking\" labels are fun but not comparable.",
+      "Not necessarily, and often not. SigRank's Yield is leverage times velocity, computed from token counts and not from price. Two operators with the same dollar spend can sit far apart on Yield, and a small spender can outrank a big one.",
+  },
+  {
+    question: "Is the SigRank field big enough to compare against clawdboard's?",
+    answer:
+      "No. The public SigRank board is small, so treat its percentiles as a small-sample reference rather than a population norm. See the dated figure in the body of this page and the live board for current numbers.",
   },
 ];
 
@@ -125,10 +147,10 @@ export default function VsClawdboardPage() {
             { name: "Comparisons", path: "/vs" },
             { name: "SigRank vs clawdboard", path: "/vs/clawdboard" },
           ]),
-          faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs clawdboard — Cascade vs Streaks",
-            description: "clawdboard ranks by cost, tokens, streaks, and active days. SigRank ranks by cascade efficiency. Streaks measure consistency; Yield measures skill.",
+            title: "SigRank vs clawdboard — Spend and Streaks vs Yield",
+            description:
+              "clawdboard ranks by estimated API cost, with streaks and active days. SigRank ranks by Yield. How they differ, with figures dated 11 Nov 2026.",
             path: "/vs/clawdboard",
           }),
         ]}
@@ -136,77 +158,213 @@ export default function VsClawdboardPage() {
 
       <WaveHero
         eyebrow="◈ SigRank vs clawdboard"
-        title="Streaks Measure Consistency. Yield Measures Skill."
+        title="One Board Counts Spend. The Other Counts Return."
         subtitle={
           <>
-            clawdboard has a clean UI, streak gamification, and &quot;cooking&quot;
-            project labels. It ranks by cost, tokens, streaks, and active days.
-            SigRank ranks by{" "}
-            <span className="text-gold">cascade efficiency</span>. Showing up
-            every day is good. Driving well is better.
+            clawdboard is a free community board for how much AI coding you do
+            and how often. SigRank asks a narrower question:{" "}
+            <span className="text-gold">how much output did each fresh input token buy?</span>{" "}
+            The two sit side by side without conflict.
           </>
         }
       />
 
-      {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version: clawdboard
+          What clawdboard is, in its own words
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          clawdboard aggregates token usage, layers on streak gamification and
-          &quot;cooking&quot; project labels, and ranks operators by a blend of
-          cost, tokens, streaks, and active days. It does the engagement layer
-          well: clean UI, habit-forming streaks, a sense of progress. But it
-          ranks by the wrong axis. <em>Streaks measure attendance, not
-          ability.</em> An operator who shows up daily and re-sends the same
-          context will have a perfect streak and a low signal-to-noise ratio.
-          Higher streak, lower skill, higher rank.
+          clawdboard is a free, open-source leaderboard for AI coding agents.
+          Its{" "}
+          <a href={SRC.board} className="text-gold underline underline-offset-2">
+            leaderboard page
+          </a>{" "}
+          invites you to sign in with GitHub and run{" "}
+          <span className="font-mono text-text-primary">npx clawdboard auth</span>
+          , and ranks developers on a cost column beside tokens, active days,
+          streak and a project column. Each fact below links to the page it
+          came from and shows the date we read it.
         </p>
+        <dl className="grid gap-px overflow-hidden rounded-lg border border-bg-border bg-bg-border sm:grid-cols-2">
+          {FACTS.map((f) => (
+            <div key={f.label} className="flex flex-col gap-1 bg-bg-surface p-4">
+              <dt className="font-mono text-xs uppercase tracking-wide text-text-muted">
+                {f.label}
+              </dt>
+              <dd className="font-sans text-sm leading-relaxed text-text-secondary">
+                {f.value}{" "}
+                <a
+                  href={f.href}
+                  className="text-gold underline underline-offset-2"
+                >
+                  (source, read {f.readOn})
+                </a>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What clawdboard does better
+        </h2>
+        <ul className="flex list-disc flex-col gap-2 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            <strong className="text-text-primary">Breadth of tools.</strong>{" "}
+            It reads the long list of agent tools on its stats page.
+            SigRank&apos;s cascade is built around token pillars, so a tool is
+            only useful to it if those four counts can be read out.
+          </li>
+          <li>
+            <strong className="text-text-primary">Dollar framing.</strong> If
+            your question is &quot;what would this have cost at API prices?&quot;,
+            a cost column answers it directly. SigRank does not rank on price.
+          </li>
+          <li>
+            <strong className="text-text-primary">Habit and social loop.</strong>{" "}
+            Streaks and a project column give people a reason to
+            come back and a place to point at what they ship.
+          </li>
+          <li>
+            <strong className="text-text-primary">A larger crowd.</strong> On{" "}
+            {READ_ON} its{" "}
+            <a href={SRC.stats} className="text-gold underline underline-offset-2">
+              stats page
+            </a>{" "}
+            reported 96 registered developers, more than the public SigRank
+            board had on the same date.
+          </li>
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          The methodological difference
+        </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank takes the same four token pillars and asks a different
-          question: <strong className="text-text-primary">is the cascade
-          compounding or burning?</strong> The headline metric, Υ Yield =
-          cache_read × output / input², rewards the operator who reuses cached
-          context efficiently and penalizes the one who burns fresh input
-          without leverage. clawdboard counts the days; SigRank grades the
-          driving. Both matter. Only one tells you who is skilled.
+          Both tools start from the same four token counts: input, output,
+          cache-read and cache-write. clawdboard prices them. SigRank takes
+          ratios of them. The headline metric is{" "}
+          <span className="font-mono text-gold">
+            Υ Yield = Leverage × Velocity
+          </span>
+          , where Leverage is cache-read per fresh input token and Velocity is
+          output per fresh input token (a ratio, not a speed). SNR, the output
+          share of fresh traffic, sits alongside.
+        </p>
+        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+          <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
+            Worked example (hypothetical numbers, for illustration only)
+          </p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full border-collapse font-sans text-sm">
+              <thead>
+                <tr className="border-b border-bg-border text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                  <th className="py-2 pr-4"> </th>
+                  <th className="py-2 pr-4">Operator A</th>
+                  <th className="py-2">Operator B</th>
+                </tr>
+              </thead>
+              <tbody className="text-text-secondary">
+                <tr className="border-b border-bg-border-subtle">
+                  <td className="py-2 pr-4 text-text-primary">Fresh input</td>
+                  <td className="py-2 pr-4">1M</td>
+                  <td className="py-2">8M</td>
+                </tr>
+                <tr className="border-b border-bg-border-subtle">
+                  <td className="py-2 pr-4 text-text-primary">Output</td>
+                  <td className="py-2 pr-4">4M</td>
+                  <td className="py-2">4M</td>
+                </tr>
+                <tr className="border-b border-bg-border-subtle">
+                  <td className="py-2 pr-4 text-text-primary">Cache-read</td>
+                  <td className="py-2 pr-4">200M</td>
+                  <td className="py-2">200M</td>
+                </tr>
+                <tr className="border-b border-bg-border-subtle">
+                  <td className="py-2 pr-4 text-text-primary">Leverage</td>
+                  <td className="py-2 pr-4">200 / 1 = 200</td>
+                  <td className="py-2">200 / 8 = 25</td>
+                </tr>
+                <tr className="border-b border-bg-border-subtle">
+                  <td className="py-2 pr-4 text-text-primary">Velocity</td>
+                  <td className="py-2 pr-4">4 / 1 = 4</td>
+                  <td className="py-2">4 / 8 = 0.5</td>
+                </tr>
+                <tr className="border-b border-bg-border-subtle">
+                  <td className="py-2 pr-4 text-text-primary">SNR</td>
+                  <td className="py-2 pr-4">4 / (4 + 1) = 0.80</td>
+                  <td className="py-2">4 / (4 + 8) = 0.33</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4 text-text-primary">Υ Yield</td>
+                  <td className="py-2 pr-4 font-medium text-gold">800</td>
+                  <td className="py-2 font-medium text-gold">12.5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+            Same output, same cache-read, and B sends eight times the fresh
+            input. B also moves more tokens in total, so on a board that sorts
+            by volume or by a cost that tracks it, B edges ahead. On Yield, A
+            is 64 times higher. A streak would not separate them at all if both
+            ran every day.
+          </p>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          How big is the SigRank field?
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Small. On {SIGRANK_READ_ON} the{" "}
+          <Link href="/board/30d" className="text-gold underline underline-offset-2">
+            30-day board
+          </Link>{" "}
+          had {SIGRANK_OPERATORS_30D} public operators, so read SigRank
+          percentiles as a snapshot of a few people, not a population norm. The{" "}
+          <Link href="/board/all" className="text-gold underline underline-offset-2">
+            all-time board
+          </Link>{" "}
+          is current, and the definitions are in the{" "}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            methodology
+          </Link>
+          .
         </p>
       </section>
 
-      {/* Comparison table */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Feature comparison
+          Use clawdboard when, use SigRank when
         </h2>
         <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
           <table className="w-full border-collapse font-sans text-sm">
             <thead>
-              <tr className="border-b border-bg-border bg-bg-elevated">
-                <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  Feature
-                </th>
-                <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  clawdboard
-                </th>
-                <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-gold">
-                  SigRank
-                </th>
+              <tr className="border-b border-bg-border bg-bg-elevated text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                <th className="px-4 py-3">If you want to</th>
+                <th className="px-4 py-3">Reach for</th>
+                <th className="px-4 py-3">Because</th>
               </tr>
             </thead>
             <tbody>
-              {COMPARE_ROWS.map((r) => (
+              {WHEN_ROWS.map((r) => (
                 <tr
-                  key={r.feature}
+                  key={r.need}
                   className="border-b border-bg-border-subtle last:border-0"
                 >
-                  <td className="px-4 py-2.5 text-text-primary">{r.feature}</td>
-                  <td className="px-4 py-2.5 text-text-secondary">
-                    {r.clawdboard}
+                  <td className="px-4 py-2.5 text-text-primary">{r.need}</td>
+                  <td
+                    className={`px-4 py-2.5 font-medium ${
+                      r.pick === "SigRank" ? "text-gold" : "text-text-secondary"
+                    }`}
+                  >
+                    {r.pick}
                   </td>
-                  <td className="px-4 py-2.5 font-medium text-gold">
-                    {r.sigrank}
-                  </td>
+                  <td className="px-4 py-2.5 text-text-secondary">{r.why}</td>
                 </tr>
               ))}
             </tbody>
@@ -214,93 +372,60 @@ export default function VsClawdboardPage() {
         </div>
       </section>
 
-      {/* Why the cascade matters */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Why streaks and active days aren&apos;t enough
+          A workflow that uses both
         </h2>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          clawdboard answers <em>&quot;how consistent am I?&quot;</em> That is
-          a habit question, not a skill question. Two operators can have the
-          same 30-day streak and get wildly different outcomes. One reuses
-          cached context efficiently and produces 30K output tokens per
-          session; the other re-sends the same context every turn and produces
-          3K. Same streak, ten-fold difference in signal. On a streak
-          leaderboard, they tie. On a Yield leaderboard, the gap is obvious.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s headline metric,{" "}
-          <span className="font-mono text-gold">
-            Υ = cache_read × output / input²
-          </span>
-          , measures exactly that gap. It rewards the operator who compounds
-          cached context into output and penalizes the one who burns fresh
-          input without leverage. clawdboard counts the days you showed up;
-          SigRank tells you whether the cascade you ran was{" "}
-          <em>compounding or burning</em>.
-        </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-          <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
-            The four token pillars (both tools read these)
-          </p>
-          <ul className="mt-3 flex flex-col gap-1.5 font-sans text-sm text-text-secondary">
-            <li>
-              <strong className="text-text-primary">Input</strong>: tokens you
-              send to the model
-            </li>
-            <li>
-              <strong className="text-text-primary">Output</strong>: tokens the
-              model generates back
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-read</strong>: cached
-              tokens reused from prior context
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-write</strong>: new
-              tokens written to cache for future reuse
-            </li>
-          </ul>
-        </div>
+        <ol className="flex list-decimal flex-col gap-2 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            Leave clawdboard syncing in the background. Check it for spend and
+            streak.
+          </li>
+          <li>
+            Once a week, run a SigRank dry run and read Leverage and Velocity.
+          </li>
+          <li>
+            If clawdboard cost climbs while Velocity falls, you are sending
+            more fresh input for the same output. Look at what got re-sent
+            instead of cached.
+          </li>
+          <li>
+            If cost is flat and Velocity climbs, the work is getting denser.
+            That is the case clawdboard cannot show you.
+          </li>
+        </ol>
       </section>
 
-      {/* The upgrade path */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          From streaks to Yield
+          Adding SigRank if you already use clawdboard
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          If you already run clawdboard, you have the logs. SigRank reads the
-          same telemetry and adds the efficiency layer streak rankings never
-          had:
+          Nothing to remove. SigRank reads local usage separately, so
+          clawdboard keeps working as it does today. Create a connect code in
+          Settings on signalaf.com, then:
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
-            {`npm install -g sigrank
-sigrank enroll      # link this device (connect code from Settings)
-sigrank submit --dry-run  # inspect payload; nothing sent
-sigrank submit      # reads logs, scores, signs, publishes`}
+            {`npx sigrank                    # look at your local usage first
+npx sigrank enroll             # bind this device with the connect code
+npx sigrank submit --dry-run   # see the payload; nothing is sent
+npx sigrank submit             # publish a signed snapshot`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Prefer to inspect before you submit? Run{" "}
-          <span className="font-mono text-text-primary">
-            npx sigrank submit --dry-run
-          </span>{" "}
-          to see your scored payload locally, or paste your token counts into
-          the{" "}
+          Want the numbers without an account? The{" "}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and velocity instantly,
-          no account, no submission, just the numbers.
+          takes your four token counts and returns Υ Yield, Leverage,
+          Velocity and SNR in the browser.
         </p>
       </section>
 
-      {/* FAQ */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Frequently asked questions
+          Questions people ask about clawdboard and SigRank
         </h2>
         <dl className="flex flex-col gap-5">
           {FAQS.map((f) => (
@@ -314,15 +439,20 @@ sigrank submit      # reads logs, scores, signs, publishes`}
         </dl>
       </section>
 
-      {/* CTA */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Ready to see your Yield?
+          See your own Yield
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Keep clawdboard for the streak loop. Add the efficiency layer that
-          streak counts cannot provide. Install SigRank and submit your first
-          signed snapshot in under a minute.
+          Keep clawdboard for spend and streaks. Paste four token counts into the calculator to see Υ
+          Yield, Leverage, Velocity and SNR, or read how to{" "}
+          <Link
+            href="/guides/how-to-measure-ai-coding-efficiency"
+            className="text-gold underline underline-offset-2"
+          >
+            measure AI coding efficiency
+          </Link>
+          .
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -340,7 +470,29 @@ sigrank submit      # reads logs, scores, signs, publishes`}
         </div>
       </section>
 
-      {/* ── Cross-links ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Sources and read dates
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          clawdboard facts link to{" "}
+          <a href={SRC.board} className="text-gold underline underline-offset-2">
+            its leaderboard
+          </a>
+          ,{" "}
+          <a href={SRC.stats} className="text-gold underline underline-offset-2">
+            its stats page
+          </a>{" "}
+          and{" "}
+          <a href={SRC.repo} className="text-gold underline underline-offset-2">
+            its repository
+          </a>
+          , all read on {READ_ON}. The SigRank operator count is from the
+          30-day board, read on {SIGRANK_READ_ON}. clawdboard changes often;
+          check its pages for anything that matters to you.
+        </p>
+      </section>
+
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
@@ -366,10 +518,14 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           </Link>
           {" · "}
           <Link
-            href="/vs/wakatime"
+            href="/board/all"
             className="text-gold underline underline-offset-2"
           >
-            SigRank vs WakaTime
+            The leaderboard
+          </Link>
+          {" · "}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            Methodology
           </Link>
         </p>
       </section>

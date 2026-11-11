@@ -132,8 +132,8 @@ const COMPARISONS = [
   },
   {
     href: "/vs/clawdboard",
-    title: "SigRank vs clawdboard — Cascade vs Streaks",
-    desc: "clawdboard ranks by cost, tokens, streaks, and active days. SigRank ranks by cascade efficiency. Streaks measure consistency; Yield measures skill.",
+    title: "SigRank vs clawdboard — Spend and Streaks vs Yield",
+    desc: "clawdboard ranks by estimated API cost, with streaks and active days alongside. SigRank ranks by Yield. What each tells you.",
   },
   {
     href: "/vs/costhawk",
@@ -157,8 +157,8 @@ const COMPARISONS = [
   },
   {
     href: "/vs/tokscale",
-    title: "SigRank vs Tokscale — Yield vs Volume Leaderboard",
-    desc: "Tokscale ranks by total tokens burned across 40+ tools. SigRank ranks by Yield efficiency. Volume is noise; Yield is signal.",
+    title: "SigRank vs Tokscale — Token Volume vs Yield",
+    desc: "Tokscale is a multi-agent token and cost tracker whose board sorts by tokens or cost. SigRank ranks by Yield.",
   },
   {
     href: "/vs/aiusage",

@@ -1,117 +1,106 @@
 /**
- * app/vs/tokscale/page.tsx — "SigRank vs Tokscale" SEO comparison page.
+ * app/vs/tokscale/page.tsx — "SigRank vs Tokscale".
  *
- * Angle: Tokscale has the biggest board (2,100+ users, 40+ tools) but ranks by
- * volume. SigRank ranks by Yield efficiency. Volume is noise; Yield is signal.
+ * Rebuilt 2026-11-11 from Tokscale's own README (github.com/junhoyeo/tokscale),
+ * its leaderboard (tokscale.ai/leaderboard) and the GitHub API, plus a live read
+ * of the public SigRank board. Tokscale claims below are things its own pages
+ * state; SigRank numbers were fetched on the as-of date. Canon names only
+ * (lib/identity/canon-ids.ts, token-era board).
  *
- * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
- * WaveHero, and a styled comparison table matching the repo's table conventions.
+ * RSC only — no client JS.
  */
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
+import { breadcrumb, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
+const README_READ_ON = "11 November 2026";
+const BOARD_READ_ON = "10 November 2026";
+const SIGRANK_READ_ON = "11 November 2026";
+const SIGRANK_OPERATORS_30D = 7;
+
+const SRC = {
+  readme: "https://github.com/junhoyeo/tokscale#readme",
+  board: "https://tokscale.ai/leaderboard",
+};
+
+// Figures as published on Tokscale's board in the view read on BOARD_READ_ON.
+const BOARD = {
+  rankedUsers: "2,452",
+  rows: [
+    { rank: "#7", tokens: "1.32T", cost: "$288.21K", perMillion: "about $0.22" },
+    { rank: "#45", tokens: "450.0B", cost: "$4.50M", perMillion: "about $10.00" },
+  ],
+};
+
 export const metadata: Metadata = withOG({
-  title: "SigRank vs Tokscale \u2014 Yield vs Volume Leaderboard",
+  title: "SigRank vs Tokscale — Token Volume vs Yield",
   description:
-    "Tokscale ranks by total tokens burned across 40+ tools. SigRank ranks by Yield efficiency. Volume is noise; Yield is signal.",
+    "Tokscale tracks tokens and cost across many agent tools; its board sorts by tokens or cost. SigRank ranks by Yield. Figures dated Nov 2026.",
   path: "/vs/tokscale",
 });
 
-// Comparison rows — feature-by-feature, Tokscale vs SigRank.
-const COMPARE_ROWS: { feature: string; tokscale: string; sigrank: string }[] = [
+const SIDE_BY_SIDE: { aspect: string; tokscale: string; sigrank: string }[] = [
   {
-    feature: "Reads Claude Code token logs",
-    tokscale: "Yes",
-    sigrank: "Yes (bundles ccusage)",
+    aspect: "Primary job",
+    tokscale: "Local usage and cost reports across many agent tools, plus a public board",
+    sigrank: "Operator-efficiency ranking from four token pillars",
   },
   {
-    feature:
-      "Token pillar breakdown (input / output / cache-read / cache-write)",
-    tokscale: "Yes",
-    sigrank: "Yes",
+    aspect: "Public board sorts by",
+    tokscale: "Tokens or cost (a switch on the page)",
+    sigrank: "Υ Yield (Leverage × Velocity)",
   },
   {
-    feature: "Cascade efficiency score (Υ = cache_read × output / input²)",
-    tokscale: "No (ranks by volume)",
-    sigrank: "Yes",
+    aspect: "Price enters the score",
+    tokscale: "Yes: pricing from LiteLLM, with OpenRouter fallback",
+    sigrank: "No, ranking uses token ratios (cost per 1M is shown as its own metric)",
   },
   {
-    feature: "SNR + Leverage + Velocity",
-    tokscale: "Partial (raw counts)",
-    sigrank: "Yes (derived metrics)",
+    aspect: "Submission check",
+    tokscale: "Level 1 validation: totals consistent, no future dates, required fields, duplicates",
+    sigrank: "Signed snapshot, verified and re-scored by the server",
   },
   {
-    feature: "Class tier (IGNITER to ARCH+)",
-    tokscale: "No",
-    sigrank: "Yes",
-  },
-  {
-    feature: "Build archetype (10 types)",
-    tokscale: "No",
-    sigrank: "Yes",
-  },
-  {
-    feature: "Global operator leaderboard",
-    tokscale: "Yes (2,100+ users, volume-ranked)",
-    sigrank: "Yes (Yield-ranked)",
-  },
-  {
-    feature: "Operator profiles + head-to-head compare",
-    tokscale: "Partial (profile pages)",
-    sigrank: "Yes",
-  },
-  {
-    feature: "MCP server for AI-agent integration",
-    tokscale: "No",
-    sigrank: "Yes",
-  },
-  {
-    feature: "ed25519-signed snapshot submission",
-    tokscale: "No",
-    sigrank: "Yes",
-  },
-  {
-    feature: "Tool coverage",
-    tokscale: "40+ tools",
-    sigrank: "15+ platforms (Claude, Cursor, Copilot, Gemini)",
-  },
-  {
-    feature: "Privacy-preserving (token counts only)",
-    tokscale: "Yes",
-    sigrank: "Yes",
+    aspect: "Local viewing without publishing",
+    tokscale: "Yes: interactive terminal UI with ten views, JSON export",
+    sigrank: "Yes: npx sigrank, and submit --dry-run",
   },
 ];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: "Is SigRank a Tokscale alternative?",
+    question: "Is a cost sort the same as an efficiency sort?",
     answer:
-      "They overlap on data collection but diverge on the question they answer. Tokscale aggregates token usage across 40+ tools and ranks operators by total volume burned. SigRank takes the same token telemetry and ranks by Yield efficiency: Υ = cache_read × output / input². If you want the biggest board by headcount, Tokscale wins. If you want to know who is actually efficient, SigRank is the answer. You can run both, they read the same logs.",
+      "No. A cost figure is tokens multiplied by a price per model, so it grows with how much you run. Yield is computed from token ratios, so a light user can outrank a heavy one.",
   },
   {
-    question: "What does Tokscale not measure that SigRank does?",
+    question: "Why can a tokens sort and a cost sort order people differently?",
     answer:
-      "Tokscale reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). Tokscale tells you who burned the most; SigRank tells you who got the most signal per token spent. Volume rewards the operator who never stops typing; Yield rewards the one who compounds.",
+      "Dollars per token varies by model and by how much of the traffic is cheap cache reads. The body of this page shows a dated example from a public board.",
   },
   {
-    question: "Can I use both Tokscale and SigRank?",
+    question: "Does SigRank work alongside a usage tracker like Tokscale?",
     answer:
-      "Yes, and many operators do. Tokscale gives you the widest tool coverage and the largest community board. SigRank gives you the efficiency layer that volume rankings cannot. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your Tokscale profile for the volume crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. SigRank reads local usage on its own, so a tracker keeps working as it does today. Use the tracker for inventory and spend and SigRank for the output-per-fresh-input ratio.",
   },
   {
-    question: "Which is better for finding the most skilled AI operators?",
+    question: "Can I submit to both boards?",
     answer:
-      "SigRank. Volume leaderboards conflate activity with skill. An operator who burns 50M tokens re-sending the same context every turn will outrank one who burns 5M tokens but compounds cached context into high-yield output. Yield filters out that noise: it rewards the operator whose cascade is compounding, not the one whose burn rate is highest. If you want to find the best drivers, look at lap times, not fuel consumption.",
+      "Yes, they are independent. Tokscale submits with its own CLI and API token; SigRank enrolls a device with a connect code and submits a signed snapshot. Neither needs the other installed.",
   },
   {
-    question: "Tokscale has 2,100+ users and 40+ tools. Why is SigRank's board smaller?",
+    question: "Is Yield a better number than tokens or cost?",
     answer:
-      "Because SigRank measures a harder thing. Counting tokens is easy and scales to anyone with a log file. Computing a signed, cascade-scored, class-tiered snapshot requires the four pillars to be present and the operator to enroll an ed25519 identity. The SigRank board is smaller by design: every entry is a verified, scored, comparable signal, not a raw volume counter. Bigger is not better when bigger means noisier.",
+      "It answers a different question. Tokens and cost say how much you ran. Yield says how much output you got per fresh input once cached context is counted. Yield ignores scale on purpose, so a light user can score high, and it does not say anything about the quality of the work produced. Scale V, the log of total tokens, is shown beside it for exactly that reason.",
+  },
+  {
+    question: "How large is the SigRank field?",
+    answer:
+      "Small. The public SigRank board is a small field, so use its figures as a snapshot rather than a population norm. See the dated figure in the body of this page and the live board.",
   },
 ];
 
@@ -124,10 +113,10 @@ export default function VsTokscalePage() {
             { name: "Comparisons", path: "/vs" },
             { name: "SigRank vs Tokscale", path: "/vs/tokscale" },
           ]),
-          faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs Tokscale — Yield vs Volume Leaderboard",
-            description: "Tokscale ranks by total tokens burned across 40+ tools. SigRank ranks by Yield efficiency. Volume is noise; Yield is signal.",
+            title: "SigRank vs Tokscale — Token Volume vs Yield",
+            description:
+              "Tokscale tracks tokens and cost across many agent tools; its board sorts by tokens or cost. SigRank ranks by Yield. Figures dated Nov 2026.",
             path: "/vs/tokscale",
           }),
         ]}
@@ -135,170 +124,289 @@ export default function VsTokscalePage() {
 
       <WaveHero
         eyebrow="◈ SigRank vs Tokscale"
-        title="Volume Is Noise. Yield Is Signal."
+        title="Tokscale Counts What You Burned. SigRank Counts What It Bought."
         subtitle={
           <>
-            Tokscale has the biggest board (2,100+ users, 40+ tools) and ranks
-            by total tokens burned. SigRank ranks by{" "}
-            <span className="text-gold">Υ Yield efficiency</span>. Same data,
-            different question. Volume tells you who typed the most; Yield
-            tells you who drove the best.
+            Tokscale is a broad, fast tracker with the larger public board.
+            SigRank is a narrow instrument that ranks the{" "}
+            <span className="text-gold">ratio</span> between fresh input, cached
+            context and output. If you run Tokscale already, this page shows
+            what a second number adds.
           </>
         }
       />
 
-      {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version: Tokscale
+          What Tokscale is, from its README and leaderboard
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Tokscale aggregates token usage across 40+ AI tools and publishes a
-          community leaderboard ranked by total volume. It does the
-          aggregation layer well: wide coverage, big board, active community.
-          But it ranks by the wrong axis. <em>Volume is a measure of
-          activity, not skill.</em> An operator who re-sends the same context
-          every turn and burns 50M input tokens will outrank one who compounds
-          cached context and burns 5M. Same tool, ten times the waste, higher
-          rank.
+          Per its{" "}
+          <a href={SRC.readme} className="text-gold underline underline-offset-2">
+            README
+          </a>{" "}
+          (read {README_READ_ON}), Tokscale is a CLI and visualization
+          dashboard for token usage and cost across AI coding agents. It reads
+          local session files for many clients, including Claude Code, prices
+          them with LiteLLM data, and shows the result in a terminal UI or as
+          JSON. It is MIT licensed. Publishing is optional:{" "}
+          <span className="font-mono text-text-primary">tokscale submit</span>{" "}
+          sends your totals to tokscale.ai, where the{" "}
+          <a href={SRC.board} className="text-gold underline underline-offset-2">
+            all-time leaderboard
+          </a>{" "}
+          listed {BOARD.rankedUsers} ranked users when read on {BOARD_READ_ON}.
         </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank takes the same four token pillars and asks a different
-          question: <strong className="text-text-primary">is the cascade
-          compounding or burning?</strong> The headline metric, Υ Yield =
-          cache_read × output / input², rewards the operator who reuses cached
-          context efficiently and penalizes the one who burns fresh input
-          without leverage. Tokscale counts the fuel; SigRank measures the lap
-          time. Both matter. Only one tells you who is winning.
-        </p>
-      </section>
-
-      {/* Comparison table */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-mono text-base font-bold text-text-primary">
-          Feature comparison
-        </h2>
         <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
           <table className="w-full border-collapse font-sans text-sm">
             <thead>
-              <tr className="border-b border-bg-border bg-bg-elevated">
-                <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  Feature
-                </th>
-                <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  Tokscale
-                </th>
-                <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-gold">
-                  SigRank
-                </th>
+              <tr className="border-b border-bg-border bg-bg-elevated text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                <th className="px-4 py-3">Aspect</th>
+                <th className="px-4 py-3">Tokscale</th>
+                <th className="px-4 py-3 text-gold">SigRank</th>
               </tr>
             </thead>
             <tbody>
-              {COMPARE_ROWS.map((r) => (
+              {SIDE_BY_SIDE.map((r) => (
                 <tr
-                  key={r.feature}
+                  key={r.aspect}
                   className="border-b border-bg-border-subtle last:border-0"
                 >
-                  <td className="px-4 py-2.5 text-text-primary">{r.feature}</td>
-                  <td className="px-4 py-2.5 text-text-secondary">
-                    {r.tokscale}
-                  </td>
-                  <td className="px-4 py-2.5 font-medium text-gold">
-                    {r.sigrank}
-                  </td>
+                  <td className="px-4 py-2.5 text-text-primary">{r.aspect}</td>
+                  <td className="px-4 py-2.5 text-text-secondary">{r.tokscale}</td>
+                  <td className="px-4 py-2.5 text-text-secondary">{r.sigrank}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          Tokscale column: its{" "}
+          <a href={SRC.readme} className="text-gold underline underline-offset-2">
+            README
+          </a>{" "}
+          (read {README_READ_ON}) and{" "}
+          <a href={SRC.board} className="text-gold underline underline-offset-2">
+            leaderboard
+          </a>{" "}
+          (read {BOARD_READ_ON}).
+        </p>
       </section>
 
-      {/* Why the cascade matters */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Why raw token counts aren&apos;t enough
+          Where Tokscale is the better tool
+        </h2>
+        <ul className="flex list-disc flex-col gap-2 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            <strong className="text-text-primary">Coverage.</strong> If you
+            switch between several agents in a week, one tool that reads all of
+            them gives a single total. SigRank is not trying to be that
+            inventory.
+          </li>
+          <li>
+            <strong className="text-text-primary">Local reporting.</strong>{" "}
+            Per-workspace and per-machine groupings, date filters, custom price
+            overrides and an autosubmit schedule are real working features for
+            anyone who has to account for spend.
+          </li>
+          <li>
+            <strong className="text-text-primary">Honest pricing rules.</strong>{" "}
+            Its{" "}
+            <a href={SRC.readme} className="text-gold underline underline-offset-2">
+              README
+            </a>{" "}
+            says unpriced usage is excluded from submission rather
+            than guessed, and lists the reasons a message is skipped. That is a
+            careful choice, and worth copying.
+          </li>
+          <li>
+            <strong className="text-text-primary">Reach.</strong> A board of
+            {" "}{BOARD.rankedUsers} users ({BOARD_READ_ON}) and a profile embed
+            you can paste into a GitHub README give it social reach SigRank does not have yet.
+          </li>
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          One board, a wide spread in price per token
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Tokscale answers <em>&quot;who burned the most tokens?&quot;</em>{" "}
-          That is a popularity contest, not a skill ranking. Two operators can
-          spend the same 50K input tokens and get wildly different outcomes.
-          One reuses cached context efficiently and produces 30K output tokens;
-          the other re-sends the same context every turn and produces 3K. Same
-          spend, ten-fold difference in signal. On a volume leaderboard, they
-          tie. On a Yield leaderboard, the gap is obvious.
+          Tokscale&apos;s leaderboard makes a good case study for why a single
+          volume or cost figure hides a lot. In the all-time view read on{" "}
+          {BOARD_READ_ON}, two entries looked like this:
         </p>
+        <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full border-collapse font-sans text-sm">
+            <thead>
+              <tr className="border-b border-bg-border bg-bg-elevated text-left font-mono text-xs uppercase tracking-wide text-text-muted">
+                <th className="px-4 py-3">Tokscale rank</th>
+                <th className="px-4 py-3">Tokens</th>
+                <th className="px-4 py-3">Cost shown</th>
+                <th className="px-4 py-3">Cost per 1M tokens</th>
+              </tr>
+            </thead>
+            <tbody className="text-text-secondary">
+              {BOARD.rows.map((r) => (
+                <tr
+                  key={r.rank}
+                  className="border-b border-bg-border-subtle last:border-0"
+                >
+                  <td className="px-4 py-2.5 text-text-primary">{r.rank}</td>
+                  <td className="px-4 py-2.5">{r.tokens}</td>
+                  <td className="px-4 py-2.5">{r.cost}</td>
+                  <td className="px-4 py-2.5">{r.perMillion}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s headline metric,{" "}
-          <span className="font-mono text-gold">
-            Υ = cache_read × output / input²
-          </span>
-          , measures exactly that gap. It rewards the operator who compounds
-          cached context into output and penalizes the one who burns fresh
-          input without leverage. Tokscale gives you the four integers and sums
-          them; SigRank tells you whether the cascade they describe is{" "}
-          <em>compounding or burning</em>.
+          Sorted by tokens, #7 is well ahead. Sorted by cost, #45 is. Neither
+          row says how much of that traffic was fresh input versus cache reads
+          versus output, which is what decides whether the work was dense. The
+          per-million column is our own division of the figures Tokscale
+          published on that date; it is not a Tokscale metric. SigRank carries the same idea as its own
+          canonical metric, Cost per 1M, next to the ranking one.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          The methodological difference, worked through
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Tokscale reads the four token counts and totals them (with a price on
+          top). SigRank keeps them apart and takes ratios:{" "}
+          <span className="font-mono text-gold">Leverage</span> is cache-read
+          per fresh input token, <span className="font-mono text-gold">Velocity</span>{" "}
+          is output per fresh input token, and{" "}
+          <span className="font-mono text-gold">Υ Yield = Leverage × Velocity</span>.
+          Velocity here is a ratio, not a rate over time.
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
-            The four token pillars (both tools read these)
+            Hypothetical, for illustration only
           </p>
-          <ul className="mt-3 flex flex-col gap-1.5 font-sans text-sm text-text-secondary">
+          <ul className="mt-3 flex flex-col gap-3 font-sans text-sm leading-relaxed text-text-secondary">
             <li>
-              <strong className="text-text-primary">Input</strong>: tokens you
-              send to the model
+              <strong className="text-text-primary">Operator C:</strong> 10M
+              fresh input, 5M output, 2,000M cache-read. About 2.0B tokens in
+              total. Leverage 200, Velocity 0.5, Yield 100, SNR 0.33.
             </li>
             <li>
-              <strong className="text-text-primary">Output</strong>: tokens the
-              model generates back
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-read</strong>: cached
-              tokens reused from prior context
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-write</strong>: new
-              tokens written to cache for future reuse
+              <strong className="text-text-primary">Operator D:</strong> 1M
+              fresh input, 3M output, 300M cache-read. About 0.3B tokens in
+              total. Leverage 300, Velocity 3, Yield 900, SNR 0.75.
             </li>
           </ul>
+          <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
+            On a tokens board C sits roughly 6.6 times above D. On Yield D is 9
+            times above C. C re-reads a great deal of context and sends a lot
+            of fresh input for each unit of output it gets back; D sends little
+            and gets a lot.
+          </p>
         </div>
       </section>
 
-      {/* The upgrade path */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          From volume to Yield
+          How big is the SigRank field?
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          If you already run Tokscale, you have the logs. SigRank reads the
-          same telemetry and adds the scoring layer volume rankings never had:
+          Small. On {SIGRANK_READ_ON} the{" "}
+          <Link href="/board/30d" className="text-gold underline underline-offset-2">
+            30-day board
+          </Link>{" "}
+          had {SIGRANK_OPERATORS_30D} public operators, so read SigRank
+          percentiles as a snapshot of a few people, not a population norm. The{" "}
+          <Link href="/board/all" className="text-gold underline underline-offset-2">
+            all-time board
+          </Link>{" "}
+          is current, and the definitions are in the{" "}
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            methodology
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Use Tokscale when, use SigRank when
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
+              Use Tokscale when
+            </p>
+            <ul className="mt-3 flex list-disc flex-col gap-1.5 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+              <li>You use more than one agent and want one total.</li>
+              <li>You need spend by workspace, machine or model.</li>
+              <li>You want an automatic scheduled submission to a public board.</li>
+              <li>You like a README card and a year-in-review image.</li>
+            </ul>
+          </div>
+          <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+            <p className="font-mono text-xs uppercase tracking-wide text-gold">
+              Use SigRank when
+            </p>
+            <ul className="mt-3 flex list-disc flex-col gap-1.5 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+              <li>You want to know if reused context is becoming output.</li>
+              <li>You want to compare operators of very different size.</li>
+              <li>You want a signed, server-verified score to point to.</li>
+              <li>You want one ratio to track from week to week.</li>
+            </ul>
+          </div>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">Using both.</strong> Let Tokscale
+          hold the inventory: which tools, which models, what it cost. Once a
+          week, run a SigRank dry run and look at Leverage and Velocity. A
+          rising Tokscale total with falling Velocity means more fresh input is
+          going in for the same output.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Adding SigRank next to Tokscale
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Tokscale users already know the shape of this: run it once, preview,
+          then publish. Where Tokscale uses{" "}
+          <span className="font-mono text-text-primary">bunx tokscale@latest submit</span>,
+          SigRank first binds the device with a connect code from Settings on
+          signalaf.com:
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
-            {`npm install -g sigrank
-sigrank enroll      # link this device (connect code from Settings)
-sigrank submit --dry-run  # inspect payload; nothing sent
-sigrank submit      # reads logs, scores, signs, publishes`}
+            {`npx sigrank                    # inspect local usage in the terminal
+npx sigrank enroll             # bind this device using the connect code
+npx sigrank submit --dry-run   # inspect the payload without sending it
+npx sigrank submit             # publish a signed snapshot`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Prefer to inspect before you submit? Run{" "}
-          <span className="font-mono text-text-primary">
-            npx sigrank submit --dry-run
-          </span>{" "}
-          to see your scored payload locally, or paste your token counts into
-          the{" "}
+          Prefer to test by hand? Paste four token counts into the{" "}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and velocity instantly,
-          no account, no submission, just the numbers.
+          or the{" "}
+          <Link
+            href="/tools/yield-calculator"
+            className="text-gold underline underline-offset-2"
+          >
+            Yield calculator
+          </Link>
+          . You can copy the four totals out of a Tokscale JSON export.
         </p>
       </section>
 
-      {/* FAQ */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Frequently asked questions
+          Questions about Tokscale and SigRank
         </h2>
         <dl className="flex flex-col gap-5">
           {FAQS.map((f) => (
@@ -312,15 +420,20 @@ sigrank submit      # reads logs, scores, signs, publishes`}
         </dl>
       </section>
 
-      {/* CTA */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Ready to see your Yield?
+          See your own Yield
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Keep your Tokscale profile for the volume crowd. Add the efficiency
-          layer that volume rankings cannot provide. Install SigRank and
-          submit your first signed snapshot in under a minute.
+          Keep Tokscale for inventory and cost. Paste four token counts into the calculator to see Υ
+          Yield, Leverage, Velocity and SNR, or read how to{" "}
+          <Link
+            href="/guides/how-to-measure-ai-coding-efficiency"
+            className="text-gold underline underline-offset-2"
+          >
+            measure AI coding efficiency
+          </Link>
+          .
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -338,7 +451,25 @@ sigrank submit      # reads logs, scores, signs, publishes`}
         </div>
       </section>
 
-      {/* ── Cross-links ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Sources and read dates
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Tokscale facts link to its{" "}
+          <a href={SRC.readme} className="text-gold underline underline-offset-2">
+            README
+          </a>{" "}
+          (read {README_READ_ON}) and{" "}
+          <a href={SRC.board} className="text-gold underline underline-offset-2">
+            leaderboard
+          </a>{" "}
+          (view read {BOARD_READ_ON}). The SigRank operator count is from the
+          30-day board, read on {SIGRANK_READ_ON}. Tokscale ships often, so
+          check its README for current details.
+        </p>
+      </section>
+
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
@@ -350,24 +481,18 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           </Link>
           {" · "}
           <Link
-            href="/tools/yield-calculator"
+            href="/vs/clawdboard"
             className="text-gold underline underline-offset-2"
           >
-            Yield Calculator
+            SigRank vs clawdboard
           </Link>
           {" · "}
-          <Link
-            href="/vs/ccusage"
-            className="text-gold underline underline-offset-2"
-          >
-            SigRank vs ccusage
+          <Link href="/board/all" className="text-gold underline underline-offset-2">
+            The leaderboard
           </Link>
           {" · "}
-          <Link
-            href="/vs/tokenrank"
-            className="text-gold underline underline-offset-2"
-          >
-            SigRank vs TokenRank
+          <Link href="/methodology" className="text-gold underline underline-offset-2">
+            Methodology
           </Link>
         </p>
       </section>
